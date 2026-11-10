@@ -1,0 +1,16 @@
+{
+  "schema": "crypto.infra-loss/v1",
+  "id": "20261109-e14-runpod-zero-balance",
+  "observed_at": "2026-11-09",
+  "route": "runpod",
+  "cause": "balance_exhausted",
+  "what": "E14 RunPod pod oubpztzdbbbo4s removed by provider at negative balance (-0.04 USD) about 5 h in; no draw finished, scored not completed.",
+  "lost_cpu_hours": 320.0,
+  "lost_cpu_hours_derivation": "64 vCPU x about 5 h (log: 'about 5 h into the run')",
+  "lost_usd": 12.8,
+  "lost_usd_derivation": "about 5 h x costPerHr 2.56 USD; log gives a total-cost ceiling of ~USD 65 for the 24 h fallback limit, which is a limit not a spend",
+  "relaunched": false,
+  "relaunch_ref": "not relaunched: negative balance, needs a new amendment",
+  "source": "docs/session-logs/2026-11-09.md#13:15 UTC \u2014 E14 pod terminated by provider; E14 scored \"not completed\"",
+  "pcc": "[pcc:unverified]"
+}

@@ -1,0 +1,1406 @@
+From 4131f34276335068fe6a3824968ca4a20b177cf3 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 10 Nov 2026 05:04:05 +0000
+Subject: [PATCH 02/10] =?UTF-8?q?harness:=20usage=20or=20no=20receipt=20?=
+ =?UTF-8?q?=E2=80=94=20session=20receipts=20read=20Claude=20Code=20transcr?=
+ =?UTF-8?q?ipts=20(I4)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ports crypto's token_usage.py (dedup by message id, subagent lower bounds,
+cache tiers). A claude_code receipt fills usage from the newest transcript
+or refuses; absent transcript records usage_source: unavailable;
+--allow-null-usage needs a reason. Summary prints cost per evidence record
+and usage coverage by runtime (today: claude_code 0/128, codex_cli 1/47).
+
+Co-Authored-By: Claude Mythos 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AXUKfUzw574GenKpShCun6
+---
+ docs/session-receipts.md      |  15 +
+ docs/token-efficiency.md      |  10 +
+ tools/session_receipt.py      | 140 ++++++-
+ tools/test_session_receipt.py | 109 +++++-
+ tools/test_token_usage.py     | 256 +++++++++++++
+ tools/token_prices.json       |  26 ++
+ tools/token_usage.py          | 680 ++++++++++++++++++++++++++++++++++
+ 7 files changed, 1231 insertions(+), 5 deletions(-)
+ create mode 100644 tools/test_token_usage.py
+ create mode 100644 tools/token_prices.json
+ create mode 100644 tools/token_usage.py
+
+diff --git a/docs/session-receipts.md b/docs/session-receipts.md
+index 7dccc5e2d7..0927127d8b 100644
+--- a/docs/session-receipts.md
++++ b/docs/session-receipts.md
+@@ -92,3 +92,18 @@ a status wake that reads 40 files is a cost), `deep-research`,
+ an impediment writes `--outcome impeded`; a `run` that found nothing to
+ execute writes `nothing_executable`, which is the number P0.3 of the review
+ wants driven to zero.
++
++## Usage or no receipt
++
++A receipt from a Claude Code session carries usage, read from the newest
++transcript under `~/.claude/projects/` by `tools/token_usage.py` (deduplicated
++by message id, subagent output counted as a lower bound, cache tiers priced):
++`usage`, `usage_source: claude_code_transcript`, `cost_usd`, `cache_hit_ratio`,
++`requests`. `--usage-json` still wins where the runtime gives its own counters.
++A transcript that exists but cannot be read refuses the receipt (exit 2).
++No transcript at all writes `usage: null`, `usage_source: unavailable` and
++prints a warning. `--allow-null-usage '<reason>'` overrides a refusal and stores
++the reason as `usage_override_reason`. Usage is never estimated. `summary`
++prints total cost, cost per evidence record, cost per supported outcome (a
++proxy: approved or reviewed receipts that created EV-*/H-* records) and usage
++coverage by runtime.
+diff --git a/docs/token-efficiency.md b/docs/token-efficiency.md
+index 42a9012520..27f034875b 100644
+--- a/docs/token-efficiency.md
++++ b/docs/token-efficiency.md
+@@ -77,3 +77,13 @@ Per role, backend, model policy, and task class, record:
+ 
+ Optimization decisions should use token cost per validated task outcome rather
+ than raw token volume or cache-hit rate alone.
++
++## Transcript reader
++
++`tools/token_usage.py` (ported from the crypto repository, prices in
++`tools/token_prices.json`, record schema `crypto.autoresearch.token-usage.v1`)
++reads Claude Code transcripts and handles the accounting traps: dedupe by
++message id, subagent snapshot lower bounds, cache write tiers. `tools/session_receipt.py`
++calls it to fill each Claude Code receipt's usage; run it directly with
++`python3 tools/token_usage.py session [path]`. Tests:
++`python3 -m unittest tools.test_token_usage`.
+diff --git a/tools/session_receipt.py b/tools/session_receipt.py
+index 629d941d8f..fc7d3104fa 100644
+--- a/tools/session_receipt.py
++++ b/tools/session_receipt.py
+@@ -40,6 +40,9 @@ from typing import Any
+ 
+ import yaml
+ 
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++import token_usage  # noqa: E402  (ported from crypto; reads Claude Code transcripts)
++
+ try:  # libyaml, with the pure loader's errors (orchestration/fast_yaml.py)
+     import fast_yaml
+ except ImportError:  # imported as tools.<name>, the repository root importable
+@@ -70,7 +73,8 @@ def detect_runtime(env: dict[str, str] | None = None) -> str | None:
+         return env["AUTORESEARCH_RUNTIME"]
+     if env.get("CURSOR_AGENT") or env.get("CURSOR_CONVERSATION_ID"):
+         return "cursor_cloud" if env.get("CURSOR_WORKLOAD_CGROUP") else "cursor"
+-    if env.get("CLAUDECODE") or env.get("CLAUDE_CODE_ENTRYPOINT"):
++    if (env.get("CLAUDECODE") or env.get("CLAUDE_CODE_ENTRYPOINT")
++            or env.get("CLAUDE_CODE_SESSION") or env.get("CLAUDE_CODE_SESSION_ID")):
+         return "claude_code"
+     if env.get("CODEX_SANDBOX") or env.get("CODEX_CLI"):
+         return "codex_cli"
+@@ -117,6 +121,71 @@ def _git(repo_root: Path, *args: str) -> str | None:
+     return out.stdout.strip() or None
+ 
+ 
++UNAVAILABLE = "unavailable"
++TRANSCRIPT_SOURCE = "claude_code_transcript"
++
++
++class UsageRefused(ValueError):
++    """A transcript exists but cannot be read: no receipt without usage."""
++
++
++def projects_root(env: dict[str, str]) -> Path | None:
++    """~/.claude/projects from the given environment's HOME; None when no HOME."""
++    override = env.get("CLAUDE_PROJECTS_DIR")
++    if override:
++        return Path(override)
++    home = env.get("HOME")
++    return Path(home) / ".claude" / "projects" if home else None
++
++
++def usage_from_transcript(args: argparse.Namespace, runtime: str | None, repo_root: Path,
++                          env: dict[str, str]) -> dict[str, Any] | None:
++    """Usage fields from the newest Claude Code transcript, or None when absent.
++
++    Raises UsageRefused when a transcript is found but yields no usage. Never
++    estimates: every number is token_usage's deduplicated, priced total.
++    """
++    root = projects_root(env)
++    explicit = getattr(args, "transcript", None)
++    if not explicit:
++        if root is None or not root.is_dir():
++            return None
++        if runtime != "claude_code":
++            # Only a runtime that identifies itself as Claude Code may read a
++            # transcript implicitly; a plain shell on a developer machine must
++            # not attach an unrelated session's usage to its receipt.
++            return None
++        explicit = token_usage.newest_transcript(str(root), cwd=str(repo_root))
++        if not explicit:
++            return None
++    try:
++        prices = token_usage.load_prices()
++        rec = token_usage.session_record(prices, explicit)
++    except (OSError, UnicodeDecodeError, SystemExit, KeyError, TypeError, ValueError) as error:
++        raise UsageRefused(f"transcript {explicit} is unreadable ({error}); no receipt without usage "
++                           "(fix it, or pass --allow-null-usage '<reason>')") from error
++    total = rec["total"]
++    if not total["requests"]:
++        raise UsageRefused(f"transcript {explicit} holds no API responses; no receipt without usage "
++                           "(pass --allow-null-usage '<reason>' to override)")
++    tk = total["tokens"]
++    return {
++        "usage": {
++            "input_tokens": tk["input"],
++            "cache_creation_input_tokens": tk["cache_write_5m"] + tk["cache_write_1h"],
++            "cache_read_input_tokens": tk["cache_read"],
++            "output_tokens": tk["output"],
++            "thinking_tokens": tk["thinking"],
++            "prompt_tokens": total["prompt_tokens"],
++            "output_lower_bound_requests": total["output_lower_bound_requests"],
++        },
++        "cost_usd": total["cost_usd"],
++        "cache_hit_ratio": total["cache_hit_ratio"],
++        "requests": total["requests"],
++        "transcript": os.path.basename(explicit),
++    }
++
++
+ def created_by_kind(ids: list[str]) -> dict[str, list[str]]:
+     by_kind: dict[str, list[str]] = defaultdict(list)
+     for rid in ids:
+@@ -138,6 +207,26 @@ def receipt(args: argparse.Namespace, *, repo_root: Path, now: datetime | None =
+         usage = json.loads(args.usage_json)
+         if not isinstance(usage, dict):
+             raise ValueError("--usage-json must be a JSON object of the runtime's own counters")
++    usage_source = args.usage_source if usage else None
++    extra: dict[str, Any] = {"cost_usd": None, "cache_hit_ratio": None, "requests": None}
++    runtime = args.runtime or detect_runtime(env)
++    override = getattr(args, "allow_null_usage", None)
++    if override is not None and not override.strip():
++        raise ValueError("--allow-null-usage needs a reason string")
++    if usage is None and (runtime in (None, "claude_code")):
++        try:
++            found = usage_from_transcript(args, runtime, repo_root, env)
++        except UsageRefused:
++            if override is None:
++                raise
++            found = None
++        if found:
++            usage, usage_source = found.pop("usage"), TRANSCRIPT_SOURCE
++            extra = {k: found[k] for k in ("cost_usd", "cache_hit_ratio", "requests")}
++        elif runtime == "claude_code" or override is not None:
++            usage_source = UNAVAILABLE
++            print("session_receipt: warning: no Claude Code transcript found; "
++                  "usage: null, usage_source: unavailable", file=sys.stderr)
+     ids = [s for s in (args.created or "").split(",") if s.strip()]
+     rec = {
+         "schema": SCHEMA,
+@@ -146,7 +235,7 @@ def receipt(args: argparse.Namespace, *, repo_root: Path, now: datetime | None =
+         "skill": args.skill,
+         "role": args.role,
+         "mode": args.mode,
+-        "runtime": args.runtime or detect_runtime(env),
++        "runtime": runtime,
+         "model": args.model or detect_model(env),
+         "provider": getattr(args, "provider", None) or env.get("AUTORESEARCH_PROVIDER"),
+         "backend": getattr(args, "backend", None) or env.get("AUTORESEARCH_BACKEND"),
+@@ -159,7 +248,9 @@ def receipt(args: argparse.Namespace, *, repo_root: Path, now: datetime | None =
+         "files_read": args.files_read,
+         "bounced": args.bounced,
+         "usage": usage,
+-        "usage_source": args.usage_source if usage else None,
++        "usage_source": usage_source,
++        **extra,
++        "usage_override_reason": override.strip() if override else None,
+         "branch": _git(repo_root, "rev-parse", "--abbrev-ref", "HEAD"),
+         "commit": _git(repo_root, "rev-parse", "HEAD"),
+         "goal_id": args.goal,
+@@ -207,13 +298,31 @@ def summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+     usage_known = 0
+     runtime_known = model_known = provider_known = provenance_complete = 0
+     high_input_zero_record: list[str] = []
++    cost_total = 0.0
++    cost_known = costed_records = costed_ev = costed_supported = 0
++    by_runtime: dict[str, list[int]] = defaultdict(lambda: [0, 0])
++    for r in rows:
++        rt = r.get("runtime") or "unknown"
++        by_runtime[rt][0] += 1
++        by_runtime[rt][1] += bool(r.get("usage"))
++        if isinstance(r.get("cost_usd"), (int, float)):
++            made = r.get("records_created") or {}
++            cost_total += float(r["cost_usd"])
++            cost_known += 1
++            costed_records += int(r.get("records_created_count") or 0)
++            costed_ev += len(made.get("EV") or [])
++            # Proxy for a `supported` outcome (no ledger join): a reviewed or
++            # approved session that created an EV-* or H-* record.
++            costed_supported += bool(r.get("outcome") in ("approved", "reviewed")
++                                     and (made.get("EV") or made.get("H")))
+     for r in rows:
+         by_skill[r.get("skill") or "?"][r.get("outcome") or "?"] += 1
+         created[r.get("skill") or "?"] += int(r.get("records_created_count") or 0)
+         bounced[r.get("skill") or "?"] += int(r.get("bounced") or 0)
+         if r.get("usage"):
+             usage_known += 1
+-            input_tokens = (r.get("usage") or {}).get("input_tokens")
++            u = r.get("usage") or {}
++            input_tokens = u.get("prompt_tokens", u.get("input_tokens"))
+             if (isinstance(input_tokens, int) and input_tokens >= 500_000
+                     and not r.get("records_created_count")):
+                 high_input_zero_record.append(str(r.get("id") or "?"))
+@@ -230,6 +339,14 @@ def summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+         "provider_known": provider_known,
+         "provenance_complete": provenance_complete,
+         "high_input_zero_record": high_input_zero_record,
++        "cost_usd_total": round(cost_total, 6),
++        "cost_known": cost_known,
++        "cost_per_record": round(cost_total / costed_records, 6) if costed_records else None,
++        "cost_per_evidence_record": round(cost_total / costed_ev, 6) if costed_ev else None,
++        "supported_proxy_receipts": costed_supported,
++        "cost_per_supported": round(cost_total / costed_supported, 6) if costed_supported else None,
++        "usage_by_runtime": {k: {"receipts": v[0], "usage_known": v[1]}
++                             for k, v in sorted(by_runtime.items())},
+         "by_skill": {k: dict(v) for k, v in sorted(by_skill.items())},
+         "records_created_by_skill": dict(created),
+         "bounced_by_skill": {k: v for k, v in bounced.items() if v},
+@@ -245,6 +362,16 @@ def render_summary(s: dict[str, Any]) -> str:
+              f"model {s.get('model_known', 0)}/{s['receipts']}, "
+              f"provider {s.get('provider_known', 0)}/{s['receipts']}, "
+              f"complete {s.get('provenance_complete', 0)}/{s['receipts']}"]
++    def usd(x):
++        return "n/a" if x is None else f"US${x:,.4f}"
++    lines.append(
++        f"  cost (receipts with usage, {s.get('cost_known', 0)}): total {usd(s.get('cost_usd_total', 0.0))}; "
++        f"per evidence record (EV-*) {usd(s.get('cost_per_evidence_record'))}; "
++        f"per supported outcome {usd(s.get('cost_per_supported'))} "
++        f"(proxy: {s.get('supported_proxy_receipts', 0)} approved/reviewed receipts with EV-*/H-* records, no ledger join)")
++    if s.get("usage_by_runtime"):
++        lines.append("  usage coverage by runtime: " + ", ".join(
++            f"{k} {v['usage_known']}/{v['receipts']}" for k, v in s["usage_by_runtime"].items()))
+     if s.get("high_input_zero_record"):
+         lines.append("  process anomaly: >=500k input tokens and zero records: " +
+                      ", ".join(s["high_input_zero_record"]))
+@@ -283,6 +410,11 @@ def main(argv: list[str] | None = None) -> int:
+         p.add_argument("--policy", help="requested inference policy")
+         p.add_argument("--usage-json", help="runtime's own usage counters as JSON; never an estimate")
+         p.add_argument("--usage-source", help="where --usage-json came from (e.g. cursor run-info)")
++        p.add_argument("--allow-null-usage", metavar="REASON",
++                       help="write the receipt with usage null although the transcript is unreadable; "
++                            "the reason is stored in the receipt")
++        p.add_argument("--transcript", help="Claude Code session .jsonl to read usage from "
++                                            "(default: newest under ~/.claude/projects)")
+         p.add_argument("--goal", help="GOAL-* the session worked, if one")
+         p.add_argument("--notes", help="one line; anything longer belongs in a record")
+         p.add_argument("--supersedes", help="id of the receipt this one corrects")
+diff --git a/tools/test_session_receipt.py b/tools/test_session_receipt.py
+index eae570c0ad..fb9a42f244 100644
+--- a/tools/test_session_receipt.py
++++ b/tools/test_session_receipt.py
+@@ -4,6 +4,9 @@
+ from __future__ import annotations
+ 
+ import argparse
++import contextlib
++import io
++import json
+ import sys
+ import tempfile
+ import unittest
+@@ -21,7 +24,7 @@ def _args(**over) -> argparse.Namespace:
+                 created="EXP-FROB-123456,H-FROB-000001,TASK-20261007-aaaaaa,weird",
+                 files_read=12, started=None, runtime=None, model=None, policy=None,
+                 usage_json=None, usage_source=None, goal="GOAL-FROB-000001", notes=None,
+-                supersedes=None, bounced=None)
++                supersedes=None, bounced=None, allow_null_usage=None, transcript=None)
+     base.update(over)
+     return argparse.Namespace(**base)
+ 
+@@ -144,3 +147,107 @@ class ReceiptTests(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++def _line(mid, u, model="claude-opus-5-5", stop="end_turn"):
++    return {"type": "assistant", "requestId": "req_" + mid,
++            "message": {"id": mid, "model": model, "stop_reason": stop,
++                        "content": [{"type": "text"}], "usage": u}}
++
++
++def _u(inp, w1, rd, out):
++    return {"input_tokens": inp, "cache_creation_input_tokens": w1,
++            "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": w1},
++            "cache_read_input_tokens": rd, "output_tokens": out, "speed": "standard"}
++
++
++class TranscriptUsageTests(unittest.TestCase):
++    def setUp(self) -> None:
++        self.tmp = tempfile.TemporaryDirectory()
++        self.root = Path(self.tmp.name) / "repo"
++        self.root.mkdir()
++        self.home = Path(self.tmp.name) / "home"
++        self.proj = self.home / ".claude" / "projects" / "-x-repo"
++        self.proj.mkdir(parents=True)
++        self.env = {"HOME": str(self.home), "CLAUDECODE": "1"}
++        self.now = datetime(2026, 11, 10, 9, 0, tzinfo=timezone.utc)
++
++    def tearDown(self) -> None:
++        self.tmp.cleanup()
++
++    def _transcript(self, text=None):
++        path = self.proj / "sess1.jsonl"
++        if text is None:
++            rows = [_line("m1", _u(2, 10_000, 40_000, 200), stop="tool_use"),
++                    _line("m1", _u(2, 10_000, 40_000, 200), stop="tool_use"),  # duplicate block line
++                    _line("m2", _u(2, 1_000, 50_000, 300))]
++            text = "".join(json.dumps(r) + "\n" for r in rows)
++        path.write_text(text, encoding="utf-8")
++        return path
++
++    def _receipt(self, **over):
++        err = io.StringIO()
++        with contextlib.redirect_stderr(err):
++            rec = sr.receipt(_args(**over), repo_root=self.root, now=self.now, env=self.env)
++        return rec, err.getvalue()
++
++    def test_usage_filled_from_newest_transcript(self) -> None:
++        self._transcript()
++        rec, _ = self._receipt()
++        self.assertEqual(rec["usage_source"], "claude_code_transcript")
++        self.assertEqual(rec["requests"], 2)  # deduplicated by message id
++        self.assertEqual(rec["usage"]["output_tokens"], 500)
++        self.assertEqual(rec["usage"]["cache_creation_input_tokens"], 11_000)
++        self.assertEqual(rec["usage"]["cache_read_input_tokens"], 90_000)
++        self.assertAlmostEqual(rec["cost_usd"], 11_000 * 8e-6 + 90_000 * 0.2e-6 + 500 * 20e-6 + 4 * 4e-6, places=6)
++        self.assertAlmostEqual(rec["cache_hit_ratio"], round(90_000 / 101_004, 4))
++        self.assertIsNone(rec["usage_override_reason"])
++        print(json.dumps({k: rec[k] for k in ("runtime", "usage", "usage_source", "cost_usd",
++                                              "cache_hit_ratio", "requests")}))
++
++    def test_unreadable_transcript_refuses(self) -> None:
++        self._transcript("not json at all\n{broken\n")
++        with self.assertRaises(sr.UsageRefused) as ctx:
++            self._receipt()
++        self.assertIn("no receipt without usage", str(ctx.exception))
++        self.assertEqual(sr.main(["--repo-root", str(self.root), "--skill", "run", "--outcome", "ran",
++                                  "--runtime", "claude_code", "--transcript", str(self.proj / "sess1.jsonl")]), 2)
++        self.assertFalse((self.root / sr.RECEIPTS_DIR).exists())
++
++    def test_absent_transcript_writes_null_with_warning(self) -> None:
++        rec, err = self._receipt()
++        self.assertIsNone(rec["usage"])
++        self.assertEqual(rec["usage_source"], "unavailable")
++        self.assertIn("warning", err)
++
++    def test_override_requires_reason_and_is_stored(self) -> None:
++        self._transcript("garbage\n")
++        rec, _ = self._receipt(allow_null_usage="transcript truncated by container restart")
++        self.assertIsNone(rec["usage"])
++        self.assertEqual(rec["usage_source"], "unavailable")
++        self.assertEqual(rec["usage_override_reason"], "transcript truncated by container restart")
++        with self.assertRaises(ValueError):
++            self._receipt(allow_null_usage="  ")
++
++    def test_usage_json_wins_over_transcript(self) -> None:
++        self._transcript()
++        rec, _ = self._receipt(usage_json='{"input_tokens": 7}', usage_source="manual")
++        self.assertEqual(rec["usage"], {"input_tokens": 7})
++        self.assertEqual(rec["usage_source"], "manual")
++
++    def test_summary_cost_columns_and_runtime_coverage(self) -> None:
++        self._transcript()
++        a, _ = self._receipt()
++        b, _ = self._receipt(created="EXP-FROB-123456", outcome="review_required")
++        c = sr.receipt(_args(runtime="cursor"), repo_root=self.root, now=self.now, env={})
++        s = sr.summary([a, b, c])
++        self.assertEqual(s["cost_known"], 2)
++        self.assertAlmostEqual(s["cost_usd_total"], 2 * a["cost_usd"], places=5)
++        self.assertEqual(s["supported_proxy_receipts"], 1)
++        self.assertAlmostEqual(s["cost_per_supported"], 2 * a["cost_usd"], places=5)
++        self.assertIsNone(s["cost_per_evidence_record"])  # no EV-* created
++        self.assertEqual(s["usage_by_runtime"]["claude_code"], {"receipts": 2, "usage_known": 2})
++        self.assertEqual(s["usage_by_runtime"]["cursor"], {"receipts": 1, "usage_known": 0})
++        text = sr.render_summary(s)
++        self.assertIn("per supported outcome", text)
++        self.assertIn("usage coverage by runtime: claude_code 2/2, cursor 0/1", text)
+diff --git a/tools/test_token_usage.py b/tools/test_token_usage.py
+new file mode 100644
+index 0000000000..16f1f697cf
+--- /dev/null
++++ b/tools/test_token_usage.py
+@@ -0,0 +1,256 @@
++#!/usr/bin/env python3
++"""Tests for tools/token_usage.py on synthetic transcripts.
++
++Run: python3 tools/test_token_usage.py
++"""
++
++import json
++import os
++import sys
++import tempfile
++import unittest
++
++sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
++import token_usage as tu  # noqa: E402
++
++PRICES = tu.load_prices()
++
++
++def usage(inp=2, w5=0, w1=0, rd=0, out=0, think=0, speed="standard"):
++    return {"input_tokens": inp, "cache_creation_input_tokens": w5 + w1,
++            "cache_creation": {"ephemeral_5m_input_tokens": w5, "ephemeral_1h_input_tokens": w1},
++            "cache_read_input_tokens": rd, "output_tokens": out,
++            "output_tokens_details": {"thinking_tokens": think}, "speed": speed}
++
++
++def line(mid, model, u, stop="tool_use", block="text", sidechain=False):
++    return {"type": "assistant", "isSidechain": sidechain, "requestId": "req_" + mid,
++            "message": {"id": mid, "model": model, "usage": u, "stop_reason": stop,
++                        "content": [{"type": block}]}}
++
++
++def write_jsonl(path, rows):
++    os.makedirs(os.path.dirname(path), exist_ok=True)
++    with open(path, "w") as f:
++        for r in rows:
++            f.write(json.dumps(r) + "\n")
++
++
++class SessionTests(unittest.TestCase):
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory()
++        self.main = os.path.join(self.tmp.name, "s1.jsonl")
++        opus, haiku = "claude-opus-5-5", "claude-haiku-5-5"
++        u1 = usage(w1=10_000, rd=40_000, out=200, think=50)
++        u2 = usage(w1=1_000, rd=50_000, out=300)
++        final = usage(w5=1_500, rd=37_000, out=212, think=121)
++        write_jsonl(self.main, [
++            {"type": "user", "message": {"content": "hi"}},
++            # One response written as two lines (thinking block, tool_use block).
++            line("m1", opus, u1, block="thinking"),
++            line("m1", opus, u1, block="tool_use"),
++            line("m2", opus, u2),
++            line("syn", "<synthetic>", usage(out=5)),
++            {"type": "user", "toolUseResult": {"agentId": "abc", "agentType": "executor-mechanical",
++                                               "usage": final, "totalTokens": 38_714}},
++        ])
++        write_jsonl(os.path.join(self.tmp.name, "s1", "subagents", "agent-abc.jsonl"), [
++            # Streaming snapshots: no stop_reason, output far below what was billed.
++            line("a1", haiku, usage(w5=37_000, out=20), stop=None, sidechain=True),
++            line("a2", haiku, usage(w5=1_500, rd=37_000, out=3), stop=None, block="thinking", sidechain=True),
++            line("a2", haiku, usage(w5=1_500, rd=37_000, out=3), stop=None, sidechain=True),
++        ])
++
++    def tearDown(self):
++        self.tmp.cleanup()
++
++    def test_dedup_by_message_id(self):
++        rec = tu.session_record(PRICES, self.main)
++        main = next(g for g in rec["groups"] if g["agent"] == "main")
++        self.assertEqual(main["requests"], 2)
++        self.assertEqual(main["output_tokens"], 500)
++        self.assertEqual(main["tokens"]["cache_write_1h"], 11_000)
++        self.assertEqual(main["thinking_tokens"], 50)
++
++    def test_subagent_final_output_patched_and_lower_bound_flagged(self):
++        rec = tu.session_record(PRICES, self.main)
++        sub = next(g for g in rec["groups"] if g["agent"] == "agent-abc")
++        self.assertEqual(sub["agent_type"], "executor-mechanical")
++        self.assertEqual(sub["tier"], "mechanical")
++        self.assertEqual(sub["requests"], 2)
++        self.assertEqual(sub["output_tokens"], 20 + 212)  # a1 snapshot + a2 billed
++        self.assertEqual(sub["output_lower_bound_requests"], 1)
++        self.assertTrue(any("lower bound" in n for n in rec["notes"]))
++
++    def test_total_tokens_is_not_spend(self):
++        rec = tu.session_record(PRICES, self.main)
++        sub = next(g for g in rec["groups"] if g["agent"] == "agent-abc")
++        self.assertEqual(sub["prompt_tokens"], 2 + 37_000 + 2 + 1_500 + 37_000)
++        self.assertNotEqual(sub["prompt_tokens"] + sub["output_tokens"], 38_714)
++
++    def test_opus_cost_by_component(self):
++        rec = tu.session_record(PRICES, self.main)
++        main = next(g for g in rec["groups"] if g["agent"] == "main")
++        c = main["cost_usd_by_component"]
++        self.assertAlmostEqual(c["cache_write_1h"], 11_000 * 8.0e-6)
++        self.assertAlmostEqual(c["cache_read"], 90_000 * 0.20e-6)
++        self.assertAlmostEqual(c["output"], 500 * 20e-6)
++        self.assertAlmostEqual(c["input"], 4 * 4e-6)
++        # Uncached counterfactual prices every prompt token at base input.
++        self.assertAlmostEqual(main["uncached_cost_usd"], 101_004 * 4e-6 + 500 * 20e-6, places=9)
++
++    def test_tier_shares(self):
++        rec = tu.session_record(PRICES, self.main)
++        t = rec["total"]
++        self.assertAlmostEqual(t["delegated_output_share"], round(232 / 732, 4))
++        self.assertIn("core", rec["by_tier"])
++        self.assertIn("mechanical", rec["by_tier"])
++
++    def test_outcome_per_unit(self):
++        rec = tu.session_record(PRICES, self.main, {"result": "completed", "units": 2, "unit_name": "card"})
++        self.assertAlmostEqual(rec["outcome"]["cost_usd_per_unit"], round(rec["total"]["cost_usd"] / 2, 6))
++        self.assertEqual(rec["outcome"]["output_tokens_per_unit"], 366.0)
++
++    def test_session_dir_accepted(self):
++        rec = tu.session_record(PRICES, os.path.join(self.tmp.name, "s1"))
++        self.assertEqual(rec["source"]["subagents"], 1)
++
++
++class PricingTests(unittest.TestCase):
++    def test_unknown_model_version_is_not_a_known_prefix(self):
++        for model in ("claude-opus-5-6", "claude-opus-50", "claude-haiku-5-5-preview"):
++            with self.subTest(model=model):
++                self.assertIsNone(tu.price_entry(PRICES, model))
++                self.assertIsNone(tu.request_cost(PRICES, model, tu.Usage(input=100)))
++
++    def test_dated_snapshot_and_context_suffix_remain_priced(self):
++        model = "claude-opus-5-5"
++        for suffix in ("-20261006", "[1m]", "-20261006[1m]"):
++            with self.subTest(suffix=suffix):
++                self.assertEqual(tu.price_entry(PRICES, model + suffix), PRICES["models"][model])
++
++    def test_haiku_long_context_per_request(self):
++        small = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=100_000, output=1_000))
++        big = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=100_001, output=1_000))
++        self.assertAlmostEqual(small["input"], 100_000 * 0.10e-6)
++        self.assertAlmostEqual(big["input"], 100_001 * 0.50e-6)
++        self.assertAlmostEqual(big["output"], 1_000 * 2.50e-6)
++        agg = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=500_000), per_request=False)
++        self.assertIsNone(agg)
++        bounded = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=100_000), per_request=False)
++        self.assertAlmostEqual(bounded["input"], 100_000 * 0.10e-6)
++
++    def test_fast_mode(self):
++        c = tu.request_cost(PRICES, "claude-opus-5-5", tu.Usage(output=1_000, speed="fast"))
++        self.assertAlmostEqual(c["output"], 1_000 * 40e-6)
++
++    def test_unknown_model_unpriced(self):
++        g = tu.Group("x", "x", "some-other-model", "unknown")
++        g.add(PRICES, tu.Usage(output=10))
++        m = tu.metrics(g.tokens, g.cost, g.requests, g.priced)
++        self.assertIsNone(m["cost_usd"])
++
++    def test_suffixed_model_id(self):
++        self.assertEqual(tu.tier_of(PRICES, "claude-opus-5-5[1m]"), "core")
++
++    def test_missing_ttl_split_priced_as_5m(self):
++        u = tu.Usage.from_api({"input_tokens": 0, "cache_creation_input_tokens": 1000, "output_tokens": 0})
++        self.assertEqual((u.cache_write_5m, u.cache_write_1h), (1000, 0))
++
++
++class ActionTests(unittest.TestCase):
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory()
++
++    def tearDown(self):
++        self.tmp.cleanup()
++
++    def write(self, msgs):
++        p = os.path.join(self.tmp.name, "claude-execution-output.json")
++        with open(p, "w") as f:
++            json.dump(msgs, f)
++        return p
++
++    def test_per_response_matches_model_usage(self):
++        u1, u2 = usage(w5=5_000, rd=0, out=100), usage(w5=200, rd=5_000, out=50)
++        p = self.write([
++            {"type": "system", "subtype": "init", "model": "claude-haiku-5-5"},
++            {"type": "assistant", "message": {"id": "x1", "model": "claude-haiku-5-5", "usage": u1}},
++            {"type": "assistant", "message": {"id": "x1", "model": "claude-haiku-5-5", "usage": u1}},
++            {"type": "assistant", "message": {"id": "x2", "model": "claude-haiku-5-5", "usage": u2}},
++            {"type": "result", "subtype": "success", "is_error": False, "num_turns": 3, "duration_ms": 9000,
++             "total_cost_usd": 0.0007,
++             "modelUsage": {"claude-haiku-5-5": {"inputTokens": 4, "outputTokens": 150,
++                                                 "cacheReadInputTokens": 5_000,
++                                                 "cacheCreationInputTokens": 5_200}}},
++        ])
++        rec = tu.action_record(PRICES, p, label="haiku", outcome={"result": "accepted"})
++        self.assertEqual(rec["total"]["requests"], 2)
++        self.assertEqual(rec["total"]["output_tokens"], 150)
++        self.assertEqual(rec["source"]["num_turns"], 3)
++        self.assertEqual(rec["notes"], [])
++        self.assertIn("reported_vs_priced", rec["total"])
++
++    def test_model_usage_wins_when_responses_missing(self):
++        p = self.write([
++            {"type": "result", "subtype": "error_max_turns", "is_error": True, "num_turns": 40,
++             "modelUsage": {"claude-sonnet-5-5": {"inputTokens": 10, "outputTokens": 2_000,
++                                                  "cacheReadInputTokens": 900_000,
++                                                  "cacheCreationInputTokens": 60_000}}},
++        ])
++        rec = tu.action_record(PRICES, p, label="sonnet")
++        self.assertEqual(rec["total"]["output_tokens"], 2_000)
++        self.assertAlmostEqual(rec["total"]["cost_usd"],
++                               round(10 * 2e-6 + 900_000 * 0.1e-6 + 60_000 * 2.5e-6 + 2_000 * 10e-6, 6))  # Sonnet 5.5 cache read: $0.10/MTok
++
++    def test_summary_cost_per_accepted(self):
++        p = self.write([{"type": "result", "modelUsage": {"claude-haiku-5-5": {
++            "inputTokens": 0, "outputTokens": 1_000_000, "cacheReadInputTokens": 0, "cacheCreationInputTokens": 0}}}])
++        ok = tu.action_record(PRICES, p, "haiku", {"result": "accepted"})
++        bad = tu.action_record(PRICES, p, "haiku", {"result": "rejected"})
++        s = tu.summarize([ok, bad, ok])
++        self.assertEqual(s["accepted"], 2)
++        self.assertAlmostEqual(s["cost_usd_per_accepted"], 3 * 0.5 / 2)
++
++    def test_cli_missing_file(self):
++        self.assertEqual(tu.main(["action", os.path.join(self.tmp.name, "nope.json"), "--label", "h"]), 0)
++
++    def test_unknown_rejected_cost_keeps_ledger_total_unknown(self):
++        known = self.write([{"type": "assistant", "message": {
++            "id": "known", "model": "claude-sonnet-5-5", "usage": usage(out=100)}}])
++        accepted = tu.action_record(PRICES, known, outcome={"result": "accepted"})
++        unknown = self.write([{"type": "assistant", "message": {
++            "id": "unknown", "model": "unpriced-model", "usage": usage(out=500)}}])
++        rejected = tu.action_record(PRICES, unknown, outcome={"result": "rejected"})
++        result = tu.summarize([accepted, rejected])
++        self.assertEqual(result["accepted"], 1)
++        self.assertEqual(result["unpriced_records"], 1)
++        self.assertEqual(result["known_cost_subtotal_usd"], accepted["total"]["cost_usd"])
++        self.assertIsNone(result["total_cost_usd"])
++        self.assertIsNone(result["cost_usd_per_accepted"])
++        self.assertIn("remain unknown", tu.summary_markdown(result))
++
++    def test_empty_usage_is_unknown_not_free(self):
++        record = tu.action_record(PRICES, self.write([{"type": "result", "modelUsage": {}}]))
++        self.assertIsNone(record["total"]["cost_usd"])
++        self.assertEqual(tu.summarize([record])["unpriced_records"], 1)
++
++    def test_aggregate_long_context_price_is_unknown(self):
++        path = self.write([{"type": "result", "modelUsage": {
++            "claude-haiku-5-5": {"inputTokens": 500_000, "outputTokens": 1000}}}])
++        record = tu.action_record(PRICES, path)
++        self.assertEqual(record["total"]["prompt_tokens"], 500_000)
++        self.assertIsNone(record["total"]["cost_usd"])
++        self.assertTrue(any("long-context" in note for note in record["notes"]))
++
++    def test_svg_escapes_agent_label(self):
++        import xml.etree.ElementTree as ET
++        path = self.write([{"type": "assistant", "message": {
++            "id": "x", "model": "claude-sonnet-5-5", "usage": usage(out=100)}}])
++        record = tu.action_record(PRICES, path, label="director & <worker>")
++        root = ET.fromstring(tu.svg(record))
++        self.assertTrue(any("director & <worker>" in (node.text or "") for node in root.iter()))
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/token_prices.json b/tools/token_prices.json
+new file mode 100644
+index 0000000000..648ff62794
+--- /dev/null
++++ b/tools/token_prices.json
+@@ -0,0 +1,26 @@
++{
++  "schema": "crypto.autoresearch.token-prices.v1",
++  "currency": "USD",
++  "unit": "per million tokens",
++  "as_of": "2026-10-06",
++  "source": "Anthropic first-party API list prices, as cached in the claude-api skill (Claude Code 2.1.305, 'Current Models' table and per-model migration notes). Re-check https://www.anthropic.com/pricing before quoting a cost outside this repository.",
++  "notes": [
++    "cache_write_5m and cache_write_1h are the 1.25x and 2x write premiums on base input.",
++    "cache_read differs by model: 0.05x on Opus 5.5 and Sonnet 5.5, 0.025x on Fable 5.1 / Mythos 5.1, 0.1x on Haiku 5.5, Sonnet 5 and Fable 5 / Mythos 5.",
++    "claude-sonnet-5-5 cache_read corrected from 0.20 to 0.10 on 2026-11-04 against https://platform.claude.com/docs/en/about-claude/pricing (footnote 2: 0.05x on Opus 5.5 and Sonnet 5.5).",
++    "long_context applies per request when the request's prompt (uncached + cache write + cache read) exceeds threshold_prompt_tokens; every input-side rate scales by the same factor as base input.",
++    "fast_multiplier applies to requests whose usage.speed is 'fast'."
++  ],
++  "models": {
++    "claude-fable-5-1":  {"tier": "frontier",   "input": 10.0, "output": 50.0, "cache_write_5m": 12.5, "cache_write_1h": 20.0, "cache_read": 0.25},
++    "claude-mythos-5-1": {"tier": "frontier",   "input": 10.0, "output": 50.0, "cache_write_5m": 12.5, "cache_write_1h": 20.0, "cache_read": 0.25},
++    "claude-fable-5":    {"tier": "frontier",   "input": 10.0, "output": 50.0, "cache_write_5m": 12.5, "cache_write_1h": 20.0, "cache_read": 1.0},
++    "claude-mythos-5":   {"tier": "frontier",   "input": 10.0, "output": 50.0, "cache_write_5m": 12.5, "cache_write_1h": 20.0, "cache_read": 1.0},
++    "claude-opus-5-5":   {"tier": "core",       "input": 4.0,  "output": 20.0, "cache_write_5m": 5.0,  "cache_write_1h": 8.0,  "cache_read": 0.20, "fast_multiplier": 2.0},
++    "claude-opus-5":     {"tier": "core",       "input": 5.0,  "output": 25.0, "cache_write_5m": 6.25, "cache_write_1h": 10.0, "cache_read": 0.50, "fast_multiplier": 2.0},
++    "claude-sonnet-5-5": {"tier": "director",   "input": 2.0,  "output": 10.0, "cache_write_5m": 2.5,  "cache_write_1h": 4.0,  "cache_read": 0.10},
++    "claude-sonnet-5":   {"tier": "director",   "input": 2.0,  "output": 10.0, "cache_write_5m": 2.5,  "cache_write_1h": 4.0,  "cache_read": 0.20},
++    "claude-haiku-5-5":  {"tier": "mechanical", "input": 0.10, "output": 0.50, "cache_write_5m": 0.125, "cache_write_1h": 0.20, "cache_read": 0.01,
++                          "long_context": {"threshold_prompt_tokens": 100000, "input": 0.50, "output": 2.50}}
++  }
++}
+diff --git a/tools/token_usage.py b/tools/token_usage.py
+new file mode 100644
+index 0000000000..e328cc2ca9
+--- /dev/null
++++ b/tools/token_usage.py
+@@ -0,0 +1,680 @@
++#!/usr/bin/env python3
++"""Token-efficiency metrics for the repository's agent workflows.
++
++Reads what the runtimes already record and prices it, never content:
++
++  session  a Claude Code session transcript (<session>.jsonl, plus the
++           <session>/subagents/agent-*.jsonl files the Agent tool writes),
++           split by agent: the main session and each subagent, labelled with
++           its agent type (experiment-director, executor-mechanical, ...).
++  action   the execution file anthropics/claude-code-action writes
++           (steps.<id>.outputs.execution_file), as in autofix-queue.yml.
++  summary  a JSONL ledger of records written by the two commands above.
++
++Accounting rules, each one a trap in the raw data (docs/token-efficiency.md):
++
++- Claude Code writes one transcript line per content block, each carrying the
++  whole response's usage. Lines are deduplicated by message id; summing lines
++  double-counts (about 1.8x on a typical session).
++- Subagent transcripts record usage when a response starts, so their
++  output_tokens are a streaming snapshot (3 where the API billed 212). The
++  final response is patched from the Agent tool result's usage; every other
++  response with no stop_reason is counted as a lower bound and flagged.
++- The Agent tool result's totalTokens is the final request's context size,
++  not the subagent's spend. It is never used as spend.
++
++Pure standard library; workflow tooling, not research code (AGENTS.md
++"Implementation language" covers research and performance work).
++"""
++
++from __future__ import annotations
++
++import argparse
++import glob
++from html import escape
++import json
++import os
++import re
++import sys
++from dataclasses import dataclass, field
++
++SCHEMA = "crypto.autoresearch.token-usage.v1"
++PRICES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "token_prices.json")
++TIER_ORDER = ["frontier", "core", "director", "mechanical", "unknown"]
++COMPONENTS = ["input", "cache_write_5m", "cache_write_1h", "cache_read", "output"]
++
++
++def load_prices(path: str = PRICES_PATH) -> dict:
++    with open(path) as f:
++        return json.load(f)
++
++
++def price_entry(prices: dict, model: str) -> dict | None:
++    models = prices["models"]
++    if model in models:
++        return models[model]
++    # Tolerate suffixes such as "[1m]" or a dated snapshot of a known id.
++    for mid in sorted(models, key=len, reverse=True):
++        if model.startswith(mid) and re.fullmatch(r"(?:-[0-9]{8})?(?:\[1m\])?", model[len(mid):]):
++            return models[mid]
++    return None
++
++
++def tier_of(prices: dict, model: str) -> str:
++    entry = price_entry(prices, model)
++    return entry["tier"] if entry else "unknown"
++
++
++@dataclass
++class Usage:
++    """One API response's usage, in the Messages API's own fields."""
++
++    input: int = 0
++    cache_write_5m: int = 0
++    cache_write_1h: int = 0
++    cache_read: int = 0
++    output: int = 0
++    thinking: int = 0
++    speed: str = "standard"
++    output_exact: bool = True
++
++    @property
++    def prompt(self) -> int:
++        return self.input + self.cache_write_5m + self.cache_write_1h + self.cache_read
++
++    @classmethod
++    def from_api(cls, u: dict, output_exact: bool = True) -> "Usage":
++        cw = int(u.get("cache_creation_input_tokens") or 0)
++        split = u.get("cache_creation") or {}
++        w1h = int(split.get("ephemeral_1h_input_tokens") or 0)
++        w5m = int(split.get("ephemeral_5m_input_tokens") or 0)
++        if w1h + w5m != cw:  # no TTL split recorded: price as the 5-minute default
++            w5m, w1h = cw, 0
++        details = u.get("output_tokens_details") or {}
++        return cls(
++            input=int(u.get("input_tokens") or 0),
++            cache_write_5m=w5m,
++            cache_write_1h=w1h,
++            cache_read=int(u.get("cache_read_input_tokens") or 0),
++            output=int(u.get("output_tokens") or 0),
++            thinking=int(details.get("thinking_tokens") or 0),
++            speed=u.get("speed") or "standard",
++            output_exact=output_exact,
++        )
++
++
++def request_cost(prices: dict, model: str, u: Usage, per_request: bool = True) -> dict | None:
++    """Cost of one request by component, or None when the model is unpriced.
++
++    per_request=False prices an aggregate of many requests, where the
++    long-context threshold cannot be applied (it is per request).
++    """
++    p = price_entry(prices, model)
++    if p is None:
++        return None
++    scale_in = scale_out = 1.0
++    lc = p.get("long_context")
++    if lc and not per_request and u.prompt > lc["threshold_prompt_tokens"]:
++        # The same aggregate can contain many short requests or one expensive
++        # long-context request. Its price cannot be recovered from totals.
++        return None
++    if lc and per_request and u.prompt > lc["threshold_prompt_tokens"]:
++        scale_in, scale_out = lc["input"] / p["input"], lc["output"] / p["output"]
++    if u.speed == "fast":
++        f = p.get("fast_multiplier", 1.0)
++        scale_in, scale_out = scale_in * f, scale_out * f
++    m = 1e-6
++    return {
++        "input": u.input * p["input"] * scale_in * m,
++        "cache_write_5m": u.cache_write_5m * p["cache_write_5m"] * scale_in * m,
++        "cache_write_1h": u.cache_write_1h * p["cache_write_1h"] * scale_in * m,
++        "cache_read": u.cache_read * p["cache_read"] * scale_in * m,
++        "output": u.output * p["output"] * scale_out * m,
++        # Counterfactual: the same prompt with no caching, every token at base input.
++        "uncached_prompt": u.prompt * p["input"] * scale_in * m,
++    }
++
++
++@dataclass
++class Group:
++    """Accumulated usage for one (agent, model) pair."""
++
++    agent: str
++    agent_type: str
++    model: str
++    tier: str
++    requests: int = 0
++    tokens: dict = field(default_factory=lambda: {k: 0 for k in COMPONENTS + ["thinking"]})
++    cost: dict = field(default_factory=lambda: {k: 0.0 for k in COMPONENTS + ["uncached_prompt"]})
++    priced: bool = True
++    max_prompt: int = 0
++    output_lower_bound_requests: int = 0
++
++    def add(self, prices: dict, u: Usage, per_request: bool = True) -> None:
++        self.requests += 1
++        for k in COMPONENTS + ["thinking"]:
++            self.tokens[k] += getattr(u, k)
++        self.max_prompt = max(self.max_prompt, u.prompt)
++        if not u.output_exact:
++            self.output_lower_bound_requests += 1
++        c = request_cost(prices, self.model, u, per_request)
++        if c is None:
++            self.priced = False
++        else:
++            for k, v in c.items():
++                self.cost[k] += v
++
++    def add_totals(self, prices: dict, tokens: dict, requests: int) -> None:
++        """Add pre-aggregated per-model totals (claude-code-action modelUsage)."""
++        u = Usage(**{k: int(tokens.get(k, 0)) for k in COMPONENTS + ["thinking"]})
++        self.add(prices, u, per_request=False)
++        self.requests += requests - 1
++        self.max_prompt = 0  # unknown from totals
++
++
++def metrics(tokens: dict, cost: dict, requests: int, priced: bool) -> dict:
++    prompt = sum(tokens[k] for k in ["input", "cache_write_5m", "cache_write_1h", "cache_read"])
++    total_cost = sum(cost[k] for k in COMPONENTS)
++    uncached = cost["uncached_prompt"] + cost["output"]
++    return {
++        "requests": requests,
++        "prompt_tokens": prompt,
++        "output_tokens": tokens["output"],
++        "thinking_tokens": tokens["thinking"],
++        "cache_hit_ratio": round(tokens["cache_read"] / prompt, 4) if prompt else None,
++        "mean_prompt_tokens": round(prompt / requests) if requests else None,
++        "output_per_request": round(tokens["output"] / requests, 1) if requests else None,
++        "cost_usd": round(total_cost, 6) if priced else None,
++        "cost_usd_by_component": {k: round(cost[k], 6) for k in COMPONENTS} if priced else None,
++        "output_cost_share": round(cost["output"] / total_cost, 4) if priced and total_cost else None,
++        "uncached_cost_usd": round(uncached, 6) if priced else None,
++        "cache_saving_ratio": round(1 - total_cost / uncached, 4) if priced and uncached else None,
++    }
++
++
++def build_record(prices: dict, source: dict, groups: list[Group], outcome: dict | None,
++                 notes: list[str]) -> dict:
++    rows = []
++    tot_tokens = {k: 0 for k in COMPONENTS + ["thinking"]}
++    tot_cost = {k: 0.0 for k in COMPONENTS + ["uncached_prompt"]}
++    tot_req, all_priced, lower = 0, bool(groups), 0
++    for g in sorted(groups, key=lambda g: (TIER_ORDER.index(g.tier), g.agent, g.model)):
++        rows.append({
++            "agent": g.agent, "agent_type": g.agent_type, "model": g.model, "tier": g.tier,
++            "tokens": dict(g.tokens), "max_prompt_tokens": g.max_prompt,
++            "output_lower_bound_requests": g.output_lower_bound_requests,
++            **metrics(g.tokens, g.cost, g.requests, g.priced),
++        })
++        for k in tot_tokens:
++            tot_tokens[k] += g.tokens[k]
++        for k in tot_cost:
++            tot_cost[k] += g.cost[k]
++        tot_req += g.requests
++        all_priced &= g.priced
++        lower += g.output_lower_bound_requests
++    total = metrics(tot_tokens, tot_cost, tot_req, all_priced)
++    total["tokens"] = tot_tokens
++    total["output_lower_bound_requests"] = lower
++
++    # How much of the work ran below the reasoning tiers (AGENTS.md "Model tiers").
++    by_tier = {}
++    for t in TIER_ORDER:
++        sel = [r for r in rows if r["tier"] == t]
++        if not sel:
++            continue
++        by_tier[t] = {
++            "requests": sum(r["requests"] for r in sel),
++            "output_tokens": sum(r["output_tokens"] for r in sel),
++            "prompt_tokens": sum(r["prompt_tokens"] for r in sel),
++            "cost_usd": round(sum(r["cost_usd"] or 0 for r in sel), 6) if all_priced else None,
++        }
++    below = [t for t in ("director", "mechanical") if t in by_tier]
++    out_all = total["output_tokens"]
++    total["delegated_output_share"] = (
++        round(sum(by_tier[t]["output_tokens"] for t in below) / out_all, 4) if out_all else None)
++    total["delegated_cost_share"] = (
++        round(sum(by_tier[t]["cost_usd"] for t in below) / total["cost_usd"], 4)
++        if all_priced and total["cost_usd"] else None)
++
++    if outcome and outcome.get("units"):
++        n = outcome["units"]
++        outcome["cost_usd_per_unit"] = round(total["cost_usd"] / n, 6) if all_priced else None
++        outcome["output_tokens_per_unit"] = round(total["output_tokens"] / n, 1)
++        outcome["prompt_tokens_per_unit"] = round(total["prompt_tokens"] / n, 1)
++
++    return {
++        "schema": SCHEMA,
++        "source": source,
++        "prices": {"as_of": prices.get("as_of"), "source": "tools/token_prices.json"},
++        "groups": rows,
++        "by_tier": by_tier,
++        "total": total,
++        "outcome": outcome,
++        "notes": notes,
++    }
++
++
++# --------------------------------------------------------------- session ----
++
++def _read_jsonl(path: str):
++    with open(path) as f:
++        for line in f:
++            line = line.strip()
++            if line:
++                try:
++                    yield json.loads(line)
++                except json.JSONDecodeError:
++                    continue
++
++
++def _responses(path: str) -> list[dict]:
++    """One entry per API response (deduplicated by message id), in order."""
++    seen: dict[str, dict] = {}
++    order: list[str] = []
++    for d in _read_jsonl(path):
++        if d.get("type") != "assistant":
++            continue
++        m = d.get("message") or {}
++        mid = m.get("id") or d.get("requestId") or d.get("uuid")
++        model = m.get("model") or "unknown"
++        if model == "<synthetic>" or not m.get("usage"):
++            continue
++        prev = seen.get(mid)
++        cur = {"model": model, "usage": m["usage"], "stop_reason": m.get("stop_reason")}
++        if prev is None:
++            seen[mid] = cur
++            order.append(mid)
++        elif (cur["stop_reason"] and not prev["stop_reason"]) or (
++                int(cur["usage"].get("output_tokens") or 0) > int(prev["usage"].get("output_tokens") or 0)):
++            seen[mid] = cur
++    return [dict(seen[k], id=k) for k in order]
++
++
++def _agent_results(main_path: str) -> dict[str, dict]:
++    """agentId -> the Agent tool result (type, model, final usage)."""
++    out = {}
++    for d in _read_jsonl(main_path):
++        r = d.get("toolUseResult")
++        if isinstance(r, dict) and r.get("agentId"):
++            out[r["agentId"]] = r
++    return out
++
++
++def project_dir_name(cwd: str) -> str:
++    """Claude Code's directory name for a working directory: non-alphanumerics become '-'."""
++    return re.sub(r"[^A-Za-z0-9]", "-", os.path.abspath(cwd))
++
++
++def newest_transcript(projects_dir: str | None = None, cwd: str | None = None) -> str | None:
++    """Newest top-level session transcript under ~/.claude/projects/<project>/.
++
++    Prefers the project directory of `cwd` (when given and present), else any
++    project. None when there is no transcript. Subagent files live in
++    <session>/subagents/ and are never matched.
++    """
++    root = projects_dir or os.path.expanduser("~/.claude/projects")
++    cands: list[str] = []
++    if cwd:
++        cands = glob.glob(os.path.join(root, project_dir_name(cwd), "*.jsonl"))
++    if not cands:
++        cands = glob.glob(os.path.join(root, "*", "*.jsonl"))
++    return max(cands, key=os.path.getmtime) if cands else None
++
++
++def _resolve_session(path: str) -> tuple[str, str]:
++    """Accept <session>.jsonl or the <session>/ directory; return (jsonl, dir)."""
++    if os.path.isdir(path):
++        d = path.rstrip("/")
++        return d + ".jsonl", d
++    if path.endswith(".jsonl"):
++        return path, path[: -len(".jsonl")]
++    raise SystemExit(f"not a session transcript: {path}")
++
++
++def session_record(prices: dict, path: str, outcome: dict | None = None) -> dict:
++    main, sdir = _resolve_session(path)
++    if not os.path.exists(main):
++        raise SystemExit(f"missing transcript: {main}")
++    groups: dict[tuple[str, str], Group] = {}
++    notes: list[str] = []
++
++    def group(agent: str, agent_type: str, model: str) -> Group:
++        key = (agent, model)
++        if key not in groups:
++            groups[key] = Group(agent, agent_type, model, tier_of(prices, model))
++        return groups[key]
++
++    for r in _responses(main):
++        group("main", "main", r["model"]).add(prices, Usage.from_api(r["usage"]))
++
++    results = _agent_results(main)
++    for sub in sorted(glob.glob(os.path.join(sdir, "subagents", "agent-*.jsonl"))):
++        aid = os.path.basename(sub)[len("agent-"):-len(".jsonl")]
++        res = results.get(aid, {})
++        atype = res.get("agentType") or "subagent"
++        responses = _responses(sub)
++        final = res.get("usage") or {}
++        for i, r in enumerate(responses):
++            u = Usage.from_api(r["usage"], output_exact=bool(r["stop_reason"]))
++            if i == len(responses) - 1 and final:
++                fu = Usage.from_api(final)
++                if fu.prompt == u.prompt:  # same request: take the billed output
++                    u.output, u.thinking, u.output_exact = fu.output, fu.thinking, True
++                else:
++                    notes.append(f"agent {aid}: final usage does not match its last response; output left as a lower bound")
++            group(f"agent-{aid}", atype, r["model"]).add(prices, u)
++        if not res:
++            notes.append(f"agent {aid}: no Agent tool result in the main transcript (still running, or a fork)")
++
++    lower = sum(g.output_lower_bound_requests for g in groups.values())
++    if lower:
++        notes.append(f"{lower} subagent response(s) recorded without a final usage: their output_tokens are lower bounds")
++    source = {"kind": "claude-code-session", "session_id": os.path.basename(sdir),
++              "subagents": len(glob.glob(os.path.join(sdir, "subagents", "agent-*.jsonl")))}
++    return build_record(prices, source, list(groups.values()), outcome, notes)
++
++
++# ---------------------------------------------------------------- action ----
++
++def action_record(prices: dict, path: str, label: str | None = None,
++                  outcome: dict | None = None) -> dict:
++    with open(path) as f:
++        messages = json.load(f)
++    if not isinstance(messages, list):
++        raise SystemExit(f"{path}: expected the JSON array claude-code-action writes")
++    result = next((m for m in reversed(messages) if isinstance(m, dict) and m.get("type") == "result"), None)
++    notes: list[str] = []
++    groups: list[Group] = []
++    agent = label or "action"
++
++    # Per-response usage, deduplicated, gives the cache TTL split and per-request
++    # pricing (Haiku long-context tier). The result message's modelUsage is the
++    # SDK's own per-model total, and is the authority when the two disagree.
++    per_model: dict[str, Group] = {}
++    seen: dict[str, dict] = {}
++    for m in messages:
++        if not isinstance(m, dict) or m.get("type") != "assistant":
++            continue
++        msg = m.get("message") or {}
++        if not msg.get("usage") or msg.get("model") == "<synthetic>":
++            continue
++        mid = msg.get("id") or m.get("uuid")
++        prev = seen.get(mid)
++        if prev is None or int(msg["usage"].get("output_tokens") or 0) > int(prev["usage"].get("output_tokens") or 0):
++            seen[mid] = msg
++    for msg in seen.values():
++        model = msg.get("model") or "unknown"
++        g = per_model.setdefault(model, Group(agent, agent, model, tier_of(prices, model)))
++        g.add(prices, Usage.from_api(msg["usage"]))
++
++    model_usage = (result or {}).get("modelUsage") or {}
++    for model, mu in model_usage.items():
++        if "inputTokens" not in mu:
++            continue  # sanitized: only limits recorded
++        tot = {"input": mu.get("inputTokens", 0), "cache_read": mu.get("cacheReadInputTokens", 0),
++               "cache_write_5m": mu.get("cacheCreationInputTokens", 0), "output": mu.get("outputTokens", 0)}
++        g = per_model.get(model)
++        if g is None or any(g.tokens[k] != tot[k] for k in ("input", "cache_read", "output")) or \
++                g.tokens["cache_write_5m"] + g.tokens["cache_write_1h"] != tot["cache_write_5m"]:
++            if g is not None:
++                notes.append(f"{model}: per-response usage disagrees with the result's modelUsage; modelUsage used")
++            ng = Group(agent, agent, model, tier_of(prices, model))
++            if g is None and len(model_usage) == 1 and (result or {}).get("num_turns"):
++                n = int(result["num_turns"])  # turns stand in for responses
++                notes.append(f"{model}: per-response usage missing; requests = num_turns ({n})")
++            else:
++                n = max(g.requests if g else 1, 1)
++            ng.add_totals(prices, tot, n)
++            if not ng.priced and price_entry(prices, model):
++                notes.append(f"{model}: aggregate usage cannot determine per-request long-context pricing; cost is unknown")
++            per_model[model] = ng
++    groups = list(per_model.values())
++
++    source = {"kind": "claude-code-action", "label": label}
++    if result:
++        source.update({k: result.get(k) for k in ("subtype", "is_error", "num_turns", "duration_ms")})
++        if result.get("total_cost_usd") is not None:
++            source["reported_cost_usd"] = result["total_cost_usd"]
++    else:
++        notes.append("no result message: the run was cut off; totals cover the responses recorded")
++    if not groups:
++        notes.append("no usage found (execution file sanitized or empty)")
++    rec = build_record(prices, source, groups, outcome, notes)
++    rep, ours = source.get("reported_cost_usd"), rec["total"]["cost_usd"]
++    if rep and ours:
++        rec["total"]["reported_vs_priced"] = round(ours / rep, 4)
++    return rec
++
++
++# --------------------------------------------------------------- summary ----
++
++def summarize(records: list[dict]) -> dict:
++    """Aggregate ledger records by (source kind, label/agent type, outcome)."""
++    buckets: dict[tuple, dict] = {}
++    for i, r in enumerate(records):
++        kind = r["source"].get("kind")
++        label = r["source"].get("label") or "session"
++        out = (r.get("outcome") or {}).get("result") or "-"
++        for g in r["groups"]:
++            key = (kind, label if kind != "claude-code-session" else g["agent_type"], g["model"], out)
++            b = buckets.setdefault(key, {"runs": set(), "requests": 0, "prompt_tokens": 0,
++                                         "output_tokens": 0, "cache_read": 0, "cost_usd": 0.0, "priced": True})
++            b["runs"].add(i)
++            b["requests"] += g["requests"]
++            b["prompt_tokens"] += g["prompt_tokens"]
++            b["output_tokens"] += g["output_tokens"]
++            b["cache_read"] += g["tokens"]["cache_read"]
++            if g["cost_usd"] is None:
++                b["priced"] = False
++            else:
++                b["cost_usd"] += g["cost_usd"]
++    rows = []
++    for (kind, label, model, out), b in sorted(buckets.items()):
++        n = len(b["runs"])
++        rows.append({
++            "kind": kind, "label": label, "model": model, "outcome": out, "runs": n,
++            "requests": b["requests"], "prompt_tokens": b["prompt_tokens"],
++            "output_tokens": b["output_tokens"],
++            "cache_hit_ratio": round(b["cache_read"] / b["prompt_tokens"], 4) if b["prompt_tokens"] else None,
++            "cost_usd": round(b["cost_usd"], 6) if b["priced"] else None,
++            "cost_usd_per_run": round(b["cost_usd"] / n, 6) if b["priced"] else None,
++        })
++    accepted = [r for r in records if (r.get("outcome") or {}).get("result") == "accepted"]
++    spent = [r["total"]["cost_usd"] for r in records if r["total"]["cost_usd"] is not None]
++    unpriced = len(records) - len(spent)
++    return {
++        "schema": SCHEMA + ":summary",
++        "records": len(records),
++        "rows": rows,
++        "known_cost_subtotal_usd": round(sum(spent), 6),
++        "unpriced_records": unpriced,
++        "total_cost_usd": round(sum(spent), 6) if not unpriced else None,
++        "accepted": len(accepted),
++        # Every run's spend, failures included, divided by the runs that produced something.
++        "cost_usd_per_accepted": round(sum(spent) / len(accepted), 6) if accepted and not unpriced else None,
++    }
++
++
++# --------------------------------------------------------------- render -----
++
++def _fmt_int(n) -> str:
++    return "–" if n is None else f"{n:,}"
++
++
++def _fmt_usd(x) -> str:
++    return "unpriced" if x is None else f"${x:,.4f}"
++
++
++def _fmt_pct(x) -> str:
++    return "–" if x is None else f"{100 * x:.1f}%"
++
++
++def markdown(rec: dict) -> str:
++    src = rec["source"]
++    title = src.get("label") or src.get("session_id") or src.get("kind")
++    lines = [f"### Token usage: {title}", ""]
++    lines.append("| agent | type | model | tier | requests | prompt tok | cache hit | output tok | cost | output share of cost |")
++    lines.append("| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |")
++    for g in rec["groups"]:
++        lb = " (≥)" if g["output_lower_bound_requests"] else ""
++        lines.append(f"| {g['agent']} | {g['agent_type']} | `{g['model']}` | {g['tier']} | {g['requests']} | "
++                     f"{_fmt_int(g['prompt_tokens'])} | {_fmt_pct(g['cache_hit_ratio'])} | "
++                     f"{_fmt_int(g['output_tokens'])}{lb} | {_fmt_usd(g['cost_usd'])} | {_fmt_pct(g['output_cost_share'])} |")
++    t = rec["total"]
++    lines.append(f"| **total** | | | | {t['requests']} | {_fmt_int(t['prompt_tokens'])} | "
++                 f"{_fmt_pct(t['cache_hit_ratio'])} | {_fmt_int(t['output_tokens'])} | "
++                 f"**{_fmt_usd(t['cost_usd'])}** | {_fmt_pct(t['output_cost_share'])} |")
++    lines.append("")
++    lines.append(f"- Without prompt caching the same tokens would cost {_fmt_usd(t['uncached_cost_usd'])} "
++                 f"(caching saved {_fmt_pct(t['cache_saving_ratio'])}).")
++    if t.get("delegated_output_share") is not None and len(rec["by_tier"]) > 1:
++        lines.append(f"- Director and mechanical tiers produced {_fmt_pct(t['delegated_output_share'])} of output "
++                     f"tokens for {_fmt_pct(t['delegated_cost_share'])} of cost.")
++    if "reported_cost_usd" in src:
++        lines.append(f"- The runtime reported {_fmt_usd(src['reported_cost_usd'])} "
++                     f"(priced/reported = {t.get('reported_vs_priced', '–')}).")
++    o = rec.get("outcome")
++    if o:
++        bits = [f"outcome **{o.get('result', '-')}**"]
++        if o.get("units"):
++            bits.append(f"{_fmt_usd(o['cost_usd_per_unit'])} and {_fmt_int(int(o['output_tokens_per_unit']))} "
++                        f"output tokens per {o.get('unit_name', 'unit')}")
++        lines.append("- " + ", ".join(bits) + ".")
++    for n in rec["notes"]:
++        lines.append(f"- Note: {n}")
++    return "\n".join(lines) + "\n"
++
++
++def summary_markdown(s: dict) -> str:
++    lines = ["### Token usage ledger", "",
++             "| kind | label | model | outcome | runs | requests | prompt tok | cache hit | output tok | cost | cost/run |",
++             "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
++    for r in s["rows"]:
++        lines.append(f"| {r['kind']} | {r['label']} | `{r['model']}` | {r['outcome']} | {r['runs']} | {r['requests']} | "
++                     f"{_fmt_int(r['prompt_tokens'])} | {_fmt_pct(r['cache_hit_ratio'])} | {_fmt_int(r['output_tokens'])} | "
++                     f"{_fmt_usd(r['cost_usd'])} | {_fmt_usd(r['cost_usd_per_run'])} |")
++    lines += ["", f"- {s['records']} records, {_fmt_usd(s['total_cost_usd'])} in all."]
++    if s["unpriced_records"]:
++        lines.append(f"- {s['unpriced_records']} record(s) have unknown cost; "
++                     f"{_fmt_usd(s['known_cost_subtotal_usd'])} is the known subtotal only. "
++                     "Total cost and cost per accepted outcome remain unknown.")
++    if s["cost_usd_per_accepted"] is not None:
++        lines.append(f"- {s['accepted']} accepted: {_fmt_usd(s['cost_usd_per_accepted'])} per accepted outcome, "
++                     "counting the spend of every run, rejected ones included.")
++    return "\n".join(lines) + "\n"
++
++
++SVG_COLORS = {"input": "#8c6bb1", "cache_write_5m": "#e6863b", "cache_write_1h": "#c0542b",
++              "cache_read": "#4f9a8a", "output": "#3b6fb6"}
++
++
++def svg(rec: dict) -> str:
++    """Horizontal stacked bars: cost by component for each agent/model group."""
++    rows = [g for g in rec["groups"] if g["cost_usd"]]
++    if not rows:
++        return '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>\n'
++    left, width, bar, gap, top = 260, 460, 22, 10, 44
++    height = top + len(rows) * (bar + gap) + 60
++    vmax = max(g["cost_usd"] for g in rows)
++    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{left + width + 110}" height="{height}" '
++           'font-family="system-ui, sans-serif" font-size="12">',
++           '<rect width="100%" height="100%" fill="#ffffff"/>',
++           f'<text x="12" y="22" font-size="14" font-weight="600">Cost by component (USD, list prices as of '
++           f'{escape(str(rec["prices"]["as_of"]))})</text>']
++    for i, g in enumerate(rows):
++        y = top + i * (bar + gap)
++        label = f'{g["agent_type"]} · {g["model"].replace("claude-", "")}'
++        out.append(f'<text x="{left - 8}" y="{y + bar * 0.7}" text-anchor="end">{escape(label)}</text>')
++        x = left
++        for k in COMPONENTS:
++            w = width * g["cost_usd_by_component"][k] / vmax
++            if w > 0:
++                out.append(f'<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{bar}" fill="{SVG_COLORS[k]}">'
++                           f'<title>{k}: ${g["cost_usd_by_component"][k]:.4f}</title></rect>')
++                x += w
++        out.append(f'<text x="{x + 6:.1f}" y="{y + bar * 0.7}">${g["cost_usd"]:.4f}</text>')
++    ly = height - 28
++    for j, k in enumerate(COMPONENTS):
++        lx = 12 + j * 150
++        out.append(f'<rect x="{lx}" y="{ly}" width="12" height="12" fill="{SVG_COLORS[k]}"/>')
++        out.append(f'<text x="{lx + 18}" y="{ly + 10}">{k}</text>')
++    out.append("</svg>")
++    return "\n".join(out) + "\n"
++
++
++# ------------------------------------------------------------------ CLI -----
++
++def _outcome(args) -> dict | None:
++    if args.outcome is None and args.units is None:
++        return None
++    o = {"result": args.outcome}
++    if args.units is not None:
++        o.update(units=args.units, unit_name=args.unit_name)
++    return o
++
++
++def _emit(rec: dict, args) -> None:
++    if args.json:
++        with open(args.json, "w") as f:
++            json.dump(rec, f, indent=2)
++            f.write("\n")
++    if args.ledger:
++        with open(args.ledger, "a") as f:
++            f.write(json.dumps(rec, separators=(",", ":")) + "\n")
++    if args.svg:
++        with open(args.svg, "w") as f:
++            f.write(svg(rec))
++    sys.stdout.write(markdown(rec))
++
++
++def main(argv: list[str] | None = None) -> int:
++    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
++    ap.add_argument("--prices", default=PRICES_PATH)
++    sub = ap.add_subparsers(dest="cmd", required=True)
++
++    def common(p):
++        p.add_argument("--json", help="write the record here")
++        p.add_argument("--ledger", help="append the record to this JSONL ledger")
++        p.add_argument("--svg", help="write a cost-by-component chart here")
++        p.add_argument("--outcome", help="what the run produced, e.g. accepted / rejected / completed")
++        p.add_argument("--units", type=int, help="units of work delivered (cards, fixes) for per-unit metrics")
++        p.add_argument("--unit-name", default="unit")
++
++    p = sub.add_parser("session", help="a Claude Code session transcript and its subagents")
++    p.add_argument("path", nargs="?", help="<session>.jsonl or <session>/ (default: newest under ~/.claude/projects)")
++    common(p)
++    p = sub.add_parser("action", help="a claude-code-action execution file")
++    p.add_argument("path")
++    p.add_argument("--label", help="name for this run in tables, e.g. haiku / sonnet")
++    common(p)
++    p = sub.add_parser("summary", help="aggregate a JSONL ledger")
++    p.add_argument("ledger_path")
++    p.add_argument("--json")
++    args = ap.parse_args(argv)
++    prices = load_prices(args.prices)
++
++    if args.cmd == "session":
++        path = args.path
++        if not path:
++            path = newest_transcript()
++            if not path:
++                raise SystemExit("no session transcripts under ~/.claude/projects")
++        _emit(session_record(prices, path, _outcome(args)), args)
++    elif args.cmd == "action":
++        if not os.path.exists(args.path):
++            sys.stdout.write(f"### Token usage: {args.label or 'action'}\n\nNo execution file was written.\n")
++            return 0
++        _emit(action_record(prices, args.path, args.label, _outcome(args)), args)
++    else:
++        records = list(_read_jsonl(args.ledger_path))
++        s = summarize(records)
++        if args.json:
++            with open(args.json, "w") as f:
++                json.dump(s, f, indent=2)
++                f.write("\n")
++        sys.stdout.write(summary_markdown(s))
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+-- 
+2.43.0
+

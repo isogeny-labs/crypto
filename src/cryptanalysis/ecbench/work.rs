@@ -629,6 +629,7 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         | "giant_steps"
         | "jump_count"
         | "dp_bits"
+        | "chained_setup"
         | "starts" => Shape,
         // Kangaroo's distinguished points are probed under lookups_uncharged.
         "distinguished_points" if kangaroo => Shape,
@@ -672,6 +673,7 @@ fn gae_carries_group_ops(method: &str) -> bool {
         method,
         "rho.plain"
             | "rho.negation"
+            | "rho.negation_chained"
             | "rho.cubic"
             | "rho.quartic"
             | "rho.signed_frobenius"

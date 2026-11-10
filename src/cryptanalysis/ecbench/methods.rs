@@ -1309,6 +1309,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.negation_chained",
+            family: "rho",
+            summary: "rho.negation with a chained jump set-up: the first two jumps [a]G + [b]Q by joint scalar multiplication, every later one M_j = M_(j-1) + M_(j-2) by one charged addition (coefficients added mod r); the walk, starts, distinguished points and charged final check are rho.negation's (research/curve25519_engine_items_20261110)",
+            entry: "ic_boundary::rho_walk_with_policy(NegationClasses, RhoWalk::negation(), WalkPolicy::chained())",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.cubic_v2",
             family: "rho",
             summary: "rho.cubic with the set-up [κ]G verification ledger of CubicClasses::new inside total_gae (phase automorphism_setup), plus the walk of rho.negation_v2; refuses any curve without the j = 0 structure",
@@ -1506,7 +1514,9 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
-        "rho.negation" | "rho.negation_v2" | "rho.negation_strong" => Some((PI / 4.0).sqrt()),
+        "rho.negation" | "rho.negation_v2" | "rho.negation_chained" | "rho.negation_strong" => {
+            Some((PI / 4.0).sqrt())
+        }
         "rho.cubic" | "rho.cubic_v2" => Some((PI / 12.0).sqrt()),
         "rho.quartic" | "rho.quartic_v2" | "rho.gls" => Some((PI / 8.0).sqrt()),
         "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
@@ -2589,6 +2599,20 @@ fn solve_generic<G: CountedGroup>(
             let o = kangaroo(g, gen, target, r, seed, cap()?);
             generic(o, t.elapsed().as_nanos() as u64, 1)
         }
+        "rho.negation_chained" => {
+            let res = rho_walk_with_policy(
+                g,
+                &NegationClasses { r },
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                RhoWalk::negation(),
+                WalkPolicy::chained(),
+            );
+            rho(res, t.elapsed().as_nanos() as u64)
+        }
         // The `_v2` ids: the same searches, then the one charged check.
         "rho.negation_v2" => {
             let res = rho_walk_with_policy(
@@ -2945,13 +2969,34 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                 g_jumps: or.flag("g"),
                 grow,
             };
-            wwalk_plan_check(i.r, x, jumps, opts)?;
-            let (tw, cj) = (or.flag("tw"), or.flag("cj"));
-            if cj && !tw {
-                return Err("wwalk: cj=1 needs tw=1".into());
+            let (_, _, _, bound) = wwalk_plan_check(i.r, x, jumps, opts)?;
+            let tw = match or.get("tw") {
+                None | Some("0" | "false" | "no") => 0u8,
+                Some("1" | "true" | "yes") => 1,
+                Some("2") => 2,
+                Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
+            };
+            let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
+            if cj && tw == 0 {
+                return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
             }
-            if tw && (!opts.g_jumps || grow != 2) {
-                return Err("wwalk: tw=1 needs g=1 and grow=2".into());
+            if lazy && !opts.g_jumps {
+                return Err("wwalk: lazy=1 needs g=1".into());
+            }
+            let cv = crate::cryptanalysis::ic_framework::plugins::wwalk_cv(&or)?;
+            if !cv && tw == 0 {
+                return Err("wwalk: cv=0 needs tw=1 or tw=2".into());
+            }
+            if !cv && lazy {
+                return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
+            }
+            if !cv && tw == 2 && bound >= 1 << 31 {
+                return Err(format!(
+                    "wwalk: cv=0 with tw=2 needs coefficients below 2^31 (bound {bound})"
+                ));
+            }
+            if tw > 0 && (!opts.g_jumps || grow != 2) {
+                return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
         }
         _ => {}
@@ -10967,3 +11012,284 @@ mod tensor_contraction_tests {
 #[cfg(test)]
 #[path = "registry_audit_tests.rs"]
 mod registry_audit_tests;
+
+/// research/curve25519_engine_items_20261110: the two engine options,
+/// `wwalk` `cv=0` (no per-collision recomputation in the target walk) and
+/// `rho.negation_chained` (chained jump set-up), against their defaults.
+#[cfg(test)]
+mod engine_items_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    /// The k = 20 Curve25519-family miniature of the study.
+    fn k20() -> CurveSpec {
+        CurveSpec::PrimeExplicit {
+            p: 1048573,
+            a: 63700,
+            b: 872826,
+            group_order: 1049624,
+            r: 131203,
+            gx: 349837,
+            gy: 122,
+        }
+    }
+
+    fn built(spec: &CurveSpec) -> (Instance, CurveFacts) {
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(spec);
+        (inst, facts)
+    }
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    fn run(
+        m: &ResolvedMethod,
+        inst: &Instance,
+        facts: &CurveFacts,
+        k: u128,
+        seed: u64,
+    ) -> SolveReport {
+        let target = inst.mul_generator_hex(k).expect("a nonzero target");
+        solve(m, inst, facts, &target, seed).unwrap()
+    }
+
+    fn twcj(cv: Option<&str>) -> ResolvedMethod {
+        let oracle = match cv {
+            None => "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run".to_string(),
+            Some(v) => format!("wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=16,seed=run,cv={v}"),
+        };
+        method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "prime-projected-abscissa:size=1,scan_cap=32"),
+                ("oracle", &oracle),
+                ("targets", "stride-generator"),
+            ],
+        )
+    }
+
+    /// A counter from the report's counters, else from a phase's native
+    /// counters (the pipeline reports the target walk's under `relations`).
+    fn counter(rep: &SolveReport, name: &str) -> Option<u64> {
+        let hit = |k: &String| k.as_str() == name || k.ends_with(&format!(".{name}"));
+        rep.counters
+            .iter()
+            .find(|(k, _)| hit(k))
+            .map(|(_, v)| *v)
+            .or_else(|| {
+                rep.phases
+                    .iter()
+                    .find_map(|p| p.native.iter().find(|(k, _)| hit(k)).map(|(_, v)| *v))
+            })
+    }
+
+    fn phases_sum(id: &str, rep: &SolveReport) {
+        let sum: f64 = rep.phases.iter().map(|p| p.gae).sum();
+        assert!(
+            (sum - rep.total_gae).abs() < 1e-9,
+            "{id}: phases {:?}",
+            rep.phases
+        );
+    }
+
+    /// `cv=0` walks the same walk and emits the same rows as the default, so
+    /// it recovers the same logarithm, and its total is the default's minus
+    /// exactly the verification additions; `cv=1` is the default exactly.
+    #[test]
+    fn wwalk_cv0_recovers_and_saves_exactly_the_verification() {
+        let (inst, facts) = built(&k20());
+        let (base, explicit, cv0) = (twcj(None), twcj(Some("1")), twcj(Some("0")));
+        assert_ne!(base.method_id, cv0.method_id);
+        let mut saved_total = 0.0;
+        for seed in 0..12u64 {
+            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r - 1);
+            let d = run(&base, &inst, &facts, k, seed);
+            let e = run(&explicit, &inst, &facts, k, seed);
+            let n = run(&cv0, &inst, &facts, k, seed);
+            assert_eq!(d.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+            assert_eq!(n.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+            assert_eq!(d.total_gae, e.total_gae);
+            assert_eq!(d.counters, e.counters);
+            phases_sum("cv=0", &n);
+            let verify = counter(&d, "tw_verify_adds").expect("tw_verify_adds") as f64;
+            assert_eq!(counter(&n, "tw_verify_adds"), Some(0));
+            assert_eq!(counter(&n, "tw_collision_verify"), Some(0));
+            assert_eq!(counter(&d, "tw_collision_verify"), None);
+            assert_eq!(counter(&n, "tw_steps"), counter(&d, "tw_steps"));
+            assert_eq!(counter(&n, "tw_rows"), counter(&d, "tw_rows"));
+            assert_eq!(counter(&n, "probe_hits"), counter(&d, "probe_hits"));
+            assert_eq!(n.total_gae + verify, d.total_gae, "seed {seed}");
+            assert!(verify > 0.0);
+            saved_total += verify;
+        }
+        assert!(saved_total > 0.0);
+    }
+
+    /// `cv` is 0 or 1, `cv=0` needs the target walk, and `cv=0` with
+    /// `lazy=1` is refused.
+    #[test]
+    fn wwalk_cv_refusals() {
+        let (inst, facts) = built(&k20());
+        let bad = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "prime-projected-abscissa:size=1,scan_cap=32"),
+                ("oracle", "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,cv=2,seed=run"),
+                ("targets", "stride-generator"),
+            ],
+        );
+        let no_tw = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "prime-projected-abscissa:size=2,scan_cap=32"),
+                ("oracle", "wwalk:x=1.5,g=1,grow=2,cv=0,seed=run"),
+                ("targets", "stride-generator"),
+            ],
+        );
+        let with_lazy = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "prime-projected-abscissa:size=1,scan_cap=32"),
+                ("oracle", "wwalk:x=1.5,g=1,grow=2,tw=1,cv=0,lazy=1,seed=run"),
+                ("targets", "stride-generator"),
+            ],
+        );
+        let target = inst.mul_generator_hex(77).unwrap();
+        for m in [bad, no_tw, with_lazy] {
+            let refused = applicable(&m, &inst, &facts).is_err()
+                || solve(&m, &inst, &facts, &target, 1).is_err();
+            assert!(refused, "{:?}", m.params);
+        }
+    }
+
+    /// `rho.negation_chained` recovers known logarithms, its phases sum,
+    /// its set-up is cheaper than `rho.negation`'s on every seed (two joint
+    /// multiplications and `m − 2` additions instead of `m` joint
+    /// multiplications), and `rho.negation` is untouched (no new counter).
+    #[test]
+    fn rho_negation_chained_recovers_with_a_cheaper_setup() {
+        let (inst, facts) = built(&k20());
+        let (plain, chained) = (
+            method("rho.negation", &[]),
+            method("rho.negation_chained", &[]),
+        );
+        assert_ne!(plain.method_id, chained.method_id);
+        let setup = |rep: &SolveReport| {
+            rep.phases
+                .iter()
+                .find(|p| p.name == "setup")
+                .map(|p| p.gae)
+                .expect("setup phase")
+        };
+        for seed in 0..16u64 {
+            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r - 1);
+            let a = run(&plain, &inst, &facts, k, seed);
+            let b = run(&chained, &inst, &facts, k, seed);
+            assert_eq!(a.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+            assert_eq!(b.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+            phases_sum("rho.negation_chained", &b);
+            assert!(
+                setup(&b) < setup(&a),
+                "seed {seed}: {} vs {}",
+                setup(&b),
+                setup(&a)
+            );
+            assert_eq!(b.counters.get("chained_setup"), Some(&1));
+            assert!(!a.counters.contains_key("chained_setup"));
+            assert_eq!(b.counters.get("jumps"), a.counters.get("jumps"));
+            assert_eq!(b.automorphisms_used, 2);
+        }
+        assert_eq!(
+            expected_s("rho.negation_chained", 2),
+            expected_s("rho.negation", 2)
+        );
+    }
+
+    /// The chained table obeys its recurrence, point by point and
+    /// coefficient by coefficient: `M_j = M_{j-1} + M_{j-2}` and
+    /// `(a_j, b_j) = (a_{j-1} + a_{j-2}, b_{j-1} + b_{j-2}) mod r`, every
+    /// `M_j = [a_j]G + [b_j]Q`, the first two coefficients drawn in
+    /// `[1, short)`, and the set-up is two joint multiplications plus one
+    /// charged addition per later jump.  The walk built on it still solves
+    /// (the walk's own collisions are checked by the charged `[d]G = Q`).
+    #[test]
+    fn chained_rho_jump_table_obeys_its_recurrence() {
+        use crate::cryptanalysis::ic_boundary::{
+            chained_jumps, rho_walk_with_policy, NegationClasses,
+        };
+        let (inst, _facts) = built(&k20());
+        let Instance::Prime(p) = &inst else {
+            panic!("prime instance")
+        };
+        let g = &p.curve;
+        let gen = p.generator_point();
+        let r = p.r;
+        for seed in 0..8u64 {
+            let mut ops = GroupOps::default();
+            let q = g.mul(&mut ops, gen, 12345 + seed);
+            // The table itself.
+            let short = 1u64 << 9;
+            let count = 8usize;
+            let gq = g.add(&mut ops, gen, q);
+            let mut rng = StdRng::seed_from_u64(seed);
+            let mut table_ops = GroupOps::default();
+            let table = chained_jumps(g, &mut table_ops, &mut rng, gen, q, gq, r, short, count);
+            assert_eq!(table.len(), count);
+            for (j, &(m, a, b)) in table.iter().enumerate() {
+                let mut chk = GroupOps::default();
+                let ag = g.mul(&mut chk, gen, a);
+                let bq = g.mul(&mut chk, q, b);
+                assert!(
+                    g.add(&mut chk, ag, bq) == m,
+                    "seed {seed} j {j}: M_j != [a]G + [b]Q"
+                );
+                if j < 2 {
+                    assert!((1..short).contains(&a) && (1..short).contains(&b));
+                    continue;
+                }
+                let (m1, a1, b1) = table[j - 1];
+                let (m2, a2, b2) = table[j - 2];
+                assert!(
+                    g.add(&mut chk, m1, m2) == m,
+                    "seed {seed} j {j}: point recurrence"
+                );
+                assert_eq!(a, (a1 + a2) % r, "seed {seed} j {j}: a recurrence");
+                assert_eq!(b, (b1 + b2) % r, "seed {seed} j {j}: b recurrence");
+            }
+            let res = rho_walk_with_policy(
+                g,
+                &NegationClasses { r },
+                gen,
+                q,
+                r,
+                seed,
+                rho_cap(r, 64.0),
+                RhoWalk::negation(),
+                WalkPolicy::chained(),
+            );
+            assert_eq!(res.recovered, Some((12345 + seed) % r));
+            let legacy = rho_walk_with_policy(
+                g,
+                &NegationClasses { r },
+                gen,
+                q,
+                r,
+                seed,
+                rho_cap(r, 64.0),
+                RhoWalk::negation(),
+                WalkPolicy::legacy(),
+            );
+            let su = |c: &BTreeMap<String, u64>| c["setup_additions"] + c["setup_doublings"];
+            assert!(su(&res.counters) < su(&legacy.counters));
+        }
+    }
+}
