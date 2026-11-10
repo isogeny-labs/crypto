@@ -1,3 +1,9 @@
+start form (the command words before the runner's own arguments; a word over 200 characters is shown by its sha256):
+  /bin/bash
+  /home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/../stageb_units_runner.sh
+shell in use: GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+awk in use (/usr/bin/awk): mawk 1.3.4 20240123
+host tools: bash 5.2.21(1)-release
 ##### T1
 rc=0
 91
@@ -40,14 +46,14 @@ check PASS: list sha256 unchanged from revision 2
 RESULT T1: PASS (0 failed checks)
 ##### T2
 rc=0
-2026-11-10T17:42:45Z start g1
-2026-11-10T17:42:45Z end g1 exit 0
-2026-11-10T17:42:45Z start B-m3-tower-t2
-2026-11-10T17:42:45Z end B-m3-tower-t2 exit 0
-2026-11-10T17:42:45Z start B-m3-tower-t3
-2026-11-10T17:42:48Z end B-m3-tower-t3 exit 0
-2026-11-10T17:42:48Z start DB-m3-tower-t2
-2026-11-10T17:42:48Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:29:37Z start g1
+2026-11-10T18:29:37Z end g1 exit 0
+2026-11-10T18:29:37Z start B-m3-tower-t2
+2026-11-10T18:29:37Z end B-m3-tower-t2 exit 0
+2026-11-10T18:29:37Z start B-m3-tower-t3
+2026-11-10T18:29:40Z end B-m3-tower-t3 exit 0
+2026-11-10T18:29:40Z start DB-m3-tower-t2
+2026-11-10T18:29:40Z end DB-m3-tower-t2 exit 0
    3 $T/T2/w-j1/runs/B-m3-tower-t2.jsonl
    3 $T/T2/w-j1/runs/B-m3-tower-t3.jsonl
    3 $T/T2/w-j1/runs/DB-m3-tower-t2.jsonl
@@ -88,20 +94,21 @@ rayon: 2
 model name	: Intel(R) Xeon(R) Processor @ 2.10GHz
 MemTotal:       16472400 kB
 6.18.44-fc-v338
-2026-11-10T17:42:45Z
+2026-11-10T18:29:37Z
 prev: 
 closed_by_rule: 
 allowed: 
+skipped: 
 closed_tool_failure: 
 testmode: 1
 pilot_extra: --seed 777
 unit_filter: ^(B-m3-tower-t[23]|DB-m3-tower-t2)$
 lock_wait: 900
-runner_sha256: 33bf8d84212b4eefad363a214a5c1c74faa196c880a8d6062a18f271b4af21a9
+runner_sha256: 1c2229386976e8d6f22e5f243b269a5d23d588d0e105d6cb530c9a5488157a79
 bash: 5.2.21(1)-release
 node: node-x
 pod_uid: pod-y
-job: job-z
+job: pfd-bu-1-777
 seed: 1347112276 (the pilot's default; recorded, not passed)
 check PASS: rc 0
 check PASS: 3 units end exit 0
@@ -111,23 +118,23 @@ check PASS: argv record of B-m3-tower-t3 = pilot words
 check PASS: argv record of DB-m3-tower-t2 = pilot words
 check PASS: S3 units_done.txt lists the 3 units
 check PASS: host.txt runner_sha256 = sha256 of the runner
-check PASS: host.txt records NODE_NAME, POD_UID, ISOLAB_JOB_ID
+check PASS: host.txt records NODE_NAME, POD_UID and the job name
 check PASS: host.txt has bash, node, pod_uid, job, seed, lock_wait, closed_by_rule, allowed, closed_tool_failure lines
 RESULT T2: PASS (0 failed checks)
 ##### T3
 === T3 budget 0: runner, ladder B-m3-tower
 rc=0
-2026-11-10T17:42:48Z start g1
-2026-11-10T17:42:48Z end g1 exit 0
-2026-11-10T17:42:48Z start B-m3-tower-t2
-2026-11-10T17:42:48Z end B-m3-tower-t2 exit 0
-2026-11-10T17:42:48Z closed B-m3-tower at t=2
-2026-11-10T17:42:48Z skip B-m3-tower-t3 ladder-closed
-2026-11-10T17:42:48Z skip B-m3-tower-t4 ladder-closed
-2026-11-10T17:42:48Z skip B-m3-tower-t5 ladder-closed
-2026-11-10T17:42:48Z skip B-m3-tower-t6 ladder-closed
-2026-11-10T17:42:48Z skip B-m3-tower-t7 ladder-closed
-2026-11-10T17:42:48Z skip B-m3-tower-t8 ladder-closed
+2026-11-10T18:29:41Z start g1
+2026-11-10T18:29:41Z end g1 exit 0
+2026-11-10T18:29:41Z start B-m3-tower-t2
+2026-11-10T18:29:41Z end B-m3-tower-t2 exit 0
+2026-11-10T18:29:41Z closed B-m3-tower at t=2
+2026-11-10T18:29:41Z skip B-m3-tower-t3 ladder-closed
+2026-11-10T18:29:41Z skip B-m3-tower-t4 ladder-closed
+2026-11-10T18:29:41Z skip B-m3-tower-t5 ladder-closed
+2026-11-10T18:29:41Z skip B-m3-tower-t6 ladder-closed
+2026-11-10T18:29:41Z skip B-m3-tower-t7 ladder-closed
+2026-11-10T18:29:41Z skip B-m3-tower-t8 ladder-closed
 B-m3-tower t=2 this-job
 $T/T3/w-b0/runs/B-m3-tower-t2.log:-- kummer m=3 tower: every run at t = 2 timed out; stopping
 --- registered-style single invocation, same extra flags
@@ -139,30 +146,30 @@ kummer   m=3 tower  t= 2 N= 6 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=    
 check PASS: budget 0: rc 0
 === T3 budget 2: runner, ladder B-m3-tower
 rc=0
-2026-11-10T17:42:48Z start g1
-2026-11-10T17:42:48Z end g1 exit 0
-2026-11-10T17:42:48Z start B-m3-tower-t2
-2026-11-10T17:42:48Z end B-m3-tower-t2 exit 0
-2026-11-10T17:42:48Z start B-m3-tower-t3
-2026-11-10T17:42:51Z end B-m3-tower-t3 exit 0
-2026-11-10T17:42:51Z start B-m3-tower-t4
-2026-11-10T17:43:00Z end B-m3-tower-t4 exit 0
-2026-11-10T17:43:00Z closed B-m3-tower at t=4
-2026-11-10T17:43:00Z skip B-m3-tower-t5 ladder-closed
-2026-11-10T17:43:00Z skip B-m3-tower-t6 ladder-closed
-2026-11-10T17:43:00Z skip B-m3-tower-t7 ladder-closed
-2026-11-10T17:43:00Z skip B-m3-tower-t8 ladder-closed
+2026-11-10T18:29:41Z start g1
+2026-11-10T18:29:41Z end g1 exit 0
+2026-11-10T18:29:41Z start B-m3-tower-t2
+2026-11-10T18:29:41Z end B-m3-tower-t2 exit 0
+2026-11-10T18:29:41Z start B-m3-tower-t3
+2026-11-10T18:29:44Z end B-m3-tower-t3 exit 0
+2026-11-10T18:29:44Z start B-m3-tower-t4
+2026-11-10T18:29:48Z end B-m3-tower-t4 exit 0
+2026-11-10T18:29:49Z closed B-m3-tower at t=4
+2026-11-10T18:29:49Z skip B-m3-tower-t5 ladder-closed
+2026-11-10T18:29:49Z skip B-m3-tower-t6 ladder-closed
+2026-11-10T18:29:49Z skip B-m3-tower-t7 ladder-closed
+2026-11-10T18:29:49Z skip B-m3-tower-t8 ladder-closed
 B-m3-tower t=4 this-job
 $T/T3/w-b2/runs/B-m3-tower-t4.log:-- kummer m=3 tower: every run at t = 4 timed out; stopping
 --- registered-style single invocation, same extra flags
-kummer   m=3 tower  t= 2 hky d_F=Some(5) ffd=Some(4) falls=[4, 5] censored_at=None 11 ms
-kummer   m=3 tower  t= 2 hky d_F=Some(5) ffd=Some(4) falls=[4, 5] censored_at=None 10 ms
-kummer   m=3 tower  t= 3 hky d_F=Some(6) ffd=Some(4) falls=[4, 5, 6] censored_at=None 1109 ms
-kummer   m=3 tower  t= 3 hky d_F=Some(6) ffd=Some(4) falls=[4, 5, 6] censored_at=None 1140 ms
-kummer   m=3 tower  t= 4 hky d_F=None ffd=Some(4) falls=[4, 5] censored_at=Some(6) 4923 ms
-kummer   m=3 tower  t= 4 N=12 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0   4923.3 ms  TIMEOUT
-kummer   m=3 tower  t= 4 hky d_F=None ffd=Some(4) falls=[4, 5] censored_at=Some(6) 4761 ms
-kummer   m=3 tower  t= 4 N=12 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0   4760.9 ms  TIMEOUT
+kummer   m=3 tower  t= 2 hky d_F=Some(5) ffd=Some(4) falls=[4, 5] censored_at=None 14 ms
+kummer   m=3 tower  t= 2 hky d_F=Some(5) ffd=Some(4) falls=[4, 5] censored_at=None 12 ms
+kummer   m=3 tower  t= 3 hky d_F=Some(6) ffd=Some(4) falls=[4, 5, 6] censored_at=None 1273 ms
+kummer   m=3 tower  t= 3 hky d_F=Some(6) ffd=Some(4) falls=[4, 5, 6] censored_at=None 1282 ms
+kummer   m=3 tower  t= 4 hky d_F=None ffd=Some(4) falls=[4, 5] censored_at=Some(6) 2213 ms
+kummer   m=3 tower  t= 4 N=12 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0   2213.1 ms  TIMEOUT
+kummer   m=3 tower  t= 4 hky d_F=None ffd=Some(4) falls=[4, 5] censored_at=Some(6) 2296 ms
+kummer   m=3 tower  t= 4 N=12 g= 1 random  Dmax=  0 reached=  0 cols_to_sol=      0 cols=      0   2295.8 ms  TIMEOUT
 -- kummer m=3 tower: every run at t = 4 timed out; stopping
 check PASS: budget 2: rc 0
 check PASS: budget 0 closes at t=2
@@ -203,16 +210,16 @@ check PASS: the runner exited 0 for B-m3-tower
 RESULT T4: PASS (0 failed checks)
 ##### T5
 === job A (PREV none), killed with SIGKILL while B-m3-tower-t4 is in flight
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 79: 15830 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 94: 19857 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
 no live pilot left after the kill (defunct zombie entries ignored)
 S3 progress of A:
-2026-11-10T17:46:03Z start g1
-2026-11-10T17:46:03Z end g1 exit 0
-2026-11-10T17:46:03Z start B-m3-tower-t2
-2026-11-10T17:46:03Z end B-m3-tower-t2 exit 0
-2026-11-10T17:46:03Z start B-m3-tower-t3
-2026-11-10T17:46:06Z end B-m3-tower-t3 exit 0
-2026-11-10T17:46:06Z start B-m3-tower-t4
+2026-11-10T18:33:07Z start g1
+2026-11-10T18:33:07Z end g1 exit 0
+2026-11-10T18:33:07Z start B-m3-tower-t2
+2026-11-10T18:33:07Z end B-m3-tower-t2 exit 0
+2026-11-10T18:33:07Z start B-m3-tower-t3
+2026-11-10T18:33:10Z end B-m3-tower-t3 exit 0
+2026-11-10T18:33:10Z start B-m3-tower-t4
 B-m3-tower-t2.argv
 B-m3-tower-t2.jsonl
 B-m3-tower-t2.log
@@ -223,30 +230,30 @@ B-m3-tower-t3.log
 B-m3-tower-t3.out
 === job D (PREV = A): resume to the end
 rc=0
-2026-11-10T17:46:07Z start g1
-2026-11-10T17:46:07Z end g1 exit 0
-2026-11-10T17:46:07Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:46:07Z skip B-m3-tower-t3 done-in 0
-2026-11-10T17:46:07Z start B-m3-tower-t4
-2026-11-10T17:47:21Z end B-m3-tower-t4 exit 0
-2026-11-10T17:47:21Z start DB-m3-tower-t2
-2026-11-10T17:47:21Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:33:11Z start g1
+2026-11-10T18:33:11Z end g1 exit 0
+2026-11-10T18:33:11Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:33:11Z skip B-m3-tower-t3 done-in 0
+2026-11-10T18:33:11Z start B-m3-tower-t4
+2026-11-10T18:34:36Z end B-m3-tower-t4 exit 0
+2026-11-10T18:34:36Z start DB-m3-tower-t2
+2026-11-10T18:34:36Z end DB-m3-tower-t2 exit 0
 B-m3-tower-t4
 DB-m3-tower-t2
-prev: s3://b/A
+prev: s3://b/runs/pfd-bu-1-777/A/
 === job B (PREV = A), killed again while B-m3-tower-t4 is in flight
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 79: 16837 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
-2026-11-10T17:47:21Z start g1
-2026-11-10T17:47:21Z end g1 exit 0
-2026-11-10T17:47:21Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:47:21Z skip B-m3-tower-t3 done-in 0
-2026-11-10T17:47:21Z start B-m3-tower-t4
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 94: 20969 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+2026-11-10T18:34:37Z start g1
+2026-11-10T18:34:37Z end g1 exit 0
+2026-11-10T18:34:37Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:34:37Z skip B-m3-tower-t3 done-in 0
+2026-11-10T18:34:37Z start B-m3-tower-t4
 === job C (PREV = A, B): t4 in flight in two prevs
 lost B-m3-tower-t4
 rc=75
-2026-11-10T17:47:23Z start g1
-2026-11-10T17:47:23Z end g1 exit 0
-2026-11-10T17:47:23Z lost B-m3-tower-t4
+2026-11-10T18:34:38Z start g1
+2026-11-10T18:34:38Z end g1 exit 0
+2026-11-10T18:34:38Z lost B-m3-tower-t4
 lost_units.txt:
 B-m3-tower-t4
 binary.sha256
@@ -266,16 +273,16 @@ check PASS: C: no unit started
 RESULT T5: PASS (0 failed checks)
 ##### T6
 rc=20
-2026-11-10T17:47:23Z start g1
-2026-11-10T17:47:23Z end g1 exit 0
-2026-11-10T17:47:23Z start B-m3-tower-t2
-2026-11-10T17:47:23Z end B-m3-tower-t2 exit 0
-2026-11-10T17:47:23Z start B-m3-tower-t3
-2026-11-10T17:47:23Z end B-m3-tower-t3 exit 3
+2026-11-10T18:34:38Z start g1
+2026-11-10T18:34:38Z end g1 exit 0
+2026-11-10T18:34:38Z start B-m3-tower-t2
+2026-11-10T18:34:38Z end B-m3-tower-t2 exit 0
+2026-11-10T18:34:38Z start B-m3-tower-t3
+2026-11-10T18:34:38Z end B-m3-tower-t3 exit 3
 0
-2026-11-10T17:47:23Z end B-m3-tower-t2 exit 0
-2026-11-10T17:47:23Z start B-m3-tower-t3
-2026-11-10T17:47:23Z end B-m3-tower-t3 exit 3
+2026-11-10T18:34:38Z end B-m3-tower-t2 exit 0
+2026-11-10T18:34:38Z start B-m3-tower-t3
+2026-11-10T18:34:38Z end B-m3-tower-t3 exit 3
 B-m3-tower-t2.argv
 B-m3-tower-t2.jsonl
 B-m3-tower-t2.log
@@ -294,11 +301,11 @@ RESULT T6: PASS (0 failed checks)
 runner rc=143
 live pilots after TERM: 0
 S3 progress:
-2026-11-10T17:47:23Z start g1
-2026-11-10T17:47:23Z end g1 exit 0
-2026-11-10T17:47:23Z start B-m3-tower-t3
-2026-11-10T17:47:26Z end B-m3-tower-t3 exit 0
-2026-11-10T17:47:26Z start B-m3-tower-t4
+2026-11-10T18:34:39Z start g1
+2026-11-10T18:34:39Z end g1 exit 0
+2026-11-10T18:34:39Z start B-m3-tower-t3
+2026-11-10T18:34:42Z end B-m3-tower-t3 exit 0
+2026-11-10T18:34:42Z start B-m3-tower-t4
 units_done.txt (S3):
 B-m3-tower-t3
 binary.sha256
@@ -318,37 +325,37 @@ RESULT T7: PASS (0 failed checks)
 job P rc=0
 === variant: log
 rc=12
-cannot read s3://b/Q/runs/B-m3-tower-t3.log
+cannot read s3://b/runs/pfd-bu-1-777/Q//runs/B-m3-tower-t3.log
 unit starts: 0
 check PASS: log: rc 12 and no unit started
 === variant: jsonl
 rc=12
-cannot read s3://b/Q/runs/B-m3-tower-t3.jsonl
+cannot read s3://b/runs/pfd-bu-1-777/Q//runs/B-m3-tower-t3.jsonl
 unit starts: 0
 check PASS: jsonl: rc 12 and no unit started
 === variant: nosummary
 rc=12
-s3://b/Q/runs/B-m3-tower-t3.jsonl has no final summary line
+s3://b/runs/pfd-bu-1-777/Q//runs/B-m3-tower-t3.jsonl has no final summary line
 unit starts: 0
 check PASS: nosummary: rc 12 and no unit started
 === variant: argv
 rc=12
-cannot read s3://b/Q/runs/B-m3-tower-t3.argv
+cannot read s3://b/runs/pfd-bu-1-777/Q//runs/B-m3-tower-t3.argv
 unit starts: 0
 check PASS: argv: rc 12 and no unit started
 === variant: hostfile
 rc=12
-cannot read s3://b/Q/host.txt
+cannot read s3://b/runs/pfd-bu-1-777/Q//host.txt
 unit starts: 0
 check PASS: hostfile: rc 12 and no unit started
 === variant: progressfile
 rc=12
-cannot read s3://b/Q/progress.txt
+cannot read s3://b/runs/pfd-bu-1-777/Q//progress.txt
 unit starts: 0
 check PASS: progressfile: rc 12 and no unit started
 === variant: binfile
 rc=12
-cannot read s3://b/Q/binary.sha256
+cannot read s3://b/runs/pfd-bu-1-777/Q//binary.sha256
 unit starts: 0
 check PASS: binfile: rc 12 and no unit started
 === control: the unedited copy is accepted
@@ -357,27 +364,28 @@ check PASS: control: rc 0, 3 units skipped done-in 0
 RESULT T8: PASS (0 failed checks)
 ##### T9
 === progress.txt upload fails (marker present from the start)
-shim: injected failure for $T/T9/s3/b/u1/progress.txt
-shim: injected failure for $T/T9/s3/b/u1/progress.txt
+shim: injected failure for $T/T9/s3/b/u1//progress.txt
+shim: injected failure for $T/T9/s3/b/u1//progress.txt
 rc=13
-2026-11-10T17:47:34Z start g1
-2026-11-10T17:47:34Z end g1 exit 0
-2026-11-10T17:47:34Z start B-m3-tower-t2
-2026-11-10T17:47:34Z abort B-m3-tower-t2 start-upload-failed
+2026-11-10T18:34:51Z start g1
+2026-11-10T18:34:51Z end g1 exit 0
+2026-11-10T18:34:51Z start B-m3-tower-t2
+2026-11-10T18:34:51Z abort B-m3-tower-t2 start-upload-failed
 files in runs/ (no pilot started; only the argv record): B-m3-tower-t2.argv 
 === sync of runs/ fails after the unit
-shim: injected failure for $T/T9/s3/b/u2/runs
-shim: injected failure for $T/T9/s3/b/u2/runs
+shim: injected failure for $T/T9/s3/b/u2//runs
+shim: injected failure for $T/T9/s3/b/u2//runs
 rc=13
 local progress:
-2026-11-10T17:47:34Z start g1
-2026-11-10T17:47:34Z end g1 exit 0
-2026-11-10T17:47:34Z start B-m3-tower-t2
-2026-11-10T17:47:34Z abort B-m3-tower-t2 files-upload-failed
+2026-11-10T18:34:51Z start g1
+2026-11-10T18:34:51Z end g1 exit 0
+2026-11-10T18:34:51Z start B-m3-tower-t2
+2026-11-10T18:34:51Z abort B-m3-tower-t2 files-upload-failed
 S3 progress:
-2026-11-10T17:47:34Z start g1
-2026-11-10T17:47:34Z end g1 exit 0
-2026-11-10T17:47:34Z start B-m3-tower-t2
+2026-11-10T18:34:51Z start g1
+2026-11-10T18:34:51Z end g1 exit 0
+2026-11-10T18:34:51Z start B-m3-tower-t2
+2026-11-10T18:34:51Z abort B-m3-tower-t2 files-upload-failed
 end-exit-0 lines in S3: 0
 check PASS: u1: rc 13, local abort start-upload-failed, no pilot output
 check PASS: u2: rc 13, local abort files-upload-failed
@@ -410,14 +418,14 @@ check PASS: LOCK_WAIT=abc is refused (exit 15)
 RESULT T10: PASS (0 failed checks)
 ##### T11
 rc=0
-2026-11-10T17:47:34Z start g1
-2026-11-10T17:47:34Z end g1 exit 0
-2026-11-10T17:47:34Z start B-m3-tower-t2
-2026-11-10T17:47:34Z end B-m3-tower-t2 exit 0
-2026-11-10T17:47:34Z start B-m3-tower-t3
-2026-11-10T17:47:37Z end B-m3-tower-t3 exit 0
-2026-11-10T17:47:37Z start DB-m3-tower-t2
-2026-11-10T17:47:37Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:34:52Z start g1
+2026-11-10T18:34:52Z end g1 exit 0
+2026-11-10T18:34:52Z start B-m3-tower-t2
+2026-11-10T18:34:52Z end B-m3-tower-t2 exit 0
+2026-11-10T18:34:52Z start B-m3-tower-t3
+2026-11-10T18:34:54Z end B-m3-tower-t3 exit 0
+2026-11-10T18:34:54Z start DB-m3-tower-t2
+2026-11-10T18:34:55Z end DB-m3-tower-t2 exit 0
 B-m3-tower-t2
 B-m3-tower-t3
 DB-m3-tower-t2
@@ -426,85 +434,94 @@ RESULT T11: PASS (0 failed checks)
 ##### T12
 tools in PATH: 31; flock present: no; python3 present: no; jq present: no
 t12a rc=0
-2026-11-10T17:47:37Z start g1
-2026-11-10T17:47:37Z end g1 exit 0
-2026-11-10T17:47:37Z start B-m3-tower-t2
-2026-11-10T17:47:37Z end B-m3-tower-t2 exit 0
-2026-11-10T17:47:37Z start B-m3-tower-t3
-2026-11-10T17:47:40Z end B-m3-tower-t3 exit 0
-2026-11-10T17:47:40Z start DB-m3-tower-t2
-2026-11-10T17:47:40Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:34:55Z start g1
+2026-11-10T18:34:55Z end g1 exit 0
+2026-11-10T18:34:55Z start B-m3-tower-t2
+2026-11-10T18:34:55Z end B-m3-tower-t2 exit 0
+2026-11-10T18:34:55Z start B-m3-tower-t3
+2026-11-10T18:34:58Z end B-m3-tower-t3 exit 0
+2026-11-10T18:34:58Z start DB-m3-tower-t2
+2026-11-10T18:34:58Z end DB-m3-tower-t2 exit 0
 ls: cannot access '$T/T12/w-t12a/.up.lock.d': No such file or directory
 check PASS: t12a: rc 0, 3 units, no lock directory left
---- t12b: resume with PREV and an allow: argument, restricted PATH
+--- t12b: resume with PREV, restricted PATH
 t12b rc=0
-2026-11-10T17:47:40Z start g1
-2026-11-10T17:47:40Z end g1 exit 0
-2026-11-10T17:47:40Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:47:40Z skip B-m3-tower-t3 done-in 0
-2026-11-10T17:47:40Z skip DB-m3-tower-t2 done-in 0
+2026-11-10T18:34:58Z start g1
+2026-11-10T18:34:58Z end g1 exit 0
+2026-11-10T18:34:58Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:34:58Z skip B-m3-tower-t3 done-in 0
+2026-11-10T18:34:58Z skip DB-m3-tower-t2 done-in 0
 check PASS: t12b: rc 0, 3 skips
---- t12c: hand-made earlier jobs (copies of t12a with their progress.txt replaced): X1 has t2 done and t3 started, X2 has t3 started: t3 lost, exit 75; then close: runs
+--- t12c: hand-made earlier jobs (copies of t12a, jobs 1 and 2, progress.txt replaced): X1 has t2 done and t3 started, X2 has t3 started: t3 lost, exit 75; then allow: and close: run
 lost B-m3-tower-t3
 t12c rc=75
 B-m3-tower-t3
 check PASS: t12c: rc 75
 t12d rc=0
-2026-11-10T17:47:41Z start g1
-2026-11-10T17:47:41Z end g1 exit 0
-2026-11-10T17:47:41Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:47:41Z skip B-m3-tower-t3 closed-by-rule
-2026-11-10T17:47:41Z start DB-m3-tower-t2
-2026-11-10T17:47:41Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:34:59Z start g1
+2026-11-10T18:34:59Z end g1 exit 0
+2026-11-10T18:34:59Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:34:59Z skip B-m3-tower-t3 closed-by-rule
+2026-11-10T18:34:59Z start DB-m3-tower-t2
+2026-11-10T18:34:59Z end DB-m3-tower-t2 exit 0
 check PASS: t12d: rc 0, t3 closed-by-rule
+t12f rc=0
+2026-11-10T18:35:00Z start g1
+2026-11-10T18:35:00Z end g1 exit 0
+2026-11-10T18:35:00Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:35:00Z start B-m3-tower-t3
+2026-11-10T18:35:02Z end B-m3-tower-t3 exit 0
+2026-11-10T18:35:02Z start DB-m3-tower-t2
+2026-11-10T18:35:03Z end DB-m3-tower-t2 exit 0
+check PASS: t12f: rc 0, t3 run after allow:
 --- t12e: two hand-made failures (end t3 exit 3 in Y1 and Y2): tool-failure closure
 t12e rc=0
-2026-11-10T17:47:41Z start g1
-2026-11-10T17:47:41Z end g1 exit 0
-2026-11-10T17:47:41Z closed B-m3-tower at t=3 tool-failure
-2026-11-10T17:47:41Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:47:41Z skip B-m3-tower-t3 closed-tool-failure
-2026-11-10T17:47:41Z start DB-m3-tower-t2
-2026-11-10T17:47:42Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:35:03Z start g1
+2026-11-10T18:35:03Z end g1 exit 0
+2026-11-10T18:35:03Z closed B-m3-tower at t=3 tool-failure
+2026-11-10T18:35:03Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:35:03Z skip B-m3-tower-t3 closed-tool-failure
+2026-11-10T18:35:03Z start DB-m3-tower-t2
+2026-11-10T18:35:03Z end DB-m3-tower-t2 exit 0
 B-m3-tower t=3 tool-failure
 check PASS: t12e: rc 0, closed tool-failure at t=3
 RESULT T12: PASS (0 failed checks)
 ##### T13
 job1 rc=0
-job2 (PREV=s3://b/jobS/) rc=0
-2026-11-10T17:47:45Z start g1
-2026-11-10T17:47:45Z end g1 exit 0
-2026-11-10T17:47:45Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:47:45Z skip B-m3-tower-t3 done-in 0
-2026-11-10T17:47:45Z start B-m3-tower-t4
-2026-11-10T17:48:59Z end B-m3-tower-t4 exit 0
-2026-11-10T17:48:59Z skip DB-m3-tower-t2 done-in 0
+job2 (PREV=s3://b/runs/pfd-bu-1-777/jobS/) rc=0
+2026-11-10T18:35:07Z start g1
+2026-11-10T18:35:07Z end g1 exit 0
+2026-11-10T18:35:07Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:35:07Z skip B-m3-tower-t3 done-in 0
+2026-11-10T18:35:07Z start B-m3-tower-t4
+2026-11-10T18:36:32Z end B-m3-tower-t4 exit 0
+2026-11-10T18:36:32Z skip DB-m3-tower-t2 done-in 0
 --- raw URIs of job1 (first 12) and the PREV reads of job2:
-cp $T/T13/w-j1/binary.sha256 s3://b/jobS//binary.sha256
-cp $T/T13/w-j1/host.txt s3://b/jobS//host.txt
-cp $T/T13/w-j1/units_done.txt s3://b/jobS//units_done.txt
-cp $T/T13/w-j1/progress.txt s3://b/jobS//progress.txt
-sync $T/T13/w-j1/runs s3://b/jobS//runs
-sync $T/T13/w-j1/gates s3://b/jobS//gates
-cp $T/T13/w-j1/units_done.txt s3://b/jobS//units_done.txt
-cp $T/T13/w-j1/progress.txt s3://b/jobS//progress.txt
-cp $T/T13/w-j1/units_done.txt s3://b/jobS//units_done.txt
-cp $T/T13/w-j1/progress.txt s3://b/jobS//progress.txt
-sync $T/T13/w-j1/runs s3://b/jobS//runs
-sync $T/T13/w-j1/gates s3://b/jobS//gates
+cp $T/T13/w-jobS/binary.sha256 s3://b/runs/pfd-bu-1-777/jobS//binary.sha256
+cp $T/T13/w-jobS/host.txt s3://b/runs/pfd-bu-1-777/jobS//host.txt
+cp $T/T13/w-jobS/units_done.txt s3://b/runs/pfd-bu-1-777/jobS//units_done.txt
+cp $T/T13/w-jobS/progress.snap s3://b/runs/pfd-bu-1-777/jobS//progress.txt
+sync $T/T13/w-jobS/runs s3://b/runs/pfd-bu-1-777/jobS//runs
+sync $T/T13/w-jobS/gates s3://b/runs/pfd-bu-1-777/jobS//gates
+cp $T/T13/w-jobS/units_done.txt s3://b/runs/pfd-bu-1-777/jobS//units_done.txt
+cp $T/T13/w-jobS/progress.snap s3://b/runs/pfd-bu-1-777/jobS//progress.txt
+cp $T/T13/w-jobS/units_done.txt s3://b/runs/pfd-bu-1-777/jobS//units_done.txt
+cp $T/T13/w-jobS/progress.snap s3://b/runs/pfd-bu-1-777/jobS//progress.txt
+sync $T/T13/w-jobS/runs s3://b/runs/pfd-bu-1-777/jobS//runs
+sync $T/T13/w-jobS/gates s3://b/runs/pfd-bu-1-777/jobS//gates
 21
-cp s3://b/jobS//progress.txt $T/T13/w-j2/prev/0/progress.txt
-cp s3://b/jobS//host.txt $T/T13/w-j2/prev/0/host.txt
-cp s3://b/jobS//binary.sha256 $T/T13/w-j2/prev/0/binary.sha256
-cp s3://b/jobS//runs/B-m3-tower-t2.argv $T/T13/w-j2/prev/0/runs/B-m3-tower-t2.argv
-cp s3://b/jobS//runs/B-m3-tower-t2.log $T/T13/w-j2/prev/0/runs/B-m3-tower-t2.log
-cp s3://b/jobS//runs/B-m3-tower-t2.jsonl $T/T13/w-j2/prev/0/runs/B-m3-tower-t2.jsonl
-cp s3://b/jobS//runs/B-m3-tower-t3.argv $T/T13/w-j2/prev/0/runs/B-m3-tower-t3.argv
-cp s3://b/jobS//runs/B-m3-tower-t3.log $T/T13/w-j2/prev/0/runs/B-m3-tower-t3.log
-cp s3://b/jobS//runs/B-m3-tower-t3.jsonl $T/T13/w-j2/prev/0/runs/B-m3-tower-t3.jsonl
-cp s3://b/jobS//runs/DB-m3-tower-t2.argv $T/T13/w-j2/prev/0/runs/DB-m3-tower-t2.argv
-cp s3://b/jobS//runs/DB-m3-tower-t2.log $T/T13/w-j2/prev/0/runs/DB-m3-tower-t2.log
-cp s3://b/jobS//runs/DB-m3-tower-t2.jsonl $T/T13/w-j2/prev/0/runs/DB-m3-tower-t2.jsonl
+cp s3://b/runs/pfd-bu-1-777/jobS//progress.txt $T/T13/w-jobS2/prev/0/progress.txt
+cp s3://b/runs/pfd-bu-1-777/jobS//host.txt $T/T13/w-jobS2/prev/0/host.txt
+cp s3://b/runs/pfd-bu-1-777/jobS//binary.sha256 $T/T13/w-jobS2/prev/0/binary.sha256
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/B-m3-tower-t2.argv $T/T13/w-jobS2/prev/0/runs/B-m3-tower-t2.argv
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/B-m3-tower-t2.log $T/T13/w-jobS2/prev/0/runs/B-m3-tower-t2.log
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/B-m3-tower-t2.jsonl $T/T13/w-jobS2/prev/0/runs/B-m3-tower-t2.jsonl
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/B-m3-tower-t3.argv $T/T13/w-jobS2/prev/0/runs/B-m3-tower-t3.argv
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/B-m3-tower-t3.log $T/T13/w-jobS2/prev/0/runs/B-m3-tower-t3.log
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/B-m3-tower-t3.jsonl $T/T13/w-jobS2/prev/0/runs/B-m3-tower-t3.jsonl
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/DB-m3-tower-t2.argv $T/T13/w-jobS2/prev/0/runs/DB-m3-tower-t2.argv
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/DB-m3-tower-t2.log $T/T13/w-jobS2/prev/0/runs/DB-m3-tower-t2.log
+cp s3://b/runs/pfd-bu-1-777/jobS//runs/DB-m3-tower-t2.jsonl $T/T13/w-jobS2/prev/0/runs/DB-m3-tower-t2.jsonl
 --- shim directory layout:
 ./b/jobS/binary.sha256
 ./b/jobS/gates/g1.log
@@ -544,39 +561,39 @@ T2 job (list exhausted) rc=0
 === forced exit 14: a prev says ladder B-m3-tower closed at t=4 (done t4 with 'timed out; stopping') but t2, t3 were never done
 incomplete: B-m3-tower-t2 is neither done nor at or above a closed ladder level
 rc=14
-2026-11-10T17:49:02Z start g1
-2026-11-10T17:49:02Z end g1 exit 0
-2026-11-10T17:49:02Z skip B-m3-tower-t2 ladder-closed
-2026-11-10T17:49:02Z skip B-m3-tower-t3 ladder-closed
-2026-11-10T17:49:02Z skip B-m3-tower-t4 done-in 0
+2026-11-10T18:36:36Z start g1
+2026-11-10T18:36:36Z end g1 exit 0
+2026-11-10T18:36:36Z skip B-m3-tower-t2 ladder-closed
+2026-11-10T18:36:36Z skip B-m3-tower-t3 ladder-closed
+2026-11-10T18:36:36Z skip B-m3-tower-t4 done-in 0
 check PASS: T2 job rc 0 with the filtered list exhausted
 check PASS: forced exit 14, t2 and t3 skipped ladder-closed
 RESULT T14: PASS (0 failed checks)
 ##### T15
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 272: 24732 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 272: 25103 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
-2026-11-10T17:49:06Z start g1
-2026-11-10T17:49:06Z end g1 exit 0
-2026-11-10T17:49:06Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:06Z skip B-m3-tower-t3 done-in 0
-2026-11-10T17:49:06Z start B-m3-tower-t4
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 290: 29361 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 290: 29769 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+2026-11-10T18:36:41Z start g1
+2026-11-10T18:36:41Z end g1 exit 0
+2026-11-10T18:36:41Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:36:41Z skip B-m3-tower-t3 done-in 0
+2026-11-10T18:36:41Z start B-m3-tower-t4
 === job C without the rule: lost
 lost B-m3-tower-t4
 rc=75
 === job C with close:B-m3-tower:4 (t4 is lost, so the rule is accepted)
 rc=0
-2026-11-10T17:49:08Z start g1
-2026-11-10T17:49:08Z end g1 exit 0
-2026-11-10T17:49:08Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:08Z skip B-m3-tower-t3 done-in 0
-2026-11-10T17:49:08Z skip B-m3-tower-t4 closed-by-rule
-2026-11-10T17:49:08Z start DB-m3-tower-t2
-2026-11-10T17:49:08Z end DB-m3-tower-t2 exit 0
+2026-11-10T18:36:43Z start g1
+2026-11-10T18:36:43Z end g1 exit 0
+2026-11-10T18:36:43Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:36:43Z skip B-m3-tower-t3 done-in 0
+2026-11-10T18:36:43Z skip B-m3-tower-t4 closed-by-rule
+2026-11-10T18:36:43Z start DB-m3-tower-t2
+2026-11-10T18:36:44Z end DB-m3-tower-t2 exit 0
 ladders_closed.txt:
 B-m3-tower t=4 by-rule
 units_done.txt:
 DB-m3-tower-t2
-prev: s3://b/A s3://b/B
+prev: s3://b/runs/pfd-bu-1-777/A/ s3://b/runs/pfd-bu-2-777/B/
 closed_by_rule: close:B-m3-tower:4
 check PASS: C0 (no rule): rc 75
 check PASS: C: rc 0, t4 closed-by-rule, DB-m3-tower-t2 run
@@ -601,23 +618,23 @@ A rc=20
 B rc=20
 === job C (PREV A B), the failure switched OFF: the rule, not a rerun, must skip t3
 C rc=0
-2026-11-10T17:49:09Z start g1
-2026-11-10T17:49:09Z end g1 exit 0
-2026-11-10T17:49:09Z closed B-m3-tower at t=3 tool-failure
-2026-11-10T17:49:09Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:09Z skip B-m3-tower-t3 closed-tool-failure
-2026-11-10T17:49:09Z skip B-m3-tower-t4 closed-tool-failure
+2026-11-10T18:36:46Z start g1
+2026-11-10T18:36:46Z end g1 exit 0
+2026-11-10T18:36:46Z closed B-m3-tower at t=3 tool-failure
+2026-11-10T18:36:46Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:36:46Z skip B-m3-tower-t3 closed-tool-failure
+2026-11-10T18:36:46Z skip B-m3-tower-t4 closed-tool-failure
 B-m3-tower t=3 tool-failure
 closed_by_rule: 
 closed_tool_failure: B-m3-tower:3
 === job D (PREV A B C), also without an argument
 D rc=0
-2026-11-10T17:49:09Z start g1
-2026-11-10T17:49:10Z end g1 exit 0
-2026-11-10T17:49:10Z closed B-m3-tower at t=3 tool-failure
-2026-11-10T17:49:10Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:10Z skip B-m3-tower-t3 closed-tool-failure
-2026-11-10T17:49:10Z skip B-m3-tower-t4 closed-tool-failure
+2026-11-10T18:36:46Z start g1
+2026-11-10T18:36:46Z end g1 exit 0
+2026-11-10T18:36:46Z closed B-m3-tower at t=3 tool-failure
+2026-11-10T18:36:46Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:36:46Z skip B-m3-tower-t3 closed-tool-failure
+2026-11-10T18:36:46Z skip B-m3-tower-t4 closed-tool-failure
 B-m3-tower t=3 tool-failure
 --- wrapper calls (unit, fail|run), in order:
 B-m3-tower-t2 run
@@ -633,17 +650,17 @@ check PASS: the pilot was called for t3 exactly twice (A, B), never in C or D
 === T16b: a unit that failed once and passes on the rerun (B-m3-tower-t2 fails in E, passes in F)
 E rc=20
 F rc=0
-2026-11-10T17:49:10Z start g1
-2026-11-10T17:49:10Z end g1 exit 0
-2026-11-10T17:49:10Z start B-m3-tower-t2
-2026-11-10T17:49:10Z end B-m3-tower-t2 exit 0
-2026-11-10T17:49:10Z start B-m3-tower-t3
-2026-11-10T17:49:12Z end B-m3-tower-t3 exit 0
+2026-11-10T18:36:47Z start g1
+2026-11-10T18:36:47Z end g1 exit 0
+2026-11-10T18:36:47Z start B-m3-tower-t2
+2026-11-10T18:36:47Z end B-m3-tower-t2 exit 0
+2026-11-10T18:36:47Z start B-m3-tower-t3
+2026-11-10T18:36:50Z end B-m3-tower-t3 exit 0
 G rc=0
-2026-11-10T17:49:13Z start g1
-2026-11-10T17:49:13Z end g1 exit 0
-2026-11-10T17:49:13Z skip B-m3-tower-t2 done-in 1
-2026-11-10T17:49:13Z skip B-m3-tower-t3 done-in 1
+2026-11-10T18:36:50Z start g1
+2026-11-10T18:36:50Z end g1 exit 0
+2026-11-10T18:36:50Z skip B-m3-tower-t2 done-in 1
+2026-11-10T18:36:50Z skip B-m3-tower-t3 done-in 1
 check PASS: E rc 20, F rc 0
 check PASS: F: t2 rerun done and t3 run (ladder continues), no closure
 check PASS: G: rc 0, both skipped done-in 1
@@ -651,10 +668,10 @@ check PASS: G: rc 0, both skipped done-in 1
 J (budget 0, 3 units done, each closes its ladder) rc=0
 lost B-m3-null-t2
 K (PREV X1 X2 X3) rc=75
-2026-11-10T17:49:13Z start g1
-2026-11-10T17:49:13Z end g1 exit 0
-2026-11-10T17:49:13Z closed DB-m3-tower at t=2 tool-failure
-2026-11-10T17:49:13Z lost B-m3-null-t2
+2026-11-10T18:36:52Z start g1
+2026-11-10T18:36:52Z end g1 exit 0
+2026-11-10T18:36:52Z closed DB-m3-tower at t=2 tool-failure
+2026-11-10T18:36:52Z lost B-m3-null-t2
 lost_units.txt:
 B-m3-null-t2
 ladders_closed.txt (S3):
@@ -670,29 +687,29 @@ RESULT T16: PASS (0 failed checks)
 shim_faults: injected failure on progress upload #2
 rc=13
 local progress:
-2026-11-10T17:49:14Z start g1
-2026-11-10T17:49:14Z end g1 exit 0
-2026-11-10T17:49:14Z start B-m3-tower-t2
-2026-11-10T17:49:14Z end B-m3-tower-t2 exit 0
-2026-11-10T17:49:14Z abort B-m3-tower-t2 end-upload-failed
+2026-11-10T18:36:52Z start g1
+2026-11-10T18:36:52Z end g1 exit 0
+2026-11-10T18:36:52Z start B-m3-tower-t2
+2026-11-10T18:36:52Z end B-m3-tower-t2 exit 0
+2026-11-10T18:36:52Z abort B-m3-tower-t2 end-upload-failed
 S3 progress:
-2026-11-10T17:49:14Z start g1
-2026-11-10T17:49:14Z end g1 exit 0
-2026-11-10T17:49:14Z start B-m3-tower-t2
-2026-11-10T17:49:14Z end B-m3-tower-t2 exit 0
-2026-11-10T17:49:14Z abort B-m3-tower-t2 end-upload-failed
+2026-11-10T18:36:52Z start g1
+2026-11-10T18:36:52Z end g1 exit 0
+2026-11-10T18:36:52Z start B-m3-tower-t2
+2026-11-10T18:36:52Z end B-m3-tower-t2 exit 0
+2026-11-10T18:36:52Z abort B-m3-tower-t2 end-upload-failed
 S3 units_done.txt:
 B-m3-tower-t2
 snapshots of what S3 held before each progress upload (n: units_done | progress last line | last line being uploaded):
-1: [] |  | 2026-11-10T17:49:14Z start B-m3-tower-t2
-2: [B-m3-tower-t2 ] | 2026-11-10T17:49:14Z start B-m3-tower-t2 | 2026-11-10T17:49:14Z end B-m3-tower-t2 exit 0
-3: [B-m3-tower-t2 ] | 2026-11-10T17:49:14Z start B-m3-tower-t2 | 2026-11-10T17:49:14Z abort B-m3-tower-t2 end-upload-failed
+1: [] |  | 2026-11-10T18:36:52Z start B-m3-tower-t2
+2: [B-m3-tower-t2 ] | 2026-11-10T18:36:52Z start B-m3-tower-t2 | 2026-11-10T18:36:52Z end B-m3-tower-t2 exit 0
+3: [B-m3-tower-t2 ] | 2026-11-10T18:36:52Z start B-m3-tower-t2 | 2026-11-10T18:36:52Z abort B-m3-tower-t2 end-upload-failed
 next job rc=0
-2026-11-10T17:49:14Z start g1
-2026-11-10T17:49:14Z end g1 exit 0
-2026-11-10T17:49:14Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:14Z start B-m3-tower-t3
-2026-11-10T17:49:17Z end B-m3-tower-t3 exit 0
+2026-11-10T18:36:53Z start g1
+2026-11-10T18:36:53Z end g1 exit 0
+2026-11-10T18:36:53Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:36:53Z start B-m3-tower-t3
+2026-11-10T18:36:56Z end B-m3-tower-t3 exit 0
 units_done.txt of the next job:
 B-m3-tower-t3
 check PASS: rc 13, abort end-upload-failed after the end line
@@ -705,10 +722,10 @@ check PASS: the union of the two jobs' units_done.txt has both units
 === T17(ii): SIGTERM while the end line of t2 is being uploaded (the upload is held 4 s by the shim)
 runner rc=143
 S3 progress:
-2026-11-10T17:49:17Z start g1
-2026-11-10T17:49:17Z end g1 exit 0
-2026-11-10T17:49:17Z start B-m3-tower-t2
-2026-11-10T17:49:17Z end B-m3-tower-t2 exit 0
+2026-11-10T18:36:56Z start g1
+2026-11-10T18:36:56Z end g1 exit 0
+2026-11-10T18:36:56Z start B-m3-tower-t2
+2026-11-10T18:36:56Z end B-m3-tower-t2 exit 0
 S3 units_done.txt:
 B-m3-tower-t2
 check PASS: rc 143
@@ -720,22 +737,22 @@ RESULT T17: PASS (0 failed checks)
 A rc=0
 B-m3-tower t=2 this-job
 B rc=0
-2026-11-10T17:49:26Z start g1
-2026-11-10T17:49:26Z end g1 exit 0
-2026-11-10T17:49:26Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:26Z skip B-m3-tower-t3 ladder-closed
-2026-11-10T17:49:26Z skip B-m3-tower-t4 ladder-closed
-prev: s3://b/A
+2026-11-10T18:37:06Z start g1
+2026-11-10T18:37:06Z end g1 exit 0
+2026-11-10T18:37:06Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:37:06Z skip B-m3-tower-t3 ladder-closed
+2026-11-10T18:37:06Z skip B-m3-tower-t4 ladder-closed
+prev: s3://b/runs/pfd-bu-1-777/A/
 C (PREV B only) rc=12
-s3://b/B was run after s3://b/A, which is not among the PREVs: an earlier job was left out
+s3://b/runs/pfd-bu-2-777/B/ was run after s3://b/runs/pfd-bu-1-777/A/, which is not among the PREVs: an earlier job was left out
 control C2 (PREV A B) rc=0
 check PASS: C: exit 12, message names the left-out job, no unit started
 check PASS: control C2: rc 0
 === T18b: a duplicate PREV is refused with exit 16
 rc=16
-bad argument s3://b/A: PREV given twice
+bad argument s3://b/runs/pfd-bu-1-777/A/: PREV given twice
 check PASS: duplicate PREV: exit 16
-=== T18c: a unit done in two PREVs is refused with exit 12
+=== T18c: a unit done in two PREVs (job 1 and a copy of it as job 2) is refused with exit 12
 rc=12
 unit B-m3-tower-t2 is done in more than one PREV
 unit starts: 0
@@ -749,25 +766,25 @@ check PASS: control: rc 0
 === (a) pilot_extra differs: a genuine job with --seed 778, then a seed 777 job naming it
 P778 rc=0
 rc=12
-s3://b/P778/host.txt: its pilot_extra: line differs from this job's
+s3://b/runs/pfd-bu-1-777/P778//host.txt: its pilot_extra: line differs from this job's
 check PASS: pilot_extra: exit 12, no unit started
 === (b) runner text differs: a genuine job run from a copy of the runner with one more comment line
 PA rc=0
 rc=12
-s3://b/PA/host.txt: its runner_sha256: line differs from this job's
+s3://b/runs/pfd-bu-1-777/PA//host.txt: its runner_sha256: line differs from this job's
 check PASS: runner_sha256: exit 12, no unit started
 === (c) edited copies of P: testmode 0; first binary hash; the argv record of t3; no runner_sha256 line (as a revision 2 host.txt)
 --- testmode: rc=12
-s3://b/Q/host.txt: its testmode: line differs from this job's
+s3://b/runs/pfd-bu-1-777/Q//host.txt: its testmode: line differs from this job's
 check PASS: testmode: exit 12, no unit started
 --- binhash: rc=12
-s3://b/Q/binary.sha256 differs from this job's binary hashes
+s3://b/runs/pfd-bu-1-777/Q//binary.sha256 differs from this job's binary hashes
 check PASS: binhash: exit 12, no unit started
 --- argv: rc=12
-s3://b/Q/runs/B-m3-tower-t3.argv differs from the argv this job computes for B-m3-tower-t3
+s3://b/runs/pfd-bu-1-777/Q//runs/B-m3-tower-t3.argv differs from the argv this job computes for B-m3-tower-t3
 check PASS: argv: exit 12, no unit started
 --- nosha: rc=12
-s3://b/Q/host.txt: its runner_sha256: line differs from this job's
+s3://b/runs/pfd-bu-1-777/Q//host.txt: its runner_sha256: line differs from this job's
 check PASS: nosha: exit 12, no unit started
 RESULT T19: PASS (0 failed checks)
 ##### T20
@@ -775,48 +792,48 @@ RESULT T19: PASS (0 failed checks)
 shim_faults: injected failure on progress upload #1
 A rc=13
 S3 progress of A:
-2026-11-10T17:49:42Z start g1
-2026-11-10T17:49:42Z end g1 exit 0
-2026-11-10T17:49:42Z start B-m3-tower-t2
-2026-11-10T17:49:42Z abort B-m3-tower-t2 start-upload-failed
+2026-11-10T18:37:24Z start g1
+2026-11-10T18:37:24Z end g1 exit 0
+2026-11-10T18:37:24Z start B-m3-tower-t2
+2026-11-10T18:37:24Z abort B-m3-tower-t2 start-upload-failed
 files in S3 runs/: B-m3-tower-t2.argv 
 shim_faults: injected failure on progress upload #1
 B rc=13
 S3 progress of B:
-2026-11-10T17:49:42Z start g1
-2026-11-10T17:49:42Z end g1 exit 0
-2026-11-10T17:49:42Z start B-m3-tower-t2
-2026-11-10T17:49:42Z abort B-m3-tower-t2 start-upload-failed
+2026-11-10T18:37:24Z start g1
+2026-11-10T18:37:24Z end g1 exit 0
+2026-11-10T18:37:24Z start B-m3-tower-t2
+2026-11-10T18:37:24Z abort B-m3-tower-t2 start-upload-failed
 files in S3 runs/: B-m3-tower-t2.argv 
 === job C (PREV A B)
 C rc=0
-2026-11-10T17:49:42Z start g1
-2026-11-10T17:49:42Z end g1 exit 0
-2026-11-10T17:49:42Z start B-m3-tower-t2
-2026-11-10T17:49:43Z end B-m3-tower-t2 exit 0
+2026-11-10T18:37:25Z start g1
+2026-11-10T18:37:25Z end g1 exit 0
+2026-11-10T18:37:25Z start B-m3-tower-t2
+2026-11-10T18:37:25Z end B-m3-tower-t2 exit 0
 cat: $T/T20/w-C/lost_units.txt: No such file or directory
 check PASS: A and B: S3 has start t2 then abort start-upload-failed, no end
 check PASS: C: rc 0, no lost unit, t2 run and done
 RESULT T20: PASS (0 failed checks)
 ##### T21
 === T21a: close: is carried forward. A and B are killed in t3 (t2 done in A); C is given close:; D is not
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 63:  3255 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 63:  3471 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78:  8029 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78:  8255 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
 lost B-m3-tower-t3
 C0 (no close:) rc=75
 C (close:B-m3-tower:3) rc=0
-2026-11-10T17:49:46Z start g1
-2026-11-10T17:49:46Z end g1 exit 0
-2026-11-10T17:49:46Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:46Z skip B-m3-tower-t3 closed-by-rule
-2026-11-10T17:49:46Z skip B-m3-tower-t4 closed-by-rule
+2026-11-10T18:37:29Z start g1
+2026-11-10T18:37:29Z end g1 exit 0
+2026-11-10T18:37:29Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:37:29Z skip B-m3-tower-t3 closed-by-rule
+2026-11-10T18:37:29Z skip B-m3-tower-t4 closed-by-rule
 closed_by_rule: close:B-m3-tower:3
 D (no close: argument) rc=0
-2026-11-10T17:49:47Z start g1
-2026-11-10T17:49:47Z end g1 exit 0
-2026-11-10T17:49:47Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:47Z skip B-m3-tower-t3 closed-by-rule
-2026-11-10T17:49:47Z skip B-m3-tower-t4 closed-by-rule
+2026-11-10T18:37:29Z start g1
+2026-11-10T18:37:29Z end g1 exit 0
+2026-11-10T18:37:29Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:37:29Z skip B-m3-tower-t3 closed-by-rule
+2026-11-10T18:37:29Z skip B-m3-tower-t4 closed-by-rule
 B-m3-tower t=3 by-rule
 closed_by_rule: close:B-m3-tower:3
 check PASS: C0: rc 75
@@ -841,33 +858,33 @@ bad argument close:B-m3-tower:3: unit B-m3-tower-t3 is not lost in these PREVs (
 unit starts: 0
 check PASS: [no PREV at all] close:B-m3-tower:3: exit 16, nothing started
 === T21c: allow:. A and B killed in t3 (in flight twice)
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 63:  5517 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 63:  5735 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 10497 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 10722 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
 lost B-m3-tower-t3
 without allow: rc=75
 check PASS: without allow:, t3 in flight twice: exit 75
 allow:B-m3-tower-t3:3: rc=0
-2026-11-10T17:49:51Z start g1
-2026-11-10T17:49:51Z end g1 exit 0
-2026-11-10T17:49:51Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:51Z start B-m3-tower-t3
-2026-11-10T17:49:54Z end B-m3-tower-t3 exit 0
+2026-11-10T18:37:34Z start g1
+2026-11-10T18:37:35Z end g1 exit 0
+2026-11-10T18:37:35Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:37:35Z start B-m3-tower-t3
+2026-11-10T18:37:37Z end B-m3-tower-t3 exit 0
 allowed: allow:B-m3-tower-t3:3
 check PASS: allow:...:3, in flight twice: the unit runs (rc 0, end t3 exit 0)
 --- chain with allow 3: C3 is given allow:3 and killed in t3 (in flight a third time); D3 has no argument
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 63:  6679 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 11698 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
 lost B-m3-tower-t3
 D3 (allowance carried, in flight 3 times): rc=75
 B-m3-tower-t3
 check PASS: in flight three times with allow 3 (carried): exit 75 again
 --- chain with allow 4: C4 is given allow:4 and killed in t3; D4 has no argument and runs t3
-/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 63:  7358 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 12396 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
 D4 (allow 4 carried, in flight 3 times): rc=0
-2026-11-10T17:49:58Z start g1
-2026-11-10T17:49:58Z end g1 exit 0
-2026-11-10T17:49:58Z skip B-m3-tower-t2 done-in 0
-2026-11-10T17:49:58Z start B-m3-tower-t3
-2026-11-10T17:50:00Z end B-m3-tower-t3 exit 0
+2026-11-10T18:37:42Z start g1
+2026-11-10T18:37:42Z end g1 exit 0
+2026-11-10T18:37:42Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:37:42Z start B-m3-tower-t3
+2026-11-10T18:37:45Z end B-m3-tower-t3 exit 0
 allowed: allow:B-m3-tower-t3:4
 check PASS: allowance carried to a later job without being repeated: t3 runs (rc 0)
 === T21d: bad allow:/close: arguments (exit 16)
@@ -891,31 +908,31 @@ bad argument close:B-m3-tower:4: a second close: for ladder B-m3-tower
 check PASS: close:B-m3-tower:3 close:B-m3-tower:4: exit 16
 RESULT T21: PASS (0 failed checks)
 ##### T22
-=== T22a: a leftover lock directory, LOCK_WAIT=3: exit 13 after the bounded waits, not a hang
-rc=13 elapsed=22s
+=== T22a: a leftover lock directory, LOCK_WAIT=2: exit 13 after the bounded waits, not a hang
+rc=13 elapsed=8s
 local progress:
-2026-11-10T17:50:01Z start g1
-2026-11-10T17:50:01Z end g1 exit 0
-2026-11-10T17:50:01Z start B-m3-tower-t2
-2026-11-10T17:50:04Z abort B-m3-tower-t2 start-upload-failed
+2026-11-10T18:37:46Z start g1
+2026-11-10T18:37:46Z end g1 exit 0
+2026-11-10T18:37:46Z start B-m3-tower-t2
+2026-11-10T18:37:48Z abort B-m3-tower-t2 start-upload-failed
 S3 progress:
-2026-11-10T17:50:01Z start g1
-2026-11-10T17:50:01Z end g1 exit 0
-2026-11-10T17:50:01Z start B-m3-tower-t2
-2026-11-10T17:50:04Z abort B-m3-tower-t2 start-upload-failed
-. .. .stop binary.sha256 gates host.txt ladders_closed.txt prev progress.txt runs units_done.txt 
+2026-11-10T18:37:46Z start g1
+2026-11-10T18:37:46Z end g1 exit 0
+2026-11-10T18:37:46Z start B-m3-tower-t2
+2026-11-10T18:37:48Z abort B-m3-tower-t2 start-upload-failed
+. .. .stop binary.sha256 gates host.txt ladders_closed.txt prev progress.snap progress.txt runs units_done.txt 
 check PASS: rc 13
-check PASS: elapsed is 20..60 s (3 s lock wait + the exit handler's 20 s wait, then the lock is removed regardless)
+check PASS: elapsed is 7..30 s (2 s lock wait + the exit handler's 5 s wait, then the lock is removed regardless)
 check PASS: abort start-upload-failed logged; S3 progress has it (exit handler uploaded after removing the lock)
 check PASS: stop file created, lock directory removed
 check PASS: no pilot started
-=== T22b: the lock is released by someone else after 8 s: the exit handler stops waiting then (not after 20 s)
-rc=13 elapsed=9s
-2026-11-10T17:50:23Z start g1
-2026-11-10T17:50:23Z end g1 exit 0
-2026-11-10T17:50:23Z start B-m3-tower-t2
-2026-11-10T17:50:27Z abort B-m3-tower-t2 start-upload-failed
-check PASS: rc 13, elapsed under 16 s
+=== T22b: the lock is released by someone else after 5 s: the exit handler stops waiting then (not after its 5 s limit)
+rc=13 elapsed=5s
+2026-11-10T18:37:53Z start g1
+2026-11-10T18:37:53Z end g1 exit 0
+2026-11-10T18:37:53Z start B-m3-tower-t2
+2026-11-10T18:37:55Z abort B-m3-tower-t2 start-upload-failed
+check PASS: rc 13, elapsed under 8 s (a forced removal would end at about 7.5 s plus G1)
 check PASS: abort line reached S3
 === T22c: the syncer. A fake sleep makes its 300 s period 2 s; B-m3-tower-t4 runs (about 70 s); .stop is created by hand after 7 s
 syncer sync-runs calls: after 7 s: 3; stop file created, 3 s later: 3; 7 s later: 3; after the TERM and the exit handler: 4; runner rc=143
@@ -961,7 +978,7 @@ rc=2: run the runner as a file: /bin/bash <file> <arguments>
 check PASS: bash -c form: exit 2
 RESULT T24: PASS (0 failed checks)
 ##### T25
-runner sha256 and size: 33bf8d84212b4eefad363a214a5c1c74faa196c880a8d6062a18f271b4af21a9 23668 bytes, 396 lines
+runner sha256 and size: 1c2229386976e8d6f22e5f243b269a5d23d588d0e105d6cb530c9a5488157a79 28966 bytes, 466 lines
 capital Q count: 0
 check PASS: no capital Q in the runner
 bash -n stageb_units_runner.sh: rc=0
@@ -1001,12 +1018,12 @@ constructs newer than bash 4.2 or unsafe under set -u (each count must be 0):
   EPOCH: 0
   "\${[A-Za-z_]*\[@\]}": 3
   (the last pattern lists expansions of whole arrays; each must be of a never-empty array:)
-106:  if [ "$cfg" = hky ]; then ARGV+=("${HKY[@]}"); else ARGV+=("${F4[@]}"); fi
-115:  PW=("${ARGV[@]}")
-375:  "$BIN" "${PW[@]}" > "runs/$u.out" 2> "runs/$u.log" < /dev/null &
+120:  if [ "$cfg" = hky ]; then ARGV+=("${HKY[@]}"); else ARGV+=("${F4[@]}"); fi
+129:  PW=("${ARGV[@]}")
+445:  "$BIN" "${PW[@]}" > "runs/$u.out" 2> "runs/$u.log" < /dev/null &
 check PASS: no forbidden construct
 commands the runner calls (words in command position, from a trace-free scan of the text without comments):
-     16 grep;      8 awk;      6 printf;      4 sort;      4 sleep;      4 mkdir;      4 cut;      3 tr;      3 kill;      2 wc;      2 wait;      2 sha256sum;      2 rmdir;      2 nproc;      2 date;      2 cat;      2 aws;      1 uname;      1 touch;      1 tail;      1 rm;      1 mv;      1 cp;
+     19 grep;      8 awk;      6 sort;      6 printf;      6 cut;      4 tr;      3 sleep;      3 mkdir;      3 kill;      2 wc;      2 wait;      2 sha256sum;      2 rmdir;      2 nproc;      2 date;      2 cp;      2 cat;      2 aws;      1 uname;      1 touch;      1 tail;      1 rm;      1 mv;
 check PASS: no flock, jq, python, seq, comm, diff, cmp, base64 in the runner text (uncommented lines)
 RESULT T25: PASS (0 failed checks)
 ##### T26
@@ -1015,13 +1032,13 @@ rc=0
 validator: /home/user/crypto/taskq/deploy/eks-karpenter/remote/run-command (sha256 1cdaa7447893fd5c...), 22 jq lines
 VALID    $T/T26/out/pfd-bu-1.json
 $T/T26/out/pfd-bu-1.json
-boot_sha256: 9118502af1ca3d4842f1b3b3cd12bf455bc68bf2b6e1de92a9b9daa2e782f3c9
-command word lengths: [9,2,299,6,8000,8000,7668]
-BOOT: set -u; r=$(mktemp) || exit 2; printf '%s' "${@:1:3}" | tr Q '\n' > "$r" || exit 2; [ "$(sha256sum < "$r" | cut -d' ' -f1)" = 33bf8d84212b4eefad363a214a5c1c74faa196c880a8d6062a18f271b4af21a9 ] || { echo 'runner text differs from its frozen SHA-256' >&2; exit 17; }; shift 3; exec /bin/bash "$r" "$@"
+boot_sha256: 572ce3fb23e57416732a64a7cc25523c5ff84bd8496a7dd59455e07b1b6bcade
+pieces: 4; command word lengths: [9,2,301,6,8000,8000,8000,4966]
+BOOT: set -u; r=$(mktemp) || exit 18; printf '%s' "${@:1:4}" | tr Q '\n' > "$r" || exit 18; [ "$(sha256sum < "$r" | cut -d' ' -f1)" = 1c2229386976e8d6f22e5f243b269a5d23d588d0e105d6cb530c9a5488157a79 ] || { echo 'runner text differs from its frozen SHA-256' >&2; exit 17; }; shift 4; exec /bin/bash "$r" "$@"
 check PASS: rc 0, VALID by validate_command_request.sh, prints boot_sha256
 check PASS: boot_sha256 printed = sha256 of the BOOT string in the request
 check PASS: every command word is 1..8192 characters without newline
-check PASS: the runner needs 3 pieces; BOOT names 3
+check PASS: BOOT names its pieces and the command has 4 + that many words
 check PASS: decoding the pieces gives the runner file byte for byte
 --- BOOT run as a job runs it: --list
 0f80105da0a47729f6a5242a522356e0f3877f29e2ca4c0c9a8e532ca583d2b5  -
@@ -1029,6 +1046,12 @@ check PASS: BOOT + --list gives the registered unit list
 --- BOOT with one character of piece 2 changed: exit 17
 rc=17: runner text differs from its frozen SHA-256
 check PASS: changed piece: exit 17 with the message, nothing run
+--- BOOT with a failing mktemp (TMPDIR does not exist): exit 18
+rc=18: mktemp: failed to create file via template '$T/T26/nonexistent/tmp.XXXXXXXXXX': No such file or directory
+check PASS: failing mktemp: exit 18 (not the runner's 2)
+--- STAMP that is not all digits is refused
+rc=5: STAMP must be all digits (the job name is pfd-bu-<N>-<STAMP>)
+check PASS: STAMP 2026-11-10: rc 5, nothing written
 --- refuses to overwrite
 rc=4: $T/T26/out/pfd-bu-1.json exists
 check PASS: second call: rc 4
@@ -1037,9 +1060,8 @@ N=3 PREV1 PREV2: rc=0
 ["s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-1-20261110/aaa/","s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-2-20261110/bbb/"]
 check PASS: N=3 with two PREVs: rc 0 and the arguments follow the pieces
 N=4 PREV1 skip:2:costguard PREV3: rc=0
-["s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-1-20261110/aaa/","s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-3-20261110/ccc/"]
-jobs not given as PREV: skip:2:costguard
-check PASS: skip word is not passed to the runner and is recorded in the note
+["s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-1-20261110/aaa/","skip:2:costguard","s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-3-20261110/ccc/"]
+check PASS: skip word is passed to the runner (in order) and recorded in the note
 N=2 PREV1 close: allow:: rc=0
 ["s3://isolab-results-104186811093-us-east-2/runs/pfd-bu-1-20261110/aaa/","close:B-m3-tower:3","allow:B-m3-tower-t3:3"]
 check PASS: close: and allow: words are passed to the runner in order
@@ -1085,6 +1107,164 @@ check PASS: placeholder RUNNER_SHA: rc 3
 rc=7: the runner text contains the letter Q; the newline encoding needs another letter
 check PASS: runner with a Q: rc 7, no request
 RESULT T26: PASS (0 failed checks)
+##### T28
+=== T28a: r10, the most recent earlier job left out. A (job 1) runs t2; B (job 2, PREV A) runs t3; C names only A
+A rc=0
+B rc=0
+C rc=12
+job 2 is neither given as a PREV nor skipped (an earlier job was left out)
+unit starts: 0
+check PASS: r10: exit 12, job 2 named, no unit started
+control C2 (PREV A B) rc=0
+check PASS: control: rc 0
+=== T28b: a gap in the middle (hand-made jobs 1 and 3, copies of A; job 3 did nothing; this job is number 4)
+rc=12
+job 2 is neither given as a PREV nor skipped (an earlier job was left out)
+check PASS: gap: exit 12, job 2 named
+=== T28c: skip: for a job that is also a PREV
+rc=12
+job 1 is both given as a PREV and skipped
+check PASS: PREV and skip for job 1: exit 12
+=== T28d: a valid skip:2:costguard (job 2 never ran), recorded in skipped:, carried to the next job without being repeated
+K (job 3) rc=0
+2026-11-10T18:38:23Z start g1
+2026-11-10T18:38:23Z end g1 exit 0
+2026-11-10T18:38:23Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:38:23Z start B-m3-tower-t3
+2026-11-10T18:38:26Z end B-m3-tower-t3 exit 0
+skipped: skip:2:costguard
+L (job 4, PREV A K, no skip argument) rc=0
+skipped: skip:2:costguard
+check PASS: K: rc 0, skipped: line
+check PASS: L: rc 0, the skip is carried
+=== T28e: the carried skip contradicted by another reason
+rc=12
+job 2 is skipped as neverran and as costguard
+check PASS: carried skip with another reason: exit 12
+=== T28f: ISOLAB_JOB_ID of another form: exit 2
+[job7]: rc=2: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not 'job7'
+check PASS: ISOLAB_JOB_ID 'job7': exit 2
+[pfd-bu-0-1]: rc=2: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not 'pfd-bu-0-1'
+check PASS: ISOLAB_JOB_ID 'pfd-bu-0-1': exit 2
+[pfd-bu-3]: rc=2: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not 'pfd-bu-3'
+check PASS: ISOLAB_JOB_ID 'pfd-bu-3': exit 2
+[pfd-bu-3-x]: rc=2: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not 'pfd-bu-3-x'
+check PASS: ISOLAB_JOB_ID 'pfd-bu-3-x': exit 2
+[pfd-bu-03-5]: rc=2: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not 'pfd-bu-03-5'
+check PASS: ISOLAB_JOB_ID 'pfd-bu-03-5': exit 2
+[]: rc=2: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not ''
+check PASS: ISOLAB_JOB_ID '': exit 2
+=== T28g: a PREV whose job: line does not match its URI; a PREV that is not earlier; bad skip words
+rc=12
+s3://b/runs/pfd-bu-1-777/Q/ does not contain its job name pfd-bu-2-777 as a path component
+check PASS: job: line vs URI: exit 12
+PREV job 2 for this job 2: rc=12
+s3://b/runs/pfd-bu-2-777/B/ is job 2, not an earlier job than this job 2
+check PASS: PREV not earlier than this job: exit 12
+[skip:3:costguard]: rc=16: bad argument skip:3:costguard: need skip:<n>:costguard or skip:<n>:neverran with 1 <= n < 3
+check PASS: [skip:3:costguard]: exit 16
+[skip:0:costguard]: rc=16: bad argument skip:0:costguard: need skip:<n>:costguard or skip:<n>:neverran with 1 <= n < 3
+check PASS: [skip:0:costguard]: exit 16
+[skip:1:other]: rc=16: bad argument skip:1:other: need skip:<n>:costguard or skip:<n>:neverran with 1 <= n < 3
+check PASS: [skip:1:other]: exit 16
+[skip:1:costguard:]: rc=16: bad argument skip:1:costguard:: need skip:<n>:costguard or skip:<n>:neverran with 1 <= n < 3
+check PASS: [skip:1:costguard:]: exit 16
+[skip:1:costguard skip:1:costguard]: rc=16: bad argument skip:1:costguard: a second skip: for job 1
+check PASS: [skip:1:costguard skip:1:costguard]: exit 16
+RESULT T28: PASS (0 failed checks)
+##### T29
+=== T29: aa (job 1) and ab (job 2) are killed in t3 (in flight twice)
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 19336 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 19559 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+--- e1: allow: for a unit never started
+rc=16: bad argument allow:B-m3-tower-t5:9: B-m3-tower-t5 is not lost in these PREVs with a new K above its in-flight count (0 in flight, K now 2)
+check PASS: e1: exit 16, nothing started
+--- allow: for a unit that is done (t2)
+rc=16: bad argument allow:B-m3-tower-t2:5: B-m3-tower-t2 is not lost in these PREVs with a new K above its in-flight count (0 in flight, K now 2)
+check PASS: done unit: exit 16
+--- close: and allow: for one unit
+rc=16: bad arguments: close:B-m3-tower:3 and allow:B-m3-tower-t3 for one unit
+check PASS: close: + allow: for one unit: exit 16
+--- allow:3 for the lost unit (in flight twice, K now 2): accepted, the unit runs
+rc=0
+2026-11-10T18:38:32Z start g1
+2026-11-10T18:38:32Z end g1 exit 0
+2026-11-10T18:38:32Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:38:32Z start B-m3-tower-t3
+2026-11-10T18:38:34Z end B-m3-tower-t3 exit 0
+check PASS: allow:3 for a lost unit: rc 0, t3 ran
+--- ac (job 3) is given allow:3 and killed in t3: in flight three times, carried K = 3
+/home/user/crypto/research/pkm_falldegree_unblock_20261107/devcheck_r2g/test_driver.sh: line 78: 20833 Killed                  setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null
+allow:3 again (K not above the 3 in flight): rc=16: bad argument allow:B-m3-tower-t3:3: B-m3-tower-t3 is not lost in these PREVs with a new K above its in-flight count (3 in flight, K now 3)
+check PASS: K not above the in-flight count: exit 16
+allow:4 (above 3): rc=0
+2026-11-10T18:38:37Z start g1
+2026-11-10T18:38:37Z end g1 exit 0
+2026-11-10T18:38:37Z skip B-m3-tower-t2 done-in 0
+2026-11-10T18:38:37Z start B-m3-tower-t3
+2026-11-10T18:38:40Z end B-m3-tower-t3 exit 0
+allowed: allow:B-m3-tower-t3:4
+check PASS: allow:4 above the count: rc 0, t3 ran, allowed: line
+RESULT T29: PASS (0 failed checks)
+##### T30
+=== T30: e5, TERM while the start line of t2 is being uploaded (held 4 s by the shim), in job 1 and in job 2
+z1 runner rc=143
+S3 progress of z1:
+2026-11-10T18:38:40Z start g1
+2026-11-10T18:38:40Z end g1 exit 0
+2026-11-10T18:38:40Z start B-m3-tower-t2
+2026-11-10T18:38:44Z abort B-m3-tower-t2 terminated-before-start
+pilot outputs: 0
+check PASS: z1: rc 143, S3 has start then abort terminated-before-start, no pilot ran
+z2 runner rc=143
+S3 progress of z2:
+2026-11-10T18:38:45Z start g1
+2026-11-10T18:38:45Z end g1 exit 0
+2026-11-10T18:38:45Z start B-m3-tower-t2
+2026-11-10T18:38:49Z abort B-m3-tower-t2 terminated-before-start
+pilot outputs: 0
+check PASS: z2: rc 143, S3 has start then abort terminated-before-start, no pilot ran
+job 3 (PREV z1 z2) rc=0
+2026-11-10T18:38:50Z start g1
+2026-11-10T18:38:50Z end g1 exit 0
+2026-11-10T18:38:50Z start B-m3-tower-t2
+2026-11-10T18:38:50Z end B-m3-tower-t2 exit 0
+check PASS: job 3: no lost unit, t2 runs and is done
+RESULT T30: PASS (0 failed checks)
+##### T31
+P rc=0
+=== control: an unedited copy of P (job 1)
+rc=0
+check PASS: control: rc 0
+=== a PREV whose closed_tool_failure: line names a closure this job does not recompute
+[B-m3-tower:3]: rc=12: s3://b/runs/pfd-bu-1-777/Q/ recorded the tool-failure closure B-m3-tower:3, which this job does not recompute: an earlier job is missing
+check PASS: [B-m3-tower:3]: exit 12, no unit started
+[DB-m3-tower:2 B-m3-tower:3]: rc=12: s3://b/runs/pfd-bu-1-777/Q/ recorded the tool-failure closure DB-m3-tower:2, which this job does not recompute: an earlier job is missing
+check PASS: [DB-m3-tower:2 B-m3-tower:3]: exit 12, no unit started
+=== a PREV host.txt without the closed_tool_failure: line
+rc=12: s3://b/runs/pfd-bu-1-777/Q//host.txt has no closed_tool_failure: line
+check PASS: no line: exit 12
+=== a real closure is recomputed: A, B fail t3 (jobs 1, 2), C closes it, D (PREV A B C) agrees (rc 0)
+C rc=0
+D rc=0
+check PASS: D: rc 0 (the closure recorded by C is recomputed)
+RESULT T31: PASS (0 failed checks)
+##### T32
+=== T32: the exit handler's upload order (SIGTERM while B-m3-tower-t4 runs), from the shim's operation log
+rc=143
+operations after the TERM:
+cp $W/w-o1/units_done.txt s3://b/runs/pfd-bu-1-777/o1//units_done.txt
+cp $W/w-o1/progress.snap s3://b/runs/pfd-bu-1-777/o1//progress.txt
+sync $W/w-o1/runs s3://b/runs/pfd-bu-1-777/o1//runs
+sync $W/w-o1/gates s3://b/runs/pfd-bu-1-777/o1//gates
+cp $W/w-o1/units_done.txt s3://b/runs/pfd-bu-1-777/o1//units_done.txt
+cp $W/w-o1/ladders_closed.txt s3://b/runs/pfd-bu-1-777/o1//ladders_closed.txt
+cp $W/w-o1/binary.sha256 s3://b/runs/pfd-bu-1-777/o1//binary.sha256
+cp $W/w-o1/host.txt s3://b/runs/pfd-bu-1-777/o1//host.txt
+first lines: units_done=1 progress=2 sync-runs=3 sync-gates=4 ladders_closed=6
+check PASS: rc 143
+check PASS: units_done.txt, then progress.txt, then the runs sync, then gates, then the other files
+RESULT T32: PASS (0 failed checks)
 === summary
 RESULT T1: PASS (0 failed checks)
 RESULT T2: PASS (0 failed checks)
@@ -1111,3 +1291,8 @@ RESULT T22: PASS (0 failed checks)
 RESULT T24: PASS (0 failed checks)
 RESULT T25: PASS (0 failed checks)
 RESULT T26: PASS (0 failed checks)
+RESULT T28: PASS (0 failed checks)
+RESULT T29: PASS (0 failed checks)
+RESULT T30: PASS (0 failed checks)
+RESULT T31: PASS (0 failed checks)
+RESULT T32: PASS (0 failed checks)

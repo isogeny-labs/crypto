@@ -1,20 +1,30 @@
 #!/bin/bash
-# Stage B as resumable units, revision 3 (Amendment R2-G, sections 3 and 7).
+# Stage B as resumable units, revision 4 (Amendment R2-G, sections 3 and 7).
 # Run as a FILE:  /bin/bash <this file> [arguments]   ($0 is the file; its sha256 is recorded in host.txt; if $0 is not a
 # readable file, as under bash -c, the runner stops with exit 2). Arguments, in any order:
 #   --list                  (first argument) print the unit list, "unit ladder t" per line, exit 0
 #   --argv <ladder> <T>     (first arguments) print the pilot flags of that unit (without --out), exit
 #   PREV                    result prefix of an earlier unit job, verbatim that job's ISOLAB_RESULTS_URI (ends in "/");
 #                           outside test mode it must match ^s3://.+/$ (else exit 16). A PREV given twice: exit 16.
+#   skip:<n>:<reason>       earlier job n (1 <= n < this job's number) is deliberately not a PREV; reason costguard or
+#                           neverran. One per n, else exit 16.
 #   close:<ladder>:<T>      close the ladder from level T on (units with t >= T are logged "skip <unit> closed-by-rule").
 #                           Accepted only if unit <ladder>-t<T> is lost (below) in these PREVs, else exit 16. One per ladder.
 #   allow:<unit>:<K>        K >= 3, <unit> in the list: the unit counts as lost only when in flight in K or more PREVs
-#                           (default 2). One per unit; otherwise exit 16.
+#                           (default 2). Accepted only if, in these PREVs and before this argument is applied, the unit is
+#                           lost (below; K taken from a carried allowance, else 2) and K exceeds its in-flight count, else
+#                           exit 16. One per unit. close: and allow: for one unit in one job: exit 16.
+# Job numbers: ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp> (else exit 2); N is this job's number. Each PREV's host.txt must have
+# "job: pfd-bu-<n>-<stamp>", its URI must contain that name as a path component, n < N, no number twice. The PREV numbers and
+# the effective skip numbers (own arguments plus every PREV's skipped: line) must be disjoint and together exactly 1..N-1;
+# a skip carried with another reason is exit 12. Every other mismatch below is exit 12 too.
 # Every PREV must hold progress.txt, host.txt, binary.sha256 and, for each done unit, runs/<unit>.{argv,log,jsonl}
 # (the .jsonl ends with its {"summary" line and the .argv equals this job's argv for the unit), else exit 12. Exit 12 also if
-# a PREV's testmode:/pilot_extra:/runner_sha256: line or binary hashes differ from this job's, if a PREV's prev: line names a job
-# that is not among the PREVs, or if a unit is done in two PREVs. host.txt closed_by_rule: and allowed: (this job's arguments plus
-# those of every PREV) are carried forward, so a closure or allowance given once holds in every later job.
+# a PREV's testmode:/pilot_extra:/runner_sha256: line or binary hashes differ from this job's, if its host.txt lacks a prev:,
+# closed_by_rule:, allowed:, skipped: or closed_tool_failure: line, if its prev: line names a job that is not among the PREVs,
+# if a unit is done in two PREVs, or if a closure its closed_tool_failure: line names is not recomputed here with the same T.
+# host.txt closed_by_rule:, allowed: and skipped: (this job's arguments plus those of every PREV) are carried forward, so a
+# closure, allowance or skip given once holds in every later job.
 # Per unit, over the PREVs: done = "end <u> exit 0"; failed = PREVs with "end <u> exit N", N != 0; in flight = PREVs with "start <u>"
 # and neither an "end <u>" nor an "abort <u>" line. A unit that is not done and failed in 2 or more PREVs closes its ladder from
 # its level on (log "closed <ladder> at t=<T> tool-failure"). A unit that is not done, not at or above a closed level of its
@@ -22,7 +32,8 @@
 #
 # Environment:
 #   ISOLAB_RESULTS_URI  required (not for --list / --argv), unset or empty: exit 2; used verbatim (production: ends in "/")
-#   RAYON_NUM_THREADS (12)   NODE_NAME POD_UID ISOLAB_JOB_ID (recorded in host.txt)
+#   ISOLAB_JOB_ID       required, pfd-bu-<N>-<stamp>
+#   RAYON_NUM_THREADS (12)   NODE_NAME POD_UID (recorded in host.txt)
 #   TEST-ONLY (local tests; refused with exit 15 unless S3CP or S3SYNC is set, which marks test mode):
 #     STUDY_DIR (/work/study)  BIN (/usr/local/bin/pkm_tower_pilot)  G1BIN (/usr/local/bin/hky_fp_tower_check)
 #     S3CP / S3SYNC (aws s3 cp / sync; replaced by local-directory shims in tests)
@@ -35,19 +46,22 @@
 # Order: read the PREVs and compute every closure and lost unit; write and upload binary.sha256 and host.txt (exit 13 if that
 #   fails); start the syncer; G1; log tool-failure closures; exit 75 if a unit is lost; the units.
 # Per unit: runs/<unit>.argv is written, "start" is uploaded, the pilot runs, files are uploaded, then the "end" line. Every
-#   upload of progress.txt is preceded by units_done.txt (the units with an "end <u> exit 0" line of this job's progress.txt)
-#   in the same locked step, so S3 never holds an "end <u> exit 0" line without the unit in units_done.txt. Before every
-#   exit 13 inside the unit loop an "abort <unit> <reason>" line is appended (start-upload-failed, files-upload-failed,
-#   end-upload-failed); the exit handler uploads it.
-# Exit handler: creates $S/.stop (the syncer checks it before each upload), kills the pilot, releases a lock that the main
-#   shell itself holds, waits at most 20 s for the lock, removes the lock, kills the syncer (and its sleep), writes the
-#   summaries and uploads everything once more.
+#   upload of progress.txt works from one snapshot of it: units_done.txt (the units with an "end <u> exit 0" line in the
+#   snapshot) is uploaded first and then the snapshot, in one locked step, so S3 never holds an "end <u> exit 0" line without the
+#   unit in units_done.txt. Before every exit 13 inside the unit loop an "abort <unit> <reason>" line is appended
+#   (start-upload-failed, files-upload-failed, end-upload-failed, closed-upload-failed); a TERM/INT between the "start" line and
+#   the pilot's launch gets "abort <unit> terminated-before-start" from the exit handler.
+# Exit handler: creates $S/.stop (the syncer checks it before each upload), kills the pilot, appends the abort above if it
+#   applies, releases a lock that the main shell itself holds, waits at most 5 s for the lock (then removes it regardless),
+#   kills the syncer (and its sleep), writes the summaries and uploads: units_done.txt and progress.txt first, then the runs
+#   and gates, then the other files. (Safe: an "end" line is appended only after a successful runs upload.)
 # Exit: 0 list exhausted and every unit done or at/above a closed level; 2 cannot make work dir, ISOLAB_RESULTS_URI unset or
-#       empty, or $0 not a readable file; 10 G1 failed; 11 unit count differs from 25 ladders / 91 units (49 hky-B in 13
-#       ladders, 42 d-B in 12 ladders); 12 an earlier job is unreadable, inconsistent or from another run (see above); 13 an
-#       upload failed or a lock wait ran out (the runner stops); 14 the list ended with a unit neither done nor at/above a
-#       closed level; 15 test-only variable set outside test mode (or LOCK_WAIT not a whole number); 16 bad argument; 20 a pilot
-#       exited non-zero; 75 a unit was lost (lost_units.txt); 143 TERM/INT. (Exit 17 belongs to the job request's start command.)
+#       empty, ISOLAB_JOB_ID not pfd-bu-<N>-<stamp>, or $0 not a readable file; 10 G1 failed; 11 unit count differs from 25
+#       ladders / 91 units (49 hky-B in 13 ladders, 42 d-B in 12 ladders); 12 an earlier job is unreadable, inconsistent, from
+#       another run, or the PREVs and skips do not make up jobs 1..N-1 (see above); 13 an upload failed or a lock wait ran
+#       out (the runner stops); 14 the list ended with a unit neither done nor at/above a closed level; 15 test-only variable
+#       set outside test mode (or LOCK_WAIT not a whole number); 16 bad argument; 20 a pilot exited non-zero; 75 a unit was lost
+#       (lost_units.txt); 143 TERM/INT. (Exits 17 and 18 belong to the job request's start command.)
 #
 # Final argv of each ladder, from run.sh lines hky-B / d-B (T = the unit's level; P0=786433, P1=2013265921):
 #   common  = --p $P --ladder-t none --planted 0 --random 2
@@ -145,7 +159,7 @@ fi
 FULL=$(printf '%s\n' "$ALL" | awk '{print $1}')
 if [ -n "${UNIT_FILTER:-}" ]; then ALL=$(printf '%s\n' "$ALL" | awk -v re="$UNIT_FILTER" '$1 ~ re'); fi
 
-declare -A INALL RULE ALLOW DONE_IN FAIL INFL CLOSED CLOSED_SRC TFC JOBDONE
+declare -A INALL RULE ALLOW OWNALLOW SKIP DONE_IN FAIL INFL CLOSED CLOSED_SRC TFC JOBDONE PNUM TFW
 while read -r u lad t; do [ -n "$u" ] && INALL[$u]=1; done <<< "$ALL"
 # chk_close <word>: close:<ladder>:<T> -> CL_L CL_T ; chk_allow <word>: allow:<unit>:<K> -> AL_U AL_K (exact spelling only)
 chk_close() {
@@ -160,8 +174,17 @@ chk_allow() {
   IFS=: read -r x AL_U AL_K extra <<< "$1"
   [ "$1" = "allow:$AL_U:$AL_K" ] && [[ $AL_K =~ ^[1-9][0-9]{0,2}$ ]] && [ "$AL_K" -ge 3 ] && printf '%s\n' "$FULL" | grep -qxF -- "$AL_U"
 }
+chk_skip() { # chk_skip <word> <bound>: skip:<n>:<reason> with 1 <= n < bound -> SK_N SK_R
+  local x extra
+  IFS=: read -r x SK_N SK_R extra <<< "$1"
+  [ "$1" = "skip:$SK_N:$SK_R" ] && [[ $SK_N =~ ^[1-9][0-9]{0,2}$ ]] && [ "$SK_N" -lt "$2" ] && { [ "$SK_R" = costguard ] || [ "$SK_R" = neverran ]; }
+}
+# --- this job's number, from ISOLAB_JOB_ID ---
+if [ -z "${ISOLAB_RESULTS_URI:-}" ]; then echo "ISOLAB_RESULTS_URI is unset or empty" >&2; exit 2; fi
+[[ ${ISOLAB_JOB_ID:-} =~ ^pfd-bu-([1-9][0-9]*)-[0-9]+$ ]] || { echo "ISOLAB_JOB_ID must be pfd-bu-<N>-<stamp>, not '${ISOLAB_JOB_ID:-}'" >&2; exit 2; }
+JN=${BASH_REMATCH[1]}
 # --- arguments: validated before anything touches S3 ---
-PREVS=(); OWNC=()
+PREVS=(); OWNC=(); OWNA=()
 for a in "$@"; do
   case "$a" in
     close:*)
@@ -170,8 +193,12 @@ for a in "$@"; do
       RULE[$CL_L]=$CL_T; OWNC+=("$CL_L:$CL_T") ;;
     allow:*)
       chk_allow "$a" || { echo "bad argument $a: need allow:<unit>:<K> with a unit of the list and K >= 3" >&2; exit 16; }
-      [ -z "${ALLOW[$AL_U]:-}" ] || { echo "bad argument $a: a second allow: for unit $AL_U" >&2; exit 16; }
-      ALLOW[$AL_U]=$AL_K ;;
+      [ -z "${OWNALLOW[$AL_U]:-}" ] || { echo "bad argument $a: a second allow: for unit $AL_U" >&2; exit 16; }
+      OWNALLOW[$AL_U]=$AL_K; OWNA+=("$AL_U") ;;
+    skip:*)
+      chk_skip "$a" "$JN" || { echo "bad argument $a: need skip:<n>:costguard or skip:<n>:neverran with 1 <= n < $JN" >&2; exit 16; }
+      [ -z "${SKIP[$SK_N]:-}" ] || { echo "bad argument $a: a second skip: for job $SK_N" >&2; exit 16; }
+      SKIP[$SK_N]=$SK_R ;;
     *)
       if [ -z "$a" ] || { [ "$TESTMODE" = 0 ] && ! [[ $a =~ ^s3://.+/$ ]]; }; then echo "bad argument '$a': a PREV must match ^s3://.+/$ (the earlier job's ISOLAB_RESULTS_URI)" >&2; exit 16; fi
       for j in "${!PREVS[@]}"; do [ "${PREVS[$j]}" != "$a" ] || { echo "bad argument $a: PREV given twice" >&2; exit 16; }; done
@@ -179,7 +206,10 @@ for a in "$@"; do
   esac
 done
 
-if [ -z "${ISOLAB_RESULTS_URI:-}" ]; then echo "ISOLAB_RESULTS_URI is unset or empty" >&2; exit 2; fi
+for j in "${!OWNC[@]}"; do
+  IFS=: read -r cl ct <<< "${OWNC[$j]}"
+  [ -z "${OWNALLOW[$cl-t$ct]:-}" ] || { echo "bad arguments: close:$cl:$ct and allow:$cl-t$ct for one unit" >&2; exit 16; }
+done
 U=$ISOLAB_RESULTS_URI
 S=${STUDY_DIR:-/work/study}
 BIN=${BIN:-/usr/local/bin/pkm_tower_pilot}
@@ -201,7 +231,7 @@ lock() {
 unlock() { HELD=0; rmdir "$S/.up.lock.d" 2>/dev/null; }
 # units_done.txt: the units of this ALL list with an "end <u> exit 0" line in this job's progress.txt
 write_done() {
-  awk 'NR == FNR { if ($2 == "end" && $4 == "exit" && $5 == "0") d[$3] = 1; next } $1 in d { print $1 }' "$S/progress.txt" - <<< "$ALL" > "$S/units_done.tmp" &&
+  awk 'NR == FNR { if ($2 == "end" && $4 == "exit" && $5 == "0") d[$3] = 1; next } $1 in d { print $1 }' "${1:-$S/progress.txt}" - <<< "$ALL" > "$S/units_done.tmp" &&
     mv "$S/units_done.tmp" "$S/units_done.txt"
 }
 up_runs() { # unit files and gates; progress.txt is a separate step; fails if either sync fails
@@ -210,16 +240,16 @@ up_runs() { # unit files and gates; progress.txt is a separate step; fails if ei
   $S3SYNC "$S/gates" "$U/gates" --only-show-errors < /dev/null || r=1
   return $r
 }
-up_progress() { # units_done.txt first, so that no "end" line is ever in S3 without its unit in units_done.txt
-  write_done && $S3CP "$S/units_done.txt" "$U/units_done.txt" --only-show-errors < /dev/null &&
-    $S3CP "$S/progress.txt" "$U/progress.txt" --only-show-errors < /dev/null
+up_progress() { # one snapshot; units_done.txt first, so that no "end" line is ever in S3 without its unit in units_done.txt
+  cp "$S/progress.txt" "$S/progress.snap" && write_done "$S/progress.snap" && $S3CP "$S/units_done.txt" "$U/units_done.txt" --only-show-errors < /dev/null &&
+    $S3CP "$S/progress.snap" "$U/progress.txt" --only-show-errors < /dev/null
 }
 up()                { local r; lock || return 1; up_runs && up_progress; r=$?; unlock; return $r; }
 up_runs_locked()     { local r; lock || return 1; up_runs; r=$?; unlock; return $r; }
 up_progress_locked() { local r; lock || return 1; up_progress; r=$?; unlock; return $r; }
 
 LOST=(); TFORD=()
-ppid=""; syncer=""; HELD=0   # HELD: this shell holds the lock (a TERM can arrive inside a locked step)
+ppid=""; syncer=""; PRE=""; HELD=0   # HELD: this shell holds the lock (a TERM can arrive inside a locked step)
 write_summaries() {
   write_done
   { for l in "${!CLOSED[@]}"; do echo "$l t=${CLOSED[$l]} ${CLOSED_SRC[$l]}"; done
@@ -231,15 +261,17 @@ final() {
   trap - EXIT TERM INT
   : > "$S/.stop"
   [ -n "$ppid" ] && kill "$ppid" 2>/dev/null
+  [ -n "$PRE" ] && { log "abort $PRE terminated-before-start"; PRE=""; }
   [ "$HELD" = 1 ] && unlock
-  until mkdir "$S/.up.lock.d" 2>/dev/null; do n=$((n + 1)); [ "$n" -ge 20 ] && break; sleep 1; done
-  rmdir "$S/.up.lock.d" 2>/dev/null     # released, or removed regardless after 20 s
+  LOCK_WAIT=5; lock || rmdir "$S/.up.lock.d" 2>/dev/null     # at most 5 s for the lock, then it is removed regardless
   [ -n "$syncer" ] && kill "$syncer" 2>/dev/null
   write_summaries
-  up || { [ "$rc" = 0 ] && rc=13; }
+  up_progress || { [ "$rc" = 0 ] && rc=13; }                 # progress first, then the runs (an end line follows its runs upload)
+  up_runs || { [ "$rc" = 0 ] && rc=13; }
   for f in units_done.txt ladders_closed.txt lost_units.txt binary.sha256 host.txt; do
     [ -f "$S/$f" ] && { $S3CP "$S/$f" "$U/$f" --only-show-errors < /dev/null || { [ "$rc" = 0 ] && rc=13; }; }
   done
+  unlock
   exit $rc
 }
 trap final EXIT
@@ -260,7 +292,15 @@ for i in "${!PREVS[@]}"; do
     [ "$(grep -m1 "^$k:" "$d/host.txt")" = "$(own_line $k)" ] || bad12 "$pv/host.txt: its $k: line differs from this job's"
   done
   [ "$(awk '{print $1}' "$d/binary.sha256")" = "$OWNBIN" ] || bad12 "$pv/binary.sha256 differs from this job's binary hashes"
-  for k in prev closed_by_rule allowed; do grep -q "^$k:" "$d/host.txt" || bad12 "$pv/host.txt has no $k: line"; done
+  for k in prev closed_by_rule allowed skipped closed_tool_failure job; do grep -q "^$k:" "$d/host.txt" || bad12 "$pv/host.txt has no $k: line"; done
+  jb=$(grep -m1 '^job:' "$d/host.txt"); jb=${jb#job: }
+  [[ $jb =~ ^pfd-bu-([1-9][0-9]*)-[0-9]+$ ]] || bad12 "$pv/host.txt: job: line '$jb' is not pfd-bu-<n>-<stamp>"
+  pn=${BASH_REMATCH[1]}
+  [[ $pv == */"$jb"/* ]] || bad12 "$pv does not contain its job name $jb as a path component"
+  [ "$pn" -lt "$JN" ] || bad12 "$pv is job $pn, not an earlier job than this job $JN"
+  [ -z "${PNUM[$pn]:-}" ] || bad12 "two PREVs are job $pn"
+  PNUM[$pn]=$i
+  set -f
   for w in $(grep -m1 '^prev:' "$d/host.txt" | cut -d' ' -f2-); do
     ok=0; for j in "${!PREVS[@]}"; do [ "${PREVS[$j]}" != "$w" ] || ok=1; done
     [ "$ok" = 1 ] || bad12 "$pv was run after $w, which is not among the PREVs: an earlier job was left out"
@@ -273,6 +313,13 @@ for i in "${!PREVS[@]}"; do
     chk_allow "$w" || bad12 "$pv/host.txt: bad allowance word $w"
     if [ -z "${ALLOW[$AL_U]:-}" ] || [ "$AL_K" -gt "${ALLOW[$AL_U]}" ]; then ALLOW[$AL_U]=$AL_K; fi
   done
+  for w in $(grep -m1 '^skipped:' "$d/host.txt" | cut -d' ' -f2-); do
+    chk_skip "$w" "$pn" || bad12 "$pv/host.txt: bad skip word $w"
+    [ -z "${SKIP[$SK_N]:-}" ] || [ "${SKIP[$SK_N]}" = "$SK_R" ] || bad12 "job $SK_N is skipped as ${SKIP[$SK_N]} and as $SK_R"
+    SKIP[$SK_N]=$SK_R
+  done
+  TFW[$i]=$(grep -m1 '^closed_tool_failure:' "$d/host.txt" | cut -d' ' -f2-)
+  set +f
   # one line "<unit> D|F|I" per unit: done, failed (end with non-zero exit), in flight (start, no end, no abort)
   while read -r u st; do
     [ -n "${INALL[$u]:-}" ] || continue
@@ -286,7 +333,12 @@ for i in "${!PREVS[@]}"; do
                 $2 == "end" && $4 == "exit" && $5 == "0" { d[$3] = 1 }
                 END { for (u in d) print u, "D"
                       for (u in e) if (!(u in d)) print u, "F"
-                      for (u in s) if (!(u in e) && !(u in a)) print u, "I" }' "$d/progress.txt")
+                      for (u in s) if (!(u in e) && !(u in a)) print u, "I" }' "$d/progress.txt" | LC_ALL=C sort)
+done
+# the PREV numbers and the skip numbers must be disjoint and make up exactly 1..N-1
+for ((k = 1; k < JN; k++)); do
+  if [ -n "${PNUM[$k]:-}" ] && [ -n "${SKIP[$k]:-}" ]; then bad12 "job $k is both given as a PREV and skipped"; fi
+  if [ -z "${PNUM[$k]:-}" ] && [ -z "${SKIP[$k]:-}" ]; then bad12 "job $k is neither given as a PREV nor skipped (an earlier job was left out)"; fi
 done
 # every done unit: its argv record, log and rows must be readable; argv as computed here; rows file complete (final summary line)
 while read -r u lad t <&3; do
@@ -325,6 +377,22 @@ for j in "${!OWNC[@]}"; do
     echo "bad argument close:$cl:$ct: unit $cl-t$ct is not lost in these PREVs (not done and in flight in ${ALLOW[$cl-t$ct]:-2} or more)" >&2; exit 16
   fi
 done
+# every closure a PREV recorded as a tool failure must be recomputed here with the same T
+for i in "${!PREVS[@]}"; do
+  set -f
+  for w in ${TFW[$i]}; do
+    [ "${TFC[${w%%:*}]:-}" = "${w#*:}" ] || { set +f; bad12 "${PREVS[$i]} recorded the tool-failure closure $w, which this job does not recompute: an earlier job is missing"; }
+  done
+  set +f
+done
+# allow:<unit>:<K> arguments of this job need a lost unit (carried allowance as K) and K above its in-flight count
+for j in "${!OWNA[@]}"; do
+  u=${OWNA[$j]}; lad=${u%-t*}; t=${u##*-t}
+  if [ -n "${DONE_IN[$u]:-}" ] || closed_at "$lad" "$t" || [ "${INFL[$u]:-0}" -lt "${ALLOW[$u]:-2}" ] || [ "${OWNALLOW[$u]}" -le "${INFL[$u]:-0}" ]; then
+    echo "bad argument allow:$u:${OWNALLOW[$u]}: $u is not lost in these PREVs with a new K above its in-flight count (${INFL[$u]:-0} in flight, K now ${ALLOW[$u]:-2})" >&2; exit 16
+  fi
+done
+for j in "${!OWNA[@]}"; do ALLOW[${OWNA[$j]}]=${OWNALLOW[${OWNA[$j]}]}; done
 while read -r u lad t <&3; do
   [ -n "$u" ] || continue
   [ -z "${DONE_IN[$u]:-}" ] || continue
@@ -336,9 +404,10 @@ done 3<<< "$ALL"
 cw=$(for l in "${!RULE[@]}"; do echo "close:$l:${RULE[$l]}"; done | LC_ALL=C sort | tr '\n' ' ')
 aw=$(for l in "${!ALLOW[@]}"; do echo "allow:$l:${ALLOW[$l]}"; done | LC_ALL=C sort | tr '\n' ' ')
 tw=$(for l in "${!TFC[@]}"; do echo "$l:${TFC[$l]}"; done | LC_ALL=C sort | tr '\n' ' ')
+sw=$(for l in "${!SKIP[@]}"; do echo "skip:$l:${SKIP[$l]}"; done | LC_ALL=C sort -t: -k2,2n | tr '\n' ' ')
 { echo "argv: $*"; echo "nproc: $(nproc)"; echo "rayon: $RAYON_NUM_THREADS"
   grep -m1 'model name' /proc/cpuinfo; grep MemTotal /proc/meminfo; uname -r; date -u +%FT%TZ
-  echo "prev: ${PREVS[*]:-}"; echo "closed_by_rule: ${cw% }"; echo "allowed: ${aw% }"; echo "closed_tool_failure: ${tw% }"
+  echo "prev: ${PREVS[*]:-}"; echo "closed_by_rule: ${cw% }"; echo "allowed: ${aw% }"; echo "skipped: ${sw% }"; echo "closed_tool_failure: ${tw% }"
   echo "testmode: $TESTMODE"; echo "pilot_extra: $PILOT_EXTRA"; echo "unit_filter: ${UNIT_FILTER:-}"; echo "lock_wait: $LOCK_WAIT"
   echo "runner_sha256: $RSHA"; echo "bash: $BASH_VERSION"; echo "node: ${NODE_NAME:-}"; echo "pod_uid: ${POD_UID:-}"
   echo "job: ${ISOLAB_JOB_ID:-}"; echo "seed: 1347112276 (the pilot's default; recorded, not passed)"
@@ -371,16 +440,17 @@ while read -r u lad t <&3; do
   pilot_words "$lad" "$t" "$u" || exit 11
   rm -f runs/"$u".*
   echo "${PW[*]}" > "runs/$u.argv"
-  log "start $u"; up_progress_locked || { log "abort $u start-upload-failed"; exit 13; }
+  log "start $u"; PRE=$u
+  up_progress_locked || { PRE=""; log "abort $u start-upload-failed"; exit 13; }
   "$BIN" "${PW[@]}" > "runs/$u.out" 2> "runs/$u.log" < /dev/null &
-  ppid=$!; wait "$ppid"; rc=$?; ppid=""
+  ppid=$!; PRE=""; wait "$ppid"; rc=$?; ppid=""
   up_runs_locked || { log "abort $u files-upload-failed"; exit 13; }            # unit files first
   log "end $u exit $rc"; up_progress_locked || { log "abort $u end-upload-failed"; exit 13; }
   if [ "$rc" != 0 ]; then exit 20; fi
   JOBDONE[$u]=1
   if grep -q 'timed out; stopping' "runs/$u.log"; then
     CLOSED[$lad]=$t; CLOSED_SRC[$lad]="this-job"
-    log "closed $lad at t=$t"; up_progress_locked || { log "abort $u end-upload-failed"; exit 13; }
+    log "closed $lad at t=$t"; up_progress_locked || { log "abort $u closed-upload-failed"; exit 13; }
   fi
 done 3<<< "$ALL"
 
