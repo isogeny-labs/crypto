@@ -13,6 +13,7 @@ Headline `[pcc:unverified]`: random dense `GF(31)` systems 3.4–4.1× (bases
 identical), `GF(65521)` 1.6–2.0×, `GF(2)` under exact-width binaries
 unchanged, `wd_n16` under a 64-variable binary 1.26×; wide-binary cells
 censored by the container's memory limit. Local container shared with a Rust
-build; not an isolab run and not a leaderboard row (unvalidated: no
-`VALIDATION.json`, no replay certificate, no rho reference, because this is a
-kernel speed-up of an external Gröbner solver, not an ECDLP cost).
+build; not an isolab run and not a table row in `benchmarks/README.md` (unvalidated:
+no `VALIDATION.json`, no replay certificate, no rho reference, because this is
+a kernel speed-up of an external Gröbner solver, not an ECDLP cost). The
+benchmark record and `benchmarks/progress/` list it.

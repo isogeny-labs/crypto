@@ -22,7 +22,6 @@ These rows remain reviewable with their original text in [ARCHIVE.json](ARCHIVE.
 
 | Entry | Disposition | Source record |
 |:--|:--|:--|
-| [20261110-m4gb-arith-kernels](20261110-m4gb-arith-kernels/) | documentary | [source](../research/m4gb_integration_20261110/README.md) |
 | [20261020-ic-oracle-setup-blocked](20261020-ic-oracle-setup-blocked/) | incomplete | [source](../research/ic_oracle_setup_blocked_20261020/README.md) |
 | [20261019-ic-matched-rho-v8](20261019-ic-matched-rho-v8/) | incomplete | [source](../research/ic_tool_program/rule/v8/README.md) |
 | [20261017-two-sylow-fp64](20261017-two-sylow-fp64/) | incomplete | [source](../research/two_sylow_fp64_20261017/README.md) |
