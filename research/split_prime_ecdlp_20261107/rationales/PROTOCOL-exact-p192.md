@@ -48,3 +48,19 @@ d = 30, 40, 45, 50 digits, all fundamental: the class numbers agree exactly
 ## Artifacts
 `data/cl/rust_<label>.json` (result), `data/cl/rust_<label>.log` (stderr), launch
 script `tools/run_classgroup.sh`. Hashes in `data/SHA256SUMS`.
+
+## Outcome (2026-11-10, appended after the runs; the sections above are unchanged)
+
+All five curves accepted at the first or second relation round (ratios to the
+analytic estimate 0.99997, 0.99983, 1.00002, 0.99994, 0.99989). Results in
+`data/cl/rust_<label>.json`, structure in `structure_<label>.json`, PARI checks
+in `pari_check_<label>.json`; summary table in `README.md` §5.
+
+- Prediction 1 (h within 5 % of h*): held on all five, within 0.03 %.
+- Prediction 2 (no cyclic group; 2-rank 3 for p192-139): held; 2-ranks 3, 2, 3,
+  3, 2 equal the genus-theory values on all five.
+- Prediction 3 (split primes <= 50 generate for at least four of five): held;
+  four of five, p192-139 has index 2 at 50 and 1 at 163.
+- Wall per curve 668–2502 s of computation; three container restarts and one
+  harness cap interrupted the runs, each resumed from the checkpoints
+  (`p192_launch_time.txt`, session logs 2026-11-09/10).
