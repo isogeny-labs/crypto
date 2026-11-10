@@ -768,6 +768,42 @@
       "source": "round-036/holdout",
       "target_seed": 2026146932,
       "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-037/train",
+      "target_seed": 2026147420,
+      "targets": 16
+    },
+    {
+      "size": 28,
+      "source": "round-037/train",
+      "target_seed": 2026147428,
+      "targets": 16
+    },
+    {
+      "size": 32,
+      "source": "round-037/train",
+      "target_seed": 2026147432,
+      "targets": 16
+    },
+    {
+      "size": 20,
+      "source": "round-037/holdout",
+      "target_seed": 2026147920,
+      "targets": 64
+    },
+    {
+      "size": 28,
+      "source": "round-037/holdout",
+      "target_seed": 2026147928,
+      "targets": 64
+    },
+    {
+      "size": 32,
+      "source": "round-037/holdout",
+      "target_seed": 2026147932,
+      "targets": 64
     }
   ],
   "family": "curve25519",
@@ -1615,6 +1651,44 @@
         }
       },
       "track": "generic"
+    },
+    {
+      "ci95": [
+        0.8635497190921531,
+        0.9686333993291368
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkG-x06-sr",
+        "n": 2,
+        "name": "wwalkG-x06-sr-n2",
+        "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
+      },
+      "ratio": 0.9145835663808709,
+      "round": 37,
+      "s_from": [
+        1.8423102792691786,
+        1.9320765242126474,
+        2.7399727287038655
+      ],
+      "s_to": [
+        1.7146582107763975,
+        1.8842625305055205,
+        3.410701408067641
+      ],
+      "session": "ECBS1h879b9a8f4677",
+      "size": 32,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic"
     }
   ],
   "notes": [
@@ -1978,6 +2052,17 @@
       ],
       "status": "ratcheted",
       "track": "generic"
+    },
+    {
+      "dir": "round-037",
+      "round": 37,
+      "sizes": [
+        20,
+        28,
+        32
+      ],
+      "status": "ratcheted",
+      "track": "generic"
     }
   ],
   "schema": "ic_autolab.ledger/v1",
@@ -2201,30 +2286,41 @@
       "32": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkG-x06-sr",
+          "family": "tw2l-x20-j16",
           "n": 2,
-          "name": "wwalkG-x06-sr-n2",
-          "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
+          "name": "tw2l-x20-j16-n2",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "params": {
+            "targets": "stride-generator"
+          }
         },
         "evidence": {
-          "claim": "PCC-20261104-d91a51",
-          "dir": "rebaseline-seedrun",
-          "note": "re-baseline of wwalkG-x06-n2: same oracle with seed=run (fresh table per run); fixed-table S 1.606 was a favourable draw",
+          "band_verdict": "sel < inc",
+          "binary_sha256": "1163f6b35d27ec8853455f6d88dfb9fb1d824745068df4dfd065bf6ada23b859",
+          "ci95_w0": [
+            0.8635497190921531,
+            0.9686333993291368
+          ],
+          "dir": "round-037",
+          "paired_ratio_w0": 0.9145835663808709,
+          "round": 37,
           "route": "local",
-          "session_id": "ECBS1h472e3dd7d7e2",
-          "validation_gate": "none (development evidence)"
+          "session_id": "ECBS1h879b9a8f4677",
+          "spec_sha256": "5179e3d4da7d4cd61820c4c5ffdf3e6142f6350512e2795abad5afc0364c5417",
+          "validation_gate": "none (development loop)",
+          "verify_receipt_sha256": "6eef034fb7e60d80946bc3d7c95acaa129ab59adaa71c798c2ed2b910e45ef91"
         },
         "rho_s": [
-          1.010478342570442,
-          1.1098430218031168,
-          2.0041251348971967
+          0.9659350879401662,
+          1.060853752962088,
+          1.9151217381593832
         ],
         "s": [
-          1.8423102792691786,
-          1.9320765242126474,
-          2.7399727287038655
+          1.7146582107763975,
+          1.8842625305055205,
+          3.410701408067641
         ],
-        "since_round": 33
+        "since_round": 37
       }
     }
   },
@@ -14272,7 +14368,139 @@
       "stage": "holdout",
       "status": "null",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 37,
+      "s": [
+        2.3069572242849694,
+        2.470221467038779,
+        3.9395996518230683
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 37,
+      "s": [
+        1.8853541752658705,
+        2.067713940392575,
+        3.7089518265329198
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 37,
+      "s": [
+        1.7069754442729386,
+        1.8757999392628575,
+        3.3952203941721315
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 37,
+      "s": [
+        2.4692487317095417,
+        2.6486094794790946,
+        4.2628562094050695
+      ],
+      "size": 20,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 37,
+      "s": [
+        1.8339005200015233,
+        2.0110480949214105,
+        3.605376269200384
+      ],
+      "size": 28,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 37,
+      "s": [
+        1.7146582107763975,
+        1.8842625305055205,
+        3.410701408067641
+      ],
+      "size": 32,
+      "stage": "holdout",
+      "status": "improvement",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-10T04:02:54Z"
+  "updated": "2026-11-10T04:10:43Z"
 }
