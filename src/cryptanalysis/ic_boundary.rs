@@ -9125,19 +9125,28 @@ pub const TW_SIGN_BIT: u64 = 1 << 63;
 /// one multiplication and one squaring, per parent one more multiplication
 /// (the continuing child's `y`), i.e. `m` inversions, `2m + 1`
 /// multiplications and `2m` squarings a parent, less one multiplication and
-/// one squaring for each skipped minus child.  The group ledger charges a
-/// pair as ONE group addition (it holds one inversion, like an addition;
-/// `walk_ops.adds`), which also covers the continuing child's `y`, and the
-/// second x-only point as one unit of the unpriced native counter
-/// `sibling_second_points` (`work.rs`: 1 field multiplication, 1 squaring,
-/// 3 additions), so the `bitop/v1` price and the §5a band (`w` = 0, 0.1, 1)
-/// price the second point like other native work.  A pair whose minus child
-/// is skipped is the addition alone.  The addition's second multiplication
-/// is not performed for a non-continuing pair, so the group-ledger price is
-/// one multiplication above `field_ops` there (conservative).  With `sib`,
-/// `steps` counts keyed points, not additions.
+/// one squaring for each skipped minus child.  A pair performs
+/// `inv + 2 mul + 2 sqr + 8 add` (the additions counted: `dx`, `dy`, two for
+/// `x₊`; `Σy`, its negation, two for `x₋`).  The group ledger charges it as
+/// ONE group addition (`inv + 2 mul + sqr + 6 add`; `walk_ops.adds`) plus one
+/// unit of the native counter `sibling_second_points` (`work.rs`:
+/// `sqr + 2 add`, the difference), so the `bitop/v1` price of a pair equals
+/// its field work exactly, and the §5a band prices the second point at
+/// `w` = 0, 0.1, 1.  The continuing child's `y` (one product, two
+/// subtractions) is the counter `sibling_lift_products`, once a parent.  A
+/// pair whose minus child is skipped is charged the addition alone, which is
+/// one product and two additions above what it performs (at most two such
+/// pairs a parent; counted in `tw_sib_pairs - tw_sib_second_points`).  With
+/// `sib`, `steps` counts keyed points, not additions.
 ///
-/// /// `verify_collisions = false` (`cv=0`, [`TargetWalk::build_cv`]): a key
+/// **The pool is a product set.**  `pool = a·b` jumps `J_{i,j} = A_i + K_j`:
+/// `a` seed parts `A_i = [α_i]P1 (+ [α'_i]P2)` from the doubled multiples
+/// (`a = 4`, or `8` from `pool = 256`) and `b = pool/a` parts
+/// `K_j = [γ_j]G + [β_j]Q` chained as `cj=1` chains them
+/// (`K_j = K_{j−1} + K_{j−2}`), so the set-up is about `a·popcount + b + a·b`
+/// additions, charged to `setup_ops`.  `pool` must be a multiple of `a`.
+///
+/// `verify_collisions = false` (`cv=0`, [`TargetWalk::build_cv`]): a key
 /// collision is not recomputed.  The table key is the point's abscissa
 /// (the group key without its sign bit), so a key collision on a curve
 /// whose key is `abscissa·2 + sign` is exactly `E_t = ±E_s`, and the sign
@@ -9235,6 +9244,8 @@ pub struct TargetWalk<E> {
     pub sib_resolutions: u64,
     /// Pairs not formed because the parent is the identity or `P = ±J`.
     pub sib_degenerate: u64,
+    /// Continuing children lifted (one product each).
+    pub sib_lifts: u64,
     pub sib_resolve_ops: GroupOps,
 }
 
@@ -9675,6 +9686,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             sib_second_points: 0,
             sib_resolutions: 0,
             sib_degenerate: 0,
+            sib_lifts: 0,
             sib_resolve_ops: GroupOps::default(),
         };
         let mut rng = {
@@ -9685,7 +9697,13 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             }
             StdRng::seed_from_u64(s)
         };
-        let jump_pts = if cheap {
+        let jump_pts = if let Some((_, pool)) = sib {
+            let a = if pool >= 256 { 8 } else { 4 };
+            if pool % a != 0 {
+                return Err(format!("wwalk: pool must be a multiple of {a}, not {pool}"));
+            }
+            tw.product_jumps(g, r, a, &mut rng)?
+        } else if cheap {
             tw.cheap_jumps(g, r, &mut rng)?
         } else {
             tw.plain_jumps(g, r, &mut rng)?
@@ -9931,6 +9949,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             .expect("a finite parent");
                         let k = g.key(&pt);
                         debug_assert_eq!(k >> 1, sp.key_plus);
+                        self.sib_lifts += 1;
                         sw.next_parent = pt;
                         sw.next_c = cp;
                         sw.queue.push_back(SibItem {
@@ -10144,6 +10163,88 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 }
                 break;
             }
+        }
+        self.setup_ops = ops;
+        Ok(out)
+    }
+
+    /// The sibling pool as a product set: `a` seed parts `A_i`, a chain of
+    /// `b` parts `K_j`, `J_{i·b + j} = A_i + K_j`.  Set-up charged to
+    /// `setup_ops`.
+    #[allow(clippy::type_complexity)]
+    fn product_jumps<G: CountedGroup<Elt = E>>(
+        &mut self,
+        g: &G,
+        r: u64,
+        a: usize,
+        rng: &mut StdRng,
+    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+        let b = self.jumps / a;
+        let mut ops = self.setup_ops;
+        let mut ks: Vec<(E, u64, u64)> = Vec::with_capacity(b);
+        let mut tries = 0u32;
+        while ks.len() < b {
+            tries += 1;
+            if tries > 64 * b as u32 {
+                self.setup_ops = ops;
+                return Err("wwalk: could not draw non-identity chained pool parts".into());
+            }
+            if ks.len() < 2 {
+                let ga = rng.gen_range(1..r);
+                let be = rng.gen_range(1..r);
+                if let Some(pt) = self.eval(g, &mut ops, 0, 0, ga, be) {
+                    ks.push((pt, ga, be));
+                }
+                continue;
+            }
+            let (k1, g1, b1) = ks[ks.len() - 1];
+            let (k2, g2, b2) = ks[ks.len() - 2];
+            let k = g.add(&mut ops, k1, k2);
+            if g.is_identity(&k) {
+                ks.clear();
+                continue;
+            }
+            ks.push((k, addmod(g1, g2, r), addmod(b1, b2, r)));
+        }
+        let mut out = Vec::with_capacity(self.jumps);
+        let mut coefs: Vec<(u64, u64, u64)> = Vec::new();
+        let mut al2s: Vec<u64> = Vec::new();
+        for _ in 0..a {
+            let mut tries = 0u32;
+            'row: loop {
+                tries += 1;
+                if tries > 64 {
+                    self.setup_ops = ops;
+                    return Err("wwalk: could not draw a non-identity pool part".into());
+                }
+                let al = rng.gen_range(1..=self.w);
+                let al2 = if self.n_seeds == 2 {
+                    rng.gen_range(1..=self.w)
+                } else {
+                    0
+                };
+                let Some(ai) = self.eval(g, &mut ops, al, al2, 0, 0) else {
+                    continue;
+                };
+                let mut row = Vec::with_capacity(b);
+                for &(k, ga, be) in &ks {
+                    let j = g.add(&mut ops, ai, k);
+                    if g.is_identity(&j) {
+                        continue 'row;
+                    }
+                    row.push((j, self.pack_alpha(al, al2), ga, be));
+                }
+                for &(_, _, ga, be) in &row {
+                    coefs.push((al, ga, be));
+                    al2s.push(al2);
+                }
+                out.extend(row);
+                break;
+            }
+        }
+        self.jump_coefs = coefs;
+        if self.n_seeds == 2 {
+            self.jump_alpha2 = al2s;
         }
         self.setup_ops = ops;
         Ok(out)
@@ -10403,8 +10504,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             out.insert("lookups".to_string(), self.index_lookups);
         }
         if self.sib.is_some() {
-            // The marker the band reads (`band::SIBLING_WORK_COUNTERS`).
+            // The markers the band reads (`band::SIBLING_WORK_COUNTERS`).
             out.insert("counted:sibling_second_points".to_string(), 1);
+            out.insert("counted:sibling_lift_products".to_string(), 1);
+            out.insert("sibling_lift_products".to_string(), self.sib_lifts);
         }
         if self.sib_second_points > 0 {
             out.insert("sibling_second_points".to_string(), self.sib_second_points);
@@ -10452,6 +10555,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             out.insert("tw_sib_second_points".into(), self.sib_second_points);
             out.insert("tw_sib_resolutions".into(), self.sib_resolutions);
             out.insert("tw_sib_degenerate".into(), self.sib_degenerate);
+            out.insert("tw_sib_lifts".into(), self.sib_lifts);
             out.insert("tw_sib_resolve_adds".into(), self.sib_resolve_ops.adds);
             out.insert("tw_walk_muls".into(), self.walk_ops.field_ops.muls);
             out.insert("tw_walk_sqrs".into(), self.walk_ops.field_ops.sqrs);
@@ -19152,6 +19256,52 @@ mod wwalk_table_tests {
                 Some(bad)
             )
             .is_err());
+        }
+    }
+
+    /// The `bitop/v1` price of a sibling pair equals the price of its field
+    /// work: group addition + `sibling_second_points` against
+    /// `inv + 2 mul + 2 sqr + 8 add`, and the continuing child's lift
+    /// against `mul + 2 add`, at every field size of the smoke panels.  The
+    /// per-point price against one group addition is printed.
+    #[test]
+    fn sibling_pair_bitop_price_equals_its_field_work() {
+        use crate::cryptanalysis::bitops::{Field, Prim, Widths};
+        for b in [20u32, 24, 28, 32] {
+            let w = Widths {
+                field: Field::Prime { bits: b },
+                r_bits: b - 3,
+            };
+            let g = |p| w.gates(p).unwrap();
+            let charged = g(Prim::GroupAdd) + g(Prim::FieldSqr) + 2 * g(Prim::FieldAdd);
+            let performed = g(Prim::FieldInv)
+                + 2 * g(Prim::FieldMul)
+                + 2 * g(Prim::FieldSqr)
+                + 8 * g(Prim::FieldAdd);
+            assert_eq!(charged, performed, "b={b}");
+            // The tally of one pair, as PrimeCurve::sibling_pair performs it.
+            let inst = prime_instance_for(12, 3);
+            let curve = &inst.curve;
+            let gen = inst.generator_point();
+            let mut ops = GroupOps::default();
+            let j = curve.mul(&mut ops, gen, 5);
+            let pt = curve.mul(&mut ops, gen, 11);
+            let mut pops = GroupOps::default();
+            curve.sibling_pair(&mut pops, pt, j, true).unwrap();
+            assert_eq!(
+                (
+                    pops.field_ops.invs,
+                    pops.field_ops.muls,
+                    pops.field_ops.sqrs
+                ),
+                (1, 2, 2)
+            );
+            let lift = g(Prim::FieldMul) + 2 * g(Prim::FieldAdd);
+            assert!(lift > 0);
+            eprintln!(
+                "b={b}: pair {performed} bit-ops, {:.4} of a group addition a point",
+                performed as f64 / 2.0 / g(Prim::GroupAdd) as f64
+            );
         }
     }
 

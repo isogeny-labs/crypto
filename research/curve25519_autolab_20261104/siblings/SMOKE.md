@@ -66,3 +66,26 @@ Post hoc decomposition of the `oracle_setup` phase in bit-ops per sqrt(r), price
 The walk-only ratio is 0.682 [pcc:unverified]. That is the near-top-of-interval value the charging rule predicts (0.698 a point against a rho step, less the walk's saving), and it is a post hoc number, not a claim of the mechanism's total cost. At k = 20 the pool set-up (M = 256) is about four times the whole `tw2cj-lazy` walk, so the mechanism cannot pay here; whether it pays when the set-up is a small share (k = 28, where sqrt(r) is 16,384 and the set-up is a fixed 1,600 additions) is not measured by this smoke [pcc:unverified].
 
 Nothing was tuned after the data: `pool` and the spec are as first written [pcc:unverified]. All 36 sib8 records (24 measured, 12 warm-up) verified with no lazy failure [pcc:unverified].
+
+# Amendment of 2026-11-10: exact charging, product-set pool, second smoke (written before any new run)
+
+Status: [pcc:unverified]. The section above stays as the record of the first smoke, whose pre-registered bit-op ratio of 0.62 was missed (measured 2.299) [pcc:unverified]. This amendment is committed before the second smoke is run.
+
+## Reasons [pcc:unverified]
+
+1. The first charging priced a pair one multiplication above what it performs. Reason: the group addition's `y` product is not performed by a non-continuing pair, and the price must equal the field work [pcc:unverified].
+2. The pool's set-up was 1,587 additions a run for 256 jumps at k = 20 (about 6 a jump), which is 4.4 sqrt(r) and more than the whole `tw2cj-lazy` walk. Reason: a product set `J = A_i + K_j` needs only about `a * popcount + b + a * b` additions for `a * b` jumps [pcc:unverified].
+
+## Changes [pcc:unverified]
+
+- Charging: a pair performs 1 inversion, 2 multiplications, 2 squarings and 8 additions (`dx`, `dy`, two for `x+`; the sum of the y values, its negation, two for `x-`). It is charged as one group addition (1 inv, 2 mul, 1 sqr, 6 add) plus one `sibling_second_points` priced as 1 sqr + 2 add, so the `bitop/v1` price of the pair equals the price of its field work (unit test `sibling_pair_bitop_price_equals_its_field_work`). The continuing child's `y` is a second counter, `sibling_lift_products` (1 mul + 2 add), once a parent. A pair whose minus child is skipped is charged the addition alone, one multiplication and two additions above what it performs (at most two such pairs a parent).
+- Pool: product set with `a = 4`, `b = 16` for M = 64 and `a = 8`, `b = 32` for M = 256 (`a = 4` below 256, so `pool` must be a multiple of `a`); the `K_j` chain `K_j = K_(j-1) + K_(j-2)` as `cj=1`; coefficient vectors follow.
+
+## Pre-registered, second smoke [pcc:unverified]
+
+Specs `spec-smoke2-k20.json` (same curve and seeds as the first smoke; arms `rho-neg`, `tw2cj-lazy`, `tw2cj-lazy-sib8-p64`, `tw2cj-lazy-sib8-p256`) and `spec-smoke2-k28.json` (first curve of `snc-panel/spec-k28.json`; arms `rho-neg`, `tw2cj-lazy`, `tw2cj-lazy-sib8-p64`), 12 targets, 2 rounds each [pcc:unverified].
+
+- Bit-op ratio `tw2cj-lazy-sib8-p64` / `tw2cj-lazy`, total including set-up: 0.70 [0.62, 0.80] at k = 20 and 0.64 [0.58, 0.72] at k = 28 [pcc:unverified].
+- Stored points per sqrt(r) within 5 percent of `tw2cj-lazy` [pcc:unverified].
+- Every record verified and 4 replays reproduced a session [pcc:unverified].
+- Reported separately: the walk-only ratio and the set-up share of each arm's `oracle_setup` phase [pcc:unverified]. No pre-registration for `p256`, which is reported as measured [pcc:unverified].

@@ -140,7 +140,7 @@ pub const TABLE_WORK_COUNTERS: &[&str] = &["table_insert_attempts"];
 /// so no earlier record changes; it is not part of
 /// [`Pricing::priced_table_work`], whose list names only the
 /// pre-sibling counter, and a row reports it in `table_work_mean_counts`.
-pub const SIBLING_WORK_COUNTERS: &[&str] = &["sibling_second_points"];
+pub const SIBLING_WORK_COUNTERS: &[&str] = &["sibling_second_points", "sibling_lift_products"];
 
 /// The phase sum of each [`TABLE_WORK_COUNTERS`] counter in `r`'s
 /// `work_native` maps, present only where some phase carries the marker
