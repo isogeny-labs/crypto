@@ -84,7 +84,7 @@ with open(md_out, 'w') as f:
     f.write('| input | binary | n | base median s (min–max) | patched median s (min–max) | speedup (median) | speedup (min/min) | output |\n|:--|:--|--:|--:|--:|--:|--:|:--|\n')
     for s in summary:
         if s['censored']:
-            out = 'censored: a run died (`std::bad_alloc` under the virtual-memory cap); times are time-to-failure'
+            out = 'censored: a run died (`std::bad_alloc` under the 6 GB virtual-memory cap, or the cgroup OOM killer at about 7 GB resident in the re-run); times are time-to-failure'
             sp = sm = 'n/a'
         else:
             out = ('same basis' if s['same_output'] else 'DIFFERENT: ' + str(s['base_output']) + ' vs ' + str(s['new_output']))

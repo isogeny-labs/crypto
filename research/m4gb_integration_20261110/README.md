@@ -81,4 +81,42 @@ target `[pcc:unverified]`.
 
 ## Results
 
-(filled from `results.tsv` by `ab_report.py`; see below)
+`RESULTS.md` (table), `results.svg` / `results.png` (graph), `results.json`,
+`REPORT.pdf`; raw rows in `results.tsv` and `results_rerun.tsv`, every
+solver log and basis in `logs.tar.gz`. Regenerate with `./make_report.sh`.
+
+- **Patch 0001, `GF(31)`:** 3.4–4.1× (medians; `n = 12` 0.54 → 0.14 s,
+  `n = 14` 1.12 → 0.29 s, `n = 15` 1.61 → 0.39 s, `n = 16` 7.20 → 2.12 s),
+  identical bases and planted roots recovered. `GF(65521)` (16-bit storage,
+  compiler `%` path): 1.6–2.0× (`quad_n9` 7.45 → 3.75 s). Prediction met.
+- **Patch 0002:** `wd_n16` under the 64-variable binary 1.18 → 0.94 s (1.26×
+  median, 1.14× min/min) and the basis no longer carries the 48 `^2 + ` lines
+  for undeclared variables. Under exact-width binaries the eight 35-variable
+  decomposition systems and the random `n = 30` system are unchanged
+  (0.91–1.05×, inside the repeat spread), as predicted.
+- **Censored:** the 35-variable systems under the 128-variable binary and the
+  `n = 30` system under the 64-variable binary. Under a 6 GB virtual-memory
+  cap both arms died with `std::bad_alloc`; re-run with a 14 GB cap they were
+  killed by the container's cgroup OOM killer at about 7 GB resident (dmesg:
+  `Killed process … (solver_m4gb_n64) … anon-rss:7160784kB`) while a Rust
+  build shared the 16 GiB. The one earlier unguarded run (upstream, `root1`,
+  128-variable binary, before this protocol) took 16.0 s against 7.9 s for the
+  35-variable binary. Conclusion for the adapter: use the narrowest binary
+  that fits the system; the wide-binary penalty is mostly memory and monomial
+  bookkeeping, not the field equations alone.
+- **Against the other engines (same inputs, earlier comparison, different
+  computations):** upstream M4GB decides the eight `n = 17` Boolean systems in
+  1.8–8.8 s single-threaded where msolve took 42–46 s and PolyBoRi 40–52 s
+  for a full basis; the repository's inherited F4 decides them in 11–24 ms
+  by a degree-bounded tree, not a basis. `[pcc:unverified]`
+
+### Open threads
+
+- Run the same protocol on isolab (pinned image, one job per host) so the
+  numbers can carry a pcc claim; this container shared CPU and memory with a
+  Rust build throughout.
+- `GF(2)`: `m4gb::update()` is the lever (42 % of samples); nothing in this PR
+  touches it.
+- Wide binaries: memory, not time, is the limit; a dense index sized to the
+  declared variables rather than `MAXVARS` would remove the need for several
+  binaries.

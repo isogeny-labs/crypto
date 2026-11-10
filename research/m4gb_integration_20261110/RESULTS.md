@@ -15,8 +15,8 @@
 | `root6` | `n35_gf2` | 3 | 2.064 (1.952–2.066) | 2.091 (2.042–2.110) | 0.99× | 0.96× | same verdict: unit ideal (no solution) |
 | `root7` | `n35_gf2` | 3 | 1.821 (1.767–2.446) | 1.977 (1.751–2.373) | 0.92× | 1.01× | same verdict: unit ideal (no solution) |
 | `root8` | `n35_gf2` | 3 | 8.242 (7.774–8.466) | 8.330 (8.024–8.380) | 0.99× | 0.97× | same verdict: unit ideal (no solution) |
-| `root1` | `n128_gf2` | 3 | 15.303 (14.624–15.711) | 13.831 (12.453–14.074) | n/a | n/a | censored: a run died (`std::bad_alloc` under the virtual-memory cap); times are time-to-failure |
-| `root3` | `n128_gf2` | 3 | 15.428 (15.152–15.582) | 14.989 (14.781–15.054) | n/a | n/a | censored: a run died (`std::bad_alloc` under the virtual-memory cap); times are time-to-failure |
+| `root1` (re-run, 14 GB cap) | `n128_gf2` | 3 | 17.661 (16.554–26.796) | 19.540 (14.658–22.678) | n/a | n/a | censored: a run died (`std::bad_alloc` under the 6 GB virtual-memory cap, or the cgroup OOM killer at about 7 GB resident in the re-run); times are time-to-failure |
+| `root3` (re-run, 14 GB cap) | `n128_gf2` | 3 | 21.132 (14.474–24.378) | 23.984 (17.751–24.683) | n/a | n/a | censored: a run died (`std::bad_alloc` under the 6 GB virtual-memory cap, or the cgroup OOM killer at about 7 GB resident in the re-run); times are time-to-failure |
 | `wd_n16` | `n64_gf2` | 3 | 1.183 (1.021–1.183) | 0.941 (0.892–1.079) | 1.26× | 1.14× | same basis |
 | `g2_n30` | `n30_gf2` | 2 | 128.517 (126.699–130.335) | 123.691 (117.392–129.990) | 1.04× | 1.08× | same basis |
-| `g2_n30` | `n64_gf2` | 1 | 27.899 (27.899–27.899) | 27.559 (27.559–27.559) | n/a | n/a | censored: a run died (`std::bad_alloc` under the virtual-memory cap); times are time-to-failure |
+| `g2_n30` (re-run, 14 GB cap) | `n64_gf2` | 1 | 37.403 (37.403–37.403) | 28.617 (28.617–28.617) | n/a | n/a | censored: a run died (`std::bad_alloc` under the 6 GB virtual-memory cap, or the cgroup OOM killer at about 7 GB resident in the re-run); times are time-to-failure |

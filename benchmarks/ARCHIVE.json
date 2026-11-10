@@ -723,6 +723,18 @@
         "benchmarks/20261013-n83-dense-root/panel.pdf",
         "benchmarks/20261013-n83-dense-root/panel.png"
       ]
+    },
+    {
+      "directory": "20261110-m4gb-arith-kernels",
+      "row": "| 2026-11-10 | [`20261110-m4gb-arith-kernels`](20261110-m4gb-arith-kernels/) ([PDF](20261110-m4gb-arith-kernels/REPORT.pdf)) | M4GB (external Gröbner solver, upstream `01860a52`) with patches 0001 (arithmetic GF(p) dense kernels) and 0002 (field equations for declared variables only) against upstream from the same tree; random dense GF(31) n = 12–16, three GF(65521) and eight 35-variable Boolean systems of the 2026-10-11 CAS comparison, wd_n16, random GF(2) n = 30; one thread, interleaved, three repeats | GF(31) 3.4–4.1× (bases identical), GF(65521) 1.6–2.0×, wd_n16 under a 64-variable binary 1.26×, GF(2) under exact-width binaries 0.91–1.05× (no change); wide-binary cells censored by the container's memory limit | local container shared with a Rust build, not isolab; kernel speed-up of an external solver, not an ECDLP cost; unvalidated |",
+      "sha256": "34e5843aaae26101980b9b647437ca95ae8e546bae98b359e5413db295efdea2",
+      "disposition": "documentary",
+      "reason": "Kernel speed-up of an external Gröbner solver measured on the session container, not an ECDLP cost: no replay certificate, validator report or rho reference applies, so it is recorded here and never admitted to README.md.",
+      "provenance": [
+        "research/m4gb_integration_20261110/README.md",
+        "research/m4gb_integration_20261110/RESULTS.md",
+        "benchmarks/records/20261110T0551Z-m4gb-arith-kernels-ab.json"
+      ]
     }
   ]
 }

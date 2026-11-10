@@ -106,3 +106,27 @@ early-exit behaviour deserves a look at larger `n`).
   (`README.md`, `src/config.hpp`, `src/common.hpp`, `src/m4gb.hpp`,
   `lib/gf_p_simple.hpp`, `lib/gf_2n_simple.hpp`, `lib/parser.hpp`,
   `lib/solver_base.hpp`, `tests/gebauer_moeller/wd_n16.in`).
+
+## Implementation (same day, PR #3812)
+
+The plan above was carried out in the follow-up PR, with these deviations
+from the order proposed:
+
+- Build and patches first: `scripts/m4gb/build.sh` (pinned commit, manifest
+  with hashes) and `third_party/m4gb-patches/` (0001 arithmetic `GF(p)` dense
+  kernels, 0002 field equations for declared variables only; README there).
+- Measurement: `research/m4gb_integration_20261110/` (protocol, A/B, graph,
+  PDF; benchmark record `20261110T0551Z-m4gb-arith-kernels-ab`). `GF(31)`
+  3.4–4.1× and `GF(65521)` 1.6–2.0× over upstream with identical bases; `GF(2)`
+  unchanged under exact-width binaries; wide binaries are memory-bound
+  (about 7 GB resident at 128 variables) `[pcc:unverified]`.
+- Adapter: `src/cryptanalysis/m4gb_oracle.rs` and `m4gb-f2` in
+  `ic_framework/solvers.rs`, behind `M4GB_BINARY` (a binary or a directory of
+  binaries, the narrowest that fits is chosen); `.m4gb` output in
+  `examples/gb_cas_export.rs`; `docs/ic/FRAMEWORK.md`.
+- Corrections to the table above: M4GB signals the unit ideal by exit status
+  1 and `contradiction: I=(1)` or `contradiction: 1=0` on stderr with no
+  output file, not by printing `1`; upstream prints `^2 + ` lines for the
+  field equations of undeclared variables (removed by patch 0002); and the
+  thread option does run work on several threads (user time exceeded wall
+  time), the header comment notwithstanding.
