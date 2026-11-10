@@ -1,0 +1,197 @@
+{
+  "small": [
+    {
+      "r": 7,
+      "queries": 200,
+      "candidate": [
+        56820,
+        2200,
+        1400
+      ],
+      "per_block": [
+        66220,
+        2800,
+        1400
+      ],
+      "final_norm_calls": 200,
+      "complete_blocks": 400,
+      "unit_outcomes": 84,
+      "simple_outcomes": 116,
+      "max_accumulator_slots": 2
+    },
+    {
+      "r": 19,
+      "queries": 2144,
+      "candidate": [
+        1594168,
+        55544,
+        19296
+      ],
+      "per_block": [
+        2158609,
+        85475,
+        19296
+      ],
+      "final_norm_calls": 2144,
+      "complete_blocks": 6432,
+      "unit_outcomes": 784,
+      "simple_outcomes": 1360,
+      "max_accumulator_slots": 4
+    },
+    {
+      "r": 199,
+      "queries": 350,
+      "candidate": [
+        4093839,
+        75469,
+        10150
+      ],
+      "per_block": [
+        8109124,
+        188871,
+        10150
+      ],
+      "final_norm_calls": 350,
+      "complete_blocks": 4550,
+      "unit_outcomes": 56,
+      "simple_outcomes": 294,
+      "max_accumulator_slots": 14
+    }
+  ],
+  "P192": {
+    "candidate": {
+      "queries": 24,
+      "selected": [
+        15321,
+        645,
+        168
+      ]
+    },
+    "per-block": {
+      "queries": 24,
+      "selected": [
+        19449,
+        1317,
+        168
+      ]
+    },
+    "formation_counts": [
+      6408,
+      0,
+      0
+    ],
+    "quotient_jet_merge_counts": [
+      4368,
+      96,
+      0
+    ],
+    "denominator_counts": [
+      912,
+      0,
+      0
+    ],
+    "final_norm_counts": [
+      2802,
+      336,
+      0
+    ],
+    "division_counts": [
+      48,
+      48,
+      0
+    ],
+    "norm_calls": 24,
+    "unit_outcomes": 6,
+    "simple_outcomes": 18,
+    "target_setups": [
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "public_Q",
+        "tensor_cache_counts": [
+          1138,
+          18,
+          0
+        ],
+        "tensor_coefficient_slots": 72,
+        "tensor_slot_bound": 72
+      },
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "mu_G",
+        "tensor_cache_counts": [
+          1138,
+          18,
+          0
+        ],
+        "tensor_coefficient_slots": 72,
+        "tensor_slot_bound": 72
+      },
+      {
+        "H_Q_cache_counts": [
+          20,
+          0,
+          0
+        ],
+        "H_Q_coefficient_slots": 5,
+        "algebra_counts": [
+          172,
+          16,
+          0
+        ],
+        "persistent_polynomial_coefficient_slots": 13,
+        "point_counts": [
+          27,
+          7,
+          7
+        ],
+        "point_slots": 8,
+        "target": "relation_lambda_G",
+        "tensor_cache_counts": [
+          1138,
+          18,
+          0
+        ],
+        "tensor_coefficient_slots": 72,
+        "tensor_slot_bound": 72
+      }
+    ],
+    "max_accumulator_slots": 8
+  },
+  "counter_models": "small K multiplication counts include inverse powers; P192 explicit calls exclude inverse internals; no timing claim",
+  "synthetic_control_cases": 26,
+  "wrong_first_product_rejections": 10
+}

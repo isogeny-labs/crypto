@@ -78,6 +78,7 @@ pub mod rootfind;
 pub mod shared_rank;
 pub mod solvers;
 pub mod stages;
+pub mod subgroup_semaev;
 pub mod subspace_select;
 pub mod useful_rank;
 
@@ -1160,6 +1161,8 @@ mod tests {
             r: 562021,
             cofactor: 16,
             generator: (4890799, 2220468),
+
+            representation: None,
         };
         let mut scratch = GroupOps::default();
         let g = inst.generator_point();

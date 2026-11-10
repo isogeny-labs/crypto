@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Shamir interleaving panel (IC_SHAMIR=1) on fresh prime-order instances.
 Arms: table (IC_SUM_TABLE=1, fb 32, extra 2) and retuned sweep (fb 128, extra 2),
-each with IC_SHAMIR 0 (default), 1 (interleaved) and 2 (vartime two-ladder control). Serial, interleaved seeded order. Metric: solver
+each with IC_SHAMIR 0 (the former default: two scalar_mul ladders), 2 (two scalar_mul_vartime ladders) and unset (the new default: Point::double_scalar_mul_vartime, one joint word-Jacobian pass). Shamir arm label 3 = unset. Serial, interleaved seeded order. Metric: solver
 total_ms; equivalence check: trials, relations and recovered log equal per
 (instance, seed, collector) between Shamir off and on."""
 import json,os,subprocess,random,glob,sys
 inst=sys.argv[1];out=sys.argv[2];ic=sys.argv[3] if len(sys.argv)>3 else "../../target/release/ic"
 COL={"table":(32,2,1),"sweep":(128,2,0)};SEEDS=[1,2]
-jobs=[(f,json.load(open(f)),s,c,sh) for f in sorted(glob.glob(inst+"/*.json")) if not f.endswith("MANIFEST.json") for s in SEEDS for c in COL for sh in (0,1,2)]
+jobs=[(f,json.load(open(f)),s,c,sh) for f in sorted(glob.glob(inst+"/*.json")) if not f.endswith("MANIFEST.json") for s in SEEDS for c in COL for sh in (0,2,3)]
 random.Random("shamir-v1").shuffle(jobs)
 os.makedirs(out,exist_ok=True);t=os.path.join(out,"_t.json");rows=[]
 for f,d,s,c,sh in jobs:
@@ -16,7 +16,7 @@ for f,d,s,c,sh in jobs:
     env=dict(os.environ)
     for k in ("IC_SUM_TABLE","IC_SHAMIR","IC_HOIST_SWEEP"): env.pop(k,None)
     if tb: env["IC_SUM_TABLE"]="1"
-    if sh: env["IC_SHAMIR"]=str(sh)
+    if sh != 3: env["IC_SHAMIR"]=str(sh)   # 3 = unset = the new default (joint Jacobian pass)
     r=subprocess.run([ic,"--json","solve-prime-file","--input",t,"--seed",str(s),"--fb-size",str(fb),"--extra-relations",str(e),"--rho-steps","0","--max-trials-per-relation","2000000","--max-relation-attempts","512"],capture_output=True,text=True,env=env)
     try:o=json.loads(r.stdout)
     except Exception:o={"status":"crash"}

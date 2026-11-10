@@ -20,3 +20,24 @@ By size, interleaved / control on the table collector: 1.006 for r <= 17, 1.299 
 - Interleaving, as implemented (plain binary, no window or NAF), is not an improvement: 1.16x slower on the table collector, 1.30x at r >= 20, level on the sweep. The two ladders presumably use a cheaper recoding than the 3/4-density binary interleave. A windowed or signed-digit interleave was not tried.
 
 **Scope and limits.** One producer (`solve-prime-file`), toy sizes (r up to 2^23), prime-order instances, local host. Wall-time ratios from a single host. The default path is unchanged; `IC_SHAMIR=2` is opt-in. Making the variable-time pair the default would shift the other session's timed baselines (same trials, less time), so it is left as a separate decision. The native E-222 / M-221 operation counts (`h2_edwards`, `h3_montgomery`) price the same step in field operations and are unaffected.
+
+## Addendum: default switched to one joint word-Jacobian pass
+
+**Change.** The relation point `R = aG + bQ` now defaults to `Point::double_scalar_mul_vartime` (`src/ecc/point.rs`): when `p` fits a word, one interleaved pass in Jacobian coordinates with `G + Q` precomputed and a single inversion for the whole sum; otherwise the two variable-time ladders and an addition. `IC_SHAMIR=0` selects the former default (two `scalar_mul` ladders), `1` the affine interleave, `2` two `scalar_mul_vartime` ladders. Unit tests: `point_double_scalar_mul_vartime_matches_two_ladders` (three partner points including `Q = -G`, 3,600 scalar pairs each with zero scalars) and the earlier interleave test pass.
+
+**Why the first interleave lost.** It did an affine addition with an inversion at every step; the single-ladder path is Jacobian with one final inversion. Done in Jacobian the interleave pays off (below).
+
+**Panel.** Same 32 fresh instances (`e222m221-shamir-v1`, 12 to 23 bits), seeds 1, 2, table (fb 32, extra 2) and sweep (fb 128, extra 2), arms former default / two vartime ladders / new default; 384 runs, all recovered the planted log; trials and relation counts equal across arms in 128 of 128 groups. Data: `results/shamir/v3_joint_jacobian/rows.jsonl`. Medians of per-run total-time ratios (bootstrap 95% CI, n = 64):
+
+| collector | new default / former default | new default / two vartime ladders | two vartime ladders / former default |
+|---|---|---|---|
+| table | 0.102 (0.067 to 0.143) | 0.741 (0.673 to 0.830) | 0.134 (0.101 to 0.168) |
+| sweep | 0.873 (0.857 to 0.901) | 0.999 (0.951 to 1.020) | 0.881 (0.856 to 0.909) |
+
+Table collector, new / former: 0.299 for r <= 17, 0.062 for r >= 20 (median 2360 ms to 147 ms at r = 22 and 23). Sweep: 0.843 and 0.881; the factor-base square-root sweep dominates there, so the relation point matters little.
+
+**Reading.** On the table collector the joint pass is about 9.8x faster than the former default overall and about 16x at r >= 20; about 1.35x of that is the interleave itself over two variable-time ladders. The earlier statement that interleaving does not help applied to the affine version only. Relations, trial counts and recovered logs are unchanged, so this is a cost-per-trial change, not a relation-count change.
+
+**Baseline shift.** Timed results recorded before this change (extra-relations retune, pair-sum table panels) were taken with the former default relation point; their wall times are not comparable with runs from this commit on (their trial counts are). `IC_SHAMIR=0` reproduces the former path.
+
+**Limits.** One producer, prime-order toy instances up to r = 2^23, local host, wall-time ratios; a word-sized prime only (larger moduli use the two-ladder fallback, which is the variable-time pair and also faster than the former default for `p` that fits a word only; for larger `p` it is `scalar_mul` itself). Not run on the native E-222 / M-221 sizes.

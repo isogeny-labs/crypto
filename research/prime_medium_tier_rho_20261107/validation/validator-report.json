@@ -1,0 +1,2191 @@
+{
+ "schema": "validator-report/v1 (docs/VALIDATION_GATE.md fields: status, independent, raw_data, headline)",
+ "status": "pass",
+ "independent": true,
+ "independence_note": "Validator session distinct from the producer; recompute code is the validator's own (stdlib Python, scratchpad, hashes below); the replay binary is the producer-pinned ecbench a18af09f (no independent rebuild, disk). The boolean is validator-written; no pcc keyring signature is attached, so the standing is [pcc:unverified].",
+ "disposition": "validated",
+ "disposition_scope": "the six admitted sessions, their counts and certificates, the twelve sealed medium bounds, the per-job P4/P7/P8 comparisons, the R(N) point fits, and the PROTOCOL.md section 9 verdict `inconclusive`; not an IC leaderboard row (no IC arm exists)",
+ "study": "research/prime_medium_tier_rho_20261107",
+ "validated_commit": "f13a690df016d0a457bd40579fbb9d054f486adf",
+ "working_tree": "study directory clean at f13a690 (git status shows only ignored files and the untracked research/open_leads_execution_20261108/); validator wrote only research/prime_medium_tier_rho_20261107/validation/",
+ "protocol": {
+  "path": "protocol.json",
+  "protocol_sha256_recorded": "5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+  "protocol_sha256_recomputed": "sha256 of sorted-key compact JSON of protocol.json without `freeze` = 5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+  "freeze_commit": "189b78587b (2026-11-07T21:15:31Z); first session started 2026-11-07T21:27:16Z",
+  "change_since_529aa8ee": "only arms[].instrument.commit and binary_sha256 filled (null -> dbd587a01a / a18af09f); PROTOCOL.md byte-identical"
+ },
+ "paths_relative_to": "research/prime_medium_tier_rho_20261107 (the study directory)",
+ "raw_data": [
+  {
+   "path": "sessions/J1/records.jsonl",
+   "sha256": "e50cb6213210cde19df013b5697e81fe5e9e5650b6df5ada5e93f7a69ea7a0f6",
+   "bytes": 10821976,
+   "store": "s3://setec-astronomy-artifacts/store/sha256/e5/e50cb6213210cde19df013b5697e81fe5e9e5650b6df5ada5e93f7a69ea7a0f6",
+   "also": "s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j1/.../session/records.jsonl",
+   "note": "artifact-store managed (sessions/J1/.artifacts.json); pull with tools/artifacts before a file-level gate check"
+  },
+  {
+   "path": "sessions/J1/session.json",
+   "sha256": "0e54979323a2123938460dccfbca2fb1567ce8f960be2547d3527e72726e7ece"
+  },
+  {
+   "path": "sessions/J1/plan.json",
+   "sha256": "441582a215e86f0345fc361d7c6ce4f586b3ef7f8928cab79a48455bb5c8d999"
+  },
+  {
+   "path": "sessions/J1/spec.json",
+   "sha256": "5d41b87e148fc7cd91a37149a05c471d9f5e5f7d6ef2f1e833a5b7e274630115"
+  },
+  {
+   "path": "sessions/J1/host.json",
+   "sha256": "5f858f068ffd9f85044cf2456c2aa9aebaf2ca6b522a9b904a21867d18f8ad46"
+  },
+  {
+   "path": "sessions/J1.audit.json",
+   "sha256": "2fbac521a33ba21fcd2d37da9274aad0d011c8c058203be271ccaf10156b4131"
+  },
+  {
+   "path": "sessions/J1.pod/audit.json",
+   "sha256": "026d0218905fa67e65876eb57788bf69a214d4b1707f6c580b935fe29f753082"
+  },
+  {
+   "path": "sessions/J2/records.jsonl",
+   "sha256": "d9b91213ec3f0af3fed8a1c997e5861fd1a1dc4fe36cfbb67cd9d8abee28d6d2",
+   "bytes": 3661479,
+   "store": "s3://setec-astronomy-artifacts/store/sha256/d9/d9b91213ec3f0af3fed8a1c997e5861fd1a1dc4fe36cfbb67cd9d8abee28d6d2",
+   "also": "s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j2/.../session/records.jsonl",
+   "note": "artifact-store managed (sessions/J2/.artifacts.json); pull with tools/artifacts before a file-level gate check"
+  },
+  {
+   "path": "sessions/J2/session.json",
+   "sha256": "80b86e42e0b353e18ddc8e77ba8f9eef7772cf20b89bc405df3cd0f5a3edbf58"
+  },
+  {
+   "path": "sessions/J2/plan.json",
+   "sha256": "8ebd5f4fc0cc909c9240d6bcfc43fd36bbd87b898df2e2af0a956ab9ba4f2812"
+  },
+  {
+   "path": "sessions/J2/spec.json",
+   "sha256": "c4d00d174db057b199b6e6a2d42f95c832fb1d01df4174e1e778eaa34e10934b"
+  },
+  {
+   "path": "sessions/J2/host.json",
+   "sha256": "ef0904c8d0152a12288b8c728ac8b5e45f2a09970643b4f933f90f9bcb7c7b13"
+  },
+  {
+   "path": "sessions/J2.audit.json",
+   "sha256": "302d1859a3dc4f2bb949437249de94a45bedb40237f5562c73cce0ae15836b0d"
+  },
+  {
+   "path": "sessions/J2.pod/audit.json",
+   "sha256": "bf405c27e2c693d8dc2f62fd6905e7eab80b78624e1b4b950a0426dba52f88ce"
+  },
+  {
+   "path": "sessions/J3/records.jsonl",
+   "sha256": "cc6be07568d8e8eeec937ac636e5925bd9237836948067db4f625ae1a3a0a4ae",
+   "bytes": 926590,
+   "store": "s3://setec-astronomy-artifacts/store/sha256/cc/cc6be07568d8e8eeec937ac636e5925bd9237836948067db4f625ae1a3a0a4ae",
+   "also": "s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j3/.../session/records.jsonl",
+   "note": "artifact-store managed (sessions/J3/.artifacts.json); pull with tools/artifacts before a file-level gate check"
+  },
+  {
+   "path": "sessions/J3/session.json",
+   "sha256": "2e05195771bc118a79033442818b343f25e9664fc4e160acf7a5cf1bf84b3242"
+  },
+  {
+   "path": "sessions/J3/plan.json",
+   "sha256": "0439943bcad72ca73aa161c51a1fb2307403098a8a3bbb3d4998e6bcc5c49ff1"
+  },
+  {
+   "path": "sessions/J3/spec.json",
+   "sha256": "0f9344b81dc27f98605c579f963c8b20ac4dc094d7ba8cbddd0b8af9467c8d44"
+  },
+  {
+   "path": "sessions/J3/host.json",
+   "sha256": "224f8ecdbdb5a9fb8428a93c3ae918f0cbe56806341fb1854e7e617191b67dd2"
+  },
+  {
+   "path": "sessions/J3.audit.json",
+   "sha256": "075c5d45610a2c812363d2d3606aac6685a2442bd24817976375cd974157090e"
+  },
+  {
+   "path": "sessions/J3.pod/audit.json",
+   "sha256": "860dc45de6a871f79b64e6665e02202d8b56486863258ce0aeb0753ab439f5a7"
+  },
+  {
+   "path": "sessions/J4/records.jsonl",
+   "sha256": "e645b4b9f6c4ed648db7bae84cf0a82ea767ea1d62c6853eec97fda09d4dffbf",
+   "bytes": 926787,
+   "store": "s3://setec-astronomy-artifacts/store/sha256/e6/e645b4b9f6c4ed648db7bae84cf0a82ea767ea1d62c6853eec97fda09d4dffbf",
+   "also": "s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j4/.../session/records.jsonl",
+   "note": "artifact-store managed (sessions/J4/.artifacts.json); pull with tools/artifacts before a file-level gate check"
+  },
+  {
+   "path": "sessions/J4/session.json",
+   "sha256": "ca871800513775eca1af35f79392463e824fc1285021418994ce3af77814f2f7"
+  },
+  {
+   "path": "sessions/J4/plan.json",
+   "sha256": "bf358f94b5793f301de2a6c392e2318e96795cf7705254ecf0bad3faaaa70ef5"
+  },
+  {
+   "path": "sessions/J4/spec.json",
+   "sha256": "d2445538f7188eae55dd7788b9142cf06e8ec4c246850db6185d935fca37b9f0"
+  },
+  {
+   "path": "sessions/J4/host.json",
+   "sha256": "a0aab9c305b50856f82e471614e5953b55b51f6df0a42824ce3eed563f430045"
+  },
+  {
+   "path": "sessions/J4.audit.json",
+   "sha256": "37e9222b3a9bf7b5ca4b62143dac24d00fc849758f1b651e92f57c3c424cd6c9"
+  },
+  {
+   "path": "sessions/J4.pod/audit.json",
+   "sha256": "781f283f64dea24546782a5d362c98bcf6f2cb72226b61f0f65d119821b3e556"
+  },
+  {
+   "path": "sessions/J5/records.jsonl",
+   "sha256": "f0a4b301af8dc27bf0aad2374cac7a9bf2ce1c477dcdc29fc64d193500e78adf",
+   "bytes": 927469,
+   "store": "s3://setec-astronomy-artifacts/store/sha256/f0/f0a4b301af8dc27bf0aad2374cac7a9bf2ce1c477dcdc29fc64d193500e78adf",
+   "also": "s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j5/.../session/records.jsonl",
+   "note": "artifact-store managed (sessions/J5/.artifacts.json); pull with tools/artifacts before a file-level gate check"
+  },
+  {
+   "path": "sessions/J5/session.json",
+   "sha256": "0d1bf71d56050c6b4c608b9cd39ffe287c8ae5f735ab4444de1540f988d69007"
+  },
+  {
+   "path": "sessions/J5/plan.json",
+   "sha256": "89ab3127a40c65bdb18e2c0943035c367086b2efaefbf5b17b907af54a35fe1d"
+  },
+  {
+   "path": "sessions/J5/spec.json",
+   "sha256": "77315bbea70310c56fc3363616cbe12aa0289e699eddc644fe14894136e8e890"
+  },
+  {
+   "path": "sessions/J5/host.json",
+   "sha256": "1e3818676437a84117b9f8ea18baf931db31514b00c77374688efb9979410976"
+  },
+  {
+   "path": "sessions/J5.audit.json",
+   "sha256": "4b71b26cea338a9e5aaf8e666fc8c194ebd263e05709cfeb3a2a4f8809f961b4"
+  },
+  {
+   "path": "sessions/J5.pod/audit.json",
+   "sha256": "d432677ce5293177fc378dc80ba00032c9b543b75aac7b22f4edeb02919553f1"
+  },
+  {
+   "path": "sessions/J6/records.jsonl",
+   "sha256": "2a77a1d67660f1fe5dc76a2c8db7bd8f8041889ea162f97a0a6f7133439b8bee",
+   "bytes": 926682,
+   "store": "s3://setec-astronomy-artifacts/store/sha256/2a/2a77a1d67660f1fe5dc76a2c8db7bd8f8041889ea162f97a0a6f7133439b8bee",
+   "also": "s3://isolab-results-104186811093-us-east-2/runs/prime-medium-rho-20261107-j6/.../session/records.jsonl",
+   "note": "artifact-store managed (sessions/J6/.artifacts.json); pull with tools/artifacts before a file-level gate check"
+  },
+  {
+   "path": "sessions/J6/session.json",
+   "sha256": "e03746ed97abb8859a649337aebc044067e6de55767934387e5efd1fac53691e"
+  },
+  {
+   "path": "sessions/J6/plan.json",
+   "sha256": "3dc288555bfb0a760859f832dedfcebc31fe6f1e9a1dd18d654c17262250e33e"
+  },
+  {
+   "path": "sessions/J6/spec.json",
+   "sha256": "14e9efc8f2d9776a9d9611bd8ee27fe931a0277e6508e15025c8188e90bdb9ed"
+  },
+  {
+   "path": "sessions/J6/host.json",
+   "sha256": "11d25828bc0c5452352b5e0ff016cfde842eba42d677c8a7ab6eefa3c6aceba6"
+  },
+  {
+   "path": "sessions/J6.audit.json",
+   "sha256": "d3e68ba50a16e2f01348f3c5e55d23425b9a7a1029c5867fa13390af4b220e2c"
+  },
+  {
+   "path": "sessions/J6.pod/audit.json",
+   "sha256": "cd421bdf7dfdcb7a3b3568dcef69a1dcc898d981337acc9b2426947324ee6f6d"
+  },
+  {
+   "path": "protocol.json",
+   "sha256": "5a15b0a2730a4256dcb318ed08607cbdf7552d85fb1b78bb652194af94dcf690"
+  },
+  {
+   "path": "PROTOCOL.md",
+   "sha256": "2dbafd435b3fd90d8026e679bd6a7e40669317352c96b5ee852296003a5747b8"
+  },
+  {
+   "path": "seeds.json",
+   "sha256": "dafa175ef83ea25e792019f73e9308192b1210157cccc1e6a7f6983be1b210a9"
+  },
+  {
+   "path": "curves.json",
+   "sha256": "6ccc0acb15d99a5593fcfce6b9dc57ddfd6141f87b35e2a96f41043569ad3680"
+  },
+  {
+   "path": "RESULTS.md",
+   "sha256": "059cbff1c55d43d94196abf832262009f45f404e387e69d384f17fab6f3aedf8"
+  },
+  {
+   "path": "receipts/image-publication.json",
+   "sha256": "5a3aa09a349bd61045663cfeb61aac1bb9fc12da8a02f03c68e4725493e8dd28"
+  },
+  {
+   "path": "receipts/publication-receipt.json",
+   "sha256": "c788a1b64de4005261d6f94c326d6432c1e6cb1b49f52ce1d57e9b1b0c09e137"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-bsgs-neg-w0.1.json",
+   "sha256": "4d9e66d54e0fc22c2b022552ea06637318b7046c42671d0861700a44d20df393"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-bsgs-neg-w1.json",
+   "sha256": "5b497f60646ccd67bc12bfcff325ba0908428899dcc75937fd9ee9d4e6f2c12e"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-bsgs-neg.json",
+   "sha256": "9dbd5f5cc151fdb62da625838e3d4c551f358169a72addb5ea7261980c15e75a"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json",
+   "sha256": "65e2a5ef682e51a775480354d5dff1725d644830539ce559eff5578876224ca3"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-neg-v2-w1.json",
+   "sha256": "e68e16d8155d9617eed4155688434d0671fbfc6557d0af46faf3f24987c1f23d"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-neg-v2.json",
+   "sha256": "a62891bfb63fddaf31986908a039ecdbf8d752102748da86fe9af0cddef6dcc0"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-neg-w0.1.json",
+   "sha256": "f869e052a23e36199dd74d964dc246a0bf173ca54770b5628406de9bee280d2a"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-neg-w1.json",
+   "sha256": "37aeb464f253aefa5913ffc0f78ef8c972a9c3baa2300781b668d44e2a707e8a"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-neg.json",
+   "sha256": "c257355cb57f846528ef18fc875825883172b08c7905735070dfbdde09b56d7b"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-plain-w0.1.json",
+   "sha256": "17b2566afb771571164a8850f0e6489014945e4fe5a655cd39dadd63d6f9e746"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-plain-w1.json",
+   "sha256": "5355ebba70fea21fc8660c21cad9a25bfdef4f48880050e4180f62e1f8448819"
+  },
+  {
+   "path": "../../docs/bounds/records/prime-medium-rho-plain.json",
+   "sha256": "03955be07df72848a9acef56c6d189f28773993479d47d8b0ca69b157e38a353"
+  },
+  {
+   "path": "../../docs/bounds/records/calibration-prime-rho-neg-v2.json",
+   "sha256": "5ae29df19a3a0b10eb03fd2704a1a6d2945fcfcdf125e66e46c4a0da35ef7675"
+  }
+ ],
+ "headline": [
+  {
+   "name": "rho-neg w=0.0 constant.ratio_to_floor",
+   "claimed": 1.0934308362429286,
+   "recomputed": 1.0934308362429292,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.0325593293474,
+   "recomputed": 1.0325593293474007,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.1558904712271172,
+   "recomputed": 1.1558904712271187,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 constant.s",
+   "claimed": 0.9690278481988097,
+   "recomputed": 0.9690278481988093,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 0.9131539505185012,
+   "recomputed": 0.913153950518501,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.026274385316299,
+   "recomputed": 1.0262743853162988,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.49688575799670714,
+   "recomputed": 0.4968857579967067,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg.json"
+  },
+  {
+   "name": "rho-neg w=0.1 constant.ratio_to_floor",
+   "claimed": 1.202617652942062,
+   "recomputed": 1.2026176529420618,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.135610619808883,
+   "recomputed": 1.1356106198088831,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.2713778315165132,
+   "recomputed": 1.2713778315165134,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 constant.s",
+   "claimed": 1.0657921450620542,
+   "recomputed": 1.0657921450620553,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.004363461406553,
+   "recomputed": 1.0043634614065535,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.1287383111654898,
+   "recomputed": 1.1287383111654894,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.49693525215670725,
+   "recomputed": 0.496935252156707,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=0.1 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w0.1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 constant.ratio_to_floor",
+   "claimed": 2.1852990032342534,
+   "recomputed": 2.1852990032342534,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 2.0632036321661458,
+   "recomputed": 2.0632036321661467,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 2.3104058012830966,
+   "recomputed": 2.310405801283097,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 constant.s",
+   "claimed": 1.9366708168312694,
+   "recomputed": 1.936670816831269,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.824963021160557,
+   "recomputed": 1.8249630211605563,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 2.0518026384522257,
+   "recomputed": 2.0518026384522234,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.49715845555597243,
+   "recomputed": 0.4971584555559722,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-neg w=1.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-w1.json"
+  },
+  {
+   "name": "rho-plain w=0.0 constant.ratio_to_floor",
+   "claimed": 1.433365013881185,
+   "recomputed": 1.4333650138811846,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.3427942655944825,
+   "recomputed": 1.342794265594482,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.5222735265979752,
+   "recomputed": 1.5222735265979732,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 constant.s",
+   "claimed": 1.2702866693034724,
+   "recomputed": 1.270286669303472,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.19385358633292,
+   "recomputed": 1.1938535863329192,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.3536366815649752,
+   "recomputed": 1.3536366815649747,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.5060910306811314,
+   "recomputed": 0.5060910306811308,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain.json"
+  },
+  {
+   "name": "rho-plain w=0.1 constant.ratio_to_floor",
+   "claimed": 1.433365013881185,
+   "recomputed": 1.4333650138811846,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.3427942655944825,
+   "recomputed": 1.342794265594482,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.5222735265979752,
+   "recomputed": 1.5222735265979732,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 constant.s",
+   "claimed": 1.2702866693034724,
+   "recomputed": 1.270286669303472,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.19385358633292,
+   "recomputed": 1.1938535863329192,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.3536366815649752,
+   "recomputed": 1.3536366815649747,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.5060910306811314,
+   "recomputed": 0.5060910306811308,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=0.1 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w0.1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 constant.ratio_to_floor",
+   "claimed": 1.433365013881185,
+   "recomputed": 1.4333650138811846,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.3427942655944825,
+   "recomputed": 1.342794265594482,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.5222735265979752,
+   "recomputed": 1.5222735265979732,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 constant.s",
+   "claimed": 1.2702866693034724,
+   "recomputed": 1.270286669303472,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.19385358633292,
+   "recomputed": 1.1938535863329192,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.3536366815649752,
+   "recomputed": 1.3536366815649747,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.5060910306811314,
+   "recomputed": 0.5060910306811308,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "rho-plain w=1.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-plain-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 constant.ratio_to_floor",
+   "claimed": 1.110589754962096,
+   "recomputed": 1.1105897549620918,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.0319467411701644,
+   "recomputed": 1.0319467411701606,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.1845475836927948,
+   "recomputed": 1.1845475836927932,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 constant.s",
+   "claimed": 0.9842345439793895,
+   "recomputed": 0.9842345439793865,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 0.915951236063988,
+   "recomputed": 0.9159512360639869,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.0481240645784684,
+   "recomputed": 1.0481240645784662,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.4996179701144414,
+   "recomputed": 0.49961797011444076,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 constant.ratio_to_floor",
+   "claimed": 1.2216401772362895,
+   "recomputed": 1.2216401772362868,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.135125564450757,
+   "recomputed": 1.1351255644507594,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.302988451545146,
+   "recomputed": 1.3029884515451438,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 constant.s",
+   "claimed": 1.0826504182816774,
+   "recomputed": 1.0826504182816767,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.0075393107356414,
+   "recomputed": 1.0075393107356394,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.152924700207311,
+   "recomputed": 1.1529247002073106,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.4996201741560616,
+   "recomputed": 0.4996201741560606,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=0.1 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w0.1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 constant.ratio_to_floor",
+   "claimed": 2.221093977704042,
+   "recomputed": 2.221093977704041,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 2.0637349739761452,
+   "recomputed": 2.063734973976147,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 2.3689562622162916,
+   "recomputed": 2.368956262216298,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 constant.s",
+   "claimed": 1.968393287002287,
+   "recomputed": 1.9683932870022887,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.8318319827805114,
+   "recomputed": 1.8318319827805136,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 2.0961304208669045,
+   "recomputed": 2.096130420866907,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.4996300930964019,
+   "recomputed": 0.49963009309640233,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "bsgs-neg w=1.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-bsgs-neg-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 constant.ratio_to_floor",
+   "claimed": 1.068958794734207,
+   "recomputed": 1.0689587947342063,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.0031132677271286,
+   "recomputed": 1.0031132677271282,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.1376134007032455,
+   "recomputed": 1.1376134007032448,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 constant.s",
+   "claimed": 0.9473400660929809,
+   "recomputed": 0.9473400660929815,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 0.8855348494147386,
+   "recomputed": 0.8855348494147383,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.0045240725037972,
+   "recomputed": 1.004524072503796,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.4912060491388881,
+   "recomputed": 0.4912060491388876,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 constant.ratio_to_floor",
+   "claimed": 1.1760116224368176,
+   "recomputed": 1.1760116224368178,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.103552261954408,
+   "recomputed": 1.1035522619544083,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 1.2515307788549328,
+   "recomputed": 1.251530778854933,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 constant.s",
+   "claimed": 1.042213164448891,
+   "recomputed": 1.0422131644488906,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 0.974194995787508,
+   "recomputed": 0.9741949957875077,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.1051903405093113,
+   "recomputed": 1.105190340509311,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.49120610199452786,
+   "recomputed": 0.4912061019945274,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=0.1 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w0.1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 constant.ratio_to_floor",
+   "claimed": 2.139487071760322,
+   "recomputed": 2.1394870717603207,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 constant.ratio_to_floor ci95_lo (harness resampler, seed 20261005^0xF)",
+   "claimed": 2.0075032099999284,
+   "recomputed": 2.0075032099999284,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 constant.ratio_to_floor ci95_hi (harness resampler, seed 20261005^0xF)",
+   "claimed": 2.276787182220126,
+   "recomputed": 2.2767871822201253,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 constant.s",
+   "claimed": 1.8960710496520743,
+   "recomputed": 1.896071049652073,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 constant.s ci95_lo (harness resampler, seed 20261005^0x5)",
+   "claimed": 1.7721363131424326,
+   "recomputed": 1.772136313142432,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 constant.s ci95_hi (harness resampler, seed 20261005^0x5)",
+   "claimed": 2.0106443822333233,
+   "recomputed": 2.010644382233322,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 fit.alpha (OLS ln gae on ln r, 480 runs)",
+   "claimed": 0.4912066147566063,
+   "recomputed": 0.49120661475660626,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "rho-neg-v2 w=1.0 provenance.records",
+   "claimed": 480,
+   "recomputed": 480,
+   "rel_tol": 1e-09,
+   "claimed_from": "docs/bounds/records/prime-medium-rho-neg-v2-w1.json"
+  },
+  {
+   "name": "P4 J1 rho-plain/rho-neg ops ratio",
+   "claimed": 1.2854533162933108,
+   "recomputed": 1.2854533162933095,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J1 rho-plain/rho-neg ci95_lo (linearised t, df 47)",
+   "claimed": 1.176644056923963,
+   "recomputed": 1.1766440569239642,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J1 rho-plain/rho-neg ci95_hi (linearised t, df 47)",
+   "claimed": 1.4043246287150106,
+   "recomputed": 1.4043246287150084,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J1 pairs",
+   "claimed": 288,
+   "recomputed": 288,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P7 J1 rho-neg-aa/rho-neg ops ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J1 rho-neg-aa/rho-neg ci95_lo (linearised t, df 47)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J1 rho-neg-aa/rho-neg ci95_hi (linearised t, df 47)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J1 pairs",
+   "claimed": 288,
+   "recomputed": 288,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P8 J1 rho-neg-v2/rho-neg ops ratio",
+   "claimed": 1.0015829517637407,
+   "recomputed": 1.0015829517637398,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J1 rho-neg-v2/rho-neg ci95_lo (linearised t, df 47)",
+   "claimed": 0.9337593541103824,
+   "recomputed": 0.9337593541103835,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J1 rho-neg-v2/rho-neg ci95_hi (linearised t, df 47)",
+   "claimed": 1.0743329154860368,
+   "recomputed": 1.0743329154860357,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J1 pairs",
+   "claimed": 288,
+   "recomputed": 288,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "J1 records_written",
+   "claimed": 1680,
+   "recomputed": 1680,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J1/session.json"
+  },
+  {
+   "name": "P4 J2 rho-plain/rho-neg ops ratio",
+   "claimed": 1.285916731716601,
+   "recomputed": 1.2859167317166005,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J2 rho-plain/rho-neg ci95_lo (linearised t, df 15)",
+   "claimed": 1.0939992851133964,
+   "recomputed": 1.0939992851133964,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J2 rho-plain/rho-neg ci95_hi (linearised t, df 15)",
+   "claimed": 1.5115017563629438,
+   "recomputed": 1.5115017563629438,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J2 pairs",
+   "claimed": 96,
+   "recomputed": 96,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P7 J2 rho-neg-aa/rho-neg ops ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J2 rho-neg-aa/rho-neg ci95_lo (linearised t, df 15)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J2 rho-neg-aa/rho-neg ci95_hi (linearised t, df 15)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J2 pairs",
+   "claimed": 96,
+   "recomputed": 96,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P8 J2 rho-neg-v2/rho-neg ops ratio",
+   "claimed": 0.9660333027135928,
+   "recomputed": 0.9660333027135924,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J2 rho-neg-v2/rho-neg ci95_lo (linearised t, df 15)",
+   "claimed": 0.8468702331377175,
+   "recomputed": 0.8468702331377175,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J2 rho-neg-v2/rho-neg ci95_hi (linearised t, df 15)",
+   "claimed": 1.1019638020503806,
+   "recomputed": 1.1019638020503806,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J2 pairs",
+   "claimed": 96,
+   "recomputed": 96,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "J2 records_written",
+   "claimed": 560,
+   "recomputed": 560,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J2/session.json"
+  },
+  {
+   "name": "P4 J3 rho-plain/rho-neg ops ratio",
+   "claimed": 1.3515167919820021,
+   "recomputed": 1.3515167919820021,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J3 rho-plain/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.9093016401877595,
+   "recomputed": 0.9093016401877597,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J3 rho-plain/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 2.008791756531037,
+   "recomputed": 2.0087917565310365,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J3 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P7 J3 rho-neg-aa/rho-neg ops ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J3 rho-neg-aa/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J3 rho-neg-aa/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J3 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P8 J3 rho-neg-v2/rho-neg ops ratio",
+   "claimed": 0.8846240815162904,
+   "recomputed": 0.8846240815162902,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J3 rho-neg-v2/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.5105776489535551,
+   "recomputed": 0.5105776489535554,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J3 rho-neg-v2/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.5326949136971049,
+   "recomputed": 1.5326949136971046,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J3 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "J3 records_written",
+   "claimed": 140,
+   "recomputed": 140,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J3/session.json"
+  },
+  {
+   "name": "P4 J4 rho-plain/rho-neg ops ratio",
+   "claimed": 1.4138892166843455,
+   "recomputed": 1.4138892166843453,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J4 rho-plain/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.68798764234166,
+   "recomputed": 0.6879876423416602,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J4 rho-plain/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 2.9056956753643424,
+   "recomputed": 2.905695675364342,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J4 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P7 J4 rho-neg-aa/rho-neg ops ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J4 rho-neg-aa/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J4 rho-neg-aa/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J4 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P8 J4 rho-neg-v2/rho-neg ops ratio",
+   "claimed": 0.9866263264248142,
+   "recomputed": 0.9866263264248142,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J4 rho-neg-v2/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.6640858163625377,
+   "recomputed": 0.6640858163625378,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J4 rho-neg-v2/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.4658218621900339,
+   "recomputed": 1.4658218621900339,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J4 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "J4 records_written",
+   "claimed": 140,
+   "recomputed": 140,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J4/session.json"
+  },
+  {
+   "name": "P4 J5 rho-plain/rho-neg ops ratio",
+   "claimed": 1.6632736753233337,
+   "recomputed": 1.6632736753233346,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J5 rho-plain/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.9863785082805382,
+   "recomputed": 0.9863785082805384,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J5 rho-plain/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 2.8046832892234645,
+   "recomputed": 2.804683289223463,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J5 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P7 J5 rho-neg-aa/rho-neg ops ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J5 rho-neg-aa/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J5 rho-neg-aa/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J5 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P8 J5 rho-neg-v2/rho-neg ops ratio",
+   "claimed": 0.9555980767732392,
+   "recomputed": 0.9555980767732394,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J5 rho-neg-v2/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.5133787207903813,
+   "recomputed": 0.5133787207903813,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J5 rho-neg-v2/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.7787408152149953,
+   "recomputed": 1.7787408152149946,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J5 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "J5 records_written",
+   "claimed": 140,
+   "recomputed": 140,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J5/session.json"
+  },
+  {
+   "name": "P4 J6 rho-plain/rho-neg ops ratio",
+   "claimed": 1.2174678427251977,
+   "recomputed": 1.2174678427251981,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J6 rho-plain/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.7372371056206967,
+   "recomputed": 0.737237105620697,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J6 rho-plain/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 2.0105172905289757,
+   "recomputed": 2.010517290528975,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P4 J6 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-plain.json"
+  },
+  {
+   "name": "P7 J6 rho-neg-aa/rho-neg ops ratio",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J6 rho-neg-aa/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J6 rho-neg-aa/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P7 J6 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-aa.json"
+  },
+  {
+   "name": "P8 J6 rho-neg-v2/rho-neg ops ratio",
+   "claimed": 0.8477265400461031,
+   "recomputed": 0.8477265400461031,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J6 rho-neg-v2/rho-neg ci95_lo (linearised t, df 3)",
+   "claimed": 0.41447517942907,
+   "recomputed": 0.4144751794290702,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J6 rho-neg-v2/rho-neg ci95_hi (linearised t, df 3)",
+   "claimed": 1.7338560241133076,
+   "recomputed": 1.7338560241133072,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "P8 J6 pairs",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/comparisons/rho-neg__rho-neg-v2.json"
+  },
+  {
+   "name": "J6 records_written",
+   "claimed": 140,
+   "recomputed": 140,
+   "rel_tol": 1e-09,
+   "claimed_from": "sessions/J6/session.json"
+  },
+  {
+   "name": "R(N) model A beta",
+   "claimed": 0.5780000000000001,
+   "recomputed": 0.5780000000000001,
+   "rel_tol": 1e-09,
+   "claimed_from": "analysis/rfit-rho-neg.json"
+  },
+  {
+   "name": "R(N) model A chi2",
+   "claimed": 13.248916355387902,
+   "recomputed": 13.248916355387903,
+   "rel_tol": 1e-09,
+   "claimed_from": "analysis/rfit-rho-neg.json"
+  },
+  {
+   "name": "R(N) model B R_inf",
+   "claimed": 1.0842409867513252,
+   "recomputed": 1.0842409867513252,
+   "rel_tol": 1e-09,
+   "claimed_from": "analysis/rfit-rho-neg.json"
+  },
+  {
+   "name": "R(N) model B chi2",
+   "claimed": 5.49239558063606,
+   "recomputed": 5.492395580636059,
+   "rel_tol": 1e-09,
+   "claimed_from": "analysis/rfit-rho-neg.json"
+  },
+  {
+   "name": "weighted mean R, medium",
+   "claimed": 1.0830046484557074,
+   "recomputed": 1.0830046484557074,
+   "rel_tol": 1e-09,
+   "claimed_from": "analysis/rfit-rho-neg.json"
+  },
+  {
+   "name": "weighted mean R, toy",
+   "claimed": 1.3795609558685515,
+   "recomputed": 1.3795609558685515,
+   "rel_tol": 1e-09,
+   "claimed_from": "analysis/rfit-rho-neg.json"
+  }
+ ],
+ "headline_failures": [],
+ "verdict_recompute": {
+  "M": 1.0934308362429292,
+  "M_ci95_harness_resampler": [
+   1.0325593293474007,
+   1.1558904712271187
+  ],
+  "M_ci95_validator_rng": [
+   1.0315812212212996,
+   1.1583847150806321
+  ],
+  "M_ci95_three_stage_sensitivity_not_protocol": [
+   1.021484100488,
+   1.162914579898033
+  ],
+  "M_line": "setup_excess",
+  "within_1.10_strict": false,
+  "P4_lower_end_above_1.2_any_job_linearised": false,
+  "P4_lower_end_above_1.2_any_job_bootstrap": false,
+  "audits_pass": true,
+  "verdict": "inconclusive",
+  "producer_verdict": "inconclusive",
+  "agrees": true,
+  "P4_pooled_not_preregistered": {
+   "pairs": 480,
+   "workloads": 80,
+   "ratio": 1.3108876815714128,
+   "ci95": [
+    1.2238539441016603,
+    1.4041107780692264
+   ],
+   "df": 79,
+   "t975": 1.9904502102300667,
+   "same_seeds": true,
+   "unpaired": 0,
+   "all_pairs_count_identical": false
+  }
+ },
+ "independent_interval_check": {
+  "method": "two-stage cluster bootstrap (sizes, then runs), 2000 resamples, Python random.Random(777); Monte-Carlo agreement only",
+  "rows": {
+   "rho-neg w=0.0": {
+    "validator_ci95": [
+     1.0315812212212996,
+     1.1583847150806321
+    ],
+    "sealed_ci95": [
+     1.0325593293474,
+     1.1558904712271172
+    ]
+   },
+   "rho-neg w=0.1": {
+    "validator_ci95": [
+     1.134519823437814,
+     1.2741400108061374
+    ],
+    "sealed_ci95": [
+     1.135610619808883,
+     1.2713778315165132
+    ]
+   },
+   "rho-neg w=1.0": {
+    "validator_ci95": [
+     2.061508267418497,
+     2.3144960572297255
+    ],
+    "sealed_ci95": [
+     2.0632036321661458,
+     2.3104058012830966
+    ]
+   },
+   "rho-plain w=0.0": {
+    "validator_ci95": [
+     1.342571961157489,
+     1.5224180081250596
+    ],
+    "sealed_ci95": [
+     1.3427942655944825,
+     1.5222735265979752
+    ]
+   },
+   "rho-plain w=0.1": {
+    "validator_ci95": [
+     1.342571961157489,
+     1.5224180081250596
+    ],
+    "sealed_ci95": [
+     1.3427942655944825,
+     1.5222735265979752
+    ]
+   },
+   "rho-plain w=1.0": {
+    "validator_ci95": [
+     1.342571961157489,
+     1.5224180081250596
+    ],
+    "sealed_ci95": [
+     1.3427942655944825,
+     1.5222735265979752
+    ]
+   },
+   "bsgs-neg w=0.0": {
+    "validator_ci95": [
+     1.0311322772946474,
+     1.1823351300322793
+    ],
+    "sealed_ci95": [
+     1.0319467411701644,
+     1.1845475836927948
+    ]
+   },
+   "bsgs-neg w=0.1": {
+    "validator_ci95": [
+     1.1342371494796666,
+     1.300557083275216
+    ],
+    "sealed_ci95": [
+     1.135125564450757,
+     1.302988451545146
+    ]
+   },
+   "bsgs-neg w=1.0": {
+    "validator_ci95": [
+     2.0621809991448066,
+     2.3645546624616407
+    ],
+    "sealed_ci95": [
+     2.0637349739761452,
+     2.3689562622162916
+    ]
+   },
+   "rho-neg-v2 w=0.0": {
+    "validator_ci95": [
+     0.9994727718230642,
+     1.1365398872004258
+    ],
+    "sealed_ci95": [
+     1.0031132677271286,
+     1.1376134007032455
+    ]
+   },
+   "rho-neg-v2 w=0.1": {
+    "validator_ci95": [
+     1.0995736055645908,
+     1.250408982808493
+    ],
+    "sealed_ci95": [
+     1.103552261954408,
+     1.2515307788549328
+    ]
+   },
+   "rho-neg-v2 w=1.0": {
+    "validator_ci95": [
+     2.0004811092383328,
+     2.2752308432810895
+    ],
+    "sealed_ci95": [
+     2.0075032099999284,
+     2.276787182220126
+    ]
+   }
+  }
+ },
+ "certificates": {
+  "records_checked": 2800,
+  "records_ok": 2800,
+  "checks": [
+   "p and r prime (deterministic Miller-Rabin)",
+   "curve nonsingular, G on curve, [r]G = O, r in Hasse interval and r > 4 sqrt(p) so #E = r (cofactor 1)",
+   "a != 0 and b != 0 (j not 0 or 1728) so Aut = {+-1}, automorphisms_available = 2",
+   "target = [planted]G",
+   "recovered == planted and [recovered]G = target",
+   "S = total_gae / sqrt(r)",
+   "rho family: total_gae = setup_additions + setup_doublings + walk_operations + start_additions + verification_operations",
+   "floor_s = sqrt(pi/4)"
+  ],
+  "curves": {
+   "icv1-fp33-t65189-eee04389": {
+    "p": 5557729739,
+    "a": 2036002406,
+    "b": 2773982840,
+    "r": 5557664551,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 33,
+    "log2_r": 32.371831613099474
+   },
+   "icv1-fp33-tm43469-ac81a6df": {
+    "p": 7183145327,
+    "a": 4546663450,
+    "b": 440691422,
+    "r": 7183188797,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 33,
+    "log2_r": 32.741977288610805
+   },
+   "icv1-fp37-tm218953-61268c9f": {
+    "p": 70093240733,
+    "a": 34866272438,
+    "b": 47397029180,
+    "r": 70093459687,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 37,
+    "log2_r": 36.028560783732466
+   },
+   "icv1-fp37-t160405-998ed0ab": {
+    "p": 92849827471,
+    "a": 41216192137,
+    "b": 53376697970,
+    "r": 92849667067,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 37,
+    "log2_r": 36.434177685941705
+   },
+   "icv1-fp41-tm405553-81153b6e": {
+    "p": 1495523448539,
+    "a": 640197488525,
+    "b": 566237084442,
+    "r": 1495523854093,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 41,
+    "log2_r": 40.44378806074534
+   },
+   "icv1-fp41-tm886935-baa24912": {
+    "p": 1930433675293,
+    "a": 28146981299,
+    "b": 897732060440,
+    "r": 1930434562229,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 41,
+    "log2_r": 40.81206278935506
+   },
+   "icv1-fp45-tm6458695-fe3d5bd2": {
+    "p": 27611383581911,
+    "a": 12878670601399,
+    "b": 4914515096856,
+    "r": 27611390040607,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 45,
+    "log2_r": 44.6503287529072
+   },
+   "icv1-fp45-t1999407-5563cb34": {
+    "p": 25361112161527,
+    "a": 20787366627629,
+    "b": 12019143787601,
+    "r": 25361110162121,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 45,
+    "log2_r": 44.5276831332059
+   },
+   "icv1-fp49-tm10234315-a355a6d8": {
+    "p": 365857381347911,
+    "a": 265803930896159,
+    "b": 186608017781445,
+    "r": 365857391582227,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 49,
+    "log2_r": 48.37827473499269
+   },
+   "icv1-fp49-tm34125029-11a5de23": {
+    "p": 561006233595917,
+    "a": 429062284978109,
+    "b": 409501054401560,
+    "r": 561006267720947,
+    "problems": [],
+    "j_is_0_or_1728": false,
+    "automorphisms_available_recorded": 2,
+    "field_bits": 49,
+    "log2_r": 48.995010217544866
+   }
+  }
+ },
+ "replay": {
+  "nonce": "fea12c9b689d3b3ed11162cb78f2b8f8",
+  "nonce_source": "/dev/urandom, 2026-11-08T04:52:18Z",
+  "selection": "per (job, arm): the 3 measured deterministic runs with the smallest sha256(nonce:job:seq); 15 per job, 90 total, 18 per arm",
+  "binary": {
+   "sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+   "equals_pinned": true,
+   "ecr_layer": "sha256:1ea30931f11882a85819a6e4fb63df27e9ac961096abc657c6a060d93ef2416f of image isolab/tasks@sha256:292bdc3d...cae5 (manifest digest recomputed) holds usr/local/bin/ecbench with sha256 a18af09f... (streamed, not stored)",
+   "github_artifact": "isolab-build-42413370386-1 digest sha256:457ef10389c680f8cd010d91eb2cf122f4b2d83480b42f594bf07ec0fdc8b9ed = sha256 of the bundle zip the frozen binary was extracted from",
+   "independent_rebuild": "not done: shared disk (see Errors); local rustc 1.97.0 vs 1.99.1 would not reproduce the hash in any case"
+  },
+  "ecbench_verify_replay_seq": {
+   "J1": {
+    "ok": true,
+    "replays": 15,
+    "reproduced": 15,
+    "problems": 0
+   },
+   "J2": {
+    "ok": true,
+    "replays": 15,
+    "reproduced": 15,
+    "problems": 0
+   },
+   "J3": {
+    "ok": true,
+    "replays": 15,
+    "reproduced": 15,
+    "problems": 0
+   },
+   "J4": {
+    "ok": true,
+    "replays": 15,
+    "reproduced": 15,
+    "problems": 0
+   },
+   "J5": {
+    "ok": true,
+    "replays": 15,
+    "reproduced": 15,
+    "problems": 0
+   },
+   "J6": {
+    "ok": true,
+    "replays": 15,
+    "reproduced": 15,
+    "problems": 0
+   }
+  },
+  "validator_exec_compare": {
+   "executions": 90,
+   "identical": 90,
+   "compared_fields": "recovered, total_gae, every counter, field_ops, automorphisms_used, unpriced list, phases (name, adds, doubles, scalar_mults, gae, native); child input (curve, target seed and index, method and params, algorithm seed) equal to the record"
+  },
+  "replay_host_hardware_class": "ECBHW1he9e33daae9e7 (pod ECBHW1hef96e8cddc74; producer local audit ECBHW1h3937d921311d)"
+ },
+ "validator_code": {
+  "location": "/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/valscripts/ (not committed: AGENTS.md \"Implementation language: no Python\")",
+  "sha256": {
+   "hashcheck.py": "e2ec09b18847c46097863e73961d24d27735f726c145887d965ea2b70e1dcf56",
+   "sample.py": "edef881e0d44c328c5504708905245b4119e2df6a30ac36dbac2ee598d7be06a",
+   "replay_exec.py": "a6f989597abab8bc7a2ee137d9eb7f9507b6f52169d744a13fbca5aa10c586f9",
+   "certs.py": "c0784317a5c65d093a958c5fe82e8ae8e36ec8654ab00866d130a33d3f774b0f",
+   "estimate.py": "0bdef8646f239d8c73c0db524c0d397c8e2ae4ee518c504ddacf44d261481ea1",
+   "exact_boot.py": "f7b67bcfb79cddf2c439cd0075f7dee07bb597b27363b9b6f1ad6e5d786c6ea8",
+   "exact_boot_s.py": "1d7e2732ace6c15c9b5a2fd29756ef59822706fde411a75bc0dedbfd92322755",
+   "design.py": "4d32dfd2443364308b4570e3eb3a73ec8b2f7887b21882c90d558e400183bf1f",
+   "rfit_check.py": "829a5c37094180e151deadf921d138398358f6ebd51a63039a9817f6b9bd0377"
+  }
+ },
+ "outputs": [
+  {
+   "path": "validation/recompute/certificates.json",
+   "sha256": "6e5254c5b706c963fd1cd9472bda27d39af67ac7d8b483501cbfd5635d55a4fd"
+  },
+  {
+   "path": "validation/recompute/design.json",
+   "sha256": "c4b831e0e37a3e9ca58bc241fc882456ffb586b14070d6a9193817fe887f753d"
+  },
+  {
+   "path": "validation/recompute/ecr-manifest-292bdc3d.json",
+   "sha256": "649b21456b2ef2342067ce0a5c12ea245cf2dcc4aaa330ebe8976f131e4ec55a"
+  },
+  {
+   "path": "validation/recompute/estimates.json",
+   "sha256": "e70aa278bd980fafaafb75bc574e7cedbbe56a539509ffb86d21769028465b1b"
+  },
+  {
+   "path": "validation/recompute/harness-resampler-S.jsonl",
+   "sha256": "ba388151683dec1c26435a7499047dbd8ad280e0d34a0c17a252277cc70f8ad9"
+  },
+  {
+   "path": "validation/recompute/harness-resampler-ratio-to-floor.jsonl",
+   "sha256": "f9e077ce00dff3482323b4513da3d19b0eef01f8985f95ffab51577871583599"
+  },
+  {
+   "path": "validation/recompute/hashes.json",
+   "sha256": "e5e4baa3e5c41cc198312b39873d71919e51b2623c88de420895d098bb77b296"
+  },
+  {
+   "path": "validation/recompute/rfit-points.json",
+   "sha256": "cd81e721e596dc65e1d7382e5e0c1bf0927c631a82f0a61a0fc9c2a808a545af"
+  },
+  {
+   "path": "validation/replay/J1.verify-replay-seq.json",
+   "sha256": "82a23f535688a4ab23b987fd56f820b42f6f86878ff53b17e54aa48ef4466088"
+  },
+  {
+   "path": "validation/replay/J2.verify-replay-seq.json",
+   "sha256": "79d7be84f6b31fbac032a8ba7528ee7d63d3a02e623f7f1b253464eff05559a2"
+  },
+  {
+   "path": "validation/replay/J3.verify-replay-seq.json",
+   "sha256": "6419c67901f9823d7d557f3b27bf614b2e548983cc9f9da0a870bb8c0c04bcec"
+  },
+  {
+   "path": "validation/replay/J4.verify-replay-seq.json",
+   "sha256": "f6bf7db59098383a3836b65dd85120066b58be8129012d81adcb43ab0dd0b03e"
+  },
+  {
+   "path": "validation/replay/J5.verify-replay-seq.json",
+   "sha256": "1fff0305b8b5319a434de3c19cf3e7329a55ba755ab901c9f90a7938b82f870f"
+  },
+  {
+   "path": "validation/replay/J6.verify-replay-seq.json",
+   "sha256": "a1f97b5f78c17219982954387941fb460b02678beb93f8e44b651ca4c08aa050"
+  },
+  {
+   "path": "validation/replay/exec-replay-compare.json",
+   "sha256": "91757d24953577631679672e81525234c679d7ef0ad03ba10ef72404b35fa3b3"
+  },
+  {
+   "path": "validation/replay/nonce.txt",
+   "sha256": "cb53244fd36812779548673e3f65261621e8347a8de033e110bcb024cdc378e5"
+  },
+  {
+   "path": "validation/replay/sample.json",
+   "sha256": "9d17e13458d0675d0af2ff5939c7c4863fab617e2e680b0401cffc1139ec6f10"
+  }
+ ],
+ "rho_reference_check": {
+  "question": "does a matched-rho reference with the section 5a band exist for this row",
+  "answer": "not applicable as gate evidence: the study has no IC arm, so the gate rho_reference {ic, rho} band pair cannot be filled; the row is itself the rho reference",
+  "reference_arm": "rho-neg = rho.negation, the reference PROTOCOL.md section 3 names; same binary a18af09f, same six sessions and workloads as every arm, unit ecbench.gae",
+  "strongest_available": "negation map: generic prime-order curves over F_p with a, b != 0 have Aut = {+-1} and no usable Frobenius; no automorphism fold beyond negation",
+  "band_ratio_to_floor": {
+   "rho-neg": {
+    "0.0": 1.0934308362429292,
+    "0.1": 1.2026176529420618,
+    "1.0": 2.1852990032342534
+   },
+   "rho-plain": {
+    "0.0": 1.4333650138811846,
+    "0.1": 1.4333650138811846,
+    "1.0": 1.4333650138811846
+   },
+   "bsgs-neg": {
+    "0.0": 1.1105897549620918,
+    "0.1": 1.2216401772362868,
+    "1.0": 2.221093977704041
+   },
+   "rho-neg-v2": {
+    "0.0": 1.0689587947342063,
+    "0.1": 1.1760116224368178,
+    "1.0": 2.1394870717603207
+   }
+  },
+  "unpriced_counters": {
+   "rho-neg": [
+    "canonicalisations_uncharged"
+   ],
+   "rho-plain": [
+    "canonicalisations_uncharged"
+   ],
+   "bsgs-neg": [
+    "inserts_uncharged",
+    "lookups_uncharged"
+   ],
+   "rho-neg-v2": [
+    "canonicalisations_uncharged",
+    "distinguished_point_table_inserts_uncharged",
+    "distinguished_point_table_queries_uncharged"
+   ]
+  },
+  "order_holds_across_band_rho_neg_vs_rho_plain": false,
+  "note": "rho.negation is cheaper than rho.plain at w = 0 (1.093 vs 1.433) and w = 0.1 (1.203 vs 1.433) but dearer at w = 1 (2.185 vs 1.433); J1 paired ops ratio rho-plain/rho-neg 1.285, 1.169, 0.643 at w = 0, 0.1, 1. Ranking rho.negation as the strongest reference is unresolved inside the band."
+ },
+ "checks": [
+  {
+   "id": "C1",
+   "requirement": "Frozen artifact set at a named commit; study directory clean",
+   "result": "pass",
+   "evidence": "git rev-parse HEAD = f13a690df0; git status --short --ignored research/prime_medium_tier_rho_20261107 shows only ignored card logs and sources/"
+  },
+  {
+   "id": "C2",
+   "requirement": "Protocol frozen before data; protocol_sha256 recomputes",
+   "result": "pass",
+   "evidence": "protocol.json freeze block; validator canonical-JSON hash 5643e3e7...4cd6; freeze commit 189b78587b 21:15:31Z before first session 21:27:16Z"
+  },
+  {
+   "id": "C3",
+   "requirement": "Session files hash to the receipts, the pod SHA256SUMS, session.json digests and the artifact manifests; S3 objects present in both buckets",
+   "result": "pass",
+   "evidence": "validation/recompute/hashes.json (0 problems in 6 jobs); 6 records.jsonl, 18,190,983 bytes, downloaded to validation/raw/ (gitignored)"
+  },
+  {
+   "id": "C4",
+   "requirement": "Six jobs complete, admitted for counts under PROTOCOL.md section 10 (pod exit 42 = L2 wall gate, audit passing)",
+   "result": "pass",
+   "evidence": "job-exit.json exit_code 42 x6; l2-gate.json accepted false with L1 records 1/14/57/50/67/46 (matches record isolation levels); sessions complete, executions_planned = records_written = 1680/560/140/140/140/140, all verified"
+  },
+  {
+   "id": "C5",
+   "requirement": "Pod and local verify --replay-all: 0 problems, every replay identical",
+   "result": "pass",
+   "evidence": "sessions/Jn.pod/audit.json and sessions/Jn.audit.json: ok, 0 problems, 1440/480/120/120/120/120 replays identical; bound provenance pins the local audit hashes"
+  },
+  {
+   "id": "C6",
+   "requirement": "Binary identity: image, ecbench sha256, source revision",
+   "result": "pass",
+   "evidence": "ECR manifest digest 292bdc3d recomputed; layer 1ea30931 holds ecbench a18af09f; GitHub artifact isolab-build-42413370386-1 digest 457ef103 = frozen bundle zip; build-info source_revision dbd587a01a; build scripts identical at dbd587a01a and e374755"
+  },
+  {
+   "id": "C7",
+   "requirement": "git_commit e374755b explanation",
+   "result": "pass_with_note",
+   "evidence": "GitHub API run 42413370386: workflow_dispatch on main, head_sha e374755bd7; src/build_provenance.rs and ecbench/host.rs use option_env!(CRYPTO_BUILD_GIT_COMMIT).or(option_env!(GITHUB_SHA)); build-bundle sets neither; the binary contains the string e374755bd7... and not dbd587a01a. receipts/image-publication.json names dbd587a01a but says nothing about e374755 or GITHUB_SHA. See discrepancy D3."
+  },
+  {
+   "id": "C8",
+   "requirement": "Solver-independent certificates for every record",
+   "result": "pass",
+   "evidence": "validation/recompute/certificates.json: 2800/2800 records (2400 measured) pass; 10 curves well formed, #E = r, j != 0, 1728"
+  },
+  {
+   "id": "C9",
+   "requirement": "Nonce-sampled exact replay",
+   "result": "pass",
+   "evidence": "nonce fea12c9b689d3b3ed11162cb78f2b8f8; validation/replay/: ecbench verify --replay-seq 90/90 reproduced, 0 problems; validator exec comparison 90/90 identical; frozen binary (no rebuild)"
+  },
+  {
+   "id": "C10",
+   "requirement": "Design: seeds, curves, targets, rounds, arms as preregistered",
+   "result": "pass",
+   "evidence": "validation/recompute/design.json: 19/19 seeds recompute; per-job curves, 8/8/4/4/4/4 targets, rounds 6 + warmup 1, alternate, L2, timeout 300, arms and default params; workloads disjoint across jobs; records curves equal curves.json"
+  },
+  {
+   "id": "C11",
+   "requirement": "Recompute M and its interval",
+   "result": "pass",
+   "evidence": "M = 1.0934308362429292 (sealed 1.0934308362429286); harness-resampler replica [1.0325593293474007, 1.1558904712271187] (sealed [1.0325593293474, 1.1558904712271172]); validator RNG [1.0316, 1.1584]"
+  },
+  {
+   "id": "C12",
+   "requirement": "Recompute P4 per job",
+   "result": "pass",
+   "evidence": "linearised t on workload clusters, own t quantile: J1 1.2855 [1.1766, 1.4043], J2 1.2859 [1.0940, 1.5115], J3 1.3515 [0.9093, 2.0088], J4 1.4139 [0.6880, 2.9057], J5 1.6633 [0.9864, 2.8047], J6 1.2175 [0.7372, 2.0105]; all agree with the comparison files to 2e-15"
+  },
+  {
+   "id": "C13",
+   "requirement": "Section 9 verdict",
+   "result": "pass",
+   "evidence": "M line setup_excess (M <= 1.10, hi < 1.30); within_1.10_strict false; P4 lower end above 1.2 in no job (linearised or bootstrap) -> inconclusive, as the producer states"
+  },
+  {
+   "id": "C14",
+   "requirement": "Section 5a band on every arm, reference included",
+   "result": "pass",
+   "evidence": "unpriced counters listed and priced at w = 0, 0.1, 1 for all four arms; twelve sealed records reproduce (constants, intervals, exponents)"
+  },
+  {
+   "id": "C15",
+   "requirement": "Matched-rho reference with the band for this row",
+   "result": "not_applicable",
+   "evidence": "no IC arm; the row is the rho reference itself; rho.negation vs rho.plain order flips at w = 1 (rho_reference_check)"
+  },
+  {
+   "id": "C16",
+   "requirement": "Secondary predictions as reported in RESULTS.md",
+   "result": "fail_minor",
+   "evidence": "P8 at J1 reported as holding; its preregistered interval bound [0.93, 1.07] is exceeded (upper 1.0743). See D1."
+  }
+ ],
+ "discrepancies": [
+  {
+   "id": "D1",
+   "severity": "minor (secondary, not verdict-affecting)",
+   "text": "RESULTS.md says \"P8 holds at J1: 1.002 [0.934, 1.074]\". PROTOCOL.md section 7 P8 requires an interval containing 1 and inside [0.93, 1.07]; the upper end 1.0743 exceeds 1.07, so P8 fails at J1 as written. The numbers are right; the classification is not."
+  },
+  {
+   "id": "D2",
+   "severity": "protocol specification gap",
+   "text": "P4 does not say whether its interval is per job or pooled. The per-job reading (section 6.1 compares) fails in every job under both the linearised and the bootstrap interval. A pooled reading, not preregistered and computed here only as a sensitivity, gives 1.3109 [1.2239, 1.4041] over 80 workloads, which would clear 1.2. Section 10 forbids choosing it after the data, so the verdict stays inconclusive. Derived, not measured: sqrt(2) x 1.0135 / 1.0934 = 1.311, so the 1.41 prediction assumed rho.negation at its floor."
+  },
+  {
+   "id": "D3",
+   "severity": "provenance label",
+   "text": "The sessions git_commit e374755bd7 is not the build source. e374755 and dbd587a01a are siblings (merge-base 8bb2629dd3) and differ in five src files, including src/cryptanalysis/ic_boundary.rs and src/cryptanalysis/ecbench/methods.rs. A rebuild from the session git_commit would not reproduce a18af09f; the binding is through the binary sha256 and build-info.json. RESULTS.md explains this correctly, but the e374755 link rests on the GitHub API, not on receipts/image-publication.json."
+  },
+  {
+   "id": "D4",
+   "severity": "reproducibility binding",
+   "text": "protocol.json arms[].instrument.build is `cargo build --release --bin ecbench`. The pinned binary was built by taskq/deploy/eks-karpenter/build-bundle with `cargo +1.99.1 build --locked --release --no-default-features --target x86_64-unknown-linux-musl --bin ecbench` and RUSTFLAGS=-C target-cpu=x86-64. The protocol build line would not give the pinned hash. Sessions record git_dirty null; a clean tree is asserted only inside build-bundle."
+  },
+  {
+   "id": "D5",
+   "severity": "wording",
+   "text": "PROTOCOL.md section 5 says the cluster bootstrap runs \"over the sizes' workloads\". The harness resamples sizes, then runs, and has no workload stage. Sensitivity with a sizes, workloads, runs bootstrap: [1.0215, 1.1629]. The M line is unchanged."
+  },
+  {
+   "id": "D6",
+   "severity": "omission",
+   "text": "RESULTS.md does not state P1, P5, P9 or the Holm family of the secondary methods. Recomputed: P1 holds on its point (1.093 inside [1.00, 1.10]). P5: beta 0.578 is outside 0.8-1 on its point, its interval [0.21, 1.89] contains that range, and model A is not rejected (p 0.51). P9: no curve effect after Holm (smallest p 0.088 with run-level SE, 0.141 with the sealed size intervals)."
+  },
+  {
+   "id": "D7",
+   "severity": "minor",
+   "text": "build-info.json source_repository is https://github.com/aburan28/crypto (hard-coded in build-bundle), but the workflow ran in isogeny-labs/crypto."
+  },
+  {
+   "id": "D8",
+   "severity": "informational",
+   "text": "The twelve sealed medium bounds are already in docs/bounds/frontier.json and FRONTIER.md. That is outside the validation gate, which covers the IC leaderboard and benchmarks/README.md. No IC leaderboard or benchmarks row cites this study, and no pcc claim exists."
+  }
+ ],
+ "limitations": [
+  "No independent rebuild of ecbench: my first source export (a full-repository git archive) filled the shared disk, and the coordinator told me to use the frozen binary. Every replay, the producer's included, therefore ran the same a18af09f binary. The replay checks cross-host determinism, not compiler or source independence.",
+  "The validator code is stdlib Python, as the dispatch asked. AGENTS.md \"Implementation language: no Python\" excludes Python certificate verifiers, replay tools and result generators from the repository, so the scripts are not committed (hashes above). Gate use may need a native re-implementation.",
+  "The curve generator generate_instance(generic, bits, seed) was not re-run. The curves were checked arithmetically and the seed rule was recomputed.",
+  "The uniform_scalar_sha256_v1 target derivation was not re-implemented. target = [planted]G and recovered == planted were checked for all 2800 records, and the 90 sampled child inputs match their records.",
+  "The R(N) parametric-bootstrap intervals were not recomputed; only the point fits and weighted means were.",
+  "The wall-time figures, the experiment.export gap and the benchmark-record launch-entry gap were not assessed (no wall time is admitted under section 10).",
+  "research-kb and Conductor are not installed here, so neither was consulted.",
+  "No pcc claim or keyring signature exists; every number here is [pcc:unverified]."
+ ],
+ "errors": [
+  "git archive of the whole dbd587a01a tree into the scratchpad filled the shared disk to 0 bytes free (about 4.1 GB). The extraction was stopped and the tree deleted, and the disk is back to 7.4 GB free. No from-source build was attempted after that.",
+  "My first phase-accounting check (gae = adds + doubles) was wrong for counter-priced phases. I replaced it with the rho counter identity, which holds on every record.",
+  "My first harness-resampler replica used the unsalted seed. The harness uses seed ^ 0xF for ratio_to_floor and seed ^ 0x5 for S; with the salts, the sealed intervals reproduce to 2e-15."
+ ],
+ "downloads": {
+  "validation/raw/": "19 MB in total: six records.jsonl (10,821,976 + 3,661,479 + 926,590 + 926,787 + 927,469 + 926,682 = 18,190,983 bytes) plus session/plan/spec/host/audit/receipt files; gitignored by validation/.gitignore",
+  "ecr_layer": "16,075,146 bytes, streamed in memory, not stored",
+  "github_publication_artifact": "966 bytes, scratchpad"
+ }
+}

@@ -1,0 +1,612 @@
+{
+  "branch": "claude/serene-davinci-ujoi58",
+  "closed_utc": "2026-11-08T12:33:26+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-08T05:05:01+00:00",
+      "wall_s": 368.534
+    },
+    {
+      "argv": [
+        "research/ml_learnability_control_20261107/cards/wait_command_status.sh",
+        "research/ml_learnability_control_20261107/cards/status_request.json",
+        "mllc-all-20261108",
+        "research/ml_learnability_control_20261107/receipts/R2/status",
+        "5400",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 41,
+      "started_utc": "2026-11-08T05:11:09+00:00",
+      "wall_s": 5446.256
+    },
+    {
+      "argv": [
+        "research/ml_learnability_control_20261107/cards/wait_command_status.sh",
+        "research/ml_learnability_control_20261107/cards/status_request.json",
+        "mllc-all-20261108",
+        "research/ml_learnability_control_20261107/receipts/R2/status-2b",
+        "6600",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-08T06:45:01+00:00",
+      "wall_s": 52.696
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-m16-20261108.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-08T07:08:38+00:00",
+      "wall_s": 368.732
+    },
+    {
+      "argv": [
+        "research/ml_learnability_control_20261107/cards/wait_command_status.sh",
+        "research/ml_learnability_control_20261107/cards/status_request_m16.json",
+        "mllc-m16-20261108",
+        "research/ml_learnability_control_20261107/receipts/M16/status",
+        "5400",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 41,
+      "started_utc": "2026-11-08T07:14:47+00:00",
+      "wall_s": 5422.768
+    }
+  ],
+  "commit": "26a45988e5ab1e20b6058556d9ad70695e726d62",
+  "commit_dirty": true,
+  "created_utc": "2026-11-08T05:01:38+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261108T0501Z-mllc-panel",
+  "metrics": [
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 2190,
+      "name": "heldout_accuracy/curve/m12/logreg/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.954, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.461313,
+        0.503133
+      ],
+      "unit": "ratio",
+      "value": 0.482192
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 2190,
+      "name": "heldout_accuracy/curve/m12/logreg/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.904, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.46541,
+        0.50724
+      ],
+      "unit": "ratio",
+      "value": 0.486301
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 2190,
+      "name": "heldout_accuracy/curve/m12/hgb/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict UNDERPOWERED (pooled one-sided p 0.0761, gate G failed); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.494585,
+        0.536411
+      ],
+      "unit": "ratio",
+      "value": 0.515525
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 2190,
+      "name": "heldout_accuracy/curve/m12/hgb/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict UNDERPOWERED (pooled one-sided p 0.773, gate G failed); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.471331,
+        0.513171
+      ],
+      "unit": "ratio",
+      "value": 0.492237
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 2190,
+      "name": "heldout_accuracy/curve/m12/mlp/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.918, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4645,
+        0.506328
+      ],
+      "unit": "ratio",
+      "value": 0.485388
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 2190,
+      "name": "heldout_accuracy/curve/m12/mlp/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.994, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.452669,
+        0.494456
+      ],
+      "unit": "ratio",
+      "value": 0.473516
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 36588,
+      "name": "heldout_accuracy/curve/m16/logreg/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.773, gate G held); source research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json; m=16 is the rerun job mllc-m16-20261108 under AMENDMENT_R2_M16 (amendment not yet recorded in protocol.json)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.492937,
+        0.503183
+      ],
+      "unit": "ratio",
+      "value": 0.498059
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 36588,
+      "name": "heldout_accuracy/curve/m16/logreg/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.617, gate G held); source research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json; m=16 is the rerun job mllc-m16-20261108 under AMENDMENT_R2_M16 (amendment not yet recorded in protocol.json)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.494112,
+        0.504358
+      ],
+      "unit": "ratio",
+      "value": 0.499235
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 36588,
+      "name": "heldout_accuracy/curve/m16/hgb/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.24, gate G held); source research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json; m=16 is the rerun job mllc-m16-20261108 under AMENDMENT_R2_M16 (amendment not yet recorded in protocol.json)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.496735,
+        0.506981
+      ],
+      "unit": "ratio",
+      "value": 0.501859
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 36588,
+      "name": "heldout_accuracy/curve/m16/hgb/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.0498, gate G held); source research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json; m=16 is the rerun job mllc-m16-20261108 under AMENDMENT_R2_M16 (amendment not yet recorded in protocol.json)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.499195,
+        0.509441
+      ],
+      "unit": "ratio",
+      "value": 0.504318
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 36588,
+      "name": "heldout_accuracy/curve/m16/mlp/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.823, gate G held); source research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json; m=16 is the rerun job mllc-m16-20261108 under AMENDMENT_R2_M16 (amendment not yet recorded in protocol.json)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.492472,
+        0.502718
+      ],
+      "unit": "ratio",
+      "value": 0.497595
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 36588,
+      "name": "heldout_accuracy/curve/m16/mlp/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.836, gate G held); source research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json; m=16 is the rerun job mllc-m16-20261108 under AMENDMENT_R2_M16 (amendment not yet recorded in protocol.json)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.492335,
+        0.502581
+      ],
+      "unit": "ratio",
+      "value": 0.497458
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m20/logreg/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.917, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.49784,
+        0.50037
+      ],
+      "unit": "ratio",
+      "value": 0.499105
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m20/logreg/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.876, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.49799,
+        0.50052
+      ],
+      "unit": "ratio",
+      "value": 0.499255
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m20/hgb/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.917, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.497842,
+        0.500372
+      ],
+      "unit": "ratio",
+      "value": 0.499107
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m20/hgb/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.905, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.49789,
+        0.50042
+      ],
+      "unit": "ratio",
+      "value": 0.499155
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m20/mlp/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.994, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.497107,
+        0.499637
+      ],
+      "unit": "ratio",
+      "value": 0.498372
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m20/mlp/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 1, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.496437,
+        0.498967
+      ],
+      "unit": "ratio",
+      "value": 0.497702
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m24/logreg/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.215, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.499245,
+        0.501775
+      ],
+      "unit": "ratio",
+      "value": 0.50051
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m24/logreg/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model logreg; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.403, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.498895,
+        0.501425
+      ],
+      "unit": "ratio",
+      "value": 0.50016
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m24/hgb/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.427, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.498855,
+        0.501385
+      ],
+      "unit": "ratio",
+      "value": 0.50012
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m24/hgb/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model hgb; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.854, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.498055,
+        0.500585
+      ],
+      "unit": "ratio",
+      "value": 0.49932
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m24/mlp/lsb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, lsb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.489, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.498753,
+        0.501284
+      ],
+      "unit": "ratio",
+      "value": 0.500018
+    },
+    {
+      "baseline": 0.5,
+      "better": "neutral",
+      "n": 600000,
+      "name": "heldout_accuracy/curve/m24/mlp/msb",
+      "note": "[pcc:unverified] pooled held-out accuracy (correct/n over 3 curves) of the curve arm, msb(k), model mlp; value is a fraction, not reference/candidate; spread = Wilson 95% CI; baseline = chance 1/2; PROTOCOL section 7 verdict NULL (pooled one-sided p 0.633, gate G held); source research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.498516,
+        0.501047
+      ],
+      "unit": "ratio",
+      "value": 0.499782
+    }
+  ],
+  "problem": "study:ml_learnability_control_20261107",
+  "raw": [
+    {
+      "bytes": 44390,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4e/4e13f6aba395d24dd59c5e8c17924aeb78c4fafadfaa9a43f91c1a440fa010a0",
+      "sha256": "4e13f6aba395d24dd59c5e8c17924aeb78c4fafadfaa9a43f91c1a440fa010a0",
+      "uploaded": true
+    },
+    {
+      "bytes": 44364,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/28/28e3c93ecc230157f3205b0a309d34369f4c01084de2ac3e131f83ccb282da09",
+      "sha256": "28e3c93ecc230157f3205b0a309d34369f4c01084de2ac3e131f83ccb282da09",
+      "uploaded": true
+    },
+    {
+      "bytes": 93,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/exit_codes.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/65/6569c7140091b9ee55499aa85c547eadedd19cb742204b1a02c834f5a6b0ce89",
+      "sha256": "6569c7140091b9ee55499aa85c547eadedd19cb742204b1a02c834f5a6b0ce89",
+      "uploaded": true
+    },
+    {
+      "bytes": 70,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/versions.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9c943102c34d6c219be000ccf7816528ee7e220c51d970d9d033c10b56e9e729",
+      "sha256": "9c943102c34d6c219be000ccf7816528ee7e220c51d970d9d033c10b56e9e729",
+      "uploaded": true
+    },
+    {
+      "bytes": 2995,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/2749ba2116b779910ca8026d3c72820436958ca3f232cb5334f28856a26ec45d",
+      "sha256": "2749ba2116b779910ca8026d3c72820436958ca3f232cb5334f28856a26ec45d",
+      "uploaded": true
+    },
+    {
+      "bytes": 1754,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m16.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5d/5d5cc3ba74d392def959379ca61da3360aa30c99c6835c3439ba65e7e8402ee5",
+      "sha256": "5d5cc3ba74d392def959379ca61da3360aa30c99c6835c3439ba65e7e8402ee5",
+      "uploaded": true
+    },
+    {
+      "bytes": 705,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e6/e65571d9e0c8f0ecf19e0c7eb7fdf090b7e200978f73cc751af1dddd67846035",
+      "sha256": "e65571d9e0c8f0ecf19e0c7eb7fdf090b7e200978f73cc751af1dddd67846035",
+      "uploaded": true
+    },
+    {
+      "bytes": 885,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/SHA256SUMS",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b98af7607d44a1e00a90456d48c643b421207ec3d2007aa432dbb06873aa506d",
+      "sha256": "b98af7607d44a1e00a90456d48c643b421207ec3d2007aa432dbb06873aa506d",
+      "uploaded": true
+    },
+    {
+      "bytes": 2979,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m24.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6b/6b477b96ea6ff3989d8fa8dc8855ce07159cb87a84ecfad10815db4fa30d889d",
+      "sha256": "6b477b96ea6ff3989d8fa8dc8855ce07159cb87a84ecfad10815db4fa30d889d",
+      "uploaded": true
+    },
+    {
+      "bytes": 318,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/source.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c6/c66fb2ca4dfc815a070418eff652f0d5bed93bc57b95dc2ce9f963bfad368da0",
+      "sha256": "c66fb2ca4dfc815a070418eff652f0d5bed93bc57b95dc2ce9f963bfad368da0",
+      "uploaded": true
+    },
+    {
+      "bytes": 49344,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m12.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/06/06d26f77e7f6fe9af7e9af2c935836dbd9247fabb5fb218490f5cf88517ba17e",
+      "sha256": "06d26f77e7f6fe9af7e9af2c935836dbd9247fabb5fb218490f5cf88517ba17e",
+      "uploaded": true
+    },
+    {
+      "bytes": 2979,
+      "path": "research/ml_learnability_control_20261107/results/R2/d1e64084-42af-4973-b1a1-b1c28510c122/ladder_m20.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/744d71b207ab3f518223aad1ee67a9ccc14cedb96d16821b09e510fd9bd46887",
+      "sha256": "744d71b207ab3f518223aad1ee67a9ccc14cedb96d16821b09e510fd9bd46887",
+      "uploaded": true
+    },
+    {
+      "bytes": 48,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/exit_codes.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/37518feead6127c9df0d2fffbc1989f5217354baab12c38a94ed35203a184edf",
+      "sha256": "37518feead6127c9df0d2fffbc1989f5217354baab12c38a94ed35203a184edf",
+      "uploaded": true
+    },
+    {
+      "bytes": 70,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/versions.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9c943102c34d6c219be000ccf7816528ee7e220c51d970d9d033c10b56e9e729",
+      "sha256": "9c943102c34d6c219be000ccf7816528ee7e220c51d970d9d033c10b56e9e729",
+      "uploaded": true
+    },
+    {
+      "bytes": 2979,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d9/d9e8456ae9712e2f753aa27880e45100f0b584ed54abeba4f2a0103e6c13041d",
+      "sha256": "d9e8456ae9712e2f753aa27880e45100f0b584ed54abeba4f2a0103e6c13041d",
+      "uploaded": true
+    },
+    {
+      "bytes": 49165,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/ladder_m16.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a2/a26cc2384974b1cf2c223302c94fffef52f3dc80124464fececdfdaeadd959b8",
+      "sha256": "a26cc2384974b1cf2c223302c94fffef52f3dc80124464fececdfdaeadd959b8",
+      "uploaded": true
+    },
+    {
+      "bytes": 696,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4f/4f71542352839ff9d51a54c5f30b25bc2ba2a107d897fea2a7e2da8d03b72fea",
+      "sha256": "4f71542352839ff9d51a54c5f30b25bc2ba2a107d897fea2a7e2da8d03b72fea",
+      "uploaded": true
+    },
+    {
+      "bytes": 478,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/SHA256SUMS",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e702c3959b8b4f79dd4257e442ed6cc7064bf709ece7e02265e92b4b1a784c9e",
+      "sha256": "e702c3959b8b4f79dd4257e442ed6cc7064bf709ece7e02265e92b4b1a784c9e",
+      "uploaded": true
+    },
+    {
+      "bytes": 328,
+      "path": "research/ml_learnability_control_20261107/results/M16/a1282059-b11b-4338-b043-d7c72944b8e2/source.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b1e1dff043b757c61894c18a4ff8401b5bc62c588f1382501db0b78cc8ca02d",
+      "sha256": "1b1e1dff043b757c61894c18a4ff8401b5bc62c588f1382501db0b78cc8ca02d",
+      "uploaded": true
+    },
+    {
+      "bytes": 349599,
+      "path": "research/ml_learnability_control_20261107/receipts/M16/status.archive/m16-status-polls.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d7812c71c4b997c24b6ffb0e94c4879692f45686e21640406210c5a9c6aa9f37",
+      "sha256": "d7812c71c4b997c24b6ffb0e94c4879692f45686e21640406210c5a9c6aa9f37",
+      "uploaded": true
+    },
+    {
+      "bytes": 18191,
+      "path": "research/ml_learnability_control_20261107/results/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/95/95299a16b72eb104ecc4a7236cd6a9ac51833371431742e989d789a467383c85",
+      "sha256": "95299a16b72eb104ecc4a7236cd6a9ac51833371431742e989d789a467383c85",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ml_learnability_control_20261107/results/analysis/mllcan_report.pdf",
+    "png": [
+      "research/ml_learnability_control_20261107/results/analysis/mllcan_fig1.png"
+    ],
+    "svg": [
+      "research/ml_learnability_control_20261107/results/analysis/mllcan_fig1.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "mllc-panel",
+  "status": "measured",
+  "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+  "validation": null
+}

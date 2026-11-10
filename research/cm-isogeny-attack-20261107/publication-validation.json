@@ -1,0 +1,111 @@
+{
+  "all_checks_pass": true,
+  "checks": [
+    {
+      "round": 44,
+      "command": [
+        "sha256sum",
+        "-c",
+        "manifest.sha256"
+      ],
+      "returncode": 0,
+      "output": "build.log: OK\nbuild.py: OK\ncarrier-dimension.json: OK\ncarrier_dimension.py: OK\ncertificate.json: OK\ncontinuation.json: OK\ncost-theorem.json: OK\ncost-theorem.log: OK\ncost_theorem.py: OK\ncounts.svg: OK\ndependencies.sha256: OK\nfailures.json: OK\nflow.json: OK\nflow.svg: OK\norbit.py: OK\npage-1.png: OK\npage-2.png: OK\nplot-data.json: OK\nrender.py: OK\nreport.md: OK\nreport.pdf: OK\nreport.typ: OK\nscope.json: OK\nverification.json: OK\nverification.log: OK\nverify.py: OK\n"
+    },
+    {
+      "round": 44,
+      "command": [
+        "sha256sum",
+        "-c",
+        "dependencies.sha256"
+      ],
+      "returncode": 0,
+      "output": "../round18-p192/cached_orbit.py: OK\n../round4-p192/certificate-verification.json: OK\n../round43-p192/continuation.json: OK\n"
+    },
+    {
+      "round": 44,
+      "command": [
+        "python3",
+        "verify.py"
+      ],
+      "returncode": 0,
+      "output": "{\n  \"all_checks_pass\": true,\n  \"labelled_transitions\": 840,\n  \"point_additions_replayed\": 1512,\n  \"planted_scalar_recoveries\": 10,\n  \"generic_batch_count_checks\": 72,\n  \"fruitless_repeat_records\": 92,\n  \"zero_denominator\": \"identical labels imply zero denominator; extraction must reject\",\n  \"scope\": \"Finite deterministic mechanism verification; no random-walk performance assertion\"\n}\n"
+    },
+    {
+      "round": 45,
+      "command": [
+        "sha256sum",
+        "-c",
+        "manifest.sha256"
+      ],
+      "returncode": 0,
+      "output": "amendment1.json: OK\nattempt1-certificate.json: OK\nattempt1-point-certificate.json: OK\nattempt1-points.log: OK\nattempt1-search.log: OK\ncertificate.json: OK\ncontinuation.json: OK\ncounts.svg: OK\ndependencies.sha256: OK\nfailures.json: OK\nflow.json: OK\nflow.svg: OK\npage-1.png: OK\npage-2.png: OK\nplot-data.json: OK\npoint-certificate.json: OK\npoint-verification.json: OK\npoint-verification.log: OK\npoints.log: OK\npoints.py: OK\nrender.py: OK\nreport.md: OK\nreport.pdf: OK\nreport.typ: OK\nscope.json: OK\nsearch.log: OK\nsearch.py: OK\nverification.json: OK\nverification.log: OK\nverify.py: OK\nverify_points.py: OK\n"
+    },
+    {
+      "round": 45,
+      "command": [
+        "sha256sum",
+        "-c",
+        "dependencies.sha256"
+      ],
+      "returncode": 0,
+      "output": "../round18-p192/cached_orbit.py: OK\n../round38-p192/lattice.py: OK\n../round44-p192/carrier-dimension.json: OK\n"
+    },
+    {
+      "round": 45,
+      "command": [
+        "python3",
+        "verify.py"
+      ],
+      "returncode": 0,
+      "output": "INDEPENDENT_LATTICE_MATRIX_AND_COST_PASS 4 4 8 40\n"
+    },
+    {
+      "round": 45,
+      "command": [
+        "python3",
+        "verify_points.py"
+      ],
+      "returncode": 0,
+      "output": "{\n  \"all_checks_pass\": true,\n  \"independent_orbit_and_matrix_transitions\": 200,\n  \"point_fixtures\": 40,\n  \"canonical_representatives\": 32,\n  \"orbit_encoding_controls\": 320,\n  \"identity_controls\": 8,\n  \"imports_producer\": false\n}\n"
+    },
+    {
+      "round": 46,
+      "command": [
+        "sha256sum",
+        "-c",
+        "manifest.sha256"
+      ],
+      "returncode": 0,
+      "output": "certificate.json: OK\ncontinuation.json: OK\ncounts.svg: OK\ndependencies.sha256: OK\nfailures.json: OK\nflow.json: OK\nflow.svg: OK\npage-1.png: OK\nplot-data.json: OK\npoint-certificate.json: OK\npoint-verification.json: OK\npoint-verification.log: OK\npoints.log: OK\npoints.py: OK\nrender.py: OK\nreport.md: OK\nreport.pdf: OK\nreport.typ: OK\nscope.json: OK\nsearch.log: OK\nsearch.py: OK\nverification.json: OK\nverification.log: OK\nverify.py: OK\nverify_points.py: OK\n"
+    },
+    {
+      "round": 46,
+      "command": [
+        "sha256sum",
+        "-c",
+        "dependencies.sha256"
+      ],
+      "returncode": 0,
+      "output": "../round18-p192/cached_orbit.py: OK\n"
+    },
+    {
+      "round": 46,
+      "command": [
+        "python3",
+        "verify.py"
+      ],
+      "returncode": 0,
+      "output": "{\n  \"all_checks_pass\": true,\n  \"global_minimax_certificates\": 4,\n  \"independent_box_points\": 250,\n  \"independent_signed_digit_schedules\": 31250,\n  \"basis\": \"alternate unimodular basis and Gauss-Jordan inverse, no producer imports\"\n}\n"
+    },
+    {
+      "round": 46,
+      "command": [
+        "python3",
+        "verify_points.py"
+      ],
+      "returncode": 0,
+      "output": "{\n  \"all_checks_pass\": true,\n  \"independent_point_images\": 100,\n  \"equivalent_encoding_controls\": 160,\n  \"fixtures\": 20,\n  \"producer_imports\": false\n}\n"
+    }
+  ],
+  "rust_library_tests": "not run: publication contains standalone Python research and evidence, no Rust changes"
+}

@@ -1,0 +1,25 @@
+{
+  "status": "failed",
+  "commands": [],
+  "errors": [
+    {
+      "repr": "RuntimeError('supervisor ownership permit not received')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-worker.py\", line 96, in <module>\n    try:check_permit();break\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-worker.py\", line 21, in check_permit\n    permit=json.loads((Path(F['durable_run'])/'supervisor-permit.json').read_text())\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1194, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors) as f:\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1180, in open\n    return io.open(self, mode, buffering, encoding, errors, newline,\n  File \"/usr/lib64/python3.9/pathlib.py\", line 1038, in _opener\n    return self._accessor.open(self, flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: '/home/ec2-user/pencil-validation-receipts/t1958-root-library-20261109/supervisor-permit.json'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-20261109/durable-worker.py\", line 98, in <module>\n    if time.monotonic()>=wait_end:raise RuntimeError('supervisor ownership permit not received')\nRuntimeError: supervisor ownership permit not received\n"
+    }
+  ],
+  "invocation_id": "4342ad37f3dd4cbbadf95ff27001cf69",
+  "source_scope": "root default-feature library tests, private candidate patch",
+  "phase": "terminal",
+  "elapsed_seconds": 10.091595156001858,
+  "cgroup": {
+    "path": "/sys/fs/cgroup/system.slice/pencil-root-durable-t1958-20261109.service",
+    "inode": 1222227,
+    "controls": {
+      "cpu.max": "200000 100000",
+      "memory.max": "17179869184",
+      "memory.swap.max": "0",
+      "pids.max": "512"
+    }
+  },
+  "within_unit_input_visibility": true
+}

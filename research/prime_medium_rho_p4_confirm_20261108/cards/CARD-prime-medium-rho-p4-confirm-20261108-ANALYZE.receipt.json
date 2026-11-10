@@ -1,0 +1,565 @@
+{
+  "card_id": "CARD-prime-medium-rho-p4-confirm-20261108-ANALYZE",
+  "card_path": "research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-ANALYZE.yaml",
+  "card_sha256": "f978821f9287ef0808d82eab3280daf441e08e23f209ccd1c2affc91f7c74fbd",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "75cf6c230728b6e9cefe30f175402bad1af7ccb4",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "75cf6c230728b6e9cefe30f175402bad1af7ccb4",
+        "HEAD",
+        "--",
+        "research/prime_medium_rho_p4_confirm_20261108",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/cards",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/receipts",
+        ":(exclude)research/prime_medium_rho_p4_confirm_20261108/sessions",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.113,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.113,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2c8fb1a0ceabccb482fbe45df810f70e8432af7a7b638bd264efef75f67c4e93",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_rho_p4_confirm_20261108/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "26fd5c574d585f57d39cf298dbfb48b3569d952c1693526e253853bfca02ae0c",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "01e6270937bbf3919bb8c37d94919a51c112d19ba4fa8335bc8f36a1e439e194",
+        ".analysis_plan.script.sha256 == $h",
+        "research/prime_medium_rho_p4_confirm_20261108/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "analysis-script-frozen",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/PC.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-pc",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M1.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.014,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m1",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.014,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M2.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m2",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M3.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m3",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M4.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m4",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M5.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m5",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M6.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m6",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M7.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m7",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m8",
+      "index": 14,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        ".ok == true and .session_status == \"complete\" and (.problems | length) == 0",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit-ok-m9",
+      "index": 15,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-I",
+        "-B",
+        "research/prime_medium_rho_p4_confirm_20261108/analysis/p4_confirm.py",
+        "analyze",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M1",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M1.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M2",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M2.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M3",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M3.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M4",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M4.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M5",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M5.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M6",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M6.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M7",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M7.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M8.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/M9.audit.json",
+        "--session",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/PC",
+        "--audit",
+        "research/prime_medium_rho_p4_confirm_20261108/sessions/PC.audit.json",
+        "--seeds",
+        "research/prime_medium_rho_p4_confirm_20261108/seeds.json",
+        "--spec-ids",
+        "research/prime_medium_rho_p4_confirm_20261108/specs/spec-ids.json",
+        "--planned-pairs",
+        "2160",
+        "--out",
+        "research/prime_medium_rho_p4_confirm_20261108/analysis/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 13.009,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "analyze",
+      "index": 16,
+      "outputs": {
+        "research/prime_medium_rho_p4_confirm_20261108/analysis/result.json": "93dda756c524f2ea7fe2230ddf8491017022debe943e93fd1e4b16b3f8e154ce"
+      },
+      "seconds": 13.009,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "493298ee03e585efc9d370ed74f407530be9faf2e11a0044ee65e073cf6dac37",
+      "stdout_tail": [
+        "verdict: inconclusive theta: 1.362445350898039 ci95: [1.3201856254764677, 1.405351464380865]"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 16,
+  "commit": "bc5f973cf699771ffa787d27f56d0bd5cae93810",
+  "dirty_after": [
+    "benchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json",
+    "enchmarks/records/20261108T0449Z-minors-gd-panel.json",
+    "research/prime_medium_rho_p4_confirm_20261108/analysis/result.json",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-ANALYZE.yaml"
+  ],
+  "dirty_before": [
+    "benchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json",
+    "enchmarks/records/20261108T0449Z-minors-gd-panel.json",
+    "research/prime_medium_rho_p4_confirm_20261108/cards/CARD-prime-medium-rho-p4-confirm-20261108-ANALYZE.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

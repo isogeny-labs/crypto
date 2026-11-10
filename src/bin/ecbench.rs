@@ -398,6 +398,19 @@ enum Cmd {
         /// the comparison, which is then not admissible).
         #[arg(long)]
         allow_interrupted: bool,
+        /// Price, in the §5a band and under --weight, the per-step table
+        /// inserts the IC table oracles count in `work_native`
+        /// (`table_insert_attempts` behind its `counted:` marker), which
+        /// `cost.unpriced` never lists. The default since 2026-11-08;
+        /// accepted for compatibility.
+        #[arg(long, conflicts_with = "no_price_table_work")]
+        price_table_work: bool,
+        /// The pre-2026-11-08 reading: charge `cost.unpriced` alone and
+        /// leave the counted table work listed but unpriced. Reproduces
+        /// every comparison saved before that date, `comparison_id` and
+        /// plain file name included.
+        #[arg(long)]
+        no_price_table_work: bool,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -425,6 +438,19 @@ enum Cmd {
         /// Print the pairwise verdicts after the table.
         #[arg(long)]
         ranks: bool,
+        /// Price the per-step table inserts the IC table oracles count in
+        /// `work_native` (`table_insert_attempts` behind its `counted:`
+        /// marker), which `cost.unpriced` never lists, at w per operation
+        /// like rho's canonicalisations. The default since 2026-11-08
+        /// (AGENTS.md §5a); accepted for compatibility. The record format
+        /// is unchanged.
+        #[arg(long, conflicts_with = "no_price_table_work")]
+        price_table_work: bool,
+        /// The pre-2026-11-08 reading: charge `cost.unpriced` alone and
+        /// list the counted table work without pricing it. Reproduces the
+        /// band files written before that date.
+        #[arg(long)]
+        no_price_table_work: bool,
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
@@ -1756,6 +1782,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             save,
             json,
             allow_interrupted,
+            price_table_work: _,
+            no_price_table_work,
         } => {
             let c = compare::compare_weighted_with(
                 &dir,
@@ -1766,16 +1794,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     resamples,
                     seed,
                     allow_interrupted,
+                    pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
+                        table_work: !no_price_table_work,
+                    },
                 },
                 weight,
             )?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let suffix = c
-                    .pricing_weight
-                    .map(|_| format!("__{}", c.comparison_id))
-                    .unwrap_or_default();
+                // The plain `a__b.json` name is pinned to the unweighted
+                // pre-2026-11-08 reading, which every comparison saved
+                // before that date is; a weighted or table-work-priced
+                // comparison (the default since then) carries its id, so a
+                // new reading never overwrites an old file.
+                let suffix = if c.pricing_weight.is_some() || !c.priced_table_work.is_empty() {
+                    format!("__{}", c.comparison_id)
+                } else {
+                    String::new()
+                };
                 let f = d.join(format!("{a}__{b}{suffix}.json"));
                 std::fs::write(
                     &f,
@@ -1790,6 +1827,16 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 println!("{}", c.verdict);
                 if let Some(weight) = c.pricing_weight {
                     println!("pricing weight: {weight} GAE per native operation");
+                }
+                if c.priced_table_work.is_empty() {
+                    println!(
+                        "table work listed, not priced: the pre-2026-11-08 reading (--no-price-table-work)"
+                    );
+                } else {
+                    println!(
+                        "table work priced with the unpriced counters (the default since 2026-11-08): {}",
+                        c.priced_table_work.join(", ")
+                    );
                 }
                 if let Some(q) = &c.quality {
                     println!(
@@ -1840,9 +1887,29 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             .collect::<Vec<_>>()
                             .join(", ")
                     };
+                    let table_work = if arm.table_work_counts.is_empty() {
+                        "none".to_string()
+                    } else {
+                        arm.table_work_counts
+                            .iter()
+                            .map(|(k, v)| format!("{k}={v}"))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
                     println!(
-                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}",
-                        arm.arm, arm.verified, arm.measured, arm.censored, tail, unpriced
+                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}; table work ({}): {}",
+                        arm.arm,
+                        arm.verified,
+                        arm.measured,
+                        arm.censored,
+                        tail,
+                        unpriced,
+                        if c.priced_table_work.is_empty() {
+                            "listed, not priced"
+                        } else {
+                            "priced"
+                        },
+                        table_work
                     );
                 }
                 let o = |v: Option<f64>| v.map(|x| format!("{x:.4}")).unwrap_or_else(|| "–".into());
@@ -1885,7 +1952,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             weights,
             json,
             ranks,
-        } => band_cmd(&dir, &weights, json.as_deref(), ranks)?,
+            price_table_work: _,
+            no_price_table_work,
+        } => band_cmd(&dir, &weights, json.as_deref(), ranks, !no_price_table_work)?,
         Cmd::Resources { dir, out } => {
             let report = resources::session(&dir)?;
             if let Some(path) = out {
@@ -2591,6 +2660,7 @@ fn band_cmd(
     weights: &str,
     json: Option<&std::path::Path>,
     ranks: bool,
+    price_table_work: bool,
 ) -> Result<(), String> {
     let weights: Vec<f64> = weights
         .split(',')
@@ -2604,7 +2674,10 @@ fn band_cmd(
     for d in dirs {
         recs.extend(runner::read_records(d)?);
     }
-    let rep = crypto_lib::cryptanalysis::ecbench::band::band(&recs, &weights)?;
+    let pricing = crypto_lib::cryptanalysis::ecbench::band::Pricing {
+        table_work: price_table_work,
+    };
+    let rep = crypto_lib::cryptanalysis::ecbench::band::band_with(&recs, &weights, pricing)?;
     print!(
         "{}",
         crypto_lib::cryptanalysis::ecbench::band::markdown(&rep)

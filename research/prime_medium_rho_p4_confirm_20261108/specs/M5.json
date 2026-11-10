@@ -1,0 +1,60 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime medium rho P4 confirm M5: 49-bit curve 1, target block K05",
+  "description": "research/prime_medium_rho_p4_confirm_20261108/PROTOCOL.md. Confirmatory study of the paired rho.plain / rho.negation operation-count ratio on the ten medium-tier curves of research/prime_medium_tier_rho_20261107 (curves.json); seeds from seeds.json (new, disjoint). Operation counts are the result; wall time only at L2 against the A/A arm.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 365857381347911,
+        "a": 265803930896159,
+        "b": 186608017781445,
+        "group_order": 365857391582227,
+        "r": 365857391582227,
+        "gx": 2,
+        "gy": 209161832331426
+      }
+    ],
+    "targets_per_curve": 12,
+    "target_seed": 112559572458697,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "rho-neg-v2",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 124745887533118,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}
