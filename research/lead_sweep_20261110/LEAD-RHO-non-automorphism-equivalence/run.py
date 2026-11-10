@@ -33,7 +33,7 @@ def subgroup(N, h):
         if all(pow(g, h//q, N) != 1 for q in range(2, h+1) if h % q == 0 and isprime(q)):
             return [pow(g, i, N) for i in range(h)]
 
-def steps_to_collision(N, H, rng, R=16):
+def steps_to_collision(N, H, rng, R=64):
     jumps = [rng.randrange(1, N) for _ in range(R)]
     x = rng.randrange(N)
     seen = set(); n = 0
@@ -41,7 +41,7 @@ def steps_to_collision(N, H, rng, R=16):
         c = min(h*x % N for h in H)
         if c in seen: return n
         seen.add(c); n += 1
-        x = (x + jumps[c % R]) % N
+        x = (x + jumps[((c*2654435761) >> 11) % R]) % N
 
 def arm(h, rng):
     N = prime_for(h, BITS); H = subgroup(N, h)
