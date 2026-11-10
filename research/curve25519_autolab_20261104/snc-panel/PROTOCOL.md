@@ -23,7 +23,7 @@ Neither record can reach the owner's 0.75x goal; the K = 3 collision floor is 1.
   - If the implementation lands under different option names before any data, the names are updated here and the change is recorded in section 7 as non-substantive.
 - Unit and pricing: ecbench GAE, S = cost / sqrt(r), every comparison at w = 0, 0.1, 1 with the 2026-11-08 reading (table inserts and probe lookups priced on every arm, rho-neg's canonicalisations likewise); `ecbench band --ranks` is the band verdict.
 - Audit: `ecbench verify --replay 8` per size; every record must carry the audit status `verified` [pcc:unverified].
-- Statistic (frozen): for a pair of arms (A, B) at one size, R = (sum of S over all measured runs of A) / (same for B) at w = 0, 0.1 and 1; its 95% interval is the percentile bootstrap over (curve, target) blocks (each block carries its 8 paired rounds), 4000 resamples, seed 20261110. The upper end of the w = 0 interval is the gate named below; w = 0.1 and 1 are reported with it and a gain holds only where the order holds across the band (AGENTS.md section 5a).
+- Statistic (frozen): for a pair of arms (A, B) at one size, the paired ratio B / A and its 95% bootstrap interval from the repository's own instrument, `ecbench compare --dir <session> --a A --b B --resamples 4000 --seed 20261110 --weight w --save`, at w = 0, 0.1 and 1 (runs are paired by workload and round; `scripts/compare.sh`). The upper end of the w = 0 interval is the gate named below; w = 0.1 and 1 are reported with it and a gain holds only where the order holds across the band (AGENTS.md section 5a).
 - Pre-registered pairs: (`inc-lazy`, `inc`) at k = 24, 28, 32; (`tw2cj-lazy`, `inc`) at k = 20; (`tw2cj-lazy`, `inc-lazy`) at k = 24, 28, 32; (`tw2cj`, `tw2cj-lazy`) as the lazy effect inside the target walk; every IC arm against `rho-neg` as distance remaining.
 
 ## 3. Predictions (from the records, before data) [pcc:unverified]
@@ -56,4 +56,4 @@ The w = 1 ratio of `tw2cj-lazy` to the incumbent is predicted within 0.03 of its
 
 ## 7. Amendments
 
-None yet.
+- 2026-11-10, before any data: the pair statistic names `ecbench compare` (paired bootstrap, 4000 resamples, seed 20261110, per weight) instead of a study-local bootstrap over (curve, target) blocks. Same quantity, the repository's standard instrument. Non-substantive.
