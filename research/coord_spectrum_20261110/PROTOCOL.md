@@ -56,3 +56,41 @@ or larger `p`.
 Local host, exact counts (no timing result; §9a confirmatory EKS run open). `results/run.json`,
 README with the rule-4 reading, one SVG (η ratios and energy ratios per curve with null bands),
 REPORT.pdf, session-log entry. Run by a task card after `FREEZE.sha256`.
+
+## 6. Amendment and disclosure before the full run (2026-11-10, after the implementer's `--quick`)
+Predictions and rules were committed (`c8bbc80e1a`) before the tool existed. The implementer's
+`--quick` (R16, 2 curves, 5 nulls; not committed, not scored) exposed two defects in §2's
+*statistic*, not in the mechanism, and they are corrected here with their reasons:
+1. **`b = 0` is excluded from the gated `η`.** Because `⟨G⟩ = E(F_p)` on a prime-order curve, the
+   coefficient `S_g(a, 0) = Σ_{Q ∈ E(F_p)} e(a·g(Q)/p)` is a sum over the whole group and does not
+   depend on `G` or on the labelling `k`; it is a character sum of `g` over `E(F_p)` (Kloosterman-type
+   for Dickson maps when `n | p − 1`, which the quick run showed as an inflated `b = 0` value) and
+   cannot carry logarithm information. The gated statistic is `η_g = max_{a, b ≠ 0} |S_g(a,b)|/r`;
+   the `b = 0` column is reported separately as a function-level statistic.
+2. **Legendre rows enter as complex `±1` values**, i.e. `S_χ(b) = Σ_k χ(x([k]G) + c)·e(b·k/r)`,
+   `η_χ = max_{b ≠ 0} |S_χ(b)|/r`, against a null of 20 uniformly random `±1` sequences of length `r`
+   (seed `F3/nullpm/<curve>/<j>`). The original mapping `±1 ↦ {1, p − 1}` made `e(a·g/p)` nearly
+   constant, which is an encoding artefact (quick run: `η = 1` at `(1, 0)` for every χ row).
+P1–P4 and the rules of §4 are unchanged in form and now read the `b ≠ 0` statistics; the null for
+P1 is the matching null (`F_p`-valued random functions for `x, y, D_n`; `±1` sequences for `χ`).
+Also recorded: the "2^16" anomalous curve has `p = 74869` (the `D = −11` CM search lands above
+`2^16`); orders are by exhaustive Legendre count; `g(O) = 0` at `k = 0`.
+3. **Nulls carry the negation symmetry of the coordinate map.** Along the orbit `k ↦ [k]G`,
+   `x, χ(x + c), D_n(x)` are even (`g_{r−k} = g_k`) because `x(−P) = x(P)`, and `y, λ` are odd
+   (`g_{r−k} = −g_k`) because `y(−P) = −y(P)` and `λ` is a homomorphism. A uniformly random
+   function has neither symmetry, so its `η` distribution is not the right null for either
+   class (the quick run after items 1–2 showed every χ row at `0.59–0.61` of the uniform `±1`
+   null, on both curves and all three shifts: a symmetry-class effect, not an orbit effect).
+   Nulls are therefore drawn per symmetry class: `NULL_even`: a random value per `{P, −P}` class
+   (random `F_p` values for `x, D_n`; random `±1` for `χ`), assigned to both members; `NULL_odd`:
+   a random `v` on `P` and `−v` (resp. `p − v`) on `−P`, for `y` and `λ`; `g(O) = 0`. Seeds
+   `F3/null/<class>/<curve>/<j>`, 20 each. Every ratio in P1/P4 is against the null of its
+   function's class. PLANT keeps the uniform null (it is a synthetic control).
+Items 1–3 change the statistic and the null, not the predictions or the rules.
+**Freeze note.** After items 1–3 the quick run (R16, 2 curves, 5 nulls per class) read x 0.74–0.79,
+y 0.73, χ 0.455–0.464 and D_n 0.99–1.04 of their class-null medians, energy 0.9965–0.9999, PLANT
+1.0. P1's band `[0.8, 1.25]` is therefore expected to **fail downward** on x, y, χ; it is kept as
+written and will be scored as failed. (Reading to be tested in the full run, not a rule: a Weil-type
+bound `|S_g(a,b)| ≤ C√p` for every `b` sits below the random extreme-value maximum `≈ √(r ln r)`, so
+orbit spectra are flatter than random; rule 2 fires only upward and is unaffected.) No further
+amendment after this line.
