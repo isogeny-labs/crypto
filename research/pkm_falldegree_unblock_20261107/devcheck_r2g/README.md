@@ -9,6 +9,11 @@ Image layer `sha256:a0f7e28e...b1971` of `isolab/tasks` (us-east-2) was download
 and untarred into the scratchpad. `sha256sum` of `usr/local/bin/{pkm_tower_pilot,hky_fp_tower_check,prime_fall_degree_tools}`
 equals `image/binaries.sha256` for all three (f78f3959..., c36d324e..., 7e8a6703...). The tests use the real frozen pilot and G1 binary.
 
+> **Revision 2 (2026-11-10, runner sha256 773a978d...).** Sections "Files" to "NOT tested" and "Added by the main session"
+> below describe runner revision 1 (sha256 143242e2...) and PREDATE this revision; their raw outputs are
+> `test_outputs_rev1_predates_revision.txt` and `progress_rev1_predates_revision/`. T1-T6 were re-run on revision 2 (see the end);
+> `test_outputs.txt` and `progress/` are the revision 2 outputs.
+
 ## Files
 - `test_driver.sh T1..T6` (and `T5k`, a kill check): the driver. It runs the runner exactly as a job does,
   `bash -c "$(cat stageb_units_runner.sh)" stageb <PREV...>`, with `S3CP/S3SYNC/S3LS` replaced by `s3shim.sh` (a local
@@ -64,3 +69,35 @@ list; the real 12 thread / 56Gi pod.
   `start B-m3-tower-t4` and no `end` line for t4; `units_done.txt` lists t3 only; `ladders_closed.txt`, `host.txt`,
   `binary.sha256` uploaded. A first attempt signalled the wrong process (a `setsid` wrapper) and showed nothing; it was repeated.
 - Still not tested: everything listed under "NOT tested" above except SIGTERM.
+
+## Revision 2 (runner sha256 773a978d5816730026e91dd596c8541fc3e0faca84585ad89dda3f577775cbe3), tests T1-T15
+
+Changes A-I: mkdir lock instead of flock; `ISOLAB_RESULTS_URI` and PREV used verbatim (no slash stripping); `< /dev/null` on every S3
+command and fd 3 for the unit-list loops; upload failures exit 13; done units' `.log` and `.jsonl` (with final `{"summary"` line)
+are fetched from the prev or exit 12 (no `ls`, no S3LS); test-only variables refused with exit 15 outside test mode; completeness
+check exit 14; `close:<ladder>:<T>` arguments (exit 16 when invalid). Beyond A-I: the final upload turns rc 0 into 13 when it fails;
+host.txt also records `testmode`, `pilot_extra`, `unit_filter`, `closed_by_rule`; a PREV progress.txt is still required (exit 12).
+Verbatim outputs: `test_outputs.txt`; progress files: `progress/`. Shim switches added: `SHIM_FAIL_PROGRESS`, `SHIM_FAIL_SYNC_RUNS`,
+`SHIM_READS_STDIN`, `SHIM_LOG`. Driver: `test_driver.sh T1..T15` (T7 uses `runner_bg`, no setsid).
+
+| Test | Result | Evidence |
+|:--|:--|:--|
+| T1 list | PASS | 91 units / 25 ladders, 49 + 42, same order |
+| T2 happy path | PASS | rc 0, 3 units `end exit 0` |
+| T3 ladder stop | PASS | budget 0 closes at t=2, budget 2 closes at t=4, rest `ladder-closed`; registered-style stops at the same levels |
+| T4 equivalence | PASS | B-m3-tower, DB-m3-tower, p0-isogeny, null: IDENTICAL except wall-time fields |
+| T5 resume | PASS | `done-in 0` skips, t4 re-run; two kills then C: `lost B-m3-tower-t4`, rc 75 |
+| T6 non-zero | PASS | rc 20, no `end t3 exit 0` |
+| T7 SIGTERM | PASS | runner rc 143, 0 live pilots, S3 progress `start t4` without `end`, units_done.txt = `B-m3-tower-t3` only |
+| T8 missing prev file | PASS | missing `.log`, missing `.jsonl`, truncated `.jsonl` (no summary): rc 12 each, 0 unit starts |
+| T9 upload failure | PASS | progress.txt cp fails: rc 13, `runs/` empty (no pilot started); runs sync fails: rc 13, 0 `end ... exit 0` lines in S3 |
+| T10 guard | PASS | each of PILOT_EXTRA, UNIT_FILTER, BIN, G1BIN, STUDY_DIR without S3CP/S3SYNC: rc 15; fake `aws` marker file absent |
+| T11 stdin hazard | PASS | shim reads stdin; all 3 units ran, rc 0 |
+| T12 image tool set | PASS | PATH = symlinks to the listed tools only (31 present; `gawk` is not installed on this host, so the link was not made and `awk` is mawk here; no flock, no python3): rc 0, 3 units, no lock dir left |
+| T13 trailing slash | PASS | job 1 at `s3://b/jobS/`: raw URIs `s3://b/jobS//runs`, `//progress.txt`; job 2 PREV `s3://b/jobS/` reads `s3://b/jobS//progress.txt`, `//runs/<unit>.log/.jsonl`; `skip ... done-in 0`, t4 run. The shim file system collapses `//`, so the layout listing shows `b/jobS/...`; the raw keys are in the shim log lines shown |
+| T14 completeness | PASS | T2: exit 0 with the filtered list exhausted. Forced exit 14: a hand-made prev with a done t4 whose log has `timed out; stopping` but t2, t3 never done: t2, t3 skipped `ladder-closed`, rc 14 |
+| T15 close:<ladder>:<T> | PASS | killed twice in t4: without the rule rc 75; with `close:B-m3-tower:4` rc 0, `skip B-m3-tower-t4 closed-by-rule`, DB-m3-tower-t2 run, `ladders_closed.txt` has `B-m3-tower t=4 by-rule`; `close:NOPE:3`, `:99`, `:1`, `:x` rc 16 |
+
+Not tested on revision 2: real `aws s3` commands and their error output, the 300 s background sync, G1 failure (exit 10),
+exit 11 on a modified list, m >= 4 ladders, the 12-thread pod, a lock left by a killed syncer in a live run (the `rmdir` in the exit
+handler is covered only through T7's normal path).
