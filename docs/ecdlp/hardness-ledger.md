@@ -70,10 +70,13 @@ and probability theory; the combinatorial half is now done.
 | --- | --- |
 | `collision_secret_unique` | For `bᵢ ≠ bⱼ` the equation `(aᵢ-aⱼ) + (bᵢ-bⱼ)·x = 0` has the unique solution `-(aᵢ-aⱼ)/(bᵢ-bⱼ)` |
 | `revealed_card_le` | With `k` known elements, at most `k(k-1)` secrets are revealed by some colliding pair |
+| `samePattern_of_not_revealed` | All secrets outside the revealed set have the same collision pattern |
+| `correct_card_le` | A non-adaptive algorithm whose output depends only on the pattern is correct on at most `k(k-1)+1` of the `p` secrets |
 
-The remaining Layer 2 gap is the model: define the generic-group transcript,
-show that an algorithm without a revealing collision cannot distinguish
-secrets, and convert `k(k-1)/p` into a success-probability bound.
+The remaining Layer 2 gap is adaptivity and probability: the query set of a
+real algorithm depends on the secret (and on random coins). The same counting
+argument applies per transcript, but formalizing the transcript distribution
+and averaging over it is a separate model-building step.
 
 ## Layer 3 — algorithm costs
 
@@ -87,7 +90,7 @@ secrets, and convert `k(k-1)/p` into a success-probability bound.
 ## Layer 3b — algorithm correctness (formal)
 
 `lean/Algorithms.lean` (Mathlib project; the project gate reports
-`PASS 41 thm 0 trusted`) proves that the two standard generic reductions
+`PASS 61 thm 0 trusted`) proves that the two standard generic reductions
 return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
@@ -111,7 +114,7 @@ cost/probability model exists.
 
 ## Layer 3c — Pollard rho correctness (formal)
 
-`lean/Rho.lean` (`PASS 41 thm 0 trusted` for the whole project) proves the
+`lean/Rho.lean` (`PASS 61 thm 0 trusted` for the whole project) proves the
 deterministic part of the rho attack.
 
 | Theorem | Statement |
@@ -127,13 +130,45 @@ two walks meet is the birthday bound `√(πn/2)`, and that remains a premise.
 What is proved is that once a collision with distinct `Q`-coefficients occurs,
 the recovered scalar is the discrete log, not merely a candidate.
 
+## Layer 4b — MOV reduction (formal interface)
+
+`lean/Mov.lean` proves the algebraic facts the MOV/Frey–Rück reduction needs,
+without constructing the pairing itself.
+
+| Theorem | Statement |
+| --- | --- |
+| `target_order_dvd` | `addOrderOf (e(P,P))` divides `addOrderOf P` |
+| `target_annihilator` | `x·e(P,P) = 0 ↔ addOrderOf (e(P,P)) ∣ x` |
+| `mov_target_injective` | Full target order makes `x ↦ x·e(P,P)` injective below `n` |
+| `mov_reduction` | A target solution below `n` is the unique source exponent |
+| `mov_degenerate_ambiguity` | If the target order is a proper divisor, at least two exponents below `n` collide |
+
+The open part is exactly the pairing: construct the Weil pairing on `E[n]`,
+prove it is bilinear and non-degenerate, and show `e(P,P)` has full order for
+the curves where MOV applies.
+
+## Layer 4c — anomalous curves (formal reduction step)
+
+`lean/Anomalous.lean` proves the endpoint of Smart–Satoh–Araki.
+
+| Theorem | Statement |
+| --- | --- |
+| `anomalous_order_of_card` | In a group of cardinality `p`, every nonzero point has order `p` |
+| `anomalous_generator` | Such a point has order equal to the whole group order |
+| `log_reduction` | An additive map `L : G →+ ZMod p` sends `Q = x·P` to `x·L(P) = L(Q)` |
+| `anomalous_recover` | With `L` injective and `P ≠ 0`, `x = (L(Q)/L(P)).val` for `x < p` |
+
+The open part is the p-adic elliptic logarithm: define the formal group of the
+curve, construct the isomorphism `E(F_p) → pZ_p/p²Z_p`, and prove it is
+injective and computable.
+
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
 
 | Attack | Hypothesis it breaks | Status |
 | --- | --- | --- |
 | Pohlig–Hellman | Order has small prime factors | Implemented |
-| MOV / Frey–Rück | Embedding degree is small; pairing is non-degenerate and computable | Implemented; **reduction logic formal** (`Bilin` interface, `mov_reduction`); Weil pairing construction/non-degeneracy open |
-| Smart–Satoh–Araki | `#E(F_p) = p` (anomalous); p-adic elliptic logarithm | Implemented; p-adic formalization open |
+| MOV / Frey–Rück | Embedding degree is small; pairing is non-degenerate and computable | Implemented; **reduction logic formal** (`Mov.lean`): target order divides the source, full order gives an injective target map, and a proper target order provably leaves multiple candidates. Weil pairing construction and its non-degeneracy remain open. |
+| Smart–Satoh–Araki | `#E(F_p) = p` (anomalous); p-adic elliptic logarithm | Implemented; **reduction step formal** (`Anomalous.lean`): prime order forces order `p`, an injective log map turns the DLP into `x = L(Q)/L(P)`, and `x` is read off as a residue. Construction/injectivity of the p-adic logarithm remains open. |
 | GHS / Weil descent | Curve defined over a proper subfield / weak cover | Implemented for the repo's descent campaigns |
 | Singular curve | Discriminant zero: node or cusp | Handled by validation; group is multiplicative/additive |
 | Invalid-curve / small-subgroup | Implementation does not validate points | Implementation assumption, not a math theorem |
@@ -158,7 +193,7 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
    deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
-   `PASS 41 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   `PASS 61 thm 0 trusted`): baby/giant match equivalence, existence, candidate
    correctness, collision-free baby table, coprime CRT combination, PH
    subgroup order, projection and reconstruction; finite-orbit collision,
    Floyd meeting, collision relation and DLP recovery. Only the cost/success
@@ -167,9 +202,12 @@ separately; a break here breaks deployments, not ECDLP.
    `Generic.lean` (`collision_secret_unique`, `revealed_card_le`). Remaining:
    the generic-group transcript/adversary model, the indistinguishability
    lemma for secrets without a revealing collision, and the probability step.
-5. **Done (logic):** MOV reduction formal over a biadditive map with
-   `e(a,a)` of full order. Remaining: construct the Weil pairing and prove
-   non-degeneracy/embedding degree.
-6. **Anomalous-curve attack** at the formal-group level.
+5. **Partially done (4b):** MOV reduction formal in `Mov.lean`, including
+   target-order divisibility and the necessity of non-degeneracy. Remaining:
+   construct the Weil pairing, prove bilinearity/non-degeneracy, and identify
+   the embedding degree.
+6. **Partially done (4c):** the anomalous reduction step is formal in
+   `Anomalous.lean`. Remaining: the formal group, the p-adic elliptic
+   logarithm and its injectivity/computability.
 
 Each step lands as a Lean file with a proof-gate receipt, plus an entry here.

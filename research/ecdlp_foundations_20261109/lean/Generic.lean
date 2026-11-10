@@ -95,3 +95,73 @@ theorem revealed_card_le (S : Finset (ZMod p × ZMod p)) :
           _ = S.card * (S.card - 1) := (Nat.mul_sub_one _ _).symm
 
 end ECDLPGeneric
+
+namespace ECDLPGeneric
+
+open Classical Finset
+
+variable {p : ℕ} [Fact p.Prime]
+
+/-! ## Layer 2b: the non-adaptive transcript bound
+
+A deterministic algorithm whose queries are fixed in advance sees only the
+collision pattern of the known linear forms.  If two secrets have the same
+pattern, the algorithm must output the same value for both, so it can be
+correct on at most one secret in each pattern class.  All secrets outside the
+revealed set share one class; every other correct secret lies in the revealed
+set.  Hence the number of correct secrets is at most `revealed + 1`. -/
+
+/-- Two secrets have the same transcript when every pair of known linear forms
+agrees at one iff it agrees at the other. -/
+def SamePattern (S : Finset (ZMod p × ZMod p)) (x y : ZMod p) : Prop :=
+  ∀ i ∈ S, ∀ j ∈ S,
+    ((i.1 - j.1) + (i.2 - j.2) * x = 0) ↔
+      ((i.1 - j.1) + (i.2 - j.2) * y = 0)
+
+/-- Secrets outside the revealed set all have the same transcript. -/
+theorem samePattern_of_not_revealed {S : Finset (ZMod p × ZMod p)} {x y : ZMod p}
+    (hx : ¬ Revealed S x) (hy : ¬ Revealed S y) : SamePattern S x y := by
+  intro i hi j hj
+  by_cases hb : i.2 = j.2
+  · have hsub : i.2 - j.2 = 0 := sub_eq_zero.mpr hb
+    rw [hsub]
+    simp
+  · have hxn : (i.1 - j.1) + (i.2 - j.2) * x ≠ 0 := by
+      intro h
+      exact hx ⟨i, hi, j, hj, hb, h⟩
+    have hyn : (i.1 - j.1) + (i.2 - j.2) * y ≠ 0 := by
+      intro h
+      exact hy ⟨i, hi, j, hj, hb, h⟩
+    exact ⟨fun h => absurd h hxn, fun h => absurd h hyn⟩
+
+/-- **Non-adaptive Shoup bound.**  If an algorithm's output depends only on
+the collision pattern of `S`, it is correct on at most `k(k-1) + 1` of the
+`p` possible secrets, where `k = |S|`.  The `+1` is the single secret in the
+"no revealing collision" class; the rest lie in the revealed set. -/
+theorem correct_card_le {S : Finset (ZMod p × ZMod p)} {f : ZMod p → ZMod p}
+    (hf : ∀ x y, SamePattern S x y → f x = f y) :
+    (univ.filter (fun x => f x = x)).card ≤ S.card * (S.card - 1) + 1 := by
+  classical
+  let U : Finset (ZMod p) := univ.filter (fun x => Revealed S x)
+  let V : Finset (ZMod p) := univ.filter (fun x => f x = x)
+  let W : Finset (ZMod p) := univ.filter (fun x => f x = x ∧ x ∉ U)
+  have hU : U.card ≤ S.card * (S.card - 1) := revealed_card_le S
+  have hW : W.card ≤ 1 := by
+    rw [card_le_one]
+    intro x hx y hy
+    simp only [W, U, mem_filter, mem_univ, true_and] at hx hy
+    have h := hf x y (samePattern_of_not_revealed hx.2 hy.2)
+    rw [hx.1, hy.1] at h
+    exact h
+  have hsub : V ⊆ U ∪ W := by
+    intro x hx
+    have hx' : f x = x := by simpa [V] using hx
+    by_cases hxU : x ∈ U
+    · exact mem_union_left _ hxU
+    · exact mem_union_right _ (by simp [W, hx', hxU])
+  calc V.card ≤ (U ∪ W).card := card_le_card hsub
+    _ ≤ U.card + W.card := card_union_le U W
+    _ ≤ U.card + 1 := Nat.add_le_add_left hW U.card
+    _ ≤ S.card * (S.card - 1) + 1 := Nat.add_le_add_right hU 1
+
+end ECDLPGeneric
