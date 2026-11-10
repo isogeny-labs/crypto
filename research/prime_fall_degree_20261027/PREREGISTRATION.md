@@ -486,3 +486,37 @@ text, with the source lines and the development check, is
 - No hypothesis, §6 rule, Kummer cell, seed, image, wall budget or cost ceiling changes.
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decision 6).
+
+## Amendment 14 (2026-11-10; memory request and `--max-dense` limit of the capped runs at `t = 13, 14` not yet submitted; before any cap-6 row at `t = 13` or `t = 14` exists)
+
+The Amendment 7 B capped jobs at `t = 13` and `t = 14` that have never been submitted request 56Gi instead of 112Gi. The full
+text, with its evidence, its disclosure and the independent review, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_F_mem56.md` (R2-F). The binding parts are restated here.
+
+- **Why.** Cell `pfd-x-t13-k0-c6` was launched twice at 112Gi and killed both times by an EC2 Spot interruption (about 10 and
+  20 minutes in; no result row). A 112Gi request can only be placed on 128 GiB nodes; since 2026-11-09 20:00Z all four such nodes
+  that ran longer than a minute were interrupted within about 50 minutes, and the two 30-minute `t = 12` cap-6 runs on 64 GiB
+  nodes were not. Seven nodes: suggestive, not established (`SPOT_LOSSES.md`).
+- **Disclosure.** When this was written the main session had seen the `t = 12` rows, the `t = 13` cap-5 rows (both draws: cap 5
+  does not refute) and the last line of the lost run's partial log, whose step-26 counters equal the `t = 12` cap-6 log's. No
+  cap-6 row at `t = 13` or `t = 14` exists. The rules below do not depend on what that log suggests.
+- **Change.** For the covered jobs (today `pfd-x-t13-k1-c6`, `pfd-x-t14-k0-c6`, `pfd-x-t14-k1-c6`, and any later step of those
+  brackets): memory request 56Gi; `--max-dense 12800000000`, which is Amendment 7 A's own formula at 56Gi. Nothing else changes:
+  image, binaries, stage, `--budget 86400`, 12 vCPU, job time limit, no pin, seeds, draws, caps, bracket order.
+- **A run that completes** (`oversize false`, `timed_out false`) is the cell's row, whatever it reads. `--max-dense` only stops a
+  run: it is used once, as a stop before the dense block is built (`src/cryptanalysis/f4_fp_tower.rs:1578` at f13a690df0).
+- **Re-run rule, fixed before any such row.** A 56Gi run that stops on `--max-dense` (`oversize true`), or is killed by the
+  memory limit (container reason `OOMKilled`), is recorded as censored-by-limit and is not the cell's row. The cell is then run
+  once at the Amendment 7 A size (112Gi, `--max-dense 27900000000`) under a job name with the suffix `-m112`, and that run's row
+  is the cell's row. The trigger is `oversize true` or `OOMKilled` only. Exit 137 is classified by the pod and container reason,
+  never by the exit code alone. An `-m112` run that stops on its limit or is `OOMKilled` is censored (Amendment 7 B).
+- **A 56Gi run stopped by its budget** (`timed_out true`) is censored as Amendment 7 B says and is not re-run at 112Gi.
+- **Spot losses.** Owner decision 3 is unchanged. The `-m112` run is not a Spot relaunch; a Spot-lost job is relaunched at its
+  own size; the one relaunch counts per cell, across both sizes. The lost cell `pfd-x-t13-k0-c6` is not relaunched by this
+  amendment; if the owner allows another attempt, it runs under it.
+- **Cost.** Worst case one extra job per cell, within the US$40 per-job ceiling; the US$400 total is checked before each `-m112`
+  submission.
+- The two draws of a cell may differ in memory request; each row's request and `host.txt` record it. The `m = 4` requests
+  (Amendments 8 and 13) are not touched. No hypothesis, §6 rule, cell, seed or cap changes.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decisions 3, 4 and 6).

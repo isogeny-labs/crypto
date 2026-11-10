@@ -1,6 +1,6 @@
 {
   "branch": "claude/serene-davinci-ujoi58",
-  "closed_utc": null,
+  "closed_utc": "2026-11-10T03:16:07+00:00",
   "commands": [
     {
       "argv": [
@@ -101,7 +101,68 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261109T2346Z-pkm-fd-pfd-x-t12",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "x12/kummer-p1-t12-median-df",
+      "note": "median d_F at t=12 from the Amendment 7 B bracket (cap 5 does not refute, cap 6 refutes, both draws); runs/X-m2-t12-k*-c{5,6}.jsonl; [pcc:unverified]; RESULTS_T12_BRACKET.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "x12/c-star-t12",
+      "note": "C-step prediction c*(12) = 4 + floor(10/4); D.5 reading 'holds at t = 12' applied by hand, scorer patch not committed; [pcc:unverified]; RESULTS_T12_BRACKET.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "x12/cap6-wall-s-draw0",
+      "note": "wall of the cap-6 refuting run, draw 0 (X3), 12 threads, instance type not recorded; context only, no timing claim; [pcc:unverified]; RESULTS_T12_BRACKET.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 1824.025236034
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "x12/cap6-wall-s-draw1",
+      "note": "wall of the cap-6 refuting run, draw 1 (X4), 12 threads, instance type not recorded; context only, no timing claim; [pcc:unverified]; RESULTS_T12_BRACKET.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 1762.846554637
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "x12/cap5-draws-not-refuting",
+      "note": "cap-5 runs that do not refute (degree_reached 5, inconsistent false), draws 0 and 1; equal to stage A CAP rows in 6 fields; [pcc:unverified]; RESULTS_T12_BRACKET.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    }
+  ],
   "problem": "study:pkm_falldegree_unblock_20261107:pfd-x-t12",
   "raw": [
     {
@@ -271,18 +332,85 @@
       "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/54/540335a771a26b49c8f5c0a1ad4ddc592cd2a4653e30ebdf65e9cfdf1f1dc649",
       "sha256": "540335a771a26b49c8f5c0a1ad4ddc592cd2a4653e30ebdf65e9cfdf1f1dc649",
       "uploaded": true
+    },
+    {
+      "bytes": 398,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/binary.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bec86166d04ae72fd6dd15e7a814b0bacb1ba865e0b4dfd054f8306bca118cec",
+      "sha256": "bec86166d04ae72fd6dd15e7a814b0bacb1ba865e0b4dfd054f8306bca118cec",
+      "uploaded": true
+    },
+    {
+      "bytes": 1106,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/051759f643f6a4bf2b84ac37de030a35bb02cc6c9899462b6853e678b6ec6a7b",
+      "sha256": "051759f643f6a4bf2b84ac37de030a35bb02cc6c9899462b6853e678b6ec6a7b",
+      "uploaded": true
+    },
+    {
+      "bytes": 146,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/progress.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/381ea62e4ec8b0688ea9da056ac98c4d45ce897b9996b0f51d0a8624be73bc9e",
+      "sha256": "381ea62e4ec8b0688ea9da056ac98c4d45ce897b9996b0f51d0a8624be73bc9e",
+      "uploaded": true
+    },
+    {
+      "bytes": 0,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/runs/X-m2-t12-k1-c6.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": true
+    },
+    {
+      "bytes": 0,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/runs/X-m2-t12-k1-c6.gridzeros.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": true
+    },
+    {
+      "bytes": 10809,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/runs/X-m2-t12-k1-c6.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3e/3e35df095c40dae576c997affa4a2fd164fef1dbd3bca079677f2134fe114e27",
+      "sha256": "3e35df095c40dae576c997affa4a2fd164fef1dbd3bca079677f2134fe114e27",
+      "uploaded": true
+    },
+    {
+      "bytes": 94,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/runs/X-m2-t12-k1-c6.gridzeros.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/01/01ca64ff31a2ba6868b5318c7c11b8991beed5921165935c9f0ed220e5668c79",
+      "sha256": "01ca64ff31a2ba6868b5318c7c11b8991beed5921165935c9f0ed220e5668c79",
+      "uploaded": true
+    },
+    {
+      "bytes": 1349,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X4/6cb84cac-2967-42f7-b858-a1965d3c9892/runs/X-m2-t12-k1-c6.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f8/f84b803d1d4c8a548190dc828e6f399256e3cd0a47e17312d326a7f7335af36f",
+      "sha256": "f84b803d1d4c8a548190dc828e6f399256e3cd0a47e17312d326a7f7335af36f",
+      "uploaded": true
+    },
+    {
+      "bytes": 4232,
+      "path": "research/pkm_falldegree_unblock_20261107/results/X12/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b970dbf5b44a355934142280543af1fa5370bfd9651efc89121753f246ec6f21",
+      "sha256": "b970dbf5b44a355934142280543af1fa5370bfd9651efc89121753f246ec6f21",
+      "uploaded": true
     }
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/pkm_falldegree_unblock_20261107/results/X12/analysis/pfdX12_report.pdf",
+    "png": [
+      "research/pkm_falldegree_unblock_20261107/results/X12/analysis/pfdX12_fig1.png"
+    ],
+    "svg": [
+      "research/pkm_falldegree_unblock_20261107/results/X12/analysis/pfdX12_fig1.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "pkm-fd-pfd-x-t12",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "PKM t = 12 bracket (Kummer m = 2, P1): cap 5 does not refute and cap 6 refutes on both draws, so d_F = 6, median 6 = c*(12); D.5 reads 'holds at t = 12' (applied by hand); same value as t = 11, so t = 14 stays the decisive cell",
   "validation": null
 }
