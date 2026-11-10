@@ -60,8 +60,10 @@ Declaration: `TorsionBoundaryAudit.bk_excluded_boundary_counterexample`.
 This closes an actual excluded-case witness, **not** a proof/refutation of
 the qualified BK theorem. The later [actual Frobenius descent](FROBENIUS_DESCENT.md)
 closes finite-base fixed-point/point-image descent and its actual torsion-set
-criterion. Full E[r] dimension, Frobenius determinant, q-Frobenius iterate
-to the chosen extension, and Weil-pairing necessity remain unformalized.
+criterion. The [finite-extension follow-up](FROBENIUS_FINITE_EXTENSION.md) now closes
+the actual q-Frobenius iterate/point-image criterion for a chosen finite
+extension, including degree and cardinality forms. Full E[r] dimension,
+Frobenius determinant and Weil-pairing necessity remain unformalized.
 The requested all-p<500 census remains unexecuted. [pcc:unverified]
 
 ## Corrected prime-field arithmetic
