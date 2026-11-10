@@ -1,3 +1,14 @@
+The new [original F4 model audit](F4_MODEL.md) proves ideal containment for
+every actual original F4Run and directly refutes its unrestricted extension
+to saturation outputs. Exact imported original modules and literal F101
+expected rows are checked; the whole gate passes 573 theorems with zero
+failures or trusted-native exceptions. Native failures remain explicit:
+F101 saturation is unsupported; F65537 ordinary crashes and saturation times
+out. V1's sample-count registration error remains frozen and disclosed;
+v2's complete export passes structural checks with no successful solver row.
+Ordinary C refinement and the crash/hang diagnosis remain open.
+Signed standing is recorded separately. [pcc:unverified]
+
 The new [Diem domain proof](DIEM_DOMAIN.md) checks the arithmetic last
 step under n≥2, 2^(7n)≤q and the explicit geometric lower estimate. An
 actual F4=F2[alpha] curve y²+y=x³+alpha has discriminant1, actual point
@@ -375,7 +386,7 @@ only at their already-stated scope. [pcc:unverified]
 | 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. Native msolve controls passed, but those heuristic systems are not yet measured. |
 | 10 Walks | Actual PMF fixed-support nonmixing, uniform graph-variance correction and exact3930-support/82034-map populations remain checked. New Lean theorem proves actual in-degree mean1/variance1−Σpᵢ²for every finite abelian group, distinct finite increments and normalized nonnegative label law, using a genuine product PMF and actual edge counts at every target. Direct negative control shows nonzero-only increments insufficient: duplicate+1steps have variance0versusunmerged-label1/2. Whole walk gate70passes. General collision populations, random-support averaging and limiting collision constants remain open; qualified Hildebrand is not refuted. See ../walk_audit_20261109/WEIGHTED_GENERAL.md. |
 | 11 Standards | Screening hypotheses reviewed. Large-order anomalous Smart fixture/proof and matched rho benchmark remain open. Screened NIST recommendation is not refuted. |
-| 12 msolve/F4 | Partial static audit, exact native GB/staircase/count fixtures, and a Lean-backed preflight coefficient discrepancy/C conversion boundary. No faithful C/libm-to-F4Run refinement, full parameter-map or row-trace certificate yet. |
+| 12 msolve/F4 | Exact original F4Run modules now imported unchanged. Generic ideal containment and direct disproof of an unrestricted saturation-output reading are proved, with actual F101 expected-row certificates; whole gate573passes. Selection/preprocessing/simplify source mapping is documented. Native F101 saturation rejects low characteristic; v1 registration defect retained. Separately frozen F65537 trial crashes in ordinary mode and times out in saturation; both not_validated, complete export structurally valid. No ordinary C/libm refinement, crash/hang diagnosis, full parameter-map or row-trace certificate yet. See F4_MODEL.md. |
 | 13 Independence | Separate Rust S3 arithmetic now matches the complete six-prime C++ population:942models/4188162triples/244236zeros,0directional discrepancies. New actual quadratic-field Lean foundation gate11pass. The single separate-host manual dispatch returnedHTTP404, with response retained; no remote execution is claimed. See ../independent_s3_validator_20261109. |
 | 14 Negative control | Prior Lean lower/upper degree certificates, production Rust control, and actual msolve degree3known-answer run pass. No retroactive claim that older censuses used this control. |
 
