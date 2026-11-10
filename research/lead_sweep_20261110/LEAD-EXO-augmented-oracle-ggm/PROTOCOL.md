@@ -1,26 +1,37 @@
 # LEAD-EXO-augmented-oracle-ggm
 
 ## 1. Lead as recorded (disposition, family, title, next-step excerpt; files read with paths)
-- Disposition: closed_obstructed (atlas_tally_20261101; last reviewed 2026-10-29; theorem recorded 2026-11-04). Family: exotic.
+- Disposition: closed_obstructed (last reviewed 2026-10-29; theorem 2026-11-04 per survey). Family: exotic.
 - Title: Augmented oracles (x-, y-, full-point, halving, endomorphism-image, incidence) and GGM simulability.
-- Next-step excerpt: empty in leads.json (closed lead, no next step).
-- Recorded obstruction (atlas_survey.md A6): label-valued oracles have explicit GGM simulators; endomorphism image = public scalar lambda.
-- Files read: /home/user/crypto/research/lead_sweep_20261110/leads.json; /home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md (lines 69-74, 155). Other hits (atlas_tally.json, candidate_matches.json, cryptanalysis ATLAS_INPUTS) are index files, not read.
+- Next-step excerpt: empty in leads.json. Survey line: "label-valued oracles have explicit GGM simulators (endomorphism image = public scalar lambda)".
+- Files read: /home/user/crypto/research/lead_sweep_20261110/leads.json;
+  /home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md (lines 69-75, 153-160);
+  /home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json (entry only).
+- Not read: the atlas YAML (encrypted), the theorem's own write-up (not found by the search). Coordinate-revealing oracles are a separate, open lead and are out of scope.
 
 ## 2. Hypothesis
-In a toy generic group Z_N (N prime, 2^12..2^20) with random-hash labels, the endomorphism-image oracle (multiply by public lambda) and the halving oracle are simulated exactly by the group-add oracle with at most ~2*log2(N) add queries per call, while a non-label-valued oracle (parity of the discrete log) is not simulable (simulator accuracy 0.5).
+In a generic group with random labels, an endomorphism-image oracle E(label) -> label(lambda*x), lambda of order 3, gives only a constant-factor gain in query count for DLP, at most about sqrt(3), once its queries are charged. Its transcript is reproduced exactly by a simulator that uses only the group-law oracle and the public scalar lambda (double-and-add). So the augmented oracle adds no generic power beyond a constant factor.
 
 ## 3. Preregistered prediction and falsification criterion
-- Statistic: per-instance match rate of simulated vs real oracle outputs over 3000 random queries (200 in smoke); mean simulator add queries per call.
-- Prediction: match rate exactly 1.0 for endo and halving; mean adds <= 2*log2(N); parity-simulator accuracy within 4 sigma of 0.5 (|acc-0.5| <= 4*sqrt(0.25/n)).
-- Falsified if any endo/halving match < 1.0 or overhead exceeds the bound (the recorded simulator claim fails). Inconclusive if the simulable claims hold but the null or A/A check fails.
-- Positive control: endo/halving oracles (detector sees a perfect simulator). Negative control/null: parity oracle with a coin-flip simulator. A/A arm: same protocol, different label key and seed (777), must also match 1.0.
+- Statistic G = mean(group-law queries of plain rho) / mean(add + E queries of lambda-orbit rho), pooled over 4 prime orders near 2^18 (N = 1 mod 3), 40 seeded trials each.
+- Also: simulator identity (real-E vs simulated-E runs return the same answer and restart count on every trial) and simulator overhead S = (simulated add queries) / (real add + E queries).
+- Prediction: simulator identical in 100% of trials, and 0.7 <= G <= 1.25*sqrt(3) = 2.165, and S >= 1.
+- Falsified if any trial's simulated and real transcripts differ, or G > 2.165 (an unsimulated gain beyond the orbit constant). Consistent_with_prediction if all hold. Inconclusive if the controls fail.
+- Positive control: a non-simulable comparison oracle on the discrete log (bisection) must give gain >= 10 over plain rho, so the detector can see a real gain.
+- A/A arm: plain rho vs plain rho with another seed; the ratio of means must lie in [0.7, 1.4].
+- Negative control / null: plain rho with no oracle (G = 1 by definition).
 
 ## 4. Method
-Labels are keyed blake2b(key, x) 64-bit values (collision probability negligible at these sizes); the oracle keeps a label-to-exponent dict. Simulator: double-and-add using only add queries. Sizes N in {4093, 65521, 1048573}, 3 seeds each (seeds 1000*bits+i), lambda drawn from seeded RNG, 3000 queries each. Cost: a few seconds, <50 MB, stdlib only.
+- Group Z_N (N prime, N = 1 mod 3, ~2^18, primes derived from seed 20261110); labels are lazy random 60-bit injective strings; only add(l1,l2) and (arm "real") endo(l) are exposed.
+- Rho: 16-way additive walk on labels with known step scalars, per-seed restarts, dictionary collision store, x recovered from collision coefficients and checked against the hidden x. Orbit arm canonicalises each state to min label of {y, lambda y, lambda^2 y}, tracking coefficients times lambda^k.
+- Arms per seed: plain, real-E, sim-E (E built from add queries only), plain A/A on seed+77. Seeds: seed0 + 1000*N%99991 + trial.
+- Cost: roughly 10^5 to 10^6 dictionary operations; under 1 min, under 50 MB, stdlib only. The smoke run uses N ~ 2^12 and 3 trials (<1 s).
 
-## 5. Classification
-runnable_local. A stdlib toy can re-derive the recorded simulability bound directly.
+## 5. Classification: runnable_local
+A stdlib toy decides the constant-factor claim and checks simulator identity directly.
 
 ## 6. What a run cannot establish
-It is a toy generic-group model, not real elliptic curves: it cannot say anything about coordinate-revealing oracles on real curves, nor about incidence or x/y oracles, whose simulability is a proof matter. It re-checks the easy direction (public-scalar oracles are simulable) and cannot establish the obstruction theorem itself or any speedup. Results are labelled [pcc:unverified].
+- It is a toy GGM in Z_N with one endomorphism class, not real elliptic curves, and not other oracle types (halving, incidence, x/y-valued).
+- It does not prove the general simulability theorem. It only checks one instance and the charged-cost gain.
+- Identity of transcripts holds by construction if the code is right; a pass is a sanity check, not independent evidence.
+- Gain bounds are statistical (small trial counts); the fixed 2.165 threshold is a choice. Results are [pcc:unverified].

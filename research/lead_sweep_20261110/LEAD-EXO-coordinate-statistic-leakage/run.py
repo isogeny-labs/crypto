@@ -1,133 +1,131 @@
-#!/usr/bin/env python3
-"""Digit-character leakage of x(kG) vs additive characters of k. stdlib only."""
-import sys, json, math, cmath, random, time
+import sys, json, random, math, time
+from collections import Counter
+SMOKE = '--smoke' in sys.argv
+B = 16
+LAGS = list(range(1, 9)) + ['x2', 'x3']
 
-def fft(a, inv=False):
-    n = len(a); j = 0
-    for i in range(1, n):
-        bit = n >> 1
-        while j & bit:
-            j ^= bit; bit >>= 1
-        j ^= bit
-        if i < j: a[i], a[j] = a[j], a[i]
-    L = 2
-    while L <= n:
-        ang = 2 * math.pi / L * (1 if inv else -1)
-        wl = [cmath.exp(1j * ang * t) for t in range(L // 2)]
-        for s in range(0, n, L):
-            h = L // 2
-            for t in range(h):
-                u = a[s + t]; v = a[s + t + h] * wl[t]
-                a[s + t] = u + v; a[s + t + h] = u - v
-        L <<= 1
-    if inv:
-        a[:] = [x / n for x in a]
+def isprime(n):
+    if n < 2: return False
+    i = 2
+    while i * i <= n:
+        if n % i == 0: return False
+        i += 1
+    return True
 
-class Blu:
-    def __init__(s, N):
-        s.N = N; M = 1
-        while M < 2 * N: M <<= 1
-        s.M = M
-        s.w = [cmath.exp(-1j * math.pi * ((k * k) % (2 * N)) / N) for k in range(N)]
-        b = [0j] * M
-        for k in range(-(N - 1), N):
-            b[k % M] = cmath.exp(1j * math.pi * ((k * k) % (2 * N)) / N)
-        fft(b); s.B = b
-    def dft(s, x):
-        N, M = s.N, s.M
-        a = [x[k] * s.w[k] for k in range(N)] + [0j] * (M - N)
-        fft(a); a = [p * q for p, q in zip(a, s.B)]; fft(a, True)
-        return [s.w[m] * a[m] for m in range(N)]
+def next_prime(n):
+    while not isprime(n): n += 1
+    return n
 
-def find_curve(p, rng):
-    sq = [0] * p
-    for y in range(p): sq[y * y % p] += 1
-    while True:
-        a, b = rng.randrange(p), rng.randrange(1, p)
-        if (4 * a ** 3 + 27 * b * b) % p == 0: continue
-        n = 1 + sum(sq[(x ** 3 + a * x + b) % p] for x in range(p))
-        if n < 100 or any(n % q == 0 for q in range(2, int(n ** .5) + 1)): continue
+def curve_orbit(p, rng):
+    sq = set((y * y) % p for y in range(p))
+    for _ in range(400):
+        a, b = rng.randrange(p), rng.randrange(p)
+        if (4 * a**3 + 27 * b * b) % p == 0: continue
+        cnt = 1
         for x in range(p):
-            r = (x ** 3 + a * x + b) % p
-            for y in range(p):
-                if y * y % p == r:
-                    return a, b, n, (x, y)
-            # (slow search only until first point; p small)
+            r = (x * x * x + a * x + b) % p
+            if r == 0: cnt += 1
+            elif r in sq: cnt += 2
+        if not isprime(cnt): continue
+        while True:   # find a point
+            x = rng.randrange(p); r = (x**3 + a * x + b) % p
+            if r in sq or r == 0:
+                y = next(yy for yy in range(p) if (yy * yy) % p == r) if p < 3000 else sqrt_mod(r, p)
+                break
+        xs = [None]; X, Y = x, y
+        cx, cy = X, Y
+        xs.append(cx)
+        for k in range(2, cnt):
+            # add (X,Y) to (cx,cy)
+            if cx == X:
+                if cy != Y: break
+                lam = (3 * cx * cx + a) * pow(2 * cy, -1, p) % p
+            else:
+                lam = (Y - cy) * pow(X - cx, -1, p) % p
+            nx = (lam * lam - X - cx) % p
+            ny = (lam * (cx - nx) - cy) % p
+            cx, cy = nx, ny
+            xs.append(cx)
+        if len(xs) == cnt:
+            return cnt, xs
+    raise RuntimeError('no curve')
 
-def xs(p, a, G, n):
-    out = [None]; P = G
-    for k in range(1, n):
-        out.append(P[0])
-        if k == n - 1: break
-        if P[0] == G[0]:
-            l = (3 * P[0] ** 2 + a) * pow(2 * P[1], -1, p) % p
-        else:
-            l = (G[1] - P[1]) * pow(G[0] - P[0], -1, p) % p
-        x3 = (l * l - P[0] - G[0]) % p
-        P = (x3, (l * (P[0] - x3) - P[1]) % p)
+def sqrt_mod(r, p):
+    if p % 4 == 3: return pow(r, (p + 1) // 4, p)
+    for y in range(p):
+        if (y * y) % p == r: return y
+
+def digits(xs, p):
+    top = int(math.log(p, B))
+    out = []
+    for j in (0, 1, top - 1):
+        out.append([(v // B**j) % B if v is not None else 0 for v in xs])
     return out
 
-def digit_chars(p, nb2, nb3):
-    ch = []
-    for j in range(nb2): ch.append(("b2d%d" % j, lambda x, j=j: 1.0 if (x >> j) & 1 else -1.0))
-    for j in range(nb3):
-        ch.append(("b3d%d" % j, lambda x, j=j: cmath.exp(2j * math.pi * ((x // 3 ** j) % 3) / 3)))
-    return ch
+def stat(dl, N):
+    """max over digit positions and lags of |mean e((d_k - d_k')/B)| * sqrt(N)"""
+    T = 0.0
+    cs = [(math.cos(2 * math.pi * t / B), math.sin(2 * math.pi * t / B)) for t in range(B)]
+    for d in dl:
+        d = d[1:]
+        n = len(d)
+        for L in LAGS:
+            if L == 'x2': pairs = zip(d[0::1][:n // 2], [d[2 * k + 1] for k in range(n // 2)])
+            elif L == 'x3': pairs = zip(d[:n // 3], [d[3 * k + 2] for k in range(n // 3)])
+            else: pairs = zip(d[:-L], d[L:])
+            c = Counter((a - b) % B for a, b in pairs); m = sum(c.values())
+            re = sum(c[t] * cs[t][0] for t in c); im = sum(c[t] * cs[t][1] for t in c)
+            T = max(T, math.hypot(re, im) / math.sqrt(m))
+    return T
 
-def stat(F, n, chars, xv):
-    """xv: x label per k (1..n-1). T = max over digits,m of |S|/norm."""
-    best = 0.0
-    for name, f in chars:
-        v = [0j] + [complex(f(xv[k])) for k in range(1, n)]
-        mu = sum(v) / (n - 1)
-        v = [0j] + [z - mu for z in v[1:]]
-        nrm = math.sqrt(sum(abs(z) ** 2 for z in v)) or 1.0
-        S = F.dft(v)
-        t = max(abs(S[m]) for m in range(1, n // 2 + 1)) / nrm
-        best = max(best, t)
-    return best
+def null_labels(N, p, rng):
+    h = N // 2
+    half = [rng.randrange(p) for _ in range(h + 1)]
+    return [None] + [half[min(k, N - k)] for k in range(1, N)]
 
-def null_label(xv, n, rng):
-    h = (n - 1) // 2; vals = [xv[k] for k in range(1, h + 1)]; rng.shuffle(vals)
-    out = [None] * n
-    for k in range(1, h + 1): out[k] = out[n - k] = vals[k - 1]
+def leaky_labels(xs, N, p, rng):
+    # positive control: low digit replaced by a slow function of k with prob 0.3
+    out = [None]
+    for k in range(1, N):
+        v = xs[k]
+        if rng.random() < 0.3:
+            v = v - v % B + (min(k, N - k) // 7) % B  # symmetric in k
+        out.append(v)
     return out
-
-def planted(xv, n, p, rng):
-    h = (n - 1) // 2; out = [None] * n
-    for k in range(1, h + 1):
-        bit = math.cos(2 * math.pi * 7 * k / n) > 0
-        if rng.random() < 0.2: bit = not bit
-        x = (xv[k] & ~1) | (1 if bit else 0)
-        out[k] = out[n - k] = x
-    return out
-
-def pval(t, nulls): return (1 + sum(1 for u in nulls if u >= t)) / (len(nulls) + 1)
 
 def main():
-    smoke = "--smoke" in sys.argv
-    primes = [211] if smoke else [2053, 2999, 4001]
-    R = 6 if smoke else 40
-    nb2, nb3 = (3, 1) if smoke else (11, 4)
-    seed = 20261110; rng = random.Random(seed)
-    t0 = time.time(); rows = []
-    for p in primes:
-        a, b, n, G = find_curve(p, rng)
-        F = Blu(n); chars = digit_chars(p, nb2, nb3)
-        xv = xs(p, a, G, n)
-        T = stat(F, n, chars, xv)
-        nulls = [stat(F, n, chars, null_label(xv, n, rng)) for _ in range(R)]
-        aa = nulls[0]; aap = pval(aa, nulls[1:])
-        Tpos = stat(F, n, chars, planted(xv, n, p, rng))
-        rows.append(dict(p=p, a=a, b=b, n=n, T=T, p_real=pval(T, nulls), T_pos=Tpos,
-                         p_pos=pval(Tpos, nulls), p_AA=aap, null_mean=sum(nulls) / R, null_max=max(nulls)))
-    C = len(rows); alpha = 0.05 / C
-    pos_ok = all(r["p_pos"] <= 0.05 for r in rows)
-    aa_ok = all(r["p_AA"] > 0.01 for r in rows)
-    if not pos_ok or not aa_ok: v = "inconclusive"
-    elif min(r["p_real"] for r in rows) <= alpha: v = "falsified"
-    else: v = "consistent_with_prediction"
-    print(json.dumps(dict(lead="LEAD-EXO-coordinate-statistic-leakage", smoke=smoke, seed=seed,
-        params=dict(primes=primes, null_draws=R, digits_b2=nb2, digits_b3=nb3, alpha_bonferroni=alpha),
-        rows=rows, positive_control_ok=pos_ok, aa_ok=aa_ok, seconds=round(time.time() - t0, 1), verdict=v)))
+    t0 = time.time()
+    sizes = [(2**8, 1, 6)] if SMOKE else [(2**12, 6, 30), (2**16, 3, 8), (2**18, 1, 3)]
+    res = []; seed = 20261110
+    flags = []
+    for (target, ncurve, nnull) in sizes:
+        p = next_prime(target)
+        row = {'p': p, 'real': [], 'null': [], 'null2_AA': [], 'leaky': []}
+        for c in range(ncurve):
+            rng = random.Random(seed + p * 7 + c)
+            N, xs = curve_orbit(p, rng)
+            row['N'] = N
+            row['real'].append(stat(digits(xs, p), N))
+            row['leaky'].append(stat(digits(leaky_labels(xs, N, p, rng), p), N))
+            if c == 0:
+                for i in range(nnull):
+                    r2 = random.Random(seed + 99 + i + p)
+                    row['null'].append(stat(digits(null_labels(N, p, r2), p), N))
+                for i in range(max(3, nnull // 3)):
+                    r2 = random.Random(seed + 5555 + i + p)
+                    row['null2_AA'].append(stat(digits(null_labels(N, p, r2), p), N))
+        nl = sorted(row['null'])
+        thr = nl[min(len(nl) - 1, int(0.95 * len(nl)))] if len(nl) > 2 else nl[-1]
+        row['null_q95'] = thr
+        row['real_exceeds_q95'] = sum(v > thr for v in row['real'])
+        row['leaky_detected'] = all(v > thr for v in row['leaky'])
+        row['aa_exceeds_q95'] = sum(v > thr for v in row['null2_AA'])
+        res.append(row)
+    pc_ok = all(r['leaky_detected'] for r in res)
+    nreal = sum(len(r['real']) for r in res); nex = sum(r['real_exceeds_q95'] for r in res)
+    aa_ok = all(r['aa_exceeds_q95'] <= max(1, len(r['null2_AA']) // 3) for r in res)
+    if not pc_ok or not aa_ok: verdict = 'inconclusive'
+    elif nex > max(1, 0.05 * nreal + 2): verdict = 'falsified'
+    else: verdict = 'consistent_with_prediction'
+    print(json.dumps({'lead': 'LEAD-EXO-coordinate-statistic-leakage', 'smoke': SMOKE, 'statistic': 'max |digit-character lag autocorr|*sqrt(m)', 'base': B, 'lags': [str(l) for l in LAGS], 'seed': seed, 'rows': res, 'positive_control_ok': pc_ok, 'aa_ok': aa_ok, 'real_exceed_count': nex, 'real_total': nreal, 'verdict': verdict, 'seconds': round(time.time() - t0, 1)}))
 main()
