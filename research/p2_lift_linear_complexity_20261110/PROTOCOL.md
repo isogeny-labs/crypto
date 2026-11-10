@@ -69,7 +69,7 @@ and `p²` in `u128`), with:
 |---|---|---|
 | H | the seven H110 curves `E101 … E907` (`p, a, b, r` from H110 `run.py` `CURVES`), generator = H110 `first_point` | continuity with H110's 28 rows |
 | R12, R14, R16 | 4 prime-order curves each: `p` = the largest prime below `2^bits`, `(a, b)` from seed `F2/curve/<bits>/<i>`, `i = 0..3`, first `(a,b)` with `4a³ + 27b² ≠ 0` and `#E` prime (`#E` by exhaustive point count), `j ∉ {0, 1728}`, `#E ≠ p` | fresh instances, no selection on the result |
-| S | 2 supersingular curves `y² = x³ + b`, `p ≡ 2 (mod 3)`, `p ≥ 2^14`, `#E = p + 1 = c·r` with `r` prime `≥ 2^12`, `G` of order `r`; seed `F2/ss/<i>` | embedding degree `m = 2`: the only curves where the null allows vanishing components with non-negligible probability and where the positive control can be built in `F_{p²}` |
+| S | 2 supersingular curves `y² = x³ + b`, `p ≡ 2 (mod 3)`: for bits ∈ {15, 16}, `p` = the largest prime `≡ 2 (mod 3)` below `2^bits` whose `p + 1` has a prime factor `r ≥ 2^12` (stepping down over primes that fail; the skipped primes are recorded), `#E = p + 1 = c·r`, `G` of order `r`; `b` from seed `F2/ss/<i>` (amended before the full run: `6 | p + 1` makes `r ≥ 2^12` impossible below `2^14`, so the original "p ≥ 2^14" wording with bits 14/15 was unsatisfiable) | embedding degree `m = 2`: the only curves where the null allows vanishing components with non-negligible probability and where the positive control can be built in `F_{p²}` |
 
 Generator multipliers `{1, 2, 3, 5}` on every curve (A/A: decimation by a
 unit of `Z/r` permutes the DFT components, so `L` and `c` must be identical
@@ -84,7 +84,7 @@ across multipliers; any difference is an instrument bug, not a result).
 | O2 | `f₁([k]G)` (section `u = 1`) | reported |
 | O3 | `f₁ − f₀` (a rational function of `(x, y)` alone: coordinate-only) | negative control of the same shape |
 | O4 | 200 uniformly random sequences per curve, seed `F2/null/<curve>/<j>` | empirical null of `(L, c)` |
-| O5 | on set S only: `Tr_{F_{p²}/F_p}(α ζ^k)`, `ζ ∈ μ_r ⊂ F_{p²}`, seed `F2/plant/<curve>` | positive control: must give `L = 2`, `c = 1` |
+| O5 | on set S only: `Tr_{F_{p²}/F_p}(α ζ^k)`, `ζ ∈ μ_r ⊂ F_{p²} = F_p[i]/(i² + n)`, `n` the smallest positive integer with `−n` a non-residue, seed `F2/plant/<curve>` | positive control: must give `L = 2`, `c = 1` |
 | O7 | `a − mean(a)` for O1 | positive control for the trivial component: `L` drops by exactly 1 iff `mean ≠ 0` |
 
 ## 5. Null (exact)
@@ -148,3 +148,15 @@ diff is "local evidence; §9a confirmatory run open" (as
 decision-rule reading and `[pcc:unverified]` labels, one SVG graph
 (`c/((r−1)/m)` per observable per curve, with the null band), `REPORT.pdf`
 (research-visuals), session-log entry.
+
+## 11. Disclosure: what was seen before the freeze
+
+The predictions of §6 and the rules of §7 were written (commit `4da4a01f06`)
+before the tool existed. While building the tool the implementing agent ran
+`--quick` (set H, multiplier 1, 10 null sequences), set R12 and set S with 3
+null sequences each; every row had `c = N` and O5 gave `L = 2`, consistent
+with P1, P2 and P4. Those outputs are not committed and are not scored. §3's
+set-S selection rule and §4's O5 modulus were made precise in this amendment
+(the originals were unsatisfiable or ambiguous); no prediction or rule
+changed. The frozen full run (`--null 200`, all sets, all multipliers) is the
+one that is read.
