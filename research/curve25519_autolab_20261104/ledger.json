@@ -720,6 +720,54 @@
       "source": "round-035/holdout",
       "target_seed": 2026145932,
       "targets": 32
+    },
+    {
+      "size": 20,
+      "source": "round-036/train",
+      "target_seed": 2026146420,
+      "targets": 16
+    },
+    {
+      "size": 24,
+      "source": "round-036/train",
+      "target_seed": 2026146424,
+      "targets": 16
+    },
+    {
+      "size": 28,
+      "source": "round-036/train",
+      "target_seed": 2026146428,
+      "targets": 16
+    },
+    {
+      "size": 32,
+      "source": "round-036/train",
+      "target_seed": 2026146432,
+      "targets": 16
+    },
+    {
+      "size": 20,
+      "source": "round-036/holdout",
+      "target_seed": 2026146920,
+      "targets": 32
+    },
+    {
+      "size": 24,
+      "source": "round-036/holdout",
+      "target_seed": 2026146924,
+      "targets": 32
+    },
+    {
+      "size": 28,
+      "source": "round-036/holdout",
+      "target_seed": 2026146928,
+      "targets": 32
+    },
+    {
+      "size": 32,
+      "source": "round-036/holdout",
+      "target_seed": 2026146932,
+      "targets": 32
     }
   ],
   "family": "curve25519",
@@ -1526,6 +1574,47 @@
         "oracle": "wwalk:x=0.6,g=1,grow=2"
       },
       "track": "generic"
+    },
+    {
+      "ci95": [
+        0.8568522666275187,
+        0.9959314277082901
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.9237781666814978,
+      "round": 36,
+      "s_from": [
+        2.105468649162268,
+        2.1480283586153517,
+        2.5310657436931066
+      ],
+      "s_to": [
+        2.016048700383613,
+        2.188772264813193,
+        3.7432843446794113
+      ],
+      "session": "ECBS1hbefb5a60befd",
+      "size": 24,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic"
     }
   ],
   "notes": [
@@ -1877,6 +1966,18 @@
       ],
       "status": "ratcheted",
       "track": "generic"
+    },
+    {
+      "dir": "round-036",
+      "round": 36,
+      "sizes": [
+        20,
+        24,
+        28,
+        32
+      ],
+      "status": "ratcheted",
+      "track": "generic"
     }
   ],
   "schema": "ic_autolab.ledger/v1",
@@ -2030,33 +2131,41 @@
       "24": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wwalkGg-x09-sr",
+          "family": "tw2l-x20-j32",
           "n": 2,
-          "name": "wwalkGg-x09-sr-n2",
-          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "name": "tw2l-x20-j32-n2",
+          "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "claim": "PCC-20261104-d91a51",
-          "dir": "rebaseline-seedrun",
-          "note": "re-baseline of wwalkGg-x09-n2: same oracle with seed=run (fresh table per run); fixed-table S 1.723 was a favourable draw",
+          "band_verdict": "sel < inc",
+          "binary_sha256": "1163f6b35d27ec8853455f6d88dfb9fb1d824745068df4dfd065bf6ada23b859",
+          "ci95_w0": [
+            0.8568522666275187,
+            0.9959314277082901
+          ],
+          "dir": "round-036",
+          "paired_ratio_w0": 0.9237781666814978,
+          "round": 36,
           "route": "local",
-          "session_id": "ECBS1h01111fac5089",
-          "validation_gate": "none (development evidence)"
+          "session_id": "ECBS1hbefb5a60befd",
+          "spec_sha256": "2884b3fddbf2652e41dbe1654766277ec58241ff317af3f9c231285d279a84a8",
+          "validation_gate": "none (development loop)",
+          "verify_receipt_sha256": "9c7f9c918ae01d295cc7dd4dc6bb46386c864ce3d4699a1cd70a14010e1e7a68"
         },
         "rho_s": [
-          1.0841845116817346,
-          1.1808202015008287,
-          2.050541409872676
+          1.1253988220502746,
+          1.2261613374494649,
+          2.1330239760421765
         ],
         "s": [
-          2.105468649162268,
-          2.1480283586153517,
-          2.5310657436931066
+          2.016048700383613,
+          2.188772264813193,
+          3.7432843446794113
         ],
-        "since_round": 33
+        "since_round": 36
       },
       "28": {
         "arm": {
@@ -13459,7 +13568,711 @@
       "stage": "holdout",
       "status": "null",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j8",
+        "n": 2,
+        "name": "tw2l-x10-j8-n2",
+        "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.40341115759651,
+        2.5919708325926667,
+        4.2890079075580765
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j16",
+        "n": 2,
+        "name": "tw2l-x10-j16-n2",
+        "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.2840084351428676,
+        2.448118159601912,
+        3.92510567973332
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x15-j16",
+        "n": 2,
+        "name": "tw2l-x15-j16-n2",
+        "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.351646971561694,
+        2.5202429254770897,
+        4.037606510715652
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j8",
+        "n": 2,
+        "name": "tw2l-x20-j8-n2",
+        "oracle": "wwalk:x=2.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.3633801870629183,
+        2.5449171874870187,
+        4.1787501913039184
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.4874416862596944,
+        2.6674430158314286,
+        4.2874549819770325
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.6416989606434464,
+        2.8097600179698157,
+        4.322309533907141
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x30-j16",
+        "n": 2,
+        "name": "tw2l-x30-j16-n2",
+        "oracle": "wwalk:x=3.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.4294657979007006,
+        2.603341698791648,
+        4.168224806810173
+      ],
+      "size": 20,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j8",
+        "n": 2,
+        "name": "tw2l-x10-j8-n2",
+        "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.816623225815002,
+        1.9818214024220537,
+        3.4686049918855213
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j16",
+        "n": 2,
+        "name": "tw2l-x10-j16-n2",
+        "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.1846605439541746,
+        2.3830459505857364,
+        4.1685146102697965
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x15-j16",
+        "n": 2,
+        "name": "tw2l-x15-j16-n2",
+        "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.9723744782967412,
+        2.1491169774415777,
+        3.739799469745109
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j8",
+        "n": 2,
+        "name": "tw2l-x20-j8-n2",
+        "oracle": "wwalk:x=2.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.992183241081202,
+        2.174410911794459,
+        3.8144599482137735
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.194154940060016,
+        2.392548977960766,
+        4.17809531906751
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.7729921600740657,
+        1.9214758839002426,
+        3.257829398335836
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x30-j16",
+        "n": 2,
+        "name": "tw2l-x30-j16-n2",
+        "oracle": "wwalk:x=3.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.9558024414574542,
+        2.1305036454395347,
+        3.702814481278262
+      ],
+      "size": 24,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j8",
+        "n": 2,
+        "name": "tw2l-x10-j8-n2",
+        "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.965365772396417,
+        2.1569372286814366,
+        3.8810803352466126
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j16",
+        "n": 2,
+        "name": "tw2l-x10-j16-n2",
+        "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.0007538574271875,
+        2.1948337679102723,
+        3.9415529622580356
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x15-j16",
+        "n": 2,
+        "name": "tw2l-x15-j16-n2",
+        "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.7262804174324309,
+        1.8927727262619547,
+        3.391203505727669
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j8",
+        "n": 2,
+        "name": "tw2l-x20-j8-n2",
+        "oracle": "wwalk:x=2.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.6880763902696385,
+        1.8517613882073927,
+        3.3249263696471743
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.6779778391754923,
+        1.839506105955425,
+        3.2932605069748235
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.9284564312713357,
+        2.1127808824602674,
+        3.7717009431606527
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x30-j16",
+        "n": 2,
+        "name": "tw2l-x30-j16-n2",
+        "oracle": "wwalk:x=3.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.6144950671263907,
+        1.7696772145114763,
+        3.1663165409772485
+      ],
+      "size": 28,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j8",
+        "n": 2,
+        "name": "tw2l-x10-j8-n2",
+        "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.874616605754539,
+        2.0606019991107036,
+        3.7344705393161775
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j16",
+        "n": 2,
+        "name": "tw2l-x10-j16-n2",
+        "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.6433823948265949,
+        1.805945229442204,
+        3.2690107409826843
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x15-j16",
+        "n": 2,
+        "name": "tw2l-x15-j16-n2",
+        "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.8928184168193478,
+        2.0803016563053705,
+        3.7676508116795753
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j8",
+        "n": 2,
+        "name": "tw2l-x20-j8-n2",
+        "oracle": "wwalk:x=2.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.6205734863553412,
+        1.7810822784211797,
+        3.2256614070137255
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.8648035961733633,
+        2.049436261573244,
+        3.711130250172166
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.7115987258623102,
+        1.8802953658071098,
+        3.3985651253103004
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x30-j16",
+        "n": 2,
+        "name": "tw2l-x30-j16-n2",
+        "oracle": "wwalk:x=3.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.9620624434709029,
+        2.1564218028096835,
+        3.905656036858709
+      ],
+      "size": 32,
+      "stage": "train",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x10-j16",
+        "n": 2,
+        "name": "tw2l-x10-j16-n2",
+        "oracle": "wwalk:x=1.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.4462028847186246,
+        2.6272955758792604,
+        4.25712979632497
+      ],
+      "size": 20,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        2.016048700383613,
+        2.188772264813193,
+        3.7432843446794113
+      ],
+      "size": 24,
+      "stage": "holdout",
+      "status": "improvement",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x30-j16",
+        "n": 2,
+        "name": "tw2l-x30-j16-n2",
+        "oracle": "wwalk:x=3.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.767934243433207,
+        1.9384468221360815,
+        3.4730600304619528
+      ],
+      "size": 28,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j8",
+        "n": 2,
+        "name": "tw2l-x20-j8-n2",
+        "oracle": "wwalk:x=2.0,jumps=8,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 36,
+      "s": [
+        1.771977191974853,
+        1.9476415272741365,
+        3.5286205449676857
+      ],
+      "size": 32,
+      "stage": "holdout",
+      "status": "null",
+      "track": "generic"
     }
   ],
-  "updated": "2026-11-04T16:11:20Z"
+  "updated": "2026-11-10T04:02:54Z"
 }
