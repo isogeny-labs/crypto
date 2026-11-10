@@ -28,16 +28,25 @@ quadratics at `m = 2`) in front of:
   `m4gb-f2` (M4GB upstream `01860a52` + patches 0001/0002, one thread,
   narrowest binary that fits, 60 s per call).
 
-Repeats 2, seed 20261110, `--targets walk`, `incremental-gauss`.
+Repeats 2 (1 on the degree-23 cell, whose `f4-f2` rows cost about 2 s per
+call over thousands of calls), seed 20261110, `--targets walk`,
+`incremental-gauss`.
 
-## How the solver's work enters S
+## How the solver's work enters S, and why S is not the engine comparison
 
-`ic_framework` prices word-XOR counts at the host's measured
-`ns_per_word_xor / ns_per_add` ratio and every other unit, M4GB's included
-(it reports no count), at measured wall time over the host's addition time
-(`priced_by: measured`, see `ic_framework/mod.rs`). So the `m4gb-f2` rows
-carry the solver's whole wall time per call, process start and file round
-trip included, converted to additions on this host.
+`ic_framework` prices word-XOR counts at the repository's pinned
+`ns_per_word_xor / ns_per_add` ratio (`priced_by: pinned` for `inherited-f4`
+and `f4-f2` on these instances; the count covers their eliminations only, a
+third or less of their wall time at small sizes, as `solvers.rs` documents)
+and every other unit, M4GB's included (it reports no count), at measured wall
+time over the host's addition time (`priced_by: measured`). The smoke cell
+made the consequence plain: at 14 unknowns `f4-f2` takes 2.9 ms per call and
+`m4gb-f2` 16 ms, a 5.5× wall gap, while their S differ by 300× (424 against
+128,100). So between a pinned-count engine and a wall-time engine **S
+compares pricing bases, not engines**. The engine comparison in this study is
+the solver's wall per call (both measured on this host); S is reported for
+every row because it is what the pipeline charges and what the rho column
+divides, and the `m4gb-f2` S rows are an upper bound in that sense.
 
 ## Pre-stated expectation
 

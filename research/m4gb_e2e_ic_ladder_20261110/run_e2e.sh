@@ -11,7 +11,7 @@ out="${1:-$here/results}"
 mkdir -p "$out"
 : "${M4GB_BINARY:?set M4GB_BINARY to a directory of solver_m4gb_n<N>_gf2 binaries}"
 export M4GB_THREADS="${M4GB_THREADS:-1}"
-for sweep in koblitz-n13 char2-n15 koblitz-n17 koblitz-n19 char2-n21 koblitz-n23; do
+for sweep in ${SWEEPS:-koblitz-n13 char2-n15 koblitz-n17 koblitz-n19 char2-n21 koblitz-n23}; do
   f="$out/$sweep.json"
   if [ -s "$f" ]; then echo "skip $sweep (exists)"; continue; fi
   echo "run $sweep"
