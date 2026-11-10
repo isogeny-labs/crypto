@@ -409,7 +409,21 @@ No record was refused. The full run in a 4-CPU container took under an hour; ecd
 | `isogeny_volcano` / `volcano_vertex` | 81,583 / 85,057 / 88,659 components for ℓ = 2 / 3 / 5. 8,228 / 3,144 / 946 of them have depth > 0, with maximum depth 5 / 3 / 2. Every census curve is a vertex. |
 | `endomorphism_level` | 470,490 census levels, plus 1,045 crater levels of other curves where ℓ ∤ v |
 | `isogeny.direction` | 468,785 census edges: 330,769 horizontal, 68,293 ascending, 69,723 descending. Outside D_K = −3, −4, ascending equals descending (60,687 each), as duality requires. |
-| `endomorphism_ring` | 149,593 census curves whose v is {2, 3, 5}-smooth, so f_E = ∏ ℓ^level is determined. 90,799 of them are maximal. |
+| `endomorphism_ring` | 149,593 census curves whose v is {2, 3, 5}-smooth, so f_E = ∏ ℓ^level is determined. 90,799 of them are maximal. The remaining ordinary census curves are filled by `ecdb import end-rings` (below). |
+
+**End(E) of every ordinary census curve** (`ecdb import end-rings`, `src/import/end_ring.rs`; also part of `ecdb import all`, after the volcanoes). The volcanoes pin End(E) only where v is {2, 3, 5}-smooth; this importer computes the conductor f of End(E) for every ordinary short-Weierstrass curve over F_p, 5 ≤ p < 2^10, whatever v is.
+
+- **Rule (Kohel; Bisson–Sutherland).** For each prime ℓ | v with d = v_ℓ(v), v_ℓ(f) = d − k_max, where k_max is the largest k ≤ d such that Frobenius is a scalar on E[ℓ^k]. That is the ℓ-volcano level counted from the crater. The scalar must be a with 2a ≡ t (mod ℓ^k), and the test is x^p ≡ x([a]P) modulo the polynomial of x-coordinates of E[ℓ^k] \ {0} (the ℓ^k-division polynomial, times x³ + Ax + B for even ℓ^k). This works for every ℓ: about 7,750 census curves have a prime ℓ ≥ 7 (up to 37) dividing v, always with d = 1.
+- **Checks.** Each one runs before any write; a failure is a reported problem, and the whole isogeny class is then left out:
+  - the trace is recounted from the model, t² − 4p = v² D_K, and D_K is fundamental;
+  - per curve: a scalar on E[ℓ^k] is a scalar on E[ℓ^(k−1)], a² ≡ p (mod ℓ^k), ℓ^(2k) divides #E or #E′ when a ≡ ±1, f | v, and t² − 4p = (v/f)² f² D_K;
+  - per class (Deuring/Waterhouse): for every f | v, exactly h(f² D_K) F_p-isomorphism classes have conductor f, and isomorphic curves share it. Short and over-full classes are both refused;
+  - existing `endomorphism_ring.conductor_f` / `discriminant` and `endomorphism_level` rows must agree exactly.
+- **Writes.** `endomorphism_ring` (kind `imaginary_quadratic_order`, conductor f, discriminant f² D_K, `conductor_divides` = v, `is_maximal`, `contains` {Z[pi]}, `cm_field_id` where the quadratic field is stored, status `proved`) for curves without a row. A row with a NULL conductor is filled in place; a known conductor is never changed. `endomorphism_level` for each ℓ | v that has no row. A rerun inserts nothing.
+- **Report.** `endomorphism_rings_inserted_census_fp` is the number of previously-null census-fp curves filled. The report also counts the agreements with stored End(E) and levels, and the refused classes.
+- **Verified so far (no deployed run yet).**
+  - Without a database, `full_census_sweep` (an ignored test) covers every ordinary F_p-isomorphism class over 5 ≤ p < 2^10: 157,350 curves in 13,558 classes, and every class satisfies the h(f² D_K) counts. 7,750 of those curves have v that is not {2, 3, 5}-smooth: 6,818 are on the floor at some ℓ ≥ 7, and 932 are on the crater at every ℓ ≥ 7.
+  - End to end, on a throwaway database with a census of every curve over 5 ≤ p < 140 and its ℓ = 2, 3, 5 isogenies, after `volcanoes`: 948 classes passed and 0 problems. All 3,944 stored End(E) rows and all 12,270 stored levels agree, 146 previously-null census curves were filled, and a second run inserted 0. A deliberately corrupted stored conductor was refused with its class.
 
 These tables exist and still wait for a producer:
 
