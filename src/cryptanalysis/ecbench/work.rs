@@ -320,6 +320,12 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "lp_merge_ops_uncharged" | "merge_modr_mults" => {
             Prims(&[(ModrMul, 1), (ModrAdd, 1), (HashProbe, 1)])
         }
+        // The second x-only point of a sibling pair (`wwalk` `sib=m`): the
+        // pair is charged as one group addition, which holds the shared
+        // inversion; this is `λ₋ = −(y_J + y_P)·inv` (one product),
+        // `x₋ = λ₋² − x_P − x_J` (one squaring, two subtractions) and the
+        // negated numerator (one addition), priced at w = 0 by the §5a band.
+        "sibling_second_points" => Prims(&[(FieldMul, 1), (FieldSqr, 1), (FieldAdd, 3)]),
         // One `points_with_x`: 1/x², b·x⁻², the Artin–Schreier solve, y = x·u.
         "as_solves" => Prims(&[(FieldInv, 1), (FieldSqr, 1), (FieldMul, 2), (AsSolve, 1)]),
         "lift_field_squares_uncharged" | "min_key_field_squares_uncharged" => {
