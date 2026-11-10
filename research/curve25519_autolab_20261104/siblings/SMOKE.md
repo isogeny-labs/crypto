@@ -89,3 +89,68 @@ Specs `spec-smoke2-k20.json` (same curve and seeds as the first smoke; arms `rho
 - Stored points per sqrt(r) within 5 percent of `tw2cj-lazy` [pcc:unverified].
 - Every record verified and 4 replays reproduced a session [pcc:unverified].
 - Reported separately: the walk-only ratio and the set-up share of each arm's `oracle_setup` phase [pcc:unverified]. No pre-registration for `p256`, which is reported as measured [pcc:unverified].
+
+## Results of the second smoke [pcc:unverified]
+
+Sessions `smoke2-k20` (144 records) and `smoke2-k28` (108 records), every record verified, `verify --replay 4` reproduced 4 replays with 0 problems in each, and the k24 panel session replays with the new binary (`--replay 8`: 2,700 records, 8 reproduced, 0 problems) [pcc:unverified]. 24 measured runs an arm, paired bootstrap 95 percent intervals, `smoke_stats2.py` writing `smoke2-stats-k20.json` and `smoke2-stats-k28.json`, bands in `band-smoke2-k*.txt` [pcc:unverified].
+
+Price per point after the fix, one pair over two points against one group addition, from the unit test [pcc:unverified]:
+
+| field bits | pair, bit-ops | per point / group addition |
+|--:|--:|--:|
+| 20 | 31,920 | 0.6014 |
+| 24 | 45,408 | 0.6006 |
+| 28 | 61,264 | 0.6001 |
+| 32 | 79,488 | 0.5997 |
+
+The note's 0.59 counted 6 additions a pair; the pair performs 8 (two more for the negated sum of the y values), which gives 0.60 [pcc:unverified].
+
+Set-up additions a run (means), `tw_setup_adds` with doubles in brackets [pcc:unverified]:
+
+| configuration | k = 20 | k = 28 |
+|:--|--:|--:|
+| `tw2cj-lazy` (16 chained jumps) | 127.9 (66) | 173.0 (94) |
+| sib8, pool 64 (a = 4, b = 16) | 126.2 (68) | 149.4 (100) |
+| sib8, pool 256 (a = 8, b = 32) | 350.2 (68) | not run |
+| first smoke, pool 256, 6 a jump | 1,587 | not run |
+
+Per sqrt(r), means [pcc:unverified]:
+
+| size | arm | stored points | S (w = 0) | S (w = 0.1) | S (w = 1) | bit-ops |
+|:--|:--|--:|--:|--:|--:|--:|
+| k = 20 | rho-neg | 0.857 steps | 1.337 | 1.428 | 2.243 | 37,710 |
+| k = 20 | tw2cj-lazy | 1.745 | 2.534 | 2.719 | 4.384 | 71,081 |
+| k = 20 | sib8 p64 | 1.796 | 1.725 | 2.017 | 4.641 | 55,113 |
+| k = 20 | sib8 p256 | 1.847 | 2.361 | 2.661 | 5.361 | 72,174 |
+| k = 28 | rho-neg | 0.870 steps | 0.948 | 1.036 | 1.831 | 50,248 |
+| k = 28 | tw2cj-lazy | 1.769 | 1.839 | 2.017 | 3.616 | 94,705 |
+| k = 28 | sib8 p64 | 1.932 | 1.050 | 1.352 | 4.069 | 65,459 |
+
+Against the pre-registered intervals, ratio of means with paired bootstrap 95 percent interval [pcc:unverified]:
+
+| quantity | measured | pre-registered | inside |
+|:--|--:|:--|:--|
+| k = 20, bit-ops p64 / tw2cj-lazy | 0.775 [0.713, 0.846] | 0.70 [0.62, 0.80] | point yes, interval end 0.846 above 0.80 |
+| k = 28, bit-ops p64 / tw2cj-lazy | 0.691 [0.606, 0.793] | 0.64 [0.58, 0.72] | point yes, interval inside |
+| k = 20, stored points p64 / tw2cj-lazy | 1.029 [0.895, 1.183] | within 5 percent | point yes, interval wide |
+| k = 28, stored points p64 / tw2cj-lazy | 1.092 [0.944, 1.269] | within 5 percent | point no (9.2 percent above), interval holds 1 |
+| verified, replays | 144 and 108 of 144 and 108; 4 and 4 reproduced | all, 4 | yes |
+
+Other ratios [pcc:unverified]: k = 20, p256 / tw2cj-lazy 1.015 [0.917, 1.123] in bit-ops; p64 / rho-neg 1.461 [1.280, 1.682] at k = 20 and 1.303 [1.085, 1.595] at k = 28; tw2cj-lazy / rho-neg 1.885 at both sizes.
+
+Walk-only ratio (every part of `oracle_setup` except the set-up, priced at the records' own prices) and set-up share, post hoc [pcc:unverified]:
+
+| size | arm | walk-only / tw2cj-lazy | set-up share of `oracle_setup` |
+|:--|:--|--:|--:|
+| k = 20 | tw2cj-lazy | 1 | 0.246 |
+| k = 20 | sib8 p64 | 0.655 [0.570, 0.752] | 0.334 |
+| k = 20 | sib8 p256 | 0.669 [0.556, 0.807] | 0.505 |
+| k = 28 | tw2cj-lazy | 1 | 0.027 |
+| k = 28 | sib8 p64 | 0.678 [0.588, 0.785] | 0.037 |
+
+## Reading, post hoc [pcc:unverified]
+
+- The walk-only ratio is 0.66 to 0.68 where the per-point price alone says 0.60: the rest is the lift products, the sign resolutions at collisions, the table inserts and a stored-point count 3 to 9 percent above `tw2cj-lazy`'s [pcc:unverified].
+- The product-set pool removes the first smoke's miss: the p64 set-up is as cheap as the 16-jump chain's (126 against 128 additions at k = 20), so the total ratio falls from 2.30 to 0.775 at k = 20 and is 0.691 at k = 28 [pcc:unverified].
+- In the band the mechanism wins at w = 0 and loses at w = 1: the second points and lifts are native operations, and at w = 1 `sib8 p64` is 4.64 against 4.38 at k = 20 and 4.07 against 3.62 at k = 28 [pcc:unverified]. The band ranks `tw2cj-lazy` against `sib8 p64` as unresolved inside the band at both sizes [pcc:unverified].
+- Neither sib8 arm reaches `rho-neg` in bit-ops: 1.46 and 1.30 times it [pcc:unverified].
