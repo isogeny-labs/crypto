@@ -58,8 +58,10 @@ nonrational3-torsion. [pcc:unverified]
 
 Declaration: `TorsionBoundaryAudit.bk_excluded_boundary_counterexample`.
 This closes an actual excluded-case witness, **not** a proof/refutation of
-the qualified BK theorem. The full E[r] dimension, Frobenius determinant,
-fixed-point/descent and Weil-pairing necessity bridges remain unformalized.
+the qualified BK theorem. The later [actual Frobenius descent](FROBENIUS_DESCENT.md)
+closes finite-base fixed-point/point-image descent and its actual torsion-set
+criterion. Full E[r] dimension, Frobenius determinant, q-Frobenius iterate
+to the chosen extension, and Weil-pairing necessity remain unformalized.
 The requested all-p<500 census remains unexecuted. [pcc:unverified]
 
 ## Corrected prime-field arithmetic

@@ -1,0 +1,10 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.22,ranksep=0.30];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=10];
+ a [label="Finite field F, q = |F|; any field extension L/F\nX^q - X splits with exactly the base-field roots"];
+ b [label="Actual Mathlib point Frobenius\nP fixed iff actual base-field point maps to P\nAffine witnesses descend with nonsingularity"];
+ c [label="Actual r-torsion set criterion\nAll r-torsion rational iff Frobenius is identity there\nActual torsion is preserved",fillcolor="#dcf1e2"];
+ d [label="Checked excluded-case disproof\nF7: y² = x³ + 3x + 2; #E = 9; discriminant nonzero\n3 divides q-1, yet actual 3-torsion is not all fixed",fillcolor="#fff1cf"];
+ e [label="Still open for qualified BK\nActual torsion rank / determinant / Weil necessity\nq-Frobenius iterate to chosen extension bridge",fillcolor="#eeeeee"];
+ a -> b; b -> c; c -> d; c -> e [style=dashed];
+}
