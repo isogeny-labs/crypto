@@ -369,3 +369,18 @@ Genus grows with order; full ambient/Picard identification and typical,
 dominant-prime or fixed-genus asymptotic statements remain open. The host
 question for item13remains pending; authorized local proof work continued
 while that input was unavailable. [pcc:unverified]
+
+### Registered-runner availability recheck
+
+A fresh read-only GitHub preflight confirms the repository is public and the
+prepared manual S3workflow endpoint still returns404. The frozen protocol
+already permits a free standard public GitHub runner. The remaining issue
+is a callable registered workflow/access route. [Actual receipt](../research/independent_s3_validator_20261109/evidence/registration-probe-20261110.json).
+No new dispatch/native attempt or paid resource was submitted. [pcc:unverified]
+
+[AGENTS.md lines861–870](../AGENTS.md) requires research workflows on main,
+schedule or manualdispatch. The separate frozen-workflow replay job restores
+30unrelatedstudies and readsAWSartifacts; it is not an S3executionadapter.
+No PRresearchtrigger, signer reroute, frozen protocol or original rejection
+was changed. The userhost/workflowidentifierquestionremains pending.
+[pcc:unverified]
