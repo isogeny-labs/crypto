@@ -1,17 +1,28 @@
+The new [all-arity geometric proof](SEMAEV_GEOMETRY.md) closes the actual
+canonical polynomial-to-point bridge: over every algebraically closed field,
+for a general Weierstrass curve with nonzero discriminant and every arity
+m≥3, canonical evaluation is zero iff actual curve points with the prescribed
+affine x-coordinates sum to zero. Actual polynomial evaluation, fixed-size
+resultant leading-zero cases, point-list gluing, S3/S4 bases and strong
+induction are all checked. A direct Lean disproof on the nonsingular F5
+curve refutes the rational-only strengthening. Full polynomial permutation
+invariance and irreducibility remain separate obligations. Whole census gate471passes,
+zero failures/zero trusted-native exceptions. Full local packetaf2329passes; signed
+standing remains unverified. [pcc:unverified]
+
 The new [fixed-size root criterion](DECLARED_ROOTS.md) proves the exact
 common-finite-root OR both-leading-zero alternative over algebraically
 closed fields with positive declared sizes and degree bounds. Lean refutes
 the affine-only version using padded constants, and removal of closure
 using X²+1overQ. Latest whole census gate431passes, zero failures/zero
-trusted-native exceptions. This remains a polynomial bridge toward actual
-geometric recursion. [pcc:unverified]
+trusted-native exceptions. This is the polynomial bridge used by the later all-arity geometric proof. [pcc:unverified]
 
 The new [all-input degree proof](ALL_INPUT_DEGREES.md) checks sharp
 individual degree2^(m−2)for every formal input, every aritym≥3and every
 field in the actual canonical resultant family. Explicit variable
 permutations identify each input; a Lean finite-position case split covers
 all positions. The all-input-stage whole census gate passes423declarations with
-zero failures and zero trusted-native exceptions. Higher geometric recursion
+zero failures and zero trusted-native exceptions. The later geometric proof closes higher recursion; full polynomial symmetry
 and irreducibility remain open; no degree preservation after field
 evaluation is claimed. [pcc:unverified]
 
@@ -35,8 +46,8 @@ The [newest-pair symmetry proof](RECURSIVE_SYMMETRY.md) now shows that
 every actual recursive resultant extension is invariant under exchanging
 its two newest independent variables. Both input degrees are 2^(m−2)
 for every recursive arity m≥4. Complete census gate: 320 declarations,
-zero failures or trusted-native exceptions. Full permutation invariance and higher geometric recursion remain open;
-the later all-input component closes formal degree coverage. [pcc:unverified]
+zero failures or trusted-native exceptions. Full permutation invariance remains open; the later geometric proof closes higher
+recursion and the all-input component closes formal degree coverage. [pcc:unverified]
 
 # Skeptical Lean refutations and exact Semaev census
 
@@ -321,7 +332,7 @@ only at their already-stated scope. [pcc:unverified]
 
 | Item | Current status and concrete remaining obligation |
 |---|---|
-| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic, repeated-coordinate cases and actual point sums proved. Short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. Actual fixed-degree S4resultant equivalence and degree-drop control proved; bounded S3/S4/S5native census completed. Canonical individual degree4in each m4input and sharp specialization criterion proved. Universal fixed-size resultant degree step, actual recursive family and last-input degree2^(m−2)for every aritym≥3now proved; reset-of-size counterexample retained. New actual bivariate-exchange proof gives newest-pair symmetry and sharp degree for both newest inputs at every recursive aritym≥4; symmetry-stage wholegate320passes. New sharp surviving-variable degree/leading coefficient theorem gives actual canonical third-newest degree2^(m−2)at allm≥5; latest wholegate357passes. All formal input degrees are now proved through actual variable permutations with explicit Fin-position coverage; all-input gate423passes. General fixed-size root criterion and leading-zero/closure controls now proved; latest census gate431passes. All-m geometric zero-sum recursion, full permutation invariance beyondm4 and irreducibility remain open; original2004PDFstill403/unread. |
+| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic, repeated-coordinate cases and actual point sums proved. Short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. Actual fixed-degree S4resultant equivalence and degree-drop control proved; bounded S3/S4/S5native census completed. Canonical individual degree4in each m4input and sharp specialization criterion proved. Universal fixed-size resultant degree step, actual recursive family and last-input degree2^(m−2)for every aritym≥3now proved; reset-of-size counterexample retained. New actual bivariate-exchange proof gives newest-pair symmetry and sharp degree for both newest inputs at every recursive aritym≥4; symmetry-stage wholegate320passes. New sharp surviving-variable degree/leading coefficient theorem gives actual canonical third-newest degree2^(m−2)at allm≥5; latest wholegate357passes. All formal input degrees are now proved through actual variable permutations with explicit Fin-position coverage; all-input gate423passes. General fixed-size root criterion and leading-zero/closure controls now proved; latest census gate431passes. The new actual evaluation and point-list strong induction now prove all-m geometric zero-sum equivalence over algebraically closed fields/nonzero discriminant, with a direct nonsingular F5rational-only disproof. Full polynomial permutation invariance beyondm4 and irreducibility remain open; original2004PDFstill403/unread. |
 | 2 BK | Partial: original r²point-count formulation read; actual excluded-case geometric3-torsion witness even with9dividing#E. New F2/r2actual geometric torsion has2points all rational, refuting unrestricted set inclusion despite2notdividingq−1. The actual node already excludes this by gcd(r,q)=1; original r²condition is not refuted. Full qualified Frobenius proof and all-p<500 census remain open. |
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected modular embedding proof now covers every integer r>2, with an actual order8positive control, and remains conditional on Hasse; New trace-class module proves prime-divisor modular order in{1,2,3,4,6}, coprimality and actual prime-order point, conditional on explicit trace-square classification; composite q289/r81control has order9but is arithmetic only. Latest census gate331passes. Original Waterhouse4.1pp536–537read/visually checked. General trace/p-rank/classification and embedding-field bridges plus binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
