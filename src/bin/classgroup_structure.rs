@@ -82,8 +82,8 @@ fn main() {
     let (dk, conductor, delta_factors) = match (opts.get("disc-primes"), opts.get("conductor")) {
         (Some(list), cond) => {
             let f: BigUint = cond.map_or(BigUint::one(), |c| parse_big(c).magnitude().clone());
-            let dk = -(delta.magnitude() / (&f * &f));
-            let dk = BigInt::from_biguint(num_bigint::Sign::Minus, dk);
+            let dk_mag = delta.magnitude() / (&f * &f);
+            let dk = BigInt::from_biguint(num_bigint::Sign::Minus, dk_mag);
             let primes: Vec<BigUint> = list
                 .split(',')
                 .filter(|t| !t.trim().is_empty())
