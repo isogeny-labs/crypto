@@ -24,7 +24,7 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
 - **Third attempt lost (2026-11-10 17:33Z).** `pfd-x-t13-k0-c6-20261110-r2` ran 3 h 51 min on an `m7i.4xlarge` and was killed by an
   EC2 Spot interruption (row 3 above). Its row file in S3 is 0 bytes. Its partial log was synced through step 30 (last upload
   16:19:36Z); it is not admitted and not analysed. Decision 7 allowed one attempt, so the cell is not relaunched and goes back to
-  the owner. Draw 1 of the same cell completed in 3.2 h on a faster node (`m8i.4xlarge`).
+  the owner. Draw 1 of the same cell completed in 3.2 h on an `m8i.4xlarge`.
   - Disclosure: while watching the run I read the step lines of the partial log to estimate when it would end. Through step 30
     its counters equal those of the completed draw 1 log. That is not a result and enters no rule; the run did not reach the
     steps where draw 1's refutation appeared.
