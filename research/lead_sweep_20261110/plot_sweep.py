@@ -53,8 +53,9 @@ def bars(x0, y0, title, data, keys, cols, note):
     x = x0
     for k in keys:
         out.append(f'<rect x="{x}" y="{ly}" width="12" height="12" fill="{cols[k]}"/>')
-        text(x + 16, ly + 11, f"{k} ({sum(data[f][k] for f in FAM)})", 10.5)
-        x += 150 if len(k) < 20 else 255
+        label = f"{k} ({sum(data[f][k] for f in FAM)})"
+        text(x + 16, ly + 11, label, 10.5)
+        x += 6.2 * len(label) + 28
 
 bars(20, 60, "A. Verdict against the preregistered prediction, by family", byfam, VERD, VCOL,
      f"run.py verdict field; {tot_v['falsified']} falsified of which {ctl[('falsified', True)]} with all controls passing")
