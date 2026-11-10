@@ -64,3 +64,18 @@ records cited above.
 
 No leaderboard or `benchmarks/README.md` row: that needs the validation gate (replay
 certificate, validator report, VALIDATION.json). No security claim about any standard curve.
+
+## Amendment 1 (2026-11-10T23:20Z, before any data of this panel)
+
+Both EKS jobs failed before a pod ran: workflow runs 42913750091 and 42913756188, Kubernetes Jobs
+`gh-42913750091-1` (UID `cd697db9-...`) and `gh-42913756188-1`, state `failed`, `pod_uid` empty, launcher
+exit 23, about 3.5 min after submission. Image `isolab/tasks@sha256:54dea54b...`, ecbench SHA-256
+`3e0cde94...` built from `a4db61b2e1`. Receipts are in the lab S3 bucket, which this session cannot
+read (no AWS identity). Every non-publish dispatch of this workflow since 2026-11-01 has failed.
+
+Change: run the same panels on this session's host (4 vCPU cloud VM, no PMU) from
+`spec-k28-local.json` and `spec-k32-local.json`. These are byte-for-byte the frozen specs except
+`isolation_required` L0, the label and the description. Expectations E1 to E4 and the analysis are
+unchanged. Admission becomes: every record verified, `verify --replay 8` reproduces, and the A/A
+interval contains 1. There is no L2 gate. Local L0 rows are development evidence (as in the SNC
+panel), not an EKS measurement. The EKS specs stay frozen for a re-launch once the route works.
