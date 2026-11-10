@@ -27,8 +27,11 @@ for lab in "${labels[@]}"; do
   extra=()
   if [ -n "$dkline" ]; then extra=(--disc-primes "$(printf '%s' "$dkline" | cut -f4)" --conductor "$(printf '%s' "$dkline" | cut -f3)"); fi
   echo "$lab: starting $(date -u +%FT%TZ)"
+  # tuned on the P-224 probes of 2026-11-10: a 2^16 half-interval gives 1.4x the
+  # relation rate of 2^14 (2^18 no more); P-192 keeps the 2^14 of its runs
+  half="${HALF:-65536}"; case "$lab" in p192-*) half="${HALF:-16384}";; esac
   "$BIN" --label "$lab" --p "$p" --n "$n" "${extra[@]}" --threads "${THREADS:-4}" --seed "${SEED:-1}" \
-    ${BOUND:+--bound "$BOUND"} ${HALF:+--half-length "$HALF"} ${SUPPORT:+--support "$SUPPORT"} \
+    ${BOUND:+--bound "$BOUND"} --half-length "$half" ${SUPPORT:+--support "$SUPPORT"} ${LARGE_PRIME:+--large-prime "$LARGE_PRIME"} \
     --checkpoint "$OUT/rust_${lab}.ckpt" --sub-bounds 50,163,691,2000 \
     --out "$OUT/rust_${lab}.json" 2>> "$OUT/rust_${lab}.log" > /dev/null
   echo "$lab: $(grep -o '"h_bits": [0-9]*\|"ratio_to_analytic": [0-9.]*\|"accepted": [a-z]*' "$OUT/rust_${lab}.json" | tr '\n' ' ') $(date -u +%FT%TZ)"
