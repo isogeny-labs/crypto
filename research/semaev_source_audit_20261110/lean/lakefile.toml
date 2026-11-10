@@ -1,0 +1,11 @@
+name = "semaev_source_audit"
+version = "0.1.0"
+defaultTargets = ["SemaevSourceAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "SemaevSourceAudit"
+roots = ["BinaryFourth", "BinaryFourthControl", "BinaryFourthPoints", "BinaryFourthCertificate"]
