@@ -2637,6 +2637,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
             ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
             ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 63 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery; with tw=2 needs coefficients below 2^31 (default 1)"),
         ]
     }
 
@@ -2685,11 +2686,18 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         if lazy && !opts.g_jumps {
             return Err("wwalk: lazy=1 needs g=1".into());
         }
+        let cv = wwalk_cv(params)?;
+        if !cv && tw == 0 {
+            return Err("wwalk: cv=0 needs tw=1 or tw=2".into());
+        }
+        if !cv && lazy {
+            return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
+        }
         if tw > 0 {
             if !opts.g_jumps || grow != 2 {
                 return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
-            let walk = TargetWalk::build_ext(
+            let walk = TargetWalk::build_ext_cv(
                 ctx.group,
                 ctx.generator,
                 ctx.target,
@@ -2702,6 +2710,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                 seed,
                 lazy,
                 tw,
+                cv,
             )?;
             self.free_pending = true;
             self.free_checked = walk.collisions.len() as u64;
@@ -2843,6 +2852,16 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             }
         }
         m
+    }
+}
+
+/// `wwalk`'s `cv` parameter: absent or `1` recomputes every key collision
+/// (the committed walk), `0` does not.
+pub fn wwalk_cv(params: &Params) -> Result<bool, String> {
+    match params.get("cv") {
+        None | Some("1") => Ok(true),
+        Some("0") => Ok(false),
+        Some(v) => Err(format!("wwalk: cv is 0 or 1, not `{v}`")),
     }
 }
 

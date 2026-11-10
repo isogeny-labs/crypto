@@ -1537,6 +1537,14 @@ pub struct WalkPolicy {
     /// distinguished point (by how they ended) and the distinguished-point
     /// table's queries and inserts (counted, not charged).
     pub extra_counters: bool,
+    /// Chained set-up (`rho.negation_chained`): only the first two jumps
+    /// `M_0`, `M_1` are joint scalar multiplications; every later one is
+    /// `M_j = M_{j−1} + M_{j−2}` (one addition, coefficients added modulo
+    /// `r`).  The jumps then satisfy small integer relations
+    /// (`M_j − M_{j−1} − M_{j−2} = O`), which the independent table avoids
+    /// on purpose ([`jump_coefficient_bits`]); the walk's cycle window and
+    /// escape still apply, and the counters show what the relations cost.
+    pub chained_setup: bool,
 }
 
 impl WalkPolicy {
@@ -1545,6 +1553,17 @@ impl WalkPolicy {
         Self {
             brent: false,
             extra_counters: false,
+            chained_setup: false,
+        }
+    }
+
+    /// The legacy walk with the chained jump set-up
+    /// (`rho.negation_chained`).
+    pub const fn chained() -> Self {
+        Self {
+            brent: false,
+            extra_counters: false,
+            chained_setup: true,
         }
     }
 
@@ -1553,6 +1572,7 @@ impl WalkPolicy {
         Self {
             brent: true,
             extra_counters: true,
+            chained_setup: false,
         }
     }
 }
@@ -2780,17 +2800,31 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
 
     // Set-up: G + Q once, the table, the start stride.
     let gq = g.add(&mut ops, generator, target);
-    let jumps: Vec<(G::Elt, u64, u64)> = (0..shape.jumps)
-        .map(|_| {
-            let a = rng.gen_range(1..short);
-            let b = rng.gen_range(1..short);
-            (
-                joint_mul(g, &mut ops, generator, target, gq, a, b),
-                a % r,
-                b % r,
-            )
-        })
-        .collect();
+    let jumps: Vec<(G::Elt, u64, u64)> = if policy.chained_setup {
+        chained_jumps(
+            g,
+            &mut ops,
+            &mut rng,
+            generator,
+            target,
+            gq,
+            r,
+            short,
+            shape.jumps,
+        )
+    } else {
+        (0..shape.jumps)
+            .map(|_| {
+                let a = rng.gen_range(1..short);
+                let b = rng.gen_range(1..short);
+                (
+                    joint_mul(g, &mut ops, generator, target, gq, a, b),
+                    a % r,
+                    b % r,
+                )
+            })
+            .collect()
+    };
     let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
     let mut stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
     // A stride that is the identity (`ta + tb·d ≡ 0 (mod r)`, one seed in
@@ -2882,6 +2916,9 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
         counters: {
             let mut counters =
                 tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
+            if policy.chained_setup {
+                counters.insert("chained_setup".into(), 1);
+            }
             if policy.extra_counters {
                 extra_walk_counters(&mut counters, &tally);
                 counters.insert(
@@ -2896,6 +2933,48 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
             counters
         },
     }
+}
+
+/// The chained jump table of [`WalkPolicy::chained_setup`]: `M_0`, `M_1`
+/// by joint scalar multiplication with short coefficients (as the
+/// independent table draws them), then `M_j = M_{j−1} + M_{j−2}`, one
+/// charged addition each.  A chain that meets the identity (about one
+/// draw in `r`) is drawn again from the start.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn chained_jumps<G: CountedGroup>(
+    g: &G,
+    ops: &mut GroupOps,
+    rng: &mut StdRng,
+    generator: G::Elt,
+    target: G::Elt,
+    gq: G::Elt,
+    r: u64,
+    short: u64,
+    count: usize,
+) -> Vec<(G::Elt, u64, u64)> {
+    let mut out: Vec<(G::Elt, u64, u64)> = Vec::with_capacity(count);
+    while out.len() < count {
+        if out.len() < 2 {
+            let a = rng.gen_range(1..short);
+            let b = rng.gen_range(1..short);
+            let m = joint_mul(g, ops, generator, target, gq, a, b);
+            if g.is_identity(&m) {
+                out.clear();
+                continue;
+            }
+            out.push((m, a % r, b % r));
+            continue;
+        }
+        let (m1, a1, b1) = out[out.len() - 1];
+        let (m2, a2, b2) = out[out.len() - 2];
+        let m = g.add(ops, m1, m2);
+        if g.is_identity(&m) {
+            out.clear();
+            continue;
+        }
+        out.push((m, addmod(a1, a2, r), addmod(b1, b2, r)));
+    }
+    out
 }
 
 /// One target's share of a [`rho_batch_with`] run.
@@ -8665,6 +8744,13 @@ pub struct TargetWalkRow {
     pub b: u64,
 }
 
+/// The top bit of a [`TargetWalk`] entry's `u` word: the stored point's
+/// key sign bit with `cv=0` and with `lazy=1` (never set otherwise, so the
+/// default walk is unchanged).  Coefficients are below `2^32`
+/// ([`wwalk_plan_check`]); with two seeds (`u = u1 << 32 | u2`) both modes
+/// refuse coefficients of `2^31` or more, so the bit is never part of `u`.
+pub const TW_SIGN_BIT: u64 = 1 << 63;
+
 /// **A walk with the target inside it** (`wwalk:tw=1`, `F = 1`;
 /// `wwalk:tw=2`, `F = 2`).
 ///
@@ -8717,10 +8803,33 @@ pub struct TargetWalkRow {
 /// (charged to `verify_ops`), the rows that fail are dropped, the walk
 /// resumes with recomputation on until rank is reached again or the cap
 /// is hit (below full rank the table answers probes as before).
+///
+/// `verify_collisions = false` (`cv=0`, [`TargetWalk::build_cv`]): a key
+/// collision is not recomputed.  The table key is the point's abscissa
+/// (the group key without its sign bit), so a key collision on a curve
+/// whose key is `abscissa·2 + sign` is exactly `E_t = ±E_s`, and the sign
+/// bit of the stored entry's key says which.  That bit is packed into the
+/// top bit of the entry's `u` word ([`TW_SIGN_BIT`]; every coefficient is
+/// below `2^32`, [`wwalk_plan_check`]), so `cv=0` makes exactly the table
+/// accesses of `cv=1` (one per non-identity step) and keeps no second
+/// table; `verify_ops` stays empty.  The relation loop's final `[d]G = Q`
+/// check is kept and charged
+/// as before, so a wrong row makes the solve fail (it is never retried).
+/// With two seeds `cv=0` needs coefficients below `2^31` (as `lazy=1`
+/// does), so the packed `u1` never reaches the sign bit; `cv=0` and
+/// `lazy=1` are alternatives and are refused together.
 pub struct TargetWalk<E> {
     /// Key (abscissa and sign bit, shifted) → `(u, z, b)`; with two seeds
-    /// `u = u1 << 32 | u2`; with `lazy` bit 63 of `u` is the key's low bit.
+    /// `u = u1 << 32 | u2`; with `cv=0` or `lazy` bit 63 of `u`
+    /// ([`TW_SIGN_BIT`]) is the key's low bit.
     map: FastMap<(u64, u64, u64)>,
+    /// Table accesses made by the walk (one `entry` call per non-identity
+    /// step, in every mode); not emitted as a counter.
+    pub table_probes: u64,
+    /// `false` with `cv=0`: collisions are not recomputed.
+    pub verify_collisions: bool,
+    /// With `cv=0`: collisions turned into rows from the stored sign bit.
+    pub unverified_collisions: u64,
     /// Base index and relation column of the (first) seed.
     pub seed: usize,
     pub seed_col: usize,
@@ -8783,9 +8892,6 @@ pub struct TargetWalk<E> {
     pub lazy_dropped_rows: u64,
 }
 
-/// Bit 63 of a lazy walk's stored `u`: the key's low (sign) bit.
-const TW_SIGN: u64 = 1 << 63;
-
 /// Solve the last unknown of `Σ_j c_j·x_j = rhs (mod r)` (rows are
 /// `[c_0, .., c_{n−1}, rhs]`, `r` prime) by Gauss–Jordan; `None` if the last
 /// unknown is not determined or the system is inconsistent.
@@ -8845,6 +8951,40 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         )
     }
 
+    /// [`TargetWalk::build`] with the collision recomputation switched by
+    /// `verify_collisions` (`cv`); `true` is `build` exactly.  `false`
+    /// refuses a group whose key is not `abscissa·2 + sign` on the seed
+    /// (checked on `P1` and `−P1`, negation being free).
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_cv<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: E,
+        target: E,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        x: f64,
+        jumps: usize,
+        cheap: bool,
+        seed: u64,
+        verify_collisions: bool,
+    ) -> Result<Self, String> {
+        Self::build_ext_cv(
+            g,
+            generator,
+            target,
+            fb,
+            r,
+            1,
+            x,
+            jumps,
+            cheap,
+            seed,
+            false,
+            1,
+            verify_collisions,
+        )
+    }
+
     /// [`TargetWalk::build`] with `seeds` (1 or 2: the base must hold that
     /// many abscissae), the curve's cofactor `h` (the pipeline's rows read
     /// `Σ coef·x = h·(a + b·d)`; only the in-build final check uses it) and
@@ -8864,8 +9004,45 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         lazy: bool,
         seeds: usize,
     ) -> Result<Self, String> {
+        Self::build_ext_cv(
+            g, generator, target, fb, r, h, x, jumps, cheap, seed, lazy, seeds, true,
+        )
+    }
+
+    /// [`TargetWalk::build_ext`] with the collision recomputation switched
+    /// by `verify_collisions` (`cv`, as in [`TargetWalk::build_cv`]); `true`
+    /// is `build_ext` exactly.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_ext_cv<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: E,
+        target: E,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        h: u64,
+        x: f64,
+        jumps: usize,
+        cheap: bool,
+        seed: u64,
+        lazy: bool,
+        seeds: usize,
+        verify_collisions: bool,
+    ) -> Result<Self, String> {
         Self::build_inner(
-            g, generator, target, fb, r, h, x, jumps, cheap, seed, lazy, seeds, None,
+            g,
+            generator,
+            target,
+            fb,
+            r,
+            h,
+            x,
+            jumps,
+            cheap,
+            seed,
+            lazy,
+            seeds,
+            verify_collisions,
+            None,
         )
     }
 
@@ -8883,6 +9060,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         seed: u64,
         lazy: bool,
         n_seeds: usize,
+        verify_collisions: bool,
         fault: Option<u64>,
     ) -> Result<Self, String> {
         let opts = WalkOpts {
@@ -8908,6 +9086,14 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         if lazy && n_seeds == 2 && bound >= 1 << 31 {
             return Err(format!(
                 "wwalk: lazy=1 with tw=2 needs coefficients below 2^31 (bound {bound})"
+            ));
+        }
+        if lazy && !verify_collisions {
+            return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
+        }
+        if !verify_collisions && n_seeds == 2 && bound >= 1 << 31 {
+            return Err(format!(
+                "wwalk: cv=0 with tw=2 needs coefficients below 2^31 (bound {bound})"
             ));
         }
         let start = Instant::now();
@@ -8936,6 +9122,12 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             seed_cols[1] = seed_cols[0];
         }
         let p1 = pts[0];
+        if !verify_collisions && pts.iter().any(|p| g.key(&g.neg(*p)) != g.key(p) ^ 1) {
+            return Err(
+                "wwalk: cv=0 needs a group key of the form abscissa·2 + sign (the seed and its negative differ in the low bit only)"
+                    .into(),
+            );
+        }
         let nbits = (64 - bound.leading_zeros()) as usize;
         let rbits = (64 - (r - 1).leading_zeros()).max(1) as usize;
         let mut setup_ops = GroupOps::default();
@@ -8957,6 +9149,9 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         }
         let mut tw = Self {
             map: fast_map(t_max as usize + 1),
+            table_probes: 0,
+            verify_collisions,
+            unverified_collisions: 0,
             seed: seeds[0],
             seed_col: seed_cols[0],
             n_seeds,
@@ -9021,6 +9216,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let mut verify_ops = GroupOps::default();
         let mut check_ops = GroupOps::default();
         let mut lazy_active = lazy;
+        // `cv=0` and `lazy=1` store the key's sign bit in bit 63 of `u`.
+        let store_sign = lazy || !verify_collisions;
         let _ = fault;
         loop {
             while tw.rank < need && tw.steps < t_max {
@@ -9037,17 +9234,24 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 tw.insert_attempts += 1;
                 let full_key = g.key(&e);
                 let key = full_key >> 1;
-                let low = u64::from(lazy) * ((full_key & 1) << 63);
+                let low = u64::from(store_sign) * ((full_key & 1) << 63);
+                tw.table_probes += 1;
                 let mut kept = match tw.map.entry(key) {
                     std::collections::hash_map::Entry::Vacant(slot) => {
+                        // The bit is free: u < 2^32 (one seed) or u1 < 2^31.
+                        debug_assert!(c.0 & TW_SIGN_BIT == 0);
                         slot.insert((c.0 | low, c.1, c.2));
                         continue;
                     }
                     std::collections::hash_map::Entry::Occupied(o) => *o.get(),
                 };
+                // Equal sign bits: E_t = E_s (only meaningful with store_sign).
+                let minus = (kept.0 & TW_SIGN_BIT) == low;
+                if store_sign {
+                    kept.0 &= !TW_SIGN_BIT;
+                }
                 if lazy {
-                    tw.collision_minus.push((kept.0 & TW_SIGN) == low);
-                    kept.0 &= !TW_SIGN;
+                    tw.collision_minus.push(minus);
                 }
                 #[cfg(test)]
                 if fault == Some(tw.collisions.len() as u64) {
@@ -9056,8 +9260,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 }
                 tw.collisions.push((kept, c));
                 if lazy_active {
-                    let minus = tw.collision_minus[tw.collisions.len() - 1];
                     tw.lazy_certified += 1;
+                    tw.add_row(fb, r, !minus, kept, c);
+                } else if !verify_collisions {
+                    // cv=0: same abscissa, E_t = ±E_s, the sign bits say which.
+                    tw.unverified_collisions += 1;
                     tw.add_row(fb, r, !minus, kept, c);
                 } else {
                     tw.verify(g, fb, r, &mut verify_ops, kept, c);
@@ -9417,7 +9624,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         *lookups += 1;
         let key = g.key(&point) >> 1;
         let (u, z, b) = *self.map.get(&key)?;
-        let u = u & !TW_SIGN;
+        // Clear the cv=0 / lazy sign bit (never set otherwise).
+        let u = u & !TW_SIGN_BIT;
         let (u1, u2) = self.parts(u);
         let s = self.eval(g, ops, u1, u2, z, b)?;
         if s == point {
@@ -9509,6 +9717,14 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             out.insert("tw_lazy_checks".into(), self.lazy_checks);
             out.insert("tw_lazy_failures".into(), self.lazy_failures);
             out.insert("tw_lazy_dropped_rows".into(), self.lazy_dropped_rows);
+        }
+        if !self.verify_collisions {
+            // Only with cv=0, so the default walk's counters are unchanged.
+            out.insert("tw_collision_verify".into(), 0);
+            out.insert(
+                "tw_unverified_collisions".into(),
+                self.unverified_collisions,
+            );
         }
         out
     }
@@ -17732,6 +17948,172 @@ mod wwalk_table_tests {
         assert!(TargetWalk::build(g, gen, q, &fb, r, 9.0, 16, false, 0).is_err());
     }
 
+    /// `cv=0` ([`TargetWalk::build_cv`] with `verify_collisions = false`):
+    /// on a prime curve the stored sign bit gives every collision's sign, so
+    /// the walk, its rows, its rank and its set-up are those of `cv=1`
+    /// exactly, and its ledger is `cv=1`'s minus the verification ledger.
+    /// The default counters do not change; `cv=0` adds two.
+    #[test]
+    fn target_walk_without_collision_verify_keeps_rows_and_drops_the_ledger() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let gen = inst.generator_point();
+        let mut cops = GroupOps::default();
+        let fb = prime_factor_base(&inst, 1);
+        let (mut collisions, mut saved) = (0u64, 0u64);
+        for cheap in [false, true] {
+            for seed in 0..32u64 {
+                let k = 1 + (seed * 7919 + 13) % (r - 1);
+                let q = g.mul(&mut cops, gen, k);
+                let v = TargetWalk::build(g, gen, q, &fb, r, 1.5, 16, cheap, seed).unwrap();
+                let v2 =
+                    TargetWalk::build_cv(g, gen, q, &fb, r, 1.5, 16, cheap, seed, true).unwrap();
+                let n =
+                    TargetWalk::build_cv(g, gen, q, &fb, r, 1.5, 16, cheap, seed, false).unwrap();
+                // `build` is `build_cv(.., true)`.
+                assert_eq!(v.rows, v2.rows);
+                assert_eq!(v.build_ops, v2.build_ops);
+                assert_eq!(v.breakdown_counters(), v2.breakdown_counters());
+                // Every key collision is a genuine ± collision on this curve.
+                assert_eq!(v.verified_collisions, v.collisions.len() as u64);
+                // Same walk, same rows, same stop.
+                assert_eq!(n.steps, v.steps, "cheap={cheap} seed={seed}");
+                assert_eq!(n.collisions, v.collisions);
+                assert_eq!(n.rows, v.rows, "cheap={cheap} seed={seed}");
+                assert_eq!(n.rank, v.rank);
+                assert_eq!(n.zero_rows, v.zero_rows);
+                assert_eq!(n.inconsistent_rows, 0);
+                assert_eq!(n.steps_first_row, v.steps_first_row);
+                assert_eq!(n.steps_rank_two, v.steps_rank_two);
+                assert_eq!(n.jump_coefs, v.jump_coefs);
+                assert_eq!(n.work_counters(), v.work_counters());
+                // E1 (validator 2026-11-10): one table, one access per
+                // non-identity step in both modes.  The sign bit rides in
+                // the top bit of `u`; masked, the cv=0 table is the cv=1
+                // table, and cv=1 never sets the bit.
+                assert_eq!(n.insert_attempts, v.insert_attempts);
+                assert_eq!(v.table_probes, v.insert_attempts);
+                assert_eq!(n.table_probes, v.table_probes);
+                assert_eq!(n.steps, n.insert_attempts + n.identities_skipped);
+                assert_eq!(n.entries, v.entries);
+                assert_eq!(n.map.len(), v.map.len());
+                for (key, &(u, z, b)) in &v.map {
+                    assert_eq!(u & TW_SIGN_BIT, 0);
+                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
+                }
+                // The relation loop's probe reads the same entry in both.
+                for &(u, z, b) in v.map.values().take(8) {
+                    let Some(pt) = v.eval(g, &mut cops, u, 0, z, b) else {
+                        continue;
+                    };
+                    let (mut l1, mut l2) = (0u64, 0u64);
+                    let (mut o1, mut o2) = (GroupOps::default(), GroupOps::default());
+                    assert_eq!(
+                        n.probe(g, &mut o1, &mut l1, pt),
+                        v.probe(g, &mut o2, &mut l2, pt)
+                    );
+                    assert_eq!((o1, l1), (o2, l2));
+                    let neg = g.neg(pt);
+                    assert_eq!(
+                        n.probe(g, &mut o1, &mut l1, neg),
+                        v.probe(g, &mut o2, &mut l2, neg)
+                    );
+                }
+                // The ledgers: no verification, everything else unchanged.
+                assert_eq!(n.verify_ops, GroupOps::default());
+                assert_eq!(n.setup_ops, v.setup_ops);
+                assert_eq!(n.walk_ops, v.walk_ops);
+                assert_eq!(n.build_ops.adds + v.verify_ops.adds, v.build_ops.adds);
+                assert_eq!(n.build_ops.doubles, v.build_ops.doubles);
+                assert_eq!(n.verified_collisions, 0);
+                assert_eq!(n.unverified_collisions, v.collisions.len() as u64);
+                // Counters: the default's are unchanged, cv=0 adds two.
+                let (cd, cn) = (v.breakdown_counters(), n.breakdown_counters());
+                assert!(!cd.contains_key("tw_collision_verify"));
+                assert!(!cd.contains_key("tw_unverified_collisions"));
+                assert_eq!(cn.get("tw_collision_verify"), Some(&0));
+                assert_eq!(cn.get("tw_verify_adds"), Some(&0));
+                for (key, val) in &cd {
+                    if key != "tw_verify_adds" && key != "tw_verified_collisions" {
+                        assert_eq!(cn.get(key), Some(val), "{key}");
+                    }
+                }
+                collisions += v.collisions.len() as u64;
+                saved += v.verify_ops.adds;
+            }
+        }
+        eprintln!(
+            "cv=0 small curve: {collisions} collisions, {saved} verification additions saved"
+        );
+        assert!(collisions > 0 && saved > 0);
+    }
+
+    /// `cv=0` composes with main's two-seed walk (`tw=2`): the sign bit
+    /// rides in bit 63 of the packed `u = u1 << 32 | u2` (coefficients are
+    /// refused at `2^31` or more, so `u1` never reaches it), and the walk,
+    /// rows, rank and set-up are `cv=1`'s with the verification ledger
+    /// removed.  `cv=0` with `lazy=1` is refused; `cv=1` with either seed
+    /// count is `build_ext` exactly.
+    #[test]
+    fn target_walk_without_collision_verify_two_seeds() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let (r, h) = (inst.r, inst.cofactor);
+        let gen = inst.generator_point();
+        let mut cops = GroupOps::default();
+        let fb = prime_factor_base(&inst, 2);
+        let mut collisions = 0u64;
+        for cheap in [false, true] {
+            for seed in 0..24u64 {
+                let k = 1 + (seed * 7919 + 13) % (r - 1);
+                let q = g.mul(&mut cops, gen, k);
+                let v = TargetWalk::build_ext(g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, false, 2)
+                    .unwrap();
+                let v2 = TargetWalk::build_ext_cv(
+                    g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, false, 2, true,
+                )
+                .unwrap();
+                let n = TargetWalk::build_ext_cv(
+                    g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, false, 2, false,
+                )
+                .unwrap();
+                assert_eq!(v.rows, v2.rows);
+                assert_eq!(v.build_ops, v2.build_ops);
+                assert_eq!(v.breakdown_counters(), v2.breakdown_counters());
+                assert_eq!(v.verified_collisions, v.collisions.len() as u64);
+                assert_eq!(n.steps, v.steps, "cheap={cheap} seed={seed}");
+                assert_eq!(n.collisions, v.collisions);
+                assert_eq!(n.rows, v.rows, "cheap={cheap} seed={seed}");
+                assert_eq!(n.rank, v.rank);
+                assert_eq!(n.zero_rows, v.zero_rows);
+                assert_eq!(n.steps_rank_three, v.steps_rank_three);
+                assert_eq!(n.table_probes, v.table_probes);
+                assert_eq!(n.map.len(), v.map.len());
+                for (key, &(u, z, b)) in &v.map {
+                    assert_eq!(u & TW_SIGN_BIT, 0);
+                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
+                }
+                assert_eq!(n.verify_ops, GroupOps::default());
+                assert_eq!(n.build_ops.adds + v.verify_ops.adds, v.build_ops.adds);
+                assert_eq!(n.unverified_collisions, v.collisions.len() as u64);
+                assert_eq!(n.breakdown_counters().get("tw_seeds"), Some(&2));
+                collisions += v.collisions.len() as u64;
+            }
+        }
+        assert!(collisions > 0);
+        let q = g.mul(&mut cops, gen, 5);
+        let fb1 = prime_factor_base(&inst, 1);
+        for (f, seeds) in [(&fb1, 1usize), (&fb, 2)] {
+            assert!(TargetWalk::build_ext_cv(
+                g, gen, q, f, r, h, 1.5, 16, false, 0, true, seeds, false
+            )
+            .is_err());
+        }
+    }
+
     /// The true column values of a base's seeds on a tiny curve: the loop's
     /// unknown of a seed's column is `log([h]P) / coef`.
     fn seed_col_values(
@@ -18041,6 +18423,7 @@ mod wwalk_table_tests {
                         seed,
                         false,
                         seeds,
+                        true,
                         Some(0),
                     )
                     .unwrap();
@@ -18057,6 +18440,7 @@ mod wwalk_table_tests {
                         seed,
                         true,
                         seeds,
+                        true,
                         Some(0),
                     )
                     .unwrap();
