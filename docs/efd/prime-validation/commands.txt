@@ -27,6 +27,9 @@ python3 tools/efd/verify_symbolic.py --out docs/efd/prime-validation/symbolic.js
 python3 tools/efd/verify_symbolic.py --catalogue src/prime_ecc/efd/legacy_catalogue.json \
   --out docs/efd/prime-validation/symbolic-legacy.json
 
+# Symbolic verification of the Weierstrass bridges.
+python3 tools/efd/verify_bridges.py --out docs/efd/prime-validation/bridges.json
+
 # Source hashes for the module and catalogue.
 cd src/prime_ecc/efd && sha256sum mod.rs program.rs formats.rs checked.rs \
   tests.rs catalogue.json
