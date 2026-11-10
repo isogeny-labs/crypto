@@ -1,6 +1,6 @@
 # DRAFT Amendment R2-G (proposed number 15): stage B as resumable units
 
-**Status: draft (fourth version, after three independent reviews of the draft and its runner), NOT applied, NOT frozen.** Written 2026-11-10 by the main
+**Status: draft (fifth version, after three independent reviews and a re-check of the runner: "freeze with edits", the edits are applied here), NOT applied, NOT frozen. The freeze waits for the owner's answer named in rule 5.** Written 2026-11-10 by the main
 session for owner decision 8 of `research/open_leads_execution_20261108/DECISIONS.md` ("split stage B into short jobs under a
 dated amendment, reviewed before it is frozen; readings and rules stay as registered"). Target when frozen:
 `research/prime_fall_degree_20261027/PREREGISTRATION.md`, appended as "Amendment 15". It changes execution and procedure: how
@@ -73,9 +73,11 @@ unit list from this table and refuses to start if the counts differ.
    line `end <unit> exit 0`. A done unit is never run again. Its row file is the unit's data. A unit can be done in one job
    only; a job that finds a unit done in two earlier jobs runs nothing (exit 12), stage B stops and goes to the owner.
 4. **Resume.** Unit jobs are numbered 1, 2, 3, ... (job name `pfd-bu-<n>-<stamp>`) and run one at a time: a job is submitted
-   only after the one before it is terminal, with a status receipt. Job `N` is given the result prefix of every earlier job
+   only after the one before it is terminal, with a status receipt. Each unit-job request is submitted once (the launch card
+   refuses a job name that already has a receipt). A job that must be repeated gets the next number, and the earlier one a
+   skip. If two pods ever ran under one job name, stage B stops and goes to the owner. Job `N` is given the result prefix of every earlier job
    (each exactly as that job's `ISOLAB_RESULTS_URI`) or a `skip:<n>:<reason>` for it; the reason is `costguard` (rule 9) or
-   `neverran` (the job's prefix has no `host.txt`: it stopped before it read anything or ran anything). Each skip has a status
+   `neverran` (the job stopped before it wrote `host.txt`, so its prefix has none and it ran no unit). Each skip has a status
    receipt of the skipped job. The runner checks this itself: the numbers of the jobs given and of the skips, including skips
    carried forward from earlier jobs' `host.txt`, must be exactly 1 to `N - 1`, each once. It cannot check a skip's reason;
    the skip is recorded in every later `host.txt`.
@@ -83,8 +85,11 @@ unit list from this table and refuses to start if the counts differ.
      unit fetches its log, its row file and its recorded pilot command line again.
    - It runs nothing and exits 12 if any of these cannot be read or lacks a line the runner writes; if a row file does not
      end with the pilot's summary line; if an earlier job's runner hash, binary hashes, test-mode flag or extra pilot flags
-     differ from its own; if a done unit's recorded pilot command line differs from the one it would use; if the job numbers
-     do not add up; or if a tool-failure closure recorded by an earlier job is not one it computes itself.
+     differ from its own; if a done unit's recorded pilot command line differs from the one it would use; if an earlier job
+     names an earlier job that this one was not given; if an earlier job's result prefix does not contain the job name its
+     `host.txt` records; if the job numbers do not add up (one missing, one given twice, one both given and skipped, or a
+     skip carried with another reason); or if a tool-failure closure recorded by an earlier job is not one it computes
+     itself.
    - After an exit 12 no unit has run; the main session finds the cause in the listing and submits a corrected job. If a done
      unit's files are really gone from S3, stage B stops and goes to the owner.
    - The runner is not changed once the first unit job has run. If it had to be, the earlier jobs would fail the hash check;
@@ -108,7 +113,7 @@ unit list from this table and refuses to start if the counts differ.
      two jobs carry different values, the lower `T` and the higher `K` hold. Other ladders continue in either case.
 6. **Non-zero exit and upload failures.** These are handled mechanically; no diagnosis changes what happens next.
    - A unit whose pilot exits non-zero is not done; its files and its line `end <unit> exit N` are uploaded and the job stops
-     (exit 20). A pilot that cannot be started (126, 127) or dies from a signal counts the same way. The next job runs that unit once more. If the pilot exits non-zero for that unit in a second job, the ladder
+     (exit 20). A pilot that cannot be started (126, 127), or that dies from a signal while the runner keeps running, counts the same way. The next job runs that unit once more. If the pilot exits non-zero for that unit in a second job, the ladder
      is closed at that level by the runner itself, in every later job, and reported as "tool failure at t = T".
    - A failed upload stops the job (exit 13). The runner writes `abort <unit> <reason>`; if that line reaches S3 the unit
      does not count as in flight, and it is run again by the next job unless its `end` line did reach S3. With S3 unreachable
@@ -184,7 +189,9 @@ unit list from this table and refuses to start if the counts differ.
 
 ## 7. Runner, tests and review
 
-- The runner is one frozen bash script, `stageb_units_runner.sh` (revision 4); its SHA-256 is recorded here at the freeze. It
+- The runner is one frozen bash script, `stageb_units_runner.sh` (revision 4), SHA-256
+  `1c2229386976e8d6f22e5f243b269a5d23d588d0e105d6cb530c9a5488157a79` (28,966 bytes). The start command built from it by
+  `make_request_bu.sh` has SHA-256 `572ce3fb23e57416732a64a7cc25523c5ff84bd8496a7dd59455e07b1b6bcade` (4 pieces). It
   was written by Sonnet agents to this draft and to written specifications of the main session, and read by the main session.
 - **How a job carries it.** The lab's request validator refuses a command argument longer than 8192 characters or containing
   a newline, so the runner cannot be one argument. `make_request_bu.sh` writes the runner into the command in pieces, with
@@ -192,7 +199,7 @@ unit list from this table and refuses to start if the counts differ.
   `/bin/bash`, `-c`, a one-line start command, and `stageb`. The start command joins the pieces, restores the newlines, checks
   the file's SHA-256 against the frozen value (exit 17 if it differs; exit 18 if it cannot write the file) and runs the file
   with the remaining arguments. So a job runs the frozen runner byte for byte or runs nothing, provided the start command is
-  the frozen one: its SHA-256 is recorded here at the freeze, next to the runner's, and the launch card of every unit job
+  the frozen one: its SHA-256 is recorded above, next to the runner's, and the launch card of every unit job
   checks the request's first four command words against it before submitting.
 - The image's shell and awk, measured from its base layer (Amazon Linux 2023): bash 5.2.15 and GNU Awk 5.1.0.
 - It is tested on a local copy of the frozen binaries (the image layer; SHA-256 equal to `image/binaries.sha256`) with
@@ -217,16 +224,26 @@ unit list from this table and refuses to start if the counts differ.
   by anything frozen (only by the request script); `allow:` was accepted for any unit and carried for good; a termination
   during a `start` upload counted as in flight. It asked for the start command's hash to be recorded, for rule 7 to say which
   jobs count, and for the reading about the lost `pfd-b` attempts to be put to the owner. Revision 4 and this fourth draft
-  address each of these (rules 3 to 7 and 9, and the bullets above). A targeted re-check of revision 4 follows; its verdict
-  is recorded here at the freeze.
+  address each of these (rules 3 to 7 and 9, and the bullets above).
+- Re-check of revision 4 (same reviewer, 2026-11-10, `fcb1f0a674`): freeze with edits, no runner change. It replayed its
+  reproductions and its attempts on the job-number check and on the `allow:` evidence against revision 4 under the image's
+  bash and gawk; all show the corrected outcome; the unit list and all 91 pilot command lines are unchanged; the three
+  committed suite outputs show what they claim (it rebuilt the request independently and got the same start-command and
+  piece hashes). Its one required text edit (a request is submitted once; rule 4) and its wording notes are applied in this
+  version.
 - Runner exits: 0 list accounted for; 2 no work directory, no result prefix, the runner not run as a file, or a job name not
   of the form `pfd-bu-<N>-<stamp>`; 10 G1 failed; 11 unit list count wrong; 12 the earlier jobs' state cannot be read or does
   not match (rules 3 and 4); 13 an upload failed or a lock wait ran out; 14 list not accounted for at the end; 15 a test-only
   variable set in production; 16 a bad argument; 20 a pilot exited non-zero; 75 a lost unit; 143 terminated by a signal.
   Exits 17 and 18 are the start command's. A container killed outright shows 137.
 - Known limits, stated before any unit job: the runner cannot check a skip's reason (rule 4); it cannot detect an earlier job
-  that is still running (rule 4: one job at a time, by receipt); test-only settings other than the extra pilot flags are not
-  compared between jobs, and are refused in production anyway.
+  that is still running, or two pods under one job name (rule 4: one job at a time, each request submitted once, by
+  receipt); it trusts what it reads from S3 (a result prefix forged consistently, which needs write access to the bucket, is
+  accepted); if the exit handler cannot take the upload lock within 5 s it uploads anyway, and an overlap with a periodic
+  upload still in progress can drop a line, which can only make a unit count as in flight; test-only settings other than
+  the extra pilot flags are not compared between jobs, and are refused in production anyway. The start command was tested
+  as a whole under the host's shell (the whole suite) and under the image's shell (the unit list, and exit 17 on a changed
+  piece; main session, 2026-11-10).
 - Not tested locally: the real `aws s3` commands (a local-directory stand-in is used), ladders with `m >= 4`, the production
   budgets at large levels, the 12-thread pod, exits 17 and 18 inside a pod. The first job is therefore watched as a test of
   those: its S3 listing and `progress.txt` are checked against the rules above before any second job is submitted.
