@@ -2,7 +2,7 @@
 """Summarize `ic descent --solver` JSON (schema_version 1, operation descent-engines)
 into RESULTS.md, results.json and results.svg.  Standard library only.
 
-    summarize.py results/ladder.json RESULTS.md results.json results.svg
+    summarize.py results/ RESULTS.md results.json results.svg      (a directory of per-cell JSON files, or one file)
 
 Per cell and engine: the median over targets of the per-target median wall
 (milliseconds), the ratio of that to f4-f2 and to the cell's reference engine,
@@ -11,9 +11,15 @@ A cell where an engine declined or hit the budget on every target shows that
 instead of a number."""
 import json, math, statistics, sys
 src, md_out, json_out, svg_out = sys.argv[1:5]
-d = json.load(open(src))
+import glob, os
+files = sorted(glob.glob(os.path.join(src, '*.json'))) if os.path.isdir(src) else [src]
+cells_all = []
+for f in files:
+    d = json.load(open(f))
+    cells_all.extend(d.get('cells', []))
+cells_all.sort(key=lambda c: (c['summands'], c['n'], c['family']))
 rows = []
-for c in d['cells']:
+for c in cells_all:
     per_engine = {}
     for t in c['per_target']:
         for eng, runs in t['runs'].items():

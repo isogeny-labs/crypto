@@ -30,7 +30,13 @@ quadratic `m = 2` cells, `exhaustive` otherwise).
   (M4GB upstream `01860a52` with patches 0001 + 0002, one thread,
   `M4GB_BINARY` a directory of binaries built for 16, 20, 24, 28, 30, 32, 35,
   36, 40 and 64 variables; the narrowest that fits is used).
-- Targets 8 per cell, repeats 3, budget 300 s per target and engine.
+- Targets 6 per cell, repeats 2, budget 60 s per target and engine (a first
+  attempt with 8 targets, 3 repeats and 300 s was killed by the session's
+  two-hour cap before `ic descent` wrote its single output file; nothing of it
+  survived, see the session log).
+- One `ic descent` invocation per cell and family, each writing its own JSON
+  under `results/`; for each family the `m = 2` ladder stops once `m4gb-f2`
+  exhausted the budget on every target of a cell.
 - Launcher: [`run_ladder.sh`](run_ladder.sh), run under
   `tools/benchrec.py run` (record `20261110T1513Z-m4gb-descent-ladder`).
 
