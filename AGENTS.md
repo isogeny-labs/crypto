@@ -1732,6 +1732,13 @@ specified in [`docs/curves/ICV1.md`](docs/curves/ICV1.md).
   challenge published may go by that name (`ECC2K-130`, `sect163k1`,
   `secp256k1`, `P-256`).  Family notation with a free parameter is fine
   when a sentence is about the family.
+- **Use the standard panel.** New measurements run on the curves of
+  [`docs/ic/STANDARD_PANEL.md`](docs/ic/STANDARD_PANEL.md) (owner,
+  2026-11-10), and a study that uses another curve says why. Prose and
+  tables may name a panel curve by its alias (`K0-23`, `K1-83`, `P36a`);
+  records and file names keep the slug. An alias-shaped name that is not
+  on the panel fails `curve-names` in `docs/ic/` and in research dated on
+  or after the freeze.
 - **Never write a retired form.** The spellings in `ICV1.md`'s table of
   retired names carry no model and may not appear in new text or be
   emitted by new code.  Frozen reports keep them; the registry resolves

@@ -399,7 +399,10 @@ def alias_map_text(registry: dict) -> str:
     src/ because workflows that sparse-check-out src/ must still build."""
     aliases = {}
     for c in registry["curves"]:
-        for name in c["aliases"] + c["standard_names"] + [c["slug"], c["icv1"]]:
+        names = c["aliases"] + c["standard_names"] + [c["slug"], c["icv1"]]
+        if c.get("panel_alias"):  # docs/ic/STANDARD_PANEL.md
+            names.append(c["panel_alias"])
+        for name in names:
             aliases[normalise_alias(name)] = c["slug"]
     doc = {"schema_version": 1, "generated_from": "docs/curves/registry.json",
            "generated_by": "scripts/build_curve_registry.py",
