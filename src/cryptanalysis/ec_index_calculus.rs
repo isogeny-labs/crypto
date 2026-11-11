@@ -2569,6 +2569,29 @@ mod tests {
         }
     }
 
+    /// With no surplus relations the system is sometimes rank-deficient
+    /// (about one run in ten on this fixture before the retry); the staged
+    /// driver now collects more relations and still returns the log.
+    #[test]
+    fn staged_retries_a_rank_deficient_system() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let x_truth = BigUint::from(190u32);
+        let q = g.scalar_mul(&x_truth, &a_fe);
+        let mut retried = 0;
+        for seed in 0..120u64 {
+            let (x, report) =
+                ec_index_calculus_dlp_staged_seeded(&curve, &g, &q, 8, 0, 5000, 64, seed)
+                    .expect("the retry recovers a rank-deficient system");
+            assert_eq!(g.scalar_mul(&x, &a_fe), q);
+            if report.relations_collected > report.factor_base_size {
+                retried += 1;
+            }
+        }
+        assert!(retried > 0, "no seed exercised the retry path");
+    }
+
     /// Shamir interleaving equals two separate ladders plus an add.
     #[test]
     fn double_scalar_mul_matches_two_ladders() {
