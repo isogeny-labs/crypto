@@ -61,7 +61,7 @@ jobs:
       - name: Build and audit the proof files
         run: |
           set -euo pipefail
-          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms; do
+          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres; do
             tools/lean/proof-gate.sh "research/chained_jacobian_transfers_20261110/lean/$source.lean" --out "$RUNNER_TEMP/proofs-$source"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

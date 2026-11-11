@@ -1,3 +1,38 @@
+# CT23 in progress — actual Psi kernel checkpoint 2026-11-11T22:06Z
+
+Read study CLOSED_FIBRES_CHECKPOINT.md and frozen CLOSED_FIBRES_PROOF.md
+first. Consumer fresh child research/chained-transfer-closed-fibres-20261111
+starts994869034/readyPR1490, which targets1488. Its new closed_fibres.rs,
+shared unchanged reduction extraction in nonsplit_map.rs and new tests in
+seven_chain.rs are preserved as root evidence source02 snapshots. [pcc:unverified]
+
+Actual49 KerPsi=R0(KerPhi) classes/all2401 additions/Frobenius5/6/all7-
+annihilators/all49 geometric dualR0 norm2 pass, consumerb0738e/rootb29faf.
+Targeted192 perR0/R1direction passesdb5cea. These are partial local results;
+FOUR COMPLETE DOMAIN comparisons are still running in local session90163,
+raw /workspace/scratch/ct-closed-fibres-full-and-kernel-02.txt. Inspect actual
+process/log before restarting. No complete-suite or timing pass inferred.
+[pcc:unverified]
+
+Six new ClosedFibres Lean lemmas gate/localbindingsa97f41 pass, total103,
+zero trusted native. Written coordinate-algebra/multiplicity/ordinate/
+Picard-reduction bridge0e5bbf and consumerba4bdd are frozen. Partial report
+has two inspected pages. Next collect all-domain02, freeze/register result,
+exercise actual geometric chart boundaries, then integrate retaining old
+maps and run complete changed-source guards. Do not edit source02 snapshots
+or claimed proof/modules. Continue CT24 nondual7-hop after checkpointing.
+[pcc:unverified]
+
+Root CT22 e174f85d6bb7ba2745e895d243f464715c997b6d is published on3877;
+1490 at994869034bbc9cc882db826cdabf73d2befb97cc is published ready stacked.
+1490 focus dispatch requested but initial discovery empty; root filtered
+push initial query also empty. Next normal checks22:40/22:42UTC,1488 at
+22:29,1484 quiet01:09Nov12. Both frozen-ledger forks and S3/livebudget/
+KB/ecdb/locked atlas8edec422a limits remain. No bypass or paid jobs.
+[pcc:unverified]
+
+# Historical completed direct-norm checkpoint
+
 # Chained ECDLP Transfers — direct norms checkpoint 2026-11-11T21:46Z
 
 Read study DIRECT_NORMS_CHECKPOINT.md, frozen DIRECT_NORMS_PROOF.md and

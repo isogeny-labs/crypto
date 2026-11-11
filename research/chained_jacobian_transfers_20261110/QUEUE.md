@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 97 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Seven new DirectNorms cleared algebra helpers pass gate/local bindings,PCC8eaf58. Source census97;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
+| CT03 | 103 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Seven new DirectNorms cleared algebra helpers pass gate/local bindings,PCC8eaf58. Six ClosedFibres elimination helpers also pass gate/localbindings,a97f41. Source census103;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -35,7 +35,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 | CT21 | actual transported(7,7)Psi/written globalproof/fullcontrols;unsigned | Continue from the accepted six-cycle target using the actual odd kernel and transported Richelot cross-kernel. | SEVEN_CHAIN_CHECKPOINT.md/SEVEN_CHAIN_PROOF.md,PCCeb3240/d0441a:49-kernel/64-lift action,actualR1 delta33/scale47,full16-point compositekernel/globalquotient/dual7,F101 descent viaAut/Torelli/oddwitness,ellipticembedding/trace/j noniso. Both12317 Psi domains/all109source reverse28-inverse74/direct4 pass. Consumer7c1f32ecb ready stackedPR1488;fullguard25/65+two andthirdintegration/strictClippy pass;focused43097723254 startup_failure before jobs/checks,PCC4baafc; no CI pass inferred. |
 | CT22 | integrated and complete local checks; unsigned | Direct base-field norms with all exceptional balanced support. | DIRECT_NORMS_CHECKPOINT.md/PROOF.md; both norms agree with generic maps on all12317 C0/C1 classes. Integrated guard06 passes25native/66reference unit+three integrations,one old ignored; all Phi/Psi/source controls and full generic/direct Phi comparisons pass. ConsumerPCCb6af61/3f2084,rootc23653/8eaf58;97 helpers. No measured cost claim. |
-| CT23 | next unblocked task; not executed | Whole-fibre Richelot elimination without splitting quadratic support; actual Psi kernel. | CT23_PLAN.md: reuse existing polynomial/Cantor engine, count all chart boundaries, compare all R0/R1 domains, then49-point KerPsi/all2401 additions/Frobenius over existing Fp6. Preserve pointwise reference. |
+| CT23 | actual Psi kernel and targeted chart pass; all-domain comparison running | Whole-fibre Richelot elimination and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md:49 actual KerPsi classes, all2401 sums/Frobenius5/6/geometric dualR0 norm2 pass,b29faf/b0738e. Targeted192 per map direction pass. Four complete domains still running02; production integration/fullguard pending. Six new Lean lemmas,a97f41,total103. Preserve pointwise fallback and boundary obligations. |
 | CT24 | queued after CT23 | Another nondual7-hop with genuine new target and transported Richelot continuation. | CT24_PLAN.md: actual Frobenius kernels, compatible elliptic gluing, full geometric/global/source controls and direct elliptic two-hop control; unsupported charts remain explicit. |
 
 ## Session constraints
@@ -51,7 +51,12 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read DIRECT_NORMS_CHECKPOINT.md, frozen DIRECT_NORMS_PROOF.md, then CT23_PLAN.md.
+Read CLOSED_FIBRES_CHECKPOINT.md, frozen CLOSED_FIBRES_PROOF.md, then CT23_PLAN.md.
+CT23 consumer child starts994869034/readyPR1490. Exact pending local process
+90163 writes /workspace/scratch/ct-closed-fibres-full-and-kernel-02.txt.
+Kernel test already passed and is frozen underb0738e; full-domain test is
+separate and still running. Never repeat completed kernel/targeted stages
+without changed inputs. Direct norms remain the completed published rung.
 Consumer direct-norm branch starts7c1f32ecb/readyPR1488 and must target that
 immediate feature parent. Complete changed guard06 passes25/66+three.
 Preceding focused43097723254 ended startup_failure before jobs/checks; retain
@@ -59,7 +64,7 @@ metadata/PCC4baafc rather than claim an arithmetic CI result. Parent1484's
 56-row common-prefix fork remains, next quiet check around01:09UTC Nov12.
 Root ledger fork/archive-clock, S3/livebudget and KB/vault limits persist.
 Do not rebase, force, rechain, choose a frozen lineage or bypass admission.
-Continue CT23 in a fresh child after publishing this completed rung.
+Continue current CT23 child; after full comparisons, exercise actual geometric boundaries, then integrate/fullguard/publish. Parent1490 stays frozen994869034.
 [pcc:unverified]
 
 Read today's session log, this table and CHECKPOINT.md. Inspect actual heads
