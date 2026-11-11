@@ -85,10 +85,10 @@ Direct F11³ polynomial multiplication yields prod_i G_i=x⁶+x²+6.
 
 **Six-cycle negative control:**
 
-    E_-: v²=u³+u+5, #E_-(F11)=11 (prime).
-    C_-: y²=x⁶+x²+5.
-    h_-(u) irreducible, -5=6 is a nonsquare mod 11.
-    x⁶+x²+5 irreducible over F11 (no factors degree 1,2,3).
+    E_-: v²=u³+2u+4, #E_-(F11)=17 (prime).
+    C_-: y²=x⁶+2x²+4.
+    h_-(u) irreducible, -4=7 is a nonsquare mod 11.
+    x⁶+2x²+4 irreducible over F11 (no factors degree 1,2,3).
     Unique F11-stable root-pair partition has delta=0.
 
 This negative result rules out a nondegenerate **rational Richelot
