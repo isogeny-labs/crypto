@@ -42,14 +42,7 @@ fn main() {
                     lanes.push(cur);
                     cur = c.add(cur, Some(g));
                 }
-                let step = vec![c.mul(Some(g), lanes_n as u64); lanes_n];
-                let step: Vec<Option<Pt>> = step
-                    .into_iter()
-                    .map(Some)
-                    .collect::<Vec<_>>()
-                    .into_iter()
-                    .map(|x: Option<Pt>| x)
-                    .collect();
+                let step: Vec<Option<Pt>> = vec![c.mul(Some(g), lanes_n as u64); lanes_n];
                 let mut scratch0 = BatchAddScratch::default();
                 let mut base = 0u64;
                 'outer: loop {
