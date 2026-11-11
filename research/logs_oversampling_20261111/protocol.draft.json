@@ -182,7 +182,7 @@
     },
     {
       "variable": "filter/solver options",
-      "handling": "identical in every arm (CADO filter, block Wiedemann, block 4, target_excess fixed)"
+      "handling": "identical in every arm within a cell (block Wiedemann, block 4, target_excess fixed); filter is CADO in C1-C3 and legacy in C4. C3 and C4 share seeds and therefore identical relation pools; C3 vs C4 is a secondary paired filter contrast, outside the decision rule"
     },
     {
       "variable": "host",
@@ -201,7 +201,8 @@
     "cells": [
       "C1 degree 23 a=0 m=2 factor-index 0 (primary)",
       "C2 degree 37 a=0 m=3 ic-search spec",
-      "C3 degree 37 a=0 m=3 subgroup_orbits points 7400 (exploratory)"
+      "C3 degree 37 a=0 m=3 subgroup_orbits points 7400 (factor base research/logs_oversampling_20261111/fb37_subgroup_orbits_7400.json), CADO filter (exploratory)",
+      "C4 = C3 with --filter-strategy legacy (legacy-filter cell): same curve, factor base, seeds and fractions; only the filter differs"
     ],
     "seeds_per_cell": 30,
     "pilot_seeds": 5,
@@ -229,7 +230,8 @@
   ],
   "measurement": {
     "command": "ic oversample --degree D --curve-a A --summands M [--factor-base F] --seeds 30 --fractions 0,0.1,0.25,0.5 --aa-control --logs-arm --rows-out rows.jsonl --json",
-    "verification": "unverified arm = failure"
+    "verification": "unverified arm = failure",
+    "command_c4": "ic oversample --degree 37 --curve-a 0 --summands 3 --factor-base research/logs_oversampling_20261111/fb37_subgroup_orbits_7400.json --filter-strategy legacy --seeds 30 --fractions 0,0.1,0.25,0.5 --aa-control --logs-arm --rows-out rows-c4.jsonl --json"
   },
   "execution": {
     "route": "isolab-eks (CLAUDE.md); not launched by this draft",
@@ -243,7 +245,7 @@
   "analysis_plan": {
     "estimator": "mean paired difference over seeds",
     "ci": "paired bootstrap over seeds, 10000 resamples, 95%",
-    "multiplicity": "three candidate fractions per cell; report all, Holm on the primary"
+    "multiplicity": "three candidate fractions per cell, four cells; report all, Holm on the primary within each cell; lambda_hat estimated per cell"
   },
   "inadmissible": [
     "dropping unverified arms",
@@ -252,7 +254,7 @@
   ],
   "amendments": [],
   "open_issues": [
-    "CADO filter merges the whole system at C1-C3 in smoke checks (core 0-1); decide whether to add a large-core or legacy-filter cell before freezing",
+    "CADO filter leaves core 0-1 at C1-C3 in smoke checks; C4 (legacy filter) added 2026-11-11 to exercise a nonzero core (smoke: core 9-10, 175-190 nonzeros). A large-core cell (hundreds of columns) remains optional",
     "research-kb receipt to be added by the main session"
   ],
   "freeze": {

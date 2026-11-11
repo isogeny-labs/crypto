@@ -50,21 +50,34 @@ trade-offs count only if total cost falls).
 ## Cells
 
 Choose cells where `ic logs` completes in seconds to minutes (release).
+The filter is CADO (the `ic logs` default) except in C4.
 
 | id | cell | columns | prior use |
 |----|------|---------|-----------|
 | C1 (primary) | `--degree 23 --curve-a 0 --summands 2 --factor-index 0` | 44 | `research/la_engines_20261014/scripts/e2e.sh` label `n23-legacy`; `raw/e2e.jsonl` |
 | C2 | `--degree 37 --curve-a 0 --summands 3 --factor-base <ic search spec>` | 16 | same script, label `n37-search` |
-| C3 (exploratory, not previously used) | degree 37, m = 3, `subgroup_orbits` points 7400 | 104 | none; a larger column count |
+| C3 (exploratory, not previously used) | degree 37, m = 3, `subgroup_orbits` points 7400 ([`fb37_subgroup_orbits_7400.json`](fb37_subgroup_orbits_7400.json)), CADO filter | 104 | none; a larger column count |
+| C4 (legacy-filter cell) | C3 with `--filter-strategy legacy` | 104 | none; added 2026-11-11 so the Krylov core is not empty |
 
-**Open issue for the pilot:** on smoke checks of C1, C2 and C3 the CADO
-filter merged the whole system (core dimension 0–1), so the Krylov solver is
-not exercised and the LA saving can only come from filter/reconstruction
-work. Before freezing, either (a) accept that this measures the trade-off as
-`ic logs` actually runs at these sizes, or (b) add a cell with a nontrivial
-core (hundreds or more columns; collection then takes hours, e.g. the N73
-600-column run in la_engines), or (c) add a `--filter-strategy legacy` cell.
-The reviewer decides; the draft defaults to (a) with C1 primary.
+**Why C4.** On smoke checks of C1, C2 and C3 the CADO filter merged the
+whole system (core dimension 0–1), so the Krylov solver is not exercised and
+any LA saving can only come from filter/reconstruction work. C4 keeps C3's
+curve, factor base, seeds and fractions and changes only the filter, which
+leaves a nonzero core. Smoke checks (2026-11-11, debug build, local, one
+seed, **not data**):
+
+| cell | arm | prefix | core dim | core nnz | row_ops | verified |
+|------|-----|--------|----------|----------|---------|----------|
+| C3 (CADO) | f0 / f0.25 / f0.5 | 358 / 384 / 410 | 1 / 1 / 1 | 33 / 33 / 33 | 2298 / 2342 / 2400 | yes |
+| C4 (legacy) | f0 / f0.25 / f0.5 | 358 / 384 / 410 | 10 / 9 / 9 | 190 / 179 / 175 | 9682 / 8741 / 8697 | yes |
+
+At degree 23 the legacy filter leaves a core of 0–5 (2 seeds), too small to
+add as a cell. Because the pool is drawn
+deterministically from the seed, C3 and C4 see identical relation pools (the
+smoke prefixes match), so C3 vs C4 is a paired filter contrast. It is
+secondary, not part of the decision rule: each cell's primary is f vs f0
+within the cell. A large-core cell (hundreds of columns; hours of collection, e.g. the
+N73 600-column run in la_engines) remains optional.
 
 ## Arms, seeds, order
 
