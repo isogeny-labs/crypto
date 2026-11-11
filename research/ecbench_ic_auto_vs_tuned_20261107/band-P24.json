@@ -1,0 +1,113 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "log2_r": 23.510149522128863,
+      "arm": "auto",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        12.68792370044816,
+        14.370563898427307,
+        29.514325680239576
+      ],
+      "charged_sum": 4210095.0,
+      "native_sum": 5583321,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "log2_r": 23.510149522128863,
+      "arm": "rho-v3",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        0.9482698000973412,
+        1.0416607565391358,
+        1.8821793645152896
+      ],
+      "charged_sum": 314654.0,
+      "native_sum": 309889,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "log2_r": 23.510149522128863,
+      "arm": "tuned",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        13.880878053545631,
+        15.052056683888637,
+        25.5926643569757
+      ],
+      "charged_sum": 4605940.0,
+      "native_sum": 3886194,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "log2_r": 23.510149522128863,
+      "arm": "tuned-aa",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        13.880878053545631,
+        15.052056683888637,
+        25.5926643569757
+      ],
+      "charged_sum": 4605940.0,
+      "native_sum": 3886194,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "a": "auto",
+      "b": "rho-v3",
+      "verdict": "rho-v3 < auto"
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "a": "auto",
+      "b": "tuned",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "a": "auto",
+      "b": "tuned-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "a": "rho-v3",
+      "b": "tuned",
+      "verdict": "rho-v3 < tuned"
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "a": "rho-v3",
+      "b": "tuned-aa",
+      "verdict": "rho-v3 < tuned-aa"
+    },
+    {
+      "curve": "icv1-fp24-tm4739-bb3c4b72",
+      "a": "tuned",
+      "b": "tuned-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

@@ -93,6 +93,12 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
         if let Some(below) = params.get("below") {
             return format!("every abscissa in [1, {below}) carrying a point, one column each");
         }
+        if params.get("size") == Some("auto") {
+            return format!(
+                "the round({} * r^(1/3)) smallest abscissae carrying a point, one column each",
+                params.get("scale").unwrap_or("0.5")
+            );
+        }
         match params.get("stride") {
             None | Some("1") => format!(
                 "the {} smallest abscissae carrying a point, one column each",
@@ -109,7 +115,13 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
         &[
             (
                 "size",
-                "abscissae in the base; the family optimum is about #E^(1/3)",
+                "abscissae in the base; the family optimum is about #E^(1/3); `auto` takes \
+                 round(scale * r^(1/3)), at least 4",
+            ),
+            (
+                "scale",
+                "with size=auto: the constant c of B = c * r^(1/3); default 0.5 (the pair-table \
+                 oracle's B(B+1) build against its r * N/(2B^2) trials with N ~ 0.6 B)",
             ),
             (
                 "stride",
@@ -152,7 +164,20 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
             }
             return Ok(prime_factor_base(self.instance, size));
         }
-        let size = params.u64("size")? as usize;
+        let size = if params.get("size") == Some("auto") {
+            let scale: f64 = params.get("scale").map_or(Ok(0.5), |v| {
+                v.parse::<f64>()
+                    .ok()
+                    .filter(|c| c.is_finite() && *c > 0.0)
+                    .ok_or_else(|| "scale must be a positive number".to_string())
+            })?;
+            ((scale * (self.instance.r as f64).cbrt()).round() as usize).max(4)
+        } else {
+            if params.get("scale").is_some() {
+                return Err("prime-abscissa: scale= needs size=auto".into());
+            }
+            params.u64("size")? as usize
+        };
         if size == 0 {
             return Err("factor base size must be positive".into());
         }
