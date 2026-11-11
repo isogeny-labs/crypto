@@ -37,11 +37,11 @@ until it resets.
    report/PDF, validator, VALIDATION.json, benchmarks row, leaderboard, PR.
 
 ## Runs in flight
-Iso Lab Job rule-v9-20261106-a1 (submitted 2026-11-10 22:02 UTC on owner authorization over the
-monthly budget; launch/README.md). Job UID 5a545fed-4434-4e26-bda4-ce55bee21c5e, pod
-33053ca8-de9a-4639-bea4-a129ce6d5461, node ip-10-84-68-133 (AMD EPYC 9R45), deadline 43200 s.
-Rows: s3://isolab-results-104186811093-us-east-2/runs/rule-v9-20261106-a1/33053ca8-de9a-4639-bea4-a129ce6d5461/
-Both pins held in the pod. On a Spot loss: launch/make-request.sh 2 <that prefix>.
+a1 (Job 5a545fed…, pod 33053ca8…) lost to a Spot interruption at 22:22 UTC 2026-11-10 after v9 k1n47 T01–T29
+(launch/receipts/a1-status/LOSS.md). a2 resumes it: Job rule-v9-20261106-a2, UID 83860681-8373-4335-89e3-3ac24f56adc3,
+pod 7f9a0e34-6f29-4ffd-acd6-bfc774e2902f on ip-10-84-0-50 (AMD EPYC 9R45), started 00:27 UTC 2026-11-11; pins held.
+Rows: s3://isolab-results-104186811093-us-east-2/runs/rule-v9-20261106-a2/7f9a0e34-6f29-4ffd-acd6-bfc774e2902f/
+One resumption left (a3 via launch/make-request.sh 3 <a2 prefix>).
 
 ## Stop and success conditions
 Rule v8's stop rule (failed row check, logarithm differing from §23, failed
