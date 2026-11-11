@@ -663,8 +663,8 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
                          "verify": online * sh["recovery_check"]},
             "ratio_rho": x["cold_ratio_ic_over_rho"]["value"],
             "ratio_rho_ci": list(x["cold_ratio_ic_over_rho"]["ci95"]),
-            "ratio_rho_before": before["cold_ratio_ic_over_rho"]["value"],
-            "online_speedup_before": before["online_speedup"]["mean_ratio"],
+            "ratio_rho_rule_before": before["cold_ratio_ic_over_rho"]["value"],
+            "online_speedup_rule_before": before["online_speedup"]["mean_ratio"],
             "before_label": "rule v7, rho as then",
             "online_speedup": x["online_speedup"]["mean_ratio"],
             "online_speedup_ci": list(x["online_speedup"]["ci95"]),
@@ -2846,7 +2846,7 @@ def markdown(doc: dict) -> str:
                 g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
                                                    if "ratio_rho_section23" in b else "")
-                + (f" (was {times(b['ratio_rho_before'])}, {b['before_label']})" if "ratio_rho_before" in b else ""),
+                + (f" (was {times(b['ratio_rho_rule_before'])}, {b['before_label']})" if "ratio_rho_rule_before" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
                 "✓" if b["verified"] else "✗", validation_cell(r["validation"])]
             L.append("| " + " | ".join(cells) + " |")
@@ -4654,9 +4654,9 @@ def page(doc: dict, standalone: bool) -> str:
             if "ratio_rho_section23" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section23"])} cold, '
                        f'{g3(b["online_speedup_section23"])}× online-only ratio (§23, at v0)</span>')
-            if "ratio_rho_before" in b:
-                ci += (f'<br><span class="muted">was {times(b["ratio_rho_before"])} cold, '
-                       f'{g3(b["online_speedup_before"])}× online-only ratio ({b["before_label"]})</span>')
+            if "ratio_rho_rule_before" in b:
+                ci += (f'<br><span class="muted">was {times(b["ratio_rho_rule_before"])} cold, '
+                       f'{g3(b["online_speedup_rule_before"])}× online-only ratio ({b["before_label"]})</span>')
             if "ratio_rho_section21" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
