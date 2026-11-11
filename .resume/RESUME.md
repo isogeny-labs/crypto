@@ -1,28 +1,25 @@
-# Resume: crypto @ claude/best-leads-experiments-jikl0j
+# Resume: Chained ECDLP transfers / PR #3877
 
 ## Goal
-Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
-Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
-0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
-(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
+Continue the user's autonomous research across crypto, cryptanalysis and crypto-autoresearcher. Prioritize explicit DLP-preserving transfers, chained Jacobians, prime-field descent and fully accounted solving cost.
 
 ## Lead / hypothesis
-Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
-sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
-p256 below 1 at k = 32; cv0 vs lazy two-sided.
+CT01: replace the legacy split-only Python maps with native Mumford maps on the odd-degree chart of C:y²=x⁶+1 over F101. CT02: compare arbitrary classes with the existing BigUint implementation. CT03/CT04: structural kernel/descent proof, then genuine Jacobian hop. See research/chained_jacobian_transfers_20261110/QUEUE.md.
 
 ## Spec
-research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
-x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
-Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
-on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
-(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
-push of this branch is the checkpoint.
+Historical PROTOCOL.md is frozen history. New development uses Rust and public toy fixture p=101, root=10, E:y²=x³+1, r=17, P=(4,41). Sources and exact chart obligations: SOURCES_20261111.md. No experiment/benchmark is admitted yet.
 
-## State (23:20Z: EKS failed; local L0 panel done, results committed)
-Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
-push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
+## State
+Repositories restored. Branch research/chained-jacobian-transfer-20261110 at 4ff4da410d6b10834a59e843455a79a12b1baa30. KB unavailable; autoresearcher locked; no AWS/checkpoint binding. Native replacement not yet implemented. Historical audit failures saved outside Git in /workspace/scratch/pr3877-ci-failed.txt and reference unrelated archived sessions.
 
 ## Next steps
-1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
-2. Report + figure + PDF (research-visuals), benchrec record close, PR.
+In /workspace/crypto: implement native crate, cargo test --release --manifest-path research/chained_jacobian_transfers_20261110/native/Cargo.toml. Add differential root example, then run cargo test --release --lib and touched examples. Register claims with actual standing, retain output and reports, commit/push to #3877. Follow QUEUE.md for next task.
+
+## Runs in flight
+None. Rust stable 1.99.1 installed under ~/.cargo/bin; use that path. No remote allocation or paid job.
+
+## Stop and success conditions
+Local development checks only until checkpoint gate can push and live IsoLab budgets/capacity are known. Do not bypass S3 gate. Continue unblocked implementation/proof work; preserve state on session resource limit. No speedup promotion without complete measured evidence and independent signed verdict.
+
+## Open questions
+Restore KEY through environment secret settings for autoresearcher; restore checkpoint token/AWS via configured bindings. Need primary Richelot source review and a concrete correspondence before claiming a new chain. Need exact branch protection and final-head CI before merge.
