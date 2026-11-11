@@ -59,6 +59,7 @@ by zero. Source infinities use
 `U∞=lead(G1)H1+lead(G2)H2`,
 `V∞=lead(G1)H1/(source_cap*target_scale)`.
 Prove/validate any degree restrictions used for this fixed model.
+[pcc:unverified]
 
 With ψ(P)=[fiber(P)−K_target], the two source infinity images are negatives.
 For canonical source finite degree m and plus count n, evaluate
