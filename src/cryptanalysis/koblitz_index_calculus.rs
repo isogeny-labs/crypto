@@ -126,6 +126,7 @@
 
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
+use std::hash::BuildHasherDefault;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -150,6 +151,7 @@ use crate::cryptanalysis::ec_index_calculus::{
 };
 use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
 use crate::cryptanalysis::group_op_count;
+use crate::cryptanalysis::ic_boundary::MixHasher;
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastCurve, FastPoint, FrobeniusCanon};
 use crate::cryptanalysis::koblitz_fast_arith::{pack_fast, FastPoint as ArithFastPoint};
@@ -1409,11 +1411,21 @@ pub fn points_with_x(curve: &BinaryCurve, x: &F2mElement) -> Vec<BinaryPoint> {
 /// therefore the floor everything else in that phase is measured
 /// against (`examples/koblitz_select_decomposition.rs`).
 pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint> {
+    let (lifts, count) = lift_x_packed(curve, curve.field.from_element(x));
+    lifts[..count].iter().map(|&p| curve.lower(p)).collect()
+}
+
+/// [`points_with_x_fast`] on a packed abscissa, before lowering: the
+/// points above `coordinate` in the same order, `count` of them (0, 1 or
+/// 2). The single-word factor-base selection builds on this so that a
+/// point is lowered to a `BinaryPoint` once, at the end.
+fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) {
     debug_assert!(curve.n % 2 == 1);
     let field = &curve.field;
-    let coordinate = field.from_element(x);
+    let none = [FastPoint::INFINITY; 2];
     if coordinate == 0 {
-        return vec![curve.lower(FastPoint::affine(0, field.sqr_k(curve.b, curve.n - 1)))];
+        let point = FastPoint::affine(0, field.sqr_k(curve.b, curve.n - 1));
+        return ([point, FastPoint::INFINITY], 1);
     }
     let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
@@ -1426,11 +1438,29 @@ pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint>
     // H(rhs)^2 + H(rhs) = rhs + Tr(rhs) for odd degree. Testing the
     // equation is the same trace-zero admission check as the general solver.
     if field.sqr(root) ^ root != rhs {
-        return Vec::new();
+        return (none, 0);
     }
     let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
-    vec![curve.lower(point), curve.lower(curve.neg(point))]
+    ([point, curve.neg(point)], 2)
 }
+
+/// [`FastCurve::lower`] without the `BigUint` round trip: the same
+/// `BinaryPoint`, built from the words directly.
+fn lower_packed(n: u32, p: FastPoint) -> BinaryPoint {
+    if p.infinity {
+        BinaryPoint::Infinity
+    } else {
+        BinaryPoint::Affine {
+            x: F2mElement::from_words(&[p.x], n),
+            y: F2mElement::from_words(&[p.y], n),
+        }
+    }
+}
+
+/// A `u64`-keyed set and map hashed by [`MixHasher`]: the keys are packed
+/// points or abscissa words, and SipHash dominated the probes.
+type WordSet = HashSet<u64, BuildHasherDefault<MixHasher>>;
+type WordMap<V> = HashMap<u64, V, BuildHasherDefault<MixHasher>>;
 
 /// The scalar `λ` with `π(Q) = [λ]Q` for all `Q ∈ ⟨G⟩`.
 ///
@@ -3064,6 +3094,23 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
         return Err("a factor base needs at least one point".into());
     }
     let curve = FastCurve::new(&kc.curve).ok_or("field too wide for single-word arithmetic")?;
+    if curve.n % 2 == 1 && kc.frobenius_is_endomorphism {
+        return build_subgroup_orbit_factor_base_packed(kc, &curve, seed, points);
+    }
+    build_subgroup_orbit_factor_base_reference(kc, &curve, seed, points)
+}
+
+/// The selection in the general representation: abscissae as `BigUint`
+/// keys, Frobenius by [`KoblitzCurve::frobenius_x`], each rebuild through
+/// [`build_explicit_frobenius_orbit_factor_base`]. The only path for an
+/// even degree or a non-endomorphic Frobenius, and the reference
+/// [`build_subgroup_orbit_factor_base_packed`] is checked against.
+fn build_subgroup_orbit_factor_base_reference(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    seed: u64,
+    points: usize,
+) -> Result<(FrobeniusFactorBase, FactorBaseSelectionCost), String> {
     let cofactor = &kc.cofactor;
     let mut rng = StdRng::seed_from_u64(seed);
     let mut representatives: Vec<F2mElement> = Vec::new();
@@ -3143,6 +3190,131 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
     cost.abscissae_drawn = drawn;
     base.map(|b| (b, cost))
         .ok_or_else(|| "subgroup orbit sampling produced no base".into())
+}
+
+/// [`build_subgroup_orbit_factor_base_reference`] in single-word
+/// arithmetic, for an odd degree below 64 with an endomorphic Frobenius.
+///
+/// The same draws from the same generator in the same order, the same
+/// decisions and the same base, bit for bit, with the same counters: the
+/// selection cost and the thread's Frobenius-map count. What changes is
+/// the representation. Abscissae and their orbits are `u64` words squared
+/// by the field's `sqr_k` and kept in a [`MixHasher`] set, not `BigUint`
+/// keys squared by `F2mElement`; the base is built from the sorted words
+/// (the `BTreeMap<BigUint, _>` order of the reference), its points lifted
+/// and its orbits walked packed, and each point is lowered once.
+/// `subgroup_orbit_selection_agrees_in_both_representations` pins it.
+fn build_subgroup_orbit_factor_base_packed(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    seed: u64,
+    points: usize,
+) -> Result<(FrobeniusFactorBase, FactorBaseSelectionCost), String> {
+    debug_assert!(curve.n % 2 == 1 && kc.frobenius_is_endomorphism && kc.n < 64);
+    let field = &curve.field;
+    let cofactor = &kc.cofactor;
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut representatives: Vec<u64> = Vec::new();
+    let mut seen = WordSet::default();
+    let mut base: Option<FrobeniusFactorBase> = None;
+    let batch = 8usize;
+    let cap = 1u64 << kc.n;
+    let mut drawn = 0u64;
+    let budget = 1024u64 * points as u64;
+    let mut abscissae = WordSet::default();
+    let mut cost = FactorBaseSelectionCost::default();
+    let extension = kc.extension_degree();
+    while base.as_ref().is_none_or(|b| b.points.len() < points) {
+        let mut added = 0usize;
+        while added < batch {
+            drawn += 1;
+            if drawn > budget {
+                return Err(format!(
+                    "drew {drawn} abscissae without reaching {points} subgroup points on {}",
+                    kc.label()
+                ));
+            }
+            let (lifts, count) = lift_x_packed(curve, rng.gen_range(1..cap));
+            if count == 0 {
+                continue;
+            }
+            cost.lifts_found += 1;
+            cost.cofactor_multiplications += 1;
+            let projected = curve.mul(lifts[0], cofactor);
+            if projected.infinity {
+                continue;
+            }
+            if !seen.insert(projected.x) {
+                continue;
+            }
+            let mut orbit = projected.x;
+            for _ in 0..extension {
+                abscissae.insert(orbit);
+                // `kc.frobenius_x`, counted as it counts.
+                group_op_count::count_frobenius_maps(1);
+                orbit = field.sqr_k(orbit, kc.k);
+                cost.frobenius_squarings += u64::from(kc.k);
+            }
+            representatives.push(projected.x);
+            added += 1;
+        }
+        if 2 * abscissae.len() < points {
+            continue;
+        }
+        cost.rebuilds += 1;
+        // The reference rebuild closes every representative under
+        // Frobenius again, which is the set `abscissae` already holds.
+        group_op_count::count_frobenius_maps(representatives.len() as u64 * u64::from(extension));
+        base = explicit_orbit_base_packed(kc, curve, representatives.len(), &abscissae);
+    }
+    cost.abscissae_drawn = drawn;
+    base.map(|b| (b, cost))
+        .ok_or_else(|| "subgroup orbit sampling produced no base".into())
+}
+
+/// [`build_explicit_frobenius_orbit_factor_base`] followed by
+/// [`finish_factor_base_domain`], from the Frobenius-closed abscissa
+/// words: the same base, built packed and lowered once.
+fn explicit_orbit_base_packed(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    representatives: usize,
+    abscissae: &WordSet,
+) -> Option<FrobeniusFactorBase> {
+    if representatives == 0 {
+        return None;
+    }
+    let mut xs: Vec<u64> = abscissae.iter().copied().collect();
+    xs.sort_unstable();
+    let mut fast: Vec<FastPoint> = Vec::with_capacity(2 * xs.len());
+    for &x in &xs {
+        let (lifts, count) = lift_x_packed(curve, x);
+        fast.extend_from_slice(&lifts[..count]);
+    }
+    let (orbit_of, orbits, signed_orbit_of, signed_orbits) =
+        orbit_maps_from_packed(kc, curve, &fast)?;
+    if signed_orbits.iter().map(Vec::len).sum::<usize>() != fast.len() {
+        return None;
+    }
+    Some(FrobeniusFactorBase {
+        domain: FactorBaseDomain::ExplicitFrobeniusOrbits { representatives },
+        ell: kc.n,
+        f_j: 0,
+        linearised_exponents: Vec::new(),
+        subspace: xs
+            .iter()
+            .map(|&x| F2mElement::from_words(&[x], kc.n))
+            .collect(),
+        subspace_basis: (0..kc.n)
+            .map(|i| F2mElement::from_bit_positions(&[i], kc.n))
+            .collect(),
+        points: fast.iter().map(|&p| lower_packed(kc.n, p)).collect(),
+        orbits,
+        orbit_of,
+        signed_orbits,
+        signed_orbit_of,
+        derived: Default::default(),
+    })
 }
 
 /// **Keep only the listed signed orbits** of a factor base.
@@ -3268,7 +3440,19 @@ fn orbit_maps_packed(
         return orbit_maps_bigint(kc, points);
     }
     let fast: Vec<FastPoint> = points.iter().map(|p| curve.lift(p)).collect();
-    let mut index_of: HashMap<u64, usize> = HashMap::with_capacity(points.len() * 2);
+    orbit_maps_from_packed(kc, curve, &fast)
+}
+
+/// The walks of [`orbit_maps_packed`] on points already packed.
+fn orbit_maps_from_packed(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    fast: &[FastPoint],
+) -> Option<OrbitMaps> {
+    debug_assert!(kc.frobenius_is_endomorphism);
+    let points = fast;
+    let mut index_of: WordMap<usize> =
+        WordMap::with_capacity_and_hasher(points.len() * 2, Default::default());
     for (i, p) in fast.iter().enumerate() {
         index_of.insert(p.pack(), i);
     }
@@ -11004,7 +11188,7 @@ fn projected_signed_orbit_map_fast(
     let fc = FastCurve::new(&kc.curve)?;
     let (projected, _) = project_by_frobenius_orbits(kc, &fc, fb);
     let mut representatives: Vec<FastPoint> = Vec::new();
-    let mut seen: HashSet<u64> = HashSet::new();
+    let mut seen = WordSet::with_capacity_and_hasher(projected.len(), Default::default());
     for &point in &projected {
         if point.infinity || seen.contains(&point.pack()) {
             continue;
@@ -11027,7 +11211,10 @@ fn projected_signed_orbit_map_fast(
     }
     representatives.sort_unstable_by_key(|p| p.pack());
 
-    let mut location_by_key: HashMap<u64, (usize, u32, bool)> = HashMap::new();
+    let mut location_by_key: WordMap<(usize, u32, bool)> = WordMap::with_capacity_and_hasher(
+        2 * kc.n as usize * representatives.len(),
+        Default::default(),
+    );
     for (orbit, &representative) in representatives.iter().enumerate() {
         let mut current = representative;
         for k in 0..kc.n {
@@ -20591,6 +20778,92 @@ mod tests {
     /// the only thing the round moved is the time selection takes. If
     /// they ever disagree, the measured gain is meaningless and the base
     /// is wrong, in that order of importance.
+    /// The single-word subgroup selection against its `BigUint`
+    /// reference: the same base field for field (points, abscissae, both
+    /// orbit maps, domain), the same selection cost, the same thread
+    /// counters, and the same projected signed-orbit map as the
+    /// general-field construction gives. Rule v10 rests on this.
+    #[test]
+    fn subgroup_orbit_selection_agrees_in_both_representations() {
+        let mut curves: Vec<KoblitzCurve> = Vec::new();
+        for a in [0u8, 1] {
+            for n in [13u32, 17, 19, 23, 29, 31, 37, 41, 43, 47] {
+                if let Some(kc) = KoblitzCurve::new(a, n) {
+                    curves.push(kc);
+                }
+            }
+        }
+        for (k, n) in [(3u32, 39u32), (3, 45)] {
+            if let Some(kc) = KoblitzCurve::subfield(k, n, 1, 1) {
+                curves.push(kc);
+            }
+        }
+        let mut checked = 0;
+        for kc in &curves {
+            let Some(curve) = FastCurve::new(&kc.curve) else {
+                continue;
+            };
+            if curve.n % 2 == 0 || !kc.frobenius_is_endomorphism {
+                continue;
+            }
+            for (seed, points) in [(1u64, 64usize), (7, 600), (201, 1500)] {
+                let (fast, fast_ops) = group_op_count::counted(|| {
+                    build_subgroup_orbit_factor_base_packed(kc, &curve, seed, points)
+                });
+                let (slow, slow_ops) = group_op_count::counted(|| {
+                    build_subgroup_orbit_factor_base_reference(kc, &curve, seed, points)
+                });
+                let label = format!("{} seed {seed}, {points} points", kc.label());
+                let (fast, fast_cost, slow, slow_cost) = match (fast, slow) {
+                    (Ok((f, fc)), Ok((s, sc))) => (f, fc, s, sc),
+                    (Err(f), Err(s)) => {
+                        assert_eq!(f, s, "{label}: the errors differ");
+                        continue;
+                    }
+                    (f, s) => panic!("{label}: one path failed: {:?} / {:?}", f.err(), s.err()),
+                };
+                assert_eq!(fast_cost, slow_cost, "{label}: selection cost");
+                assert_eq!(fast_ops, slow_ops, "{label}: thread counters");
+                assert_eq!(fast.domain, slow.domain, "{label}: domain");
+                assert_eq!(fast.ell, slow.ell, "{label}: ell");
+                assert_eq!(fast.f_j, slow.f_j, "{label}: f_j");
+                assert_eq!(fast.linearised_exponents, slow.linearised_exponents);
+                assert_eq!(fast.subspace, slow.subspace, "{label}: abscissae");
+                assert_eq!(fast.subspace_basis, slow.subspace_basis, "{label}: basis");
+                assert_eq!(fast.points, slow.points, "{label}: points");
+                assert_eq!(fast.orbits, slow.orbits, "{label}: orbits");
+                assert_eq!(fast.orbit_of, slow.orbit_of, "{label}: orbit_of");
+                assert_eq!(
+                    fast.signed_orbits, slow.signed_orbits,
+                    "{label}: signed_orbits"
+                );
+                assert_eq!(
+                    fast.signed_orbit_of, slow.signed_orbit_of,
+                    "{label}: signed_orbit_of"
+                );
+                // The public entry point takes the packed path here.
+                let (public, _) = build_subgroup_orbit_factor_base_with_cost(kc, seed, points)
+                    .expect("public selection");
+                assert_eq!(public.points, slow.points, "{label}: public entry point");
+                // The projection: the single-word map, as the projection
+                // phase builds it, against the general-field construction.
+                let fast_map = projected_signed_orbit_map_fast(kc, &fast).expect("fast map");
+                let (projected, _) = project_by_frobenius_orbits_generic(kc, &slow);
+                let slow_map = projected_signed_orbit_map_slow(kc, &slow, projected);
+                assert_eq!(
+                    fast_map.orbit_of, slow_map.orbit_of,
+                    "{label}: projected orbit_of"
+                );
+                assert_eq!(
+                    fast_map.representatives, slow_map.representatives,
+                    "{label}: projected representatives"
+                );
+                checked += 1;
+            }
+        }
+        assert!(checked >= 30, "only {checked} cases compared");
+    }
+
     #[test]
     fn factor_base_orbit_maps_agree_in_both_representations() {
         let mut checked = 0;
