@@ -577,6 +577,21 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
 
+## Multi-target IC4 against the cheapest of four rho arms, outside tables A–C
+
+Many targets on one prime-order Weierstrass curve (2^22 to 2^26, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only pair-sum table and tries x(Q ± W) with one shared inversion; the reference is the cheapest of four rho variants (anchored, sibling, x-only sibling, sequential database) at three database sizes, chosen per configuration and price. IC4 / rho and IC4 / BSGS per target, median [95% bootstrap]; the BSGS ratio is the distance remaining. Class: multi-target method. validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) with the §5a band (benchmarks/20261111-mt-fieldops-ic4/VALIDATION.json).
+
+| bits | T | IC4/rho h=0 | h=0.1 | h=1 | §5a | IC4/BSGS h=0 | h=1 |
+|--:|--:|--:|--:|--:|:--|--:|--:|
+| 22 | 1024 | 1.053 [1.040, 1.058] | 1.066 [1.052, 1.071] | 1.120 [1.101, 1.127] | dearer | 1.45 | 1.60 |
+| 24 | 1024 | 1.106 [1.099, 1.118] | 1.121 [1.114, 1.134] | 1.182 [1.174, 1.199] | dearer | 1.64 | 1.77 |
+| 24 | 4096 | 0.976 [0.972, 0.980] | 0.983 [0.979, 0.988] | 1.016 [1.010, 1.022] | unranked | 1.33 | 1.46 |
+| 24 | 16384 | 0.933 [0.932, 0.937] | 0.935 [0.933, 0.939] | 0.942 [0.939, 0.948] | cheaper | 1.18 | 1.30 |
+| 25 | 4096 | 0.987 [0.983, 0.993] | 0.996 [0.992, 1.002] | 1.033 [1.027, 1.040] | unranked | 1.40 | 1.51 |
+| 25 | 16384 | 0.926 [0.923, 0.928] | 0.928 [0.925, 0.931] | 0.938 [0.935, 0.942] | cheaper | 1.23 | 1.35 |
+
+Study: [research/mt_fieldops_v2_20261111/](../../research/mt_fieldops_v2_20261111/); [report](../../research/mt_fieldops_v2_20261111/REPORT.pdf); source `research/mt_fieldops_v2_20261111/results/holdout/summary.json`.
+
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
 Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion (m = 4, N = 12, f4_fp, p = 786433, two random targets, uncontended) reduces the F4 stage from 1.102e+11 to 4.010e+05 counted field operations (2.75e+05×), the widest matrix from 21,619 to 3,663 columns (5.90×) and the time per system from 70.2 s to 0.0087 s (8.07e+03×). Class: solver-stage diagnostic; no pipeline is priced and no curve verdict changes. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
