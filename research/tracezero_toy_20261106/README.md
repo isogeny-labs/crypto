@@ -122,7 +122,7 @@ sign-symmetric random.
   registered verdicts are unchanged. A rerun should exclude j = 1728 (b = 0), or stratify it
   in the protocol.
 
-## Why b = 0 curves lose coverage: the 2-isogeny descent class (post hoc, verified on toy fields)
+## Why b = 0 curves lose coverage: the 2-isogeny descent class (post hoc, checked on toy fields [pcc:unverified])
 
 `subgroup_index_b0.py` and `descent_coset_test.py` (outputs `*.out.txt`; p = 23, 37, 53; k = 2).
 
