@@ -135,7 +135,7 @@ struct SymStats {
     rels: usize,
 }
 
-fn sym_solve(
+fn sym_solve_ex(
     c: &FastCurve,
     g: Pt,
     q: Pt,
@@ -144,6 +144,7 @@ fn sym_solve(
     extra: usize,
     seed: u64,
     summands: u32,
+    fix: bool,
 ) -> Option<(u64, SymStats)> {
     let f = c.f;
     let n = c.n;
@@ -196,7 +197,7 @@ fn sym_solve(
         }
     };
     // entries: (key, i, j, m, sigma_neg)
-    let mut ents: Vec<(u64, u32, u32, u8, u8)> = Vec::new();
+    let mut ents: Vec<(u64, u32, u32, u8, u8, u8)> = Vec::new();
     let mut heads: Vec<u32> = Vec::new();
     let mut next: Vec<u32> = Vec::new();
     let mut hmask = 0usize;
@@ -206,7 +207,10 @@ fn sym_solve(
         for i in 0..b_size {
             let fi = reps[i];
             if let Some(dbl) = c.double(fi) {
-                ents.push((canon(dbl.x).0, i as u32, i as u32, 0, 0));
+                {
+                    let (kk, se) = canon(dbl.x);
+                    ents.push((kk, i as u32, i as u32, 0, 0, if fix { se as u8 } else { 0 }));
+                }
             }
             for j in i..b_size {
                 dd.clear();
@@ -223,8 +227,28 @@ fn sym_solve(
                     }
                     let sx = c.add_x_with_inv(fi, qj, dd[t]);
                     let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[t]);
-                    ents.push((canon(sx).0, i as u32, j as u32, m as u8, 0));
-                    ents.push((canon(dx2).0, i as u32, j as u32, m as u8, 1));
+                    {
+                        let (kk, se) = canon(sx);
+                        ents.push((
+                            kk,
+                            i as u32,
+                            j as u32,
+                            m as u8,
+                            0,
+                            if fix { se as u8 } else { 0 },
+                        ));
+                    }
+                    {
+                        let (kk, se) = canon(dx2);
+                        ents.push((
+                            kk,
+                            i as u32,
+                            j as u32,
+                            m as u8,
+                            1,
+                            if fix { se as u8 } else { 0 },
+                        ));
+                    }
                 }
             }
         }
@@ -481,7 +505,17 @@ fn main() {
                 let mut rng = StdRng::seed_from_u64(0xA11CE ^ ins ^ c.n ^ bsz as u64);
                 let k = rng.gen_range(2..c.n);
                 let q = c.mul(Some(g), k).unwrap();
-                let sym = sym_solve(&c, g, q, lam, bsz, extra, ins + 1, summ);
+                let sym = sym_solve_ex(
+                    &c,
+                    g,
+                    q,
+                    lam,
+                    bsz,
+                    extra,
+                    ins + 1,
+                    summ,
+                    std::env::var_os("SHIFTFIX").is_some(),
+                );
                 let t0 = Instant::now();
                 let plain = if std::env::var_os("NOPLAIN2").is_some() {
                     None
