@@ -38,8 +38,7 @@ value; the standardized dollar-cost field is null.
 )
 
 The cache roots are local physical paths under
-`/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/`, recorded as
-reproduced from published sources. This packet preserves the exact 593,986-byte
+`/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/`, derived during the prior retained build attempts. This packet preserves the exact 593,986-byte
 manifest and small receipts. It does not contain or claim upload of the
 2,618,767,578-byte cache body.
 
