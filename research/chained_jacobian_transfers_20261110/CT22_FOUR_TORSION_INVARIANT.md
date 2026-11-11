@@ -58,7 +58,19 @@ A common compatible mod-4 Frobenius chart is
 
     F=[[0,3],[1,1]] on each elliptic 2-dimensional block.
 
-It satisfies F^2-F+I=0 (mod 4); modulo 2 it cyclically permutes
+It satisfies F^2-F+I=0 (mod 4), so **F^3=-I and F^6=I** on
+E[4]. For every primitive order-four point R, its Frobenius orbit
+has exact length six, while its x-coordinate (which identifies R
+with -R) has exact Frobenius orbit length three. Consequently,
+**all primitive 4-torsion x-coordinates lie in F_(101^3), and the
+full points first lie in F_(101^6)**. This is a useful concrete
+field-degree bound for the next actual Kohel-kernel lift calculation:
+evaluate the rational x-isogeny in the cubic field and track its
+y-sign in the sextic field. It follows from the already-known
+Frobenius polynomial, not from constructing real E[4] points here.
+The Rust test checks F^3=-I and the exact point/x periods on all
+twelve primitive torsion classes of one elliptic 4-torsion block.
+Modulo 2 it cyclically permutes
 the three nonzero 2-torsion points. The test confirms that F
 preserves G, the induced pairing and group operation. It finds
 15 total maximal isotropic 2-planes in J[2], **exactly three**
