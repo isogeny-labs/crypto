@@ -10,6 +10,7 @@
 | C2 | With the new defaults 720 runs on 240 fresh instances all recovered | `results/default_flip/robust/rows.jsonl` (artifact store, sha256 pinned) | yes |
 | C3 | H1 with the new defaults: paired trials on/off 0.277 (cofactor 4), 0.153 (cofactor 8), exactly 1.000 (cofactor 1); 288 runs, all recovered | `results/h1_defaults/rows.jsonl` (git) | yes |
 | C4 | Real E-222 and M-221: joint relation point costs 0.529 and 0.581 of the former path | `native/native_timing.txt` | no: wall-time re-measurement (see `claims.json`) |
+| C5 | Section 5a band: on 72 instances the IC arm (default configuration, all counters emitted) costs more than the matched negation-map rho on the same instance at every weight w = 0, 0.1, 1 in all 72 (and in all 48 with H1); pooled median IC / rho 254 / 244 / 179; the distance grows with size | `band/` (120 per-instance outputs, hash manifest `band/MANIFEST.json`) | yes, counters and rho GAE are deterministic given the seed |
 
 Scope of every claim: prime-order or small-cofactor toy instances (subgroup orders up to about 2^23), local unisolated host, wall times diagnostic, `trials_total` the operation count. The 660x in C1 is against the old untuned defaults of this tool. Cite as `[pcc:unverified]` until a pcc claim exists.
 
@@ -23,6 +24,8 @@ python3 -I research/ic_e222_m221_20261106/evidence/recompute.py \
 cargo build --release --bin ic
 python3 -I research/ic_e222_m221_20261106/evidence/replay.py --ic target/release/ic --k 30 [--nonce HEX] [--robust-rows ...]
 ```
+
+`run_band_panel.py --ic target/release/ic --out DIR` regenerates the 120 band outputs; `band.py DIR/default/*.json` prices them at w = 0, 0.1, 1.
 
 `replay.py` regenerates the three instance sets from their seeds and checks their manifest hashes (`claims.json`), draws rows with a nonce, reruns them with the recorded arguments and compares `trials_total`, relations collected and the recovered scalar. It samples the old-defaults arm from rungs up to 17 bits only (a 22-bit old-defaults solve takes about two minutes). It records the blake3 of the binary it ran and `git rev-parse HEAD`.
 
@@ -47,8 +50,21 @@ Pre-gate status: these results sit under `research/` only. If any is promoted to
 
 ## Replay result (producer-run, independent = false)
 
-`replay.py --ic target/release/ic --k 30` with nonce `66b9b37129514d0e`, binary blake3 `bf83d502ad3d05b709c4eec47d4d7680093a5cb56b45e25d951ee55e73af37d9` built at git head `b72976d354` (a later commit than the one that produced the rows, with the multi-word relation point and other changes merged in): 90 rows drawn (30 each from the paired, robustness and H1-with-defaults files; the old-defaults arm only from rungs up to 17 bits), 90 reproduced `trials_total`, relations collected and the recovered scalar exactly, 0 mismatches; the three regenerated instance sets match their pinned manifests. Output: `replay-log.json`. This shows the recorded counts are reproducible by a rebuilt binary, not that anyone other than the producer ran it.
+`replay.py --ic target/release/ic --k 30` with nonce `3f11131df8784337`, binary blake3 `1e8e07b434fc35810636e6486ec3241489b0ce66a91e2ae113b0a7e88c0f5f16` (the binary that produced the band panel, `band/binary.json`) at git head `b4506f65dc`: 120 rows drawn (30 each from the paired, robustness, H1-with-defaults and band files; the old-defaults arm only from rungs up to 17 bits), 120 reproduced exactly (`trials_total`, relations collected and the recovered scalar for the first three; every IC counter, the matched rho's mean GAE and its counters for the band), 0 mismatches; the three regenerated instance sets match their pinned manifests. Output: `replay-log.json`. This shows the recorded counts are reproducible by a rebuilt binary, not that anyone other than the producer ran it.
 
 ## What the gate says about the draft
 
-`gate-output.txt` is the output of `python3 scripts/validation_gate.py evidence` on a copy of this directory with `VALIDATION.draft.json` renamed `VALIDATION.json` (the copy must sit at the same directory depth as this one, because the paths in the validator report are relative to it). Exit status 1, for exactly these reasons: both pinned files say `independent` is not true; the robustness rows are in the artifact store, not the repository (`../results/default_flip/robust/rows.jsonl` is not a file; fetch by sha256 from its `.artifacts.json`); and the rho reference is not matched to the protocol, not in the same unit or process, and has no 0 / 0.1 / 1 GAE band. All other raw-data paths resolve.
+`gate-output.txt` is the output of `python3 scripts/validation_gate.py evidence` on a copy of this directory (same directory depth, with `band/MANIFEST.json`) with `VALIDATION.draft.json` renamed `VALIDATION.json`. Exit status 1, for exactly these reasons: both pinned files say `independent` is not true (they are producer-run), and the robustness rows are in the artifact store, not the repository (`../results/default_flip/robust/rows.jsonl` is not a file; fetch by sha256 from its `.artifacts.json`). The rho reference (matched negation-map walk, same unit, same process, band at 0 / 0.1 / 1 GAE, order holding across the band) no longer appears among the refusals; its values are in `VALIDATION.draft.json` and the reading in `../RESULTS_band.md`.
+
+## What the gate still needs
+
+| gate item | state | what is missing |
+|---|---|---|
+| replay certificate | `replay-log.json`, `independent: false` | an independent party reruns `replay.py` (or their own replay) with their own binary and writes the certificate; under the sabotage contract it carries a keyring signature (`pcc verdict` / `sign`) |
+| validator report | `recompute-output.json`, `independent: false` | an independent recompute of the headline numbers from the raw data, with its own code |
+| rho reference with the 0 / 0.1 / 1 GAE band | done for the panel (C5) | the band is for toy sizes; limits in `../RESULTS_band.md` (rho's cost is a floor if it has unnamed unpriced work; IC group operations are derived from the scalars) |
+| raw data in the repository | the robustness rows (`results/default_flip/robust/rows.jsonl`) are in the artifact store | fetch by sha256 (`.artifacts.json`) into the evidence directory before the gate reads them |
+| pcc claim ids | none registered | `python3 tools/pcc/pcc.py claim new --kind ... --statement ... --proof ...` by the producer, verdict signed by a keyring holder; not run here because registering appends to the shared hash-chained ledger |
+| process | not done | Conductor task, knowledge-base queries (`research-kb` has no binary here), `ecdb` lookup, resume checkpoint, benchmark record (`tools/benchrec.py`), EKS run (AWS credentials in this environment are rejected; no isolab image contains `ic`; `../validation_path/REPORT.md`) |
+
+Pre-gate status: these results sit under `research/` only. If any is promoted to a row, it renders as "unvalidated (pre-gate)" at best and the builder refuses it as new. Do not add one before the items above exist.

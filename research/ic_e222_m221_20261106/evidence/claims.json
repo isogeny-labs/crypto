@@ -53,6 +53,12 @@
    "path": "results/rho1/rho_matched.json",
    "sha256": "abec3fd74ca2ae2b4cc7cf23eb5ebe9029cf3e0a6d93947b525c24ceb0f27c47",
    "in_git": true
+  },
+  "band": {
+   "path": "evidence/band/MANIFEST.json",
+   "sha256": "c3c7f0581bcdc2b64b5e445d27c748fb3e6de1a11085564230b6346f56b1c29b",
+   "in_git": true,
+   "note": "hash manifest of the 120 per-instance outputs under evidence/band/{default,h1}/; produced by run_band_panel.py"
   }
  },
  "claims": [
@@ -158,6 +164,49 @@
     }
    ],
    "replay": "not replayed by replay.py: wall-time, needs `cargo build --release --example relation_point_native` and native/native_params.py; rerun is a timing re-measurement, not a deterministic replay"
+  },
+  {
+   "id": "C5",
+   "statement": "Band, section 5a: on 72 instances (E, M, W; generator rungs 12, 16, 20) the IC arm (default configuration, all counters emitted) costs more than the matched negation-map rho on the same instance at every weight w = 0, 0.1, 1 in all 72 instances; the pooled median IC/rho is 254 / 244 / 179 at w = 0 / 0.1 / 1. The distance grows with size (per-rung table in RESULTS_band.md).",
+   "source_note": "RESULTS_band.md",
+   "raw": "band",
+   "headline": [
+    {
+     "name": "band_default_instances",
+     "claimed": 72,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "band_default_order_holds_instances",
+     "claimed": 72,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "band_h1_instances",
+     "claimed": 48,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "band_h1_order_holds_instances",
+     "claimed": 48,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "band_default_median_ic_over_rho_w0",
+     "claimed": 254.28,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "band_default_median_ic_over_rho_w0.1",
+     "claimed": 243.66,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "band_default_median_ic_over_rho_w1",
+     "claimed": 179.24,
+     "rel_tol": 0.002
+    }
+   ]
   }
  ],
  "rho_reference": {

@@ -46,6 +46,27 @@ if os.path.exists(path("h1_defaults")):
         val[f"{fam}_trials_on_over_off_median"]=statistics.median(rat)
         if fam=="W": val["W_pairs_exactly_1"]=sum(x==1.0 for x in rat)
     val["h1_all_recovered"]=int(all(r["ok"] for r in H))
+# C5 band (section 5a): re-derived from the raw per-instance outputs listed in the manifest
+if os.path.exists(path("band")):
+    man=json.load(open(path("band")));bdir=os.path.dirname(path("band"))
+    NON_OP={"residual_table_bytes_uncharged","factor_base_vec_bytes_floor_uncharged","native_table_bytes_uncharged"}
+    def unp(c): return sum(v for k,v in c.items() if k.endswith("_uncharged") and k not in NON_OP)
+    W=(0.0,0.1,1.0);band={}
+    for rel,h in man["files"].items():
+        p=os.path.join(bdir,os.path.relpath(rel,"band"))
+        if sha(p)!=h: problems.append(f"band: {rel} sha256 differs from the manifest");continue
+        o=json.load(open(p));cfg=o["_meta"]["config"];c=o["ic"]["stages"]["counters"];m=o["matched_rho"]
+        icc=c["group_additions"]+c["group_doublings"];icu=unp(c);rc=m["mean_gae"];ru=unp(m["counters_per_run"])
+        r=[(icc+w*icu)/(rc+w*ru) for w in W]
+        band.setdefault(cfg,[]).append((r,all(x>1 for x in r) or all(x<1 for x in r),o["ic"]["stages"].get("counters_unemitted",[])))
+    for cfg in ("default","h1"):
+        rows=band.get(cfg,[])
+        val[f"band_{cfg}_instances"]=len(rows)
+        val[f"band_{cfg}_order_holds_instances"]=sum(1 for r in rows if r[1] and all(x>1 for x in r[0]))
+    if band.get("default"):
+        for i,w in enumerate(("w0","w0.1","w1")):
+            val[f"band_default_median_ic_over_rho_{w}"]=statistics.median(r[0][i] for r in band["default"])
+    if any(r[2] for rows in band.values() for r in rows): problems.append("band: some IC outputs list unemitted counters")
 # C4 native
 t=open(path("native_timing")).read()
 for name,key in (("E-222","E222"),("M-221","M221")):
