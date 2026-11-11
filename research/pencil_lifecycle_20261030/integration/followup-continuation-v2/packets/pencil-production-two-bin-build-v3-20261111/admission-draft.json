@@ -1,0 +1,121 @@
+{
+  "absolute_deadline": "2026-11-11T12:00:00Z",
+  "attempts": 1,
+  "automatic_retry": false,
+  "build_phase_seconds": 1800,
+  "campaign_ceiling_seconds": 129600,
+  "campaign_charged_seconds": null,
+  "campaign_remaining_seconds": null,
+  "cpu": 2,
+  "donor_workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+  "durable_run": "/home/ec2-user/pencil-validation-receipts/pencil-production-two-bin-build-v3-20261111",
+  "exact_tests": [
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::partial_rows_do_not_change_the_frozen_expected_set",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::retry_requires_present_same_slot_attempt_zero_parent",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::same_seed_different_workload_or_plan_never_forms_one_triplet",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::caller_eligibility_and_cost_injection_are_unknown_fields",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::null_or_partial_nine_category_rows_are_not_admitted",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::changed_file_bytes_do_not_match_a_retained_pin",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::distinct_retry_resource_snapshot_uses_primary_plan_not_primary_session",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::partial_primary_and_retry_sessions_keep_expected_slots",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::missing_custody_or_diagnostics_prevents_comparison_even_with_priced_data",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::observed_rows_respect_native_written_prefix_and_unwritten_boundary",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::qualification::full_frozen_enrollment_empty_interrupted_files_export_6300_null_triplets",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::direct_managed_four_modes_preserve_order_and_counters",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::actual_adapter_native_and_managed_routes_preserve_order_and_counters",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::actual_progress_io_failure_is_nonfatal_and_online_closes",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::trace_io_record_byte_limits_fail_and_online_guard_closes"
+  ],
+  "execution_phase_seconds": 600,
+  "fresh_cache_manifest": {
+    "path": null,
+    "sha256": null
+  },
+  "gid": 1000,
+  "immutable_manifest": {
+    "path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+    "sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
+  },
+  "lease": null,
+  "limits": {
+    "durable_metadata_stop_bytes": 67108864,
+    "durable_total_stop_bytes": 402653184,
+    "logs_stop_threshold_bytes": 268435456,
+    "minimum_free_bytes": 6442450944,
+    "supervisor_permit_seconds": 10,
+    "target_stop_threshold_bytes": 6442450944,
+    "workspace_stop_threshold_bytes": 8589934592
+  },
+  "memory_bytes": 17179869184,
+  "packet_files": {
+    "cache-mode-inventory.json": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+    "commands.json": "0d8b4b9b5a5dc0b7964c16eb5c26fb2d68312d931d57c934aa496270137453ef",
+    "concurrent_traversal_control.py": "f3270b9580fe5b2b6081303c2bb04a4ea6f62c3237e210a404c45b963443b5c0",
+    "concurrent_tree.py": "94f07575c3f5ef1524250044d8fe8be2542719a7dcf4725d8a858af5318277ea",
+    "durable-launcher.py": "aa6cd5159603e0d32e0637f154c513d64df43a3de12b9b18a79662d3a9852535",
+    "durable-worker.py": "80d607cd0aaeae81b81df3ddbc2247b2cc19de63ee3611b3920beef31e594170",
+    "durable_io.py": "5792be73a02347cf15b49f745922f97f1c3eef791748a56093e1a524bd94ccb2",
+    "expected-source-manifest.json": "d91d2bc23c8613c232e36f3132fbd02e94253ee4f50f7fdb2c29850998408235",
+    "materialize.py": "37234e76721a4f59e2ceafb79010ce891465b1f7f2c7700e64bc84f0bec50f7e",
+    "overlay-archive.json": "9df7b8c00eab7bf8e6de5e7df7596bc6beb43b44b047bdcd5eddc56ff2b5e44f",
+    "overlays.json": "559cb3fe95eba32ee0ed7f62f059097f94d78b452d06c743cbb7efea8173d4f8",
+    "source-overlay.tar.gz": "fc06e4f6cefaf75a222ee9e4d16fbfbf2425107bab4a2de7e9810229b474b83a"
+  },
+  "prior_v4_terminal_confirmed": false,
+  "production_binaries": {
+    "ecbench": "src/bin/ecbench.rs",
+    "ecbench_retained_attempt_export_v4": "src/bin/ecbench_retained_attempt_export_v4.rs"
+  },
+  "published_source_revision": null,
+  "release_receipts": {
+    "campaign_authorization": {
+      "path": null,
+      "sha256": null
+    },
+    "combined_qualification": {
+      "path": null,
+      "sha256": null
+    },
+    "exporter_materialization": {
+      "path": null,
+      "sha256": null
+    },
+    "exporter_qualification": {
+      "path": null,
+      "sha256": null
+    },
+    "fresh_cache_snapshot": {
+      "path": null,
+      "sha256": null
+    },
+    "independent_review": {
+      "path": null,
+      "sha256": null
+    },
+    "lease_readback": {
+      "path": null,
+      "sha256": null
+    },
+    "ledger": {
+      "path": null,
+      "sha256": null
+    },
+    "prior_v4_terminal": {
+      "path": null,
+      "sha256": null
+    },
+    "publication": {
+      "path": null,
+      "sha256": null
+    }
+  },
+  "released": false,
+  "schema": "pencil.production-two-bin-build-admission/v1",
+  "source_manifest_sha256": "d91d2bc23c8613c232e36f3132fbd02e94253ee4f50f7fdb2c29850998408235",
+  "swap_bytes": 0,
+  "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+  "total_seconds": 2400,
+  "uid": 1000,
+  "unit": "pencil-pencil-production-two-bin-build-v3-20261111.service",
+  "workspace": "/var/tmp/pencil-pencil-production-two-bin-build-v3-20261111"
+}

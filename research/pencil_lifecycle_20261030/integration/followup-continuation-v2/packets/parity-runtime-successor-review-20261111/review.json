@@ -1,0 +1,45 @@
+{
+  "schema": "independent.prospective-source-review/v1",
+  "task": "T-2199",
+  "status": "static_closure_checked_execution_pending",
+  "packets": [
+    {
+      "packet": "exporter-v4-qualification-v5-20261111",
+      "manifest_sha256": "bf5820291957800f5135a56ea8dfe1800119e66999d3c0089d2923d020088ff1",
+      "admission_sha256": "309b426a3fd57963570d34a36722664e9136ec7bffb8b7681d3c653b83cbcce4",
+      "semantic_members_verified": 26,
+      "runtime_packet_pins_verified": 12,
+      "overlay_members_verified": 107,
+      "source_files_reconstructed": 4501,
+      "exact_tests": 15,
+      "prior11_preserved_in_order": true
+    },
+    {
+      "packet": "pencil-production-two-bin-build-v3-20261111",
+      "manifest_sha256": "44a57aa4d6cbc971adaaef9958315e7563b61608127a57b159356a4669bbab2f",
+      "admission_sha256": "cf9a92b5d6a6bd96f845dcfc3a990f6d6a1d23b9181c373cbc62b037cdb25f8d",
+      "semantic_members_verified": 24,
+      "runtime_packet_pins_verified": 12,
+      "overlay_members_verified": 107,
+      "source_files_reconstructed": 4501,
+      "exact_tests": 15,
+      "prior11_preserved_in_order": true
+    }
+  ],
+  "expected_source_manifest_sha256": "d91d2bc23c8613c232e36f3132fbd02e94253ee4f50f7fdb2c29850998408235",
+  "source_archive_sha256": "fc06e4f6cefaf75a222ee9e4d16fbfbf2425107bab4a2de7e9810229b474b83a",
+  "checks": [
+    "Both107-member archives rehashed and source inventory reconstructed from base plus overlays",
+    "Exporter executes original11 tests in order then4 parity controls; worker requires15 results",
+    "Production admission requires exact15 successful qualification results and matching4501-file materialization source digest",
+    "Cache mode checks and concurrent traversal helper preserved; fresh identities and finite2CPU16GiB1800+600 limits retained",
+    "No release, current accounting or lease populated; workspace/durable paths absent"
+  ],
+  "scope_limits": [
+    "Parity review remaining contract obligations still apply",
+    "Compilation and runtime feasibility unmeasured",
+    "Final publication/current ledger/lease/native qualification receipts remain required"
+  ],
+  "execution_performed": false,
+  "source_modified": false
+}
