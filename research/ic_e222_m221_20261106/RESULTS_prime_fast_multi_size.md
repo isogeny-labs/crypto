@@ -14,3 +14,20 @@ Setup: batched multi-target IC with the bucketed pair table (`ic_multi_solve_ex`
 Prediction (written first): IC/BSGS <= 3.0 at 33 bits and <= 3.5 at 35 bits. **Both missed** (3.2 and 4.0). Together with the frozen evaluation (best constant per size: 1.9, 2.2, 2.4 at 25, 29, 31 bits) the distance to the tuned BSGS keeps growing with the field size, roughly 1.9 -> 2.4 -> 3.2 -> 4.0 from 25 to 35 bits (with c = 1.0 at 33 and 35 bits, not tuned there). The setup share rises to 67% to 77% of the run at 35 bits (the pair table is fb^2 entries and the factor-base solve grows as p^(2/3)), so at these sizes the setup, not the per-target phase, is again the dominant cost at T = 1000. The earlier "flatter than before" statement holds only up to 31 bits.
 
 Limits: one instance per residue; c not retuned (a smaller constant may reduce the setup); BSGS arm not compacted (the true distance is about 1.1x to 1.3x larger); exploratory, not frozen; same host; no rho arm, §5a band, certificate file, bench record or `VALIDATION.json`.
+
+## c-retune at 35 bits (exploratory; predictions in `results/pf_size/PREDICTION_c.txt` and `PREDICTION_c15.txt`, written before the runs)
+
+T = 1000, one instance per residue, all targets verified (1000/1000), tuned (not compacted) BSGS = 495 ms (residue 1) and 537 ms (residue 3):
+
+| c | fb | residue | IC ms | setup ms | IC / BSGS |
+|---|---|---|---|---|---|
+| 0.5 | 1625 | 3 / 1 | 2513 / 2531 | 1426 / 1294 | 4.68 / 5.11 |
+| 0.7 | 2276 | 3 | 2569 | 1567 | 4.79 |
+| 1.0 | 3251 | 1 / 3 | 1977 / 2162 | 1435 / 1656 | 3.99 / 4.03 |
+| 1.5 | 4876 | 3 / 1 | 3278 / 2790 | 3006 / 2567 | 6.11 / 5.63 |
+
+Both predictions **failed**: "c = 0.5 at least 15% lower than c = 1.0" (it is about 25% higher), and "c = 1.5 at most 0.9x of c = 1.0" (it is about 1.4x higher). c = 1.0 is the best of the four constants at 35 bits, as at 27 to 31 bits at T = 1000, and the setup has a floor of about 1.3 to 1.7 s (T-independent) that no constant removes: a smaller factor base lengthens the relation collection (about p / fb walk points in total), a larger one makes the fb^2-entry pair table build and scatter dominate (24 million entries at c = 1.5).
+
+Reading (counted-operation reasoning, not a measurement): the setup scales like p^(2/3) (relations: p / fb points at fb ~ p^(1/3); pair table: fb^2 ~ p^(2/3) entries) while the tuned multi-target BSGS costs about sqrt(T n) additions, so for fixed T the ratio grows like p^(1/6), a factor of 2 per 6 bits. The measured ratios (1.9, 2.2, 2.4, 3.2, 4.0 at 25, 29, 31, 33, 35 bits) are consistent with that (about 2.1x over 10 bits) but are five points from different protocols. This is the Gaudry-Diem exponent gap (2/3 against 1/2) seen in the multi-target setup: the lead 'cheaper setup' improves constants (setup roughly 4x cheaper at 27 bits through the batched collection and the bucketed lookup) and not the exponent, so it does not lead to a crossover at larger sizes. The per-target phase (the T-dependent part) is not the wall; the T-independent setup is.
+
+Limits: one instance per residue, exploratory, c on a four-point grid, not compacted BSGS, same host, not independently replayed.
