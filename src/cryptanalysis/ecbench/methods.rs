@@ -4157,7 +4157,10 @@ fn solve_isogeny_transfer(
                 r: inst.r,
                 cofactor: inst.cofactor,
                 generator: (g1.x, g1.y),
-            }.curve_id().slug,
+                representation: None,
+            }
+            .curve_id()
+            .slug,
         },
         "inner": inner_id,
         "inner_detail": rep.detail,
