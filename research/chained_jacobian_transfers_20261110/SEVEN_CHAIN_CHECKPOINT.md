@@ -49,8 +49,9 @@ ReadyPR1488 targets immediateparentbranch
 research/chained-transfer-seven-glue-20261111/PR1484,thenretargetmain and
 rerunchecks onlyafterparentlands. Feature-base auto-merge is unavailable;
 no prematurestack merge. Exactnewhead focused65+threeCI is still a separate
-obligation;focused43097723254 on exact7c1f32ecb was observedqueued after
-manualdispatch,not complete.
+obligation. Focused43097723254 on exact7c1f32ecb completed with
+startup_failure before jobs/checks were created, observed21:39UTC;
+consumerPCC4baafc preserves metadata. The cause is not established.
 Inspect currentGitHub state beforeacting.
 [pcc:unverified]
 
@@ -70,7 +71,7 @@ actualmodels. Every evaluator alwaysusedthecorrectconstructor. Failed
 array/API compilation,RNGformat andLean scalar-zero attempts are preserved;
 no assumption,validator or corpus was weakened. [pcc:unverified]
 
-Next CT22_PLAN.md derives direct base-field formulas for BOTH elliptic norms
+Historical next task CT22_PLAN.md derives direct base-field formulas for BOTH elliptic norms
 on balancedC0/C1 classes. Validate all12317 classes ofeachmodel,including
 repeated/zero support andinfinities,thenfaithfullyprove clearedalgebra and
 integratewithfullsource/wholemapchecks. No direct-normcode/test ormeasured

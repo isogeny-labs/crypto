@@ -1,0 +1,79 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T21:05:53Z",
+ "id": "PCC-20261111-8eaf58",
+ "kind": "theorem",
+ "producer": {
+  "commit": "3fb49f182f18bf3f205f1c06da0d30747d52534d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "33136a6ca98b77379171d0d0bd304f2ebd11217f3f5263f07936c061b0220109",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.quadratic_sum_squares"
+  },
+  {
+   "decl_sha256": "bf063bda53f13de04224a326ca9a513bee72d1b83a67df44d64ac7837ae7bfa2",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.quotient_slope_constraint"
+  },
+  {
+   "decl_sha256": "7921c9479093b392ac7f54218c456ee1a6f101e659e86b832175dd8a369fdb30",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.quotient_ordinate_support"
+  },
+  {
+   "decl_sha256": "93502c8518345556f9cffc5f047dec2560a46a528148787ffc484802e19a1ac3",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.reciprocal_support"
+  },
+  {
+   "decl_sha256": "a613a44829ddc19cca941b8a8f398295d992019f864e63b1b349ebbd2b35ba7e",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.reciprocal_ordinate_remainder"
+  },
+  {
+   "decl_sha256": "4223625734c99ababc0e0254e3be723ceea5935c8cee0028a6bcab0b719baa49",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.even_support_remainder"
+  },
+  {
+   "decl_sha256": "c235ae8d15408c4d1c44a28ffdf5e5c6fe94be60fbbf9644b2ce4959d9a7ad5b",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/DirectNorms.lean",
+   "theorem": "DirectNorms.even_support_zero_factor"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/direct-norms-lean-01.txt",
+    "sha256": "fcf05a5638a6da21399455b542d27dd9501e0fb4e440a85ce6bef53f935ddc76"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/direct-norms-lean-01-build.txt",
+    "sha256": "46bfc7610d66fa73918077976c780a0f9212a5f02f19725ee5962ffc3d63e05b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/direct-norms-lean-01-audit.txt",
+    "sha256": "356f542c5c7d7ca185f8d9a4810e146634693231f9393d9dca200f41e9f55d23"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Seven conditional cleared-algebra lemmas for the direct quotient norm formulas:quadratic sumof squares,slope denominator constraint,ordinate reduction onvalidquadraticsupport,reciprocal monicsupport,reciprocalordinate remainder,even-support ordinate-square remainder and zerofactor under explicit inverse2/domain hypotheses. Arbitrarycommutative rings with stated inverses are used;no unsafe zero division or customaxiom. Actual finitefields,Mumfordjets,ellipticgroup law,projectiveinfinities andglobalPicardnorm equality remain writtenbridges. Lean4.35.0 gate7,standardfoundations/0trustednative,unsigned standing."
+}

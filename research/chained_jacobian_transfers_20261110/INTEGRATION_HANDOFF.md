@@ -1,9 +1,11 @@
 # Autoresearcher integration handoff
 
-Latest continuation: SEVEN_CHAIN_CHECKPOINT.md / SEVEN_CHAIN_PROOF.md.
-Actual fixedF101 Psi,globalwrittenproof,bothfullrational/sourcecontrols and
-unpolarizedFp-Jacobian distinction are recorded. CT22 directnormengineering
-is next. Earlier prospective paragraphs below are historical snapshots.
+Latest continuation: DIRECT_NORMS_CHECKPOINT.md / DIRECT_NORMS_PROOF.md.
+Both direct C0/C1 norms match the generic maps on all12317 classes each;
+the integrated native25/reference66 plus three-integration guard passes.
+Root helper census is97. CT23 whole-fibre Richelot evaluation is next;
+CT24 preserves the further nondual odd-hop obligation. Earlier prospective
+paragraphs below are historical snapshots.
 Vault state remains locked. [pcc:unverified]
 
 Destination: `crypto-autoresearcher` lead atlas, after configured vault access

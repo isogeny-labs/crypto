@@ -1,4 +1,37 @@
-# Chained ECDLP Transfers — actual Psi checkpoint 2026-11-11
+# Chained ECDLP Transfers — direct norms checkpoint 2026-11-11T21:46Z
+
+Read study DIRECT_NORMS_CHECKPOINT.md, frozen DIRECT_NORMS_PROOF.md and
+CT23_PLAN.md first. CT22 is implemented; complete changed guard06 passes
+native25/reference66 unit plus three integrations, one old ignored benchmark.
+Both norms match generic evaluation on all12317 C0/C1 classes; complete Phi
+graphs and all Psi/source/recovery controls pass. Root080e8f/c23653 and
+consumerb6af61/3f2084 remain unsigned. Seven new Lean lemmas bring source
+census97, gate/localbindings8eaf58; geometry is written. [pcc:unverified]
+
+Consumer direct-norm branch starts7c1f32ecb and must publish ready stacked
+against research/chained-transfer-seven-torsion-20261111/PR1488. Preserve
+that exact parent head. Its focused43097723254 ended startup_failure with
+no jobs/checks; metadata18/PCC47be0d/4baafc, cause unknown. New CT22 head CI
+remains separate. Root filtered branch push coverage is added because its
+dedicated workflow is absent on main. Inspect actual publication metadata.
+[pcc:unverified]
+
+Next CT23: whole-fibre Richelot evaluation without quadratic splitting;
+reuse existing engines/reduction, all R0/R1 rational domains, then actual
+49-point KerPsi/all2401 sums/Frobenius over Fp6. CT24 retains the further
+nondual7-hop. Start a fresh child after publishing CT22. No CT23 code has
+run here. Complete06 is unchanged: do not rerun it for documentation edits.
+[pcc:unverified]
+
+Parent1484 remains245 with focused43085588914 success, a56-prefix ledger
+fork and unchanged-C findings; next quiet check01:09UTC Nov12. 1488 next
+check22:29UTC unless actual activity. Root3877 has its separate569-prefix
+fork/archive-clock/baseline gaps. Preserve both histories; no rebase,force,
+rechain,lineage selection or gate bypass. S3/livebudget,KB/ecdb and locked
+atlas8edec422a remain unavailable. Rust/Lean math only; no paid jobs or timing
+claims. Continue authorized unblocked work. [pcc:unverified]
+
+# Historical actual Psi checkpoint 2026-11-11
 
 Read SEVEN_CHAIN_CHECKPOINT.md,SEVEN_CHAIN_PROOF.md andCT22_PLAN.md first.
 This section supersedes the historical snapshots below. Continue authorized

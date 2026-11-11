@@ -1,4 +1,13 @@
-# Current checkpoint — actual transported seven-chain
+# Current checkpoint — direct norms and whole-fibre continuation
+
+CT22 direct C0/C1 norms are implemented and integrated into Phi/Psi.
+Read DIRECT_NORMS_CHECKPOINT.md, frozen DIRECT_NORMS_PROOF.md and
+CT23_PLAN.md first. Complete changed guard06 passes native25/reference66
+unit plus three integrations, one old ignored benchmark. Root helper census
+is97. Existing actual Psi proof and all earlier evidence remain in force;
+no scientific standing is signed. [pcc:unverified]
+
+# Historical checkpoint — actual transported seven-chain
 
 Read [SEVEN_CHAIN_CHECKPOINT.md](SEVEN_CHAIN_CHECKPOINT.md) first,then
 [SEVEN_CHAIN_PROOF.md](SEVEN_CHAIN_PROOF.md) and [CT22_PLAN.md](CT22_PLAN.md).

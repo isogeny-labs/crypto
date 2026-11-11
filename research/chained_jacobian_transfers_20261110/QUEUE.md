@@ -1,6 +1,6 @@
 # Chained ECDLP transfers — persistent queue
 
-Owner: autonomous research session, starting from PR #3877. Updated 2026-11-11 during restored CT21 execution;historical interruption is resolved at custody/access scope.
+Owner: autonomous research session, starting from PR #3877. Updated 2026-11-11 after CT22 direct norms; historical interruption is resolved at custody/access scope.
 This is the canonical queue; completed entries stay here. Results require their
 own evidence and PCC standing; a checked box is not a verification verdict.
 
@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 90 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Source census90;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
+| CT03 | 97 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Seven new DirectNorms cleared algebra helpers pass gate/local bindings,PCC8eaf58. Source census97;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -33,8 +33,10 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT19 | implemented elliptic kernels/maps/duals and separate replay; CI passes; unsigned | Construct fixed101 degree7 elliptic maps and independent algebraic replay. | ef9a54259/PR1483,ELLIPTIC_SEVEN.md:four actual maps,exact curve/both global x[7],all109/113 group/scalar/recovery/j/coordinate controls; unchanged Kohel construction and independent Montgomery verifier. Frozen TSV/manifests/report/diagram/PDF durable.43038507853 passes25/51-unit+two integrations. Root helpers/harness recovered; original root PCC7e9547/58dbb8 restored unchanged;see RESTORATION_20261111.md. No actual Jacobian7-hop/advantage. |
 | CT20 | actual fixed(7,7) transfer,full rational/geometric certificates,written proof;unsigned | Glue compatible degree7 elliptic images and construct actual global Jacobian isogeny. | SEVEN_JACOBIAN_CHECKPOINT.md/SEVEN_JACOBIAN_PROOF.md;C0->C1 monic68-model,both12317-class dual[7]/bijections/paired additions,all109 source norm14/inverse39/direct coordinates,full16-point geometric2-kernel,444 extension pulls,injective elliptic factors/j-based F101-Jacobian distinction. Focused43085588914 exact2450815e2 succeeds25/57+two;PR1484 merge blocked by newconsumer ledgerfork. |
 
-| CT21 | actual transported(7,7)Psi/written globalproof/fullcontrols;unsigned | Continue from the accepted six-cycle target using the actual odd kernel and transported Richelot cross-kernel. | SEVEN_CHAIN_CHECKPOINT.md/SEVEN_CHAIN_PROOF.md,PCCeb3240/d0441a:49-kernel/64-lift action,actualR1 delta33/scale47,full16-point compositekernel/globalquotient/dual7,F101 descent viaAut/Torelli/oddwitness,ellipticembedding/trace/j noniso. Both12317 Psi domains/all109source reverse28-inverse74/direct4 pass. Consumer7c1f32ecb ready stackedPR1488;fullguard25/65+two andthirdintegration/strictClippy pass;exactCIpending. |
-| CT22 | next unblocked arithmetic task;not executed | Replace generic divisor norms in the coordinate evaluator with direct base-field quotient formulas. | CT22_PLAN.md:both norms onALL12317 classes ofC0 andC1,repeated/zero support/infinities,faithful clearedLean identities,thenchangedfullPhi/Psi/sourcechecks. Preserve genericnormreference/directellipticcontrols;no performanceclaim beforeadmission/matchedmeasurement. |
+| CT21 | actual transported(7,7)Psi/written globalproof/fullcontrols;unsigned | Continue from the accepted six-cycle target using the actual odd kernel and transported Richelot cross-kernel. | SEVEN_CHAIN_CHECKPOINT.md/SEVEN_CHAIN_PROOF.md,PCCeb3240/d0441a:49-kernel/64-lift action,actualR1 delta33/scale47,full16-point compositekernel/globalquotient/dual7,F101 descent viaAut/Torelli/oddwitness,ellipticembedding/trace/j noniso. Both12317 Psi domains/all109source reverse28-inverse74/direct4 pass. Consumer7c1f32ecb ready stackedPR1488;fullguard25/65+two andthirdintegration/strictClippy pass;focused43097723254 startup_failure before jobs/checks,PCC4baafc; no CI pass inferred. |
+| CT22 | integrated and complete local checks; unsigned | Direct base-field norms with all exceptional balanced support. | DIRECT_NORMS_CHECKPOINT.md/PROOF.md; both norms agree with generic maps on all12317 C0/C1 classes. Integrated guard06 passes25native/66reference unit+three integrations,one old ignored; all Phi/Psi/source controls and full generic/direct Phi comparisons pass. ConsumerPCCb6af61/3f2084,rootc23653/8eaf58;97 helpers. No measured cost claim. |
+| CT23 | next unblocked task; not executed | Whole-fibre Richelot elimination without splitting quadratic support; actual Psi kernel. | CT23_PLAN.md: reuse existing polynomial/Cantor engine, count all chart boundaries, compare all R0/R1 domains, then49-point KerPsi/all2401 additions/Frobenius over existing Fp6. Preserve pointwise reference. |
+| CT24 | queued after CT23 | Another nondual7-hop with genuine new target and transported Richelot continuation. | CT24_PLAN.md: actual Frobenius kernels, compatible elliptic gluing, full geometric/global/source controls and direct elliptic two-hop control; unsupported charts remain explicit. |
 
 ## Session constraints
 
@@ -49,13 +51,16 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read SEVEN_CHAIN_CHECKPOINT.md,then SEVEN_CHAIN_PROOF.md and CT22_PLAN.md.
-CT19 is merged,CT20 readyPR1484 is frozen at2450815e2 with exact-head
-focused43085588914 succeeds. ReadyCT21 stackedPR1488 freezes7c1f32ecb;
-newexactfocusedCI pending afterdispatch. Parent1484 mainledgerfork remains.
-ContinueCT22 in a fresh childbranch;inspect actualPCC/rawlogs before anyrerun.
-RESTORATION_20261111.md preserves recovered originals;the old interruption
-notes are historical. GitHub recovery is not an S3 admission bypass. [pcc:unverified]
+Read DIRECT_NORMS_CHECKPOINT.md, frozen DIRECT_NORMS_PROOF.md, then CT23_PLAN.md.
+Consumer direct-norm branch starts7c1f32ecb/readyPR1488 and must target that
+immediate feature parent. Complete changed guard06 passes25/66+three.
+Preceding focused43097723254 ended startup_failure before jobs/checks; retain
+metadata/PCC4baafc rather than claim an arithmetic CI result. Parent1484's
+56-row common-prefix fork remains, next quiet check around01:09UTC Nov12.
+Root ledger fork/archive-clock, S3/livebudget and KB/vault limits persist.
+Do not rebase, force, rechain, choose a frozen lineage or bypass admission.
+Continue CT23 in a fresh child after publishing this completed rung.
+[pcc:unverified]
 
 Read today's session log, this table and CHECKPOINT.md. Inspect actual heads
 and uncommitted diffs first. Reuse immutable passing receipts when inputs have
