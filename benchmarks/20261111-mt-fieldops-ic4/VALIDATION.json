@@ -14,7 +14,7 @@
   "unit": "GAE per target from counted F_p I, M, S (I = 10M, S = M, 1 GAE = I + 2M + S) plus h GAE per hash/solver op",
   "binary_or_process": "target/release/examples/mt_fieldops built from commit 6b0ac6f192 (sha256 bbcc68cc..., in every row of results/holdout/rows.jsonl)",
   "matches_protocol": true,
-  "strongest_available": true,
+  "strongest_available": false,
   "same_unit": true,
   "same_binary_or_process": true,
   "gae_band": {
@@ -32,6 +32,6 @@
    }
   },
   "order_holds_across_band": true,
-  "note": "band shown for the 25-bit, T = 16384 cell (medians over 22 configurations); the admitted row is the T = 16384 cells, where IC4 is cheaper at every I/M and h. T = 4096 is unranked and T = 1024 dearer; strongest_available means the strongest rho in this harness, not ecbench's"
+  "note": "band shown for the 25-bit, T = 16384 cell (medians over 22 configurations); the admitted row is the T = 16384 cells, where IC4 is cheaper at every I/M and h. T = 4096 is unranked and T = 1024 dearer; strongest_available means the strongest rho in this harness, not ecbench's CORRECTION 2026-11-11 (research/mt_rho_start_fix_20261111): the rho arms had a restart defect that made the reference 1.4-4.8% too expensive (corrected IC4/rho at T = 16384: 0.95-0.99), and the family lacks Kuhn-Struik retention, against which IC4 is dearer at h = 0 (1.12-1.17x). strongest_available is therefore false and this row no longer passes the gate."
  }
 }

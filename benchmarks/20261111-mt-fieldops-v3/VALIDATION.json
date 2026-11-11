@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "add86c6818849fff863a9463f11e242a1506ac84fbcde302ef29f5aea7084e95"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "06586f286ba85a3e6d7bb74dded31c104b2d6a4016ca1b1ad452bf3967ae9590"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/mt_fieldops_v3_20261111/PROTOCOL.md: per configuration and price, the cheapest of the 12 pre-registered runs of this harness's anchored, fixed-database rho family (rho, rho2, rho2x, rhoseq x kappa 0.5/0.7/1.0)",
+  "unit": "GAE per target from counted F_p I, M, S (I = 10M, S = M, 1 GAE = I + 2M + S) plus h GAE per hash/solver op",
+  "binary_or_process": "target/release/examples/mt_fieldops built from the commit in every row of the study's rows.jsonl (after the restart fix 75dbc70b36)",
+  "matches_protocol": true,
+  "strongest_available": false,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 448.025,
+    "rho": 500.942
+   },
+   "0.1": {
+    "ic": 520.598,
+    "rho": 577.16
+   },
+   "1": {
+    "ic": 1173.758,
+    "rho": 1263.116
+   }
+  },
+  "order_holds_across_band": false,
+  "note": "band for 32 b, T = 16384 against the harness rho family. NOT the strongest rho: the family lacks Kuhn-Struik retention; with retention (validator, validation/ks_runs.json) ic5 is dearer at h = 0 and 0.1 (unranked in all 36 decisions). The validator report's status is insufficient_evidence for the vs-rho headline, so this gate does not pass; the validated statement is ic5 vs ic4 (IC baseline), cheaper in all 36."
+ }
+}
