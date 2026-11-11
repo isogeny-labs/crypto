@@ -1,0 +1,9 @@
+# Concurrent-tree correction: exporter qualification
+
+This additive successor preserves the exact 4500-file source image, archive, cache-mode inventory, original controls and resource envelope from exporter-v4-qualification-v3-20261111. No mathematical, exporter, collector or scientific protocol code changes. [pcc:unverified]
+
+Reuse byte-identical concurrent_tree.py and concurrent_traversal_control.py from the independently inspected combined-v8 source. The sampled mutable-tree scanner tolerates only ENOENT for compiler-owned target/tmp or explicitly recognized atomic receipt temporary names, and only after a second lstat confirms absence. Symlinks, special files, permission errors and missing immutable paths remain fatal. Strict source/custody traversal is unchanged. Observed transient path samples remain in the command receipt. [pcc:unverified]
+
+The charged deterministic control runs inline inside the admitted worker before materialization and before normal workspace monitoring. It exercises directory-lstat, actual directory-descent scandir/onerror, file and atomic-temp disappearance, plus five rejection cases. The control-only os.scandir wrapper passes integer descriptors used by shutil.rmtree unchanged. Deliberate symlink/FIFO/permission fixtures are removed before normal monitoring starts, and the workspace must again contain only its owner receipt. Fixture content is bounded by its fixed construction and checked at1MiB; elapsed time must be<=30seconds on return. The existing phase/systemd deadlines are the hard stop; this adds no separate30second watchdog. [pcc:unverified]
+
+Limits remain1800seconds build+600seconds existing post-build phase,2400total,2CPU16GiB,zero swap,oneattempt,noautomaticretry,oneactivepayload,deadline2026-11-11T12:00:00Z. Currentledger,lease,publication and release remainunset. No filesystem control, compiler or test ran during this source task. [pcc:unverified]

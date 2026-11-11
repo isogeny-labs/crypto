@@ -1,0 +1,22 @@
+--- original/GraphAlgebra.lean.txt
++++ replay/GraphAlgebra.lean.txt
+@@ -1,4 +1,8 @@
+-import Product
++import Mathlib.Algebra.Field.Basic
++import Mathlib.Tactic.Ring
++import Mathlib.Tactic.FieldSimp
++import Lean.Elab.Tactic.Omega
++import Lean.Elab.Tactic.Decide
+ set_option autoImplicit false
+ namespace SignedGraphAlgebra
+ variable {K : Type*} [CommRing K]
+--- original/UnionSize.lean.txt
++++ replay/UnionSize.lean.txt
+@@ -1,4 +1,6 @@
+-import UnionAfterFinds
++import Mathlib.Data.Fintype.Card
++import Mathlib.Data.Finset.Card
++import Lean.Elab.Tactic.Omega
+ set_option autoImplicit false
+ namespace UnionSize
+ 
