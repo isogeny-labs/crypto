@@ -2,8 +2,9 @@
 
 Date: 2026-11-11. Treatise open problem 12
 (`papers/ecdlp-index-calculus-treatise/sections/prog_openproblems.tex`).
-Status: research note. Nothing here is committed and nothing was run off this
-machine. No `pcc` claim exists for anything below, so every statement is
+Status: research note, committed with #3878 and updated through the C runs of
+#3887, #3891 and #3893. Nothing was run off this machine (a 4-vCPU, 15 GB cloud
+container). No `pcc` claim exists for anything below, so every statement is
 `[pcc:unverified]`. The labels **PROVED**, **SKETCH**, **MEASURED**,
 **HEURISTIC** and **CONJECTURE** below say what kind of support each statement has.
 
@@ -38,8 +39,12 @@ presentation. What this note establishes:
 4. **A weaker, well-defined proof system has a measured linear growth.** This is the
    "selector" Nullstellensatz, the proof system of the treatise's `k+2` upper bound.
    - Its degree has an exact dual characterisation (Prop. S, S*, PROVED).
-   - Its degree is measured at `ceil(k/3) + 2` on the diagonal for `k = 4..11`
-     (Conjecture S).
+   - Its degree was measured at `ceil(k/3) + 2` on the diagonal for `k = 4..12`,
+     which gave Conjecture S.
+   - **Conjecture S is false as stated** (§6, COUNTEREXAMPLE, checked independently
+     in both directions). At `n = 25`, `k = 13`, both instances tested have
+     `e_min = 4 < ceil(13/3) = 5`. At `k = 14, 15` the measured value is back at
+     `ceil(k/3)`. The selector degree still grows, but not as `ceil(k/3)`.
    - Local (flat-supported) dual certificates cannot prove more than `e >= 1`
      (Lemma F, PROVED, with a MEASURED premise).
    - Even a proof of Conjecture S would not bound `d_F`: measured `d_F` is 1–2 below
@@ -394,10 +399,11 @@ is a single linear functional, and showing it is not in the span of the conditio
 is the whole difficulty. That is primal infeasibility again; no structural
 construction of `p` was found.
 
-### Conjecture S (selector degree grows linearly). CONJECTURE, MEASURED, HEURISTIC
+### Conjecture S (selector degree grows linearly). FALSIFIED as stated at `k = 13`
 
-For unsatisfiable random-subspace instances on the diagonal `k = ceil(n/2)`,
-`e_min >= ceil(k/3)`, so `d_SEL >= ceil(k/3) + 2`.
+As first stated: for unsatisfiable random-subspace instances on the diagonal
+`k = ceil(n/2)`, `e_min >= ceil(k/3)`, so `d_SEL >= ceil(k/3) + 2`. The counterexample
+and the data beyond `k = 12` follow the original data below.
 
 - **Data** (`out/emin_*.txt`, `out/n*.txt`):
 
@@ -416,6 +422,72 @@ For unsatisfiable random-subspace instances on the diagonal `k = ceil(n/2)`,
   shown equal at `n <= 11`.
 - **Heuristic.** With `n ~ 2k` unknown coordinates times `C(k, <=e)`, against
   `(k+1) C(k, <=e+1)` constraints, solvability needs `e >~ (k-2)/3`.
+
+**Counterexample (`n = 25`, `k = 13`).** COUNTEREXAMPLE, checked independently in
+both directions. `lfd_small.make_instance(25, seed)` for seeds 5 and 6 (the first two
+unsatisfiable seeds) gives `e_min = 4`, while `ceil(13/3) = 5`.
+- **`e_min <= 4` (feasibility).** `emin.c` found `lambda` with every coordinate of
+  degree `<= 4` that satisfies all `2^13 * 14 = 114,688` constraints of Prop. S.
+  - `verify_lambda.py` re-checks the saved `lambda`
+    (`out/c/cert/n25_s{5,6}/lambda_e4.bin`) with `lfd_small`'s own field
+    arithmetic: 0 violated constraints, ANF degree 4, for both seeds.
+- **`e_min > 3` (infeasibility).** The rows of 838 points
+  (`out/c/cert/n25_s{5,6}/points_e3.txt`) are already inconsistent at `e = 3`.
+  - `emin verify` rebuilds them by a second code path (`Tr(x^j w)` computed
+    directly) with PLUQ elimination: rank 9,371 for the coefficient matrix, 9,372
+    with the right-hand side, for both seeds.
+
+So Conjecture S fails as stated `[pcc:unverified]`. Proposition S, the definition of
+`e_min`, and the measurements at `k <= 12` are unaffected.
+
+**C data beyond `k = 12`** (`emin.c`, `out/c/emin_n*.jsonl`; seeds are the first
+unsatisfiable ones):
+
+| `n` | `k` | seeds | `e_min` | `ceil(k/3)` | unknowns at the last `e` tested |
+|--:|--:|:--|:--|--:|--:|
+| 23 | 12 | 4, 8 | 4, 4 | 4 | 18,262 |
+| 25 | 13 | 5, 6 | **4, 4** | 5 | 27,325 |
+| 27 | 14 | 3, 6 | 5, 5 | 5 | 93,771 |
+| 29 | 15 | 3, 4 | 5, 5 | 5 | 143,376 |
+| 31 | 16 | 2, 3 | `> 4`, `> 4` | 6 | 78,027 |
+| 33 | 17 | 1, 5 | `> 4`, `> 4` | 6 | 106,062 |
+| 35 | 18 | 6, 7 | `> 4`, `> 4` | 6 | 141,680 |
+| 37 | 19 | 1, 3 | `> 3`, `> 3` | 7 | 42,920 |
+| 39 | 20 | 3, 7 | `> 3`, `> 3` | 7 | 52,689 |
+| 41 | 21 | 1, 2 | `> 3`, `> 3` | 7 | 64,042 |
+
+- **Coverage.** `n = 15–23` reproduces the Python `e_min` on every committed
+  instance, and every feasible `lambda` at `n = 25–29` passes `verify_lambda.py`.
+- **Every lower bound at `n = 31–41` is independently re-checked.** `emin verify`
+  (second row builder, PLUQ) confirms each point set is inconsistent; the right-hand
+  side always raises the rank by one:
+  - `n = 31`, `e = 4`: 77,451 → 77,452;
+  - `n = 33`, `e = 4`: 105,365 → 105,366;
+  - `n = 35`, `e = 4`: 140,846 → 140,847;
+  - `n = 37`, `e = 3`: 42,748 → 42,749;
+  - `n = 39`, `e = 3`: 52,498 → 52,499;
+  - `n = 41`, `e = 3`: 63,831 → 63,832.
+
+  The same ranks hold for both seeds at each `n`. Raw outputs are in
+  `out/c/verify_*.txt`.
+- **Above `n = 29` the rows are lower bounds only.** The next `e` needs
+  `n * sum_{d<=e} C(k,d)` unknowns:
+  - 213k (`n = 31`, `e = 5`), 310k (`n = 33`, `e = 5`), 442k (`n = 35`, `e = 5`),
+    186k (`n = 37`, `e = 4`), 242k (`n = 39`, `e = 4`), 309k (`n = 41`, `e = 4`).
+  - The container restarts about hourly, which killed the 213k run twice. So
+    `n = 31, 35, 37, 39` were finished with a 145k cap, keeping each test under
+    about 20 minutes.
+  - Exact values there need a host that stays up and has more memory, or a sparse
+    solver.
+
+**What survives.** The measured `e_min` is non-decreasing in `k` on this diagonal:
+4, 4, 4, 5, 5 at `k = 11..15`. The `k = 13` value of 4 was certified on both
+instances. A weaker form, `e_min >= ceil((k-1)/3)`, fits every diagonal instance
+measured so far, including the `n = 7`, seed 16 exception (`k = 4`, `e_min = 1`).
+This form is a CONJECTURE fitted to the same data that falsified the original, so it
+is not evidence. The data at `k >= 16` cannot test it. Those rows are lower bounds of
+4 or 3, below both `ceil(k/3)` and `ceil((k-1)/3)`, so they agree with either form and
+decide nothing.
 
 Even a proof of Conjecture S would show only that the strategy of the `k+2` upper
 bound cannot be improved to constant degree with `c`-only multipliers. It says
@@ -522,15 +594,16 @@ trace equations alone.
 
 ## 8. Cheapest next step
 
-1. **Port `selector_check.e_min` to C/M4RI** and measure `e_min` at
-   `n = 23–41`, about 10 instances per `n`.
-   - This is local: `2^k` points, with the linear system of Prop. S.
-   - It tests Conjecture S beyond `k = 12`, where `ceil(k/3)` and the
-     slower-growing `d_F` would separate.
-   - The Python version took 229 s at `n = 23`.
-   - Then solve the *dual* system of Prop. S* at `n = 13–19` and inspect the
-     certificate `p` (its support, degree, and how it depends on `C`). That is the
-     concrete route to a proof of Conjecture S.
+1. **Done: `e_min` ported to C** (`emin.c`, #3887). It runs `n = 23` in 2 s,
+   against 229 s for the Python version. Exact values hold to `n = 29`; above
+   that, only independently checked lower bounds were obtained, up to `n = 41`.
+   - The port falsified Conjecture S at `k = 13` (§6).
+   - Exact values above `n = 29` need sparse or structured elimination, or a host
+     with more memory (EKS). The dense system has 0.3–8M unknowns there.
+   - Still open: solve the *dual* system of Prop. S* at `n = 13–25` and inspect the
+     certificate `p` (support, degree, dependence on `C`). Comparing the
+     `k = 13` instances with `k = 12, 14` should show what lets degree 4 suffice at
+     `k = 13`.
 2. **Measure `d_PCc` and `d_F` side by side at `n = 23–29`**, reusing the existing
    M4RI closure with a restricted multiplier set. This shows whether the
    `a`-multiplication falls (Lemma `deg3`) are the whole gap between `d_F` and
@@ -550,8 +623,12 @@ trace equations alone.
 - **Lemma 5 does not prove** that expansion methods fail; it only shows that every
   presentation in the orbit has non-constant arity. The growth `k - sqrt(2k)` of the
   minimum rank is heuristic.
-- **Conjecture S is not proved.** Even if proved, it bounds only the selector
-  degree, never `d_F`. Propositions S and S* are exact reformulations, not bounds.
+- **Conjecture S is false as stated** (`k = 13`, two instances). The weaker form
+  `e_min >= ceil((k-1)/3)` is fitted to the same data and is not claimed. Any such
+  bound would cover only the selector degree, never `d_F`. Propositions S and S* are
+  exact reformulations, not bounds.
+- **The `n = 31–41` rows are lower bounds** on `e_min` only. No exact value is
+  claimed above `n = 29`.
 - **Corollary 4b** (monotonicity in `t`) is a sketch for the chain as stated in the
   treatise; it was not checked computationally.
 - **The small-size data are not evidence about asymptotic growth of `d_F`.** At
