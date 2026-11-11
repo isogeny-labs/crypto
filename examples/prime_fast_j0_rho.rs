@@ -2,9 +2,6 @@
 //! usage: prime_fast_j0_rho <out.jsonl> <bits> <targets>
 //!
 //! Curve y^2 = x^3 + b over F_p, p = 1 mod 3, prime order n.  phi(x,y) = (beta x, y) = [lambda]P.
-//! Symmetric arm: B orbit representatives, 6B covered points, B unknowns.
-//! Plain arm (`ic_solve`, 2 summands): 3B x-coordinates covered, 3B unknowns.
-//! usage: prime_fast_j0_sym <out.jsonl> <bits> <B,B,...> <instances> <extra>
 use crypto_lib::cryptanalysis::challenge_ladder::is_prime_u64;
 use crypto_lib::cryptanalysis::prime_fast::*;
 use rand::rngs::StdRng;
@@ -12,49 +9,6 @@ use rand::{Rng, SeedableRng};
 use serde_json::json;
 use std::io::Write;
 use std::time::Instant;
-
-/// Open-addressing x -> (orbit element id) table.
-struct XTable {
-    keys: Vec<u64>,
-    vals: Vec<u32>,
-    mask: usize,
-}
-impl XTable {
-    fn new(cap: usize) -> Self {
-        let n = (cap * 4).next_power_of_two();
-        XTable {
-            keys: vec![u64::MAX; n],
-            vals: vec![0; n],
-            mask: n - 1,
-        }
-    }
-    #[inline(always)]
-    fn h(&self, k: u64) -> usize {
-        (k.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.mask
-    }
-    fn insert(&mut self, k: u64, v: u32) {
-        let mut i = self.h(k);
-        while self.keys[i] != u64::MAX {
-            i = (i + 1) & self.mask;
-        }
-        self.keys[i] = k;
-        self.vals[i] = v;
-    }
-    #[inline(always)]
-    fn get(&self, k: u64) -> Option<u32> {
-        let mut i = self.h(k);
-        loop {
-            let kk = self.keys[i];
-            if kk == k {
-                return Some(self.vals[i]);
-            }
-            if kk == u64::MAX {
-                return None;
-            }
-            i = (i + 1) & self.mask;
-        }
-    }
-}
 
 fn find_j0_curve(bits: u32, skip: u64) -> (FastCurve, Pt, u64, u64) {
     let mut p = (1u64 << bits) - 1;
