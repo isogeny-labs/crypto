@@ -1,0 +1,17 @@
+{
+  "schema": "validation-gate/v1",
+  "_comment": "DRAFT, named .draft.json so no builder reads it. Shows the shape the gate would need. Not valid: both pinned files say independent=false, and rho_reference.gae_band is absent because the IC arm has no priced band.",
+  "replay_certificate": {"path": "replay-log.json", "sha256": "FILLED_BY_make_draft"},
+  "validator_report": {"path": "recompute-output.json", "sha256": "FILLED_BY_make_draft"},
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "ic rho, negation-map walk (A = 2), counted group operations, generated prime-order curves of 10 to 16 bits (results/rho1/rho_matched.json)",
+    "unit": "GAE",
+    "binary_or_process": "NOT the same process as the IC arm",
+    "matches_protocol": false,
+    "strongest_available": true,
+    "same_unit": false,
+    "same_binary_or_process": false,
+    "order_holds_across_band": false
+  }
+}

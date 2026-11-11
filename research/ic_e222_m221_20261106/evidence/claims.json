@@ -1,0 +1,168 @@
+{
+ "schema": "evidence-bundle/v1",
+ "status": "prepared by the producer session; independent replay and validator outstanding",
+ "binary_note": "replay.py records the blake3 of the ic binary it runs and `git rev-parse HEAD`; trial counts are deterministic given seed and binary behaviour on word-sized primes",
+ "instance_sets": {
+  "def_inst": {
+   "generator": "gen_instances.py",
+   "args": "--families W --bits 12,16,20,22 --per 8 --seed e222m221-default-v1",
+   "manifest_sha256": "07040d28b5eb531c5813f18b51e99ad68211573449060a404ced5c74932ede3a"
+  },
+  "rob_inst": {
+   "generator": "gen_instances.py",
+   "args": "--families W --bits 12,14,16,18 --per 60 --seed e222m221-robust-v1",
+   "manifest_sha256": "df91f544986adaf52d7a16351e037a138d45b58b7805344628675d77caa32375"
+  },
+  "h1d_inst": {
+   "generator": "gen_instances.py",
+   "args": "--families E,M,W --bits 12,16,20 --per 8 --seed e222m221-h1default-v1",
+   "manifest_sha256": "261a37b2b1e9fc9f1391fec7f80f0c5f704ef2f7d740dfd539f52b5553b4ef82"
+  }
+ },
+ "raw_data": {
+  "paired": {
+   "path": "results/default_flip/paired/rows.jsonl",
+   "sha256": "e95ef37a948a712272c55bb2b16401937701a1dbbf68bb45386162ec798eb9b1",
+   "instances": "def_inst",
+   "in_git": true
+  },
+  "robust": {
+   "path": "results/default_flip/robust/rows.jsonl",
+   "sha256": "32db28a7418923289b4828e794b00b808cf6f78247193214cc512e9728a69ea8",
+   "instances": "rob_inst",
+   "in_git": false,
+   "note": "artifact store; pinned by results/default_flip/robust/.artifacts.json"
+  },
+  "h1_defaults": {
+   "path": "results/h1_defaults/rows.jsonl",
+   "sha256": "e0c80167f800fcabee3073b529f327c598f3bcd1820cfe10d0d5ea9b23a60695",
+   "instances": "h1d_inst",
+   "in_git": true
+  },
+  "native_timing": {
+   "path": "native/native_timing.txt",
+   "sha256": "01a58122d734dad2dd0638c140c390d21fe4d34a000ac7d76dd3b47851c18cf9",
+   "in_git": true
+  },
+  "native_fixed_costs": {
+   "path": "native/native_fixed_costs.txt",
+   "sha256": "849864164efa70bd88169402560c15d77536426a53b5d6a6b2c82569e3e43e57",
+   "in_git": true
+  },
+  "rho_matched": {
+   "path": "results/rho1/rho_matched.json",
+   "sha256": "abec3fd74ca2ae2b4cc7cf23eb5ebe9029cf3e0a6d93947b525c24ceb0f27c47",
+   "in_git": true
+  }
+ },
+ "claims": [
+  {
+   "id": "C1",
+   "statement": "New solve-prime defaults (table, fb 32, extra 2, joint relation point) take 0.0015 of the old shipped defaults' total time, paired by instance and seed (33 fresh prime-order instances, 12 to 23 bits)",
+   "source_note": "RESULTS_default_flip.md",
+   "raw": "paired",
+   "headline": [
+    {
+     "name": "paired_median_total_ms_ratio_new_over_old",
+     "claimed": 0.0015,
+     "rel_tol": 0.05
+    },
+    {
+     "name": "paired_n",
+     "claimed": 64,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "rung22_median_trials_old",
+     "claimed": 2354250.5,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "rung22_median_trials_new",
+     "claimed": 75224.5,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "paired_all_recovered",
+     "claimed": 1,
+     "rel_tol": 0.0
+    }
+   ]
+  },
+  {
+   "id": "C2",
+   "statement": "With the new defaults, 720 runs on 240 fresh prime-order instances all recovered the planted logarithm (zero failures)",
+   "source_note": "RESULTS_default_flip.md",
+   "raw": "robust",
+   "headline": [
+    {
+     "name": "robust_runs",
+     "claimed": 720,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "robust_failures",
+     "claimed": 0,
+     "rel_tol": 0.0
+    }
+   ]
+  },
+  {
+   "id": "C3",
+   "statement": "H1 (--project-cofactor) with the new defaults: paired trials on/off 0.277 (cofactor 4), 0.153 (cofactor 8), exactly 1.000 (cofactor 1), 288 runs all recovered",
+   "source_note": "RESULTS_h1_defaults.md",
+   "raw": "h1_defaults",
+   "headline": [
+    {
+     "name": "E_trials_on_over_off_median",
+     "claimed": 0.277,
+     "rel_tol": 0.003
+    },
+    {
+     "name": "M_trials_on_over_off_median",
+     "claimed": 0.153,
+     "rel_tol": 0.004
+    },
+    {
+     "name": "W_trials_on_over_off_median",
+     "claimed": 1.0,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "W_pairs_exactly_1",
+     "claimed": 48,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "h1_all_recovered",
+     "claimed": 1,
+     "rel_tol": 0.0
+    }
+   ]
+  },
+  {
+   "id": "C4",
+   "statement": "On the real E-222 and M-221 (Weierstrass images, [r]G = O checked) the joint relation point costs 0.529 and 0.581 of the former path (single unpinned host, 40 pairs, 6 reps)",
+   "source_note": "RESULTS_native.md",
+   "raw": "native_timing",
+   "headline": [
+    {
+     "name": "E222_joint_over_former",
+     "claimed": 0.529,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "M221_joint_over_former",
+     "claimed": 0.581,
+     "rel_tol": 0.002
+    }
+   ],
+   "replay": "not replayed by replay.py: wall-time, needs `cargo build --release --example relation_point_native` and native/native_params.py; rerun is a timing re-measurement, not a deterministic replay"
+  }
+ ],
+ "rho_reference": {
+  "status": "not complete",
+  "available": "results/rho1/rho_matched.json (ic rho, negation-map walk, A = 2) at 10 to 16 bits, mean GAE per solve",
+  "missing": "the 0 / 0.1 / 1 GAE band for both arms: solve-prime-file does not emit its unpriced native counters (table probes, field operations outside group additions); rho reference is for generated curves of the same size, not the E/M/W instances; no same-process run"
+ }
+}
