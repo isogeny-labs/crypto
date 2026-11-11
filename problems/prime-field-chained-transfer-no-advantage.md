@@ -78,7 +78,31 @@ stands. Neither is implied by the existence of the intermediate maps.
 - **Recheck trigger:** a new computable map that changes the destination's
   genus or characteristic.
 
+## Transfer atlas (2026-11-11 addendum)
+
+Covering a *fixed* target curve and sweeping the cover maps the discrete log to
+a rich spectrum of different-order complementary curves, but the log follows to
+none (`research/chained_prime_transfer_20261111/ATLAS.md`) [pcc:unverified]:
+
+- Sweep workflow: 5,641 covers; the complement takes up to 141 distinct orders
+  across the Hasse interval; 3,479 complements are smoother than the target;
+  the cover map `φ2_*φ1^* = 0` on every report; no reachable complement is
+  strictly easier (reachable ⇒ same order ⇒ identical hardness).
+- Census: `φ2_*φ1^* = 0` on 300/300 curves per prime; no non-special start has
+  a reachable easier node.
+- Positive control: Smart's additive transfer recovers the log on a genuinely
+  anomalous curve over `F_43`, so the easy node is real — just unreachable from
+  a non-anomalous start (an isogeny preserves the trace; no edge changes the
+  characteristic, so no binary node is reachable either).
+
+The load-bearing theorem: a DLP-preserving `E → E'` exists iff `E ~ E'`
+(isogenous) iff `#E = #E'`, so a map to a different-order curve cannot preserve
+the log. This strengthens, not resolves, the obstruction: the reachable set is
+confined to `E`'s isogeny class.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
   (native Rust framework, PR #3877 follow-up).
+- 2026-11-11: transfer-atlas addendum — cover sweep, census and down-edge
+  controls; the obstruction holds across every arm measured.
