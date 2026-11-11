@@ -58,6 +58,53 @@ in k (odd-degree finite-field norm preserves square class).
   k-rational quadratic factor. Kernel descent is standard; actual
   codomain/morphism normalization and descent remain a separate check.
 
+
+## Explicit closed-fiber pullback works even without rational square roots
+
+The rational degree-two cover is **computationally evaluable on arbitrary
+affine k-rational elliptic points without extracting a square root**.
+For Q=(u0,v0) on E, its full scheme-theoretic fiber is the degree-two
+closed divisor D_Q cut out by
+
+    U(X)=X²-u0,     V(X)=v0,     (U(X), Y-V(X)) in k[X,Y]/(Y²-h(X²)).
+
+Because V²-h(X²) is divisible by U, this is an ideal over k, whether
+U is split, irreducible, or equal to X². The last case u0=0 is the
+ramified double fiber, when the point is k-rational. This is an
+effective divisor representation, **not a claim that an even-sextic
+Mumford pair is already canonical under the existing odd-quintic backend**.
+The two k-rational infinity points of C (monic even sextic) map to
+O_E and supply the degree-two reference divisor.
+
+    f*(Q-O_E) = [D_Q - infinity_plus - infinity_minus]
+    f_* f*(Q-O_E) = [2](Q-O_E).
+
+The second identity is immediate from scheme-theoretic pushforward of
+a degree-two fiber, including geometric conjugate points/multiplicity.
+Consequently f* is injective on every odd-order subgroup of E(k):
+if [r]Q=O and f*(Q)=0, then [2]Q=0, so Q=O for odd r. The target
+subgroup DLP is *functionally equivalent* to the source subgroup DLP,
+but no lower computational solving cost follows.
+
+Local tiny-field fiber classification (affine rational elliptic Q only,
+plus O_E separately):
+
+| E/F11 | split X²-u | irreducible X²-u | ramified X² | O_E |
+|---|---:|---:|---:|---:|
+| u³+u+6, #E=13 | 4 | 8 | 0 | 1 |
+| u³+2u+4, #E=17 | 4 | 10 | 2 | 1 |
+
+The added Rust regression checks polynomial ideal divisibility for
+every one of these affine Q. That test is **committed but not yet run**;
+the displayed counts were recomputed using a separate local Python
+enumerator. [pcc:unverified]
+
+**Engineering consequence:** don't abandon a degree-two cover merely
+because no rational Weierstrass point or split fiber exists. Add
+even-sextic *two-infinity* arithmetic and evaluate this rational
+closed-divisor representation first. This is a narrower, testable
+next step than searching a new higher-degree cover.
+
 The cases are about this even-sextic / degree-2-cover family; they do not
 prove or disprove other covers, field transfers or general DLP advantages.
 In particular, a nontrivial rational kernel need not have pointwise-rational
