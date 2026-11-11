@@ -46,3 +46,16 @@ both ladders ("Semaev-specific": the curve structure lowers the degree and is wo
 `d_F(null) < d_F(tower)` would say the summation polynomial is harder than a random one of its
 shape. Rows: `null_m2_t2-9.jsonl`, `null_m3_t2-3.jsonl`, `null_m4_t2-3.jsonl`; a width ladder
 (`--null-width`, if implemented) follows in `nullw_*.jsonl`. Every value `[pcc:unverified]`.
+
+## Width ladder (`--null-width W`), stated before its rows exist (2026-11-11)
+
+`--null-width W` replaces the Null control's support by the full box of exponents `0..=W` on the
+variables of each summation equation (at `m = 2`: 4, 9, 16, 25 monomials for `W = 1..4`; `S₃`'s own
+support is a 9-monomial subset of the `W = 2` box). Cells: Kummer `P1`, `W = 1..4`, `m = 2`, `t = 2..8`
+(cmax 7, budget 300 s); `m = 3, 4` at `t = 2, 3` with `--null-chain` (cmax 8, budget 900 s); two
+random targets, same seeds, both arms (`tower`, `null`) in every run. Prediction: `d_F(null, W)` is a
+function of `(W, N)` alone, non-decreasing in `W` and in `N`, with `d_F(null, 2) = d_F(tower)`; a
+`W = 1` (bilinear) box below the tower and `W ≥ 3` above it would say the degree is set by the
+support width, i.e. the carry-graded one-generator closure, not by the curve. The agent's smoke rows
+(`agent_smoke_nullw{1,3}_m2_t3-5.jsonl`, written before this paragraph) are not part of the ladder.
+Rows: `nullw{1,2,3,4}_m2_t2-8.jsonl`, `nullw{W}_m3_t2-3.jsonl`, `nullw{W}_m4_t2-3.jsonl`.

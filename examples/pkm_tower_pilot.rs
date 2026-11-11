@@ -60,6 +60,16 @@
 //! `--null-chain` runs the null control at `m ≥ 3` as well, with every `S₃`
 //! link of the chain given random coefficients on its own support
 //! (`research/pkm_dickson_torus_20261015/`).
+//! `--null-width W` (1..=4) changes the null control's support: every
+//! summation equation is replaced by a random polynomial on the full box of
+//! exponents `0..=W` on the variables that equation uses (at `m = 2`, the
+//! two top tower variables `y_{1,0}`, `y_{2,0}` and `x_R`'s slot, i.e. the
+//! raw indices `0` and `t`), coefficients uniform in `1..p` and the planted
+//! value subtracted as before. At `m = 2` the box has 4, 9, 16, 25 monomials
+//! for `W = 1, 2, 3, 4`. `W = 2` is *not* the default null: the default
+//! support is `S₃`'s own 9 monomials, which are not the 9-monomial box.
+//! Every row (all controls) then carries `null_width`; without the flag
+//! the null control draws and builds exactly what it did before.
 //!
 //! The committed runs, their exact flags and the scripts that tabulate and
 //! cross-check them are in `research/pkm_tower_pilot_20260924/` (the pilot,
@@ -1114,6 +1124,29 @@ fn random_quadric(n: usize, at: &[u64], p: u64, rng: &mut StdRng) -> Pol {
     f.sub(&Pol::constant(n, c, p), p)
 }
 
+/// The exponent vectors of the `--null-width W` support of `eq`: every
+/// vector with exponent `0..=W` on each variable that occurs in `eq` and 0 on
+/// the others, in lexicographic order (`(W+1)^|vars|` of them).
+fn null_box(eq: &Pol, n: usize, w: usize) -> Vec<Vec<u32>> {
+    let mut vars: Vec<usize> = (0..n)
+        .filter(|&i| eq.terms.keys().any(|e| e[i] > 0))
+        .collect();
+    vars.sort_unstable();
+    let mut out = vec![vec![0u32; n]];
+    for &v in vars.iter().rev() {
+        let mut next = Vec::with_capacity(out.len() * (w + 1));
+        for d in 0..=w as u32 {
+            for e in &out {
+                let mut e = e.clone();
+                e[v] = d;
+                next.push(e);
+            }
+        }
+        out = next;
+    }
+    out
+}
+
 /// The system for one (control, target), with its number of variables
 /// and the planted solution in that system's variables.
 fn system(
@@ -1123,6 +1156,7 @@ fn system(
     m: usize,
     target: &Target,
     g: usize,
+    null_width: Option<usize>,
     rng: &mut StdRng,
 ) -> (Vec<Pol>, usize, Option<Vec<u64>>, std::ops::Range<usize>) {
     let p = curve.p;
@@ -1161,8 +1195,19 @@ fn system(
         // order. At m = 2 the draws are those of the pilot's null.
         for eq in eqs.iter_mut() {
             let mut f = Pol::zero(n);
-            for e in eq.terms.keys() {
-                f.terms.insert(e.clone(), rng.gen_range(1..p));
+            match null_width {
+                None => {
+                    for e in eq.terms.keys() {
+                        f.terms.insert(e.clone(), rng.gen_range(1..p));
+                    }
+                }
+                Some(w) => {
+                    // `--null-width`: the full box of exponents 0..=w on
+                    // every variable the equation uses, 0 elsewhere.
+                    for e in null_box(eq, n, w) {
+                        f.terms.insert(e, rng.gen_range(1..p));
+                    }
+                }
             }
             if let Some(sol) = &target.solution {
                 let c = f.eval(sol, p);
@@ -1938,6 +1983,10 @@ struct Args {
     /// link of the chain given random coefficients on its own support (off
     /// by default, so every committed command line runs what it ran).
     null_chain: bool,
+    /// `--null-width W` (1..=4): the null control's support is the full box
+    /// of exponents `0..=W` on the equation's own variables, not `S₃`'s
+    /// support (off by default).
+    null_width: Option<usize>,
     budget: u64,
     seed: u64,
     ladder_ts: Vec<usize>,
@@ -2151,6 +2200,7 @@ fn parse_args() -> Args {
         planted_max_t: usize::MAX,
         random: 3,
         null_chain: false,
+        null_width: None,
         budget: 60,
         seed: 0x504B_4D54,
         ladder_ts: vec![4, 6],
@@ -2290,6 +2340,11 @@ fn parse_args() -> Args {
             }
             "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
             "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--null-width" => {
+                let w: usize = v.parse().expect("--null-width");
+                assert!((1..=4).contains(&w), "--null-width must be 1..=4");
+                a.null_width = Some(w);
+            }
             "--radix" => {
                 let r: u32 = v.parse().expect("--radix");
                 assert!(
@@ -2431,6 +2486,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             cell.m,
             target,
             cell.g,
+            a.null_width,
             &mut rng,
         );
         if !matches!(a.engine, Engine::F4 | Engine::Hky) && cell.control == Control::Naive {
@@ -2556,6 +2612,9 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             "staircase_at_stop": r.staircase_at_stop,
             "planted_ok": r.planted_ok,
         });
+        if let Some(w) = a.null_width {
+            row["null_width"] = json!(w);
+        }
         if cell.control == Control::Multiples {
             row["multiples"] = json!(2);
             row["appended"] = json!(multiples_appended(cell.m));
@@ -2739,7 +2798,16 @@ fn export_magma_rows(files: &[String], dir: &str) {
                 xs: Vec::new(),
             };
             let mut rng = StdRng::seed_from_u64(0);
-            let (eqs, n, _, _) = system(Control::Tower, &tower, &curve, m, &target, 1, &mut rng);
+            let (eqs, n, _, _) = system(
+                Control::Tower,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
             let name = format!("pkm_kummer_p{p}_m{m}_t{t}_x{x_r}");
             let mut names: Vec<String> = Vec::new();
             for i in 0..m {
@@ -3000,11 +3068,20 @@ mod tests {
                 break tg;
             }
         };
-        let (eqs, _, sol, _) = system(Control::Null, &tower, &curve, 3, &target, 1, &mut rng);
+        let (eqs, _, sol, _) = system(Control::Null, &tower, &curve, 3, &target, 1, None, &mut rng);
         let sol = sol.expect("planted");
         assert!(eqs.iter().all(|e| e.eval(&sol, p) == 0));
         // The null changed every chain link's coefficients.
-        let (tw, _, _, _) = system(Control::Tower, &tower, &curve, 3, &target, 1, &mut rng);
+        let (tw, _, _, _) = system(
+            Control::Tower,
+            &tower,
+            &curve,
+            3,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
         assert_ne!(eqs[0].terms, tw[0].terms);
         assert_ne!(eqs[1].terms, tw[1].terms);
     }
@@ -3058,8 +3135,26 @@ mod tests {
 
     fn check_multiples_vanish(m: usize, t: usize, seed: u64) {
         let (tower, curve, target, mut rng) = multiples_cell(m, t, seed);
-        let (tw, n_tw, _, _) = system(Control::Tower, &tower, &curve, m, &target, 1, &mut rng);
-        let (eqs, n, sol, _) = system(Control::Multiples, &tower, &curve, m, &target, 1, &mut rng);
+        let (tw, n_tw, _, _) = system(
+            Control::Tower,
+            &tower,
+            &curve,
+            m,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
+        let (eqs, n, sol, _) = system(
+            Control::Multiples,
+            &tower,
+            &curve,
+            m,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
         let sol = sol.expect("planted");
         assert_eq!(sol.len(), n);
         assert_eq!(eqs.len() - tw.len(), multiples_appended(m));
@@ -3098,9 +3193,26 @@ mod tests {
             let tower = kummer(p, 3, &mut rng);
             let (curve, _) = target_curve(p, &tower, m, &mut rng);
             let target = random_target(&curve, &mut rng);
-            let (tw, _, _, _) = system(Control::Tower, &tower, &curve, m, &target, 1, &mut rng);
-            let (mu, n, sol, _) =
-                system(Control::Multiples, &tower, &curve, m, &target, 1, &mut rng);
+            let (tw, _, _, _) = system(
+                Control::Tower,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
+            let (mu, n, sol, _) = system(
+                Control::Multiples,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
             assert!(sol.is_none());
             assert_eq!(mu.len(), tw.len() + multiples_appended(m));
             for (k, e) in tw.iter().enumerate() {
@@ -3113,5 +3225,82 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn null_width_support_is_the_full_box() {
+        let (tower, curve, target, _) = multiples_cell(2, 3, 12345);
+        let t = tower.t;
+        for (w, count) in [(1usize, 4usize), (2, 9), (3, 16)] {
+            let mut rng = StdRng::seed_from_u64(99);
+            let (eqs, n, sol, _) = system(
+                Control::Null,
+                &tower,
+                &curve,
+                2,
+                &target,
+                1,
+                Some(w),
+                &mut rng,
+            );
+            let f = &eqs[0];
+            // The planted shift can only change the constant's coefficient.
+            assert_eq!(f.terms.len(), count, "W = {w}");
+            for e in f.terms.keys() {
+                for (i, &d) in e.iter().enumerate() {
+                    if i == 0 || i == t {
+                        assert!(d as usize <= w);
+                    } else {
+                        assert_eq!(d, 0, "index {i}");
+                    }
+                }
+            }
+            assert_eq!(
+                f.terms
+                    .keys()
+                    .filter(|e| e[0] as usize == w && e[t] as usize == w)
+                    .count(),
+                1
+            );
+            if let Some(s) = sol {
+                assert_eq!(f.eval(&s, curve.p), 0);
+            }
+            assert_eq!(n, 2 * t);
+        }
+    }
+
+    #[test]
+    fn null_width_keeps_targets_and_tower() {
+        let (tower, curve, target, rng) = multiples_cell(2, 3, 777);
+        let mut r1 = rng.clone();
+        let mut r2 = rng;
+        let (tw, n1, _, rg1) = system(Control::Tower, &tower, &curve, 2, &target, 1, None, &mut r1);
+        let (nu, n2, _, rg2) = system(
+            Control::Null,
+            &tower,
+            &curve,
+            2,
+            &target,
+            1,
+            Some(3),
+            &mut r2,
+        );
+        assert_eq!((n1, rg1.clone()), (n2, rg2.clone()));
+        for (a, b) in tw[rg1].iter().zip(&nu[rg2]) {
+            assert_eq!(a.terms, b.terms);
+        }
+        assert_eq!(tw.len(), nu.len());
+        assert_ne!(tw[0].terms, nu[0].terms);
+    }
+
+    #[test]
+    fn null_default_unchanged() {
+        // Expected values computed with the code before `--null-width`.
+        let (tower, curve, target, mut rng) = multiples_cell(2, 3, 12345);
+        let (eqs, _, _, _) = system(Control::Null, &tower, &curve, 2, &target, 1, None, &mut rng);
+        assert_eq!(eqs.len(), 7);
+        assert_eq!(eqs[0].terms.len(), 9);
+        let sum = eqs[0].terms.values().fold(0u64, |a, &c| (a + c) % curve.p);
+        assert_eq!(sum, 1_862_312_789);
     }
 }
