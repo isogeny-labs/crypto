@@ -229,7 +229,7 @@ fn main() {
                 c.add_many_batched(&mut cur, &sel, &mut scratch);
                 total_steps += lanes as u64;
                 resolved_check += 1;
-                if resolved_check % 64 == 0 {
+                if resolved_check.is_multiple_of(64) {
                     let mut all = true;
                     for t in 0..m {
                         let (r, _, _) = dsu.find(t);
