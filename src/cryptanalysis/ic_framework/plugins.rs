@@ -2641,7 +2641,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
             ("sib", "1 to 16 (needs tw=1 or tw=2 and pool=M; default off): sibling points.  Every parent P draws its own random m-subset of a pool of M jump points (a product set J = A_i + K_j: a = 4 seed parts, or 8 from M = 256, and M/a chained parts K_j = K_(j-1) + K_(j-2), built as cj=1 chains them; set-up about a·popcount + M/a + M additions), and for each chosen J forms the two x-only children x(P ± J) from ONE inversion 1/(x_J − x_P); all 2m children are keyed (negation folded) with coefficient vectors c_P ± c_J and a key collision among any stored points is a row as in the target walk (lazy applies); the walk continues from P + J_h with h the first of the subset; the two known-copy minus children are not formed; stored points are capped at 3T.  Charging: a pair performs inv + 2 mul + 2 sqr + 8 add; it is charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add, the difference), so its bitop/v1 price equals its field work, and the band prices the second point at w; the continuing child's y (mul + 2 add) is the counter sibling_lift_products, once a parent; a pair whose minus child is skipped is the addition alone (one mul and two adds above what it performs); field_ops are counted as performed, never through the addition; a collision's x-only point gets its sign resolved at that time (one more addition, charged)"),
             ("pool", "sib to 512 (needs sib): the sibling pool's size M (default off)"),
-            ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 63 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery; with tw=2 needs coefficients below 2^31 (default 1)"),
+            ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 127 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery (default 1)"),
         ]
     }
 
@@ -5923,6 +5923,90 @@ mod wwalk_pipeline_tests {
             );
             assert!(res.is_err(), "{bad} should be refused");
         }
+    }
+
+    /// Prime-order curves above the old `r < 2^31` limit: `sib`, `lazy=1`
+    /// and `cv=0` on the two-seed walk recover and verify the planted log at
+    /// r ≈ 2^34 and r ≈ 2^38 (the `u128` coefficient word, `TW_COEF_BITS`),
+    /// and the plain `WalkTable` keeps its 32-bit refusal there.
+    #[test]
+    fn wwalk_target_walk_runs_above_two_to_the_31() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance};
+        for bits in [35u32, 39] {
+            let spec = CurveSpec::PrimeOrbitShape {
+                shape: "generic_a_minus_3".into(),
+                bits,
+                seed: 7,
+            };
+            let Instance::Prime(inst) = spec.build().unwrap() else {
+                panic!("a prime instance");
+            };
+            assert!(inst.r >= 1 << 31, "r={} is not above 2^31", inst.r);
+            let base = Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=32")
+                .unwrap()
+                .1;
+            let pre = "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1";
+            for (arm, s) in [
+                (format!("{pre},lazy=1,sib=8,pool=256"), 1u64),
+                (format!("{pre},sib=8,pool=64"), 2),
+                (format!("{pre},lazy=1"), 3),
+                (format!("{pre},cv=0"), 4),
+            ] {
+                let planted = (inst.r / 3 + 7919 * s) % inst.r;
+                let mut ops = GroupOps::default();
+                let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+                let (name, oracle_params) = Params::parse_spec(&format!("{arm},seed={s}")).unwrap();
+                let ps = PipelineSpec {
+                    factor_base: "prime-projected-abscissa".into(),
+                    factor_base_params: base.clone(),
+                    oracle: name,
+                    oracle_params,
+                    targets: Targets::StrideGenerator,
+                    linalg: "incremental-gauss".into(),
+                    max_trials: 5_000_000,
+                    seed: s,
+                    ..Default::default()
+                };
+                let mut oracle = WWalkOracle::<PrimePoint>::new();
+                let rep = run_pipeline(
+                    &ctx(&inst, q),
+                    &ps,
+                    &PrimeProjectedAbscissaBase { instance: &inst },
+                    &mut oracle,
+                    planted,
+                    &Calibration {
+                        ns_per_add: 1.0,
+                        ns_per_double: 1.0,
+                        ..Default::default()
+                    },
+                    None,
+                )
+                .unwrap_or_else(|e| panic!("{arm} at {bits} bits: {e}"));
+                assert!(
+                    rep.verified && rep.recovered == Some(planted),
+                    "{arm} at {bits} bits: planted log not recovered"
+                );
+                if arm.contains("sib") {
+                    let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+                    assert!(ctr["tw_sib_pairs"] > 0);
+                }
+            }
+        }
+        // The plain walk table still packs coefficients in 32 bits.
+        let r = 1u64 << 39;
+        let opts = crate::cryptanalysis::ic_boundary::WalkOpts {
+            g_jumps: true,
+            grow: 2,
+        };
+        assert!(crate::cryptanalysis::ic_boundary::wwalk_plan_check(r, 2.0, 16, opts).is_err());
+        assert!(crate::cryptanalysis::ic_boundary::wwalk_plan_check_bits(
+            r,
+            2.0,
+            16,
+            opts,
+            crate::cryptanalysis::ic_boundary::TW_COEF_BITS
+        )
+        .is_ok());
     }
 
     /// `tw=2` (size-2 `prime-projected-abscissa` base) and `lazy=1`, end to
