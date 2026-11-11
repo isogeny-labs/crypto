@@ -1,0 +1,40 @@
+review-file F<n>	file:line	status	reason/evidence
+frontier F1	audit.tex:211	applied	jv_sieve_negrho_20261102/VALIDATION.json (VAL-20261103-c31c76, order_holds_across_band) supports; added "no validated leaderboard row" wording, sieve sentence, and that the 19 validated board rows have pcc measurement claims of standing unverified (pcc.py standing on origin/main copy)
+frontier F2	audit.tex:7-9	applied	"Most corrections ... moved down"; names byte-counter and JV sieve as moving IC up
+frontier F3	prog_frontier.tex:756	applied	53-221 -> 53-317 (benchmarks/README.md; audit.tex:43)
+frontier F4	prog_frontier.tex:309-311	applied	reviewer's wording, pointer Chapter~\ref{sec:transfer}
+frontier F5	distance.tex:201-271	applied	JV sieve row added to tab:distance-weak and top of tab:nearest; line 204 rewritten; Nagao row kept, relabelled, with matched negation-rho rescore (1.405/1.160/0.870, jv_cover_negrho_rescore_20261101)
+frontier F6	distance.tex:81-84,245-267	applied	res2 2.59 (LEADERBOARD.md:33) and res1eq 1.54/1.64 (benchmarks/20261101-ic-residual-dp-eq/VALIDATION.json, not an admitted row) added to prime table and tab:nearest; Koblitz lazy orbit-member 1.272 [0.770,1.803] (leaderboard.json lazy_members_component a1-n29) added, labelled not validated (leaderboard.json says no VALIDATION.json); "never below 1" -> point estimates/intervals wording
+frontier F7	distance.tex:49-55; audit.tex:187-203	partial	v8 VALIDATION.json, replay-certificate, validator-report exist on main; status set in distance table and audit caption. prog_koblitz.tex:363 "archived as incomplete" not mine: owner should reconcile
+frontier F8	distance.tex (validated rows); audit.tex:173-209	partial	claim ids verified (19 board measurement claims, all standing unverified via pcc.py standing). Added chapter-level standing statement, v7 claim id, Table B claim ids in caption, ids in tab:nearest, "producer-reported" labels; not a per-row column for every board row
+frontier F9	rho_side.tex:3-6,18-21	applied	PCC-20261104-c97d81 and -d91a51 exist, standing unverified; header comment, standing paragraph and tab:gf-collision caption updated
+frontier F10	rho_side.tex:260-262	partial	rho_side sentence marked superseded (not priced across band; no exponent separation). prog_prime.tex:381 not mine: owner should replace "beats rho from 24 bits up"
+frontier F11	prog_frontier.tex:489,750,797	applied	extension.tex:110-129 red-team verdict "not survived (unsupported)", m=15 5.2x
+frontier F12	prog_frontier.tex:745-752,804	applied	cold frontier lists sieve 0.0065 validated; (ix) notes matched rho now exists for sieve (1511) and Nagao (1301-1601); reviewer's "Nagao still lacks it" not used, since jv_cover_negrho_rescore_20261101 ran matched negation rho on the Nagao arm
+frontier F13	prog_frontier.tex:536-542	partial	prog_frontier sentence replaced with pointer to ch:audit item 4 (ADDENDUM-20261026). prog_method.tex item 6 not mine
+frontier F14	audit.tex:141-146	applied	research/quartic_pic_canonical_20261018 exists; quartic_n4v2 README says cut from the canonical-key branch
+frontier F15	distance.tex:86-92,262	partial	unit stated (LEADERBOARD.md:27 "cold IC / same-point rho online wall"); prog_koblitz.tex:309-311 not mine: owner should reconcile
+frontier F16	distance.tex:107-111	applied	RESULT.md: L0, one run, no replay certificate or validator, public reproduction panel
+frontier F17	corrections.tex:3-9, corr-engine, corr-rho, corr-exotic	applied	intro rewritten ("collects every correction; where a chapter tells it at length, the entry is a pointer"); 5 engine rows and 4 rho rows told in rho_side cut to pointer sentences/caption; E27 row kept as one-line pointer because transfer_ext.tex:2049 cites tab:corr-rho for it; ETH-leads, WDSat and hashed-ECDL rows shortened to pointers into unconventional.tex. All labels kept
+frontier F18	summer.tex:71-73	applied	research/jksst_xedni_audit_20261101/README.md: conditional theorem, overbroad inferences refuted; sentence appended to summer
+frontier F19	corrections.tex:43	applied	dropped \S\ref{sec:binary} from xref row. Follow-up for prog_binary.tex owner: 1,237 certified-empty n=83 cells (17-19 Oct) predate the 24 Oct FieldStructure fix; check n83_msweep_20261024
+frontier F20	corrections.tex:457-461	applied	"The one row in this appendix that ends below rho"
+frontier F21	unconventional.tex:433-767	partial	full account kept in unconventional; removed reliance on tab:pa-eth for standing (now "this section is the full account; sec:pa-sat summarises"); L05 aligned with SKEPTIC_DIGEST.md:30 ("REFUTED as closed", both skeptics) while keeping LEADS.md §9 group label. prime_ext owner should shrink §pt-tensor / §pa-sat twelve-lead material and set L05 to "refuted as closed" (it already does); corrections.tex:373 ETH row shortened to a pointer
+frontier F22	prog_frontier.tex:550	applied	(3,7) and l=8 cells ran (same chapter 651-666; binary_ext tab:bd-guess)
+frontier F23	distance.tex:148,151	applied	campaign README:37,45: w=0 ratios 9.8/95.2 added with w=0.1 in parentheses; exponent labelled w=0; caption notes 0.586-0.650 is the k-sum refit
+frontier F24	distance.tex:154	applied	LEADERBOARD.md:220 board row 8.3x
+frontier F25	distance.tex:156,169	applied	planner cells: ic_planner_validation_20261020 README (c24-c30, 23.5-29.6 bits, w=0, supplementary); Kummer lower end 29 (pkm_tower_ecbench_20261013 24-bit 29.4)
+frontier F26	audit.tex:173,184-193	applied	component row count parenthesised and caption says not counted in the 28; leaderboard.json has several validated *_component sections
+frontier F27	corrections.tex:227-228	applied	"rho-side changes listed with the leaderboard corrections"
+frontier F28	rho_side.tex:711-713	applied	prog_frontier.tex:509-511 gives 1,196->718 in three rounds then 707.2->679.7
+frontier F29	rho_side.tex:1070-1074	applied	FRONTIER.md:57-59 (flips 0.290, 0.417, not dominating) and :31 (a frontier entry needs at least 4 sizes)
+frontier F30	rho_side.tex:240-245	applied	added "(L0, no validation file)"
+frontier F31	summer.tex:146	applied	DEC-20260815-6b806c exists in crypto-autoresearcher ledger/decisions (supersede, evidence-neutral, EV-DREG-4500cd); cited in text
+frontier F32	corrections.tex:22-24	applied	"are carried in the main text"
+frontier F33	distance.tex:269-271	applied	"(at the toy and medium sizes measured, <=2^47)"
+fields F3	prog_frontier.tex:692-695,803-806	applied	jv_cover_negrho_rescore_20261101 README: 1.405 [1.206,1.629], 1.160 [1.020,1.338], 0.870 [0.697,1.183]; U2 above at all three; crossing near 1330 stated as failed; line-search p*~1185 not added (unvalidated, kept short)
+fields F4	distance.tex:223,255	partial	distance rows added/relabelled as asked; abstract.tex not mine
+fields F8	corrections.tex:45	partial	"no pcc claim, so its statement is an unverified assertion" added to xref JV row (grep of pcc/claims for jv/joux/c31c76 empty); also in distance and audit. prog_transfer/abstract/prog_openproblems not mine
+fields F20	prog_frontier.tex:683-700	partial	prog_frontier JV paragraph rewritten to point to sec:jac-jv as full account; kept one paragraph (not two sentences) because the task asked it to state the Nagao arm against matched negation rho
+fields F28	distance.tex:169	applied	29-159 (24-bit 29.4)
+algos F7	prog_frontier.tex:650-671	applied	l=8 sentences cut to a summary with pointer to sec:bd-guess/tab:bd-guess, consistent with binary_ext (four suffice on every draw; S3 on 7 of 12; k=6 bound unchanged)

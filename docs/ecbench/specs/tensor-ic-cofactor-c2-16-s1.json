@@ -1,0 +1,55 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "fixed-cofactor tensor-contraction IC (ic.tensor_contraction_cofactor_v1, m = 2) against rho.negation on the registered 16-bit c = 2 curve icv1-fp16-tm166-90917c6c, shard 1 of 2 (counted S only)",
+  "description": "research/ecdl_tensor_ic_cofactor_speed_20261107: counts-only session, shard 1 of 2 (4 targets each, its own target_seed) so each EKS request stays under the 3600 s cap; S is deterministic per (workload, seed), so one measured round and no warm-up. No wall-time claim. Protocol: research/ecdl_tensor_ic_cofactor_speed_20261107/protocol.json.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 65519,
+        "a": 65516,
+        "b": 38179,
+        "group_order": 65686,
+        "r": 32843,
+        "gx": 65517,
+        "gy": 34281
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202611071
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "tensor-cof-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.tensor_contraction_cofactor_v1",
+        "params": {
+          "m": "2"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261107,
+    "isolation_required": "L2",
+    "timeout_seconds": 1800
+  }
+}

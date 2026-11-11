@@ -7013,13 +7013,17 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
     if LEGACY_NO_LINEAR_HARVEST.with(|c| c.get()) {
         return None;
     }
-    if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
-        return v;
+    let chosen = match LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
+        Some(v) => v,
+        None => *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
+            Err(_) => Some(LINEAR_HARVEST_DEFAULT),
+            Ok(s) => parse_linear_harvest(&s),
+        }),
+    };
+    if chosen == Some(LINEAR_HARVEST_DEFAULT) && LEGACY_HARVEST_R3.with(|c| c.get()) {
+        return Some(LINEAR_HARVEST_R3);
     }
-    *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
-        Err(_) => Some(LINEAR_HARVEST_DEFAULT),
-        Ok(s) => parse_linear_harvest(&s),
-    })
+    chosen
 }
 
 // The replay audit's view of a record made before the harvest was on by
@@ -7028,6 +7032,21 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
 // solve.  Per thread.
 thread_local! {
     static LEGACY_NO_LINEAR_HARVEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+// The replay audit's view of a record made while the harvest default was
+// round 3 item 02's `gpv OR rank >= 331` gate ([`LINEAR_HARVEST_R3`]), before
+// repair R8 (`59fcca75d4`, 2026-10-26) narrowed the default to the rank gate:
+// wherever the current default is chosen, the R3 gate is used instead.  An
+// explicit `gpv`, `every` or `off` choice is untouched.  Per thread.
+thread_local! {
+    static LEGACY_HARVEST_R3: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count the default harvest as round 3 item 02 shipped it (before repair
+/// R8); `false` restores the current default.
+pub fn set_legacy_harvest_r3(on: bool) {
+    LEGACY_HARVEST_R3.with(|c| c.set(on));
 }
 
 /// Count as the engine did before the harvest was the default; `false`
@@ -7226,6 +7245,26 @@ fn reduce_inherited(
                     take_lane_root(system, d, support_local)
                 } else {
                     None
+                };
+                // Prefix-cached root (`KIC_F4_PREFIX_ROOT=1`, off by
+                // default): the first reduction of a solve whose leading
+                // generators the decomposer marked target-free.  Exact; see
+                // `inherited_f4::prefix`.
+                let prebuilt = match prebuilt {
+                    Some(root) => Some(root),
+                    None if rounds == 0
+                        && stats.reductions == 1
+                        && crate::cryptanalysis::inherited_f4::prefix_root_enabled() =>
+                    {
+                        ReducedBasis::from_system_with_prefix(
+                            system,
+                            crate::cryptanalysis::inherited_f4::prefix_hint(),
+                            n_vars,
+                            d,
+                            support_local,
+                        )
+                    }
+                    None => None,
                 };
                 let built = match prebuilt {
                     Some(root) => Some(root),

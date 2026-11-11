@@ -22,6 +22,7 @@
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
 //! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
 //! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
+//! | `m4gb-f2` | M4GB (external process, Makarim–Stevens ISSAC 2017), reduced degrevlex basis over GF(2) with field equations | none (wall time only; see `AGENTS.md` §6: a reference arm, not a leaderboard row) |
 //! | `exhaustive` | evaluate every equation at every point, stopping at the first that fails | monomial tests |
 //!
 //! The exhaustive searches are not strawmen.  They are the
@@ -76,6 +77,7 @@ use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
 };
+use crate::cryptanalysis::m4gb_oracle::{run_m4gb, select_binary, M4gbError, M4gbOptions};
 use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
 use crate::cryptanalysis::pq_groebner_f2::{
     groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
@@ -301,6 +303,100 @@ impl SystemSolver for F4F2 {
         bitop_tally::snapshot()
             .since(tally_before)
             .put_complete(&mut cost.extra, st.word_xors_performed + tests);
+        cost.wall_ns = started.elapsed().as_nanos() as u64;
+        (verdict, cost)
+    }
+}
+
+// ── M4GB, an external process ──────────────────────────────────────
+
+/// M4GB (Makarim–Stevens, ISSAC 2017) run as a separate process behind
+/// `M4GB_BINARY` ([`crate::cryptanalysis::m4gb_oracle`]).  It is priced by
+/// wall time only, so it is a reference arm and never a leaderboard row.
+pub struct M4gbF2;
+
+impl SystemSolver for M4gbF2 {
+    fn name(&self) -> &str {
+        "m4gb-f2"
+    }
+
+    fn describe(&self) -> String {
+        "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "M4GB_BINARY",
+                "path to a solver_m4gb_n<N>_gf2 binary, or a directory of them from which the narrowest N >= unknowns is used (required)",
+            ),
+            ("M4GB_THREADS", "threads passed to --nrthreads (default 1)"),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        let Some(options) = M4gbOptions::from_env() else {
+            return false;
+        };
+        shape.n_vars <= MASK_BITS && select_binary(&options.binary, shape.n_vars).is_some()
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let started = Instant::now();
+        let mut cost = SolverCost {
+            ops: 0,
+            op_unit: "none (external process; wall time only)".into(),
+            ..SolverCost::default()
+        };
+        let Some(options) = M4gbOptions::from_env() else {
+            eprintln!("m4gb-f2: M4GB_BINARY is not set");
+            cost.extra.insert("m4gb_error".into(), 1);
+            cost.wall_ns = started.elapsed().as_nanos() as u64;
+            return (SolverVerdict::BudgetExceeded, cost);
+        };
+        let run = match run_m4gb(system, &options, budget) {
+            Ok(run) => run,
+            Err(M4gbError::Timeout(_)) => {
+                cost.timed_out = true;
+                cost.wall_ns = started.elapsed().as_nanos() as u64;
+                return (SolverVerdict::BudgetExceeded, cost);
+            }
+            Err(e) => {
+                static REPORTED: std::sync::Once = std::sync::Once::new();
+                REPORTED.call_once(|| eprintln!("m4gb-f2: {e}"));
+                cost.extra.insert("m4gb_error".into(), 1);
+                cost.wall_ns = started.elapsed().as_nanos() as u64;
+                return (SolverVerdict::BudgetExceeded, cost);
+            }
+        };
+        let mut tests = 0u64;
+        let verdict = match solutions_from_reduced_basis(&run.basis, system.n_vars, 24, &mut tests)
+        {
+            None => SolverVerdict::BudgetExceeded,
+            Some(points) => {
+                let points = verified(points, system, &mut tests);
+                if points.is_empty() {
+                    SolverVerdict::Unsatisfiable
+                } else {
+                    SolverVerdict::Solved(points)
+                }
+            }
+        };
+        cost.peak_bytes = run.peak_mib.unwrap_or(0).saturating_mul(1 << 20);
+        cost.degree_reached = run.max_lcm_degree;
+        cost.extra.insert(
+            "m4gb_cpu_ms".into(),
+            run.cpu_seconds.map_or(0, |s| (s * 1000.0).round() as u64),
+        );
+        cost.extra
+            .insert("m4gb_basis_len".into(), run.basis.len() as u64);
+        cost.extra.insert("extraction_tests".into(), tests);
         cost.wall_ns = started.elapsed().as_nanos() as u64;
         (verdict, cost)
     }
@@ -1186,6 +1282,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
     vec![
         Box::new(F4F2),
         Box::new(BuchbergerF2),
+        Box::new(M4gbF2),
         Box::new(HybridF4 {
             kind: HybridKind::MatrixF4,
         }),
@@ -1233,6 +1330,42 @@ mod tests {
                 F2BoolPoly::from_monos(vec![m(3), m(2)], 2),
             ],
             n_vars: 2,
+        }
+    }
+
+    #[test]
+    fn m4gb_is_registered_and_declines_without_binary() {
+        let solver = solver_by_name("m4gb-f2").expect("registered");
+        assert_eq!(solver.name(), "m4gb-f2");
+        if std::env::var_os("M4GB_BINARY").is_none() {
+            assert!(!solver.accepts(&fixture().shape()));
+        }
+    }
+
+    /// Runs only with `M4GB_BINARY` set: the external solver must find
+    /// the same solutions as the exhaustive reference.
+    #[test]
+    fn m4gb_matches_exhaustive_on_fixture() {
+        if std::env::var_os("M4GB_BINARY").is_none() {
+            return;
+        }
+        let sys = fixture();
+        assert!(M4gbF2.accepts(&sys.shape()));
+        let reference: std::collections::BTreeSet<Mask> =
+            match Exhaustive.solve(&sys, &Params::default(), None).0 {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                other => panic!("the reference must solve the fixture, got {other:?}"),
+            };
+        let (verdict, cost) = M4gbF2.solve(&sys, &Params::default(), None);
+        assert!(!cost.extra.contains_key("m4gb_error"), "{cost:?}");
+        match verdict {
+            SolverVerdict::Solved(v) => {
+                assert_eq!(
+                    v.into_iter().collect::<std::collections::BTreeSet<_>>(),
+                    reference
+                )
+            }
+            other => panic!("m4gb-f2 did not solve the fixture: {other:?}"),
         }
     }
 
@@ -1328,6 +1461,11 @@ mod tests {
         assert_eq!(reference, [0 as Mask, 3].into_iter().collect());
 
         for solver in solver_registry() {
+            // An engine that declines the shape (`m4gb-f2` without
+            // `M4GB_BINARY`) is not asked.
+            if !solver.accepts(&sys.shape()) {
+                continue;
+            }
             // The CDCL solver returns one model rather than all of
             // them, so it is checked for membership, not equality.
             let (verdict, cost) = solver.solve(&sys, &Params::default(), None);
@@ -1374,6 +1512,9 @@ mod tests {
             n_vars: 1,
         };
         for solver in solver_registry() {
+            if !solver.accepts(&sys.shape()) {
+                continue;
+            }
             let (verdict, _) = solver.solve(&sys, &Params::default(), None);
             assert!(
                 matches!(verdict, SolverVerdict::Unsatisfiable),

@@ -1,13 +1,49 @@
 \chapter{Open problems and proposed experiments}\label{sec:open}
 
-% Survey section (draft 2026-10-15). Each problem is phrased as the
+% Survey section (drafted 2026-10-15, updated 2026-11-06). Each problem is phrased as the
 % measurement or proof that would settle it, per the repository's
 % "name the obstruction" rule.
 
+Table~\ref{tab:fm-open} lists each problem with the measurement or proof
+that would settle it and the value that measurement has now. The
+paragraphs after it give the experiment in full.
+
+\begin{table}[tbp]
+\centering\scriptsize
+\begin{tabularx}{\linewidth}{@{}r>{\raggedright}X>{\raggedright}p{0.33\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}@{}}
+\toprule
+& settled by & current value (standing) & where \\
+\midrule
+1 & $d_{\rm ff}$, $d_F$ and solving degree of Weil-descended $\Sem{m+1}$, $m\ge3$, four or more $n$ per $(\ell,m)$ & $d_F\ge5$ at $n=33$--$45$ (certified, independently checked); $\ge4$ at $n=17$--$24$ (census, unverified) & Ch.~\ref{ch:falldegree}, \ref{ch:hardness} \\
+2 & per-arm cold exponents, crossover only where fits separate across the band & no arm below matched rho; validated gaps $3.43$--$11.51\times$ (Table~A), $5.47$--$13.46\times$ prime and $10.62$--$38.21\times$ binary (Table~B) & \art{docs/ic/leaderboard.json} \\
+3 & measured trials per relation against $m!\,r/N^{m-1}$ per base family & ECC2K-130 fit $C=0.27$ at $n=61$, $1.2$--$1.5$ at $n=71,73$, model $0.25$ (unvalidated) & \S\ref{sec:corrections}, item~3 \\
+4 & a sub-$N^2$ non-generic membership test for $\Sem4$ over $\FF_p$, or a counting argument against one & none known; generic $k$-sum exponent $0.521$; generic single-target floor $1.5\times$ rho & Ch.~\ref{ch:distance}; Prop.~\ref{prop:collisionfloor} \\
+5 & IC advice--time curve $(S,T)$ against preprocessing rho at equal $S$ & IC $53$--$317\times$ slower online than Bernstein--Lange rho with an equal or smaller table & \S\ref{sec:ladder} \\
+6 & $k=4$ replication, $m=14$--$17$, eight targets per arm, measured negation rho per rung & $5.2\times$ rho at $m=15$; crossover $m^*\approx17.6$ ($16.3$--$19.2$) extrapolated; E32 $1.5\cdot10^3\times$ at $2^{42.4}$ (validated) & Ch.~\ref{ch:extension}, \ref{ch:glvprogramme} \\
+7 & the shared-rank arm's uncounted work, counted & three categories uncounted; the arm is a lower bound & \S\ref{sec:frontier} \\
+8 & genus-3 GHS IC and negation rho at $q=2^{21}$--$2^{24}$, one cofactor, priced across the band & local exponent $1.356$ at $q=2^{22}$ (target ${<}4/3$); below the strongest rho at $q=2^{16}$ only under the registered price; $q=2^{23}$ exceeds the 4.5\,GB cap (no validation file) & \S\ref{sec:ladder2}, Ch.~\ref{sec:transfer} \\
+9 & N4~v2 on an isolated host with a replayable rho baseline & exponent $0.983$; $0.005\times$ rho near $q=2^{21}$ (L0, no validation file) & Ch.~\ref{sec:transfer} \\
+10 & a published index calculus (FGHR base, msolve, WDSat) as reference arm in ecbench & not run: no ratio against published IC at matched $(q,n,m)$ & \S\ref{sec:ladder3} \\
+11 & sieve and Nagao arms with F4, descent and linear-algebra additions emitted, at $p\approx1300$--$2000$ on the isolated lab & sieve $0.0065\times$ matched negation rho at $p=1511$ (validated as accounting); Nagao $1.405$, $1.160$, $0.870$ $[0.697,1.183]$ at $p=1301$, $1451$, $1601$ & \S\ref{sec:jac-jv} \\
+12 & a proof that $d_F$ grows with $n$ or $k$ & no growing bound; best certified value 5 & Ch.~\ref{ch:falldegree} \\
+13 & certificates for about 20 subspaces per $n$, $n=33$--$51$; guarded chain at $B=4$--$8$ & named instances only; guarded chain exact at $B=3$, $(4,5)$ & Ch.~\ref{ch:falldegree} \\
+14 & Kummer-tower stage A at $t=1$--$14$ with closure certificates & session values $d_F=3,4,4,4,4,5,5,5,5,6$ at $t=1$--$10$ (not committed); F4 extrapolated to 1.7\,h, 17\,h, 7 days at $t=12$--$14$ & \S\ref{sec:fd-pkm}; \art{research/prime_ic_program_20261029/} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Open problems, the measurement or proof that settles each, and
+its current value. Values are copied from the sections named; standing is
+as stated there, and an entry without a validation file or certificate is
+a producer-reported value.}
+\label{tab:fm-open}
+\end{table}
+
 \paragraph{1. The solving degree of Weil-descended summation systems.}
 Every subexponential claim for prime-degree binary curves rests on a bound
-for this degree (\S\ref{sec:theory}); none is proved and the experimental
-evidence is contested. \emph{Experiment:} measure first-fall, last-fall
+for this degree (\S\ref{sec:theory}). No growing lower bound is proved;
+Chapter~\ref{ch:falldegree} certifies $d_F\ge5$ at $n=33$--45 and the
+census of Chapter~\ref{ch:hardness} gives $\ge4$ at $n=17$--24. The proof
+half of the question is problem~12; this item is its measurement half.
+\emph{Experiment:} measure first-fall, last-fall
 and solving degree of $\Sem{m+1}$ restricted to $\ell$-dimensional
 subspaces over a grid of $(n,\ell,m)$ with $m\ge3$, at least four values
 of $n$ per $(\ell,m)$, against the semi-regular prediction, with
@@ -17,8 +53,9 @@ growth consistent with zero would revive the Petit--Quisquater and Semaev
 heuristics, a positive slope would close them for this model.
 
 \paragraph{2. Cold index calculus against rho with every operation
-priced.} No measured arm beats matched rho on the cold one-target boundary
-once native work is priced on both sides (\S\ref{sec:frontier}).
+priced.} No measured arm on a prime-order or prime-degree binary curve
+is below matched rho on the cold one-target boundary once native work is
+priced on both sides (\S\ref{sec:frontier}).
 \emph{Experiment:} the frontier campaign of \S\ref{sec:frontier} extended
 to the largest sizes each arm can reach, with exponents fitted per arm and
 the crossover reported only where the fitted exponents separate across the
@@ -36,11 +73,17 @@ residual (e.g.\ the unexplained factor 5 in the ECC2K-130 extrapolation,
 \paragraph{4. Root finding beyond two summands on prime curves.} The
 two-summand oracle is prior art in mechanism (McGuire--Mueller) and costs
 $\Theta(N)$ per trial; three summands cost a pair table of $N^2$ entries.
-\emph{Question:} is there a sub-$N^2$ structure for $\Sem4$ membership
-over a prime-field base---for example from the $D_m$-invariant coordinates
-of 2-torsion curves---and does it change the $r^{2/3}$ cost of two-summand
-prime index calculus? A negative answer with a counting argument would be
-as useful as a positive one.
+A generic table of signed 4-sums already moved the generic exponent to
+$0.521$ (Chapter~\ref{ch:distance}), and any membership structure built
+from group operations stays inside the $\sqrt r$ floor
+(\S\ref{sec:gf-shoup}); a single-target generic arm with unknown base
+logarithms costs at least $1.5\times$ rho
+(Proposition~\ref{prop:collisionfloor}). \emph{Open:} whether a
+sub-$N^2$ \emph{non-generic} (coordinate-algebraic) membership test for
+$\Sem4$ over a prime-field base exists whose cost escapes that floor, for
+example one built from the $D_m$-invariant coordinates of 2-torsion
+curves. A counting argument against one would settle the question as well
+as a construction.
 
 \paragraph{5. The preprocessing regime.} Index calculus with a retained
 table beats rho without one, and loses by $53$--$317\times$ to
@@ -51,34 +94,39 @@ $S\,T^2\approx N$; an index-calculus online result counts only if it lies
 below that curve at equal $S$.
 
 \paragraph{6. Symmetry at $k=4$, end to end.} The $D_4$ reduction and its
-four-unknown weighted form move a \emph{modelled} handover over $\FF_{p^4}$
-from about $2^{150}$ to $2^{119}$--$2^{137}$ depending on frame
-(\S\ref{sec:ladder}).
-Since then the odd-characteristic oracle is $370\times$ cheaper again
-(index calculus still $1.39\cdot10^6\times$ rho), and in characteristic two
-a Frobenius-reduced form brings the measured gap to $6.1\times$ rho at
-$n\approx2^{56}$, closing as $n^{-1/4}$ (\S\ref{sec:ladder2}).
-\emph{Experiment:} continue the characteristic-two ladder to $m=15$--$17$
-with a measured negation-map rho at every rung, cold and priced across the
-band; a measured crossover near $n\approx2^{68}$ would confirm the fit, and
-its absence would locate the term the model misses. A red-team review
-(Chapter~\ref{ch:extension}) found the only clean point, $m=15$, at
-$5.2\times$ rho after corrections and placed the crossover at
-$m^*\approx17.6$ ($16.3$--$19.2$); its frozen replication plan (eight targets
-per arm, $m=14$--$17$, about 30\,h) is the experiment to run.
+four-unknown weighted form moved a \emph{modelled} handover over
+$\FF_{p^4}$ down from about $2^{150}$ (\S\S\ref{sec:ladder},\ref{sec:ladder2}).
+Those single-point models are superseded: the E32 ladder, validated,
+measured $1.5\cdot10^3\times$ its strongest matched rho at $n=2^{42.4}$,
+falling as $n^{-0.24}$, with a fitted (not measured) crossover at
+$2^{85.5}$ $[2^{79.2},2^{94.3}]$ (Chapter~\ref{ch:glvprogramme}). In
+characteristic two a Frobenius-reduced form brought the gap to $4.3\times$
+a measured rho at $n\approx2^{56}$ on one target ($6.1\times$ against the
+rho model, \S\ref{sec:ladder2}). A red-team review
+(Chapter~\ref{ch:extension}) found the extrapolated crossover near
+$n\approx2^{68}$ unsupported, not refuted: the only clean point, $m=15$,
+is $5.2\times$ rho after corrections, and the crossover extrapolates to
+$m^*\approx17.6$ ($16.3$--$19.2$), at or above the edge of the data.
+\emph{Experiment:} the frozen replication plan (eight targets per arm,
+$m=14$--$17$, about 30\,h), with a measured negation-map rho at every
+rung, cold and priced across the band; a measured crossover would be an
+\cls{advance} on a weak family, and its absence would locate the term the
+model misses.
 
 \paragraph{7. Pricing and calibration infrastructure.} Rankings now
 require every arm's native work to be counted (AGENTS.md \S5a).
 \emph{Work:} count the three uncounted categories of the shared-rank arm;
-calibrate every ladder size on one fixed host; record the inherited-F4 code
-path (BMI2 or portable) in its method identity, now that the cross-host
-counter drift is traced to it; register the $n=83$ dense root index in the
-harness.
+calibrate every ladder size on one fixed host; register the $n=83$ dense
+root index in the harness. (The cross-host F4 counter drift is closed:
+since \#2043 every host takes the eager path, and sessions record the
+version of the F4 accounting; Chapter~\ref{ch:audit}, item~4.)
 
 \paragraph{8. Genus three after cubic GHS, to the crossover.} The one
 family whose fitted exponent (about $q^{1.4}$) lies below rho's $q^{3/2}$ was
 $1.15\times$ a measured negation-map rho at $q=2^{20}$ before rounds three
-and four cut a further $0.44\times$ (\S\S\ref{sec:ladder},\ref{sec:ladder2}),
+and four brought the whole solve to about $0.44\times$ the second round's
+at $q=2^{22}$ (derived, in the inversion-charging unit;
+\S\S\ref{sec:ladder},\ref{sec:ladder2}),
 and is now below the strongest rho at $q=2^{16}$ under the registered
 pricing, unresolved at the other sizes to $2^{20}$, and above it under a
 heavier sensitivity pricing, with no measurable pooled trend
@@ -91,8 +139,9 @@ algebra grows faster than $q^{4/3}$, and $q=2^{23}$ needs more than the
 \emph{Experiment:} measure negation-map rho on the same instances in the
 latest unit (inversions and mod-$\ell$ multiplications priced), and run
 both past $q=2^{22}$, in the harness and across the pricing band. A measured
-crossover there would be the programme's first \cls{advance} against rho,
-on a narrow and undeployed family.
+size crossover there would be an \cls{advance} against rho on a narrow and
+undeployed family; the programme's one validated below-rho measurement
+(the Joux--Vitse sieve, problem~11) is accounting at a single size.
 
 \paragraph{9. Plane quartics: Diem's $\tilde O(q)$.} Genus-3 GHS covers whose
 Jacobian is that of a smooth plane quartic admit Diem's index
@@ -111,8 +160,9 @@ round ranks this branch as its one exponent candidate (LEAD-15,
 which resolve the degree-3 merges (\S\ref{sec:corrections}). On the direct
 quartic route, index calculus is below a matched plain rho from $q=4051$,
 with fitted exponent $1.083$ against $1.485$, and N4~v2 extends this
-against a negation-map rho to $q\approx2^{22}$, at exponent $0.983$ and
-$0.005\times$ rho (\S\ref{sec:transfer}). \emph{Still open:} a validation
+against a negation-map rho over $q=2^8$--$2^{22}$, at exponent $0.983$,
+and $0.005\times$ rho at $q\approx2^{21}$ (L0, no validation file;
+\S\ref{sec:transfer}). \emph{Still open:} a validation
 of N4~v2 on an isolated host with a replayable baseline; index calculus on
 the quartics reached through Smith's isogeny; and a record-scale run (for
 example $q\approx2^{40}$, $\ell\approx2^{120}$) where rho is out of reach
@@ -132,16 +182,39 @@ calculus, as opposed to on this programme's own baseline. Stage ratios
 quoted against the in-house F4 say nothing about published Gr\"obner
 engines until this is done.
 
-\paragraph{11. The Joux--Vitse cover, to the crossover.} The cover of
-$E(\FF_{p^6})$ closes on rho as about $p^{-2}$ and is $1.6$--$2.0\times$ a
-pooled rho constant at $p=1009$, with the line meeting rho near
-$p\approx1330$ by extrapolation (\S\ref{sec:ladder3}). \emph{Experiment:}
-emit the cover arm's unpriced F4 and Wiedemann counters, measure rho at the
-largest $p$ it can run (or with a memory-light rho at $p\ge503$), and run
-both at $p\approx1300$--$2000$, across the band. A measured crossover would
-be the programme's first \cls{advance} against rho, on a weak and undeployed
-class; its absence at the predicted $p$ would locate the term the cost
-model misses.
+\paragraph{11. The Joux--Vitse cover, to the crossover.} On 24 October the
+plain Nagao arm of the cover of $E(\FF_{p^6})$ was $1.6$--$2.0\times$ a
+pooled rho constant at $p=1009$ (a lower bound), closing as about
+$p^{-2}$, with the line meeting rho near $p\approx1330$ by extrapolation
+(\S\ref{sec:ladder3}). The November studies ran rho on the same instances
+(\S\ref{sec:jac-jv}), and the extrapolation does not hold. Against a
+matched negation rho the plain arm is above rho in group additions at
+$p=1301$ ($1.405$) and $1451$ ($1.160$) and unresolved at $1601$
+($0.870$ $[0.697,1.183]$), and above it in $\FF_p$ multiplications at all
+three (\art{research/jv_cover_negrho_rescore_20261101/}). A factor-base
+line search makes it $1.71\times$ cheaper, below rho in additions
+($0.791$--$0.548$) but above in multiplications ($1.900$--$1.318$), so it
+is unranked across the band; its modelled crossovers are $p^*\approx1185$
+in additions and $1799$ in multiplications, with no validation file
+(\art{research/jv_cover_fbline_20261102/}). The \emph{sieve} arm is
+$0.0065\times$ a matched negation rho at $p=1511$ in group additions
+($155\times$ $[125,184]$ below it; $64\times$ in $\FF_p$
+multiplications; at most $0.12\times$ across the band), on the weak class
+only, validated as accounting (\texttt{VAL-20261103-c31c76}); it has no
+\texttt{pcc} claim record, so its statement is a validation-gate result
+and otherwise an unverified assertion. Four questions remain:
+\begin{itemize}
+\item whether the sieve arm's order survives once its F4, descent and
+  linear-algebra additions are emitted and priced, rather than bounded;
+\item whether the Nagao line-search row validates, in both units;
+\item why the two arms differ by about $30\times$ at $p=1009$;
+\item whether both results hold on the isolated lab rather than a local
+  run.
+\end{itemize}
+\emph{Experiment:} emit those counters on both arms, and run both arms and
+rho at $p\approx1300$--$2000$ on the isolated lab, across the band. On a
+weak, undeployed class this would turn a validated accounting result into a
+priced result.
 
 \paragraph{12. A growing lower bound on the last fall degree.} Chapter~\ref{ch:falldegree}
 proves the first fall degree constant and certifies $d_F\ge5$ on named

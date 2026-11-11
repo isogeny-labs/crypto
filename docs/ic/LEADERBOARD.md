@@ -151,6 +151,38 @@ Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
+## Component improvement: Hilbert early stop in the Joux–Vitse cover IC (2026-10-28, engineering)
+
+On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–503), the Hilbert stop certifies the leading forms are a regular sequence and drops every pending F4 pair the complete intersection's Hilbert function proves reduces to zero; the reduced basis is unchanged. The baseline arm reproduces the recorded S; every cell has equal residuals, relations, decompositions and relation digest, every logarithm is verified, and A/A is 1.000. The as-found form (B0) is a relabelling: S fell 2.53–2.64× while the emitted native-ops counter rose 8.3–8.5×. Counted F_p multiplications only (`S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread`), a lower bound: the F4 driver's pair selection, matrix assembly and table lookups are unpriced, and the IC side's unpriced work is not emitted. These curves have no row in tables A–C. The log–log slope of S/rho over p is -2.27 (full F4) and -2.27 (Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a gate, and no cross-method rank is claimed.
+
+| p | cells | S before → after | S_A/S_B | IC ÷ rho-neg after (w = 0 / 0.1 / 1) | IC ÷ rho-neg before |
+|---:|--:|:--|:--|:--|:--|
+| 53 | 8 | 1980 → 1062 | **1.848** [1.825, 1.878] | 271.5 / 227.5 / 92.5 | 506.6 / 424.4 / 172.5 |
+| 101 | 8 | 259.8 → 138.5 | **1.875** [1.870, 1.879] | 70.8 / 59.2 / 23.8 | 132.9 / 111.0 / 44.7 |
+| 251 | 6 | 47.9 → 25.64 | **1.868** [1.866, 1.870] | 25.0 / 20.8 / 8.4 | 46.7 / 39.0 / 15.7 |
+| 503 | 3 | 9.786 → 5.291 | **1.849** [1.848, 1.850] | 5.5 / 4.6 / 1.8 | 10.1 / 8.4 / 3.4 |
+
+[Report](../../research/ic_cover_weakclass_20261023/REPORT.pdf) · [study](../../research/ic_cover_weakclass_20261023/) · [data](../../research/ic_cover_weakclass_20261023/summary.json).
+
+validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)
+
+## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
+
+On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
+
+| curve | target | S before → after | after ÷ before | IC ÷ rho-neg before → after (w = 0 / 0.1 / 1) |
+|:--|--:|:--|:--|:--|
+| m = 12 | 0 | 44.03 → 37.62 | **0.8543** | 47.23 → 40.35 / 42.94 → 36.68 / 23.62 → 20.18 |
+| m = 12 | 1 | 42.59 → 36.39 | **0.8543** | 50.29 → 42.97 / 45.72 → 39.06 / 25.15 → 21.48 |
+| m = 12 | 2 | 41.47 → 35.43 | **0.8543** | 39.88 → 34.07 / 36.26 → 30.98 / 19.94 → 17.04 |
+| m = 14 | 0 | 5.37 → 4.379 | **0.8154** | 4.27 → 3.48 / 3.88 → 3.16 / 2.13 → 1.74 |
+
+Paired lever ÷ base (ecbench compare): m = 12: 0.8543 [0.8543, 0.8543] over 3 pair(s); m = 14: 0.8154 [0.8154, 0.8154] over 1 pair(s). Rho stays ahead at every weight; the IC ÷ rho column is the distance remaining, not a gate.
+
+[Report](../../research/ic_d4_char2_lever_20261023/REPORT.pdf) · [study](../../research/ic_d4_char2_lever_20261023/) · [data](../../research/ic_d4_char2_lever_20261023/results/table-m12.tsv).
+
+validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)
+
 ## Table A: Koblitz, one target (§23, re-run at main as rule v9 against a matched rho)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).
@@ -455,6 +487,15 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Aimed-subset gather in relation collection, outside tables A–C
+
+`ic price` on icv1-f2m53-tm56619371-dac20a85 (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the change that gathers the aimed subset's coordinates once per unit instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the change and is not re-priced. Callgrind instructions per process, main / candidate: 1.023 at n53, 1.029 at n61. Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its lower end clears 1 and the same-session A/A's upper end. Intervals are corrected: the bootstrap as first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only under the correction is marked marginal and not claimed. 126 processes, none contended. validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json). Study: [research/ic_aimed_gather_20261023/](../../research/ic_aimed_gather_20261023/).
+
+| metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |
+|:--|:--|--:|:--|:--|:--|:--|:--|
+| collect phase | 1.093 [1.068, 1.136] | 38 / 42 | 0.999 [0.977, 1.026] | **established** | 1.111 [1.082, 1.149] | 0.998 [0.944, 1.087] | not established |
+| whole set-up | 1.042 [1.020, 1.082] | 29 / 42 | 0.985 [0.946, 1.015] | marginal (+0.005), not claimed | 1.037 [1.018, 1.080] | 0.993 [0.953, 1.121] | not established |
+
 ## Quartic-twist pair index, outside tables A–C
 
 Exact signed four-factor group oracle on the canonical quartic twist. A 12-action pair orbit constructs all physical pair-sum keys from one elliptic addition; the direct-posting candidate is compared with the existing full hash table on identical residuals (class: counted component improvement). Every full signed decomposition set matches; all postings passed a separate group-addition audit and the non-timing A/A records are identical. The query counts below are the same in both arms. Setup and retained allocator-requested bytes improve, but hash CPU, an isolated native-time comparison, a complete polynomial IC pipeline and a matched rho band are absent. No priced row moves. Study: [research/twist_index_calculus_20261020/](../../research/twist_index_calculus_20261020/).
@@ -535,6 +576,21 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 ## Plain-S₅ C₄ solver stage, outside tables A–C
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
+
+## Multi-target IC4 against the cheapest of four rho arms, outside tables A–C
+
+Many targets on one prime-order Weierstrass curve (2^22 to 2^26, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only pair-sum table and tries x(Q ± W) with one shared inversion; the reference is the cheapest of four rho variants (anchored, sibling, x-only sibling, sequential database) at three database sizes, chosen per configuration and price. IC4 / rho and IC4 / BSGS per target, median [95% bootstrap]; the BSGS ratio is the distance remaining. Class: multi-target method. validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) with the §5a band (benchmarks/20261111-mt-fieldops-ic4/VALIDATION.json).
+
+| bits | T | IC4/rho h=0 | h=0.1 | h=1 | §5a | IC4/BSGS h=0 | h=1 |
+|--:|--:|--:|--:|--:|:--|--:|--:|
+| 22 | 1024 | 1.053 [1.040, 1.058] | 1.066 [1.052, 1.071] | 1.120 [1.101, 1.127] | dearer | 1.45 | 1.60 |
+| 24 | 1024 | 1.106 [1.099, 1.118] | 1.121 [1.114, 1.134] | 1.182 [1.174, 1.199] | dearer | 1.64 | 1.77 |
+| 24 | 4096 | 0.976 [0.972, 0.980] | 0.983 [0.979, 0.988] | 1.016 [1.010, 1.022] | unranked | 1.33 | 1.46 |
+| 24 | 16384 | 0.933 [0.932, 0.937] | 0.935 [0.933, 0.939] | 0.942 [0.939, 0.948] | cheaper | 1.18 | 1.30 |
+| 25 | 4096 | 0.987 [0.983, 0.993] | 0.996 [0.992, 1.002] | 1.033 [1.027, 1.040] | unranked | 1.40 | 1.51 |
+| 25 | 16384 | 0.926 [0.923, 0.928] | 0.928 [0.925, 0.931] | 0.938 [0.935, 0.942] | cheaper | 1.23 | 1.35 |
+
+Study: [research/mt_fieldops_v2_20261111/](../../research/mt_fieldops_v2_20261111/); [report](../../research/mt_fieldops_v2_20261111/REPORT.pdf); source `research/mt_fieldops_v2_20261111/results/holdout/summary.json`.
 
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
@@ -911,8 +967,17 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/ecbench_lazy_columns2_20261018/figures/ratios.json` — sha256 `e97bc0f02c39695a…`
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
+- `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
+- `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
+- `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
+- `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
+- `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
+- `research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json` — sha256 `f0a9ddb6f02528e6…`
 - `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/ic_aimed_gather_20261023/aa2_20261029/summary.json` — sha256 `4be9dd4755ad6bb2…`
+- `research/ic_aimed_gather_20261023/summary.json` — sha256 `a3e06802bada65df…`
+- `research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json` — sha256 `6df1dfcc98784b7b…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
 - `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`
@@ -946,6 +1011,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
+- `research/mt_fieldops_v2_20261111/results/holdout/summary.json` — sha256 `da6ae47bec25e264…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
@@ -957,7 +1023,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
 - `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
 - `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
-- `docs/curves/registry.json` — sha256 `1edbd0d717644b04…`
+- `docs/curves/registry.json` — sha256 `33a16da0548b7b0c…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `0bbdf920814f5946…`
 - `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`

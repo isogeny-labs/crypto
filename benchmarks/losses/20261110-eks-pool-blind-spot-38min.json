@@ -1,0 +1,16 @@
+{
+  "schema": "crypto.infra-loss/v1",
+  "id": "20261110-eks-pool-blind-spot-38min",
+  "observed_at": "2026-11-10",
+  "route": "isolab-eks",
+  "cause": "pool_blind_spot",
+  "what": "Capped EKS job waited 38 min behind another lab job because the launch card's pool check sees only its own study's jobs.",
+  "lost_cpu_hours": null,
+  "lost_cpu_hours_derivation": "not recorded: 38 min wall wait, no CPU count in the log",
+  "lost_usd": null,
+  "lost_usd_derivation": "not recorded",
+  "relaunched": true,
+  "relaunch_ref": "same job ran after the blocking job's node was Spot-interrupted (00:26:44Z)",
+  "source": "docs/session-logs/2026-11-10.md#2026-11-10T03:20Z \u2014 Open leads: PKM t = 12 bracket complete, t = 13 started (Claude, main session)",
+  "pcc": "[pcc:unverified]"
+}

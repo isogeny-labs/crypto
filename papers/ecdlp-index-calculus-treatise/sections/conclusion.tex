@@ -1,74 +1,96 @@
 \chapter{Conclusion}\label{ch:conclusion}
 
-Four months of work on elliptic-curve index calculus produced four kinds of
-result.
+From July to 6 November 2026 the programme filed 1{,}402 ledger decisions
+to 30 September, then 745 ecbench sessions with 129{,}945 sealed records,
+145 admitted benchmark rows and 28 leaderboard rows, 19 of them validated
+(Tables~\ref{tab:fm-glance} and~\ref{tab:fm-standing}). Its results fall
+into four kinds.
 
 \paragraph{Theory.}
 \begin{itemize}
-\item \emph{What is fixed for every curve.} The summation cover's monodromy
-  is $(\ZZ/2)^{m-2}$ everywhere. Its fibres split completely where relation
-  search operates. The mean yield at a given base size is a double count.
-  So no choice of curve or base geometry can raise the \emph{mean}
-  decomposition yield at matched base size. Coverage, the cost of the
-  membership oracle and the difficulty of the solve remain free, and the
-  engineering of Part~\ref{part:algorithms} works on those.
-\item \emph{What is open.} For three presentations of the decomposition
-  system the first fall degree is a constant of the presentation, and the
-  last fall degree is not bounded by it:
-  \begin{itemize}
-  \item proved for the guarded chain;
-  \item certified on named instances of binary Weil descent;
-  \item measured for prime-field Kummer towers.
-  \end{itemize}
-  The subexponential claims for binary curves assume exactly the step
-  these results show is not automatic. Whether the last fall degree grows
-  without bound is unproved.
+\item \emph{Fixed for every curve.} The summation cover's monodromy is
+  $(\ZZ/2)^{m-2}$ everywhere, its fibres split completely where relation
+  search operates, and the mean yield at a given base size is a double
+  count. No choice of curve or base geometry raises the mean decomposition
+  yield at matched base size. Coverage, oracle cost and the difficulty of
+  the solve remain free; Part~\ref{part:algorithms} works on those.
+\item \emph{Open.} In three presentations the first fall degree is a
+  constant of the presentation and the last fall degree exceeds it: proved
+  for the guarded chain, certified on named instances of binary Weil
+  descent ($\ge5$ at $n=33$--$45$), session-reported for prime-field
+  Kummer towers (raw data not committed). The subexponential claims for
+  binary curves assume the step these results show is not automatic.
+  Whether the last fall degree grows without bound is unproved.
+\item \emph{Hardness} (Chapter~\ref{ch:hardness}). The literal
+  Petit--Quisquater Assumption~2 fails on all 119 census instances, PKM's
+  ``$\Delta=10$ suffices'' fails at toy sizes, and a kernel-checked
+  left-kernel theorem removes the rank condition for a single target. The
+  census figures are unverified assertions.
+\item \emph{Generic floor} (Chapter~\ref{ch:genericfloor}). A
+  single-target index calculus whose base logarithms are unknown costs at
+  least $1.5\times$ rho, and $1.875\times$ with two base elements, the
+  constant of the measured generic incumbent (generic group model, checked
+  by Monte Carlo).
 \end{itemize}
 
-\paragraph{Engineering.} The decomposition oracle became two to five
-orders of magnitude cheaper where root finding applies. The Gröbner
-engines improved by one to two orders in counted work. Factor bases
-closed under known-logarithm maps, a $k$-sum table, and set-up and linear
-algebra engineering each cut a constant. None of this changed an exponent
-on a prime field or a prime-degree binary field. The prime-field $k$-sum
-oracle moved its exponent from $0.62$ to $0.52$, but it is generic, and
-its limit is baby-step giant-step.
+\paragraph{Engineering.} Root finding cut one decomposition
+$400$--$5\cdot10^4\times$ against F4 where it applies; the Gr\"obner
+engines improved one to two orders in counted work; known-logarithm-closed
+bases, a $k$-sum table, set-up and linear algebra each cut a constant. The
+cost moved to set-up and relation collection, which take
+$98.2$--$99.98\%$ of cold $S$ on the validated rows
+(Table~\ref{tab:fm-phases}). No exponent moved below rho's on a prime or
+prime-degree binary field. The generic $k$-sum oracle moved its own
+exponent from $0.62$ to $0.52$; its limit is baby-step giant-step.
 
 \paragraph{Measurement.} At a matched reference, priced across a band and
-replayed, rho is cheaper on every prime-order curve the programme measured:
-\begin{itemize}
-\item $4.7$--$18\times$ on Koblitz curves of 37--47 bits;
-\item $5.3$--$102\times$ on prime curves of 20--40 bits;
-\item $10.6$--$38\times$ on random binary curves.
-\end{itemize}
-Nineteen leaderboard rows passed a validation gate that demands independent
-replay, recomputation and a matched rho. None of them is below its
-reference. Every online win disappeared under an equal-advice audit, and
-the corrections forced by matching, pricing and replaying lengthened the
-measured distance more often than any single improvement shortened it.
+replayed, rho is cheaper on every prime-order curve measured: by
+$3.4$--$11.5\times$ on Koblitz curves of 37--47 bits (validated, rule v7;
+$4.7$--$18\times$ against rule v8's same-binary rho), $5.5$--$13.5\times$
+on prime curves of 10--24 bits (validated), $10.6$--$38\times$ on random
+binary curves (validated), $5.3$--$13.1\times$ for the $k$-sum table and
+$10.5$--$102\times$ for the campaign pair table at 20--40 bits, and
+$1.3$--$1.7\times$ for the generic residual collectors at 36--42 bits. No
+validated leaderboard row is below its reference. Off the board, one
+validated measurement is: the Joux--Vitse sieve route on the weak class at
+$p=1511$, $0.0065\times$ a matched negation rho in group additions and
+$0.016\times$ in $\FF_p$ multiplications, with the order holding across
+the band (\texttt{VAL-20261103-c31c76}; no \texttt{pcc} claim). The
+validator classes it as accounting: a local run, a sampled replay, and the
+F4, descent and linear-algebra additions bounded rather than emitted. An
+equal-advice audit retired every online win, and 65 benchmark rows left
+the admitted table, 56 as incomplete. Matching, pricing and replaying
+lengthened the measured distance more often than any single improvement
+shortened it.
 
 \paragraph{Where index calculus wins.} In weak extension-field families
 ($E_0/\FF_{q^3}$ through genus-3 covers, Joux--Vitse covers of
-$E(\FF_{p^6})$, and perhaps $k=4$ in characteristic two) the measured cost
-crosses or approaches rho, as theory predicts. The plane-quartic route
-measured exponent $\approx1$ against rho's $1.5$, at $0.005\times$ negation
-rho near $q=2^{21}$. These are known algorithms; the programme's
-contribution there is fair measurement.
+$E(\FF_{p^6})$, perhaps $k=4$ in characteristic two) the measured cost
+reaches rho, as theory predicts. The plane-quartic route measured exponent
+$\approx1$ against rho's $1.5$, at $0.005\times$ negation rho near
+$q=2^{21}$ (L0, no validation file). The plain Nagao arm of the
+Joux--Vitse cover is above a matched negation rho at $p=1301$ and $1451$
+and unresolved at $1601$, so its extrapolated crossing near $p\approx1330$
+does not hold. These algorithms are known; the programme contributed fair
+measurement.
 
-\paragraph{What would change the picture.} Three items, in order of what
-they would settle:
+\paragraph{What would change the picture.} In order of what they would
+settle (Table~\ref{tab:fm-open}):
 \begin{enumerate}
-\item \emph{A proved lower bound on the last fall degree that grows with
-  $n$}, for any presentation of the binary decomposition system. It would
-  answer the question left open by Huang, Kosters and Yeo and by
-  Kousidis and Wiemers, and it is the only result that bears on the
-  subexponential claims.
-\item \emph{More certified instances} at $n=33$--$51$, with public
-  certificates, to show whether the last fall degree reaches 6.
-\item \emph{The frozen $k=4$ replication} at $m=14$--$17$, the cheapest
-  experiment that could put a measured crossover on record. It would be
-  in a weak family.
+\item a proved, growing lower bound on the last fall degree for any
+  presentation of the binary decomposition system (open problem~12; best
+  certified value now 5). This is the only result that bears on the
+  subexponential claims;
+\item more certified instances at $n=33$--$51$, with the certificates
+  published, to see whether the last fall degree reaches 6 (problem~13);
+\item the frozen $k=4$ replication at $m=14$--$17$: the cheapest
+  experiment that could put a measured size crossover on record, an
+  \cls{advance} in a weak family (problem~6; now $5.2\times$ rho at
+  $m=15$);
+\item owner rulings on whether the Curve25519 BSGS-boundary rounds count
+  as index calculus, and on admitting the Joux--Vitse cover result to the
+  leaderboard. That result is validated as accounting only; emitting and
+  pricing its F4, descent and linear-algebra work (problem~11) would turn
+  it into a priced result.
 \end{enumerate}
-Nothing here concerns a deployed curve. The open problems of
-Chapter~\ref{sec:open} state each remaining question as the experiment or
-proof that would settle it.
+Nothing here concerns a deployed curve or key recovery.

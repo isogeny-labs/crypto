@@ -1,0 +1,25 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho v3 ladder table against the v2 tuned walks, prime ladder 2^18..2^28",
+  "description": "Does building the jump table from shared ladders (rho.negation_v3, rho.plain_v3: two additions a jump, k ~ sqrt(F/2) jumps) bring S to sqrt(pi/2A)? Incumbent rho.negation_v2 with an A/A control, rho.plain beside rho.plain_v3, interleaved on six registered-search prime curves (same seed as the 2026-10-06 prime-toy challenge), 32 planted targets each. Counted GAE; local L0 host.",
+  "workloads": {
+    "curves": [
+      {"kind": "prime_search", "bits": 18, "seed": 59297},
+      {"kind": "prime_search", "bits": 20, "seed": 59297},
+      {"kind": "prime_search", "bits": 22, "seed": 59297},
+      {"kind": "prime_search", "bits": 24, "seed": 59297},
+      {"kind": "prime_search", "bits": 26, "seed": 59297},
+      {"kind": "prime_search", "bits": 28, "seed": 59297}
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 20261107
+  },
+  "arms": [
+    {"name": "incumbent", "role": "reference", "method": {"id": "rho.negation_v2"}},
+    {"name": "candidate", "role": "candidate", "method": {"id": "rho.negation_v3"}},
+    {"name": "incumbent-aa", "role": "control", "method": {"id": "rho.negation_v2"}},
+    {"name": "plain", "role": "baseline", "method": {"id": "rho.plain"}},
+    {"name": "plain-v3", "role": "candidate", "method": {"id": "rho.plain_v3"}}
+  ],
+  "measurement": {"rounds": 6, "warmup": 1, "order": "alternate", "seed": 20261107, "isolation_required": "L0", "timeout_seconds": 300}
+}

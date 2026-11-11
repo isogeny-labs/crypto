@@ -1,0 +1,134 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "SIBLING-POINTS Stage 1 EKS panel k = 28: sib8 pools and cv=0 (6 arms) vs tw2cj-lazy and rho-neg, five SNC-panel curves (Amendment 1: local L0)",
+ "description": "research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md, frozen before data; Amendment 1 runs it locally at L0 after both EKS jobs failed before any pod ran. C = 2 index-calculus arms on a size-2 base; public synthetic targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "tw2cj-lazy",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-lazy-sib8-p64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=64",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-lazy-sib8-p256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=256",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-cv0",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,cv=0",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 6,
+  "seed": 20261128,
+  "timeout_seconds": 600,
+  "warmup": 1
+ },
+ "workloads": {
+  "curves": [
+   {
+    "a": 178687587,
+    "b": 13872414,
+    "gx": 89478497,
+    "gy": 121408824,
+    "group_order": 268464472,
+    "p": 268434581,
+    "r": 33558059,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268215858,
+    "b": 39365730,
+    "gx": 283,
+    "gy": 18229649,
+    "group_order": 268452472,
+    "p": 268434557,
+    "r": 33556559,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268066962,
+    "b": 85749650,
+    "gx": 354,
+    "gy": 37168132,
+    "group_order": 268438712,
+    "p": 268434461,
+    "r": 33554839,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 176974979,
+    "b": 188574103,
+    "gx": 178957077,
+    "gy": 33226997,
+    "group_order": 268455688,
+    "p": 268434389,
+    "r": 33556961,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 265839570,
+    "b": 266541725,
+    "gx": 936,
+    "gy": 70189180,
+    "group_order": 268438648,
+    "p": 268434269,
+    "r": 33554831,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261228,
+  "targets_per_curve": 8
+ }
+}
