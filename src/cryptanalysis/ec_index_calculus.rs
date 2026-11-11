@@ -2120,12 +2120,20 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     if fb.is_empty() {
         return None;
     }
-    let target = fb.len() + extra_relations;
+    let mut target = fb.len() + extra_relations;
 
     let relations_started = Instant::now();
     // Experimental: IC_SUM_TABLE=1 swaps the per-trial sweep for a pair-sum table lookup.
     // Table construction is charged to the relation-collection stage.
-    let sum_table = if std::env::var("IC_SUM_TABLE").as_deref() == Ok("1") {
+    // Default: the table for a small factor base (its build is O(fb^2) point
+    // additions and it loses from fb about 128); `IC_SUM_TABLE=1` forces it,
+    // `IC_SUM_TABLE=0` selects the per-trial sweep.
+    let use_table = match std::env::var("IC_SUM_TABLE").as_deref() {
+        Ok("1") => true,
+        Ok("0") => false,
+        _ => fb.len() <= 64,
+    };
+    let sum_table = if use_table {
         Some(build_pair_sum_table(curve, &fb))
     } else {
         None
@@ -2152,89 +2160,99 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
     let mut trials_total = 0usize;
-    while relations.len() < target {
-        let mut failed_trials = 0usize;
-        let found = 'attempt: {
-            for _ in 0..max_relation_attempts {
-                let attempt = match &sum_table {
-                    Some(t) if walk.is_some() => find_one_relation_table_walk(
-                        curve,
-                        g,
-                        q,
-                        t,
-                        walk.as_mut().expect("walk checked"),
-                        max_trials_per_relation,
-                        rng,
-                    ),
-                    Some(t) => find_one_relation_table_with_rng(
-                        curve,
-                        g,
-                        q,
-                        t,
-                        max_trials_per_relation,
-                        rng,
-                    ),
-                    None => match &hoisted_index {
-                        Some(ix) => find_one_relation_sweep_with_index(
+    let mut retries = 0usize;
+    let mut relations_ms;
+    let (m, solution, linear_algebra_ms) = loop {
+        while relations.len() < target {
+            let mut failed_trials = 0usize;
+            let found = 'attempt: {
+                for _ in 0..max_relation_attempts {
+                    let attempt = match &sum_table {
+                        Some(t) if walk.is_some() => find_one_relation_table_walk(
                             curve,
                             g,
                             q,
-                            &fb,
-                            ix,
-                            word_sweep.as_ref(),
+                            t,
+                            walk.as_mut().expect("walk checked"),
                             max_trials_per_relation,
                             rng,
                         ),
-                        None => find_one_relation_counted_with_rng(
+                        Some(t) => find_one_relation_table_with_rng(
                             curve,
                             g,
                             q,
-                            &fb,
+                            t,
                             max_trials_per_relation,
                             rng,
                         ),
-                    },
-                };
-                if let Some(found) = attempt {
-                    break 'attempt Some(found);
+                        None => match &hoisted_index {
+                            Some(ix) => find_one_relation_sweep_with_index(
+                                curve,
+                                g,
+                                q,
+                                &fb,
+                                ix,
+                                word_sweep.as_ref(),
+                                max_trials_per_relation,
+                                rng,
+                            ),
+                            None => find_one_relation_counted_with_rng(
+                                curve,
+                                g,
+                                q,
+                                &fb,
+                                max_trials_per_relation,
+                                rng,
+                            ),
+                        },
+                    };
+                    if let Some(found) = attempt {
+                        break 'attempt Some(found);
+                    }
+                    attempts_exhausted += 1;
+                    failed_trials += max_trials_per_relation;
                 }
-                attempts_exhausted += 1;
-                failed_trials += max_trials_per_relation;
-            }
-            None
-        };
-        let (rel, trials) = found?;
-        trials_total += failed_trials + trials;
-        trials_per_relation.push(failed_trials + trials);
-        relations.push(rel);
-    }
-    let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
-
-    // Build the linear system.  Unknowns: (y_1, …, y_m, x = log_G Q).
-    // Row r:   Σ entries[j].value y_j  − coef_b · x  ≡ coef_a (mod n)
-    // i.e.    entries  ‖ −coef_b   ·   (y, x)  =  coef_a.
-    let m = fb.len();
-    let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());
-    let mut rhs: Vec<BigUint> = Vec::with_capacity(relations.len());
-    for rel in &relations {
-        let mut row = vec![BigUint::zero(); m + 1];
-        for &(j, mult) in &rel.entries {
-            let val = signed_mod(mult, &curve.n);
-            row[j] = (&row[j] + &val) % &curve.n;
+                None
+            };
+            let (rel, trials) = found?;
+            trials_total += failed_trials + trials;
+            trials_per_relation.push(failed_trials + trials);
+            relations.push(rel);
         }
-        // last column: −coef_b
-        let neg_b = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
-        row[m] = neg_b;
-        matrix.push(row);
-        rhs.push(rel.coef_a.clone() % &curve.n);
-    }
+        relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
 
-    let la_started = Instant::now();
-    let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n)?;
-    if !solution.determined[m] {
-        return None;
-    }
-    let linear_algebra_ms = la_started.elapsed().as_secs_f64() * 1e3;
+        // Build the linear system.  Unknowns: (y_1, …, y_m, x = log_G Q).
+        // Row r:   Σ entries[j].value y_j  − coef_b · x  ≡ coef_a (mod n)
+        // i.e.    entries  ‖ −coef_b   ·   (y, x)  =  coef_a.
+        let m = fb.len();
+        let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());
+        let mut rhs: Vec<BigUint> = Vec::with_capacity(relations.len());
+        for rel in &relations {
+            let mut row = vec![BigUint::zero(); m + 1];
+            for &(j, mult) in &rel.entries {
+                let val = signed_mod(mult, &curve.n);
+                row[j] = (&row[j] + &val) % &curve.n;
+            }
+            // last column: −coef_b
+            let neg_b = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
+            row[m] = neg_b;
+            matrix.push(row);
+            rhs.push(rel.coef_a.clone() % &curve.n);
+        }
+
+        let la_started = Instant::now();
+        let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n)?;
+        if solution.determined[m] {
+            break (m, solution, la_started.elapsed().as_secs_f64() * 1e3);
+        }
+        // Rank-deficient (the target is not pinned down): collect two more
+        // relations and eliminate again, so a small `extra_relations` is safe.
+        retries += 1;
+        if retries > 8 {
+            return None;
+        }
+        target += 2;
+    };
     let x = solution.values[m].clone();
 
     let verify_started = Instant::now();
