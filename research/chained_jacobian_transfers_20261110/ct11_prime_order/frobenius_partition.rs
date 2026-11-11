@@ -168,5 +168,6 @@ fn sign_is_a_required_zeta_control_not_an_isogeny_certificate() {
     let corr2:Vec<i64>=raw2.iter().map(|&v|m(-v)).collect();
     assert_eq!(jcard(&corr1),(10,156,117));
     assert_eq!(jcard(&corr2),(10,156,117));
-    assert_eq!(count_e(1,6)*count_e(6,1),117); // second quotient: 6u³+u²+1
+    let e2=1+(0..P).map(|x|(0..P).filter(|&y|m(y*y)==m(6*x*x*x+x*x+1)).count() as i64).sum::<i64>();
+    assert_eq!(e2,9); assert_eq!(count_e(1,6)*e2,117); // second elliptic quotient
 }
