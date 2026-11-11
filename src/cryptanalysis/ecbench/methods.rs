@@ -3174,6 +3174,26 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
             if tw > 0 && (!opts.g_jumps || grow != 2) {
                 return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
+            match or.get("aut") {
+                None | Some("0" | "1" | "off" | "no" | "false") => {}
+                Some("3") => {
+                    if tw == 0 {
+                        return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
+                    }
+                    use crate::cryptanalysis::ic_boundary::CountedGroup;
+                    let mut ops = crate::cryptanalysis::ic_boundary::GroupOps::default();
+                    if i.curve
+                        .order_three_aut(i.generator_point(), i.r, &mut ops)
+                        .is_none()
+                    {
+                        return Err(format!(
+                            "wwalk: aut=3 needs a j = 0 curve over p ≡ 1 (mod 3) with 3 | r − 1 and a nontrivial ζ₃ on the subgroup; {} lacks the structure",
+                            i.name
+                        ));
+                    }
+                }
+                Some(v) => return Err(format!("wwalk: aut is 3 (or off), not `{v}`")),
+            }
         }
         _ => {}
     }

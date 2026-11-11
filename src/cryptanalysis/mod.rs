@@ -126,6 +126,7 @@ pub mod certicom_dlp_cli;
 pub mod cga_hnc;
 pub mod chain_pivot_rules;
 pub mod chain_trace;
+pub mod chained_transfer;
 pub mod challenge_ladder;
 pub mod cheon_attack;
 pub mod cheon_counted;
