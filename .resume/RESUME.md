@@ -1,3 +1,52 @@
+# Current CT24 checkpoint — native successor implementation next
+
+Read study SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_GLOBAL_PROOF.md.
+Consumer CT23 is published5d5dc81faa442de6d9a4ee8144806ab89cf9a3b8,
+readyPR1493 against1490. Full changed07 passes25native/70reference unit plus
+three integrations,one old ignored,guards/fmt/strictClippy. Consumer1f1423/
+root9f98fd pin receipt and exact07 sources. Compact49-class Psi TSV and
+independent flat validity/Frobenius replay are durable. All standing unsigned.
+[pcc:unverified]
+
+Fresh consumer branch research/chained-transfer-successor-seven-20261111
+starts5d5. No new successor source yet. CT24 standalone preflight validates
+beta1(26,58)→(59,27),kernel[99,94,75,1],j47/Frob5;beta2(69,50)→(23,7),
+kernel[53,19,40,1],j89/Frob6. Actual C2[19,0,10,0,22,0,1],charts
+(destination,shift,scale)[(1,41,18),(0,37,18)]. Full5 standalone tests08/
+Clippy07 pass,e11fb7. Frozen proofe98755 gives global degree49/type7 Phi2/
+dual7/rational109/113 preservation/Jacobian distinction. Native all-class
+forward/dual/source evaluation is next,not inferred from the model proof.
+[pcc:unverified]
+
+Implement Phi2 with C1 matched coordinates/actual beta/C2 pulls,retaining
+old maps. Complete both12317-class domains and original109-source/direct
+beta*alpha controls. Then Phi2[2] transports actual R1 kernel to R2/Psi2.
+Individual7-hop kernels split in existingFp6. The composite Z49² kernel
+needsFp42;only49/2401 points lie overFp6. Six kernel-decide finite-ring
+lemmas82b8fb gate/localbindingspass,sourcecensus109/zero trustednative;
+elliptic/Tate/HLP/Picard bridges remain written. Do not write a new field
+engine just to enumerate that full composite kernel. [pcc:unverified]
+
+All local runs complete. 1493 exactfocused43114643386 is in_progress,
+nextcheck23:37UTC;1488 fixed7c1 retry43113992769 in_progress,next23:32.
+1490 exact994 focused43106607205 succeeds25/66+three,38f401;next23:29
+(activity reset,correcting earlier quiet02:40 estimate). Parent1484 next
+quiet01:09Nov12. Root initialfilteredpush had no immediate run;next old882
+CI check22:56 unless publishing creates new activity. No foreground CI wait.
+[pcc:unverified]
+
+Root successor-preflight crate reuses immutable seven-reference.rs SHA
+bb640465;Cargo.lock needs explicit force-add because root ignore rule.
+Its own .gitignore excludes /target/. New root native/Lean/preflight workflow
+coverage is ready;only existing path-filtered pushes/manual,no PR-wide event.
+Preserve source snapshots/claims/ledger rows and all failed Clippy/Typst
+attempts. Both frozen-ledger forks,root archive-clock/baseline/benchrec and
+S3/livebudget/KB/ecdb/locked atlas8edec422a limits persist. Continue unblocked
+research;no paid jobs,benchmark/admission bypass or canonicalgraph promotion.
+[pcc:unverified]
+
+# Historical checkpoints below
+
 # CT23 in progress — actual Psi kernel checkpoint 2026-11-11T22:06Z
 
 Read study CLOSED_FIBRES_CHECKPOINT.md and frozen CLOSED_FIBRES_PROOF.md

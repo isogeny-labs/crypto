@@ -1,3 +1,15 @@
+# Current checkpoint — next global Phi2 and native implementation
+
+Read SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_GLOBAL_PROOF.md first.
+CT23 is published ready1493/5d5dc81fa with complete native25/reference70
+plus three-integration guard. CT24 validates actual nondual beta maps/C2
+and supplies a written global degree49 Phi2,with exact composite-kernel
+Fp42 boundary. Native whole-map evaluation is next in the fresh child.
+Root109 partial helper lemmas;all scientific standing unsigned.
+[pcc:unverified]
+
+# Historical checkpoints
+
 # Current checkpoint — direct norms and whole-fibre continuation
 
 CT22 direct C0/C1 norms are implemented and integrated into Phi/Psi.

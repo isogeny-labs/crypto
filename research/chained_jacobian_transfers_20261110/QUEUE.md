@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 103 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Seven new DirectNorms cleared algebra helpers pass gate/local bindings,PCC8eaf58. Six ClosedFibres elimination helpers also pass gate/localbindings,a97f41. Source census103;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
+| CT03 | 109 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Seven new DirectNorms cleared algebra helpers pass gate/local bindings,PCC8eaf58. Six ClosedFibres elimination helpers also pass gate/localbindings,a97f41. Six CyclicFortyNine finite-ring certificates pass82b8fb. Source census109;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -35,8 +35,8 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 | CT21 | actual transported(7,7)Psi/written globalproof/fullcontrols;unsigned | Continue from the accepted six-cycle target using the actual odd kernel and transported Richelot cross-kernel. | SEVEN_CHAIN_CHECKPOINT.md/SEVEN_CHAIN_PROOF.md,PCCeb3240/d0441a:49-kernel/64-lift action,actualR1 delta33/scale47,full16-point compositekernel/globalquotient/dual7,F101 descent viaAut/Torelli/oddwitness,ellipticembedding/trace/j noniso. Both12317 Psi domains/all109source reverse28-inverse74/direct4 pass. Consumer7c1f32ecb ready stackedPR1488;fullguard25/65+two andthirdintegration/strictClippy pass;focused43097723254 startup_failure before jobs/checks,PCC4baafc; no CI pass inferred. |
 | CT22 | integrated and complete local checks; unsigned | Direct base-field norms with all exceptional balanced support. | DIRECT_NORMS_CHECKPOINT.md/PROOF.md; both norms agree with generic maps on all12317 C0/C1 classes. Integrated guard06 passes25native/66reference unit+three integrations,one old ignored; all Phi/Psi/source controls and full generic/direct Phi comparisons pass. ConsumerPCCb6af61/3f2084,rootc23653/8eaf58;97 helpers. No measured cost claim. |
-| CT23 | actual Psi kernel and targeted chart pass; all-domain comparison running | Whole-fibre Richelot elimination and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md:49 actual KerPsi classes, all2401 sums/Frobenius5/6/geometric dualR0 norm2 pass,b29faf/b0738e. Targeted192 per map direction pass. Four complete domains still running02; production integration/fullguard pending. Six new Lean lemmas,a97f41,total103. Preserve pointwise fallback and boundary obligations. |
-| CT24 | queued after CT23 | Another nondual7-hop with genuine new target and transported Richelot continuation. | CT24_PLAN.md: actual Frobenius kernels, compatible elliptic gluing, full geometric/global/source controls and direct elliptic two-hop control; unsupported charts remain explicit. |
+| CT23 | completed/integrated; ready1493; unsigned | Closed Richelot fibres and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md:all four12317 domains agree with pointwise;actual49-class TSV/all2401 sums/Frobenius5/6/dualR0 norm2,real geometric boundary counts[1,0,0,2,13]. Fullguard07 passes25/70+three,root9f98fd/consumer1f1423. Independent flat validity/Frobenius replay4a98a7/7a86d3. Ready1493 head5d5dc81fa,focused43114643386 running. |
+| CT24 | actual next elliptic maps/C2 validated;global written Phi2;native evaluator next | Another nondual7-hop and transported Richelot continuation. | SUCCESSOR_CHECKPOINT.md/SUCCESSOR_GLOBAL_PROOF.md,e98755:beta targets(59,27)j47/(23,7)j89,kerFrob5/6;C2[19,0,10,0,22,0,1],charts[(1,41,18),(0,37,18)]. Final5 standalone tests/Clippy pass,e11fb7. Composite Z49² kernel needsFp42;only49 points inFp6,190ae8/82b8fb. Implement full Phi2 then Phi2[2]/R2/Psi2/source controls in fresh5d5 child. |
 
 ## Session constraints
 
@@ -51,20 +51,17 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read CLOSED_FIBRES_CHECKPOINT.md, frozen CLOSED_FIBRES_PROOF.md, then CT23_PLAN.md.
-CT23 consumer child starts994869034/readyPR1490. Exact pending local process
-90163 writes /workspace/scratch/ct-closed-fibres-full-and-kernel-02.txt.
-Kernel test already passed and is frozen underb0738e; full-domain test is
-separate and still running. Never repeat completed kernel/targeted stages
-without changed inputs. Direct norms remain the completed published rung.
-Consumer direct-norm branch starts7c1f32ecb/readyPR1488 and must target that
-immediate feature parent. Complete changed guard06 passes25/66+three.
-Preceding focused43097723254 ended startup_failure before jobs/checks; retain
-metadata/PCC4baafc rather than claim an arithmetic CI result. Parent1484's
-56-row common-prefix fork remains, next quiet check around01:09UTC Nov12.
-Root ledger fork/archive-clock, S3/livebudget and KB/vault limits persist.
-Do not rebase, force, rechain, choose a frozen lineage or bypass admission.
-Continue current CT23 child; after full comparisons, exercise actual geometric boundaries, then integrate/fullguard/publish. Parent1490 stays frozen994869034.
+Read SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_GLOBAL_PROOF.md first.
+Consumer CT23 is published5d5dc81fa/ready1493,focused43114643386 in_progress;
+full changed guard07 already passes25/70+three. New child
+research/chained-transfer-successor-seven-20261111 starts5d5,with no new
+successor source yet. Implement the actual C1→C2 Phi2 using validatedbeta/
+charts18;preserve old maps and all full-domain/source controls,then R2/Psi2.
+1490 focused43106607205 succeeds25/66+three;1488 retry43113992769 is running.
+Next routine checks1490~23:29,1488~23:32,1493~23:37;parent1484 quiet01:09Nov12.
+Root/consumer frozen-ledger forks/archive-clock,S3/livebudget,KB/vault limits
+persist. No rebase,force,rechain,lineage selection or admission bypass.
+Full composite geometrickernel needsFp42;maps retainF101 coefficients.
 [pcc:unverified]
 
 Read today's session log, this table and CHECKPOINT.md. Inspect actual heads

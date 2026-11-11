@@ -9,7 +9,8 @@ quadratic source support. Its targeted comparison passes192 inputs in
 each R0/R1 direction. The separate kernel test computes49 actual T0
 classes R0(Ker Φ), checks every2401 addition,7-annihilation, geometric
 dualR0 norm2 and Frobenius eigenvalues5/6 over the existing F101⁶ field.
-PCCdb5cea/b0738e; the all-domain comparison remains pending here.
+PCC60944e: all four complete12317-class map domains also agree with the
+old evaluator, including group controls and explicit geometric boundaries.
 [pcc:unverified]
 
 #image("closed-fibres.svg",width:100%)
@@ -53,8 +54,9 @@ classes in the existing F101⁶ field. [pcc:unverified]
 Native02 checks every image,7-annihilation, all49 geometric dualR0
 compositions against[2], all2401 additions and Frobenius5/6. The independent
 flat-field elliptic route supplies actual7-kernels and checks Φ killing.
-PCCb0738e pins a partial process receipt that already contains this test's
-PASS/ok; its separate full-domain test is not thereby a pass.
+Full native02/PCC60944e completes the kernel and all-domain comparisons.
+Earlier partial02/PCCb0738e is preserved unchanged; its scope is not
+retroactively promoted.
 [pcc:unverified]
 
 == Faithful partial Lean proof
@@ -73,11 +75,25 @@ engines are reused. KB retrieval is unavailable; no novelty is claimed.
 [pcc:unverified]
 
 == Current scope and next action
-The complete four-domain12317-class comparison is still running. Require
-old/closed equality, both dual2 identities, bijections, paired additions,
-coefficient descent and wrong-model rejection. Exercise actual geometric
-chart boundaries, retain the old evaluator, then integrate and run the
-complete changed guard and109-source/Psi controls before publication.
+The full four-domain12317-class comparison passes exact old/closed equality,
+both dual2 norms, bijections, paired additions, descent and wrong-model
+rejection. Each direction has239 lower-degree/12078 quadratic cases and
+zero fallback. All16 geometric2-classes per direction separately give
+route counts[1,0,0,2,13]: identity evaluated, two projection and13 ordinate
+nonunit boundaries. No branch denominator is inverted. PCC60944e.
+[pcc:unverified]
+
+Integrated complete guard07 passes25native/70reference unit plus three
+integrations,one old ignored benchmark,all guards/fmt/strictClippy and
+109-source/naive/reverse28-inverse74/direct4 controls. PCC1f1423 pins exact
+source07/receipt. The compact49-class TSV07 is frozen under9efff5.
+[pcc:unverified]
+
+Independent flatFpR/poly replay02 checks all exported curve-divisor
+identities,canonical shapes/distinctness and Frobenius5/6,with fixed counts
+1/7/1/49 over degrees1/2/3/6. RootPCC4a98a7. It imports no producer tower,
+closed map or elliptic generator. Group additions and kernel membership
+retain their separate native/written evidence.
 [pcc:unverified]
 
 Read CLOSED_FIBRES_STATUS.md, src/closed_fibres.rs and immutable evidence
