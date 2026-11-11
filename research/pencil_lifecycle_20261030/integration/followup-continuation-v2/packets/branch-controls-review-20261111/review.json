@@ -1,0 +1,38 @@
+{
+  "schema": "source-review/v1",
+  "task": "T-2105",
+  "review_plan_sha256": "9488d928dea0d4a191a7cbae52b3c6e7e68ff40ae7f942386c3c9fe58e991a86",
+  "initial_freeze_sha256": "94c593ca00cc87d1f3caca8ddcaeec708317cbfacec32a295d00842e8e92ff9a",
+  "status": "no_remaining_blocking_source_finding",
+  "mathematical_delta": "exact two simp only[Polynomial.C_ofNat] lines removed after bare norm_num; ring remains and bezout simp unchanged",
+  "unchanged_files": [
+    "BranchRootMultiplicity.lean.txt",
+    "BranchCoefficientMultiplicity.lean.txt",
+    "ExpectedFailure.lean.txt",
+    "Readback.lean.txt",
+    "names.json",
+    "commands.json",
+    "retained-imports.json",
+    "runtime-pins.json"
+  ],
+  "findings": [
+    {
+      "id": "R1",
+      "path": "launch.py:30",
+      "issue": "600+129000 asserted equal129000; intended campaign total129600",
+      "effect": "every intended admission rejected",
+      "required_correction": "restore sum==129600; preserve original and regenerate binding hashes"
+    }
+  ],
+  "compile_executed": false,
+  "source_scope": "No statements, assumptions, positive/negative controls,5calls13names26imports or resource/custody scope weakened. Source-only support does not establish compiler acceptance.",
+  "ancestry": "Reviewer authored old coefficientData wrapper but not controls, cast correction or successor; nonblind delta review.",
+  "corrected_freeze_sha256": "d20691095b0e6f932a5f34f9107e09c56629b57da85ea94dea35c007d87f3a40",
+  "producer_manifest_sha256": "2c7a0dfb01ec07d28ed18be8930db74145c2b70d6a0e0dd377be2f06a9dd2abb",
+  "repair": {
+    "R1": "resolved",
+    "delta": "only sum bound129000\u2192129600 in launcher; derived hashes refreshed",
+    "original_preserved": true,
+    "freeze_manifest_mismatches": 0
+  }
+}

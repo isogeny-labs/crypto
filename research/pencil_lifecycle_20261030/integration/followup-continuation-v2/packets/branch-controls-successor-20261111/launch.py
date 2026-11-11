@@ -27,7 +27,7 @@ assert type(F['prior_attempt_conservative_debit_seconds']) is int, 'campaign led
 assert type(F['remaining_before_attempt_seconds']) is int
 assert F['prior_attempt_conservative_debit_seconds']==600
 assert F['remaining_before_attempt_seconds']==129000
-assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==129000
+assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==129600
 assert release['prior_debit_seconds']==F['prior_attempt_conservative_debit_seconds']
 assert release['remaining_before_attempt_seconds']==F['remaining_before_attempt_seconds']
 assert type(F['materializer_conservative_debit_seconds']) is int and F['materializer_conservative_debit_seconds']>=0

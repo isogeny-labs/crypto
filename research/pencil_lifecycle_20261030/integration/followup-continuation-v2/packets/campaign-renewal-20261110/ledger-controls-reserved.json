@@ -1,0 +1,29 @@
+{
+  "schema": "pencil.campaign-ledger/v1",
+  "campaign_id": "pencil-continuation-20261110",
+  "ceiling_seconds": 129600,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "entries": [
+    {
+      "id": "branch-helper-cast-renewal-20261110",
+      "status": "charged",
+      "seconds": 600,
+      "attempts": 1,
+      "execution_admitted": true,
+      "outcome": "failed_IndependentControls_simp_no_progress",
+      "observed_elapsed_seconds": 192.1372683380032,
+      "terminal_receipt": "/home/ec2-user/pencil-native-branch-helper-cast-renewal-20261110.outer/completion.json"
+    },
+    {
+      "id": "branch-controls-successor-20261111",
+      "status": "reserved",
+      "seconds": 600,
+      "attempts": 1,
+      "execution_admitted": false
+    }
+  ],
+  "charged_seconds": 600,
+  "reserved_seconds": 600,
+  "unreserved_seconds": 128400,
+  "max_active_payloads": 1
+}
