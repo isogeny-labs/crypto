@@ -1,0 +1,103 @@
+-- Prospective source only; no elaboration or axiom readback performed.
+import EliminationField
+import Mathlib.Data.List.FinRange
+set_option autoImplicit false
+namespace Solve4PivotSwap
+open Solve4Stage
+abbrev WordMatrix := Fin 4 → Fin 5 → Nat
+
+def firstNonzero (M : WordMatrix) (col : Fin 4) : List (Fin 4) → Option (Fin 4)
+  | [] => none
+  | i :: rest => if M i col.castSucc ≠ 0 then some i else firstNonzero M col rest
+
+def candidates (col : Fin 4) : List (Fin 4) :=
+  (List.finRange 4).filter (fun i => col.val ≤ i.val)
+def nativePivot (M : WordMatrix) (col : Fin 4) := firstNonzero M col (candidates col)
+
+theorem search_some (M : WordMatrix) (col q : Fin 4) (rows : List (Fin 4))
+    (h : firstNonzero M col rows = some q) :
+    ∃ before after, rows = before ++ q :: after ∧
+      (∀ i ∈ before, M i col.castSucc = 0) ∧ M q col.castSucc ≠ 0 := by
+  induction rows with
+  | nil => simp [firstNonzero] at h
+  | cons i rest ih =>
+    by_cases hi : M i col.castSucc ≠ 0
+    · have heq : i = q := by simpa [firstNonzero, hi] using h
+      subst q
+      exact ⟨[], rest, by simp, by simp, hi⟩
+    · have hz : M i col.castSucc = 0 := not_not.mp hi
+      have hr : firstNonzero M col rest = some q := by simpa [firstNonzero, hi] using h
+      obtain ⟨before, after, heq, hb, hq⟩ := ih hr
+      refine ⟨i :: before, after, ?_, ?_, hq⟩
+      · simp [heq]
+      · intro j hj
+        rcases List.mem_cons.mp hj with hji | hjb
+        · simpa [hji] using hz
+        · exact hb j hjb
+
+theorem search_none (M : WordMatrix) (col : Fin 4) (rows : List (Fin 4)) :
+    firstNonzero M col rows = none ↔ ∀ i ∈ rows, M i col.castSucc = 0 := by
+  induction rows with
+  | nil => simp [firstNonzero]
+  | cons i rest ih =>
+    by_cases hi : M i col.castSucc = 0
+    · simp [firstNonzero, hi, ih]
+    · simp [firstNonzero, hi]
+
+theorem native_search_bound (M : WordMatrix) (col q : Fin 4)
+    (h : nativePivot M col = some q) : col.val ≤ q.val ∧ M q col.castSucc ≠ 0 := by
+  obtain ⟨before, after, heq, _, hn⟩ := search_some M col q (candidates col) h
+  have hmem : q ∈ candidates col := by rw [heq]; simp
+  have hb : col.val ≤ q.val := by simpa using (List.mem_filter.mp hmem).2
+  exact ⟨hb, hn⟩
+
+def swapIndex (a b i : Fin 4) : Fin 4 := if i = a then b else if i = b then a else i
+def swapRows (M : WordMatrix) (a b : Fin 4) : WordMatrix := fun i => M (swapIndex a b i)
+
+theorem swap_involutive (a b i : Fin 4) : swapIndex a b (swapIndex a b i) = i := by
+  by_cases hab : a = b
+  · subst b
+    by_cases hi : i = a
+    · subst i; simp [swapIndex]
+    · simp [swapIndex, hi]
+  · have hba : b ≠ a := Ne.symm hab
+    by_cases ha : i = a
+    · subst i; simp [swapIndex, hab, hba]
+    · by_cases hb : i = b
+      · subst i; simp [swapIndex, hab, hba]
+      · simp [swapIndex, ha, hb]
+
+theorem swap_row_predicate (M : WordMatrix) (a b : Fin 4)
+    (P : (Fin 5 → Nat) → Prop) :
+    (∀ i, P (swapRows M a b i)) ↔ ∀ i, P (M i) := by
+  constructor
+  · intro h i
+    have hi := h (swapIndex a b i)
+    simpa only [swapRows, swap_involutive] using hi
+  · intro h i
+    exact h (swapIndex a b i)
+
+theorem canonical_preserved (M : WordMatrix) (a b : Fin 4) (p : Nat)
+    (h : ∀ i j, M i j < p) : ∀ i j, swapRows M a b i j < p := by
+  intro i j
+  exact h (swapIndex a b i) j
+
+theorem selected_pivot (M : WordMatrix) (col q : Fin 4)
+    (h : M q col.castSucc ≠ 0) : swapRows M col q col col.castSucc ≠ 0 := by
+  simpa [swapRows, swapIndex] using h
+
+theorem selected_zero_prefix (M : WordMatrix) (col q : Fin 4)
+    (hq : col.val ≤ q.val)
+    (h : ∀ i : Fin 4, col.val ≤ i.val → ∀ j : Fin 5, j.val < col.val → M i j = 0) :
+    ∀ j : Fin 5, j.val < col.val → swapRows M col q col j = 0 := by
+  intro j hj
+  simpa [swapRows, swapIndex] using h q hq j hj
+
+variable {K : Type*} [Field K]
+def decodedRow (decode : Nat → K) (r : Fin 5 → Nat) : Row K := fun j => decode (r j)
+theorem augmented_equations_preserved (M : WordMatrix) (a b : Fin 4)
+    (decode : Nat → K) (x : Vector K) :
+    (∀ i, residual (decodedRow decode (swapRows M a b i)) x = 0) ↔
+      ∀ i, residual (decodedRow decode (M i)) x = 0 := by
+  exact swap_row_predicate M a b (fun r => residual (decodedRow decode r) x = 0)
+end Solve4PivotSwap
