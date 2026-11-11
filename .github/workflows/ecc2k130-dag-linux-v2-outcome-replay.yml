@@ -24,8 +24,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile versioned verifier
-        run: |
-          python3 -m py_compile research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/{gate,corrected_replay}.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 -m py_compile research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/{gate,corrected_replay}.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only dag_linux_v2_outcome_replay_20260929 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Bind first-run ZIP and replay all semantics without rerunning children
-        run: |
-          python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/gate.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/gate.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only dag_linux_v2_outcome_replay_20260929 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

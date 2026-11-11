@@ -84,10 +84,20 @@ revision that still holds those bytes. The
 custody and runs each study's unchanged `ci_replay.py` in an isolated view that
 restores the pinned workflow bytes from Git
 ([frozen-workflow-check.mjs](scripts/frozen-workflow-check.mjs), which reads a
-pin from a `files`/`sha256` map, a dotted `key:` field, or a JSON `pointer:`,
-and overlays further pinned workflows with `--extra-workflow`). Live workflows
-are free to follow current CI policy. A workflow marked `record` has a pin no
-runtime check asserts; the index documents it and the job keeps custody.
+pin from a `files`/`sha256` map, a dotted `key:` field, a JSON `pointer:`, or
+a coreutils `sha256sum` manifest, and overlays further pinned workflows with
+`--extra-workflow`). Live workflows are free to follow current CI policy. A per-study workflow whose own steps
+assert its pin runs them in the same view, by replay id:
+`node .github/scripts/run-frozen-workflow-replays.mjs --only <id> -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"`,
+with the step's original commands in `env.FROZEN_VIEW_STEP`. That form checks
+custody of that replay's pins only, and fetches the index revision when a
+shallow checkout lacks it. A replay whose manifest pins a different version
+of its workflow than the index's top-level `revision` holds carries its own
+`revision`; custody then checks that its manifest pins its workflows' bytes
+at that commit, and the runner fetches it like the top-level one. A workflow marked `record` keeps custody of its pin
+but has no replay: either no check on `main` asserts the pin, or its `note`
+says why a workflow view cannot make that check pass (source drift, or a pin
+at a second revision).
 
 ### Result-page triggers
 
