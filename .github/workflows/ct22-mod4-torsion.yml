@@ -1,0 +1,20 @@
+name: CT22 HLP mod-4 torsion census
+on:
+  pull_request:
+    paths:
+      - "research/chained_jacobian_transfers_20261110/ct22_mod4_gluing.rs"
+      - ".github/workflows/ct22-mod4-torsion.yml"
+  workflow_dispatch:
+jobs:
+  torsion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile std-only Rust test and run exhaustive 256-element checks
+        run: |
+          rustc --version
+          rustc --edition=2021 --test \
+            research/chained_jacobian_transfers_20261110/ct22_mod4_gluing.rs \
+            -o /tmp/ct22_mod4_gluing
+          /tmp/ct22_mod4_gluing --nocapture
