@@ -79,3 +79,19 @@ curves idx 0,1 (26 bit, two curves), all targets verified against the planted k 
 Reading: the symmetry cuts the setup by only about 1.4x (not 3x: the orbit pair table, scans and the O(B³) elimination are not all reduced), and the per-target phase, which dominates for T>=200, is
 unchanged (same covered x-set, same yield) and my per-target scan is unbatched while the baseline's is lock-step batched. The advantage vanishes with T. Not a holdout run and not a claim; no j=0
 BSGS/rho multi-target comparator was built, so no ranking against them (the a=-3 results, 2x-4x behind tuned BSGS, are unchanged). The single-target result (2.0x-2.4x) stays the only improvement.
+
+## Experiment: native automorphism-folded rho on j=0 curves (2026-11-11) — `[pcc:unverified]`
+`examples/prime_fast_j0_rho.rs`: single-target r-adding rho (32 steps) on canonical x6 orbit representatives (negation + order-3 rotation, coefficients
+tracked through the automorphism), DP restart, walk length cap 40·2^d, unbatched, one thread; 40 targets per curve, all verified (240/240).
+Median ms (steps) vs `rho_parallel` (negation, batched, same host):
+
+| bits | curve | folded ms (steps) | rho_parallel ms |
+|---|---|---|---|
+| 26 | b15 / b17 | 2.8 (8.3k) / 3.3 (9.9k) | 3.3 / 3.4 |
+| 26 | b18 / b22 (fresh) | 3.5 (10.0k) / 2.3 (8.5k) | 3.0 / 2.9 |
+| 28 | b3 / b5 | 7.0 (32.8k) / 6.7 (35.0k) | 3.4 / 3.6 |
+| 30 | b17 / b26 | 19.5 (127k) / 17.2 (98k) | 4.3 / 4.5 |
+
+Reading: the naive folded walk does not realise the expected sqrt(3) (steps blow up beyond 26 bits: fruitless short cycles and the walk cap, the known folding problem, not handled);
+at 26 bits it ties `rho_parallel`. So no valid automorphism-aware matched rho exists in this repository's native engine yet; the matched reference stays `rho_parallel`
+(sym3 3x-23x behind it). An untuned folded rho is not evidence about a tuned one; building the tuned one (cycle detection, batched steps) is the open comparator task. No claim.
