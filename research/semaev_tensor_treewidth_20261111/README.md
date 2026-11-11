@@ -9,7 +9,60 @@ from the object itself (a width from its order, an acceptance from the network);
 upper bound from a greedy order; **[bound]** a lower bound with the argument that makes it one.
 No claim here is independently validated: `[pcc:unverified]` throughout.
 
-RESULTS_PLACEHOLDER
+## Results (one line each, then the tables)
+
+All rows: `rows/*.json`, laid out in `TABLE.md`; graphs `treewidth_vs_bits.svg`, `exponents_vs_bits.svg`;
+report `REPORT.pdf`. Schoolbook networks were measured at b = 8–36 (40 in a reduced run if present in
+`rows/`), Fourier networks at b = 8–24 (plus S3 at 28 and 36 if present): the 2-hour runtime budget of the
+sweeps cut the rest, said so here rather than extrapolated.
+
+1. **The encoding is the bottleneck, not the solver.** The treewidth *lower* bound — what no elimination
+   order can beat — exceeds the enumeration/rho exponent b/2 by 4–5× at every size and grows about
+   2 per bit against 0.5 per bit for enumeration **[bound, measured]**: schoolbook S3 lb = 22, 39, 53, 69,
+   74 at b = 8, 16, 24, 32, 36 (b/2 = 4, 8, 12, 16, 18); hashed group law lb = 27, 48, 67, 84, 95. So
+   even a treewidth-optimal exact contraction costs at least 2^{~2b} on these graphs, against 2^{b/2}
+   for enumerating one slot. No solver that treats the bit-level network as a Boolean tensor network
+   can reach enumeration, let alone rho.
+2. **The generic bound is loose by two orders of magnitude, and it does not matter.** The D.1
+   exponent s/√log₂ s is 30–150× the *best measured upper bound* **[derived]** (S3, b = 36: 23,928 vs
+   616; hashed group law: 119,731 vs 900). Structure a tree decomposition can see is real and large, but
+   the structure that remains (lb ≈ 2b) is still a 2^{1.5 b} factor above enumeration.
+3. **Semaev buys constants, not a regime.** Against the hashed group law at the same b (schoolbook),
+   S3 has 3.7–5.3× fewer edges (b = 36: 97,408 vs 521,803), a 15–25% lower width lower bound
+   (74 vs 95) and a 20–30% lower best upper bound (616 vs 900) **[measured]**; its lower-bound slope
+   is 1.86 per bit against 2.43 **[derived]**. The whole gain comes from dropping the ordinates and the
+   curve-equation checks; the hash gadget itself costs about 2× in s and ≤ 10% in width (hashed vs
+   small-x group law: lb 95 vs 86, ub 900 vs 752 at b = 36).
+4. **Chained S3 (m = 3, sparse S4)** has the same width as the group law at the same b (lb 84, ub 670
+   at b = 36) with a larger enumeration exponent 2b/3; the ratio lb/(enumeration) is 3.5 instead of 4.1,
+   still far from 1 **[measured, derived]**.
+5. **The Fourier gadget is the worst choice for a structure-exploiting solver.** Its transform vertex is a
+   clique of 132 (b ≤ 12), 260 (b = 16–32) or 520 variables, so the width is set by the multiplier, not
+   the relation: lb 139–405 and ub 181–870 at b = 8–24 for every relation **[bound, heuristic]**, i.e.
+   35–60× b/2. The O(b)-edge encoding minimises s (what the generic bound charges) by maximising
+   width (what a decomposition pays). s grows with slope 1.2 in log–log for Fourier against 1.8 for
+   schoolbook **[derived]**, as the audit's gadget count predicts.
+6. **Contraction cost tracks the widest bag**: log₂ of the exact table work along the best order is the
+   best width + 2 on every row **[exact]** (S3 b = 36: 618 bits; enumeration 18; rho 18).
+
+What this says about the owner's question: encoding S3/S4 as a constraint graph gives the solver
+structure it can exploit — the graphs are 20–150× narrower than the generic bound assumes — but the
+structure is not of the kind that closes the gap. Any bit-level encoding of a b-bit modular
+multiplication has width Ω(b) (communication argument; measured here as ≥ 2b in the lower bound
+and ≈ 20b in the greedy upper bound), and a relation needs several of them, so the exponent is at
+least a constant multiple of b where enumeration pays b/2. The lever that remains is algebraic, not
+graphical: eliminating at the field level (Gröbner/F4 on the S3 system, the known index-calculus route)
+rather than at the bit level. The closed verdict of the audit stands for the hashed encoding; the
+Semaev encoding does not reopen it by this route.
+
+Validation: every schoolbook row at b = 8 and 10 passed (0 mismatches; positives 1–13 of 82–4,104
+candidates) **[exact]**. The Fourier rows reuse the crate's own tested language and the
+multiplier-independence test (same accepted set for both gadgets on the 17-curve).
+
+Limits are in the report: one curve per b; greedy upper bounds (eager min-fill only to b = 16, lazy
+beyond, noisy under tie-breaking); MMD+ lower bounds are valid but weak; the model is exact Boolean
+contraction, so it does not credit algebraic structure inside a tensor.
+
 
 ## Question
 

@@ -44,7 +44,19 @@ Least squares of the recorded bounds against $b$ *[derived]*. The "best-upper" s
 
 = Reading
 
-RESULTS_PLACEHOLDER
+*Bounds against enumeration.* On every schoolbook row the treewidth lower bound *[bound]* is 4–5 times the enumeration exponent $b\/2$ and grows at about 2 per bit against 0.5 per bit: $S_3$ gives $22, 39, 53, 69, 74$ at $b = 8, 16, 24, 32, 36$ ($b\/2 = 4, 8, 12, 16, 18$); the hashed group law $27, 48, 67, 84, 95$. A lower bound on width binds every elimination order, so an exact contraction of these networks costs at least $2^(approx 2b)$ table operations where enumerating one free slot costs $2^(b\/2)$: no solver that treats the bit-level network as a Boolean tensor network reaches enumeration, whatever its order-finding. The best measured orders *[heuristic, exact for their order]* sit at 71–92 ($b = 8$), 180–205 ($b = 16$) and 616–900 ($b = 36$), and the $log_2$ table work along them is the width plus 2 on every row *[exact]*.
+
+*Against the generic bound.* The D.1 exponent $s\/sqrt(log_2 s)$ (constant 1) is 30–150 times the best measured width *[derived]*: $S_3$ at $b = 36$: 23,928 against 616; hashed group law: 119,731 against 900. The structure a decomposition can see is real and large; the structure that remains is still a factor $2^(1.5 b)$ above enumeration.
+
+*Semaev against hashed relations.* At equal $b$ (schoolbook) $S_3$ has 3.7–5.3 times fewer edges (97,408 against 521,803 at $b = 36$), a 15–25% lower width lower bound (74 against 95) and a 20–30% lower best upper bound (616 against 900) *[measured]*; lower-bound slope 1.86 per bit against 2.43 *[derived]*. The gain comes from dropping ordinates and curve-equation checks; the hash gadget itself costs about $2 times$ in $s$ and at most 10% in width (hashed against small-x group law: lower 95 against 86, upper 900 against 752). The chained $S_3$ ($m = 3$) has the width of the group law at the same $b$ (84 / 670 at $b = 36$) against a larger enumeration exponent $2b\/3$: ratio 3.5 instead of 4.1.
+
+*The Fourier gadget.* Its transform vertex is a clique of 132, 260 or 520 variables, so the width is fixed by the multiplier and not by the relation: lower 139–405 and upper 181–870 at $b = 8$–$24$ for all four relations, 35–60 times $b\/2$. The $O(b)$-edge encoding minimises $s$, which the generic bound charges, by maximising width, which a decomposition pays; $s$ grows with log–log slope 1.2 against 1.8 for schoolbook *[derived]*, as the audit's gadget count predicts.
+
+*Answer.* Encoding $S_3\/S_4$ as a constraint graph does give a solver structure to exploit, but not the kind that closes the gap: every bit-level encoding of a $b$-bit modular multiplication has width $Omega(b)$, measured here as at least $2b$ (lower bound) and about $20 b$ (greedy upper bound), and a relation needs several of them, so the exponent is a constant multiple of $b$ where enumeration pays $b\/2$. The encoding is the bottleneck; a better contraction solver would recover two orders of magnitude of exponent and still lose. The lever that remains is algebraic, not graphical: elimination at the field level ($F_4$ on the $S_3$ system, the known index-calculus route) rather than at the bit level. The audit's closed verdict stands for the hashed encoding, and the Semaev encoding does not reopen it by this route.
+
+*Validation.* Every schoolbook row at $b = 8$ and $10$ passed: 0 mismatches, 1–13 positives among 82–4,104 candidates *[exact]*. Fourier rows use the crate's own tested language; the multiplier-independence test shows both gadgets accept the same set on the 17-curve.
+
+*What the runtime budget cut.* The two-hour sweep budget stopped the schoolbook 40-bit rows and the Fourier rows beyond 24 bits; reduced reruns (one restart; $S_3$ only for Fourier) are in `rows/` where they finished and in the tables above.
 
 = Limits
 
