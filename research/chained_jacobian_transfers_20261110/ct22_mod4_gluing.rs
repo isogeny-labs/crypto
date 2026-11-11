@@ -58,6 +58,40 @@ fn example_alpha(v: V) -> V { add(v, frob(v)) }
 #[test]
 fn full_four_torsion_census_and_kernel_invariance() {
     let v = all();
+    // On the actual prime-field E1/E2 four-torsion, t=-7/-11 and p=101
+    // imply F^2-F+I=0 mod 4, hence F^3=-I. Primitive 4-torsion
+    // points have full Frobenius orbit 6; their x-coordinate classes
+    // modulo +/- have orbit 3. Thus x lives in F_(101^3), while the
+    // full point (including y sign) first lives in F_(101^6).
+    for &x in &v {
+        let cube = frob(frob(frob(x)));
+        let minus: V = std::array::from_fn(|i| (4 - x[i]) % 4);
+        assert_eq!(cube, minus);
+        assert_eq!(frob(frob(frob(cube))), x);
+    }
+    for u in 0..4_u8 { for w in 0..4_u8 {
+        if u % 2 == 0 && w % 2 == 0 { continue; }
+        let first: V = [u, w, 0, 0];
+        let minus: V = std::array::from_fn(|i| (4 - first[i]) % 4);
+        let mut current = first;
+        let mut point_period = 0;
+        loop {
+            current = frob(current);
+            point_period += 1;
+            assert!(point_period <= 6);
+            if current == first { break; }
+        }
+        assert_eq!(point_period, 6);
+        current = first;
+        let mut x_period = 0;
+        loop {
+            current = frob(current);
+            x_period += 1;
+            assert!(x_period <= 3);
+            if current == first || current == minus { break; }
+        }
+        assert_eq!(x_period, 3);
+    }}
     let g = graph();
     let s: Vec<V> = v.iter().copied().filter(|&x| g.contains(&twice(x))).collect();
     let q: BTreeSet<V> = s.iter().copied().map(|x| quotient_class(x, &g)).collect();
