@@ -9,6 +9,7 @@
 //! ecbench run    --spec S --out D      run a session (pinned, interleaved, sealed records)
 //! ecbench verify --dir D [--replay N]  re-derive a session; replay runs exactly
 //! ecbench compare --dir D --a X --b Y  paired ratio with a bootstrap interval
+//! ecbench compare --dir D1 --dir D2 ... --a X --b Y  pooled over sessions (pairs stay within each)
 //! ecbench table  --dir D... [--reference ARM]   the one-unit table AGENTS.md §2 asks for
 //! ecbench resources --dir D [--out F]   cold native-work, memory and PMU vectors
 //! ecbench fb --curve C --factor-base F a factor base with its points
@@ -366,9 +367,12 @@ enum Cmd {
     },
     /// Compare arm B against arm A.
     Compare {
-        /// The session directory.
-        #[arg(long)]
-        dir: PathBuf,
+        /// The session directory. Repeat it (`--dir A --dir B`, or
+        /// `--dir A B`) to pool the pairs of several sessions: pairs stay
+        /// within each session, and the ratio is of total cost (`S·√r`)
+        /// over them all (`compare::compare_pooled`).
+        #[arg(long, required = true, num_args = 1..)]
+        dir: Vec<PathBuf>,
         /// The baseline arm's name (the ratio's denominator).
         #[arg(long)]
         a: String,
@@ -1019,6 +1023,69 @@ fn emit_claim(
     if exit_code && !problems.is_empty() {
         return Ok(ExitCode::from(1));
     }
+    Ok(ExitCode::SUCCESS)
+}
+
+/// `compare` with several `--dir`: the pairs of every session pooled.
+#[allow(clippy::too_many_arguments)]
+fn compare_pooled_cmd(
+    dirs: &[PathBuf],
+    a: &str,
+    b: &str,
+    has_b_dir: bool,
+    save: bool,
+    json: bool,
+    opts: &compare::CompareOptions,
+    weight: Option<f64>,
+) -> Result<ExitCode, String> {
+    if has_b_dir {
+        return Err(
+            "--b-dir takes one session; with several --dir every session holds both arms".into(),
+        );
+    }
+    if save {
+        return Err("--save writes into one session; keep a pooled comparison with --json".into());
+    }
+    let c = compare::compare_pooled(dirs, a, b, opts, weight)?;
+    if json {
+        print_json(&c)?;
+        return Ok(ExitCode::SUCCESS);
+    }
+    println!("{}", c.verdict);
+    if let Some(weight) = c.pricing_weight {
+        println!("pricing weight: {weight} GAE per native operation");
+    }
+    if let Some(band) = &c.band {
+        let r: Vec<String> = band
+            .weights
+            .iter()
+            .zip(&band.ratio_b_over_a)
+            .map(|(w, r)| match r {
+                Some(r) => format!("w={w}: {r:.4}"),
+                None => format!("w={w}: n/a"),
+            })
+            .collect();
+        println!(
+            "band ({} pairs, total cost): {}; {}",
+            band.pairs,
+            r.join(", "),
+            band.order
+        );
+    }
+    for s in &c.sessions {
+        println!(
+            "  {} {} [{}]: {} pairs, {} workloads, ratio {}",
+            s.session_id,
+            s.dir,
+            s.status,
+            s.pairs,
+            s.workloads,
+            s.ratio_b_over_a
+                .map(|r| format!("{r:.4}"))
+                .unwrap_or_else(|| "n/a".into())
+        );
+    }
+    println!("comparison id: {}", c.comparison_id);
     Ok(ExitCode::SUCCESS)
 }
 
@@ -1785,21 +1852,28 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             price_table_work: _,
             no_price_table_work,
         } => {
-            let c = compare::compare_weighted_with(
-                &dir,
-                &a,
-                b_dir.as_deref(),
-                &b,
-                &compare::CompareOptions {
-                    resamples,
-                    seed,
-                    allow_interrupted,
-                    pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
-                        table_work: !no_price_table_work,
-                    },
+            let opts = compare::CompareOptions {
+                resamples,
+                seed,
+                allow_interrupted,
+                pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
+                    table_work: !no_price_table_work,
                 },
-                weight,
-            )?;
+            };
+            if dir.len() > 1 {
+                return compare_pooled_cmd(
+                    &dir,
+                    &a,
+                    &b,
+                    b_dir.is_some(),
+                    save,
+                    json,
+                    &opts,
+                    weight,
+                );
+            }
+            let dir = dir.into_iter().next().ok_or("--dir is required")?;
+            let c = compare::compare_weighted_with(&dir, &a, b_dir.as_deref(), &b, &opts, weight)?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
