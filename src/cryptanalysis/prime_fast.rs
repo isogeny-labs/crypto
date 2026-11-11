@@ -1122,6 +1122,8 @@ pub struct PairTable {
     shift: u32,
     /// Largest canonical x in the table (0 when empty).
     max_x: u64,
+    /// Legacy layout (one bucket, globally sorted, binary-search lookup); `IC_PAIR_SORTED=1`.
+    sorted: bool,
 }
 
 const PAIR_DIFF_BIT: u32 = 1 << 31;
@@ -1156,6 +1158,18 @@ impl PairTable {
         }
         let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
         let t_sort = Instant::now();
+        if std::env::var_os("IC_PAIR_SORTED").is_some() {
+            entries.sort_unstable();
+            let max_x = entries.last().map(|e| e.0).unwrap_or(0);
+            let len = entries.len() as u32;
+            return PairTable {
+                entries,
+                starts: vec![0, len],
+                shift: 63,
+                max_x,
+                sorted: true,
+            };
+        }
         // Counting sort over the high bits of x (monotone buckets), then a tiny sort inside each bucket.
         let bits_p = 64 - (f.p.max(2) - 1).leading_zeros();
         let target_bits = (usize::BITS - 1 - (entries.len().max(32) / 2).leading_zeros()).max(4);
@@ -1190,6 +1204,7 @@ impl PairTable {
             starts,
             shift,
             max_x,
+            sorted: false,
         }
     }
 
@@ -1205,11 +1220,19 @@ impl PairTable {
     #[inline]
     pub fn lookup(&self, x: u64) -> impl Iterator<Item = &(u64, u32, u32)> {
         let b = (x >> self.shift) as usize;
-        let bucket: &[(u64, u32, u32)] = if b + 1 >= self.starts.len() {
+        let mut bucket: &[(u64, u32, u32)] = if b + 1 >= self.starts.len() {
             &[]
         } else {
             &self.entries[self.starts[b] as usize..self.starts[b + 1] as usize]
         };
+        if self.sorted {
+            let lo = bucket.partition_point(|e| e.0 < x);
+            let mut hi = lo;
+            while hi < bucket.len() && bucket[hi].0 == x {
+                hi += 1;
+            }
+            bucket = &bucket[lo..hi];
+        }
         bucket.iter().filter(move |e| e.0 == x)
     }
 
