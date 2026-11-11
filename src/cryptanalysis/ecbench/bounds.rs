@@ -1979,7 +1979,10 @@ fn size_axes_and_band(
         put(axis, &|r| field_axis(r, axis), 0x111 + 2 * i as u64);
     }
     let mut band = Vec::new();
-    if opts.weight.is_none() {
+    // Fit version 2 records the price band on a weighted fit too, so the
+    // frontier can test a dominance across the band in that fit's own
+    // domain; version 1 left it out there.
+    if opts.weight.is_none() || opts.fit_version >= 2 {
         for (i, w) in BAND_WEIGHTS.iter().enumerate() {
             let point =
                 strata_of(&|r| super::band::priced_s(r, *w).ok().flatten()).and_then(|st| {
@@ -2589,6 +2592,36 @@ mod tests {
             let v: Vec<f64> = s.band.iter().filter_map(|p| p.s).collect();
             assert!(v.windows(2).all(|w| w[0] <= w[1] + 1e-12), "{v:?}");
         }
+    }
+
+    #[test]
+    fn a_weighted_version_2_fit_carries_the_same_pricing_band() {
+        // The band prices each size at the fixed band weights, whatever
+        // weight the fit itself charges, so a weighted fit records the
+        // same band as the unweighted one; version 1 left it out.
+        let src = repo().join(CANDIDATES).join("sessions/prime");
+        let audit = repo().join(CANDIDATES).join("audit-prime.json");
+        let run = |weight, fit_version| {
+            fit(
+                std::slice::from_ref(&src),
+                "bsgs-neg",
+                std::slice::from_ref(&audit),
+                FitOptions {
+                    weight,
+                    fit_version,
+                    ..Default::default()
+                },
+            )
+            .unwrap()
+        };
+        let plain = run(None, 2);
+        let weighted = run(Some(1.0), 2);
+        assert_eq!(plain.sizes.len(), weighted.sizes.len());
+        for (p, w) in plain.sizes.iter().zip(&weighted.sizes) {
+            assert_eq!(w.band.len(), BAND_WEIGHTS.len());
+            assert_eq!(p.band, w.band);
+        }
+        assert!(run(Some(1.0), 1).sizes.iter().all(|s| s.band.is_empty()));
     }
 
     #[test]
