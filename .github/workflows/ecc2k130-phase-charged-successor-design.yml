@@ -15,4 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Hash-only design check
-        run: python3 research/notes/ecc2k130/rotated_phase_charged_successor_20260925/check_protocol.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/rotated_phase_charged_successor_20260925/check_protocol.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_phase_charged_successor_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

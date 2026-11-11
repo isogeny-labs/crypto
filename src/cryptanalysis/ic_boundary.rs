@@ -1321,6 +1321,19 @@ pub trait CountedGroup {
     fn supports_siblings(&self) -> bool {
         false
     }
+    /// The rational order-3 automorphism `ζ₃: (x, y) ↦ (ωx, y)` of a
+    /// `j = 0` curve, acting on the order-`r` subgroup of `generator` as
+    /// `[κ]`: `Some((p, ω, κ))`, or `None` when the group lacks it (the
+    /// default).  The check `[κ]G = ζ₃(G)` is charged to `ops`
+    /// ([`CubicClasses::new`]).  Used by the target walk's `aut=3` keys.
+    fn order_three_aut(
+        &self,
+        _generator: Self::Elt,
+        _r: u64,
+        _ops: &mut GroupOps,
+    ) -> Option<(u64, u64, u64)> {
+        None
+    }
     /// The x-only siblings `P + J` and (with `want_minus`) `P − J` from ONE
     /// inversion `1/(x_J − x_P)`: `λ₊ = (y_J − y_P)·inv`, `λ₋ = −(y_J + y_P)·inv`,
     /// `x(P ± J) = λ² − x_P − x_J`.  The field work is tallied into
@@ -5483,6 +5496,15 @@ impl CountedGroup for PrimeCurve {
     fn supports_siblings(&self) -> bool {
         true
     }
+    fn order_three_aut(
+        &self,
+        generator: PrimePoint,
+        r: u64,
+        ops: &mut GroupOps,
+    ) -> Option<(u64, u64, u64)> {
+        let c = CubicClasses::new(self, generator, r, ops)?;
+        Some((self.p, c.omega, c.kappa))
+    }
     fn sibling_pair(
         &self,
         ops: &mut GroupOps,
@@ -8854,6 +8876,19 @@ pub fn wwalk_plan_check(
     jumps: usize,
     opts: WalkOpts,
 ) -> Result<(u64, u64, u64, u64), String> {
+    wwalk_plan_check_bits(r, x, jumps, opts, 32)
+}
+
+/// [`wwalk_plan_check`] with the coefficient width as a parameter: the
+/// plain [`WalkTable`] packs coefficients in 32 bits, a [`TargetWalk`] in
+/// [`TW_COEF_BITS`].
+pub fn wwalk_plan_check_bits(
+    r: u64,
+    x: f64,
+    jumps: usize,
+    opts: WalkOpts,
+    coef_bits: u32,
+) -> Result<(u64, u64, u64, u64), String> {
     if !(x > 0.0 && x <= WWALK_MAX_X) {
         return Err(format!("wwalk: x is in (0, {WWALK_MAX_X}], not {x}"));
     }
@@ -8881,11 +8916,11 @@ pub fn wwalk_plan_check(
         ));
     }
     let w = ((1.2 * (t as f64).sqrt()).round() as u64).max(2);
-    // Every coefficient is at most 1 + t_max·w: it must pack in 32 bits.
+    // Every coefficient is at most 1 + t_max·w: it must pack in `coef_bits`.
     let bound = 1 + t_max * w;
-    if bound >= 1 << 32 {
+    if bound >= 1 << coef_bits {
         return Err(format!(
-            "wwalk: coefficients up to {bound} do not fit the 32-bit packing (x={x}, r={r})"
+            "wwalk: coefficients up to {bound} do not fit the {coef_bits}-bit packing (x={x}, r={r})"
         ));
     }
     Ok((t, t_max, w, bound))
@@ -9553,10 +9588,23 @@ pub struct TargetWalkRow {
 
 /// The top bit of a [`TargetWalk`] entry's `u` word: the stored point's
 /// key sign bit with `cv=0` and with `lazy=1` (never set otherwise, so the
-/// default walk is unchanged).  Coefficients are below `2^32`
-/// ([`wwalk_plan_check`]); with two seeds (`u = u1 << 32 | u2`) both modes
-/// refuse coefficients of `2^31` or more, so the bit is never part of `u`.
-pub const TW_SIGN_BIT: u64 = 1 << 63;
+/// default walk is unchanged).  The word is a `u128`: one seed stores `u`,
+/// two seeds `u = u1 << 64 | u2`; every seed coefficient is below `2^62`
+/// ([`TW_COEF_BITS`], [`wwalk_plan_check_bits`]) and below `r + 2^62`
+/// after a sibling reduction, so the bit is never part of `u`.
+pub const TW_SIGN_BIT: u128 = 1 << 127;
+
+/// Coefficient width a [`TargetWalk`] accepts: each seed coefficient sits
+/// in a 64-bit half of the `u128` `u` word, below the sign bit.
+pub const TW_COEF_BITS: u32 = 62;
+
+/// With `aut=3`: bits 62 and 63 of a [`TargetWalk`] entry's `u` word hold
+/// the rotation `i` (0, 1 or 2) that took the stored point's abscissa `x`
+/// to the table key `min(x, ωx, ω²x) + 1` (`ω^i·x`); never set otherwise.
+/// Every seed coefficient is below `2^62` ([`TW_COEF_BITS`]), so the bits
+/// are free in both the one-seed word and the low half of the two-seed word.
+pub const TW_AUT_SHIFT: u32 = 62;
+pub const TW_AUT_MASK: u128 = 3 << TW_AUT_SHIFT;
 
 /// **A walk with the target inside it** (`wwalk:tw=1`, `F = 1`;
 /// `wwalk:tw=2`, `F = 2`).
@@ -9662,19 +9710,18 @@ pub const TW_SIGN_BIT: u64 = 1 << 63;
 /// whose key is `abscissa·2 + sign` is exactly `E_t = ±E_s`, and the sign
 /// bit of the stored entry's key says which.  That bit is packed into the
 /// top bit of the entry's `u` word ([`TW_SIGN_BIT`]; every coefficient is
-/// below `2^32`, [`wwalk_plan_check`]), so `cv=0` makes exactly the table
+/// below `2^62`, [`TW_COEF_BITS`]), so `cv=0` makes exactly the table
 /// accesses of `cv=1` (one per non-identity step) and keeps no second
 /// table; `verify_ops` stays empty.  The relation loop's final `[d]G = Q`
 /// check is kept and charged
 /// as before, so a wrong row makes the solve fail (it is never retried).
-/// With two seeds `cv=0` needs coefficients below `2^31` (as `lazy=1`
-/// does), so the packed `u1` never reaches the sign bit; `cv=0` and
+/// The packed `u1` never reaches the sign bit (bit 127); `cv=0` and
 /// `lazy=1` are alternatives and are refused together.
 pub struct TargetWalk<E> {
     /// Key (abscissa and sign bit, shifted) → `(u, z, b)`; with two seeds
-    /// `u = u1 << 32 | u2`; with `cv=0` or `lazy` bit 63 of `u`
-    /// ([`TW_SIGN_BIT`]) is the key's low bit.
-    map: FastMap<(u64, u64, u64)>,
+    /// `u = u1 << 64 | u2` (a `u128`); with `cv=0` or `lazy` bit 127 of
+    /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.
+    map: FastMap<(u128, u64, u64)>,
     /// Table accesses made by the walk (one `entry` call per non-identity
     /// step, in every mode); not emitted as a counter.
     pub table_probes: u64,
@@ -9719,7 +9766,7 @@ pub struct TargetWalk<E> {
     pub identities_skipped: u64,
     pub index_lookups: u64,
     /// Key collisions found: kept and new coefficient triples.
-    pub collisions: Vec<((u64, u64, u64), (u64, u64, u64))>,
+    pub collisions: Vec<((u128, u64, u64), (u128, u64, u64))>,
     pub verified_collisions: u64,
     pub rows: Vec<TargetWalkRow>,
     /// Rows whose seed part (and with one seed also `db`) cancelled modulo
@@ -9757,15 +9804,27 @@ pub struct TargetWalk<E> {
     /// Continuing children lifted (one product each).
     pub sib_lifts: u64,
     pub sib_resolve_ops: GroupOps,
+    /// `aut=3` (`j = 0` curves): `Some((p, ω, κ))` of the order-3
+    /// automorphism `ζ₃(x, y) = (ωx, y) = [κ]·(x, y)`; keys are
+    /// orbit-canonical under `{±ζ₃^i}` and a collision at rotation
+    /// difference `d` is the row of `E_t = ±[κ^d]E_s`.
+    pub aut: Option<(u64, u64, u64)>,
+    /// With `aut`: canonicalisations made (two field multiplications each,
+    /// charged to the ledger's `field_ops` as `rho.cubic` charges them) and
+    /// collisions between different rotations of the orbit.
+    pub aut_canonicalisations: u64,
+    pub aut_rotated_collisions: u64,
+    /// The subgroup order, for [`TargetWalk::probe`]'s `aut` rotation.
+    r_for_aut: u64,
 }
 
 /// One keyed point waiting to be inserted by the sibling walk.
 struct SibItem {
     key: u64,
-    c: (u64, u64, u64),
-    /// The key's sign bit already shifted to bit 63 (`0` or
+    c: (u128, u64, u64),
+    /// The key's sign bit already shifted to bit 127 (`0` or
     /// [`TW_SIGN_BIT`]) when the point's `y` is known.
-    sign: Option<u64>,
+    sign: Option<u128>,
     /// An x-only sibling: `(parent index, pool index, minus, λ)`.
     xref: Option<(usize, usize, bool, u64)>,
 }
@@ -9774,9 +9833,9 @@ struct SibItem {
 struct SibWalk<E> {
     started: bool,
     parent: E,
-    c: (u64, u64, u64),
+    c: (u128, u64, u64),
     next_parent: E,
-    next_c: (u64, u64, u64),
+    next_c: (u128, u64, u64),
     /// Pool index of the jump the walk takes from the current parent.
     h_t: usize,
     prev_h: Option<usize>,
@@ -9790,12 +9849,14 @@ struct SibWalk<E> {
     parents: Vec<E>,
     parents_n: u64,
     queue: std::collections::VecDeque<SibItem>,
-    /// Table key of an x-only entry → `(parent index, pool index, minus)`.
-    refs: FastMap<(usize, usize, bool)>,
+    /// Table key of an x-only entry → `(parent index, pool index, minus,
+    /// the entry's own abscissa key)` (the table key is canonical with
+    /// `aut=3`; the sign resolution needs the point's own abscissa).
+    refs: FastMap<(usize, usize, bool, u64)>,
 }
 
 impl<E: Copy> SibWalk<E> {
-    fn new(_m: usize, pool: usize, p1: E, c: (u64, u64, u64)) -> Self {
+    fn new(_m: usize, pool: usize, p1: E, c: (u128, u64, u64)) -> Self {
         Self {
             started: false,
             parent: p1,
@@ -9969,6 +10030,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             verify_collisions,
             None,
             None,
+            false,
         )
     }
 
@@ -10007,6 +10069,48 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             verify_collisions,
             None,
             sib,
+            false,
+        )
+    }
+
+    /// [`TargetWalk::build_ext_sib`] (with `cheap` chained jumps when `sib`
+    /// is `None`) and the order-3 automorphism keys (`aut=3`, `j = 0`
+    /// curves): `aut = false` is `build_ext_sib` / `build_ext_cv` exactly.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_ext_aut<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: E,
+        target: E,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        h: u64,
+        x: f64,
+        jumps: usize,
+        cheap: bool,
+        seed: u64,
+        lazy: bool,
+        seeds: usize,
+        verify_collisions: bool,
+        sib: Option<(usize, usize)>,
+        aut: bool,
+    ) -> Result<Self, String> {
+        Self::build_inner(
+            g,
+            generator,
+            target,
+            fb,
+            r,
+            h,
+            x,
+            jumps,
+            cheap || sib.is_some(),
+            seed,
+            lazy,
+            seeds,
+            verify_collisions,
+            None,
+            sib,
+            aut,
         )
     }
 
@@ -10027,6 +10131,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         verify_collisions: bool,
         fault: Option<u64>,
         sib: Option<(usize, usize)>,
+        aut: bool,
     ) -> Result<Self, String> {
         let opts = WalkOpts {
             g_jumps: true,
@@ -10035,7 +10140,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         // With `sib` the jump pool has `pool` points (up to 512), outside
         // the plain walk's jump range; the range is checked on `pool` below.
         let plan_jumps = if sib.is_some() { 16 } else { jumps };
-        let (t, t_max, w, bound) = wwalk_plan_check(r, x, plan_jumps, opts)?;
+        let (t, t_max, w, bound) = wwalk_plan_check_bits(r, x, plan_jumps, opts, TW_COEF_BITS)?;
         let (jumps, cheap) = match sib {
             None => (jumps, cheap),
             Some((m, pool)) => {
@@ -10049,8 +10154,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                         "wwalk: sib needs a group with x-only siblings (a prime curve)".into(),
                     );
                 }
-                if r >= 1 << 31 {
-                    return Err(format!("wwalk: sib needs r below 2^31 (r={r})"));
+                // A reduced minus sibling's seed coefficient is below `r`,
+                // later sums below `r + bound`: both fit below the sign bit.
+                if r >= 1 << TW_COEF_BITS {
+                    return Err(format!("wwalk: sib needs r below 2^{TW_COEF_BITS} (r={r})"));
                 }
                 // The pool is built as `cj=1` builds jumps.
                 (pool, true)
@@ -10071,18 +10178,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 "wwalk: tw={n_seeds} with an identity generator or target"
             ));
         }
-        if lazy && n_seeds == 2 && bound >= 1 << 31 {
-            return Err(format!(
-                "wwalk: lazy=1 with tw=2 needs coefficients below 2^31 (bound {bound})"
-            ));
-        }
         if lazy && !verify_collisions {
             return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
-        }
-        if !verify_collisions && n_seeds == 2 && bound >= 1 << 31 {
-            return Err(format!(
-                "wwalk: cv=0 with tw=2 needs coefficients below 2^31 (bound {bound})"
-            ));
         }
         let start = Instant::now();
         let mut seeds = [0usize; 2];
@@ -10119,15 +10216,31 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let nbits = (64 - bound.leading_zeros()) as usize;
         let rbits = (64 - (r - 1).leading_zeros()).max(1) as usize;
         let mut setup_ops = GroupOps::default();
+        // `aut=3`: the order-3 automorphism, its `[κ]G = ζ₃(G)` check
+        // charged to the set-up.
+        let aut = if aut {
+            if pts.iter().any(|p| g.key(&g.neg(*p)) != g.key(p) ^ 1) {
+                return Err(
+                    "wwalk: aut=3 needs a group key of the form (abscissa + 1)·2 + sign".into(),
+                );
+            }
+            Some(g.order_three_aut(generator, r, &mut setup_ops).ok_or_else(|| {
+                "wwalk: aut=3 needs a j = 0 curve over p ≡ 1 (mod 3) with 3 | r − 1 and a nontrivial ζ₃ on the subgroup".to_string()
+            })?)
+        } else {
+            None
+        };
         let mut pows: [Vec<Option<E>>; 4] = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
         let mut chains: Vec<(usize, E, usize)> =
             vec![(0, p1, nbits), (1, generator, rbits), (2, target, rbits)];
         if n_seeds == 2 {
             chains.push((3, pts[1], nbits));
         }
-        if sib.is_some() {
+        if sib.is_some() || aut.is_some() {
             // A minus sibling's seed coefficients are reduced modulo `r`
-            // (`u_P − α` can be negative): the seed chains cover `r`.
+            // (`u_P − α` can be negative), and with `aut` a rotated
+            // collision scales the kept coefficients by `κ^d` modulo `r`:
+            // the seed chains cover `r`.
             for ch in chains.iter_mut() {
                 if ch.0 == 0 || ch.0 == 3 {
                     ch.2 = ch.2.max(rbits);
@@ -10198,6 +10311,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             sib_degenerate: 0,
             sib_lifts: 0,
             sib_resolve_ops: GroupOps::default(),
+            aut,
+            aut_canonicalisations: 0,
+            aut_rotated_collisions: 0,
+            r_for_aut: r,
         };
         let mut rng = {
             let mut s =
@@ -10227,7 +10344,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let mut verify_ops = GroupOps::default();
         let mut check_ops = GroupOps::default();
         let mut lazy_active = lazy;
-        // `cv=0` and `lazy=1` store the key's sign bit in bit 63 of `u`.
+        // `cv=0` and `lazy=1` store the key's sign bit in bit 127 of `u`.
         let store_sign = lazy || !verify_collisions;
         let _ = fault;
         // The sibling walk's state (only with `sib`): see "Sibling points".
@@ -10249,7 +10366,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     tw.steps += 1;
                     tw.insert_attempts += 1;
                     tw.table_probes += 1;
-                    let key = item.key;
+                    let own_key = item.key;
+                    let (key, rot) = tw.canon_key(own_key, &mut walk_ops);
                     let low = if store_sign {
                         item.sign.unwrap_or(0)
                     } else {
@@ -10257,35 +10375,39 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     };
                     let mut kept = match tw.map.entry(key) {
                         std::collections::hash_map::Entry::Vacant(slot) => {
-                            debug_assert!(item.c.0 & TW_SIGN_BIT == 0);
-                            slot.insert((item.c.0 | low, item.c.1, item.c.2));
+                            debug_assert!(item.c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
+                            slot.insert((item.c.0 | low | rot, item.c.1, item.c.2));
                             if let Some((pi, h, minus, _)) = item.xref {
-                                sw.refs.insert(key, (pi, h, minus));
+                                sw.refs.insert(key, (pi, h, minus, own_key));
                             }
                             continue;
                         }
                         std::collections::hash_map::Entry::Occupied(o) => *o.get(),
                     };
+                    let kept_rot = kept.0 & TW_AUT_MASK;
+                    kept.0 &= !TW_AUT_MASK;
                     // A collision.  With the sign bit in use, an x-only
                     // point's sign is resolved now (charged), the kept
                     // entry's from its parent, the new one from its slope.
                     let mut minus = false;
                     if store_sign {
                         let kept_low = match sw.refs.get(&key).copied() {
-                            Some((pi, h, mn)) => {
-                                tw.sib_sign(g, sw, &jump_pts, pi, h, mn, key, None)
+                            Some((pi, h, mn, k0)) => {
+                                tw.sib_sign(g, sw, &jump_pts, pi, h, mn, k0, None)
                             }
                             None => kept.0 & TW_SIGN_BIT,
                         };
                         let new_low = match item.xref {
                             Some((pi, h, mn, lam)) => {
-                                tw.sib_sign(g, sw, &jump_pts, pi, h, mn, key, Some(lam))
+                                tw.sib_sign(g, sw, &jump_pts, pi, h, mn, own_key, Some(lam))
                             }
                             None => low,
                         };
                         minus = kept_low == new_low;
                         kept.0 &= !TW_SIGN_BIT;
                     }
+                    // `aut`: E_t = ±ζ₃^d(E_s) = ±[κ^d]E_s; rotate the kept entry.
+                    kept = tw.rotate_kept(kept, kept_rot, rot, r);
                     let c = item.c;
                     if lazy {
                         tw.collision_minus.push(minus);
@@ -10314,23 +10436,27 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 }
                 tw.insert_attempts += 1;
                 let full_key = g.key(&e);
-                let key = full_key >> 1;
-                let low = u64::from(store_sign) * ((full_key & 1) << 63);
+                let (key, rot) = tw.canon_key(full_key >> 1, &mut walk_ops);
+                let low = u128::from(store_sign) * (u128::from(full_key & 1) << 127);
                 tw.table_probes += 1;
                 let mut kept = match tw.map.entry(key) {
                     std::collections::hash_map::Entry::Vacant(slot) => {
-                        // The bit is free: u < 2^32 (one seed) or u1 < 2^31.
-                        debug_assert!(c.0 & TW_SIGN_BIT == 0);
-                        slot.insert((c.0 | low, c.1, c.2));
+                        // The bits are free: every coefficient is below 2^62.
+                        debug_assert!(c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
+                        slot.insert((c.0 | low | rot, c.1, c.2));
                         continue;
                     }
                     std::collections::hash_map::Entry::Occupied(o) => *o.get(),
                 };
+                let kept_rot = kept.0 & TW_AUT_MASK;
+                kept.0 &= !TW_AUT_MASK;
                 // Equal sign bits: E_t = E_s (only meaningful with store_sign).
                 let minus = (kept.0 & TW_SIGN_BIT) == low;
                 if store_sign {
                     kept.0 &= !TW_SIGN_BIT;
                 }
+                // `aut`: E_t = ±ζ₃^d(E_s) = ±[κ^d]E_s; rotate the kept entry.
+                kept = tw.rotate_kept(kept, kept_rot, rot, r);
                 if lazy {
                     tw.collision_minus.push(minus);
                 }
@@ -10397,7 +10523,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         g: &G,
         sw: &mut SibWalk<E>,
         m: usize,
-        jump_pts: &[(E, u64, u64, u64)],
+        jump_pts: &[(E, u128, u64, u64)],
         rng: &mut StdRng,
         ops: &mut GroupOps,
         r: u64,
@@ -10409,7 +10535,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             sw.queue.push_back(SibItem {
                 key: k >> 1,
                 c: sw.c,
-                sign: Some((k & 1) << 63),
+                sign: Some(u128::from(k & 1) << 127),
                 xref: None,
             });
             return;
@@ -10465,7 +10591,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                         sw.queue.push_back(SibItem {
                             key: sp.key_plus,
                             c: cp,
-                            sign: Some((k & 1) << 63),
+                            sign: Some(u128::from(k & 1) << 127),
                             xref: None,
                         });
                     } else {
@@ -10505,7 +10631,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             sw.queue.push_back(SibItem {
                                 key: k >> 1,
                                 c: cp,
-                                sign: Some((k & 1) << 63),
+                                sign: Some(u128::from(k & 1) << 127),
                                 xref: None,
                             });
                         } else {
@@ -10526,13 +10652,13 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         &mut self,
         g: &G,
         sw: &SibWalk<E>,
-        jump_pts: &[(E, u64, u64, u64)],
+        jump_pts: &[(E, u128, u64, u64)],
         parent_idx: usize,
         h: usize,
         minus: bool,
         key: u64,
         lambda: Option<u64>,
-    ) -> u64 {
+    ) -> u128 {
         let parent = sw.parents[parent_idx];
         let mut ops = self.sib_resolve_ops;
         let lam = lambda.unwrap_or_else(|| {
@@ -10545,7 +10671,71 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         ops.adds += 1;
         self.sib_resolutions += 1;
         self.sib_resolve_ops = ops;
-        (g.key(&pt) & 1) << 63
+        u128::from(g.key(&pt) & 1) << 127
+    }
+
+    /// The table key of an abscissa key `k = x + 1` and the rotation bits:
+    /// without `aut` the key itself and `0`; with `aut=3` the
+    /// orbit-canonical `min(x, ωx, ω²x) + 1` and `i << TW_AUT_SHIFT` for
+    /// the rotation `ω^i` that reached it (two field multiplications,
+    /// charged to `ops.field_ops`, as `rho.cubic` charges its rotations).
+    fn canon_key(&mut self, k: u64, ops: &mut GroupOps) -> (u64, u128) {
+        let Some((p, omega, _)) = self.aut else {
+            return (k, 0);
+        };
+        if k == 0 {
+            return (0, 0);
+        }
+        let x0 = k - 1;
+        let x1 = mulmod(omega, x0, p);
+        let x2 = mulmod(omega, x1, p);
+        ops.field_ops.muls += 2;
+        self.aut_canonicalisations += 1;
+        let (mut best, mut i) = (x0, 0u128);
+        if x1 < best {
+            (best, i) = (x1, 1);
+        }
+        if x2 < best {
+            (best, i) = (x2, 2);
+        }
+        (best + 1, i << TW_AUT_SHIFT)
+    }
+
+    /// With `aut`: the kept entry `E_s` (rotation bits `kept_rot`) and the
+    /// new point `E_t` (`new_rot`) share a canonical key, so
+    /// `x_t = ω^d·x_s` with `d = i_s − i_t (mod 3)` and `E_t = ±[κ^d]E_s`;
+    /// the kept coefficients are scaled by `κ^d` modulo `r` so the rest of
+    /// the collision (sign bits, rows, recomputation) reads `E_t = ±E_kept`.
+    fn rotate_kept(
+        &mut self,
+        kept: (u128, u64, u64),
+        kept_rot: u128,
+        new_rot: u128,
+        r: u64,
+    ) -> (u128, u64, u64) {
+        let Some((_, _, kappa)) = self.aut else {
+            return kept;
+        };
+        let (is, it) = (
+            (kept_rot >> TW_AUT_SHIFT) as u64,
+            (new_rot >> TW_AUT_SHIFT) as u64,
+        );
+        let d = (is + 3 - it) % 3;
+        if d == 0 {
+            return kept;
+        }
+        self.aut_rotated_collisions += 1;
+        let f = if d == 1 {
+            kappa
+        } else {
+            mulmod(kappa, kappa, r)
+        };
+        let (u1, u2) = self.parts(kept.0);
+        (
+            self.pack_alpha(mulmod(u1 % r, f, r), mulmod(u2 % r, f, r)),
+            mulmod(kept.1 % r, f, r),
+            mulmod(kept.2 % r, f, r),
+        )
     }
 
     /// Rows needed: `n_seeds + 1` independent ones pin `log Q`.
@@ -10554,11 +10744,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
     }
 
     /// `(u1, u2)` of a stored `u` (`u2 = 0` with one seed).
-    fn parts(&self, u: u64) -> (u64, u64) {
+    fn parts(&self, u: u128) -> (u64, u64) {
         if self.n_seeds == 2 {
-            (u >> 32, u & 0xFFFF_FFFF)
+            ((u >> 64) as u64, u as u64)
         } else {
-            (u, 0)
+            (u as u64, 0)
         }
     }
 
@@ -10570,7 +10760,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         g: &G,
         r: u64,
         rng: &mut StdRng,
-    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+    ) -> Result<Vec<(E, u128, u64, u64)>, String> {
         let mut out = Vec::with_capacity(self.jumps);
         let mut tries = 0u32;
         while out.len() < self.jumps {
@@ -10600,11 +10790,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         Ok(out)
     }
 
-    fn pack_alpha(&self, al: u64, al2: u64) -> u64 {
+    fn pack_alpha(&self, al: u64, al2: u64) -> u128 {
         if self.n_seeds == 2 {
-            (al << 32) | al2
+            (u128::from(al) << 64) | u128::from(al2)
         } else {
-            al
+            u128::from(al)
         }
     }
 
@@ -10616,7 +10806,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         g: &G,
         r: u64,
         rng: &mut StdRng,
-    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+    ) -> Result<Vec<(E, u128, u64, u64)>, String> {
         let mut ops = self.setup_ops;
         let mut ks: Vec<(E, u64, u64)> = Vec::with_capacity(self.jumps);
         let mut tries = 0u32;
@@ -10688,7 +10878,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         r: u64,
         a: usize,
         rng: &mut StdRng,
-    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+    ) -> Result<Vec<(E, u128, u64, u64)>, String> {
         let b = self.jumps / a;
         let mut ops = self.setup_ops;
         let mut ks: Vec<(E, u64, u64)> = Vec::with_capacity(b);
@@ -10797,8 +10987,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         fb: &FactorBase<E>,
         r: u64,
         ops: &mut GroupOps,
-        kept: (u64, u64, u64),
-        new: (u64, u64, u64),
+        kept: (u128, u64, u64),
+        new: (u128, u64, u64),
     ) {
         let ((ku1, ku2), (nu1, nu2)) = (self.parts(kept.0), self.parts(new.0));
         let s1 = self.eval(g, ops, ku1, ku2, kept.1, kept.2);
@@ -10825,8 +11015,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         fb: &FactorBase<E>,
         r: u64,
         plus: bool,
-        kept: (u64, u64, u64),
-        new: (u64, u64, u64),
+        kept: (u128, u64, u64),
+        new: (u128, u64, u64),
     ) {
         let comb = |a: u64, b: u64| -> u64 {
             let (a, b) = (a % r, b % r);
@@ -10949,12 +11139,52 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         ops: &mut GroupOps,
         lookups: &mut u64,
         point: E,
-    ) -> Option<(i8, u64, u64, u64)> {
+    ) -> Option<(i8, u128, u64, u64)> {
         *lookups += 1;
-        let key = g.key(&point) >> 1;
+        let mut key = g.key(&point) >> 1;
+        let mut point_rot = 0u128;
+        if let Some((p, omega, _)) = self.aut {
+            // The same orbit-canonical key the walk stored (two charged
+            // field multiplications).
+            if key != 0 {
+                let x0 = key - 1;
+                let x1 = mulmod(omega, x0, p);
+                let x2 = mulmod(omega, x1, p);
+                ops.field_ops.muls += 2;
+                let (mut best, mut i) = (x0, 0u128);
+                if x1 < best {
+                    (best, i) = (x1, 1);
+                }
+                if x2 < best {
+                    (best, i) = (x2, 2);
+                }
+                key = best + 1;
+                point_rot = i << TW_AUT_SHIFT;
+            }
+        }
         let (u, z, b) = *self.map.get(&key)?;
-        // Clear the cv=0 / lazy sign bit (never set otherwise).
-        let u = u & !TW_SIGN_BIT;
+        // Clear the cv=0 / lazy sign bit and the aut rotation (never set
+        // otherwise).
+        let entry_rot = u & TW_AUT_MASK;
+        let mut u = u & !(TW_SIGN_BIT | TW_AUT_MASK);
+        let (mut z, mut b) = (z, b);
+        if let Some((_, _, kappa)) = self.aut {
+            // point = ±ζ₃^d(E_s) = ±[κ^d]E_s, d = i_s − i_point.
+            let r = self.r_for_aut;
+            let d =
+                ((entry_rot >> TW_AUT_SHIFT) as u64 + 3 - (point_rot >> TW_AUT_SHIFT) as u64) % 3;
+            if d != 0 {
+                let f = if d == 1 {
+                    kappa
+                } else {
+                    mulmod(kappa, kappa, r)
+                };
+                let (u1, u2) = self.parts(u);
+                u = self.pack_alpha(mulmod(u1 % r, f, r), mulmod(u2 % r, f, r));
+                z = mulmod(z % r, f, r);
+                b = mulmod(b % r, f, r);
+            }
+        }
         let (u1, u2) = self.parts(u);
         let s = self.eval(g, ops, u1, u2, z, b)?;
         if s == point {
@@ -10977,7 +11207,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         a: u64,
         b: u64,
         sign: i8,
-        u: u64,
+        u: u128,
         z: u64,
         be: u64,
     ) -> TargetWalkRow {
@@ -11038,6 +11268,20 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         out.insert("tw_steps_first_row".into(), self.steps_first_row);
         out.insert("tw_steps_rank_two".into(), self.steps_rank_two);
         out.insert("tw_collisions".into(), self.collisions.len() as u64);
+        if self.aut.is_some() {
+            // Unpriced in GAE and listed as such: the `_uncharged` suffix puts
+            // it in `cost.unpriced`, so the §5a band charges it at w, exactly
+            // as rho.cubic lists its `canonicalisations_uncharged`; bitop/v1
+            // prices each at its two field multiplications (`work.rs`).
+            out.insert(
+                "aut_canonicalisations_uncharged".into(),
+                self.aut_canonicalisations,
+            );
+            out.insert(
+                "tw_aut_rotated_collisions".into(),
+                self.aut_rotated_collisions,
+            );
+        }
         out.insert("tw_verified_collisions".into(), self.verified_collisions);
         out.insert("tw_rows".into(), self.rows.len() as u64);
         out.insert("tw_rank".into(), self.rank as u64);
@@ -19365,7 +19609,8 @@ mod wwalk_table_tests {
                 }
                 // The relation loop's probe reads the same entry in both.
                 for &(u, z, b) in v.map.values().take(8) {
-                    let Some(pt) = v.eval(g, &mut cops, u, 0, z, b) else {
+                    // One seed: the u128 word holds `u` itself.
+                    let Some(pt) = v.eval(g, &mut cops, u as u64, 0, z, b) else {
                         continue;
                     };
                     let (mut l1, mut l2) = (0u64, 0u64);
@@ -19411,8 +19656,8 @@ mod wwalk_table_tests {
     }
 
     /// `cv=0` composes with main's two-seed walk (`tw=2`): the sign bit
-    /// rides in bit 63 of the packed `u = u1 << 32 | u2` (coefficients are
-    /// refused at `2^31` or more, so `u1` never reaches it), and the walk,
+    /// rides in bit 127 of the packed `u128` word `u = u1 << 64 | u2`
+    /// (coefficients are below `2^62`, so `u1` never reaches it), and the walk,
     /// rows, rank and set-up are `cv=1`'s with the verification ledger
     /// removed.  `cv=0` with `lazy=1` is refused; `cv=1` with either seed
     /// count is `build_ext` exactly.
@@ -19978,6 +20223,7 @@ mod wwalk_table_tests {
                         true,
                         Some(0),
                         None,
+                        false,
                     )
                     .unwrap();
                     let lazy = TargetWalk::build_inner(
@@ -19996,6 +20242,7 @@ mod wwalk_table_tests {
                         true,
                         Some(0),
                         None,
+                        false,
                     )
                     .unwrap();
                     if lazy.collisions.is_empty() {

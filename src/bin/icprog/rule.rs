@@ -266,6 +266,32 @@ pub const V8C: Constants = Constants {
     ..V6
 };
 
+/// The rule's comparison at baseline v9 (`research/ic_tool_program/rule/v9`):
+/// rule v8's protocol, matched rho included, on main's binary of
+/// 2026-11-06, which carries the index-calculus changes since v8 (the
+/// aimed-subset gather of #2448 among them).
+pub const V9: Constants = Constants {
+    what_this_is:
+        "The rule's comparison at baseline v9, rho matched: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v9",
+    },
+    ..V8
+};
+
+/// Rule v9's control: rule v8's binary, rebuilt from its commit and run in
+/// the same session and host as rule v9, so their rows pair by target.
+pub const V9C: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v9, its control: rule v8's binary, rho \
+                   matched, same session: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v9c",
+    },
+    ..V8
+};
+
 /// Where a comparison lives and what it writes.
 pub struct Comparison {
     /// The repository: the ledger, and what record paths are relative to.
