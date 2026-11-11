@@ -1709,6 +1709,7 @@ pub fn ic_multi_solve(
     extra_relations: usize,
     max_walk: u64,
     seed: u64,
+    table: bool,
 ) -> Option<(Vec<Option<u64>>, MultiReport)> {
     let t0 = Instant::now();
     let fb = FastFactorBase::build(curve, fb_size);
@@ -1717,7 +1718,14 @@ pub fn ic_multi_solve(
     }
     let pairs = PairTable::build(curve, &fb);
     let needed = fb.len() + extra_relations;
-    let (rels, _) = collect_relations(curve, g, g, &fb, Some(&pairs), needed, u64::MAX, seed);
+    let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
+        if table {
+            collect_relations_table(curve, g, q, &fb, &pairs, need, maxw, sd)
+        } else {
+            collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
+        }
+    };
+    let (rels, _) = collect(g, needed, u64::MAX, seed);
     if rels.len() < needed {
         return None;
     }
@@ -1734,12 +1742,8 @@ pub fn ic_multi_solve(
         let mut rs: Vec<FastRelation> = Vec::new();
         let mut st = CollectStats::default();
         for attempt in 0..32u64 {
-            let (r1, s1) = collect_relations(
-                curve,
-                g,
+            let (r1, s1) = collect(
                 q,
-                &fb,
-                Some(&pairs),
                 1,
                 max_walk,
                 seed ^ (0x9E37_79B9 + t as u64 * 7919 + attempt * 104_729),
