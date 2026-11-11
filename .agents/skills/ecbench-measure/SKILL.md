@@ -95,6 +95,19 @@ cargo build --release --bin ecbench
   or edit a session. Ctrl-C or a SIGTERM stops a session cleanly: the child is
   killed, evicted threads are restored and the session is marked `interrupted`. An
   interrupted session stays as evidence; start a new directory.
+- **Local runs in a Claude Code cloud session** (only when explicitly requested).
+  The container keeps processes alive only while a turn is active; a detached or
+  background job dies when the session goes idle, and the host can be replaced
+  with its disk. research/cheon_ecbench_wide_20261106 lost two whole-spec
+  sessions and an hour of chunks this way. So:
+  - split the spec into sessions of well under an hour (for example one per
+    size; a bound may be fitted over several complete sessions with no filter);
+  - commit and push each session and its audit as soon as it is audited;
+  - stay in the turn while sessions run;
+  - send anything longer to EKS.
+
+  Amend the frozen protocol before changing the split, and keep every killed
+  session as interrupted evidence.
 
 ## 4. Audit
 
