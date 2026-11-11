@@ -1,0 +1,15 @@
+ecbench binaries used by the chunk sessions (research/cheon_ecbench_wide_20261106)
+
+Both were built with `cargo build --release --bin ecbench` from the sources of
+commit 8c62e3c927 (the frozen protocol commit; amendments 1-3 change only
+research/ files), on two different hosts after a host replacement:
+
+8c2639b20e7f758d852cdaddd652e2c5ba2c06235bad7747ce5a5ec92bbd7499
+  minus-b36, minus-b38, plus-b36, and the four interrupted whole-spec sessions
+d4df6333bcf94bc9feed8adaa725a801a48ce37489fbf06cbc7c04d87aa01db1
+  the other 19 chunks; also the auditor of the 19 and of the fits
+
+The binaries differ in bytes (different build hosts). Counts agree: every run
+compared across them is identical (results-p1.jsonl: 96 of 96 medium-study runs
+per family, and 2107 of 2107 interrupted-session records with a chunk run),
+and every chunk's --replay-all audit reproduced all of its runs.
