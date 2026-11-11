@@ -290,12 +290,15 @@ fn sym_solve(
                         if ent.0 != key {
                             continue;
                         }
-                        let (ei, ej, em, sg) = (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
+                        let (ei, ej, em, sg) =
+                            (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
                         // P = F_ei + s*phi^em F_ej ; T = +-phi^sft P
                         let fa = reps[ei];
                         let fb_ = cand[3 * ej + em];
                         let fb_ = if sg == 1 { c.neg(fb_) } else { fb_ };
-                        let Some(pp) = c.add(Some(fa), Some(fb_)) else { continue };
+                        let Some(pp) = c.add(Some(fa), Some(fb_)) else {
+                            continue;
+                        };
                         let y3 = f.sub(f.mul(l, f.sub(r.x, x3)), r.y);
                         let tau = if y3 == pp.y { 1i8 } else { -1 };
                         // terms: eps*cand[id], tau*phi^sft F_ei, tau*s*phi^(sft+em) F_ej
@@ -453,7 +456,10 @@ fn main() {
     let extra: usize = a[5].parse().unwrap();
     let summ: u32 = a.get(6).map(|v| v.parse().unwrap()).unwrap_or(2);
     let mut out = std::fs::File::create(&a[1]).unwrap();
-    let cs: u64 = std::env::var("CSKIP").ok().and_then(|v| v.parse().ok()).unwrap_or(0);
+    let cs: u64 = std::env::var("CSKIP")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
     for curve_idx in cs..cs + 2 {
         let (c, g, _n, lam) = find_j0_curve(bits, curve_idx);
         let mut rho_ms = Vec::new();
@@ -477,9 +483,19 @@ fn main() {
                 let q = c.mul(Some(g), k).unwrap();
                 let sym = sym_solve(&c, g, q, lam, bsz, extra, ins + 1, summ);
                 let t0 = Instant::now();
-                let plain = if std::env::var_os("NOPLAIN2").is_some() { None } else { ic_solve(&c, g, q, 3 * bsz, extra, 2, u64::MAX, ins + 1) };
+                let plain = if std::env::var_os("NOPLAIN2").is_some() {
+                    None
+                } else {
+                    ic_solve(&c, g, q, 3 * bsz, extra, 2, u64::MAX, ins + 1)
+                };
                 let plain_ms = t0.elapsed().as_secs_f64() * 1e3;
-                let fbs3 = ((std::env::var("C3").ok().and_then(|v| v.parse::<f64>().ok()).unwrap_or(0.5) * (c.f.p as f64).cbrt()).round() as usize).max(8);
+                let fbs3 = ((std::env::var("C3")
+                    .ok()
+                    .and_then(|v| v.parse::<f64>().ok())
+                    .unwrap_or(0.5)
+                    * (c.f.p as f64).cbrt())
+                .round() as usize)
+                    .max(8);
                 let t3 = Instant::now();
                 let p3 = ic_solve(&c, g, q, fbs3, extra, 3, u64::MAX, ins + 1);
                 let p3_ms = t3.elapsed().as_secs_f64() * 1e3;
