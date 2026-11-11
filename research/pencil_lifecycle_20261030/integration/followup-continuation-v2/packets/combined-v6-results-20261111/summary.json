@@ -1,0 +1,40 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "signed-kummer-combined-v6-20261111",
+  "status": "failed",
+  "seal_status": "passed",
+  "cleanup_complete": true,
+  "sealed_after_owned_cgroup_empty": true,
+  "materialization_status": "passed",
+  "materialization_source_files": 4485,
+  "commands_executed": [
+    "materialize",
+    "compile"
+  ],
+  "command_exits": [
+    0,
+    101
+  ],
+  "all_commands_reaped": true,
+  "cargo_invoked": true,
+  "tests_invoked": false,
+  "build_script_executed": false,
+  "failure": "Cargo failed to execute cached proc-macro2 build-script-build: permission denied. Readback found identical private/donor bytes with0600/0700 modes.",
+  "elapsed_seconds": {
+    "materializer": 35.01883615500992,
+    "cargo_command": 0.4203482250450179,
+    "worker": 93.6595768329571,
+    "completion": 94.8206544239656,
+    "caller": 94.96023184404476
+  },
+  "nested_intervals_not_additive": true,
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 15780,
+  "campaign_remaining_seconds": 113820,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "raw_files": 19,
+  "raw_terminal_entries_rehashed": 11,
+  "dollar_cost": null,
+  "scientific_cost_ratio": null,
+  "source_and_cache_modified_by_reporter": false
+}
