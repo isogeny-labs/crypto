@@ -456,6 +456,8 @@ mod tests {
             r: 342833,
             cofactor: 1,
             generator: (0, 2882),
+
+            representation: None,
         }
     }
 

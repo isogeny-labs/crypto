@@ -9,7 +9,7 @@
   execution)
 - **Next action owner:** owner (credentials and budget); then the session that
   holds them runs the frozen cards
-- **Last updated:** 2026-11-04
+- **Last updated:** 2026-11-08 (Koblitz part resolved; prime tower open)
 
 ## Problem
 
@@ -153,3 +153,20 @@ k0n37, k0n41; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
 prime-tower controls under protocol v2 (D 6, 7, 4); kummer-m5-t2 D = 6;
 kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
 `analyze.py` and the director's assessment.
+
+## Update 2026-11-08: Koblitz part resolved, prime tower open
+
+- Koblitz m = 5, 6: complete. The stale line above ("shards have not started")
+  was wrong: attempt 4 ran Part A and 3 Part B cells on 11-05, then ended by Job
+  DeadlineExceeded after about 8.9 h Pending. Attempt 5 ran the 13 remaining
+  Part B cells as a plain command Job (no CRIU; launch/README.md deviation 10).
+  148 of 148 cells are recorded.
+  - Assessment: `koblitz_m5_m6/ASSESSMENT-a5.md` (complete-with-deviations).
+  - Report: `koblitz_m5_m6/reports/REPORT.md` and `REPORT.pdf`.
+  - Record: `benchmarks/records/20261108T1825Z-arity-koblitz-m56-a5.json`.
+- CRIU/EBS command mode is qualified (`launch/criu/QUALIFICATION-20261108.md`).
+  It is not used for these protocols, because their checkpoint policy is `none`.
+- Still open: the prime-tower `isogeny-m5-t2` cell has used its
+  `retries.max_attempts` = 2. Running it again needs an owner decision. The
+  cpu-spot limit raise (`launch/criu/nodepool-change-20261107/patch-cpu-spot.sh`)
+  still needs an operator.

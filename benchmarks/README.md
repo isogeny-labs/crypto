@@ -7,6 +7,8 @@ raw records, sources and inputs and is the source of truth; the files here
 are copies for browsing (AGENTS.md "Performance results also land in
 `benchmarks/`"). Not to be confused with `benches/` (Cargo bench sources).
 
+Infrastructure losses (killed, preempted, unlaunched runs) are counted by cause in [`losses/`](losses/); see [`docs/infra-loss-ledger.md`](../docs/infra-loss-ledger.md).
+
 **Validation gate (owner, 2026-10-19).** A row is listed here only with a replay
 certificate, a validator report and a matched rho reference named by its
 directory's `VALIDATION.json` (AGENTS.md, "Validation gate";
@@ -42,6 +44,20 @@ The [retained wide-variable engine report](WIDE_VARS_UNADMITTED_20261021.md)
 remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
+
+The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
+([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
+frozen re-measurement of the ledger incumbent (`wwalkGg-x09-sr-n2`) against matched
+`rho-neg` on the five k = 24 Curve25519-rule curves, 1,152 paired solves per arm per curve
+(sessions `ECBS1h250938713613`, `ECBS1hdd033a38d490`). On `icv1-fp24-tm1514-dce9313c` the
+inc/rho-neg ratio of mean S is 1.8058 [1.7543, 1.8598], 1.6890 [1.6402, 1.7404] and
+1.1359 [1.1001, 1.1739] at w = 0, 0.1 and 1 (95 %): rho-neg ahead at every weight, tm1514
+within its siblings' ratio, and the earlier 24-solve 1.52 a draw. **Unvalidated**: counted
+operations only on a local L0 development host, no wall time, self-audit replays only
+(14,400 per session reproduced), and no `VALIDATION.json`, independent replay certificate or
+validator report, so it remains outside the admitted table (statement claim
+`PCC-20261110-97c3b6`, standing unverified; source of truth:
+[`research/tm1514_recheck_20261106/`](../research/tm1514_recheck_20261106/REPORT.md)).
 
 The [5 November ecbench statistics v2 before/after study](20261105-ecbench-statistics-v2/)
 (PR #2442's interval, censoring, wall-statistic and flag changes recomputed on five committed sessions with the pre- and

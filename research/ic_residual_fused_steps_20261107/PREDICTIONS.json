@@ -1,0 +1,98 @@
+{
+ "frozen": "2026-11-07, before the confirmatory run",
+ "model": "steps ratio = sqrt(hazard_den / hazard_num); hazard per step: base = (J-1)/J + (F-1)/F + s; fused = (JF-1)/(JF) + s; s = 1 with sign classes, 0 without",
+ "run": "N = 33554467 (prime near 2^25), 16 walks x 1000 reps per arm, seeds 50000+, F in {2, 8} with J = 16, and F = 4 with J = 32",
+ "pass": "every prediction inside the paired-bootstrap 95% interval",
+ "predictions": [
+  {
+   "F": 2,
+   "J": 16,
+   "ratio": "fused/base",
+   "prediction": 1.1126972805283737
+  },
+  {
+   "F": 2,
+   "J": 16,
+   "ratio": "base_ns/base",
+   "prediction": 1.3021720984236467
+  },
+  {
+   "F": 2,
+   "J": 16,
+   "ratio": "fused_ns/base_ns",
+   "prediction": 1.2181424250644648
+  },
+  {
+   "F": 2,
+   "J": 16,
+   "ratio": "fused_ns/fused",
+   "prediction": 1.4255728899344744
+  },
+  {
+   "F": 2,
+   "J": 16,
+   "ratio": "fusedind/fused",
+   "prediction": 1.0
+  },
+  {
+   "F": 8,
+   "J": 16,
+   "ratio": "fused/base",
+   "prediction": 1.1881770515720091
+  },
+  {
+   "F": 8,
+   "J": 16,
+   "ratio": "base_ns/base",
+   "prediction": 1.2456821978060995
+  },
+  {
+   "F": 8,
+   "J": 16,
+   "ratio": "fused_ns/base_ns",
+   "prediction": 1.3515811679449026
+  },
+  {
+   "F": 8,
+   "J": 16,
+   "ratio": "fused_ns/fused",
+   "prediction": 1.4169947126746916
+  },
+  {
+   "F": 8,
+   "J": 16,
+   "ratio": "fusedind/fused",
+   "prediction": 1.0
+  },
+  {
+   "F": 4,
+   "J": 32,
+   "ratio": "fused/base",
+   "prediction": 1.1682062670406033
+  },
+  {
+   "F": 4,
+   "J": 32,
+   "ratio": "base_ns/base",
+   "prediction": 1.257703534947001
+  },
+  {
+   "F": 4,
+   "J": 32,
+   "ratio": "fused_ns/base_ns",
+   "prediction": 1.3161624005292543
+  },
+  {
+   "F": 4,
+   "J": 32,
+   "ratio": "fused_ns/fused",
+   "prediction": 1.4169947126746916
+  },
+  {
+   "F": 4,
+   "J": 32,
+   "ratio": "fusedind/fused",
+   "prediction": 1.0
+  }
+ ]
+}

@@ -1,0 +1,255 @@
+{
+ "_note": "Reconstruction of 2026-11-10T00:15Z (docs/session-logs/2026-11-10.md): one cpu-spot node, 14 CPU / ~122 GiB allocatable; another lab Job p1r3-rr-a3-20261108 (2 CPU, 64Gi) bound at 23:36Z; DaemonSets 180m (14180m > 14000m, AMENDMENT_R2_C_cpu12.md). DaemonSet split and node name are illustrative; totals follow the log.",
+ "nodepool": {
+  "apiVersion": "karpenter.sh/v1",
+  "kind": "NodePool",
+  "metadata": {
+   "name": "cpu-spot"
+  },
+  "spec": {
+   "limits": {
+    "cpu": "16",
+    "memory": "128Gi"
+   }
+  },
+  "status": {
+   "resources": {
+    "cpu": "16",
+    "memory": "130451092Ki",
+    "nodes": "1"
+   }
+  }
+ },
+ "nodes": {
+  "items": [
+   {
+    "metadata": {
+     "name": "ip-10-0-3-17.us-east-2.compute.internal",
+     "labels": {
+      "isolab.dev/pool": "cpu-spot",
+      "karpenter.sh/nodepool": "cpu-spot",
+      "node.kubernetes.io/instance-type": "r6i.4xlarge"
+     }
+    },
+    "status": {
+     "capacity": {
+      "cpu": "16",
+      "memory": "130451092Ki"
+     },
+     "allocatable": {
+      "cpu": "14",
+      "memory": "127922324Ki"
+     }
+    }
+   }
+  ]
+ },
+ "pods": {
+  "items": [
+   {
+    "metadata": {
+     "name": "aws-node-x7k2p",
+     "namespace": "kube-system",
+     "creationTimestamp": "2026-11-09T23:35:40Z",
+     "ownerReferences": [
+      {
+       "kind": "DaemonSet",
+       "name": "aws-node"
+      }
+     ]
+    },
+    "spec": {
+     "nodeName": "ip-10-0-3-17.us-east-2.compute.internal",
+     "containers": [
+      {
+       "name": "aws-node",
+       "resources": {
+        "requests": {
+         "cpu": "25m",
+         "memory": "0"
+        }
+       }
+      }
+     ]
+    },
+    "status": {
+     "phase": "Running"
+    }
+   },
+   {
+    "metadata": {
+     "name": "kube-proxy-x7k2p",
+     "namespace": "kube-system",
+     "creationTimestamp": "2026-11-09T23:35:40Z",
+     "ownerReferences": [
+      {
+       "kind": "DaemonSet",
+       "name": "kube-proxy"
+      }
+     ]
+    },
+    "spec": {
+     "nodeName": "ip-10-0-3-17.us-east-2.compute.internal",
+     "containers": [
+      {
+       "name": "kube-proxy",
+       "resources": {
+        "requests": {
+         "cpu": "100m",
+         "memory": "0"
+        }
+       }
+      }
+     ]
+    },
+    "status": {
+     "phase": "Running"
+    }
+   },
+   {
+    "metadata": {
+     "name": "ebs-csi-node-x7k2p",
+     "namespace": "kube-system",
+     "creationTimestamp": "2026-11-09T23:35:40Z",
+     "ownerReferences": [
+      {
+       "kind": "DaemonSet",
+       "name": "ebs-csi-node"
+      }
+     ]
+    },
+    "spec": {
+     "nodeName": "ip-10-0-3-17.us-east-2.compute.internal",
+     "containers": [
+      {
+       "name": "ebs-csi-node",
+       "resources": {
+        "requests": {
+         "cpu": "30m",
+         "memory": "120Mi"
+        }
+       }
+      }
+     ]
+    },
+    "status": {
+     "phase": "Running"
+    }
+   },
+   {
+    "metadata": {
+     "name": "eks-pod-identity-agent-x7k2p",
+     "namespace": "kube-system",
+     "creationTimestamp": "2026-11-09T23:35:40Z",
+     "ownerReferences": [
+      {
+       "kind": "DaemonSet",
+       "name": "eks-pod-identity-agent"
+      }
+     ]
+    },
+    "spec": {
+     "nodeName": "ip-10-0-3-17.us-east-2.compute.internal",
+     "containers": [
+      {
+       "name": "eks-pod-identity-agent",
+       "resources": {
+        "requests": {
+         "cpu": "25m",
+         "memory": "0"
+        }
+       }
+      }
+     ]
+    },
+    "status": {
+     "phase": "Running"
+    }
+   },
+   {
+    "metadata": {
+     "name": "p1r3-rr-a3-20261108-9f2qd",
+     "namespace": "isolab",
+     "creationTimestamp": "2026-11-09T23:28:51Z",
+     "labels": {
+      "batch.kubernetes.io/job-name": "p1r3-rr-a3-20261108",
+      "job-name": "p1r3-rr-a3-20261108"
+     },
+     "ownerReferences": [
+      {
+       "kind": "Job",
+       "name": "p1r3-rr-a3-20261108"
+      }
+     ]
+    },
+    "spec": {
+     "nodeName": "ip-10-0-3-17.us-east-2.compute.internal",
+     "nodeSelector": {
+      "isolab.dev/pool": "cpu-spot"
+     },
+     "containers": [
+      {
+       "name": "task",
+       "resources": {
+        "requests": {
+         "cpu": "2",
+         "memory": "64Gi"
+        },
+        "limits": {
+         "cpu": "2",
+         "memory": "64Gi"
+        }
+       }
+      }
+     ]
+    },
+    "status": {
+     "phase": "Running"
+    }
+   },
+   {
+    "metadata": {
+     "name": "unrelated-web-0",
+     "namespace": "default",
+     "creationTimestamp": "2026-11-01T00:00:00Z"
+    },
+    "spec": {
+     "nodeName": "ip-10-0-9-9.us-east-2.compute.internal",
+     "containers": [
+      {
+       "name": "w",
+       "resources": {
+        "requests": {
+         "cpu": "4"
+        }
+       }
+      }
+     ]
+    },
+    "status": {
+     "phase": "Running"
+    }
+   }
+  ]
+ },
+ "quotas": {
+  "items": [
+   {
+    "metadata": {
+     "name": "jobs",
+     "namespace": "isolab"
+    },
+    "status": {
+     "hard": {
+      "requests.cpu": "16",
+      "requests.memory": "128Gi"
+     },
+     "used": {
+      "requests.cpu": "2",
+      "requests.memory": "64Gi"
+     }
+    }
+   }
+  ]
+ }
+}

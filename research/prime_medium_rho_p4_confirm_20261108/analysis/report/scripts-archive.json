@@ -1,0 +1,18 @@
+{
+  "what": "P4 confirm report scripts: explore_pc.py and g3_calibration.py (exploratory positive-control analyses) and make_report.py (summary JSON, figure, PDF). Stdlib Python plus numpy/matplotlib, kept out of the repo per AGENTS.md; not part of the frozen analysis (analysis/p4_confirm.py)",
+  "path": "research/prime_medium_rho_p4_confirm_20261108/analysis/report/scripts.tar.gz",
+  "uri": "s3://setec-astronomy-artifacts/store/sha256/14/144e171868c13550ef77c9f70609b0ce2f44877b0c232f66db462648f6821aec",
+  "sha256": "144e171868c13550ef77c9f70609b0ce2f44877b0c232f66db462648f6821aec",
+  "bytes": 11169,
+  "record": "benchmarks/records/20261108T0512Z-prime-medium-rho-p4-confirm.json",
+  "members_sha256": {
+    "explore_pc.py": "548a2b6f6ae8ba2fd423d0c075f581d6ed375b5647c85c8eaf9b42ebbf5f513d",
+    "g3_calibration.py": "e7d8621d8c030e19365606ecfa93cfa797bd02749c5e3f58f21041052ca41bdb",
+    "make_report.py": "cc6572a4251cceb83e61941692b82c98c067fa489eaa6801cc116298e33e93dc"
+  },
+  "commands": [
+    "python3 -I explore_pc.py research/prime_medium_rho_p4_confirm_20261108 research/prime_medium_rho_p4_confirm_20261108/analysis/result.json pc_explore.json",
+    "python3 -I g3_calibration.py pc_explore.json g3_calibration.json 2000 4000",
+    "python3 -I make_report.py <repo> research/prime_medium_rho_p4_confirm_20261108 <dir holding pc_explore.json and g3_calibration.json>"
+  ]
+}

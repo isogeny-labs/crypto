@@ -1,38 +1,28 @@
-# Resume: crypto @ aburan28/wizardly-einstein-i9seky
+# Resume: crypto @ claude/best-leads-experiments-jikl0j
 
 ## Goal
-User request (2026-11-07): bring each ECDLP method's measured cost to what its
-algorithm predicts (rho/BSGS/kangaroo constants vs sqrt(pi r/2A), index-calculus
-exponent vs its family's theory) and keep iterating until they match.
+Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
+Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
+0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
+(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
 
 ## Lead / hypothesis
-Rho's gap to sqrt(pi/2A) at r = 2^18..2^28 is set-up and r-adding excess of a
-4-16 jump table built by joint double-and-add. rho.negation_v3 / rho.plain_v3
-(commit 1d03f077eb) build the table from shared ladders (2 additions a jump)
-with k ~ sqrt(F/2) jumps. Local diagnostic (examples/rho_v3_diag.rs, 2000-30000
-runs/size): v3 S/floor 1.33 / 1.26 / 1.15 / 1.09 / 1.08 / 1.05 at 2^17.7..2^28
-against legacy 1.63 / 1.53 / 1.35 / 1.20 / 1.14 / 1.11.
-Second lead: ic.pipeline with fixed B = 32 has theoretical alpha = 1 (measured
-1.005); B ~ r^(1/3) should give alpha = 2/3 (no size=auto yet).
+Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
+sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
+p256 below 1 at k = 32; cv0 vs lazy two-sided.
 
 ## Spec
-research/ecbench_rho_v3_ladder_20261107/spec.json (interleaved, A/A of v2).
+research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
+x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
+Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
+on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
+(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
+push of this branch is the checkpoint.
 
-## State
-Code committed; legacy ids replay bit-for-bit (288/288 of the 2026-10-06
-prime-toy session). Local L0 session next (no AWS identity in this container,
-so the isolab-eks receipts could not be read back).
+## State (23:20Z: EKS failed; local L0 panel done, results committed)
+Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
+push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
 
 ## Next steps
-1. Run the spec locally, verify --replay-all, table, bound fit for v3.
-2. Report + graph + PDF, benchmarks/ entry, benchrec record, PR.
-3. IC: add factor-base size=auto (B = c r^(1/3)) and measure alpha.
-
-## Runs in flight
-None.
-
-## Stop and success conditions
-v3 search phase within ~2-3 % of sqrt(pi r/2A) and total S/floor -> 1 as r grows.
-
-## Open questions
-EKS/L2 confirmation needs an AWS identity (not in this container).
+1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
+2. Report + figure + PDF (research-visuals), benchrec record close, PR.
