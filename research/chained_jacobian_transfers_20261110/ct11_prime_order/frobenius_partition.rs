@@ -62,13 +62,13 @@ fn bracket(a:[K;3],b:[K;3])->[K;3] {
 }
 fn richelot_raw(k:usize)->Vec<i64> {
     let r=rows(k);let d=det(r);
-    assert_eq!(d.0[1..],[0,0]);
+    assert_eq!(&d.0[1..], &[0,0]);
     assert_ne!(d.0[0],0);
     let h: Vec<[K;3]>=(0..3).map(|i|bracket(r[(i+1)%3],r[(i+2)%3])).collect();
     let mut prod=vec![K::one()];
     for g in h {prod=poly_mul(&prod,&g);}
     let inv=powmod(d.0[0],9); // inverse in F11: x^(11-2)
-    prod.into_iter().map(|c| {assert_eq!(c.0[1..],[0,0]);m(c.0[0]*inv)}).collect()
+    prod.into_iter().map(|c| {assert_eq!(&c.0[1..], &[0,0]);m(c.0[0]*inv)}).collect()
 }
 fn div_monic(mut a:Vec<i64>,b:&[i64])->bool {
     if a.len()<b.len() {return false;}
@@ -118,10 +118,10 @@ fn jcard(f:&[i64])->(i64,i64,i64) {
 #[test]
 fn prime_order_elliptic_inputs_and_sextic_irreducibility() {
     assert_eq!(count_e(1,6),13);
-    assert_eq!(count_e(1,5),11);
+    assert_eq!(count_e(2,4),17);
     assert_eq!(count_e(0,0),12); // singular control only; not an elliptic-curve claim
     let f_plus=[6,0,1,0,0,0,1];
-    let f_minus=[5,0,1,0,0,0,1];
+    let f_minus=[4,0,2,0,0,0,1];
     assert_eq!(f_plus.iter().len(),7);
     for d in [1,2] {assert!(!has_factor(&f_plus,d));}
     for d in [1,2,3] {assert!(!has_factor(&f_minus,d));}
@@ -133,7 +133,7 @@ fn prime_order_elliptic_inputs_and_sextic_irreducibility() {
     }
     assert_eq!(prod,f_plus);
     assert_eq!(powmod(m(0-6),5),1); // Norm(alpha)=-b square.
-    assert_eq!(powmod(m(0-5),5),10); // Norm(alpha)=-b nonsquare.
+    assert_eq!(powmod(m(0-4),5),10); // Norm(alpha)=-b nonsquare.
 }
 #[test]
 fn frobenius_stable_nonrational_quadratic_partitions() {
