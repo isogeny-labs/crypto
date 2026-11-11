@@ -1,6 +1,6 @@
 # Blind sign-joint handout
 
-Reviewer A received only this mathematical input. Repository files, proof text, receipts, sibling reports, and web pages were forbidden.
+This file transcribes the mathematical input sent directly to Reviewer A. It was written after the reviewer responded, rather than precommitted as the session input. Repository files, proof text, receipts, sibling reports, and web pages were forbidden by the reviewer instruction.
 
 Let K = Q, n(X) = -9, b = -9, and let P+ = (1, 1) and P- = (1, -1) be rational points on y² = f(x), with f(1) = 1. Define g = n(x) - b y in the local ring at each point. Assume each local ring has residue field Q and an element is a unit exactly when its residue is nonzero.
 

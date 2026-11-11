@@ -1,6 +1,6 @@
 # Independent blind sign review
 
-**Scope and attestation:** Reviewer A read only [blind-handout.md](blind-handout.md). They did not inspect repository files, proof code, receipts, prior chat, web pages, or sibling reports. Joint owned: the sign/residue calculation and the control's false equality. Verdict: **holds** for those elementary calculations; **inconclusive** for the valuation identity.
+**Scope and attestation:** Reviewer A received only the mathematical text reproduced in [blind-handout.md](blind-handout.md), sent directly before this file existed. They attested that they did not inspect repository files, proof code, receipts, prior chat, web pages, or sibling reports. Joint owned: the sign/residue calculation and the control's false equality. Verdict: **holds** for those elementary calculations; **inconclusive** for the valuation identity.
 
 Since g = n(x) - b y = -9 + 9y, its residue at P+ is -9 + 9(1) = 0; by the supplied local-ring criterion g is not a unit. At P- the residue is -9 + 9(-1) = -18, so g is a unit. The proposed control equality n(1) = b(-1) reads -9 = 9 and is false.
 

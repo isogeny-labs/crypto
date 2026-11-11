@@ -11,6 +11,6 @@
 
 The [blind handout](blind-handout.md), [blind report](blind-review.md), and [source report](source-review.md) record separate inputs and verdicts. The editable [flow.svg](flow.svg) and inspected [report.pdf](report.pdf) visualize the boundary.
 
-Reviewer isolation is attested by the two sessions; this packet does not include an applicable structured independence-checker run. That limits the review strength and prevents a `validated_scoped` outcome.
+Reviewer isolation is attested by the two sessions; this packet does not include an applicable structured independence-checker run. The blind mathematical handout was sent directly and transcribed to a file after the response, so its exact session input is not established by a precommitted file hash. Those limits prevent a `validated_scoped` outcome.
 
 The merged prospective plan fixes one local attempt of at most 40 minutes, with no retries or new EKS/instance use, but execution still requires separate owner authorization and fresh resource/budget admission. This packet supplies no such authorization. Current hosted gate batches 180 and 184 fail while compiling five archived pencil roots because their cross-directory imports are absent; the original native compiler result remains failed and the correction remains proposed_uncompiled.

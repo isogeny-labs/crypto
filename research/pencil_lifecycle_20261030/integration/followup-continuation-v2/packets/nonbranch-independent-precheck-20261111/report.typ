@@ -25,6 +25,6 @@ The exact review plan and input hashes were published in crypto PR #3859 before 
 
 Hosted proof-gate batches 180 and 184 failed to resolve five archived pencil roots' cross-directory imports. The original native compiler result remains failed; the correction is proposed_uncompiled. A prospective one-attempt plan sets a 40-minute local limit and resource controls, but execution requires separate owner authorization. Passing compilation would still require an exact-name axiom audit, a failing negative control, and independent semantic review.
 
-Reviewer isolation is self-attested; no applicable structured independence checker ran for this packet. The outcome is therefore a limited precheck, not validated_scoped.
+Reviewer isolation is self-attested; no applicable structured independence checker ran for this packet. The blind handout was sent directly and transcribed after the response, not precommitted as a file. The outcome is therefore a limited precheck, not validated_scoped.
 
 #text(size: 8pt, fill: gray)[Artifacts: blind-handout.md, blind-review.md, source-review.md, flow.svg. The active user Spot-agent and experiment limit is USD 25/day; the repository's USD 200/day IsoLab allowance is separate.]
