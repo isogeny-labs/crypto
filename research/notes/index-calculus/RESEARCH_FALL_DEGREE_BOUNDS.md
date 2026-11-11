@@ -301,18 +301,53 @@ E1 matches this exactly on 39 of 40 subfield draws:
 | 0 | `n' − 1` | 23 |
 | 0, with `x_3 ∈ F_{2^{n'}}` | 2 (`n = 16`, seed 112005) | 1 |
 
-The outlier has every coefficient of `S_3` in the subfield. The descent
-then has only `n'` independent coordinates, and the target is refuted at
-degree 2.
+The outlier has `x_3 ∈ F_{2^{n'}}` (its `b` is *not* in the subfield;
+corrected 2026-11-11 by the exact-count proof below). The descent then has
+only `n' + 1` independent coordinates, two of degree ≤ 1, and the target is
+refuted at degree 2.
 
 This is the algebraic reason the subfield case is easy. At degree 2 the
 system already pins all but about one bit of `X_1 + X_2`, as in the
 classical subfield decomposition.
 
 - The inequality is a THEOREM.
-- The exact count `n' − 1 + Tr(b/x_3²)` for `x_3 ∉ F_{2^{n'}}` is
-  TOY-EVIDENCE. Its proof needs the dependency of the `n` equations to be
-  exactly the one from Prop. A.
+- The exact count `n' − 1 + Tr(b/x_3²)` for `x_3 ∉ F_{2^{n'}}` is a
+  THEOREM since 2026-11-11 (Prop. B′ below); until then it was toy evidence.
+
+**Proposition B′ (exact count, subfield base; proved 2026-11-11).** With
+`n = 2n'`, `V = F_{2^{n'}}`, `x_3 ≠ 0`, let `N = dim(span_{F_2}(F) ∩ R_{≤1})`,
+`φ(s) = s² + x_3 s`, `ψ(t) = x_3² t²` (`F_2`-linear maps `V → F`) and
+`U = im φ + im ψ`. Then
+
+1. `N = dim(U + ⟨b⟩) − dim im φ` for every `x_3, b`;
+2. if `x_3 ∉ V`: `U = ker Tr(x_3^{−2}·)` is a hyperplane, `dim im φ = n'`,
+   so `N = n' − 1 + Tr(b/x_3²)`, and the constant `1` lies in the span iff
+   `Tr(b/x_3²) = 1`;
+3. if `x_3 ∈ V`: `N = 1` when `b ∈ V` and `N = 2` when `b ∉ V`; the descended
+   equations have rank `n'` resp. `n' + 1`.
+
+So the exceptional set is exactly `{x_3 ∈ V*}`. The proof (the quadratic
+part of `λ(S_3)` vanishes iff `λ∘φ = 0`; `V^⊥ = V` for the absolute trace
+when `[F : V] = 2`; the `ψ`-condition forces `λ = Tr(w x_3^{−2}·)` with
+`w ∈ V` and the `φ`-condition then forces `(w + √w)/x_3 ∈ V`, hence `w ∈ F_2`
+when `x_3 ∉ V`) and an exhaustive check on 122,752 `(x_3, b)` pairs at
+`n' = 2…6` with zero disagreements, plus the recomputation of all 40 E1
+draws, are in `research/first_fall_closure_20261111/propB_exact_count/`
+(`[pcc:unverified]`, prose proof; not in Lean).
+
+**Lean (Prop. A, 2026-11-11).** The algebraic content of Prop. A is
+machine-checked in
+`research/first_fall_closure_20261111/propA_lean/TraceRelation.lean`: for
+any commutative ring of characteristic 2 with an additive `Tr` to `F_2`
+satisfying `Tr(a²) = Tr(a)`, and any `x_3` with inverse `w`,
+`Tr(S_3(X_1, X_2, x_3) w²) = Tr X_1 + Tr X_2 + Tr(b w²)`; that functional is
+an `F_2`-combination of the coordinate functionals of `S_3` (the descended
+equations); and `Tr X_i` is affine-linear in the bits of `X_i`, constant
+iff `Tr|_V ≡ 0`. Axioms: `propext`, `Classical.choice`, `Quot.sound`; no
+`sorry`. Not formalised: polynomial degree, the first-fall-degree
+definitions, Boolean reduction, the "every descended equation has degree
+exactly 2" hypothesis of the treatise's Cor. ffd2, and the concrete
+`F_{2^n}` trace (the hypotheses are instantiated only for `F_2` itself).
 
 ## References
 
