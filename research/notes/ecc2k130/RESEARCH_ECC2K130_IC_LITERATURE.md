@@ -417,6 +417,43 @@ built no proof.  Two code changes are left open:
 - a "formalized upstream, not rebuilt" status;
 - a `2.3711` every-field row.
 
+## Addendum, 2026-11-07: `ω ≤ 9/4` reported over every field
+
+This answers the open question the 2026-10-07 and 2026-10-26 addenda left on the `9/4` row. Two independent reports now state `ω ≤ 9/4` over every field, characteristic 2 included. A third gives a constructive proof in characteristic 0 only. None of the three was checked here.
+
+- **Amanov, van den Berg and Zuiddam, arXiv [2610.30054](https://arxiv.org/abs/2610.30054)** (21 Oct 2026).
+  - Theorem 1.1, quoted: "For every field 𝔽, ω𝔽≤9/4." The paper is an exposition of the openai/math family-107 argument, reworked for every characteristic.
+  - It also proves an *operational barrier*: the current degeneration ingredients cannot improve on `9/4`.
+  - Read here: the abstract and the first part of the HTML. The barrier theorem and the positive-characteristic sections are known only from a summary.
+- **Navot, [`matrix-multiplication-all-fields`](https://github.com/selanavot/matrix-multiplication-all-fields)**.
+  - A Lean fork of the openai/math proof. It states `omega_le_nine_quarters (F : Type*) [Field F] : Arithmetic.omega F ≤ 9/4` for any characteristic.
+  - The README reports only `propext`, `Classical.choice` and `Quot.sound` as axioms.
+  - Not built here, and the statement was not compared with the claim.
+- **Pass, arXiv [2610.28627](https://arxiv.org/abs/2610.28627).** An explicit, galactic `O(n^{9/4+γ})` algorithm for integer matrices, in characteristic 0. It does not cover GF(2^k).
+
+Effect on the table in the 2026-10-07 addendum:
+- **The `9/4` row** changes from *conditional* to *reported for every field*. The numbers are unchanged: `log₂ T = 68.96` at `n = 131`, still above generic `2^65.5` and rho `2^60.8`, with the turning point at `n = 227`.
+- **What the row still is.** It remains an existence-only exponent inside a contested first-fall-degree model, not an attack.
+- **The barrier.** Do not extrapolate a further fall in `ω` from this line of work.
+- **`src/cryptanalysis/matmul_exponent.rs`** still tags `CORPUS_FAMILY_107` as `Conditional` in characteristic 2. Re-tagging it is a code change, left open until someone here builds the Navot Lean artefact or checks the proof.
+
+Both arXiv papers (20–21 Oct) predate the 2026-10-26 review, which missed them.
+
+`openai/math` was reviewed through `4eaee87` (2026-10-29). The only change since `7ef5c0c` is a namespace fix in the CM-Hodge Comparator challenge, with nothing ECDLP-relevant. No report from the ETH working group (family 378) was found as of 2026-11-07.
+
+The knowledge-base records are in crypto-autoresearcher#3153: KN-LIT-eef882, KN-LIT-d4aa5d, KN-LIT-ac18f4, and KN-LIT-58d42d, which supersedes KN-LIT-0b036e. KN-OPEN-57907f is superseded by KN-LIT-eef882.
+
+### Wider sweep, same day
+
+A 60-day sweep of arXiv and ePrint is in [`research/lit_sweep_20261107/`](../../lit_sweep_20261107/README.md), with a report, two figures and a PDF.
+
+- **Lü, arXiv 2610.18914.** A third reported route to `9/4` in characteristic 2: every algebraically closed field, and ω depends only on the characteristic.
+- **Dias and Lima, arXiv 2611.00517.** OpenAI's ETH algorithm beats brute force only beyond `n ≈ 10^32` variables (constant `C = 2`) to `10^3517` (`C = 10`). That confirms the galactic assessment above.
+- **Majdoddin, arXiv 2610.41622.** Anthropic's parallel #3-SAT algorithm crosses over at about `2^420` clauses at density 1.
+- **Sun, arXiv 2610.13971.** Claims ω = 2. It is an unverified outlier and is not used.
+
+No new paper in the window targets ECDLP index calculus directly, and no number in this note changes.
+
 ## Honest limits
 
 - This is a literature survey, not a result. It says what has been

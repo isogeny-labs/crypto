@@ -136,6 +136,8 @@ pub fn instance(root: &Path, id: &str) -> Result<ArchiveInstance, String> {
                 group_order: order,
                 cofactor: h,
                 generator: (x, y),
+
+                representation: None,
             };
             i.name = i.curve_id().slug;
             Ok(ArchiveInstance::Prime(i))
