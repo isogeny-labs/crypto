@@ -49,3 +49,18 @@ an automorphism-aware rho would be a further ≈√3 faster, not run. No replay 
 
 ## Correction after independent validation (2026-11-11)
 See `results/pf_j0/VALIDATOR_REPORT.md`. The "1.87x-2.93x" range above mixed pairings of runs; the supported statement is **about 2.0x-2.4x** faster than the best 3-summand `ic_solve` arm (c grid optimum ~0.7, not covered by the frozen {0.5,1.0}), and the holdout curves at one size form one twist group; fresh primes give 2.1x-2.6x. 490/490 independent certificates pass. Gap to negation-only rho grows 3x -> 23x from 26 to 30 bits. `[pcc:unverified]`.
+
+## Experiment: store the entry's x-shift in the orbit pair table (2026-11-11) — `[pcc:unverified]`
+Validator observation: 2/3 of pair-table hits fail the group check because the entry's own x-shift was not stored. `SHIFTFIX=1`
+stores it (`sft = s - s_e`). Tuning curves only (idx 0,1, 26 bit, 4 targets, baseline `ic_solve` c=0.7, 48 solves all verified):
+
+| B | sym3 no-fix ms | sym3 shift-fix ms | plain3 c=0.7 ms | ratio fix | relations-yield (targets used) |
+|---|---|---|---|---|---|
+| 68 | 15.0 | 9.0 | 16.4-26.3 | 1.82 | 671 = 671 |
+| 100 | 12.7 | 8.6 | 18.3-25.2 | 2.11 | 273 = 273 |
+| 150 | – | 9.6 | 17.7 | 1.84 | 119 |
+| 40 | – | 16.8 | 17.4 | 1.03 | 2415 |
+
+Result: the number of targets needed is identical with and without the fix (the three rotated entries already cover every orbit pair), so the fix does not
+raise relation yield; it only avoids the failing group re-additions (about 1.4x lower sym3 time at B=68/100 in separate runs on the same host; baseline medians differed 16-26 ms between the two
+runs, so host noise is of the same size; not claimed). Not a holdout run; no new claim. The headline stays at about 2.0x-2.4x.
