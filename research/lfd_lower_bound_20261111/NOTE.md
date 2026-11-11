@@ -454,6 +454,10 @@ unsatisfiable ones):
 
 - **Coverage.** `n = 15–23` reproduces the Python `e_min` on every committed
   instance, and every feasible `lambda` at `n = 25–29` passes `verify_lambda.py`.
+- **The `n = 33` and `41` lower bounds are independently re-checked.** `emin verify`
+  (second row builder, PLUQ) confirms each point set is inconsistent:
+  - `n = 41` seed 1, `e = 3`: rank 63,831 → 63,832;
+  - `n = 33` seeds 1 and 5, `e = 4`: rank 105,365 → 105,366 (both seeds).
 - **Lower bounds only at `n = 33` and `41`.** The next `e` needs `n * sum_{d<=e}
   C(k,d)` unknowns, which exceeds the 250k-unknown cap of dense elimination on this
   container: 310k for `n = 33, e = 5` and 309k for `n = 41, e = 4`.
