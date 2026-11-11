@@ -2896,7 +2896,113 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
         stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
     }
     let setup = ops;
+    rho_search_from(
+        g,
+        classes,
+        RhoSetup {
+            generator,
+            target,
+            r,
+            max_steps,
+            walk,
+            policy,
+            shape,
+            jumps,
+            stride,
+            ta,
+            tb,
+            setup,
+            ops,
+            start,
+            continue_walks: false,
+            verify_ladder: Vec::new(),
+        },
+    )
+}
 
+/// What a tuned walk's set-up hands its search: the jump table, the start
+/// stride `T = [ta]G + [tb]Q`, and the operations spent so far.
+struct RhoSetup<G: CountedGroup> {
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    max_steps: u64,
+    walk: RhoWalk,
+    policy: WalkPolicy,
+    shape: WalkShape,
+    jumps: Vec<(G::Elt, u64, u64)>,
+    stride: G::Elt,
+    ta: u64,
+    tb: u64,
+    setup: GroupOps,
+    ops: GroupOps,
+    start: Instant,
+    /// Resume from each newly stored distinguished point instead of
+    /// starting a new walk (`false` in every legacy walk).
+    continue_walks: bool,
+    /// `[2^i]G` for `i < len`, already paid for in the set-up: the charged
+    /// check `[d]G` reads its low bits from here.  Empty in every legacy
+    /// walk (the check is then `g.mul(G, d)`, as before).
+    verify_ladder: Vec<G::Elt>,
+}
+
+/// `[d]G` from a ladder `[2^i]G`, `i < L`, as a counted operation sequence:
+/// one addition per set bit below `L` (the first is free), and for the
+/// bits at and above `L` one doubling of the top rung, a double-and-add of
+/// `d >> L`, and one addition.
+fn ladder_mul<G: CountedGroup>(g: &G, ops: &mut GroupOps, ladder: &[G::Elt], d: u64) -> G::Elt {
+    ops.scalar_mults += 1;
+    let len = ladder.len().min(63);
+    let mut acc: Option<G::Elt> = None;
+    for (i, rung) in ladder.iter().enumerate().take(len) {
+        if (d >> i) & 1 == 1 {
+            acc = Some(match acc {
+                None => *rung,
+                Some(a) => g.add(ops, a, *rung),
+            });
+        }
+    }
+    let high = d >> len;
+    if high > 0 {
+        let top = g.double(ops, ladder[len - 1]);
+        let part = g.mul(ops, top, high);
+        // `mul` counted itself as a scalar multiplication; this is one.
+        ops.scalar_mults -= 1;
+        acc = Some(match acc {
+            None => part,
+            Some(a) => g.add(ops, a, part),
+        });
+    }
+    acc.unwrap_or_else(|| g.identity())
+}
+
+/// The search of [`rho_walk_with_policy`] (and of [`rho_walk_v3`]): walks
+/// from `[k]T` until two distinguished points solve the target.  It draws
+/// nothing at random, so how the set-up was built is the only difference
+/// between the walks that share it.
+fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    s: RhoSetup<G>,
+) -> RhoResult {
+    let RhoSetup {
+        generator,
+        target,
+        r,
+        max_steps,
+        walk,
+        policy,
+        shape,
+        jumps,
+        stride,
+        ta,
+        tb,
+        setup,
+        mut ops,
+        start,
+        continue_walks,
+        verify_ladder,
+    } = s;
     let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk).with_policy(policy);
     let mut table: FastMap<(u64, u64)> = fast_map(1024);
     let (mut table_queries, mut table_inserts) = (0u64, 0u64);
@@ -2906,22 +3012,32 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
     let (mut walks, mut dps, mut start_adds) = (0u64, 0u64, 0u64);
     let (mut useless, mut verification_ops) = (0u64, 0u64);
     let mut recovered = None;
+    let mut fresh_starts = 0u64;
+    let mut resume: Option<(G::Elt, u64, u64)> = None;
     // The next walk's start, `[k]T`, and its coefficients.
     let (mut sx, mut sa, mut sb) = (stride, ta % r, tb % r);
 
     while tally.walk_ops() < max_steps && walks < max_steps {
         walks += 1;
-        if walks > 1 {
-            sx = g.add(&mut ops, sx, stride);
-            sa = addmod(sa, ta, r);
-            sb = addmod(sb, tb, r);
-            start_adds += 1;
-        }
-        if g.is_identity(&sx) {
-            continue;
-        }
+        // A walk resumed from the distinguished point the last one stored
+        // costs no start; otherwise the next `[k]T`.
+        let (wx, wa, wb) = if let Some(at) = resume.take() {
+            at
+        } else {
+            fresh_starts += 1;
+            if fresh_starts > 1 {
+                sx = g.add(&mut ops, sx, stride);
+                sa = addmod(sa, ta, r);
+                sb = addmod(sb, tb, r);
+                start_adds += 1;
+            }
+            if g.is_identity(&sx) {
+                continue;
+            }
+            (sx, sa, sb)
+        };
         let WalkEnd::Distinguished(x, a, b) =
-            walker.walk(&mut ops, &mut tally, sx, sa, sb, max_steps)
+            walker.walk(&mut ops, &mut tally, wx, wa, wb, max_steps)
         else {
             continue;
         };
@@ -2937,7 +3053,11 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
                     if let Some(inv) = invmod(den, r) {
                         let d = mulmod(num, inv, r);
                         let before = ops.gae();
-                        let check = g.mul(&mut ops, generator, d);
+                        let check = if verify_ladder.is_empty() {
+                            g.mul(&mut ops, generator, d)
+                        } else {
+                            ladder_mul(g, &mut ops, &verify_ladder, d)
+                        };
                         verification_ops += (ops.gae() - before) as u64;
                         if check == target {
                             recovered = Some(d);
@@ -2950,6 +3070,9 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
             None => {
                 table.insert(key, (a, b));
                 table_inserts += 1;
+                if continue_walks {
+                    resume = Some((x, a, b));
+                }
             }
         }
     }
@@ -2992,6 +3115,366 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
             counters
         },
     }
+}
+
+/// How [`rho_walk_v3`] builds its table.
+///
+/// The legacy walks pay about `1.75·w` operations a jump (a joint
+/// double-and-add on `w`-bit coefficients), which is why their tables stop
+/// at 16 jumps: more would cost more set-up than they save.  The v3 table
+/// is built from two shared ladders, `[2^i]G` and `[2^i]Q` for `i < t`
+/// (`2(t − 1)` doublings once), each jump the sum of `weight` distinct
+/// rungs (`weight − 1` additions).  A jump then costs about two operations,
+/// and the table can be as large as the walk wants.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct RhoV3 {
+    /// Walk on `{P, −P}` with the look-ahead, or on points.
+    pub negation: bool,
+    /// Jumps; `0` takes [`rho_v3_jumps_for`].
+    pub jumps: usize,
+    /// Rungs summed into each jump (at least 2).
+    pub weight: u32,
+    /// Rungs on each ladder; `0` takes [`rho_v3_ladder_bits`].
+    pub ladder_bits: u32,
+    /// Distinguished-point bits; `None` takes `⌊bits(r)/4⌋`, as the legacy walk.
+    pub dp_bits: Option<u32>,
+    /// After storing a new distinguished point, walk on from it (one long
+    /// walk, Pollard's own) instead of paying a start; a walk lost in a
+    /// cycle or ended on a stored point still restarts at the next `[k]T`.
+    pub continue_walks: bool,
+    /// With `dp_bits = None`: take `round(½·log₂ F − 0.8)` distinguished-point
+    /// bits, `F = √(πr/2A)`, instead of the legacy `⌊bits(r)/4⌋` (which
+    /// assumes `A = 2`; with `A = 2n` it leaves walks of `r^{1/4}` steps
+    /// in a search of `√(πr/4n)`, the distinguished-point tail dominating).
+    pub dp_from_floor: bool,
+    /// Read the charged check `[d]G`'s low bits from the `G` ladder
+    /// (already paid for) instead of a fresh double-and-add.
+    pub ladder_verify: bool,
+    /// Jumps in G only, the target entering through the start stride; the
+    /// Q ladder (its doublings) is dropped and the G ladder doubles in length.
+    pub g_only: bool,
+}
+
+impl RhoV3 {
+    /// `rho.negation_v4` / `rho.plain_v4`: the v3 table with the
+    /// distinguished-point rule from the floor and the ladder-read check.
+    pub const fn v4(negation: bool) -> Self {
+        Self {
+            negation,
+            jumps: 0,
+            weight: 3,
+            ladder_bits: 0,
+            dp_bits: None,
+            continue_walks: false,
+            dp_from_floor: true,
+            ladder_verify: true,
+            g_only: false,
+        }
+    }
+
+    /// `rho.negation_v5` / `rho.plain_v5` and, with `frobenius`,
+    /// `rho.signed_frobenius_v4`: [`RhoV3::v4`] / [`RhoV3::frobenius`] with
+    /// two-rung jumps (one addition a jump), so `k ≈ √F` jumps.
+    pub const fn v5(negation: bool) -> Self {
+        let mut v = Self::v4(negation);
+        v.weight = 2;
+        v
+    }
+
+    /// `rho.negation_v6` / `rho.plain_v6` and, on signed-Frobenius classes,
+    /// `rho.signed_frobenius_v5`: [`RhoV3::v5`] with jumps in G only.
+    pub const fn v6(negation: bool) -> Self {
+        let mut v = Self::v5(negation);
+        v.g_only = true;
+        v
+    }
+
+    /// The signed-Frobenius table: [`RhoV3::negation`] with the
+    /// distinguished-point rule taken from the floor.
+    pub const fn frobenius() -> Self {
+        Self {
+            negation: true,
+            jumps: 0,
+            weight: 3,
+            ladder_bits: 0,
+            dp_bits: None,
+            continue_walks: false,
+            dp_from_floor: true,
+            ladder_verify: true,
+            g_only: false,
+        }
+    }
+    pub const fn negation() -> Self {
+        Self {
+            negation: true,
+            jumps: 0,
+            weight: 3,
+            ladder_bits: 0,
+            dp_bits: None,
+            continue_walks: false,
+            dp_from_floor: false,
+            ladder_verify: false,
+            g_only: false,
+        }
+    }
+    pub const fn plain() -> Self {
+        Self {
+            negation: false,
+            jumps: 0,
+            weight: 3,
+            ladder_bits: 0,
+            dp_bits: None,
+            continue_walks: false,
+            dp_from_floor: false,
+            ladder_verify: false,
+            g_only: false,
+        }
+    }
+}
+
+/// The v3 jump count: the `k` that minimises set-up plus the walk's
+/// excess.  With `F = √(πr/2A)` operations of walk, `k` jumps cost about
+/// `F/k` more (the adding walk's `√(k/(k−1))` and, under negation, the
+/// look-ahead's `1/(2k)` additions a step) and `(weight − 1)·k` to build,
+/// so `k ≈ √(F/(weight − 1))`.
+pub fn rho_v3_jumps_for(r: u64, automorphisms: u32, weight: u32) -> usize {
+    let f = generic_floor_ops(r as f64, automorphisms.max(1) as f64);
+    let k = (f / (weight.max(2) - 1) as f64).sqrt().round() as usize;
+    k.clamp(4, 4096)
+}
+
+/// Rungs per ladder for `jumps` jumps: `2·⌈log₂ k⌉ + 4` bits a side, so
+/// the coefficient space (`2^{2t}`) is about `256·k⁴` and a vanishing
+/// four-term signed combination of jumps is unlikely; shorter ones are
+/// refused outright.  Below `bits(r)`, so every rung is a distinct
+/// multiple.
+pub fn rho_v3_ladder_bits(r: u64, jumps: usize) -> u32 {
+    let bits = 64 - r.leading_zeros();
+    let lg = usize::BITS - (jumps.max(2) - 1).leading_zeros();
+    (2 * lg + 4).clamp(6, bits.saturating_sub(1).clamp(2, 28))
+}
+
+/// **Tuned rho, v3**: [`rho_walk_with_policy`]'s search under
+/// [`WalkPolicy::v2`] on a table built from shared ladders ([`RhoV3`]).
+/// The search is the same code; the set-up, the jump count and the start
+/// stride (a sum of rungs, not a full-size joint multiplication) differ.
+/// Every operation of the ladders, the jumps and the stride is counted in
+/// the `setup` phase.
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> RhoResult {
+    let start = Instant::now();
+    let mut ops = GroupOps::default();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let weight = v3.weight.max(2) as usize;
+    let k = if v3.jumps == 0 {
+        rho_v3_jumps_for(r, classes.automorphisms(), weight as u32)
+    } else {
+        v3.jumps
+    }
+    .max(1);
+    let t = if v3.ladder_bits == 0 {
+        rho_v3_ladder_bits(r, k)
+    } else {
+        v3.ladder_bits.clamp(2, 28)
+    } as usize;
+    let dp_bits = match (v3.dp_bits, v3.dp_from_floor) {
+        (Some(d), _) => Some(d),
+        (None, false) => None,
+        (None, true) => {
+            let f = generic_floor_ops(r as f64, classes.automorphisms().max(1) as f64);
+            Some((0.5 * f.log2() - 0.8).round().max(0.0) as u32)
+        }
+    };
+    let walk = RhoWalk {
+        negation: v3.negation,
+        jumps: k,
+        dp_bits,
+        look_ahead: v3.negation,
+        cycle_window: 16,
+    };
+    let mut shape = WalkShape::of(r, walk);
+    shape.coefficient_bits = t as u32;
+    // `tg` rungs on the G ladder.  With `g_only` the jumps are multiples of
+    // G alone (the target enters only through the start stride, as in
+    // Kuhn–Struik and Bernstein–Lange walks), the Q ladder is just Q, and
+    // the G ladder takes the coefficient room the Q ladder gave up.
+    let rbits = (64 - r.leading_zeros()) as usize;
+    let tg = if v3.g_only {
+        (2 * t).min(rbits.saturating_sub(1)).clamp(2, 28)
+    } else {
+        t
+    };
+    let span = if v3.g_only { tg } else { 2 * t };
+
+    // Choose every jump's rungs first (no group operation is spent on a
+    // refused draw).  A rung index below `t` is `[2^i]G`, at or above it
+    // `[2^(i−t)]Q`.  Refused: a repeat, and any three-term relation over Z²
+    // with the jumps already kept: `c = x ± y`, `c = y − x`, `c = 2x`,
+    // `2c = x`.  Coefficients stay below `2^31` (`t ≤ 28`, three rungs), so
+    // `(a, b)` packs into one key; the checks are `O(k)` look-ups a draw.
+    let pack = |a: u64, b: u64| (a << 32) | b;
+    let coeff = |rungs: &[usize]| -> (u64, u64) {
+        rungs.iter().fold((0u64, 0u64), |(a, b), &i| {
+            if i < tg {
+                (a + (1u64 << i), b)
+            } else {
+                (a, b + (1u64 << (i - tg)))
+            }
+        })
+    };
+    let mut kept: Vec<(Vec<usize>, (u64, u64))> = Vec::with_capacity(k);
+    let mut values: FastMap<()> = fast_map(2 * k);
+    let mut draws = 0u64;
+    while kept.len() < k {
+        draws += 1;
+        let mut rungs: Vec<usize> = Vec::with_capacity(weight);
+        while rungs.len() < weight.min(span) {
+            let i = rng.gen_range(0..span);
+            if !rungs.contains(&i) {
+                rungs.push(i);
+            }
+        }
+        let (a, b) = coeff(&rungs);
+        let has = |a: u64, b: u64| values.contains_key(&pack(a, b));
+        let related = has(a, b)
+            || (a % 2 == 0 && b % 2 == 0 && has(a / 2, b / 2))
+            || has(2 * a, 2 * b)
+            || kept.iter().any(|(_, (xa, xb))| {
+                let (xa, xb) = (*xa, *xb);
+                has(a + xa, b + xb)
+                    || (a >= xa && b >= xb && has(a - xa, b - xb))
+                    || (xa >= a && xb >= b && has(xa - a, xb - b))
+            })
+            || (a % r == 0 && b % r == 0);
+        if related && draws < 64 * k as u64 + 1024 {
+            continue;
+        }
+        values.insert(pack(a, b), ());
+        kept.push((rungs, (a, b)));
+    }
+    // The stride: `weight + 2` rungs, at least one on each ladder.
+    let stride_rungs: Vec<usize> = if v3.g_only {
+        let mut rungs: Vec<usize> = Vec::new();
+        while rungs.len() < (weight + 1).min(tg) {
+            let i = rng.gen_range(0..tg);
+            if !rungs.contains(&i) {
+                rungs.push(i);
+            }
+        }
+        rungs.push(tg);
+        rungs
+    } else {
+        loop {
+            let mut rungs: Vec<usize> = Vec::new();
+            while rungs.len() < (weight + 2).min(2 * t) {
+                let i = rng.gen_range(0..2 * t);
+                if !rungs.contains(&i) {
+                    rungs.push(i);
+                }
+            }
+            if rungs.iter().any(|&i| i < t) && rungs.iter().any(|&i| i >= t) {
+                break rungs;
+            }
+        }
+    };
+
+    // The ladders, as far as any rung is used.
+    let top_g = kept
+        .iter()
+        .flat_map(|(rs, _)| rs.iter())
+        .chain(stride_rungs.iter())
+        .filter(|&&i| i < tg)
+        .max()
+        .copied();
+    let top_q = kept
+        .iter()
+        .flat_map(|(rs, _)| rs.iter())
+        .chain(stride_rungs.iter())
+        .filter(|&&i| i >= tg)
+        .max()
+        .map(|i| i - tg);
+    let mut ladder_g = vec![generator];
+    if let Some(top) = top_g {
+        for _ in 0..top {
+            let next = g.double(&mut ops, *ladder_g.last().unwrap());
+            ladder_g.push(next);
+        }
+    }
+    let mut ladder_q = vec![target];
+    if let Some(top) = top_q {
+        for _ in 0..top {
+            let next = g.double(&mut ops, *ladder_q.last().unwrap());
+            ladder_q.push(next);
+        }
+    }
+    let sum_rungs = |ops: &mut GroupOps, rungs: &[usize]| -> G::Elt {
+        let pick = |i: usize| {
+            if i < tg {
+                ladder_g[i]
+            } else {
+                ladder_q[i - tg]
+            }
+        };
+        let mut acc = pick(rungs[0]);
+        for &i in &rungs[1..] {
+            acc = g.add(ops, acc, pick(i));
+        }
+        acc
+    };
+    let mut jumps: Vec<(G::Elt, u64, u64)> = Vec::with_capacity(k);
+    for (rungs, (a, b)) in &kept {
+        let m = sum_rungs(&mut ops, rungs);
+        jumps.push((m, a % r, b % r));
+    }
+    let (ta, tb) = coeff(&stride_rungs);
+    let mut stride = sum_rungs(&mut ops, &stride_rungs);
+    let (mut ta, mut tb) = (ta % r, tb % r);
+    // As in the legacy walk: an identity stride (`ta + tb·d ≡ 0`) would spin
+    // every start on the identity; fall back to a full joint multiplication.
+    if g.is_identity(&stride) {
+        let gq = g.add(&mut ops, generator, target);
+        while g.is_identity(&stride) {
+            ta = rng.gen_range(1..r.max(2));
+            tb = rng.gen_range(1..r.max(2));
+            stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+        }
+    }
+    let setup = ops;
+    rho_search_from(
+        g,
+        classes,
+        RhoSetup {
+            generator,
+            target,
+            r,
+            max_steps,
+            walk,
+            policy: WalkPolicy::v2(),
+            shape,
+            jumps,
+            stride,
+            ta,
+            tb,
+            setup,
+            ops,
+            start,
+            continue_walks: v3.continue_walks,
+            verify_ladder: if v3.ladder_verify {
+                ladder_g
+            } else {
+                Vec::new()
+            },
+        },
+    )
 }
 
 /// The chained jump table of [`WalkPolicy::chained_setup`]: `M_0`, `M_1`
@@ -3904,6 +4387,30 @@ pub fn signed_frobenius_rho_tuned_policy(
         max_steps,
         RhoWalk::negation(),
         policy,
+    ))
+}
+
+/// [`rho_walk_v3`] on a Koblitz instance's signed-Frobenius classes
+/// (`A = 2n`): the ladder-built table sized to `√(πr/4n)`, the `_v2`
+/// search.  `None` for any other curve.
+pub fn signed_frobenius_rho_v3(
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> Option<RhoResult> {
+    let classes = SignedFrobeniusClasses::new(inst)?;
+    let g = BinaryGroup(&inst.fast);
+    Some(rho_walk_v3(
+        &g,
+        &classes,
+        inst.generator,
+        target,
+        inst.r,
+        seed,
+        max_steps,
+        v3,
     ))
 }
 
@@ -8347,6 +8854,19 @@ pub fn wwalk_plan_check(
     jumps: usize,
     opts: WalkOpts,
 ) -> Result<(u64, u64, u64, u64), String> {
+    wwalk_plan_check_bits(r, x, jumps, opts, 32)
+}
+
+/// [`wwalk_plan_check`] with the coefficient width as a parameter: the
+/// plain [`WalkTable`] packs coefficients in 32 bits, a [`TargetWalk`] in
+/// [`TW_COEF_BITS`].
+pub fn wwalk_plan_check_bits(
+    r: u64,
+    x: f64,
+    jumps: usize,
+    opts: WalkOpts,
+    coef_bits: u32,
+) -> Result<(u64, u64, u64, u64), String> {
     if !(x > 0.0 && x <= WWALK_MAX_X) {
         return Err(format!("wwalk: x is in (0, {WWALK_MAX_X}], not {x}"));
     }
@@ -8374,11 +8894,11 @@ pub fn wwalk_plan_check(
         ));
     }
     let w = ((1.2 * (t as f64).sqrt()).round() as u64).max(2);
-    // Every coefficient is at most 1 + t_max·w: it must pack in 32 bits.
+    // Every coefficient is at most 1 + t_max·w: it must pack in `coef_bits`.
     let bound = 1 + t_max * w;
-    if bound >= 1 << 32 {
+    if bound >= 1 << coef_bits {
         return Err(format!(
-            "wwalk: coefficients up to {bound} do not fit the 32-bit packing (x={x}, r={r})"
+            "wwalk: coefficients up to {bound} do not fit the {coef_bits}-bit packing (x={x}, r={r})"
         ));
     }
     Ok((t, t_max, w, bound))
@@ -9046,10 +9566,15 @@ pub struct TargetWalkRow {
 
 /// The top bit of a [`TargetWalk`] entry's `u` word: the stored point's
 /// key sign bit with `cv=0` and with `lazy=1` (never set otherwise, so the
-/// default walk is unchanged).  Coefficients are below `2^32`
-/// ([`wwalk_plan_check`]); with two seeds (`u = u1 << 32 | u2`) both modes
-/// refuse coefficients of `2^31` or more, so the bit is never part of `u`.
-pub const TW_SIGN_BIT: u64 = 1 << 63;
+/// default walk is unchanged).  The word is a `u128`: one seed stores `u`,
+/// two seeds `u = u1 << 64 | u2`; every seed coefficient is below `2^62`
+/// ([`TW_COEF_BITS`], [`wwalk_plan_check_bits`]) and below `r + 2^62`
+/// after a sibling reduction, so the bit is never part of `u`.
+pub const TW_SIGN_BIT: u128 = 1 << 127;
+
+/// Coefficient width a [`TargetWalk`] accepts: each seed coefficient sits
+/// in a 64-bit half of the `u128` `u` word, below the sign bit.
+pub const TW_COEF_BITS: u32 = 62;
 
 /// **A walk with the target inside it** (`wwalk:tw=1`, `F = 1`;
 /// `wwalk:tw=2`, `F = 2`).
@@ -9155,19 +9680,18 @@ pub const TW_SIGN_BIT: u64 = 1 << 63;
 /// whose key is `abscissa·2 + sign` is exactly `E_t = ±E_s`, and the sign
 /// bit of the stored entry's key says which.  That bit is packed into the
 /// top bit of the entry's `u` word ([`TW_SIGN_BIT`]; every coefficient is
-/// below `2^32`, [`wwalk_plan_check`]), so `cv=0` makes exactly the table
+/// below `2^62`, [`TW_COEF_BITS`]), so `cv=0` makes exactly the table
 /// accesses of `cv=1` (one per non-identity step) and keeps no second
 /// table; `verify_ops` stays empty.  The relation loop's final `[d]G = Q`
 /// check is kept and charged
 /// as before, so a wrong row makes the solve fail (it is never retried).
-/// With two seeds `cv=0` needs coefficients below `2^31` (as `lazy=1`
-/// does), so the packed `u1` never reaches the sign bit; `cv=0` and
+/// The packed `u1` never reaches the sign bit (bit 127); `cv=0` and
 /// `lazy=1` are alternatives and are refused together.
 pub struct TargetWalk<E> {
     /// Key (abscissa and sign bit, shifted) → `(u, z, b)`; with two seeds
-    /// `u = u1 << 32 | u2`; with `cv=0` or `lazy` bit 63 of `u`
-    /// ([`TW_SIGN_BIT`]) is the key's low bit.
-    map: FastMap<(u64, u64, u64)>,
+    /// `u = u1 << 64 | u2` (a `u128`); with `cv=0` or `lazy` bit 127 of
+    /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.
+    map: FastMap<(u128, u64, u64)>,
     /// Table accesses made by the walk (one `entry` call per non-identity
     /// step, in every mode); not emitted as a counter.
     pub table_probes: u64,
@@ -9212,7 +9736,7 @@ pub struct TargetWalk<E> {
     pub identities_skipped: u64,
     pub index_lookups: u64,
     /// Key collisions found: kept and new coefficient triples.
-    pub collisions: Vec<((u64, u64, u64), (u64, u64, u64))>,
+    pub collisions: Vec<((u128, u64, u64), (u128, u64, u64))>,
     pub verified_collisions: u64,
     pub rows: Vec<TargetWalkRow>,
     /// Rows whose seed part (and with one seed also `db`) cancelled modulo
@@ -9255,10 +9779,10 @@ pub struct TargetWalk<E> {
 /// One keyed point waiting to be inserted by the sibling walk.
 struct SibItem {
     key: u64,
-    c: (u64, u64, u64),
-    /// The key's sign bit already shifted to bit 63 (`0` or
+    c: (u128, u64, u64),
+    /// The key's sign bit already shifted to bit 127 (`0` or
     /// [`TW_SIGN_BIT`]) when the point's `y` is known.
-    sign: Option<u64>,
+    sign: Option<u128>,
     /// An x-only sibling: `(parent index, pool index, minus, λ)`.
     xref: Option<(usize, usize, bool, u64)>,
 }
@@ -9267,9 +9791,9 @@ struct SibItem {
 struct SibWalk<E> {
     started: bool,
     parent: E,
-    c: (u64, u64, u64),
+    c: (u128, u64, u64),
     next_parent: E,
-    next_c: (u64, u64, u64),
+    next_c: (u128, u64, u64),
     /// Pool index of the jump the walk takes from the current parent.
     h_t: usize,
     prev_h: Option<usize>,
@@ -9288,7 +9812,7 @@ struct SibWalk<E> {
 }
 
 impl<E: Copy> SibWalk<E> {
-    fn new(_m: usize, pool: usize, p1: E, c: (u64, u64, u64)) -> Self {
+    fn new(_m: usize, pool: usize, p1: E, c: (u128, u64, u64)) -> Self {
         Self {
             started: false,
             parent: p1,
@@ -9528,7 +10052,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         // With `sib` the jump pool has `pool` points (up to 512), outside
         // the plain walk's jump range; the range is checked on `pool` below.
         let plan_jumps = if sib.is_some() { 16 } else { jumps };
-        let (t, t_max, w, bound) = wwalk_plan_check(r, x, plan_jumps, opts)?;
+        let (t, t_max, w, bound) = wwalk_plan_check_bits(r, x, plan_jumps, opts, TW_COEF_BITS)?;
         let (jumps, cheap) = match sib {
             None => (jumps, cheap),
             Some((m, pool)) => {
@@ -9542,8 +10066,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                         "wwalk: sib needs a group with x-only siblings (a prime curve)".into(),
                     );
                 }
-                if r >= 1 << 31 {
-                    return Err(format!("wwalk: sib needs r below 2^31 (r={r})"));
+                // A reduced minus sibling's seed coefficient is below `r`,
+                // later sums below `r + bound`: both fit below the sign bit.
+                if r >= 1 << TW_COEF_BITS {
+                    return Err(format!("wwalk: sib needs r below 2^{TW_COEF_BITS} (r={r})"));
                 }
                 // The pool is built as `cj=1` builds jumps.
                 (pool, true)
@@ -9564,18 +10090,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 "wwalk: tw={n_seeds} with an identity generator or target"
             ));
         }
-        if lazy && n_seeds == 2 && bound >= 1 << 31 {
-            return Err(format!(
-                "wwalk: lazy=1 with tw=2 needs coefficients below 2^31 (bound {bound})"
-            ));
-        }
         if lazy && !verify_collisions {
             return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
-        }
-        if !verify_collisions && n_seeds == 2 && bound >= 1 << 31 {
-            return Err(format!(
-                "wwalk: cv=0 with tw=2 needs coefficients below 2^31 (bound {bound})"
-            ));
         }
         let start = Instant::now();
         let mut seeds = [0usize; 2];
@@ -9720,7 +10236,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let mut verify_ops = GroupOps::default();
         let mut check_ops = GroupOps::default();
         let mut lazy_active = lazy;
-        // `cv=0` and `lazy=1` store the key's sign bit in bit 63 of `u`.
+        // `cv=0` and `lazy=1` store the key's sign bit in bit 127 of `u`.
         let store_sign = lazy || !verify_collisions;
         let _ = fault;
         // The sibling walk's state (only with `sib`): see "Sibling points".
@@ -9808,11 +10324,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 tw.insert_attempts += 1;
                 let full_key = g.key(&e);
                 let key = full_key >> 1;
-                let low = u64::from(store_sign) * ((full_key & 1) << 63);
+                let low = u128::from(store_sign) * (u128::from(full_key & 1) << 127);
                 tw.table_probes += 1;
                 let mut kept = match tw.map.entry(key) {
                     std::collections::hash_map::Entry::Vacant(slot) => {
-                        // The bit is free: u < 2^32 (one seed) or u1 < 2^31.
+                        // The bit is free: every coefficient is below 2^62.
                         debug_assert!(c.0 & TW_SIGN_BIT == 0);
                         slot.insert((c.0 | low, c.1, c.2));
                         continue;
@@ -9890,7 +10406,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         g: &G,
         sw: &mut SibWalk<E>,
         m: usize,
-        jump_pts: &[(E, u64, u64, u64)],
+        jump_pts: &[(E, u128, u64, u64)],
         rng: &mut StdRng,
         ops: &mut GroupOps,
         r: u64,
@@ -9902,7 +10418,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             sw.queue.push_back(SibItem {
                 key: k >> 1,
                 c: sw.c,
-                sign: Some((k & 1) << 63),
+                sign: Some(u128::from(k & 1) << 127),
                 xref: None,
             });
             return;
@@ -9958,7 +10474,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                         sw.queue.push_back(SibItem {
                             key: sp.key_plus,
                             c: cp,
-                            sign: Some((k & 1) << 63),
+                            sign: Some(u128::from(k & 1) << 127),
                             xref: None,
                         });
                     } else {
@@ -9998,7 +10514,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             sw.queue.push_back(SibItem {
                                 key: k >> 1,
                                 c: cp,
-                                sign: Some((k & 1) << 63),
+                                sign: Some(u128::from(k & 1) << 127),
                                 xref: None,
                             });
                         } else {
@@ -10019,13 +10535,13 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         &mut self,
         g: &G,
         sw: &SibWalk<E>,
-        jump_pts: &[(E, u64, u64, u64)],
+        jump_pts: &[(E, u128, u64, u64)],
         parent_idx: usize,
         h: usize,
         minus: bool,
         key: u64,
         lambda: Option<u64>,
-    ) -> u64 {
+    ) -> u128 {
         let parent = sw.parents[parent_idx];
         let mut ops = self.sib_resolve_ops;
         let lam = lambda.unwrap_or_else(|| {
@@ -10038,7 +10554,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         ops.adds += 1;
         self.sib_resolutions += 1;
         self.sib_resolve_ops = ops;
-        (g.key(&pt) & 1) << 63
+        u128::from(g.key(&pt) & 1) << 127
     }
 
     /// Rows needed: `n_seeds + 1` independent ones pin `log Q`.
@@ -10047,11 +10563,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
     }
 
     /// `(u1, u2)` of a stored `u` (`u2 = 0` with one seed).
-    fn parts(&self, u: u64) -> (u64, u64) {
+    fn parts(&self, u: u128) -> (u64, u64) {
         if self.n_seeds == 2 {
-            (u >> 32, u & 0xFFFF_FFFF)
+            ((u >> 64) as u64, u as u64)
         } else {
-            (u, 0)
+            (u as u64, 0)
         }
     }
 
@@ -10063,7 +10579,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         g: &G,
         r: u64,
         rng: &mut StdRng,
-    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+    ) -> Result<Vec<(E, u128, u64, u64)>, String> {
         let mut out = Vec::with_capacity(self.jumps);
         let mut tries = 0u32;
         while out.len() < self.jumps {
@@ -10093,11 +10609,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         Ok(out)
     }
 
-    fn pack_alpha(&self, al: u64, al2: u64) -> u64 {
+    fn pack_alpha(&self, al: u64, al2: u64) -> u128 {
         if self.n_seeds == 2 {
-            (al << 32) | al2
+            (u128::from(al) << 64) | u128::from(al2)
         } else {
-            al
+            u128::from(al)
         }
     }
 
@@ -10109,7 +10625,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         g: &G,
         r: u64,
         rng: &mut StdRng,
-    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+    ) -> Result<Vec<(E, u128, u64, u64)>, String> {
         let mut ops = self.setup_ops;
         let mut ks: Vec<(E, u64, u64)> = Vec::with_capacity(self.jumps);
         let mut tries = 0u32;
@@ -10181,7 +10697,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         r: u64,
         a: usize,
         rng: &mut StdRng,
-    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+    ) -> Result<Vec<(E, u128, u64, u64)>, String> {
         let b = self.jumps / a;
         let mut ops = self.setup_ops;
         let mut ks: Vec<(E, u64, u64)> = Vec::with_capacity(b);
@@ -10290,8 +10806,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         fb: &FactorBase<E>,
         r: u64,
         ops: &mut GroupOps,
-        kept: (u64, u64, u64),
-        new: (u64, u64, u64),
+        kept: (u128, u64, u64),
+        new: (u128, u64, u64),
     ) {
         let ((ku1, ku2), (nu1, nu2)) = (self.parts(kept.0), self.parts(new.0));
         let s1 = self.eval(g, ops, ku1, ku2, kept.1, kept.2);
@@ -10318,8 +10834,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         fb: &FactorBase<E>,
         r: u64,
         plus: bool,
-        kept: (u64, u64, u64),
-        new: (u64, u64, u64),
+        kept: (u128, u64, u64),
+        new: (u128, u64, u64),
     ) {
         let comb = |a: u64, b: u64| -> u64 {
             let (a, b) = (a % r, b % r);
@@ -10442,7 +10958,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         ops: &mut GroupOps,
         lookups: &mut u64,
         point: E,
-    ) -> Option<(i8, u64, u64, u64)> {
+    ) -> Option<(i8, u128, u64, u64)> {
         *lookups += 1;
         let key = g.key(&point) >> 1;
         let (u, z, b) = *self.map.get(&key)?;
@@ -10470,7 +10986,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         a: u64,
         b: u64,
         sign: i8,
-        u: u64,
+        u: u128,
         z: u64,
         be: u64,
     ) -> TargetWalkRow {
@@ -18858,7 +19374,8 @@ mod wwalk_table_tests {
                 }
                 // The relation loop's probe reads the same entry in both.
                 for &(u, z, b) in v.map.values().take(8) {
-                    let Some(pt) = v.eval(g, &mut cops, u, 0, z, b) else {
+                    // One seed: the u128 word holds `u` itself.
+                    let Some(pt) = v.eval(g, &mut cops, u as u64, 0, z, b) else {
                         continue;
                     };
                     let (mut l1, mut l2) = (0u64, 0u64);
@@ -18904,8 +19421,8 @@ mod wwalk_table_tests {
     }
 
     /// `cv=0` composes with main's two-seed walk (`tw=2`): the sign bit
-    /// rides in bit 63 of the packed `u = u1 << 32 | u2` (coefficients are
-    /// refused at `2^31` or more, so `u1` never reaches it), and the walk,
+    /// rides in bit 127 of the packed `u128` word `u = u1 << 64 | u2`
+    /// (coefficients are below `2^62`, so `u1` never reaches it), and the walk,
     /// rows, rank and set-up are `cv=1`'s with the verification ledger
     /// removed.  `cv=0` with `lazy=1` is refused; `cv=1` with either seed
     /// count is `build_ext` exactly.
