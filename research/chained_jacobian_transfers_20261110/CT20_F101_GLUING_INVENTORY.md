@@ -31,7 +31,7 @@ For **every** row the oracle enumerates all x in F101 and F101² and checks #C(F
 
 Original failure retained as a discriminating control: individual quadratic factors of the HLP sextic live in F101³ and generally do **not** descend, although the sextic product does. The reference implementation was corrected to project the product only; otherwise the first row falsely reports failure. All tests and figures are local producer assertions, not independent signed PCC verification.
 
-## Reproduction and independent controls
+## Additional native regression\n\nThe branch also includes `isogeny_algos/tests/ct20_f101_gluing.rs`. It replays all four images using the existing `FpR::from_modulus`, unchanged `Kohel::kohel` and HLP `genus2::glue`, then checks prime-field coefficient descent, L-polynomial, and the supported first/reciprocal quotient identifications. It does not implement the Jacobian map or provide a signed independent PCC verdict. Its new native CI test must pass before treating the Rust fixture as compiled/tested; the separate standard-library oracle already passed its published GitHub regression. [pcc:unverified]\n\n## Reproduction and independent controls
 
 ```sh
 python3 -S research/chained_jacobian_transfers_20261110/ct20_gluing_oracle.py
