@@ -90,6 +90,24 @@ theorem injective_torsion_iff
   · intro h
     rw [← f.scalar, h, f.zero]
 
+/-- A next kernel disjoint from the previous dual kernel adds no new
+d-torsion to the composite kernel. For Richelot d=2 this is the structural
+step behind a nonbacktracking chain; actual geometric kernels and finite
+cardinalities remain external obligations.
+-/
+theorem composite_kernel_on_torsion
+    (f : Transfer A B) (back : Transfer B A) (g : Transfer B C) (d : Int)
+    (hnorm : ∀ x, back.apply (f.apply x) = d • x)
+    (hinter : ∀ y, g.apply y = 0 → back.apply y = 0 → y = 0)
+    (x : A) (htor : d • x = 0) :
+    g.apply (f.apply x) = 0 ↔ f.apply x = 0 := by
+  constructor
+  · intro h
+    apply hinter (f.apply x) h
+    rw [hnorm, htor]
+  · intro h
+    rw [h, g.zero]
+
 /-- Invariant fibers projected anti-invariantly yield two-torsion. This
 alone does not imply zero: the odd-order certificate is used below. -/
 theorem anti_invariant_twice_zero
@@ -167,6 +185,7 @@ end CharacteristicBoundary
 #print axioms ChainedTransfer.two_hop_injective
 #print axioms ChainedTransfer.two_hop_scalar_relation
 #print axioms ChainedTransfer.injective_torsion_iff
+#print axioms ChainedTransfer.composite_kernel_on_torsion
 #print axioms ChainedTransfer.anti_invariant_twice_zero
 #print axioms ChainedTransfer.anti_invariant_odd_source_zero
 #print axioms CharacteristicBoundary.map_nat

@@ -32,13 +32,18 @@ finite-group deduplication against an elliptic shortcut. Its target model is
 isomorphic to the source. A second preselected fixture has nonisomorphic
 Jacobians over F101 (rational2-torsion4 vs16, each order9216), but its complete
 96-point elliptic endpoint also matches a direct2-isogeny after doubling.
-Its preserved prime subgroup has order3. The report gives the precise scope
+Its preserved prime subgroup has order3. A predeclared second Richelot hop
+now reaches a third Jacobian with rational2-torsion8; the reverse-kernel
+intersection is trivial and all full-domain dual checks pass. The three
+counts4,16,8 distinguish the three Jacobians over F101. The report gives the precise scope
 and open geometric proof bridge. No performance run or speed claim is present.
 [pcc:unverified]
 
-Pinned oracle baseline: [cryptanalysis PR #1469](https://github.com/isogeny-labs/cryptanalysis/pull/1469).
-The successor's independent BigUint development checks and immutable pin
-update are tracked separately from that retained baseline.
+Pinned oracle baseline: [cryptanalysis PR #1469](https://github.com/isogeny-labs/cryptanalysis/pull/1469),
+merged; [successor PR #1471](https://github.com/isogeny-labs/cryptanalysis/pull/1471)
+pins b280efc with27 passing tests/1 ignored benchmark. The third model's
+independent BigUint development checks pass; its immutable replay is tracked
+separately from those retained checkpoints. [pcc:unverified]
 
 Benchmark/integration blockers have a
 [named record](../../problems/chained-transfer-admission-and-ledger-sync.md).

@@ -97,11 +97,11 @@ All remain unsigned and unverified.
 
 #pagebreak()
 == Formal obligations and prime-field boundary
-Core Lean4.35.0 is pinned. Nine structural lemmas cover norm composition,
+Core Lean4.35.0 is pinned. Ten structural lemmas cover norm composition,
 Bézout recovery/injectivity, scalar relations, anti-invariant zero controls,
 torsion invariance and the characteristic obstruction. Eight polynomial
 lemmas cover cleared splitting, target numerator, chart and coordinate
-isomorphism identities. Gates audit21+8 declarations with standard foundations
+isomorphism identities. Gates audit22+8 declarations with standard foundations
 only(propext,Classical.choice,Quot.sound), no trusted native declarations.
 Actual Jacobians and their dual norm identities remain explicit hypotheses
 of the structural proofs. [pcc:unverified]
@@ -121,8 +121,8 @@ without altering any ledger history or published claim.
 == Reproduction, checks and gates
 Run the standalone native Cargo tests and strict Clippy, then both Lean
 files through tools/lean/proof-gate.sh. Root examples
-chained_jacobian_reference and chained_jacobian_identities now pass15
-and1 tests, including the generic model extension. The native suite passes14
+chained_jacobian_reference and chained_jacobian_identities pass16
+and1 tests, including the second-hop extension. The native suite passes15
 tests and strict Clippy. Two local
 replay-accepted identity certificates bind the polynomial Lean source digest.
 These are development checks, not signed independent validation.
@@ -139,12 +139,12 @@ No performance experiment has been launched. S3 checkpoint admission is
 unavailable, and live IsoLab budget/capacity is unknown. The research-KB and
 ecdb are unavailable; crypto-autoresearcher is vault locked without a key
 binding. The current-main PCC ledger fork is a merge blocker, not something
-to repair by rewriting history. Newly added workflows require default-branch
-registration before manual dispatch. GitHub CI and required reviews still
+to repair by rewriting history. The new crypto workflow requires default-branch
+registration before dispatch; the reference workflow is registered. GitHub CI and required reviews still
 apply. The queue names every blocker and next action.
 
-Next: immutable successor replay, a second nonbacktracking Jacobian hop,
-field generalization, independent signed validation and an admitted total-cost
+Next: immutable second-hop replay, checked small-prime field support,
+independent signed validation and an admitted total-cost
 comparison including both direct elliptic shortcuts. Canonical transfer and
 leaderboard graphs receive no promotion from this unsigned fixed-field work.
 
@@ -162,3 +162,55 @@ dashed edges are zero controls; dotted edges are complete finite endpoint
 shortcuts. The successor’s different rational2-torsion counts obstruct a
 base-field Jacobian isomorphism. No edge denotes a measured DLP advantage.
 [pcc:unverified]
+
+#pagebreak()
+= A second nonbacktracking Jacobian hop
+The next pairing was fixed before execution as
+(z−2)(z−18), (z+2)(z−28), 20(z+18)(z+28), preserving Cₜ’s exact
+scale20 and base(2,0). Its determinant is67 and first target factor
+23z²+66z+26 has roots11,52; the fixed minimum-root rule chooses11.
+The next curve is Cᵤ: a²=8b⁶+17b⁵+86b⁴+62b³+29b²+9b+38.
+
+#image("chain.svg", width: 100%)
+
+Both rational class sets have9,216 elements. The next map has equal
+four-element fibers and both dual norms[2]. Target rational2-torsion has
+cardinality8. The pre-existing BigUint reference independently obtains
+point-count order9,216, self-inverse count8, paired additions and dual norm
+on all9,216 classes. The three counts4,16,8 distinguish all three Jacobians
+over F101, without asserting algebraic-closure nonisomorphism. These are
+unsigned development assertions; immutable third-model replay is next.
+[pcc:unverified]
+
+The next kernel intersects the previous dual kernel only at zero. Both
+four-element2-torsion kernels are rational, so this checks the full
+intersection and excludes an immediate reverse hop. Under the standard
+separable Richelot geometry, the degree16 geometric composite kernel is
+killed by4 and has2-torsion cardinality4, hence is (Z/4Z)². The *rational*
+composite kernel has only8 elements,4 self-inverse, hence Z/4Z×Z/2Z.
+Not all geometric4-torsion need be rational. The counts are execution
+assertions; the geometry and finite-group classification are not fully
+formalized here. [pcc:unverified]
+
+For source P=(48,20), the final class based at(11,0) is
+u(T)=T²+86T+27,v(T)=34T+7, nonzero of order3. Reversing both maps and
+applying the source norm gives[8]P, inverted by2 modulo3. All three scalar
+relations are checked with no DLP solver used in evaluation. Point recovery
+does not reveal the unknown scalar. No elliptic quotient for this final
+non-even sextic has been implemented; the earlier elliptic shortcut results
+are not claimed as identities of the final Jacobian-valued map.
+[pcc:unverified]
+
+The new core Lean lemma composite_kernel_on_torsion states the abstract
+kernel-intersection step with actual maps/norms as hypotheses. Proof inventory
+is now18 written lemmas,10 structural and8 polynomial; axiom gates audit22+8
+declarations with standard foundations only. Final native suite passes15
+tests and strict Clippy. The full geometric bridge, signed standing and a
+measured computational advantage remain open. [pcc:unverified]
+
+Receipts: native-second-hop-01(failed compilation),02(first passed fixture),
+final-01(full15-test suite), lean-second-hop-01. Claims53535c and795c4d;
+cryptanalysisad0e63. The independent successor replay is published in
+cryptanalysis PR1471 at c6bc590, pinning cryptob280efc,27 tests/1 ignored
+benchmark; focused CI run42986170752 was dispatched on that exact head.
+Source report and queue retain actual final-head CI status separately.

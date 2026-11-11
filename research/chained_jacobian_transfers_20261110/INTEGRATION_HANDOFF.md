@@ -30,14 +30,24 @@ This handoff remains in the authorized crypto study and GitHub queue #3904.
    r=3 explicitly. Its complete96-point endpoint also equals a direct
    elliptic2-isogeny after doubling, followed by tau(X,V)=(100X+80,91V).
    No computational advantage is established. [pcc:unverified]
-4. Seventeen core Lean lemmas compile, with standard axiom gates auditing
-   21+8 declarations. They give conditional structural criteria and cleared
+4. Eighteen core Lean lemmas compile, with standard axiom gates auditing
+   22+8 declarations. They give conditional structural criteria and cleared
    coordinate identities, not a formal construction of Picard groups or
    Richelot geometry. Signed standing remains unverified. [pcc:unverified]
 5. Prime-field boundary: ordinary proper-subfield Weil restriction does not
    apply to a prime field. The Lean characteristic obstruction applies to
    unital additive/field maps, not arbitrary encoded cyclic group transfers.
    Lifts and cross-prime reductions remain open mechanisms. [pcc:unverified]
+6. The predeclared next pairing(2,18),(-2,28),(-18,-28), with leading scale20,
+   gives determinant67 and C_u coefficients[38,9,29,62,86,17,8], base11.
+   Both full9,216-class domains and both dual norms are checked. The next
+   kernel meets the previous dual kernel trivially; rational composite kernel
+   size8 with4 self-inverse elements differs from geometric degree16. The
+   three rational2-torsion cardinalities4,16,8 distinguish all three
+   Jacobians over F101. Original r3 maps to (u,v)=([27,86,1],[7,34]) and
+   reversed-chain/source norm gives[8], invertible modulo3. BigUint third-model
+   development checks agree. This is no measured DLP advantage; immutable
+   replay is tracked separately. [pcc:unverified]
 
 ## Custody and next discriminating tasks
 
@@ -51,10 +61,9 @@ This handoff remains in the authorized crypto study and GitHub queue #3904.
   atlas reads/writes. Run `lead_atlas.py --match` and research-KB retrieval
   before assigning existing lead IDs or claiming novelty. No lead ID was
   guessed while the atlas was unreadable.
-- Next construction: a nonbacktracking second Richelot hop with complete
-  scalar/dual checks, model-equivalence audit and independent arithmetic.
-  Then field parameterization with fixed inputs and overflow/nonresidue
-  validation. A genuinely different Jacobian is insufficient for a cost win.
+- Next: immutable second-hop replay, then field parameterization with fixed
+  inputs and overflow/nonresidue validation. A genuinely different Jacobian
+  is insufficient for a cost win.
 - Measurements remain blocked by the failed S3 admission gate and unknown
   live IsoLab budget/capacity. Future total-cost comparisons include direct
   source/destination solvers and both collapsed elliptic routes. No benchmark

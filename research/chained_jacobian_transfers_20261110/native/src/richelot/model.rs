@@ -501,4 +501,80 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn predeclared_second_hop_full_domain_and_nonbacktracking() {
+        let first = Richelot::new([[-1, 0, 1], [4, 1, 1], [4, -1, 1]], 1, 2).unwrap();
+        let second = Richelot::new([[36, -20, 1], [-56, -26, 1], [10080, 920, 20]], 2, 11).unwrap();
+        assert_eq!(second.determinant(), 67);
+        assert_eq!(first.target(), second.source());
+        // The two roots of H1 are11,52; the fixed rule chooses the smaller.
+        assert_eq!(integers(&second.h[0]).unwrap(), vec![26, 66, 23]);
+        assert_eq!(value(&second.h[0], F2::base(52)), F2::ZERO);
+        assert!((0..11).all(|x| value(&second.h[0], F2::base(x)) != F2::ZERO));
+        let source = second.source.classes();
+        let target = second.target.classes();
+        assert_eq!((source.len(), target.len()), (9216, 9216));
+        let two_target = target
+            .iter()
+            .filter(|d| d.mul(2) == second.target.zero())
+            .count();
+        assert_eq!(two_target, 8);
+        let mut fibers = std::collections::BTreeMap::new();
+        let translation = &source[111];
+        let it = second.transfer(translation).unwrap();
+        let mut kernel_intersection = 0;
+        for d in &source {
+            let image = second.transfer(d).unwrap();
+            if image == second.target.zero() && first.dual(d).unwrap() == first.source.zero() {
+                kernel_intersection += 1;
+            }
+            *fibers.entry(image.coefficients()).or_insert(0_usize) += 1;
+            assert_eq!(second.dual(&image).unwrap(), d.mul(2));
+            assert_eq!(
+                second.transfer(&d.add(translation).unwrap()).unwrap(),
+                image.add(&it).unwrap()
+            );
+        }
+        assert_eq!(kernel_intersection, 1);
+        assert_eq!(fibers.len(), 2304);
+        assert!(fibers.values().all(|n| *n == 4));
+        for d in &target {
+            assert_eq!(second.transfer(&second.dual(d).unwrap()).unwrap(), d.mul(2));
+        }
+        let mut composite_kernel = 0_usize;
+        let mut composite_kernel_two = 0_usize;
+        for d in first.source.classes() {
+            let image = second.transfer(&first.transfer(&d).unwrap()).unwrap();
+            if image == second.target.zero() {
+                composite_kernel += 1;
+                assert_eq!(d.mul(4), first.source.zero());
+                if d.mul(2) == first.source.zero() {
+                    composite_kernel_two += 1;
+                }
+            }
+            assert_eq!(first.dual(&second.dual(&image).unwrap()).unwrap(), d.mul(4));
+        }
+        // Count rational points of the composite kernel, not geometric points
+        // of order4 that need not be F101-rational.
+        assert_eq!((composite_kernel, composite_kernel_two), (8, 4));
+        let p = point(48, 20);
+        let image = second
+            .transfer(&first.transfer(&first.source.pull(p).unwrap()).unwrap())
+            .unwrap();
+        assert_ne!(image, second.target.zero());
+        assert_eq!(image.mul(3), second.target.zero());
+        for k in 0..3 {
+            let q = ec_mul(p, k, 6, 9);
+            let d = second
+                .transfer(&first.transfer(&first.source.pull(q).unwrap()).unwrap())
+                .unwrap();
+            assert_eq!(d, image.mul(k));
+            let back = first.dual(&second.dual(&d).unwrap()).unwrap();
+            let encoded = first.source.norm(&back, Quotient::F).unwrap();
+            assert_eq!(encoded, ec_mul(q, 8, 6, 9));
+            assert_eq!(ec_mul(encoded, 2, 6, 9), q); // 8^-1 modulo3
+        }
+        println!("second hop: delta=67, source #J={}, target #J={}, target sextic={:?}, target2-torsion={two_target}, intersection(kerR2,kerDualR1)={kernel_intersection}, rational composite kernel={composite_kernel}, r=3, image={:?}",source.len(),target.len(),second.target.sextic(),image.coefficients());
+    }
 }
