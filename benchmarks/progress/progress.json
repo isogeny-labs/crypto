@@ -5,7 +5,7 @@
   "records": {
     "censored": 4,
     "invalid": 2,
-    "measured": 99,
+    "measured": 100,
     "open": 3
   },
   "repo": "crypto",
@@ -266,11 +266,11 @@
     {
       "better": "lower",
       "first": 0.5739107759707482,
-      "latest": 0.5739107759707482,
+      "latest": 0.6349822161224699,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "improvement_vs_previous_percent": 0.0,
-        "value_over_reference": 0.581373
+        "improvement_vs_first_percent": -10.6413,
+        "improvement_vs_previous_percent": -10.6413,
+        "value_over_reference": 0.678072
       },
       "metric": "s_w0_cheon_pminus1_comb",
       "points": [
@@ -310,6 +310,22 @@
           ],
           "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
           "value": 0.5739107759707482
+        },
+        {
+          "commit": "9f7214a00379",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -10.6413,
+            "improvement_vs_previous_percent": -10.6413,
+            "value_over_reference": 0.678072
+          },
+          "n": 264,
+          "record": "20261107T0840Z-cheon-wide",
+          "reference": 0.9364528647264987,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Cheon comb vs matched rho.negation, 11 P-224-shaped sizes 36-56 bits, 24 targets, L0 counts only: fitted alpha of S comb 0.455 [0.428, 0.479] vs rho 0.508 [0.481, 0.538] (n-1), comb 0.432 [0.416, 0.447] vs rho 0.510 [0.473, 0.542] (n+1); intervals disjoint at w = 0, 0.1, 1 (n-1 by 0.002 at w = 0). DLPwAI under a counted static-DH oracle only.",
+          "value": 0.6349822161224699
         }
       ],
       "problem": "dlpwai:static-dh-p224-shape",
@@ -370,11 +386,11 @@
     {
       "better": "lower",
       "first": 0.5818646872479218,
-      "latest": 0.5818646872479218,
+      "latest": 0.608997215462331,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "improvement_vs_previous_percent": 0.0,
-        "value_over_reference": 0.574551
+        "improvement_vs_first_percent": -4.663,
+        "improvement_vs_previous_percent": -4.663,
+        "value_over_reference": 0.624836
       },
       "metric": "s_w0_cheon_pplus1_comb",
       "points": [
@@ -414,6 +430,22 @@
           ],
           "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
           "value": 0.5818646872479218
+        },
+        {
+          "commit": "9f7214a00379",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -4.663,
+            "improvement_vs_previous_percent": -4.663,
+            "value_over_reference": 0.624836
+          },
+          "n": 264,
+          "record": "20261107T0840Z-cheon-wide",
+          "reference": 0.9746512856636927,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Cheon comb vs matched rho.negation, 11 P-224-shaped sizes 36-56 bits, 24 targets, L0 counts only: fitted alpha of S comb 0.455 [0.428, 0.479] vs rho 0.508 [0.481, 0.538] (n-1), comb 0.432 [0.416, 0.447] vs rho 0.510 [0.473, 0.542] (n+1); intervals disjoint at w = 0, 0.1, 1 (n-1 by 0.002 at w = 0). DLPwAI under a counted static-DH oracle only.",
+          "value": 0.608997215462331
         }
       ],
       "problem": "dlpwai:static-dh-p224-shape",
