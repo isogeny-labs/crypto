@@ -42,9 +42,9 @@ pub struct PrimeArgs {
     qx: u64,
     #[arg(long)]
     qy: u64,
-    #[arg(long, default_value_t = 8)]
+    #[arg(long, default_value_t = 32)]
     fb_size: usize,
-    #[arg(long, default_value_t = 64)]
+    #[arg(long, default_value_t = 2)]
     extra_relations: usize,
     #[arg(long, default_value_t = 5000)]
     max_trials_per_relation: usize,
@@ -73,9 +73,9 @@ pub struct PrimeFileArgs {
     /// JSON target file or checked store:NAME/sha256:DIGEST reference.
     #[arg(long)]
     input: PathBuf,
-    #[arg(long, default_value_t = 8)]
+    #[arg(long, default_value_t = 32)]
     fb_size: usize,
-    #[arg(long, default_value_t = 64)]
+    #[arg(long, default_value_t = 2)]
     extra_relations: usize,
     #[arg(long, default_value_t = 5000)]
     max_trials_per_relation: usize,
