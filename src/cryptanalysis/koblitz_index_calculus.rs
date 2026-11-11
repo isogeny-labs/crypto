@@ -20857,6 +20857,50 @@ mod tests {
     /// every offset a trial can draw, wraparound included: `xs[i]` and
     /// `ys[i]` of a [`Scan::Gathered`] scan are those of `idxs[i]`.  And
     /// they exist only where the folding kernel can read them.
+    /// Lever 2 falsifier (untimed): how often an aimed summand's negated twin
+    /// shares its aligned 8-lane kernel group, over the eight alignments.
+    #[test]
+    #[ignore]
+    fn lever2_twin_in_block_fraction() {
+        for (a, n, points, seed) in [(0u8, 53u32, 27984usize, 201u64), (0, 61, 39040, 201)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, seed, points).unwrap();
+            // twin of each index: same signed orbit, same k, other sign
+            let mut by_key = std::collections::HashMap::new();
+            for (i, &(o, k, neg)) in fb.signed_orbit_of.iter().enumerate() {
+                by_key.insert((o, k, neg), i);
+            }
+            let twin: Vec<Option<usize>> = fb
+                .signed_orbit_of
+                .iter()
+                .map(|&(o, k, neg)| by_key.get(&(o, k, !neg)).copied())
+                .collect();
+            let with_twin = twin.iter().filter(|t| t.is_some()).count();
+            // whole columns, as aimed collection scans them: every base index, sorted
+            let idxs: Vec<usize> = (0..fb.points.len()).collect();
+            let pos: std::collections::HashMap<usize, usize> =
+                idxs.iter().enumerate().map(|(p, &i)| (i, p)).collect();
+            let adjacent = idxs.iter().filter(|&&i| twin[i].map_or(false, |t| (t as isize - i as isize).abs() == 1)).count();
+            let mut same_block = 0usize;
+            for shift in 0..8usize {
+                for (p, &i) in idxs.iter().enumerate() {
+                    if let Some(t) = twin[i] {
+                        if (p + shift) / 8 == (pos[&t] + shift) / 8 {
+                            same_block += 1;
+                        }
+                    }
+                }
+            }
+            eprintln!(
+                "n={n}: {} points, {} with a twin in the base, twin adjacent {:.4}, twin in same 8-group {:.4} (mean over 8 alignments)",
+                idxs.len(),
+                with_twin,
+                adjacent as f64 / idxs.len() as f64,
+                same_block as f64 / (8 * idxs.len()) as f64
+            );
+        }
+    }
+
     #[test]
     fn aimed_scans_carry_the_coordinates_of_their_indices() {
         let kc = KoblitzCurve::new(0, 19).unwrap();
