@@ -69,18 +69,30 @@ python3 figures/plot.py /tmp/rows.jsonl /tmp/summary.json figures   # layout onl
 `SHA256SUMS` lists every data file and source file. The uncompressed row file
 is git-ignored; `data/census_p2147483647.jsonl.gz` is `gzip -n -9` of it.
 
-## Proposed next step (not run; needs a decision)
+## Phase 2: rho measured across 57 classes (run 2026-11-11)
 
-The measured counterpart of this census asks whether rho cost depends on anything
-except r. Hold r fixed by taking prime-order classes only (r ≈ 2^31, 8,646 of them).
-Stratify by class size H, conductor f and |D_K|. In each sampled class, solve on
-curves from the crater and from the floor with 10 generators each, and test
-whether steps / √(πr/2) varies with any class invariant. The expected outcome is a null.
+Report: [`phase2/REPORT_PHASE2.pdf`](phase2/REPORT_PHASE2.pdf). Protocol, frozen before data:
+[`phase2/PROTOCOL.md`](phase2/PROTOCOL.md) (sha256 `3d81d9fe…19c7ba`). The task card was compiled by the
+director and run by the executor; its receipt and the director's assessment ("executed as specified") are in
+`phase2/cards/`. Benchmark record: `benchmarks/records/20261111T0634Z-fp31-rho-across-classes.json`.
 
-- Positive controls: a composite-order class (Pohlig–Hellman) and the j = 0 class
-  with the order-6 automorphism fold.
-- Negative control: an A/A arm.
-
-This is a benchmark under the repository rules. It needs a frozen protocol,
-an ecbench spec, a `bench.record/v1` record and the isolab-eks route, so it
-was not launched from this session.
+- **Classes.** 57 classes were drawn by a frozen rule from 400,000 seeded random curves:
+  - 16 prime-order classes in each of three endomorphism-ring strata;
+  - 8 cofactor-4–64 classes, to check √r scaling;
+  - the j = 0 class.
+- **Scale.** 394 curves reached by verified isogeny walks; 281,240 rho runs; 0 classes failed.
+- **Result** ([pcc:unverified]): **null supported** under the frozen rule. After normalizing by √(πr/2),
+  rho cost does not depend on the class (Kruskal–Wallis p = 0.076), the class size, the conductor, the
+  number of endomorphism rings or |D_K| (Spearman p ≥ 0.45). Nor does it depend on the curve within a class
+  or on the generator (per-class p-values uniform, KS p = 0.20 and 0.20). The resolution is about 1% per class.
+- **Controls.**
+  - Detector (planted negation fold): 0.741, inside its window.
+  - A/A replica: 1.003. Isomorphic models: 0.998.
+  - √r scaling: 1.009.
+  - j = 0 automorphism fold: 0.449, against 1/√6 = 0.408.
+- **Execution.** Local at isolation L0, a recorded deviation: there is no AWS identity here, and the EKS
+  dispatch only accepts ecbench specs. The raw data are hashed in the record but not uploaded to S3.
+- **Reproduce.**
+  - Regenerate the root streams with `fp31-class-census roots` and check them against `phase2/ROOTS.sha256`.
+  - Run `phase2/run_phase2.sh target/release/isoclass-rho phase2/manifest.json <dir> 200 40`.
+  - Or unpack `phase2/runs_phase2.tar.gz` (sha256 `450d8ea9…a2291e`) and run `fp31-class-census analyze`.
