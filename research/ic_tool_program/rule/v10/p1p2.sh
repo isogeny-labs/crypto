@@ -14,7 +14,7 @@ row() { # file -> one JSON object
   jq -c "$med"' {
     identity: (.identity_inputs | tojson),
     counts: (.counts | tojson),
-    logs: [.repetitions[] | [.ic_online.recovered, (.rho_online.recovered | tostring)]],
+    logs: ([.repetitions[] | [.ic_online.recovered, (.rho_online.recovered | tostring)]] | unique),
     select: ([.repetitions[].setup_phases_ns | .select + .select_projection] | med),
     setup: ([.repetitions[].setup_ns] | med)
   }' "$1"
