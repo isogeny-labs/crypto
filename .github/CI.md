@@ -91,7 +91,10 @@ assert its pin runs them in the same view, by replay id:
 `node .github/scripts/run-frozen-workflow-replays.mjs --only <id> -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"`,
 with the step's original commands in `env.FROZEN_VIEW_STEP`. That form checks
 custody of that replay's pins only, and fetches the index revision when a
-shallow checkout lacks it. A workflow marked `record` keeps custody of its pin
+shallow checkout lacks it. A replay whose manifest pins a different version
+of its workflow than the index's top-level `revision` holds carries its own
+`revision`; custody then checks that its manifest pins its workflows' bytes
+at that commit, and the runner fetches it like the top-level one. A workflow marked `record` keeps custody of its pin
 but has no replay: either no check on `main` asserts the pin, or its `note`
 says why a workflow view cannot make that check pass (source drift, or a pin
 at a second revision).
