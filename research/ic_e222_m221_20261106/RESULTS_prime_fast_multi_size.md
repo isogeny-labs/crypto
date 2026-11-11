@@ -31,3 +31,18 @@ Both predictions **failed**: "c = 0.5 at least 15% lower than c = 1.0" (it is ab
 Reading (counted-operation reasoning, not a measurement): the setup scales like p^(2/3) (relations: p / fb points at fb ~ p^(1/3); pair table: fb^2 ~ p^(2/3) entries) while the tuned multi-target BSGS costs about sqrt(T n) additions, so for fixed T the ratio grows like p^(1/6), a factor of 2 per 6 bits. The measured ratios (1.9, 2.2, 2.4, 3.2, 4.0 at 25, 29, 31, 33, 35 bits) are consistent with that (about 2.1x over 10 bits) but are five points from different protocols. This is the Gaudry-Diem exponent gap (2/3 against 1/2) seen in the multi-target setup: the lead 'cheaper setup' improves constants (setup roughly 4x cheaper at 27 bits through the batched collection and the bucketed lookup) and not the exponent, so it does not lead to a crossover at larger sizes. The per-target phase (the T-dependent part) is not the wall; the T-independent setup is.
 
 Limits: one instance per residue, exploratory, c on a four-point grid, not compacted BSGS, same host, not independently replayed.
+
+## T-scaling at 35 bits (exploratory; prediction in `results/pf_size/PREDICTION_T.txt`, written before the run)
+
+T = 10 000, one instance per residue, all 10 000 targets of every run verified; tuned (not compacted) BSGS = 1929 ms (residue 3) and 2011 ms (residue 1):
+
+| c | fb | residue | IC ms | setup ms | IC / BSGS |
+|---|---|---|---|---|---|
+| 1.0 | 3251 | 3 / 1 | 7190 / 7051 | 1882 / 2193 | 3.73 / 3.51 |
+| 1.5 | 4876 | 3 / 1 | 5227 / 5998 | 3088 / 3159 | 2.71 / 2.98 |
+
+Prediction "IC/BSGS <= 2.0 at T = 10 000 for the better of c = 1.0 and 1.5" **failed** (best 2.71). The T-independent setup does amortize (setup is 26% to 59% of the run, against about 70% at T = 1000), but the per-target phase becomes the wall: about 0.53 ms per target at c = 1.0 (35 bits), against about 0.04 ms at 27 bits (c = 2.0) and 0.2 ms per target for the BSGS.
+
+Reading (counted-operation reasoning, not a measurement): per target the IC walks about p / fb^2 = p^(1/3) / c^2 points (a 2-term relation has probability about fb^2 / p per point); the BSGS pays about sqrt(n / T) additions per target. The IC total is about p^(2/3) (setup) + T p^(1/3) / c^2; the BSGS total is about sqrt(T n). At T ~ p^(1/3) the two exponents coincide (both about p^(2/3)): below that the IC is setup-bound, above it per-target-bound, so for a fixed factor base of size ~p^(1/3) the IC can be at best a constant factor from the BSGS (here about 2.7 at the best constant at 35 bits), never below it asymptotically. This matches the observed minimum of the ratio near T ~ 1000 to 10 000 (about p^(1/3) = 3 000 at 35 bits) and is the multi-target form of the Gaudry-Diem barrier for this factor-base size. A different exponent would need a factor base of another size, a symmetry that shrinks the relation probability's denominator, or a decomposition into more summands with a smaller table; none of these was measured.
+
+Limits: one instance per residue, exploratory, c on a short grid, BSGS not compacted (true distance 1.1x to 1.3x larger), same host, not independently replayed.
