@@ -13,6 +13,11 @@
 // evidence replay) in its replay's isolated view: one --only, and the command
 // after -- replaces the index's default command. With --only, custody covers
 // only the pins of the selected replays.
+//
+// A replay may carry its own `revision`, overriding the index's top-level one,
+// when its manifest pins a different version of its workflow (or of an extra
+// workflow) than the one the index holds. Custody then also checks that the
+// replay's manifest carries the digest of each of its workflows at that revision.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -42,6 +47,24 @@ export function custodyProblems({ cwd, index, only = null }) {
       try { text = execFileSync('git', ['show', `HEAD:${file}`], { cwd, maxBuffer: 64 * 1024 * 1024,
         stdio: ['ignore', 'pipe', 'pipe'] }).toString('utf8'); } catch { problems.push(`${workflow}: pinning file gone: ${file}`); continue; }
       if (!text.includes(entry.pinned_sha256)) problems.push(`${workflow}: ${file} no longer carries its pin`);
+    }
+  }
+  for (const replay of index.replays) {
+    if (only && !only.includes(replay.id)) continue;
+    if (replay.revision === undefined) continue;
+    if (!/^[0-9a-f]{40}$/.test(replay.revision ?? '')) { problems.push(`replay ${replay.id}: invalid revision`); continue; }
+    const pins = [[replay.workflow, replay.manifest],
+      ...replay.extra_workflows.map(extra => extra.split('|').slice(0, 2))];
+    for (const [workflow, manifest] of pins) {
+      let historical;
+      try {
+        historical = execFileSync('git', ['show', `${replay.revision}:${workflow}`],
+          { cwd, maxBuffer: 16 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
+      } catch { problems.push(`replay ${replay.id}: ${workflow} absent at ${replay.revision}`); continue; }
+      let text;
+      try { text = execFileSync('git', ['show', `HEAD:${manifest}`], { cwd, maxBuffer: 64 * 1024 * 1024,
+        stdio: ['ignore', 'pipe', 'pipe'] }).toString('utf8'); } catch { problems.push(`replay ${replay.id}: manifest gone: ${manifest}`); continue; }
+      if (!text.includes(sha(historical))) problems.push(`replay ${replay.id}: ${manifest} does not pin ${workflow} at ${replay.revision}`);
     }
   }
   const covered = new Set();
@@ -85,16 +108,20 @@ function main(argv) {
   if (unknown.length) throw new Error(`unknown replay id: ${unknown.join(', ')}`);
   // A per-study workflow's default checkout is shallow; fetch the pinned commit.
   ensureCommit(cwd, index.revision);
+  const selectedReplays = index.replays.filter(replay => !only.length || only.includes(replay.id));
+  for (const replay of selectedReplays) {
+    if (/^[0-9a-f]{40}$/.test(replay.revision ?? '')) ensureCommit(cwd, replay.revision);
+  }
   const problems = custodyProblems({ cwd, index, only: only.length ? only : null });
   for (const problem of problems) console.error(`custody: ${problem}`);
   console.log(`Custody of ${only.length ? `the pins of ${only.join(', ')}` : `${Object.keys(index.workflows).length} pinned workflows`}: ${problems.length} problems`);
   if (problems.length || custodyOnly) return problems.length ? 1 : 0;
   const results = [];
-  for (const replay of index.replays.filter(replay => !only.length || only.includes(replay.id))) {
+  for (const replay of selectedReplays) {
     console.log(`::group::${replay.id}`);
     let status;
     try {
-      status = withFrozenWorkflow({ cwd, workflow: replay.workflow, revision: index.revision,
+      status = withFrozenWorkflow({ cwd, workflow: replay.workflow, revision: replay.revision ?? index.revision,
         manifest: replay.manifest, manifestFormat: replay.manifest_format, roots: replay.roots,
         extraWorkflows: replay.extra_workflows, command: command ?? replay.command });
     } catch (error) {
