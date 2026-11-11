@@ -193,11 +193,11 @@
     },
     ".github/workflows/ecc2k130-symbolic-oaware-width-gate.yml": {
       "pinned_sha256": "7a55e6b8247bd0e1648376f480dc21630f89d02869dfb6b78ef711ec2f3e6e09",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN.json"
       ],
-      "note": "Its own preflight asserts the pin, and also fails on source drift a workflow view does not cover: src/binary_ecc/curve.rs changed on main after the 2026-09-25 freeze."
+      "note": "Replayed with a historical source view (input_view_manifest): eight src/ files the freeze pins changed on main after 2026-09-25. The study's checks only hash them or replay the frozen width decision against them; see research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN_VIEW.md."
     },
     ".github/workflows/endomorphism-search.yml": {
       "pinned_sha256": "1bee6995d9c8affdb6bb37149e8e37c3bc4d0c8e9451ea5e425941afff608fa6",
@@ -673,6 +673,40 @@
         "python3",
         "-B",
         "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "symbolic_oaware_width_gate_20260925",
+      "workflow": ".github/workflows/ecc2k130-symbolic-oaware-width-gate.yml",
+      "manifest": "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN.json",
+      "manifest_format": "pointer:/files/.github~1workflows~1ecc2k130-symbolic-oaware-width-gate.yml",
+      "input_view_manifest": ".github/scripts/symbolic-oaware-width-gate-source-view-v1.json",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/FROZEN.json",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/RESULT.md",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/run.py",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/PROTOCOL.md",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/export.py",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/verify.py",
+        "src/binary_ecc/curve.rs",
+        "src/binary_ecc/f2m.rs",
+        "src/cryptanalysis/binary_semaev.rs",
+        "src/cryptanalysis/coordinate_search.rs",
+        "src/cryptanalysis/pq_descent.rs",
+        "src/cryptanalysis/pq_descent_symbolic.rs",
+        "src/cryptanalysis/pq_groebner_f2.rs",
+        "src/cryptanalysis/sat.rs",
+        "src/cryptanalysis/semaev_decomp.rs",
+        "src/cryptanalysis/semaev_sat.rs"
+      ],
+      "command": [
+        "bash",
+        "-eo",
+        "pipefail",
+        "-c",
+        "python3 -m py_compile research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/{audit,verify,run,ci_replay}.py\npython3 research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/audit.py --preflight\npython3 research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/ci_replay.py\n"
       ]
     }
   ]
