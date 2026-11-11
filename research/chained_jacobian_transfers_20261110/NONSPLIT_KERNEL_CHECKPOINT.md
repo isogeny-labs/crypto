@@ -1,5 +1,8 @@
 # Non-split kernel/codomain checkpoint and next map plan
 
+This is the kernel-only snapshot. The later operational result and current
+next task are in NONSPLIT_MAP_CHECKPOINT.md and CHECKPOINT.md.
+
 Producer commit cryptanalysis0348e90f0654255917c0d6878168ebbda782ffd5;
 `experiments/chained-transfer-reference/src/nonsplit.rs` SHA-256
 `6ac0dbe9ebe814a5cdb898c3483684a5fb5306845ef08fd4453b363953a3df4c`.

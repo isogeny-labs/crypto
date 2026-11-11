@@ -1,5 +1,9 @@
 # Autoresearcher integration handoff
 
+Latest continuation: NONSPLIT_MAP_CHECKPOINT.md / CHECKPOINT.md. The actual
+fixed F17 non-split map is now implemented; earlier prospective paragraphs
+below are historical snapshots. Vault state remains locked.
+
 Destination: `crypto-autoresearcher` lead atlas, after configured vault access
 is restored. Last inspected commit:
 `8edec422a60d87b2cbc656fb02f99f42eba959c7`. Its `VAULT.md` requires encrypted

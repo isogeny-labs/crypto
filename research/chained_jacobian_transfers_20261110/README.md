@@ -77,3 +77,13 @@ stable targets. The E109 unshifted cover has only a degenerate stable kernel.
 These are unsigned fixture-specific results; actual non-split correspondence
 is CT13b, then a predeclared shifted E109 cover is CT15. No cost result or
 unpolarized-Jacobian nonisomorphism is inferred. [pcc:unverified]
+
+The [operational map checkpoint](NONSPLIT_MAP_CHECKPOINT.md) now supplies the
+actual F17 non-split correspondence and dual. Every285 source/target class
+passes descent, both dual norms[2], bijection and paired additivity; all19
+elliptic scalar/recovery relations pass. Latest native25/reference43 guard
+passes(1 old benchmark ignored). A separate pre-existing flat Fp6 engine
+replays128 field witnesses; that checks the extension layer, not independently
+the whole Jacobian map. CT15 next assesses the frozen shift2 E109 cover.
+Standing unsigned, no demonstrated cost advantage or cross-prime descent.
+[pcc:unverified]
