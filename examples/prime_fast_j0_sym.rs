@@ -143,6 +143,7 @@ fn sym_solve(
     b_size: usize,
     extra: usize,
     seed: u64,
+    summands: u32,
 ) -> Option<(u64, SymStats)> {
     let f = c.f;
     let n = c.n;
@@ -182,6 +183,61 @@ fn sym_solve(
             y: r.y,
         });
     }
+    // 3-summand pair table: canonical x-orbit key of F_i + sigma*phi^m F_j  (i<j, all m, sigma; i==j: m>=1 or doubling)
+    let canon = |x3: u64| -> (u64, usize) {
+        let x1 = f.mul(beta, x3);
+        let x2 = f.mul(beta2, x3);
+        if x3 <= x1 && x3 <= x2 {
+            (x3, 0)
+        } else if x1 <= x2 {
+            (x1, 2)
+        } else {
+            (x2, 1)
+        }
+    };
+    // entries: (key, i, j, m, sigma_neg)
+    let mut ents: Vec<(u64, u32, u32, u8, u8)> = Vec::new();
+    let mut heads: Vec<u32> = Vec::new();
+    let mut next: Vec<u32> = Vec::new();
+    let mut hmask = 0usize;
+    if summands >= 3 {
+        let mut dd = Vec::new();
+        let mut sc = Vec::new();
+        for i in 0..b_size {
+            let fi = reps[i];
+            if let Some(dbl) = c.double(fi) {
+                ents.push((canon(dbl.x).0, i as u32, i as u32, 0, 0));
+            }
+            for j in i..b_size {
+                dd.clear();
+                let ms: &[usize] = if j == i { &[1, 2] } else { &[0, 1, 2] };
+                for &m in ms {
+                    let dx = f.sub(cand[3 * j + m].x, fi.x);
+                    dd.push(if dx == 0 { f.one } else { dx });
+                }
+                f.batch_inv(&mut dd, &mut sc);
+                for (t, &m) in ms.iter().enumerate() {
+                    let qj = cand[3 * j + m];
+                    if f.sub(qj.x, fi.x) == 0 {
+                        continue;
+                    }
+                    let sx = c.add_x_with_inv(fi, qj, dd[t]);
+                    let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[t]);
+                    ents.push((canon(sx).0, i as u32, j as u32, m as u8, 0));
+                    ents.push((canon(dx2).0, i as u32, j as u32, m as u8, 1));
+                }
+            }
+        }
+        let hs = (ents.len() * 2).next_power_of_two().max(16);
+        hmask = hs - 1;
+        heads = vec![u32::MAX; hs];
+        next = vec![u32::MAX; ents.len()];
+        for (e, ent) in ents.iter().enumerate() {
+            let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & hmask;
+            next[e] = heads[h];
+            heads[h] = e as u32;
+        }
+    }
     let ms_fb = t0.elapsed().as_secs_f64() * 1e3;
     let t1 = Instant::now();
     let needed = b_size + extra;
@@ -203,6 +259,7 @@ fn sym_solve(
     let mut inversions = 0u64;
     let mut d = vec![0u64; cand.len()];
     let mut scratch = Vec::new();
+    let mut seen: Vec<Vec<u64>> = Vec::new();
     let max_targets = 50_000_000u64;
     while rows.len() < needed && targets < max_targets {
         targets += 1;
@@ -213,6 +270,7 @@ fn sym_solve(
         f.batch_inv(&mut d, &mut scratch);
         inversions += 1;
         let mut productive = false;
+        seen.clear();
         'scan: for (id, fi) in cand.iter().enumerate() {
             let inv = d[id];
             if f.sub(r.x, fi.x) == 0 {
@@ -222,6 +280,60 @@ fn sym_solve(
             let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
             for (eps, l) in [(1i8, lam_minus), (-1i8, lam_plus)] {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
+                if summands >= 3 {
+                    let (key, sft) = canon(x3);
+                    let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & hmask;
+                    let mut e = heads[h];
+                    while e != u32::MAX {
+                        let ent = ents[e as usize];
+                        e = next[e as usize];
+                        if ent.0 != key {
+                            continue;
+                        }
+                        let (ei, ej, em, sg) =
+                            (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
+                        // P = F_ei + s*phi^em F_ej ; T = +-phi^sft P
+                        let fa = reps[ei];
+                        let fb_ = cand[3 * ej + em];
+                        let fb_ = if sg == 1 { c.neg(fb_) } else { fb_ };
+                        let Some(pp) = c.add(Some(fa), Some(fb_)) else {
+                            continue;
+                        };
+                        let y3 = f.sub(f.mul(l, f.sub(r.x, x3)), r.y);
+                        let tau = if y3 == pp.y { 1i8 } else { -1 };
+                        // terms: eps*cand[id], tau*phi^sft F_ei, tau*s*phi^(sft+em) F_ej
+                        let sgn = |v: i8, neg: bool| if neg { -v } else { v };
+                        let terms = [
+                            (id / 3, id % 3, eps),
+                            (ei, sft, tau),
+                            (ej, (sft + em) % 3, sgn(tau, sg == 1)),
+                        ];
+                        let mut acc: Option<Pt> = None;
+                        for &(ri, kk, sv) in &terms {
+                            let pt = cand[3 * ri + kk];
+                            acc = c.add(acc, Some(if sv > 0 { pt } else { c.neg(pt) }));
+                        }
+                        if acc != Some(r) {
+                            continue;
+                        }
+                        let mut row = vec![0u64; cols];
+                        for &(ri, kk, sv) in &terms {
+                            let cv = if sv > 0 { lams[kk] } else { n - lams[kk] } % n;
+                            row[ri] = fnum.add(row[ri], fnum.to_mont(cv));
+                        }
+                        row[b_size] = fnum.to_mont((n - b % n) % n);
+                        if row[..b_size].iter().all(|&v| v == 0) || seen.contains(&row) {
+                            continue;
+                        }
+                        seen.push(row.clone());
+                        rows.push(row);
+                        rhs.push(fnum.to_mont(a % n));
+                        productive = true;
+                        if rows.len() >= needed {
+                            break 'scan;
+                        }
+                    }
+                }
                 let Some(jid) = tab.get(x3) else { continue };
                 let jid = jid as usize;
                 if jid < id {
@@ -342,8 +454,13 @@ fn main() {
     let bs: Vec<usize> = a[3].split(',').map(|s| s.parse().unwrap()).collect();
     let inst: u64 = a[4].parse().unwrap();
     let extra: usize = a[5].parse().unwrap();
+    let summ: u32 = a.get(6).map(|v| v.parse().unwrap()).unwrap_or(2);
     let mut out = std::fs::File::create(&a[1]).unwrap();
-    for curve_idx in 0..2u64 {
+    let cs: u64 = std::env::var("CSKIP")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    for curve_idx in cs..cs + 2 {
         let (c, g, _n, lam) = find_j0_curve(bits, curve_idx);
         let mut rho_ms = Vec::new();
         for t in 0..10u64 {
@@ -364,18 +481,28 @@ fn main() {
                 let mut rng = StdRng::seed_from_u64(0xA11CE ^ ins ^ c.n ^ bsz as u64);
                 let k = rng.gen_range(2..c.n);
                 let q = c.mul(Some(g), k).unwrap();
-                let sym = sym_solve(&c, g, q, lam, bsz, extra, ins + 1);
+                let sym = sym_solve(&c, g, q, lam, bsz, extra, ins + 1, summ);
                 let t0 = Instant::now();
-                let plain = ic_solve(&c, g, q, 3 * bsz, extra, 2, u64::MAX, ins + 1);
+                let plain = if std::env::var_os("NOPLAIN2").is_some() {
+                    None
+                } else {
+                    ic_solve(&c, g, q, 3 * bsz, extra, 2, u64::MAX, ins + 1)
+                };
                 let plain_ms = t0.elapsed().as_secs_f64() * 1e3;
-                let fbs3 = ((0.5 * (c.f.p as f64).cbrt()).round() as usize).max(8);
+                let fbs3 = ((std::env::var("C3")
+                    .ok()
+                    .and_then(|v| v.parse::<f64>().ok())
+                    .unwrap_or(0.5)
+                    * (c.f.p as f64).cbrt())
+                .round() as usize)
+                    .max(8);
                 let t3 = Instant::now();
                 let p3 = ic_solve(&c, g, q, fbs3, extra, 3, u64::MAX, ins + 1);
                 let p3_ms = t3.elapsed().as_secs_f64() * 1e3;
                 let row = json!({
                     "plain3_ok": p3.as_ref().map(|s| s.0 == k).unwrap_or(false), "plain3_ms": p3_ms, "plain3_fb": fbs3,
                     "curve": c.name, "rho_neg_median_ms": rho1, "p": c.f.p, "n": c.n, "B": bsz, "inst": ins,
-                    "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
+                    "summands": summ, "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
                     "sym_ms": sym.as_ref().map(|s| s.1.ms_total),
                     "sym_fb_ms": sym.as_ref().map(|s| s.1.ms_fb),
                     "sym_collect_ms": sym.as_ref().map(|s| s.1.ms_collect),
