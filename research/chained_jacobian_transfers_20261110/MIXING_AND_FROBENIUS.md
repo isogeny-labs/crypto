@@ -33,7 +33,7 @@ Set `K=g^* f_* : J(C)->J(C)`. Then `K²=g^*(f_*g^*)f_*=0`, so `M=1+K` is an **ab
 `g_* M f^* = (g_*f^*)+(g_*g^*)(f_*f^*)=[4]`,
 `f_* M f^*=[2]`.
 
-Thus the zero natural cross map becomes nonzero following an actual Jacobian-to-Jacobian mixing map. On odd-order torsion `(f_*,g_*)` supplies split-factor coordinates; M has matrix `[[1,0],[2,1]]` and transports `(2P,0)` to `(2P,4P)`. This is **factor rerouting** with no new attack. Require more than nonzero off-diagonal composites to call CT04 useful. This is an elementary application of the known split-Jacobian structure, not a novelty claim.
+Thus the zero natural cross map becomes nonzero following an actual Jacobian-to-Jacobian mixing map. On odd-order torsion `(f_*,g_*)` supplies split-factor coordinates; M has matrix `[[1,0],[2,1]]` and transports `(2P,0)` to `(2P,4P)`. This is **factor rerouting** with no new attack. The shear is an unpolarized abelian-variety automorphism; it is **not** asserted to preserve the Jacobian's canonical principal polarization or to arise from an automorphism of the underlying genus-two curve. That distinction matters when CT04 restricts to Richelot or other polarized correspondences. Require more than nonzero off-diagonal composites to call CT04 useful. This is an elementary application of the known split-Jacobian structure, not a novelty claim.
 
 ## Theorem 3: exact necessary condition from N1 and N2
 
