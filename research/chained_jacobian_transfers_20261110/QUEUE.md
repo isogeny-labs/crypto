@@ -107,3 +107,8 @@ finite-field elliptic-torsion map, **not** a genus-two balanced
 divisor isogeny. Next: match six target branch points to actual
 product four-torsion cosets for both nonsplit Richelot labels,
 then execute full 12,317-class Phi and dual[7] tests.
+
+
+## CT23 — exact rational-product acceptance / cross-factor vanishing (2026-11-11)
+
+**[pcc:unverified]** Independent stdlib Python product-coordinate control on F101 E109 x E113 for both B+A/B+B degree-seven elliptic maps; 12,317/12,317 distinct target product images, full 109/113 component dual[7] checks, 109/109 public order-109 scalar recoveries, CRT idempotents and deliberately wrong E113 target negative check. Coprime rational factor orders imply any cross-factor rational *group* homomorphism vanishes, regardless of geometric Hom over extensions. On rational points, conditional HLP formula Phi_rat(D)=P1 alpha [6159]N0(D) follows from N0P0=[2], but neither P1/N0 nor Phi were constructed as actual genus-2 balanced-divisor maps. Cold BSGS counts across 109 known answers: 1685 EC additions direct and 1685 transported plus 109 rational degree7 map evaluations, excluding field ops/gluing/cost of Phi; **not** a matched complete solver cost. Local python3 -S/py_compile self-check passed; exact-head CI and independent signed PCC remain pending. See CT23_RATIONAL_PRODUCT_CONTROL.md and ct23_rational_product_transport.py on a stacked regular review PR after #3926. Continue actual geometric correspondence and full-class Jacobian replay, then admitted matched costs. No paid work or root frozen-ledger edits.
