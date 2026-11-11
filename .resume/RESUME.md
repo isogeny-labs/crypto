@@ -1,76 +1,101 @@
-# Chained ECDLP Transfers — resume2026-11-11T13:40Z
+# Chained ECDLP Transfers — interruption recovery2026-11-11
 
 ## Goal
-Continue user-authorized autonomous project across crypto,cryptanalysis,
-crypto-autoresearcher,starting cryptoPR3877. Persistent GitHubqueue3904 and
-study QUEUE.md/CHECKPOINT.md are canonical;inspect actual heads/diffs first.
-Prioritize genuine DLP-preserving chains,prime-field maps and actual costs.
+Continue user-authorized autonomous project across crypto,cryptanalysis and
+crypto-autoresearcher from cryptoPR3877. Persistent GitHubqueue3904 and study
+QUEUE.md/CHECKPOINT.md remain canonical. Prioritize actual DLP-preserving
+Jacobian chains,prime-field coefficient descent and complete computational
+costs. Execution workspace is currently unavailable; preserve resume state.
 
 ## Lead / hypothesis
-CT18 closes rational maximal-isotropic3/5 kernels both17/101,also7 at17;
-101ell7 has4 abstract candidates,not an actual map. CT19 now constructs
-fixed101 rational7-isogenies on elliptic factors109/113 using existing
-isogeny_algos engines. CT20 then builds compatible genuine Jacobian7-hop,
-requiring geometric kernel inclusion/global factor proof,not just halving.
-Read CT19_PLAN.md before code. No computational advantage accepted yet.
+CT19 now publishes four actual F101 degree7 elliptic maps/duals on the full
+109/113 groups with separate unchanged Montgomery-engine replay. CT20 must
+glue compatible image2-torsion,prove full geometric2-kernel inclusion and
+factor[2] globally to obtain an actual(7,7) Jacobian map. Rational halving
+alone is insufficient. CT20_PLAN.md is prospective;no gluing test has run.
+The accepted six-cycle targets' next rational Richelot kernels backtrack.
+An actual odd hop is the next technical route,not an accepted advantage.
+[pcc:unverified]
 
 ## Spec
-Crypto study research/chained_jacobian_transfers_20261110/:QUEUE.md,
-CHECKPOINT.md,ODD_KERNEL_CHECKPOINT.md,CT19_PLAN.md,SOURCES_20261111.md.
-Consumer experiments/chained-transfer-reference/ODD_KERNELS.md and frozen
-odd-kernel-proposal-01.txt. New math Rust/Lean only. Keep seven native runtime
-inputs pinned75a737b8366ec6c78ed8672886423fcbe69853a2;separately freeze any
-new existing-engine source closure for CI. No benchmark/paid job before
-successful S3 admission/live IsoLab allowance/capacity.
+Study research/chained_jacobian_transfers_20261110/:
+EMERGENCY_RESUME_20261111.md,CT20_PLAN.md,QUEUE.md,CHECKPOINT.md,
+ODD_KERNEL_CHECKPOINT.md and CT19_PLAN.md.
+Consumer ef9a54259:experiments/chained-transfer-reference/ELLIPTIC_SEVEN.md,
+src/seven.rs,tests/seven_independent.rs,freeze TSV/separate102/five-input
+manifests. Native seven-input pin75a737b8366ec6c78ed8672886423fcbe69853a2
+unchanged. New arithmetic Rust/Lean. No experiment/benchmark/paid job before
+S3 admission and live IsoLab allowance/capacity. [pcc:unverified]
 
 ## State
-Crypto branch research/chained-jacobian-transfer-20261110,PR3877,published
-97e32aadc7b26392832310a9d7f95b3f346e9c90 before pending CT18 checkpoint.
-ActualPRstillDIRTY,frozen ledger diverges after569 shared rows;Copilot
-sync request6789021128 unanswered. Extend3877,no rebase/alternate lineage.
-Consumer75e5064d1d089b917b068e7ca15b124ec0bcae37,readyPR1482,branch
-research/chained-transfer-odd-kernels-20261111. All targeted odd-kernel
-controls/Clippy pass,PCC034bed/afecb5. Original separately authored std-only
-Rust CT16 oracle from closedPR3918/source3a972adb7 compiles unchanged/passes;
-formatting-only integration passes,no producer arithmetic imports/PCCed9aff.
-Full50-unit-plus1-integration CI pending. Prior da66ab9d9 exact-head
-43026964101 passes native25/reference49,one old ignored benchmark;1481
-mergedee3f177b4a2d66544887d0307d5d042aef04f6b4 at13:21:37Z.
-Six new OddKernelProjectors lemmas gate6/PCC8b67e3 pass,total68 written
-lemmas;no finite-field/Picard/odd-isogeny geometry formalized. Standing
-unsigned;localproof pass is not signed verdict. Reports/PDFs inspected.
-Root library attempt04 remains6184pass/13fail/133ignored;restored files fix6,
-five absent archives/two kernel clock causes unresolved. Do not repeat.
-S3 gate exact headings fixed,recheck reaches transport but lacks configured
-AWS profile/checkpoint token. No experiment/benchmark launched. Live budget
+Crypto recovery extendsad10b21a3578dadf2366dbd793ebed2f7aea319a on
+research/chained-jacobian-transfer-20261110,existingPR3877.
+Read actual HEAD. Frozen PCC fork after569 shared rows remains unresolved;
+no alternate lineage/rebase/force/hand-rechain. Copilot sync6789021128 was
+unanswered at last observation. Root library remains6184pass/13fail/133ignored,
+six fixed by tracked restoration,five absent archives/two missing clock causes.
+Global benchrec189 problems/106 historical records;consumer scoped16 passed.
+Do not repeat completed baselines without resolving causes. [pcc:unverified]
+
+Consumer ef9a542598c1b0ebfde03cf27f77929b928391cd,readyPR1483,
+research/chained-transfer-seven-20261111. Focused43038507853 completed
+success14:33:50Z:native25/reference51 unit+two integration passes,one old
+benchmark ignored;source guards/fmt/Clippy pass. Existing consumer claims
+a51d74/beeac7/45f608/2f70a0 unsigned. Requiredstore/gate/records passed;
+last snapshot Rust analysis running,five general jobs failed apt DNS.
+No merge during rescue.1482 merged29c4d7206 after43030710539 success;
+prior1481/1480/1479 merged with original receipts retained. [pcc:unverified]
+
+Workspace became unavailable around14:29UTC. Last patch failed;health
+exec stalled and was terminated. No known local job/solver/allocation
+running. GitHub connector rescued Lean source,root replay harness/fixture,
+plan/queue/checkpoint without changing frozen claims/ledger. Pre-loss
+root PCC7e9547/58dbb8,original receipts/two extra ledger rows were
+uncommitted and remain unavailable. Never recreate them manually.
+Prior68 Lean receipts durable;four recovered helpers need new retained gate
+if originals cannot be restored. See detailed custody notes. [pcc:unverified]
+
+S3 gate exact headings fixed but transport lacks configured AWS profile
+ecc-challenges-new/checkpoint token. No new experiment launched/live budget
 unknown. KB/ecdb unavailable;atlas8edec422a60d87b2cbc656fb02f99f42eba959c7
-AES-SIV locked,noKEY/no plaintext. Use INTEGRATION_HANDOFF.md on unlock.
+AES-SIV locked,noKEY/no plaintext. GitHub rescue is not S3 admission.
+All standing unsigned;no benchmark,solver advantage,cross-prime or novelty
+claim. Reports/diagrams/inspected PDFs are durable upstream. [pcc:unverified]
 
 ## Next steps
-1. Collect1482 exact-head43030710539 native25/reference50-unit-plus1-
-   integration outcome/rawlog before expected-head auto-merge/actual rules.
-2. Publish pending root CT18 checkpoint/update3877/3904;object uploader
-   /workspace/scratch/publish_checkpoint_objects.py accepts exact40hex only,
-   moves no refs;guard connector ref updates,no force. ReadactualHEAD.
-3. CT19_PLAN.md:reuse existing division-polynomial/Kohel crate,freeze source
-   manifest/CI checkout if imported. Exact curve identity/global dualx[7],
-   all109/113 point/group/scalar recovery. Independent kernel replay via
-   existing isogeny_walk Montgomery field/poly. Then CT20 compatible gluing.
-4. Preserve additional CRT projector scalars as queued/unexecuted CT17a;
-   no repeated closed Richelot neighbors or completed full-library run.
+1. Restore usable execution. Inspect actual refs/worktree/index/untracked
+   files before any reset;preserve original pending claims/raw receipts.
+2. Read EMERGENCY_RESUME_20261111.md and CT20_PLAN.md. Check PR1483 on
+   repository cadence,collect exactCI logs/artifacts and current analysis.
+   Merge only when actual requirements permit,with expectedef9 head/merge
+   commit,no bypass;confirm result. Keep crypto3877 blocked.
+3. If originals unavailable,retain fresh outputs for recovered root:
+   cargo test --release --example chained_elliptic_seven_reference -- --nocapture
+   tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/EllipticSeven.lean
+   Then use existing PCC CLI to register FRESH records. Never invent oldIDs.
+4. CT20 first implement four actual image2-torsion gluing inventories with
+   unchanged FpR/genus2::glue;check descent,normalization,quotient component
+   swap/actual isomorphisms and counts. Then global factor/duals,64-lift
+   torsion action,new R1/Psi and full12317/109 controls. No CT20 run yet.
+5. CT17a supplied CRT controls remain optional/unexecuted. Do not reopen
+   already disproved exact-target nonbacktracking Richelot routes.
+[pcc:unverified]
 
 ## Runs in flight
-Only remote focusedCI43030710539 on consumer75e5064d1/PR1482. Checkactual
-status/log,do not infercompletion. No local math/test/solver job remains.
-No benchmark,collector,paid/cloud allocation. Prior object uploadconsumer
-75e5064d1 finished;logs/workspace/scratch/ct-github-odd-kernels-publication-01.txt.
-Root localproofverification8b67e3 finishedpass. Poll on~50min cadence unless
-actual status needed for next publication/merge. Commit state frequently.
+No known local job or paid/cloud allocation. Focused43038507853 is DONE,
+success. Last observed remote Analyze(rust) on ef9 still in progress;
+collect actual status on cadence or next restored session. No background
+research scheduled. FailedgeneralCI job links/excerpts retained in
+study evidence/elliptic-seven-ci-observation.md;S3 archive still owed.
+No newly launched job or successful S3 checkpoint is implied. [pcc:unverified]
 
 ## Stop and success conditions
-Continue next unblocked correctness/proof task after durable checkpoints.
-Accept only actual maps/kernels/duals/descent/nonzero source preservation in
-frozen scope;record negatives/equivalences/failures and exact source custody.
-No signed standing fabricated,frozen ledger rewritten,CI bypass or vault
-plaintext. Benchmark requires S3/livebudgetgate. If interrupted,commit full
-resume state/updateGitHubqueue;rely on CHECKPOINT.md and actual heads.
+Workspace unavailability currently prevents further compilation/proofs/map
+construction;resume after execution returns. User research objective remains
+open. Accept actual kernels/maps/duals/descent/nonzero subgroup preservation,
+preserve negatives/failures and direct elliptic/source controls. Global
+geometry must accompany rational-point tests. No fabricated standing,
+ledger rewrite,review/CI bypass,secret exposure or vault plaintext.
+Benchmark/collector admission and live budget remain separate gates.
+Commit resume state continuously and progress to the next unblocked task.
+[pcc:unverified]
