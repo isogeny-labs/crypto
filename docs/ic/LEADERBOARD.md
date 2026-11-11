@@ -151,24 +151,24 @@ Does `columns = 2` beat the per-curve column count frozen on 2026-10-14 now that
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
-## Table A: Koblitz, one target (§23, re-run at baseline v7)
+## Table A: Koblitz, one target (§23, re-run at main as rule v9 against a matched rho)
 
-- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
-- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).
+- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).
+- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v9 at main, with rule v8's matched rho: batched canonicalisation).
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
 - **Online reading:** The archived online-only ratios compare IC after its reusable set-up with rho as built in that experiment. They do not establish an equal-advice online advantage. Later retained-setup claims were superseded by equal-advice rho controls; see the frontier audit above. The cold rows remain the ranked comparison.
-- **Rho step:** rho's walk as built costs 9.4–10.6 units a step; the canonical step costs 4.2–4.92
+- **Rho step:** rho's walk as built costs 4.65–5.8 units a step; the canonical step costs 2.95–3.33
 
 | curve | log₂ r | recipe | |F| | columns | IC operations | rho operations | S, IC | S, reference | IC / rho | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 5264 | 56 | — | — | 6.03 | 1.76 | **3.43×** (was 4.95×, §23) | 0.129 | 46.6× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7296 | 64 | — | — | 6.37 | 1.6 | **3.97×** (was 1.98×, §23) | 0.117 | 54.2× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6560 | 80 | — | — | 6.63 | 1.4 | **4.74×** (was 8.04×, §23) | 0.138 | 47.9× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 27984 | 264 | — | — | 8.15 | 1.16 | **7.03×** (was 14.7×, §23) | 0.122 | 66.9× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 30208 | 256 | — | — | 7.82 | 1.23 | **6.37×** (was 15.7×, §23) | 0.115 | 67.8× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 39040 | 320 | — | — | 12.4 | 1.08 | **11.5×** (was 31.6×, §23) | 0.113 | 109× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 5264 | 56 | — | — | 4.15 | 1.02 | **4.08×** (was 3.43×, rule v7, rho as then) | 0.129 | 32.1× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7296 | 64 | — | — | 4.38 | 0.926 | **4.73×** (was 3.97×, rule v7, rho as then) | 0.117 | 37.3× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6560 | 80 | — | — | 4.48 | 0.729 | **6.14×** (was 4.74×, rule v7, rho as then) | 0.138 | 32.4× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 27984 | 264 | — | — | 4.42 | 0.593 | **7.46×** (was 7.03×, rule v7, rho as then) | 0.122 | 36.3× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 30208 | 256 | — | — | 4.24 | 0.62 | **6.83×** (was 6.37×, rule v7, rho as then) | 0.115 | 36.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 39040 | 320 | — | — | 5.9 | 0.53 | **11.1×** (was 11.5×, rule v7, rho as then) | 0.113 | 52× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
 
 ## Table B: Prime and random-binary ladder (§18)
 
@@ -240,12 +240,12 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 | table | curve | Reusable set-up | Curve and subgroup | Workflow constructions | Factor base | Pair table | Relations (PDP) | Linear algebra | Descent | Verification |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| A | `icv1-f2m47-t22705043-f4e44623` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
-| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.9% | 0.0% |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.7% | — | — | — | — | — | — | 1.3% | 0.0% |
-| A | `icv1-f2m53-tm56619371-dac20a85` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m59-tm943548413-98844ecc` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m47-t22705043-f4e44623` | 98.9% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m57-tm747311035-c1f545af` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.5% | — | — | — | — | — | — | 1.5% | 0.0% |
+| A | `icv1-f2m53-tm56619371-dac20a85` | 99.4% | — | — | — | — | — | — | 0.6% | 0.0% |
+| A | `icv1-f2m59-tm943548413-98844ecc` | 99.5% | — | — | — | — | — | — | 0.5% | 0.0% |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.4% | — | — | — | — | — | — | 0.6% | 0.0% |
 | B | `icv1-fp10-t5-192cb216` | — | — | — | 5.3% | — | 93.0% | 0.2% | — | 1.5% |
 | B | `icv1-fp12-t19-d4a315df` | — | — | — | 30.2% | — | 68.1% | 0.4% | — | 1.4% |
 | B | `icv1-fp14-tm43-158b6914` | — | — | — | 12.3% | — | 86.5% | 0.1% | — | 1.1% |
@@ -277,12 +277,12 @@ The registry overview below uses current links. Frozen measurement rows retain t
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
 | B | `icv1-fp10-t5-192cb216` | `icv1_fp10_t5_192cb216` | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
 | B | `icv1-fp12-t19-d4a315df` | `icv1_fp12_t19_d4a315df` | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
 | B | `icv1-fp14-tm43-158b6914` | `icv1_fp14_tm43_158b6914` | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
@@ -868,6 +868,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
 - `research/ic_single_target_20260930/analysis.json` — sha256 `109326d7c2882b71…`
 - `research/ic_tool_program/rule/v7/analysis.json` — sha256 `af81dd9ab2879632…`
+- `research/ic_tool_program/rule/v9/analysis.json` — sha256 `5773ba15d4512ebb…`
 - `docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json` — sha256 `2271c4aa5236e2bd…`
 - `research/ecbench_n37_rank_columns_20261004/RESULT.json` — sha256 `f7b950edc74978cb…`
 - `research/ecbench_n37_k8_k16_20261004/DECISION.json` — sha256 `c4a33ffd9045a479…`
