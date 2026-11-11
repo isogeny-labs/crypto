@@ -1,8 +1,9 @@
 //! Explicit fixed Richelot correspondence, Kunzweiler (DCC 2024), Prop. 7–8.
 //! Source factors: x²+1, x²+10x-1, x²-10x-1, in THIS order.
 //! Target coefficients depend on determinant/sign convention; never retwist.
-//! Generic affine support only: unsupported Weierstrass/pole cases return Err.
-//! The complete order-17 elliptic pullback image is tested, including identity.
+//! Exceptional fibers are extended on the smooth projective source: original
+//! infinities, Weierstrass support, and a target infinity in degree-drop fibers.
+//! Invalid inputs are errors; the fixed-field rational class domain is tested.
 
 use super::*;
 type EP = Vec<F2>;
@@ -226,9 +227,6 @@ fn to_chart(u: &[F2], v: &[F2], f: &[F2]) -> Result<ED, &'static str> {
         }
         power = times(&power, &base(&[1, ROOT]));
     }
-    if uu[2] == F2::ZERO {
-        return Err("Richelot fiber meets target base point");
-    }
     let mut vv = vec![F2::ZERO; 4];
     let mut power = base(&[1]);
     for (i, c) in v.iter().enumerate() {
@@ -278,8 +276,71 @@ impl Image {
     }
 }
 
-/// Partial evaluator of a genuine degree-four (2,2)-isogeny.
-/// No source/target DLP solver or scalar is called. Unsupported support is Err.
+fn finite_target_point(z: F2, w: F2, f: &[F2]) -> Result<ED, &'static str> {
+    if z == F2::base(ROOT) {
+        return Err("target Weierstrass base point must be removed as a divisor");
+    }
+    let t = z.minus(F2::base(ROOT)).inverse();
+    ED::new(vec![t.negative(), F2::ONE], vec![w.times(t.power(3))], f)
+}
+fn fiber_image(t: F2, y_cap: F2, f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<ED, &'static str> {
+    if t == F2::ZERO {
+        // x=∞: G1/G2 -> 1, and y/x³ -> y_cap=+/-1.
+        let g1lead = *g[0].last().unwrap();
+        let g2lead = *g[1].last().unwrap();
+        let u = mono(&plus(&times(&h[0], &[g1lead]), &times(&h[1], &[g2lead])));
+        let v = quotient(&times(&h[0], &[g1lead.times(y_cap.inverse())]), &u).1;
+        return to_chart(&u, &v, f);
+    }
+    let x = F2::base(ROOT).plus(t.inverse());
+    let y = y_cap.times(t.power(3).inverse());
+    let g1 = value(&g[0], x);
+    let g2 = value(&g[1], x);
+    if y == F2::ZERO {
+        if g1 == F2::ZERO {
+            return to_chart(&h[1], &[], f);
+        }
+        if g2 == F2::ZERO {
+            return to_chart(&h[0], &[], f);
+        }
+        if value(&g[2], x) == F2::ZERO {
+            // The completed fiber is a hyperelliptic conjugate pair over z=x.
+            // Its class relative to 2W' is zero, not a repeated signed point.
+            return Ok(ED::zero());
+        }
+        return Err("zero-y support outside the source branch locus");
+    }
+    let u = tr(plus(&times(&h[0], &[g1]), &times(&h[1], &[g2])));
+    if u.len() == 2 {
+        // One finite point and one original target infinity. Reducing v mod
+        // the linear finite polynomial alone would silently lose that point.
+        let z = u[0].negative().times(u[1].inverse());
+        let w = g1
+            .times(value(&h[0], z))
+            .times(x.minus(z))
+            .times(y.inverse());
+        let finite = finite_target_point(z, w, f)?;
+        let infinity_y = g1
+            .times(*h[0].last().unwrap())
+            .negative()
+            .times(y.inverse());
+        let infinity = ED::new(base(&[0, 1]), vec![infinity_y], f)?;
+        return Ok(finite.add(&infinity, f));
+    }
+    if u.len() != 3 {
+        return Err("unexpected correspondence fiber dimension");
+    }
+    let u = mono(&u);
+    let v = quotient(
+        &times(&times(&h[0], &[g1.times(y.inverse())]), &[x, F2::base(-1)]),
+        &u,
+    )
+    .1;
+    to_chart(&u, &v, f)
+}
+
+/// Fixed-field evaluator of a genuine degree-four (2,2)-isogeny.
+/// No source/target DLP solver or scalar is called. Invalid inputs are Err.
 pub fn transfer(d: &Divisor) -> Result<Image, &'static str> {
     if !d.valid() {
         return Err("invalid source divisor");
@@ -287,43 +348,49 @@ pub fn transfer(d: &Divisor) -> Result<Image, &'static str> {
     let f = target_f();
     let g = factors();
     let h = dual_factors();
+    Ok(Image(evaluate(&d.u, &d.v, &f, &g, &h)?))
+}
+
+fn evaluate(u: &[i64], v: &[i64], f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<ED, &'static str> {
     let mut result = ED::zero();
-    for t in roots(&d.u)? {
-        if t == F2::ZERO {
-            return Err("source infinity chart not supported by this evaluator");
-        }
-        let x = F2::base(ROOT).plus(t.inverse());
-        let y = eval(&d.v, t).times(t.power(3).inverse());
-        if y == F2::ZERO {
-            return Err("Weierstrass support not supported by this evaluator");
-        }
-        let g1 = value(&g[0], x);
-        let g2 = value(&g[1], x);
-        let u = tr(plus(&times(&h[0], &[g1]), &times(&h[1], &[g2])));
-        if u.len() != 3 {
-            return Err("Richelot affine fiber degree drop");
-        }
-        let u = mono(&u);
-        let v = quotient(
-            &times(&times(&h[0], &[g1.times(y.inverse())]), &[x, F2::base(-1)]),
-            &u,
-        )
-        .1;
-        result = result.add(&to_chart(&u, &v, &f)?, &f);
+    for t in roots(u)? {
+        result = result.add(&fiber_image(t, eval(v, t), f, g, h)?, f);
     }
     // ψ(W)=(H2,0). Subtract deg(D)*ψ(W), not an assumed zero base image.
-    let base_image = to_chart(&h[1], &[], &f)?;
-    result = result.add(&base_image.mul((d.u.len() - 1) as u64, &f).neg(), &f);
+    let base_image = to_chart(&h[1], &[], f)?;
+    result = result.add(&base_image.mul((u.len() - 1) as u64, f).neg(), f);
     if result.u.iter().chain(&result.v).any(|z| z.1 != 0) {
         return Err("image did not descend to F101");
     }
-    Ok(Image(result))
+    Ok(result)
+}
+
+/// Sign-corrected reversed correspondence on the represented target image.
+/// Normalizing the brackets twice recovers G, but swaps (x-z) to (z-x).
+/// Negation restores the dual's positive norm convention.
+pub fn dual(image: &Image) -> Result<Divisor, &'static str> {
+    let (u, v) = image.coefficients();
+    let d = evaluate(&u, &v, &base(&quintic()), &dual_factors(), &factors())?.neg();
+    Divisor::new(
+        d.u.iter().map(|z| z.0).collect(),
+        d.v.iter().map(|z| z.0).collect(),
+    )
 }
 
 /// Coefficients a2,a4,a6 after X=L*z², V=L*y, L=leading(sextic).
 pub fn endpoint() -> (i64, i64, i64) {
     let f = target_sextic();
     (f[4], fp(f[6] * f[2]), fp(f[6] * f[6] * f[0]))
+}
+/// Deduplication control, not used to evaluate the Jacobian correspondence.
+/// Historical degree-two phi after doubling, then the fixed codomain isomorphism.
+pub fn collapsed_endpoint(q: Point) -> Point {
+    phi(ec_mul(q, 2, 0, 0)).map(|(u, v)| {
+        (
+            F2::base(82).times(u).plus(F2::base(60)),
+            F2::base(98).times(v),
+        )
+    })
 }
 pub fn norm(image: &Image, q: Quotient) -> Result<Point, &'static str> {
     let (u, v) = image.coefficients();
@@ -385,6 +452,11 @@ mod tests {
         assert_eq!(determinant(), 40);
         assert_eq!(target_sextic(), vec![41, 0, 9, 0, 9, 0, 41]);
         assert_eq!(endpoint(), (9, 66, 39));
+        let (a, b, c) = endpoint();
+        let disc =
+            fp(a * a * b * b - 4 * b * b * b - 4 * a * a * a * c - 27 * c * c + 18 * a * b * c);
+        assert_ne!(disc, 0, "singular elliptic endpoint");
+        assert_eq!(fp(16 * a * a - 48 * b), 47);
         let f = target_f();
         assert_eq!(f.len(), 6);
         assert_eq!(egcd(f.clone(), derivative(&f)).0, base(&[1]));
@@ -415,6 +487,57 @@ mod tests {
                 );
             }
         }
-        assert!(transfer(&pull(point(-1, 0)).unwrap()).is_err());
+        assert_eq!(
+            transfer(&pull(point(-1, 0)).unwrap()).unwrap(),
+            Image::zero()
+        );
+    }
+
+    #[test]
+    fn every_rational_class_kernel_fibers_and_additivity() {
+        let classes = rational_classes();
+        let mut fibers = std::collections::BTreeMap::new();
+        let translations = [&classes[1], &classes[37], &classes[111]];
+        let mut kernel = 0;
+        for d in &classes {
+            let image = transfer(d).unwrap_or_else(|e| panic!("{e}: {d:?}"));
+            if image == Image::zero() {
+                kernel += 1;
+                assert_eq!(d.mul(2), Divisor::zero());
+            }
+            *fibers.entry(image.coefficients()).or_insert(0_usize) += 1;
+            for h in translations {
+                assert_eq!(
+                    transfer(&d.add(h)).unwrap(),
+                    image.add(&transfer(h).unwrap()),
+                    "{d:?}, {h:?}"
+                );
+            }
+        }
+        assert_eq!(kernel, 4);
+        assert_eq!(fibers.len(), 2601);
+        assert!(fibers.values().all(|n| *n == 4));
+    }
+
+    #[test]
+    fn complete_elliptic_domain_route_deduplication_control() {
+        for q in ec_points() {
+            let via_jacobians = norm(&transfer(&pull(q).unwrap()).unwrap(), Quotient::F).unwrap();
+            assert_eq!(via_jacobians, collapsed_endpoint(q), "source point {q:?}");
+        }
+    }
+
+    #[test]
+    fn dual_norm_and_order_17_point_recovery() {
+        for d in rational_classes() {
+            assert_eq!(dual(&transfer(&d).unwrap()).unwrap(), d.mul(2), "{d:?}");
+        }
+        for k in 0..17 {
+            let q = ec_mul(point(4, 41), k, 0, 0);
+            let image = transfer(&pull(q).unwrap()).unwrap();
+            let back = push(&dual(&image).unwrap(), Quotient::F).unwrap();
+            // norm_f * dual_R * R * pull_f = [4], inverse(4) mod 17=13.
+            assert_eq!(ec_mul(back, 13, 0, 0), q);
+        }
     }
 }
