@@ -18,6 +18,8 @@
 | 22 | 139,372.0 | 164.9 | 0.0012 | 2,354,250 to 75,224 |
 | 23 | 136,795.4 | 189.5 | 0.0014 | 2,336,908 to 76,820 |
 
+**Rounding note (found by `evidence/recompute.py`).** The per-rung trial counts in the table above were printed rounded to integers. Each rung has an even number of pairs, so a median can be a half-integer; at r = 22 the medians are 2,354,250.5 (OLD) and 75,224.5 (NEW), shown above as 2,354,250 and 75,224. The conclusions are unaffected.
+
 Relations collected: 72 (OLD) to 34 (NEW, fb 32 + 2). The trial count falls about 31x (a larger factor base: trials scale like p over fb squared, and 34 rather than 72 relations are collected); the remaining factor is the cost per trial (table lookup instead of a factor-base sweep, and the joint relation point).
 
 **Robustness sample.** NEW alone on 240 fresh instances (seed `e222m221-robust-v1`, generator rungs 12, 14, 16 and 18 with 60 each; the realised subgroup order has 12 to 19 bits), seeds 1, 2, 3: 720 runs, 720 recovered, 0 failures (rule-of-three 95% upper bound 0.42%). The retry never fired in these runs (every run collected exactly fb + 2 relations), so the sample does not exercise it; the unit test below does. Data: `results/default_flip/robust/rows.jsonl`.

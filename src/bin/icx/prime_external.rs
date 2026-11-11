@@ -5,6 +5,9 @@ use crypto_lib::cryptanalysis::ec_index_calculus::{
     ec_index_calculus_dlp_staged, ec_index_calculus_dlp_staged_seeded,
     ec_index_calculus_dlp_staged_seeded_projected, pollard_rho_ecdlp,
 };
+use crypto_lib::cryptanalysis::ic_boundary::{
+    rho_cap, rho_reference_walk, PrimeCurve, PrimePoint, RhoWalk,
+};
 use crypto_lib::ecc::{curve::CurveParams, field::FieldElement, point::Point};
 use num_bigint::BigUint;
 use serde::Deserialize;
@@ -66,6 +69,12 @@ pub struct PrimeArgs {
     /// entry lies in the prime-order subgroup <G>; the default path is unchanged.
     #[arg(long)]
     project_cofactor: bool,
+    /// Run the repository's counted negation-map Pollard rho (the matched reference,
+    /// A = 2) this many times on this very instance, in this process, and report
+    /// its charged group operations and its unpriced counters beside the index
+    /// calculus counters. Zero (default) skips it.
+    #[arg(long, default_value_t = 0)]
+    matched_rho_runs: usize,
 }
 
 #[derive(Args)]
@@ -97,6 +106,12 @@ pub struct PrimeFileArgs {
     /// entry lies in the prime-order subgroup <G>; the default path is unchanged.
     #[arg(long)]
     project_cofactor: bool,
+    /// Run the repository's counted negation-map Pollard rho (the matched reference,
+    /// A = 2) this many times on this very instance, in this process, and report
+    /// its charged group operations and its unpriced counters beside the index
+    /// calculus counters. Zero (default) skips it.
+    #[arg(long, default_value_t = 0)]
+    matched_rho_runs: usize,
 }
 
 #[derive(Deserialize)]
@@ -146,6 +161,7 @@ pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
         route_file: args.route_file.clone(),
         route_id: args.route_id.clone(),
         project_cofactor: args.project_cofactor,
+        matched_rho_runs: args.matched_rho_runs,
     };
     let mut report = solve(&solve_args)?;
     report["operation"] = json!("solve-prime-file");
@@ -339,7 +355,75 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
         "ic": ic.map(|(x, stages)| json!({"scalar": x.to_string(), "stages": stages})),
         "isogeny_route": transported.map(|t| t.receipt),
         "rho": rho,
+        "matched_rho": if args.matched_rho_runs > 0 { Some(matched_rho(args)) } else { None },
     }))
+}
+
+/// The counted negation-map walk (the matched reference, A = 2) run `matched_rho_runs`
+/// times on this instance with distinct walk seeds. Everything is in the unit of the
+/// index-calculus arm: charged group additions and doublings (`gae` = adds + doubles) and
+/// the walk's own unpriced counters, summed over the runs and per run.
+fn matched_rho(args: &PrimeArgs) -> Value {
+    let curve = PrimeCurve {
+        p: args.p,
+        a: args.a,
+        b: args.b,
+    };
+    let g = PrimePoint::affine(args.gx, args.gy);
+    let q = PrimePoint::affine(args.qx, args.qy);
+    let cap = rho_cap(args.n, 64.0);
+    let base = args.seed.unwrap_or(1);
+    let k = args.matched_rho_runs;
+    let mut gaes = Vec::with_capacity(k);
+    let mut steps = Vec::with_capacity(k);
+    let mut all_verified = true;
+    let mut counters: std::collections::BTreeMap<String, u64> = Default::default();
+    let mut method = String::new();
+    for i in 0..k {
+        let seed = base ^ (i as u64 + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        let res = rho_reference_walk(&curve, g, q, args.n, seed, cap, RhoWalk::negation());
+        gaes.push(res.gae);
+        steps.push(res.steps);
+        all_verified &= res.verified;
+        method = res.method.clone();
+        for (name, v) in &res.counters {
+            *counters.entry(name.clone()).or_insert(0) += v;
+        }
+    }
+    let mean = |xs: &[f64]| xs.iter().sum::<f64>() / xs.len().max(1) as f64;
+    let mut sorted = gaes.clone();
+    sorted.sort_by(|x, y| x.partial_cmp(y).unwrap());
+    let median = if sorted.is_empty() {
+        0.0
+    } else if sorted.len() % 2 == 1 {
+        sorted[sorted.len() / 2]
+    } else {
+        (sorted[sorted.len() / 2 - 1] + sorted[sorted.len() / 2]) / 2.0
+    };
+    let per_run: std::collections::BTreeMap<String, f64> = counters
+        .iter()
+        .map(|(n, v)| (n.clone(), *v as f64 / k.max(1) as f64))
+        .collect();
+    // j = 0 or j = 1728 carry automorphisms beyond negation; then this walk is not the matched one.
+    let eligible = if args.a == 0 || args.b == 0 {
+        "NOT MATCHED: a = 0 or b = 0 (extra automorphisms)"
+    } else {
+        "negation only (A = 2): a and b are nonzero; no other automorphism checked"
+    };
+    json!({
+        "method": method,
+        "matched_rho_eligible": eligible,
+        "runs": k,
+        "cap": cap,
+        "all_verified": all_verified,
+        "mean_gae": mean(&gaes),
+        "median_gae": median,
+        "mean_steps": steps.iter().sum::<u64>() as f64 / k.max(1) as f64,
+        "gae_per_run": gaes,
+        "counters_summed": counters,
+        "counters_per_run": per_run,
+        "unit": "gae = group additions + doublings, as in ic rho",
+    })
 }
 
 #[cfg(test)]
@@ -366,6 +450,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         args.p = 272;
         assert!(solve(&args).unwrap_err().contains("prime"));
@@ -394,6 +479,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("docs/ic/fixtures/prime271_isogeny_routes.json");
@@ -429,6 +515,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let report = solve(&args).unwrap();
         assert_eq!(report["input"]["curve_order"], 21);
@@ -456,6 +543,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         assert!(solve(&args).unwrap_err().contains("outside the subgroup"));
         args.qx = 0;
@@ -483,6 +571,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let first = solve(&args).unwrap();
         let second = solve(&args).unwrap();
@@ -504,6 +593,39 @@ mod tests {
     }
 
     #[test]
+    fn matched_rho_runs_on_the_same_instance_and_reports_its_counters() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let input = root.join("docs/ic/fixtures/prime271_target_input_20261023.json");
+        let args = PrimeFileArgs {
+            input,
+            fb_size: 8,
+            extra_relations: 16,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            seed: Some(42),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+            project_cofactor: false,
+            matched_rho_runs: 6,
+        };
+        let report = solve_file(&args).unwrap();
+        let m = &report["matched_rho"];
+        assert_eq!(m["runs"], 6);
+        assert_eq!(m["all_verified"], true);
+        assert!(m["mean_gae"].as_f64().unwrap() > 0.0);
+        assert!(m["counters_summed"]["canonicalisations_uncharged"]
+            .as_u64()
+            .is_some());
+        assert!(
+            report["ic"]["stages"]["counters"]["group_additions"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+    }
+
+    #[test]
     fn prime_target_file_reuses_checked_solver_and_route() {
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
         let input = root.join("docs/ic/fixtures/prime271_target_input_20261023.json");
@@ -518,6 +640,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let report = solve_file(&args).unwrap();
         assert_eq!(report["status"], "complete");
