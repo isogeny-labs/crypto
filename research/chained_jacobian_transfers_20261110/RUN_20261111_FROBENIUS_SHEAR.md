@@ -21,3 +21,6 @@
 ### Errors / blockers
 - Research-KB MCP, atlas vault key, `conductor`, and a full repository checkout were not present. Local container network was not available, so the exact GitHub commit bytes could not be fetched for execution in the container; this limitation is disclosed rather than represented as a clean CI run.
 - Earlier `wc` command returned nonzero because it included `__pycache__/` as a directory, although all preceding Python tests passed; the command failure is unrelated to mathematical tests.
+
+### Additional finished component
+- Added `independent_quad_count.py`, a second algorithm enumerating the entire quadratic-extension square image and evaluating polynomial powers by binomial coefficients. Local equivalent program returned `PASS independent 11 Fp2 counts (10 controls plus shared-r=3 negative case)`. No hidden baseline substitution. GitHub-committed version still needs exact-byte checkout replay and PCC standing. **[pcc:unverified]**
