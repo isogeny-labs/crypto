@@ -207,7 +207,8 @@ fn main() {
                             let t = rng.gen_range(0..m);
                             let u = rng.gen_range(1..n);
                             tgt[l] = t;
-                            off[l] = u;
+                            // the lane is advanced by steps[0] below, so account for it in the offset
+                            off[l] = addm(u, steps[0].0, n);
                             cur[l] = c.add(c.mul(Some(g), u), Some(qs[t]));
                             sel[l] = Some(steps[0].1);
                             continue;
