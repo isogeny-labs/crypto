@@ -19,6 +19,11 @@ STUDY = ROOT / "research/n83_candidate_pdp_20261028"
 VARIANTS = STUDY / "evidence/n83-factorbase-variants"
 CHAIN_SUMMARY = STUDY / "evidence/chain-exact/verified-summary.json"
 OUT = Path(__file__).resolve().parent / "coordinate-basis-dreg-map.json"
+R38_ATTEMPT = VARIANTS / "r38-attempt-01/top-form-20261105T1840Z-attempt-09"
+R38_REPLAY = R38_ATTEMPT / "replay-summary.json"
+R38_INDEX = R38_ATTEMPT / "S3_PERSISTENCE_INDEX.json"
+R38_RECONCILIATION = R38_ATTEMPT / "ATTEMPT-09-RECONCILIATION.json"
+R38_READBACK = R38_ATTEMPT / "RESULTS-S3-READBACK.json"
 N = 83
 ELL = 27
 FAMILIES = ("koblitz", "binary", "prime")
@@ -116,6 +121,33 @@ def main() -> None:
         if not row.get("verified") or row.get("dreg_exact") != expected:
             raise ValueError(f"chain-exact reference does not match formula: {row['key']}")
 
+    top_replay = load_json(R38_REPLAY)
+    top_index = load_json(R38_INDEX)
+    top_reconciliation = load_json(R38_RECONCILIATION)
+    top_readback = load_json(R38_READBACK)
+    if len(top_replay.get("rows", [])) != 48 or not top_replay.get("all_verified"):
+        raise ValueError("spike38 top-form replay is not complete and verified")
+    if not top_reconciliation.get("fresh_replay_all_verified"):
+        raise ValueError("spike38 top-form reconciliation lacks fresh replay verification")
+    if not top_reconciliation.get("s3_indexed_objects_byte_identical"):
+        raise ValueError("spike38 top-form S3 object readback did not match")
+    if not top_readback.get("all_byte_identical") or top_readback.get("failures"):
+        raise ValueError("spike38 top-form byte readback is not clean")
+    if top_readback.get("objects_checked") != top_reconciliation.get("s3_indexed_object_count"):
+        raise ValueError("spike38 top-form readback object count mismatch")
+    top_index_by_path = {row["path"]: row for row in top_index["files"]}
+    top_rows = {}
+    for row in top_replay["rows"]:
+        key = (row["family"], int(row["m"]), row["target_kind"])
+        if key in top_rows:
+            raise ValueError(f"duplicate spike38 top-form result: {key}")
+        cert_rel = f"top-certificates/{row['certificate']}"
+        cert_entry = top_index_by_path.get(cert_rel)
+        cert_path = R38_ATTEMPT / cert_rel
+        if not cert_entry or not cert_path.is_file() or sha256(cert_path) != cert_entry.get("sha256"):
+            raise ValueError(f"spike38 top-form certificate is not bound by its index: {key}")
+        top_rows[key] = (row, cert_entry)
+
     bases = []
     cases = []
     for bit in range(27, 40):
@@ -198,6 +230,24 @@ def main() -> None:
                         if key[0] == candidate and key[1] == family and key[2] == m and key[3] == target
                     ), None)
                     theorem_value = N * (m - 2) + ELL + 1 if family in ("koblitz", "binary") and m >= 3 else None
+                    saved_top_form = None
+                    if candidate == "spike38" and (family, m, target) in top_rows:
+                        top_row, cert_entry = top_rows[(family, m, target)]
+                        saved_top_form = {
+                            "result_status": top_row["status"],
+                            "dreg_lower_bound": top_row.get("dreg_lower_bound"),
+                            "dreg_upper_bound": top_row.get("dreg_upper_bound"),
+                            "source_sha256": top_row.get("source_sha256"),
+                            "factor_base_manifest_sha256": top_row.get("factor_base_manifest_sha256"),
+                            "certificate_path": (R38_ATTEMPT / f"top-certificates/{top_row['certificate']}").relative_to(ROOT).as_posix(),
+                            "certificate_sha256": cert_entry["sha256"],
+                            "replay_summary_sha256": sha256(R38_REPLAY),
+                            "s3_object_readback_verified": True,
+                            "lower_bound_matches_conditional_formula": (
+                                theorem_value is not None
+                                and top_row.get("dreg_lower_bound") == theorem_value
+                            ),
+                        }
                     cases.append({
                         "candidate_id": candidate,
                         "coordinate_bit": bit,
@@ -210,6 +260,7 @@ def main() -> None:
                         "theorem_value_if_chain_hypotheses_hold": theorem_value,
                         "dreg_exact_for_this_candidate": None,
                         "candidate_source_shape_status": "not_verified_by_chain_exact_parser",
+                        "saved_top_form_result": saved_top_form,
                         "status": (
                             "conditional_theorem_projection_not_measurement"
                             if theorem_value is not None
@@ -239,6 +290,19 @@ def main() -> None:
             "exact_dreg_values_by_m": {
                 str(m): N * (m - 2) + ELL + 1 for m in range(3, 10)
             },
+        },
+        "saved_top_form_reference": {
+            "attempt_path": R38_ATTEMPT.relative_to(ROOT).as_posix(),
+            "attempt_reconciliation_sha256": sha256(R38_RECONCILIATION),
+            "replay_summary_sha256": sha256(R38_REPLAY),
+            "s3_persistence_index_sha256": sha256(R38_INDEX),
+            "s3_readback_receipt_sha256": sha256(R38_READBACK),
+            "verified_case_count": len(top_rows),
+            "fresh_replay_all_verified": top_reconciliation["fresh_replay_all_verified"],
+            "s3_indexed_objects_byte_identical": top_reconciliation["s3_indexed_objects_byte_identical"],
+            "s3_objects_checked": top_readback["objects_checked"],
+            "s3_bytes_checked": top_readback["total_bytes_checked"],
+            "claim_scope": "Dreg intervals or positive-dimensional original-top ideals; not exact candidate Dreg, FFD, LFD, affine solving degree, or attack cost",
         },
         "candidate_base_count": len(bases),
         "candidate_case_count": len(cases),

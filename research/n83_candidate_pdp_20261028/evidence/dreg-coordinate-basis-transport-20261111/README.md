@@ -15,11 +15,18 @@ and 609 for `m=3..9` respectively.
 The generated map records candidate coordinate-bit bases spike27 through
 spike39, available family manifests, and saved case metadata. For binary and
 Koblitz `m>=3`, it records the value implied **if** each concrete candidate
-system satisfies the chain theorem's hypotheses. Candidate-specific exact Dreg
-fields remain null because these candidates were not passed through the
-chain-exact source parser. Prime and `m=2` rows are explicitly outside this
-theorem's scope. Missing local manifests or case inputs are marked as missing;
-they are not interpreted as proof that no S3 object exists.
+system satisfies the chain theorem's hypotheses. It also joins all 48 saved
+spike38 top-form records. For all 28 Koblitz/binary `m=3..9` cases, the
+verified lower bound equals the conditional formula value; the corresponding
+upper bounds are 165, 275, 385, 495, 605, 715 and 825. The other 14 spike38
+cases (`prime`, `m=3..9`, both targets) have positive-dimensional top ideals.
+The run's fresh replay passed, and S3 readback matched all 584 indexed objects
+(1,447,312,183 bytes). These are bounds and positive-dimension results, not
+exact candidate Dreg values. The spike38 top-form parser is not the chain-exact
+parser, so it does not by itself certify all hypotheses needed to apply the
+chain theorem to these concrete systems. Prime and `m=2` rows are explicitly
+outside the theorem's scope. Missing local manifests or case inputs are marked
+as missing; they are not interpreted as proof that no S3 object exists.
 
 The next evidence needed for a case-specific conclusion is a strict source
 parse and certificate binding for each candidate's actual top forms, followed

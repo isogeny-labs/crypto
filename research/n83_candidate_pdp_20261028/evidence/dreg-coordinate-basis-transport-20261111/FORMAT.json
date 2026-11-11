@@ -4,7 +4,7 @@
   "generator": "build_dreg_coordinate_basis_map.py",
   "records": {
     "bases": "One row per requested coordinate-bit candidate and curve family. Includes available point-manifest byte hash, point count, and hashes/paths for saved case input metadata.",
-    "cases": "One row per candidate, family, m=2..9, and target kind. theorem_value_if_chain_hypotheses_hold is conditional for binary/Koblitz m>=3; dreg_exact_for_this_candidate is deliberately null because no matching chain-exact certificate was produced for these candidate sources.",
+    "cases": "One row per candidate, family, m=2..9, and target kind. theorem_value_if_chain_hypotheses_hold is conditional for binary/Koblitz m>=3. saved_top_form_result joins the existing spike38 replayed interval/positive-dimension record and its indexed S3 certificate hash. dreg_exact_for_this_candidate is null because no candidate-specific exact chain-Dreg certificate was produced.",
     "reference_certificate": "The existing 84-row chain-exact result is bound by file SHA-256 and listed separately from candidate projections."
   },
   "missing_values": {
@@ -15,7 +15,7 @@
   "hashes": "SHA-256 is over exact local file bytes. Source paths are relative to the repository root.",
   "limitations": [
     "This file is a derived theorem-application/coverage map, not a new measurement.",
-    "Candidate-specific top-form source-shape parsing is not established here.",
+    "The saved spike38 top-form instrument replay is verified, but its parser is not the chain-exact parser and does not by itself establish all chain-theorem hypotheses.",
     "The formula does not establish FFD, LFD, affine solving degree, prime-field transfer, or end-to-end attack cost.",
     "Full algebraic formalization and independent scientific review remain pending."
   ]
