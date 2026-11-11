@@ -211,6 +211,9 @@ def verify_chart(name, A, B, b, scale):
         assert on_curve(even_Q, *long_even)
         assert on_curve(even_R, *long_even)
         assert ec_add(even_Q, even_R, *long_even) is None
+        # Deliberately corrupt the EVEN quotient coefficient on the same
+        # actual support point: because r=b/U != 0, it must fail.
+        assert not on_curve(even_Q, A, (B+1) % P, b)
         # Closed degree-2 divisor invariant under Frobenius.
         tfr = fpow(t, P)
         yfr = fpow(y, P)
@@ -224,10 +227,6 @@ def verify_chart(name, A, B, b, scale):
         checked += 1
     assert checked == 109
     assert kinds == {'split': 58, 'nonsplit': 48, 'ramified_infinity': 2, 'zero': 1}, kinds
-    # Negative control: an incorrect even-quotient coefficient rejects a
-    # nonzero fiber (prevents a self-fulfilling norm cancellation).
-    assert any(not on_curve((ff(r), ff(0)), A, (B+1) % P, b)
-               for r in range(1, P))
     print(name, '109/109 points; reciprocal norm [2]; even cross norm 0;',
           'Fp2 Frobenius descent;', kinds)
 
