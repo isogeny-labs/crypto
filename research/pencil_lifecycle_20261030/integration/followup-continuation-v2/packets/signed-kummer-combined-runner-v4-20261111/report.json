@@ -1,0 +1,34 @@
+{
+  "schema": "research.source-packet/v1",
+  "title": "Combined qualification v4 lifecycle successor",
+  "status": "source_only_unexecuted",
+  "task": "T-2147",
+  "changes": "Allows the private target directory to be absent only while the materialize command is creating it; every later phase still requires the target, and any existing target must be a real directory.",
+  "compiler_runs": 0,
+  "tests_run": 0,
+  "lock_generation_runs": 0,
+  "payload_runs": 0,
+  "cost_ratio_to_rho": null,
+  "actual_locks": {
+    "driver": "41829631b1c402e6bec2ea0c91327d557d5160bcb71b92bd10d8eba82ecfdde3",
+    "adapter": "0748a4bcf82a638dc393117a9256b828bd1a5b21f32972962abc29184d9ff6a1"
+  },
+  "review_findings_addressed": [
+    "v3 target-directory startup race"
+  ],
+  "staged_source_count": 50,
+  "pending": [
+    "independent v4 source review",
+    "source publication",
+    "post-pivot current ledger",
+    "live owner and serial reconciliation",
+    "new release and final binding"
+  ],
+  "observations": [
+    "V3 failed before materialization, compilation, or tests: its monitor raised FileNotFoundError on the not-yet-created cache/target and killed the child after 0.11502473399741575 seconds.",
+    "The v3 source, terminal evidence, and full 2400-second campaign charge remain unchanged.",
+    "All panel geometry, source inputs, exact tests, resource caps, deadlines, and no-retry policy remain unchanged."
+  ],
+  "version": 4,
+  "source_review_pending": true
+}

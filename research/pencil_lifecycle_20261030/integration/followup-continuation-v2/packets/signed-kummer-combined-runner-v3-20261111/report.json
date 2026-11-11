@@ -1,0 +1,38 @@
+{
+  "schema": "research.source-packet/v1",
+  "title": "Combined qualification successor",
+  "status": "source_only_unexecuted",
+  "task": "T-2116",
+  "changes": "Adds the omitted driver-controls.rs, authenticates emitted trace headers, and compiles the adapter through its standalone workspace with its own actual lock. V3 parses the actual Record sequence/event envelope and updates identity rejection fixtures.",
+  "compiler_runs": 0,
+  "tests_run": 0,
+  "lock_generation_runs": 0,
+  "payload_runs": 0,
+  "cost_ratio_to_rho": null,
+  "actual_locks": {
+    "driver": null,
+    "adapter": null
+  },
+  "review_findings_addressed": [
+    "F1",
+    "F2-R1",
+    "F3"
+  ],
+  "staged_source_count": 50,
+  "pending": [
+    "independent source review",
+    "actual generated driver and adapter locks",
+    "published input and lock readback",
+    "absolute UTC deadline",
+    "live owner and ledger",
+    "fresh cache and current release receipts",
+    "current campaign authorization receipt for 129600 seconds and 2026-11-11T12:00:00Z"
+  ],
+  "observations": [
+    "The header-write fault intentionally emits zero bytes; identity is unavailable for that expected prefix. Other traces require exact revision, source digest, workload and run identity.",
+    "Previous packets and failed attempts are unchanged.",
+    "The stale 43200-second campaign constant is corrected to the authorized 129600 seconds; actual prior and remaining worker time remain unbound until the final ledger."
+  ],
+  "version": 3,
+  "source_review_pending": true
+}

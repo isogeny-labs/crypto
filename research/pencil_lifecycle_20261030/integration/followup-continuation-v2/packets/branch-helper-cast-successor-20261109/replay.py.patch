@@ -1,0 +1,54 @@
+--- helper/replay.py
++++ cast-successor/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-branch-helper-20261109')
++W=Path('/home/ec2-user/pencil-native-branch-helper-cast-20261109')
+ ABSOLUTE_DEADLINE=1794287499  # 2026-11-10T05:11:39Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+@@ -12,7 +12,7 @@
+ # Reject repeat attempts before entering receipt-writing cleanup, preserving prior receipts.
+ if (mode=='pre' and W.exists()) or (W/(mode+'.started')).exists():
+  raise SystemExit('existing workspace/phase attempt; no retry, original evidence preserved')
+-start=time.monotonic();limit=600 if mode=='compiler' else 900;work=limit-20
++start=time.monotonic();limit=240 if mode=='compiler' else 180;work=limit-20
+ progress['phase']=mode
+ resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+ resource.setrlimit(resource.RLIMIT_STACK,(10*1024**2,10*1024**2))
+@@ -32,7 +32,7 @@
+ def boundary():
+  checkpoint()
+  assert time.time()<ABSOLUTE_DEADLINE,'absolute deadline'
+- assert campaign_start is None or time.monotonic()-campaign_start<2380,'campaign work deadline'
++ assert campaign_start is None or time.monotonic()-campaign_start<580,'campaign work deadline'
+  assert not pending,'pending signal'
+  assert time.monotonic()-start<work,'work deadline'
+ def sha(p):
+@@ -107,7 +107,7 @@
+  if mode=='pre':
+   W.mkdir(mode=0o700);OWNED=True
+   campaign_start=start
+-  durable(W/'campaign-start.json',{'monotonic':start,'absolute_deadline':ABSOLUTE_DEADLINE,'total_seconds':2400})
++  durable(W/'campaign-start.json',{'monotonic':start,'absolute_deadline':ABSOLUTE_DEADLINE,'total_seconds':600})
+  assert W.is_dir() and not W.is_symlink()
+  marker=W/(mode+'.started');fd=os.open(marker,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600);os.close(fd)
+  OWNED=True
+@@ -210,13 +210,13 @@
+    remains=group_members(child.pid)
+    if remains:errors.append('remaining group '+repr(remains))
+   except BaseException as e:errors.append('cleanup '+repr(e))
+- if errors or pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=2400):status='failed'
++ if errors or pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=600):status='failed'
+  result={'phase':mode,'status':status,'errors':errors,'pending_signals':pending,'elapsed_seconds':time.monotonic()-start,'commands':rows,'compiler_invocations':len(rows),'workspace':str(W),'dependency_files_declared':16736,'dependency_bytes_declared':3111892318,'checked_dependency_files':progress['checked_files'],'checked_dependency_bytes':progress['checked_bytes'],'hash_progress':dict(progress),'machine_review_complete':False,'post_custody_required':True,'scientific_execution':False,'independent_binary_kernel_rechecker':False,'trust':'Pinned shared caches; pre/post checks do not exclude transient concurrent changes.'}
+  try:
+   if not OWNED:raise RuntimeError('workspace/phase not owned; no receipt overwrite')
+   checkpoint(force=True)
+   durable(W/(mode+'-receipt.json'),result)
+-  if pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=2400):
++  if pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=600):
+    status='failed';result['status']='failed';result['late_boundary_failed']=True;durable(W/(mode+'-receipt.json'),result)
+  except BaseException as e:status='failed';print('receipt failure '+repr(e),file=sys.stderr)
+  print(json.dumps(result));sys.exit(0 if status=='passed' else 1)

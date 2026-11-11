@@ -1,0 +1,27 @@
+{
+  "schema": "source-fidelity-review/v1",
+  "status": "changes_requested",
+  "source_packet": "affine-mul-runner-20261109",
+  "freeze_sha256": "1aab560b1af9c37bb0f462ed98215f3f78b4d88ee23aea6432b5d44ddd6a5d5d",
+  "execution_performed": false,
+  "checks": [
+    "All freeze file hashes matched;136 unique modules have exact source/import-list agreement and a valid topological order under the proposed11 external imports.26 target names retained.",
+    "The runner stages source exclusively just before compilation, preserving distinct historical prerequisite selection. Positive modules reject sorry and missing artifacts; negative rejection requires a single False goal.",
+    "The9000-second shared compiler cap bounds136calls despite120-second per-module caps; total10800,1CPU8GiB/no swap,one attempt and inherited owner cleanup remain intact. Null ledger and false release remain prospective.",
+    "Finding A1: The proposed NatClassifier import replacement removes the explicit Field (ZMod p) instance provider. ZMod.Basic explicitly asserts Field absent; classifySameU22 is declared under [Field K]. The removed Mathlib.Algebra.Field.ZMod defines the required instance. Exact external transitive metadata is being checked for any incidental provider. Retain original NatClassifier import and stage/compile the exact1106-byte Field.ZMod source before NatClassifier, using actual nested module paths; its two imports are already bound. Preserve body and count the additional call.",
+    "The transitive .ilean metadata traversal was stopped after slow filesystem reads. No claim is made that every incidental instance path was excluded. The explicit source-level instance obligation remains unresolved by the proposed import replacement."
+  ],
+  "findings": [
+    {
+      "id": "A1",
+      "severity": "blocking_source_dependency",
+      "detail": "The proposed NatClassifier import replacement removes the explicit Field (ZMod p) instance provider. ZMod.Basic explicitly asserts Field absent; classifySameU22 is declared under [Field K]. The removed Mathlib.Algebra.Field.ZMod defines the required instance. Full incidental transitive-provider exclusion was not completed; this is an unresolved explicit instance binding, not an observed compiler failure.",
+      "repair": "Retain original NatClassifier import and stage/compile the exact1106-byte Field.ZMod source before NatClassifier, using actual nested module paths; its two imports are already bound. Preserve body and count the additional call."
+    }
+  ],
+  "remaining": [
+    "Review the corrected finite packet with the original NatClassifier import and exact field-instance source; no runtime admission is granted."
+  ],
+  "kb": "KB unavailable; exact retained source closure and pinned Mathlib declarations used.",
+  "trust": "Source-only review; no elaboration or payload execution."
+}

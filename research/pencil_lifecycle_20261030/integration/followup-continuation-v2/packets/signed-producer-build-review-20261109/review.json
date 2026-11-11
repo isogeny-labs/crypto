@@ -1,0 +1,49 @@
+{
+  "schema": "source-review/v1",
+  "status": "source_review_completed_no_remaining_blocking_source_finding",
+  "execution_performed": false,
+  "reviewer": "materializer_qualification",
+  "scope": "Concrete unchanged28 signed plus7 Labels build containment; excludes new driver successor",
+  "checks": [
+    "Fresh private workspace owner marker; no existing source/cache or automatic retry accepted.",
+    "All mutable cache files copied independently, exact source overlays and private membership verified; donor vendor/toolchain read-only in service.",
+    "2400 seconds total; staging and compile share 1800; worker and same-invocation supervisor only shorten deadline to 600 seconds after build.",
+    "Root-library Cargo JSON selects one test executable from exact private source target; executable hash checked before each exact test and afterwards.",
+    "Signed acceptance requires exact28 panel rows plus final completed28 after faults and positive identity/duplicate counts. Labels acceptance requires exact7 named rows.",
+    "Source hash in trace environment now binds full patched expected-source-manifest; canonical revision is explicitly base provenance.",
+    "Admission remains false with fresh post-v4 cache, ledger, lease, review, publication and serial terminal receipts pending.",
+    "Success-path post-input custody is distinct from failure paths that do not reach that check."
+  ],
+  "resolved_findings": [
+    {
+      "finding": "Trace source hash used base file instead of patched source identity",
+      "resolution": "Worker uses verified admission source_manifest_sha256; base provenance retained separately."
+    },
+    {
+      "finding": "Post-custody prose overstates early-failure verification",
+      "resolution": "PLAN now states success-path post-custody only; failures before check retain unknown."
+    }
+  ],
+  "limits": {
+    "total_seconds": 2400,
+    "build_seconds": 1800,
+    "execution_seconds": 600,
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "swap_bytes": 0,
+    "attempts": 1
+  },
+  "observations": [
+    "No runtime fit, cache hit or compiler success established by source review.",
+    "New offline lock-generation gate is separate; changes to build inputs require a new exact binding review."
+  ],
+  "files": {
+    "durable-worker.py": "6044e6a04b51dc974bd31c6644f669c0ea716cd9ca869d0e5b8ce5e676fcb5f9",
+    "durable-launcher.py": "765ea9c12c3c9ee953af664f679092a4e0bc202dafed04a7f4d7c7e86604747c",
+    "durable_io.py": "1eaaadf4028fab2bbaafecc228e3fbdc1411c8d94e77718417a7cef53ae685b6",
+    "materialize.py": "8c5cfcc419a71b7b25f75924e904de01fa4fe37d0db191f7fc050f1119d1b689",
+    "expected-source-manifest.json": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+    "commands.json": "fcce383eb95e19edf6e4752f6fc7e09b2721db850e172b8e74b97d7fc9e0ab88"
+  },
+  "producer_manifest_sha256": "90cf6efd1ff2714316b151e8909e55232818a08a0a1813ed8a8134caf3f1be58"
+}

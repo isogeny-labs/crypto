@@ -1,0 +1,42 @@
+{
+  "status": "generated_pending_publication",
+  "compile_invoked": false,
+  "network_allowed": false,
+  "locks": {
+    "driver": {
+      "sha256": "41829631b1c402e6bec2ea0c91327d557d5160bcb71b92bd10d8eba82ecfdde3",
+      "bytes": 2952,
+      "path": "/var/tmp/pencil-kummer-lock-v4-20261111/driver.Cargo.lock"
+    },
+    "adapter": {
+      "sha256": "0748a4bcf82a638dc393117a9256b828bd1a5b21f32972962abc29184d9ff6a1",
+      "bytes": 2999,
+      "path": "/var/tmp/pencil-kummer-lock-v4-20261111/adapter.Cargo.lock"
+    }
+  },
+  "resolutions": [
+    {
+      "workspace": "driver",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "generate-lockfile",
+        "--offline",
+        "--manifest-path",
+        "/var/tmp/pencil-kummer-lock-v4-20261111/source/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/Cargo.toml"
+      ],
+      "exit_code": 0
+    },
+    {
+      "workspace": "adapter",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "generate-lockfile",
+        "--offline",
+        "--manifest-path",
+        "/var/tmp/pencil-kummer-lock-v4-20261111/source/research/pencil_large_prime_20261029/Cargo.toml"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "elapsed_seconds": 0.8692167460103519
+}

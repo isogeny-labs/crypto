@@ -1,0 +1,22 @@
+{
+  "schema": "pencil.proof-source-review/v1",
+  "recorded_utc": "2026-11-11T00:59:04.325961+00:00",
+  "status": "source_correction_supported_pending_native_elaboration",
+  "freeze_sha256": "42323cde9765941299c571192bcfe7be807b030f6f7b3583c60e8148bd8fb736",
+  "manifest_sha256": "a91757316d6df902edfb52251aba9a4abcc8442cb5414b02a7ac55044256e435",
+  "proof_delta": "Only equal-row branch split into i=a and i!=a; positive case substitutes i then unfolds swapIndex, negative case simplifies each identical guard with hi.",
+  "statement_and_hypotheses_unchanged": true,
+  "controls_and_readbacks_unchanged": true,
+  "calls": 5,
+  "readback_names": 17,
+  "phase_caps_seconds": [
+    900,
+    600,
+    900
+  ],
+  "actual_ledger_binding_pending": true,
+  "runtime_executed": false,
+  "prior_failure_preserved": true,
+  "source_fidelity_scope": "Finite4 index swap involution and existing downstream use; no runtime mutation equivalence added.",
+  "review_note": "Initial automated replacement comparison expected semicolon formatting, stopped; exact original newline comparison then matched."
+}

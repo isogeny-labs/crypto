@@ -1,0 +1,29 @@
+{
+  "schema": "independent.operational-binding-review/v1",
+  "status": "bindings_checked_pending_publication_of_final_binding_and_review",
+  "release_sha256": "e8d862e9aeae60da6e93439ae8ff28e40991a530c1f6f9670317e6ca25e07679",
+  "source_manifest_sha256": "5a397fabe926d50bd1973153a988ba68006a96eb1f6e829784f0bd536698e834",
+  "receipt_hashes": {
+    "execution-command.json": "0a6fef922096fc7c383ef76ee726138633a8d5d3d08e6c1d409416fce6adf222",
+    "source-review.json": "33b508e9aeb1ddbb6d223198ebcad5daf672a763205702b1be66068ea9782261",
+    "lease.json": "346143035740191ba45fd2c8e46676fb1a762e0b740bb0c5e2e366f766c78c75",
+    "publication.json": "4ef0b9a603105cc07ab1cfca553b1bd03b35079e8c3bf58ebb9c0563d54e664e",
+    "serial-terminal.json": "6432b48cb10cd16fad83a3bc579e857dfc9a4fe8717f3a0cde32877dc92ba83c",
+    "current-ledger.json": "f89c42fd72f00441f5f0f830dd2457d27e8f349dfaec9ea95b8e4383741ea139"
+  },
+  "checks": [
+    "Exact source and release hashes match.",
+    "Exact 59-second caller plus one-second kill allowance matches the 60-second reservation.",
+    "Ledger 3660 charged + 60 reserved + 125880 unreserved = 129600; release prior3660/remaining125940 match.",
+    "Current Conductor task claimed with exact fence and unexpired lease.",
+    "Fresh workspace absent and native unit not found.",
+    "Current remote branch equals published source commit 69223bade475ad92f994c80bf3c20b50e5ce0856.",
+    "Source manifest members unchanged; independent source review pinned."
+  ],
+  "remaining": [
+    "Publish final release and this review before launch.",
+    "Refresh live lease immediately before and during the single attempt."
+  ],
+  "execution_performed": false,
+  "observed_utc": "2026-11-11T01:06:11.860307+00:00"
+}

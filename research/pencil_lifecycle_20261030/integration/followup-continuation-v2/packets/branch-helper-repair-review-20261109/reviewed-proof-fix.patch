@@ -1,0 +1,38 @@
+--- previous/BranchRootMultiplicity.lean.txt
++++ candidate/BranchRootMultiplicity.lean.txt
+@@ -83,7 +83,7 @@
+   have hunit : IsUnit (e t) := (polynomial_germ_unit_iff a3 a2 a1 a0 a hroot t).mpr ht
+   have hvunit : v (e t)=0 := IsDiscreteValuationRing.addVal_eq_zero_iff.mpr hunit
+   have hx : e (X-C a)=projectiveXSubA a3 a2 a1 a0 a hroot := by
+-    simpa only [BranchNormTransport.E, Polynomial.coe_eval₂RingHom,
++    simpa only [e, BranchNormTransport.E, Polynomial.coe_eval₂RingHom,
+       Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C] using
+       projectiveX_sub_scalar a3 a2 a1 a0 a hroot
+   have hxorder : v (e (X-C a))=2 := by
+@@ -98,7 +98,7 @@
+       rw [AddValuation.map_mul, AddValuation.map_pow]
+     _ = (g.rootMultiplicity a : ℕ∞)*2 := by
+       rw [hxorder,hvunit,add_zero]
+-      simp only [nsmul_eq_mul]
++      simp only [nsmul_eq_mul, m]
+ 
+ theorem polynomial_germ_order_nat (a3 a2 a1 a0 a : K)
+     (hroot : fAt a3 a2 a1 a0 a = 0)
+@@ -115,7 +115,8 @@
+   have h := polynomial_germ_order a3 a2 a1 a0 a hroot hsimple g hg
+   constructor
+   · rw [h]
+-    simp
++    change ((g.rootMultiplicity a * 2 : ℕ) : ℕ∞) ≠ ⊤
++    exact ENat.natCast_ne_top _
+   · rw [h,ENat.toNat_mul]
+     simp [mul_comm]
+ 
+@@ -143,6 +144,7 @@
+   have hU : U ≠ 0 := by
+     intro hz
+     simp [hz] at hs
++  dsimp only at hs
+   rw [polynomial_germ_order a3 a2 a1 a0 a hroot hsimple u1 hu1,
+     polynomial_germ_order a3 a2 a1 a0 a hroot hsimple u2 hu2,
+     polynomial_germ_order a3 a2 a1 a0 a hroot hsimple U hU] at hs

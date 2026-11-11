@@ -1,0 +1,56 @@
+{
+  "schema": "bounded-software-qualification-draft/v1",
+  "status": "not_admitted_uncompiled",
+  "selection": "Fixed existing small Scholten test grid; every listed cell retained. No outcome-based seed search or extension.",
+  "signed_panel": "signed-panel.json",
+  "signed_cases": 28,
+  "case_order": "p19,31,43,59 each k1..7",
+  "baseline_and_adapter_runs": 56,
+  "fault_rule": "For EACH fixed case whose retained actual callback contains identity or duplicate, rerun the same case once per matching kind and Write/Flush fault. Do not select seeds or change inputs.",
+  "maximum_fault_runs": 112,
+  "maximum_signed_runs": 168,
+  "per_run_candidate_cap": "100*p+10000 <=15900",
+  "minimum_branch_coverage": {
+    "native_identity_cases": 1,
+    "native_duplicate_cases": 1,
+    "successful_native_terminals": 28
+  },
+  "kummer_fixture": "kummer-fixture.json",
+  "kummer_cases": 7,
+  "kummer_statuses": [
+    "candidate_verified",
+    "redundant",
+    "invariant_error",
+    "candidate_rejected",
+    "noncanonical_label"
+  ],
+  "outputs_and_arithmetic_comparison": "Compare entire serialized Outcome including recovered/exhausted/phases/counts/native/detail; independently check source kG=Q. Compare entire actual Labels result including scalar_before/after and field delta.",
+  "failure_rules": [
+    "Constructor None, identity source target, missing source solve, mismatch, missing required branch or missing terminal is a failed/incomplete qualification, not a skipped cell.",
+    "Record missing branches and stop after fixed panel; no supplemental seed screening.",
+    "Fault must occur inside actual callback and result in Err, incomplete trace, no terminal or successful Outcome.",
+    "Retain compile errors, timeouts, partial stdout/stderr and every attempted case."
+  ],
+  "resources": {
+    "proposed_total_worker_seconds": 2400,
+    "build_seconds": 1800,
+    "execution_seconds": 600,
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "swap_bytes": 0,
+    "max_active_payloads": 1,
+    "attempts": 1,
+    "automatic_retry": false,
+    "trace_max_records": 250000,
+    "trace_max_bytes": 67108864,
+    "kummer_trace_max_records": 20,
+    "kummer_trace_max_bytes": 1048576
+  },
+  "deadline": "2026-11-10T05:11:39Z",
+  "campaign_remaining_seconds": null,
+  "publication_receipt": null,
+  "independent_review": null,
+  "cache_binding": "Root must reconcile mutable build cache and bind full current manifest before admitted build; do not reuse an unbound initial cache.",
+  "scientific_performance_claim": false,
+  "counted_cost_policy": "All qualification, compilation, fixture construction, fault runs and cleanup charged; no timing/rho ratio inferred."
+}

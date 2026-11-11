@@ -1,0 +1,45 @@
+{
+  "schema": "pencil.signed-kummer-combined-v3-final-binding-validation/v1",
+  "status": "candidate_checked_pending_publication_and_coordinator_review",
+  "admission_candidate_sha256": "2f5d04dab9ac459280ee390aab1c420ab2381c0282f1d20ada72715e5d539418",
+  "checks": {
+    "all_eight_release_receipt_hashes_match": true,
+    "all_eleven_source_packet_hashes_match": true,
+    "generated_lock_hashes_and_sizes_match": true,
+    "source_manifest_matches_published_commit": true,
+    "fresh_cache_exact_manifest_matches_retained_native_bytes": true,
+    "fresh_cache_terminal_cgroup_empty": true,
+    "artifact_store_readback_matches_receipt_blobs": true,
+    "prior_v4_terminal_native_and_caller_custody_bound": true,
+    "campaign_authorization_field_mapping_exact": true,
+    "campaign_arithmetic_exact": true,
+    "single_attempt_no_retry": true
+  },
+  "campaign_seconds": {
+    "ceiling": 129600,
+    "charged": 3780,
+    "reserved": 2400,
+    "unreserved": 123420,
+    "remaining_before_attempt": 125820
+  },
+  "scope": {
+    "plans": 7,
+    "slots": 22680,
+    "tests": 2,
+    "build_cap_seconds": 1800,
+    "execution_cap_seconds": 600,
+    "total_cap_seconds": 2400,
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "swap_bytes": 0,
+    "deadline_utc": "2026-11-11T12:00:00Z"
+  },
+  "remaining_gates": [
+    "canonical artifact correction commit and remote verification",
+    "tracked runner-v3 admission.json byte identity",
+    "independent coordinator final-binding review",
+    "published final-binding readback",
+    "live lease heartbeat at invocation"
+  ],
+  "compiler_or_payload_executed_by_this_validation": false
+}

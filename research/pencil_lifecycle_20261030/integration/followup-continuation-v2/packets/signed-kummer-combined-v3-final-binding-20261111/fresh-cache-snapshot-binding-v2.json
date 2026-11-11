@@ -1,0 +1,59 @@
+{
+  "schema": "pencil.fresh-cache-snapshot-binding-supersession/v1",
+  "supersedes_unexecuted_binding": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-v3-final-binding-20261111/fresh-cache-snapshot-binding.json",
+    "sha256": "f1d6396cdc77fcaf3ce52ea5baa5251077fe86de1062f9b19845c594ad8bbcfb"
+  },
+  "corrections": [
+    {
+      "field": "summary.sha256",
+      "prior": "16d772fcdbbf6777e5f8702d382f1007715d3640b1059ba55cfac8ece8b0616e",
+      "current": "6e9a72ca8158c7871251d53c57541d21be215f8d2753e3d48e5b6e43efaf0798",
+      "reason": "Presentation metadata renamed root_pid to root_exec_session_id without changing the observed value."
+    },
+    {
+      "field": "artifact_packaging.remote_readback.sha256",
+      "prior": "918ff12cd3ba27099afa1216ca7b132e03bc0583b91ef439256734bbb2a2a04",
+      "current": "918ff12cd3ba27099afa1216ca7b132e03bcf0583b91ef439256734bbb2a2a04",
+      "reason": "The first candidate transcribed a 63-hex digest; this successor records the exact 64-hex file digest."
+    },
+    {
+      "field": "artifact_packaging.root_manifest.sha256",
+      "prior": "19ba3ae4fa264ee3306cfd36ec0abd7a357ae5c9270a9dc7e659309e3f8bb958",
+      "current": "810264975c89d6a55b731643e3b187489b8870bb7c0a105672a1032b6c72960f",
+      "reason": "The final artifact manifest additionally stores the presentation PDF; raw receipt and cache object digests are unchanged."
+    }
+  ],
+  "current_exact_bindings": {
+    "summary": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-cache-snapshot-results-20261111/summary.json",
+      "sha256": "6e9a72ca8158c7871251d53c57541d21be215f8d2753e3d48e5b6e43efaf0798"
+    },
+    "artifact_remote_readback": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-cache-snapshot-results-20261111/artifact-remote-readback.json",
+      "sha256": "918ff12cd3ba27099afa1216ca7b132e03bcf0583b91ef439256734bbb2a2a04"
+    },
+    "root_artifact_manifest": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-cache-snapshot-results-20261111/.artifacts.json",
+      "sha256": "810264975c89d6a55b731643e3b187489b8870bb7c0a105672a1032b6c72960f"
+    },
+    "native_artifact_manifest": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-cache-snapshot-results-20261111/raw/native/.artifacts.json",
+      "sha256": "63375aee235905d9b2e1f4cc14af7ce88b9b47009ac03a698af4d84bc9f455c2"
+    },
+    "canonical_publication": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-v3-final-binding-20261111/canonical-artifact-publication.json",
+      "sha256": "3d81ca653dfce8e413fa911fae48b3c472b25db38e857cf7aaf87eef99850443"
+    }
+  },
+  "unchanged_raw_observation_hashes": {
+    "current_cache": "9eae2a2fc003071692c5058e52b6e712f2d3ee0ad87e5c2086bc08240479c850",
+    "native_result": "55e37774b4e4d7fcfb3db595e23a70cd1d738b5ba3b7af603748d13d7f8a1529",
+    "controller_terminal": "b3c53913706fe5feb71c9d66d1f87f8f73cd9e778e26241be52f2e3f6eba9c50",
+    "caller_result": "d5bed1762129fcaa5e6c4f2cd67e95dfb27f6d08b4acce00ce68e397f66886a7",
+    "raw_manifest": "f0125de7b08129a00a7e2db6f1047c6182ef40f721661eb1e69b6b7750bd38e1",
+    "raw_receipts_archive": "6c0c2c740db1a06cc3cc64255260f23176ca28cbab9c90c54b5899a1d07d93a0"
+  },
+  "execution_performed_under_prior_binding": false,
+  "execution_admitted": false
+}

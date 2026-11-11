@@ -1,0 +1,55 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{xcolor,booktabs,array,enumitem}
+\usepackage[T1]{fontenc}
+\definecolor{ink}{HTML}{172033}
+\definecolor{fail}{HTML}{B91C1C}
+\definecolor{muted}{HTML}{64748B}
+\color{ink}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\begin{document}
+{\LARGE\bfseries Independent machine review: pivot renewal}\par
+{\large\bfseries\color{fail} Retained run status: failed}\par
+
+The retained receipts are internally consistent with a bounded run. Pre-custody passed; the first module compiled; the second module failed at source line 59; and post-custody passed. The three later modules were not attempted.
+
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.34\linewidth}p{0.22\linewidth}p{0.28\linewidth}}
+\toprule
+\textbf{Stage} & \textbf{Result} & \textbf{Observed time}\\
+\midrule
+Pre-custody & passed & 45.61097849800717 s\\
+Compiler & failed & 42.47305457800394 s\\
+Post-custody & passed & 40.05902259401046 s\\
+Overall & failed & 128.24891154497163 s\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Module outcomes}
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+\item \texttt{EliminationField}: exit 0; \texttt{EliminationField.olean} retained.
+\item \texttt{PivotSwap}: exit 1; the equal-row branch of \texttt{swap\_involutive} remained unsolved.
+\item \texttt{Controls}, \texttt{Readback}, \texttt{ExpectedFailure}: not attempted.
+\end{itemize}
+
+Both compiler child groups were reaped with no remaining members. All three outer phase owners are terminal; no outer wait timed out.
+
+\section*{Custody}
+The pre and post scans each checked 16,736 files totaling 3,111,892,318 bytes. The maps are byte-identical at:
+
+{\footnotesize\ttfamily bd79b0566f9d19dbf1bdecbc1e94cd5dd119bffcf3f0bb639b9d921ff41ed2ad}
+
+The native receipt notes that shared-cache equality does not exclude transient concurrent changes between the two scans.
+
+\section*{Binding note}
+The admission receipt binds repository release SHA-256:
+
+{\footnotesize\ttfamily b3acbb8650a1f370579e067fa89874d6348278a63517adb9cb1ee54aae8eecff}
+
+The retained outer copy is semantically equal JSON but was reserialized, so its byte digest differs. The original bound release remains present.
+
+\section*{Scope}
+This review recomputed hashes and checked retained receipts and source bytes. It did not rerun Lean or independently prove any statement. The supported component result is the \texttt{EliminationField} compilation; the full five-module replay did not complete.
+\end{document}
