@@ -172,3 +172,38 @@ store is unavailable (stated in the report). For `v10` and `v10c`: `manifest`
 and `pin`. Then, for each size, `size` for `v10` and then for `v10c`. Then,
 for each run, `reference`, `claims` and `analyse`. Then
 `icprog rule matched --comparison v10` and `p1p2.sh`.
+
+## Amendment 0 (2026-11-11, before any row)
+
+Recorded after the change was implemented and before the first row. The
+question, the arms, the sizes, the order, the predictions and the decision
+rules above are unchanged.
+
+- **The binaries** ([`binaries.sha256`](binaries.sha256)) are as follows.
+  `ic-v10` is built from `f67d6c481b`, which is this branch with the change.
+  `ic-v10c` is built from `ca1a767b1f`. `icprog` is built from
+  `f67d6c481b`. `isolated_bench` and `koblitz_rho_fixture` are built from
+  `ca1a767b1f`. The toolchain is rustc 1.97.0 on this container.
+- **The implementation** has one detail beyond the list under "The single
+  change". A point is lifted once per Frobenius orbit, not once per
+  abscissa. For odd `n`, the lift of `x^q` is the `q`-th power of the lift
+  of `x`, because `rhs` and the half-trace commute with `q`-th powering.
+  The orbit's other points therefore cost two `sqr_k`. A representative
+  that does not lift to two points falls back to one lift per abscissa.
+  The base is unchanged; the unit test
+  `subgroup_orbit_selection_agrees_in_both_representations` compares both
+  paths on `a = 0, 1` curves for `n = 13 … 47` and on subfield curves with
+  `k = 3, 5, 7`. It checks the base field by field, the selection cost,
+  the thread counters, and the projected map against the general-field
+  construction. It passes, as do the module's 193 tests and the lib's
+  `subgroup` (51) and `factor_base` (60) tests.
+- **What was seen** beyond the list above was development only, with no
+  row and no isolation. Two unisolated runs of n47 T01 on each binary gave
+  equal `identity_inputs` and `counts` hashes for the two arms.
+  Their median `select + select_projection` was 1.57 ms (`v10`) against
+  4.95 ms (`v10c`), and an earlier build of `v10` (one lift per abscissa)
+  gave about 2.0 + 0.6 ms. Callgrind put the two phases at 9.0 M
+  instructions (`v10`) against 32.5 M (`v10c`). These figures led to the
+  per-orbit lift. They are not the measurement, and no prediction was
+  changed after seeing them. On those figures P2's 4x may not be met at
+  n47.
