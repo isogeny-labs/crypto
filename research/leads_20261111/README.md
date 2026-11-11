@@ -44,7 +44,7 @@ So "new" means new with respect to this repository and the sweep only.
 
 **Why the top two.**
 - **Lead 1** is the cheapest test with the largest predicted *measured*
-  improvement of an existing IC row. Its mechanism (Hilbert early stop of F4) is
+  improvement of an existing IC row [pcc:unverified]. Its mechanism (Hilbert early stop of F4) is
   already validated at smaller p, and the scale runs simply never used it.
 - **Lead 2** has a proved core and a sharp falsifier: a non-trivial `c`-only
   syzygy. Data from this morning's runs already agree with it.
@@ -86,7 +86,7 @@ not on any row.
   BSGS-type (known-log table) arm. The owner ruled on 2026-11-08 that BSGS-class
   results are labelled boundary results outside the index-calculus ratchet
   (`research/curve25519_autolab_20261104/bsgs/README.md`). As things stand, a win
-  for lead 10 would not count as an IC improvement.
+  for lead 10 would not count as an IC improvement [pcc:unverified].
 
 ## What none of these is
 
