@@ -1,6 +1,6 @@
 # Chained ECDLP transfers — persistent queue
 
-Owner: autonomous research session, starting from PR #3877. Updated 2026-11-11 after the execution workspace became unavailable around14:29UTC.
+Owner: autonomous research session, starting from PR #3877. Updated 2026-11-11 during restored CT21 execution;historical interruption is resolved at custody/access scope.
 This is the canonical queue; completed entries stay here. Results require their
 own evidence and PCC standing; a checked box is not a verification verdict.
 
@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 80 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian helpers gate8/localPCCb320bb pass:matched supports,kernel fibers,functional descent/additivity,conditional Hom cancellation,recovery14/28. Source census80;actual Picard/regular quotient/polarization geometry remains written. Identity certificates have exact proof pointers;all standing unsigned. |
+| CT03 | 86 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian helpers gate8/localPCCb320bb and six ChainTransport helpers gate6/localPCC7409b3 pass. New scope:kernel transport,square,composite28,rationalhalf,source28,target4. Source census86;actual Picard/regular quotient/polarization geometry remains written. Identity certificate proof-source pointers frozen;all standing unsigned. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -33,7 +33,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT19 | implemented elliptic kernels/maps/duals and separate replay; CI passes; unsigned | Construct fixed101 degree7 elliptic maps and independent algebraic replay. | ef9a54259/PR1483,ELLIPTIC_SEVEN.md:four actual maps,exact curve/both global x[7],all109/113 group/scalar/recovery/j/coordinate controls; unchanged Kohel construction and independent Montgomery verifier. Frozen TSV/manifests/report/diagram/PDF durable.43038507853 passes25/51-unit+two integrations. Root helpers/harness recovered; original root PCC7e9547/58dbb8 restored unchanged;see RESTORATION_20261111.md. No actual Jacobian7-hop/advantage. |
 | CT20 | actual fixed(7,7) transfer,full rational/geometric certificates,written proof;unsigned | Glue compatible degree7 elliptic images and construct actual global Jacobian isogeny. | SEVEN_JACOBIAN_CHECKPOINT.md/SEVEN_JACOBIAN_PROOF.md;C0->C1 monic68-model,both12317-class dual[7]/bijections/paired additions,all109 source norm14/inverse39/direct coordinates,full16-point geometric2-kernel,444 extension pulls,injective elliptic factors/j-based F101-Jacobian distinction. Local guard25/57+two integrations passes;actual-head CI next. |
 
-| CT21 | next unblocked chain step;not executed | Transport actual7-kernel and old Richelot cross-kernel to continue from accepted six-cycle target. | Compute49-point P0(Ker alpha) and64 product4-torsion lifts,Phi on16 geometric2-classes/all256 additions/Frobenius;select validated R1. Then global factor R1 Phi R0Hat=Psi[2],both full12317 dual[7],all109 source norm28/inverse74/direct coordinates. Preserve unsupported R1 charts;no rational-halving-only acceptance. |
+| CT21 | actual49-kernel/64-lift action passes;R1/Psi active;unsigned | Transport actual7-kernel and old Richelot cross-kernel to continue from accepted six-cycle target. | SEVEN_TORSION_CHECKPOINT.md/PCCba6bee:49 distinct kernel points,all2401 additions/Frobenius,eigenvalues5/6;64 lifts giveall16 source/target two-classes/four preimages/all256 additions/Frobenius. Actual transported pairing[(0,5),(1,3),(2,4)],delta33,rawtarget[78,66,56,53,91,29,88]. Next global factor R1 Phi R0Hat=Psi[2],both full12317 dual[7],all109 source norm28/inverse74/direct coordinates. Preserve unsupported charts;no rational-halving-only acceptance. |
 
 ## Session constraints
 
@@ -48,10 +48,12 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read RESTORATION_20261111.md,then EMERGENCY_RESUME_20261111.md. CT19 is published and focused CI passes;
-CT20_PLAN.md is prospective. Original root PCC records/receipts are recovered unchanged and their
-subject hashes match;the four existing Lean proof checks pass. Local
-development execution is usable again;continue CT20_PLAN.md. GitHub recovery is not an S3 admission bypass. [pcc:unverified]
+Read SEVEN_TORSION_CHECKPOINT.md,then SEVEN_JACOBIAN_CHECKPOINT.md and CT21_PLAN.md.
+CT19 is merged,CT20 readyPR1484 is frozen at2450815e2 with exact-head
+focused43085588914 pending atlastobservation. CT21 continues in a separate
+consumer branch;inspect local nativePCC/rawlogs before rerunning any corpus.
+RESTORATION_20261111.md preserves recovered originals;the old interruption
+notes are historical. GitHub recovery is not an S3 admission bypass. [pcc:unverified]
 
 Read today's session log, this table and CHECKPOINT.md. Inspect actual heads
 and uncommitted diffs first. Reuse immutable passing receipts when inputs have

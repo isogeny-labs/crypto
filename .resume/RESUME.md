@@ -1,4 +1,46 @@
-# Chained ECDLP Transfers — actual Phi checkpoint 2026-11-11T19:13:43Z
+# Chained ECDLP Transfers — CT21 live checkpoint 2026-11-11
+
+Read studySEVEN_TORSION_CHECKPOINT.md,then CT21_PLAN.md andQUEUE.md.
+This section supersedes the historical Phi snapshot below. Continue authorized
+autonomous work after each checkpoint;usergoal remainsopen. [pcc:unverified]
+
+RootPCCba6bee pins actual49-kernel/all2401 additions/Frobenius5/6 and64lifts:
+all16 two-classes/four preimages/all256 additions/Frobenius. Actual transported
+pairing[(0,5),(1,3),(2,4)],delta33/rawtarget[78,66,56,53,91,29,88].
+Root7409b3 six ChainTransport helpers gate/localbinding all6pass;sourcecensus86.
+Geometry is partialformal/written,scientificstandingunsigned. [pcc:unverified]
+
+Consumerbranch research/chained-transfer-seven-torsion-20261111 starts2450815e2.
+Inspect live src/seven_torsion.rs,src/seven_chain.rs,selected-pairingctor in
+src/nonsplit_map.rs and actualdiff/PCC/rawlogs beforechanginganything.
+Localb9242a/2f72c8 kernel/action,c1b585 geometriccomposite,c2a691 fullR1 and
+afd0a9 all109source receipts exist;newconsumer work is notyet published here.
+Do not rerun completed fullR1/source corpora just for a newsummary.
+[pcc:unverified]
+
+Runs:inspect ps beforeanyrestart. LatestwholePsi attempt is
+/workspace/scratch/ct-seven-chain-full-08.txt;strictClippy07 separate.
+Geometric04 failed uninferred arraylength;05 correctedpasses. Lean01 failed
+untypedexistential;02passes. All failures must be retained. [pcc:unverified]
+
+Next:collectwholePsi08,freezeexactsource/receipts/registerPCC beforeciting;
+finishwrittenquotient/degree/polarization/noniso proof,completeguard and
+source-linkedreport/diagram/inspectedPDF. Fullgraph checks mayevaluateeach
+immutablemap onEVERYclass once andlookupits completegraph for norms/sums;
+no productionmap uses a corpus/scalarlabel. Preserveallacceptancecases.
+Publishrootcheckpoint/3904,then readyconsumerPR/exactheadCI/review/ordinary
+guardedmergewhen allactualrequirementspermit. Continue nextunblockedtask.
+[pcc:unverified]
+
+Parent1484 staysfrozen2450815e2;focused43085588914 lastseen in_progress
+around19:16UTC. Check on50-minutecadence oractualnewactivity;noauto-merge
+beforefocusedsuccess/actualrequirements/review. Root3877 ledgerfork/archive
+blockers persist;no rootmerge/rebase/force/rechain. No oldtwo-hour suite rerun.
+S3profile/token/livebudget,KB/ecdb/lockedatlas8edec422a remainunavailable;
+no solver/benchmark/paidallocation. Keep frozenproofs/identitypointers,
+snapshots andoldPCCrows unchanged. Newmath Rust/Lean only. [pcc:unverified]
+
+# Historical Phi checkpoint 2026-11-11T19:13:43Z
 
 ## Goal
 Continue authorized autonomous research from cryptoPR3877 across all three

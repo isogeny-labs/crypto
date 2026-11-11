@@ -1,9 +1,11 @@
-# Current checkpoint — actual F101 degree49 Jacobian transfer
+# Current checkpoint — geometric torsion transport underway
 
-Read [SEVEN_JACOBIAN_CHECKPOINT.md](SEVEN_JACOBIAN_CHECKPOINT.md) first.
+Read [SEVEN_TORSION_CHECKPOINT.md](SEVEN_TORSION_CHECKPOINT.md) first,then
+[SEVEN_JACOBIAN_CHECKPOINT.md](SEVEN_JACOBIAN_CHECKPOINT.md).
 It supersedes the restoration/interruption state below;the original records
 are recovered and CT20 Phi is now implemented/proved in written geometry.
-CT21 torsion transport/R1/Psi continuation is next. Scientific standing is
+CT21 actual49-kernel/64-lift action passes;R1/Psi continuation is active.
+Historical interruption paragraphs below are superseded. Scientific standing is
 unsigned. [pcc:unverified]
 
 # Resume checkpoint — CT19 degree7 elliptic maps; workspace interrupted

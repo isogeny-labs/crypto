@@ -1,8 +1,9 @@
 # Autoresearcher integration handoff
 
-Latest continuation: NONSPLIT_MAP_CHECKPOINT.md / CHECKPOINT.md. The actual
-fixed F17 non-split map is now implemented; earlier prospective paragraphs
-below are historical snapshots. Vault state remains locked.
+Latest continuation: SEVEN_TORSION_CHECKPOINT.md / CHECKPOINT.md. Actual
+fixedF101 Phi and its49-kernel/64-lift two-action are recorded;nextR1/Psi
+is active. Earlier prospective paragraphs below are historical snapshots.
+Vault state remains locked. [pcc:unverified]
 
 Destination: `crypto-autoresearcher` lead atlas, after configured vault access
 is restored. Last inspected commit:
@@ -238,3 +239,17 @@ Next CT21 actual49-kernel/64 lifts/R1/Psi. Do not invent an atlas lead ID,
 write plaintext into vault or promote this as measured solver benefit.
 Original direct elliptic controls/earlier collapse and forced-backtrack
 negatives remain required. S3/livebudget/KB gates unchanged. [pcc:unverified]
+
+## CT21 geometric torsion continuation
+
+SEVEN_TORSION_CHECKPOINT.md/rootPCCba6bee preserve49 actual kernelclasses,
+all2401 additions/Frobenius5/6 and64 product4-torsion lifts giving thefull
+16-class Phi2 action/four preimages/all256 additions/Frobenius. Actual
+cross-kernel pairing[(0,5),(1,3),(2,4)],delta33/rawtarget
+[78,66,56,53,91,29,88]. Six ChainTransport helpers gate/localbindingpass,
+PCC7409b3,total86sourcelemmas;actualgeometry remainswritten/partialformal.
+R1/Psi liveconsumercontinuation is isolated fromfrozen1484 head2450815e2.
+Do not duplicate thecompletedkernel/action orinterpret thegeometric
+certificate as a fullPsi/cost verdict. Next fullrational/globalchain
+acceptance staysCT21_PLAN.md. No vaultplaintext/guessedlead/graphpromotion;
+all scientificstanding unsigned. [pcc:unverified]
