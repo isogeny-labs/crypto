@@ -16,6 +16,7 @@ fn main() {
     let bits: u32 = a[2].parse().unwrap();
     let t_count: usize = a[3].parse().unwrap();
     let inst: u64 = a[4].parse().unwrap();
+    let tuned = a.get(5).is_some_and(|s| s == "tuned");
     let mut out = std::fs::File::create(&a[1]).unwrap();
     for res in [3u64, 1] {
         let Some((c, g)) = find_a3_curve(bits, res) else {
@@ -28,14 +29,49 @@ fn main() {
             let t0 = Instant::now();
             let b = (((t_count as f64) * (c.n as f64) / 4.0).sqrt().ceil() as u64).max(16);
             let m = 2 * b + 1;
-            // baby steps
-            let mut table: HashMap<u64, u32> = HashMap::with_capacity(b as usize);
-            let mut cur = Some(g);
-            for j in 1..=b {
-                if let Some(p) = cur {
-                    table.insert(p.x, j as u32);
+            // baby steps: tuned = batched adds over lanes + open-addressing table; else HashMap
+            let mut table: HashMap<u64, u32> = HashMap::new();
+            let cap = ((2 * b) as usize).next_power_of_two().max(16);
+            let shift = 64 - cap.trailing_zeros();
+            let mut open: Vec<(u64, u32)> = if tuned { vec![(0, 0); cap] } else { Vec::new() };
+            if tuned {
+                let lanes_n = 1024usize.min(b as usize);
+                let mut lanes: Vec<Option<Pt>> = Vec::with_capacity(lanes_n);
+                let mut cur = Some(g);
+                for _ in 0..lanes_n {
+                    lanes.push(cur);
+                    cur = c.add(cur, Some(g));
                 }
-                cur = c.add(cur, Some(g));
+                let step: Vec<Option<Pt>> = vec![c.mul(Some(g), lanes_n as u64); lanes_n];
+                let mut scratch0 = BatchAddScratch::default();
+                let mut base = 0u64;
+                'outer: loop {
+                    for (i, lane) in lanes.iter().enumerate() {
+                        let j = base + i as u64 + 1;
+                        if j > b {
+                            break 'outer;
+                        }
+                        if let Some(pt) = lane {
+                            let mut h =
+                                (pt.x.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> shift) as usize;
+                            while open[h].1 != 0 {
+                                h = (h + 1) & (cap - 1);
+                            }
+                            open[h] = (pt.x, j as u32);
+                        }
+                    }
+                    c.add_many_batched(&mut lanes, &step, &mut scratch0);
+                    base += lanes_n as u64;
+                }
+            } else {
+                table.reserve(b as usize);
+                let mut cur = Some(g);
+                for j in 1..=b {
+                    if let Some(p) = cur {
+                        table.insert(p.x, j as u32);
+                    }
+                    cur = c.add(cur, Some(g));
+                }
             }
             let mg = c.mul(Some(g), m).unwrap();
             let neg_mg = c.neg(mg);
@@ -52,7 +88,21 @@ fn main() {
                         continue;
                     }
                     if let Some(p) = lane {
-                        if let Some(&j) = table.get(&p.x) {
+                        let hit = if tuned {
+                            let mut h = (p.x.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> shift) as usize;
+                            let mut r = None;
+                            while open[h].1 != 0 {
+                                if open[h].0 == p.x {
+                                    r = Some(open[h].1);
+                                    break;
+                                }
+                                h = (h + 1) & (cap - 1);
+                            }
+                            r
+                        } else {
+                            table.get(&p.x).copied()
+                        };
+                        if let Some(j) = hit {
                             // lane = Q - i*M*G = +-jG
                             let jg = c.mul(Some(g), j as u64).unwrap();
                             let sign_plus = jg.y == p.y;
@@ -91,7 +141,7 @@ fn main() {
                 .zip(&ks)
                 .filter(|(f, k)| **f == Some(**k))
                 .count();
-            let row = json!({"bits":bits,"res":res,"n":c.n,"T":t_count,"inst":ins,"B":b,"rounds":round,
+            let row = json!({"bits":bits,"res":res,"n":c.n,"tuned":tuned,"T":t_count,"inst":ins,"B":b,"rounds":round,
                 "ok":ok,"bsgs_total_ms":ms,"bsgs_per_target_ms":ms/t_count as f64});
             println!("{row}");
             writeln!(out, "{row}").unwrap();
