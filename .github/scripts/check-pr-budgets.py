@@ -83,9 +83,9 @@ NAMED_BUDGET_EXCEPTIONS = {
         "reason": "Polynomial-reuse correctness job; 15-minute runs that hit the 25-minute cap on slow shared runners (2026-10-17)",
     },
     (".github/workflows/ecbench.yml", "harness"): {
-        "timeout": 45,
-        # The workflow's pull_request budget expression evaluates to 45.
-        "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18)",
+        "timeout": 60,
+        # The workflow's pull_request budget expression evaluates to 60.
+        "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18), then at 45 minutes on #3667 (2026-11-08)",
     },
     (".github/workflows/ecbench.yml", "evidence_audit_pr"): {
         "timeout": 40,
