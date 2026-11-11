@@ -1,0 +1,42 @@
+name: CT24 explicit closed-fiber Jacobian leg
+
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/ct24_closed_fiber_transport.py'
+      - 'research/chained_jacobian_transfers_20261110/ct24_fiber_replay.py'
+      - 'research/chained_jacobian_transfers_20261110/CT24_CLOSED_FIBER_TRANSFER.md'
+      - '.github/workflows/ct24-closed-fiber.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  closed-fiber:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/ct24_closed_fiber_transport.py
+            research/chained_jacobian_transfers_20261110/ct24_fiber_replay.py
+      - name: All 109 E109-to-Jacobian explicit fiber and DLP-recovery controls
+        run: |
+          set -euo pipefail
+          unset PYTHONOPTIMIZE || true
+          python3 -S research/chained_jacobian_transfers_20261110/ct24_closed_fiber_transport.py | tee /tmp/ct24-main.log
+      - name: Separate F1012 support replay and Python compilation
+        run: |
+          set -euo pipefail
+          unset PYTHONOPTIMIZE || true
+          python3 -S research/chained_jacobian_transfers_20261110/ct24_fiber_replay.py | tee /tmp/ct24-replay.log
+          python3 -m py_compile research/chained_jacobian_transfers_20261110/ct24_closed_fiber_transport.py research/chained_jacobian_transfers_20261110/ct24_fiber_replay.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct24-fiber-stdout
+          path: /tmp/ct24-*.log
+          if-no-files-found: ignore
