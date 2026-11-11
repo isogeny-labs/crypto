@@ -333,3 +333,41 @@ only the closures that were interrupted, each from its start: one closure is the
 unit of restart, and nothing inside a closure is restored. An interrupted
 closure's partial time is never reported. The queue log keeps every `start` and
 `interrupted` line, and the tally reads the last `exit` line per closure, as before.
+
+### 11.9 Amendment A4 (2026-11-07 04:40Z, before the run): C1 on an 846 GB host
+
+The second C1 host (RunPod `9g6slrqws33cr8`, 512 GB, `A` = 471 GB) failed to
+allocate after 1,317 s at a peak RSS of about 405 GiB (*recorded*:
+`research/ic_leads_rented_20261018/snapshots/README.md`). Two hosts now put the
+cell's memory far above the 217 GB projection, and an allocation failure is
+still not evidence about the degree (§11.3).
+
+- Host: RunPod GPU pod with 3 × NVIDIA RTX PRO 6000 Blackwell Workstation Edition
+  (282 GB host RAM per GPU, about 846 GB in all, about $7.77/h secure), used only for its
+  host RAM; the GPUs stay idle. It is launched with `pod/launch.py run --job c1` (the
+  same `pod/boot.sh run_c1` as before), and `A` = 0.92 × the cgroup limit. The planned
+  AWS host (`x2iedn.8xlarge`, 1 TiB) was refused at launch: the account's X-family quota
+  is 0 vCPU in every region (`MaxSpotInstanceCountExceeded`, 2026-11-07 04:45Z), and
+  no standard-family spot host of 768 GB or more fits in the free 44 vCPU of us-east-2.
+- Gate: C1 runs only if that limit is at least **768 GB** (`DEG5_MIN_LIMIT=768000000000`).
+- Draw 0 only, timeout 12 h, lifetime cap 14 h (at most about $109 at $7.77/h). Nothing else in §§11.3–11.5 changes.
+- Outcomes are read as in §11.3. Exit 0 with a refutation means "degree 5 on draw 0
+  only". A saturated closure that does not refute means degree ≥ 6 on draw 0. Exit
+  134/137 with a memory failure is recorded as not evidence. Exit 124 (timeout) is
+  recorded as open. A host interruption is recorded as `interrupted` and is not a
+  result.
+- A third RunPod launch on the same 512 GB shape (2026-11-07 04:22Z, pod
+  `g0mby110kxbo6i`) was terminated after about 2 minutes, before the build
+  finished, once the 405 GiB failure above was found. It produced no record.
+
+Outcome of A4 (recorded 2026-11-10 22:15Z). Pod `mw1aoh9jtgr4nk` (848 GB cgroup
+limit, `A` = 780,160,000,000 B) started the C1 closure on draw 0 at
+2026-11-07 07:10:32Z. It was still running, with no exit line, at 08:18Z and 10:20Z.
+No later observation was made: the session's next check-in reached it only on
+2026-11-10, after the pod's 14 h lifetime had ended. The pod no longer exists, and its
+`:8000` listing returns 404. Nothing from it was fetched. **C1 stays open.** The run
+is neither a result nor an allocation failure: its outcome is unknown. The only fact it
+adds is that the closure did not fail to allocate within 3 h 10 min under 780 GB,
+where the 512 GB host failed after 1,317 s. Spend: at most 14 h × $7.77 ≈ $109. The
+billed figure was not read. A retry needs the result copied off the host as the run
+ends, before the host can expire.

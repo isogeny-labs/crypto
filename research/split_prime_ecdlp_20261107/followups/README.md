@@ -23,6 +23,13 @@ obstruction.
 | P2 unplanted targets | **coset-independence holds exactly**: identical F4 work across cosets, primes and towers; the stage gain holds for the whole relation search |
 | P3 rho rerun (walk v2) | **null**: 0 of 7 tests, every CI within ±0.19 %; walk defect resolved (A/A r 0.027 / 0.009) |
 
+
+### Round 3 (protocol `p1_rr_dickson/PROTOCOL-R3.md`)
+
+| follow-up | outcome |
+|---|---|
+| P1 m5 t4 on Iso Lab EKS, 56–60 GiB, 24 h | **still undecided** [pcc:unverified]: T capped at 56 GiB after 5.9 h (D ≥ 9, widest ≥ 1,305,345, up from 662,876); all three RR attempts were lost to Spot interruptions (15 min, 2 h 33 min, 52 min) in the degree-7 step and supply no bound. Needs RR on a host that is not reclaimed (On-Demand or a qualified resumable route). |
+
 ## Rules shared by the three protocols
 
 - **Frozen before data.** Each protocol is committed before any claim cell runs.
