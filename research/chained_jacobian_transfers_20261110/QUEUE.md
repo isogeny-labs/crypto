@@ -88,3 +88,22 @@ curve-isomorphism class, but does **not** replace actual E[4]
 maps/kernel labels, geometric divisor correspondences, the 12,317-class
 dual[7] tests, 109 scalar recovery, or full-cost benchmarks. No
 cloud spending. Keep root #3877 ledger/archive gates untouched.
+
+
+### CT22b concrete extension-field result (2026-11-11)
+
+**[pcc:unverified]** CT22 now includes ct22_actual_e4.py:
+constructs *actual* F101^6 elliptic E[4] classes via cubic-field
+half-point x=r +/- sqrt(3r^2+a) and y=zeta*u (zeta^2=2).
+Evaluates all four degree-seven Kohel maps and normalized duals
+at all 16 source/target E[4] elements, 256 group-addition pairs
+per map, plus Frobenius and curve identities. Then forms all
+64 actual product E[4] lifts of the HLP graph for CT20 B+A/B+B,
+replays two product maps and complete 16-class quotient-addition
+tables, and checks the norm-kernel image and wrong-graph negative.
+Local Python producer-run self-check passed; exact-head CI
+and independent signed PCC are pending. This is a genuine
+finite-field elliptic-torsion map, **not** a genus-two balanced
+divisor isogeny. Next: match six target branch points to actual
+product four-torsion cosets for both nonsplit Richelot labels,
+then execute full 12,317-class Phi and dual[7] tests.
