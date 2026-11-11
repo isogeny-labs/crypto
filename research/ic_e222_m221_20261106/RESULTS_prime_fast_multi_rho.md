@@ -22,3 +22,16 @@ Prediction check: "best IC / rho <= 0.7 at T = 1000 at 25, 29 and 31 bits" holds
 Finding: the batched, bucketed multi-target IC is faster than this multi-target rho at 25 and 29 bits (by 5x down to 1.6x at T = 1000) and slower at 31 bits (1.3x at T = 1000, 1.1x at T = 10 000). The advantage shrinks monotonically with the field size and has gone by 31 bits, in line with the exponent argument (IC setup about p^(2/3), per-target about p^(1/3); rho about sqrt(nT)). So there is **no sustained improvement over a rho-type multi-target attack either**: at best a small-size win that reverses by about 30 bits. This is the first same-run comparison of the IC with an independent rho-type multi-target arm.
 
 Limits and caveats that all favour the rho being faster than measured here: no negation map (about sqrt(2) fewer steps), no walk or DP tuning (lanes, table size, DP bits chosen once from a formula), a simple restart scheme (the arm is 3.4x slower than the tuned BSGS), one thread. Against that, the rho arm is my own implementation and the IC rows come from earlier-tuned constants. One instance at 31 bits per residue (2 rows), three sizes only; the BSGS arm is not compacted; no §5a pricing band; not independently replayed; no certificate file, bench record or `VALIDATION.json`.
+
+## Extension to 33 and 35 bits (exploratory; prediction in `results/pf_rho2/PREDICTION_33_35.txt`, written before the run)
+
+T = 1000, one instance per residue, identical targets as the existing IC (c = 1.0; `results/pf_size/ic_c1_33.jsonl`, `ic_c1_35.jsonl`) and tuned-BSGS rows. The multi-target rho resolved and verified all 1000 targets in every run.
+
+| bits | residue | rho ms | rho steps | IC ms (c = 1) | IC / rho | tuned BSGS ms | rho / BSGS |
+|---|---|---|---|---|---|---|---|
+| 33 | 3 | 501 | 7.9e6 | 956 | 1.91 | 297 | 1.69 |
+| 33 | 1 | 418 | 8.3e6 | 818 | 1.96 | 253 | 1.65 |
+| 35 | 3 | 817 | 1.73e7 | 2162 | 2.65 | 537 | 1.52 |
+| 35 | 1 | 848 | 1.77e7 | 1977 | 2.33 | 495 | 1.71 |
+
+Prediction (rho about 550 ms at 33 bits and about 1.1 s at 35 bits; IC / rho about 1.5 to 1.7 and 1.8 to 2.0): the rho is faster than predicted (418 to 501 ms and 817 to 848 ms) and IC / rho is higher than predicted (1.9 to 2.0 and 2.3 to 2.7). Together with the frozen evaluation (best IC / rho = 0.19, 0.61, 1.31 at 25, 29, 31 bits for T = 1000) the picture is: IC faster than this rho up to about 29 bits, slower from 31 bits, and the gap grows with the size (about 2x at 33 bits, 2.3x to 2.7x at 35 bits). The rho is 1.5x to 1.7x behind the tuned BSGS here (3.4x at the frozen sizes at T = 1000: the ratio improves with size because the DP overhead per step shrinks), so the BSGS stays the strongest multi-target reference. Limits as above (no negation map or rho tuning in this arm, one instance per residue, exploratory, same host, not independently replayed).
