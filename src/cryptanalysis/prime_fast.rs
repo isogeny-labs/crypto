@@ -456,6 +456,14 @@ impl FastCurve {
         Pt { x: x3, y: y3 }
     }
 
+    /// Montgomery x of `p1 + p2` for `x1 != x2` given `inv_dx = 1 / (x2 - x1)`; skips the y coordinate.
+    #[inline]
+    pub fn add_x_with_inv(&self, p1: Pt, p2: Pt, inv_dx: u64) -> u64 {
+        let f = &self.f;
+        let lam = f.mul(f.sub(p2.y, p1.y), inv_dx);
+        f.sub(f.sub(f.sqr(lam), p1.x), p2.x)
+    }
+
     #[inline]
     pub fn neg(&self, p: Pt) -> Pt {
         Pt {
@@ -1150,10 +1158,10 @@ impl PairTable {
             for (idx, k) in ((j + 1)..b).enumerate() {
                 let fk = fb.pts[k];
                 let inv = d[idx];
-                let sum = curve.add_with_inv(fj, fk, inv);
-                let diff = curve.add_with_inv(fj, curve.neg(fk), inv);
-                entries.push((f.from_mont(sum.x), j as u32, k as u32));
-                entries.push((f.from_mont(diff.x), j as u32, k as u32 | PAIR_DIFF_BIT));
+                let sum_x = curve.add_x_with_inv(fj, fk, inv);
+                let diff_x = curve.add_x_with_inv(fj, curve.neg(fk), inv);
+                entries.push((f.from_mont(sum_x), j as u32, k as u32));
+                entries.push((f.from_mont(diff_x), j as u32, k as u32 | PAIR_DIFF_BIT));
             }
         }
         let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
@@ -2311,6 +2319,34 @@ pub fn find_a3_curve(bits: u32, residue_mod_4: u64) -> Option<(FastCurve, Pt)> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn add_x_with_inv_matches_the_full_addition() {
+        let (curve, g) = find_a3_curve(24, 3).expect("curve");
+        let f = curve.f;
+        let mut pts = vec![g];
+        for k in 2..40u64 {
+            pts.push(curve.mul(Some(g), k).expect("multiple"));
+        }
+        for a in &pts {
+            for b in &pts {
+                if a.x == b.x {
+                    continue;
+                }
+                let inv = f.inv(f.sub(b.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, *b, inv),
+                    curve.add_with_inv(*a, *b, inv).x
+                );
+                let nb = curve.neg(*b);
+                let inv2 = f.inv(f.sub(nb.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, nb, inv2),
+                    curve.add_with_inv(*a, nb, inv2).x
+                );
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
 
