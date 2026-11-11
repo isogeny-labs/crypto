@@ -60,3 +60,33 @@ No figure or PDF (matplotlib is not installed here), no benchmark record (no tim
 no Conductor task and no research-kb query (neither available). Sources read:
 `repo:src/bin/curve25519_family.rs` (`build_miniature_at`, base forms),
 `repo:research/curve25519_cofactor_algebraic_20261102/PROTOCOL.md`.
+
+## The "isogeny" base (PROTOCOL_isogeny.md, frozen at `d1f5fafcf9` before its data)
+
+Result: **the premise fails for the isogeny base too.** The point set V = x(R' + ⟨Q⟩) was produced
+by the real `isogeny_tower(p, t, seed, ..)` from `src/cryptanalysis/ic_framework/prime_tower.rs`
+through a scratch program ([`towerdump/main.rs`](towerdump/main.rs), built against this
+repository's library with `Cargo.toml.txt` renamed; it is not part of the workspace). Dumps are
+in `tower_dumps/`. [`classify_isogeny_base.py`](classify_isogeny_base.py) keeps the V-abscissae
+that lie on the miniature (p = 1048573, A = 926) and takes delta = chi(x_W − A/3)
+(`isogeny_classes.out.txt`, `isogeny_classes.json`).
+
+| registered cell (seed 0) | on-curve abscissae | delta = +1 | delta = −1 | smaller class |
+|---|---|---|---|---|
+| isogeny t = 4 | 9 | 6 | 3 | 33% |
+| isogeny t = 5 | 18 | 7 | 11 | 39% |
+| isogeny t = 6 | 25 | 14 | 11 | 44% |
+
+- Under the frozen rule (both classes ≥ 10% in the registered cells) the premise fails.
+- Supplementary, unregistered: t = 9, seed 0: 121 / 135. Seeds 1 to 20 at t = 5 pool to 153 / 166
+  (48% in class +1) and at t = 6 to 311 / 308 (50%); per-seed minority fractions range from 21%
+  to 50%. The class mix does not depend on the seed in any way I can see.
+- Why: V is a coset's x-coordinates on a searched auxiliary curve E', then read as Weierstrass
+  abscissae on the miniature. It has no relation to the miniature's 2-torsion, so
+  chi(x_W − A/3) behaves like a fair coin on it. This matches the "bits" base.
+
+Both bases tested on the miniature therefore span both descent classes: no cofactor lift can be
+skipped, and the only remaining use of delta is class-pruning candidate pairs (about half per lift,
+effect on F4 cost unmeasured). "digits", "square-bits" and "edwards-bits" remain untested.
+No figure or PDF (matplotlib is not installed here), no cost claim, no matched rho.
+Everything here is [pcc:unverified].

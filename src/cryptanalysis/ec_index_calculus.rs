@@ -1893,9 +1893,9 @@ pub fn ec_index_calculus_dlp_staged_seeded_projected(
 /// (`i <= j`) to `(i, s_i, j, s_j)`.  Built once per solve, so a relation
 /// trial is one hash lookup instead of a square-root sweep over the factor
 /// base.  Experimental (`IC_SUM_TABLE=1`); the default sweep is unchanged.
-type PairSumTable = std::collections::HashMap<(BigUint, BigUint), (usize, i64, usize, i64)>;
+pub type PairSumTable = std::collections::HashMap<(BigUint, BigUint), (usize, i64, usize, i64)>;
 
-fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
     let a_fe = curve.a_fe();
     let mut table = PairSumTable::with_capacity(factor_base.len() * factor_base.len() * 2);
     let mut put = |pt: &Point, key: (usize, i64, usize, i64)| {
