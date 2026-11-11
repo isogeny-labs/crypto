@@ -1,6 +1,6 @@
 # Phase 2 protocol: does Pollard rho cost depend on anything but r, across and within isogeny classes of F_{2^31−1}?
 
-Status: **DRAFT, not yet frozen** (2026-11-11). It is frozen, and this line changed, once §8 is filled from the timing pilot and before any study data. Requested by the user on 2026-11-11 ("Yes run it all") after
+Status: **frozen before data** (2026-11-11T06:45Z), after the timing pilot of §8 and before any study data. Requested by the user on 2026-11-11 ("Yes run it all") after
 the phase-1 census (`../REPORT.pdf`). Any later change is an amendment, appended at the end with its
 reason and date. Data taken before an amendment stays in the record.
 
@@ -102,4 +102,14 @@ AWS. Raw files are hashed into the benchmark record, and their upload is left to
 
 ## 8. Trial counts (fixed from the timing pilot before any study data)
 
-TO BE FILLED FROM THE PILOT, then this file is frozen and hashed.
+The pilot ran on a curve outside the study: the first prime-order root with draw > 100000 (draw 100006,
+`a = 532875221`, `b = 504541723`, `t = −62813`). Its data are excluded from every analysis and are not
+committed. Results:
+- `isoclass-rho selftest`: 0 failures. Binary sha256 `4f0897306551c10bd3eebb065dc385aeae38101e81eedc76e5ec73a4917424d3`.
+- `walk`: 16 measured vertices, 22 verified edges, 0.23 s.
+- `measure --mode class --trials 10`: 21 arms (16 curves, 2 isomorphic models, A/A, 2 plants), 210 solves, 0.78 s.
+- `measure --mode generators --generators 10 --trials 5`: 83 arms, 415 solves, 1.7 s.
+
+Frozen: **TC = 200**, **TG = 40**. That is about 4,200 class-mode solves and about 3,300 generator solves per
+class. With 16 curves × 200 solves, a class's mean `c` has standard error about 0.52/√3200 ≈ 0.9%. The
+expected wall time is about 30 s per class and under an hour for all 57 classes.
