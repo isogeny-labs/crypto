@@ -1759,7 +1759,14 @@ def mt_fieldops_component() -> dict:
             "correction": "research/mt_rho_start_fix_20261111/",
             "class": "multi-target method",
             "validation": ("validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) "
-                           f"with the §5a band ({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+                           f"with the §5a band ({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else (
+                "not validated against rho: the gate refuses "
+                f"{MT_FIELDOPS_EVIDENCE}/VALIDATION.json (validator status insufficient_evidence, strongest_available "
+                "false). The rho reference is this harness's anchored, fixed-database family without Kuhn-Struik "
+                "retention of finished walks; against the same family with retention IC5 is 1.07-1.34x at h = 0 and "
+                "1.05-1.18x at h = 0.1, so every §5a decision against a standard multi-target rho is unranked. The "
+                "validator does validate IC5 against IC4, the multi-target IC baseline: cheaper in all 36 (cell, I/M) "
+                "decisions, 0.47-0.99x (engineering)"),
             "validated": not errs}
 
 
@@ -3604,7 +3611,7 @@ def markdown(doc: dict) -> str:
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     mt = doc["mt_fieldops_component"]
-    L += ["## Multi-target IC5 against the cheapest of four rho arms, outside tables A–C", "",
+    L += ["## Multi-target IC5 against IC4 and this harness's rho family, outside tables A–C", "",
           "Many targets on one prime-order Weierstrass curve (2^22 to 2^33, 44 fresh curves, 22 paired "
           "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
           "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table "
@@ -3613,7 +3620,7 @@ def markdown(doc: dict) -> str:
           "database) at three database sizes, chosen per configuration and price, after a restart fix that made rho "
           "1.4-4.8% cheaper. IC5 / rho and IC5 / BSGS per target, median [95% bootstrap]; the BSGS ratio "
           f"is the distance remaining. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
-          "| bits | T | IC5/rho h=0 | h=0.1 | h=1 | §5a | IC5/BSGS h=0 | h=1 |",
+          "| bits | T | IC5/harness rho h=0 | h=0.1 | h=1 | §5a (harness rho) | IC5/BSGS h=0 | h=1 |",
           "|--:|--:|--:|--:|--:|:--|--:|--:|"]
     for r in mt["rows"]:
         f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
@@ -4960,7 +4967,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
     mt = doc["mt_fieldops_component"]
-    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC5 against the cheapest of four rho arms, outside the priced tables</h2>'
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC5 against IC4 and this harness\'s rho family, outside the priced tables</h2>'
              '<p>Many targets on one prime-order Weierstrass curve (2<sup>22</sup> to 2<sup>33</sup>, 44 fresh curves, 22 paired '
              'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
              '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table of 4-term '
@@ -4968,8 +4975,8 @@ def page(doc: dict, standalone: bool) -> str:
              'reference is the cheapest of four rho variants at three database sizes, chosen per configuration and price, after a '
              'restart fix that made rho 1.4-4.8% cheaper. IC5 / rho and IC5 / BSGS per target, median [95% bootstrap]; '
              f'the BSGS ratio is the distance remaining. Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
-             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC5/rho h=0</th><th>h=0.1</th><th>h=1</th>'
-             '<th>§5a</th><th class="n">IC5/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC5/harness rho h=0</th><th>h=0.1</th><th>h=1</th>'
+             '<th>§5a (harness rho)</th><th class="n">IC5/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
              + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
                        + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
                                  f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))
