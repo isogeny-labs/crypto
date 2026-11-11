@@ -1,0 +1,55 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean:68:2: error: `grind` failed
+case grind.1
+H : Type
+inst : IntModule H
+a identity : H
+hc : ∀ (h : H), 4 • h = 0 → h = 0
+hn : 4 • a = 28 • identity
+hz : 4 • (a - 7 • identity) = 0
+hh : a - 7 • identity = 0
+h : ¬a = 7 • identity
+h_1 : 4 • a = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] ∀ (h : H), 4 • h = 0 → h = 0
+    [prop] 4 • a = 28 • identity
+    [prop] 4 • (a - 7 • identity) = 0
+    [prop] a - 7 • identity = 0
+    [prop] ¬a = 7 • identity
+    [prop] 4 • (a - 7 • identity) = 0 → a - 7 • identity = 0
+    [prop] 4 • a = 0 → a = 0
+    [prop] 4 • a = 0
+  [eqc] True propositions
+    [prop] ∀ (h : H), 4 • h = 0 → h = 0
+    [prop] a = 0
+    [prop] 4 • a = 0
+    [prop] 4 • (a - 7 • identity) = 0
+    [prop] a - 7 • identity = 0
+    [prop] 4 • a = 0 → a = 0
+    [prop] 4 • (a - 7 • identity) = 0 → a - 7 • identity = 0
+  [eqc] False propositions
+    [prop] a = 7 • identity
+  [eqc] Equivalence classes
+    [eqc] {a, 0, 4 • a, 4 • (a - 7 • identity), 28 • identity, a - 7 • identity}
+  [cases] Case analyses
+    [cases] [1/2]: 4 • a = 0
+      [cases] source: E-matching `hc`
+  [ematch] E-matching patterns
+    [thm] hc: [@HSMul.hSMul `[Int] `[H] `[H] `[instHSMul] `[4] #1]
+  [linarith] Linarith assignment for `H`
+    [assign] a := 0
+    [assign] identity := 0
+[grind] Diagnostics
+  [ematch] E-matching Diagnostics
+    [thm] Theorem Instance Count
+      [thm] hc ↦ 2
+'SevenJacobian.support_cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.matched_pullback_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.kernel_fiber_constancy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.factor_through_surjection' depends on axioms: [Classical.choice, Quot.sound]
+'SevenJacobian.factor_respects_addition' does not depend on any axioms
+'SevenJacobian.cancel_factor_norm' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'SevenJacobian.recover_norm14_order109' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SevenJacobian.recover_norm28_order109' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

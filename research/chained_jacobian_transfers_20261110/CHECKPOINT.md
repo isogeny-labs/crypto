@@ -1,3 +1,11 @@
+# Current checkpoint — actual F101 degree49 Jacobian transfer
+
+Read [SEVEN_JACOBIAN_CHECKPOINT.md](SEVEN_JACOBIAN_CHECKPOINT.md) first.
+It supersedes the restoration/interruption state below;the original records
+are recovered and CT20 Phi is now implemented/proved in written geometry.
+CT21 torsion transport/R1/Psi continuation is next. Scientific standing is
+unsigned. [pcc:unverified]
+
 # Resume checkpoint — CT19 degree7 elliptic maps; workspace interrupted
 
 Current update: execution and original CT19 records/receipts are restored; see [RESTORATION_20261111.md](RESTORATION_20261111.md). PR1483 merged52fe5eba0. Prior interruption notes below are historical, with their custody gaps now resolved. All scientific standing remains unsigned. [pcc:unverified]

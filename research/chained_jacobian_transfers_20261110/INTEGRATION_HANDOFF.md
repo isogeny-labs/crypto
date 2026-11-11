@@ -223,3 +223,18 @@ elliptic maps/duals with exact cleared identities/all109/113 controls,then
 compatible genuine Jacobian7-hop with global kernel/factor/dual proof.
 No new map/benefit accepted yet. CRT scalar projector extras remain unexecuted.
 Vault/KB blocked,no plaintext/new lead ID or benchmark. [pcc:unverified]
+
+## 2026-11-11T19:13:43Z — CT20 actual(7,7) Jacobian transfer,atlas still locked
+
+Root SEVEN_JACOBIAN_PROOF.md/SEVEN_JACOBIAN_CHECKPOINT.md and consumer
+2450815e2a3b84687b405ef8498dae9dc2663fe1 preserve actualC0->C1 Phi/PhiHat,
+full geometric2-kernel/global factor proof,both entire12317 rational dual[7],
+all109 source/direct norm14/inverse39 controls,444 exceptional-complete
+extension pulls and unpolarizedFp-Jacobian distinction via injective elliptic
+factors/trace-type uniqueness/j. Native inventory corroborates separately
+published3920;41/46 normalization boundaries retained,no Python rerun.
+ConsumerPCC5b631f/root917adf unsigned;80 Lean helpers partial,geometry written.
+Next CT21 actual49-kernel/64 lifts/R1/Psi. Do not invent an atlas lead ID,
+write plaintext into vault or promote this as measured solver benefit.
+Original direct elliptic controls/earlier collapse and forced-backtrack
+negatives remain required. S3/livebudget/KB gates unchanged. [pcc:unverified]

@@ -1,0 +1,64 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T18:51:50Z",
+ "id": "PCC-20261111-b320bb",
+ "kind": "theorem",
+ "producer": {
+  "commit": "dcd324f35fdac7a7ea47027a3f67ff31b011a36c",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b58c7a0404eab5e6bf1c64c8693a5bad0f7baa7a72bbbbb2a770e9ee7e57aa92",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.support_cleared_identity"
+  },
+  {
+   "decl_sha256": "e459cff351b3e37cd3573017c78d2dda3df92a7687e5e71047b456613920019f",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.matched_pullback_support"
+  },
+  {
+   "decl_sha256": "16e8c460239a29656e6451b06dd4eeaa1d2b559448830a2f922ad173496fe372",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.kernel_fiber_constancy"
+  },
+  {
+   "decl_sha256": "4829a7f9f00453516af1ea03fb8ccaa50dfcf0ccc4b060ffc9b83cd3d4f24571",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.factor_through_surjection"
+  },
+  {
+   "decl_sha256": "613a486d6e4d003bc5413d74e87a8e2da711a43fc9cc8ebe7403300177dead12",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.factor_respects_addition"
+  },
+  {
+   "decl_sha256": "7027b921d8665d8e57802a92bf6647c16da681beff468a44a62a5d3d963e5aab",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.cancel_factor_norm"
+  },
+  {
+   "decl_sha256": "41a32d4f59335924ae2f5d51e907fcaa672e8cfdf4e6c0be053063b18c0eabab",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.recover_norm14_order109"
+  },
+  {
+   "decl_sha256": "77baea8373aa99bc62088ab84c0e705e08f01001d670b866c6f0ae0489b3e49a",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SevenJacobian.lean",
+   "theorem": "SevenJacobian.recover_norm28_order109"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Eight core Lean degree7 Jacobian helper lemmas pass gate8:cleared/matched quadratic support,kernel fiber constancy,unique functional factor through a surjection,additivity of the factor,cancellation in an explicit torsion-free Hom module,source recovery for[14]/[28] under109 torsion. Functional/group/Hom-algebra helpers only;actual finite fields,divisors,regular quotient morphisms,polarizations and Picard geometry remain the separate written bridge. No custom axioms/trusted native evaluation;local kernel pass is not signed scientific standing."
+}
