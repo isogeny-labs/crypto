@@ -41,3 +41,13 @@ are disclosed in the README and are not data. Scope: the cubic norm-one branch t
 That study's starts were built from a weak curve by the same restricted moves, so they lie in the walk's reachable
 set by construction. If W at p ≥ 1009 is low, the walk charge holds only for starts reachable by this walk, and
 the README of that study must say so.
+
+## Amendment 1 (2026-11-11, after 8, 6 and 167 F/W records at p = 1009, 53 and 37 existed)
+
+Walking every admitted curve with a 100,000-curve cap would take hours per prime: single walks took up to 195 s.
+**W now walks only the first 60 admitted curves of each prime (`--walk-limit 60`).** F, admission over all 400
+curves, is unchanged. The seeds are deterministic, so the walked curves are the first 60 admitted ones of the same
+sequence. The interrupted first attempt is kept in `runs/attempt1/`.
+
+Disclosed before this amendment: five walks at p = 1009 had been seen, all unresolved, with 6.9·10⁷ to
+3.1·10⁹ multiplications. The decision rules and estimands are otherwise unchanged.
