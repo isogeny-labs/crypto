@@ -31,3 +31,18 @@ job). Their logs are `run_m5_t3_k{0,1}.log` (no row written). The rerun
 by the engine's own limit and written as a row. A `c = 6` closure that completes without `1`
 reads `d_F(multiples) ≥ 7` at a cell where the tower arm reads `≥ 8`: that neither fires nor
 refutes the falsifier (a drop of two) on this host, and is reported as such.
+
+## Null-support slope (note §7 lead 3), stated before the rows exist (2026-11-11)
+
+Question: is the fall-degree growth a property of the monomial support and the carry grading
+alone (curve-independent), or does Semaev's `S₃` sit below a random polynomial on the same
+support? Instrument: the pilot's existing `null` control (random coefficients on `S₃`'s
+monomial support; at `m ≥ 3` every chain link, `--null-chain`), same cell seeds, so the same
+tower and the same random targets as the `tower` arm; closure engine. Cells: Kummer `P1`,
+`m = 2`, `t = 2..9` (cmax 7, budget 600 s), `m = 3, 4` at `t = 2, 3` (cmax 8, budget 1,200 s).
+Prediction: `d_F(null) = d_F(tower)` on every completed cell ("shape-driven"), with the same
+fall sequences. Discriminating outcome: `d_F(null) > d_F(tower)` by one or more on cells of
+both ladders ("Semaev-specific": the curve structure lowers the degree and is worth isolating);
+`d_F(null) < d_F(tower)` would say the summation polynomial is harder than a random one of its
+shape. Rows: `null_m2_t2-9.jsonl`, `null_m3_t2-3.jsonl`, `null_m4_t2-3.jsonl`; a width ladder
+(`--null-width`, if implemented) follows in `nullw_*.jsonl`. Every value `[pcc:unverified]`.
