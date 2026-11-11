@@ -12,7 +12,9 @@
 // The second form is how a per-study workflow runs its own steps (preflight,
 // evidence replay) in its replay's isolated view: one --only, and the command
 // after -- replaces the index's default command. With --only, custody covers
-// only the pins of the selected replays.
+// only the pins of the selected replays. A replay entry may name an
+// `input_view_manifest` (frozen-input-view/v1), whose historical inputs are
+// overlaid in the same view, as frozen-workflow-check.mjs --input-view-manifest does.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -52,6 +54,13 @@ export function custodyProblems({ cwd, index, only = null }) {
   for (const [workflow, entry] of Object.entries(index.workflows)) {
     if (selected && !selected.has(workflow)) continue;
     if ((entry.check === 'replay') !== covered.has(workflow)) problems.push(`${workflow}: check=${entry.check} disagrees with the replay list`);
+  }
+  for (const replay of index.replays) {
+    if (only && !only.includes(replay.id)) continue;
+    if (replay.input_view_manifest !== undefined && (typeof replay.input_view_manifest !== 'string'
+      || !/^\.github\/scripts\/[A-Za-z0-9._-]+\.json$/.test(replay.input_view_manifest))) {
+      problems.push(`${replay.id}: input_view_manifest must be a JSON file under .github/scripts/`);
+    }
   }
   for (const workflow of covered) if ((!selected || selected.has(workflow)) && !index.workflows[workflow]) problems.push(`${workflow}: replayed but not indexed`);
   return problems;
@@ -96,6 +105,7 @@ function main(argv) {
     try {
       status = withFrozenWorkflow({ cwd, workflow: replay.workflow, revision: index.revision,
         manifest: replay.manifest, manifestFormat: replay.manifest_format, roots: replay.roots,
+        inputViewManifest: replay.input_view_manifest,
         extraWorkflows: replay.extra_workflows, command: command ?? replay.command });
     } catch (error) {
       console.error(`frozen workflow custody failed: ${error.message}`);
