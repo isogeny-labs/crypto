@@ -308,13 +308,54 @@ Reading against the pre-stated predictions:
   it does not test: `[3]`- and `[4]`-multiples together, larger `N`, or an F4 run (`D`)
   on the augmented systems.
 
+### 6b. Null-support slope (lead 3): the degree is set by the support, not by the curve (development check, 2026-11-11)
+
+Pre-registered in `devcheck/README.md` before the rows existed. Same instrument, cells, seeds and
+targets as §6; the `null` control replaces every summation equation by a random polynomial on a
+chosen monomial support (coefficients from the cell rng after the targets are drawn, so the tower
+and the targets are identical to the `tower` arm). Two supports: `S₃`'s own 9-monomial support
+(the pilot's default `null`), and the full exponent box `0..=W` on each equation's variables
+(`--null-width W`, added today: 4, 9, 16, 25 monomials at `m = 2` for `W = 1..4`). Rows:
+`devcheck/null_*.jsonl`, `devcheck/nullw*_*.jsonl`; every value `[pcc:unverified]`.
+
+| support | `m = 2`, `t = 2..8` (`d_F`, both draws) | `m = 3`, `t = 2, 3` | `m = 4`, `t = 2, 3` |
+|:--|:--|:--|:--|
+| tower (`S₃`, the curve) | 4, 4, 4, 4, 5, 5, 5 | 5, 6 | 6, 7 |
+| null on `S₃`'s support | 4, 4, 4, 4, 5, 5, 5 (`t = 9`: 5 = tower) | 5, 6 | 6, 7 |
+| box `W = 1` (bilinear) | 3, 3, 4, 4, 4, 4, 5 | 4, 4 | 4, 5 |
+| box `W = 2` | 4, 4, 4, 4, 5, 5, 5 | 5, 6 | 6, 7 |
+| box `W = 3` | 5, 5, 5, 5, 5, 5, 5 | 8, 8 | > 8, > 8 (cmax 8) |
+| box `W = 4` | 5, 5, 5, 5, 5, 5, 5 | > 8 | > 8 |
+
+Reading against the pre-stated prediction:
+
+- **Shape-driven, as predicted.** A random polynomial on `S₃`'s support, and a random polynomial on
+  the `W = 2` box, give the tower's `d_F` on every one of the 24 + 16 completed cells, draw by
+  draw, with the same fall sequences (one exception in the sequence only: `W = 2`, `m = 4`, `t = 2`
+  falls [4, 6] against [4, 5, 6], same `d_F`). The curve contributes nothing the support does not:
+  the growth measured in §1 is a property of the carry-graded one-generator closure, which is the
+  mechanism §4 names. H-null of the preregistration (`PREREGISTRATION.md` §6) reads "shape-driven"
+  on these cells.
+- **The degree is monotone in the support width.** At `m = 2` the bilinear box sits at or one below
+  the tower, `W = 2` equals it, and `W = 3` and `W = 4` coincide at 5 from `t = 2` on (the tower
+  reaches 5 at `t = 6`); at `m = 3, 4` the `W = 1` chain sits one to two degrees below the tower.
+  At `m ≥ 3` the boxes with `W ≥ 3` also raise the degree in the chain's free `F_p` unknowns
+  (which the ring does not reduce), so those rows are not a like-for-like width comparison; they
+  are reported, not read.
+- **What it closes and what it opens.** The Semaev structure of `S₃` is not what sets `d_F` at these
+  sizes, so no presentation that keeps the support can lower it; what sets it is `(support, N)`
+  under the carry grading, a combinatorial object that can be computed without any curve. The
+  derivation of the `d_F(W, N)` law (the C-step slope included) is therefore the theory lead that
+  would close the Kummer lane with a mechanism (problem record, third unblock item); it needs no
+  further measurement at this scale.
+
 ## 7. Leads, ranked
 
 | rank | lead | kind | cost | discriminates | atlas |
 |--:|:--|:--|:--|:--|:--|
 | 1 | **Finish the decisive PKM cells**: `t = 14` cap 7 (C-step predicts 7), and the `m = 4`, `N = 20` closure (Amendment 8: rise / flat / fall) | measurement, queued | EKS jobs already requested (`requests_r2h/`); the `m = 4` job needs a host that survives 49 h or a split amendment | "close the lane" vs "keep as a mechanism question for `m ≥ 6`" (Amendment 8, as written) | `LEAD-ICP-pkm-tower-algebraic-oracle` |
 | 2 | **Multiples presentation probe** (§6) at the stage C cells `t = 2, 3`, `m = 2..5`, both draws, `--engine hky`, same seeds | presentation experiment | minutes to an hour on a 4-core host | P1/P2 vs the falsifier above | none (new) |
-| 3 | **Null-support slope**: run the pilot's `null` control (random coefficients on `S₃`'s support, planted zero) and supports of width `w = 1..4` on the same towers, and fit `d_F` against `N` and `w` | mechanism closure | same tool, minutes per cell | if `d_F(N, w)` is curve-independent, the growth is a property of a one-generator system in the carry-graded cyclic group algebra and the lane closes with a named mechanism (the note's H0, now with its cause); if the curve's `S₃` sits below the null at equal support, Semaev structure helps and is worth isolating | `LEAD-ICP-construction-normal-form` (instrument), `LEAD-ICE-prime-field-semaev-solving-degree` (closed_known) |
+| 3 | **Null-support slope.** *Measured 2026-11-11 (§6b)*: a random polynomial on `S₃`'s support, or on the `W = 2` box, has the tower's `d_F` on all 40 completed cells; the degree is monotone in the box width. The curve contributes nothing the support does not: the growth is a property of the carry-graded one-generator closure. What remains is the derivation of `d_F(W, N)` (the C-step slope included), a computation without any curve | mechanism, measured at toy scale | desk (theory) | a derived `d_F(W, N)` law closes the Kummer lane with a mechanism; a law that stays bounded for some presentable support would be the first bounded-degree route over `F_p` | `LEAD-ICP-construction-normal-form` (instrument), `LEAD-ICE-prime-field-semaev-solving-degree` (closed_known) |
 | 4 | **First counted algebraic-track row**: `pkm-semaev` on a Table B curve, `m = 2` full and `m = 3` chain, §5a band, matched rho-negation, replay certificate. *Specification written 2026-11-11* (`algebraic_row_spec/`: `spec.json` with 3 curves × 8 targets × 14 arms, protocol draft validated OK, blockers, submission steps; the Kummer base is unavailable on fp16/18/20, `v₂(p − 1)` = 3, 1, 1, so the isogeny base at `t = 4..6` is used; derived budget 4.2 h single-thread, 46 vCPU-hours ceiling with replays; owner decides the route) | measurement, spec ready | EKS (`D-EKS` approved 2026-10-29: about 49 CPU-hours); the oracle exists (`pkm_semaev.rs`, `Membership::{Kummer, Isogeny}`) | gives the headline track a baseline to ratchet; the smoke row (§1) suggests about 100× above the generic incumbent at `w = 0`, which is the number the track would then report as its distance | `LEAD-ICP-pkm-tower-algebraic-oracle`, program `reference_arm/` |
 | 5 | **Generic-track constants.** *Reconciled 2026-11-11* (`prefetch_status/ANALYSIS.md`): the hash-table prefetch Design A patch is obsolete. `main` already carries an independent `layout=lines` implementation of the same line-layout idea (`src/cryptanalysis/ic_framework/plugins.rs`, option `layout=lines` on `mitm-prime-batch` and `mitm:negation_folded=1`, with equality tests), and it was measured: the line-layout tournament v6 at fp28 reads the candidate 12 % slower in the valid sessions and is recorded as `invalid_measurement` (`research/prime_field_lead_assessment_20261107/README.md`, rows 53 and 146; `research/ic_line_layout_tournament_20261031/`) `[pcc:unverified]`. What stays open on this lead is the software-prefetch step itself (`prefetcht0` on the landed layout) and `N > 45` at 20 bits. | engineering | build host + EKS L2 session | the only place a measured improvement over the current baseline is available; cannot reach parity (§2) | `LEAD-ICP-prime-ic-constant-engineering` |
 | 6 | **Honest non-uniform accounting**: record `S·T²` per Table B row and the preprocessing-rho reference (Probe A of the program note) | accounting | desk | makes the many-target regime comparable; not an improvement | `LEAD-ICP-retained-setup-online` (obstructed) |

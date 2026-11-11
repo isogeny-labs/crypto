@@ -59,3 +59,8 @@ function of `(W, N)` alone, non-decreasing in `W` and in `N`, with `d_F(null, 2)
 support width, i.e. the carry-graded one-generator closure, not by the curve. The agent's smoke rows
 (`agent_smoke_nullw{1,3}_m2_t3-5.jsonl`, written before this paragraph) are not part of the ladder.
 Rows: `nullw{1,2,3,4}_m2_t2-8.jsonl`, `nullw{W}_m3_t2-3.jsonl`, `nullw{W}_m4_t2-3.jsonl`.
+
+Outcome (2026-11-11): all 12 width groups completed (`run_nullw.log`); the reading is in the note's
+§6b. Caveat recorded there: at `m ≥ 3` the `W ≥ 3` boxes raise the raw degree in the chain's free
+unknowns `u_k`, which the closure ring does not reduce, so those rows are not a like-for-like width
+comparison.

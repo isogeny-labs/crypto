@@ -78,12 +78,29 @@ Weil descent over $F_(2^n)$: one relation gives $n$ equations of degree 2 in $m 
 
 P1 holds (identical at $m = 2$, draw by draw). P2 holds and nothing reaches the falsifier: at $m >= 3$ the drop is exactly one degree on six of ten completed cells and zero on four, and both slopes are unchanged ($m = 4$: 6 → 7 against 5 → 6 from $t = 2$ to 3; $t = 3$: 6 → 7 against 5 → 6 from $m = 3$ to 4). The one-degree offset at $m >= 3$ arrives with the degree-4 doubling links and the extra unknowns $u'_k$, a presentation shift, not a change in growth. The $m = 5$, $t = 3$ cell is censored on both arms (tower > 7, multiples > 6) and is inconclusive on this host. Section 4 item 3 stays closed as far as this check can test it; not tested: $[3]$- and $[4]$-multiples together, larger $N$, an F4 run on the augmented systems.
 
+= Null-support slope (lead 3, development check, 2026-11-11)
+
+Pre-registered before the rows existed. The `null` control replaces every summation equation by a random polynomial on a chosen support, with the same tower and targets as the `tower` arm: $S_3$'s own support, or the full exponent box $0..W$ (`--null-width`). Every value `[pcc:unverified]`; rows in `devcheck/`.
+
+#table(
+  columns: 4, inset: 4pt, stroke: 0.4pt,
+  [*support*], [*$m = 2$, $t = 2..8$*], [*$m = 3$, $t = 2, 3$*], [*$m = 4$, $t = 2, 3$*],
+  [tower ($S_3$, the curve)], [4, 4, 4, 4, 5, 5, 5], [5, 6], [6, 7],
+  [null on $S_3$'s support], [4, 4, 4, 4, 5, 5, 5], [5, 6], [6, 7],
+  [box $W = 1$], [3, 3, 4, 4, 4, 4, 5], [4, 4], [4, 5],
+  [box $W = 2$], [4, 4, 4, 4, 5, 5, 5], [5, 6], [6, 7],
+  [box $W = 3$], [5, 5, 5, 5, 5, 5, 5], [8, 8], [> 8],
+  [box $W = 4$], [5, 5, 5, 5, 5, 5, 5], [> 8], [> 8],
+)
+
+Shape-driven, as predicted: a random polynomial on $S_3$'s support or on the $W = 2$ box has the tower's $d_F$ on all 40 completed cells, draw by draw, with the same fall sequences. The degree is monotone in the support width (at $m >= 3$ the $W >= 3$ boxes also raise the degree in the chain's free unknowns, so those rows are reported, not read). The curve contributes nothing the support does not: the growth is a property of the carry-graded one-generator closure, the mechanism of section 4, and the remaining step on this lead is the derivation of the $d_F (W, N)$ law, a computation without any curve.
+
 = Leads, ranked
 
 1. Finish the decisive PKM cells: $t = 14$ cap 7; the $m = 4$, $N = 20$ closure (Amendment 8 readings).
-2. The multiples presentation probe at $t = 2, 3$, $m = 2..5$ (minutes on a 4-core host).
-3. The null-support slope: `null` control and supports of width $w = 1..4$; if $d_F (N, w)$ is curve-independent, the growth is a property of the carry-graded one-generator closure and the lane closes with a mechanism.
-4. The first counted algebraic-track row: `pkm-semaev` on a Table B curve with the §5a band and matched rho (D-EKS approved; about 49 CPU-hours).
+2. The multiples presentation probe: done (section 6): P1 and P2 hold, the falsifier is not reached, one cell inconclusive.
+3. The null-support slope: measured (section above): curve-independent on all 40 cells; what remains is the derivation of $d_F (W, N)$.
+4. The first counted algebraic-track row: specification written (`algebraic_row_spec/`: 3 Table B curves × 8 targets × 14 arms on the isogeny base, protocol draft validated, derived 46 vCPU-hour ceiling inside the approved budget); the owner decides the submission route; it needs an EKS identity and an image rebuild.
 5. Generic-track constants: the prefetch Design A patch is obsolete (reconciled 2026-11-11: `layout=lines` is already on `main` and measured 12 % slower at fp28 in the v6 tournament, `invalid_measurement`); what stays open is the software-prefetch step on the landed layout and $N > 45$ at 20 bits: the only place a measured improvement over the current baseline is available.
 6. Honest non-uniform accounting ($S T^2$ per row; preprocessing-rho reference).
 

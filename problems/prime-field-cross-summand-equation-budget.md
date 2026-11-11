@@ -87,3 +87,13 @@ or a flat ladder) was not reached on any completed cell; the `m = 5`, `t = 3` ce
 both arms (tower `> 7`, multiples `> 6`, the latter by a 2.5·10⁸-entry cap on a 15 GB host) and
 is inconclusive. The second "what would unblock it" item is therefore not
 met at toy scale; the record stays open on the first and third.
+
+## Update 2026-11-11 (null-support development check; every value `[pcc:unverified]`)
+
+The suspected explanation is now measured at toy scale: a random polynomial on `S₃`'s monomial
+support, or on the full width-2 exponent box, has the tower's last fall degree on all 40 completed
+cells (`m = 2`, `t = 2..9`; `m = 3, 4`, `t = 2, 3`), with the same fall sequences, and the degree is
+monotone in the box width (`research/prime_ic_leads_20261110/README.md` §6b). The growth is a
+property of the carry-graded one-generator closure, not of the curve. The third "what would unblock
+it" item (a derivation or exact computation of the one-generator closure degree as a function of
+support and `N`) is the remaining step; the first two are unchanged.
