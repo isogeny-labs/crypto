@@ -2733,6 +2733,7 @@ mod diagnostic_child_v2_tests {
             target: ["0".into(), "0".into()],
             planted: None,
             target_counter: None,
+            representation: None,
         };
         let bytes = serde_json::to_vec(&serde_json::to_value(&workload).unwrap()).unwrap();
         let diagnostic = job.diagnostic_lifecycle.as_mut().unwrap();

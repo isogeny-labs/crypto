@@ -748,6 +748,9 @@ pub struct RegimeInstance {
     pub variants: Vec<VariantResult>,
     pub seeds: Vec<u64>,
     pub targets: Vec<u64>,
+    /// EFD model/chart used for input and output, when one was selected.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub representation: Option<PrimeRepresentation>,
 }
 
 /// A fitted exponent `ops ∝ r^α` for one phase of one variant, and the
@@ -13173,6 +13176,7 @@ pub fn run_prime_instance(inst: &PrimeInstance, cfg: &BoundaryConfig) -> RegimeI
         variants: Vec::new(),
         seeds: Vec::new(),
         targets: Vec::new(),
+        representation: inst.representation.clone(),
     };
     let calib = &priced;
     out.curve["factor_base"] = serde_json::json!({
@@ -13783,6 +13787,7 @@ fn binary_regime_shell(inst: &BinaryInstance, regime: &str, automorphisms: u32) 
         variants: Vec::new(),
         seeds: Vec::new(),
         targets: Vec::new(),
+        representation: None,
     }
 }
 
@@ -17743,6 +17748,7 @@ mod tests {
             rho: Vec::new(),
             rho_s_mean: 0.0,
             rho_verified_all: true,
+            representation: None,
             variants: vec![VariantResult {
                 name: "v".into(),
                 oracle: "o".into(),
