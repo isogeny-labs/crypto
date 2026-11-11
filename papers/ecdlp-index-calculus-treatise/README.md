@@ -2,7 +2,7 @@
 
 `treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 293 pages) is the
 programme's comprehensive document on ECDLP index calculus, current to
-2026-11-06.
+2026-11-10.
 
 **Status:** research draft, anonymized, not peer-reviewed, not submitted.
 It synthesises committed evidence. Its one new computation is a
@@ -31,6 +31,7 @@ the ledger.
 - **6. Fall degrees:** binary Weil descent of $S_3$ (first fall degree 2, last fall degree at most $k+2$, certified $\ge5$ at $n=33$–$45$, Semaev's Assumption 1 fails as stated); the guarded chain, $(4,5)$ exactly; PKM Kummer towers; definitional pitfalls, including Nagao's Lemma 4.
 - **7. Obstructions:** transport conservation, generic-oracle closures, xedni $\alpha=3$, and the twist obstruction.
 - **12.7 Curve25519 miniatures** (new section in Chapter 12, Prime fields): 31 studies on $k=16$–$32$ curves built by Curve25519's selection rule. Rho with negation is ahead of every arm: the generic baseline is $7.8$–$24.7\times$ rho, the autolab plateau is $1.8$–$1.9\times$ (a derived $F=2$ collision floor; claims unverified), and the best F4 arm is $1.83\cdot10^4\times$ at $w=0.1$. No statement about the 255-bit curve is made.
+- **The record, 6–10 November** (new chapter after Corrections and validation): about 70 studies committed after the survey. The Curve25519 generic arms reach $1.22$–$1.40\times$ rho-neg but are boundary methods, not index calculus; table inserts are priced by default from 8 November; the prime medium-tier rho is $1.067\times$ its floor (toy-normalised prime gaps understated by about $1.27\times$); $k=4$ in characteristic two reaches $m=18$ at $0.45\times$ rho theory on one target (crossover indicated, not established); minors guess-and-determine is closed ($4.37$–$1552\times$ rho). Data: `figures/data-november.json`; figures: `python3 figures/make_fig_november.py`.
 - **13. Extension fields:** $k=4$ with $D_4$, and the red-team verdict.
 - **15. The summer record (July–September 2026):** 1,402 ledger decisions indexed by date, verdict and run-data path ([`research/ecdlp_jul_sep_index_20261029/`](../../research/ecdlp_jul_sep_index_20261029/)); the retracted July wins, August yield/monodromy/oracle/transfer closures, September tables, lifts, Semaev 2015 and Nagao audits, Frobenius bases and the first ICPERF costing against rho.
 - **17. Distance by family:** includes the $k$-sum oracle, the validated 20-bit baseline, N4 v2, and the $n=83$ precomputed-rho reproduction.
@@ -48,6 +49,7 @@ the ledger.
 ```sh
 python3 figures/make_fig_fall_degrees.py   # fall-degree figure, from data-new.json
 python3 figures/make_fig_weak.py           # weak-family figure, from data-new.json
+python3 figures/make_fig_november.py       # Chapter 'The record, 6-10 November', from data-november.json
 make                                        # pdflatex + bibtex
 make check                                  # fail on errors, unresolved refs, overfull boxes
 ```
