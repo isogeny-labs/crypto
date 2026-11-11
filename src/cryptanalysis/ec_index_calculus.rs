@@ -2592,6 +2592,31 @@ mod tests {
         assert!(retried > 0, "no seed exercised the retry path");
     }
 
+    /// Above one word, `double_scalar_mul_vartime` equals two ladders plus an
+    /// add on secp256k1 and P-256, including `Q = -G` and a zero scalar.
+    #[test]
+    fn point_double_scalar_mul_vartime_matches_two_ladders_multiword() {
+        for curve in [CurveParams::secp256k1(), CurveParams::p256()] {
+            let a_fe = curve.a_fe();
+            let g = curve.generator();
+            let q = g.scalar_mul(&BigUint::from(0x1234_5678_9abc_def0_u64), &a_fe);
+            let neg_g = g.scalar_mul(&(&curve.n - BigUint::one()), &a_fe);
+            let big = |seed: u64| {
+                (BigUint::from(seed) << 200u32)
+                    + BigUint::from(seed.wrapping_mul(0x9e37_79b9_7f4a_7c15))
+            };
+            for other in [&q, &neg_g] {
+                for (i, j) in [(1u64, 2u64), (3, 0), (0, 5), (7, 7), (11, 13), (255, 4097)] {
+                    let (k, l) = (big(i), big(j));
+                    let want = g
+                        .scalar_mul(&k, &a_fe)
+                        .add(&other.scalar_mul(&l, &a_fe), &a_fe);
+                    assert_eq!(g.double_scalar_mul_vartime(&k, other, &l, &a_fe), want);
+                }
+            }
+        }
+    }
+
     /// Shamir interleaving equals two separate ladders plus an add.
     #[test]
     fn double_scalar_mul_matches_two_ladders() {
