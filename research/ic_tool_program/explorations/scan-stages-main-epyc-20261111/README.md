@@ -46,3 +46,14 @@ One `isolab.eks.command-request/v1` Job ([`make-request.sh`](make-request.sh),
 Ceiling USD 3: `c8a.2xlarge` Spot for at most 3 hours, plus the launcher.
 The owner authorized this run on 2026-11-11 ("All", answering whether to
 run the EPYC stage probe while the monthly AWS budget is over its limit).
+
+## Status: blocked before submission (2026-11-11, 09:1x UTC)
+
+`remote/launch-remote-command request-a1.json` failed at `StartBuild`:
+`AccountLimitExceededException: Cannot have more than 0 builds in queue for
+the account` ([`receipts/a1-launcher.out`](receipts/a1-launcher.out)). No
+build was created, so no Job ran and nothing was charged. Every
+`Concurrently running builds` quota for CodeBuild in us-east-2 reads 0
+(Service Quotas, read at the same time). The launcher's last successful
+build was at about 00:27 UTC (rule v9's attempt a2). Raising the quota is an
+owner action and was not attempted. The run waits for the bridge.
