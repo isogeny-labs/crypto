@@ -156,3 +156,14 @@ rows in `pilot/rows/`, summary `pilot/pilot_summary.json`, bench record
 verified. Every f > 0 arm and `logs_default` had higher total counted cost than
 f0 in all four cells at every λ tested `[pcc:unverified]`. The pilot does not
 change the protocol; `seeds_per_cell` stays 30 pending the reviewer's freeze.
+
+## Freeze (2026-11-11T05:54Z)
+
+Frozen as [`protocol.json`](protocol.json) (`freeze.protocol_sha256`
+`aa928f27f9be1dff19e1d62ee79a148ac14c06d56c0dd80193bef62ae1153076`, scheme in
+the file) before any frozen-run data, at the owner's instruction ("run the
+whole thing"). Amendments over this draft: 30 seeds per cell; seed base
+offset +100 so the frozen run's seeds are disjoint from the pilot's; route
+local and unisolated (wall metrics indicative only, primary metric counted).
+Gaps recorded in the frozen file: no research-kb receipt (not reachable from
+this container) and no independent reviewer before freeze.
