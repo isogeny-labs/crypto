@@ -1,6 +1,6 @@
 # Phase 2 protocol: does Pollard rho cost depend on anything but r, across and within isogeny classes of F_{2^31−1}?
 
-Status: **frozen before data** (2026-11-11). Requested by the user on 2026-11-11 ("Yes run it all") after
+Status: **DRAFT, not yet frozen** (2026-11-11). It is frozen, and this line changed, once §8 is filled from the timing pilot and before any study data. Requested by the user on 2026-11-11 ("Yes run it all") after
 the phase-1 census (`../REPORT.pdf`). Any later change is an amendment, appended at the end with its
 reason and date. Data taken before an amendment stays in the record.
 
