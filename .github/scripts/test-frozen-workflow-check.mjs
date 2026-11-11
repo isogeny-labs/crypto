@@ -67,7 +67,10 @@ async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-r
         ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
           [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
         : { files };
-    write(manifest, JSON.stringify(freeze) + '\n');
+    write(manifest, manifestFormat === 'sha256sum'
+      ? Object.entries(files).map(([file, digest]) =>
+        `${digest}  ${file.startsWith('.github/') ? file : study + '/' + file}\n`).join('')
+      : JSON.stringify(freeze) + '\n');
     git('add', '.');
     git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'original freeze');
     const revision = git('rev-parse', 'HEAD');
@@ -409,4 +412,78 @@ test('a JSON Pointer reads names with dots and escapes, and only own fields', as
       extraWorkflows: [`${extraWorkflow}|${extraManifest}|pointer:/constructor`] }),
     /historical workflow does not match its frozen digest/);
   }, { extra: true });
+});
+
+test('replay runner: a command after -- needs exactly one --only', async () => {
+  const { parseArgs } = await import('./run-frozen-workflow-replays.mjs');
+  assert.deepEqual(parseArgs([]), { custodyOnly: false, only: [], command: null });
+  assert.deepEqual(parseArgs(['--only', 'a', '--only', 'b']), { custodyOnly: false, only: ['a', 'b'], command: null });
+  assert.deepEqual(parseArgs(['--only', 'a', '--', 'bash', '-c', 'x --only y']),
+    { custodyOnly: false, only: ['a'], command: ['bash', '-c', 'x --only y'] });
+  for (const argv of [['--', 'true'], ['--only', 'a', '--only', 'b', '--', 'true'], ['--only', 'a', '--'],
+    ['--only', 'a', '--custody-only', '--', 'true'], ['--only'], ['--only', '--custody-only'], ['--bogus']]) {
+    assert.throws(() => parseArgs(argv), undefined, argv.join(' '));
+  }
+});
+
+test('replay runner: --only scopes custody to the pins of the selected replays', async () => {
+  const { custodyProblems } = await import('./run-frozen-workflow-replays.mjs');
+  const repo = mkdtempSync(path.join(os.tmpdir(), 'frozen-replay-custody-'));
+  try {
+    const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim();
+    git('init', '-q');
+    git('config', 'user.email', 'test@example.invalid');
+    git('config', 'user.name', 'test');
+    const hash = text => createHash('sha256').update(text).digest('hex');
+    mkdirSync(path.join(repo, '.github/workflows'), { recursive: true });
+    for (const name of ['a', 'b', 'c']) writeFileSync(path.join(repo, `.github/workflows/${name}.yml`), `name: ${name}\n`);
+    const pins = Object.fromEntries(['a', 'b', 'c'].map(name => [name, hash(`name: ${name}\n`)]));
+    // b's evidence file drops its pin, so only replays that cover b see a problem.
+    writeFileSync(path.join(repo, 'a.json'), pins.a);
+    writeFileSync(path.join(repo, 'b.json'), 'unpinned');
+    writeFileSync(path.join(repo, 'c.json'), pins.c);
+    git('add', '.');
+    git('commit', '-qm', 'pins');
+    const index = { revision: git('rev-parse', 'HEAD'),
+      workflows: Object.fromEntries(['a', 'b', 'c'].map(name => [`.github/workflows/${name}.yml`,
+        { pinned_sha256: pins[name], check: 'replay', pinned_by: [`${name}.json`] }])),
+      replays: [
+        { id: 'ra', workflow: '.github/workflows/a.yml', extra_workflows: [] },
+        { id: 'rb', workflow: '.github/workflows/c.yml', extra_workflows: ['.github/workflows/b.yml|b.json|key:x'] },
+      ] };
+    assert.deepEqual(custodyProblems({ cwd: repo, index, only: ['ra'] }), []);
+    assert.deepEqual(custodyProblems({ cwd: repo, index, only: ['rb'] }),
+      ['.github/workflows/b.yml: b.json no longer carries its pin']);
+    assert.deepEqual(custodyProblems({ cwd: repo, index }), ['.github/workflows/b.yml: b.json no longer carries its pin']);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('a coreutils sha256sum manifest pins the workflow and its root-relative inputs', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    assert.equal(withFrozenWorkflow(options), 0);
+    assert.notEqual(readFileSync(marker, 'utf8'), cwd);
+    // sha256sum --check itself passes in the view and fails on the live checkout.
+    const check = { ...options, command: ['sha256sum', '--check', '--quiet', manifest] };
+    assert.equal(withFrozenWorkflow(check), 0);
+    assert.throws(() => execFileSync('sha256sum', ['--check', '--quiet', manifest], { cwd, stdio: 'pipe' }));
+  }, { manifestFormat: 'sha256sum' });
+});
+
+test('a sha256sum manifest rejects drifted inputs and malformed lines', async () => {
+  await fixture(async ({ write, options }) => {
+    write(study + '/input.json', '{"evidence":"changed"}\n');
+    assert.throws(() => withFrozenWorkflow(options), /frozen input drift: research\/study\/input.json/);
+  }, { manifestFormat: 'sha256sum' });
+  for (const bad of ['not a digest line\n', `${'a'.repeat(64)} research/x\n`, `${'a'.repeat(64)}  x\n${'b'.repeat(64)}  x\n`]) {
+    await fixture(async ({ cwd, write, options }) => {
+      write(manifest, bad);
+      const git = (...args) => execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+      git('add', '.');
+      git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'bad manifest');
+      const revision = git('rev-parse', 'HEAD').toString().trim();
+      assert.throws(() => withFrozenWorkflow({ ...options, revision }), /invalid sha256sum manifest line/);
+    }, { manifestFormat: 'sha256sum' });
+  }
 });
