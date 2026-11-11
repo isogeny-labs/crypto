@@ -1,0 +1,11 @@
+--- predecessor/BranchRootMultiplicity.lean
++++ successor/BranchRootMultiplicity.lean
+@@ -150,7 +150,7 @@
+     polynomial_germ_order a3 a2 a1 a0 a hroot hsimple U hU] at hs
+   have hcast : ((u1.rootMultiplicity a*2+u2.rootMultiplicity a*2+
+       U.rootMultiplicity a*2 : ℕ) : ℕ∞)=2 := by
+-    simpa only [ENat.natCast_add,ENat.natCast_mul] using hs
++    simpa only [ENat.natCast_add,ENat.natCast_mul,Nat.cast_ofNat] using hs
+   have hnat := congrArg ENat.toNat hcast
+   change u1.rootMultiplicity a*2+u2.rootMultiplicity a*2+U.rootMultiplicity a*2=2 at hnat
+   refine ⟨hu1,hu2,hU,?_⟩

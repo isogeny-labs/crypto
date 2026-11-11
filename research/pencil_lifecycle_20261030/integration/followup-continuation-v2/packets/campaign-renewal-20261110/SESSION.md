@@ -53,3 +53,17 @@ Publish/review fresh cast identity, budget, deadline and final bindings, then in
 
 ### Errors (what went wrong, how it was handled)
 No active pencil units were listed; Diem stays deadline-expired and is not restarted. [pcc:unverified]
+
+## 2026-11-11 — Cast attempt terminal
+
+### What was done (commands, files, features)
+Ran the exact published release once. Both mathematical modules exited0; IndependentControls failed at lines22 and28 with simp made no progress. Final Readback/ExpectedFailure were not reached. Pre54.448825s and post32.848408s passed; compiler104.721577s failed; total192.137268s. All three phase owners terminal; tool session77051 exit1. [pcc:unverified]
+
+### Decisions made (and why)
+Charge full600seconds, leaving129000. Preserve all failed/raw records; no automatic retry. Diagnose only redundant simp control steps before any separately reviewed successor. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Independent machine audit and neutral PDF/SVG/CSV/JSON archival in progress. Full13-name readback and expected-failure control remain unexecuted. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+Control elaboration failure preserved; no change to prior native outputs or old campaign. [pcc:unverified]
