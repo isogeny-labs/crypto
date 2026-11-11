@@ -1,0 +1,81 @@
+{
+  "schema": "source-review/v1",
+  "created_utc": "2026-11-11T00:32:19Z",
+  "reviewer": "/root/artifact_final_audit",
+  "subjects": [
+    {
+      "packet": "signed-kummer-combined-runner-v2-20261111",
+      "manifest_sha256": "6467e061c332c1f8ebeb251d4a3c8a643b94bfe2577353c3345a49ff996e7a51",
+      "manifest_entries": 71
+    },
+    {
+      "packet": "signed-kummer-lock-gate-v2-20261111",
+      "manifest_sha256": "74dd88670a3635736684af62c6470f3cfa67c8ea8d9d6c3c25e41bc56469dbfb",
+      "manifest_entries": 37
+    }
+  ],
+  "status": "release_blocked_by_trace_record_shape_mismatch",
+  "execution_performed": false,
+  "forbidden_actions_performed": [],
+  "verdict_scope": "Independent static source, inventory, panel, cap, custody, and admission review only; no compiler, resolver, test, payload, source application, index mutation, or canonical-journal write.",
+  "prior_findings": {
+    "F1": "structurally_corrected",
+    "F2": "not_corrected_record_envelope_mismatch",
+    "F3": "structurally_corrected_runtime_unchecked"
+  },
+  "findings": [
+    {
+      "id": "F2-R1",
+      "severity": "blocking",
+      "kind": "producer_consumer_json_shape_mismatch",
+      "summary": "Rust emits Record{sequence,event}, but trace_identity and its negative controls expect top-level kind/data",
+      "evidence": [
+        "kummer-signed-driver-20261109/relation_stream.rs.candidate:137-140 defines Record with sequence and event",
+        "kummer-signed-driver-20261109/relation_stream.rs.candidate:242-248 serializes Record",
+        "signed-kummer-combined-runner-v2-20261111/panel_acceptance.py:8-12 reads top-level kind and data",
+        "signed-kummer-combined-runner-v2-20261111/acceptance_negative_controls.py:7-13 constructs the same non-native top-level shape",
+        "signed-kummer-combined-runner-v2-20261111/durable-worker.py:238-248 invokes identity acceptance before adapter negatives"
+      ],
+      "effect": "Every nonempty real driver trace is rejected before identity comparison, so the combined attempt cannot produce a passing terminal receipt.",
+      "required_correction": "Parse exact Record envelope, require sequence zero, compare event.kind/data identity/native header, and make the changed-revision/hash negatives use the same envelope. Preserve the intentional empty fault-0 prefix and every panel member."
+    }
+  ],
+  "passed_static_checks": {
+    "packet_manifests_match": true,
+    "packet_member_hashes_and_bytes_match": true,
+    "input_contracts_byte_identical": true,
+    "staged_input_count": 50,
+    "unique_source_paths": 50,
+    "unique_destinations": 50,
+    "declared_input_hashes_and_bytes_match": true,
+    "driver_controls_entries": 1,
+    "independent_driver_and_adapter_workspace_roots": true,
+    "independent_lock_destinations": true,
+    "standalone_adapter_manifest_selected": true,
+    "signed_cases": 28,
+    "labels_cases": 7,
+    "native_driver_calls": 11,
+    "forced_native_probes": 2,
+    "adapter_negatives": 4,
+    "lock_shared_resolver_cap_seconds": 45,
+    "lock_total_reservation_seconds": 60,
+    "combined_build_cap_seconds": 1800,
+    "combined_execution_cap_seconds": 600,
+    "combined_total_cap_seconds": 2400,
+    "campaign_ceiling_seconds": 129600,
+    "absolute_deadline": "2026-11-11T12:00:00Z",
+    "initial_campaign_bindings_preserved": true
+  },
+  "unadmitted_state": {
+    "actual_prior_seconds": null,
+    "actual_remaining_seconds": null,
+    "driver_lock": null,
+    "adapter_lock": null,
+    "combined_released": false,
+    "lock_gate_released": false,
+    "serial_owner_confirmed": false,
+    "qualification_runs": 0,
+    "cost_ratio_to_rho": null
+  },
+  "recommendation": "Preserve the sealed v2 packets. Fix F2-R1 in a successor, refresh hashes, and repeat independent source review before any release or invocation."
+}

@@ -1,0 +1,74 @@
+--- initial/admission-draft.json
++++ current/admission-draft.json
+@@ -3,7 +3,7 @@
+   "released": false,
+   "workspace": "/var/tmp/pencil-signed-kummer-combined-v2-20261111",
+   "donor_workspace": "/var/tmp/pencil-root-materialize-t1953-20261109",
+-  "absolute_deadline": null,
++  "absolute_deadline": "2026-11-11T12:00:00Z",
+   "total_seconds": 2400,
+   "build_phase_seconds": 1800,
+   "execution_phase_seconds": 600,
+@@ -21,7 +21,7 @@
+     "path": "/home/ec2-user/pencil-validation-receipts/t1953-materializer-20261109/worker/materialized-inputs.json",
+     "sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2"
+   },
+-  "campaign_ceiling_seconds": 43200,
++  "campaign_ceiling_seconds": 129600,
+   "campaign_charged_seconds": null,
+   "campaign_remaining_seconds": null,
+   "lease": null,
+@@ -66,7 +66,7 @@
+     "stage_driver.py": "3a072cbfd03fac4149bbebdc969ef33173b67f1e35fa248e83cdc96ef9f64564",
+     "materialize.py": "087a3a31491a4ed0abff0e730e29cef46aab6461398b6c650555c778b2f79e78",
+     "durable-launcher.py": "aa6cd5159603e0d32e0637f154c513d64df43a3de12b9b18a79662d3a9852535",
+-    "durable_io.py": "6fd36bc2127416e16a3d1b1790bf7f37dd44c68def0c4d436cbb43141bdb5abd",
++    "durable_io.py": "f225a6e232e27cded358b96f6867734e7c49d9904bed24aaa496cea88111c4ba",
+     "durable-worker.py": "8db5ec046ecb249f050b3d3b4e06e042f7b427eaabf3a022550fab8385da9203",
+     "panel_acceptance.py": "afa728704e1559ddcdaffa705960e2e1dcda694a7c322b63a47dd433a7d7be33",
+     "overlays.json": "636f528a373fc7937a46a6dce2d80533246a85ce043a6e33900b876ba76c35a8",
+--- initial/durable_io.py
++++ current/durable_io.py
+@@ -45,7 +45,7 @@
+     import datetime
+     deadline=datetime.datetime.fromisoformat(a['absolute_deadline'].replace('Z','+00:00'))
+     assert deadline.tzinfo is not None and (deadline-datetime.datetime.now(datetime.timezone.utc)).total_seconds()>0
+-    assert a['campaign_ceiling_seconds']==43200
++    assert a['campaign_ceiling_seconds']==129600
+     assert set(a['generated_locks'])=={'driver','adapter'}
+     for lock in a['generated_locks'].values():
+         assert isinstance(lock['path'],str) and Path(lock['path']).is_absolute(), 'generated lock absent'
+@@ -55,7 +55,7 @@
+         assert hashlib.sha256(Path(lock['path']).read_bytes()).hexdigest()==lock['sha256']
+     assert re.fullmatch('[a-f0-9]{40}',a['published_source_revision'] or ''), 'source publication pending' 
+     assert type(a['campaign_charged_seconds']) is int and type(a['campaign_remaining_seconds']) is int
+-    assert a['campaign_charged_seconds']>=0 and a['campaign_charged_seconds']+a['campaign_remaining_seconds']==43200
++    assert a['campaign_charged_seconds']>=0 and a['campaign_charged_seconds']+a['campaign_remaining_seconds']==129600
+     assert a['campaign_remaining_seconds']>=2400
+     assert set(a['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
+     assert type(a['lease']['fencing_epoch']) is int and a['lease']['fencing_epoch']>0
+@@ -77,7 +77,7 @@
+     for kind,lock in a['generated_locks'].items():
+         assert lockpub['locks'][kind]['sha256']==lock['sha256'] and lockpub['locks'][kind]['bytes']==lock['bytes']
+     authorization=json.loads(Path(a['release_receipts']['campaign_authorization']['path']).read_text())
+-    assert authorization['absolute_deadline']==a['absolute_deadline'] and authorization['worker_seconds']==43200
++    assert authorization['absolute_deadline']==a['absolute_deadline'] and authorization['worker_seconds']==129600
+     assert a['fresh_cache_manifest']['sha256'] and a['fresh_cache_manifest']['path']
+     assert a['source_manifest_sha256']==hashlib.sha256((p/'expected-source-manifest.json').read_bytes()).hexdigest()
+     assert a['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+--- initial/report.json
++++ current/report.json
+@@ -26,11 +26,11 @@
+     "absolute UTC deadline",
+     "live owner and ledger",
+     "fresh cache and current release receipts",
+-    "explicit 43200-second suballocation for combined admission"
++    "current campaign authorization receipt for 129600 seconds and 2026-11-11T12:00:00Z"
+   ],
+   "observations": [
+     "The header-write fault intentionally emits zero bytes; identity is unavailable for that expected prefix. Other traces require exact revision, source digest, workload and run identity.",
+     "Previous packets and failed attempts are unchanged.",
+-    "The 43200-second combined suballocation check is preserved, not expanded to the enclosing 129600-second campaign."
++    "The stale 43200-second campaign constant is corrected to the authorized 129600 seconds; actual prior and remaining worker time remain unbound until the final ledger."
+   ]
+ }
