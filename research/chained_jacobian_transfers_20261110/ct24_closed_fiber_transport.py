@@ -211,14 +211,15 @@ def run():
                 else:nonsplit+=1
             norm_short=decode_norm(D,coeff)
             target_2=ec_mul(E,2,TARGET)
-            assert (None if norm_short is None else
-                    (mod(scale**2*norm_short[0]),mod(scale**3*norm_short[1]))) == target_2
+            decoded=(None if norm_short is None else
+                     (mod(scale**2*norm_short[0]),mod(scale**3*norm_short[1])))
+            assert decoded == target_2
             neg=ec_mul(src,108,SOURCE)
             Dneg=pullback_divisor(iso_to_long(phi(neg),coeff,scale),coeff)
             assert reverse_divisor(D)==Dneg
             # Dual norm gives the source log without scalar-readback:
             # [55] pi_*D gives E; inverse phi is precomposition of its dual.
-            recovered=ec_mul(target_2,55,TARGET)
+            recovered=ec_mul(decoded,55,TARGET)
             assert recovered==E
             log,ops=bsgs(target_gen,recovered,TARGET)
             assert log==k
