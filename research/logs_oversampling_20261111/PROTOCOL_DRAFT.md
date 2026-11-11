@@ -146,3 +146,13 @@ validation gate (replay certificate, validator report, matched rho with the
 port), `research/sparse_la_timing_20261018/README.md` (completion rule
 dominates sparse arms). The research-kb MCP server was not queried from this
 subagent; the main session should add the kb receipt before freezing.
+
+## Pilot (2026-11-11, run-20261111T0451Z)
+
+5 seeds per cell, local unisolated container, owner-requested route; report
+[`reports/run-20261111T0451Z/report.pdf`](reports/run-20261111T0451Z/report.pdf),
+rows in `pilot/rows/`, summary `pilot/pilot_summary.json`, bench record
+`benchmarks/records/20261111T0443Z-logs-oversampling-pilot.json`. 120/120 arms
+verified. Every f > 0 arm and `logs_default` had higher total counted cost than
+f0 in all four cells at every λ tested `[pcc:unverified]`. The pilot does not
+change the protocol; `seeds_per_cell` stays 30 pending the reviewer's freeze.
