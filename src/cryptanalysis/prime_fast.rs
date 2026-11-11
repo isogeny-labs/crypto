@@ -456,6 +456,14 @@ impl FastCurve {
         Pt { x: x3, y: y3 }
     }
 
+    /// Montgomery x of `p1 + p2` for `x1 != x2` given `inv_dx = 1 / (x2 - x1)`; skips the y coordinate.
+    #[inline]
+    pub fn add_x_with_inv(&self, p1: Pt, p2: Pt, inv_dx: u64) -> u64 {
+        let f = &self.f;
+        let lam = f.mul(f.sub(p2.y, p1.y), inv_dx);
+        f.sub(f.sub(f.sqr(lam), p1.x), p2.x)
+    }
+
     #[inline]
     pub fn neg(&self, p: Pt) -> Pt {
         Pt {
@@ -1109,13 +1117,21 @@ impl FastFactorBase {
 }
 
 /// Meet-in-the-middle table for 3-decompositions: every
-/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), sorted by
-/// canonical x.  `B²` entries of 16 bytes.
+/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), bucketed by the
+/// high bits of the canonical x (entries inside a bucket are unordered).  `B²` entries of 16 bytes.
 #[derive(Clone, Debug)]
 pub struct PairTable {
     /// `(x_canonical, j, k_with_sign)`; the top bit of the third field
     /// is set for a difference `F_j − F_k`.
     entries: Vec<(u64, u32, u32)>,
+    /// Bucket index over the high bits of x: bucket `b` holds `entries[starts[b]..starts[b + 1]]`,
+    /// the buckets are monotone in x; entries inside a bucket are in construction order.
+    starts: Vec<u32>,
+    shift: u32,
+    /// Largest canonical x in the table (0 when empty).
+    max_x: u64,
+    /// Legacy layout (one bucket, globally sorted, binary-search lookup); `IC_PAIR_SORTED=1`.
+    sorted: bool,
 }
 
 const PAIR_DIFF_BIT: u32 = 1 << 31;
@@ -1124,6 +1140,7 @@ impl PairTable {
     pub fn build(curve: &FastCurve, fb: &FastFactorBase) -> Self {
         let f = curve.f;
         let b = fb.len();
+        let t_build = Instant::now();
         let mut entries = Vec::with_capacity(b * b);
         let mut d = Vec::with_capacity(b);
         let mut scratch = Vec::with_capacity(b);
@@ -1141,14 +1158,62 @@ impl PairTable {
             for (idx, k) in ((j + 1)..b).enumerate() {
                 let fk = fb.pts[k];
                 let inv = d[idx];
-                let sum = curve.add_with_inv(fj, fk, inv);
-                let diff = curve.add_with_inv(fj, curve.neg(fk), inv);
-                entries.push((f.from_mont(sum.x), j as u32, k as u32));
-                entries.push((f.from_mont(diff.x), j as u32, k as u32 | PAIR_DIFF_BIT));
+                let sum_x = curve.add_x_with_inv(fj, fk, inv);
+                let diff_x = curve.add_x_with_inv(fj, curve.neg(fk), inv);
+                entries.push((f.from_mont(sum_x), j as u32, k as u32));
+                entries.push((f.from_mont(diff_x), j as u32, k as u32 | PAIR_DIFF_BIT));
             }
         }
-        entries.sort_unstable();
-        PairTable { entries }
+        let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
+        let t_sort = Instant::now();
+        if std::env::var_os("IC_PAIR_SORTED").is_some() {
+            entries.sort_unstable();
+            let max_x = entries.last().map(|e| e.0).unwrap_or(0);
+            let len = entries.len() as u32;
+            return PairTable {
+                entries,
+                starts: vec![0, len],
+                shift: 63,
+                max_x,
+                sorted: true,
+            };
+        }
+        // Counting sort over the high bits of x (monotone buckets), then a tiny sort inside each bucket.
+        let bits_p = 64 - (f.p.max(2) - 1).leading_zeros();
+        let target_bits = (usize::BITS - 1 - (entries.len().max(32) / 2).leading_zeros()).max(4);
+        let shift = bits_p.saturating_sub(target_bits);
+        let nb = (((f.p.max(2) - 1) >> shift) + 1) as usize;
+        let mut starts = vec![0u32; nb + 1];
+        for e in &entries {
+            starts[((e.0 >> shift) as usize) + 1] += 1;
+        }
+        for i in 0..nb {
+            starts[i + 1] += starts[i];
+        }
+        let mut cursor: Vec<u32> = starts[..nb].to_vec();
+        let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); entries.len()];
+        for e in &entries {
+            let b = (e.0 >> shift) as usize;
+            sorted[cursor[b] as usize] = *e;
+            cursor[b] += 1;
+        }
+        let max_x = entries.iter().map(|e| e.0).max().unwrap_or(0);
+        let entries = sorted;
+        if std::env::var_os("IC_MULTI_TIMING").is_some() {
+            eprintln!(
+                "pair table: {} entries, adds {:.1} ms, sort {:.1} ms",
+                entries.len(),
+                add_ms,
+                t_sort.elapsed().as_secs_f64() * 1e3
+            );
+        }
+        PairTable {
+            entries,
+            starts,
+            shift,
+            max_x,
+            sorted: false,
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -1161,13 +1226,27 @@ impl PairTable {
 
     /// All `(j, k, sigma)` with `x(F_j + sigma·F_k) == x`.
     #[inline]
-    pub fn lookup(&self, x: u64) -> &[(u64, u32, u32)] {
-        let lo = self.entries.partition_point(|e| e.0 < x);
-        let mut hi = lo;
-        while hi < self.entries.len() && self.entries[hi].0 == x {
-            hi += 1;
+    pub fn lookup(&self, x: u64) -> impl Iterator<Item = &(u64, u32, u32)> {
+        let b = (x >> self.shift) as usize;
+        let mut bucket: &[(u64, u32, u32)] = if b + 1 >= self.starts.len() {
+            &[]
+        } else {
+            &self.entries[self.starts[b] as usize..self.starts[b + 1] as usize]
+        };
+        if self.sorted {
+            let lo = bucket.partition_point(|e| e.0 < x);
+            let mut hi = lo;
+            while hi < bucket.len() && bucket[hi].0 == x {
+                hi += 1;
+            }
+            bucket = &bucket[lo..hi];
         }
-        &self.entries[lo..hi]
+        bucket.iter().filter(move |e| e.0 == x)
+    }
+
+    /// Largest canonical x in the table (0 when empty).
+    pub fn max_x(&self) -> u64 {
+        self.max_x
     }
 }
 
@@ -1294,7 +1373,7 @@ pub fn collect_relations(
                     }
                 }
                 if let Some(pairs) = pairs {
-                    if xc <= pairs.entries.last().map(|e| e.0).unwrap_or(0) {
+                    if xc <= pairs.max_x() {
                         for &(_, j, k_raw) in pairs.lookup(xc) {
                             if (j as usize) < i {
                                 continue;
@@ -1385,7 +1464,7 @@ pub fn collect_relations_table(
     let mut rng = StdRng::seed_from_u64(seed);
     let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
     let mut stats = CollectStats::default();
-    let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+    let max_pair_x = pairs.max_x();
 
     let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
         loop {
@@ -1711,7 +1790,7 @@ fn collect_setup_batched(
 ) -> Vec<FastRelation> {
     let n = curve.n;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5E70_BA7C);
-    let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+    let max_pair_x = pairs.max_x();
     let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
     let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
     let fresh = |rng: &mut StdRng| -> (u64, Pt) {
@@ -1880,7 +1959,7 @@ pub fn ic_multi_solve_ex(
         // each point is looked up in the pair table (O(1)); a relation using only determined logs retires the lane.
         let m = qs.len();
         let mut rng = StdRng::seed_from_u64(seed ^ 0xBA7C_4ED0);
-        let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+        let max_pair_x = pairs.max_x();
         let mut ab: Vec<(u64, u64)> = vec![(0, 0); m];
         let mut cur: Vec<Option<Pt>> = Vec::with_capacity(m);
         let fresh = |rng: &mut StdRng, q: Pt| -> (u64, u64, Pt) {
@@ -2240,6 +2319,34 @@ pub fn find_a3_curve(bits: u32, residue_mod_4: u64) -> Option<(FastCurve, Pt)> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn add_x_with_inv_matches_the_full_addition() {
+        let (curve, g) = find_a3_curve(24, 3).expect("curve");
+        let f = curve.f;
+        let mut pts = vec![g];
+        for k in 2..40u64 {
+            pts.push(curve.mul(Some(g), k).expect("multiple"));
+        }
+        for a in &pts {
+            for b in &pts {
+                if a.x == b.x {
+                    continue;
+                }
+                let inv = f.inv(f.sub(b.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, *b, inv),
+                    curve.add_with_inv(*a, *b, inv).x
+                );
+                let nb = curve.neg(*b);
+                let inv2 = f.inv(f.sub(nb.x, a.x));
+                assert_eq!(
+                    curve.add_x_with_inv(*a, nb, inv2),
+                    curve.add_with_inv(*a, nb, inv2).x
+                );
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
 

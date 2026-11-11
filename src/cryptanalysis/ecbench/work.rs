@@ -658,6 +658,9 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // compare each (`work_native` of the search phase, 2026-11-07;
         // research/rho_cycle_window_bitops_20261107).
         "cycle_window_word_ops" | "brent_word_ops" => Prims(&[(WordOp, 1)]),
+        // wwalk aut=3: min(x, ωx, ω²x) per stored or probed point, the two
+        // ω-rotations and the two key comparisons.
+        "aut_canonicalisations_uncharged" => Prims(&[(FieldMul, 2), (WordOp, 2)]),
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.
