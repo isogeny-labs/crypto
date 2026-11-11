@@ -155,6 +155,18 @@ fn main() {
                     (s, c.mul(Some(g), s).unwrap())
                 })
                 .collect();
+            let tab_a: Vec<(u64, Pt)> = (0..4096)
+                .map(|_| {
+                    let s = rng.gen_range(1..n);
+                    (s, c.mul(Some(g), s).unwrap())
+                })
+                .collect();
+            let tab_b: Vec<(u64, Pt)> = (0..4096)
+                .map(|_| {
+                    let s = rng.gen_range(1..n);
+                    (s, c.mul(Some(g), s).unwrap())
+                })
+                .collect();
             let lanes = 2048usize.min(m * 2).max(64);
             let total_ops = ((n as f64) * (m as f64)).sqrt();
             let dp_period = ((total_ops / (lanes as f64 * 20.0)).max(1.0))
@@ -186,6 +198,7 @@ fn main() {
             let mut resolved_check = 0u64;
             let mut done = false;
             let mut sel: Vec<Option<Pt>> = vec![None; lanes];
+            let mut restart = vec![false; lanes];
             while !done {
                 for l in 0..lanes {
                     let p = match cur[l] {
@@ -207,6 +220,7 @@ fn main() {
                     off[l] = addm(off[l], s, n);
                     // distinguished point test (on the current x, before the step)
                     if xc & dp_mask == 0 {
+                        restart[l] = true;
                         let key = xc;
                         if let Some(&(y0, t0_, a0)) = dps.get(&key) {
                             if t0_ != tgt[l] || a0 != off[l] {
@@ -227,6 +241,17 @@ fn main() {
                     }
                 }
                 c.add_many_batched(&mut cur, &sel, &mut scratch);
+                for l in 0..lanes {
+                    if restart[l] {
+                        restart[l] = false;
+                        let t = rng.gen_range(0..m);
+                        let (sa, pa) = tab_a[rng.gen_range(0..tab_a.len())];
+                        let (sb, pb) = tab_b[rng.gen_range(0..tab_b.len())];
+                        tgt[l] = t;
+                        off[l] = addm(sa, sb, n);
+                        cur[l] = c.add(c.add(Some(pa), Some(pb)), Some(qs[t]));
+                    }
+                }
                 total_steps += lanes as u64;
                 resolved_check += 1;
                 if resolved_check.is_multiple_of(64) {
