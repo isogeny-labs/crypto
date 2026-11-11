@@ -231,6 +231,7 @@ jobs:
         env:
           CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
           CRYPTO_BUILD_GIT_DIRTY: "false"
+          CRYPTO_CLI_VERSION: ${{ needs.meta.outputs.release_version }}
         # Only the shipped/smoke-tested binaries belong in this packaging lane.
         # All other bins/examples are still compiled by rust-all-targets.
         run: >-
@@ -352,6 +353,112 @@ jobs:
         with:
           name: rust-${{ matrix.target }}
           path: dist/*
+          if-no-files-found: error
+
+  macos:
+    if: always() && !cancelled()
+    needs: [meta, scope]
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - name: Require successful scope classification
+        if: needs.scope.result != 'success' || needs.meta.result != 'success'
+        run: |
+          echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/factor-base/
+            /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /Cargo.lock
+            /.gitattributes
+            /.cargo/
+            /rust-toolchain*
+            /.github/scripts/
+            /build.rs
+            /rustfmt.toml
+            /clippy.toml
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+            /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /docs/curves/
+            /docs/ecdlp-audit/
+            /docs/ic/params/
+            /ecc2k130/codegen/
+            /packaging/macos/
+            /README.md
+            /LICENSE*
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
+      - uses: dtolnay/rust-toolchain@1.98.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-macos
+      - name: Build ic
+        env:
+          CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
+          CRYPTO_BUILD_GIT_DIRTY: "false"
+          CRYPTO_CLI_VERSION: ${{ needs.meta.outputs.release_version }}
+        run: cargo build --locked --release --bin ic
+      - name: Smoke-test ic
+        run: |
+          ./target/release/ic --help > /dev/null
+          ./target/release/ic --version
+          ./target/release/ic --json > ic-smoke.json
+          grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' ic-smoke.json
+      - name: Build crax from the public cryptanalysis repository
+        run: |
+          git clone --depth 1 https://github.com/isogeny-labs/cryptanalysis.git "$RUNNER_TEMP/cryptanalysis"
+          cd "$RUNNER_TEMP/cryptanalysis"
+          tools/bootstrap_crypto_analysis_core.sh
+          cd suite
+          cargo build --locked --release --bin crax
+          ./target/release/crax --help > /dev/null
+      - name: Build the DMG and update archive
+        env:
+          CRYPTO_BUILD_GIT_COMMIT: ${{ github.sha }}
+        run: |
+          packaging/macos/build_dmg.sh \
+            --version "${{ needs.meta.outputs.tag }}" \
+            --arch aarch64 \
+            --ic target/release/ic \
+            --crax "$RUNNER_TEMP/cryptanalysis/suite/target/release/crax" \
+            --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-aarch64
+          path: |
+            dist/*.dmg
+            dist/*.tar.gz
+            dist/SHA256SUMS
           if-no-files-found: error
 
   isogeny:
@@ -832,7 +939,7 @@ jobs:
           bash .github/scripts/test_publish_release_assets.sh
 
   release:
-    needs: [meta, rust, native, cuda, isogeny, isogeny-algos, release-assets]
+    needs: [meta, rust, native, cuda, isogeny, isogeny-algos, release-assets, macos]
     # Dry runs build and stage everything, then stop short of publishing.
     # The ref test is not redundant with the event test: workflow_dispatch
     # can be started from any branch, and a release tagged `-main.` that
@@ -879,7 +986,7 @@ jobs:
         id: assets
         run: |
           mkdir -p dist
-          find staging -type f \( -name '*.tar.gz' -o -name '*.zip' \) \
+          find staging -type f \( -name '*.tar.gz' -o -name '*.zip' -o -name '*.dmg' \) \
             -exec mv -t dist/ {} +
           # Build the sums outside dist so the glob cannot race the file
           # being written into the directory it is listing.
@@ -905,6 +1012,15 @@ jobs:
           | `isogeny-algos-*-x86_64-unknown-linux-musl.tar.gz` | `isogeny-algos` — static |
           | `ecc2k130-cpu-*.tar.gz` | ECC2K-130 client, CPU (`-march=x86-64-v3`) |
           | `ecc2k130-cuda-*.tar.gz` | ECC2K-130 client, CUDA fatbinary (sm_80–sm_120) |
+          | `crypto-cli-v*-macos-aarch64.dmg` | macOS installer for `ic`, `crax` and the ECC2K-130 Python engine — unsigned/ad-hoc unless signed |
+
+          On macOS, the DMG is for first install:
+
+              sudo installer -pkg "/Volumes/CryptoCLI/CryptoCLI Installer.pkg" -target /
+
+          It installs `/usr/local/bin/ic` and `/usr/local/bin/crax`. After that,
+          `ic update --check` reports a newer macOS archive and `sudo ic update`
+          verifies SHA256SUMS and replaces both binaries plus the Python engine.
 
           Verify with `sha256sum -c SHA256SUMS`.
 

@@ -71,6 +71,36 @@ from the prime-field closure is open again (`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`)
 | `TransparentEncoding` | `dlog_identity_encoding`, `zero_operation_dlog` | With a transparent encoding the logarithm is the encoding: Shoup's Ω(√r) is relative to random encodings, not a statement about every algorithm. |
 | `BooleanNullstellensatz` | `mem_fieldIdeal_of_eval_zero`, `linear_mem_of_unique_zero` | Over F₂ with the field equations adjoined: vanishing on all of F₂^N means lying in the field-equation ideal; a unique common zero `z` puts every `X_i − z_i` in the ideal. This is the `|Z| = 1` case of the bridge `k = N − affdim(Z)` used by the census. |
 
+## Round 5: F4 stays inside the degree-D closure
+
+| module | theorems | what it says |
+|---|---|---|
+| `F4Containment` | `run_subset`, `no_gb_of_run_of_low_lt`, `dclosed_of_basis`, `monomial_mul_mem` | A subspace S is D-closed when `X i * f ∈ S` for every `f ∈ S` with `totalDegree f + 1 ≤ D`. An abstract F4 run (`F4Run`) puts each new basis in the span of earlier bases and their monomial multiples within degree D. Every basis of such a run lies in any D-closed S that contains the generators. With `dim(S ∩ P_{≤1}) < k`, no basis of the run is a Gröbner basis, so the `pq2_rank` closure counts are lower bounds on F4's maximal step degree. Closure of `span B` reduces to a finite check on B. |
+
+The axiom audit for all four theorems shows `propext`, `Classical.choice` and `Quot.sound` only.
+Their pcc claims are `PCC-20261107-209a57` and `PCC-20261107-91a01d`, both unsigned [pcc:unverified].
+Fidelity limit: the model covers F4 as published, including symbolic preprocessing, the
+simplify heuristic, criteria and the final interreduction. That msolve, Magma or FGb fit it
+is a reading of their algorithms, not a theorem.
+
+## Round 6: the `x ∈ F_q` factor base of a subfield curve never leaves `E(F_q)`
+
+| module | theorems | what it says |
+|---|---|---|
+| `SubfieldFactorBase` | `mem_range_of_quadratic_of_odd`, `baseChange_range_of_x_mem`, `closure_factorBase_le_range`, `card_decomposable_le`, `card_point_le`, `card_decomposable_le_two_mul_card_add_one` | For a Weierstrass curve `W` over a field `K` and an extension `L` of odd degree, a root in `L` of a monic quadratic over `K` lies in `K`, so every point of `W(L)` with `x ∈ K` comes from `W(K)`. Every sum of such factor-base points (any number of summands) lies in the image of `W(K)`; over a finite `K` with `q` elements that is at most `2q + 1` points. |
+
+Consequence for the corpus. `HEUR-SP-JV-ASSUMPTION1` (Joux–Vitse) claims `Ω(q^{n-1}/(n-1)!)`
+decomposable points in `E(F_{q^n})` under the recorded hypothesis `#F ∈ Ω(q)`, with no
+restriction on the curve. A curve defined over `F_q` with `n ≥ 3` odd satisfies the hypothesis
+(its factor base contains `E(F_q) \ {O}`, and `#E(F_q) ≥ q + 1 - 2√q` by Hasse, cited, not
+formalised), yet has at most `2q + 1` decomposable points. The `1/n!` proportion of
+`HEUR-BK-GG-DECOMP-PROPORTION` fails on the same family, where its "no unexpected collisions"
+assumption is violated wholesale. The census control `ext_decomp` measured this family at
+`n = 3`: 0.0003 to 0.002 decomposable, against `1/6` [pcc:unverified]. Both heuristics remain
+open for curves whose coefficients generate `F_{q^n}`.
+
+The axiom audit for all six theorems shows `propext`, `Classical.choice` and `Quot.sound` only.
+
 ## What changes in the corpus
 
 - **`HEUR-RELATION-RANK` (W2).** The left-kernel method needs no rank

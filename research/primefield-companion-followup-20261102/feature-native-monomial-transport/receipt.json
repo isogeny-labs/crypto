@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-07T00:31:05.174331+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-monomial-transport/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-monomial-transport-20261107/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-monomial-transport-20261107/tests",
+        "tests::combined_",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 17,
+  "binary_sha256": "87117530014ca00e7693742770990ec52a7f9bd1a5b79ba121b64b1489a23997",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

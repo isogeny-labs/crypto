@@ -1,0 +1,15 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | f1-x07 | 64/64 | 2.373 | 2.439 | 3.028 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 64/64 | 1.527 | 1.637 | 2.626 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw-x15 | 64/64 | 2.784 | 2.789 | 2.829 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | twcj-x15 | 64/64 | 2.039 | 2.044 | 2.084 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs rho-neg | rho-neg < f1-x07 |
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs tw-x15 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | f1-x07 vs twcj-x15 | twcj-x15 < f1-x07 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw-x15 | rho-neg < tw-x15 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs twcj-x15 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | tw-x15 vs twcj-x15 | twcj-x15 < tw-x15 |
