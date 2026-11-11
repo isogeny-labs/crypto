@@ -1,31 +1,28 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ claude/best-leads-experiments-jikl0j
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
+Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
+0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
+(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
+sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
+p256 below 1 at k = 32; cv0 vs lazy two-sided.
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
+x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
+Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
+on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
+(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
+push of this branch is the checkpoint.
 
-## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+## State (23:20Z: EKS failed; local L0 panel done, results committed)
+Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
+push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
-
-## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
-
-## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
-
-## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
+2. Report + figure + PDF (research-visuals), benchrec record close, PR.

@@ -139,3 +139,35 @@ the prime-tower control ctl-m3-n15-kummer, whose restored rows must equal the
 recorded ones (timing fields excepted) after an induced worker loss. Command
 mode has no live qualification until that run passes; no study cell runs on it
 before then.
+
+## Route after the CRIU qualification (2026-11-08; no frozen file changes)
+
+10. **Koblitz attempt 5: plain command Job, not CRIU.** The CRIU command-mode
+    qualification passed (`criu/QUALIFICATION-20261108.md`), but both frozen
+    protocols set `execution.checkpoint.policy` to `none`, and a CRIU dump
+    stops the process tree (`--leave-stopped`) while the wall-clock `timeout`
+    caps (600 s, 1800 s) keep running. That inflates every checkpointed cell's
+    time and biases cells toward `process_cap`, which K2–K4 predict. The owner
+    chose (2026-11-08) to run Koblitz without CRIU: a cell interrupted by
+    infrastructure is re-run fresh from the start, counted against
+    `retries.max_attempts` = 3 per cell (deviation 6).
+    State found in attempt 4 (`arity-koblitz-m56-20261104-a4`, pod
+    `da7313ba`, m7i.2xlarge, Intel Xeon Platinum 8488C, 287 files matching
+    SHA256SUMS): every Part A m = 5 and m = 6 cell is recorded (m = 5: 21
+    complete, 35 process_cap, 6 skipped_stopping_rule; m = 6: 18, 37, 6);
+    Part B has 3 of 16 cells. Attempt 4 did not end by Spot loss: the Job hit
+    `activeDeadlineSeconds` (60900 s, counted from Job creation on 11-04,
+    after about 8.9 h Pending), killing the in-flight
+    `liftB n83k1 m5 union-3 chain-s3-orbit public` and
+    `liftB n83k1 m6 union-2 chain-s3 public` cells. These are their first
+    infrastructure attempts. Attempt 5 resumes attempt 4's prefix, keeps
+    m7i.2xlarge so Part B stays on one host model, and sets the Job deadline
+    to 64800 s so that Pending time cannot consume the 13 remaining cells
+    (at most about 3.5 h with the shards running concurrently).
+    The image is unchanged from attempt 4 (`dd52495…`, published
+    2026-11-04 15:42Z, before the CRIU-mode `job-lib.sh` change in
+    77b38335e3 at 20:47Z), so the Job runs the pre-CRIU `job-lib.sh`
+    (`7c1e760e…`, as bound by the attempt-4 card). The attempt-5 card binds
+    the working-tree copy (`f03e57cf…`), whose S3 mode differs only in the
+    order of the final log line and an added TERM trap. That bind records the
+    tree; it is not what runs.

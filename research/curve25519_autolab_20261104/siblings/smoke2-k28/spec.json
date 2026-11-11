@@ -1,0 +1,63 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "SIBLING-POINTS smoke 2, k = 28, first curve of snc-panel, 12 targets x 2 rounds: product-set pool, sib8 pool 64",
+ "description": "research/curve25519_autolab_20261104/siblings/SMOKE.md, amendment of 2026-11-10: product-set pool and exact pair charging; smoke, not the panel; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "tw2cj-lazy",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "tw2cj-lazy-sib8-p64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 20261138,
+  "timeout_seconds": 3600,
+  "warmup": 1
+ },
+ "workloads": {
+  "curves": [
+   {
+    "a": 178687587,
+    "b": 13872414,
+    "gx": 89478497,
+    "gy": 121408824,
+    "group_order": 268464472,
+    "p": 268434581,
+    "r": 33558059,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261148,
+  "targets_per_curve": 12
+ }
+}
