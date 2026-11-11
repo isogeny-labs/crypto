@@ -46,3 +46,6 @@ Limits: j=0 curves only; toy sizes 26–30 bits; one host/thread, wall clock, tu
 Distance to rho remains: sym3 is 3x–23x behind negation-only rho and the ratio grows with size (the exponent argument is unchanged);
 an automorphism-aware rho would be a further ≈√3 faster, not run. No replay certificate, validator report, §5a band, S3, ecdb
 (none possible here), so it cannot enter the leaderboard.
+
+## Correction after independent validation (2026-11-11)
+See `results/pf_j0/VALIDATOR_REPORT.md`. The "1.87x-2.93x" range above mixed pairings of runs; the supported statement is **about 2.0x-2.4x** faster than the best 3-summand `ic_solve` arm (c grid optimum ~0.7, not covered by the frozen {0.5,1.0}), and the holdout curves at one size form one twist group; fresh primes give 2.1x-2.6x. 490/490 independent certificates pass. Gap to negation-only rho grows 3x -> 23x from 26 to 30 bits. `[pcc:unverified]`.
