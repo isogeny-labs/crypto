@@ -3265,7 +3265,7 @@ fn build_subgroup_orbit_factor_base_packed(
         // The reference rebuild closes every representative under
         // Frobenius again, which is the set `abscissae` already holds.
         group_op_count::count_frobenius_maps(representatives.len() as u64 * u64::from(extension));
-        base = explicit_orbit_base_packed(kc, curve, representatives.len(), &abscissae);
+        base = explicit_orbit_base_packed(kc, curve, &representatives, &abscissae);
     }
     cost.abscissae_drawn = drawn;
     base.map(|b| (b, cost))
@@ -3275,35 +3275,83 @@ fn build_subgroup_orbit_factor_base_packed(
 /// [`build_explicit_frobenius_orbit_factor_base`] followed by
 /// [`finish_factor_base_domain`], from the Frobenius-closed abscissa
 /// words: the same base, built packed and lowered once.
+///
+/// A point is lifted once per Frobenius orbit, not once per abscissa. For
+/// odd `n` the lift of `x` is `(x, x·H(rhs(x)))` with `H` the half-trace,
+/// and `rhs` and `H` commute with `q`-th powering, so the lift of `x^q` is
+/// the `q`-th power of the lift of `x`, `P` and `-P` in the same order: the
+/// orbit's other points are two `sqr_k` each instead of an inversion and a
+/// half-trace. Should a representative not lift to two points, every
+/// abscissa is lifted on its own, as the reference does.
 fn explicit_orbit_base_packed(
     kc: &KoblitzCurve,
     curve: &FastCurve,
-    representatives: usize,
+    representatives: &[u64],
     abscissae: &WordSet,
 ) -> Option<FrobeniusFactorBase> {
-    if representatives == 0 {
+    if representatives.is_empty() {
         return None;
     }
-    let mut xs: Vec<u64> = abscissae.iter().copied().collect();
-    xs.sort_unstable();
-    let mut fast: Vec<FastPoint> = Vec::with_capacity(2 * xs.len());
-    for &x in &xs {
-        let (lifts, count) = lift_x_packed(curve, x);
-        fast.extend_from_slice(&lifts[..count]);
+    let field = &curve.field;
+    let mut lifted: Vec<(u64, u64)> =
+        Vec::with_capacity(representatives.len() * kc.extension_degree() as usize);
+    let mut by_orbit = true;
+    for &r in representatives {
+        let (lifts, count) = lift_x_packed(curve, r);
+        if count != 2 {
+            by_orbit = false;
+            break;
+        }
+        let (mut x, mut y) = (lifts[0].x, lifts[0].y);
+        for _ in 0..kc.extension_degree() {
+            lifted.push((x, y));
+            x = field.sqr_k(x, kc.k);
+            y = field.sqr_k(y, kc.k);
+        }
     }
+    if by_orbit {
+        lifted.sort_unstable();
+        lifted.dedup_by_key(|p| p.0);
+        by_orbit =
+            lifted.len() == abscissae.len() && lifted.iter().all(|(x, _)| abscissae.contains(x));
+    }
+    if !by_orbit {
+        let mut xs: Vec<u64> = abscissae.iter().copied().collect();
+        xs.sort_unstable();
+        lifted.clear();
+        for &x in &xs {
+            let (lifts, count) = lift_x_packed(curve, x);
+            lifted.push((x, if count == 0 { u64::MAX } else { lifts[0].y }));
+        }
+    }
+    let mut fast: Vec<FastPoint> = Vec::with_capacity(2 * lifted.len());
+    for &(x, y) in &lifted {
+        if y == u64::MAX {
+            continue;
+        }
+        let point = FastPoint::affine(x, y);
+        if x == 0 {
+            fast.push(point);
+        } else {
+            fast.extend_from_slice(&[point, curve.neg(point)]);
+        }
+    }
+    let xs = lifted;
     let (orbit_of, orbits, signed_orbit_of, signed_orbits) =
         orbit_maps_from_packed(kc, curve, &fast)?;
     if signed_orbits.iter().map(Vec::len).sum::<usize>() != fast.len() {
         return None;
     }
     Some(FrobeniusFactorBase {
-        domain: FactorBaseDomain::ExplicitFrobeniusOrbits { representatives },
+        domain: FactorBaseDomain::ExplicitFrobeniusOrbits {
+            representatives: representatives.len(),
+        },
         ell: kc.n,
         f_j: 0,
         linearised_exponents: Vec::new(),
         subspace: xs
             .iter()
-            .map(|&x| F2mElement::from_words(&[x], kc.n))
+            .map(|&(x, _)| F2mElement::from_words(&[x], kc.n))
             .collect(),
         subspace_basis: (0..kc.n)
             .map(|i| F2mElement::from_bit_positions(&[i], kc.n))
@@ -20793,12 +20841,16 @@ mod tests {
                 }
             }
         }
-        for (k, n) in [(3u32, 39u32), (3, 45)] {
-            if let Some(kc) = KoblitzCurve::subfield(k, n, 1, 1) {
-                curves.push(kc);
+        // Subfield curves: Frobenius is the q-power map, k squarings.
+        for (k, n) in [(3u32, 33u32), (3, 39), (3, 45), (5, 35), (5, 45), (7, 35)] {
+            for (a, b) in [(0u64, 1u64), (1, 1), (1, 3)] {
+                if let Some(kc) = KoblitzCurve::subfield(k, n, a, b) {
+                    curves.push(kc);
+                }
             }
         }
         let mut checked = 0;
+        let mut subfield_checked = 0;
         for kc in &curves {
             let Some(curve) = FastCurve::new(&kc.curve) else {
                 continue;
@@ -20859,9 +20911,13 @@ mod tests {
                     "{label}: projected representatives"
                 );
                 checked += 1;
+                if kc.k > 1 {
+                    subfield_checked += 1;
+                }
             }
         }
         assert!(checked >= 30, "only {checked} cases compared");
+        assert!(subfield_checked >= 1, "no subfield curve was compared");
     }
 
     #[test]
