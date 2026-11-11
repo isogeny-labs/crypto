@@ -162,3 +162,76 @@ dual-[7] compositions and all 109 source DLP scalar transports.
 Benchmark only with complete costs and direct elliptic controls.
 Do not repair/merge the frozen root PCC ledger by rewriting it;
 the ledger/archive/S3 budget and independent-verifier gates persist.
+
+
+## CT22b: actual finite-field elliptic 4-torsion, not just the abstract module
+
+**[pcc:unverified]** A separate standard-library field implementation now
+evaluates the **four concrete CT19 degree-seven Kohel maps** on the entire
+geometric 4-torsion, including their normalized duals and both CT20
+supported product-gluing cases. Source:
+`ct22_actual_e4.py`; command:
+
+```sh
+python3 -S research/chained_jacobian_transfers_20261110/ct22_actual_e4.py
+python3 -m py_compile research/chained_jacobian_transfers_20261110/ct22_actual_e4.py
+```
+
+The field is (ℝ) replaced by (ᵓ_{101^3}):
+choose (θ^3+6θ^2+13θ+56=0), and represent the sextic field
+as (ᵓ_{101^3}(ζ)) with (ζ^2=2). Because 2 is a nonsquare
+in the cubic field, primitive order-four points have y-coordinate
+(ζ u), (uinᵓ_{101^3}). No generic degree-six
+irreducible-polynomial rootfinder is needed.
+
+For a short-Weierstrass two-torsion point (T=(r,0)), the duplication
+equation (x([2]R)=r) is the *square* of the quadratic
+((X^2-2rX-a-2r^2)). Its two x roots are therefore
+
+[
+oxed{x(R)=r ± sqrt{3r^2+a}.}
+]
+
+This is an exact algebraic identity from the ordinary duplication
+formula, not a guessed quartic factorization. Here all six square roots
+per elliptic factor are found in (ᵓ_{101^3}). We then solve
+(u^2=(x^3+ax+b)/2) in the same cubic field and represent the actual
+points ((x,ζ u)). The 16 points per factor consist of the
+identity, three nonzero 2-torsion points and 12 primitive 4-torsion
+points.
+
+The oracle derives the full Kohel x-map from the already committed
+monic cubic kernel (h):
+
+[
+phi_x(X)=7X+2c_2 -(6X^2+2a)h'/h
++4(X^3+aX+b)((h')^2-hh'')/h^2,
+]
+
+and evaluates (y' = y,phi_x'(X)), rather than applying the
+two-torsion-only simplification to general points. It separately checks
+the target curve equation, all (16^2=256) ordered group-law pairs
+per map, full image bijections, Frobenius commutation and
+(hatphiphi=phihatphi=[7]) for all 16 source/target points.
+The four fixed kernel/target/dual rows come from CT19
+(isogeny-labs/crypto #3919 and cryptanalysis #1483); no producer
+kernel-search heuristic is imported.
+
+For CT20 B+A and B+B, it forms **the actual 64 product E[4] lifts** of
+the four-element 2-gluing graph inside the full 256-element product
+group, transports every lift under the paired Kohel maps, and
+compares all 16 quotient (J[2]=[2]^{-1}G/G) classes and their full
+(16^2) addition table. It checks that the norm-zero 4-element
+kernel maps to the target norm-zero kernel and rejects a rotated
+target matching (intersection only the identity).
+
+The *local producing* Python run reported all four map/dual/Frobenius
+checks and both 64-lift quotient tests passing. This remains
+[pcc:unverified] until exact-head CI replay and independently signed
+verification. Importantly, the quotient uses actual elliptic
+torsion and Kohel maps **but still is not a balanced Mumford-divisor
+evaluator for the genus-two Jacobian**. The isogeny action on the
+three geometric Richelot pairings has not yet been matched to the
+actual target sextic's six named branch points. The next gate is
+the explicit branch-pair-to-four-torsion lifting correspondence,
+followed by the complete rational-divisor map and solving costs.
