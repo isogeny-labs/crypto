@@ -62,7 +62,7 @@ fn main() {
         let mut hit = 0usize;
         for i in 0..n_look {
             let key = (&probe.0 + BigUint::from(i as u64), probe.1.clone());
-            if table.get(&key).is_some() {
+            if table.contains_key(&key) {
                 hit += 1;
             }
         }
