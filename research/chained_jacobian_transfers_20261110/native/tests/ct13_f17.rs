@@ -38,7 +38,7 @@ impl L {
         for d in (3..=4).rev() {
             let a = v[d];
             for (j, coefficient) in [7, 1, 6].iter().enumerate() {
-                v[d-3+j] = m(v[d-3+j]-a*coefficient);
+                v[d-3+j] = m(v[d-3+j]-a*(*coefficient));
             }
         }
         Self([v[0],v[1],v[2]])
@@ -174,7 +174,7 @@ fn invariant(pairs:&[(u8,u8)], perm:&[u8;6]) -> bool {
         (x.min(y),x.max(y))
     }).collect();
     mapped.sort_unstable();
-    mapped == pairs
+    mapped.as_slice() == pairs
 }
 #[test]
 fn f17_source_and_stable_kernels() {
@@ -184,7 +184,7 @@ fn f17_source_and_stable_kernels() {
     assert_eq!(fpow(-2,8),1); // -constant is square; cubic+ cubic.
     let a=[7,1,6,1];let b=[10,1,11,1];
     let product=multiply(&a.map(L::c), &b.map(L::c));
-    assert_eq!(product,[2,0,2,0,0,0,1].map(L::c));
+    assert_eq!(product,[2,0,2,0,0,0,1].map(L::c).to_vec());
     assert!(!has_monic_factor(&a,1));
     assert!(!has_monic_factor(&b,1));
     let roots=frobenius_roots();
@@ -193,7 +193,7 @@ fn f17_source_and_stable_kernels() {
         let r=rows(k);
         let mut product=vec![L::one()];
         for g in &r { product=multiply(&product,&[g[2],g[1],g[0]]); }
-        assert_eq!(product,[2,0,2,0,0,0,1].map(L::c));
+        assert_eq!(product,[2,0,2,0,0,0,1].map(L::c).to_vec());
         for i in 0..3 {
             assert_eq!(r[i][1].pow(17),r[(i+1)%3][1]);
             assert_eq!(r[i][2].pow(17),r[(i+1)%3][2]);
@@ -216,7 +216,7 @@ fn f17_descended_codomain_and_zeta_gates() {
     assert_eq!(h2,vec![14,5,6,13,10,14,16]);
     // Involution X↦-X interchanges the two resulting curves.
     for i in 0..7 {
-        assert_eq!(h2[i], if i%2==0 {h1[i]} else {m(-h1[i])});
+        assert_eq!(h2[i], if i.is_multiple_of(2) {h1[i]} else {m(-h1[i])});
     }
     // Source sextic has Frobenius type (3,3); targets have type (6).
     for d in 1..=2 {assert!(!has_monic_factor(&f,d));}
