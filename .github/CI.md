@@ -100,7 +100,11 @@ that manifest's SHA-256. The input then either equals a current twin
 (`current_equal`) or is named in a committed drift note
 (`current_drift_note`) that says why the checks only verify or replay frozen
 code. [symbolic-oaware-width-gate-source-view-v1.json](scripts/symbolic-oaware-width-gate-source-view-v1.json)
-is the example. A workflow marked `record` keeps custody of its pin
+is the example. A replay whose manifest pins a different version of its
+workflow than the index's top-level `revision` holds carries its own
+`revision`; custody then checks that its manifest pins its workflows' bytes
+at that commit, and the runner fetches it like the top-level one. A workflow
+marked `record` keeps custody of its pin
 but has no replay: either no check on `main` asserts the pin, or its `note`
 says why a workflow view cannot make that check pass (source drift, or a pin
 at a second revision).
