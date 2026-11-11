@@ -1124,6 +1124,7 @@ impl PairTable {
     pub fn build(curve: &FastCurve, fb: &FastFactorBase) -> Self {
         let f = curve.f;
         let b = fb.len();
+        let t_build = Instant::now();
         let mut entries = Vec::with_capacity(b * b);
         let mut d = Vec::with_capacity(b);
         let mut scratch = Vec::with_capacity(b);
@@ -1147,7 +1148,17 @@ impl PairTable {
                 entries.push((f.from_mont(diff.x), j as u32, k as u32 | PAIR_DIFF_BIT));
             }
         }
+        let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
+        let t_sort = Instant::now();
         entries.sort_unstable();
+        if std::env::var_os("IC_MULTI_TIMING").is_some() {
+            eprintln!(
+                "pair table: {} entries, adds {:.1} ms, sort {:.1} ms",
+                entries.len(),
+                add_ms,
+                t_sort.elapsed().as_secs_f64() * 1e3
+            );
+        }
         PairTable { entries }
     }
 
