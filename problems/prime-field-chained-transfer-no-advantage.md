@@ -100,9 +100,23 @@ The load-bearing theorem: a DLP-preserving `E → E'` exists iff `E ~ E'`
 the log. This strengthens, not resolves, the obstruction: the reachable set is
 confined to `E`'s isogeny class.
 
+## Tower up (2026-11-11 addendum)
+
+Carrying the same elliptic log *up* the cover tower makes the destination
+harder (`research/chained_prime_transfer_20261111/tower/TOWER.md`)
+[pcc:unverified]. One target E/F_p is covered by a genus-2 and a genus-3
+curve (`C : y² = F(x²)`), and the pull-back is verified by homomorphism
+checks. On the same instance, counted index calculus on genus 3 costs 2.3–3.4×
+index calculus on genus 2 at every p in 53–251 (about the `1/g!` smoothness
+ratio). Genus 3 is above rho at every §5a price. Genus 2 cannot be ranked
+against rho at 0 GAE, and is above rho at 0.1 and 1 GAE. The IC slope in p is
+0.85 (genus 2) and 1.06 (genus 3), against 0.44 for rho. Up, across and down
+are now each measured or proved closed.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
   (native Rust framework, PR #3877 follow-up).
 - 2026-11-11: transfer-atlas addendum — cover sweep, census and down-edge
   controls; the obstruction holds across every arm measured.
+- 2026-11-11: tower-up addendum (genus 1 → 2 → 3 on one instance); the ladder raises IC cost per rung.
