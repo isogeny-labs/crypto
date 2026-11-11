@@ -1,0 +1,25 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "rule-v9-20261106-a2",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:99008289b0b5bd78a1d9e260ada9c26ca1bf0e4cba95a69a8fc6c337480859cb",
+    "command": [
+      "/opt/rulev9/job.sh",
+      "s3://isolab-results-104186811093-us-east-2/runs/rule-v9-20261106-a1/33053ca8-de9a-4639-bea4-a129ce6d5461/"
+    ],
+    "cpu": 4,
+    "memory": "12Gi",
+    "seconds": 43200,
+    "isolation_profile": "l2",
+    "instance_type": "c8a.2xlarge",
+    "retries": 0,
+    "wait_seconds": 600
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "source_revision": "f81e58cc7ff195b3f9c0c70e4c17b84c7a6e1aa5",
+    "study": "research/ic_tool_program/rule/v9",
+    "protocol_sha256": "1687808776cad62db9e5b60de516654ea57d5f51f5f0b483a943898f9024b239",
+    "note": "rule v9 and its control v9c on Iso Lab EKS (launch/README.md); command Jobs have no L2 admission, so the in-process pairing of IC and matched rho is the comparison"
+  }
+}
