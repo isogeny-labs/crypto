@@ -193,7 +193,7 @@ equation (x([2]R)=r) is the *square* of the quadratic
 ]
 
 This is an exact algebraic identity from the ordinary duplication
-formula, not a guessed quartic factorization. Here all six square roots
+formula, not a guessed quartic factorization. Here the three required square roots
 per elliptic factor are found in (ᵓ_{101^3}). We then solve
 (u^2=(x^3+ax+b)/2) in the same cubic field and represent the actual
 points ((x,ζ u)). The 16 points per factor consist of the
