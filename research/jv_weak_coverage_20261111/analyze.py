@@ -16,6 +16,7 @@ for p in (37, 53, 1009, 1511, 1823):
         pass
     try:
         F = [json.loads(l) for l in open(f"runs/FW_p{p}.jsonl") if l.strip()]
+        if not F: raise FileNotFoundError
         n = len(F); ad = [x for x in F if x["admitted"]]; wk = [x for x in ad if x["walked"]]; fd = [x for x in wk if x["found"]]
         row["F"] = {"n": n, "admitted": len(ad) / n, "admitted_ci": wilson(len(ad), n), "start_weak": sum(x["start_weak"] for x in F)}
         row["W"] = {"walked": len(wk), "reached": len(fd), "reached_frac": len(fd) / max(1, len(wk)), "reached_ci": wilson(len(fd), len(wk)),
