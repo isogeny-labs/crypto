@@ -91,7 +91,16 @@ assert its pin runs them in the same view, by replay id:
 `node .github/scripts/run-frozen-workflow-replays.mjs --only <id> -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"`,
 with the step's original commands in `env.FROZEN_VIEW_STEP`. That form checks
 custody of that replay's pins only, and fetches the index revision when a
-shallow checkout lacks it. A workflow marked `record` keeps custody of its pin
+shallow checkout lacks it. A replay whose study also pins source that has
+since changed on `main` may name an `input_view_manifest`
+(`frozen-input-view/v1`, read by `applyPinnedInputView`): each input is
+restored from a named revision after its digest is matched against the
+study's original freeze manifest (by `source_sha256` key or JSON pointer) and
+that manifest's SHA-256. The input then either equals a current twin
+(`current_equal`) or is named in a committed drift note
+(`current_drift_note`) that says why the checks only verify or replay frozen
+code. [symbolic-oaware-width-gate-source-view-v1.json](scripts/symbolic-oaware-width-gate-source-view-v1.json)
+is the example. A workflow marked `record` keeps custody of its pin
 but has no replay: either no check on `main` asserts the pin, or its `note`
 says why a workflow view cannot make that check pass (source drift, or a pin
 at a second revision).
