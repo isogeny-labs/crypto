@@ -811,15 +811,17 @@ fn main() {
             let mut ca = 0u64;
             let mut st = RESTART;
             let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
             while db.len() < db_target {
                 if st >= RESTART || cur.is_none() {
-                    let (k1, k2, k3) = (
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                    );
-                    cur = f.padd(f.padd(bank[k1].0, bank[k2].0), bank[k3].0);
-                    ca = (bank[k1].1 + bank[k2].1 + bank[k3].1) % n;
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
                     st = 0;
                 }
                 let h = hidx(cur);
@@ -849,11 +851,16 @@ fn main() {
                 let mut cur: Pt = None;
                 let mut ca = 0u64;
                 let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
                 let v = loop {
                     if st >= RESTART || cur.is_none() {
-                        let (k1, k2) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
-                        cur = f.padd(f.padd(bank[k1].0, bank[k2].0), q);
-                        ca = (bank[k1].1 + bank[k2].1) % n;
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
                         st = 0;
                     }
                     let h = hidx(cur);
@@ -942,15 +949,17 @@ fn main() {
             let mut ca = 0u64;
             let mut st = RESTART;
             let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
             while db.len() < db_target {
                 if st >= RESTART || cur.is_none() {
-                    let (k1, k2, k3) = (
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                    );
-                    cur = f.padd(f.padd(bank[k1].0, bank[k2].0), bank[k3].0);
-                    ca = (bank[k1].1 + bank[k2].1 + bank[k3].1) % n;
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
                     st = 0;
                 }
                 let h = hidx(cur);
@@ -986,11 +995,16 @@ fn main() {
                 let mut cur: Pt = None;
                 let mut ca = 0u64;
                 let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
                 let v = loop {
                     if st >= RESTART || cur.is_none() {
-                        let (k1, k2) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
-                        cur = f.padd(f.padd(bank[k1].0, bank[k2].0), q);
-                        ca = (bank[k1].1 + bank[k2].1) % n;
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
                         st = 0;
                     }
                     let h = hidx(cur);
@@ -1073,11 +1087,16 @@ fn main() {
                 let mut cur: Pt = None;
                 let mut ca = 0u64;
                 let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
                 let v = loop {
                     if st >= RESTART || cur.is_none() {
-                        let (k1, k2) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
-                        cur = f.padd(f.padd(bank[k1].0, bank[k2].0), q);
-                        ca = (bank[k1].1 + bank[k2].1) % n;
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
                         st = 0;
                     }
                     let h = hidx(cur);

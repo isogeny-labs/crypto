@@ -62,3 +62,12 @@ otherwise **unranked**. Comparisons reported: ic5 vs rhobest, bsgs2 and ic4; ic4
 Groups 2^22 to 2^33; counted, not timed; memory unbounded for every arm; local host (no AWS identity, so no
 isolab-eks); the rho family is this harness's (not ecbench's); a verification constant of about 32 to 50 GAE per
 target is shared by every arm and compresses ratios toward 1 (reported with and without it).
+
+## Amendment A1 (2026-11-11, before any holdout result was analysed)
+
+The first holdout launch hung at 32 bits on a defect in the rho-family restarts (bounded set of start points;
+details and fix in `../mt_rho_start_fix_20261111/PROTOCOL.md`). Six rows had been written (32 b, T = 1024,
+idx 1, seed 21); they are discarded unread beyond the hang diagnosis. The holdout reruns in full with the fixed
+binary; arms, parameters, instances, seeds and the decision rule are unchanged. The fix makes every rho arm
+cheaper or equal (one addition per restart instead of two, no repeated walks), so it can only strengthen the
+reference against ic4 and ic5.
