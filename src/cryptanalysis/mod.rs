@@ -352,6 +352,7 @@ pub mod prime_orbit_index_calculus;
 pub mod prime_root_trace;
 pub mod prime_small_x;
 pub mod q_curve;
+pub mod quadcert;
 pub mod quantum_estimator;
 pub mod quartic_folds;
 pub mod quasi_subfield;
