@@ -1,28 +1,19 @@
-# Resume: crypto @ claude/best-leads-experiments-jikl0j
+# Resume: crypto @ aburan28/eloquent-bell-2jerrf
 
 ## Goal
-Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
-Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
-0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
-(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
+Owner (2026-11-11): "we do number one, make row equal solid" — turn the multi-target IC4 result of PR #3624
+(research/mt_fieldops_20261107) into a validated, admitted row: pre-registered stronger rho arms (rhoseq, rho2x),
+fresh curves, independent validator, VALIDATION.json, pcc claim, bench record, benchmarks row, leaderboard.
 
 ## Lead / hypothesis
-Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
-sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
-p256 below 1 at k = 32; cv0 vs lazy two-sided.
+IC4 (x-only pair-sum table, shared inversions) cheaper per target than the strongest of four rho arms at
+T >= 4096 for I/M in {3,10,30}, across h in {0,0.1,1}; dearer than paired BSGS. All [pcc:unverified].
 
 ## Spec
-research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
-x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
-Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
-on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
-(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
-push of this branch is the checkpoint.
-
-## State (23:20Z: EKS failed; local L0 panel done, results committed)
-Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
-push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
+research/mt_fieldops_v2_20261111/PROTOCOL.md; runner run.py holdout; analysis analyze.py; 2112 runs, local L0.
+Route: local (no AWS identity in this container; S3 checkpoint push impossible, Git push of this branch is the checkpoint).
 
 ## Next steps
-1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
-2. Report + figure + PDF (research-visuals), benchrec record close, PR.
+1. run.py holdout under benchrec; analyze; figure/PDF.
+2. Independent validator -> replay-certificate.json, validator-report.json; VALIDATION.json.
+3. pcc claim; benchmarks/20261111-mt-fieldops-ic4/ + README row; leaderboard regen; PR.

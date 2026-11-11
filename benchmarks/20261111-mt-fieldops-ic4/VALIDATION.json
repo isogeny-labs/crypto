@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "e17fa9d7431b324dacc44dae56a9f9c19daa7307f1526f55b0b772fd66343452"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "77ad5e1a02bf5ee99b8e3e7133f93098006d8ee878d22e9de97d9e66b0aabe80"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/mt_fieldops_v2_20261111/PROTOCOL.md: per configuration and price, the cheapest of the four pre-registered rho arms (rho, rho2, rho2x, rhoseq) x kappa {0.5, 0.7, 1.0}, all with x-only (negation-map) lookups; generic prime-order curves (no j = 0 / 1728 automorphism, no Frobenius)",
+  "unit": "GAE per target from counted F_p I, M, S (I = 10M, S = M, 1 GAE = I + 2M + S) plus h GAE per hash/solver op",
+  "binary_or_process": "target/release/examples/mt_fieldops built from commit 6b0ac6f192 (sha256 bbcc68cc..., in every row of results/holdout/rows.jsonl)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 76.815,
+    "rho": 82.985
+   },
+   "0.1": {
+    "ic": 83.709,
+    "rho": 90.226
+   },
+   "1": {
+    "ic": 145.795,
+    "rho": 155.395
+   }
+  },
+  "order_holds_across_band": true,
+  "note": "band shown for the 25-bit, T = 16384 cell (medians over 22 configurations); the admitted row is the T = 16384 cells, where IC4 is cheaper at every I/M and h. T = 4096 is unranked and T = 1024 dearer; strongest_available means the strongest rho in this harness, not ecbench's"
+ }
+}

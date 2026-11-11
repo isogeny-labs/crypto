@@ -206,8 +206,9 @@ impl Point {
     /// Jacobian coordinates with `self + other` precomputed, about
     /// `max(bits)` doublings and three quarters as many mixed additions,
     /// and a single inversion for the whole sum; the two ladders and the
-    /// final addition cost three.  Otherwise it is the two ladders and an
-    /// addition.
+    /// final addition cost three.  Above one word the same pass runs on
+    /// `BigUint` Jacobian points; an identity operand falls back to the two
+    /// ladders and an addition.
     pub fn double_scalar_mul_vartime(
         &self,
         k: &BigUint,
@@ -245,6 +246,34 @@ impl Point {
                     return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
                 }
             }
+            // Above one word: the same interleaved pass on `BigUint` Jacobian
+            // points, one inversion for the whole sum.
+            let both = self.add_vartime(other, a);
+            let mut acc: Option<Jacobian> = None;
+            for i in (0..k.bits().max(l.bits())).rev() {
+                if let Some(j) = &acc {
+                    acc = j.double(a);
+                }
+                let add = match (k.bit(i), l.bit(i)) {
+                    (true, true) => match &both {
+                        Point::Affine { x, y } => Some((x, y)),
+                        Point::Infinity => None,
+                    },
+                    (true, false) => Some((x1, y1)),
+                    (false, true) => Some((x2, y2)),
+                    (false, false) => None,
+                };
+                if let Some((x, y)) = add {
+                    acc = match &acc {
+                        None => Some(Jacobian::from_affine(x, y)),
+                        Some(j) => j.add_affine(x, y, a),
+                    };
+                }
+            }
+            return match acc {
+                None => Point::Infinity,
+                Some(j) => j.to_affine(),
+            };
         }
         self.scalar_mul_vartime(k, a)
             .add_vartime(&other.scalar_mul_vartime(l, a), a)
