@@ -171,3 +171,28 @@ fn sign_is_a_required_zeta_control_not_an_isogeny_certificate() {
     let e2=1+(0..P).map(|x|(0..P).filter(|&y|m(y*y)==m(6*x*x*x+x*x+1)).count() as i64).sum::<i64>();
     assert_eq!(e2,9); assert_eq!(count_e(1,6)*e2,117); // second elliptic quotient
 }
+
+#[test]
+fn rational_closed_fiber_ideals_include_nonsplit_and_ramified_support() {
+    // D_Q: (U(X)=X^2-u, V(X)=v), with y^2=X^6+a*X^2+b.
+    // v^2-F(X) is divisible by U for every Q=(u,v) in E(F11).
+    // The divisor class is [D_Q - infinity_plus - infinity_minus] on
+    // the even-sextic curve; no splitting square root or rational
+    // Weierstrass point is required to represent the rational ideal.
+    for (a,b,expected) in [(1,6,[4,8,0]),(2,4,[4,10,2])] {
+        let mut kinds=[0_i64;3]; // split, nonsplit, ramified
+        for u in 0..P {
+            for v in 0..P {
+                if m(v*v)!=m(u*u*u+a*u+b) {continue;}
+                let ideal_u=[m(-u),0,1];
+                let v_squared_minus_f=vec![m(v*v-b),0,m(-a),0,0,0,m(-1)];
+                assert!(div_monic(v_squared_minus_f,&ideal_u),
+                    "invalid closed-fiber ideal at ({u},{v})");
+                let i=if u==0 {2} else if chi(u)==1 {0} else {1};
+                kinds[i]+=1;
+            }
+        }
+        assert_eq!(kinds,expected);
+        assert_eq!(kinds.into_iter().sum::<i64>()+1,count_e(a,b));
+    }
+}
