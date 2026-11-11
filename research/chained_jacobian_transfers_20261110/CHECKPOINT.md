@@ -1,93 +1,84 @@
-# Resume checkpoint — operational non-split transfer
+# Resume checkpoint — shifted full-order109 transfer
 
-Inspect actual heads and uncommitted diffs first. Read QUEUE.md and the latest
+Inspect actual heads/uncommitted diffs first. Read QUEUE.md and the latest
 session-log entries. Reuse immutable passing receipts when inputs match;
-do not repeat completed baseline work. All scientific standings remain
-unsigned/unverified. [pcc:unverified]
+do not repeat completed baseline work. All standing unsigned. [pcc:unverified]
 
-## Current durable sources
+## Durable sources and completed checks
 
-- Crypto branch research/chained-jacobian-transfer-20261110, existing PR3877;
-  last published checkpointcdaa61178c4135846a85f57b9844ed38d2997e3d before
-  the pending operational-map proof/field replay checkpoint. Read actual HEAD.
-- Native runtime pin75a737b8366ec6c78ed8672886423fcbe69853a2; its seven inputs
-  in small-prime-inputs.sha256 remain unchanged.
-- Operational producer cryptanalysis9cd20ac5f80cdd140be2d16d49701c1b950ef13c,
-  branch research/chained-transfer-nonsplit-map-20261111, PR1478. Its base is
-  merged PR1477,c321a8f5af96185aaa5e8de0d27f0c3f4080772a. Observe current
-  GitHub status before a new publishing decision; do not assume a merge.
-- NONSPLIT_MAP_CHECKPOINT.md binds source digests, report/PDF, scope and
-  independent field witness. Earlier cubic/balanced/kernel checkpoint files
-  and every source pin/raw receipt remain historical evidence.
-- Crypto-autoresearcher8edec422a60d87b2cbc656fb02f99f42eba959c7 is vault
-  locked. No plaintext written there; use INTEGRATION_HANDOFF.md on unlock.
+- Crypto branch research/chained-jacobian-transfer-20261110, PR3877;
+  last published944c7f6564b043b693aef161dcd5a3917de481df before this pending
+  shifted checkpoint. Read actual HEAD. Native runtime pin75a737b8 and all
+  seven small-prime-inputs.sha256 inputs remain unchanged.
+- Shifted producer cryptanalysis767c945a0a832c4f9d2827add8aefce3a16d2371,
+  ready PR1479, branch research/chained-transfer-shifted109-20261111. Base
+  is merged PR1478,f387be120074584a2e40be2062cb7711e490cd09. Exact-head
+  focused43014776243 on9cd20ac5f succeeded; raw log/PCCf0e470 retained.
+- SHIFTED109_CHECKPOINT.md binds source digests, report/two-page inspected
+  PDF,128 independent field witnesses, acceptance scope and commands.
+  Complete shifted targeted map passes on all12,317 classes both directions:
+  both dual norms[2],descent,bijection/additivity. All109 scalar/coordinate/
+  recovery[4]/inverse82 controls pass. Inventory: stable3,degenerate1,
+  smooth2 reflection-equivalent,delta63/38,raw scale22.
+- Changed-input F17 three map controls,both17/101 field controls,formatting
+  and strict Clippy pass. Current full46-test consumer guard is pending
+  exact-head focused CI. Do not relabel earlier43-test receipt as current.
+- Root independent flat Fp6/Rabin engine passes128 cases each17/101,exact
+  seeds/products/inverses/Frobenius,using explicit primitive bridges;
+  PCC5dbc9d. F17 TSV unchanged. Only test/fixture code changed,no old
+  arithmetic modified. This checks field layer,not independently whole maps.
+- Four ShiftedCover.lean lemmas pass gate4/local PCC7c396d. Total48 written
+  lemmas,gates22+8+7+12+6+5+7+4. Finite-field/Picard/global-dual geometry
+  remains written. Local pass does not create signed standing.
+- Earlier source9cd20ac5f passes native25/reference43 full guard,1 old
+  benchmark ignored; all285 F17 map classes/all19 scalars. Earlier cubic130
+  independent witnesses and balanced10404-class comparisons stay retained.
+- Root library attempt04 finished6184 pass/13 fail/133 ignored. Restored
+  tracked files fix6 tests;5 need missing archives,2 missing kernel clock
+  metadata. Full suite remains failed; do not repeat without resolving causes.
+- Crypto-autoresearcher8edec422a60d87b2cbc656fb02f99f42eba959c7 stays vault
+  locked; no plaintext written. INTEGRATION_HANDOFF.md is the unlock handoff.
 
-## Completed checks: reuse unchanged inputs
+All scientific assertions above remain unsigned/unverified. [pcc:unverified]
 
-- Consumer full guard: native25/reference43 tests,1 existing benchmark ignored,
-  formatting, strict Clippy and exact runtime guards pass; receipt
-  nonsplit-map-pinned-01.txt/PCCbd303e. All285 rational classes in each
-  direction satisfy both dual norms[2], paired additivity and bijection;
-  every19 elliptic scalar/source norm[4]/inverse5 check passes.
-- Independent pre-existing flat Fp6 engine replays128 tower-field products,
-  inverses/Frobenius cases with exact seed checks, Rabin irreducibility and
-  primitive-element bridge; PCC167595, independent-field6-02.txt and frozen
-  TSV. Only a unit test/fixture added; engine arithmetic unchanged. This
-  checks the field layer, not independently the whole Jacobian map.
-- Four generic RichelotAlgebra.lean certificates pass7-declaration gate and
-  local PCCf7eb4f check. Total44 written lemmas, gates22+8+7+12+6+5+7.
-  Finite-field/Picard/global dual geometry remains written primary input.
-- Current producer map diagram/PDF rebuilt and every2 pages inspected.
-  Earlier130-witness cubic replay, balanced original/translated10404-class
-  comparisons and kernel/PGL2 checks remain passed snapshots, not new runs.
-- Root library attempt04 is finished:6184 pass/13 fail/133 ignored. Restoring
-  tracked files fixes6 failing tests;5 need missing archives and2 unavailable
-  kernel clock metadata. Full-suite status remains failed. Do not rerun the
-  two-hour suite without resolving its actual causes. [pcc:unverified]
+## Next CT16: target Frobenius and nonbacktracking continuation
 
-For changed inputs, use installed Rust/Lean on PATH:
+For accepted F17/F101 targets,compute actual bracket discriminants over
+checked cubic fields. Split all6 target roots in Fp6,verify exact Frobenius
+permutations and enumerate all15 stable matchings. Identify previous-dual
+kernel; preserve forced backtracks/equivalent models. No outcome assumed.
+
+Build all15 nonzero geometric2-torsion classes from unordered branch pairs
+over Fp6; check distinct/nonzero/double-zero and Frobenius³ action. Compare
+source/target2-torsion over Fp³. Different cardinalities would obstruct any
+unpolarized Fp-Jacobian isomorphism; curve PGL2 distinction alone does not.
+If another kernel exists,construct/evaluate it with explicit leading/twist,
+both dual norms and nonzero subgroup/recovery controls before accepting a hop.
+CT14 production/catalog/large-prime/extension/normalization coverage and
+all solver-cost obligations remain open. [pcc:unverified]
+
+## Reproduce changed inputs only
 
 ```sh
 export PATH="$HOME/.cargo/bin:$HOME/.elan/bin:$PATH"
-# From cryptanalysis:
+# cryptanalysis,unchanged seven-input runtime closure:
 experiments/chained-transfer-reference/check.sh
-# From crypto:
-cargo test --release --bin icprog chained_nonsplit_compositum_witnesses -- --nocapture
-tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/RichelotAlgebra.lean
+# crypto:
+cargo test --release --bin icprog chained_ -- --nocapture
+tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/ShiftedCover.lean
 ```
-
-## Next: CT15 shifted E109; CT16 chain obligation remains open
-
-CT13b operational F17 map is complete; reuse its receipts. CT15 now assesses
-frozen proposal8774df: shift2 of the existing E109 source. In U=X−2 the
-source cubic coefficients are[56,13,6,1], cover[56,0,13,0,6,0,1], generator
-(U=0,Y=37). Root norm45 is square, but no shifted kernel/map was computed.
-Parameterize checked cubic quotient construction/square roots and the source
-quadratic cover, retaining all F17 controls. First inventory determinants,
-leading coefficients, twists and field descent before a map implementation.
-If target leading is nonsquare, retain the unsupported boundary and derive
-an explicit split-infinity coordinate change; never silently retwist. Check
-source-coordinate shift back to original E and recovery inverse4=82 mod109.
-This is a proposed input/acceptance plan, not an accepted shifted transfer.
-[pcc:unverified]
-
-CT16 assesses the accepted F17 codomain's next nonbacktracking kernels and
-Galois2-torsion. Its PGL2 curve distinction is not yet an unpolarized-Jacobian
-distinction. Preserve any forced backtrack or equivalent model. No continuation
-is accepted yet. CT14 production/catalog/large-prime/extension/normalization
-coverage and all solver-cost obligations remain open. [pcc:unverified]
 
 ## Continuing constraints
 
-- No benchmark, collector experiment or paid allocation before successful S3
-  checkpoint admission and live IsoLab budget/capacity visibility.
-- Crypto's frozen PCC ledger-prefix fork remains unresolved. Extend PR3877;
-  do not choose a history, rewrite entries, rebase away evidence or bypass CI.
-  No crypto auto-merge while ledger/archive/review gates remain blocked.
-- Local Lean pass and unsigned statement receipts do not create signed
-  scientific standing. KB/ecdb unavailable, atlas locked; no novelty claim.
-- New arithmetic Rust/Lean only, no new Python research arithmetic.
-- Use guarded immutable GitHub object publication if ordinary Git auth still
-  fails; verify remote heads, never force. Commit exact resume state frequently.
-- Poll PRs on repository cadence(about50min absent new activity), or when
-  actual merge state is necessary for the next publishing decision.
+- No benchmark/collector/paid allocation before successful S3 admission and
+  live IsoLab allowance/capacity. Local unit tests/proofs remain permitted.
+- Crypto frozen PCC ledger fork unresolved. Extend PR3877; never choose a
+  lineage,rewrite frozen entries,rebase away evidence or bypass CI/review.
+  No crypto auto-merge while ledger/archive gates remain blocked.
+- KB/ecdb unavailable,atlas locked; no novelty claim. Lean pass and unsigned
+  attestations do not create signed scientific standing or a measured edge.
+- Rust/Lean for new arithmetic. Guard immutable GitHub publication with
+  exact40hex refs; never force. Commit exact resume state frequently.
+- Poll on repository cadence(about50min absent activity),or when actual
+  state is necessary for next publishing decision. Focused workflows have
+  no new PR trigger; preserve every historical receipt.

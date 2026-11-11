@@ -2217,36 +2217,46 @@ mod tests {
 
     /// Independent replay of the Chained Transfers tower-field witnesses.
     /// Uses this pre-existing flat degree6 Fpk engine, no producer map code.
-    #[test]
-    fn chained_nonsplit_compositum_witnesses() {
-        let modc = [14, 10, 14, 4, 12, 0];
-        assert!(rabin_irreducible(17, &modc));
-        let f = Fpk::new(17, &modc).unwrap();
+    fn check_chained_tower_witnesses(
+        p: u128,
+        cubic: [u128; 3],
+        nr: u128,
+        wide: bool,
+        fixture: &str,
+    ) {
+        let [c0, c1, c2] = cubic;
+        let a = vec![(c2 * nr + c0) % p, (3 * nr + c1) % p, c2, 1];
+        let b = vec![(nr + c1) % p, 2 * c2 % p, 3];
+        let b_squared = pmul(&b, &b, p)
+            .iter()
+            .map(|x| nr * x % p)
+            .collect::<Vec<_>>();
+        let mut modc = psub(&pmul(&a, &a, p), &b_squared, p);
+        assert_eq!(modc.len(), 7);
+        assert_eq!(modc.pop(), Some(1));
+        assert!(rabin_irreducible(p, &modc));
+        let f = Fpk::new(p, &modc).unwrap();
         let gamma = f.reduce(&[0, 1]);
-        // gamma=T+s; q(T)=T³+2T+2 and s²=3 imply
-        // s=(gamma³+11gamma+2)/(3gamma²+5).
-        let aa = f.add(
-            &f.add(&f.pow(&gamma, 3), &f.mul(&f.scalar(11), &gamma)),
-            &f.scalar(2),
-        );
-        let bb = f.add(&f.mul(&f.scalar(3), &f.pow(&gamma, 2)), &f.scalar(5));
+        // q(gamma-s)=A(gamma)-B(gamma)s, so s=A/B and T=gamma-s.
+        let eval = |coefficients: &[u128], x: &[u128]| {
+            coefficients
+                .iter()
+                .rev()
+                .fold(f.zero(), |value, c| f.add(&f.mul(&value, x), &f.scalar(*c)))
+        };
+        let aa = eval(&a, &gamma);
+        let bb = eval(&b, &gamma);
         let s = f.mul(&aa, &f.inv(&bb).unwrap());
         let t = f.sub(&gamma, &s);
-        assert_eq!(f.pow(&s, 2), f.scalar(3));
-        assert_eq!(
-            f.add(
-                &f.add(&f.pow(&t, 3), &f.mul(&f.scalar(2), &t)),
-                &f.scalar(2)
-            ),
-            f.zero()
-        );
+        assert_eq!(f.pow(&s, 2), f.scalar(nr));
+        assert_eq!(eval(&[c0, c1, c2, 1], &t), f.zero());
         let decode = |value: &str| {
             let c = value
                 .split(',')
                 .map(|x| x.parse::<u128>().unwrap())
                 .collect::<Vec<_>>();
             assert_eq!(c.len(), 6);
-            assert!(c.iter().all(|x| *x < 17));
+            assert!(c.iter().all(|x| *x < p));
             let mut a = f.zero();
             let mut b = f.zero();
             for i in 0..3 {
@@ -2255,42 +2265,51 @@ mod tests {
             }
             f.add(&a, &f.mul(&b, &s))
         };
-        let fixture=include_str!("../../../research/chained_jacobian_transfers_20261110/evidence/nonsplit-field6-witness-01.tsv");
         let mut seen = BTreeSet::new();
         for line in fixture.lines().skip(2) {
             let cells = line.split('\t').collect::<Vec<_>>();
             assert_eq!(cells.len(), 7);
             let n = cells[0].parse::<u128>().unwrap();
             assert!(n < 128 && seen.insert(n));
-            let digits = |v: u128| (0..3).map(|i| v / 17_u128.pow(i) % 17).collect::<Vec<_>>();
+            let digits = |v: u128| (0..3).map(|i| v / p.pow(i) % p).collect::<Vec<_>>();
             let coordinates = |s: &str| {
                 s.split(',')
                     .map(|x| x.parse::<u128>().unwrap())
                     .collect::<Vec<_>>()
             };
-            let mut expected_x = digits(n);
-            expected_x.extend(digits((37 * n + 19) % 4913));
-            let mut expected_y = digits((13 * n + 7) % 4913);
-            expected_y.extend(digits((29 * n + 11) % 4913));
+            let seeds = if wide {
+                [
+                    (37 * p * p + 19) * n + 13,
+                    (13 * p * p + 7 * p + 29) * n + 23,
+                    (29 * p * p + 11 * p + 7) * n + 31,
+                    (11 * p * p + 23 * p + 17) * n + 43,
+                ]
+            } else {
+                [n, 37 * n + 19, 13 * n + 7, 29 * n + 11]
+            };
+            let mut expected_x = digits(seeds[0] % p.pow(3));
+            expected_x.extend(digits(seeds[1] % p.pow(3)));
+            let mut expected_y = digits(seeds[2] % p.pow(3));
+            expected_y.extend(digits(seeds[3] % p.pow(3)));
             assert_eq!(coordinates(cells[1]), expected_x, "frozen inputx{n}");
             assert_eq!(coordinates(cells[2]), expected_y, "frozen inputy{n}");
             let x = decode(cells[1]);
             let y = decode(cells[2]);
             assert_eq!(f.mul(&x, &y), decode(cells[3]), "product{n}");
             assert_eq!(f.inv(&x).unwrap(), decode(cells[4]), "inverse{n}");
-            assert_eq!(
-                f.pow(&x, 17_u128.pow(3)),
-                decode(cells[5]),
-                "Frobenius3 case{n}"
-            );
-            assert_eq!(
-                f.pow(&x, 17_u128.pow(6)),
-                decode(cells[6]),
-                "Frobenius6 case{n}"
-            );
+            assert_eq!(f.pow(&x, p.pow(3)), decode(cells[5]), "Frobenius3 case{n}");
+            assert_eq!(f.pow(&x, p.pow(6)), decode(cells[6]), "Frobenius6 case{n}");
         }
         assert_eq!(seen.len(), 128);
-        println!("PASS128 tower-field witnesses against pre-existing flat F17^6 arithmetic with independently Rabin-checked modulus and explicit primitive-element bridge; no producer field/map code imported");
+        println!("PASS128 tower-field witnesses against pre-existing flat F{p}^6 arithmetic with independently Rabin-checked modulus{modc:?} and explicit primitive-element bridge; no producer field/map code imported");
+    }
+    #[test]
+    fn chained_nonsplit_compositum_witnesses() {
+        check_chained_tower_witnesses(17,[2,2,0],3,false,include_str!("../../../research/chained_jacobian_transfers_20261110/evidence/nonsplit-field6-witness-01.tsv"));
+    }
+    #[test]
+    fn chained_shifted101_compositum_witnesses() {
+        check_chained_tower_witnesses(101,[56,13,6],2,true,include_str!("../../../research/chained_jacobian_transfers_20261110/evidence/shifted101-field6-witness-01.tsv"));
     }
 
     /// `#E` by counting, one abscissa at a time (curve_id.py's selftest).

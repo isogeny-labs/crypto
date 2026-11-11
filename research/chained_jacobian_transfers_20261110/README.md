@@ -84,6 +84,15 @@ passes descent, both dual norms[2], bijection and paired additivity; all19
 elliptic scalar/recovery relations pass. Latest native25/reference43 guard
 passes(1 old benchmark ignored). A separate pre-existing flat Fp6 engine
 replays128 field witnesses; that checks the extension layer, not independently
-the whole Jacobian map. CT15 next assesses the frozen shift2 E109 cover.
+the whole Jacobian map. The subsequent CT15 checkpoint is linked below.
 Standing unsigned, no demonstrated cost advantage or cross-prime descent.
 [pcc:unverified]
+
+The [shifted109 checkpoint](SHIFTED109_CHECKPOINT.md) now evaluates the
+predeclared shift2 source: determinant63/raw scale22, all12,317 classes in
+each direction satisfy both dual norms[2], descent, bijection/additivity;
+all109 scalar/recovery[4]/inverse82 controls pass. Independent flat F101⁶
+field replay128 and four shifted-cover Lean lemmas pass. Current full46-test
+consumer CI is pending; CT16 next assesses target Frobenius2-torsion and
+nonbacktracking kernels. Unshifted negative/equivalent targets retained;
+standing unsigned, no cost or cross-prime descent result. [pcc:unverified]

@@ -141,3 +141,23 @@ actual Frobenius-stable non-split kernels/codomains/maps on E19/F17. No
 non-split correspondence, cost gain or cross-prime descent is supplied by
 this checkpoint. Atlas/KB/vault and benchmark gates remain unchanged.
 [pcc:unverified]
+
+## Shifted109 operational continuation
+
+Cryptanalysis767c945a0a832c4f9d2827add8aefce3a16d2371,ready PR1479,now
+implements the frozen shift2 E109/F101 source. All12,317 classes each way
+pass both Richelot dual norms[2],descent,bijection/additivity; all109 source
+coordinate/scalar/recovery[4]/inverse82 controls pass. Stable kernels:
+1 degenerate/2 smooth reflection-equivalent,delta63/38,raw scale22.
+SHIFTED109_CHECKPOINT.md binds digests and inspected two-page report.
+Independent flat F101⁶ replay128 plus four shifted-cover Lean lemmas pass;
+field layer alone independently cross-checked,not whole Jacobian map.
+Current full46-test guarded CI pending. Prior PR1478 mergedf387be120,
+exact-head focused43014776243 succeeds. All standings unsigned.
+[pcc:unverified]
+
+CT16 next computes target Frobenius action/geometric2-torsion and stable
+next kernels; no nonbacktracking continuation or stronger nonisomorphism
+result assumed. Retain unshifted negative/equivalent targets. Atlas remains
+locked,no plaintext/guessed lead ID; no benchmark,cost or cross-prime result.
+[pcc:unverified]
