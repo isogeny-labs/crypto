@@ -107,6 +107,7 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+    "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -1234,6 +1235,39 @@ def ic_cover_weakclass_component() -> dict:
             "validation": ("validated with caveats: replay certificate, validator report and the "
                            "negation-map rho reference with the §5a band "
                            f"({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def jv_sieve_line_vs_rho_component() -> dict:
+    """The Joux-Vitse cover sieve route (arms P, H, U) against a matched negation-map
+    rho on the same weak-class instances, p in {1009, 1511, 1823}, from
+    research/jv_sieve_line_vs_rho_20261103/fit.json (made by the study's Rust tool
+    from its records; every point recomputed independently by the validator,
+    review/validator/recompute.json). Per-prime reference (the frozen homogeneity
+    rule failed), unit U2, layer A of the §5a band (all unemitted cover F_p work
+    priced as native). Weak class only, never prime order: outside tables A-C.
+    Its standing comes from the study's VALIDATION.json."""
+    f = load(SOURCES["jv_sieve_line_vs_rho"])
+    study = "research/jv_sieve_line_vs_rho_20261103"
+    if f["controls"]["primary"] != "per-prime" or not (f["controls"]["c1_pass"] and f["controls"]["c2_pass"]
+                                                       and f["controls"]["replays_ok"]):
+        raise SystemExit(f"{SOURCES['jv_sieve_line_vs_rho']}: controls or primary reference changed")
+    rows = []
+    for arm in "PHU":
+        for scope in ("p=1009", "p=1511", "p=1823", "pooled (24 instances)"):
+            cell = lambda m: f[f"per-prime|{arm}|{scope}|{m}"]
+            band = [cell(f"band A U2 w={w}") for w in ("0", "0.1", "1")]
+            rows.append({"arm": arm, "scope": scope.replace(" (24 instances)", ""),
+                         "s": cell("S/rho U2")["point"], "lo": cell("S/rho U2")["lo"], "hi": cell("S/rho U2")["hi"],
+                         "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
+                         "below": all(b["verdict"] == "below" for b in band)})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "transfer (weak class only)",
+            "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["jv_sieve_line_vs_rho"],
+            "validation": ("validated with caveats (weak class only; isogeny walk into the class not charged): "
+                           "replay certificate, validator report and the matched negation-map rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -2567,6 +2601,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
+        "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -2966,6 +3001,21 @@ def markdown(doc: dict) -> str:
                  f"**{r['ratio']:.3f}** [{r['ratio_min']:.3f}, {r['ratio_max']:.3f}] | {band} | {before} |")
     L += ["", f"[Report]({'../../' + cw['report']}) · [study](../../{cw['study']}) · "
               f"[data](../../{cw['source']}).", "", cw["validation"], ""]
+    js = doc["jv_sieve_line_vs_rho_component"]
+    L += ["## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)", "",
+          "Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} "
+          "(never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per "
+          "prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; "
+          f"`{js['unit']}`. The band is layer A: every unemitted cover F_p operation is also priced as native, the "
+          "upper-bound convention. The isogeny walk into the class is not charged. Distance remaining is IC ÷ rho; "
+          "\"below\" means the 95% interval's upper end is under 1 at all three prices.", "",
+          "| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |",
+          "|:--|:--|:--|:--|:--|"]
+    for r in js["rows"]:
+        L.append(f"| {r['arm']} | {r['scope']} | **{r['s']:.4f}** [{r['lo']:.4f}, {r['hi']:.4f}] | "
+                 + " / ".join(f"{x:.3f}" for x in r["band"]) + f" | {'yes' if r['below'] else 'no'} |")
+    L += ["", f"[Report]({'../../' + js['report']}) · [study](../../{js['study']}) · "
+              f"[data](../../{js['source']}).", "", js["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -4369,6 +4419,23 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table></div>'
              f'<p>{gh(cw["report"], "Report")} · {gh(cw["study"], "study")} · {gh(cw["source"], "data")}.</p>'
              f'<p class="muted">{esc(cw["validation"])}</p></section>')
+    js = doc["jv_sieve_line_vs_rho_component"]
+    P.append('<section class="panel" id="jv-sieve-line-vs-rho"><h2>Joux–Vitse cover sieve vs matched negation rho '
+             '<span class="chip">weak class only</span></h2>'
+             '<p>Curves over F<sub>p⁶</sub> with full rational 2-torsion whose class has a genus-3 cover over '
+             'F<sub>p²</sub> (never prime order). Arms P, H and U, 8 instances per prime, against a negation-map rho '
+             f'on the same instances in the same binary. Per-prime reference; {esc(js["unit"])}. Layer-A band: every '
+             'unemitted cover F<sub>p</sub> operation is also priced as native. The isogeny walk into the class is '
+             'not charged.</p><div class="scroll"><table><thead><tr><th>arm</th><th>scope</th>'
+             '<th>IC ÷ rho, U2 [95%]</th><th>layer-A band (w = 0 / 0.1 / 1)</th><th>below across band</th>'
+             '</tr></thead><tbody>')
+    for r in js["rows"]:
+        P.append(f'<tr><td>{r["arm"]}</td><td>{esc(r["scope"])}</td><td><b>{r["s"]:.4f}</b> '
+                 f'[{r["lo"]:.4f}, {r["hi"]:.4f}]</td><td>' + " / ".join(f"{x:.3f}" for x in r["band"])
+                 + f'</td><td>{"yes" if r["below"] else "no"}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(js["report"], "Report")} · {gh(js["study"], "study")} · {gh(js["source"], "data")}.</p>'
+             f'<p class="muted">{esc(js["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'

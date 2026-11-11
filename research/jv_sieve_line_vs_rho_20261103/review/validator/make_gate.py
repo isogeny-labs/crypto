@@ -28,7 +28,7 @@ raw = sorted([os.path.join(dp, f) for dp, _, fs in os.walk(f"{D}/results/cover")
              + [os.path.join(dp, f) for dp, _, fs in os.walk(f"{D}/results/rho") for f in fs if f.endswith(".json")])
 rep = {"schema": "validator-report/v1", "study": rel(D), "status": "pass" if rc["max_rel_err"] < 1e-9 and bs["all_below"] and ok else "fail",
        "independent": True, "validator": "validator session 2026-11-11 (not the study's producer); recompute written from PROTOCOL.md without reading fit/src",
-       "raw_data": [{"path": rel(p), "sha256": sha(p)} for p in raw],
+       "raw_data": [{"path": os.path.relpath(p, D), "sha256": sha(p)} for p in raw],
        "headline": [{"name": c["name"], "claimed": c["claimed"], "recomputed": c["recomputed"], "rel_tol": 1e-9} for c in heads],
        "all_cells": {"count": len(rc["cells"]), "max_rel_err": rc["max_rel_err"], "file": "recompute.json"},
        "bootstrap": {"file": "bootstrap.json", "resamples": bs["resamples"], "cells": len(bs["cells"]), "all_below_rho": bs["all_below"], "max_hi": bs["max_hi"]},

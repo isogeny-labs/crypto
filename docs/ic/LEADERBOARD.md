@@ -166,6 +166,29 @@ On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–
 
 validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)
 
+## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)
+
+Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} (never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; `U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each`. The band is layer A: every unemitted cover F_p operation is also priced as native, the upper-bound convention. The isogeny walk into the class is not charged. Distance remaining is IC ÷ rho; "below" means the 95% interval's upper end is under 1 at all three prices.
+
+| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |
+|:--|:--|:--|:--|:--|
+| P | p=1009 | **0.0656** [0.0456, 0.0956] | 0.066 / 0.360 / 0.378 | yes |
+| P | p=1511 | **0.0177** [0.0135, 0.0246] | 0.018 / 0.133 / 0.140 | yes |
+| P | p=1823 | **0.0125** [0.0103, 0.0157] | 0.012 / 0.092 / 0.096 | yes |
+| P | pooled | **0.0244** [0.0206, 0.0292] | 0.024 / 0.164 / 0.172 | yes |
+| H | p=1009 | **0.0314** [0.0239, 0.0435] | 0.031 / 0.167 / 0.176 | yes |
+| H | p=1511 | **0.0124** [0.0099, 0.0165] | 0.012 / 0.075 / 0.079 | yes |
+| H | p=1823 | **0.0094** [0.0078, 0.0113] | 0.009 / 0.060 / 0.063 | yes |
+| H | pooled | **0.0154** [0.0135, 0.0180] | 0.015 / 0.091 / 0.095 | yes |
+| U | p=1009 | **0.0306** [0.0224, 0.0440] | 0.031 / 0.158 / 0.165 | yes |
+| U | p=1511 | **0.0115** [0.0085, 0.0160] | 0.011 / 0.071 / 0.075 | yes |
+| U | p=1823 | **0.0081** [0.0074, 0.0088] | 0.008 / 0.056 / 0.059 | yes |
+| U | pooled | **0.0141** [0.0122, 0.0167] | 0.014 / 0.086 / 0.090 | yes |
+
+[Report](../../research/jv_sieve_line_vs_rho_20261103/REPORT.pdf) · [study](../../research/jv_sieve_line_vs_rho_20261103/) · [data](../../research/jv_sieve_line_vs_rho_20261103/fit.json).
+
+validated with caveats (weak class only; isogeny walk into the class not charged): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
+
 ## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
 
 On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
@@ -953,6 +976,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
 - `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
 - `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
+- `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
