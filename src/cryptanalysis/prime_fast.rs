@@ -1109,17 +1109,19 @@ impl FastFactorBase {
 }
 
 /// Meet-in-the-middle table for 3-decompositions: every
-/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), sorted by
-/// canonical x.  `B²` entries of 16 bytes.
+/// `x(F_j + F_k)` (`j ≤ k`) and `x(F_j − F_k)` (`j < k`), bucketed by the
+/// high bits of the canonical x (entries inside a bucket are unordered).  `B²` entries of 16 bytes.
 #[derive(Clone, Debug)]
 pub struct PairTable {
     /// `(x_canonical, j, k_with_sign)`; the top bit of the third field
     /// is set for a difference `F_j − F_k`.
     entries: Vec<(u64, u32, u32)>,
     /// Bucket index over the high bits of x: bucket `b` holds `entries[starts[b]..starts[b + 1]]`,
-    /// the buckets are monotone in x, so `entries` is sorted by x as a whole.
+    /// the buckets are monotone in x; entries inside a bucket are in construction order.
     starts: Vec<u32>,
     shift: u32,
+    /// Largest canonical x in the table (0 when empty).
+    max_x: u64,
 }
 
 const PAIR_DIFF_BIT: u32 = 1 << 31;
@@ -1173,12 +1175,7 @@ impl PairTable {
             sorted[cursor[b] as usize] = *e;
             cursor[b] += 1;
         }
-        for b in 0..nb {
-            let (lo, hi) = (starts[b] as usize, starts[b + 1] as usize);
-            if hi - lo > 1 {
-                sorted[lo..hi].sort_unstable();
-            }
-        }
+        let max_x = entries.iter().map(|e| e.0).max().unwrap_or(0);
         let entries = sorted;
         if std::env::var_os("IC_MULTI_TIMING").is_some() {
             eprintln!(
@@ -1192,6 +1189,7 @@ impl PairTable {
             entries,
             starts,
             shift,
+            max_x,
         }
     }
 
@@ -1205,19 +1203,19 @@ impl PairTable {
 
     /// All `(j, k, sigma)` with `x(F_j + sigma·F_k) == x`.
     #[inline]
-    pub fn lookup(&self, x: u64) -> &[(u64, u32, u32)] {
+    pub fn lookup(&self, x: u64) -> impl Iterator<Item = &(u64, u32, u32)> {
         let b = (x >> self.shift) as usize;
-        if b + 1 >= self.starts.len() {
-            return &[];
-        }
-        let (blo, bhi) = (self.starts[b] as usize, self.starts[b + 1] as usize);
-        let bucket = &self.entries[blo..bhi];
-        let lo = bucket.partition_point(|e| e.0 < x);
-        let mut hi = lo;
-        while hi < bucket.len() && bucket[hi].0 == x {
-            hi += 1;
-        }
-        &bucket[lo..hi]
+        let bucket: &[(u64, u32, u32)] = if b + 1 >= self.starts.len() {
+            &[]
+        } else {
+            &self.entries[self.starts[b] as usize..self.starts[b + 1] as usize]
+        };
+        bucket.iter().filter(move |e| e.0 == x)
+    }
+
+    /// Largest canonical x in the table (0 when empty).
+    pub fn max_x(&self) -> u64 {
+        self.max_x
     }
 }
 
@@ -1344,7 +1342,7 @@ pub fn collect_relations(
                     }
                 }
                 if let Some(pairs) = pairs {
-                    if xc <= pairs.entries.last().map(|e| e.0).unwrap_or(0) {
+                    if xc <= pairs.max_x() {
                         for &(_, j, k_raw) in pairs.lookup(xc) {
                             if (j as usize) < i {
                                 continue;
@@ -1435,7 +1433,7 @@ pub fn collect_relations_table(
     let mut rng = StdRng::seed_from_u64(seed);
     let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
     let mut stats = CollectStats::default();
-    let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+    let max_pair_x = pairs.max_x();
 
     let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
         loop {
@@ -1761,7 +1759,7 @@ fn collect_setup_batched(
 ) -> Vec<FastRelation> {
     let n = curve.n;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5E70_BA7C);
-    let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+    let max_pair_x = pairs.max_x();
     let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
     let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
     let fresh = |rng: &mut StdRng| -> (u64, Pt) {
@@ -1930,7 +1928,7 @@ pub fn ic_multi_solve_ex(
         // each point is looked up in the pair table (O(1)); a relation using only determined logs retires the lane.
         let m = qs.len();
         let mut rng = StdRng::seed_from_u64(seed ^ 0xBA7C_4ED0);
-        let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+        let max_pair_x = pairs.max_x();
         let mut ab: Vec<(u64, u64)> = vec![(0, 0); m];
         let mut cur: Vec<Option<Pt>> = Vec::with_capacity(m);
         let fresh = |rng: &mut StdRng, q: Pt| -> (u64, u64, Pt) {
