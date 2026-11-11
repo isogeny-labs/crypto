@@ -1697,6 +1697,101 @@ pub struct MultiReport {
     pub targets_walked: Vec<u64>,
 }
 
+/// Relation collection against `Q = G` for the shared factor-base solve, with `lanes` walkers advanced in
+/// lock-step (one batched inversion per round) and the pair-table lookup of [`collect_relations_table`].
+/// Relations are returned as `a = a_eff, b = 0` (so `R = a G`).
+fn collect_setup_batched(
+    curve: &FastCurve,
+    g: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    lanes: usize,
+    seed: u64,
+) -> Vec<FastRelation> {
+    let n = curve.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x5E70_BA7C);
+    let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
+    let fresh = |rng: &mut StdRng| -> (u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            if let Some(r) = curve.mul(Some(g), a) {
+                return (a, r);
+            }
+        }
+    };
+    let mut a_l: Vec<u64> = Vec::with_capacity(lanes);
+    let mut cur: Vec<Option<Pt>> = Vec::with_capacity(lanes);
+    for _ in 0..lanes {
+        let (a, r) = fresh(&mut rng);
+        a_l.push(a);
+        cur.push(Some(r));
+    }
+    let gv: Vec<Option<Pt>> = vec![Some(g); lanes];
+    let mut scratch = BatchAddScratch::default();
+    let mut guard = 0u64;
+    while rels.len() < needed && guard < 50_000_000 {
+        guard += 1;
+        for l in 0..lanes {
+            let Some(r) = cur[l] else {
+                let (a, nr) = fresh(&mut rng);
+                a_l[l] = add_mod(a, 1, n);
+                cur[l] = Some(nr);
+                continue;
+            };
+            let xc = curve.f.from_mont(r.x);
+            let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+            if let Some(j) = fb.lookup(xc) {
+                let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                cands.push(vec![(j as u32, sg)]);
+            }
+            if xc <= max_pair_x {
+                for &(_, j, k_raw) in pairs.lookup(xc) {
+                    let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                    let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                    let fk = fb.pts[k];
+                    let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                    let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                        continue;
+                    };
+                    let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                    cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                }
+            }
+            let mut productive = false;
+            for entries in cands {
+                let merged = merge_entries(entries);
+                if merged.is_empty() || !seen.insert(merged.clone()) {
+                    continue;
+                }
+                if !relation_holds(curve, fb, r, &merged) {
+                    continue;
+                }
+                rels.push(FastRelation {
+                    a: a_l[l],
+                    b: 0,
+                    entries: merged,
+                });
+                productive = true;
+                if rels.len() >= needed {
+                    break;
+                }
+            }
+            if productive {
+                // restart this lane at a fresh point, pre-shifted by -G so the batched step below lands on it
+                let (a, nr) = fresh(&mut rng);
+                a_l[l] = a;
+                cur[l] = Some(nr);
+            }
+            a_l[l] = add_mod(a_l[l], 1, n);
+        }
+        curve.add_many_batched(&mut cur, &gv, &mut scratch);
+    }
+    rels
+}
+
 /// Same as [`ic_multi_solve_ex`] without the batched per-target phase.
 pub fn ic_multi_solve(
     curve: &FastCurve,
@@ -1741,7 +1836,9 @@ pub fn ic_multi_solve_ex(
     if fb.is_empty() {
         return None;
     }
+    let t_pt = Instant::now();
     let pairs = PairTable::build(curve, &fb);
+    let pair_ms = t_pt.elapsed().as_secs_f64() * 1e3;
     let needed = fb.len() + extra_relations;
     let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
         if table {
@@ -1750,11 +1847,30 @@ pub fn ic_multi_solve_ex(
             collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
         }
     };
-    let (rels, _) = collect(g, needed, u64::MAX, seed);
+    let t_col = Instant::now();
+    let (rels, _) = if table && batched {
+        (
+            collect_setup_batched(curve, g, &fb, &pairs, needed, 256, seed),
+            CollectStats::default(),
+        )
+    } else {
+        collect(g, needed, u64::MAX, seed)
+    };
+    let col_ms = t_col.elapsed().as_secs_f64() * 1e3;
     if rels.len() < needed {
         return None;
     }
+    let t_sol = Instant::now();
     let logs = solve_fb_logs(curve, fb.len(), &rels);
+    if std::env::var_os("IC_MULTI_TIMING").is_some() {
+        eprintln!(
+            "multi setup: fb {} pair_table {:.1} ms collect {:.1} ms solve {:.1} ms",
+            fb.len(),
+            pair_ms,
+            col_ms,
+            t_sol.elapsed().as_secs_f64() * 1e3
+        );
+    }
     let determined = logs.iter().filter(|l| l.is_some()).count();
     let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
     let fnum = curve.scalar_field();
