@@ -81,6 +81,53 @@ representable. Three curves per `t`.
   structured lift (canonical lift, or `a, b` chosen so that the curve has small-height CM) could
   behave differently and is not tested here.
 
-## 4. Result
+## 4. Result (development check, this host; every value `[pcc:unverified]`)
 
-(filled from `rows/*.jsonl` after the run)
+Rows: `rows/t6.jsonl`, `rows/t8.jsonl`, `rows/t10.jsonl` (three prime-order curves per `t`, `p = 40961`,
+`k = 4`, `--verify`: every section point reduced to `P`, lay on the lifted curve, had order `r`
+mod `p^k`; `x_j` even in `P` on 10 points; 20 random homomorphism pairs per row, all held).
+Implementation `examples/jet_digit_degree.rs` (4 unit tests; the agent's two corrections to the
+pre-registered recipe are recorded below).
+
+| `t` | `n = |A|` (of `2^t`) | `x` | `x³` | `x^{2^t − 1}` | random (3 draws) | `x₁` | `x₂` | `x₃` | `d_full` |
+|--:|:--|--:|--:|--:|:--|--:|--:|--:|--:|
+| 6 | 31, 36, 37 | 1 | 2 | 3 | 3, 3, 3 | 3 | 3 | 3 | 3 |
+| 8 | 133, 118, 128 | 1 | 2 | 4 | 4, 4, 4 | 4 | 4 | 4 | 4 |
+| 10 | 507, 509, 491 | 1 | 2 | 5 | 5, 5, 5 | 5 | 5 | 5 | 5 |
+
+(identical on all three curves at each `t`.)
+
+**Reading.**
+
+- **P-J2 holds: the digits are generic.** On every one of the nine cells, `x₁`, `x₂` and `x₃` need
+  the same popcount degree as a random function on the same abscissa set, which is also `d_full`,
+  the degree at which every function on `A` is representable: 3, 4, 5 at `t = 6, 8, 10`, i.e. about
+  `t/2`, growing with `t`. The test is one-sided by construction (nothing on `A` can need more than
+  `d_full`), so what it establishes is that the digits are *not below* generic at any of these sizes,
+  on any of the curves, for any of the three digits. Each digit equation of §2 would therefore enter
+  the tower quotient at degree about `t/2 + 2`, above the measured last fall degrees at these `N`,
+  and it grows with `N`. The `Z/p^k` exit fails filter item 4 at toy scale: it supplies the
+  equations, but at a degree that grows linearly in the unknown bits, which is the same budget again
+  in another currency.
+- **P-J1, corrected.** `x` and `x³` read 1 and 2 as predicted. The control `x^{2^t − 1}` was predicted
+  to read `t`; it reads `d_full`. That prediction was wrong, not the instrument: on the abscissa
+  subset `A` (about half of `V`) every function, that one included, is representable by degree
+  `d_full`; the popcount-`t` monomial is only distinguishable on the whole coset `V`. The random
+  draws read `d_full` too, which is the generic value stated in §2.
+- **What it does not establish.** Toy prime (16 bits), three curves, the trivial lift of `(a, b)`;
+  a structured lift (canonical lift, small-height CM) and the Dickson and isogeny towers are
+  untested. It says nothing about the discrete-log channel, which the atlas already closes.
+
+**Recipe corrections made by the implementing agent, checked by the main session.** (1) The
+section scalar: `u = p^{k−1}·(p^{−(k−1)} mod r)` (`u ≡ 0 mod p^{k−1}`, `u ≡ 1 mod r`); the
+pre-registration had the two congruences swapped. (2) The lift `P̃` of `P` must lie on the lifted
+curve: `x` is kept and `y` is Hensel-lifted mod `p^k`; with that the section is independent of the
+lift, and the homomorphism check replaces the recompute-with-another-lift check.
+
+## 5. Consequence for the filter
+
+All three bigger-ring exits are now closed at the level this note can test: `F_{p^k}` by cost
+(Gaudry), dual numbers by the splitting of §1 (new `F_p` unknowns), and `Z/p^k` by the digit degree of
+§4 (equations at degree about `t/2`). The filter stands with no known passer. What would reopen the
+`Z/p^k` route is a lift of `E` whose torsion-section digits have bounded popcount degree on some
+presentable base; the instrument here tests any candidate lift in seconds.

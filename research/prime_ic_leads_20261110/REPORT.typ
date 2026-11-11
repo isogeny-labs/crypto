@@ -104,7 +104,7 @@ Shape-driven, as predicted: a random polynomial on $S_3$'s support or on the $W 
 5. Generic-track constants: the prefetch Design A patch is obsolete (reconciled 2026-11-11: `layout=lines` is already on `main` and measured 12 % slower at fp28 in the v6 tournament, `invalid_measurement`); what stays open is the software-prefetch step on the landed layout and $N > 45$ at 20 bits: the only place a measured improvement over the current baseline is available.
 6. Honest non-uniform accounting ($S T^2$ per row; preprocessing-rho reference).
 
-What would change the list: an equation source that passes the filter of section 4. None is known; the jet exit is the only one of the three still open in the atlas.
+What would change the list: an equation source that passes the filter of section 4. None is known. On 2026-11-11 the jet and $Z\/p^k$ exits were derived and measured against the filter (`jet_exit/`): dual numbers add only free $F_p$ unknowns, and the torsion section's $p$-adic digits are generic on Kummer bases (popcount degree about $t\/2$, equal to random, on nine cells at $t = 6, 8, 10$), so all three bigger-ring exits are closed at toy scale.
 
 = Sources checked
 

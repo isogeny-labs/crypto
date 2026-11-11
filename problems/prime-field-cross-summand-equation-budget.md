@@ -97,3 +97,13 @@ monotone in the box width (`research/prime_ic_leads_20261110/README.md` §6b). T
 property of the carry-graded one-generator closure, not of the curve. The third "what would unblock
 it" item (a derivation or exact computation of the one-generator closure degree as a function of
 support and `N`) is the remaining step; the first two are unchanged.
+
+## Update 2026-11-11, later (the bigger-ring exits; every value `[pcc:unverified]`)
+
+Derived and measured in `research/prime_ic_leads_20261110/jet_exit/README.md`: over `F_p[ε]/(ε²)`
+the extra equation comes only with free `F_p` unknowns (no homomorphism `E(F_p) → F_p` when
+`p ∤ r`); over `Z/p^k` the torsion section gives `k − 1` extra cross-summand equations in the digit
+functions `x_j(P)`, whose popcount degree on Kummer bases equals that of a random function (3, 4, 5
+at `t = 6, 8, 10`, nine cells, three digits), so they enter at a degree that grows with the unknown
+bits. All three bigger-ring exits are closed at toy scale; the first unblock item has no known
+candidate.

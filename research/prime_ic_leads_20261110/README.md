@@ -361,8 +361,12 @@ Reading against the pre-stated prediction:
 | 6 | **Honest non-uniform accounting**: record `S·T²` per Table B row and the preprocessing-rho reference (Probe A of the program note) | accounting | desk | makes the many-target regime comparable; not an improvement | `LEAD-ICP-retained-setup-online` (obstructed) |
 
 What would change this list: an equation source that passes the filter of §4. None is
-known to this note; the three exits in §4 item 2 are the places to look, and the jet lead
-is the only one of them still open in the atlas.
+known to this note. The three exits in §4 item 2 were the places to look; on 2026-11-11 the
+jet and `Z/p^k` exits were derived and measured against the filter (`jet_exit/README.md`): dual
+numbers add only free `F_p` unknowns, and the torsion section's `p`-adic digits are generic on
+Kummer bases (popcount degree about `t/2`, equal to random, on nine curve-tower cells), so its
+extra equations enter at a degree that grows with the unknown bits. All three exits are closed at
+toy scale; the instrument tests any other lift in seconds.
 
 ## 8. What this note does not claim
 
