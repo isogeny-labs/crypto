@@ -2,132 +2,163 @@
 #set text(font: "DejaVu Sans", size: 10pt)
 #set par(justify: true)
 #set heading(numbering: "1.")
-= Native chained Jacobian transfer over F₁₀₁
-2026-11-11 · continuation of crypto PR #3877 · queue issue #3904
+= Chained Jacobian transfers over F₁₀₁
+2026-11-11 · crypto PR #3877 · cryptanalysis PR #1469 · queue #3904
 
-*Standing: unverified producer assertions.* Local correctness checks and kernel
-proof builds are retained. There is no independent signed validation and no
-solving-cost benchmark. Full report and sources: REPORT_20261111.md and
-SOURCES_20261111.md beside this PDF.
+*Standing: unverified producer assertions.* The initial Jacobian target is
+isomorphic to its source. A second fixture has nonisomorphic Jacobians over
+F101, distinguished by rational 2-torsion. Both complete elliptic endpoint
+functions match direct elliptic shortcuts. There is no measured DLP advantage.
+Full report, primary sources and raw receipts are retained beside this PDF.
+[pcc:unverified]
 
-== Explicit route
-The source is E: v²=u³+1 with P=(4,41), order 17. The degree-two cover
-f: C → E is f(x,y)=(x²,y), C: y²=x⁶+1. Its whole-fiber pullback
-enters Jac(C). The ordered quadratic splitting
-(x²+1)(x²+10x−1)(x²−10x−1) has determinant 40 in F₁₀₁.
-Kunzweiler’s Richelot correspondence gives a degree-four (2,2)-isogeny
+== Initial explicit route and controls
+E: v²=u³+1, P=(4,41), r=17. The degree-two cover f(x,y)=(x²,y)
+from C: y²=x⁶+1 induces whole-fiber pullback into Jac(C). The ordered
+splitting (x²+1)(x²+10x−1)(x²−10x−1) has determinant40.
+Kunzweiler’s normalized Richelot correspondence gives a degree-four map R
 to Jac(C₂), C₂: w²=41z⁶+9z⁴+9z²+41.
 
-The first quotient of C₂, with X=41z² and V=41w, reaches
-E₂: V²=X³+9X²+66X+39. The local test obtains (91,84) from P.
-All 17 source scalars and all 289 subgroup addition pairs are checked.
-The second quotient sends this image subgroup to zero; it remains an explicit
-negative control. [pcc:unverified]
+The first target quotient, X=41z²,V=41w, reaches
+E₂: V²=X³+9X²+66X+39 and sends P to (91,84), order17. The
+second target quotient annihilates this subgroup, as does the anti-invariant
+source norm on f∗(E). These are explicit zero controls. [pcc:unverified]
 
-== Native maps and exceptional points
-The source uses the odd-degree chart t=1/(x−10), Y=yt³:
-F(t)=1+60t+86t²+2t³+15t⁴+60t⁵. Canonical Mumford pairs represent
-degree-zero classes based at W=(10,0). This avoids using one-infinity Cantor
-arithmetic directly on a sextic.
-
-Whole-fiber pullback handles nonsplit and ramified fibers and the degree drop
-at (−1,0). Both source quotient norms accept every reduced rational class,
-split quadratic support in F₁₀₁[s]/(s²−2), retain multiplicity, and handle
-the two original infinities. Elliptic infinity and unsupported input are
-different API outcomes. [pcc:unverified]
-
-The Richelot evaluator computes polynomial fibers over F₁₀₁², composes
-them on an odd target chart, and subtracts the source-base-point image.
-The extended version admits all 10,404 rational source classes, including
-Weierstrass, source infinity and degree-drop cases. Kernel size is four;
-the 2,601 image classes each have four preimages in the local checks.
-This is fixed-field coverage; map evaluation never calls a DLP solver.
+Canonical classes use t=1/(x−10),Y=yt³ with odd quintic
+F(t)=1+60t+86t²+2t³+15t⁴+60t⁵. Whole fibers include nonsplit
+support, multiplicities, Weierstrass points, both original infinities and
+degree drops. Unsupported input and elliptic identity are different outcomes.
+All10,404 source classes are admitted; kernel4 and image2601 have equal
+four-element fibers. Both sign-corrected dual compositions give[2] on the
+complete source and target. Source norm gives[4] on E, inverted by13 modulo17
+to recover encoded points. This does not recover unknown DLP scalars.
 [pcc:unverified]
 
-== Development evidence
-#table(
-  columns: (1fr, 2fr), inset: 5pt, align: left,
-  [Check], [Scope and evidence],
-  [Native whole-fiber maps], [102 elliptic inputs; all ordered additivity pairs],
-  [Source classes], [10,404 canonical classes; both norms and three translations],
-  [Differential reference], [10,404 additions/inverses, unchanged cryptanalysis BigUint code],
-  [Richelot chain], [17 scalars; 289 addition pairs; nonzero and zero endpoint controls],
-  [Dual norm], [All 10,404 classes: dual-after-forward equals multiplication by two],
-  [Elliptic shortcut], [All 102 inputs: full route equals τ φ after doubling],
-  [Lean structure], [8 structural + 6 polynomial lemmas; 20+6 declarations audited],
-)
-These are local development checks, not independent signed validation. Both
-Jacobian implementations use Cantor arithmetic. Raw receipts and failed
-attempts live in evidence/; claim standings remain unverified.
+== Two retained equivalences
+C₂ is F101-isomorphic to C. Put r=10,r²=−1:
+x=(z−1)/(z+1),y=8r w/(z+1)³. Its inverse is
+z=(1+x)/(1−x),w=−r y/(1−x)³. The aligned odd charts obey
+t=56+10T,Y=79Z. Every10,404 rational class round-trips. Cleared identities
+compile in Lean; projective/Picard geometry is not formalized. R becomes a
+nontrivial endomorphism after model identification, not a new destination.
+[pcc:unverified]
+
+On all102 source elliptic points the full endpoint equals τ φ[2], where φ
+is the historical degree-two elliptic quotient and τ(U,V)=(82U+60,98V).
+Future cost comparisons must include this direct shortcut. No cost ratio
+follows from finite functional equality. [pcc:unverified]
 
 #pagebreak()
-== Proof map and prime-field boundary
-Core Lean 4.35.0 is pinned. The two-hop norm lemma multiplies the individual
-dual norm identities. A Bézout certificate and the actual source subgroup
-annihilator then give recovery and injectivity. Anti-invariance yields
-two-torsion; odd subgroup exponent yields zero. The existence of the geometric
-objects and their norm identities is explicit input, not proved by these
-structural lemmas. Six further polynomial lemmas prove the cleared source and
-target identities, the F101 chart, and the elliptic endpoint isomorphism/inverse.
-Only the standard foundations propext, Classical.choice and Quot.sound occur.
+== Nonisomorphic successor and its limitation
+The model-tagged backend accepts ordered quadratic splittings and rational
+Weierstrass bases over *fixed F101*. It rejects mixed-curve/chart arithmetic;
+it does not yet generalize fields. The preselected successor is
+G₁=x²−1,G₂=x²+x+4,G₃=x²−x+4, determinant91=−10:
+
+- Cₛ: y²=x⁶+6x⁴+9x²−16, base(1,0).
+- Cₜ: w²=20z⁶+81z⁴+83z²+21, base(2,0).
+
+Each Jacobian has9,216 rational classes; all are admitted. Transfer fibers
+have size4 and both dual compositions are[2]. The source rational2-torsion
+has cardinality4 and target16. The unchanged BigUint reference independently
+recounts these as self-inverse classes, obtains order9,216 from Fp/Fp² point
+counts, and checks paired additions and dual norms on both complete sets.
+The first reference run used the development tree; immutable pin/replay is
+tracked separately. [pcc:unverified]
+
+An F101 abelian-variety isomorphism induces a rational group isomorphism
+commuting with[2], hence equal rational2-torsion cardinalities. Uniqueness of
+reduced Mumford representatives gives a second derivation: self-inverse pairs
+have v=0 and monic u dividing the odd quintic, degree≤2. The source factor
+pattern is1+2+2 with both quadratics irreducible, so there are4 choices. The
+target has five rational quintic roots, giving1+5+10=16 choices. Closed
+quadratic support must be counted. Thus these Jacobians cannot be
+F101-isomorphic; no algebraic-closure nonisomorphism is asserted.
 [pcc:unverified]
 
-A separate lemma shows that a unital additive map from characteristic p
-to characteristic q requires q dividing p. This excludes field maps for
-distinct prime characteristics. It says nothing about arbitrary efficient
-maps between encoded cyclic subgroups. A prime field has no proper subfield,
-so ordinary Weil restriction does not provide a smaller-base-field route.
-Lifting and cross-prime reduction remain separate open mechanisms.
+The source elliptic quotient has96 points, largest odd prime factor3,
+P=(48,20). Its transferred class is nonzero of order3, first target norm
+(2,72), second norm zero. The normalized first target elliptic curve is
+V²=X³+81X²+44X+17. This tiny subgroup is retained explicitly rather
+than substituted for the original r=17 fixture. [pcc:unverified]
+
+The successor endpoint also equals a direct shortcut on all96 source points.
+Shift U=u−1, so Y²=U³+9U²+24U. The standard quotient by(0,0)
+is V²=X³+83X²+86X; τ(X,V)=(100X+80,91V) identifies its target
+with the endpoint. The full function equals τ φ[2]. All F101 affine
+coordinate isomorphisms satisfying the coefficient identities were checked;
+this sign uniquely matches. A nonisomorphic Jacobian hop still does not
+establish a new elliptic reduction or a computational advantage.
 [pcc:unverified]
 
-Claims: PCC-20261111-ca60cb (native maps), PCC-20261111-3f548f (Richelot
-fixture), PCC-20261111-7a3fe0 (conditional chain injectivity),
-PCC-20261111-a00fb9 (characteristic boundary). All are unverified until a
-signed verdict establishes otherwise. Geometry, exact Richelot kernel, and
-the full Picard bridge are not yet formalized in this file.
-
-== Reproduction and unresolved work
-From crypto, add Cargo and Lean to PATH and run the native Cargo tests, then
-tools/lean/proof-gate.sh on lean/ChainTransfer.lean. The root examples
-chained_jacobian_reference and chained_jacobian_identities provide the
-BigUint comparison and denominator-cleared identity certificates. The
-cross-repository oracle is cryptanalysis:experiments/chained-transfer-reference.
-
-Retain Lean attempt 01 (failed elaboration) and root-library attempts
-01–03 (off-disk dependencies); never treat them as passes. The canonical queue
-and resume state record the latest build outcomes and exact next actions.
-
-No remote experiment has been launched: S3 checkpoint transport is unavailable
-and the live remaining IsoLab budget/capacity is unknown. The research-KB
-MCP/CLI is unavailable, and crypto-autoresearcher is vault locked without its
-key binding. Local unit tests and proof development remain possible.
-
-The full chain equals a cheaper expression on all 102 source elliptic points:
-τ φ after doubling, where φ is the historical 2-isogeny and
-τ(U,V)=(82U+60,98V). The reverse correspondence, with its sign corrected,
-provides multiplication by two on every rational source Jacobian class.
-Source norm then gives multiplication by four, invertible modulo 17. Point
-recovery is distinct from solving its unknown scalar. [pcc:unverified]
-
-Next obligations: publish the full target-side differential evidence, obtain
-an independent signed validator, generalize the fixed-field backend, and freeze
-a total-cost comparison. That comparison must include the collapsed elliptic
-route as a separate arm. There is no measured speedup in this report.
-
-== Primary sources
-- S. Galbraith, Mathematics of Public Key Cryptography, corrected version 2.0,
-  ch. 8 §8.3 and ch. 10 §§10.3–10.4, author-hosted full PDFs.
-- S. Kunzweiler, Efficient computation of (2ⁿ,2ⁿ)-isogenies, Designs, Codes
-  and Cryptography 92 (2024), 1761–1802. DOI 10.1007/s10623-024-01366-1,
-  §3.1–3.2, Propositions 7–8 and Algorithm 1. Full publisher PDF read.
-
-The local route diagram has no leaderboard promotion. Canonical transfer and
-IC graph sources remain unchanged pending their evidence gates.
+Claims: PCC-20261111-a282a9(model equivalence), ae88cc(successor),
+6e9e6b(successor shortcut); cryptanalysis21e28e(reference development).
+All remain unsigned and unverified.
 
 #pagebreak()
-= Explicit route and zero controls
+== Formal obligations and prime-field boundary
+Core Lean4.35.0 is pinned. Nine structural lemmas cover norm composition,
+Bézout recovery/injectivity, scalar relations, anti-invariant zero controls,
+torsion invariance and the characteristic obstruction. Eight polynomial
+lemmas cover cleared splitting, target numerator, chart and coordinate
+isomorphism identities. Gates audit21+8 declarations with standard foundations
+only(propext,Classical.choice,Quot.sound), no trusted native declarations.
+Actual Jacobians and their dual norm identities remain explicit hypotheses
+of the structural proofs. [pcc:unverified]
+
+A unital additive map from characteristic p to q requires q dividing p.
+For distinct primes this forbids field maps, not arbitrary efficiently
+encoded cyclic subgroup transfers. A prime field has no proper subfield, so
+ordinary Weil restriction provides no smaller-base-field descent. Lifts and
+cross-prime reductions remain separate open mechanisms. [pcc:unverified]
+
+The full projective/Picard/Richelot bridge remains open. Claims7a3fe0,
+a00fb9,a97961,ced5d7 are unverified until their actual signed standing changes.
+The two new proof records initially omitted theorem bindings; their initial
+incomplete bytes are retained and the correction appends ledger events,
+without altering any ledger history or published claim.
+
+== Reproduction, checks and gates
+Run the standalone native Cargo tests and strict Clippy, then both Lean
+files through tools/lean/proof-gate.sh. Root examples
+chained_jacobian_reference and chained_jacobian_identities now pass15
+and1 tests, including the generic model extension. The native suite passes14
+tests and strict Clippy. Two local
+replay-accepted identity certificates bind the polynomial Lean source digest.
+These are development checks, not signed independent validation.
+[pcc:unverified]
+
+Cryptanalysis PR1469 freezes the original baseline at crypto18db046 with
+source/reference digests and a fail-closed check script. Original receipts
+remain immutable. The full crypto library run is still in progress and has
+reported failures in untouched historical modules. Keep failed elaboration,
+missing-dependency and lint attempts; never label them passed.
+[pcc:unverified]
+
+No performance experiment has been launched. S3 checkpoint admission is
+unavailable, and live IsoLab budget/capacity is unknown. The research-KB and
+ecdb are unavailable; crypto-autoresearcher is vault locked without a key
+binding. The current-main PCC ledger fork is a merge blocker, not something
+to repair by rewriting history. Newly added workflows require default-branch
+registration before manual dispatch. GitHub CI and required reviews still
+apply. The queue names every blocker and next action.
+
+Next: immutable successor replay, a second nonbacktracking Jacobian hop,
+field generalization, independent signed validation and an admitted total-cost
+comparison including both direct elliptic shortcuts. Canonical transfer and
+leaderboard graphs receive no promotion from this unsigned fixed-field work.
+
+Primary sources: Galbraith, corrected Mathematics of Public Key Cryptography,
+ch.8 §8.3 and ch.10 §§10.3–10.4,10.6; Kunzweiler, DCC92(2024),1761–1802,
+DOI10.1007/s10623-024-01366-1, Proposition1 and §§3.1–3.2. Full PDFs were
+read; retrieval gaps and exact hashes are in SOURCES_20261111.md.
+
+#pagebreak()
+= Explicit routes and controls
 #image("route.svg", width: 100%)
 
-All nodes and maps are over F₁₀₁. The solid path is the explicit development
-fixture; dashed edges are the retained vanishing projections. No edge denotes
-a measured computational advantage. [pcc:unverified]
+All objects and maps use F101. Solid edges are actual development maps;
+dashed edges are zero controls; dotted edges are complete finite endpoint
+shortcuts. The successor’s different rational2-torsion counts obstruct a
+base-field Jacobian isomorphism. No edge denotes a measured DLP advantage.
+[pcc:unverified]

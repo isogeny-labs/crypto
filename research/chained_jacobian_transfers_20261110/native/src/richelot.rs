@@ -7,6 +7,7 @@
 
 use super::*;
 type EP = Vec<F2>;
+pub mod model;
 
 fn tr(mut p: EP) -> EP {
     while p.last() == Some(&F2::ZERO) {
@@ -194,14 +195,16 @@ pub fn target_sextic() -> Poly {
 }
 // F_new(T)=T^6*F_old(ROOT+1/T), valid because ROOT is a Weierstrass point.
 fn target_f() -> EP {
-    let f = base(&target_sextic());
+    chart_of_sextic(&base(&target_sextic()), ROOT)
+}
+fn chart_of_sextic(f: &[F2], root: i64) -> EP {
     let mut out = vec![F2::ZERO; 7];
     let mut power = base(&[1]);
     for (i, c) in f.iter().enumerate() {
         for (j, z) in power.iter().enumerate() {
             out[j + 6 - i] = out[j + 6 - i].plus(c.times(*z));
         }
-        power = times(&power, &base(&[1, ROOT]));
+        power = times(&power, &base(&[1, root]));
     }
     tr(out)
 }
@@ -215,7 +218,7 @@ pub fn target_quintic() -> Poly {
         .collect()
 }
 // u has degree exactly two and v degree below two, on the old sextic chart.
-fn to_chart(u: &[F2], v: &[F2], f: &[F2]) -> Result<ED, &'static str> {
+fn to_chart(u: &[F2], v: &[F2], f: &[F2], root: i64) -> Result<ED, &'static str> {
     if u.len() != 3 {
         return Err("Richelot fiber degree drop unsupported");
     }
@@ -225,7 +228,7 @@ fn to_chart(u: &[F2], v: &[F2], f: &[F2]) -> Result<ED, &'static str> {
         for (j, z) in power.iter().enumerate() {
             uu[j + 2 - i] = uu[j + 2 - i].plus(c.times(*z));
         }
-        power = times(&power, &base(&[1, ROOT]));
+        power = times(&power, &base(&[1, root]));
     }
     let mut vv = vec![F2::ZERO; 4];
     let mut power = base(&[1]);
@@ -233,7 +236,7 @@ fn to_chart(u: &[F2], v: &[F2], f: &[F2]) -> Result<ED, &'static str> {
         for (j, z) in power.iter().enumerate() {
             vv[j + 3 - i] = vv[j + 3 - i].plus(c.times(*z));
         }
-        power = times(&power, &base(&[1, ROOT]));
+        power = times(&power, &base(&[1, root]));
     }
     ED::new(uu, vv, f)
 }
@@ -276,32 +279,40 @@ impl Image {
     }
 }
 
-fn finite_target_point(z: F2, w: F2, f: &[F2]) -> Result<ED, &'static str> {
-    if z == F2::base(ROOT) {
+fn finite_target_point(z: F2, w: F2, f: &[F2], root: i64) -> Result<ED, &'static str> {
+    if z == F2::base(root) {
         return Err("target Weierstrass base point must be removed as a divisor");
     }
-    let t = z.minus(F2::base(ROOT)).inverse();
+    let t = z.minus(F2::base(root)).inverse();
     ED::new(vec![t.negative(), F2::ONE], vec![w.times(t.power(3))], f)
 }
-fn fiber_image(t: F2, y_cap: F2, f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<ED, &'static str> {
+fn fiber_image(
+    t: F2,
+    y_cap: F2,
+    f: &[F2],
+    g: &[EP; 3],
+    h: &[EP; 3],
+    source_root: i64,
+    target_root: i64,
+) -> Result<ED, &'static str> {
     if t == F2::ZERO {
         // x=∞: G1/G2 -> 1, and y/x³ -> y_cap=+/-1.
         let g1lead = *g[0].last().unwrap();
         let g2lead = *g[1].last().unwrap();
         let u = mono(&plus(&times(&h[0], &[g1lead]), &times(&h[1], &[g2lead])));
         let v = quotient(&times(&h[0], &[g1lead.times(y_cap.inverse())]), &u).1;
-        return to_chart(&u, &v, f);
+        return to_chart(&u, &v, f, target_root);
     }
-    let x = F2::base(ROOT).plus(t.inverse());
+    let x = F2::base(source_root).plus(t.inverse());
     let y = y_cap.times(t.power(3).inverse());
     let g1 = value(&g[0], x);
     let g2 = value(&g[1], x);
     if y == F2::ZERO {
         if g1 == F2::ZERO {
-            return to_chart(&h[1], &[], f);
+            return to_chart(&h[1], &[], f, target_root);
         }
         if g2 == F2::ZERO {
-            return to_chart(&h[0], &[], f);
+            return to_chart(&h[0], &[], f, target_root);
         }
         if value(&g[2], x) == F2::ZERO {
             // The completed fiber is a hyperelliptic conjugate pair over z=x.
@@ -319,7 +330,7 @@ fn fiber_image(t: F2, y_cap: F2, f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<E
             .times(value(&h[0], z))
             .times(x.minus(z))
             .times(y.inverse());
-        let finite = finite_target_point(z, w, f)?;
+        let finite = finite_target_point(z, w, f, target_root)?;
         let infinity_y = g1
             .times(*h[0].last().unwrap())
             .negative()
@@ -336,7 +347,7 @@ fn fiber_image(t: F2, y_cap: F2, f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<E
         &u,
     )
     .1;
-    to_chart(&u, &v, f)
+    to_chart(&u, &v, f, target_root)
 }
 
 /// Fixed-field evaluator of a genuine degree-four (2,2)-isogeny.
@@ -348,16 +359,27 @@ pub fn transfer(d: &Divisor) -> Result<Image, &'static str> {
     let f = target_f();
     let g = factors();
     let h = dual_factors();
-    Ok(Image(evaluate(&d.u, &d.v, &f, &g, &h)?))
+    Ok(Image(evaluate(&d.u, &d.v, &f, &g, &h, ROOT, ROOT)?))
 }
 
-fn evaluate(u: &[i64], v: &[i64], f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<ED, &'static str> {
+fn evaluate(
+    u: &[i64],
+    v: &[i64],
+    f: &[F2],
+    g: &[EP; 3],
+    h: &[EP; 3],
+    source_root: i64,
+    target_root: i64,
+) -> Result<ED, &'static str> {
     let mut result = ED::zero();
     for t in roots(u)? {
-        result = result.add(&fiber_image(t, eval(v, t), f, g, h)?, f);
+        result = result.add(
+            &fiber_image(t, eval(v, t), f, g, h, source_root, target_root)?,
+            f,
+        );
     }
     // ψ(W)=(H2,0). Subtract deg(D)*ψ(W), not an assumed zero base image.
-    let base_image = to_chart(&h[1], &[], f)?;
+    let base_image = to_chart(&h[1], &[], f, target_root)?;
     result = result.add(&base_image.mul((u.len() - 1) as u64, f).neg(), f);
     if result.u.iter().chain(&result.v).any(|z| z.1 != 0) {
         return Err("image did not descend to F101");
@@ -370,11 +392,62 @@ fn evaluate(u: &[i64], v: &[i64], f: &[F2], g: &[EP; 3], h: &[EP; 3]) -> Result<
 /// Negation restores the dual's positive norm convention.
 pub fn dual(image: &Image) -> Result<Divisor, &'static str> {
     let (u, v) = image.coefficients();
-    let d = evaluate(&u, &v, &base(&quintic()), &dual_factors(), &factors())?.neg();
+    let d = evaluate(
+        &u,
+        &v,
+        &base(&quintic()),
+        &dual_factors(),
+        &factors(),
+        ROOT,
+        ROOT,
+    )?
+    .neg();
     Divisor::new(
         d.u.iter().map(|z| z.0).collect(),
         d.v.iter().map(|z| z.0).collect(),
     )
+}
+
+fn substitute_affine(p: &[F2], a: F2, b: F2) -> EP {
+    p.iter()
+        .rev()
+        .fold(vec![], |v, c| plus(&times(&v, &[a, b]), &[*c]))
+}
+
+/// C2 is isomorphic to C, although the Richelot map has degree four.
+/// In the odd charts induced by their respective (10,0) base points:
+/// t=56+10*T, Y=79*Z. This coordinate map contains no group scalar/DLP call.
+pub fn isomorphism_to_source(image: &Image) -> Result<Divisor, &'static str> {
+    let (a, b, c) = (F2::base(56), F2::base(10), F2::base(79));
+    let u = mono(&substitute_affine(
+        &image.0.u,
+        a.negative().times(b.inverse()),
+        b.inverse(),
+    ));
+    let v = times(
+        &substitute_affine(&image.0.v, a.negative().times(b.inverse()), b.inverse()),
+        &[c],
+    );
+    if u.iter().chain(&v).any(|z| z.1 != 0) {
+        return Err("model isomorphism did not descend");
+    }
+    Divisor::new(
+        u.iter().map(|z| z.0).collect(),
+        v.iter().map(|z| z.0).collect(),
+    )
+}
+
+/// Inverse model isomorphism; accepts the entire fixed source Jacobian.
+pub fn isomorphism_from_source(d: &Divisor) -> Result<Image, &'static str> {
+    if !d.valid() {
+        return Err("invalid source class");
+    }
+    let u = mono(&substitute_affine(&base(&d.u), F2::base(56), F2::base(10)));
+    let v = times(
+        &substitute_affine(&base(&d.v), F2::base(56), F2::base(10)),
+        &[F2::base(79).inverse()],
+    );
+    Ok(Image(ED::new(u, v, &target_f())?))
 }
 
 /// Coefficients a2,a4,a6 after X=L*z², V=L*y, L=leading(sextic).
@@ -539,5 +612,17 @@ mod tests {
             // norm_f * dual_R * R * pull_f = [4], inverse(4) mod 17=13.
             assert_eq!(ec_mul(back, 13, 0, 0), q);
         }
+    }
+
+    #[test]
+    fn full_model_isomorphism_and_target_dual_norm() {
+        let mut target_classes = std::collections::BTreeSet::new();
+        for d in rational_classes() {
+            let image = isomorphism_from_source(&d).unwrap();
+            assert_eq!(isomorphism_to_source(&image).unwrap(), d);
+            target_classes.insert(image.coefficients());
+            assert_eq!(transfer(&dual(&image).unwrap()).unwrap(), image.mul(2));
+        }
+        assert_eq!(target_classes.len(), 10404);
     }
 }

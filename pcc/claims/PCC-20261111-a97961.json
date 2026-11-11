@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T07:52:10Z",
+ "id": "PCC-20261111-a97961",
+ "kind": "theorem",
+ "producer": {
+  "commit": "18db046d2e9fd0b01473f549815a1b51069da677",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "21e489e82c065c30e357117fd6640da05b939af88b555bc7d2c74afb4489292a",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/PolynomialIdentities.lean",
+   "theorem": "ChainedTransferIdentities.mobius_sextic_identity"
+  },
+  {
+   "decl_sha256": "22e19d456942c98c3966886080b424d8df0a7c1163b51b309a4c10f27125d8a3",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/PolynomialIdentities.lean",
+   "theorem": "ChainedTransferIdentities.genus_two_model_identity"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The denominator-cleared Mobius sextic identity and model-rescaling identity compile in core Lean4.35.0 over any commutative ring, assuming r\u00b2=-1 for the latter. They are polynomial identities only; the geometric projective-curve and Jacobian isomorphisms are not formalized."
+}

@@ -5,7 +5,8 @@ Current continuation: [report](REPORT_20261111.md), [PDF](report.pdf),
 [GitHub #3904](https://github.com/isogeny-labs/crypto/issues/3904).
 
 `native/` is the execution path for new development. It is a standalone,
-dependency-free Rust crate for the exact public F101 fixture. The historical
+dependency-free Rust crate for public F101 fixtures and model-tagged quadratic
+splittings. It still uses a fixed field. The historical
 Python files, protocol and 2026-11-10 receipt are retained evidence; their
 old status paragraphs do not describe the continuation. Do not extend or use
 those Python paths for new comparisons.
@@ -27,9 +28,17 @@ All current claim standings must be read through `tools/pcc/pcc.py standing`.
 
 The fixed fixture now has full rational source maps, a genuine Richelot hop,
 its sign-corrected dual, nonzero and zero endpoint controls, and a complete
-finite-group deduplication against an elliptic shortcut. The report gives the
-precise scope and open geometric proof bridge. No performance run or speed
-claim is present. [pcc:unverified]
+finite-group deduplication against an elliptic shortcut. Its target model is
+isomorphic to the source. A second preselected fixture has nonisomorphic
+Jacobians over F101 (rational2-torsion4 vs16, each order9216), but its complete
+96-point elliptic endpoint also matches a direct2-isogeny after doubling.
+Its preserved prime subgroup has order3. The report gives the precise scope
+and open geometric proof bridge. No performance run or speed claim is present.
+[pcc:unverified]
+
+Pinned oracle baseline: [cryptanalysis PR #1469](https://github.com/isogeny-labs/cryptanalysis/pull/1469).
+The successor's independent BigUint development checks and immutable pin
+update are tracked separately from that retained baseline.
 
 Benchmark/integration blockers have a
 [named record](../../problems/chained-transfer-admission-and-ledger-sync.md).

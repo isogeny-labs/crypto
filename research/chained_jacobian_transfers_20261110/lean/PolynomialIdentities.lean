@@ -17,6 +17,15 @@ theorem target_numerator_cleared (x : K) :
       -2000*x^6+2320*x^4+2320*x^2-2000 := by
   grind
 
+theorem mobius_sextic_identity (z : K) :
+    (z-1)^6+(z+1)^6 = 2*(z^6+15*z^4+15*z^2+1) := by
+  grind
+
+theorem genus_two_model_identity (r z w : K) (hr : r^2 = -1) :
+    (8*r*w)^2-((z-1)^6+(z+1)^6) =
+      -2*(32*w^2+z^6+15*z^4+15*z^2+1) := by
+  grind
+
 variable [IsCharP K 101]
 
 theorem source_splitting_fp101 (x : K) :
@@ -40,6 +49,8 @@ end ChainedTransferIdentities
 
 #print axioms ChainedTransferIdentities.source_splitting_cleared
 #print axioms ChainedTransferIdentities.target_numerator_cleared
+#print axioms ChainedTransferIdentities.mobius_sextic_identity
+#print axioms ChainedTransferIdentities.genus_two_model_identity
 #print axioms ChainedTransferIdentities.source_splitting_fp101
 #print axioms ChainedTransferIdentities.source_chart_fp101
 #print axioms ChainedTransferIdentities.elliptic_isomorphism_fp101

@@ -75,6 +75,21 @@ theorem two_hop_scalar_relation
     g.apply (f.apply (k • p)) = k • g.apply (f.apply p) := by
   rw [f.scalar, g.scalar]
 
+/-- An injective group transfer preserves and reflects n-torsion. In
+particular, an isomorphism identifies rational 2-torsion subgroups. Their
+finite cardinalities must therefore agree; counting them is a separate input.
+-/
+theorem injective_torsion_iff
+    (f : Transfer A B) (hf : Function.Injective f.apply) (n : Int) (x : A) :
+    n • f.apply x = 0 ↔ n • x = 0 := by
+  constructor
+  · intro h
+    apply hf
+    rw [f.scalar, f.zero]
+    exact h
+  · intro h
+    rw [← f.scalar, h, f.zero]
+
 /-- Invariant fibers projected anti-invariantly yield two-torsion. This
 alone does not imply zero: the odd-order certificate is used below. -/
 theorem anti_invariant_twice_zero
@@ -151,6 +166,7 @@ end CharacteristicBoundary
 #print axioms ChainedTransfer.injective_with_recovery
 #print axioms ChainedTransfer.two_hop_injective
 #print axioms ChainedTransfer.two_hop_scalar_relation
+#print axioms ChainedTransfer.injective_torsion_iff
 #print axioms ChainedTransfer.anti_invariant_twice_zero
 #print axioms ChainedTransfer.anti_invariant_odd_source_zero
 #print axioms CharacteristicBoundary.map_nat

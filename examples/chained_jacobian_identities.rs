@@ -1,7 +1,7 @@
 //! Issue/replay v1 certificates for the denominator-cleared integer identities.
 //! Reduction modulo 101 is a separate exact coefficient check in native tests.
 use crypto_lib::cryptanalysis::identity_certificate::{
-    check, issue, Expr as E, IdentityStatement, Verdict,
+    check, issue, Expr as E, IdentityStatement, ProofRef, Verdict,
 };
 
 fn term(c: i64, n: usize) -> E {
@@ -49,6 +49,14 @@ fn statements() -> Vec<IdentityStatement> {
     ]
 }
 fn certificates() -> Vec<crypto_lib::cryptanalysis::identity_certificate::IdentityCertificate> {
+    let proof_path = "research/chained_jacobian_transfers_20261110/lean/PolynomialIdentities.lean";
+    let proof = ProofRef {
+        kind: "lean4".into(),
+        path: proof_path.into(),
+        sha256: hex::encode(crypto_lib::hash::sha256::sha256(include_bytes!(
+            "../research/chained_jacobian_transfers_20261110/lean/PolynomialIdentities.lean"
+        ))),
+    };
     statements()
         .into_iter()
         .map(|s| {
@@ -57,7 +65,7 @@ fn certificates() -> Vec<crypto_lib::cryptanalysis::identity_certificate::Identi
                 20261111,
                 32,
                 "producer issue/replay only; no independent signed verification",
-                None,
+                Some(proof.clone()),
             )
             .unwrap();
             assert!(matches!(check(&cert).unwrap(), Verdict::Accept { .. }));
