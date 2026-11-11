@@ -111,7 +111,7 @@ Bug notes found on the way:
 | (2) cofactor cosets | Up to 8× constant gain, no exponent change, but only if the cofactor is folded into the keys: look up hR in tables of sums of ±hPᵢ, which costs 3 doublings and **one** lookup per trial. The naive 8-lookup version makes MITM worse (m=3 c=1 at 2^24: 65× → 120× rho). Folded, it is better (m=3 c=0.5 at 2^24: 79.7× → 15.8× rho, `results_cost/folded_coset.md`, computed analytically from the measured coset trial counts). For FULL it changes nothing, because the table build dominates. |
 | (3) decomposition strategy | FULL table: memory ∝ q^1.0, one-DLP cost ∝ q^0.90–0.96 (fit). It is a lookup table covering a constant fraction of the group, i.e. a BSGS/full-table attack in disguise. MITM: memory q^{1/2} (m=2, 4) or q^{2/3} (m=3); theoretical one-DLP time q^1, q^{2/3}, q^{3/4} for m = 2, 3, 4. The 4-point fits (0.51–0.77) are pulled down by about 64 scalar mults of fixed setup, so the evidence is the ratio to rho, which grows with size (m=3: 1.8× → 65×, folded cosets 2.5× → 15.8×). |
 
-Best configuration per size (cost per DLP, ×rho total / ×rho walk-only):
+Best configuration per size (cost per DLP, ×rho total / ×rho walk-only): [pcc:unverified]
 - **1 DLP:** 1.8× / 20× at 2^14, growing to 65× / 111× at 2^24, using MITM m=3 c=1. Index calculus loses, and the gap widens with size.
 - **100 DLPs sharing the precomputation:** 0.07× / 0.79× at 2^14, and 0.81× / 1.37× at 2^24, using FULL m=3 c=0.5 with a 355k-entry table.
   - This "win" is against a rho that recomputes everything per target.
@@ -120,18 +120,18 @@ Best configuration per size (cost per DLP, ×rho total / ×rho walk-only):
 
 **Conclusion:** none of the three levers changes the picture. On a prime field the only working decomposition step is enumeration. Enumeration costs ~q (full table) or ≥ q^{1/2} per relation batch (MITM), so this index calculus is at best a worse-constant generic attack.
 
-**Linear algebra is a second floor.** Sparse linear algebra costs about |FB|² ≈ q^{2/m}: q^1, q^{2/3} and q^{1/2} for m = 2, 3, 4.
+**Linear algebra is a second floor.** Sparse linear algebra costs about |FB|² ≈ q^{2/m}: q^1, q^{2/3} and q^{1/2} for m = 2, 3, 4. [pcc:unverified]
 - It is negligible in these runs only because |FB| is tiny for m ≥ 3.
 - The m=2 field-op estimate grows from 4.2k at 2^14 to 8.5M at 2^24, roughly ∝ q.
 - So even a free decomposition oracle cannot beat rho for m ≤ 4.
 
-To beat rho you would need:
+To beat rho you would need: [pcc:unverified]
 - m ≥ 5, or large-prime / factor-base-reduction rebalancing; **and**
 - a decomposition method that finds m-term decompositions of a random R well below q^{1/2 − 1/m}/m! per trial.
 
 That would be a sub-generic algorithm for small-root points of S_{m+1} over F_p, and none is known. That is the open problem; isogenies, factor-base tuning and cosets do not touch it.
 
-Checks: 84 configurations, 1680/1680 k recovered, 0 wrong candidates.
+Checks: 84 configurations, 1680/1680 k recovered, 0 wrong candidates. [pcc:unverified]
 Rank deficiencies occur only at m=2: 2–3 dims without cosets (the class-pair kernel) and 1 dim with cosets. All are harmless, since every k verified.
 The m=4, c=0.5 rows were skipped because predicted yield < 1% (|FB| ≤ 3), not because the factor base can't be built.
 
@@ -160,7 +160,7 @@ Changes from Follow-up 2:
 | 28 | MITM m=5 c=2 folded | 25× | MITM m=3 c=1 folded | 0.37× | 4.3× |
 | 32 | MITM m=5 c=2 folded | 40× | MITM m=5 c=2 folded | 0.51× | 4.8× |
 
-- **Multi-target rho beats index calculus at every size from 2^18 on, and the gap widens.** That settles the D=100 "win" from Follow-up 2: it held only against a rho that starts over for every target.
+- **Multi-target rho beats index calculus at every size from 2^18 on, and the gap widens.** That settles the D=100 "win" from Follow-up 2: it held only against a rho that starts over for every target. [pcc:unverified]
 - **The ratio to rho grows with size for every configuration** (`ratio vs rho` by m in summary.md). Best MITM at 2^32 is:
 
   | m | ÷ rho DP+neg |
@@ -169,7 +169,7 @@ Changes from Follow-up 2:
   | 4 | 124× |
   | 5 | 40× |
 
-  m=5 is the best but still loses, and its gap also grows (12× → 40× from 2^24 to 2^32).
+  m=5 is the best but still loses, and its gap also grows (12× → 40× from 2^24 to 2^32). [pcc:unverified]
 - **Folded cosets, measured, confirm the earlier computed estimate.** MITM gains up to about 8–12×: largest at small c and at m=4, shrinking toward 1.5× at m=3 c=2, where yield is already near 1. FULL gains nothing.
 - **A floor for MITM enumeration.** Once yield saturates (the regime the best configurations reach), each add tests one candidate X − s against a table covering |Tm|/q of the group.
   - So cost ≈ |FB|·q/|Tm| + |Tm|, with |Tm| ~ |FB|^k and k = ⌈m/2⌉.
