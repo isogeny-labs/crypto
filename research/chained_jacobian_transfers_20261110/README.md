@@ -52,3 +52,13 @@ Benchmark/integration blockers have a
 [named record](../../problems/chained-transfer-admission-and-ledger-sync.md).
 Root-library checks and the new focused CI are tracked in the session log and
 PR. A source checkpoint does not waive their gates.
+
+The next bounded prerequisite is implemented in the sibling reference:
+[cubic arbitrary-class norm](CUBIC_NORM_20261111.md),
+[diagram and PDF](cubic-report.pdf). Whole-fiber cubic pullbacks preserve
+full prime-order109/19 sources through genera4/13; an actual genus4 norm
+handles closed support through degree4. All130 fixed norm witnesses pass a
+separate root arithmetic replay. Genus13 recovery is restricted to the exact
+pullback image. No computational advantage or prime-field descent is claimed.
+The active queue now moves to balanced even-sextic arithmetic, then possible
+Frobenius-stable non-split Richelot kernels. [pcc:unverified]

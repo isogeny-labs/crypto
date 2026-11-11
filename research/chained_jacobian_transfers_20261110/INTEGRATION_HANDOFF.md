@@ -79,3 +79,24 @@ Feature small-prime uses unchanged checked Fp2 context(p≤4096), enumeration ca
 GLOBAL_SUCCESSOR_COLLAPSE.md and seven new core Lean ring lemmas give a written first-elliptic-endpoint argument n R f*=tau phi[2] in characteristic≠2,3,5, tau=(X/100+1/125,-V/1000). Actual base translation by(1/125,0) is essential. Total25 written lemmas,22+8+7 audited declarations. Geometric completion remains written, not Lean formalized. This is no claim about the final Jacobian-valued two-hop map. [pcc:unverified]
 
 Cryptanalysis1469/1471 merged;1473 at73d6d5849 pinsaabae197, before this feature. New immutable feature pin/replay is next. Preserve every older pin/receipt. Next construction assessment: scope of the simple quadratic cover for odd full elliptic groups, then alternative odd-degree covers if warranted. Do not invent lead IDs or write plaintext into the locked atlas.
+
+## Cubic arbitrary-class norm checkpoint
+
+Cryptanalysis1469/1471/1473/1474 are merged;1474 merge852a464a7 pinscrypto75a737b8,
+with exact-head focused replay42999610365 succeeding. Next sourcef91a5e061
+implements the bounded arbitrary-class genus4 norm on the existing Enge
+cover family. Whole cubic pullbacks preserve E109/F101 and E19/F17 into
+genera4/13;130 fixed norms with irreducible support through degree4 pass an
+independent root arithmetic replay. The second inverse/norm is restricted
+to the exact image. All standing remains unsigned, no cost result.
+[pcc:unverified]
+
+CUBIC_NORM_20261111.md, cubic-checkpoint.json and CHECKPOINT.md bind the source,
+witnesses, proofs and resume instructions. Four new Lean lemmas bring the
+written total to29, gates22+8+7+12 declarations; finite-field/Picard geometry
+remains written. The odd-full-group restriction concerns individually rational
+quadratic factors, not every Frobenius-stable unordered splitting.
+Next CT12 supplies balanced genus2 arithmetic; CT13 then assesses actual
+non-split descent. Do not assign a new atlas lead or performance edge before
+the configured vault/KB and independent verification become available.
+[pcc:unverified]

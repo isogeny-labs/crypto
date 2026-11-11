@@ -43,6 +43,13 @@ also has a PCC ledger fork relative to current main. [pcc:unverified]
 - **Missing capability:** admitted external experiment transport/accounting,
   vault access for lead-atlas writes, an accepted append-only ledger
   reconciliation, and signed independent verification.
+- **Observed full-library failure:** completed root attempt04 has6184 pass,
+  13 fail,133 ignored (PCC-20261111-8ffeb3). Restoring exact tracked fixture
+  blobs fixes6 failing tests. Five still require an untracked archived
+  targetwalk records.jsonl; two require absent container time-namespace
+  metadata. Raw failure and targeted reruns are retained in the study evidence.
+  The full run remains failed; no raw archive or kernel metadata was fabricated.
+  [pcc:unverified]
 - **What this does not establish:** a speed advantage, its absence for all
   algorithms, security, or nonexistence of cross-characteristic computation.
 
