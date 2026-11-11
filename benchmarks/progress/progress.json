@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261111T0020Z-sib-stage2-primefield",
+  "latest_record": "20261111T0324Z-rho-chained-vs-v5v6",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 4,
     "invalid": 2,
-    "measured": 96,
+    "measured": 100,
     "open": 3
   },
   "repo": "crypto",
@@ -266,11 +266,11 @@
     {
       "better": "lower",
       "first": 0.5739107759707482,
-      "latest": 0.5739107759707482,
+      "latest": 0.6349822161224699,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "improvement_vs_previous_percent": 0.0,
-        "value_over_reference": 0.581373
+        "improvement_vs_first_percent": -10.6413,
+        "improvement_vs_previous_percent": -10.6413,
+        "value_over_reference": 0.678072
       },
       "metric": "s_w0_cheon_pminus1_comb",
       "points": [
@@ -310,6 +310,22 @@
           ],
           "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
           "value": 0.5739107759707482
+        },
+        {
+          "commit": "9f7214a00379",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -10.6413,
+            "improvement_vs_previous_percent": -10.6413,
+            "value_over_reference": 0.678072
+          },
+          "n": 264,
+          "record": "20261107T0840Z-cheon-wide",
+          "reference": 0.9364528647264987,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Cheon comb vs matched rho.negation, 11 P-224-shaped sizes 36-56 bits, 24 targets, L0 counts only: fitted alpha of S comb 0.455 [0.428, 0.479] vs rho 0.508 [0.481, 0.538] (n-1), comb 0.432 [0.416, 0.447] vs rho 0.510 [0.473, 0.542] (n+1); intervals disjoint at w = 0, 0.1, 1 (n-1 by 0.002 at w = 0). DLPwAI under a counted static-DH oracle only.",
+          "value": 0.6349822161224699
         }
       ],
       "problem": "dlpwai:static-dh-p224-shape",
@@ -370,11 +386,11 @@
     {
       "better": "lower",
       "first": 0.5818646872479218,
-      "latest": 0.5818646872479218,
+      "latest": 0.608997215462331,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "improvement_vs_previous_percent": 0.0,
-        "value_over_reference": 0.574551
+        "improvement_vs_first_percent": -4.663,
+        "improvement_vs_previous_percent": -4.663,
+        "value_over_reference": 0.624836
       },
       "metric": "s_w0_cheon_pplus1_comb",
       "points": [
@@ -414,6 +430,22 @@
           ],
           "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
           "value": 0.5818646872479218
+        },
+        {
+          "commit": "9f7214a00379",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -4.663,
+            "improvement_vs_previous_percent": -4.663,
+            "value_over_reference": 0.624836
+          },
+          "n": 264,
+          "record": "20261107T0840Z-cheon-wide",
+          "reference": 0.9746512856636927,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Cheon comb vs matched rho.negation, 11 P-224-shaped sizes 36-56 bits, 24 targets, L0 counts only: fitted alpha of S comb 0.455 [0.428, 0.479] vs rho 0.508 [0.481, 0.538] (n-1), comb 0.432 [0.416, 0.447] vs rho 0.510 [0.473, 0.542] (n+1); intervals disjoint at w = 0, 0.1, 1 (n-1 by 0.002 at w = 0). DLPwAI under a counted static-DH oracle only.",
+          "value": 0.608997215462331
         }
       ],
       "problem": "dlpwai:static-dh-p224-shape",
@@ -1610,6 +1642,36 @@
     },
     {
       "better": "lower",
+      "first": 3.2479,
+      "latest": 3.2479,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_chained_over_negation_ops",
+      "points": [
+        {
+          "commit": "c7c4c2874f8a",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261111T0324Z-rho-chained-vs-v5v6",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.979,
+            3.541
+          ],
+          "summary": "rho.negation_chained vs rho.negation_v5/v6 on prime 2^17.7..2^28, local L0: v5/chained 0.256 [0.236,0.277], v6/chained 0.261 [0.240,0.284], chained/rho.negation 3.25 [2.98,3.54]; band-robust. Chained's walk 3.7x longer (fruitless cycles from M_j = M_j-1 + M_j-2). Replay-all clean.",
+          "value": 3.2479
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.8643,
       "latest": 0.8643,
       "latest_derived": {
@@ -1753,6 +1815,36 @@
           ],
           "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
           "value": 0.9391
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.2557,
+      "latest": 0.2557,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_v5_over_chained_ops",
+      "points": [
+        {
+          "commit": "c7c4c2874f8a",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261111T0324Z-rho-chained-vs-v5v6",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.236,
+            0.277
+          ],
+          "summary": "rho.negation_chained vs rho.negation_v5/v6 on prime 2^17.7..2^28, local L0: v5/chained 0.256 [0.236,0.277], v6/chained 0.261 [0.240,0.284], chained/rho.negation 3.25 [2.98,3.54]; band-robust. Chained's walk 3.7x longer (fruitless cycles from M_j = M_j-1 + M_j-2). Replay-all clean.",
+          "value": 0.2557
         }
       ],
       "problem": "ecdlp:prime-ladder-18-28",
@@ -5111,6 +5203,306 @@
     },
     {
       "better": "lower",
+      "first": 1.6703,
+      "latest": 1.6703,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_bsgs2_gae_i10_h01_24b_t1024",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.6554,
+            1.6804
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 1.6703
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2024,
+      "latest": 1.2024,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_bsgs2_gae_i10_h01_24b_t16384",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2006,
+            1.2066
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 1.2024
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3516,
+      "latest": 1.3516,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_bsgs2_gae_i10_h01_24b_t4096",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3454,
+            1.3586
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 1.3516
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2459,
+      "latest": 1.2459,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_bsgs2_gae_i10_h01_25b_t16384",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2432,
+            1.2474
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 1.2459
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.4182,
+      "latest": 1.4182,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_bsgs2_gae_i10_h01_25b_t4096",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.4118,
+            1.4197
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 1.4182
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1215,
+      "latest": 1.1215,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_rhobest_gae_i10_h01_24b_t1024",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1137,
+            1.1343
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 1.1215
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9349,
+      "latest": 0.9349,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_rhobest_gae_i10_h01_24b_t16384",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9329,
+            0.9389
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 0.9349
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.983,
+      "latest": 0.983,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_rhobest_gae_i10_h01_24b_t4096",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9789,
+            0.9878
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 0.983
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9278,
+      "latest": 0.9278,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_rhobest_gae_i10_h01_25b_t16384",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9254,
+            0.9306
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 0.9278
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9961,
+      "latest": 0.9961,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic4_over_rhobest_gae_i10_h01_25b_t4096",
+      "points": [
+        {
+          "commit": "6b0ac6f19285",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 22,
+          "record": "20261111T0142Z-mt-fieldops-ic4-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9915,
+            1.0024
+          ],
+          "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+          "value": 0.9961
+        }
+      ],
+      "problem": "ic:multi-target-prime-w22-25",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.516,
       "latest": 0.516,
       "latest_derived": {
@@ -5291,6 +5683,98 @@
         }
       ],
       "problem": "ic:primefield-shapes-p31",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.472,
+      "latest": 0.472,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "sib8_p256_over_tw2cj_lazy_gae_w0_gen_p40",
+      "points": [
+        {
+          "commit": "ce7cd4e716d1",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261111T0151Z-sib-stage3-scaling",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.444,
+            0.502
+          ],
+          "summary": "Local L0, prime-order prime-field curves p 34/37/40 bits (a=-3, generic, j=0 b=7): sib8 / tw2cj-lazy 0.45-0.51 at w=0, flat in r; vs rho-neg 0.78-0.91 at w=0, flat on generic and j0b7, slope +0.034 on a=-3; 1.48-1.54x rho-cubic; unvalidated",
+          "value": 0.472
+        }
+      ],
+      "problem": "ic:primefield-shapes-scaling",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.531,
+      "latest": 1.531,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.531
+      },
+      "metric": "sib8_p512_over_rho_cubic_gae_w0_j0b7_p40",
+      "points": [
+        {
+          "commit": "ce7cd4e716d1",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.531
+          },
+          "n": null,
+          "record": "20261111T0151Z-sib-stage3-scaling",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.399,
+            1.675
+          ],
+          "summary": "Local L0, prime-order prime-field curves p 34/37/40 bits (a=-3, generic, j=0 b=7): sib8 / tw2cj-lazy 0.45-0.51 at w=0, flat in r; vs rho-neg 0.78-0.91 at w=0, flat on generic and j0b7, slope +0.034 on a=-3; 1.48-1.54x rho-cubic; unvalidated",
+          "value": 1.531
+        }
+      ],
+      "problem": "ic:primefield-shapes-scaling",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.482,
+      "latest": 0.482,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "sib8_p512_over_tw2cj_lazy_gae_w0_a3_p40",
+      "points": [
+        {
+          "commit": "ce7cd4e716d1",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261111T0151Z-sib-stage3-scaling",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.451,
+            0.515
+          ],
+          "summary": "Local L0, prime-order prime-field curves p 34/37/40 bits (a=-3, generic, j=0 b=7): sib8 / tw2cj-lazy 0.45-0.51 at w=0, flat in r; vs rho-neg 0.78-0.91 at w=0, flat on generic and j0b7, slope +0.034 on a=-3; 1.48-1.54x rho-cubic; unvalidated",
+          "value": 0.482
+        }
+      ],
+      "problem": "ic:primefield-shapes-scaling",
       "unit": "ratio"
     },
     {
