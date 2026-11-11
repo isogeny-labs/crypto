@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261111T0437Z-ic-rule-v9",
+  "latest_record": "20261111T0602Z-logs-oversampling-full",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 4,
     "invalid": 2,
-    "measured": 101,
+    "measured": 103,
     "open": 3
   },
   "repo": "crypto",
@@ -5560,6 +5560,518 @@
       ],
       "problem": "ic:koblitz_rule_cold",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 17.851,
+      "latest": 12.922,
+      "latest_derived": {
+        "improvement_vs_first_percent": 27.6119,
+        "improvement_vs_previous_percent": 27.6119
+      },
+      "metric": "c1_f01_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11.792,
+            26.11
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 17.851
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 27.6119,
+            "improvement_vs_previous_percent": 27.6119
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11.259,
+            14.755
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 12.922
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 29.727,
+      "latest": 29.727,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "c1_f025_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            27.287,
+            32.325
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 29.727
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 66.609,
+      "latest": 61.197,
+      "latest_derived": {
+        "improvement_vs_first_percent": 8.125,
+        "improvement_vs_previous_percent": 8.125
+      },
+      "metric": "c1_f05_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            56.777,
+            80.101
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 66.609
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 8.125,
+            "improvement_vs_previous_percent": 8.125
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            57.454,
+            64.878
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 61.197
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 4.123,
+      "latest": 3.407,
+      "latest_derived": {
+        "improvement_vs_first_percent": 17.366,
+        "improvement_vs_previous_percent": 17.366
+      },
+      "metric": "c2_f01_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.331,
+            4.894
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 4.123
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 17.366,
+            "improvement_vs_previous_percent": 17.366
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.063,
+            3.796
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 3.407
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 6.541,
+      "latest": 6.541,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "c2_f025_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            6.035,
+            7.058
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 6.541
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 12.971,
+      "latest": 13.228,
+      "latest_derived": {
+        "improvement_vs_first_percent": -1.9813,
+        "improvement_vs_previous_percent": -1.9813
+      },
+      "metric": "c2_f05_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11.676,
+            14.925
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 12.971
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": -1.9813,
+            "improvement_vs_previous_percent": -1.9813
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            12.57,
+            13.874
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 13.228
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 11.047,
+      "latest": 10.888,
+      "latest_derived": {
+        "improvement_vs_first_percent": 1.4393,
+        "improvement_vs_previous_percent": 1.4393
+      },
+      "metric": "c3_f01_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10.018,
+            11.832
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 11.047
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 1.4393,
+            "improvement_vs_previous_percent": 1.4393
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10.548,
+            11.212
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 10.888
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 26.22,
+      "latest": 26.22,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "c3_f025_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            25.859,
+            26.589
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 26.22
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 52.693,
+      "latest": 52.446,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.4688,
+        "improvement_vs_previous_percent": 0.4688
+      },
+      "metric": "c3_f05_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            52.125,
+            53.392
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 52.693
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.4688,
+            "improvement_vs_previous_percent": 0.4688
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            51.914,
+            52.969
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 52.446
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 11.026,
+      "latest": 10.999,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.2449,
+        "improvement_vs_previous_percent": 0.2449
+      },
+      "metric": "c4_f01_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10.744,
+            11.326
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 11.026
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.2449,
+            "improvement_vs_previous_percent": 0.2449
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10.873,
+            11.122
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 10.999
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 26.039,
+      "latest": 26.039,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "c4_f025_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            25.908,
+            26.17
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 26.039
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 52.027,
+      "latest": 52.014,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.025,
+        "improvement_vs_previous_percent": 0.025
+      },
+      "metric": "c4_f05_minus_f0_cost_lambda_hat",
+      "points": [
+        {
+          "commit": "6df0f9101084",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261111T0443Z-logs-oversampling-pilot",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            51.753,
+            52.301
+          ],
+          "summary": "5-seed local pilot of relation oversampling in ic logs precompute (DRAFT protocol): 120/120 arms verified; every f>0 arm costs more than f0 in all 4 cells. Not a claim.",
+          "value": 52.027
+        },
+        {
+          "commit": "a1ef86e0ccca",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.025,
+            "improvement_vs_previous_percent": 0.025
+          },
+          "n": 30,
+          "record": "20261111T0602Z-logs-oversampling-full",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            51.839,
+            52.19
+          ],
+          "summary": "Frozen 30-seed run (protocol sha256 aa928f27...): 720/720 arms verified; H0 for every f in all 4 cells \u2014 relation oversampling raises total ic logs precompute cost. No improvement.",
+          "value": 52.014
+        }
+      ],
+      "problem": "ic:logs-oversampling",
+      "unit": "count"
     },
     {
       "better": "lower",

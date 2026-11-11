@@ -1,6 +1,6 @@
 {
   "schema": "frozen-workflow-pins/v1",
-  "description": "Workflows whose exact bytes research evidence pins. Live workflows may change (runner, triggers, disk fixes); custody is checked in an isolated view that restores the pinned bytes from `revision` (.github/scripts/frozen-workflow-check.mjs). check: replay = run below by frozen-workflow-replays.yml; wrapper = the workflow itself runs frozen-workflow-check.mjs; record = no runtime check asserts the pin, so this file and the replay job's custody step document it.",
+  "description": "Workflows whose exact bytes research evidence pins. Live workflows may change (runner, triggers, disk fixes); custody is checked in an isolated view that restores the pinned bytes from `revision` (.github/scripts/frozen-workflow-check.mjs); a replay may carry its own `revision` when its manifest pins another version of its workflow. check: replay = run below by frozen-workflow-replays.yml; wrapper = the workflow itself runs frozen-workflow-check.mjs; record = no runtime check asserts the pin, so this file and the replay job's custody step document it.",
   "revision": "d30a63b89c3a6f79d55cd798ea6519e075636034",
   "workflows": {
     ".github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml": {
@@ -222,7 +222,7 @@
         "research/p192_extension_cover_20261012/reports/run-20261016T0747Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T1850Z/RUN.json"
       ],
-      "note": "Not covered: reports/run-20261024-anchor-eight/ARTIFACTS.sha256 pins this workflow at b350582e757d1c1f979a222eca3801d6de045d290c270f2c216fb7ba5b335514, a second version this index (one revision) does not hold, and the cross-cubic-anchor-fan job checks it with sha256sum -c."
+      "note": "Not covered: reports/run-20261024-anchor-eight/ARTIFACTS.sha256 pins this workflow at b350582e757d1c1f979a222eca3801d6de045d290c270f2c216fb7ba5b335514, held by d0597e0ea3df9ce4003d27f182c06d9e19ee5c4b (a per-replay revision can restore it; custody of that pin passes), but the same manifest pins research/p192_extension_cover_20261012/REPORT.md at 0444d2bfb9316fed4f5682918434b3ae7318530b888dcc88965f7cd4f075341e, and merge 097e2b2361 later added four figure-link lines to that report, so the cross-cubic-anchor-fan job's sha256sum -c fails on source drift in any workflow view. The run-20261024 and run-20261024-high-degree ARTIFACTS.sha256 manifests do not pin this workflow and pass on live bytes."
     }
   },
   "replays": [

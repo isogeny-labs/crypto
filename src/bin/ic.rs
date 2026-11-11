@@ -21,6 +21,10 @@ mod fixed;
 mod install;
 #[path = "ic/large_prime.rs"]
 mod large_prime;
+#[path = "ic/log_store.rs"]
+mod log_store;
+#[path = "ic/oversample.rs"]
+mod oversample;
 #[path = "ic/params.rs"]
 mod params;
 #[path = "ic/plan.rs"]
@@ -136,6 +140,8 @@ enum Action {
     Rho(rho::RhoArgs),
     /// Price the workflow's pipeline phase by phase: the same calls in memory on one thread, each phase on its own clock, converted at one batched addition measured in the same process, beside batch rho on the same targets with its step priced.
     Price(price::PriceArgs),
+    /// Measure relation oversampling in the logarithm precompute: one pool per seed past full rank, prefixes solved at each surplus fraction, paired rows.
+    Oversample(oversample::OversampleArgs),
     /// Import the ECBench binary-curve battery and run bounded exact
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
@@ -233,6 +239,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
+        Some(Action::Oversample(args)) => oversample::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
