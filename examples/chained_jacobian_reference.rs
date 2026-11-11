@@ -1,6 +1,8 @@
 //! Differential development test against the pre-existing BigUint arithmetic.
 //! This is not an independent signed validation or a timing benchmark.
-#[allow(dead_code)]
+// This example imports a standalone research crate whose opt-in feature is
+// declared in its own Cargo.toml. Root Cargo does not expose that feature.
+#[allow(dead_code, unexpected_cfgs)]
 #[path = "../research/chained_jacobian_transfers_20261110/native/src/lib.rs"]
 mod chain;
 

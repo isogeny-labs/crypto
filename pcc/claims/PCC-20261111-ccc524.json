@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T08:39:36Z",
+ "id": "PCC-20261111-ccc524",
+ "kind": "statement",
+ "producer": {
+  "commit": "aabae1979457c3ba9e5112487a907b50cab15a99",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/small-prime-integrated-01.txt",
+    "sha256": "b1bb5ab8a18396d9f9ef0b5579c4e1a03064e508c88d97f7ba4a26f1b436cd80"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/small-prime-clippy-01.txt",
+    "sha256": "6b2871243ce64a390fa522975e62dd3a07eddaa48223fe94748ac574c106a8a0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Integrated opt-in small-prime feature passes24 tests(15 prior native,3 new family/compatibility,6 inherited field) and strict Clippy. Fixed p13,29,101 prime subgroups have r5,P(10,6);r5,P(24,15);r3,P(48,20). Scalar transfers nonzero; complete class sets and both dual norms pass, and both F101 Richelot hops match the prior fixed model backend. Boundp<=4096, exhaustive enumeration<=101, reused field layer disclosed. No independent signed verification, cryptographic-size field coverage or timing result."
+}

@@ -12,6 +12,8 @@ pub const ROOT: i64 = 10;
 pub type Poly = Vec<i64>;
 
 pub mod richelot;
+#[cfg(feature = "small-prime")]
+pub mod small_prime;
 
 pub fn fp(a: i64) -> i64 {
     a.rem_euclid(P)

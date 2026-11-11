@@ -5,6 +5,7 @@ on:
     paths:
       - 'research/chained_jacobian_transfers_20261110/native/**'
       - 'research/chained_jacobian_transfers_20261110/lean/**'
+      - 'src/prime_hyperelliptic/fp2.rs'
       - '.github/workflows/chained-jacobian-transfers.yml'
   workflow_dispatch:
 
@@ -19,8 +20,10 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           persist-credentials: false
-          sparse-checkout: research/chained_jacobian_transfers_20261110/native
-      - name: Pin Rust and check the fixed native fixture
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/native
+            src/prime_hyperelliptic
+      - name: Pin Rust and check the native fixtures
         env:
           RUSTUP_TOOLCHAIN: 1.99.1
         run: |
@@ -28,8 +31,8 @@ jobs:
           rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
           manifest=research/chained_jacobian_transfers_20261110/native/Cargo.toml
           cargo fmt --manifest-path "$manifest" -- --check
-          cargo clippy --manifest-path "$manifest" --all-targets --offline --locked -- -D warnings
-          cargo test --release --manifest-path "$manifest" --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/native-tests.txt"
+          cargo clippy --manifest-path "$manifest" --all-targets --features small-prime --offline --locked -- -D warnings
+          cargo test --release --manifest-path "$manifest" --features small-prime --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/native-tests.txt"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -53,10 +56,10 @@ jobs:
           curl -fsSL --connect-timeout 15 --max-time 120 https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
           sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain "$(cat research/chained_jacobian_transfers_20261110/lean/lean-toolchain)"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Build and audit both proof files
+      - name: Build and audit the proof files
         run: |
           set -euo pipefail
-          for source in ChainTransfer PolynomialIdentities; do
+          for source in ChainTransfer PolynomialIdentities SuccessorCollapse; do
             tools/lean/proof-gate.sh "research/chained_jacobian_transfers_20261110/lean/$source.lean" --out "$RUNNER_TEMP/proofs-$source"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

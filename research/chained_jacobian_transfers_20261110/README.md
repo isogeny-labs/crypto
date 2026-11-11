@@ -1,12 +1,15 @@
 # Chained Jacobian transfers
 
 Current continuation: [report](REPORT_20261111.md), [PDF](report.pdf),
+[small-prime supplement](SUPPLEMENT_20261111.md), [supplement PDF](small-prime-report.pdf),
 [persistent queue](QUEUE.md), [sources](SOURCES_20261111.md),
 [GitHub #3904](https://github.com/isogeny-labs/crypto/issues/3904).
 
 `native/` is the execution path for new development. It is a standalone,
 dependency-free Rust crate for public F101 fixtures and model-tagged quadratic
-splittings. It still uses a fixed field. The historical
+splittings. Its default API uses a fixed field. The opt-in `small-prime`
+feature adds checked odd primes≤4096, with enumeration capped at101; see
+the supplement and external-source input manifest. The historical
 Python files, protocol and 2026-11-10 receipt are retained evidence; their
 old status paragraphs do not describe the continuation. Do not extend or use
 those Python paths for new comparisons.

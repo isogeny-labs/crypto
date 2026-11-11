@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T09:21:05Z",
+ "id": "PCC-20261111-f7545a",
+ "kind": "statement",
+ "producer": {
+  "commit": "aabae1979457c3ba9e5112487a907b50cab15a99",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/small-prime-inputs.sha256",
+    "sha256": "3b2be0004b6d6c4f92af437b213d4eda53838bf57a16c35679a2d1a845b3cdcb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/small-prime-final-01.txt",
+    "sha256": "48df6278414b3908882626191508f34ff1c05fc7f0b115aee072458288b28e50"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Seven runtime source files for the accepted small-prime development checkpoint are bound by small-prime-inputs.sha256, alongside its25-test receipt. The manifest includes the unchanged external Fp2 source; this is producer source custody, not signed execution verification."
+}

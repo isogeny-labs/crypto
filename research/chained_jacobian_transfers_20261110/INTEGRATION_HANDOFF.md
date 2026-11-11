@@ -72,3 +72,10 @@ This handoff remains in the authorized crypto study and GitHub queue #3904.
   receipts are named in
   `problems/chained-transfer-admission-and-ledger-sync.md`. Do not rewrite
   frozen claims, archived evidence or either ledger history to merge.
+
+## Small-prime/global endpoint continuation
+Feature small-prime uses unchanged checked Fp2 context(p≤4096), enumeration capped101. Fixed13/29/101 plus separate nonresidue control31 give #J180/960/9216/1008, source/target2-torsion4/4,4/16,4/16,16/4, source r5/5/3/7. Native25 tests and Clippy pass; BigUint development comparison covers all eight models and independent elliptic counts. No signed standing or performance claim. [pcc:unverified]
+
+GLOBAL_SUCCESSOR_COLLAPSE.md and seven new core Lean ring lemmas give a written first-elliptic-endpoint argument n R f*=tau phi[2] in characteristic≠2,3,5, tau=(X/100+1/125,-V/1000). Actual base translation by(1/125,0) is essential. Total25 written lemmas,22+8+7 audited declarations. Geometric completion remains written, not Lean formalized. This is no claim about the final Jacobian-valued two-hop map. [pcc:unverified]
+
+Cryptanalysis1469/1471 merged;1473 at73d6d5849 pinsaabae197, before this feature. New immutable feature pin/replay is next. Preserve every older pin/receipt. Next construction assessment: scope of the simple quadratic cover for odd full elliptic groups, then alternative odd-degree covers if warranted. Do not invent lead IDs or write plaintext into the locked atlas.
