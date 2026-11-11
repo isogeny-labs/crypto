@@ -96,7 +96,7 @@ cheaper (`../mt_bsgs_gap_20261111/README.md`).
 
 ## Limits
 
-Groups of 2^22 to 2^33; costs counted in field operations, not timed; memory unbounded for every arm; one local
+Group orders of about 2^22 to 2^32 (the protocol said 2^33; the largest tested is 2^32.00004); costs counted in field operations, not timed; memory unbounded for every arm; one local
 host (this container has no AWS identity, so not isolab-eks); the rho family is this harness's, not ecbench's, was
 fixed during this study (`../mt_rho_start_fix_20261111/`) and lacks retention and distinguished points. The
 comparison is per target in a batch of T targets on one curve; it says nothing about single-target ECDLP, and

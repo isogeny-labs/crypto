@@ -3612,7 +3612,7 @@ def markdown(doc: dict) -> str:
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     mt = doc["mt_fieldops_component"]
     L += ["## Multi-target IC5 against IC4 and this harness's rho family, outside tables A–C", "",
-          "Many targets on one prime-order Weierstrass curve (2^22 to 2^33, 44 fresh curves, 22 paired "
+          "Many targets on one prime-order Weierstrass curve (group orders about 2^22 to 2^32, 44 fresh curves, 22 paired "
           "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
           "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table "
           "of 4-term factor-base sums (few unknown logs, so a small relation phase) and tries x(Q ± W) with one shared "
@@ -4968,7 +4968,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
     mt = doc["mt_fieldops_component"]
     P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC5 against IC4 and this harness\'s rho family, outside the priced tables</h2>'
-             '<p>Many targets on one prime-order Weierstrass curve (2<sup>22</sup> to 2<sup>33</sup>, 44 fresh curves, 22 paired '
+             '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>22</sup> to 2<sup>32</sup>, 44 fresh curves, 22 paired '
              'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
              '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table of 4-term '
              'factor-base sums (few unknown logs, so a small relation phase) and tries x(Q ± W) with one shared inversion; the '

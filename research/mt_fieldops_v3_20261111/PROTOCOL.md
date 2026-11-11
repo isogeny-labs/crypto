@@ -72,8 +72,9 @@ binary; arms, parameters, instances, seeds and the decision rule are unchanged. 
 cheaper or equal (one addition per restart instead of two, no repeated walks), so it can only strengthen the
 reference against ic4 and ic5.
 
-### Erratum to A1 (validator, 2026-11-11)
+### Erratum to A1 (producer, from validator finding A-F3, 2026-11-11)
 
 Two statements in A1 are wrong and are corrected here (the arms and data are unaffected): the fix does not make
 every rho run cheaper or equal (3.5% to 15.7% of runs got dearer, by up to 4.3%), and chained starts can repeat a
 walk (with probability 1/64 per restart a start retraces the previous one).
+The "Limits" line above says groups up to 2^33; the largest group order tested is 4 295 088 293 (2^32.00004).
