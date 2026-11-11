@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><title>E14 RunPod run</title><style>
+body{font-family:Helvetica,Arial,sans-serif;max-width:960px;margin:auto;font-size:13px;color:#1a202c}
+table{border-collapse:collapse;margin:10px 0}td,th{border:1px solid #cbd5e0;padding:4px 7px;text-align:left}
+code{font-size:11.5px;background:#edf2f7;padding:0 3px}img{width:100%}</style></head><body>
+<h1>E14 (Amendment 19): RunPod run of the E13 parts that ran out of 13 GiB, 2026-11-09</h1>
+
+<p><b>Not completed.</b> RunPod terminated the pod, a 64-vCPU AMD EPYC 7702P with 504 GiB of memory, part-way through the first E14b draw. The pod&#x27;s last upload landed at 10:17:27 UTC and the next 10-minute upload never arrived. At 13:07 UTC the API returned &quot;pod not found&quot; and the account balance was −0.04 USD. Termination for a zero balance is inferred from those two facts; no provider event log was read. Another pod on the same account (not part of this study) was billing 1.19 USD/h at the same time. Records: <code>e14/pod/</code> (last <code>out.tgz</code>, sha256 <code>0f8603c6…751965</code>) and <code>e14/score.json</code>. Report: <code>reports/run-20261109-e14/</code>.</p>
+
+<table>
+<tr><th>Unit</th><th>Status</th><th>Registered reading</th><th>Prediction outcome</th></tr>
+<tr><td>Gates G0 and G1</td><td>passed (G0 7/7 tests; G1 diff against <code>S3.d0.b4.jsonl</code> empty)</td><td>—</td><td>—</td></tr>
+<tr><td>E14b 6:10:3 d1</td><td>ran ≥ 16,428 s (05:43:39 to 10:17:27 UTC) without output</td><td><b>not completed</b></td><td>&quot;controls confirmed&quot; (0.85) failed</td></tr>
+<tr><td>E14b d3, d4</td><td>not started</td><td></td><td></td></tr>
+<tr><td>E14a 3:21:7, degree 5, draws 0/1/3/4</td><td>not started</td><td><b>not completed</b></td><td>&quot;not completed&quot; (0.15) occurred</td></tr>
+<tr><td>E14c 4:28:7, hky_window</td><td>not started</td><td><b>no reading</b></td><td>&quot;no reading&quot; (0.75) occurred</td></tr>
+</table>
+
+<p>The combined statement &quot;independent agreement (E13b + E14b)&quot; is not made. E13b&#x27;s recorded reading stays &quot;disagreement&quot; (3 controls unmeasured; no measured draw differs).</p>
+
+<p><b>Observation (not a registered reading).</b> On draw d1 of 6:10:3 the reference hky_par closed at degree 4 in 190.4 s on 32 threads (E9). pe with <code>--to 4 --max-cols 600000</code> on 64 threads had not finished after 4.56 h. Locally, in E13, it exceeded 13 GiB after 2,343 s. So the pe degree-4 system for this 58-variable, 50-equation control costs at least two orders of magnitude more wall time than hky_par&#x27;s. A rerun as registered would probably spend most of its window on the three controls. Before any rerun, measure pe&#x27;s matrix size on d1 and decide whether E14a should run first. That is a design question for a new amendment, not a result.</p>
+
+<p>Binary: <code>dreg_linear_guess</code> sha256 <code>f902edfd…321a99</code>, built on the pod from the frozen source archive <code>fd-src-a2be6609.tgz</code> (hash checked: OK). Cost: about 6.3 h × 2.56 USD/h ≈ 16 USD, including the idle first hour.</p>
+<img src="e14.svg" alt="E14 timeline">
+<p style="color:#555">Sources: <code>research/fall_degree_bounds_20261008/e14/score.json</code>, <code>e14/pod/run.log</code>, PREREGISTRATION.md Amendment 19. Plot: <code>plot_e14.py</code>; render: <code>render.js</code>.</p>
+</body></html>

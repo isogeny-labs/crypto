@@ -1,0 +1,58 @@
+{
+  "schema": "research.source-review/v1",
+  "status": "source_correction_supported_pending_native_replay",
+  "source_sha256": "74b457c0788a2874f1b7bd58550081d62c7386e248301b5d0c1dd56d4f128229",
+  "new_execution": false,
+  "findings": [],
+  "checks": [
+    "Only BranchConjugateOrders changed among 18 Lean source files; theorem statement and hypotheses unchanged.",
+    "Four proof tails now expose definitional local expressions, rewrite established hm/hp/hprod valuation equalities, then normalize ENat constants. Each matches its retained failed goal.",
+    "No new axiom, premise or sorry added. Kernel acceptance remains a future replay result.",
+    "All other Lean files, 18 ordered modules, 13 named readbacks, direct import/runtime/tactic bindings byte-identical. Independent positive and two negative controls remain unchanged.",
+    "Runner changes exclusively fresh v2 workspace and unit names; 900/1800/900 seconds, 1 CPU, 8 GiB, deadline and failure/custody logic unchanged.",
+    "All frozen local file hashes match inspected bytes. Prior failure log was read; original failed workspace remains intact."
+  ],
+  "remaining": "Coordinator binds prior terminal/accounting, current lease/release and published exact source before one bounded replay; no new approval or test gate introduced.",
+  "reviewed_sources": [
+    {
+      "path": "branch-coefficient-replay-v2-20261109/BranchConjugateOrders.lean.txt",
+      "sha256": "74b457c0788a2874f1b7bd58550081d62c7386e248301b5d0c1dd56d4f128229",
+      "bytes": 4995
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/proof-fix.patch",
+      "sha256": "4bedcbaab363f3e2a8b823e8d7c95fe57f3f9cc839614c329341067153a1e947",
+      "bytes": 676
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/freeze.json",
+      "sha256": "e83cd2f50e2e6edd17146ed158be688afcd6b8d94f3d470f8ec3d4d89754d6a1",
+      "bytes": 8456
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/modules.json",
+      "sha256": "7fdceb4decb76313f04d8a882511e892d92004146ad7893971ebdeeb5b7fce27",
+      "bytes": 512
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/names.json",
+      "sha256": "826ae5cc2c3673a105e2a5c4890316c123868eb7495c454e85959c3b44e98e30",
+      "bytes": 704
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/launch.py",
+      "sha256": "78c7acbb03007ab862e3766c426e7ed89ca1dae69cb5de5e75cab7fb5ea91da4",
+      "bytes": 12251
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/replay.py",
+      "sha256": "d6801175761a123c7384162addbed83df71ad7f770bae76049eb54d04201a14e",
+      "bytes": 10999
+    },
+    {
+      "path": "branch-coefficient-replay-v2-20261109/failure-binding.json",
+      "sha256": "97d41bd431f2c258199ad52424d21dbfdcdd70468011fbba081574a1998394a9",
+      "bytes": 738
+    }
+  ]
+}

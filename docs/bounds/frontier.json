@@ -16,12 +16,16 @@
     "ECBND1h0984b6f06aad",
     "ECBND1h0b4e1d5006f9",
     "ECBND1h0c77e54dd67d",
+    "ECBND1h0e1051dee00c",
     "ECBND1h11f6a579f4ae",
     "ECBND1h12eaa40acb81",
     "ECBND1h145884744bd0",
     "ECBND1h1573ea580e89",
+    "ECBND1h1616aa915bf9",
     "ECBND1h1684199f3192",
+    "ECBND1h17bc6a73d40a",
     "ECBND1h18e0d9d32693",
+    "ECBND1h1d791f3ff0f0",
     "ECBND1h1d9e483113c1",
     "ECBND1h22629907ff60",
     "ECBND1h242c8c9495a1",
@@ -39,6 +43,8 @@
     "ECBND1h36247411dca1",
     "ECBND1h3a17bf1d8dd4",
     "ECBND1h3b205a6d0540",
+    "ECBND1h3b357487c59f",
+    "ECBND1h3be5d3c55c05",
     "ECBND1h3fb5dc7e0d42",
     "ECBND1h412ef80d6c1a",
     "ECBND1h435dff125a94",
@@ -60,6 +66,8 @@
     "ECBND1h60bcd8d6c059",
     "ECBND1h61751f81bdac",
     "ECBND1h62095be473ba",
+    "ECBND1h6263cb36e679",
+    "ECBND1h637103221773",
     "ECBND1h63df4ec3d936",
     "ECBND1h64d9644c93b9",
     "ECBND1h65b55d17b35c",
@@ -99,6 +107,7 @@
     "ECBND1h9879c0aa348f",
     "ECBND1h9896c8176a62",
     "ECBND1h99cf9dff484c",
+    "ECBND1h9a9f2fd12811",
     "ECBND1h9b939ef3e3a4",
     "ECBND1h9ca30b59bfc6",
     "ECBND1h9d01a5c2ae56",
@@ -109,6 +118,7 @@
     "ECBND1ha346733048d7",
     "ECBND1ha6fbf0c678d0",
     "ECBND1ha7a3cdc54301",
+    "ECBND1ha9bbeb195898",
     "ECBND1hac955f085850",
     "ECBND1hb2a6ab54015c",
     "ECBND1hb4ad379d43d8",
@@ -132,6 +142,7 @@
     "ECBND1hc8fa6c1da954",
     "ECBND1hc9785405132e",
     "ECBND1hc9cc7d62e248",
+    "ECBND1hcb948f2cbbc6",
     "ECBND1hcc568213272c",
     "ECBND1hce4cbf18c091",
     "ECBND1hce4f9adaff6b",
@@ -139,16 +150,21 @@
     "ECBND1hcf69c27b4978",
     "ECBND1hd1e5d326c8f2",
     "ECBND1hd392c8f42bb0",
+    "ECBND1hd41f030a1cbf",
     "ECBND1hd4cfe6663583",
     "ECBND1hd53ee4aa6eb3",
     "ECBND1hd63ea1f18273",
     "ECBND1hd6c041802dca",
     "ECBND1hd98a33a44a6a",
+    "ECBND1hd98edefcdaa7",
     "ECBND1hdb2a8a16cc26",
     "ECBND1hde461251f8e4",
+    "ECBND1he0081cbc999e",
     "ECBND1he00f1952b198",
     "ECBND1he0aea8671f10",
+    "ECBND1he10b9180919e",
     "ECBND1he508a84e4e20",
+    "ECBND1he5f5bb348f82",
     "ECBND1he76af9184de3",
     "ECBND1he80db231bec9",
     "ECBND1he8163c29cc39",
@@ -162,8 +178,10 @@
     "ECBND1hf39923f02d49",
     "ECBND1hf3dffe8b4684",
     "ECBND1hf7a7f0920bc4",
+    "ECBND1hf922997c935e",
     "ECBND1hfad1d3ddfab2",
-    "ECBND1hfe908d79a46d"
+    "ECBND1hfe908d79a46d",
+    "ECBND1hfefc9d7bd95f"
   ],
   "domains": [
     {
@@ -3808,6 +3826,1246 @@
           "scaling_claim": true,
           "unranked_reasons": [
             "historical: fit version 1, kept as published and re-derivable; ranking uses fit-version-2 bounds (its -v2 twin where one was fitted)"
+          ]
+        }
+      ]
+    },
+    {
+      "axes": [
+        "ops",
+        "memory"
+      ],
+      "domain": {
+        "envelope": {
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae"
+      },
+      "domain_id": "ECDOM1h60fe9630e4bd",
+      "entries": [
+        {
+          "alpha": 0.5055315971519687,
+          "alpha_ci95": [
+            0.48266003332173246,
+            0.5294336091224687
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.8875614061040297,
+                1.001051656148962
+              ],
+              "known": true,
+              "value": 0.945602347377174
+            },
+            "field_muls": {
+              "ci95": [
+                1.7845048368170688,
+                2.0153527027856466
+              ],
+              "known": true,
+              "value": 1.897100110361639
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8902102981341855,
+                1.0045473804331748
+              ],
+              "known": true,
+              "value": 0.9475674859129368
+            },
+            "memory": {
+              "ci95": [
+                0.0007686332046338211,
+                0.002303092518806402
+              ],
+              "known": true,
+              "value": 0.001480111282736818
+            },
+            "ops": {
+              "ci95": [
+                0.9993679069475536,
+                1.1340932095392895
+              ],
+              "known": true,
+              "value": 1.0669979891370174
+            },
+            "uncharged": {
+              "ci95": [
+                0.8842462231226422,
+                1.0026242276939097
+              ],
+              "known": true,
+              "value": 0.9440656006921372
+            }
+          },
+          "bound_id": "ECBND1h3b357487c59f",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on generic prime-order curves, log2 r 32-49 (medium tier, conditional-PC study 2026-11-09)",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 432,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 3.7556210933328984,
+            "max_ratio": 3.82032196520219,
+            "median_ratio": 1.017227742166043,
+            "runs": 432,
+            "top_run": "ECR1hc80c33a1b076",
+            "top_run_share": 0.008288054872122981
+          }
+        },
+        {
+          "alpha": 0.4836136690490313,
+          "alpha_ci95": [
+            0.462599558579772,
+            0.5035325161556967
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                1.2339484442008883,
+                1.3946809699804186
+              ],
+              "known": true,
+              "value": 1.317648562000868
+            },
+            "field_muls": {
+              "ci95": [
+                2.471046890733877,
+                2.799672573858551
+              ],
+              "known": true,
+              "value": 2.637992899667267
+            },
+            "field_sqrs": {
+              "ci95": [
+                1.233047273345833,
+                1.3950893174881016
+              ],
+              "known": true,
+              "value": 1.3185471538893767
+            },
+            "memory": {
+              "ci95": [
+                0.0011781738818201022,
+                0.003445020823346427
+              ],
+              "known": true,
+              "value": 0.002224167986638517
+            },
+            "ops": {
+              "ci95": [
+                1.3919994464313543,
+                1.5772604962961947
+              ],
+              "known": true,
+              "value": 1.4868071869151396
+            },
+            "uncharged": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            }
+          },
+          "bound_id": "ECBND1h6263cb36e679",
+          "bounded": false,
+          "declared_alpha": 0.5,
+          "dominance_notes": [
+            "ECBND1h3b357487c59f (rho.negation) is clearly better on ops, memory at the charged cost but not across the pricing band (weights 0, 0.1, 1): not dominating; the order flips at about 0.377 GAE per uncharged operation"
+          ],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.plain on generic prime-order curves, log2 r 32-49 (medium tier, conditional-PC study 2026-11-09)",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.plain",
+          "method_id": "ECM1hb367476fce6c",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "price_checks": [
+            {
+              "band": [
+                0.0,
+                0.1,
+                1.0
+              ],
+              "break_even_price": 0.3770836517157012,
+              "dominator": "ECBND1h3b357487c59f",
+              "holds_across_band": false
+            }
+          ],
+          "runs": 432,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.9835364658064676,
+            "max_ratio": 4.165556017209548,
+            "median_ratio": 1.3961806952755222,
+            "runs": 432,
+            "top_run": "ECR1h39ea5f67fc13",
+            "top_run_share": 0.006485367346511232
+          }
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1h3b357487c59f",
+      "ops_leader": "ECBND1h3b357487c59f",
+      "unranked": [
+        {
+          "alpha": 0.4912060491388881,
+          "alpha_ci95": [
+            0.4674367792080214,
+            0.5194074020419642
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.888972748795993,
+                1.0052405594814968
+              ],
+              "known": true,
+              "value": 0.9473400660929808
+            },
+            "field_muls": {
+              "ci95": [
+                1.7858864340649458,
+                2.022796640577877
+              ],
+              "known": true,
+              "value": 1.9035611424267704
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8869597065710565,
+                1.0103678229288604
+              ],
+              "known": true,
+              "value": 0.9503004028399178
+            },
+            "memory": {
+              "ci95": [
+                0.0007172278282405926,
+                0.0021274373010038215
+              ],
+              "known": true,
+              "value": 0.0013896548140904523
+            },
+            "ops": {
+              "ci95": [
+                1.0031132677271286,
+                1.1376134007032457
+              ],
+              "known": true,
+              "value": 1.068958794734207
+            },
+            "uncharged": {
+              "ci95": [
+                0.8877024305511965,
+                1.0101518845760822
+              ],
+              "known": true,
+              "value": 0.9487309835590918
+            }
+          },
+          "bound_id": "ECBND1hd41f030a1cbf",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.negation_v2 on generic prime-order curves, log2 r 32-49 (medium tier)",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation_v2",
+          "method_id": "ECM1h0de59de796c1",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.993473330429717,
+            "max_ratio": 3.0149638783938357,
+            "median_ratio": 1.0071791346011536,
+            "runs": 480,
+            "top_run": "ECR1hdb7fbb4082d6",
+            "top_run_share": 0.005875974619036291
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.49688575799670714,
+          "alpha_ci95": [
+            0.4806934486142741,
+            0.5138959020446336
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.9147121840425788,
+                1.0276255613108378
+              ],
+              "known": true,
+              "value": 0.9690278481988096
+            },
+            "field_muls": {
+              "ci95": [
+                1.8360633366717056,
+                2.0508942092225615
+              ],
+              "known": true,
+              "value": 1.94375847687873
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.9177078235598386,
+                1.0294880609048314
+              ],
+              "known": true,
+              "value": 0.9709287750258456
+            },
+            "memory": {
+              "ci95": [
+                0.0007328363421041022,
+                0.002189478344033464
+              ],
+              "known": true,
+              "value": 0.001401368677780224
+            },
+            "ops": {
+              "ci95": [
+                1.0325593293474,
+                1.1558904712271172
+              ],
+              "known": true,
+              "value": 1.0934308362429286
+            },
+            "uncharged": {
+              "ci95": [
+                0.9115934460375472,
+                1.0259020575952722
+              ],
+              "known": true,
+              "value": 0.967642968632459
+            }
+          },
+          "bound_id": "ECBND1ha9bbeb195898",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.negation on generic prime-order curves, log2 r 32-49 (medium tier, reference)",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.922200445821567,
+            "max_ratio": 3.055200626863953,
+            "median_ratio": 1.0455137091066296,
+            "runs": 480,
+            "top_run": "ECR1hdc2b28573461",
+            "top_run_share": 0.005821128410679322
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.4996179701144414,
+          "alpha_ci95": [
+            0.4798575142285162,
+            0.5215052998980818
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.9188722259727784,
+                1.05095397542128
+              ],
+              "known": true,
+              "value": 0.9842311147297794
+            },
+            "field_muls": {
+              "ci95": [
+                1.8316764816214937,
+                2.1019122873151743
+              ],
+              "known": true,
+              "value": 1.968644128259664
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.9159206113379263,
+                1.052038457541551
+              ],
+              "known": true,
+              "value": 0.9842917476631496
+            },
+            "memory": {
+              "ci95": [
+                0.5000013910753237,
+                0.500007645543525
+              ],
+              "known": true,
+              "value": 0.5000042420657832
+            },
+            "ops": {
+              "ci95": [
+                1.0319467411701644,
+                1.1845475836927948
+              ],
+              "known": true,
+              "value": 1.110589754962096
+            },
+            "uncharged": {
+              "ci95": [
+                0.916847982778616,
+                1.0500462180322263
+              ],
+              "known": true,
+              "value": 0.984158743022902
+            }
+          },
+          "bound_id": "ECBND1h0e1051dee00c",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "bsgs.negation on generic prime-order curves, log2 r 32-49 (medium tier)",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "bsgs.negation",
+          "method_id": "ECM1h87f6341629c3",
+          "params": {},
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 1.575639733024363,
+            "max_ratio": 1.6890191254212128,
+            "median_ratio": 1.07195768805552,
+            "runs": 480,
+            "top_run": "ECR1hfa8bb924729e",
+            "top_run_share": 0.0031683975373495428
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.5060910306811314,
+          "alpha_ci95": [
+            0.48572858247881673,
+            0.5281898744623713
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                1.1884774866582908,
+                1.34877727163992
+              ],
+              "known": true,
+              "value": 1.2702866693034724
+            },
+            "field_muls": {
+              "ci95": [
+                2.389740919301524,
+                2.704296614093579
+              ],
+              "known": true,
+              "value": 2.5430045433004973
+            },
+            "field_sqrs": {
+              "ci95": [
+                1.192112021919311,
+                1.3499579712243184
+              ],
+              "known": true,
+              "value": 1.2710970708679905
+            },
+            "memory": {
+              "ci95": [
+                0.000982249681244402,
+                0.002913149926387891
+              ],
+              "known": true,
+              "value": 0.001867351970943444
+            },
+            "ops": {
+              "ci95": [
+                1.3427942655944825,
+                1.5222735265979752
+              ],
+              "known": true,
+              "value": 1.433365013881185
+            },
+            "uncharged": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            }
+          },
+          "bound_id": "ECBND1h637103221773",
+          "bounded": false,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.plain on generic prime-order curves, log2 r 32-49 (medium tier)",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.plain",
+          "method_id": "ECM1hb367476fce6c",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 3.4210305187307437,
+            "max_ratio": 4.704404359938763,
+            "median_ratio": 1.3751424707208315,
+            "runs": 480,
+            "top_run": "ECR1hd2eb98422e7f",
+            "top_run_share": 0.006837645904305226
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        }
+      ]
+    },
+    {
+      "axes": [
+        "ops",
+        "memory"
+      ],
+      "domain": {
+        "envelope": {
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae+band(w=0.1)"
+      },
+      "domain_id": "ECDOM1h8604ed49f755",
+      "entries": [
+        {
+          "alpha": 0.5055955435114499,
+          "alpha_ci95": [
+            0.48275305721906553,
+            0.5295196474047089
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.8875614061040297,
+                1.001051656148962
+              ],
+              "known": true,
+              "value": 0.945602347377174
+            },
+            "field_muls": {
+              "ci95": [
+                1.7845048368170688,
+                2.0153527027856466
+              ],
+              "known": true,
+              "value": 1.897100110361639
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8902102981341855,
+                1.0045473804331748
+              ],
+              "known": true,
+              "value": 0.9475674859129368
+            },
+            "memory": {
+              "ci95": [
+                0.0007686332046338211,
+                0.002303092518806402
+              ],
+              "known": true,
+              "value": 0.001480111282736818
+            },
+            "ops": {
+              "ci95": [
+                1.0990500729413477,
+                1.2472865950916228
+              ],
+              "known": true,
+              "value": 1.1735243847562682
+            },
+            "uncharged": {
+              "ci95": [
+                0.8842462231226422,
+                1.0026242276939097
+              ],
+              "known": true,
+              "value": 0.9440656006921372
+            }
+          },
+          "bound_id": "ECBND1h3be5d3c55c05",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on generic prime-order curves, log2 r 32-49 (medium tier, conditional-PC study 2026-11-09)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 432,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 3.755640181003821,
+            "max_ratio": 4.201766887930903,
+            "median_ratio": 1.1187884582723364,
+            "runs": 432,
+            "top_run": "ECR1hc80c33a1b076",
+            "top_run_share": 0.008288121122085478
+          }
+        },
+        {
+          "alpha": 0.4836136690490313,
+          "alpha_ci95": [
+            0.462599558579772,
+            0.5035325161556967
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                1.2339484442008883,
+                1.3946809699804186
+              ],
+              "known": true,
+              "value": 1.317648562000868
+            },
+            "field_muls": {
+              "ci95": [
+                2.471046890733877,
+                2.799672573858551
+              ],
+              "known": true,
+              "value": 2.637992899667267
+            },
+            "field_sqrs": {
+              "ci95": [
+                1.233047273345833,
+                1.3950893174881016
+              ],
+              "known": true,
+              "value": 1.3185471538893767
+            },
+            "memory": {
+              "ci95": [
+                0.0011781738818201022,
+                0.003445020823346427
+              ],
+              "known": true,
+              "value": 0.002224167986638517
+            },
+            "ops": {
+              "ci95": [
+                1.3919994464313543,
+                1.5772604962961947
+              ],
+              "known": true,
+              "value": 1.4868071869151396
+            },
+            "uncharged": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            }
+          },
+          "bound_id": "ECBND1h9a9f2fd12811",
+          "bounded": false,
+          "declared_alpha": 0.5,
+          "dominance_notes": [
+            "ECBND1h3be5d3c55c05 (rho.negation) is clearly better on ops, memory at the charged cost but not across the pricing band (weights 0, 0.1, 1): not dominating; unpriced work is uncounted on one side, so it cannot be ranked above w = 0"
+          ],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.plain on generic prime-order curves, log2 r 32-49 (medium tier, conditional-PC study 2026-11-09)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.plain",
+          "method_id": "ECM1hb367476fce6c",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "price_checks": [
+            {
+              "band": [
+                0.0,
+                0.1,
+                1.0
+              ],
+              "break_even_price": null,
+              "dominator": "ECBND1h3be5d3c55c05",
+              "holds_across_band": null
+            }
+          ],
+          "runs": 432,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.9835364658064676,
+            "max_ratio": 4.165556017209548,
+            "median_ratio": 1.3961806952755222,
+            "runs": 432,
+            "top_run": "ECR1h39ea5f67fc13",
+            "top_run_share": 0.006485367346511232
+          }
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1h3be5d3c55c05",
+      "ops_leader": "ECBND1h3be5d3c55c05",
+      "unranked": [
+        {
+          "alpha": 0.49120610199452786,
+          "alpha_ci95": [
+            0.4674282893354366,
+            0.5194169659409037
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.888972748795993,
+                1.0052405594814968
+              ],
+              "known": true,
+              "value": 0.9473400660929808
+            },
+            "field_muls": {
+              "ci95": [
+                1.7858864340649458,
+                2.022796640577877
+              ],
+              "known": true,
+              "value": 1.9035611424267704
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8869597065710565,
+                1.0103678229288604
+              ],
+              "known": true,
+              "value": 0.9503004028399178
+            },
+            "memory": {
+              "ci95": [
+                0.0007172278282405926,
+                0.0021274373010038215
+              ],
+              "known": true,
+              "value": 0.0013896548140904523
+            },
+            "ops": {
+              "ci95": [
+                1.103552261954408,
+                1.2515307788549328
+              ],
+              "known": true,
+              "value": 1.1760116224368176
+            },
+            "uncharged": {
+              "ci95": [
+                0.8877024305511965,
+                1.0101518845760822
+              ],
+              "known": true,
+              "value": 0.9487309835590918
+            }
+          },
+          "bound_id": "ECBND1hf922997c935e",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.negation_v2 on generic prime-order curves, log2 r 32-49 (medium tier)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation_v2",
+          "method_id": "ECM1h0de59de796c1",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.994099218457678,
+            "max_ratio": 3.3174130726430415,
+            "median_ratio": 1.1079836807652317,
+            "runs": 480,
+            "top_run": "ECR1hdb7fbb4082d6",
+            "top_run_share": 0.005876878342708994
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.49693525215670725,
+          "alpha_ci95": [
+            0.4807433381228484,
+            0.5139182944506108
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.9147121840425788,
+                1.0276255613108378
+              ],
+              "known": true,
+              "value": 0.9690278481988096
+            },
+            "field_muls": {
+              "ci95": [
+                1.8360633366717056,
+                2.0508942092225615
+              ],
+              "known": true,
+              "value": 1.94375847687873
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.9177078235598386,
+                1.0294880609048314
+              ],
+              "known": true,
+              "value": 0.9709287750258456
+            },
+            "memory": {
+              "ci95": [
+                0.0007328363421041022,
+                0.002189478344033464
+              ],
+              "known": true,
+              "value": 0.001401368677780224
+            },
+            "ops": {
+              "ci95": [
+                1.135610619808883,
+                1.2713778315165132
+              ],
+              "known": true,
+              "value": 1.202617652942062
+            },
+            "uncharged": {
+              "ci95": [
+                0.9115934460375472,
+                1.0259020575952722
+              ],
+              "known": true,
+              "value": 0.967642968632459
+            }
+          },
+          "bound_id": "ECBND1h17bc6a73d40a",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.negation on generic prime-order curves, log2 r 32-49 (medium tier, reference)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.922840747855872,
+            "max_ratio": 3.3606818440711863,
+            "median_ratio": 1.1497998467882673,
+            "runs": 480,
+            "top_run": "ECR1hdc2b28573461",
+            "top_run_share": 0.005821817508959306
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.4996201741560616,
+          "alpha_ci95": [
+            0.4798592349758111,
+            0.5215074247868274
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.9188722259727784,
+                1.05095397542128
+              ],
+              "known": true,
+              "value": 0.9842311147297794
+            },
+            "field_muls": {
+              "ci95": [
+                1.8316764816214937,
+                2.1019122873151743
+              ],
+              "known": true,
+              "value": 1.968644128259664
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.9159206113379263,
+                1.052038457541551
+              ],
+              "known": true,
+              "value": 0.9842917476631496
+            },
+            "memory": {
+              "ci95": [
+                0.5000013910753237,
+                0.500007645543525
+              ],
+              "known": true,
+              "value": 0.5000042420657832
+            },
+            "ops": {
+              "ci95": [
+                1.135125564450757,
+                1.302988451545146
+              ],
+              "known": true,
+              "value": 1.2216401772362897
+            },
+            "uncharged": {
+              "ci95": [
+                0.916847982778616,
+                1.0500462180322263
+              ],
+              "known": true,
+              "value": 0.984158743022902
+            }
+          },
+          "bound_id": "ECBND1hcb948f2cbbc6",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "bsgs.negation on generic prime-order curves, log2 r 32-49 (medium tier)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "bsgs.negation",
+          "method_id": "ECM1h87f6341629c3",
+          "params": {},
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 1.5756598458190676,
+            "max_ratio": 1.8579208373877527,
+            "median_ratio": 1.1791382780475432,
+            "runs": 480,
+            "top_run": "ECR1hfa8bb924729e",
+            "top_run_share": 0.0031684193785940225
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.5060910306811314,
+          "alpha_ci95": [
+            0.48572858247881673,
+            0.5281898744623713
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                1.1884774866582908,
+                1.34877727163992
+              ],
+              "known": true,
+              "value": 1.2702866693034724
+            },
+            "field_muls": {
+              "ci95": [
+                2.389740919301524,
+                2.704296614093579
+              ],
+              "known": true,
+              "value": 2.5430045433004973
+            },
+            "field_sqrs": {
+              "ci95": [
+                1.192112021919311,
+                1.3499579712243184
+              ],
+              "known": true,
+              "value": 1.2710970708679905
+            },
+            "memory": {
+              "ci95": [
+                0.000982249681244402,
+                0.002913149926387891
+              ],
+              "known": true,
+              "value": 0.001867351970943444
+            },
+            "ops": {
+              "ci95": [
+                1.3427942655944825,
+                1.5222735265979752
+              ],
+              "known": true,
+              "value": 1.433365013881185
+            },
+            "uncharged": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            }
+          },
+          "bound_id": "ECBND1he10b9180919e",
+          "bounded": false,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.plain on generic prime-order curves, log2 r 32-49 (medium tier)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.plain",
+          "method_id": "ECM1hb367476fce6c",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 3.4210305187307437,
+            "max_ratio": 4.704404359938763,
+            "median_ratio": 1.3751424707208315,
+            "runs": 480,
+            "top_run": "ECR1hd2eb98422e7f",
+            "top_run_share": 0.006837645904305226
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
           ]
         }
       ]
@@ -7528,6 +8786,612 @@
             "runs": 48,
             "top_run": "ECR1he5af3bddf2c5",
             "top_run_share": 0.04701736221814726
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        }
+      ]
+    },
+    {
+      "axes": [
+        "ops",
+        "memory"
+      ],
+      "domain": {
+        "envelope": {
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae+band(w=1)"
+      },
+      "domain_id": "ECDOM1h94dcaaa9a5db",
+      "entries": [
+        {
+          "alpha": 0.4836136690490313,
+          "alpha_ci95": [
+            0.462599558579772,
+            0.5035325161556967
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                1.2339484442008883,
+                1.3946809699804186
+              ],
+              "known": true,
+              "value": 1.317648562000868
+            },
+            "field_muls": {
+              "ci95": [
+                2.471046890733877,
+                2.799672573858551
+              ],
+              "known": true,
+              "value": 2.637992899667267
+            },
+            "field_sqrs": {
+              "ci95": [
+                1.233047273345833,
+                1.3950893174881016
+              ],
+              "known": true,
+              "value": 1.3185471538893767
+            },
+            "memory": {
+              "ci95": [
+                0.0011781738818201022,
+                0.003445020823346427
+              ],
+              "known": true,
+              "value": 0.002224167986638517
+            },
+            "ops": {
+              "ci95": [
+                1.3919994464313543,
+                1.5772604962961947
+              ],
+              "known": true,
+              "value": 1.4868071869151396
+            },
+            "uncharged": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            }
+          },
+          "bound_id": "ECBND1h1d791f3ff0f0",
+          "bounded": false,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.plain on generic prime-order curves, log2 r 32-49 (medium tier, conditional-PC study 2026-11-09)-w1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.plain",
+          "method_id": "ECM1hb367476fce6c",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 432,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.9835364658064676,
+            "max_ratio": 4.165556017209548,
+            "median_ratio": 1.3961806952755222,
+            "runs": 432,
+            "top_run": "ECR1h39ea5f67fc13",
+            "top_run_share": 0.006485367346511232
+          }
+        },
+        {
+          "alpha": 0.5058842108096064,
+          "alpha_ci95": [
+            0.48289752776385025,
+            0.5299091546012523
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.8875614061040297,
+                1.001051656148962
+              ],
+              "known": true,
+              "value": 0.945602347377174
+            },
+            "field_muls": {
+              "ci95": [
+                1.7845048368170688,
+                2.0153527027856466
+              ],
+              "known": true,
+              "value": 1.897100110361639
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8902102981341855,
+                1.0045473804331748
+              ],
+              "known": true,
+              "value": 0.9475674859129368
+            },
+            "memory": {
+              "ci95": [
+                0.0007686332046338211,
+                0.002303092518806402
+              ],
+              "known": true,
+              "value": 0.001480111282736818
+            },
+            "ops": {
+              "ci95": [
+                1.997020452718437,
+                2.2665020861591647
+              ],
+              "known": true,
+              "value": 2.132261945329537
+            },
+            "uncharged": {
+              "ci95": [
+                0.8842462231226422,
+                1.0026242276939097
+              ],
+              "known": true,
+              "value": 0.9440656006921372
+            }
+          },
+          "bound_id": "ECBND1he5f5bb348f82",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on generic prime-order curves, log2 r 32-49 (medium tier, conditional-PC study 2026-11-09)-w1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 432,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 3.757573924234369,
+            "max_ratio": 7.634771192489322,
+            "median_ratio": 2.031835260312266,
+            "runs": 432,
+            "top_run": "ECR1hc80c33a1b076",
+            "top_run_share": 0.008288419489362658
+          }
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1he5f5bb348f82",
+      "ops_leader": "ECBND1h1d791f3ff0f0",
+      "unranked": [
+        {
+          "alpha": 0.5060910306811314,
+          "alpha_ci95": [
+            0.48572858247881673,
+            0.5281898744623713
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                1.1884774866582908,
+                1.34877727163992
+              ],
+              "known": true,
+              "value": 1.2702866693034724
+            },
+            "field_muls": {
+              "ci95": [
+                2.389740919301524,
+                2.704296614093579
+              ],
+              "known": true,
+              "value": 2.5430045433004973
+            },
+            "field_sqrs": {
+              "ci95": [
+                1.192112021919311,
+                1.3499579712243184
+              ],
+              "known": true,
+              "value": 1.2710970708679905
+            },
+            "memory": {
+              "ci95": [
+                0.000982249681244402,
+                0.002913149926387891
+              ],
+              "known": true,
+              "value": 0.001867351970943444
+            },
+            "ops": {
+              "ci95": [
+                1.3427942655944825,
+                1.5222735265979752
+              ],
+              "known": true,
+              "value": 1.433365013881185
+            },
+            "uncharged": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            }
+          },
+          "bound_id": "ECBND1hd98edefcdaa7",
+          "bounded": false,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.plain on generic prime-order curves, log2 r 32-49 (medium tier)-w1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.plain",
+          "method_id": "ECM1hb367476fce6c",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 3.4210305187307437,
+            "max_ratio": 4.704404359938763,
+            "median_ratio": 1.3751424707208315,
+            "runs": 480,
+            "top_run": "ECR1hd2eb98422e7f",
+            "top_run_share": 0.006837645904305226
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.4912066147566063,
+          "alpha_ci95": [
+            0.4673903409717704,
+            0.5194604426419821
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.888972748795993,
+                1.0052405594814968
+              ],
+              "known": true,
+              "value": 0.9473400660929808
+            },
+            "field_muls": {
+              "ci95": [
+                1.7858864340649458,
+                2.022796640577877
+              ],
+              "known": true,
+              "value": 1.9035611424267704
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8869597065710565,
+                1.0103678229288604
+              ],
+              "known": true,
+              "value": 0.9503004028399178
+            },
+            "memory": {
+              "ci95": [
+                0.0007172278282405926,
+                0.0021274373010038215
+              ],
+              "known": true,
+              "value": 0.0013896548140904523
+            },
+            "ops": {
+              "ci95": [
+                2.0075032099999284,
+                2.276787182220126
+              ],
+              "known": true,
+              "value": 2.139487071760322
+            },
+            "uncharged": {
+              "ci95": [
+                0.8877024305511965,
+                1.0101518845760822
+              ],
+              "known": true,
+              "value": 0.9487309835590918
+            }
+          },
+          "bound_id": "ECBND1hfefc9d7bd95f",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.negation_v2 on generic prime-order curves, log2 r 32-49 (medium tier)-w1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation_v2",
+          "method_id": "ECM1h0de59de796c1",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.996914503796996,
+            "max_ratio": 6.0394558208858955,
+            "median_ratio": 2.0152245962419335,
+            "runs": 480,
+            "top_run": "ECR1hdb7fbb4082d6",
+            "top_run_share": 0.005880942115949907
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.4971584555559724,
+          "alpha_ci95": [
+            0.48096830612921654,
+            0.5143127320968758
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.9147121840425788,
+                1.0276255613108378
+              ],
+              "known": true,
+              "value": 0.9690278481988096
+            },
+            "field_muls": {
+              "ci95": [
+                1.8360633366717056,
+                2.0508942092225615
+              ],
+              "known": true,
+              "value": 1.94375847687873
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.9177078235598386,
+                1.0294880609048314
+              ],
+              "known": true,
+              "value": 0.9709287750258456
+            },
+            "memory": {
+              "ci95": [
+                0.0007328363421041022,
+                0.002189478344033464
+              ],
+              "known": true,
+              "value": 0.001401368677780224
+            },
+            "ops": {
+              "ci95": [
+                2.0632036321661458,
+                2.3104058012830966
+              ],
+              "known": true,
+              "value": 2.1852990032342534
+            },
+            "uncharged": {
+              "ci95": [
+                0.9115934460375472,
+                1.0259020575952722
+              ],
+              "known": true,
+              "value": 0.967642968632459
+            }
+          },
+          "bound_id": "ECBND1he0081cbc999e",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "rho.negation on generic prime-order curves, log2 r 32-49 (medium tier, reference)-w1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 2.9257257664687293,
+            "max_ratio": 6.110012798936287,
+            "median_ratio": 2.0883750859230066,
+            "runs": 480,
+            "top_run": "ECR1hdc2b28573461",
+            "top_run_share": 0.005824920668649002
+          },
+          "unranked_reasons": [
+            "fitted on one tier of a session (--tier), not its full curve set"
+          ]
+        },
+        {
+          "alpha": 0.4996300930964019,
+          "alpha_ci95": [
+            0.47986697883568863,
+            0.5215169875197612
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.9188722259727784,
+                1.05095397542128
+              ],
+              "known": true,
+              "value": 0.9842311147297794
+            },
+            "field_muls": {
+              "ci95": [
+                1.8316764816214937,
+                2.1019122873151743
+              ],
+              "known": true,
+              "value": 1.968644128259664
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.9159206113379263,
+                1.052038457541551
+              ],
+              "known": true,
+              "value": 0.9842917476631496
+            },
+            "memory": {
+              "ci95": [
+                0.5000013910753237,
+                0.500007645543525
+              ],
+              "known": true,
+              "value": 0.5000042420657832
+            },
+            "ops": {
+              "ci95": [
+                2.0637349739761452,
+                2.3689562622162916
+              ],
+              "known": true,
+              "value": 2.221093977704042
+            },
+            "uncharged": {
+              "ci95": [
+                0.916847982778616,
+                1.0500462180322263
+              ],
+              "known": true,
+              "value": 0.984158743022902
+            }
+          },
+          "bound_id": "ECBND1h1616aa915bf9",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "fit_version": 2,
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "bsgs.negation on generic prime-order curves, log2 r 32-49 (medium tier)-w1",
+          "level": "exponent",
+          "log2_r": [
+            32.371831613099474,
+            32.741977288610805,
+            36.028560783732466,
+            36.434177685941705,
+            40.44378806074534,
+            40.81206278935506,
+            44.5276831332059,
+            44.6503287529072,
+            48.37827473499269,
+            48.995010217544866
+          ],
+          "method": "bsgs.negation",
+          "method_id": "ECM1h87f6341629c3",
+          "params": {},
+          "runs": 480,
+          "scaling_claim": true,
+          "tail": {
+            "large": false,
+            "max_over_median": 1.5757503598035834,
+            "max_ratio": 3.3780362450866126,
+            "median_ratio": 2.1437635879757524,
+            "runs": 480,
+            "top_run": "ECR1hfa8bb924729e",
+            "top_run_share": 0.003168517667979049
           },
           "unranked_reasons": [
             "fitted on one tier of a session (--tier), not its full curve set"
@@ -13742,7 +15606,7 @@
       ]
     }
   ],
-  "frontier_id": "ECFR1h52da363b1267",
+  "frontier_id": "ECFR1hc58e598ea9c4",
   "inadmissible": [
     {
       "bound_id": "ECBND1hd63ea1f18273",

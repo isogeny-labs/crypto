@@ -1,0 +1,28 @@
+{
+  "note": "Route map for research/ecdlp_subexp_ideas_20261110. Status values are this note's readings of recorded leads (see README sections); nothing here is a measurement.",
+  "lemma_a_families": [
+    {"family": "theta group / Heisenberg representation", "target": "linear (dim >= k)", "obstruction": "embedding degree (MOV)"},
+    {"family": "Hecke / modular spectra", "target": "linear or J0(M)", "obstruction": "cover route or mu_N"},
+    {"family": "Chow group / etale regulator", "target": "Alb(S) or H^1(F_p,E[N])", "obstruction": "sec. 2 / Kummer = MOV"},
+    {"family": "correspondences T in E x C", "target": "J(C)", "obstruction": "E | J(C): cost >= p"},
+    {"family": "class-group action on points", "target": "End(E) acts by integers", "obstruction": "known scalars"},
+    {"family": "point-count oracles V_{P,Q}", "target": "isogeny invariant", "obstruction": "graph of [k] has degree k^2"}
+  ],
+  "operations": [
+    {"op": "smoothness of integer lift", "status": "open lead", "lead": "ICP-char0-lifting-xedni-smoothness"},
+    {"op": "small roots (lattices)", "status": "closed (proof)", "lead": "ICP-coppersmith-smallroot-semaev"},
+    {"op": "continued fractions", "status": "closed (F4)", "lead": "ICP-coppersmith-smallroot-semaev"},
+    {"op": "digits / carries", "status": "open lead", "lead": "ICP-digit-presentation-solving-degree"},
+    {"op": "Hensel / p-adic", "status": "closed (proof)", "lead": "TRF-padic-canonical-section"},
+    {"op": "Frobenius on lift", "status": "closed (proof)", "lead": "TRF-padic-canonical-section"},
+    {"op": "CRT / several moduli", "status": "closed (F6)", "lead": "global lifting wall"},
+    {"op": "sum-product / additive energy", "status": "null measured", "lead": "ICP-coincidence-harvest-structured-base"},
+    {"op": "fast multipoint evaluation", "status": "closed (cost)", "lead": "program note 4.6"},
+    {"op": "sieving by congruence classes", "status": "unexamined", "lead": "Question C / probe P2"}
+  ],
+  "arity_frontier": [
+    {"m": 2, "oracle": "free S3", "total_B2": "p^(2/3)", "total_Bquasi": "p^(1/2)"},
+    {"m": 3, "oracle": "free S4", "total_B2": "p^(1/2)", "total_Bquasi": "p^(1/3)"},
+    {"m": 4, "oracle": "free S5", "total_B2": "p^(2/5)", "total_Bquasi": "p^(1/4)"}
+  ]
+}

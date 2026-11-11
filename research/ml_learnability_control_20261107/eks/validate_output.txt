@@ -1,0 +1,8 @@
+validator: run-command sha256 1cdaa7447893fd5c..., 22 jq lines
+VALID    requests/mllc-all-20261108.json
+VALID    requests/mllc-m12-m16-20261108.json
+VALID    requests/mllc-m20-20261108.json
+VALID    requests/mllc-m24-20261108.json
+--- negative control (must be INVALID)
+validator: run-command sha256 1cdaa7447893fd5c..., 22 jq lines
+INVALID  /tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpad/r2mllc_bad.json

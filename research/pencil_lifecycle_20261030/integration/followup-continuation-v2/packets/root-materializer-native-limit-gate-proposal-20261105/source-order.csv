@@ -1,0 +1,8 @@
+stage,operation,behavior,boundary
+inert admission,false review/null publication/null lease,reject before creating outputs,no runtime authorization
+owned durable receipt,existing mkdir + checkpoint,native status failed by default,preserve prior schema fields
+physical cgroup,existing 2CPU/4GiB/no swap/tasks512 checks,reject before limit gate,unchanged
+native observation,read /proc/self/limits; getrlimit AS and DATA,checkpoint raw text/hash and exact native values,no external PID race
+native policy,require both soft and hard RLIM_INFINITY for both,checkpoint qualified/rejected before child,finite/missing/unreadable means no child
+child commands,findmnt then pinned Git extraction,reachable after checkpointed qualified policy,no set/raise of inherited limits
+outer custody,existing exact owner and empty-cgroup procedure,still required,native limits alone do not establish terminal success
