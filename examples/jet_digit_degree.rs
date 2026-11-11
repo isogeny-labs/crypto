@@ -256,6 +256,15 @@ struct Curve {
     a: u64,
     b: u64,
     r: u64,
+    /// Lift offsets: the lifted curve has coefficients `a + la·p`, `b + lb·p`
+    /// (read mod p^k). `(0, 0)` is the trivial lift of the integers in [0, p).
+    la: u64,
+    lb: u64,
+}
+impl Curve {
+    fn lifted(&self) -> (u64, u64) {
+        (self.a + self.la * self.p, self.b + self.lb * self.p)
+    }
 }
 fn rhs(c: &Curve, x: u64) -> u64 {
     let (p, x) = (c.p as u128, x as u128);
@@ -269,9 +278,10 @@ fn pk(p: u64, k: u32) -> u128 {
 fn hensel_y(c: &Curve, k: u32, x: u64, y: u64) -> u128 {
     let m = pk(c.p, k);
     let xx = x as u128;
+    let (la, lb) = c.lifted();
     let f = addmod(
-        addmod(powmod(xx, 3, m), mulmod(c.a as u128, xx, m), m),
-        c.b as u128,
+        addmod(powmod(xx, 3, m), mulmod(la as u128 % m, xx, m), m),
+        lb as u128 % m,
         m,
     );
     let mut yy = y as u128;
@@ -295,7 +305,8 @@ fn section_scalar(c: &Curve, k: u32) -> u128 {
 
 /// `s_k(P)` for `P = (x, y)` in E(F_p), projectively mod p^k.
 fn section(c: &Curve, k: u32, x: u64, y: u64) -> Proj {
-    let ring = Ring::new(pk(c.p, k), c.a, c.b);
+    let (la, lb) = c.lifted();
+    let ring = Ring::new(pk(c.p, k), la, lb);
     let pt = Proj {
         x: x as u128,
         y: hensel_y(c, k, x, y),
@@ -317,7 +328,8 @@ struct Verify {
 /// Self-checks for one point; returns the normalised x-coordinate in [0, p^k).
 fn check_point(c: &Curve, k: u32, x: u64, y: u64, full: bool, v: &mut Verify) -> u128 {
     let m = pk(c.p, k);
-    let ring = Ring::new(m, c.a, c.b);
+    let (la, lb) = c.lifted();
+    let ring = Ring::new(m, la, lb);
     let s = section(c, k, x, y);
     assert_ne!(s.z % c.p as u128, 0, "Z not a unit");
     let (xt, yt) = ring.affine(s);
@@ -327,7 +339,7 @@ fn check_point(c: &Curve, k: u32, x: u64, y: u64, full: bool, v: &mut Verify) ->
     let lhs = mulmod(yt, yt, m);
     let r = addmod(
         addmod(powmod(xt, 3, m), mulmod(ring.a, xt, m), m),
-        c.b as u128 % m,
+        lb as u128 % m,
         m,
     );
     assert_eq!(lhs, r, "section point not on lifted curve");
@@ -344,7 +356,8 @@ fn check_point(c: &Curve, k: u32, x: u64, y: u64, full: bool, v: &mut Verify) ->
 /// Homomorphism check s(P)+s(Q) == s(P+Q) for random pairs from `pts`.
 fn check_hom(c: &Curve, k: u32, pts: &[(u64, u64)], pairs: usize, rng: &mut Rng, v: &mut Verify) {
     let m = pk(c.p, k);
-    let ring = Ring::new(m, c.a, c.b);
+    let (la, lb) = c.lifted();
+    let ring = Ring::new(m, la, lb);
     let ring1 = Ring::new(c.p as u128, c.a, c.b);
     let mut done = 0;
     while done < pairs {
@@ -561,11 +574,11 @@ fn probe(c: &Curve, t: u32, k: u32, g: u64, full: bool, rng: &mut Rng) -> Row {
     deg_json += &format!("\"random\":[{}]", rnd.join(","));
     let secs = t0.elapsed().as_secs_f64();
     let json = format!(
-        "{{\"p\":{},\"t\":{},\"k\":{},\"a\":{},\"b\":{},\"r\":{},\"g\":{},\"n_abscissae\":{},\"size_V\":{},\
-\"lift_note\":\"x_j depends on the integer lift (a,b) in [0,p)\",\"deg\":{{{}}},\"d_full\":{},\
+        "{{\"p\":{},\"t\":{},\"k\":{},\"a\":{},\"b\":{},\"lift_a\":{},\"lift_b\":{},\"r\":{},\"g\":{},\"n_abscissae\":{},\"size_V\":{},\
+\"lift_note\":\"lifted curve a+lift_a*p, b+lift_b*p\",\"deg\":{{{}}},\"d_full\":{},\
 \"verify\":{{\"points\":{},\"reduces\":{},\"on_curve\":{},\"order_r\":{},\"even\":{},\"hom_pairs\":{}}},\
 \"wall_seconds\":{:.3}}}",
-        p, t, k, c.a, c.b, c.r, g, n, 1u64 << t, deg_json, d_full,
+        p, t, k, c.a, c.b, c.la, c.lb, c.r, g, n, 1u64 << t, deg_json, d_full,
         ver.points, ver.reduces, ver.on_curve, ver.order_r, ver.even, ver.hom_pairs, secs
     );
     let summary =
@@ -587,7 +600,14 @@ fn find_curve(p: u64, rng: &mut Rng) -> Curve {
         }
         if let Some(r) = (PrimeCurve { p, a, b }).prime_order() {
             if r != p && r > 2 {
-                return Curve { p, a, b, r };
+                return Curve {
+                    p,
+                    a,
+                    b,
+                    r,
+                    la: 0,
+                    lb: 0,
+                };
             }
         }
     }
@@ -604,6 +624,8 @@ fn main() {
     let t: u32 = get("--t").map_or(6, |s| s.parse().unwrap());
     let k: u32 = get("--k").map_or(4, |s| s.parse().unwrap());
     let seed: u64 = get("--seed").map_or(1, |s| s.parse().unwrap());
+    let lift_a: u64 = get("--lift-a").map_or(0, |s| s.parse().unwrap());
+    let lift_b: u64 = get("--lift-b").map_or(0, |s| s.parse().unwrap());
     let ncurves: usize = get("--curves").map_or(1, |s| s.parse().unwrap());
     let verify = args.iter().any(|a| a == "--verify");
     assert!(
@@ -619,12 +641,21 @@ fn main() {
             let r = (PrimeCurve { p, a, b })
                 .prime_order()
                 .expect("curve order is not prime");
-            Some(Curve { p, a, b, r })
+            Some(Curve {
+                p,
+                a,
+                b,
+                r,
+                la: 0,
+                lb: 0,
+            })
         }
         _ => None,
     };
     for _ in 0..ncurves {
-        let c = fixed.unwrap_or_else(|| find_curve(p, &mut rng));
+        let mut c = fixed.unwrap_or_else(|| find_curve(p, &mut rng));
+        c.la = lift_a;
+        c.lb = lift_b;
         let g = 1 + Rng::below(&mut rng, p - 1);
         let row = probe(&c, t, k, g, verify, &mut rng);
         println!("{}", row.summary);

@@ -97,6 +97,20 @@ pre-registered recipe are recorded below).
 
 (identical on all three curves at each `t`.)
 
+**Widened after the hook's objection (same instrument, `rows/ext_*.jsonl`, `--verify` on every row):**
+
+| set | cells | `x₁`, `x₂`, `x₃` | random | `d_full` |
+|:--|--:|:--|:--|--:|
+| `p = 40961`, `t = 12`, 3 curves (`n ≈ 2,000`) | 3 | 6, 6, 6 | 6, 6, 6 | 6 |
+| `p = 40961`, `t = 10`, 10 further curves (seed 7) | 10 | 5, 5, 5 | 5, 5, 5 | 5 |
+| `p = 40961`, `t = 10`, 3 curves, lifts `(a + p, b)`, `(a, b + p)`, `(a + 3p, b + 7p)`, `(a + 17p, b + 5p)` | 12 | 5, 5, 5 | 5, 5, 5 | 5 |
+| `p = 12289` (`3·2¹² + 1`), `t = 10` and `t = 12`, 3 curves each | 6 | 5 / 6 | 5 / 6 | 5 / 6 |
+
+In all 40 cells (9 original + 31 widened; 16 distinct curves, two primes, five lifts, `t` up to 12,
+i.e. `N = 2t` up to 24 unknown bits at `m = 2`) every digit reads the generic degree and never below
+it. The lift dependence stated as a caveat in §3 does not show at this scale: four non-trivial lifts
+give the same reading on the same curves.
+
 **Reading.**
 
 - **P-J2 holds: the digits are generic.** On every one of the nine cells, `x₁`, `x₂` and `x₃` need
@@ -114,9 +128,12 @@ pre-registered recipe are recorded below).
   subset `A` (about half of `V`) every function, that one included, is representable by degree
   `d_full`; the popcount-`t` monomial is only distinguishable on the whole coset `V`. The random
   draws read `d_full` too, which is the generic value stated in §2.
-- **What it does not establish.** Toy prime (16 bits), three curves, the trivial lift of `(a, b)`;
-  a structured lift (canonical lift, small-height CM) and the Dickson and isogeny towers are
-  untested. It says nothing about the discrete-log channel, which the atlas already closes.
+- **What it does not establish.** Primes of 14 and 16 bits, `t ≤ 12`, 16 curves, five integer lifts
+  of `(a, b)`; the Serre–Tate canonical lift, small-height CM lifts, and the Dickson and isogeny
+  towers are untested. The test is one-sided (nothing on `A` can need more than `d_full`). The
+  filter's `Θ(N)` is its *requirement*, not a measured asymptotic: what is measured is that the
+  digit degree tracks `d_full ≈ t/2` from `t = 6` to `t = 12` with no sign of saturating. It says
+  nothing about the discrete-log channel, which the atlas already closes.
 
 **Recipe corrections made by the implementing agent, checked by the main session.** (1) The
 section scalar: `u = p^{k−1}·(p^{−(k−1)} mod r)` (`u ≡ 0 mod p^{k−1}`, `u ≡ 1 mod r`); the
@@ -126,7 +143,11 @@ lift, and the homomorphism check replaces the recompute-with-another-lift check.
 
 ## 5. Consequence for the filter
 
-All three bigger-ring exits are now closed at the level this note can test: `F_{p^k}` by cost
+Atlas dispositions, re-read from the YAML on 2026-11-11 (`ATLAS_DELTA.md`): `extension-field-embedding`
+`open_next_step` (cost-model obstruction), `padic-jet-canonical-lift` `open_next_step` (proof-level
+obstruction, as a logarithm channel), `padic-canonical-section` `closed_obstructed`; none of them
+asked the equation-source question. At the level this note can test, all three bigger-ring exits
+are closed: `F_{p^k}` by cost
 (Gaudry), dual numbers by the splitting of §1 (new `F_p` unknowns), and `Z/p^k` by the digit degree of
 §4 (equations at degree about `t/2`). The filter stands with no known passer. What would reopen the
 `Z/p^k` route is a lift of `E` whose torsion-section digits have bounded popcount degree on some

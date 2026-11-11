@@ -364,9 +364,14 @@ What would change this list: an equation source that passes the filter of §4. N
 known to this note. The three exits in §4 item 2 were the places to look; on 2026-11-11 the
 jet and `Z/p^k` exits were derived and measured against the filter (`jet_exit/README.md`): dual
 numbers add only free `F_p` unknowns, and the torsion section's `p`-adic digits are generic on
-Kummer bases (popcount degree about `t/2`, equal to random, on nine curve-tower cells), so its
-extra equations enter at a degree that grows with the unknown bits. All three exits are closed at
-toy scale; the instrument tests any other lift in seconds.
+Kummer bases (popcount degree equal to random and to the full-rank degree, 3 to 6 for `t = 6` to
+12, on 40 cells over 16 curves, two primes and five integer lifts), so its extra equations enter at
+a degree that grows with the unknown bits. The atlas dispositions re-read from the YAML are
+`open_next_step` (extension embedding; jet lead, as a logarithm channel) and `closed_obstructed`
+(canonical section); the delta that records the equation-source result is `jet_exit/ATLAS_DELTA.patch`
+(this session cannot push to the atlas repository). All three exits are closed at toy scale
+(`t ≤ 12`, 14- and 16-bit primes; the filter's `Θ(N)` is a requirement, not a measured asymptotic);
+the instrument tests any other lift in seconds.
 
 ## 8. What this note does not claim
 
