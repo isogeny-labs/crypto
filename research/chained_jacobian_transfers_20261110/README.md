@@ -62,3 +62,11 @@ separate root arithmetic replay. Genus13 recovery is restricted to the exact
 pullback image. No computational advantage or prime-field descent is claimed.
 The active queue now moves to balanced even-sextic arithmetic, then possible
 Frobenius-stable non-split Richelot kernels. [pcc:unverified]
+
+The [balanced prototype checkpoint](BALANCED_CHECKPOINT.md) now supplies the
+bounded prime5..101 monic split-sextic representation and quadratic induced
+maps. Original and translated10,404-class controls match the existing engine;
+E109 transfers without rational Weierstrass points. Latest consumer suite
+passes native25/reference37 tests(1 old benchmark ignored). The production
+backend/catalog gap remains open; CT13 next assesses actual non-split kernel
+descent. No cost or cross-prime result. [pcc:unverified]

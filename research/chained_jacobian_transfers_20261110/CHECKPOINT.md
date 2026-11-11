@@ -1,4 +1,4 @@
-# Resume checkpoint — cubic arbitrary-class norm
+# Resume checkpoint — cubic norms and balanced genus2
 
 Read `QUEUE.md`, the latest dated session-log entries and actual Git status
 before extending code. Do not repeat completed work solely because a prior
@@ -13,6 +13,10 @@ session ended. Claims remain unsigned/unverified. [pcc:unverified]
 - Cryptanalysis cubic source commitf91a5e061ca5cfd777688afb65ab6972306618d1,
   branch `research/chained-transfer-cubic-norm-20261111`.
   Its base is merged PR1474,852a464a7310d733a472e4550e1fe4070614c538.
+- Latest balanced source28ba661017cdba4b132c2dcbc1615a3fd92a2a48,
+  branch `research/chained-transfer-balanced-genus2-20261111`, based on
+  merged cubic PR1475,04fb06c27274990b8cadac7c356c6a2e40dc90b7.
+  BALANCED_CHECKPOINT.md pins source digests, proof scope and producer PDF.
 - `cubic-checkpoint.json` pins the producer, independent replay and witness
   digest. Earlier native/reference source pins and all raw receipts remain.
 - Crypto-autoresearcher8edec422a60d87b2cbc656fb02f99f42eba959c7 is vault
@@ -29,6 +33,14 @@ session ended. Claims remain unsigned/unverified. [pcc:unverified]
   12-declaration gate passes. They do not formalize Picard/finite-field geometry.
 - Consumer three-page and crypto two-page cubic PDFs were rebuilt and every
   page visually inspected. No overflow or clipped content observed.
+- Latest complete balanced replay: native25/reference37 tests, strict Clippy,
+  formatting and source guards; producer balanced-pinned-01.txt/PCC8b7ca0.
+  Both10,404-class old/translated controls match the existing engine;
+  E109/F101 source scalar/norm[2]/inverse55 controls and all11,663 paired norm
+  additions pass. Its separate two-page PDF was rebuilt and inspected.
+- Six balanced Lean bookkeeping/expansion lemmas pass6-declaration gate and
+  local PCC check1cadd0. Signed standing remains unverified; actual geometry
+  is primary-source input. Total35 written lemmas, gates22+8+7+12+6.
 - Focused GitHub run42999610365 succeeds on exactdf2b78a2, merged PR1474.
   Broad C++ analysis jobs later failed; this is not an all-CI-green verdict.
   [pcc:unverified]
@@ -50,20 +62,25 @@ cargo test --release --example chained_cubic_norm_reference
 tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/CubicPullback.lean
 ```
 
-## Next unblocked task: CT12, then CT13
+## Next unblocked task: CT13
 
-Implement bounded balanced genus2 arithmetic on monic even sextics, using
-degree2 effective representatives relative to K=∞++∞−. Derive and validate
-finite support plus infinity counts; do not reuse odd-degree reduction as if
-there were one infinity. Compare every10404 old-fixture class/addition/inverse
-with the pre-existing odd-chart engine before using E109 without rational
-Weierstrass points. Preserve failures and narrow catalog-wide claims.
+CT12's bounded balanced arithmetic and full old-chart controls are complete;
+reuse their receipts when inputs match. Production/catalog integration remains
+CT14, with large-prime/extension/normalization boundaries still unsupported.
 
-Only after that, assess a Frobenius-stable unordered Richelot splitting.
-The individually-rational-factor obstruction does not exclude it. The
-predeclared E19/F17 source y²=x³+2x+2 has a potential(3,3) factor route;
-prove its factor/orbit/descent claims and implement an actual correspondence
-before calling it a transfer. No kernel exclusion is already established.
+Assess a Frobenius-stable unordered Richelot splitting. The
+individually-rational-factor obstruction does not exclude it. Use the
+predeclared E19/F17 source y²=x³+2x+2 and quadratic sextic. Validate its cubic
+residue field and square roots, enumerate all Frobenius-stable pairings,
+preserve every degenerate determinant, compute normalized descended targets
+and audit curve/model equivalences. No target or transfer is already accepted.
+Then implement an actual correspondence on the balanced classes and check
+descent, additivity, odd-subgroup preservation and both dual norms before
+calling it an operational transfer. [pcc:unverified]
+
+The E109 sextic may supply a contrasting Frobenius-cycle control, but no
+universal kernel exclusion has been established. Keep mathematical target
+construction distinct from an implemented map or a measured solving advantage.
 [pcc:unverified]
 
 ## Continuing constraints

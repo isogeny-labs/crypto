@@ -100,3 +100,21 @@ Next CT12 supplies balanced genus2 arithmetic; CT13 then assesses actual
 non-split descent. Do not assign a new atlas lead or performance edge before
 the configured vault/KB and independent verification become available.
 [pcc:unverified]
+
+## Balanced genus2 continuation
+
+Cryptanalysis28ba661017cdba4b132c2dcbc1615a3fd92a2a48 now implements the
+bounded monic split-sextic representation at checked primes5..101. Both
+10,404-class original/translated controls match existing arithmetic;
+E109/F101 transfers without rational Weierstrass points, with arbitrary-class
+norm image109/equal107 fibers on11,663 classes. Full native25/reference37
+guard passes,1 old benchmark ignored. Producer PCC8b7ca0 and crypto six-lemma
+PCC1cadd0 remain unsigned. BALANCED_CHECKPOINT.md links source, diagram and
+inspected PDF. [pcc:unverified]
+
+The production backend and1,940-row catalog remain unchanged; CT14 covers
+large primes, extension fields, normalizations and replay. CT13 now assesses
+actual Frobenius-stable non-split kernels/codomains/maps on E19/F17. No
+non-split correspondence, cost gain or cross-prime descent is supplied by
+this checkpoint. Atlas/KB/vault and benchmark gates remain unchanged.
+[pcc:unverified]
