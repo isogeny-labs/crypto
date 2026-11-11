@@ -48,12 +48,32 @@ integer relation. Under the negation map that becomes a short fruitless
 cycle: cycles and escapes rise 15× and the walk runs 3.7× longer. The v5
 table refuses every three-term relation among its jumps before spending
 an operation (`c = x ± y`, `c = y − x`, `c = 2x`, `2c = x`), and it uses
-k ≈ √F jumps instead of 4–16. Its walk is at 1.00 the floor and records
-no cycle.
+k ≈ √F jumps instead of 4–16. Its walk comes to 0.88 √r, and cycles are
+rare: 270 of its 1,152 runs escaped one, with a mean of 0.0004 √r
+doublings, about 100× fewer than chained's 0.045 √r. The 0.000 in the
+table above is that value rounded.
 
 This agrees in direction with the chained method's own study, which
 found 1.532× rho.negation at 20 bits and 2.738× at 24 bits and rejected
 it. Here the ratio is 3.25× pooled, and 8.2× theory at 2^28.
+
+## Validation
+
+An independent validator (`validation/`) recomputed every pooled ratio
+and band value to within rounding (v5 / chained 0.255689, chained /
+rho.negation 3.247918), and every mechanism mean (walk 3.70798 /
+0.88383 / 1.00899). It re-checked [d]G = Q and recovered = planted on
+all 6,720 records. It corrected one sentence of the first version of
+this report, which said v5 "records no cycle" (see above).
+
+It also found the band asymmetric. chained and rho.negation do not
+declare their distinguished-point table probes as unpriced work, while
+v5 and v6 do. Charging every arm's table work at 1 GAE gives v5 / chained
+0.258–0.260 (instead of 0.261) and chained / rho.negation 3.38–3.40
+(instead of 3.42). No ranking changes at any weight. Per curve,
+chained / rho.negation rises from 1.75 at 2^17.7 to 7.62 at 2^28. The
+producer's replay ran on the same host class, so it is not a cross-host
+replay.
 
 ## Run
 
