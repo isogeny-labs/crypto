@@ -1116,6 +1116,10 @@ pub struct PairTable {
     /// `(x_canonical, j, k_with_sign)`; the top bit of the third field
     /// is set for a difference `F_j − F_k`.
     entries: Vec<(u64, u32, u32)>,
+    /// Bucket index over the high bits of x: bucket `b` holds `entries[starts[b]..starts[b + 1]]`,
+    /// the buckets are monotone in x, so `entries` is sorted by x as a whole.
+    starts: Vec<u32>,
+    shift: u32,
 }
 
 const PAIR_DIFF_BIT: u32 = 1 << 31;
@@ -1150,7 +1154,32 @@ impl PairTable {
         }
         let add_ms = t_build.elapsed().as_secs_f64() * 1e3;
         let t_sort = Instant::now();
-        entries.sort_unstable();
+        // Counting sort over the high bits of x (monotone buckets), then a tiny sort inside each bucket.
+        let bits_p = 64 - (f.p.max(2) - 1).leading_zeros();
+        let target_bits = (usize::BITS - 1 - (entries.len().max(32) / 2).leading_zeros()).max(4);
+        let shift = bits_p.saturating_sub(target_bits);
+        let nb = (((f.p.max(2) - 1) >> shift) + 1) as usize;
+        let mut starts = vec![0u32; nb + 1];
+        for e in &entries {
+            starts[((e.0 >> shift) as usize) + 1] += 1;
+        }
+        for i in 0..nb {
+            starts[i + 1] += starts[i];
+        }
+        let mut cursor: Vec<u32> = starts[..nb].to_vec();
+        let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); entries.len()];
+        for e in &entries {
+            let b = (e.0 >> shift) as usize;
+            sorted[cursor[b] as usize] = *e;
+            cursor[b] += 1;
+        }
+        for b in 0..nb {
+            let (lo, hi) = (starts[b] as usize, starts[b + 1] as usize);
+            if hi - lo > 1 {
+                sorted[lo..hi].sort_unstable();
+            }
+        }
+        let entries = sorted;
         if std::env::var_os("IC_MULTI_TIMING").is_some() {
             eprintln!(
                 "pair table: {} entries, adds {:.1} ms, sort {:.1} ms",
@@ -1159,7 +1188,11 @@ impl PairTable {
                 t_sort.elapsed().as_secs_f64() * 1e3
             );
         }
-        PairTable { entries }
+        PairTable {
+            entries,
+            starts,
+            shift,
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -1173,12 +1206,18 @@ impl PairTable {
     /// All `(j, k, sigma)` with `x(F_j + sigma·F_k) == x`.
     #[inline]
     pub fn lookup(&self, x: u64) -> &[(u64, u32, u32)] {
-        let lo = self.entries.partition_point(|e| e.0 < x);
+        let b = (x >> self.shift) as usize;
+        if b + 1 >= self.starts.len() {
+            return &[];
+        }
+        let (blo, bhi) = (self.starts[b] as usize, self.starts[b + 1] as usize);
+        let bucket = &self.entries[blo..bhi];
+        let lo = bucket.partition_point(|e| e.0 < x);
         let mut hi = lo;
-        while hi < self.entries.len() && self.entries[hi].0 == x {
+        while hi < bucket.len() && bucket[hi].0 == x {
             hi += 1;
         }
-        &self.entries[lo..hi]
+        &bucket[lo..hi]
     }
 }
 
