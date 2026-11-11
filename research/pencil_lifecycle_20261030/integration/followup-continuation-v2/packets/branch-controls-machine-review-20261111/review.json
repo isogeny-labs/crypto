@@ -1,0 +1,111 @@
+{
+  "campaign_accounting": {
+    "campaign_ceiling_seconds": 129600,
+    "conservative_charge_seconds": 600,
+    "new_total_charged_seconds": 1200,
+    "note": "The bound pre-launch ledger still labels this attempt reserved; campaign status update belongs to the coordinator, not this review.",
+    "prior_charged_seconds": 600,
+    "remaining_seconds": 128400
+  },
+  "created_utc": "2026-11-11T00:22:00Z",
+  "execution_performed_by_reviewer": false,
+  "findings": [],
+  "machine_outcome": {
+    "all_named_readbacks_match": true,
+    "allowed_axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "calls": [
+      {
+        "exit": 0,
+        "expected_exit": 0,
+        "module": "BranchRootMultiplicity",
+        "reaped": true
+      },
+      {
+        "exit": 0,
+        "expected_exit": 0,
+        "module": "BranchCoefficientMultiplicity",
+        "reaped": true
+      },
+      {
+        "exit": 0,
+        "expected_exit": 0,
+        "module": "IndependentControls",
+        "reaped": true
+      },
+      {
+        "exit": 0,
+        "expected_exit": 0,
+        "module": "Readback",
+        "reaped": true
+      },
+      {
+        "exit": 1,
+        "expected_exit": 1,
+        "module": "ExpectedFailure",
+        "reaped": true
+      }
+    ],
+    "compiled_positive_modules": 4,
+    "compiler_phase_dependency_bytes_checked": 0,
+    "compiler_phase_dependency_files_checked": 0,
+    "completion_status": "passed",
+    "expected_negative_modules": 1,
+    "full_dependency_bytes_pre_and_post": 3111892318,
+    "full_dependency_files_pre_and_post": 16736,
+    "full_dependency_maps_equal": true,
+    "named_axiom_readbacks": 13,
+    "phase_results": [
+      {
+        "elapsed_seconds": 55.443576349993236,
+        "passed": true,
+        "phase": "pre",
+        "terminal_owner_confirmed": true
+      },
+      {
+        "elapsed_seconds": 185.60343303100672,
+        "passed": true,
+        "phase": "compiler",
+        "terminal_owner_confirmed": true
+      },
+      {
+        "elapsed_seconds": 46.03922345099272,
+        "passed": true,
+        "phase": "post",
+        "terminal_owner_confirmed": true
+      }
+    ],
+    "retained_import_maps_equal": true,
+    "runtime_maps_equal": true,
+    "worker_wall_seconds": 287.1954594349954
+  },
+  "recommendation": "Accept the machine receipts for the exact frozen theorem/control scope and preserve the stated semantic and custody boundaries.",
+  "reviewer": "/root/ci_audit",
+  "schema": "pencil.branch-controls-machine-review/v1",
+  "semantic_scope": {
+    "kernel_checked": "The five frozen Lean inputs behaved as declared: four elaborated successfully; the false wrong-branch example failed with an unsolved False goal; 13 named declarations reported only the allowed axioms.",
+    "not_established": [
+      "No independent binary kernel rechecker was used.",
+      "This machine audit does not rederive the mathematical bridge from the broader genus-2 collector or certify claims outside the frozen theorem statements.",
+      "The compiler receipt itself checked zero dependency files; dependency custody comes from the distinct complete pre/post hash phases.",
+      "Pinned shared caches do not exclude transient concurrent changes between the pre and post observations, although the full maps are equal at both observations."
+    ],
+    "theorem_statement": "For a field, simple branch root, separable quintic, nonzero determinant, two support divisibilities and support vanishing, the source-specific support polynomials are nonzero and their three root multiplicities sum to one. The rational control instantiates these hypotheses and two negative controls."
+  },
+  "source": {
+    "freeze_sha256": "d20691095b0e6f932a5f34f9107e09c56629b57da85ea94dea35c007d87f3a40",
+    "module_sha256": {
+      "BranchCoefficientMultiplicity": "4e8cfd2ff984359b4fbd92e8fd0432db04b82e08fd19223eb5dac9d718995b76",
+      "BranchRootMultiplicity": "4ef1d87d4ce5f46fd8d6f4a4217f83fb674d2976ec7a45b46488adaaba143aa7",
+      "ExpectedFailure": "3152eb16a277c4c97276a3eb2e9ed999a2b76ae75e1be3458af7cd68e9f0ea6d",
+      "IndependentControls": "e60abe6d8b092ce4ed64078cb57bbc854a1b662bcd818b78641d34ff47f638b9",
+      "Readback": "51e6146d6efea84ceb03a501acb40b6c4e83e7d09dbac30cd5a746d0362b014c"
+    },
+    "published_revision": "d6365d5265bb24a3ffffa1560a13a66d04c1741a",
+    "release_sha256": "bcbe1b0b3a1da832b45e3d1fed9dabfc6c8d8fe2afdc8c60b4be9fb1c054bdfe"
+  },
+  "status": "machine_evidence_passed_scoped"
+}
