@@ -198,3 +198,28 @@ rational odd-prime maximal-isotropic kernels at3/5,prospective7 control.
 No kernel/codomain/map pre-accepted. Atlas still locked,no plaintext/new
 invented lead ID. Root S3 gate rechecked after exact-format resume update;
 transport still unavailable,so no benchmark/paid allocation. [pcc:unverified]
+
+## Odd-prime module assessment and separately authored branch audit
+
+Producer75e5064d1d089b917b068e7ca15b124ec0bcae37,ready PR1482;focused
+43030710539 runs native25/reference50-unit-plus1-integration,one old ignored
+benchmark. Negatives:rational maximal-isotropic3/5 bothp,7 p17;101ell7
+has4 abstract candidates. Written coprime/irreducible-block argument does
+not assume repeated Jordan type. Complete finite RREF/pairing-ratio controls
+and six Lean algebra/root certificates pass,total68. ODD_KERNEL_CHECKPOINT.md
+binds source/report/inspectedPDF/primary Milne review. [pcc:unverified]
+
+Closed cryptoPR3918 source3a972adb7 separately authored Rust polynomial
+oracle is preserved verbatim,compiled unchanged and passes;formatting-only
+integration passes Cargo/Clippy without new producer arithmetic imports.
+Confirms bounded branch/factorization/Frobenius data,not whole Jacobian maps
+or signed standing. PCCed9aff/source/hash/custody retained,no alternate
+ledger imported. Prior1481 mergedee3f177b4,exact-head43026964101 passes49.
+[pcc:unverified]
+
+CT19_PLAN.md reuses existing isogeny_algos division-polynomial/Kohel/FpR/
+genus2 gluing and separate isogeny_walk verifier. First actual degree7
+elliptic maps/duals with exact cleared identities/all109/113 controls,then
+compatible genuine Jacobian7-hop with global kernel/factor/dual proof.
+No new map/benefit accepted yet. CRT scalar projector extras remain unexecuted.
+Vault/KB blocked,no plaintext/new lead ID or benchmark. [pcc:unverified]

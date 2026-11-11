@@ -1,4 +1,4 @@
-# Resume checkpoint — full split-quotient coordinates
+# Resume checkpoint — odd-kernel assessment and independent oracle
 
 Inspect actual heads/uncommitted diffs first. Read QUEUE.md and the latest
 session-log entries. Reuse immutable passing receipts when inputs match;
@@ -7,8 +7,8 @@ do not repeat completed baseline work. All standing unsigned. [pcc:unverified]
 ## Durable sources and completed checks
 
 - Crypto branch research/chained-jacobian-transfer-20261110, PR3877;
-  last published8ef9baecf6a4288cb0eb0596af26187d30ff04a8 before this pending
-  split-quotient checkpoint. Read actual HEAD. Native runtime pin75a737b8 and all
+  last published97e32aadc7b26392832310a9d7f95b3f346e9c90 before this pending
+  odd-kernel checkpoint. Read actual HEAD. Native runtime pin75a737b8 and all
   seven small-prime-inputs.sha256 inputs remain unchanged.
 - Shifted producer cryptanalysis767c945a0a832c4f9d2827add8aefce3a16d2371,
   ready PR1479, branch research/chained-transfer-shifted109-20261111. Base
@@ -60,8 +60,8 @@ TARGET_FROBENIUS_CHECKPOINT.md binds producer/report/inspected2-pagePDF.
 [pcc:unverified]
 
 CT17 producerda66ab9d953d2ba96c4ac9d6e8379c3478b3f277,ready PR1481,
-branch research/chained-transfer-split-quotients-20261111. Full49-test focused
-43026964101 running; hold auto-merge until exact-head pass/actual requirements.
+branch research/chained-transfer-split-quotients-20261111. Exact-head43026964101 passes native25/reference49,one old benchmark ignored;
+PR1481 mergedee3f177b4 at13:21:37Z. Raw log/PCCf2de08 retained upstream.
 All285/12317 reciprocal inverses/bijections/paired additions,both norm additions,
 cross0,sum pull/norms[2],odd reconstruction pass(PCC036d81). Zero-support
 multiplicities0/1/2 and both old infinities completed. All19/109 source
@@ -74,14 +74,39 @@ Rational-group isomorphisms do not assert abelian-variety product isomorphism.
 No solver,measured benefit or independently signed geometric verdict.
 [pcc:unverified]
 
-CT18 next assesses rational odd-prime maximal-isotropic kernels. Fixed
-elliptic quotient traces:p17(−1,3),p101(−7,−11). Read primary Weil-pairing/
-Frobenius input,freeze ell3/5 and prospective7 acceptance,then implement
-bounded symplectic-plane/coprime-characteristic-factor checks. Do not infer
-actual geometry from an unchecked companion model when repeated eigenvalues
-occur. Preserve negatives and require actual codomain/maps/duals/source
-subgroup and cost controls for any accepted candidate. No odd-prime map
-pre-accepted. CT14 production/catalog/large fields remains open.
+CT18 producer75e5064d1d089b917b068e7ca15b124ec0bcae37,ready PR1482,
+branch research/chained-transfer-odd-kernels-20261111. Focused43030710539
+runs native25/reference50-unit-plus1-integration,one old benchmark ignored;
+hold auto-merge until actual success/required checks. Module assessment:
+no rational maximal-isotropic3/5 kernels both17/101,nor7 at17;101ell7
+has4 abstract candidates. Written coprime/irreducible argument avoids
+assuming repeated-eigenvalue Jordan type. Complete finite RREF/isotropic/
+pairing-ratio controls pass,PCC034bed/afecb5. Six OddKernelProjectors.lean
+lemmas gate6/localPCC8b67e3 pass,total68,gates22+8+7+12+6+5+7+4+7+7+6.
+ODD_KERNEL_CHECKPOINT.md binds source/report/inspected PDF/primary Milne review.
+[pcc:unverified]
+
+Separately authored closedPR3918 oracle/source3a972adb7 was reviewed and
+compiled unchanged underRust1.99.1;passes. Formatting-only consumer integration
+also passes Cargo/Clippy. No producer field/Richelot/Cantor imports;independent
+polynomial-quotient/Rabin/Frobenius checks confirm both source cubic factors,
+both reflected targets and matching/2-torsion fixed counts at degrees1/2/3/6.
+Original SHA256284e4d72af09fa0729bfa14a7c06249ce8fe78cb6194f01cc0008bf63ab2b04a,
+PCCed9aff/source custody retained. No closed PR reopened/frozen ledger imported;
+not a whole-map or signed scientific verdict. Extra CRT projector controls
+are queued CT17a,not executed. [pcc:unverified]
+
+CT19 now constructs fixed101 degree7 elliptic maps/duals using unchanged
+isogeny_algos machinery,not new kernel algorithms. Read CT19_PLAN.md:
+actual kernel polynomials,exact cleared curve identity,both global rational
+x-compositions[7],all109/113 point/scalar/addition/recovery checks and
+separate isogeny_walk kernel/polynomial verifier. If consumer adds crate,
+freeze a separate existing-source manifest/pin/CI checkout closure;do not
+mix it with seven native runtime inputs75a737b8. CT20 then uses existing
+FpR/genus2::glue with compatible image2-torsion to construct a genuine
+Jacobian7-hop. Prove full2-torsion kernel inclusion/factor[2],not just
+rational halving;validate chart/twist/descent/codomain/duals/full109 before
+acceptance. No odd-prime map or computational gain pre-accepted.
 [pcc:unverified]
 
 Updated tracked .resume/RESUME.md satisfies exact gate headings. Fresh gate
@@ -98,7 +123,7 @@ export PATH="$HOME/.cargo/bin:$HOME/.elan/bin:$PATH"
 experiments/chained-transfer-reference/check.sh
 # crypto:
 cargo test --release --bin icprog chained_ -- --nocapture
-tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean
+tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/OddKernelProjectors.lean
 ```
 
 ## Continuing constraints

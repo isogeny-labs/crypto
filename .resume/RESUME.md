@@ -1,87 +1,76 @@
-# Chained ECDLP Transfers — exact resume 2026-11-11T13:11Z
+# Chained ECDLP Transfers — resume2026-11-11T13:40Z
 
 ## Goal
-Continue user-authorized autonomous research across crypto,cryptanalysis,
-crypto-autoresearcher,starting from cryptoPR3877. Prioritize genuine DLP-
-preserving maps,Jacobian chains,prime-field descent and actual solver costs.
-Canonical durable queue: research/chained_jacobian_transfers_20261110/QUEUE.md
-and GitHub isogeny-labs/crypto issue3904. Read actual HEAD/diffs first.
+Continue user-authorized autonomous project across crypto,cryptanalysis,
+crypto-autoresearcher,starting cryptoPR3877. Persistent GitHubqueue3904 and
+study QUEUE.md/CHECKPOINT.md are canonical;inspect actual heads/diffs first.
+Prioritize genuine DLP-preserving chains,prime-field maps and actual costs.
 
 ## Lead / hypothesis
-CT17 implements both elliptic quotient maps on accepted odd bielliptic
-Jacobian rational groups. Sources:p17 coefficients[2,0,2,0,0,0,1],order285;
-p101 shifted109[56,0,13,0,6,0,1],order12317. Quotient orders19/15,109/113.
-Reciprocal T=s/x,Y=b*y/x³,b=s² gives second monic elliptic cubic
-[b²,a2*b,a4,1]. Both full class tests and source subgroup coordinates
-([4]P,0) pass; this is unsigned correctness,no solver/advantage.
-CT16 found target6-cycles,only previous-dual stable Richelot kernel and
-Fp3-two-torsion16/4,obstructing unpolarizedFp-Jacobian isomorphism using
-written standard geometry. Forced backtrack retained. Next CT18 assesses
-rational odd-prime maximal-isotropic kernels without pre-accepting a map.
+CT18 closes rational maximal-isotropic3/5 kernels both17/101,also7 at17;
+101ell7 has4 abstract candidates,not an actual map. CT19 now constructs
+fixed101 rational7-isogenies on elliptic factors109/113 using existing
+isogeny_algos engines. CT20 then builds compatible genuine Jacobian7-hop,
+requiring geometric kernel inclusion/global factor proof,not just halving.
+Read CT19_PLAN.md before code. No computational advantage accepted yet.
 
 ## Spec
-See crypto study CHECKPOINT.md,QUEUE.md,TARGET_FROBENIUS_CHECKPOINT.md;
-cryptanalysis experiments/chained-transfer-reference/SPLIT_QUOTIENTS.md,
-TARGET_FROBENIUS.md and frozen split-quotients-proposal-01.txt. Strict
-source custody: seven upstream runtime files remain pinned to crypto
-75a737b8366ec6c78ed8672886423fcbe69853a2. New arithmetic Rust/Lean only.
-Tests are local development correctness,not experiments or benchmarks.
-Any actual experiment requires successful S3 admission and live IsoLab
-allowance/capacity; neither currently available. No bypass.
+Crypto study research/chained_jacobian_transfers_20261110/:QUEUE.md,
+CHECKPOINT.md,ODD_KERNEL_CHECKPOINT.md,CT19_PLAN.md,SOURCES_20261111.md.
+Consumer experiments/chained-transfer-reference/ODD_KERNELS.md and frozen
+odd-kernel-proposal-01.txt. New math Rust/Lean only. Keep seven native runtime
+inputs pinned75a737b8366ec6c78ed8672886423fcbe69853a2;separately freeze any
+new existing-engine source closure for CI. No benchmark/paid job before
+successful S3 admission/live IsoLab allowance/capacity.
 
 ## State
-Crypto branch research/chained-jacobian-transfer-20261110,PR3877,local and
-published8ef9baecf6a4288cb0eb0596af26187d30ff04a8 before pending CT17 proof
-checkpoint. Local seven-lemma SplitQuotients.lean passes gate7/PCCfffa35;
-total62 written lemmas. Failed broad tactic attempts01/02 retained,03pass.
-PCC is unsigned; local proof pass is not signed scientific standing.
-Consumer branch research/chained-transfer-split-quotients-20261111,HEAD
-da66ab9d953d2ba96c4ac9d6e8379c3478b3f277. Targeted all285/12317 fullsplit,
-all19/109 target components and strict Clippy pass,PCC036d81/96b1e2.
-Ready PR1481;current full49-test focused43026964101 running; do not claim
-that whole current matrix passed. Prior63cf80560 passes exact-head
-43024621372:native25/reference47,one old benchmark ignored;PR1480 merged
-57ab3ad058f77f4d28b6d1db8831bab6d1b33dad at13:05:29Z.
-Reports/diagrams/two-page PDFs inspected. Root library attempt04 remains
-6184pass/13fail/133ignored; six restored-file reruns pass,five need absent
-archives,two missing kernel clock metadata. Do not repeat two-hour suite.
-Crypto frozen ledger diverges after569 shared rows; ownerCopilot request
-6789021128 pending. Extend existing PR3877,no rebase/alternate lineage/force.
-Globalbenchrec historical189 problems/106records retained; consumer16passes.
-Autoresearcher8edec422a60d87b2cbc656fb02f99f42eba959c7 remains AES-SIV
-locked,no KEY binding/no plaintext. Use INTEGRATION_HANDOFF.md when unlocked.
-KB MCP/CLI/ecdb unavailable,no novelty claim. No paid allocation/solver run.
+Crypto branch research/chained-jacobian-transfer-20261110,PR3877,published
+97e32aadc7b26392832310a9d7f95b3f346e9c90 before pending CT18 checkpoint.
+ActualPRstillDIRTY,frozen ledger diverges after569 shared rows;Copilot
+sync request6789021128 unanswered. Extend3877,no rebase/alternate lineage.
+Consumer75e5064d1d089b917b068e7ca15b124ec0bcae37,readyPR1482,branch
+research/chained-transfer-odd-kernels-20261111. All targeted odd-kernel
+controls/Clippy pass,PCC034bed/afecb5. Original separately authored std-only
+Rust CT16 oracle from closedPR3918/source3a972adb7 compiles unchanged/passes;
+formatting-only integration passes,no producer arithmetic imports/PCCed9aff.
+Full50-unit-plus1-integration CI pending. Prior da66ab9d9 exact-head
+43026964101 passes native25/reference49,one old ignored benchmark;1481
+mergedee3f177b4a2d66544887d0307d5d042aef04f6b4 at13:21:37Z.
+Six new OddKernelProjectors lemmas gate6/PCC8b67e3 pass,total68 written
+lemmas;no finite-field/Picard/odd-isogeny geometry formalized. Standing
+unsigned;localproof pass is not signed verdict. Reports/PDFs inspected.
+Root library attempt04 remains6184pass/13fail/133ignored;restored files fix6,
+five absent archives/two kernel clock causes unresolved. Do not repeat.
+S3 gate exact headings fixed,recheck reaches transport but lacks configured
+AWS profile/checkpoint token. No experiment/benchmark launched. Live budget
+unknown. KB/ecdb unavailable;atlas8edec422a60d87b2cbc656fb02f99f42eba959c7
+AES-SIV locked,noKEY/no plaintext. Use INTEGRATION_HANDOFF.md on unlock.
 
 ## Next steps
-1. Inspect actual heads,diffs and this file versus current CHECKPOINT.md;
-   collect focused43026964101 on exactda66ab9d9/readyPR1481.
-   Hold auto-merge until focused49-test pass plus actual branch requirements.
-2. Publish root CT17 proof/source/queue/report checkpoint,update3877/3904.
-   Object publishing workaround uses exact40hex objects and guarded connector
-   ref update,neverforce. See /workspace/scratch/publish_checkpoint_objects.py.
-3. CT18: read primary odd-prime isotropic-isogeny/ellipticFrobenius input;
-   freeze3/5 (and prospective7) kernel criteria before bounded correctness
-   tests. Preserve negative/equivalent outcomes,no new map pre-accepted.
-4. Do not re-run completed unchanged arithmetic or root full suite. Reuse
-   immutable receipts only with matching inputs. Poll PRs on~50min cadence
-   unless actual state is necessary for next publishing/merge decision.
+1. Collect1482 exact-head43030710539 native25/reference50-unit-plus1-
+   integration outcome/rawlog before expected-head auto-merge/actual rules.
+2. Publish pending root CT18 checkpoint/update3877/3904;object uploader
+   /workspace/scratch/publish_checkpoint_objects.py accepts exact40hex only,
+   moves no refs;guard connector ref updates,no force. ReadactualHEAD.
+3. CT19_PLAN.md:reuse existing division-polynomial/Kohel crate,freeze source
+   manifest/CI checkout if imported. Exact curve identity/global dualx[7],
+   all109/113 point/group/scalar recovery. Independent kernel replay via
+   existing isogeny_walk Montgomery field/poly. Then CT20 compatible gluing.
+4. Preserve additional CRT projector scalars as queued/unexecuted CT17a;
+   no repeated closed Richelot neighbors or completed full-library run.
 
 ## Runs in flight
-No benchmark,solver,collector,paid/cloud job. No full-library test running.
-Consumer immutable Git object upload may still run:
-python3 /workspace/scratch/publish_checkpoint_objects.py isogeny-labs/cryptanalysis
-57ab3ad058f77f4d28b6d1db8831bab6d1b33dad
-da66ab9d953d2ba96c4ac9d6e8379c3478b3f277
-Log:/workspace/scratch/ct-github-split-quotients-publication-01.txt.
-Checkps/log before restarting; uploader moves no refs. Prior CT16 focused CI
-43024621372 is finished success,rawlogcommitted in consumerda66ab9d9.
-No other local work needs waiting. Any newly dispatched focusedCI is visible
-in gh run list by exactbranch/head; record actualrun ID and outcome.
+Only remote focusedCI43030710539 on consumer75e5064d1/PR1482. Checkactual
+status/log,do not infercompletion. No local math/test/solver job remains.
+No benchmark,collector,paid/cloud allocation. Prior object uploadconsumer
+75e5064d1 finished;logs/workspace/scratch/ct-github-odd-kernels-publication-01.txt.
+Root localproofverification8b67e3 finishedpass. Poll on~50min cadence unless
+actual status needed for next publication/merge. Commit state frequently.
 
 ## Stop and success conditions
-Continue next unblocked correctness/proof task after each durable checkpoint.
-Accept only actual full-domain/source-subgroup/duals/descent checks in frozen
-scope. Record failures,uncertainty,negative results and exactsource/CI pins.
-No signed standing fabricated,no immutable ledger rewrite,no CI bypass or
-plaintext vault write. No benchmark until S3 gate and live budget succeed.
-If interrupted,commit complete state and updateGitHubqueue/this resume file.
+Continue next unblocked correctness/proof task after durable checkpoints.
+Accept only actual maps/kernels/duals/descent/nonzero source preservation in
+frozen scope;record negatives/equivalences/failures and exact source custody.
+No signed standing fabricated,frozen ledger rewritten,CI bypass or vault
+plaintext. Benchmark requires S3/livebudgetgate. If interrupted,commit full
+resume state/updateGitHubqueue;rely on CHECKPOINT.md and actual heads.

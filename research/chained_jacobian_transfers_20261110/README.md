@@ -116,3 +116,13 @@ passes/PR1480 merged;currentda66ab9d9/PR1481 full49-test CI running. These
 are rational-group bijections,not variety-product isomorphisms. CT18 next
 assesses rational odd-prime isotropic kernels; no solver/cost benefit or
 cross-prime descent accepted. [pcc:unverified]
+
+The [odd-kernel checkpoint](ODD_KERNEL_CHECKPOINT.md) closes rational3/5
+maximal-isotropic kernels for both accepted examples,also7 for17;shifted101
+has four abstract7 candidates. Complete finite-module controls and six new
+Lean algebra/root certificates pass,total68. A separately authored polynomial
+Rabin/Frobenius oracle from closedPR3918 compiles unchanged and passes;
+formatting-only consumer integration enters CI. Source75e5064d1/PR1482
+full50-unit-plus1-integration CI running. CT19_PLAN.md freezes actual7-map/
+dual construction and a later compatible genuine Jacobian7-hop. No such map
+or cost advantage pre-accepted;standing unsigned. [pcc:unverified]
