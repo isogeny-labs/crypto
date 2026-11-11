@@ -11269,10 +11269,12 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         out.insert("tw_steps_rank_two".into(), self.steps_rank_two);
         out.insert("tw_collisions".into(), self.collisions.len() as u64);
         if self.aut.is_some() {
-            // Counted, not priced in GAE: the rotations are field
-            // multiplications on the ledger's field_ops (as rho.cubic).
+            // Unpriced in GAE and listed as such: the `_uncharged` suffix puts
+            // it in `cost.unpriced`, so the §5a band charges it at w, exactly
+            // as rho.cubic lists its `canonicalisations_uncharged`; bitop/v1
+            // prices each at its two field multiplications (`work.rs`).
             out.insert(
-                "tw_aut_canonicalisations".into(),
+                "aut_canonicalisations_uncharged".into(),
                 self.aut_canonicalisations,
             );
             out.insert(

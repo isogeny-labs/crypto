@@ -57,3 +57,34 @@ Each cell gives the ratio at w = 0 / 0.1 / 1. The bracket is the 95 percent inte
 3. Price the sibling second points more cheaply, or replace them with a native-free variant. The band is decided at w = 1, where they cost the most.
 
 Files: `PROTOCOL.md`, `frozen.sha256`, `spec-j0b7-{34,37,40}.json`, `run_local.sh`, `sessions/` (records gzip-compressed, raw SHA-256 in `sessions/raw.sha256`), `verify-*.json`, `band-*.{json,txt}`, `results.json`, `collect.py`, `scaling.json`, `scaling_fit.py`, `stats_bitops.py`, `bitops-*.json`, `plot.py`, `figures/`, `REPORT.pdf`.
+
+## Errata from independent validation (2026-11-11; `validator-report.json`, verdict pass_with_errata)
+
+An independent validator re-checked this directory at commit `011e143f00` [pcc:unverified]. Its checks:
+- the raw-data and frozen-protocol hashes;
+- the binary, by a byte-identical rebuild;
+- `verify --replay-all`: 1,260/1,260 identical per size;
+- [d]G = Q recomputed for 4,410/4,410 records, with the negative control rejected;
+- all 72 ratios in `results.json` recomputed;
+- rho-cubic as the strongest available matched rho.
+
+It validates the **w = 0 headline**: sib8-p512-aut3 / rho-cubic 0.886 [0.808, 0.971], 0.901 [0.811, 1.000] and 0.929 [0.847, 1.020] [pcc:unverified]. It also validates the verdict "unresolved in the §5a band". The errata:
+
+- **E1 (charging asymmetry, the producer's error).**
+  - The aut=3 canonicalisations were not listed as unpriced on the IC arm. They stayed in a native map the band does not read, while rho-cubic's identical rotations are listed (`canonicalisations_uncharged`) and charged at w.
+  - The w = 0.1 and w = 1 values in the table above, and the bench record metric `sib8_p512_aut3_over_rho_cubic_gae_w1_p40 = 1.912`, are therefore too favourable to the IC arm.
+  - Under the same pricing on both arms, sib8-p512-aut3 / rho-cubic is 1.210 / 1.235 / 1.276 at w = 0.1 and 2.677 / 2.742 / 2.838 at w = 1 (p 34 / 37 / 40) [pcc:unverified].
+  - The engine now emits the count as `aut_canonicalisations_uncharged`, so `cost.unpriced` lists it and bitop/v1 prices it. That is a separate commit; it does not rewrite these frozen sessions.
+- **E2.** With E1 corrected, aut3 is still lower than non-aut3 at every weight. At w = 1 the ratios are 0.77-0.87 (tw2cj) and 0.84-0.88 (sib8), not the 0.52-0.59 shown above for w = 1.
+- **E3.** In `results.json`, the "sib8-p512-aut3 < rho-neg at every weight" orders at p 37 and p 40 become unresolved under E1. This README does not cite them.
+- **E4.** The same asymmetry explains part of the bitop/v1 disagreement on rho-cubic, which favoured the IC arm. The bit-op ratio was already not used.
+- **E5.** At w = 0 the candidate runs at 0.94-0.96 times the A = 6 generic floor, because second points and lifts are priced at 0. Cite the w = 0 figure only together with the band.
+- **E7 (process).**
+  - The `.gz` copies moved to the artifact store after `011e143f00`.
+  - The bench record says `uploaded: false` and lacks plan digests and a p 37 metric.
+  - `stats_bitops.py` and `scaling_fit.py` are Python result generators. AGENTS.md's no-Python rule covers them.
+- **E8 (wording).** The ratio is of summed S = GAE/√r per run, not of summed GAE; the two differ in the third decimal.
+
+**Corrected reading.** At w = 0 the arm is 0.89 to 0.93 of rho-cubic. With the canonicalisations charged on both arms it is 1.21 to 1.28 at w = 0.1 and 2.7 to 2.8 at w = 1 [pcc:unverified]. Unresolved in the band, and further from rho at w > 0 than first reported.
+
+The gate stays closed: `scripts/validation_gate.py` refuses a `pass_with_errata` report until E1 is corrected and a validator re-issues it. `VALIDATION.json` records `order_holds_across_band: false`.
