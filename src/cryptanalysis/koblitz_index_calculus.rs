@@ -182,6 +182,130 @@ use crate::utils::mod_inverse;
 /// boundary-ledger rungs through `n = 53`.  What actually bounds a run
 /// is the `2^dim` factor base and, for the meet-in-the-middle oracle,
 /// its `|F|²` pair table.
+/// **In-scan stage counters** for R04
+/// (`research/ic_tool_program/rounds/R04-scan-probes/PROTOCOL.md`),
+/// compiled only with the `scan-probes` feature.
+///
+/// The collection scan reads the time-stamp counter at its stage
+/// boundaries and adds the cycles to one total per stage.  Without the
+/// feature none of this exists, and every probe in the scan is a
+/// `#[cfg]`-gated statement, so the default build compiles the same code
+/// it always did.  Scans outside relation collection (the descent's)
+/// are kept apart, under `other`.
+#[cfg(feature = "scan-probes")]
+pub mod scan_probes {
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering::Relaxed};
+
+    pub const SUBTRACT: usize = 0;
+    pub const KEY: usize = 1;
+    pub const FILTER: usize = 2;
+    pub const ADMITTED: usize = 3;
+    /// The rest of a collection trial: its whole time less the scan's.
+    pub const TRIAL: usize = 4;
+    pub const STAGES: [&str; 5] = ["subtract", "key", "filter", "admitted", "trial"];
+
+    pub const TRIALS: usize = 0;
+    pub const SUMMANDS: usize = 1;
+    pub const BLOCKS: usize = 2;
+    pub const ADMITTED_KEYS: usize = 3;
+    pub const PAIRS: usize = 4;
+    pub const COUNTS: [&str; 5] = ["trials", "summands", "blocks", "admitted", "pairs"];
+
+    /// `[collection, other]` × stage.
+    static CYCLES: [[AtomicU64; 5]; 2] = [const { [const { AtomicU64::new(0) }; 5] }; 2];
+    static TALLY: [[AtomicU64; 5]; 2] = [const { [const { AtomicU64::new(0) }; 5] }; 2];
+    static COLLECTING: AtomicBool = AtomicBool::new(false);
+
+    fn side() -> usize {
+        usize::from(!COLLECTING.load(Relaxed))
+    }
+
+    /// The time-stamp counter, or the monotonic clock in nanoseconds
+    /// where there is none.
+    #[inline(always)]
+    pub fn now() -> u64 {
+        #[cfg(target_arch = "x86_64")]
+        {
+            // SAFETY: `rdtsc` has no preconditions on x86-64.
+            unsafe { core::arch::x86_64::_rdtsc() }
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            use std::sync::OnceLock;
+            static START: OnceLock<std::time::Instant> = OnceLock::new();
+            START
+                .get_or_init(std::time::Instant::now)
+                .elapsed()
+                .as_nanos() as u64
+        }
+    }
+
+    /// Charge the cycles since `*since` to `stage`, and move `*since` on.
+    #[inline(always)]
+    pub fn lap(stage: usize, since: &mut u64) {
+        let t = now();
+        CYCLES[side()][stage].fetch_add(t.wrapping_sub(*since), Relaxed);
+        *since = t;
+    }
+
+    #[inline(always)]
+    pub fn count(which: usize, k: u64) {
+        TALLY[side()][which].fetch_add(k, Relaxed);
+    }
+
+    /// The scan's four stages so far, on the collection side.
+    #[inline(always)]
+    pub fn scan_cycles() -> u64 {
+        CYCLES[0][..TRIAL].iter().map(|c| c.load(Relaxed)).sum()
+    }
+
+    /// Charge a collection trial's time beyond its scan to `trial`.
+    #[inline(always)]
+    pub fn close_trial(began: u64, scan_before: u64) {
+        let whole = now().wrapping_sub(began);
+        let scan = scan_cycles().wrapping_sub(scan_before);
+        CYCLES[0][TRIAL].fetch_add(whole.saturating_sub(scan), Relaxed);
+        TALLY[0][TRIALS].fetch_add(1, Relaxed);
+    }
+
+    pub fn collecting(on: bool) {
+        COLLECTING.store(on, Relaxed);
+    }
+
+    /// Counter ticks a second, against the monotonic clock over 50 ms.
+    pub fn rate_hz() -> f64 {
+        let (t0, i0) = (now(), std::time::Instant::now());
+        while i0.elapsed() < std::time::Duration::from_millis(50) {
+            std::hint::spin_loop();
+        }
+        now().wrapping_sub(t0) as f64 / i0.elapsed().as_secs_f64()
+    }
+
+    /// Every total, as the report writes it.
+    pub fn snapshot() -> serde_json::Value {
+        let side = |s: usize| {
+            let stages: serde_json::Map<String, serde_json::Value> = STAGES
+                .iter()
+                .zip(&CYCLES[s])
+                .map(|(k, v)| (k.to_string(), v.load(Relaxed).into()))
+                .collect();
+            let counts: serde_json::Map<String, serde_json::Value> = COUNTS
+                .iter()
+                .zip(&TALLY[s])
+                .map(|(k, v)| (k.to_string(), v.load(Relaxed).into()))
+                .collect();
+            serde_json::json!({"stages": stages, "counts": counts})
+        };
+        let mut out = side(0);
+        out["other"] = side(1);
+        out["tsc_hz"] = serde_json::json!(rate_hz());
+        out["what"] = serde_json::json!(
+            "cycles per stage of the collection scan (R04); `other` holds scans outside collection"
+        );
+        out
+    }
+}
+
 pub const MAX_N: u32 = 127;
 
 // ── F_2[x] helpers on `u64` bitmasks ───────────────────────────────
@@ -6927,6 +7051,10 @@ impl PairSumTable {
         if len == 0 {
             return;
         }
+        #[cfg(feature = "scan-probes")]
+        let mut probe = scan_probes::now();
+        #[cfg(feature = "scan-probes")]
+        scan_probes::count(scan_probes::SUMMANDS, len as u64);
         // Every buffer below is borrowed from `scratch`, so a scan
         // allocates nothing; `add_many` appends, so `rests` is cleared
         // rather than re-created.
@@ -7053,6 +7181,8 @@ impl PairSumTable {
         const LOOKAHEAD: usize = 32;
         let mut admitted_offsets = Vec::with_capacity(BLOCK / 8);
         let mut hashes = Vec::with_capacity(BLOCK);
+        #[cfg(feature = "scan-probes")]
+        scan_probes::lap(scan_probes::SUBTRACT, &mut probe);
         let count = if fused { x3s.len() } else { rests.len() };
         for lo in (0..count).step_by(BLOCK) {
             let hi = (lo + BLOCK).min(count);
@@ -7060,6 +7190,8 @@ impl PairSumTable {
                 Some(canon) if fused => canon.x_keys(&x3s[lo..hi], keys),
                 _ => self.keys_of(&rests[lo..hi], keys),
             }
+            #[cfg(feature = "scan-probes")]
+            scan_probes::lap(scan_probes::KEY, &mut probe);
             hashes.clear();
             hashes.extend(keys.iter().copied().map(pair_filter_hash));
             admitted_offsets.clear();
@@ -7077,6 +7209,13 @@ impl PairSumTable {
                 self.prefetch_bucket_hash(keys[within], h);
                 admitted_offsets.push(within);
             }
+            #[cfg(feature = "scan-probes")]
+            {
+                scan_probes::lap(scan_probes::FILTER, &mut probe);
+                scan_probes::count(scan_probes::BLOCKS, 1);
+                scan_probes::count(scan_probes::ADMITTED_KEYS, admitted_offsets.len() as u64);
+            }
+            // (R12's run prefetch below is counted with the admitted keys.)
             // The bucket entries arrived during the filter pass: read them
             // and send for every admitted key's run before looking any up,
             // so the runs' misses overlap instead of following one another.
@@ -7105,12 +7244,18 @@ impl PairSumTable {
                     None => rest,
                 };
                 self.pairs_for_key_hash(rest, keys[within], hashes[within], pairs);
+                #[cfg(feature = "scan-probes")]
+                scan_probes::count(scan_probes::PAIRS, pairs.len() as u64);
                 for &(i, j) in pairs.iter() {
                     if !sink(&[i as usize, j as usize, k]) {
+                        #[cfg(feature = "scan-probes")]
+                        scan_probes::lap(scan_probes::ADMITTED, &mut probe);
                         return;
                     }
                 }
             }
+            #[cfg(feature = "scan-probes")]
+            scan_probes::lap(scan_probes::ADMITTED, &mut probe);
         }
     }
 
@@ -14424,6 +14569,8 @@ impl<'a> RelationCollector<'a> {
             // per probe.
             let mut scratch = ScanScratch::default();
             for t in run_start..run_end {
+                #[cfg(feature = "scan-probes")]
+                let (trial_began, scan_before) = (scan_probes::now(), scan_probes::scan_cycles());
                 measurement::mark(Phase::Pdp);
                 let pdp = if !point.infinity && a != 0 {
                     let scan = targets.scan(unit.seed, t, base);
@@ -14444,9 +14591,13 @@ impl<'a> RelationCollector<'a> {
                 // re-deriving the run's anchor.
                 a = ((a as u128 + stride as u128) % self.r_u64.max(2) as u128) as u64;
                 point = fc.add(point, stride_point);
+                #[cfg(feature = "scan-probes")]
+                scan_probes::close_trial(trial_began, scan_before);
             }
             found
         };
+        #[cfg(feature = "scan-probes")]
+        scan_probes::collecting(true);
         let mut collected = if measurement::enabled() {
             (first_run..=last_run)
                 .map(run_probes)
@@ -14457,6 +14608,8 @@ impl<'a> RelationCollector<'a> {
                 .map(run_probes)
                 .reduce(CollectionChunk::default, CollectionChunk::merge)
         };
+        #[cfg(feature = "scan-probes")]
+        scan_probes::collecting(false);
         measurement::mark(Phase::Queries);
         collected.relations.sort_by_key(|r| r.trial);
         collected.attempts.sort_by_key(|r| r.trial);
@@ -20880,7 +21033,10 @@ mod tests {
             let idxs: Vec<usize> = (0..fb.points.len()).collect();
             let pos: std::collections::HashMap<usize, usize> =
                 idxs.iter().enumerate().map(|(p, &i)| (i, p)).collect();
-            let adjacent = idxs.iter().filter(|&&i| twin[i].map_or(false, |t| (t as isize - i as isize).abs() == 1)).count();
+            let adjacent = idxs
+                .iter()
+                .filter(|&&i| twin[i].map_or(false, |t| (t as isize - i as isize).abs() == 1))
+                .count();
             let mut same_block = 0usize;
             for shift in 0..8usize {
                 for (p, &i) in idxs.iter().enumerate() {
