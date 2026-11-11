@@ -1,0 +1,14 @@
+{
+  "schema": "pr-maintenance/v1",
+  "pr": 2850,
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "parent": "91e275c5c7f7e1ff4122f813ba021f0d17b06e20",
+  "change": "Sort the existing 16 artifact-pull prefixes in the exact lexicographic order returned by unchanged wire_workflows.py. The prefix set, credentials, steps and triggers are identical.",
+  "observed_ci": "Artifact job 127165347585 confirmed no data files were committed, then rejected the noncanonical prefix ordering.",
+  "new_validation": "Current-head CI pending; no local pass claimed; exact benchmark inputs unchanged",
+  "sources": [
+    "job 127165347585",
+    "tools/artifacts/wire_workflows.py:needed returns sorted paths"
+  ]
+}

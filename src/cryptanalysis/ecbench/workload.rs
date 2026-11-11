@@ -35,7 +35,7 @@ use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4,
 use crate::cryptanalysis::ic_boundary::{
     find_prime_order_curve, koblitz_instance, random_binary_instance, roster_prime_instance,
     BinaryGroup, BinaryInstance, CountedGroup, CubicClasses, GroupOps, PrimeCurve, PrimeInstance,
-    PrimePoint, QuarticClasses,
+    PrimePoint, PrimeRepresentation, QuarticClasses,
 };
 use crate::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
@@ -96,6 +96,18 @@ pub enum CurveSpec {
         gx: u64,
         gy: u64,
     },
+    /// An EFD model/chart: the engine builds the short-Weierstrass curve
+    /// through the EFD bridge and decodes the generator in `chart`.
+    Efd {
+        model: String,
+        chart: String,
+        p: u64,
+        params: std::collections::BTreeMap<String, u64>,
+        r: u64,
+        cofactor: u64,
+        generator: Vec<u64>,
+        lift: u32,
+    },
     /// An externally supplied public point with no logarithm in the fixture,
     /// retained verbatim in measured child inputs. Restricted to certified
     /// cofactor-one prime-order regression cohorts.
@@ -127,6 +139,18 @@ pub enum CurveSpec {
     /// point is written as two packed words (coefficient `i` of the tower
     /// basis in bits `[im, (i + 1)m)`).
     F2m4Torsion {
+        m: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// `ecbench::xline_bin::find_bin_curve_a0(m, seed, max_cofactor)`: the
+    /// curve `y² + xy = x³ + b` (`a = 0`, so `Tr(a) = 0`) over the same tower
+    /// `F_{q⁴}`, `q = 2^m`, `4 ≤ m ≤ 15`, `b ∉ F_{q²}`, `#E = h·r`, `r`
+    /// prime, `h ≤ max_cofactor`: the C1 end-to-end study's family
+    /// (`research/c1_end_to_end_solve_20261107`), on which the twisted
+    /// all-lift line exists.  Built as an `f2m4_torsion` instance, so every
+    /// method that runs there runs here.
+    F2m4A0 {
         m: u32,
         seed: u64,
         max_cofactor: u64,
@@ -430,6 +454,8 @@ impl CurveSpec {
                         word("generator x", &params.gx)?,
                         word("generator y", &params.gy)?,
                     ),
+
+                    representation: None,
                 };
                 instance.name = instance.curve_id().slug;
                 Ok(Instance::Prime(instance))
@@ -475,6 +501,17 @@ impl CurveSpec {
                 }
                 .map(Instance::Prime)
             }
+            CurveSpec::Efd {
+                ref model,
+                ref chart,
+                p,
+                ref params,
+                r,
+                cofactor,
+                ref generator,
+                lift,
+            } => PrimeInstance::from_efd(model, chart, p, params, r, cofactor, generator, lift)
+                .map(Instance::Prime),
             CurveSpec::PrimeExplicit {
                 p,
                 a,
@@ -506,6 +543,8 @@ impl CurveSpec {
                     r,
                     cofactor: group_order / r,
                     generator: (gx, gy),
+
+                    representation: None,
                 };
                 inst.name = inst.curve_id().slug;
                 Ok(Instance::Prime(inst))
@@ -548,6 +587,12 @@ impl CurveSpec {
                 }
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
+            CurveSpec::F2m4A0 {
+                m,
+                seed,
+                max_cofactor,
+            } => crate::cryptanalysis::ecbench::xline_bin::find_bin_curve_a0(m, seed, max_cofactor)
+                .map(|c| Instance::F2m4(Box::new(c))),
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
@@ -706,6 +751,12 @@ impl CurveSpec {
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
             }
+            CurveSpec::Efd {
+                ref model,
+                ref chart,
+                p,
+                ..
+            } => format!("PrimeInstance::from_efd({model}, {chart}, {p}, ...)"),
             CurveSpec::PrimeOrbitShape {
                 ref shape,
                 bits,
@@ -749,6 +800,11 @@ impl CurveSpec {
                 seed,
                 max_cofactor,
             } => format!("gaudry_quartic_bin::find_bin_curve({m}, {seed}, {max_cofactor})"),
+            CurveSpec::F2m4A0 {
+                m,
+                seed,
+                max_cofactor,
+            } => format!("ecbench::xline_bin::find_bin_curve_a0({m}, {seed}, {max_cofactor})"),
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
@@ -1380,6 +1436,15 @@ impl Instance {
         }
     }
 
+    /// Verify an exact scalar on a legacy instance. Reduction happens before
+    /// conversion, so no high bits are discarded. All current instance orders
+    /// fit u128; a future full-width instance must supply its own branch here.
+    pub fn mul_generator_exact(&self, k: super::exact_scalar::ExactScalar) -> Option<[String; 2]> {
+        let reduced = k.to_biguint() % num_bigint::BigUint::from(self.r());
+        let narrow = super::exact_scalar::ExactScalar::from_biguint(&reduced)?.checked_u128()?;
+        self.mul_generator_hex(narrow)
+    }
+
     /// `[k]G` as hex coordinates, computed by the instance's own counted
     /// double-and-add on a ledger nobody reads.  Used to build the
     /// target and, separately, to verify an answer.
@@ -1486,8 +1551,23 @@ impl Instance {
         seed: u64,
         index: u64,
     ) -> Option<([String; 2], u64)> {
+        self.hash_to_subgroup_counted(curve, seed, index, &mut HashWork::default())
+    }
+
+    /// [`Instance::hash_to_subgroup`], also tallying into `work` what the
+    /// derivation did, including the draws that found no point. Only the
+    /// prime-field branch fills `work.draws`, `sqrt_field_muls` and
+    /// `on_curve_checks`; every branch adds its cofactor multiplications to
+    /// `work.group_ops`. The result is the same function of the inputs.
+    pub fn hash_to_subgroup_counted(
+        &self,
+        curve: &CurveFacts,
+        seed: u64,
+        index: u64,
+        work: &mut HashWork,
+    ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
-        let mut scratch = GroupOps::default();
+        let scratch = &mut work.group_ops;
         if let Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
@@ -1532,13 +1612,17 @@ impl Instance {
                 Instance::Prime(i) => {
                     let c = &i.curve;
                     let x = h % c.p;
-                    let Some(y) = c.sqrt(c.rhs(x)) else { continue };
+                    work.draws += 1;
+                    let Some(y) = c.sqrt_counted(c.rhs(x), &mut work.sqrt_field_muls) else {
+                        continue;
+                    };
                     let y = if flip && y != 0 { c.p - y } else { y };
                     let p = PrimePoint::affine(x, y);
+                    work.on_curve_checks += 1;
                     if !c.is_on_curve(p) {
                         continue;
                     }
-                    let q = c.mul(&mut scratch, p, i.cofactor);
+                    let q = c.mul(scratch, p, i.cofactor);
                     if !q.infinity {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
@@ -1581,7 +1665,7 @@ impl Instance {
                     };
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
-                    let q: Pt4 = CountedGroup::mul(c, &mut scratch, pt, i.cofactor);
+                    let q: Pt4 = CountedGroup::mul(c, scratch, pt, i.cofactor);
                     if !q.inf {
                         return Some((
                             [
@@ -1611,7 +1695,7 @@ impl Instance {
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
                     let cof = u64::try_from(i.cofactor).expect("a small cofactor");
-                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, cof);
+                    let q: PtB = CountedGroup::mul(c, scratch, pt, cof);
                     if !q.inf {
                         return Some((
                             [
@@ -1633,7 +1717,7 @@ impl Instance {
                         continue;
                     };
                     let g = BinaryGroup(&i.fast);
-                    let q = g.mul(&mut scratch, p, i.cofactor);
+                    let q = g.mul(scratch, p, i.cofactor);
                     if !q.infinity {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
@@ -1642,6 +1726,19 @@ impl Instance {
         }
         None
     }
+}
+
+/// What one [`Instance::hash_to_subgroup_counted`] call did: the cofactor
+/// multiplications' group operations, and, on a prime field, the draws (each
+/// one SHA-256 hash, one curve-equation evaluation and one square-root
+/// attempt), the modular multiplications of those square roots and the
+/// on-curve checks. Nothing here is priced by the derivation itself.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HashWork {
+    pub group_ops: GroupOps,
+    pub draws: u64,
+    pub sqrt_field_muls: u64,
+    pub on_curve_checks: u64,
 }
 
 /// ICV1's last field: the first 12 hex digits of the model hash.
@@ -1755,6 +1852,11 @@ pub struct Workload {
     /// The hash counter that landed a public target in the subgroup.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_counter: Option<u64>,
+    /// EFD model/chart used for input and output, when one was selected.
+    /// This does not change the group or the priced workload; it is kept so
+    /// a record names the representation its generator and target came from.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub representation: Option<PrimeRepresentation>,
 }
 
 impl Workload {
@@ -1848,6 +1950,10 @@ impl Workload {
             "W",
             &Self::identity_view(&curve, law, target_seed, index, &target),
         )?;
+        let representation = match inst {
+            Instance::Prime(prime) => prime.representation.clone(),
+            _ => None,
+        };
         Ok(Workload {
             workload_id,
             workload_sha256,
@@ -1859,6 +1965,7 @@ impl Workload {
             target,
             planted,
             target_counter: counter,
+            representation,
         })
     }
 
@@ -1920,6 +2027,24 @@ impl Workload {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn exact_scalar_verification_preserves_high_bits_until_subgroup_reduction() {
+        use super::super::exact_scalar::ExactScalar;
+        let inst = CurveSpec::Koblitz { a: 0, n: 7 }.build().unwrap();
+        for scalar in [0u128, 1, 13, u64::MAX as u128, u128::MAX] {
+            assert_eq!(
+                inst.mul_generator_exact(scalar.into()),
+                inst.mul_generator_hex(scalar)
+            );
+        }
+        let wide = (num_bigint::BigUint::from(1u8) << 200usize)
+            * num_bigint::BigUint::from(inst.r())
+            + 13u8;
+        let exact = ExactScalar::from_biguint(&wide).unwrap();
+        assert!(exact.checked_u128().is_none());
+        assert_eq!(inst.mul_generator_exact(exact), inst.mul_generator_hex(13));
+    }
 
     #[test]
     fn prime_orbit_shapes_keep_the_requested_coefficients_and_freeze_explicitly() {
@@ -2424,5 +2549,34 @@ mod merged_variant_tests {
                 spec
             );
         }
+    }
+
+    #[test]
+    fn efd_spec_builds_and_records_the_representation() {
+        let spec = CurveSpec::Efd {
+            model: "montgom".into(),
+            chart: "xz".into(),
+            p: 1019,
+            params: std::collections::BTreeMap::from([
+                ("a".to_string(), 131u64),
+                ("b".to_string(), 1u64),
+            ]),
+            r: 269,
+            cofactor: 4,
+            generator: vec![604, 1],
+            lift: 0,
+        };
+        let instance = spec.build().unwrap();
+        let facts = instance.facts(&spec);
+        assert_eq!(facts.family, "prime");
+        assert_eq!(facts.r, 269);
+        let (workload, _) = Workload::build(&spec, 1, 0, TargetKind::Planted).unwrap();
+        let representation = workload.representation.expect("EFD representation");
+        assert_eq!(representation.model, "montgom");
+        assert_eq!(representation.chart, "montgom/xz");
+        assert_eq!(
+            serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
+            spec
+        );
     }
 }

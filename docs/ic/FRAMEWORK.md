@@ -456,6 +456,7 @@ What ships behind it (`ic bench --list` prints each one's parameters):
 | name | engine | native unit | limits |
 |:--|:--|:--|:--|
 | `f4-f2` | Faugère's F4 over `F_2[v]/(v² − v)`: normal strategy, Gebauer–Möller criteria, the field products `v·g` as pairs, symbolic preprocessing, bit-packed elimination; a full reduced basis, solutions read off its linear elements ([`pq_f4_f2.rs`](../../src/cryptanalysis/pq_f4_f2.rs)) | word XORs (elimination only) | matrix size; the budget |
+| `m4gb-f2` | M4GB (Makarim–Stevens, ISSAC 2017) run as an external process ([`m4gb_oracle.rs`](../../src/cryptanalysis/m4gb_oracle.rs)): reduced degrevlex basis over GF(2) with field equations, solutions read off it | none (wall time only) | `M4GB_BINARY` must be set; unknowns ≤ the binary's `MAXVARS`; the budget |
 | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree (`max_degree`, default 3), propagation, splitting (`split`) | word XORs (elimination only) | `node_budget` |
 | `matrix-f5` | the same, leaving out the rows the Boolean F5 criterion predicts to reduce to zero | word XORs (elimination only) | `node_budget` |
 | `inherited-f4` | the same, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) | `node_budget` |
@@ -466,6 +467,20 @@ What ships behind it (`ic bench --list` prints each one's parameters):
 | `fes-f2` | fast exhaustive search, libfes-lite's Gray code: two word XORs per point | word XORs (Gray-code steps) | quadratic systems, ≤ 32 unknowns, ≤ 64 equations |
 | `fes-f2-wide` | the same over 16 (AVX-512) or 8 (AVX2) sub-cubes per Gray-code step, the last four or three unknowns fixed per 32-bit lane; the first 32 equations in the lanes, the rest filtering the candidates; the scalar walk where the lanes do not fit ([`mq_fes.rs`](../../src/cryptanalysis/mq_fes.rs)) | vector XORs (Gray-code steps, *k* lanes) | quadratic systems, ≤ 36 unknowns; 3–4× `fes-f2` here |
 | `exhaustive` | every equation at every point, stopping at the first that fails | monomial tests (performed) | 26 unknowns |
+
+`m4gb-f2` is an external process, not linked code: M4GB is GPL-3, so the
+adapter writes its text input, runs the binary named by `M4GB_BINARY`
+(`M4GB_THREADS` sets `--nrthreads`) and parses the reduced basis back. It is
+GF(2) only and priced by wall time, so it is a reference arm and never a
+leaderboard row (`AGENTS.md` §6). Build the binary in a checkout of
+[cr-marcstevens/m4gb](https://github.com/cr-marcstevens/m4gb) with
+`autoreconf --install && ./configure`, then
+`make MAXVARS=128 FIELDSIZE=2 m4gb`; the `solver_m4gb_n<MAXVARS>_gf2` it
+produces bounds the unknowns the adapter accepts. `M4GB_BINARY` may also
+name a directory of such binaries (several `MAXVARS`): the adapter then runs
+the one with the smallest `MAXVARS` at least the system's unknowns, because a
+wide binary is memory-hungry (about 7 GB resident for `n128` on a 35-unknown
+system against about 150 MB for `n35`).
 
 The exhaustive searches are the **reference**, not a strawman:
 `fes-f2-wide` (or `fes-f2` on a host without the vector instructions)
@@ -835,7 +850,7 @@ worse than none:
 | factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `hashed-affine`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
 | point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`, `chained-x`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
-| polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
+| polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `m4gb-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
 | relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
 
 ### Hashed-affine / hashed-tensor
@@ -859,6 +874,35 @@ A parameter that takes several values (`divisor` on `koblitz-orbit`,
 `koblitz-trace-zero`, and `koblitz-symmetrised`) takes them separated by `;`,
 quoted in a shell.
 
+### Degree-of-regularity forecast
+
+Every algebraic oracle that reports its calls through
+`SolverTotals::absorb_outcome` also feeds the advisory
+degree-of-regularity forecaster (`cryptanalysis::dreg_forecast`, schema
+`dreg_forecast/v1`): a decided call observes its solving degree (the
+engine's, or else the highest degree it built), a budget-exceeded call is
+right-censored at the highest degree built, and the Kaplan–Meier estimate
+of the solving-degree distribution gives the predicted degree of
+regularity with a 95 % band, the semi-regular yardstick, the expected work
+of one more call, the projected relation-phase work from the relation yield
+and the rows still missing, and the rho floor over that work at 1, 10 and
+100 multiplications per group addition. A capped engine (`matrix-f4`,
+`matrix-f5`, `inherited-f4`, `max_degree`) is censored at its cap; an
+uncapped full Gröbner basis (`f4-f2`) is bounded by the ring's ceiling, the
+variable count; an engine that reports no degree (`sat-cdcl`, `exhaustive`)
+leaves `forecast_unavailable` saying so. The Gaudry quartic (`gaudry-d4`,
+`gaudry-d4-bin`) and line-S4 oracles, which total their degrees by hand,
+observe their fixed Macaulay degree directly (`SolverTotals::observe_degree`),
+a degenerate system censored at that degree. The relation matrix's total
+work is charged beside the solver work. `ecbench` writes the forecast on
+the record's `solver` block as `degree_of_regularity_forecast`, priced at
+the curve's automorphism fold. The same forecaster runs inside
+[the factor-base sweeper](factor-base-sweep/README.md) and the N83 summand
+sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines); the
+`dreg-triage` skill describes iterating a sweep on it. It is
+advisory everywhere: never priced into `S`, outside the replay comparison,
+never a stopping rule, and `certified_degree_of_regularity` stays null.
+
 ### Source map
 
 | file | what is in it |
@@ -872,6 +916,7 @@ quoted in a shell.
 | [`pq_descent_symbolic.rs`](../../src/cryptanalysis/pq_descent_symbolic.rs) | the symbolic Weil descent the algebraic oracle builds its systems with |
 | [`linalg.rs`](../../src/cryptanalysis/ic_framework/linalg.rs) | the structured elimination and the matrix registry |
 | [`mod.rs`](../../src/cryptanalysis/ic_framework/mod.rs) | the runner and the report |
+| [`dreg_forecast.rs`](../../src/cryptanalysis/dreg_forecast.rs) | the advisory degree-of-regularity forecaster the solver totals feed |
 | [`bench.rs`](../../src/bin/ic/bench.rs) | the CLI |
 
 The relation loop itself — the target guard, the collision guards, the

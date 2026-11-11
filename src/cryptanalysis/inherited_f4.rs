@@ -88,6 +88,12 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+mod prefix;
+pub use prefix::{
+    clear_prefix_cache, prefix_hint, prefix_root_counts, prefix_root_enabled, set_prefix_hint,
+    set_prefix_root,
+};
+
 static COMPACT_REFUTED_BASIS: AtomicBool = AtomicBool::new(false);
 
 /// Keep only the decisive constant row after a basis proves `1`.
@@ -116,6 +122,12 @@ fn note_rows_generated(rows: u64, words: u64) {
 /// charges elimination and specialisation but not row generation.
 pub fn f4_rows_generated_thread() -> (u64, u64) {
     ROWS_GENERATED.with(|c| c.get())
+}
+
+/// Credit rows generated on another thread to this one (a parallel solve
+/// hands its workers' counts back to the thread that asked).
+pub(crate) fn credit_rows_generated(rows: u64, words: u64) {
+    note_rows_generated(rows, words);
 }
 
 /// Shape of the degree-`degree` Macaulay matrix an inherited-F4 root builds
@@ -166,6 +178,11 @@ fn note_root_elimination(word_ops: u64) {
 /// only in how they were reduced can be compared tree for tree.
 pub fn f4_root_elimination_thread() -> u64 {
     ROOT_ELIMINATION.with(|c| c.get())
+}
+
+/// Credit root eliminations done on another thread to this one.
+pub(crate) fn credit_root_elimination(word_ops: u64) {
+    note_root_elimination(word_ops);
 }
 
 // ── Root shape replay (`KIC_F4_ROOT_REPLAY=1`, off by default) ─────────

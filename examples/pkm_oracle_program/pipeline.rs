@@ -1,7 +1,9 @@
 //! Tiny prime-order cold-DLP correctness control, not the qualified G6 panel.
 //! No target scalar or known factor-base labels enter the interface.
 use super::{algebra, reference, Point, Report, Witness};
-use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
+use crypto_lib::cryptanalysis::ic_boundary::{
+    CountedGroup, FieldOps, GroupOps, PrimeCurve, PrimePoint,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -121,6 +123,31 @@ struct Query {
     useful_rows: usize,
     rank_after: usize,
     elapsed_ns: u128,
+    generation_counts: GroupOps,
+    generation_field_counts: QueryFieldCounts,
+}
+
+/// GroupOps intentionally skips these fields in its shared wire format.
+/// Emit them explicitly without changing that schema. Each attempt owns its
+/// work; Output's aggregates are alternative views of the same operations.
+#[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
+struct QueryFieldCounts {
+    coordinate_modulus: u64,
+    implementation: &'static str,
+    field_ops: FieldOps,
+    montgomery_reductions: u64,
+    ownership: &'static str,
+}
+impl QueryFieldCounts {
+    fn from_group(coordinate_modulus: u64, ops: GroupOps) -> Self {
+        Self {
+            coordinate_modulus,
+            implementation: "ic_boundary::PrimeCurve ordinary affine",
+            field_ops: ops.field_ops,
+            montgomery_reductions: ops.montgomery_reductions,
+            ownership: "partial field call tally inside group calls; alternative to whole-group pricing; excludes inverse internals/add/sub/logical work",
+        }
+    }
 }
 
 #[derive(Debug, Serialize)]
@@ -135,6 +162,7 @@ pub(super) struct Output {
     setup_helper_arithmetic: algebra::Arithmetic,
     setup_reference_counts: reference::Counts,
     query_generation_counts: GroupOps,
+    query_generation_field_counts: QueryFieldCounts,
     scalar_elimination_ns: u128,
     scalar_ops: ScalarOps,
     scalar_verification_ns: u128,
@@ -149,7 +177,8 @@ pub(super) struct Output {
 }
 
 fn setup(r: &Request) -> Result<(Vec<Point>, reference::Counts), String> {
-    r.oracle.validate()?;
+    let mut validation_counts = reference::Counts::default();
+    r.oracle.validate_counted(&mut validation_counts)?;
     if r.schema != "pkm.toy-dlp-request/v1"
         || r.oracle.p > 257
         || r.max_queries == 0
@@ -162,6 +191,7 @@ fn setup(r: &Request) -> Result<(Vec<Point>, reference::Counts), String> {
         );
     }
     let mut c = reference::Curve::new(&r.oracle);
+    c.counts.merge(validation_counts);
     if !c.on_curve(r.generator) {
         return Err("invalid generator".into());
     }
@@ -253,19 +283,21 @@ pub(super) fn run(r: &Request) -> Result<Output, String> {
     let mut elimination_ns = 0;
     for _ in 0..r.max_queries {
         let start = Instant::now();
+        let mut attempt_generation = GroupOps::default();
         let a = next(&mut seed) % r.order;
         let b = next(&mut seed) % r.order;
         let ap = curve.mul(
-            &mut generation,
+            &mut attempt_generation,
             PrimePoint::affine(r.generator.x, r.generator.y),
             a,
         );
         let bq = curve.mul(
-            &mut generation,
+            &mut attempt_generation,
             PrimePoint::affine(r.oracle.target.x, r.oracle.target.y),
             b,
         );
-        let raw_rhs = curve.add(&mut generation, ap, bq);
+        let raw_rhs = curve.add(&mut attempt_generation, ap, bq);
+        generation.merge(attempt_generation);
         let rhs = if raw_rhs.infinity {
             None
         } else {
@@ -303,6 +335,8 @@ pub(super) fn run(r: &Request) -> Result<Output, String> {
             useful_rows: useful,
             rank_after: matrix.rows.len(),
             elapsed_ns: start.elapsed().as_nanos(),
+            generation_counts: attempt_generation,
+            generation_field_counts: QueryFieldCounts::from_group(r.oracle.p, attempt_generation),
         });
         if matrix.target().is_some() {
             break;
@@ -325,6 +359,7 @@ pub(super) fn run(r: &Request) -> Result<Output, String> {
     Ok(Output {schema:"pkm.toy-dlp-output/v1",request:r.clone(),factor_base:base,queries,
         original_rows:rows,final_rref:matrix.rows,setup_ns,setup_helper_arithmetic:setup_arithmetic,
         setup_reference_counts:setup_counts,query_generation_counts:generation,
+        query_generation_field_counts:QueryFieldCounts::from_group(r.oracle.p,generation),
         scalar_elimination_ns:elimination_ns,scalar_ops:matrix.ops,scalar_verification_ns:verification_ns,
         scalar_verification_counts:verifier.counts,cold_total_ns,cold_unattributed_ns,
         recovered:answer,scalar_verified:verified,status:if verified {"verified"} else {"unknown_query_cap"},
@@ -338,6 +373,8 @@ pub(super) struct Certificate {
     rows_checked: usize,
     scalar_verified: bool,
     rank: usize,
+    recovery_weights: Option<super::rank_reference::Combination>,
+    ambiguity_kernel: Option<Vec<u64>>,
     scope: &'static str,
 }
 
@@ -351,7 +388,11 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         return Err("toy DLP binding/admission mismatch".into());
     }
     let mut curve = reference::Curve::new(&r.oracle);
-    let mut matrix = Elimination::new(r.order, base.len() + 1);
+    let variables = base.len() + 1;
+    let mut coefficients = super::rank_reference::Space::new(r.order, variables)?;
+    let mut augmented = super::rank_reference::Space::new(r.order, variables + 1)?;
+    let mut target_unit = vec![0; variables];
+    target_unit[variables - 1] = 1;
     let mut original = Vec::new();
     let mut checked = 0;
     let mut seed = r.seed;
@@ -362,7 +403,7 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
         return Err("query cap exceeded".into());
     }
     for query in queries {
-        if matrix.target().is_some() {
+        if coefficients.contains(&target_unit)? {
             return Err("queries continue after scalar recovery".into());
         }
         let a = next(&mut seed) % r.order;
@@ -398,26 +439,48 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
                 if lhs != curve.mul(Some(r.generator), a) {
                     return Err("original relation does not hold on curve".into());
                 }
-                useful += usize::from(matrix.insert(row.clone())?);
+                useful += usize::from(coefficients.insert(&row[..variables])?);
+                augmented.insert(&row)?;
+                if augmented.rank() != coefficients.rank() {
+                    return Err("independently detected inconsistent scalar rows".into());
+                }
                 original.push(row);
             }
         } else if !query["oracle"].is_null() {
             return Err("identity attempt must not carry an oracle answer".into());
         }
-        if query["rank_after"] != matrix.rows.len() || query["useful_rows"] != useful {
+        if query["rank_after"] != coefficients.rank() || query["useful_rows"] != useful {
             return Err("rank/yield recomputation mismatch".into());
         }
     }
-    if record["original_rows"] != serde_json::to_value(&original).map_err(|e| e.to_string())?
-        || record["final_rref"] != serde_json::to_value(&matrix.rows).map_err(|e| e.to_string())?
-    {
+    if record["original_rows"] != serde_json::to_value(&original).map_err(|e| e.to_string())? {
         return Err("retained relation matrix mismatch".into());
     }
+    let declared_rref: Vec<(usize, Vec<u64>)> =
+        serde_json::from_value(record["final_rref"].clone()).map_err(|e| e.to_string())?;
+    augmented.verify_rref(&declared_rref, coefficients.rank())?;
     let answer: Option<u64> =
         serde_json::from_value(record["recovered"].clone()).map_err(|e| e.to_string())?;
-    if answer != matrix.target() || answer.is_some_and(|k| k >= r.order) {
+    let determined = coefficients.contains(&target_unit)?;
+    if answer.is_some() != determined || answer.is_some_and(|k| k >= r.order) {
         return Err("recovery certificate mismatch".into());
     }
+    let (recovery_weights, ambiguity_kernel) = if let Some(k) = answer {
+        let mut equation = target_unit.clone();
+        equation.push(k);
+        let weights = augmented
+            .representation(&equation)?
+            .ok_or("recovered scalar equation is not implied by original rows")?;
+        augmented.verify_combination(&original, &weights, &equation)?;
+        (Some(weights), None)
+    } else {
+        let kernel = coefficients
+            .ambiguity(variables - 1)?
+            .ok_or("unknown result has no target ambiguity")?;
+        let rows: Vec<Vec<u64>> = original.iter().map(|r| r[..variables].to_vec()).collect();
+        coefficients.verify_kernel(&rows, variables - 1, &kernel)?;
+        (None, Some(kernel))
+    };
     if answer.is_none() && queries.len() != r.max_queries {
         return Err("truncated query stream is not a query-cap result".into());
     }
@@ -448,12 +511,74 @@ pub(super) fn replay(r: &Request, record: &serde_json::Value) -> Result<Certific
     {
         return Err("scalar verification/status mismatch".into());
     }
-    Ok(Certificate{schema:"pkm.toy-dlp-replay/v1",oracle_records:checked,rows_checked:original.len(),scalar_verified:verified,rank:matrix.rows.len(),scope:"independent affine row/scalar equations; rank recomputed with producer elimination; no independent cost admission"})
+    Ok(Certificate{schema:"pkm.toy-dlp-replay/v2",oracle_records:checked,rows_checked:original.len(),scalar_verified:verified,rank:coefficients.rank(),recovery_weights,ambiguity_kernel,scope:"independent affine equations and rightmost-pivot scalar row-space/rank replay; original-row recovery combination or target-changing kernel witness; no complete cost admission"})
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn query_field_emission_conserves_every_attempt_including_identity() {
+        let mut oracle = crate::tests::fixture();
+        oracle.target = Point { x: 6, y: 3 };
+        oracle.limits.solver_millis = 0;
+        let request = Request {
+            schema: "pkm.toy-dlp-request/v1".into(),
+            oracle,
+            generator: Point { x: 5, y: 1 },
+            order: 19,
+            seed: 20261030,
+            max_queries: 128,
+        };
+        let result = run(&request).unwrap();
+        assert_eq!(result.queries.len(), 128);
+        assert!(result.queries.iter().any(|q| q.rhs.is_none()));
+        let mut total = GroupOps::default();
+        let group = PrimeCurve { p: 17, a: 2, b: 2 };
+        for query in &result.queries {
+            // Reconstruct public query generation; verify every local emitted
+            // block before checking aggregate conservation and serialization.
+            let mut expected = GroupOps::default();
+            let ap = group.mul(&mut expected, PrimePoint::affine(5, 1), query.a);
+            let bq = group.mul(&mut expected, PrimePoint::affine(6, 3), query.b);
+            let rhs = group.add(&mut expected, ap, bq);
+            assert_eq!(rhs.infinity, query.rhs.is_none());
+            assert_eq!(query.generation_counts, expected);
+            assert_eq!(query.generation_field_counts.field_ops, expected.field_ops);
+            total.merge(query.generation_counts);
+        }
+        assert_eq!(total, result.query_generation_counts);
+        assert_eq!(
+            total.field_ops,
+            result.query_generation_field_counts.field_ops
+        );
+        assert!(total.field_ops.invs > 0);
+        assert!(total.field_ops.muls > 0);
+        assert_eq!(result.query_generation_field_counts.coordinate_modulus, 17);
+        assert_eq!(result.request.order, 19); // coordinate and scalar units differ
+        assert_eq!(result.setup_reference_counts.point_tests, 17 * 17 + 2);
+        let value = serde_json::to_value(result).unwrap();
+        assert!(value["query_generation_counts"].get("field_ops").is_none());
+        assert_eq!(
+            value["query_generation_field_counts"]["field_ops"]["invs"],
+            total.field_ops.invs
+        );
+        assert_eq!(
+            value["query_generation_field_counts"]["montgomery_reductions"],
+            total.montgomery_reductions
+        );
+        assert_eq!(value["comparison_admissible"], false);
+    }
+
+    #[test]
+    fn inverse_diagnostic_does_not_replace_expanded_multiplications() {
+        let mut matrix = Elimination::new(19, 1);
+        assert_eq!(matrix.inv(2), 10);
+        assert_eq!(matrix.ops.inverse_calls, 1);
+        assert_eq!(matrix.ops.multiplications, 6); // exponent17: four squares + two products
+        assert_eq!(matrix.ops.subtractions, 0);
+    }
+
     #[test]
     fn rank_deficiency_and_contradiction_are_not_answers() {
         let mut matrix = Elimination::new(19, 3);
@@ -481,12 +606,35 @@ mod tests {
         assert!(result.scalar_verified);
         assert!(!result.comparison_admissible);
         let record = serde_json::to_value(&result).unwrap();
-        assert!(replay(&request, &record).unwrap().scalar_verified);
+        let certificate = replay(&request, &record).unwrap();
+        assert!(certificate.scalar_verified);
+        assert!(certificate.recovery_weights.is_some());
+        assert!(certificate.ambiguity_kernel.is_none());
+        let mut equation = vec![0; result.factor_base.len() + 2];
+        equation[result.factor_base.len()] = 1;
+        equation[result.factor_base.len() + 1] = result.recovered.unwrap();
+        super::super::rank_reference::Space::new(request.order, equation.len())
+            .unwrap()
+            .verify_combination(
+                &result.original_rows,
+                certificate.recovery_weights.as_ref().unwrap(),
+                &equation,
+            )
+            .unwrap();
         let mut bad = record.clone();
         bad["recovered"] = serde_json::json!(3);
         assert!(replay(&request, &bad).is_err());
-        let mut bad = record;
+        let mut bad = record.clone();
         bad["queries"][0]["a"] = serde_json::json!(19);
+        assert!(replay(&request, &bad).is_err());
+        let mut bad = record.clone();
+        bad["queries"][0]["rank_after"] = serde_json::json!(999);
+        assert!(replay(&request, &bad).is_err());
+        let mut bad = record;
+        let row = bad["final_rref"][0][1].as_array_mut().unwrap();
+        for value in row {
+            *value = serde_json::json!((value.as_u64().unwrap() * 2) % request.order);
+        }
         assert!(replay(&request, &bad).is_err());
     }
     #[test]
@@ -504,7 +652,19 @@ mod tests {
         let result = run(&request).unwrap();
         assert_eq!(result.recovered, None);
         assert_eq!(result.status, "unknown_query_cap");
-        replay(&request, &serde_json::to_value(&result).unwrap()).unwrap();
+        let certificate = replay(&request, &serde_json::to_value(&result).unwrap()).unwrap();
+        assert!(certificate.recovery_weights.is_none());
+        let kernel = certificate.ambiguity_kernel.unwrap();
+        let vars = result.factor_base.len() + 1;
+        let original: Vec<Vec<u64>> = result
+            .original_rows
+            .iter()
+            .map(|r| r[..vars].to_vec())
+            .collect();
+        super::super::rank_reference::Space::new(request.order, vars)
+            .unwrap()
+            .verify_kernel(&original, vars - 1, &kernel)
+            .unwrap();
         request.order = 17;
         assert!(run(&request).is_err());
     }

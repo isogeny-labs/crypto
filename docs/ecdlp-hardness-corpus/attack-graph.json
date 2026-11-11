@@ -7,26 +7,26 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 541,
-    "frontier": 330,
+    "nodes": 613,
+    "frontier": 395,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
       "definition": 43,
-      "assumed": 15,
+      "assumed": 18,
       "proved_external": 132,
       "algorithm": 12,
-      "conditional": 88,
-      "measured": 24,
-      "proved_internal_unreviewed": 47,
-      "open": 45,
+      "conditional": 89,
+      "measured": 31,
+      "proved_internal_unreviewed": 70,
+      "open": 70,
       "heuristic": 71,
-      "refuted": 20,
+      "refuted": 33,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 504,
-      "kernel_checked": 29,
+      "none": 560,
+      "kernel_checked": 45,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 4
@@ -80,6 +80,18 @@
         {
           "from": "HEUR-WD-SUBGROUP-SMOOTHNESS",
           "relation": "qualifies"
+        },
+        {
+          "from": "THM-MEAN-COUNT-IDENTITY",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PF-YIELD-CENSUS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
+          "relation": "qualifies"
         }
       ]
     },
@@ -111,6 +123,10 @@
         },
         {
           "from": "THM-RP-COFACTOR4-RANK-SHORTFALL",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-LEFT-KERNEL-RELATIONS",
           "relation": "qualifies"
         }
       ]
@@ -263,6 +279,10 @@
         {
           "from": "THM-SP-KY-SUMPOLY-NP-COMPLETE",
           "relation": "qualifies"
+        },
+        {
+          "from": "THM-SD-DEGREE2-CRITERION",
+          "relation": "qualifies"
         }
       ]
     },
@@ -291,6 +311,10 @@
         },
         {
           "from": "HEUR-GG-BRENT-POLLARD-ADDING",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PA-RHO-SEPARATION",
           "relation": "qualifies"
         }
       ]
@@ -546,7 +570,12 @@
         "RT-BK-BOOK-INVENTORY",
         "RT-BK-DECOMP-MEASURE"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "HEUR-GB-PQ-ASSUMPTION-2",
@@ -584,6 +613,22 @@
         {
           "from": "OBS-SP-KY-SEMAEV-N45",
           "relation": "obstructs"
+        },
+        {
+          "from": "THM-SD-DEGREE2-CRITERION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-SD-SUBSPACE-CRITERION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PQ2-DLIN-CENSUS",
+          "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-PQ2-MSOLVE-F4",
+          "relation": "qualifies"
         }
       ]
     },
@@ -622,7 +667,12 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "MEAS-RANK-DEFICIT-CENSUS",
+          "relation": "obstructs"
+        }
+      ]
     },
     {
       "id": "HEUR-PF-PKM-SOLUTION-COUNT",
@@ -864,6 +914,14 @@
         },
         {
           "from": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-PA-POLY-FUNCTION",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
           "relation": "qualifies"
         }
       ]
@@ -1441,7 +1499,12 @@
       "research_targets": [
         "RT-BK-BOOK-INVENTORY"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-LEFT-KERNEL-RELATIONS",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "HEUR-GB-SEMIREG-ASSUMPTION",
@@ -1666,6 +1729,10 @@
         {
           "from": "HEUR-DECOMPOSITION-PROBABILITY",
           "relation": "qualifies"
+        },
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
+          "relation": "qualifies"
         }
       ]
     },
@@ -1714,6 +1781,10 @@
         {
           "from": "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4",
           "relation": "qualifies"
+        },
+        {
+          "from": "MEAS-PQ2-MSOLVE-N37-STEP5",
+          "relation": "obstructs"
         }
       ]
     },
@@ -1913,6 +1984,34 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "ASM-PA-FS-CHALLENGE-INDEPENDENCE",
+      "label": "Fiat-Shamir-derived batching challenges act as independent uniform challenges",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 1,
+      "downstream": [
+        "COND-PA-FS-BATCH-SOUNDNESS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "ASM-XEDNI-TRIAL-MARGINAL",
+      "label": "Each adaptive xedni trial, as run, succeeds with marginal probability O(1/p)",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "STD-BK-SAFECURVES-RHO",
@@ -2198,7 +2297,12 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "GAP-PA-DLP-CDH-DDH-DIRECTION",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "RED-PAIRING-CO-DDH",
@@ -2212,7 +2316,12 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-PA-PAIRING-DECIDES-DDH",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "STANDARD-CURVE-EXCLUSIONS",
@@ -2242,8 +2351,26 @@
         {
           "from": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
           "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PA-CURVE-SELECTION",
+          "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "CEX-PA-BATCH-ADAPTIVE",
+      "label": "Adaptive RLC cancellation and fixed-error count (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "COND-PA-FS-BATCH-SOUNDNESS"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "RED-GG-FKL-AGM-CDH-DL",
@@ -2257,7 +2384,12 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "GAP-PA-MODEL-BOUNDARIES",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "THM-BK-GG-SEMAEV-LEMMA2",
@@ -2268,6 +2400,20 @@
       "impact": 1,
       "downstream": [
         "DEF-BK-GG-UNROLLED-SYSTEM"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-F4-CONTAINMENT",
+      "label": "F4 runs with step degree <= D stay in every D-closed subspace containing the generators",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "MEAS-PQ2-DLIN-CENSUS"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -2301,6 +2447,34 @@
       "impact": 1,
       "downstream": [
         "CLAIM-GG-FKL-AGM-TO-GGM"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-HAZARD-MARGINAL-SUFFICES",
+      "label": "Per-trial marginal bounds give the linear waiting time (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "OBSTRUCTION-XEDNI-HEIGHT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-PA-SCHNORR-SS",
+      "label": "Schnorr special soundness under exact fork hypotheses (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "RED-SCHNORR-ROM"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -2387,6 +2561,20 @@
       "impact": 1,
       "downstream": [
         "COND-BINARY-WEIL-DESCENT"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-SD-SUBSPACE-CRITERION",
+      "label": "Linear-count criterion for any finite-dimensional subspace: d_lin <= sd (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "MEAS-PQ2-DLIN-CENSUS"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -2580,6 +2768,23 @@
       ]
     },
     {
+      "id": "CLAIM-JV-ASSUMPTION1-ALL-CURVES",
+      "label": "'Omega(q^(n-1)/(n-1)!) decomposable points whenever #F in Omega(q)', over all E/F_{q^n}",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-SUBFIELD-FACTOR-BASE",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
       "id": "CLAIM-LEMMA4-REVERSE-GENERAL",
       "label": "Reverse repair d'_F <= d_F (outside), unrestricted",
       "status": "refuted",
@@ -2592,6 +2797,210 @@
       "pressure": [
         {
           "from": "CEX-LEMMA4-REVERSE-R",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-MARGINAL-IMPLIES-HAZARD",
+      "label": "'Per-trial success bounds give the conditional-hazard recurrence'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-HAZARD-SEPARATION",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-AMBIENT-BLINDING",
+      "label": "'Blinding by any group element preserves a subgroup DLP instance'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-AMBIENT-BLINDING",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-BATCH-ADAPTIVE",
+      "label": "'Random-linear-combination batching fails with probability <= d/|F| even against adaptive errors'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-BATCH-ADAPTIVE",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
+      "label": "'Cofactor clearing maps onto the prime subgroup bijectively'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-COFACTOR-ZMOD9",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-MOD-ALIAS",
+      "label": "'Equality in ZMod q is equality of the represented integers'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-MOD-ALIAS",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
+      "label": "'Pedersen commitments with independent generators are binding unconditionally'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-POLY-FUNCTION",
+      "label": "'Polynomials equal at every field point are equal as formal polynomials'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-POLY-FUNCTION",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-SCHNORR-ANY-TWO",
+      "label": "'Any two accepting Schnorr-like transcripts reveal the witness'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-SCHNORR-SAME-CHALLENGE",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-SS-IMPLIES-FS",
+      "label": "'Special soundness implies Fiat-Shamir security'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-ZERO-HASH-FORGERY",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-SUBGROUP-AMBIENT",
+      "label": "'An accepted ambient group element is a scalar multiple in the intended subgroup'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-SUBGROUP-AMBIENT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-PA-ZK-IMPLIES-SOUND",
+      "label": "'Complete, zero-knowledge protocols are sound'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-ALWAYS-ACCEPT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-SHOUP-ALL-ALGORITHMS",
+      "label": "'Every algorithm needs Omega(sqrt r) group operations for DLP in a prime-order group'",
+      "status": "refuted",
+      "formal": "none",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-TRANSPARENT-ENCODING",
           "relation": "refutes"
         }
       ]
@@ -3034,6 +3443,335 @@
       ]
     },
     {
+      "id": "GAP-PA-CIRCUIT-EC-REFINEMENT",
+      "label": "In-circuit elliptic-curve arithmetic refinement",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-COFACTOR",
+      "label": "Cofactor clearing as a uniform projection",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-PROTOCOL-QUEUE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-PA-COFACTOR-ZMOD9",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-CONCRETE-MULTIUSER",
+      "label": "Concrete and multi-user security accounting",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-CURVE-SELECTION",
+      "label": "Curve-selection assumptions with exact curve and subgroup identities",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-DLP-CDH-DDH-DIRECTION",
+      "label": "DLP, CDH and DDH are not interchangeable",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-PROTOCOL-QUEUE"
+      ],
+      "pressure": [
+        {
+          "from": "THM-PA-PAIRING-DECIDES-DDH",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-EXCEPTIONAL-FORMULAS",
+      "label": "Exceptional cases of elliptic-curve addition formulas",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-FORKING-LEMMA",
+      "label": "Finite random-oracle game semantics for the forking lemma",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-FS-TRANSCRIPT-ENCODING",
+      "label": "Fiat-Shamir transcript encoding",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-FS-ZERO-HASH",
+      "label": "'Special soundness implies Fiat-Shamir security'",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-PROTOCOL-QUEUE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-PA-ZERO-HASH-FORGERY",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-FULL-KZG-GROTH-PLONK",
+      "label": "End-to-end KZG, Groth16 and PLONK",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-GGM-TRANSPARENT-ENCODING",
+      "label": "Generic-group lower bounds versus transparent encodings",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-TRANSPARENT-ENCODING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-HASH-TO-CURVE",
+      "label": "Hash-to-curve contracts (RFC 9380)",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-INVALID-CURVE-PATHS",
+      "label": "Invalid-curve and twist input paths",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-KZG-BATCHING",
+      "label": "KZG batch opening boundaries",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-KZG-TRAPDOOR-DEGREE",
+      "label": "KZG trapdoor and degree boundaries",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-MODEL-BOUNDARIES",
+      "label": "ROM, AGM, KEA, q-SDH and QROM as named models",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-ONE-SHOT-REPEAT",
+      "label": "One-shot success bound versus geometric waiting time",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-XEDNI-HAZARD",
+        "RT-PA-PROTOCOL-QUEUE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-HAZARD-SEPARATION",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-PEDERSEN-RELATION",
+      "label": "'Independent generators' read as literal linear independence",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-PROTOCOL-QUEUE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-PLONK-PRODUCTS",
+      "label": "PLONK permutation and lookup product premises",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-RHO-SEPARATION",
+      "label": "Separate rho correctness, collision time and collision usefulness",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-RSR-EXACT-SUBGROUP",
+      "label": "ECDLP random self-reducibility over the exact subgroup",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-PA-AMBIENT-BLINDING",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PA-SNARK-DEFINITIONS",
+      "label": "SNARK definitions as separate games",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "GAP-PA-ZK-SEPARATION",
+      "label": "Completeness, zero knowledge, soundness and proof of knowledge are distinct",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-PROTOCOL-QUEUE"
+      ],
+      "pressure": [
+        {
+          "from": "CEX-PA-ALWAYS-ACCEPT",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "GAP-PF-DEDICATED-ROOT-FINDER",
       "label": "Dedicated algorithm for the generalized root-finding problem",
       "status": "open",
@@ -3116,6 +3854,23 @@
       "pressure": []
     },
     {
+      "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+      "label": "Can a trace-pulled-back subspace factor base be small?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "MEAS-TRACE-PULLBACK-CENSUS",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
       "id": "GAP-PKM-SOLVING-DEGREE",
       "label": "Prime-field PKM solving-degree growth",
       "status": "open",
@@ -3135,6 +3890,23 @@
         },
         {
           "from": "THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PQ2-M2-RANK-CENSUS",
+      "label": "Does r2 < k hold on m = 2 descended S_3 instances for infinitely many n?",
+      "status": "open",
+      "formal": "none",
+      "action": "prove or refute",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "THM-BOOLEAN-NSS-UNIQUE",
           "relation": "qualifies"
         }
       ]
@@ -3690,6 +4462,10 @@
         {
           "from": "RED-MAURER-AUXILIARY-CURVE",
           "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PA-DLP-CDH-DDH-DIRECTION",
+          "relation": "qualifies"
         }
       ]
     },
@@ -3718,6 +4494,29 @@
         },
         {
           "from": "GAP-MULTITARGET-NONUNIFORM",
+          "relation": "qualifies"
+        }
+      ]
+    },
+    {
+      "id": "ASM-XEDNI-HAZARD-RECURRENCE",
+      "label": "Adaptive xedni trials satisfy a history-uniform conditional-hazard recurrence",
+      "status": "assumed",
+      "formal": "none",
+      "action": "assumption: narrow its scope or reduce it to a weaker one",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [
+        "RT-PA-XEDNI-HAZARD"
+      ],
+      "pressure": [
+        {
+          "from": "GAP-PA-ONE-SHOT-REPEAT",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-HAZARD-MARGINAL-SUFFICES",
           "relation": "qualifies"
         }
       ]
@@ -3862,7 +4661,12 @@
       "research_targets": [
         "RT-BK-THRESHOLDS"
       ],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "GAP-PA-INVALID-CURVE-PATHS",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "ALG-GAUDRY-FIXED-EXTENSION",
@@ -4069,7 +4873,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "CEX-PA-SUBGROUP-AMBIENT",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "CLAIM-BK-SEC1-COFACTOR-CDH",
@@ -4084,6 +4893,10 @@
       "pressure": [
         {
           "from": "RED-MAURER-AUXILIARY-CURVE",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PA-COFACTOR",
           "relation": "qualifies"
         }
       ]
@@ -4105,6 +4918,10 @@
         },
         {
           "from": "LB-GG-AHP-GEOMETRIC",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PA-MODEL-BOUNDARIES",
           "relation": "qualifies"
         }
       ]
@@ -4253,6 +5070,23 @@
       "depends_citations": [],
       "research_targets": [],
       "pressure": []
+    },
+    {
+      "id": "COND-PA-FS-BATCH-SOUNDNESS",
+      "label": "Fiat-Shamir RLC batch verification fails with probability <= d/|F|",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "GAP-PA-KZG-BATCHING",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "COND-PF-APS-BEATS-PKM",
@@ -4751,6 +5585,18 @@
         {
           "from": "DEF-GG-GENERIC-ROM",
           "relation": "qualifies"
+        },
+        {
+          "from": "CEX-PA-SUBGROUP-AMBIENT",
+          "relation": "qualifies"
+        },
+        {
+          "from": "GAP-PA-FS-ZERO-HASH",
+          "relation": "qualifies"
+        },
+        {
+          "from": "CEX-PA-ZERO-HASH-FORGERY",
+          "relation": "qualifies"
         }
       ]
     },
@@ -4854,6 +5700,18 @@
       "pressure": []
     },
     {
+      "id": "CEX-HAZARD-SEPARATION",
+      "label": "Three-point model: marginals <= 1/3, hazard recurrence fails (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-INSIDE-GAP-N1-FAMILY",
       "label": "n = 1: {X^k, X^k+1} has inside gap k - 1",
       "status": "proved_internal_unreviewed",
@@ -4902,6 +5760,114 @@
         "RT-LEMMA4-FORMAL",
         "RT-LEMMA4-REVERSE"
       ],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-ALWAYS-ACCEPT",
+      "label": "Always-accept protocol: complete, simulatable, unsound (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-AMBIENT-BLINDING",
+      "label": "Ambient blinding leaves the subgroup; subgroup blinding is a bijection (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-COFACTOR-ZMOD9",
+      "label": "In Z/9, cofactor 3 kills the order-3 subgroup; coprime cofactors are bijective (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-MOD-ALIAS",
+      "label": "Modulus alias and bounded repair (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+      "label": "H = tG gives commit(m, r) = commit(m + t, r - 1) (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-POLY-FUNCTION",
+      "label": "Nonzero polynomial with zero function (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-SCHNORR-SAME-CHALLENGE",
+      "label": "Schnorr extraction countermodels: equal challenges; nonunit difference over ZMod 4",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-SUBGROUP-AMBIENT",
+      "label": "Ambient membership does not imply designated-subgroup membership (Lean, sibling)",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-PA-ZERO-HASH-FORGERY",
+      "label": "Constant-zero challenge: (sP, 0, s) verifies for every key (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
       "pressure": []
     },
     {
@@ -4996,6 +5962,30 @@
           "relation": "qualifies"
         }
       ]
+    },
+    {
+      "id": "CEX-SUBFIELD-FACTOR-BASE",
+      "label": "Subfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "CEX-TRANSPARENT-ENCODING",
+      "label": "Z/r with the identity encoding: the logarithm is the encoding (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
     },
     {
       "id": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
@@ -5284,6 +6274,18 @@
       "pressure": []
     },
     {
+      "id": "THM-BOOLEAN-NSS-UNIQUE",
+      "label": "Unique F_2-solution puts every X_i - z_i in the ideal (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-GB-SEMAEV-TENTI-2DREG",
       "label": "Semaev-Tenti: two-phase solving degree <= 2 d_reg - 2 with field equations",
       "status": "proved_external_unread",
@@ -5335,6 +6337,54 @@
       "status": "proved_external_unread",
       "formal": "none",
       "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-LEFT-KERNEL-RELATIONS",
+      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-MEAN-COUNT-IDENTITY",
+      "label": "Mean ordered representation count is exactly |F|^m / |G| (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+      "label": "Nagao Lemma 4 holds in the literal >=, field-equations-inside cell (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-PA-PAIRING-DECIDES-DDH",
+      "label": "A nondegenerate pairing decides DDH with one evaluation (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
       "depends_citations": [],
@@ -5595,6 +6645,18 @@
     {
       "id": "THM-SALIZZONI-EX39-EXACT",
       "label": "Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-SD-DEGREE2-CRITERION",
+      "label": "Solving degree >= 3 when k + rank(quadratic parts) > |F| (Lean)",
       "status": "proved_internal_unreviewed",
       "formal": "kernel_checked",
       "action": "independent review, then kernel-check",

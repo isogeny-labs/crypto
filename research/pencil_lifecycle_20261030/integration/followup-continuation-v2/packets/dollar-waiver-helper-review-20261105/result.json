@@ -1,0 +1,56 @@
+{
+  "schema": "source-delta-review/v1",
+  "standing": "[pcc:unverified]",
+  "scope": "owner dollar-waiver helper only",
+  "candidate_commit": "19415004f875e345f4f312788ed2916563c78bd3",
+  "candidate_sha256": "41123bbcbc8f724c68d9bbe825dd077410a3899fd9f89f97c99b7cd458f981b1",
+  "prior_sha256": "27654595f0ed9e062d9a648ca61c41d8ba6923f21690ad6ef0ac394d85e93546",
+  "published_proposal_commit": "714e95ca6113706f7d85739166dc8bc8e4beeaf8",
+  "publication_confirmation": "Coordinator confirmed push c6dbff6486 includes proposal before inspection",
+  "disposition": "No new defect found in the inspected helper delta; source-only scoped observation",
+  "executed": false,
+  "runtime_validated": false,
+  "additional_attempt_authorized": false,
+  "reviewer_authored_candidate": false,
+  "blind": false,
+  "coordination_note": "Preread plan written after clear scope check and task creation, approximately ten seconds before successful claim; candidate and diff unread at freeze. Preserved as a coordination timing deviation.",
+  "task": "T-1702",
+  "findings": [
+    {
+      "id": "W1",
+      "source": "load_admission:40-64",
+      "status": "source-consistent",
+      "observation": "The delta replaces dollar allocation checks with a hash-bound, exact-scope owner instruction receipt; schema changes explicitly."
+    },
+    {
+      "id": "W2",
+      "source": "load_admission:42-45,61-67",
+      "status": "preserved-with-external-obligation",
+      "observation": "Exact recipe fields, one attempt, no automatic retry, deadline and integer worker ceiling remain. The historical 46500 ceiling is not the current 42300 remaining-worker ledger."
+    },
+    {
+      "id": "W3",
+      "source": "durable-launcher.py:31-51,62-67,74-140",
+      "status": "unchanged-source",
+      "observation": "Live lease heartbeat, invocation-bound permit and cleanup, elapsed/UTC guards and completion sealing are unchanged."
+    },
+    {
+      "id": "W4",
+      "source": "durable-worker.py:84-103,117-141",
+      "status": "unchanged-source",
+      "observation": "Actual cgroup readback, permit before input work, four ordered exact tests, full suite, immutable input checks and failure receipt remain unchanged."
+    },
+    {
+      "id": "W5",
+      "source": "additional-admission-proposal/PLAN.md",
+      "status": "not-admitted",
+      "observation": "Proposal remains unexecuted and requires a fresh approved attempt, exact publication, live ownership and current budget. Descriptive disabled fields are not worker enforcement."
+    }
+  ],
+  "limitations": [
+    "Hash-bound approval receipt checks content, not independent authentication of the owner; the recorded owner instruction must be supplied by the coordinator.",
+    "Static worker ceiling is not an atomic campaign allocation or current debit check; fresh admission must bind the current ledger and separate attempt approval.",
+    "Python assertions require ordinary non-optimized interpreter; this is inherited. The reviewed recipe uses python3 -B, not -O.",
+    "No runtime, compiler, test, mock, or scientific payload executed; source review does not establish fresh-launch admission."
+  ]
+}

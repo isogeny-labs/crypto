@@ -4,6 +4,7 @@
 //! solve. The `relations` phase clocks collector construction and probe loops
 //! only; `solve_wall_ns` remains the end-to-end one-target run.
 
+use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::time::Instant;
 
@@ -197,7 +198,7 @@ pub fn solve(
     if descent.verified {
         counters.insert("verified_descents".into(), 1);
     }
-    let recovered = descent.recovered.map(u128::from);
+    let recovered = descent.recovered.map(ExactScalar::from);
     Ok(SolveReport {
         recovered,
         exhausted: recovered.is_none(),
@@ -261,7 +262,11 @@ mod tests {
                 0x5eed,
             )
             .unwrap();
-            assert_eq!(report.recovered, workload.planted, "{coordinates}");
+            assert_eq!(
+                report.recovered,
+                workload.planted.map(ExactScalar::from),
+                "{coordinates}"
+            );
             assert!(!report.exhausted, "{coordinates}");
             assert_eq!(report.counters["rejected_relations"], 0, "{coordinates}");
             assert_eq!(report.counters["verified_descents"], 1, "{coordinates}");

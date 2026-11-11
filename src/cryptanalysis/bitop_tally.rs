@@ -110,6 +110,14 @@ pub fn field_ops(adds: u64, muls: u64, sqrs: u64, invs: u64) {
     bump(&FIELD_INVS, invs);
 }
 
+/// Add `t` to this thread's tallies: work another thread did on this
+/// thread's behalf.
+pub fn credit(t: Tally) {
+    bump(&WORD_OPS, t.word_ops);
+    bump(&HASH_PROBES, t.hash_probes);
+    field_ops(t.field_adds, t.field_muls, t.field_sqrs, t.field_invs);
+}
+
 /// This thread's tallies so far.
 pub fn snapshot() -> Tally {
     Tally {

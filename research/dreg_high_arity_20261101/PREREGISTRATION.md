@@ -19,9 +19,11 @@ affected data at pushed source commit
 after the replacement four-binary rebuild and validation. Amendment
 `A3-CARGO-MANIFEST-ADVANCE` then superseded the v3 identities before affected
 data when current main registered a new binary in the recursively frozen root
-`Cargo.toml`. Protocol v4 is draft pending the new source commit, rebuild, and
-refreeze. No registered draw, closure attempt, analysis, publication, or cloud
-job has run.
+`Cargo.toml`. Protocol v4 was canonically frozen before affected data at pushed
+source commit `5ad6cecdf4805d8a91dc6cb28ff1d263bfeed6df`, protocol SHA-256
+`a9670894fe4ec61e4e4693799132774c8ea8b21e4d90c41b4d53901b414d3f72`,
+after the replacement rebuild and validation. No registered draw, closure
+attempt, analysis, publication, or cloud job has run.
 
 ## Question and scope
 

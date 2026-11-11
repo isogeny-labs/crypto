@@ -1,0 +1,54 @@
+spec ECS1h04f0947dd1f5 (XP-20261029-packed-filter P24 wall session: wall time per operation, filtered packed pair table against the packed pair table at N 162): 1344 executions
+  arm dgb              baseline   ECM1h7130702fe80a ic.pipeline {"factor_base": "prime-abscissa:size=162", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm-prime-blocked:m=2", "solver": "", "solver_budget_seconds": "0", "targets": "stride-renew-deferred-guard"}
+  arm dgb-aa           control    ECM1h7130702fe80a ic.pipeline {"factor_base": "prime-abscissa:size=162", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm-prime-blocked:m=2", "solver": "", "solver_budget_seconds": "0", "targets": "stride-renew-deferred-guard"}
+  arm dgbf             candidate  ECM1h72ec76c15b6d ic.pipeline {"factor_base": "prime-abscissa:size=162", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm-prime-blocked:m=2,filter=1", "solver": "", "solver_budget_seconds": "0", "targets": "stride-renew-deferred-guard"}
+  arm dgbf-edge        reference  ECM1h72ec76c15b6d ic.pipeline {"factor_base": "prime-abscissa:size=162", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm-prime-blocked:m=2,filter=1", "solver": "", "solver_budget_seconds": "0", "targets": "stride-renew-deferred-guard"}
+  workload W319293275e4f icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W48c7b18d8a0c icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W0f663374db53 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W6568b4ced1fc icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W95431f623a46 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W490cb5a5d1c8 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload We667d103e808 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W49ec4ccaaf80 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W1f8fd52ab6e3 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W23505dcad7eb icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W5755892a9e5e icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Wa24a01d2ca91 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload We5161bc75935 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Wca588fae2fd5 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W75bedb687ee2 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Wb5d9231b68ea icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Weac49aaf43d6 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W80bbfebc739d icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W4a6fc88cc560 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Wbf025bb842e1 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W3d04d851329b icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Wa27406da5721 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W724095dbcee3 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload W53ac48556de1 icv1-fp24-t217-e1fbffd2 r=2^23.60 A=2 registered=false ec1=-
+  workload Web2c1ef54b57 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W0497bfe120de icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wc393a5227fc6 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W1e1f078dfa65 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wa948d3e3e81b icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wdecc1d5a1c61 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W7c731290a459 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload We9a52b153a9e icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W661c77938b1a icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W441ffa90fd53 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wbdb6de2cb749 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload We40d1a34bf0f icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wea75d39d0831 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wb0e9639ce7b1 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W79f28119f80f icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wb312aca7713e icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wfca0a9b8c940 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wb52e8ca74e73 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W2463a0dd797d icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W82af5f97b618 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wfc70bade61db icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W4f3a820ac5ce icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload Wf448761b7b07 icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+  workload W940c2189fabc icv1-fp24-tm567-4accd0e8 r=2^23.83 A=2 registered=false ec1=-
+note: 48 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

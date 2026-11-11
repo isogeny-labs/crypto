@@ -1,0 +1,99 @@
+{
+  "schema": "validator-report/v1",
+  "subject": "research/curve25519_ic_atlas_20261104/REPORT.md",
+  "validated_commit": "d0e13779956af4eb9837cfb327ff29f4dfa47b3c",
+  "report_sha256": "7ba5516a625ab60632117c6a53fcd19d87888efbc48e3a92b9d4229e60aa15fd",
+  "tree_state": "moving during validation: HEAD advanced 2ba5d7bbf5 -> 1e2d98c435 -> 35d39cfb91 -> d0e1377995 (another session committing); working tree dirty (T12 ecbench/verify receipts being written; research/curve25519_leads_wave4_20261104 and atlas figures/scripts untracked). REPORT.md on disk is byte-identical to the d0e1377995 blob; the only change since 2ba5d7bbf5 is the §6 progress paragraph (9.55e5 / 6.9e5 / 4.73e5 / ~16x), rechecked against its sources.",
+  "independent": true,
+  "validator": "validator subagent (session model), not the producer",
+  "date": "2026-11-04",
+  "verdict": "pass_with_errata",
+  "scope": "Every numeric claim and attributed claim in REPORT.md checked against the named study READMEs, analysis/summary.json files, ecbench band/compare outputs, pooled_compare.jsonl, validator-report.json files, and the cited code/notes. No experiment rerun; no evidence edited.",
+  "recomputed": [
+    "Curve facts (own code): 1048573 is prime, = 5 mod 8, and is the largest such prime below 2^20; r = 131203 prime, 8r = 1049624, sqrt(r) = 362.22; p-1 = 2^2 * 3^3 * 7 * 19 * 73 = 1048572.",
+    "(a) §5 coset cancellation: over the 64 pairs (c_a, c_b) in Z/8 x Z/8, c_a + c_b = 0 holds for 8, c_a - c_b = 0 for 8, both for 2 (c_a = c_b in {0,4}); union 14/64 = 0.21875. Expected cancelling signed sums per unordered column pair i<j is 16/64 = 0.25. 36*37/2 = 666; 498/666 = 0.7477. Census code (src/bin/curve25519_family.rs:1524-1562): J loops over pairs of signed points (fb.points = 2 x columns = 72 -> 2592 non-trivial pairs) and covered_points counts R and -R separately, so 666 is the number of unordered column pairs, not signed pairs; the uniform-model value of covered/column-pairs is about 0.50 (seed 0: 172/325 = 0.53, seed 1093: 528/1081 = 0.49), so seed 1308's 0.75 is 1.5x uniform.",
+    "(b) §7 grid cost from pkm_semaev.rs grid(), m = 2, first_only = false: the outer loop charges 6 per i (s3c closure, n times) and the inner loop over j >= i charges 2 per pair (n(n+1)/2 pairs). Total = 6n + n(n+1) = n^2 + 7n exactly. For |V| = 2^t = 32 (prepare() requires v.len() == 1 << t, line 1793): 1024 + 224 = 1248 F_p multiplications per target, as the report states. Cross-checks from data: T7 native counters give pkm_grid_fp_mults_uncharged = 1248 for the t = 5 isogeny cells and 4544 = 64^2 + 7*64 for t = 6; T5's per-arm totals 318080 and 554368 are exactly 70 and 122 grid calls of 4544.",
+    "§6/§7 ratios from pooled_compare.jsonl and band_pooled.txt: 17.10, 60627 (6.06e4), 378172 (3.78e5), 2.090, 7360, 44450; 52816/1248 = 42.3; 100277/13.625 = 7360; 9.55e5/6.06e4 = 15.8; 13528559/362.2 = 37351; 6.94e6/362.2 = 19161; 710094/52816 = 13.44; model 1/18.65 = 0.0536, 1/9.28 = 0.1078, (22/210)/(36/498) = 1.449; measured/model 1.07, 1.19, 1.10, 1.13.",
+    "Frame-search summary.json: P1_inside 49/50; P2 in-scope range 0.9856-1.0122 (n = 20); gain_vs_mean t=5 2.53-2.84, t=6 1.95-2.16, t=7 1.49-1.72; k=20 gain_vs_lo0 4.71 (t=5), 3.31 (t=6)."
+  ],
+  "verified_claims": [
+    "§0 curve constants and A values (frame_search README table).",
+    "§2 ladder Q-A 458/0.959, 533/0.987, 499/0.979, 268/0.669, 245/0.604 (curve25519_algebraic_ladder_20261102/README.md).",
+    "§2 Edwards engine 8/8 equal degree/terms, 0.6386x on 7/7 and 3/3 seeds, gone at G>=1 and t=4,6 (edwards_semaev README; wave2/t6 README).",
+    "§2 T0 per-relation 1.24/1.73/3.00 (t0_algebraic README), 1.944-2.016 and 3.33-4.00 (t0_symmetry README), T7 0.93-0.95x and 3.9-79x (wave2/t7 README).",
+    "§2 2-descent 1.89-2.02x, degree 4->6 and 5->7, 1.28x/1.71x (torsion_leads README, summary.json t2_eff_ratio 1.887-2.023).",
+    "§2 census 2000+2000 frames, 49/50, 0.986-1.012, 2.5-2.8x (t=5), ~2x (t=6), engine 4.71x/3.33x (frame_search README, summary.json).",
+    "§3 m=3 2297x/6643x (wave2/t3 README 2297.13, 6642.86); projection beats T0 3.3-4.0x; T1 1.00-1.12x and 19/20 failures (torsion_leads summary Q1_count 1).",
+    "§4 proj-a S 12.05/12.93/20.83 (T5 band.txt); bits 9.71e8, 9.49e9; bits@L 1.49e8 (6.50x); t0-bits 0.951/0.934/1.25; square-bits 1.28/1.71; isogeny 25/172, 46/528, 36/498, 22/210, 16 terms (T9/T10 READMEs, census table).",
+    "§5 J/cols best-of-2000 in 14 of 15 cells (T9 census table).",
+    "§6 every S value in the table (T5 band.txt, T9 README, T12 band_pooled.txt); paired ratios and CIs (T9 README compare table; T12 pooled_compare.jsonl); model 0.054/0.108/1.45/0.497; search costs 1.35e7 (13,528,559) and 6.94e6 (6,935,271); distances; 9.55e5 (algebraic_ecbench README), 6.9e5 (isogeny_seed README), 4.73e5 (T9 README).",
+    "§7 52,816 mul-adds per target with calls_per_target 16 (T10 data/cells/t5_g4_s1307.json); 1248; ~40x (42.3); 7.4e3x.",
+    "§8 mpt 13x (710094/52816 = 13.44).",
+    "§9 T4/T5 0.641 [0.379, 1.084]; T9 0.5605 [0.421, 0.747]; T10 18.65x; T11 commit 2993713af8 exists (ecbench prime-interval factor base); T12 0.0578 [0.047, 0.072].",
+    "Code/notes: s3_in_u (pkm_semaev.rs:149), Membership::EdwardsBits (:706), test t0_symmetrised_polynomial_is_s3_times_its_t0_image (:3393) and the S3(1/z1,1/z2,z3) = S3/(z1 z2)^2 identity (:3390); the S3 formula in §3.1 matches the grid() coefficients; coordinate_search.rs header (lines 16-24) states the Mobius-frame fact and that it is checked numerically; RESEARCH_EXOTIC_COORDINATES.md §1.3 contains the T4 -> E/<T0> argument (relying on §1.2)."
+  ],
+  "errata": [
+    {
+      "id": "E1",
+      "section": "§10 Validation state",
+      "claim": "Independently validated (validator-report.json in each directory): frame search, torsion leads, isogeny seed (T4/T5), wave 2 (T3, T6, T7, T4-rep), wave 3 T9 and T10. All pass_with_errata.",
+      "source_value": "find research -name validator-report.json: none exists in research/curve25519_torsion_leads_20261103/ or research/curve25519_isogeny_seed_20261103/ (and no session-log validation entry for them). research/curve25519_frame_search_20261103/validator-report.json has status 'errata_open', disposition 'validated (measured claims)', not 'pass_with_errata'. pass_with_errata holds for wave2 T3, T4-rep, T6, T7 and wave3 T9, T10 (6 files).",
+      "fix": "List torsion leads (T1-T3 census) and isogeny seed (T4/T5) as not independently validated; state frame search as validated with status errata_open (E9-E11 since applied in its README)."
+    },
+    {
+      "id": "E2",
+      "section": "§6 End-to-end ledger",
+      "claim": "All sessions: 2 measured rounds",
+      "source_value": "research/curve25519_isogeny_seed_20261103/ecbench/spec.json: measurement.rounds = 1 (warmup 1, order alternate), 6 runs per arm; T9 and T12 have 2 rounds (32 runs per arm).",
+      "fix": "T5 (ECBS1h405f20219036): 1 measured round, 6 runs per arm; T9 and T12: 2 rounds."
+    },
+    {
+      "id": "E3",
+      "section": "§6 (contradicts §10)",
+      "claim": "every run verified by ecbench against the planted scalar, replay audits with 0 problems",
+      "source_value": "§10 itself says T12's replay audit is pending; T12 README Q1 cell reads 'held: 32/32, AUDIT_RESULT' (unfilled placeholder). At validation time research/curve25519_t10_winner_ecbench_20261104/ecbench/verify/c00-c09.txt each read 'audit OK: 10 records, 10 verified, 1 replays reproduced, 0 problems'; c10 was in progress; c11-c15 absent.",
+      "fix": "State that T5 and T9 audits are complete (0 problems) and T12's chunk audits are partial (10 of 16 receipts at 06:13Z), or wait for all 16 before the blanket statement."
+    },
+    {
+      "id": "E4",
+      "section": "§5 Cosets",
+      "claim": "Uniform cosets cancel with probability 14/64 ~ 0.22 (sign-folded). Selection pushes this up. For seed 1308 at t = 6, 498 covered points out of 36*37/2 = 666 signed pairs: 0.75.",
+      "source_value": "src/bin/curve25519_family.rs:1524-1562: J counts pairs of signed points (72 signed points -> 2592 non-trivial pairs), covered_points counts R and -R separately. 666 is the number of unordered column pairs (i <= j). On that denominator the uniform-coset expectation is about 0.50 covered points per column pair (16/64 cancelling signed sums per pair x 2 points), and the data agree: seed 0 172/325 = 0.53, seed 1093 528/1081 = 0.49; seed 1308's 0.75 is 1.5x uniform. 14/64 (recomputed correct) is P(at least one sign cancels) for one column pair i != j, a different quantity.",
+      "fix": "Relabel 666 as unordered column pairs and compare 0.75 with the uniform 0.50 (seed 0 measures 0.53), i.e. a 1.5x coverage-per-pair gain; or quote per signed pair 498/2592 = 0.19 against 1/8. The 14/64 figure stands only as the probability that a column pair admits a cancelling sign."
+    },
+    {
+      "id": "E5",
+      "section": "§4 Factor-base table, proj-a row",
+      "claim": "7.0-8.5x rho-neg (T5 session)",
+      "source_value": "T5 band.txt: 12.053/1.447 = 8.33, 12.931/1.547 = 8.36, 20.831/2.448 = 8.51. The 7.0 lower end comes from curve25519_algebraic_ecbench_20261102 band_s1.txt (7.04/7.06/7.16); T9 7.56-7.68; T12 8.18-8.51.",
+      "fix": "8.3-8.5x in the T5 session; 7.0-8.5x across the four k = 20 sessions, with the sessions named."
+    },
+    {
+      "id": "E6",
+      "section": "§4 Factor-base table, bits@L row",
+      "claim": "2.02*10^9 (t = 5, 4.7x lower)",
+      "source_value": "frame_search README engine table and T3/T7 cells: 2,012,386,385.76 = 2.012*10^9.",
+      "fix": "2.01*10^9 (4.71x lower); mis-rounded at the third significant figure."
+    },
+    {
+      "id": "E7",
+      "section": "§2, 'What does work: choosing the frame'",
+      "claim": "1.6-1.7x (t = 7) over the mean frame",
+      "source_value": "frame_search analysis/summary.json gain_vs_mean at t = 7: 1.49 (k16), 1.63, 1.68, 1.72, 1.68.",
+      "fix": "1.5-1.7x (t = 7)."
+    },
+    {
+      "id": "E8",
+      "section": "§8 Scaling",
+      "claim": "At fixed (t, G), columns, covered and mpt do not depend on k (T4-rep, T6, T10)",
+      "source_value": "wave2/t4_seed_replication README: mpt is 710,09x at every k, but seed-0 columns/covered at t = 6 are 28/198, 30/230, 25/172, 32/270, 39/364 for k = 16..24; frame_search summary.json shows only the per-t means (about 70 at t = 5, about 270 at t = 6) are curve-independent.",
+      "fix": "Say mpt is k-independent and that columns and covered fluctuate per curve and seed around k-independent means at fixed t; the linear-in-r conclusion for E survives in expectation, not cell by cell."
+    }
+  ],
+  "notes": [
+    "§6 'The model is good to 10-20%': measured/model ratios are 1.07, 1.10, 1.13, 1.19 (7-19%); acceptable at the stated precision.",
+    "§7 '52,816 multiply-adds in total' per target is correct (T10 muladds_per_target, calls_per_target 16). The T12 README's 'about 52,816 mul-adds each' for 16 systems is the inconsistent statement, outside this report's scope.",
+    "§6 '6.94e6 GAE (1.92e4 in S)': exact 6,935,271/362.22 = 1.91e4; equal at two significant figures.",
+    "No erratum changes a measured S value, a paired ratio, or any band ordering; E1 and E3 overstate the validation/audit state, E4 misframes the coset statistic, E5-E8 are range or rounding corrections."
+  ]
+}

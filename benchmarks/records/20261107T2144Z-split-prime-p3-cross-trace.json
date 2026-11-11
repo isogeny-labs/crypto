@@ -1,0 +1,186 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-08T01:46:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/cards/p3-run-01.yaml"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "note": "card 1, launched by executor-mechanical with BENCHREC=<this record>; killed by the agent shell's 30-minute background limit after its p24 steps; no receipt, so no exit code or wall time was recorded; outputs kept in runs/run-20261107T214600Z/ and used only as a replay check",
+      "started_utc": "2026-11-07T21:44:00Z",
+      "wall_s": null
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/cards/p3-run-02.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "card 2, launched detached (setsid nohup env BENCHREC=<this record> ...); started_utc approximate from the launch time; wall_s = sum of receipt per-command seconds; exit from the receipt (status completed)",
+      "started_utc": "2026-11-07T22:21:00Z",
+      "wall_s": 11944.444
+    }
+  ],
+  "commit": "72004b435c02aae8bd7e5aff9fb31429e146cec8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-07T21:44:09+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T2144Z-split-prime-p3-cross-trace",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 14,
+      "name": "bonferroni_significant_tests",
+      "note": "of 14 covariate tests at alpha 0.003125; frozen rule 2 null",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2000,
+      "name": "max_abs_rho_effect_pct",
+      "note": "p24 psi5 roots, per SD, 95 % CI [+0.16, +1.25]; rho walk defective (problems/p3census-rho-walk-bimodal.md)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.7
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2000,
+      "name": "aa_rho_correlation_p28",
+      "note": "A/A r between disjoint-seed rho runs per curve; instrument defect",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.986
+    }
+  ],
+  "problem": "ecdlp:split-prime-p3-cross-trace-census",
+  "raw": [
+    {
+      "bytes": 278846,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/curves.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2de7ddf48fa83a07b2e15c803b709966e754b6001a6967c1788224e6ab8acf78",
+      "sha256": "2de7ddf48fa83a07b2e15c803b709966e754b6001a6967c1788224e6ab8acf78",
+      "uploaded": true
+    },
+    {
+      "bytes": 1602929,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/cov.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/2788e8cb8073e072bc6c0fbb7a602d5fa62e28c6cee2bb9b1acedc4429806bf2",
+      "sha256": "2788e8cb8073e072bc6c0fbb7a602d5fa62e28c6cee2bb9b1acedc4429806bf2",
+      "uploaded": true
+    },
+    {
+      "bytes": 586794,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/rhoA.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1efad98aad6cb8662c0ecb0390591d7ecbe0dacbe0585dc379f9537fd326386b",
+      "sha256": "1efad98aad6cb8662c0ecb0390591d7ecbe0dacbe0585dc379f9537fd326386b",
+      "uploaded": true
+    },
+    {
+      "bytes": 586837,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/rhoB.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f2/f2eb6e8f91f550ebdb7b28e5b0c39e3aeb6d73b07be148189435aafeb2296b1a",
+      "sha256": "f2eb6e8f91f550ebdb7b28e5b0c39e3aeb6d73b07be148189435aafeb2296b1a",
+      "uploaded": true
+    },
+    {
+      "bytes": 320890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/yield.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6b/6ba886a2a61cd02ec73d0b5786a8a14f765f9dee09a6fb60fef1fdeeaefd8d32",
+      "sha256": "6ba886a2a61cd02ec73d0b5786a8a14f765f9dee09a6fb60fef1fdeeaefd8d32",
+      "uploaded": true
+    },
+    {
+      "bytes": 6834,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/023c20f9b5ca81c82d3a85826689097127d6d311a5057565b0aa0a06c9794c34",
+      "sha256": "023c20f9b5ca81c82d3a85826689097127d6d311a5057565b0aa0a06c9794c34",
+      "uploaded": true
+    },
+    {
+      "bytes": 296678,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/curves.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/de3b746c54be5ad72184cd569017c98f82d2f7d3f1f17c3b0468fca492e72b19",
+      "sha256": "de3b746c54be5ad72184cd569017c98f82d2f7d3f1f17c3b0468fca492e72b19",
+      "uploaded": true
+    },
+    {
+      "bytes": 1608360,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/cov.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2f/2fd9a1f74d5d282a26272843f20252f21b73ffe524a9cc66f8735a1c1766ca13",
+      "sha256": "2fd9a1f74d5d282a26272843f20252f21b73ffe524a9cc66f8735a1c1766ca13",
+      "uploaded": true
+    },
+    {
+      "bytes": 594890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/rhoA.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6ad52d12ce308e090962e64e6d9de13e8d58f0b817001ba0c13bfb50c7e153a9",
+      "sha256": "6ad52d12ce308e090962e64e6d9de13e8d58f0b817001ba0c13bfb50c7e153a9",
+      "uploaded": true
+    },
+    {
+      "bytes": 594890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/rhoB.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/17/174ed0a8d8f5e4cd13059e0f556cf570657235f865e12ae7e1245aeb6b8989ec",
+      "sha256": "174ed0a8d8f5e4cd13059e0f556cf570657235f865e12ae7e1245aeb6b8989ec",
+      "uploaded": true
+    },
+    {
+      "bytes": 328890,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/yield.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd00e230adb93c002cb2f11d0f88968286d2bcac4d4d75b3fce39faa97197d7e",
+      "sha256": "dd00e230adb93c002cb2f11d0f88968286d2bcac4d4d75b3fce39faa97197d7e",
+      "uploaded": true
+    },
+    {
+      "bytes": 5524,
+      "path": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/aebca379022263b150eb12d49d1ef9aa43ce20cdbe6115c696a00ed53cafd38a",
+      "sha256": "aebca379022263b150eb12d49d1ef9aa43ce20cdbe6115c696a00ed53cafd38a",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/report/REPORT.pdf",
+    "png": [
+      "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/figures/p3_summary.png"
+    ],
+    "svg": [
+      "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/figures/p3_summary.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p3-cross-trace",
+  "status": "measured",
+  "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+  "validation": null
+}

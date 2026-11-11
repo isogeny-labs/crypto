@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-05T17:22:47Z",
+ "id": "PCC-20261105-c46a77",
+ "kind": "execution",
+ "producer": {
+  "commit": "cf98294c73244645dbd9c4e24e0605e6e6963399",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-bidirectional-builder/receipt.json",
+    "sha256": "214e19a15c78b5a930eb10362c35fe081360700c843974a29014f0c822ce6f32"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-bidirectional-builder/test.log",
+    "sha256": "3995ab216a2ed2c0c25c3299f63565cf7f48695e7d82aa562f79168cdd9427bd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-bidirectional-builder/checker-receipt.json",
+    "sha256": "e2720ad5d1027c2880f5adef437555d4477edf9ada24ff3947702bc41dd395f5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Saved local correctness run; no signed execution verifier or timing comparison",
+ "statement": "Saved bidirectional builder receipts report 102 passing native correctness tests and a byte-identical reflection packet, followed by positive polynomial checker replay."
+}

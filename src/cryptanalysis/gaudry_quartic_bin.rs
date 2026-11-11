@@ -3297,6 +3297,9 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
                         .entry("degenerate_fq_muls".into())
                         .or_insert(0) += cost.total_muls;
                 }
+                let degree = u32::from(self.macaulay);
+                self.totals
+                    .observe_degree(degree, degree, cost.total_muls, true, false);
                 return None;
             }
         };
@@ -3314,14 +3317,17 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
             self.totals.solving_degree_max.max(u32::from(self.macaulay));
         self.totals.calls_with_a_degree += 1;
         self.last_witnesses = sol.witnesses.clone();
-        let w = sol.witness?;
-        let idx: Option<Vec<usize>> = w
-            .iter()
-            .map(|q| fb.index_of_key(CountedGroup::key(c, q)))
-            .collect();
-        if idx.is_none() {
+        let idx: Option<Vec<usize>> = sol.witness.as_ref().and_then(|w| {
+            w.iter()
+                .map(|q| fb.index_of_key(CountedGroup::key(c, q)))
+                .collect()
+        });
+        if sol.witness.is_some() && idx.is_none() {
             counters.lift_failures += 1;
         }
+        let degree = u32::from(self.macaulay);
+        self.totals
+            .observe_degree(degree, degree, sol.solve.total_muls, false, idx.is_some());
         idx
     }
     fn decompose_relations(
@@ -3381,6 +3387,30 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn two_large_prime_cycle_closes_over_small_columns() {
+        let mut lp = LargePrimes {
+            max_large: 2,
+            small_permille: 500,
+            small_cols: 2,
+            ..LargePrimes::default()
+        };
+        let r = 101;
+        let (stored, first_ops) = lp.feed(&[(0, 1), (2, 1), (3, 1)], 10, 1, r);
+        assert!(stored.is_none());
+        assert_eq!(first_ops, 0);
+
+        let (closed, second_ops) = lp.feed(&[(1, 1), (2, 1), (3, 1)], 20, 2, r);
+        let closed = closed.expect("the repeated two-large-prime edge closes a cycle");
+        assert_eq!(closed.columns, vec![(0, 100), (1, 1)]);
+        assert_eq!((closed.a, closed.b), (10, 1));
+        assert!(second_ops > 0);
+        assert_eq!(lp.counts.get("lp_decompositions_2_large"), Some(&2));
+        assert_eq!(lp.counts.get("lp_stored_2_large"), Some(&1));
+        assert_eq!(lp.counts.get("lp_full_merged"), Some(&1));
+        assert_eq!(lp.counts.get("lp_merges"), Some(&1));
+    }
 
     fn random_point(c: &CurveB, rng: &mut StdRng) -> PtB {
         loop {

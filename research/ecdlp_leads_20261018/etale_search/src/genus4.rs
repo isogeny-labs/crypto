@@ -184,7 +184,7 @@ fn quadric_points(f: &Fq, qt: QType, mons: &[[u32; 4]]) -> QPoints {
 }
 
 /// Weil bound on the L-polynomial coefficients: |a_i| <= C(2g, i) 2^(i/2).
-fn within_weil(g: usize, lp: &[i64]) -> bool {
+pub(crate) fn within_weil(g: usize, lp: &[i64]) -> bool {
     let mut binom = 1f64;
     lp.iter().enumerate().all(|(i, &a)| {
         if i > 0 {
@@ -196,7 +196,7 @@ fn within_weil(g: usize, lp: &[i64]) -> bool {
 
 /// Power sums p_k = sum of alpha_i^k over the inverse roots of L = sum a_j X^j, k <= kmax:
 /// p_k = -k a_k - sum_{i<k} p_i a_{k-i}.
-fn power_sums(lp: &[i64], kmax: usize) -> Vec<i64> {
+pub(crate) fn power_sums(lp: &[i64], kmax: usize) -> Vec<i64> {
     let a = |j: usize| lp.get(j).copied().unwrap_or(0);
     let mut p = vec![0i64; kmax + 1];
     for k in 1..=kmax {

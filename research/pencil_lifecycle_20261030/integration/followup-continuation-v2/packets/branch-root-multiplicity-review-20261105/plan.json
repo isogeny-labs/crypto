@@ -1,0 +1,51 @@
+{
+  "schema": "formal-preread-source-review-plan/v1",
+  "task": "T-1695",
+  "created_utc": "2026-11-05T19:15:23.280893+00:00",
+  "candidate_read": false,
+  "independence": "Earlier branch derivation and transport review known; successor candidate not inspected.",
+  "target_statement": "For nonzero p over a field and a simple branch point P=(a,0), v_P(E(p)) = 2 * rootMultiplicity(a,p), with finite value; therefore its Nat order equals twice the root multiplicity.",
+  "support_corollary": "Under the reviewed source norm, b nonzero, simple branch and support vanishing, root multiplicities of u1,u2,U sum to 1; derive their nonzero premises from finite stalk support valuation, do not assume the conclusion.",
+  "review_joints": [
+    "Factor p=(X-C a)^m*q with q(a) nonzero using exact mathlib rootMultiplicity API.",
+    "Establish actual branch evaluation of affine polynomial equals p(a); use branchIdeal kernel and localization to prove E(q) unit.",
+    "Transport X-C a to actual projectiveXSubA and use its valuation 2.",
+    "Apply additive valuation product/power and unit zero, with coercions correct and finite before toNat.",
+    "Exclude zero polynomial in generic theorem: mathlib rootMultiplicity(a,0)=0 while valuation(E(0))=top.",
+    "Check source support sum 1 follows from stalk sum 2 and natural arithmetic; no hidden base-order premise."
+  ],
+  "attacks": [
+    "p=0",
+    "p nonzero constant",
+    "p=(X-C a)^m with m>1",
+    "q(a)=0 incorrectly admitted",
+    "singular branch",
+    "abstract evaluator substitution",
+    "top-toNat converting infinity to zero",
+    "characteristic two interpretation",
+    "support factor zero",
+    "assuming desired base multiplicity sum"
+  ],
+  "knowledge": "KB tools unavailable per parent readback; configured binary/catalog absent. Use exact primary local sources and independent derivation.",
+  "source_bindings": [
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/Mathlib/Algebra/Polynomial/Div.lean",
+      "sha256": "755f958b2ae34a593310e6cc3d3316d48258a8cfb51bb58c0ffb58a2e4892849"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjBranchPolynomialEval.lean",
+      "sha256": "20fce390a60291aab9950d24c99005ea8fc79d2b944a42ad91939bf40c932ce0"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjFiniteBranchDVR.lean",
+      "sha256": "181f480366672eadf9fa0e08fac1786f467789d71f677ea858aadac6252cb35f"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchStalk.lean",
+      "sha256": "cc32399449c95235659c251c3a1133daf12bc2668890a56e107a104060a7925a"
+    }
+  ],
+  "compiler_allowed": false,
+  "trials_allowed": false,
+  "await_exact_publication": true
+}

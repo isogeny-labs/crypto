@@ -1,0 +1,50 @@
+{
+ "created_at": "2026-11-09T17:59:21Z",
+ "id": "PCC-20261109-2e4db0",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round66-p192/report.md",
+    "sha256": "4c0d42dda18ac32a509a13d0e63630753f75e5ab07ff98529fe1221a6ca17d15"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round66-p192/audit-summary.json",
+    "sha256": "7f7e6679ea54adf59869f09b9544db5754cfa80d9a3070e68912528c4dfccce2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round66-p192/candidate-response.json",
+    "sha256": "2c7949f0951d877aae9993c34c942c1a38d9243ad15f1d2bffb06b016eb1beb1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round66-p192/candidate-P192.json",
+    "sha256": "b599bd320b6a5e1c7cac48cc81b089dd5ce906e92d4b321b91bf5b3044fadffc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round66-p192/validation.json",
+    "sha256": "9abe9ea62f4e63d8cd4eaa943d3b0238b52022bf7d44e58368d861c9ea921439"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "381 small decoder cases,2694 queries,11382 complete baby blocks;24 prescribed P192 27-factor responses,72 direct rational baby norms. Both denominator modes match, six fresh outputs/receipts match, mutations reject101. Setup separate, small r7 loss retained; no full order-r P192 response.",
+ "statement": "Round66 integrates a per-target H_Q cache and Horner denominator into the selected complete signed-block first response, preserving decoder outputs and prescribed P192 response coefficients with explicit cache, numerator, denominator, reference and selected-query costs."
+}

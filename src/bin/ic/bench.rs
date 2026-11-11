@@ -16,6 +16,7 @@
 //! See `docs/ic/FRAMEWORK.md`.
 
 use clap::Args;
+use crypto_lib::cryptanalysis::curve25519_wide::scan_row;
 use crypto_lib::cryptanalysis::ic_framework::archive::{
     self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase,
 };
@@ -24,10 +25,10 @@ use serde_json::{json, Value};
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    find_prime_order_curve, generic_floor_ops, koblitz_floor_instance, koblitz_instance,
-    random_binary_instance, rho_reference, rho_reference_negation, roster_prime_instance,
-    signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps,
-    PinOutcome, PrimeInstance, RhoResult,
+    curve25519_family_instance, find_prime_order_curve, generic_floor_ops, koblitz_floor_instance,
+    koblitz_instance, random_binary_instance, rho_reference, rho_reference_negation,
+    roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
+    CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
 };
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
@@ -92,9 +93,38 @@ pub struct BenchArgs {
     /// roster's curve at that size; `j0`, `j1728`, `d7` and `d8` generate
     /// a CM curve of that family (order certified against the Cornacchia
     /// candidates, deterministic in `--seed`) so that `glv-orbit` has an
-    /// automorphism group to fold by.
+    /// automorphism group to fold by.  `curve25519` takes the committed
+    /// Curve25519-family miniature at that size (20, 24, 28, 32 bits):
+    /// `p ≡ 5 (mod 8)`, `#E = 8r`, `#E' = 4r'`, smallest Montgomery `A`.
     #[arg(long, default_value = "generic")]
     pub family: String,
+    /// EFD model for the prime instance (`montgom`, `edwards`, `twisted`,
+    /// `twistedhessian`, `hessian`, `jintersect`, `jquartic`, `2dik`, `3dik`).
+    /// When set, the short-Weierstrass bench engine is built from the EFD
+    /// bridge and `--efd-chart` controls input/output.
+    #[arg(long)]
+    pub efd_model: Option<String>,
+    /// EFD chart id (`affine`, `xz`, `jacobian`, `extended`, ...).
+    #[arg(long, default_value = "affine")]
+    pub efd_chart: String,
+    /// Prime field modulus of the EFD curve (`5 <= p < 2^62`).
+    #[arg(long)]
+    pub efd_p: Option<String>,
+    /// EFD model parameter, `NAME=VALUE`; repeatable.
+    #[arg(long = "efd-param", value_name = "NAME=VALUE")]
+    pub efd_params: Vec<String>,
+    /// Prime subgroup order of the EFD curve.
+    #[arg(long)]
+    pub efd_order: Option<String>,
+    /// Cofactor of the EFD curve.
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u64).range(1..))]
+    pub efd_cofactor: u64,
+    /// Generator in `--efd-chart` coordinates, comma-separated.
+    #[arg(long)]
+    pub efd_generator: Option<String>,
+    /// Lift index for quotient EFD charts.
+    #[arg(long, default_value_t = 0)]
+    pub efd_lift: u32,
     /// Binary-field instance of this field degree (random curve).
     #[arg(long)]
     pub char2_degree: Option<u32>,
@@ -589,6 +619,12 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
                 rule: "negation map (A = 2): the only eligible automorphism of this curve",
             }
         }
+        Instance::Wide255 => RhoReferences {
+            matched: None,
+            plain: None,
+            candidates: Vec::new(),
+            rule: "no matched rho reference is wired for the 255-bit wide group",
+        },
         Instance::Binary(i) => {
             let bg = BinaryGroup(&i.fast);
             let (gen, r) = (i.generator, i.r);
@@ -630,6 +666,43 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
 }
 
 /// One prime-field configuration, over `repeats` targets.
+/// The wide Curve25519 path: the relation phase runs, no relation exists, and
+/// the row is `exhausted`.  It exists so `ic bench`/`ic sweep` have an honest
+/// 255-bit measurement instead of a refusal.
+fn run_wide255(specs: &[PipelineSpec], args: &BenchArgs) -> Result<Value, String> {
+    let size_of = |spec: &PipelineSpec| -> usize {
+        spec.factor_base
+            .split([':', ','])
+            .find_map(|kv| kv.strip_prefix("size="))
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1024)
+    };
+    let mut rows = Vec::new();
+    for spec in specs {
+        for rep in 0..args.repeats.max(1) {
+            let seed = args.seed ^ (rep as u64).wrapping_mul(0x9E37_79B9);
+            rows.push(scan_row(size_of(spec), args.max_trials, seed));
+        }
+    }
+    Ok(json!({
+        "schema_version": 1,
+        "operation": "bench",
+        "status": "complete",
+        "instance": "curve25519-wide",
+        "regime": "prime",
+        "rows": rows,
+        "configurations_skipped": [],
+        "rho_reference": Value::Null,
+        "calibration": Value::Null,
+        "what_this_is": "The real 255-bit Curve25519 relation phase, counted. With N base points and T probes the expected hits are T·N/ℓ, so no relation exists at any feasible size; the row is exhausted, not a solve.",
+        "what_this_is_not": [
+            "not a solved ECDLP: no relation was found",
+            "not a speed claim: operation counts only",
+            "not a claim about any deployed key",
+        ],
+    }))
+}
+
 fn run_prime(
     inst: &PrimeInstance,
     spec: &PipelineSpec,
@@ -842,6 +915,8 @@ fn run_binary(
 enum Instance {
     Prime(PrimeInstance),
     Binary(BinaryInstance),
+    /// The real 255-bit Curve25519 group (`--bits 255 --family curve25519`).
+    Wide255,
 }
 
 impl Instance {
@@ -849,6 +924,14 @@ impl Instance {
         match self {
             Instance::Prime(i) => &i.name,
             Instance::Binary(i) => &i.name,
+            Instance::Wide255 => "curve25519-wide",
+        }
+    }
+
+    fn representation_json(&self) -> Result<Option<Value>, String> {
+        match self {
+            Instance::Prime(i) => i.representation_json(),
+            _ => Ok(None),
         }
     }
 }
@@ -994,6 +1077,35 @@ fn spec_from(
     })
 }
 
+fn parse_efd_u64(value: &str) -> Result<u64, String> {
+    let value = value.trim();
+    if let Some(hex) = value
+        .strip_prefix("0x")
+        .or_else(|| value.strip_prefix("0X"))
+    {
+        u64::from_str_radix(hex, 16).map_err(|_| format!("bad integer {value}"))
+    } else {
+        value
+            .parse::<u64>()
+            .map_err(|_| format!("bad integer {value}"))
+    }
+}
+
+fn parse_efd_params(items: &[String]) -> Result<std::collections::BTreeMap<String, u64>, String> {
+    let mut out = std::collections::BTreeMap::new();
+    for item in items {
+        let (name, value) = item
+            .split_once('=')
+            .ok_or_else(|| format!("--efd-param expects NAME=VALUE, got {item}"))?;
+        out.insert(name.trim().to_owned(), parse_efd_u64(value)?);
+    }
+    Ok(out)
+}
+
+fn parse_efd_coords(value: &str) -> Result<Vec<u64>, String> {
+    value.split(',').map(parse_efd_u64).collect()
+}
+
 /// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
 fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
     Ok(match regime {
@@ -1005,15 +1117,56 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
                 ArchiveInstance::Binary(i) => Instance::Binary(*i),
             }
         }
-        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
-            CmFamily::Generic => roster_prime_instance(degree)
-                .or_else(|| {
-                    (8..=32)
-                        .contains(&degree)
-                        .then(|| find_prime_order_curve(degree, args.seed))
-                })
-                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
-            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+        "prime" if args.efd_model.is_some() => {
+            let model = args.efd_model.as_deref().ok_or("--efd-model required")?;
+            let p = parse_efd_u64(args.efd_p.as_deref().ok_or("--efd-model requires --efd-p")?)?;
+            let order = parse_efd_u64(
+                args.efd_order
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-order")?,
+            )?;
+            let generator = parse_efd_coords(
+                args.efd_generator
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-generator")?,
+            )?;
+            Instance::Prime(PrimeInstance::from_efd(
+                model,
+                &args.efd_chart,
+                p,
+                &parse_efd_params(&args.efd_params)?,
+                order,
+                args.efd_cofactor,
+                &generator,
+                args.efd_lift,
+            )?)
+        }
+        "prime" if args.family == "curve25519" && degree == 255 => {
+            // The real curve, over the generic Fp256 backend.  The relation
+            // phase runs; no relation exists at this size, so the row is an
+            // honest `exhausted` measurement.
+            Instance::Wide255
+        }
+        "prime" => Instance::Prime(if args.family == "curve25519" {
+            // The Curve25519-family miniatures keep Curve25519's structure
+            // (p ≡ 5 mod 8, #E = 8r, #E' = 4r', smallest Montgomery A) at a
+            // field size the u64 engine can hold.
+            curve25519_family_instance(degree).ok_or_else(|| {
+                format!(
+                    "no Curve25519-family miniature at {degree} bits (the committed ones are 20, 24, 28, 32, or 255 for the real curve)"
+                )
+            })?
+        } else {
+            match CmFamily::parse(&args.family)? {
+                CmFamily::Generic => roster_prime_instance(degree)
+                    .or_else(|| {
+                        (8..=32)
+                            .contains(&degree)
+                            .then(|| find_prime_order_curve(degree, args.seed))
+                    })
+                    .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
+                family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+            }
         }),
         "char2" => Instance::Binary(
             random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
@@ -1104,7 +1257,14 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = if args.archive_manifest.is_some() {
+            let (regime, degree) = if args.efd_model.is_some() {
+                let p = parse_efd_u64(
+                    args.efd_p
+                        .as_deref()
+                        .ok_or("--efd-model requires --efd-p")?,
+                )?;
+                ("prime".to_string(), u64::BITS - p.leading_zeros())
+            } else if args.archive_manifest.is_some() {
                 ("archive".to_string(), 0)
             } else {
                 match (args.bits, args.char2_degree, args.koblitz_degree) {
@@ -1147,6 +1307,10 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         let profile = match &inst {
             Instance::Prime(i) => CurveProfile::of_prime(i),
             Instance::Binary(i) => CurveProfile::of_binary(i),
+            Instance::Wide255 => return Err(
+                "--auto has no planner profile for the 255-bit curve; give the stages explicitly"
+                    .into(),
+            ),
         };
         let plan = planner::plan(
             &profile,
@@ -1223,9 +1387,13 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         None => build_instance(&regime, degree, &args)?,
     };
 
+    if let Instance::Wide255 = &instance {
+        return run_wide255(&specs, &args);
+    }
+
     if regime == "archive" {
         regime = match &instance {
-            Instance::Prime(_) => "prime",
+            Instance::Prime(_) | Instance::Wide255 => "prime",
             Instance::Binary(i) if i.koblitz.is_some() => "koblitz",
             Instance::Binary(_) => "char2",
         }
@@ -1236,6 +1404,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             calibration_for(&i.curve, &sample_prime_points(i), "prime", &i.name, i.r)
         }
         Instance::Binary(i) => calibration_for_binary(i, &regime),
+        Instance::Wide255 => unreachable!("the wide path returns before calibration"),
     };
 
     let started = std::time::Instant::now();
@@ -1284,6 +1453,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         let outcome = match &instance {
             Instance::Prime(i) => run_prime(i, spec, &args, &calib, rho_s),
             Instance::Binary(i) => run_binary(i, spec, &args, &calib, rho_s, &mut frozen),
+            Instance::Wide255 => unreachable!("the wide path returns before the row loop"),
         };
         match outcome {
             Ok(mut got) => rows.append(&mut got),
@@ -1314,7 +1484,8 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             eprintln!("  skipped: {}", f["configuration"].as_str().unwrap_or("?"));
         }
     }
-    Ok(json!({
+    let representation = instance.representation_json()?;
+    let mut report = json!({
         "schema_version": 1,
         "operation": "bench",
         "status": if all_verified { "complete" } else { "incomplete" },
@@ -1344,7 +1515,11 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "markdown": markdown,
         "rows": rows,
         "plan": plan_report,
-    }))
+    });
+    if let Some(representation) = representation {
+        report["representation"] = representation;
+    }
+    Ok(report)
 }
 
 #[cfg(test)]
@@ -1587,5 +1762,36 @@ mod tests {
         )
         .unwrap_err();
         assert!(err.contains("sweep"), "{err}");
+    }
+
+    #[test]
+    fn efd_flags_build_a_prime_instance_with_a_chart() {
+        let args = bench_args(&[
+            "--efd-model",
+            "montgom",
+            "--efd-p",
+            "1019",
+            "--efd-param",
+            "a=131",
+            "--efd-param",
+            "b=1",
+            "--efd-order",
+            "269",
+            "--efd-cofactor",
+            "4",
+            "--efd-generator",
+            "604,1",
+            "--efd-chart",
+            "xz",
+        ]);
+        let instance = build_instance("prime", 10, &args).unwrap();
+        let Instance::Prime(prime) = instance else {
+            panic!("EFD flags must build a prime instance");
+        };
+        assert_eq!(prime.curve.a, 55);
+        assert_eq!(prime.curve.b, 762);
+        assert_eq!(prime.r, 269);
+        assert!(prime.representation.is_some());
+        assert!(prime.representation_json().unwrap().is_some());
     }
 }

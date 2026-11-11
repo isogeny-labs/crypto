@@ -1,0 +1,155 @@
+claim	value	source (path:line or quoted snippet)
+pcc claims in family	PCC-20261104-1df881, PCC-20261104-458dda; no verdict events	crypto pcc/claims/PCC-20261104-{1df881,458dda}.json; pcc/ledger.jsonl has registration entries only for both; research/hashed_ecdl_entry_cost_20261104/README.md:3 "standing **unverified**"
+exotic lead count	32	crypto-autoresearcher git ls-tree knowledge/leads/ecdlp/exotic/ (32 YAML files)
+dispositions 26 open_next_step / 2 open_blocked / 2 exhausted / 1 closed_obstructed / 1 closed_dominated	as stated	grep '^disposition:' over the 32 YAML files (hnp-advice-leakage, ideas-corpus blocked; cryptoscale, dl-character-sum exhausted; augmented-oracle-ggm closed_obstructed; holant-decomposition-count-network closed_dominated)
+every table row best result	as quoted	best_measured / obstruction fields of each LEAD-EXO-*.yaml (extracted with yaml.safe_load)
+augmented split saving 0.0557, 40/40 cells, 7-8 bits m=3	preliminary	LEAD-EXO-augmented-oracle-ggm.yaml best_measured "toy 7-8 bits, m = 3: Y_A = Y_B (40/40 cells); B/A field ops 0.0557 (split)"; coordinate-revealing best_measured "Not a bound"
+"the GGM gives no bound"	quote	LEAD-EXO-coordinate-revealing-oracles.yaml title and next_action.step
+split 2026-11-04 owner decision	yes	LEAD-EXO-augmented-oracle-ggm.yaml mechanism "Split 2026-11-04 (owner decision in session; red-team review ...)"
+three oracle types L/C/P; label overhead Theta(log N), incidence O(m)	as stated	docs/reports/leads-round2-20261104/augmented-oracle-review.md:40-47, table l.53-71
+x-oracle non-simulable, two x-queries + O(log N) fix sign	Lemma 3	augmented-oracle-review.md:53; holant-h1-ggm-lemma-20261103/README.md:46 "Lemma 3 (restated). On every curve, X cannot be simulated with o(sqrt n')"
+Smart's attack sanity check	quote	augmented-oracle-review.md:55
+End_Fp(E)=Z premise false, replaced by eigenvalue argument	as stated	augmented-oracle-review.md:58
+jet C=1 is structured-GGM verdict withdrawn CORR-20260727-003	as stated	augmented-oracle-review.md:66
+KN-OPEN-001 time-bounded question	as stated	LEAD-EXO-coordinate-revealing-oracles.yaml next_action.step
+single-point tests <=2D (3D) values	proved	docs/reports/ecdlp-leads-desk-20261104/low-degree-desk.md:14-18
+Delta formula; binary search ceil(log2 N) tests; D=3 t~(6N)^(1/3), T=O(N^(1/3) log N)	as stated	low-degree-desk.md:20-37
+H1' bound	(C(T_g+2,2)+sum(Delta_j+t_j)+1)/N	low-degree-desk.md:64-69
+KS does not suffice t>=2 large b; paper read in full	as stated	low-degree-desk.md:105-123
+LOWDEG-RANK frozen; 39/39 full rank; p=251,509,1021,2039	HOLDS	docs/reports/lowdeg-rank-20261104/README.md:3-9
+shift bound 3Dt+1; null full rank	as stated	lowdeg-rank README:26,40
+ap failures 3 cells sum b^2=0.34-0.41N	as stated	lowdeg-rank README:41-43
+180-490 group ops vs sqrt N 32-45; beats sqrt N/D only D>=3, N~2^28 (D=5) to 2^48 (D=3), never D=2; corrected after validation	as stated	lowdeg-rank README:10-14
+validator re-ranked 8 cells	8	lowdeg-rank README:67-68
+N^omega local work; ~N/2 monomials; DL table dominates	as stated	lowdeg-rank README:16-17,56-59
+subexp desk: sixteen candidates all land on existing leads; 154-lead snapshot cfc1dae2; later 160	as stated	research/ecdlp_subexp_desk_20261101/README.md:3-13,15-30
+route obstructions (B/3, 0.3293 vs 0.8889, generic digit form, no sub-rho ENUM/MITM cell, jets, embedding degree, p^(2-2/g), sqrt|Aut|)	as stated	ecdlp_subexp_desk README route table (section 1)
+"xedni is closed" superseded	quote	ecdlp_subexp_desk README:12
+cryptoscale 13 batches FINAL_NO_CANDIDATE / NO_ADMISSIBLE_NEXT_MECHANISM, EV-CRYPTO-010..013; "zero-compute admission sheets; no crypto-size run"; sensitivity audit	as stated	LEAD-EXO-cryptoscale-candidate-screen.yaml obstruction
+ideas corpus 15 active registry rows	15	LEAD-EXO-ideas-corpus-algebraic-transforms.yaml next_action.step
+minors design reconstructed from abstract pages	as stated	LEAD-EXO-minors-guess-and-determine.yaml next_action.step
+k-SUM: 4-SUM oracle on S_B, n^ceil(k/2), Chan-Lewenstein, Kane-Lovett-Moran caveat	as stated	LEAD-EXO-ksum-conjecture-s5-oracle.yaml mechanism and next_action.step
+four-tree 0.4167 closed for character filters N<=65539	as stated	LEAD-EXO-four-list-ktree-join.yaml best_measured
+507 families, 13,528 combos, max 1.10x; planted log-mod-M = Pohlig-Hellman leak	as stated	research/ic_prime_eth_leads_20261031/SYNTHESIS.md:103-104 (proposals 8, 9)
+Lange-Winterhof/Kiltz-Winterhof not read beyond abstracts	as stated	LEAD-EXO-invertible-hint-subset.yaml next_action.step "First obtain and read the theorem statements"; LEAD-EXO-lange-winterhof-interpolation.yaml "it is not in the knowledge base"
+list decoding counting bound C(B,M)p^(k-M-1)>=1, M=sqrt(Bk)	as stated	LEAD-EXO-elliptic-code-list-decoding.yaml next_action.step
+Cheon 0.23 vs 0.50 from 24 bits, only when [alpha^i]G leaked	as stated	LEAD-EXO-hnp-advice-leakage.yaml best_measured
+W3 papers and statements (SGGM Omega(min(sqrt q,1/delta)), DKM 3T^2/N+4ln2 ST/N, 2026/2253 abstract only)	as stated	research/lit2026_w3_ggm_audit_20261011/README.md:19-28,42-49,78-92
+delta mapping is study derivation; EC section not extracted	gap stated	w3 README:53-58,72-74,229-230
+table rows 72/35/72/6/9/14; delta<1 48/23/13/1/1/0; min ratios 38.9/56.8/355/2.84e6/7.99e4/1077; 0 below	as stated	w3 README Results table §1
+208 total, 86 with delta<1	derived sum	72+35+72+6+9+14=208; 48+23+13+1+1+0=86
+closest row 38.9x; balanced m=2 prime 39-52x	as stated	w3 README "Closest rows"
+122/208 delta_upper=1; SGGM treats search as free	as stated	w3 README "122 of 208 rows"
+13 rows above counting ceiling up to 1.2x, min p 0.0087	as stated	w3 README "Relation rate above the counting ceiling"
+multiplier closure 0.739-1.432 (27 arms); compact orbit 1.053-2.734	as stated	w3 README §2 table
+multi-target slopes 0.521-0.585; KS 0.533-0.539; 744+744 logs	as stated	w3 README §3 table and bullets
+record problems n61 47.5407 vs 47.2109; precompute; 0.0065x/0.0075x, P~0.006-0.007	as stated	w3 README §4
+ETH preprint 17 Oct revised 25 Oct, pinned 7ef5c0cc	as stated	research/ic_prime_eth_leads_20261031/LEADS.md:6,524
+D.1 statement degree ceil(s^(9/10)), (s+L)^O(1) 2^O(s/sqrt log s)	as stated	LEADS.md:62-65
+unverified: no public bug; Lean in openai/math weaker rate, no D.1; formal statements unmatched; "claimed, under examination, no reported bug"	as stated	LEADS.md:95-102
+KN-LIT-caa51d tagged unverified-proof, "Not checked here"	as stated	crypto-autoresearcher knowledge/literature/KN-LIT-caa51d.md:14,34
+black-box vertices, bit edges, no p-adic analogue	as stated	LEADS.md:75-82
+lambda>=2^85, s>=2^(2^85); Bochum quotes 2^(2^17)	derived by audit	LEADS.md:83-86
+u=floor(ceil(log2 s)/131072) zero; finite-size fallback	as stated	crypto docs/hashed-ecdl.md:192-196
+prototype counts 42=42, 40=40; 112=112; width 34 vs 23; 336 s; 237 vs 112 error	as stated	research/btn_ecdl_20261029/README.md:28-37
+toy IC GF(2^5) r=11 N=16, 17 relations, ~340 s	as stated	btn README:38-42
+ECC2K-130 encoding 105,062 vars, 104,801 predicates, 524,008 edges	as stated	btn README:43-49
+widths read as 2^(5n), five times enumeration exponent	as stated	LEADS.md:155-157
+O(n^2) multiplier, char-2 variant missing, no GPU run	as stated	btn README:65,98-108
+ECCp-131 validation 27 passed; AKS multiplicative order resource limit	as stated	docs/hashed-ecdl-eccp131-validation.md:31-39
+5,589 charged diagnostic steps; 34 tests; matched evaluation blocked	as stated	research/hashed_ecdl_speed_20261029/README.md:5,57-61
+54-minute hang AKS not Fourier network	as stated	research/hashed_ecdl_hash_prime_20261030/README.md:10-16
+13 strong witnesses below 3317044064679887385961981; 17,471 steps; 74 tests	as stated	research/hashed_ecdl_primality_fast_paths_20261030/README.md:14-15,60,66-67
+construction 1,684,796 edges, 249,620 vertices, degree 1,032, 526 interface bits	as stated	hashed_ecdl_primality_fast_paths README "earlier integrated construction completed with 1,684,796 edges ..."
+CPU panels 120 executions, 45.99->3.90 ms, 80.54->4.12 ms, L0 EPYC 9R45 EKS VM, not tensor hypothesis	as stated	research/hashed_ecdl_cpu_20261030/README.md:4-31,58-62
+CPU gain 11.8-19.6x	derived	45.993793/3.903194=11.78; 80.536765/4.118365=19.56
+larger-field ladder expired	as stated	hashed_ecdl_cpu README:38-43
+counts v2 supersedes v1 withdrawn before data; L2->L0; no session run	as stated	research/hashed_ecdl_counts_20261031/README.md:1-30
+entry-cost: D.1 permits exponential entry-work allowance	unverified	hashed_ecdl_entry_cost_20261104/README.md:29-33
+ECCp-131 companion 1,564,506 edges, 654,523 vars, degree 1,032, u_0=0 budget; "do not prove nonexistence..."	as stated	docs/hashed-ecdl-eccp131-validation.md:44-48; docs/hashed-ecdl.md:44-46
+ECC2K-130 2,694,680 edges exceed exact-leaf budget without relation	as stated	LEADS.md:152-153; SYNTHESIS.md:54
+atlas quote "attempts exceed their exact-leaf budget without a relation; no runtime, S or S/rho figure"	quote	LEAD-EXO-hashed-factor-base-tensor-ecdl.yaml best_measured
+next steps audit + frozen 84-case panel blocked	as stated	LEAD-EXO-hashed-factor-base-tensor-ecdl.yaml next_action.step
+ladder rule e<m/2-1; solver floor delta>=1/2+1/m; tensor delta=1/sqrt(log s)	as stated	LEADS.md:202-212
+black-box balance m~(log b)^(1/4), g>16c, log2 b>256c^2	as stated	LEADS.md:213-219; SYNTHESIS.md:109
+b=256: m=2, r^(3/2)~2^384 vs 2^128; m>6 needs b>~2^1296	derived (producer)	LEADS.md:129-131
+Lean IcTensorRoute standard axioms, no sorry, covers arithmetic only	as stated	LEADS.md:13-14; SYNTHESIS.md:58
+L01,L05,L06,L08,L10,L12 refuted as stated; L03,L07,L11 constant only; L04,L09 contested; L02 not run	as stated	LEADS.md:547
+"Nothing moved the exponent question..." quote	quote	SYNTHESIS.md:10
+raw lead dirs external; nothing re-run	as stated	SYNTHESIS.md:5-6
+L01 details: 3 finished l=7 runs, slope ~2.58, reopen CI<2.5, 11k floor, CPU 3x, 4 of 11 products	as stated	SYNTHESIS.md:12,40
+L05 details	as stated	SYNTHESIS.md:48
+L06 details: Python model not dump; 15..51 vs 2..10.7	as stated	SYNTHESIS.md:50
+L08 details: 14,618 vs 37,030; 1.4x not 3.42x; 80d+228sqrt d fails d=46; 175d	as stated	SYNTHESIS.md:54; LEADS.md:544-545
+L10 seven gaps confirmed	as stated	SYNTHESIS.md:58; LEADS.md:538
+L12 1/R=40x m=2 b=12; setup uncharged; fresh censored m=3; 48% duplicated	as stated	SYNTHESIS.md:36,62
+L03 1.000+-0.0003, p 2^14-2^22, weight 3 loses ~10%	as stated	SYNTHESIS.md:44
+L04 offset 2log2(cap)-1 (1,3,5); supportable sentence	as stated	SYNTHESIS.md:13,46
+L07 1.000+-0.005; 0.713/0.833/0.916 at m=4	as stated	SYNTHESIS.md:52
+L09 34 rows, margin -16.11..-16.33, 37x-41,000x	as stated	SYNTHESIS.md:16,56
+L11 0.78 [0.67,0.92] b=9; 1.15x worse b=6	as stated	SYNTHESIS.md:60
+m=3 prime SAT censored above b~12; only b=6,9 uncensored	as stated	SYNTHESIS.md:113; LEADS.md:543
+lane "should be closed for exponent purposes"; CaDiCaL ExternalPropagator untested	quote	SYNTHESIS.md:19
+three corrected sentences (never beat rho; 1e5 b edges 9-30x high, 3,364 / 1.17e4 / 11.9k; clustering closed, s_eff>=(h/A)^1.11, b<2^36 m=3, b<2^16 m=4)	as stated	LEADS.md:539-541; SYNTHESIS.md:109-111
+original sentences quoted	quote	LEADS.md:131-132,138-141
+errata win where conflicting	quote	LEADS.md:536
+nine proposals all refuted, six residues kept	as stated	SYNTHESIS.md:86-104
+finite-size: onset is a guard; fourth route "largest proof gap"; no implementation	as stated	research/hashed_ecdl_finite_size_20261030/README.md:3-12,110-128
+assessment priorities; finite track "no admitted matched full-cost panel or evidence of an exponent improvement"	quote	research/hashed_ecdl_leads_20261030/README.md:8-11, table row "Finite hashed-ECDL"
+ML-SAT closed by preregistered rule; protocol 8a85584fd	as stated	research/pdp_ml_sat_ceiling_20261027/README.md:3-10
+setting S4 m=3 CDCL+XOR Trimoska corpus; n15l5 3000, n17l6 1200	as stated	pdp_ml_sat_ceiling README:18-20,35-36
+4,200 labels agree; 0.963/0.998 per triple; within 4.1%	as stated	pdp_ml_sat_ceiling README:30,38-42
+UNSAT medians 5781 [5738,5819], 45649 [45539,45781]	as stated	pdp_ml_sat_ceiling README:35-36
+ceiling 5.2-9.0x (columns 5.21-9.01 n15l5, 5.75-6.69 n17l6)	as stated	pdp_ml_sat_ceiling README:43-45 and AUC table last column
+AUC ranges n15l5 0.485-0.556, n17l6 0.461-0.513; permuted 0.478-0.540, 0.449-0.517	from table	pdp_ml_sat_ceiling README AUC table rows
+positive control 0.747, 0.785; 0.717, 0.725	as stated	pdp_ml_sat_ceiling README cutoff table
+tel512 0.556 [0.518,0.599], gain 0.99; train gains up to 4.7x; cross-size 0.50, 0.52	as stated	pdp_ml_sat_ceiling README:50-53, cross table (0.496, 0.520)
+cutoff gains 0.93,1.05 / 0.91,0.98	as stated	pdp_ml_sat_ceiling README cutoff table
+learned activity >=10.03 / >=10.00	as stated	pdp_ml_sat_ceiling README branching table
+largest held-out lower bound 0.92; P4 failed	as stated	pdp_ml_sat_ceiling README:114-121
+product law relations x targets x oracle ~ m 2^n; 5-9x	as stated	pdp_ml_sat_ceiling README:129-131
+solver soundness bug fixed	as stated	pdp_ml_sat_ceiling README:135-146
+ML dataset dirs >40, dated 28 Oct-1 Nov	43 dirs	git ls-tree research/ | grep ml_dataset (dates 20261028..20261101)
+2,016 parameter cells; 16,515,072 tasks per backend config	planning arithmetic	docs/ml-dataset/DESIGN.md:144-147
+165,150,720 method cells	as stated	research/ml_dataset_campaign_inventory_20261101/README.md:3
+124 terminal cells, seven cohorts; "coverage inventory, not a pooled estimate or a training set"	quote	ml_dataset_campaign_inventory README:15
+cohort examples (Koblitz n23 26 cells 4/22; Koblitz n47 16 verified; prime61 2+2; n26-31 36 cells 35 replayed)	as stated	ml_dataset_campaign_inventory README table
+252-cell matrix development-only	as stated	ml_dataset_campaign_inventory README:15
+label rules (Q=[k]G not solved; PDP not ECDLP; first fall/last fall; censored kept; split components)	as stated	docs/ml-dataset/DESIGN.md:138-142,152-176
+dev pilot: development-only, 960 cells, 819 rows, enumerate 240/240 recovers 0, bsgs 237/240, DLP 0.050 vs 0.192, perm 0.168, session container	as stated	research/ecdlp_dataset_models_20261102/REPORT.typ:8-9,42-52,78-86,112-113
+WDSat item 8: 88 calls, 61c6ff3f, 3,092/16,097/16,785/16,676/16,097, learned = ascending order, symmetry disabled	as stated	cryptanalysis experiments/ideas_learning_20261018/REPORT.md:16-41
+atlas "the only learned-branching negative"	quote	SYNTHESIS.md:70
+item 9 constant min-weight	as stated	research/ideas_execution_20261018/EXECUTION.md:17
+item 10 820 counted units, pair-hash kernel	as stated	ideas_learning REPORT.md:126-138
+item 11 7,254 targets, 27 cells, prefilter rejects genuine decompositions, disabled	as stated	EXECUTION.md:19
+item 12 1,718 records, MAE 0.10041, interval unbounded, three calibration curves	as stated	ideas_learning REPORT.md:152,171-178; EXECUTION.md:20
+gbrl -5.5% steps cyclic-6; Semaev m=2 -3.9% steps +5.4% ops; m=3 |F|=6 496 vs 459; Buchberger only, F4 scaffold kernels not implemented	as stated	research/gbrl/PAPER.md:51,68-69,107,118
+gbrl no frozen protocol/ecbench record	survey digest; not contradicted	exotic.md A5 (no protocol file found in research/gbrl listing)
+learnability control next step, N up to 2^24	as stated	LEAD-EXO-ml-learned-models.yaml next_action.step
+QUADPHASE statistic, 512 points, 40 nulls, NULL 9/9, u 0.125-0.85, planted 3.8-5.2x, A/A <=2.3% pooled, ~0.3 coherent leakage	as stated	crypto-autoresearcher docs/reports/quadphase-20261104/README.md:6-9,13-18,42-43
+validation recomputed 385 rows within 7e-15	as stated	quadphase README:56-57
+2^16 rerun u=0.50, mean 4.750, sd 0.229, max 5.581	as stated	docs/reports/quadphase-2p16-20261104/README.md:7-8
+QTT reformulation; invariance checked p=61; ceiling 2^L from L=8; 1024 at p=1021; LOG 109-121	as stated	docs/reports/holant-step-b-qtt-20261104/README.md:14-23,45-62
+anomalous follow-up 63+63, 37<=p<=127, perm p=0.831	as stated	docs/reports/anomalous-qtt-20261104/README.md results table
+coordinate census lowered to preliminary	as stated	LEAD-EXO-coordinate-statistic-leakage.yaml best_measured; next step digit characters (next_action.step)
+H-PSEUDO correction cross-reference only	cross-ref	LEAD-EXO-dl-character-sum-pseudorandom.yaml best_measured; corrections.tex tab:corr-xref
+WEAKCLASS classes A/B/C/D, sizes L=10,12,14, 3 per class, cell rule	as stated	docs/reports/weakclass-20261104/README.md:11-25
+WEAKCLASS table I1 invalid 0.61/0.41/0.12; I2 0.56/0.44/0.64; I3 0.36/0.44/0.60	as stated	weakclass README:29-33
+positive controls u=0.00 for I2, I3	as stated	weakclass README:37
+I1 gate 5% on 20+20 draws, sampling error ~2%, 5 of 54 exceed	as stated	weakclass README:40-42
+I1 rerun 200 draws KS; 7 vs allowance 14; blind 0.46/0.44/0.28; paired 0.276 KS p=1.4e-4	as stated	docs/reports/weakclass-i1-20261104/README.md:9-11,19-23,32
+paired anomaly 108+108, z=0.45, p=0.65; 36/class A 0.483 p=0.86, B 0.476 p=0.82, C 0.233 z=-4.79 p<1e-5; MDS 0.13; validation replayed 324 rows	as stated	docs/reports/paired-anomaly-20261104/README.md:8-9,26-30,35,46-47
+zeta-stable explanation (fewer independent frequencies)	as stated	paired-anomaly README:36-37
+methodology next step planted signals / false-negative rate	as stated	LEAD-EXO-methodology-instruments.yaml next_action.step
+global-lift short MW relations p<=31, no decomposition step	as stated	LEAD-EXO-global-lift-height.yaml best_measured
+padic jets: zero additive image, 1360/1360 hard lift, Teichmuller chance, valuation collapses; KN-FIND ids	as stated	LEAD-EXO-padic-jet-canonical-lift.yaml obstruction and evidence
+elliptic nets 1.97-2.80 vs 1.17-1.32; 24x->135x; p in {101,431,1601}	as stated	LEAD-EXO-elliptic-net-eds.yaml obstruction; best_measured "24.2 -> 134.7"
+curve models d_reg=2 m=2,3 Edwards larger; EV-REP-001/002	as stated	LEAD-EXO-curve-model-representation.yaml obstruction, best_measured
+split Jacobian KN-FIND-61347e; lambda,mu<=0.45	as stated	LEAD-EXO-split-jacobian-projection.yaml obstruction
+torsor deck no-go	as stated	LEAD-EXO-torsor-deck-period.yaml obstruction
+Miller cocycle unreviewed proposal	as stated	LEAD-EXO-miller-pairing-cocycle.yaml evidence IDEA-20261017-e3a6f1 "(proposal, unreviewed)"
+Lattes forward iterate = group op; sqrt|Aut|; EV-ECDLP-0c0f51, -a8af77	as stated	LEAD-EXO-lattes-xline-dynamics.yaml obstruction, evidence
+lossy objects orbit argument, rigidity, EV-ECDLP-ce9b50 O-MIXED F_17	as stated	LEAD-EXO-lossy-object-propagation.yaml evidence
+quantum 2,490,847,962 = 1,736,993 x 1,434, -0.124%, 9024-shot island	as stated	LEAD-EXO-quantum-ecdlp-resources.yaml best_measured
+Eigen-Seta / neural distinguishers dirs exist	path	git ls-tree research/ (eigen_seta_assessment_20261017, neural_distinguishers_20261102)
+digest vs source differences	noted	digest A1 date "10-27" is ML-SAT; ml_dataset dirs start 20261028 (used source); digest "L01 refuted" matches LEADS.md:547 while SYNTHESIS table reads L01 "constant_only, no gain (undecided REFUTED)" (both stated in text)

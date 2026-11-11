@@ -390,7 +390,22 @@ fn cm_discriminant(t: i64, p: u64) -> (i128, u64) {
 }
 
 fn build_miniature(k: u32) -> Miniature {
-    let p = largest_prime_5mod8_below(k);
+    build_miniature_at(k, largest_prime_5mod8_below(k), None)
+        .expect("the family rule always finds an A for the largest prime")
+}
+
+/// The next prime `p ≡ 5 (mod 8)` below `p`.
+fn next_prime_5mod8_below(p: u64) -> u64 {
+    let mut q = p - 8;
+    while !is_prime_u64(q) {
+        q -= 8;
+    }
+    q
+}
+
+/// The family rule at a given prime `p ≡ 5 (mod 8)`: the smallest valid `A`, or
+/// `None` once `A` exceeds `a_cap` (the largest prime below `2^k` always has one).
+fn build_miniature_at(k: u32, p: u64, a_cap: Option<u64>) -> Option<Miniature> {
     let mut tried = 0;
     let mut a = 6u64; // A ≡ 2 (mod 4), A ≠ ±2
     loop {
@@ -470,7 +485,7 @@ fn build_miniature(k: u32) -> Miniature {
                     }
                     s3_checks += 1;
                 }
-                return Miniature {
+                return Some(Miniature {
                     k,
                     p,
                     a_mont: a,
@@ -490,11 +505,14 @@ fn build_miniature(k: u32) -> Miniature {
                     cm_conductor: f,
                     embedding_degree_gt: e,
                     s3_checks,
-                };
+                });
             }
         }
         a += 4;
-        assert!(a < p, "no A found");
+        match a_cap {
+            Some(cap) if a > cap => return None,
+            _ => assert!(a < p, "no A found"),
+        }
     }
 }
 
@@ -1462,13 +1480,288 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
     f4cost_m(
-        k, form, t, guess, targets, seed, cap_s, 2, "full", false, None, false,
+        k, form, t, guess, targets, seed, cap_s, 2, "full", 0, None, false,
     )
 }
 
 /// `f4cost` with the number of summands `m` (2 or 3) and the presentation
 /// `mode` (`full` or `chain`; `chain` needs `m = 3`).  `m = 2, full` is the
 /// original measurement, byte for byte in its spec.
+/// `iso-census <k> <t> <seed_lo> <seed_hi>`: for each tower seed, the
+/// isogeny base's columns, its exact m = 2 subgroup coverage and the
+/// log-free coset count J (signed pairs i <= j whose [r]-images cancel,
+/// P + (-P) excluded).  One JSON line per seed.
+fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
+    use crypto_lib::cryptanalysis::ic_boundary::{
+        CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
+    };
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
+    use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
+    let m = build_miniature(k);
+    let inst = PrimeInstance {
+        name: format!("c25519-mini-k{k}"),
+        curve: PrimeCurve {
+            p: m.p,
+            a: m.weier.a,
+            b: m.weier.b,
+        },
+        group_order: m.order,
+        r: m.r,
+        cofactor: 8,
+        generator: (m.g.x, m.g.y),
+
+        representation: None,
+    };
+    let ctx = InstanceCtx {
+        group: &inst.curve,
+        generator: inst.generator_point(),
+        target: inst.generator_point(),
+        r: inst.r,
+        cofactor: inst.cofactor,
+        group_order: inst.group_order,
+        name: inst.name.clone(),
+        field_degree: None,
+    };
+    for seed in seed_lo..seed_hi {
+        let mut params = Params::default();
+        params.set("t", t.to_string());
+        params.set("seed", seed.to_string());
+        let mut build_ops = GroupOps::default();
+        let builder = PrimeIsogenyBase { instance: &inst };
+        let fb = match builder.build(&ctx, &params, &mut build_ops) {
+            Ok(fb) => fb,
+            Err(e) => {
+                println!("{}", json!({"k": k, "t": t, "seed": seed, "error": e}));
+                continue;
+            }
+        };
+        let curve = &inst.curve;
+        let mut ops = GroupOps::default();
+        // log-free cosets: [r]P for every signed base point
+        let img: Vec<PrimePoint> = fb
+            .points
+            .iter()
+            .map(|&pt| curve.mul(&mut ops, pt, m.r))
+            .collect();
+        let mut j = 0u64;
+        for a in 0..fb.points.len() {
+            for b in a..fb.points.len() {
+                if fb.points[a] == curve.neg(fb.points[b]) {
+                    continue; // P + (-P) = O
+                }
+                if curve.add(&mut ops, img[a], img[b]).infinity {
+                    j += 1;
+                }
+            }
+        }
+        let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
+            curve,
+            &fb,
+            2,
+            &mut GroupOps::default(),
+        );
+        let covered = all
+            .iter()
+            .filter(|&&key| {
+                if key == 0 {
+                    return false;
+                }
+                let x = (key >> 1) - 1;
+                let y = sqrtm(m.weier.rhs(x), m.p).expect("covered point is on the curve");
+                let q = PrimePoint {
+                    x,
+                    y,
+                    infinity: false,
+                };
+                curve.mul(&mut GroupOps::default(), q, m.r).infinity
+            })
+            .count();
+        println!(
+            "{}",
+            json!({"k": k, "t": t, "seed": seed, "columns": fb.columns, "base_points": fb.points.len(),
+                   "covered_points": covered, "coverage_exact": covered as f64 / m.r as f64, "J": j,
+                   "selector_group_ops": ops.adds + ops.doubles,
+                   "build_group_ops": build_ops.adds + build_ops.doubles})
+        );
+    }
+}
+
+/// Smallest primitive root mod `p`.
+fn primitive_root(p: u64) -> u64 {
+    let mut fs = Vec::new();
+    let mut n = p - 1;
+    let mut q = 2u64;
+    while q * q <= n {
+        if n.is_multiple_of(q) {
+            fs.push(q);
+            while n.is_multiple_of(q) {
+                n /= q;
+            }
+        }
+        q += 1;
+    }
+    if n > 1 {
+        fs.push(n);
+    }
+    (2..p)
+        .find(|&h| fs.iter().all(|&q| powm(h, (p - 1) / q, p) != 1))
+        .unwrap()
+}
+
+/// The subgroup/bits base of the exponent study, from the command line:
+/// `sub` (`d` = order, coset `w^gidx`) or `bits` (`d` = t).
+fn study_base(
+    m: &Miniature,
+    kind: &str,
+    d: u64,
+    gidx: u64,
+    frame: &str,
+) -> crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::Base {
+    use crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::*;
+    let lo = match frame {
+        "mont" => m.shift % m.p,
+        "zero" => 0,
+        s => s.parse::<u64>().expect("frame: mont | zero | <lo>"),
+    };
+    match kind {
+        "bits" => Base::Bits { t: d as u32, lo },
+        _ => {
+            let w = primitive_root(m.p);
+            let zeta = primitive_root_of_unity(m.p, d).expect("d must divide p - 1");
+            Base::Subgroup {
+                factors: factor_ascending(d),
+                g: powm(w, gidx, m.p),
+                lo,
+                zeta,
+            }
+        }
+    }
+}
+
+/// `f4sub <k> <sub|bits> <d|t> <gidx> <frame> <m> <sym|plain> <targets> <seed> <cap_s>`:
+/// the decomposition system of the exponent study on `targets` random
+/// multiples of the generator, one F4 run each; one JSON object.
+fn f4sub(args: &[String]) -> Value {
+    use crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::*;
+    let k: u32 = args[0].parse().unwrap();
+    let kind = args[1].as_str();
+    let d: u64 = args[2].parse().unwrap();
+    let gidx: u64 = args[3].parse().unwrap();
+    let frame = args[4].as_str();
+    let msum: usize = args[5].parse().unwrap();
+    let form = match args[6].as_str() {
+        "sym" => Form::Sym,
+        "plain" => Form::Plain,
+        f => panic!("form {f}"),
+    };
+    let targets: u64 = args[7].parse().unwrap();
+    let seed: u64 = args[8].parse().unwrap();
+    let cap_s: u64 = args[9].parse().unwrap();
+    let m = build_miniature(k);
+    let base = study_base(&m, kind, d, gidx, frame);
+    let (a, b, p) = (m.weier.a, m.weier.b, m.p);
+    let mut st = seed;
+    let mut rows = Vec::new();
+    let mut tot_ops = 0u128;
+    let mut done = 0u64;
+    let mut capped = false;
+    let (mut n_vars, mut sym_terms, mut input_terms, mut input_degree) = (0, 0, 0, 0);
+    for _ in 0..targets {
+        st = st
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        let e = 1 + (st >> 11) % (m.r - 1);
+        let t = m.weier.mul(m.g, e);
+        if t.inf {
+            continue;
+        }
+        let sys = build_system(p, a, b, &base, msum, t.x, form, seed).expect("system");
+        n_vars = sys.n_vars;
+        sym_terms = sys.sym_terms;
+        input_terms = sys.input_terms;
+        input_degree = sys.input_degree;
+        let rep = solve_system(&sys, p, cap_s, 400);
+        let complete = !rep.timed_out && rep.pairs_above_bound == 0;
+        rows.push(json!({
+            "target_x": t.x, "field_ops": rep.field_ops, "complete": complete,
+            "inconsistent": rep.inconsistent, "timed_out": rep.timed_out,
+            "solving_degree_max": rep.solving_degree_max, "solving_degree": rep.solving_degree,
+            "degree_reached": rep.degree_reached, "steps": rep.steps,
+            "max_rows": rep.max_rows, "max_cols": rep.max_cols, "ms": rep.ms,
+            "basis_len": rep.basis.len(),
+        }));
+        if !complete {
+            capped = true;
+            break;
+        }
+        tot_ops += u128::from(rep.field_ops);
+        done += 1;
+    }
+    json!({
+        "study": "curve25519_exponent_study_20261108", "k": k, "p": p, "base": kind,
+        "d_or_t": d, "gidx": gidx, "frame": frame, "m": msum,
+        "form": args[6], "levels": base.levels(), "v_size": base.size(),
+        "n_vars": n_vars, "sym_terms": sym_terms, "input_terms": input_terms,
+        "input_degree": input_degree, "targets_requested": targets, "targets_done": done,
+        "seed": seed, "cap_s": cap_s, "capped": capped,
+        "mean_field_ops": if done > 0 { Some(tot_ops as f64 / done as f64) } else { None },
+        "per_target": rows,
+    })
+}
+
+/// `subcensus <k> <sub|bits> <d|t> <gidx> <frame> <mmax>`: the factor base of
+/// the study's base and its exact m-sum coverage of the order-r subgroup.
+fn subcensus(args: &[String]) -> Value {
+    use std::collections::HashSet;
+    let k: u32 = args[0].parse().unwrap();
+    let kind = args[1].as_str();
+    let d: u64 = args[2].parse().unwrap();
+    let gidx: u64 = args[3].parse().unwrap();
+    let frame = args[4].as_str();
+    let mmax: usize = args[5].parse().unwrap();
+    let m = build_miniature(k);
+    let base = study_base(&m, kind, d, gidx, frame);
+    let xs = base.abscissae(m.p);
+    let mut pts: Vec<Pt> = Vec::new();
+    let mut cols = 0u64;
+    for &x in &xs {
+        if let Some(y) = sqrtm(m.weier.rhs(x), m.p) {
+            cols += 1;
+            let q = Pt { x, y, inf: false };
+            pts.push(q);
+            if y != 0 {
+                pts.push(m.weier.neg(q));
+            }
+        }
+    }
+    let in_sub = |q: Pt| q.inf || m.weier.mul(q, m.r).inf;
+    // sums of exactly m points of the signed base (repeats allowed), distinct
+    // points R != O with [r]R = O.
+    let mut cov = serde_json::Map::new();
+    let mut cur: HashSet<(u64, u64, bool)> = HashSet::new();
+    cur.insert((0, 0, true));
+    for mm in 1..=mmax {
+        let mut nx: HashSet<(u64, u64, bool)> = HashSet::new();
+        for &(x, y, inf) in &cur {
+            let s = Pt { x, y, inf };
+            for &q in &pts {
+                let r = m.weier.add(s, q);
+                nx.insert((r.x, r.y, r.inf));
+            }
+        }
+        cur = nx;
+        if mm >= 2 {
+            let n = cur
+                .iter()
+                .filter(|&&(x, y, inf)| !inf && in_sub(Pt { x, y, inf }))
+                .count();
+            cov.insert(format!("m{mm}"), json!(n));
+        }
+    }
+    json!({"k": k, "p": m.p, "r": m.r, "base": kind, "d_or_t": d, "gidx": gidx, "frame": frame,
+           "v_size": xs.len(), "columns": cols, "base_points": pts.len(), "covered_points": cov})
+}
+
 #[allow(clippy::too_many_arguments)]
 fn f4cost_m(
     k: u32,
@@ -1480,7 +1773,7 @@ fn f4cost_m(
     cap_s: u64,
     nsum: u32,
     mode: &str,
-    lifts: bool,
+    lifts: u8,
     max_nnz: Option<u64>,
     trace: bool,
 ) -> Value {
@@ -1504,6 +1797,8 @@ fn f4cost_m(
         r: m.r,
         cofactor: 8,
         generator: (m.g.x, m.g.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &inst.curve,
@@ -1516,10 +1811,22 @@ fn f4cost_m(
         field_degree: None,
     };
     let span = 1u64 << t;
-    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0).
-    let (form_name, t0_lo) = match form.split_once('@') {
-        Some((f, lo)) => (f, lo.parse::<u64>().expect("form@lo: lo is an integer")),
-        None => (form, 0),
+    // `t0-bits@LO`: the T₀-invariant interval [LO, LO + 2^t) (LO default 0);
+    // `digits@LO:c1;…;ct` carries its digit list after the frame.
+    let (form_name, t0_lo, digits) = match form.split_once('@') {
+        Some((f, rest)) => {
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::parse_digits;
+            let (lo, digits) = match rest.split_once(':') {
+                Some((lo, list)) => (lo, Some(parse_digits(list).expect("digits@LO:c1;...;ct"))),
+                None => (rest, None),
+            };
+            (
+                f,
+                lo.parse::<u64>().expect("form@lo: lo is an integer"),
+                digits,
+            )
+        }
+        None => (form, 0, None),
     };
     let (fb, mut oracle) = match form_name {
         "t0-bits" => {
@@ -1545,6 +1852,19 @@ fn f4cost_m(
             let fb = square_bits_factor_base(&inst, t, t0_lo, shift);
             (fb, PkmSemaevOracle::new_square_bits(nsum, t, t0_lo))
         }
+        "digits" => {
+            // `digits@LO:c1;…;ct`: x = LO + Σ c_j b_j over the 2^t subset sums
+            // (L14 digit-set frames); t is the digit count.
+            use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::digits_factor_base;
+            let digits = digits.expect("digits@LO:c1;...;ct names the digits");
+            assert_eq!(
+                digits.len(),
+                t as usize,
+                "digits: t must equal the digit count"
+            );
+            let fb = digits_factor_base(&inst, t0_lo, &digits);
+            (fb, PkmSemaevOracle::new_digits(nsum, t, t0_lo, digits))
+        }
         "bits" if t0_lo != 0 => {
             // `bits@LO`: the translation frame x in [LO, LO + 2^t) (mod p).
             use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::bits_factor_base;
@@ -1556,8 +1876,18 @@ fn f4cost_m(
             let n = (0..span)
                 .filter(|&x| sqrtm(m.weier.rhs(x), m.p).is_some())
                 .count();
-            let fb = prime_factor_base(&inst, n);
+            // `prime_factor_base` scans from x = 1, so when x = 0 carries a
+            // point (b a square) it would take one abscissa past 2^t; build
+            // the interval [0, 2^t) directly then. Otherwise keep the
+            // original builder, so published cells replay byte-identically.
+            let fb = if sqrtm(m.weier.rhs(0), m.p).is_some() {
+                use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::bits_factor_base;
+                bits_factor_base(&inst, t, 0)
+            } else {
+                prime_factor_base(&inst, n)
+            };
             assert!(fb.abscissa_list.iter().all(|&x| x < span));
+            assert_eq!(fb.abscissa_list.len(), n);
             (fb, PkmSemaevOracle::new_bits(nsum, t, 0))
         }
         "edwards-bits" => {
@@ -1572,12 +1902,15 @@ fn f4cost_m(
             (fb, PkmSemaevOracle::new_edwards_bits(nsum, t))
         }
         "isogeny" => {
+            // `isogeny@SEED`: the tower's public seed (auxiliary curve and
+            // coset R' + <Q>); no `@` is seed 0, the original measurement.
             let mut params = Params::default();
             params.set("t", t.to_string());
+            params.set("seed", t0_lo.to_string());
             let fb = PrimeIsogenyBase { instance: &inst }
                 .build(&ctx, &params, &mut GroupOps::default())
                 .expect("isogeny base");
-            let tower = isogeny_tower(m.p, t, 0, &mut GroupOps::default()).expect("tower");
+            let tower = isogeny_tower(m.p, t, t0_lo, &mut GroupOps::default()).expect("tower");
             let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
             (
                 fb,
@@ -1585,7 +1918,8 @@ fn f4cost_m(
             )
         }
         o => panic!(
-            "form is bits[@lo], square-bits[@lo], edwards-bits, t0-bits[@lo] or isogeny, not {o}"
+            "form is bits[@lo], digits@lo:c1;…;ct, square-bits[@lo], edwards-bits, t0-bits[@lo] or \
+             isogeny, not {o}"
         ),
     };
     let mut spec = if guess > 0 {
@@ -1593,8 +1927,8 @@ fn f4cost_m(
     } else {
         format!("pkm-semaev:m={nsum},mode={mode}")
     };
-    if lifts {
-        spec.push_str(",lifts=1");
+    if lifts > 0 {
+        spec.push_str(&format!(",lifts={lifts}"));
     }
     if let Some(n) = max_nnz {
         spec.push_str(&format!(",max_nnz={n}"));
@@ -1633,7 +1967,7 @@ fn f4cost_m(
             // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
             // is accepted when the projected sums agree; without lifts the
             // sum must be R itself.
-            let ok = if lifts {
+            let ok = if lifts > 0 {
                 let mut o = GroupOps::default();
                 inst.curve.mul(&mut o, s, inst.cofactor)
                     == inst.curve.mul(&mut o, target, inst.cofactor)
@@ -1722,6 +2056,35 @@ fn f4cost_m(
         })
         .count();
     let coverage = covered as f64 / m.r as f64;
+    // Projected coverage: distinct targets R in the subgroup with R + K a sum of
+    // two base points for some K in E[h], i.e. distinct [h]S over the sums S
+    // (what an ideal lift oracle sees).
+    let covered_projected = {
+        use crypto_lib::cryptanalysis::ic_boundary::PrimePoint;
+        let mut set = std::collections::HashSet::new();
+        for &key in &all {
+            if key == 0 {
+                continue;
+            }
+            let x = (key >> 1) - 1;
+            let y = sqrtm(m.weier.rhs(x), m.p).expect("on the curve");
+            for yy in [y, m.p - y] {
+                let q = PrimePoint {
+                    x,
+                    y: yy,
+                    infinity: false,
+                };
+                if inst.curve.key(&q) == key {
+                    let pr = inst.curve.mul(&mut GroupOps::default(), q, inst.cofactor);
+                    if !pr.infinity {
+                        set.insert(inst.curve.key(&pr));
+                    }
+                    break;
+                }
+            }
+        }
+        set.len()
+    };
     let mut out = json!({
         "coverage_exact": coverage, "covered_points": covered, "covered_points_all_cosets": all.len(),
         "muladds_per_relation_at_exact_coverage": if coverage > 0.0 { Some(per_target / coverage) } else { None },
@@ -1733,7 +2096,7 @@ fn f4cost_m(
         "wall_s": started.elapsed().as_secs_f64(),
         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
         "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
-        "lifts": lifts, "trace": trace, "hits_exact": exact,
+        "lifts": lifts > 0, "lifts_mode": lifts, "trace": trace, "hits_exact": exact,
         "trace_learn_muladds": learn_muladds,
         "amortised_muladds_per_target": (learn_muladds + tot.ops) as f64 / done.max(1) as f64,
         "calls_per_target": tot.calls as f64 / done.max(1) as f64,
@@ -1747,6 +2110,10 @@ fn f4cost_m(
         "native": native,
     });
     out["solver_extra"] = json!(tot.extra);
+    out["covered_projected_points"] = json!(covered_projected);
+    out["coverage_projected"] = json!(covered_projected as f64 / m.r as f64);
+    out["solving_degree_mean"] =
+        json!(tot.solving_degree_sum as f64 / tot.calls_with_a_degree.max(1) as f64);
     out["planted_done"] = json!(p_done);
     out["planted_hits"] = json!(p_hits);
     out["planted_exact"] = json!(p_exact);
@@ -1775,6 +2142,8 @@ fn t0size(k: u32, t: u32, lo_from: u64, lo_to: u64) -> Vec<Value> {
         r: m.r,
         cofactor: 8,
         generator: (m.g.x, m.g.y),
+
+        representation: None,
     };
     let span = 1u64 << t;
     let n = (0..span)
@@ -1897,6 +2266,47 @@ fn main() {
                 .unwrap()
             );
         }
+        "wide" => {
+            // wide [base] [trials] [seed]: the real 255-bit curve over Fp256,
+            // with the order checks and a bounded counted probe scan.
+            let base: usize = args.get(2).map_or(1024, |v| v.parse().unwrap());
+            let trials: u64 = args.get(3).map_or(100_000, |v| v.parse().unwrap());
+            let seed: u64 = args.get(4).map_or(20_261_104, |v| v.parse().unwrap());
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&crypto_lib::cryptanalysis::curve25519_wide::smoke(
+                    base, trials, seed
+                ))
+                .unwrap()
+            );
+        }
+        "siblings" => {
+            // siblings <k> <n> [a_cap]: the n largest primes p = 5 mod 8 below 2^k that
+            // satisfy the family rule with A <= a_cap (default 4000), as ecbench curves.
+            let k: u32 = args[2].parse().unwrap();
+            let n: usize = args[3].parse().unwrap();
+            let a_cap: u64 = args.get(4).map(|v| v.parse().unwrap()).unwrap_or(4000);
+            assert!((12..=40).contains(&k), "k in 12..=40");
+            let mut p = largest_prime_5mod8_below(k);
+            let mut curves = Vec::new();
+            while curves.len() < n {
+                if let Some(m) = build_miniature_at(k, p, Some(a_cap)) {
+                    curves.push(json!({
+                        "kind": "prime_explicit", "p": m.p, "a": m.weier.a, "b": m.weier.b,
+                        "group_order": m.order, "r": m.r, "gx": m.g.x, "gy": m.g.y,
+                        "k": m.k, "A": m.a_mont,
+                    }));
+                }
+                p = next_prime_5mod8_below(p);
+            }
+            println!(
+                "{}",
+                serde_json::to_string_pretty(
+                    &json!({"schema": "curve25519-family-siblings/v1", "k": k, "curves": curves})
+                )
+                .unwrap()
+            );
+        }
         "spec" => {
             // spec <k> <targets_per_curve> <seed>: the frozen baseline panel of
             // research/curve25519_ic_baseline_20261102/PROTOCOL.md for one size.
@@ -1955,8 +2365,15 @@ fn main() {
                 println!("{}", serde_json::to_string(&row).unwrap());
             }
         }
+        "iso-census" => {
+            // iso-census <k> <t> <seed_lo> <seed_hi>
+            let k: u32 = args[2].parse().unwrap();
+            let t: u32 = args[3].parse().unwrap();
+            iso_census(k, t, args[4].parse().unwrap(), args[5].parse().unwrap());
+        }
         "f4cost" => {
-            // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
+            // f4cost <k> <bits|digits@LO:c1;..;ct|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1] [max_nnz|-] [trace 0|1]
+            // f4cost <k> <bits|edwards-bits|isogeny> <t> <guess> <targets> <seed> [cap_s] [m] [mode] [lifts 0|1|2] [max_nnz|-] [trace 0|1]
             let k: u32 = args[2].parse().unwrap();
             let t: u32 = args[4].parse().unwrap();
             let g: u32 = args[5].parse().unwrap();
@@ -1966,7 +2383,8 @@ fn main() {
             // Optional: <m> <mode> (default 2 full, the original measurement).
             let nsum: u32 = args.get(9).map_or(2, |v| v.parse().unwrap());
             let mode = args.get(10).map_or("full", String::as_str);
-            let lifts = args.get(11).is_some_and(|v| v == "1");
+            let lifts: u8 = args.get(11).map_or(0, |v| v.parse().unwrap());
+            assert!(lifts <= 2, "lifts is 0, 1 or 2");
             // Position 12: max_nnz ("-" for none); position 13: F4 trace
             // (learn once per branch system, replay per target).
             let max_nnz: Option<u64> = args
@@ -1981,6 +2399,12 @@ fn main() {
                 ))
                 .unwrap()
             );
+        }
+        "f4sub" => {
+            println!("{}", serde_json::to_string(&f4sub(&args[2..])).unwrap());
+        }
+        "subcensus" => {
+            println!("{}", serde_json::to_string(&subcensus(&args[2..])).unwrap());
         }
         "summarise" => {
             // summarise <out_prefix> <session_dir>...
@@ -1997,7 +2421,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: curve25519-family audit | family [k1,k2,...] | spec <k> <targets> <seed>"
+                "usage: curve25519-family audit | family [k1,k2,...] | wide [base] [trials] [seed] | spec <k> <targets> <seed>"
             );
             std::process::exit(2);
         }

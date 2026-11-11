@@ -1,35 +1,28 @@
-# Resume: crypto @ claude/index-calculus-ecdlp-symmetry-65jh09
+# Resume: crypto @ claude/best-leads-experiments-jikl0j
 
 ## Goal
-User request (2026-11-03): run a deep research loop on prime-field ECDLP index
-calculus. Find a connection to a seemingly unrelated field, use it to find a
-factor-base symmetry that lowers the degree of regularity, and make sure it is
-new (not a repeat of the lab's tried lines). Treat the IC steps together.
+Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
+Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
+0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
+(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
 
 ## Lead / hypothesis
-Two connections, both new to the lab (grep found no Elekes/Ritt/toric fiber
-product/phylogenetic hits):
-1. Barrier: Ritt's theorem on commuting maps (complex dynamics) and
-   Elekes–Szabó (incidence combinatorics) imply a dichotomy. A factor-base
-   structure either commutes with the group law (an isogeny coset, which
-   degenerates to IC on E/K) or does not interact with S_{m+1} at all.
-2. Constructive: phylogenetic group-based tree models / toric fiber products.
-   Pair the summands into "cherries" of a balanced binary tree, encode each
-   cherry symmetrically (s, q), and glue the cherries by S3. This quotients
-   the Sylow-2 wreath symmetry (S2)^{m/2} while keeping every input at degree <= 4.
-   Prediction (from the gluing analogy): the solving degree D is flatter in the
-   arity m than the caterpillar chain's. Kill: tree D >= caterpillar D in every cell.
+Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
+sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
+p256 below 1 at k = 32; cv0 vs lazy two-sided.
 
 ## Spec
-research/ic_tree_gluing_20261103/gen.py builds the systems and checks each one
-on a planted on-curve decomposition. run.sh runs msolve 0.6.5 (-g 2 -t 1 -v 2).
-Cells: p=786433, m in {2,3,4}, t in {3..7}, 2 targets per cell. Arms: C
-(caterpillar), T (tree), F (full symmetric S4(e), m=3 only).
+research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
+x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
+Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
+on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
+(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
+push of this branch is the checkpoint.
 
-## State (2026-11-03)
-- gen.py written; every planted check passes for all cells (m=2 t>=3, m=3/4 t>=4).
-- Next: run msolve, parse D / last productive degree / widest matrix, then the
-  report, graph and PDF, then the PR.
+## State (23:20Z: EKS failed; local L0 panel done, results committed)
+Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
+push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
 
-## Resume command
-python3 research/ic_tree_gluing_20261103/gen.py OUT && bash research/ic_tree_gluing_20261103/run.sh OUT
+## Next steps
+1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
+2. Report + figure + PDF (research-visuals), benchrec record close, PR.

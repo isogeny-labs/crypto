@@ -1,0 +1,104 @@
+name: Frozen workflow replays
+# Research evidence pins the exact bytes of 30 workflows (see
+# .github/scripts/frozen-workflow-pins.json). Those workflows now follow current
+# CI policy (runners, the merge set, checkout fixes), so their live bytes no
+# longer match the pins. Instead of reverting them, this job checks custody of
+# every pin and runs each study's unchanged ci_replay.py in an isolated view
+# that restores its pinned workflow bytes from Git
+# (.github/scripts/frozen-workflow-check.mjs). Evidence and live workflows are
+# never edited. Not a pull-request check: the merge set is gate, size, and
+# artifacts (AGENTS.md). This runs when a matching change is on main, weekly,
+# or on dispatch.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/frozen-workflow-replays.yml'
+      - '.github/scripts/frozen-workflow-check.mjs'
+      - '.github/scripts/run-frozen-workflow-replays.mjs'
+      - '.github/scripts/frozen-workflow-pins.json'
+      - 'research/notes/ecc2k130/**'
+      - 'research/ecc2k130_factor_base_replication_20260925/**'
+      - 'research/ecc2k130_relations/**'
+      - '.github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml'
+      - '.github/workflows/ecc2k130-factor-base-orbit-holdouts.yml'
+      - '.github/workflows/ecc2k130-leaf-m10-support.yml'
+      - '.github/workflows/ecc2k130-m10-capacity-once.yml'
+      - '.github/workflows/ecc2k130-m3-base-selector-source.yml'
+      - '.github/workflows/ecc2k130-m3-four-policy.yml'
+      - '.github/workflows/ecc2k130-n13-oaware-sat-benchmark.yml'
+      - '.github/workflows/ecc2k130-n13-s5-fullpoint-control.yml'
+      - '.github/workflows/ecc2k130-n13-s5-solver-panel.yml'
+      - '.github/workflows/ecc2k130-n19-s6-fullpoint-exporter.yml'
+      - '.github/workflows/ecc2k130-native-fullpoint-edge.yml'
+      - '.github/workflows/ecc2k130-native-m3-chain.yml'
+      - '.github/workflows/ecc2k130-oaware-sparse-dense-sat.yml'
+      - '.github/workflows/ecc2k130-phase-charged-successor-design.yml'
+      - '.github/workflows/ecc2k130-rotated-nearthreshold-slot.yml'
+      - '.github/workflows/ecc2k130-rotated-phase-selector.yml'
+      - '.github/workflows/ecc2k130-rotated-slot-placement.yml'
+      - '.github/workflows/ecc2k130-rotated-solver-admission.yml'
+      - '.github/workflows/ecc2k130-s3-sparse-cnf.yml'
+      - '.github/workflows/ecc2k130-s3-sparse-n19-growth.yml'
+      - '.github/workflows/ecc2k130-s3-sparse-n19-linear-replay.yml'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-gate.yml'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-linux-preparation.yml'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml'
+      - '.github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-measure.yml'
+      - '.github/workflows/ecc2k130-symbolic-dag-fullpoint.yml'
+      - '.github/workflows/ecc2k130-symbolic-oaware-width-gate.yml'
+      - '.github/workflows/endomorphism-search.yml'
+      - '.github/workflows/n53-target-cyclic-rank.yml'
+      - '.github/workflows/p192-geometry-collector-lean.yml'
+  schedule:
+    - cron: '17 4 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frozen-workflow-replays-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  replays:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history without blobs: four frozen preflights assert Git
+          # ancestry (merge-base --is-ancestor), and the pinned revision's
+          # workflow bytes are read with git show; blobs arrive on demand.
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            research/notes/ecc2k130
+            research/ecc2k130_factor_base_replication_20260925
+            research/ecc2k130_relations
+            tools/artifacts
+            .artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130
+      - name: Custody of every pin, then each replay in its isolated view
+        run: node .github/scripts/run-frozen-workflow-replays.mjs

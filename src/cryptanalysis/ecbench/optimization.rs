@@ -115,8 +115,15 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.three_leads_genus2_pencil_symbolic_v3",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -220,6 +227,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.residual_batch",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.residual_batch_v2",
         ImplementationAb,
         DiagnosticOnly,
         StandardBand
@@ -426,6 +439,12 @@ const POLICIES: &[PolicyDecl] = &[
         FullPrice
     ),
     policy!(
+        "rho.signed_frobenius_v2_full",
+        ImplementationAb,
+        PricingSensitivity,
+        FullPrice
+    ),
+    policy!(
         "rho.signed_frobenius_strong_full",
         NativeGrid,
         PricingSensitivity,
@@ -457,6 +476,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.tensor_contraction_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.tensor_contraction_cofactor_v1",
         NativeGrid,
         DiagnosticOnly,
         StandardBand
@@ -505,6 +530,80 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "rho.negation_v2",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    // Rejected by research/curve25519_engine_items_20261110 (1.53x and
+    // 2.74x rho.negation's cost): a diagnostic, never a frontier reference.
+    policy!(
+        "rho.negation_chained",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v3",
         ImplementationAb,
         FrontierEligible,
         StandardBand
@@ -567,6 +666,24 @@ const POLICIES: &[PolicyDecl] = &[
         "ic.large_prime_v2",
         NativeAdaptive,
         FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_naive",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pplus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
         StandardBand
     ),
 ];

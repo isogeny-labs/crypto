@@ -3,8 +3,8 @@ name: executor-mechanical
 description: >-
   Executor, mechanical tier (AGENTS.md "Model tiers"). ONLY runs a task card
   that experiment-director wrote and `tools/task_card.py lint` accepted: one
-  command, `python3 tools/task_card.py run <card>`, which executes the card's
-  steps and writes the receipt; relays its output verbatim, computes nothing.
+  command, `python3 tools/task_card.py run <card>` (then `wait <card>` while
+  it exits 4), which executes the card's steps and writes the receipt; relays its output verbatim, computes nothing.
   Refuses anything underspecified. Never interprets results, never edits
   code, specs or results, never retries outside the card.
 tools: Read, Grep, Glob, Write, Bash
@@ -43,7 +43,10 @@ This is the tier's one hard rule.
 1. Run the one command the dispatch names, exactly:
    `python3 tools/task_card.py run <card>`, from the repository root. Run it
    in the background when the dispatch says so and wait for the completion
-   notice; never poll in a loop.
+   notice; never poll in a loop. Then wait: on exit 4 (a step runs
+   detached), run `python3 tools/task_card.py wait <card>` the same way, and
+   again each time it exits 4. Exit 5: a detached step was lost; return the
+   output with its `record the loss:` line, run nothing else.
 2. Read its exit status. 0: completed. 3: stopped at a failing step, which is
    a result to report, not a problem to fix. 2: refused to start; return
    `refused` with the `IMPEDIMENT` line. The tool has already checked the

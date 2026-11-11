@@ -1,0 +1,30 @@
+file	kind	what	source_path	verified
+prime_ext.tex	figure	fig:pf-residual: residual collectors / matched rho.negation per arm, p36+p37, w=0 with 95% interval, w=1 as built and byte-excluded	research/ic_residual_dp_eq_20261101/sessions/E-p3{6,7}/comparisons/rho__*.json; benchmarks/20261101-ic-residual-dp-eq/validator-report.json	yes
+prime_ext.tex	table	tab:pf-residual-cells: 18 per-cell rows (curve, arm): S, arm/rho w=0 [95% t], w=1 built, w=1 ex-bytes, w=1 rho+DP; standing stated	same as above	yes
+prime_ext.tex	table	tab:pf-residual-base: 12 candidate/baseline cells, w=0 with validator bootstrap, w=0.1/w=1 ex-bytes, w=1 built	benchmarks/20261101-ic-residual-dp-eq/validator-report.json	yes
+prime_ext.tex	text	paragraph introducing per-cell table (rho S 0.929/0.930; all w=0 intervals above 1; eq 2.6-4.5x at w=1 ex-bytes; res1dp p37 1.398 with rho DP-charged)	same	yes
+prime_ext.tex	text	CORRECTION: "summary.json gives 8 of 12 as built, unreconciled" -> summary.json gives 9 of 12 (dp fails p36 res1dp, p37 res2dp, p37 res4dp); validator bootstrap 10 of 12; difference is p37 res4dp (harness upper 1.002), validator finding F4	research/ic_residual_dp_eq_20261101/analysis/summary.json; benchmarks/20261101-ic-residual-dp-eq/validator-report.json (findings F4, c1_interval_check_validator.summary)	yes
+prog_prime.tex	table	tab:pf-c25519-multi: Curve25519-rule multi-curve re-baseline, k=20..32, five per-curve ratios at w=0, means at w=0/0.1/1, w=1 range; standing unverified PCC-20261105-37a78d	research/curve25519_autolab_20261104/multicurve/band-k{20,24,28,32}.json	yes
+prog_prime.tex	figure	fig:pf-c25519: per-curve inc/rho-neg at w=0,0.1,1 vs k with F=1/F=2 floors and parity line	multicurve/band-k*.json; research/curve25519_rho_parity_bound_20261104/README.md	yes
+prog_prime.tex	text	CORRECTION: "rho ahead of every arm at every weight" -> ahead at w=0; across band unresolved on one k=24 sibling curve (icv1-fp24-tm1514: 1.52 at w=0, 0.95 at w=1; band verdict 'unresolved inside the band')	research/curve25519_autolab_20261104/multicurve/band-k24.txt	yes
+transfer_ext.tex	figure	fig:pf-jv: JV Nagao arm / matched negation rho per p (1301,1451,1601), U1 and U2, estimators a/b/c with 95% bootstrap; validated sieve row at p=1511; ratio-1 line	research/jv_cover_negrho_rescore_20261101/fit.json; research/jv_sieve_negrho_20261102/fit.json	yes
+transfer_ext.tex	table	tab:pf-jv-band: Nagao arm 5a band, U1/U2 x p x w with 95% intervals and same-at-all-w flag (6 rows)	research/jv_cover_negrho_rescore_20261101/fit.json (band_5a)	yes
+transfer_ext.tex	table	tab:pf-jv-sieve: validated sieve row at p=1511, layers A/B x U1/U2 x w with 95% intervals (seeds 17-24) and 16-seed w=1 point (4 rows)	research/jv_sieve_negrho_20261102/fit.json; VALIDATION.json	yes
+transfer_ext.tex	text	paragraph on Nagao band (U1 same verdict at all w; U2 at 1601 not ordered across band)	research/jv_cover_negrho_rescore_20261101/fit.json	yes
+extension.tex	table	tab:pf-d4: k=4 F_(2^m)^4 D4 per-target rows m=6..17 (13 rows) incl. trials/relation, IC/rho theory and IC/rho run, session standing; replaces first-target-only inline tabular	research/gaudry_quartic_d4_char2_20261015/README.md; research/gaudry_k4_char2_crossover_20261015/README.md	yes
+extension.tex	table	tab:pf-d4-la: dense vs Wiedemann linear algebra, 6 paired workloads m=8,10,12	research/gaudry_k4_char2_crossover_20261015/raw/summary.json (part_d)	yes
+extension.tex	figure	fig:pf-d4: IC/rho (theory and same-session run) vs log2 n, clean vs interrupted markers, parity line	same two READMEs	yes
+extension.tex	text	Characteristic-two paragraph rewritten around the table: second targets, m=15 clean 3.61/3.67, m=16/17 interrupted, m=18 no record, crossover 2^68.1 (source precision)	same	yes
+prog_rootfinding.tex	table	tab:pf-rf-binary: rf-mitm counts and median wall per target for 4 oracle arms, binary n=23..42 (8 rows)	research/pdp_root_finder_20261012/ANALYSIS.json	yes
+prog_rootfinding.tex	table	tab:pf-rf-koblitz: ecbench mean S per arm on Koblitz n=13..37 and rootfind/strong-rho with 95% interval (5 rows)	research/pdp_root_finder_ecbench_20261013/README.md	yes
+prog_rootfinding.tex	figure	fig:pf-rootfind: left oracle wall per target vs l (log); right rootfind/strong rho vs n with intervals and parity line	same two	yes
+prog_rootfinding.tex	text	paragraph on binary rungs (3.1 -> 482.0 us; lookups 0.91-1.00 of floor)	research/pdp_root_finder_20261012/ANALYSIS.json	yes
+prog_prime.tex	slop	em-dash parenthetical + rhetorical question -> plain clause (smallness repo question)	-	yes
+prog_prime.tex	slop	em dash -> colon (PKM degree-8 memory stop)	-	yes
+prog_prime.tex	slop	em dash -> new sentence (Mahalanobis exhaustive in r)	-	yes
+prog_transfer.tex	slop	chapter opener 'A recurring hope was...---...---' -> direct statement with parentheses	-	yes
+prog_transfer.tex	slop	em dash -> full stop (two-torsion symmetrisation correction)	-	yes
+prog_rootfinding.tex	slop	em-dash parenthetical -> parentheses (McGuire-Mueller mechanism)	-	yes
+prog_rootfinding.tex	slop	em dash -> colon (pair table MITM)	-	yes
+figures/	figure	data-pf-{residual,c25519,jv,d4,rootfind}.json with sources (path + git blob sha at origin/main); make_fig_pf_{residual,c25519,jv,d4,rootfind}.py; fig-pf-*.pdf/.svg	see each JSON sources list	yes
+-	text	NOT SOURCED: Curve25519 walk-table rows for k=16 and k=18; the multi-curve study covers k=20..32 only, the rebaseline k=24..32	research/curve25519_autolab_20261104/	no
