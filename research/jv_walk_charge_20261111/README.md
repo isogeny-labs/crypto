@@ -46,6 +46,12 @@ class only.
 
 ## What this does and does not cover
 
+- **Reachability (added 2026-11-11, from `research/jv_weak_coverage_20261111`).** The starts here were built from a
+  weak curve by the walk's own restricted moves, so the walk can always get back. From a *random* admitted curve,
+  the implemented walk reaches a weak curve in about 40 % of classes at p = 37–53, 3 of 60 at p = 1009 and 0 of 60
+  at p = 1511 and 1823. When it does, it costs 0.008–0.14 × rho at p = 1009. The charge measured here therefore
+  holds for starts within the walk's reach, not for an arbitrary curve of the class.
+
 - **Covered:** curves in an isogeny class that holds a weak curve, starting up to 512 random moves away.
 - **Not covered: the class coverage.** `research/jv_weak_class_law_20261007` (toy sizes, exhaustive) finds **no** weak
   curve in classes whose 2-volcano has depth 1, which is half of all classes. For depth ≥ 2, 86–95 % of classes

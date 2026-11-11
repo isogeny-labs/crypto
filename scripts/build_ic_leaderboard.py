@@ -1268,7 +1268,10 @@ def jv_sieve_line_vs_rho_component() -> dict:
                  f"research/jv_walk_charge_20261111 ({walk['verdict']}): pooled {w512['0']['point']:.4f} / "
                  f"{w512['0.1']['point']:.4f} / {w512['1']['point']:.4f} at w = 0 / 0.1 / 1 with the walk, against "
                  f"{w512['0']['uncharged_point']:.4f} / {w512['0.1']['uncharged_point']:.4f} / {w512['1']['uncharged_point']:.4f} without it. "
-                 "Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route.")
+                 "That charge covers starts within the implemented walk's reach: from a random admitted curve it "
+                 "reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % "
+                 "operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak "
+                 "curve (all depth-1 2-volcanoes) cannot use the route.")
     return {"rows": rows, "class": "transfer (weak class only)", "walk_note": walk_note,
             "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["jv_sieve_line_vs_rho"],
