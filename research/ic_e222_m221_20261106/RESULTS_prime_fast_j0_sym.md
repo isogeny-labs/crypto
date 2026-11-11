@@ -64,3 +64,18 @@ stores it (`sft = s - s_e`). Tuning curves only (idx 0,1, 26 bit, 4 targets, bas
 Result: the number of targets needed is identical with and without the fix (the three rotated entries already cover every orbit pair), so the fix does not
 raise relation yield; it only avoids the failing group re-additions (about 1.4x lower sym3 time at B=68/100 in separate runs on the same host; baseline medians differed 16-26 ms between the two
 runs, so host noise is of the same size; not claimed). Not a holdout run; no new claim. The headline stays at about 2.0x-2.4x.
+
+## Experiment: multi-target symmetric factor base (2026-11-11) — `[pcc:unverified]`
+`examples/prime_fast_j0_multi.rs`: orbit factor base (B=100), setup relations against G once (Gauss-Jordan, log determined when its pivot row is otherwise zero), then one
+verified 2/3-term relation per target (unbatched scan); baseline `ic_multi_solve_ex` (table + batched collection, c=0.5, the strongest multi-target IC). Tuning
+curves idx 0,1 (26 bit, two curves), all targets verified against the planted k in both arms (every row `sym_ok == base_ok == T`).
+
+| T | rows | sym total ms | baseline total ms | baseline/sym | setup sym / base ms |
+|---|---|---|---|---|---|
+| 20 | 6 | 9 | 14 | 1.63 | 7.4 / 11.6 |
+| 200 | 4 | 22 | 26 | 1.18 | 7.2 / 10.4 |
+| 1000 | 6 | 74 | 76 | 1.03 | 6.7 / 9.5 |
+
+Reading: the symmetry cuts the setup by only about 1.4x (not 3x: the orbit pair table, scans and the O(B³) elimination are not all reduced), and the per-target phase, which dominates for T>=200, is
+unchanged (same covered x-set, same yield) and my per-target scan is unbatched while the baseline's is lock-step batched. The advantage vanishes with T. Not a holdout run and not a claim; no j=0
+BSGS/rho multi-target comparator was built, so no ranking against them (the a=-3 results, 2x-4x behind tuned BSGS, are unchanged). The single-target result (2.0x-2.4x) stays the only improvement.
