@@ -38,7 +38,9 @@ fn main() {
     let seed: u64 = get("--seed", "20261111").parse().expect("--seed");
     let cap: u64 = get("--cap", "1000000").parse().expect("--cap");
     // walk at most this many admitted classes (the rest are counted and labelled only)
-    let walk_limit: u64 = get("--walk-limit", "1000000").parse().expect("--walk-limit");
+    let walk_limit: u64 = get("--walk-limit", "1000000")
+        .parse()
+        .expect("--walk-limit");
     let jumps: Vec<u64> = get("--jumps", "3,5,7")
         .split(',')
         .map(|v| v.parse().expect("--jumps"))
