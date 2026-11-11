@@ -3,7 +3,7 @@
 Protocol: `PROTOCOL.md` (frozen in 75dbc70b36 before data). Rerun: every rho-family job of the v2 holdout,
 1584 runs with the fixed binary, **0 errors, every target verified**. `results/rows.jsonl` (new rho rows),
 `results/merged.jsonl` (v2 `ic4` and `bsgs2` rows + new rho rows), `results/analysis.txt` (v2 `analyze.py`
-unchanged), `results/summary.json`. All numbers [pcc:unverified] (claim PCC-20261111-e5ded0, superseding PCC-20261111-fa13c8 for its rho comparison) until the claim is signed. Independent validation:
+unchanged), `results/summary.json`. All numbers [pcc:unverified] (claim PCC-20261111-9a26ac, superseding PCC-20261111-fa13c8 for its rho comparison) until the claim is signed. Independent validation:
 `validation/VALIDATOR_REPORT.md` (valid_with_amendments: every merged row replays exactly, every number recomputes;
 the "survives" headline is insufficient evidence against a standard rho, applied below).
 

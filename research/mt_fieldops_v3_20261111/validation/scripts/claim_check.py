@@ -5,9 +5,11 @@ Cost/target = [(cI I + M + S)/(cI + 3) + h (H + L)]/T; rhobest = min over the 12
 and price; 'with Kuhn-Struik retention' = min over those 12 and the validator's 4 rho2xks runs; decisions by the
 frozen section-5a rule (bootstrap of the median, B = 4000, random.Random(1); cheaper iff hi < 1 at h = 0, 0.1, 1;
 dearer iff lo > 1 at all three).
-usage: claim_check.py A|B <repo> <validated commit>"""
+usage: claim_check.py A|B <repo> <validated commit> [submitted|accepted]  (default submitted)
+"accepted" judges the reworded statement the validator offered (statement_accepted), byte for byte."""
 import json, sys, os, hashlib, random, statistics, collections, subprocess, math
 STUDY, REPO, COMMIT = sys.argv[1:4]
+MODE = sys.argv[4] if len(sys.argv) > 4 else "submitted"
 D = {"A": "research/mt_fieldops_v3_20261111", "B": "research/mt_rho_start_fix_20261111"}[STUDY]
 RUNS = {"A": f"{D}/results/holdout/runs.json", "B": f"{D}/results/runs.json"}[STUDY]
 KS = f"{D}/validation/ks_runs.json"
@@ -63,8 +65,10 @@ if STUDY == "A":
     a = rng(sel("ic4")); b = rng(sel("bsgs2")); c = rng(sel("rhobest")); k0 = rng(sel("rhoks", h=0)); k1 = rng(sel("rhoks", h=0.1)); k2 = rng(sel("rhoks", h=1))
     out["clause_checks"] = [
         dict(clause="44 fresh prime-order Weierstrass curves", ok=curves == 44, recomputed=f"{curves} curves (idx 1..11 x 4 sizes); validity and freshness: validator-report.json A-F checks"),
-        dict(clause="(2^22-2^33)", ok=False, recomputed=f"group orders n from {min(ns)} (2^{math.log2(min(ns)):.5f}) to {max(ns)} (2^{math.log2(max(ns)):.5f}): about 2^22 to 2^32; no group near 2^33 was tested",
-             required_fix="write '(group orders about 2^22 to 2^32)' or '(22- to 32-bit primes p)'"),
+        (dict(clause="(2^22-2^33)", ok=False, recomputed=f"group orders n from {min(ns)} (2^{math.log2(min(ns)):.5f}) to {max(ns)} (2^{math.log2(max(ns)):.5f}): about 2^22 to 2^32; no group near 2^33 was tested",
+             required_fix="write '(group orders about 2^22 to 2^32)' or '(22- to 32-bit primes p)'") if MODE == "submitted" else
+         dict(clause="(group orders about 2^22 to 2^32)", ok=abs(math.log2(min(ns)) - 22) < 0.01 and abs(math.log2(max(ns)) - 32) < 0.01,
+             recomputed=f"group orders n from {min(ns)} (2^{math.log2(min(ns)):.5f}) to {max(ns)} (2^{math.log2(max(ns)):.5f})")),
         dict(clause="T = 1024/4096/16384, 22 paired configurations per cell", ok=sorted({r['T'] for r in rows}) == [1024, 4096, 16384] and all(e["n"] == 22 for e in E), recomputed="yes"),
         dict(clause="counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE", ok=True,
              recomputed="yes; ic5's mod-n elimination is counted in the same I/M units (0.08%-2.5% of its cost); 'F_p and mod-n operations' would be more exact (optional)"),
@@ -103,19 +107,28 @@ else:
         dict(clause="all 1584 v2 rho jobs rerun, every target verified", ok=len(rho_rows) == 1584 and all(r["ok"] == r["targets"] for r in rho_rows), recomputed=f"{len(rho_rows)} rho-family rows, all ok == targets; replay 2112/2112 and 36 runs independently verified (replay-certificate.json)"),
         dict(clause="the cheapest of four rho arms is 1.4-4.8% cheaper", ok=(round(100 * min(red), 1), round(100 * max(red), 1)) == (1.4, 4.8), recomputed=f"rhobest median cost per (cell, cI, h) {100 * min(red):.3f}%-{100 * max(red):.3f}% lower than in the v2 rows"),
         dict(clause="IC4 0.951-0.991x it at T = 16384, cheaper at every I/M and h", ok=(round(t[0], 3), round(t[1], 3)) == (0.951, 0.991) and dec16 == {"cheaper": 6}, recomputed=f"{t[0]:.4f}-{t[1]:.4f}; T = 16384 (cell, cI) decisions {dict(dec16)}"),
-        dict(clause="against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0", ok=False,
+        (dict(clause="against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0", ok=False,
              recomputed=f"T = 16384: {k0_16[0]:.4f}-{k0_16[1]:.4f}; all six v2 cells: {k0_all[0]:.4f}-{k0_all[1]:.4f}",
-             required_fix="the range holds only at T = 16384, but the clause carries no T and the next clause speaks of all v2 decisions; write '1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells)'"),
+             required_fix="the range holds only at T = 16384, but the clause carries no T and the next clause speaks of all v2 decisions; write '1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells)'") if MODE == "submitted" else
+         dict(clause="against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells)",
+             ok=(round(k0_16[0], 2), round(k0_16[1], 2), round(k0_all[0], 2), round(k0_all[1], 2)) == (1.12, 1.17, 1.12, 1.48),
+             recomputed=f"T = 16384: {k0_16[0]:.4f}-{k0_16[1]:.4f}; all six v2 cells: {k0_all[0]:.4f}-{k0_all[1]:.4f}")),
         dict(clause="the v2 decisions are 0 cheaper, 6 unranked, 12 dearer", ok=decisions("rhoks") == {"unranked": 6, "dearer": 12}, recomputed=f"{decisions('rhoks')}"),
         dict(clause="IC4 vs paired BSGS is unchanged (1.18-1.80x)", ok=(round(bs[0], 2), round(bs[1], 2)) == (1.18, 1.80) and sorted(v2bs) == sorted(e["median"] for e in sel("bsgs2")),
              recomputed=f"{bs[0]:.4f}-{bs[1]:.4f}; identical to the v2 summary medians")]
     out["headline"] = [H("rhobest reduction min %", 1.4, 100 * min(red), 1), H("rhobest reduction max %", 4.8, 100 * max(red), 1), H("IC4/rhobest T16384 min", 0.951, t[0], 3),
                        H("IC4/rhobest T16384 max", 0.991, t[1], 3), H("IC4/rhoKS h0 T16384 min", 1.12, k0_16[0], 2), H("IC4/rhoKS h0 T16384 max", 1.17, k0_16[1], 2),
-                       H("IC4/bsgs2 min", 1.18, bs[0], 2), H("IC4/bsgs2 max", 1.80, bs[1], 2)]
+                       H("IC4/bsgs2 min", 1.18, bs[0], 2), H("IC4/bsgs2 max", 1.80, bs[1], 2)] + \
+                      ([H("IC4/rhoKS h0 all cells min", 1.12, k0_all[0], 2), H("IC4/rhoKS h0 all cells max", 1.48, k0_all[1], 2)] if MODE == "accepted" else [])
     out["statement_accepted"] = out["statement_submitted"].replace("IC4 is 1.12-1.17x at h = 0 and", "IC4 is 1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells) and")
+if MODE == "accepted":
+    out["statement_judged"] = out["statement_accepted"]; out["statement_previous_submission"] = out.pop("statement_submitted"); out.pop("statement_accepted")
+else:
+    out["statement_judged"] = out["statement_submitted"]
 ok = all(c["ok"] for c in out["clause_checks"])
 out["status"] = "pass" if ok else "needs_rewording"
-out["verdict"] = "endorsed as worded" if ok else "not endorsed as worded; the numbers recompute, the wording in clause_checks with ok = false must change; statement_accepted would be endorsed"
+out["verdict"] = ("endorsed exactly as worded (statement_judged)" if ok else
+                  "not endorsed as worded; the numbers recompute, the wording in clause_checks with ok = false must change" + ("; statement_accepted would be endorsed" if MODE == "submitted" else ""))
 dst = os.path.join(REPO, D, "validation", "claim-report.json")
 json.dump(out, open(dst, "w"), indent=1)
 print(dst, out["status"], sha(open(dst, "rb").read()))

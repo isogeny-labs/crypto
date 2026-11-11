@@ -6,7 +6,7 @@ result). ic5 parameters frozen from the tune set in `frozen_ic5.json` (mu = 1.0,
 Holdout: 44 fresh prime-order curves (indices 1..11 at 22, 24, 28, 32 bits), seeds 21 and 22, T in {1024, 4096,
 16384}: **4488 runs, 0 errors, every target of every run verified**. Data: `results/holdout/rows.jsonl` (artifact
 store), `results/holdout/runs.json` (compact counters in Git), `analysis.txt`, `summary.json`, `noverify.txt`.
-Every number here is [pcc:unverified] (claim PCC-20261111-751c50) until the claim is signed. Independent validation:
+Every number here is [pcc:unverified] (claim PCC-20261111-dda51e) until the claim is signed. Independent validation:
 `validation/VALIDATOR_REPORT.md` (verdict valid_with_amendments; every row replays exactly, every number recomputes;
 the vs-rho headline is insufficient evidence, see below). The amendments it required are applied in this file.
 
