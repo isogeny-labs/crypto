@@ -67,3 +67,17 @@ Independent machine audit and neutral PDF/SVG/CSV/JSON archival in progress. Ful
 
 ### Errors (what went wrong, how it was handled)
 Control elaboration failure preserved; no change to prior native outputs or old campaign. [pcc:unverified]
+
+## 2026-11-11 — Control successor terminal
+
+### What was done (commands, files, features)
+One published control successor completed passed:5calls exits0/0/0/0/1; pre55.443576s,compiler185.603433s,post46.039223s, total287.195459s. All phase owners terminal; session6189exit0. [pcc:unverified]
+
+### Decisions made (and why)
+Charge full600seconds; newtotal1200, remaining128400. Preserve prior failedattempt separately. Independent machine audit and neutralreport/archive delegated; no automatic retry. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Publish all terminal records and reports. Pivot/swap renewal readyforindependentreview; combinedqualification sourcefindings and actualmanagedcollector integration still in progress. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+No nativeerror in secondattempt; expectedFalse rejection remains deliberate and is not counted as a failure. [pcc:unverified]
