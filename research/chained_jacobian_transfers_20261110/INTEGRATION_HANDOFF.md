@@ -161,3 +161,21 @@ next kernels; no nonbacktracking continuation or stronger nonisomorphism
 result assumed. Retain unshifted negative/equivalent targets. Atlas remains
 locked,no plaintext/guessed lead ID; no benchmark,cost or cross-prime result.
 [pcc:unverified]
+
+## Target Frobenius continuation and closed neighbors
+
+Cryptanalysis63cf80560b8339b9ea67629746131f5c6f722299,ready PR1480,now
+checks full geometric2-torsion/Frobenius for accepted17/101 targets. Both
+have6-cycle,only previous-dual rational Richelot kernel,source/targetFp3-fixed
+torsion16/4. Written standard branch-pair geometry plus Frobenius invariance
+obstructs unpolarizedFp-Jacobian isomorphism; no rational next nonbacktracking
+Richelot hop. All256 torsion additions/equivariance checks and seven Lean
+certificates pass. Prior1479 merged3e76a274f,exact-head43022364261 passes
+native25/reference46. CT16 full47-test CI pending. [pcc:unverified]
+
+TARGET_FROBENIUS_CHECKPOINT.md binds exact source,report/inspected PDF and
+limits. Retain forced-backtrack negative with positive genuine maps; other
+degrees/products/extensions/covers remain open. CT17 next makes both elliptic
+quotients/full odd rational-group reconstruction explicit for direct cost
+controls. No split implementation or solver advantage accepted yet. Vault/KB
+still blocked,no plaintext/new guessed lead ID. [pcc:unverified]

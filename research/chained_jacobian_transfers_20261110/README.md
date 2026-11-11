@@ -96,3 +96,13 @@ field replay128 and four shifted-cover Lean lemmas pass. Current full46-test
 consumer CI is pending; CT16 next assesses target Frobenius2-torsion and
 nonbacktracking kernels. Unshifted negative/equivalent targets retained;
 standing unsigned, no cost or cross-prime descent result. [pcc:unverified]
+
+The [target Frobenius checkpoint](TARGET_FROBENIUS_CHECKPOINT.md) proves the
+stronger unpolarized Fp-Jacobian distinction via2-torsion over Fp³:16/4.
+Both accepted17/101 targets have6-cycle branch action and only the previous
+dual as a stable Richelot kernel,so the next rational step must backtrack.
+All256 torsion additions/Frobenius branch-image controls and seven Lean
+finite/conditional lemmas pass. Prior shifted source full46-test CI passes;
+CT16 source63cf80560/PR1480 full47-test CI pending. Next CT17 implements
+both elliptic quotient norms/full rational-group reconstruction. Standing
+unsigned,no universal transfer impossibility or cost advantage. [pcc:unverified]
