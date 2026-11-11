@@ -9,7 +9,7 @@
 set -eu
 D=$(cd "$(dirname "$0")/.." && pwd)
 A=${P1P2_A:-$D/v10/runs}; B=${P1P2_B:-$D/v10c/runs}
-med='def med: sort | if length % 2 == 1 then .[length/2|floor] else (.[length/2-1] + .[length/2]) / 2 end;'
+med='def med: sort | if length == 0 then null elif length % 2 == 1 then .[length/2|floor] else (.[length/2-1] + .[length/2]) / 2 end;'
 row() { # file -> one JSON object
   jq -c "$med"' {
     identity: (.identity_inputs | tojson),
@@ -21,11 +21,14 @@ row() { # file -> one JSON object
 }
 {
 for size in k1n47 k0n57 k0n41 k0n53 k1n59 k0n61; do
-  for f in "$A/$size"/T*-R*.price.json; do
+  for f in "$A/$size"/T[0-9][0-9]-R[0-9].price.json; do
     [ -e "$f" ] || continue
     name=$(basename "$f")
-    g="$B/$size/$name"
-    [ -e "$g" ] || { echo "{\"size\":\"$size\",\"row\":\"$name\",\"unpaired\":true}"; continue; }
+    # The harness keeps every attempt and stops at the first clean one, so a
+    # row's figure is its last attempt (…-retryN.price.json when it has one).
+    f=$(ls "$A/$size/${name%.price.json}"*.price.json | sort -V | tail -1)
+    g=$(ls "$B/$size/${name%.price.json}"*.price.json 2>/dev/null | sort -V | tail -1)
+    [ -n "$g" ] || { echo "{\"size\":\"$size\",\"row\":\"$name\",\"unpaired\":true}"; continue; }
     x=$(row "$f"); y=$(row "$g")
     jq -cn --arg size "$size" --arg row "$name" --argjson a "$x" --argjson b "$y" '{
       size: $size, row: $row,
@@ -39,7 +42,7 @@ for size in k1n47 k0n57 k0n41 k0n53 k1n59 k0n61; do
     }'
   done
 done
-} | jq -s "$med"' def q($p): sort | .[((length - 1) * $p) | floor];
+} | jq -s "$med"' def q($p): sort | if length == 0 then null else .[((length - 1) * $p) | floor] end;
   {
     what_this_is: "Rule v10, P1 and P2 from the rows (p1p2.sh): v10 against v10c paired by size, target and repeat",
     sizes: (group_by(.size) | map({
