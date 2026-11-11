@@ -84,7 +84,7 @@ P1 holds (identical at $m = 2$, draw by draw). P2 holds and nothing reaches the 
 2. The multiples presentation probe at $t = 2, 3$, $m = 2..5$ (minutes on a 4-core host).
 3. The null-support slope: `null` control and supports of width $w = 1..4$; if $d_F (N, w)$ is curve-independent, the growth is a property of the carry-graded one-generator closure and the lane closes with a mechanism.
 4. The first counted algebraic-track row: `pkm-semaev` on a Table B curve with the §5a band and matched rho (D-EKS approved; about 49 CPU-hours).
-5. Generic-track constants (hash-table prefetch Design A; $N > 45$ at 20 bits): the only place a measured improvement over the current baseline is available.
+5. Generic-track constants: the prefetch Design A patch is obsolete (reconciled 2026-11-11: `layout=lines` is already on `main` and measured 12 % slower at fp28 in the v6 tournament, `invalid_measurement`); what stays open is the software-prefetch step on the landed layout and $N > 45$ at 20 bits: the only place a measured improvement over the current baseline is available.
 6. Honest non-uniform accounting ($S T^2$ per row; preprocessing-rho reference).
 
 What would change the list: an equation source that passes the filter of section 4. None is known; the jet exit is the only one of the three still open in the atlas.
