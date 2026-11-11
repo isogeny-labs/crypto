@@ -20,16 +20,21 @@ Rule v8's column ran on another host (Emerald Rapids) and is quoted, never paire
 
 #image("cold-ratio.svg", width: 100%)
 
-== What changed between v8's code and main (paired by target, in the run's time unit)
-The index calculus's online time, v9 over v9c: 1.058--1.074. Rho's online time, v9c over v9: 0.938--0.945 (main's rho takes about 6% more of the unit a step). Index-calculus set-up medians, v9 over v9c (derived from `setup_units_median`): 1.084, 1.051, 1.021, 1.025, 1.033, 0.992. Main is slower than v8's code on this host in this unit, rho more so than the index calculus, so the distance between them narrows: the cold ratio falls 2--6% from 2^38 up (3.2% at n = 53, 6.4% at 2^47.2) and rises 1.3% at 2^36.6.
+== What changed between v8's code and main (paired by target)
+*Read in wall-clock time, not in the run's unit.* Each process prices time in its own unit, `unit_ns` (one batched `add_many` addition, measured by the binary under test). The unit belongs to the binary: v9's is about 7% smaller than v9c's (9.51 against 10.24 ns at n = 53) on every target, at every size, on both nodes. Ratios of units across the two binaries (`matched.json`'s `ic_online_matched_over_control`, `rho_online_control_over_matched`, `setup_units_median`; the bars below) are therefore not time ratios. Within one process the unit cancels, so the cold ratios above are unaffected (7.454 in ns against 7.458 in units at n = 53).
+
+In wall-clock time (independent review, recomputed from the raw rows): rho takes identical steps on every target and is about 1.5--2% faster a step in v9; the index calculus's set-up is faster in v9 (4.7% at n = 53, 7.8% at 2^47.2). That is what narrows the distance to rho: the paired cold ratio v9/v9c falls 2--6% from 2^38 up (0.968 at n = 53, 0.936 at 2^47.2) and rises 1.3% at 2^36.6.
 
 #image("paired.svg", width: 100%)
+The bars are in each binary's own unit and overstate main's slowdown by the unit difference; the red bars (cold ratios) are unit-free.
 
 == The prediction
-Declared: the index calculus's cold time at n = 53, v9 over v9c, in [0.85, 1.00]. Derived from the paired figures (cold-ratio pair 0.968 over the rho time pair 0.944) it is about 1.02--1.03: *the prediction does not hold*. The narrower distance comes from rho's slowdown, not from a faster index calculus. The aimed-subset gather (#2448) does not show as an absolute gain here.
+Declared: the index calculus's cold time at n = 53, v9 over v9c, in [0.85, 1.00]. The protocol did not fix the unit. In wall-clock time the ratio is 0.953 (median cold time 192.9 against 202.8 ms over 64 targets; every one of the 64 targets in [0.899, 0.974]): inside the band. In each binary's own unit it is 1.025: outside. Because the unit depends on the binary, only the wall-clock reading is a time ratio; neither reading was named in advance, and both are reported. The aimed-subset gather (#2448) and the other set-up changes since v8 show as a 4.7% faster set-up at n = 53.
 
 == Slope of ln(cold ratio) on ln r
 v9: 0.113 (95% t over six sizes [0.056, 0.169]; bootstrap over targets [0.097, 0.129]). v9c: 0.119 ([0.056, 0.183]; [0.104, 0.136]). Rule v8 measured 0.168 on its host. n and log2 r are not independent in these six curves.
 
 == Deviations, disclosed
 The first attempt ran locally and was lost with its container (no rows survive; amendment 1). On EKS, attempt a1 was lost to a Spot interruption after v9's first 29 rows at 2^36.6; a2 resumed from the synced rows on a second node of the same type, so that size of v9 is split across two nodes. Each run's `host.json` names a1's node; each pod's `host.txt` names its own. The rebuilt `ic` binaries differ in hash from the first attempt's (same sources); the hashes that ran are in `binaries.sha256` and were replayed.
+
+Independent review (`independent-review.md`): admit with caveats. It recomputed all 12 cold ratios from the raw rows, re-verified all 1,678 certificates with its own GF(2^m) code, redrew the replay sample and replayed two records itself. Not independently re-derived: the bootstrap intervals (reproduced with this programme's tool). The replay certificate's `host` field names the earlier replay host; v9's replays ran on `fc-v378` (`validation/raw/native-replay.json`, `hosts`). Each run's `host.json` leaves `rustc`, `repository_commit` and `cargo_lock_sha256` empty. Arm order within a size was always v9 then v9c; the A/A drift in ns is up to ±1.7%.
