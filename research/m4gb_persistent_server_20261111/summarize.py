@@ -27,9 +27,17 @@ for c in cells_all:
             if len(dec) == len(runs) and runs:
                 per_engine.setdefault(eng, []).append(statistics.median(r['wall_ns'] for r in runs) / 1e6)
     summ = {e['engine']: e for e in c['engines']}
+    # paired per target: median wall of the server against the one-shot adapter on the same target
+    paired = []
+    for t in c['per_target']:
+        a = t['runs'].get('m4gb-f2', []); b = t['runs'].get('m4gb-f2-server', [])
+        if a and b and all(r['verdict'] in ('solved', 'unsatisfiable') for r in a + b):
+            paired.append(statistics.median(r['wall_ns'] for r in a) / 1e6 - statistics.median(r['wall_ns'] for r in b) / 1e6)
     cell = {'family': c['family'], 'curve': c['curve'], 'n': c['n'], 'n_prime': c['n_prime'], 'm': c['summands'],
             'n_vars': c['n_vars'], 'equations': c['equations'], 'targets': c['targets'], 'repeats': c['repeats'],
-            'reference': c['reference_engine'], 'engines': {}}
+            'reference': c['reference_engine'], 'engines': {},
+            'paired_targets': len(paired), 'server_faster_targets': sum(1 for d in paired if d > 0),
+            'median_paired_saving_ms': statistics.median(paired) if paired else None}
     for eng, s in summ.items():
         ms = per_engine.get(eng, [])
         cell['engines'][eng] = {
@@ -46,8 +54,8 @@ for cell in rows:
         if e not in engines: engines.append(e)
 def fmt(v): return 'n/a' if v is None else (f'{v:.1f}' if v >= 10 else f'{v:.2f}')
 with open(md_out, 'w') as f:
-    f.write('Median over targets of the per-target median wall, ms, one call. Ratio columns: engine / `f4-f2` and engine / reference on the same cell. `dec` = targets decided in every repetition / targets; `ob` = targets with a budget verdict; `agree` = every decided answer equals the reference.\n\n')
-    f.write('| family | n | n\' | m | vars | ref | ' + ' | '.join(f'`{e}` ms (dec, ob, agree, Dmax)' for e in engines) + ' | server / one-shot | one-shot − server ms | server / ref |\n')
+    f.write('Median over targets of the per-target median wall, ms, one call. Ratio columns: `m4gb-f2-server` over `m4gb-f2` (the persistent server over the one-shot process), the median over targets of the paired per-target saving in ms with the count of targets on which the median wall of the server is below that of the one-shot process, and the server over the reference engine of the cell. `dec` = targets decided in every repetition / targets; `ob` = targets with a budget verdict; `agree` = every decided answer equals the reference.\n\n')
+    f.write('| family | n | n\' | m | vars | ref | ' + ' | '.join(f'`{e}` ms (dec, ob, agree, Dmax)' for e in engines) + ' | server / one-shot | paired saving ms (targets server below one-shot) | server / ref |\n')
     f.write('|:--|--:|--:|--:|--:|:--|' + '--:|' * len(engines) + '--:|--:|--:|\n')
     for cell in rows:
         cols = []
@@ -57,7 +65,7 @@ with open(md_out, 'w') as f:
             if s['declined']: cols.append('declined'); continue
             cols.append(f"{fmt(s['median_ms'])} ({s['decided']}/{cell['targets']}, {s['over_budget']}, {'y' if s['agrees'] else 'NO'}, {s['d_reach_max'] if s['d_reach_max'] is not None else '-'})")
         m4 = cell['engines'].get('m4gb-f2', {}).get('median_ms'); sv = cell['engines'].get('m4gb-f2-server', {}).get('median_ms'); ref = cell['engines'].get(cell['reference'], {}).get('median_ms')
-        r1 = f'{sv/m4:.2f}×' if m4 and sv else 'n/a'; d1 = f'{m4-sv:.1f}' if m4 and sv else 'n/a'; r2 = f'{sv/ref:.2f}×' if sv and ref else 'n/a'
+        r1 = f'{sv/m4:.2f}×' if m4 and sv else 'n/a'; d1 = f"{cell['median_paired_saving_ms']:.1f} ({cell['server_faster_targets']}/{cell['paired_targets']})" if cell['paired_targets'] else 'n/a'; r2 = f'{sv/ref:.2f}×' if sv and ref else 'n/a'
         f.write(f"| {cell['family']} | {cell['n']} | {cell['n_prime']} | {cell['m']} | {cell['n_vars']} | `{cell['reference']}` | " + ' | '.join(cols) + f' | {r1} | {d1} | {r2} |\n')
 # SVG: median ms per cell, one marker series per engine, log scale
 colors = {'fes-f2': '#8c8c8c', 'f4-f2': '#2ca02c', 'inherited-f4': '#ff7f0e', 'm4gb-f2': '#1f77b4', 'm4gb-f2-server': '#d62728'}

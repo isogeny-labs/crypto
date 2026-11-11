@@ -1,7 +1,18 @@
 {
   "branch": "claude/zealous-meitner-85ipb5",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-11T21:34:11+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/m4gb_persistent_server_20261111/run_ab.sh",
+        "research/m4gb_persistent_server_20261111/results"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-11T20:24:53+00:00",
+      "wall_s": 4018.071
+    }
+  ],
   "commit": "f10150ae0929984e67066cb17ced87a90a862f7f",
   "commit_dirty": true,
   "created_utc": "2026-11-11T19:46:14+00:00",
@@ -17,19 +28,85 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261111T1946Z-m4gb-persistent-server",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 13,
+      "name": "server_over_oneshot_wall_ratio_min_m2",
+      "note": "m4gb-f2-server / m4gb-f2 median wall per call, minimum over the 13 m=2 cells (K 11:6, 12 unknowns); median over cells 0.80, maximum 1.00",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.36
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "server_over_oneshot_wall_ratio_m3_12_unknowns",
+      "note": "cubic cells K and R 11:4:3 (12 unknowns, about 6 s per call): 1.03 and 1.05, the server slightly slower on long solves",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.04
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "engine_disagreements",
+      "note": "every decided answer of both adapters equals inherited-f4 on every target",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 13,
+      "name": "server_paired_saving_wall_s_median_m2",
+      "note": "median over the m=2 cells of the per-cell median paired per-target saving (one-shot minus server), range 0.0038 to 0.0234 s",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0061
+    }
+  ],
   "problem": "study:m4gb_persistent_server_20261111:descent-ab",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 135998,
+      "path": "research/m4gb_persistent_server_20261111/results.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4b/4bdb9e58ba05d16c0de6621f8f2ff4a911b39d4ba3a541ef4e26e490cb36dab8",
+      "sha256": "4bdb9e58ba05d16c0de6621f8f2ff4a911b39d4ba3a541ef4e26e490cb36dab8",
+      "uploaded": false
+    },
+    {
+      "bytes": 24359,
+      "path": "research/m4gb_persistent_server_20261111/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e6/e6ee6c709c288809f2f34d62e818435e903ffc697436ed935300d7cc4546892a",
+      "sha256": "e6ee6c709c288809f2f34d62e818435e903ffc697436ed935300d7cc4546892a",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/m4gb_persistent_server_20261111/REPORT.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/m4gb_persistent_server_20261111/results.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "m4gb-persistent-server",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "ic descent paired comparison of the one-shot M4GB adapter (m4gb-f2) and the persistent --serve adapter (m4gb-f2-server), K and R, 12-24 unknowns (m=2) and 12-15 (m=3), 6 targets x 3 repeats, 60 s budget, one thread: the server saves a near-constant 4-8 ms per call (ratio 0.36-0.50 at 12-14 unknowns, 0.7-0.85 at 16-20, 0.95-1.0 at 24) and is 3-5 % slower on the 6 s cubic cells; 0 disagreements; inherited-f4 stays 6-28x below both. Local container; unverified.",
   "validation": null
 }

@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261110T1937Z-m4gb-e2e-ic-ladder",
+  "latest_record": "20261111T1946Z-m4gb-persistent-server",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 4,
     "invalid": 2,
-    "measured": 110,
+    "measured": 111,
     "open": 3
   },
   "repo": "crypto",
@@ -9329,6 +9329,110 @@
       ],
       "problem": "study:m4gb_integration_20261110:e2e-ic-ladder",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "engine_disagreements",
+      "points": [
+        {
+          "commit": "f10150ae0929",
+          "date": "2026-11-11",
+          "derived": {},
+          "n": null,
+          "record": "20261111T1946Z-m4gb-persistent-server",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic descent paired comparison of the one-shot M4GB adapter (m4gb-f2) and the persistent --serve adapter (m4gb-f2-server), K and R, 12-24 unknowns (m=2) and 12-15 (m=3), 6 targets x 3 repeats, 60 s budget, one thread: the server saves a near-constant 4-8 ms per call (ratio 0.36-0.50 at 12-14 unknowns, 0.7-0.85 at 16-20, 0.95-1.0 at 24) and is 3-5 % slower on the 6 s cubic cells; 0 disagreements; inherited-f4 stays 6-28x below both. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:m4gb_persistent_server_20261111:descent-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.04,
+      "latest": 1.04,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "server_over_oneshot_wall_ratio_m3_12_unknowns",
+      "points": [
+        {
+          "commit": "f10150ae0929",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261111T1946Z-m4gb-persistent-server",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic descent paired comparison of the one-shot M4GB adapter (m4gb-f2) and the persistent --serve adapter (m4gb-f2-server), K and R, 12-24 unknowns (m=2) and 12-15 (m=3), 6 targets x 3 repeats, 60 s budget, one thread: the server saves a near-constant 4-8 ms per call (ratio 0.36-0.50 at 12-14 unknowns, 0.7-0.85 at 16-20, 0.95-1.0 at 24) and is 3-5 % slower on the 6 s cubic cells; 0 disagreements; inherited-f4 stays 6-28x below both. Local container; unverified.",
+          "value": 1.04
+        }
+      ],
+      "problem": "study:m4gb_persistent_server_20261111:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.36,
+      "latest": 0.36,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "server_over_oneshot_wall_ratio_min_m2",
+      "points": [
+        {
+          "commit": "f10150ae0929",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 13,
+          "record": "20261111T1946Z-m4gb-persistent-server",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic descent paired comparison of the one-shot M4GB adapter (m4gb-f2) and the persistent --serve adapter (m4gb-f2-server), K and R, 12-24 unknowns (m=2) and 12-15 (m=3), 6 targets x 3 repeats, 60 s budget, one thread: the server saves a near-constant 4-8 ms per call (ratio 0.36-0.50 at 12-14 unknowns, 0.7-0.85 at 16-20, 0.95-1.0 at 24) and is 3-5 % slower on the 6 s cubic cells; 0 disagreements; inherited-f4 stays 6-28x below both. Local container; unverified.",
+          "value": 0.36
+        }
+      ],
+      "problem": "study:m4gb_persistent_server_20261111:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.0061,
+      "latest": 0.0061,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "server_paired_saving_wall_s_median_m2",
+      "points": [
+        {
+          "commit": "f10150ae0929",
+          "date": "2026-11-11",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 13,
+          "record": "20261111T1946Z-m4gb-persistent-server",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic descent paired comparison of the one-shot M4GB adapter (m4gb-f2) and the persistent --serve adapter (m4gb-f2-server), K and R, 12-24 unknowns (m=2) and 12-15 (m=3), 6 targets x 3 repeats, 60 s budget, one thread: the server saves a near-constant 4-8 ms per call (ratio 0.36-0.50 at 12-14 unknowns, 0.7-0.85 at 16-20, 0.95-1.0 at 24) and is 3-5 % slower on the 6 s cubic cells; 0 disagreements; inherited-f4 stays 6-28x below both. Local container; unverified.",
+          "value": 0.0061
+        }
+      ],
+      "problem": "study:m4gb_persistent_server_20261111:descent-ab",
+      "unit": "wall_s"
     },
     {
       "better": "lower",
