@@ -91,6 +91,25 @@ independent root arithmetic replay. The second inverse/norm is restricted
 to the exact image. All standing remains unsigned, no cost result.
 [pcc:unverified]
 
+## Non-split kernel/codomain continuation
+
+Cryptanalysis0348e90f0654255917c0d6878168ebbda782ffd5, PR1477, classifies
+the predeclared E19/F17 source:3 stable pairings among15,1 degenerate and2
+smooth descended targets, deltas11/6, leading9 andJac285. Targets are
+reflection-equivalent; full PGL2 audit finds no F17 curve isomorphism to
+source. E109 unshifted quadratic cover instead has only its degenerate stable
+kernel. Both are fixture-specific, without unpolarized-Jacobian inference or
+operational non-split map. Claims42713c/3c51f5 and crypto five-lemma465142 are
+unsigned. Native25/reference40 guard passes,1 old benchmark ignored.
+[pcc:unverified]
+
+NONSPLIT_KERNEL_CHECKPOINT.md and CHECKPOINT.md preserve exact source, report,
+diagram/PDF and F17⁶ correspondence/dual acceptance plan. Next CT13b actually
+evaluates determinant11 map with w=3Y and both dual norms; then CT15 tests
+predeclared shift2 of the existing E109 cover. Preserve unshifted negative
+and equivalent-target deduplication. No plaintext atlas write or guessed lead
+ID, benchmark, solver gain or prime-field descent result. [pcc:unverified]
+
 CUBIC_NORM_20261111.md, cubic-checkpoint.json and CHECKPOINT.md bind the source,
 witnesses, proofs and resume instructions. Four new Lean lemmas bring the
 written total to29, gates22+8+7+12 declarations; finite-field/Picard geometry

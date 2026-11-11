@@ -17,6 +17,10 @@ session ended. Claims remain unsigned/unverified. [pcc:unverified]
   branch `research/chained-transfer-balanced-genus2-20261111`, based on
   merged cubic PR1475,04fb06c27274990b8cadac7c356c6a2e40dc90b7.
   BALANCED_CHECKPOINT.md pins source digests, proof scope and producer PDF.
+- Latest kernel/codomain source0348e90f0654255917c0d6878168ebbda782ffd5,
+  branch `research/chained-transfer-nonsplit-kernels-20261111`, ready PR1477,
+  based on merged balanced PR1476,1bef68b5736dc359a884f7d64391fb26f3f74d84.
+  NONSPLIT_KERNEL_CHECKPOINT.md pins outcomes, scope and detailed next-map plan.
 - `cubic-checkpoint.json` pins the producer, independent replay and witness
   digest. Earlier native/reference source pins and all raw receipts remain.
 - Crypto-autoresearcher8edec422a60d87b2cbc656fb02f99f42eba959c7 is vault
@@ -41,6 +45,10 @@ session ended. Claims remain unsigned/unverified. [pcc:unverified]
 - Six balanced Lean bookkeeping/expansion lemmas pass6-declaration gate and
   local PCC check1cadd0. Signed standing remains unverified; actual geometry
   is primary-source input. Total35 written lemmas, gates22+8+7+12+6.
+- Latest kernel guard: native25/reference40,1 existing ignored benchmark,
+  formatting/strict Clippy/guards pass; producer nonsplit-pinned-02/PCC3c51f5.
+  Five new Lean table/algebra lemmas pass5-declaration gate/PCC465142 locally;
+  total40 written lemmas, gates22+8+7+12+6+5. Signed standing remains unverified.
 - Focused GitHub run42999610365 succeeds on exactdf2b78a2, merged PR1474.
   Broad C++ analysis jobs later failed; this is not an all-CI-green verdict.
   [pcc:unverified]
@@ -62,25 +70,30 @@ cargo test --release --example chained_cubic_norm_reference
 tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/CubicPullback.lean
 ```
 
-## Next unblocked task: CT13
+## Next unblocked task: CT13b actual non-split map
 
 CT12's bounded balanced arithmetic and full old-chart controls are complete;
 reuse their receipts when inputs match. Production/catalog integration remains
 CT14, with large-prime/extension/normalization boundaries still unsupported.
 
-Assess a Frobenius-stable unordered Richelot splitting. The
-individually-rational-factor obstruction does not exclude it. Use the
-predeclared E19/F17 source y²=x³+2x+2 and quadratic sextic. Validate its cubic
-residue field and square roots, enumerate all Frobenius-stable pairings,
-preserve every degenerate determinant, compute normalized descended targets
-and audit curve/model equivalences. No target or transfer is already accepted.
-Then implement an actual correspondence on the balanced classes and check
-descent, additivity, odd-subgroup preservation and both dual norms before
-calling it an operational transfer. [pcc:unverified]
+CT13a is complete: E19/F17 has3 stable pairings,1 degenerate/2 equivalent smooth
+targets; both source/target Jacobians have285 rational classes. The full PGL2
+curve audit distinguishes source from target, without unpolarized-Jacobian
+inference. E109/F101 unshifted cover has only the degenerate stable pairing;
+this is a fixture-specific direct-neighbor restriction, not universal closure.
+[pcc:unverified]
 
-The E109 sextic may supply a contrasting Frobenius-cycle control, but no
-universal kernel exclusion has been established. Keep mathematical target
-construction distinct from an implemented map or a measured solving advantage.
+Implement the frozen determinant11 correspondence, raw target w=3Y, in the
+F17⁶ compositum; see NONSPLIT_KERNEL_CHECKPOINT.md for exact finite/infinity
+formulas and acceptance criteria. Validate both dual norms[2] on all285
+rational classes, additivity, coefficient descent and all19 source scalar
+relations/recovery[4]/inverse5. Target construction is not an accepted map.
+[pcc:unverified]
+
+After that pipeline passes, CT15 predeclares shift2 of the E109 cover, rather
+than interpreting the unshifted negative as closure of shifted covers.
+Its exact proposed input is in QUEUE.md; do not claim a shifted map or
+performance edge before implementation and independent checks.
 [pcc:unverified]
 
 ## Continuing constraints

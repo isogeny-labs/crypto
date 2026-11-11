@@ -70,3 +70,10 @@ E109 transfers without rational Weierstrass points. Latest consumer suite
 passes native25/reference37 tests(1 old benchmark ignored). The production
 backend/catalog gap remains open; CT13 next assesses actual non-split kernel
 descent. No cost or cross-prime result. [pcc:unverified]
+
+[Non-split kernel/codomain assessment](NONSPLIT_KERNEL_CHECKPOINT.md) now
+classifies all15 pairings on E19/F17:1 degenerate and2 equivalent smooth
+stable targets. The E109 unshifted cover has only a degenerate stable kernel.
+These are unsigned fixture-specific results; actual non-split correspondence
+is CT13b, then a predeclared shifted E109 cover is CT15. No cost result or
+unpolarized-Jacobian nonisomorphism is inferred. [pcc:unverified]
