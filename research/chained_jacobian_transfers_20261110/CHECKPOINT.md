@@ -1,10 +1,11 @@
-# Current checkpoint — geometric torsion transport underway
+# Current checkpoint — actual transported seven-chain
 
-Read [SEVEN_TORSION_CHECKPOINT.md](SEVEN_TORSION_CHECKPOINT.md) first,then
-[SEVEN_JACOBIAN_CHECKPOINT.md](SEVEN_JACOBIAN_CHECKPOINT.md).
+Read [SEVEN_CHAIN_CHECKPOINT.md](SEVEN_CHAIN_CHECKPOINT.md) first,then
+[SEVEN_CHAIN_PROOF.md](SEVEN_CHAIN_PROOF.md) and [CT22_PLAN.md](CT22_PLAN.md).
 It supersedes the restoration/interruption state below;the original records
 are recovered and CT20 Phi is now implemented/proved in written geometry.
-CT21 actual49-kernel/64-lift action passes;R1/Psi continuation is active.
+CT21 actualR1/Psi now passes full geometric/rational/source controls;
+the global descent/quotient/polarization/noniso proof is written.
 Historical interruption paragraphs below are superseded. Scientific standing is
 unsigned. [pcc:unverified]
 

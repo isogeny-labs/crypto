@@ -1,4 +1,60 @@
-# Chained ECDLP Transfers — CT21 live checkpoint 2026-11-11
+# Chained ECDLP Transfers — actual Psi checkpoint 2026-11-11
+
+Read SEVEN_CHAIN_CHECKPOINT.md,SEVEN_CHAIN_PROOF.md andCT22_PLAN.md first.
+This section supersedes the historical snapshots below. Continue authorized
+autonomous research after eachcheckpoint;inspect realheads/diffs/processes
+beforeanycheckout. Do not reset or repeat completedcorpora. [pcc:unverified]
+
+ActualF101(7,7)Psi:T0[31,75,74,54,71,55,1]→T1[95,26,19,27,94,91,1]
+haswrittenregularquotient/descent/polarization/noniso proof,PCCrooteb3240/
+consumerd0441a. Bothcomplete12317-class domains/dual7/bijections/pairedsums/
+descent andall109source/reverse28-inverse74/direct4 pass. Fullgeometric16
+two-kernel,49kernel/64lifts andcomplete120branchautomorphism certificates
+support it. All scientificstanding unsigned;fullgeometry remainswritten.
+[pcc:unverified]
+
+Consumer7c1f32ecb24daffce449703075573c824dd1f241 published readyPR1488,
+branchresearch/chained-transfer-seven-torsion-20261111,stackedon parent1484/
+research/chained-transfer-seven-glue-20261111 at2450815e2. Keep1488headfrozen
+for exactfocusedCI;newCT22work needs a freshchildbranch. Localguard11 passes
+25native/65reference unit+two integrations,oneoldignoredbenchmark;thirdaut
+integration12/strictClippy13 pass. Focused25/65+three dispatched on7c1head;
+run43097723254 observedqueued;metadata in evidence/seven-chain-ci-dispatch-15.json.
+No successinferred;check on50-minutecadence from20:43UTC/actualactivity.
+[pcc:unverified]
+
+Root90sourcelemmas;ChainTransport6/PCC7409b3 andRichelotDescent4/PCCf4ced8
+gates/alllocalbindingspass. Rootautexample/consumerthirdintegrationbyteequal.
+Three-pagechainreport rendered/eachpageinspected. Source/evidence snapshots,
+oldPCC/ledgerrows,SEVEN_CHAIN_PROOF.md,consumerSEVEN_CHAIN.md andidentity
+pointerfiles arefrozen:useNEW versions/reports/records fornextresults.
+[pcc:unverified]
+
+Parent1484 exact245focused43085588914 succeeds25/57+two. Mainfb3f88a03
+adds5bypassledgerrows;main61/frozenPhi60 share56rows,so mergeblocked/dirty.
+Twoactualunchanged-C analysisfindings preserved. Root3877forkafter569rows/
+archive-clock/library/benchrec gaps persist. Acceptedreconciliation must
+retainboth histories;neverrebase/force/rechain/chooselineage/dropclaims.
+Stacked1488cannotautomergefeaturebase;retarget/rerunonlyafterparentlands.
+[pcc:unverified]
+
+NextCT22_PLAN.md:directbasefield norms forbothquotients onbalancedC0/C1.
+Prototype/faithfulclearedLeanproofs,ALL12317classes eachmodel including
+repeated/zero support/infinities,thenchangedPhi/Psi/sourcefullchecks before
+acceptance. Existinggenericnormreferenceanddirectellipticcontrolsrequired.
+No normadapter executed atthischeckpoint. Continue withoutwaitingforCI
+orinstructions;use spacedCI/reviewcheckins,notforegroundpolling.
+[pcc:unverified]
+
+AlllocalCT21runscompleted. Wrongtypedcoefficients inunsigned9b9e0a retained
+unchanged/corrected2b4435;everyevaluatorusedcorrectconstructor. Native/
+Lean/Clippyfailures retained. No solver/benchmark/paidallocation: S3profile/
+token/livebudget/capacity absent. KB/ecdb unavailable,atlas8edec422a vault
+locked/noKEY/noplaintext. Same-prime descent only,no cost/novelty/cross-prime
+claim. Ifinterrupted,preserveheads/queue/rawlogs/commands beforeending.
+[pcc:unverified]
+
+# Historical CT21 torsion checkpoint 2026-11-11
 
 Read studySEVEN_TORSION_CHECKPOINT.md,then CT21_PLAN.md andQUEUE.md.
 This section supersedes the historical Phi snapshot below. Continue authorized

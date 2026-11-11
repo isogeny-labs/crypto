@@ -1,8 +1,9 @@
 # Autoresearcher integration handoff
 
-Latest continuation: SEVEN_TORSION_CHECKPOINT.md / CHECKPOINT.md. Actual
-fixedF101 Phi and its49-kernel/64-lift two-action are recorded;nextR1/Psi
-is active. Earlier prospective paragraphs below are historical snapshots.
+Latest continuation: SEVEN_CHAIN_CHECKPOINT.md / SEVEN_CHAIN_PROOF.md.
+Actual fixedF101 Psi,globalwrittenproof,bothfullrational/sourcecontrols and
+unpolarizedFp-Jacobian distinction are recorded. CT22 directnormengineering
+is next. Earlier prospective paragraphs below are historical snapshots.
 Vault state remains locked. [pcc:unverified]
 
 Destination: `crypto-autoresearcher` lead atlas, after configured vault access
@@ -253,3 +254,21 @@ Do not duplicate thecompletedkernel/action orinterpret thegeometric
 certificate as a fullPsi/cost verdict. Next fullrational/globalchain
 acceptance staysCT21_PLAN.md. No vaultplaintext/guessedlead/graphpromotion;
 all scientificstanding unsigned. [pcc:unverified]
+
+## Actual transported seven-chain continuation
+
+Consumer7c1f32ecb/readyPR1488 stackedon1484 freezesactualPsi between accepted
+T0=[31,75,74,54,71,55,1] andT1=[95,26,19,27,94,91,1]. Full16geometric
+kernel/regularquotient/globalF101 descent viaAut/Torelli/oddwitness,
+dual7 andellipticembedding/trace/j noniso proof arewritten. Bothfull12317
+rationaldomains/all109source reverse28-inverse74/direct4 controls pass;
+fullguard25/65+two andthirdautintegration/strictClippy pass. PCCeb3240/d0441a
+unsigned. Newformalhelpers total90,actualgeometrypartialformal. [pcc:unverified]
+
+CT22_PLAN.md nextderivesbothdirectellipticnorms onbalancedclasses with
+everyexception/repeatedsupport/infinitycase andfullC0/C1comparison before
+integration. Do notduplicateCT21corporework orpromotea measurededge. Parent
+consumerledgerfork now joinsrootfork;allhistoriespreserved. No vaultplaintext,
+guessedleadID,novelty/cross-prime orcomputationaladvantage. S3/livebudget/KB
+gatespersist;canonicalatlas update waitsforproperunlock/sourceconsultation.
+[pcc:unverified]

@@ -4,6 +4,7 @@
 - **Kind:** access/tool limit, measurement gap, and PR synchronization gap
 - **Affected work:** [PR #3877](https://github.com/isogeny-labs/crypto/pull/3877),
   [queue #3904](https://github.com/isogeny-labs/crypto/issues/3904),
+  [consumer PR #1484](https://github.com/isogeny-labs/cryptanalysis/pull/1484),
   [CT05–CT07](../research/chained_jacobian_transfers_20261110/QUEUE.md)
 - **Next action owner:** continuing research session; ledger policy reconciliation requires the repository's accepted procedure
 - **Last updated:** 2026-11-11
@@ -87,3 +88,33 @@ shortcut τ φ [2] discovered on all 102 source points. [pcc:unverified]
 - [Current report and proof map](../research/chained_jacobian_transfers_20261110/REPORT_20261111.md)
 - [Source review receipt](../research/chained_jacobian_transfers_20261110/SOURCES_20261111.md)
 - [Original broader prime-cover backend gap](prime-cover-balanced-jacobian-and-induced-maps-missing.md)
+
+## 2026-11-11 consumer fork after focused Phi success
+
+The consumer now has its own instance of this same append-only synchronization
+obstruction. Exact Phi head2450815e2a3b84687b405ef8498dae9dc2663fe1 has60
+ledger rows. Mainfb3f88a03d54bd81a8e83a1281633a54522c8286 has61 after
+PR1485/1486 appended five checkpoint-bypass entries;the histories share only
+56 rows. Current native continuation had65 rows at the captured comparison,
+and its original chain remains intact. Prefix validation reports row56
+differs;GitHub PR1484 reports mergeable_state dirty. No entry,hash link or
+history was changed to make it pass. [pcc:unverified]
+
+ConsumerPCC9c0b68 pins exact ledger digests/counts,failedprefix output,current
+checks/review metadata and full compressed CI logs. Focused43085588914 on
+exact2450815e2 succeeded25native/57reference unit+two integrations,one old
+ignored benchmark. Requiredstore/gate/records and allCodeQL complete,zero
+reviews/threads at the observation. Separate cppcheck/clang-tidy jobs have
+actual findings in unchanged C files;they are not package-DNS failures or
+clean-code verdicts. Existing consumerproblem static-analysis-ubuntu26-tool-drift.md
+tracks the analyzer lane;these newer diagnostics are a new observation,not
+proof that all historical causes are identical. [pcc:unverified]
+
+Exit remains an accepted reconciliation retaining BOTH frozen histories and
+passing actual base-prefix/hash-link requirements,plus final-head applicable
+CI/review. Do not rebase,force,choose a lineage,rechain archived records,
+drop claims or weaken the gate. Focused arithmetic success does not resolve
+this integration requirement. Continue unblocked CT21 quotient/proof/source
+work while the accepted reconciliation is unavailable. Root6905c86363
+preserves the geometric stage;no ledger bypass or benchmark is authorized
+by that checkpoint. [pcc:unverified]
