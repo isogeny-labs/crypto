@@ -49,7 +49,7 @@ The frozen panel contains 28 unique inputs: two families x seven m values x natu
 - Producer elapsed time 35.86 s, replay 34.56 s; peak RSS 142,864 KiB and 144,116 KiB, respectively. These are L0 process diagnostics, not performance evidence.
 - The producer wrapper had a typo only in its final exit-marker path. `/usr/bin/time` recorded producer exit status 0; the correct `producer.exit` and the wrapper issue are documented in the run directory.
 
-The run bundle has 76 manifest-listed files totaling 21,175,275 bytes. The SHA-256 manifest was verified locally and the evidence commit was pushed to the repository branch. No new S3 output upload was made: the account's current monthly spend readback was USD 1,360.114 against its configured USD 1,300 limit, so this run's new output is persisted in Git. Source inputs remain available at the frozen S3 URIs.
+The run bundle has 76 manifest-listed files totaling 21,175,275 bytes. Its SHA-256 manifest was verified locally. After the push, the repository's artifact-autofix workflow moved the 9,276,061-byte `certificates/global.json` into the content-addressed S3 store and committed the pointer at `certificates/.artifacts.json`. I downloaded that object and verified its SHA-256 against the manifest: `s3://setec-astronomy-artifacts/store/sha256/16/168f16028492ac47c3f35e16937d67c504bce635278592955fdb07c5e79675de`. The configured monthly budget readback was already USD 1,360.114 against a USD 1,300 limit; the workflow did not expose an attributable per-object cost. No EKS job was submitted.
 
 == Scope and next work
 
