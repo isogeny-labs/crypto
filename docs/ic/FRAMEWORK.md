@@ -290,6 +290,30 @@ stopwatch, and the table should say which is which.
 | `total_gae`, `s` | the whole pipeline, and it over `√r` |
 | `s_over_rho` | against the matched counted Pollard rho on the same instance, when supplied |
 
+#### Stored factor-base log tables (individual logarithm only)
+
+A factor-base logarithm table depends only on the curve, its generator
+`G` and the materialised base, so it can be paid for once and reused.
+`ic logs --log-store <dir>` (or `$IC_LOG_STORE`) writes the table to
+`<dir>/<key>.json`, where the key is SHA-256 over a canonical text of
+the curve (degree, subfield, `a`, `b`, field modulus, subgroup order,
+cofactor), `G`'s coordinates and the SHA-256 of the *sorted point list*
+of the base (`src/bin/ic/log_store.rs`). Files are schema-2 documents
+(schema 1 still loads), written to a temporary name and hard-linked
+into place; an existing file is never replaced. `ic solve --log-store`
+(with `--factor-base` or `--factor-index`) and `ic price --log-store`
+look the table up by recomputing the key, check the generator and base
+hash, and re-verify every column as `[log]G == point` before use: a
+mismatch or failed check is an error, never a silent fallback. A run
+that used the store skips collection and linear algebra, and its report
+says so: `log_table.log_table_source` is `"store"` (or `"file"` for
+`--logs`, `"computed"` otherwise), with the key and
+`precomputation_paid_in_this_run: false`. That run's cost is
+**amortized, not cold**: `ic price` moves its cold figures to `*_store`
+fields (`s_cold` → `s_store`, `s_ic_cold` → `s_ic_store`) and nulls the
+cold ones. Report the cold cost first; a store-backed figure is
+secondary and never stands in for `S` (§7).
+
 ### The rho reference
 
 `ic bench` runs the reference before any configuration, on the same
