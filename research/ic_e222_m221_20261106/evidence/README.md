@@ -44,3 +44,11 @@ python3 -I research/ic_e222_m221_20261106/evidence/replay.py --ic target/release
 | process | not done | Conductor task, knowledge-base queries (`research-kb` has no binary here), `ecdb` lookup, resume checkpoint, benchmark record (`tools/benchrec.py`), EKS run (AWS credentials in this environment are rejected; no isolab image contains `ic`; `../validation_path/REPORT.md`) |
 
 Pre-gate status: these results sit under `research/` only. If any is promoted to a row, it renders as "unvalidated (pre-gate)" at best and the builder refuses it as new. Do not add one before the items above exist.
+
+## Replay result (producer-run, independent = false)
+
+`replay.py --ic target/release/ic --k 30` with nonce `66b9b37129514d0e`, binary blake3 `bf83d502ad3d05b709c4eec47d4d7680093a5cb56b45e25d951ee55e73af37d9` built at git head `b72976d354` (a later commit than the one that produced the rows, with the multi-word relation point and other changes merged in): 90 rows drawn (30 each from the paired, robustness and H1-with-defaults files; the old-defaults arm only from rungs up to 17 bits), 90 reproduced `trials_total`, relations collected and the recovered scalar exactly, 0 mismatches; the three regenerated instance sets match their pinned manifests. Output: `replay-log.json`. This shows the recorded counts are reproducible by a rebuilt binary, not that anyone other than the producer ran it.
+
+## What the gate says about the draft
+
+`gate-output.txt` is the output of `python3 scripts/validation_gate.py evidence` on a copy of this directory with `VALIDATION.draft.json` renamed `VALIDATION.json` (the copy must sit at the same directory depth as this one, because the paths in the validator report are relative to it). Exit status 1, for exactly these reasons: both pinned files say `independent` is not true; the robustness rows are in the artifact store, not the repository (`../results/default_flip/robust/rows.jsonl` is not a file; fetch by sha256 from its `.artifacts.json`); and the rho reference is not matched to the protocol, not in the same unit or process, and has no 0 / 0.1 / 1 GAE band. All other raw-data paths resolve.

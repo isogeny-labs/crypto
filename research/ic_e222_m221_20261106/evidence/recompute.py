@@ -17,7 +17,12 @@ raw=[];problems=[]
 for k,r in C["raw_data"].items():
     p=path(k)
     if not os.path.exists(p): problems.append(f"{k}: {p} not found"); continue
-    ok=sha(p)==r["sha256"]; raw.append({"path":os.path.relpath(p,ROOT) if k!="robust" or not a.robust_rows else p,"sha256":sha(p),"pinned_sha256_matches":ok})
+    ok=sha(p)==r["sha256"]
+    # paths are relative to this evidence directory (what the gate resolves); the artifact-store file is
+    # recorded under its logical repository path, with a note when it was read from a fetched copy
+    ent={"path":os.path.relpath(os.path.join(ROOT,r["path"]),HERE),"sha256":sha(p),"pinned_sha256_matches":ok}
+    if k=="robust" and a.robust_rows: ent["read_from_fetched_copy"]=True; ent["in_repository"]=False
+    raw.append(ent)
     if not ok: problems.append(f"{k}: sha256 differs from claims.json")
 def rows(k): return [json.loads(l) for l in open(path(k))]
 val={}
