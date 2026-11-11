@@ -1,5 +1,7 @@
 # Resume checkpoint — CT19 degree7 elliptic maps; workspace interrupted
 
+Current update: execution and original CT19 records/receipts are restored; see [RESTORATION_20261111.md](RESTORATION_20261111.md). PR1483 merged52fe5eba0. Prior interruption notes below are historical, with their custody gaps now resolved. All scientific standing remains unsigned. [pcc:unverified]
+
 Updated2026-11-11. Start with [EMERGENCY_RESUME_20261111.md](EMERGENCY_RESUME_20261111.md)
 and [CT20_PLAN.md](CT20_PLAN.md). Execution workspace unavailable around14:29UTC;
 GitHub recovery extends crypto parent ad10b21a3578dadf2366dbd793ebed2f7aea319a.

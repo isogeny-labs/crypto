@@ -1,5 +1,7 @@
 # Interruption recovery — Chained ECDLP Transfers, 2026-11-11
 
+Current update: execution and original CT19 records/receipts are restored; see [RESTORATION_20261111.md](RESTORATION_20261111.md). PR1483 merged52fe5eba0. Prior interruption notes below are historical, with their custody gaps now resolved. All scientific standing remains unsigned. [pcc:unverified]
+
 Read this before older checkpoint paragraphs. The execution workspace became
 unavailable around14:29UTC. A final local apply_patch failed after35seconds;
 a subsequent read-only health call stalled and was terminated after the

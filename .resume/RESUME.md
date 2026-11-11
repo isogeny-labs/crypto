@@ -1,11 +1,11 @@
-# Chained ECDLP Transfers — interruption recovery2026-11-11
+# Chained ECDLP Transfers — restored2026-11-11T18:08Z
 
 ## Goal
 Continue user-authorized autonomous project across crypto,cryptanalysis and
 crypto-autoresearcher from cryptoPR3877. Persistent GitHubqueue3904 and study
 QUEUE.md/CHECKPOINT.md remain canonical. Prioritize actual DLP-preserving
 Jacobian chains,prime-field coefficient descent and complete computational
-costs. Execution workspace is currently unavailable; preserve resume state.
+costs. Execution workspace is restored;original CT19 custody is recovered.
 
 ## Lead / hypothesis
 CT19 now publishes four actual F101 degree7 elliptic maps/duals on the full
@@ -28,70 +28,50 @@ unchanged. New arithmetic Rust/Lean. No experiment/benchmark/paid job before
 S3 admission and live IsoLab allowance/capacity. [pcc:unverified]
 
 ## State
-Crypto recovery extendsad10b21a3578dadf2366dbd793ebed2f7aea319a on
-research/chained-jacobian-transfer-20261110,existingPR3877.
-Read actual HEAD. Frozen PCC fork after569 shared rows remains unresolved;
-no alternate lineage/rebase/force/hand-rechain. Copilot sync6789021128 was
-unanswered at last observation. Root library remains6184pass/13fail/133ignored,
-six fixed by tracked restoration,five absent archives/two missing clock causes.
-Global benchrec189 problems/106 historical records;consumer scoped16 passed.
-Do not repeat completed baselines without resolving causes. [pcc:unverified]
+Execution restored. Crypto HEAD45e3498a6821d7537cc62b114d4c5f0224b713e2
+plus pending restored-original custody checkpoint on existing3877 branch.
+Original PCC7e9547/58dbb8 and two ledger rows restored UNCHANGED;ledger613
+chain/prefix45e3498 passes. Both attestation hashes match;root example/Lean
+source byte-identical to recovered versions. Existing58dbb8 four Lean checks
+pass;7e9547 remains unsigned/not_covered. Original raw receipts recovered.
+See RESTORATION_20261111.md. No fresh baseline replay needed. [pcc:unverified]
 
-Consumer ef9a542598c1b0ebfde03cf27f77929b928391cd,readyPR1483,
-research/chained-transfer-seven-20261111. Focused43038507853 completed
-success14:33:50Z:native25/reference51 unit+two integration passes,one old
-benchmark ignored;source guards/fmt/Clippy pass. Existing consumer claims
-a51d74/beeac7/45f608/2f70a0 unsigned. Requiredstore/gate/records passed;
-last snapshot Rust analysis running,five general jobs failed apt DNS.
-No merge during rescue.1482 merged29c4d7206 after43030710539 success;
-prior1481/1480/1479 merged with original receipts retained. [pcc:unverified]
+Consumer ef9a54259/PR1483 merged52fe5eba0834358549ad88981510067a4b7f8c24
+at18:05:54Z with head guard. Requiredstore/gate/records,allCodeQL/focused
+43038507853 pass. Five generalC++ apt DNS failures retained;no check bypass.
+CT20 code/gluing tests not yet run. All scientific standing unsigned.
+[pcc:unverified]
 
-Workspace became unavailable around14:29UTC. Last patch failed;health
-exec stalled and was terminated. No known local job/solver/allocation
-running. GitHub connector rescued Lean source,root replay harness/fixture,
-plan/queue/checkpoint without changing frozen claims/ledger. Pre-loss
-root PCC7e9547/58dbb8,original receipts/two extra ledger rows were
-uncommitted and remain unavailable. Never recreate them manually.
-Prior68 Lean receipts durable;four recovered helpers need new retained gate
-if originals cannot be restored. See detailed custody notes. [pcc:unverified]
-
-S3 gate exact headings fixed but transport lacks configured AWS profile
-ecc-challenges-new/checkpoint token. No new experiment launched/live budget
-unknown. KB/ecdb unavailable;atlas8edec422a60d87b2cbc656fb02f99f42eba959c7
-AES-SIV locked,noKEY/no plaintext. GitHub rescue is not S3 admission.
-All standing unsigned;no benchmark,solver advantage,cross-prime or novelty
-claim. Reports/diagrams/inspected PDFs are durable upstream. [pcc:unverified]
+Crypto ledger fork after569 shared rows/archive/full-library causes remain
+unresolved;do not merge3877 or rewrite lineage. S3 gate last lacked profile/
+checkpoint token;live IsoLab budget/capacity unknown. No experiment/benchmark/
+paid job launched. KB CLI unavailable;atlas8edec422a encrypted/noKEY/no plaintext.
+Prior root library6184pass/13fail/133ignored and global benchrec historical
+artifacts remain as documented;do not repeat unchanged corpora. [pcc:unverified]
 
 ## Next steps
-1. Restore usable execution. Inspect actual refs/worktree/index/untracked
-   files before any reset;preserve original pending claims/raw receipts.
-2. Read EMERGENCY_RESUME_20261111.md and CT20_PLAN.md. Check PR1483 on
-   repository cadence,collect exactCI logs/artifacts and current analysis.
-   Merge only when actual requirements permit,with expectedef9 head/merge
-   commit,no bypass;confirm result. Keep crypto3877 blocked.
-3. If originals unavailable,retain fresh outputs for recovered root:
-   cargo test --release --example chained_elliptic_seven_reference -- --nocapture
-   tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/EllipticSeven.lean
-   Then use existing PCC CLI to register FRESH records. Never invent oldIDs.
-4. CT20 first implement four actual image2-torsion gluing inventories with
-   unchanged FpR/genus2::glue;check descent,normalization,quotient component
-   swap/actual isomorphisms and counts. Then global factor/duals,64-lift
-   torsion action,new R1/Psi and full12317/109 controls. No CT20 run yet.
-5. CT17a supplied CRT controls remain optional/unexecuted. Do not reopen
-   already disproved exact-target nonbacktracking Richelot routes.
+1. Publish original-custody checkpoint on3877;update3904 and consumer merge
+   handoff. Inspect actual refs before any guarded update,no force/rebase.
+2. Create CT20 consumer branch from merged52fe5eba0. Implement four actual
+   image2-torsion gluing inventories with unchanged FpR/genus2::glue;check
+   descent,normalization,quotient component swap/isomorphisms and counts.
+3. Prove full geometric2-kernel inclusion/global factor[2],then both complete
+   rational dual[7],64-lift torsion action,new Richelot/Psi and full12317/109
+   controls. Read CT20_PLAN.md;do not accept rational halving alone.
+4. Preserve every failed chart/negative,update proof/report/diagram/PDF/PCC
+   before continuous commits. Benchmark admission and live budget remain
+   separate gates. Existing complete baseline receipts are reused.
 [pcc:unverified]
 
 ## Runs in flight
-No known local job or paid/cloud allocation. Focused43038507853 is DONE,
-success. Last observed remote Analyze(rust) on ef9 still in progress;
-collect actual status on cadence or next restored session. No background
-research scheduled. FailedgeneralCI job links/excerpts retained in
-study evidence/elliptic-seven-ci-observation.md;S3 archive still owed.
-No newly launched job or successful S3 checkpoint is implied. [pcc:unverified]
+None known. Original restoration proof checks finished. PR1483 merged;
+no focused job or benchmark/solver/paid allocation pending. Next CT20
+local development test will be recorded separately. No scheduled background
+research. GitHub branch updates are the durable checkpoint path currently
+available;S3 admission is not waived. [pcc:unverified]
 
 ## Stop and success conditions
-Workspace unavailability currently prevents further compilation/proofs/map
-construction;resume after execution returns. User research objective remains
+Execution is restored;continue the next construction/proof/test task. User research objective remains
 open. Accept actual kernels/maps/duals/descent/nonzero subgroup preservation,
 preserve negatives/failures and direct elliptic/source controls. Global
 geometry must accompany rational-point tests. No fabricated standing,
