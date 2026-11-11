@@ -51,3 +51,13 @@ sequence. The interrupted first attempt is kept in `runs/attempt1/`.
 
 Disclosed before this amendment: five walks at p = 1009 had been seen, all unresolved, with 6.9·10⁷ to
 3.1·10⁹ multiplications. The decision rules and estimands are otherwise unchanged.
+
+## Amendment 2 (2026-11-11, before any p ≥ 1009 walk under Amendment 1 finished past the 8th record)
+
+At p = 1009 a single walk under the 100,000-curve cap ran for more than 10 minutes: odd jumps cost about 4·10⁶
+multiplications each. **The cap is lowered to 10,000 curves at every prime.** p = 37 and 53 are rerun at that
+cap, so recall is measured at the same cap as the large primes. The 100,000-cap records of p = 37 and 53 (all
+400 curves, 60 walks each) are kept in `runs/attempt2/` and reported as a secondary row.
+
+Disclosed: under the 100,000 cap, p = 37 reached a weak curve on 24 of 60 walks and p = 53 on 11 of 32 (the run
+was interrupted at that point). At p = 1009, 0 of 5 reached one, and p = 1511 had no admitted walk yet.
