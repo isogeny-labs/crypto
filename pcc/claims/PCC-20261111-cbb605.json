@@ -1,0 +1,67 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T23:38:44Z",
+ "id": "PCC-20261111-cbb605",
+ "kind": "statement",
+ "producer": {
+  "commit": "ae9fb898090c6727cdfa2487adbf7d3cf0ff9d51",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "f1b9b25248f7656ebd5b63089cf8aa21eaa7151ecf97a5f25ca67449c83f339a",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoHopTransport.lean",
+   "theorem": "TwoHopTransport.two_commuting_squares"
+  },
+  {
+   "decl_sha256": "722f4b534cd0434846b7585e438f8a270761665717cfc18cb24915842268726b",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoHopTransport.lean",
+   "theorem": "TwoHopTransport.two_chain_adjoint_norm49"
+  },
+  {
+   "decl_sha256": "136530a4c27ad2a9dbf89320f31612225f5daa5f6fb157e89c0a86b13c70a797",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoHopTransport.lean",
+   "theorem": "TwoHopTransport.full_source_reverse196"
+  },
+  {
+   "decl_sha256": "00d7b55d42815fdc3ca098e79bfa40de90a45ef0776a5f9ca3284fdec5adc8b9",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoHopTransport.lean",
+   "theorem": "TwoHopTransport.recovery196_order109"
+  },
+  {
+   "decl_sha256": "a7145cbba4051bc3765d5739db95f54c546315df5baae38c2901621a022a571a",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoHopTransport.lean",
+   "theorem": "TwoHopTransport.recovery196_order113"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/two-hop-lean-gate-01.txt",
+    "sha256": "f99cd2839b0dc411dcaa45bc0096841c13b743bce9cec80949f7e74ec79fc8b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/two-hop-lean-build-01.txt",
+    "sha256": "8e7e85fa08e56844be786eae17c982788318420770764656111540eac7cb25c4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/two-hop-lean-audit-01.txt",
+    "sha256": "4612405044661183fc93b9f123ef1ae2556fcdce3f9cbfc9e915fce5d6b89055"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned partial Lean formalization: five faithful conditional module/function consequences for two actual transported squares,adjoint norm49,fullreverse196,and recovery109/113. Lean4.35.0 proof gate passes5,0trusted;axioms inspected. No constructed fields/Jacobians/regular quotient/descent/polarization/Torelli bridge."
+}

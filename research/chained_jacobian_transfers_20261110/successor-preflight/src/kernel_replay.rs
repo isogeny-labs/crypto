@@ -30,8 +30,7 @@ fn parse_polynomial(f: &FpR, text: &str, basis: &[ER; 6]) -> Vec<ER> {
         .collect()
 }
 
-#[test]
-fn explicit_psi_kernel_flat_validity_and_frobenius_replay() {
+fn replay(witness: &str, header: &str, coefficients: &[u64; 7], prefix: Option<&str>) {
     let f = FpR::from_modulus(101, &[33, 46, 2, 18, 56, 12, 1]);
     let g = f.gen();
     let lift = |p: &[u64]| p.iter().map(|c| f.from_u64(*c)).collect::<Vec<_>>();
@@ -46,10 +45,9 @@ fn explicit_psi_kernel_flat_validity_and_frobenius_replay() {
     assert_eq!(f.frobenius(f.frobenius(f.frobenius(t))), t);
     assert_eq!(f.frobenius(f.frobenius(f.frobenius(s))), f.neg(s));
     let basis = [f.one(), t, f.sq(t), s, f.mul(s, t), f.mul(s, f.sq(t))];
-    let witness = include_str!("../fixtures/explicit-psi-kernel-07.tsv");
     let mut lines = witness.lines();
-    assert_eq!(lines.next().unwrap(),"# explicit-psi-kernel/v1;p101;T^3+6T^2+13T+56=0;S^2=2;basis[1,T,T2,S,ST,ST2];T0[31,75,74,54,71,55,1];index,u_coefficients,v_coefficients,plus");
-    let curve = lift(&[31, 75, 74, 54, 71, 55, 1]);
+    assert_eq!(lines.next().unwrap(), header);
+    let curve = lift(coefficients);
     assert_eq!(
         poly::gcd(&f, &curve, &poly::derivative(&f, &curve)),
         vec![f.one()]
@@ -57,12 +55,15 @@ fn explicit_psi_kernel_flat_validity_and_frobenius_replay() {
     let mut classes = vec![];
     for (i, line) in lines.enumerate() {
         let columns = line.split('\t').collect::<Vec<_>>();
-        assert_eq!(columns.len(), 5);
-        assert_eq!(columns[0], "actualPsiKernel");
-        assert_eq!(columns[1].parse::<usize>().unwrap(), i);
-        let u = parse_polynomial(&f, columns[2], &basis);
-        let v = parse_polynomial(&f, columns[3], &basis);
-        let plus = columns[4].parse::<u8>().unwrap();
+        let offset = usize::from(prefix.is_some());
+        assert_eq!(columns.len(), 4 + offset);
+        if let Some(prefix) = prefix {
+            assert_eq!(columns[0], prefix);
+        }
+        assert_eq!(columns[offset].parse::<usize>().unwrap(), i);
+        let u = parse_polynomial(&f, columns[1 + offset], &basis);
+        let v = parse_polynomial(&f, columns[2 + offset], &basis);
+        let plus = columns[3 + offset].parse::<u8>().unwrap();
         assert_eq!(u.last(), Some(&f.one()));
         assert!(v.is_empty() || v.last() != Some(&f.zero()));
         assert!(v.len() < u.len());
@@ -73,7 +74,7 @@ fn explicit_psi_kernel_flat_validity_and_frobenius_replay() {
         }
         assert!(
             poly::rem(&f, &poly::sub(&f, &curve, &poly::mul(&f, &v, &v)), &u).is_empty(),
-            "actualT0 divisor validity{i}"
+            "actual curve{coefficients:?} divisor validity{i}"
         );
         classes.push((u, v, plus));
     }
@@ -105,5 +106,19 @@ fn explicit_psi_kernel_flat_validity_and_frobenius_replay() {
         })
         .to_vec();
     assert_eq!(fixed, [1, 7, 1, 49]);
-    println!("PASS frozen49 actualPsiKernel TSV rows,semantic T/S basis,canonical coefficient/shape/curve validity/distinctness and all Frobenius5/6 permutation checks in unchanged flatFpR/poly engines;fixed counts degrees1/2/3/6={fixed:?};no producer tower/closed-map/generator imported,no independent Jacobian addition or kernel-membership verdict");
+    println!("PASS frozen49 kernel TSV rows for curve{coefficients:?},semantic T/S basis,canonical coefficient/shape/curve validity/distinctness and all Frobenius5/6 permutation checks in unchanged flatFpR/poly engines;fixed counts degrees1/2/3/6={fixed:?};no producer tower/closed-map/generator imported,no independent Jacobian addition or kernel-membership verdict");
+}
+
+#[test]
+fn explicit_psi_kernel_flat_validity_and_frobenius_replay() {
+    replay(include_str!("../fixtures/explicit-psi-kernel-07.tsv"),
+        "# explicit-psi-kernel/v1;p101;T^3+6T^2+13T+56=0;S^2=2;basis[1,T,T2,S,ST,ST2];T0[31,75,74,54,71,55,1];index,u_coefficients,v_coefficients,plus",
+        &[31,75,74,54,71,55,1], Some("actualPsiKernel"));
+}
+
+#[test]
+fn explicit_psi2_kernel_flat_validity_and_frobenius_replay() {
+    replay(include_str!("../fixtures/explicit-psi2-kernel-12.tsv"),
+        "# explicit-psi2-kernel/v1;p101;T^3+6T^2+13T+56=0;S^2=2;basis[1,T,T2,S,ST,ST2];T1[95,26,19,27,94,91,1];index,u_coefficients,v_coefficients,plus",
+        &[95,26,19,27,94,91,1], None);
 }

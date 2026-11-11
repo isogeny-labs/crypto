@@ -1,3 +1,70 @@
+# CT24 current — actual Phi2/Psi2 pass components; final guard15 running
+
+Current prose-lint-clean proof:SUCCESSOR_CHAIN_PROOF_V2.md/6dd50c,
+same mathematics as frozen6e531a with one inline unsigned marker.
+
+Read frozen SUCCESSOR_GLOBAL_PROOF.md/e98755 and
+SUCCESSOR_CHAIN_PROOF.md/6e531a,then inspected two-page
+reports/successor-chain/chain-report.pdf. Scientific standing unsigned.
+Native Phi2/Phi2Hat now pass BOTH complete12317 C1/C2 domains and
+all109/113 original components through Phi1/Phi2:dual7/composite49,
+fullreverse98/inverses99/15,actualtarget2 beta alpha. All49 Phi2-kernel/
+2401 sums/Frobenius5/6,all16 two-kernel and64 four-lift transport checks
+pass. Root6a2cfe;consumer85aed0/48abec/91606b. [pcc:unverified]
+
+Actual R2 pairing[(0,4),(1,5),(2,3)],delta49,raw[49,99,36,35,23,80,76],
+scale50,T2[95,93,43,39,92,17,1]. BOTH complete12317 R2 domains pass
+old/closed equality/dual2/bijections/additions/descent;route counts each
+[239,12078,0,0,0]. Both complete12317 Psi2 graphs pass dual7/bijections/
+paired additions/descent. All109/113 source two-hop controls pass both
+naive/quarter directions,reverse196/inverses104/64,direct4 beta alpha.
+All16 composite/adjoint2-kernel and12 elliptic intersections pass;actual49
+KerPsi2/all2401 sums/Frobenius/dualR1 norm2 exported. Roota31794;
+consumer26a862/f41c22/594b3f/d2169b. Initial whole source05 was not frozen;
+later source12 retains its R2 functions;exact-source final guard remains owed.
+[pcc:unverified]
+
+Independent accepted oracle has byte-identical prefix;all120 PGL2 candidates
+leave only identity for actualT2. Written Aut/Torelli/odd-witness descent,
+finite-etale2-kernel/regular quotient give globalF101 Psi2 degree49/type7,
+both squares/composite norm49 and unpolarizedF101 distinction. Composite
+Z49² kernels of BOTH Phi/Psi chains needFp42,only49 points overFp6;
+maps retainFp coefficients. Five TwoHopTransport conditional lemmas pass
+gate/localbindings,cbb605;source census114,zero trustednative. Geometric
+fields/Picard/quotient/polarization/Torelli bridges remain written.
+[pcc:unverified]
+
+Standalone14 passes6 tests/strictClippy,78b6c4. Both frozen49-class Psi/Psi2
+TSVs independently replay curve-divisor validity/distinctness/semanticbasis/
+Frobenius5/6/fixed counts1/7/1/49 in existing flatFpR/poly. Scope excludes
+independent Jacobian addition or kernel membership. Constructor snapshot
+seven-reference.rs remains byte-identical SHA bb640465. [pcc:unverified]
+
+Root exactae9 focused43116447528 succeeds25native/18named proof gates/
+standalone5,full logs/API archived7ce2d3. Later root changes need own CI.
+Consumer1488 fixed7c1 retry43113992769 succeeds25/65+three,984027;
+old startup_failure immutable.1493 exact5d5 focused43114643386 succeeds
+25/70+three,3c9865.1490 exact994 unchanged success. Nextchecks1488~00:22,
+1493~00:26,1490quiet03:29Nov12;1484quiet01:09. Frozen-ledger forks persist;
+no feature-base auto-merge or lineage rewrite. [pcc:unverified]
+
+Consumer research/chained-transfer-successor-seven-20261111 starts
+5d5dc81faa442de6d9a4ee8144806ab89cf9a3b8;new implementation/PCC/receipts
+and frozen sources15 in worktree. FULL changed check.sh15 started23:42UTC,
+session79899,raw/workspace/scratch/ct-successor-complete-15.txt. Keep it
+running;do not duplicate or change arithmetic inputs. After actual pass,
+archive/register exact receipt,finish consumer report/status,commit/publish
+ready child against immediateparent research/chained-transfer-closed-fibres-
+20261111/1493,dispatch exact-headCI,then continue CT25_PLAN.md. Missing-trait
+03/Clippy10 failures retained;enumerate fix11 passes without gate weakening.
+
+S3/livebudget/KB/ecdb unavailable;atlas8edec422a locked/clean. No benchmark,
+solver,paid job or canonicalgraph promotion. Root unchanged two-hour baseline
+not rerun. Frozen forks/archive-clock/parent1484 C findings remain open.
+[pcc:unverified]
+
+# Historical preflight checkpoint below — superseded by the current section
+
 # CT24 checkpoint — next nondual maps and global Phi2 construction
 
 Read frozen SUCCESSOR_GLOBAL_PROOF.md/PCCe98755 and the inspected two-page

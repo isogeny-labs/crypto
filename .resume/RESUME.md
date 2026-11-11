@@ -1,3 +1,42 @@
+# Current CT24 — second Phi/Psi chain implemented; final guard15 running
+
+Current prose-lint-clean proof is SUCCESSOR_CHAIN_PROOF_V2.md/6dd50c;
+same mathematics as immutable6e531a,one inline unsigned marker added.
+
+Read study SUCCESSOR_CHECKPOINT.md,frozen SUCCESSOR_CHAIN_PROOF.md/6e531a,
+and inspected reports/successor-chain/chain-report.pdf. Both complete12317
+Phi2/R2/Psi2 domains,all109/113 source/recovery/direct controls,geometric
+two/kernel49/Aut controls pass as separate components,6a2cfe/a31794.
+ActualR2scale50,T2[95,93,43,39,92,17,1],two-hop reverse196/inverses104/64.
+Standalone6/strictClippy/independent flat validity-Frobenius replay78b6c4;
+five conditional Lean helpers cbb605 pass,source census114/geometry partial.
+All scientific standing unsigned. [pcc:unverified]
+
+Consumer research/chained-transfer-successor-seven-20261111 starts
+5d5dc81faa442de6d9a4ee8144806ab89cf9a3b8. New code/frozen sources15/PCC
+in worktree. FULL changed check.sh15 started23:42UTC,session79899,
+raw/workspace/scratch/ct-successor-complete-15.txt. Do not duplicate or
+change arithmetic inputs. After actual pass:archive/register exact receipt,
+finish report/status,commit/publish ready child against1493 immediatebranch
+research/chained-transfer-closed-fibres-20261111,dispatch exactheadCI.
+Then CT25_PLAN.md explicit C2 direct norms,retaining generic references.
+
+Root exactae9 focused43116447528 succeeds25native/18proofmodules/preflight5,
+full logs/API7ce2d3. New root head needs ownCI. Parent1488 fixed7c1 retry
+43113992769 succeeds25/65+three,984027;old startupfailure remains.1493
+exact5d5 focused43114643386 succeeds25/70+three,3c9865.1490 unchanged
+success. Nextchecks1488~00:22,1493~00:26,1490quiet03:29Nov12;
+1484quiet01:09. No feature-base auto-merge or foreground CI wait.
+[pcc:unverified]
+
+Composite Phi/Psi Z49² kernel needsFp42,only49/2401 points overFp6;
+maps remainFp. Preserve frozen proofs/sources/ledger rows/failures.
+Frozen forks/archive-clock/parent1484 C findings and S3/livebudget/KB/ecdb/
+lockedatlas8edec422a limits persist. No benchmark,solver,paidjob,admission
+bypass or canonicalgraph promotion. [pcc:unverified]
+
+# Historical checkpoints below — superseded by current section
+
 # Current CT24 checkpoint — native successor implementation next
 
 Read study SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_GLOBAL_PROOF.md.

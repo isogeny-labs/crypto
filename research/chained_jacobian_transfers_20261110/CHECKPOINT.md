@@ -1,3 +1,16 @@
+# Current — actual second chain; full consumer guard15 running
+
+Read SUCCESSOR_CHECKPOINT.md/SUCCESSOR_CHAIN_PROOF.md and inspected
+reports/successor-chain/chain-report.pdf. Both complete12317 Phi2/R2/Psi2
+domains/all109/113 source/geometric controls pass,6a2cfe/a31794. Written
+globalPsi2/chain proof6e531a,conditional5Lean cbb605,standalone6/flat
+replay78b6c4;source census114. Full changed guard15 runs in79899;do not
+infer final-head acceptance from components. Publish ready child against
+1493 after pass,then CT25_PLAN.md. Scientific standing unsigned;frozen
+fork/admission/vault limits remain. [pcc:unverified]
+
+# Historical checkpoints below
+
 # Current checkpoint — next global Phi2 and native implementation
 
 Read SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_GLOBAL_PROOF.md first.

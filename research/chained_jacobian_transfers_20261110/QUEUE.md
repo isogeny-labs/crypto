@@ -33,10 +33,11 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT19 | implemented elliptic kernels/maps/duals and separate replay; CI passes; unsigned | Construct fixed101 degree7 elliptic maps and independent algebraic replay. | ef9a54259/PR1483,ELLIPTIC_SEVEN.md:four actual maps,exact curve/both global x[7],all109/113 group/scalar/recovery/j/coordinate controls; unchanged Kohel construction and independent Montgomery verifier. Frozen TSV/manifests/report/diagram/PDF durable.43038507853 passes25/51-unit+two integrations. Root helpers/harness recovered; original root PCC7e9547/58dbb8 restored unchanged;see RESTORATION_20261111.md. No actual Jacobian7-hop/advantage. |
 | CT20 | actual fixed(7,7) transfer,full rational/geometric certificates,written proof;unsigned | Glue compatible degree7 elliptic images and construct actual global Jacobian isogeny. | SEVEN_JACOBIAN_CHECKPOINT.md/SEVEN_JACOBIAN_PROOF.md;C0->C1 monic68-model,both12317-class dual[7]/bijections/paired additions,all109 source norm14/inverse39/direct coordinates,full16-point geometric2-kernel,444 extension pulls,injective elliptic factors/j-based F101-Jacobian distinction. Focused43085588914 exact2450815e2 succeeds25/57+two;PR1484 merge blocked by newconsumer ledgerfork. |
 
-| CT21 | actual transported(7,7)Psi/written globalproof/fullcontrols;unsigned | Continue from the accepted six-cycle target using the actual odd kernel and transported Richelot cross-kernel. | SEVEN_CHAIN_CHECKPOINT.md/SEVEN_CHAIN_PROOF.md,PCCeb3240/d0441a:49-kernel/64-lift action,actualR1 delta33/scale47,full16-point compositekernel/globalquotient/dual7,F101 descent viaAut/Torelli/oddwitness,ellipticembedding/trace/j noniso. Both12317 Psi domains/all109source reverse28-inverse74/direct4 pass. Consumer7c1f32ecb ready stackedPR1488;fullguard25/65+two andthirdintegration/strictClippy pass;focused43097723254 startup_failure before jobs/checks,PCC4baafc; no CI pass inferred. |
+| CT21 | actual transported Psi;fixed-head retry CI succeeds;unsigned | Continue the accepted target through the actual odd kernel and Richelot transport. | SEVEN_CHAIN_CHECKPOINT.md/PROOF.md;all full geometric/rational/source controls retained. Fixed7c1 retry43113992769 succeeds25/65+three,consumer984027. Initial43097723254 startup_failure/4baafc remains immutable. Ready1488 against1484;frozen-ledger fork blocks bottom-up integration. |
 | CT22 | integrated and complete local checks; unsigned | Direct base-field norms with all exceptional balanced support. | DIRECT_NORMS_CHECKPOINT.md/PROOF.md; both norms agree with generic maps on all12317 C0/C1 classes. Integrated guard06 passes25native/66reference unit+three integrations,one old ignored; all Phi/Psi/source controls and full generic/direct Phi comparisons pass. ConsumerPCCb6af61/3f2084,rootc23653/8eaf58;97 helpers. No measured cost claim. |
-| CT23 | completed/integrated; ready1493; unsigned | Closed Richelot fibres and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md:all four12317 domains agree with pointwise;actual49-class TSV/all2401 sums/Frobenius5/6/dualR0 norm2,real geometric boundary counts[1,0,0,2,13]. Fullguard07 passes25/70+three,root9f98fd/consumer1f1423. Independent flat validity/Frobenius replay4a98a7/7a86d3. Ready1493 head5d5dc81fa,focused43114643386 running. |
-| CT24 | actual next elliptic maps/C2 validated;global written Phi2;native evaluator next | Another nondual7-hop and transported Richelot continuation. | SUCCESSOR_CHECKPOINT.md/SUCCESSOR_GLOBAL_PROOF.md,e98755:beta targets(59,27)j47/(23,7)j89,kerFrob5/6;C2[19,0,10,0,22,0,1],charts[(1,41,18),(0,37,18)]. Final5 standalone tests/Clippy pass,e11fb7. Composite Z49² kernel needsFp42;only49 points inFp6,190ae8/82b8fb. Implement full Phi2 then Phi2[2]/R2/Psi2/source controls in fresh5d5 child. |
+| CT23 | complete/ready1493/exact CI succeeds;unsigned | Closed Richelot fibres and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md;four full12317 domains,actual49-class TSV/2401 sums/Frobenius/dualR0,explicit geometric boundaries. Fullguard25/70+three,1f1423/9f98fd. Exact5d5 focused43114643386 succeeds25/70+three,3c9865;independent flat validity/Frobenius replay retained. |
+| CT24 | actual second Phi/Psi chain component controls pass;finalguard15 running;unsigned | Another nondual7-hop and transported Richelot continuation. | SUCCESSOR_CHECKPOINT.md/GLOBAL_PROOF.md/CHAIN_PROOF.md;both complete12317 Phi2/R2/Psi2 domains,all109/113 source/geometric2/kernel49 controls,6a2cfe/a31794. ActualR2scale50/T2[95,93,43,39,92,17,1];global proof6e531a,two-hop reverse196/inverses104/64,Fp42 composite kernel. Standalone6/flat replay78b6c4,partial114Lean census/cbb605. Full consumer exact-source guard15 running79899;publish ready child against1493 after pass. |
+| CT25 | queued after CT24 publication | Direct C2 endpoint norms with complete generic references and exception controls. | CT25_PLAN.md;explicit C2 factory,all12317 norm comparisons/full Phi2-Psi2 generic graphs,109/113 source controls,fullguard/readyPR. No blind whitelist expansion or measured gain. Admission/livebudget still block matched benchmarks. |
 
 ## Session constraints
 
@@ -51,21 +52,13 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_GLOBAL_PROOF.md first.
-Consumer CT23 is published5d5dc81fa/ready1493,focused43114643386 in_progress;
-full changed guard07 already passes25/70+three. New child
-research/chained-transfer-successor-seven-20261111 starts5d5,with no new
-successor source yet. Implement the actual C1→C2 Phi2 using validatedbeta/
-charts18;preserve old maps and all full-domain/source controls,then R2/Psi2.
-1490 focused43106607205 succeeds25/66+three;1488 retry43113992769 is running.
-Next routine checks1490~23:29,1488~23:32,1493~23:37;parent1484 quiet01:09Nov12.
-Root/consumer frozen-ledger forks/archive-clock,S3/livebudget,KB/vault limits
-persist. No rebase,force,rechain,lineage selection or admission bypass.
-Full composite geometrickernel needsFp42;maps retainF101 coefficients.
+Read SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_CHAIN_PROOF.md. Full
+consumer guard15 runs in79899;raw/workspace/scratch/ct-successor-complete-15.txt,
+exact source15 frozen. Preserve it;after pass archive/register/publish ready
+child against1493,then CT25_PLAN.md. Component Phi2/R2/Psi2 full domains and
+source/geometric controls already pass;do not mistake them for final guard.
+Parent1488 retry and1493 exact-headCI now succeed;nextchecks00:22/00:26,
+1490quiet03:29/1484quiet01:09Nov12. Root new headCI separate. Frozen forks,
+admission/livebudget/KB/vault limits persist;no benchmark/solver/paidjob,
+rebase/force/rechain/lineage choice or canonicalgraph promotion.
 [pcc:unverified]
-
-Read today's session log, this table and CHECKPOINT.md. Inspect actual heads
-and uncommitted diffs first. Reuse immutable passing receipts when inputs have
-not changed; do not repeat the completed two-hour root library run. Rerun
-affected checks after new arithmetic changes. Never rerun historical Python
-research for extension work. Recheck access before any new experiment.
