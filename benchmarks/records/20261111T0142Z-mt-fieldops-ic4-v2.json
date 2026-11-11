@@ -1,6 +1,6 @@
 {
   "branch": "aburan28/eloquent-bell-2jerrf",
-  "closed_utc": null,
+  "closed_utc": "2026-11-11T02:17:08+00:00",
   "commands": [
     {
       "argv": [
@@ -193,14 +193,18 @@
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "benchmarks/20261111-mt-fieldops-ic4/REPORT.pdf",
+    "png": [
+      "benchmarks/20261111-mt-fieldops-ic4/ratios.png"
+    ],
+    "svg": [
+      "benchmarks/20261111-mt-fieldops-ic4/ratios.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "mt-fieldops-ic4-v2",
-  "status": "open",
-  "summary": "",
-  "validation": null
+  "status": "measured",
+  "summary": "Multi-target IC4 vs cheapest of four rho arms (field-op GAE, 33 fresh curves): T = 16384 0.91-0.95 (cheaper at all I/M, h); T = 4096 unranked; T = 1024 dearer; paired BSGS 1.18-1.80x. Claim PCC-20261111-fa13c8 [pcc:unverified].",
+  "validation": "benchmarks/20261111-mt-fieldops-ic4/VALIDATION.json"
 }

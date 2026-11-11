@@ -1726,7 +1726,7 @@ MT_FIELDOPS_EVIDENCE = "benchmarks/20261111-mt-fieldops-ic4"
 
 
 def mt_fieldops_component() -> dict:
-    """Multi-target IC4 (x-only pair-sum table, shared inversions) against the strongest rho in the same
+    """Multi-target IC4 (x-only pair-sum table, shared inversions) against the cheapest of four rho arms in the same
     counted field layer (cheapest of rho, rho2, rho2x, rhoseq x three kappa, per configuration and price)
     and a paired BSGS, from research/mt_fieldops_v2_20261111 (33 fresh prime-order curves, 2112 runs).
     Medians and bootstrap intervals are copied from summary.json (analyze.py); I/M = 10, h in {0, 0.1, 1}.
@@ -1749,7 +1749,7 @@ def mt_fieldops_component() -> dict:
     return {"rows": rows, "study": "research/mt_fieldops_v2_20261111/",
             "report": "research/mt_fieldops_v2_20261111/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
             "class": "multi-target method",
-            "validation": ("validated: replay certificate, validator report and the strongest-rho reference "
+            "validation": ("validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) "
                            f"with the §5a band ({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
@@ -3594,7 +3594,7 @@ def markdown(doc: dict) -> str:
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     mt = doc["mt_fieldops_component"]
-    L += ["## Multi-target IC4 against the strongest rho, outside tables A–C", "",
+    L += ["## Multi-target IC4 against the cheapest of four rho arms, outside tables A–C", "",
           "Many targets on one prime-order Weierstrass curve (2^22 to 2^26, 33 fresh curves, 22 paired "
           "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
           "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only "
@@ -4948,7 +4948,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
     mt = doc["mt_fieldops_component"]
-    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC4 against the strongest rho, outside the priced tables</h2>'
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC4 against the cheapest of four rho arms, outside the priced tables</h2>'
              '<p>Many targets on one prime-order Weierstrass curve (2<sup>22</sup> to 2<sup>26</sup>, 33 fresh curves, 22 paired '
              'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
              '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only pair-sum '
