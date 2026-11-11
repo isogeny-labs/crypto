@@ -232,3 +232,82 @@ fn f17_descended_codomain_and_zeta_gates() {
     assert_eq!(card_j(&f),(16,348,285));
     assert_eq!(19*15,285);
 }
+
+ 
+/// The usual two-term Richelot correspondence is written in a chart where
+/// the kernel quadratics are defined over the base field. Here Frobenius
+/// cyclically permutes all three quadratics. The *raw* two-term support
+/// polynomial cannot be interpreted as a rational degree-two divisor on
+/// the F17 target, even though its bracket-product target is rational.
+/// This is a descent guard, not a proof that the rational isogeny fails.
+#[test]
+fn f17_raw_two_term_correspondence_requires_descent() {
+    let xs: Vec<_> = (0..P)
+        .filter(|&x| chi(m(fpow(x, 6) + 2 * x * x + 2)) >= 0)
+        .collect();
+    assert_eq!(xs, vec![0, 3, 4, 8, 9, 13, 14]);
+    // Each affine x supports two rational points (none is a branch point).
+    for &x in &xs {
+        assert_ne!(m(fpow(x, 6) + 2 * x * x + 2), 0);
+    }
+    assert_eq!(2 * xs.len() + 2, 16); // two points at infinity
+    for k in [1, 2] {
+        let gs = rows(k);
+        let delta = det3(gs);
+        let delta_inv = L::c(fpow(delta.0[0], 15));
+        let hs: [[L; 3]; 3] = std::array::from_fn(|i| {
+            bracket(gs[(i + 1) % 3], gs[(i + 2) % 3])
+                .map(|c| c.times(delta_inv))
+        });
+        for &x in &xs {
+            let z = L::c(x);
+            let eval_g = |g: [L; 3]| {
+                g[0].times(z.times(z))
+                    .plus(g[1].times(z))
+                    .plus(g[2])
+            };
+            let a = eval_g(gs[0]);
+            let b = eval_g(gs[1]);
+            // Coefficients of G0(x) H0(Z) + G1(x) H1(Z).
+            let c: [L; 3] = std::array::from_fn(|j| {
+                a.times(hs[0][j]).plus(b.times(hs[1][j]))
+            });
+            assert_ne!(c[2], L::zero());
+            // Inversion-free rationality test for monic support:
+            // c_j/c_2 is F17-rational iff c_j^17*c_2 == c_j*c_2^17.
+            for j in 0..2 {
+                assert_ne!(
+                    c[j].pow(17).times(c[2]),
+                    c[j].times(c[2].pow(17)),
+                    "unexpected F17 support for kernel {k}, x={x}, coeff={j}"
+                );
+            }
+        }
+    }
+}
+
+/// Each nonzero geometric 2-torsion class is indexed by an unordered
+/// pair of six branch roots (even subsets modulo complement).
+/// No pair is Frobenius-invariant for either (3)(3) or (6).
+/// If a base-field-defined kernel K has abstract type (2,2,4), then
+/// 2K is a characteristic order-two subgroup, hence its nonzero member
+/// would be an F17-rational 2-torsion point. Such a kernel is impossible.
+#[test]
+fn f17_absent_rational_two_torsion_rules_out_double_richelot_type() {
+    let f = [2, 0, 2, 0, 0, 0, 1];
+    let t = [14, 12, 6, 4, 10, 3, 16];
+    assert_eq!(card_j(&f).2, 285);
+    assert_eq!(card_j(&t).2, 285);
+    for frob in [[1_u8, 2, 0, 4, 5, 3], [1, 2, 3, 4, 5, 0]] {
+        let mut fixed = 0;
+        for a in 0_u8..6 {
+            for b in (a + 1)..6 {
+                let pair = [a, b];
+                let mut moved = [frob[a as usize], frob[b as usize]];
+                moved.sort_unstable();
+                if moved == pair { fixed += 1; }
+            }
+        }
+        assert_eq!(fixed, 0);
+    }
+}
