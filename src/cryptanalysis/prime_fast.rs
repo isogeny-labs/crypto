@@ -1697,10 +1697,7 @@ pub struct MultiReport {
     pub targets_walked: Vec<u64>,
 }
 
-/// Multi-target index calculus: one shared factor-base log solve (relations against `G`), then per target
-/// one relation `aG + bQ_t = sum s_j F_j` (3-term decompositions) gives `log Q_t = (sum s_j x_j - a)/b`.
-/// Every returned log is verified `k G == Q_t`; `None` entries failed (no relation within `max_walk`
-/// points, an undetermined factor-base log, or b = 0).
+/// Same as [`ic_multi_solve_ex`] without the batched per-target phase.
 pub fn ic_multi_solve(
     curve: &FastCurve,
     g: Pt,
@@ -1709,6 +1706,35 @@ pub fn ic_multi_solve(
     extra_relations: usize,
     max_walk: u64,
     seed: u64,
+    table: bool,
+) -> Option<(Vec<Option<u64>>, MultiReport)> {
+    ic_multi_solve_ex(
+        curve,
+        g,
+        qs,
+        fb_size,
+        extra_relations,
+        max_walk,
+        seed,
+        table,
+        false,
+    )
+}
+
+/// Multi-target index calculus: one shared factor-base log solve (relations against `G`), then per target
+/// one relation `aG + bQ_t = sum s_j F_j` (3-term decompositions) gives `log Q_t = (sum s_j x_j - a)/b`.
+/// Every returned log is verified `k G == Q_t`; `None` entries failed (no relation within `max_walk`
+/// points, an undetermined factor-base log, or b = 0).
+pub fn ic_multi_solve_ex(
+    curve: &FastCurve,
+    g: Pt,
+    qs: &[Pt],
+    fb_size: usize,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+    table: bool,
+    batched: bool,
 ) -> Option<(Vec<Option<u64>>, MultiReport)> {
     let t0 = Instant::now();
     let fb = FastFactorBase::build(curve, fb_size);
@@ -1717,7 +1743,14 @@ pub fn ic_multi_solve(
     }
     let pairs = PairTable::build(curve, &fb);
     let needed = fb.len() + extra_relations;
-    let (rels, _) = collect_relations(curve, g, g, &fb, Some(&pairs), needed, u64::MAX, seed);
+    let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
+        if table {
+            collect_relations_table(curve, g, q, &fb, &pairs, need, maxw, sd)
+        } else {
+            collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
+        }
+    };
+    let (rels, _) = collect(g, needed, u64::MAX, seed);
     if rels.len() < needed {
         return None;
     }
@@ -1726,6 +1759,132 @@ pub fn ic_multi_solve(
     let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
     let fnum = curve.scalar_field();
     let n = curve.n;
+    if table && batched {
+        // All targets walk in lock-step: one batched inversion per round advances every active R_t <- R_t + G;
+        // each point is looked up in the pair table (O(1)); a relation using only determined logs retires the lane.
+        let m = qs.len();
+        let mut rng = StdRng::seed_from_u64(seed ^ 0xBA7C_4ED0);
+        let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+        let mut ab: Vec<(u64, u64)> = vec![(0, 0); m];
+        let mut cur: Vec<Option<Pt>> = Vec::with_capacity(m);
+        let fresh = |rng: &mut StdRng, q: Pt| -> (u64, u64, Pt) {
+            loop {
+                let a = rng.gen_range(1..n);
+                let b = rng.gen_range(1..n);
+                if let Some(r) = curve.combine(g, q, a, b) {
+                    return (a, b, r);
+                }
+            }
+        };
+        for (t, &q) in qs.iter().enumerate() {
+            let (a, b, r) = fresh(&mut rng, q);
+            ab[t] = (a, b);
+            cur.push(Some(r));
+        }
+        let mut res: Vec<Option<u64>> = vec![None; m];
+        let mut act: Vec<usize> = (0..m).collect();
+        let mut scratch = BatchAddScratch::default();
+        let mut walked = vec![0u64; m];
+        let mut round = 0u64;
+        while !act.is_empty() && round < max_walk {
+            round += 1;
+            let mut act2: Vec<usize> = Vec::with_capacity(act.len());
+            let mut cur2: Vec<Option<Pt>> = Vec::with_capacity(act.len());
+            for (pos, &t) in act.iter().enumerate() {
+                walked[t] += 1;
+                let (a, b) = ab[t];
+                let Some(r) = cur[pos] else {
+                    let (na, nb, nr) = fresh(&mut rng, qs[t]);
+                    ab[t] = (add_mod(na, 1, n), nb);
+                    act2.push(t);
+                    cur2.push(Some(nr));
+                    continue;
+                };
+                let xc = curve.f.from_mont(r.x);
+                let mut cands: Vec<Vec<(u32, i8)>> = Vec::new();
+                if let Some(j) = fb.lookup(xc) {
+                    let sg = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+                    cands.push(vec![(j as u32, sg)]);
+                }
+                if xc <= max_pair_x {
+                    for &(_, j, k_raw) in pairs.lookup(xc) {
+                        let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                        let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                        let fk = fb.pts[k];
+                        let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                        let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                            continue;
+                        };
+                        let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                        cands.push(vec![(j, tau), (k as u32, tau * sigma)]);
+                    }
+                }
+                let mut done = false;
+                let mut restart = false;
+                for entries in cands {
+                    let merged = merge_entries(entries);
+                    if merged.is_empty() || !relation_holds(curve, &fb, r, &merged) {
+                        continue;
+                    }
+                    let usable =
+                        b % n != 0 && merged.iter().all(|&(j, _)| logs[j as usize].is_some());
+                    if !usable {
+                        restart = true;
+                        continue;
+                    }
+                    let mut sum = 0u64;
+                    for &(j, sg) in &merged {
+                        let x = logs[j as usize].unwrap() % n;
+                        let term = if sg < 0 { neg_mod(x, n) } else { x };
+                        let term = fnum.from_mont(fnum.mul(
+                            fnum.to_mont(term),
+                            fnum.to_mont((sg.unsigned_abs() as u64) % n),
+                        ));
+                        sum = add_mod(sum, term, n);
+                    }
+                    let num = add_mod(sum, neg_mod(a % n, n), n);
+                    let k = ((num as u128 * inv_mod_u64(b % n, n) as u128) % n as u128) as u64;
+                    if curve.mul(Some(g), k) == Some(qs[t]) {
+                        res[t] = Some(k);
+                        done = true;
+                        break;
+                    }
+                    restart = true;
+                }
+                if done {
+                    continue;
+                }
+                if restart {
+                    let (na, nb, nr) = fresh(&mut rng, qs[t]);
+                    ab[t] = (add_mod(na, 1, n), nb);
+                    act2.push(t);
+                    cur2.push(Some(nr));
+                } else {
+                    ab[t].0 = add_mod(a, 1, n);
+                    act2.push(t);
+                    cur2.push(Some(r));
+                }
+            }
+            // every lane in act2 now holds R = a*G + b*Q - G... i.e. a has been incremented to match R + G below
+            let gv: Vec<Option<Pt>> = vec![Some(g); cur2.len()];
+            curve.add_many_batched(&mut cur2, &gv, &mut scratch);
+            act = act2;
+            cur = cur2;
+        }
+        let total_ms = t0.elapsed().as_secs_f64() * 1e3;
+        let m_f = m.max(1) as f64;
+        return Some((
+            res,
+            MultiReport {
+                setup_ms,
+                per_target_ms: vec![(total_ms - setup_ms) / m_f; m],
+                total_ms,
+                factor_base_size: fb.len(),
+                determined_logs: determined,
+                targets_walked: walked,
+            },
+        ));
+    }
     let mut out = Vec::with_capacity(qs.len());
     let mut per = Vec::with_capacity(qs.len());
     let mut walked = Vec::with_capacity(qs.len());
@@ -1734,12 +1893,8 @@ pub fn ic_multi_solve(
         let mut rs: Vec<FastRelation> = Vec::new();
         let mut st = CollectStats::default();
         for attempt in 0..32u64 {
-            let (r1, s1) = collect_relations(
-                curve,
-                g,
+            let (r1, s1) = collect(
                 q,
-                &fb,
-                Some(&pairs),
                 1,
                 max_walk,
                 seed ^ (0x9E37_79B9 + t as u64 * 7919 + attempt * 104_729),
