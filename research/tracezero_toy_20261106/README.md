@@ -94,3 +94,30 @@ summary files).
   stays "no structure detected".
 - Reading: degenerate V account for most of the k = 2, d = 1 deficit, not all. A residual of
   this size is irrelevant to any cost question, and nothing here is a result about rho.
+
+## Where the last k = 2, d = 1 residual comes from (post hoc stratification)
+
+`stratify_curve_class.py` splits the A6 part (a) rows (rows SHA-256 `fa1111c1…a92ec6`, checked
+before use) by curve class; output in `stratify_curve_class.out.txt`. Small-base Δ = trace −
+sign-symmetric random.
+
+| k = 2 class | n | Δcov_2 [95%] | Δcov_3 [95%] |
+|---|---|---|---|
+| b = 0 (j = 1728) | 75 | −0.0965 [−0.1148, −0.0796] | **−0.2032 [−0.2250, −0.1832]** |
+| a = 0 (j = 0) | 75 | +0.0016 [−0.0086, +0.0113] | +0.0031 [−0.0110, +0.0177] |
+| generic | 2,250 | +0.0022 [+0.0008, +0.0037] | +0.0027 [+0.0004, +0.0051] |
+
+- b = 0 curves are 3.1% of the rows. The weighted mix, 0.969 × 0.0027 − 0.031 × 0.2032 =
+  −0.0037, is the pooled A6 cov_3 residual. So that residual is the b = 0 curves.
+- The b = 0 deficit is the same for p ≡ 1 and p ≡ 3 (mod 4): −0.2034 and −0.2031 in cov_3. So
+  it does not track whether the automorphism (x, y) → (−x, iy) is defined over F_p. The
+  mechanism is untested. The V = F_p·g line is closed under x → −x, which this
+  automorphism preserves, and that is the obvious thing to look at.
+- Generic k = 2 curves are slightly positive (+0.0027), not zero: the trace image covers a
+  little more than a random base. Interval excludes 0 for cov_2 and just for cov_3.
+- k = 3: b = 0 and generic intervals contain 0 for cov_3. The a = 0 class has Δcov_2 =
+  −0.0133 [−0.0252, −0.0014] (n = 70). It is one exploratory look among about a dozen and
+  is not read as a result.
+- This is a post hoc stratification of already-seen rows, with no multiplicity correction. The
+  registered verdicts are unchanged. A rerun should exclude j = 1728 (b = 0), or stratify it
+  in the protocol.
