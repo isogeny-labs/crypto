@@ -103,5 +103,5 @@ for every prime $ell <= 47$ with relative error at most $1.3 times 10^(-4)$ (fig
   (Pohlig–Hellman), $t = 1$ (anomalous) or $t = 0$ (supersingular). No class with $r >= 2^20$ has embedding degree below 31.
 - Not established: anything about running time. The cost column is a model. A measured check that rho cost is
   $sqrt(pi r slash 2)$ in every class and depends on nothing else (class size, conductor, $D_K$) needs a preregistered ecbench
-  run with a benchmark record; it is the proposed next step (README). This is not an improvement over the index-calculus
-  baseline and adds no leaderboard row.
+  run with a benchmark record; it is the proposed next step (README). It leaves the index-calculus baseline
+  unchanged and adds no leaderboard row.
