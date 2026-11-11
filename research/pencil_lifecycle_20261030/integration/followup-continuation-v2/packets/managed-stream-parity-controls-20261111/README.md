@@ -1,0 +1,21 @@
+# Managed-stream software parity source layer
+
+[pcc:unverified] This additive source packet implements four bounded software controls over the frozen exporter source image. It changes no non-test algorithm: the three observations in each solver and the helper module are all gated by `cfg(test)`. Existing tests and all eleven exporter controls remain required. Nothing here has been compiled or executed.
+
+The fixture reuses the existing prepared p739 target0 and its first warmup seed. It is not held out and is not an independent cohort sample. The exact plan, existing source, curve, target, seed and configuration are bound in `fixture-bindings.json` before any new run. Tests recompute the known scalar multiplication and reject its adjacent wrong scalar. There is no fixture search or selection from new outcomes.
+
+Direct managed equivalence covers Noop/recording progress crossed with absent/present trace. A separate test invokes the actual adapter: its ordinary absent-progress route uses native_solver, its progress route uses progress_native, and its trace-only route must reject. The observer captures actual ordered walk labels/divisors, enumerated lambdas, and collector rows/admissions/pending constraints/rank/answers. The checks retain the existing deterministic ledger filter; timing/allocation observations are excluded from equality and from scientific pricing. Observer serialization and formatting are test-only overhead.
+
+The negative controls exercise actual AtomicSink filesystem failure after creating then removing its empty private leaf, a writer that fails after the header, a two-record limit, and a one-byte limit. The measurement Session must finish, proving the online guard is closed along those exercised paths; the pre-online header failure must leave no online interval. The event cap is enforced before push. Serialized observer bytes are a return-time postcondition; the enclosing process memory and deadline limits are the hard bounds.
+
+This layer does not complete the entire prior validation contract. Independent fresh trace replay, collector working/retained-cap cases, changed identities/configuration/seed, missing terminal, timeout/signal/durable-prefix, owner/process/authentication, and retry-as-primary controls retain their separate obligations. Header/terminal and sequence checks plus equality of the two emitted traces are not fresh replay. Actual source/binary identities must come from the qualification custody record; fixed trace Identity values here identify only the synthetic parent fixture.
+
+## Prospective variables and observations
+
+Fixed: source image plus this four-file layer, public fixture, target, seed, denominator 8, coefficient cap 25 million, collector/solver implementation, exact test names and serialized execution. Varied: progress sink and trace presence, actual adapter dispatch, and one specific failure mode per negative case. Observations: exact ordered JSON events, recovered scalar/source verification, deterministic arithmetic/semantic ledgers, collector state, snapshot presence, trace bytes/sequence/completion/failure and online interval closure. Acceptance requires every assertion and all prior eleven exporter controls; failed controls remain failed attempts with their costs. No timing or price conclusion is licensed by these controls.
+
+`qualification-tests.json` specifies exact runnable test names and inherited proposed 1800-second build plus 600-second post-build bounds, 2 CPUs, 16 GiB, one payload, one attempt and the November 11 noon UTC deadline. Actual publication, independent review, current accounting/lease and fresh launch identities remain root-owned admission bindings. No automatic retry or native execution occurs in this source task. Feasibility within those limits is unmeasured.
+
+## Sources checked
+
+Read the parent managed-stream `validation-contract.json`, exact native/managed adapter sources, kernel relation-stream/collector APIs, and existing AtomicSink source and fixture. These determine dispatch, error handling and the controlled comparisons. KB tools were not loaded in this child runtime (tool discovery found none) and this sparse checkout has no `scripts/research-kb` wrapper; repository source fallback was used. This is software contract qualification, with no novelty or literature-performance claim.

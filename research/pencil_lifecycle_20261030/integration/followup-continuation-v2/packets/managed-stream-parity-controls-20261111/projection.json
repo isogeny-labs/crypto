@@ -1,0 +1,16 @@
+{
+  "excluded_keys_exact": [
+    "allocation",
+    "candidate_envelope_allocation",
+    "cold_setup_allocation",
+    "allocation_observer_available",
+    "elapsed_ns",
+    "candidate_elapsed_ns",
+    "cold_setup_elapsed_ns",
+    "candidate_phase_overhead_ns"
+  ],
+  "recursive_projection_source_sha256": "03a0a30660938fd9f4f58ab1ec750b690fcfbc2807419c8205f9bc5c661ec3e2",
+  "source_path": "src/cryptanalysis/ecbench/pencil.rs",
+  "unchanged_from_parent": true,
+  "reason": "Pre-existing replay projection excludes nondeterministic timing/allocation only. All remaining arithmetic and semantic counters participate."
+}
