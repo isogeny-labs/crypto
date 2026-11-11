@@ -1,0 +1,109 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "SIBLING-POINTS Stage 3 (scaling): shape j0_b7, 40-bit p, five prime-order curves",
+ "description": "research/curve25519_autolab_20261104/siblings/stage3-scaling/PROTOCOL.md, frozen before data. C = 2 index-calculus arms vs matched rho as r grows; public synthetic targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-cubic",
+   "role": "baseline",
+   "method": {
+    "id": "rho.cubic"
+   }
+  },
+  {
+   "name": "tw2cj-lazy",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sib8-p256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=256",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sib8-p512",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=512",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 6,
+  "seed": 33601,
+  "timeout_seconds": 900,
+  "warmup": 1
+ },
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_orbit_shape",
+    "shape": "j0_b7",
+    "bits": 40,
+    "seed": 33601
+   },
+   {
+    "kind": "prime_orbit_shape",
+    "shape": "j0_b7",
+    "bits": 40,
+    "seed": 33602
+   },
+   {
+    "kind": "prime_orbit_shape",
+    "shape": "j0_b7",
+    "bits": 40,
+    "seed": 33603
+   },
+   {
+    "kind": "prime_orbit_shape",
+    "shape": "j0_b7",
+    "bits": 40,
+    "seed": 33604
+   },
+   {
+    "kind": "prime_orbit_shape",
+    "shape": "j0_b7",
+    "bits": 40,
+    "seed": 33605
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 33651,
+  "targets_per_curve": 6
+ }
+}
