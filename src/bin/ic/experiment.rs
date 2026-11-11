@@ -993,11 +993,13 @@ pub fn solve(args: SolveArgs, quiet: bool) -> Result<Value, String> {
             let key = super::log_store::key_for(&c, &fb)?;
             match super::log_store::lookup(&dir, &c, &fb)? {
                 Some((_, doc, key, path)) => (doc, Some((key, path))),
-                None => return Err(format!(
+                None => {
+                    return Err(format!(
                     "no stored logarithm table for key {} in {}; run `ic logs --log-store` first",
                     key.key,
                     dir.display()
-                )),
+                ))
+                }
             }
         }
     };

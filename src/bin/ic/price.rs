@@ -319,6 +319,7 @@ fn one_pass(p: &workflow::WorkflowParams, targets: &[Target]) -> Result<Pass, St
     one_pass_with(p, PassTargets::Batch(targets))
 }
 
+#[cfg(test)]
 fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Result<Pass, String> {
     one_pass_stored(p, targets, None)
 }
