@@ -7,7 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 rows = []
 for path in sorted(glob.glob(os.path.join(HERE, "rows", "*.json"))):
     rows.extend(json.load(open(path)))
-rows.sort(key=lambda r: (r["multiplier"], r["relation"], r["bits"]))
+rows.sort(key=lambda r: (r["multiplier"], r["relation"], r["bits"], -r.get("restarts", 1)))
 ORDER = ["grouplaw-hash", "grouplaw-smallx", "semaev-s3-smallx", "chained-s3-smallx"]
 LABEL = {"grouplaw-hash": "group law + hash (Bochum, m=2)",
          "grouplaw-smallx": "group law, small-x (m=2)",
@@ -27,22 +27,22 @@ def ub(r):
     return r.get("upper_bound")
 
 # ---- table -----------------------------------------------------------------
-lines = ["| multiplier | relation | b | l | s (edges) | V | max arity | free bits | core vars | tw lower | min-degree | min-fill | min-fill lazy | best upper | log2 cost (best) | s/sqrt(log2 s) | enum (m-1)b/m | validated |",
-         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+lines = ["| multiplier | relation | b | l | restarts | s (edges) | V | max arity | free bits | core vars | tw lower | min-degree | min-fill | min-fill lazy | best upper | log2 cost (best) | s/sqrt(log2 s) | enum (m-1)b/m | validated |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
 for r in rows:
     mf = r.get("min_fill"); mfl = r.get("min_fill_lazy"); v = r.get("validation")
     costs = [x["log2_cost"] for x in [r["min_degree"], mf, mfl] if x and x["width"] == ub(r)]
     val = "-" if not v else ("pass %d/%d" % (v["positives"], v["evaluated"]) if v["passed"] else "FAIL")
-    lines.append("| %s | %s | %d | %d | %s | %s | %d | %s | %s | %d | %d | %s | %s | %d | %.1f | %.0f | %.2f | %s |" % (
-        r["multiplier"], r["relation"], r["bits"], r["low_bits"], format(r["edges"], ","), format(r["vertices"], ","),
+    lines.append("| %s | %s | %d | %d | %d | %s | %s | %d | %s | %s | %d | %d | %s | %s | %d | %.1f | %.0f | %.2f | %s |" % (
+        r["multiplier"], r["relation"], r["bits"], r["low_bits"], r.get("restarts", 1), format(r["edges"], ","), format(r["vertices"], ","),
         r["max_arity"], r["free_bits"], format(r["core_variables"], ","), r["lower_bound"], r["min_degree"]["width"],
         mf["width"] if mf else "-", mfl["width"] if mfl else "-", ub(r), min(costs) if costs else float("nan"),
         r["d1_exponent_c1"], r["enumeration_exponent"], val))
 table = "\n".join(lines)
 
 # ---- slopes ----------------------------------------------------------------
-slope_lines = ["| multiplier | relation | b range | n | lower-bound slope (per bit) | best-upper slope (per bit) | lower/(b/2) at max b | upper/(b/2) at max b | s slope (log-log) |",
-               "|---|---|---|---|---|---|---|---|---|"]
+slope_lines = ["| multiplier | relation | b range | n | lower-bound slope (per bit) | best-upper slope (per bit) | eager min-fill slope where run (per bit) | lower/(b/2) at max b | upper/(b/2) at max b | s slope (log-log) |",
+               "|---|---|---|---|---|---|---|---|---|---|"]
 slopes = {}
 for mult in ["schoolbook", "fourier"]:
     for rel in ORDER:
@@ -54,13 +54,16 @@ for mult in ["schoolbook", "fourier"]:
         ub_slope, _ = fit(xs, [ub(r) for r in sel])
         s_slope, _ = fit([math.log2(x) for x in xs], [math.log2(r["edges"]) for r in sel])
         last = sel[-1]
-        slopes[(mult, rel)] = (lb_slope, ub_slope)
-        slope_lines.append("| %s | %s | %d-%d | %d | %.2f | %.2f | %.1f | %.1f | %.2f |" % (
+        eager = [r for r in sel if r.get("min_fill")]
+        eager_slope = fit([r["bits"] for r in eager], [r["min_fill"]["width"] for r in eager])[0] if len(eager) >= 2 else float("nan")
+        slopes[(mult, rel)] = (lb_slope, ub_slope, eager_slope)
+        slope_lines.append("| %s | %s | %d-%d | %d | %.2f | %.2f | %s | %.1f | %.1f | %.2f |" % (
             mult, rel, xs[0], xs[-1], len(xs), lb_slope, ub_slope,
+            "%.2f" % eager_slope if eager_slope == eager_slope else "-",
             last["lower_bound"] / (last["bits"] / 2), ub(last) / (last["bits"] / 2), s_slope))
 slope_table = "\n".join(slope_lines)
 open(os.path.join(HERE, "TABLE.md"), "w").write("# Recorded rows\n\n" + table + "\n\n# Least-squares slopes\n\n" + slope_table + "\n")
-json.dump({"rows": len(rows), "slopes": {"%s/%s" % k: {"lower": v[0], "upper": v[1]} for k, v in slopes.items()}},
+json.dump({"rows": len(rows), "slopes": {"%s/%s" % k: {"lower": v[0], "upper": v[1], "eager_min_fill": v[2]} for k, v in slopes.items()}},
           open(os.path.join(HERE, "slopes.json"), "w"), indent=1)
 
 # ---- Typst tables (included by REPORT.typ) ----------------------------------
@@ -70,7 +73,7 @@ def typ_table(md_lines, size="6.2pt"):
     header = [c.strip() for c in md_lines[0].strip("|").split("|")]
     body = [[c.strip() for c in l.strip("|").split("|")] for l in md_lines[2:]]
     cols = len(header)
-    out = ["#text(size: %s)[" % size, "#table(columns: %d, stroke: 0.3pt, inset: 2.2pt, align: (left,) * 2 + (right,) * %d," % (cols, cols - 2)]
+    out = ["#text(size: %s)[" % size, "#table(columns: %d, stroke: 0.3pt, inset: 2pt, align: (left,) * 2 + (right,) * %d," % (cols, cols - 2)]
     out.append("  " + ", ".join("[*%s*]" % typ_escape(h) for h in header) + ",")
     for row in body:
         out.append("  " + ", ".join("[%s]" % typ_escape(c) for c in row) + ",")
@@ -115,7 +118,7 @@ fig.savefig(os.path.join(HERE, "treewidth_vs_bits.svg"))
 fig.savefig(os.path.join(HERE, "treewidth_vs_bits.png"), dpi=150)
 
 # second graph: exponents compared, schoolbook only
-fig, ax = plt.subplots(figsize=(7.5, 5))
+fig, ax = plt.subplots(figsize=(7.5, 5.8))
 for rel in ORDER:
     sel = [r for r in rows if r["multiplier"] == "schoolbook" and r["relation"] == rel]
     if not sel:
@@ -132,9 +135,9 @@ ax.set_xlabel("field size b (bits)")
 ax.set_ylabel("exponent (log2 of operations)")
 ax.set_title("Generic contraction bound vs tree-decomposition width vs enumeration (schoolbook networks)", fontsize=9)
 ax.grid(True, which="both", alpha=0.3)
-ax.legend(fontsize=6.5)
+ax.legend(fontsize=6.5, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2)
 fig.tight_layout()
-fig.savefig(os.path.join(HERE, "exponents_vs_bits.svg"))
-fig.savefig(os.path.join(HERE, "exponents_vs_bits.png"), dpi=150)
+fig.savefig(os.path.join(HERE, "exponents_vs_bits.svg"), bbox_inches="tight")
+fig.savefig(os.path.join(HERE, "exponents_vs_bits.png"), dpi=150, bbox_inches="tight")
 print("rows", len(rows))
 print(slope_table)
