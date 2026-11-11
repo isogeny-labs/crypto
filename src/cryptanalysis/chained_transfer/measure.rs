@@ -122,14 +122,6 @@ pub struct IcOutcome {
     pub la_field_ops: u64,
 }
 
-/// A degree-1 place `[(x, y) − ∞]`, keyed by `x`; `y` canonicalised to the
-/// smaller representative, with a sign recording which `y` the class used.
-#[derive(Clone, Copy)]
-struct Place {
-    x: u64,
-    y: u64,
-}
-
 /// Factorise a reduced class into degree-1 places over `F_p`, returning the
 /// signed exponent of each place (±1), or `None` if it does not split into
 /// base places.
@@ -190,22 +182,21 @@ pub fn genus2_index_calculus(
 ) -> IcOutcome {
     let p = c.p();
     let k = Fp::new(p).expect("genus2_fp curve has a prime field");
-    // Factor base: first fb_size abscissae x giving an affine point, canonical y0.
-    let mut places: Vec<Place> = vec![];
+    // Factor base: the first `fb_size` abscissae `x` with an affine point. Only
+    // the index of each place matters here; the canonical sign is recomputed in
+    // `smooth_decompose`.
+    let mut nfb = 0usize;
     let mut xindex = std::collections::HashMap::new();
     for x in 0..p {
-        if places.len() >= fb_size {
+        if nfb >= fb_size {
             break;
         }
-        let fx = c.eval_f(x);
-        if let Some(y) = k.sqrt(fx) {
-            let y0 = y.min((p - y) % p);
-            xindex.insert(x, places.len());
-            places.push(Place { x, y: y0 });
+        if k.sqrt(c.eval_f(x)).is_some() {
+            xindex.insert(x, nfb);
+            nfb += 1;
         }
     }
     let index = |x: u64| xindex.get(&x).copied();
-    let nfb = places.len();
 
     // Relation collection.
     let mut ops = 0u64;
@@ -250,7 +241,7 @@ pub fn genus2_index_calculus(
         group_ops: ops,
         trials,
         relations: rows.len() as u64,
-        fb_size: places.len(),
+        fb_size: nfb,
         la_field_ops: la_ops,
     }
 }
@@ -367,7 +358,7 @@ fn solve_linear(
             if b != 0 {
                 let x = (r - a % r) % r * finv(b) % r;
                 ops += 1;
-                if reference.map_or(true, |rx| rx == x) {
+                if reference.is_none_or(|rx| rx == x) {
                     return (Some(x), ops);
                 }
             }
@@ -385,7 +376,7 @@ pub fn jac_instance(
     x: u64,
     seed: u64,
 ) -> Option<(Divisor, Divisor)> {
-    if order % r != 0 || (order / r) % r == 0 {
+    if !order.is_multiple_of(r) || (order / r).is_multiple_of(r) {
         return None;
     }
     let cof = order / r;
@@ -415,7 +406,7 @@ mod tests {
             if r < 20 {
                 continue;
             }
-            if order % r != 0 || (order / r) % r == 0 {
+            if !order.is_multiple_of(r) || (order / r).is_multiple_of(r) {
                 continue;
             }
             let x = (p * 7 + 13) % r;
@@ -435,9 +426,9 @@ mod tests {
         let mut best = 1;
         let mut d = 2;
         while d * d <= n {
-            if n % d == 0 {
+            if n.is_multiple_of(d) {
                 let mut e = 0;
-                while n % d == 0 {
+                while n.is_multiple_of(d) {
                     n /= d;
                     e += 1;
                 }

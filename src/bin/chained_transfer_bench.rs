@@ -35,9 +35,9 @@ fn largest_cyclic_prime(mut n: u64) -> u64 {
     let mut best = 1u64;
     let mut d = 2u64;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             let mut e = 0;
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
                 e += 1;
             }
@@ -56,7 +56,7 @@ fn largest_cyclic_prime(mut n: u64) -> u64 {
 /// A generator of the order-`r` subgroup of `E` and `[x]gen`.
 fn ec_instance(e: &Curve, r: u64, x: u64) -> Option<(Pt, Pt)> {
     let order = e.order();
-    if order % r != 0 {
+    if !order.is_multiple_of(r) {
         return None;
     }
     let cof = order / r;
@@ -73,7 +73,7 @@ fn ec_instance(e: &Curve, r: u64, x: u64) -> Option<(Pt, Pt)> {
 fn find_isogeny(e: &Curve, r: u64) -> Option<VeluIsogeny> {
     let order = e.order();
     for ell in [2u64, 3, 5, 7] {
-        if order % ell != 0 || r == ell {
+        if !order.is_multiple_of(ell) || r == ell {
             continue;
         }
         let cof = order / ell;
@@ -125,7 +125,7 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
     let jac_order = e1_order * e2_order;
     let r = largest_cyclic_prime(e1_order);
     // Need r ∥ #J, i.e. r ∤ #E2, for a cyclic r-part.
-    if r < 50 || e2_order % r == 0 {
+    if r < 50 || e2_order.is_multiple_of(r) {
         return None;
     }
     let x = (seed.wrapping_mul(2_246_822_519).wrapping_add(7)) % r;
@@ -302,7 +302,7 @@ fn main() -> ExitCode {
     }
 
     println!(
-        "{:>7} {:>8} {:>10} {:>12} {:>12} {:>7} {:>10} {:>12} {:>12}  {}",
+        "{:>7} {:>8} {:>10} {:>12} {:>12} {:>7} {:>10} {:>12} {:>12}  chain",
         "p",
         "r",
         "rho_src",
@@ -311,8 +311,7 @@ fn main() -> ExitCode {
         "ic_fb",
         "ic_grpops",
         "ic_trials",
-        "ic/rho_src",
-        "chain"
+        "ic/rho_src"
     );
     for row in &rows {
         let ratio = row.ic_jac_group_ops as f64 / row.rho_src_ops.max(1) as f64;

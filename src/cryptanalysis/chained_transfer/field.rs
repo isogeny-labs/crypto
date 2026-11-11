@@ -46,12 +46,12 @@ pub fn is_prime(n: u64) -> bool {
         return false;
     }
     for q in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             return n == q;
         }
     }
     let (mut d, mut s) = (n - 1, 0);
-    while d % 2 == 0 {
+    while d.is_multiple_of(2) {
         d /= 2;
         s += 1;
     }
@@ -137,7 +137,7 @@ impl Fp {
     }
     /// Inverse of a nonzero element (Fermat).
     pub fn inv(&self, a: u64) -> u64 {
-        debug_assert!(a % self.p != 0);
+        debug_assert!(!a.is_multiple_of(self.p));
         self.pow(a, self.p - 2)
     }
     /// Legendre symbol in `{−1, 0, 1}`.
@@ -162,7 +162,7 @@ impl Fp {
         }
         let p = self.p;
         let (mut q, mut s) = (p - 1, 0u32);
-        while q % 2 == 0 {
+        while q.is_multiple_of(2) {
             q /= 2;
             s += 1;
         }

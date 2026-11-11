@@ -29,12 +29,12 @@ instance in Python. This effort:
 
 ## Results
 
-See `RESULTS.md`, `results.json` and `REPORT.pdf`. Claim `PCC-20261111-e80054`
-(standing: unverified). Summary: the chain is verified at p = 211 to 1619.
-Rho on each destination stays within the scatter of the source rho.
-Genus-2 index calculus on J(C) costs 9.8× to 42.9× the matched rho, and the
-fit gives about p^1.0. This is a boundary, not an improvement.
-[pcc:unverified]
+See `RESULTS.md`, `results.json` and `REPORT.pdf`. The result is reported as an
+unverified assertion (no independent validator has signed it). Summary: the
+chain is verified at p = 211 to 1619. Rho on each destination stays within the
+scatter of the source rho. Genus-2 index calculus on J(C) costs 9.8× to 42.9×
+the matched rho, and the fit gives about p^1.0. This is a boundary, not an
+improvement. [pcc:unverified]
 
 ## Reproduce
 

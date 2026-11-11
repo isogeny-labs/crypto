@@ -58,9 +58,9 @@ fn largest_prime_factor_sqfree(mut n: u64) -> u64 {
     let mut best = 1u64;
     let mut d = 2u64;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             let mut e = 0;
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
                 e += 1;
             }
@@ -78,7 +78,7 @@ fn largest_prime_factor_sqfree(mut n: u64) -> u64 {
 
 /// Embedding degree: least `k ≤ bound` with `r | p^k − 1`; `None` otherwise.
 pub fn embedding_degree(p: u64, r: u64, bound: u64) -> Option<u64> {
-    if r <= 1 || p % r == 0 {
+    if r <= 1 || p.is_multiple_of(r) {
         return None; // r = p (anomalous) or r | p: no pairing embedding
     }
     let mut acc = 1u128 % r as u128;

@@ -72,7 +72,7 @@ impl Curve {
 
     /// Whether the point is `F_p`-rational.
     pub fn rational(p: &Pt) -> bool {
-        p.map_or(true, |(x, y)| x.in_base() && y.in_base())
+        p.is_none_or(|(x, y)| x.in_base() && y.in_base())
     }
 
     pub fn neg(&self, p: &Pt) -> Pt {
@@ -295,7 +295,7 @@ mod tests {
             .find_map(|s| {
                 let c = Curve::new(k, 1 + s % 100, 3 + 7 * s % 400, 2 + 11 * s % 500)?;
                 let n = c.order();
-                if [2u64, 3, 5, 7].iter().any(|&l| n % l == 0) {
+                if [2u64, 3, 5, 7].iter().any(|&l| n.is_multiple_of(l)) {
                     Some(c)
                 } else {
                     None
@@ -313,7 +313,7 @@ mod tests {
         for s in 0..400u64 {
             let p = e.point_from_seed(s * 31 + 5);
             for l in [2u128, 3, 5] {
-                if n % l != 0 {
+                if !n.is_multiple_of(l) {
                     continue;
                 }
                 let g = e.mul(&p, n / l);

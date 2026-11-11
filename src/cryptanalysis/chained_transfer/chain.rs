@@ -204,7 +204,7 @@ impl Chain {
 
     /// Transport an element through every hop.
     pub fn transport(&self, start: &Elt) -> Elt {
-        let mut cur = start.clone();
+        let mut cur = *start;
         for h in &self.hops {
             cur = h.apply(&cur);
         }
