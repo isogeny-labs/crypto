@@ -13,49 +13,6 @@ use serde_json::json;
 use std::io::Write;
 use std::time::Instant;
 
-/// Open-addressing x -> (orbit element id) table.
-struct XTable {
-    keys: Vec<u64>,
-    vals: Vec<u32>,
-    mask: usize,
-}
-impl XTable {
-    fn new(cap: usize) -> Self {
-        let n = (cap * 4).next_power_of_two();
-        XTable {
-            keys: vec![u64::MAX; n],
-            vals: vec![0; n],
-            mask: n - 1,
-        }
-    }
-    #[inline(always)]
-    fn h(&self, k: u64) -> usize {
-        (k.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.mask
-    }
-    fn insert(&mut self, k: u64, v: u32) {
-        let mut i = self.h(k);
-        while self.keys[i] != u64::MAX {
-            i = (i + 1) & self.mask;
-        }
-        self.keys[i] = k;
-        self.vals[i] = v;
-    }
-    #[inline(always)]
-    fn get(&self, k: u64) -> Option<u32> {
-        let mut i = self.h(k);
-        loop {
-            let kk = self.keys[i];
-            if kk == k {
-                return Some(self.vals[i]);
-            }
-            if kk == u64::MAX {
-                return None;
-            }
-            i = (i + 1) & self.mask;
-        }
-    }
-}
-
 fn find_j0_curve(bits: u32, skip: u64) -> (FastCurve, Pt, u64, u64) {
     let mut p = (1u64 << bits) - 1;
     let mut skipped = 0;
