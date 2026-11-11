@@ -149,6 +149,7 @@ SOURCES = {
     "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
+    "mt_fieldops_component": "research/mt_fieldops_v2_20261111/results/holdout/summary.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
@@ -488,7 +489,7 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 
 
 # These engineering components also carry validation gates outside tables A-C.
-COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather",)
+COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -1721,6 +1722,38 @@ def pkm_symmetric_component() -> dict:
             "class": "solver-stage diagnostic", "validation": NOT_VALIDATED}
 
 
+MT_FIELDOPS_EVIDENCE = "benchmarks/20261111-mt-fieldops-ic4"
+
+
+def mt_fieldops_component() -> dict:
+    """Multi-target IC4 (x-only pair-sum table, shared inversions) against the strongest rho in the same
+    counted field layer (cheapest of rho, rho2, rho2x, rhoseq x three kappa, per configuration and price)
+    and a paired BSGS, from research/mt_fieldops_v2_20261111 (33 fresh prime-order curves, 2112 runs).
+    Medians and bootstrap intervals are copied from summary.json (analyze.py); I/M = 10, h in {0, 0.1, 1}.
+    A multi-target regime outside tables A-C; its standing comes from the benchmarks directory's
+    VALIDATION.json."""
+    summary = load(SOURCES["mt_fieldops_component"])
+    errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
+    cells = sorted({(x["bits"], x["T"]) for x in summary})
+    rows = []
+    for bits, t in cells:
+        def q(vs, h):
+            x = next(y for y in summary if y["vs"] == vs and y["cI"] == 10 and y["bits"] == bits
+                     and y["T"] == t and y["h"] == h)
+            return {"median": x["median"], "ci95": [x["lo"], x["hi"]], "n": x["n"]}
+        band = {str(h): q("rhobest", h) for h in (0, 0.1, 1)}
+        verdict = ("cheaper" if all(v["ci95"][1] < 1 for v in band.values())
+                   else "dearer" if all(v["ci95"][0] > 1 for v in band.values()) else "unranked")
+        rows.append({"bits": bits, "T": t, "rho": band, "bsgs": {str(h): q("bsgs2", h) for h in (0, 1)},
+                     "verdict": verdict})
+    return {"rows": rows, "study": "research/mt_fieldops_v2_20261111/",
+            "report": "research/mt_fieldops_v2_20261111/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+            "class": "multi-target method",
+            "validation": ("validated: replay certificate, validator report and the strongest-rho reference "
+                           f"with the §5a band ({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def _jsonl(rel: str) -> list[dict]:
     return [json.loads(x) for x in (REPO / rel).read_text().splitlines() if x.strip()]
 
@@ -2571,6 +2604,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "aimed_gather_component": aimed_gather_component(),
+        "mt_fieldops_component": mt_fieldops_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
         "quartic_polynomial_component": quartic_polynomial_component(),
@@ -3559,6 +3593,22 @@ def markdown(doc: dict) -> str:
           f"[{c4['paired_min']:.2f}, {c4['paired_max']:.2f}] across paired instances. "
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
+    mt = doc["mt_fieldops_component"]
+    L += ["## Multi-target IC4 against the strongest rho, outside tables A–C", "",
+          "Many targets on one prime-order Weierstrass curve (2^22 to 2^26, 33 fresh curves, 22 paired "
+          "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
+          "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only "
+          "pair-sum table and tries x(Q ± W) with one shared inversion; the reference is the cheapest of four rho "
+          "variants (anchored, sibling, x-only sibling, sequential database) at three database sizes, chosen per "
+          "configuration and price. IC4 / rho and IC4 / BSGS per target, median [95% bootstrap]; the BSGS ratio "
+          f"is the distance remaining. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
+          "| bits | T | IC4/rho h=0 | h=0.1 | h=1 | §5a | IC4/BSGS h=0 | h=1 |",
+          "|--:|--:|--:|--:|--:|:--|--:|--:|"]
+    for r in mt["rows"]:
+        f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
+        L.append(f"| {r['bits']} | {r['T']} | {f(r['rho']['0'])} | {f(r['rho']['0.1'])} | {f(r['rho']['1'])} | "
+                 f"{r['verdict']} | {r['bsgs']['0']['median']:.2f} | {r['bsgs']['1']['median']:.2f} |")
+    L += ["", f"Study: [{mt['study']}](../../{mt['study']}); [report](../../{mt['report']}); source `{mt['source']}`.", ""]
     pk = doc["pkm_symmetric_component"]
     L += ["## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C", "",
           f"Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion "
@@ -4897,6 +4947,22 @@ def page(doc: dict, standalone: bool) -> str:
              f'{c4["paired_max"]:.2f}]. This is a solver-stage change; no full-pipeline row or curve verdict '
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
+    mt = doc["mt_fieldops_component"]
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC4 against the strongest rho, outside the priced tables</h2>'
+             '<p>Many targets on one prime-order Weierstrass curve (2<sup>22</sup> to 2<sup>26</sup>, 33 fresh curves, 22 paired '
+             'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
+             '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only pair-sum '
+             'table and tries x(Q ± W) with one shared inversion; the reference is the cheapest of four rho variants at three '
+             'database sizes, chosen per configuration and price. IC4 / rho and IC4 / BSGS per target, median [95% bootstrap]; '
+             f'the BSGS ratio is the distance remaining. Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
+             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC4/rho h=0</th><th>h=0.1</th><th>h=1</th>'
+             '<th>§5a</th><th class="n">IC4/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
+                       + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
+                                 f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))
+                       + f'<td>{esc(r["verdict"])}</td><td class="n">{r["bsgs"]["0"]["median"]:.2f}</td>'
+                       f'<td class="n">{r["bsgs"]["1"]["median"]:.2f}</td></tr>' for r in mt["rows"])
+             + f'</tbody></table><p><a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["study"])}">Study</a>.</p></section>')
     pk = doc["pkm_symmetric_component"]
     P.append('<section class="card" id="pkm-symmetric-component"><h2>Symmetric PKM tower, F4 stage at m = 4, outside the priced tables</h2>'
              f'<p>Writing the Kummer membership and S<sub>5</sub> in the elementary symmetric functions before expansion '

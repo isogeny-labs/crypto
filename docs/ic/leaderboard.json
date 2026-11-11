@@ -394,6 +394,10 @@
    "path": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
    "sha256": "4360d61a47960810d8994e88cea8ebabf938363f0e3288b45fe98f6bde59278b"
   },
+  "mt_fieldops_component": {
+   "path": "research/mt_fieldops_v2_20261111/results/holdout/summary.json",
+   "sha256": "da6ae47bec25e2643ee3cb77189562325d85ddaab1773bc4907c32b95b846c2d"
+  },
   "ghs_weak_n4": {
    "path": "research/quartic_n4_20261019/results/summary_all.json",
    "sha256": "fd5598a2860d965c8b47ca9163cb1ff101150c3b04690ea208d05d8c87b067e7"
@@ -338286,6 +338290,310 @@
   "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
   "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json)",
   "validated": true
+ },
+ "mt_fieldops_component": {
+  "rows": [
+   {
+    "bits": 22,
+    "T": 1024,
+    "rho": {
+     "0": {
+      "median": 1.0533734123,
+      "ci95": [
+       1.0404985733,
+       1.0584672798
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.06556934456,
+      "ci95": [
+       1.05153448778,
+       1.07080893311
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.11986605025,
+      "ci95": [
+       1.1007470537,
+       1.12657441842
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.4532105467,
+      "ci95": [
+       1.44789460937,
+       1.4614709764
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.59704325594,
+      "ci95": [
+       1.59034001382,
+       1.61161934038
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 24,
+    "T": 1024,
+    "rho": {
+     "0": {
+      "median": 1.1062996673,
+      "ci95": [
+       1.09881991298,
+       1.11840271721
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.12145008459,
+      "ci95": [
+       1.11366272923,
+       1.13432496324
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.1824635956,
+      "ci95": [
+       1.17374074237,
+       1.19850313621
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.6449426146,
+      "ci95": [
+       1.63050314799,
+       1.65435411412
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.7734299776,
+      "ci95": [
+       1.75659376139,
+       1.78626788486
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 0.975711634648,
+      "ci95": [
+       0.972005578957,
+       0.980328025977
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 0.982986988481,
+      "ci95": [
+       0.978920589893,
+       0.98784980673
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.01568289658,
+      "ci95": [
+       1.01035059452,
+       1.02210010186
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.32955574719,
+      "ci95": [
+       1.32375081339,
+       1.33600549952
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.45566712679,
+      "ci95": [
+       1.44788875427,
+       1.46554921671
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 0.933436991684,
+      "ci95": [
+       0.931654403028,
+       0.937053345371
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 0.934887251595,
+      "ci95": [
+       0.932874691142,
+       0.938863842507
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.942368475817,
+      "ci95": [
+       0.939175972844,
+       0.948165070579
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.18491196522,
+      "ci95": [
+       1.18327167384,
+       1.18868734481
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.30061763416,
+      "ci95": [
+       1.29767439237,
+       1.30724487189
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "cheaper"
+   },
+   {
+    "bits": 25,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 0.987464929592,
+      "ci95": [
+       0.983159236498,
+       0.993368894836
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 0.996090388277,
+      "ci95": [
+       0.991515562585,
+       1.00235248537
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.03270309001,
+      "ci95": [
+       1.02696270822,
+       1.0402487189
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.39662285407,
+      "ci95": [
+       1.39050985625,
+       1.39798427885
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.51299326458,
+      "ci95": [
+       1.50547526285,
+       1.51596064988
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
+   },
+   {
+    "bits": 25,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 0.925610538001,
+      "ci95": [
+       0.923375157846,
+       0.928179088158
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 0.927820499817,
+      "ci95": [
+       0.925407236159,
+       0.930583809844
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.938434520062,
+      "ci95": [
+       0.935170850089,
+       0.942158500807
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.22675320811,
+      "ci95": [
+       1.22434566948,
+       1.22810829205
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.34553975701,
+      "ci95": [
+       1.34126492895,
+       1.347739288
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "cheaper"
+   }
+  ],
+  "study": "research/mt_fieldops_v2_20261111/",
+  "report": "research/mt_fieldops_v2_20261111/REPORT.pdf",
+  "source": "research/mt_fieldops_v2_20261111/results/holdout/summary.json",
+  "class": "multi-target method",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "quartic_twist_pair_component": {
   "rows": [
