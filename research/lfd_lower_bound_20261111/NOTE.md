@@ -449,26 +449,45 @@ unsatisfiable ones):
 | 25 | 13 | 5, 6 | **4, 4** | 5 | 27,325 |
 | 27 | 14 | 3, 6 | 5, 5 | 5 | 93,771 |
 | 29 | 15 | 3, 4 | 5, 5 | 5 | 143,376 |
+| 31 | 16 | 2, 3 | `> 4`, `> 4` | 6 | 78,027 |
 | 33 | 17 | 1, 5 | `> 4`, `> 4` | 6 | 106,062 |
-| 41 | 21 | 1 | `> 3` | 7 | 64,042 |
+| 35 | 18 | 6, 7 | `> 4`, `> 4` | 6 | 141,680 |
+| 37 | 19 | 1, 3 | `> 3`, `> 3` | 7 | 42,920 |
+| 39 | 20 | 3, 7 | `> 3`, `> 3` | 7 | 52,689 |
+| 41 | 21 | 1, 2 | `> 3`, `> 3` | 7 | 64,042 |
 
 - **Coverage.** `n = 15–23` reproduces the Python `e_min` on every committed
   instance, and every feasible `lambda` at `n = 25–29` passes `verify_lambda.py`.
-- **The `n = 33` and `41` lower bounds are independently re-checked.** `emin verify`
-  (second row builder, PLUQ) confirms each point set is inconsistent:
-  - `n = 41` seed 1, `e = 3`: rank 63,831 → 63,832;
-  - `n = 33` seeds 1 and 5, `e = 4`: rank 105,365 → 105,366 (both seeds).
-- **Lower bounds only at `n = 33` and `41`.** The next `e` needs `n * sum_{d<=e}
-  C(k,d)` unknowns, which exceeds the 250k-unknown cap of dense elimination on this
-  container: 310k for `n = 33, e = 5` and 309k for `n = 41, e = 4`.
-- `n = 31, 35, 37, 39` and the second `n = 41` seed are still running.
+- **Every lower bound at `n = 31–41` is independently re-checked.** `emin verify`
+  (second row builder, PLUQ) confirms each point set is inconsistent; the right-hand
+  side always raises the rank by one:
+  - `n = 31`, `e = 4`: 77,451 → 77,452;
+  - `n = 33`, `e = 4`: 105,365 → 105,366;
+  - `n = 35`, `e = 4`: 140,846 → 140,847;
+  - `n = 37`, `e = 3`: 42,748 → 42,749;
+  - `n = 39`, `e = 3`: 52,498 → 52,499;
+  - `n = 41`, `e = 3`: 63,831 → 63,832.
+
+  The same ranks hold for both seeds at each `n`. Raw outputs are in
+  `out/c/verify_*.txt`.
+- **Above `n = 29` the rows are lower bounds only.** The next `e` needs
+  `n * sum_{d<=e} C(k,d)` unknowns:
+  - 213k (`n = 31`, `e = 5`), 310k (`n = 33`, `e = 5`), 442k (`n = 35`, `e = 5`),
+    186k (`n = 37`, `e = 4`), 242k (`n = 39`, `e = 4`), 309k (`n = 41`, `e = 4`).
+  - The container restarts about hourly, which killed the 213k run twice. So
+    `n = 31, 35, 37, 39` were finished with a 145k cap, keeping each test under
+    about 20 minutes.
+  - Exact values there need a host that stays up and has more memory, or a sparse
+    solver.
 
 **What survives.** The measured `e_min` is non-decreasing in `k` on this diagonal:
 4, 4, 4, 5, 5 at `k = 11..15`. The `k = 13` value of 4 was certified on both
 instances. A weaker form, `e_min >= ceil((k-1)/3)`, fits every diagonal instance
 measured so far, including the `n = 7`, seed 16 exception (`k = 4`, `e_min = 1`).
 This form is a CONJECTURE fitted to the same data that falsified the original, so it
-is not evidence. Only the data at `k >= 16` (running) can test it.
+is not evidence. The data at `k >= 16` cannot test it. Those rows are lower bounds of
+4 or 3, below both `ceil(k/3)` and `ceil((k-1)/3)`, so they agree with either form and
+decide nothing.
 
 Even a proof of Conjecture S would show only that the strategy of the `k+2` upper
 bound cannot be improved to constant degree with `c`-only multipliers. It says
@@ -576,8 +595,8 @@ trace equations alone.
 ## 8. Cheapest next step
 
 1. **Done: `e_min` ported to C** (`emin.c`, #3887). It runs `n = 23` in 2 s,
-   against 229 s for the Python version. Exact values hold to `n = 29`; lower bounds
-   to `n = 41` are running.
+   against 229 s for the Python version. Exact values hold to `n = 29`; above
+   that, only independently checked lower bounds were obtained, up to `n = 41`.
    - The port falsified Conjecture S at `k = 13` (§6).
    - Exact values above `n = 29` need sparse or structured elimination, or a host
      with more memory (EKS). The dense system has 0.3–8M unknowns there.
@@ -608,7 +627,7 @@ trace equations alone.
   `e_min >= ceil((k-1)/3)` is fitted to the same data and is not claimed. Any such
   bound would cover only the selector degree, never `d_F`. Propositions S and S* are
   exact reformulations, not bounds.
-- **The `n = 33`, `41` rows are lower bounds** on `e_min` only. No exact value is
+- **The `n = 31–41` rows are lower bounds** on `e_min` only. No exact value is
   claimed above `n = 29`.
 - **Corollary 4b** (monotonicity in `t`) is a sketch for the chain as stated in the
   treatise; it was not checked computationally.
