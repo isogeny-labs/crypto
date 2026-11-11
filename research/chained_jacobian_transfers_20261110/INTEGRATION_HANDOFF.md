@@ -179,3 +179,22 @@ degrees/products/extensions/covers remain open. CT17 next makes both elliptic
 quotients/full odd rational-group reconstruction explicit for direct cost
 controls. No split implementation or solver advantage accepted yet. Vault/KB
 still blocked,no plaintext/new guessed lead ID. [pcc:unverified]
+
+## Explicit split-quotient continuation
+
+Producerda66ab9d953d2ba96c4ac9d6e8379c3478b3f277,ready PR1481,implements
+both quotient norms/completed reciprocal maps. All285/12317 classes pass
+inverses,bijection,paired additions,cross0,sum[2] and odd reconstruction;
+all19/109 transferred source scalars have coordinates([4]P,0). Seven core
+Lean reciprocal/split/recovery lemmas compile,total62;geometry remains
+written and standing unsigned. SPLIT_QUOTIENT_CHECKPOINT.md binds exact
+sources/report/inspectedPDF. Current full49-test focused43026964101 runs;
+prior CT16 exact-head43024621372 passes47 tests/PR1480 merged57ab3ad05.
+[pcc:unverified]
+
+This exposes direct original-source controls,no extra DLP equation from the
+second elliptic factor and no demonstrated solver gain. CT18 next assesses
+rational odd-prime maximal-isotropic kernels at3/5,prospective7 control.
+No kernel/codomain/map pre-accepted. Atlas still locked,no plaintext/new
+invented lead ID. Root S3 gate rechecked after exact-format resume update;
+transport still unavailable,so no benchmark/paid allocation. [pcc:unverified]

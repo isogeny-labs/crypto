@@ -106,3 +106,13 @@ finite/conditional lemmas pass. Prior shifted source full46-test CI passes;
 CT16 source63cf80560/PR1480 full47-test CI pending. Next CT17 implements
 both elliptic quotient norms/full rational-group reconstruction. Standing
 unsigned,no universal transfer impossibility or cost advantage. [pcc:unverified]
+
+The [split-quotient checkpoint](SPLIT_QUOTIENT_CHECKPOINT.md) now implements
+both elliptic norms and full rational-group reconstruction on all285/12317
+classes,including reciprocal zero/infinity completion. Target source-scalar
+coordinates are([4]P,0),with all19/109 controls passing. Seven cleared/
+conditional Lean lemmas compile,total62. Prior CT16 exact-head47-test CI
+passes/PR1480 merged;currentda66ab9d9/PR1481 full49-test CI running. These
+are rational-group bijections,not variety-product isomorphisms. CT18 next
+assesses rational odd-prime isotropic kernels; no solver/cost benefit or
+cross-prime descent accepted. [pcc:unverified]

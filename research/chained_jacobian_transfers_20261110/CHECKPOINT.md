@@ -1,4 +1,4 @@
-# Resume checkpoint — target Frobenius and forced backtrack
+# Resume checkpoint — full split-quotient coordinates
 
 Inspect actual heads/uncommitted diffs first. Read QUEUE.md and the latest
 session-log entries. Reuse immutable passing receipts when inputs match;
@@ -7,8 +7,8 @@ do not repeat completed baseline work. All standing unsigned. [pcc:unverified]
 ## Durable sources and completed checks
 
 - Crypto branch research/chained-jacobian-transfer-20261110, PR3877;
-  last published8fbc0ac385e209483744753caeaf597e14a5a8be before this pending
-  target-Frobenius checkpoint. Read actual HEAD. Native runtime pin75a737b8 and all
+  last published8ef9baecf6a4288cb0eb0596af26187d30ff04a8 before this pending
+  split-quotient checkpoint. Read actual HEAD. Native runtime pin75a737b8 and all
   seven small-prime-inputs.sha256 inputs remain unchanged.
 - Shifted producer cryptanalysis767c945a0a832c4f9d2827add8aefce3a16d2371,
   ready PR1479, branch research/chained-transfer-shifted109-20261111. Base
@@ -52,23 +52,43 @@ branch-pair geometry. Only next stable kernel is previous dual: no rational
 nonbacktracking Richelot hop for either exact target. All256 torsion additions
 and Frobenius-equivariant branch images pass,kernel4/image4. Discovery and
 regression retained,PCC954795/4823b5; targeted test/strict Clippy pass.
-Current full47-test focused CI pending; do not replace old exact-head scope.
+Exact-head43024621372 passes native25/reference47,one old benchmark ignored;
+PR1480 merged57ab3ad05 at13:05:29Z. Raw log/PCCbfa6ff retained upstream.
 Seven new TargetFrobenius.lean lemmas gate7/localPCC8c5ee5 pass; total55,
 gates22+8+7+12+6+5+7+4+7. No finite-field/Jacobian geometry formalized.
 TARGET_FROBENIUS_CHECKPOINT.md binds producer/report/inspected2-pagePDF.
 [pcc:unverified]
 
-CT17 next implements frozen consumer proposal84d254: full rational-group
-decomposition via both elliptic quotient norms. For C:y²=x6+a2*x4+a4*x2+b,
-b=s²,use T=s/x,Y=b*y/x³; second monic cover has coefficients
-[b²,0,a2*b,0,a4,0,1],second elliptic cubic[b²,a2*b,a4,1]. Complete balanced
-zero/infinity support and inverse x=s/T,y=s*Y/T³ explicitly. On all285/12317
-classes check reciprocal inverses/additivity, both quotient norms, cross-norm
-zero and sum of pull/norms=[2]. Invert2 on odd elliptic components19/15 and
-109/113 to reconstruct all classes without scalar labels. Then inspect
-accepted target r19/r109 image components via Richelot dual. No full split
-implementation or advantage pre-accepted. CT14 production/catalog/large-field
-coverage and all solver-cost obligations remain open. [pcc:unverified]
+CT17 producerda66ab9d953d2ba96c4ac9d6e8379c3478b3f277,ready PR1481,
+branch research/chained-transfer-split-quotients-20261111. Full49-test focused
+43026964101 running; hold auto-merge until exact-head pass/actual requirements.
+All285/12317 reciprocal inverses/bijections/paired additions,both norm additions,
+cross0,sum pull/norms[2],odd reconstruction pass(PCC036d81). Zero-support
+multiplicities0/1/2 and both old infinities completed. All19/109 source
+scalars have target quotient coordinates([4]P,0),inverse5/82/source-class
+reconstruction pass(PCC96b1e2); strict Clippy passes. Seven SplitQuotients.lean
+lemmas gate7/localPCCfffa35 pass; total62,gates22+8+7+12+6+5+7+4+7+7.
+Two broad-tactic failures retained; explicit local power identities pass.
+SPLIT_QUOTIENT_CHECKPOINT.md binds source/report/inspected2-pagePDF.
+Rational-group isomorphisms do not assert abelian-variety product isomorphism.
+No solver,measured benefit or independently signed geometric verdict.
+[pcc:unverified]
+
+CT18 next assesses rational odd-prime maximal-isotropic kernels. Fixed
+elliptic quotient traces:p17(−1,3),p101(−7,−11). Read primary Weil-pairing/
+Frobenius input,freeze ell3/5 and prospective7 acceptance,then implement
+bounded symplectic-plane/coprime-characteristic-factor checks. Do not infer
+actual geometry from an unchecked companion model when repeated eigenvalues
+occur. Preserve negatives and require actual codomain/maps/duals/source
+subgroup and cost controls for any accepted candidate. No odd-prime map
+pre-accepted. CT14 production/catalog/large fields remains open.
+[pcc:unverified]
+
+Updated tracked .resume/RESUME.md satisfies exact gate headings. Fresh gate
+reaches transport but fails without configured AWS profile/checkpoint token.
+Raw first-heading/second-transport failures retained. No experiment/benchmark
+launched; live allowance unknown. Use latest GitHub queue/actual heads to
+refresh that living resume file before another admission attempt.
 
 ## Reproduce changed inputs only
 
@@ -78,7 +98,7 @@ export PATH="$HOME/.cargo/bin:$HOME/.elan/bin:$PATH"
 experiments/chained-transfer-reference/check.sh
 # crypto:
 cargo test --release --bin icprog chained_ -- --nocapture
-tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/TargetFrobenius.lean
+tools/lean/proof-gate.sh research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean
 ```
 
 ## Continuing constraints

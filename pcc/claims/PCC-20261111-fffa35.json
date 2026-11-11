@@ -1,0 +1,58 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T13:06:01Z",
+ "id": "PCC-20261111-fffa35",
+ "kind": "theorem",
+ "producer": {
+  "commit": "8ef9baecf6a4288cb0eb0596af26187d30ff04a8",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d9feabc7a66de97350b1fe264db05907f4a0e2ff14995ef6a8935b910e846625",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.reciprocal_curve_cleared"
+  },
+  {
+   "decl_sha256": "473aa7eb6130fed22ecaef7e24a93eba691e2b7bdd0379e7592a242e90ad7e4e",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.reciprocal_inverse_cleared"
+  },
+  {
+   "decl_sha256": "9c4e5cbcfb34607c5cb94839e31870d80a14c9f9f319e21f6d06baa451877713",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.complementary_norms"
+  },
+  {
+   "decl_sha256": "744a7f89011f331a251ffcec25f1220d608a823896d6bc9ed59052bfb01c1fca",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.odd_halving"
+  },
+  {
+   "decl_sha256": "45112bea80b10ecaf5c07a6d8e2c74c1f9b3898f5f26eb927bef6691caf44082",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.split_reconstruction"
+  },
+  {
+   "decl_sha256": "7577affca891245596205df0593a8a45bf8ccbbed0631365c595c1db485f955e",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.target_first_component"
+  },
+  {
+   "decl_sha256": "243be78fee5d9a47d1b62aafe467ed13f062796d63cf233c8b5d235a065e664b",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean",
+   "theorem": "SplitQuotients.target_other_component"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Seven split-quotient Lean lemmas pass gate7: denominator-cleared reciprocal curve/inverse identities,complementary involution norm sum,generic odd-annihilator halving,conditional split reconstruction and transferred source coordinates([4]P,0). Two failed broad-tactic attempts retained; final explicit power equalities avoid irrelevant Groebner constraints. No finite fields,Jacobian/Picard maps,group orders or actual geometric splitting formalized; local proof pass is not signed scientific standing."
+}
