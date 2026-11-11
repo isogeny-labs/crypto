@@ -2331,7 +2331,28 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         }
 
         let la_started = Instant::now();
-        let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n)?;
+        // The elimination charges its modular operations to the `bitop/v1` tally; the
+        // difference across the call is what this solve spent (summed over every retry).
+        let tally_before = bitop_ops::snapshot();
+        let eliminated = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n);
+        let spent = bitop_ops::snapshot().since(&tally_before).total();
+        count(
+            "elimination_modular_multiplications_uncharged",
+            spent.get(bitop_ops::Kind::ModrMul),
+        );
+        count(
+            "elimination_modular_additions_uncharged",
+            spent.get(bitop_ops::Kind::ModrAdd),
+        );
+        count(
+            "elimination_modular_inversions_uncharged",
+            spent.get(bitop_ops::Kind::ModrInv),
+        );
+        count(
+            "elimination_word_operations_uncharged",
+            spent.get(bitop_ops::Kind::WordOp),
+        );
+        let solution = eliminated?;
         if solution.determined[m] {
             break (m, solution, la_started.elapsed().as_secs_f64() * 1e3);
         }
@@ -2381,7 +2402,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         trials_per_relation_median: median,
         trials_per_relation_max: sorted_trials.last().copied().unwrap_or(0),
         counters: take_counters(),
-        counters_unemitted: vec!["elimination_modular_operations_uncharged"],
+        counters_unemitted: Vec::new(),
     };
     Some((x, report))
 }
@@ -2740,10 +2761,11 @@ mod tests {
         assert_eq!(get("table_insert_attempts_uncharged"), 2 * 36 + 2 * 28);
         assert!(get("group_additions") > 0 && get("group_doublings") > 0);
         assert_eq!(get("relation_points_not_counted"), 0);
-        assert_eq!(
-            report.counters_unemitted,
-            vec!["elimination_modular_operations_uncharged"]
-        );
+        // the elimination's modular operations are emitted now, and are not zero
+        assert!(report.counters_unemitted.is_empty());
+        assert!(get("elimination_modular_multiplications_uncharged") > 0);
+        assert!(get("elimination_modular_inversions_uncharged") > 0);
+        assert!(get("elimination_word_operations_uncharged") > 0);
     }
 
     /// Shamir interleaving equals two separate ladders plus an add.
