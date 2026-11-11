@@ -1741,7 +1741,9 @@ pub fn ic_multi_solve_ex(
     if fb.is_empty() {
         return None;
     }
+    let t_pt = Instant::now();
     let pairs = PairTable::build(curve, &fb);
+    let pair_ms = t_pt.elapsed().as_secs_f64() * 1e3;
     let needed = fb.len() + extra_relations;
     let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
         if table {
@@ -1750,11 +1752,23 @@ pub fn ic_multi_solve_ex(
             collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
         }
     };
+    let t_col = Instant::now();
     let (rels, _) = collect(g, needed, u64::MAX, seed);
+    let col_ms = t_col.elapsed().as_secs_f64() * 1e3;
     if rels.len() < needed {
         return None;
     }
+    let t_sol = Instant::now();
     let logs = solve_fb_logs(curve, fb.len(), &rels);
+    if std::env::var_os("IC_MULTI_TIMING").is_some() {
+        eprintln!(
+            "multi setup: fb {} pair_table {:.1} ms collect {:.1} ms solve {:.1} ms",
+            fb.len(),
+            pair_ms,
+            col_ms,
+            t_sol.elapsed().as_secs_f64() * 1e3
+        );
+    }
     let determined = logs.iter().filter(|l| l.is_some()).count();
     let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
     let fnum = curve.scalar_field();
