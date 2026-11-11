@@ -1,0 +1,35 @@
+name: CT25 absolute geometric cross-factor control
+
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/ct25_absolute_cross_factor.py'
+      - 'research/chained_jacobian_transfers_20261110/CT25_ABSOLUTE_FACTOR_OBSTRUCTION.md'
+      - '.github/workflows/ct25-cross-factor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cross-factor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/ct25_absolute_cross_factor.py
+      - name: Independent F1012 geometric cross-norm and ordinary CM field controls
+        run: |
+          set -euo pipefail
+          unset PYTHONOPTIMIZE || true
+          python3 -S research/chained_jacobian_transfers_20261110/ct25_absolute_cross_factor.py | tee /tmp/ct25-cross-factor.log
+          python3 -m py_compile research/chained_jacobian_transfers_20261110/ct25_absolute_cross_factor.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct25-cross-factor-stdout
+          path: /tmp/ct25-cross-factor.log
+          if-no-files-found: ignore
