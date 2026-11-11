@@ -168,7 +168,7 @@ validated with caveats: replay certificate, validator report and the negation-ma
 
 ## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)
 
-Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} (never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; `U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each`. The band is layer A: every unemitted cover F_p operation is also priced as native, the upper-bound convention. The isogeny walk into the class is not charged. Distance remaining is IC ÷ rho; "below" means the 95% interval's upper end is under 1 at all three prices.
+Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} (never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; `U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each`. The band is layer A: every unemitted cover F_p operation is also priced as native, the upper-bound convention. The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route. Distance remaining is IC ÷ rho; "below" means the 95% interval's upper end is under 1 at all three prices.
 
 | arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |
 |:--|:--|:--|:--|:--|
@@ -187,7 +187,7 @@ Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover
 
 [Report](../../research/jv_sieve_line_vs_rho_20261103/REPORT.pdf) · [study](../../research/jv_sieve_line_vs_rho_20261103/) · [data](../../research/jv_sieve_line_vs_rho_20261103/fit.json).
 
-validated with caveats (weak class only; isogeny walk into the class not charged): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
+validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
 
 ## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
 

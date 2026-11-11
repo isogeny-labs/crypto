@@ -1262,10 +1262,17 @@ def jv_sieve_line_vs_rho_component() -> dict:
                          "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
                          "below": all(b["verdict"] == "below" for b in band)})
     errs = gate.check_evidence_dir(REPO / study, REPO)
-    return {"rows": rows, "class": "transfer (weak class only)",
+    walk = load("research/jv_walk_charge_20261111/analysis.json")
+    w512 = walk["by_M"]["512"]["pooled"]
+    walk_note = (f"The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in "
+                 f"research/jv_walk_charge_20261111 ({walk['verdict']}): pooled {w512['0']['point']:.4f} / "
+                 f"{w512['0.1']['point']:.4f} / {w512['1']['point']:.4f} at w = 0 / 0.1 / 1 with the walk, against "
+                 f"{w512['0']['uncharged_point']:.4f} / {w512['0.1']['uncharged_point']:.4f} / {w512['1']['uncharged_point']:.4f} without it. "
+                 "Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route.")
+    return {"rows": rows, "class": "transfer (weak class only)", "walk_note": walk_note,
             "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["jv_sieve_line_vs_rho"],
-            "validation": ("validated with caveats (weak class only; isogeny walk into the class not charged): "
+            "validation": ("validated with caveats (weak class only; the isogeny walk is charged in a separate study): "
                            "replay certificate, validator report and the matched negation-map rho reference "
                            f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
@@ -3007,7 +3014,7 @@ def markdown(doc: dict) -> str:
           "(never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per "
           "prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; "
           f"`{js['unit']}`. The band is layer A: every unemitted cover F_p operation is also priced as native, the "
-          "upper-bound convention. The isogeny walk into the class is not charged. Distance remaining is IC ÷ rho; "
+          f"upper-bound convention. {js['walk_note']} Distance remaining is IC ÷ rho; "
           "\"below\" means the 95% interval's upper end is under 1 at all three prices.", "",
           "| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |",
           "|:--|:--|:--|:--|:--|"]
@@ -4425,8 +4432,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>Curves over F<sub>p⁶</sub> with full rational 2-torsion whose class has a genus-3 cover over '
              'F<sub>p²</sub> (never prime order). Arms P, H and U, 8 instances per prime, against a negation-map rho '
              f'on the same instances in the same binary. Per-prime reference; {esc(js["unit"])}. Layer-A band: every '
-             'unemitted cover F<sub>p</sub> operation is also priced as native. The isogeny walk into the class is '
-             'not charged.</p><div class="scroll"><table><thead><tr><th>arm</th><th>scope</th>'
+             f'unemitted cover F<sub>p</sub> operation is also priced as native. {esc(js["walk_note"])}</p><div class="scroll"><table><thead><tr><th>arm</th><th>scope</th>'
              '<th>IC ÷ rho, U2 [95%]</th><th>layer-A band (w = 0 / 0.1 / 1)</th><th>below across band</th>'
              '</tr></thead><tbody>')
     for r in js["rows"]:
