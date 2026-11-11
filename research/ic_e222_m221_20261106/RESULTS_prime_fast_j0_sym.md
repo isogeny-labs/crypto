@@ -95,3 +95,8 @@ Median ms (steps) vs `rho_parallel` (negation, batched, same host):
 Reading: the naive folded walk does not realise the expected sqrt(3) (steps blow up beyond 26 bits: fruitless short cycles and the walk cap, the known folding problem, not handled);
 at 26 bits it ties `rho_parallel`. So no valid automorphism-aware matched rho exists in this repository's native engine yet; the matched reference stays `rho_parallel`
 (sym3 3x-23x behind it). An untuned folded rho is not evidence about a tuned one; building the tuned one (cycle detection, batched steps) is the open comparator task. No claim.
+
+## Experiment: where the symmetric multi-target setup cost goes (2026-11-11) — `[pcc:unverified]`
+Phase timing added to `examples/prime_fast_j0_multi.rs` (28 bit, B=159, 20 targets, 2 curves, all targets verified): setup 23-28 ms = orbit pair table 6-7 ms + relation collection 16-22 ms + Gauss-Jordan 0.5 ms; `ic_multi_solve_ex` setup (batched, bucketed) 31-35 ms. The setup is collection-dominated (about 400 unbatched scans of 3B candidates), not elimination.
+Tried: exact-x keys for all three rotations of each entry (`ROTKEYS=1`, no canonicalisation at probe): table build +30%, collection unchanged within noise; sym/base setup ratio 0.76 (canonical) vs 0.92 (rot keys), 24 runs each: no gain. A B sweep (100,159,230,330) was inconclusive: the same baseline config varied 25-45 ms setup between runs (host noise ~1.8x), so no setup-optimal B is claimed.
+Lever left: a lock-step batched per-scan collector for the symmetric arm (as `collect_setup_batched` does for the plain arm) needs a quiet host to measure; nothing measured here beats noise.
