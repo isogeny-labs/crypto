@@ -3087,12 +3087,14 @@ fn tensor_contraction_applicable(m: &ResolvedMethod, inst: &Instance) -> Result<
 /// The plan-time refusals of the pipeline's prime-only components added
 /// since 2026-10-28: the `wsum` and `wwalk` oracles and the `prime-interval`
 /// base run on single-word prime curves only, and their parameter
-/// refusals (`ic_boundary::{wwalk_plan_check, WSUM_MAX_B}`, the interval's
+/// refusals (`ic_boundary::{wwalk_plan_check_bits, WSUM_MAX_B}`, the interval's
 /// own `t`/`lo` rule) do not depend on the run.  What is known only once the
 /// base is built (its column count against `wwalk`'s two seeds, `wsum`'s
 /// table bound) is still refused by the run.
 fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result<(), String> {
-    use crate::cryptanalysis::ic_boundary::{wwalk_plan_check, WalkOpts, WSUM_MAX_B};
+    use crate::cryptanalysis::ic_boundary::{
+        wwalk_plan_check_bits, WalkOpts, TW_COEF_BITS, WSUM_MAX_B,
+    };
     use crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase;
     let (Some(fb_spec), Some(or_spec)) = (m.params.get("factor_base"), m.params.get("oracle"))
     else {
@@ -3145,13 +3147,16 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                 g_jumps: or.flag("g"),
                 grow,
             };
-            let (_, _, _, bound) = wwalk_plan_check(i.r, x, jumps, opts)?;
             let tw = match or.get("tw") {
                 None | Some("0" | "false" | "no") => 0u8,
                 Some("1" | "true" | "yes") => 1,
                 Some("2") => 2,
                 Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
             };
+            // The target walk packs coefficients in a u128 word (62 bits a
+            // seed); the plain walk table in 32 bits.
+            let coef_bits = if tw > 0 { TW_COEF_BITS } else { 32 };
+            wwalk_plan_check_bits(i.r, x, jumps, opts, coef_bits)?;
             let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
             if cj && tw == 0 {
                 return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
@@ -3165,11 +3170,6 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
             }
             if !cv && lazy {
                 return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
-            }
-            if !cv && tw == 2 && bound >= 1 << 31 {
-                return Err(format!(
-                    "wwalk: cv=0 with tw=2 needs coefficients below 2^31 (bound {bound})"
-                ));
             }
             if tw > 0 && (!opts.g_jumps || grow != 2) {
                 return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));

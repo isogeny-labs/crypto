@@ -42,7 +42,7 @@ function regularBytes(root, file, label) {
   return readFileSync(target);
 }
 
-function ensureCommit(cwd, revision) {
+export function ensureCommit(cwd, revision) {
   if (!/^[0-9a-f]{40,64}$/.test(revision ?? '')) throw new Error('expected an immutable Git revision');
   try {
     execFileSync('git', ['cat-file', '-e', `${revision}^{commit}`], { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -138,6 +138,17 @@ function selectField(frozen, manifestFormat) {
     && Object.prototype.hasOwnProperty.call(node, key) ? node[key] : undefined), frozen);
 }
 
+function sha256sumDigests(bytes) {
+  const digests = {};
+  for (const line of bytes.toString('utf8').split('\n')) {
+    if (!line.trim()) continue;
+    const match = /^([0-9a-f]{64}) [ *](.+)$/.exec(line);
+    if (!match || Object.prototype.hasOwnProperty.call(digests, match[2])) throw new Error('invalid sha256sum manifest line');
+    digests[match[2]] = match[1];
+  }
+  return digests;
+}
+
 // The pin custody shared by the main workflow and every --extra-workflow: the
 // manifest is byte-identical to its copy at the revision, and that revision's
 // workflow bytes hash to the pinned digest.
@@ -146,16 +157,19 @@ function pinnedWorkflow({ cwd, revision, workflow, manifest, manifestFormat }) {
     { cwd, maxBuffer: 16 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
   const manifestBytes = readFileSync(path.join(cwd, manifest));
   if (!manifestBytes.equals(fromGit(manifest))) throw new Error('original frozen manifest changed');
-  const frozen = JSON.parse(manifestBytes.toString('utf8'));
+  // `sha256sum` is a coreutils manifest (`<hex>  <root-relative path>` per
+  // line, as `sha256sum --check` reads it); every other format is JSON.
+  const frozen = manifestFormat === 'sha256sum' ? sha256sumDigests(manifestBytes)
+    : JSON.parse(manifestBytes.toString('utf8'));
   const field = manifestFormat.startsWith('key:') || manifestFormat.startsWith('pointer:');
-  if (!field && !['files-relative', 'sha256-root'].includes(manifestFormat)) {
+  if (!field && !['files-relative', 'sha256-root', 'sha256sum'].includes(manifestFormat)) {
     throw new Error('unsupported frozen manifest format');
   }
   // Both map layouts retain the original manifest and every original input digest.
   // Root-relative sha256 maps occur in the native-m3 archive; opting in changes
   // path interpretation only, never the bytes admitted by the historical gate.
   const digests = field ? { [workflow]: selectField(frozen, manifestFormat) }
-    : manifestFormat === 'sha256-root' ? frozen.sha256 : frozen.files;
+    : manifestFormat === 'sha256-root' ? frozen.sha256 : manifestFormat === 'sha256sum' ? frozen : frozen.files;
   if (!digests || typeof digests !== 'object' || Array.isArray(digests)) {
     throw new Error('invalid frozen input digest map');
   }
@@ -191,7 +205,7 @@ export function withFrozenWorkflow({ cwd = process.cwd(), workflow, revision, ma
   const extraPins = extras.map(extra => ({ ...extra, ...pinnedWorkflow({ cwd, revision, ...extra }) }));
   const liveWorkflowSha = sha(readFileSync(path.join(cwd, workflow)));
   const ownInputs = Object.entries(digests).map(([name, digest]) => {
-    const file = relative(manifestFormat === 'sha256-root' || name.startsWith('.github/')
+    const file = relative(['sha256-root', 'sha256sum'].includes(manifestFormat) || name.startsWith('.github/')
       ? name : path.posix.join(path.posix.dirname(manifest), name));
     if (!/^[0-9a-f]{64}$/.test(digest)) throw new Error(`invalid frozen digest: ${name}`);
     return { file, digest };
