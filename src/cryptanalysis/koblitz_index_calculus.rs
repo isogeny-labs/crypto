@@ -15231,6 +15231,121 @@ pub fn solve_factor_base_logs_from_relations(
     ))
 }
 
+/// Cumulative collection cost up to and including one relation of a
+/// [`RelationPool`].  `trials` is exact (the relation's own trial index
+/// plus one); the seconds and scanned summands are reported per batch by
+/// the collector and are pro-rated by trial within the batch.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize)]
+pub struct RelationPoolCost {
+    pub trials: u64,
+    pub collection_seconds_prorated: f64,
+    pub summands_scanned_prorated: f64,
+}
+
+/// One relation pool drawn by the exact collector, batches and probe
+/// sequence of [`solve_factor_base_logs`], continued past full column
+/// rank so that prefixes of it can be solved and compared.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct RelationPool {
+    pub columns: usize,
+    #[serde(skip)]
+    pub relations: Vec<CollectedRelation>,
+    /// One entry per relation, in pool order; nondecreasing in every field.
+    #[serde(skip)]
+    pub cumulative: Vec<RelationPoolCost>,
+    /// Prefix length at which the coefficient rank first equals `columns`.
+    pub full_rank_relations: Option<usize>,
+    /// Prefix length at which [`solve_factor_base_logs`] would make its
+    /// first solve attempt (the end of the batch where rank became full).
+    pub logs_first_attempt_relations: Option<usize>,
+    pub trials: usize,
+    pub collection_seconds: f64,
+    pub summands_scanned: u64,
+    /// Collector construction (pair table included), shared by every prefix.
+    pub setup_seconds: f64,
+    pub batch_trials: usize,
+}
+
+/// Collect one relation pool for a paired oversampling comparison: draw
+/// batches exactly as [`solve_factor_base_logs`] does, track coefficient
+/// rank, and stop after the batch in which the pool reaches
+/// `full_rank + ceil(surplus · columns)` relations (or the trial budget is
+/// spent).  No solve is attempted.
+/// `None` for a degenerate base or a subgroup wider than a word.
+pub fn collect_factor_base_log_pool(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    opts: &KoblitzIcOptions,
+    surplus: f64,
+) -> Option<RelationPool> {
+    if kc.subgroup_order.bits() > 64 || !surplus.is_finite() || surplus < 0.0 {
+        return None;
+    }
+    let setup = std::time::Instant::now();
+    let mut system = LogSystem::new(kc, fb, opts)?;
+    let collector = RelationCollector::new(kc, fb, opts)?;
+    let r_u64 = kc.subgroup_order.to_u64_digits().first().copied()?;
+    let mut pool = RelationPool {
+        columns: system.n_cols,
+        setup_seconds: setup.elapsed().as_secs_f64(),
+        batch_trials: opts.relation_batch_size.max(PRECOMPUTE_BATCH_TRIALS),
+        ..RelationPool::default()
+    };
+    let extra = (surplus * system.n_cols as f64).ceil() as usize;
+    let mut ranker = U64RankTracker::new(r_u64, system.n_cols);
+    let mut target = usize::MAX;
+    while pool.trials < opts.max_trials && pool.relations.len() < target {
+        let count = pool.batch_trials.min(opts.max_trials - pool.trials);
+        let start = pool.trials as u64;
+        let before = pool.relations.len();
+        let unit = RelationWorkUnit {
+            seed: opts.seed,
+            start,
+            count: count as u64,
+        };
+        let (relations, creport) = collector.collect(unit);
+        let unit_trials = creport.trials.max(1) as f64;
+        // Whole batches are kept, as `solve_factor_base_logs` keeps them,
+        // so the pool always reaches `logs_first_attempt_relations`.
+        for rel in relations {
+            system.push(&rel);
+            let row = system
+                .dense_matrix
+                .last()
+                .cloned()
+                .or_else(|| system.sparse_rows.last_dense(system.n_cols))?;
+            let rank = ranker.insert(
+                row.iter()
+                    .map(|coefficient| to_u64_mod(coefficient, r_u64))
+                    .collect(),
+            );
+            let share = (rel.trial + 1 - start) as f64 / unit_trials;
+            pool.cumulative.push(RelationPoolCost {
+                trials: rel.trial + 1,
+                collection_seconds_prorated: pool.collection_seconds
+                    + share * creport.elapsed_seconds,
+                summands_scanned_prorated: pool.summands_scanned as f64
+                    + share * creport.summands_scanned as f64,
+            });
+            pool.relations.push(rel);
+            if rank == system.n_cols && pool.full_rank_relations.is_none() {
+                pool.full_rank_relations = Some(pool.relations.len());
+                target = pool.relations.len() + extra;
+            }
+        }
+        pool.trials += creport.trials;
+        pool.collection_seconds += creport.elapsed_seconds;
+        pool.summands_scanned += creport.summands_scanned;
+        if pool.full_rank_relations.is_some() && pool.logs_first_attempt_relations.is_none() {
+            // `solve_factor_base_logs` attempts at the end of this batch,
+            // over every relation the batch produced (not only those kept
+            // here under `target`).
+            pool.logs_first_attempt_relations = Some(before + creport.relations);
+        }
+    }
+    Some(pool)
+}
+
 /// What an individual-logarithm descent did.
 #[derive(Clone, Debug, Serialize)]
 pub struct DescentRelation {
