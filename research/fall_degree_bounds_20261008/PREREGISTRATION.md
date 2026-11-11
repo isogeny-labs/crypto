@@ -1022,3 +1022,97 @@ the deadline is "not completed". Nothing is retried.
 - E14c: "no reading" 0.75.
 
 Nothing from any E14 part has been computed, and no E14 draw has been generated.
+
+## Amendment 20 (2026-11-11 UTC, before any draw below): E14 relaunch (r2) after the zero-balance termination
+
+**Why.**
+- The Amendment 19 pod (`oubpztzdbbbo4s`) was terminated by the provider at zero account balance
+  about 5 h after start (`e14/score.json`). It passed G0 and G1 and produced no draw. E14b's first
+  control, 6:10:3 draw 1, had run for more than 16,400 s at 64 threads without output, against 190 s
+  for the `hky_par` reference, and its `.err` stream was empty. E13's local timings put the `pe`
+  engine at roughly 20× the `hky_par` time at matched column counts (E_3-24-8: 1,830 s for 186k
+  columns at 4 threads against 90–124 s for `hky_par` at 213k columns). Dense elimination scales
+  about cubically in the column count, so the registered E14a design (`pe`, 975k columns at degree
+  5) had no realistic chance inside the USD 100 cap. This amendment keeps every reading rule and
+  changes the engine for E14a, the transport, the order, and adds a scaling gate.
+- AWS identity is unavailable in the authoring session (`aws` is not installed; the last check on
+  2026-11-11 returned `InvalidClientTokenId`), so the S3 presigned transport of Amendments 17–19
+  cannot be minted. The repository `isogeny-labs/crypto` is public, so the pod fetches the frozen
+  commit directly from GitHub.
+- The owner authorised the spend on 2026-11-11 ("a few hundred dollars of large-memory compute to
+  finish E14 and the three missing controls, once credentials are restored").
+
+**Admission (checked by `e14/launch_r2.sh`, recorded in `e14/pod-r2/launch.json`).**
+- RunPod account balance ≥ USD 100 + 24 h × (sum of `costPerHr` of every other running pod). At
+  authoring time the balance was USD 15.74 with another pod (`icb-k14d`, not this study's) running
+  at USD 5.29/h, so the launch is **not admitted** until the account is topped up.
+- No other pod whose name starts with `fd-e14` exists.
+- `.resume/RESUME.md` filled by the launching session (repository rule). The S3 push needs a
+  checkpoint token or AWS identity; absent both, the owner's waiver is recorded in the session log.
+- The in-pod script `e14/run_pod_r2.sh` is passed as `SCRIPT_B64`; its sha256 at launch is recorded
+  in `launch.json` and must equal the committed file's.
+
+**Route.** One RunPod CPU pod, Secure Cloud, flavor `cpu3g` (fallback `cpu5g`), 64 vCPU,
+`interruptible: false`, 150 GB container disk, `runpod/base:1.0.2-ubuntu2404`. Hard cap USD 100:
+deadline `min(36 h, floor(100 / costPerHr) h)` from start, read from the pod's own record with the
+key passed as `POD_CTL_KEY`; fallback 18 h if the cost cannot be read. The pod deletes itself at the
+end or at the deadline. No second pod without a new amendment.
+
+**Source.** Frozen commit `a2be660914e8e485eefd45f2958eb6d18344dadf` (main, 2026-11-07), as in
+Amendments 17–19, fetched by sparse partial clone from `https://github.com/isogeny-labs/crypto` over
+the E13 path list. Gates:
+- `G-src-a`: `git rev-parse HEAD` equals the commit.
+- `G-src-b`: sha256 of the path list fetched from the commit equals
+  `97b6bbde009ee1e04884041280b1c5dcd9030024d95b940f7e4a12bd9bd28ecd`.
+- `G-src-c`: `git ls-tree -r HEAD -- <paths> | sha256sum` equals
+  `da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff` (4,501 entries). This is the
+  tree identity; it does not depend on gzip. For the record, `git archive --format=tar <commit>
+  <paths> | gzip -n` hashed `e9d4924a4cde92cc469a3f663eae25d29d12c0bb56a0cf68dc97482f7d8dd170` on the
+  authoring host (32,129,557 bytes); Amendment 17's archive hash `18b14930…` was made with other gzip
+  settings and is not re-checked.
+
+**Outputs.** No S3. The pod serves `/workspace/out` over HTTP on port 8080 under a random path token
+(`OUT_TOKEN`, 32 hex chars, generated at launch) through RunPod's proxy; `e14/pull_r2.sh` pulls
+`out.tgz` every 10 minutes into `e14/pod-r2/pulls/` with its sha256, and the final pull into
+`e14/pod-r2/out/`. The pod refreshes `out.tgz` every 10 minutes and after every draw, keeps serving
+for 30 minutes after `final_status` is written, then deletes itself; the controller deletes it as
+soon as the final pull is verified.
+
+**Gates on the pod (all before any draw; any failure ends the run with that status).**
+- `G0`, `G1`: as Amendment 17 (unit tests; `pe` reproduces `S3.d0.b4.jsonl` on the 3-22-8 draw).
+- `G2` (new, `hky_par` identity): `hky_par newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4`
+  at 64 threads must reproduce `e10/run-r3-B/out/E_3-21-7.jsonl` on every non-timing field (`draw`,
+  `x_r`, `v_basis`, `solutions`, `d_f`, `d_f_at_least`, `per_degree`) for draws 0, 1, 3, 4.
+- `G3` (new, `pe` scaling pilot): the G1 command at 8, 16 and 64 threads, wall time recorded in
+  `g3.json`. `T_pe` = the fastest; `TH_pe` = its thread count, used for every `pe` run below.
+  If `T_pe > 1,800 s`, E14b is skipped with reading "not completed (G3: pe too slow)", because the
+  cubic extrapolation from 140k to 457k columns (×34) would exceed the cap per draw.
+
+**E14a: the exact `d_F` at (3, 21, 7), engine `hky_par`.** `hky_par newcells --cells 3:21:7 --seed
+20261012 --keep 4 --cmax 5`, 64 threads, default `HKY_CHUNK`. Per draw, in the engine's order
+(expected 0, 1, 3, 4): the degree-≤4 `per_degree` entries must equal the E10 record for that draw or
+the draw is **void**; then "`d_F = 5`" if `d_f = 5`, "`d_F ≥ 6`" if `d_f_at_least = 6`. Cell rule as
+Amendment 19: "`d_F = 5`" if ≥ 3 of 4 read 5; "`d_F ≥ 6`" if ≥ 3 read ≥ 6; "split" if ≥ 2 are
+measured; "not completed" otherwise. The engine processes all four draws in one invocation; its
+per-draw records are read as they appear. Time box: if no draw has finished 12 h after E14a starts,
+E14a is killed and reads "not completed".
+
+**E14b: the three unmeasured E13b controls, engine `pe`.** 6:10:3 draws 1, 3, 4 from
+`e9/run-r3/out/E_6-10-3.jsonl`, `dreg_linear_guess --engine pe --batch 64 --to 4 --max-cols 600000
+--draw D`, `TH_pe` threads, sequential, 6 h per draw (a draw past 6 h is killed and reads "not
+completed"). Readings exactly as Amendment 19, including the combined "independent agreement (E13b +
+E14b)" statement.
+
+**E14c: (4, 28, 7).** `e12/run_window.sh "$OUT/C" 4:28:7`, 24 threads, only after E14a and E14b, until
+the deadline. Reading as Amendment 19.
+
+**Order.** Gates; E14a; E14b; E14c. Nothing runs concurrently with E14a or E14b. A part cut off by
+the deadline is "not completed". Nothing is retried.
+
+**Prediction (recorded before any draw).**
+- E14a: "`d_F = 5`" 0.50, "`d_F ≥ 6`" 0.25, "split" 0.05, "not completed" 0.20.
+- E14b: "controls confirmed" 0.55, "not completed" 0.35, "control differs" 0.10.
+- E14c: "no reading" 0.80.
+- G2 passes (hky_par at `a2be6609` reproduces E10): 0.90.
+
+Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.
