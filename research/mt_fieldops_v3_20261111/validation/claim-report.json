@@ -2,7 +2,7 @@
  "schema": "validator.report/v1",
  "independent": true,
  "validator": "independent validator subagent (claude-opus-5-5), 2026-11-11; scripts/claim_check.py",
- "validated_commit": "b13f88dcda572a44bbced7553794d7cccf4745d2",
+ "validated_commit": "a094afb97435c0e62bb4ffd055556752297581bf",
  "scope": "this one statement exactly as worded; nothing else in the study",
  "raw_data": [
   {
@@ -15,7 +15,6 @@
    "note": "validator retention arm rho2xks (sensitivity runs, every target verified by the counted check)"
   }
  ],
- "statement_submitted": "On 44 fresh prime-order Weierstrass curves (2^22-2^33), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established.",
  "clause_checks": [
   {
    "clause": "44 fresh prime-order Weierstrass curves",
@@ -23,10 +22,9 @@
    "recomputed": "44 curves (idx 1..11 x 4 sizes); validity and freshness: validator-report.json A-F checks"
   },
   {
-   "clause": "(2^22-2^33)",
-   "ok": false,
-   "recomputed": "group orders n from 4193971 (2^21.99989) to 4295088293 (2^32.00004): about 2^22 to 2^32; no group near 2^33 was tested",
-   "required_fix": "write '(group orders about 2^22 to 2^32)' or '(22- to 32-bit primes p)'"
+   "clause": "(group orders about 2^22 to 2^32)",
+   "ok": true,
+   "recomputed": "group orders n from 4193971 (2^21.99989) to 4295088293 (2^32.00004)"
   },
   {
    "clause": "T = 1024/4096/16384, 22 paired configurations per cell",
@@ -126,7 +124,8 @@
    "rel_tol": 0.004235201736048005
   }
  ],
- "statement_accepted": "On 44 fresh prime-order Weierstrass curves (group orders about 2^22 to 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established.",
- "status": "needs_rewording",
- "verdict": "not endorsed as worded; the numbers recompute, the wording in clause_checks with ok = false must change; statement_accepted would be endorsed"
+ "statement_judged": "On 44 fresh prime-order Weierstrass curves (group orders about 2^22 to 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established.",
+ "statement_previous_submission": "On 44 fresh prime-order Weierstrass curves (2^22-2^33), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established.",
+ "status": "pass",
+ "verdict": "endorsed exactly as worded (statement_judged)"
 }

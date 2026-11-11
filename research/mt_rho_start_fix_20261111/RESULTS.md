@@ -40,8 +40,9 @@ IC4 / bsgs2 is unchanged (1.18-1.80; neither arm's code changed).
 ## Consequences (applied in the PR that lands this file)
 
 - Claim PCC-20261111-fa13c8 (v2) is superseded by the claim recorded with this correction.
-- `benchmarks/20261111-mt-fieldops-ic4/` (README, VALIDATION.json: `strongest_available` false) and its row in
-  `benchmarks/README.md` carry the corrected range and the retention result; the leaderboard's multi-target section
+- `benchmarks/20261111-mt-fieldops-ic4/` (README, VALIDATION.json: `strongest_available` false) carries the
+  corrected range and the retention result, and its row leaves `benchmarks/README.md` (the gate admits validated rows
+  only; the v3 and correction directories are not listed there either); the leaderboard's multi-target section
   moves to the v3 rows (`../mt_fieldops_v3_20261111/`), which carry the same caveat.
 - `rows.jsonl` and `merged.jsonl` are moved to the artifact store by the store bot when the PR opens
   (`results/runs.json` keeps the merged counters in Git).

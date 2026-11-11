@@ -2,7 +2,7 @@
  "schema": "validator.report/v1",
  "independent": true,
  "validator": "independent validator subagent (claude-opus-5-5), 2026-11-11; scripts/claim_check.py",
- "validated_commit": "b13f88dcda572a44bbced7553794d7cccf4745d2",
+ "validated_commit": "a094afb97435c0e62bb4ffd055556752297581bf",
  "scope": "this one statement exactly as worded; nothing else in the study",
  "raw_data": [
   {
@@ -15,7 +15,6 @@
    "note": "validator retention arm rho2xks (sensitivity runs, every target verified by the counted check)"
   }
  ],
- "statement_submitted": "With the rho-family restart defect of examples/mt_fieldops.rs fixed (all 1584 v2 rho jobs rerun, every target verified), the cheapest of four rho arms is 1.4-4.8% cheaper and multi-target IC4 costs 0.951-0.991x it per target at T = 16384 on the v2 curves (cheaper at every I/M and h against this harness's rho family); against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 and the v2 decisions are 0 cheaper, 6 unranked, 12 dearer. IC4 vs paired BSGS is unchanged (1.18-1.80x).",
  "clause_checks": [
   {
    "clause": "all 1584 v2 rho jobs rerun, every target verified",
@@ -33,10 +32,9 @@
    "recomputed": "0.9513-0.9908; T = 16384 (cell, cI) decisions {'cheaper': 6}"
   },
   {
-   "clause": "against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0",
-   "ok": false,
-   "recomputed": "T = 16384: 1.1206-1.1651; all six v2 cells: 1.1206-1.4819",
-   "required_fix": "the range holds only at T = 16384, but the clause carries no T and the next clause speaks of all v2 decisions; write '1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells)'"
+   "clause": "against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells)",
+   "ok": true,
+   "recomputed": "T = 16384: 1.1206-1.1651; all six v2 cells: 1.1206-1.4819"
   },
   {
    "clause": "the v2 decisions are 0 cheaper, 6 unranked, 12 dearer",
@@ -97,9 +95,22 @@
    "claimed": 1.8,
    "recomputed": 1.7970838924073282,
    "rel_tol": 0.002782285247184098
+  },
+  {
+   "name": "IC4/rhoKS h0 all cells min",
+   "claimed": 1.12,
+   "recomputed": 1.1206117723142508,
+   "rel_tol": 0.004461848540815144
+  },
+  {
+   "name": "IC4/rhoKS h0 all cells max",
+   "claimed": 1.48,
+   "recomputed": 1.4818637084396982,
+   "rel_tol": 0.003374129464811932
   }
  ],
- "statement_accepted": "With the rho-family restart defect of examples/mt_fieldops.rs fixed (all 1584 v2 rho jobs rerun, every target verified), the cheapest of four rho arms is 1.4-4.8% cheaper and multi-target IC4 costs 0.951-0.991x it per target at T = 16384 on the v2 curves (cheaper at every I/M and h against this harness's rho family); against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells) and the v2 decisions are 0 cheaper, 6 unranked, 12 dearer. IC4 vs paired BSGS is unchanged (1.18-1.80x).",
- "status": "needs_rewording",
- "verdict": "not endorsed as worded; the numbers recompute, the wording in clause_checks with ok = false must change; statement_accepted would be endorsed"
+ "statement_judged": "With the rho-family restart defect of examples/mt_fieldops.rs fixed (all 1584 v2 rho jobs rerun, every target verified), the cheapest of four rho arms is 1.4-4.8% cheaper and multi-target IC4 costs 0.951-0.991x it per target at T = 16384 on the v2 curves (cheaper at every I/M and h against this harness's rho family); against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells) and the v2 decisions are 0 cheaper, 6 unranked, 12 dearer. IC4 vs paired BSGS is unchanged (1.18-1.80x).",
+ "statement_previous_submission": "With the rho-family restart defect of examples/mt_fieldops.rs fixed (all 1584 v2 rho jobs rerun, every target verified), the cheapest of four rho arms is 1.4-4.8% cheaper and multi-target IC4 costs 0.951-0.991x it per target at T = 16384 on the v2 curves (cheaper at every I/M and h against this harness's rho family); against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 and the v2 decisions are 0 cheaper, 6 unranked, 12 dearer. IC4 vs paired BSGS is unchanged (1.18-1.80x).",
+ "status": "pass",
+ "verdict": "endorsed exactly as worded (statement_judged)"
 }
