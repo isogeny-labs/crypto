@@ -90,6 +90,17 @@ is sharp for `m ≥ 3` and measured `d_ff = 7 (m=3), 13 (m=4)` at
 at those sizes, which is the whole empirical basis of the "first fall
 degree assumption".
 
+*Sharpness at `m = 3`, 2026-11-11*
+(`research/first_fall_closure_20261111/kw_sharpness/`, `[pcc:unverified]`):
+in the top-form convention `d_ff ∈ {6, 7}`, and `d_ff = 7` iff
+`dim_{F_2} span{e_p e_q e_r} = dim V` with `e_{ab} = ν_a ν_b (ν_a + ν_b)`
+(Theorem A there, proved given KW Lemma 3.1). Hence `d_ff = 6`, not 7,
+whenever `n > ρ(n')` (`ρ(3..7) = 10, 49, 170, 475, 1141`) or `V` lies in a
+proper subfield; so the bound is not attained for every `n' ≥ m`. In KW's
+regime `n' ≈ n/3` the value 7 was measured on all 1,276 independent
+instances (every KW `m = 3` cell reproduced) but the generic rank condition
+is unproved; the note names the obstruction.
+
 ### 2.2 First fall degree — lower bounds
 
 Nothing beyond the trivial `d_ff ≥ 2` is proved for `m ≥ 3`. For `m = 2`
