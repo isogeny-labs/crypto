@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - "research/chained_jacobian_transfers_20261110/ct22_mod4_gluing.rs"
+      - "research/chained_jacobian_transfers_20261110/ct22_actual_e4.py"
       - ".github/workflows/ct22-mod4-torsion.yml"
   workflow_dispatch:
 jobs:
@@ -18,3 +19,7 @@ jobs:
             research/chained_jacobian_transfers_20261110/ct22_mod4_gluing.rs \
             -o /tmp/ct22_mod4_gluing
           /tmp/ct22_mod4_gluing --nocapture
+      - name: Replay actual degree-seven elliptic 4-torsion and product lifts
+        run: |
+          python3 -S research/chained_jacobian_transfers_20261110/ct22_actual_e4.py
+          python3 -m py_compile research/chained_jacobian_transfers_20261110/ct22_actual_e4.py
