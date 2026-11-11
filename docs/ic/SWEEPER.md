@@ -137,19 +137,22 @@ baselines ─► per trial:  ask (TPE) ─► rung 1 ─► rung 2 ─► … �
 
 ## Tracks
 
-Owner rulings: on 2026-10-24, an index-calculus pipeline counts only when its
-relations come from solving summation-polynomial systems over an
-algebraically defined factor base, without table collisions. On 2026-10-29
-this was refined by `AGENTS.md`, "Tracks of index calculus"
-(`research/prime_ic_program_20261029/DECISIONS.md` R1). There are now two
-counted tracks, algebraic and generic decomposition, each with its own
-baseline. They may be ranked against each other on the same instances in the
-same unit, and a gain in one never ratchets the other.
+Owner rulings:
 
-| track (2026-10-29) | spaces | counted? |
+- **2026-10-24:** an index-calculus pipeline counts only when its relations
+  come from solving summation-polynomial systems over an algebraically
+  defined factor base, without table collisions.
+- **2026-10-29:** that rule was widened to two counted tracks
+  (`research/prime_ic_program_20261029/DECISIONS.md` R1).
+- **2026-11-10:** the 2026-10-24 rule was restored
+  ([`research/ic_track_ruling_20261110/DECISIONS.md`](../../research/ic_track_ruling_20261110/DECISIONS.md);
+  `AGENTS.md`, "Tracks of index calculus"). **Only the algebraic track
+  counts.**
+
+| track (2026-11-10) | spaces | counted? |
 |:--|:--|:--|
-| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`), `prime-algebraic` (`pkm-semaev` F4, baseline the naive interval; see below) | yes, within a scope; the headline track |
-| `generic` | `koblitz-table`, `prime-table`, `prime-rootfind` (`rootfind-subtract`) | yes, as generic decomposition on its own track; a gain here is never ratcheted into the algebraic track |
+| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`), `prime-algebraic` (`pkm-semaev` F4, baseline the naive interval; see below) | yes: the only index-calculus track |
+| `generic` (reference) | `koblitz-table`, `prime-table`, `prime-rootfind` (`rootfind-subtract`) | no: a labelled reference, like rho; never ratcheted, never an incumbent |
 
 The `rootfind-*` oracles are generic. At m = 2, `rootfind-subtract` computes
 x(R ∓ F_i) for every base point and probes the base's hash index. It never
@@ -158,9 +161,9 @@ forms S₃, and it runs identically on a random base
 
 **Code not yet relabelled.** `src/bin/ic/sweep/space.rs` still tags these
 spaces `Track::Table` and `Track::Unclassified` and keeps them unranked
-against the algebraic track. Until a build session adds `Track::Generic` and
-retires `Track::Unclassified`, read the sweeper's `table` and `unclassified`
-output as the generic track.
+against the algebraic track. Since 2026-11-10, read the
+sweeper's `table` and `unclassified` output as references, not as a counted
+track.
 
 ## The prime algebraic space: auxiliary-curve factor bases
 

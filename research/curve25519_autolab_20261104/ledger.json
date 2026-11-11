@@ -1698,7 +1698,8 @@
     "Algebraic track k = 20: the PKM isogeny tower with the J-selected seed 1093 (T4/T5), the cheapest algebraic arm in every measured cell; band s1093 < seed 0 at every weight, paired interval includes 1.",
     "Exposures list every ecbench target_seed used on this family so far (baseline, ratchet round 1, m = 3, algebraic ecbench, isogeny seed T5, frame and torsion leads), so a round never reuses a target seed.",
     "Round 9 (k = 32) was stopped by the operator after 10 train records because its panel held rootfind-pairs:m=3 at N = 179; the round is censored, not assessed, and its target seeds count as exposed.",
-    "2026-11-04: Re-baseline PCC-20261104-d91a51: generic incumbents at k = 24, 28, 32 moved to their seed=run arms (fresh wwalk table per run); see rebaseline-seedrun/README.md"
+    "2026-11-04: Re-baseline PCC-20261104-d91a51: generic incumbents at k = 24, 28, 32 moved to their seed=run arms (fresh wwalk table per run); see rebaseline-seedrun/README.md",
+    "2026-11-10: owner ruling research/ic_track_ruling_20261110/DECISIONS.md: only algebraic index calculus counts. The generic track is retired (history only); ic_autolab refuses it. Algebraic track seeded at k = 24 from research/curve25519_algebraic_ecbench_scale_20261105 (bridge arm pkm-iso-t6-g4, chunks c0, c1)."
   ],
   "rounds": [
     {
@@ -2169,6 +2170,34 @@
           26.448,
           1073000.0,
           10730000.0
+        ],
+        "since_round": 0
+      },
+      "24": {
+        "arm": {
+          "factor_base": "prime-isogeny:t=6",
+          "family": "pkm-iso-g4",
+          "n": 6,
+          "name": "pkm-iso-t6-g4",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+        },
+        "evidence": {
+          "study": "research/curve25519_algebraic_ecbench_scale_20261105 (scale-up S2, bridge arm)",
+          "chunks": "k24 c0, c1 (2 of 2 finished; one target each)",
+          "source": "analysis/perchunk.tsv (per-chunk S at w = 0, 0.1, 1); rho_s is rho-neg on the same two chunks",
+          "seeded_by": "owner ruling 2026-11-10, research/ic_track_ruling_20261110/DECISIONS.md R3",
+          "validation_gate": "none (development evidence)",
+          "note": "two targets: a seed for the ratchet, not a measurement of the arm; local L0 run on a shared box [pcc:unverified]"
+        },
+        "rho_s": [
+          0.9649758951210015,
+          1.049148032233882,
+          1.8066972662498035
+        ],
+        "s": [
+          51.57183339309467,
+          3157164.298168173,
+          31571178.835181184
         ],
         "since_round": 0
       }

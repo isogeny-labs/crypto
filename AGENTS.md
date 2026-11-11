@@ -297,35 +297,59 @@ descriptive investigations report their own technical outcomes and next steps.
   work uses the matched reference for that component. A claim to beat rho uses
   the complete accounting, growing-size checks, and independent replay for
   that comparison.
+- **Only algebraic arms count** (owner, 2026-11-10). The baseline and the
+  ratchet are algebraic index calculus; generic decomposition is a reference.
+  See "Tracks of index calculus".
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
 ## Tracks of index calculus
 
-Owner's rule, 2026-10-29 (`research/prime_ic_program_20261029/DECISIONS.md`
-R1, Option C as amended for D2). It refines the 2026-10-24 criterion
-(`docs/ic/SWEEPER.md`, "Tracks").
+Owner's rule, 2026-11-10
+([`research/ic_track_ruling_20261110/DECISIONS.md`](research/ic_track_ruling_20261110/DECISIONS.md)).
+It replaces the two-track rule of 2026-10-29
+(`research/prime_ic_program_20261029/DECISIONS.md` R1, Option C).
 
-Index-calculus pipelines are reported in two tracks. Each track has its own
-baseline and its own ratchet under the success criterion above.
+**Only algebraic index calculus counts.** An arm is index calculus when its
+relations come from a solver applied to a system that contains both the
+summation polynomial and the factor-base constraint. Examples:
 
-- **Algebraic.** Relations come from a solver applied to a system that
-  contains both the summation polynomial and the factor-base constraint, for
-  example ⟨S_{m+1}, F_V⟩ handed to msolve or F4, Weil descent over a subspace
-  base, or a PKM tower system. This is the headline track.
-- **Generic decomposition.** Relations come from enumerating the base,
-  computing group sums or differences, and testing them against the base or a
-  table of precomputed sums: `subtract`, `rootfind-*`, `mitm`, pair tables,
-  and large primes on a pair table. Such an oracle runs identically on a
-  random base. Label this track "generic decomposition" and document the
-  applicable generic-group bounds with their assumptions in its method
-  description. Improvements in this track count against its own baseline.
+- ⟨S_{m+1}, F_V⟩ handed to msolve or F4;
+- Weil descent over a subspace base;
+- a PKM tower system.
 
-Arms of the two tracks may be ranked against each other on the same
-instances, in the same unit and across the §5a band. A gain in one track
-never ratchets the other track's baseline. Include matched rho in tables whose
-protocol calls for that comparison. Per-oracle classification:
-`research/prime_ic_program_20261029/ruling/classification.json`, column C.
+Only such arms hold a baseline, ratchet, or appear on a leaderboard as index
+calculus.
+
+**Generic decomposition is a reference, not index calculus.** This covers
+`subtract`, `rootfind-*`, `mitm`, pair, k-sum and coefficient-box tables,
+`wsum`, `wwalk`, target-in-walk and other BSGS-boundary methods, and large
+primes on a pair table. Such an oracle runs identically on a random base.
+These arms may appear in a table only as labelled references, like rho. They
+never ratchet and never become an incumbent. Their committed results stay as
+evidence.
+
+**Admission is mechanical.**
+
+- `ic_autolab` refuses the retired `generic` track and any arm whose oracle
+  is not on its algebraic list (`ALGEBRAIC_ORACLES` in `src/bin/ic_autolab.rs`).
+- A new oracle joins that list only after the random-base test of the
+  ruling, recorded as a dated amendment to the ruling.
+- An exhaustive or root-finding engine of an algebraic oracle does not count.
+
+**Distance to rho is not the objective.** Judge an algebraic arm against the
+algebraic incumbent at its size. Report the distance to matched rho as the
+scope of the comparison, and report beside it:
+
+- the growth exponent of total cost in r, with rho's;
+- relations per decomposition attempt;
+- solver work per call, with a paired stage comparison;
+- the share of calls that hit the solver budget;
+- the largest solving degree;
+- the share of cost per phase.
+
+A stage improvement is reported as one, and ratchets only once it moves
+end-to-end `S`.
 
 ## Pointers
 

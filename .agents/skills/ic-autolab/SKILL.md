@@ -25,13 +25,14 @@ the Curve25519 miniatures is
 trials and exposures; `families.json`: the candidate families; one
 `round-NNN/` per round). It is the autolab contract (propose, portfolio,
 development screen, selection, fresh confirmation, scoreboard) on ecbench,
-under the success criterion and the two tracks of AGENTS.md:
+under the success criterion and the algebraic-only rule of AGENTS.md
+("Tracks of index calculus", owner 2026-11-10):
 
 ```sh
 cargo build --release --bin ecbench --bin ic_autolab
 H=research/curve25519_autolab_20261104
 ./target/release/ic_autolab --home $H status
-./target/release/ic_autolab --home $H propose --round N --track generic --sizes 20,24 --out /tmp/panel.json
+./target/release/ic_autolab --home $H propose --round N --track algebraic --sizes 20,24 --out /tmp/panel.json
 ./target/release/ic_autolab --home $H freeze  --round N --panel /tmp/panel.json --ecbench target/release/ecbench
 ./target/release/ic_autolab --home $H card    --round N --stage train      # relay route (lint, relay, assess)
 ./target/release/ic_autolab --home $H run     --round N --stage train      # explicitly requested local route only
@@ -40,6 +41,18 @@ H=research/curve25519_autolab_20261104
 ./target/release/ic_autolab --home $H assess  --round N && ./target/release/ic_autolab --home $H ratchet --round N
 ./target/release/ic_autolab --home $H report  --round N && $H/scripts/render_pdf.sh $H/round-$(printf %03d N)
 ```
+
+**Algebraic only (owner, 2026-11-10).** The tool refuses the retired `generic`
+track and any arm whose oracle is not algebraic (`ALGEBRAIC_ORACLES`:
+`pkm-semaev` F4, `descent-algebraic`, `pdp3-koblitz` inherited-f4/f6-ic,
+`gaudry-x-bin`). Do not add generic families, walk tables or BSGS-boundary arms
+to an autolab; they are references, not index calculus. A new oracle needs the
+random-base test of `research/ic_track_ruling_20261110/DECISIONS.md` first.
+`assess` reports, beside the class, the algebraic measures (yield per attempt,
+solver work per call with a paired stage interval, budget-exceeded rate,
+solving degree, phase shares). `status` reports the growth exponent of total
+cost against rho's. Optimise those; the distance to rho is the scope, not the
+objective.
 
 Rules the tool enforces: a round is frozen once (protocol, specs, manifest
 with sha256, fresh target seeds disjoint from every exposure); the train

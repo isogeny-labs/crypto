@@ -1,5 +1,14 @@
 # Curve25519-family index calculus: the autolab improvement loop
 
+> **Owner ruling, 2026-11-10: only algebraic index calculus counts**
+> ([`research/ic_track_ruling_20261110/DECISIONS.md`](../ic_track_ruling_20261110/DECISIONS.md)).
+> The `generic` track below is **retired**. Its rounds 1–37 and incumbents are
+> history: they are generic decomposition and BSGS-boundary arms, references
+> and not index calculus. `ic_autolab` now refuses the generic track and any
+> non-algebraic arm, and defaults to `--track algebraic`. The algebraic track is
+> seeded at k = 20 and k = 24. k = 28 and k = 32 wait on the blockers of the
+> ruling's queue (Q2, Q3).
+
 **Class:** an automated optimisation loop (the owner's success criterion made
 mechanical), with its ledger of incumbents and its rounds. Not itself a result;
 each round's `README.md` and `RESULT.json` carry that round's result, and the
