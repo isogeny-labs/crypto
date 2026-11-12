@@ -3856,6 +3856,9 @@ fn f4_with_arithmetic(
                 })
             })
         } else {
+            // Products an entry below `p` can take without reaching `2⁶⁴`
+            // (`p < 2³²`, so `(p - 1)²` fits a `u64`).
+            let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
             let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                 if deadline.is_some_and(|d| Instant::now() > d) {
                     return None;
@@ -3867,6 +3870,38 @@ fn f4_with_arithmetic(
                 // One count a pair row, on the thread that reduced it: the same
                 // totals as one a reducer (assessment 2026-11-10, R3).
                 let mut row_ops = 0usize;
+                if lazy_limit >= 64 {
+                    // Unreduced accumulation: a product is below
+                    // `(p - 1)²`, so `lazy_limit` of them on an entry below
+                    // `p` stay below `2⁶⁴`; the entry at a reducer's column
+                    // is read through one reduction and the row is
+                    // reduced when read out, so every value is the
+                    // remainder the reducing form gave.
+                    let mut pending = 0usize;
+                    for c in r[0].0 as usize..n_cols {
+                        if reducer_at[c] == NONE || acc[c] == 0 {
+                            continue;
+                        }
+                        let f = fp.reduce(acc[c]);
+                        if f == 0 {
+                            continue;
+                        }
+                        acc[c] = 0;
+                        let neg = p - f;
+                        let reducer = &reducers[reducer_at[c] as usize][1..];
+                        for &(cc, v) in reducer {
+                            acc[cc as usize] += neg * v;
+                        }
+                        row_ops += reducer.len();
+                        pending += 1;
+                        if pending == lazy_limit {
+                            normalize_lazy(&mut acc, fp);
+                            pending = 0;
+                        }
+                    }
+                    count_ops(row_ops);
+                    return Some(free_cols.iter().map(|&c| fp.reduce(acc[c])).collect());
+                }
                 for c in r[0].0 as usize..n_cols {
                     let f = acc[c];
                     if f == 0 || reducer_at[c] == NONE {
