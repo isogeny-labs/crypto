@@ -1,0 +1,112 @@
+{
+ "k": 8,
+ "D": 5,
+ "p": 43,
+ "split": false,
+ "gens": "all",
+ "columns": 6885,
+ "generator_rows": 697,
+ "rank": 6885,
+ "profile": [
+  1,
+  17,
+  137,
+  697,
+  2517,
+  6885
+ ],
+ "part_ranks": [
+  6885
+ ],
+ "contains_one": true,
+ "closure_complete": true,
+ "closed": true,
+ "rounds": 14,
+ "seconds": 64.9,
+ "madds": 46778880809,
+ "madds_detail": {
+  "reduce": 28590601260,
+  "reduce_dense": 237566923264,
+  "update": 14662776306,
+  "rref": 3525503243
+ },
+ "madds_dense": 255755202813,
+ "madds_closure_phase": 46778880809,
+ "seconds_detail": {
+  "reduce": 15.31,
+  "update": 25.09,
+  "rref": 19.76
+ },
+ "peak_entries": [
+  11849546
+ ],
+ "peak_phys_entries": [
+  12591346
+ ],
+ "compactions": [
+  49
+ ],
+ "rref_ok": true,
+ "sweep_random": {
+  "t": 6,
+  "seed": 1,
+  "nonzero_residuals": 0,
+  "passed": true,
+  "maps": 16
+ },
+ "sweep_full": {
+  "complete": true,
+  "rows_checked": 2517,
+  "nonzero_residuals": 0,
+  "passed": true,
+  "sweeps_run": 1
+ },
+ "repairs": 0,
+ "repair_rows": 0,
+ "resumes": 0,
+ "device": "cpu",
+ "threads": 1,
+ "blas_threads_env": null,
+ "maxrss_mb": 413,
+ "engine_sha256": "e4f15a088f92305f7d15dfc1b4e787c1ecc0233520a8e053e88ccbd804e99bab",
+ "engine_version": "ic_bounds_big/2",
+ "work_gb": 1.5,
+ "tile_mb": 256.0,
+ "tile_rows": [
+  6885
+ ],
+ "batch": 512,
+ "compact_frac": 0.05,
+ "t_random": 6,
+ "sweep_chunk": 256,
+ "stop_on_one": false,
+ "no_repair": false,
+ "compress": false,
+ "spill": {
+  "spills": 0,
+  "fetches": 0,
+  "d2h_bytes": 0,
+  "h2d_bytes": 0,
+  "d2h_s": 0.0,
+  "h2d_s": 0.0,
+  "switches": 0,
+  "tile_budget_bytes": null,
+  "dev_limit_bytes": null,
+  "host_tile_bytes": 0
+ },
+ "dev_used_mb": 0,
+ "dev_total_mb": 0,
+ "dev_peak_live_mb": null,
+ "status": "done",
+ "inputs": [
+  "g"
+ ],
+ "input_weights": [
+  2
+ ],
+ "a": 42,
+ "b": 30,
+ "t": 36,
+ "law": 5,
+ "one_in_V": true
+}

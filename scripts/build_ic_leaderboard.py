@@ -151,7 +151,7 @@ SOURCES = {
     "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
-    "mt_fieldops_component": "research/mt_fieldops_v4_20261112/results/holdout/summary.json",
+    "mt_fieldops_component": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
@@ -493,7 +493,8 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 
 # These engineering components also carry validation gates outside tables A-C.
 COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
-                           "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4")
+                           "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
+                           "benchmarks/20261112-mt-fieldops-v5")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -889,6 +890,59 @@ def prime_base_size_component() -> dict:
                            f"reference with the §5a band are filed in `{study}/VALIDATION.json`. The promoted "
                            "result is the 20-bit `N=45` engineering baseline only; it is one curve, counted "
                            "pricing-band evidence, and not a scaling or wall-time claim.") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def prime_ksum_component() -> dict:
+    """Pooled k-sum decomposition tables against the tuned mitm incumbent on 16 fresh prime-field
+    holdout curves, research/prime_ksum_pooled_20261029 (frozen protocol, selection hashed before the
+    holdout): per size the holdout mean S (mean over the size's 4 curves of the per-curve mean in the
+    study's `ecbench band` table, band.json) and, at w = 0, 0.1 and 1, the paired ratios of totals
+    ksum5-sel / inc-sel, ksum4-sel / inc-sel, ksum5-sel / rho-neg and ksum4-sel / rho-neg with ci95 and
+    pairs, copied from the study's saved `ecbench compare --weight` outputs. Generic decomposition
+    track: bounded by sqrt(r), it cannot beat rho; rho stays ahead (distance remaining). The saved
+    comparisons are the study's pre-2026-11-08 pricing reading (table_insert_attempts not priced).
+    Its standing comes from the study's VALIDATION.json."""
+    study = "research/prime_ksum_pooled_20261029"
+    per = {}
+    for r in load(f"{study}/analysis/band.json")["rows"]:
+        per.setdefault((int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"]), []).append(r["mean_s"])
+    rows = []
+    for bits in (20, 24, 28, 32):
+        means = {}
+        for arm in ("inc-sel", "ksum4-sel", "ksum5-sel", "rho-neg"):
+            ms = per[(bits, arm)]
+            if len(ms) != 4:
+                raise SystemExit(f"{study}: band.json has {len(ms)} curves for P{bits} {arm}, expected 4")
+            means[arm] = [sum(m[i] for m in ms) / len(ms) for i in range(3)]
+        cmps = {}
+        for name, key in (("ksum5_over_inc", "inc-sel__ksum5-sel"), ("ksum4_over_inc", "inc-sel__ksum4-sel"),
+                          ("ksum5_over_rho", "rho-neg__ksum5-sel"), ("ksum4_over_rho", "rho-neg__ksum4-sel")):
+            acc = []
+            for w in ("0", "0.1", "1"):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+            cmps[name] = acc
+        rows.append({"bits": bits, "mean_s": means, **cmps})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/report.pdf",
+            "readme": study + "/README.md",
+            "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
+            "unit": ("S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in "
+                     "the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not "
+                     "charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 "
+                     "distance to rho grows to 6.30x-8.52x"),
+            "validation": ("Validated with caveats: replay certificate (count-identical replay of all 8 sessions, "
+                           "9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean "
+                           "archive of 6edb2cb36d), validator report (independent recompute) and the matched rho "
+                           f"reference with the §5a band are filed in `{study}/VALIDATION.json`. Scope: the counted "
+                           "unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording "
+                           "host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the "
+                           "validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records "
+                           "give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.")
+            if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -1772,18 +1826,18 @@ def pkm_symmetric_component() -> dict:
             "class": "solver-stage diagnostic", "validation": NOT_VALIDATED}
 
 
-MT_FIELDOPS_EVIDENCE = "benchmarks/20261112-mt-fieldops-v4"
+MT_FIELDOPS_EVIDENCE = "benchmarks/20261112-mt-fieldops-v5"
 
 
 def mt_fieldops_component() -> dict:
-    """Multi-target IC (icbest = cheaper of ic5 and ic5 with retention per configuration and price) against the
-    cheapest standard multi-target rho of the same counted field layer (rhobest = best of 15 runs of Kuhn-Struik
-    retention rho rho2xks and distinguished-point rho rhodp) and a paired BSGS, from research/mt_fieldops_v4_20261112
-    (33 fresh prime-order curves at 24-32 bits, 3960 runs). Supersedes the v3 IC5 rows, whose rho reference lacked
-    retention (research/mt_fieldops_v3_20261111), and the v2 IC4 rows (research/mt_rho_start_fix_20261111).
-    Medians and bootstrap intervals are copied from summary.json (analyze.py); I/M = 10, h in {0, 0.1, 1}.
-    A multi-target regime outside tables A-C; its standing comes from the benchmarks directory's
-    VALIDATION.json."""
+    """Multi-target IC (icbest = cheapest of ic5, ic5ks, ic5w, ic5rw per configuration and price) against the
+    cheapest multi-target rho of the same counted field layer (rhobest = best of 10 runs of Kuhn-Struik retention
+    rho rho2xks and distinguished-point rho rhodpu) and a paired BSGS, with every arm's native work (step-index
+    hashes, canonicalisations, offset-step indices) counted and priced at h as section 5a requires, from
+    research/mt_fieldops_v5_20261112 (33 fresh prime-order curves at 24-32 bits, 3366 runs). Supersedes v4
+    (research/mt_fieldops_v4_20261112), v3 and v2. Medians and bootstrap intervals are copied from summary.json
+    (analyze.py); I/M = 10, h in {0, 0.1, 1}. A multi-target regime outside tables A-C; its standing comes from the
+    benchmarks directory's VALIDATION.json."""
     summary = load(SOURCES["mt_fieldops_component"])
     errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
     cells = sorted({(x["bits"], x["T"]) for x in summary})
@@ -1798,8 +1852,9 @@ def mt_fieldops_component() -> dict:
                    else "dearer" if all(v["ci95"][0] > 1 for v in band.values()) else "unranked")
         rows.append({"bits": bits, "T": t, "rho": band, "bsgs": {str(h): q("bsgs2", h) for h in (0, 1)},
                      "verdict": verdict})
-    return {"rows": rows, "study": "research/mt_fieldops_v4_20261112/",
-            "report": "research/mt_fieldops_v4_20261112/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+    return {"rows": rows, "study": "research/mt_fieldops_v5_20261112/",
+            "report": "research/mt_fieldops_v5_20261112/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+            "v4": "research/mt_fieldops_v4_20261112/",
             "previous": "research/mt_fieldops_v3_20261111/",
             "correction": "research/mt_rho_start_fix_20261111/",
             "class": "multi-target method",
@@ -2648,6 +2703,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "prime_ksum_component": prime_ksum_component(),
         "packed_filter_component": packed_filter_component(),
         "lazy_members_component": lazy_members_component(),
         "generator_orbit_component": generator_orbit_component(),
@@ -3429,6 +3485,32 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    L += ["## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)", "",
+          f"Track: {pk['track']}. Registered protocol; the incumbent and both k-sum families were tuned on separate "
+          "train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every "
+          "arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table "
+          f"incumbent. {pk['unit']}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.", "",
+          "| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |",
+          "|--:|:--|:--|:--|:--|--:|"]
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        L.append(f"| {r['bits']} | {m['inc-sel'][0]:.2f} / {m['ksum5-sel'][0]:.2f} / {m['rho-neg'][0]:.2f} | "
+                 f"{pk_q(r['ksum5_over_inc'])} | {pk_q(r['ksum4_over_inc'])} | {pk_g(r['ksum5_over_rho'])} | "
+                 f"{r['ksum5_over_inc'][0]['pairs']} |")
+    L += ["", "The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that "
+          "index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on "
+          "16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its "
+          "limit is BSGS, and it stays above BSGS at every size.", "",
+          f"[Report]({'../../' + pk['report']}) · [README](../../{pk['readme']}) · [study](../../{pk['study']}).", "",
+          pk["validation"], ""]
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -3669,24 +3751,24 @@ def markdown(doc: dict) -> str:
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     mt = doc["mt_fieldops_component"]
-    L += ["## Multi-target IC against standard multi-target rho (no ranking established), outside tables A–C", "",
+    L += ["## Multi-target IC against multi-target rho: the order flips with the hash price, outside tables A–C", "",
           "Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired "
           "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
-          "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. The IC is the cheaper of ic5 (an "
-          "x-only table of 4-term factor-base sums, paired trials x(Q ± W) with one shared inversion) and ic5 with "
-          "retention of solved trials; the reference is the cheapest standard multi-target rho: Kuhn-Struik retention rho "
-          "(x-only sibling walks) or distinguished-point rho with retention and precomputation, 15 runs per configuration. "
-          "IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The decision "
-          "column is the frozen rule, which prices h on hash-table operations only: with rho's per-step "
-          "canonicalisations priced at h as §5a requires, every decision is unranked (IC 0.89-0.94x rho at h = 1), so "
-          f"no ranking against rho is established. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
-          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | frozen rule | IC/BSGS h=0 | h=1 |",
+          "1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point "
+          "canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four "
+          "ic5 variants (4-term x-only table, paired trials with one shared inversion; with or without retention and "
+          "random-walk offsets); the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, "
+          "10 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance "
+          "remaining. The IC is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a "
+          f"decision is unranked. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
+          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |",
           "|--:|--:|--:|--:|--:|:--|--:|--:|"]
     for r in mt["rows"]:
         f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
         L.append(f"| {r['bits']} | {r['T']} | {f(r['rho']['0'])} | {f(r['rho']['0.1'])} | {f(r['rho']['1'])} | "
                  f"{r['verdict']} | {r['bsgs']['0']['median']:.2f} | {r['bsgs']['1']['median']:.2f} |")
     L += ["", f"Study: [{mt['study']}](../../{mt['study']}); [report](../../{mt['report']}); source `{mt['source']}`. "
+          f"v4, without native work priced: [{mt['v4']}](../../{mt['v4']}). "
           f"Earlier rows were measured against a rho without retention: IC5 (v3, [{mt['previous']}](../../{mt['previous']}); "
           f"its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [{mt['correction']}](../../{mt['correction']})).", ""]
     pk = doc["pkm_symmetric_component"]
@@ -4783,6 +4865,37 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    P.append('<section class="card" id="prime-ksum"><h2>Prime-field k-sum tables against the tuned incumbent '
+             '(2026-10-30) <span class="chip">engineering</span></h2>'
+             f'<p>Track: {esc(pk["track"])}. Registered protocol; the incumbent and both k-sum families were tuned '
+             'on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets '
+             '× 2 rounds, every arm in one session per size). <code>ksum5-sel</code> is the k = 5 sum table, '
+             '<code>inc-sel</code> the tuned pair-table incumbent. '
+             f'{esc(pk["unit"])}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>S holdout mean: inc-sel / ksum5-sel / '
+             'rho-neg (w = 0)</th><th>ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1)</th><th>ksum4-sel ÷ inc-sel</th>'
+             '<th>ksum5-sel ÷ rho-neg: distance remaining</th><th class="n">Pairs</th></tr></thead><tbody>')
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{m["inc-sel"][0]:.2f} / {m["ksum5-sel"][0]:.2f} / '
+                 f'{m["rho-neg"][0]:.2f}</td><td>{pk_q(r["ksum5_over_inc"])}</td><td>{pk_q(r["ksum4_over_inc"])}</td>'
+                 f'<td>{pk_g(r["ksum5_over_rho"])}</td><td class="n">{r["ksum5_over_inc"][0]["pairs"]}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that '
+             'index-calculus baseline. Rho stays ahead at every size and weight (<code>rho-neg</code> &lt; '
+             '<code>ksum5-sel</code> &lt; <code>inc-sel</code> on 16 of 16 curves); the ÷ rho column is the distance '
+             'remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every '
+             'size.</p>'
+             f'<p>{gh(pk["report"], "Report")} · {gh(pk["readme"], "README")} · {gh(pk["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pk["validation"])}</p></section>')
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -5044,24 +5157,24 @@ def page(doc: dict, standalone: bool) -> str:
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
     mt = doc["mt_fieldops_component"]
-    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against standard multi-target rho (no ranking established), outside the priced tables</h2>'
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against multi-target rho: the order flips with the hash price, outside the priced tables</h2>'
              '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>24</sup> to 2<sup>32</sup>, 33 fresh curves, 22 paired '
              'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
-             '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. The IC is the cheaper of ic5 (4-term '
-             'x-only table, paired trials with one shared inversion) and ic5 with retention; the reference is the cheapest '
-             'standard multi-target rho: Kuhn-Struik retention rho or distinguished-point rho with retention, 15 runs per '
-             'configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. '
-             'The decision column is the frozen rule, which prices h on hash-table operations only: with rho\'s per-step '
-             'canonicalisations priced at h as §5a requires, every decision is unranked (IC 0.89-0.94x rho at h = 1), so no '
-             f'ranking against rho is established. Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
+             '1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point '
+             'canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four ic5 '
+             'variants; the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, 10 runs per '
+             'configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The IC '
+             'is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a decision is unranked. '
+             f'Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
              '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC/rho h=0</th><th>h=0.1</th><th>h=1</th>'
-             '<th>frozen rule</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             '<th>§5a</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
              + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
                        + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
                                  f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))
                        + f'<td>{esc(r["verdict"])}</td><td class="n">{r["bsgs"]["0"]["median"]:.2f}</td>'
                        f'<td class="n">{r["bsgs"]["1"]["median"]:.2f}</td></tr>' for r in mt["rows"])
              + f'</tbody></table><p><a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["study"])}">Study</a>; '
+             f'v4 without native work priced: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["v4"])}">v4</a>; '
              f'earlier rows against a rho without retention: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["previous"])}">IC5 (v3)</a>, '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">IC4 (v2)</a>.</p></section>')
     pk = doc["pkm_symmetric_component"]

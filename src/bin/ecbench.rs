@@ -415,6 +415,11 @@ enum Cmd {
         /// plain file name included.
         #[arg(long)]
         no_price_table_work: bool,
+        /// Pair each run's recorded bitop/v1 price (`work.bitops_per_sqrt_r`)
+        /// instead of its S: `bitop/v1` is the only value. Not with
+        /// `--weight` or several `--dir`; the §5a band is not computed.
+        #[arg(long)]
+        unit: Option<String>,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -1851,7 +1856,16 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             allow_interrupted,
             price_table_work: _,
             no_price_table_work,
+            unit,
         } => {
+            let bitop = match unit.as_deref() {
+                None => false,
+                Some("bitop/v1") => true,
+                Some(u) => return Err(format!("no unit `{u}`; compare knows bitop/v1")),
+            };
+            if bitop && dir.len() > 1 {
+                return Err("--unit bitop/v1 compares one session (one --dir)".into());
+            }
             let opts = compare::CompareOptions {
                 resamples,
                 seed,
@@ -1859,6 +1873,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
                     table_work: !no_price_table_work,
                 },
+                bitop,
             };
             if dir.len() > 1 {
                 return compare_pooled_cmd(
@@ -1882,7 +1897,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 // before that date is; a weighted or table-work-priced
                 // comparison (the default since then) carries its id, so a
                 // new reading never overwrites an old file.
-                let suffix = if c.pricing_weight.is_some() || !c.priced_table_work.is_empty() {
+                let suffix = if c.pricing_weight.is_some()
+                    || !c.priced_table_work.is_empty()
+                    || c.ops.unit == "bitop/v1"
+                {
                     format!("__{}", c.comparison_id)
                 } else {
                     String::new()

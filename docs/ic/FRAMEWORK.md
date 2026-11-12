@@ -279,6 +279,53 @@ in it. Two `pinned` rows compare operation counts; a `pinned` row
 against a `measured` row compares an operation count against a
 stopwatch, and the table should say which is which.
 
+#### Solver and oracle work units: calibration keys (2026-11-12)
+
+Since PR #1774 the whole `word XORs (…)` family is priced by count where the
+curve pins `ns_per_word_xor`. Every other solver or oracle unit has no ratio in
+[`calibration.json`](calibration.json), so it is still a lower bound everywhere.
+`ic bench` prices it at this host's wall time (`measured`). `ecbench` takes that
+term back out and lists `solver_<unit>_uncharged` (`lower_bound: true`). The
+§5a band then charges it at `w`. Each such unit now has a calibration key, read
+by `Calibration::pin` like the older keys. A key charges the count
+(`priced_by: pinned`, named in `calibration_pins` / `calibration_pinned_units`)
+only once the table pins it for the curve. A value that is merely present
+prices nothing. **No row pins any of these keys yet**, so every run, record and
+qualification string is byte-identical to the ones written before the keys
+existed (tests `solver_pricing_is_unchanged_with_no_solver_unit_key_pinned`,
+`sat_cdcl_record_is_unchanged_with_no_solver_unit_key_pinned`). A key's ratio is
+the solver call's whole wall time per counted unit, so a count that stands in
+for the whole run may be charged at it. A count that by its own `op_unit` is
+partial or modelled is refused even when pinned. The run is then priced as if
+no key were pinned, and the solver block's `pricing_qualification` says why.
+How to pin each key: [`calibration-solver-units.md`](calibration-solver-units.md).
+
+| unit (`op_unit` or counter) | emitted by | `bitop_complete` | pricing today | key | charged once pinned |
+|:--|:--|:--|:--|:--|:--|
+| `word XORs (elimination only)` | `f4-f2`, `matrix-f4`, `matrix-f5` (`solvers.rs`) | 1 | pinned `ns_per_word_xor` where the row has it (all 25 rows do); else measured / `solver_…_uncharged` | `ns_per_word_xor` (existing) | yes, since #1774 |
+| `word XORs (elimination, specialisation and linear elimination only)` | `inherited-f4` (`solvers.rs`); pdp3 / symmetrised oracles (`plugins.rs`) | 1 | as above | `ns_per_word_xor` (existing) | yes, since #1774 |
+| `word XORs (Gray-code steps)` | `fes-f2` | 1 | as above (prefix match) | `ns_per_word_xor` (existing) | yes |
+| `vector XORs (Gray-code steps, 8 \| 16 lanes of 32 bits)` | `fes-f2-wide` | 1 | measured; ecbench `solver_vector_XORs_…_uncharged`; band weight only | `ns_per_vector_xor_8x32`, `ns_per_vector_xor_16x32` | yes |
+| `conflicts` | `sat-cdcl` | 1 | measured; `solver_conflicts_uncharged`; band weight only | `ns_per_conflict` | yes |
+| `monomial operations` | `buchberger-f2` | 1 | measured; `solver_monomial_operations_uncharged`; band weight only | `ns_per_monomial_op` | yes |
+| `monomial operations (modelled)` | `xl-f2` | 1 | measured; `solver_…_uncharged`; band weight only | `ns_per_monomial_op` | **refused**: modelled count (terms × n²), not the work done |
+| `monomial tests` | `exhaustive` | 1 | measured; `solver_monomial_tests_uncharged`; band weight only | `ns_per_monomial_test` | yes |
+| `word operations (partial: …)` | `crossbred-f2` | 1 | measured; `solver_…_uncharged`; band weight only | `ns_per_word_op` | **refused**: per-point solves counted apart (`solve_row_ops`) |
+| `F_p multiply-adds (elimination only)` | `pkm-semaev` tower F4 (`pkm_semaev.rs`) | no | measured; `solver_F_p_multiply-adds_(elimination_only)_uncharged`; band weight only | `ns_per_f4_muladd` | yes |
+| `F_p multiplications (grid)` | `pkm-semaev`, `engine=exhaustive` (block carries `ops = 0`; the work is on `pkm_grid_fp_mults_uncharged`) | no | measured (wall) | `ns_per_fp_mul` | yes |
+| `F_p multiplications`, no `fp_muls_per_add` | `line-resultant`, `line-s4-macaulay`, `fghr-d3`, `y-line-s3-macaulay` | no | measured; `solver_F_p_multiplications_uncharged`; band weight only | `ns_per_fp_mul` | yes |
+| `F_p` / `F_q multiplications` with `fp_muls_per_add` | the Gaudry and x-line oracles | no | `counted` at the curve's own multiplications per addition | none needed | already charged |
+| `none (external process; wall time only)` | `m4gb-f2` | no | measured | none (a reference arm, AGENTS.md §6) | no |
+| `pkm_system_fp_mults_uncharged`, `pkm_grid_…`, `pkm_shared_poly_…`, `pkm_trace_learn_spec_…`, `pkm_t0_base_map_…`, `pkm_base_check_…`, `pkm_t0_target_fp_mults_uncharged` | `pkm-semaev` native counters | — | listed unpriced; band weight only; `*_full` rule to optional unit `fp_mul` (no row has it) | `ns_per_fp_mul` (`ic_boundary::PINNABLE_NATIVE`) | yes, under the frozen name, dropped from `unpriced` |
+| `hashed_tensor_steps` | `hashed-affine` base, `hashed-tensor` set-up and relations (`hashed.rs`) | — | uncharged, `cost_qualification` names it; not an ecbench id | `ns_per_hashed_tensor_step` | yes; the run stays qualified for the omitted tensor-curve certification |
+| `pkm_trace_learn_muladds`, `pkm_t0_base_inversions`, `pkm_t0_target_inversions`, `pkm_crosscheck_fp_mults` | `pkm-semaev` | — | counted, not `*_uncharged`: neither priced nor listed unpriced | none (not changed here: renaming would change frozen records) | — |
+
+Every shipped engine except `m4gb-f2` and the `pkm-semaev` F4 also reports
+`bitop_complete = 1`. `ecbench::work` prices those engines' whole run in
+`bitop/v1` primitives from the `bitop_*` keys. That accounting is separate, and
+these keys do not change it. The `*_full` and `*_wordram` repricings keep
+every `solver_*` unpriced entry as it was.
+
 ### Linear algebra, verification, total
 
 | field | meaning |
@@ -891,7 +938,12 @@ the summation-polynomial pipeline.
 The contraction's work is reported as `hashed_tensor_steps`, an
 **uncalibrated** charged-primitive count, so the `S` column does not yet
 price it. Treat a `hashed-affine + hashed-tensor` row as a stage diagnostic,
-not as a comparable end-to-end `S`, until that step has a calibration.
+not as a comparable end-to-end `S`, until that step has a calibration. The
+key `ns_per_hashed_tensor_step` exists (§3, "Solver and oracle work units")
+but no curve pins it. Pinning it charges the steps and removes the step
+clauses from `cost_qualification`. The row stays qualified until the tensor
+curve's certification is charged too
+([`calibration-solver-units.md`](calibration-solver-units.md)).
 
 `ic bench --list` prints this with every parameter each plug-in reads.
 A parameter that takes several values (`divisor` on `koblitz-orbit`,
