@@ -4,7 +4,10 @@ Protocol: `PROTOCOL.md` (frozen in 5aab996e55 before data). Holdout: 33 fresh pr
 about 2^24, 2^28, 2^32), seeds 41 and 42, T in {1024, 4096, 16384}: **3366 runs, 0 errors, every target of every
 run verified**. Data: `results/holdout/rows.jsonl`, `runs.json` (`mk_runs.py`), `analysis.txt` (primary rule),
 `analysis_v4rule.txt`, `summary.json`, `summary_v4rule.json`, `noverify.txt` (`noverify.py`). Every number here is
-[pcc:unverified] until the claim is signed.
+[pcc:unverified] (claim PCC-20261112-22e5d2) until the claim is signed. Independent validation: `validation/VALIDATOR_REPORT.md` (status pass:
+3366/3366 rows replay exactly, 1.10M recovered logs checked with independent EC code, every number recomputes; its
+three non-blocking amendments are applied here). The pre-freeze smoke runs behind the protocol's predictions are
+recorded in `SMOKE_20261112.md`.
 
 Primary rule (section 5a): cost per target in GAE = [(c_I I + M + S)/(c_I + 3) + h (H + L + N)] / T, N = counted
 native work (rho step-index hashes, distinguished-point canonicalisations and point hashes, IC offset-step
@@ -39,15 +42,16 @@ the 10 rho runs (rho2xks x 4 kappa, rhodpu x 6). Ratios: medians of 22 per-confi
 | 32 | 16384 | 1.101 [1.097, 1.108] | 0.998 [0.992, 1.005] | 0.713 [0.711, 0.716] | 1.261 | 501.7, 503.8 |
 
 Without the verification phase that every arm shares (`noverify.txt`, I = 10 M): 1.12-1.21 at h = 0, 1.00-1.07 at
-h = 0.1, 0.71-0.73 at h = 1.
+h = 0.1, 0.70-0.73 at h = 1.
 
 ## Which arm wins (per configuration, I = 10 M)
 
-- Rho: `rho2xks` at every price, in all 198 configurations; `rhodpu` never (its two native operations per point
-  outweigh its few hash-table operations once native work is priced). Best kappa: 0.05 (126) or 0.1 (69) at h = 0;
-  0.1 (111) or 0.05 (63) at h = 0.1; 0.25 (147) or 0.5 (36) at h = 1. **At h = 0 the best kappa is often the grid
-  floor (0.05)**, so a smaller database could make rho cheaper still at h = 0; that can only widen the IC's h = 0
-  loss. At h = 1 the best kappa is interior, so the IC's h = 1 win does not rest on the grid edge.
+- Rho: `rho2xks` in all 198 configurations at h = 0 and h = 0.1 and in 194 at h = 1; `rhodpu` in 4 at h = 1 (all
+  32 b, T = 1024; at I = 3 M it wins 27 of 198 at h = 1). Best kappa: 0.05 (126) or 0.1 (69) at h = 0; 0.1 (111)
+  or 0.05 (63) at h = 0.1; 0.25 (147) or 0.5 (36, the grid top) at h = 1. **At h = 0 the best kappa is often the
+  grid floor (0.05)**, so a smaller database could make rho cheaper still at h = 0; that can only widen the IC's
+  h = 0 loss. At h = 1 the validator ran kappa 0.75 and 1.0 on all 198 configurations and they never win, so the
+  IC's h = 1 win does not rest on the grid edge.
 - IC: `ic5rw` at h = 0 (198) and h = 0.1 (197); `ic5w` (100) or `ic5` (98) at h = 1. Retention with the random-walk
   offsets is what makes the IC cheapest when hash operations are free; without hash-heavy retention the IC wins
   at h = 1.
@@ -76,14 +80,17 @@ The multi-target index calculus built here is neither cheaper nor dearer than [p
 across the section 5a band: it is 6-16% dearer when hash and native operations are free, about tied at 0.1 GAE per
 operation, and 20-29% cheaper when they cost one GAE each, in every cell from 2^24 to 2^32 and T = 1024 to 16384.
 Which one is cheaper in practice is therefore a question of how expensive a hash-table operation is relative to a
-field multiplication on the target platform, which this counted harness does not measure. It stays 11-47% dearer
-than BSGS at every price.
+field multiplication on the target platform, which this counted harness does not measure. The h = 1 advantage
+also rests on charging the distinguished-point rho two native operations per point (one canonicalisation, one
+hash); at one per point the IC is not cheaper at h = 1 at 28-32 bits with T = 1024-4096 (0.83-1.06x at I = 10 M)
+and 3 of the 27 decisions become dearer. It stays 11-47% dearer than BSGS at every price.
 
 ## Limits
 
 Group orders of about 2^24 to 2^32; costs counted, not timed; memory unbounded for every arm (rho2xks's retained
 database and the IC's table grow with T); one local host (no AWS identity, so not isolab-eks); the rho arms are this
 harness's, not ecbench's `rho.multitarget_pooled`; pricing every native operation at the same h as a hash-table
-operation is the section 5a convention, and the count of rhodpu's native work (2 per point) is a choice that
-favours rho over the v4 validator's count; the comparison is per target in a batch of T on one curve and says
+operation is the section 5a convention; rhodpu's native work is counted as 2 per point (canonicalisation and
+hash; 4 per step in the v4 validator's count gives the same decisions, 1 per point gives unranked 24 / dearer 3
+with the IC 0.83-1.06x at h = 1); rho's random draws at walk restarts are not counted (favours rho); the comparison is per target in a batch of T on one curve and says
 nothing about single-target ECDLP or about ECC2K-130 / m = 83.
