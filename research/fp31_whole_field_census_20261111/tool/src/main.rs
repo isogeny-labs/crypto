@@ -421,6 +421,9 @@ fn main() {
         Some("rho-spec") => phase4::cmd_rho_spec(&args),
         Some("rho-timing") => phase4::cmd_rho_timing(&args),
         Some("ic-timing") => phase5::cmd_ic_timing(&args),
+        Some("rho-timing-diag") => phase5::cmd_rho_timing_diag(&args),
+        Some("rho-timing-diag2") => phase5::cmd_rho_timing_diag2(&args),
+        Some("rho-timing-diag3") => phase5::cmd_rho_timing_diag3(&args),
         _ => {
             eprintln!("usage: fp31-class-census census|bruteforce|summary|roots|select|analyze|ic-classes|ic-analyze|timing|rho-spec|rho-timing|ic-timing ...");
             std::process::exit(2);

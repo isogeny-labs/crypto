@@ -122,3 +122,164 @@ pub fn cmd_ic_timing(args: &[String]) {
     let mut f = OpenOptions::new().write(true).create_new(true).open(&out).expect("output exists");
     f.write_all(serde_json::to_string_pretty(&report).unwrap().as_bytes()).unwrap();
 }
+
+// ------------------------------------------- phase 4 consistency diagnostic
+// `rho-timing-diag` (exploratory, after phase 4's frozen analysis): does a curve that
+// is cheap per GAE in the `plain` arm also come out cheap in the independent `plain-aa`
+// runs and in the `control` (rho.negation) runs on the same curves and targets?
+// Per class: Spearman across curves of per-curve geometric means; pooled over classes:
+// the mean rho, a sign test, and a permutation reference (curve labels shuffled
+// within class, seeded).
+pub fn cmd_rho_timing_diag(args: &[String]) {
+    use crate::stats::{spearman_perm, SplitMix};
+    let classes = arg(args, "--classes").expect("--classes");
+    let runs = arg(args, "--runs").expect("--runs");
+    let out = arg(args, "--out").expect("--out");
+    let doc: Value = serde_json::from_str(&fs::read_to_string(&classes).unwrap()).unwrap();
+    let geo = |v: &[f64]| (v.iter().map(|x| x.ln()).sum::<f64>() / v.len() as f64).exp();
+    let (mut rows, mut r_aa, mut r_ctl) = (vec![], vec![], vec![]);
+    for c in doc["classes"].as_array().unwrap() {
+        let id = c["id"].as_str().unwrap();
+        let text = match fs::read_to_string(format!("{runs}/{id}/session/records.jsonl")) { Ok(t) => t, Err(_) => continue };
+        let mut by: BTreeMap<(String, (u64, u64)), Vec<f64>> = BTreeMap::new();
+        for line in text.lines() {
+            let r: Value = serde_json::from_str(line).unwrap();
+            if r["warmup"].as_bool() == Some(true) { continue; }
+            let cs = &r["workload"]["curve_spec"];
+            let v = r["online"]["wall_ns"].as_f64().unwrap() / r["cost"]["total_gae"].as_f64().unwrap();
+            by.entry((r["arm"].as_str().unwrap().to_string(), (cs["a"].as_u64().unwrap(), cs["b"].as_u64().unwrap()))).or_default().push(v);
+        }
+        let curves: Vec<(u64, u64)> = { let mut v: Vec<_> = by.keys().map(|k| k.1).collect(); v.sort(); v.dedup(); v };
+        if curves.len() < 3 { continue; }
+        let g = |arm: &str| -> Vec<f64> { curves.iter().map(|cv| geo(&by[&(arm.to_string(), *cv)])).collect() };
+        let (p, a, ctl) = (g("plain"), g("plain-aa"), g("control"));
+        let (ra, pa) = spearman_perm(&p, &a, 2000, 0xD1A6 + rows.len() as u64);
+        let (rc, pc) = spearman_perm(&p, &ctl, 2000, 0xD1A7 + rows.len() as u64);
+        r_aa.push(ra); r_ctl.push(rc);
+        rows.push(json!({"id": id, "curves": curves.len(), "spearman_plain_vs_aa": ra, "p_perm_aa": pa, "spearman_plain_vs_negation": rc, "p_perm_negation": pc}));
+    }
+    let mean = |v: &[f64]| v.iter().sum::<f64>() / v.len() as f64;
+    // sign test: P(at least k positive of n) under p = 1/2
+    let sign = |v: &[f64]| {
+        let n = v.len(); let k = v.iter().filter(|&&x| x > 0.0).count();
+        let mut tail = 0.0f64; let mut comb = 1.0f64;
+        for i in 0..=n { if i > 0 { comb = comb * (n - i + 1) as f64 / i as f64; } if i >= k { tail += comb; } }
+        (k, n, tail / 2f64.powi(n as i32))
+    };
+    let (ka, na, psa) = sign(&r_aa);
+    let (kc, nc, psc) = sign(&r_ctl);
+    let _ = SplitMix(0);
+    let report = json!({"schema": "fp31.phase4.diag/v1",
+        "note": "exploratory diagnostic run after the frozen phase-4 analysis; not a preregistered test",
+        "plain_vs_aa": {"mean_spearman": mean(&r_aa), "positive": ka, "classes": na, "sign_test_p_one_sided": psa},
+        "plain_vs_negation": {"mean_spearman": mean(&r_ctl), "positive": kc, "classes": nc, "sign_test_p_one_sided": psc},
+        "per_class": rows});
+    let mut f = OpenOptions::new().write(true).create_new(true).open(&out).expect("output exists");
+    f.write_all(serde_json::to_string_pretty(&report).unwrap().as_bytes()).unwrap();
+}
+
+// `rho-timing-diag2` (exploratory): (1) does an isomorphic model (same group, other
+// a, b) time like its base curve? Compare |log(iso/base)| with |log(x/y)| over all
+// other curve pairs of the class. (2) pooled Spearman of class-normalised per-curve
+// log ns/GAE against popcount and bit length of a and of b.
+pub fn cmd_rho_timing_diag2(args: &[String]) {
+    use crate::stats::spearman_perm;
+    let classes = arg(args, "--classes").expect("--classes");
+    let runs = arg(args, "--runs").expect("--runs");
+    let out = arg(args, "--out").expect("--out");
+    let doc: Value = serde_json::from_str(&fs::read_to_string(&classes).unwrap()).unwrap();
+    let (mut iso_d, mut other_d) = (vec![], vec![]);
+    let (mut feat_y, mut f_pa, mut f_pb, mut f_la, mut f_lb) = (vec![], vec![], vec![], vec![], vec![]);
+    for c in doc["classes"].as_array().unwrap() {
+        let id = c["id"].as_str().unwrap();
+        let text = match fs::read_to_string(format!("{runs}/{id}/session/records.jsonl")) { Ok(t) => t, Err(_) => continue };
+        let mut by: BTreeMap<(u64, u64), Vec<f64>> = BTreeMap::new();
+        for line in text.lines() {
+            let r: Value = serde_json::from_str(line).unwrap();
+            if r["warmup"].as_bool() == Some(true) || r["arm"].as_str() != Some("plain") { continue; }
+            let cs = &r["workload"]["curve_spec"];
+            by.entry((cs["a"].as_u64().unwrap(), cs["b"].as_u64().unwrap())).or_default()
+                .push((r["online"]["wall_ns"].as_f64().unwrap() / r["cost"]["total_gae"].as_f64().unwrap()).ln());
+        }
+        let lm: BTreeMap<(u64, u64), f64> = by.iter().map(|(k, v)| (*k, v.iter().sum::<f64>() / v.len() as f64)).collect();
+        let cm = lm.values().sum::<f64>() / lm.len() as f64;
+        for (k, v) in &lm {
+            feat_y.push(v - cm);
+            f_pa.push(k.0.count_ones() as f64); f_pb.push(k.1.count_ones() as f64);
+            f_la.push((64 - k.0.leading_zeros()) as f64); f_lb.push((64 - k.1.leading_zeros()) as f64);
+        }
+        let curves = c["curves"].as_array().unwrap();
+        let mut iso_pairs = vec![];
+        for im in c["iso_models"].as_array().unwrap() {
+            let base = &curves[im["of"].as_u64().unwrap() as usize];
+            let (kb, ki) = ((base["a"].as_u64().unwrap(), base["b"].as_u64().unwrap()), (im["a"].as_u64().unwrap(), im["b"].as_u64().unwrap()));
+            if let (Some(x), Some(y)) = (lm.get(&kb), lm.get(&ki)) { iso_d.push((x - y).abs()); iso_pairs.push((kb, ki)); }
+        }
+        let keys: Vec<(u64, u64)> = lm.keys().cloned().collect();
+        for i in 0..keys.len() { for j in i + 1..keys.len() {
+            let pr = (keys[i], keys[j]);
+            if iso_pairs.iter().any(|&(a, b)| (a, b) == pr || (b, a) == pr) { continue; }
+            other_d.push((lm[&keys[i]] - lm[&keys[j]]).abs());
+        } }
+    }
+    let mean = |v: &[f64]| v.iter().sum::<f64>() / v.len() as f64;
+    let med = |v: &[f64]| { let mut s = v.to_vec(); s.sort_by(|a, b| a.partial_cmp(b).unwrap()); s[s.len() / 2] };
+    // Mann-Whitney style: fraction of (iso, other) pairs with iso difference smaller
+    let mut smaller = 0.0;
+    for a in &iso_d { for b in &other_d { if a < b { smaller += 1.0 } else if a == b { smaller += 0.5 } } }
+    let auc = smaller / (iso_d.len() * other_d.len()) as f64;
+    let feats = [("popcount_a", &f_pa), ("popcount_b", &f_pb), ("bitlen_a", &f_la), ("bitlen_b", &f_lb)];
+    let fr: Vec<Value> = feats.iter().enumerate().map(|(i, (n, x))| { let (rho, p) = spearman_perm(x, &feat_y, 5000, 0xFEA7 + i as u64); json!({"feature": n, "spearman": rho, "p_perm": p, "n": x.len()}) }).collect();
+    let report = json!({"schema": "fp31.phase4.diag2/v1", "note": "exploratory diagnostic after the frozen phase-4 analysis; not preregistered",
+        "iso_vs_base_abs_log_diff": {"n": iso_d.len(), "mean": mean(&iso_d), "median": med(&iso_d)},
+        "other_pairs_abs_log_diff": {"n": other_d.len(), "mean": mean(&other_d), "median": med(&other_d)},
+        "prob_iso_pair_closer_than_other_pair": auc,
+        "features": fr});
+    let mut f = OpenOptions::new().write(true).create_new(true).open(&out).expect("output exists");
+    f.write_all(serde_json::to_string_pretty(&report).unwrap().as_bytes()).unwrap();
+}
+
+// `rho-timing-diag3` (exploratory): execution-order confound. ecbench runs workloads
+// in spec order within a round (only the arms are shuffled), so each curve occupies
+// one time window. Per class: Spearman of per-curve mean log ns/GAE (plain arm)
+// against the curve's first measured seq (its time position); pooled: mean rho, sign
+// test; plus the pooled per-run trend of log ns/GAE against seq within the session.
+pub fn cmd_rho_timing_diag3(args: &[String]) {
+    use crate::stats::spearman_perm;
+    let classes = arg(args, "--classes").expect("--classes");
+    let runs = arg(args, "--runs").expect("--runs");
+    let out = arg(args, "--out").expect("--out");
+    let doc: Value = serde_json::from_str(&fs::read_to_string(&classes).unwrap()).unwrap();
+    let (mut rows, mut rhos) = (vec![], vec![]);
+    let mut profile: BTreeMap<usize, Vec<f64>> = BTreeMap::new(); // decile of session position -> normalised log ns/GAE
+    for c in doc["classes"].as_array().unwrap() {
+        let id = c["id"].as_str().unwrap();
+        let text = match fs::read_to_string(format!("{runs}/{id}/session/records.jsonl")) { Ok(t) => t, Err(_) => continue };
+        let mut pts: Vec<(f64, (u64, u64), f64)> = vec![];
+        for line in text.lines() {
+            let r: Value = serde_json::from_str(line).unwrap();
+            if r["warmup"].as_bool() == Some(true) || r["arm"].as_str() != Some("plain") { continue; }
+            let cs = &r["workload"]["curve_spec"];
+            pts.push((r["seq"].as_f64().unwrap(), (cs["a"].as_u64().unwrap(), cs["b"].as_u64().unwrap()),
+                      (r["online"]["wall_ns"].as_f64().unwrap() / r["cost"]["total_gae"].as_f64().unwrap()).ln()));
+        }
+        let mu = pts.iter().map(|x| x.2).sum::<f64>() / pts.len() as f64;
+        let (smin, smax) = pts.iter().fold((f64::INFINITY, 0.0f64), |b, x| (b.0.min(x.0), b.1.max(x.0)));
+        for p in &pts { let d = (((p.0 - smin) / (smax - smin + 1.0)) * 10.0) as usize; profile.entry(d.min(9)).or_default().push(p.2 - mu); }
+        let mut by: BTreeMap<(u64, u64), (f64, f64, usize)> = BTreeMap::new();
+        for p in &pts { let e = by.entry(p.1).or_insert((f64::INFINITY, 0.0, 0)); e.0 = e.0.min(p.0); e.1 += p.2; e.2 += 1; }
+        if by.len() < 3 { continue; }
+        let first: Vec<f64> = by.values().map(|v| v.0).collect();
+        let mean: Vec<f64> = by.values().map(|v| v.1 / v.2 as f64).collect();
+        let (rho, p) = spearman_perm(&first, &mean, 2000, 0x0D3 + rows.len() as u64);
+        rhos.push(rho);
+        rows.push(json!({"id": id, "curves": by.len(), "spearman_position_vs_ns_per_gae": rho, "p_perm": p}));
+    }
+    let n = rhos.len(); let k = rhos.iter().filter(|&&x| x > 0.0).count();
+    let prof: Vec<Value> = profile.iter().map(|(d, v)| json!({"session_decile": d, "mean_log_ns_per_gae_minus_class_mean": v.iter().sum::<f64>() / v.len() as f64, "n": v.len()})).collect();
+    let report = json!({"schema": "fp31.phase4.diag3/v1", "note": "exploratory; execution-order confound check after the frozen phase-4 analysis",
+        "position_vs_speed": {"mean_spearman": rhos.iter().sum::<f64>() / n as f64, "positive": k, "classes": n},
+        "session_profile_by_decile": prof, "per_class": rows});
+    let mut f = OpenOptions::new().write(true).create_new(true).open(&out).expect("output exists");
+    f.write_all(serde_json::to_string_pretty(&report).unwrap().as_bytes()).unwrap();
+}

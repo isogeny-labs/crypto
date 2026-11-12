@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0103Z-fp31-ic-yield-across-classes",
+  "latest_record": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 111,
+    "measured": 112,
     "open": 0
   },
   "repo": "crypto",
@@ -754,6 +754,114 @@
         }
       ],
       "problem": "ecdlp-rho-isogeny-class-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0009,
+      "latest": 1.0009,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "aa_ratio",
+      "points": [
+        {
+          "commit": "fbdac3e320fe",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 50048,
+          "record": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rho ns per group operation across isogenous curves (same planted k), 45 of 48 classes: frozen rule says effect suspected (between-curve SD about 1%), but per-curve speed does not follow the isomorphism class and curves ran in contiguous time windows (ecbench orders workloads by spec); inconclusive, randomized-order follow-up required.",
+          "value": 1.0009
+        }
+      ],
+      "problem": "ecdlp-rho-step-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.00948,
+      "latest": 0.00948,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "between_curve_sd_log_ns_per_gae",
+      "points": [
+        {
+          "commit": "fbdac3e320fe",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 45,
+          "record": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rho ns per group operation across isogenous curves (same planted k), 45 of 48 classes: frozen rule says effect suspected (between-curve SD about 1%), but per-curve speed does not follow the isomorphism class and curves ran in contiguous time windows (ecbench orders workloads by spec); inconclusive, randomized-order follow-up required.",
+          "value": 0.00948
+        }
+      ],
+      "problem": "ecdlp-rho-step-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0936,
+      "latest": 1.0936,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "positive_control_ratio",
+      "points": [
+        {
+          "commit": "fbdac3e320fe",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 50048,
+          "record": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rho ns per group operation across isogenous curves (same planted k), 45 of 48 classes: frozen rule says effect suspected (between-curve SD about 1%), but per-curve speed does not follow the isomorphism class and curves ran in contiguous time windows (ecbench orders workloads by spec); inconclusive, randomized-order follow-up required.",
+          "value": 1.0936
+        }
+      ],
+      "problem": "ecdlp-rho-step-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.5e-15,
+      "latest": 3.5e-15,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "t1_friedman_ks_p",
+      "points": [
+        {
+          "commit": "fbdac3e320fe",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 45,
+          "record": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rho ns per group operation across isogenous curves (same planted k), 45 of 48 classes: frozen rule says effect suspected (between-curve SD about 1%), but per-curve speed does not follow the isomorphism class and curves ran in contiguous time windows (ecbench orders workloads by spec); inconclusive, randomized-order follow-up required.",
+          "value": 3.5e-15
+        }
+      ],
+      "problem": "ecdlp-rho-step-cost-isogeny-invariance",
       "unit": "ratio"
     },
     {

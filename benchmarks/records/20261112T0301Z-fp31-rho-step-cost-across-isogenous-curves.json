@@ -1,7 +1,39 @@
 {
   "branch": "aburan28/vigilant-babbage-26wqzs",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-12T04:09:12+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase4/run_phase4.sh",
+        "target/release/ecbench",
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase4/runs"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.receipt.json; first start from its pid file, later starts derived",
+      "started_utc": "2026-11-12T03:03:16+00:00",
+      "wall_s": 3526.949
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "rho-timing",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase4/runs",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase4/analysis.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.receipt.json; first start from its pid file, later starts derived",
+      "started_utc": "2026-11-12T04:02:02.949000+00:00",
+      "wall_s": 6.673
+    }
+  ],
   "commit": "fbdac3e320feaad0261472bb06580f6d3886be53",
   "commit_dirty": false,
   "created_utc": "2026-11-12T03:01:34+00:00",
@@ -15,19 +47,85 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 45,
+      "name": "between_curve_sd_log_ns_per_gae",
+      "note": "variance-components estimate, upper95 in spread-high; confounded with execution order (see report)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.00948
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 45,
+      "name": "t1_friedman_ks_p",
+      "note": "p-value; frozen rule: effect suspected",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 3.5e-15
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 50048,
+      "name": "positive_control_ratio",
+      "note": "rho.negation / rho.plain ns per GAE",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0936
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 50048,
+      "name": "aa_ratio",
+      "note": "plain-aa / plain (identical walks)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0009
+    }
+  ],
   "problem": "ecdlp-rho-step-cost-isogeny-invariance",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 85684402,
+      "path": "research/fp31_whole_field_census_20261111/phase4/runs_phase4.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6ad5d4fec7277bb69d50694925e5f934e5e7801292f1a1a6afd516df36a28d34",
+      "sha256": "6ad5d4fec7277bb69d50694925e5f934e5e7801292f1a1a6afd516df36a28d34",
+      "uploaded": false
+    },
+    {
+      "bytes": 33758,
+      "path": "research/fp31_whole_field_census_20261111/phase4/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1d/1d6a6472d95f31ec08cf252c843e3c8edc1e15a985dc2d4baa5d26d4c43b863a",
+      "sha256": "1d6a6472d95f31ec08cf252c843e3c8edc1e15a985dc2d4baa5d26d4c43b863a",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/fp31_whole_field_census_20261111/phase4/REPORT_PHASE4.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/fp31_whole_field_census_20261111/phase4/figures/phase4_diagnostics.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "fp31-rho-step-cost-across-isogenous-curves",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Rho ns per group operation across isogenous curves (same planted k), 45 of 48 classes: frozen rule says effect suspected (between-curve SD about 1%), but per-curve speed does not follow the isomorphism class and curves ran in contiguous time windows (ecbench orders workloads by spec); inconclusive, randomized-order follow-up required.",
   "validation": null
 }
