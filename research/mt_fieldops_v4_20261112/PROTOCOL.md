@@ -63,3 +63,11 @@ Groups of about 2^24 to 2^32; counted, not timed; memory unbounded for every arm
 so not isolab-eks); the rho family is this harness's, not ecbench's `rho.multitarget_pooled`; the verification
 constant (about 30 to 50 GAE per target) is shared by every arm and compresses ratios toward 1 (reported with and
 without it).
+
+## Errata (producer, from the validator's report, 2026-11-12; arms and data unaffected)
+
+- 7 of the 11 curves at 32 bits have group order just above 2^32, not one.
+- `icbest` is not a symmetric favour: the IC side has 2 runs per configuration, the rho side 15. (Fixing rho's
+  parameters from the other seed leaves the frozen-rule decisions unchanged.)
+- The decision rule prices h on hash-table and solver operations only; section 5a also prices rho's unpriced
+  native work (canonicalisations), which this harness did not count. Both readings are reported in RESULTS.

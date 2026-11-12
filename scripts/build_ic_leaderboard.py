@@ -3667,16 +3667,18 @@ def markdown(doc: dict) -> str:
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     mt = doc["mt_fieldops_component"]
-    L += ["## Multi-target IC against standard multi-target rho, outside tables A–C", "",
+    L += ["## Multi-target IC against standard multi-target rho (no ranking established), outside tables A–C", "",
           "Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired "
           "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
           "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. The IC is the cheaper of ic5 (an "
           "x-only table of 4-term factor-base sums, paired trials x(Q ± W) with one shared inversion) and ic5 with "
           "retention of solved trials; the reference is the cheapest standard multi-target rho: Kuhn-Struik retention rho "
           "(x-only sibling walks) or distinguished-point rho with retention and precomputation, 15 runs per configuration. "
-          "IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. "
-          f"Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
-          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |",
+          "IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The decision "
+          "column is the frozen rule, which prices h on hash-table operations only: with rho's per-step "
+          "canonicalisations priced at h as §5a requires, every decision is unranked (IC 0.89-0.94x rho at h = 1), so "
+          f"no ranking against rho is established. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
+          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | frozen rule | IC/BSGS h=0 | h=1 |",
           "|--:|--:|--:|--:|--:|:--|--:|--:|"]
     for r in mt["rows"]:
         f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
@@ -5040,16 +5042,18 @@ def page(doc: dict, standalone: bool) -> str:
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
     mt = doc["mt_fieldops_component"]
-    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against standard multi-target rho, outside the priced tables</h2>'
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against standard multi-target rho (no ranking established), outside the priced tables</h2>'
              '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>24</sup> to 2<sup>32</sup>, 33 fresh curves, 22 paired '
              'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
              '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. The IC is the cheaper of ic5 (4-term '
              'x-only table, paired trials with one shared inversion) and ic5 with retention; the reference is the cheapest '
              'standard multi-target rho: Kuhn-Struik retention rho or distinguished-point rho with retention, 15 runs per '
              'configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. '
-             f'Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
+             'The decision column is the frozen rule, which prices h on hash-table operations only: with rho\'s per-step '
+             'canonicalisations priced at h as §5a requires, every decision is unranked (IC 0.89-0.94x rho at h = 1), so no '
+             f'ranking against rho is established. Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
              '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC/rho h=0</th><th>h=0.1</th><th>h=1</th>'
-             '<th>§5a</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             '<th>frozen rule</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
              + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
                        + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
                                  f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))

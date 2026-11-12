@@ -1,0 +1,167 @@
+{
+ "schema": "validator.report/v1",
+ "independent": true,
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validator code in validation/scripts/, not the producer's; scripts/make_artifacts.py",
+ "validated_commit": "bb3d2bc40ee75de9b0623f919391832f4a1d5669",
+ "scope": "this one statement exactly as worded; nothing else in the study",
+ "statement_judged": "On 33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the multi-target index calculus (cheaper of ic5 and ic5 with retention per configuration) costs 1.003-1.810x per target of the cheapest standard multi-target rho of this harness (Kuhn-Struik retention rho rho2xks or distinguished-point rho rhodp, best of 15 runs per configuration) and is dearer in all 27 cell x I/M section-5a decisions; at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1; it is 1.14-1.50x a paired BSGS.",
+ "statement_sha256": "3e820609305c8b572863276e6f8d47c6f0245557c315ea4999fd2c42e6a57e52",
+ "status": "insufficient_evidence",
+ "verdict": "not endorsed as worded: three clauses fail (5a pricing, the IC's retention variant, the BSGS range); endorsed in the accepted wording",
+ "raw_data": [
+  {
+   "path": "../results/holdout/runs.json",
+   "sha256": "cf78059ac83bd70bba530da418155e1b6a0c84a27de125efd11676b3917d168f"
+  },
+  {
+   "path": "native_work.json",
+   "sha256": "7e6c7528853c6d6e0eb327d429bf8b3d8dc6af0e57dad5c880a8f8c0a2f8d1be",
+   "note": "validator replay counts of rhodp canonicalisations (needed for the 5a reading)"
+  }
+ ],
+ "clause_checks": [
+  {
+   "clause": "33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32)",
+   "ok": true,
+   "recomputed": "33 valid curves, n prime, cofactor 1, n in {'24': [16770973, 16776713], '25': [16778521, 16782209], '28': [268414967, 268432867], '29': [268439183, 268459117], '32': [4294901887, 4294964207], '33': [4294971077, 4295070037]}; regenerate byte-identically; 0 overlap with 3312 curve records"
+  },
+  {
+   "clause": "T = 1024/4096/16384, 22 paired configurations per cell",
+   "ok": true,
+   "recomputed": "9 cells x 11 curves x seeds 31, 32; planted target lists identical across the 20 runs of a configuration"
+  },
+  {
+   "clause": "counted F_p operations (I = 3/10/30 M, S = M)",
+   "ok": true,
+   "recomputed": "yes; ic5's elimination mod n and rhodp's one mod-n product are counted in the same units ('F_p and mod-n operations' is more exact)"
+  },
+  {
+   "clause": "with hash/solver ops at 0/0.1/1 GAE",
+   "ok": false,
+   "recomputed": "only hash-table operations and solver ops are priced; rhodp's 7266086859 canonicalisations, 14018374537 step-index hashes and 7009187296 DP tests (and rho2xks's 839442752 step-index hashes) are neither counted nor priced (V4-F1)"
+  },
+  {
+   "clause": "the multi-target index calculus (cheaper of ic5 and ic5 with retention per configuration)",
+   "ok": false,
+   "recomputed": "it is this harness's ic5 / ic5ks; ic5ks's retention is degenerate (shared progression W; saves at most 1.5%); a non-degenerate retention (validator ic5rw) is 0.79-0.93x of it (V4-F2)"
+  },
+  {
+   "clause": "costs 1.003-1.810x per target of the cheapest standard multi-target rho of this harness (... best of 15 runs per configuration)",
+   "ok": true,
+   "recomputed": "1.0032-1.8101; the cheapest rho is rho2xks at h = 0 and 0.1 and rhodp at h = 1 (per-price envelope; against either arm alone: unranked 27/27)"
+  },
+  {
+   "clause": "and is dearer in all 27 cell x I/M section-5a decisions",
+   "ok": false,
+   "recomputed": "frozen rule: {'dearer': 27}; with rhodp's canonicalisations priced at h (5a): {'unranked': 27}"
+  },
+  {
+   "clause": "at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1",
+   "ok": true,
+   "recomputed": "1.0394-1.1557; 1.0280-1.0830; 1.1973-1.7565 (frozen rule)"
+  },
+  {
+   "clause": "it is 1.14-1.50x a paired BSGS",
+   "ok": false,
+   "recomputed": "1.1431-1.4946 = 1.14-1.49x (1.4946 does not round to 1.50); dearer in all 27"
+  }
+ ],
+ "accepted_wording_checks": [
+  {
+   "clause": "ic5ks saves at most 1.5%",
+   "recomputed": 0.98489958649211,
+   "source": "ic5ks/ic5 at h = 0 (all cI) min 0.9849; at h = 0.1 and 1 ic5ks is dearer than ic5"
+  },
+  {
+   "clause": "IC 0.89-0.94x the cheapest rho at h = 1, I = 10M, 5a pricing",
+   "recomputed": [
+    0.8878,
+    0.9351
+   ],
+   "source": "C0 vs R0, P1"
+  },
+  {
+   "clause": "all 27 unranked under 5a pricing",
+   "recomputed": {
+    "unranked": 27
+   },
+   "source": "C0 vs R0, P1"
+  }
+ ],
+ "headline": [
+  {
+   "name": "icbest/rhobest median, min over cells, cI and h",
+   "claimed": 1.003,
+   "recomputed": 1.0032274545350892,
+   "rel_tol": 0.0004983919626000544
+  },
+  {
+   "name": "icbest/rhobest median, max over cells, cI and h",
+   "claimed": 1.81,
+   "recomputed": 1.8100723669863759,
+   "rel_tol": 0.0002762323259110686
+  },
+  {
+   "name": "icbest/rhobest cI=10 h=0 min",
+   "claimed": 1.04,
+   "recomputed": 1.039424907052846,
+   "rel_tol": 0.004810357117742023
+  },
+  {
+   "name": "icbest/rhobest cI=10 h=0 max",
+   "claimed": 1.16,
+   "recomputed": 1.155656379082716,
+   "rel_tol": 0.004326549907480869
+  },
+  {
+   "name": "icbest/rhobest cI=10 h=0.1 min",
+   "claimed": 1.03,
+   "recomputed": 1.0279742355084291,
+   "rel_tol": 0.004863939997024371
+  },
+  {
+   "name": "icbest/rhobest cI=10 h=0.1 max",
+   "claimed": 1.08,
+   "recomputed": 1.083026690810788,
+   "rel_tol": 0.004616696007978195
+  },
+  {
+   "name": "icbest/rhobest cI=10 h=1 min",
+   "claimed": 1.2,
+   "recomputed": 1.197348591620198,
+   "rel_tol": 0.004175897508038338
+  },
+  {
+   "name": "icbest/rhobest cI=10 h=1 max",
+   "claimed": 1.76,
+   "recomputed": 1.7565464468688912,
+   "rel_tol": 0.0028464974603505037
+  },
+  {
+   "name": "icbest/bsgs2 min over cells, cI and h",
+   "claimed": 1.14,
+   "recomputed": 1.1430981290256894,
+   "rel_tol": 0.004374082043386523
+  },
+  {
+   "name": "icbest/bsgs2 max over cells, cI and h (claimed 1.50; 1.4946 rounds to 1.49)",
+   "claimed": 1.5,
+   "recomputed": 1.4946319814121916,
+   "rel_tol": 0.003345308451968078
+  },
+  {
+   "name": "icbest vs rhobest decisions 'dearer' (frozen rule)",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "icbest vs bsgs2 decisions 'dearer'",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  }
+ ],
+ "accepted_wording": "On 33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p and mod-n operations (I = 3/10/30 M, S = M) with hash-table and solver operations at 0/0.1/1 GAE: this harness's multi-target index calculus (the cheaper of ic5 and ic5ks per configuration and price; ic5ks's retention of solved trial classes along the shared arithmetic-progression W saves at most 1.5%) costs 1.003-1.810x per target of the cheapest of 15 runs of this harness's multi-target rho per configuration and price (Kuhn-Struik retention rho rho2xks at h = 0 and 0.1, distinguished-point rho rhodp at h = 1) and is dearer in all 27 cell x I/M decisions of the frozen rule; at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1; it is 1.14-1.49x a paired BSGS. The frozen rule prices h on hash-table operations only: with rhodp's per-step canonicalisations priced at the same h (AGENTS.md section 5a) the IC is 0.89-0.94x the cheapest rho at h = 1 and I = 10M and all 27 decisions are unranked, so no ranking against rho is established.",
+ "accepted_wording_sha256": "e519257338e1baa374e2b90067352a23160d2359a3d353b8ffe3f67f636ad46e"
+}
