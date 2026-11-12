@@ -1048,13 +1048,25 @@ impl<'r, W: ModWord, const N: usize> LazyLanes<'r, W, N> {
     }
 
     /// Lane `l` gains `Σ_k vals[k] · x[cols[k]·n + l]`.
+    ///
+    /// # Safety
+    /// `cols.len() == vals.len()`, `N ≤ n`, and `cols[k]·n + N ≤ x.len()`
+    /// for every `k`: the gathers are unchecked (the bounds checks were a
+    /// quarter of the one-lane inner loop).
     #[inline(always)]
-    fn add_sparse(&mut self, cols: &[u32], vals: &[W], x: &[W], n: usize) {
+    unsafe fn add_sparse(&mut self, cols: &[u32], vals: &[W], x: &[W], n: usize) {
+        debug_assert_eq!(cols.len(), vals.len());
         let (mut cols, mut vals) = (cols, vals);
         loop {
             let take = vals.len().min(self.room);
-            for (&c, &a) in cols[..take].iter().zip(&vals[..take]) {
-                self.mac(a, &x[c as usize * n..]);
+            for k in 0..take {
+                // SAFETY: `k < take ≤ vals.len() = cols.len()`, and the
+                // caller bounds every gather.
+                let (c, a) = unsafe { (*cols.get_unchecked(k), *vals.get_unchecked(k)) };
+                let at = c as usize * n;
+                debug_assert!(at + N <= x.len());
+                let src = unsafe { x.get_unchecked(at..at + N) };
+                self.mac(a, src);
             }
             self.room -= take;
             (cols, vals) = (&cols[take..], &vals[take..]);
@@ -2203,6 +2215,9 @@ pub struct CsrMatrix<W: ModWord = u64> {
     /// no lazy path for the modulus (`u64` outside `[2, 2⁶³)`).
     lazy: Option<W::Lazy>,
     spmv: SpmvOptions,
+    /// `Aᵀ` in the same lazy form, built on the first transpose product
+    /// (`None` inside when the width has no lazy path).
+    transposed: std::sync::OnceLock<Option<Box<CsrMatrix<W>>>>,
 }
 
 /// Sparse matrix-times-block execution backend.  `Worker` uses the stable
@@ -2250,7 +2265,7 @@ impl<W: ModWord> CsrMatrix<W> {
         row_ptr.push(0);
         for row in rows {
             for &(c, v) in &row.entries {
-                debug_assert!((c as usize) < n_cols);
+                assert!((c as usize) < n_cols, "column index out of range");
                 col_idx.push(c);
                 vals.push(v);
             }
@@ -2277,7 +2292,49 @@ impl<W: ModWord> CsrMatrix<W> {
             modulus,
             lazy,
             spmv: SpmvOptions::default(),
+            transposed: std::sync::OnceLock::new(),
         }
+    }
+
+    /// `Aᵀ` as a CSR matrix over the stored (lazy-form) coefficients, for
+    /// the division-free row products; `None` without a lazy path.  A
+    /// stable counting sort by column, so each row of `Aᵀ` lists its
+    /// entries by increasing row of `A`.
+    fn transposed(&self) -> Option<&CsrMatrix<W>> {
+        self.transposed
+            .get_or_init(|| {
+                self.lazy.as_ref()?;
+                let mut row_ptr = vec![0usize; self.n_cols + 1];
+                for &c in &self.col_idx {
+                    row_ptr[c as usize + 1] += 1;
+                }
+                for c in 0..self.n_cols {
+                    row_ptr[c + 1] += row_ptr[c];
+                }
+                let mut next = row_ptr.clone();
+                let mut col_idx = vec![0u32; self.col_idx.len()];
+                let mut vals = vec![W::zero(); self.vals.len()];
+                for row in 0..self.n_rows {
+                    for k in self.row_ptr[row]..self.row_ptr[row + 1] {
+                        let slot = &mut next[self.col_idx[k] as usize];
+                        col_idx[*slot] = row as u32;
+                        vals[*slot] = self.vals[k];
+                        *slot += 1;
+                    }
+                }
+                Some(Box::new(CsrMatrix {
+                    n_rows: self.n_cols,
+                    n_cols: self.n_rows,
+                    row_ptr,
+                    col_idx,
+                    vals,
+                    modulus: self.modulus,
+                    lazy: self.lazy,
+                    spmv: SpmvOptions::default(),
+                    transposed: std::sync::OnceLock::new(),
+                }))
+            })
+            .as_deref()
     }
 
     pub fn with_spmv(mut self, options: SpmvOptions) -> Self {
@@ -2331,6 +2388,7 @@ impl<W: ModWord> CsrMatrix<W> {
     fn row_lazy(&self, i: usize, x: &[W], n: usize, extra: W, lazy: &W::Lazy, out: &mut [W]) {
         let span = self.row_ptr[i]..self.row_ptr[i + 1];
         let row = (&self.col_idx[span.clone()], &self.vals[span]);
+        assert!(x.len() >= self.n_cols * n && out.len() >= n);
         let extra = (self.n_cols * n, extra);
         let mut j = 0;
         while j + 4 <= n {
@@ -2538,6 +2596,12 @@ impl<W: ModWord> CsrMatrix<W> {
     pub fn mul_block_transpose(&self, x: &[W], n: usize, y: &mut [W]) {
         debug_assert_eq!(x.len(), self.n_rows * n);
         debug_assert_eq!(y.len(), self.n_cols * n);
+        if let Some(t) = self.transposed() {
+            // The same sums, exact and reduced once per lane, in the
+            // forward kernel's division-free form.
+            t.mul_block(x, n, y);
+            return;
+        }
         y.fill(W::zero());
         let modulus = &self.modulus;
         for row in 0..self.n_rows {
@@ -2565,7 +2629,11 @@ fn csr_lanes<W: ModWord, const N: usize>(
     extra: (usize, W),
     out: &mut [W],
 ) {
-    acc.add_sparse(cols, vals, x, n);
+    // SAFETY: `from_rows` checks every column index is below `n_cols`,
+    // `row_lazy` checks `x.len() ≥ n_cols·n` and calls with `N` lanes
+    // starting at lane `j` with `j + N ≤ n`, so `x` (already offset by
+    // `j`) holds `cols[k]·n + N` entries; `cols` and `vals` are one span.
+    unsafe { acc.add_sparse(cols, vals, x, n) };
     if !extra.1.is_zero() {
         acc.add(extra.1, &x[extra.0..]);
     }
