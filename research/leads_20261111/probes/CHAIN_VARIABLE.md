@@ -25,5 +25,5 @@ Result `[pcc:unverified]`: **closed, falsified on its premise.**
 override. It is ignored unless set to 2 or 3, and the default is unchanged.
 
 **Not tested.** Other variable orders. Those need a change to the monomial order,
-not just the chain unknown. The lead gave a 10 % prior to any improvement, and the
+not just the chain unknown. The lead gave a 10 % prior to any improvement [pcc:unverified], and the
 k = 12 measurement removes its stated mechanism.
