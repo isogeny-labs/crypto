@@ -49,8 +49,6 @@
 //!
 //! Every figure produced with it is `[pcc:unverified]` until replayed.
 
-use std::collections::BTreeMap;
-
 use super::ec::{Curve, Pt};
 use super::field::Fp;
 use crate::cryptanalysis::ic_boundary::{CountedGroup, GroupOps};
@@ -2303,7 +2301,3 @@ mod tests {
         }
     }
 }
-
-// Silence an unused-import warning when `BTreeMap` is only used by `ic`.
-#[allow(dead_code)]
-type _Unused = BTreeMap<u8, u8>;

@@ -480,7 +480,7 @@ mod tests {
         let mut n = order;
         let mut d = 2;
         while d * d <= n {
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 r = d;
                 n /= d;
             }
@@ -541,7 +541,11 @@ mod tests {
             let order = c.jacobian_order().unwrap();
             let mut r = 0;
             for cand in 2..order {
-                if is_prime(cand) && order % cand == 0 && (order / cand) % cand != 0 && cand > 20 {
+                if is_prime(cand)
+                    && order.is_multiple_of(cand)
+                    && !(order / cand).is_multiple_of(cand)
+                    && cand > 20
+                {
                     r = cand;
                 }
             }
