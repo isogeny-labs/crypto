@@ -1,7 +1,6 @@
 # Phase 3 protocol: does index-calculus relation yield depend on the isogeny class or the curve, over F_{2^31−1}?
 
-Status: **DRAFT, not yet frozen** (2026-11-12). It is frozen, and this line changed, once §8 is filled from the
-timing pilot and before any study data.
+Status: **frozen before data** (2026-11-12T01:10Z), after the timing pilot of §8 and before any study data.
 
 Requested by the user on 2026-11-12. Of the next phases offered after phase 2, the user chose "IC yield across
 classes". This protocol follows `../phase2/PROTOCOL.md` and reuses the P2 instrument of
@@ -93,4 +92,16 @@ counts are exact and do not depend on host load. Wall times are descriptive.
 
 ## 8. Timing pilot and frozen budget
 
-TO BE FILLED FROM THE PILOT, then this file is frozen and hashed.
+The pilot ran on the non-study curve of phase 2's pilot (draw 100006, `t = −62813`) and its 16-curve walk.
+It used `--first 3 --iso 1 --rounds 1 --targets 1`, which is 5 curves and 2 arms. Its data are excluded and not
+committed. Binaries:
+- `ecbench` sha256 `86a9421ddd9881665af24006d9505497fc2fab58e99890aa8af2a7972425254a`;
+- `p2tool` sha256 `f0fdbe84017a22aa0d38d999d7e2ccf96423ca3ac8bd9a369c977cf526d533e8`.
+
+Pilot results:
+- m = 3: |F| = 378 (pc 402), predicted yield 3.35·10⁻², 5,965 attempts per run, 20 records, 14.8 s.
+- m = 2: |F| = 1448 (pc 1586), predicted yield 1.95·10⁻³, 102,425 attempts per run, 20 records, 11.4 s.
+- ecbench graded the rows L2.
+
+Frozen budget: the §4 arguments unchanged (2 rounds × 2 targets, `--aa 0`, `--replay 4`). That is about
+1 minute per class per m, and about 1.6 h for the 96 cells.
