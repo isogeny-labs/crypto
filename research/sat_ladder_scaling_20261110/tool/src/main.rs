@@ -14,12 +14,15 @@
 //!  * Final: X = x_Q * Z (mod p) and Z != 0.  x_Q bits are free variables (assumptions in REUSE,
 //!    unit clauses in FRESH), so both arms load the identical CNF.
 
+use std::cell::Cell;
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::Write as _;
+use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::Instant;
 
+use batsat::{lbool, Callbacks, ClauseKind, Lit as BLit, Solver as BSolver, SolverInterface, SolverOpts, Var as BVar};
 use cadical_sys::{CaDiCal, Status};
 
 // ------------------------------------------------------------------ utils
@@ -789,6 +792,131 @@ fn stats(s: &CaDiCal) -> (i64, i64, i64) {
     )
 }
 
+// ---- second backend: BatSat 0.6.0 (pure-Rust port of the MiniSat 2.2 core)
+
+/// Conflict-budget censoring for BatSat.  batsat 0.6.0 has no settable conflict budget
+/// (`SolverV::conflict_budget` is private and fixed at -1), so the budget is enforced through the
+/// `Callbacks::stop()` hook, which `within_budget()` polls in the no-conflict branch of the search
+/// loop (the same place MiniSat 2.2 polls its own conflict budget).  The hook counts learnt-clause
+/// events (`on_new_clause`, one per conflict analysed above decision level 0) since the start of
+/// the current solve call; the counter is reset before every solve.
+struct BudgetCb {
+    learnt: Rc<Cell<u64>>,
+    budget: Rc<Cell<u64>>,
+}
+
+impl Callbacks for BudgetCb {
+    fn on_new_clause(&mut self, _c: &[BLit], src: ClauseKind) {
+        if src == ClauseKind::Learnt {
+            self.learnt.set(self.learnt.get() + 1);
+        }
+    }
+    fn stop(&self) -> bool {
+        self.learnt.get() >= self.budget.get()
+    }
+}
+
+struct BatSlv {
+    s: BSolver<BudgetCb>,
+    learnt: Rc<Cell<u64>>,
+    budget: Rc<Cell<u64>>,
+    assumps: Vec<BLit>,
+    vars: Vec<BVar>, // vars[v-1] is the batsat variable of CNF variable v
+}
+
+impl BatSlv {
+    fn new() -> BatSlv {
+        let learnt = Rc::new(Cell::new(0));
+        let budget = Rc::new(Cell::new(u64::MAX));
+        let cb = BudgetCb { learnt: learnt.clone(), budget: budget.clone() };
+        BatSlv { s: BSolver::new(SolverOpts::default(), cb), learnt, budget, assumps: Vec::new(), vars: Vec::new() }
+    }
+    /// batsat: Lit::new(var, true) is the positive literal.
+    fn lit(&self, l: i32) -> BLit {
+        BLit::new(self.vars[l.unsigned_abs() as usize - 1], l > 0)
+    }
+    fn clause(&mut self, lits: &[i32]) {
+        let mut c: Vec<BLit> = lits.iter().map(|&l| self.lit(l)).collect();
+        self.s.add_clause_reuse(&mut c);
+    }
+    fn load(cnf: &Cnf) -> BatSlv {
+        let mut b = BatSlv::new();
+        for _ in 0..cnf.nv {
+            let v = b.s.new_var_default();
+            b.vars.push(v);
+        }
+        let mut cur: Vec<i32> = Vec::new();
+        for &l in &cnf.cl {
+            if l == 0 {
+                b.clause(&cur);
+                cur.clear();
+            } else {
+                cur.push(l);
+            }
+        }
+        b
+    }
+    /// One solve call under the pending assumptions, with a per-call conflict budget.
+    fn solve(&mut self, budget: i32) -> Res {
+        self.learnt.set(0);
+        self.budget.set(budget as u64);
+        let a = std::mem::take(&mut self.assumps);
+        let r = self.s.solve_limited(&a);
+        self.budget.set(u64::MAX);
+        if r == lbool::TRUE {
+            Res::Sat
+        } else if r == lbool::FALSE {
+            Res::Unsat
+        } else {
+            Res::Unknown
+        }
+    }
+    fn val(&self, l: i32) -> bool {
+        self.s.value_lit(self.lit(l)) == lbool::TRUE
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum SolverKind {
+    Cadical,
+    Batsat,
+}
+
+impl SolverKind {
+    fn name(self) -> &'static str {
+        match self {
+            SolverKind::Cadical => "cadical",
+            SolverKind::Batsat => "batsat",
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Res {
+    Sat,
+    Unsat,
+    Unknown,
+}
+
+enum Slv {
+    Cad(CaDiCal),
+    Bat(Box<BatSlv>),
+}
+
+fn load_slv(kind: SolverKind, cnf: &Cnf) -> Slv {
+    match kind {
+        SolverKind::Cadical => Slv::Cad(load(cnf)),
+        SolverKind::Batsat => Slv::Bat(Box::new(BatSlv::load(cnf))),
+    }
+}
+
+fn stats_slv(s: &Slv) -> (i64, i64, i64) {
+    match s {
+        Slv::Cad(c) => stats(c),
+        Slv::Bat(b) => (b.s.num_conflicts() as i64, b.s.num_decisions() as i64, b.s.num_propagations() as i64),
+    }
+}
+
 #[derive(Clone, Debug)]
 struct Row {
     n: u32,
@@ -808,7 +936,7 @@ struct Row {
 }
 
 fn solve_target(
-    s: &mut CaDiCal,
+    s: &mut Slv,
     lad: &Ladder,
     curve: &Curve,
     arm: &'static str,
@@ -818,20 +946,41 @@ fn solve_target(
     budget: i32,
 ) -> Result<Row, String> {
     let xq = curve.xq(k).ok_or("k*G = O")?;
-    let (c0, d0, p0) = stats(s);
-    s.limit("conflicts", budget);
+    let (c0, d0, p0) = stats_slv(s);
+    if let Slv::Cad(c) = s {
+        c.limit("conflicts", budget);
+    }
     let t0 = Instant::now();
     for i in 0..curve.n as usize {
         let lit = if (xq >> i) & 1 == 1 { lad.xqv[i] } else { -lad.xqv[i] };
-        if arm == "REUSE" {
-            s.assume(lit);
-        } else {
-            s.clause6(&[lit]);
+        match s {
+            Slv::Cad(c) => {
+                if arm == "REUSE" {
+                    c.assume(lit);
+                } else {
+                    c.clause6(&[lit]);
+                }
+            }
+            Slv::Bat(b) => {
+                if arm == "REUSE" {
+                    let bl = b.lit(lit);
+                    b.assumps.push(bl);
+                } else {
+                    b.clause(&[lit]);
+                }
+            }
         }
     }
-    let st = s.solve();
+    let st = match s {
+        Slv::Cad(c) => match c.solve() {
+            Status::SATISFIABLE => Res::Sat,
+            Status::UNSATISFIABLE => Res::Unsat,
+            _ => Res::Unknown,
+        },
+        Slv::Bat(b) => b.solve(budget),
+    };
     let wall_ms = t0.elapsed().as_secs_f64() * 1e3;
-    let (c1, d1, p1) = stats(s);
+    let (c1, d1, p1) = stats_slv(s);
     let mut row = Row {
         n: curve.n,
         arm,
@@ -849,18 +998,31 @@ fn solve_target(
         wall_ms,
     };
     eprintln!(
-        "  n={} {} target={} status={:?} conflicts={} wall_ms={:.0}",
-        curve.n, arm, target, st, row.conflicts, wall_ms
+        "  n={} {} target={} status={} conflicts={} wall_ms={:.0}",
+        curve.n,
+        arm,
+        target,
+        match st {
+            Res::Sat => "SATISFIABLE",
+            Res::Unsat => "UNSATISFIABLE",
+            Res::Unknown => "UNKNOWN",
+        },
+        row.conflicts,
+        wall_ms
     );
     match st {
-        Status::UNKNOWN => row.censored = true,
-        Status::UNSATISFIABLE => {
+        Res::Unknown => row.censored = true,
+        Res::Unsat => {
             return Err(format!("FATAL: UNSAT on planted instance n={} arm={} target={} k={}", curve.n, arm, target, k))
         }
-        Status::SATISFIABLE => {
+        Res::Sat => {
             let mut kd = 0u64;
             for i in 0..curve.nk {
-                if s.val(lad.kv[i]) > 0 {
+                let bit = match s {
+                    Slv::Cad(c) => c.val(lad.kv[i]) > 0,
+                    Slv::Bat(b) => b.val(lad.kv[i]),
+                };
+                if bit {
                     kd |= 1 << i;
                 }
             }
@@ -882,26 +1044,26 @@ struct NInfo {
     build_ms: f64,
 }
 
-fn targets_for(curve: &Curve, targets: usize) -> Vec<u64> {
+fn targets_for(curve: &Curve, targets: usize, prefix: &str) -> Vec<u64> {
     (0..targets)
         .map(|i| {
-            let mut rng = Rng::from_seed_str(&format!("F4/target/{}/{}", curve.n, i));
+            let mut rng = Rng::from_seed_str(&format!("{}/{}/{}", prefix, curve.n, i));
             1 + rng.next() % (curve.r - 1)
         })
         .collect()
 }
 
-fn run_n(n: u32, targets: usize, budget: i32) -> Result<(NInfo, Vec<Row>), String> {
+fn run_n(kind: SolverKind, prefix: &str, n: u32, targets: usize, budget: i32) -> Result<(NInfo, Vec<Row>), String> {
     let curve = find_curve(n);
     let t0 = Instant::now();
     let lad = build_ladder(&curve);
     let build_ms = t0.elapsed().as_secs_f64() * 1e3;
     let info = NInfo { curve: curve.clone(), vars: lad.cnf.nv, clauses: lad.cnf.ncl, build_ms };
-    let ks = targets_for(&curve, targets);
+    let ks = targets_for(&curve, targets, prefix);
     let mut rows = Vec::new();
     // FRESH
     for (i, &k) in ks.iter().enumerate() {
-        let mut s = load(&lad.cnf);
+        let mut s = load_slv(kind, &lad.cnf);
         rows.push(solve_target(&mut s, &lad, &curve, "FRESH", i, i, k, budget)?);
     }
     // REUSE: seeded random order, one incremental solver
@@ -911,7 +1073,7 @@ fn run_n(n: u32, targets: usize, budget: i32) -> Result<(NInfo, Vec<Row>), Strin
         let j = (rng.next() % (i as u64 + 1)) as usize;
         order.swap(i, j);
     }
-    let mut s = load(&lad.cnf);
+    let mut s = load_slv(kind, &lad.cnf);
     for (pos, &i) in order.iter().enumerate() {
         rows.push(solve_target(&mut s, &lad, &curve, "REUSE", i, pos, ks[i], budget)?);
     }
@@ -1010,9 +1172,30 @@ fn fit_json(f: &Fit) -> J {
     ])
 }
 
+/// REUSE decomposition per n: the first solve (solve_order 0) and the warm solves (solve_order >= 1).
+struct Decomp {
+    first: Option<(u64, bool)>,
+    warm: Vec<(u64, bool)>,
+}
+
+fn reuse_decomp(rows: &[Row]) -> BTreeMap<u32, Decomp> {
+    let mut m: BTreeMap<u32, Decomp> = BTreeMap::new();
+    for r in rows.iter().filter(|r| r.arm == "REUSE") {
+        let d = m.entry(r.n).or_insert(Decomp { first: None, warm: Vec::new() });
+        if r.order == 0 {
+            d.first = Some((r.conflicts, r.censored));
+        } else {
+            d.warm.push((r.conflicts, r.censored));
+        }
+    }
+    m
+}
+
 // ------------------------------------------------------------------ CLI / main
 
 struct Args {
+    solver: SolverKind,
+    seed_prefix: String,
     out: String,
     ns: Vec<u32>,
     targets: usize,
@@ -1031,6 +1214,8 @@ fn parse_args() -> Result<Args, String> {
         quick: false,
         threads: 1,
         protocol: concat!(env!("CARGO_MANIFEST_DIR"), "/../PROTOCOL.md").into(),
+        solver: SolverKind::Cadical,
+        seed_prefix: "F4/target".into(),
     };
     let (mut n_set, mut t_set) = (false, false);
     let argv: Vec<String> = std::env::args().skip(1).collect();
@@ -1060,9 +1245,22 @@ fn parse_args() -> Result<Args, String> {
             }
             "--threads" => a.threads = val()?.parse().map_err(|e: std::num::ParseIntError| e.to_string())?,
             "--protocol" => a.protocol = val()?,
+            "--seed-prefix" => a.seed_prefix = val()?,
+            "--solver" => {
+                a.solver = match val()?.as_str() {
+                    "cadical" => SolverKind::Cadical,
+                    "batsat" => SolverKind::Batsat,
+                    other => {
+                        return Err(format!(
+                            "unknown solver {} (use cadical or batsat; the minisat 0.4.4 crate exposes no conflict budget or statistics)",
+                            other
+                        ))
+                    }
+                }
+            }
             "--quick" => a.quick = true,
             "-h" | "--help" => {
-                println!("usage: sat_ladder_scaling [--out results/run.json] [--n 10,12,..] [--targets 20] [--budget 10000000] [--quick] [--threads 1] [--protocol PATH]");
+                println!("usage: sat_ladder_scaling [--out results/run.json] [--n 10,12,..] [--targets 20] [--budget 10000000] [--quick] [--threads 1] [--protocol PATH] [--solver cadical|batsat] [--seed-prefix F4/target]");
                 std::process::exit(0);
             }
             other => return Err(format!("unknown argument {}", other)),
@@ -1099,6 +1297,47 @@ fn main() {
     std::process::exit(run(&args));
 }
 
+/// Solver-specific header fields (the CaDiCaL values are unchanged from the original run).
+fn solver_header(kind: SolverKind) -> Vec<(&'static str, J)> {
+    match kind {
+        SolverKind::Cadical => vec![
+            ("solver", js("CaDiCaL")),
+            ("solver_version", js(&CaDiCal::version())),
+            ("solver_signature", js(&CaDiCal::signature())),
+            ("solver_crate", js("cadical-sys 0.8.0 (vendored CaDiCaL C++ source, built via cc)")),
+            ("fallback_solver_used", J::Bool(false)),
+            ("solver_options", js("CaDiCaL defaults; only per-solve limit('conflicts', budget)")),
+            (
+                "stat_definitions",
+                js("conflicts, decisions: CaDiCaL stats.conflicts/stats.decisions, delta per solve call; propagations: stats.propagations.search (search-loop propagations only, excludes probing/vivification), delta per solve call"),
+            ),
+            (
+                "budget_mechanism",
+                js("native: CaDiCaL limit('conflicts', budget) set before every solve call (per-solve, relative to the call); UNKNOWN status = censored"),
+            ),
+        ],
+        SolverKind::Batsat => vec![
+            ("solver", js("BatSat")),
+            ("solver_version", js("batsat 0.6.0 (pure-Rust port of the MiniSat 2.2 core; MiniSat/Glucose-style CDCL lineage, no pre-/inprocessing)")),
+            (
+                "solver_signature",
+                js("batsat-0.6.0 SolverOpts::default(): var_decay 0.95, clause_decay 0.999, random_var_freq 0, random_seed 91648253, luby_restart true (restart_first 100, restart_inc 2.0), ccmin_mode 2, phase_saving 2, learntsize_factor 1/3, learntsize_inc 1.1"),
+            ),
+            ("solver_crate", js("batsat =0.6.0 (pure Rust; the minisat 0.4.4 crate was rejected: its Rust wrapper exposes neither a conflict budget nor statistics and its build needs libclang/bindgen)")),
+            ("fallback_solver_used", J::Bool(false)),
+            ("solver_options", js("batsat defaults (SolverOpts::default()); FRESH adds x_Q bits as unit clauses, REUSE passes them as assumptions to solve_limited on one persistent solver per curve; learned clauses persist across REUSE solves")),
+            (
+                "stat_definitions",
+                js("conflicts: Solver.conflicts delta per solve call (+1 per BCP conflict, including a conflict at decision level 0 that ends the solve as UNSAT; same counter MiniSat reports); decisions: Solver.decisions delta (+1 per free-variable branching decision; assumption levels are not counted); propagations: Solver.propagations delta = trail literals processed by BCP in propagate(), including level-0 propagation and propagation under assumptions; batsat has no probing/vivification/inprocessing so search is the only source; CaDiCaL's counterpart is propagations.search"),
+            ),
+            (
+                "budget_mechanism",
+                js("batsat 0.6.0 has no settable conflict budget (SolverV.conflict_budget is private and fixed at -1), so censoring uses the Callbacks::stop() hook that within_budget() polls in the no-conflict branch of the search loop (as MiniSat 2.2 polls setConfBudget): a counter of learnt-clause events (on_new_clause, one per conflict analysed above level 0), reset before every solve call, stops the solve with lbool::UNDEF once counter >= budget; UNDEF = censored, never imputed. Reported conflicts is the solver's own counter delta and can exceed the budget by the few conflicts of a chain that ends before the next poll"),
+            ),
+        ],
+    }
+}
+
 fn fmt_opt(x: Option<f64>) -> String {
     x.map(|v| format!("{:.1}", v)).unwrap_or_else(|| "cens".into())
 }
@@ -1115,7 +1354,7 @@ fn run(args: &Args) -> i32 {
                 }
                 let n = args.ns[j];
                 eprintln!("[n={}] building and solving ...", n);
-                let r = run_n(n, args.targets, args.budget);
+                let r = run_n(args.solver, &args.seed_prefix, n, args.targets, args.budget);
                 eprintln!("[n={}] done", n);
                 results.lock().unwrap().push((j, r));
             });
@@ -1149,6 +1388,15 @@ fn run(args: &Args) -> i32 {
     let empty = BTreeMap::new();
     let fit_f = fit_arm("FRESH", data.get("FRESH").unwrap_or(&empty));
     let fit_r = fit_arm("REUSE", data.get("REUSE").unwrap_or(&empty));
+    // REUSE decomposition: first solve (solve_order 0) vs warm solves (solve_order >= 1)
+    let decomp = reuse_decomp(&rows);
+    let mut warm_data: BTreeMap<u32, Vec<(u64, bool)>> = BTreeMap::new();
+    for (n, d) in &decomp {
+        if !d.warm.is_empty() {
+            warm_data.insert(*n, d.warm.clone());
+        }
+    }
+    let fit_w = fit_arm("REUSE_warm", &warm_data);
 
     // per-n table
     let mut table = Vec::new();
@@ -1168,6 +1416,11 @@ fn run(args: &Args) -> i32 {
         };
         ratios.push((n, ratio));
         let (cf, cr) = (f.iter().filter(|x| x.1).count(), r.iter().filter(|x| x.1).count());
+        let dn = &decomp[&n];
+        let mw = median_c(&dn.warm);
+        let cw = dn.warm.iter().filter(|x| x.1).count();
+        let first = dn.first.filter(|x| !x.1).map(|x| x.0);
+        let first_cens = dn.first.map(|x| x.1);
         println!(
             "{:>3} {:>9} {:>10} | {:>12} {:>5} | {:>12} {:>5} | {:>7}",
             n,
@@ -1188,6 +1441,11 @@ fn run(args: &Args) -> i32 {
             ("reuse_median_conflicts", jopt(mr)),
             ("reuse_censored", ji(cr as u64)),
             ("reuse_over_fresh_median", jopt(ratio)),
+            ("reuse_warm_median_conflicts", jopt(mw)),
+            ("reuse_warm_n", ji(dn.warm.len() as u64)),
+            ("reuse_warm_censored", ji(cw as u64)),
+            ("reuse_first_conflicts", first.map(ju).unwrap_or(J::Null)),
+            ("reuse_first_censored", first_cens.map(J::Bool).unwrap_or(J::Null)),
         ]));
     }
     let fa = |x: Option<f64>| x.map(|v| format!("{:.3}", v)).unwrap_or_else(|| "n/a".into());
@@ -1201,6 +1459,14 @@ fn run(args: &Args) -> i32 {
         fa(fit_r.lo),
         fa(fit_r.hi),
         fit_r.ns
+    );
+
+    println!(
+        "alpha REUSE warm (solve_order>=1) = {} [{}, {}] over n={:?}",
+        fa(fit_w.alpha),
+        fa(fit_w.lo),
+        fa(fit_w.hi),
+        fit_w.ns
     );
 
     // predictions / decision rules
@@ -1271,42 +1537,36 @@ fn run(args: &Args) -> i32 {
             ])
         })
         .collect();
-    let doc = jo(vec![
+    let mut hdr: Vec<(&str, J)> = vec![
+        ("study", js("F4 sat_ladder_scaling")),
+        ("solver_flag", js(args.solver.name())),
+        ("seed_prefix", js(&args.seed_prefix)),
+    ];
+    hdr.extend(solver_header(args.solver));
+    hdr.extend(vec![
         (
-            "header",
-            jo(vec![
-                ("study", js("F4 sat_ladder_scaling")),
-                ("solver", js("CaDiCaL")),
-                ("solver_version", js(&CaDiCal::version())),
-                ("solver_signature", js(&CaDiCal::signature())),
-                ("solver_crate", js("cadical-sys 0.8.0 (vendored CaDiCaL C++ source, built via cc)")),
-                ("fallback_solver_used", J::Bool(false)),
-                ("solver_options", js("CaDiCaL defaults; only per-solve limit('conflicts', budget)")),
-                (
-                    "stat_definitions",
-                    js("conflicts, decisions: CaDiCaL stats.conflicts/stats.decisions, delta per solve call; propagations: stats.propagations.search (search-loop propagations only, excludes probing/vivification), delta per solve call"),
-                ),
-                (
-                    "encoding",
-                    js("k = nk=ceil(log2 r) free bits with k<r comparator; ladder over all nk bits from (O=(1:0),G), xor-swap muxes; schoolbook multiplier, reduction prod + q*c = q*2^n + rem (c=2^n-p), rem<p; X = x_Q*Z mod p, Z!=0; x_Q bits free vars (assumptions in REUSE, units in FRESH); ~20 modular mults per ladder step"),
-                ),
-                (
-                    "x_only_note",
-                    js("x-only ladder cannot distinguish k from r-k; a model is accepted iff x([k']G)=x_Q (verified); P3 counts k' in {k, r-k} as the true k"),
-                ),
-                ("protocol_sha256", js(&proto_sha)),
-                ("source_sha256", js(&src_sha)),
-                ("ns", J::A(args.ns.iter().map(|&n| ji(n)).collect())),
-                ("targets", ji(args.targets as u64)),
-                ("conflict_budget", ji(args.budget)),
-                ("quick", J::Bool(args.quick)),
-                ("threads", ji(args.threads as u64)),
-                ("censoring_rules", js("fit uses n where every target of the arm finished; ratio uses medians with censored ordered as +inf (null if a middle element is censored); nothing is imputed")),
-            ]),
+            "encoding",
+            js("k = nk=ceil(log2 r) free bits with k<r comparator; ladder over all nk bits from (O=(1:0),G), xor-swap muxes; schoolbook multiplier, reduction prod + q*c = q*2^n + rem (c=2^n-p), rem<p; X = x_Q*Z mod p, Z!=0; x_Q bits free vars (assumptions in REUSE, units in FRESH); ~20 modular mults per ladder step"),
         ),
+        (
+            "x_only_note",
+            js("x-only ladder cannot distinguish k from r-k; a model is accepted iff x([k']G)=x_Q (verified); P3 counts k' in {k, r-k} as the true k"),
+        ),
+        ("protocol_sha256", js(&proto_sha)),
+        ("source_sha256", js(&src_sha)),
+        ("ns", J::A(args.ns.iter().map(|&n| ji(n)).collect())),
+        ("targets", ji(args.targets as u64)),
+        ("conflict_budget", ji(args.budget)),
+        ("quick", J::Bool(args.quick)),
+        ("threads", ji(args.threads as u64)),
+        ("censoring_rules", js("fit uses n where every target of the arm finished; ratio uses medians with censored ordered as +inf (null if a middle element is censored); nothing is imputed")),
+        ("warm_first_note", js("REUSE decomposition: reuse_first_conflicts = conflicts of the solve_order 0 solve (null if censored); reuse_warm_median_conflicts = median over solve_order >= 1 solves (censored ordered as +inf, null if a middle element is censored); alpha_reuse_warm = log2-median-vs-n least-squares slope with 1000-resample bootstrap 95% CI (seed F4/boot/REUSE_warm), fitted like alpha_FRESH on the n at which every warm solve finished")),
+    ]);
+    let doc = jo(vec![
+        ("header", jo(hdr)),
         ("curves", J::A(curves)),
         ("rows", J::A(row_json)),
-        ("fits", jo(vec![("FRESH", fit_json(&fit_f)), ("REUSE", fit_json(&fit_r))])),
+        ("fits", jo(vec![("FRESH", fit_json(&fit_f)), ("REUSE", fit_json(&fit_r)), ("REUSE_warm", fit_json(&fit_w))])),
         (
             "summary",
             jo(vec![
@@ -1317,6 +1577,10 @@ fn run(args: &Args) -> i32 {
                 ("instrument_failure", J::Bool(instrument_failure)),
                 ("lead_alive", J::Bool(lead_alive)),
                 ("verdict", js(verdict)),
+                ("alpha_reuse_warm", jopt(fit_w.alpha)),
+                ("alpha_reuse_warm_ci95_lo", jopt(fit_w.lo)),
+                ("alpha_reuse_warm_ci95_hi", jopt(fit_w.hi)),
+                ("alpha_reuse_warm_uncensored_n", J::A(fit_w.ns.iter().map(|&n| ji(n)).collect())),
             ]),
         ),
     ]);
@@ -1434,7 +1698,10 @@ mod tests {
     }
 
     fn planted(n: u32) {
-        let (info, rows) = run_n(n, 3, 10_000_000).unwrap();
+        planted_with(SolverKind::Cadical, n);
+    }
+    fn planted_with(kind: SolverKind, n: u32) {
+        let (info, rows) = run_n(kind, "F4/target", n, 3, 10_000_000).unwrap();
         assert!(info.vars > 0);
         for r in &rows {
             assert!(r.found && r.verified && !r.censored, "{:?}", r);
@@ -1463,7 +1730,7 @@ mod tests {
     fn hinted(n: u32) {
         let curve = find_curve(n);
         let lad = build_ladder(&curve);
-        let ks = targets_for(&curve, 2);
+        let ks = targets_for(&curve, 2, "F4/target");
         let hint = |k: u64| -> Vec<i32> {
             (2..curve.nk).map(|i| if (k >> i) & 1 == 1 { lad.kv[i] } else { -lad.kv[i] }).collect()
         };
@@ -1505,7 +1772,129 @@ mod tests {
 
     #[test]
     fn tiny_budget_is_censored() {
-        let (_, rows) = run_n(12, 2, 1).unwrap();
+        let (_, rows) = run_n(SolverKind::Cadical, "F4/target", 12, 2, 1).unwrap();
         assert!(rows.iter().any(|r| r.censored));
+    }
+
+    // ---- second solver (BatSat)
+
+    /// BatSat verifies planted instances in both arms and decodes k' in {k, r-k}.
+    #[test]
+    fn batsat_planted_k_recovered_small_n() {
+        for n in [4u32, 5] {
+            planted_with(SolverKind::Batsat, n);
+        }
+    }
+
+    /// The ladder circuit loaded into BatSat reproduces x([k]G) for fixed k (assumptions on k bits)
+    /// and rejects k = 0 and k >= r, exactly as the CaDiCaL test does.
+    #[test]
+    fn batsat_ladder_fixed_k_reproduces_x_of_kg() {
+        let curve = find_curve(10);
+        let lad = build_ladder(&curve);
+        let mut b = BatSlv::load(&lad.cnf);
+        let ks = [1u64, 2, 3, curve.r - 1, (curve.r - 1) / 2, (curve.r + 1) / 2];
+        for &k in &ks {
+            for l in word_units(&lad.kv, k) {
+                let bl = b.lit(l);
+                b.assumps.push(bl);
+            }
+            assert_eq!(b.solve(i32::MAX), Res::Sat, "k={}", k);
+            let mut x = 0u64;
+            for (i, &l) in lad.xqv.iter().enumerate() {
+                if b.val(l) {
+                    x |= 1 << i;
+                }
+            }
+            assert_eq!(Some(x), curve.xq(k), "k={}", k);
+        }
+        for &k in &[0u64, curve.r] {
+            for l in word_units(&lad.kv, k) {
+                let bl = b.lit(l);
+                b.assumps.push(bl);
+            }
+            assert_eq!(b.solve(i32::MAX), Res::Unsat, "k={}", k);
+        }
+    }
+
+    /// A budget of one conflict censors every n = 12 solve of the second solver (both arms);
+    /// the censored rows carry no model and the reported conflicts stay near the budget.
+    #[test]
+    fn tiny_budget_is_censored_batsat() {
+        let (_, rows) = run_n(SolverKind::Batsat, "F4/target", 12, 2, 1).unwrap();
+        assert_eq!(rows.len(), 4);
+        for r in &rows {
+            assert!(r.censored && !r.found && !r.verified && r.decoded_k.is_none(), "{:?}", r);
+            assert!(r.conflicts >= 1 && r.conflicts < 1000, "{:?}", r);
+        }
+        // the budget is per solve call, not cumulative: a generous budget on the same instance
+        // is not censored at n = 4
+        let (_, ok) = run_n(SolverKind::Batsat, "F4/target", 4, 2, 10_000_000).unwrap();
+        assert!(ok.iter().all(|r| !r.censored && r.found));
+    }
+
+    fn syn_row(n: u32, arm: &'static str, order: usize, conflicts: u64, censored: bool) -> Row {
+        Row {
+            n,
+            arm,
+            target: order,
+            order,
+            k: 1,
+            xq: 1,
+            found: !censored,
+            verified: !censored,
+            decoded_k: None,
+            conflicts,
+            decisions: 0,
+            propagations: 0,
+            censored,
+            wall_ms: 0.0,
+        }
+    }
+
+    /// Warm/first decomposition on a synthetic rows list: first = solve_order 0, warm = order >= 1,
+    /// FRESH rows ignored, warm medians (censored ordered as +inf) and the warm alpha fit.
+    #[test]
+    fn warm_first_decomposition_synthetic() {
+        let mut rows = Vec::new();
+        // n = 4: first 1000, warm {10, 30, 20} (median 20); FRESH rows must be ignored
+        rows.push(syn_row(4, "REUSE", 2, 30, false));
+        rows.push(syn_row(4, "REUSE", 0, 1000, false));
+        rows.push(syn_row(4, "REUSE", 3, 20, false));
+        rows.push(syn_row(4, "REUSE", 1, 10, false));
+        rows.push(syn_row(4, "FRESH", 0, 5, false));
+        // n = 5: first 2000, warm {40, 80, 60, 100} (median 70)
+        for (o, c) in [(0usize, 2000u64), (1, 40), (2, 80), (3, 60), (4, 100)] {
+            rows.push(syn_row(5, "REUSE", o, c, false));
+        }
+        // n = 6: first censored, warm {160, 320, 640} (median 320)
+        for (o, c, ce) in [(0usize, 4_000_000u64, true), (1, 160, false), (2, 320, false), (3, 640, false)] {
+            rows.push(syn_row(6, "REUSE", o, c, ce));
+        }
+        // n = 7: warm has a censored element at the median -> median None, n excluded from the fit
+        for (o, c, ce) in [(0usize, 5u64, false), (1, 1, false), (2, 99, true), (3, 99, true)] {
+            rows.push(syn_row(7, "REUSE", o, c, ce));
+        }
+        let d = reuse_decomp(&rows);
+        assert_eq!(d.len(), 4);
+        assert_eq!(d[&4].first, Some((1000, false)));
+        assert_eq!(d[&5].first, Some((2000, false)));
+        assert_eq!(d[&6].first, Some((4_000_000, true)));
+        assert_eq!(d[&4].warm.len(), 3);
+        assert_eq!(d[&5].warm.len(), 4);
+        assert_eq!(d[&6].warm.len(), 3);
+        assert_eq!(median_c(&d[&4].warm), Some(20.0));
+        assert_eq!(median_c(&d[&5].warm), Some(70.0));
+        assert_eq!(median_c(&d[&6].warm), Some(320.0));
+        assert_eq!(median_c(&d[&7].warm), None);
+        let warm_data: BTreeMap<u32, Vec<(u64, bool)>> = d.iter().map(|(n, x)| (*n, x.warm.clone())).collect();
+        let f = fit_arm("REUSE_warm", &warm_data);
+        assert_eq!(f.ns, vec![4, 5, 6]); // n = 7 has censored warm solves
+        let (a, c) = (f.alpha.unwrap(), f.intercept.unwrap());
+        let (y4, y5, y6) = (20f64.log2(), 70f64.log2(), 320f64.log2());
+        let expect = (y6 - y4) / 2.0 + 0.0; // slope of least squares over x = 4,5,6 is (y6 - y4) / 2
+        assert!((a - expect).abs() < 1e-12, "{} vs {}", a, expect);
+        assert!((c - ((y4 + y5 + y6) / 3.0 - a * 5.0)).abs() < 1e-12);
+        assert!(f.lo.is_some() && f.hi.is_some() && f.lo.unwrap() <= f.hi.unwrap());
     }
 }
