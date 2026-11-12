@@ -1,45 +1,43 @@
-# CURRENT — actualT20 geometry full39 accepted; commit then whole41
+# CURRENT — properT20 full41/proof/reports accepted; commit B next
 
-RootLOCAL/REMOTE30fa845af46c70b05fb3665cc12d787e0d793daf/treeb30005f7,
-parentd87/143paths/publication17ee06. Own43283121414inprogress/212e37,
-next19:40UTC(expected25/38/23/eight/37modules188written214compiledexpected
-0trusted/nativeJSONcompare). d87own43277728697SUCCESSall4/a75664at25/37/23/
-seven/36modules209compiled183written0trusted/full4logssettled. Allolder
-root/consumer1513/f656/c712successessettled,DO NOTrepoll.
+RootLOCAL/REMOTEc7af55d0002cf09d5b8d7003cd237229662e926b/tree94ba329a,
+parent30fa/146paths/publicationc6afa1. Own43291074099inprogress/95a56e,
+next20:24UTC at25/39/23/ten/bothJSONcmp/38modules192written218compiled
+expected0trusted. Root30 own43283121414SUCCESSall4/965785 at25/38/23/eight/
+JSONcmp/37modules214compiled188written0trusted/whole4logs,settlednorepoll.
+Older d87a75664/338d/fdfe/51d/0796 andconsumer1513/f656/c712successessettled.
 
-UNCOMMITTEDT20geometryAacceptedfull39/84454e:all626hashes/oldguardsfmt
-strictClippy/0failedignoredfiltered; geometry6141byteJSONidenticalselected
-296872 andoldkernel24475byteJSONidentical9f7c80. ActualQ20anti4sixteen/
-256sumsWeil/Gamma20four;P20Q20kernel4/16sums/Frobenius[0,2,3,1]/unique
-matching[[0,4],[1,3],[2,5]]of15/3stablemonicdeltas0,34,67/selected67.
-q11cube18/rawdelta95/rawT20[25,3,69,63,52,62,76],smooth6cycle/counts
-N1=120,N2=10436,J12317. Whole134348→XZ11468;completecustodyretained.
-Writtenb24be8usesactualcubicL/squarediscriminantclass/BD4.3Fpdegree4
-quotient/adjoint2/oddDLP; wholeMumfordBnotexecuted. [pcc:unverified]
+UNCOMMITTEDproperB full41/6cecba COMPLETEzero failedignoredfiltered/old39
+retained/oldreference+legacyguardsfmtstrictClippy/all627hashesunchanged/
+bothgeometry6141+kernel24475JSONbyte-identical/whole155310→XZ12028/exact
+custody. All12317C20→T20actualclasses/validdistinctFp/bothpositive-dual2/
+6159recovery/group/DLP/wrongtranspose12316vs1;actualC0-C20-T20all12317/
+normdiag98,2/recovery/bothprimeDLPgroups. PhysicalDivkeycachesnoindexlogs.
+Point0219c509:122/120controls/repeatedMumfordinputs/degree-drop4each/
+16J2each256sums+mapadds/kernelimage4/Frob3fixed16vs4/actualkernels/model
+reject. Source122includesbothgeometricinfinities,not122Fpcurvepoints.
+Observedrepeatedtargetfibres0reportedhonestly. [pcc:unverified]
 
-FourboundT20Geometry89e906/02c312/fee2b1/151a58,gate4/0trusted,192written
-38modules. Algebrad4220d23/10outputs/all13hashes/old8unchanged;newIDC
-11c6b82bbe669b8f+3147241afb3d4b6b fixed2^61-1scope. Mainreportpcc/claims/PCC-20261112-aed7ed.json
-2page49451PDF/failurepcc/claims/PCC-20261112-333065.json1page37694PDFallinspected;govpcc/claims/PCC-20261112-d38d9d.json
-own30prefix971/prose0/diff0,oldbenchrec189gaps106recordsNOTgreen.
-Static017c05b4Clone/privateIOfailurepreserved,newchild-onlyfixb578de.
-NOactivenative/proofprocess;full39session10458 COMPLETE/sourcefreezeENDED.
+Written720a59properfibres/basepoint/transpose/Fpdomain/globaldegree196/
+odddegreeobstruction. SixexactT20Wholelocalbindingsd01c21/2de44b/507bb7/
+f2b3ce/87bce9/b7ad54/gate6/0trusted;198written39modules,224compiled
+expectednotownCIobserved. ActualPicard/polarization/order/branchmodel
+bridgesexplicit. Mainpcc/claims/PCC-20261112-99a12e.json2page49373PDF/failurepcc/claims/PCC-20261112-a8af48.json1page39338PDF
+allinspected/editablesources;focusedCI39thmoduleappended,algebra10old.
+Formal0145889b/027fc8a6failed0audited;additiveplaceholderclarification
+76b1b9/fullnative6cecba. Whole03f776e2missingoriginalexit/afterreceipts
+NOTaccepted/causeunknown/late627guard;archivecallerworkflowerrorretained.
+Full04completealloriginalcriteria. Noactiveprocess/sourcefreezeENDED.
 
-NEXT:scopedAcommitchild30/artifactgate/exactobjects/nonforceCAS/3877+3904/
-ownautomaticCI(expected25/39/23/ten/38modules192written218compiledexpected
-0trusted/bothJSONcompares). THENB:readT20_WHOLE_IMPLEMENTATION_NOTES.md/
-b0c5f6andprotocola2c024;announcecoordinatehelperrefactorscope,snapshotold
-EvenModelpoint_class/support,delegateunchangedgenericarithmetic;implement
-properfinite/ramified/repeated/degree-drop/infinity/basepointfibres and
-negatedtranspose. Add2diagnosticsandfull41/allold39required; all12317Fp
-classes/dual2/Frob/DLP/recovery/actualC0-C20-T20norm98,2. Extra16actual
-J2classes/256sums/Frob3fixed16vs4preregisteredbeforeBcode. Bnotcoded.
-
-Consumer1513/748e all3SUCCESS3ea63d/root1e1681atfixed338d35scope;next
-distinctconsumer38pin/replay/independentkernelchecker. Vault8edec422key/KB/
-EKSbudget/S3unavailable. No paidrun/benchmark/subagents/historyrewrite/
-lineagechoice. Actualledger/C/archive/review/signing gatespersist. Continue.
-[pcc:unverified]
+NEXTownc7ledger/currentprose/diff/governance/scopedcommitchildc7/artifact
+gate/exactobjects/nonforceCAS/update3877+3904/ownautomaticCI(expected25/
+41/23/ten/bothJSONcmp/39modules198written224compiledexpected0trusted).
+Thenconsumerproper41pinparent748e/immediate1513andindependentlyencoded
+kernelpolynomialrecompute,preserveold3jobs/pins/inputs. Possiblelater
+nondualRichelotmirrorlooprequiresKB/primaryreview/preregistrationbefore
+code;notimplemented. Vault8edec422key/KB/EKSbudget/S3unavailable. No paid
+run/benchmark/subagents/historyrewrite/lineagechoice. Actualmainledger/
+C/archive/review/signing gatespersist. Continue. [pcc:unverified]
 
 ---
 # CURRENT — consumer1513 published/CI; root whole37 maps next

@@ -1,6 +1,8 @@
 //! Actual primitive-four kernel and normalized nonsplit Richelot geometry.
 //! Field/poly/elliptic/Cantor/determinant/count engines are unchanged.
 use super::*;
+#[path = "richelot_t20_maps.rs"]
+mod richelot_t20_maps;
 
 fn perfect_matchings(left: &[usize]) -> Vec<Vec<[usize; 2]>> {
     if left.is_empty() {

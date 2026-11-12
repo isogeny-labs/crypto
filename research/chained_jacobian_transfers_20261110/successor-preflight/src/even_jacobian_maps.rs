@@ -19,6 +19,77 @@ enum PullCase {
     BranchCorner,
     Infinity,
 }
+fn original_point_class(
+    f: &FpR,
+    coefficients: &[u64],
+    chart: &Chart,
+    j: &legacy::Hyp<'_, Flat<'_>>,
+    p: EvenPoint,
+) -> legacy::Div<ER> {
+    match p {
+        EvenPoint::Infinity(rho) => {
+            let z = f.mul(f.sq(chart.l), rho);
+            assert!(z == chart.q.v[0] || z == f.neg(chart.q.v[0]));
+            if z == chart.q.v[0] {
+                chart.q.clone()
+            } else {
+                j.neg(&chart.q)
+            }
+        }
+        EvenPoint::Finite(x, y) => {
+            assert_eq!(f.sq(y), poly::eval(f, &lift(f, coefficients), x));
+            if x == chart.a {
+                assert_eq!(y, f.zero());
+                return j.identity();
+            }
+            let w = f.div(chart.l, f.sub(x, chart.a));
+            let z = f.div(f.mul(y, f.pow(w, 3)), chart.l);
+            let raw = legacy::Div {
+                u: vec![f.neg(w), f.one()],
+                v: vec![z],
+            };
+            assert!(j.is_valid(&raw));
+            j.reduce(raw)
+        }
+    }
+}
+
+fn original_support(
+    f: &FpR,
+    coefficients: &[u64],
+    chart: &Chart,
+    j: &legacy::Hyp<'_, Flat<'_>>,
+    d: &legacy::Div<ER>,
+    cache: &mut RootCache,
+) -> Vec<EvenPoint> {
+    assert!(j.is_valid(d) && d.u.len() <= 3);
+    let degree = d.u.len() - 1;
+    let roots = cache.entry(d.u.clone()).or_insert_with(|| {
+        let mut roots = poly::roots(f, &d.u, &mut Rng::new(0x4901));
+        if degree == 2 && roots.len() == 1 {
+            roots.push(roots[0]);
+        }
+        assert_eq!(roots.len(), degree, "complete support with multiplicity");
+        roots
+    });
+    roots
+        .iter()
+        .map(|&w| {
+            let z = poly::eval(f, &d.v, w);
+            if w == f.zero() {
+                let rho = f.div(z, f.sq(chart.l));
+                assert_eq!(f.sq(rho), f.from_u64(coefficients[6]));
+                EvenPoint::Infinity(rho)
+            } else {
+                let x = f.add(chart.a, f.div(chart.l, w));
+                let y = f.div(f.mul(z, chart.l), f.pow(w, 3));
+                assert_eq!(f.sq(y), poly::eval(f, &lift(f, coefficients), x));
+                EvenPoint::Finite(x, y)
+            }
+        })
+        .collect()
+}
+
 impl EvenModel {
     fn source() -> Self {
         Self {
@@ -74,32 +145,7 @@ impl EvenModel {
         j: &legacy::Hyp<'_, Flat<'_>>,
         p: EvenPoint,
     ) -> legacy::Div<ER> {
-        match p {
-            EvenPoint::Infinity(rho) => {
-                let z = f.mul(f.sq(chart.l), rho);
-                assert!(z == chart.q.v[0] || z == f.neg(chart.q.v[0]));
-                if z == chart.q.v[0] {
-                    chart.q.clone()
-                } else {
-                    j.neg(&chart.q)
-                }
-            }
-            EvenPoint::Finite(x, y) => {
-                assert_eq!(f.sq(y), poly::eval(f, &lift(f, &self.coefficients), x));
-                if x == chart.a {
-                    assert_eq!(y, f.zero());
-                    return j.identity();
-                }
-                let w = f.div(chart.l, f.sub(x, chart.a));
-                let z = f.div(f.mul(y, f.pow(w, 3)), chart.l);
-                let raw = legacy::Div {
-                    u: vec![f.neg(w), f.one()],
-                    v: vec![z],
-                };
-                assert!(j.is_valid(&raw));
-                j.reduce(raw)
-            }
-        }
+        original_point_class(f, &self.coefficients, chart, j, p)
     }
     fn support(
         &self,
@@ -109,32 +155,7 @@ impl EvenModel {
         d: &legacy::Div<ER>,
         cache: &mut RootCache,
     ) -> Vec<EvenPoint> {
-        assert!(j.is_valid(d) && d.u.len() <= 3);
-        let degree = d.u.len() - 1;
-        let roots = cache.entry(d.u.clone()).or_insert_with(|| {
-            let mut roots = poly::roots(f, &d.u, &mut Rng::new(0x4901));
-            if degree == 2 && roots.len() == 1 {
-                roots.push(roots[0]);
-            }
-            assert_eq!(roots.len(), degree, "complete support with multiplicity");
-            roots
-        });
-        roots
-            .iter()
-            .map(|&w| {
-                let z = poly::eval(f, &d.v, w);
-                if w == f.zero() {
-                    let rho = f.div(z, f.sq(chart.l));
-                    assert_eq!(f.sq(rho), f.from_u64(self.coefficients[6]));
-                    EvenPoint::Infinity(rho)
-                } else {
-                    let x = f.add(chart.a, f.div(chart.l, w));
-                    let y = f.div(f.mul(z, chart.l), f.pow(w, 3));
-                    assert_eq!(f.sq(y), poly::eval(f, &lift(f, &self.coefficients), x));
-                    EvenPoint::Finite(x, y)
-                }
-            })
-            .collect()
+        original_support(f, &self.coefficients, chart, j, d, cache)
     }
     fn norm(
         &self,

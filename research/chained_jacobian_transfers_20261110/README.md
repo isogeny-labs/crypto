@@ -1,3 +1,14 @@
+# New component: proper whole C20→T20 map and degree196 chain
+
+Complete41/6cecba all627hashes/bothJSONcmp;all12317actualclasses/bothdual2/
+6159recovery/actualC0-C20-T20normdiag98,2/primeDLP. Written720a59,
+sixboundlocalLean198written39modules0trusted;explicitgeometricbridges.
+Mainpcc/claims/PCC-20261112-99a12e.json /[inspected2pagePDF report](reports/t20-proper-whole-map/REPORT.md);
+failurepcc/claims/PCC-20261112-a8af48.json /[inspected1pagePDF report](reports/t20-proper-failures/REPORT.md).
+Fullscope/failures/fielddomain preserved. Nextdistinctconsumerproper41
+pin/replay/independentkernelchecker. Standingunsigned. [pcc:unverified]
+
+---
 # New component: actual T20 primitive-four geometry
 
 Full39/84454e acceptsactualP20Q20kernel4/uniqueWeierstrassmatching/
