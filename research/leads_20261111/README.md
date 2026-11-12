@@ -41,6 +41,12 @@ All results below are `[pcc:unverified]`.
   - §5a band: cheaper at w = 0 and 0.1, dearer at w = 1, so unresolved.
   - Write-up: `research/jv_sieve_hilbert_descent_20261112/README.md`.
 
+- **Lead 5 (`LEAD-ICB-d4bin-chain-variable-sweep`): closed.**
+  - The current chain unknown already gives k = 12 chains, not the 16 the lead
+    assumed.
+  - The only alternative (s4) gives 28 chains and 2.34× the cost per trial.
+  - Write-up: `probes/CHAIN_VARIABLE.md`.
+
 | Lane | File | Leads |
 |:--|:--|--:|
 | A — last fall degree and the selector proof system | `lane_A_falldegree.md` | 5 |

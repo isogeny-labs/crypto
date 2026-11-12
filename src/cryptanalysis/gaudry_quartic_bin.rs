@@ -2325,7 +2325,13 @@ pub fn solve_d4_bin(
             fq,
             &comps,
             &FROBENIUS_WEIGHTS,
-            3,
+            // chain unknown: P (index 3) by default; `D4_BIN_MVAR=2` selects the other
+            // weight-1 unknown s4 (LEAD-ICB-d4bin-chain-variable-sweep probe).
+            std::env::var("D4_BIN_MVAR")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .filter(|&v: &usize| v == 2 || v == 3)
+                .unwrap_or(3),
             macaulay,
             opts.sparsest,
             &mut out.solve,
