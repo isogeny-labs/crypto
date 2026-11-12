@@ -29,14 +29,16 @@ subgroup `r`, `Q = [x]P`; the chain is built and each hop verified to satisfy
   (same `#E`); rho on the order-`r` subgroup of `J(C)` matches `E1` rho in
   group-op count (same `√r` walk) and is dearer in field operations (a Cantor
   step costs several elliptic additions); genus-2 index calculus on `J(C)`
-  with the full degree-1 factor base collects `Ω(p)` relations, its measured
+  with the full degree-1 factor base collects about `p` relations, its measured
   relation-phase group-op count growing like `p` while rho grows like `√p`.
   See `research/chained_prime_transfer_20261111/RESULTS.md`.
 - **Derived:** for a degree-2 morphism `φ : C → E`, `φ_*φ^* = [deg φ] = [2]`,
   so `φ^*` preserves the odd-order DLP; the second quotient gives
   `φ2_* φ1^* = 0` (a vanishing cross-composite). Both are verified in code on
-  the unramified locus and on random classes. The index-calculus cost floor
-  is the standard genus-`g` relation count `Ω(p^{2-2/g}) = Ω(p)` for `g = 2`.
+  the unramified locus and on random classes. The usual small-genus
+  index-calculus estimate is `Õ(p^{2-2/g})`, exponent 1 at `g = 2`. That is a
+  limit of this approach, not a lower bound on the problem: rho on the
+  original `r ≍ p` subgroup already costs about `√p`.
 - **Suspected explanation:** the chain is a group isomorphism onto its image,
   so it transports the hardness unchanged; the only structure it exposes
   (a second elliptic quotient) communicates with the first through a map that
@@ -96,7 +98,9 @@ none (`research/chained_prime_transfer_20261111/ATLAS.md`) [pcc:unverified]:
 - Positive control: Smart's additive transfer recovers the log on a genuinely
   anomalous curve over `F_43`, so the easy node is real — just unreachable from
   a non-anomalous start (an isogeny preserves the trace; no edge changes the
-  characteristic, so no binary node is reachable either).
+  characteristic, so no binary node is reachable either). Isogeny transfer still
+  works over prime fields; what is missing is a smaller base field. A weak
+  prime-field family discovered later could still be a transfer target.
 
 The load-bearing theorem: a DLP-preserving `E → E'` exists iff `E ~ E'`
 (isogenous) iff `#E = #E'`, so a map to a different-order curve cannot preserve

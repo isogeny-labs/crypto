@@ -472,6 +472,23 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
 
+## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)
+
+Track: generic decomposition, bounded by sqrt(r), cannot beat rho. Registered protocol; the incumbent and both k-sum families were tuned on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table incumbent. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 distance to rho grows to 6.30x-8.52x. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.
+
+| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |
+|--:|:--|:--|:--|:--|--:|
+| 20 | 10.66 / 7.46 / 1.24 | 0.700 [0.682, 0.718] / 0.685 [0.666, 0.705] / 0.615 [0.591, 0.640] | 0.632 [0.611, 0.654] / 0.633 [0.610, 0.656] / 0.637 [0.606, 0.669] | 5.99 / 5.87 / 5.26 | 192 |
+| 24 | 14.27 / 6.37 / 1.09 | 0.446 [0.432, 0.461] / 0.448 [0.432, 0.464] / 0.454 [0.432, 0.476] | 0.452 [0.440, 0.465] / 0.458 [0.445, 0.472] / 0.486 [0.467, 0.505] | 5.82 / 5.84 / 5.92 | 192 |
+| 28 | 21.45 / 6.96 / 0.95 | 0.324 [0.318, 0.331] / 0.319 [0.312, 0.326] / 0.293 [0.284, 0.304] | 0.336 [0.329, 0.344] / 0.337 [0.329, 0.345] / 0.341 [0.330, 0.353] | 7.33 / 7.12 / 6.16 | 192 |
+| 32 | 32.18 / 6.99 / 0.95 | 0.217 [0.212, 0.222] / 0.218 [0.212, 0.223] / 0.220 [0.212, 0.229] | 0.253 [0.248, 0.258] / 0.256 [0.250, 0.262] / 0.271 [0.262, 0.280] | 7.34 / 7.22 / 6.70 | 192 |
+
+The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on 16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every size.
+
+[Report](../../research/prime_ksum_pooled_20261029/report.pdf) · [README](../../research/prime_ksum_pooled_20261029/README.md) · [study](../../research/prime_ksum_pooled_20261029/).
+
+Validated with caveats: replay certificate (count-identical replay of all 8 sessions, 9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean archive of 6edb2cb36d), validator report (independent recompute) and the matched rho reference with the §5a band are filed in `research/prime_ksum_pooled_20261029/VALIDATION.json`. Scope: the counted unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.
+
 ## Component speed-up: membership filter on the packed pair table (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261029-packed-filter); track generic (prime-table; docs/ic/SWEEPER.md, Tracks). Label: whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table, `mitm-prime-blocked:m=2,filter=1` against `mitm-prime-blocked:m=2` at b = 32. It moves no row of tables A–C and is ranked against nothing in them.
@@ -1038,7 +1055,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
-- `research/mt_fieldops_v3_20261111/results/holdout/summary.json` — sha256 `ae2eb540476901f4…`
+- `research/mt_fieldops_v5_20261112/results/holdout/summary.json` — sha256 `130f9c0da9b3546b…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`

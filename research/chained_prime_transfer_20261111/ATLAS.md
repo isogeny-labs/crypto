@@ -25,7 +25,9 @@ bites.
 
 - **Up, to the cover `J(C)`.** `φ^* : E → J(C)` is an explicit DLP-preserving [pcc:unverified]
   embedding. It is no cheaper: genus-2 index calculus on `J(C)` over `F_p`
-  costs `Ω(p)` against rho's `√p` (PR #3898, `RESULTS.md`).
+  costs about `p` group operations against rho's `√p` (PR #3898,
+  `RESULTS.md`). That is the cost of this IC approach (`Õ(p^{2-2/g})`), not a
+  lower bound.
 - **Across, to the complement `E'`.** The cover offers exactly one other
   elliptic map, `φ2_* : J(C) → E'`, and the composite that would carry the log,
   `φ2_* φ1^*`, is **identically zero** — forced by the deck involution
@@ -39,6 +41,10 @@ bites.
 - **Down, to a binary curve.** No edge here changes the characteristic. There
   is no binary node in the reachable set; the only known bridge is a global
   lift of degree `≥ m` (`cryptanalysis:research/xedni_cross_field`).
+  Isogeny transfer itself still works over prime fields. What is missing is
+  the smaller base field that makes a GHS-style target pay off. A weak
+  prime-field family discovered later could still become an isogeny-transfer
+  target from curves in its isogeny class.
 
 ## The cover sweep (parallel workflow)
 
