@@ -28,3 +28,29 @@
 - Initial CT51 README math backslashes were eaten by JS string escaping; replaced malformed math with explicit inline expressions in a follow-up commit.
 - JS torsion enumeration initially used .filter(psi3), selecting nonroots. Corrected to .filter(z=>psi3(z)===0) and executed the exact committed code successfully.
 - KB, Conductor binary and crypto-autoresearcher AGENTS.md remained unavailable; no attempt to bypass access controls or overwrite concurrent heads.
+
+## 2026-11-12T20:55:06Z — CT52 full mod-3 Galois image
+
+### What was done (commands, files, features)
+
+- Inspected root crypto PR #3877 (latest inspected head 030ea125), existing cross-characteristic PRs #4012/#4015 and cryptanalysis PR #1511, CT51 code/README/handoff and AGENTS.md/CLAUDE.md. Parent CT51 commit 50461855 had passing GitHub scoped CI run 43296406860 and pcc-gate 43296406764 (scientific signing still skipped). The shared research-KB MCP and repo wrapper were not accessible; fallback cross-repo GitHub search and two published division-field/Galois-surjectivity references were read.
+- Added CT52 exact arithmetic certificate and proof: psi3 mod 2 irreducible quartic; mod 7 factor 1+irreducible cubic. Projective image S4 and Frobenius_2 order 8 imply full GL2(F3), of size 48, on Cremona 11a1. Thus one geometric point has degree 8, while the full division field has degree 48.
+- Independently implemented Python polynomial arithmetic/S4 48-cycle-pair check/GL2 orbit enumeration, and JavaScript polynomial arithmetic/trace/GL2 enumeration. All four local runs passed (normal/optimized Python and normal/no-opt Node), plus reducible polynomial and trace-zero mutants rejected. Exact-head CI still pending after committing.
+- Added CT52 proof at ct52/CT52_GALOIS_ORBIT.md and updated the existing five-minute scoped workflow with four new CT52 commands; parent CT51 arithmetic remained untouched.
+
+### Decisions made (and why)
+
+- Prove actual surjectivity for ell=3 from two Frobenius witnesses rather than assuming it. Distinguish point, x-coordinate, cyclic line and full-basis orbit indices. Explicit field presentations of a single point and a whole torsion basis have different dimensions.
+- Conditional ell=5/7/11 GL2 group enumerations are **not** claims that 11a1 is surjective at those primes. Serre open-image applies to all sufficiently large ell only on fixed non-CM E.
+- Keep this scoped to cross-characteristic PR #4015 and retain [pcc:unverified], with no paid compute or merger of concurrent native #3877.
+
+### Open threads (unfinished, pick up next time)
+
+- Confirm exact-head CI and reviewer/PCC status. No independent scientific signature yet.
+- Prove or construct a **uniform** encoded-input algebraization for changing A_(p,ell) (especially g>=2) that beats the full baseline once field degree, heights, orientation and target solver are charged; fixed-E orbit bounds are not uniform.
+- Keep proper genus-two Richelot/Cantor and same-characteristic work with its existing native owners/PRs.
+
+### Errors (what went wrong, how it was handled)
+
+- CT51 branch does not contain docs/session-logs/2026-11-12.md although default branch has concurrent edits; kept a scoped append-only CT51 RUN_LOG rather than introducing a conflicting root file.
+- No algebra/test failures after local CT52 verifier corrections. Scientific verification gate remains pending.
