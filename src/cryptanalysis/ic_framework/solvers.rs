@@ -48,6 +48,16 @@
 //! native count stays in the report as the engine's own regression
 //! measure.
 //!
+//! Since PR #1774 the framework matches the whole `word XORs (…)` family to
+//! `ns_per_word_xor`.  Every other unit has its own calibration key
+//! ([`solver_unit_key`], 2026-11-12), which charges the count only once
+//! `docs/ic/calibration.json` pins that key for the curve.  No key is pinned
+//! yet, so every unit below is still priced by wall time as described above.
+//! The rule in this section still holds after a pin: a unit whose count
+//! does not cover the engine's whole run is refused, and the solver block
+//! says why (`pricing_qualification`).  Today that is `crossbred-f2`'s
+//! `word operations (partial…)` and `xl-f2`'s modelled count.
+//!
 //! ## Adding an engine — F4, F5, or anything else
 //!
 //! Implement [`SystemSolver`] and register it in [`solver_registry`].
@@ -85,6 +95,8 @@ use crate::cryptanalysis::pq_groebner_f2::{
     groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
 };
 use crate::cryptanalysis::semaev_sat::XorEncoding;
+
+pub use super::solver_units::{solver_unit_key, SolverUnitKey};
 
 /// The largest system `exhaustive` and the model-enumerating solvers
 /// will attempt, since they are `2^n` in the variable count.
