@@ -1,6 +1,6 @@
 # Chained ECDLP transfers — persistent queue
 
-Owner: autonomous research session, starting from PR #3877. Updated 2026-11-12 after CT25 publication and odd coefficient descent; historical interruption is resolved at custody/access scope.
+Owner: autonomous research session from PR3877. Updated2026-11-12 after actual1508/full98 and complete independent whole-map29;historical interruption resolved at custody/access scope.
 This is the canonical queue; completed entries stay here. Results require their
 own evidence and PCC standing; a checked box is not a verification verdict.
 
@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 134written helpers/24modules;geometrypartial;unsigned | Formalize transport and descent with faithful hypotheses. | Added two BalancedChart linear-support/infinity-accounting lemmas db2184/9fd61b,local zero-trusted gate7d9a53;132 prior statements unchanged. Actual fields/projective/Picard/quotient/polarization/Torelli/Galois bridges remain written. |
+| CT03 | 147written helpers/29modules;geometrypartial;unsigned | Formalize transport/descent with faithful hypotheses. | Three newIndependentMapChart bound lemmas175646/fe086f/73e237;all144older statements unchanged. Actualfields/projective/Picard/quotient/polarization/Cantor/geometry bridges remain written/partial. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -43,11 +43,12 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT26 | complete/ready1498/exactCI succeeds;unsigned | Lazy canonical root tables without arithmetic changes. | Consumer25fd/1498 against1496,full25/82+five3c6362/root089c42. Exact43144567065 succeeds,signedjobskips,full205514 in5ceb. Canonical roots17/1013f015c,written718425/filter1da835/report5e1f22 retained. |
 | CT27 | complete/ready1501;ownCI succeeds;unsigned | Independently replay arbitrary balanced degree0/1/2 classes beyond49kernels. | FULL_CLASS_CHECKPOINT.md:consumer5ceb ready1501 against1498,full25native/83reference+five93b147/root18115e,post-run frozen hashes unchanged. Both full12317 corpora/negations/doubles/paired sums pass existing-Cantor12/Clippy/sourceguards4b2aa9,writtenb71a87,partial7d9a53/final89916e. Timestamp-only correctione15346/root279a08 preserves05. Exact5cebCI43157257094 green/fullf74e9e. No all151M pairs or independent map-membership claim. |
 | CT28 | complete/ready1506/exactCI success;unsigned | Whole firstforward overF101. | b297/treeae092,full25/90+five76871d/root6e000a;exact43180569278 SUCCESS/full64e1d9/root7993eb;parentfixed. |
-| CT28a | complete/ready1507/ownCI pending;unsigned | Whole firstadjoint overF101. | 93587b9/tree0f032e,full25/92+five d744cf/root ee9ebc,sourceccfb25,writteneceeb1/report8248ae/packd2f0e5;published456712;ownfocused09:23initiallistempty,next10:13. |
-| CT28b | allisolated forward/reverse accepted;actual98 running;unsigned | Whole secondhop/compressed outer norm/pullback chain. | T2runtimee383f2,forward8e0523,reverse4ac90f all12317/group/norm7+49/source196;written89e13d/001dff. Actual source02d0ad0a13frozen/full03session33859 since09:35 expected25/98+five;no source edits until result. |
+| CT28a | complete/ready1507/exactCI SUCCESS;unsigned | Whole firstadjoint overF101. | 935/tree0f032,full25/92+five d744cf,exact43191178913 SUCCESS/fullf72285/root5bbe4d;bodyupdated,fixedhead settled. |
+| CT28b | complete/ready1508/ownCI pending;unsigned | Actual secondhop/compressed outer norm/pullback chain. | c7128485f/tree083952bd,full25/98+five3be24d/root04f89e/all13source02 unchanged;d0ad0a/written96a2d2/reportecddc4/pack9e858b. Exactoldreferences andeveryexception/control retained. Ownfocused10:40initiallistempty,next11:30. |
 | CT28c | written geometric distinction and native inputs complete;unsigned | Distinguish actual unpolarized Jacobians over the algebraic closure. | b05286:primary ordinaryEnd fields -355/-283 plus old actual elliptic embeddings/unique connected norm kernels and j12/87/47. Rust inputs5c1a1b/full20 829d69;CT37 prior credited,twistcd2506 retained. Actual geometry written,not native End/isomorphism computation or full Lean construction. |
 | CT28d | complete independent fixedspectra/partialformal;unsigned | Distinguish isogenyclass checks from selected geometry. | ExternalCT38/39/40 a30c63d1 credited48d283;Rust21/full3d96bc actual120/10436/mutant120/10314,76d876;four bound spectrallemmas plus2recovery144written/28modules. Root9084 ownCI20/13826 full411a94 settled;newscope ownCI separate. |
-| CT28e | next discriminating task;unsigned | Independently evaluate whole maps with existing generic Cantor/flat-field engines. | Inspect fixedfullclass chart/finitequarticnorm/pullback adapters;preserve all12317/exception/model/negative criteria. No lead source/run yet. Earlier12hop ellipticcycle hypotheses4/3 remain queued,not a coupledJacobian closure claim. |
+| CT28e | complete independent wholemap29;unsigned | Everyoldrationaloutput andactual49kernel membership via separateCantor/pointwisenorms. | Full5cf8f9 all6×12317 directions/12316wrongquartereach,both49kernels/48omitted7controls,all3source9fixturehashes unchanged. Writtenab8c53/completec49e8b/report7aea70. Timeoutb6bc9e/V2fd19e7 retained;147/29partialformal. Globaldegree/Picard stillseparate. |
+| CT28f | next frozenprotocol;no code/runyet;unsigned | Full2401 geometric7torsion action andnondualchain/backtracking/shadow controls. | GEOMETRIC_SEVEN_CENSUS_PROTOCOL.md;existingengines/Fp12/quinticpointnorms/all3models/all6maps;predictedkernel49/image49,sharedT1intersection1,backtrackingzero2401. Keepdegreeblindspot;native30/newLean planned. Earlier12hopcycle remainsqueued. |
 
 ## Session constraints
 
@@ -62,10 +63,10 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read PRIME_FIELD_CHECKPOINT.md/newest journal. Actual second/compressed
-full03 session33859 runs on13frozen source02 since09:35UTC;expected25/98+five.
-Ready1507/935 full92 accepted,ownCIinitiallistempty/next10:13. Root9084
-exact43185969853 SUCCESS/full411a94 scope20/13826 settled. Commit/publish
-new21/144/28 reverse/spectral checkpoint now;new ownCI separately. Then
-independent whole-map feasibility via existingCantor/flatfield adapters.
-Keep all frozen subjects/forks/vault/S3/budget/KB blockers;no broad reruns.
+Read PRIME_FIELD_CHECKPOINT.md/newestjournal. No localnative active:actual
+98/33859,producerV2/46605,independent29/13533 allEXIT0/afterhashes captured.
+Ready1508/c712 full98 accepted,ownCIinitiallistempty/next11:30. Parent1507
+exact43191178913 SUCCESS/fullf72285. Commit/publish newroot29/147/29 now
+fromb351;oldb351 exact43196578049 due10:52. Then fullgeometric7torsion
+census via frozenprotocol;no newcensuscode/resultyet. Keep allfrozen
+subjects/forks/vault/S3/budget/KB blockers,no broadreruns or unchangedpolls.
