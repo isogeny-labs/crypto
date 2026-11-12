@@ -200,7 +200,7 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 ## Proof note (2026-11-12 addendum)
 
 `research/chained_transfer_proof_20261112/PROOF.md` states the obstruction once.
-- **Proved:** `c_*c^* = [d]`, `J_C ~ E × P`, and pull-back injective on `E[r]` for `r ∤ d`.
+- **Established in the note** (argument given there, unverified by pcc) [pcc:unverified]: `c_*c^* = [d]`, `J_C ~ E × P`, and pull-back injective on `E[r]` for `r ∤ d`.
 - **Fibre rigidity (T5).** For hyperelliptic `C`, `d ≤ g` and `c ∘ ι_h = [−1] ∘ c`, every `Q` outside an explicit finite set has `c^*Q` as the reduced representative of `c^*[Q − O]`.
 - **Collision equivalence (T7).** Every dependency among the fibre rows is a collision `Q_i = ±Q_j` on `E`. So an IC whose relations lie in the transferred subgroup cannot beat the matched collision search on `E`.
 - **`φ2_*φ1^* = 0` (T8).**
