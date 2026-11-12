@@ -29,7 +29,7 @@ instance in Python. This effort:
 
 ## Results
 
-See `RESULTS.md`, `results.json` and `REPORT.pdf`. The result is reported as an
+See `RESULTS.md`, `results.json` and `REPORT.pdf`; the replay-corrected rerun is `results_v2.json` and `REPORT_v2.pdf`. The result is reported as an
 unverified assertion (no independent validator has signed it). Summary: the
 chain is verified at p = 211 to 1619. Rho on each destination stays within the
 scatter of the source rho. Genus-2 index calculus on J(C) costs 9.8× to 42.9×

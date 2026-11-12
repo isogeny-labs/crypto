@@ -82,3 +82,23 @@ next section.
 - **F13/F14, bindings.** Some bench records bind a dirty commit that does
   not contain the measured files, and no solve certificates were emitted. The
   v2 run is recorded from a clean commit.
+
+## Corrected rerun (`results_v2.json`, 2026-11-12)
+
+Bench record `benchmarks/records/20261112T0316Z-chained-prime-transfer-v2.json`.
+The run is from clean commit `c211ce17a4`, which carries the F1–F3 and F6
+fixes. Every row recovered the planted log by rho and by IC, and every chain
+verified. The IC/rho ratios and the LA mulmods equal the independent replay's
+corrected values exactly. IC is relation-collection group operations; LA is
+priced per AGENTS §5a at 0, 0.1 and 1 GAE per mulmod. All values are
+`[pcc:unverified]`.
+
+| p | r | rho on E1 | IC group ops | LA mulmods | IC/rho @ 0 GAE | @ 0.1 GAE | @ 1 GAE |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 211 | 109 | 428 | 3,700 | 14,633 | 8.6× | 12.1× | 42.8× |
+| 419 | 113 | 357 | 8,315 | 51,976 | 23.3× | 37.9× | 168.9× |
+| 821 | 71 | 370 | 11,596 | 164,828 | 31.3× | 75.9× | 476.8× |
+| 1619 | 401 | 847 | 33,196 | 603,721 | 39.2× | 110.5× | 752.0× |
+
+IC is above rho at every price, so the order holds across the (one-sided)
+band. The distance remaining to rho is 8.6–39.2× at 0 GAE and grows with p.
