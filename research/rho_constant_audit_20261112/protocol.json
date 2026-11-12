@@ -1,0 +1,495 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "rho-constant-ecbench-main-20261112",
+  "version": 1,
+  "created": "2026-11-12",
+  "repository": "crypto",
+  "study_dir": "research/rho_constant_audit_20261112",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "spec": "spec.json",
+    "source_review": "evidence/source-review.json",
+    "original_item": "11"
+  },
+  "question": "What are the actual fixed-population cold GAE and native counts of the repository rho implementations, relative to the standard-negating sqrt(pi/4) reference, with all outcomes retained?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Exact finite correctness, counted costs, determinism and replay for the frozen population; report per-curve totals and ratios descriptively.",
+      "class": "exact_computation",
+      "decided_by": [
+        "finite-checks"
+      ]
+    },
+    {
+      "id": "C2",
+      "text": "sqrt(pi/4) is the standard-negating average reference, not an exact finite-population value or universal lower bound.",
+      "class": "heuristic_estimate",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "No asymptotic rejection/confirmation, mathematical optimality, isolated negation-map causal effect, wall-time speedup, compiler refinement or independent-host proof.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "On a 20-bit prime-order curve BSGS with the negation map pays its table setup in counted operations and lands above rho.negation in S.",
+      "mechanism": "BSGS charges sqrt(r)-scale table construction before the first lookup; rho's expected cost is sqrt(pi r / 4) with the negation map.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "s",
+          "direction": "higher",
+          "minimum_effect": "median S of bsgs-neg above the upper end of the rho A/A interval",
+          "provenance": {
+            "written_at": "2026-10-22",
+            "data_seen": [
+              {
+                "path": "crypto:research/eks_crypto_validation_20261019/README.md",
+                "measured": "the same session's verified counts; this example is in-sample by construction"
+              }
+            ],
+            "sample_status": "in_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "Actual unmodified registered native method; no tuning",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "cap_multiple": "64"
+      }
+    },
+    {
+      "id": "rho-plain",
+      "role": "baseline",
+      "description": "Actual unmodified registered native method; no tuning",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "method": "rho.plain",
+        "cap_multiple": "64"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "Actual unmodified registered native method; no tuning",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "cap_multiple": "64"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every row is an actual known-answer discrete log; solver never receives scalar, harness and replay verifier both check [k]G=Q and planted scalar. Separate preflight must pass before main; no separate positive arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Descriptive finite counts only; no unusualness or asymptotic rejection test. rho.plain is a method baseline, not a fabricated statistical null."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.negation",
+          "rho.plain"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "how": "Four existing generic prime_roster curves at14/16/18/20 bits, alltargets derived from frozen spec; independent of arm."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One exact release binary/source/compiler, no code tuning; hash pinned before data."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "RAYON_NUM_THREADS=1,OMP_NUM_THREADS=1."
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "Frozen ecbench SHA256 derivation per workload/round, shared across arms; disjoint pilot/main master seeds."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "Existing alternate harness order within rounds."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Record CPU/OS/kernel/SMT/NUMA/affinity/PSI/co-tenants; L0 counts only, no valid scientific clocks."
+      },
+      {
+        "name": "layout_environment",
+        "treatment": "measured",
+        "how": "Each run fresh child process; binary and single-thread environment fixed, host capsule retained."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Unmasked descriptive analysis script frozen before data, all cells/failures included; no discretionary rank/significance claim."
+      },
+      {
+        "name": "interruption",
+        "treatment": "measured",
+        "how": "No measurement retries or resumes; preserve interrupted rows and stop."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "finite-checks",
+        "arms": [
+          "rho-neg",
+          "rho-plain",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All planned rows verified; all measured deterministic replay counts identical; each same-seed A/A measured pair count identical. Otherwise not_validated; no survivor-only conclusion."
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "threshold": "Per paired-workload/round count equality; tests determinism only, not independent-seed variability."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "ecbench spec spec.json: uniform_scalar_sha256_v1 target law; derive_u64 ecbench.algorithm_seed(workload,round,measurement.seed), paired across all arms. Pilot/master seeds20261112001/20261112002; main20261112011/20261112012."
+    },
+    "instance_sampling": {
+      "rule": "64 fixed targets across four roster curves by spec, no outcome-dependent selection",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact/descriptive all-cell audit, no selection/inferential verdict. Native fixed analysis frozen before data; method parameters necessarily public.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 64,
+    "replicates": 3,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "No hypothesis test/power claim. Fixed finite descriptive coverage and exact answers/replay; alpha unused schema metadata. Main16 targets per curve, three independent algorithm rounds; not sufficient to establish limiting constant."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "Pilot budget is prospective conservative cap, not observed runtime; prerequisite binary build/plan not experiment data. Main estimate filled from separately frozen pilot before main freeze; do not pool pilot."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "total_gae",
+        "name": "Total cold counted cost",
+        "unit": "GAE",
+        "kind": "counted",
+        "definition": "All native method phases, jump-table/setup, starts, walks, cycle handling and internal verification; add/double1; scalar actual add/double events.",
+        "source": "records.jsonl cost.total_gae",
+        "aggregation": "per_row",
+        "resolution": "1 GAE before sqrt(r) normalization",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "s",
+        "name": "Normalized cold count",
+        "unit": "GAE/sqrt(r)",
+        "kind": "counted",
+        "definition": "Total cold count divided by actual subgroup-order square root; report ratio to sqrt(pi/4) birthday reference, not an optimality floor.",
+        "source": "records.jsonl cost.s",
+        "aggregation": "mean",
+        "resolution": "1 GAE before sqrt(r) normalization",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [
+      "all phase counters",
+      "all cost.unpriced names/counts",
+      "all work_native counters",
+      "steps",
+      "walk_operations"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "approved zero-paid local checkpoint; no EKS/cloud jobs",
+    "placement": {
+      "cpus": "none; counts only",
+      "threads": 1,
+      "paid_spend": 0
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 15,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed64workloads x3arms x(3measured+1warmup)=768calls then stop;15s perchild; no outcome-dependent retry.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Global session cap180seconds with SIGINT then5s kill grace; preserve any incomplete session. No paid execution.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "Main begins only if all12pilot calls verify and measured replays match; otherwise main is not_validated.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any failure, timeout, interruption, wrong answer or missing row prevents complete-population claim; retain all rows and native comparison bound flags.",
+    "All clocks scientifically invalid; L0 operation counts remain counted, not timing evidence.",
+    "Missing unpriced counts prevents ranking; no ranking unless stable at0/0.1/1GAE per operation."
+  ],
+  "decision_rule": {
+    "text": "known_answer_pass only when all planned answers, exact replay and paired A/A count checks pass. Report every curve/arm meanS, ratios and native phase/unpriced counts. A finite mismatch with0.886 is not a refutation of the qualified asymptotic statement.",
+    "comparison_ids": [
+      "finite-checks"
+    ],
+    "threshold": "All planned answers and deterministic measured replays identical; no statistical threshold.",
+    "statistic": "Per-curve meanS and native ratios of paired sums; all-arm pricing band at0/0.1/1.",
+    "interval": "Exact finite counts; native descriptive cluster/delta and bootstrap intervals retained without asymptotic verdict.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "MeanS/sqrt(pi/4) and same-population configured-method ratio; no isolated negation-map causal claim.",
+    "verdict_vocabulary": [
+      "known_answer_pass",
+      "not_validated",
+      "discrepancy"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.sh",
+      "sha256": "082e83471c2b4329f24f9ed96e8ad924b50241cb162b357afb0b2420e49fa8a5"
+    },
+    "inputs": [
+      "sessions/main"
+    ],
+    "outputs": [
+      "analysis/main",
+      "export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-curve totalS and standard-negation birthday reference; every native phase/unpriced counter visible."
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Changing population/seeds/caps/counting after results.",
+    "Dropping failed/censored/warmup records from retained evidence.",
+    "Calling sqrt(pi/4) a universal rigorous lower bound.",
+    "Claiming asymptotic confirmation/refutation from this small population.",
+    "Reading same-seed A/A as independent noise variance.",
+    "Calling local replay independent-host validation or a Lean compiler/runtime refinement.",
+    "Wall-time speed claims or paid/cloud execution."
+  ],
+  "literature": [
+    {
+      "ref": "evidence/source-review.json",
+      "provenance": "retrieved",
+      "claim": "Selected primary SafeCurves survey assumptions/cost model; primary URLs/access/read scopes explicit."
+    },
+    {
+      "ref": "docs/ecbench/README.md; actual pinned ic_boundary/methods/workload/compare sources",
+      "provenance": "internal",
+      "claim": "Native actual prime-curve rho, total counted costs, seed pairing, registered curves, and descriptive interval implementation."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "spec_sha256": "756b31640515e7deb37b13ed0c5656e6c3613a37f6ddec6b2d3cf947d73aac37",
+    "source_review_sha256": "f7e3c0bfad280feb87b005d067b715980480da01b50b27f11a29a157b4cfdec8",
+    "run_argv": [
+      "target/release/ecbench",
+      "run",
+      "--wait",
+      "--cpus",
+      "none",
+      "--spec",
+      "research/rho_constant_audit_20261112/spec.json",
+      "--out",
+      "research/rho_constant_audit_20261112/sessions/main"
+    ],
+    "paid_compute": 0,
+    "scope": "Count-only approved local checkpoint; actual wall intervals are retained but invalid scientific clocks."
+  }
+}

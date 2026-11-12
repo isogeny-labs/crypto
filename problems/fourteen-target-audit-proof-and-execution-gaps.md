@@ -326,7 +326,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees and literal binary S4 display disproof | Full polynomial symmetry, absolute irreducibility and arbitrary-split normalization |
-| 2 BK | Partial: excluded-case disproof and actual qualified F5/r3 criterion at every positive extension degree | Generic torsion rank/determinant/Weil bridges and complete p<500 census |
+| 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius | Generic torsion rank/determinant/Weil bridges and complete p<500 census |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite controls and exhaustive F25Miller tables with actual quotient-domain bilinearity/nondegeneracy and base-restriction disproofs | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
@@ -451,3 +451,23 @@ valuationidentification,genericMOV/FRandcomplexityremainopen; no
 sourceNDtheoremisassumed. OriginalFR94correctDOIsuffix-6confirmed
 byCrossrefbutprimaryPDFstill403/unread. No nativeexperimentorpaidcompute.
 [pcc:unverified]
+
+
+### 2026-11-12 actual geometric torsion bridge
+
+The [dependent geometric study](../research/pairing_geometric_torsion_audit_20261112/README.md)
+proves that every actual3-torsion point of E:y²=x³+1 in any field receiving
+an F5-algebra embedding of F25 descends from an actual F25 torsion point.
+The actual restricted point homomorphism is an additive equivalence.
+Over every algebraically closed characteristic5 extension, the embedding
+is constructed by IsAlgClosed.lift, and actual geometric3-torsion has
+cardinality9 and an actual (Z/3)² basis. Frobenius acts by(a,-b), and the
+actual F5-rational image is exactlyb0. No general rank/basis hypothesis.
+The exact final gate/packet receipts are in that study. [pcc:unverified]
+
+This closes geometric coverage for this concrete curve/r3; genericallcurve
+BK rank/determinant/Weil and the p<500 census remain open. Canonical
+principal-divisor/valuation identification of Miller expressions and generic
+MOV/Frey–Rück remain open. All other original requirements retain the
+matrix's remaining obligations. No paid compute or new native experiment
+belongs to this formal extension. [pcc:unverified]
