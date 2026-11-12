@@ -8,6 +8,9 @@ on:
       - 'research/chained_jacobian_transfers_20261110/native/**'
       - 'research/chained_jacobian_transfers_20261110/lean/**'
       - 'research/chained_jacobian_transfers_20261110/successor-preflight/**'
+      - 'research/chained_jacobian_transfers_20261110/algebra-certificates/**'
+      - 'src/hash/sha256.rs'
+      - 'src/cryptanalysis/identity_certificate.rs'
       - 'src/prime_hyperelliptic/fp2.rs'
       - 'src/cryptanalysis/jv_cover.rs'
       - '.github/workflows/chained-jacobian-transfers.yml'
@@ -17,6 +20,41 @@ permissions:
   contents: read
 
 jobs:
+  algebra-certificates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/algebra-certificates
+            research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean
+            research/chained_jacobian_transfers_20261110/evidence/quartic-duplication-identity-03.json
+            src/hash/sha256.rs
+            src/cryptanalysis/identity_certificate.rs
+      - name: Replay the existing identity checker and duplication certificate
+        env:
+          RUSTUP_TOOLCHAIN: 1.99.1
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+          cd research/chained_jacobian_transfers_20261110/algebra-certificates
+          sha256sum -c reference.sha256
+          cargo fmt -- --check
+          cargo fetch --locked
+          cargo clippy --all-targets --offline --locked -- -D warnings
+          cargo test --release --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/algebra-tests.txt"
+          cargo run --release --offline --locked -- "$RUNNER_TEMP/duplication.json" 2>&1 | tee -a "$RUNNER_TEMP/algebra-tests.txt"
+          cmp "$RUNNER_TEMP/duplication.json" ../evidence/quartic-duplication-identity-03.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: chained-algebra-certificates-${{ github.sha }}
+          path: ${{ runner.temp }}/algebra-tests.txt
+          if-no-files-found: ignore
+
   native:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -96,7 +134,7 @@ jobs:
       - name: Build and audit the proof files
         run: |
           set -euo pipefail
-          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport SuccessorNorms KernelChart OddFieldDescent RootTable BalancedChart QuarticFibre ChainCompression SpectralControls ReverseRecovery IndependentMapChart SevenCensusControls; do
+          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport SuccessorNorms KernelChart OddFieldDescent RootTable BalancedChart QuarticFibre ChainCompression SpectralControls ReverseRecovery IndependentMapChart SevenCensusControls QuarticGluing; do
             tools/lean/proof-gate.sh "research/chained_jacobian_transfers_20261110/lean/$source.lean" --out "$RUNNER_TEMP/proofs-$source"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

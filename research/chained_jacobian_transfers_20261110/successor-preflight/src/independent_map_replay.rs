@@ -9,6 +9,8 @@ use isogeny_algos::poly;
 use std::collections::{HashMap, HashSet};
 #[path = "geometric_seven_census.rs"]
 mod geometric_seven_census;
+#[path = "quartic_gluing.rs"]
+mod quartic_gluing;
 
 const MODELS: [[u64; 7]; 3] = [
     [31, 75, 74, 54, 71, 55, 1],

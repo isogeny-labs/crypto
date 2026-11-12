@@ -1,0 +1,26 @@
+    Checking chained-successor-preflight v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/successor-preflight)
+error[E0308]: mismatched types
+   --> src/quartic_gluing.rs:150:17
+    |
+141 |                 coordinates.insert(t, (a, b));
+    |                 -----------           ------ this argument has type `(u128, u128)`...
+    |                 |
+    |                 ... which causes `coordinates` to have type `std::collections::HashMap<isogeny_algos::curve::Pt<[u64; 16]>, (u128, u128)>`
+...
+150 |                 coordinates,
+    |                 ^^^^^^^^^^^ expected `HashMap<Pt<[u64; 16]>, (u64, u64)>`, found `HashMap<Pt<[u64; 16]>, (u128, u128)>`
+    |
+    = note: expected struct `HashMap<_, (u64, u64)>`
+               found struct `HashMap<_, (u128, u128)>`
+
+error[E0560]: struct `legacy_jacobian::Hyp<'_, independent_map_replay::Flat<'_>>` has no field named `poly`
+   --> src/quartic_gluing.rs:224:13
+    |
+224 |             poly: chart.quintic.clone(),
+    |             ^^^^ `legacy_jacobian::Hyp<'_, _>` does not have this field
+    |
+    = note: available fields are: `h`, `g`
+
+Some errors have detailed explanations: E0308, E0560.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `chained-successor-preflight` (lib test) due to 2 previous errors

@@ -126,3 +126,12 @@ formatting-only consumer integration enters CI. Source75e5064d1/PR1482
 full50-unit-plus1-integration CI running. CT19_PLAN.md freezes actual7-map/
 dual construction and a later compatible genuine Jacobian7-hop. No such map
 or cost advantage pre-accepted;standing unsigned. [pcc:unverified]
+
+Current actual quartic-gluing extension: [written proof](QUARTIC_GLUING_PROOF.md)
+(933d35),[two-page report](reports/quartic-gluing/report.pdf),
+[native source](successor-preflight/src/quartic_gluing.rs),
+[formal structural lemmas](lean/QuarticGluing.lean) and
+[identity adapter](algebra-certificates/src/main.rs). Full31+23 tests and
+154written31modules;actualTateindex16/sixgeometricJacobian distinction
+uses explicit written global dependencies. See CHECKPOINT/QUEUE for the
+next full4-primary quotient evaluator. [pcc:unverified]

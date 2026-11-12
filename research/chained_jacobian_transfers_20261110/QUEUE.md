@@ -49,7 +49,8 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT28d | complete independent fixedspectra/partialformal;unsigned | Distinguish isogenyclass checks from selected geometry. | ExternalCT38/39/40 a30c63d1 credited48d283;Rust21/full3d96bc actual120/10436/mutant120/10314,76d876;four bound spectrallemmas plus2recovery144written/28modules. Root9084 ownCI20/13826 full411a94 settled;newscope ownCI separate. |
 | CT28e | complete independent wholemap29;unsigned | Everyoldrationaloutput andactual49kernel membership via separateCantor/pointwisenorms. | Full5cf8f9 all6×12317 directions/12316wrongquartereach,both49kernels/48omitted7controls,all3source9fixturehashes unchanged. Writtenab8c53/completec49e8b/report7aea70. Timeoutb6bc9e/V2fd19e7 retained;147/29partialformal. Globaldegree/Picard stillseparate. |
 | CT28f | complete local30/14930;unsigned | Full2401 geometric7torsion action andnondualchain/backtracking/shadow controls. | e78426/d89ae5 all3models/all6maps kernel49/image49/sharedT1intersection1/backtrackingzero2401;2bound controls a6ff17/90cebe,failed01/02kept. New2page inspectedreport. Globaldegreeblindspot retained. |
-| CT28g | next protocol/native;unsigned | Actual quartic4gluing and six Jacobian distinction. | PrimaryCT41/Howe–Lauter/Milne f07968;fullE4/ramifiedY0/kernel16/anti-isometry planned. ActualTateindexsharpness and C_i/T_i sumdegree distinction require globalgeometry. Later12hopcycle queued. |
+| CT28g | complete local31+23/15431;unsigned | Actual quartic4glue and six Jacobian distinction. | Native642759 kernel16/inversepairing/Frob/ramifiedcorners;written933d35 actualTateindex16/Z4²/all15pairs ofsixC_i/T_i. FiveboundLean15431 plus23algebra/IDC1he156b6adc8f9cdd5/1176bb. Newinspected2pagePDF53692bytes. Globalgeometry bridges explicit. |
+| CT28h | next frozenprotocol/native;unsigned | Transportactual4glue and evaluateall256 A_i[4] classes withoutinverse4. | E16/F16 inexistingFp12 viahalving;4096lifts/[4]b inkernel16 permodel;quotientK_target φ definesmap afterall16kernelgraphcompatibilities. All6directions/norm7/49/bijection/groupchecks planned. No newcode/resultyet. Later12hopcyclequeued. |
 
 ## Session constraints
 
@@ -64,8 +65,8 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read current CHECKPOINT.md/.resume and newestjournal. Publish completedroot30/14930
-from67b,then nativeactual4glue viafrozenprotocol. No localnativeactive. Fixedroot67b
-exact43205484930 SUCCESS/full57d865;priorb351 full3b94c3. Consumer1508/c712
-43202427032 stillrunning at11:27,next12:20. Budget/S3/vault/KB/ledger/C blockers
-unchanged;no broadreruns,unchangedpolls,lineagechoice orpaidlaunch. [pcc:unverified]
+ReadcurrentCHECKPOINT/.resume andnewestjournal. Publishcompletedroot31+23/15431
+from92,own4jobCI. Root92 exact43210021347 next12:23;consumer1508/c712
+43202427032 next12:20. No localnativeactive. Nextactual4gluetransport/fullA4
+quotientviaE16 protocol,native32;do notdivideby4 on4torsion. Alloldfrozen
+subjects/mergeledger/C/budget/S3/vault/KB limits retained. [pcc:unverified]
