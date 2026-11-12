@@ -3,7 +3,7 @@
 Protocol: `PROTOCOL.md` (frozen in 25a2540781 before data). Holdout: 33 fresh prime-order curves (group orders
 about 2^24, 2^28, 2^32), seeds 31 and 32, T in {1024, 4096, 16384}: **3960 runs, 0 errors, every target of every
 run verified**. Data: `results/holdout/rows.jsonl`, `runs.json` (compact counters in Git, `mk_runs.py`),
-`analysis.txt`, `summary.json`, `noverify.txt` (`noverify.py`). Every number here is [pcc:unverified] until the
+`analysis.txt`, `summary.json`, `noverify.txt` (`noverify.py`). Every number here is [pcc:unverified] (claim PCC-20261112-830272) until the
 claim is signed. Independent validation: `validation/VALIDATOR_REPORT.md` (measurement valid: 3960/3960 rows
 replay exactly, 1.29M targets checked with independent EC code, every number recomputes; the headline below is
 the validator's amended one, and its required amendments are applied in this file).
