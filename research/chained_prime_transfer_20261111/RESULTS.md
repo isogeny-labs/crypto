@@ -49,3 +49,36 @@ included, so the IC figure is a lower bound on its total cost.
   columns.
 - Nothing about other cover families, genera above 2, or cross-characteristic
   maps (none is constructed).
+
+## Corrections from the independent replay (2026-11-12)
+
+The independent replay (`replay/REPLAY.md`) reproduced every raw file of this
+run byte for byte. It also found faults in what the run measures
+[pcc:unverified]. The table above is kept as frozen evidence (`results.json`,
+`frozen.sha256`). The corrected rerun is `results_v2.json`, summarised in the
+next section.
+
+- **F1, IC overcount.** `scalar_counted` counted the first addition into the
+  identity as a group operation, which inflated IC by 8–13%. The replay's
+  corrected IC/rho values are 8.64, 23.29, 31.34 and 39.19, with slope 1.019.
+  The qualitative result does not change. The code is fixed.
+- **F2, LA not emitted.** The linear-algebra cost is now written out as
+  `ic_jac_la_mulmods`. The replay's figures are 14,633, 51,976, 164,828 and
+  603,721 mulmods.
+- **F3, rho unchecked.** Rho now has to recover the planted log
+  (`rho_recovered_ok`), and a row is accepted only when IC, rho and the chain
+  all verify.
+- **F4, IC answer check.** The linear algebra accepts a candidate log only if
+  it equals an uncharged BSGS reference. So `ic_recovered_ok` shows that no
+  wrong log is returned, not that the elimination alone finds the log. The
+  replay certified each answer separately with `[k]D_G = D_T`. Not fixed here.
+- **F5, surrogate instance.** The Jacobian instance is the pulled-back
+  surrogate (`jac_instance`), not a fresh random one. This is a stated
+  limitation.
+- **F6, silent rejections.** Rejected candidate curves are now logged to
+  stderr.
+- **F7, set-up dominance.** At these `r` (71–401), rho is dominated by fixed
+  set-up (S = 34–44). The 0-GAE ratio is a loose bound.
+- **F13/F14, bindings.** Some bench records bind a dirty commit that does
+  not contain the measured files, and no solve certificates were emitted. The
+  v2 run is recorded from a clean commit.

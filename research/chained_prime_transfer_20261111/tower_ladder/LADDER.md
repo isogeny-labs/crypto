@@ -155,6 +155,12 @@ Genus-4 cover data:
    rho at 0 GAE, 6.5-27.6x at 1 GAE [pcc:unverified]. Going up the tower does
    not close it; it widens it [pcc:unverified].
 
+*Band caveat (replay F12, 2026-11-12):* the §5a band here is one-sided. The
+rho reference has no unpriced counters, so only the IC arm moves across 0,
+0.1 and 1 GAE. Rankings that hold across the band remain valid. Where the
+order flips, the flip comes from the price of the IC linear algebra, not from
+any uncertainty on the rho side.
+
 ## Limits
 
 - `p < 256` (`HCurve`) and `r` between 11 and 67: toy sizes where rho is
