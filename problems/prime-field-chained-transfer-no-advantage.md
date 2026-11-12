@@ -29,14 +29,16 @@ subgroup `r`, `Q = [x]P`; the chain is built and each hop verified to satisfy
   (same `#E`); rho on the order-`r` subgroup of `J(C)` matches `E1` rho in
   group-op count (same `√r` walk) and is dearer in field operations (a Cantor
   step costs several elliptic additions); genus-2 index calculus on `J(C)`
-  with the full degree-1 factor base collects `Ω(p)` relations, its measured
+  with the full degree-1 factor base collects about `p` relations, its measured
   relation-phase group-op count growing like `p` while rho grows like `√p`.
   See `research/chained_prime_transfer_20261111/RESULTS.md`.
 - **Derived:** for a degree-2 morphism `φ : C → E`, `φ_*φ^* = [deg φ] = [2]`,
   so `φ^*` preserves the odd-order DLP; the second quotient gives
   `φ2_* φ1^* = 0` (a vanishing cross-composite). Both are verified in code on
-  the unramified locus and on random classes. The index-calculus cost floor
-  is the standard genus-`g` relation count `Ω(p^{2-2/g}) = Ω(p)` for `g = 2`.
+  the unramified locus and on random classes. The usual small-genus
+  index-calculus estimate is `Õ(p^{2-2/g})`, exponent 1 at `g = 2`. That is a
+  limit of this approach, not a lower bound on the problem: rho on the
+  original `r ≍ p` subgroup already costs about `√p`.
 - **Suspected explanation:** the chain is a group isomorphism onto its image,
   so it transports the hardness unchanged; the only structure it exposes
   (a second elliptic quotient) communicates with the first through a map that
@@ -85,15 +87,20 @@ a rich spectrum of different-order complementary curves, but the log follows to
 none (`research/chained_prime_transfer_20261111/ATLAS.md`) [pcc:unverified]:
 
 - Sweep workflow: 5,641 covers; the complement takes up to 141 distinct orders
-  across the Hasse interval; 3,479 complements are smoother than the target;
-  the cover map `φ2_*φ1^* = 0` on every report; no reachable complement is
+  across the Hasse interval; 3,479 complements are smoother than the target (smaller largest
+  exactly-once prime);
+  the cover map `φ2_*φ1^* = 0` wherever sampled (first 40 covers ×
+  16 samples per report, one direction; replay F9); no reachable complement is
   strictly easier (reachable ⇒ same order ⇒ identical hardness).
-- Census: `φ2_*φ1^* = 0` on 300/300 curves per prime; no non-special start has
-  a reachable easier node.
+- Census: `φ2_*φ1^* = 0` in both directions on 300/300 curves per prime. The
+  "no reachable easier node" counters are zero by construction. They restate
+  the theorem below and are not independent evidence (replay F8).
 - Positive control: Smart's additive transfer recovers the log on a genuinely
   anomalous curve over `F_43`, so the easy node is real — just unreachable from
   a non-anomalous start (an isogeny preserves the trace; no edge changes the
-  characteristic, so no binary node is reachable either).
+  characteristic, so no binary node is reachable either). Isogeny transfer still
+  works over prime fields; what is missing is a smaller base field. A weak
+  prime-field family discovered later could still be a transfer target.
 
 The load-bearing theorem: a DLP-preserving `E → E'` exists iff `E ~ E'`
 (isogenous) iff `#E = #E'`, so a map to a different-order curve cannot preserve
@@ -113,6 +120,46 @@ against rho at 0 GAE, and is above rho at 0.1 and 1 GAE. The IC slope in p is
 0.85 (genus 2) and 1.06 (genus 3), against 0.44 for rho. Up, across and down
 are now each measured or proved closed.
 
+## Ladder, formula, smoothness and replay (2026-11-12 addendum)
+
+Four parallel experiments under
+`research/chained_prime_transfer_20261111/{tower_ladder,tower_formula,tower_smoothness,replay}`
+[pcc:unverified]:
+
+- Ladder (genus 1 → 2 → 3 → 4 on one instance, genus 4 by a degree-3 cover
+  `y² = c(h(x))`): IC per rung grows by about 2×, 3× and 4×. Genus 4 costs
+  3.7–19.6× rho at 0 GAE. No rung ranks below rho across the band.
+- Formula scan to 2^128: the best genus is g = 2, still about 64 bits above
+  rho. No subexponential regime beats rho at any size scanned
+  [pcc:unverified].
+- Smoothness: measured trials per relation are 1.00, 1.94, 5.91 and 22.2 for
+  genus 1–4, against `g!` = 1, 2, 6, 24.
+- Independent replay: every raw file is byte-identical. One figure was wrong:
+  the cover-spectrum note said 470/504 smoother, and the correct count is 87/504
+  (fixed). The replay also found that the IC counter overcounted by 8–13%,
+  that rho was not checked against the planted log, and that LA work was not
+  emitted. These are fixed in code and rerun as `results_v2.json`. The band
+  is one-sided, because rho has no unpriced counters.
+
+## Amortized IC, certificates and larger-p genus 3 (2026-11-12 addendum)
+
+See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified].
+
+- **Amortized IC.** Factor-base logs are computed once and each target needs
+  only a descent. Its online cost is 2.0–3.1% of plain rho, but 1.3–11% above
+  Bernstein–Lange rho given the same memory. The frozen rule fails in 11 of
+  11 rows. The factor base is at least as large as the target group in every
+  row (`fb/r` 0.98–125), so the precomputation is a table the size of the
+  group. This answers the trapdoor question for IC's own one-time work:
+  amortizing helps only when the factor base is much smaller than the group,
+  and an elliptic subgroup of order about `p` pushed into a genus-2 Jacobian
+  over `F_p` never gives that.
+- **Certificates and the real instance** (F4, F5, F14 closed). Logs of the
+  pulled-back pair are recovered with oracle-free LA, and 16 of 16
+  certificates pass an independent checker. IC/rho is 8.0–40.8× at 0 GAE.
+- **Genus 3 to p = 64,007.** IC3/IC2 stays near 3, smoothness follows `1/g!`,
+  and the gap to rho grows about as `√p`.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -120,3 +167,7 @@ are now each measured or proved closed.
 - 2026-11-11: transfer-atlas addendum — cover sweep, census and down-edge
   controls; the obstruction holds across every arm measured.
 - 2026-11-11: tower-up addendum (genus 1 → 2 → 3 on one instance); the ladder raises IC cost per rung.
+- 2026-11-12: ladder/formula/smoothness/replay addendum; replay corrections
+  applied (F1–F3, F6, F8–F12) and the bench rerun as `results_v2.json`.
+- 2026-11-12: amortized-IC / certificate / larger-p genus-3 addendum; the
+  obstruction holds against matched precomputed rho.

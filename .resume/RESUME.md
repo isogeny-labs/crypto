@@ -1,41 +1,35 @@
-# Resume: crypto @ claude/relaxed-lovelace-wjy1um
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-Owner (2026-11-11/12): finish E14 of the fall-degree study: the exact last fall degree `d_F` at
-(m, n, ℓ) = (3, 21, 7) (first exact value above 4) and the three unmeasured E13b controls
-(6:10:3 draws 1, 3, 4); then (4, 28, 7) windows as time allows.
+Owner (2026-11-12): "Speed it all up" (M4GB and Gröbner-basis decomposition engines). Two tracks:
+(A) M4GB patch 0004, divisibility signatures in update() (this run); (B) inherited-f4 per-call
+speed-up by an Opus subagent working in this checkout (koblitz_groebner.rs, gf2_elim.rs, pq_f4_f2.rs,
+inherited part of ic_framework/solvers.rs; engine name inherited-f4-next for a paired A/B).
 
 ## Lead / hypothesis
-`research/fall_degree_bounds_20261008/PREREGISTRATION.md`, Amendments 17–21. Frozen readings and
-predictions in Amendment 20: E14a "d_F = 5" 0.50, "≥ 6" 0.25, "split" 0.05, "not completed" 0.20;
-E14b "controls confirmed" 0.55; E14c "no reading" 0.80.
+Callgrind: update() is 70 % of a 24-variable M4GB solve, divisibility on degrevlex-ranked monomials
+decoded per variable. Exact two-mask signatures cut instructions to 0.47x / 0.43x. Expectation and
+falsifier: research/m4gb_update_signatures_20261112/README.md.
 
 ## Spec
-One RunPod CPU pod (cpu3g, 64 vCPU, Secure, not interruptible), USD 100 cap, deadline
-min(36 h, 100/costPerHr). Source: sparse clone of `isogeny-labs/crypto` at `a2be6609`
-(tree sha256 `da6ee5f3…`). Engines: `hky_par newcells --cells 3:21:7 --seed 20261012 --keep 4
---cmax 5` (E14a), `dreg_linear_guess --engine pe` (E14b, threads from gate G3),
-`e12/run_window.sh 4:28:7` (E14c). Gates G0–G3 and G-src-a/b/c before any draw.
-Launcher `e14/launch_r2.sh` (OWNER_OVERRIDE=1 per Amendment 21), controller `e14/pull_r2.sh`.
+research/m4gb_update_signatures_20261112/ab_corpus.py under tools/benchrec.py run (record benchmarks/records/20261112T0517Z-m4gb-update-signatures.json):
+corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old (patches 0001-0003,
+scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
 
 ## State
-Launching 2026-11-12 ~02:10 UTC. `e14/pod-r2/launch.json` holds pod id and output token.
-Owner override of the balance rule recorded (balance USD 99, sibling pod burning USD 5.29/h:
-zero-balance termination after ~12 h is possible and was accepted).
+2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
+
+Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
+(merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
-Pod named `fd-e14-r2-<stamp>`; outputs pulled every 10 min to `e14/pod-r2/pulls/`, final to
-`e14/pod-r2/out/`. Session: session_01AXUKfTRWdZTFrWGLHJZp11.
+Paired per-call A/B inherited-f4 vs inherited-f4-next vs fes-f2 (research/inherited_f4_next_20261112/run_ab.sh, record benchmarks/records/20261112T0630Z-inherited-f4-next-ab.json); then an end-to-end ic bench ladder adding fes-f2 and inherited-f4-next to the oracle.
+
+Local corpus A/B (this record). Subagent B (inherited-f4) in the background.
 
 ## Stop and success conditions
-The pod stops itself at the deadline or when done. A fresh session resumes by running
-`e14/pull_r2.sh` (idempotent) with the pod id from `launch.json`; if the pod is gone, score
-whatever snapshots exist with the Amendment 19/20 reading rules ("not completed" for anything cut
-off). Nothing is retried without a new amendment.
+Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
 
 ## Next steps
-1. Pull outputs; when `final_status` arrives, delete the pod (the controller does this).
-2. Score: extend `e14/score.json` (schema `fall_degree_e14_score/v1`) with an r2 section per the
-   Amendment 20 rules; report + graph + PDF under `reports/run-<UTC>/`; append RESULTS.md.
-3. Lean scoring table: add E14 rows (kind 8) if any reading is registered.
-4. Commit on the branch, PR, session log.
+1. summarize/make_report; close record; benchmarks entry; session log; commit; push.
+2. Integrate track B result (paired A/B under its own record), then PR update.

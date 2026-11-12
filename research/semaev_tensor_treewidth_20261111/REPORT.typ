@@ -58,6 +58,25 @@ Least squares of the recorded bounds against $b$ *[derived]*. The "best-upper" s
 
 *What the runtime budget changed.* The two-hour sweep budget stopped the first schoolbook sweep after 36 bits and the Fourier sweep after 24 bits. The 40-bit schoolbook rows were rerun with one restart (all four relations) and the Fourier $S_3$ rows at 28 and 36 bits in a second run; both are in `rows/` and in the tables above. Fourier rows for the other three relations beyond 24 bits were not run.
 
+= Follow-up: the field-level system (2026-11-12)
+
+The census says every bit-level encoding has width $>= 2b$. The remaining lever is elimination at the field level. `semaev-descent-treewidth` (`src/bin/semaev_descent_treewidth.rs`) builds the Weil-descended binary Semaev $S_3$ point-decomposition system exactly as the lab's refutation harness does ($X_1, X_2$ in the subspace $V$ of dimension $n' = n\/2$, $2n'$ Boolean variables, $n$ quadratic equations) and measures the primal treewidth of that field-level system in a black-box encoding (one factor per equation) and an arity-3 encoding (shared AND gadgets, XOR chains), next to the refutation degree $D^*$ the harness reaches on the same instance (`d_max` = 4). Rows `rows/field-level-8-30.json`; details in `FIELD_LEVEL.md`.
+
+#table(columns: 9, stroke: 0.3pt, inset: 2.5pt, align: (right,) * 9,
+  [*n*], [*n'*], [*cross monomials*], [*bb width (exact)*], [*split lower / upper*], [*split log2 cost*], [*enum one slot*], [*$D^*$*], [*Macaulay cols at $D^*$*],
+  [8], [4], [16], [7], [12 / 19], [22.3], [4], [2], [37],
+  [12], [6], [36], [11], [16 / 39], [41.4], [6], [2], [79],
+  [15], [7], [49], [13], [22 / 54], [56.4], [7], [4], [1,471],
+  [16], [8], [64], [15], [23 / 74], [76.4], [8], [2], [137],
+  [22], [11], [121], [21], [32 / 104], [106.1], [11], [2], [254],
+  [28], [14], [196], [27], [41 / 182], [184.5], [14], [2], [407],
+  [30], [15], [225], [29], [44 / 159], [162.4], [15], [> 4], [-],
+)
+
+#figure(image("field_level_vs_n.svg", width: 78%), caption: [Field-level binary $S_3$ system: treewidth bounds of its primal graph (black-box and arity-3 encodings) against the one- and two-slot enumeration exponents and the measured refutation degree $D^*$. Seed 20261112, one instance per $n$.])
+
+*Reading.* In the black-box encoding every equation touches every variable, so the width is $2n' - 1$ exactly *[exact]*: a tree-decomposition contraction of the field-level system is enumeration of both slots, $2^(2n')$, twice the exponent of the naive one-slot search. The arity-3 form is wider still (best upper 19 → 182 over $n = 8 → 30$). The refutation harness derives the contradiction on the same instances at Macaulay degree 2 (even $n$) or 3–4 (odd $n$) with 37–1,471 columns *[measured]*: polynomial in $n'$. The structure the field-level route exploits is algebraic degree, which a Boolean tensor network cannot represent; it is the lab's existing index-calculus program (F4 on $FF_2$-linear bases), and the lab's own measurements say where it stops being cheap (solving degree 7 at $m = 3$; `ml-cryptanalysis` stage 5). Over prime fields the small-x base has no low-degree membership polynomial, and the measured algebraic alternative (PKM Dickson towers) costs $2^38.8$ multiply-adds per attempt at $m = 2$, $N = 20$ against $2^20$ enumeration. Neither the bit-level nor the field-level graph carries the lever; the contraction-solver framing adds nothing to F4.
+
 = Limits
 
 - One curve per $b$; $s$ moves by a few percent with the Hamming weights of $p$ and the planted constants (the schoolbook rows fold constant bits), so $s$ is not monotone to the last digit.
