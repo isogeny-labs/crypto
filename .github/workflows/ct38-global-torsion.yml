@@ -40,3 +40,23 @@ jobs:
           assert a['negative_control']==b['negative_control']==[2,29]
           print('Independent finite-group counts and negative controls agree; [pcc:unverified].')
           PY
+      - name: CT39 point count, trace and minimal residue degree - independent oracles
+        run: |
+          set -euo pipefail
+          P=research/lift_reduce_second_prime_20261112/ct39_residue_degree
+          python3 -B ${P}.py > /tmp/ct39.py.json
+          python3 -O -B ${P}.py > /tmp/ct39.py.optimized.json
+          cmp /tmp/ct39.py.json /tmp/ct39.py.optimized.json
+          python3 -m py_compile ${P}.py
+          go run ${P}.go > /tmp/ct39.go.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/ct39.py.json'))
+          b=json.load(open('/tmp/ct39.go.json'))
+          keys=['a','b','r','n101','n103','t103','min_residue_degree','number_field_degree_floor','discriminant103']
+          assert len(a['cases'])==len(b['cases'])==2
+          for ca,cb in zip(a['cases'],b['cases']):
+              assert {k:ca[k] for k in keys} == {k:cb[k] for k in keys}
+          assert [(c['r'],c['n101'],c['n103'],c['min_residue_degree']) for c in a['cases']] == [(109,109,112,27),(113,113,99,4256)]
+          print('Independent Frobenius field-degree certificates agree [pcc:unverified].')
+          PY
