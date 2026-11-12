@@ -31,7 +31,12 @@
  *   so a block of 128 reads 128 consecutive (x_R, y_R) pairs: two fully
  *   coalesced 1 KiB segments for Fp64, 4 KiB for P-256.
  * Registers.  The per-thread batched inversion holds 2*CHUNK field
- *   elements (d[] and the prefix products).  For Fp64 that is 4*CHUNK
+ *   elements (d[] and the prefix products).  Audit note (2026-11-12,
+ *   clang 18 + ptxas 12.9, no GPU): the sweep indexes d[w] with a
+ *   run-time w, so d[] is placed in local memory, not registers: stack
+ *   frames are 240/368/624 bytes (Fp64, CHUNK 16/32/64) and
+ *   1296/2320/4368 bytes (P-256, where pre[] is local too); see
+ *   docs/perf/20261112-ic-gpu-audit.md.  For Fp64 that is 4*CHUNK
  *   32-bit registers: CHUNK=32 -> ~128 + ~40 for temporaries, i.e. about
  *   170 registers and 12 warps/SM out of 48 on sm_120 (64K regs per SM).
  *   CHUNK=16 roughly doubles occupancy at the cost of twice the Fermat
@@ -51,7 +56,8 @@
  *   the first touch.  Targets are read once per thread into registers.
  * Lookup.  Small factor bases (hash capacity <= RF_SHARED_HASH_CAP =
  *   4096 slots, i.e. |F| <= 2048) stage the open-addressing table in
- *   static shared memory (48 KiB); probes are then ~1-2 shared loads
+ *   dynamic shared memory sized to it (12 bytes per slot, at most
+ *   48 KiB); probes are then ~1-2 shared loads
  *   with no global traffic.  Larger factor bases use the global sorted
  *   array + binary search: log2(N) dependent 8-byte loads per probe,
  *   L2-resident for N up to a few million.  A global hash table would
@@ -123,13 +129,21 @@ __global__ void RF_BOUNDS k_decompose_sorted(DecompArgs<F> a, SortedTable table)
 }
 
 /* Shared-memory hash table: the block copies the table (keys + values)
- * into static shared memory, then probes it.  `cap` must be
- * <= RF_SHARED_HASH_CAP; the host checks before launching. */
+ * into shared memory, then probes it.  `cap` must be
+ * <= RF_SHARED_HASH_CAP; the host checks before launching.
+ *
+ * The staging buffer is dynamic shared memory sized to the table's
+ * capacity (cap * 12 bytes, launched with that many bytes).  It used to
+ * be a static RF_SHARED_HASH_CAP-slot array, i.e. 48 KiB per block
+ * whatever the factor base, which caps residency at 1-4 blocks per SM
+ * (96-228 KiB of shared memory) even for a 64-slot table.  The probes
+ * see the same keys and values at the same slots.  Untested on a GPU. */
 template <class F, int CHUNK>
 __global__ void RF_BOUNDS k_decompose_shared_hash(DecompArgs<F> a, HashTable gtable) {
-    __shared__ uint64_t s_keys[RF_SHARED_HASH_CAP];
-    __shared__ uint32_t s_vals[RF_SHARED_HASH_CAP];
+    extern __shared__ uint64_t s_dyn[];
     const uint32_t cap = gtable.mask + 1;
+    uint64_t *s_keys = s_dyn;
+    uint32_t *s_vals = reinterpret_cast<uint32_t *>(s_dyn + cap);
     for (uint32_t s = threadIdx.x; s < cap; s += blockDim.x) {
         s_keys[s] = gtable.keys[s];
         s_vals[s] = gtable.vals[s];
@@ -188,6 +202,7 @@ static int run_device(const typename F::ctx &f,
     DecompArgs<F> a{};
     float ms = 0;
     uint32_t found = 0, nw = 0, hcap = 0;
+    size_t hash_smem = 0;
 
     CU(rf_cu_alloc(&d_fbx, n_fb * sizeof(elt)));
     CU(rf_cu_alloc(&d_fby, n_fb * sizeof(elt)));
@@ -223,6 +238,7 @@ static int run_device(const typename F::ctx &f,
     a.t_x = d_tx; a.t_y = d_ty; a.n_targets = n_targets;
     a.out = d_out; a.out_count = d_cnt; a.out_cap = cap;
 
+    hash_smem = (size_t)hcap * (sizeof(uint64_t) + sizeof(uint32_t));
     CU(rf_cu_event(&e0));
     CU(rf_cu_event(&e1));
     CU(cudaEventRecord(e0));
@@ -232,7 +248,7 @@ static int run_device(const typename F::ctx &f,
     if (lookup == RF_LOOKUP_SORTED) {                                                         \
         k_decompose_sorted<F, CH><<<grid, RF_BLOCK>>>(a, sview);                              \
     } else if (hash.capacity() <= RF_SHARED_HASH_CAP) {                                       \
-        k_decompose_shared_hash<F, CH><<<grid, RF_BLOCK>>>(a, hview);                         \
+        k_decompose_shared_hash<F, CH><<<grid, RF_BLOCK, hash_smem>>>(a, hview);              \
     } else {                                                                                  \
         k_decompose_global_hash<F, CH><<<grid, RF_BLOCK>>>(a, hview);                         \
     }

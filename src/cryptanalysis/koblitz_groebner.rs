@@ -9901,20 +9901,10 @@ mod tests {
         assert!(solved > 0 && refuted > 0, "both outcomes are pinned");
     }
 
-    /// **`inherited-f4-batched` decides exactly as `inherited-f4`, with no
-    /// more work.**  The batched rewrite ([`with_batched_rewrite`]) leaves
-    /// every decision where the eager rewrite puts it — the same roots and
-    /// the same tree (reductions, refuted branches, propagations, splits,
-    /// eliminated variables, oversize matrices, tail enumerations, degree
-    /// reached, exhaustion) — and charges at most the eager rewrite's word
-    /// XORs, on the 33 systems of the next-kernel pinning test and on dense
-    /// random quadratic systems of 12, 14, 16 and 20 unknowns.  Each system
-    /// is solved twice per mode on a fresh thread (cold, then warm), with
-    /// the next kernels on as `inherited-f4` runs them.  Prints the
-    /// per-system ratio of the batched count to the eager one
-    /// (`--nocapture`).
-    #[test]
-    fn batched_rewrite_leaves_decisions_and_never_adds_word_xors() {
+    /// The 41 systems the batched-rewrite tests use: the next-kernel pin
+    /// systems and eight dense random quadratic systems of 12, 14, 16 and
+    /// 20 unknowns.
+    fn batched_rewrite_pin_systems() -> Vec<(Vec<F2BoolPoly>, usize)> {
         let mut systems = next_kernels_pin_systems();
         let mut seed = 0xba7c_4ed0_f4f4_2026u64;
         let mut next = || {
@@ -9945,6 +9935,116 @@ mod tests {
                 .collect();
             systems.push((system, n_vars));
         }
+        systems
+    }
+
+    /// **The batched mode's counted cost is pinned.**  Per system of
+    /// [`batched_rewrite_pin_systems`], solved cold and then warm on a fresh
+    /// thread under `inherited-f4-batched` (next kernels on, batched rewrite
+    /// on): the stage unit (`f4_word_ops_thread`), the `bitop/v1` word
+    /// operations and hash probes.  The figures are those of the version
+    /// committed in 1da7694876; a change that is only meant to make the
+    /// batched mode faster must leave every one of them where it is.
+    #[test]
+    fn batched_rewrite_counts_are_pinned() {
+        let systems = batched_rewrite_pin_systems();
+        let mut got: Vec<[u64; 6]> = Vec::new();
+        for (system, n_vars) in &systems {
+            let system = system.clone();
+            let n_vars = *n_vars;
+            got.push(
+                std::thread::spawn(move || {
+                    let mut out = [0u64; 6];
+                    for pass in 0..2 {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let before = f4_word_ops_thread();
+                        let tally = bitop_tally::snapshot();
+                        let _ = with_next_kernels(true, || {
+                            with_batched_rewrite(true, || {
+                                solve_boolean_system(&system, n_vars, &opts)
+                            })
+                        });
+                        let t = bitop_tally::snapshot().since(tally);
+                        out[3 * pass] = f4_word_ops_thread() - before;
+                        out[3 * pass + 1] = t.word_ops;
+                        out[3 * pass + 2] = t.hash_probes;
+                    }
+                    out
+                })
+                .join()
+                .unwrap(),
+            );
+        }
+        assert_eq!(got.len(), BATCHED_PIN.len(), "one pinned row per system");
+        for (k, (g, want)) in got.iter().zip(BATCHED_PIN).enumerate() {
+            assert_eq!(g, want, "system {k}: the batched mode's counted cost moved");
+        }
+    }
+
+    /// Per system: (ops, bitop word ops, hash probes) cold, then warm.
+    const BATCHED_PIN: &[[u64; 6]] = &[
+        [9, 861, 42, 9, 464, 42],                               // system 0
+        [0, 33, 0, 0, 33, 0],                                   // system 1
+        [67, 2612, 186, 67, 1679, 186],                         // system 2
+        [72, 3939, 213, 72, 2988, 207],                         // system 3
+        [20, 1057, 54, 20, 659, 54],                            // system 4
+        [18, 624, 50, 18, 359, 50],                             // system 5
+        [36, 2185, 137, 36, 1555, 123],                         // system 6
+        [0, 32, 0, 0, 32, 0],                                   // system 7
+        [85, 1309, 30, 85, 909, 30],                            // system 8
+        [10, 726, 39, 10, 461, 39],                             // system 9
+        [439, 9017, 183, 439, 8479, 183],                       // system 10
+        [0, 40, 0, 0, 40, 0],                                   // system 11
+        [5, 667, 16, 5, 435, 3],                                // system 12
+        [9, 1166, 89, 9, 634, 89],                              // system 13
+        [0, 31, 0, 0, 31, 0],                                   // system 14
+        [210, 6399, 131, 210, 5583, 125],                       // system 15
+        [134, 3635, 39, 134, 2885, 39],                         // system 16
+        [0, 35, 0, 0, 35, 0],                                   // system 17
+        [0, 24, 0, 0, 24, 0],                                   // system 18
+        [19, 1515, 78, 19, 1110, 73],                           // system 19
+        [19, 607, 24, 19, 343, 24],                             // system 20
+        [6, 661, 10, 6, 416, 0],                                // system 21
+        [2, 272, 0, 2, 272, 0],                                 // system 22
+        [66, 3172, 238, 66, 2503, 238],                         // system 23
+        [91395, 539076, 12034, 91395, 490580, 6734],            // system 24
+        [314531, 1583456, 21212, 314531, 1498432, 11840],       // system 25
+        [1229773, 5456540, 36958, 1229773, 5292282, 20394],     // system 26
+        [87808, 522910, 12098, 87808, 474200, 6692],            // system 27
+        [315797, 1575761, 21200, 315797, 1491319, 11744],       // system 28
+        [1242998, 5517073, 35190, 1242998, 5364193, 19386],     // system 29
+        [82368, 477063, 11614, 82368, 429519, 6538],            // system 30
+        [314161, 1591957, 21764, 314161, 1503889, 12128],       // system 31
+        [1248547, 5598325, 37458, 1248547, 5433799, 20412],     // system 32
+        [84306, 494873, 12166, 84306, 444869, 6902],            // system 33
+        [306018, 1532455, 21784, 306018, 1447337, 11808],       // system 34
+        [1289286, 5716851, 35929, 1289286, 5563652, 19589],     // system 35
+        [16577314, 55853216, 86434, 16577314, 55478097, 46332], // system 36
+        [86284, 500240, 11786, 86284, 452358, 6580],            // system 37
+        [311365, 1582564, 21352, 311365, 1498046, 11744],       // system 38
+        [1230436, 5434112, 36910, 1230436, 5273676, 19998],     // system 39
+        [16701321, 56008489, 85250, 16701321, 55635964, 46046], // system 40
+    ];
+
+    /// **`inherited-f4-batched` decides exactly as `inherited-f4`, with no
+    /// more work.**  The batched rewrite ([`with_batched_rewrite`]) leaves
+    /// every decision where the eager rewrite puts it — the same roots and
+    /// the same tree (reductions, refuted branches, propagations, splits,
+    /// eliminated variables, oversize matrices, tail enumerations, degree
+    /// reached, exhaustion) — and charges at most the eager rewrite's word
+    /// XORs, on the 33 systems of the next-kernel pinning test and on dense
+    /// random quadratic systems of 12, 14, 16 and 20 unknowns.  Each system
+    /// is solved twice per mode on a fresh thread (cold, then warm), with
+    /// the next kernels on as `inherited-f4` runs them.  Prints the
+    /// per-system ratio of the batched count to the eager one
+    /// (`--nocapture`).
+    #[test]
+    fn batched_rewrite_leaves_decisions_and_never_adds_word_xors() {
+        let systems = batched_rewrite_pin_systems();
         type Run = (Vec<Mask>, [usize; 7], u32, bool, u64, [(u64, u64); 3]);
         let solve_twice = |system: &[F2BoolPoly], n_vars: usize, on: bool| -> Vec<Run> {
             let system = system.to_vec();

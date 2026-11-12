@@ -5,7 +5,7 @@ by family, each with its reference, its boundary and its validation status.
 A ratio is IC over rho: greater than 1 means rho is cheaper.
 Chapter~\ref{sec:frontier} gives the frontier campaign, the improvement
 ladders of 14--24 October and the three frontiers (cold, online, stage);
-this chapter adds the work of 25 October to 3 November. Under the
+this chapter adds the work of 25 October to 12 November. Under the
 proof-carrying-claims rule every leaderboard row named here has a
 \texttt{pcc} measurement claim, and every such claim has standing
 \emph{unverified} (\texttt{pcc.py standing}, 6 November). A figure without
@@ -351,6 +351,101 @@ Table~\ref{tab:pg-summary}. Sources: leaderboard Table~B
 \label{tab:distance-prime}
 \end{table}
 
+\paragraph{Walk arms on prime-field miniatures, 8--12 November.} The
+generic track's closest arms are walk tables over seed abscissae on
+Curve25519-family and prime-field miniatures (\S\ref{sec:c25519}).
+Table~\ref{tab:distance-walk} gives their distances as of 12 November.
+The F$=1$ target-in-walk arm \texttt{twcj} has one unknown base logarithm;
+its source states that it does no decomposition work and is not
+decomposition-based index calculus. The $C=2$ two-seed arms
+(\texttt{tw2cj}) count as index calculus by the owner's ruling of 4
+November. Three changes moved them.
+\begin{itemize}
+\item Dropping the per-collision recomputation (\texttt{cv=0}) costs
+  $0.879$ $[0.876,0.881]$ of the \texttt{twcj} arm at $k=20$ and $0.950$
+  $[0.948,0.951]$ at $k=24$ ($w=0$, after the validator's erratum E1 was
+  fixed and re-measured on 16 fresh sessions); on the two-seed walk the
+  same change is $0.997$ and $0.999$, a negligible constant
+  (\art{research/curve25519_engine_items_20261110/README.md};
+  \art{research/curve25519_autolab_20261104/siblings/stage1-eks/README.md}).
+\item Sibling points (each walk step stores a second point) cut the
+  two-seed walk's counted cost to $0.45$--$0.51$ of \texttt{tw2cj-lazy} at
+  $w=0$ on all three prime-field shapes, flat in $r$ from $2^{30}$ to
+  $2^{40}$; at $w=1$ the ratio is $0.93$--$1.06$, because the second points,
+  lifts and table inserts are native operations
+  (\art{research/curve25519_autolab_20261104/siblings/stage3-scaling/README.md}).
+\item On $j=0$ curves, orbit-canonical keys under the order-3 automorphism
+  (\texttt{aut=3}) cut both two-seed walks to $0.56$--$0.61$ of their cost
+  at $w=0$ and $0.84$--$0.90$ at $w=1$; at $w=0$ this is close to
+  rho-cubic's $0.544$--$0.558$ of rho-neg
+  (\art{research/curve25519_autolab_20261104/siblings/stage4b-aut3/README.md}).
+\end{itemize}
+Two rho choices matter. A chained jump set-up for rho-neg saved its set-up
+as modelled but lengthened the walk, to $1.532\times$ $[1.402,1.673]$ and
+$2.738\times$ $[2.583,2.903]$ rho-neg at $k=20$ and $24$; it was rejected
+as a reference, so distances stay against \texttt{rho.negation}. On $j=0$
+curves the matched rho is rho-cubic ($A=6$), the walk on the orbits of
+the order-3 automorphism and negation.
+
+The aut=3 sibling arm is the one walk arm at or below its matched rho at
+$w=0$: $0.875$--$0.992$ of rho-cubic at 34--40 bits. It is $1.200$--$1.356$
+at $w=0.1$ and $2.663$--$3.000$ at $w=1$, so the order does not hold
+across the band; per curve, 10 of 15 are unresolved and on 5 of 15 rho-cubic
+is lower at every weight. Stage~4 had reported $1.8$--$1.9$ at $w=1$; its
+validator found the aut=3 canonicalisations unpriced on the IC arm while
+rho-cubic's identical rotations were priced (erratum E1), and the
+corrected values were $2.7$--$2.8$. Stage~4b re-ran the design on fresh
+curves with the canonicalisations priced, and an independent validator
+passed its GAE comparison (\art{research/curve25519_autolab_20261104/siblings/stage4b-aut3/VALIDATION.json},
+\texttt{order\_holds\_across\_band: false}). It is a validation-gate result
+without a pcc claim, so its statement is an unverified assertion; it is not
+a leaderboard row. Its bit-op ratios are not covered (erratum N1). At L0
+the IC arm takes 5.2--5.3 times rho-cubic's wall time. A design note
+models the remaining gap: the two-seed walk needs three independent
+collisions where rho needs one, so it stores about $1.95\times$ rho's steps
+before the cost per point is counted, and at $w=1$ no change that stores a
+point per operation can close it
+(\art{research/curve25519_autolab_20261104/siblings/stage5-design/README.md};
+desk note, unverified).
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{3.2cm}>{\raggedright}p{1.7cm}>{\raggedright}p{3.0cm}>{\raggedright}p{1.0cm}>{\raggedright}p{1.0cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Arm, reference & Curves, size & $w=0$ [95\%] & $w=0.1$ & $w=1$ & Band; standing \\
+\midrule
+\texttt{twcj} (F$=1$, 16 jumps) / rho-neg & C25519 family, $k=20$, $24$ & $1.358$ $[1.232,1.497]$, $1.343$ $[1.219,1.479]$ & $1.351$, $1.338$ & $1.316$, $1.317$ & rho ahead (priced); validator pass with errata \\
+ & $k=28$, $32$ & $1.395$ $[1.345,1.446]$, $1.366$ $[1.267,1.473]$ & $1.397$, $1.367$ & $1.407$, $1.368$ & rho ahead (priced); validator pass with errata \\
+\texttt{twcj-cv0} / rho-neg & $k=20$, $24$ & $1.217$ $[1.166,1.271]$, $1.259$ $[1.187,1.336]$ & & & rho ahead (priced); unresolved (unpriced) \\
+\addlinespace
+\texttt{tw2cj-lazy} / rho-neg & C25519 family, $k=28$, $32$ & $1.724$ $[1.603,1.855]$, $1.693$ $[1.568,1.827]$ & $1.729$, $1.694$ & $1.750$, $1.698$ & rho ahead; L0 \\
+\texttt{sib8-p256} / rho-neg & $k=28$, $32$ & $0.927$ $[0.861,0.998]$, $0.827$ $[0.758,0.902]$ & $1.082$, $0.979$ & $1.801$, $1.671$ & unresolved; L0 \\
+best sibling / rho-neg & $a=-3$, generic, $j=0$; 31 bits & $0.843$ $[0.786,0.903]$ ($a=-3$), $0.906$ $[0.848,0.968]$ (gen.) & $0.999$, $1.076$ & $1.705$, $1.846$ & unresolved; L0 \\
+ & 34--40 bits & $0.78$--$0.91$ & & $1.60$--$1.87$ & unresolved; L0 \\
+\addlinespace
+\texttt{sib8-p512} / rho-cubic & $j=0$, $b=7$; 34, 37, 40 bits & $1.680$, $1.544$, $1.495$ & $2.001$, $1.840$, $1.782$ & $3.450$, $3.175$, $3.078$ & rho ahead; L0 \\
+\texttt{sib8-p512-aut3} / rho-cubic & $j=0$, $b=7$; 34, 37, 40 bits & $0.992$ $[0.902,1.092]$, $0.875$ $[0.804,0.952]$, $0.909$ $[0.828,0.997]$ & $1.356$, $1.200$, $1.248$ & $3.000$, $2.663$, $2.776$ & unresolved; validated (GAE) \\
+\bottomrule
+\end{tabularx}
+\caption[]{Walk arms on prime-field miniatures against their matched rho,
+in GAE ($S=\mathrm{GAE}/\sqrt r$), cover over rho at $w=0$, $0.1$ and $1$
+GAE per unpriced native operation, with table inserts priced (the band's
+reading since the owner's ruling of 8 November). Pooled or paired ratios as
+each source gives them; brackets at $w=0$. C25519 family: Curve25519-rule
+miniatures with cofactor 8; $k$: bits of $p$. 31--40 bits: five
+prime-order curves per shape and size. ``rho ahead'': rho lower at every
+weight. Every value is \texttt{[pcc:unverified]}; no pcc claim is filed.
+L0: local runs, no validator. Validated (GAE): stage~4b's
+\texttt{VALIDATION.json}, scoped to the GAE comparison; order does not
+hold across the band. Sources:
+\art{research/curve25519_tw_jumps_20261108/},
+\art{research/curve25519_tw_scaling_20261108/},
+\art{research/curve25519_engine_items_20261110/},
+\art{research/curve25519_autolab_20261104/siblings/} (stages 1, 2, 3, 4b).}
+\label{tab:distance-walk}
+\end{table}
+
 \paragraph{Algebraic track.} The Kummer tower is $29$--$159\times$ rho at
 $w=0$ (29.4 at 24 bits, \art{research/pkm_tower_ecbench_20261013/README.md};
 158.9 $[121.6,221.4]$ at 30 bits). No algebraic prime baseline exists.
@@ -386,12 +481,15 @@ $w=0$. Dotted line: $\tilde O(q)$. Dashed line: rho's $q^{3/2}$. Source:
 
 Only in these families (Figure~\ref{fig:weak},
 Table~\ref{tab:distance-weak}) does index calculus approach rho or go
-below it. The genus-3 hyperelliptic row and the Joux--Vitse sieve row are
+below it. The genus-3 hyperelliptic row and the Joux--Vitse sieve rows are
 the programme's preregistered decisions of IC below the strongest rho, and
-the sieve row is the only one validated
-(Chapter~\ref{sec:transfer}, \S\ref{sec:jac-jv}). It has no pcc claim, so
-its statement is an unverified assertion under the proof-carrying-claims
-rule. The plane-quartic row uses double large
+the two sieve rows (at $p=1511$, and the table-line arm pooled over
+$p=1009$--$1823$) are the only ones validated
+(Chapter~\ref{sec:transfer}, \S\ref{sec:jac-jv}). They have no pcc claim, so
+their statements are unverified assertions under the proof-carrying-claims
+rule. With the Hilbert early stop, the Joux--Vitse Nagao arm is below a
+matched negation rho across the band at $p=1451$ and $1601$, on a local,
+unvalidated run (\S\ref{sec:ext-jv-nov}). The plane-quartic row uses double large
 primes, structured elimination and Lanczos; its 501 IC units and 2{,}442
 rho runs are all verified, and it is a measurement of a known result
 (Diem, Diem--Thomé).
@@ -407,16 +505,24 @@ Genus 3, cubic GHS, hyperelliptic & $q=2^{16}$ & $0.70$, $0.71$, $0.70$ &
   preregistered; at $c_\ell=9$ every instance $2.7$--$12.4$ \\
 Genus 3, cubic GHS, plane quartic (Diem) & $q=2{,}097{,}091$ & $0.005$
   $[0.004,0.008]$ & negation rho & $0.983$ $[0.975,0.993]$ against $1.543$
-  & interpolated crossover $q^*=555$ $[389,752]$; L0; no validation file \\
+  & interpolated crossover $q^*=555$ $[389,752]$; L0; no validation file;
+  to $k=25$ ($q=33{,}554{,}383$): $0.0021$ $[0.0017,0.0026]$ against a
+  calibrated rho model, not a measured rho \\
 \addlinespace
 Joux--Vitse cover, sieve route & $p=1511$ & $0.00647$ $[0.00545,0.00799]$
   (U1); $0.0156$ (U2); $0.107$--$0.123$ at $w=0.1$, 1 & matched negation rho
   (142 pooled runs) & & validated (\texttt{VAL-20261103-\allowbreak c31c76}); weak class
   only; unemitted work upper-bounded; local run \\
-Joux--Vitse cover, plain Nagao arm & $p=1009$ & $1.59$--$1.98$ & pooled
-  rho constant & & lower bound; against matched negation rho above at
-  $p=1301$ ($1.41$) and $1451$ ($1.16$), unresolved at $1601$
-  (\S\ref{sec:jac-jv}) \\
+Joux--Vitse cover, sieve route, table line (arm U) & $p=1009$--$1823$,
+  pooled & $0.0141$ $[0.0122,0.0167]$ (U2); $0.0857$, $0.0900$ at $w=0.1$,
+  1 & matched negation rho, per prime & & validated (11 November); with
+  the isogeny walk from a non-weak start charged, $0.0155$
+  $[0.0125,0.0200]$ (unverified, \S\ref{sec:ext-jv-nov}) \\
+Joux--Vitse cover, Nagao arm, line search and Hilbert stop & $p=1301$,
+  $1451$, $1601$ & $1.003$, $0.837$, $0.695$ (U2); $0.417$, $0.348$, $0.289$
+  (U1) & matched negation rho (126 pooled runs) & & below across the band at
+  1451 and 1601, not at 1301; lower bound; local; unverified
+  (\S\ref{sec:ext-jv-nov}) \\
 \addlinespace
 $k=4$ over $\FF_{(2^m)^4}$ & $m=15$ & $5.2$ & & & after corrections;
   crossover unsupported \\
@@ -435,10 +541,15 @@ records do not replay. Joux--Vitse sieve: U1 is group additions, U2
 textbook $\FF_p$ multiplications; the $w>0$ cells price the cover's
 unemitted F4, descent and linear-algebra work as an upper bound; the order
 holds across the band in all four cells. Only the genus-3 and Joux--Vitse
-sieve rows ran under a frozen protocol, and no row has a pcc claim.
+sieve rows ran under a frozen protocol (the Nagao Hilbert row under a
+preregistration), and no row has a pcc claim.
 Sources: Chapter~\ref{sec:transfer};
 \art{research/quartic_n4v2_20261020/};
+\art{research/leads_20261111/runs/C_quartic_k26/RESULT.md};
 \art{research/jv_sieve_negrho_20261102/VALIDATION.json};
+\art{research/jv_sieve_line_vs_rho_20261103/VALIDATION.json};
+\art{research/jv_walk_charge_20261111/README.md};
+\art{research/jv_nagao_hilbert_20261112/rescore/table.md};
 \art{research/jv_cover_negrho_rescore_20261101/README.md};
 Chapter~\ref{ch:extension};
 \art{research/ghs_q16_genus3_subcovers_20261028/REPORT.md}.}
@@ -454,9 +565,12 @@ Chapter~\ref{ch:extension};
 Family & IC/rho & Qualifier \\
 \midrule
 Joux--Vitse cover, sieve route, $p=1511$ & $0.0065$ & matched negation rho; weak class; validated (\texttt{VAL-20261103-c31c76}); no pcc claim \\
+Joux--Vitse cover, sieve route, table line, pooled & $0.0141$ & U2; validated 11 November; walk into the class charged: $0.0155$ (unverified) \\
 Plane quartic via cubic GHS, $q\approx2^{21}$ & $0.005$ & negation rho; weak family; L0; no validation file; producer-reported \\
 Genus-3 hyperelliptic via GHS, $q=2^{16}$ & $0.70$ & ideal strong rho; one size of seven; pricing-sensitive; producer-reported \\
-Joux--Vitse cover, plain Nagao arm & $1.16$ & matched negation rho at $p=1451$; above rho at 1301 and 1451; producer-reported \\
+Joux--Vitse cover, Nagao arm with Hilbert stop, $p=1601$ & $0.695$ & U2, matched negation rho; below across the band at 1451 and 1601, level at 1301; lower bound; local; unverified \\
+Prime $j=0$ miniatures, sibling walk with \texttt{aut=3}, 37 bits & $0.875$ & $w=0$ against rho-cubic; $1.200$ at $w=0.1$, $2.663$ at $w=1$; unresolved in the band; validated GAE comparison; no pcc claim \\
+Curve25519 miniatures, \texttt{twcj-cv0}, $k=20$ & $1.217$ & F$=1$ walk, not decomposition-based; rho-neg ahead at every weight (table work priced); unverified \\
 Koblitz, lazy orbit-member index, $n=29$ & $1.27$ $[0.77,1.80]$ & fully priced; component, not a board row; not validated \\
 Prime, residual collector \texttt{res1eq}, 36 bits & $1.54$ & rho's exponent; \texttt{VALIDATION.json}, not an admitted row \\
 Prime, residual collector \texttt{res2}, 36 bits & $2.59$ & $w=0$; improvement-log row; no validator \\
@@ -474,8 +588,11 @@ a pcc claim id is producer-reported (an unverified assertion).}
 \end{table}
 
 On every prime-order curve of cryptographic shape that the programme
-measured (at the toy and medium sizes measured, $\le2^{47}$), rho is
-cheaper. Index calculus goes below rho only in weak
+measured (at the toy and medium sizes measured, $\le2^{47}$), no
+index-calculus arm is below its matched rho across the pricing band. At
+$w=0$ alone the sibling walks are $0.78$--$0.927$ of rho-neg, and with
+\texttt{aut=3} $0.875$--$0.992$ of rho-cubic on $j=0$ curves of 34--40
+bits; at $w=1$ rho is cheaper in every case (Table~\ref{tab:distance-walk}). Index calculus goes below rho only in weak
 extension-field families, which is where theory said it would. There the
 programme's contribution is matched, priced, verified measurement of
 known algorithms.
