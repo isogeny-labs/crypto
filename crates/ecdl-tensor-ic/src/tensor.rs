@@ -16,6 +16,7 @@
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
+use crate::fasthash::FastMap;
 use crate::schedule::Step;
 use crate::{Error, Result};
 
@@ -244,8 +245,8 @@ pub struct SparseContractor {
 /// Partial contraction (Go: table). `rows` key: one byte (0/1) per edge in `edges`.
 struct Table {
     edges: Vec<usize>,
-    pos: HashMap<usize, usize>,
-    rows: HashMap<Vec<u8>, u64>,
+    pos: FastMap<usize, usize>,
+    rows: FastMap<Vec<u64>, u64>,
 }
 
 impl Counter for SparseContractor {
@@ -265,15 +266,16 @@ impl Counter for SparseContractor {
                 last[e] = i as isize;
             }
         }
+        let fixed_arr = Fixed::new(fixed, n.num_edges);
         let mut t = Table {
             edges: Vec::new(),
-            pos: HashMap::new(),
-            rows: HashMap::from([(Vec::new(), 1u64)]),
+            pos: FastMap::default(),
+            rows: FastMap::from_iter([(Vec::new(), 1u64)]),
         };
         for (i, v) in n.vertices.iter().enumerate() {
             t = match v {
-                Vertex::Support(v) => join_support(&t, v, fixed),
-                Vertex::Func(v) => apply_func(&t, v, fixed)?,
+                Vertex::Support(v) => join_support(&t, v, &fixed_arr),
+                Vertex::Func(v) => apply_func(&t, v, &fixed_arr)?,
                 Vertex::Pred(v) => apply_pred(&t, v)?,
             };
             if t.rows.len() > self.peak_rows {
@@ -304,16 +306,69 @@ impl Counter for SparseContractor {
     }
 }
 
+/// `fixed` as a dense array by edge index (-1 free, 0, 1): the per-row
+/// lookups of the join and function steps otherwise hash a `usize` each.
+struct Fixed(Vec<i8>);
+
+impl Fixed {
+    fn new(fixed: &HashMap<usize, bool>, num_edges: usize) -> Fixed {
+        let n = fixed.keys().map(|&e| e + 1).max().unwrap_or(0).max(num_edges);
+        let mut v = vec![-1i8; n];
+        for (&e, &b) in fixed {
+            v[e] = b as i8;
+        }
+        Fixed(v)
+    }
+
+    #[inline(always)]
+    fn get(&self, e: usize) -> Option<bool> {
+        match self.0.get(e) {
+            Some(&x) if x >= 0 => Some(x == 1),
+            _ => None,
+        }
+    }
+}
+
 fn new_table(edges: Vec<usize>) -> Table {
     let pos = edges.iter().enumerate().map(|(i, &e)| (e, i)).collect();
     Table {
         edges,
         pos,
-        rows: HashMap::new(),
+        rows: FastMap::default(),
     }
 }
 
-fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Table {
+// Row keys are bit-packed: bit `p` of a key is the value of `edges[p]`, with
+// every bit past the key's width zero, so equal rows are equal words.
+
+#[inline(always)]
+fn words(bits: usize) -> usize {
+    bits.div_ceil(64)
+}
+
+#[inline(always)]
+fn get_bit(key: &[u64], p: usize) -> bool {
+    (key[p >> 6] >> (p & 63)) & 1 == 1
+}
+
+#[inline(always)]
+fn set_bit(key: &mut [u64], p: usize) {
+    key[p >> 6] |= 1u64 << (p & 63);
+}
+
+/// Appends the `slen` bits of `src` after the `dlen` bits already in `dst`.
+fn append_bits(dst: &mut Vec<u64>, dlen: usize, src: &[u64], slen: usize) {
+    dst.resize(words(dlen + slen), 0);
+    let (base, shift) = (dlen >> 6, dlen & 63);
+    for (i, &w) in src.iter().enumerate() {
+        dst[base + i] |= w << shift;
+        if shift != 0 && base + i + 1 < dst.len() {
+            dst[base + i + 1] |= w >> (64 - shift);
+        }
+    }
+}
+
+fn join_support(t: &Table, v: &SupportVertex, fixed: &Fixed) -> Table {
     let mut shared: Vec<usize> = Vec::new(); // indices into v.e bound in t
     let mut shared_pos: Vec<usize> = Vec::new(); // their positions in t
     let mut fresh: Vec<usize> = Vec::new(); // indices into v.e not yet bound
@@ -326,11 +381,11 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
         }
     }
     // Group the vertex rows (restricted to fixed bits) by their shared part.
-    let mut groups: HashMap<Vec<u8>, Vec<Vec<u8>>> = HashMap::new();
+    let mut groups: FastMap<Vec<u64>, Vec<Vec<u64>>> = FastMap::default();
     for r in &v.rows {
         let mut ok = true;
         for (i, e) in v.e.iter().enumerate() {
-            if let Some(&b) = fixed.get(e) {
+            if let Some(b) = fixed.get(*e) {
                 if b != r[i] {
                     ok = false;
                     break;
@@ -340,26 +395,41 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
         if !ok {
             continue;
         }
-        let sk: Vec<u8> = shared.iter().map(|&i| bit(r[i])).collect();
-        let fk: Vec<u8> = fresh.iter().map(|&i| bit(r[i])).collect();
+        let mut sk = vec![0u64; words(shared.len())];
+        for (j, &i) in shared.iter().enumerate() {
+            if r[i] {
+                set_bit(&mut sk, j);
+            }
+        }
+        let mut fk = vec![0u64; words(fresh.len())];
+        for (j, &i) in fresh.iter().enumerate() {
+            if r[i] {
+                set_bit(&mut fk, j);
+            }
+        }
         groups.entry(sk).or_default().push(fk);
     }
+    let width = t.edges.len();
     let mut edges = t.edges.clone();
     for &i in &fresh {
         edges.push(v.e[i]);
     }
     let mut out = new_table(edges);
-    let mut sk = vec![0u8; shared.len()];
+    let mut sk = vec![0u64; words(shared.len())];
+    let mut nk: Vec<u64> = Vec::new();
     for (key, &c) in &t.rows {
+        sk.iter_mut().for_each(|w| *w = 0);
         for (j, &p) in shared_pos.iter().enumerate() {
-            sk[j] = key[p];
+            if get_bit(key, p) {
+                set_bit(&mut sk, j);
+            }
         }
         if let Some(g) = groups.get(&sk) {
             for fk in g {
-                let mut nk = key.clone();
-                nk.extend_from_slice(fk);
-                let slot = out.rows.entry(nk).or_insert(0);
-                *slot = slot.wrapping_add(c);
+                nk.clear();
+                nk.extend_from_slice(key);
+                append_bits(&mut nk, width, fk, fresh.len());
+                add_row(&mut out.rows, &nk, c);
             }
         }
     }
@@ -367,7 +437,7 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
     out
 }
 
-fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result<Table> {
+fn apply_func(t: &Table, v: &FuncVertex, fixed: &Fixed) -> Result<Table> {
     let mut in_pos = Vec::with_capacity(v.in_.len());
     for &e in &v.in_ {
         match t.pos.get(&e) {
@@ -382,48 +452,57 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
     }
     let mut out_pos: Vec<isize> = Vec::with_capacity(v.out.len()); // -1 when the output edge is new
     let mut edges = t.edges.clone();
+    let mut n_new = 0usize;
     for &e in &v.out {
         if let Some(&p) = t.pos.get(&e) {
             out_pos.push(p as isize);
         } else {
             out_pos.push(-1);
             edges.push(e);
+            n_new += 1;
         }
     }
+    let width = t.edges.len();
     let mut out = new_table(edges);
     let mut inp = vec![false; v.in_.len()];
+    let mut nk: Vec<u64> = Vec::new();
+    let mut ext = vec![0u64; words(n_new)];
     for (key, &c) in &t.rows {
         for (i, &p) in in_pos.iter().enumerate() {
-            inp[i] = key[p] == 1;
+            inp[i] = get_bit(key, p);
         }
         let res = match (v.f)(&inp) {
             Some(r) => r,
             None => continue,
         };
-        let mut ext: Vec<u8> = Vec::with_capacity(v.out.len());
+        ext.iter_mut().for_each(|w| *w = 0);
+        let mut k = 0usize;
         let mut ok = true;
         for (i, &b) in res.iter().enumerate() {
             let e = v.out[i];
-            if let Some(&fb) = fixed.get(&e) {
+            if let Some(fb) = fixed.get(e) {
                 if fb != b {
                     ok = false;
                     break;
                 }
             }
             if out_pos[i] >= 0 {
-                if (key[out_pos[i] as usize] == 1) != b {
+                if get_bit(key, out_pos[i] as usize) != b {
                     ok = false;
                     break;
                 }
             } else {
-                ext.push(bit(b));
+                if b {
+                    set_bit(&mut ext, k);
+                }
+                k += 1;
             }
         }
         if ok {
-            let mut nk = key.clone();
-            nk.extend_from_slice(&ext);
-            let slot = out.rows.entry(nk).or_insert(0);
-            *slot = slot.wrapping_add(c);
+            nk.clear();
+            nk.extend_from_slice(key);
+            append_bits(&mut nk, width, &ext, n_new);
+            add_row(&mut out.rows, &nk, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
@@ -447,11 +526,10 @@ fn apply_pred(t: &Table, v: &PredVertex) -> Result<Table> {
     let mut vals = vec![false; v.e.len()];
     for (key, &c) in &t.rows {
         for (i, &p) in pos.iter().enumerate() {
-            vals[i] = key[p] == 1;
+            vals[i] = get_bit(key, p);
         }
         if (v.p)(&vals) {
-            let slot = out.rows.entry(key.clone()).or_insert(0);
-            *slot = slot.wrapping_add(c);
+            add_row(&mut out.rows, key, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
@@ -472,15 +550,27 @@ fn sum_out(t: Table, keep: &dyn Fn(usize) -> bool) -> Table {
         return t;
     }
     let mut out = new_table(edges);
-    let mut buf = vec![0u8; keep_idx.len()];
+    let mut buf = vec![0u64; words(keep_idx.len())];
     for (key, &c) in &t.rows {
+        buf.iter_mut().for_each(|w| *w = 0);
         for (j, &i) in keep_idx.iter().enumerate() {
-            buf[j] = key[i];
+            if get_bit(key, i) {
+                set_bit(&mut buf, j);
+            }
         }
-        let slot = out.rows.entry(buf.clone()).or_insert(0);
-        *slot = slot.wrapping_add(c);
+        add_row(&mut out.rows, &buf, c);
     }
     out
+}
+
+/// `rows[key] += c` (wrapping), cloning the key only when it is new.
+#[inline]
+fn add_row(rows: &mut FastMap<Vec<u64>, u64>, key: &[u64], c: u64) {
+    if let Some(slot) = rows.get_mut(key) {
+        *slot = slot.wrapping_add(c);
+    } else {
+        rows.insert(key.to_vec(), c);
+    }
 }
 
 /// FindWitness turns a counting solver into a search solver by
