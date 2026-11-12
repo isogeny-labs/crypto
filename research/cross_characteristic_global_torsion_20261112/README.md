@@ -40,14 +40,14 @@ The Python verifier also checks reductions \(p\in\{2,3,7,23\}\to2\); for \(p=7,2
 
 No packages, SageMath, paid infrastructure, or external access are required.
 
-\`\`\`bash
+```bash
 python3 -B research/cross_characteristic_global_torsion_20261112/toy_transfer.py
 python3 -O -B research/cross_characteristic_global_torsion_20261112/toy_transfer.py
 node research/cross_characteristic_global_torsion_20261112/independent.js
 node --no-opt research/cross_characteristic_global_torsion_20261112/independent.js
-\`\`\`
+```
 
-The checks cover, for each source characteristic, all five subgroup points, all 25 group-law pairs, all five planted public DLPs solved in the target, and a deliberately swapped output that must violate the group law. The Python verifier calculates the five global points using exact rational arithmetic; the JS implementation audits the finite-field side independently. Using unconditional checks instead of Python \`assert\` keeps \`-O\` testing meaningful. **Local preliminary execution on both implementations passed, but a cryptographic claim is not signed or PCC verified.**
+The checks cover, for each source characteristic, all five subgroup points, all 25 group-law pairs, all five planted public DLPs solved in the target, and a deliberately swapped output that must violate the group law. The Python verifier calculates the five global points using exact rational arithmetic; the JS implementation audits the finite-field side independently. Using unconditional checks instead of Python `assert` keeps `-O` testing meaningful. **Local preliminary execution on both implementations passed, but a cryptographic claim is not signed or PCC verified.**
 
 ## Cost and obstruction
 
@@ -64,8 +64,8 @@ In particular the target field cannot be arbitrarily small at fixed \(g\), but t
 - [LMFDB 11.a2](https://www.lmfdb.org/EllipticCurve/Q/11/a/2) independently records the exact model, rational order-five generator, discriminant and global rational torsion. This is a **textbook positive control**, not a novel mathematical theorem.
 - [Jacobson, Koblitz, Silverman, Stein, Teske, *Analysis of the Xedni Calculus Attack* (2000)](https://doi.org/10.1023/A:1008312401197) treats relation-preserving characteristic-zero lifts rather than a completed cross-prime algorithm.
 - [Bourdon–Clark, *Torsion Points and Galois Representations on CM Elliptic Curves*](https://arxiv.org/abs/1612.03229) addresses field-degree restrictions in the CM case; **our 11a1 is non-CM** and this paper is not invoked as a theorem about all genus-\(g\) abelian varieties.
-- Repo: \`problems/lift-reduce-second-prime-transfer.md\`, \`problems/prime-field-chained-transfer-no-advantage.md\`, \`research/chained_prime_transfer_20261111/\`, and \`cryptanalysis:research/xedni_cross_field\`. CT47–50 investigate torsion/gluing/Richelot **within** characteristic 101 and are not duplicated here.
-- Shared research KB: no \`kb_status/search_knowledge\` MCP actions were loaded in this runtime and no repository-local catalog checkout was available. GitHub search in all three repos for \`cross-characteristic\`, \`global torsion\`, \`11a1\`, \`xedni\`, plus the cited repo records and papers was the fallback. It does not establish absence from the encrypted/autoresearcher atlas.
+- Repo: `problems/lift-reduce-second-prime-transfer.md`, `problems/prime-field-chained-transfer-no-advantage.md`, `research/chained_prime_transfer_20261111/`, and `cryptanalysis:research/xedni_cross_field`. CT47–50 investigate torsion/gluing/Richelot **within** characteristic 101 and are not duplicated here.
+- Shared research KB: no `kb_status/search_knowledge` MCP actions were loaded in this runtime and no repository-local catalog checkout was available. GitHub search in all three repos for `cross-characteristic`, `global torsion`, `11a1`, `xedni`, plus the cited repo records and papers was the fallback. It does not establish absence from the encrypted/autoresearcher atlas.
 
 ## Next proof obligation
 
