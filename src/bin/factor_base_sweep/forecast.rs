@@ -86,8 +86,13 @@ pub fn forecaster(request: &Request, dump: &FactorBaseDump, r: u64, cofactor: u6
     f.set_inventory(dump.points.len(), r, cofactor);
     // Calibrated prior point for the cells the table covers (Boolean, m = 2,
     // binary subspace shapes); everywhere else the semi-regular prior stays.
-    if let (Some(shape), Some(n)) = (request.candidate.shape.as_deref(), binary_degree(&request.candidate.curve)) {
-        if let Some(d) = dreg_prior_table::calibrated_prior_degree(n, request.candidate.dimension, shape) {
+    if let (Some(shape), Some(n)) = (
+        request.candidate.shape.as_deref(),
+        binary_degree(&request.candidate.curve),
+    ) {
+        if let Some(d) =
+            dreg_prior_table::calibrated_prior_degree(n, request.candidate.dimension, shape)
+        {
             f.set_prior_degree(d, dreg_prior_table::SOURCE);
         }
     }

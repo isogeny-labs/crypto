@@ -26,7 +26,8 @@ use std::sync::OnceLock;
 const TABLE_JSON: &str = include_str!("dreg_prior_table.json");
 
 /// Recorded on every forecast that used the table.
-pub const SOURCE: &str = "calibrated prior: mode of exact MutantXL D_mut (an F4 proxy) per (n, k, shape), \
+pub const SOURCE: &str =
+    "calibrated prior: mode of exact MutantXL D_mut (an F4 proxy) per (n, k, shape), \
      ml-cryptanalysis experiments/dreg-prior-calibration-20261112";
 
 #[derive(Deserialize)]
@@ -48,7 +49,10 @@ fn table() -> &'static Table {
     static TABLE: OnceLock<Table> = OnceLock::new();
     TABLE.get_or_init(|| {
         let t: Table = serde_json::from_str(TABLE_JSON).expect("embedded dreg prior table parses");
-        assert_eq!(t.schema, "crypto.dreg-prior-table/v1", "unexpected dreg prior table schema");
+        assert_eq!(
+            t.schema, "crypto.dreg-prior-table/v1",
+            "unexpected dreg prior table schema"
+        );
         t
     })
 }
@@ -87,13 +91,21 @@ mod tests {
         let t = table();
         assert!(!t.cells.is_empty());
         for c in &t.cells {
-            assert!(c.mode >= 1 && c.mode <= 9, "implausible degree {} at {:?}", c.mode, (c.n, c.k));
+            assert!(
+                c.mode >= 1 && c.mode <= 9,
+                "implausible degree {} at {:?}",
+                c.mode,
+                (c.n, c.k)
+            );
             assert!(c.rows > 0);
         }
         for n in [11, 13, 17, 19, 23, 29, 31] {
             for k in 2..=8 {
                 for shape in ["coordinate", "gp", "scaled", "random"] {
-                    assert!(calibrated_prior_degree(n, k, shape).is_some(), "missing cell {n} {k} {shape}");
+                    assert!(
+                        calibrated_prior_degree(n, k, shape).is_some(),
+                        "missing cell {n} {k} {shape}"
+                    );
                 }
             }
         }

@@ -759,11 +759,7 @@ impl Forecaster {
             .and_then(|s| s.equation_degrees.iter().copied().min())
             .unwrap_or(2)
             .max(1);
-        let prior_point = self
-            .prior_point
-            .as_ref()
-            .map(|(d, _)| *d)
-            .or(semi_regular);
+        let prior_point = self.prior_point.as_ref().map(|(d, _)| *d).or(semi_regular);
         let all = degree_forecast(
             self.observations.iter().copied(),
             self.bound,
@@ -1142,7 +1138,11 @@ mod tests {
         f.set_shape(quadratic_shape(2, false)); // semi-regular degree 3
         f.set_prior_degree(2, "test calibration");
         let empty = f.forecast();
-        assert_eq!(empty.semi_regular_degree, Some(3), "the semi-regular degree is still reported");
+        assert_eq!(
+            empty.semi_regular_degree,
+            Some(3),
+            "the semi-regular degree is still reported"
+        );
         assert_eq!(empty.all_targets.predicted_degree, Some(2));
         assert_eq!(empty.all_targets.prior_weight, 1.0);
         assert_eq!(
@@ -1154,7 +1154,11 @@ mod tests {
         }
         let full = f.forecast();
         assert_eq!(full.all_targets.predicted_degree, Some(6));
-        assert_eq!(full.excess_over_semi_regular, Some(3), "excess stays relative to semi-regular");
+        assert_eq!(
+            full.excess_over_semi_regular,
+            Some(3),
+            "excess stays relative to semi-regular"
+        );
     }
 
     #[test]
@@ -1182,7 +1186,10 @@ mod tests {
         let mut f = Forecaster::new(8);
         f.set_shape(quadratic_shape(2, false));
         let plain = serde_json::to_value(f.forecast()).unwrap();
-        assert!(plain.get("prior_source").is_none(), "unset source is not serialized");
+        assert!(
+            plain.get("prior_source").is_none(),
+            "unset source is not serialized"
+        );
         let back: Forecast = serde_json::from_value(plain).unwrap();
         assert_eq!(back.prior_source, None);
         f.set_prior_degree(2, "test calibration");
