@@ -3146,7 +3146,7 @@ fn build_subgroup_orbit_factor_base_reference(
             }
             let x = F2mElement::from_biguint(&BigUint::from(rng.gen_range(1..cap)), kc.n);
             let lifts = if curve.n % 2 == 1 {
-                points_with_x_fast(&curve, &x)
+                points_with_x_fast(curve, &x)
             } else {
                 points_with_x(&kc.curve, &x)
             };
