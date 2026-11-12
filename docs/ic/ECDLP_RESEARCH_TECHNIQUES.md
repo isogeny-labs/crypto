@@ -1692,13 +1692,24 @@ performance verdict".
 5. Done 2026-11-12 for the pooled `ksum` study (validated). Still open: the
    external-tool comparison its README owes, and a second-host timed (L2)
    replay if a wall-time claim is wanted.
-6. Calibrate `hashed_tensor_steps` (nanoseconds per charged primitive step on
-   the calibration host, pinned in [`calibration.json`](calibration.json)) or
-   charge the contraction in GAE, so the hashed arm gets a priced `S` and can
-   leave `DiagnosticOnly`; until then it stays a stage diagnostic.
-7. Give the algebraic oracles a priced solver unit (word XORs covering the
-   whole run, or conflicts at a pinned price), so `descent-algebraic`,
-   `chained-x`, `pkm-semaev` and the SAT arms stop reading as lower bounds.
+6. Pin `ns_per_hashed_tensor_step` on the calibration host (the key exists
+   since 2026-11-12; protocol in
+   [`calibration-solver-units.md`](calibration-solver-units.md)) and charge
+   the omitted tensor-curve certification work; only then can the hashed arm
+   leave `DiagnosticOnly`. Until pinned it stays a stage diagnostic.
+7. Pin the solver-unit keys added on 2026-11-12 (`ns_per_conflict`,
+   `ns_per_monomial_op`, `ns_per_monomial_test`, `ns_per_vector_xor_8x32` /
+   `_16x32`, `ns_per_f4_muladd`, `ns_per_fp_mul`) per
+   [`calibration-solver-units.md`](calibration-solver-units.md), which first
+   needs its three missing measurement tools (an `ic bench` report reader, an
+   `F_p` multiplication microbenchmark, a contraction-step timer). Until a
+   curve's row pins a key, its unit stays a lower bound exactly as before;
+   `word operations (partial)` (crossbred) and `monomial operations
+   (modelled)` (XL) stay refused even when pinned, because their counts do
+   not cover the whole run. Four pkm counters (`pkm_trace_learn_muladds`,
+   `pkm_t0_*_inversions`, `pkm_crosscheck_fp_mults`) are neither priced nor
+   listed as unpriced: listing them changes frozen ids' unpriced lists and
+   needs its own versioned id.
 8. Pursue G1 (binary F4 trace reuse) and G3 (BooleanSolve refutation) only
    with a preregistered falsifier; both are Backlog with no code.
 9. Attempt general trace-zero or higher-genus GHS integration only after the
