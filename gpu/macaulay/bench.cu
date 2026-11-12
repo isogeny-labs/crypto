@@ -49,6 +49,78 @@ __global__ void rref_batch_kernel(uint32_t* a, int rows, int cols, int* piv,
     if (threadIdx.x == 0) rank[inst] = r;
 }
 
+/* One block per matrix, the matrix staged in shared memory as uint16_t
+ * (p < 2^16).  The reduction is the same mac_rref_block, so the result is
+ * the same matrix; the global matrix is read once and written once
+ * instead of once per pivot column. */
+template <int THREADS>
+__global__ void rref_batch_kernel_smem(uint32_t* a, int rows, int cols,
+                                       int* piv, int* rank) {
+    extern __shared__ uint32_t smem[];
+    const int inst = blockIdx.x;
+    const size_t n = (size_t)rows * cols;
+    uint32_t* mine = a + (size_t)inst * n;
+    uint32_t* scratch = smem;
+    uint16_t* sa = (uint16_t*)(smem + mac_block_scratch_words(cols));
+    for (size_t i = threadIdx.x; i < n; i += THREADS) sa[i] = (uint16_t)mine[i];
+    __syncthreads();
+    int r = mac_rref_block<THREADS, uint16_t>(sa, rows, cols,
+                                              piv + (size_t)inst * rows, scratch);
+    __syncthreads();
+    for (size_t i = threadIdx.x; i < n; i += THREADS) mine[i] = sa[i];
+    if (threadIdx.x == 0) rank[inst] = r;
+}
+
+static size_t smem16_bytes() {
+    return mac_block_scratch_words(MAC_COLS) * sizeof(uint32_t) +
+           (size_t)MAC_ROWS * MAC_COLS * sizeof(uint16_t);
+}
+
+/* Which reduction kernel runs: the shared-resident one when p < 2^16 and
+ * the device's opt-in shared memory per block holds the matrix (sm_80:
+ * 163 KiB, sm_90: 227 KiB; sm_86/sm_89: 99 KiB does not hold 226x286),
+ * else the global one.  MAC_SMEM=0 forces global; MAC_SMEM_THREADS picks
+ * 256, 512 (default) or 1024 threads for the shared kernel. */
+static int smem_threads() {
+    static int t = -1;
+    if (t >= 0) return t;
+    t = 0;
+    const char* e = getenv("MAC_SMEM");
+    if (e && !strcmp(e, "0")) return t;
+    if (MAC_P >= 65536u) return t;
+    int dev = 0, optin = 0;
+    CUDA_OK(cudaGetDevice(&dev));
+    CUDA_OK(cudaDeviceGetAttribute(&optin, cudaDevAttrMaxSharedMemoryPerBlockOptin, dev));
+    if ((size_t)optin < smem16_bytes()) return t;
+    const char* te = getenv("MAC_SMEM_THREADS");
+    int want = te ? atoi(te) : 512;
+    if (want != 256 && want != 1024) want = 512;
+    CUDA_OK(cudaFuncSetAttribute(rref_batch_kernel_smem<256>, cudaFuncAttributeMaxDynamicSharedMemorySize, (int)smem16_bytes()));
+    CUDA_OK(cudaFuncSetAttribute(rref_batch_kernel_smem<512>, cudaFuncAttributeMaxDynamicSharedMemorySize, (int)smem16_bytes()));
+    CUDA_OK(cudaFuncSetAttribute(rref_batch_kernel_smem<1024>, cudaFuncAttributeMaxDynamicSharedMemorySize, (int)smem16_bytes()));
+    t = want;
+    return t;
+}
+
+static const char* rref_path() {
+    static char buf[64];
+    int t = smem_threads();
+    if (t) snprintf(buf, sizeof buf, "shared-u16 (%d threads, %zu B)", t, smem16_bytes());
+    else snprintf(buf, sizeof buf, "global (%d threads)", MAC_THREADS);
+    return buf;
+}
+
+static size_t shared_bytes();
+static void launch_rref(uint32_t* d_a, int batch, int rows, int cols, int* d_piv,
+                        int* d_rank) {
+    switch (smem_threads()) {
+    case 256: rref_batch_kernel_smem<256><<<batch, 256, smem16_bytes()>>>(d_a, rows, cols, d_piv, d_rank); break;
+    case 512: rref_batch_kernel_smem<512><<<batch, 512, smem16_bytes()>>>(d_a, rows, cols, d_piv, d_rank); break;
+    case 1024: rref_batch_kernel_smem<1024><<<batch, 1024, smem16_bytes()>>>(d_a, rows, cols, d_piv, d_rank); break;
+    default: rref_batch_kernel<<<batch, MAC_THREADS, shared_bytes()>>>(d_a, rows, cols, d_piv, d_rank);
+    }
+}
+
 /* Montgomery conversion, flat over the whole batch. */
 __global__ void to_mont_kernel(uint32_t* a, size_t n) {
     for (size_t i = (size_t)blockIdx.x * blockDim.x + threadIdx.x; i < n;
@@ -72,8 +144,8 @@ static size_t shared_bytes() {
 static int selftest(int batch) {
     const int rows = MAC_ROWS, cols = MAC_COLS;
     const size_t sz = (size_t)rows * cols;
-    printf("selftest: p=%u shape=%dx%d batch=%d threads=%d\n", MAC_P, rows, cols,
-           batch, MAC_THREADS);
+    printf("selftest: p=%u shape=%dx%d batch=%d threads=%d path=%s\n", MAC_P, rows, cols,
+           batch, MAC_THREADS, rref_path());
 
     std::vector<uint32_t> host(sz * batch);
     for (int b = 0; b < batch; b++) {
@@ -104,8 +176,7 @@ static int selftest(int batch) {
     CUDA_OK(cudaMemset(d_piv, 0xFF, (size_t)rows * batch * sizeof(int)));
 
     to_mont_kernel<<<256, 256>>>(d_a, sz * batch);
-    rref_batch_kernel<<<batch, MAC_THREADS, shared_bytes()>>>(d_a, rows, cols,
-                                                              d_piv, d_rank);
+    launch_rref(d_a, batch, rows, cols, d_piv, d_rank);
     from_mont_kernel<<<256, 256>>>(d_a, sz * batch);
     CUDA_OK(cudaGetLastError());
     CUDA_OK(cudaDeviceSynchronize());
@@ -162,8 +233,8 @@ static int selftest(int batch) {
 static void throughput() {
     const int rows = MAC_ROWS, cols = MAC_COLS;
     const size_t sz = (size_t)rows * cols;
-    printf("throughput: p=%u shape=%dx%d threads=%d\n", MAC_P, rows, cols,
-           MAC_THREADS);
+    printf("throughput: p=%u shape=%dx%d threads=%d path=%s\n", MAC_P, rows, cols,
+           MAC_THREADS, rref_path());
     printf("  %8s %12s %14s %12s\n", "batch", "ms", "matrices/s", "MB");
     for (int batch = 64; batch <= 8192; batch *= 2) {
         std::vector<uint32_t> host(sz * batch);
@@ -201,8 +272,7 @@ static void throughput() {
                                cudaMemcpyHostToDevice));
             if (rep == 1) CUDA_OK(cudaEventRecord(t0));
             to_mont_kernel<<<256, 256>>>(d_a, sz * batch);
-            rref_batch_kernel<<<batch, MAC_THREADS, shared_bytes()>>>(
-                d_a, rows, cols, d_piv, d_rank);
+            launch_rref(d_a, batch, rows, cols, d_piv, d_rank);
             if (rep == 1) CUDA_OK(cudaEventRecord(t1));
             CUDA_OK(cudaDeviceSynchronize());
         }

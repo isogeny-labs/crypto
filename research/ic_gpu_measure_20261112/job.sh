@@ -22,7 +22,9 @@ NV="-O3 -std=c++17 -arch=$ARCH -lineinfo"
 shim() {  # shim FILE  -> insert the timing lines around the first <<< launch
   python3 - "$1" <<'P'
 import re,sys
-p=sys.argv[1]; s=open(p).read().split('\n')
+p=sys.argv[1]; s=open(p).read()
+if '__icg_t0' in s: sys.exit(0)
+s=s.split('\n')
 i=next(k for k,l in enumerate(s) if '<<<' in l)
 j=next(k for k in range(i,len(s)) if 'cudaDeviceSynchronize' in s[k])
 s.insert(j+1,'    { auto __icg_t1 = std::chrono::steady_clock::now(); fprintf(stderr, "KERNEL_MS %.4f\\n", std::chrono::duration<double, std::milli>(__icg_t1 - __icg_t0).count()); }')
@@ -32,18 +34,20 @@ open(p,'w').write('\n'.join(s))
 P
 }
 
-for T in base base2 cand; do
-  D=$W/trees/$T/gpu; L=$OUT/build-$T; mkdir -p $L
+build_tree() {  # one tree; the three trees build concurrently
+  local T=$1 D=$W/trees/$1/gpu L=$OUT/build-$1; mkdir -p $L
   shim $D/spmv/spmv.cu; shim $D/fes/fes.cu
-  log "build $T"
-  ( cd $D/spmv && make host-worker cuda-worker NVCCFLAGS="$NV" > $L/spmv.log 2>&1 && \
+  ( cd $D/spmv && make host-worker > $L/spmv.log 2>&1 && nvcc $NV -o spmv_cuda spmv.cu >> $L/spmv.log 2>&1 && \
     nvcc $NV -Xptxas -v -c spmv.cu -o /dev/null > $L/spmv.ptxas 2>&1 ) || log "spmv build FAILED $T"
   ( cd $D/fes && make host-worker cuda ARCH=$ARCH > $L/fes.log 2>&1 && \
     make nvcc-check ARCH=$ARCH NVCCFLAGS="$NV -Xptxas -v" > $L/fes.ptxas 2>&1 ) || log "fes build FAILED $T"
   ( cd $D/macaulay && make bench ARCH=$ARCH NVCCFLAGS="$NV -Xptxas -v" > $L/macaulay.log 2>&1 ) || log "macaulay build FAILED $T"
-  ( cd $D/rootfind && make bench ARCH=$ARCH > $L/rootfind.log 2>&1 && \
-    make ptxas-info ARCH=$ARCH > $L/rootfind.ptxas 2>&1 ) || log "rootfind build FAILED $T"
-done
+  # ptxas -v folded into the one rootfind build (a separate ptxas-info target recompiles for ~10 min)
+  ( cd $D/rootfind && make -j2 bench ARCH=$ARCH NVCCFLAGS="-O3 -std=c++17 -lineinfo -gencode arch=compute_$CC,code=$ARCH -Xcompiler -pthread -Xptxas -v" > $L/rootfind.log 2>&1 ) || log "rootfind build FAILED $T"
+  log "built $T"
+}
+log "build base base2 cand (parallel)"
+build_tree base & build_tree base2 & build_tree cand & wait
 # semaev is unchanged between base and cand: one tree, default build (clmad) and the portable one.
 ( cd $W/trees/cand/gpu/semaev && make bench2 ARCH=$ARCH > $OUT/semaev-default-build.log 2>&1 \
   && cp bench2 bench2_default; make clean >/dev/null; \
