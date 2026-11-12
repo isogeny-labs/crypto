@@ -3291,7 +3291,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         // conversions into Montgomery form.
         let k = self.reps.len() as u64;
         if k > 0 {
-            *out.entry("lookups".to_string()).or_insert(0) += k;
+            crate::cryptanalysis::ic_boundary::bump_counter(&mut out, "lookups", k);
             out.insert("montgomery_conversions".to_string(), 2 * k);
         }
         table_counted(out)
@@ -3873,8 +3873,11 @@ pub(crate) fn charge_system_build(
 ) {
     crate::cryptanalysis::pq_descent_symbolic::take_descent_work().charge(extra);
     let terms: u64 = system.equations.iter().map(|p| p.terms.len() as u64).sum();
-    *extra.entry("bitop_word_ops".to_string()).or_insert(0) +=
-        terms + shape_calls * system.shape_word_ops(shape);
+    crate::cryptanalysis::ic_boundary::bump_counter(
+        extra,
+        "bitop_word_ops",
+        terms + shape_calls * system.shape_word_ops(shape),
+    );
 }
 
 /// The hash probes of one `lift_abscissae` call on `xs`: one per
@@ -3904,7 +3907,11 @@ pub(crate) fn charge_lift(
     lifted: bool,
 ) {
     crate::cryptanalysis::pq_descent_symbolic::take_descent_work().charge(extra);
-    *extra.entry("bitop_hash_probes".to_string()).or_insert(0) += lift_probes(fb, xs, lifted);
+    crate::cryptanalysis::ic_boundary::bump_counter(
+        extra,
+        "bitop_hash_probes",
+        lift_probes(fb, xs, lifted),
+    );
 }
 
 impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
@@ -4031,7 +4038,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
             // The descent, the copy, and two shape computations (here and
             // in the harness).
             charge_system_build(&mut self.totals.extra, &system, &shape, 2);
-            *self.totals.extra.entry("slot_systems".into()).or_insert(0) += 1;
+            crate::cryptanalysis::ic_boundary::bump_counter(
+                &mut self.totals.extra,
+                "slot_systems",
+                1,
+            );
             let SolverVerdict::Solved(solutions) = verdict else {
                 continue;
             };
@@ -4042,7 +4053,11 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
                 );
                 charge_lift(&mut self.totals.extra, fb, &xs, lifted.is_some());
                 if let Some(indices) = lifted {
-                    *self.totals.extra.entry("slot_hits".into()).or_insert(0) += 1;
+                    crate::cryptanalysis::ic_boundary::bump_counter(
+                        &mut self.totals.extra,
+                        "slot_hits",
+                        1,
+                    );
                     *self
                         .totals
                         .extra
