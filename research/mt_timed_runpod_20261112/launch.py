@@ -15,11 +15,13 @@ PAYLOAD = os.environ.get("MTR_PAYLOAD", "/tmp/claude-0/-home-user/aeefaead-5838-
 REST = "https://rest.runpod.io/v1"
 INST = os.path.join(HERE, "../mt_fieldops_v5_20261112/instances")
 RECEIPTS = os.path.join(HERE, "launch")
+UA = "mt-timed-launcher/1.0"  # RunPod's edge refuses urllib's default user agent (Cloudflare error 1010)
 
 
 def api(method, path, body=None):
     req = urllib.request.Request(REST + path, method=method, data=None if body is None else json.dumps(body).encode(),
-                                 headers={"Authorization": "Bearer proxy-injected", "Content-Type": "application/json"})
+                                 headers={"Authorization": "Bearer proxy-injected", "Content-Type": "application/json",
+                                          "User-Agent": UA})
     with urllib.request.urlopen(req, timeout=60) as r:
         t = r.read()
         return json.loads(t) if t else {}
@@ -30,7 +32,7 @@ def pod_url(st, route):
 
 
 def http(method, url, data=None, timeout=120):
-    req = urllib.request.Request(url, method=method, data=data)
+    req = urllib.request.Request(url, method=method, data=data, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read()
 
