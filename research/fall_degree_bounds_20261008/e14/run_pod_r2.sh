@@ -16,8 +16,8 @@ delete_self() {
 }
 finish() {
   log "finish: $1"; echo "$1" >"$OUT/final_status"; pack
-  # keep serving for 30 minutes so the controller can take the final pull, then delete the pod
-  sleep 1800; delete_self; sleep infinity
+  # keep serving for 6 hours (Amendment 21) so the controller can take the final pull, then delete the pod
+  sleep 21600; delete_self; sleep infinity
 }
 ln -sfn "$OUT" "$SERVE/out"
 ( cd "$W/serve" && python3 -m http.server 8080 --bind 0.0.0.0 >"$OUT/http.log" 2>&1 ) &
