@@ -1,0 +1,16 @@
+digraph maps {
+  graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.25",ranksep="0.65"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#49616c",fillcolor="#e5f2e8",margin="0.12,0.1"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#4f8b6b"];
+  c0 [label="C0 / Jac(C0)(F101)\nE0(1,46) × F0(44,21)\n12317 actual Mumford classes",fillcolor="#eef4f5"];
+  c10 [label="C10 · E1 × F0\n89+93x²+8x⁴+61x⁶\nNorm diag(7,1)"];
+  c20 [label="C20 · E2 × F0\n40+45x²+75x⁴+18x⁶\nNorm diag(49,1)"];
+  p1 [label="Cpi1 · E0 × F0\n52+25x²+77x⁴+84x⁶\nNorm diag(101,1)"];
+  p2 [label="Cpi2 · E0 × F0\n72+85x²+14x⁴+93x⁶\nNorm diag(10201,1)"];
+  c0 -> c10 [label="global degree7\nseparable"];
+  c0 -> c20 [label="global degree49\nseparable"];
+  c0 -> p1 [label="global degree101\npurely inseparable"];
+  c0 -> p2 [label="global degree10201\npurely inseparable"];
+  note [shape=note,fillcolor="#fff6df",fontsize=10,label="All arrows:actual rational evaluator/adjoint/recovery\n12317 valid,distinct,Frobenius-fixed images each\nGlobal degrees:written quotient proof\nGeometric kernel certificates still stageC · unsigned"];
+  {rank=same;c0;note;}
+}

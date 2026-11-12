@@ -1,3 +1,15 @@
+# New component: four whole rational Jacobian maps
+
+Full37/3c1cb7 and six bound local Lean declarations/183written36modules
+complete the actual Mumford rational evaluators, adjoints and recovery on
+all12317 source classes for C10/C20/Cpi1/Cpi2. Writtenproof afd164 connects
+them to global quotient maps. Mainreport pcc/claims/PCC-20261112-e4f934.json with editable figures and
+inspected2pagePDF: [whole maps](reports/even-whole-maps/REPORT.md).
+Geometric7/49 kernel certificates are next; no measured cost claim.
+Consumer1513/748e ownCI43268001587 succeeds at fixed338d35-testscope;
+new37-testownCI follows this commit. Scientificstandingunsigned. [pcc:unverified]
+
+---
 # New component: actual partial-Frobenius gluing transfers
 
 Full35/f04008 andsixboundlocalLean177written35modulesacceptactualA24/A12,

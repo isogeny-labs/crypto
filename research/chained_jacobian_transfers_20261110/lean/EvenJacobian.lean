@@ -1,0 +1,53 @@
+import Init.Grind.Module.Basic
+
+/-! Nonmonic infinity and Weierstrass-basepoint accounting.
+The actual curve/chart/Picard identification and rational product factors
+are written/native bridges. No axiom asserts their existence. -/
+set_option autoImplicit false
+namespace EvenJacobian
+open Lean.Grind
+
+theorem nonmonic_infinity_square {R : Type} [CommRing R]
+    (l rho leading : R) (root : rho^2=leading) :
+    (l^2*rho)^2=l^4*leading := by grind
+
+theorem degree_two_basepoint_cancels {M : Type} [IntModule M]
+    (s w : M) (torsion : (2 : Int) • w=0) :
+    s-(2 : Int) • w=s := by grind
+
+theorem degree_one_omission_detected {M : Type} [IntModule M]
+    (s w : M) (nonzero : w≠0) : s-w≠s := by grind
+
+theorem frobenius_basepoint_rebasing {M : Type} [IntModule M]
+    (s oldBase newBase : M) (d : Int) :
+    s-d • newBase=(s-d • oldBase)-d • (newBase-oldBase) := by
+  rw [IntModule.zsmul_sub]
+  have cancel (u v : M) : s-v=(s-u)-(v-u) := by grind
+  exact cancel _ _
+
+theorem public_unbalanced_norm_inverses :
+    (6329 : Nat)%109=7 ∧ (6329 : Nat)%113=1 ∧
+    (11414 : Nat)%109=78 ∧ (11414 : Nat)%113=1 ∧
+    (6329*11414 : Nat)%12317=1 ∧
+    (1357 : Nat)%109=49 ∧ (1357 : Nat)%113=1 ∧
+    (2487 : Nat)%109=89 ∧ (2487 : Nat)%113=1 ∧
+    (1357*2487 : Nat)%12317=1 := by decide
+
+/-- Only the F113 coordinate distinguishes these diagonal adjoint norms
+from the wrong uniform scalar. The actual product identification is an
+external input; the final equation counts its nonzero second coordinates. -/
+theorem uniform_mutant_coordinates :
+    (∀ b : Fin 113,
+      ((7 : Fin 113)*b=b ↔ b=0) ∧
+      ((49 : Fin 113)*b=b ↔ b=0) ∧
+      ((101 : Fin 113)*b=b ↔ b=0) ∧
+      ((10201 : Fin 113)*b=b ↔ b=0)) ∧
+    (109 : Nat)*112=12208 ∧ (12317 : Nat)-109=12208 := by decide
+
+end EvenJacobian
+#print axioms EvenJacobian.nonmonic_infinity_square
+#print axioms EvenJacobian.degree_two_basepoint_cancels
+#print axioms EvenJacobian.degree_one_omission_detected
+#print axioms EvenJacobian.frobenius_basepoint_rebasing
+#print axioms EvenJacobian.public_unbalanced_norm_inverses
+#print axioms EvenJacobian.uniform_mutant_coordinates

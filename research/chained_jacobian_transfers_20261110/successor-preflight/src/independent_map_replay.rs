@@ -202,7 +202,12 @@ struct Chart {
 }
 impl Chart {
     fn new(f: &FpR, model: usize, avoid: &[Input]) -> Self {
-        let sextic = lift(f, &MODELS[model]);
+        Self::from_sextic(f, &MODELS[model], f.one(), avoid)
+    }
+    fn from_sextic(f: &FpR, coefficients: &[u64], leading_root: ER, avoid: &[Input]) -> Self {
+        let sextic = lift(f, coefficients);
+        assert_eq!(sextic.len(), 7);
+        assert_eq!(f.sq(leading_root), sextic[6]);
         assert_eq!(
             poly::gcd(f, &sextic, &poly::derivative(f, &sextic)),
             vec![f.one()]
@@ -256,7 +261,7 @@ impl Chart {
             quintic,
             q: legacy::Div {
                 u: vec![f.zero(), f.one()],
-                v: vec![f.sq(l)],
+                v: vec![f.mul(f.sq(l), leading_root)],
             },
         }
     }

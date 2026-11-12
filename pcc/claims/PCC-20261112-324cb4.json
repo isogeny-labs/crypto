@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T17:16:59Z",
+ "id": "PCC-20261112-324cb4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "338d154b85e67960908e4a747e14ad18e7fdea99",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "43f1924d6dc291b5d53e5b34a7a4f749e4108991b9b15e69ccb77e61b235cdef",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+   "theorem": "EvenJacobian.frobenius_basepoint_rebasing"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact nonmonic infinitysquare/IntModule basepoint cancellation and degreeone mutant/Frobenius rebasing/publicCRT and concrete Fin113 uniformnormmutant coordinates. Actual curve/chart/cover/Picard/odd rationalproduct identification remain native/written bridges;not a full formalAVtheory or scientificsignature.",
+ "statement": "theorem frobenius_basepoint_rebasing {M : Type} [IntModule M] (s oldBase newBase : M) (d : Int) : s-d \u2022 newBase=(s-d \u2022 oldBase)-d \u2022 (newBase-oldBase)"
+}
