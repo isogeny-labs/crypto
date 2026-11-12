@@ -4523,6 +4523,13 @@ enum Targets {
         doubled: Vec<u32>,
         doubled_x: Vec<u64>,
         doubled_y: Vec<u64>,
+        /// The subset as abscissa-sharing pairs, read cyclically:
+        /// `pair_x[j]` is the abscissa of summands `2j` and `2j + 1` (mod
+        /// `len`), `pair_ya`/`pair_yb` their ordinates.  Empty unless the
+        /// subset is wholly such pairs and pairing is on.
+        pair_x: Vec<u64>,
+        pair_ya: Vec<u64>,
+        pair_yb: Vec<u64>,
         len: usize,
         window: usize,
     },
@@ -4561,6 +4568,9 @@ impl Targets {
                 doubled,
                 doubled_x,
                 doubled_y,
+                pair_x,
+                pair_ya,
+                pair_yb,
                 window,
                 ..
             } => {
@@ -4568,10 +4578,22 @@ impl Targets {
                 if doubled_x.is_empty() {
                     Scan::Indices(idxs)
                 } else {
+                    // Whole pairs from the one holding the window's first
+                    // summand to the one holding its last.
+                    let pairs = (!pair_x.is_empty()).then(|| {
+                        let (first, end) = (offset / 2, (offset + *window).div_ceil(2));
+                        PairedScan {
+                            px: &pair_x[first..end],
+                            pya: &pair_ya[first..end],
+                            pyb: &pair_yb[first..end],
+                            skip: offset % 2,
+                        }
+                    });
                     Scan::Gathered {
                         idxs,
                         xs: &doubled_x[offset..offset + *window],
                         ys: &doubled_y[offset..offset + *window],
+                        pairs,
                     }
                 }
             }
@@ -4616,7 +4638,32 @@ pub enum Scan<'a> {
         idxs: &'a [u32],
         xs: &'a [u64],
         ys: &'a [u64],
+        /// The same summands as abscissa-sharing pairs, when the unit's
+        /// subset is made of them ([`PairedScan`]); `None` otherwise.
+        pairs: Option<PairedScan<'a>>,
     },
+}
+
+/// A [`Scan::Gathered`] window as whole pairs of summands sharing an
+/// abscissa (a base point's ± twins, adjacent in the base): pair `j` is
+/// `(px[j], pya[j])` then `(px[j], pyb[j])`.  The pairs cover the window
+/// and at most one summand either side of it: the window's first summand is
+/// pair output `skip`, and its `len` summands follow.  The folding kernel
+/// then forms both sums of a pair from one inverse; the outputs outside the
+/// window are formed and never read.
+#[derive(Clone, Copy, Debug)]
+pub struct PairedScan<'a> {
+    pub px: &'a [u64],
+    pub pya: &'a [u64],
+    pub pyb: &'a [u64],
+    pub skip: usize,
+}
+
+/// Whether aimed scans pair ± twins (`KIC_SCAN_PAIRED=0` turns it off,
+/// the control arm).  The same rests either way.
+fn scan_paired_enabled() -> bool {
+    static PAIRED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PAIRED.get_or_init(|| std::env::var("KIC_SCAN_PAIRED").map_or(true, |v| v != "0"))
 }
 
 impl Scan<'_> {
@@ -7072,6 +7119,8 @@ impl PairSumTable {
         rests.clear();
         lambdas.clear();
         x3s.clear();
+        // Outputs of a paired scan before the window's first summand.
+        let mut skip = 0usize;
         // A cyclic window is `negated[start..start + tail]` and then, if it
         // wraps, `negated[..len − tail]`.
         let (start, tail) = match scan {
@@ -7120,19 +7169,36 @@ impl PairSumTable {
                     self.curve
                         .add_many_lazy_soa(target, gather_x, gather_y, x3s, lambdas, batch)
                 }
-                Scan::Gathered { idxs, xs, ys } => {
-                    // A shorter slice would scan fewer summands than
-                    // `Scan::len` counts; a longer one would index past
-                    // `idxs` when a rest is matched.
-                    debug_assert!(
-                        xs.len() == idxs.len() && ys.len() == idxs.len(),
-                        "Scan::Gathered: {} indices, {} and {} coordinates",
-                        idxs.len(),
-                        xs.len(),
-                        ys.len()
-                    );
-                    self.curve
-                        .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
+                Scan::Gathered {
+                    idxs,
+                    xs,
+                    ys,
+                    pairs,
+                } => {
+                    if let Some(p) = pairs {
+                        if self.curve.add_many_lazy_soa_paired(
+                            target, p.px, p.pya, p.pyb, x3s, lambdas, batch, len as u64,
+                        ) {
+                            skip = p.skip;
+                            debug_assert!(x3s.len() >= skip + len, "pairs cover the window");
+                        }
+                    }
+                    if skip > 0 || x3s.len() >= len {
+                        true
+                    } else {
+                        // A shorter slice would scan fewer summands than
+                        // `Scan::len` counts; a longer one would index past
+                        // `idxs` when a rest is matched.
+                        debug_assert!(
+                            xs.len() == idxs.len() && ys.len() == idxs.len(),
+                            "Scan::Gathered: {} indices, {} and {} coordinates",
+                            idxs.len(),
+                            xs.len(),
+                            ys.len()
+                        );
+                        self.curve
+                            .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
+                    }
                 }
             };
             if !done {
@@ -7183,11 +7249,11 @@ impl PairSumTable {
         let mut hashes = Vec::with_capacity(BLOCK);
         #[cfg(feature = "scan-probes")]
         scan_probes::lap(scan_probes::SUBTRACT, &mut probe);
-        let count = if fused { x3s.len() } else { rests.len() };
+        let count = if fused { len } else { rests.len() };
         for lo in (0..count).step_by(BLOCK) {
             let hi = (lo + BLOCK).min(count);
             match canon {
-                Some(canon) if fused => canon.x_keys(&x3s[lo..hi], keys),
+                Some(canon) if fused => canon.x_keys(&x3s[skip + lo..skip + hi], keys),
                 _ => self.keys_of(&rests[lo..hi], keys),
             }
             #[cfg(feature = "scan-probes")]
@@ -7235,11 +7301,11 @@ impl PairSumTable {
                     Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => idxs[offset] as usize,
                 };
                 let rest = if fused {
-                    FastPoint::affine(x3s[offset], 0)
+                    FastPoint::affine(x3s[skip + offset], 0)
                 } else {
                     rests[offset]
                 };
-                let rest = match lambdas.get(offset) {
+                let rest = match lambdas.get(skip + offset) {
                     Some(&lambda) => self.curve.finish_lazy(target, rest, lambda),
                     None => rest,
                 };
@@ -14336,10 +14402,33 @@ impl<'a> RelationCollector<'a> {
             }
             _ => (Vec::new(), Vec::new()),
         };
+        // The ± twins of a column sit side by side in the base, so a subset
+        // of whole columns is pairs `(2j, 2j + 1)` sharing an abscissa; the
+        // folding kernel then takes one inverse for each pair.  Read
+        // cyclically, the pairs cover every window `scan` can name (its
+        // offset is below `len`, its end at most `len + window`).
+        let paired = scan_paired_enabled()
+            && !doubled_x.is_empty()
+            && len % 2 == 0
+            && (0..len / 2).all(|j| doubled_x[2 * j] == doubled_x[2 * j + 1]);
+        let (pair_x, pair_ya, pair_yb) = if paired {
+            let pairs = (len + window).div_ceil(2);
+            let at = |v: &[u64], t: usize| v[t % len];
+            (
+                (0..pairs).map(|j| at(&doubled_x, 2 * j)).collect(),
+                (0..pairs).map(|j| at(&doubled_y, 2 * j)).collect(),
+                (0..pairs).map(|j| at(&doubled_y, 2 * j + 1)).collect(),
+            )
+        } else {
+            (Vec::new(), Vec::new(), Vec::new())
+        };
         Some(Targets::Subset {
             doubled,
             doubled_x,
             doubled_y,
+            pair_x,
+            pair_ya,
+            pair_yb,
             len,
             window,
         })
@@ -20964,6 +21053,7 @@ mod tests {
                     idxs: &idxs,
                     xs: &xs,
                     ys: &ys,
+                    pairs: None,
                 };
                 folded.witnesses_fast_scan(target, 3, gathered, &mut scratch_b, &mut |w| {
                     b.push(w.to_vec());
@@ -20977,6 +21067,7 @@ mod tests {
                         idxs: &idxs,
                         xs: &xs_off,
                         ys: &ys_off,
+                        pairs: None,
                     };
                     folded.witnesses_fast_scan(target, 3, shifted, &mut scratch_c, &mut |w| {
                         c.push(w.to_vec());
@@ -21090,7 +21181,7 @@ mod tests {
             let mut gathered_scans = 0;
             for t in 0..2 * subset as u64 {
                 match targets.scan(0x5eed, t, base) {
-                    Scan::Gathered { idxs, xs, ys } => {
+                    Scan::Gathered { idxs, xs, ys, .. } => {
                         assert!(expect_gathered, "gathered where the kernel cannot run");
                         assert_eq!(idxs.len(), targets.len());
                         assert_eq!(xs.len(), idxs.len());
