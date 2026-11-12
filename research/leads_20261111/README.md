@@ -53,6 +53,30 @@ All results below are `[pcc:unverified]`.
   - `V` inside `ker Tr` is harder: (13, 25, 4) is infeasible there.
   - Write-up: `research/lfd_lower_bound_20261111/out/lead_A2/RESULT.md`.
 
+## Status update, 2026-11-12: the remaining open leads, run in parallel (workflow)
+
+At the owner's request, a workflow ran one agent per open lead against its
+preregistered test, plus an independent skeptic for each result. Write-ups are in
+`runs/<lead>/RESULT.md` and the skeptics' notes in `runs/<lead>/VERIFY.md`. All
+results are `[pcc:unverified]`. Where the skeptic disagreed, the skeptic's reading
+is the one given here.
+
+| lead | verdict | key numbers | skeptic |
+|:--|:--|:--|:--|
+| 3 `LEAD-C-jv-sieve-emit-price` | **partial** (accounting) | Counted F4, descent and LA additions / proxy: ratio of means 0.816, inside [0.80, 1.05]. Per seed 0.44–0.93, geometric mean 0.715. Layer-A priced cells move 0.976×; U1 at w = 1 is 0.1185, still below rho; distance ×8.2 → ×8.4. | agrees. The 0.816 depends on pricing an LA operation as 1 addition, not 16; with ×16 it is about 0.99. |
+| 7 `LEAD-A-fall-effective-variable-law` | **falsified** | The rule "1 ∈ W_4 iff v ≤ 33" fails. T-type n = 35 (v = 34) and R-type n = 36 (v = 35) both *fall* at D = 4, 2 of 2 instances each. Treatise stalls reproduced (R35 codim 5287, T33 codim 4888). New native closure: `runs/A_fall_effective_variable/fallclose.c`. | agrees. The falls are checked by one tool only, with no exported certificate. |
+| 8 `LEAD-A-closure-dimension-laws` | **held** | dim(W_3 ∩ B_≤3) = n(5n+1)/2 at n = 23–33, and dim(W_4 ∩ B_≤3) = 3n(n+2) at n = 35–43, on fresh instances. T-type differs. | agrees. Protocol deviation: n = 37–43 used the memory-lean `fallclose_q.c`, not the frozen tool. |
+| 9 `LEAD-A-bilinear-lift-size-degree` | **partial** | The bilinear lift gives d_F = 3 at n = 11, 13, 15 (original d_F at n = 15 is 4). At n = 17 the full lift at D = 3 did not finish. The negative control (random bilinear forms) *also* drops 4 → 3, so the drop is not specific to the descent. | agrees. The control was built differently from the preregistration. |
+| 10 `LEAD-ICB-tableB-binary-known-log-claw` | **prediction failed** (BSGS boundary result, outside the IC ratchet) | Under the preregistered band, known-log / matched rho-neg at w = 0 is 0.88, 1.03, 1.19, 1.27, 1.44 at f2m15–27. The prediction [1.4, 2.4] fails on 4 of 5. The low ratios come from rho-neg's high S at small r. | **disagrees with the producer's "held"**: the producer charged base generation, which the preregistration listed as unpriced. |
+| 11 `LEAD-C-quartic-n4v2-k26` | **inconclusive, borderline kill** | 128-bit arithmetic fork reached k = 25. DL / rho-neg 0.0021 at k = 25 (w = 0) and 0.0012 at w = 1; k = 26 projected 0.0016. The k22–25 exponent is about 1.10, and its lower bound sits on the 1.10 kill line. | **disagrees with "partial / not triggered"**: four fresh calibrations put the lower bound at 1.1000–1.1034, at or above the kill line. Host calibration noise is about ±0.005. |
+| 12 + 13 `LEAD-ICB-d4bin-…` | **closed / falsified as written** | Coset: the 21 carrying monomials have F2-rank of differences 4 on 300 of 300 instances, so there is no index-2 coset. Elimination: the quadratic part has rank 2, not 3, on 300 of 300 targets. | agrees. The rank-2 variant (two equations linear in S2, S3) is untested. |
+| follow-up `FOLLOWUP-selector-extra-syzygies` | **held** | Extra c-only syzygies appear **only at e = e_min**. Excess over the trivial family: n = 15: 117–118; 17: 50–51; 19: 1034–1035; 21: 1034–1035; 23: 911–913; 25: 441–442; 27 (e = 5): 9307–9308. The excess is 0 at e_min − 1 on all 18 instances. Tool: `out/lead_A1_syzygies/syz.c`. | agrees. The preregistration sits inside RESULT.md; 12 of 37 cells were seen before. |
+
+**Code changes, all opt-in with defaults unchanged:**
+- `src/cryptanalysis/f4_fp.rs` and `examples/jv_cover.rs`: `JV_SIEVE_EMIT`.
+- `src/cryptanalysis/gaudry_quartic_bin.rs`: `pub fn macaulay_staircase`, additive and not called by any solver path.
+- New example `examples/d4bin_coset_quadratic_probe.rs`.
+
 | Lane | File | Leads |
 |:--|:--|--:|
 | A — last fall degree and the selector proof system | `lane_A_falldegree.md` | 5 |
