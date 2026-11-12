@@ -4893,6 +4893,26 @@ pub struct PairedScan<'a> {
 
 /// Whether aimed scans pair ± twins (`KIC_SCAN_PAIRED=0` turns it off,
 /// the control arm).  The same rests either way.
+/// How many keys ahead the aimed scan prefetches a filter word
+/// (`KIC_LOOKAHEAD`, default 32).
+fn scan_lookahead() -> usize {
+    static L: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *L.get_or_init(|| {
+        std::env::var("KIC_LOOKAHEAD")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&v: &usize| v > 0)
+            .unwrap_or(32)
+    })
+}
+
+/// Whether the fold build forms a row's twin pairs from one inverse
+/// (`KIC_BUILD_PAIRED=0` keeps the unpaired kernel, the control).
+fn build_paired_enabled() -> bool {
+    static PAIRED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PAIRED.get_or_init(|| std::env::var("KIC_BUILD_PAIRED").map_or(true, |v| v != "0"))
+}
+
 fn scan_paired_enabled() -> bool {
     static PAIRED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *PAIRED.get_or_init(|| std::env::var("KIC_SCAN_PAIRED").map_or(true, |v| v != "0"))
@@ -6079,6 +6099,27 @@ impl PairSumTable {
         } else {
             (Vec::new(), Vec::new())
         };
+        // The base again as `±` twin pairs, one abscissa a pair: the
+        // orbit order keeps a point's negation at the next position
+        // (twins are adjacent in the base and share a signed orbit), so
+        // a row past its own orbit is whole pairs, and the paired kernel
+        // forms both sums of a pair from one inverse
+        // ([`FastCurve::add_many_lazy_soa_paired`]).  Empty, and every
+        // row unpaired, unless every pair is a twin pair
+        // (`KIC_BUILD_PAIRED=0` keeps the unpaired kernel, the control).
+        let (pair_x, pair_ya, pair_yb) = if !by_orbit_x.is_empty()
+            && build_paired_enabled()
+            && by_orbit_x.len().is_multiple_of(2)
+            && suffix.iter().all(|&s| s % 2 == 0)
+            && by_orbit_x.chunks_exact(2).all(|w| w[0] == w[1])
+        {
+            let px: Vec<u64> = by_orbit_x.iter().step_by(2).copied().collect();
+            let ya: Vec<u64> = by_orbit_y.iter().step_by(2).copied().collect();
+            let yb: Vec<u64> = by_orbit_y.iter().skip(1).step_by(2).copied().collect();
+            (px, ya, yb)
+        } else {
+            (Vec::new(), Vec::new(), Vec::new())
+        };
         // A row hands its keys over in order, a slice at a time, with
         // its orbit.
         let each_row = |r: usize, f: &mut dyn FnMut(&[u64], u32, usize)| {
@@ -6117,6 +6158,25 @@ impl PairSumTable {
                 }
                 let mut x3s = Vec::with_capacity(n_points - own_end);
                 lambdas.clear();
+                if !pair_x.is_empty() {
+                    let first = own_end / 2;
+                    if curve.add_many_lazy_soa_paired(
+                        points[rep],
+                        &pair_x[first..],
+                        &pair_ya[first..],
+                        &pair_yb[first..],
+                        &mut x3s,
+                        &mut lambdas,
+                        &mut scratch,
+                        (n_points - own_end) as u64,
+                    ) {
+                        canon.x_keys(&x3s, &mut keys);
+                        f(&keys, orbit, own_end - from);
+                        return;
+                    }
+                    x3s.clear();
+                    lambdas.clear();
+                }
                 if curve.add_many_lazy_soa(
                     points[rep],
                     &by_orbit_x[own_end..],
@@ -7476,7 +7536,7 @@ impl PairSumTable {
         // [`Self::witnesses_fast_inner`].  Little enough that a search
         // stopping at its first witness has not paid for the rest.
         const BLOCK: usize = 1024;
-        const LOOKAHEAD: usize = 32;
+        let lookahead = scan_lookahead();
         let mut admitted_offsets = Vec::with_capacity(BLOCK / 8);
         let mut hashes = Vec::with_capacity(BLOCK);
         #[cfg(feature = "scan-probes")]
@@ -7493,11 +7553,11 @@ impl PairSumTable {
             hashes.clear();
             hashes.extend(keys.iter().copied().map(pair_filter_hash));
             admitted_offsets.clear();
-            for &h in hashes.iter().take(LOOKAHEAD) {
+            for &h in hashes.iter().take(lookahead) {
                 prefetch(&self.present[self.filter_word_hash(h)]);
             }
             for within in 0..hi - lo {
-                if let Some(&ahead) = hashes.get(within + LOOKAHEAD) {
+                if let Some(&ahead) = hashes.get(within + lookahead) {
                     prefetch(&self.present[self.filter_word_hash(ahead)]);
                 }
                 let h = hashes[within];
