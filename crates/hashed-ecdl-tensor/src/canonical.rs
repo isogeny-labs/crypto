@@ -46,7 +46,16 @@ pub struct IrProvenance {
 /// Too large a table (or modulus one) yields `None` and callers take the
 /// per-term `modpow` path. Equality and debugging ignore the cache.
 pub(crate) struct Cached<T>(OnceLock<T>);
-pub(crate) type PowerTable = Cached<Option<Vec<BigUint>>>;
+
+impl<T> Cached<T> {
+    fn peek(&self) -> Option<&T> {
+        self.0.get()
+    }
+    fn set(&self, value: T) -> std::result::Result<(), T> {
+        self.0.set(value)
+    }
+}
+pub(crate) type PowerTable = Cached<Option<Arc<Vec<BigUint>>>>;
 /// `[omega^(column*t) mod modulus for t < count]` of one column, cached.
 pub(crate) type TwistTable = Cached<Vec<BigUint>>;
 
@@ -74,7 +83,39 @@ impl<T> std::fmt::Debug for Cached<T> {
 
 const POWER_TABLE_LIMIT: usize = 1 << 16;
 
-impl Cached<Option<Vec<BigUint>>> {
+type PowerKey = (BigUint, usize, usize, BigUint);
+
+/// Programs of one transform share a root, stride and modulus, so identical
+/// tables are built once per process (a handful of entries, bounded).
+fn shared_power_table(key: PowerKey, len: usize) -> Arc<Vec<BigUint>> {
+    use std::sync::Mutex;
+    static TABLES: Mutex<Vec<(PowerKey, Arc<Vec<BigUint>>)>> = Mutex::new(Vec::new());
+    const ENTRIES: usize = 16;
+    const ELEMENTS: usize = 1 << 18;
+    if let Ok(tables) = TABLES.lock() {
+        if let Some((_, table)) = tables.iter().find(|(k, _)| *k == key) {
+            return table.clone();
+        }
+    }
+    let (omega, step, _, modulus) = &key;
+    let root = omega.modpow(&BigUint::from(*step), modulus);
+    let mut table = Vec::with_capacity(len);
+    table.push(BigUint::one());
+    for k in 1..len {
+        let next = &table[k - 1] * &root % modulus;
+        table.push(next);
+    }
+    let table = Arc::new(table);
+    if let Ok(mut tables) = TABLES.lock() {
+        let held: usize = tables.iter().map(|(_, t)| t.len()).sum();
+        if tables.len() < ENTRIES && held + len <= ELEMENTS {
+            tables.push((key, table.clone()));
+        }
+    }
+    table
+}
+
+impl Cached<Option<Arc<Vec<BigUint>>>> {
     pub(crate) fn get(
         &self,
         omega: &BigUint,
@@ -89,16 +130,13 @@ impl Cached<Option<Vec<BigUint>>> {
                 if len > POWER_TABLE_LIMIT || modulus <= &BigUint::one() {
                     return None;
                 }
-                let root = omega.modpow(&BigUint::from(step), modulus);
-                let mut table = Vec::with_capacity(len);
-                table.push(BigUint::one());
-                for k in 1..len {
-                    let next = &table[k - 1] * &root % modulus;
-                    table.push(next);
-                }
-                Some(table)
+                Some(shared_power_table(
+                    (omega.clone(), step, count, modulus.clone()),
+                    len,
+                ))
             })
             .as_deref()
+            .map(Vec::as_slice)
     }
 }
 
@@ -270,7 +308,8 @@ impl ValueOperation {
         powers: &PowerTable,
         self_twists: &TwistTable,
     ) -> Result<Vec<BigUint>> {
-        self.validate()?;
+        // Only `PredicateProgram::evaluate` calls this, after its own
+        // `validate` (which includes `self.validate()`), so it is not repeated.
         let (inputs, _) = self.shape();
         if values.len() != inputs {
             return Err(invalid("canonical value-operation input count"));
@@ -355,6 +394,7 @@ pub struct PredicateProgram {
     operation: ValueOperation,
     powers: PowerTable,
     twists: TwistTable,
+    validated: Cached<usize>,
 }
 impl PredicateProgram {
     pub(crate) fn define(
@@ -388,6 +428,7 @@ impl PredicateProgram {
             operation,
             powers: PowerTable::default(),
             twists: TwistTable::default(),
+            validated: Cached::default(),
         };
         program.validate(port)?;
         Ok(program)
@@ -416,7 +457,12 @@ impl PredicateProgram {
 
     /// Evaluate the typed relation on an exact ordered port assignment.
     pub fn evaluate(&self, ports: &[bool], meter: &mut Meter) -> Result<bool> {
-        self.validate(ports.len())?;
+        // `validate` is a pure function of (self, arity) and self is
+        // immutable: remember the arity it last accepted.
+        if self.validated.peek().copied() != Some(ports.len()) {
+            self.validate(ports.len())?;
+            let _ = self.validated.set(ports.len());
+        }
         let mut values = Vec::with_capacity(self.words.len());
         for word in &self.words {
             let mut value = BigUint::zero();
@@ -488,6 +534,7 @@ impl PredicateProgram {
             operation,
             powers: PowerTable::default(),
             twists: TwistTable::default(),
+            validated: Cached::default(),
         })
     }
 }
