@@ -57,7 +57,7 @@ One cloud pod, not an isolated lab node; one implementation per build; 4 configu
 (not fresh) with the seed of the earlier timed study, so the std build is a host replication, not new data on new
 configurations.
 
-## Amendment A1 (2026-11-12 16:40Z, after attempt 1, before any measurement)
+## Amendment A1 (2026-11-12 16:32Z, after attempt 1, before any measurement)
 
 Attempt 1 (pod fukok3vh2qhsum, AMD EPYC 4564P host with 32 CPUs) produced no measurement: every execution failed at
 `taskset -c 2` ("Invalid argument"), because the container may use only its own allowed CPU set. Its receipts and
