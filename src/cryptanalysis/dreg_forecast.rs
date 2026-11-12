@@ -346,6 +346,10 @@ pub struct Forecast {
     pub advice_reasons: Vec<String>,
     pub advisory: String,
     pub certified_degree_of_regularity: Option<u32>,
+    /// The calibration that placed the prior's point mass, when it is not
+    /// the semi-regular degree.  Absent in forecasts written before it existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prior_source: Option<String>,
 }
 
 /// Sequential forecaster for one cell of a sweep.
@@ -365,6 +369,8 @@ pub struct Forecaster {
     linear_algebra: Vec<(usize, u64)>,
     linear_algebra_unit: String,
     linear_algebra_price: f64,
+    /// Calibrated prior point and its source; `None` keeps the semi-regular degree.
+    prior_point: Option<(u32, String)>,
 }
 
 fn label(d: Option<u32>, bound: u32) -> String {
@@ -502,7 +508,16 @@ impl Forecaster {
             linear_algebra: Vec::new(),
             linear_algebra_unit: "relation-matrix row operations".into(),
             linear_algebra_price: 1.0,
+            prior_point: None,
         }
+    }
+    /// Centre the prior's point mass on a calibrated degree instead of the
+    /// semi-regular degree.  The prior weight and its uniform half are
+    /// unchanged, so the prior still washes out with data and the cost
+    /// projection still excludes it once a solve is observed.  `source`
+    /// names the calibration and is recorded on the forecast.
+    pub fn set_prior_degree(&mut self, degree: u32, source: &str) {
+        self.prior_point = Some((degree.max(1), source.into()));
     }
     /// Name the unit the relation matrix's work is counted in.
     pub fn set_linear_algebra_unit(&mut self, unit: &str) {
@@ -744,11 +759,12 @@ impl Forecaster {
             .and_then(|s| s.equation_degrees.iter().copied().min())
             .unwrap_or(2)
             .max(1);
+        let prior_point = self.prior_point.as_ref().map(|(d, _)| *d).or(semi_regular);
         let all = degree_forecast(
             self.observations.iter().copied(),
             self.bound,
             self.prior_weight,
-            semi_regular,
+            prior_point,
             lowest,
         );
         let decomposable = degree_forecast(
@@ -758,7 +774,7 @@ impl Forecaster {
                 .filter(|o| o.outcome == Outcome::Decomposed),
             self.bound,
             self.prior_weight,
-            semi_regular,
+            prior_point,
             lowest,
         );
         // The prior shapes the degree forecast; the cost projection charges
@@ -919,6 +935,10 @@ impl Forecaster {
             advice_reasons: reasons,
             advisory: "advisory triage only; the sweep never stops, skips or shortens a candidate on this forecast".into(),
             certified_degree_of_regularity: None,
+            prior_source: self
+                .prior_point
+                .as_ref()
+                .map(|(d, s)| format!("{s}; prior point at degree {d}")),
         }
     }
 }
@@ -1110,6 +1130,72 @@ mod tests {
         assert_eq!(full.band_of_all(), (Some(6), Some(6)));
         assert_eq!(full.excess_over_semi_regular, Some(3));
         assert_eq!(full.structural_gain, Some(false));
+    }
+
+    #[test]
+    fn a_calibrated_prior_point_moves_the_empty_forecast_and_washes_out() {
+        let mut f = Forecaster::new(8);
+        f.set_shape(quadratic_shape(2, false)); // semi-regular degree 3
+        f.set_prior_degree(2, "test calibration");
+        let empty = f.forecast();
+        assert_eq!(
+            empty.semi_regular_degree,
+            Some(3),
+            "the semi-regular degree is still reported"
+        );
+        assert_eq!(empty.all_targets.predicted_degree, Some(2));
+        assert_eq!(empty.all_targets.prior_weight, 1.0);
+        assert_eq!(
+            empty.prior_source.as_deref(),
+            Some("test calibration; prior point at degree 2")
+        );
+        for _ in 0..40 {
+            f.observe(decided(Outcome::Decomposed, 6, 10, true));
+        }
+        let full = f.forecast();
+        assert_eq!(full.all_targets.predicted_degree, Some(6));
+        assert_eq!(
+            full.excess_over_semi_regular,
+            Some(3),
+            "excess stays relative to semi-regular"
+        );
+    }
+
+    #[test]
+    fn a_calibrated_prior_at_the_semi_regular_degree_changes_nothing_but_the_source() {
+        let mut base = Forecaster::new(8);
+        base.set_shape(quadratic_shape(2, false));
+        let mut cal = base.clone();
+        cal.set_prior_degree(3, "test calibration");
+        for f in [&mut base, &mut cal] {
+            f.observe(decided(Outcome::Decomposed, 4, 10, true));
+            f.observe(decided(Outcome::Refuted, 3, 10, false));
+        }
+        let (a, b) = (base.forecast(), cal.forecast());
+        assert_eq!(a.prior_source, None);
+        assert_eq!(a.all_targets, b.all_targets);
+        assert_eq!(a.decomposable_targets, b.decomposable_targets);
+        assert_eq!(a.cost, b.cost);
+        let mut b_without = b.clone();
+        b_without.prior_source = None;
+        assert_eq!(a, b_without);
+    }
+
+    #[test]
+    fn prior_source_is_absent_from_old_json_and_round_trips() {
+        let mut f = Forecaster::new(8);
+        f.set_shape(quadratic_shape(2, false));
+        let plain = serde_json::to_value(f.forecast()).unwrap();
+        assert!(
+            plain.get("prior_source").is_none(),
+            "unset source is not serialized"
+        );
+        let back: Forecast = serde_json::from_value(plain).unwrap();
+        assert_eq!(back.prior_source, None);
+        f.set_prior_degree(2, "test calibration");
+        let with = f.forecast();
+        let back: Forecast = serde_json::from_value(serde_json::to_value(&with).unwrap()).unwrap();
+        assert_eq!(back.prior_source, with.prior_source);
     }
 
     impl Forecast {

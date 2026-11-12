@@ -83,8 +83,8 @@ Lead (\texttt{LEAD-EXO-}) & Disposition & Best result recorded; obstruction & Wh
 \path{low-degree-algebraic-query-bound} & open & theorem programme; none & \S\ref{sec:um-lowdeg} \\
 \path{ksum-conjecture-s5-oracle} & open & a 4-SUM oracle on $\{P:x(P)<p^{1/5}\}$ needs $n^{\lceil k/2\rceil}$ under the $k$-SUM conjecture; none measured & \S\ref{sec:um-generic} \\
 \path{four-list-ktree-join} & open & $j=2$ four-tree at exponent $0.4167$ closed for character filters, toy $N\le65539$ & \S\ref{sec:um-generic} \\
-\path{invertible-hint-subset} & open & none; Lange--Winterhof and Kiltz--Winterhof statements still to be read & \S\ref{sec:um-generic} \\
-\path{lange-winterhof-interpolation} & open & none; theorem not yet recorded & \S\ref{sec:um-generic} \\
+\path{invertible-hint-subset} & open & none; Kiltz--Winterhof Theorems 5--6 transcribed 12 Nov, Lange--Winterhof unread & \S\ref{sec:um-generic} \\
+\path{lange-winterhof-interpolation} & open & none; 12 Nov: neighbouring Kiltz--Winterhof theorems recorded, original paywalled & \S\ref{sec:um-generic} \\
 \path{elliptic-code-list-decoding} & open & none; counting bound $\binom BMp^{k-M-1}\ge1$, $M=\sqrt{Bk}$ & \S\ref{sec:um-generic} \\
 \path{hnp-advice-leakage} & blocked & Cheon walk exponent $0.23$ against rho's $0.50$ only when $[\alpha^i]G$ is leaked & \S\ref{sec:um-generic} \\
 \addlinespace
@@ -213,9 +213,20 @@ generic or structureless algorithms rather than by a measurement.
   subset of $E(\FF_p)$ whose membership and logarithms are both computable
   from coordinates would beat the square-root bound by random
   self-reduction. The Lange--Winterhof and Kiltz--Winterhof degree bounds on
-  polynomials interpolating the ECDL and ECDH maps are the expected closure,
-  but both records say the theorem statements have not been read beyond
-  their abstracts; whether they cover the statistics of
+  polynomials interpolating the ECDL and ECDH maps are the expected closure.
+  On 12 November the Kiltz--Winterhof statements were transcribed from the
+  open paper (Bull.\ Austral.\ Math.\ Soc.\ 69 (2004) 305--315), which
+  presents its Theorems 5 and 6 as extending Lange--Winterhof's Theorem~3;
+  the Lange--Winterhof text itself is still paywalled and unread
+  (\art{research/cheon_aux_leads_20261112/LITERATURE_LANGE_WINTERHOF.md}).
+  For $P$ of prime order $l$ and $x_k=x(kP)$, a polynomial $F$ with
+  $F(x_n,x_m)=x_{nm}$ on all but $s$ pairs of $\{1,\dots,l-1\}^2$ has
+  $\deg F\ge\frac1{28}(l-2-2s/(l-1))$ (Theorem~5), and on a product set
+  $U\times V$ with $\abs U\ge3$ and $v,v+1\in V$ has $\deg F\ge\abs U/8$
+  (Theorem~6). These bound one representation, a single interpolating
+  polynomial, not the cost of an algorithm; they exclude a low-degree
+  interpolant on a set of density $1-O(1/l)$ or on a product set, not on
+  sparse or structured subsets. Whether they cover the statistics of
   Chapter~\ref{ch:learning} is open.
 \item \emph{List decoding.} Using Guruswami--Sudan list decoding of elliptic
   codes as a decomposition oracle predicts hits only when
@@ -225,7 +236,24 @@ generic or structureless algorithms rather than by a measurement.
   deferred until some statistic has a measured nonzero advantage. The Cheon
   walk on leaked powers $[\alpha^i]G$ measured exponent $0.23$ against rho's
   $0.50$ from 24 bits up, but that is a different problem (the discrete
-  logarithm with auxiliary inputs), not index calculus.
+  logarithm with auxiliary inputs), not index calculus. A 12 November lead
+  review reconciles this with the ecbench exponents of the wide study,
+  $0.455$ $[0.428,0.479]$ ($n-1$) and $0.432$ $[0.416,0.447]$ ($n+1$) against
+  rho's $0.508$ and $0.510$ at 36--56 bits
+  (\art{research/cheon_ecbench_wide_20261106/}; \S\ref{sec:gf-cheon}): the first used $d\approx\sqrt r$ (predicted
+  $1/4$), the ecbench studies P-224-shaped $d\approx r^{0.129}$ and $r^{0.211}$
+  (predicted $(1-\rho)/2\approx0.435$ and $0.394$)
+  (\art{research/cheon_aux_leads_20261112/README.md}). The same review ran
+  the frozen specification EXP-AUXIN-25a29a, which checks only the integer
+  stage counts and signed gaps behind a memory-charged Cheon pricing at 56
+  bits and $d=65536$; two independent routes agreed on all nine
+  preregistered values. It is not a walk and not an attack cost, and no
+  experiment yet runs the 56-bit walk with memory charged. Of the review's
+  other follow-ups, the deployed-applicability protocol has no current
+  version (its successor contract was retired on 17 October before any
+  run), and relaunching the PKM $t=13$ cell is blocked by the Spot-only
+  capacity policy. Every statement of the review is
+  \texttt{[pcc:unverified]}.
 \end{itemize}
 
 \section{Augmented oracles after the 4 November split}\label{sec:um-oracles}
@@ -995,10 +1023,33 @@ data.
   from strong to preliminary by \texttt{CORR-20261026-c94668}
   (Table~\ref{tab:corr-structure}). The record's next step is the one
   natural family the census never measured, digit characters.
+\item \emph{Coordinate spectra and additive energy} (F3,
+  \art{research/coord_spectrum_20261110/README.md}). For $g$ a coordinate
+  function along $\langle G\rangle$, the statistic is
+  $\eta_g=\max_{a,b\ne0}\abs{\sum_{k}e(a\,g([k]G)/p+bk/r)}/r$; a coefficient
+  well above $r^{-1/4}$ would give the logarithm by a hidden-shift step. The
+  functions were $x$, $y$, three Legendre symbols $\chi(x+c)$ and a Dickson
+  polynomial of degree $\lceil r^{1/4}\rceil$, on 8 prime-order curves each
+  at $p=65{,}521$ and $p=1{,}048{,}573$ and 2 anomalous curves, against 20
+  symmetry-matched nulls per class. The second statistic is the additive
+  energy of $\{x([k]G):k\le K\}$ at $K=\lceil r^{1/2}\rceil$ and
+  $\lceil r^{2/3}\rceil$ against 50 random subsets. Rule 3 closed the line: no
+  non-control function exceeded $1.5\times$ its null median on any curve
+  (maximum $1.105$), and all 36 (curve, $K$) energies were within 3 standard
+  deviations (ratios $0.9948$--$1.0072$). The controls fired: the Smart
+  $p$-adic logarithm on the anomalous curves and a planted linear function
+  had $\eta=1.000$. The $x$, $y$ and $\chi$ rows sat at $0.40$--$0.78$ of
+  their null medians, below the frozen band, as the freeze note announced:
+  orbit spectra are flatter than random. The Dickson rows sat at
+  $0.96$--$1.10$. The closure covers these function classes at $r\le2^{20}$
+  only, not higher Gowers norms or larger $p$; the run was local and every
+  value is \texttt{[pcc:unverified]}.
 \end{itemize}
 Together with H-PSEUDO, these say that at toy size the small-$x$ factor base
 in log order looks like a random negation-closed set under linear and
-coherent quadratic phases and under digit-level tensor rank. They say it
+coherent quadratic phases and under digit-level tensor rank, and that the
+coordinate orbit has no heavy Fourier coefficient and no additive-energy
+excess for the function classes of F3. They say it
 only for structure of each statistic's type, and the next section shows how
 narrow that is.
 

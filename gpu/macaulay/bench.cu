@@ -64,7 +64,7 @@ __global__ void from_mont_kernel(uint32_t* a, size_t n) {
 }
 
 static size_t shared_bytes() {
-    return (size_t)(MAC_MAX_ROWS + 4) * sizeof(uint32_t);
+    return mac_block_scratch_words(MAC_COLS) * sizeof(uint32_t);
 }
 
 /* Build `batch` instances on the host, reduce them on the device, and

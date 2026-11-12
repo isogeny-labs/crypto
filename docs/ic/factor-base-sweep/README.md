@@ -169,6 +169,18 @@ system shape (Bardet–Faugère–Salvy; the Boolean series
 `(1+t)^v / Π(1+t^{d_i})` for binary systems, `Π(1−t^{d_i}) / (1−t)^v` for the
 prime membership systems, field equations excluded) and half uniform, keeps the
 forecast defined before the first solve and washes out as solves accumulate.
+
+For Boolean `m = 2` binary-subspace candidates of shape `coordinate`, `gp`,
+`scaled` or `random` with `n ∈ {11, 13, 17, 19, 23, 29, 31}` and `2 ≤ k ≤ 8`,
+the point half of the prior sits at a **calibrated degree** instead
+(`src/cryptanalysis/dreg_prior_table.rs`, `dreg_prior_table.json`): the mode
+of the exact MutantXL solving degree over 40 systems per cell, measured in
+ml-cryptanalysis `experiments/dreg-prior-calibration-20261112`. There, leaving
+each `n` out in turn, it cut the prior's log-loss from 2.075 (semi-regular
+point) to 0.833, and the point equalled the realised degree on 88.3 % of
+systems against 29.7 %. MutantXL is a calibrated F4 proxy (10 of 11 control
+cells), not F4. The forecast names the calibration in `prior_source`. Every
+other candidate keeps the semi-regular point.
 The semi-regular degree is also the yardstick: `structural_gain` is `true`
 when the whole band lies below it, `false` when it lies on or above it.
 

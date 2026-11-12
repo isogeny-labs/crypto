@@ -23,9 +23,7 @@ Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15
 (merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
-Paired per-call A/B inherited-f4 vs inherited-f4-next vs fes-f2 (research/inherited_f4_next_20261112/run_ab.sh, record benchmarks/records/20261112T0630Z-inherited-f4-next-ab.json); then an end-to-end ic bench ladder adding fes-f2 and inherited-f4-next to the oracle.
-
-Local corpus A/B (this record). Subagent B (inherited-f4) in the background.
+Paired ic descent inherited-f4 vs inherited-f4-batched vs fes-f2 (research/inherited_f4_batched_20261112/run_ab.sh, record benchmarks/records/20261112T1829Z-inherited-f4-batched-ab.json, IC_BIN scratchpad ic-batched built at 4f0eca9eb4); then the end-to-end ladder (run_e2e.sh) under its own record. Validated isolab degree-13 run frozen (research/fes_k13_validated_20261112/) and blocked on the exhausted monthly budget.
 
 ## Stop and success conditions
 Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
