@@ -584,16 +584,29 @@ pub struct PhaseCost {
     pub work_native: std::collections::BTreeMap<String, u64>,
 }
 
+/// `*map.entry(name.to_string()).or_insert(0) += by`, allocating the key
+/// only when the counter is new: the same map after every call (a counter
+/// is created at zero even when `by` is 0), without a `String` per hit
+/// (assessment 2026-11-10, R14).
+#[inline]
+pub fn bump_counter(map: &mut std::collections::BTreeMap<String, u64>, name: &str, by: u64) {
+    if let Some(v) = map.get_mut(name) {
+        *v += by;
+    } else {
+        map.insert(name.to_string(), by);
+    }
+}
+
 impl PhaseCost {
     /// Add `by` to the native counter `name`, creating it at zero.
     pub fn count(&mut self, name: &str, by: u64) {
-        *self.native.entry(name.to_string()).or_insert(0) += by;
+        bump_counter(&mut self.native, name, by);
     }
     /// Add `by` to the `bitop/v1`-only counter `name`; a zero leaves the
     /// map untouched, so a phase that did none of the work carries none.
     pub fn work(&mut self, name: &str, by: u64) {
         if by > 0 {
-            *self.work_native.entry(name.to_string()).or_insert(0) += by;
+            bump_counter(&mut self.work_native, name, by);
         }
     }
     /// Fold a map of `bitop/v1`-only counters into this phase.
