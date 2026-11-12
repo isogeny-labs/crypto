@@ -161,3 +161,27 @@ KBMCPabsent/wrappernoexecutable(ct38-kb-status-01),Conductorabsent;local
 primaryfallback/no noveltyclaim. Runtime11:25running/current/enforced/0
 configuredbindings. Continueuntilactualworkspace/interruption/resourcelimit.
 [pcc:unverified]
+
+## Latest publication/integration activity
+Root16c9927b777a9076dac00f175d553299e0a2db62/tree76373e65f3fc385f216e26d3899f3af1123a2d09
+parent4e nowpublishedexactobjects28/108paths/artifactpass/nonforceCAS/refconfirmed,
+readyPR3877/queue3904updated12:51. Own4job43221639639 initiallyqueued,next13:41.
+Currentpublishedscope32+23/16032,sourcepinfornewconsumerchild1508. Root4e
+prior43215479664next13:01. Consumerbranchindependent-replay fromc712 nowhas
+secondpin16c/script/separatejob;localisolatedclonevalidation runs79199 with
+wrongHEAD/dirtysource negatives retained. Original98sources/check.sh/oldpin
+unchanged. Do notfinalizeorstopafterthischeckpoint. [pcc:unverified]
+
+## Clean-checkout lockfile repair in progress
+Published4e exact43215479664 and16c exact43221639639 overallFAILURE only
+newalgebrajob:Cargo.lockmissingfromGit(globalignore),cargo fetch--locked.
+Other3jobs pass25native/31or32standalone/31or32proofmodules,compiled180or186
+versuswritten154or160. Full4logs/API/XZ/hash/roundtrip preserved foreach.
+Bothfailedheads settled,do notpollagain unchanged. Consumerisolated01
+56d812/rootab6a48 reproducesafter32nativepasses;algebra/proofsNOTRUN.
+TrackexactalreadytestedCargo.lock (all7inputhashes unchanged) withpackage
+ignoreexception;no code/dependencyversion/criteria change,no --locked removal.
+Commit/publishnewheadfrom16c,updateconsumersecondpin/ProtocolV2 andrerun
+fullintegrationwithall32/23/32proofmodules. Mathematicalreports/graphs stay
+unchangedbecauseonlybuildinputtracking changes. No currentwholeCIgreen.
+[pcc:unverified]
