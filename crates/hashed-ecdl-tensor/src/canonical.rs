@@ -9,7 +9,7 @@ use crate::{integrity, invalid, overflow, BigUint, Error, Meter, Result};
 use num_traits::{One, ToPrimitive, Zero};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 const MAGIC: &[u8; 8] = b"BTNIR001";
 
@@ -37,6 +37,95 @@ pub struct IrProvenance {
     pub generator: String,
     /// Source revision, protocol revision, or other immutable version label.
     pub revision: String,
+}
+
+/// Lazily built powers of one Fourier root, shared by the evaluations of a
+/// program: `table[k] = omega^(step*k) mod modulus` for `k <= (count-1)^2`.
+/// Since `omega^(step*j*t) = (omega^step)^(j*t)` holds exactly modulo any
+/// modulus above one, indexing it returns the very residue `modpow` computed.
+/// Too large a table (or modulus one) yields `None` and callers take the
+/// per-term `modpow` path. Equality and debugging ignore the cache.
+#[derive(Default)]
+pub(crate) struct PowerTable(OnceLock<Option<Vec<BigUint>>>);
+
+impl Clone for PowerTable {
+    fn clone(&self) -> Self {
+        Self::default()
+    }
+}
+impl PartialEq for PowerTable {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+impl Eq for PowerTable {}
+impl std::fmt::Debug for PowerTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("PowerTable")
+    }
+}
+
+const POWER_TABLE_LIMIT: usize = 1 << 16;
+
+impl PowerTable {
+    pub(crate) fn get(
+        &self,
+        omega: &BigUint,
+        step: usize,
+        count: usize,
+        modulus: &BigUint,
+    ) -> Option<&[BigUint]> {
+        self.0
+            .get_or_init(|| {
+                let top = count.checked_sub(1)?;
+                let len = top.checked_mul(top)?.checked_add(1)?;
+                if len > POWER_TABLE_LIMIT || modulus <= &BigUint::one() {
+                    return None;
+                }
+                let root = omega.modpow(&BigUint::from(step), modulus);
+                let mut table = Vec::with_capacity(len);
+                table.push(BigUint::one());
+                for k in 1..len {
+                    let next = &table[k - 1] * &root % modulus;
+                    table.push(next);
+                }
+                Some(table)
+            })
+            .as_deref()
+    }
+}
+
+/// `sum_{j<count} values[j] * omega^(step*j*t) mod modulus`, charging one
+/// step per term through `charge` in term order (as the per-term loop did).
+pub(crate) fn fourier_sum(
+    values: &[BigUint],
+    count: usize,
+    t: usize,
+    table: Option<&[BigUint]>,
+    omega: &BigUint,
+    step: usize,
+    modulus: &BigUint,
+    mut charge: impl FnMut() -> Result<()>,
+) -> Result<BigUint> {
+    match table {
+        Some(table) => {
+            let mut sum = BigUint::zero();
+            for j in 0..count {
+                charge()?;
+                sum += &values[j] * &table[j * t];
+            }
+            Ok(sum % modulus)
+        }
+        None => {
+            let mut sum = BigUint::zero();
+            for j in 0..count {
+                charge()?;
+                let exponent = BigUint::from(step) * BigUint::from(j) * BigUint::from(t);
+                sum = (sum + &values[j] * omega.modpow(&exponent, modulus)) % modulus;
+            }
+            Ok(sum)
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -140,7 +229,12 @@ impl ValueOperation {
         Ok(())
     }
 
-    fn evaluate(&self, values: &[BigUint], meter: &mut Meter) -> Result<Vec<BigUint>> {
+    fn evaluate(
+        &self,
+        values: &[BigUint],
+        meter: &mut Meter,
+        powers: &PowerTable,
+    ) -> Result<Vec<BigUint>> {
         self.validate()?;
         let (inputs, _) = self.shape();
         if values.len() != inputs {
@@ -174,15 +268,12 @@ impl ValueOperation {
                 second,
                 column,
             } => {
+                let table = powers.get(omega, *second, *first, modulus);
                 let mut out = Vec::with_capacity(*first);
                 for t1 in 0..*first {
-                    let mut sum = BigUint::zero();
-                    for j1 in 0..*first {
-                        meter.charge(1, "canonical Fourier column transform")?;
-                        let exponent =
-                            BigUint::from(*second) * BigUint::from(j1) * BigUint::from(t1);
-                        sum = (sum + &values[j1] * omega.modpow(&exponent, modulus)) % modulus;
-                    }
+                    let sum = fourier_sum(values, *first, t1, table, omega, *second, modulus, || {
+                        meter.charge(1, "canonical Fourier column transform")
+                    })?;
                     let twist = BigUint::from(*column) * BigUint::from(t1);
                     out.push(sum * omega.modpow(&twist, modulus) % modulus);
                 }
@@ -195,15 +286,12 @@ impl ValueOperation {
                 second,
                 scale,
             } => {
+                let table = powers.get(omega, *first, *second, modulus);
                 let mut out = Vec::with_capacity(*second);
                 for t2 in 0..*second {
-                    let mut sum = BigUint::zero();
-                    for j2 in 0..*second {
-                        meter.charge(1, "canonical Fourier row transform")?;
-                        let exponent =
-                            BigUint::from(*first) * BigUint::from(j2) * BigUint::from(t2);
-                        sum = (sum + &values[j2] * omega.modpow(&exponent, modulus)) % modulus;
-                    }
+                    let sum = fourier_sum(values, *second, t2, table, omega, *first, modulus, || {
+                        meter.charge(1, "canonical Fourier row transform")
+                    })?;
                     out.push(sum * scale % modulus);
                 }
                 Ok(out)
@@ -230,6 +318,7 @@ pub struct PredicateProgram {
     words: Vec<Vec<ProgramBit>>,
     input_words: usize,
     operation: ValueOperation,
+    powers: PowerTable,
 }
 impl PredicateProgram {
     pub(crate) fn define(
@@ -261,6 +350,7 @@ impl PredicateProgram {
             words,
             input_words,
             operation,
+            powers: PowerTable::default(),
         };
         program.validate(port)?;
         Ok(program)
@@ -308,7 +398,7 @@ impl PredicateProgram {
         }
         let expected = self
             .operation
-            .evaluate(&values[..self.input_words], meter)?;
+            .evaluate(&values[..self.input_words], meter, &self.powers)?;
         Ok(expected == values[self.input_words..])
     }
 
@@ -359,6 +449,7 @@ impl PredicateProgram {
             words,
             input_words,
             operation,
+            powers: PowerTable::default(),
         })
     }
 }
