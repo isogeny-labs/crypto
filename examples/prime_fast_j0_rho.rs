@@ -103,6 +103,7 @@ fn folded_rho(
     lam: u64,
     dp_bits: u32,
     seed: u64,
+    cyc: bool,
 ) -> Option<(u64, u64)> {
     let f = c.f;
     let n = c.n;
@@ -136,6 +137,8 @@ fn folded_rho(
         }
         let (mut a, mut b) = (mulm(a0, mu), mulm(b0, mu));
         let mut len = 0u64;
+        let mut ring = [u64::MAX; 8];
+        let mut ri = 0usize;
         loop {
             if f.from_mont(p.x) & mask == 0 {
                 let key = f.from_mont(p.x) ^ (f.from_mont(p.y) << 32);
@@ -154,11 +157,22 @@ fn folded_rho(
                 break;
             }
             let h = (f.from_mont(p.x) as usize) % R;
-            let (t, u, v) = tb[h];
-            let Some(p1) = c.add(Some(p), Some(t)) else {
+            let (mut t, mut u, mut v) = tb[h];
+            let Some(mut p1) = c.add(Some(p), Some(t)) else {
                 break;
             };
-            let (p2, s, neg) = canon_pt(c, beta, beta2, p1);
+            let (mut p2, mut s, mut neg) = canon_pt(c, beta, beta2, p1);
+            if cyc && ring.contains(&p2.x) {
+                // fruitless short cycle: leave it through a different jump
+                (t, u, v) = tb[(h + 1) % R];
+                let Some(q1) = c.add(Some(p), Some(t)) else {
+                    break;
+                };
+                p1 = q1;
+                (p2, s, neg) = canon_pt(c, beta, beta2, p1);
+            }
+            ring[ri & 7] = p2.x;
+            ri += 1;
             let mut mu = lams[s];
             if neg {
                 mu = (n - mu) % n;
@@ -194,7 +208,15 @@ fn main() {
             let k = rng.gen_range(2..c.n);
             let q = c.mul(Some(g), k).unwrap();
             let t0 = Instant::now();
-            if let Some((x, st)) = folded_rho(&c, g, q, lam, dp_bits, t + 1) {
+            if let Some((x, st)) = folded_rho(
+                &c,
+                g,
+                q,
+                lam,
+                dp_bits,
+                t + 1,
+                std::env::var_os("CYCFIX").is_some(),
+            ) {
                 if x == k {
                     ok += 1;
                 }
