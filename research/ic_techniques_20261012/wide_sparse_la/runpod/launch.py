@@ -12,6 +12,7 @@ presigned GETs and push their raw JSONL back via presigned PUTs (7 days).
 """
 import argparse, datetime, hashlib, json, os, subprocess, sys, time, urllib.request
 import boto3
+from botocore.config import Config
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUTFILES = {"GRID": "grid.jsonl", "AA": "aa.jsonl", "WIDE": "wide_coeffs.jsonl",
@@ -40,7 +41,10 @@ bundle = os.path.join(tmp, "src.tar.gz")
 print(subprocess.check_output([sys.executable, os.path.join(HERE, "make_bundle.py"), bundle], text=True, cwd=root))
 h = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
 src_sha, script = h(bundle), os.path.join(HERE, "pod_run.sh")
-s3 = boto3.client("s3")
+# Presigned URLs must be SigV4 for the bucket's own region, or S3 answers 400.
+region = boto3.client("s3").get_bucket_location(Bucket=a.bucket).get("LocationConstraint") or "us-east-1"
+s3 = boto3.client("s3", region_name=region, endpoint_url=f"https://s3.{region}.amazonaws.com",
+                  config=Config(signature_version="s3v4", s3={"addressing_style": "virtual"}))
 s3.upload_file(bundle, a.bucket, f"{prefix}/src.tar.gz")
 s3.upload_file(script, a.bucket, f"{prefix}/pod_run.sh")
 ttl = 7 * 24 * 3600
@@ -52,6 +56,15 @@ manifest = {"schema": "wide-sparse-la.runpod-launch/v1", "commit": sha, "s3_pref
             "flavor": a.flavor, "vcpu": a.vcpu, "cloud": "SECURE", "interruptible": False,
             "deadline_utc": datetime.datetime.fromtimestamp(deadline, datetime.timezone.utc).isoformat(),
             "launched_utc": stamp, "pods": []}
+# Preflight: a presigned GET and PUT must work from here before any pod is created.
+import tempfile
+probe = f"{prefix}/preflight.txt"
+pf = os.path.join(tmp, "preflight.txt"); open(pf, "w").write("ok\n")
+for cmd in (["curl", "-sS", "-f", "-X", "PUT", "-T", pf, put(probe)], ["curl", "-sS", "-f", "-o", "/dev/null", get(probe)],
+            ["curl", "-sS", "-f", "-o", "/dev/null", get(f"{prefix}/pod_run.sh")]):
+    if subprocess.run(cmd).returncode:
+        sys.exit(f"preflight failed: {cmd[:5]}")
+print("preflight: presigned PUT/GET ok")
 for seed in a.seeds:
     env = {"SEED": str(seed), "SRC_URL": get(f"{prefix}/src.tar.gz"), "SRC_SHA256": src_sha,
            "DEADLINE_EPOCH": str(deadline), "SCRIPT_URL": get(f"{prefix}/pod_run.sh")}
