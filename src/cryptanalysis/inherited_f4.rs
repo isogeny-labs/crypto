@@ -1537,26 +1537,124 @@ struct LazyRow {
 /// The words of a basis row: a range of a shared buffer.  A row inserted
 /// on its own owns its buffer; the kept rows of an eager specialisation
 /// share one ([`ReducedBasis::rewrite_kept`]), which spares an allocation,
-/// a staging pass and a copy per row.
+/// a staging pass and a copy per row; a row the batched rewrite brings
+/// current on its own takes a span of the thread's [`RowArena`] chunk.
+///
+/// `ptr` points at the range's first word inside the buffer `owner`
+/// keeps alive, so reading a row is one slice construction whatever
+/// holds it.
 #[derive(Clone, Debug)]
 struct RowWords {
-    buf: Rc<[u64]>,
-    off: u32,
+    ptr: *const u64,
     len: u32,
+    _owner: RowOwner,
+}
+
+/// What keeps a [`RowWords`] range alive (held, never read).
+#[derive(Clone, Debug)]
+#[allow(dead_code)]
+enum RowOwner {
+    Words(Rc<[u64]>),
+    Arena(Rc<ArenaChunk>),
+}
+
+impl RowWords {
+    /// Words `off .. off + len` of `buf`.
+    fn range(buf: Rc<[u64]>, off: usize, len: usize) -> Self {
+        let ptr = buf[off..off + len].as_ptr();
+        Self {
+            ptr,
+            len: len as u32,
+            _owner: RowOwner::Words(buf),
+        }
+    }
 }
 
 impl std::ops::Deref for RowWords {
     type Target = [u64];
     #[inline]
     fn deref(&self) -> &[u64] {
-        &self.buf[self.off as usize..(self.off + self.len) as usize]
+        // SAFETY: `ptr .. ptr + len` lies inside the buffer `_owner` keeps
+        // alive, and no one writes it once a `RowWords` exists: an `Rc`
+        // buffer is shared and immutable, and an arena span is written
+        // only before its `RowWords` is made ([`RowArena::span`]).
+        unsafe { std::slice::from_raw_parts(self.ptr, self.len as usize) }
     }
 }
 
 impl From<Rc<[u64]>> for RowWords {
     fn from(buf: Rc<[u64]>) -> Self {
-        let len = buf.len() as u32;
-        Self { buf, off: 0, len }
+        let len = buf.len();
+        Self::range(buf, 0, len)
+    }
+}
+
+/// A write-once chunk of row words for the batched rewrite's one-row
+/// materialisations: zeroed when allocated, handed out in disjoint spans,
+/// each span written once by the rewrite that reserved it and only read
+/// afterwards.  It spares the allocator a call, and a free, per row.
+struct ArenaChunk {
+    cells: Box<[std::cell::UnsafeCell<u64>]>,
+    fill: std::cell::Cell<usize>,
+}
+
+impl std::fmt::Debug for ArenaChunk {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ArenaChunk({}/{})", self.fill.get(), self.cells.len())
+    }
+}
+
+/// The thread's current [`ArenaChunk`].
+struct RowArena;
+
+impl RowArena {
+    /// Words per chunk; a row longer than a quarter of it gets its own
+    /// buffer instead.
+    const CHUNK: usize = 1 << 14;
+
+    /// Reserve `n` zeroed words, run `write` on them, and return them as a
+    /// row's words; `None` (the span left unused) if `write` does.
+    fn span<T>(n: usize, write: impl FnOnce(&mut [u64]) -> Option<T>) -> Option<(T, RowWords)> {
+        thread_local! {
+            static CURRENT: RefCell<Option<Rc<ArenaChunk>>> = const { RefCell::new(None) };
+        }
+        if n > Self::CHUNK / 4 {
+            let mut buf: Rc<[u64]> = std::iter::repeat_n(0u64, n).collect();
+            let t = write(Rc::get_mut(&mut buf).expect("just allocated"))?;
+            return Some((t, buf.into()));
+        }
+        let chunk = CURRENT.with(|c| {
+            let mut c = c.borrow_mut();
+            match &*c {
+                Some(chunk) if chunk.fill.get() + n <= chunk.cells.len() => chunk.clone(),
+                _ => {
+                    let chunk = Rc::new(ArenaChunk {
+                        cells: (0..Self::CHUNK)
+                            .map(|_| std::cell::UnsafeCell::new(0))
+                            .collect(),
+                        fill: std::cell::Cell::new(0),
+                    });
+                    *c = Some(chunk.clone());
+                    chunk
+                }
+            }
+        });
+        let off = chunk.fill.get();
+        chunk.fill.set(off + n);
+        // SAFETY: `off .. off + n` was just reserved and is handed out
+        // once: no other reference to it exists.  `UnsafeCell<u64>` has the
+        // layout of `u64`, and every cell is initialised (zeroed).
+        let ptr = chunk.cells[off..off + n].as_ptr() as *mut u64;
+        let out = unsafe { std::slice::from_raw_parts_mut(ptr, n) };
+        let t = write(out)?;
+        Some((
+            t,
+            RowWords {
+                ptr: ptr as *const u64,
+                len: n as u32,
+                _owner: RowOwner::Arena(chunk),
+            },
+        ))
     }
 }
 
@@ -2932,11 +3030,7 @@ impl ReducedBasis {
                 version: to,
                 start: lo as u32,
                 lead: (lo + first) as u32,
-                data: RowWords {
-                    buf: buf.clone(),
-                    off: off as u32,
-                    len: len as u32,
-                },
+                data: RowWords::range(buf.clone(), off, len),
             };
         }
         rewrite_tally::add(rewrite_tally::BULK, bulk_rows, bulk_words);
@@ -2969,16 +3063,35 @@ impl ReducedBasis {
         row: &LazyRow,
         cost: &mut InheritCost,
     ) -> Option<(usize, usize, Rc<[u64]>)> {
+        let lo = plan.low[row.lead as usize] as usize;
+        if lo >= self.words {
+            cost.specialise_word_ops += row.live().len() as u64;
+            return None;
+        }
+        let mut data = zeroed_words(self.words - lo);
+        let out = Rc::get_mut(&mut data).expect("just allocated");
+        let first = self.rewrite_into(mode, plan, row, cost, out, lo)?;
+        Some((lo, first, data))
+    }
+
+    /// The body of [`ReducedBasis::rewrite_through`]: rewrite `row` into
+    /// `out`, zeroed, holding words `lo ..` (`lo` the plan's bound) of the
+    /// current layout; the offset of the image's first nonzero word, `None`
+    /// if it is zero.  Charges as `rewrite_through` does, the zeroed
+    /// buffer's tally apart.
+    fn rewrite_into(
+        &self,
+        mode: EagerMode,
+        plan: &StepPlan,
+        row: &LazyRow,
+        cost: &mut InheritCost,
+        out: &mut [u64],
+        lo: usize,
+    ) -> Option<usize> {
         debug_assert!(row.version < self.epoch());
         let words = self.words;
         let live = row.live();
         cost.specialise_word_ops += live.len() as u64;
-        let lo = plan.low[row.lead as usize] as usize;
-        if lo >= words {
-            return None;
-        }
-        let mut data = zeroed_words(words - lo);
-        let out = Rc::get_mut(&mut data).expect("just allocated");
         let lead = row.lead as usize;
         let segments = if next_kernels() {
             apply_step_counted(mode, plan, live, lead, out, lo)
@@ -2994,7 +3107,7 @@ impl ReducedBasis {
         bitop_tally::word_ops(3 * segments + first_pos.map_or(out.len() as u64, |f| f as u64 + 1));
         let first = first_pos?;
         cost.specialise_word_ops += (words - lo - first) as u64;
-        Some((lo, first, data))
+        Some(first)
     }
 
     /// Bring row `r` into the current layout if it is not there yet.  A
@@ -3027,14 +3140,20 @@ impl ReducedBasis {
                 // map from the row's own epoch: one pass however many
                 // layout steps it skipped.
                 let plan = self.step_plan_from(mode, self.rows[r].version);
-                let (lo, first, data) = self
-                    .rewrite_through(mode, &plan, &self.rows[r], cost)
-                    .expect("a kept pivot survives");
+                let row = &self.rows[r];
+                let lo = plan.low[row.lead as usize] as usize;
+                assert!(lo < self.words, "a kept pivot survives");
+                let n = self.words - lo;
+                // `bitop/v1`: the zeroed span, as `zeroed_words` tallies it
+                bitop_tally::word_ops(n as u64);
+                let (first, data) =
+                    RowArena::span(n, |out| self.rewrite_into(mode, &plan, row, cost, out, lo))
+                        .expect("a kept pivot survives");
                 self.rows[r] = LazyRow {
                     version: self.epoch(),
                     start: lo as u32,
                     lead: (lo + first) as u32,
-                    data: data.into(),
+                    data,
                 };
                 return;
             }
