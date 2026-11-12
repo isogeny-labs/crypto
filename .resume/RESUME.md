@@ -17,7 +17,7 @@ Counts only (D), no timing comparison, not a benchmark.
 
 ## State
 Code: `examples/pkm_tower_pilot.rs` (`--cover-map`, `CoverMap`, control `randbase`). Built.
-Protocol pushed. Runs: not started.
+Runs done (m3-square stopped at time limit). README written.
 
 ## Next step
 Run run.sh, tabulate D per (map, kind, control, t), plot, write README + report, open PR.
