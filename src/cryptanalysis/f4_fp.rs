@@ -343,6 +343,25 @@ pub fn field_ops_total() -> u64 {
     field_ops_now()
 }
 
+/// Opt-in (counted only while `jv_bitops` counting is on): the share of
+/// [`count_ops`] row operations that are pivot normalisations (`x · inv`, a
+/// product with no addition).  Every other row operation is a
+/// multiply-subtract, so F4's emitted `F_p` additions are
+/// `count_ops − norm_ops`.  Off by default: one relaxed load per pivot.
+static NORM_OPS: AtomicU64 = AtomicU64::new(0);
+
+/// Process-wide pivot-normalisation row operations (see [`NORM_OPS`]).
+pub fn norm_ops_total() -> u64 {
+    NORM_OPS.load(AtomicOrdering::Relaxed)
+}
+
+#[inline]
+fn count_norm(n: usize) {
+    if super::jv_bitops::enabled() {
+        NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
+    }
+}
+
 #[inline]
 fn count_ops(n: usize) {
     FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
@@ -2141,6 +2160,7 @@ fn rref32(
             *x = fp.reduce(*x * inv);
         }
         count_ops(n_cols - c);
+        count_norm(n_cols - c);
         let (head, tail) = rows.split_at_mut(pr + 1);
         let prow = &head[pr];
         let parallel = tail.len() * (n_cols - c) > PAR_WORK;
@@ -2387,6 +2407,7 @@ fn rref32_deferred(
                 *x = fp32.reduce(*x * inv);
             }
             count_ops(row.len() - c);
+            count_norm(row.len() - c);
             let at = known.partition_point(|(pc, _)| *pc < c);
             known.insert(at, (c, row));
         }
@@ -2765,6 +2786,7 @@ fn rref_ckpt(
                 }
             }
             count_ops(ops);
+            count_norm(ops);
             let (head, tail) = rows.split_at_mut(pr + 1);
             let prow = &head[pr];
             let parallel = tail.len() * (n_cols - c) > PAR_WORK;
