@@ -87,3 +87,27 @@ columns) and k = 7 (401,930 columns): GPU-class, owner's call.
 ## J1 `LEAD-J-quartic-dl1-generic-jacobian`
 
 Step 1 (read the N4v2 builder, size the adapter) is delegated; the run protocol is written after that report.
+
+## Amendment 2026-11-12 03:55 UTC (before any S1 cell ran): the C-c cells are void; S1 rescoped
+
+Structural fact found while generating instances: over F_l with F_l^× = μ_{l−1} ⊂ μ_N (Fermat primes 17, 257 at
+k ≥ 4, 8; and nearly so for 97, whose μ_32 ⊂ F_97^×), every F_l-point of the Semaev curve with nonzero coordinates
+is a zero of g on μ_N², so the chain ideal is proper for essentially every instance: 0 unit instances in 60 seeded
+draws for each of l = 17, 97, 257 at k = 6 and k = 10 (`tools/unit_test.py`). The record's cells C-c17, C-c97,
+C-c257 therefore cannot be run as written (their "1 ∈ V_D" reading is impossible on proper ideals). Primes with
+l ≡ 3 mod 4 admit unit instances freely (19: 50/60, 23: 40/60, 43: 50/60, 107: 57/60, 227: 59/60 at k = 10).
+
+Rescoped S1 (frozen now):
+- **Arm (b′), scored.** One generator over l ∈ {19, 43, 107, 227}, four unit instances each (rule as above with
+  these l), k = 4..9 at D ≤ 4 (D = 5 for k ≤ 7) on the growth lib, and k = 10 at D = 5 on the big engine. Reading:
+  "law" if the first D with 1 ∈ V_D equals ⌊(k+14)/4⌋ at every k ≤ 9 and 1 ∉ V_5(10); "below law" if 1 enters
+  earlier on ≥ 3 of 4 instances at any k. Prediction under S (characteristic-free): law at every l. Under L or F
+  (characteristic below 2^(k+1) matters): a departure somewhere in k = 4..10; the σ_l(g) elements of these l have
+  weight ≥ 6 (binary weight of l ≥ 3), so the F-links mechanism has no admissible element at D ≤ 5 and a
+  departure would have to come from elsewhere; a "law" reading at every l is evidence for S at these depths and
+  pushes any characteristic effect to D ≥ 6 cells (k ≥ 14, GPU-class), which are not run here.
+- **Arm (c)** is run only where σ_l(g) has weight ≤ D (recorded, expected skipped at D ≤ 5).
+- **Arm (d), scored as in the record** (Dm): C-d1 {g, h} and C-d2 {g, σ_257 g} over F_12289 at k = 10, D = 5 on the
+  big engine; the k = 6 versions and the negative control d0 on the growth lib.
+- Arm (a) control unchanged.
+Everything else in the S1 section stands. Cost: the same.
