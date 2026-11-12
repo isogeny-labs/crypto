@@ -1,30 +1,19 @@
 # CT51: a degree-eight prime-to-binary torsion bridge
 
-**Status:** independently implemented *local arithmetic checks* only; [pcc:unverified]. This is a classical division-field specialization, **not** a scalable ECDLP reduction. This stacked branch starts from cross-characteristic PR #4012 and leaves concurrent CT51? / native CT branches unchanged.
+**Status:** independently implemented *local arithmetic checks* only; [pcc:unverified]. This is a classical division-field specialization, **not** a scalable ECDLP reduction. This stacked branch starts from cross-characteristic PR #4012 and leaves concurrent native CT branches unchanged.
 
 ## Explicit global and two local models
 
 Let the rational curve be Cremona 11a1,
-[
-E:quad y^2+y=x^3-x^2-10x-20.
-]
+`E: y^2+y=x^3-x^2-10x-20`.
 Its third division polynomial is
-[
-f(X)=3X^4-4X^3-60X^2-237X-21.
-]
+`f(X)=3X^4-4X^3-60X^2-237X-21`.
 Set
-[
-K=mathbb Q[X,Y]/(f(X),,Y^2+Y-X^3+X^2+10X+20).
-]
+`K = Q[X,Y]/(f(X), Y^2+Y-X^3+X^2+10X+20)`.
 The mod-two reduction of `f` is `X^4+X+1`, irreducible over `F_2`: neither element of `F_2` is a root and its reduction modulo the only irreducible quadratic `X^2+X+1` is 1. In `F_16=F_2[X]/(X^4+X+1)`, `R=X^3+X^2` has absolute trace one. Hence `Y^2+Y=R` is irreducible over `F_16`, and **[K:Q]=8** (irreducibility lifts from reduction mod 2 at the monic-in-Y stage). The 2-adic local residue field is `F_256`; the reduction of the global 3-torsion point is `(X,Y)`.
 
 At the other prime, the simultaneous congruences `X=18,Y=5 (mod 29)` solve both equations; the specialization is the point `P_29=(18,5)`. Thus the same algebraic point specializes to **two genuinely different residue characteristics**:
-[
- E(mathbb F_{29})[3]supsetlangle(18,5)angle
- quadlongleftarrow E(K)[3]
-i (X,Y)
- quadlongrightarrow E(mathbb F_{2^8})[3]supsetlangle(X,Y)angle.
-]
+`< (18,5) > in E(F_29)[3] <- (X,Y) in E(K)[3] -> < (X,Y) > in E(F_(2^8))[3]`.
 Both points have exact order 3, and `O,(18,5),(18,23)` map respectively to `O,(X,Y),(X,Y+1)`. This is the full subgroup isomorphism for the two specified generators. The source group has order 30 and the target has order 225; the latter contains all eight nonzero geometric 3-torsion points.
 
 **Sharper negative result for this particular global curve:** every nonzero geometric 3-torsion point has an `X` coordinate of degree 4 over `F_2`, and its `Y` coordinate has degree 8. Therefore no nonzero 3-torsion point on this particular `E` is defined over `F_{2^m}` for `m<8`. An arbitrary global point of order 3 has degree exactly 8 over Q: the transitivity follows from the irreducibility of the degree-eight point equations, not a conjectural Galois-group assertion.
