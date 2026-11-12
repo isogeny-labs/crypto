@@ -1,0 +1,72 @@
+{
+  "schema": "width5-wide16-input-rules/v1",
+  "panel": "research/width5_wider_panel_plan_20261112_v1/UNOPENED_INPUTS.json",
+  "panel_sha256": "c9b1b827e918c8f40f21f224755b19fa26110f5f43f626d5647aa4c5437ff9ee",
+  "input_selection": "Frozen before chart/solver/timing evaluation, no replacement after guard failures.",
+  "comparison_fields": [
+    "P-192",
+    "P-224",
+    "P-256",
+    "P-384",
+    "P-521"
+  ],
+  "H": 15,
+  "width": 16,
+  "full_fibers_per_arm": 80,
+  "native_batch_max": 40,
+  "max_batches_per_arm": 2,
+  "orders": [
+    [
+      "all",
+      "seven",
+      "five"
+    ],
+    [
+      "five",
+      "seven",
+      "all"
+    ],
+    [
+      "seven",
+      "all",
+      "five"
+    ]
+  ],
+  "controls": {
+    "primes": [
+      5,
+      7,
+      11,
+      13,
+      17
+    ],
+    "M": 2,
+    "H": 8,
+    "all_h_fibers": 45,
+    "independent_original_states": 1215,
+    "batch_sizes": [
+      40,
+      5
+    ],
+    "faults": [
+      "missing-second",
+      "capped-second",
+      "duplicate-second-id"
+    ],
+    "empty_batch": true
+  },
+  "caps": {
+    "worker_seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "node_per_fiber": 100000,
+    "candidate_u_per_5d_arm": 2000,
+    "candidate_u_per_7d_arm": 3920,
+    "profile_all_mask_checks": 17760,
+    "profile_max_recovered_fibers": 720
+  },
+  "source_contract": "Complete conditional ordered tuplesplusk only; no global-originalroot claim",
+  "prior_field_setup_proofs_reused": true,
+  "qualified_speedup": null,
+  "release_claim": false
+}
