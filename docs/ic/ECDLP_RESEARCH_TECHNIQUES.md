@@ -36,7 +36,7 @@ a deployed curve.
 | Relation collection | Semaev `S₃`/`S₄`; `subtract`; prime and Koblitz pair tables (`mitm`, `mitm-prime-batch`, `mitm-prime-blocked`, `mitm-frobenius`); `rootfind-*`; `chained-x`; `descent-algebraic`; the F4 family (`f4-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`); symmetrised systems; target sources with the repeat guard; CADO-style filtering | `ksum`/`wsum`/`wwalk`; known-log and CM-folded MITM2; `pkm-semaev` and the tower F4 engines; line and resultant oracles; residual and cofactor-fibre collectors; one- and two-large-prime collectors; Buchberger, crossbred, SAT, FES, exhaustive and M4GB arms; WDSat and SMT; chained-`S₃` SAT; `pdp-split`; six-sum extraction; wide solvers; `n = 83` gates; degree levers and MutantXL closure; orbit pair table | Collector adapters to the common multi-large-prime layer; Joux–Vitse F4 trace reuse (G1); BooleanSolve refutation (G3); an equivariant F4 engine (G2); GPU root finding and FES on hardware; a priced solver unit for the algebraic oracles |
 | Filtering | Deduplication; singleton peeling; clique removal; structured merging; Markowitz pivoting; CADO purge and merge; large-prime graph and hypergraph filtering | Collector-specific partial-relation combination; `audit_rank` receipts | None at the reusable layer |
 | Linear algebra | Ten-name relation-matrix registry (dense, echelon, structured Gauss, deferred sparse Wiedemann and Lanczos); parallel block Wiedemann; block Lanczos; wide moduli to 255 bits; serial/Rayon/sharded/worker SpMV | Wide `k = 4` pipeline (`ic_wide`); Petit–Quisquater sparse elimination; sparse FGLM stage; CUDA SpMV worker | The ECC2K-130 `10⁹`-column cost (an extrapolation; the cited benchmark pack does not exist); GPU and distributed performance evidence |
-| Individual logarithm | Randomized target decomposition (`ic solve`); signed-Frobenius recovery; the ledger-§23 one-target pipeline; the factor-base log database and log store | Shared full-rank log and point-only descent; batched collection with rank checks; recursive scheduler and its toy adapters (Component) | Curve adapters for the recursive scheduler; higher-genus GHS target descent |
+| Individual logarithm | Randomized target decomposition (`ic solve`); signed-Frobenius recovery; the ledger-§23 one-target pipeline; the factor-base log database and log store | Shared full-rank log and point-only descent; batched collection with rank checks; recursive scheduler with the prime pair-table adapter and transcript replay (Experimental) | Koblitz, Diem and Gaudry adapters for the recursive scheduler; higher-genus GHS target descent |
 | Higher genus and transfers | None (nothing here is an ECDLP production path) | Hyperelliptic IC (odd and binary); Gaudry–Diem `k = 3, 4, 5`; GHS smooth covers and IC; Joux–Vitse weak-class cover and sieve; plane-quartic Diem IC; cover, isogeny and Jacobian-image transfers; three-leads and APS instruments; binary large-prime references | A crossover on any non-weak class |
 | Orchestration and accounting | `run_pipeline`, `ic bench`, the planner, the resumable workflow, pricing arms, the §5a band, the `S` unit and ledger, the validation gate, bounds and frontier | Degree-of-regularity forecast; relation-yield pruning | None |
 
@@ -1261,26 +1261,58 @@ shrinks to 1 (batch 16 at 0.69–0.80× batch 64, 1600 records, 1280 replays
 reproduced), "not promotable"; the isolated L2 protocol is proposed and not
 run.
 
-### Recursive point decomposition and descent adapters — Component (corrected)
+### Recursive point decomposition and descent adapters — Experimental (one prime adapter), Component (scheduler alone)
 
 [`recursive_descent.rs`](../../src/cryptanalysis/recursive_descent.rs)
 implements the budgeted scheduler (memoisation, depth/node/relation caps,
-cycle rejection, verified relations, replay transcript, a canonicalisation
-hook returning the representative and the multiplier transporting its
-logarithm). It has no caller outside its own two toy tests, and no curve
-adapter implements `RecursiveDescentOracle`, so the earlier "Integrated
-scheduler" wording, and the "large-prime descent" and "Frobenius-orbit
-recursive descent" entries that rested on it, are Component: tested code
-that no end-to-end path uses. The adapters are diagnostics:
+cycle rejection, verified relations, a canonicalisation hook returning the
+representative and the multiplier transporting its logarithm). Until
+2026-11-12 it had no caller outside its own two toy tests; the earlier
+"Integrated scheduler" wording was corrected to Component then.
+
+It now has one curve adapter,
+[`ic_framework/recursive_adapter.rs`](../../src/cryptanalysis/ic_framework/recursive_adapter.rs)
+(`PrimePairTableDescent`), on prime curves over the counted group:
+nodes are subgroup points canonicalised by negation only (multiplier 1 or
+`r − 1`); a node is a leaf when it is a factor-base point whose certified
+column logarithm is supplied (the adapter does not know how the logs were
+obtained); relations are a two-summand pair-table decomposition through
+the existing `PairTable::build_negation_folded` / `decompose_mitm`, and
+one-large-prime relations `node = P_i + L` with `L` outside the base
+returned as a child, so the scheduler recurses on `L` (bounded by
+`max_large_prime_probes` per attempt). Every relation is re-checked as
+`[a]·node = [c]G + Σ [b_i]·child_i` in the counted group after the witness
+indices are matched against the base, and every logarithm by `[d]G = node`.
+`replay_transcript` re-verifies a recorded descent (every step's relation,
+every child log as a base leaf or an earlier step, every step result, the
+final logarithm) without re-running the search: the frozen termination
+transcript.
+
+Tests (`cargo test --lib recursive`, 6 passed): on a 20-bit prime-order
+curve (`r = 1,046,999`) with a 200-column known-log base, a planted target
+that is neither a base point nor a pair-table hit is recovered through a
+large-prime child and its transcript replays; the replay rejects a wrong
+final logarithm, a tampered coefficient, a tampered child, a tampered
+child log and a dropped step; `max_depth = 1` solves a direct pair and
+refuses large-prime recursion (the scheduler checks depth before leaves,
+so `max_depth = 0` admits only a target that is itself a base point); a
+node budget of 1 fails with `NodeBudget`, never a wrong log. In the
+end-to-end test the descent spent 25,011 additions, 675 doublings and 38
+scalar multiplications beside the 40,200-addition table build, almost all
+of it on failed large-prime branches (8,256 probes, 8,250 children, 8,204
+relations verified, 0 rejected; 164 nodes, maximum depth 3); nothing was
+tuned, and no comparison with the one-relation `ic solve` descent or with
+rho has been run. Experimental: a working bounded adapter with replayable
+transcripts, not registered as an `ic bench` oracle and not on any
+production path. Koblitz (signed Frobenius), Diem and Gaudry adapters
+remain to be written; the other descent modules are diagnostics:
 [`coordinate_descent.rs`](../../src/cryptanalysis/coordinate_descent.rs)
 ranks the Gaudry, sign-symmetrised and Klein-invariant systems on one
 engine at `p^k ≲ 5000`, `m = 2`, recovering no scalar;
 [`diem_descent.rs`](../../src/cryptanalysis/diem_descent.rs) is the toy
 Diem `(p, k) = (5, 2)` with brute-force decomposition, "not subexponential";
 [`ghs_descent.rs`](../../src/cryptanalysis/ghs_descent.rs) is end to end
-for `m = 1` only. Large primes as descent children remain the plan; the
-large-prime relations actually produced go through the collectors of §2
-and the hypergraph filter of §3.
+for `m = 1` only.
 
 ## 6. Higher-genus index calculus, covers and transfers
 
@@ -1644,9 +1676,10 @@ performance verdict".
 
 1. Add collector-specific converters for the common large-prime relation type,
    retaining each collector's independent curve-group verifier.
-2. Give the recursive-descent scheduler a curve adapter (Koblitz, Diem or
-   Gaudry) and a frozen termination transcript; until one exists it stays a
-   Component.
+2. Measure the prime recursive-descent adapter against the one-relation
+   `ic solve` descent and matched rho on a frozen ladder, and add the Koblitz
+   (signed-Frobenius canonicalisation), Diem and Gaudry adapters; the prime
+   adapter and its replayable transcript landed on 2026-11-12.
 3. Validate block Lanczos against the larger frozen block-Wiedemann corpus,
    and produce the wide-modulus benchmark pack the 2026-10-12 note cites.
 4. Validate the CUDA SpMV worker, the GPU root finder and the FES kernels on
@@ -1676,9 +1709,10 @@ one-target recovery. Stage-only results remain labelled stage diagnostics.
 
 - The trace-zero entry said the smooth `m ≥ 2` GHS model was missing;
   `ghs_smooth.rs` builds it and `ghs_ic.rs` runs index calculus on it (§6).
-- `recursive_descent.rs` was listed as an Integrated scheduler; it has no
-  caller outside its own tests and no curve adapter, so it and the two
-  entries built on it are Component (§5).
+- `recursive_descent.rs` was listed as an Integrated scheduler; it had no
+  caller outside its own tests and no curve adapter, so it was Component;
+  the prime adapter `PrimePairTableDescent` with transcript replay now gives
+  it one Experimental path (§5).
 - `docs/ic/IC_TECHNIQUE_INTEGRATION_20261012.md` cites a wide-modulus
   benchmark pack (`research/ic_techniques_20261012/wide_sparse_la/`) that is
   not in the tree; the wide code is real and tested (§4). Its §8 verdict on

@@ -219,10 +219,10 @@ pub fn semaev_s3_in_x3(
 ///
 /// This is the polynomial used in 3-decompositions: given `R = aG + bQ`,
 /// find `(F_i, F_j, F_k)` in the factor base with `S_4(x_R, x_i, x_j, x_k)
-/// = 0`.  We **compute** `S_4` here for completeness and future use;
-/// solving for `x_k` over `F_p` requires univariate root-finding for
-/// degree-4 polynomials (Berlekamp/Cantor–Zassenhaus), which is not
-/// implemented in this module.
+/// = 0`.  Solving for `x_k` over `F_p` is univariate root-finding of a
+/// quartic: [`find_roots_fp_fast`] does it by `gcd(f, X^p - X)` followed by
+/// equal-degree splitting (Cantor–Zassenhaus) above 20 bits, and by brute
+/// force below; [`find_one_relation_s4_counted`] is the caller.
 pub fn semaev_s4_in_x4(
     x1: &FieldElement,
     x2: &FieldElement,

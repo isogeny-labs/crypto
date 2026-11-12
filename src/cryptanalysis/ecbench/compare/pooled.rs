@@ -238,7 +238,7 @@ pub fn compare_pooled_loaded(
             Some(_) => {}
         }
 
-        let matched = match_pairs(&ma, &mb, weight, opts.pricing)?;
+        let matched = match_pairs(&ma, &mb, weight, opts.pricing, false)?;
         if weight.is_some() {
             validate_weighted_totals(&matched)?;
         }
@@ -465,6 +465,7 @@ mod tests {
             seed,
             allow_interrupted: false,
             pricing: Pricing::default(),
+            bitop: false,
         }
     }
 
