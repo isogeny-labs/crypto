@@ -1,7 +1,85 @@
 {
   "branch": "aburan28/vigilant-babbage-26wqzs",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-12T08:12:34+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase5/run_phase5.sh",
+        "target/release/ecbench",
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase5/runs"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.receipt.json; first start from its pid file, later starts derived",
+      "started_utc": "2026-11-12T04:22:23+00:00",
+      "wall_s": 13667.371
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "p5-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase5/runs",
+        "--kind",
+        "rho",
+        "--sessions",
+        "8",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase5/analysis_rho.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.receipt.json; first start from its pid file, later starts derived",
+      "started_utc": "2026-11-12T08:10:10.371000+00:00",
+      "wall_s": 2.208
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "p5-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase5/runs",
+        "--kind",
+        "ic3",
+        "--sessions",
+        "4",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.receipt.json; first start from its pid file, later starts derived",
+      "started_utc": "2026-11-12T08:10:12.579000+00:00",
+      "wall_s": 0.389
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "p5-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase5/runs",
+        "--kind",
+        "ic2",
+        "--sessions",
+        "4",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "source": "transcribed from research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.receipt.json; first start from its pid file, later starts derived",
+      "started_utc": "2026-11-12T08:10:12.968000+00:00",
+      "wall_s": 0.415
+    }
+  ],
   "commit": "56e1371d6e6ba3bf11d1d9710a9dc92183a32300",
   "commit_dirty": false,
   "created_utc": "2026-11-12T04:19:30+00:00",
@@ -15,19 +93,111 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261112T0419Z-fp31-per-curve-cost-randomised",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 47,
+      "name": "rho_t1_friedman_ks_p",
+      "note": "p-value; effect suspected; S1 iso-closer 0.47 (not intrinsic)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 7.7e-07
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 47,
+      "name": "rho_between_curve_sd_log",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.00914
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 47,
+      "name": "ic3_t1_friedman_ks_p",
+      "note": "p-value; null supported",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.4828
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 48,
+      "name": "ic2_t1_friedman_ks_p",
+      "note": "p-value; null supported",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.6184
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 25696,
+      "name": "rho_positive_control_ratio",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0986
+    }
+  ],
   "problem": "ecdlp-per-curve-cost-isogeny-invariance",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 48859295,
+      "path": "research/fp31_whole_field_census_20261111/phase5/runs_phase5.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/7251910102f1f7caaec3407f113e3b5dbd42f9323de3ced157b326f549a48099",
+      "sha256": "7251910102f1f7caaec3407f113e3b5dbd42f9323de3ced157b326f549a48099",
+      "uploaded": false
+    },
+    {
+      "bytes": 14398,
+      "path": "research/fp31_whole_field_census_20261111/phase5/analysis_rho.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/3127210793de2d6d595070d9c839ba362d54094949354b480a381f3ae1a04f10",
+      "sha256": "3127210793de2d6d595070d9c839ba362d54094949354b480a381f3ae1a04f10",
+      "uploaded": false
+    },
+    {
+      "bytes": 13896,
+      "path": "research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6a4fa1441077bc244acf3e1a9dac87e1c218f0770db5d82e14dca6b5d0f4555f",
+      "sha256": "6a4fa1441077bc244acf3e1a9dac87e1c218f0770db5d82e14dca6b5d0f4555f",
+      "uploaded": false
+    },
+    {
+      "bytes": 13935,
+      "path": "research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/db/dbed1c05801e44e9088be40c76e58d503ee5194b146dc11e34951dcca511a823",
+      "sha256": "dbed1c05801e44e9088be40c76e58d503ee5194b146dc11e34951dcca511a823",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/fp31_whole_field_census_20261111/phase5/REPORT_PHASE5.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/fp31_whole_field_census_20261111/phase5/figures/phase5_summary.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "fp31-per-curve-cost-randomised",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Randomised-order per-curve cost across isogenous curves of F_(2^31-1), same planted k: IC ns per attempt null at m=3 and m=2; rho ns/GAE shows a ~0.9% SD per-model spread (KS p 7.7e-7) that does not follow the curve (iso-model closeness 0.47 = chance). 727/768 sessions; 41 refused at start (host busy).",
   "validation": null
 }

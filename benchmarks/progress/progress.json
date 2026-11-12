@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves",
+  "latest_record": "20261112T0419Z-fp31-per-curve-cost-randomised",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 112,
+    "measured": 113,
     "open": 0
   },
   "repo": "crypto",
@@ -641,6 +641,141 @@
       ],
       "problem": "ecdlp-ic-yield-isogeny-class-invariance",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 0.6184,
+      "latest": 0.6184,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ic2_t1_friedman_ks_p",
+      "points": [
+        {
+          "commit": "56e1371d6e6b",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 48,
+          "record": "20261112T0419Z-fp31-per-curve-cost-randomised",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Randomised-order per-curve cost across isogenous curves of F_(2^31-1), same planted k: IC ns per attempt null at m=3 and m=2; rho ns/GAE shows a ~0.9% SD per-model spread (KS p 7.7e-7) that does not follow the curve (iso-model closeness 0.47 = chance). 727/768 sessions; 41 refused at start (host busy).",
+          "value": 0.6184
+        }
+      ],
+      "problem": "ecdlp-per-curve-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.4828,
+      "latest": 0.4828,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ic3_t1_friedman_ks_p",
+      "points": [
+        {
+          "commit": "56e1371d6e6b",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 47,
+          "record": "20261112T0419Z-fp31-per-curve-cost-randomised",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Randomised-order per-curve cost across isogenous curves of F_(2^31-1), same planted k: IC ns per attempt null at m=3 and m=2; rho ns/GAE shows a ~0.9% SD per-model spread (KS p 7.7e-7) that does not follow the curve (iso-model closeness 0.47 = chance). 727/768 sessions; 41 refused at start (host busy).",
+          "value": 0.4828
+        }
+      ],
+      "problem": "ecdlp-per-curve-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.00914,
+      "latest": 0.00914,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "rho_between_curve_sd_log",
+      "points": [
+        {
+          "commit": "56e1371d6e6b",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 47,
+          "record": "20261112T0419Z-fp31-per-curve-cost-randomised",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Randomised-order per-curve cost across isogenous curves of F_(2^31-1), same planted k: IC ns per attempt null at m=3 and m=2; rho ns/GAE shows a ~0.9% SD per-model spread (KS p 7.7e-7) that does not follow the curve (iso-model closeness 0.47 = chance). 727/768 sessions; 41 refused at start (host busy).",
+          "value": 0.00914
+        }
+      ],
+      "problem": "ecdlp-per-curve-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0986,
+      "latest": 1.0986,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "rho_positive_control_ratio",
+      "points": [
+        {
+          "commit": "56e1371d6e6b",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 25696,
+          "record": "20261112T0419Z-fp31-per-curve-cost-randomised",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Randomised-order per-curve cost across isogenous curves of F_(2^31-1), same planted k: IC ns per attempt null at m=3 and m=2; rho ns/GAE shows a ~0.9% SD per-model spread (KS p 7.7e-7) that does not follow the curve (iso-model closeness 0.47 = chance). 727/768 sessions; 41 refused at start (host busy).",
+          "value": 1.0986
+        }
+      ],
+      "problem": "ecdlp-per-curve-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 7.7e-07,
+      "latest": 7.7e-07,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "rho_t1_friedman_ks_p",
+      "points": [
+        {
+          "commit": "56e1371d6e6b",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 47,
+          "record": "20261112T0419Z-fp31-per-curve-cost-randomised",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Randomised-order per-curve cost across isogenous curves of F_(2^31-1), same planted k: IC ns per attempt null at m=3 and m=2; rho ns/GAE shows a ~0.9% SD per-model spread (KS p 7.7e-7) that does not follow the curve (iso-model closeness 0.47 = chance). 727/768 sessions; 41 refused at start (host busy).",
+          "value": 7.7e-07
+        }
+      ],
+      "problem": "ecdlp-per-curve-cost-isogeny-invariance",
+      "unit": "ratio"
     },
     {
       "better": "higher",

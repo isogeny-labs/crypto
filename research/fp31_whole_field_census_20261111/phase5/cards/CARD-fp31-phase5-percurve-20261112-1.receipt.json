@@ -1,0 +1,185 @@
+{
+  "card_id": "CARD-fp31-phase5-percurve-20261112-1",
+  "card_path": "research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.yaml",
+  "card_sha256": "9e90a1f34840216a9fcbed6ce89ef18ab7bc72f120baa808a9127b3748a7ede8",
+  "commands": [
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase5/run_phase5.sh",
+        "target/release/ecbench",
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase5/runs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 13667.371,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "run-phase5",
+      "index": 1,
+      "outputs": {},
+      "pid_file": "research/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.run/01-run-phase5.pid.json",
+      "seconds": 13667.371,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "73dabfed5375b8dc032231db58e3ae8fdbcf6fb71b3ab93802a0172bfda4f0a9",
+      "stdout_tail": [
+        "ok c054 ic2 s0 41s",
+        "ok c054 ic2 s1 41s",
+        "ok c054 ic2 s2 43s",
+        "ok c054 ic2 s3 41s",
+        "ok c055 rho s0 9s",
+        "ok c055 rho s1 8s",
+        "ok c055 rho s2 9s",
+        "ok c055 rho s3 9s",
+        "ok c055 rho s4 9s",
+        "ok c055 rho s5 8s",
+        "ok c055 rho s6 9s",
+        "ok c055 rho s7 8s",
+        "ok c055 ic3 s0 46s",
+        "ok c055 ic3 s1 47s",
+        "ok c055 ic3 s2 46s",
+        "ok c055 ic3 s3 47s",
+        "ok c055 ic2 s0 41s",
+        "ok c055 ic2 s1 41s",
+        "ok c055 ic2 s2 42s",
+        "ok c055 ic2 s3 42s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "p5-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase5/runs",
+        "--kind",
+        "rho",
+        "--sessions",
+        "8",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase5/analysis_rho.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.208,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "analyze-rho",
+      "index": 2,
+      "outputs": {
+        "research/fp31_whole_field_census_20261111/phase5/analysis_rho.json": "3127210793de2d6d595070d9c839ba362d54094949354b480a381f3ae1a04f10"
+      },
+      "seconds": 2.208,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "p5-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase5/runs",
+        "--kind",
+        "ic3",
+        "--sessions",
+        "4",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.389,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "analyze-ic3",
+      "index": 3,
+      "outputs": {
+        "research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json": "6a4fa1441077bc244acf3e1a9dac87e1c218f0770db5d82e14dca6b5d0f4555f"
+      },
+      "seconds": 0.389,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census",
+        "p5-analyze",
+        "--classes",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "--runs",
+        "research/fp31_whole_field_census_20261111/phase5/runs",
+        "--kind",
+        "ic2",
+        "--sessions",
+        "4",
+        "--out",
+        "research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.415,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "analyze-ic2",
+      "index": 4,
+      "outputs": {
+        "research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json": "dbed1c05801e44e9088be40c76e58d503ee5194b146dc11e34951dcca511a823"
+      },
+      "seconds": 0.415,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "5f8552da4ca3bbddbd4c1f572db3fbb40b3985dc",
+  "dirty_after": [
+    "research/fp31_whole_field_census_20261111/phase5/analysis_ic2.json",
+    "research/fp31_whole_field_census_20261111/phase5/analysis_ic3.json",
+    "research/fp31_whole_field_census_20261111/phase5/analysis_rho.json"
+  ],
+  "dirty_before": [
+    "esearch/fp31_whole_field_census_20261111/phase5/cards/CARD-fp31-phase5-percurve-20261112-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
