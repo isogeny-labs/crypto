@@ -2280,8 +2280,11 @@ fn lazy_simd_kind() -> u8 {
     }
 }
 
+/// One lazy update `acc += factor · pivot` over `from..`, uncounted: the
+/// caller adds the row operations (`acc.len() - from` an update) to the
+/// counters once for all it did.
 #[inline]
-fn add_lazy(acc: &mut [u64], pivot: &[u32], from: usize, factor: u64, simd: u8) {
+fn add_lazy_uncounted(acc: &mut [u64], pivot: &[u32], from: usize, factor: u64, simd: u8) {
     debug_assert_eq!(acc.len(), pivot.len());
     #[cfg(target_arch = "x86_64")]
     if simd == 0 {
@@ -2298,7 +2301,6 @@ fn add_lazy(acc: &mut [u64], pivot: &[u32], from: usize, factor: u64, simd: u8) 
         let _ = simd;
         add_lazy_scalar(acc, pivot, from, factor);
     }
-    count_ops(acc.len() - from);
 }
 
 #[inline]
@@ -2334,10 +2336,14 @@ fn reduce_lazy_by(
     pending: &mut usize,
 ) {
     const NORMALIZE_AFTER: usize = 256;
+    // one count for the whole pass, on this thread: the same total as one
+    // per update
+    let mut ops = 0usize;
     for (c, pivot) in known {
         let f = fp.reduce(acc[*c]);
         if f != 0 {
-            add_lazy(acc, pivot, *c, fp.p - f, simd);
+            add_lazy_uncounted(acc, pivot, *c, fp.p - f, simd);
+            ops += acc.len() - *c;
             *pending += 1;
             if *pending == NORMALIZE_AFTER {
                 normalize_lazy(acc, fp);
@@ -2345,6 +2351,7 @@ fn reduce_lazy_by(
             }
         }
     }
+    count_ops(ops);
 }
 
 /// Row-oriented RREF.  Each row keeps a 64-bit scratch accumulator while
@@ -2496,6 +2503,7 @@ fn reduce_pairs_fl(
     let against_finished = |k: usize, block_start: usize, bprime: &Vec<Vec<u32>>| {
         let mut acc = vec![0u64; n_free];
         let mut pending = 0usize;
+        let mut ops = 0usize;
         let mut later: Vec<(usize, u64)> = Vec::new();
         for &(c, v) in &reducers[k][1..] {
             let fi = free_index[c as usize];
@@ -2504,7 +2512,8 @@ fn reduce_pairs_fl(
             } else {
                 let j = reducer_at[c as usize] as usize;
                 if position[j] < block_start {
-                    add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
+                    add_lazy_uncounted(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
+                    ops += n_free - bstart[j];
                     pending += 1;
                     if pending == NORMALIZE_AFTER {
                         normalize_lazy(&mut acc, fp);
@@ -2515,6 +2524,7 @@ fn reduce_pairs_fl(
                 }
             }
         }
+        count_ops(ops);
         (acc, pending, later)
     };
     for block in order.chunks(FL_BLOCK) {
@@ -2537,15 +2547,18 @@ fn reduce_pairs_fl(
             };
         for (&k, (acc, pending, later)) in block.iter().zip(partial.iter_mut()) {
             // in-block dependencies are earlier in the block, so finished
+            let mut ops = 0usize;
             for &(j, v) in later.iter() {
                 debug_assert!(position[j] < position[k]);
-                add_lazy(acc, &bprime[j], bstart[j], fp.p - v, simd);
+                add_lazy_uncounted(acc, &bprime[j], bstart[j], fp.p - v, simd);
+                ops += n_free - bstart[j];
                 *pending += 1;
                 if *pending == NORMALIZE_AFTER {
                     normalize_lazy(acc, fp);
                     *pending = 0;
                 }
             }
+            count_ops(ops);
             bprime[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
         }
     }
@@ -2567,13 +2580,15 @@ fn reduce_pairs_fl(
         }
         let mut acc = vec![0u64; n_free];
         let mut pending = 0usize;
+        let mut ops = 0usize;
         for &(c, v) in r {
             let fi = free_index[c as usize];
             if fi != NONE {
                 acc[fi as usize] += v;
             } else {
                 let j = reducer_at[c as usize] as usize;
-                add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
+                add_lazy_uncounted(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
+                ops += n_free - bstart[j];
                 pending += 1;
                 if pending == NORMALIZE_AFTER {
                     normalize_lazy(&mut acc, fp);
@@ -2581,6 +2596,7 @@ fn reduce_pairs_fl(
                 }
             }
         }
+        count_ops(ops);
         Some(acc.iter().map(|&x| fp.reduce(x) as u32).collect())
     };
     if pair_rows.len() * n_free > PAR_WORK {
