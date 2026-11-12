@@ -17,10 +17,10 @@
 //! sizes come from `measure_refutation_degree` on the same instance. One JSON
 //! row per `n`; the layout and reading live in the study directory.
 
-use crypto::cryptanalysis::ffd_harness::{
+use crypto_lib::cryptanalysis::ffd_harness::{
     choose_irreducible, random_nonzero_f2m, weil_descend_s3, F2BoolPoly,
 };
-use crypto::cryptanalysis::pc_degree_harness::{
+use crypto_lib::cryptanalysis::pc_degree_harness::{
     is_decomposable, measure_refutation_degree, restrict_to_subspace,
 };
 use hashed_ecdl_tensor::treewidth::{analyse, Analysis, PrimalGraph};
@@ -210,6 +210,16 @@ fn summarise(analysis: &Analysis) -> Value {
     .into_iter()
     .flatten()
     .min();
+    let log2_cost_best = [
+        Some(&analysis.min_degree),
+        analysis.min_fill.as_ref(),
+        analysis.min_fill_lazy.as_ref(),
+    ]
+    .into_iter()
+    .flatten()
+    .filter(|r| Some(r.width) == upper)
+    .map(|r| r.log2_cost)
+    .fold(f64::INFINITY, f64::min);
     json!({
         "lower_bound": analysis.lower_bound,
         "upper_bound": upper,
@@ -218,16 +228,7 @@ fn summarise(analysis: &Analysis) -> Value {
         "min_fill_lazy": analysis.min_fill_lazy.as_ref().map(|r| r.width),
         "core_variables": analysis.core_variables,
         "exact": analysis.exact,
-        "log2_cost_best": [
-            Some(&analysis.min_degree),
-            analysis.min_fill.as_ref(),
-            analysis.min_fill_lazy.as_ref(),
-        ]
-        .into_iter()
-        .flatten()
-        .filter(|r| Some(r.width) == upper)
-        .map(|r| r.log2_cost)
-        .fold(f64::INFINITY, f64::min),
+        "log2_cost_best": log2_cost_best,
     })
 }
 
@@ -286,6 +287,12 @@ fn run() -> Result<(), String> {
         let refutation = if options.refutation {
             let started = Instant::now();
             let row = measure_refutation_degree(n, n_sub, &irr, &b, &x3, options.d_max);
+            let log2_columns = row.refutation_degree.map(|d| {
+                (0..=u64::from(d))
+                    .map(|k| 2f64.powf(log2_binomial(u64::from(num_vars), k)))
+                    .sum::<f64>()
+                    .log2()
+            });
             let macaulay: Vec<Value> = row
                 .per_degree
                 .iter()
@@ -302,9 +309,7 @@ fn run() -> Result<(), String> {
                 "refutation_degree": row.refutation_degree,
                 "decomposable": row.decomposable,
                 "macaulay": macaulay,
-                "log2_columns_at_refutation": row.refutation_degree.map(|d| {
-                    (0..=u64::from(d)).map(|k| 2f64.powf(log2_binomial(u64::from(num_vars) + 0, k))).sum::<f64>().log2()
-                }),
+                "log2_columns_at_refutation": log2_columns,
                 "seconds": started.elapsed().as_secs_f64(),
             })
         } else {
