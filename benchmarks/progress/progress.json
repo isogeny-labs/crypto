@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0419Z-fp31-per-curve-cost-randomised",
+  "latest_record": "20261112T0607Z-ic-paired-inverse-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 127,
+    "measured": 128,
     "open": 0
   },
   "repo": "crypto",
@@ -5748,6 +5748,126 @@
       ],
       "problem": "ic:koblitz-chain-s3-arity-m5m6",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 1.0396859786646675,
+      "latest": 1.0396859786646675,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_unpaired_over_paired_k0n53",
+      "points": [
+        {
+          "commit": "5898bc67ccbc",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261112T0607Z-ic-paired-inverse-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.018972164497682,
+            1.0585977436531506
+          ],
+          "summary": "Lever 2 (one inverse per \u00b1 twin pair): collect 1.040 [1.019,1.059] faster at 2^44.3, established against its A/A; 1.027 [1.000,1.056] at 2^47.2 and whole set-up not established; outputs identical; local Intel Xeon container. Not an admitted row (component result, not validated).",
+          "value": 1.0396859786646675
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0266897870989415,
+      "latest": 1.0266897870989415,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_unpaired_over_paired_k0n61",
+      "points": [
+        {
+          "commit": "5898bc67ccbc",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261112T0607Z-ic-paired-inverse-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0000123126872953,
+            1.0560457710618893
+          ],
+          "summary": "Lever 2 (one inverse per \u00b1 twin pair): collect 1.040 [1.019,1.059] faster at 2^44.3, established against its A/A; 1.027 [1.000,1.056] at 2^47.2 and whole set-up not established; outputs identical; local Intel Xeon container. Not an admitted row (component result, not validated).",
+          "value": 1.0266897870989415
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0403928372262723,
+      "latest": 1.0403928372262723,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_unpaired_over_paired_k0n53",
+      "points": [
+        {
+          "commit": "5898bc67ccbc",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261112T0607Z-ic-paired-inverse-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9840425992028529,
+            1.077538655525699
+          ],
+          "summary": "Lever 2 (one inverse per \u00b1 twin pair): collect 1.040 [1.019,1.059] faster at 2^44.3, established against its A/A; 1.027 [1.000,1.056] at 2^47.2 and whole set-up not established; outputs identical; local Intel Xeon container. Not an admitted row (component result, not validated).",
+          "value": 1.0403928372262723
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0228690328553112,
+      "latest": 1.0228690328553112,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_unpaired_over_paired_k0n61",
+      "points": [
+        {
+          "commit": "5898bc67ccbc",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261112T0607Z-ic-paired-inverse-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9909990479013427,
+            1.0494850935003033
+          ],
+          "summary": "Lever 2 (one inverse per \u00b1 twin pair): collect 1.040 [1.019,1.059] faster at 2^44.3, established against its A/A; 1.027 [1.000,1.056] at 2^47.2 and whole set-up not established; outputs identical; local Intel Xeon container. Not an admitted row (component result, not validated).",
+          "value": 1.0228690328553112
+        }
+      ],
+      "problem": "ic:koblitz_collect_phase",
+      "unit": "ratio"
     },
     {
       "better": "lower",
