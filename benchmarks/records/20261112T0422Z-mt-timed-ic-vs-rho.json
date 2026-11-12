@@ -1,7 +1,19 @@
 {
   "branch": "aburan28/eloquent-bell-2jerrf",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/mt_timed_20261112/run.py",
+        "holdout"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T04:23:14+00:00",
+      "wall_s": 1661.924
+    }
+  ],
   "commit": "a992ed6c807eee6fa713176412e6475e19db7946",
   "commit_dirty": false,
   "created_utc": "2026-11-12T04:22:59+00:00",
@@ -17,9 +29,160 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261112T0422Z-mt-timed-ic-vs-rho",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_24b_t1024",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7651,
+        0.9224
+      ],
+      "unit": "ratio",
+      "value": 0.7777
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_24b_t4096",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7528,
+        0.8209
+      ],
+      "unit": "ratio",
+      "value": 0.7923
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_24b_t16384",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.811,
+        0.8719
+      ],
+      "unit": "ratio",
+      "value": 0.8288
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_28b_t1024",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.869,
+        0.9672
+      ],
+      "unit": "ratio",
+      "value": 0.9319
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_28b_t4096",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9868,
+        1.1005
+      ],
+      "unit": "ratio",
+      "value": 1.0533
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_28b_t16384",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9535,
+        1.193
+      ],
+      "unit": "ratio",
+      "value": 1.0072
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_32b_t1024",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0486,
+        1.2115
+      ],
+      "unit": "ratio",
+      "value": 1.1144
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_32b_t4096",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1161,
+        1.3033
+      ],
+      "unit": "ratio",
+      "value": 1.2026
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 4,
+      "name": "icbest_over_rhobest_walltime_solve_32b_t16384",
+      "note": "solve-phase wall time, median per-config ratio, bootstrap 95%; session VM, diagnostic; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2688,
+        1.3194
+      ],
+      "unit": "ratio",
+      "value": 1.2885
+    }
+  ],
   "problem": "ic:multi-target-prime-w24-32",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 1357788,
+      "path": "research/mt_timed_20261112/results/holdout/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bdcfabf94f93c2a65f752fd00952f2abcad4cca701e26750f3c886d74ace2683",
+      "sha256": "bdcfabf94f93c2a65f752fd00952f2abcad4cca701e26750f3c886d74ace2683",
+      "uploaded": false
+    },
+    {
+      "bytes": 10264,
+      "path": "research/mt_timed_20261112/results/holdout/opcost.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/76bdb48972eb64872e5967d655edc7f9b86b5a8b9cde228e101ddb6e82eec702",
+      "sha256": "76bdb48972eb64872e5967d655edc7f9b86b5a8b9cde228e101ddb6e82eec702",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
