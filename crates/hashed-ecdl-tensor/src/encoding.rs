@@ -77,6 +77,16 @@ impl MultiplicationParameters {
     }
 }
 
+/// Integer multiplication gadget used inside `modular_multiply`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Multiplier {
+    /// Theorem 3's two-stage Fourier gadget: Θ(d) edges, vertex degree Θ(d^{3/4}).
+    #[default]
+    Fourier,
+    /// Schoolbook AND/ripple-adder gadget: Θ(d²) edges, every vertex of arity ≤ 5.
+    Schoolbook,
+}
+
 /// Words representing a point: one identity bit and canonical coordinates.
 #[derive(Clone, Debug)]
 pub struct PointWords {
@@ -99,11 +109,31 @@ pub struct Encoder {
     steps: Vec<Step>,
     interface: Vec<usize>,
     semantic_region: Option<String>,
+    multiplier: Multiplier,
 }
 impl Encoder {
     /// Start an empty encoding.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Choose the integer multiplication gadget behind `modular_multiply`.
+    /// The default is the manuscript's Fourier gadget; the schoolbook gadget
+    /// exists for finite contraction-width comparisons and changes no language.
+    pub fn set_multiplier(&mut self, multiplier: Multiplier) {
+        self.multiplier = multiplier;
+    }
+
+    /// The integer multiplication gadget currently selected.
+    pub fn multiplier(&self) -> Multiplier {
+        self.multiplier
+    }
+
+    fn multiply(&mut self, a: &Word, b: &Word, meter: &Meter) -> Result<Word> {
+        match self.multiplier {
+            Multiplier::Fourier => self.integer_multiply(a, b, meter),
+            Multiplier::Schoolbook => self.schoolbook_multiply(a, b, meter),
+        }
     }
 
     pub(crate) fn set_semantic_region(&mut self, region: &str) -> Result<()> {
@@ -837,9 +867,8 @@ impl Encoder {
         let z = witnesses.remove(0);
         let theta = witnesses.remove(0);
         self.canonical(&z, q, meter)?;
-        let product = self.integer_multiply(x, y, meter)?;
-        let quotient_product =
-            self.integer_multiply(&theta, &Self::constant(x.width(), q)?, meter)?;
+        let product = self.multiply(x, y, meter)?;
+        let quotient_product = self.multiply(&theta, &Self::constant(x.width(), q)?, meter)?;
         let sum = self.integer_add(&quotient_product, &Self::pad(&z, 2 * x.width())?, meter)?;
         self.assert_equal(&Self::pad(&product, sum.width())?, &sum, meter)?;
         Ok(z)
@@ -860,11 +889,21 @@ impl Encoder {
         meter.vector(width, "schoolbook row")?;
         let mut sum = Self::constant(width, &BigUint::zero())?;
         for j in 0..b.width() {
+            // Constant bits fold: a zero multiplier bit contributes no row, a
+            // one bit copies the multiplicand, and only signal pairs need an AND.
+            if matches!(b.0[j], Bit::Constant(false)) {
+                continue;
+            }
             let mut row = vec![Bit::Constant(false); width];
             for i in 0..a.width() {
-                row[i + j] = self
-                    .and(&Self::slice(a, i, 1), &Self::slice(b, j, 1), meter)?
-                    .0[0];
+                row[i + j] = match (a.0[i], b.0[j]) {
+                    (Bit::Constant(false), _) | (_, Bit::Constant(false)) => Bit::Constant(false),
+                    (Bit::Constant(true), other) | (other, Bit::Constant(true)) => other,
+                    (Bit::Signal(_), Bit::Signal(_)) => {
+                        self.and(&Self::slice(a, i, 1), &Self::slice(b, j, 1), meter)?
+                            .0[0]
+                    }
+                };
             }
             let next = self.integer_add(&sum, &Word(row), meter)?;
             self.assert_equal(
@@ -943,6 +982,118 @@ impl Encoder {
         let point = PointWords { infinity, x, y };
         self.valid_point(curve, &point, meter)?;
         Ok(point)
+    }
+
+    /// Free affine point of the small-x factor base `x < 2^low_bits`: only the
+    /// low `low_bits` of the abscissa are free signals, the rest are constant
+    /// zero, the identity bit is constant zero, and the curve equation is
+    /// enforced. The free words are allocated as `x` low bits, then `y`.
+    pub fn input_point_small_x(
+        &mut self,
+        curve: &Curve,
+        low_bits: usize,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let width = curve.modulus().bits() as usize;
+        if low_bits == 0 || low_bits > width {
+            return Err(invalid("small-x width"));
+        }
+        let low = self.input_word(low_bits, meter)?;
+        self.mark_interface(&low, meter)?;
+        let x = Self::pad(&low, width)?;
+        let y = self.input_word(width, meter)?;
+        self.mark_interface(&y, meter)?;
+        let point = PointWords {
+            infinity: Self::constant(1, &BigUint::zero())?,
+            x,
+            y,
+        };
+        self.valid_point(curve, &point, meter)?;
+        Ok(point)
+    }
+
+    /// Assert that a point is affine with `x < 2^low_bits` (small-x membership).
+    pub fn assert_small_x(
+        &mut self,
+        point: &PointWords,
+        low_bits: usize,
+        meter: &Meter,
+    ) -> Result<()> {
+        let width = point.x.width();
+        if low_bits == 0 || low_bits > width {
+            return Err(invalid("small-x width"));
+        }
+        self.assert_equal(
+            &point.infinity,
+            &Self::constant(1, &BigUint::zero())?,
+            meter,
+        )?;
+        let high = Self::slice(&point.x, low_bits, width - low_bits);
+        self.assert_equal(
+            &high,
+            &Self::constant(width - low_bits, &BigUint::zero())?,
+            meter,
+        )
+    }
+
+    /// Free abscissa of the small-x factor base, zero-padded to the field width
+    /// and marked as interface. No ordinate and no curve equation: the Semaev
+    /// gadgets below only need `x`.
+    pub fn input_small_x(&mut self, curve: &Curve, low_bits: usize, meter: &Meter) -> Result<Word> {
+        let width = curve.modulus().bits() as usize;
+        if low_bits == 0 || low_bits > width {
+            return Err(invalid("small-x width"));
+        }
+        let low = self.input_word(low_bits, meter)?;
+        self.mark_interface(&low, meter)?;
+        Self::pad(&low, width)
+    }
+
+    /// Assert Semaev's third summation polynomial
+    /// `S3(x1,x2,x3) = (x1-x2)^2 x3^2 - 2((x1+x2)(x1 x2 + a) + 2b) x3 + (x1 x2 - a)^2 - 4b(x1+x2) = 0`
+    /// over `F_p` for the curve `y^2 = x^3 + a x + b`. The words are field-width
+    /// abscissae (constants allowed); every modular product goes through
+    /// `modular_multiply`, so the selected multiplier gadget is used. Four of
+    /// the seven products have two signal operands; the other three multiply by
+    /// a constant (`x3^2`, `x3` or `4b`) when `x3` is constant.
+    pub fn semaev_s3_zero(
+        &mut self,
+        curve: &Curve,
+        x1: &Word,
+        x2: &Word,
+        x3: &Word,
+        meter: &Meter,
+    ) -> Result<()> {
+        let p = curve.modulus();
+        let width = p.bits() as usize;
+        if x1.width() != width || x2.width() != width || x3.width() != width {
+            return Err(invalid("summation polynomial word widths"));
+        }
+        let two_b = (curve.b() << 1) % p;
+        let four_b = (curve.b() << 2) % p;
+        let a = Self::constant(width, curve.a())?;
+        // (x1 - x2)^2 * x3^2
+        let difference = self.modular_subtract(x1, x2, p, meter)?;
+        let difference_square = self.modular_multiply(&difference, &difference, p, meter)?;
+        let x3_square = self.modular_multiply(x3, x3, p, meter)?;
+        let term1 = self.modular_multiply(&difference_square, &x3_square, p, meter)?;
+        // 2 * ((x1 + x2)(x1 x2 + a) + 2b) * x3
+        let sum = self.modular_add(x1, x2, p, meter)?;
+        let product = self.modular_multiply(x1, x2, p, meter)?;
+        let product_a = self.modular_add(&product, &a, p, meter)?;
+        let inner = self.modular_multiply(&sum, &product_a, p, meter)?;
+        let inner = self.modular_add(&inner, &Self::constant(width, &two_b)?, p, meter)?;
+        let inner_x3 = self.modular_multiply(&inner, x3, p, meter)?;
+        let term2 = self.modular_add(&inner_x3, &inner_x3, p, meter)?;
+        // (x1 x2 - a)^2
+        let product_minus_a = self.modular_subtract(&product, &a, p, meter)?;
+        let term3 = self.modular_multiply(&product_minus_a, &product_minus_a, p, meter)?;
+        // 4b (x1 + x2)
+        let term4 = self.modular_multiply(&sum, &Self::constant(width, &four_b)?, p, meter)?;
+        // term1 + term3 == term2 + term4
+        let left = self.modular_add(&term1, &term3, p, meter)?;
+        let right = self.modular_add(&term2, &term4, p, meter)?;
+        self.assert_equal(&left, &right, meter)
     }
 
     /// Hardcode a canonical curve point.

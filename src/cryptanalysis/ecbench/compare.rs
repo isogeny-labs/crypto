@@ -92,6 +92,12 @@ use crate::cryptanalysis::ecbench::stats::{
     median, Linearised,
 };
 
+mod pooled;
+pub use pooled::{
+    compare_pooled, compare_pooled_loaded, PooledComparison, PooledRatio, PooledSession,
+    POOLED_COMPARISON_SCHEMA,
+};
+
 /// The v1 schema name.  Kept under this name for the readers that match on
 /// it (`db`, `calibration`); new comparisons are [`COMPARISON_SCHEMA_V2`].
 pub const COMPARISON_SCHEMA: &str = "ecbench.comparison/v1";

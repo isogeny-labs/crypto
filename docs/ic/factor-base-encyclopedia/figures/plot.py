@@ -57,6 +57,7 @@ def taxonomy():
             ("A11 isogeny-augmented, class nbrs", "refuted", False),
             ("A12 height box, degree-d maps", "open", False),
             ("A13 coset vs low-x/random (stage)", "refuted", False),
+            ("A14 hashed affine-threshold (tensor)", "refuted", False),
         ]),
         ("Extension fields E(F_{p^k})", [
             ("B1 Gaudry-Diem x in F_p, k=2..5", "refuted", False),
@@ -115,7 +116,7 @@ def taxonomy():
     handles = [plt.Rectangle((0, 0), 1, 1, fc=VERDICT_COLOR[k]) for k in VERDICT_LABEL]
     ax.legend(handles, list(VERDICT_LABEL.values()), loc="lower center", bbox_to_anchor=(0.5, 0.0),
               fontsize=9, frameon=False, title="recorded verdict (black border = flagship families, §0)")
-    ax.set_title("Factor-base families tried, by field regime\n(verdicts as recorded by each source; updated 2026-10-16)",
+    ax.set_title("Factor-base families tried, by field regime\n(verdicts as recorded by each source; updated 2026-11-12)",
                  fontsize=12)
     fig.tight_layout()
     fig.savefig(HERE / "taxonomy.svg")
