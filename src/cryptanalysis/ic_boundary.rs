@@ -3267,6 +3267,431 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
     }
 }
 
+/// One lane of [`rho_walk_lanes`]: the state [`TunedWalker::walk`] keeps in
+/// locals for one walk, plus the pending attempt of the current step.
+struct RhoLane<E> {
+    active: bool,
+    x: E,
+    a: u64,
+    b: u64,
+    key: u64,
+    h: u64,
+    /// The step's first jump and how many attempts it has made (the
+    /// look-ahead's rejections), as `j0` and `tried` in `TunedWalker::walk`.
+    j0: usize,
+    tried: usize,
+    last_escape: Option<u64>,
+    len: u64,
+    /// Walk operations this walk has spent (steps, look-ahead additions,
+    /// escape doublings): what [`WalkTally::lose`] books for a lost walk.
+    spent: u64,
+    ring_keys: Vec<u64>,
+    ring_states: Vec<(E, u64, u64)>,
+    ring_next: usize,
+}
+
+impl<E: Copy> RhoLane<E> {
+    fn idle(identity: E, window: usize) -> Self {
+        Self {
+            active: false,
+            x: identity,
+            a: 0,
+            b: 0,
+            key: 0,
+            h: 0,
+            j0: 0,
+            tried: 0,
+            last_escape: None,
+            len: 0,
+            spent: 0,
+            ring_keys: Vec::with_capacity(window),
+            ring_states: Vec::with_capacity(window),
+            ring_next: 0,
+        }
+    }
+
+    fn forget_recent(&mut self) {
+        self.ring_keys.clear();
+        self.ring_states.clear();
+        self.ring_next = 0;
+    }
+
+    fn remember(&mut self, window: usize, key: u64, x: E, a: u64, b: u64) {
+        if self.ring_keys.len() < window {
+            self.ring_keys.push(key);
+            self.ring_states.push((x, a, b));
+        } else {
+            self.ring_keys[self.ring_next] = key;
+            self.ring_states[self.ring_next] = (x, a, b);
+        }
+        self.ring_next = if self.ring_next + 1 == window {
+            0
+        } else {
+            self.ring_next + 1
+        };
+    }
+
+    fn recent_entry(&self, window: usize, i: usize) -> (u64, E, u64, u64) {
+        let len = self.ring_keys.len();
+        let oldest = if len < window { 0 } else { self.ring_next };
+        let slot = (oldest + i) % window;
+        let (x, a, b) = self.ring_states[slot];
+        (self.ring_keys[slot], x, a, b)
+    }
+
+    fn recent_position(&self, window: usize, key: u64) -> Option<usize> {
+        let hit = self
+            .ring_keys
+            .iter()
+            .fold(false, |any, &k| any | (k == key));
+        if !hit {
+            return None;
+        }
+        (0..self.ring_keys.len()).find(|&i| self.recent_entry(window, i).0 == key)
+    }
+
+    /// End this walk without a distinguished point, booking what it spent.
+    fn lose(&mut self, tally: &mut WalkTally, how: LostHow) {
+        match how {
+            LostHow::Identity => tally.lost_identity += self.spent,
+            LostHow::Abandoned => tally.lost_abandoned += self.spent,
+            LostHow::Capped => tally.lost_capped += self.spent,
+            LostHow::Budget => tally.lost_budget += self.spent,
+        }
+        self.active = false;
+    }
+}
+
+/// Lanes [`rho_walk_lanes`] runs when the caller gives none.
+pub const RHO_LANES_DEFAULT: usize = 32;
+
+/// **`rho.negation_lanes_v1`: the tuned walk in lock-step lanes, one batched
+/// inversion a round.**
+///
+/// The set-up is [`rho_walk_with_policy`]'s under [`WalkPolicy::legacy`],
+/// draw for draw: `G + Q`, the jump table `M_j = [a_j]G + [b_j]Q`, and the
+/// start stride `T` (the same operations, charged the same way).  Each walk
+/// is [`TunedWalker::walk`]'s, step for step: canonical representatives,
+/// the Wiener–Zuccherato look-ahead, the 16-point cycle window with its
+/// escape by doubling the least-key member, the distinguished-point rule
+/// and the walk cap.  Walk `k` starts at `[k]T` as there.
+///
+/// What differs is the schedule.  `lanes` walks advance together: each
+/// round every active lane asks for one addition `X + M_j`, and the round's
+/// additions go through [`CountedGroup::native_lane_walk_adder`] with
+/// `batched = true`, which shares one field inversion among all of them
+/// (Montgomery's trick).  A lane that reaches a distinguished point, loses
+/// its walk, or is rejected by the look-ahead is handled at once, in lane
+/// order; a finished lane takes the next start `[k]T` before the next round.
+/// The distinguished points therefore arrive in another order than in the
+/// serial walk, so the same seed solves after a different number of steps:
+/// this is a new method, not a faster `rho.negation`.
+///
+/// **Counted unit.**  `S` is charged exactly as for `rho.negation`: one
+/// group operation per walk step, per look-ahead rejection (an addition
+/// that was computed and discarded) and per escape doubling, plus the
+/// set-up, the starts and the final check `[d]G`.  A step whose addition
+/// was computed in a round that the solve ended in the middle of is charged
+/// too (it was performed).  The field-operation tally is the batched one
+/// the adder books: per round with `k` ordinary additions, one inversion
+/// and `3k + 1` multiplications, plus `2M + 1S` an addition, and `2M` for
+/// each conversion of a point into Montgomery form (`montgomery_conversions`
+/// counts the conversions back, uncharged).  Escapes, starts, set-up and
+/// the check use the serial group law and its tally.
+///
+/// Requires a group with a native lane adder (prime curves with
+/// `p < 2^prime_fast::MAX_BITS`) and at most 16 jumps (the adder's slots).
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_lanes<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    walk: RhoWalk,
+    lanes: usize,
+) -> Result<RhoResult, String> {
+    if !(1..=4096).contains(&lanes) {
+        return Err(format!("lanes must be 1..=4096, not {lanes}"));
+    }
+    let mut adder = g
+        .native_lane_walk_adder(true)
+        .ok_or("the lane walk needs a native lane adder (a prime curve with p below prime_fast::MAX_BITS bits)")?;
+    let start = Instant::now();
+    let mut ops = GroupOps::default();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let shape = WalkShape::of(r, walk);
+    if shape.jumps > 16 {
+        return Err(format!(
+            "the lane adder holds 16 jump slots; this walk has {} jumps",
+            shape.jumps
+        ));
+    }
+    let short = r.min(1u64 << shape.coefficient_bits).max(2);
+
+    // Set-up: rho_walk_with_policy's under WalkPolicy::legacy(), draw for draw.
+    let gq = g.add(&mut ops, generator, target);
+    let jumps: Vec<(G::Elt, u64, u64)> = (0..shape.jumps)
+        .map(|_| {
+            let a = rng.gen_range(1..short);
+            let b = rng.gen_range(1..short);
+            (
+                joint_mul(g, &mut ops, generator, target, gq, a, b),
+                a % r,
+                b % r,
+            )
+        })
+        .collect();
+    let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
+    let mut stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+    while g.is_identity(&stride) {
+        ta = rng.gen_range(1..r.max(2));
+        tb = rng.gen_range(1..r.max(2));
+        stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+    }
+    let setup = ops;
+
+    let jump_count = shape.jumps;
+    let index_of = |h: u64| -> usize {
+        let n = jump_count as u64;
+        let h = h >> 24;
+        (if n.is_power_of_two() {
+            h & (n - 1)
+        } else {
+            h % n
+        }) as usize
+    };
+    let look_ahead = walk.look_ahead && !classes.trivial();
+    let window = walk.cycle_window;
+    let automorphisms = classes.automorphisms();
+    let expected = generic_floor_ops(r as f64, automorphisms as f64);
+    let mut table: FastMap<(u64, u64)> = fast_map(1024);
+    let mut tally = WalkTally::default();
+    let (mut walks, mut dps, mut start_adds, mut fresh_starts) = (0u64, 0u64, 0u64, 0u64);
+    let (mut useless, mut verification_ops, mut rounds) = (0u64, 0u64, 0u64);
+    let mut recovered = None;
+    let (mut sx, mut sa, mut sb) = (stride, ta % r, tb % r);
+    let mut lane: Vec<RhoLane<G::Elt>> = (0..lanes)
+        .map(|_| RhoLane::idle(g.identity(), window))
+        .collect();
+    let mut requests: Vec<(usize, G::Elt, G::Elt, usize)> = Vec::with_capacity(lanes);
+    let mut outputs: Vec<G::Elt> = Vec::with_capacity(lanes);
+
+    'search: loop {
+        // Every idle lane takes the next start `[k]T`, in lane order, while
+        // the budget lasts (rho_search_from's loop condition).
+        for l in lane.iter_mut() {
+            while !l.active && tally.walk_ops() < max_steps && walks < max_steps {
+                walks += 1;
+                fresh_starts += 1;
+                if fresh_starts > 1 {
+                    sx = g.add(&mut ops, sx, stride);
+                    sa = addmod(sa, ta, r);
+                    sb = addmod(sb, tb, r);
+                    start_adds += 1;
+                }
+                if g.is_identity(&sx) {
+                    continue;
+                }
+                let (x, a, b, _) = rho_canon(
+                    g,
+                    classes,
+                    &mut ops,
+                    sx,
+                    sa,
+                    sb,
+                    r,
+                    &mut tally.canonicalisations,
+                );
+                l.active = true;
+                l.x = x;
+                l.a = a;
+                l.b = b;
+                l.key = g.key(&x);
+                l.h = mix(l.key);
+                l.j0 = index_of(l.h);
+                l.tried = 0;
+                l.last_escape = None;
+                l.len = 0;
+                l.spent = 0;
+                l.forget_recent();
+            }
+        }
+        requests.clear();
+        for (i, l) in lane.iter().enumerate() {
+            if l.active {
+                // `j0` and `tried` are below `jump_count`.
+                let j = if l.j0 + l.tried >= jump_count {
+                    l.j0 + l.tried - jump_count
+                } else {
+                    l.j0 + l.tried
+                };
+                requests.push((i, l.x, jumps[j].0, j));
+            }
+        }
+        if requests.is_empty() {
+            break;
+        }
+        rounds += 1;
+        adder(&mut ops, &requests, &mut outputs);
+        for (k, &(i, _, _, j)) in requests.iter().enumerate() {
+            let l = &mut lane[i];
+            let (_, aj, bj) = jumps[j];
+            let (y, ya, yb, flipped) = rho_canon(
+                g,
+                classes,
+                &mut ops,
+                outputs[k],
+                addmod(l.a, aj, r),
+                addmod(l.b, bj, r),
+                r,
+                &mut tally.canonicalisations,
+            );
+            l.tried += 1;
+            l.spent += 1;
+            let ky = g.key(&y);
+            let hy = mix(ky);
+            if look_ahead
+                && flipped
+                && l.tried < jump_count
+                && !g.is_identity(&y)
+                && index_of(hy) == j
+            {
+                tally.look_ahead_adds += 1;
+                continue;
+            }
+            l.x = y;
+            l.a = ya;
+            l.b = yb;
+            l.key = ky;
+            l.h = hy;
+            tally.steps += 1;
+            l.len += 1;
+            if g.is_identity(&l.x) {
+                l.lose(&mut tally, LostHow::Identity);
+                continue;
+            }
+            if window > 0 {
+                tally.window_word_ops += l.ring_keys.len() as u64;
+                if let Some(pos) = l.recent_position(window, l.key) {
+                    let c = l.ring_keys.len() - pos;
+                    tally.window_word_ops += (pos as u64 + 1) + (c as u64 - 1) + 1;
+                    match c {
+                        2 => tally.cycles_2 += 1,
+                        4 => tally.cycles_4 += 1,
+                        _ => tally.cycles_other += 1,
+                    }
+                    let (min_key, mp, ma, mb) = (pos..l.ring_keys.len())
+                        .map(|e| l.recent_entry(window, e))
+                        .min_by_key(|e| e.0)
+                        .expect("a cycle has members");
+                    if l.last_escape == Some(min_key) {
+                        tally.abandoned += 1;
+                        l.lose(&mut tally, LostHow::Abandoned);
+                        continue;
+                    }
+                    l.last_escape = Some(min_key);
+                    let d2 = g.double(&mut ops, mp);
+                    tally.escapes += 1;
+                    l.spent += 1;
+                    let (e, ea, eb, _) = rho_canon(
+                        g,
+                        classes,
+                        &mut ops,
+                        d2,
+                        addmod(ma, ma, r),
+                        addmod(mb, mb, r),
+                        r,
+                        &mut tally.canonicalisations,
+                    );
+                    l.x = e;
+                    l.a = ea;
+                    l.b = eb;
+                    l.key = g.key(&l.x);
+                    l.h = mix(l.key);
+                    l.forget_recent();
+                    if g.is_identity(&l.x) {
+                        l.lose(&mut tally, LostHow::Identity);
+                        continue;
+                    }
+                }
+                tally.window_word_ops += 2;
+                let (key, x, a, b) = (l.key, l.x, l.a, l.b);
+                l.remember(window, key, x, a, b);
+            }
+            if l.h & shape.dp_mask == 0 {
+                l.active = false;
+                dps += 1;
+                let (x, a, b) = (l.x, l.a, l.b);
+                let key = g.key(&x);
+                match table.get(&key) {
+                    Some(&(a2, b2)) => {
+                        if b2 != b {
+                            let num = submod(a, a2, r);
+                            let den = submod(b2, b, r);
+                            if let Some(inv) = invmod(den, r) {
+                                let d = mulmod(num, inv, r);
+                                let before = ops.gae();
+                                let check = g.mul(&mut ops, generator, d);
+                                verification_ops += (ops.gae() - before) as u64;
+                                if check == target {
+                                    recovered = Some(d);
+                                    break 'search;
+                                }
+                            }
+                        }
+                        useless += 1;
+                    }
+                    None => {
+                        table.insert(key, (a, b));
+                    }
+                }
+                continue;
+            }
+            if l.len > shape.walk_cap {
+                tally.capped += 1;
+                l.lose(&mut tally, LostHow::Capped);
+                continue;
+            }
+            if tally.walk_ops() >= max_steps {
+                l.lose(&mut tally, LostHow::Budget);
+                continue;
+            }
+            l.j0 = index_of(l.h);
+            l.tried = 0;
+        }
+    }
+    let wall_ns = start.elapsed().as_nanos() as u64;
+    let gae = ops.gae();
+    let walked = tally.walk_ops();
+    let mut counters = tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
+    counters.insert("lanes".into(), lanes as u64);
+    counters.insert("lane_rounds".into(), rounds);
+    counters.insert(
+        "montgomery_conversions_uncharged".into(),
+        ops.montgomery_reductions,
+    );
+    Ok(RhoResult {
+        method: format!("{}_lanes", classes.method()),
+        automorphisms,
+        group_ops: ops,
+        steps: tally.steps,
+        walks,
+        distinguished_points: dps,
+        gae,
+        s: gae / (r as f64).sqrt(),
+        s_walk: walked as f64 / (r as f64).sqrt(),
+        expected_steps: expected,
+        steps_over_expected: walked as f64 / expected,
+        wall_ns,
+        verified: recovered.is_some(),
+        recovered,
+        work_native: tally.work_native(),
+        counters,
+    })
+}
 /// How [`rho_walk_v3`] builds its table.
 ///
 /// The legacy walks pay about `1.75·w` operations a jump (a joint

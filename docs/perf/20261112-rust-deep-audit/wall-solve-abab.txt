@@ -1,0 +1,15 @@
+== A/A base vs base, bsgs32 solve wall, 20 runs/round | load before 3.22 4.83 5.21 | after 3.29 4.82 5.20
+A: min 310 ms, median 322 ms all: 353 347 322 317 310
+B: min 319 ms, median 339 ms all: 351 357 339 329 319
+== B1 R13: base vs b1, bsgs32 solve wall | load before 3.29 4.82 5.20 | after 3.29 4.82 5.20
+A: min 304 ms, median 318 ms all: 338 304 318 330 314
+B: min 283 ms, median 293 ms all: 300 293 283 294 288
+== B2: b1 vs b2, kangaroo32 solve wall | load before 3.29 4.82 5.20 | after 3.42 4.82 5.20
+A: min 324 ms, median 351 ms all: 351 324 371 344 369
+B: min 328 ms, median 343 ms all: 343 328 339 363 346
+== A/A b1 vs b1, kangaroo32 solve wall | load before 3.42 4.82 5.20 | after 3.39 4.79 5.19
+A: min 333 ms, median 355 ms all: 346 355 361 358 333
+B: min 340 ms, median 351 ms all: 357 351 340 349 360
+== C1: rho.negation (base) vs lanes_v1 lanes=32 (c), rho 32-bit solve wall | load before 3.39 4.79 5.19 | after 3.36 4.76 5.17
+A: min 240 ms, median 257 ms all: 260 257 252 262 240
+B: min 128 ms, median 132 ms all: 131 143 146 132 128
