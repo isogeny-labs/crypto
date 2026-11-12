@@ -4606,7 +4606,19 @@ impl PackedSet {
 /// The index of the first of `lms`, other than `skip`, that divides `x`.
 fn first_divisor(lms: &[u128], skip: usize, x: u128) -> Option<usize> {
     let cut = skip.min(lms.len());
-    let find = |part: &[u128]| part.iter().position(|&l| packed_divides(l, x));
+    // [`packed_divides`] on the two halves: every field of a lead is at
+    // most 127 (or `SET_NEVER`'s 128, which `x | guard` still covers), so
+    // no field of `(x | guard) − l` borrows, nor does either half as a
+    // whole, and the halves can be tested together without the 128-bit
+    // borrow chain.
+    const G: u64 = PACKED_GUARD as u64;
+    let (xl, xh) = ((x as u64) | G, ((x >> 64) as u64) | G);
+    let find = |part: &[u128]| {
+        part.iter().position(|&l| {
+            let (ll, lh) = (l as u64, (l >> 64) as u64);
+            xl.wrapping_sub(ll) & xh.wrapping_sub(lh) & G == G
+        })
+    };
     find(&lms[..cut]).or_else(|| {
         let rest = lms.get(cut + 1..)?;
         find(rest).map(|j| cut + 1 + j)
@@ -6823,6 +6835,34 @@ mod packed_set_tests {
         assert_eq!(first_divisor(&lms[..3], 2, lm(&[0, 5])), None);
         assert_eq!(first_divisor(&lms, 4, lm(&[0, 5])), None);
         assert_eq!(first_divisor(&[], 0, x), None);
+    }
+
+    /// The half-word divisibility scan agrees with [`packed_divides`] on
+    /// random leads (exponents up to 127, bytes of both halves, and
+    /// `SET_NEVER`) and every `skip`.
+    #[test]
+    fn first_divisor_agrees_with_packed_divides() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(17);
+        for round in 0..200 {
+            let max = [1u32, 2, 3, 127][round % 4];
+            let word = |rng: &mut rand::rngs::StdRng| {
+                let e: Vec<u32> = (0..16).map(|_| rng.gen_range(0..=max)).collect();
+                set_pack(&e).unwrap()
+            };
+            let mut lms: Vec<u128> = (0..40).map(|_| word(&mut rng)).collect();
+            lms[rng.gen_range(0..40)] = SET_NEVER;
+            for _ in 0..40 {
+                let x = word(&mut rng);
+                for skip in [0, 3, 17, 39, 40, usize::MAX] {
+                    let cut = skip.min(lms.len());
+                    let want = (0..lms.len())
+                        .filter(|&i| i != cut)
+                        .find(|&i| packed_divides(lms[i], x));
+                    assert_eq!(first_divisor(&lms, skip, x), want);
+                }
+            }
+        }
     }
 
     /// Reduction by a set with its monomials packed against the vector one,
