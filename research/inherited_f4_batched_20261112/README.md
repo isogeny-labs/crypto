@@ -152,6 +152,26 @@ unpaired check: 1.061, 1.126, 1.001, 0.934). Falsifier: any per-target `ops`
 differing from run 1, any disagreement, or a median paired wall ratio above
 1.05 at 20 unknowns and up.
 
+**Run 3 result** `[pcc:unverified]` (record
+`benchmarks/records/20261112T1938Z-inherited-f4-batched-ab-run3.json`,
+`RESULTS_AB_RUN3.md`, binary built at cd4dcfb3f1 from a clean tree):
+
+- **Counts unchanged**: all 234 target × engine pairs have exactly the
+  per-target `ops` of run 1; 0 disagreements with `fes-f2`.
+- **Wall batched / eager, run 1 → run 3**: K 13 1.13 → 1.09, R 13 1.08 → 1.04,
+  K 15 1.11 → 1.11, R 15 1.14 → 1.12, K 17 0.99 → 1.05, R 17 0.99 → 1.01,
+  K 19 1.04 → 0.98, R 19 1.08 → 1.10, R 21 1.02 → 0.95, K 23 0.91 → 0.97,
+  R 23 0.95 → 0.89, K 29 0.90 → 0.89, K 31 0.85 → 0.85. The changes go both
+  ways by up to 0.07, the size of the run-to-run spread; the plan-builder
+  change does not measurably move the paired wall. **The pre-stated
+  falsifier fired again on random 19:10:2 (1.10)**, where the subagent's
+  unpaired check had suggested parity (1.001).
+- Conclusion for this lever: below 20 unknowns the batched mode stays 4 to 12
+  % above eager on wall; the remaining cost is the composed-plan builds,
+  which are counted work and cannot be skipped without changing the count.
+  From 22 unknowns up it is below eager (0.85 to 0.97). The counted gain
+  (0.70 to 0.91 of the word XORs) holds at every size.
+
 ### Run 2: end to end
 
 Record `benchmarks/records/20261112T1831Z-inherited-f4-batched-e2e.json`
