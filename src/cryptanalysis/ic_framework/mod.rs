@@ -73,6 +73,7 @@ pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
+pub mod recursive_adapter;
 pub mod residual;
 pub mod rootfind;
 pub mod shared_rank;
