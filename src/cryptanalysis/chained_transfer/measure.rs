@@ -16,7 +16,7 @@
 use super::ec::{Curve, Pt};
 use super::field::Fp;
 use crate::cryptanalysis::genus2_fp::{Divisor, Genus2Curve};
-use crate::cryptanalysis::ic_boundary::{rho_reference, CountedGroup, GroupOps};
+use crate::cryptanalysis::ic_boundary::{rho_reference, CountedGroup, GroupOps, RhoResult};
 
 // ── Counted elliptic group over F_p (points may be in F_{p²}, but the
 //    subgroup we solve is F_p-rational) ────────────────────────────────────
@@ -90,18 +90,17 @@ impl CountedGroup for JacGroup {
     }
 }
 
-/// Counted Pollard rho (negation-aware) on an elliptic subgroup.
-pub fn rho_on_ec(c: &Curve, gen: Pt, target: Pt, r: u64, seed: u64) -> GroupOps {
+/// Counted Pollard rho on an elliptic subgroup. The full result is returned so
+/// the caller can check `recovered` against the planted log.
+pub fn rho_on_ec(c: &Curve, gen: Pt, target: Pt, r: u64, seed: u64) -> RhoResult {
     let g = EcGroup(*c);
-    let out = rho_reference(&g, gen, target, r, seed, 200 * r);
-    out.group_ops
+    rho_reference(&g, gen, target, r, seed, 200 * r)
 }
 
-/// Counted Pollard rho on a genus-2 Jacobian subgroup.
-pub fn rho_on_jac(c: &Genus2Curve, gen: Divisor, target: Divisor, r: u64, seed: u64) -> GroupOps {
+/// Counted Pollard rho on a genus-2 Jacobian subgroup (full result, as above).
+pub fn rho_on_jac(c: &Genus2Curve, gen: Divisor, target: Divisor, r: u64, seed: u64) -> RhoResult {
     let g = JacGroup(c.clone());
-    let out = rho_reference(&g, gen, target, r, seed, 200 * r);
-    out.group_ops
+    rho_reference(&g, gen, target, r, seed, 200 * r)
 }
 
 // ── Genus-2 single-large-prime index calculus ───────────────────────────────
@@ -253,8 +252,13 @@ fn scalar_counted(c: &Genus2Curve, d: &Divisor, mut n: u64) -> (Divisor, u64) {
     let mut ops = 0u64;
     while n > 0 {
         if n & 1 == 1 {
+            // The first addition into the identity is a copy, not a group
+            // operation (Genus2Curve::add returns early on the identity), so it
+            // is not charged; rho's scalar multiplication counts the same way.
+            if !acc.is_identity() {
+                ops += 1;
+            }
             acc = c.add(&acc, &base);
-            ops += 1;
         }
         n >>= 1;
         if n > 0 {
@@ -418,7 +422,8 @@ mod tests {
             assert!(out.group_ops > 0);
             // rho on the same subgroup, for the comparison.
             let rho = rho_on_jac(&c, gen, target, r, p);
-            assert!(rho.adds + rho.doubles > 0);
+            assert_eq!(rho.recovered, Some(x), "rho recovers the log");
+            assert!(rho.group_ops.adds + rho.group_ops.doubles > 0);
         }
     }
 

@@ -1146,3 +1146,181 @@ USD 100 cap stand.
   allowed for the 2026-11-11 oversampling run.
 
 Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.
+
+## Amendment 22 (2026-11-12 UTC, before any draw below): pod r2a failed to bootstrap; relaunch r2b with observability
+
+**What happened.** Pod `vvek50lemifzcw` (`fd-e14-r2-20261112T0205Z`, created 02:05:40 UTC) ran for
+13 minutes with the container reporting 0 % CPU and nothing listening on port 8080 (proxy 502, then
+timeouts), so its in-pod script either stopped early (most likely in `finish`, idle in the
+post-finish grace) or never started its HTTP server (if `python3` is absent from
+`runpod/base:1.0.2-ubuntu2404`; the sibling pod on the same image installs Python packages through
+`apt` as a fallback, which suggests exactly that). Its log could not be read, so the cause is **not
+established**. It computed no gate and no draw. It was deleted at 02:21:09 UTC (about USD 0.66).
+Its launch record is kept as `e14/pod-r2/launch-r2a.json`.
+
+**Changes for r2b (`e14/run_pod_r2.sh`, sha256 recorded in `launch.json`).**
+- `apt-get install python3 openssh-server …` runs **before** the HTTP server starts; the first
+  `run.log` lines ("boot: script started", "boot: apt exit=…", "boot: sshd started") are written
+  before any network-dependent step, and `pack` runs after the Rust toolchain and after the source
+  check, so a failure in any later step leaves a readable log.
+- `sshd` is started with RunPod's account `PUBLIC_KEY` (and `EXTRA_PUBKEY` if given; none given,
+  the authoring session has no SSH client) and port `22/tcp` is exposed, so the owner can inspect
+  the pod from the RunPod console if needed. Root login is key-only.
+- Pod name prefix `fd-e14-r2b-`. Nothing else changes: engines, gates, readings, predictions, the
+  USD 100 cap and Amendment 21's owner override all stand. No draw of r2a exists, so no draw is
+  retried.
+
+## Amendment 23 (2026-11-12 UTC, before any draw below): r2b also failed to bootstrap; cause established; relaunch r2c
+
+**What happened.** Pod r2b (`vlydemuitde7d7`, created 02:21:55 UTC) behaved exactly like r2a: container
+up, 0 % CPU, nothing on port 8080 after 11 minutes, no readable log. A diagnostic pod
+(`fd-e14-diag-python-proxy`, `ar0ext66azn7u1`, 2 vCPU, USD 0.06/h, created 02:30 UTC) running the
+same image with a start command that writes under `/srv` after `mkdir -p` served its status file
+through the proxy **17 s after boot** and reported `python3=/usr/bin/python3`. So the image has
+Python, the proxy path works, and r2a/r2b's script never ran: their start command was
+`echo "$SCRIPT_B64" | base64 -d >/workspace/run.sh && bash /workspace/run.sh`, which fails at the
+redirect because these CPU pods mount no volume and `/workspace` does not exist before the script's
+own `mkdir -p`. The E14 r1 pod (Amendment 19) had created `/workspace` another way. r2b computed no
+gate and no draw; it and the diagnostic pod were deleted at 02:33 UTC (r2b about USD 0.5, the
+diagnostic pod under USD 0.01). Records: `e14/pod-r2/launch-r2b.json`.
+
+**Change for r2c (`e14/launch_r2.sh`).** Start command
+`mkdir -p /workspace /root && echo "$SCRIPT_B64" | base64 -d >/root/run.sh && exec bash /root/run.sh`;
+pod name prefix `fd-e14-r2c-`. The in-pod script (`run_pod_r2.sh`, sha256 `5f49b8ac…`, Amendment 22)
+is unchanged. Nothing else changes: engines, gates, readings, predictions, the USD 100 cap and the
+Amendment 21 owner override stand. No draw exists, so no draw is retried.
+
+## Amendment 24 (2026-11-12 UTC, before any draw below): r2c failed the same way; early-serving start command and a full trace; relaunch r2d
+
+**What happened.** Pod r2c (`qoulmu5122514o`, created 02:33:06 UTC) showed the r2a/r2b signature
+again (container up, 0 % CPU, nothing on 8080 after 5 minutes). The stored `SCRIPT_B64` decodes to
+the committed script (sha256 `5f49b8ac…`, 7,981 bytes) and the sibling pod carries a 20 KB variable
+the same way, so delivery is not the cause; the `/workspace` theory of Amendment 23 is therefore
+**not confirmed** either. The cause is still not established. r2c was deleted at about 02:41 UTC
+(about USD 0.35, no gate, no draw). Record: `e14/pod-r2/launch-r2c.json`.
+
+**Changes for r2d.**
+- Start command (`e14/launch_r2.sh`): creates the output and serve directories, writes "start command
+  running" to `run.log`, starts `python3 -m http.server 8080` itself (Python is in the image, as the
+  diagnostic pod showed), decodes the script, logs its sha256, then runs it. The log is therefore
+  readable from the first second, whatever the script does.
+- In-pod script (`e14/run_pod_r2.sh`): `set -x` with timestamps into `out/trace.log`; `apt` split into
+  update, base tools and build tools, each with its exit code logged; `openssh-server` and `sshd`
+  dropped (no SSH client in the authoring session; port 22 no longer exposed). Everything after the
+  boot block is unchanged. The new script's sha256 is recorded in `launch.json`.
+- Pod name prefix `fd-e14-r2d-`. Engines, gates, readings, predictions, the USD 100 cap and the
+  Amendment 21 owner override stand. No draw exists, so no draw is retried. If r2d also fails to
+  bootstrap, no further pod is launched without the owner's reading of `trace.log`.
+
+## Amendment 25 (2026-11-12 UTC, before any draw below): cause of the r2a–r2d failures established (64 vCPU exceeds the provider maximum); relaunch r2e at 32 vCPU on a memory-optimized flavor
+
+**What happened.** r2d (`9cfghisyn5cliy`) showed the same signature and was deleted at 02:55 UTC
+(14 min, about USD 0.6; record `e14/pod-r2/launch-r2d.json`). Diagnostic pods settled the cause:
+- D2 (`7u7h5lowmoe4f7`): the known-good simple start command with r2d's **full env block** served
+  after 11 s with every variable present, so the env block (including the 10 KB `SCRIPT_B64`) is
+  not the cause.
+- D5 (`e1j3jly1yk1hf6`): a 2-vCPU pod on `cpu5c` served after about 15 s (EUR-IS-1).
+- RunPod's flavor catalogue (GraphQL `cpuFlavors`, read 03:03 UTC): every CPU flavor has
+  `maxVcpu = 32` (cpu3c/cpu5c 2 GB per vCPU, cpu3g/cpu5g 4 GB, cpu3m/cpu5m 8 GB; disk 10–15 GB per
+  vCPU). r2a–r2d all requested **64 vCPU**; the API accepted the request and echoed
+  `vcpuCount: 64`, but their containers never started (uptime counting, 0 % CPU, no listener).
+  The E14 r1 pod of Amendment 19 ran with 64 vCPU and 528 GB on 2026-11-09, so the limit is new or
+  was not enforced then; it is enforced now.
+- D3 and D4 (2-vCPU probes created 02:53–02:55 on cpu3c/cpu3g) had not started after 10 min
+  (one container with uptime 0, one with no container), so container start on some hosts is also
+  slow; that is a second, independent effect and does not change the conclusion above.
+  All probes were deleted at 03:05 UTC (total under USD 0.05).
+
+**Changes for r2e.**
+- `e14/launch_r2.sh`: `vcpuCount: 32`, flavors `["cpu5m","cpu3m"]` (8 GB per vCPU, so 256 GB RAM,
+  which the E14a degree-5 closure needs: Amendment 13 sized it at 256 GiB), pod name prefix
+  `fd-e14-r2e-`. Price about USD 4.16/h (cpu5m) or 3.52/h (cpu3m); the USD 100 cap therefore gives a
+  deadline of about 24 h or 28 h instead of 36 h. The cap is unchanged.
+- `e14/run_pod_r2.sh` (sha256 `6003ecbdbb92c6ef…`): every 64-thread setting becomes 32 (G1, G2, E14a, and the
+  G3 pilot now times 8, 16 and 32 threads; `g3.json` records `t32`). Nothing else changes.
+- Engines, gates, readings, predictions and the Amendment 21 owner override stand. No draw exists,
+  so no draw is retried. If r2e has not written "start command running" to its served `run.log`
+  within 20 minutes of creation, it is left running for a further 20 minutes before any action,
+  because slow container starts were also observed.
+
+*Note at launch (03:05:14 UTC):* the provider priced the 32-vCPU memory-optimized pod at USD 2.08/h
+(below the catalogue estimate above), so the USD 100 cap gives the full 36 h deadline. Pod
+`xkgx6mw9roo3zl`, `fd-e14-r2e-20261112T0305Z`, 32 vCPU, 256 GB; balance at launch USD 91.37; the
+sibling pod was at USD 5.35/h.
+
+## Amendment 26 (2026-11-12 UTC, before any draw below): r2e booted correctly and stopped at G-src-b; path list fetched from a commit that contains it; relaunch r2f
+
+**What happened.** r2e (`xkgx6mw9roo3zl`, cpu5m/cpu3m 32 vCPU, 528 GB host, AMD EPYC 9575F) ran the
+start command 2 s after creation, finished `apt` and the Rust toolchain by 03:05:33 UTC, and then
+stopped at gate `G-src-b`: the path list was fetched from
+`raw.githubusercontent.com/.../a2be6609.../e13/source_paths.txt`, but `e13/source_paths.txt` was
+added to the repository after the frozen commit `a2be6609` (it is absent there; the raw URL returns
+404), so the hash check refused the 404 page, as it should. The controller pulled the final output
+(`e14/pod-r2/out-r2e/`: `run.log`, `trace.log`, `apt.log`, `host.txt`) and deleted the pod at
+03:05:49 UTC (under USD 0.05). This confirms Amendment 25's cause: with 32 vCPU the pod starts at once.
+No gate beyond G-src-a was reached; no draw exists.
+
+**Change for r2f.** The path list is fetched from commit
+`43438f5ab6eb6d1844b8d0465c933ad079099326` (main at the start of this session, where it exists with
+sha256 `97b6bbde…`); `G-src-b` still pins its content by that hash, and `G-src-a`/`G-src-c` still
+pin the source tree at `a2be6609`. Env `PATHS_COMMIT` carries the commit; the in-pod script
+(sha256 `a6c9d90cec93b62f…`) defaults to the same value. Pod name prefix `fd-e14-r2f-`. Nothing else changes.
+
+## Amendment 27 (2026-11-12 UTC, before any draw below): G2's comparison key excluded timings as Amendment 20 states; relaunch r2g
+
+**What happened.** r2f (`vx5qv5kjfk21k0`) passed G-src-a/b/c (03:08:04 UTC), G0 and G1 (G1: 597 s at
+32 threads for the 140k-column cell, against 511–586 s at 4 threads in E13, so `pe` gains nothing
+from threads) and ran G2 at 03:26:33 UTC. G2 reported "differs" because the in-pod `jq` key compared
+`per_degree` whole, and each degree entry carries a `secs` wall-time field (E10: 136.7, 140.5,
+134.2, 139.0 s; r2f: 94.2, 90.0, 84.0, 88.0 s). Every non-timing field is identical on all four draws:
+`draw`, `x_r`, `v_basis`, `solutions`, `d_f`, `d_f_at_least`, and `dim`, `of`, `rounds` at
+degrees 2, 3 and 4 (`e14/pod-r2/out-r2f/g2.diff`, `g2.jsonl`). Amendment 20 defines G2 on
+"every non-timing field"; the script's key was wrong, not the engine. The output was pulled, the pod
+deleted at about 03:36 UTC (about USD 1), and the records archived under `e14/pod-r2/out-r2f/`.
+No draw of E14a, E14b or E14c exists.
+
+**Change for r2g.** The G2 key becomes
+`{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}`
+(script sha256 `e6e6d62754a76a66…`). Applied to E10's committed records and to r2f's `g2.jsonl` on the
+authoring host, both sides hash identically. Pod name prefix `fd-e14-r2g-`. Nothing else changes.
+
+## Amendment 28 (2026-11-12 UTC, before any draw below): r2g stalled in the build on a slow host; CPU probe and build time limit; relaunch r2h
+
+**What happened.** r2g (`q0pylpkso8ofd1`, cpu5m, 32 vCPU, EPYC 9575F, 528 GB) verified its source
+at 03:41:13 UTC and then spent more than 55 minutes on the final crate of the build
+(`Compiling crypto v0.1.0`), with the container reporting about 200 % CPU, against 3.5 minutes for
+the whole build on r2f (same host model, same 231 crates). It shared no machine with the sibling pods.
+The container was effectively getting about two of its 32 cores; whether by a quota or by host
+contention is not established. At that rate E14a would also run about 15 times slower than planned,
+so the pod was pulled (`e14/pod-r2/out-r2g/`, key redacted) and deleted at 04:39:46 UTC
+(about USD 2.2). No gate beyond the source checks ran; no draw exists.
+
+**Change for r2h (`e14/run_pod_r2.sh`, sha256 `690f657cf36fe54b…`).** Before the build the script records
+`/sys/fs/cgroup/cpu.max` and `/proc/pressure/cpu` in `host.txt`, runs a 32-way busy-loop probe and
+logs the effective parallelism; below 12 of 32 the run ends with `cpu_probe_low_<value>` before any
+build, so a bad host costs minutes, not an hour. The build is bounded at 25 minutes
+(`build_failed_or_timeout`). Pod name prefix `fd-e14-r2h-`. Nothing else changes.
+
+## Amendment 29 (2026-11-12 UTC, before any draw below): the CPU probe ran under the command trace; relaunch r2i
+
+r2h (`7zs8zqc7idamg6`) verified its source at 04:41:18 UTC and started the Amendment 28 probe with
+`set -x` still active, so every iteration of the 32 busy loops was written to `trace.log`. Ten
+minutes later the loops were at about 82 % with the container at 2,672 % CPU (about 27 cores busy)
+and `cpu.max: max 100000` (no quota), so the host was healthy and the probe itself was the stall;
+its result would also have been distorted by 32 writers contending on one file. The pod was deleted at
+about 04:52 UTC (about USD 0.4); no build or gate ran; record `e14/pod-r2/launch-r2h.json`.
+
+**Change for r2i (`e14/run_pod_r2.sh`, sha256 `cd2c4679dbc5c775…`):** tracing is switched off for the probe
+and back on after it. Pod name prefix `fd-e14-r2i-`. Nothing else changes.
+
+## Amendment 30 (2026-11-12 UTC, before any draw below): the CPU probe's bare `wait` blocked on the snapshot and watchdog loops; relaunch r2j
+
+r2i (`jrizifz5p2wv18`) verified its source at 04:53:09 UTC and then sat at 0 % CPU: the probe ended
+with a bare `wait`, which waits for every background child of the script, including the 10-minute
+snapshot loop and the deadline watchdog, neither of which exits. The probe loops themselves had
+finished. Deleted at about 04:58 UTC (about USD 0.2); record `e14/pod-r2/launch-r2i.json`.
+
+**Change for r2j (`e14/run_pod_r2.sh`, sha256 `40bd8720b8bb79d2…`):** the probe records the PIDs of its 32
+jobs and waits only on those. Tested on the authoring host with an unrelated long-lived background
+job present: the probe returned and read 4.0 of 8 on a 4-core machine. The only other `wait` in the
+script names a specific PID. Pod name prefix `fd-e14-r2j-`. Nothing else changes.

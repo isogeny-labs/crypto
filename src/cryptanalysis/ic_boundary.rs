@@ -234,6 +234,51 @@ pub struct Calibration {
     /// coordinates and the least of `n` rotations, with its shift),
     /// Koblitz regime, measured on the instance's field.
     pub ns_per_canon: Option<f64>,
+    /// The solver and oracle work units below have calibration keys but,
+    /// as of 2026-11-12, no measured ratio: no host measures them and
+    /// `docs/ic/calibration.json` carries none, so each stays `None` and its
+    /// work stays a lower bound (`docs/ic/calibration-solver-units.md`).
+    /// Each is read by [`Calibration::pin`] like the factors above, and
+    /// charges only once pinned ([`Calibration::is_pinned`]); a value that
+    /// is merely present prices nothing.  `None` is not serialised, so a
+    /// report written without a pin is byte-identical to one written before
+    /// these keys existed.
+    ///
+    /// One `sat-cdcl` conflict, the solver call's whole run per conflict.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_conflict: Option<f64>,
+    /// One `buchberger-f2` monomial operation (also the key `xl-f2`'s
+    /// modelled count would need; that count is refused, see
+    /// `ic_framework::solvers::solver_unit_key`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_monomial_op: Option<f64>,
+    /// One `exhaustive` monomial test.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_monomial_test: Option<f64>,
+    /// One `crossbred-f2` word operation (refused while the count is
+    /// partial).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_word_op: Option<f64>,
+    /// One `fes-f2-wide` Gray-code vector XOR, 8 lanes of 32 bits (AVX2).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_vector_xor_8x32: Option<f64>,
+    /// One `fes-f2-wide` Gray-code vector XOR, 16 lanes of 32 bits
+    /// (AVX-512).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_vector_xor_16x32: Option<f64>,
+    /// One `F_p` multiply-add of the `pkm-semaev` oracle's tower F4.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_f4_muladd: Option<f64>,
+    /// One prime-field multiplication outside the group law: the
+    /// `pkm-semaev` oracle's system specialisation, grid search and set-up
+    /// counters ([`PINNABLE_NATIVE`]) and its grid solver block, and the
+    /// line oracles' bare `F_p multiplications` solver blocks.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_fp_mul: Option<f64>,
+    /// One primitive step of the hashed-affine / hashed-tensor
+    /// contraction (`hashed_tensor_steps`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_hashed_tensor_step: Option<f64>,
     /// The factors above that [`Calibration::pin`] replaced with a
     /// ratio from the repository's table, by field name.  A consumer
     /// that labels a price `pinned` must check here: a factor that is
@@ -344,11 +389,18 @@ impl Calibration {
     /// A unit the table does not carry keeps its measured value and is
     /// named in the outcome, so a row priced the old way says so.
     pub fn pin(&mut self, regime: &str, instance: &str) -> PinOutcome {
-        let mut out = PinOutcome::default();
         let table = pinned_ratios(regime, instance);
+        self.pin_with(table.as_ref())
+    }
+
+    /// [`Calibration::pin`] from a given table row (`None`: no row).
+    fn pin_with(
+        &mut self,
+        table: Option<&serde_json::Map<String, serde_json::Value>>,
+    ) -> PinOutcome {
+        let mut out = PinOutcome::default();
         let add = self.ns_per_add;
         let apply = |name: &str, slot: &mut Option<f64>, out: &mut PinOutcome| match table
-            .as_ref()
             .and_then(|t| t.get(name))
             .and_then(serde_json::Value::as_f64)
         {
@@ -383,8 +435,53 @@ impl Calibration {
         ] {
             apply(name, slot, &mut out);
         }
+        // The solver and oracle unit keys (2026-11-12).  The table carries
+        // none of them yet, so for every row this loop pins nothing and
+        // reports nothing: each slot is `None` and stays so.
+        for name in SOLVER_UNIT_KEYS {
+            if let Some(slot) = self.unit_slot(name) {
+                apply(name, slot, &mut out);
+            }
+        }
         self.pinned_units = out.pinned.clone();
         out
+    }
+
+    fn unit_slot(&mut self, key: &str) -> Option<&mut Option<f64>> {
+        Some(match key {
+            "ns_per_conflict" => &mut self.ns_per_conflict,
+            "ns_per_monomial_op" => &mut self.ns_per_monomial_op,
+            "ns_per_monomial_test" => &mut self.ns_per_monomial_test,
+            "ns_per_word_op" => &mut self.ns_per_word_op,
+            "ns_per_vector_xor_8x32" => &mut self.ns_per_vector_xor_8x32,
+            "ns_per_vector_xor_16x32" => &mut self.ns_per_vector_xor_16x32,
+            "ns_per_f4_muladd" => &mut self.ns_per_f4_muladd,
+            "ns_per_fp_mul" => &mut self.ns_per_fp_mul,
+            "ns_per_hashed_tensor_step" => &mut self.ns_per_hashed_tensor_step,
+            _ => return None,
+        })
+    }
+
+    /// The nanoseconds a solver or oracle unit key (one of
+    /// [`SOLVER_UNIT_KEYS`]) prices at, only when the repository's table
+    /// pinned it for this curve.  A merely present value — never written
+    /// by a host measurement — returns `None` and prices nothing.
+    pub fn pinned_unit_ns(&self, key: &str) -> Option<f64> {
+        if !self.is_pinned(key) {
+            return None;
+        }
+        match key {
+            "ns_per_conflict" => self.ns_per_conflict,
+            "ns_per_monomial_op" => self.ns_per_monomial_op,
+            "ns_per_monomial_test" => self.ns_per_monomial_test,
+            "ns_per_word_op" => self.ns_per_word_op,
+            "ns_per_vector_xor_8x32" => self.ns_per_vector_xor_8x32,
+            "ns_per_vector_xor_16x32" => self.ns_per_vector_xor_16x32,
+            "ns_per_f4_muladd" => self.ns_per_f4_muladd,
+            "ns_per_fp_mul" => self.ns_per_fp_mul,
+            "ns_per_hashed_tensor_step" => self.ns_per_hashed_tensor_step,
+            _ => None,
+        }
     }
 
     /// Whether `unit` (a field name such as `ns_per_word_xor`) carries
@@ -393,6 +490,33 @@ impl Calibration {
     pub fn is_pinned(&self, unit: &str) -> bool {
         self.pinned_units.iter().any(|u| u == unit)
     }
+}
+
+/// Calibration keys for solver and oracle work units that had none before
+/// 2026-11-12 (`docs/ic/FRAMEWORK.md`, "Solver and oracle work units").
+/// [`Calibration::pin`] reads each from `docs/ic/calibration.json` like the
+/// older keys; no row carries one yet, so every unit below is still a lower
+/// bound everywhere.  Which solver unit maps to which key, and which counts
+/// are refused even when pinned, is `ic_framework::solvers::solver_unit_key`.
+pub const SOLVER_UNIT_KEYS: &[&str] = &[
+    "ns_per_conflict",
+    "ns_per_monomial_op",
+    "ns_per_monomial_test",
+    "ns_per_word_op",
+    "ns_per_vector_xor_8x32",
+    "ns_per_vector_xor_16x32",
+    "ns_per_f4_muladd",
+    "ns_per_fp_mul",
+    "ns_per_hashed_tensor_step",
+];
+
+pub use crate::cryptanalysis::ic_framework::solver_units::PINNABLE_NATIVE;
+
+/// Whether `counter` is one of [`PINNABLE_NATIVE`] and `calib` pinned its key.
+pub fn native_is_pinned(counter: &str, calib: &Calibration) -> bool {
+    PINNABLE_NATIVE
+        .iter()
+        .any(|(c, k)| *c == counter && calib.pinned_unit_ns(k).is_some())
 }
 
 /// `√(πr/2A)`: expected operations of a generic collision search on a
@@ -584,16 +708,29 @@ pub struct PhaseCost {
     pub work_native: std::collections::BTreeMap<String, u64>,
 }
 
+/// `*map.entry(name.to_string()).or_insert(0) += by`, allocating the key
+/// only when the counter is new: the same map after every call (a counter
+/// is created at zero even when `by` is 0), without a `String` per hit
+/// (assessment 2026-11-10, R14).
+#[inline]
+pub fn bump_counter(map: &mut std::collections::BTreeMap<String, u64>, name: &str, by: u64) {
+    if let Some(v) = map.get_mut(name) {
+        *v += by;
+    } else {
+        map.insert(name.to_string(), by);
+    }
+}
+
 impl PhaseCost {
     /// Add `by` to the native counter `name`, creating it at zero.
     pub fn count(&mut self, name: &str, by: u64) {
-        *self.native.entry(name.to_string()).or_insert(0) += by;
+        bump_counter(&mut self.native, name, by);
     }
     /// Add `by` to the `bitop/v1`-only counter `name`; a zero leaves the
     /// map untouched, so a phase that did none of the work carries none.
     pub fn work(&mut self, name: &str, by: u64) {
         if by > 0 {
-            *self.work_native.entry(name.to_string()).or_insert(0) += by;
+            bump_counter(&mut self.work_native, name, by);
         }
     }
     /// Fold a map of `bitop/v1`-only counters into this phase.
@@ -13513,6 +13650,13 @@ pub fn price_phase(phase: &mut PhaseCost, calib: &Calibration) {
     gae += conv("frobenius_maps", calib.ns_per_frobenius);
     gae += conv("canonicalisations", calib.ns_per_canon);
     gae += conv("target_guard_probes", Some(calib.ns_per_lookup));
+    // Pinned solver/oracle unit keys only; with none pinned this adds
+    // nothing and `gae` is bit-for-bit what it was.
+    for (counter, key) in PINNABLE_NATIVE {
+        if let Some(ns) = calib.pinned_unit_ns(key) {
+            gae += calib.gae(phase.get(counter), ns);
+        }
+    }
     phase.gae = gae;
 }
 
@@ -20404,5 +20548,98 @@ mod efd_instance_tests {
         assert!(
             PrimeInstance::from_efd("montgom", "xz", 1019, &params, 268, 4, &[604, 1], 0).is_err()
         );
+    }
+}
+
+#[cfg(test)]
+mod solver_unit_key_tests {
+    use super::*;
+
+    /// **A table row that carries a solver/oracle unit key pins it** like
+    /// any other key (named in the outcome, which `ic bench` writes as
+    /// `calibration_pins`, and in `pinned_units`), and a row without one —
+    /// every row of `docs/ic/calibration.json` today — pins nothing new.
+    #[test]
+    fn a_solver_unit_key_in_the_table_is_pinned_and_named() {
+        let base = || Calibration {
+            ns_per_add: 2.0,
+            ns_per_double: 2.0,
+            ..Default::default()
+        };
+        let row: serde_json::Map<String, serde_json::Value> = serde_json::from_str(
+            r#"{"ns_per_double": 1.0, "ns_per_conflict": 0.75, "ns_per_hashed_tensor_step": 0.125}"#,
+        )
+        .unwrap();
+        let mut c = base();
+        let out = c.pin_with(Some(&row));
+        assert_eq!(
+            out.pinned,
+            vec![
+                "ns_per_double",
+                "ns_per_conflict",
+                "ns_per_hashed_tensor_step"
+            ]
+        );
+        // `ns_per_lookup` / `ns_per_row_op` always carry a host value, so
+        // they are reported measured; an absent solver key is not.
+        assert_eq!(out.measured, vec!["ns_per_lookup", "ns_per_row_op"]);
+        assert_eq!(c.pinned_units, out.pinned);
+        assert_eq!(c.ns_per_conflict, Some(1.5), "ratio × ns_per_add");
+        assert_eq!(c.pinned_unit_ns("ns_per_conflict"), Some(1.5));
+        assert_eq!(c.pinned_unit_ns("ns_per_hashed_tensor_step"), Some(0.25));
+        assert_eq!(c.pinned_unit_ns("ns_per_f4_muladd"), None);
+        let json = serde_json::to_string(&c).unwrap();
+        assert!(json.contains(r#""ns_per_conflict":1.5"#), "{json}");
+        assert!(!json.contains("ns_per_f4_muladd"), "{json}");
+
+        // Every committed row: no new key pinned, none serialised.
+        let doc: serde_json::Value = serde_json::from_str(PINNED_CALIBRATION).unwrap();
+        for (name, row) in doc["instances"].as_object().unwrap() {
+            let mut c = base();
+            let out = c.pin_with(row.as_object());
+            for key in SOLVER_UNIT_KEYS {
+                assert!(!out.pinned.iter().any(|u| u == key), "{name}: {key}");
+                assert!(c.pinned_unit_ns(key).is_none(), "{name}: {key}");
+            }
+            let json = serde_json::to_string(&c).unwrap();
+            for key in SOLVER_UNIT_KEYS {
+                assert!(!json.contains(key), "{name}: {key} serialised");
+            }
+        }
+    }
+
+    /// `price_phase` charges a [`PINNABLE_NATIVE`] counter only at a
+    /// pinned key; present-but-unpinned or absent, the phase is priced
+    /// bit for bit as before.
+    #[test]
+    fn a_pinnable_native_counter_is_charged_only_when_pinned() {
+        let mut phase = PhaseCost::default();
+        phase.count("pkm_grid_fp_mults_uncharged", 1000);
+        phase.count("hashed_tensor_steps", 64);
+        phase.count("lookups", 10);
+        let mut c = Calibration {
+            ns_per_add: 2.0,
+            ns_per_double: 2.0,
+            ns_per_lookup: 1.0,
+            ns_per_fp_mul: Some(0.5),
+            ns_per_hashed_tensor_step: Some(4.0),
+            ..Default::default()
+        };
+        let mut unpinned = phase.clone();
+        price_phase(&mut unpinned, &c);
+        assert_eq!(unpinned.gae, 5.0, "lookups only");
+        assert!(!native_is_pinned("pkm_grid_fp_mults_uncharged", &c));
+
+        c.pinned_units = vec!["ns_per_fp_mul".into()];
+        let mut fp = phase.clone();
+        price_phase(&mut fp, &c);
+        assert_eq!(fp.gae, 5.0 + 1000.0 * 0.5 / 2.0);
+        assert!(native_is_pinned("pkm_grid_fp_mults_uncharged", &c));
+        assert!(!native_is_pinned("hashed_tensor_steps", &c));
+
+        c.pinned_units.push("ns_per_hashed_tensor_step".into());
+        let mut both = phase;
+        price_phase(&mut both, &c);
+        assert_eq!(both.gae, 5.0 + 250.0 + 64.0 * 4.0 / 2.0);
     }
 }

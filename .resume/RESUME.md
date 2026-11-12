@@ -1,28 +1,34 @@
-# Resume: crypto @ aburan28/youthful-hopper-hfrwkd
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-User (2026-11-12): run steps 1–3 of the cheapest test of "idea 2": a cover φ: C → E used only to
-generate the factor base x∘φ(V) on E(F_p); measure the F4 solving degree D against its null,
-the PKM tower and a random base of equal size.
+Owner (2026-11-11): "Any other perf optimizations here? Can we use tricks like dynamic programming
+or things that I'm not aware of for grobner base" — then "Go". Catalogue the levers
+(docs/ic/GROEBNER_PERF_LEVERS_20261111.md) and measure the first one: a persistent M4GB server
+process (patch 0003 `--serve`, Rust `m4gb-f2-server`).
 
 ## Lead / hypothesis
-`research/cover_image_fb_20261112/PROTOCOL.md` (committed 07c6471fe5 before any cell). P0 positive
-control (square map collapses Kummer depth t → t−1), H1 survive / H0 falsifier. Prior: H0 ≈ 0.8.
+Per-call fixed cost (process start, field tables, thread pool, pipes) is 5 to 15 ms and dominates
+decomposition calls at 12 to 16 unknowns. Expectation and falsifier: research/m4gb_persistent_server_20261111/README.md.
 
 ## Spec
-Local container (4 cores), `target/release/examples/pkm_tower_pilot --engine f4 --p 2013265921
---kinds kummer,dickson --m 2 --controls tower,null,randbase [--cover-map square|quad|generic]
---t-min 2 --max-t 8 --budget 600`, plus m = 3 t ≤ 4. Run script `research/cover_image_fb_20261112/run.sh`.
-Counts only (D), no timing comparison, not a benchmark.
+research/m4gb_persistent_server_20261111/run_ab.sh under tools/benchrec.py run
+(record benchmarks/records/20261111T1946Z-m4gb-persistent-server.json): ic descent --solver
+inherited-f4 --solver m4gb-f2 --solver m4gb-f2-server, K and R, m=2 n=11..23, m=3 n=11,13,15,
+6 targets x 3 repeats, 60 s budget, one thread. Binaries: scripts/m4gb/build.sh n{16,20,24,28,32}_gf2
+with patches 0001-0003 (scratchpad prefix m4gb-prefix-v3). Local container, unisolated (stage
+diagnostic, no leaderboard row).
 
 ## State
-Code: `examples/pkm_tower_pilot.rs` (`--cover-map`, `CoverMap`, control `randbase`). Built.
-Runs done (m3-square stopped at time limit). README written.
+Patch 0003 written and clean-built; Rust client in progress (subagent); record open; run next.
 
-## Next step
-Run run.sh, tabulate D per (map, kind, control, t), plot, write README + report, open PR.
+## Runs in flight
+None yet.
 
 ## Stop and success conditions
-Stop when every arm has run t = 2…8 at m = 2 (or stopped at the first all-timeout t) and t ≤ 4 at m = 3,
-and the verdict (P0, H1/H0/inconclusive) is written. P0 failing stops the reading. Success = a verified
-verdict either way, not H1.
+All cells finish or fail individually; summarize.py -> RESULTS.md/results.json/svg; make_report.sh;
+benchrec add-raw/metric/close; session-log entry; PR on the branch (PR #3936 is the open
+predecessor, auto-merge enabled).
+
+## Next steps
+1. cargo build --release --bin ic with m4gb-f2-server; cargo test --lib m4gb_oracle.
+2. Run run_ab.sh under the record; summarize; report; close record; benchmarks entry; session log; push; PR.

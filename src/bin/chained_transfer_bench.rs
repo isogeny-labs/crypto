@@ -110,6 +110,10 @@ struct Row {
     ic_jac_relations: u64,
     ic_jac_fb: usize,
     ic_recovered_ok: bool,
+    /// Every rho arm recovered the planted log.
+    rho_recovered_ok: bool,
+    /// Z/r multiplications in the IC's linear algebra (unpriced work).
+    ic_jac_la_mulmods: u64,
     chain_verified: bool,
 }
 
@@ -133,6 +137,7 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
 
     // --- direct cost: rho on the source curve ---
     let rho_src = rho_on_ec(&e1, gen, target, r, seed);
+    let mut rho_ok = rho_src.recovered == Some(x);
 
     // --- chain 1: isogeny hop E1 → E1', then rho ---
     let (rho_isog_ops, isog_degree, isog_ok) = match find_isogeny(&e1, r) {
@@ -149,7 +154,8 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
                         _ => (None, None),
                     };
                     let rho = rho_on_ec(&e_prime, gp, tp, r, seed ^ 0xA5);
-                    (rho.adds + rho.doubles, deg, ok)
+                    rho_ok &= rho.recovered == Some(x);
+                    (rho.group_ops.adds + rho.group_ops.doubles, deg, ok)
                 }
                 Err(_) => (0, deg, false),
             }
@@ -170,10 +176,15 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
             match jac_instance(&jac, jac_order, r, x, seed) {
                 Some((dg, dt)) => {
                     let rho = rho_on_jac(&jac, dg, dt, r, seed ^ 0x5A);
+                    rho_ok &= rho.recovered == Some(x);
                     // Full degree-1 factor base (≈ p/2 places): genus-2 IC uses
                     // every rational place, so smoothness ≈ 1/2.
                     let ic = genus2_index_calculus(&jac, &dg, &dt, r, p as usize, 50_000_000, seed);
-                    (rho.adds + rho.doubles, Some(ic), chain_ok)
+                    (
+                        rho.group_ops.adds + rho.group_ops.doubles,
+                        Some(ic),
+                        chain_ok,
+                    )
                 }
                 None => (0, None, chain_ok),
             }
@@ -189,7 +200,7 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
         e2_order,
         jac_order,
         x,
-        rho_src_ops: rho_src.adds + rho_src.doubles,
+        rho_src_ops: rho_src.group_ops.adds + rho_src.group_ops.doubles,
         rho_isog_ops,
         isog_degree,
         rho_jac_ops,
@@ -198,6 +209,8 @@ fn measure_curve(p: u64, c: [u64; 4], seed: u64) -> Option<Row> {
         ic_jac_relations: ic.relations,
         ic_jac_fb: ic.fb_size,
         ic_recovered_ok: ic.recovered == Some(x),
+        rho_recovered_ok: rho_ok,
+        ic_jac_la_mulmods: ic.la_field_ops,
         chain_verified: chain_verified && isog_ok,
     })
 }
@@ -289,10 +302,16 @@ fn main() -> ExitCode {
                 1 + (s.wrapping_mul(3_266_489_917) >> 9) % (p - 1),
             ];
             if let Some(row) = measure_curve(p, c, 0xC0FFEE + i as u64 * 101 + s) {
-                if row.ic_recovered_ok && row.chain_verified {
+                if row.ic_recovered_ok && row.rho_recovered_ok && row.chain_verified {
                     found = Some(row);
                     break;
                 }
+                // A measured candidate that failed a check is reported, not
+                // silently replaced.
+                eprintln!(
+                    "p = {p}: measured candidate rejected (ic_ok={}, rho_ok={}, chain_ok={})",
+                    row.ic_recovered_ok, row.rho_recovered_ok, row.chain_verified
+                );
             }
         }
         match found {

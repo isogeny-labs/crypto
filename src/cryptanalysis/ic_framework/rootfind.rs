@@ -80,8 +80,14 @@ impl PairedAdd for BinaryGroup<'_> {
         }
         ops.adds += qs.len() as u64;
         let _ = counters;
-        let mut scratch = BatchScratch::default();
-        self.0.add_many(r, qs, out, &mut scratch);
+        // One batch-inversion scratch a thread, reused across calls
+        // (`FastCurve::add_many` clears what it uses), instead of a fresh
+        // one a block (assessment 2026-11-10, R5).
+        thread_local! {
+            static SCRATCH: std::cell::RefCell<BatchScratch> =
+                std::cell::RefCell::new(BatchScratch::default());
+        }
+        SCRATCH.with(|s| self.0.add_many(r, qs, out, &mut s.borrow_mut()));
     }
 }
 
@@ -121,9 +127,31 @@ impl<E: Copy> Reps<E> {
     }
 }
 
+/// Reusable buffers of [`row_points`], held by an oracle so that a block
+/// allocates nothing (assessment 2026-11-10, R5): the sums are the same
+/// points in the same order as the allocating version returned.
+struct RowBufs<E> {
+    minus: Vec<E>,
+    plus_src: Vec<E>,
+    plus: Vec<E>,
+    out: Vec<(usize, E)>,
+}
+
+impl<E> Default for RowBufs<E> {
+    fn default() -> Self {
+        Self {
+            minus: Vec::new(),
+            plus_src: Vec::new(),
+            plus: Vec::new(),
+            out: Vec::new(),
+        }
+    }
+}
+
 /// `R ∓ P_k` for every representative, as `(signed index of P_k, R − P_k)`
 /// pairs: `R − P_k` carries `k`'s own index, `R + P_k` the index of `−P_k`,
-/// so that `R = P_{index} + (the returned point)` in both cases.
+/// so that `R = P_{index} + (the returned point)` in both cases.  The
+/// pairs are left in `bufs.out`.
 fn row_points<G: PairedAdd>(
     g: &G,
     reps: &Reps<G::Elt>,
@@ -133,29 +161,31 @@ fn row_points<G: PairedAdd>(
     r: G::Elt,
     from: usize,
     to: usize,
-) -> Vec<(usize, G::Elt)> {
-    let mut minus = Vec::with_capacity(to - from);
-    g.add_many(ops, counters, r, &reps.negated[from..to], &mut minus);
-    let plus_src: Vec<G::Elt> = (from..to)
-        .filter(|&k| !reps.self_negated[k])
-        .map(|k| reps.point[k])
-        .collect();
-    let mut plus = Vec::with_capacity(plus_src.len());
-    g.add_many(ops, counters, r, &plus_src, &mut plus);
-    let mut out = Vec::with_capacity(minus.len() + plus.len());
-    for (k, s) in (from..).zip(minus) {
-        out.push((reps.index[k], s));
+    bufs: &mut RowBufs<G::Elt>,
+) {
+    bufs.minus.clear();
+    g.add_many(ops, counters, r, &reps.negated[from..to], &mut bufs.minus);
+    bufs.plus_src.clear();
+    bufs.plus_src.extend(
+        (from..to)
+            .filter(|&k| !reps.self_negated[k])
+            .map(|k| reps.point[k]),
+    );
+    bufs.plus.clear();
+    g.add_many(ops, counters, r, &bufs.plus_src, &mut bufs.plus);
+    bufs.out.clear();
+    for (k, &s) in (from..).zip(&bufs.minus) {
+        bufs.out.push((reps.index[k], s));
     }
-    let mut it = plus.into_iter();
+    let mut it = bufs.plus.iter();
     for k in from..to {
         if !reps.self_negated[k] {
-            out.push((
+            bufs.out.push((
                 fb.neg_index[reps.index[k]],
-                it.next().expect("one sum a point"),
+                *it.next().expect("one sum a point"),
             ));
         }
     }
-    out
 }
 
 /// The `rootfind-mitm` oracle.
@@ -163,6 +193,7 @@ pub struct RootfindMitmOracle<E> {
     m: u32,
     table: Option<PairTable>,
     reps: Option<Reps<E>>,
+    bufs: RowBufs<E>,
 }
 
 impl<E> RootfindMitmOracle<E> {
@@ -171,6 +202,7 @@ impl<E> RootfindMitmOracle<E> {
             m,
             table: None,
             reps: None,
+            bufs: RowBufs::default(),
         }
     }
 }
@@ -273,7 +305,8 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let mut from = 0;
         while from < a {
             let to = (from + BLOCK).min(a);
-            for (k, s) in row_points(g, reps, fb, ops, counters, point, from, to) {
+            row_points(g, reps, fb, ops, counters, point, from, to, &mut self.bufs);
+            for &(k, s) in &self.bufs.out {
                 if g.is_identity(&s) {
                     continue;
                 }
@@ -291,11 +324,21 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
 pub struct RootfindPairsOracle<E> {
     m: u32,
     reps: Option<Reps<E>>,
+    /// Representative position of each signed index, built in `prepare`.
+    position: BTreeMap<usize, usize>,
+    rows: RowBufs<E>,
+    cands: RowBufs<E>,
 }
 
 impl<E> RootfindPairsOracle<E> {
     pub fn new(m: u32) -> Self {
-        Self { m, reps: None }
+        Self {
+            m,
+            reps: None,
+            position: BTreeMap::new(),
+            rows: RowBufs::default(),
+            cands: RowBufs::default(),
+        }
     }
 }
 
@@ -330,7 +373,18 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindPairsOracle<G::Elt> {
         if self.m != 3 {
             return Err(format!("rootfind-pairs runs at m = 3, not {}", self.m));
         }
-        self.reps = Some(Reps::of(ctx.group, fb));
+        let reps = Reps::of(ctx.group, fb);
+        // Row `i` pairs with the abscissae `x_j ≥ x_i`; the position of a
+        // row point's abscissa among the representatives is recovered
+        // from its index.  Built once here, not once a target (it depends
+        // only on the base, as `reps` does).
+        self.position = reps
+            .index
+            .iter()
+            .enumerate()
+            .flat_map(|(pos, &i)| [(i, pos), (fb.neg_index[i], pos)])
+            .collect();
+        self.reps = Some(reps);
         Ok(())
     }
 
@@ -363,22 +417,14 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindPairsOracle<G::Elt> {
         let g = ctx.group;
         let reps = self.reps.as_ref()?;
         let a = reps.index.len();
-        let rows = row_points(g, reps, fb, ops, counters, point, 0, a);
-        // Row `i` pairs with the abscissae `x_j ≥ x_i`; the position of a
-        // row point's abscissa among the representatives is recovered
-        // from its index.
-        let position: BTreeMap<usize, usize> = reps
-            .index
-            .iter()
-            .enumerate()
-            .flat_map(|(pos, &i)| [(i, pos), (fb.neg_index[i], pos)])
-            .collect();
-        for (si, u) in rows {
+        row_points(g, reps, fb, ops, counters, point, 0, a, &mut self.rows);
+        for &(si, u) in &self.rows.out {
             if g.is_identity(&u) {
                 continue;
             }
-            let from = position[&si];
-            for (sj, c) in row_points(g, reps, fb, ops, counters, u, from, a) {
+            let from = self.position[&si];
+            row_points(g, reps, fb, ops, counters, u, from, a, &mut self.cands);
+            for &(sj, c) in &self.cands.out {
                 counters.lookups += 1;
                 if g.is_identity(&c) {
                     continue;
