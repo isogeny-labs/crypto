@@ -110,7 +110,10 @@ document:] a search round over code, notes and records (AGENTS.md
 that are already recorded and runs nothing new. Every number below is
 quoted from the file cited next to it. Numbers marked #emph[derived
 here] are this note\'s own arithmetic on quoted numbers, and the working
-is shown. #strong[Updated:] 2026-10-15, with the outcomes of the five
+is shown. #strong[Corrected:] 2026-10-16 (claim audit): §0.1 and §8 lead
+1 now cite `research/ic_next10_20261014/03-pkm-degree` (`D ≥ 8` at
+`m = 4, N = 20`, NEGATIVE), and the P-192 `t = 48` card is marked
+superseded. #strong[Updated:] 2026-10-15, with the outcomes of the five
 lead studies that merged to `main` at `b906df024` (PRs \#1887, \#1889,
 \#1892, \#1893, \#1895). They were chased from §8 of the first version;
 each verdict below is quoted from the study\'s README on `main`, and the
@@ -398,8 +401,20 @@ at `p₁ = 15·2^27 + 1`, are consolidated from
   [2.7e13],
   [8.1 GB],
   [55.5 min],
+  [4],
+  [20],
+  [#strong[≥ 8] (msolve)],
+  [—],
+  [—],
+  [5 GB cap],
+  [—],
 )
 ]
+
+The `m = 4, N = 20` row is msolve 0.6.5 on the raw presentation, not
+`f4_fp_tower`, from
+#link("../../../research/ic_next10_20261014/03-pkm-degree/README.md")[`research/ic_next10_20261014/03-pkm-degree/`]
+(2026-10-14; see the correction under §0.1 #emph[Status]).
 
 The rounds and controls behind that table:
 
@@ -428,6 +443,15 @@ The rounds and controls behind that table:
 - #strong[Round 7, §16] (2026-10-06): `m = 3`, `N = 18` gives `D = 7`,
   so the `m = 3` line reads 6, 6, 7, 7. `N = 21` needs more than this
   host\'s 14 GB.
+- #strong[IC next-10, item 3] (2026-10-14,
+  #link("../../../research/ic_next10_20261014/03-pkm-degree/README.md")[`research/ic_next10_20261014/03-pkm-degree/`]):
+  #strong[NEGATIVE for the `m = 4` plateau.] At `m = 4`, `N = 20`, on
+  both targets, msolve completes three productive degree-8 F4 rounds
+  before its 5 GB cap; it reduces every lower-degree pair first, so
+  #strong[`D ≥ 8`], and the `m = 4` line reads `D = 6, 7, 7, ≥ 8`.
+  `m = 3` stays inconclusive (`D ≥ 7` at `N = 18, 21, 24`, stopped by
+  the wall before any degree-8 round). Caveat: msolve on the raw
+  presentation; `f4_fp_tower` has not run `N = 20`.
 
 #strong[Pre-registered reading] (rule A1, lines 1506–1513 and
 3169–3171):
@@ -597,13 +621,17 @@ family it ran: \"No index-calculus arm beats generic rho on any curve at
 any band weight; no index-calculus arm has a fitted cost exponent below
 rho\'s.\"
 
-#strong[Status.] Open, and inconclusive on the solver axis: at `m ≥ 4`
-there is no data past `N = 16` at a small prime or `N = 12` at P-224,
-and the next cells need a large-memory host (above). 2-adicity up to
-`v₂ = 96` (the P-224 prime) changes nothing in `D`. End to end it is
-engineering: a tower base costs the same as a plain base in a table
-oracle, and 30–239× rho across the band at 20–28 bits. No relation phase
-has run at P-224 size.
+#strong[Status.] #emph[Correction (2026-10-16 claim audit):] the earlier
+status said \"at `m ≥ 4` there is no data past `N = 16`\". That missed
+#link("../../../research/ic_next10_20261014/03-pkm-degree/README.md")[`research/ic_next10_20261014/03-pkm-degree/`],
+which measured #strong[`D ≥ 8` at `m = 4, N = 20` (NEGATIVE)]. So the
+solver axis is negative at `m = 4`, the only regime §3.7 allows to beat
+rho\'s exponent, and inconclusive at `m = 3`, whose next cell needs a
+large-memory host (above). The P-224 cells reach `N = 12` at `m = 4`.
+2-adicity up to `v₂ = 96` (the P-224 prime) changes nothing in `D`. End
+to end it is engineering: a tower base costs the same as a plain base in
+a table oracle, and 30–239× rho across the band at 20–28 bits. No
+relation phase has run at P-224 size.
 
 === 0.2 Isogeny tower: `x(R' + ⟨Q⟩)` on an auxiliary curve (the P-192
 shape)
@@ -703,7 +731,11 @@ free\" as inadmissible, so any priced run must add it.
 `m = 4`, `t ≈ 48`, so the note\'s own estimate (line 246) is about
 `2^48` SEA point counts per factor base. PKM\'s cheaper alternative
 builds `E'` by CM through `x² − Dy² = 4N` (requirements README lines
-110–119). It was not implemented.
+110–119). It was not implemented. #emph[Correction (2026-10-16):]
+`t ≈ 48` is `N / m` with `N ≈ 192`, the size at which every point
+decomposes; it is not the cost optimum. The note\'s own §3.7 puts the
+optimal base at `|V| ≈ (m!·r·T)^{1/(m+1)} ≈ 2^39` at `m = 4` (derived),
+i.e. `t ≈ 39`.
 
 #strong[Charged end to end in ecbench (2026-10-15, PR \#1889,
 #link("../../../research/pkm_isogeny_tower_ecbench_20261015/README.md")[`research/pkm_isogeny_tower_ecbench_20261015/README.md`]).]
@@ -821,7 +853,11 @@ table oracle). At P-192 the auxiliary curve and `V` are built (PR
 \#1947); no F4 run or relation phase has run at P-192, because the
 plug-in and the isogeny system builder are `u64`. The autoresearcher
 program cites the construction (`AR:KN-LIT-025`) but never built it:
-`AR:H-RELN-96e3ba` calls the PKM arm \"unmaterialised\".
+`AR:H-RELN-96e3ba` calls the PKM arm \"unmaterialised\". The P-192
+`t = 48` auxiliary search card (§8) is abandoned as superseded
+(2026-10-16 claim audit): `t = 48` is not the §3.7 optimum (`|V| ≈ 2^39`
+at `m = 4`), and the supersingular `E'` and the Dickson torus make the
+search unnecessary.
 
 #horizontalrule
 
@@ -847,7 +883,11 @@ odd-characteristic extension fields, §4 binary fields, §5 Koblitz
 curves, §6 Jacobians and covers. §7 collects the results that bound
 every family at once, and §8 lists the open lines.
 
-#image("figures/taxonomy.svg", width: 100%)
+#figure([#image("figures/taxonomy.svg")],
+  caption: [
+    Taxonomy of the factor-base families, coloured by recorded verdict
+  ]
+)
 
 #horizontalrule
 
@@ -1228,6 +1268,92 @@ weight and random bases (PR \#1898)
   and not band-checked.
 
 #horizontalrule
+
+=== A14. Hashed (affine-threshold) factor bases: Bochum v0.2 §3 and the
+tensor IC
+- #strong[Definition.] No set `V` of abscissae: `m` ordered slot bases
+  `F_i = {P ∈ ⟨G⟩ : (α_i·encode(P) + β_i) mod s < τ}`, `s` the first
+  prime in `[2p, 4p]`, one independent `(α_i, β_i)` per slot, `τ` set so
+  that `E|F_i| = max(⌈r^{1/m}⌉, 10m)` (Lemma 13). A relation is
+  `R = P_1 + … + P_m` with `P_i ∈ F_i`. The `ecdl-tensor-ic` variant
+  uses a keyed SHA-256 predicate by default, a random affine hash on the
+  gadget path and an optional coordinate window `x(A) < p >> k`.
+  Membership is an affine map and a comparison, so it encodes as a
+  low-degree predicate; there is no smoothness notion, so decomposition
+  is an unstructured `m`-list problem.
+- #strong[Existence.] Any prime-field curve with a prime-order subgroup;
+  a cofactor `c > 1` is handled by free source points `S` with
+  `A = [c]S` (`ic.tensor_contraction_cofactor_v1`). The framework
+  plug-in stops at `p < 2^61`; the vendored crate is arbitrary
+  precision.
+- #strong[Build.] Inverse-hash enumeration: for each `t < τ`, decode
+  `α^{-1}(t − β) mod s` to a point and keep it if it is in the subgroup.
+  `O(τ)` decodes, no `O(p)` scan, no square-root table. Charged as curve
+  additions plus `hashed_tensor_steps` and `sqrt_solves`; the
+  tensor-curve certification is not charged, and `run_pipeline` says so
+  in `unpriced_work`.
+  - Plug-in: `hashed-affine:slots=m[,seed=…,tau=…,s=…,steps=…]`
+    (`src/cryptanalysis/ic_framework/hashed.rs`), paired with
+    `hashed-tensor` on the same parameters, which it refuses to run
+    without.
+  - Crates: `crates/hashed-ecdl-tensor` (Bochum §3 reduction, Appendix
+    D.4 recursion, certificates), `crates/ecdl-tensor-ic` (whole-point
+    network, ecbench `ic.tensor_contraction_v1` / `_cofactor_v1`, policy
+    `DiagnosticOnly`), `crates/hashed-ecdl-cpu` (MITM oracle over the
+    same slot bases, persistent tuple-sum tables, batch inversion).
+- #strong[Fold.] Negation only: one column per `{P, −P}`; the slots stay
+  ordered.
+- #strong[Oracle.] Exact Boolean tensor contraction (`hashed-tensor`,
+  the crate\'s `SparseContractor`); meet-in-the-middle over the slots
+  (`hashed-ecdl-cpu`, `Solver::mitm`); plain enumeration in the bounded
+  reference. Every witness is re-added in the group before a row is
+  accepted.
+- #strong[Measured.] All `[pcc:unverified]`; nothing has reached the
+  gate.
+  - Counts-only protocol v2, 2026-10-31
+    (#link("../../../research/hashed_ecdl_counts_20261031/results/RESULTS-v2-superseding.md")[`research/hashed_ecdl_counts_20261031/`]):
+    `ic.tensor_contraction_v1`, `m = 2`, against `rho.negation` at 0,
+    0.1 and 1 GAE per unpriced operation: #strong[4.3·10³–9.5·10³×] at
+    10 bits, 2.7·10⁴–5.0·10⁴× at 12, 1.7·10⁵–3.0·10⁵× at 14,
+    #strong[6.7·10⁵–1.2·10⁶×] at 16; the order holds across the band on
+    every curve, and the ratio grows about 5.1× per two bits (log-log
+    slope 1.17, 95% interval 1.00–1.34). Against the plain
+    `prime-abscissa:size=32` + `mitm` baseline on the same curves: 259×
+    to 2.2·10⁵×. The native hashed arms (`ic.hashed_native_v1`, branch
+    `codex/hashed-ecdl-ecbench-e2e`) completed 3 of 16 cells, at
+    5·10²–2.8·10³× rho; the rest exhausted their budgets and are
+    unknown. The validator replayed all 416 executions and checked
+    `[d]G = Q` on the 306 verified rows; one round, 8 targets per cell,
+    A/A vacuous for counts.
+  - CPU oracle, L0 shared host
+    (#link("../../../research/hashed_ecdl_cpu_20261030/README.md")[`research/hashed_ecdl_cpu_20261030/`]):
+    `p = 65521`, `m = 3`, `τ = 80`: complete recovery median 45.99 ms →
+    3.90 ms with persistent tables and batch-64 inversion, 120
+    executions per panel, byte-identical certificates across arms. No
+    rho arm.
+  - Desk audit, 2026-11-07
+    (#link("../../../research/hashed_ecdl_tensor_audit_20261107/README.md")[`research/hashed_ecdl_tensor_audit_20261107/`]):
+    reduction correct; encoding `s = a·m·b` edges with `a ≥ 5.3·10³` at
+    `b = 131`; the recursion is admitted only for `λ ≥ 2^17`
+    (`s ≥ 2^131072` edges), so every run so far is direct summation
+    (`root_u = 0`); the composed exponent is above rho by ≥ 120 bits at
+    `b = 128–256` even with `a = 1`; linear algebra alone exceeds rho
+    for every `m ≤ 6`. §7 item 1 applies as written: the hashed base
+    behaves like a random set of its size.
+- #strong[Verdict.] Refuted at every measurable size, and closed as an
+  experimental lead (`closed_obstructed`; card
+  #link("../../../research/pdp_strategy_evaluation_20261031/cards/e4.md")[`research/pdp_strategy_evaluation_20261031/cards/e4.md`]).
+  The asymptotic claim is conditional on OpenAI Theorem D.1 and stays a
+  watch item: revisit on an explicit-constants D.1 whose saving starts
+  below about `10^6` edges. The hash is an encoding device, not a yield
+  device.
+- #strong[Sources.]
+  #link("../ECDLP_RESEARCH_TECHNIQUES.md")[`ECDLP_RESEARCH_TECHNIQUES.md`]
+  (\"Hashed factor bases\"), #link("../FRAMEWORK.md")[`FRAMEWORK.md`]
+  (\"Hashed-affine / hashed-tensor\"),
+  `cryptanalysis/docs/hashed-ecdl.md`,
+  `research/hashed_ecdl_leads_20261030/`,
+  `research/ic_prime_eth_leads_20261031/leads/L09/`.
 
 == 3. Odd-characteristic extension fields `E(F_{p^k})`
 === B1. Gaudry–Diem subfield base `{P : x(P) ∈ F_p}`
@@ -1868,9 +1994,19 @@ never landed: its evidence file is missing on `main`.
   exponent below rho\'s.\" L0 counts only, and `ic-shared` leaves three
   categories uncounted, so the IC side is still a lower bound.
 
-#image("figures/cost_vs_rho.svg", width: 100%)
+#figure([#image("figures/cost_vs_rho.svg")],
+  caption: [
+    Recorded cost of the best row of each family relative to its matched
+    rho (log scale; sizes differ by row)
+  ]
+)
 
-#image("figures/pkm_solving_degree.svg", width: 100%)
+#figure([#image("figures/pkm_solving_degree.svg")],
+  caption: [
+    PKM tower solving degree D against N \= m·t, Kummer and isogeny
+    families
+  ]
+)
 
 #horizontalrule
 
@@ -1882,13 +2018,19 @@ study; items 2 and 4 were extended on 2026-10-16 (PRs \#1925, \#1942,
 lines of the entries added in this round.
 
 + #strong[The `m ≥ 4` PKM solving degree past `N = 16`.] This decides
-  whether either tower family is subexponential at all. #strong[Still
-  open; costed, not run] (PR \#1893,
+  whether either tower family is subexponential at all. #strong[Answered
+  at `m = 4`, NEGATIVE: `D ≥ 8` at `N = 20`]
+  (#link("../../../research/ic_next10_20261014/03-pkm-degree/README.md")[`research/ic_next10_20261014/03-pkm-degree/`],
+  2026-10-14; msolve, raw presentation). #emph[Correction (2026-10-16):]
+  this item first read \"still open\" and did not cite that result. Only
+  the `m = 3`, `N = 21` cell remains open (inconclusive at `D ≥ 7`),
+  costed, not run (PR \#1893,
   #link("../../../research/pkm_dickson_torus_20261015/README.md")[`research/pkm_dickson_torus_20261015/`]
   §5). #emph[Derived:] `m = 3, N = 21` needs about 130–150 GB peak
   memory and `m = 4, N = 20` about 240–380 GB on the current engine, so
   a 192–256 GB and a 512 GB host, or a disk-backed reducer block that is
-  not built. This container has about 14 GB.
+  not built (the `m = 4` projection assumed `D` stays at 7 and is moot).
+  This container has about 14 GB.
 + #strong[An isogeny-tower plug-in that is charged] — #strong[done at
   toy size; verdict accounting] (PR \#1889,
   #link("../../../research/pkm_isogeny_tower_ecbench_20261015/README.md")[`research/pkm_isogeny_tower_ecbench_20261015/`]).
@@ -1896,7 +2038,10 @@ lines of the entries added in this round.
   1.002–1.331× a plain base of equal size, search share 0.8–25%, curves
   tried ≈ 1.05·2^t. It buys a table oracle nothing over a plain base.
   #emph[Derived:] the P-192 `t = 48` search costs about `2^74` GAE
-  against rho\'s `2^95.8`.
+  against rho\'s `2^95.8`; but `t = 48` is not the attack-optimal size
+  (§3.7 puts `|V| ≈ 2^39` at `m = 4`), and the supersingular `E'` and
+  the Dickson torus remove the search at P-192 (see the backlog card
+  below).
   - #emph[The P-192 auxiliary curve] — #strong[search built and
     measured; `t = 48` derived at 11.2 core-years] (PR \#1925,
     #link("../../../research/pkm_isogeny_tower_p192_20261015/README.md")[`research/pkm_isogeny_tower_p192_20261015/`];
@@ -1923,8 +2068,9 @@ lines of the entries added in this round.
     see.\"
   - #strong[Still open:] an F4 run and a relation phase at P-192 (the
     isogeny system builder and the plug-in are `u64`), and the decision
-    the backlog card records: whether a supersingular `E'` is
-    acceptable. Lead 1 remains the gate for all of it.
+    the backlog card records: whether a supersingular `E'` is acceptable
+    (the card is abandoned as superseded since the 2026-10-16 claim
+    audit). Lead 1 remains the gate for all of it.
 + #strong[The Dickson torus case] (`2^t | p + 1`) — #strong[measured;
   H\_same] (PR \#1893,
   #link("../../../research/pkm_dickson_torus_20261015/README.md")[`research/pkm_dickson_torus_20261015/`];
@@ -1992,12 +2138,13 @@ lines of the entries added in this round.
 #strong[The experiment backlog.]
 #link("../../../backlog/README.md")[`backlog/README.md`] (PR \#1903)
 holds runnable cards for the heavy runs that are still open. Their
-`status` on `main` at `05e414f3f` (from each `card.json`):
+`status` on `main` at `05e414f3f` (from each `card.json`), with the
+2026-10-16 claim audit\'s changes to two cards applied:
 
 - #link("../../../backlog/XP-20261015-pkm-m3-n21-m4-n20/README.md")[`XP-20261015-pkm-m3-n21-m4-n20`]:
-  item 1\'s cells. #strong[Blocked] on hardware (192–256 GB for
-  `m = 3, N = 21`, about 512 GB for `m = 4, N = 20`) or a disk-backed
-  reducer that is not built;
+  item 1\'s `m = 3, N = 21` cell. #strong[Blocked] on hardware (192–256
+  GB) or a disk-backed reducer that is not built; rescoped 2026-10-16,
+  since the `m = 4, N = 20` cell is answered (`D ≥ 8`);
 - #link("../../../backlog/XP-20261015-kummer-p224-depth/README.md")[`XP-20261015-kummer-p224-depth`]:
   item 4\'s remaining cells. #strong[Draft], with no blocker: the
   generic-field engine exists, and the card waits for a frozen
@@ -2007,12 +2154,17 @@ holds runnable cards for the heavy runs that are still open. Their
   G1\'s frozen cells. #strong[Blocked] on memory (47–50 GB at `(13,5)`,
   more beyond) and on the merge commit of PR \#1892 being pinned;
 - #link("../../../backlog/XP-20261015-p192-isogeny-aux-search-t48/README.md")[`XP-20261015-p192-isogeny-aux-search-t48`]:
-  item 2\'s ordinary auxiliary curve at `t = 48`. #strong[Blocked] on a
-  decision: whether PKM\'s relation phase may use the supersingular `E'`
-  (then the search is unnecessary) or the checker must require an
-  ordinary curve (then the card runs at about 98,000 core-hours). PR
-  \#1947\'s answer, at the sizes it tested, is that the supersingular
-  curve is sufficient. The card also names lead 1 as its gate.
+  item 2\'s P-192 auxiliary-curve search at `t = 48`, #strong[abandoned
+  (superseded)] by the 2026-10-16 claim audit: `t = 48` is not
+  attack-optimal (§3.7: `|V| ≈ 2^39` at `m = 4`), its argv\'s `z2xz2`
+  family contradicted the `z2xz8` estimate, and the supersingular
+  `y² = x³ + x` and the Dickson torus give the tower at P-192 without a
+  search. It had been #strong[blocked] on a decision: whether PKM\'s
+  relation phase may use the supersingular `E'` (then the search is
+  unnecessary) or the checker must require an ordinary curve (then the
+  card runs at about 98,000 core-hours). PR \#1947\'s answer, at the
+  sizes it tested, is that the supersingular curve is sufficient. The
+  card also names lead 1 as its gate.
 
 Two cards still name PR \#1892 or PR \#1893 as \"open, unmerged\" in
 their `blocked_on` text; both PRs have since merged. The cards\'
@@ -2064,6 +2216,12 @@ merge commit.
   (frontier campaign, supersingular auxiliary curve) and weight-0 or
   wall-clock rows (N83 cold, large primes, genus-3 cover), each labelled
   with its pricing.
+- #strong[Third update round] (2026-11-12). Added A14, the hashed
+  (affine-threshold) factor bases of Bochum v0.2 §3 and the tensor IC
+  crates, from the counts-only record of 2026-10-31, the CPU panels of
+  2026-10-30 and the desk audit of 2026-11-07; one taxonomy box and one
+  cost row. The `research-kb` server and its CLI were unavailable in the
+  authoring container, so the sources were read from the tree directly.
 - #strong[What is not re-derived.] Entries condensed from long notes
   keep their source\'s status label and are not re-derived here. If a
   source and this page disagree, the source wins.
