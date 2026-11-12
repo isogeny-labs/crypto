@@ -62,6 +62,16 @@ for key in sorted(GROUPS):
             g[name]["span"] = span
         else:
             g[name] = {"applicable": False, "n": len(sel), "span": span}
+    # Other readings (not preregistered verdicts): the d >= 9 fit computed despite the span gate,
+    # and the same fit on the even and odd d separately, because the even cells added here are far
+    # dearer than their odd neighbours.
+    g["other_readings"] = {}
+    for name, sel in (("d_ge_9_despite_gate", [r for r in ok if r["d"] >= 9]),
+                      ("even_d_only", [r for r in ok if r["d"] % 2 == 0]),
+                      ("odd_d_ge_9_only", [r for r in ok if r["d"] % 2 == 1 and r["d"] >= 9])):
+        if len(sel) >= 3:
+            g["other_readings"][name] = fit([math.log(r["v_size"]) for r in sel], [math.log(r["T"]) for r in sel])
+            g["other_readings"][name]["d"] = [r["d"] for r in sel]
     g["local_slopes"] = [{"d": [a["d"], b["d"]],
                           "slope": math.log(b["T"] / a["T"]) / math.log(b["v_size"] / a["v_size"])}
                          for a, b in zip(ok, ok[1:])]
@@ -126,6 +136,9 @@ json.dump(out, open(os.path.join(D, "data", "analysis.json"), "w"), indent=1)
 for k, g in G.items():
     print(k, "fit_d_ge_9:", g["fit_d_ge_9"])
     print("   local:", [(l["d"], round(l["slope"], 2)) for l in g["local_slopes"]])
+    print("   fit_all:", g["fit_all"])
+    for n, f in g["other_readings"].items():
+        print(f"   other {n}: d={f['d']} s={f['slope']:.2f} [{f['lo95']:.2f}, {f['hi95']:.2f}]")
 for k, p in P.items():
     print(k, p["outcome"], "|", p.get("basis", ""))
 print("ALL_DONE" if out["all_done"] else "run not finished")
