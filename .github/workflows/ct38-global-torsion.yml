@@ -1,0 +1,42 @@
+name: CT38 global 5-torsion cross-characteristic control
+on:
+  pull_request:
+    paths:
+      - 'research/lift_reduce_second_prime_20261112/**'
+      - '.github/workflows/ct38-global-torsion.yml'
+  push:
+    paths:
+      - 'research/lift_reduce_second_prime_20261112/**'
+      - '.github/workflows/ct38-global-torsion.yml'
+permissions:
+  contents: read
+jobs:
+  bounded-arithmetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Normal Python, optimized Python, independent Go
+        run: |
+          set -euo pipefail
+          P=research/lift_reduce_second_prime_20261112/ct38_cross_characteristic
+          python3 -B ${P}.py > /tmp/ct38.py.normal.json
+          python3 -O -B ${P}.py > /tmp/ct38.py.optimized.json
+          cmp /tmp/ct38.py.normal.json /tmp/ct38.py.optimized.json
+          python3 -m py_compile ${P}.py
+          go run ${P}.go > /tmp/ct38.go.json
+          python3 - <<'PY'
+          import json
+          a=json.load(open('/tmp/ct38.py.normal.json'))
+          b=json.load(open('/tmp/ct38.go.json'))
+          assert a['point_counts']==b['point_counts']=={'7':10,'13':10,'17':20,'101':100,'103':120}
+          assert a['torsion_order']==b['torsion_order']==5
+          assert a['negative_control']==b['negative_control']==[2,29]
+          print('Independent finite-group counts and negative controls agree; [pcc:unverified].')
+          PY
