@@ -47,6 +47,12 @@ All results below are `[pcc:unverified]`.
   - The only alternative (s4) gives 28 chains and 2.34× the cost per trial.
   - Write-up: `probes/CHAIN_VARIABLE.md`.
 
+- **Lead 6 (`LEAD-A-selector-counting-law`): Model A wins the preregistered grid.**
+  - Score: A 4 of 5, B 2 of 8; all controls as expected.
+  - The plain ratio `(k+1)M(k,e+1)/(n M(k,e))` predicts the random-`V` cells.
+  - `V` inside `ker Tr` is harder: (13, 25, 4) is infeasible there.
+  - Write-up: `research/lfd_lower_bound_20261111/out/lead_A2/RESULT.md`.
+
 | Lane | File | Leads |
 |:--|:--|--:|
 | A — last fall degree and the selector proof system | `lane_A_falldegree.md` | 5 |
