@@ -104,7 +104,7 @@ Derived and measured in `research/prime_ic_leads_20261110/jet_exit/README.md`: o
 the extra equation comes only with free `F_p` unknowns (no homomorphism `E(F_p) → F_p` when
 `p ∤ r`); over `Z/p^k` the torsion section gives `k − 1` extra cross-summand equations in the digit
 functions `x_j(P)`, whose popcount degree on Kummer bases equals that of a random function (3, 4, 5
-at `t = 6, 8, 10`, and 6 at `t = 12`; 40 cells over 16 curves, two primes and five integer lifts, three
-digits), so they enter at a degree that grows with the unknown bits (`t ≤ 12` measured; the asymptotic
+at `t = 6, 8, 10`, and 6 at `t = 12, 13`; 42 cells over 17 curves, two primes and five integer lifts, three
+digits), so they enter at a degree that grows with the unknown bits (`t ≤ 13` measured; the asymptotic
 is the filter's requirement, not a measurement). All three bigger-ring exits are closed at toy scale; the first unblock item has no known
 candidate.

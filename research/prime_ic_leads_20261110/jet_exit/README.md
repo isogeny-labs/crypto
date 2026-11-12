@@ -105,9 +105,10 @@ pre-registered recipe are recorded below).
 | `p = 40961`, `t = 10`, 10 further curves (seed 7) | 10 | 5, 5, 5 | 5, 5, 5 | 5 |
 | `p = 40961`, `t = 10`, 3 curves, lifts `(a + p, b)`, `(a, b + p)`, `(a + 3p, b + 7p)`, `(a + 17p, b + 5p)` | 12 | 5, 5, 5 | 5, 5, 5 | 5 |
 | `p = 12289` (`3·2¹² + 1`), `t = 10` and `t = 12`, 3 curves each | 6 | 5 / 6 | 5 / 6 | 5 / 6 |
+| `p = 40961`, `t = 13`, 2 curves (`n ≈ 4,050`, 8,192 columns, 74 s each) | 2 | 6, 6, 6 | 6, 6, 6 | 6 |
 
-In all 40 cells (9 original + 31 widened; 16 distinct curves, two primes, five lifts, `t` up to 12,
-i.e. `N = 2t` up to 24 unknown bits at `m = 2`) every digit reads the generic degree and never below
+In all 42 cells (9 original + 33 widened; 17 distinct curves, two primes, five lifts, `t` up to 13,
+i.e. `N = 2t` up to 26 unknown bits at `m = 2`) every digit reads the generic degree and never below
 it. The lift dependence stated as a caveat in §3 does not show at this scale: four non-trivial lifts
 give the same reading on the same curves.
 
@@ -132,7 +133,8 @@ give the same reading on the same curves.
   of `(a, b)`; the Serre–Tate canonical lift, small-height CM lifts, and the Dickson and isogeny
   towers are untested. The test is one-sided (nothing on `A` can need more than `d_full`). The
   filter's `Θ(N)` is its *requirement*, not a measured asymptotic: what is measured is that the
-  digit degree tracks `d_full ≈ t/2` from `t = 6` to `t = 12` with no sign of saturating. It says
+  digit degree tracks `d_full ≈ t/2` from `t = 6` to `t = 13` with no sign of saturating (at `t = 13`,
+  `d_full = 6` because `Σ_{i≤6} C(13, i) = 4,096 ≥ n`). It says
   nothing about the discrete-log channel, which the atlas already closes.
 
 **Recipe corrections made by the implementing agent, checked by the main session.** (1) The
