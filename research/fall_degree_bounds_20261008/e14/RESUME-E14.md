@@ -16,7 +16,8 @@ CPU probe: 28–30.
 ## Current run
 Pod `fd-e14-r2j-20261112T0457Z` (`gjr9mpprgga8eb`), cpu5m 32 vCPU 256 GB, USD 2.08/h, launched
 2026-11-12T04:57:05Z, deadline 2026-11-13T16:57:18Z (USD 100 cap). Probe 14.5 of 32; build done
-05:00:59; G0 started 05:00:59. Pod id and output token in `e14/pod-r2/launch.json`.
+05:00:59; G0–G3 passed by 05:33:41 (G3: `pe` at 8 threads, 341 s); E14a (`hky_par` cmax 5,
+32 threads) started 05:33:41, time box until 17:33 UTC. Pod id and output token in `e14/pod-r2/launch.json`.
 
 ## How to resume
 1. `bash research/fall_degree_bounds_20261008/e14/pull_r2.sh` (idempotent; pulls every 10 min,

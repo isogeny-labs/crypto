@@ -85,11 +85,14 @@ a rich spectrum of different-order complementary curves, but the log follows to
 none (`research/chained_prime_transfer_20261111/ATLAS.md`) [pcc:unverified]:
 
 - Sweep workflow: 5,641 covers; the complement takes up to 141 distinct orders
-  across the Hasse interval; 3,479 complements are smoother than the target;
-  the cover map `φ2_*φ1^* = 0` on every report; no reachable complement is
+  across the Hasse interval; 3,479 complements are smoother than the target (smaller largest
+  exactly-once prime);
+  the cover map `φ2_*φ1^* = 0` wherever sampled (first 40 covers ×
+  16 samples per report, one direction; replay F9); no reachable complement is
   strictly easier (reachable ⇒ same order ⇒ identical hardness).
-- Census: `φ2_*φ1^* = 0` on 300/300 curves per prime; no non-special start has
-  a reachable easier node.
+- Census: `φ2_*φ1^* = 0` in both directions on 300/300 curves per prime. The
+  "no reachable easier node" counters are zero by construction. They restate
+  the theorem below and are not independent evidence (replay F8).
 - Positive control: Smart's additive transfer recovers the log on a genuinely
   anomalous curve over `F_43`, so the easy node is real — just unreachable from
   a non-anomalous start (an isogeny preserves the trace; no edge changes the
@@ -113,6 +116,27 @@ against rho at 0 GAE, and is above rho at 0.1 and 1 GAE. The IC slope in p is
 0.85 (genus 2) and 1.06 (genus 3), against 0.44 for rho. Up, across and down
 are now each measured or proved closed.
 
+## Ladder, formula, smoothness and replay (2026-11-12 addendum)
+
+Four parallel experiments under
+`research/chained_prime_transfer_20261111/{tower_ladder,tower_formula,tower_smoothness,replay}`
+[pcc:unverified]:
+
+- Ladder (genus 1 → 2 → 3 → 4 on one instance, genus 4 by a degree-3 cover
+  `y² = c(h(x))`): IC per rung grows by about 2×, 3× and 4×. Genus 4 costs
+  3.7–19.6× rho at 0 GAE. No rung ranks below rho across the band.
+- Formula scan to 2^128: the best genus is g = 2, still about 64 bits above
+  rho. No subexponential regime beats rho at any size scanned
+  [pcc:unverified].
+- Smoothness: measured trials per relation are 1.00, 1.94, 5.91 and 22.2 for
+  genus 1–4, against `g!` = 1, 2, 6, 24.
+- Independent replay: every raw file is byte-identical. One figure was wrong:
+  the cover-spectrum note said 470/504 smoother, and the correct count is 87/504
+  (fixed). The replay also found that the IC counter overcounted by 8–13%,
+  that rho was not checked against the planted log, and that LA work was not
+  emitted. These are fixed in code and rerun as `results_v2.json`. The band
+  is one-sided, because rho has no unpriced counters.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -120,3 +144,5 @@ are now each measured or proved closed.
 - 2026-11-11: transfer-atlas addendum — cover sweep, census and down-edge
   controls; the obstruction holds across every arm measured.
 - 2026-11-11: tower-up addendum (genus 1 → 2 → 3 on one instance); the ladder raises IC cost per rung.
+- 2026-11-12: ladder/formula/smoothness/replay addendum; replay corrections
+  applied (F1–F3, F6, F8–F12) and the bench rerun as `results_v2.json`.

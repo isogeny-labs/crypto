@@ -184,3 +184,31 @@ has `t ≤ 10` already). *Prediction:* `W = 1` steps from 5 to 6 at `t = 12` or 
 are at `t = 4` and `t = 8`, four levels apart, like C-step); `W = 3` and `W = 4` stay at 5 through
 `t = 9` and step to 6 at `t = 10` or `11`; every value is non-decreasing in `W` and in `t`.
 *Use:* the step positions are the data a derivation of `d_F(W, N)` must reproduce.
+
+## 7. Results of the follow-ups (development checks, this host; every value `[pcc:unverified]`)
+
+**7a. Structured (CM) lifts (6a): prediction holds.** `examples/cm_lift_scan.rs` scanned twists
+`d ≤ 2000` of the seven class-number-one models at `p = 40961` and `p = 12289`; prime-order twists
+exist only for `D = −43` at `p = 40961` (`r = 41081`) and `D = −163` at `p = 12289` (`r = 12143`),
+two integer representatives of the one non-trivial twist class each (`rows/cm/hits.tsv`). On their
+canonical lifts (`--lift-a/--lift-b` from `A = a₀d²`, `B = b₀d³`), at `t = 10` and `t = 12`, two
+seeds each (16 rows), the digits `x₁, x₂, x₃` read 5 and 6, equal to random and to `d_full`; the
+trivial lift on the same `(a, b)` and seeds reads the same (8 rows). No digit below `d_full` in any
+of the 24 rows (`rows/cm/SUMMARY.md`). The canonical lift is not the reopening case at this scale.
+
+**7b. Dickson towers (6b): prediction holds.** `--tower dickson` (split case, `u` with
+`u^{2^{t+1}} ≠ 1`, degree measured in the multilinear monomials of the tower values): at
+`p = 40961`, `t = 6, 8, 10`, three curves each (`rows/dickson_*.jsonl`), the digits read 3, 4, 5,
+equal to random and to `d_full`; `y₀ → 1`, `y₀y₁ → 2`.
+
+**7c. Support-width law at larger `t` (6c), interim.** `W = 1` stays at 5 through `t = 11`
+(consistent with the prediction of a step at `t = 12` or later); `W = 3` steps to 6 at `t = 9`,
+**refuting** the prediction of a plateau through `t = 9`; every completed cell is monotone in `W` and
+`t`. `W = 1` and `W = 2` both step every four levels, offset by two (`d_F(1, t) = 3 + ⌊t/4⌋`,
+`d_F(2, t) = 4 + ⌊(t − 2)/4⌋` on `t = 2..11`, fits to the recorded steps). Table and censoring in
+`devcheck/README.md`; the `W = 3, 4` cells at `t = 10, 11` are still running.
+
+**Standing after 7a and 7b.** The `Z/p^k` exit now fails filter item 4 on the trivial lift (42
+cells), on the canonical lift of two CM curves (16 cells), and on the Dickson base (9 cells). The
+remaining untested configurations are the 2-isogeny tower and primes beyond 16 bits, neither of
+which has a mechanism in its favour.

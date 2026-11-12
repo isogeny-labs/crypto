@@ -84,6 +84,12 @@ The figure `tower.svg` plots the group-operation columns.
    for IC on genus 2 and 1.06 for IC on genus 3, against 0.44 for rho on E
    (derived; 8 points, no interval). This is the `Ω(p)` relation count
    against rho's `√r`.
+
+*Band caveat (replay F12, 2026-11-12):* the §5a band here is one-sided. The
+rho reference has no unpriced counters, so only the IC arm moves across 0,
+0.1 and 1 GAE. Rankings that hold across the band remain valid. Where the
+order flips, the flip comes from the price of the IC linear algebra, not from
+any uncertainty on the rho side.
 5. **Rho is unchanged by the transfer.** On the order-`r` subgroup of either
    Jacobian, rho matches rho on E: the subgroup is the same size.
 

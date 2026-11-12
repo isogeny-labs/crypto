@@ -49,3 +49,56 @@ included, so the IC figure is a lower bound on its total cost.
   columns.
 - Nothing about other cover families, genera above 2, or cross-characteristic
   maps (none is constructed).
+
+## Corrections from the independent replay (2026-11-12)
+
+The independent replay (`replay/REPLAY.md`) reproduced every raw file of this
+run byte for byte. It also found faults in what the run measures
+[pcc:unverified]. The table above is kept as frozen evidence (`results.json`,
+`frozen.sha256`). The corrected rerun is `results_v2.json`, summarised in the
+next section.
+
+- **F1, IC overcount.** `scalar_counted` counted the first addition into the
+  identity as a group operation, which inflated IC by 8–13%. The replay's
+  corrected IC/rho values are 8.64, 23.29, 31.34 and 39.19, with slope 1.019.
+  The qualitative result does not change. The code is fixed.
+- **F2, LA not emitted.** The linear-algebra cost is now written out as
+  `ic_jac_la_mulmods`. The replay's figures are 14,633, 51,976, 164,828 and
+  603,721 mulmods.
+- **F3, rho unchecked.** Rho now has to recover the planted log
+  (`rho_recovered_ok`), and a row is accepted only when IC, rho and the chain
+  all verify.
+- **F4, IC answer check.** The linear algebra accepts a candidate log only if
+  it equals an uncharged BSGS reference. So `ic_recovered_ok` shows that no
+  wrong log is returned, not that the elimination alone finds the log. The
+  replay certified each answer separately with `[k]D_G = D_T`. Not fixed here.
+- **F5, surrogate instance.** The Jacobian instance is the pulled-back
+  surrogate (`jac_instance`), not a fresh random one. This is a stated
+  limitation.
+- **F6, silent rejections.** Rejected candidate curves are now logged to
+  stderr.
+- **F7, set-up dominance.** At these `r` (71–401), rho is dominated by fixed
+  set-up (S = 34–44). The 0-GAE ratio is a loose bound.
+- **F13/F14, bindings.** Some bench records bind a dirty commit that does
+  not contain the measured files, and no solve certificates were emitted. The
+  v2 run is recorded from a clean commit.
+
+## Corrected rerun (`results_v2.json`, 2026-11-12)
+
+Bench record `benchmarks/records/20261112T0316Z-chained-prime-transfer-v2.json`.
+The run is from clean commit `c211ce17a4`, which carries the F1–F3 and F6
+fixes. Every row recovered the planted log by rho and by IC, and every chain
+verified. The IC/rho ratios and the LA mulmods equal the independent replay's
+corrected values exactly. IC is relation-collection group operations; LA is
+priced per AGENTS §5a at 0, 0.1 and 1 GAE per mulmod. All values are
+`[pcc:unverified]`.
+
+| p | r | rho on E1 | IC group ops | LA mulmods | IC/rho @ 0 GAE | @ 0.1 GAE | @ 1 GAE |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 211 | 109 | 428 | 3,700 | 14,633 | 8.6× | 12.1× | 42.8× |
+| 419 | 113 | 357 | 8,315 | 51,976 | 23.3× | 37.9× | 168.9× |
+| 821 | 71 | 370 | 11,596 | 164,828 | 31.3× | 75.9× | 476.8× |
+| 1619 | 401 | 847 | 33,196 | 603,721 | 39.2× | 110.5× | 752.0× |
+
+IC is above rho at every price, so the order holds across the (one-sided)
+band. The distance remaining to rho is 8.6–39.2× at 0 GAE and grows with p.
