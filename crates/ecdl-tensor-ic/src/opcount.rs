@@ -21,6 +21,9 @@ use std::collections::BTreeMap;
 struct Tally {
     phase: &'static str,
     counts: BTreeMap<String, u64>,
+    /// Scratch for the `<phase>.<name>` key, so a count that exists already
+    /// costs no allocation (one bump per point addition).
+    key: String,
 }
 
 thread_local! {
@@ -33,6 +36,7 @@ pub fn start() {
         *t.borrow_mut() = Some(Tally {
             phase: "setup",
             counts: BTreeMap::new(),
+            key: String::new(),
         })
     });
 }
@@ -62,7 +66,17 @@ pub fn set_phase(phase: &'static str) {
 pub(crate) fn bump(name: &str, n: u64) {
     TALLY.with(|t| {
         if let Some(t) = t.borrow_mut().as_mut() {
-            *t.counts.entry(format!("{}.{}", t.phase, name)).or_default() += n;
+            t.key.clear();
+            t.key.push_str(t.phase);
+            t.key.push('.');
+            t.key.push_str(name);
+            // the same entry `or_default() += n` makes, created on first use
+            match t.counts.get_mut(t.key.as_str()) {
+                Some(v) => *v += n,
+                None => {
+                    t.counts.insert(t.key.clone(), n);
+                }
+            }
         }
     });
 }

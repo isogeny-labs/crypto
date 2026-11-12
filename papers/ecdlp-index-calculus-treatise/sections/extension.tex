@@ -244,6 +244,207 @@ Joux--Vitse sieve row among them (Chapter~\ref{sec:transfer},
 \S\ref{sec:jac-jv}). It would be a crossover in a weak family:
 $\FF_{(2^m)^4}$ is not a field deployed curves use.
 
+\paragraph{Three per-trial probes, 12 November.} Three leads of the
+11 November survey targeted the cost of one characteristic-two $k=4$ trial
+(\art{research/leads_20261111/README.md}; local, unverified). The
+chain unknown of the Frobenius-reduced system is fixed by the weight
+vector; it already gives 12 chains, not the 16 the lead assumed, and the
+only alternative variable gives 28 chains at $2.34\times$ the cost per
+trial, so the lead is closed (\art{research/leads_20261111/probes/CHAIN_VARIABLE.md}).
+The 21 carrying monomials have $\FF_2$-rank of differences 4 on 300 of
+300 instances, so they lie in no index-2 coset, and that lead is closed.
+The quadratic part has rank 2, not 3, on 300 of 300 targets, so the
+constant-quadratic elimination is falsified as written; its rank-2 variant
+is untested (\art{research/leads_20261111/runs/B_d4bin_probes/RESULT.md}).
+None of the three moves the distances of Table~\ref{tab:pf-d4}.
+
+\section{The Joux--Vitse cover, 11--12 November}\label{sec:ext-jv-nov}
+
+Four studies extend the Joux--Vitse account of \S\ref{sec:jac-jv}. Two
+change the cost of a solver arm; two charge or bound the cost of reaching
+the weak class at all. Every number below is an unverified assertion
+(\texttt{[pcc:unverified]} in each source); none has a pcc claim. All are
+local runs on a 4-vCPU container, on the weak class of curves over
+$\FF_{p^6}$ with full rational 2-torsion. The validated sieve row they
+refer to is the pooled table-line arm U of the 3 November study:
+$0.0141$ $[0.0122,0.0167]$ of matched negation rho in U2 at $w=0$, and
+$0.0857$ and $0.0900$ at $w=0.1$ and $1$ (\art{research/jv_sieve_line_vs_rho_20261103/VALIDATION.json},
+validated 11 November; leaderboard component
+\texttt{jv\_sieve\_line\_vs\_rho\_component}).
+
+\paragraph{The Hilbert stop on the Nagao arm.} The Hilbert early stop of F4
+(\texttt{--stop hilbert:16}) had lowered counted $S$ by $1.848$--$1.875$ at
+$p=53$--$503$, and the scale runs at $p\ge1301$ never used it
+(\art{research/leads_20261111/README.md}, lead~1). A preregistered test ran
+it on the nine line-search instances of \S\ref{sec:jac-jv}
+($p\in\{1301,1451,1601\}$, seeds 1--3), with a drift control that
+reproduced the frozen record exactly
+(\art{research/jv_nagao_hilbert_20261112/README.md}). Relations, residuals
+and the relation digest are identical on 9 of 9 instances. Counted $S$
+falls to $0.5276$--$0.5280$ of the line-search arm; F4 multiplications
+fall to $0.3894$--$0.3895$; the emitted native F4 counter falls to
+$0.983$; about $0.08\%$ of systems fall back. All four preregistered
+falsifiers pass. Re-scored with the unchanged tool against the pooled
+matched negation rho (126 runs), the arm moves below rho in U2 at
+$p=1451$ and $1601$ at every weight of the band
+(Table~\ref{tab:ext-jv-hilbert}). At $p=1301$ it is level with rho at
+$w=0$ ($1.003$ $[0.916,1.104]$), so the order does not hold across the
+band there. The cover's native count omits its $\FF_p$ additions, so a
+``below'' could narrow under complete counts. The source classifies the
+change as engineering: the counted cost falls while the native counter
+stays flat.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rrrrrrrl@{}}
+\toprule
+$p$ & $S_B/S_A$ & U2, line & U2, Hilbert, $w=0$ & $w=0.1$ & $w=1$ & U1, $w=0$ & Band \\
+\midrule
+1301 & $0.5276$--$0.5279$ & $1.900$ & $1.003$ $[0.916,1.104]$ & $0.861$ & $0.831$ & $0.417$ $[0.381,0.459]$ & no \\
+1451 & $0.5278$--$0.5280$ & $1.585$ & $0.837$ $[0.771,0.910]$ & $0.718$ & $0.693$ & $0.348$ $[0.321,0.379]$ & below \\
+1601 & $0.5277$--$0.5278$ & $1.318$ & $0.695$ $[0.642,0.756]$ & $0.597$ & $0.576$ & $0.289$ $[0.267,0.314]$ & below \\
+\bottomrule
+\end{tabular}
+\caption[]{The Hilbert early stop on the plain Nagao arm of the
+Joux--Vitse cover. $S_B/S_A$: counted $S$ with the stop over the
+line-search records, per seed (three seeds). U2, line: the line-search arm
+against matched negation rho at $w=0$
+(Table~\ref{tab:jac-nagao}). U2, Hilbert: with the stop, cover/rho in
+textbook $\FF_p$ multiplications at $w=0$, $0.1$ and $1$ GAE per native
+operation; U1: group additions. Brackets: 95\% bootstrap intervals over
+cover seeds and the 126 pooled rho runs (estimator b). Band: verdict
+across $w\in\{0,0.1,1\}$ in U2 (``no'': not the same at every weight).
+The cover's native count is a lower bound. Modelled U2 crossover
+$p^*=1327$ $[1278,1381]$, U1 $874$ $[842,910]$, on the crossover study's
+slope $-2.10$ (not re-fitted). Local L0, no validation file, unverified.
+Sources: \art{research/jv_nagao_hilbert_20261112/results/paired.txt},
+\art{research/jv_nagao_hilbert_20261112/rescore/table.md}.}
+\label{tab:ext-jv-hilbert}
+\end{table}
+
+\paragraph{The same stop in the sieve's descent: killed.} The sieve route's
+descent built its F4 options without the Hilbert rule; an opt-in patch
+(\texttt{JV\_SIEVE\_HILBERT=16}) wired it in and ran 16 paired seeds at
+$p=1511$, the plain arm reproducing the committed records exactly
+(\art{research/jv_sieve_hilbert_descent_20261112/README.md}). Digests,
+relations and solutions agree on 16 of 16 seeds. Descent F4
+multiplications fall to $0.407$ and counted $S$ to $0.856$ (paired
+geometric mean; per seed $0.709$--$0.969$); $S^+$ falls to $0.961$; 11
+of 20{,}405 systems fall back. The descent's native F4 operations rise to
+$1.139\times$, above the preregistered kill limit of $1.10\times$. In the
+band, Hilbert over plain is $0.709$--$0.832$ at $w=0$, $0.927$--$0.947$ at
+$w=0.1$ and $1.095$--$1.101$ at $w=1$ on the four seeds tabulated, so the
+order flips inside the band. The lead is killed by its own falsifier; the
+plain sieve row is unchanged. The source's reading: at $p=1511$ the
+descent's native F4 work (about $6.7\cdot10^7$ operations) is large next
+to its counted work (about $1.0\cdot10^7$ group-addition equivalents), so a
+change that trades multiplications for checks ranks only if it wins at
+$w=1$.
+
+\paragraph{Emitting the sieve's unemitted additions.} The validated row
+priced the cover's F4, descent and linear-algebra additions by an upper-bound
+proxy. A preregistered run on seeds 17--32 emitted them
+(\art{research/leads_20261111/runs/C_sieve_emit_price/RESULT.md}, lead~3).
+Emitted over proxy is $0.816$ as a ratio of per-run means on seeds
+17--24 ($0.815$ on all 16), $0.44$--$0.93$ per seed, geometric mean
+$0.715$. The layer-A cells move by less than 3\%; the worst emitted cell is
+$0.1196$ (U2, $w=1$), and U1 at $w=1$ is $0.1185$. Neither falsifier
+triggered; the verdict is ``partial'', because the ratio prediction
+$0.92$ $[0.80,1.05]$ holds only as a ratio of means. The proxy priced a
+linear-algebra operation at 16 additions; the emitted count is one, and the
+skeptic's note records that at 16 the ratio is about $0.99$. This is
+accounting: the proxy was an upper bound, so the validated row needs no
+erratum.
+
+\paragraph{The walk into the weak class, charged.} The validated row
+starts on a weak curve. A frozen protocol charged the isogeny walk from a
+non-weak start $C$, built by $M\in\{8,32,128,512\}$ random isogeny moves
+away from the weak curve, on the validated instances ($p\in\{1009,1511,1823\}$,
+seeds 17--24; 96 runs, 0 failures)
+(\art{research/jv_walk_charge_20261111/README.md}). With the walk charged,
+the pooled arm-U ratio stays below rho at every weight
+(Table~\ref{tab:ext-jv-walk}); the preregistered verdict ``walk charged,
+still below rho'' held. The walk cost is heavy-tailed: medians stay at
+0.1--4\% of the route, while the worst instance rises from $0.18\times$
+the route at $M=8$ to $1.48\times$ at $M=512$ ($p=1009$;
+$1.9\cdot10^9$ $\FF_p$ multiplications). As an arithmetic mean, a
+statistic declared after the run, the walk adds 21\%, 1.6\% and 6.2\% at
+$p=1009$, $1511$ and $1823$, and the charged mean is $0.039$, $0.012$ and
+$0.0086$ of rho. The walk's hash-set probes are not emitted.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+$w$ & walk charged, $M=512$ [95\%] & validated row, walk not charged \\
+\midrule
+0 & $0.0155$ $[0.0125,0.0200]$ & $0.0141$ \\
+0.1 & $0.0858$ $[0.0707,0.1088]$ & $0.0857$ \\
+1 & $0.0900$ $[0.0739,0.1138]$ & $0.0900$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The Joux--Vitse sieve route (arm U, U2, layer A, pooled over 24
+instances at $p\in\{1009,1511,1823\}$) over matched negation rho, with
+the isogeny walk from a start $M=512$ random moves from the weak curve
+charged, against the validated row without it. 95\% bootstrap
+intervals. Starts lie within the implemented walk's reach by
+construction (see Table~\ref{tab:ext-jv-coverage}). Unverified; no
+validation file for the charge. Source:
+\art{research/jv_walk_charge_20261111/README.md}
+(\texttt{analysis.json}).}
+\label{tab:ext-jv-walk}
+\end{table}
+
+\paragraph{How often a curve reaches the class.} The walk-charge starts were
+built by the walk's own moves, so the walk can always return. A second
+frozen study asked how often a curve over $\FF_{p^6}$ lands in a weak class,
+and how often the implemented walk reaches a weak curve from a random
+admitted start (\art{research/jv_weak_coverage_20261111/README.md}; the
+cubic norm-one branch only, two disclosed amendments).
+Table~\ref{tab:ext-jv-coverage} gives the shares. About a quarter of
+uniform curves pass the proved necessary condition
+$t\equiv\pm(p^6+1)\pmod{16}$ at every size; the prediction of $1/8$
+failed. At $p=37$--$67$ exact censuses find a weak curve in 98.8--99.6\%
+of admitted classes; at $p\ge1009$ that share is unresolved, apart from
+three classes reached at $p=1009$. The implemented walk reaches a weak curve
+from about 40\% of admitted starts at $p=37$ and 53, from 3 of 60 at
+$p=1009$ and from none of 60 at $p=1511$ and $1823$ (prediction $W<0.1$ at
+$p\ge1009$ held). The odd jumps exist only where an $\ell$-torsion point is
+rational over $\FF_{q^3}$, so from a random start they reach a small part
+of the class. The three successful walks at $p=1009$ took 19--153 isogeny
+steps and $1.8\cdot10^9$--$3.0\cdot10^{10}$ $\FF_p$ multiplications,
+$0.008$--$0.14$ of matched rho and up to about $30\times$ the route. The
+validated sieve row therefore holds for curves in the weak class; the
+walk charge of Table~\ref{tab:ext-jv-walk} holds for starts within the
+walk's reach, not for an arbitrary curve of the class. Reaching the class
+from a typical curve needs odd isogenies with irrational kernel points,
+which are not implemented.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rllll@{}}
+\toprule
+$p$ & uniform admitted & full 2-torsion admitted & walk reaches weak & coverage \\
+ & ($n=2{,}000$) & ($n=400$) & (of 60 admitted) & U$\times$W \\
+\midrule
+37 & $24.5\%$ $[22.6,26.4]$ & $62.5\%$ $[57.7,67.1]$ & $40\%$ $[29,53]$ & $9.8\%$ \\
+53 & $24.0\%$ $[22.2,25.9]$ & $62.5\%$ $[57.7,67.1]$ & $42\%$ $[30,54]$ & $10.0\%$ \\
+1009 & $22.9\%$ $[21.1,24.8]$ & $59.3\%$ $[54.4,64.0]$ & $5\%$ $[1.7,13.7]$ & $1.1\%$ \\
+1511 & $22.3\%$ $[20.5,24.2]$ & $59.8\%$ $[54.9,64.4]$ & $0\%$ $[0,6.0]$ & $<1.5\%$ \\
+1823 & $24.0\%$ $[22.1,25.9]$ & $63.3\%$ $[58.4,67.8]$ & $0\%$ $[0,6.0]$ & $<1.6\%$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Reach of the Joux--Vitse weak class over $\FF_{p^6}$. Admitted:
+the class passes the proved necessary condition $t\equiv\pm(p^6+1)
+\pmod{16}$ (an upper bound on landing in a weak class). Walk reaches weak:
+share of random admitted starts from which the implemented walk reaches a
+weak curve. Coverage: the source's operational coverage of the route as
+implemented; at $p=1511$ and $1823$ an upper bound. Wilson 95\% intervals.
+Unverified. Source: \art{research/jv_weak_coverage_20261111/README.md}.}
+\label{tab:ext-jv-coverage}
+\end{table}
+
 \section{Other extension-field routes}
 
 \begin{itemize}
@@ -256,5 +457,6 @@ $\FF_{(2^m)^4}$ is not a field deployed curves use.
   short remainder on $\FF_{p^4}$, are recorded with the named targets in
   \S\ref{sec:pt-gfp5}.
 \item \emph{Joux--Vitse cover.} The cover of $E(\FF_{p^6})$ is summarised in
-  Chapter~\ref{sec:transfer}, with the full account in \S\ref{sec:jac-jv}.
+  Chapter~\ref{sec:transfer}, with the full account in \S\ref{sec:jac-jv}
+  and the November follow-ups in \S\ref{sec:ext-jv-nov}.
 \end{itemize}
