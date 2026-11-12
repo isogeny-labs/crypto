@@ -5,13 +5,40 @@ Protocol: `PROTOCOL.md` (frozen at commit dccf37b6, amended at e50d4f23 before t
 engine, one machine, no independent replay) unless a line says otherwise. Engines: ml-cryptanalysis at 27a67b9
 (`scripts/ic_bounds_growth_lib.py`, `csd/ic_bounds_big.py`), N4v2 `v2.rs` built here (`j2/BUILD.txt`).
 
+**Summary.** [pcc:unverified]
+- **J2 (percolation factor-base size): measured improvement, held out.** On the N4v2 plane-quartic DL1 solver (weak
+  GHS family), lowering the factor-base constant from the frozen 2.00 to 1.60 cuts the charged cost to 0.655–0.685×
+  at k = 21 and 22 on fresh seeds, with the order holding across the w ∈ {0, 0.1, 1} band; the success threshold sits
+  between 1.50 and 1.60 at every k. Falsified at k = 16 (no gain there). Engineering class, unvalidated.
+- **S1 (mechanism of the prime degree law): Dm survives.** A second equation lowers the fall degree at k = 10;
+  characteristic down to 19 with one equation does not. The record's small-characteristic cells were void (Fermat
+  moduli admit no unit instance) and were rescoped before data. Side finding: about 1 in 10 small-characteristic
+  unit instances has a non-generic closure (exceptional loci), one class extending the D = 4 plateau by one depth.
+- **P1 (quotient law): reproduces exactly out of sample** (72/72 cells), which confirms instance-independence; the
+  decisive test is the GPU-class stage 2.
+- **M1 (m = 3 arity): closes** at the measured depths from existing exact records.
+- **J1 (quartic solver on generic Jacobians): blocked** on the instance side (no genus-3 point counter; ℓ < 2^64),
+  with the solver adapter sized at about 140 lines.
+
 ## P1 quotient law: stage 0 reproduced, stage 1 (fresh primes) — see table below
 
 Stage 0 (`tools/p1_stage0.txt`): the twelve committed cells give q/2^k = 2.500, 4.375, 5.250, 5.156 (D = 3);
 2.953, 5.016, 5.688, 5.365 (D = 4); 3.058, 5.083, 5.712, 5.374 (D = 5); 3.067 (D = 6): lane P's table to the digit.
 Side finding: the N8 main instance (12289, 4021, 9917, 4408) is unit at k ≤ 6 and proper at k = 8, 9 (2, 16 zeros).
 
-Stage 1 (`p1/`, `tools/p1_score.py`): STAGE1_PLACEHOLDER
+Stage 1 (`p1/`, `tools/p1_score.py`, figure `figures/p1_quotient_law.svg`): primes 13313, 15361, 19457; per prime two unit
+instances and one proper control; D = 3 at k = 2..9 and D = 4 at k = 4..9 (18 closures, growth-lib engine, full sweep clean
+on every closure). **All 72 plateau cells equal the committed q/2^k exactly** (D = 3: 2.500, 4.375, 5.250, 5.156; D = 4:
+2.953, 5.016, 5.688, 5.365), on unit and proper instances alike; 1 ∈ V_4(k) iff k ≤ 5 on every unit instance. The
+prediction (within 2%) holds with zero deviation.
+
+What this does and does not show. The closures at these sizes are instance-independent (the profile is the same for
+every prime, curve and target tested), so an out-of-sample prime reproduces the committed value to the digit: stage 1
+confirms that independence and the [2.5, 6.0] band at j ≤ 3, not the mechanism behind the quotient size. Outside the
+plateau the ratio keeps falling (D = 3: 4.47, 3.56, 2.66, 1.89 at j = 4..7), so the band is a statement about
+j ≤ 3 only. The informative next cell is stage 2, the direct D = 6 closure at k = 15 with the derived prediction
+q = 167,665 (GPU-class, about 6 H200-hours; owner's call on the rented-GPU route). The corollary "any closure-type
+solver pays at least about 3B per target" stays a heuristic about that class of solver.
 
 ## S1 crossing: the record's characteristic cells are void; rescoped cells — see below
 

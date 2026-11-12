@@ -1,6 +1,6 @@
 # LEAD-J step 1: can N4v2's D family run on a generic plane quartic? (read-only study)
 
-Paths: V2 = research/quartic_n4v2_20261020, N4 = research/quartic_n4_20261019,
+Paths: V2 = research/quartic_n4v2_20261020, N4 = research/quartic_n4_20261019, [pcc:unverified]
 PIC = src/cryptanalysis/plane_quartic_pic.rs. All line numbers verified by reading the files.
 
 ## Verdict
