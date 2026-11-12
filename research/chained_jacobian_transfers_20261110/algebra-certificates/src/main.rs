@@ -237,9 +237,74 @@ fn cubic_homogenization() -> IdentityStatement {
     }
 }
 
+fn common_leading_determinant() -> IdentityStatement {
+    let names = ["q", "a", "b", "c", "d", "e", "f", "g", "h", "i"];
+    let variables = names.map(Expr::var);
+    let determinant = |scaled| {
+        Expr::Add(
+            [
+                [1, 5, 9],
+                [2, 6, 7],
+                [3, 4, 8],
+                [1, 6, 8],
+                [2, 4, 9],
+                [3, 5, 7],
+            ]
+            .into_iter()
+            .enumerate()
+            .map(|(j, indices)| {
+                let term = Expr::Mul(
+                    indices
+                        .map(|k| {
+                            if scaled {
+                                Expr::Mul(vec![variables[0].clone(), variables[k].clone()])
+                            } else {
+                                variables[k].clone()
+                            }
+                        })
+                        .to_vec(),
+                );
+                if j < 3 {
+                    term
+                } else {
+                    Expr::Neg(Box::new(term))
+                }
+            })
+            .collect(),
+        )
+    };
+    IdentityStatement {
+        name: "Common quadratic leading scale factors the Richelot determinant".into(),
+        source: "PRIMITIVE_FOUR_T20_PROTOCOL.md;Bruin-Doerksen4.3;Lean T20Geometry.common_leading_determinant".into(),
+        variables: names.map(String::from).to_vec(),
+        degree_bound: 6,
+        lhs: determinant(true),
+        rhs: Expr::Mul(vec![power(variables[0].clone(), 3), determinant(false)]),
+    }
+}
+
+fn richelot_normalization() -> IdentityStatement {
+    let [q, s, d, t, a, b, c] = ["q", "s", "d", "t", "a", "b", "c"].map(Expr::var);
+    IdentityStatement {
+        name: "Richelot normalized product factorization before unit cancellation".into(),
+        source: "PRIMITIVE_FOUR_T20_PROTOCOL.md;Bruin-Doerksen4.3;Lean T20Geometry.normalization_factorization".into(),
+        variables: ["q", "s", "d", "t", "a", "b", "c"].map(String::from).to_vec(),
+        degree_bound: 15,
+        lhs: Expr::Mul(vec![
+            power(q.clone(), 3),power(d.clone(), 3),
+            Expr::Mul([a.clone(), b.clone(), c.clone()].map(|x| Expr::Mul(vec![s.clone(),t.clone(),x])).to_vec()),
+        ]),
+        rhs: Expr::Mul(vec![
+            power(Expr::Mul(vec![q,s]), 3),
+            power(Expr::Mul(vec![d,t]), 3),
+            Expr::Mul(vec![a,b,c]),
+        ]),
+    }
+}
+
 fn main() {
     let outputs = std::env::args_os().skip(1).collect::<Vec<_>>();
-    let cases: [(IdentityStatement, &[u8], &str, u64); 8] = [
+    let cases: [(IdentityStatement, &[u8], &str, u64); 10] = [
         (
             duplication(),
             include_bytes!("../../lean/QuarticGluing.lean"),
@@ -288,6 +353,18 @@ fn main() {
             "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
             0x4741,
         ),
+        (
+            common_leading_determinant(),
+            include_bytes!("../../lean/T20Geometry.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+            0x4841,
+        ),
+        (
+            richelot_normalization(),
+            include_bytes!("../../lean/T20Geometry.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+            0x4842,
+        ),
     ];
     for (i, (statement, source, path, seed)) in cases.into_iter().enumerate() {
         let cert=identity::issue(statement,seed,32,"Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",Some(identity::ProofRef {kind:"lean4;pointer only;requires separate proof gate".into(),path:path.into(),sha256:hex::encode(sha256_native::sha256(source))})).expect("the issuer must reject any false identity");
@@ -315,6 +392,8 @@ fn mutated_identities_are_rejected() {
         even_cover(true),
         even_cover(false),
         cubic_homogenization(),
+        common_leading_determinant(),
+        richelot_normalization(),
     ] {
         statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
         assert!(matches!(

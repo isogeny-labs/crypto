@@ -3,6 +3,8 @@
 use super::*;
 #[path = "even_kernel_certificates.rs"]
 mod even_kernel_certificates;
+#[path = "primitive_four_t20.rs"]
+mod primitive_four_t20;
 
 #[derive(Clone, Copy, Debug)]
 enum EvenPoint {

@@ -1,41 +1,44 @@
-# CURRENT — kernel stageC full38 accepted; commit then T20
+# CURRENT — actualT20 geometry full39 accepted; commit then whole41
 
-RootLOCAL/REMOTEd87fd630504090f1f8acb0ce56664d6cad6077af/tree233b4073,
-parent338d/187paths/publicationcd5da9. Own43277728697inprogress/f10843,
-next19:06UTC at25/37/23/seven/209compiledexpected183written36modules0trusted.
-Allolderroot338d/fdfe/51d/0796 andconsumer1513/f656/c712successessettled;
-DO NOTrepoll.
+RootLOCAL/REMOTE30fa845af46c70b05fb3665cc12d787e0d793daf/treeb30005f7,
+parentd87/143paths/publication17ee06. Own43283121414inprogress/212e37,
+next19:40UTC(expected25/38/23/eight/37modules188written214compiledexpected
+0trusted/nativeJSONcompare). d87own43277728697SUCCESSall4/a75664at25/37/23/
+seven/36modules209compiled183written0trusted/full4logssettled. Allolder
+root/consumer1513/f656/c712successessettled,DO NOTrepoll.
 
-UNCOMMITTEDkernelCacceptedfull38/9f7c80:0failedignoredfiltered/all625hashes
-unchanged/oldreference+legacyguardsfmtstrictClippy. Whole129135→XZ11128,
-24475-byteJSONbyte-identicalselected19142f. Actual49E7slice/C0pulls/norm2/
-all2401source+targetsumcomparisons/Frob;7actualkernelclasses/49sums/exact
-nonzeroorder7/Frobenius5. Correcthalf4vswrong55=42different7equal.
-h49degree24/exactpsi49degree1200division/fullquotient/gcdpsi7=h1/DDF3+21;
-cyclicity/fullpointfield42written,notFp42enumeration. Protocol779dc2;
-written063773;5boundLean c9aa3b/e1bd7f/f5bb27/063ed6/7310b6,gate03
-5thm0trusted/188written37modules. Algebrad7d12d23/eight/all12hashes,old7
-certsbyte-identical,newIDC1ha31d00e9a1842a62 fixed2^61-1scope. [pcc:unverified]
+UNCOMMITTEDT20geometryAacceptedfull39/84454e:all626hashes/oldguardsfmt
+strictClippy/0failedignoredfiltered; geometry6141byteJSONidenticalselected
+296872 andoldkernel24475byteJSONidentical9f7c80. ActualQ20anti4sixteen/
+256sumsWeil/Gamma20four;P20Q20kernel4/16sums/Frobenius[0,2,3,1]/unique
+matching[[0,4],[1,3],[2,5]]of15/3stablemonicdeltas0,34,67/selected67.
+q11cube18/rawdelta95/rawT20[25,3,69,63,52,62,76],smooth6cycle/counts
+N1=120,N2=10436,J12317. Whole134348→XZ11468;completecustodyretained.
+Writtenb24be8usesactualcubicL/squarediscriminantclass/BD4.3Fpdegree4
+quotient/adjoint2/oddDLP; wholeMumfordBnotexecuted. [pcc:unverified]
 
-Mainreportpcc/claims/PCC-20261112-10a47c.json(2page52520PDF),failurepcc/claims/PCC-20261112-edcac0.json(1page38127PDF)
-allinspected/editablesources; governancepcc/claims/PCC-20261112-290033.jsonownd87prefix/prose0/diff0.
-Oldbroadbenchrec189gaps106recordsNOTgreen. Interruptedfull02eb1ebb/algebra01
-2cb5c1NOTaccepted;latechecksnotoriginalreceipts. Alloriginalfailuresretained.
-NOactivenative/proofprocess; full03session72648 COMPLETE/sourcefreezeENDED.
+FourboundT20Geometry89e906/02c312/fee2b1/151a58,gate4/0trusted,192written
+38modules. Algebrad4220d23/10outputs/all13hashes/old8unchanged;newIDC
+11c6b82bbe669b8f+3147241afb3d4b6b fixed2^61-1scope. Mainreportpcc/claims/PCC-20261112-aed7ed.json
+2page49451PDF/failurepcc/claims/PCC-20261112-333065.json1page37694PDFallinspected;govpcc/claims/PCC-20261112-d38d9d.json
+own30prefix971/prose0/diff0,oldbenchrec189gaps106recordsNOTgreen.
+Static017c05b4Clone/privateIOfailurepreserved,newchild-onlyfixb578de.
+NOactivenative/proofprocess;full39session10458 COMPLETE/sourcefreezeENDED.
 
-NEXT:scopedcommitkernelcomponentchildd87/artifactgate/exactobjects/nonforce
-CAS/update3877+3904/ownautomaticCI(expected25/38/23/eight/214compiledexpected
-188written37modules0trusted). ThenactualT20primitivefour/Richelotkernel
-P20Q20 matching/rawnonmonictarget/descent/fullMumfordmaps/duals/orientation.
-ReadprimaryBDProp4.3/nativeRic andexternalCT49f7d4c6be candidatepolys first;
-validateinRust,notPython/JS/C++execution. Addnextdistinctconsumerpin/replay.
+NEXT:scopedAcommitchild30/artifactgate/exactobjects/nonforceCAS/3877+3904/
+ownautomaticCI(expected25/39/23/ten/38modules192written218compiledexpected
+0trusted/bothJSONcompares). THENB:readT20_WHOLE_IMPLEMENTATION_NOTES.md/
+b0c5f6andprotocola2c024;announcecoordinatehelperrefactorscope,snapshotold
+EvenModelpoint_class/support,delegateunchangedgenericarithmetic;implement
+properfinite/ramified/repeated/degree-drop/infinity/basepointfibres and
+negatedtranspose. Add2diagnosticsandfull41/allold39required; all12317Fp
+classes/dual2/Frob/DLP/recovery/actualC0-C20-T20norm98,2. Extra16actual
+J2classes/256sums/Frob3fixed16vs4preregisteredbeforeBcode. Bnotcoded.
 
-Consumerready1513 LOCAL/REMOTE748e,parentf656/1509,own43268001587SUCCESS
-all3fulljobs3ea63d/root1e1681 atfixed338d35/23/seven/203compiled177written35;
-oldreference98+five/oldindependent0796allretained. Currentrootwhole37 and
-kernel38arenotcoveredbythatconsumer. Vault8edec422key/KB/EKSbudget/S3
-unavailable. No paidrun/benchmark/subagents/force/rebase/rechain/lineagechoice.
-Actualmainledger/C/archive/review/signing gatespersist. Continue.
+Consumer1513/748e all3SUCCESS3ea63d/root1e1681atfixed338d35scope;next
+distinctconsumer38pin/replay/independentkernelchecker. Vault8edec422key/KB/
+EKSbudget/S3unavailable. No paidrun/benchmark/subagents/historyrewrite/
+lineagechoice. Actualledger/C/archive/review/signing gatespersist. Continue.
 [pcc:unverified]
 
 ---

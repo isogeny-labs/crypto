@@ -1,0 +1,233 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h3147241afb3d4b6b",
+  "statement": {
+    "name": "Richelot normalized product factorization before unit cancellation",
+    "source": "PRIMITIVE_FOUR_T20_PROTOCOL.md;Bruin-Doerksen4.3;Lean T20Geometry.normalization_factorization",
+    "variables": [
+      "q",
+      "s",
+      "d",
+      "t",
+      "a",
+      "b",
+      "c"
+    ],
+    "degree_bound": 15,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "q"
+            },
+            {
+              "op": "var",
+              "args": "q"
+            },
+            {
+              "op": "var",
+              "args": "q"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "var",
+              "args": "d"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s"
+                },
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s"
+                },
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "var",
+                  "args": "b"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "s"
+                },
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "var",
+                  "args": "c"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "q"
+                },
+                {
+                  "op": "var",
+                  "args": "s"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "q"
+                },
+                {
+                  "op": "var",
+                  "args": "s"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "q"
+                },
+                {
+                  "op": "var",
+                  "args": "s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "d"
+                },
+                {
+                  "op": "var",
+                  "args": "t"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "d"
+                },
+                {
+                  "op": "var",
+                  "args": "t"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "d"
+                },
+                {
+                  "op": "var",
+                  "args": "t"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "var",
+              "args": "b"
+            },
+            {
+              "op": "var",
+              "args": "c"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 18498,
+  "value_digest": "7915eaea0f84ba8bad23d3095ceb38dc816510109182b5932a153cb6ed13a81b",
+  "independence": "Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",
+  "proof": {
+    "kind": "lean4;pointer only;requires separate proof gate",
+    "path": "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+    "sha256": "43c555e45d2054ab859fd1c69f2a677aecebead6b6b24d898eb82f1921e199c9"
+  }
+}

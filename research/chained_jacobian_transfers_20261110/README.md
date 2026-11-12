@@ -1,3 +1,15 @@
+# New component: actual T20 primitive-four geometry
+
+Full39/84454e acceptsactualP20Q20kernel4/uniqueWeierstrassmatching/
+commoncubescale11/rawdelta95/F101target[25,3,69,63,52,62,76]/6cycle/
+N1=120,N2=10436,J12317,all626hashesandbothnativeJSONcomparisons.
+Writtenb24be8establishesBD4.3square-discriminantFpdegree4quotient. Fourbound
+localLean192written38modules/algebra23tenoutputs/old8unchanged. Mainreport
+pcc/claims/PCC-20261112-aed7ed.json /inspected2page49451PDF:[T20geometry](reports/t20-primitive-four-geometry/REPORT.md).
+NextproperwholeMumfordcorrespondence/duals/all12317chain(full41). No new
+wholeBresultorcostclaim;scientificstandingunsigned. [pcc:unverified]
+
+---
 # New component: actual seven-kernel and cyclic-49 certificates
 
 Full38/9f7c80 accepts625unchangedhashes/actual7kernel and49E7slice,correct
