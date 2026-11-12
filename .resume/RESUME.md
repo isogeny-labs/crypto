@@ -1,41 +1,34 @@
-# Resume: crypto @ claude/relaxed-lovelace-wjy1um
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-Owner (2026-11-11/12): finish E14 of the fall-degree study: the exact last fall degree `d_F` at
-(m, n, ℓ) = (3, 21, 7) (first exact value above 4) and the three unmeasured E13b controls
-(6:10:3 draws 1, 3, 4); then (4, 28, 7) windows as time allows.
+Owner (2026-11-11): "Any other perf optimizations here? Can we use tricks like dynamic programming
+or things that I'm not aware of for grobner base" — then "Go". Catalogue the levers
+(docs/ic/GROEBNER_PERF_LEVERS_20261111.md) and measure the first one: a persistent M4GB server
+process (patch 0003 `--serve`, Rust `m4gb-f2-server`).
 
 ## Lead / hypothesis
-`research/fall_degree_bounds_20261008/PREREGISTRATION.md`, Amendments 17–21. Frozen readings and
-predictions in Amendment 20: E14a "d_F = 5" 0.50, "≥ 6" 0.25, "split" 0.05, "not completed" 0.20;
-E14b "controls confirmed" 0.55; E14c "no reading" 0.80.
+Per-call fixed cost (process start, field tables, thread pool, pipes) is 5 to 15 ms and dominates
+decomposition calls at 12 to 16 unknowns. Expectation and falsifier: research/m4gb_persistent_server_20261111/README.md.
 
 ## Spec
-One RunPod CPU pod (cpu3g, 64 vCPU, Secure, not interruptible), USD 100 cap, deadline
-min(36 h, 100/costPerHr). Source: sparse clone of `isogeny-labs/crypto` at `a2be6609`
-(tree sha256 `da6ee5f3…`). Engines: `hky_par newcells --cells 3:21:7 --seed 20261012 --keep 4
---cmax 5` (E14a), `dreg_linear_guess --engine pe` (E14b, threads from gate G3),
-`e12/run_window.sh 4:28:7` (E14c). Gates G0–G3 and G-src-a/b/c before any draw.
-Launcher `e14/launch_r2.sh` (OWNER_OVERRIDE=1 per Amendment 21), controller `e14/pull_r2.sh`.
+research/m4gb_persistent_server_20261111/run_ab.sh under tools/benchrec.py run
+(record benchmarks/records/20261111T1946Z-m4gb-persistent-server.json): ic descent --solver
+inherited-f4 --solver m4gb-f2 --solver m4gb-f2-server, K and R, m=2 n=11..23, m=3 n=11,13,15,
+6 targets x 3 repeats, 60 s budget, one thread. Binaries: scripts/m4gb/build.sh n{16,20,24,28,32}_gf2
+with patches 0001-0003 (scratchpad prefix m4gb-prefix-v3). Local container, unisolated (stage
+diagnostic, no leaderboard row).
 
 ## State
-Launching 2026-11-12 ~02:10 UTC. `e14/pod-r2/launch.json` holds pod id and output token.
-Owner override of the balance rule recorded (balance USD 99, sibling pod burning USD 5.29/h:
-zero-balance termination after ~12 h is possible and was accepted).
+Patch 0003 written and clean-built; Rust client in progress (subagent); record open; run next.
 
 ## Runs in flight
-Pod named `fd-e14-r2-<stamp>`; outputs pulled every 10 min to `e14/pod-r2/pulls/`, final to
-`e14/pod-r2/out/`. Session: session_01AXUKfTRWdZTFrWGLHJZp11.
+None yet.
 
 ## Stop and success conditions
-The pod stops itself at the deadline or when done. A fresh session resumes by running
-`e14/pull_r2.sh` (idempotent) with the pod id from `launch.json`; if the pod is gone, score
-whatever snapshots exist with the Amendment 19/20 reading rules ("not completed" for anything cut
-off). Nothing is retried without a new amendment.
+All cells finish or fail individually; summarize.py -> RESULTS.md/results.json/svg; make_report.sh;
+benchrec add-raw/metric/close; session-log entry; PR on the branch (PR #3936 is the open
+predecessor, auto-merge enabled).
 
 ## Next steps
-1. Pull outputs; when `final_status` arrives, delete the pod (the controller does this).
-2. Score: extend `e14/score.json` (schema `fall_degree_e14_score/v1`) with an r2 section per the
-   Amendment 20 rules; report + graph + PDF under `reports/run-<UTC>/`; append RESULTS.md.
-3. Lean scoring table: add E14 rows (kind 8) if any reading is registered.
-4. Commit on the branch, PR, session log.
+1. cargo build --release --bin ic with m4gb-f2-server; cargo test --lib m4gb_oracle.
+2. Run run_ab.sh under the record; summarize; report; close record; benchmarks entry; session log; push; PR.
