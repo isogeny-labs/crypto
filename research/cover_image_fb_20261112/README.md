@@ -2,7 +2,7 @@
 
 **Question (idea 2).** Use a cover `φ: C → E` only to choose the factor base:
 `F = x∘φ(V)`, `V` a structured set of `u`-coordinates on `C` (a PKM tower set),
-relations still found and solved on `E`. Does the summation system restricted to
+relations and the linear algebra stay on `E`. Does the summation system restricted to
 `φ(V)` solve more cheaply than (a) its own random-coefficient null, (b) PKM's tower
 base of the same size, (c) a random base of the same size?
 
