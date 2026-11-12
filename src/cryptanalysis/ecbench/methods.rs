@@ -65,7 +65,7 @@ use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
-    rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
+    rho_walk_lanes, rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
     signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
     PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
@@ -296,6 +296,19 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     default: Some("64"),
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
+
+const RHO_LANES_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget as a multiple of √r before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "lanes",
+        default: None,
+        help: "walks advanced in lock-step, one batched field inversion a round (1..=4096)",
+    },
+];
 
 const POOLED_PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -1408,6 +1421,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.negation_lanes_v1",
+            family: "rho",
+            summary: "rho.negation's set-up and walk (A = 2, look-ahead, cycle window, escapes) in `lanes` lock-step walks whose additions share one Montgomery-batched field inversion a round (prime curves, p < 2^62); S charged as rho.negation (one group operation a step, look-ahead addition and escape), field tally the batched one; distinguished points arrive in lane order, so a seed's S differs from rho.negation's; expected S ≈ √(π/4)",
+            entry: "ic_boundary::rho_walk_lanes(NegationClasses, RhoWalk::negation(), lanes)",
+            applies: Applies::PrimeOnly,
+            params: RHO_LANES_PARAMS,
+        },
+        MethodDecl {
             id: "rho.cubic_v2",
             family: "rho",
             summary: "rho.cubic with the set-up [κ]G verification ledger of CubicClasses::new inside total_gae (phase automorphism_setup), plus the walk of rho.negation_v2; refuses any curve without the j = 0 structure",
@@ -1613,6 +1634,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.negation"
         | "rho.negation_v2"
         | "rho.negation_chained"
+        | "rho.negation_lanes_v1"
         | "rho.negation_v3"
         | "rho.negation_v4"
         | "rho.negation_v5"
@@ -2702,6 +2724,23 @@ fn solve_generic<G: CountedGroup>(
         "kangaroo.vow" => {
             let o = kangaroo(g, gen, target, r, seed, cap()?);
             generic(o, t.elapsed().as_nanos() as u64, 1)
+        }
+        "rho.negation_lanes_v1" => {
+            let lanes = param_u64(m, "lanes")?;
+            let lanes =
+                usize::try_from(lanes).map_err(|_| "lanes does not fit usize".to_string())?;
+            let res = rho_walk_lanes(
+                g,
+                &NegationClasses { r },
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                RhoWalk::negation(),
+                lanes,
+            )?;
+            rho(res, t.elapsed().as_nanos() as u64)
         }
         "rho.negation_chained" => {
             let res = rho_walk_with_policy(
@@ -11730,6 +11769,87 @@ mod engine_items_tests {
             );
             let su = |c: &BTreeMap<String, u64>| c["setup_additions"] + c["setup_doublings"];
             assert!(su(&res.counters) < su(&legacy.counters));
+        }
+    }
+}
+
+/// `rho.negation_lanes_v1` (docs/perf/20261112-rust-deep-audit.md): with one
+/// lane it is `rho.negation`'s walk exactly (same steps, walks, distinguished
+/// points, group operations and counters, plus its own three); with more it
+/// recovers the logarithm, shares inversions, and charges the same kinds of
+/// operation.
+#[cfg(test)]
+mod rho_lanes_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn curve() -> (Instance, CurveFacts) {
+        let spec = CurveSpec::PrimeSearch {
+            bits: 22,
+            seed: 59297,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        (inst, facts)
+    }
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn one_lane_is_the_serial_walk_and_more_lanes_recover() {
+        let (inst, facts) = curve();
+        let serial = method("rho.negation", &[]);
+        let one = method("rho.negation_lanes_v1", &[("lanes", "1")]);
+        let many = method("rho.negation_lanes_v1", &[("lanes", "16")]);
+        assert_ne!(serial.method_id, one.method_id);
+        assert_ne!(one.method_id, many.method_id);
+        let own = ["lanes", "lane_rounds", "montgomery_conversions_uncharged"];
+        for seed in 0..8u64 {
+            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r - 1);
+            let target = inst.mul_generator_hex(k).expect("a nonzero target");
+            let a = solve(&serial, &inst, &facts, &target, seed).unwrap();
+            let b = solve(&one, &inst, &facts, &target, seed).unwrap();
+            let c = solve(&many, &inst, &facts, &target, seed).unwrap();
+            for rep in [&a, &b, &c] {
+                assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+                assert_eq!(rep.automorphisms_used, 2);
+            }
+            assert_eq!(a.total_gae, b.total_gae, "seed {seed}");
+            let mut bc = b.counters.clone();
+            for key in own {
+                assert!(bc.remove(key).is_some(), "seed {seed}: {key}");
+            }
+            assert_eq!(a.counters, bc, "seed {seed}");
+            assert_eq!(c.counters.get("lanes"), Some(&16));
+            // Batched: fewer inversions than additions on the 16-lane walk;
+            // one lane pays one inversion a round, as the serial law does.
+            let (fb, fc) = (b.field_ops.unwrap(), c.field_ops.unwrap());
+            let fa = a.field_ops.unwrap();
+            assert_eq!(fa.invs, fb.invs, "seed {seed}");
+            assert!(fc.invs * 4 < fa.invs, "seed {seed}: {fc:?} vs {fa:?}");
+        }
+        assert_eq!(
+            expected_s("rho.negation_lanes_v1", 2),
+            expected_s("rho.negation", 2)
+        );
+    }
+
+    #[test]
+    fn lanes_out_of_range_and_other_groups_are_refused() {
+        let (inst, facts) = curve();
+        let target = inst.mul_generator_hex(12345).unwrap();
+        for bad in ["0", "4097"] {
+            let m = method("rho.negation_lanes_v1", &[("lanes", bad)]);
+            assert!(solve(&m, &inst, &facts, &target, 1).is_err(), "lanes={bad}");
         }
     }
 }
