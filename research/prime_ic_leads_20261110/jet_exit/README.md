@@ -154,3 +154,33 @@ are closed: `F_{p^k}` by cost
 §4 (equations at degree about `t/2`). The filter stands with no known passer. What would reopen the
 `Z/p^k` route is a lift of `E` whose torsion-section digits have bounded popcount degree on some
 presentable base; the instrument here tests any candidate lift in seconds.
+
+## 6. Follow-ups pre-registered before their rows exist (2026-11-12)
+
+**6a. Structured lifts (the reopening condition of §5).** For the class-number-one CM
+`j`-invariants with small-height integer models (`D = −7`: `y² = x³ − 35x − 98`, `j = −3375`;
+`D = −8`: `y² = x³ − 30x − 56`, `j = 8000`; `D = −11`: `y² = x³ − 264x − 1694`, `j = −32768`; and
+`D = −19, −43, −67, −163` if their models are found with the same check `j` recomputed from
+`(a, b)`), take a prime `p` with `2^t | p − 1` (`40961`, `12289`) where the curve is ordinary, and a
+quadratic twist `d ∈ F_p^*` such that `y² = x³ + a d² x + b d³` has prime order. The integer
+coefficients `A = a d²`, `B = b d³` define a lift whose reduction is that twist and which is
+`Z_p`-isomorphic to a twist of the CM curve, i.e. the canonical (Serre–Tate) lift of the reduced
+curve (`j̃ = j` is an integer with CM, and twists by units `≡ 1 mod p` are `Z_p`-isomorphic). The
+probe takes it through `--a (A mod p) --b (B mod p) --lift-a ⌊A/p⌋ --lift-b ⌊B/p⌋`. Cells: every
+such `(curve, p, d)` found at `t = 10` (and `t = 12` where `2^12 | p − 1`), `k = 4`.
+*Prediction:* the digits read the generic degree again (`d_full`), on every CM curve: the torsion
+section is still the scalar multiple `[u]P̃`, and CM gives the lift an endomorphism ring, not a
+low-degree description of the section's digits on a Kummer coset. *Discriminating outcome:* any
+digit at most `d_full − 2` on a CM lift, on both draws of the base, at `t = 10` or `12`.
+
+**6b. Dickson towers.** Same probe with the Dickson base `V = {w + w^{−1} : w ∈ u·μ_{2^t}}`
+(split case, `2^t | p − 1`), tower values `y_0 = v`, `y_{j+1} = y_j² − 2`, and the degree measured in
+the multilinear monomials of those tower variables (the quotient has the same square-free normal
+form). *Prediction:* generic, as for Kummer. *Discriminating outcome:* as in 6a.
+
+**6c. Support-width law, larger `t`.** The pilot's width ladder (`devcheck/README.md`) extended at
+`m = 2` to `t = 9, 10, 11` for `W = 1, 3, 4` (cmax 7, budget 900 s; `W = 2` equals the tower and
+has `t ≤ 10` already). *Prediction:* `W = 1` steps from 5 to 6 at `t = 12` or later (its steps so far
+are at `t = 4` and `t = 8`, four levels apart, like C-step); `W = 3` and `W = 4` stay at 5 through
+`t = 9` and step to 6 at `t = 10` or `11`; every value is non-decreasing in `W` and in `t`.
+*Use:* the step positions are the data a derivation of `d_F(W, N)` must reproduce.
