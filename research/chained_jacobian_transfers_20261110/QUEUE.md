@@ -48,7 +48,8 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT28c | written geometric distinction and native inputs complete;unsigned | Distinguish actual unpolarized Jacobians over the algebraic closure. | b05286:primary ordinaryEnd fields -355/-283 plus old actual elliptic embeddings/unique connected norm kernels and j12/87/47. Rust inputs5c1a1b/full20 829d69;CT37 prior credited,twistcd2506 retained. Actual geometry written,not native End/isomorphism computation or full Lean construction. |
 | CT28d | complete independent fixedspectra/partialformal;unsigned | Distinguish isogenyclass checks from selected geometry. | ExternalCT38/39/40 a30c63d1 credited48d283;Rust21/full3d96bc actual120/10436/mutant120/10314,76d876;four bound spectrallemmas plus2recovery144written/28modules. Root9084 ownCI20/13826 full411a94 settled;newscope ownCI separate. |
 | CT28e | complete independent wholemap29;unsigned | Everyoldrationaloutput andactual49kernel membership via separateCantor/pointwisenorms. | Full5cf8f9 all6×12317 directions/12316wrongquartereach,both49kernels/48omitted7controls,all3source9fixturehashes unchanged. Writtenab8c53/completec49e8b/report7aea70. Timeoutb6bc9e/V2fd19e7 retained;147/29partialformal. Globaldegree/Picard stillseparate. |
-| CT28f | next frozenprotocol;no code/runyet;unsigned | Full2401 geometric7torsion action andnondualchain/backtracking/shadow controls. | GEOMETRIC_SEVEN_CENSUS_PROTOCOL.md;existingengines/Fp12/quinticpointnorms/all3models/all6maps;predictedkernel49/image49,sharedT1intersection1,backtrackingzero2401. Keepdegreeblindspot;native30/newLean planned. Earlier12hopcycle remainsqueued. |
+| CT28f | complete local30/14930;unsigned | Full2401 geometric7torsion action andnondualchain/backtracking/shadow controls. | e78426/d89ae5 all3models/all6maps kernel49/image49/sharedT1intersection1/backtrackingzero2401;2bound controls a6ff17/90cebe,failed01/02kept. New2page inspectedreport. Globaldegreeblindspot retained. |
+| CT28g | next protocol/native;unsigned | Actual quartic4gluing and six Jacobian distinction. | PrimaryCT41/Howe–Lauter/Milne f07968;fullE4/ramifiedY0/kernel16/anti-isometry planned. ActualTateindexsharpness and C_i/T_i sumdegree distinction require globalgeometry. Later12hopcycle queued. |
 
 ## Session constraints
 
@@ -63,10 +64,8 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read PRIME_FIELD_CHECKPOINT.md/newestjournal. No localnative active:actual
-98/33859,producerV2/46605,independent29/13533 allEXIT0/afterhashes captured.
-Ready1508/c712 full98 accepted,ownCIinitiallistempty/next11:30. Parent1507
-exact43191178913 SUCCESS/fullf72285. Commit/publish newroot29/147/29 now
-fromb351;oldb351 exact43196578049 due10:52. Then fullgeometric7torsion
-census via frozenprotocol;no newcensuscode/resultyet. Keep allfrozen
-subjects/forks/vault/S3/budget/KB blockers,no broadreruns or unchangedpolls.
+Read current CHECKPOINT.md/.resume and newestjournal. Publish completedroot30/14930
+from67b,then nativeactual4glue viafrozenprotocol. No localnativeactive. Fixedroot67b
+exact43205484930 SUCCESS/full57d865;priorb351 full3b94c3. Consumer1508/c712
+43202427032 stillrunning at11:27,next12:20. Budget/S3/vault/KB/ledger/C blockers
+unchanged;no broadreruns,unchangedpolls,lineagechoice orpaidlaunch. [pcc:unverified]

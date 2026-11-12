@@ -1,0 +1,61 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenCensusControls.lean:17:34: error: `grind` failed
+case grind
+A : Type
+inst : IntModule A
+a : A
+ha : 7 • a = 0
+hne : a ≠ 0
+hz : 4976069 • a = 0
+hn : 1244018 • a = -a
+he : 1244018 • a = a
+h : ¬2 • a = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] 7 • a = 0
+    [prop] ¬a = 0
+    [prop] 4976069 • a = 0
+    [prop] 1244018 • a = -a
+    [prop] 1244018 • a = a
+    [prop] ¬2 • a = 0
+  [eqc] False propositions
+    [prop] a = 0
+    [prop] 2 • a = 0
+  [eqc] Equivalence classes
+    [eqc] {a, -a, 1244018 • a}
+    [eqc] {0, 7 • a, 4976069 • a}
+  [linarith] Linarith assignment for `A`
+    [assign] a := 2
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SevenCensusControls.lean:20:58: error: `grind` failed
+case grind
+A : Type
+inst : IntModule A
+a : A
+ha : 7 • a = 0
+hne : a ≠ 0
+hz : 4976069 • a = 0
+hn : 1244018 • a = -a
+he : 1244018 • a = a
+h2 : 2 • a = 0
+h : ¬a = 7 • a - 3 • 2 • a
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] 7 • a = 0
+    [prop] ¬a = 0
+    [prop] 4976069 • a = 0
+    [prop] 1244018 • a = -a
+    [prop] 1244018 • a = a
+    [prop] 2 • a = 0
+    [prop] ¬a = 7 • a - 3 • 2 • a
+  [eqc] False propositions
+    [prop] a = 0
+    [prop] a = 7 • a - 3 • 2 • a
+  [eqc] Equivalence classes
+    [eqc] {a, -a, 1244018 • a}
+    [eqc] {0, 2 • a, 7 • a, 4976069 • a}
+  [linarith] Linarith assignment for `A`
+    [assign] a := 2
+'SevenCensusControls.nonzero_seven_shadow_rejected' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'SevenCensusControls.deeper_shadow_retains_finite_controls' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

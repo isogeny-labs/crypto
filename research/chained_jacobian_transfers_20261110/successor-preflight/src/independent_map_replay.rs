@@ -7,6 +7,8 @@ use isogeny_algos::fpr::{FpR, ER};
 use isogeny_algos::kernel::kohel::kohel;
 use isogeny_algos::poly;
 use std::collections::{HashMap, HashSet};
+#[path = "geometric_seven_census.rs"]
+mod geometric_seven_census;
 
 const MODELS: [[u64; 7]; 3] = [
     [31, 75, 74, 54, 71, 55, 1],
