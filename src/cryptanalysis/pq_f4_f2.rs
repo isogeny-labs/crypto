@@ -463,7 +463,6 @@ impl Columns {
     }
 
     fn unpack(&self, row: &Row, n_vars: usize) -> F2BoolPoly {
-        let mut monos = Vec::new();
         // one test a word, one extraction a set bit, then the canonical
         // rebuild of the term list
         let set: u32 = row.bits[row.start..row.end]
@@ -473,6 +472,8 @@ impl Columns {
         tally::word_ops(
             (row.end - row.start) as u64 + u64::from(set) + tally::poly::from_monos(set as usize),
         );
+        // exactly `set` terms: one allocation, no regrowth
+        let mut monos = Vec::with_capacity(set as usize);
         for w in row.start..row.end {
             let mut word = row.bits[w];
             while word != 0 {

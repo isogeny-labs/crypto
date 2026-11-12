@@ -350,10 +350,16 @@ fn packed_mask(key: u64) -> u64 {
 pub(crate) fn sort_masks_descending(masks: &mut [Mask]) {
     let span = masks.iter().fold(0 as Mask, |acc, &m| acc | m);
     if span >> PACKED_KEY_VARS == 0 {
-        let mut keys: Vec<u64> = masks.iter().map(|&u| packed_key(mask_low64(u))).collect();
-        keys.sort_unstable_by(|a, b| b.cmp(a));
-        for (m, k) in masks.iter_mut().zip(keys) {
-            *m = mask_from64(packed_mask(k));
+        // Keyed in place: a packed key fits the mask's own slot (zero-
+        // extended under `wide-vars`, which keeps its order) and is
+        // injective, so sorting the keys and mapping them back is the keyed
+        // sort without a second buffer.
+        for m in masks.iter_mut() {
+            *m = mask_from64(packed_key(mask_low64(*m)));
+        }
+        masks.sort_unstable_by(|a, b| b.cmp(a));
+        for m in masks.iter_mut() {
+            *m = mask_from64(packed_mask(mask_low64(*m)));
         }
     } else {
         let mut keys: Vec<MonoKey> = masks
@@ -365,6 +371,41 @@ pub(crate) fn sort_masks_descending(masks: &mut [Mask]) {
             *m = key_mask(k);
         }
     }
+}
+
+/// [`sort_masks_descending`] on monomials, in place: the same order
+/// (`Reverse(mono_key)`, an injective key, so every sort gives one
+/// sequence) without a key buffer.
+fn sort_monos_descending(monos: &mut [F2BoolMono]) {
+    let span = monos.iter().fold(0 as Mask, |acc, m| acc | m.mask);
+    if span >> PACKED_KEY_VARS == 0 {
+        for m in monos.iter_mut() {
+            m.mask = mask_from64(packed_key(mask_low64(m.mask)));
+        }
+        monos.sort_unstable_by(|a, b| b.mask.cmp(&a.mask));
+        for m in monos.iter_mut() {
+            m.mask = mask_from64(packed_mask(mask_low64(m.mask)));
+        }
+    } else {
+        monos.sort_unstable_by_key(|m| std::cmp::Reverse(mono_key(*m)));
+    }
+}
+
+/// Cancel equal neighbours of a sorted list in pairs (`1 + 1 = 0`), in
+/// place: the stack rebuild "pop when the top equals the next, else push"
+/// with the stack kept in the list's own prefix.
+fn cancel_adjacent_pairs(monos: &mut Vec<F2BoolMono>) {
+    let mut top = 0usize;
+    for i in 0..monos.len() {
+        let m = monos[i];
+        if top > 0 && monos[top - 1] == m {
+            top -= 1;
+        } else {
+            monos[top] = m;
+            top += 1;
+        }
+    }
+    monos.truncate(top);
 }
 
 /// Collect a sum of monomials with coefficients: sort `(mask,
@@ -459,21 +500,13 @@ impl F2BoolPoly {
         } else {
             // A long list is keyed once per mask rather than once per
             // comparison (the u128 key above was half of a large rebuild).
-            let mut masks: Vec<Mask> = monos.iter().map(|m| m.mask).collect();
-            sort_masks_descending(&mut masks);
-            for (m, mask) in monos.iter_mut().zip(masks) {
-                *m = F2BoolMono::from_mask(mask);
-            }
+            sort_monos_descending(&mut monos);
         }
-        let mut out: Vec<F2BoolMono> = Vec::with_capacity(monos.len());
-        for m in monos {
-            if out.last() == Some(&m) {
-                out.pop(); // 1 + 1 = 0
-            } else {
-                out.push(m);
-            }
+        cancel_adjacent_pairs(&mut monos); // 1 + 1 = 0
+        F2BoolPoly {
+            terms: monos,
+            n_vars,
         }
-        F2BoolPoly { terms: out, n_vars }
     }
 
     /// Specialise variable `var` to `value`: `v := 0` deletes every term
@@ -704,17 +737,14 @@ impl F2BoolPoly {
         // After mul, sort order may change AND duplicates may appear
         // (because two distinct monos can collide on union with m), so
         // the products are re-sorted and equal pairs cancelled.
-        let mut products: Vec<Mask> = self.terms.iter().map(|t| t.mask | m.mask).collect();
-        sort_masks_descending(&mut products);
-        let mut out: Vec<F2BoolMono> = Vec::with_capacity(products.len());
-        for u in products {
-            let mn = F2BoolMono::from_mask(u);
-            if out.last() == Some(&mn) {
-                out.pop();
-            } else {
-                out.push(mn);
-            }
-        }
+        // One buffer: the products are sorted and cancelled in place.
+        let mut out: Vec<F2BoolMono> = self
+            .terms
+            .iter()
+            .map(|t| F2BoolMono::from_mask(t.mask | m.mask))
+            .collect();
+        sort_monos_descending(&mut out);
+        cancel_adjacent_pairs(&mut out);
         F2BoolPoly {
             terms: out,
             n_vars: self.n_vars,
