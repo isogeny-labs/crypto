@@ -20,6 +20,8 @@ while :; do
       log "pull $stamp: ok $have"
       if tar xzf "$R/pulls/$stamp.tgz" -O out/final_status >/dev/null 2>&1; then
         rm -rf "$R/out"; mkdir -p "$R/out"; tar xzf "$R/pulls/$stamp.tgz" -C "$R/out" --strip-components=1
+        # the pod's trace may contain the control key: redact before anything is committed
+        grep -rl "${RUNPOD_API_KEY:?}" "$R/out" 2>/dev/null | while read -r f; do sed -i "s/${RUNPOD_API_KEY}/[REDACTED_RUNPOD_API_KEY]/g" "$f"; done
         log "final_status: $(cat "$R/out/final_status"); extracted to $R/out; deleting pod $pod_id"
         curl -sS -m 60 -X DELETE -H "Authorization: Bearer ${RUNPOD_API_KEY:?}" "https://rest.runpod.io/v1/pods/$pod_id" >>"$R/pull.log" 2>&1
         exit 0
