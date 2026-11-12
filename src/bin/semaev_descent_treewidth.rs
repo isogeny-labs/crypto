@@ -101,7 +101,9 @@ fn parse(args: &[String]) -> Result<Options, String> {
     }
     for &n in &options.n {
         if !SUPPORTED_N.contains(&n) {
-            return Err(format!("n = {n} has no certified irreducible polynomial here\n{USAGE}"));
+            return Err(format!(
+                "n = {n} has no certified irreducible polynomial here\n{USAGE}"
+            ));
         }
     }
     Ok(options)
@@ -231,7 +233,9 @@ fn summarise(analysis: &Analysis) -> Value {
 
 fn log2_binomial(n: u64, k: u64) -> f64 {
     let k = k.min(n - k);
-    (0..k).map(|i| ((n - i) as f64).log2() - ((i + 1) as f64).log2()).sum()
+    (0..k)
+        .map(|i| ((n - i) as f64).log2() - ((i + 1) as f64).log2())
+        .sum()
 }
 
 fn run() -> Result<(), String> {
@@ -261,8 +265,10 @@ fn run() -> Result<(), String> {
         let equations: Vec<Equation> = eqs.iter().map(|p| decode(p, num_vars)).collect();
         let build_seconds = started.elapsed().as_secs_f64();
         let quadratic_monomials: usize = {
-            let mut all: Vec<(u32, u32)> =
-                equations.iter().flat_map(|e| e.quadratic.iter().copied()).collect();
+            let mut all: Vec<(u32, u32)> = equations
+                .iter()
+                .flat_map(|e| e.quadratic.iter().copied())
+                .collect();
             all.sort_unstable();
             all.dedup();
             all.len()
