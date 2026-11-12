@@ -31,6 +31,16 @@ All results below are `[pcc:unverified]`.
   - So non-trivial c-only syzygies appear exactly at `e_min`.
   - Write-up: `research/lfd_lower_bound_20261111/out/lead_A1/RESULT.md`.
 
+- **Lead 4 (`LEAD-C-jv-sieve-hilbert-descent`): killed by its own falsifier.**
+  - Setup: opt-in `JV_SIEVE_HILBERT=16`; 16 paired seeds at p = 1511. The plain
+    arm reproduces the committed records exactly.
+  - Gains: descent F4 multiplications 0.407×, counted total 0.856×, digests
+    identical.
+  - The kill: descent native F4 operations rose 1.139×, against a preregistered
+    limit of 1.10×.
+  - §5a band: cheaper at w = 0 and 0.1, dearer at w = 1, so unresolved.
+  - Write-up: `research/jv_sieve_hilbert_descent_20261112/README.md`.
+
 | Lane | File | Leads |
 |:--|:--|--:|
 | A — last fall degree and the selector proof system | `lane_A_falldegree.md` | 5 |
