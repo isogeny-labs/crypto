@@ -32,7 +32,7 @@ target in 2^((m−1)k) summand tuples. The Gröbner/XL route must at least write
 | 4 | 0.858 | 0.290 | 0.182 |
 
 Measured m = 2 slope: 0.25. The matrix alone already exceeds brute force (2^(1.087 k) columns against 2^k), and the
-proved floor 1/14 = 0.071 is above the ω = 2.81 line, so at m = 2 the Gröbner route on family 0.1 cannot beat
+proved floor 1/14 = 0.071 (written proof, `[pcc:unverified]`) is above the ω = 2.81 line, so at m = 2 the Gröbner route on family 0.1 cannot beat
 enumeration even at the proved floor unless the linear algebra is sub-quadratic in the columns. The decisive unknown
 is LFD(k) at m = 3: below 0.184·k the route is alive, above it family 0.1 closes for m ≤ 3. No record of a certified
 m = 3 prime-chain LFD exists in the files read here. Caveats: equal yield per attempt in both arms; the column count
