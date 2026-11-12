@@ -31,7 +31,17 @@ instances per l ∈ {19, 43, 107, 227}, k = 4..9 at D ≤ 5 and k = 10 at D = 5,
 deviation from the protocol's engine split, recorded: the growth-lib driver ran 20× slower on the oversubscribed host
 and was stopped after its control rows; the two engines agree on every cell cross-checked). Control arm (a) over
 12289 reproduces the committed V_5(10) profile (0, 0, 2, 138, 3163, 18569) exactly.
-S1_CELLS
+
+| l | k = 4..9 (D ≤ 5), first D with 1 ∈ V_D | k = 10 (D = 5) | reading |
+|---|---|---|---|
+| 19 | law at every k on 4/4 instances, except one instance at k = 6 (enters at D = 4) | 1 ∉ V_5 on 2/2, dims generic | law |
+| 43 | law at every k on 4/4 | 1 ∉ V_5 on 2/2, dims generic | law |
+| 107 | law at every k on 4/4 | 1 ∉ V_5 on 2/2, dims generic | law |
+| 227 | law at every k on 4/4 | 1 ∉ V_5 on 2/2; dim V_5(10) = 18,567 on both (generic 18,569) | law (dims depart) |
+
+288 small cells and 8 k = 10 cells, no engine failure, no disagreement between the two engines on the cells run on
+both. With one equation, characteristic l from 19 to 227 (all below 2^(k+1) = 2048 at k = 10) leaves the law's step
+positions unchanged on every scored cell.
 
 **Exploratory follow-up (post hoc; `tools/s1_order_probe.py`, `tools/s1_freq_probe.py`, figure
 `figures/s1_departures.svg`).** One F_19 instance in arm (b′), (a, b, t) = (18, 18, 2), has 1 ∈ V_4(6): the D = 4
@@ -48,7 +58,26 @@ plateau lasts one depth longer than the law; both engines reproduce it, and it i
   a characteristic mechanism. The loci themselves are not identified. For the attack side: such loci cannot be
   steered to with a shared factor base (lane P's "target-adapted translation" rejection applies).
 
-**Arm (d), scored (Dm, two equations over 12289, k = 10, D = 5).** S1_ARMD
+**Arm (d), scored (Dm, two equations over 12289, k = 10, D = 5).** Both instances, both second inputs: **1 ∈ V_5(10)**, the closure fills all 21,700 columns, one
+degree below the law (LFD 6 at k = 10). Negative control d0 ({g, x_1·g}, a second input already in the closure):
+rank 18,569 and 1 ∉ V_5(10) on both instances, identical to one generator, so the multi-input engine path does not fill
+the closure by itself.
+
+**Scoring against the four hypotheses** (C-c cells void, replaced by arm (b′) as amended before data):
+
+| hypothesis | arm (b′) one equation, small l | C-d1 {g, h} | C-d2 {g, σ_257 g} | verdict |
+|---|---|---|---|---|
+| L (one equation and large characteristic) | predicted a departure; observed law | predicted below law: yes | predicted below law: yes | characteristic half not supported at k ≤ 10 |
+| Dm (number of equations) | predicted law: yes | predicted below law: yes | predicted below law: yes | **survives** |
+| F-links (long-range low-weight elements) | no admissible element at D ≤ 5 | predicted law: **no** | predicted below law: yes | falsified by C-d1 |
+| S (characteristic- and equation-free) | predicted law: yes | predicted law: **no** | predicted law: **no** | falsified |
+
+**Reading.** At depths up to 10, the measured law ⌊(k+14)/4⌋ is a property of the one-equation system, not of large
+characteristic: a second independent equation lowers the fall degree by at least one at k = 10, characteristic as
+small as 19 does not move it. This is the record's Dm explanation of why binary descents (n equations) follow a
+different, slower law. The written growth theorem's characteristic hypothesis (p > 2^(k+1)) is therefore a proof
+device at these depths; whether the characteristic matters at k ≥ 39, where that theorem applies, is untouched.
+Scope: two instances per k = 10 cell, one engine for the k = 10 cells, unit instances only.
 
 ## J2 percolation factor-base size — see table below
 
