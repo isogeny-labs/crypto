@@ -176,7 +176,7 @@ workloads.
 | Rust CodeQL cache warming (`warm-rust-cache`, named exception) | 45 minutes |
 | Rust CodeQL queries (`analyze`, named exception) | 60 minutes |
 | Each PR or merge-group packaging component | 25 minutes |
-| ecbench PR harness | 25 minutes, including a 12-minute historical integrity step |
+| ecbench PR harness (named exception) | 75 minutes (45 until 2026-11-11, when runs 42969362215 and 43000966973 were cancelled at that cap before the audit steps) |
 | ecbench weekly/manual exhaustive audit | Existing 300-minute scientific budget |
 
 The PR Rust CodeQL lane runs in three jobs that hand one database forward:

@@ -2,9 +2,6 @@
 //! usage: prime_fast_j0_rho <out.jsonl> <bits> <targets>
 //!
 //! Curve y^2 = x^3 + b over F_p, p = 1 mod 3, prime order n.  phi(x,y) = (beta x, y) = [lambda]P.
-//! Symmetric arm: B orbit representatives, 6B covered points, B unknowns.
-//! Plain arm (`ic_solve`, 2 summands): 3B x-coordinates covered, 3B unknowns.
-//! usage: prime_fast_j0_sym <out.jsonl> <bits> <B,B,...> <instances> <extra>
 use crypto_lib::cryptanalysis::challenge_ladder::is_prime_u64;
 use crypto_lib::cryptanalysis::prime_fast::*;
 use rand::rngs::StdRng;
