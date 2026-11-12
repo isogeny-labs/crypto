@@ -50,6 +50,10 @@
    "path": "research/ic_tool_program/rule/v7/analysis.json",
    "sha256": "af81dd9ab28796326789ad1a1bd792b17ba80a145cd8fceb1e27d51b54037400"
   },
+  "koblitz_rule_v9": {
+   "path": "research/ic_tool_program/rule/v9/analysis.json",
+   "sha256": "5773ba15d4512ebbaab153613ff5e24ed1cf6d77842972eabe76606dd861a196"
+  },
   "oracles": {
    "path": "docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json",
    "sha256": "2271c4aa5236e2bdc8ff3d8b7782beddcbe1bc733a9343db3e833eba49fe75c5"
@@ -226,6 +230,10 @@
    "path": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
    "sha256": "41b2bcd995ec15956deaa3630278dbf5aac68c02be9b1f38f81c1045320765c1"
   },
+  "jv_sieve_line_vs_rho": {
+   "path": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+   "sha256": "0a83239fe76f0502abba05bea81c4e3f2deafe3e6c0b4cbd3b562821d5c56501"
+  },
   "d4_char2_m12": {
    "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
    "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
@@ -393,6 +401,10 @@
   "pkm_symmetric_component": {
    "path": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
    "sha256": "4360d61a47960810d8994e88cea8ebabf938363f0e3288b45fe98f6bde59278b"
+  },
+  "mt_fieldops_component": {
+   "path": "research/mt_fieldops_v4_20261112/results/holdout/summary.json",
+   "sha256": "b2411f8a0dcb0a0ba0d37f550ea3fc9552ae7a320a4f9a6cc6417973c4b297b0"
   },
   "ghs_weak_n4": {
    "path": "research/quartic_n4_20261019/results/summary_all.json",
@@ -801,23 +813,23 @@
    "regimes": [
     "koblitz"
    ],
-   "section": "§23, re-run at baseline v7",
+   "section": "§23, re-run at main as rule v9 against a matched rho",
    "status": "primary comparison: one target, as AGENTS.md's one-target rule requires",
    "targets": "one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks",
    "unit": "one batched affine addition (`add_many` over 1,024 subgroup points), per √r",
-   "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
-   "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
+   "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).",
+   "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v9 at main, with rule v8's matched rho: batched canonicalisation).",
    "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.",
    "unit_short": "batched-addition units",
    "ref_short": "one-target rho",
    "rows": 6,
    "canonical_step_units": [
-    4.20271185425,
-    4.91583216003
+    2.94589362983,
+    3.33279084768
    ],
    "rho_step_units_as_built": [
-    9.4035675075,
-    10.6222198036
+    4.64510357079,
+    5.79601551302
    ]
   },
   "B": {
@@ -5936,15 +5948,15 @@
   "koblitz": {
    "slug": "icv1-f2m47-t22705043-f4e44623",
    "log2_r": 36.64,
-   "ratio_rho": 3.4299576491,
-   "s": 6.02892841449,
+   "ratio_rho": 4.07593714999,
+   "s": 4.15323837557,
    "recipe": "aimed m = 3 collection, m = 3 descent; one target",
    "one_target": null,
-   "online_speedup": 22.5921682232,
+   "online_speedup": 17.1005655295,
    "largest": {
     "slug": "icv1-f2m61-t158598901-ab42b6c5",
     "log2_r": 47.21,
-    "ratio_rho": 11.5079372988
+    "ratio_rho": 11.1324985226
    }
   },
   "koblitz_batch": {
@@ -9617,11 +9629,11 @@
    "regime": "koblitz",
    "slug": "icv1-f2m47-t22705043-f4e44623",
    "ec1": "EC1N47Ce1h9669b6d5105b",
-   "legacy": "K_1 / GF(2^47)",
+   "legacy": "icv1-f2m47-t22705043-f4e44623",
    "log2_r": 36.64,
    "cofactor": null,
-   "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-   "reference_s": 1.75772678012,
+   "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
+   "reference_s": 1.01896526436,
    "floor_s": 0.129269482946,
    "targets": 1,
    "recipes": [
@@ -9633,34 +9645,35 @@
      "base_points": 5264,
      "columns": 56,
      "targets": "one public point per process, 64 per size",
-     "s": 6.02892841449,
-     "s_online": 0.0595048584188,
-     "s_setup": 5.96942355607,
+     "s": 4.15323837557,
+     "s_online": 0.0437342520859,
+     "s_setup": 4.10950412349,
      "phases_s": {
-      "precomputation": 5.96942355607,
-      "descent": 0.057400098943,
-      "verify": 0.000414176605713
+      "precomputation": 4.10950412349,
+      "descent": 0.043308228295,
+      "verify": 0.000406417851035
      },
-     "ratio_rho": 3.4299576491,
+     "ratio_rho": 4.07593714999,
      "ratio_rho_ci": [
-      3.15967442212,
-      3.74923451568
+      3.76298882565,
+      4.44035719855
      ],
-     "ratio_rho_section23": 4.94676916595,
-     "online_speedup_section23": 9.76532164572,
-     "online_speedup": 22.5921682232,
+     "ratio_rho_rule_before": 3.4299576491,
+     "online_speedup_rule_before": 22.5921682232,
+     "before_label": "rule v7, rho as then",
+     "online_speedup": 17.1005655295,
      "online_speedup_ci": [
-      18.024989683,
-      28.975739417
+      13.6433296144,
+      21.9692365345
      ],
-     "online_speedup_canonical_step": 9.56734448518,
-     "ic_online_over_precomputation_model": 0.799439610063,
-     "break_even_targets": 4.64604822855,
+     "online_speedup_canonical_step": 9.14403710135,
+     "ic_online_over_precomputation_model": 0.821983884711,
+     "break_even_targets": 5.83615188516,
      "construction_artefact": false,
-     "canonical_step_units": 4.22904363771,
-     "rho_step_units_as_built": 10.024965546,
-     "cold_ratio_without_curve_construction": 4.30496893657,
-     "ratio_floor": 46.6384507548,
+     "canonical_step_units": 2.96665126883,
+     "rho_step_units_as_built": 5.55927741835,
+     "cold_ratio_without_curve_construction": 5.35401951176,
+     "ratio_floor": 32.1285293397,
      "verified": true
     }
    ],
@@ -9672,40 +9685,41 @@
     "base_points": 5264,
     "columns": 56,
     "targets": "one public point per process, 64 per size",
-    "s": 6.02892841449,
-    "s_online": 0.0595048584188,
-    "s_setup": 5.96942355607,
+    "s": 4.15323837557,
+    "s_online": 0.0437342520859,
+    "s_setup": 4.10950412349,
     "phases_s": {
-     "precomputation": 5.96942355607,
-     "descent": 0.057400098943,
-     "verify": 0.000414176605713
+     "precomputation": 4.10950412349,
+     "descent": 0.043308228295,
+     "verify": 0.000406417851035
     },
-    "ratio_rho": 3.4299576491,
+    "ratio_rho": 4.07593714999,
     "ratio_rho_ci": [
-     3.15967442212,
-     3.74923451568
+     3.76298882565,
+     4.44035719855
     ],
-    "ratio_rho_section23": 4.94676916595,
-    "online_speedup_section23": 9.76532164572,
-    "online_speedup": 22.5921682232,
+    "ratio_rho_rule_before": 3.4299576491,
+    "online_speedup_rule_before": 22.5921682232,
+    "before_label": "rule v7, rho as then",
+    "online_speedup": 17.1005655295,
     "online_speedup_ci": [
-     18.024989683,
-     28.975739417
+     13.6433296144,
+     21.9692365345
     ],
-    "online_speedup_canonical_step": 9.56734448518,
-    "ic_online_over_precomputation_model": 0.799439610063,
-    "break_even_targets": 4.64604822855,
+    "online_speedup_canonical_step": 9.14403710135,
+    "ic_online_over_precomputation_model": 0.821983884711,
+    "break_even_targets": 5.83615188516,
     "construction_artefact": false,
-    "canonical_step_units": 4.22904363771,
-    "rho_step_units_as_built": 10.024965546,
-    "cold_ratio_without_curve_construction": 4.30496893657,
-    "ratio_floor": 46.6384507548,
+    "canonical_step_units": 2.96665126883,
+    "rho_step_units_as_built": 5.55927741835,
+    "cold_ratio_without_curve_construction": 5.35401951176,
+    "ratio_floor": 32.1285293397,
     "verified": true
    },
-   "source": "research/ic_tool_program/rule/v7/analysis.json",
-   "before_source": "research/ic_single_target_20260930/analysis.json",
-   "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-   "class": "accounting",
+   "source": "research/ic_tool_program/rule/v9/analysis.json",
+   "before_source": "research/ic_tool_program/rule/v7/analysis.json",
+   "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+   "class": "measurement",
    "family": "A",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -9719,13 +9733,13 @@
     "points": 5264,
     "recipe": "aimed m = 3 collection, m = 3 descent; one target",
     "variant": "koblitz_one_target",
-    "source": "research/ic_tool_program/rule/v7/analysis.json",
+    "source": "research/ic_tool_program/rule/v9/analysis.json",
     "refs": [],
     "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
-    "evidence_dir": "research/ic_tool_program/rule/v7",
+    "evidence_dir": "research/ic_tool_program/rule/v9",
     "reasons": [],
     "sweep": {
      "verdict": "validated_with_caveats",
@@ -9741,11 +9755,11 @@
    "regime": "koblitz",
    "slug": "icv1-f2m57-tm747311035-c1f545af",
    "ec1": "EC1N57Ce0hb5884395c7f2",
-   "legacy": "K_0 / GF(2^57)",
+   "legacy": "icv1-f2m57-tm747311035-c1f545af",
    "log2_r": 38.0,
    "cofactor": null,
-   "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-   "reference_s": 1.60198955853,
+   "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
+   "reference_s": 0.925849454247,
    "floor_s": 0.117383623846,
    "targets": 1,
    "recipes": [
@@ -9757,34 +9771,35 @@
      "base_points": 7296,
      "columns": 64,
      "targets": "one public point per process, 64 per size",
-     "s": 6.36782946345,
-     "s_online": 0.056949529495,
-     "s_setup": 6.31087993396,
+     "s": 4.3803610025,
+     "s_online": 0.0426177758709,
+     "s_setup": 4.33774322663,
      "phases_s": {
-      "precomputation": 6.31087993396,
-      "descent": 0.0558655521857,
-      "verify": 0.000276170171861
+      "precomputation": 4.33774322663,
+      "descent": 0.0423192589812,
+      "verify": 0.0002671798211
      },
-     "ratio_rho": 3.97495066652,
+     "ratio_rho": 4.73118062813,
      "ratio_rho_ci": [
-      3.68268103966,
-      4.32914709614
+      4.40004590482,
+      5.13006561508
      ],
-     "ratio_rho_section23": 1.98456265413,
-     "online_speedup_section23": 13.5377271583,
-     "online_speedup": 20.8707549839,
+     "ratio_rho_rule_before": 3.97495066652,
+     "online_speedup_rule_before": 20.8707549839,
+     "before_label": "rule v7, rho as then",
+     "online_speedup": 15.1728506831,
      "online_speedup_ci": [
-      16.6378707731,
-      26.6460416511
+      12.0093953962,
+      19.515250062
      ],
-     "online_speedup_canonical_step": 9.61828687882,
-     "ic_online_over_precomputation_model": 0.733489443627,
-     "break_even_targets": 5.57680435648,
+     "online_speedup_canonical_step": 8.74371229214,
+     "ic_online_over_precomputation_model": 0.816684799365,
+     "break_even_targets": 7.18151128979,
      "construction_artefact": false,
-     "canonical_step_units": 4.89073555746,
-     "rho_step_units_as_built": 10.6222198036,
-     "cold_ratio_without_curve_construction": 5.15317409276,
-     "ratio_floor": 54.2480224651,
+     "canonical_step_units": 3.32415419258,
+     "rho_step_units_as_built": 5.79601551302,
+     "cold_ratio_without_curve_construction": 6.53297895802,
+     "ratio_floor": 37.3166278137,
      "verified": true
     }
    ],
@@ -9796,40 +9811,41 @@
     "base_points": 7296,
     "columns": 64,
     "targets": "one public point per process, 64 per size",
-    "s": 6.36782946345,
-    "s_online": 0.056949529495,
-    "s_setup": 6.31087993396,
+    "s": 4.3803610025,
+    "s_online": 0.0426177758709,
+    "s_setup": 4.33774322663,
     "phases_s": {
-     "precomputation": 6.31087993396,
-     "descent": 0.0558655521857,
-     "verify": 0.000276170171861
+     "precomputation": 4.33774322663,
+     "descent": 0.0423192589812,
+     "verify": 0.0002671798211
     },
-    "ratio_rho": 3.97495066652,
+    "ratio_rho": 4.73118062813,
     "ratio_rho_ci": [
-     3.68268103966,
-     4.32914709614
+     4.40004590482,
+     5.13006561508
     ],
-    "ratio_rho_section23": 1.98456265413,
-    "online_speedup_section23": 13.5377271583,
-    "online_speedup": 20.8707549839,
+    "ratio_rho_rule_before": 3.97495066652,
+    "online_speedup_rule_before": 20.8707549839,
+    "before_label": "rule v7, rho as then",
+    "online_speedup": 15.1728506831,
     "online_speedup_ci": [
-     16.6378707731,
-     26.6460416511
+     12.0093953962,
+     19.515250062
     ],
-    "online_speedup_canonical_step": 9.61828687882,
-    "ic_online_over_precomputation_model": 0.733489443627,
-    "break_even_targets": 5.57680435648,
+    "online_speedup_canonical_step": 8.74371229214,
+    "ic_online_over_precomputation_model": 0.816684799365,
+    "break_even_targets": 7.18151128979,
     "construction_artefact": false,
-    "canonical_step_units": 4.89073555746,
-    "rho_step_units_as_built": 10.6222198036,
-    "cold_ratio_without_curve_construction": 5.15317409276,
-    "ratio_floor": 54.2480224651,
+    "canonical_step_units": 3.32415419258,
+    "rho_step_units_as_built": 5.79601551302,
+    "cold_ratio_without_curve_construction": 6.53297895802,
+    "ratio_floor": 37.3166278137,
     "verified": true
    },
-   "source": "research/ic_tool_program/rule/v7/analysis.json",
-   "before_source": "research/ic_single_target_20260930/analysis.json",
-   "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-   "class": "accounting",
+   "source": "research/ic_tool_program/rule/v9/analysis.json",
+   "before_source": "research/ic_tool_program/rule/v7/analysis.json",
+   "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+   "class": "measurement",
    "family": "A",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -9843,13 +9859,13 @@
     "points": 7296,
     "recipe": "aimed m = 3 collection, m = 2 descent; one target",
     "variant": "koblitz_one_target",
-    "source": "research/ic_tool_program/rule/v7/analysis.json",
+    "source": "research/ic_tool_program/rule/v9/analysis.json",
     "refs": [],
     "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
-    "evidence_dir": "research/ic_tool_program/rule/v7",
+    "evidence_dir": "research/ic_tool_program/rule/v9",
     "reasons": [],
     "sweep": {
      "verdict": "validated_with_caveats",
@@ -9865,11 +9881,11 @@
    "regime": "koblitz",
    "slug": "icv1-f2m41-tm2308219-7f48b14a",
    "ec1": "EC1N41Ce0he09550ab560a",
-   "legacy": "K_0 / GF(2^41)",
+   "legacy": "icv1-f2m41-tm2308219-7f48b14a",
    "log2_r": 39.0,
    "cofactor": null,
-   "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-   "reference_s": 1.3986097727,
+   "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
+   "reference_s": 0.729042672785,
    "floor_s": 0.138405392835,
    "targets": 1,
    "recipes": [
@@ -9881,34 +9897,35 @@
      "base_points": 6560,
      "columns": 80,
      "targets": "one public point per process, 64 per size",
-     "s": 6.62666387011,
-     "s_online": 0.0893785557682,
-     "s_setup": 6.53728531434,
+     "s": 4.47838292353,
+     "s_online": 0.0655240726832,
+     "s_setup": 4.41285885085,
      "phases_s": {
-      "precomputation": 6.53728531434,
-      "descent": 0.0881069877122,
-      "verify": 0.000209356453975
+      "precomputation": 4.41285885085,
+      "descent": 0.0653061936149,
+      "verify": 0.000187757896255
      },
-     "ratio_rho": 4.73803629822,
+     "ratio_rho": 6.14282687518,
      "ratio_rho_ci": [
-      4.27480270972,
-      5.31834259431
+      5.56268574494,
+      6.85602300765
      ],
-     "ratio_rho_section23": 8.04429021325,
-     "online_speedup_section23": 9.38384745663,
-     "online_speedup": 14.128900081,
+     "ratio_rho_rule_before": 4.73803629822,
+     "online_speedup_rule_before": 14.128900081,
+     "before_label": "rule v7, rho as then",
+     "online_speedup": 9.81074661087,
      "online_speedup_ci": [
-      11.2206062064,
-      18.1897406149
+      7.76517467557,
+      12.7112208786
      ],
-     "online_speedup_canonical_step": 6.2647597244,
-     "ic_online_over_precomputation_model": 1.16156285545,
-     "break_even_targets": 5.57103342211,
+     "online_speedup_canonical_step": 6.01554139314,
+     "ic_online_over_precomputation_model": 1.16992486195,
+     "break_even_targets": 7.643749421,
      "construction_artefact": false,
-     "canonical_step_units": 4.20271185425,
-     "rho_step_units_as_built": 9.42264977176,
-     "cold_ratio_without_curve_construction": 5.1916089005,
-     "ratio_floor": 47.8786536736,
+     "canonical_step_units": 2.94589362983,
+     "rho_step_units_as_built": 4.81773407674,
+     "cold_ratio_without_curve_construction": 6.8999774321,
+     "ratio_floor": 32.3569973092,
      "verified": true
     }
    ],
@@ -9920,40 +9937,41 @@
     "base_points": 6560,
     "columns": 80,
     "targets": "one public point per process, 64 per size",
-    "s": 6.62666387011,
-    "s_online": 0.0893785557682,
-    "s_setup": 6.53728531434,
+    "s": 4.47838292353,
+    "s_online": 0.0655240726832,
+    "s_setup": 4.41285885085,
     "phases_s": {
-     "precomputation": 6.53728531434,
-     "descent": 0.0881069877122,
-     "verify": 0.000209356453975
+     "precomputation": 4.41285885085,
+     "descent": 0.0653061936149,
+     "verify": 0.000187757896255
     },
-    "ratio_rho": 4.73803629822,
+    "ratio_rho": 6.14282687518,
     "ratio_rho_ci": [
-     4.27480270972,
-     5.31834259431
+     5.56268574494,
+     6.85602300765
     ],
-    "ratio_rho_section23": 8.04429021325,
-    "online_speedup_section23": 9.38384745663,
-    "online_speedup": 14.128900081,
+    "ratio_rho_rule_before": 4.73803629822,
+    "online_speedup_rule_before": 14.128900081,
+    "before_label": "rule v7, rho as then",
+    "online_speedup": 9.81074661087,
     "online_speedup_ci": [
-     11.2206062064,
-     18.1897406149
+     7.76517467557,
+     12.7112208786
     ],
-    "online_speedup_canonical_step": 6.2647597244,
-    "ic_online_over_precomputation_model": 1.16156285545,
-    "break_even_targets": 5.57103342211,
+    "online_speedup_canonical_step": 6.01554139314,
+    "ic_online_over_precomputation_model": 1.16992486195,
+    "break_even_targets": 7.643749421,
     "construction_artefact": false,
-    "canonical_step_units": 4.20271185425,
-    "rho_step_units_as_built": 9.42264977176,
-    "cold_ratio_without_curve_construction": 5.1916089005,
-    "ratio_floor": 47.8786536736,
+    "canonical_step_units": 2.94589362983,
+    "rho_step_units_as_built": 4.81773407674,
+    "cold_ratio_without_curve_construction": 6.8999774321,
+    "ratio_floor": 32.3569973092,
     "verified": true
    },
-   "source": "research/ic_tool_program/rule/v7/analysis.json",
-   "before_source": "research/ic_single_target_20260930/analysis.json",
-   "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-   "class": "accounting",
+   "source": "research/ic_tool_program/rule/v9/analysis.json",
+   "before_source": "research/ic_tool_program/rule/v7/analysis.json",
+   "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+   "class": "measurement",
    "family": "A",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -9967,13 +9985,13 @@
     "points": 6560,
     "recipe": "aimed m = 3 collection, m = 2 descent; one target",
     "variant": "koblitz_one_target",
-    "source": "research/ic_tool_program/rule/v7/analysis.json",
+    "source": "research/ic_tool_program/rule/v9/analysis.json",
     "refs": [],
     "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
-    "evidence_dir": "research/ic_tool_program/rule/v7",
+    "evidence_dir": "research/ic_tool_program/rule/v9",
     "reasons": [],
     "sweep": {
      "verdict": "validated_with_caveats",
@@ -9989,11 +10007,11 @@
    "regime": "koblitz",
    "slug": "icv1-f2m53-tm56619371-dac20a85",
    "ec1": "EC1N53Ce0hb097de99be9a",
-   "legacy": "K_0 / GF(2^53)",
+   "legacy": "icv1-f2m53-tm56619371-dac20a85",
    "log2_r": 44.26,
    "cofactor": null,
-   "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-   "reference_s": 1.15880986879,
+   "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
+   "reference_s": 0.592837429226,
    "floor_s": 0.121732630267,
    "targets": 1,
    "recipes": [
@@ -10005,34 +10023,35 @@
      "base_points": 27984,
      "columns": 264,
      "targets": "one public point per process, 64 per size",
-     "s": 8.14639398362,
-     "s_online": 0.0362806063599,
-     "s_setup": 8.11011337726,
+     "s": 4.42166179455,
+     "s_online": 0.0246540704207,
+     "s_setup": 4.39700772413,
      "phases_s": {
-      "precomputation": 8.11011337726,
-      "descent": 0.035781042298,
-      "verify": 3.85536007865e-05
+      "precomputation": 4.39700772413,
+      "descent": 0.0246128234004,
+      "verify": 3.5776047068e-05
      },
-     "ratio_rho": 7.0299660048,
+     "ratio_rho": 7.45847272215,
      "ratio_rho_ci": [
-      6.27313931604,
-      7.92702641079
+      6.67221714845,
+      8.39437093904
      ],
-     "ratio_rho_section23": 14.7038673194,
-     "online_speedup_section23": 17.4890575596,
-     "online_speedup": 30.6631342246,
+     "ratio_rho_rule_before": 7.0299660048,
+     "online_speedup_rule_before": 30.6631342246,
+     "before_label": "rule v7, rho as then",
+     "online_speedup": 22.7842197935,
      "online_speedup_ci": [
-      24.2651506888,
-      39.2263360235
+      17.8891980414,
+      29.3233624867
      ],
-     "online_speedup_canonical_step": 15.1424338775,
-     "ic_online_over_precomputation_model": 0.645085894689,
-     "break_even_targets": 7.53590390406,
+     "online_speedup_canonical_step": 15.2283412066,
+     "ic_online_over_precomputation_model": 0.51459682015,
+     "break_even_targets": 8.18703385318,
      "construction_artefact": false,
-     "canonical_step_units": 4.55012734281,
-     "rho_step_units_as_built": 9.4035675075,
-     "cold_ratio_without_curve_construction": 7.29624169515,
-     "ratio_floor": 66.9203808853,
+     "canonical_step_units": 3.09222419658,
+     "rho_step_units_as_built": 4.64510357079,
+     "cold_ratio_without_curve_construction": 7.83927905344,
+     "ratio_floor": 36.322732737,
      "verified": true
     }
    ],
@@ -10044,40 +10063,41 @@
     "base_points": 27984,
     "columns": 264,
     "targets": "one public point per process, 64 per size",
-    "s": 8.14639398362,
-    "s_online": 0.0362806063599,
-    "s_setup": 8.11011337726,
+    "s": 4.42166179455,
+    "s_online": 0.0246540704207,
+    "s_setup": 4.39700772413,
     "phases_s": {
-     "precomputation": 8.11011337726,
-     "descent": 0.035781042298,
-     "verify": 3.85536007865e-05
+     "precomputation": 4.39700772413,
+     "descent": 0.0246128234004,
+     "verify": 3.5776047068e-05
     },
-    "ratio_rho": 7.0299660048,
+    "ratio_rho": 7.45847272215,
     "ratio_rho_ci": [
-     6.27313931604,
-     7.92702641079
+     6.67221714845,
+     8.39437093904
     ],
-    "ratio_rho_section23": 14.7038673194,
-    "online_speedup_section23": 17.4890575596,
-    "online_speedup": 30.6631342246,
+    "ratio_rho_rule_before": 7.0299660048,
+    "online_speedup_rule_before": 30.6631342246,
+    "before_label": "rule v7, rho as then",
+    "online_speedup": 22.7842197935,
     "online_speedup_ci": [
-     24.2651506888,
-     39.2263360235
+     17.8891980414,
+     29.3233624867
     ],
-    "online_speedup_canonical_step": 15.1424338775,
-    "ic_online_over_precomputation_model": 0.645085894689,
-    "break_even_targets": 7.53590390406,
+    "online_speedup_canonical_step": 15.2283412066,
+    "ic_online_over_precomputation_model": 0.51459682015,
+    "break_even_targets": 8.18703385318,
     "construction_artefact": false,
-    "canonical_step_units": 4.55012734281,
-    "rho_step_units_as_built": 9.4035675075,
-    "cold_ratio_without_curve_construction": 7.29624169515,
-    "ratio_floor": 66.9203808853,
+    "canonical_step_units": 3.09222419658,
+    "rho_step_units_as_built": 4.64510357079,
+    "cold_ratio_without_curve_construction": 7.83927905344,
+    "ratio_floor": 36.322732737,
     "verified": true
    },
-   "source": "research/ic_tool_program/rule/v7/analysis.json",
-   "before_source": "research/ic_single_target_20260930/analysis.json",
-   "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-   "class": "accounting",
+   "source": "research/ic_tool_program/rule/v9/analysis.json",
+   "before_source": "research/ic_tool_program/rule/v7/analysis.json",
+   "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+   "class": "measurement",
    "family": "A",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -10091,13 +10111,13 @@
     "points": 27984,
     "recipe": "aimed m = 3 collection, m = 2 descent; one target",
     "variant": "koblitz_one_target",
-    "source": "research/ic_tool_program/rule/v7/analysis.json",
+    "source": "research/ic_tool_program/rule/v9/analysis.json",
     "refs": [],
     "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
-    "evidence_dir": "research/ic_tool_program/rule/v7",
+    "evidence_dir": "research/ic_tool_program/rule/v9",
     "reasons": [],
     "sweep": {
      "verdict": "validated_with_caveats",
@@ -10113,11 +10133,11 @@
    "regime": "koblitz",
    "slug": "icv1-f2m59-tm943548413-98844ecc",
    "ec1": "EC1N59Ce1h20858f64459b",
-   "legacy": "K_1 / GF(2^59)",
+   "legacy": "icv1-f2m59-tm943548413-98844ecc",
    "log2_r": 44.52,
    "cofactor": null,
-   "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-   "reference_s": 1.2286669811,
+   "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
+   "reference_s": 0.620465059242,
    "floor_s": 0.115376918307,
    "targets": 1,
    "recipes": [
@@ -10129,34 +10149,35 @@
      "base_points": 30208,
      "columns": 256,
      "targets": "one public point per process, 64 per size",
-     "s": 7.82481936705,
-     "s_online": 0.0315783741807,
-     "s_setup": 7.79324099287,
+     "s": 4.23652456756,
+     "s_online": 0.021603556471,
+     "s_setup": 4.21492101109,
      "phases_s": {
-      "precomputation": 7.79324099287,
-      "descent": 0.0315034076232,
-      "verify": 4.09427816105e-05
+      "precomputation": 4.21492101109,
+      "descent": 0.0215677315981,
+      "verify": 3.28410453562e-05
      },
-     "ratio_rho": 6.36854370422,
+     "ratio_rho": 6.82798250192,
      "ratio_rho_ci": [
-      5.59591619687,
-      7.32746725356
+      6.03096187593,
+      7.83395854148
      ],
-     "ratio_rho_section23": 15.6681638536,
-     "online_speedup_section23": 16.8705054527,
-     "online_speedup": 36.9650761325,
+     "ratio_rho_rule_before": 6.36854370422,
+     "online_speedup_rule_before": 36.9650761325,
+     "before_label": "rule v7, rho as then",
+     "online_speedup": 26.7846881449,
      "online_speedup_ci": [
-      28.7172556468,
-      48.2292814294
+      20.808115908,
+      34.8615139721
      ],
-     "online_speedup_canonical_step": 18.7042497425,
-     "ic_online_over_precomputation_model": 0.522035435749,
-     "break_even_targets": 6.86194694387,
+     "online_speedup_canonical_step": 18.7201140559,
+     "ic_online_over_precomputation_model": 0.41769827213,
+     "break_even_targets": 7.56662663098,
      "construction_artefact": false,
-     "canonical_step_units": 4.88060441482,
-     "rho_step_units_as_built": 9.77289061776,
-     "cold_ratio_without_curve_construction": 6.6675065082,
-     "ratio_floor": 67.8196252933,
+     "canonical_step_units": 3.31891149256,
+     "rho_step_units_as_built": 4.76482082814,
+     "cold_ratio_without_curve_construction": 7.27488701421,
+     "ratio_floor": 36.7189957033,
      "verified": true
     }
    ],
@@ -10168,40 +10189,41 @@
     "base_points": 30208,
     "columns": 256,
     "targets": "one public point per process, 64 per size",
-    "s": 7.82481936705,
-    "s_online": 0.0315783741807,
-    "s_setup": 7.79324099287,
+    "s": 4.23652456756,
+    "s_online": 0.021603556471,
+    "s_setup": 4.21492101109,
     "phases_s": {
-     "precomputation": 7.79324099287,
-     "descent": 0.0315034076232,
-     "verify": 4.09427816105e-05
+     "precomputation": 4.21492101109,
+     "descent": 0.0215677315981,
+     "verify": 3.28410453562e-05
     },
-    "ratio_rho": 6.36854370422,
+    "ratio_rho": 6.82798250192,
     "ratio_rho_ci": [
-     5.59591619687,
-     7.32746725356
+     6.03096187593,
+     7.83395854148
     ],
-    "ratio_rho_section23": 15.6681638536,
-    "online_speedup_section23": 16.8705054527,
-    "online_speedup": 36.9650761325,
+    "ratio_rho_rule_before": 6.36854370422,
+    "online_speedup_rule_before": 36.9650761325,
+    "before_label": "rule v7, rho as then",
+    "online_speedup": 26.7846881449,
     "online_speedup_ci": [
-     28.7172556468,
-     48.2292814294
+     20.808115908,
+     34.8615139721
     ],
-    "online_speedup_canonical_step": 18.7042497425,
-    "ic_online_over_precomputation_model": 0.522035435749,
-    "break_even_targets": 6.86194694387,
+    "online_speedup_canonical_step": 18.7201140559,
+    "ic_online_over_precomputation_model": 0.41769827213,
+    "break_even_targets": 7.56662663098,
     "construction_artefact": false,
-    "canonical_step_units": 4.88060441482,
-    "rho_step_units_as_built": 9.77289061776,
-    "cold_ratio_without_curve_construction": 6.6675065082,
-    "ratio_floor": 67.8196252933,
+    "canonical_step_units": 3.31891149256,
+    "rho_step_units_as_built": 4.76482082814,
+    "cold_ratio_without_curve_construction": 7.27488701421,
+    "ratio_floor": 36.7189957033,
     "verified": true
    },
-   "source": "research/ic_tool_program/rule/v7/analysis.json",
-   "before_source": "research/ic_single_target_20260930/analysis.json",
-   "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-   "class": "accounting",
+   "source": "research/ic_tool_program/rule/v9/analysis.json",
+   "before_source": "research/ic_tool_program/rule/v7/analysis.json",
+   "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+   "class": "measurement",
    "family": "A",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -10215,13 +10237,13 @@
     "points": 30208,
     "recipe": "aimed m = 3 collection, m = 2 descent; one target",
     "variant": "koblitz_one_target",
-    "source": "research/ic_tool_program/rule/v7/analysis.json",
+    "source": "research/ic_tool_program/rule/v9/analysis.json",
     "refs": [],
     "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
-    "evidence_dir": "research/ic_tool_program/rule/v7",
+    "evidence_dir": "research/ic_tool_program/rule/v9",
     "reasons": [],
     "sweep": {
      "verdict": "validated_with_caveats",
@@ -10237,11 +10259,11 @@
    "regime": "koblitz",
    "slug": "icv1-f2m61-t158598901-ab42b6c5",
    "ec1": "EC1N61Ce0hd8c15448081e",
-   "legacy": "K_0 / GF(2^61)",
+   "legacy": "icv1-f2m61-t158598901-ab42b6c5",
    "log2_r": 47.21,
    "cofactor": null,
-   "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-   "reference_s": 1.07659796691,
+   "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
+   "reference_s": 0.530285869129,
    "floor_s": 0.113469730447,
    "targets": 1,
    "recipes": [
@@ -10253,34 +10275,35 @@
      "base_points": 39040,
      "columns": 320,
      "targets": "one public point per process, 64 per size",
-     "s": 12.3894218992,
-     "s_online": 0.0542219086457,
-     "s_setup": 12.3351999906,
+     "s": 5.90340665463,
+     "s_online": 0.037115246511,
+     "s_setup": 5.86629140812,
      "phases_s": {
-      "precomputation": 12.3351999906,
-      "descent": 0.0535831434394,
-      "verify": 1.64550487958e-05
+      "precomputation": 5.86629140812,
+      "descent": 0.037101441905,
+      "verify": 1.4282909108e-05
      },
-     "ratio_rho": 11.5079372988,
+     "ratio_rho": 11.1324985226,
      "ratio_rho_ci": [
-      10.242133559,
-      13.0618475734
+      9.91777450427,
+      12.6022962032
      ],
-     "ratio_rho_section23": 31.5994057949,
-     "online_speedup_section23": 8.83874129307,
-     "online_speedup": 19.4592820305,
+     "ratio_rho_rule_before": 11.5079372988,
+     "online_speedup_rule_before": 19.4592820305,
+     "before_label": "rule v7, rho as then",
+     "online_speedup": 13.9019511374,
      "online_speedup_ci": [
-      14.8223073656,
-      26.1429561359
+      10.6802923177,
+      18.5821733875
      ],
-     "online_speedup_canonical_step": 9.81866849845,
-     "ic_online_over_precomputation_model": 1.4459192993,
-     "break_even_targets": 12.3241390275,
+     "online_speedup_canonical_step": 9.72815426244,
+     "ic_online_over_precomputation_model": 1.0240402184,
+     "break_even_targets": 12.250558558,
      "construction_artefact": false,
-     "canonical_step_units": 4.91583216003,
-     "rho_step_units_as_built": 9.81046447563,
-     "cold_ratio_without_curve_construction": 11.7298030417,
-     "ratio_floor": 109.187021511,
+     "canonical_step_units": 3.33279084768,
+     "rho_step_units_as_built": 4.7711594859,
+     "cold_ratio_without_curve_construction": 11.4254437286,
+     "ratio_floor": 52.0262684272,
      "verified": true
     }
    ],
@@ -10292,40 +10315,41 @@
     "base_points": 39040,
     "columns": 320,
     "targets": "one public point per process, 64 per size",
-    "s": 12.3894218992,
-    "s_online": 0.0542219086457,
-    "s_setup": 12.3351999906,
+    "s": 5.90340665463,
+    "s_online": 0.037115246511,
+    "s_setup": 5.86629140812,
     "phases_s": {
-     "precomputation": 12.3351999906,
-     "descent": 0.0535831434394,
-     "verify": 1.64550487958e-05
+     "precomputation": 5.86629140812,
+     "descent": 0.037101441905,
+     "verify": 1.4282909108e-05
     },
-    "ratio_rho": 11.5079372988,
+    "ratio_rho": 11.1324985226,
     "ratio_rho_ci": [
-     10.242133559,
-     13.0618475734
+     9.91777450427,
+     12.6022962032
     ],
-    "ratio_rho_section23": 31.5994057949,
-    "online_speedup_section23": 8.83874129307,
-    "online_speedup": 19.4592820305,
+    "ratio_rho_rule_before": 11.5079372988,
+    "online_speedup_rule_before": 19.4592820305,
+    "before_label": "rule v7, rho as then",
+    "online_speedup": 13.9019511374,
     "online_speedup_ci": [
-     14.8223073656,
-     26.1429561359
+     10.6802923177,
+     18.5821733875
     ],
-    "online_speedup_canonical_step": 9.81866849845,
-    "ic_online_over_precomputation_model": 1.4459192993,
-    "break_even_targets": 12.3241390275,
+    "online_speedup_canonical_step": 9.72815426244,
+    "ic_online_over_precomputation_model": 1.0240402184,
+    "break_even_targets": 12.250558558,
     "construction_artefact": false,
-    "canonical_step_units": 4.91583216003,
-    "rho_step_units_as_built": 9.81046447563,
-    "cold_ratio_without_curve_construction": 11.7298030417,
-    "ratio_floor": 109.187021511,
+    "canonical_step_units": 3.33279084768,
+    "rho_step_units_as_built": 4.7711594859,
+    "cold_ratio_without_curve_construction": 11.4254437286,
+    "ratio_floor": 52.0262684272,
     "verified": true
    },
-   "source": "research/ic_tool_program/rule/v7/analysis.json",
-   "before_source": "research/ic_single_target_20260930/analysis.json",
-   "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-   "class": "accounting",
+   "source": "research/ic_tool_program/rule/v9/analysis.json",
+   "before_source": "research/ic_tool_program/rule/v7/analysis.json",
+   "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+   "class": "measurement",
    "family": "A",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -10339,13 +10363,13 @@
     "points": 39040,
     "recipe": "aimed m = 3 collection, m = 2 descent; one target",
     "variant": "koblitz_one_target",
-    "source": "research/ic_tool_program/rule/v7/analysis.json",
+    "source": "research/ic_tool_program/rule/v9/analysis.json",
     "refs": [],
     "link_status": "not_reconciled"
    },
    "validation": {
     "status": "validated",
-    "evidence_dir": "research/ic_tool_program/rule/v7",
+    "evidence_dir": "research/ic_tool_program/rule/v9",
     "reasons": [],
     "sweep": {
      "verdict": "validated_with_caveats",
@@ -337652,6 +337676,186 @@
   "validation": "validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)",
   "validated": true
  },
+ "jv_sieve_line_vs_rho_component": {
+  "rows": [
+   {
+    "arm": "P",
+    "scope": "p=1009",
+    "s": 0.0655539187151,
+    "lo": 0.0456320120172,
+    "hi": 0.095642256794,
+    "band": [
+     0.0655539187151,
+     0.360136160222,
+     0.37773649205
+    ],
+    "band_hi": 0.535019309018,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "p=1511",
+    "s": 0.0177305888539,
+    "lo": 0.0134586055363,
+    "hi": 0.0246184001338,
+    "band": [
+     0.0177305888539,
+     0.132812786411,
+     0.139679305028
+    ],
+    "band_hi": 0.185019036199,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "p=1823",
+    "s": 0.0124697020568,
+    "lo": 0.0103038234838,
+    "hi": 0.0156697529965,
+    "band": [
+     0.0124697020568,
+     0.0915106956848,
+     0.0962333170502
+    ],
+    "band_hi": 0.108795750427,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "pooled",
+    "s": 0.0243814369733,
+    "lo": 0.0206242795361,
+    "hi": 0.029211410898,
+    "band": [
+     0.0243814369733,
+     0.163578476241,
+     0.171876098955
+    ],
+    "band_hi": 0.200297877312,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1009",
+    "s": 0.031444072554,
+    "lo": 0.0239179616109,
+    "hi": 0.0435132757989,
+    "band": [
+     0.031444072554,
+     0.167474162514,
+     0.17560694896
+    ],
+    "band_hi": 0.235815238091,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1511",
+    "s": 0.0124458385197,
+    "lo": 0.00990341401228,
+    "hi": 0.0165114055796,
+    "band": [
+     0.0124458385197,
+     0.0749911373646,
+     0.0787343743116
+    ],
+    "band_hi": 0.103585209947,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1823",
+    "s": 0.00935252854054,
+    "lo": 0.00784441623607,
+    "hi": 0.0112668074913,
+    "band": [
+     0.00935252854054,
+     0.0596346041697,
+     0.0626404585689
+    ],
+    "band_hi": 0.0684369619791,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "pooled",
+    "s": 0.0154109944692,
+    "lo": 0.0134819723036,
+    "hi": 0.0180146132027,
+    "band": [
+     0.0154109944692,
+     0.090813838352,
+     0.0953206515249
+    ],
+    "band_hi": 0.109342741029,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1009",
+    "s": 0.030627281014,
+    "lo": 0.0224057375407,
+    "hi": 0.043953054463,
+    "band": [
+     0.030627281014,
+     0.157732188289,
+     0.165322067149
+    ],
+    "band_hi": 0.224520858806,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1511",
+    "s": 0.0114790066189,
+    "lo": 0.00853370191629,
+    "hi": 0.016041517393,
+    "band": [
+     0.0114790066189,
+     0.0711443618248,
+     0.0747083958451
+    ],
+    "band_hi": 0.0990789905816,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1823",
+    "s": 0.00805786451023,
+    "lo": 0.00735042810788,
+    "hi": 0.00884030110609,
+    "band": [
+     0.00805786451023,
+     0.0560590814556,
+     0.0589320061384
+    ],
+    "band_hi": 0.0613590987925,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "pooled",
+    "s": 0.0141496024091,
+    "lo": 0.0122283213378,
+    "hi": 0.0167371308959,
+    "band": [
+     0.0141496024091,
+     0.0856844995776,
+     0.0899533112196
+    ],
+    "band_hi": 0.103303142808,
+    "below": true
+   }
+  ],
+  "class": "transfer (weak class only)",
+  "walk_note": "The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. That charge covers starts within the implemented walk's reach: from a random admitted curve it reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route.",
+  "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+  "study": "research/jv_sieve_line_vs_rho_20261103/",
+  "report": "research/jv_sieve_line_vs_rho_20261103/REPORT.pdf",
+  "source": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+  "validation": "validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)",
+  "validated": true
+ },
  "d4_char2_frob_roots_component": {
   "rows": [
    {
@@ -338286,6 +338490,459 @@
   "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
   "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json)",
   "validated": true
+ },
+ "mt_fieldops_component": {
+  "rows": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "rho": {
+     "0": {
+      "median": 1.10976053328,
+      "ci95": [
+       1.10209303048,
+       1.1228251284
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.06346164107,
+      "ci95": [
+       1.05862702703,
+       1.07889824673
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.474015222,
+      "ci95": [
+       1.46130838385,
+       1.49078847139
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.3532177983,
+      "ci95": [
+       1.34264830949,
+       1.36662647714
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.4078745896,
+      "ci95": [
+       1.39963923642,
+       1.42305349124
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 1.07267398888,
+      "ci95": [
+       1.0668178716,
+       1.07498405028
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.0443461279,
+      "ci95": [
+       1.03807271029,
+       1.0471905842
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.32218187049,
+      "ci95": [
+       1.31225669591,
+       1.32880335143
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.23680416272,
+      "ci95": [
+       1.23611535283,
+       1.24025748811
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.3311243007,
+      "ci95": [
+       1.32870402447,
+       1.33623848748
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 1.03942490705,
+      "ci95": [
+       1.03853291944,
+       1.04103857662
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.02797423551,
+      "ci95": [
+       1.02669024346,
+       1.0303760203
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.19734859162,
+      "ci95": [
+       1.19560093254,
+       1.20233602883
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.14645548587,
+      "ci95": [
+       1.14518556773,
+       1.1476521295
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.25509988212,
+      "ci95": [
+       1.25068063503,
+       1.2576850772
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "rho": {
+     "0": {
+      "median": 1.1479992229,
+      "ci95": [
+       1.12065590635,
+       1.15804993848
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.08267133272,
+      "ci95": [
+       1.0561668679,
+       1.09324426743
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.66259727217,
+      "ci95": [
+       1.64429676295,
+       1.68002946056
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.44311683975,
+      "ci95": [
+       1.43879952431,
+       1.45217380049
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.44836053446,
+      "ci95": [
+       1.44449893957,
+       1.46031955331
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 1.11182997343,
+      "ci95": [
+       1.10598833543,
+       1.12018128547
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.05737134129,
+      "ci95": [
+       1.05008020973,
+       1.06582287466
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.56572636354,
+      "ci95": [
+       1.55966379876,
+       1.5713057383
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.37110294945,
+      "ci95": [
+       1.3671629293,
+       1.38017034484
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.41310263887,
+      "ci95": [
+       1.40715126696,
+       1.42196686829
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 1.08219307298,
+      "ci95": [
+       1.07877932829,
+       1.08397951528
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.04092976487,
+      "ci95": [
+       1.03759054198,
+       1.04317099031
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.44556189247,
+      "ci95": [
+       1.43999202947,
+       1.44762025285
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.28029951785,
+      "ci95": [
+       1.27846659071,
+       1.28192614912
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.35707392177,
+      "ci95": [
+       1.35309640744,
+       1.35859812705
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "rho": {
+     "0": {
+      "median": 1.15565637908,
+      "ci95": [
+       1.13742729843,
+       1.16556279061
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.08302669081,
+      "ci95": [
+       1.06579532014,
+       1.09201307963
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.75654644687,
+      "ci95": [
+       1.74084259634,
+       1.77458085096
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.48824542029,
+      "ci95": [
+       1.48031570856,
+       1.49845205267
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.47430318715,
+      "ci95": [
+       1.46693306087,
+       1.4850180203
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 1.12097487441,
+      "ci95": [
+       1.11418023248,
+       1.12476705147
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.05418332003,
+      "ci95": [
+       1.04785925093,
+       1.05799602195
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.68126093501,
+      "ci95": [
+       1.66696731644,
+       1.6847265918
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.42768316329,
+      "ci95": [
+       1.42343245777,
+       1.43501033967
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.43094332738,
+      "ci95": [
+       1.42586719695,
+       1.43946271243
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 1.10331062993,
+      "ci95": [
+       1.10043363579,
+       1.10514364324
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.04291675737,
+      "ci95": [
+       1.0404315062,
+       1.04529262353
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.60872541983,
+      "ci95": [
+       1.60428509875,
+       1.61216792383
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.37829905906,
+      "ci95": [
+       1.3762513916,
+       1.3805940701
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.40467236217,
+      "ci95": [
+       1.40211191279,
+       1.4069622879
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "dearer"
+   }
+  ],
+  "study": "research/mt_fieldops_v4_20261112/",
+  "report": "research/mt_fieldops_v4_20261112/REPORT.pdf",
+  "source": "research/mt_fieldops_v4_20261112/results/holdout/summary.json",
+  "previous": "research/mt_fieldops_v3_20261111/",
+  "correction": "research/mt_rho_start_fix_20261111/",
+  "class": "multi-target method",
+  "validation": "not validated: the gate refuses benchmarks/20261112-mt-fieldops-v4/VALIDATION.json (validator status insufficient_evidence for a ranking, strongest_available false); the measurement itself replays exactly and recomputes",
+  "validated": false
  },
  "quartic_twist_pair_component": {
   "rows": [

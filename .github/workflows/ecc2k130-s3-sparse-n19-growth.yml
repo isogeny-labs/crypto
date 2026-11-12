@@ -26,12 +26,14 @@ jobs:
       - name: Exercise harmless Linux wall, direct-memory and descendant controls
         run: python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/test_resource_cap.py
       - name: Check source and input hashes; replay archive only when committed
-        run: |
-          python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py
-          if test -f research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/receipt.json; then
-            python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py \
-              --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
-          fi
+        env:
+          FROZEN_VIEW_STEP: |
+            python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py
+            if test -f research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/receipt.json; then
+              python research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py \
+                --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_s3_sparse_n19_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
   measured-first-attempt:
     if: ${{ github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795 }}
     needs: frozen-and-archive

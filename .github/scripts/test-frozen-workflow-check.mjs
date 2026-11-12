@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
@@ -67,7 +67,10 @@ async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-r
         ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
           [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
         : { files };
-    write(manifest, JSON.stringify(freeze) + '\n');
+    write(manifest, manifestFormat === 'sha256sum'
+      ? Object.entries(files).map(([file, digest]) =>
+        `${digest}  ${file.startsWith('.github/') ? file : study + '/' + file}\n`).join('')
+      : JSON.stringify(freeze) + '\n');
     git('add', '.');
     git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'original freeze');
     const revision = git('rev-parse', 'HEAD');
@@ -409,4 +412,275 @@ test('a JSON Pointer reads names with dots and escapes, and only own fields', as
       extraWorkflows: [`${extraWorkflow}|${extraManifest}|pointer:/constructor`] }),
     /historical workflow does not match its frozen digest/);
   }, { extra: true });
+});
+
+test('replay runner: a command after -- needs exactly one --only', async () => {
+  const { parseArgs } = await import('./run-frozen-workflow-replays.mjs');
+  assert.deepEqual(parseArgs([]), { custodyOnly: false, only: [], command: null });
+  assert.deepEqual(parseArgs(['--only', 'a', '--only', 'b']), { custodyOnly: false, only: ['a', 'b'], command: null });
+  assert.deepEqual(parseArgs(['--only', 'a', '--', 'bash', '-c', 'x --only y']),
+    { custodyOnly: false, only: ['a'], command: ['bash', '-c', 'x --only y'] });
+  for (const argv of [['--', 'true'], ['--only', 'a', '--only', 'b', '--', 'true'], ['--only', 'a', '--'],
+    ['--only', 'a', '--custody-only', '--', 'true'], ['--only'], ['--only', '--custody-only'], ['--bogus']]) {
+    assert.throws(() => parseArgs(argv), undefined, argv.join(' '));
+  }
+});
+
+test('replay runner: --only scopes custody to the pins of the selected replays', async () => {
+  const { custodyProblems } = await import('./run-frozen-workflow-replays.mjs');
+  const repo = mkdtempSync(path.join(os.tmpdir(), 'frozen-replay-custody-'));
+  try {
+    const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim();
+    git('init', '-q');
+    git('config', 'user.email', 'test@example.invalid');
+    git('config', 'user.name', 'test');
+    const hash = text => createHash('sha256').update(text).digest('hex');
+    mkdirSync(path.join(repo, '.github/workflows'), { recursive: true });
+    for (const name of ['a', 'b', 'c']) writeFileSync(path.join(repo, `.github/workflows/${name}.yml`), `name: ${name}\n`);
+    const pins = Object.fromEntries(['a', 'b', 'c'].map(name => [name, hash(`name: ${name}\n`)]));
+    // b's evidence file drops its pin, so only replays that cover b see a problem.
+    writeFileSync(path.join(repo, 'a.json'), pins.a);
+    writeFileSync(path.join(repo, 'b.json'), 'unpinned');
+    writeFileSync(path.join(repo, 'c.json'), pins.c);
+    git('add', '.');
+    git('commit', '-qm', 'pins');
+    const index = { revision: git('rev-parse', 'HEAD'),
+      workflows: Object.fromEntries(['a', 'b', 'c'].map(name => [`.github/workflows/${name}.yml`,
+        { pinned_sha256: pins[name], check: 'replay', pinned_by: [`${name}.json`] }])),
+      replays: [
+        { id: 'ra', workflow: '.github/workflows/a.yml', extra_workflows: [] },
+        { id: 'rb', workflow: '.github/workflows/c.yml', extra_workflows: ['.github/workflows/b.yml|b.json|key:x'] },
+      ] };
+    assert.deepEqual(custodyProblems({ cwd: repo, index, only: ['ra'] }), []);
+    assert.deepEqual(custodyProblems({ cwd: repo, index, only: ['rb'] }),
+      ['.github/workflows/b.yml: b.json no longer carries its pin']);
+    assert.deepEqual(custodyProblems({ cwd: repo, index }), ['.github/workflows/b.yml: b.json no longer carries its pin']);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('a coreutils sha256sum manifest pins the workflow and its root-relative inputs', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    assert.equal(withFrozenWorkflow(options), 0);
+    assert.notEqual(readFileSync(marker, 'utf8'), cwd);
+    // sha256sum --check itself passes in the view and fails on the live checkout.
+    const check = { ...options, command: ['sha256sum', '--check', '--quiet', manifest] };
+    assert.equal(withFrozenWorkflow(check), 0);
+    assert.throws(() => execFileSync('sha256sum', ['--check', '--quiet', manifest], { cwd, stdio: 'pipe' }));
+  }, { manifestFormat: 'sha256sum' });
+});
+
+test('a sha256sum manifest rejects drifted inputs and malformed lines', async () => {
+  await fixture(async ({ write, options }) => {
+    write(study + '/input.json', '{"evidence":"changed"}\n');
+    assert.throws(() => withFrozenWorkflow(options), /frozen input drift: research\/study\/input.json/);
+  }, { manifestFormat: 'sha256sum' });
+  for (const bad of ['not a digest line\n', `${'a'.repeat(64)} research/x\n`, `${'a'.repeat(64)}  x\n${'b'.repeat(64)}  x\n`]) {
+    await fixture(async ({ cwd, write, options }) => {
+      write(manifest, bad);
+      const git = (...args) => execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+      git('add', '.');
+      git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'bad manifest');
+      const revision = git('rev-parse', 'HEAD').toString().trim();
+      assert.throws(() => withFrozenWorkflow({ ...options, revision }), /invalid sha256sum manifest line/);
+    }, { manifestFormat: 'sha256sum' });
+  }
+});
+
+// A `files`-style freeze names its inputs by path, so the input view selects
+// the digest by JSON Pointer; with no current twin, a committed drift note
+// must name the target instead of a current-source equality pair.
+function pointerView(config, { note = 'docs/DRIFT.md' } = {}) {
+  const [item] = config.inputs;
+  delete item.original_source_key;
+  delete item.current_equal;
+  item.original_source_pointer = '/source_sha256/cargo_lock';
+  item.current_drift_note = note;
+  return config;
+}
+
+test('a JSON Pointer input view with a drift note overlays the historical input', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    write(options.inputViewManifest, JSON.stringify(pointerView(
+      JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')))) + '\n');
+    write('docs/DRIFT.md', `${lockPath} changed after the freeze.\n`);
+    const logs = [];
+    const log = console.log;
+    console.log = line => logs.push(String(line));
+    try {
+      assert.equal(withFrozenWorkflow(options), 0);
+    } finally {
+      console.log = log;
+    }
+    assert.notEqual(readFileSync(marker, 'utf8'), cwd);
+    assert.equal(readFileSync(path.join(cwd, lockPath), 'utf8'), currentLock);
+    const view = JSON.parse(logs.find(line => line.startsWith('FROZEN_WORKFLOW_METADATA_VIEW ')).slice(30));
+    assert.equal(view.pinned_input_views[0].original_source_pointer, '/source_sha256/cargo_lock');
+    assert.equal(view.pinned_input_views[0].current_drift_note, 'docs/DRIFT.md');
+    assert.equal(view.pinned_input_views[0].view_sha256, sha(historicalLock));
+  }, { withPinnedInput: true });
+});
+
+test('a drift note must exist and name the pinned input', async () => {
+  for (const [noteText, pattern] of [[null, /ENOENT/], ['some other file drifted\n', /drift note does not name the pinned input/]]) {
+    await fixture(async ({ cwd, write, options, marker }) => {
+      write(options.inputViewManifest, JSON.stringify(pointerView(
+        JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')))) + '\n');
+      if (noteText !== null) write('docs/DRIFT.md', noteText);
+      assert.throws(() => withFrozenWorkflow(options), pattern);
+      assert.equal(existsSync(marker), false);
+    }, { withPinnedInput: true });
+  }
+});
+
+test('an input view names its original digest by exactly one selector, and the pointer must match', async () => {
+  const cases = [
+    [config => { config.inputs[0].original_source_key = 'cargo_lock'; }, /exactly one of original_source_key or original_source_pointer/],
+    [config => { delete config.inputs[0].original_source_pointer; }, /exactly one of original_source_key or original_source_pointer/],
+    [config => { config.inputs[0].original_source_pointer = '/source_sha256/other'; }, /does not match original frozen source/],
+    [config => { config.inputs[0].current_equal = [[lockPath, 'Cargo.lock']]; }, /lacks a current-source equality check/],
+    [config => { config.inputs[0].current_drift_note = '../outside.md'; }, /unsafe source-view path/],
+  ];
+  for (const [mutate, pattern] of cases) {
+    await fixture(async ({ cwd, write, options, marker }) => {
+      const config = pointerView(JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')));
+      mutate(config);
+      write(options.inputViewManifest, JSON.stringify(config) + '\n');
+      write('docs/DRIFT.md', `${lockPath} changed after the freeze.\n`);
+      assert.throws(() => withFrozenWorkflow(options), pattern);
+      assert.equal(existsSync(marker), false);
+    }, { withPinnedInput: true });
+  }
+});
+
+test('a tampered historical input revision fails before the validator runs', async () => {
+  await fixture(async ({ cwd, write, options, marker, current }) => {
+    const config = pointerView(JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')));
+    config.inputs[0].revision = current;
+    write(options.inputViewManifest, JSON.stringify(config) + '\n');
+    write('docs/DRIFT.md', `${lockPath} changed after the freeze.\n`);
+    assert.throws(() => withFrozenWorkflow(options), /pinned Git source hash mismatch/);
+    assert.equal(existsSync(marker), false);
+  }, { withPinnedInput: true });
+});
+
+test('replay runner: input_view_manifest is passed to the view and checked by custody', async () => {
+  const { custodyProblems } = await import('./run-frozen-workflow-replays.mjs');
+  const source = readFileSync(fileURLToPath(new URL('./run-frozen-workflow-replays.mjs', import.meta.url)), 'utf8');
+  assert.match(source, /inputViewManifest: replay\.input_view_manifest/);
+  const repo = mkdtempSync(path.join(os.tmpdir(), 'frozen-replay-input-view-'));
+  try {
+    const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim();
+    git('init', '-q');
+    mkdirSync(path.join(repo, '.github/workflows'), { recursive: true });
+    writeFileSync(path.join(repo, '.github/workflows/a.yml'), 'name: a\n');
+    const pin = sha('name: a\n');
+    writeFileSync(path.join(repo, 'a.json'), pin);
+    git('add', '.');
+    git('-c', 'user.name=t', '-c', 'user.email=t@example.invalid', 'commit', '-qm', 'pins');
+    const index = input_view_manifest => ({ revision: git('rev-parse', 'HEAD'),
+      workflows: { '.github/workflows/a.yml': { pinned_sha256: pin, check: 'replay', pinned_by: ['a.json'] } },
+      replays: [{ id: 'ra', workflow: '.github/workflows/a.yml', extra_workflows: [],
+        ...(input_view_manifest === undefined ? {} : { input_view_manifest }) }] });
+    assert.deepEqual(custodyProblems({ cwd: repo, index: index(undefined) }), []);
+    assert.deepEqual(custodyProblems({ cwd: repo, index: index('.github/scripts/view-v1.json') }), []);
+    for (const bad of ['research/view.json', '.github/scripts/../x.json', 7]) {
+      assert.deepEqual(custodyProblems({ cwd: repo, index: index(bad) }),
+        ['ra: input_view_manifest must be a JSON file under .github/scripts/']);
+    }
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+// A repository whose workflow has two pinned versions: the index revision holds
+// v2 (pinned by v2.json), and a sha256sum manifest pins v1 at an earlier commit.
+function twoVersionRepo() {
+  const repo = mkdtempSync(path.join(os.tmpdir(), 'frozen-replay-revision-'));
+  const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim();
+  const write = (file, text) => {
+    mkdirSync(path.dirname(path.join(repo, file)), { recursive: true });
+    writeFileSync(path.join(repo, file), text);
+  };
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.invalid');
+  git('config', 'user.name', 'test');
+  const w = '.github/workflows/w.yml';
+  const m = 'research/run/ARTIFACTS.sha256';
+  write(w, 'name: v1\n');
+  write('research/run/out.json', '{"row":1}\n');
+  write(m, `${sha('{"row":1}\n')}  research/run/out.json\n${sha('name: v1\n')}  ${w}\n`);
+  git('add', '.');
+  git('commit', '-qm', 'v1 run');
+  const first = git('rev-parse', 'HEAD');
+  write(w, 'name: v2\n');
+  write('v2.json', sha('name: v2\n'));
+  git('add', '.');
+  git('commit', '-qm', 'v2 evidence');
+  const second = git('rev-parse', 'HEAD');
+  write(w, 'name: live\n');
+  git('add', '.');
+  git('commit', '-qm', 'live CI policy');
+  const replay = { id: 'run', workflow: w, manifest: m, manifest_format: 'sha256sum', revision: first,
+    extra_workflows: [], roots: [], command: ['sha256sum', '--check', m] };
+  const index = { schema: 'frozen-workflow-pins/v1', revision: second,
+    workflows: { [w]: { pinned_sha256: sha('name: v2\n'), check: 'replay', pinned_by: ['v2.json'] } },
+    replays: [replay] };
+  return { repo, git, write, index, replay, first, second, w, m };
+}
+
+test('replay runner: a per-replay revision overrides the index revision in custody', async () => {
+  const { custodyProblems } = await import('./run-frozen-workflow-replays.mjs');
+  const { repo, git, write, index, replay, first, second, w, m } = twoVersionRepo();
+  try {
+    assert.deepEqual(custodyProblems({ cwd: repo, index }), []);
+    assert.deepEqual(custodyProblems({ cwd: repo, index, only: ['run'] }), []);
+    // At the index revision the manifest's pin (v1) is not the workflow's bytes.
+    const atIndex = { ...index, replays: [{ ...replay, revision: second }] };
+    assert.deepEqual(custodyProblems({ cwd: repo, index: atIndex }), [`replay run: ${m} does not pin ${w} at ${second}`]);
+    for (const revision of ['HEAD', first.slice(0, 12), first.toUpperCase(), '', null]) {
+      assert.deepEqual(custodyProblems({ cwd: repo, index: { ...index, replays: [{ ...replay, revision }] } }),
+        ['replay run: invalid revision'], String(revision));
+    }
+    // Scoped custody ignores a broken override on an unselected replay.
+    const other = { ...index, replays: [replay, { ...replay, id: 'other', revision: 'bad' }] };
+    assert.deepEqual(custodyProblems({ cwd: repo, index: other, only: ['run'] }), []);
+    write(m, `${sha('{"row":1}\n')}  research/run/out.json\n`);
+    git('add', '.');
+    git('commit', '-qm', 'drop the workflow pin');
+    assert.deepEqual(custodyProblems({ cwd: repo, index }), [`replay run: ${m} does not pin ${w} at ${first}`]);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('replay runner: a per-replay revision restores its own workflow version in the view', () => {
+  const runner = fileURLToPath(new URL('./run-frozen-workflow-replays.mjs', import.meta.url));
+  const { repo, write, index, replay, second, m } = twoVersionRepo();
+  const run = (idx, ...argv) => {
+    write('.github/scripts/frozen-workflow-pins.json', JSON.stringify(idx));
+    return spawnSync(process.execPath, [runner, ...argv], { cwd: repo, encoding: 'utf8' });
+  };
+  try {
+    // The live checkout itself fails the manifest: its workflow bytes are not v1.
+    assert.throws(() => execFileSync('sha256sum', ['--check', '--quiet', m], { cwd: repo, stdio: 'pipe' }));
+    let result = run(index);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /PASS run/);
+    result = run(index, '--only', 'run', '--', 'bash', '-eo', 'pipefail', '-c', `sha256sum -c ${m}`);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /\.github\/workflows\/w\.yml: OK/);
+    // Without the override the replay uses the index revision (v2) and fails custody of its manifest.
+    const { revision: _, ...plain } = replay;
+    result = run({ ...index, replays: [plain] });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /historical workflow does not match its frozen digest/);
+    // A tampered pin: the override names a commit whose bytes the manifest does not pin.
+    result = run({ ...index, replays: [{ ...replay, revision: second }] });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /custody: replay run: .* does not pin/);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
 });

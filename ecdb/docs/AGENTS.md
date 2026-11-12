@@ -47,7 +47,8 @@ It holds:
 - the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
   the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
   direction (horizontal, ascending, descending). End(E) is stored for 149,593
-  census curves whose conductor is {2, 3, 5}-smooth.
+  census curves whose conductor is {2, 3, 5}-smooth; `ecdb import end-rings`
+  computes it for every other ordinary census curve (Kohel's criterion).
 
 The design and the full table list are in [`SCHEMA.md`](SCHEMA.md). The
 routes are in [`../openapi.yaml`](../openapi.yaml).

@@ -45,6 +45,8 @@ fn fixture() -> (PrimeInstance, PrimePoint) {
         r: 107,
         cofactor: 1,
         generator: (78, 4),
+
+        representation: None,
     };
     let q = inst
         .curve

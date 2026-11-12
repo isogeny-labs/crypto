@@ -166,6 +166,29 @@ On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–
 
 validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)
 
+## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)
+
+Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} (never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; `U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each`. The band is layer A: every unemitted cover F_p operation is also priced as native, the upper-bound convention. The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. That charge covers starts within the implemented walk's reach: from a random admitted curve it reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route. Distance remaining is IC ÷ rho; "below" means the 95% interval's upper end is under 1 at all three prices.
+
+| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |
+|:--|:--|:--|:--|:--|
+| P | p=1009 | **0.0656** [0.0456, 0.0956] | 0.066 / 0.360 / 0.378 | yes |
+| P | p=1511 | **0.0177** [0.0135, 0.0246] | 0.018 / 0.133 / 0.140 | yes |
+| P | p=1823 | **0.0125** [0.0103, 0.0157] | 0.012 / 0.092 / 0.096 | yes |
+| P | pooled | **0.0244** [0.0206, 0.0292] | 0.024 / 0.164 / 0.172 | yes |
+| H | p=1009 | **0.0314** [0.0239, 0.0435] | 0.031 / 0.167 / 0.176 | yes |
+| H | p=1511 | **0.0124** [0.0099, 0.0165] | 0.012 / 0.075 / 0.079 | yes |
+| H | p=1823 | **0.0094** [0.0078, 0.0113] | 0.009 / 0.060 / 0.063 | yes |
+| H | pooled | **0.0154** [0.0135, 0.0180] | 0.015 / 0.091 / 0.095 | yes |
+| U | p=1009 | **0.0306** [0.0224, 0.0440] | 0.031 / 0.158 / 0.165 | yes |
+| U | p=1511 | **0.0115** [0.0085, 0.0160] | 0.011 / 0.071 / 0.075 | yes |
+| U | p=1823 | **0.0081** [0.0074, 0.0088] | 0.008 / 0.056 / 0.059 | yes |
+| U | pooled | **0.0141** [0.0122, 0.0167] | 0.014 / 0.086 / 0.090 | yes |
+
+[Report](../../research/jv_sieve_line_vs_rho_20261103/REPORT.pdf) · [study](../../research/jv_sieve_line_vs_rho_20261103/) · [data](../../research/jv_sieve_line_vs_rho_20261103/fit.json).
+
+validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
+
 ## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
 
 On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
@@ -183,24 +206,24 @@ Paired lever ÷ base (ecbench compare): m = 12: 0.8543 [0.8543, 0.8543] over 3 p
 
 validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)
 
-## Table A: Koblitz, one target (§23, re-run at baseline v7)
+## Table A: Koblitz, one target (§23, re-run at main as rule v9 against a matched rho)
 
-- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
-- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).
+- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).
+- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v9 at main, with rule v8's matched rho: batched canonicalisation).
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
 - **Online reading:** The archived online-only ratios compare IC after its reusable set-up with rho as built in that experiment. They do not establish an equal-advice online advantage. Later retained-setup claims were superseded by equal-advice rho controls; see the frontier audit above. The cold rows remain the ranked comparison.
-- **Rho step:** rho's walk as built costs 9.4–10.6 units a step; the canonical step costs 4.2–4.92
+- **Rho step:** rho's walk as built costs 4.65–5.8 units a step; the canonical step costs 2.95–3.33
 
 | curve | log₂ r | recipe | |F| | columns | IC operations | rho operations | S, IC | S, reference | IC / rho | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 5264 | 56 | — | — | 6.03 | 1.76 | **3.43×** (was 4.95×, §23) | 0.129 | 46.6× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7296 | 64 | — | — | 6.37 | 1.6 | **3.97×** (was 1.98×, §23) | 0.117 | 54.2× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6560 | 80 | — | — | 6.63 | 1.4 | **4.74×** (was 8.04×, §23) | 0.138 | 47.9× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 27984 | 264 | — | — | 8.15 | 1.16 | **7.03×** (was 14.7×, §23) | 0.122 | 66.9× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 30208 | 256 | — | — | 7.82 | 1.23 | **6.37×** (was 15.7×, §23) | 0.115 | 67.8× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 39040 | 320 | — | — | 12.4 | 1.08 | **11.5×** (was 31.6×, §23) | 0.113 | 109× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 5264 | 56 | — | — | 4.15 | 1.02 | **4.08×** (was 3.43×, rule v7, rho as then) | 0.129 | 32.1× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7296 | 64 | — | — | 4.38 | 0.926 | **4.73×** (was 3.97×, rule v7, rho as then) | 0.117 | 37.3× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6560 | 80 | — | — | 4.48 | 0.729 | **6.14×** (was 4.74×, rule v7, rho as then) | 0.138 | 32.4× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 27984 | 264 | — | — | 4.42 | 0.593 | **7.46×** (was 7.03×, rule v7, rho as then) | 0.122 | 36.3× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 30208 | 256 | — | — | 4.24 | 0.62 | **6.83×** (was 6.37×, rule v7, rho as then) | 0.115 | 36.7× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 39040 | 320 | — | — | 5.9 | 0.53 | **11.1×** (was 11.5×, rule v7, rho as then) | 0.113 | 52× | ✓ | validated (sweep: validated_with_caveats, pricing_ok=False, rho_reference_ok=partial, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=True) |
 
 ## Table B: Prime and random-binary ladder (§18)
 
@@ -272,12 +295,12 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 | table | curve | Reusable set-up | Curve and subgroup | Workflow constructions | Factor base | Pair table | Relations (PDP) | Linear algebra | Descent | Verification |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| A | `icv1-f2m47-t22705043-f4e44623` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
-| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.9% | 0.0% |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.7% | — | — | — | — | — | — | 1.3% | 0.0% |
-| A | `icv1-f2m53-tm56619371-dac20a85` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m59-tm943548413-98844ecc` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m47-t22705043-f4e44623` | 98.9% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m57-tm747311035-c1f545af` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | 98.5% | — | — | — | — | — | — | 1.5% | 0.0% |
+| A | `icv1-f2m53-tm56619371-dac20a85` | 99.4% | — | — | — | — | — | — | 0.6% | 0.0% |
+| A | `icv1-f2m59-tm943548413-98844ecc` | 99.5% | — | — | — | — | — | — | 0.5% | 0.0% |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.4% | — | — | — | — | — | — | 0.6% | 0.0% |
 | B | `icv1-fp10-t5-192cb216` | — | — | — | 5.3% | — | 93.0% | 0.2% | — | 1.5% |
 | B | `icv1-fp12-t19-d4a315df` | — | — | — | 30.2% | — | 68.1% | 0.4% | — | 1.4% |
 | B | `icv1-fp14-tm43-158b6914` | — | — | — | 12.3% | — | 86.5% | 0.1% | — | 1.1% |
@@ -309,12 +332,12 @@ The registry overview below uses current links. Frozen measurement rows retain t
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m47-t22705043-f4e44623` | `icv1_f2m47_t22705043_f4e44623` | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | `icv1_f2m57_tm747311035_c1f545af` | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | `icv1_f2m41_tm2308219_7f48b14a` | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | `icv1_f2m53_tm56619371_dac20a85` | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | `icv1_f2m59_tm943548413_98844ecc` | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | `icv1_f2m61_t158598901_ab42b6c5` | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v9/analysis.json` | none (not_reconciled) |
 | B | `icv1-fp10-t5-192cb216` | `icv1_fp10_t5_192cb216` | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
 | B | `icv1-fp12-t19-d4a315df` | `icv1_fp12_t19_d4a315df` | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
 | B | `icv1-fp14-tm43-158b6914` | `icv1_fp14_tm43_158b6914` | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (not_reconciled) |
@@ -576,6 +599,24 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 ## Plain-S₅ C₄ solver stage, outside tables A–C
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
+
+## Multi-target IC against standard multi-target rho (no ranking established), outside tables A–C
+
+Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. The IC is the cheaper of ic5 (an x-only table of 4-term factor-base sums, paired trials x(Q ± W) with one shared inversion) and ic5 with retention of solved trials; the reference is the cheapest standard multi-target rho: Kuhn-Struik retention rho (x-only sibling walks) or distinguished-point rho with retention and precomputation, 15 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The decision column is the frozen rule, which prices h on hash-table operations only: with rho's per-step canonicalisations priced at h as §5a requires, every decision is unranked (IC 0.89-0.94x rho at h = 1), so no ranking against rho is established. Class: multi-target method. not validated: the gate refuses benchmarks/20261112-mt-fieldops-v4/VALIDATION.json (validator status insufficient_evidence for a ranking, strongest_available false); the measurement itself replays exactly and recomputes.
+
+| bits | T | IC/rho h=0 | h=0.1 | h=1 | frozen rule | IC/BSGS h=0 | h=1 |
+|--:|--:|--:|--:|--:|:--|--:|--:|
+| 24 | 1024 | 1.110 [1.102, 1.123] | 1.063 [1.059, 1.079] | 1.474 [1.461, 1.491] | dearer | 1.35 | 1.41 |
+| 24 | 4096 | 1.073 [1.067, 1.075] | 1.044 [1.038, 1.047] | 1.322 [1.312, 1.329] | dearer | 1.24 | 1.33 |
+| 24 | 16384 | 1.039 [1.039, 1.041] | 1.028 [1.027, 1.030] | 1.197 [1.196, 1.202] | dearer | 1.15 | 1.26 |
+| 28 | 1024 | 1.148 [1.121, 1.158] | 1.083 [1.056, 1.093] | 1.663 [1.644, 1.680] | dearer | 1.44 | 1.45 |
+| 28 | 4096 | 1.112 [1.106, 1.120] | 1.057 [1.050, 1.066] | 1.566 [1.560, 1.571] | dearer | 1.37 | 1.41 |
+| 28 | 16384 | 1.082 [1.079, 1.084] | 1.041 [1.038, 1.043] | 1.446 [1.440, 1.448] | dearer | 1.28 | 1.36 |
+| 32 | 1024 | 1.156 [1.137, 1.166] | 1.083 [1.066, 1.092] | 1.757 [1.741, 1.775] | dearer | 1.49 | 1.47 |
+| 32 | 4096 | 1.121 [1.114, 1.125] | 1.054 [1.048, 1.058] | 1.681 [1.667, 1.685] | dearer | 1.43 | 1.43 |
+| 32 | 16384 | 1.103 [1.100, 1.105] | 1.043 [1.040, 1.045] | 1.609 [1.604, 1.612] | dearer | 1.38 | 1.40 |
+
+Study: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/); [report](../../research/mt_fieldops_v4_20261112/REPORT.pdf); source `research/mt_fieldops_v4_20261112/results/holdout/summary.json`. Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
 
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
@@ -909,6 +950,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
 - `research/ic_single_target_20260930/analysis.json` — sha256 `109326d7c2882b71…`
 - `research/ic_tool_program/rule/v7/analysis.json` — sha256 `af81dd9ab2879632…`
+- `research/ic_tool_program/rule/v9/analysis.json` — sha256 `5773ba15d4512ebb…`
 - `docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json` — sha256 `2271c4aa5236e2bd…`
 - `research/ecbench_n37_rank_columns_20261004/RESULT.json` — sha256 `f7b950edc74978cb…`
 - `research/ecbench_n37_k8_k16_20261004/DECISION.json` — sha256 `c4a33ffd9045a479…`
@@ -953,6 +995,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
 - `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
 - `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
+- `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
@@ -995,6 +1038,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
+- `research/mt_fieldops_v3_20261111/results/holdout/summary.json` — sha256 `ae2eb540476901f4…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`

@@ -290,6 +290,30 @@ stopwatch, and the table should say which is which.
 | `total_gae`, `s` | the whole pipeline, and it over `√r` |
 | `s_over_rho` | against the matched counted Pollard rho on the same instance, when supplied |
 
+#### Stored factor-base log tables (individual logarithm only)
+
+A factor-base logarithm table depends only on the curve, its generator
+`G` and the materialised base, so it can be paid for once and reused.
+`ic logs --log-store <dir>` (or `$IC_LOG_STORE`) writes the table to
+`<dir>/<key>.json`, where the key is SHA-256 over a canonical text of
+the curve (degree, subfield, `a`, `b`, field modulus, subgroup order,
+cofactor), `G`'s coordinates and the SHA-256 of the *sorted point list*
+of the base (`src/bin/ic/log_store.rs`). Files are schema-2 documents
+(schema 1 still loads), written to a temporary name and hard-linked
+into place; an existing file is never replaced. `ic solve --log-store`
+(with `--factor-base` or `--factor-index`) and `ic price --log-store`
+look the table up by recomputing the key, check the generator and base
+hash, and re-verify every column as `[log]G == point` before use: a
+mismatch or failed check is an error, never a silent fallback. A run
+that used the store skips collection and linear algebra, and its report
+says so: `log_table.log_table_source` is `"store"` (or `"file"` for
+`--logs`, `"computed"` otherwise), with the key and
+`precomputation_paid_in_this_run: false`. That run's cost is
+**amortized, not cold**: `ic price` moves its cold figures to `*_store`
+fields (`s_cold` → `s_store`, `s_ic_cold` → `s_ic_store`) and nulls the
+cold ones. Report the cold cost first; a store-backed figure is
+secondary and never stands in for `S` (§7).
+
 ### The rho reference
 
 `ic bench` runs the reference before any configuration, on the same
@@ -851,7 +875,7 @@ worse than none:
 | targets | `Targets` | `random`, `walk` |
 | point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`, `chained-x`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `m4gb-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
-| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+| relation matrix | `RelationSolver` | `incremental-gauss`, `incremental-gauss-full-rank`, `incremental-gauss-full-rank-checked`, `incremental-gauss-echelon`, `structured-gauss`, `sparse-cado` (= `filter+wiedemann`), `filter+lanczos`, `wiedemann`, `lanczos` (the deferred sparse names force the full-rank completion rule and accept an answer only when two independently seeded solves agree; `linalg.rs` `MATRIX_NAMES`) |
 
 ### Hashed-affine / hashed-tensor
 

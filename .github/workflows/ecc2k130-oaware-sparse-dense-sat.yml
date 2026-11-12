@@ -31,8 +31,10 @@ jobs:
         run: |
           python3 -m py_compile research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/{run,verify,ci_replay,analyze,selftest,runtime_controls}.py
       - name: Check merged ancestry, frozen bytes and identical target semantics
-        run: |
-          python3 research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n13_oaware_sparse_dense_sat_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Check synthetic ABBA and strict decision threshold
         run: |
           python3 research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/selftest.py
