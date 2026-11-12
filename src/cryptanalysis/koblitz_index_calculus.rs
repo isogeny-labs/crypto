@@ -14409,7 +14409,7 @@ impl<'a> RelationCollector<'a> {
         // offset is below `len`, its end at most `len + window`).
         let paired = scan_paired_enabled()
             && !doubled_x.is_empty()
-            && len % 2 == 0
+            && len.is_multiple_of(2)
             && (0..len / 2).all(|j| doubled_x[2 * j] == doubled_x[2 * j + 1]);
         let (pair_x, pair_ya, pair_yb) = if paired {
             let pairs = (len + window).div_ceil(2);
