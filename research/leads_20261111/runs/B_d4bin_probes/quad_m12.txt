@@ -1,0 +1,37 @@
+QUAD m 12 curve seed 1 trials 300
+(a) terms per component histogram {20: 3, 21: 1197}
+(a) monomial support union (S2,S3,s4,P) -> #components containing it, 21 monomials:
+    [0, 0, 0, 0] wdeg 0: 1200
+    [0, 0, 0, 4] wdeg 4: 1200
+    [0, 0, 1, 0] wdeg 1: 1200
+    [0, 0, 1, 1] wdeg 2: 1200
+    [0, 0, 1, 2] wdeg 3: 1200
+    [0, 0, 1, 3] wdeg 4: 1200
+    [0, 0, 2, 0] wdeg 2: 1200
+    [0, 0, 2, 1] wdeg 3: 1199
+    [0, 0, 2, 2] wdeg 4: 1200
+    [0, 0, 3, 0] wdeg 3: 1200
+    [0, 0, 3, 1] wdeg 4: 1200
+    [0, 0, 4, 0] wdeg 4: 1200
+    [0, 1, 0, 0] wdeg 2: 1200
+    [0, 1, 0, 2] wdeg 4: 1200
+    [0, 1, 1, 0] wdeg 3: 1198
+    [0, 1, 1, 1] wdeg 4: 1200
+    [0, 2, 0, 0] wdeg 4: 1200
+    [1, 0, 1, 0] wdeg 3: 1200
+    [1, 0, 1, 1] wdeg 4: 1200
+    [1, 0, 2, 0] wdeg 4: 1200
+    [2, 0, 0, 0] wdeg 4: 1200
+(b) rank of 4x3 quadratic-part matrix histogram {2: 300}
+(c) staircase unavailable (equation above degree): 0
+(c) triangularised leads histogram:
+    300: [Some([2, 0, 0, 0]), Some([0, 2, 0, 0]), Some([1, 0, 2, 0]), Some([0, 0, 4, 0])]
+(c) leading terms in (S2,S3):
+    300: S2^2 S3^0 | S2^0 S3^2 | S2^1 S3^0 | S2^0 S3^0
+(c) standard monomials per (S2,S3) pattern histogram:
+    300: {(0, 0): 32, (0, 1): 16, (1, 0): 12, (1, 1): 4}
+control: solver dim histogram {64: 300}; staircase size == solver dim 300, mismatch 0, solver Err 0
+
+real	2m4.012s
+user	2m1.260s
+sys	0m2.345s

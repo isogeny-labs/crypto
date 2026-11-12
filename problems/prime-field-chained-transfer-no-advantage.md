@@ -141,6 +141,25 @@ Four parallel experiments under
   emitted. These are fixed in code and rerun as `results_v2.json`. The band
   is one-sided, because rho has no unpriced counters.
 
+## Amortized IC, certificates and larger-p genus 3 (2026-11-12 addendum)
+
+See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified].
+
+- **Amortized IC.** Factor-base logs are computed once and each target needs
+  only a descent. Its online cost is 2.0–3.1% of plain rho, but 1.3–11% above
+  Bernstein–Lange rho given the same memory. The frozen rule fails in 11 of
+  11 rows. The factor base is at least as large as the target group in every
+  row (`fb/r` 0.98–125), so the precomputation is a table the size of the
+  group. This answers the trapdoor question for IC's own one-time work:
+  amortizing helps only when the factor base is much smaller than the group,
+  and an elliptic subgroup of order about `p` pushed into a genus-2 Jacobian
+  over `F_p` never gives that.
+- **Certificates and the real instance** (F4, F5, F14 closed). Logs of the
+  pulled-back pair are recovered with oracle-free LA, and 16 of 16
+  certificates pass an independent checker. IC/rho is 8.0–40.8× at 0 GAE.
+- **Genus 3 to p = 64,007.** IC3/IC2 stays near 3, smoothness follows `1/g!`,
+  and the gap to rho grows about as `√p`.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -150,3 +169,5 @@ Four parallel experiments under
 - 2026-11-11: tower-up addendum (genus 1 → 2 → 3 on one instance); the ladder raises IC cost per rung.
 - 2026-11-12: ladder/formula/smoothness/replay addendum; replay corrections
   applied (F1–F3, F6, F8–F12) and the bench rerun as `results_v2.json`.
+- 2026-11-12: amortized-IC / certificate / larger-p genus-3 addendum; the
+  obstruction holds against matched precomputed rho.

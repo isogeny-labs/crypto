@@ -167,10 +167,17 @@ fn smooth_decompose(
     Some(out)
 }
 
-/// Single-large-prime-free genus-2 index calculus restricted to the cyclic
-/// `r`-part. `gen` has order `r`, `target = [x]gen`. Returns the recovered `x`
-/// and the counted cost. `fb_size` degree-1 places form the factor base.
-pub fn genus2_index_calculus(
+/// Relations collected over the degree-1 factor base.
+struct Relations {
+    /// `(exponents over the factor base, alpha, beta)` with
+    /// `[alpha]gen + [beta]target = Σ e_i (P_i − ∞)`.
+    rows: Vec<(Vec<i64>, u64, u64)>,
+    nfb: usize,
+    ops: u64,
+    trials: u64,
+}
+
+fn collect_relations(
     c: &Genus2Curve,
     gen: &Divisor,
     target: &Divisor,
@@ -178,7 +185,7 @@ pub fn genus2_index_calculus(
     fb_size: usize,
     max_trials: u64,
     seed: u64,
-) -> IcOutcome {
+) -> Relations {
     let p = c.p();
     let k = Fp::new(p).expect("genus2_fp curve has a prime field");
     // Factor base: the first `fb_size` abscissae `x` with an affine point. Only
@@ -197,9 +204,8 @@ pub fn genus2_index_calculus(
     }
     let index = |x: u64| xindex.get(&x).copied();
 
-    // Relation collection.
     let mut ops = 0u64;
-    let mut rows: Vec<(Vec<i64>, u64, u64)> = vec![]; // (exponents over fb, alpha, beta)
+    let mut rows: Vec<(Vec<i64>, u64, u64)> = vec![];
     let mut rng = seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1;
     let mut next = || {
         rng ^= rng << 13;
@@ -229,18 +235,61 @@ pub fn genus2_index_calculus(
             }
         }
     }
+    Relations {
+        rows,
+        nfb,
+        ops,
+        trials,
+    }
+}
 
-    // Linear algebra over Z/r: find a combination of rows whose fb-part is 0.
-    // Build matrix [exponents | alpha | beta] and reduce to isolate a (α,β)
-    // relation with zero factor-base part.
-    let (recovered, la_ops) = solve_linear(&rows, nfb, r, target_is_x(c, gen, target, r));
-
+/// Single-large-prime-free genus-2 index calculus restricted to the cyclic
+/// `r`-part. `gen` has order `r`, `target = [x]gen`. Returns whatever the
+/// elimination yields (F4: no reference value is consulted, so a wrong log is
+/// returned as wrong and judged afterwards by a certificate) and the counted
+/// cost. `fb_size` degree-1 places form the factor base.
+pub fn genus2_index_calculus(
+    c: &Genus2Curve,
+    gen: &Divisor,
+    target: &Divisor,
+    r: u64,
+    fb_size: usize,
+    max_trials: u64,
+    seed: u64,
+) -> IcOutcome {
+    let rel = collect_relations(c, gen, target, r, fb_size, max_trials, seed);
+    let (recovered, la_ops) = solve_linear_free(&rel.rows, rel.nfb, r);
     IcOutcome {
         recovered,
-        group_ops: ops,
-        trials,
-        relations: rows.len() as u64,
-        fb_size: nfb,
+        group_ops: rel.ops,
+        trials: rel.trials,
+        relations: rel.rows.len() as u64,
+        fb_size: rel.nfb,
+        la_field_ops: la_ops,
+    }
+}
+
+/// The pre-F4 path: the same relations, but the elimination accepts a
+/// candidate only if it equals a BSGS answer (`target_is_x`, uncharged). A
+/// wrong elimination gives `None`, never a wrong log. Kept for older callers
+/// and as a cross-check; not independent evidence that elimination works.
+pub fn genus2_index_calculus_oracle(
+    c: &Genus2Curve,
+    gen: &Divisor,
+    target: &Divisor,
+    r: u64,
+    fb_size: usize,
+    max_trials: u64,
+    seed: u64,
+) -> IcOutcome {
+    let rel = collect_relations(c, gen, target, r, fb_size, max_trials, seed);
+    let (recovered, la_ops) = solve_linear(&rel.rows, rel.nfb, r, target_is_x(c, gen, target, r));
+    IcOutcome {
+        recovered,
+        group_ops: rel.ops,
+        trials: rel.trials,
+        relations: rel.rows.len() as u64,
+        fb_size: rel.nfb,
         la_field_ops: la_ops,
     }
 }
@@ -296,6 +345,26 @@ fn target_is_x(c: &Genus2Curve, gen: &Divisor, target: &Divisor, r: u64) -> Opti
 /// fb-part is zeroed, `α + β·x ≡ 0`, giving `x = −α/β`. `reference` lets the
 /// caller cross-check (tests only). Returns `(x, field_mults_charged)`.
 fn solve_linear(
+    rows: &[(Vec<i64>, u64, u64)],
+    fb_size: usize,
+    r: u64,
+    reference: Option<u64>,
+) -> (Option<u64>, u64) {
+    solve_linear_inner(rows, fb_size, r, reference)
+}
+
+/// Oracle-free elimination (F4): the first zero-factor-base row with
+/// `beta ≠ 0` gives `x = −α/β`, returned as is. `None` only when elimination
+/// finds no such row. Nothing about the true log is consulted.
+pub fn solve_linear_free(
+    rows: &[(Vec<i64>, u64, u64)],
+    fb_size: usize,
+    r: u64,
+) -> (Option<u64>, u64) {
+    solve_linear_inner(rows, fb_size, r, None)
+}
+
+fn solve_linear_inner(
     rows: &[(Vec<i64>, u64, u64)],
     fb_size: usize,
     r: u64,
@@ -425,6 +494,39 @@ mod tests {
             assert_eq!(rho.recovered, Some(x), "rho recovers the log");
             assert!(rho.group_ops.adds + rho.group_ops.doubles > 0);
         }
+    }
+
+    #[test]
+    fn oracle_free_elimination_reports_a_wrong_log_as_wrong() {
+        // One doctored relation: empty factor-base part, alpha = 1, beta = 1
+        // gives x = -1 mod r. The oracle-free path returns it; the oracle path
+        // (reference = some other value) returns None. Correctness is judged
+        // outside, by a certificate.
+        let r = 101u64;
+        let rows = vec![(vec![0i64, 0], 1u64, 1u64)];
+        let (free, _) = solve_linear_free(&rows, 2, r);
+        assert_eq!(free, Some(r - 1));
+        let (gated, _) = solve_linear(&rows, 2, r, Some(5));
+        assert_eq!(gated, None);
+        let (empty, _) = solve_linear_free(&[], 2, r);
+        assert_eq!(empty, None);
+    }
+
+    #[test]
+    fn oracle_free_and_oracle_paths_agree_on_a_real_instance() {
+        let c = Genus2Curve::x5_plus_b(251, 3).unwrap();
+        let order = c.jacobian_order().unwrap();
+        let r = largest_cyclic_prime(order);
+        if r < 20 || (order / r).is_multiple_of(r) {
+            return;
+        }
+        let x = 17 % r;
+        let (g, t) = jac_instance(&c, order, r, x, 3).unwrap();
+        let a = genus2_index_calculus(&c, &g, &t, r, 251, 2_000_000, 3);
+        let b = genus2_index_calculus_oracle(&c, &g, &t, r, 251, 2_000_000, 3);
+        assert_eq!(a.recovered, Some(x));
+        assert_eq!(b.recovered, Some(x));
+        assert_eq!(a.group_ops, b.group_ops);
     }
 
     fn largest_cyclic_prime(mut n: u64) -> u64 {
