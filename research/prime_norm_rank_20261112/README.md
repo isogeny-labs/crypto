@@ -82,7 +82,7 @@ measurement. They do not bound the work needed to find an admissible M
 The expanded default build passed3141 jobs. The actual tracked-source gate
 passed21 declarations with0 additional trusted axioms. All six new declarations
 print only propext, Classical.choice and Quot.sound. The import-inclusive fresh
-replay receipt is in extraction-evidence/fresh-status.json when finished.
+replay exited0; its receipt is in extraction-evidence/fresh-status.json.
 Original source and earlier receipts remain unchanged [pcc:unverified].
 
 Five structural statements have canonical unsigned PCC bindings in
