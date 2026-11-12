@@ -4,13 +4,14 @@
 - **Kind:** implementation gap; access/tool limit; measurement gap
 - **Affected work:** [continuation](../research/rr_dickson_matrix_reduction_20261110/README.md)
 - **Next action owner:** continuation session with checkpoint/experiment access
-- **Last updated:** 2026-11-10
+- **Last updated:** 2026-11-12
 
 ## Problem
 
 We cannot yet determine whether degree-capped RR substitution retains the lower
 F4 degree while beating F on width and equal-output cost. Native preprocessing
-and reconstruction exist, but output normalization and an admitted matched
+and reconstruction exist, with common-chart output normalization added on
+November 12. Complete rational solver-output collection and an admitted matched
 measurement are missing. The first comparison is m3 t3–5 on the existing T24,
 T31 and Kummer control fixtures; the original m5-with-tower objective stays open.
 
