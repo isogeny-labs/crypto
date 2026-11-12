@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T02:35:11Z",
+ "id": "PCC-20261112-830272",
+ "kind": "measurement",
+ "producer": {
+  "commit": "46bac18ec1a3593f49564fb14420567e6bb92128",
+  "model": "",
+  "session": "https://claude.ai/code/session_01TCbLH9FoRiHTPWAKdyQi2r"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/mt_fieldops_v4_20261112/validation/replay-certificate.json",
+   "sha256": "592f94c0b5496a5903f1378d0d3ef54fb078f6e6085fc4dd48339700c18cc380"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/mt_fieldops_v4_20261112/validation/claim-report.json",
+   "sha256": "0aa9b54228cc60c4cec79289b774868ef9a60fd362d62aa094057628738081fd"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/mt_fieldops_v4_20261112",
+ "statement": "On 33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p and mod-n operations (I = 3/10/30 M, S = M) with hash-table and solver operations at 0/0.1/1 GAE: this harness's multi-target index calculus (the cheaper of ic5 and ic5ks per configuration and price; ic5ks's retention of solved trial classes along the shared arithmetic-progression W saves at most 1.5%) costs 1.003-1.810x per target of the cheapest of 15 runs of this harness's multi-target rho per configuration and price (Kuhn-Struik retention rho rho2xks at h = 0 and 0.1, distinguished-point rho rhodp at h = 1) and is dearer in all 27 cell x I/M decisions of the frozen rule; at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1; it is 1.14-1.49x a paired BSGS. The frozen rule prices h on hash-table operations only: with rhodp's per-step canonicalisations priced at the same h (AGENTS.md section 5a) the IC is 0.89-0.94x the cheapest rho at h = 1 and I = 10M and all 27 decisions are unranked, so no ranking against rho is established."
+}

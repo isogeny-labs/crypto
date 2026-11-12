@@ -1116,3 +1116,33 @@ the deadline is "not completed". Nothing is retried.
 - G2 passes (hky_par at `a2be6609` reproduces E10): 0.90.
 
 Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.
+
+## Amendment 21 (2026-11-12 UTC, before any draw below): owner override of the Amendment 20 admission rule; longer post-finish grace
+
+**Owner decision (2026-11-12, about 02:05 UTC).** The RunPod balance was USD 99.23 with a sibling
+pod (`icb-bin-deep2`, not this study's, USD 5.29/h, started 01:48 UTC) running, so Amendment 20's
+admission condition (balance ≥ USD 100 + 24 h × other pods) was not met: USD 227 would have been
+needed. The main session put three options to the owner (a capped 9 h run; wait for a top-up; the
+full run now with the zero-balance risk). The owner chose **"Full run now anyway"**. The consequence
+was stated before the choice and is recorded here: at the combined burn of about USD 7.9/h the
+account reaches zero after about 12 h unless topped up, which would terminate both pods as it did
+E14 r1. Nothing else in Amendment 20 changes: engine order, gates, readings, predictions and the
+USD 100 cap stand.
+
+**Changes.**
+- `e14/launch_r2.sh` accepts `OWNER_OVERRIDE=1`, which bypasses only the balance condition (the
+  "no other `fd-e14` pod" condition stays) and records `owner_override: true`, the balance and the
+  other pods' rate in `launch.json`.
+- Post-finish grace on the pod rises from 30 minutes to 6 hours (`e14/run_pod_r2.sh`), because the
+  controller in a cloud session runs in windows of at most 2 hours and is re-armed by scheduled
+  check-ins; the controller still deletes the pod as soon as the final pull verifies, so the grace
+  costs nothing when the controller is up. Worst case USD 15.
+- Controller cadence: `e14/pull_r2.sh` pulls every 10 minutes while it runs; the main session
+  re-arms it with scheduled check-ins about every 100 minutes and records each pull's sha256 in
+  `e14/pod-r2/pull.log`. Snapshots are kept in `e14/pod-r2/pulls/` so a termination between pulls
+  loses at most 10 minutes of output.
+- Resume checkpoint: `.resume/RESUME.md` is filled on the branch; the S3 push is unavailable in this
+  session (no checkpoint token, no AWS identity), so the Git copy is the checkpoint, as the owner
+  allowed for the 2026-11-11 oversampling run.
+
+Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.

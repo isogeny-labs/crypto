@@ -886,6 +886,79 @@ without the *presentation*.
 
 ---
 
+### A14. Hashed (affine-threshold) factor bases: Bochum v0.2 §3 and the tensor IC
+
+- **Definition.** No set `V` of abscissae: `m` ordered slot bases
+  `F_i = {P ∈ ⟨G⟩ : (α_i·encode(P) + β_i) mod s < τ}`, `s` the first prime in
+  `[2p, 4p]`, one independent `(α_i, β_i)` per slot, `τ` set so that
+  `E|F_i| = max(⌈r^{1/m}⌉, 10m)` (Lemma 13). A relation is
+  `R = P_1 + … + P_m` with `P_i ∈ F_i`. The `ecdl-tensor-ic` variant uses a
+  keyed SHA-256 predicate by default, a random affine hash on the gadget path
+  and an optional coordinate window `x(A) < p >> k`. Membership is an affine
+  map and a comparison, so it encodes as a low-degree predicate; there is no
+  smoothness notion, so decomposition is an unstructured `m`-list problem.
+- **Existence.** Any prime-field curve with a prime-order subgroup; a
+  cofactor `c > 1` is handled by free source points `S` with `A = [c]S`
+  (`ic.tensor_contraction_cofactor_v1`). The framework plug-in stops at
+  `p < 2^61`; the vendored crate is arbitrary precision.
+- **Build.** Inverse-hash enumeration: for each `t < τ`, decode
+  `α^{-1}(t − β) mod s` to a point and keep it if it is in the subgroup.
+  `O(τ)` decodes, no `O(p)` scan, no square-root table. Charged as curve
+  additions plus `hashed_tensor_steps` and `sqrt_solves`; the tensor-curve
+  certification is not charged, and `run_pipeline` says so in
+  `unpriced_work`.
+  - Plug-in: `hashed-affine:slots=m[,seed=…,tau=…,s=…,steps=…]`
+    (`src/cryptanalysis/ic_framework/hashed.rs`), paired with `hashed-tensor`
+    on the same parameters, which it refuses to run without.
+  - Crates: `crates/hashed-ecdl-tensor` (Bochum §3 reduction, Appendix D.4
+    recursion, certificates), `crates/ecdl-tensor-ic` (whole-point network,
+    ecbench `ic.tensor_contraction_v1` / `_cofactor_v1`, policy
+    `DiagnosticOnly`), `crates/hashed-ecdl-cpu` (MITM oracle over the same
+    slot bases, persistent tuple-sum tables, batch inversion).
+- **Fold.** Negation only: one column per `{P, −P}`; the slots stay ordered.
+- **Oracle.** Exact Boolean tensor contraction (`hashed-tensor`, the crate's
+  `SparseContractor`); meet-in-the-middle over the slots (`hashed-ecdl-cpu`,
+  `Solver::mitm`); plain enumeration in the bounded reference. Every witness is
+  re-added in the group before a row is accepted.
+- **Measured.** All `[pcc:unverified]`; nothing has reached the gate.
+  - Counts-only protocol v2, 2026-10-31
+    ([`research/hashed_ecdl_counts_20261031/`](../../../research/hashed_ecdl_counts_20261031/results/RESULTS-v2-superseding.md)):
+    `ic.tensor_contraction_v1`, `m = 2`, against `rho.negation` at 0, 0.1 and
+    1 GAE per unpriced operation: **4.3·10³–9.5·10³×** at 10 bits,
+    2.7·10⁴–5.0·10⁴× at 12, 1.7·10⁵–3.0·10⁵× at 14, **6.7·10⁵–1.2·10⁶×** at
+    16; the order holds across the band on every curve, and the ratio grows
+    about 5.1× per two bits (log-log slope 1.17, 95% interval 1.00–1.34).
+    Against the plain `prime-abscissa:size=32` + `mitm` baseline on the same
+    curves: 259× to 2.2·10⁵×. The native hashed arms (`ic.hashed_native_v1`,
+    branch `codex/hashed-ecdl-ecbench-e2e`) completed 3 of 16 cells, at
+    5·10²–2.8·10³× rho; the rest exhausted their budgets and are unknown.
+    The validator replayed all 416 executions and checked `[d]G = Q` on the
+    306 verified rows; one round, 8 targets per cell, A/A vacuous for counts.
+  - CPU oracle, L0 shared host
+    ([`research/hashed_ecdl_cpu_20261030/`](../../../research/hashed_ecdl_cpu_20261030/README.md)):
+    `p = 65521`, `m = 3`, `τ = 80`: complete recovery median 45.99 ms → 3.90 ms
+    with persistent tables and batch-64 inversion, 120 executions per panel,
+    byte-identical certificates across arms. No rho arm.
+  - Desk audit, 2026-11-07
+    ([`research/hashed_ecdl_tensor_audit_20261107/`](../../../research/hashed_ecdl_tensor_audit_20261107/README.md)):
+    reduction correct; encoding `s = a·m·b` edges with `a ≥ 5.3·10³` at
+    `b = 131`; the recursion is admitted only for `λ ≥ 2^17`
+    (`s ≥ 2^131072` edges), so every run so far is direct summation
+    (`root_u = 0`); the composed exponent is above rho by ≥ 120 bits at
+    `b = 128–256` even with `a = 1`; linear algebra alone exceeds rho for
+    every `m ≤ 6`. §7 item 1 applies as written: the hashed base behaves like
+    a random set of its size.
+- **Verdict.** Refuted at every measurable size, and closed as an experimental
+  lead (`closed_obstructed`; card
+  [`research/pdp_strategy_evaluation_20261031/cards/e4.md`](../../../research/pdp_strategy_evaluation_20261031/cards/e4.md)).
+  The asymptotic claim is conditional on OpenAI Theorem D.1 and stays a
+  watch item: revisit on an explicit-constants D.1 whose saving starts below
+  about `10^6` edges. The hash is an encoding device, not a yield device.
+- **Sources.** [`ECDLP_RESEARCH_TECHNIQUES.md`](../ECDLP_RESEARCH_TECHNIQUES.md)
+  ("Hashed factor bases"), [`FRAMEWORK.md`](../FRAMEWORK.md)
+  ("Hashed-affine / hashed-tensor"), `cryptanalysis/docs/hashed-ecdl.md`,
+  `research/hashed_ecdl_leads_20261030/`, `research/ic_prime_eth_leads_20261031/leads/L09/`.
+
 ## 3. Odd-characteristic extension fields `E(F_{p^k})`
 
 ### B1. Gaudry–Diem subfield base `{P : x(P) ∈ F_p}`
@@ -1625,6 +1698,12 @@ blockers are hardware and, for the shape card, pinning the merge commit.
   D9, D10 and E6, and `cost_vs_rho` gained band-priced rows (frontier
   campaign, supersingular auxiliary curve) and weight-0 or wall-clock rows
   (N83 cold, large primes, genus-3 cover), each labelled with its pricing.
+- **Third update round** (2026-11-12). Added A14, the hashed
+  (affine-threshold) factor bases of Bochum v0.2 §3 and the tensor IC
+  crates, from the counts-only record of 2026-10-31, the CPU panels of
+  2026-10-30 and the desk audit of 2026-11-07; one taxonomy box and one
+  cost row. The `research-kb` server and its CLI were unavailable in the
+  authoring container, so the sources were read from the tree directly.
 - **What is not re-derived.** Entries condensed from long notes keep their
   source's status label and are not re-derived here. If a source and this page
   disagree, the source wins.
