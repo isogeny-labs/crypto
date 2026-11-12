@@ -637,8 +637,28 @@ pub fn collect_relations(
     params: &SieveParams,
     bound: u64,
 ) -> (Vec<Relation>, u64, LargePrimeStats) {
+    collect_relations_with(fb, params, bound, fb.len() + params.excess, None)
+}
+
+/// Periodic snapshot hook for [`collect_relations_with`]: called with the
+/// relations found so far and the number of products sieved so far.
+pub type SnapshotHook<'a> = &'a (dyn Fn(&[Relation], u64) + Sync);
+
+/// Interval between snapshots of the relations found so far, in seconds.
+pub const SNAPSHOT_SECS: u64 = 600;
+
+/// [`collect_relations`] with an explicit relation target and an optional hook
+/// that receives the relations found so far about every [`SNAPSHOT_SECS`]
+/// seconds (a mid-round checkpoint: a run stopped while sieving loses at most
+/// that much work).
+pub fn collect_relations_with(
+    fb: &[FbPrime],
+    params: &SieveParams,
+    bound: u64,
+    target: usize,
+    snapshot: Option<SnapshotHook<'_>>,
+) -> (Vec<Relation>, u64, LargePrimeStats) {
     let n = fb.len();
-    let target = n + params.excess;
     let found = Mutex::new(Vec::<Relation>::new());
     // partial relations by large prime; a second partial with the same prime
     // combines with the stored one into a full relation
@@ -670,7 +690,15 @@ pub fn collect_relations(
             scope.spawn(move || {
                 let mut buf = vec![0u8; 2 * params.half_length as usize + 1];
                 let mut last_report = std::time::Instant::now();
+                let mut last_snapshot = std::time::Instant::now();
                 while !done.load(Ordering::Relaxed) {
+                    if t == 0 && last_snapshot.elapsed().as_secs() >= SNAPSHOT_SECS {
+                        last_snapshot = std::time::Instant::now();
+                        if let Some(hook) = snapshot {
+                            let got = found.lock().unwrap().clone();
+                            hook(&got, products.load(Ordering::Relaxed));
+                        }
+                    }
                     // progress line from the first worker, about once a minute
                     if t == 0 && last_report.elapsed().as_secs() >= 60 {
                         last_report = std::time::Instant::now();
@@ -2210,9 +2238,49 @@ pub fn compute(
             resumed = true;
         }
     }
+    // a pool saved while sieving (below the target) is topped up before the
+    // first round instead of being eliminated short
+    let mut short = resumed && pool.len() < n + params.excess;
     for round in 0..max_rounds {
-        if !(resumed && round == 0) {
-            let (rels, prods, lp) = collect_relations(&fb, &params, bound);
+        if !(resumed && round == 0) || short {
+            // relations already pooled count towards this round's target; the
+            // seed advances with the products sieved, so a resumed or later round
+            // does not regenerate the products it already has
+            let have = if short { pool.len() } else { 0 };
+            let need = (n + params.excess).saturating_sub(have).max(1);
+            let mut p = params.clone();
+            p.seed = params.seed ^ products.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+            if short {
+                eprintln!(
+                    "[class_group_subexp] pool below target: {} of {} relations; sieving {need} more",
+                    pool.len(),
+                    n + params.excess
+                );
+            }
+            short = false;
+            let base_products = products;
+            let (rels, prods, lp) = {
+                let hook = |got: &[Relation], prods: u64| {
+                    if let Some(path) = &params.checkpoint {
+                        let mut snap = pool.clone();
+                        snap.extend_from_slice(got);
+                        let ck = PoolCheckpoint {
+                            pool: snap,
+                            products: base_products + prods,
+                            excess: params.excess,
+                            seed: params.seed,
+                        };
+                        match save_pool(path, d, bound, n, &ck) {
+                            Ok(()) => eprintln!(
+                                "[class_group_subexp]     snapshot: {} relations pooled",
+                                ck.pool.len()
+                            ),
+                            Err(e) => eprintln!("[class_group_subexp] snapshot not written: {e}"),
+                        }
+                    }
+                };
+                collect_relations_with(&fb, &p, bound, need, Some(&hook))
+            };
             products += prods;
             lp_total.partials += lp.partials;
             lp_total.combined += lp.combined;
