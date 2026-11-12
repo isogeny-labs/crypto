@@ -1,41 +1,28 @@
-# Resume: crypto @ claude/relaxed-lovelace-wjy1um
+# Resume: crypto @ aburan28/youthful-hopper-hfrwkd
 
 ## Goal
-Owner (2026-11-11/12): finish E14 of the fall-degree study: the exact last fall degree `d_F` at
-(m, n, ℓ) = (3, 21, 7) (first exact value above 4) and the three unmeasured E13b controls
-(6:10:3 draws 1, 3, 4); then (4, 28, 7) windows as time allows.
+User (2026-11-12): run steps 1–3 of the cheapest test of "idea 2": a cover φ: C → E used only to
+generate the factor base x∘φ(V) on E(F_p); measure the F4 solving degree D against its null,
+the PKM tower and a random base of equal size.
 
 ## Lead / hypothesis
-`research/fall_degree_bounds_20261008/PREREGISTRATION.md`, Amendments 17–21. Frozen readings and
-predictions in Amendment 20: E14a "d_F = 5" 0.50, "≥ 6" 0.25, "split" 0.05, "not completed" 0.20;
-E14b "controls confirmed" 0.55; E14c "no reading" 0.80.
+`research/cover_image_fb_20261112/PROTOCOL.md` (committed 07c6471fe5 before any cell). P0 positive
+control (square map collapses Kummer depth t → t−1), H1 survive / H0 falsifier. Prior: H0 ≈ 0.8.
 
 ## Spec
-One RunPod CPU pod (cpu3g, 64 vCPU, Secure, not interruptible), USD 100 cap, deadline
-min(36 h, 100/costPerHr). Source: sparse clone of `isogeny-labs/crypto` at `a2be6609`
-(tree sha256 `da6ee5f3…`). Engines: `hky_par newcells --cells 3:21:7 --seed 20261012 --keep 4
---cmax 5` (E14a), `dreg_linear_guess --engine pe` (E14b, threads from gate G3),
-`e12/run_window.sh 4:28:7` (E14c). Gates G0–G3 and G-src-a/b/c before any draw.
-Launcher `e14/launch_r2.sh` (OWNER_OVERRIDE=1 per Amendment 21), controller `e14/pull_r2.sh`.
+Local container (4 cores), `target/release/examples/pkm_tower_pilot --engine f4 --p 2013265921
+--kinds kummer,dickson --m 2 --controls tower,null,randbase [--cover-map square|quad|generic]
+--t-min 2 --max-t 8 --budget 600`, plus m = 3 t ≤ 4. Run script `research/cover_image_fb_20261112/run.sh`.
+Counts only (D), no timing comparison, not a benchmark.
 
 ## State
-Launching 2026-11-12 ~02:10 UTC. `e14/pod-r2/launch.json` holds pod id and output token.
-Owner override of the balance rule recorded (balance USD 99, sibling pod burning USD 5.29/h:
-zero-balance termination after ~12 h is possible and was accepted).
+Code: `examples/pkm_tower_pilot.rs` (`--cover-map`, `CoverMap`, control `randbase`). Built.
+Protocol pushed. Runs: not started.
 
-## Runs in flight
-Pod named `fd-e14-r2-<stamp>`; outputs pulled every 10 min to `e14/pod-r2/pulls/`, final to
-`e14/pod-r2/out/`. Session: session_01AXUKfTRWdZTFrWGLHJZp11.
+## Next step
+Run run.sh, tabulate D per (map, kind, control, t), plot, write README + report, open PR.
 
 ## Stop and success conditions
-The pod stops itself at the deadline or when done. A fresh session resumes by running
-`e14/pull_r2.sh` (idempotent) with the pod id from `launch.json`; if the pod is gone, score
-whatever snapshots exist with the Amendment 19/20 reading rules ("not completed" for anything cut
-off). Nothing is retried without a new amendment.
-
-## Next steps
-1. Pull outputs; when `final_status` arrives, delete the pod (the controller does this).
-2. Score: extend `e14/score.json` (schema `fall_degree_e14_score/v1`) with an r2 section per the
-   Amendment 20 rules; report + graph + PDF under `reports/run-<UTC>/`; append RESULTS.md.
-3. Lean scoring table: add E14 rows (kind 8) if any reading is registered.
-4. Commit on the branch, PR, session log.
+Stop when every arm has run t = 2…8 at m = 2 (or stopped at the first all-timeout t) and t ≤ 4 at m = 3,
+and the verdict (P0, H1/H0/inconclusive) is written. P0 failing stops the reading. Success = a verified
+verdict either way, not H1.
