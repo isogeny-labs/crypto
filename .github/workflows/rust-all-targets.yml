@@ -200,12 +200,13 @@ jobs:
           test -x "${test_binaries[0]}"
           sha256sum "${test_binaries[0]}" > "$VALIDATION_DIR/test-binary.sha256"
       - name: Run every non-ignored library test and retain the parent status
+        id: library
         timeout-minutes: 55
         shell: bash
         run: |
           set -euo pipefail
           set +e
-          cargo +1.99.1 test --release --lib --locked 2>&1 | tee "$VALIDATION_DIR/library.log"
+          cargo +1.99.1 test --release --lib --locked -- --nocapture 2>&1 | tee "$VALIDATION_DIR/library.log"
           pipeline_status=("${PIPESTATUS[@]}")
           test_status=${pipeline_status[0]}
           log_status=${pipeline_status[1]}
@@ -213,16 +214,38 @@ jobs:
           jq -n --arg source "$SOURCE_REVISION" --argjson status "$test_status" --argjson log_status "$log_status" \
             '{source_revision:$source,cargo_parent_exit_code:$status,
               log_writer_exit_code:$log_status,
-              command:["cargo","+1.99.1","test","--release","--lib","--locked"],
+              command:["cargo","+1.99.1","test","--release","--lib","--locked","--","--nocapture"],
               filters:[],ignored_test_policy:"unchanged_default",
               scientific_measurement:false}' > "$VALIDATION_DIR/parent-exit.json"
           if [ "$log_status" -ne 0 ]; then exit "$log_status"; fi
           exit "$test_status"
       - name: Retain checksums and post-run source state
         if: always()
+        env:
+          LIBRARY_STEP_OUTCOME: ${{ steps.library.outcome }}
         shell: bash
         run: |
           set -euo pipefail
+          VALIDATION_DIR="${VALIDATION_DIR:-$RUNNER_TEMP/native-library-validation}"
+          mkdir -p "$VALIDATION_DIR"
+          parent_payload=null
+          parent_receipt_present=false
+          if test -f "$VALIDATION_DIR/parent-exit.json"; then
+            parent_payload=$(cat "$VALIDATION_DIR/parent-exit.json")
+            parent_receipt_present=true
+          fi
+          jq -n --arg source "$SOURCE_REVISION" --arg outcome "$LIBRARY_STEP_OUTCOME" \
+            --argjson parent "$parent_payload" --argjson present "$parent_receipt_present" \
+            'if $present and $parent.source_revision != $source then
+               error("parent receipt source does not match the requested source")
+             else
+               {schema:"crypto.native-library-completion/v1",source_revision:$source,
+                test_step_outcome:$outcome,parent_exit_receipt_present:$present,
+                cargo_parent_exit_code:($parent.cargo_parent_exit_code // null),
+                log_writer_exit_code:($parent.log_writer_exit_code // null),
+                parent_summary_requires_separate_verification:true,
+                scientific_measurement:false}
+             end' > "$VALIDATION_DIR/completion.json"
           if test -d .git; then
             git status --porcelain --untracked-files=no > "$VALIDATION_DIR/post-run-status.txt"
           fi

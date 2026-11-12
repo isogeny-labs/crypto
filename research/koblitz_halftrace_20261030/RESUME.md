@@ -71,6 +71,14 @@ the155,880-byte archive/Actions ZIP remain local pending approved S3 upload.
 Do not resubmit or restart unchanged suites. The old local attempt stays incomplete.
 See development/hosted-validation-20261108/ for its bounds and receipt contract.
 
+On12November, prepared diagnostic capture for the optional hosted job: libtest
+now streams uncaptured panic output and the retention step records completion
+metadata with nulls for missing Cargo/tee observations. Five receipt cases and
+a small interrupted native libtest fixture pass, alongside actionlint and all4
+workflow-parser tests. No second hosted dispatch or scientific run was submitted.
+See development/diagnostic-capture-20261112/. Native sources and frozen inputs
+are unchanged; the old timeout remains incomplete and P1 remains unresolved.
+
 Attach an existing approved checkpoint/lab connection or configure the approved
 Actions upload secret. Do not repeat the failed preparation until its cause has
 changed. A fresh successful source-pinned checkpoint is required before dispatching
