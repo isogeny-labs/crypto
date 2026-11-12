@@ -875,7 +875,7 @@ worse than none:
 | targets | `Targets` | `random`, `walk` |
 | point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`, `chained-x`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `m4gb-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
-| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+| relation matrix | `RelationSolver` | `incremental-gauss`, `incremental-gauss-full-rank`, `incremental-gauss-full-rank-checked`, `incremental-gauss-echelon`, `structured-gauss`, `sparse-cado` (= `filter+wiedemann`), `filter+lanczos`, `wiedemann`, `lanczos` (the deferred sparse names force the full-rank completion rule and accept an answer only when two independently seeded solves agree; `linalg.rs` `MATRIX_NAMES`) |
 
 ### Hashed-affine / hashed-tensor
 
