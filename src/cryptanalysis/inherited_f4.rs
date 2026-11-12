@@ -77,9 +77,10 @@
 use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::fx_hash::{FxMap as HashMap, MaskMap};
 use crate::cryptanalysis::koblitz_groebner::{
-    all_variable_mask, build_inherited_macaulay, build_inherited_macaulay_support_local,
-    echelon_f2_counted, macaulay_columns, macaulay_rows_monos_with_mask, monomials_up_to_mask,
-    next_kernels, pack_rows, rref_f2_counted, rref_uses_four_russians,
+    all_variable_mask, batched_rewrite, build_inherited_macaulay,
+    build_inherited_macaulay_support_local, echelon_f2_counted, macaulay_columns,
+    macaulay_rows_monos_with_mask, monomials_up_to_mask, next_kernels, pack_rows, rref_f2_counted,
+    rref_uses_four_russians,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, cmp_mono, mask_fold64, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
@@ -770,6 +771,11 @@ struct LayoutStep {
     /// step's own map, under key `to − 1`), built on demand from the map.
     #[allow(dead_code)] // rewrite-plan cache reserved for a later path
     plans: RefCell<HashMap<u32, Rc<RewritePlan>>>,
+    /// Under the batched rewrite ([`batched_rewrite`]): the eager kernel's
+    /// flat plans of the composed maps from earlier epochs to the epoch
+    /// this step maps *to* (this step's own plan under key `to − 1`),
+    /// built on demand and shared like `to_here`.
+    step_plans: RefCell<HashMap<u32, Rc<StepPlan>>>,
 }
 
 /// One `pext`/`pdep` move of a rewrite: the source bits `src_mask` of one
@@ -874,6 +880,7 @@ impl RewritePlan {
 /// One layout step's rewrite plan, built whole as flat arrays: under eager
 /// specialisation every kept row of a node goes through it, so nothing is
 /// gained by building it a word at a time.
+#[derive(Debug)]
 struct StepPlan {
     /// Source word `w`'s segments are `segments[first[w]..first[w + 1]]`.
     first: Vec<u32>,
@@ -1099,6 +1106,37 @@ unsafe fn apply_step_bmi2_counted(
     }
     applied
 }
+
+/// Test-only, per-thread breakdown of the specialisation's rewrites, by
+/// kind: `(rows, charged words)` for the bulk rewrite of kept rows
+/// ([`ReducedBasis::rewrite_kept`]), the one-row materialisations and the
+/// displaced rows' rewrites.  Compiled out of every non-test build.
+mod rewrite_tally {
+    pub(super) const BULK: usize = 0;
+    pub(super) const SINGLE: usize = 1;
+    pub(super) const DISPLACED: usize = 2;
+    #[cfg(test)]
+    thread_local! {
+        static TALLY: std::cell::Cell<[(u64, u64); 3]> = const { std::cell::Cell::new([(0, 0); 3]) };
+    }
+    #[inline(always)]
+    pub(super) fn add(_kind: usize, _rows: u64, _words: u64) {
+        #[cfg(test)]
+        TALLY.with(|t| {
+            let mut v = t.get();
+            v[_kind].0 += _rows;
+            v[_kind].1 += _words;
+            t.set(v);
+        });
+    }
+    /// Read and clear this thread's tally.
+    #[cfg(test)]
+    pub(crate) fn take() -> [(u64, u64); 3] {
+        TALLY.with(|t| t.replace([(0, 0); 3]))
+    }
+}
+#[cfg(test)]
+pub(crate) use rewrite_tally::take as take_rewrite_tally;
 
 /// How a specialisation rewrites its kept rows; see [`eager_mode`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -2631,6 +2669,54 @@ impl ReducedBasis {
         self.composite_to(self.epoch(), from)
     }
 
+    /// The eager kernel's flat plan of [`ReducedBasis::composite`]`(from)`,
+    /// memoised on the step that maps into the current layout (a
+    /// specialisation under the batched rewrite leaves its own plan there
+    /// under `from = epoch − 1`).  Tallied as a specialisation tallies its
+    /// step's plan: a column each, and a word each for its bounds.
+    fn step_plan_from(&self, mode: EagerMode, from: u32) -> Rc<StepPlan> {
+        let to = self.epoch();
+        let step = &self.history[(to - 1) as usize];
+        if let Some(p) = step.step_plans.borrow().get(&from) {
+            return p.clone();
+        }
+        let map = self.composite(from);
+        bitop_tally::word_ops(2 * map.len().div_ceil(64) as u64);
+        let plan = Rc::new(StepPlan::new(&map, mode == EagerMode::Runs));
+        step.step_plans.borrow_mut().insert(from, plan.clone());
+        plan
+    }
+
+    /// **Batched rewrite, at a split.**  Bring every row into the current
+    /// layout before the basis is shared by the two children, rows from
+    /// the commonest stale epoch in one bulk pass through the composed
+    /// plan ([`ReducedBasis::rewrite_kept`]), the rest one by one.  Under
+    /// [`batched_rewrite`] a specialisation leaves its kept rows where they
+    /// are, so every rewrite between two splits — the split variable's and
+    /// each forced variable's — is done here at once, or earlier for a row
+    /// that something reads.  A no-op in the lazy mode (`KIC_F4_EAGER=0`),
+    /// where the switch changes nothing.
+    pub fn materialise_shared(&mut self, cost: &mut InheritCost) {
+        let mode = eager_mode();
+        if self.refuted || mode == EagerMode::Off {
+            return;
+        }
+        let epoch = self.epoch();
+        // `bitop/v1`: a version test a row
+        bitop_tally::word_ops(self.rows.len() as u64);
+        let mut stale: HashMap<u32, usize> = HashMap::default();
+        for row in &self.rows {
+            if row.version != epoch {
+                *stale.entry(row.version).or_insert(0) += 1;
+            }
+        }
+        let Some((&from, _)) = stale.iter().max_by_key(|&(&v, &n)| (n, v)) else {
+            return;
+        };
+        let plan = self.step_plan_from(mode, from);
+        self.rewrite_kept(mode, &plan, from, cost);
+    }
+
     /// The word-wise plan of [`ReducedBasis::composite`], memoised on the
     /// step that maps into the current layout like the map itself.
     #[allow(dead_code)]
@@ -2762,19 +2848,29 @@ impl ReducedBasis {
         })
     }
 
-    /// Rewrite every kept row that was current in the parent's layout into
-    /// this one through the step's plan, all into one shared buffer, each
-    /// trimmed to the plan's bound on its first word.  A row from an older
-    /// layout (none, unless a lazy ancestor left one) is materialised as
-    /// before.  Charged as [`ReducedBasis::rewrite`] charges: the words
-    /// read, and the words from the image's first nonzero one to the end.
-    fn rewrite_kept(&mut self, mode: EagerMode, plan: &StepPlan, cost: &mut InheritCost) {
+    /// Rewrite every kept row that was current in the layout of epoch
+    /// `from` into this one through `plan` (the map from `from` to the
+    /// current epoch: the step's own plan, `from = epoch − 1`, when a
+    /// specialisation calls it), all into one shared buffer, each trimmed
+    /// to the plan's bound on its first word.  A row from any other older
+    /// layout (none at a specialisation, unless a lazy ancestor left one)
+    /// is materialised as before.  Charged as [`ReducedBasis::rewrite`]
+    /// charges: the words read, and the words from the image's first
+    /// nonzero one to the end.
+    fn rewrite_kept(
+        &mut self,
+        mode: EagerMode,
+        plan: &StepPlan,
+        from: u32,
+        cost: &mut InheritCost,
+    ) {
         let to = self.epoch();
+        debug_assert!(from < to);
         let words = self.words;
         let mut spans: Vec<(usize, usize)> = Vec::with_capacity(self.rows.len());
         let mut total = 0usize;
         for row in &self.rows {
-            if row.version + 1 == to {
+            if row.version == from {
                 let lo = plan.low[row.lead as usize] as usize;
                 debug_assert!(lo < words, "a kept pivot survives");
                 spans.push((total, lo));
@@ -2784,6 +2880,7 @@ impl ReducedBasis {
             }
         }
         let mut buf = zeroed_words(total);
+        let bulk_before = cost.specialise_word_ops;
         {
             let data = Rc::get_mut(&mut buf).expect("just allocated");
             let fused = next_kernels();
@@ -2815,6 +2912,8 @@ impl ReducedBasis {
                 }
             }
         }
+        let mut bulk_words = cost.specialise_word_ops - bulk_before;
+        let mut bulk_rows = 0u64;
         for (r, &(off, lo)) in spans.iter().enumerate() {
             if off == usize::MAX {
                 self.ensure_current(r, cost);
@@ -2827,6 +2926,8 @@ impl ReducedBasis {
                 .expect("a kept pivot survives");
             bitop_tally::word_ops(first as u64 + 1);
             cost.specialise_word_ops += (len - first) as u64;
+            bulk_words += (len - first) as u64;
+            bulk_rows += 1;
             self.rows[r] = LazyRow {
                 version: to,
                 start: lo as u32,
@@ -2838,6 +2939,7 @@ impl ReducedBasis {
                 },
             };
         }
+        rewrite_tally::add(rewrite_tally::BULK, bulk_rows, bulk_words);
     }
 
     /// [`ReducedBasis::rewrite`] of a row current in the parent's layout,
@@ -2850,6 +2952,24 @@ impl ReducedBasis {
         cost: &mut InheritCost,
     ) -> Option<Draft> {
         debug_assert_eq!(row.version + 1, self.epoch());
+        self.rewrite_through(mode, plan, row, cost)
+            .map(|(lo, _, data)| Draft { start: lo, data })
+    }
+
+    /// [`ReducedBasis::rewrite_step`] through any plan whose map runs from
+    /// the row's own epoch to the current one: the image's words from `lo`
+    /// (the plan's bound) to the end, with the offset of its first nonzero
+    /// word; `None` if the image is zero.  Charged as the eager rewrite
+    /// charges: the words read, and the words from the image's first
+    /// nonzero one to the end.
+    fn rewrite_through(
+        &self,
+        mode: EagerMode,
+        plan: &StepPlan,
+        row: &LazyRow,
+        cost: &mut InheritCost,
+    ) -> Option<(usize, usize, Rc<[u64]>)> {
+        debug_assert!(row.version < self.epoch());
         let words = self.words;
         let live = row.live();
         cost.specialise_word_ops += live.len() as u64;
@@ -2874,7 +2994,7 @@ impl ReducedBasis {
         bitop_tally::word_ops(3 * segments + first_pos.map_or(out.len() as u64, |f| f as u64 + 1));
         let first = first_pos?;
         cost.specialise_word_ops += (words - lo - first) as u64;
-        Some(Draft { start: lo, data })
+        Some((lo, first, data))
     }
 
     /// Bring row `r` into the current layout if it is not there yet.  A
@@ -2892,6 +3012,33 @@ impl ReducedBasis {
     /// Rewrite row `r` into the current layout.
     #[inline(never)]
     fn materialise(&mut self, r: usize, cost: &mut InheritCost) {
+        let before = cost.specialise_word_ops;
+        self.materialise_row(r, cost);
+        rewrite_tally::add(rewrite_tally::SINGLE, 1, cost.specialise_word_ops - before);
+    }
+
+    /// [`ReducedBasis::materialise`] itself.
+    #[inline(always)]
+    fn materialise_row(&mut self, r: usize, cost: &mut InheritCost) {
+        if batched_rewrite() {
+            let mode = eager_mode();
+            if mode != EagerMode::Off {
+                // The eager kernel and its charge, through the composed
+                // map from the row's own epoch: one pass however many
+                // layout steps it skipped.
+                let plan = self.step_plan_from(mode, self.rows[r].version);
+                let (lo, first, data) = self
+                    .rewrite_through(mode, &plan, &self.rows[r], cost)
+                    .expect("a kept pivot survives");
+                self.rows[r] = LazyRow {
+                    version: self.epoch(),
+                    start: lo as u32,
+                    lead: (lo + first) as u32,
+                    data: data.into(),
+                };
+                return;
+            }
+        }
         let (start, data) = self
             .rewrite_frozen(&self.rows[r], cost)
             .expect("a kept pivot survives");
@@ -3046,6 +3193,7 @@ impl ReducedBasis {
             map: Rc::new(map),
             to_here: RefCell::new(HashMap::default()),
             plans: RefCell::new(HashMap::default()),
+            step_plans: RefCell::new(HashMap::default()),
         };
         self.column_index = None;
         self.words = columns.len().div_ceil(64).max(1);
@@ -3218,10 +3366,24 @@ impl ReducedBasis {
             }
         }
         let mode = eager_mode();
-        let step = (mode != EagerMode::Off).then(|| StepPlan::new(&map, mode == EagerMode::Runs));
+        let step =
+            (mode != EagerMode::Off).then(|| Rc::new(StepPlan::new(&map, mode == EagerMode::Runs)));
+        let batched = step.is_some() && batched_rewrite();
         out.adopt_layout(new_columns, map);
         if let Some(step) = &step {
-            out.rewrite_kept(mode, step, &mut cost);
+            if batched {
+                // Batched rewrite: the kept rows stay in the parent's
+                // layout until something reads them or the node splits
+                // ([`ReducedBasis::materialise_shared`]); the plan is kept
+                // for those rewrites and for the displaced rows below.
+                let from = out.epoch() - 1;
+                out.history[from as usize]
+                    .step_plans
+                    .borrow_mut()
+                    .insert(from, step.clone());
+            } else {
+                out.rewrite_kept(mode, step, out.epoch() - 1, &mut cost);
+            }
         }
         cost.displaced_rows = displaced.len() as u64;
         // Lowest pivot first.  The order changes neither the child's row
@@ -3233,12 +3395,25 @@ impl ReducedBasis {
         bitop_tally::word_ops(bitop_tally::sort_cost(displaced.len()));
         displaced.sort_unstable_by_key(|&(pc, _)| std::cmp::Reverse(pc));
         for (_, row) in displaced {
+            let before = cost.specialise_word_ops;
             let image = match &step {
                 Some(step) if row.version + 1 == out.epoch() => {
                     out.rewrite_step(mode, step, &row, &mut cost)
                 }
+                // A row the batched rewrite left stale: the eager kernel
+                // through the composed map, in one pass.
+                Some(_) if batched => {
+                    let plan = out.step_plan_from(mode, row.version);
+                    out.rewrite_through(mode, &plan, &row, &mut cost)
+                        .map(|(lo, _, data)| Draft { start: lo, data })
+                }
                 _ => out.rewrite(&row, &mut cost),
             };
+            rewrite_tally::add(
+                rewrite_tally::DISPLACED,
+                1,
+                cost.specialise_word_ops - before,
+            );
             if let Some(image) = image {
                 let inserted = out.insert(image, &mut cost);
                 if out.refutes(inserted) {
@@ -4344,6 +4519,123 @@ mod tests {
             }
         }
         assert!(compared > 100, "too few comparisons: {compared}");
+    }
+
+    /// **The batched rewrite is the eager rewrite, done fewer times.**
+    /// Chains of specialisations (a "split" — every row brought current by
+    /// [`ReducedBasis::materialise_shared`] — after every second step, and
+    /// once at the end), the linear tail read after every step, on both
+    /// eager kernels: with the switch on, every tail is the same, the rows
+    /// are the same polynomials with the same pivots, and the work charged
+    /// is never more than the eager rewrite's.
+    #[test]
+    fn batched_rewrite_builds_identical_bases_with_no_more_work() {
+        use crate::cryptanalysis::koblitz_groebner::with_batched_rewrite;
+        type Rows = Vec<(u32, Vec<u64>)>;
+        fn full_rows(b: &ReducedBasis) -> Rows {
+            let mut b = b.clone();
+            let mut c = InheritCost::default();
+            b.materialise_all(&mut c);
+            let words = b.words;
+            b.rows
+                .iter()
+                .zip(&b.pivot_col)
+                .map(|(r, &pc)| {
+                    let mut full = vec![0u64; words];
+                    full[r.start as usize..].copy_from_slice(&r.data);
+                    (pc, full)
+                })
+                .collect()
+        }
+        type Chain = (u64, Vec<Vec<F2BoolPoly>>, Vec<Rows>);
+        fn chain(
+            mode: EagerMode,
+            batched: bool,
+            system: &[F2BoolPoly],
+            n_vars: usize,
+            degree: u32,
+            steps: &[(u32, bool)],
+        ) -> Chain {
+            rewrite_path_override::with(mode, mode == EagerMode::Bmi2, || {
+                with_batched_rewrite(batched, || {
+                    let (mut basis, root_cost) =
+                        ReducedBasis::from_system(system, n_vars, degree).unwrap();
+                    let mut work = root_cost.word_ops();
+                    let mut tails = Vec::new();
+                    let mut rows = vec![full_rows(&basis)];
+                    for (i, &(v, value)) in steps.iter().enumerate() {
+                        let (next, cost) = basis.specialise(v, value);
+                        basis = next;
+                        work += cost.word_ops();
+                        let mut tail_cost = InheritCost::default();
+                        tails.push(basis.linear_tail(&mut tail_cost));
+                        work += tail_cost.word_ops();
+                        if batched && (i % 2 == 1 || i + 1 == steps.len()) {
+                            let mut c = InheritCost::default();
+                            basis.materialise_shared(&mut c);
+                            work += c.word_ops();
+                        }
+                        rows.push(full_rows(&basis));
+                    }
+                    (work, tails, rows)
+                })
+            })
+        }
+        let have_bmi2 = cfg!(target_arch = "x86_64") && {
+            #[cfg(target_arch = "x86_64")]
+            let b = std::arch::is_x86_feature_detected!("bmi2");
+            #[cfg(not(target_arch = "x86_64"))]
+            let b = false;
+            b
+        };
+        let mut modes = vec![EagerMode::Runs];
+        if have_bmi2 {
+            modes.push(EagerMode::Bmi2);
+        }
+        let mut seed = 0xba7c_4ed0_5eed_0001u64;
+        let (mut compared, mut fewer) = (0usize, 0usize);
+        let (mut eager_total, mut batched_total) = (0u64, 0u64);
+        for trial in 0..80 {
+            let n_vars = 7 + trial % 6;
+            let m = 4 + trial % 5;
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|k| random_poly(n_vars, if k % 5 == 4 { 1 } else { 2 }, 6 + k, &mut seed))
+                .filter(|p| poly_degree(p) >= 1)
+                .collect();
+            if system.is_empty() {
+                continue;
+            }
+            let degree = 2 + (trial % 2) as u32;
+            let mut steps: Vec<(u32, bool)> = Vec::new();
+            while steps.len() < 5 {
+                let v = (xorshift(&mut seed) % n_vars as u64) as u32;
+                if steps.iter().all(|&(u, _)| u != v) {
+                    steps.push((v, xorshift(&mut seed) % 2 == 1));
+                }
+            }
+            for &mode in &modes {
+                let eager = chain(mode, false, &system, n_vars, degree, &steps);
+                let batched = chain(mode, true, &system, n_vars, degree, &steps);
+                assert_eq!(eager.1, batched.1, "trial {trial} {mode:?}: tails differ");
+                assert_eq!(eager.2, batched.2, "trial {trial} {mode:?}: rows differ");
+                assert!(
+                    batched.0 <= eager.0,
+                    "trial {trial} {mode:?}: batched charged {} > eager {}",
+                    batched.0,
+                    eager.0
+                );
+                compared += 1;
+                fewer += usize::from(batched.0 < eager.0);
+                eager_total += eager.0;
+                batched_total += batched.0;
+            }
+        }
+        assert!(compared >= 80, "too few comparisons: {compared}");
+        assert!(fewer > 0, "the batched rewrite never saved anything");
+        eprintln!(
+            "batched rewrite, basis chains: {compared} compared, {fewer} cheaper, \
+             word ops {batched_total} / {eager_total}"
+        );
     }
 
     /// The charge itself is pinned, so changing what is counted cannot pass
