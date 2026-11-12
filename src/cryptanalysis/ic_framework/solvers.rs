@@ -1549,18 +1549,13 @@ mod tests {
         let reference = set(Exhaustive.solve(&sys, &Params::default(), None).0);
         for (max, expect_fes) in [(sys.n_vars as u64, true), (sys.n_vars as u64 - 1, false)] {
             let mut params = Params::default();
-            params.set("fes_max_vars", &max.to_string());
+            params.set("fes_max_vars", max.to_string());
             let (verdict, cost) = FesThenInherited.solve(&sys, &params, None);
             assert_eq!(
                 cost.extra.get("size_rule_fes"),
                 Some(&u64::from(expect_fes))
             );
-            assert_eq!(
-                cost.op_unit.starts_with("word XORs"),
-                true,
-                "{}",
-                cost.op_unit
-            );
+            assert!(cost.op_unit.starts_with("word XORs"), "{}", cost.op_unit);
             assert_eq!(set(verdict), reference, "fes_max_vars = {max}");
         }
         let folded = HybridF4 {
