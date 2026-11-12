@@ -4246,18 +4246,18 @@ mod tests {
                     let r = xorshift(&mut seed);
                     match trial % 4 {
                         0 => {
-                            if r % 3 == 0 {
+                            if r.is_multiple_of(3) {
                                 DELETED
                             } else {
                                 (r >> 8) as u32 % (2 * len as u32)
                             }
                         }
                         1 | 2 => {
-                            if r % 5 == 0 {
+                            if r.is_multiple_of(5) {
                                 DELETED
                             } else {
                                 next_dst += (r >> 8) as u32 % 3;
-                                if r % 7 == 0 {
+                                if r.is_multiple_of(7) {
                                     next_dst.saturating_sub(5)
                                 } else {
                                     next_dst
@@ -4265,7 +4265,7 @@ mod tests {
                             }
                         }
                         _ => {
-                            if r % 8 != 0 {
+                            if !r.is_multiple_of(8) {
                                 DELETED
                             } else {
                                 (r >> 8) as u32 % (len as u32 + 64)
