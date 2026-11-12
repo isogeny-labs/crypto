@@ -17,10 +17,14 @@ corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old
 scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
 
 ## State
+2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
+
 Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
 (merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
+Paired per-call A/B inherited-f4 vs inherited-f4-next vs fes-f2 (research/inherited_f4_next_20261112/run_ab.sh, record benchmarks/records/20261112T0630Z-inherited-f4-next-ab.json); then an end-to-end ic bench ladder adding fes-f2 and inherited-f4-next to the oracle.
+
 Local corpus A/B (this record). Subagent B (inherited-f4) in the background.
 
 ## Stop and success conditions

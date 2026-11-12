@@ -2255,16 +2255,87 @@ const MAX_F4_COLS: usize = 40_000;
 /// Macaulay size caps, overridable for experiments through the
 /// `F4_F2_MAX_ROWS` / `F4_F2_MAX_COLS` environment variables.
 fn max_f4_rows() -> usize {
+    if next_kernels() {
+        static ROWS: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+        return *ROWS.get_or_init(read_max_f4_rows);
+    }
+    read_max_f4_rows()
+}
+fn read_max_f4_rows() -> usize {
     std::env::var("F4_F2_MAX_ROWS")
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(MAX_F4_ROWS)
 }
 fn max_f4_cols() -> usize {
+    if next_kernels() {
+        static COLS: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+        return *COLS.get_or_init(read_max_f4_cols);
+    }
+    read_max_f4_cols()
+}
+fn read_max_f4_cols() -> usize {
     std::env::var("F4_F2_MAX_COLS")
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(MAX_F4_COLS)
+}
+
+// ── Next kernels (`inherited-f4-next`) ─────────────────────────────
+//
+// The `inherited-f4-next` solver plug-in runs the inherited engine with
+// this per-thread switch on.  Every place it is read chooses between two
+// implementations of the *same* computation: the same Macaulay rows and
+// column layout, the same eliminations in the same order, the same word
+// XORs charged.  Only how the work is done changes — SIMD row XORs in the
+// inherited basis's re-reduction, the specialisation's `bitop/v1` tally
+// taken in the rewrite pass instead of a pre-pass over the same words,
+// the Four Russians table buffer reused across pivot blocks (only each
+// table's zero entry is cleared), the exact fused and streamed Macaulay
+// builders that are off by default, and environment variables read once
+// instead of per node.  So every verdict, solution, split and `ops` count
+// is that of `inherited-f4`; the pinning tests check it.  Off, the engine
+// is unchanged.  A parallel split (`KIC_SOLVE_PARALLEL_DEPTH`) runs its
+// worker threads with the switch off: still exact, just the old kernels.
+
+thread_local! {
+    static NEXT_KERNELS: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Whether the next kernels are switched on for this thread.
+#[inline]
+pub(crate) fn next_kernels() -> bool {
+    NEXT_KERNELS.with(std::cell::Cell::get)
+}
+
+/// Run `f` with the next kernels switched `on` for this thread, restoring
+/// the previous setting afterwards (also on unwind).
+pub fn with_next_kernels<T>(on: bool, f: impl FnOnce() -> T) -> T {
+    struct Restore(bool, Option<bool>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            NEXT_KERNELS.with(|c| c.set(self.0));
+            crate::cryptanalysis::gf2_elim::set_reuse_table_thread(self.1);
+        }
+    }
+    let previous = NEXT_KERNELS.with(|c| c.replace(on));
+    let previous_reuse =
+        crate::cryptanalysis::gf2_elim::set_reuse_table_thread(if on { Some(true) } else { None });
+    let _restore = Restore(previous, previous_reuse);
+    f()
+}
+
+/// An environment switch that the next kernels read once per process and
+/// the default path reads per call, as it always has.
+fn env_is(
+    var: &'static str,
+    cache: &'static std::sync::OnceLock<Option<String>>,
+) -> Option<String> {
+    if next_kernels() {
+        cache.get_or_init(|| std::env::var(var).ok()).clone()
+    } else {
+        std::env::var(var).ok()
+    }
 }
 
 /// **Matrix-F4 step over `F_2`**: multiply every input polynomial by
@@ -3670,7 +3741,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
     }
     let rows_started = profiling.then(std::time::Instant::now);
     let rows_result = (|| {
-        if F4_SUPPORT_LOCAL_STREAM.load(Relaxed) {
+        if F4_SUPPORT_LOCAL_STREAM.load(Relaxed) || next_kernels() {
             support_local_rows_stream(polys, n_vars, degree, multiplier_mask, max_f4_rows())
         } else {
             let mut rows_monos: Vec<Vec<Mask>> = Vec::new();
@@ -3701,7 +3772,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
         return Some((Vec::new(), Vec::new()));
     }
     let columns_started = profiling.then(std::time::Instant::now);
-    let columns_result = if F4_SUPPORT_LOCAL_BITMAP_COLUMNS.load(Relaxed) {
+    let columns_result = if F4_SUPPORT_LOCAL_BITMAP_COLUMNS.load(Relaxed) || next_kernels() {
         support_local_bitmap_columns(&rows_monos, n_vars, degree)
             .or_else(|| macaulay_columns(&rows_monos))
     } else {
@@ -3865,7 +3936,9 @@ fn build_inherited_macaulay_with_layout(
         let layout_key = (multiplier_mask, degree, false);
         let cached = cached_f4_layout(layout_key);
         if let Some(layout) = cached {
-            let matrix = if F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed) {
+            let matrix = if F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed)
+                || next_kernels()
+            {
                 pack_polynomials_nested_fused::<true>(
                     polys,
                     n_vars,
@@ -4246,7 +4319,7 @@ fn build_macaulay_with_multiplier_mask(
     // cold layouts and all criterion-pruned rows.
     if reuse_layout
         && criterion == RowCriterion::None
-        && F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed)
+        && (F4_DIRECT_FUSED_PACK.load(std::sync::atomic::Ordering::Relaxed) || next_kernels())
     {
         let layout_key = (multiplier_mask, degree, false);
         if let Some(layout) = cached_f4_layout(layout_key) {
@@ -4335,7 +4408,8 @@ fn build_macaulay_packed<P: Default>(
     criterion: RowCriterion,
     pack: impl Fn(&[Vec<Mask>], &F4ColumnLayout, bool) -> Option<P>,
 ) -> Option<BuiltMacaulay<P>> {
-    let subprofile = std::env::var("KIC_F4_BUILD_SUBPROFILE").as_deref() == Ok("1");
+    static SUBPROFILE: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+    let subprofile = env_is("KIC_F4_BUILD_SUBPROFILE", &SUBPROFILE).as_deref() == Some("1");
     let rows_started = subprofile.then(std::time::Instant::now);
     let f5 = match criterion {
         RowCriterion::None => None,
@@ -6424,7 +6498,8 @@ fn reduce_system(
 /// A diagnostic for probes that need the real node systems (row-space
 /// checks, criterion counts) rather than a synthetic corpus; off by default.
 fn dump_node_system(system: &[F2BoolPoly], n_vars: usize, engine: SolverEngine) {
-    let Ok(path) = std::env::var("KIC_F4_NODE_DUMP") else {
+    static NODE_DUMP: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+    let Some(path) = env_is("KIC_F4_NODE_DUMP", &NODE_DUMP) else {
         return;
     };
     use std::io::Write;
@@ -9642,6 +9717,113 @@ mod tests {
             systems.push((system, n_vars));
         }
         systems
+    }
+
+    /// **`inherited-f4-next` is `inherited-f4`, faster.**  The next kernels
+    /// ([`with_next_kernels`]) must leave every decision and every counted
+    /// word XOR where the default kernels put them: the same roots, the same
+    /// tree (reductions, splits, propagations, refuted branches, eliminated
+    /// variables, degree reached) and the same `f4_word_ops_thread` delta, on
+    /// the determinism probe's small sparse systems (support-local roots,
+    /// linear elimination, degree drops) and on dense random quadratic
+    /// systems of the oracle's shape (12 to 16 unknowns, as many equations,
+    /// satisfiable and not; their roots reach the Four Russians kernel).
+    /// Each system is solved twice per mode on a fresh thread, cold and then
+    /// with the thread's layout caches warm, so both builder paths are pinned.
+    #[test]
+    fn next_kernels_leave_decisions_and_word_xors_unchanged() {
+        let mut systems = inherited_f4_word_xor_probe_systems();
+        let mut seed = 0x0dd5_eed0_f4f4_9e37u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        for trial in 0..9 {
+            let n_vars = 12 + 2 * (trial % 3);
+            let system: Vec<F2BoolPoly> = (0..n_vars)
+                .map(|_| {
+                    let mut monos = Vec::new();
+                    for i in 0..n_vars {
+                        for j in i..n_vars {
+                            if next() % 2 == 0 {
+                                monos.push(F2BoolMono::from_mask(mask_from64(
+                                    (1u64 << i) | (1u64 << j),
+                                )));
+                            }
+                        }
+                    }
+                    if next() % 2 == 0 {
+                        monos.push(F2BoolMono::from_mask(0));
+                    }
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        type Run = (Vec<Mask>, [usize; 7], u32, bool, u64);
+        let solve_twice = |system: &[F2BoolPoly], n_vars: usize, on: bool| -> Vec<Run> {
+            let system = system.to_vec();
+            std::thread::spawn(move || {
+                (0..2)
+                    .map(|_| {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let before = f4_word_ops_thread();
+                        let (mut roots, st) =
+                            with_next_kernels(on, || solve_boolean_system(&system, n_vars, &opts));
+                        assert!(!next_kernels(), "the switch is restored");
+                        let ops = f4_word_ops_thread() - before;
+                        roots.sort_unstable();
+                        (
+                            roots,
+                            [
+                                st.reductions,
+                                st.infeasible_branches,
+                                st.propagations,
+                                st.splits,
+                                st.eliminated,
+                                st.oversize,
+                                st.tail_enumerations,
+                            ],
+                            st.max_degree_built,
+                            st.exhausted,
+                            ops,
+                        )
+                    })
+                    .collect()
+            })
+            .join()
+            .unwrap()
+        };
+        let mut solved = 0;
+        let mut refuted = 0;
+        for (k, (system, n_vars)) in systems.iter().enumerate() {
+            let old = solve_twice(system, *n_vars, false);
+            let new = solve_twice(system, *n_vars, true);
+            assert_eq!(
+                old[0], old[1],
+                "system {k}: the default path is deterministic"
+            );
+            assert_eq!(
+                old, new,
+                "system {k} ({n_vars} unknowns): next kernels diverge"
+            );
+            for &point in &old[0].0 {
+                assert!(vanish_at(system, point), "system {k}: a root solves it");
+            }
+            if old[0].0.is_empty() {
+                refuted += 1;
+            } else {
+                solved += 1;
+            }
+        }
+        assert!(solved > 0 && refuted > 0, "both outcomes are pinned");
     }
 
     /// One configuration of the word-XOR determinism probe.  It runs in its

@@ -17,6 +17,7 @@
 //! | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree, then splitting | word XORs (elimination only) |
 //! | `matrix-f5` | the same hybrid, rows the Boolean F5 criterion predicts to vanish left out | word XORs (elimination only) |
 //! | `inherited-f4` | the same hybrid, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-next` | `inherited-f4` with faster kernels for the same work: identical rows, decisions and count (a paired A/B arm) | word XORs (elimination, specialisation and linear elimination only) |
 //! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
@@ -452,6 +453,10 @@ enum HybridKind {
     MatrixF4,
     MatrixF5,
     InheritedF4,
+    /// `InheritedF4` with the next kernels
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_next_kernels`]): the
+    /// same computation, decisions and count, done faster.
+    InheritedF4Next,
 }
 
 /// Macaulay matrices to a fixed degree, reduced with the bit-packed
@@ -474,7 +479,9 @@ impl HybridF4 {
         match self.kind {
             HybridKind::MatrixF4 => SolverEngine::MatrixF4 { max_degree },
             HybridKind::MatrixF5 => SolverEngine::MatrixF5 { max_degree },
-            HybridKind::InheritedF4 => SolverEngine::InheritedF4 { max_degree },
+            HybridKind::InheritedF4 | HybridKind::InheritedF4Next => {
+                SolverEngine::InheritedF4 { max_degree }
+            }
         }
     }
 }
@@ -498,6 +505,7 @@ impl SystemSolver for HybridF4 {
             HybridKind::MatrixF4 => "matrix-f4",
             HybridKind::MatrixF5 => "matrix-f5",
             HybridKind::InheritedF4 => "inherited-f4",
+            HybridKind::InheritedF4Next => "inherited-f4-next",
         }
     }
 
@@ -506,6 +514,7 @@ impl SystemSolver for HybridF4 {
             HybridKind::MatrixF4 => "boolean Macaulay matrices to a fixed degree, propagation, splitting (koblitz_groebner MatrixF4)",
             HybridKind::MatrixF5 => "the same with rows the Boolean F5 criterion predicts to vanish left out (MatrixF5)",
             HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default)",
+            HybridKind::InheritedF4Next => "inherited-f4 with the next kernels: identical rows, decisions and word-XOR count; SIMD re-reduction, fused tallies, exact fused builders, reused Four Russians tables",
         }
         .into()
     }
@@ -553,7 +562,10 @@ impl SystemSolver for HybridF4 {
         let resolved = opts.resolve();
         let before = f4_word_ops_thread();
         let tally_before = bitop_tally::snapshot();
-        let (points, st) = solve_boolean_system(&system.equations, system.n_vars, &opts);
+        let next = matches!(self.kind, HybridKind::InheritedF4Next);
+        let (points, st) = crate::cryptanalysis::koblitz_groebner::with_next_kernels(next, || {
+            solve_boolean_system(&system.equations, system.n_vars, &opts)
+        });
         let ops = f4_word_ops_thread().wrapping_sub(before);
         let mut tests = 0u64;
         let points = verified(points, system, &mut tests);
@@ -587,7 +599,7 @@ impl SystemSolver for HybridF4 {
         let cost = SolverCost {
             ops,
             op_unit: match self.kind {
-                HybridKind::InheritedF4 => {
+                HybridKind::InheritedF4 | HybridKind::InheritedF4Next => {
                     "word XORs (elimination, specialisation and linear elimination only)"
                 }
                 _ => "word XORs (elimination only)",
@@ -1333,6 +1345,9 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         }),
         Box::new(HybridF4 {
             kind: HybridKind::InheritedF4,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Next,
         }),
         Box::new(CrossbredF2),
         Box::new(XlF2),

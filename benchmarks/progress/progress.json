@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0517Z-m4gb-update-signatures",
+  "latest_record": "20261112T0630Z-inherited-f4-next-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 116,
+    "measured": 117,
     "open": 0
   },
   "repo": "crypto",
@@ -10467,6 +10467,109 @@
         }
       ],
       "problem": "study:elliptic_code_list_decoding_20261107",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "disagreements_with_fes",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 78,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.745,
+      "latest": 0.745,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_over_old_wall_ratio_24_unknowns",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.745
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.893,
+      "latest": 0.893,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "next_over_old_wall_ratio_median",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 13,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.86,
+            0.941
+          ],
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.893
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "ops_differences",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 78,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
       "unit": "count"
     },
     {
