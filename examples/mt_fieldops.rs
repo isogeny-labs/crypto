@@ -2582,8 +2582,177 @@ fn main() {
                 ),
             }
         }
+        "opcost" => {
+            // Timed microbenchmark (no counted result): wall-clock ns per operation of this harness's own
+            // implementations on this host, to price the section 5a band: field mul/sqr/inv, one affine
+            // addition (= 1 GAE by definition: I + 2M + S), x-pair (shared inversion), std HashMap lookup and
+            // insert at table sizes 2^10..2^24 (the harness's key/value shape), and the native operations
+            // (step index x mod 32, canonicalisation + one 64-bit hash of x). A fast multiplicative hasher is
+            // timed as a sensitivity (the harness itself uses the std hasher). param = repetition scale.
+            use std::hint::black_box;
+            let scale = param.max(0.01);
+            let reps = |base: f64| -> u64 { ((base * scale) as u64).max(1000) };
+            let time_ns = |n: u64, t: Instant| -> f64 { t.elapsed().as_nanos() as f64 / n as f64 };
+            let p = f.p;
+            let mut res: Vec<String> = Vec::new();
+            // field ops
+            let n1 = reps(2e7);
+            let mut x = 12345u64 % p;
+            let y = 987654321u64 % p;
+            let t = Instant::now();
+            for _ in 0..n1 {
+                x = f.mul(black_box(x), y);
+            }
+            res.push(format!("\"mul_ns\":{:.3}", time_ns(n1, t)));
+            black_box(x);
+            let t = Instant::now();
+            for _ in 0..n1 {
+                x = f.sqr(black_box(x));
+            }
+            res.push(format!("\"sqr_ns\":{:.3}", time_ns(n1, t)));
+            black_box(x);
+            let n2 = reps(1e6);
+            let t = Instant::now();
+            for _ in 0..n2 {
+                x = f.inv(black_box(x) | 1);
+            }
+            res.push(format!("\"inv_ns\":{:.3}", time_ns(n2, t)));
+            black_box(x);
+            // affine addition chain P <- P + Q (one GAE each)
+            let q = f.smul(g, 7);
+            let mut pt = f.smul(g, 3);
+            let t = Instant::now();
+            for _ in 0..n2 {
+                pt = f.padd(black_box(pt), q);
+                if pt.is_none() {
+                    pt = g;
+                }
+            }
+            let gae_ns = time_ns(n2, t);
+            res.push(format!("\"padd_ns\":{:.3}", gae_ns));
+            black_box(pt);
+            let t = Instant::now();
+            let mut acc = 0u64;
+            for _ in 0..n2 {
+                if let Some((a, b)) = f.xpair(black_box(pt), q) {
+                    acc ^= a ^ b;
+                }
+                pt = f.padd(pt, q);
+            }
+            res.push(format!("\"xpair_plus_padd_ns\":{:.3}", time_ns(n2, t)));
+            black_box(acc);
+            // native ops
+            let half = p / 2;
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let n3 = reps(5e7);
+            let mut xs: Vec<(u64, u64)> = Vec::with_capacity(1 << 16);
+            for _ in 0..(1 << 16) {
+                xs.push((rng.gen_range(0..p), rng.gen_range(0..p)));
+            }
+            let t = Instant::now();
+            let mut acc = 0u64;
+            for i in 0..n3 {
+                let (xx, yy) = xs[(i & 0xffff) as usize];
+                let (cx, cy) = if black_box(yy) > half {
+                    (xx, p - yy)
+                } else {
+                    (xx, yy)
+                };
+                acc = acc.wrapping_add(cx ^ cy ^ (mix(cx) >> 40));
+            }
+            res.push(format!("\"canon_hash_ns\":{:.3}", time_ns(n3, t)));
+            let t = Instant::now();
+            for i in 0..n3 {
+                let (xx, _) = xs[(i & 0xffff) as usize];
+                acc = acc.wrapping_add((black_box(xx) as usize % 32) as u64);
+            }
+            res.push(format!("\"step_index_ns\":{:.3}", time_ns(n3, t)));
+            let t = Instant::now();
+            for i in 0..n3 {
+                let (xx, _) = xs[(i & 0xffff) as usize];
+                acc = acc.wrapping_add(black_box(xx));
+            }
+            res.push(format!("\"loop_baseline_ns\":{:.3}", time_ns(n3, t)));
+            black_box(acc);
+            // hash tables: std (as in the harness) and a fast multiplicative hasher (sensitivity)
+            #[derive(Default)]
+            struct FastH(u64);
+            impl std::hash::Hasher for FastH {
+                fn finish(&self) -> u64 {
+                    self.0
+                }
+                fn write(&mut self, b: &[u8]) {
+                    for &c in b {
+                        self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);
+                    }
+                }
+                fn write_u64(&mut self, v: u64) {
+                    self.0 = (v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                }
+            }
+            type Fast = std::hash::BuildHasherDefault<FastH>;
+            let mut tabs: Vec<String> = Vec::new();
+            for lg in [10u32, 12, 14, 16, 18, 20, 22, 24] {
+                let size = 1usize << lg;
+                let keys: Vec<u64> = (0..size).map(|_| rng.gen_range(0..p)).collect();
+                let probes: Vec<u64> = (0..(1 << 20))
+                    .map(|i| {
+                        if i % 2 == 0 {
+                            keys[rng.gen_range(0..size)]
+                        } else {
+                            rng.gen_range(0..p)
+                        }
+                    })
+                    .collect();
+                let nl = reps(4e6);
+                // std hasher, value shape (u64, u64) as the rho databases
+                let mut m: HashMap<u64, (u64, u64)> = HashMap::with_capacity(size * 2);
+                let t = Instant::now();
+                for &k in &keys {
+                    m.entry(k).or_insert((k, k));
+                }
+                let ins = time_ns(size as u64, t);
+                let t = Instant::now();
+                let mut hits = 0u64;
+                for i in 0..nl {
+                    if m.contains_key(&probes[(i as usize) & ((1 << 20) - 1)]) {
+                        hits += 1;
+                    }
+                }
+                let look = time_ns(nl, t);
+                black_box(hits);
+                drop(m);
+                let mut m2: HashMap<u64, (u64, u64), Fast> =
+                    HashMap::with_capacity_and_hasher(size * 2, Fast::default());
+                let t = Instant::now();
+                for &k in &keys {
+                    m2.entry(k).or_insert((k, k));
+                }
+                let ins2 = time_ns(size as u64, t);
+                let t = Instant::now();
+                let mut hits2 = 0u64;
+                for i in 0..nl {
+                    if m2.contains_key(&probes[(i as usize) & ((1 << 20) - 1)]) {
+                        hits2 += 1;
+                    }
+                }
+                let look2 = time_ns(nl, t);
+                black_box(hits2);
+                tabs.push(format!(
+                    "{{\"log2_size\":{},\"std_insert_ns\":{:.3},\"std_lookup_ns\":{:.3},\"fast_insert_ns\":{:.3},\"fast_lookup_ns\":{:.3}}}",
+                    lg, ins, look, ins2, look2
+                ));
+            }
+            res.push(format!("\"tables\":[{}]", tabs.join(",")));
+            Out {
+                ok: 0,
+                extra: res.join(","),
+            }
+        }
         _ => panic!("unknown arm"),
     };
+    // wall time of the method itself (everything before the shared verification pass)
+    let ms_arm = t0.elapsed().as_secs_f64() * 1e3;
     // Verification (counted): every recovered log by double-and-add.
     let mut ok = out.ok;
     for t in 0..targets {
@@ -2598,8 +2767,8 @@ fn main() {
         .map(|(k, v)| format!("\"{}\":[{},{},{},{},{}]", k, v[0], v[1], v[2], v[3], v[4]))
         .collect();
     println!(
-        "{{\"arm\":\"{}\",\"n\":{},\"p\":{},\"targets\":{},\"seed\":{},\"param\":{},\"ok\":{},\"I\":{},\"M\":{},\"S\":{},\"H\":{},\"L\":{},\"N\":{},\"phases\":{{{}}},{},\"ms\":{:.1}}}",
+        "{{\"arm\":\"{}\",\"n\":{},\"p\":{},\"targets\":{},\"seed\":{},\"param\":{},\"ok\":{},\"I\":{},\"M\":{},\"S\":{},\"H\":{},\"L\":{},\"N\":{},\"phases\":{{{}}},{},\"ms_arm\":{:.1},\"ms\":{:.1}}}",
         arm, n, p, targets, seed, param, ok, f.ci.get(), f.cm.get(), f.cs.get(), f.ch.get(), f.cl.get(), f.cn.get(),
-        phases.join(","), out.extra, t0.elapsed().as_secs_f64() * 1e3
+        phases.join(","), out.extra, ms_arm, t0.elapsed().as_secs_f64() * 1e3
     );
 }
