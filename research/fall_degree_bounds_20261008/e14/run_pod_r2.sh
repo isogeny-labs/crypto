@@ -71,25 +71,25 @@ g1() { # threads -> wall seconds; output in g1_<threads>.jsonl
   diff <(jq -c "$k" research/dreg_invariant_guess_20261029/runs/S3.d0.b4.jsonl) <(jq -c "$k" "$OUT/g1_$th.jsonl") >"$OUT/g1_$th.diff" || return 2
   echo $(( $(date +%s) - s ))
 }
-log "G1 (64 threads)"
-T64=$(g1 64) || finish "G1_failed"
+log "G1 (32 threads)"
+T32=$(g1 32) || finish "G1_failed"
 # --- G2: hky_par reproduces the E10 (3,21,7) records at degree 4
 log "G2"
-RAYON_NUM_THREADS=64 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4 >"$OUT/g2.jsonl" 2>"$OUT/g2.err" || finish "G2_exit"
+RAYON_NUM_THREADS=32 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4 >"$OUT/g2.jsonl" 2>"$OUT/g2.err" || finish "G2_exit"
 k2='{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree}'
 diff <(jq -c "$k2" $S/e10/run-r3-B/out/E_3-21-7.jsonl) <(jq -c "$k2" "$OUT/g2.jsonl") >"$OUT/g2.diff" || finish "G2_differs"
-# --- G3: pe scaling pilot (8, 16 threads; 64 from G1)
+# --- G3: pe scaling pilot (8, 16 threads; 32 from G1; Amendment 25: 32 vCPU is the provider maximum)
 log "G3"
 T8=$(g1 8) || finish "G3_failed_8"; T16=$(g1 16) || finish "G3_failed_16"
-TH_PE=64; T_PE=$T64
+TH_PE=32; T_PE=$T32
 [ "$T16" -lt "$T_PE" ] && { TH_PE=16; T_PE=$T16; }
 [ "$T8" -lt "$T_PE" ] && { TH_PE=8; T_PE=$T8; }
-printf '{"t8":%s,"t16":%s,"t64":%s,"th_pe":%s,"t_pe":%s}\n' "$T8" "$T16" "$T64" "$TH_PE" "$T_PE" >"$OUT/g3.json"
+printf '{"t8":%s,"t16":%s,"t32":%s,"th_pe":%s,"t_pe":%s}\n' "$T8" "$T16" "$T32" "$TH_PE" "$T_PE" >"$OUT/g3.json"
 log "gates passed; pe threads $TH_PE ($T_PE s at 140k columns)"; pack
 TIMEV=""; [ -x /usr/bin/time ] && TIMEV="/usr/bin/time -v"
 # --- E14a: hky_par degree-5 closure at (3,21,7); 12 h without a finished draw -> killed
-log "start A_3-21-7 (hky_par cmax 5, 64 threads)"; sA=$(date +%s)
-( $TIMEV env RAYON_NUM_THREADS=64 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 5 >"$OUT/A_3-21-7.jsonl" 2>"$OUT/A_3-21-7.err"; echo "exit=$?" >>"$OUT/A_3-21-7.err" ) &
+log "start A_3-21-7 (hky_par cmax 5, 32 threads)"; sA=$(date +%s)
+( $TIMEV env RAYON_NUM_THREADS=32 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 5 >"$OUT/A_3-21-7.jsonl" 2>"$OUT/A_3-21-7.err"; echo "exit=$?" >>"$OUT/A_3-21-7.err" ) &
 APID=$!
 while kill -0 $APID 2>/dev/null; do
   sleep 60

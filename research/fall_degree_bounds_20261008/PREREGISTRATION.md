@@ -1211,3 +1211,39 @@ the same way, so delivery is not the cause; the `/workspace` theory of Amendment
 - Pod name prefix `fd-e14-r2d-`. Engines, gates, readings, predictions, the USD 100 cap and the
   Amendment 21 owner override stand. No draw exists, so no draw is retried. If r2d also fails to
   bootstrap, no further pod is launched without the owner's reading of `trace.log`.
+
+## Amendment 25 (2026-11-12 UTC, before any draw below): cause of the r2a–r2d failures established (64 vCPU exceeds the provider maximum); relaunch r2e at 32 vCPU on a memory-optimized flavor
+
+**What happened.** r2d (`9cfghisyn5cliy`) showed the same signature and was deleted at 02:55 UTC
+(14 min, about USD 0.6; record `e14/pod-r2/launch-r2d.json`). Diagnostic pods settled the cause:
+- D2 (`7u7h5lowmoe4f7`): the known-good simple start command with r2d's **full env block** served
+  after 11 s with every variable present, so the env block (including the 10 KB `SCRIPT_B64`) is
+  not the cause.
+- D5 (`e1j3jly1yk1hf6`): a 2-vCPU pod on `cpu5c` served after about 15 s (EUR-IS-1).
+- RunPod's flavor catalogue (GraphQL `cpuFlavors`, read 03:03 UTC): every CPU flavor has
+  `maxVcpu = 32` (cpu3c/cpu5c 2 GB per vCPU, cpu3g/cpu5g 4 GB, cpu3m/cpu5m 8 GB; disk 10–15 GB per
+  vCPU). r2a–r2d all requested **64 vCPU**; the API accepted the request and echoed
+  `vcpuCount: 64`, but their containers never started (uptime counting, 0 % CPU, no listener).
+  The E14 r1 pod of Amendment 19 ran with 64 vCPU and 528 GB on 2026-11-09, so the limit is new or
+  was not enforced then; it is enforced now.
+- D3 and D4 (2-vCPU probes created 02:53–02:55 on cpu3c/cpu3g) had not started after 10 min
+  (one container with uptime 0, one with no container), so container start on some hosts is also
+  slow; that is a second, independent effect and does not change the conclusion above.
+  All probes were deleted at 03:05 UTC (total under USD 0.05).
+
+**Changes for r2e.**
+- `e14/launch_r2.sh`: `vcpuCount: 32`, flavors `["cpu5m","cpu3m"]` (8 GB per vCPU, so 256 GB RAM,
+  which the E14a degree-5 closure needs: Amendment 13 sized it at 256 GiB), pod name prefix
+  `fd-e14-r2e-`. Price about USD 4.16/h (cpu5m) or 3.52/h (cpu3m); the USD 100 cap therefore gives a
+  deadline of about 24 h or 28 h instead of 36 h. The cap is unchanged.
+- `e14/run_pod_r2.sh` (sha256 `6003ecbdbb92c6ef…`): every 64-thread setting becomes 32 (G1, G2, E14a, and the
+  G3 pilot now times 8, 16 and 32 threads; `g3.json` records `t32`). Nothing else changes.
+- Engines, gates, readings, predictions and the Amendment 21 owner override stand. No draw exists,
+  so no draw is retried. If r2e has not written "start command running" to its served `run.log`
+  within 20 minutes of creation, it is left running for a further 20 minutes before any action,
+  because slow container starts were also observed.
+
+*Note at launch (03:05:14 UTC):* the provider priced the 32-vCPU memory-optimized pod at USD 2.08/h
+(below the catalogue estimate above), so the USD 100 cap gives the full 36 h deadline. Pod
+`xkgx6mw9roo3zl`, `fd-e14-r2e-20261112T0305Z`, 32 vCPU, 256 GB; balance at launch USD 91.37; the
+sibling pod was at USD 5.35/h.
