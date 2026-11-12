@@ -4,8 +4,8 @@ import csv, glob, json, os, statistics, collections
 D = os.path.dirname(os.path.abspath(__file__))
 R2 = os.path.join(D, "..", "cover_image_fb_r2_20261112", "cells.tsv")
 cells, viol = collections.defaultdict(list), 0
-for path in sorted(glob.glob(os.path.join(D, "runs", "m3-*.jsonl"))):
-    arm = os.path.basename(path)[3:-6]
+for path in sorted(glob.glob(os.path.join(D, "runs", "m3*-*.jsonl"))):
+    arm = os.path.basename(path).split("-", 1)[1][:-6]
     for line in open(path):
         r = json.loads(line)
         if "control" not in r:

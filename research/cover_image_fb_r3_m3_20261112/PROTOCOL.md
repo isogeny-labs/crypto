@@ -43,3 +43,18 @@ cause. The null decides only the explanation.
 
 No `S`, no relation-phase cost, no rho comparison, no leaderboard or `benchmarks/` row. A stage
 diagnostic of the decomposition solve. Matrix width is a proxy for F4 cost, not the cost.
+
+## Amendment 1 (17:15Z, before any cover-map t = 4 value was read)
+
+- **Cause.** `m3-none` was killed by the container's memory limit (OOM, 7.9 GB resident) in its
+  t = 5 `tower` cell, with four arms sharing 16 GB. The pilot runs every `tower` cell before any
+  `null` cell, so the reference's null never ran, and the cover arms would meet the same end at
+  t = 5. Only the reference's t = 4 values had been seen when this was written.
+- **Change.** t = 5 is dropped (the protocol already kept it out of every gate). The `tower`
+  cells at t ≤ 4 stand as run. The `null` cells run in a second pass, `--controls null
+  --null-chain --max-t-m3 4`, one arm per process. The cell seed does not depend on the control,
+  so each null draws the same curve, tower and targets as its `tower` cell.
+- **Script bug.** `run.sh` logged `exit=$?` after a `$(date …)` substitution in the same string,
+  so it recorded `date`'s status: the OOM kill was logged `exit=0`. The round-1 and round-2 copies
+  have the same bug. Their rows are complete and untimed-out, so their results stand, but their
+  logged exit codes are not evidence. `run_nulls.sh` captures the status first.
