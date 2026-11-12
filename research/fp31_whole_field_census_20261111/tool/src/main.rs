@@ -16,6 +16,7 @@ mod phase2;
 mod phase3;
 mod phase4;
 mod phase5;
+mod followup;
 mod stats;
 
 use std::collections::BTreeMap;
@@ -424,6 +425,8 @@ fn main() {
         Some("rho-timing-diag") => phase5::cmd_rho_timing_diag(&args),
         Some("rho-timing-diag2") => phase5::cmd_rho_timing_diag2(&args),
         Some("rho-timing-diag3") => phase5::cmd_rho_timing_diag3(&args),
+        Some("p5-spec") => followup::cmd_p5_spec(&args),
+        Some("p5-analyze") => followup::cmd_p5_analyze(&args),
         _ => {
             eprintln!("usage: fp31-class-census census|bruteforce|summary|roots|select|analyze|ic-classes|ic-analyze|timing|rho-spec|rho-timing|ic-timing ...");
             std::process::exit(2);
