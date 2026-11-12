@@ -52,4 +52,4 @@ go run research/lift_reduce_second_prime_20261112/ct38_cross_characteristic.go
 
 A useful follow-up must supply an explicit genus≥2 model A/K with a growing order-r torsion point, compute the smallest known field K(P), and demonstrate a uniformly defined and *efficient* lift of any encoded source point Q, not merely a log-indexed table. Only after a lift exists should full construction/lifting/reduction/solving/recovery costs be matched to optimized rho and the best index-calculus baseline under admitted budget rules. CT38 used no cloud resources.
 
-[Construction diagram](ct38-rational-torsion-bridge.svg). A locally rendered and visually inspected PDF is available separately; PDF Git publication requires binary transport. [pcc:unverified]
+[Construction diagram](ct38-rational-torsion-bridge.svg). [Vector PDF summary](CT38_Rational_Torsion_Bridge.pdf) is committed as a Git blob; the separate local report PDF was visually inspected, but the committed PDF still needs CI artifact/viewer inspection. [pcc:unverified]
