@@ -79,7 +79,7 @@ def create():
             "ports": ["8000/http"], "dockerEntrypoint": ["bash", "-c"],
             "dockerStartCmd": ["echo $PODJOB_B64 | base64 -d > /podjob.py && python3 /podjob.py"],
             "env": {"TOKEN": token, "PAYLOAD_SHA256": pin, "JOB_ARGV": json.dumps(["python3", "run.py", "holdout"]),
-                    "PIN": "2", "REPEATS": "3", "PODJOB_B64": base64.b64encode(podjob).decode()}}
+                    "PIN": "auto", "REPEATS": "3", "PODJOB_B64": base64.b64encode(podjob).decode()}}
     t0 = time.time()
     pod = api("POST", "/pods", body)
     st = {"pod_id": pod["id"], "token": token, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}

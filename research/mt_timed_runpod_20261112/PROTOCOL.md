@@ -56,3 +56,12 @@ configuration. The size-level pattern is also reported as the count of configura
 One cloud pod, not an isolated lab node; one implementation per build; 4 configurations per cell; reused v5 curves
 (not fresh) with the seed of the earlier timed study, so the std build is a host replication, not new data on new
 configurations.
+
+## Amendment A1 (2026-11-12 16:40Z, after attempt 1, before any measurement)
+
+Attempt 1 (pod fukok3vh2qhsum, AMD EPYC 4564P host with 32 CPUs) produced no measurement: every execution failed at
+`taskset -c 2` ("Invalid argument"), because the container may use only its own allowed CPU set. Its receipts and
+outputs are kept in `attempts/a1/`. Change: `run.py` pins each execution to one CPU of the container's allowed set
+(the middle element of `sched_getaffinity`, recorded with the set in `host.json`); nothing else changes. The payload
+is rebuilt (new sha256 in `launch/payload.json`) and a new pod is created. The launcher also sends an explicit user
+agent (RunPod's edge refuses urllib's default; no workload change).

@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """Timed head-to-head on a RunPod CPU pod, two builds (see PROTOCOL.md).  usage: run.py holdout|smoke
 -> results/<phase>/{runs,opcost}.jsonl, host.json.  Runs inside the extracted payload directory (bin/, instances/).
-Sequential, one process at a time, pinned with taskset to CPU $PIN (default 2). Every run key (build x configuration
+Sequential, one process at a time, pinned with taskset to CPU $PIN (default: the middle CPU of the allowed set). Every run key (build x configuration
 x arm x parameter) runs REPEATS times; within each round all keys run in a fixed-seed shuffled order, so the two
 builds and the repeats of a key are interleaved over the whole session."""
 import json, subprocess, sys, os, hashlib, itertools, random, time, platform
 HERE = os.path.dirname(os.path.abspath(__file__))
 BINS = {"std": os.path.join(HERE, "bin/mt_fieldops_std"), "fast": os.path.join(HERE, "bin/mt_fieldops_fast")}
 INST = os.path.join(HERE, "instances")
-PIN = os.environ.get("PIN", "2")
+# pin to one CPU the container may use: env PIN, or "auto" (default) = the middle CPU of the allowed set
+_ALLOWED = sorted(os.sched_getaffinity(0))
+PIN = os.environ.get("PIN", "auto")
+if PIN == "auto":
+    PIN = str(_ALLOWED[len(_ALLOWED) // 2])
 IC_ARMS = ["ic5", "ic5ks", "ic5w", "ic5rw"]; KS_K = [0.05, 0.1, 0.25, 0.5]
 DPU_K = [0.0, 0.25]; DPU_OFF = [-1, 0, 1]; BSGS_MF = [0.7, 1.0, 1.4]
 def keys(phase):
@@ -39,7 +43,7 @@ if __name__ == "__main__":
     out = os.path.join(HERE, "results", phase); os.makedirs(out, exist_ok=True)
     shas = {b: hashlib.sha256(open(p, "rb").read()).hexdigest() for b, p in BINS.items()}
     host = dict(cpu=next((l.split(":", 1)[1].strip() for l in open("/proc/cpuinfo") if l.startswith("model name")), ""),
-                nproc=os.cpu_count(), kernel=platform.release(), pin=PIN, bin_sha256=shas,
+                nproc=os.cpu_count(), allowed_cpus=_ALLOWED, kernel=platform.release(), pin=PIN, bin_sha256=shas,
                 cpuset=open("/sys/fs/cgroup/cpuset.cpus.effective").read().strip() if os.path.exists("/sys/fs/cgroup/cpuset.cpus.effective") else None,
                 cpu_max=open("/sys/fs/cgroup/cpu.max").read().strip() if os.path.exists("/sys/fs/cgroup/cpu.max") else None,
                 started=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
