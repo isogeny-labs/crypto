@@ -212,6 +212,9 @@ pub(super) fn count_curve_order(p: u64, a: u64, b: u64) -> u64 {
 }
 
 /// Largest prime field (and subgroup order) accepted: trial-division primality is about 2^25 steps here.
+/// Largest factor base the command accepts (the pair-sum table holds 2F^2 entries and the
+/// elimination is dense in F, so the cap bounds memory and time).
+const MAX_FB_SIZE: usize = 8192;
 const MAX_PRIME_FIELD: u64 = 1 << 50;
 /// Largest field whose point count is done by brute force.
 const COUNTABLE_FIELD: u64 = 40_000_000;
@@ -230,7 +233,7 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
     {
         return Err("curve coefficients and point coordinates must be less than p".into());
     }
-    if !(1..=1024).contains(&args.fb_size)
+    if !(1..=MAX_FB_SIZE).contains(&args.fb_size)
         || args.extra_relations > 4096
         || args.max_trials_per_relation == 0
         || args.max_relation_attempts == 0
