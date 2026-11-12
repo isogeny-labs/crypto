@@ -50,37 +50,67 @@ fn duplication() -> IdentityStatement {
     }
 }
 
-fn main() {
-    let cert = identity::issue(
-        duplication(),
-        0x384c,
-        32,
-        "Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",
-        Some(identity::ProofRef {
-            kind: "lean4;pointer only;requires separate proof gate".into(),
-            path: "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean".into(),
-            sha256: hex::encode(sha256_native::sha256(include_bytes!("../../lean/QuarticGluing.lean"))),
-        }),
-    )
-    .expect("the issuer must reject any false identity");
-    let verdict = identity::check_with_extra(&cert, Some((0x384d, 64))).unwrap();
-    assert!(matches!(verdict, identity::Verdict::Accept { .. }));
-    if let Some(path) = std::env::args_os().nth(1) {
-        std::fs::write(
-            path,
-            format!("{}\n", serde_json::to_string_pretty(&cert).unwrap()),
-        )
-        .unwrap();
+fn halving() -> IdentityStatement {
+    let x = Expr::var("x");
+    let a = Expr::var("a");
+    let b = Expr::var("b");
+    let target = Expr::var("X");
+    let slope = Expr::Add(vec![
+        Expr::Mul(vec![Expr::Const(3), power(x.clone(), 2)]),
+        a.clone(),
+    ]);
+    let curve = Expr::Add(vec![
+        power(x.clone(), 3),
+        Expr::Mul(vec![a.clone(), x.clone()]),
+        b.clone(),
+    ]);
+    IdentityStatement {
+        name:"Cleared doubling abscissa quartic for complete halving".into(),
+        source:"TWO_PRIMARY_QUOTIENT_PROOF.md;Galbraithch9eq9.2;Lean TwoPrimaryQuotient.halving_abscissa_identity".into(),
+        variables:vec!["x".into(),"a".into(),"b".into(),"X".into()],degree_bound:4,
+        lhs:Expr::Add(vec![power(slope,2),Expr::Mul(vec![Expr::Const(-4),curve,Expr::Add(vec![Expr::Mul(vec![Expr::Const(2),x.clone()]),target.clone()])])]),
+        rhs:Expr::Add(vec![power(x.clone(),4),Expr::Mul(vec![Expr::Const(-4),target.clone(),power(x.clone(),3)]),Expr::Mul(vec![Expr::Const(-2),a.clone(),power(x.clone(),2)]),Expr::Mul(vec![Expr::Const(-1),Expr::Add(vec![Expr::Mul(vec![Expr::Const(8),b.clone()]),Expr::Mul(vec![Expr::Const(4),a.clone(),target.clone()])]),x]),power(a,2),Expr::Mul(vec![Expr::Const(-4),b,target])]),
     }
-    println!("PASS {}:32issuer+64domain-separatedchecker points over fixed2^61-1;existing unchanged checker and SHA;not a signed or all-characteristics proof", cert.id);
+}
+
+fn main() {
+    let outputs = std::env::args_os().skip(1).collect::<Vec<_>>();
+    let cases: [(IdentityStatement, &[u8], &str, u64); 2] = [
+        (
+            duplication(),
+            include_bytes!("../../lean/QuarticGluing.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+            0x384c,
+        ),
+        (
+            halving(),
+            include_bytes!("../../lean/TwoPrimaryQuotient.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+            0x394c,
+        ),
+    ];
+    for (i, (statement, source, path, seed)) in cases.into_iter().enumerate() {
+        let cert=identity::issue(statement,seed,32,"Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",Some(identity::ProofRef {kind:"lean4;pointer only;requires separate proof gate".into(),path:path.into(),sha256:hex::encode(sha256_native::sha256(source))})).expect("the issuer must reject any false identity");
+        let verdict = identity::check_with_extra(&cert, Some((seed + 1, 64))).unwrap();
+        assert!(matches!(verdict, identity::Verdict::Accept { .. }));
+        if let Some(path) = outputs.get(i) {
+            std::fs::write(
+                path,
+                format!("{}\n", serde_json::to_string_pretty(&cert).unwrap()),
+            )
+            .unwrap();
+        }
+        println!("PASS {}:32issuer+64domain-separatedchecker points over fixed2^61-1;existing unchanged checker and SHA;not a signed or all-characteristics proof",cert.id);
+    }
 }
 
 #[test]
-fn mutated_duplication_is_rejected() {
-    let mut statement = duplication();
-    statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
-    assert!(matches!(
-        identity::issue(statement, 0x384c, 32, "negative control", None),
-        Err(identity::IssueError::False(_))
-    ));
+fn mutated_identities_are_rejected() {
+    for mut statement in [duplication(), halving()] {
+        statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
+        assert!(matches!(
+            identity::issue(statement, 0x384c, 32, "negative control", None),
+            Err(identity::IssueError::False(_))
+        ));
+    }
 }

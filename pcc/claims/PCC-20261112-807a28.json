@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T12:32:46Z",
+ "id": "PCC-20261112-807a28",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4e94d77251455793687ff954931f06620e8929cd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "bd102c4f6c6b9cdc63431623c19ba23d0293418f4f45249bc1bc123c95a07343",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+   "theorem": "TwoPrimaryQuotient.quotient_lift_independent"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful halving polynomial/quotientlift independence/16torsion lifts/Frobenius12mod16/crossdegree4divisibility/integerclearedmapzero consequences. Actual geometricquotient/Picard/Homcancellation/degree/kernelrestrictiondivisibility/classification remain written. Nativewrongdoubling control isnot theliteralclearednormpull map;V2explicit.",
+ "statement": "theorem quotient_lift_independent {B A C : Type} [IntModule B] [IntModule A] [IntModule C] (k : B \u2192 A) (l : B \u2192 C) (ks : \u2200 b c, k (b-c)=k b-k c) (ls : \u2200 b c, l (b-c)=l b-l c) (included : \u2200 b, k b=0 \u2192 l b=0) (b c : B) (same : k b=k c) : l b=l c"
+}

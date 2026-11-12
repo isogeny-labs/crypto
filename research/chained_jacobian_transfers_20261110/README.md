@@ -135,3 +135,12 @@ Current actual quartic-gluing extension: [written proof](QUARTIC_GLUING_PROOF.md
 154written31modules;actualTateindex16/sixgeometricJacobian distinction
 uses explicit written global dependencies. See CHECKPOINT/QUEUE for the
 next full4-primary quotient evaluator. [pcc:unverified]
+
+Full4-primary quotient extension: [proof](TWO_PRIMARY_QUOTIENT_PROOF.md)/492496,
+[two-page report](reports/two-primary/report.pdf)/04e86b,
+[native](successor-preflight/src/two_primary_quotient.rs) and
+[formal consequences](lean/TwoPrimaryQuotient.lean). Full32+23 tests/
+160written32modules;all256A4classes/all16lifts/all6directions,Frobenius
+fielddegree12 and a conditionalseparablecrossfamilydegree4 obstruction.
+Literalclearedmapzero isdistinctfromthenativedoublingcontrol;V2explains.
+Allscientificstandingunsigned. See currentCHECKPOINT/QUEUE. [pcc:unverified]

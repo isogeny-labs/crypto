@@ -50,7 +50,8 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT28e | complete independent wholemap29;unsigned | Everyoldrationaloutput andactual49kernel membership via separateCantor/pointwisenorms. | Full5cf8f9 all6×12317 directions/12316wrongquartereach,both49kernels/48omitted7controls,all3source9fixturehashes unchanged. Writtenab8c53/completec49e8b/report7aea70. Timeoutb6bc9e/V2fd19e7 retained;147/29partialformal. Globaldegree/Picard stillseparate. |
 | CT28f | complete local30/14930;unsigned | Full2401 geometric7torsion action andnondualchain/backtracking/shadow controls. | e78426/d89ae5 all3models/all6maps kernel49/image49/sharedT1intersection1/backtrackingzero2401;2bound controls a6ff17/90cebe,failed01/02kept. New2page inspectedreport. Globaldegreeblindspot retained. |
 | CT28g | complete local31+23/15431;unsigned | Actual quartic4glue and six Jacobian distinction. | Native642759 kernel16/inversepairing/Frob/ramifiedcorners;written933d35 actualTateindex16/Z4²/all15pairs ofsixC_i/T_i. FiveboundLean15431 plus23algebra/IDC1he156b6adc8f9cdd5/1176bb. Newinspected2pagePDF53692bytes. Globalgeometry bridges explicit. |
-| CT28h | next frozenprotocol/native;unsigned | Transportactual4glue and evaluateall256 A_i[4] classes withoutinverse4. | E16/F16 inexistingFp12 viahalving;4096lifts/[4]b inkernel16 permodel;quotientK_target φ definesmap afterall16kernelgraphcompatibilities. All6directions/norm7/49/bijection/groupchecks planned. No newcode/resultyet. Later12hopcyclequeued. |
+| CT28h | complete local32+23/16032;unsigned | Whole256A_i4 quotient maps/noinverse4 andcrossfamilydegreeobstruction. | Native956a3e all4096lifts/16representations/all6maps/65536groupchecks/Frobdegree12;written492496/separablecrossdegree4;6bound16032/algebrae13811/halvingID26ac6af5final03/report04e86b56667bytes. V2native[2]FvsintegerclearedLzero explicit;failedformal/pointers retained. |
+| CT28i | next actualconsumerintegration;unsigned | Pinnewroot32/23/16032 into a fresh child of1508. | Keepall98source13/oldsourcepin/check.sh unchanged;addindependentpin/script/CIjob for32/23/160proofs/twocertificates. Isolatedexactsourceclone localvalidation,thenreadychild1508/ownCI;includefullconsumerCI700efe/correction. Laterboundedellipticcycle/actualglueclosure. |
 
 ## Session constraints
 
@@ -65,8 +66,11 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-ReadcurrentCHECKPOINT/.resume andnewestjournal. Publishcompletedroot31+23/15431
-from92,own4jobCI. Root92 exact43210021347 next12:23;consumer1508/c712
-43202427032 next12:20. No localnativeactive. Nextactual4gluetransport/fullA4
-quotientviaE16 protocol,native32;do notdivideby4 on4torsion. Alloldfrozen
-subjects/mergeledger/C/budget/S3/vault/KB limits retained. [pcc:unverified]
+ReadcurrentCHECKPOINT/.resume andnewestjournal. Commit/publishcompletedroot32+23/
+16032from4e,own4jobCI;no nativeactive. Root4eCI13:01. Consumer1508/c712
+own43202427032 SUCCESS98/full700efe/root37223f;root92 exact43210021347
+SUCCESS30/14930/full2e26e7,settled. Nextfreshconsumerintegrationchild1508,
+pinnewroot32/23/16032/check-independent.sh/separateCIjob/isolatedclone.
+Keepold98source13/check.sh/sourcepin unchanged. Thenactual4graphcycle
+closurestudy. Alloldfrozenbytes/ledger/C/budget/S3/vault/KB limits persist.
+[pcc:unverified]

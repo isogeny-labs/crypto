@@ -1,0 +1,22 @@
+digraph quotient {
+ graph [bgcolor="white",fontname="DejaVu Sans",labelloc=t,label="Fixed F101 chain · all4096 lifts /256 classes /six directions · native956a3e,globalbridge492496 (unsigned)"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11];
+ edge [fontname="DejaVu Sans",fontsize=9];
+ B0 [label="E(1,46)[16] × F(44,21)[16]\n4096 selected quotient lifts"];
+ B1 [label="E(26,58)[16] × F(69,50)[16]\n4096 selected quotient lifts"];
+ B2 [label="E(59,27)[16] × F(23,7)[16]\n4096 selected quotient lifts"];
+ A0 [label="Jac(T0)[4]\n[31,75,74,54,71,55,1]\n256 classes /16 lifts each",fillcolor="#e4f2e7"];
+ A1 [label="Jac(T1)[4]\n[95,26,19,27,94,91,1]\n256 classes /16 lifts each",fillcolor="#e4f2e7"];
+ A2 [label="Jac(T2)[4]\n[95,93,43,39,92,17,1]\n256 classes /16 lifts each",fillcolor="#e4f2e7"];
+ {rank=same; B0;B1;B2;}
+ {rank=same; A0;A1;A2;}
+ B0 -> B1 [dir=both,label="alpha / adjoint\n7 per factor"];
+ B1 -> B2 [dir=both,label="beta / adjoint\n7 per factor"];
+ B0 -> A0 [label="K0 · all16 lifts agree"];
+ B1 -> A1 [label="K1 · all16 lifts agree"];
+ B2 -> A2 [label="K2 · all16 lifts agree"];
+ A0 -> A1 [dir=both,label="Psi1 / adjoint\n256-point bijections"];
+ A1 -> A2 [dir=both,label="Psi2 / adjoint\n256-point bijections"];
+ N [shape=plaintext,label="Compressed forward and adjoint:both exact two-stage maps on every256 classes"];
+ A1 -> N [style=invis];
+}
