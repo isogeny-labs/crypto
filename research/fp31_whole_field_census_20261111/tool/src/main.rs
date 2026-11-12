@@ -13,6 +13,8 @@
 mod classno;
 mod nt;
 mod phase2;
+mod phase3;
+mod stats;
 
 use std::collections::BTreeMap;
 use std::fs::{File, OpenOptions};
@@ -411,8 +413,10 @@ fn main() {
         Some("roots") => phase2::cmd_roots(&args),
         Some("select") => phase2::cmd_select(&args),
         Some("analyze") => phase2::cmd_analyze(&args),
+        Some("ic-classes") => phase3::cmd_ic_classes(&args),
+        Some("ic-analyze") => phase3::cmd_ic_analyze(&args),
         _ => {
-            eprintln!("usage: fp31-class-census census|bruteforce|summary|roots|select|analyze ...");
+            eprintln!("usage: fp31-class-census census|bruteforce|summary|roots|select|analyze|ic-classes|ic-analyze ...");
             std::process::exit(2);
         }
     }
