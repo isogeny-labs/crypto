@@ -42,7 +42,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT25a | written global argument/partialLean/even-degree negative control complete locally;unsigned | Explain actual F101 descent using odd coefficient degree,without rational sign witnesses. | ODD_FIELD_DESCENT_PROOF.md/6b3ff6,6written conditional module/ring lemmas and9standalone tests/strictClippyb33222. Stable kernels+targetAut±1+F101³ imply fixed Hom sign. Even-degree twist109/95/all109² additions cd2506 preserves why oddness matters. Old proofs unchanged;new rootCI separate. |
 | CT26 | complete/ready1498/exactCI succeeds;unsigned | Lazy canonical root tables without arithmetic changes. | Consumer25fd/1498 against1496,full25/82+five3c6362/root089c42. Exact43144567065 succeeds,signedjobskips,full205514 in5ceb. Canonical roots17/1013f015c,written718425/filter1da835/report5e1f22 retained. |
 | CT27 | complete/ready1501;ownCI dispatched;unsigned | Independently replay arbitrary balanced degree0/1/2 classes beyond49kernels. | FULL_CLASS_CHECKPOINT.md:consumer5ceb ready1501 against1498,full25native/83reference+five93b147/root18115e,post-run frozen hashes unchanged. Both full12317 corpora/negations/doubles/paired sums pass existing-Cantor12/Clippy/sourceguards4b2aa9,writtenb71a87,partial7d9a53/final89916e. Timestamp-only correctione15346/root279a08 preserves05. No all151M pairs or independent map-membership claim. |
-| CT28 | actual first-component ready1505;whole forward prototype+proof complete;new whole guard running;unsigned | Evaluate existing fixed Psi over F101 and preserve all map controls. | PRIME_FIELD_CHECKPOINT.md:consumer6cf/1505 full25/85+five301fbe,ownCI43165729371 next07:00. Whole forward full12317/Clippy72e1d8,all4pullbacks5143f5/T1independent850e92/root17af4b99;written4934b4/78176c and136written/25modules3413a4. Actual production-route02/1da990 full03 running24821 on frozen8sources,expected25/90+five. Next puredual/T1norms/T2covers;no measured gain. |
+| CT28 | whole forward/native proof complete;actual full04 after interrupted03;unsigned | Evaluate fixed Psi over F101 and preserve map controls. | PRIME_FIELD_CHECKPOINT.md:root33e exact43170740419 green25/17/136/25 a990e6;first1505 exact6cf green25/85+five fd53e1/root282f74. Whole forward72e1d8/all4pullbacks5143f5/global4934b4/78176c. Actual source02 frozen/full04 session45249;interrupted03 f87a99/2fe5dc retained. T1norm18 c3a1a7 complete,puredual/T2 next. Endpoint22 pcc/claims/PCC-20261112-839704.json passes,V2c2b7c9 corrects inverse39 in frozen d55462 to74;failure21 retained. No measured gain. |
 
 ## Session constraints
 
@@ -57,13 +57,10 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read .resume/RESUME.md and PRIME_FIELD_CHECKPOINT.md. Whole first
-forwardPsi is complete locally over F10172e1d8,source proofs4934b4/
-78176c,17standalone/136written/25modules. Actual new consumer child
-from6cf/ready1505 runs full03 process24821 since06:19:38UTC on frozen
-source02;expected25/90+five,DO NOT EDIT actual arithmetic. Root report/
-checkpoint/commit/publish from59d2 next;new own exactCI separate from
-published59d2 successful15/134/24/99cdd2. First1505 exact6cfCI43165729371
-next07:00;parent1501CI green/f74e9e. T1norms/puredual/T2covers in isolated
-copies next. Frozen forks/vault/S3/livebudget/KB and historical root
-archive-clock/C blockers unchanged;no unchanged full audits/baselines.
+Read PRIME_FIELD_CHECKPOINT.md and newest journal entries. Actual full04
+runs45249 on frozen8source02;03 interrupted/f87a99/2fe5dc retained.
+Exactroot33e/1505 heads green,a990e6/fd53e1,full logs archived;do not
+repoll unchanged. Endpoint22/V2 corrects recovery74,oldfailure21 retained.
+T1norm18 complete;pureadjoint next in originalct27 own target. Root
+correction/CI checkpoint commit/publication before next long task.
+Frozen forks/1484 C+conflict/vault/S3/livebudget/KB blockers unchanged.
