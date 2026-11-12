@@ -251,11 +251,67 @@ pub struct SparseContractor {
     pub peak_rows: usize,
 }
 
+/// The contractor's private tables use [`RowHasher`]: nothing the contraction
+/// returns depends on their order (every result is a wrapping sum of counts
+/// or a row count), so the hasher changes only speed.  The default SipHash
+/// with a random key was about a third of the instructions of a 12-bit
+/// `ic.tensor_contraction_v1` solve.
+type RowMap<K, V> = HashMap<K, V, std::hash::BuildHasherDefault<RowHasher>>;
+
+/// FxHash word mixing (rustc-hash) with a murmur3 `fmix64` finish, so the
+/// low bits a table indexes by depend on every input word.
+#[derive(Default, Clone, Copy)]
+struct RowHasher(u64);
+
+impl RowHasher {
+    #[inline]
+    fn add(&mut self, w: u64) {
+        self.0 = (self.0.rotate_left(5) ^ w).wrapping_mul(0x517c_c1b7_2722_0a95);
+    }
+}
+
+impl std::hash::Hasher for RowHasher {
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) {
+        let mut chunks = bytes.chunks_exact(8);
+        for c in &mut chunks {
+            self.add(u64::from_le_bytes(c.try_into().unwrap()));
+        }
+        let rest = chunks.remainder();
+        if !rest.is_empty() {
+            let mut b = [0u8; 8];
+            b[..rest.len()].copy_from_slice(rest);
+            self.add(u64::from_le_bytes(b));
+        }
+    }
+    #[inline]
+    fn write_u8(&mut self, i: u8) {
+        self.add(u64::from(i));
+    }
+    #[inline]
+    fn write_u64(&mut self, i: u64) {
+        self.add(i);
+    }
+    #[inline]
+    fn write_usize(&mut self, i: usize) {
+        self.add(i as u64);
+    }
+    #[inline]
+    fn finish(&self) -> u64 {
+        let mut h = self.0;
+        h ^= h >> 33;
+        h = h.wrapping_mul(0xff51_afd7_ed55_8ccd);
+        h ^= h >> 33;
+        h = h.wrapping_mul(0xc4ce_b9fe_1a85_ec53);
+        h ^ (h >> 33)
+    }
+}
+
 /// Partial contraction (Go: table). `rows` key: one byte (0/1) per edge in `edges`.
 struct Table {
     edges: Vec<usize>,
-    pos: HashMap<usize, usize>,
-    rows: HashMap<Vec<u8>, u64>,
+    pos: RowMap<usize, usize>,
+    rows: RowMap<Vec<u8>, u64>,
 }
 
 impl Counter for SparseContractor {
@@ -275,15 +331,19 @@ impl Counter for SparseContractor {
                 last[e] = i as isize;
             }
         }
+        // The fixed bits by edge, read once per row and edge below (a
+        // vertex edge indexes `last`, so it is below `num_edges`).
+        let fixed_at: Vec<Option<bool>> =
+            (0..n.num_edges).map(|e| fixed.get(&e).copied()).collect();
         let mut t = Table {
             edges: Vec::new(),
-            pos: HashMap::new(),
-            rows: HashMap::from([(Vec::new(), 1u64)]),
+            pos: RowMap::default(),
+            rows: RowMap::from_iter([(Vec::new(), 1u64)]),
         };
         for (i, v) in n.vertices.iter().enumerate() {
             t = match v {
-                Vertex::Support(v) => join_support(t, v, fixed),
-                Vertex::Func(v) => apply_func(t, v, fixed)?,
+                Vertex::Support(v) => join_support(t, v, &fixed_at),
+                Vertex::Func(v) => apply_func(t, v, &fixed_at)?,
                 Vertex::Pred(v) => apply_pred(t, v)?,
             };
             if t.rows.len() > self.peak_rows {
@@ -319,7 +379,7 @@ fn new_table(edges: Vec<usize>) -> Table {
     Table {
         edges,
         pos,
-        rows: HashMap::new(),
+        rows: RowMap::default(),
     }
 }
 
@@ -333,12 +393,12 @@ fn new_table(edges: Vec<usize>) -> Table {
 /// Insert `key` with count `c`, adding to an existing row (wrapping, as
 /// `entry(key).or_insert(0)` then `wrapping_add` does).
 #[inline]
-fn add_row(rows: &mut HashMap<Vec<u8>, u64>, key: Vec<u8>, c: u64) {
+fn add_row(rows: &mut RowMap<Vec<u8>, u64>, key: Vec<u8>, c: u64) {
     let slot = rows.entry(key).or_insert(0);
     *slot = slot.wrapping_add(c);
 }
 
-fn join_support(t: Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Table {
+fn join_support(t: Table, v: &SupportVertex, fixed: &[Option<bool>]) -> Table {
     let mut shared: Vec<usize> = Vec::new(); // indices into v.e bound in t
     let mut shared_pos: Vec<usize> = Vec::new(); // their positions in t
     let mut fresh: Vec<usize> = Vec::new(); // indices into v.e not yet bound
@@ -351,11 +411,11 @@ fn join_support(t: Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Ta
         }
     }
     // Group the vertex rows (restricted to fixed bits) by their shared part.
-    let mut groups: HashMap<Vec<u8>, Vec<Vec<u8>>> = HashMap::new();
+    let mut groups: RowMap<Vec<u8>, Vec<Vec<u8>>> = RowMap::default();
     for r in &v.rows {
         let mut ok = true;
         for (i, e) in v.e.iter().enumerate() {
-            if let Some(&b) = fixed.get(e) {
+            if let Some(b) = fixed[*e] {
                 if b != r[i] {
                     ok = false;
                     break;
@@ -397,7 +457,7 @@ fn join_support(t: Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Ta
     out
 }
 
-fn apply_func(t: Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result<Table> {
+fn apply_func(t: Table, v: &FuncVertex, fixed: &[Option<bool>]) -> Result<Table> {
     let mut in_pos = Vec::with_capacity(v.in_.len());
     for &e in &v.in_ {
         match t.pos.get(&e) {
@@ -439,7 +499,7 @@ fn apply_func(t: Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result<
         let mut ok = true;
         for (i, &b) in res.iter().enumerate() {
             let e = v.out[i];
-            if let Some(&fb) = fixed.get(&e) {
+            if let Some(fb) = fixed[e] {
                 if fb != b {
                     ok = false;
                     break;
