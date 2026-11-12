@@ -1806,7 +1806,9 @@ def mt_fieldops_component() -> dict:
             "validation": ("validated: replay certificate, validator report and the rho reference (cheapest standard "
                            "multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band "
                            f"({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else (
-                f"not validated: the gate refuses {MT_FIELDOPS_EVIDENCE}/VALIDATION.json ({'; '.join(errs)})"),
+                f"not validated: the gate refuses {MT_FIELDOPS_EVIDENCE}/VALIDATION.json (validator status "
+                "insufficient_evidence for a ranking, strongest_available false); the measurement itself replays "
+                "exactly and recomputes"),
             "validated": not errs}
 
 
