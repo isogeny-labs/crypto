@@ -1,5 +1,16 @@
 # Lead stub: low-degree embeddings with small value set for the DLP with auxiliary inputs
 
+> **Update 2026-11-12 (vault unlocked): do not file as a new lead.** The atlas already covers this family.
+> `ledger/proposals/IDEA-20260930-6bde2d.yaml` (status `proposed`, linked from `LEAD-RHO-cheon-deployed-applicability`) prices
+> "every branch of the polynomial-embedding family (Cheon r − 1 with f = x^d; Cheon r + 1 with Dickson f; Satoh's Φ_k; Kim–Cheon's
+> general f of degree d)" under a supply cap `q_max`: gain at most `√d ≤ √q_max`, so exponent `e ≥ 1/2 − log₂(q_max)/(2 log₂ r)`.
+> The existence question below changes which `d` are usable, not that ceiling. It belongs as a note on the existing lead.
+>
+> That proposal marks `τ_f ≤ deg f` as "recalled, not verified". It follows from degrees alone **(derived here, not read from the
+> source)**: `f(x) − f(y)` has total degree `d`, and each absolutely irreducible factor has degree at least 1, so there are at most
+> `d` of them. Equality means `f(x) − f(y)` splits into linear factors, as for `x^d` when `μ_d ⊂ F_r`. The ePrint 2012/609 PDF
+> returned 403 to automated fetches on 2026-11-12, so the paper's own statement is still unread.
+
 Proposed id: `LEAD-RHO-cheon-value-set-embedding`. Proposed family: `generic`. Proposed disposition: `open_unexamined`.
 This is a stub for the atlas owner to file. It is written here because the atlas in `crypto-autoresearcher` is vault-encrypted and
 could not be read or written from this session. Every statement is `[pcc:unverified]`.
