@@ -1,0 +1,12 @@
+[
+  {
+    "name": "ChainCompression.two_hop_double_cleared",
+    "claim_path": "pcc/claims/PCC-20261112-1b3e8b.json",
+    "statement": "theorem two_hop_double_cleared {J0 J1 J2 E0 E1 E2 : Type} [IntModule J1] [IntModule J2] [IntModule E1] [IntModule E2] (f : J0 \u2192 J1) (g : J1 \u2192 J2) (h0 : J0 \u2192 E0) (k1 : E1 \u2192 J1) (h1 : J1 \u2192 E1) (k2 : E2 \u2192 J2) (a : E0 \u2192 E1) (b : E1 \u2192 E2) (hf : \u2200 x, (4 : Int) \u2022 f x = k1 (a (h0 x))) (hg : \u2200 x, (4 : Int) \u2022 g x = k2 (b (h1 x))) (hm : \u2200 e, h1 (k1 e) = (4 : Int) \u2022 e) (gl : \u2200 n : Int, \u2200 x, g (n \u2022 x) = n \u2022 g x) (bl : \u2200 n : Int, \u2200 e, b (n \u2022 e) = n \u2022 b e) (kl : \u2200 n : Int, \u2200 e, k2 (n \u2022 e) = n \u2022 k2 e) : \u2200 x, (16 : Int) \u2022 g (f x) = (4 : Int) \u2022 k2 (b (a (h0 x)))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/ChainCompression.lean",
+      "theorem": "ChainCompression.two_hop_double_cleared",
+      "decl_sha256": "58d72fb043b9540a2e230edf703fa9474cd4f16c5a30697a0254826fa514a5c1"
+    }
+  }
+]

@@ -3,6 +3,8 @@
 #[cfg(test)]
 mod full_class_group_replay;
 #[cfg(test)]
+mod geometric_isotypy_inputs;
+#[cfg(test)]
 mod kernel_replay;
 #[cfg(test)]
 mod legacy_jacobian;

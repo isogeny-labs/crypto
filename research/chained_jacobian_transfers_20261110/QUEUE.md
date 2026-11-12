@@ -42,9 +42,10 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT25a | written global argument/partialLean/even-degree negative control complete locally;unsigned | Explain actual F101 descent using odd coefficient degree,without rational sign witnesses. | ODD_FIELD_DESCENT_PROOF.md/6b3ff6,6written conditional module/ring lemmas and9standalone tests/strictClippyb33222. Stable kernels+targetAut±1+F101³ imply fixed Hom sign. Even-degree twist109/95/all109² additions cd2506 preserves why oddness matters. Old proofs unchanged;new rootCI separate. |
 | CT26 | complete/ready1498/exactCI succeeds;unsigned | Lazy canonical root tables without arithmetic changes. | Consumer25fd/1498 against1496,full25/82+five3c6362/root089c42. Exact43144567065 succeeds,signedjobskips,full205514 in5ceb. Canonical roots17/1013f015c,written718425/filter1da835/report5e1f22 retained. |
 | CT27 | complete/ready1501;ownCI succeeds;unsigned | Independently replay arbitrary balanced degree0/1/2 classes beyond49kernels. | FULL_CLASS_CHECKPOINT.md:consumer5ceb ready1501 against1498,full25native/83reference+five93b147/root18115e,post-run frozen hashes unchanged. Both full12317 corpora/negations/doubles/paired sums pass existing-Cantor12/Clippy/sourceguards4b2aa9,writtenb71a87,partial7d9a53/final89916e. Timestamp-only correctione15346/root279a08 preserves05. Exact5cebCI43157257094 green/fullf74e9e. No all151M pairs or independent map-membership claim. |
-| CT28 | first forward complete;actual full04 running after interrupted03;unsigned | Evaluate fixed Psi over F101 with original controls. | Whole native72e1d8/global78176c/4934b4;actual source02/1da990 frozen/full04 session45249,expected25/90+five. Interrupted03 f87a99/2fe5dc retained. Ready1505 exact6cf green25/85+five fd53e1/root282f74. Sourcecontrol22/839704 andV2c2b7c9 correct frozen recovery39 to74;all negatives retained. |
-| CT28a | pure first adjoint complete locally;unsigned | Remove extension-field evaluation in the reverse first hop. | Native24/dcbb58 all12317 olddual/bijection/group/both norm7/all reverse109/113 endpoints,strictClippy;written526f9f,T1norm18/c3a1a7,T0pullbacks5143f5. Existing engines/fixed data;no timing claim. |
-| CT28b | T2 global covers/independent19 suite complete;runtime adapters running;unsigned | Prime-field second hop and outer norm/pullback chain compression. | T2construction412aba/independent2fee3f/globalf9cf19/root19bfd777;exact pole Frobenius4 field vs failed27/bf2591 retained. DirectT2norm/pullbacks30 session6534 require full oldH2/R2P2/group/exception controls. Next puresecondhop/compressedtwohop. |
+| CT28 | whole actual firstforward complete/ready1506;unsigned | Evaluate fixed Psi overF101 with original controls. | b2972eb51/treeae092d91,full25native/90reference+five76871d/root6e000a/all8source02 unchanged,finalreport6a9aa0/root2e8d14,packaging4faed6. Ready1506 targets1505/6cf;ownworkflow submitted08:08,initialrunlistempty/runIDpending,next09:00. Interrupted03 retained. |
+| CT28a | isolated firstadjoint complete;actual full92 running;unsigned | Prime-field reverse firsthop without changing old controls. | dcbb58/526f9f all12317 olddual/bothnorm7/reverse109/113 endpoints. New actual child fromb297/1506 source02ccfb25/root6985e8 preserves exact olddual_reference;full03 session53904 on9frozen sources,expected25/92+five. Failed privatefield01/bb323e retained. |
+| CT28b | T2adapters and puresecond/compressedforward complete;reverse runtime active;unsigned | Evaluate whole chains via outer norms/pulls. | e383f2 all12317 T2norms/all109/113 pulls/24650sums;pipeline33/8e0523 all12317 oldsecond+compressed/staged matches/source196 controls. General-n written89e13d/two localbound Lean1b3e8b/167fc6,138/26. Reverse01 session76293 frozenoriginalct27;newreportdcb5a2/fullroot20 829d69. |
+| CT28c | written geometric distinction and native inputs complete;unsigned | Distinguish actual unpolarized Jacobians over the algebraic closure. | b05286:primary ordinaryEnd fields -355/-283 plus old actual elliptic embeddings/unique connected norm kernels and j12/87/47. Rust inputs5c1a1b/full20 829d69;CT37 prior credited,twistcd2506 retained. Actual geometry written,not native End/isomorphism computation or full Lean construction. |
 
 ## Session constraints
 
@@ -59,11 +60,10 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read PRIME_FIELD_CHECKPOINT.md/newest journal. Actual full04 runs45249
-on frozen8source02;T2adapters30 run6534 on frozenT1prototype sources.
-Purefirstadjointdcbb58 and T2globalf9cf19/independent2fee3f/root19bfd777
-complete;commit/publish source-changing checkpoint/report/newCI now.
-Then puresecondhop and compressed outer norm/pullback whole-chain formula.
-Root848 evidence-only focusedCI inapplicable by pathfilter;prior33e green
-scope17/136/25 separate. Fixed green parents no unchanged polls. Frozen
-forks/1484 C+conflict/vault/S3/livebudget/KB blockers unchanged.
+Read PRIME_FIELD_CHECKPOINT.md and newest journal. Actual adjoint full03
+runs53904 on9frozen source02;isolated reverse01 runs76293 on7frozen
+prototype sources. Ready1506/b297 firstforward full90 accepted,ownCI
+initialrunIDpending/next09:00. Root971 exact43177796116 next08:39,
+scope19/136/25. Commit/publish new20/138/26/compression/geometry/report
+checkpoint now,then new exact-headCI. Fixed green heads no unchangedpolls.
+Keep frozen subjects/forks/vault/S3/budget/KB blockers;no broad reruns.

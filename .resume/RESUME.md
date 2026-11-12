@@ -1,88 +1,114 @@
-# Current — prime-field first transfer in both directions;T2 certificates
+# Resume — compressed prime-field chain and geometric distinction
 
-Published parent8487859d7aa48d13b0defe7928d915d67352c01f/tree9093c7ef2196a22acae550fa4f0f8e4f1f44b285
-preserves endpoint correction/native839704,CI archives and interrupted03.
-Its evidence-only diff is outside focused workflow push path filters;
-do not dispatch an unchanged re-green just for its SHA. Prior33e exact
-43170740419 SUCCESS25native/17standalone/25modules/136written helpers,
-fulla990e6. New source-changing checkpoint below has19standalone tests;
-its own exact-headCI is required separately. Scientific standing unsigned.
+Published parent9712627653dd163442dd20c03061c10b9bb7011e/tree98cb62bd0f838a746043af5cb80539b06984064d
+has exact focused43177796116 initiallyrunning,next check08:39UTC.
+That frozen scope is25native/19standalone/136written/25modules. Earlier
+33eCI43170740419 SUCCESS25/17/136/25 is fulla990e6. Evidence-only848
+did not match focused path filters. New source-changing checkpoint below
+has20standalone/138written/26modules and needs its own exact-headCI.
+Scientific standing unsigned throughout. [pcc:unverified]
+
+READY actual first-forward consumer1506:
+https://github.com/isogeny-labs/cryptanalysis/pull/1506
+headb2972eb51fd794e1a6061c41fd5f3828890c08e3/treeae092d91f6c5873a6c4d288eab67ef6b32c15352,
+base immediate1505/6cf. Full check.sh04 EXIT0:25native/90reference unit+
+five integrations/one historical ignored,all guards/fmt/strictClippy,
+all8source02 unchanged. Consumer76871d/root6e000a pins whole131756-byte
+raw→standardXZ14932/hash/roundtrip. Interrupted03 partial48451/sourcehash/
+metadata f87a99/root2fe5dc retained. Final2page6a9aa0/rootmirror2e8d14,
+written1ebbb3,packaging4faed6:ledger133/benchrec16/prose0 and130claim
+records128notcovered2localpass0fail/expectedexit2. Exact object13/879d6d
+published without refs,then connector readyPR1506. Focused workflow was
+submitted08:08,initialrunlistempty;runIDpending,nextmeaningfulcheck09:00.
+Do not re-dispatch or repoll before cadence. Keepb297 fixed.
 [pcc:unverified]
 
-First forward native15/72e1d8 and NEW pureF101 adjoint24/dcbb58 both
-check all12317 old outputs/bijection/paired sums/negations/identity/model
-controls. Adjoint additionally checks both whole-domain compositions7,
-every109/113 reverse embedded endpoint,selected dual coefficients/scale29.
-Constructors/evaluators use accepted fixed data and existing F101
-field/poly/elliptic/Kohel/Balanced engines;old references/enumeration stay
-separate. Global written4934b4/78176c/526f9f retain Picard/quotient/
-polarization dependencies. No global inverse4 morphism or timing claim.
-All4T0/T1pullbacks5143f5 and bothT1norm18/c3a1a7 remain accepted.
+ACTUAL current consumer branch research/chained-transfer-prime-field-adjoint-20261112
+startsb297. Source02/ccfb25/root6985e8 passes strictClippy/exact guards:
+SevenChain.dual selects standalonePrimeFieldAdjoint,exact old body remains
+dual_reference and new full comparison calls it explicitly. Existing
+forward/reference/quarter/naive/test suffix and Balanced/cover/Lagrange/
+point sources unchanged. T1norm18 source and adjoint24 evaluator arithmetic
+byte-identical;helper delegates to existing point enumerator. Failed private-
+field01/bb323e preserved. All9actual source02 files frozen.
+FULL changedcheck.sh03 RUNNING53904 since08:17:19UTC,raw
+/workspace/scratch/ct31-adjoint-complete-03.txt,own consumer target.
+Expected25native/92reference unit+five integrations/one historical ignored.
+DO NOT EDIT actual9sources until terminal status/afterhash;then finalnew
+report/PCC/commit/readychild1506. No completion asserted. [pcc:unverified]
+
+Accepted isolated firstforward72e1d8/adjointdcbb58 remain fixed:
+every12317 old output/bijection/paired sums/negation/model controls;
+adjoint both complete norm7/every reverse109/113 endpoint/dual coefficients
+and checked scale29. Written4934b4/78176c/526f9f retain actual geometric
+norm/Picard/quotient dependencies. T1norm18/c3a1a7 and fourpullbacks5143f5
+accepted. No new global inverse4 morphism or timing claim. [pcc:unverified]
+
+T2 exact covers/globalf9cf19 and independent2fee3f/construction412aba
+are fixed. T2E109 pole fibre has exact Frobenius orbit4 inFp[z]/(z^4-2),
+absentFp6;failed27/bf2591 retained. T2adapters30/e383f2 pass every12317
+oldH2 output/group cases per factor and every109/113 oldR2P2/all24650
+ordered sums/norm4/offdiag0/signed infinity drops2/1. Routes are
+[3,236,0,0,122,112,11844] and[3,236,2,232,108,106,11630],linear poles0/4,
+repeated118each. First pole orbit4 produces no degree<=2 rational pole
+support;no cases dropped. Existing arithmetic bodies reused. [pcc:unverified]
+
+NEW accepted pipeline33/8e0523:secondforward every12317 exact oldsecond
+output/bijection/group/model/wrongquarter/selectedbeta coefficient checks;
+compressed wholeforward every12317 equals oldsecond-after-accepted-purefirst
+and stagedpuresecond-after-purefirst. Every109/113 original source scalar,
+directK2betaalpha endpoint,fullreverse196/recovery104or64 also passes.
+Only outerT0norms/one quarter/alpha thenbeta/outerT2pulls in compressed API.
+Accepted first72e1d8 reference dependency explicit,no independent map/kernel
+or timing claim. [pcc:unverified]
+
+Written CHAIN_COMPRESSION_PROOF_V2.md/89e13d derives general-n
+4F_n=K_n(phi_n...phi_1)H0 from middleH_iK_i=4 and cancellation in Hom.
+Geometric point groups are not assumed torsion-free. Two individually
+bound local Lean helpers1b3e8b/167fc6 prove cleared16-versus4 and rational
+factorization under explicit multiplication4 injectivity.138written/
+26modules,zero trusted;actual geometry stays written. Old71048c/prose-
+lint warning and missing-PATH33a0d5 retained;do not edit frozen subjects
+or rerun binding scripts/duplicate claims. [pcc:unverified]
+
+NEW written GEOMETRIC_JACOBIAN_DISTINCTION.md/b05286 extends the old
+base-field-only distinction. Primary ordinaryEndQ fields -355/-283 give
+geometric crossHom0;old actual elliptic embedding/norm certificates give
+unique connected elliptic subvarieties. An unpolarized geometric surface
+isomorphism would identify actual E109 factors with j12/87/47,impossible.
+All three fixed Jacobians are geometrically nonisomorphic conditional on
+the explicit old Picard/embedding constructions. Existing-engine Rust
+input34/5c1a1b checks all6 counts/j/ordinary/discriminant inputs;no native
+isomorphism or End-ring computation. ExternalCT37 exact9d100 credited,
+Galbraith Ch9/10 primary review done,twistcd2506 retained. Changed full
+standalone35/829d69 passes20tests/strictClippy/fmt/reference+legacy guards.
+Source-linked compressed report dcb5a2 has2final inspected pages/PDF51664
+bytes,with pending actual/reverse scopes explicit;failed render7b68b0 kept.
 [pcc:unverified]
 
-NEW T2 exact covers ofF2=[95,93,43,39,92,17,1],low coefficients first:
-E109''(59,27):N[97,93,7,0,97],Q[55,0,1],M[71,49,20,63],q(97,63).
-E113''(23,7):N[74,0,81,42,64],Q[23,0,1],M[37,9,9,35],q(64,35).
-Construction25/412aba matches118finite or116finite+2origin oldH2
-witnesses. Original3 constructors regress26 successfully. Independent
-flat-field28/2fee3f checks complete118domains/exact identities/irreducible
-sextic/gcd/separabledegree4/infinities/four geometric poles/negative
-codomain controls. E109 pole fibre has exact Frobenius orbit4 in
-Fp[z]/(z^4-2),absentFp6;E113 has rational(49,12)/(49,89) poles.
-Failed degree6 assumption27/bf2591 preserved. Written T2_QUARTIC_PROOF.md/
-f9cf19 uses old norm4/Picard degree and Milne difference bound16 to
-identify old centred maps globally. Full changed standalone29/bfd777
-passes19tests/strictClippy/old source guards/fmt.136written/25modules
-unchanged. New two-page adjoint-t2 report inspected and pinned separately;
-old reports/proofs/receipts remain immutable. [pcc:unverified]
+ACTIVE isolated original/workspace/scratch/ct27-prototype:
+new secondadjoint/compressedreverse native01 RUNNING76293,
+raw/workspace/scratch/ct32-prime-reverse-native-01.txt,strictClippy01
+passes,7source hashes frozen01. Expected2meaningful tests:all12317
+oldseconddual/group/bothnorm7 and compressedreverse/bothnorm49/every
+original source196/recovery. Firstdcbb58 reference dependency explicit.
+DO NOT EDIT this prototype until actual completion/custody. T1prototype
+is free after acceptedT2adapter30. [pcc:unverified]
 
-T2 runtime adapters30 currently RUNNING6534 in T1prototype own target,
-raw/workspace/scratch/ct30-t2-adapter-native-30.txt,source/clippy30.
-Require all109/113 oldR2P2 outputs/norm4/offdiag0/all24650 ordered sums/
-signed infinity drops[2,1],and each12317 oldH2 outputs/group/model checks.
-Expected E109 degree<=2 rational pole support0 because orbit4;E113
-4linear/232partial/2all-pole supports,118repeated each. Do not edit this
-prototype while30 runs. Actual consumer8sources remain frozen separately.
-Next puresecondhop and compressed whole-chain outer norm/pull formula.
-[pcc:unverified]
-
-ACTUAL consumer branch research/chained-transfer-prime-field-psi-20261112
-starts6cf2f1a9902b3babeec56d62a9983891b9ffb079. Whole-prime source02/
-1da990 routes existing forward through standalone evaluator;exact old
-forward_reference and olddual/naive/test suffix/reducer arithmetic remain.
-FULL unchanged-source retry04 RUNNING45249 since07:10UTC,raw
-/workspace/scratch/ct30-prime-complete-04.txt,own consumer Cargo target.
-Expected25native/90reference unit+five integrations/one historical ignored.
-Attempt03 INTERRUPTED across restart,partial48451bytes/sourceafterhash/
-metadata f87a99/root2fe5dc retained. DO NOT EDIT actual8source02 until
-terminal status/afterhash,then finalnewreport/PCC/commit/readychild1505.
-[pcc:unverified]
-
-READY1505 at6cf/tree3657394da8bc42bbcad8100fa17bbb437b25ce1e targets
-immediate1501/5ceb. ExactCI43165729371 SUCCESS25native/85reference+five/
-one oldignored,full decoded182753bytes→XZ24748/hash/roundtrip fd53e1/
-root282f74. Localfull301fbe/final2page2cafe5. Parent1501 exact5cebCI
-43157257094 green/fullf74e9e. Keep fixed green heads;no unchanged polls.
-[pcc:unverified]
-
-Endpoint22/839704 all109/113 source/scalar/destination/norm4/reverse28/
-recovery/negative controls passes. V2c2b7c9 explicitly corrects inverse28
-to74mod109/109mod113;frozen originald55462/wrong39 and failed21/122fda
-remain. Cache19zero/8aef88,fresh20lint/24a6e1,adjoint23lint/9cf501 retained.
-Never share Cargo targets between identical scratch package clones.
-[pcc:unverified]
-
-Parent1484 thirdquiet05:11 unchanged conflict/C findings;pause until
-activity or freshpremerge. Integrate bottom-up after actual gates and
-retarget/rerun after parents land. Frozen root/consumer ledger forks and
-root full-library6184pass/13fail/133ignored/archives-clock/broadPCCf117f7
-historical missing subjects persist. No unchanged broad audits/baselines,
-force/rebase/rechain/lineage choice or feature-base auto-merge.
+Parent1505 fixed6cf exact43165729371 SUCCESS25/85+five,fd53e1/root282f74;
+parent1501 fixed5ceb exact43157257094 green/f74e9e. Parent1484 thirdquiet
+05:11 unchanged conflict/C findings;pause quietpolls untilactivity or
+freshpremerge. Integrate bottom-up after actual gates and retarget/rerun
+after parents land. Frozen root/consumer ledger forks remain;no force,
+rebase,rechain,drop or lineage choice. Root full library6184pass/13fail/
+133ignored/archives-clock and broadPCCf117f7 historical missing subjects
+are unchanged;do not rerun unchanged broad audits/baselines.
 [pcc:unverified]
 
 Atlas crypto-autoresearcher8edec422a vault locked/KEY absent,no plaintext
-writes. KB/ecdb unavailable;S3/profile/livebudget unavailable,no solver,
-benchmark,paidjob or checkpoint bypass. ExternalCT37 exact9d100 note
-read,ordinary End-fields -355/-283 relevant prior work;primary Galbraith
-Ch9/10 reviewed,independent adoption/geometric distinction still open.
-No novelty or measured advantage claim. Continue next unblocked task.
+writes. KB/ecdb tools unavailable,S3/profile/livebudget unavailable,no
+solver/collector/benchmark/paidjob or checkpoint bypass. Matched cold
+construction/transfer/solve/recovery/verification costs remain open.
+Continue next unblocked task;after actual adjoint checkpoint integrate
+T2secondhop/compressed maps in another immediate child. No novelty or
+measured computational advantage claim. [pcc:unverified]
