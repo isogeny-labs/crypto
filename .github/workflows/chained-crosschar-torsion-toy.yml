@@ -26,6 +26,14 @@ jobs:
         run: |
           python3 -B research/cross_characteristic_global_torsion_20261112/toy_transfer.py
           python3 -O -B research/cross_characteristic_global_torsion_20261112/toy_transfer.py
+      - name: CT51 degree-eight global torsion bridge - Python and optimization replay
+        run: |
+          python3 -B research/cross_characteristic_global_torsion_20261112/ct51/degree_eight.py
+          python3 -O -B research/cross_characteristic_global_torsion_20261112/ct51/degree_eight.py
+      - name: CT51 independently encoded degree-eight field - JavaScript
+        run: |
+          node research/cross_characteristic_global_torsion_20261112/ct51/independent.js
+          node --no-opt research/cross_characteristic_global_torsion_20261112/ct51/independent.js
       - name: Independent JavaScript verifier and negative control
         run: |
           node research/cross_characteristic_global_torsion_20261112/independent.js
