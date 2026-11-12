@@ -1,3 +1,134 @@
+# Latest completed component — unbalanced models ready to commit
+
+Full34/925b02+622guards,algebra23/f404e3+11guards/sevencerts/oldfivebyteidentical,
+two exactlyboundlocalpassLean1bde23/d03d51;171written34modules/0trusted.
+Writtenactualmodel/globalquotientdegree7/49/nonuniformnorm128eb1. Report
+pcc/claims/PCC-20261112-7ae0d2.json final54768-byte2pagePDF/bothpagesinspected. Governancepcc/claims/PCC-20261112-9ee593.json
+own51dprefix888/prose0/diffpass;benchrec189existinggaps/106unchangedrecords.
+[pcc:unverified]
+
+NEXT scopedrootcommit parent51d76d91817317b2be98abeb6c79e68dac31e5ce,
+artifactgate/exactobjects/nonforcedexpected51dCAS/ready3877+queue3904/ownpushCI.
+Newsourceexpected34native/23algebra/sevencert/34modules171written;compiled197
+expectednotownCIobserved. No duplicate manualdispatch. Noactivejobs.
+Consumerf656own43246121013 check16:07UTC. Root51d43239467137SUCCESS/full2c4744
+settled. ThennewpartialFrobeniusprotocol/actualgraphdiagnostic;wholeB/Copen.
+No paidrun/benchmark/force/rebase/lineagechoice;allcurrentgatespersist.
+
+---
+# Current active checkpoint — unbalanced model phase A complete; package root next
+
+Root LOCAL/REMOTE51d76d91817317b2be98abeb6c79e68dac31e5ce/treeae34b568.
+OwnCI43239467137 SUCCESSall4jobs full2c4744:25/33/23/fivecert/195compiled/
+169written33modules/0trusted. Settled, do not repoll. Rootauto-merge enabled;
+actual main/frozenledger/C/archive/signing gates remain. [pcc:unverified]
+
+NEWUNCOMMITTED phaseA:full34/925b02,all622inputsunchanged,whole82084→XZ9716;
+selected1/33filteredfeff57. Actual rawC10=[89,0,93,0,8,0,61],C20=[40,0,45,0,75,0,18],
+no retwist/bothleading+constantnonsquare;120finitepoints each/noF101infinities,
+fullcovers/extensioncorners/ramifiedroots/actualGamma21+6/Q20A6/zeta accepted.
+Two boundLean1bde23/d03d51 gate01/0trusted;171written34modules (197compiled
+expected,notownCIobserved). Algebraf404e3 full23/11guards/sevencerts,oldfive
+byteidentical. Writtenmodel/globalquotientdegree7/49/nonuniformnorm128eb1
+pinned;do not editproofV1 (bibliographic Mille typo means Milne). PhaseB/C
+wholeJacobian maps/kernel/dual/12317corpus/T20 notexecuted. No active job.
+[pcc:unverified]
+
+Consumer1509 LOCAL/REMOTEf656cf33236329c20696e0cb0a49fc74e0263950/tree73c245c4
+normalchildof1f13482f of failed8f456314; artifactpolicyexactledgerkeep only.
+OwnCI43246121013 next16:07UTC, fullold98+five and independent0796/32native/
+23algebra/2cert/186compiled160written32modules. No earlypoll. Fullno-rg04
+22ad5d(root8533ad) all695upstream+9driverhashes unchanged;129-filetar.xz55488.
+Admissioncontrols b68790 reject2/nooutput. Oldfailed8fCI55e8da/root e76fea
+kept. Old13Rust/check.sh/75a and independent0796 pins unchanged. [pcc:unverified]
+
+NEXT finish unbalanced source-linkedreport/figures/inspectedPDF/governance,
+scopedrootcommit parent51d, artifactgate/exactobjects/nonforcedexpected51d
+CAS/readyPR3877+queue3904/ownpushCI (no duplicate manualdispatch). Then new
+partialFrobenius proposal: Galbraith9.6.14/15/24+MilneII1 reviewed, need
+pairing/globalgroup-scheme source review/newprotocol before actualgraph code.
+All graphclass/degree-cost hypotheses unexecuted; keepB/C queued.
+
+No subagents/paidrun/solver/benchmark/force/rebase/rechain/lineagechoice.
+Livebudget/S3/vault8edec422/KB/frozenledger/C/signing blockers persist.
+Continue after each component; current GitHub queue3904 is durable.
+
+---
+Earlier checkpoints below; this header controls current state and cadence.
+
+# Latest active checkpoint — consumer portable parser no-rg replay04 running
+
+Root LOCAL/REMOTE51d76d91817317b2be98abeb6c79e68dac31e5ce/treeae34b568,
+139paths/published4acd0e. OwnCI43239467137 next15:29UTC,33/23/fivecert/
+169written33modules,195compiledexpectednotobserved. Old0796 own43230599875
+SUCCESSall4jobs/fullbfbd6b,settled. Rootauto-mergesetup--auto--merge exit0;
+actualmain/frozenledger/C/archive189/signing gates remain. [pcc:unverified]
+
+Consumer1509 exact8f4563147cf6f918c3096b4712f124fc50accf48 CI43232186220
+OVERALLFAIL:reference25native/98+five/oldignoredSUCCESS;independent32passes
+thenrgmissingline48exit127,algebra/proofsNOTRUN. FullbothUTF8logs/API/XZ/
+hash/roundtrip consumer55e8da/root e76fea. Failedheadsettled. [pcc:unverified]
+
+V4/d46be5 changesonly3newdriverparsers togrep/samefullregex,deterministic
+sameLeanfiles,pre-outputtoolschecks. Old13Rust/check.sh/75a/reference75min
+job andindependent0796pin unchanged. Admissionb68790 wrongHEADdd03,
+dirtyJSONandmissinggrep allreject2/nooutput. Fullno-rg04 ACTIVE session87739,
+20minbound,raw /workspace/scratch/ct42-independent-full-04.txt;runout
+/workspace/scratch/ct42-independent-run-04;9driverfrozenmanifest
+ct42-integration-source-04.sha256. Shim ct42-no-rg/rg alwaysreject127.
+DO NOT edit9driversubjects (driver/pin/workflow/oldcheck/pin/protocolV1–V4)
+orcloneprotectedsourcewhileactive. Currentproofgatepartialpassed;no whole
+04resultyet. No othernative/proofjob. [pcc:unverified]
+
+NEXT terminal04/status/9afterhash/upstreamhashes;archivewholeruntree+shim+
+admissions+source snapshots+transcript/times/status into ONE tar.xz/perfile
+SHA/exactroundtrip,PCCconsumer+rootmirror. Newreport_V2/figures/PDF inspected,
+problemrecordinputclosure marklocalonly,currentgovernance/prefix8f/PCC/
+artifact/diff,commitextendexisting1509/expected8fnonforceCAS/newfull98+
+independentCI. Keepfailed8fhead/failure55e8da andall earlierreportsimmutable.
+No unchanged98localrerun;its actualreferencejobgreen. ThenunbalancedphaseA
+underfrozenprotocoldc75fb: NO unbalancedcode/run yet. [pcc:unverified]
+
+CurrentrootCI/publication/consumerfailure/protocol/journals dirtyafter51d;
+include nextsourcecheckpoint. No subagents,paidrun,benchmark/solver,force/
+rebase/ledgerrewrite/lineagechoice. Livebudget/S3/vault8edec422/KB/frozen
+ledger/C/signing blockerspersist. Continueaftercomponentcheckpoint.
+
+---
+Oldercheckpointsbelow;latestheadercontrolsactivejob/nextaction/cadence.
+
+# Current active checkpoint — cycle/catalog published51d; unbalanced models next
+
+Root LOCAL/REMOTE51d76d91817317b2be98abeb6c79e68dac31e5ce,
+treeae34b568a37cbca8f43297670bf57c942ae5d049,parent0796,139paths/artifact/
+exactobjects31/nonforcedCAS/refconfirmed. OwnpushCI43239467137 initialinprogress,
+next15:29UTC for33standalone/23algebra/fivecert/169written33Leanmodules plus25.
+Expectedcompiled195notyetbulkobserved. No manualduplicate. [pcc:unverified]
+
+Old0796 exact43230599875 SUCCESS4jobs25/32/23/twocert/160written32modules/
+186compiled/0trusted,full4UTF8logs/API/XZ/hash/roundtrip pinned;settled.
+Consumer1509fixed8f4563147cf6f918c3096b4712f124fc50accf48,immediate1508,
+own43232186220 next14:47UTC;full98+five andindependent0796scope32/23/32modules.
+Do notmoveconsumerpin/sourceor pollsettledheads. [pcc:unverified]
+
+NEXT freezeunbalancedmodel/map protocol afterprimaryreviewalreadyinprogress:
+actual(7,1)two-glue C0→C(E1,F0) and(49,1)four-glue T0→T(E2,F0),existing
+HLP/Richelot/Cantor only. StartwithactualGalois2graph/HLPmodel/completecover
+identityandexceptionchecks,thenwholeJacobian rationalmap. Leadingcoefficient
+maynotbesquare;recordrawmodelanddo notsilentlyretwist. CT44one-factor7
+four-gluepolarizationnegativealreadyknown. Preservefullcorpora/primefield/
+geometrickernel/dual/proof/report/PCC requirements. No active nativejob.
+
+CurrentnewCI/publicationreceipts andjournals aredirtyafterfixed51d;include
+nextsourcecheckpoint. Fullcycle33/70a16a,algebra8d3d02,ninebound16933,
+writtenf48205+standingV2b7c7e7,report88b97e(5inspectedpages),governance0110a5.
+Unknownlivebudget/S3/vault8edec422/KB andfrozenledger/C/archive189/signing
+blockers unchanged. No subagents,paidrun,solver/benchmark,force/rebase/ledger
+rewriteorlineagechoice. Keepgoingaftereachcomponent.
+
+---
+Earliercheckpointsbelow;latestheadercontrolsnextstepandCIcadence.
+
 # Current active checkpoint — cycle/catalog complete; publish next source
 
 Root LOCALHEAD still0796b36df6ee9712bfa335d81191abc26ed937ce withcompleted

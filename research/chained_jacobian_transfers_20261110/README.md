@@ -1,3 +1,15 @@
+# New component: two actual unbalanced-transfer models
+
+C10/C20 are constructed overF101 withoutretwist;fullnative34/925b02,
+algebra23/sevencerts/f404e3 andtwoboundLean1bde23/d03d51 acceptthemodel/
+cover/graphphase. Writtenquotientproof128eb1 givesglobaldegree7/49 and
+nonuniformnorms. WholeJacobianmaps/duals/kernels/full12317corpus/T20remain
+phaseB/C. Reportpcc/claims/PCC-20261112-7ae0d2.json,editablefiguresandinspectedtwo-pagePDF:
+[reports/unbalanced-models/REPORT.md](reports/unbalanced-models/REPORT.md).
+Allscientificstandingunsigned. Root51dCIgreen2c4744;consumerf656CIpending.
+[pcc:unverified]
+
+---
 # New component: actual gluing cycle and fixed quotient catalog
 
 Fullnative33/70a16a,algebra23/8d3d02,nineboundLean169written33modules;

@@ -1,6 +1,8 @@
 //! Actual torsion coordinates along bounded oriented seven-isogeny cycles.
 //! Existing Kohel/field/elliptic/Cantor engines only; no timing or solver.
 use super::*;
+#[path = "unbalanced_transfer.rs"]
+mod unbalanced_transfer;
 use isogeny_algos::field::Zp;
 
 type Graph = Vec<(Pt<ER>, Pt<ER>)>;

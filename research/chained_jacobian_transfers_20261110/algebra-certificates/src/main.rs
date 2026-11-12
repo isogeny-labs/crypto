@@ -156,9 +156,64 @@ fn second_monodromy() -> IdentityStatement {
     }
 }
 
+fn even_cover(direct: bool) -> IdentityStatement {
+    let [a, b, c, d, x] = ["a", "b", "c", "d", "x"].map(Expr::var);
+    let source = if direct {
+        Expr::Add(vec![
+            Expr::Mul(vec![a.clone(), power(x.clone(), 6)]),
+            Expr::Mul(vec![b.clone(), power(x.clone(), 4)]),
+            Expr::Mul(vec![c.clone(), power(x.clone(), 2)]),
+            d.clone(),
+        ])
+    } else {
+        Expr::Add(vec![
+            a.clone(),
+            Expr::Mul(vec![b.clone(), power(x.clone(), 2)]),
+            Expr::Mul(vec![c.clone(), power(x.clone(), 4)]),
+            Expr::Mul(vec![d.clone(), power(x.clone(), 6)]),
+        ])
+    };
+    let n = if direct {
+        Expr::Add(vec![
+            Expr::Mul(vec![Expr::Const(3), a.clone(), power(x.clone(), 2)]),
+            b.clone(),
+        ])
+    } else {
+        Expr::Add(vec![
+            Expr::Mul(vec![Expr::Const(3), a.clone()]),
+            Expr::Mul(vec![b.clone(), power(x.clone(), 2)]),
+        ])
+    };
+    let middle = Expr::Mul(vec![
+        Expr::Add(vec![
+            Expr::Mul(vec![Expr::Const(9), a.clone(), c.clone()]),
+            Expr::Mul(vec![Expr::Const(-3), power(b.clone(), 2)]),
+        ]),
+        n.clone(),
+    ]);
+    let tail = Expr::Add(vec![
+        Expr::Mul(vec![Expr::Const(2), power(b.clone(), 3)]),
+        Expr::Mul(vec![Expr::Const(-9), a.clone(), b, c]),
+        Expr::Mul(vec![Expr::Const(27), power(a.clone(), 2), d]),
+    ]);
+    let short = if direct {
+        "direct_short_quotient"
+    } else {
+        "reciprocal_short_quotient"
+    };
+    IdentityStatement {
+        name: format!("Nonmonic even sextic {short} cleared cubic identity"),
+        source: format!("UNBALANCED_MODEL_PROOF.md;Bruin-Doerksen3.2 and existing cubic_to_short;Lean UnbalancedCovers.{short}"),
+        variables: ["a", "b", "c", "d", "x"].map(String::from).to_vec(),
+        degree_bound: 9,
+        lhs: Expr::Mul(vec![Expr::Const(27), power(a, 2), source]),
+        rhs: Expr::Add(vec![power(n, 3), if direct { middle } else { Expr::Mul(vec![middle, power(x.clone(), 4)]) }, if direct { tail } else { Expr::Mul(vec![tail, power(x, 6)]) }]),
+    }
+}
+
 fn main() {
     let outputs = std::env::args_os().skip(1).collect::<Vec<_>>();
-    let cases: [(IdentityStatement, &[u8], &str, u64); 5] = [
+    let cases: [(IdentityStatement, &[u8], &str, u64); 7] = [
         (
             duplication(),
             include_bytes!("../../lean/QuarticGluing.lean"),
@@ -189,6 +244,18 @@ fn main() {
             "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
             0x4543,
         ),
+        (
+            even_cover(true),
+            include_bytes!("../../lean/UnbalancedCovers.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/UnbalancedCovers.lean",
+            0x4641,
+        ),
+        (
+            even_cover(false),
+            include_bytes!("../../lean/UnbalancedCovers.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/UnbalancedCovers.lean",
+            0x4642,
+        ),
     ];
     for (i, (statement, source, path, seed)) in cases.into_iter().enumerate() {
         let cert=identity::issue(statement,seed,32,"Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",Some(identity::ProofRef {kind:"lean4;pointer only;requires separate proof gate".into(),path:path.into(),sha256:hex::encode(sha256_native::sha256(source))})).expect("the issuer must reject any false identity");
@@ -213,6 +280,8 @@ fn mutated_identities_are_rejected() {
         norm_multiplicativity(),
         first_monodromy(),
         second_monodromy(),
+        even_cover(true),
+        even_cover(false),
     ] {
         statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
         assert!(matches!(

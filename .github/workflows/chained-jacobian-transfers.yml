@@ -34,11 +34,14 @@ jobs:
             research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean
             research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean
             research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean
+            research/chained_jacobian_transfers_20261110/lean/UnbalancedCovers.lean
             research/chained_jacobian_transfers_20261110/evidence/quartic-duplication-identity-03.json
             research/chained_jacobian_transfers_20261110/evidence/two-primary-halving-identity-03.json
             research/chained_jacobian_transfers_20261110/evidence/isogeny-cycle-norm-identity-01.json
             research/chained_jacobian_transfers_20261110/evidence/isogeny-cycle-first-identity-01.json
             research/chained_jacobian_transfers_20261110/evidence/isogeny-cycle-second-identity-01.json
+            research/chained_jacobian_transfers_20261110/evidence/unbalanced-direct-identity-01.json
+            research/chained_jacobian_transfers_20261110/evidence/unbalanced-reciprocal-identity-01.json
             src/hash/sha256.rs
             src/cryptanalysis/identity_certificate.rs
             docs/identity-certificates/schoenhage-10mult.json
@@ -54,12 +57,14 @@ jobs:
           cargo fetch --locked
           cargo clippy --all-targets --offline --locked -- -D warnings
           cargo test --release --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/algebra-tests.txt"
-          cargo run --release --offline --locked -- "$RUNNER_TEMP/duplication.json" "$RUNNER_TEMP/halving.json" "$RUNNER_TEMP/cycle-norm.json" "$RUNNER_TEMP/cycle-first.json" "$RUNNER_TEMP/cycle-second.json" 2>&1 | tee -a "$RUNNER_TEMP/algebra-tests.txt"
+          cargo run --release --offline --locked -- "$RUNNER_TEMP/duplication.json" "$RUNNER_TEMP/halving.json" "$RUNNER_TEMP/cycle-norm.json" "$RUNNER_TEMP/cycle-first.json" "$RUNNER_TEMP/cycle-second.json" "$RUNNER_TEMP/unbalanced-direct.json" "$RUNNER_TEMP/unbalanced-reciprocal.json" 2>&1 | tee -a "$RUNNER_TEMP/algebra-tests.txt"
           cmp "$RUNNER_TEMP/duplication.json" ../evidence/quartic-duplication-identity-03.json
           cmp "$RUNNER_TEMP/halving.json" ../evidence/two-primary-halving-identity-03.json
           cmp "$RUNNER_TEMP/cycle-norm.json" ../evidence/isogeny-cycle-norm-identity-01.json
           cmp "$RUNNER_TEMP/cycle-first.json" ../evidence/isogeny-cycle-first-identity-01.json
           cmp "$RUNNER_TEMP/cycle-second.json" ../evidence/isogeny-cycle-second-identity-01.json
+          cmp "$RUNNER_TEMP/unbalanced-direct.json" ../evidence/unbalanced-direct-identity-01.json
+          cmp "$RUNNER_TEMP/unbalanced-reciprocal.json" ../evidence/unbalanced-reciprocal-identity-01.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -146,7 +151,7 @@ jobs:
       - name: Build and audit the proof files
         run: |
           set -euo pipefail
-          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport SuccessorNorms KernelChart OddFieldDescent RootTable BalancedChart QuarticFibre ChainCompression SpectralControls ReverseRecovery IndependentMapChart SevenCensusControls QuarticGluing TwoPrimaryQuotient IsogenyCycles; do
+          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport SuccessorNorms KernelChart OddFieldDescent RootTable BalancedChart QuarticFibre ChainCompression SpectralControls ReverseRecovery IndependentMapChart SevenCensusControls QuarticGluing TwoPrimaryQuotient IsogenyCycles UnbalancedCovers; do
             tools/lean/proof-gate.sh "research/chained_jacobian_transfers_20261110/lean/$source.lean" --out "$RUNNER_TEMP/proofs-$source"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
