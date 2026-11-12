@@ -1,0 +1,32 @@
+name: Cross-characteristic torsion toy (bounded)
+
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/**'
+      - '.github/workflows/chained-crosschar-torsion-toy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  two-independent-arithmetic-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact rational and finite-field Python checks
+        run: |
+          python3 -B research/cross_characteristic_global_torsion_20261112/toy_transfer.py
+          python3 -O -B research/cross_characteristic_global_torsion_20261112/toy_transfer.py
+      - name: Independent JavaScript verifier and negative control
+        run: |
+          node research/cross_characteristic_global_torsion_20261112/independent.js
+          node --no-opt research/cross_characteristic_global_torsion_20261112/independent.js
