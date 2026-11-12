@@ -19,7 +19,8 @@ pods=$(curl -sS -m 30 "${auth[@]}" "$API/pods")
 other_rate=$(echo "$pods" | jq '[.[] | select(.desiredStatus=="RUNNING") | .costPerHr] | add // 0')
 fd_pods=$(echo "$pods" | jq '[.[] | select(.desiredStatus=="RUNNING" and (.name|startswith("fd-e14")))] | length')
 need=$(awk -v r="$other_rate" -v c="$CAP_USD" 'BEGIN{ printf "%.2f", c + 24*r }')
-admitted=$(awk -v b="$bal" -v n="$need" -v f="$fd_pods" 'BEGIN{ print (b+0 >= n+0 && f+0 == 0) ? "true" : "false" }')
+admitted=$(awk -v b="$bal" -v n="$need" -v f="$fd_pods" -v o="${OWNER_OVERRIDE:-0}" 'BEGIN{ print ((b+0 >= n+0 || o == 1) && f+0 == 0) ? "true" : "false" }')
+override=$([ "${OWNER_OVERRIDE:-0}" = 1 ] && echo true || echo false)   # Amendment 21: bypasses only the balance condition
 [ -s .resume/RESUME.md ] || { echo "fill .resume/RESUME.md first (repository rule)"; exit 2; }
 script_sha=$(sha256sum "$S/e14/run_pod_r2.sh" | cut -d' ' -f1)
 OUT_TOKEN=$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
@@ -44,8 +45,8 @@ payload=$(jq -n --arg name "fd-e14-r2-$(date -u +%Y%m%dT%H%MZ)" --arg b64 "$SCRI
 resp=$(curl -sS -m 120 "${auth[@]}" -H 'Content-Type: application/json' -d "$payload" "$API/pods")
 pod_id=$(echo "$resp" | jq -r '.id // empty')
 [ -n "$pod_id" ] || { echo "pod creation failed: $resp"; exit 4; }
-jq -n --arg id "$pod_id" --arg tok "$OUT_TOKEN" --arg sha "$script_sha" --arg bal "$bal" --arg other "$other_rate" \
+jq -n --arg id "$pod_id" --arg tok "$OUT_TOKEN" --arg sha "$script_sha" --arg bal "$bal" --arg other "$other_rate" --argjson ov "$override" \
   --arg when "$(date -u +%FT%TZ)" --argjson resp "$resp" \
-  '{admitted:true, pod_id:$id, out_token:$tok, run_pod_r2_sha256:$sha, balance_usd:$bal, other_pods_usd_per_h:$other,
-    launched_at:$when, amendment:20, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,imageName,ports})}' | tee "$R/launch.json"
+  '{admitted:true, owner_override:$ov, pod_id:$id, out_token:$tok, run_pod_r2_sha256:$sha, balance_usd:$bal, other_pods_usd_per_h:$other,
+    launched_at:$when, amendment:21, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,imageName,ports})}' | tee "$R/launch.json"
 echo "pull with: $S/e14/pull_r2.sh"

@@ -600,26 +600,23 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
 
-## Multi-target IC5 against IC4 and this harness's rho family, outside tables A–C
+## Multi-target IC against standard multi-target rho (no ranking established), outside tables A–C
 
-Many targets on one prime-order Weierstrass curve (group orders about 2^22 to 2^32, 44 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table of 4-term factor-base sums (few unknown logs, so a small relation phase) and tries x(Q ± W) with one shared inversion; the reference is the cheapest of four rho variants (anchored, sibling, x-only sibling, sequential database) at three database sizes, chosen per configuration and price, after a restart fix that made rho 1.4-4.8% cheaper. IC5 / rho and IC5 / BSGS per target, median [95% bootstrap]; the BSGS ratio is the distance remaining. Class: multi-target method. not validated against rho: the gate refuses benchmarks/20261111-mt-fieldops-v3/VALIDATION.json (validator status insufficient_evidence, strongest_available false). The rho reference is this harness's anchored, fixed-database family without Kuhn-Struik retention of finished walks; against the same family with retention IC5 is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so every §5a decision against a standard multi-target rho is unranked. The validator does validate IC5 against IC4, the multi-target IC baseline: cheaper in all 36 (cell, I/M) decisions, 0.47-0.99x (engineering).
+Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. The IC is the cheaper of ic5 (an x-only table of 4-term factor-base sums, paired trials x(Q ± W) with one shared inversion) and ic5 with retention of solved trials; the reference is the cheapest standard multi-target rho: Kuhn-Struik retention rho (x-only sibling walks) or distinguished-point rho with retention and precomputation, 15 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The decision column is the frozen rule, which prices h on hash-table operations only: with rho's per-step canonicalisations priced at h as §5a requires, every decision is unranked (IC 0.89-0.94x rho at h = 1), so no ranking against rho is established. Class: multi-target method. not validated: the gate refuses benchmarks/20261112-mt-fieldops-v4/VALIDATION.json (validator status insufficient_evidence for a ranking, strongest_available false); the measurement itself replays exactly and recomputes.
 
-| bits | T | IC5/harness rho h=0 | h=0.1 | h=1 | §5a (harness rho) | IC5/BSGS h=0 | h=1 |
+| bits | T | IC/rho h=0 | h=0.1 | h=1 | frozen rule | IC/BSGS h=0 | h=1 |
 |--:|--:|--:|--:|--:|:--|--:|--:|
-| 22 | 1024 | 0.946 [0.939, 0.953] | 0.947 [0.939, 0.954] | 0.949 [0.940, 0.958] | cheaper | 1.28 | 1.35 |
-| 22 | 4096 | 0.955 [0.953, 0.959] | 0.953 [0.951, 0.958] | 0.947 [0.943, 0.953] | cheaper | 1.19 | 1.27 |
-| 22 | 16384 | 0.960 [0.959, 0.962] | 0.957 [0.956, 0.960] | 0.942 [0.939, 0.945] | cheaper | 1.11 | 1.20 |
-| 24 | 1024 | 0.951 [0.933, 0.953] | 0.954 [0.935, 0.956] | 0.965 [0.943, 0.967] | cheaper | 1.35 | 1.40 |
-| 24 | 4096 | 0.943 [0.936, 0.946] | 0.944 [0.936, 0.947] | 0.946 [0.936, 0.951] | cheaper | 1.25 | 1.33 |
-| 24 | 16384 | 0.950 [0.949, 0.952] | 0.949 [0.948, 0.951] | 0.942 [0.941, 0.945] | cheaper | 1.16 | 1.25 |
-| 28 | 1024 | 0.920 [0.911, 0.933] | 0.926 [0.917, 0.939] | 0.947 [0.938, 0.962] | cheaper | 1.44 | 1.44 |
-| 28 | 4096 | 0.912 [0.908, 0.919] | 0.917 [0.913, 0.924] | 0.935 [0.931, 0.944] | cheaper | 1.37 | 1.41 |
-| 28 | 16384 | 0.919 [0.916, 0.922] | 0.922 [0.919, 0.926] | 0.934 [0.931, 0.939] | cheaper | 1.29 | 1.36 |
-| 32 | 1024 | 0.924 [0.914, 0.933] | 0.933 [0.923, 0.942] | 0.963 [0.952, 0.971] | cheaper | 1.48 | 1.47 |
-| 32 | 4096 | 0.902 [0.895, 0.907] | 0.910 [0.903, 0.916] | 0.939 [0.932, 0.945] | cheaper | 1.43 | 1.43 |
-| 32 | 16384 | 0.894 [0.892, 0.898] | 0.902 [0.900, 0.905] | 0.929 [0.927, 0.933] | cheaper | 1.38 | 1.40 |
+| 24 | 1024 | 1.110 [1.102, 1.123] | 1.063 [1.059, 1.079] | 1.474 [1.461, 1.491] | dearer | 1.35 | 1.41 |
+| 24 | 4096 | 1.073 [1.067, 1.075] | 1.044 [1.038, 1.047] | 1.322 [1.312, 1.329] | dearer | 1.24 | 1.33 |
+| 24 | 16384 | 1.039 [1.039, 1.041] | 1.028 [1.027, 1.030] | 1.197 [1.196, 1.202] | dearer | 1.15 | 1.26 |
+| 28 | 1024 | 1.148 [1.121, 1.158] | 1.083 [1.056, 1.093] | 1.663 [1.644, 1.680] | dearer | 1.44 | 1.45 |
+| 28 | 4096 | 1.112 [1.106, 1.120] | 1.057 [1.050, 1.066] | 1.566 [1.560, 1.571] | dearer | 1.37 | 1.41 |
+| 28 | 16384 | 1.082 [1.079, 1.084] | 1.041 [1.038, 1.043] | 1.446 [1.440, 1.448] | dearer | 1.28 | 1.36 |
+| 32 | 1024 | 1.156 [1.137, 1.166] | 1.083 [1.066, 1.092] | 1.757 [1.741, 1.775] | dearer | 1.49 | 1.47 |
+| 32 | 4096 | 1.121 [1.114, 1.125] | 1.054 [1.048, 1.058] | 1.681 [1.667, 1.685] | dearer | 1.43 | 1.43 |
+| 32 | 16384 | 1.103 [1.100, 1.105] | 1.043 [1.040, 1.045] | 1.609 [1.604, 1.612] | dearer | 1.38 | 1.40 |
 
-Study: [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); [report](../../research/mt_fieldops_v3_20261111/REPORT.pdf); source `research/mt_fieldops_v3_20261111/results/holdout/summary.json`. The earlier IC4 rows (v2) were re-measured against the fixed rho: [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/).
+Study: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/); [report](../../research/mt_fieldops_v4_20261112/REPORT.pdf); source `research/mt_fieldops_v4_20261112/results/holdout/summary.json`. Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
 
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
