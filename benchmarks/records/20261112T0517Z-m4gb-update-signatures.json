@@ -1,7 +1,25 @@
 {
   "branch": "claude/zealous-meitner-85ipb5",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-12T05:41:37+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/m4gb_update_signatures_20261112/ab_corpus.py",
+        "/tmp/claude-0/-home-user/c98a3763-10f4-59b3-bd9c-1ee80dc15113/scratchpad/corpus",
+        "research/m4gb_update_signatures_20261112/corpus_ab.json",
+        "old=/tmp/claude-0/-home-user/c98a3763-10f4-59b3-bd9c-1ee80dc15113/scratchpad/m4gb-prefix-v3/bin",
+        "new=/tmp/claude-0/-home-user/c98a3763-10f4-59b3-bd9c-1ee80dc15113/scratchpad/m4gb-prefix-v4/bin",
+        "oldAA=/tmp/claude-0/-home-user/c98a3763-10f4-59b3-bd9c-1ee80dc15113/scratchpad/m4gb-prefix-v3/bin",
+        "--repeats",
+        "5"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T05:17:41+00:00",
+      "wall_s": 1346.284
+    }
+  ],
   "commit": "0d1de350016e86679ffedbecf047128b1e891444",
   "commit_dirty": true,
   "created_utc": "2026-11-12T05:17:38+00:00",
@@ -17,19 +35,88 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261112T0517Z-m4gb-update-signatures",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "new_over_old_wall_ratio_24_unknowns",
+      "note": "paired per-system median-of-5 ratio, cell medians K 0.61 and R 0.64 at 24 unknowns (m=2); A/A 1.03 and 1.01",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.61
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 66,
+      "name": "new_over_old_wall_ratio_range_14_to_24",
+      "note": "median over the 11 m=2 cells from 14 to 24 unknowns of the cell-median paired ratio; range 0.57-0.75; A/A cell medians 0.93-1.11",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.57,
+        0.75
+      ],
+      "unit": "ratio",
+      "value": 0.66
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "new_over_old_wall_ratio_degree6",
+      "note": "m=3 12 unknowns, cell medians K 0.88 and R 0.89",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.885
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1350,
+      "name": "arm_disagreements",
+      "note": "reply word and output SHA-256 equal across old, new, oldAA on every request",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
   "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 108190,
+      "path": "research/m4gb_update_signatures_20261112/corpus_ab.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/1204e9a333f5da9f75bc747985a572d434a849c08ba29ac9f7a25b7fa71ab113",
+      "sha256": "1204e9a333f5da9f75bc747985a572d434a849c08ba29ac9f7a25b7fa71ab113",
+      "uploaded": false
+    },
+    {
+      "bytes": 5985,
+      "path": "research/m4gb_update_signatures_20261112/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b0/b08126239a0f3eb3e1dd01b29094f21406e46b90f340390262bd9e62ffc9a019",
+      "sha256": "b08126239a0f3eb3e1dd01b29094f21406e46b90f340390262bd9e62ffc9a019",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/m4gb_update_signatures_20261112/REPORT.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/m4gb_update_signatures_20261112/results.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "m4gb-update-signatures",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
   "validation": null
 }

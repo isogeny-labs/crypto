@@ -97,6 +97,50 @@ ratio within a few percent of 1 on every cell and no disagreement.
 Falsifier: any disagreement in reply or output bytes; or a cell at 20 or
 more unknowns whose median paired ratio is not below the A/A band.
 
-## Results
+## Results `[pcc:unverified]`
 
-Filled after the run.
+Run 2026-11-12 05:18 to 05:40 Z, record
+`benchmarks/records/20261112T0517Z-m4gb-update-signatures.json` (measured;
+raw `corpus_ab.json`). Full table `RESULTS.md`, graph `results.svg/png`,
+`REPORT.pdf`. 90 systems × 5 repeats × 3 arms.
+
+| unknowns (m) | cells | `old` ms (median of cell medians) | `new` ms | paired `new`/`old`, cell medians | systems `new` below `old` | A/A `oldAA`/`old`, cell medians |
+|--:|:--|--:|--:|--:|--:|--:|
+| 12 (2) | K, R | 3.5 / 3.4 | 3.7 / 3.1 | 0.97 / 0.91 | 8 / 12 | 0.99 / 1.02 |
+| 14 (2) | K, R | 8.7 / 15.4 | 6.0 / 10.1 | 0.75 / 0.66 | 11 / 12 | 0.97 / 0.93 |
+| 16 (2) | K, R | 15.5 / 29.3 | 10.5 / 18.6 | 0.68 / 0.64 | 12 / 12 | 1.00 / 1.10 |
+| 18 (2) | K, R | 32.0 / 36.4 | 20.6 / 27.7 | 0.65 / 0.73 | 12 / 12 | 1.02 / 1.11 |
+| 20 (2) | K, R | 41.2 / 52.0 | 31.6 / 37.3 | 0.72 / 0.74 | 12 / 12 | 0.98 / 1.01 |
+| 22 (2) | R | 231.5 | 129.8 | 0.57 | 6 / 6 | 0.96 |
+| 24 (2) | K, R | 430.3 / 334.3 | 235.5 / 203.3 | 0.61 / 0.64 | 12 / 12 | 1.03 / 1.01 |
+| 12 (3), degree 6 | K, R | 7,000 / 7,199 | 6,231 / 6,494 | 0.88 / 0.89 | 12 / 12 | 1.00 / 1.01 |
+
+- **0 disagreements** in reply word or output bytes over 1,350 paired
+  requests.
+- **From 14 unknowns up the patched build is 0.57 to 0.75× of the old one
+  per call**, below the old build on 65 of the 66 systems from 14 to 24
+  unknowns, while the A/A control's cell medians stay at 0.93 to 1.11×. At
+  22 and 24 unknowns the ratio is 0.57 to 0.64×, matching the 0.43 to 0.47×
+  instruction ratio of the two profiled systems less the parts of the solve
+  that the patch does not touch.
+- **At 12 unknowns there is no effect** (0.91 and 0.97×, inside the A/A
+  spread): the solve is about 3 ms and `update()` is a small share of it.
+- **The degree-6 systems are 0.88 to 0.89×** on all 12 systems; their time
+  is mostly outside `update()`.
+
+The pre-stated expectation held, slightly better than predicted from 14 to
+20 unknowns (0.64 to 0.75× against an expected 0.75×). The falsifier did not
+fire: no disagreement, and every cell from 20 unknowns up has a paired
+median of 0.57 to 0.74×, below its A/A band. Local container, one thread,
+not isolated; a stage diagnostic, no leaderboard row. The ranking against
+the in-house `inherited-f4` engine is not changed by this patch alone
+(`inherited-f4` was 6 to 28× below M4GB per call in the persistent-server
+study).
+
+## Sources checked
+
+KB (`research-kb`) unavailable in this session. M4GB `src/m4gb.hpp`
+(`update()`, `crit_pair_t`), `lib/monomial_base.hpp`
+(`monomial_static_t::divides`, `set_lcm`), `lib/monomial_degrevlex.hpp`
+(integer codec, `const_iterator`); `research/m4gb_persistent_server_20261111/README.md`;
+`docs/ic/GROEBNER_PERF_LEVERS_20261111.md`.

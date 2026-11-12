@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0311Z-mt-fieldops-v5",
+  "latest_record": "20261112T0517Z-m4gb-update-signatures",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 114,
+    "measured": 115,
     "open": 0
   },
   "repo": "crypto",
@@ -10564,6 +10564,113 @@
       ],
       "problem": "study:m4gb_persistent_server_20261111:descent-ab",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "arm_disagreements",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 1350,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.61,
+      "latest": 0.61,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "new_over_old_wall_ratio_24_unknowns",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.61
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.885,
+      "latest": 0.885,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "new_over_old_wall_ratio_degree6",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.885
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.66,
+      "latest": 0.66,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "new_over_old_wall_ratio_range_14_to_24",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 66,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.57,
+            0.75
+          ],
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.66
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "ratio"
     },
     {
       "better": "lower",
