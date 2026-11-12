@@ -48,6 +48,16 @@ impl Vertex {
         }
     }
 
+    /// [`Vertex::edges`] without the copy: the same edges in the same order.
+    pub fn edge_iter(&self) -> impl Iterator<Item = &usize> {
+        let (a, b): (&[usize], &[usize]) = match self {
+            Vertex::Support(v) => (&v.e, &[]),
+            Vertex::Func(v) => (&v.in_, &v.out),
+            Vertex::Pred(v) => (&v.e, &[]),
+        };
+        a.iter().chain(b)
+    }
+
     /// Holds reports whether vals (aligned with `edges()`) satisfies the vertex.
     pub fn holds(&self, vals: &[bool]) -> bool {
         match self {
@@ -261,7 +271,7 @@ impl Counter for SparseContractor {
         // Last vertex index touching each edge, for early summing-out.
         let mut last: Vec<isize> = vec![-1; n.num_edges];
         for (i, v) in n.vertices.iter().enumerate() {
-            for e in v.edges() {
+            for &e in v.edge_iter() {
                 last[e] = i as isize;
             }
         }
@@ -272,9 +282,9 @@ impl Counter for SparseContractor {
         };
         for (i, v) in n.vertices.iter().enumerate() {
             t = match v {
-                Vertex::Support(v) => join_support(&t, v, fixed),
-                Vertex::Func(v) => apply_func(&t, v, fixed)?,
-                Vertex::Pred(v) => apply_pred(&t, v)?,
+                Vertex::Support(v) => join_support(t, v, fixed),
+                Vertex::Func(v) => apply_func(t, v, fixed)?,
+                Vertex::Pred(v) => apply_pred(t, v)?,
             };
             if t.rows.len() > self.peak_rows {
                 self.peak_rows = t.rows.len();
@@ -313,7 +323,22 @@ fn new_table(edges: Vec<usize>) -> Table {
     }
 }
 
-fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Table {
+// The table operations below consume their input table: a row key that
+// carries over into the output is moved (and extended in place) rather than
+// cloned, so a row costs at most one allocation, and none when it only
+// survives a filter.  The rows, their counts and the order-independent
+// tallies (`contraction_rows_uncharged`, `peak_rows`) are those of the
+// borrowing versions; only the allocations differ.
+
+/// Insert `key` with count `c`, adding to an existing row (wrapping, as
+/// `entry(key).or_insert(0)` then `wrapping_add` does).
+#[inline]
+fn add_row(rows: &mut HashMap<Vec<u8>, u64>, key: Vec<u8>, c: u64) {
+    let slot = rows.entry(key).or_insert(0);
+    *slot = slot.wrapping_add(c);
+}
+
+fn join_support(t: Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Table {
     let mut shared: Vec<usize> = Vec::new(); // indices into v.e bound in t
     let mut shared_pos: Vec<usize> = Vec::new(); // their positions in t
     let mut fresh: Vec<usize> = Vec::new(); // indices into v.e not yet bound
@@ -344,30 +369,35 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
         let fk: Vec<u8> = fresh.iter().map(|&i| bit(r[i])).collect();
         groups.entry(sk).or_default().push(fk);
     }
-    let mut edges = t.edges.clone();
+    let Table {
+        mut edges, rows, ..
+    } = t;
     for &i in &fresh {
         edges.push(v.e[i]);
     }
     let mut out = new_table(edges);
     let mut sk = vec![0u8; shared.len()];
-    for (key, &c) in &t.rows {
+    for (key, c) in rows {
         for (j, &p) in shared_pos.iter().enumerate() {
             sk[j] = key[p];
         }
-        if let Some(g) = groups.get(&sk) {
-            for fk in g {
-                let mut nk = key.clone();
+        if let Some((last, rest)) = groups.get(&sk).and_then(|g| g.split_last()) {
+            for fk in rest {
+                let mut nk = Vec::with_capacity(key.len() + fk.len());
+                nk.extend_from_slice(&key);
                 nk.extend_from_slice(fk);
-                let slot = out.rows.entry(nk).or_insert(0);
-                *slot = slot.wrapping_add(c);
+                add_row(&mut out.rows, nk, c);
             }
+            let mut nk = key;
+            nk.extend_from_slice(last);
+            add_row(&mut out.rows, nk, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
     out
 }
 
-fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result<Table> {
+fn apply_func(t: Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result<Table> {
     let mut in_pos = Vec::with_capacity(v.in_.len());
     for &e in &v.in_ {
         match t.pos.get(&e) {
@@ -381,9 +411,13 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
         }
     }
     let mut out_pos: Vec<isize> = Vec::with_capacity(v.out.len()); // -1 when the output edge is new
-    let mut edges = t.edges.clone();
+    let Table {
+        mut edges,
+        pos,
+        rows,
+    } = t;
     for &e in &v.out {
-        if let Some(&p) = t.pos.get(&e) {
+        if let Some(&p) = pos.get(&e) {
             out_pos.push(p as isize);
         } else {
             out_pos.push(-1);
@@ -392,7 +426,8 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
     }
     let mut out = new_table(edges);
     let mut inp = vec![false; v.in_.len()];
-    for (key, &c) in &t.rows {
+    let mut ext: Vec<u8> = Vec::with_capacity(v.out.len());
+    for (key, c) in rows {
         for (i, &p) in in_pos.iter().enumerate() {
             inp[i] = key[p] == 1;
         }
@@ -400,7 +435,7 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
             Some(r) => r,
             None => continue,
         };
-        let mut ext: Vec<u8> = Vec::with_capacity(v.out.len());
+        ext.clear();
         let mut ok = true;
         for (i, &b) in res.iter().enumerate() {
             let e = v.out[i];
@@ -420,17 +455,16 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
             }
         }
         if ok {
-            let mut nk = key.clone();
+            let mut nk = key;
             nk.extend_from_slice(&ext);
-            let slot = out.rows.entry(nk).or_insert(0);
-            *slot = slot.wrapping_add(c);
+            add_row(&mut out.rows, nk, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
     Ok(out)
 }
 
-fn apply_pred(t: &Table, v: &PredVertex) -> Result<Table> {
+fn apply_pred(t: Table, v: &PredVertex) -> Result<Table> {
     let mut pos = Vec::with_capacity(v.e.len());
     for &e in &v.e {
         match t.pos.get(&e) {
@@ -443,15 +477,14 @@ fn apply_pred(t: &Table, v: &PredVertex) -> Result<Table> {
             }
         }
     }
-    let mut out = new_table(t.edges.clone());
+    let mut out = new_table(t.edges);
     let mut vals = vec![false; v.e.len()];
-    for (key, &c) in &t.rows {
+    for (key, c) in t.rows {
         for (i, &p) in pos.iter().enumerate() {
             vals[i] = key[p] == 1;
         }
         if (v.p)(&vals) {
-            let slot = out.rows.entry(key.clone()).or_insert(0);
-            *slot = slot.wrapping_add(c);
+            add_row(&mut out.rows, key, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
@@ -477,8 +510,13 @@ fn sum_out(t: Table, keep: &dyn Fn(usize) -> bool) -> Table {
         for (j, &i) in keep_idx.iter().enumerate() {
             buf[j] = key[i];
         }
-        let slot = out.rows.entry(buf.clone()).or_insert(0);
-        *slot = slot.wrapping_add(c);
+        // a projected key is allocated only when it starts a new row
+        match out.rows.get_mut(&buf) {
+            Some(slot) => *slot = slot.wrapping_add(c),
+            None => {
+                out.rows.insert(buf.clone(), c);
+            }
+        }
     }
     out
 }
@@ -519,4 +557,10 @@ pub fn bit(b: bool) -> u8 {
 /// Go: bitsKey. One byte (0/1) per bool.
 pub fn bits_key(vals: &[bool]) -> Vec<u8> {
     vals.iter().map(|&b| bit(b)).collect()
+}
+
+/// `bits_key(vals) == key` without building the key: the predicate test of
+/// a fixed target point, evaluated once per contraction row.
+pub(crate) fn bits_match_key(vals: &[bool], key: &[u8]) -> bool {
+    vals.len() == key.len() && vals.iter().zip(key).all(|(&b, &k)| bit(b) == k)
 }
