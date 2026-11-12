@@ -31,6 +31,7 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashMap};
 use std::process::exit;
 
+mod extraction;
 mod reduction;
 
 // ───────────────────────────── field F_p, p < 2^32 ─────────────────────────
@@ -2085,7 +2086,7 @@ fn cmd_selftest() {
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.is_empty() {
-        eprintln!("usage: p1tool curve|emit|parse|check-gb|selftest [--flags]");
+        eprintln!("usage: p1tool curve|count|emit|parse|check-gb|lift|extract|selftest [--flags]");
         exit(2);
     }
     let m = args_map(&args[1..]);
@@ -2102,6 +2103,7 @@ fn main() {
         "parse" => cmd_parse(&m2),
         "check-gb" => cmd_check_gb(&m),
         "lift" => reduction::cmd_lift(&m),
+        "extract" => extraction::cmd_extract(&m),
         "selftest" => cmd_selftest(),
         _ => die("unknown subcommand"),
     }

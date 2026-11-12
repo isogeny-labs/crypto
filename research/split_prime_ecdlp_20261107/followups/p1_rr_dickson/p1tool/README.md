@@ -17,6 +17,25 @@ Implementation and the pending equal-output experiment are tracked in
 [`rr_dickson_matrix_reduction_20261110`](../../../../rr_dickson_matrix_reduction_20261110/README.md).
 No new F4 measurement is asserted by this continuation.
 
+### Common-chart extraction (2026-11-12)
+
+`extract --metadata C.ms.plant.json --system-file C.ms --values values.json`
+checks a supplied rational assignment (JSON array in the emitted variable order)
+against the exact input digest and all emitted equations, reconstructs reduced
+RR variables if needed, and returns canonical signed point triples summing to R.
+The extraction path does not read stored planted coordinates. It regenerates
+the full declared tower root set from public metadata, checks cubic splitting,
+curve points and group sums, and normalizes F's x-only sign choices to R.
+
+Scope: m3, 2 <= t <= 10, distinct support abscissae, nonzero support y and C,
+support disjoint from x_R, and a monic degree-two A in the RR norm identity.
+Unsupported charts produce an error; they are not silently counted as empty
+answers. F assignments with no signed E(F_p) output on this chart return an
+empty list. This command processes one supplied assignment. It does not enumerate
+all rational solutions of a Groebner basis or certify solver completeness.
+See the continuation's dated extraction report for bounded development checks;
+no F4 degree, width or timing result is implied. [pcc:unverified]
+
 2026-11-07. This is the instrument for proposal P1
 ([`../../../ideas/idea-generator.md`](../../../ideas/idea-generator.md), lines 41–135).
 It is a standalone Rust crate. It writes msolve 0.6.5 input files for six

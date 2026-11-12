@@ -13,3 +13,17 @@ Publish/review the implementation PR. Restore existing checkpoint transport and 
 None. No experiment submitted. Rust toolchain installed for local development checks only.
 ## Stop and success conditions
 No launch without S3 checkpoint, known budget headroom, published source and EKS admission. Success requires equal-output validated solving cost and measured lower matrix width with retained solving degree against the strongest baseline. An implementation or plan does not establish success.
+
+## November 12 continuation
+
+PR https://github.com/isogeny-labs/crypto/pull/3835 remains open. A merge of current
+main (55713d200) was attempted after Copilot did not supply a fix; the append-only
+PCC ledger conflicted, so the merge was aborted without choosing either history.
+The native `extract` command is now implemented and qualified on bounded m3
+common-chart fixtures (nine native tests; claim PCC-20261112-699e09 unverified).
+See EXTRACTION-20261112.md for interface and exact limits. Full rational solver
+assignment enumeration and excluded-chart coverage remain open. No F4 comparison
+or cloud job ran. Checkpoint transport/live budget and pool admission are still
+absent; no identity or spending permission was added. Next: evidence-preserving
+ledger reconciliation, complete solver-output collection, then the admitted
+matched m3 panel. The scientific objective remains unresolved.

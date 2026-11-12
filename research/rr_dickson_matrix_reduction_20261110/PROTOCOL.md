@@ -85,3 +85,16 @@ source-built experiment image, output-normalization implementation and frozen
 target/input manifest. GitHub submission is an available route after those
 conditions, not a substitute for them. Preserve artifacts and follow
 `AGENTS.md` and the IsoLab skill; do not run local timing as a workaround.
+
+## Qualification addendum — 2026-11-12 (no change to frozen success criteria)
+
+`p1tool extract` now validates one rational RR/F assignment and emits canonical
+signed triples on the explicit common m3 chart. Its development fixture and
+exact exclusions are in EXTRACTION-20261112.md. All supplied input equations
+and the reconstruction digest are checked before extraction. This is an
+implemented normalizer, not a complete rational-assignment enumerator.
+Before any equal-output timing, the runner must still enumerate all rational
+solver assignments, union normalized outputs, retain excluded charts explicitly,
+and qualify completeness against an independent reference. No scientific F4
+run has begun; checkpoint transport and current budget/pool admission remain
+missing. The original degree/width/cost acceptance criteria are unchanged.

@@ -7,6 +7,22 @@ reconstructs arbitrary reduced assignments and checks every original equation.
 No F4 experiment or speed comparison has run. Implementation/test assertions
 remain producer-unverified [pcc:unverified].
 
+## November 12 continuation: common output normalization
+
+The native `p1tool extract` command now validates the supplied assignment against
+the exact emitted input, reconstructs reduced RR variables, and normalizes RR/F
+to canonical signed triples summing to the same public R. It regenerates the full
+tower domain from public metadata rather than using the planted support. The
+common chart and remaining completeness obligations are explicit in
+[EXTRACTION-20261112.md](EXTRACTION-20261112.md), with a
+[dated PDF](REPORT-20261112.pdf). Nine native development tests pass, including
+bounded multiple-output and absent-output reference cases, sign orientation,
+Kummer scaling and input/map rejection. The separately written finite reference
+shares field primitives; this is not an independent signed audit.
+Claim `PCC-20261112-699e09` is producer-unverified. [pcc:unverified]
+
+The November 10 PDF and logs below are retained as historical artifacts.
+
 Claim records: `PCC-20261110-3e6e0a` (initial development checks) and
 `PCC-20261110-915a5d` (final checks and admission status); `pcc standing`
 reports both **unverified**. Read-only review found no remaining concrete
@@ -63,7 +79,7 @@ producer-unverified [pcc:unverified].
 |---|---|
 | Native candidate and arbitrary-assignment reconstruction | Implemented; development tests only |
 | Default historical emitter behavior | Existing calibration selftest retained |
-| Exact rational point extraction and chart coverage against F | Pending; prerequisite to a complete-output claim |
+| Rational assignment extraction and common chart against F | Implemented and checked on bounded native fixtures; full solver enumeration and excluded-chart coverage pending |
 | Retained F4 solving degree and smaller matrices | Not measured |
 | Lower complete cost against the strongest reference | Not measured |
 | Signed independent verification | Pending |
@@ -83,6 +99,11 @@ alternatives and were completed. A larger local m5 run would neither satisfy
 the experiment routing/custody rules nor fit the historic larger-memory request.
 The exact resume conditions are in the [problem record](../../problems/rr-dickson-matrix-reduction-qualification.md)
 and [HANDOFF.md](HANDOFF.md). A merged implementation PR does not resolve them.
+
+November 12 recheck: execution prerequisites remain absent. PR #3835 is open;
+the attempted update from main conflicted in the append-only PCC ledger and was
+aborted without choosing a ledger side. Evidence-preserving reconciliation is
+an additional merge dependency. Development continued with output normalization.
 
 ## Sources checked
 

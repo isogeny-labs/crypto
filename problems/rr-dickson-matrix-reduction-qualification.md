@@ -56,3 +56,10 @@ settings or an existing authorized runner. No secret value belongs in chat.
 
 2026-11-10: candidate implemented with native development tests; scientific
 question unresolved. No performance result and no theorem of impossibility.
+
+2026-11-12: m3 common-chart assignment normalization implemented with bounded
+native reference checks; see the study's EXTRACTION-20261112.md. Complete solver
+assignment enumeration and excluded-chart coverage remain missing. Execution
+prerequisites are unchanged. PR #3835 also conflicts with main's append-only
+ledger; the attempted merge was aborted to preserve evidence. No new scientific
+measurement, cost comparison or solved performance objective is asserted.
