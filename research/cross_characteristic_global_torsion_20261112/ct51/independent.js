@@ -94,7 +94,7 @@ function run(){
     const n=[0,1,2].find(k=>eq(target[i],scalar(target[1],k,true)));
     must(n===i,'wrong DLP');
   }
-  const xs=Array.from({length:256},(_,i)=>i).filter(psi3);
+  const xs=Array.from({length:256},(_,i)=>i).filter(z=>psi3(z)===0);
   const torsion=[];
   for(const xx of xs)for(let yy=0;yy<256;yy++)if(on([xx,yy],true))torsion.push([xx,yy]);
   must(xs.length===4&&torsion.length===8,'geometric 3 torsion count');
