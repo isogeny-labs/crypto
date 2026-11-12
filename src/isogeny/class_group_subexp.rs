@@ -1432,6 +1432,174 @@ fn det_crt(rows: &[Vec<BigInt>], subset: &[usize], threads: usize) -> Option<Big
     None
 }
 
+/// Sum of the `q`-adic valuations of the Smith invariants of the row lattice of
+/// `rows` (full column rank assumed), computed over `Z/q^e` with all rows: the
+/// exact `v_q([Z^k : L])` whenever every invariant is below `e`. Unit pivots are
+/// taken first (a unit always has the minimum valuation); the block left over,
+/// whose entries are all divisible by `q`, is reduced with minimum-valuation
+/// pivots. `None` if a column stays zero modulo `q^e` (an invariant `>= e`) or
+/// if `q^e` does not fit the 31-bit arithmetic.
+pub fn local_index_valuation(rows: &[Vec<BigInt>], q: u64, e: u32, threads: usize) -> Option<u32> {
+    let k = rows.first().map_or(0, |r| r.len());
+    let m = q.checked_pow(e)?;
+    if m >= 1 << 31 || q < 2 {
+        return None;
+    }
+    let mb = BigInt::from(m);
+    let mut a: Vec<Vec<u32>> = rows
+        .iter()
+        .map(|r| {
+            r.iter()
+                .map(|x| x.mod_floor(&mb).to_u32().expect("reduced"))
+                .collect()
+        })
+        .filter(|r: &Vec<u32>| r.iter().any(|&x| x != 0))
+        .collect();
+    let threads = threads.max(1);
+    let eliminate = |a: &mut Vec<Vec<u32>>, prow: &[u32], col: usize, inv: u64| {
+        let chunk = a.len().div_ceil(threads).max(1);
+        std::thread::scope(|scope| {
+            for part in a.chunks_mut(chunk) {
+                scope.spawn(move || {
+                    for row in part.iter_mut() {
+                        let x = row[col] as u64;
+                        if x == 0 {
+                            continue;
+                        }
+                        let f = (x * inv) % m;
+                        for (c, &b) in prow.iter().enumerate() {
+                            if b != 0 {
+                                row[c] = ((row[c] as u64 + m * m - f * b as u64) % m) as u32;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        a.retain(|r| r.iter().any(|&x| x != 0));
+    };
+    let inv_mod = |x: u64| -> u64 {
+        // x is a unit modulo m: extended Euclid
+        let (mut r0, mut r1, mut s0, mut s1) = (m as i64, x as i64, 0i64, 1i64);
+        while r1 != 0 {
+            let t = r0 / r1;
+            (r0, r1) = (r1, r0 - t * r1);
+            (s0, s1) = (s1, s0 - t * s1);
+        }
+        s0.rem_euclid(m as i64) as u64
+    };
+    let val = |x: u32| -> u32 {
+        let (mut x, mut v) = (x as u64, 0);
+        while x % q == 0 && v < e {
+            x /= q;
+            v += 1;
+        }
+        v
+    };
+    let mut done = vec![false; k];
+    // phase 1: unit pivots, column by column
+    for col in 0..k {
+        let Some(pr) = a.iter().position(|r| r[col] as u64 % q != 0) else {
+            continue;
+        };
+        let prow = a.swap_remove(pr);
+        let inv = inv_mod(prow[col] as u64);
+        eliminate(&mut a, &prow, col, inv);
+        done[col] = true;
+    }
+    // phase 2: every remaining entry is divisible by q; minimum-valuation pivots
+    let mut total = 0u32;
+    let mut left = done.iter().filter(|d| !**d).count();
+    while left > 0 {
+        let mut best: Option<(u32, usize, usize)> = None;
+        for (ri, r) in a.iter().enumerate() {
+            for c in (0..k).filter(|&c| !done[c] && r[c] != 0) {
+                let v = val(r[c]);
+                if best.is_none_or(|b| v < b.0) {
+                    best = Some((v, ri, c));
+                }
+            }
+        }
+        let (v, ri, col) = best?;
+        let prow = a.swap_remove(ri);
+        // pivot = q^v * u with u a unit; entries of column col are multiples of q^v
+        let qv = q.pow(v);
+        let unit = (prow[col] as u64) / qv;
+        let uinv = inv_mod(unit);
+        let chunk = a.len().div_ceil(threads).max(1);
+        std::thread::scope(|scope| {
+            for part in a.chunks_mut(chunk) {
+                let prow = &prow;
+                scope.spawn(move || {
+                    for row in part.iter_mut() {
+                        let x = row[col] as u64;
+                        if x == 0 {
+                            continue;
+                        }
+                        let f = ((x / qv) * uinv) % m;
+                        for (c, &b) in prow.iter().enumerate() {
+                            if b != 0 {
+                                row[c] = ((row[c] as u64 + m * m - f * b as u64) % m) as u32;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        a.retain(|r| r.iter().any(|&x| x != 0));
+        done[col] = true;
+        total += v;
+        left -= 1;
+    }
+    Some(total)
+}
+
+/// Lower the running gcd `g` (a multiple of the lattice index) to the exact
+/// `q`-part of the index at every prime `q < 2^16` dividing it, using
+/// [`local_index_valuation`] on all rows; `memo` keeps each `v_q` already found.
+fn refine_small_primes(
+    rows: &[Vec<BigInt>],
+    g: &BigInt,
+    threads: usize,
+    memo: &mut BTreeMap<u64, u32>,
+) -> BigInt {
+    let mut out = g.abs();
+    let mut rest = out.clone();
+    let mut q = 2u64;
+    while q < 1 << 16 && !rest.is_one() {
+        let qb = BigInt::from(q);
+        let mut mq = 0u32;
+        while (&rest % &qb).is_zero() {
+            rest /= &qb;
+            mq += 1;
+        }
+        if mq > 0 {
+            let v = match memo.get(&q) {
+                Some(&v) => Some(v),
+                None => {
+                    let t = std::time::Instant::now();
+                    let got = local_index_valuation(rows, q, mq + 1, threads);
+                    if let Some(v) = got {
+                        memo.insert(q, v);
+                        eprintln!(
+                            "[class_group_subexp]   local index at q = {q}: v_q(gcd) = {mq}, exact v_q(index) = {v} ({:.1}s)",
+                            t.elapsed().as_secs_f64()
+                        );
+                    }
+                    got
+                }
+            };
+            if let Some(v) = v {
+                for _ in v..mq {
+                    out /= &qb;
+                }
+            }
+        }
+        q += if q == 2 { 1 } else { 2 };
+    }
+    out
+}
+
 /// The lattice index `[Z^k : L]` of the dense relation matrix as the gcd of the
 /// determinants of `subsets` independent `k × k` row subsets (scanning the rows
 /// in natural, reversed and shuffled order). `None` if no subset is independent.
@@ -1458,6 +1626,8 @@ pub fn index_by_det_gcd(
     let done: BTreeMap<usize, BigInt> =
         checkpoint.map_or_else(BTreeMap::new, |p| load_dets(p, &header));
     let mut fresh = done.is_empty();
+    // exact q-parts of the index for small q dividing the gcd (memoised per q)
+    let mut local_memo: BTreeMap<u64, u32> = BTreeMap::new();
     // a further determinant that leaves the running gcd unchanged means the gcd
     // has stabilised at the lattice index (with high probability); if that index
     // is not yet the class number, only more relations help, not more subsets
@@ -1493,6 +1663,9 @@ pub fn index_by_det_gcd(
                 None => d.clone(),
                 Some(acc) => acc.gcd(d),
             });
+            if s >= 1 {
+                g = g.map(|x| refine_small_primes(rows, &x, threads, &mut local_memo));
+            }
             // the same early stop as for a computed subset (a resumed run must
             // not compute a determinant the restored ones already make redundant)
             if let (Some(acc), Some((log2_h_star, tol))) = (&g, early_stop) {
@@ -1532,6 +1705,9 @@ pub fn index_by_det_gcd(
             None => d,
             Some(acc) => acc.gcd(&d),
         });
+        if s >= 1 {
+            g = g.map(|x| refine_small_primes(rows, &x, threads, &mut local_memo));
+        }
         // the gcd of two subset determinants is the index except with small
         // probability; once it agrees with the analytic class number to within
         // the tolerance, further subsets cannot lower it (an index below the
@@ -2195,6 +2371,48 @@ mod tests {
         let hnf_index = diag.iter().fold(BigInt::one(), |acc, g| acc * g);
         assert_eq!(idx, hnf_index);
         assert_eq!(idx, BigInt::from(12));
+    }
+
+    #[test]
+    fn local_valuation_recovers_index_parts() {
+        // lattice with Smith invariants (1, 2, 4, 3, 9, 8): index 2^6 * 3^3 = 1728,
+        // presented by mixed rows (basis rows times a unimodular map, plus sums)
+        let inv = [1i64, 2, 4, 3, 9, 8];
+        let k = inv.len();
+        let mut basis: Vec<Vec<i64>> = (0..k)
+            .map(|i| (0..k).map(|j| if i == j { inv[i] } else { 0 }).collect())
+            .collect();
+        // column operations by a unimodular upper-triangular map keep the index
+        for i in 0..k {
+            for j in (i + 1)..k {
+                let f = ((i * 7 + j * 3) % 5) as i64 - 2;
+                for r in basis.iter_mut() {
+                    r[j] += f * r[i];
+                }
+            }
+        }
+        let mut rows = basis.clone();
+        for t in 0..5usize {
+            let row: Vec<i64> = (0..k)
+                .map(|c| (0..k).map(|i| ((t + 2 * i) % 3) as i64 * basis[i][c]).sum())
+                .collect();
+            rows.push(row);
+        }
+        rows.reverse();
+        let big: Vec<Vec<BigInt>> = rows
+            .iter()
+            .map(|r| r.iter().map(|&x| BigInt::from(x)).collect())
+            .collect();
+        assert_eq!(local_index_valuation(&big, 2, 7, 2), Some(6));
+        assert_eq!(local_index_valuation(&big, 3, 4, 2), Some(3));
+        assert_eq!(local_index_valuation(&big, 5, 1, 2), Some(0));
+        // a gcd carrying spurious 2^3 * 3 * 5 is lowered to the exact index
+        let mut memo = BTreeMap::new();
+        let g = BigInt::from(1728i64 * 8 * 3 * 5);
+        assert_eq!(
+            refine_small_primes(&big, &g, 2, &mut memo),
+            BigInt::from(1728)
+        );
     }
 
     #[test]
