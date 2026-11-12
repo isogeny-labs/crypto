@@ -18,7 +18,7 @@ are identical in distribution (phase 2). This phase asks about the cost of one s
 **Expectation: no.**
 - **The step formula.** The step is an affine addition, `λ = (y₂ − y₁)/(x₂ − x₁)`. Neither curve coefficient
   `a` nor `b` appears in it. Only doubling uses `a`, and an r-adding walk does not double.
-- **No faster models.** Montgomery and Edwards models need `4 | #E`, and Hessian models need `3 | #E`; a
+- **No cheaper models.** Montgomery and Edwards models need `4 | #E`, and Hessian models need `3 | #E`; a
   prime-order curve has none of these.
 - **Field arithmetic** is the same for every curve over the same `p`.
 - **What remains** is value-dependent work, such as the inversion's operand-dependent loop count. It is the same in
@@ -89,9 +89,9 @@ grades each row. Rows below L2 are counted and reported.
 ## 8. Timing pilots (non-study curve, excluded from analysis, not committed)
 
 The pilots used the 16-curve walk of phase 2's pilot curve (draw 100006) plus 2 isomorphic models: 18 workloads.
-- **Pilot 1**: 2 targets, 1 round, control `rho.frozen_reference`. 216/216 runs solved and checked. The control read
+- **Pilot 1**: 2 targets, 1 round, control `rho.frozen_reference`. 216/216 runs returned the planted k. The control read
   1.014 ± 0.017 (log), so it is **rejected as a positive control**: no resolvable difference.
-- **Pilot 2**: 8 targets, 1 round, control `rho.negation`. 864/864 runs solved and checked, about 17 ms per run, and 28 of
+- **Pilot 2**: 8 targets, 1 round, control `rho.negation`. 864/864 runs returned the planted k, about 17 ms per run, and 28 of
   432 measured rows graded below L2. Results:
   - control 1.073, log SE 0.011 (z ≈ 6.5);
   - A/A −0.009 ± 0.011;
