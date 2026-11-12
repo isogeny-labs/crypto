@@ -28,4 +28,3 @@ impl FastMod {
         ((bottom + top) >> 64) as u64
     }
 }
-
