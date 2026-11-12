@@ -30,10 +30,12 @@ with upper bound below 0.
 #strong[Answer.] The verdicts at m \= 3 and m \= 4 stay \"undetermined\"
 under the preregistered estimator, and no reading meets a lever rule
 \[pcc:unverified\]. Four new cells completed, all at k \= 20, m \= 3 (d
-\= 12, 14, 18, 28). Every larger cell, and every m \= 4 cell at or
-beyond d \= 12, exhausted 12 GB of memory before its first target
-finished; none was censored by time \[pcc:unverified\]. The binding
-limit on this route at these sizes is the memory of the F4 matrix, not
+\= 12, 14, 18, 28). The four larger cells attempted (k \= 20, m \= 3, d
+\= 36; k \= 20, m \= 4, d \= 12 and 19; k \= 22, m \= 3, d \= 55)
+exhausted 12 GB of memory; none was censored by time \[pcc:unverified\].
+The engine writes its record only at the end of a cell, so how many
+targets had finished at the abort is not recorded. The binding limit on
+this route at these sizes is memory, by inference the F4 matrix, not
 wall time.
 
 - #strong[Preregistered estimator: still not applicable.] It needs at
@@ -50,19 +52,23 @@ wall time.
   \= 3, k \= 20 \[pcc:unverified\]. The sensitivity fit over all 10
   complete cells (d \= 3 to 28) gives 6.87 \[5.01, 8.73\]; the four even
   cells alone give 7.15 \[1.38, 12.92\]; the odd cells with d \>\= 9
-  alone give 5.56 \[-8.76, 19.88\] \[pcc:unverified\]. Every point
+  alone give 5.56 \[-8.75, 19.88\] \[pcc:unverified\]. Every point
   estimate is far above both thresholds (0 and 0.5), and no upper bound
   is below them.
-- #strong[Cost does not follow |V| alone.] The even cells are much
-  dearer than their odd neighbours: d \= 18 cost 2.43e10 field
+- #strong[Cost does not follow |V| alone.] Three of the four even cells
+  are much dearer than their odd neighbours: d \= 18 cost 2.43e10 field
   operations against 2.20e8 at d \= 19 (110x), and d \= 12 cost 7.75e8
   against 1.48e8 at d \= 9 (5x), while d \= 14 cost the same as d \= 12
-  and d \= 28 cost 0.77x of d \= 27 \[pcc:unverified\]. The symmetrised
-  system has one chain variable per prime factor of d per summand (d \=
-  19: 1; d \= 14: 2; d \= 12, 18, 28: 3), so the number of prime factors
-  of d, with multiplicity, matters as much as |V| \= d. A single power
-  law in |V| is a coarse model for this series, which is one more reason
-  the span gate was not met.
+  and d \= 28 cost 0.77x of d \= 27 \[pcc:unverified\]. The validator\'s
+  exploratory joint fit of ln T on ln d and on the number of prime
+  factors of d (10 cells, k \= 20, m \= 3) gives 5.16 \[4.15, 6.16\] in
+  ln d and 2.14 \[1.35, 2.93\] per prime factor; it is exploratory, not
+  preregistered \[pcc:unverified\]. The symmetrised system has one chain
+  variable per prime factor of d per summand (d \= 19: 1; d \= 14: 2; d
+  \= 12, 18, 28: 3), so the number of prime factors of d, with
+  multiplicity, matters as much as |V| \= d. A single power law in |V|
+  is a coarse model for this series, which is one more reason the span
+  gate was not met.
 
 == 1. Predictions (frozen in #link("PROTOCOL.md")[`PROTOCOL.md`] before
 data) and outcomes
@@ -82,8 +88,10 @@ data) and outcomes
   [4 even cells completed (12, 14, 18, 28), but the estimator does not
   apply: 8 cells with d \>\= 9 span 3.1x \< 4x],
   [P3: k \= 20, m \= 4, d \= 19 censors under 12 GB / 10,800 s],
-  [passed],
-  [memory allocation failure after 1,027 s],
+  [observed, but outside the chain rule (see below)],
+  [memory allocation failure after 1,027 s; the cell was run after d \=
+  12 had censored, which the protocol\'s chain rule on the union of
+  cells excludes],
   [P4: m \= 4 cells d \= 12, 14, 18 complete, all two-point slopes above
   2],
   [#strong[failed]],
@@ -101,6 +109,17 @@ data) and outcomes
   target\_x comparison exists],
 )
 ]
+
+#strong[Chain-rule deviation (validator erratum E1).] The protocol
+applies the chain rule to the union of parent and extension cells in d
+order, under which the k \= 20, m \= 4 chain ends at d \= 12. The frozen
+runner kept the lists 12, 14, 18 and 19, 21, ... as separate chains, so
+it ran d \= 19 for 1,027 s after d \= 12 had censored (`data/run.log`
+prints \"censored at d\=12\" and then runs d \= 19). Under the
+protocol\'s rule P3 is therefore not testable, like P1; the d \= 19
+record is kept as an observation (it censored by memory, as P3 said) and
+is not counted as a passed prediction. The deviation is in the frozen
+runner, not a post-hoc choice, and the cell affects no fit.
 
 Failed predictions stay failed. P2 and P4 both failed on the resource
 side: the memory limit, not the measured slopes, decided them. The slope
@@ -143,7 +162,9 @@ Parent cells used in the fits (unchanged): k \= 20, m \= 3: d \= 3, 7,
 <3-fits>
 The estimator is the parent\'s section 5: OLS of ln T on ln |V| over
 complete cells with d \>\= 9, applied only with at least 4 cells
-spanning 4x, two-sided 95 % t-interval.
+spanning 4x, two-sided 95 % t-interval. `analysis.json` uses the
+parent\'s 3-decimal t table; the intervals quoted here use exact
+quantiles (validator erratum E2), which moves two bounds by 0.01.
 
 #align(center)[#table(
   columns: 4,
@@ -161,7 +182,7 @@ spanning 4x, two-sided 95 % t-interval.
   [not applicable: 3 cells, span 3.0x],
   [k \= 22, m \= 3],
   [not applicable: 6 cells, span 3.7x],
-  [4.51 \[-1.27, 10.28\], 6 cells],
+  [4.51 \[-1.27, 10.29\], 6 cells],
   [5.76 \[3.77, 7.75\], 8 cells, span 13.7x],
 )
 ]
@@ -172,13 +193,17 @@ cells). The k \= 22 row is the parent\'s, since d \= 55 censored again.
 
 Two-point local slopes at k \= 20, m \= 3 in d order: 9 to 12: 5.8; 12
 to 14: 0.0; 14 to 18: 13.7; 18 to 19: -87.0; 19 to 21: 25.4; 21 to 27:
-18.1; 27 to 28: -7.4. The sign changes at each parity change of d.
+18.1; 27 to 28: -7.4. The two negative slopes are the two steps from an
+even d to the next odd d.
 
 Under the paper\'s model (omega \= 2) the relation and linear-algebra
-phases balance at total exponent 2/(m + 1 - s). With s \>\= 4.5 in every
-reading, the denominator is at most -0.5 at m \= 3 and at most 0.5 at m
-\= 4, so no balance below the generic 1/2 exists at either m. This
-extrapolation is derived from a fixed small p, not measured.
+phases balance at total exponent 2/(m + 1 - s). At the point estimates
+(s \>\= 4.5 in every reading) the denominator is at most -0.5 at m \= 3
+and at most 0.5 at m \= 4, so no balance below the generic 1/2 exists at
+either m. This rests on point estimates: the d \>\= 9 intervals at k \=
+22 (m \= 3) and the only m \= 4 fit, over the three cells d \= 3, 7, 9,
+9.86 \[-59.9, 79.6\], still include s \< 0. The extrapolation is derived
+from a fixed small p, not measured.
 
 =#figure(image("exponent_ext.png", width: 100%), caption: [T(E,m,L) against |V| at m = 3 (orange) and m = 4 (green), k = 20 (left) and k = 22 (right); open circles parent cells, filled diamonds extension cells, vertical lines censored cells. Every number is an unverified assertion.])
 
@@ -194,38 +219,47 @@ extrapolation is derived from a fixed small p, not measured.
   The fix selects the line ending in `curve25519_family`. No cell had
   run.
 - `scripts/analyse_ext.py` and `scripts/figure.py` were written after
-  the freeze, while the last chain was running (7 of 8 cells done).
-  `analyse_ext.py` reimplements the parent\'s frozen estimator on the
-  union of parent and extension cells and encodes the P1 to P6 rules of
-  the protocol; its \"other readings\" (fit despite the gate, even/odd
-  split) are not preregistered and are labelled so above. The union
-  rule: an extension cell replaces the parent cell with the same key and
-  d; the parent\'s censored d \= 57 was not rerun and is kept as the
-  parent\'s.
+  the freeze, while the last chain was running (7 of 8 cells done). The
+  \"other readings\" block of `analyse_ext.py` (fit despite the gate,
+  even/odd split) was added in `723609651a`, after the last cell was
+  committed; the diff adds readings only and touches no verdict or
+  preregistered number. `analyse_ext.py` reimplements the parent\'s
+  frozen estimator on the union of parent and extension cells and
+  encodes the P1 to P6 rules of the protocol; its \"other readings\"
+  (fit despite the gate, even/odd split) are not preregistered and are
+  labelled so above. The union rule: an extension cell replaces the
+  parent cell with the same key and d; the parent\'s censored d \= 57
+  was not rerun and is kept as the parent\'s.
 - A smoke test of an even divisor (d \= 4, m \= 2, 1 target, about 30 s)
   ran before the freeze to check that the engine accepts even d; it is
   not a study cell.
 
 == 5. Host, restarts and other disclosures
 <5-host-restarts-and-other-disclosures>
-- #strong[Host.] The same shared 4-core, 15 GB container as the parent;
-  no EKS, Conductor, S3 checkpoint or benchmark record (`benchrec`)
-  because none of them is reachable from this runtime; this is a
-  deviation from the repository\'s default execution path, disclosed as
-  in the parent. Load averages (1 min) before and after each cell are in
-  each cell\'s `ext` block; they were 1.0 to 1.5 for most cells, 3.0
-  before d \= 18 and 4.6 before k \= 22 d \= 55. Wall time is not a
-  claimed quantity; only `field_ops` is, and memory censoring does not
-  depend on load.
+- #strong[Host.] A shared 4-core, 15 GB container of the same class as
+  the parent\'s; no EKS, Conductor, S3 checkpoint or benchmark record
+  (`benchrec`) because none of them is reachable from this runtime; this
+  is a deviation from the repository\'s default execution path,
+  disclosed as in the parent. Load averages (1 min) before and after
+  each cell are in each cell\'s `ext` block; they were 1.0 to 1.5 for
+  most cells, 3.0 before d \= 18, 2.5 before d \= 12 at m \= 4 and 4.6
+  before k \= 22 d \= 55. Wall time is not a claimed quantity; only
+  `field_ops` is, and memory censoring does not depend on load.
 - #strong[Three container restarts] killed the detached runner
-  (`data/env.txt`): 2026-11-10 19:40Z during d \= 18 (k \= 20, m \= 3),
-  2026-11-11 20:12Z during d \= 12 (k \= 20, m \= 4), and 2026-11-12
-  01:43Z during d \= 55 (k \= 22, m \= 3). The runner writes a cell file
-  only when the cell ends, so no partial data exists; each interrupted
-  cell was rerun from scratch with the same seed. The second check-in
-  trigger reached the session about 20 hours late, which is why the run
-  spanned two days. After the second restart a tracked background waiter
-  kept the session active between cells.
+  (`data/env.txt`). The times in `env.txt` are when a fresh container
+  was found, not when the runner died: the first kill was around 15:40
+  to 15:45Z on 2026-11-10 during d \= 18 (found 19:40Z), the second on
+  2026-11-10 during d \= 12 at m \= 4 (found 20:12Z on 2026-11-11, about
+  23 h later), and the third around 01:43Z on 2026-11-12 during d \= 55
+  at k \= 22 (relaunched 01:44Z). The kill windows are inferred from the
+  cells\' wall times. The kernel changed from 6.18.44-fc-v338 to v378
+  across the run, so \"the same container\" means the same environment
+  class and limits, not one machine. The runner writes a cell file only
+  when the cell ends, so no partial data exists; each interrupted cell
+  was rerun from scratch with the same seed. The second check-in trigger
+  reached the session about 20 hours late, which is why the run spanned
+  two days. After the second restart a tracked background waiter kept
+  the session active between cells.
 - #strong[Binary.] `/home/user/bin-archive/curve25519_family-dc2c30a4`,
   sha256
   `dc2c30a4242d80281622b2cb42cbaf9cb457d041ffbc9a4d35794bb893bf3faf`,
@@ -252,9 +286,11 @@ extrapolation is derived from a fixed small p, not measured.
   change the engine (sparse elimination, or a Gröbner engine with a
   degree bound), which is an engine change, not a measurement, and would
   need its own freeze.
-- Nothing here is an improvement over the index-calculus baseline; the
-  study is a closure measurement on the exponent question, reported with
-  its gap to rho as in the parent \[pcc:unverified\].
+- Nothing here is an improvement over the index-calculus baseline, and
+  nothing is closed: the exponent question at m \= 3 and m \= 4 stays
+  undetermined. No gap-to-rho figure is reported, because T is the cost
+  of one decomposition system, not of a solve; the parent\'s section 7
+  gives the derived comparison \[pcc:unverified\].
 
 == 7. Files
 <7-files>
@@ -269,7 +305,7 @@ extrapolation is derived from a fixed small p, not measured.
   [frozen sequential, resumable runner],
   [`scripts/analyse_ext.py`, `data/analysis.json`],
   [estimator on the cell union, prediction decisions, other readings],
-  [`scripts/figure.py`, `exponent_ext.png`, `exponent_ext.png`],
+  [`scripts/figure.py`, `exponent_ext.svg`, `exponent_ext.png`],
   [figure: T against],
   [`cells/*.json`],
   [the 8 cell records (parent format plus an `ext` block with limits,
@@ -285,5 +321,27 @@ extrapolation is derived from a fixed small p, not measured.
 
 == Validation
 <validation>
-Pending: filled in from `validator-report.json` once the independent
-validator has run.
+Independent validation on 2026-11-12 of commit `236e925fb7`
+(#link("validator-report.json")[`validator-report.json`], scripts in
+#link("validation/")[`validation/`]): status `pass_with_errata`,
+disposition `validated`, `independent: true`. The validator
+reimplemented the estimator, the curve, the targets and the consistency
+test without the producer\'s scripts; regenerated all 24 recorded
+targets and the parent\'s d \= 57 first target from the seeds; confirmed
+with its own S\_3 and S\_4 that all 24 systems are inconsistent;
+re-serialised every cell file byte-identically with the runner\'s
+writer; checked the freeze order, the binary hash, the timeline and
+every README number; and replayed d \= 12 and d \= 14 with the frozen
+binary, matching every field except per-target milliseconds. Of 74
+headline values, 72 agreed and 2 differed by 0.01 (E2). Errata E1 to E11
+are applied above: E1 chain-rule deviation at m \= 4 (P3 rescored), E2
+t-quantile rounding, E3 restart times, E4 a missing load average, E5
+kernel change, E6 claims the records cannot show, E7 parity wording, E8
+post-data script edit, E9 rho and closure wording, E10 the
+balanced-total paragraph, E11 figure cosmetics. Not done by the
+validator: replay of d \= 18 and d \= 28 (their targets and flags were
+checked, not their field\_ops), rerun of the censored cells, rebuild of
+the binary from source, and the session-timing statements. The numbers
+above remain \[pcc:unverified\] under the repository\'s claim rule
+because no pcc claim was registered; the validator report is the
+evidence a claim would cite.
