@@ -6,6 +6,30 @@ measured set) and the reference rho and band rule recorded in
 `protocol.json` (`amendments_before_freeze`). Prepared by a subagent; nothing
 was submitted by it. Submission goes through the director/executor cards.
 
+## Launch blocked: monthly budget exhausted (2026-11-12 16:42 Z)
+
+`aws budgets describe-budgets --account-id 104186811093` (caller `coreuser`),
+read before submission as `taskq/deploy/eks-karpenter/COST_CONTROLS.md`
+requires:
+
+| budget | unit | limit (USD) | actual (USD) |
+|:--|:--|--:|--:|
+| `isolab-monthly-account-cost` | monthly | 1,300 | 1,585.60 |
+| `isolab-daily-cost-100` | daily | 200 | 126.58 |
+| `spot-experiments-daily-25` | daily | 200 | 39.60 |
+
+The monthly remainder is negative, so no build or job may start ("If the
+remainder is unknown or exhausted, do not start a new build/job"). The
+publish-only image build of `e9d5dbdccd` (workflow run 43261262475) had been
+dispatched at 16:40 Z, before this readback; it was cancelled at 16:42 Z.
+Nothing reached EKS.
+
+What unblocks it: the owner raising the monthly budget or authorizing this
+run's USD 5 ceiling against it, or the new month (2026-12-01). Then, in
+order: the publish-only build, `image_uri`/`ecbench_sha256`/workflow identity
+into the request, the pool check, the director/executor card, and the
+validation steps below. The protocol stays frozen as committed.
+
 ## What is measured
 
 The local, unisolated Run 2 of
