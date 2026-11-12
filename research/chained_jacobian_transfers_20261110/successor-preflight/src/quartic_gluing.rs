@@ -1,6 +1,8 @@
 //! Actual four-gluing on the admitted T_i via ramified pullbacks and the
 //! existing field/elliptic/poly/separate Cantor engines. No producer maps.
 use super::*;
+#[path = "isogeny_cycle_census.rs"]
+mod isogeny_cycle_census;
 #[path = "two_primary_quotient.rs"]
 mod two_primary_quotient;
 

@@ -1,3 +1,14 @@
+# New component: actual gluing cycle and fixed quotient catalog
+
+Fullnative33/70a16a,algebra23/8d3d02,nineboundLean169written33modules;
+actualgraphreturn36 versusellipticpair12. Writtenfixedcatalog120AV/84principal/
+72Jac/36nonPP,f48205,V2standingannotationb7c7e7. Fullsource/evidence/failed
+attempts/figures/two-pagePDF in reports/isogeny-cycles and versionedproof.
+These are unsigned correctness/written results,not new72curveequations or
+performance evidence. Consumerready1509fixed8f456314;ownCI pending.
+[pcc:unverified]
+
+---
 # Chained Jacobian transfers
 
 Current continuation: [report](REPORT_20261111.md), [PDF](report.pdf),

@@ -73,9 +73,92 @@ fn halving() -> IdentityStatement {
     }
 }
 
+fn norm(t: Expr, p: Expr, a: Expr, b: Expr) -> Expr {
+    Expr::Add(vec![
+        power(a.clone(), 2),
+        Expr::Mul(vec![t, a, b.clone()]),
+        Expr::Mul(vec![p, power(b, 2)]),
+    ])
+}
+
+fn norm_multiplicativity() -> IdentityStatement {
+    let [t, p, a, b, c, d] = ["t", "p", "a", "b", "c", "d"].map(Expr::var);
+    let real = Expr::Add(vec![
+        Expr::Mul(vec![a.clone(), c.clone()]),
+        Expr::Mul(vec![Expr::Const(-1), p.clone(), b.clone(), d.clone()]),
+    ]);
+    let imaginary = Expr::Add(vec![
+        Expr::Mul(vec![a.clone(), d.clone()]),
+        Expr::Mul(vec![b.clone(), c.clone()]),
+        Expr::Mul(vec![t.clone(), b.clone(), d.clone()]),
+    ]);
+    IdentityStatement {
+        name: "Quadratic CM norm multiplicativity".into(),
+        source: "ISOGENY_CYCLE_PROOF.md;Galbraithch25 ordinary CM;Lean IsogenyCycles.quadratic_norm_multiplicative".into(),
+        variables: ["t", "p", "a", "b", "c", "d"].map(String::from).to_vec(),
+        degree_bound: 7,
+        lhs: Expr::Mul(vec![norm(t.clone(), p.clone(), a, b), norm(t.clone(), p.clone(), c, d)]),
+        rhs: norm(t, p, real, imaginary),
+    }
+}
+
+fn first_monodromy() -> IdentityStatement {
+    let x = Expr::var("x");
+    IdentityStatement {
+        name: "First elliptic cycle polynomial reduction".into(),
+        source: "ISOGENY_CYCLE_PROOF.md;Lean IsogenyCycles.first_cycle_polynomial".into(),
+        variables: vec!["x".into()],
+        degree_bound: 3,
+        lhs: Expr::Add(vec![
+            power(Expr::Add(vec![x.clone(), Expr::Const(-1)]), 3),
+            Expr::Const(-1),
+        ]),
+        rhs: Expr::Mul(vec![
+            Expr::Add(vec![
+                power(x.clone(), 2),
+                Expr::Neg(Box::new(x.clone())),
+                Expr::Const(1),
+            ]),
+            Expr::Add(vec![x, Expr::Const(-2)]),
+        ]),
+    }
+}
+
+fn second_monodromy() -> IdentityStatement {
+    let x = Expr::var("x");
+    IdentityStatement {
+        name: "Second elliptic cycle polynomial reduction modulo four".into(),
+        source: "ISOGENY_CYCLE_PROOF.md;Lean IsogenyCycles.second_cycle_polynomial".into(),
+        variables: vec!["x".into()],
+        degree_bound: 4,
+        lhs: Expr::Add(vec![
+            power(Expr::Add(vec![x.clone(), Expr::Const(2)]), 4),
+            x.clone(),
+        ]),
+        rhs: Expr::Add(vec![
+            Expr::Mul(vec![
+                Expr::Add(vec![
+                    power(x.clone(), 2),
+                    Expr::Neg(Box::new(x.clone())),
+                    Expr::Const(1),
+                ]),
+                Expr::Add(vec![
+                    power(x.clone(), 2),
+                    Expr::Mul(vec![Expr::Const(9), x.clone()]),
+                    Expr::Const(32),
+                ]),
+            ]),
+            Expr::Mul(vec![
+                Expr::Const(4),
+                Expr::Add(vec![Expr::Mul(vec![Expr::Const(14), x]), Expr::Const(-4)]),
+            ]),
+        ]),
+    }
+}
+
 fn main() {
     let outputs = std::env::args_os().skip(1).collect::<Vec<_>>();
-    let cases: [(IdentityStatement, &[u8], &str, u64); 2] = [
+    let cases: [(IdentityStatement, &[u8], &str, u64); 5] = [
         (
             duplication(),
             include_bytes!("../../lean/QuarticGluing.lean"),
@@ -87,6 +170,24 @@ fn main() {
             include_bytes!("../../lean/TwoPrimaryQuotient.lean"),
             "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
             0x394c,
+        ),
+        (
+            norm_multiplicativity(),
+            include_bytes!("../../lean/IsogenyCycles.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+            0x4541,
+        ),
+        (
+            first_monodromy(),
+            include_bytes!("../../lean/IsogenyCycles.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+            0x4542,
+        ),
+        (
+            second_monodromy(),
+            include_bytes!("../../lean/IsogenyCycles.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+            0x4543,
         ),
     ];
     for (i, (statement, source, path, seed)) in cases.into_iter().enumerate() {
@@ -106,7 +207,13 @@ fn main() {
 
 #[test]
 fn mutated_identities_are_rejected() {
-    for mut statement in [duplication(), halving()] {
+    for mut statement in [
+        duplication(),
+        halving(),
+        norm_multiplicativity(),
+        first_monodromy(),
+        second_monodromy(),
+    ] {
         statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
         assert!(matches!(
             identity::issue(statement, 0x384c, 32, "negative control", None),

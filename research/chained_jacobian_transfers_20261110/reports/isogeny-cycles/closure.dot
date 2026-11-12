@@ -1,0 +1,15 @@
+digraph closure {
+ graph[bgcolor="white",rankdir=TB,ranksep=.28,nodesep=.45,pad=.1];
+ node[shape=box,style="rounded,filled",fillcolor="#e9f0f6",fontname="DejaVu Sans",fontsize=10];
+ edge[color="#456580",fontname="DejaVu Sans",fontsize=9,arrowsize=.6];
+ a[label="A0=(E0×F0)/Q0\nactual Jac(T0)"];
+ b[label="A12=(E0×F0)/Q12\nrelative action ±F\nnew gluing",fillcolor="#fcf1df"];
+ c[label="A24=(E0×F0)/Q24\nrelative action ±F²\nnew gluing",fillcolor="#fcf1df"];
+ d[label="A36 ≅ A0 over F101\nrelative sign identified\nfirst graph return",fillcolor="#e8f2e9"];
+ {rank=same;a;b}
+ {rank=same;d;c}
+ a->b[label="12 hops / degree 49¹²",constraint=false];
+ b->c[label="12 hops / degree 49¹²"];
+ c->d[label="12 hops / degree 49¹²",constraint=false];
+ a->d[style=invis];
+}

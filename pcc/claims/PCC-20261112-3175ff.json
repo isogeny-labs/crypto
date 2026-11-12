@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T14:16:15Z",
+ "id": "PCC-20261112-3175ff",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0796b36df6ee9712bfa335d81191abc26ed937ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "cb76abf873ff6ddbc835a8deab88e0ada20f7b2ff13e781f9831cf782db20be9",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+   "theorem": "IsogenyCycles.quadratic_norm_multiplicative"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact CM polynomial/norm identities,complete finite16-vector monodromy and noncentral relative-sign graph obstruction,publicCRT and forcedprincipal diagonal degrees. Actual curves/CMendomorphism classification,quotientexistence,Galois/moduleidentifications,polarizationdescent,andglobalAV/Jacobiancatalog remain explicitwritten bridges. No native evaluation or signed scientific standing.",
+ "statement": "theorem quadratic_norm_multiplicative {R : Type} [CommRing R] (t p a b c d : R) : (a^2+t*a*b+p*b^2)*(c^2+t*c*d+p*d^2) = (a*c-p*b*d)^2+t*(a*c-p*b*d)*(a*d+b*c+t*b*d)+ p*(a*d+b*c+t*b*d)^2"
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T14:16:39Z",
+ "id": "PCC-20261112-353d0a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0796b36df6ee9712bfa335d81191abc26ed937ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e6a4370c963ac17a53ef62a2165336104aba6afb9cde13e3236ba9f274f06bbf",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+   "theorem": "IsogenyCycles.no_early_relative_sign"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact CM polynomial/norm identities,complete finite16-vector monodromy and noncentral relative-sign graph obstruction,publicCRT and forcedprincipal diagonal degrees. Actual curves/CMendomorphism classification,quotientexistence,Galois/moduleidentifications,polarizationdescent,andglobalAV/Jacobiancatalog remain explicitwritten bridges. No native evaluation or signed scientific standing.",
+ "statement": "theorem no_early_relative_sign : \u2200 n : Fin 2, (\u2203 a b : Fin 4, iterate secondCycle4 (4*(n.val+1)) (a,b)\u2260(a,b)) \u2227 (\u2203 a b : Fin 4, iterate secondCycle4 (4*(n.val+1)) (a,b)\u2260opposite4 (a,b))"
+}

@@ -1,0 +1,440 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hcf1c09671f79d47d",
+  "statement": {
+    "name": "Quadratic CM norm multiplicativity",
+    "source": "ISOGENY_CYCLE_PROOF.md;Galbraithch25 ordinary CM;Lean IsogenyCycles.quadratic_norm_multiplicative",
+    "variables": [
+      "t",
+      "p",
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "degree_bound": 7,
+    "lhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "b"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "p"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "c"
+                },
+                {
+                  "op": "var",
+                  "args": "c"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "var",
+                  "args": "c"
+                },
+                {
+                  "op": "var",
+                  "args": "d"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "p"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "d"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "c"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": -1
+                    },
+                    {
+                      "op": "var",
+                      "args": "p"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "c"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": -1
+                    },
+                    {
+                      "op": "var",
+                      "args": "p"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "t"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "c"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": -1
+                    },
+                    {
+                      "op": "var",
+                      "args": "p"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "c"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "t"
+                    },
+                    {
+                      "op": "var",
+                      "args": "b"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "p"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "a"
+                        },
+                        {
+                          "op": "var",
+                          "args": "d"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "b"
+                        },
+                        {
+                          "op": "var",
+                          "args": "c"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "t"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        },
+                        {
+                          "op": "var",
+                          "args": "d"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "a"
+                        },
+                        {
+                          "op": "var",
+                          "args": "d"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "b"
+                        },
+                        {
+                          "op": "var",
+                          "args": "c"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "t"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        },
+                        {
+                          "op": "var",
+                          "args": "d"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 17729,
+  "value_digest": "f9f8a6d297839667a15930bd1224011797b2056816ee55a0587f2691e9578a3c",
+  "independence": "Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",
+  "proof": {
+    "kind": "lean4;pointer only;requires separate proof gate",
+    "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+    "sha256": "58e58276291da478c043b425ff1898e7502e07504693d8ac948234413dff1330"
+  }
+}
