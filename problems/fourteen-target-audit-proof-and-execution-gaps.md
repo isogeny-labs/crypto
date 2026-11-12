@@ -490,3 +490,13 @@ finite means above sqrt(pi/4) do not contradict its qualified asymptotic
 average. Native execution and signed independent validation remain separate
 assurance scopes. This closes this measurement component, not every open
 method in the original fourteen-item request. [pcc:unverified]
+
+### 2026-11-12 general actual geometric3-torsion count
+
+[The general short-curve project](../research/three_torsion_rank_audit_20261112/README.md)
+proves exactly nine actual points killedby3 for every nonsingular short
+Weierstrass coefficient pair over algebraically closed fields of
+characteristic other than2and3. Explicit coordinate equivalence precedes
+cardinality; whole gate20/0/0, no rank/basis premise. This closes the
+generalr3 geometric count component. Genericallr determinant/BK and
+p<500 census remain open. [pcc:unverified]

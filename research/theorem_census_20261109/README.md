@@ -422,3 +422,12 @@ prefix counts/revision are in CHECKS.md. The proof/census artifacts remain
 reviewable on the separate stacked branch. [pcc:unverified]
 
 Latest finite-model additions: [Leanprime-five cycle](../jacobian_smoothness_audit_20261109/STOLL_CYCLE.md), [complete native census](../jacobian_smoothness_audit_20261109/CENSUS.md). Exact348gate, full local theorem packet check and unsigned measurement statuses are linked there; the original fourteen-item audit remains partial. [pcc:unverified]
+
+## General geometric3-torsion follow-up, 12 November
+
+The separate [general short-curve proof](../three_torsion_rank_audit_20261112/README.md)
+now proves Nat.card E[3]=9 over every algebraically closed field with
+2≠0,3≠0 and4a³+27b²≠0, using actual Mathlib points and explicit inverse
+coordinate maps. No rank/basis/Hasse/pairing premise. Whole gate20/0/0.
+This extends the concrete F5/r3 count; the all-prime rank/determinant,
+generic BK criterion and p<500 census remain separate. [pcc:unverified]

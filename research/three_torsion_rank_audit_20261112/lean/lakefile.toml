@@ -1,0 +1,11 @@
+name = "three_torsion_rank_audit"
+version = "0.1.0"
+defaultTargets = ["ThreeTorsionRankAudit"]
+
+[[require]]
+name = "theorem_audit"
+path = "../../theorem_audit_20261108/lean"
+
+[[lean_lib]]
+name = "ThreeTorsionRankAudit"
+roots = ["QuarticRoots", "ActualTorsion", "GeometricCardinality"]
