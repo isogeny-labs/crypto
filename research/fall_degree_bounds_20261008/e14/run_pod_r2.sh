@@ -21,14 +21,14 @@ finish() {
 }
 ln -sfn "$OUT" "$SERVE/out"
 echo "$(date -u +%FT%TZ) boot: script started (pid $$)" >>"$OUT/run.log"
+# Amendment 24: full command trace to a served file; the HTTP server is started by the pod's start
+# command before this script runs (python3 is in the image), so a stall anywhere below is visible.
+PS4='+ $(date -u +%T) '; exec 2>>"$OUT/trace.log"; set -x
+pgrep -f 'http.server 8080' >/dev/null || ( cd "$W/serve" && python3 -m http.server 8080 --bind 0.0.0.0 >"$OUT/http.log" 2>&1 ) &
 export DEBIAN_FRONTEND=noninteractive
-# Amendment 22: python3 may be absent from the image; install it before the HTTP server starts, and
-# enable SSH (RunPod's PUBLIC_KEY plus EXTRA_PUBKEY) so the pod can be inspected if a later step fails.
-apt-get update -qq >"$OUT/apt.log" 2>&1; apt-get install -y -qq python3 openssh-server jq git build-essential pkg-config libssl-dev curl time >>"$OUT/apt.log" 2>&1
-echo "$(date -u +%FT%TZ) boot: apt exit=$? python3=$(command -v python3 || echo missing)" >>"$OUT/run.log"
-( cd "$W/serve" && python3 -m http.server 8080 --bind 0.0.0.0 >"$OUT/http.log" 2>&1 ) &
-mkdir -p /run/sshd ~/.ssh && chmod 700 ~/.ssh && { echo "${PUBLIC_KEY:-}"; echo "${EXTRA_PUBKEY:-}"; } | grep -v '^$' >>~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
-/usr/sbin/sshd -o PermitRootLogin=prohibit-password -o PasswordAuthentication=no >>"$OUT/run.log" 2>&1 && echo "$(date -u +%FT%TZ) boot: sshd started" >>"$OUT/run.log"
+apt-get update -qq >"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt update exit=$?" >>"$OUT/run.log"
+apt-get install -y -qq jq curl git >>"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt base exit=$?" >>"$OUT/run.log"
+apt-get install -y -qq build-essential pkg-config libssl-dev time >>"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt build tools exit=$?" >>"$OUT/run.log"
 # USD 100 hard cap: deadline = min(36 h, floor(100 / costPerHr) h) from start
 COST=$(curl -sS -m 60 -H "Authorization: Bearer ${POD_CTL_KEY:-}" "https://rest.runpod.io/v1/pods/${RUNPOD_POD_ID:-x}" | jq -r '.costPerHr // empty')
 HRS=$(awk -v c="$COST" 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(100 / c); print (h < 36 ? h : 36) }')

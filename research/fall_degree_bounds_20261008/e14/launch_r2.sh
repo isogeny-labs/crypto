@@ -33,14 +33,14 @@ fi
 [ "${DRY_RUN:-0}" = 1 ] && { echo "dry run: admitted, not launching"; exit 0; }
 # --- create the pod
 SCRIPT_B64=$(base64 -w0 "$S/e14/run_pod_r2.sh")
-payload=$(jq -n --arg name "fd-e14-r2c-$(date -u +%Y%m%dT%H%MZ)" --arg pub "${EXTRA_PUBKEY:-}" --arg b64 "$SCRIPT_B64" --arg key "$RUNPOD_API_KEY" \
+payload=$(jq -n --arg name "fd-e14-r2d-$(date -u +%Y%m%dT%H%MZ)" --arg pub "${EXTRA_PUBKEY:-}" --arg b64 "$SCRIPT_B64" --arg key "$RUNPOD_API_KEY" \
   --arg c "$SRC_COMMIT" --arg p "$PATHS_SHA256" --arg t "$TREE_SHA256" --arg tok "$OUT_TOKEN" '{
   name: $name, imageName: "runpod/base:1.0.2-ubuntu2404", cloudType: "SECURE", computeType: "CPU",
   cpuFlavorIds: ["cpu3g","cpu5g"], cpuFlavorPriority: "custom", vcpuCount: 64, containerDiskInGb: 150,
-  interruptible: false, ports: ["8080/http","22/tcp"],
+  interruptible: false, ports: ["8080/http"],
   env: { SCRIPT_B64: $b64, POD_CTL_KEY: $key, SRC_COMMIT: $c, PATHS_SHA256: $p, TREE_SHA256: $t, OUT_TOKEN: $tok, MAX_HOURS_FALLBACK: "18", EXTRA_PUBKEY: $pub },
   dockerEntrypoint: ["bash","-c"],
-  dockerStartCmd: ["mkdir -p /workspace /root && echo \"$SCRIPT_B64\" | base64 -d >/root/run.sh && exec bash /root/run.sh"]
+  dockerStartCmd: ["mkdir -p /workspace/out /workspace/serve/$OUT_TOKEN /root && ln -sfn /workspace/out /workspace/serve/$OUT_TOKEN/out && echo \"$(date -u +%FT%TZ) start command running\" >>/workspace/out/run.log && (cd /workspace/serve && nohup python3 -m http.server 8080 --bind 0.0.0.0 >/workspace/out/http0.log 2>&1 &) && echo \"$SCRIPT_B64\" | base64 -d >/root/run.sh && echo \"$(date -u +%FT%TZ) script decoded $(sha256sum /root/run.sh | cut -c1-16)\" >>/workspace/out/run.log && exec bash /root/run.sh"]
 }')
 resp=$(curl -sS -m 120 "${auth[@]}" -H 'Content-Type: application/json' -d "$payload" "$API/pods")
 pod_id=$(echo "$resp" | jq -r '.id // empty')
@@ -48,5 +48,5 @@ pod_id=$(echo "$resp" | jq -r '.id // empty')
 jq -n --arg id "$pod_id" --arg tok "$OUT_TOKEN" --arg sha "$script_sha" --arg bal "$bal" --arg other "$other_rate" --argjson ov "$override" \
   --arg when "$(date -u +%FT%TZ)" --argjson resp "$resp" \
   '{admitted:true, owner_override:$ov, pod_id:$id, out_token:$tok, run_pod_r2_sha256:$sha, balance_usd:$bal, other_pods_usd_per_h:$other,
-    launched_at:$when, amendment:23, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,imageName,ports})}' | tee "$R/launch.json"
+    launched_at:$when, amendment:24, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,imageName,ports})}' | tee "$R/launch.json"
 echo "pull with: $S/e14/pull_r2.sh"

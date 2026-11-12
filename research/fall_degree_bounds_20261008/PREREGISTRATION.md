@@ -1189,3 +1189,25 @@ diagnostic pod under USD 0.01). Records: `e14/pod-r2/launch-r2b.json`.
 pod name prefix `fd-e14-r2c-`. The in-pod script (`run_pod_r2.sh`, sha256 `5f49b8ac…`, Amendment 22)
 is unchanged. Nothing else changes: engines, gates, readings, predictions, the USD 100 cap and the
 Amendment 21 owner override stand. No draw exists, so no draw is retried.
+
+## Amendment 24 (2026-11-12 UTC, before any draw below): r2c failed the same way; early-serving start command and a full trace; relaunch r2d
+
+**What happened.** Pod r2c (`qoulmu5122514o`, created 02:33:06 UTC) showed the r2a/r2b signature
+again (container up, 0 % CPU, nothing on 8080 after 5 minutes). The stored `SCRIPT_B64` decodes to
+the committed script (sha256 `5f49b8ac…`, 7,981 bytes) and the sibling pod carries a 20 KB variable
+the same way, so delivery is not the cause; the `/workspace` theory of Amendment 23 is therefore
+**not confirmed** either. The cause is still not established. r2c was deleted at about 02:41 UTC
+(about USD 0.35, no gate, no draw). Record: `e14/pod-r2/launch-r2c.json`.
+
+**Changes for r2d.**
+- Start command (`e14/launch_r2.sh`): creates the output and serve directories, writes "start command
+  running" to `run.log`, starts `python3 -m http.server 8080` itself (Python is in the image, as the
+  diagnostic pod showed), decodes the script, logs its sha256, then runs it. The log is therefore
+  readable from the first second, whatever the script does.
+- In-pod script (`e14/run_pod_r2.sh`): `set -x` with timestamps into `out/trace.log`; `apt` split into
+  update, base tools and build tools, each with its exit code logged; `openssh-server` and `sshd`
+  dropped (no SSH client in the authoring session; port 22 no longer exposed). Everything after the
+  boot block is unchanged. The new script's sha256 is recorded in `launch.json`.
+- Pod name prefix `fd-e14-r2d-`. Engines, gates, readings, predictions, the USD 100 cap and the
+  Amendment 21 owner override stand. No draw exists, so no draw is retried. If r2d also fails to
+  bootstrap, no further pod is launched without the owner's reading of `trace.log`.
