@@ -882,7 +882,9 @@ struct CoverMap {
 }
 
 fn upoly_eval(c: &[u64], u: u64, p: u64) -> u64 {
-    c.iter().rev().fold(0, |acc, &k| addm(mulm(acc, u, p), k, p))
+    c.iter()
+        .rev()
+        .fold(0, |acc, &k| addm(mulm(acc, u, p), k, p))
 }
 
 fn upoly_trim(mut a: Vec<u64>) -> Vec<u64> {
@@ -951,7 +953,11 @@ impl CoverMap {
             },
             CoverKind::Quad => {
                 // λ(u − α)² + β = λu² − 2λα·u + λα² + β.
-                let (al, be, la) = (rng.gen_range(1..p), rng.gen_range(0..p), rng.gen_range(1..p));
+                let (al, be, la) = (
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                );
                 CoverMap {
                     kind,
                     num: [
@@ -964,7 +970,11 @@ impl CoverMap {
             }
             CoverKind::Generic => loop {
                 let num = [rng.gen_range(0..p), rng.gen_range(0..p), 1];
-                let den = [rng.gen_range(1..p), rng.gen_range(0..p), rng.gen_range(1..p)];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
                 if upoly_gcd_degree(&num, &den, p) == 0 {
                     break CoverMap { kind, num, den };
                 }
@@ -1004,7 +1014,10 @@ impl CoverMap {
         let d3 = upoly_mul(&d2, &dd, p);
         let d4 = upoly_mul(&d2, &d2, p);
         let t1 = upoly_mul(&n3, &dd, p);
-        let t2: Vec<u64> = upoly_mul(&nn, &d3, p).iter().map(|&c| mulm(c, a, p)).collect();
+        let t2: Vec<u64> = upoly_mul(&nn, &d3, p)
+            .iter()
+            .map(|&c| mulm(c, a, p))
+            .collect();
         let t3: Vec<u64> = d4.iter().map(|&c| mulm(c, b, p)).collect();
         upoly_add(&upoly_add(&t1, &upoly_trim(t2), p), &upoly_trim(t3), p)
     }
@@ -2674,7 +2687,9 @@ fn parse_args() -> Args {
              the summation by the tower, which no longer starts at x"
         );
         assert!(
-            !a.controls.iter().any(|c| matches!(c, Control::Naive | Control::Multiples)),
+            !a.controls
+                .iter()
+                .any(|c| matches!(c, Control::Naive | Control::Multiples)),
             "--cover-map takes the tower, null and randbase controls"
         );
         // The generator-count ladder is not written for cover bases.
@@ -2713,7 +2728,10 @@ fn target_curve(p: u64, tower: &Tower, need: usize, rng: &mut StdRng) -> (PrimeC
                 .v
                 .iter()
                 .copied()
-                .filter(|&u| cv.eval(u, p).is_some_and(|x| curve.legendre(curve.rhs(x)) == 1))
+                .filter(|&u| {
+                    cv.eval(u, p)
+                        .is_some_and(|x| curve.legendre(curve.rhs(x)) == 1)
+                })
                 .collect();
             let distinct = cv.image(&on, p).len();
             if distinct >= need {
