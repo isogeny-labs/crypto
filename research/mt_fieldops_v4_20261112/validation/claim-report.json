@@ -1,0 +1,198 @@
+{
+ "schema": "validator.report/v1",
+ "independent": true,
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validation/scripts/claim_check.py",
+ "validated_commit": "a6782a740ee85c95bfca1ba84d3589001861ec98",
+ "scope": "this one statement exactly as worded; nothing else in the study",
+ "statement_judged": "On 33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p and mod-n operations (I = 3/10/30 M, S = M) with hash-table and solver operations at 0/0.1/1 GAE: this harness's multi-target index calculus (the cheaper of ic5 and ic5ks per configuration and price; ic5ks's retention of solved trial classes along the shared arithmetic-progression W saves at most 1.5%) costs 1.003-1.810x per target of the cheapest of 15 runs of this harness's multi-target rho per configuration and price (Kuhn-Struik retention rho rho2xks at h = 0 and 0.1, distinguished-point rho rhodp at h = 1) and is dearer in all 27 cell x I/M decisions of the frozen rule; at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1; it is 1.14-1.49x a paired BSGS. The frozen rule prices h on hash-table operations only: with rhodp's per-step canonicalisations priced at the same h (AGENTS.md section 5a) the IC is 0.89-0.94x the cheapest rho at h = 1 and I = 10M and all 27 decisions are unranked, so no ranking against rho is established.",
+ "statement_sha256": "e519257338e1baa374e2b90067352a23160d2359a3d353b8ffe3f67f636ad46e",
+ "statement_previous_submission": "On 33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the multi-target index calculus (cheaper of ic5 and ic5 with retention per configuration) costs 1.003-1.810x per target of the cheapest standard multi-target rho of this harness (Kuhn-Struik retention rho rho2xks or distinguished-point rho rhodp, best of 15 runs per configuration) and is dearer in all 27 cell x I/M section-5a decisions; at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1; it is 1.14-1.50x a paired BSGS.",
+ "status": "pass",
+ "verdict": "endorsed exactly as worded (statement_judged)",
+ "raw_data": [
+  {
+   "path": "../results/holdout/runs.json",
+   "sha256": "cf78059ac83bd70bba530da418155e1b6a0c84a27de125efd11676b3917d168f"
+  },
+  {
+   "path": "native_work.json",
+   "sha256": "7e6c7528853c6d6e0eb327d429bf8b3d8dc6af0e57dad5c880a8f8c0a2f8d1be",
+   "note": "validator instrumented replay of every row (rhodp canonicalisation counts; replay matches)"
+  }
+ ],
+ "supporting": {
+  "rows_jsonl_sha256": "eb144fd024d2897866d8fd47496d002836f196f5e0a3b2f80def2df5fc544af5",
+  "replay_certificate": "replay-certificate.json (status verified)",
+  "instances_check": "instances_check.json"
+ },
+ "clause_checks": [
+  {
+   "clause": "33 fresh prime-order Weierstrass curves (group orders about 2^24, 2^28 and 2^32)",
+   "ok": true,
+   "recomputed": "n ranges {'24': [16770973, 16776713], '25': [16778521, 16782209], '28': [268414967, 268432867], '29': [268439183, 268459117], '32': [4294901887, 4294964207], '33': [4294971077, 4295070037]}; all valid, cofactor 1; 0 overlap with 3312 curve records"
+  },
+  {
+   "clause": "T = 1024/4096/16384, 22 paired configurations per cell",
+   "ok": true,
+   "recomputed": "{'32/1024': 22, '32/4096': 22, '32/16384': 22, '28/1024': 22, '28/4096': 22, '28/16384': 22, '24/1024': 22, '24/4096': 22, '24/16384': 22}"
+  },
+  {
+   "clause": "counted F_p and mod-n operations (I = 3/10/30 M, S = M) with hash-table and solver operations at 0/0.1/1 GAE",
+   "ok": true,
+   "recomputed": "cost = [(cI I + M + S)/(cI + 3) + h (H + L)]/T; H counts hash-table inserts and lookups, L solver operations (0 here)"
+  },
+  {
+   "clause": "the cheaper of ic5 and ic5ks per configuration and price",
+   "ok": true,
+   "recomputed": "icbest = min over the ic5 and ic5ks run of each configuration at each (cI, h)"
+  },
+  {
+   "clause": "ic5ks's retention ... along the shared arithmetic-progression W saves at most 1.5%",
+   "ok": true,
+   "recomputed": "max saving 1.53% (h = 0); at h = 0.1 and 1 ic5ks is never cheaper than ic5: True; W_k = W_0 + k D in the harness"
+  },
+  {
+   "clause": "costs 1.003-1.810x per target of the cheapest of 15 runs of this harness's multi-target rho per configuration and price",
+   "ok": true,
+   "recomputed": "1.0032-1.8101; 15 rho runs in every configuration"
+  },
+  {
+   "clause": "(Kuhn-Struik retention rho rho2xks at h = 0 and 0.1, distinguished-point rho rhodp at h = 1)",
+   "ok": true,
+   "recomputed": "winners over 3 cI x 198 configurations: {'h=0 rho2xks': 594, 'h=0.1 rho2xks': 594, 'h=1 rhodp': 594}"
+  },
+  {
+   "clause": "dearer in all 27 cell x I/M decisions of the frozen rule",
+   "ok": true,
+   "recomputed": "{'dearer': 27}"
+  },
+  {
+   "clause": "at I = 10M it is 1.04-1.16x at h = 0, 1.03-1.08x at h = 0.1 and 1.20-1.76x at h = 1",
+   "ok": true,
+   "recomputed": "1.0394-1.1557; 1.0280-1.0830; 1.1973-1.7565"
+  },
+  {
+   "clause": "it is 1.14-1.49x a paired BSGS",
+   "ok": true,
+   "recomputed": "1.1431-1.4946; decisions {'dearer': 27}"
+  },
+  {
+   "clause": "The frozen rule prices h on hash-table operations only",
+   "ok": true,
+   "recomputed": "PROTOCOL.md cost unit h (H + L); rhodp's canonicalisations are neither counted nor priced (validator replay counts in native_work.json)"
+  },
+  {
+   "clause": "with rhodp's per-step canonicalisations priced at the same h (AGENTS.md section 5a) the IC is 0.89-0.94x the cheapest rho at h = 1 and I = 10M and all 27 decisions are unranked",
+   "ok": true,
+   "recomputed": "0.8878-0.9351; decisions {'unranked': 27}"
+  },
+  {
+   "clause": "so no ranking against rho is established",
+   "ok": true,
+   "recomputed": "follows: under the section-5a reading no (cell, cI) is ranked"
+  }
+ ],
+ "headline": [
+  {
+   "name": "max saving of ic5ks over ic5 (percent, h = 0, all cI)",
+   "claimed": 1.5,
+   "recomputed": 1.530039117316584,
+   "rel_tol": 0.03267893574361104
+  },
+  {
+   "name": "icbest/rhobest min (frozen rule)",
+   "claimed": 1.003,
+   "recomputed": 1.0032274545350892,
+   "rel_tol": 0.0004983919626000544
+  },
+  {
+   "name": "icbest/rhobest max (frozen rule)",
+   "claimed": 1.81,
+   "recomputed": 1.8100723669863759,
+   "rel_tol": 0.0002762323259110686
+  },
+  {
+   "name": "I = 10M h = 0 min",
+   "claimed": 1.04,
+   "recomputed": 1.039424907052846,
+   "rel_tol": 0.004810357117742023
+  },
+  {
+   "name": "I = 10M h = 0 max",
+   "claimed": 1.16,
+   "recomputed": 1.155656379082716,
+   "rel_tol": 0.004326549907480869
+  },
+  {
+   "name": "I = 10M h = 0.1 min",
+   "claimed": 1.03,
+   "recomputed": 1.0279742355084291,
+   "rel_tol": 0.004863939997024371
+  },
+  {
+   "name": "I = 10M h = 0.1 max",
+   "claimed": 1.08,
+   "recomputed": 1.083026690810788,
+   "rel_tol": 0.004616696007978195
+  },
+  {
+   "name": "I = 10M h = 1 min",
+   "claimed": 1.2,
+   "recomputed": 1.197348591620198,
+   "rel_tol": 0.004175897508038338
+  },
+  {
+   "name": "I = 10M h = 1 max",
+   "claimed": 1.76,
+   "recomputed": 1.7565464468688912,
+   "rel_tol": 0.0028464974603505037
+  },
+  {
+   "name": "icbest/bsgs2 min",
+   "claimed": 1.14,
+   "recomputed": 1.1430981290256894,
+   "rel_tol": 0.004374082043386523
+  },
+  {
+   "name": "icbest/bsgs2 max",
+   "claimed": 1.49,
+   "recomputed": 1.4946319814121916,
+   "rel_tol": 0.003345308451968078
+  },
+  {
+   "name": "5a reading: icbest/rhobest I = 10M h = 1 min",
+   "claimed": 0.89,
+   "recomputed": 0.8877853738432466,
+   "rel_tol": 0.005631997493217133
+  },
+  {
+   "name": "5a reading: icbest/rhobest I = 10M h = 1 max",
+   "claimed": 0.94,
+   "recomputed": 0.9350509905142425,
+   "rel_tol": 0.005347307313422755
+  },
+  {
+   "name": "frozen rule: decisions dearer",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "5a reading: decisions unranked",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "curves",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  }
+ ],
+ "headline_mismatches": [],
+ "notes": [
+  "The sentence is a scoped statement about this harness's arms. The validator-report.json disposition of the original headline is unchanged (insufficient_evidence); this report judges only the statement above.",
+  "The 'at most 1.5%' bound is 1.53% before rounding to the stated precision."
+ ]
+}
