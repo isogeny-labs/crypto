@@ -26,11 +26,62 @@ l ∈ {19, 43, 107, 227} with one generator (the Frobenius images σ_l(g) of the
 record draws: the l = 2 case is the extreme where F_2^× = {1} ⊂ μ_N trivially, and binary systems are never
 single-equation chains of this form.
 
-S1_PLACEHOLDER
+**Rescoped arm (b′), scored (`s1/bigsmall/`, `s1/big/`; scorer `tools/s1_score.py`).** One generator, four unit
+instances per l ∈ {19, 43, 107, 227}, k = 4..9 at D ≤ 5 and k = 10 at D = 5, on the big engine (CPU, `--nosplit`;
+deviation from the protocol's engine split, recorded: the growth-lib driver ran 20× slower on the oversubscribed host
+and was stopped after its control rows; the two engines agree on every cell cross-checked). Control arm (a) over
+12289 reproduces the committed V_5(10) profile (0, 0, 2, 138, 3163, 18569) exactly.
+S1_CELLS
+
+**Exploratory follow-up (post hoc; `tools/s1_order_probe.py`, `tools/s1_freq_probe.py`, figure
+`figures/s1_departures.svg`).** One F_19 instance in arm (b′), (a, b, t) = (18, 18, 2), has 1 ∈ V_4(6): the D = 4
+plateau lasts one depth longer than the law; both engines reproduce it, and it is back on the law at k = 7..10.
+- The same (a, b, t) = (−1, −1, 2) over 40961, 43, 107 and 227 gives the generic closure: not the curve.
+- Over 40961, targets of exact order 3, 4, 5, 6, 8, 9, 12 give the generic closure (14 instances); order-2 targets
+  depart slightly (dims 607 and 835 at k = 6, 7; the known degenerate case S_3 = c·h²): not small target order.
+- Frequency among unit instances with non-order-2 targets: departure from the generic dims (605, 829) at k = 6 or 7
+  in 5/30 (l = 19), 2/30 (23), 3/30 (43), 0/20 (107), 2/20 (227), and 0/14 at 40961. Three classes: smaller closures
+  (602, 826) and (603, 828), with 1 still excluded, and full closures (794, 857), with 1 ∈ V_4(6) (two at l = 19, one
+  at l = 227, which is above 2^(k+1) = 128).
+- Reading: departures occur at every small l including l > 2^(k+1), at rates of order a few per hundred, and not at
+  large l: consistent with exceptional codimension-one loci in (a, b, t) hit with probability of order 1/l, not with
+  a characteristic mechanism. The loci themselves are not identified. For the attack side: such loci cannot be
+  steered to with a shared factor base (lane P's "target-adapted translation" rejection applies).
+
+**Arm (d), scored (Dm, two equations over 12289, k = 10, D = 5).** S1_ARMD
 
 ## J2 percolation factor-base size — see table below
 
-J2_PLACEHOLDER
+Grid (`j2/units/`, frozen seeds 1–3; binary SHA-256 in `j2/BUILD.txt`; scorer `tools/j2_score.py`, band
+`tools/j2_band.py`; figure `figures/j2_threshold_cost.svg`; bench record
+`benchmarks/records/20261112T0348Z-j2-percolation-fb-size.json`). DL1 on N4v2's own weak-family instances, every
+attempt charged, M-eq priced with the median of three `v2 calib` records per size (PARAMS.md rule).
+
+| k (q) | first-attempt success at c = 1.40 / 1.50 / 1.60 / 1.75 / 2.00 | charged DL1 cost / c = 2.00 at c = 1.60 (w = 0) | at c = 1.75 (w = 0) |
+|---|---|---|---|
+| 16 (65,479) | 0/3, 0/3, 3/3, 3/3, 3/3 | 0.87–1.12 | 0.91–1.00 |
+| 18 (262,111) | 0/3, 0/3, 3/3, 3/3, 3/3 | 0.72–0.80 | 0.79–0.85 |
+| 20 (1,048,507) | 0/3, 0/3, 3/3, 3/3, 3/3 | 0.67–0.69 | 0.78 |
+| 22 (4,194,271) | (1.40, 1.50 not in the grid), 3/3, 3/3, 3/3 | 0.65–0.66 | 0.77 |
+
+Against the preregistered predictions:
+- **Threshold law: holds.** First-attempt success flips between c = 1.50 and 1.60 at every k, inside the predicted
+  c_50 ∈ [1.40, 1.75] (model 1.49–1.57).
+- **Success at c = 1.75 ≥ 0.9: holds** (3/3 at every k; three seeds is a weak test).
+- **Cost ratio at c = 1.75 in [0.70, 0.85] at every k: falsified at k = 16** (0.91–1.00), holds at k = 18, 20, 22
+  (0.77–0.85). The record named this risk ("a large-q lever"); the ratio falls monotonically with k.
+- **Band (§5a).** At k ≥ 18 the per-seed order c = 1.60 < 1.75 < 2.00 holds at w = 0, 0.1 and 1 (unpriced hash and
+  compare operations priced at w GAE); at k = 16 it fails at w = 0 and 0.1.
+- **Controls.** A/A repeat of (k = 16, seed 1, c = 1.75): every counter identical. Seeds agree to within 1% at
+  k ≥ 20.
+- **Post-hoc arm.** c = 1.60 is cheaper than the preregistered c = 1.75 at k ≥ 18 (0.65–0.80). It was selected after
+  reading the grid, so it was frozen as a held-out test (amendment 05:00 UTC; seeds 4–8, k = 21 and 22):
+  J2_HELDOUT
+
+Class: engineering (one parameter of the frozen pipeline; same algorithm), on the programme's weak-family quartic
+row (N4v2 DL1, itself about 0.005× matched negation rho at q = 2^21 per its README). Not validated: no replay
+certificate or validator report, so no leaderboard or `benchmarks/README.md` row; the next step is the validation
+gate on the held-out rule.
 
 ## M1 three-summand arity grid (desk, from `ml-cryptanalysis/experiments/ic-bounds-m3-depth/`, exact records)
 
