@@ -201,8 +201,12 @@ of the 24 rows (`rows/cm/SUMMARY.md`). The canonical lift is not the reopening c
 `p = 40961`, `t = 6, 8, 10`, three curves each (`rows/dickson_*.jsonl`), the digits read 3, 4, 5,
 equal to random and to `d_full`; `y₀ → 1`, `y₀y₁ → 2`.
 
-**7c. Support-width law at larger `t` (6c):** see `devcheck/README.md` and the rows
-`devcheck/nullw{1,3,4}_m2_t9-11.jsonl` when the run has finished; the reading is recorded there.
+**7c. Support-width law at larger `t` (6c), interim.** `W = 1` stays at 5 through `t = 11`
+(consistent with the prediction of a step at `t = 12` or later); `W = 3` steps to 6 at `t = 9`,
+**refuting** the prediction of a plateau through `t = 9`; every completed cell is monotone in `W` and
+`t`. `W = 1` and `W = 2` both step every four levels, offset by two (`d_F(1, t) = 3 + ⌊t/4⌋`,
+`d_F(2, t) = 4 + ⌊(t − 2)/4⌋` on `t = 2..11`, fits to the recorded steps). Table and censoring in
+`devcheck/README.md`; the `W = 3, 4` cells at `t = 10, 11` are still running.
 
 **Standing after 7a and 7b.** The `Z/p^k` exit now fails filter item 4 on the trivial lift (42
 cells), on the canonical lift of two CM curves (16 cells), and on the Dickson base (9 cells). The
