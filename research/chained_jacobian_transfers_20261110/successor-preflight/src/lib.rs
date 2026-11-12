@@ -9,6 +9,8 @@ mod legacy_jacobian;
 #[cfg(test)]
 mod odd_descent;
 #[cfg(test)]
+mod quartic_cover_replay;
+#[cfg(test)]
 #[path = "seven-reference.rs"]
 mod seven;
 #[cfg(test)]

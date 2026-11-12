@@ -1,73 +1,86 @@
-# CT27 — both complete rational class corpora independently replayed
+# CT28 — both T0 elliptic norms now evaluate directly over F101
 
-Complete changed consumer check.sh05 passes25native/83reference unit plus
-five integration tests,one pre-existing ignored benchmark,all original
-source guards/fmt/strictClippy. Each T0/T1 corpus has12317 classes and
-complete negation,doubling and fixed-partner(37i+7)%12317 operator tables.
-The integrated producer reproduces all eight frozen semantic files exactly.
-Whole101216-byte raw→standard-XZ11984bytes has raw/archive hashes and
-exact roundtrip,consumer93b147/root18115e. Actual post-run source04 and
-fixture04 hashes match. Observation06/e15346/root279a08 corrects only a
-clerical estimated timestamp in immutable observation05. [pcc:unverified]
+Both exact degree4 covers of T0=[31,75,74,54,71,55,1] have complete
+local all12317 norm acceptance,using only existing arithmetic engines.
+Coefficients are low to high;pi=(N/Q²,yM/Q³),infinity images±q.
 
-Independent root existing-Cantor standalone03 passes12tests/strictClippy/
-original extraction guards,4b2aa9. Every input/quintic validity,image
-distinctness,identity239,negation,double and predetermined paired sum
-agrees for both complete corpora. Old49-kernel tests remain. This covers
-neither all151M ordered pairs nor independent isogeny evaluation/kernel
-membership. The checker imports no producer Balanced,tower,Richelot or
-elliptic-map code;one unchanged pre-existing generic engine is shared.
-[pcc:unverified]
+| Factor | N | Q | M | q |
+|---|---|---|---|---|
+| E109(1,46) | [14,0,88,97,14] | [63,0,1] | [41,40,69,73] | (14,73) |
+| E113(44,21) | [5,49,31,0,87] | [35,0,1] | [87,1,82,87] | (87,87) |
 
-FULL_CLASS_REPLAY.md/0beed8 equals upstreamFULL_CLASS_REPLAY_PROOF.md/
-b71a87. The exact infinity term is(2n+m-2)Q;degree0 plus0/2 are not the
-identity. Two bound BalancedChart statements db2184/9fd61b have zero-
-trusted local kernel/axiom passes,aggregate7d9a53. Current root source
-census134written/24 workflow modules for this checkpoint. Actual projective/Picard
-geometry remains written;failed Clippy01 and Lean01/02 are preserved.
-Final complete-report60602bytes/two inspected pages94c84f/root89916e
-is a distinct version;earlier root classes-reportb79cbb stays unchanged.
-[pcc:unverified]
+First native constructionad6883/directnorm585f35 and second25ce85/
+2fcf0b match every12317 original H=N_(0,j)R0hat output,all negations/
+fixed-partner sums,infinities and wrong-model controls. Each includes2
+closed-pole classes/118repeated supports;coincident-image doubles126/
+114 and opposite cancellations108/102. No degree1-pole occurrence is
+claimed. Exact coefficientwise identities/gcd/smoothness/separability/
+xdegree4 and all118 finite rational witnesses pass. Independent flat-
+field5ab2bd/5eb5b1 also checks complete domains,infinity limits,four
+geometric pole branches per cover and negative controls. A negated map
+still satisfies the curve identity but fails118witnesses. [pcc:unverified]
 
-Consumer5ceb1db026898a07a1dcbda8ba186c9d1741f1e8/tree
-c85cb5b7efe8e560812905c64ee4af9b1177d54a is published ready1501 against
-immediate1498/research/chained-transfer-root-cache-20261112 at25fd.
-Parent1498 exact25fd focused43144567065 succeeds25/82+five;full171091-
-byte decoded log→XZ23300bytes/API/check observation205514 is retained
-here. Gate passes/scientific signing skips;parent remains fixed. Own
-focusedCI dispatched at04:49UTC,initial runID pending;gate43157158562
-initiallyrunning. Next meaningful exact-head observation~05:40UTC.
-Required reviews remain separate. Integrate bottom-up;
-feature-base auto-merge is unavailable. [pcc:unverified]
+QUARTIC_COVER_PROOF.md/6afa9c and T0_SECOND_QUARTIC_PROOF.md/a38aa4
+derive actual degree4 from the old global HHdagger=[4],derive the
+finite-q square-denominator ansatz,and use Milne AVv2 arbitrary-map
+cube Cor5.3 to bound a difference of degree4 maps by16. The118distinct
+agreements identify the global old maps,with expected-value provenance
+and old Picard/polarization/norm constructions explicit dependencies.
+Galbraith correctedChapter8 supplies extension,degree,fibre and norm
+facts. Geometry remains written,not fully Lean-formalized. Existing
+134written declarations/24modules unchanged. [pcc:unverified]
 
-Root published952e1cb4bc44163a49c097d3d68d8f483f43d8f1 exact focused
-43149872098 succeeds25native/23named modules/132written/9standalone,
-full decoded three-job archive4dc04c. It excludes local CT27 scope12/
-134/24. New root exact-headCI must follow publication. [pcc:unverified]
+Root complete standalone10 passes15tests/strictClippy09,c3a4b7;all prior
+complete-class/kernel controls and original constructor/legacy/jv hashes
+retained. First component report996822 has two final inspected pages,
+DOT/SVG/Typst/PDF and historical14-test scope;do not edit it. Initial
+compilerfailure01/7137fa,all source snapshots and prior proofs remain
+immutable. Existing private Sutherland Lagrange body has exact visibility-
+only extraction custody. [pcc:unverified]
 
-CT28 first isolated native02/ad6883 constructs actual T0→E109 candidate
-N=[14,0,88,97,14],Q=[63,0,1],M=[41,40,69,73],infinity+q=(14,73).
-Exact polynomial identity,gcd/smoothness/separability,xdegree4 and all118
-finite rational points agree with the retained route. No rational poles
-were dropped. Existing Sutherland Lagrange body has visibility-only byte-
-exact extraction guard;all field/poly/group arithmetic reused. Initial
-SevenEdge field-access compilerfailure01/7137fa retained. Global
-identification/independent certificate replay/arbitrary-class norm
-acceptance remain pending. Continue in isolated scratch ct27-prototype,
-src/ct28_quartic.rs;native raw scratch/ct28-first-cover-02.txt. New consumer
-research/chained-transfer-quartic-covers-20261112 starts5ceb,clean.
- Exact polynomial identity,degree/global
-identification,exceptional support and full12317 norm comparisons are
-acceptance requirements. Sources:retained actual Ri/norm code and written
-global norm identities;Milne AVv2 ChapterI Corollary5.3(theorem of cube)
-supports the degree parallelogram after pullback and symmetry. KB/ecdb
-tools/wrapper unavailable,atlas8edec422a vault locked/KEY absent;no novelty
-or absence claim. No measured stage/pipeline/ECDLP gain. [pcc:unverified]
+Consumer new research/chained-transfer-quartic-covers-20261112 starts
+5ceb1db026898a07a1dcbda8ba186c9d1741f1e8. Only FIRST component is
+integrated so far:targeted05 passes2tests/strictClippy86b79a;written
+5e3d69 equalsroot6afa9c. Complete changed check.sh07 runs86050 since
+05:04:43UTC,raw/workspace/scratch/ct28-complete-07.txt. Four actual
+sources are frozen by evidence/ct28-integrated-source-05.sha256 and
+individual snapshots05. DO NOT EDIT actual consumer sources during
+this guard. Predict25native/85reference unit+five integrations,one old
+ignored;inspect actual completion before acceptance. [pcc:unverified]
 
-S3 checkpoint/profile and livebudget unavailable:bounded correctness/
-proof construction only,no solver,benchmark,paid job or gate bypass.
-Frozen root/consumer ledger forks,parent1484 C findings and root legacy
-archive/clock failures persist. No rebase,force,rechain or lineage choice.
-Green fixed descendants need no quiet poll while parent gates are blocked;
-recheck exact heads and actual requirements before any merge. Parent1484
-nextquiet05:11UTC;root unchanged baseline/audits are not to be rerun.
+Next active isolated prototype is/workspace/scratch/ct27-prototype,
+src/ct28_joint_h0.rs,source11 hashes/rawct28-joint-native-11.txt,
+process46808. It combines both accepted components as H0 and substitutes
+their coordinates into the unchanged quarter/alpha/pull/R1 remainder.
+Old forward remains reference. Predict complete12317 ordered-coordinate
+and forwardPsi equality/bijection/model controls. No whole-prime-field
+Psi or measured gain is accepted. Next T1 covers/directpullbacks may
+remove the remaining extension-field stage;use a separate isolated
+copy while active prototype sources are frozen. [pcc:unverified]
+
+Published consumer CT27 ready1501 at5ceb/treec85cb5b7efe8e560812905c64ee4af9b1177d54a
+targets immediate1498/25fd. Its complete25native/83reference+five guard
+93b147/root18115e and independent12 replay4b2aa9 stay frozen. Own exact
+focused43157257094 nextmeaningfulcheck~05:40UTC;gate43157158562 succeeds,
+scientific signing separate. Parent1498 exact25fd focused43144567065
+succeeds25/82+five,full205514 in5ceb;head fixed. [pcc:unverified]
+
+Published root00cba85497f927a0f41a4436b2ae09c72aa885f7/tree3ce8a3a858ca0fddff4229399ca15f8869f8a076
+has own exactfocused43157805224 next~05:45UTC,scope12/134written/24modules
+only. It excludes current15/directnorm proofs. Prior952 CI43149872098
+succeeds25native/23modules/132written/9standalone,full4dc04c committed.
+New root exact-headCI follows this checkpoint publication. [pcc:unverified]
+
+Parent1484 quiet05:11 unchanged245/main52fe/mergeconflict/cppcheck and
+clang-tidy failures/reference+gate pass/signskip. Third quiet observation:
+pause unchanged polls until activity or a fresh pre-integration check.
+Other green fixed descendants remain paused. Integrate bottom-up after
+actual gates;feature-base auto-merge unavailable. Frozen ledger forks/
+root missingarchives-clock remain;no force/rebase/rechain/lineage choice.
+Broad root PCC03 actualexit1/f117f7 historical missing-subject failures
+and unchanged full library baseline are not to be rerun. [pcc:unverified]
+
+KB/ecdb absent;atlas8edec422a vault locked/KEY absent. S3 checkpoint/
+profile and livebudget unavailable. Bounded local correctness/proof work
+continues;no solver,benchmark,paidjob,checkpoint bypass or plaintext
+atlas write. No measured computational advantage or novelty claim.
