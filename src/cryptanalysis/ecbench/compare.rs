@@ -474,6 +474,12 @@ pub struct CompareOptions {
     /// (default since 2026-11-08: the counted table inserts;
     /// `Pricing::pre_2026_11_08()` charges nothing extra).
     pub pricing: Pricing,
+    /// Pair each run's recorded bitop/v1 price (`work.bitops_per_sqrt_r`)
+    /// instead of its S (`ecbench compare --unit bitop/v1`): the ratio and
+    /// its intervals are in gates, the §5a GAE band is not computed (it
+    /// prices operations in GAE), and the unit enters `comparison_id`.
+    /// Refused with a weight.
+    pub bitop: bool,
 }
 
 // ── Tail diagnostics ───────────────────────────────────────────────
@@ -708,6 +714,7 @@ fn match_pairs(
     mb: &[&Record],
     weight: Option<f64>,
     pricing: Pricing,
+    bitop: bool,
 ) -> Result<Matched, String> {
     let (ca, cb) = (arm_censor(ma), arm_censor(mb));
     let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
@@ -716,11 +723,32 @@ fn match_pairs(
     let mut a_unpriced = 0usize;
     let mut b_unpriced = 0usize;
 
+    let bitop_s = |r: &Record| -> Result<Option<(f64, bool)>, String> {
+        if !r.counts() {
+            return Ok(None);
+        }
+        let w = r
+            .work
+            .as_ref()
+            .ok_or_else(|| format!("record {} has no bitop/v1 work block", r.record_id))?;
+        let v = w.bitops_per_sqrt_r;
+        if !(v.is_finite() && v >= 0.0) {
+            return Err(format!(
+                "record {}: bitops_per_sqrt_r is not finite",
+                r.record_id
+            ));
+        }
+        Ok(Some((v, false)))
+    };
     for r in ma {
-        let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
-            Some(_) => None,
-            None => run_cost(r, &ca),
+        let cost = if bitop {
+            bitop_s(r)?
+        } else {
+            match weight {
+                Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
+                Some(_) => None,
+                None => run_cost(r, &ca),
+            }
         };
         if let Some((s, censored)) = cost {
             a.insert(key(r), (*r, s, censored));
@@ -729,10 +757,14 @@ fn match_pairs(
         }
     }
     for r in mb {
-        let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
-            Some(_) => None,
-            None => run_cost(r, &cb),
+        let cost = if bitop {
+            bitop_s(r)?
+        } else {
+            match weight {
+                Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
+                Some(_) => None,
+                None => run_cost(r, &cb),
+            }
         };
         if let Some((s, censored)) = cost {
             b.insert(key(r), (*r, s, censored));
@@ -752,7 +784,7 @@ fn match_pairs(
                 b: *sb,
                 a_censored: *ca,
                 b_censored: *cb,
-                band: if exact {
+                band: if exact && !bitop {
                     priced_pair(ra, rb, pricing)
                 } else {
                     Vec::new()
@@ -964,6 +996,7 @@ pub fn compare_weighted(
             seed,
             allow_interrupted: false,
             pricing: Pricing::default(),
+            bitop: false,
         },
         weight,
     )
@@ -1086,7 +1119,10 @@ pub fn compare_loaded_weighted(
         return Err("the arms report different units".into());
     }
 
-    let matched = match_pairs(&ma, &mb, weight, opts.pricing)?;
+    if opts.bitop && weight.is_some() {
+        return Err("a bitop/v1 comparison takes no GAE weight".into());
+    }
+    let matched = match_pairs(&ma, &mb, weight, opts.pricing, opts.bitop)?;
     if weight.is_some() {
         validate_weighted_totals(&matched)?;
     }
@@ -1171,7 +1207,11 @@ pub fn compare_loaded_weighted(
         } else {
             "ok".into()
         },
-        unit: ma[0].cost.unit.clone(),
+        unit: if opts.bitop {
+            "bitop/v1".to_string()
+        } else {
+            ma[0].cost.unit.clone()
+        },
         ratio_b_over_a: rep.ratio,
         ci95: rep.ci95,
         ci_method: rep.ci_method.clone(),
@@ -1252,6 +1292,9 @@ pub fn compare_loaded_weighted(
         if let Some(w) = weight {
             identity["pricing_weight"] = json!(w.to_string());
         }
+        if opts.bitop {
+            identity["unit"] = json!("bitop/v1");
+        }
         // The reading is part of the v2 identity; the v1 identity predates
         // pricing and stays the same under either reading.
         if extra && !priced_table_work.is_empty() {
@@ -1275,7 +1318,7 @@ pub fn compare_loaded_weighted(
         wall,
         quality: Some(quality),
         verdict,
-        legacy_comparison_id: weight.is_none().then_some(legacy_id),
+        legacy_comparison_id: (weight.is_none() && !opts.bitop).then_some(legacy_id),
         a_session_status: Some(sa.status.clone()),
         b_session_status: Some(sb.status.clone()),
         allow_interrupted: opts.allow_interrupted,
@@ -2213,6 +2256,7 @@ mod tests {
                 seed: 7,
                 allow_interrupted: allow,
                 pricing: Pricing::default(),
+                bitop: false,
             },
         )
     }
@@ -2629,6 +2673,7 @@ mod tests {
             seed: 1,
             allow_interrupted: false,
             pricing: Pricing::default(),
+            bitop: false,
         };
         let unweighted = compare_loaded_weighted(
             &session,
@@ -2696,6 +2741,7 @@ mod tests {
                 seed: 7,
                 allow_interrupted: false,
                 pricing,
+                bitop: false,
             };
             compare_loaded_weighted(
                 &session,
@@ -2799,9 +2845,41 @@ mod tests {
         );
         a.cost.total_gae = None;
         b.cost.total_gae = None;
-        let matched = match_pairs(&[&a], &[&b], Some(1.0), Pricing::default()).unwrap();
+        let matched = match_pairs(&[&a], &[&b], Some(1.0), Pricing::default(), false).unwrap();
         assert_eq!(matched.unpaired, 2);
         assert!(matched.by_workload.is_empty());
+    }
+
+    #[test]
+    fn bitop_pairing_needs_a_work_block() {
+        let a = rec(
+            "A",
+            "M1",
+            "reference",
+            "W00",
+            1,
+            "verified",
+            Some(10.0),
+            1_000,
+        );
+        let b = rec(
+            "B",
+            "M2",
+            "candidate",
+            "W00",
+            1,
+            "verified",
+            Some(20.0),
+            2_000,
+        );
+        assert!(a.work.is_none());
+        let err = match_pairs(&[&a], &[&b], None, Pricing::default(), true)
+            .err()
+            .unwrap();
+        assert!(err.contains("no bitop/v1 work block"), "{err}");
+        // The S reading of the same records still pairs.
+        let m = match_pairs(&[&a], &[&b], None, Pricing::default(), false).unwrap();
+        assert_eq!(m.by_workload.values().map(|v| v.len()).sum::<usize>(), 1);
     }
 
     #[test]
