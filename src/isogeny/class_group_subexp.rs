@@ -1458,6 +1458,21 @@ pub fn index_by_det_gcd(
     let done: BTreeMap<usize, BigInt> =
         checkpoint.map_or_else(BTreeMap::new, |p| load_dets(p, &header));
     let mut fresh = done.is_empty();
+    // a further determinant that leaves the running gcd unchanged means the gcd
+    // has stabilised at the lattice index (with high probability); if that index
+    // is not yet the class number, only more relations help, not more subsets
+    let mut prev_key: Option<(u64, u64)> = None;
+    let mut stable = |g: &Option<BigInt>, s: usize| -> bool {
+        let key = g.as_ref().map(|x| {
+            (
+                x.magnitude().bits(),
+                x.magnitude().iter_u64_digits().next().unwrap_or(0),
+            )
+        });
+        let same = s >= 2 && key.is_some() && key == prev_key;
+        prev_key = key;
+        same
+    };
     for s in 0..subsets {
         // the row order is generated before the checkpoint is consulted, so the
         // random stream of later subsets does not depend on which were skipped
@@ -1486,6 +1501,10 @@ pub fn index_by_det_gcd(
                     eprintln!("[class_group_subexp]   restored determinants already match the analytic estimate; stopping");
                     break;
                 }
+            }
+            if stable(&g, s) {
+                eprintln!("[class_group_subexp]   restored determinants: gcd unchanged by subset {s}; stopping this round");
+                break;
             }
             continue;
         }
@@ -1529,6 +1548,10 @@ pub fn index_by_det_gcd(
                     break;
                 }
             }
+        }
+        if stable(&g, s) {
+            eprintln!("[class_group_subexp]   gcd unchanged by subset {s}; stopping this round");
+            break;
         }
     }
     g
