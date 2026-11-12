@@ -861,6 +861,16 @@ enum CoverKind {
     Quad,
     /// `X = N(u)/D(u)`, random coprime quadratics: genus 3.
     Generic,
+    /// `X = u⁴`: genus 5, the second positive control. On a Kummer tower it
+    /// is the tower's first two steps, so `x∘φ(V)` is the depth-`t − 2` tower.
+    Fourth,
+    /// `X = u³ + c₂u² + c₁u + c₀`, random: `h = f(X(u))` of degree 9, genus 4.
+    Cubic,
+    /// `X = u⁴ + c₃u³ + … + c₀`, random: `h` of degree 12, genus 5.
+    Quart,
+    /// `X = N(u)/D(u)`, random coprime cubics: `h = D⁴f(N/D)` of degree 12,
+    /// genus 5.
+    Generic3,
 }
 
 impl CoverKind {
@@ -869,16 +879,30 @@ impl CoverKind {
             CoverKind::Square => "square",
             CoverKind::Quad => "quad",
             CoverKind::Generic => "generic",
+            CoverKind::Fourth => "fourth",
+            CoverKind::Cubic => "cubic",
+            CoverKind::Quart => "quart",
+            CoverKind::Generic3 => "generic3",
         }
     }
 }
 
-/// `x∘φ(u) = N(u)/D(u)`, coefficients from degree 0 up.
+/// The largest degree of `N` and `D` in [`CoverMap`], plus one.
+const COVER_COEFFS: usize = 5;
+
+/// `x∘φ(u) = N(u)/D(u)`, coefficients from degree 0 up, zero-padded.
 #[derive(Clone, Copy, Debug)]
 struct CoverMap {
     kind: CoverKind,
-    num: [u64; 3],
-    den: [u64; 3],
+    num: [u64; COVER_COEFFS],
+    den: [u64; COVER_COEFFS],
+}
+
+/// Zero-pads `c` to [`COVER_COEFFS`] coefficients.
+fn cover_coeffs(c: &[u64]) -> [u64; COVER_COEFFS] {
+    let mut out = [0u64; COVER_COEFFS];
+    out[..c.len()].copy_from_slice(c);
+    out
 }
 
 fn upoly_eval(c: &[u64], u: u64, p: u64) -> u64 {
@@ -948,8 +972,44 @@ impl CoverMap {
         match kind {
             CoverKind::Square => CoverMap {
                 kind,
-                num: [0, 0, 1],
-                den: [1, 0, 0],
+                num: cover_coeffs(&[0, 0, 1]),
+                den: cover_coeffs(&[1]),
+            },
+            CoverKind::Fourth => CoverMap {
+                kind,
+                num: cover_coeffs(&[0, 0, 0, 0, 1]),
+                den: cover_coeffs(&[1]),
+            },
+            CoverKind::Cubic | CoverKind::Quart => {
+                let deg = if kind == CoverKind::Cubic { 3 } else { 4 };
+                let mut num: Vec<u64> = (0..deg).map(|_| rng.gen_range(0..p)).collect();
+                num.push(1);
+                CoverMap {
+                    kind,
+                    num: cover_coeffs(&num),
+                    den: cover_coeffs(&[1]),
+                }
+            }
+            CoverKind::Generic3 => loop {
+                let num = [
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    1,
+                ];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
+                if upoly_gcd_degree(&num, &den, p) == 0 {
+                    break CoverMap {
+                        kind,
+                        num: cover_coeffs(&num),
+                        den: cover_coeffs(&den),
+                    };
+                }
             },
             CoverKind::Quad => {
                 // λ(u − α)² + β = λu² − 2λα·u + λα² + β.
@@ -960,12 +1020,12 @@ impl CoverMap {
                 );
                 CoverMap {
                     kind,
-                    num: [
+                    num: cover_coeffs(&[
                         addm(mulm(la, mulm(al, al, p), p), be, p),
                         subm(0, mulm(2, mulm(la, al, p), p), p),
                         la,
-                    ],
-                    den: [1, 0, 0],
+                    ]),
+                    den: cover_coeffs(&[1]),
                 }
             }
             CoverKind::Generic => loop {
@@ -976,7 +1036,11 @@ impl CoverMap {
                     rng.gen_range(1..p),
                 ];
                 if upoly_gcd_degree(&num, &den, p) == 0 {
-                    break CoverMap { kind, num, den };
+                    break CoverMap {
+                        kind,
+                        num: cover_coeffs(&num),
+                        den: cover_coeffs(&den),
+                    };
                 }
             },
         }
@@ -990,16 +1054,17 @@ impl CoverMap {
 
     /// `x∘φ(u)` as an argument of [`s3_dbl_args`], `u` a polynomial.
     fn arg(&self, u: &Pol, n: usize, p: u64) -> Arg {
-        let lift = |c: &[u64; 3]| {
-            let mut f = Pol::constant(n, c[0], p);
+        let lift = |c: &[u64; COVER_COEFFS]| {
+            let c = upoly_trim(c.to_vec());
+            let mut f = Pol::constant(n, c.first().copied().unwrap_or(0), p);
             let mut pw = u.clone();
-            for &k in &c[1..] {
+            for &k in c.iter().skip(1) {
                 f = f.add(&pw.scale(k, p), p);
                 pw = pw.mul(u, p);
             }
             f
         };
-        if self.den == [1, 0, 0] {
+        if upoly_trim(self.den.to_vec()) == [1] {
             Arg::Plain(lift(&self.num))
         } else {
             Arg::Frac(lift(&self.num), lift(&self.den))
@@ -2580,7 +2645,14 @@ fn parse_args() -> Args {
                     "square" => CoverKind::Square,
                     "quad" => CoverKind::Quad,
                     "generic" => CoverKind::Generic,
-                    other => panic!("unknown --cover-map `{other}` (square, quad, generic)"),
+                    "fourth" => CoverKind::Fourth,
+                    "cubic" => CoverKind::Cubic,
+                    "quart" => CoverKind::Quart,
+                    "generic3" => CoverKind::Generic3,
+                    other => panic!(
+                        "unknown --cover-map `{other}` \
+                         (square, quad, generic, fourth, cubic, quart, generic3)"
+                    ),
                 })
             }
             "--controls" => {
@@ -2940,8 +3012,8 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         if let Some(cv) = &tower.cover {
             row["cover"] = json!({
                 "map": cv.kind.name(),
-                "num": cv.num,
-                "den": cv.den,
+                "num": upoly_trim(cv.num.to_vec()),
+                "den": upoly_trim(cv.den.to_vec()),
                 "genus": cv.genus(curve.a, curve.b, p),
                 "h_degree": cv.h(curve.a, curve.b, p).len() - 1,
                 "base_size": cv.image(&tower.v, p).len(),
