@@ -1,0 +1,42 @@
+[
+  {
+    "name": "SpectralControls.rational_tangent_shadow",
+    "claim_path": "pcc/claims/PCC-20261112-28f4e8.json",
+    "statement": "theorem rational_tangent_shadow {A V W : Type} [IntModule A] [IntModule V] [IntModule W] (a : A) (v : V) (w : W) (ha : (12317 : Int) \u2022 a = 0) (hv : (101 : Int) \u2022 v = 0) (hw : (7 : Int) \u2022 w = 0) : (1244018 : Int) \u2022 a = a \u2227 (4976069 : Int) \u2022 a = a \u2227 (1244018 : Int) \u2022 v = v \u2227 (4976069 : Int) \u2022 v = v \u2227 (1244018 : Int) \u2022 w = -w \u2227 (4976069 : Int) \u2022 w = 0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/SpectralControls.lean",
+      "theorem": "SpectralControls.rational_tangent_shadow",
+      "decl_sha256": "e11f40100186fa5955683d945d0ab2db14994465fe8d42e26c8d93377882a774"
+    }
+  },
+  {
+    "name": "SpectralControls.fixed_frobenius_projectors",
+    "claim_path": "pcc/claims/PCC-20261112-c783fc.json",
+    "statement": "theorem fixed_frobenius_projectors {K : Type} [CommRing K] (x u : K) (hp : (x^2+7*x+101)*(x^2+11*x+101) = 0) (hu : (404 : K)*u = 1) : let a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/SpectralControls.lean",
+      "theorem": "SpectralControls.fixed_frobenius_projectors",
+      "decl_sha256": "4324817b1119d5bf04a7794d25c8fe6a1c567220189a7ecc1c34411b000b32da"
+    }
+  },
+  {
+    "name": "SpectralControls.unique_projector_decomposition",
+    "claim_path": "pcc/claims/PCC-20261112-032f9e.json",
+    "statement": "theorem unique_projector_decomposition {M : Type} [IntModule M] (p q : M \u2192 M) (pl : \u2200 a b, p (a+b) = p a+p b) (ql : \u2200 a b, q (a+b) = q a+q b) (hs : \u2200 a, p a+q a = a) (hpq : \u2200 a, p (q a) = 0) (hqp : \u2200 a, q (p a) = 0) (x : M) : p x+q x = x \u2227 p (p x) = p x \u2227 q (q x) = q x \u2227 \u2200 a b, p a = a \u2192 q b = b \u2192 a+b = x \u2192 a = p x \u2227 b = q x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/SpectralControls.lean",
+      "theorem": "SpectralControls.unique_projector_decomposition",
+      "decl_sha256": "4e8f1e8f86d980341cf9247a9572cc0f9501df529935a4d8b4e96412ff6668ac"
+    }
+  },
+  {
+    "name": "SpectralControls.polynomial_projector_naturality",
+    "claim_path": "pcc/claims/PCC-20261112-d261e9.json",
+    "statement": "theorem polynomial_projector_naturality {M N : Type} [IntModule M] [IntModule N] (pi : M \u2192 M) (tau : N \u2192 N) (f : M \u2192 N) (fl : \u2200 (n : Int) a, f (n \u2022 a) = n \u2022 f a) (fa : \u2200 a b, f (a+b) = f a+f b) (fc : \u2200 a, f (pi a) = tau (f a)) (u a b c d : Int) (x : M) : f (u \u2022 (a \u2022 pi (pi (pi x))+b \u2022 pi (pi x)+c \u2022 pi x+d \u2022 x)) = u \u2022 (a \u2022 tau (tau (tau (f x)))+b \u2022 tau (tau (f x))+c \u2022 tau (f x)+d \u2022 f x)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/SpectralControls.lean",
+      "theorem": "SpectralControls.polynomial_projector_naturality",
+      "decl_sha256": "d59accdf377afec4060a6ba8201af4b71573864e06b8b4331cf7497f9a959ad9"
+    }
+  }
+]

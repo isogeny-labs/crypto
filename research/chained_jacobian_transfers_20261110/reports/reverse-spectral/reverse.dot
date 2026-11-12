@@ -1,0 +1,16 @@
+digraph reverse_chain {
+  graph [rankdir=LR,bgcolor="transparent",pad="0.15",nodesep="0.18",ranksep="0.24"];
+  node [shape=box,style="rounded,filled",fillcolor="#e8f1fa",color="#285b88",fontname="DejaVu Sans",fontsize=10];
+  edge [color="#285b88",arrowsize=0.7];
+  input [label="Jac(T2)\n12,317 rational classes"];
+  norms [label="Two T2 norms\nH2"];
+  quarter [label="Public quarter\n82 / 85 once"];
+  duals [label="betaHat then alphaHat\nscale 29 after each"];
+  pulls [label="Two T0 pullbacks\nK0 and sum"];
+  output [label="Jac(T0)\ncompressed adjoint"];
+  input -> norms -> quarter -> duals -> pulls -> output;
+  norm [label="Both roundtrips [49]\nrational inverse [4776] adjoint",fillcolor="#e8f5e9",color="#397449"];
+  {rank=same; input;norm;output;}
+  output -> norm [style=dashed,color="#397449",constraint=false];
+  norm -> input [style=dashed,color="#397449",constraint=false];
+}

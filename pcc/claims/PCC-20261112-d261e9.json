@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T09:35:25Z",
+ "id": "PCC-20261112-d261e9",
+ "kind": "theorem",
+ "producer": {
+  "commit": "9084c16ce7096ca4c890058d7aa21be85c787a7b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d59accdf377afec4060a6ba8201af4b71573864e06b8b4331cf7497f9a959ad9",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/SpectralControls.lean",
+   "theorem": "SpectralControls.polynomial_projector_naturality"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful explicit module/ring consequences of credited CT38/39/40 inputs. Actual abelian varieties,tangent spaces,degree,geometric torsion realization,Frobenius characteristic relation and Tate-module/subgroup bridges remain separate written dependencies. No full geometric formalization or signed scientific standing.",
+ "statement": "theorem polynomial_projector_naturality {M N : Type} [IntModule M] [IntModule N] (pi : M \u2192 M) (tau : N \u2192 N) (f : M \u2192 N) (fl : \u2200 (n : Int) a, f (n \u2022 a) = n \u2022 f a) (fa : \u2200 a b, f (a+b) = f a+f b) (fc : \u2200 a, f (pi a) = tau (f a)) (u a b c d : Int) (x : M) : f (u \u2022 (a \u2022 pi (pi (pi x))+b \u2022 pi (pi x)+c \u2022 pi x+d \u2022 x)) = u \u2022 (a \u2022 tau (tau (tau (f x)))+b \u2022 tau (tau (f x))+c \u2022 tau (f x)+d \u2022 f x)"
+}

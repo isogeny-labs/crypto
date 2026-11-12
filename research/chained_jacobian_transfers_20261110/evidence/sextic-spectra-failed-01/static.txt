@@ -1,0 +1,15 @@
+src/seven-reference.rs: OK
+src/legacy_jacobian.rs: OK
+../../../src/cryptanalysis/jv_cover.rs: OK
+    Checking chained-successor-preflight v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/successor-preflight)
+error: manually reimplementing `div_ceil`
+  --> src/sextic_spectra.rs:30:39
+   |
+30 |     assert_eq!(squares.len() as u128, (f.size() + 1) / 2);
+   |                                       ^^^^^^^^^^^^^^^^^^ help: consider using `.div_ceil()`: `f.size().div_ceil(2)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_div_ceil
+   = note: `-D clippy::manual-div-ceil` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_div_ceil)]`
+
+error: could not compile `chained-successor-preflight` (lib test) due to 1 previous error

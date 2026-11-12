@@ -18,4 +18,6 @@ mod quartic_t1_replay;
 #[path = "seven-reference.rs"]
 mod seven;
 #[cfg(test)]
+mod sextic_spectra;
+#[cfg(test)]
 mod successor;
