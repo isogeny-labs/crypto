@@ -510,23 +510,7 @@ pub const SOLVER_UNIT_KEYS: &[&str] = &[
     "ns_per_hashed_tensor_step",
 ];
 
-/// Native counters that a phase charges only when their key is pinned
-/// ([`Calibration::pinned_unit_ns`]); unpinned, [`price_phase`] leaves them
-/// out exactly as before and `ecbench` lists the `*_uncharged` ones as
-/// unpriced.  The names are frozen (records carry them), so a pinned
-/// `pkm_*_uncharged` counter is charged under its old name and dropped
-/// from `unpriced`.  `pkm_crosscheck_fp_mults` (the opt-in cross-check) is
-/// not here: it is a diagnostic, not part of the solve.
-pub const PINNABLE_NATIVE: &[(&str, &str)] = &[
-    ("hashed_tensor_steps", "ns_per_hashed_tensor_step"),
-    ("pkm_system_fp_mults_uncharged", "ns_per_fp_mul"),
-    ("pkm_grid_fp_mults_uncharged", "ns_per_fp_mul"),
-    ("pkm_shared_poly_fp_mults_uncharged", "ns_per_fp_mul"),
-    ("pkm_trace_learn_spec_fp_mults_uncharged", "ns_per_fp_mul"),
-    ("pkm_t0_base_map_fp_mults_uncharged", "ns_per_fp_mul"),
-    ("pkm_base_check_fp_mults_uncharged", "ns_per_fp_mul"),
-    ("pkm_t0_target_fp_mults_uncharged", "ns_per_fp_mul"),
-];
+pub use crate::cryptanalysis::ic_framework::solver_units::PINNABLE_NATIVE;
 
 /// Whether `counter` is one of [`PINNABLE_NATIVE`] and `calib` pinned its key.
 pub fn native_is_pinned(counter: &str, calib: &Calibration) -> bool {

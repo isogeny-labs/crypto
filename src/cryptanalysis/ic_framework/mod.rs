@@ -77,6 +77,7 @@ pub mod recursive_adapter;
 pub mod residual;
 pub mod rootfind;
 pub mod shared_rank;
+pub mod solver_units;
 pub mod solvers;
 pub mod stages;
 pub mod subgroup_semaev;
