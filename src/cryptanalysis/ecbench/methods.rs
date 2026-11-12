@@ -64,8 +64,8 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_v3,
-    rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
+    ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
+    rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
     signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
     PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
@@ -6127,9 +6127,17 @@ fn ic_report(
             }
         }
     }
+    // A `*_uncharged` counter whose solver/oracle unit key is pinned for
+    // this curve (`ic_boundary::PINNABLE_NATIVE`) was charged by
+    // `price_phase` under its frozen name; with no such key pinned — every
+    // curve today — the list is what it always was.
     for phase in &phases {
         for (name, &count) in &phase.native {
-            if count > 0 && name.ends_with("_uncharged") && !unpriced.contains(name) {
+            if count > 0
+                && name.ends_with("_uncharged")
+                && !unpriced.contains(name)
+                && !native_is_pinned(name, calib)
+            {
                 unpriced.push(name.clone());
             }
         }
@@ -9566,6 +9574,162 @@ mod accounting_rules_tests {
             .forecast_unavailable
             .as_deref()
             .is_some_and(|s| s.contains("max_degree")));
+    }
+
+    /// **No solver-unit key pinned: an `ic.pipeline` `sat-cdcl` record is
+    /// the one it was.**  Snapshot taken on this checkout before the keys
+    /// existed (2026-11-12, K_1 / GF(2^17), seed 6, k = 4242): the same
+    /// total and phase bits, `solver_conflicts_uncharged` the only unpriced
+    /// entry (so `lower_bound`), the same pinned units, no
+    /// `pricing_qualification` in the solver block.
+    #[test]
+    fn sat_cdcl_record_is_unchanged_with_no_solver_unit_key_pinned() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let sat = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "sat-cdcl"),
+            ],
+        );
+        let rep = run(&sat, &inst, &facts, 4242, 6);
+        let s = rep.solver.as_ref().unwrap();
+        assert_eq!((s.op_unit.as_str(), s.ops), ("conflicts", 376494));
+        assert_eq!(rep.total_gae.to_bits(), 4650515843237975044);
+        assert_eq!(
+            rep.phases
+                .iter()
+                .map(|p| p.gae.to_bits())
+                .collect::<Vec<_>>(),
+            vec![
+                4632812305481666075,
+                0,
+                4649897368651038485,
+                4608088191764273417,
+                4624633867356078080
+            ]
+        );
+        assert_eq!(rep.unpriced, vec!["solver_conflicts_uncharged".to_string()]);
+        assert_eq!(
+            rep.detail["calibration_pinned_units"],
+            json!([
+                "ns_per_double",
+                "ns_per_lookup",
+                "ns_per_row_op",
+                "ns_per_as_solve",
+                "ns_per_word_xor",
+                "ns_per_frobenius",
+                "ns_per_canon"
+            ])
+        );
+        let block = &rep.detail["decomposition"]["solver"];
+        assert_eq!(block["priced_by"], "measured");
+        assert!(block.get("pricing_qualification").is_none());
+    }
+
+    /// **A pinned `ns_per_conflict` keeps the SAT solver's charge in the
+    /// ecbench total** (`priced_by = pinned`), so `solver_conflicts_uncharged`
+    /// leaves `unpriced` and the pin is named in `calibration_pinned_units`;
+    /// unpinned, the same report takes the solver back out as before.  A
+    /// pinned `pkm_*_uncharged` counter likewise leaves `unpriced`.
+    #[test]
+    fn a_pinned_solver_unit_key_is_charged_and_named_by_ic_report() {
+        use crate::cryptanalysis::ic_boundary::{random_binary_instance, BinaryGroup};
+        use crate::cryptanalysis::ic_framework::plugins::{
+            BinarySubspaceBase, DescentAlgebraicOracle,
+        };
+        let inst = random_binary_instance(11, 3, 8).expect("a curve at n = 11");
+        let group = BinaryGroup(&inst.fast);
+        let planted = 1 + 30_011 % (inst.r - 1);
+        let mut scratch = GroupOps::default();
+        let target = group.mul(&mut scratch, inst.generator, planted);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let base = BinarySubspaceBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "binary-subspace".into(),
+            oracle: "descent-algebraic".into(),
+            solver: Some("sat-cdcl".into()),
+            targets: Targets::Walk,
+            max_trials: 200_000,
+            seed: 7,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("dimension", "5");
+        let m = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "sat-cdcl"),
+            ],
+        );
+        let report = |calib: &Calibration| {
+            let mut oracle = DescentAlgebraicOracle::new(
+                2,
+                &inst,
+                solver_by_name("sat-cdcl").unwrap(),
+                Params::default(),
+                None,
+            );
+            let (mut rep, _) =
+                run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, planted, calib, None)
+                    .unwrap();
+            // A pkm counter on the relations phase, to read its listing.
+            rep.decomposition
+                .cost
+                .count("pkm_grid_fp_mults_uncharged", 17);
+            ic_report(&m, rep, calib, None, 0, 2)
+        };
+        let mut calib = Calibration {
+            ns_per_add: 1.0,
+            ns_per_double: 1.0,
+            ns_per_conflict: Some(0.5),
+            ns_per_fp_mul: Some(0.25),
+            ..Default::default()
+        };
+        let unpinned = report(&calib);
+        assert!(unpinned
+            .unpriced
+            .contains(&"solver_conflicts_uncharged".to_string()));
+        assert!(unpinned
+            .unpriced
+            .contains(&"pkm_grid_fp_mults_uncharged".to_string()));
+
+        calib.pinned_units = vec!["ns_per_conflict".into(), "ns_per_fp_mul".into()];
+        let pinned = report(&calib);
+        for gone in ["solver_conflicts_uncharged", "pkm_grid_fp_mults_uncharged"] {
+            assert!(
+                !pinned.unpriced.contains(&gone.to_string()),
+                "{:?}",
+                pinned.unpriced
+            );
+        }
+        assert_eq!(
+            pinned.detail["calibration_pinned_units"],
+            json!(["ns_per_conflict", "ns_per_fp_mul"])
+        );
+        let block = &pinned.detail["decomposition"]["solver"];
+        assert_eq!(block["priced_by"], "pinned");
+        let ops = pinned.solver.as_ref().unwrap().ops;
+        let solver_gae = block["gae"].as_f64().unwrap();
+        assert_eq!(solver_gae, ops as f64 * 0.5);
+        let sum: f64 = pinned.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(pinned.total_gae, sum);
+        assert!(
+            pinned.phases[2].gae >= solver_gae,
+            "the solver's charge stays in the relations phase"
+        );
+        assert!(pinned.total_gae > unpinned.total_gae);
     }
 
     #[test]
