@@ -10,6 +10,10 @@ fn polynomial(f: &FpR, a: &[u64]) -> Vec<ER> {
     a.iter().map(|c| f.from_u64(*c)).collect()
 }
 struct Certificate {
+    source: [u64; 7],
+    finite_count: usize,
+    rational_pole_count: usize,
+    pole_field_degree: usize,
     header: &'static str,
     text: &'static str,
     curve: [u64; 2],
@@ -19,8 +23,16 @@ struct Certificate {
     infinity: [u64; 2],
 }
 fn check(c: Certificate) {
-    let f = FpR::from_modulus(101, &F);
-    let source = polynomial(&f, &F);
+    // Always check irreducibility of the actual sextic, independently of
+    // which field contains this particular geometric pole fibre.
+    let source_field = FpR::from_modulus(101, &c.source);
+    let f = if c.pole_field_degree == 6 {
+        source_field
+    } else {
+        assert_eq!(c.pole_field_degree, 4);
+        FpR::new(101, 4)
+    };
+    let source = polynomial(&f, &c.source);
     let n = polynomial(&f, &c.n);
     let q = polynomial(&f, &c.q);
     let m = polynomial(&f, &c.m);
@@ -91,9 +103,9 @@ fn check(c: Certificate) {
             finite += 1;
         }
     }
-    assert_eq!(finite, 116);
+    assert_eq!(finite, c.finite_count);
     assert!(finite > 16);
-    assert_eq!(rational_poles.len(), 2);
+    assert_eq!(rational_poles.len(), c.rational_pole_count);
     assert_eq!(domain.len(), 118);
     let mut complete = HashSet::new();
     for x in 0..101 {
@@ -123,10 +135,17 @@ fn check(c: Certificate) {
         assert_ne!(poly::eval(&f, &m, x), f.zero());
         let fx = poly::eval(&f, &source, x);
         assert_ne!(fx, f.zero());
-        let y = f.sqrt(fx).expect("four fixed pole branches in F101^6");
+        let y = f.sqrt(fx).expect("four pole branches in declared field");
         for y in [y, f.neg(y)] {
             assert_eq!(f.sq(y), fx);
             assert!(geometric.insert((x, y)));
+            if c.pole_field_degree == 4 {
+                assert_ne!(f.pow(x, 101), x);
+                assert_eq!(f.pow(x, 101 * 101), x);
+                assert_eq!(f.pow(y, 101 * 101), f.neg(y));
+                assert_ne!(y, f.neg(y));
+                assert_eq!(f.pow(y, 101 * 101 * 101 * 101), y);
+            }
             if f.pow(x, 101) == x && f.pow(y, 101) == y {
                 rational.insert((x, y));
             }
@@ -136,11 +155,15 @@ fn check(c: Certificate) {
     assert_eq!(rational, rational_poles);
     let wrong = poly::add(&f, &rhs, &poly::scale(&f, &q6, f.one()));
     assert_ne!(lhs, wrong, "wrong codomain b rejected");
-    println!("PASS independent actualT1 target{:?} exact curve identity/irreducible source/gcd/separabledegree4,116 finite+2origin witnesses/complete118point domain,both infinity limits/four simple geometric poles exactly2 rational,wrong codomain;old H provenance/global bridge separate",c.curve);
+    println!("PASS independent source{:?} target{:?} exact curve identity/irreducible source/gcd/separabledegree4,{} finite+{}origin witnesses/complete118point domain,both infinity limits/four simple geometric poles exactly{} rational,declared F101^{} modulus{:?},degree4 field requires all four pole Frobenius orbits4,wrong codomain;old H provenance/global bridge separate",c.source,c.curve,finite,c.rational_pole_count,c.rational_pole_count,c.pole_field_degree,f.modulus());
 }
 #[test]
 fn t1_e109prime_complete_certificate_including_rational_poles() {
     check(Certificate {
+        source: F,
+        finite_count: 116,
+        rational_pole_count: 2,
+        pole_field_degree: 6,
         header: "CT28 T1 e109prime F101 x y X Y centred minus q=(84,37)",
         text: include_str!("../fixtures/quartic/t1-e109prime-points.tsv"),
         curve: [26, 58],
@@ -153,6 +176,10 @@ fn t1_e109prime_complete_certificate_including_rational_poles() {
 #[test]
 fn t1_e113prime_complete_certificate_including_rational_poles() {
     check(Certificate {
+        source: F,
+        finite_count: 116,
+        rational_pole_count: 2,
+        pole_field_degree: 6,
         header: "CT28 T1 e113prime F101 x y X Y centred minus q=(46,41)",
         text: include_str!("../fixtures/quartic/t1-e113prime-points.tsv"),
         curve: [69, 50],
@@ -160,5 +187,39 @@ fn t1_e113prime_complete_certificate_including_rational_poles() {
         q: [70, 0, 1],
         m: [4, 76, 75, 41],
         infinity: [46, 41],
+    });
+}
+
+#[test]
+fn t2_e109second_complete_certificate_and_all_geometric_poles() {
+    check(Certificate {
+        source: [95, 93, 43, 39, 92, 17, 1],
+        finite_count: 118,
+        rational_pole_count: 0,
+        pole_field_degree: 4,
+        header: "CT30 T2 e109second F101 x y X Y centred minus q=(97,63)",
+        text: include_str!("../fixtures/quartic/t2-e109second-points.tsv"),
+        curve: [59, 27],
+        n: [97, 93, 7, 0, 97],
+        q: [55, 0, 1],
+        m: [71, 49, 20, 63],
+        infinity: [97, 63],
+    });
+}
+
+#[test]
+fn t2_e113second_complete_certificate_including_rational_poles() {
+    check(Certificate {
+        source: [95, 93, 43, 39, 92, 17, 1],
+        finite_count: 116,
+        rational_pole_count: 2,
+        pole_field_degree: 6,
+        header: "CT30 T2 e113second F101 x y X Y centred minus q=(64,35)",
+        text: include_str!("../fixtures/quartic/t2-e113second-points.tsv"),
+        curve: [23, 7],
+        n: [74, 0, 81, 42, 64],
+        q: [23, 0, 1],
+        m: [37, 9, 9, 35],
+        infinity: [64, 35],
     });
 }

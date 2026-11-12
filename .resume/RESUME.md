@@ -1,74 +1,88 @@
-# Current — whole first Jacobian transfer over F101; adjoint next
+# Current — prime-field first transfer in both directions;T2 certificates
 
-Published root33e8ef7524c2dddec08f1e61447933ae3fbbd500/tree853e2f430f3bb5523c1a5f38286b4dbc97f14d0b
-has exact focused43170740419 SUCCESS:25native/17standalone/25named Lean
-modules/136written helpers,full three logs/API/hash/roundtrip a990e6.
-Old59d2/99cdd2 and00cba/d695c8 scopes stay immutable. Scientific
-standing unsigned;CI completion does not sign claims. [pcc:unverified]
+Published parent8487859d7aa48d13b0defe7928d915d67352c01f/tree9093c7ef2196a22acae550fa4f0f8e4f1f44b285
+preserves endpoint correction/native839704,CI archives and interrupted03.
+Its evidence-only diff is outside focused workflow push path filters;
+do not dispatch an unchanged re-green just for its SHA. Prior33e exact
+43170740419 SUCCESS25native/17standalone/25modules/136written helpers,
+fulla990e6. New source-changing checkpoint below has19standalone tests;
+its own exact-headCI is required separately. Scientific standing unsigned.
+[pcc:unverified]
 
-Whole fixed forwardPsi(T0→T1) native15/72e1d8 checks all12317 exact old
-outputs,bijection,paired sums,negations,identity/model/alpha controls.
-Constructor/evaluator uses F101 and existing field/poly/Kohel/balanced
-engines;old reference/domain enumeration remain separate. All4 direct
-pullbacks5143f5 cover every109/113 input per model,49300ordered sums,
-norm4/offdiag0/signed infinity drops. IndependentT1full850e92/root17
-af4b99 retained. Written4934b4/78176c and bound QuarticFibre3413a4
-remain;actual geometry/Picard bridges written. Report0c33af is frozen
-with historical actual-guard-pending scope. No timing claim. [pcc:unverified]
+First forward native15/72e1d8 and NEW pureF101 adjoint24/dcbb58 both
+check all12317 old outputs/bijection/paired sums/negations/identity/model
+controls. Adjoint additionally checks both whole-domain compositions7,
+every109/113 reverse embedded endpoint,selected dual coefficients/scale29.
+Constructors/evaluators use accepted fixed data and existing F101
+field/poly/elliptic/Kohel/Balanced engines;old references/enumeration stay
+separate. Global written4934b4/78176c/526f9f retain Picard/quotient/
+polarization dependencies. No global inverse4 morphism or timing claim.
+All4T0/T1pullbacks5143f5 and bothT1norm18/c3a1a7 remain accepted.
+[pcc:unverified]
 
-First consumer READY1505 at6cf2f1a9902b3babeec56d62a9983891b9ffb079/tree3657394da8bc42bbcad8100fa17bbb437b25ce1e
-targets immediate1501/5ceb. Full local25/85+five301fbe/root3fe041,
-final2page2cafe5/rootf1ffc8. Own exact43165729371 SUCCESS25native/
-85reference+five integrations/one historical ignored;full decoded log
-182753bytes→XZ24748/hash/roundtrip fd53e1/root282f74. Keep6cf fixed.
-Parent1501 exact5cebCI43157257094 green/fullf74e9e. [pcc:unverified]
+NEW T2 exact covers ofF2=[95,93,43,39,92,17,1],low coefficients first:
+E109''(59,27):N[97,93,7,0,97],Q[55,0,1],M[71,49,20,63],q(97,63).
+E113''(23,7):N[74,0,81,42,64],Q[23,0,1],M[37,9,9,35],q(64,35).
+Construction25/412aba matches118finite or116finite+2origin oldH2
+witnesses. Original3 constructors regress26 successfully. Independent
+flat-field28/2fee3f checks complete118domains/exact identities/irreducible
+sextic/gcd/separabledegree4/infinities/four geometric poles/negative
+codomain controls. E109 pole fibre has exact Frobenius orbit4 in
+Fp[z]/(z^4-2),absentFp6;E113 has rational(49,12)/(49,89) poles.
+Failed degree6 assumption27/bf2591 preserved. Written T2_QUARTIC_PROOF.md/
+f9cf19 uses old norm4/Picard degree and Milne difference bound16 to
+identify old centred maps globally. Full changed standalone29/bfd777
+passes19tests/strictClippy/old source guards/fmt.136written/25modules
+unchanged. New two-page adjoint-t2 report inspected and pinned separately;
+old reports/proofs/receipts remain immutable. [pcc:unverified]
+
+T2 runtime adapters30 currently RUNNING6534 in T1prototype own target,
+raw/workspace/scratch/ct30-t2-adapter-native-30.txt,source/clippy30.
+Require all109/113 oldR2P2 outputs/norm4/offdiag0/all24650 ordered sums/
+signed infinity drops[2,1],and each12317 oldH2 outputs/group/model checks.
+Expected E109 degree<=2 rational pole support0 because orbit4;E113
+4linear/232partial/2all-pole supports,118repeated each. Do not edit this
+prototype while30 runs. Actual consumer8sources remain frozen separately.
+Next puresecondhop and compressed whole-chain outer norm/pull formula.
+[pcc:unverified]
 
 ACTUAL consumer branch research/chained-transfer-prime-field-psi-20261112
-starts6cf with whole-prime source02/1da990. SevenChain.forward selects
-cached standalonePrimeFieldPsi;exact old forward body remains explicitly
-forward_reference. Original dual/naive/test suffix and Balanced reducer
-arithmetic remain byte-exact. Eight snapshots/hashmanifest frozen.
-Attempt03 INTERRUPTED across workspace restart,NOT running or passed;
-partial48451bytes/source-after-hash/metadata f87a99/root2fe5dc retained.
-Identical full check.sh04 now RUNNING session45249 since07:10UTC;
-raw/workspace/scratch/ct30-prime-complete-04.txt,own consumer Cargo target.
-Expected25native/90reference unit+five integrations/one oldignored.
-DO NOT EDIT actual8source02 while04 runs;inspect terminal status and
-afterhash before acceptance. This retry responds to real interruption.
+starts6cf2f1a9902b3babeec56d62a9983891b9ffb079. Whole-prime source02/
+1da990 routes existing forward through standalone evaluator;exact old
+forward_reference and olddual/naive/test suffix/reducer arithmetic remain.
+FULL unchanged-source retry04 RUNNING45249 since07:10UTC,raw
+/workspace/scratch/ct30-prime-complete-04.txt,own consumer Cargo target.
+Expected25native/90reference unit+five integrations/one historical ignored.
+Attempt03 INTERRUPTED across restart,partial48451bytes/sourceafterhash/
+metadata f87a99/root2fe5dc retained. DO NOT EDIT actual8source02 until
+terminal status/afterhash,then finalnewreport/PCC/commit/readychild1505.
 [pcc:unverified]
 
-T1 directnorm18/c3a1a7 passes each12317 oldH1 outputs/group/pole controls;
-each component4linear poles/232partial-pole quadratics/118repeated.
-Prototype/workspace/scratch/ct27-prototype is free for pureF101 adjoint.
-Next formula:twoT1norms,quarters82/85,actual dualalpha with normalized
-codomain(78,72)/(99,68),scale29 to originalE109/E113,two directT0pulls,
-sum. Require all12317 exact olddual outputs,bijection/group controls,
-both forward-adjoint norms7. No new dual result accepted yet.
+READY1505 at6cf/tree3657394da8bc42bbcad8100fa17bbb437b25ce1e targets
+immediate1501/5ceb. ExactCI43165729371 SUCCESS25native/85reference+five/
+one oldignored,full decoded182753bytes→XZ24748/hash/roundtrip fd53e1/
+root282f74. Localfull301fbe/final2page2cafe5. Parent1501 exact5cebCI
+43157257094 green/fullf74e9e. Keep fixed green heads;no unchanged polls.
 [pcc:unverified]
 
-Original embedded elliptic-source direct endpoint test22 now passes:
-pcc/claims/PCC-20261112-839704.json,all109/113 points/scalars,norm4/reverse28/recovery/injectivity/
-wrong-quarter controls,strictClippy. V2c2b7c9 corrects d55462 inverse39
-to74 modulo109;109 modulo113 unchanged. Old proof/claim/native21 failure
-122fda retained. Cache19 selected0tests/8aef88;fresh20 duplicate_mod/
-24a6e1 nativeNOTRUN;separate T1target fixes cache selection. Never share
-Cargo target between identical scratch package clones. [pcc:unverified]
-
-Next:checkpoint/commit/publish root corrections/CI/full T1norm18 now;
-complete actual04/finalnewreport/PCC/readychild against1505. Continue
-puredual/T2covers in isolated scratch. Two-lemma binding script DONE;
-do not duplicate claims or alter frozen proofs/reports/receipts.
+Endpoint22/839704 all109/113 source/scalar/destination/norm4/reverse28/
+recovery/negative controls passes. V2c2b7c9 explicitly corrects inverse28
+to74mod109/109mod113;frozen originald55462/wrong39 and failed21/122fda
+remain. Cache19zero/8aef88,fresh20lint/24a6e1,adjoint23lint/9cf501 retained.
+Never share Cargo targets between identical scratch package clones.
+[pcc:unverified]
 
 Parent1484 thirdquiet05:11 unchanged conflict/C findings;pause until
-activity or freshpremerge. Other fixed green descendants paused.
-Integrate bottom-up after gates;no feature-base auto-merge/rebase/force/
-ledger rechain/lineage choice. Root frozen fork and full-library
-6184pass/13fail/133ignored/archives-clock plus broadPCCf117f7 historical
-missing subjects persist;do not rerun unchanged audits/baselines.
+activity or freshpremerge. Integrate bottom-up after actual gates and
+retarget/rerun after parents land. Frozen root/consumer ledger forks and
+root full-library6184pass/13fail/133ignored/archives-clock/broadPCCf117f7
+historical missing subjects persist. No unchanged broad audits/baselines,
+force/rebase/rechain/lineage choice or feature-base auto-merge.
 [pcc:unverified]
 
-Atlas crypto-autoresearcher8edec422a is vault locked/KEY absent;no
-plaintext writes. KB/ecdb tools absent,S3 checkpoint/profile/livebudget
-unavailable. No solver/benchmark/paidjob/bypass. ExternalCT37/1502
-ordinaryEnd-fields -355/-283 is prior work requiring independent review
-before adoption. No novelty or measured-advantage claim.
+Atlas crypto-autoresearcher8edec422a vault locked/KEY absent,no plaintext
+writes. KB/ecdb unavailable;S3/profile/livebudget unavailable,no solver,
+benchmark,paidjob or checkpoint bypass. ExternalCT37 exact9d100 note
+read,ordinary End-fields -355/-283 relevant prior work;primary Galbraith
+Ch9/10 reviewed,independent adoption/geometric distinction still open.
+No novelty or measured advantage claim. Continue next unblocked task.
