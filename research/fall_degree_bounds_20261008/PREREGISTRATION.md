@@ -1169,3 +1169,23 @@ Its launch record is kept as `e14/pod-r2/launch-r2a.json`.
 - Pod name prefix `fd-e14-r2b-`. Nothing else changes: engines, gates, readings, predictions, the
   USD 100 cap and Amendment 21's owner override all stand. No draw of r2a exists, so no draw is
   retried.
+
+## Amendment 23 (2026-11-12 UTC, before any draw below): r2b also failed to bootstrap; cause established; relaunch r2c
+
+**What happened.** Pod r2b (`vlydemuitde7d7`, created 02:21:55 UTC) behaved exactly like r2a: container
+up, 0 % CPU, nothing on port 8080 after 11 minutes, no readable log. A diagnostic pod
+(`fd-e14-diag-python-proxy`, `ar0ext66azn7u1`, 2 vCPU, USD 0.06/h, created 02:30 UTC) running the
+same image with a start command that writes under `/srv` after `mkdir -p` served its status file
+through the proxy **17 s after boot** and reported `python3=/usr/bin/python3`. So the image has
+Python, the proxy path works, and r2a/r2b's script never ran: their start command was
+`echo "$SCRIPT_B64" | base64 -d >/workspace/run.sh && bash /workspace/run.sh`, which fails at the
+redirect because these CPU pods mount no volume and `/workspace` does not exist before the script's
+own `mkdir -p`. The E14 r1 pod (Amendment 19) had created `/workspace` another way. r2b computed no
+gate and no draw; it and the diagnostic pod were deleted at 02:33 UTC (r2b about USD 0.5, the
+diagnostic pod under USD 0.01). Records: `e14/pod-r2/launch-r2b.json`.
+
+**Change for r2c (`e14/launch_r2.sh`).** Start command
+`mkdir -p /workspace /root && echo "$SCRIPT_B64" | base64 -d >/root/run.sh && exec bash /root/run.sh`;
+pod name prefix `fd-e14-r2c-`. The in-pod script (`run_pod_r2.sh`, sha256 `5f49b8ac…`, Amendment 22)
+is unchanged. Nothing else changes: engines, gates, readings, predictions, the USD 100 cap and the
+Amendment 21 owner override stand. No draw exists, so no draw is retried.
