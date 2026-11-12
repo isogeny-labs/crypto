@@ -129,3 +129,14 @@ setup cost is bounded by about 0.73x of the baseline's here; no further constant
 Without the fix the same walk needed 2x-8x more steps beyond 26 bits (fruitless cycles), so the earlier "no valid folded rho" reading is superseded: the fold reaches the sqrt(pi n/12) step count. Its time is tied with
 `rho_parallel` (unbatched inversion per step; batching would lower it further), so the matched rho for the symmetric IC is min(folded, `rho_parallel`): sym3 / matched rho = 3.5x-5x at 26 bits (8.9-11.6 ms against 1.9-2.6 ms),
 about 21x at 30 bits (93-102 ms against 4.3-4.4 ms). Gap unchanged at 28-30 bits where `rho_parallel` is the matched reference; grows with size. No claim.
+
+## Experiment: fingerprinted linear-probe pair table (2026-11-12) — `[pcc:unverified]`
+Hypothesis: the setup collection (about 70% of the symmetric setup) is memory-bound on the pair-table probe, so a linear-probe slot table with a 32-bit fingerprint (dereference the entry only on a fingerprint match) should cut cache misses.
+`LINPROBE=1` in `examples/prime_fast_j0_multi.rs`; 28 bits, B=159, T=20, 2 curves, 5 interleaved rounds (20 rows per arm), all targets verified in both arms:
+
+| layout | table ms | collection ms | setup ms | sym/baseline setup |
+|---|---|---|---|---|
+| chained (`heads`/`next`) | 6.2 | 13.6 | 20.5 | 0.75 |
+| linear probe + fingerprint | 6.3 | 14.0 | 20.8 | 0.74 |
+
+No difference: the probe is not the bottleneck (the table is about 1-2 MB and cache-resident); the per-candidate field arithmetic is. The symmetric setup stays at about 0.75x of the baseline's. Setup-cost levers tried and exhausted: B retune (flat 159-190), rotated keys (no gain), batched collector (cannot help), fingerprinted layout (no gain).
