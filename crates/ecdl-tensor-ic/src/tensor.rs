@@ -375,16 +375,17 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &Fixed) -> Table {
     }
     let mut out = new_table(edges);
     let mut sk = vec![0u8; shared.len()];
+    let mut nk: Vec<u8> = Vec::new();
     for (key, &c) in &t.rows {
         for (j, &p) in shared_pos.iter().enumerate() {
             sk[j] = key[p];
         }
         if let Some(g) = groups.get(&sk) {
             for fk in g {
-                let mut nk = key.clone();
+                nk.clear();
+                nk.extend_from_slice(key);
                 nk.extend_from_slice(fk);
-                let slot = out.rows.entry(nk).or_insert(0);
-                *slot = slot.wrapping_add(c);
+                add_row(&mut out.rows, &nk, c);
             }
         }
     }
@@ -417,6 +418,7 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &Fixed) -> Result<Table> {
     }
     let mut out = new_table(edges);
     let mut inp = vec![false; v.in_.len()];
+    let mut nk: Vec<u8> = Vec::new();
     for (key, &c) in &t.rows {
         for (i, &p) in in_pos.iter().enumerate() {
             inp[i] = key[p] == 1;
@@ -445,10 +447,10 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &Fixed) -> Result<Table> {
             }
         }
         if ok {
-            let mut nk = key.clone();
+            nk.clear();
+            nk.extend_from_slice(key);
             nk.extend_from_slice(&ext);
-            let slot = out.rows.entry(nk).or_insert(0);
-            *slot = slot.wrapping_add(c);
+            add_row(&mut out.rows, &nk, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
@@ -475,8 +477,7 @@ fn apply_pred(t: &Table, v: &PredVertex) -> Result<Table> {
             vals[i] = key[p] == 1;
         }
         if (v.p)(&vals) {
-            let slot = out.rows.entry(key.clone()).or_insert(0);
-            *slot = slot.wrapping_add(c);
+            add_row(&mut out.rows, key, c);
         }
     }
     crate::opcount::bump("contraction_rows_uncharged", out.rows.len() as u64);
@@ -502,10 +503,19 @@ fn sum_out(t: Table, keep: &dyn Fn(usize) -> bool) -> Table {
         for (j, &i) in keep_idx.iter().enumerate() {
             buf[j] = key[i];
         }
-        let slot = out.rows.entry(buf.clone()).or_insert(0);
-        *slot = slot.wrapping_add(c);
+        add_row(&mut out.rows, &buf, c);
     }
     out
+}
+
+/// `rows[key] += c` (wrapping), cloning the key only when it is new.
+#[inline]
+fn add_row(rows: &mut FastMap<Vec<u8>, u64>, key: &[u8], c: u64) {
+    if let Some(slot) = rows.get_mut(key) {
+        *slot = slot.wrapping_add(c);
+    } else {
+        rows.insert(key.to_vec(), c);
+    }
 }
 
 /// FindWitness turns a counting solver into a search solver by
