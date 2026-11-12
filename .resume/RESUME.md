@@ -1,27 +1,29 @@
-# Resume: crypto @ aburan28/kind-volta-4zo2ul
+# Resume: crypto @ aburan28/laughing-darwin-3qdnk2 — IC lever 2 A/B, 2026-11-12
 
 ## Goal
-Owner (2026-11-11): "run the whole thing" — the frozen 30-seed relation-oversampling run.
+Measure the paired-inverse change (one inverse per ± twin pair in the aimed scan's folding kernel, a31ae987a6/b06ee3ae7f) on the collect phase and set-up of `ic price --single-target`.
 
 ## Lead / hypothesis
-research/logs_oversampling_20261111/protocol.json (frozen, sha256 aa928f27…3076). H1: some f>0 lowers
-total counted cost C = trials + lambda*row_ops vs f=0. Pilot (run-20261111T0451Z) favoured H0.
+LEAD-ICB-koblitz-setup-phase-cost. research/ic_tool_program/explorations/paired-inverse-20261112/ab/PROTOCOL.md: A/B a/c medians predicted collect [1.02,1.08] (k0n53), [1.05,1.13] (k0n61).
 
 ## Spec
-research/logs_oversampling_20261111/full/run_full.sh: ic oversample, cells C1-C4, 30 seeds (base +100),
-fractions 0,0.1,0.25,0.5, --aa-control --logs-arm, release build. Local, unisolated (owner-requested;
-no AWS identity). S3 checkpoint waived by owner; this file in Git is the checkpoint.
+- Protocol, run.sh, summarise.sh: research/ic_tool_program/explorations/paired-inverse-20261112/ab/ (commit 064334a304).
+- Binary: /tmp/claude-0/l2ab/ic, SHA-256 in ab/runs/arms.sha256 (rebuild: CARGO_TARGET_DIR=/dev/shm/tgt-prof cargo build --release --bin ic at that commit).
+- isolated_bench: /tmp/claude-0/rulev9/bin/isolated_bench (2f56b833…).
+- Bench record: benchmarks/records/20261112T0607Z-ic-paired-inverse-ab.json (open).
 
 ## State
-Protocol frozen and committed; run next under a bench record.
-
-## Runs in flight
-Local `ic oversample` full run, cells C1-C4 sequential, session_01TCbLH7MBa3sEKfh3Trpi2R.
-
-## Stop and success conditions
-Fixed sample: stop when all cells finish 30 seeds; any unverified arm is a failure (reported).
-Decision rule per protocol.json; no claim beyond it.
+Protocol and pins committed; session starting.
 
 ## Next steps
-1. full/analyze.py; run report + graph + PDF under reports/run-<UTC>/; bench record close.
-2. Commit on PR branch; report to owner.
+1. `BIN=/tmp/claude-0/l2ab/ic ISO=/tmp/claude-0/rulev9/bin/isolated_bench bash research/ic_tool_program/explorations/paired-inverse-20261112/ab/run.sh` (resumes).
+2. `bash .../ab/summarise.sh`; report/graph/PDF; validator; benchmarks row only if validated.
+
+## Runs in flight
+Local session of the A/B (252 processes), started 2026-11-12 ~06:10 UTC.
+
+## Stop and success conditions
+Identity mismatch voids the session. Decision per PROTOCOL.md (A/B lower > 1 and > A/A upper), applied once at 42 rounds.
+
+## Open questions
+Iso Lab blocked (CodeBuild quota 0); lever 3 dropped; lever 1 dropped.
