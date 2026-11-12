@@ -1,0 +1,4299 @@
+{
+ "schema": "validator.report/v1",
+ "status": "pass",
+ "independent": true,
+ "verdict": "headline validated: every number of the RESULTS.md headline and table recomputes from runs.json (388/388 summary.json fields exact); both binaries rebuild bit-identical from 43fc3b0e61 in fresh target dirs; all 1224 keys (3672 rows) replay exactly; 301,056 recovered logs of 42 nonce-sampled runs (both builds, all arms, all sizes) verified with the validator's EC code; the pinned payload rebuilds bit for bit. RESULTS.md needs the non-blocking amendments listed (R-F3..R-F10); the separate claim statement is not endorsed as worded (claim-report.json, R-F1, R-F2)",
+ "disposition": "validated",
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validator code in validation/scripts/, not the producer's",
+ "validated_commit": "43fc3b0e61907dbc12b95ddd471678535311b011",
+ "protocol_commit": "fde73fb405",
+ "amendment_commit": "7934b7e343",
+ "claim_scope": "solve-phase wall time (ms_arm) on one pinned CPU (91) of a RunPod cpu5c pod, two builds (std SipHash; mt-fasthash); icbest = fastest of ic5, ic5ks, ic5w, ic5rw; rhobest = fastest of rho2xks x 4 kappa and rhodpu x 6; bsgsbest = fastest of bsgs2 x 3; key time = median of 3 interleaved repeats; cell = 4 configurations; decision faster/slower if the protocol bootstrap 95% interval of the cell median is on one side of 1 (with n = 4 the interval is the range: a 4-of-4 sign rule)",
+ "raw_data": [
+  {
+   "path": "../../research/mt_timed_runpod_20261112/results/holdout/runs.json",
+   "sha256": "4bee6928b7236334506d029e219d81eb710ad1b3d5d6a3dc3d16c2ac3e4e050f"
+  },
+  {
+   "path": "../../research/mt_timed_runpod_20261112/results/holdout/opcost.jsonl",
+   "sha256": "4b59963b51fe337d7239a9695be9970b31be446a16176e7fb546e92da3b6d856"
+  }
+ ],
+ "supporting_data": [
+  {
+   "path": "../results/holdout/runs.jsonl",
+   "sha256": "dd3445fc087475b11be6b4ed0219cf8851511cb2d9223ae0a4fab4a171f7aeae",
+   "note": "full rows; replayed; in Git, not the artifact store (R-F9)"
+  },
+  {
+   "path": "../results/holdout/host.json",
+   "sha256": "414d04c9ca29a98d1bed00c556a9dc30879e6c87af4f8b17124607bdfd1fdf6e"
+  },
+  {
+   "path": "../../mt_timed_20261112/results/holdout/runs.json",
+   "sha256": "fec25670306811f3af5e3441e2235ab10f95e6a38d5daf1f2efec5e04aabc3c6",
+   "note": "earlier timed study (session VM), for the host-replication statements and the counter comparison"
+  },
+  {
+   "path": "recompute.json",
+   "sha256": "69dcb81f5a37717609eb87a90304cccd349baa7726eaac6399344cfe37a365f3"
+  },
+  {
+   "path": "results_check.json",
+   "sha256": "526a13e30e1107b1dfc4a90d84d07466904b06534cd103f9d506eaec7e73d15c"
+  },
+  {
+   "path": "source_diff.json",
+   "sha256": "00fc2183d3aa429fe5a0ded167e5a7ef105a84b6a5e680c193e50f776376c0ed"
+  },
+  {
+   "path": "payload_check.json",
+   "sha256": "5346470362c885e8a786643f2a5cb7d689592386fe00e0aeb35acc72ce349a4d"
+  },
+  {
+   "path": "payload_check_a1.json",
+   "sha256": "55fca1792ae32a4b17b5a93069bd72affd7b67b563a20b660f9a2c270713c182"
+  },
+  {
+   "path": "ec_check.json",
+   "sha256": "95c1912c117260922bffeae666afe2e3971003784c011abb2ba62c9b9d20623f"
+  },
+  {
+   "path": "replay_check.json",
+   "sha256": "c444388aace56fad8e901aaed3dd6d7c1b2cbc33965804fe3dd2289e96305239"
+  },
+  {
+   "path": "replay-certificate.json",
+   "sha256": "c88ee9466ee267bde3230551cfb3b69173892b469a63206cf13e2d524af0d995"
+  }
+ ],
+ "checks": {
+  "design": {
+   "runs_json_sha256": "4bee6928b7236334506d029e219d81eb710ad1b3d5d6a3dc3d16c2ac3e4e050f",
+   "runs_jsonl_sha256": "dd3445fc087475b11be6b4ed0219cf8851511cb2d9223ae0a4fab4a171f7aeae",
+   "runs_json_source_sha256_matches": true,
+   "rows_json": 3672,
+   "rows_jsonl": 3672,
+   "runs_json_vs_jsonl_field_mismatches": 0,
+   "runs_json_commit_field": [
+    null
+   ],
+   "design_keys": 1224,
+   "rows_out_of_preregistered_order": 0,
+   "seq_order_matches_seeded_shuffle": true,
+   "keys_with_reps_0_1_2": 1224,
+   "errors": 0,
+   "ok_ne_targets": 0,
+   "targets_ne_T": 0,
+   "targets_total": 26320896,
+   "targets_verified_total": 26320896,
+   "bin_sha256_by_build": {
+    "std": [
+     "7ac0cf63fe0960670c6d22c5d8c0bb612ec105a6e12b67e4cd4929034d58189b"
+    ],
+    "fast": [
+     "afc768c574e131bb899c9481f51592b8bc0dd72cfc46a3f445101f6da619c483"
+    ]
+   },
+   "bin_sha256_match_payload": true,
+   "host_bin_sha256_match_payload": true,
+   "keys_with_counters_differing_across_repeats": 0,
+   "configuration_keys_with_counters_differing_between_builds": 0,
+   "configuration_keys_with_phases_differing_between_builds_or_repeats": 0,
+   "loadavg_min_max": [
+    37.62939453125,
+    93.51318359375
+   ],
+   "loadavg_median_by_round": [
+    86.56884765625,
+    77.2841796875,
+    61.00439453125
+   ],
+   "loadavg_by_sixth_of_run": [
+    89.1,
+    81.6,
+    75.3,
+    78.0,
+    76.4,
+    39.9
+   ],
+   "steal_ticks_sum_max": [
+    0,
+    0
+   ],
+   "wall_s_total": 1428.2021780001232,
+   "host": {
+    "cpu": "AMD EPYC 9575F 64-Core Processor",
+    "nproc": 128,
+    "allowed_cpus": [
+     27,
+     56,
+     91,
+     120
+    ],
+    "pin": "91",
+    "cpuset": "27,56,91,120",
+    "cpu_max": "max 100000",
+    "kernel": "6.8.0-147-generic",
+    "started": "2026-11-12T16:33:08Z"
+   }
+  },
+  "summary_json_fields_compared": 388,
+  "summary_json_mismatches": 0,
+  "analysis_regenerated_identical": "producer's analyze.py and mk_runs.py rerun on the committed data reproduce summary.json, analysis.txt and runs.json byte for byte",
+  "decisions_match": true,
+  "source_diff": {
+   "old_commit": "a992ed6c807eee6fa713176412e6475e19db7946",
+   "new_commit": "43fc3b0e61907dbc12b95ddd471678535311b011",
+   "alias_block_found": true,
+   "normalised_equal": true,
+   "alias_default_is_RandomState": true,
+   "alias_feature_is_MtFastH": true,
+   "remaining_std_hashmap_uses_in_new": [
+    "let mut m: std::collections::HashMap<u64, (u64, u64)> =",
+    "std::collections::HashMap::with_capacity(size * 2);",
+    "let mut m2: std::collections::HashMap<u64, (u64, u64), Fast> =",
+    "std::collections::HashMap::with_capacity_and_hasher(size * 2, Fast::default());"
+   ],
+   "hashmap_new_or_with_capacity_left_in_new": [
+    "std::collections::HashMap::with_capacity(size * 2);"
+   ],
+   "cargo_toml_diff": [
+    "+# examples/mt_fieldops.rs: fast multiplicative hasher for every arm's hash tables (timing sensitivity only;",
+    "+# counted operations are identical with and without it).",
+    "+mt-fasthash = []"
+   ],
+   "cargo_toml_only_feature": true
+  },
+  "build": {
+   "nonce_drawn": "5a7b5fe5a26fbf2bd874f3c10df7e3ad at 2026-11-12T17:14:31Z (os.urandom(16)), before any sampling",
+   "std": {
+    "command": "CARGO_TARGET_DIR=<scratch>/t-std cargo build --release --locked --offline --example mt_fieldops (repository at 43fc3b0e61, inputs clean)",
+    "sha256": "7ac0cf63fe0960670c6d22c5d8c0bb612ec105a6e12b67e4cd4929034d58189b",
+    "payload_sha256": "7ac0cf63fe0960670c6d22c5d8c0bb612ec105a6e12b67e4cd4929034d58189b",
+    "build_time": "13m 33s",
+    "bit_identical": true
+   },
+   "fast": {
+    "command": "CARGO_TARGET_DIR=<scratch>/t-fast cargo build --release --locked --offline --features mt-fasthash --example mt_fieldops (fresh target dir)",
+    "sha256": "afc768c574e131bb899c9481f51592b8bc0dd72cfc46a3f445101f6da619c483",
+    "payload_sha256": "afc768c574e131bb899c9481f51592b8bc0dd72cfc46a3f445101f6da619c483",
+    "build_time": "14m 27s",
+    "bit_identical": true
+   },
+   "dump_builds": {
+    "source": "git show 43fc3b0e61:examples/mt_fieldops.rs + MTFO_DUMP block (scripts/mk_dump_crate.py), standalone crate, rand =0.8.8, serde_json =1.0.151, Cargo.lock of 43fc3b0e61",
+    "std_sha256": "cbec9883bdf8ee638d3e5d626c2e3b52feb8109849dccdd9b7325df19b43819d",
+    "fast_sha256": "39c69138e5329ddc194425c02d50e061f95bf290eacd55876baa29abaefb3977"
+   },
+   "note": "each build in its own fresh target directory under the validator's scratch (producer: target/ and target-fast/); bit-identical, so the target-dir path does not enter the binary"
+  },
+  "receipts": {
+   "collect_hashes_match_committed_results": true,
+   "a1_collect_hashes_match_committed": true,
+   "podjob_sha256_matches_create": true
+  },
+  "payload": {
+   "pin": "70770d45fd3619b4f664711d183ab884776b0ca62a2646af11389608e52b9219",
+   "candidate_is_pinned_payload": true,
+   "members": [
+    "run.py",
+    "bin/mt_fieldops_std",
+    "bin/mt_fieldops_fast",
+    "instances/W24-0.json",
+    "instances/W24-1.json",
+    "instances/W24-2.json",
+    "instances/W24-3.json",
+    "instances/W28-0.json",
+    "instances/W28-1.json",
+    "instances/W28-2.json",
+    "instances/W28-3.json",
+    "instances/W32-0.json",
+    "instances/W32-1.json",
+    "instances/W32-2.json",
+    "instances/W32-3.json"
+   ],
+   "all_members_equal_validator_inputs": true,
+   "unexpected_members": [],
+   "rebuilt_bit_identical": true,
+   "gzip_header_mtime_utc": "2026-11-12T16:32:28Z",
+   "a1_pin": "d44404ff036b44dd2b2805b178755eb1136a6d36b7e48f5710d34fb8645bd335",
+   "a1_rebuilt_bit_identical": true,
+   "a1_gzip_mtime_utc": "2026-11-12T16:29:11Z",
+   "a1_run_py_is_protocol_commit_run_py": true
+  },
+  "amendment_A1": {
+   "commit_time": "2026-11-12T16:32:29Z",
+   "a2_pod_created": "2026-11-12T16:32:34Z",
+   "a2_job_started": "2026-11-12T16:33:08Z",
+   "a1_rows_with_timing": 0,
+   "stated_time": "16:40Z (wrong, R-F8)",
+   "legitimate": true,
+   "change": "run.py pins to the middle CPU of sched_getaffinity (PIN=auto); host.json records allowed_cpus; launcher user agent; no workload, analysis or rule change"
+  }
+ },
+ "recompute": {
+  "method": "scripts/recompute.py (validator's own code) from runs.json/runs.jsonl; protocol bootstrap and the exact bootstrap over all 4^4 resamples: identical intervals (the range) and decisions in all 18 build-cells",
+  "std": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.984251968503937,
+      0.8611111111111112,
+      0.8794326241134752,
+      0.888111888111888
+     ],
+     "median": 0.8837722561126816,
+     "protocol_ci": [
+      0.8611111111111112,
+      0.984251968503937
+     ],
+     "exact_ci": [
+      0.8611111111111112,
+      0.984251968503937
+     ],
+     "range": [
+      0.8611111111111112,
+      0.984251968503937
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.98125,
+      0.8722222222222222,
+      0.9069767441860466,
+      0.903954802259887
+     ],
+     "median": 0.9054657732229667,
+     "protocol_ci": [
+      0.8722222222222222,
+      0.98125
+     ],
+     "exact_ci": [
+      0.8722222222222222,
+      0.98125
+     ],
+     "range": [
+      0.8722222222222222,
+      0.98125
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.524390243902439,
+      1.4939759036144578,
+      1.5121951219512197,
+      1.548780487804878
+     ],
+     "median": 1.5182926829268295,
+     "protocol_ci": [
+      1.4939759036144578,
+      1.548780487804878
+     ],
+     "exact_ci": [
+      1.4939759036144578,
+      1.548780487804878
+     ],
+     "range": [
+      1.4939759036144578,
+      1.548780487804878
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      0.9921259842519685,
+      1.0746268656716418,
+      0.9432624113475178,
+      0.8125
+     ],
+     "median": 0.9676941977997431,
+     "protocol_ci": [
+      0.8125,
+      1.0746268656716418
+     ],
+     "exact_ci": [
+      0.8125,
+      1.0746268656716418
+     ],
+     "range": [
+      0.8125,
+      1.0746268656716418
+     ],
+     "decision": "unranked",
+     "below_1": 3
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.8172757475083058,
+      0.796116504854369,
+      0.839590443686007,
+      0.8210862619808307
+     ],
+     "median": 0.8191810047445682,
+     "protocol_ci": [
+      0.796116504854369,
+      0.839590443686007
+     ],
+     "range": [
+      0.796116504854369,
+      0.839590443686007
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.5",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 4
+    },
+    "winners_rho": {
+     "rho2xks": 4
+    },
+    "winners_rho_param": {
+     "rho2xks 0.5 None": 4
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.8251533742331287,
+      0.7337278106508877,
+      0.7183908045977012,
+      0.7331378299120235
+     ],
+     "median": 0.7334328202814555,
+     "protocol_ci": [
+      0.7183908045977012,
+      0.8251533742331287
+     ],
+     "exact_ci": [
+      0.7183908045977012,
+      0.8251533742331287
+     ],
+     "range": [
+      0.7183908045977012,
+      0.8251533742331287
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.8964757709251102,
+      0.7920168067226891,
+      0.7957894736842105,
+      0.8063829787234043
+     ],
+     "median": 0.8010862262038074,
+     "protocol_ci": [
+      0.7920168067226891,
+      0.8964757709251102
+     ],
+     "exact_ci": [
+      0.7920168067226891,
+      0.8964757709251102
+     ],
+     "range": [
+      0.7920168067226891,
+      0.8964757709251102
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.5730994152046782,
+      1.4674556213017753,
+      1.4792899408284026,
+      1.4534883720930234
+     ],
+     "median": 1.473372781065089,
+     "protocol_ci": [
+      1.4534883720930234,
+      1.5730994152046782
+     ],
+     "exact_ci": [
+      1.4534883720930234,
+      1.5730994152046782
+     ],
+     "range": [
+      1.4534883720930234,
+      1.5730994152046782
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.1764705882352942,
+      0.9159891598915989,
+      1.0747126436781609,
+      1.0762463343108504
+     ],
+     "median": 1.0754794889945056,
+     "protocol_ci": [
+      0.9159891598915989,
+      1.1764705882352942
+     ],
+     "exact_ci": [
+      0.9159891598915989,
+      1.1764705882352942
+     ],
+     "range": [
+      0.9159891598915989,
+      1.1764705882352942
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.8073959938366718,
+      0.7085714285714286,
+      0.6831275720164608,
+      0.6657754010695187
+     ],
+     "median": 0.6958495002939447,
+     "protocol_ci": [
+      0.6657754010695187,
+      0.8073959938366718
+     ],
+     "range": [
+      0.6657754010695187,
+      0.8073959938366718
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.5",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 3,
+     "ic5w": 1
+    },
+    "winners_rho": {
+     "rho2xks": 4
+    },
+    "winners_rho_param": {
+     "rho2xks 0.5 None": 2,
+     "rho2xks 0.1 None": 1,
+     "rho2xks 0.25 None": 1
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.6984126984126984,
+      0.7022397891963108,
+      0.7116402116402116,
+      0.6968503937007874
+     ],
+     "median": 0.7003262438045046,
+     "protocol_ci": [
+      0.6968503937007874,
+      0.7116402116402116
+     ],
+     "exact_ci": [
+      0.6968503937007874,
+      0.7116402116402116
+     ],
+     "range": [
+      0.6968503937007874,
+      0.7116402116402116
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.824505928853755,
+      0.8278301886792453,
+      0.8214004720692369,
+      0.8226059654631083
+     ],
+     "median": 0.8235559471584316,
+     "protocol_ci": [
+      0.8214004720692369,
+      0.8278301886792453
+     ],
+     "exact_ci": [
+      0.8214004720692369,
+      0.8278301886792453
+     ],
+     "range": [
+      0.8214004720692369,
+      0.8278301886792453
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.3134328358208953,
+      1.4764542936288088,
+      1.4619565217391304,
+      1.4668508287292816
+     ],
+     "median": 1.464403675234206,
+     "protocol_ci": [
+      1.3134328358208953,
+      1.4764542936288088
+     ],
+     "exact_ci": [
+      1.3134328358208953,
+      1.4764542936288088
+     ],
+     "range": [
+      1.3134328358208953,
+      1.4764542936288088
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.0909090909090908,
+      1.0210803689064558,
+      1.1017402945113788,
+      1.1502659574468084
+     ],
+     "median": 1.0963246927102348,
+     "protocol_ci": [
+      1.0210803689064558,
+      1.1502659574468084
+     ],
+     "exact_ci": [
+      1.0210803689064558,
+      1.1502659574468084
+     ],
+     "range": [
+      1.0210803689064558,
+      1.1502659574468084
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.6989109545163357,
+      0.692604501607717,
+      0.6842105263157896,
+      0.6803331197950031
+     ],
+     "median": 0.6884075139617534,
+     "protocol_ci": [
+      0.6803331197950031,
+      0.6989109545163357
+     ],
+     "range": [
+      0.6803331197950031,
+      0.6989109545163357
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5w",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.25",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 3,
+     "ic5": 1
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 -1": 1,
+     "rhodpu 0.0 0": 3
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.7655786350148368,
+      0.7682020802377415,
+      0.8144171779141104,
+      0.8237951807228915
+     ],
+     "median": 0.791309629075926,
+     "protocol_ci": [
+      0.7655786350148368,
+      0.8237951807228915
+     ],
+     "exact_ci": [
+      0.7655786350148368,
+      0.8237951807228915
+     ],
+     "range": [
+      0.7655786350148368,
+      0.8237951807228915
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.7799442896935933,
+      0.7835195530726258,
+      0.8261494252873564,
+      0.8356940509915015
+     ],
+     "median": 0.804834489179991,
+     "protocol_ci": [
+      0.7799442896935933,
+      0.8356940509915015
+     ],
+     "exact_ci": [
+      0.7799442896935933,
+      0.8356940509915015
+     ],
+     "range": [
+      0.7799442896935933,
+      0.8356940509915015
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.4413407821229052,
+      1.4164383561643836,
+      1.4429347826086958,
+      1.494535519125683
+     ],
+     "median": 1.4421377823658004,
+     "protocol_ci": [
+      1.4164383561643836,
+      1.494535519125683
+     ],
+     "exact_ci": [
+      1.4164383561643836,
+      1.494535519125683
+     ],
+     "range": [
+      1.4164383561643836,
+      1.494535519125683
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.0400593471810087,
+      1.008915304606241,
+      1.049079754601227,
+      0.9895678092399406
+     ],
+     "median": 1.0244873258936247,
+     "protocol_ci": [
+      0.9895678092399406,
+      1.049079754601227
+     ],
+     "exact_ci": [
+      0.9895678092399406,
+      1.049079754601227
+     ],
+     "range": [
+      0.9895678092399406,
+      1.049079754601227
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.7646229739252994,
+      0.8155339805825245,
+      0.8186728395061726,
+      0.8132530120481927
+     ],
+     "median": 0.8143934963153585,
+     "protocol_ci": [
+      0.7646229739252994,
+      0.8186728395061726
+     ],
+     "range": [
+      0.7646229739252994,
+      0.8186728395061726
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5w",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 3,
+     "ic5w": 1
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 -1": 1,
+     "rhodpu 0.0 1": 3
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.8330914368650216,
+      0.8346863468634685,
+      0.832005792903693,
+      0.8187633262260129
+     ],
+     "median": 0.8325486148843573,
+     "protocol_ci": [
+      0.8187633262260129,
+      0.8346863468634685
+     ],
+     "exact_ci": [
+      0.8187633262260129,
+      0.8346863468634685
+     ],
+     "range": [
+      0.8187633262260129,
+      0.8346863468634685
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.8504190844616377,
+      0.8533071381794369,
+      0.8525434642627173,
+      0.836294416243655
+     ],
+     "median": 0.8514812743621776,
+     "protocol_ci": [
+      0.836294416243655,
+      0.8533071381794369
+     ],
+     "exact_ci": [
+      0.836294416243655,
+      0.8533071381794369
+     ],
+     "range": [
+      0.836294416243655,
+      0.8533071381794369
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.422552664188352,
+      1.50199203187251,
+      1.467432950191571,
+      1.5421686746987953
+     ],
+     "median": 1.4847124910320404,
+     "protocol_ci": [
+      1.422552664188352,
+      1.5421686746987953
+     ],
+     "exact_ci": [
+      1.422552664188352,
+      1.5421686746987953
+     ],
+     "range": [
+      1.422552664188352,
+      1.5421686746987953
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.1328011611030477,
+      1.1439114391143912,
+      1.1481481481481481,
+      1.0150322118826058
+     ],
+     "median": 1.1383563001087196,
+     "protocol_ci": [
+      1.0150322118826058,
+      1.1481481481481481
+     ],
+     "exact_ci": [
+      1.0150322118826058,
+      1.1481481481481481
+     ],
+     "range": [
+      1.0150322118826058,
+      1.1481481481481481
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.8556701030927835,
+      0.843095491657792,
+      0.8737693389592125,
+      0.8080879744590281
+     ],
+     "median": 0.8493827973752877,
+     "protocol_ci": [
+      0.8080879744590281,
+      0.8737693389592125
+     ],
+     "range": [
+      0.8080879744590281,
+      0.8737693389592125
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "-1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 3,
+     "ic5": 1
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 3,
+     "rhodpu 0.0 1": 1
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.9360544217687075,
+      0.9948150708606982,
+      0.9524617996604414,
+      0.9540587219343696
+     ],
+     "median": 0.9532602607974054,
+     "protocol_ci": [
+      0.9360544217687075,
+      0.9948150708606982
+     ],
+     "exact_ci": [
+      0.9360544217687075,
+      0.9948150708606982
+     ],
+     "range": [
+      0.9360544217687075,
+      0.9948150708606982
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.9464726873455943,
+      0.9927657206455204,
+      0.9709668583949602,
+      0.9641255605381166
+     ],
+     "median": 0.9675462094665384,
+     "protocol_ci": [
+      0.9464726873455943,
+      0.9927657206455204
+     ],
+     "exact_ci": [
+      0.9464726873455943,
+      0.9927657206455204
+     ],
+     "range": [
+      0.9464726873455943,
+      0.9927657206455204
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.5565610859728505,
+      1.4513363590519415,
+      1.6028571428571428,
+      1.5150850246845857
+     ],
+     "median": 1.5358230553287182,
+     "protocol_ci": [
+      1.4513363590519415,
+      1.6028571428571428
+     ],
+     "exact_ci": [
+      1.4513363590519415,
+      1.6028571428571428
+     ],
+     "range": [
+      1.4513363590519415,
+      1.6028571428571428
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.096740638002774,
+      0.9986173522295194,
+      1.0306579400620048,
+      1.026361429066944
+     ],
+     "median": 1.0285096845644746,
+     "protocol_ci": [
+      0.9986173522295194,
+      1.096740638002774
+     ],
+     "exact_ci": [
+      0.9986173522295194,
+      1.096740638002774
+     ],
+     "range": [
+      0.9986173522295194,
+      1.096740638002774
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.9359849778081256,
+      0.9884422977402104,
+      0.9509233926128592,
+      0.9449636552440291
+     ],
+     "median": 0.9479435239284442,
+     "protocol_ci": [
+      0.9359849778081256,
+      0.9884422977402104
+     ],
+     "range": [
+      0.9359849778081256,
+      0.9884422977402104
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5w",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "0"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 3,
+     "ic5": 1
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 -1": 1,
+     "rhodpu 0.0 0": 3
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      1.0287976961843053,
+      1.0832095096582468,
+      1.0443126308443824,
+      1.0609800362976407
+     ],
+     "median": 1.0526463335710114,
+     "protocol_ci": [
+      1.0287976961843053,
+      1.0832095096582468
+     ],
+     "exact_ci": [
+      1.0287976961843053,
+      1.0832095096582468
+     ],
+     "range": [
+      1.0287976961843053,
+      1.0832095096582468
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_rho_all": {
+     "values": [
+      1.0278856336039532,
+      1.0819075354932655,
+      1.0431359123587811,
+      1.0604551920341394
+     ],
+     "median": 1.0517955521964604,
+     "protocol_ci": [
+      1.0278856336039532,
+      1.0819075354932655
+     ],
+     "exact_ci": [
+      1.0278856336039532,
+      1.0819075354932655
+     ],
+     "range": [
+      1.0278856336039532,
+      1.0819075354932655
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.5332618025751072,
+      1.4938524590163937,
+      1.5372367745249103,
+      1.5059247810407008
+     ],
+     "median": 1.519593291807904,
+     "protocol_ci": [
+      1.4938524590163937,
+      1.5372367745249103
+     ],
+     "exact_ci": [
+      1.4938524590163937,
+      1.5372367745249103
+     ],
+     "range": [
+      1.4938524590163937,
+      1.5372367745249103
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.1473377097009483,
+      1.1501858736059478,
+      1.137473831123517,
+      1.0806979280261721
+     ],
+     "median": 1.1424057704122328,
+     "protocol_ci": [
+      1.0806979280261721,
+      1.1501858736059478
+     ],
+     "exact_ci": [
+      1.0806979280261721,
+      1.1501858736059478
+     ],
+     "range": [
+      1.0806979280261721,
+      1.1501858736059478
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      1.05752990851513,
+      1.0157150340492405,
+      1.0418106427090532,
+      1.1414927484966395
+     ],
+     "median": 1.0496702756120917,
+     "protocol_ci": [
+      1.0157150340492405,
+      1.1414927484966395
+     ],
+     "range": [
+      1.0157150340492405,
+      1.1414927484966395
+     ],
+     "decision": "slower",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 2,
+     "ic5": 2
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 4
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      1.1740798883656027,
+      1.1652097902097902,
+      1.1362467866323906,
+      1.1949707809456347
+     ],
+     "median": 1.1696448392876966,
+     "protocol_ci": [
+      1.1362467866323906,
+      1.1949707809456347
+     ],
+     "exact_ci": [
+      1.1362467866323906,
+      1.1949707809456347
+     ],
+     "range": [
+      1.1362467866323906,
+      1.1949707809456347
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_rho_all": {
+     "values": [
+      1.1678427419354838,
+      1.159515396264513,
+      1.1311312964492155,
+      1.1879366161185894
+     ],
+     "median": 1.1636790690999983,
+     "protocol_ci": [
+      1.1311312964492155,
+      1.1879366161185894
+     ],
+     "exact_ci": [
+      1.1311312964492155,
+      1.1879366161185894
+     ],
+     "range": [
+      1.1311312964492155,
+      1.1879366161185894
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.6469292879862982,
+      1.5918318605206592,
+      1.5729537366548043,
+      1.6081982840800761
+     ],
+     "median": 1.6000150723003677,
+     "protocol_ci": [
+      1.5729537366548043,
+      1.6469292879862982
+     ],
+     "exact_ci": [
+      1.5729537366548043,
+      1.6469292879862982
+     ],
+     "range": [
+      1.5729537366548043,
+      1.6469292879862982
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.126679462571977,
+      1.1162587412587412,
+      1.013087652832788,
+      1.1432619089782186
+     ],
+     "median": 1.121469101915359,
+     "protocol_ci": [
+      1.013087652832788,
+      1.1432619089782186
+     ],
+     "exact_ci": [
+      1.013087652832788,
+      1.1432619089782186
+     ],
+     "range": [
+      1.013087652832788,
+      1.1432619089782186
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      1.1541594454072792,
+      1.1442885771543085,
+      1.1111295543198607,
+      1.1658152220971512
+     ],
+     "median": 1.1492240112807939,
+     "protocol_ci": [
+      1.1111295543198607,
+      1.1658152220971512
+     ],
+     "range": [
+      1.1111295543198607,
+      1.1658152220971512
+     ],
+     "decision": "slower",
+     "keys": {
+      "ic": [
+       "ic5w",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "-1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 2,
+     "ic5w": 2
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 4
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      1.169431279620853,
+      1.1893237212495709,
+      1.1606516290726816,
+      1.1920142421159716
+     ],
+     "median": 1.179377500435212,
+     "protocol_ci": [
+      1.1606516290726816,
+      1.1920142421159716
+     ],
+     "exact_ci": [
+      1.1606516290726816,
+      1.1920142421159716
+     ],
+     "range": [
+      1.1606516290726816,
+      1.1920142421159716
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_rho_all": {
+     "values": [
+      1.1587576856377109,
+      1.1761467889908257,
+      1.1507244119021653,
+      1.1778933270306469
+     ],
+     "median": 1.1674522373142682,
+     "protocol_ci": [
+      1.1507244119021653,
+      1.1778933270306469
+     ],
+     "exact_ci": [
+      1.1507244119021653,
+      1.1778933270306469
+     ],
+     "range": [
+      1.1507244119021653,
+      1.1778933270306469
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.584814772336277,
+      1.5704895738893925,
+      1.5552445986790553,
+      1.5875578638365133
+     ],
+     "median": 1.5776521731128348,
+     "protocol_ci": [
+      1.5552445986790553,
+      1.5875578638365133
+     ],
+     "exact_ci": [
+      1.5552445986790553,
+      1.5875578638365133
+     ],
+     "range": [
+      1.5552445986790553,
+      1.5875578638365133
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.0303342785941394,
+      1.1517105036960633,
+      1.1416040100250626,
+      1.0100881654798237
+     ],
+     "median": 1.0859691443096011,
+     "protocol_ci": [
+      1.0100881654798237,
+      1.1517105036960633
+     ],
+     "exact_ci": [
+      1.0100881654798237,
+      1.1517105036960633
+     ],
+     "range": [
+      1.0100881654798237,
+      1.1517105036960633
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      1.1789110135163943,
+      1.18934123507687,
+      1.1585365853658538,
+      1.1945275758871312
+     ],
+     "median": 1.184126124296632,
+     "protocol_ci": [
+      1.1585365853658538,
+      1.1945275758871312
+     ],
+     "range": [
+      1.1585365853658538,
+      1.1945275758871312
+     ],
+     "decision": "slower",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "0"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 3,
+     "ic5": 1
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 3,
+     "rhodpu 0.0 1": 1
+    },
+    "aa_ci_contains_1": false
+   }
+  ],
+  "fast": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.8088235294117647,
+      0.9243697478991596,
+      0.8625954198473283,
+      0.9743589743589745
+     ],
+     "median": 0.893482583873244,
+     "protocol_ci": [
+      0.8088235294117647,
+      0.9743589743589745
+     ],
+     "exact_ci": [
+      0.8088235294117647,
+      0.9743589743589745
+     ],
+     "range": [
+      0.8088235294117647,
+      0.9743589743589745
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.8411764705882353,
+      0.9342105263157895,
+      0.8957055214723926,
+      0.9865771812080536
+     ],
+     "median": 0.9149580238940911,
+     "protocol_ci": [
+      0.8411764705882353,
+      0.9865771812080536
+     ],
+     "exact_ci": [
+      0.8411764705882353,
+      0.9865771812080536
+     ],
+     "range": [
+      0.8411764705882353,
+      0.9865771812080536
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.5277777777777777,
+      1.4864864864864864,
+      1.5479452054794522,
+      1.5405405405405406
+     ],
+     "median": 1.534159159159159,
+     "protocol_ci": [
+      1.4864864864864864,
+      1.5479452054794522
+     ],
+     "exact_ci": [
+      1.4864864864864864,
+      1.5479452054794522
+     ],
+     "range": [
+      1.4864864864864864,
+      1.5479452054794522
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      0.9315068493150684,
+      1.0999999999999999,
+      1.0687022900763359,
+      1.0085470085470087
+     ],
+     "median": 1.0386246493116724,
+     "protocol_ci": [
+      0.9315068493150684,
+      1.0999999999999999
+     ],
+     "exact_ci": [
+      0.9315068493150684,
+      1.0999999999999999
+     ],
+     "range": [
+      0.9315068493150684,
+      1.0999999999999999
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.8906882591093116,
+      0.9737991266375546,
+      0.8644688644688645,
+      0.9783549783549783
+     ],
+     "median": 0.9322436928734331,
+     "protocol_ci": [
+      0.8644688644688645,
+      0.9783549783549783
+     ],
+     "range": [
+      0.8644688644688645,
+      0.9783549783549783
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.5",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 2,
+     "ic5w": 2
+    },
+    "winners_rho": {
+     "rho2xks": 4
+    },
+    "winners_rho_param": {
+     "rho2xks 0.25 None": 2,
+     "rho2xks 0.5 None": 2
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.7727272727272727,
+      0.7647058823529412,
+      0.7985865724381626,
+      0.7789473684210526
+     ],
+     "median": 0.7758373205741627,
+     "protocol_ci": [
+      0.7647058823529412,
+      0.7985865724381626
+     ],
+     "exact_ci": [
+      0.7647058823529412,
+      0.7985865724381626
+     ],
+     "range": [
+      0.7647058823529412,
+      0.7985865724381626
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.8498789346246974,
+      0.8433734939759037,
+      0.8465227817745802,
+      0.854368932038835
+     ],
+     "median": 0.8482008581996388,
+     "protocol_ci": [
+      0.8433734939759037,
+      0.854368932038835
+     ],
+     "exact_ci": [
+      0.8433734939759037,
+      0.854368932038835
+     ],
+     "range": [
+      0.8433734939759037,
+      0.854368932038835
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.483221476510067,
+      1.4258064516129034,
+      1.4675324675324677,
+      1.4509803921568627
+     ],
+     "median": 1.459256429844665,
+     "protocol_ci": [
+      1.4258064516129034,
+      1.483221476510067
+     ],
+     "exact_ci": [
+      1.4258064516129034,
+      1.483221476510067
+     ],
+     "range": [
+      1.4258064516129034,
+      1.483221476510067
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.0070422535211268,
+      1.110726643598616,
+      1.071969696969697,
+      1.0771929824561404
+     ],
+     "median": 1.0745813397129187,
+     "protocol_ci": [
+      1.0070422535211268,
+      1.110726643598616
+     ],
+     "exact_ci": [
+      1.0070422535211268,
+      1.110726643598616
+     ],
+     "range": [
+      1.0070422535211268,
+      1.110726643598616
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.7968197879858656,
+      0.7168284789644013,
+      0.8162162162162162,
+      0.7904929577464789
+     ],
+     "median": 0.7936563728661723,
+     "protocol_ci": [
+      0.7168284789644013,
+      0.8162162162162162
+     ],
+     "range": [
+      0.7168284789644013,
+      0.8162162162162162
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5w",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.25",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 3,
+     "ic5w": 1
+    },
+    "winners_rho": {
+     "rho2xks": 4
+    },
+    "winners_rho_param": {
+     "rho2xks 0.5 None": 2,
+     "rho2xks 0.25 None": 2
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.726027397260274,
+      0.7059701492537312,
+      0.7187499999999999,
+      0.7044117647058823
+     ],
+     "median": 0.7123600746268656,
+     "protocol_ci": [
+      0.7044117647058823,
+      0.726027397260274
+     ],
+     "exact_ci": [
+      0.7044117647058823,
+      0.726027397260274
+     ],
+     "range": [
+      0.7044117647058823,
+      0.726027397260274
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.8483816013628619,
+      0.8275570583262891,
+      0.8334735071488645,
+      0.8266331658291457
+     ],
+     "median": 0.8305152827375768,
+     "protocol_ci": [
+      0.8266331658291457,
+      0.8483816013628619
+     ],
+     "exact_ci": [
+      0.8266331658291457,
+      0.8483816013628619
+     ],
+     "range": [
+      0.8266331658291457,
+      0.8483816013628619
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.4676923076923079,
+      1.3994082840236686,
+      1.4289940828402368,
+      1.3685714285714285
+     ],
+     "median": 1.4142011834319526,
+     "protocol_ci": [
+      1.3685714285714285,
+      1.4676923076923079
+     ],
+     "exact_ci": [
+      1.3685714285714285,
+      1.4676923076923079
+     ],
+     "range": [
+      1.3685714285714285,
+      1.4676923076923079
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.025875190258752,
+      1.006006006006006,
+      1.0317220543806647,
+      1.0209580838323353
+     ],
+     "median": 1.0234166370455435,
+     "protocol_ci": [
+      1.006006006006006,
+      1.0317220543806647
+     ],
+     "exact_ci": [
+      1.006006006006006,
+      1.0317220543806647
+     ],
+     "range": [
+      1.006006006006006,
+      1.0317220543806647
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.7451133698201721,
+      0.7321033210332103,
+      0.7188905547226387,
+      0.6905797101449275
+     ],
+     "median": 0.7254969378779246,
+     "protocol_ci": [
+      0.6905797101449275,
+      0.7451133698201721
+     ],
+     "range": [
+      0.6905797101449275,
+      0.7451133698201721
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.25",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 3,
+     "ic5w": 1
+    },
+    "winners_rho": {
+     "rho2xks": 4
+    },
+    "winners_rho_param": {
+     "rho2xks 0.25 None": 2,
+     "rho2xks 0.1 None": 2
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.7457364341085272,
+      0.7192716236722305,
+      0.7542503863987634,
+      0.7320061255742726
+     ],
+     "median": 0.7388712798413999,
+     "protocol_ci": [
+      0.7192716236722305,
+      0.7542503863987634
+     ],
+     "exact_ci": [
+      0.7192716236722305,
+      0.7542503863987634
+     ],
+     "range": [
+      0.7192716236722305,
+      0.7542503863987634
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.7630813953488372,
+      0.7364672364672364,
+      0.7698986975397974,
+      0.7482014388489209
+     ],
+     "median": 0.755641417098879,
+     "protocol_ci": [
+      0.7364672364672364,
+      0.7698986975397974
+     ],
+     "exact_ci": [
+      0.7364672364672364,
+      0.7698986975397974
+     ],
+     "range": [
+      0.7364672364672364,
+      0.7698986975397974
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.4620060790273557,
+      1.4674922600619196,
+      1.4523809523809523,
+      1.4311377245508983
+     ],
+     "median": 1.457193515704154,
+     "protocol_ci": [
+      1.4311377245508983,
+      1.4674922600619196
+     ],
+     "exact_ci": [
+      1.4311377245508983,
+      1.4674922600619196
+     ],
+     "range": [
+      1.4311377245508983,
+      1.4674922600619196
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      0.9815950920245399,
+      1.0910470409711683,
+      0.9984544049459041,
+      1.1349693251533741
+     ],
+     "median": 1.0447507229585362,
+     "protocol_ci": [
+      0.9815950920245399,
+      1.1349693251533741
+     ],
+     "exact_ci": [
+      0.9815950920245399,
+      1.1349693251533741
+     ],
+     "range": [
+      0.9815950920245399,
+      1.1349693251533741
+     ],
+     "decision": "unranked",
+     "below_1": 2
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.727833461835004,
+      0.8305970149253731,
+      0.7164948453608246,
+      0.7080838323353293
+     ],
+     "median": 0.7221641535979143,
+     "protocol_ci": [
+      0.7080838323353293,
+      0.8305970149253731
+     ],
+     "range": [
+      0.7080838323353293,
+      0.8305970149253731
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rho2xks",
+       "0.25",
+       "None"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 3,
+     "ic5w": 1
+    },
+    "winners_rho": {
+     "rho2xks": 1,
+     "rhodpu": 3
+    },
+    "winners_rho_param": {
+     "rho2xks 0.25 None": 1,
+     "rhodpu 0.0 -1": 1,
+     "rhodpu 0.0 1": 2
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.7941176470588235,
+      0.789865871833085,
+      0.7690058479532164,
+      0.7510917030567685
+     ],
+     "median": 0.7794358598931507,
+     "protocol_ci": [
+      0.7510917030567685,
+      0.7941176470588235
+     ],
+     "exact_ci": [
+      0.7510917030567685,
+      0.7941176470588235
+     ],
+     "range": [
+      0.7510917030567685,
+      0.7941176470588235
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.8156351791530945,
+      0.8141534391534392,
+      0.7957198443579767,
+      0.7782101167315175
+     ],
+     "median": 0.804936641755708,
+     "protocol_ci": [
+      0.7782101167315175,
+      0.8156351791530945
+     ],
+     "exact_ci": [
+      0.7782101167315175,
+      0.8156351791530945
+     ],
+     "range": [
+      0.7782101167315175,
+      0.8156351791530945
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.4496644295302012,
+      1.57973174366617,
+      1.4921985815602836,
+      1.502183406113537
+     ],
+     "median": 1.4971909938369103,
+     "protocol_ci": [
+      1.4496644295302012,
+      1.57973174366617
+     ],
+     "exact_ci": [
+      1.4496644295302012,
+      1.57973174366617
+     ],
+     "range": [
+      1.4496644295302012,
+      1.57973174366617
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.1022058823529413,
+      1.1497764530551418,
+      1.0310880829015545,
+      1.0909752547307132
+     ],
+     "median": 1.0965905685418273,
+     "protocol_ci": [
+      1.0310880829015545,
+      1.1497764530551418
+     ],
+     "exact_ci": [
+      1.0310880829015545,
+      1.1497764530551418
+     ],
+     "range": [
+      1.0310880829015545,
+      1.1497764530551418
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.7869581326417192,
+      0.8154300479881876,
+      0.7782272894446488,
+      0.7525584795321637
+     ],
+     "median": 0.7825927110431841,
+     "protocol_ci": [
+      0.7525584795321637,
+      0.8154300479881876
+     ],
+     "range": [
+      0.7525584795321637,
+      0.8154300479881876
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "0"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5": 2,
+     "ic5w": 2
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 3,
+     "rhodpu 0.0 -1": 1
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      0.9399064411658871,
+      0.9489723600283487,
+      0.9290231904427265,
+      0.9754246476328153
+     ],
+     "median": 0.944439400597118,
+     "protocol_ci": [
+      0.9290231904427265,
+      0.9754246476328153
+     ],
+     "exact_ci": [
+      0.9290231904427265,
+      0.9754246476328153
+     ],
+     "range": [
+      0.9290231904427265,
+      0.9754246476328153
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_rho_all": {
+     "values": [
+      0.9527785775986178,
+      0.9584637268847794,
+      0.9438962503524105,
+      0.9895043731778425
+     ],
+     "median": 0.9556211522416986,
+     "protocol_ci": [
+      0.9438962503524105,
+      0.9895043731778425
+     ],
+     "exact_ci": [
+      0.9438962503524105,
+      0.9895043731778425
+     ],
+     "range": [
+      0.9438962503524105,
+      0.9895043731778425
+     ],
+     "decision": "faster",
+     "below_1": 4
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.5811138014527846,
+      1.644963144963145,
+      1.6024242424242423,
+      1.6278648974668273
+     ],
+     "median": 1.6151445699455347,
+     "protocol_ci": [
+      1.5811138014527846,
+      1.644963144963145
+     ],
+     "exact_ci": [
+      1.5811138014527846,
+      1.644963144963145
+     ],
+     "range": [
+      1.5811138014527846,
+      1.644963144963145
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.0970068517850702,
+      1.119773210489015,
+      1.0101897399859452,
+      1.1557643657390677
+     ],
+     "median": 1.1083900311370427,
+     "protocol_ci": [
+      1.0101897399859452,
+      1.1557643657390677
+     ],
+     "exact_ci": [
+      1.0101897399859452,
+      1.1557643657390677
+     ],
+     "range": [
+      1.0101897399859452,
+      1.1557643657390677
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      0.9693804034582133,
+      0.8967160115705292,
+      0.891156462585034,
+      0.8927668184117349
+     ],
+     "median": 0.894741414991132,
+     "protocol_ci": [
+      0.891156462585034,
+      0.9693804034582133
+     ],
+     "range": [
+      0.891156462585034,
+      0.9693804034582133
+     ],
+     "decision": "faster",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "-1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 1,
+     "ic5": 3
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 -1": 1,
+     "rhodpu 0.0 0": 3
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      1.0308370044052864,
+      0.9963221772710555,
+      1.0170850767085076,
+      1.0043305665824611
+     ],
+     "median": 1.0107078216454843,
+     "protocol_ci": [
+      0.9963221772710555,
+      1.0308370044052864
+     ],
+     "exact_ci": [
+      0.9963221772710555,
+      1.0308370044052864
+     ],
+     "range": [
+      0.9963221772710555,
+      1.0308370044052864
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "ic_rho_all": {
+     "values": [
+      1.0302375809935205,
+      0.9956772334293946,
+      1.0160793705097502,
+      1.0042432814710043
+     ],
+     "median": 1.0101613259903772,
+     "protocol_ci": [
+      0.9956772334293946,
+      1.0302375809935205
+     ],
+     "exact_ci": [
+      0.9956772334293946,
+      1.0302375809935205
+     ],
+     "range": [
+      0.9956772334293946,
+      1.0302375809935205
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.625,
+      1.51171875,
+      1.6489542114188807,
+      1.5785592739648326
+     ],
+     "median": 1.6017796369824162,
+     "protocol_ci": [
+      1.51171875,
+      1.6489542114188807
+     ],
+     "exact_ci": [
+      1.51171875,
+      1.6489542114188807
+     ],
+     "range": [
+      1.51171875,
+      1.6489542114188807
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.1215124816446402,
+      1.0801765354909894,
+      1.1300557880055788,
+      1.0447491880187656
+     ],
+     "median": 1.100844508567815,
+     "protocol_ci": [
+      1.0447491880187656,
+      1.1300557880055788
+     ],
+     "exact_ci": [
+      1.0447491880187656,
+      1.1300557880055788
+     ],
+     "range": [
+      1.0447491880187656,
+      1.1300557880055788
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      1.0559085133418045,
+      0.9633125556544968,
+      0.9850643776824034,
+      0.9897149043666545
+     ],
+     "median": 0.987389641024529,
+     "protocol_ci": [
+      0.9633125556544968,
+      1.0559085133418045
+     ],
+     "range": [
+      0.9633125556544968,
+      1.0559085133418045
+     ],
+     "decision": "unranked",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "-1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 2,
+     "ic5": 2
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 3,
+     "rhodpu 0.25 0": 1
+    },
+    "aa_ci_contains_1": false
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      1.1008328903065747,
+      1.1159523386092833,
+      1.075828561513101,
+      1.1446529745042493
+     ],
+     "median": 1.108392614457929,
+     "protocol_ci": [
+      1.075828561513101,
+      1.1446529745042493
+     ],
+     "exact_ci": [
+      1.075828561513101,
+      1.1446529745042493
+     ],
+     "range": [
+      1.075828561513101,
+      1.1446529745042493
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_rho_all": {
+     "values": [
+      1.0965540771067894,
+      1.1109781121751028,
+      1.0723112892451572,
+      1.1414949770134515
+     ],
+     "median": 1.103766094640946,
+     "protocol_ci": [
+      1.0723112892451572,
+      1.1414949770134515
+     ],
+     "exact_ci": [
+      1.0723112892451572,
+      1.1414949770134515
+     ],
+     "range": [
+      1.0723112892451572,
+      1.1414949770134515
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.6130875097377304,
+      1.6239648033126295,
+      1.6062176165803108,
+      1.6722710812209
+     ],
+     "median": 1.61852615652518,
+     "protocol_ci": [
+      1.6062176165803108,
+      1.6722710812209
+     ],
+     "exact_ci": [
+      1.6062176165803108,
+      1.6722710812209
+     ],
+     "range": [
+      1.6062176165803108,
+      1.6722710812209
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.0115207373271888,
+      0.9914923785891526,
+      1.0162228883794744,
+      1.126416430594901
+     ],
+     "median": 1.0138718128533317,
+     "protocol_ci": [
+      0.9914923785891526,
+      1.126416430594901
+     ],
+     "exact_ci": [
+      0.9914923785891526,
+      1.126416430594901
+     ],
+     "range": [
+      0.9914923785891526,
+      1.126416430594901
+     ],
+     "decision": "unranked",
+     "below_1": 1
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      1.0926910009582715,
+      1.122237017310253,
+      1.071286271113036,
+      1.1343877010072452
+     ],
+     "median": 1.1074640091342622,
+     "protocol_ci": [
+      1.071286271113036,
+      1.1343877010072452
+     ],
+     "range": [
+      1.071286271113036,
+      1.1343877010072452
+     ],
+     "decision": "slower",
+     "keys": {
+      "ic": [
+       "ic5",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "-1"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 2,
+     "ic5": 2
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 0": 3,
+     "rhodpu 0.0 -1": 1
+    },
+    "aa_ci_contains_1": true
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "n": 4,
+    "ic_rho_solve": {
+     "values": [
+      1.1496790080028143,
+      1.1706735018561074,
+      1.1100655352041673,
+      1.147239795476211
+     ],
+     "median": 1.1484594017395127,
+     "protocol_ci": [
+      1.1100655352041673,
+      1.1706735018561074
+     ],
+     "exact_ci": [
+      1.1100655352041673,
+      1.1706735018561074
+     ],
+     "range": [
+      1.1100655352041673,
+      1.1706735018561074
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_rho_all": {
+     "values": [
+      1.139156724955058,
+      1.1585245901639345,
+      1.1032025683188476,
+      1.1360527797892026
+     ],
+     "median": 1.1376047523721304,
+     "protocol_ci": [
+      1.1032025683188476,
+      1.1585245901639345
+     ],
+     "exact_ci": [
+      1.1032025683188476,
+      1.1585245901639345
+     ],
+     "range": [
+      1.1032025683188476,
+      1.1585245901639345
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "ic_bsgs_solve": {
+     "values": [
+      1.5964098180486017,
+      1.6023469634647955,
+      1.5954594855693758,
+      1.6203182374541003
+     ],
+     "median": 1.5993783907566987,
+     "protocol_ci": [
+      1.5954594855693758,
+      1.6203182374541003
+     ],
+     "exact_ci": [
+      1.5954594855693758,
+      1.6203182374541003
+     ],
+     "range": [
+      1.5954594855693758,
+      1.6203182374541003
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "aa_rho": {
+     "values": [
+      1.126201605079813,
+      1.0108714866537034,
+      1.0657032431524114,
+      1.034231735852327
+     ],
+     "median": 1.0499674895023692,
+     "protocol_ci": [
+      1.0108714866537034,
+      1.126201605079813
+     ],
+     "exact_ci": [
+      1.0108714866537034,
+      1.126201605079813
+     ],
+     "range": [
+      1.0108714866537034,
+      1.126201605079813
+     ],
+     "decision": "slower",
+     "below_1": 0
+    },
+    "fixed_ic_rho_solve": {
+     "values": [
+      1.124488829581163,
+      1.1077329245443708,
+      1.1259675986633393,
+      1.1603030171100177
+     ],
+     "median": 1.1252282141222512,
+     "protocol_ci": [
+      1.1077329245443708,
+      1.1603030171100177
+     ],
+     "range": [
+      1.1077329245443708,
+      1.1603030171100177
+     ],
+     "decision": "slower",
+     "keys": {
+      "ic": [
+       "ic5w",
+       "1.0",
+       "None"
+      ],
+      "rho": [
+       "rhodpu",
+       "0.0",
+       "0"
+      ]
+     }
+    },
+    "winners_ic": {
+     "ic5w": 3,
+     "ic5": 1
+    },
+    "winners_rho": {
+     "rhodpu": 4
+    },
+    "winners_rho_param": {
+     "rhodpu 0.0 -1": 2,
+     "rhodpu 0.0 1": 1,
+     "rhodpu 0.0 0": 1
+    },
+    "aa_ci_contains_1": false
+   }
+  ],
+  "size": {
+   "std": {
+    "24": {
+     "n": 12,
+     "below_1": 12,
+     "above_1": 0,
+     "config_range": [
+      0.6968503937007874,
+      0.984251968503937
+     ],
+     "cell_median_range": [
+      0.7003262438045046,
+      0.8837722561126816
+     ],
+     "decisions": [
+      "faster",
+      "faster",
+      "faster"
+     ]
+    },
+    "28": {
+     "n": 12,
+     "below_1": 12,
+     "above_1": 0,
+     "config_range": [
+      0.7655786350148368,
+      0.9948150708606982
+     ],
+     "cell_median_range": [
+      0.791309629075926,
+      0.9532602607974054
+     ],
+     "decisions": [
+      "faster",
+      "faster",
+      "faster"
+     ]
+    },
+    "32": {
+     "n": 12,
+     "below_1": 0,
+     "above_1": 12,
+     "config_range": [
+      1.0287976961843053,
+      1.1949707809456347
+     ],
+     "cell_median_range": [
+      1.0526463335710114,
+      1.179377500435212
+     ],
+     "decisions": [
+      "slower",
+      "slower",
+      "slower"
+     ]
+    }
+   },
+   "fast": {
+    "24": {
+     "n": 12,
+     "below_1": 12,
+     "above_1": 0,
+     "config_range": [
+      0.7044117647058823,
+      0.9743589743589745
+     ],
+     "cell_median_range": [
+      0.7123600746268656,
+      0.893482583873244
+     ],
+     "decisions": [
+      "faster",
+      "faster",
+      "faster"
+     ]
+    },
+    "28": {
+     "n": 12,
+     "below_1": 12,
+     "above_1": 0,
+     "config_range": [
+      0.7192716236722305,
+      0.9754246476328153
+     ],
+     "cell_median_range": [
+      0.7388712798413999,
+      0.944439400597118
+     ],
+     "decisions": [
+      "faster",
+      "faster",
+      "faster"
+     ]
+    },
+    "32": {
+     "n": 12,
+     "below_1": 1,
+     "above_1": 11,
+     "config_range": [
+      0.9963221772710555,
+      1.1706735018561074
+     ],
+     "cell_median_range": [
+      1.0107078216454843,
+      1.1484594017395127
+     ],
+     "decisions": [
+      "unranked",
+      "slower",
+      "slower"
+     ]
+    }
+   }
+  },
+  "fast_over_std": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "ic": {
+     "values": [
+      0.88,
+      0.8870967741935484,
+      0.9112903225806452,
+      0.8976377952755906
+     ],
+     "median": 0.8923672847345695,
+     "protocol_ci": [
+      0.88,
+      0.9112903225806452
+     ],
+     "range": [
+      0.88,
+      0.9112903225806452
+     ]
+    },
+    "rho": {
+     "values": [
+      1.0708661417322836,
+      0.8263888888888888,
+      0.9290780141843972,
+      0.8181818181818181
+     ],
+     "median": 0.8777334515366431,
+     "protocol_ci": [
+      0.8181818181818181,
+      1.0708661417322836
+     ],
+     "range": [
+      0.8181818181818181,
+      1.0708661417322836
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.878048780487805,
+      0.891566265060241,
+      0.8902439024390244,
+      0.902439024390244
+     ],
+     "median": 0.8909050837496326,
+     "protocol_ci": [
+      0.878048780487805,
+      0.902439024390244
+     ],
+     "range": [
+      0.878048780487805,
+      0.902439024390244
+     ]
+    }
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "ic": {
+     "values": [
+      0.8215613382899629,
+      0.8911290322580645,
+      0.904,
+      0.888
+     ],
+     "median": 0.8895645161290322,
+     "protocol_ci": [
+      0.8215613382899629,
+      0.904
+     ],
+     "range": [
+      0.8215613382899629,
+      0.904
+     ]
+    },
+    "rho": {
+     "values": [
+      0.8773006134969326,
+      0.8550295857988166,
+      0.8132183908045978,
+      0.8357771260997067
+     ],
+     "median": 0.8454033559492616,
+     "protocol_ci": [
+      0.8132183908045978,
+      0.8773006134969326
+     ],
+     "range": [
+      0.8132183908045978,
+      0.8773006134969326
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.871345029239766,
+      0.9171597633136096,
+      0.911242603550296,
+      0.8895348837209303
+     ],
+     "median": 0.900388743635613,
+     "protocol_ci": [
+      0.871345029239766,
+      0.9171597633136096
+     ],
+     "range": [
+      0.871345029239766,
+      0.9171597633136096
+     ]
+    }
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "ic": {
+     "values": [
+      0.903409090909091,
+      0.8874296435272045,
+      0.8977695167286245,
+      0.9020715630885122
+     ],
+     "median": 0.8999205399085684,
+     "protocol_ci": [
+      0.8874296435272045,
+      0.903409090909091
+     ],
+     "range": [
+      0.8874296435272045,
+      0.903409090909091
+     ]
+    },
+    "rho": {
+     "values": [
+      0.8690476190476192,
+      0.8827404479578392,
+      0.888888888888889,
+      0.8923884514435695
+     ],
+     "median": 0.8858146684233641,
+     "protocol_ci": [
+      0.8690476190476192,
+      0.8923884514435695
+     ],
+     "range": [
+      0.8690476190476192,
+      0.8923884514435695
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.808457711442786,
+      0.9362880886426591,
+      0.9184782608695652,
+      0.9668508287292817
+     ],
+     "median": 0.9273831747561121,
+     "protocol_ci": [
+      0.808457711442786,
+      0.9668508287292817
+     ],
+     "range": [
+      0.808457711442786,
+      0.9668508287292817
+     ]
+    }
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "ic": {
+     "values": [
+      0.9321705426356589,
+      0.9168278529980657,
+      0.919020715630885,
+      0.8738574040219378
+     ],
+     "median": 0.9179242843144754,
+     "protocol_ci": [
+      0.8738574040219378,
+      0.9321705426356589
+     ],
+     "range": [
+      0.8738574040219378,
+      0.9321705426356589
+     ]
+    },
+    "rho": {
+     "values": [
+      0.9569732937685459,
+      0.9791976225854384,
+      0.9923312883435583,
+      0.9834337349397589
+     ],
+     "median": 0.9813156787625987,
+     "protocol_ci": [
+      0.9569732937685459,
+      0.9923312883435583
+     ],
+     "range": [
+      0.9569732937685459,
+      0.9923312883435583
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.9189944134078213,
+      0.884931506849315,
+      0.9130434782608696,
+      0.9125683060109289
+     ],
+     "median": 0.9128058921358992,
+     "protocol_ci": [
+      0.884931506849315,
+      0.9189944134078213
+     ],
+     "range": [
+      0.884931506849315,
+      0.9189944134078213
+     ]
+    }
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "ic": {
+     "values": [
+      0.9407665505226481,
+      0.9372236958443856,
+      0.9155787641427328,
+      0.8958333333333334
+     ],
+     "median": 0.9264012299935591,
+     "protocol_ci": [
+      0.8958333333333334,
+      0.9407665505226481
+     ],
+     "range": [
+      0.8958333333333334,
+      0.9407665505226481
+     ]
+    },
+    "rho": {
+     "values": [
+      0.9869375907111755,
+      0.9904059040590405,
+      0.990586531498914,
+      0.9765458422174841
+     ],
+     "median": 0.988671747385108,
+     "protocol_ci": [
+      0.9765458422174841,
+      0.990586531498914
+     ],
+     "range": [
+      0.9765458422174841,
+      0.990586531498914
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.9231722428748451,
+      0.8911022576361222,
+      0.9003831417624522,
+      0.9196787148594378
+     ],
+     "median": 0.9100309283109449,
+     "protocol_ci": [
+      0.8911022576361222,
+      0.9231722428748451
+     ],
+     "range": [
+      0.8911022576361222,
+      0.9231722428748451
+     ]
+    }
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "ic": {
+     "values": [
+      0.9491279069767442,
+      0.9305072967338429,
+      0.9426024955436719,
+      0.9771904417089066
+     ],
+     "median": 0.945865201260208,
+     "protocol_ci": [
+      0.9305072967338429,
+      0.9771904417089066
+     ],
+     "range": [
+      0.9305072967338429,
+      0.9771904417089066
+     ]
+    },
+    "rho": {
+     "values": [
+      0.9452380952380952,
+      0.9754580020739716,
+      0.9663837011884551,
+      0.9557858376511226
+     ],
+     "median": 0.9610847694197888,
+     "protocol_ci": [
+      0.9452380952380952,
+      0.9754580020739716
+     ],
+     "range": [
+      0.9452380952380952,
+      0.9754580020739716
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.9343891402714931,
+      0.8209783156833081,
+      0.9428571428571428,
+      0.9094898518924849
+     ],
+     "median": 0.921939496081989,
+     "protocol_ci": [
+      0.8209783156833081,
+      0.9428571428571428
+     ],
+     "range": [
+      0.8209783156833081,
+      0.9428571428571428
+     ]
+    }
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "ic": {
+     "values": [
+      0.9825052484254724,
+      0.9290123456790121,
+      0.9746074173070497,
+      0.9521040027369141
+     ],
+     "median": 0.9633557100219818,
+     "protocol_ci": [
+      0.9290123456790121,
+      0.9825052484254724
+     ],
+     "range": [
+      0.9290123456790121,
+      0.9825052484254724
+     ]
+    },
+    "rho": {
+     "values": [
+      0.9805615550755938,
+      1.0100297176820208,
+      1.0006978367062107,
+      1.0058076225045374
+     ],
+     "median": 1.0032527296053741,
+     "protocol_ci": [
+      0.9805615550755938,
+      1.0100297176820208
+     ],
+     "range": [
+      0.9805615550755938,
+      1.0100297176820208
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.9270386266094421,
+      0.9180327868852459,
+      0.908577298407807,
+      0.908294693456981
+     ],
+     "median": 0.9133050426465265,
+     "protocol_ci": [
+      0.908294693456981,
+      0.9270386266094421
+     ],
+     "range": [
+      0.908294693456981,
+      0.9270386266094421
+     ]
+    }
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "ic": {
+     "values": [
+      0.9228940722032388,
+      0.9414853713428357,
+      0.9351432880844646,
+      0.9580616478956728
+     ],
+     "median": 0.9383143297136501,
+     "protocol_ci": [
+      0.9228940722032388,
+      0.9580616478956728
+     ],
+     "range": [
+      0.9228940722032388,
+      0.9580616478956728
+     ]
+    },
+    "rho": {
+     "values": [
+      0.9843014128728415,
+      0.9830419580419579,
+      0.9876606683804626,
+      1.0001770851779705
+     ],
+     "median": 0.985981040626652,
+     "protocol_ci": [
+      0.9830419580419579,
+      1.0001770851779705
+     ],
+     "range": [
+      0.9830419580419579,
+      1.0001770851779705
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.9422559334475166,
+      0.9228564604728923,
+      0.9157769869513642,
+      0.9213536701620592
+     ],
+     "median": 0.9221050653174757,
+     "protocol_ci": [
+      0.9157769869513642,
+      0.9422559334475166
+     ],
+     "range": [
+      0.9157769869513642,
+      0.9422559334475166
+     ]
+    }
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "ic": {
+     "values": [
+      0.9460848169054856,
+      0.9557656227449849,
+      0.9509825091772836,
+      0.941469312282199
+     ],
+     "median": 0.9485336630413845,
+     "protocol_ci": [
+      0.941469312282199,
+      0.9557656227449849
+     ],
+     "range": [
+      0.941469312282199,
+      0.9557656227449849
+     ]
+    },
+    "rho": {
+     "values": [
+      0.9623392010832769,
+      0.9709921043597666,
+      0.9943191311612365,
+      0.9782129535435743
+     ],
+     "median": 0.9746025289516704,
+     "protocol_ci": [
+      0.9623392010832769,
+      0.9943191311612365
+     ],
+     "range": [
+      0.9623392010832769,
+      0.9943191311612365
+     ]
+    },
+    "bsgs": {
+     "values": [
+      0.9392132125243721,
+      0.936763372620127,
+      0.927012201947834,
+      0.9224342328102065
+     ],
+     "median": 0.9318877872839805,
+     "protocol_ci": [
+      0.9224342328102065,
+      0.9392132125243721
+     ],
+     "range": [
+      0.9224342328102065,
+      0.9392132125243721
+     ]
+    }
+   }
+  ],
+  "drift": {
+   "std": {
+    "median_rel_by_round": [
+     1.0346036791800604,
+     1.0,
+     1.0
+    ],
+    "mean_rel_by_round": [
+     1.0466849267393006,
+     0.9954296407569891,
+     0.9963588504225775
+    ],
+    "median_abs_log_dev": 0.008380453913267475,
+    "p95_abs_log_dev": 0.10689779497671278
+   },
+   "fast": {
+    "median_rel_by_round": [
+     1.0277243342624993,
+     1.0,
+     1.0
+    ],
+    "mean_rel_by_round": [
+     1.046130483276363,
+     0.9938904895057463,
+     0.995256364129202
+    ],
+    "median_abs_log_dev": 0.008035593672426448,
+    "p95_abs_log_dev": 0.10895118378855483
+   },
+   "pooled": {
+    "median_rel_by_round": [
+     1.0319355813813142,
+     1.0,
+     1.0
+    ],
+    "median_abs_log_dev": 0.008168652773453768,
+    "p95_abs_log_dev": 0.10758146033805352
+   }
+  },
+  "opcost": {
+   "gae_ns": [
+    98.458,
+    140.016
+   ],
+   "I_over_M": [
+    23.19457128361238,
+    27.245583905789992
+   ],
+   "native_gae": [
+    0.0058979385925336525,
+    0.007364484662468469
+   ],
+   "std_lookup_gae_2_10_to_2_16": [
+    0.0583504742315164,
+    0.10999100386304704
+   ],
+   "std_lookup_gae_2_22_to_2_24": [
+    0.7436435835904468,
+    1.4525279814743344
+   ],
+   "earlier_vm_gae_ns": [
+    214.422,
+    293.751
+   ],
+   "earlier_vm_std_lookup_gae_2_22_to_2_24": [
+    0.26836334174181536,
+    0.8527572072378106
+   ],
+   "vm_over_runpod_gae_ns_median": 2.0473587800534663
+  },
+  "earlier_vm_cells": [
+   {
+    "bits": 24,
+    "T": 1024,
+    "median": 0.7776964862952125,
+    "protocol_ci": [
+     0.7650602409638553,
+     0.9223880597014925
+    ],
+    "decision": "faster",
+    "range": [
+     0.7650602409638553,
+     0.9223880597014925
+    ]
+   },
+   {
+    "bits": 24,
+    "T": 4096,
+    "median": 0.7923026353398502,
+    "protocol_ci": [
+     0.7528089887640449,
+     0.8208744710860366
+    ],
+    "decision": "faster",
+    "range": [
+     0.7528089887640449,
+     0.8208744710860366
+    ]
+   },
+   {
+    "bits": 24,
+    "T": 16384,
+    "median": 0.8288248547988808,
+    "protocol_ci": [
+     0.8110032362459547,
+     0.8719433719433719
+    ],
+    "decision": "faster",
+    "range": [
+     0.8110032362459547,
+     0.8719433719433719
+    ]
+   },
+   {
+    "bits": 28,
+    "T": 1024,
+    "median": 0.9318617164586132,
+    "protocol_ci": [
+     0.8689604685212299,
+     0.9672006102212052
+    ],
+    "decision": "faster",
+    "range": [
+     0.8689604685212299,
+     0.9672006102212052
+    ]
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "median": 1.0532513946390751,
+    "protocol_ci": [
+     0.9867904319885753,
+     1.100502512562814
+    ],
+    "decision": "unranked",
+    "range": [
+     0.9867904319885753,
+     1.100502512562814
+    ]
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "median": 1.0072227455211964,
+    "protocol_ci": [
+     0.9535401750198885,
+     1.193046820405311
+    ],
+    "decision": "unranked",
+    "range": [
+     0.9535401750198885,
+     1.193046820405311
+    ]
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "median": 1.1144071828980056,
+    "protocol_ci": [
+     1.0486237019943958,
+     1.2114891434433237
+    ],
+    "decision": "slower",
+    "range": [
+     1.0486237019943958,
+     1.2114891434433237
+    ]
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "median": 1.202571211683814,
+    "protocol_ci": [
+     1.1160646945445403,
+     1.3032721468475659
+    ],
+    "decision": "slower",
+    "range": [
+     1.1160646945445403,
+     1.3032721468475659
+    ]
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "median": 1.2885020349125165,
+    "protocol_ci": [
+     1.2688365043277092,
+     1.3193581567578687
+    ],
+    "decision": "slower",
+    "range": [
+     1.2688365043277092,
+     1.3193581567578687
+    ]
+   }
+  ],
+  "extra": {
+   "per_arm_fast_over_std": {
+    "bsgs2": {
+     "median": 0.927025414278638,
+     "lo": 0.7792329279700654,
+     "hi": 1.0574712643678161,
+     "n": 108
+    },
+    "ic5": {
+     "median": 0.9285061728395061,
+     "lo": 0.8215613382899629,
+     "hi": 1.0112570356472796,
+     "n": 36
+    },
+    "ic5ks": {
+     "median": 0.8371487475695055,
+     "lo": 0.7740112994350282,
+     "hi": 0.9274924471299093,
+     "n": 36
+    },
+    "ic5rw": {
+     "median": 0.8460213242968665,
+     "lo": 0.786144578313253,
+     "hi": 0.9640522875816993,
+     "n": 36
+    },
+    "ic5w": {
+     "median": 0.9334608843537415,
+     "lo": 0.8175182481751825,
+     "hi": 0.9873280231716147,
+     "n": 36
+    },
+    "rho2xks": {
+     "median": 0.8400400318735973,
+     "lo": 0.7757255936675461,
+     "hi": 1.094488188976378,
+     "n": 144
+    },
+    "rhodpu": {
+     "median": 0.9804229924551788,
+     "lo": 0.8910112359550562,
+     "hi": 1.0283018867924527,
+     "n": 216
+    }
+   },
+   "aa_abs_log_dev_excluding_self_median": 0.020064235095015034,
+   "aa_abs_log_dev_excluding_self_p95": 0.12028616587450193,
+   "runpod_std_over_vm": {
+    "24/1024": 1.1363973885529461,
+    "24/4096": 0.925697817434189,
+    "24/16384": 0.8449628890224857,
+    "28/1024": 0.849170660302655,
+    "28/4096": 0.7904557441100303,
+    "28/16384": 0.9464244776403777,
+    "32/1024": 0.9445796381477141,
+    "32/4096": 0.972620022767704,
+    "32/16384": 0.9153089932956812
+   },
+   "cells_beyond_10pct_of_vm": [
+    "24/1024",
+    "24/16384",
+    "28/1024",
+    "28/4096"
+   ],
+   "ic_rho_fast_minus_std": {
+    "24/1024": 0.009710327760562354,
+    "24/4096": 0.04240450029270715,
+    "24/16384": 0.01203383082236098,
+    "28/1024": -0.05243834923452606,
+    "28/4096": -0.0531127549912066,
+    "28/16384": -0.008820860200287495,
+    "32/1024": -0.04193851192552711,
+    "32/4096": -0.061252224829767554,
+    "32/16384": -0.030918098695699392
+   }
+  }
+ },
+ "reporting_contract": {
+  "one_table_one_unit": true,
+  "ratio_reported": true,
+  "phases_separated": "solve (ms_arm) and solve + shared verification (ms) both computed; same decisions in all 18 build-cells",
+  "reference_arm_priced": "wall time: every arm's work is inside ms_arm; the counted section 5a band is v5's (not re-run here)",
+  "null_A_A": "present; not clean (round 0 about 3% slower), disclosed",
+  "cheaper_baseline": "bsgs2 reported (IC 1.41-1.62x by cell median)",
+  "frozen_benchmark": "v5 instances (sha256 in ec_check.json), seed 43 of the earlier timed study",
+  "external_fastest_implementation": "not compared (harness-internal study)",
+  "m83_ecc2k130": "not mentioned beyond 'nothing here is about ECC2K-130 / m = 83'",
+  "interpretation_labelled": true,
+  "isolation": "shared cloud host, diagnostic seconds (not L2); stated"
+ },
+ "headline": [
+  {
+   "name": "std ic/rho 24/1024",
+   "claimed": 0.884,
+   "recomputed": 0.8837722561126816,
+   "rel_tol": 0.0005656108607285068
+  },
+  {
+   "name": "fast ic/rho 24/1024",
+   "claimed": 0.893,
+   "recomputed": 0.893482583873244,
+   "rel_tol": 0.0005599104153337066
+  },
+  {
+   "name": "ic fast/std 24/1024",
+   "claimed": 0.892,
+   "recomputed": 0.8923672847345695,
+   "rel_tol": 0.0005605381175919282
+  },
+  {
+   "name": "rho fast/std 24/1024",
+   "claimed": 0.878,
+   "recomputed": 0.8777334515366431,
+   "rel_tol": 0.0005694760830045558
+  },
+  {
+   "name": "std ic/bsgs 24/1024",
+   "claimed": 1.52,
+   "recomputed": 1.5182926829268295,
+   "rel_tol": 0.003289473685210526
+  },
+  {
+   "name": "fast ic/bsgs 24/1024",
+   "claimed": 1.53,
+   "recomputed": 1.534159159159159,
+   "rel_tol": 0.0032679738572091504
+  },
+  {
+   "name": "std ic/rho 24/4096",
+   "claimed": 0.733,
+   "recomputed": 0.7334328202814555,
+   "rel_tol": 0.0006821282411091405
+  },
+  {
+   "name": "fast ic/rho 24/4096",
+   "claimed": 0.776,
+   "recomputed": 0.7758373205741627,
+   "rel_tol": 0.0006443298979072165
+  },
+  {
+   "name": "ic fast/std 24/4096",
+   "claimed": 0.89,
+   "recomputed": 0.8895645161290322,
+   "rel_tol": 0.0005617977538089888
+  },
+  {
+   "name": "rho fast/std 24/4096",
+   "claimed": 0.845,
+   "recomputed": 0.8454033559492616,
+   "rel_tol": 0.000591715977331361
+  },
+  {
+   "name": "std ic/bsgs 24/4096",
+   "claimed": 1.47,
+   "recomputed": 1.473372781065089,
+   "rel_tol": 0.0034013605452176874
+  },
+  {
+   "name": "fast ic/bsgs 24/4096",
+   "claimed": 1.46,
+   "recomputed": 1.459256429844665,
+   "rel_tol": 0.0034246575352465756
+  },
+  {
+   "name": "std ic/rho 24/16384",
+   "claimed": 0.7,
+   "recomputed": 0.7003262438045046,
+   "rel_tol": 0.0007142857152857144
+  },
+  {
+   "name": "fast ic/rho 24/16384",
+   "claimed": 0.712,
+   "recomputed": 0.7123600746268656,
+   "rel_tol": 0.000702247192011236
+  },
+  {
+   "name": "ic fast/std 24/16384",
+   "claimed": 0.9,
+   "recomputed": 0.8999205399085684,
+   "rel_tol": 0.0005555555565555556
+  },
+  {
+   "name": "rho fast/std 24/16384",
+   "claimed": 0.886,
+   "recomputed": 0.8858146684233641,
+   "rel_tol": 0.000564334086778781
+  },
+  {
+   "name": "std ic/bsgs 24/16384",
+   "claimed": 1.46,
+   "recomputed": 1.464403675234206,
+   "rel_tol": 0.0034246575352465756
+  },
+  {
+   "name": "fast ic/bsgs 24/16384",
+   "claimed": 1.41,
+   "recomputed": 1.4142011834319526,
+   "rel_tol": 0.003546099291780142
+  },
+  {
+   "name": "std ic/rho 28/1024",
+   "claimed": 0.791,
+   "recomputed": 0.791309629075926,
+   "rel_tol": 0.0006321112525802781
+  },
+  {
+   "name": "fast ic/rho 28/1024",
+   "claimed": 0.739,
+   "recomputed": 0.7388712798413999,
+   "rel_tol": 0.0006765899874682003
+  },
+  {
+   "name": "ic fast/std 28/1024",
+   "claimed": 0.918,
+   "recomputed": 0.9179242843144754,
+   "rel_tol": 0.0005446623103681917
+  },
+  {
+   "name": "rho fast/std 28/1024",
+   "claimed": 0.981,
+   "recomputed": 0.9813156787625987,
+   "rel_tol": 0.0005096839969225281
+  },
+  {
+   "name": "std ic/bsgs 28/1024",
+   "claimed": 1.44,
+   "recomputed": 1.4421377823658004,
+   "rel_tol": 0.0034722222232222225
+  },
+  {
+   "name": "fast ic/bsgs 28/1024",
+   "claimed": 1.46,
+   "recomputed": 1.457193515704154,
+   "rel_tol": 0.0034246575352465756
+  },
+  {
+   "name": "std ic/rho 28/4096",
+   "claimed": 0.833,
+   "recomputed": 0.8325486148843573,
+   "rel_tol": 0.0006002400970384154
+  },
+  {
+   "name": "fast ic/rho 28/4096",
+   "claimed": 0.779,
+   "recomputed": 0.7794358598931507,
+   "rel_tol": 0.0006418485247483953
+  },
+  {
+   "name": "ic fast/std 28/4096",
+   "claimed": 0.926,
+   "recomputed": 0.9264012299935591,
+   "rel_tol": 0.0005399568044557236
+  },
+  {
+   "name": "rho fast/std 28/4096",
+   "claimed": 0.989,
+   "recomputed": 0.988671747385108,
+   "rel_tol": 0.0005055611739019211
+  },
+  {
+   "name": "std ic/bsgs 28/4096",
+   "claimed": 1.48,
+   "recomputed": 1.4847124910320404,
+   "rel_tol": 0.0033783783793783786
+  },
+  {
+   "name": "fast ic/bsgs 28/4096",
+   "claimed": 1.5,
+   "recomputed": 1.4971909938369103,
+   "rel_tol": 0.0033333333343333335
+  },
+  {
+   "name": "std ic/rho 28/16384",
+   "claimed": 0.953,
+   "recomputed": 0.9532602607974054,
+   "rel_tol": 0.0005246589726684155
+  },
+  {
+   "name": "fast ic/rho 28/16384",
+   "claimed": 0.944,
+   "recomputed": 0.944439400597118,
+   "rel_tol": 0.0005296610179491525
+  },
+  {
+   "name": "ic fast/std 28/16384",
+   "claimed": 0.946,
+   "recomputed": 0.945865201260208,
+   "rel_tol": 0.0005285412272156448
+  },
+  {
+   "name": "rho fast/std 28/16384",
+   "claimed": 0.961,
+   "recomputed": 0.9610847694197888,
+   "rel_tol": 0.0005202913641633715
+  },
+  {
+   "name": "std ic/bsgs 28/16384",
+   "claimed": 1.54,
+   "recomputed": 1.5358230553287182,
+   "rel_tol": 0.0032467532477532465
+  },
+  {
+   "name": "fast ic/bsgs 28/16384",
+   "claimed": 1.62,
+   "recomputed": 1.6151445699455347,
+   "rel_tol": 0.0030864197540864196
+  },
+  {
+   "name": "std ic/rho 32/1024",
+   "claimed": 1.053,
+   "recomputed": 1.0526463335710114,
+   "rel_tol": 0.0004748338091671415
+  },
+  {
+   "name": "fast ic/rho 32/1024",
+   "claimed": 1.011,
+   "recomputed": 1.0107078216454843,
+   "rel_tol": 0.0004945598427408507
+  },
+  {
+   "name": "ic fast/std 32/1024",
+   "claimed": 0.963,
+   "recomputed": 0.9633557100219818,
+   "rel_tol": 0.0005192108005846313
+  },
+  {
+   "name": "rho fast/std 32/1024",
+   "claimed": 1.003,
+   "recomputed": 1.0032527296053741,
+   "rel_tol": 0.0004985044875403789
+  },
+  {
+   "name": "std ic/bsgs 32/1024",
+   "claimed": 1.52,
+   "recomputed": 1.519593291807904,
+   "rel_tol": 0.003289473685210526
+  },
+  {
+   "name": "fast ic/bsgs 32/1024",
+   "claimed": 1.6,
+   "recomputed": 1.6017796369824162,
+   "rel_tol": 0.0031250000009999997
+  },
+  {
+   "name": "std ic/rho 32/4096",
+   "claimed": 1.17,
+   "recomputed": 1.1696448392876966,
+   "rel_tol": 0.0004273504283504274
+  },
+  {
+   "name": "fast ic/rho 32/4096",
+   "claimed": 1.108,
+   "recomputed": 1.108392614457929,
+   "rel_tol": 0.00045126353890613714
+  },
+  {
+   "name": "ic fast/std 32/4096",
+   "claimed": 0.938,
+   "recomputed": 0.9383143297136501,
+   "rel_tol": 0.0005330490415117271
+  },
+  {
+   "name": "rho fast/std 32/4096",
+   "claimed": 0.986,
+   "recomputed": 0.985981040626652,
+   "rel_tol": 0.0005070993924807302
+  },
+  {
+   "name": "std ic/bsgs 32/4096",
+   "claimed": 1.6,
+   "recomputed": 1.6000150723003677,
+   "rel_tol": 0.0031250000009999997
+  },
+  {
+   "name": "fast ic/bsgs 32/4096",
+   "claimed": 1.62,
+   "recomputed": 1.61852615652518,
+   "rel_tol": 0.0030864197540864196
+  },
+  {
+   "name": "std ic/rho 32/16384",
+   "claimed": 1.179,
+   "recomputed": 1.179377500435212,
+   "rel_tol": 0.0004240882113477523
+  },
+  {
+   "name": "fast ic/rho 32/16384",
+   "claimed": 1.148,
+   "recomputed": 1.1484594017395127,
+   "rel_tol": 0.0004355400706864112
+  },
+  {
+   "name": "ic fast/std 32/16384",
+   "claimed": 0.949,
+   "recomputed": 0.9485336630413845,
+   "rel_tol": 0.0005268703908840886
+  },
+  {
+   "name": "rho fast/std 32/16384",
+   "claimed": 0.975,
+   "recomputed": 0.9746025289516704,
+   "rel_tol": 0.0005128205138205128
+  },
+  {
+   "name": "std ic/bsgs 32/16384",
+   "claimed": 1.58,
+   "recomputed": 1.5776521731128348,
+   "rel_tol": 0.0031645569630253164
+  },
+  {
+   "name": "fast ic/bsgs 32/16384",
+   "claimed": 1.6,
+   "recomputed": 1.5993783907566987,
+   "rel_tol": 0.0031250000009999997
+  },
+  {
+   "name": "std 24b configurations below 1",
+   "claimed": 12,
+   "recomputed": 12,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "std 28b configurations below 1",
+   "claimed": 12,
+   "recomputed": 12,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "std 32b configurations below 1",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "fast 24b configurations below 1",
+   "claimed": 12,
+   "recomputed": 12,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "fast 28b configurations below 1",
+   "claimed": 12,
+   "recomputed": 12,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "fast 32b configurations below 1",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "std 24b cell-median ic/rho min",
+   "claimed": 0.7,
+   "recomputed": 0.7003262438045046,
+   "rel_tol": 0.007142857143857144
+  },
+  {
+   "name": "std 24b cell-median ic/rho max",
+   "claimed": 0.88,
+   "recomputed": 0.8837722561126816,
+   "rel_tol": 0.005681818182818182
+  },
+  {
+   "name": "std 28b cell-median ic/rho min",
+   "claimed": 0.79,
+   "recomputed": 0.791309629075926,
+   "rel_tol": 0.006329113925050633
+  },
+  {
+   "name": "std 28b cell-median ic/rho max",
+   "claimed": 0.95,
+   "recomputed": 0.9532602607974054,
+   "rel_tol": 0.005263157895736843
+  },
+  {
+   "name": "std 32b cell-median ic/rho min",
+   "claimed": 1.05,
+   "recomputed": 1.0526463335710114,
+   "rel_tol": 0.004761904762904762
+  },
+  {
+   "name": "std 32b cell-median ic/rho max",
+   "claimed": 1.18,
+   "recomputed": 1.179377500435212,
+   "rel_tol": 0.004237288136593221
+  },
+  {
+   "name": "fast 24b cell-median ic/rho min",
+   "claimed": 0.71,
+   "recomputed": 0.7123600746268656,
+   "rel_tol": 0.007042253522126761
+  },
+  {
+   "name": "fast 24b cell-median ic/rho max",
+   "claimed": 0.89,
+   "recomputed": 0.893482583873244,
+   "rel_tol": 0.005617977529089888
+  },
+  {
+   "name": "fast 28b cell-median ic/rho min",
+   "claimed": 0.74,
+   "recomputed": 0.7388712798413999,
+   "rel_tol": 0.0067567567577567576
+  },
+  {
+   "name": "fast 28b cell-median ic/rho max",
+   "claimed": 0.94,
+   "recomputed": 0.944439400597118,
+   "rel_tol": 0.005319148937170214
+  },
+  {
+   "name": "fast 32b cell-median ic/rho min",
+   "claimed": 1.01,
+   "recomputed": 1.0107078216454843,
+   "rel_tol": 0.004950495050504951
+  },
+  {
+   "name": "fast 32b cell-median ic/rho max",
+   "claimed": 1.15,
+   "recomputed": 1.1484594017395127,
+   "rel_tol": 0.004347826087956522
+  },
+  {
+   "name": "IC fast/std cell-median min",
+   "claimed": 0.89,
+   "recomputed": 0.8895645161290322,
+   "rel_tol": 0.005617977529089888
+  },
+  {
+   "name": "IC fast/std cell-median max",
+   "claimed": 0.96,
+   "recomputed": 0.9633557100219818,
+   "rel_tol": 0.005208333334333334
+  },
+  {
+   "name": "rho fast/std cell-median min",
+   "claimed": 0.85,
+   "recomputed": 0.8454033559492616,
+   "rel_tol": 0.005882352942176471
+  },
+  {
+   "name": "rho fast/std cell-median max",
+   "claimed": 1.0,
+   "recomputed": 1.0032527296053741,
+   "rel_tol": 0.0050000000010000005
+  },
+  {
+   "name": "IC/BSGS cell-median min (both builds)",
+   "claimed": 1.41,
+   "recomputed": 1.4142011834319526,
+   "rel_tol": 0.003546099291780142
+  },
+  {
+   "name": "IC/BSGS cell-median max (both builds)",
+   "claimed": 1.62,
+   "recomputed": 1.61852615652518,
+   "rel_tol": 0.0030864197540864196
+  },
+  {
+   "name": "round-0 drift (median key time rel. to key median)",
+   "claimed": 1.032,
+   "recomputed": 1.0319355813813142,
+   "rel_tol": 0.00048449612503100774
+  },
+  {
+   "name": "A/A median |log dev| (all keys)",
+   "claimed": 0.008,
+   "recomputed": 0.008168652773453768,
+   "rel_tol": 0.062500000001
+  },
+  {
+   "name": "A/A p95 |log dev|",
+   "claimed": 0.11,
+   "recomputed": 0.10758146033805352,
+   "rel_tol": 0.045454545455545455
+  },
+  {
+   "name": "GAE ns min",
+   "claimed": 98,
+   "recomputed": 98.458,
+   "rel_tol": 0.005102040817326531
+  },
+  {
+   "name": "GAE ns max",
+   "claimed": 140,
+   "recomputed": 140.016,
+   "rel_tol": 0.0035714285724285713
+  },
+  {
+   "name": "I/M min",
+   "claimed": 23,
+   "recomputed": 23.19457128361238,
+   "rel_tol": 0.021739130435782607
+  },
+  {
+   "name": "I/M max",
+   "claimed": 27,
+   "recomputed": 27.245583905789992,
+   "rel_tol": 0.018518518519518516
+  },
+  {
+   "name": "std lookup GAE 2^22-2^24 min",
+   "claimed": 0.74,
+   "recomputed": 0.7436435835904468,
+   "rel_tol": 0.0067567567577567576
+  },
+  {
+   "name": "std lookup GAE 2^22-2^24 max",
+   "claimed": 1.45,
+   "recomputed": 1.4525279814743344,
+   "rel_tol": 0.003448275863068966
+  },
+  {
+   "name": "std lookup GAE 2^10-2^16 min",
+   "claimed": 0.06,
+   "recomputed": 0.0583504742315164,
+   "rel_tol": 0.08333333333433335
+  },
+  {
+   "name": "std lookup GAE 2^10-2^16 max",
+   "claimed": 0.11,
+   "recomputed": 0.10999100386304704,
+   "rel_tol": 0.045454545455545455
+  }
+ ],
+ "headline_mismatches": [],
+ "findings": [
+  {
+   "id": "R-F1",
+   "severity": "blocking for the claim statement as worded (not for RESULTS.md)",
+   "requirement": "reporting contract: what a range is a range of",
+   "finding": "The statement's ranges 0.70-0.88 / 0.71-0.89 (2^24), 0.79-0.95 / 0.74-0.94 (2^28), 1.05-1.18 / 1.01-1.15 (2^32), the fast/std 4-11% / 0-15% and the BSGS 1.41-1.62x are ranges of cell medians (median over the 4 configurations of each (size, T) cell). The statement never says so and sets them beside per-configuration counts ('faster in 12 of 12 configurations'), so they read as per-configuration ranges. Per configuration the IC/rho ratio is 0.70-0.98 (std) / 0.70-0.97 (fast) at 2^24, 0.77-0.99 / 0.72-0.98 at 2^28 and 1.03-1.19 / 1.00-1.17 at 2^32; IC fast/std 0.82-0.98, rho fast/std 0.81-1.07, IC/BSGS 1.31-1.67. The statement also drops the disclosure the validated predecessor carried: each cell decision is a 4-of-4 sign rule (the bootstrap interval of a median of 4 equals their range). RESULTS.md labels its table 'median of 4 per cell' and gives the per-configuration ranges, so RESULTS itself is correct.",
+   "evidence": "recompute.json std/fast .size.*.config_range and .cells[*]; results_check.json extra",
+   "amendment": "say 'cell medians (median over the 4 configurations of each size-T cell)' and state the 4-of-4 sign rule; see claim-report.json proposed_wording"
+  },
+  {
+   "id": "R-F2",
+   "severity": "blocking for the claim statement as worded",
+   "requirement": "decisions reported with the numbers",
+   "finding": "The statement gives the fast build's 2^32 result as '1.01-1.15x (fast; 11 of 12 above 1)' without saying that the T = 1024 cell is unranked under the protocol rule (median 1.011, interval [0.996, 1.031]); only 2 of the 3 fast-build 2^32 cells are slower. RESULTS.md states it.",
+   "evidence": "recompute.json fast.cells[6] (32/1024: decision unranked)",
+   "amendment": "'1.01-1.15 (fast; slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1)'"
+  },
+  {
+   "id": "R-F3",
+   "severity": "non-blocking (RESULTS wording)",
+   "requirement": "numbers supported by the artifacts",
+   "finding": "RESULTS says 'load average 40-89' (twice). The 1-minute load average recorded at each of the 3672 executions spans 37.6-93.5; 40 and 89 are the medians of the last and first sixths of the run (39.9, 89.1). Per round the median is 86.6, 77.3, 61.0.",
+   "evidence": "recompute.json checks.loadavg_min_max, loadavg_by_sixth_of_run, loadavg_median_by_round",
+   "amendment": "'1-minute load average 38-94 at the executions (medians 87, 77, 61 in rounds 1-3)'"
+  },
+  {
+   "id": "R-F4",
+   "severity": "non-blocking (RESULTS Limits: unsupported statement)",
+   "requirement": "observations vs assumptions",
+   "finding": "'the pinned CPU's SMT sibling was idle apart from the pod's own job server' is not supported by any recorded artifact: host.json records the cpuset (27, 56, 91, 120) and the pin (91) but no thread-sibling topology and no per-CPU utilisation, and a container's cpuset on a shared host is not evidence that other tenants do not run on those CPUs. That CPU 27 is 91's sibling is itself an assumption about the host's numbering.",
+   "evidence": "results/holdout/host.json (fields recorded)",
+   "amendment": "remove, or label as an assumption: 'the container's cpuset contained CPU 27, presumably 91's SMT sibling; its use by other tenants is not recorded'"
+  },
+  {
+   "id": "R-F5",
+   "severity": "non-blocking (pre-registered predictions reported incompletely)",
+   "requirement": "pre-registration outcomes",
+   "finding": "Prediction 1 had a magnitude clause ('magnitudes within about 10% of the session VM's'); it fails in 4 of 9 cells (RunPod std / VM cell median: 24/1024 1.136, 24/16384 0.845, 28/1024 0.849, 28/4096 0.790). The outcome column says 'holds in direction' and does not say the magnitude clause failed. Prediction 2's per-arm figures are not evaluated: median fast/std key time over 36 configurations ic5rw 0.85 (predicted about 0.6), ic5ks 0.84 (about 0.8: holds), ic5 0.93 and ic5w 0.93 (0.94-0.96: about holds), rhodpu 0.98 (changes little: holds), rho2xks 0.84 (a rho arm gaining as much as ic5ks; not predicted).",
+   "evidence": "results_check.json extra.runpod_std_over_vm, cells_beyond_10pct_of_vm, per_arm_fast_over_std",
+   "amendment": "outcome of prediction 1: 'direction holds; the magnitude clause fails in 4 of 9 cells (up to 21% from the VM, 28 b T = 4096)'; prediction 2: list the per-arm outcomes"
+  },
+  {
+   "id": "R-F6",
+   "severity": "non-blocking (RESULTS details)",
+   "requirement": "numbers supported by the artifacts",
+   "finding": "(a) 'slower in 12 of 12 at 2^32 (1.03-1.20x)': the largest configuration ratio is 1.19497, i.e. 1.19. (b) 'Fastest arms: rho side rho2xks at 24 b ... and rhodpu elsewhere': in the fast build at 28 b T = 1024 rho2xks is the fastest rho in 1 of 4 configurations.",
+   "evidence": "recompute.json std.size.32.config_range; fast.cells[3].winners_rho",
+   "amendment": "'1.03-1.19x'; 'rhodpu elsewhere (rho2xks in 1 of 4 configurations at 28 b T = 1024 in the fast build)'"
+  },
+  {
+   "id": "R-F7",
+   "severity": "non-blocking (A/A wording)",
+   "requirement": "controls read correctly",
+   "finding": "(a) The A/A noise figure 'median |log(repeat/median)| over all keys is 0.008' is computed as stated, but with 3 repeats one term per key is the median itself (exactly 0), so a third of the terms are zero; over the two non-median repeats the median is 0.020 (95th percentile 0.12). (b) 'The IC/rho effects at 2^24 (12-30%) and 2^32 (5-20%) are larger than the drift': at 2^32 the fast build's T = 1024 cell is 1.011 (1%), not larger than the ~3% drift; and '5-20%' combines the std cell medians (5-18%) with a per-configuration maximum (19.5%).",
+   "evidence": "results_check.json extra.aa_abs_log_dev_excluding_self_*; recompute.json pooled_drift, cells",
+   "amendment": "report 0.020 (non-median repeats) beside 0.008; 'at 2^32 5-18% (std) and 1-15% (fast) by cell median; the fast build's 2^32 T = 1024 cell (1%) is within the drift'"
+  },
+  {
+   "id": "R-F8",
+   "severity": "non-blocking (protocol record)",
+   "requirement": "amendment made before measurement",
+   "finding": "Amendment A1 is headed '2026-11-12 16:40Z, after attempt 1, before any measurement', but attempt 2's pod was created at 16:32:34Z and its job started at 16:33:08Z, so 16:40Z is after the measurement began. The substance holds: commit 7934b7e343 (A1 text, new run.py, new pin 70770d45...) is dated 16:32:29Z, the payload's gzip time stamp is 16:32:28Z, attempt 1's 3672 executions all failed at taskset with no timing (0 rows with ok or ms_arm), and the change (pin within sched_getaffinity, PIN=auto) touches no workload, analysis or decision rule. Only the stated time is wrong.",
+   "evidence": "git log (fde73fb405 16:29:44Z, 97b1c64c4d 16:30:43Z, 7934b7e343 16:32:29Z); attempts/a1/*.json; launch/create.json createdAt; results/holdout/host.json started; payload_check.json candidate_gzip_header",
+   "amendment": "correct the A1 time to 16:32Z (before attempt 2's pod was created at 16:32:34Z)"
+  },
+  {
+   "id": "R-F9",
+   "severity": "non-blocking (repository policy, AGENTS.md section 13)",
+   "requirement": "large files go through the store",
+   "finding": "results/holdout/runs.jsonl (2,663,167 bytes) and attempts/a1/results/runs.jsonl (1,334,869 bytes) are committed to Git; data-suffixed files over 64 KiB belong in the artifact store with a .artifacts.json manifest, as research/mt_timed_20261112/results/holdout does. The compact runs.json (779,809 bytes) stays in Git as the gate's raw_data.",
+   "evidence": "git ls-files; sizes",
+   "amendment": "move both runs.jsonl files to the store (tools/artifacts push) with .artifacts.json manifests before merge"
+  },
+  {
+   "id": "R-F10",
+   "severity": "non-blocking (reproducibility binding)",
+   "requirement": "deterministic payload, commit binding",
+   "finding": "launch.py builds the payload with tarfile mode 'w:gz', whose gzip header carries time.time(); the docstring's 'deterministic' holds for the tar stream only. The pinned payload is reproduced bit for bit from the committed run.py, the 12 instances and the validator's rebuilt binaries with gzip mtime 1794501148 (16:32:28Z), found by search in the window 14:29:44Z-16:32:35Z; attempt 1's pin d44404ff... is likewise reproduced from fde73fb405's run.py (mtime found by search). The rows carry no commit field (runs.json commit [null]); the binding is bin_sha256 -> launch/payload.json -> commit, closed here by the bit-identical rebuild.",
+   "evidence": "payload_check.json, payload_check_a1.json",
+   "amendment": "pass mtime=0 to the gzip writer in future payloads; record the source commit in host.json"
+  },
+  {
+   "id": "R-F11",
+   "severity": "note",
+   "requirement": "no secrets in committed files",
+   "finding": "No pod token in any commit fde73fb405^..51ca1eb6d6 (attempt 2's token checked by value with git grep and pickaxe; attempt 1's token is not available to the validator, and no 48-hex string occurs in any study file; every long hex string there is a 64-hex sha256). create.json keeps only env key names. The receipts do commit the RunPod consumerUserId and machineId (account and host identifiers, not credentials).",
+   "evidence": "launch/create.json, attempts/a1/create.json",
+   "amendment": "optional: drop consumerUserId from future receipts"
+  },
+  {
+   "id": "R-F12",
+   "severity": "note (limit)",
+   "requirement": "wall time provenance",
+   "finding": "Wall-clock values cannot be replayed; they rest on files the producer's launcher collected from the pod (receipt hashes match the committed files). Consistency checks pass: the sum of wall_s (1428.2 s) plus six opcost runs (25.7 s) fits the 1539 s between upload (16:33:08Z) and collection (16:58:47Z); every counted field replays exactly with the bit-identical binaries; the per-operation prices (one affine addition 98-140 ns, about 2.0x faster than the session VM) are plausible for an EPYC 9575F; steal ticks 0 at every execution.",
+   "evidence": "recompute.json checks.wall_s_total, steal_ticks_sum_max; launch/upload.json, collect.json; opcost.jsonl",
+   "amendment": "none"
+  }
+ ],
+ "required_amendments": [
+  "R-F1 (blocking for the claim statement as worded (not for RESULTS.md)): say 'cell medians (median over the 4 configurations of each size-T cell)' and state the 4-of-4 sign rule; see claim-report.json proposed_wording",
+  "R-F2 (blocking for the claim statement as worded): '1.01-1.15 (fast; slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1)'",
+  "R-F3 (non-blocking (RESULTS wording)): '1-minute load average 38-94 at the executions (medians 87, 77, 61 in rounds 1-3)'",
+  "R-F4 (non-blocking (RESULTS Limits: unsupported statement)): remove, or label as an assumption: 'the container's cpuset contained CPU 27, presumably 91's SMT sibling; its use by other tenants is not recorded'",
+  "R-F5 (non-blocking (pre-registered predictions reported incompletely)): outcome of prediction 1: 'direction holds; the magnitude clause fails in 4 of 9 cells (up to 21% from the VM, 28 b T = 4096)'; prediction 2: list the per-arm outcomes",
+  "R-F6 (non-blocking (RESULTS details)): '1.03-1.19x'; 'rhodpu elsewhere (rho2xks in 1 of 4 configurations at 28 b T = 1024 in the fast build)'",
+  "R-F7 (non-blocking (A/A wording)): report 0.020 (non-median repeats) beside 0.008; 'at 2^32 5-18% (std) and 1-15% (fast) by cell median; the fast build's 2^32 T = 1024 cell (1%) is within the drift'",
+  "R-F8 (non-blocking (protocol record)): correct the A1 time to 16:32Z (before attempt 2's pod was created at 16:32:34Z)",
+  "R-F9 (non-blocking (repository policy, AGENTS.md section 13)): move both runs.jsonl files to the store (tools/artifacts push) with .artifacts.json manifests before merge",
+  "R-F10 (non-blocking (reproducibility binding)): pass mtime=0 to the gzip writer in future payloads; record the source commit in host.json",
+  "R-F11 (note): optional: drop consumerUserId from future receipts"
+ ],
+ "not_done": [
+  "no timing reproduction: the RunPod host cannot be re-run from here (instructed not to use RunPod); wall times are judged by internal consistency (R-F12)",
+  "the counted section 5a GAE band was not recomputed (wall-time study; the band belongs to the v5 counted study)"
+ ],
+ "path_rebase": {
+  "from": "research/mt_timed_runpod_20261112/validation/validator-report.json",
+  "from_sha256": "6b4c3812d6fa8da19778326cedf4467cd6698d784338bb1ce879dd17ad435217",
+  "change": "raw_data paths rebased from the validation/ directory to this benchmarks directory; nothing else changed"
+ }
+}
