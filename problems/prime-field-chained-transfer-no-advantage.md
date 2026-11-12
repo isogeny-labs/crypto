@@ -185,6 +185,18 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - **Verdict.** The frozen rule passes for `D = −3, −4, −7, −8` as written, but the control shows the gain is the fold factor, not `D_E`. Small `D_E` does not reduce the actual solving cost.
 - **Distance to rho.** No arm is below its matched rho in 120 arm-cells, including rho with the same automorphism group. The smallest ratio is 7.62× at 0.1 GAE, and the gap grows about like `√p`.
 
+## Degree-3 covers and the IC positive control (2026-11-12 addendum)
+
+- **Degree-3 covers** (`research/cover_pushforward_deg3_20261112/PUSHFORWARD_DEG3.md`) [pcc:unverified].
+  - On the genus-4 degree-3 cover, all 28,815 IC relations on the transferred subgroup are single full fibres `c^*(Q)`, and they push forward to `[3]Q`.
+  - The `J(C)` arm and the matching collision search on `E` accept identical trials and give identical certified logs in 360 of 360 seed-cells.
+  - The fibre degeneracy therefore holds at degree 3 as at degree 2.
+  - Limits: `p ≤ 251` (the HCurve bound) and `r` 11–83.
+- **Positive control** (`research/ic_positive_control_20261112/RESULTS.md`) [pcc:unverified].
+  - Double-large-prime genus-3 IC on a full Jacobian is below rho in group ops from p = 257 on (0.114× at p = 65,537).
+  - At 0.1 and 1 GAE it is 5.8× and 31× rho, so the §5a band does not show this known win at lab sizes.
+  - The verdicts here are unaffected: every transfer row loses at 0 GAE or reduces to a search on `E`. The general consequence is filed as `problems/section5a-band-cannot-show-a-known-ic-win.md`.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -200,3 +212,4 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
   transferred subgroup's genus-2 IC is a birthday search on `E`.
 - 2026-11-12: small-D_E addendum; the adapted base saves only by folding, which a
   generic control matches.
+- 2026-11-12: degree-3 fibre and positive-control addendum.
