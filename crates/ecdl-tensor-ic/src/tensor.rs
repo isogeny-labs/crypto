@@ -16,6 +16,7 @@
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
+use crate::fasthash::FastMap;
 use crate::schedule::Step;
 use crate::{Error, Result};
 
@@ -244,8 +245,8 @@ pub struct SparseContractor {
 /// Partial contraction (Go: table). `rows` key: one byte (0/1) per edge in `edges`.
 struct Table {
     edges: Vec<usize>,
-    pos: HashMap<usize, usize>,
-    rows: HashMap<Vec<u8>, u64>,
+    pos: FastMap<usize, usize>,
+    rows: FastMap<Vec<u8>, u64>,
 }
 
 impl Counter for SparseContractor {
@@ -265,15 +266,16 @@ impl Counter for SparseContractor {
                 last[e] = i as isize;
             }
         }
+        let fixed_arr = Fixed::new(fixed, n.num_edges);
         let mut t = Table {
             edges: Vec::new(),
-            pos: HashMap::new(),
-            rows: HashMap::from([(Vec::new(), 1u64)]),
+            pos: FastMap::default(),
+            rows: FastMap::from_iter([(Vec::new(), 1u64)]),
         };
         for (i, v) in n.vertices.iter().enumerate() {
             t = match v {
-                Vertex::Support(v) => join_support(&t, v, fixed),
-                Vertex::Func(v) => apply_func(&t, v, fixed)?,
+                Vertex::Support(v) => join_support(&t, v, &fixed_arr),
+                Vertex::Func(v) => apply_func(&t, v, &fixed_arr)?,
                 Vertex::Pred(v) => apply_pred(&t, v)?,
             };
             if t.rows.len() > self.peak_rows {
@@ -304,16 +306,39 @@ impl Counter for SparseContractor {
     }
 }
 
+/// `fixed` as a dense array by edge index (-1 free, 0, 1): the per-row
+/// lookups of the join and function steps otherwise hash a `usize` each.
+struct Fixed(Vec<i8>);
+
+impl Fixed {
+    fn new(fixed: &HashMap<usize, bool>, num_edges: usize) -> Fixed {
+        let n = fixed.keys().map(|&e| e + 1).max().unwrap_or(0).max(num_edges);
+        let mut v = vec![-1i8; n];
+        for (&e, &b) in fixed {
+            v[e] = b as i8;
+        }
+        Fixed(v)
+    }
+
+    #[inline(always)]
+    fn get(&self, e: usize) -> Option<bool> {
+        match self.0.get(e) {
+            Some(&x) if x >= 0 => Some(x == 1),
+            _ => None,
+        }
+    }
+}
+
 fn new_table(edges: Vec<usize>) -> Table {
     let pos = edges.iter().enumerate().map(|(i, &e)| (e, i)).collect();
     Table {
         edges,
         pos,
-        rows: HashMap::new(),
+        rows: FastMap::default(),
     }
 }
 
-fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> Table {
+fn join_support(t: &Table, v: &SupportVertex, fixed: &Fixed) -> Table {
     let mut shared: Vec<usize> = Vec::new(); // indices into v.e bound in t
     let mut shared_pos: Vec<usize> = Vec::new(); // their positions in t
     let mut fresh: Vec<usize> = Vec::new(); // indices into v.e not yet bound
@@ -326,11 +351,11 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
         }
     }
     // Group the vertex rows (restricted to fixed bits) by their shared part.
-    let mut groups: HashMap<Vec<u8>, Vec<Vec<u8>>> = HashMap::new();
+    let mut groups: FastMap<Vec<u8>, Vec<Vec<u8>>> = FastMap::default();
     for r in &v.rows {
         let mut ok = true;
         for (i, e) in v.e.iter().enumerate() {
-            if let Some(&b) = fixed.get(e) {
+            if let Some(b) = fixed.get(*e) {
                 if b != r[i] {
                     ok = false;
                     break;
@@ -367,7 +392,7 @@ fn join_support(t: &Table, v: &SupportVertex, fixed: &HashMap<usize, bool>) -> T
     out
 }
 
-fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result<Table> {
+fn apply_func(t: &Table, v: &FuncVertex, fixed: &Fixed) -> Result<Table> {
     let mut in_pos = Vec::with_capacity(v.in_.len());
     for &e in &v.in_ {
         match t.pos.get(&e) {
@@ -404,7 +429,7 @@ fn apply_func(t: &Table, v: &FuncVertex, fixed: &HashMap<usize, bool>) -> Result
         let mut ok = true;
         for (i, &b) in res.iter().enumerate() {
             let e = v.out[i];
-            if let Some(&fb) = fixed.get(&e) {
+            if let Some(fb) = fixed.get(e) {
                 if fb != b {
                     ok = false;
                     break;

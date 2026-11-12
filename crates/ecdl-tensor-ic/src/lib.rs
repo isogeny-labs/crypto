@@ -12,6 +12,7 @@ use std::fmt;
 
 pub mod cofactor;
 pub mod curve;
+pub mod fasthash;
 pub mod field;
 pub mod gadgets;
 pub mod linalg;
