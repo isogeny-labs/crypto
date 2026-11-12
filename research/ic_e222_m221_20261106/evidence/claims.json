@@ -17,6 +17,11 @@
    "generator": "gen_instances.py",
    "args": "--families E,M,W --bits 12,16,20 --per 8 --seed e222m221-h1default-v1",
    "manifest_sha256": "261a37b2b1e9fc9f1391fec7f80f0c5f704ef2f7d740dfd539f52b5553b4ef82"
+  },
+  "mid_inst": {
+   "generator": "gen_instances.py",
+   "args": "--families W,E,M --bits 26,30 --per 2 --seed e222m221-mid-v1",
+   "manifest_sha256": "e466ce39e5a62e60967c2fb2faf049d38359e5f5378ef3437547396f15975168"
   }
  },
  "raw_data": {
@@ -70,6 +75,12 @@
    "path": "native_band/native_band_results.json",
    "sha256": "44b319812cf6e102bd9ffa5036ecf9faadf462067ccbd3f74e9bcb5ac5db9eb0",
    "in_git": true
+  },
+  "mid": {
+   "path": "evidence/mid/MANIFEST.json",
+   "sha256": "383ae81edec5c5271cc4a5f0c9c4e084f070d35c9a54bd51e2ff507767ce44e1",
+   "in_git": true,
+   "note": "hash manifest of the 40 mid-size per-run outputs under evidence/mid/{default,h1}/; produced by run_mid_panel.py"
   }
  },
  "claims": [
@@ -259,6 +270,34 @@
      "name": "projection_max_abs_log2_ic_w0_minus_w1",
      "claimed": 0.011,
      "rel_tol": 0.05
+    }
+   ]
+  },
+  {
+   "id": "C7",
+   "statement": "Mid-size check of the counter model in the regime n >> 2F^2 (subgroup orders of about 2^27 and 2^31, F = 128 and 512, 40 runs on 12 instances, each with a same-instance matched rho): every run recovered the planted logarithm; observed / predicted trials is 1.001 (default configuration, 24 runs) and 0.962 (with H1, 16 runs).",
+   "source_note": "RESULTS_native_band.md",
+   "raw": "mid",
+   "headline": [
+    {
+     "name": "mid_runs",
+     "claimed": 40,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "mid_all_recovered",
+     "claimed": 1,
+     "rel_tol": 0.0
+    },
+    {
+     "name": "mid_default_trials_obs_over_pred",
+     "claimed": 1.001,
+     "rel_tol": 0.002
+    },
+    {
+     "name": "mid_h1_trials_obs_over_pred",
+     "claimed": 0.962,
+     "rel_tol": 0.002
     }
    ]
   }

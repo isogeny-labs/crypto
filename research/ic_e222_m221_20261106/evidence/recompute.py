@@ -79,6 +79,19 @@ if os.path.exists(path("native_band_model")) and os.path.exists(path("band")):
     g=lambda cv:next(x for x in pr if x["curve"]==cv and x["H1"] and x["log2_F"]==20)["log2_ic"]["0"]
     val["projection_E222_H1_F2e20_log2_ic_w0"]=g("E-222");val["projection_M221_H1_F2e20_log2_ic_w0"]=g("M-221")
     val["projection_max_abs_log2_ic_w0_minus_w1"]=max(abs(x["log2_ic"]["0"]-x["log2_ic"]["1"]) for x in pr)
+# C7 mid-size check of the counter model
+if os.path.exists(path("mid")) and os.path.exists(path("native_band_model")):
+    import importlib.util
+    sp=importlib.util.spec_from_file_location("nbm7",path("native_band_model"));nb=importlib.util.module_from_spec(sp);sp.loader.exec_module(nb)
+    mdir=os.path.dirname(path("mid"));man=json.load(open(path("mid")));ok_all=True;n_runs=0
+    for rel,h in man["files"].items():
+        p=os.path.join(mdir,os.path.relpath(rel,"mid"))
+        if sha(p)!=h: problems.append(f"mid: {rel} sha256 differs from the manifest");continue
+        o=json.load(open(p));n_runs+=1;ok_all&=bool(o["_meta"]["known_log_recovered"]) and bool(o["matched_rho"]["all_verified"])
+    v7,_=nb.validate(mdir)
+    val["mid_runs"]=n_runs;val["mid_all_recovered"]=int(ok_all)
+    val["mid_default_trials_obs_over_pred"]=v7["default"]["trials_total"]["median_obs_over_pred"]
+    val["mid_h1_trials_obs_over_pred"]=v7["h1"]["trials_total"]["median_obs_over_pred"]
 # C4 native
 t=open(path("native_timing")).read()
 for name,key in (("E-222","E222"),("M-221","M221")):
