@@ -38,3 +38,9 @@ jobs:
         run: |
           node research/cross_characteristic_global_torsion_20261112/independent.js
           node --no-opt research/cross_characteristic_global_torsion_20261112/independent.js
+      - name: CT52 exact Galois orbit certificates - Python and independent JavaScript
+        run: |
+          python3 -B research/cross_characteristic_global_torsion_20261112/ct52/ct52_galois.py
+          python3 -O -B research/cross_characteristic_global_torsion_20261112/ct52/ct52_galois.py
+          node research/cross_characteristic_global_torsion_20261112/ct52/ct52_independent.js
+          node --no-opt research/cross_characteristic_global_torsion_20261112/ct52/ct52_independent.js
