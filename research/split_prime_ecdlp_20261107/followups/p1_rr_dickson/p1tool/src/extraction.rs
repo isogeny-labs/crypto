@@ -281,7 +281,15 @@ fn normalise(
     Ok(result.into_iter().collect())
 }
 
-fn checked_extract(metadata: &Value, text: &str, values: &[u64]) -> Result<Value, String> {
+pub(super) fn validate_query(metadata: &Value) -> Result<(), String> {
+    Query::from_summary(&metadata["summary"]).map(|_| ())
+}
+
+pub(super) fn checked_extract(
+    metadata: &Value,
+    text: &str,
+    values: &[u64],
+) -> Result<Value, String> {
     let summary = &metadata["summary"];
     let q = Query::from_summary(summary)?;
     if summary["sha256"] != sha256_hex(text.as_bytes()) {

@@ -64,3 +64,9 @@ assignment enumeration and excluded-chart coverage remain missing. Execution
 prerequisites are unchanged. PR #3835 also conflicts with main's append-only
 ledger; the attempted merge was aborted to preserve evidence. No new scientific
 measurement, cost comparison or solved performance objective is asserted.
+
+2026-11-12 collector continuation: affine/quadratic supplied-basis assignment
+collection is implemented with explicit unknown for unsupported/capped cases.
+Original-input completeness is not certified; basis provenance/equivalence and
+independent complete-input qualification remain open. See COLLECTION-20261112.md.
+No fresh solver computation, scientific measurement or cost improvement occurred.

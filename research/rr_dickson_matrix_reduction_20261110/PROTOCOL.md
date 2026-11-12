@@ -98,3 +98,14 @@ solver assignments, union normalized outputs, retain excluded charts explicitly,
 and qualify completeness against an independent reference. No scientific F4
 run has begun; checkpoint transport and current budget/pool admission remain
 missing. The original degree/width/cost acceptance criteria are unchanged.
+
+## Collector addendum — 2026-11-12 (same success criteria)
+
+The native collector handles supplied basis equations reducible by affine pivots
+and prime-field quadratics, with explicit unknown for unsupported/capped cases.
+It validates all enumerated assignments through the input/extractor and unions
+normalized points. See COLLECTION-20261112.md. This provides a collector for the
+archived linear/quadratic forms; it does not certify basis equivalence to input.
+A matched run must still bind each basis to its exact solver execution and
+qualify complete input output-sets against an independent reference. Exit 0
+from `collect` alone cannot admit timing or certify original-input UNSAT.

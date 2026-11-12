@@ -23,6 +23,17 @@ Claim `PCC-20261112-699e09` is producer-unverified. [pcc:unverified]
 
 The November 10 PDF and logs below are retained as historical artifacts.
 
+## Supplied-basis collection continuation
+
+`p1tool collect` now enumerates affine/quadratic supplied-basis equations and
+unions the normalized outputs, with explicit unknown status for unsupported
+forms or resource caps. The archived two-solution msolve fixture is exercised
+after removing planted support metadata. Twelve native development tests pass;
+claim `PCC-20261112-72ed05` is unverified. No original-input completeness or
+new F4 performance result is asserted. [pcc:unverified]
+
+[Collector report](COLLECTION-20261112.md), [PDF](REPORT-COLLECTION-20261112.pdf).
+
 Claim records: `PCC-20261110-3e6e0a` (initial development checks) and
 `PCC-20261110-915a5d` (final checks and admission status); `pcc standing`
 reports both **unverified**. Read-only review found no remaining concrete
@@ -80,6 +91,7 @@ producer-unverified [pcc:unverified].
 | Native candidate and arbitrary-assignment reconstruction | Implemented; development tests only |
 | Default historical emitter behavior | Existing calibration selftest retained |
 | Rational assignment extraction and common chart against F | Implemented and checked on bounded native fixtures; full solver enumeration and excluded-chart coverage pending |
+| Supplied-basis assignment collection | Affine/quadratic forms implemented and checked; basis-equivalence provenance and unsupported forms remain open |
 | Retained F4 solving degree and smaller matrices | Not measured |
 | Lower complete cost against the strongest reference | Not measured |
 | Signed independent verification | Pending |

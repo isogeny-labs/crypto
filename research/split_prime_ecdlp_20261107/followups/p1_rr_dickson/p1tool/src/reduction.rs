@@ -5,7 +5,7 @@
 //! Input degree is bounded here; F4 solving degree is an empirical question.
 use super::*;
 
-fn substitute(p: &MP, f: F, v: usize, rhs: &MP) -> MP {
+pub(super) fn substitute(p: &MP, f: F, v: usize, rhs: &MP) -> MP {
     let mut result = MP::zero(p.n);
     for (powers, &c) in &p.t {
         let mut term = MP::konst(p.n, c);
@@ -23,7 +23,7 @@ fn substitute(p: &MP, f: F, v: usize, rhs: &MP) -> MP {
 
 // Return h from a*x + b = 0, where a is a nonzero field constant,
 // and b contains no x. This imposes no nonvanishing chart condition.
-fn pivot(p: &MP, f: F, v: usize) -> Option<MP> {
+pub(super) fn pivot(p: &MP, f: F, v: usize) -> Option<MP> {
     let mut coeff = 0;
     let mut rest = MP::zero(p.n);
     for (e, &c) in &p.t {

@@ -36,6 +36,24 @@ all rational solutions of a Groebner basis or certify solver completeness.
 See the continuation's dated extraction report for bounded development checks;
 no F4 degree, width or timing result is implied. [pcc:unverified]
 
+### Supplied-basis collection (2026-11-12)
+
+`collect --metadata C.ms.plant.json --system-file C.ms --gb C.gb` collects
+rational assignments when the supplied basis reduces by affine pivots and
+univariate quadratics. It checks the basis field/variable header, records the
+input/basis digests, validates each assignment through `extract`, and unions
+the normalized outputs. Contradictions produce an empty supplied-basis set;
+unsupported/free/capped residuals produce `status:unknown`, null assignments
+and exit 3. Normalization exclusions also cause exit 3 and remain explicit.
+
+Success has status `enumerated_supplied_basis`, not an original-input UNSAT
+or completeness claim. `binding.input_completeness` always states that input
+completeness is not certified: trusted basis provenance and independent input
+qualification are still required. Exit 0 alone is not that qualification.
+The collector supports RR/F only, up to 10,000 recursion nodes, 4,096 points
+and 100,000 terms per polynomial; other cases remain unknown. See
+[`COLLECTION-20261112.md`](../../../../rr_dickson_matrix_reduction_20261110/COLLECTION-20261112.md).
+
 2026-11-07. This is the instrument for proposal P1
 ([`../../../ideas/idea-generator.md`](../../../ideas/idea-generator.md), lines 41–135).
 It is a standalone Rust crate. It writes msolve 0.6.5 input files for six

@@ -27,3 +27,16 @@ or cloud job ran. Checkpoint transport/live budget and pool admission are still
 absent; no identity or spending permission was added. Next: evidence-preserving
 ledger reconciliation, complete solver-output collection, then the admitted
 matched m3 panel. The scientific objective remains unresolved.
+
+## Supplied-basis collection continuation (November 12)
+
+`collect` now handles affine/quadratic supplied basis equations, preserving
+unknown for other forms or caps. Twelve native tests pass, including an archived
+basis with two assignments after all planted-support metadata was removed.
+Claim PCC-20261112-72ed05 is unverified. Read COLLECTION-20261112.md for statuses:
+original-input completeness is explicitly not certified. No msolve/F4 run or
+performance result occurred. Next: source/basis provenance and independent
+complete-input qualification for an admitted matched run. An existing runner's
+nonsecret connection name was requested; no credential value was requested.
+Checkpoint transport, live budget/pool readback, and frozen-ledger reconciliation
+remain external dependencies. No new execution or spending authority was added.
