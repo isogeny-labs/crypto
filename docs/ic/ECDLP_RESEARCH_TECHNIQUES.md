@@ -26,7 +26,7 @@ a deployed curve.
 
 | Stage | Integrated | Experimental or component | Explicit backlog |
 |:--|:--|:--|:--|
-| Factor base | Subspace bases; Frobenius-invariant bases; signed-orbit quotienting; orbit representatives; trace-zero subspace policy | Higher-genus GHS/trace-zero experiments | General trace-zero-variety factor bases beyond the Koblitz subspace policy |
+| Factor base | Subspace bases; Frobenius-invariant bases; signed-orbit quotienting; orbit representatives; trace-zero subspace policy | Hashed affine-threshold bases (`hashed-affine`, `ic.tensor_contraction_*`); higher-genus GHS/trace-zero experiments | General trace-zero-variety factor bases beyond the Koblitz subspace policy; a calibrated price for hashed-base contraction steps |
 | Relation collection | Semaev systems; point decomposition; Weil restriction; F4/F5 and hybrid solving; symmetrised systems | XL; single/double/multi-large-prime experiments | Collector-specific adapters to the common multi-large-prime layer |
 | Filtering | Deduplication; singleton peeling; clique removal; structured merging; Markowitz pivoting; large-prime graph/hypergraph filtering | Collector-specific partial-relation combination | None at the reusable filtering layer |
 | Linear algebra | Parallel block Wiedemann; block Lanczos; black-box Krylov methods; serial/Rayon/sharded/worker SpMV | CUDA SpMV worker (hardware validation required) | Performance evidence for distributed/GPU deployments |
@@ -76,6 +76,118 @@ end-to-end \(m=1\) trace descent and structural \(m=2\) machinery.
 The repository does **not** yet contain a general trace-zero-variety ECDLP
 pipeline. In particular, higher-genus GHS descent still needs the explicit
 smooth model before its Jacobian path is end to end.
+
+### Hashed factor bases (factor-base hashing) — Experimental
+
+Membership is decided by a keyed hash, not by algebraic shape. A slot base is
+
+\[
+F_i = \{P \in \langle G\rangle : h_i(P) < \tau\},\qquad
+h_i(P) = (\alpha_i\cdot\mathrm{encode}(P) + \beta_i) \bmod s,
+\]
+
+with \(s\) the first prime in \([2p, 4p]\), one independent \((\alpha_i, \beta_i)\)
+per ordered slot, \(m\) slots, and \(\tau\) chosen so that
+\(\mathbb{E}|F_i| = \max(\lceil r^{1/m}\rceil, 10m)\) (Bochum v0.2, Lemma 13).
+A relation is \(R = P_1 + \dots + P_m\) with \(P_i \in F_i\). The base is
+built by inverting the hash: for each \(t < \tau\) decode
+\(z = \alpha^{-1}(t - \beta) \bmod s\) to a point and keep it if it lies in the
+subgroup, so construction costs \(O(\tau)\) decodes with no \(O(p)\) scan and no
+square-root table. Membership is one affine map and one comparison, which is
+what makes it cheap to express as a low-degree predicate inside a Boolean
+tensor network or a CNF. The price is that there is no smoothness notion:
+decomposition becomes an unstructured \(m\)-list problem, and a hashed base
+decomposes like a random set of its size (yield conservation, encyclopedia
+§7 item 1), so the hash buys an encoding, not yield.
+
+Four native implementations exist, all prime-field:
+
+- **IC-framework plug-ins** in
+  [`ic_framework/hashed.rs`](../../src/cryptanalysis/ic_framework/hashed.rs):
+  the `hashed-affine` factor base (union of `slots` = 2..=8 slot bases, one
+  column per negation orbit, parameters `seed`, `tau`, `s`, `steps`; limited
+  to \(p < 2^{61}\)) and the `hashed-tensor` decomposition oracle (exact
+  Boolean tensor contraction over the same slots). The oracle refuses a base
+  built with different parameters, maps every witness back to base indices,
+  and the shared relation loop re-adds and verifies it in the counted group.
+  Selectable as `ic bench --factor-base hashed-affine --oracle hashed-tensor`;
+  test [`tests/hashed_ic_pipeline.rs`](../../tests/hashed_ic_pipeline.rs).
+  [`FRAMEWORK.md`](FRAMEWORK.md) ("Hashed-affine / hashed-tensor") has the
+  parameter contract.
+- **Reference reduction**
+  [`hashed_ecdl.rs`](../../src/cryptanalysis/hashed_ecdl.rs) and the vendored
+  [`crates/hashed-ecdl-tensor`](../../crates/hashed-ecdl-tensor/README.md):
+  Bochum v0.2 §3.2–3.5 and Figure 2 with the October 25 manuscript's
+  Appendix D.4 recursion, arbitrary precision, exact primality, replayable
+  certificates. The algorithm source is mirrored byte-identically in
+  `cryptanalysis` (`cryptanalysis::hashed_ecdl::tensor`;
+  `cryptanalysis/docs/hashed-ecdl.md`).
+- **Whole-point tensor IC**
+  [`crates/ecdl-tensor-ic`](../../crates/ecdl-tensor-ic/README.md) (port of
+  the Go `ecdltensor` prototype): keyed SHA-256 membership predicates by
+  default, a random affine hash for the gadget path, an optional coordinate
+  window \(x(A) < p \gg k\), forward or meet-in-the-middle contraction order.
+  Registered in ecbench as `ic.tensor_contraction_v1` and
+  `ic.tensor_contraction_cofactor_v1` with policy `DiagnosticOnly`
+  ([`ecbench/optimization.rs`](../../src/cryptanalysis/ecbench/optimization.rs)).
+- **CPU meet-in-the-middle oracle**
+  [`crates/hashed-ecdl-cpu`](../../crates/hashed-ecdl-cpu/README.md) over the
+  same ordered signed slot bases: persistent tuple-sum tables, Montgomery batch
+  inversion, JSON certificates with independent replay
+  ([`docs/ecbench/cpu-reduction.md`](../ecbench/cpu-reduction.md)).
+
+**Boundary.** `run_pipeline` lists this arm's unpriced work by name:
+`hashed_tensor_steps` is an uncalibrated charged-primitive count and the
+tensor-curve certification is omitted from setup, so the `S` of a
+`hashed-affine + hashed-tensor` row is a stage diagnostic, not a comparable
+end-to-end cost. The recursive subexponential kernel has never been exercised:
+every run falls back to direct summation (`root_u = 0`), because Appendix D.4's
+admission needs \(\lambda \ge 2^{17}\), i.e. networks of at least
+\(2^{131072}\) edges. The asymptotic claim is conditional on OpenAI's
+Theorem D.1 and has not been audited here.
+
+**Measured** (every number `[pcc:unverified]` unless the source says otherwise):
+
+- Counts-only comparison, frozen protocol v2
+  ([`research/hashed_ecdl_counts_20261031/`](../../research/hashed_ecdl_counts_20261031/results/RESULTS-v2-superseding.md)):
+  `ic.tensor_contraction_v1` at \(m = 2\) against `rho.negation`, priced at 0,
+  0.1 and 1 GAE per unpriced operation, costs 4.3·10³–9.5·10³× rho at 10 bits,
+  2.7·10⁴–5.0·10⁴× at 12, 1.7·10⁵–3.0·10⁵× at 14 and 6.7·10⁵–1.2·10⁶× at 16;
+  the ratio grows about 5.1× per two bits (log-log slope 1.17, 95% interval
+  1.00–1.34). The native hashed arms (`ic.hashed_native_v1`, on branch
+  `codex/hashed-ecdl-ecbench-e2e`, not on `main`) completed only three cells,
+  at 5·10²–2.8·10³× rho (10 and 12 bits); the rest exhausted their budgets
+  and are unknown, not worse. No complete cell is cheaper than rho or than the
+  plain `prime-abscissa:size=32` + `mitm` baseline (14.8× down to 5.2× rho).
+  The validator replayed all 416 executions and checked \([d]G = Q\) on the
+  306 verified rows; the record stays unvalidated for the gate (no
+  `VALIDATION.json`, binary chain of custody not established).
+- CPU oracle, L0 shared-host timing
+  ([`research/hashed_ecdl_cpu_20261030/`](../../research/hashed_ecdl_cpu_20261030/README.md)):
+  complete recovery on the public fixture \(p = 65521\), \(m = 3\),
+  \(\tau = 80\) fell from a 45.99 ms median to 3.90 ms with persistent tables
+  and batch-64 inversion, 120 executions per panel with byte-identical
+  certificates across arms. Engineering on its own baseline; no rho arm.
+- Desk audit, 2026-11-07
+  ([`research/hashed_ecdl_tensor_audit_20261107/`](../../research/hashed_ecdl_tensor_audit_20261107/README.md)):
+  the reduction is correct; the encoding has \(s = a\cdot m\cdot b\) edges with
+  \(a \ge 5.3\cdot 10^3\) at \(b = 131\); the composed exponent sits above
+  rho by at least 120 bits at \(b = 128\)–\(256\) even with \(a = 1\); the
+  linear algebra alone exceeds rho for every \(m \le 6\). The LEAD-ICB
+  obstruction does not apply, since \(s\) is linear in \(b/m\); the closure
+  comes from admission and constants. The lead card
+  ([`research/pdp_strategy_evaluation_20261031/cards/e4.md`](../../research/pdp_strategy_evaluation_20261031/cards/e4.md))
+  closes it as an experimental lead and keeps the preprint as a watch item,
+  to be revisited on an explicit-constants Theorem D.1 whose saving starts
+  below about \(10^6\) edges.
+
+**Status.** Experimental, diagnostic only: not Integrated, because no path
+yields a priced end-to-end `S`; not Backlog, because the code paths exist,
+are registered, and are tested. The hash tables that the Integrated paths use
+for membership (`point_index`/`x_index`, the Frobenius orbit-key lookup, the
+compact bucketed hash of `PairSumTable`, which has no false negatives) are
+implementation of those paths, not this technique; §5a prices them as hash
+probes.
 
 ## 2. Relation collection
 
@@ -300,6 +412,10 @@ than assumed.
    changing the `SPMV1` transcript.
 5. Attempt general trace-zero or higher-genus GHS integration only after the
    explicit smooth-model map is available and independently checked.
+6. Calibrate `hashed_tensor_steps` (nanoseconds per charged primitive step on
+   the calibration host, pinned in [`calibration.json`](calibration.json)) or
+   charge the contraction in GAE, so the hashed arm gets a priced `S` and can
+   leave `DiagnosticOnly`; until then it stays a stage diagnostic.
 
 Each item is a separate research iteration. Before measuring, it requires a
 versioned protocol with frozen inputs, a matched baseline, a derived boundary,
@@ -318,3 +434,8 @@ one-target recovery. Stage-only results remain labelled stage diagnostics.
   subfield curves (2020).
 - Wiedemann, Coppersmith, Kaltofen, and Montgomery, sparse black-box
   linear algebra.
+- Akshima, Bacho, Huang, Kiltz, Nishaburi, Nooripoor, Tittelbach, and
+  Wiedijk, *A Subexponential Time Algorithm for Elliptic Curve Discrete
+  Logarithm*, v0.2 (2026), hashed factor bases; conditional on the exact
+  tensor-contraction theorem of OpenAI, *The Exponential Time Hypothesis is
+  False*, Appendix D (2026).
