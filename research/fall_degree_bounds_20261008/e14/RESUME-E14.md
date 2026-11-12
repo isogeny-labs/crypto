@@ -36,3 +36,9 @@ registered, session log, PR.
 ## Budget
 Balance at launch USD 79.40; other pods on the account about USD 5.6/h; combined about USD 7.7/h,
 so the account runs dry around 15:00 UTC on 2026-11-12 unless topped up.
+
+## Progress (2026-11-12 16:12 UTC)
+E14a draw 0 finished at about 16:05: `d_f = 5`, 37,890 s, degree ≤ 4 equal to E10, so it is valid
+(`pod-r2/out-r2j/A_3-21-7.draw0.jsonl`). E14a continues with draws 1, 3, 4 at about 10.5 h each.
+The pod deadline (11-13 16:57Z) allows at most draw 3. At USD 3.43/h, the account balance
+(USD 34.69 at 16:10) runs out about 02:15Z on 11-13, before draw 1 (about 02:35Z), unless topped up.

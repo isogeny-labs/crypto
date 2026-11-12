@@ -1,0 +1,67 @@
+//! Temporary identity driver (not committed): counters and outputs of f4_fp
+//! over several primes, for base-vs-candidate diffs.
+use crypto_lib::cryptanalysis::f4_fp::{
+    f4, field_ops_total, native_ops_total, norm_ops_total, F4Options, Ordering, Poly,
+};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
+fn monomials(n: usize, d: u32) -> Vec<Vec<u32>> {
+    fn rec(n: usize, d: u32, cur: &mut Vec<u32>, out: &mut Vec<Vec<u32>>) {
+        if cur.len() == n {
+            out.push(cur.clone());
+            return;
+        }
+        let used: u32 = cur.iter().sum();
+        for k in 0..=d - used {
+            cur.push(k);
+            rec(n, d, cur, out);
+            cur.pop();
+        }
+    }
+    let mut out = Vec::new();
+    rec(n, d, &mut Vec::new(), &mut out);
+    out
+}
+
+fn system(n: usize, m: usize, d: u32, p: u64, seed: u64) -> Vec<Poly> {
+    let mut s = seed | 1;
+    let mut rnd = move || {
+        s ^= s << 13;
+        s ^= s >> 7;
+        s ^= s << 17;
+        s
+    };
+    let monos = monomials(n, d);
+    (0..m)
+        .map(|_| monos.iter().map(|e| (e.clone(), rnd() % p)).collect())
+        .collect()
+}
+
+fn main() {
+    let cases: &[(usize, usize, u32, u64, u32)] = &[
+        (6, 6, 2, 31, 12),
+        (6, 6, 2, 65521, 12),
+        (6, 6, 2, 786433, 12),
+        (7, 7, 2, 786433, 12),
+        (6, 6, 2, 1_000_003, 12),
+        (6, 6, 2, 268_435_399, 12),
+        (6, 6, 2, 4_294_967_291, 12),
+        (4, 4, 3, 786433, 14),
+        (8, 12, 2, 786433, 10),
+        (9, 14, 2, 65537, 10),
+    ];
+    for &(n, m, d, p, dmax) in cases {
+        let sys = system(n, m, d, p, 0x9e37_79b9_7f4a_7c15 ^ (n as u64 * 131 + d as u64));
+        let opts = F4Options::new(Ordering::Grevlex, dmax);
+        let (f0, n0, m0) = (field_ops_total(), native_ops_total(), norm_ops_total());
+        let r = f4(&sys, n, p, &opts);
+        let mut h = DefaultHasher::new();
+        r.basis.hash(&mut h);
+        println!(
+            "n{n} m{m} d{d} p{p}: basis_fp={:016x} steps={} rows={} cols={} basis={} report_field_ops={} d_field_ops={} d_native={} d_norm={} hilbert_ops={}",
+            h.finish(), r.steps, r.max_rows, r.max_cols, r.basis.len(), r.field_ops,
+            field_ops_total() - f0, native_ops_total() - n0, norm_ops_total() - m0, r.hilbert_check_ops
+        );
+    }
+}

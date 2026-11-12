@@ -72,6 +72,54 @@ int main() {
     }
   }
 
+  // The shared-memory walk (fes_search_subcube_sym, what fes.cu runs) must
+  // match fes_search_subcube exactly: same solutions in the same order and
+  // the same final derivatives, for every prefix at several splits.
+  {
+    std::vector<uint64_t> qsym((size_t)FES_N * FES_N);
+    fes_build_qsym(FES_QUAD_TRI, FES_N, qsym.data());
+    std::vector<uint64_t> oa(1u << 16), ob(1u << 16), da(FES_N), db(FES_N);
+    long prefixes = 0, mismatches = 0;
+    for (int pb : {0, 2, 4, 6, 10}) {
+      if (pb > FES_N) continue;
+      const int low = FES_N - pb;
+      for (uint64_t p = 0; p < (1ULL << pb); ++p) {
+        int fa = 0, fb = 0;
+        fes_search_subcube(FES_CONST, FES_LIN, FES_QUAD_TRI, FES_N, low, p,
+                           oa.data(), &fa, (int)oa.size(), da.data());
+        fes_search_subcube_sym(FES_CONST, FES_LIN, FES_QUAD_TRI, qsym.data(),
+                               FES_N, low, p, ob.data(), &fb, (int)ob.size(),
+                               db.data());
+        ++prefixes;
+        bool same = fa == fb && da == db;
+        for (int i = 0; same && i < fa && i < (int)oa.size(); ++i)
+          same = oa[i] == ob[i];
+        if (!same) ++mismatches;
+      }
+    }
+    if (mismatches) {
+      printf("FAIL: symmetric-table walk differs on %ld of %ld sub-cubes\n",
+             mismatches, prefixes);
+      ++failures;
+    } else {
+      printf("ok: symmetric-table walk identical on %ld sub-cubes\n", prefixes);
+    }
+  }
+
+  // The workers' default split must also find exactly the brute-force set.
+  {
+    const int low = fes_default_low_bits(FES_N);
+    auto got = fes_all(FES_N - low);
+    if (got != brute) {
+      printf("FAIL: default split (low_bits=%d) found %zu, expected %zu\n", low,
+             got.size(), brute.size());
+      ++failures;
+    } else {
+      printf("ok: default split low_bits=%d (%d threads) -> %zu solutions\n",
+             low, 1 << (FES_N - low), got.size());
+    }
+  }
+
   if (failures == 0) {
     printf("PASS: FES host verification (n=%d, m=%d, %zu solutions)\n", FES_N,
            FES_M, brute.size());
