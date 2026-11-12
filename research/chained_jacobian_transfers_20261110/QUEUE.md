@@ -42,7 +42,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT25a | written global argument/partialLean/even-degree negative control complete locally;unsigned | Explain actual F101 descent using odd coefficient degree,without rational sign witnesses. | ODD_FIELD_DESCENT_PROOF.md/6b3ff6,6written conditional module/ring lemmas and9standalone tests/strictClippyb33222. Stable kernels+targetAut±1+F101³ imply fixed Hom sign. Even-degree twist109/95/all109² additions cd2506 preserves why oddness matters. Old proofs unchanged;new rootCI separate. |
 | CT26 | complete/ready1498/exactCI succeeds;unsigned | Lazy canonical root tables without arithmetic changes. | Consumer25fd/1498 against1496,full25/82+five3c6362/root089c42. Exact43144567065 succeeds,signedjobskips,full205514 in5ceb. Canonical roots17/1013f015c,written718425/filter1da835/report5e1f22 retained. |
 | CT27 | complete/ready1501;ownCI dispatched;unsigned | Independently replay arbitrary balanced degree0/1/2 classes beyond49kernels. | FULL_CLASS_CHECKPOINT.md:consumer5ceb ready1501 against1498,full25native/83reference+five93b147/root18115e,post-run frozen hashes unchanged. Both full12317 corpora/negations/doubles/paired sums pass existing-Cantor12/Clippy/sourceguards4b2aa9,writtenb71a87,partial7d9a53/final89916e. Timestamp-only correctione15346/root279a08 preserves05. No all151M pairs or independent map-membership claim. |
-| CT28 | both T0 covers/fullnorms/independent locally complete;first consumer fullguard running;unsigned | Direct F101 degree4 elliptic covers/norms for actual Ti. | QUARTIC_CHECKPOINT.md:both exact coefficients/all12317 original H outputs/negations/paired sums/exceptions585f35/2fcf0b,independent118point/four-pole replays5ab2bd/5eb5b1,global written6afa9c/a38aa4. Full standalone15/Clippyc3a4b7;first actual integration86b79a/full07 process86050 frozen. Joint H0 forwardPsi prototype11 process46808 pending;next T1 covers/directpullbacks. No measured gain. |
+| CT28 | actual first-component ready1505;whole forward prototype+proof complete;new whole guard running;unsigned | Evaluate existing fixed Psi over F101 and preserve all map controls. | PRIME_FIELD_CHECKPOINT.md:consumer6cf/1505 full25/85+five301fbe,ownCI43165729371 next07:00. Whole forward full12317/Clippy72e1d8,all4pullbacks5143f5/T1independent850e92/root17af4b99;written4934b4/78176c and136written/25modules3413a4. Actual production-route02/1da990 full03 running24821 on frozen8sources,expected25/90+five. Next puredual/T1norms/T2covers;no measured gain. |
 
 ## Session constraints
 
@@ -57,15 +57,13 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read .resume/RESUME.md and QUARTIC_CHECKPOINT.md. Both T0 direct norms
-are complete locally/independent/global written;current root15/134/24.
-First-only actual consumer full07 runs86050 on frozen source05 since
-05:04:43UTC;expected25/85+five,inspect actual result. DO NOT EDIT consumer
-arithmetic. Isolated joint H0 forwardPsi test11 runs46808;old forward
-retained,all12317 pair/output/bijection controls pending. Further T1
-construction must use a separate isolated copy while11 sources frozen.
-Consumer1501 exact5cebCI43157257094 next05:40;rootpublished00cba exact
-43157805224 next05:45/scope12/134/24,notcurrent15. Parent1484 thirdquiet
-05:11 unchangedconflict/C findings;pause quietpolls untilactivity/fresh
-premerge check. Frozen forks/S3/livebudget/vault/KB/ecdb/rootlegacy
-blockers unchanged;continue the next unblocked task without reruns.
+Read .resume/RESUME.md and PRIME_FIELD_CHECKPOINT.md. Whole first
+forwardPsi is complete locally over F10172e1d8,source proofs4934b4/
+78176c,17standalone/136written/25modules. Actual new consumer child
+from6cf/ready1505 runs full03 process24821 since06:19:38UTC on frozen
+source02;expected25/90+five,DO NOT EDIT actual arithmetic. Root report/
+checkpoint/commit/publish from59d2 next;new own exactCI separate from
+published59d2 successful15/134/24/99cdd2. First1505 exact6cfCI43165729371
+next07:00;parent1501CI green/f74e9e. T1norms/puredual/T2covers in isolated
+copies next. Frozen forks/vault/S3/livebudget/KB and historical root
+archive-clock/C blockers unchanged;no unchanged full audits/baselines.

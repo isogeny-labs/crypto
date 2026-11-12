@@ -11,6 +11,8 @@ mod odd_descent;
 #[cfg(test)]
 mod quartic_cover_replay;
 #[cfg(test)]
+mod quartic_t1_replay;
+#[cfg(test)]
 #[path = "seven-reference.rs"]
 mod seven;
 #[cfg(test)]
