@@ -600,9 +600,10 @@ impl Encoder {
                     let twists = twist_cache.get(&omega, j2, p.first, &modulus);
                     let mut out = Vec::with_capacity(p.first);
                     for t1 in 0..p.first {
-                        let sum = fourier_sum(v, p.first, t1, table, &omega, p.second, &modulus, || {
-                            work.charge(1, "Fourier column transform")
-                        })?;
+                        let sum =
+                            fourier_sum(v, p.first, t1, table, &omega, p.second, &modulus, || {
+                                work.charge(1, "Fourier column transform")
+                            })?;
                         out.push(sum * &twists[t1] % &modulus);
                     }
                     Ok(out)
@@ -639,9 +640,10 @@ impl Encoder {
                     let table = powers.get(&omega, p.first, p.second, &modulus);
                     let mut out = Vec::with_capacity(p.second);
                     for t2 in 0..p.second {
-                        let sum = fourier_sum(v, p.second, t2, table, &omega, p.first, &modulus, || {
-                            work.charge(1, "Fourier row transform")
-                        })?;
+                        let sum =
+                            fourier_sum(v, p.second, t2, table, &omega, p.first, &modulus, || {
+                                work.charge(1, "Fourier row transform")
+                            })?;
                         out.push(sum * &scale % &modulus);
                     }
                     Ok(out)

@@ -346,9 +346,10 @@ impl ValueOperation {
                 let twists = self_twists.get(omega, *column, *first, modulus);
                 let mut out = Vec::with_capacity(*first);
                 for t1 in 0..*first {
-                    let sum = fourier_sum(values, *first, t1, table, omega, *second, modulus, || {
-                        meter.charge(1, "canonical Fourier column transform")
-                    })?;
+                    let sum =
+                        fourier_sum(values, *first, t1, table, omega, *second, modulus, || {
+                            meter.charge(1, "canonical Fourier column transform")
+                        })?;
                     out.push(sum * &twists[t1] % modulus);
                 }
                 Ok(out)
@@ -363,9 +364,10 @@ impl ValueOperation {
                 let table = powers.get(omega, *first, *second, modulus);
                 let mut out = Vec::with_capacity(*second);
                 for t2 in 0..*second {
-                    let sum = fourier_sum(values, *second, t2, table, omega, *first, modulus, || {
-                        meter.charge(1, "canonical Fourier row transform")
-                    })?;
+                    let sum =
+                        fourier_sum(values, *second, t2, table, omega, *first, modulus, || {
+                            meter.charge(1, "canonical Fourier row transform")
+                        })?;
                     out.push(sum * scale % modulus);
                 }
                 Ok(out)
@@ -479,9 +481,12 @@ impl PredicateProgram {
             }
             values.push(value);
         }
-        let expected = self
-            .operation
-            .evaluate(&values[..self.input_words], meter, &self.powers, &self.twists)?;
+        let expected = self.operation.evaluate(
+            &values[..self.input_words],
+            meter,
+            &self.powers,
+            &self.twists,
+        )?;
         Ok(expected == values[self.input_words..])
     }
 

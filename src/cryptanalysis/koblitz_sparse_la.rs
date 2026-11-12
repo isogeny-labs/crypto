@@ -3259,7 +3259,10 @@ fn block_axpy_small<W: ModWord>(
                 acc.finish(&mut value[j..j + 1]);
                 j += 1;
             }
-            for (slot, &v) in target[row * lanes..(row + 1) * lanes].iter_mut().zip(&value) {
+            for (slot, &v) in target[row * lanes..(row + 1) * lanes]
+                .iter_mut()
+                .zip(&value)
+            {
                 *slot = if subtract {
                     slot.sub(v, modulus)
                 } else {

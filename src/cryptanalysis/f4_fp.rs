@@ -2830,9 +2830,7 @@ fn rref_ckpt(
             let prow = &head[pr];
             let parallel = tail.len() * (n_cols - c) > PAR_WORK;
             match sparse_tail(prow, c) {
-                Some(nz) => {
-                    eliminate_rows(tail, parallel, |row| eliminate_sparse(row, &nz, c, fp))
-                }
+                Some(nz) => eliminate_rows(tail, parallel, |row| eliminate_sparse(row, &nz, c, fp)),
                 None => eliminate_rows(tail, parallel, |row| eliminate(row, prow, c, fp)),
             }
             pivots.push(c);
@@ -6881,7 +6879,13 @@ mod packed_set_tests {
                 let col = rng.gen_range(0..8usize);
                 let density = [0.02, 0.1, 0.24, 0.5][round % 4];
                 let mut pivot: Vec<u64> = (0..n)
-                    .map(|_| if rng.gen_bool(density) { rng.gen_range(1..p) } else { 0 })
+                    .map(|_| {
+                        if rng.gen_bool(density) {
+                            rng.gen_range(1..p)
+                        } else {
+                            0
+                        }
+                    })
                     .collect();
                 pivot[col] = 1;
                 let row: Vec<u64> = (0..n).map(|_| rng.gen_range(0..p)).collect();
