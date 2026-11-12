@@ -1,0 +1,345 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp20-t375-aef80152",
+  "icv1-fp20-t457-f60a16c1",
+  "icv1-fp20-tm1079-bf1bb5fd",
+  "icv1-fp20-tm1141-c50333f6",
+  "icv1-fp24-t5097-1f48e65c",
+  "icv1-fp24-tm1215-254f2c18",
+  "icv1-fp24-tm2615-5e182037",
+  "icv1-fp24-tm3365-ba8f1013",
+  "icv1-fp28-t12791-9e92c6c2",
+  "icv1-fp28-t20259-8fb841e7",
+  "icv1-fp28-t24271-da5b2687",
+  "icv1-fp28-tm5475-0f58a032",
+  "icv1-fp32-t8395-a5210489",
+  "icv1-fp32-tm14249-af783d1f",
+  "icv1-fp32-tm30557-158f1cf7",
+  "icv1-fp32-tm70799-e5f3e6f2"
+ ],
+ "replay_certificate": {
+  "path": "../../research/prime_ksum_pooled_20261029/replay-certificate.json",
+  "sha256": "700f78573b7d439e8e8d66a3fd86664751a2c706cb44218af799b6c1c8991af9"
+ },
+ "validator_report": {
+  "path": "../../research/prime_ksum_pooled_20261029/validator-report.json",
+  "sha256": "00043afd39bbfbe99e0bdcdb6e2d48f3b679709fbb5f243f8d710b26125e4778"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md holdout arm rho-neg: rho.negation in the same holdout sessions (sessions/holdout-P20..P32) as ksum5-sel and inc-sel, same targets, rounds and seeds",
+  "unit": "ecbench.gae / sqrt(r) (S); unpriced native operations priced at w GAE each (AGENTS.md section 5a), in the study's pre-2026-11-08 reading (counted table work not charged); the 2026-11-08 default reading is given in gae_band_table_work_default",
+  "binary_or_process": "recorded with ecbench sha256 fc86ee11 (sessions' git_commit null); replayed count-identical by ecbench built from a clean archive of 6edb2cb36d (sha256 1df488d3fac9bf47...); both arms in the same sessions",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "all 16 holdout curves are prime-field, cofactor 1, j neither 0 nor 1728 (validator checked a, b, j against the curve registry), so Aut(E) = {+-1}; no subfield or Frobenius fold exists. Records: automorphisms_available 2, automorphisms_used 2 for rho.negation.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band_row": "pooled over the 16 holdout curves: ic = mean over curves of ksum5-sel mean S, rho = mean over curves of rho-neg mean S; per-curve values in gae_band_per_curve",
+  "gae_band": {
+   "0": {
+    "ic": 6.942851548255786,
+    "rho": 1.0601097320189283
+   },
+   "0.1": {
+    "ic": 7.464315984366,
+    "rho": 1.1577376759054234
+   },
+   "1": {
+    "ic": 12.15749590935793,
+    "rho": 2.036389170883879
+   }
+  },
+  "gae_band_per_curve": {
+   "icv1-fp20-tm1141-c50333f6": {
+    "0": {
+     "ic": 7.412087381608088,
+     "rho": 1.232501136831842,
+     "incumbent": 10.610239872526082
+    },
+    "0.1": {
+     "ic": 7.87829179444974,
+     "rho": 1.3363543517630305,
+     "incumbent": 11.50858976836362
+    },
+    "1": {
+     "ic": 12.074131510024607,
+     "rho": 2.2710332861437266,
+     "incumbent": 19.593738830901472
+    }
+   },
+   "icv1-fp20-t457-f60a16c1": {
+    "0": {
+     "ic": 7.590013835216801,
+     "rho": 1.2712487762750375,
+     "incumbent": 10.740880785772893
+    },
+    "0.1": {
+     "ic": 8.035734391549267,
+     "rho": 1.3781854383093763,
+     "incumbent": 11.611232033312504
+    },
+    "1": {
+     "ic": 12.047219398541458,
+     "rho": 2.3406153966184244,
+     "incumbent": 19.44439326116901
+    }
+   },
+   "icv1-fp20-tm1079-bf1bb5fd": {
+    "0": {
+     "ic": 7.689460507273325,
+     "rho": 1.3468879133682112,
+     "incumbent": 10.705559643970672
+    },
+    "0.1": {
+     "ic": 8.103088794709668,
+     "rho": 1.459967814671425,
+     "incumbent": 11.506188208867444
+    },
+    "1": {
+     "ic": 11.82574338163676,
+     "rho": 2.4776869264003496,
+     "incumbent": 18.711845292938403
+    }
+   },
+   "icv1-fp20-t375-aef80152": {
+    "0": {
+     "ic": 7.144773738386917,
+     "rho": 1.1279977910913905,
+     "incumbent": 10.579304569396038
+    },
+    "0.1": {
+     "ic": 7.657985849400599,
+     "rho": 1.223676407449225,
+     "incumbent": 11.587037953880158
+    },
+    "1": {
+     "ic": 12.276894848523737,
+     "rho": 2.084783954669736,
+     "incumbent": 20.656638414237243
+    }
+   },
+   "icv1-fp24-tm1215-254f2c18": {
+    "0": {
+     "ic": 6.156446637606137,
+     "rho": 1.0643561934017638,
+     "incumbent": 13.68125414943035
+    },
+    "0.1": {
+     "ic": 6.767800056079092,
+     "rho": 1.1612910309939553,
+     "incumbent": 14.986785391776785
+    },
+    "1": {
+     "ic": 12.269980822335684,
+     "rho": 2.033704569323677,
+     "incumbent": 26.736566572894684
+    }
+   },
+   "icv1-fp24-tm3365-ba8f1013": {
+    "0": {
+     "ic": 6.415485141609046,
+     "rho": 1.0841845839904385,
+     "incumbent": 13.965014644332106
+    },
+    "0.1": {
+     "ic": 7.051497532052999,
+     "rho": 1.1827272506972772,
+     "incumbent": 15.267581473938412
+    },
+    "1": {
+     "ic": 12.775609046048585,
+     "rho": 2.0696112510588267,
+     "incumbent": 26.99068294039516
+    }
+   },
+   "icv1-fp24-tm2615-5e182037": {
+    "0": {
+     "ic": 6.343106411172261,
+     "rho": 1.152087430812702,
+     "incumbent": 14.929224241380538
+    },
+    "0.1": {
+     "ic": 6.849373479776104,
+     "rho": 1.2554830587584507,
+     "incumbent": 16.150058638115947
+    },
+    "1": {
+     "ic": 11.405777097210681,
+     "rho": 2.1860437102701895,
+     "incumbent": 27.13756820873463
+    }
+   },
+   "icv1-fp24-t5097-1f48e65c": {
+    "0": {
+     "ic": 6.556810694013688,
+     "rho": 1.078810657547073,
+     "incumbent": 14.48670596359088
+    },
+    "0.1": {
+     "ic": 7.199985481506746,
+     "rho": 1.1765099435516213,
+     "incumbent": 15.85096030781252
+    },
+    "1": {
+     "ic": 12.988558568944276,
+     "rho": 2.055803517592557,
+     "incumbent": 28.129249405807258
+    }
+   },
+   "icv1-fp28-tm5475-0f58a032": {
+    "0": {
+     "ic": 7.230511401978396,
+     "rho": 0.9817237230940634,
+     "incumbent": 21.62083491080749
+    },
+    "0.1": {
+     "ic": 7.651133948002411,
+     "rho": 1.076735734598041,
+     "incumbent": 23.189705317806347
+    },
+    "1": {
+     "ic": 11.436736862218552,
+     "rho": 1.9318438381338392,
+     "incumbent": 37.3095389807961
+    }
+   },
+   "icv1-fp28-t12791-9e92c6c2": {
+    "0": {
+     "ic": 6.772595648382167,
+     "rho": 0.9147014569913304,
+     "incumbent": 21.04813806689363
+    },
+    "0.1": {
+     "ic": 7.275133336867943,
+     "rho": 1.0035473306691371,
+     "incumbent": 22.973587142125158
+    },
+    "1": {
+     "ic": 11.797972533239927,
+     "rho": 1.8031601937693977,
+     "incumbent": 40.30262881920889
+    }
+   },
+   "icv1-fp28-t20259-8fb841e7": {
+    "0": {
+     "ic": 7.065282971623902,
+     "rho": 0.8825886774983195,
+     "incumbent": 21.850369038721457
+    },
+    "0.1": {
+     "ic": 7.482088702839186,
+     "rho": 0.9678127492911992,
+     "incumbent": 23.54673204499441
+    },
+    "1": {
+     "ic": 11.233340283776739,
+     "rho": 1.7348293954271163,
+     "incumbent": 38.81399910145095
+    }
+   },
+   "icv1-fp28-t24271-da5b2687": {
+    "0": {
+     "ic": 6.759519096704636,
+     "rho": 1.0163841025589984,
+     "incumbent": 21.284678385265476
+    },
+    "0.1": {
+     "ic": 7.241687322181888,
+     "rho": 1.115346010131545,
+     "incumbent": 23.2087559281005
+    },
+    "1": {
+     "ic": 11.581201351477143,
+     "rho": 2.0060031782844656,
+     "incumbent": 40.525453813615705
+    }
+   },
+   "icv1-fp32-tm70799-e5f3e6f2": {
+    "0": {
+     "ic": 7.158375665764917,
+     "rho": 0.9171571129729474,
+     "incumbent": 32.32211605356518
+    },
+    "0.1": {
+     "ic": 7.6941395226158065,
+     "rho": 1.0080745587792808,
+     "incumbent": 34.56546157577873
+    },
+    "1": {
+     "ic": 12.516014234273817,
+     "rho": 1.8263315710362817,
+     "incumbent": 54.755571275700596
+    }
+   },
+   "icv1-fp32-tm14249-af783d1f": {
+    "0": {
+     "ic": 6.97222781903697,
+     "rho": 0.9367217833914304,
+     "incumbent": 31.7547966952171
+    },
+    "0.1": {
+     "ic": 7.573156278611296,
+     "rho": 1.0296857738420033,
+     "incumbent": 34.3686309121156
+    },
+    "1": {
+     "ic": 12.981512414780227,
+     "rho": 1.86636168789716,
+     "incumbent": 57.893138864202086
+    }
+   },
+   "icv1-fp32-t8395-a5210489": {
+    "0": {
+     "ic": 6.908223106829147,
+     "rho": 0.9715011520708375,
+     "incumbent": 32.3109466311948
+    },
+    "0.1": {
+     "ic": 7.47461376953031,
+     "rho": 1.0679239357640558,
+     "incumbent": 34.93186410690186
+    },
+    "1": {
+     "ic": 12.572129733840782,
+     "rho": 1.9357289890030211,
+     "incumbent": 58.52012138826544
+    }
+   },
+   "icv1-fp32-tm30557-158f1cf7": {
+    "0": {
+     "ic": 6.910704714886179,
+     "rho": 0.9829032204064676,
+     "incumbent": 32.34686400983548
+    },
+    "0.1": {
+     "ic": 7.493345489682952,
+     "rho": 1.08048142521715,
+     "incumbent": 35.05086886660372
+    },
+    "1": {
+     "ic": 12.737112462853915,
+     "rho": 1.9586852685132918,
+     "incumbent": 59.38691257751797
+    }
+   }
+  },
+  "gae_band_table_work_default": {
+   "0": {
+    "ic": 6.942851548255786,
+    "rho": 1.0601097320189283
+   },
+   "0.1": {
+    "ic": 7.752547278977849,
+    "rho": 1.1577376759054234
+   },
+   "1": {
+    "ic": 15.039808855476414,
+    "rho": 2.036389170883879
+   }
+  },
+  "order_holds_across_band": true,
+  "order_note": "rho-neg < ksum5-sel < inc-sel on 16/16 curves at w = 0, 0.1 and 1 in both readings. ksum5-sel is below the tuned pair-table incumbent (an improvement over that index-calculus baseline) and remains 5.3-7.3x rho-neg: the distance remaining. Generic decomposition track, bounded by BSGS."
+ }
+}

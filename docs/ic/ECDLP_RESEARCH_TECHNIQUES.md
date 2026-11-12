@@ -648,9 +648,14 @@ witness gives `log_G Q` without linear algebra.
 Measured: `ksum5` costs 0.700 / 0.446 / 0.324 / 0.217 of the tuned
 pair-table incumbent at 20 / 24 / 28 / 32 bits at `w = 0` over 16 fresh
 curves ([`research/prime_ksum_pooled_20261029/`](../../research/prime_ksum_pooled_20261029/README.md)),
-a record both READMEs label "UNQUALIFIED": no `VALIDATION.json`, not on the
-leaderboard, so it is **not yet** a verified improvement under the success
-criterion and its promotion is the open step. Known-log MITM2 is 1.11 →
+a record that has been **gate-validated** since 2026-11-12
+([`VALIDATION.json`](../../research/prime_ksum_pooled_20261029/VALIDATION.json):
+count-identical replay of all 8 sessions on another host class and build,
+and an independent recompute with `[d]G = Q` on 5,952/5,952 holdout
+records). It is therefore a verified improvement over the tuned pair-table
+incumbent on prime curves at these sizes, within the generic decomposition
+track, and `ksum5` still costs 5.3–7.3× negation rho: the distance
+remaining, bounded below by BSGS. Known-log MITM2 is 1.11 →
 15.6× cheaper than the abscissa pipeline from 12 to 24 bits while rho
 stays 0.43 of it at 24 bits; the precompute-regime control finds no
 single-target cost below rho; `wwalk` with the target in the walk reads
@@ -1684,9 +1689,9 @@ performance verdict".
    and produce the wide-modulus benchmark pack the 2026-10-12 note cites.
 4. Validate the CUDA SpMV worker, the GPU root finder and the FES kernels on
    named hardware without changing their transcripts.
-5. Take the `ksum` record through the validation gate (replay certificate,
-   independent validator, matched rho with the band): it is the one
-   unqualified result below the pair-table baseline on prime curves.
+5. Done 2026-11-12 for the pooled `ksum` study (validated). Still open: the
+   external-tool comparison its README owes, and a second-host timed (L2)
+   replay if a wall-time claim is wanted.
 6. Calibrate `hashed_tensor_steps` (nanoseconds per charged primitive step on
    the calibration host, pinned in [`calibration.json`](calibration.json)) or
    charge the contraction in GAE, so the hashed arm gets a priced `S` and can
