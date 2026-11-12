@@ -1,7 +1,19 @@
 {
   "branch": "aburan28/eloquent-bell-2jerrf",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/mt_fieldops_v5_20261112/run.py",
+        "holdout"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T03:12:01+00:00",
+      "wall_s": 698.614
+    }
+  ],
   "commit": "5aab996e554e9b1212c86bbe88d136c1c68ed547",
   "commit_dirty": false,
   "created_utc": "2026-11-12T03:11:47+00:00",
@@ -17,9 +29,198 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261112T0311Z-mt-fieldops-v5",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h0_32b_t1024",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1431,
+        1.1732
+      ],
+      "unit": "ratio",
+      "value": 1.1586
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h01_32b_t1024",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0238,
+        1.0516
+      ],
+      "unit": "ratio",
+      "value": 1.037
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_bsgs2_gae_i10_h01_32b_t1024",
+      "note": "median per-config ratio, bootstrap 95%; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.425,
+        1.4453
+      ],
+      "unit": "ratio",
+      "value": 1.4368
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h1_32b_t1024",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7174,
+        0.7346
+      ],
+      "unit": "ratio",
+      "value": 0.7284
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h0_32b_t4096",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1262,
+        1.1375
+      ],
+      "unit": "ratio",
+      "value": 1.1297
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h01_32b_t4096",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0098,
+        1.0208
+      ],
+      "unit": "ratio",
+      "value": 1.0143
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_bsgs2_gae_i10_h01_32b_t4096",
+      "note": "median per-config ratio, bootstrap 95%; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.3786,
+        1.3883
+      ],
+      "unit": "ratio",
+      "value": 1.3823
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h1_32b_t4096",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7102,
+        0.7182
+      ],
+      "unit": "ratio",
+      "value": 0.7168
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h0_32b_t16384",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0972,
+        1.1079
+      ],
+      "unit": "ratio",
+      "value": 1.1014
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h01_32b_t16384",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9922,
+        1.0051
+      ],
+      "unit": "ratio",
+      "value": 0.9983
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_bsgs2_gae_i10_h01_32b_t16384",
+      "note": "median per-config ratio, bootstrap 95%; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.3358,
+        1.3393
+      ],
+      "unit": "ratio",
+      "value": 1.3371
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 22,
+      "name": "icbest_over_rhobest_5a_gae_i10_h1_32b_t16384",
+      "note": "median per-config ratio, bootstrap 95%, native work priced at h; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7111,
+        0.7163
+      ],
+      "unit": "ratio",
+      "value": 0.7135
+    }
+  ],
   "problem": "ic:multi-target-prime-w24-32",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 2547056,
+      "path": "research/mt_fieldops_v5_20261112/results/holdout/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/36/36ab358b789f2c2cac86a943f9a6fc83c4e05247eb541fbb4fc2b34e9ff020a4",
+      "sha256": "36ab358b789f2c2cac86a943f9a6fc83c4e05247eb541fbb4fc2b34e9ff020a4",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
