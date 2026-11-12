@@ -83,7 +83,14 @@ function applyPinnedInputView({ cwd, view, manifest }) {
     }
     const viewOriginalBytes = regularBytes(view, originalManifest, 'view original freeze manifest');
     if (!viewOriginalBytes.equals(originalBytes)) throw new Error(`view changed original freeze manifest: ${originalManifest}`);
-    const frozen = JSON.parse(originalBytes.toString('utf8'));
+    // A coreutils `sha256sum` freeze (`original_manifest_format: "sha256sum"`)
+    // is read as its path-to-digest map, so a pointer names one listed path.
+    const originalFormat = item.original_manifest_format;
+    if (originalFormat !== undefined && (originalFormat !== 'sha256sum' || sourcePointer === undefined)) {
+      throw new Error(`original_manifest_format must be sha256sum with original_source_pointer: ${target}`);
+    }
+    const frozen = originalFormat === 'sha256sum' ? sha256sumDigests(originalBytes)
+      : JSON.parse(originalBytes.toString('utf8'));
     const frozenDigest = sourceKey !== undefined ? frozen.source_sha256?.[sourceKey]
       : selectField(frozen, `pointer:${sourcePointer}`);
     if (frozenDigest !== expected) {
@@ -130,6 +137,7 @@ function applyPinnedInputView({ cwd, view, manifest }) {
     }
     overlays.push({ target, revision, source_path: sourcePath, sha256: expected,
       original_manifest: originalManifest, original_manifest_sha256: item.original_manifest_sha256,
+      ...(originalFormat ? { original_manifest_format: originalFormat } : {}),
       ...(sourceKey !== undefined ? { original_source_key: sourceKey } : { original_source_pointer: sourcePointer }),
       live_target_sha256: sha(live), current_sources: currentSources,
       ...(driftNote ? { current_drift_note: driftNote } : {}),
@@ -240,11 +248,13 @@ export function withFrozenWorkflow({ cwd = process.cwd(), workflow, revision, ma
       mkdirSync(path.dirname(path.join(view, file)), { recursive: true });
       writeFileSync(path.join(view, file), bytes);
     }
+    // Pinned historical inputs are overlaid first, so the manifest's own
+    // digests then check the restored bytes; any other drift still fails.
+    const pinnedInputViews = inputViewManifest
+      ? applyPinnedInputView({ cwd, view, manifest: inputViewManifest }) : [];
     for (const { file, digest } of ownInputs) {
       if (sha(readFileSync(path.join(view, file))) !== digest) throw new Error(`frozen input drift: ${file}`);
     }
-    const pinnedInputViews = inputViewManifest
-      ? applyPinnedInputView({ cwd, view, manifest: inputViewManifest }) : [];
     // Original preflights retain their Git ancestry assertions, against the
     // current checkout's unchanged object database; no historical code checkout.
     const gitPath = path.join(cwd, '.git');
