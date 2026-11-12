@@ -1355,6 +1355,66 @@ tensor IC
   `research/hashed_ecdl_leads_20261030/`,
   `research/ic_prime_eth_leads_20261031/leads/L09/`.
 
+=== A15. Other prime-field plug-in bases without their own entry
+(inventory of 2026-11-12)
+Bases that ship on `main` and had no entry above. Each line gives the
+definition, the build, the record and the verdict as the technique
+matrix
+(#link("../ECDLP_RESEARCH_TECHNIQUES.md")[`ECDLP_RESEARCH_TECHNIQUES.md`]
+§1) records them; all numbers `[pcc:unverified]`, none gate-validated
+unless said.
+
+- #strong[`cm-multiplier:size=K,norm=N[,mult=M]`]
+  (`ic_framework/plugins.rs`). `Z[φ]` closure on a CM curve:
+  `[a]P + [b]φ(P)` for every `α = a + bφ` of norm `≤ N` on the seed\'s
+  column with weight `a + bλ`; the prime twin of D3. A precompute trade,
+  the relation floor unchanged; no dedicated record (the Koblitz
+  analogue reads 4.5× rho). Engineering.
+- #strong[`cm-scalar-orbit`] and the ecbench `ic.cm_folded_*` methods
+  (`ic_framework/cm_orbit.rs`, `ecbench/cm_folded.rs`): `columns` seeds
+  times `length` points under the CM scalar action for `D = −19` or
+  `−43`, a signed MITM2 in a hash-pinned native backend with independent
+  Rust replay. Floor/crater 0.98 \[0.87, 1.11\], \"not an admitted
+  IC/rho comparison\" (`research/conductor_gap_cm_orbits_20261015/`).
+  Accounting.
+- #strong[`known-log:size=B`] and `ic.known_log_mitm2_v1`,
+  `ic.known_log_ksum_v1` (`ecbench/known_log.rs`): the base `{±[s_i]G}`
+  with known logarithms, so no matrix; a Bernstein–Lange-shaped table.
+  Cheaper than the abscissa pipeline by 1.5 → 15.6× from 16 to 24 bits,
+  but negation rho is cheaper at every size (rho/known-log `S` 0.43 at
+  24 bits; `research/ecbench_known_log_targets_20261021/`). Not an
+  attack.
+- #strong[`prime-interval:t=T[,lo=L]`] and the digit-set, Edwards-`y`,
+  `T0`-invariant and square-bits frames of `pkm_semaev.rs`: the sets the
+  bit-membership system of `pkm-semaev` describes; frames are Möbius
+  coordinates of one system. Frame choice moves F4 cost 3.3–4.7× at
+  `k = 20` (`research/curve25519_frame_search_20261103/`,
+  `VALIDATION.json` present but unable to pass for want of a same-unit
+  rho row); square bits closed; the greedy digit set is an open, not
+  engine-confirmed lead. Engineering.
+- #strong[`archive:store=…,manifest=…,symmetry=…`]
+  (`ic_framework/archive.rs`): imports a content-addressed factory
+  archive with certified negation, cubic, quartic or Frobenius symmetry
+  and the `useful_rank` audit; the transport for the factor-base
+  factory. \"No candidate has been selected by the comparison\"
+  (`ARCHIVE_FACTOR_BASE_COMPARISON.md`). Instrument.
+- #strong[`explicit-x:xs=…`] (`ic_framework/explicit_base.rs`, ecbench
+  only): an exact abscissa list, both signs. Instrument.
+- #strong[Prime-orbit index calculus] (`prime_orbit_index_calculus.rs`,
+  `ic prime-orbit`, `ic.prime_orbit_relations_v1`): `m` full
+  `Aut`-orbits, two-unknown relations solved as a gain graph, scaled
+  curves to 40 bits; 5.42× negation rho on a 14-bit toy curve, 4.20×
+  cubic rho on `j = 0`, \"rho-led\". Engineering, the ancestor of A3.
+- #strong[Small-x exact-yield instrument] (`prime_small_x.rs`,
+  `secg_small_x.rs`, `ic prime`): the exact two-sum yield of the
+  smallest-abscissa base on every SECG curve. Loses to rho by at least
+  `2^40.9` in trials on every curve; P-192 yield `2^{−175}`–`2^{−165}`
+  (`research/secg_small_x_20261014/`). Refuted, the A1 baseline at
+  deployed size.
+- #strong[Coordinate frames] (`coordinate_search.rs`,
+  `coordinate_quotients.rs`): the module-level mechanism behind B3; toy
+  fields, constant factor.
+
 == 3. Odd-characteristic extension fields `E(F_{p^k})`
 === B1. Gaudry–Diem subfield base `{P : x(P) ∈ F_p}`
 The one textbook positive case: Weil restriction supplies the conjugate
@@ -1869,6 +1929,60 @@ never landed: its evidence file is missing on `main`.
 
 #horizontalrule
 
+=== D11. Other Koblitz and binary plug-in bases and selection
+instruments (inventory of 2026-11-12)
+- #strong[`generator_orbit=1`] on `compact-orbit-scan`: column 0 is the
+  generator\'s own orbit with known logarithm, one relation fewer. Nets
+  1.26–3.20× over the baseline on seven curves; at `n = 29` below the
+  matched rho-frob across the band (`S` 0.546 / 0.611 / 1.196 against
+  1.569), which the record itself reads as a Frobenius-folded BSGS at
+  one column on rho\'s fixed set-up; gap 1.15× at `n = 31`, 3.89× at 37
+  (`research/ecbench_generator_orbit_20261022/`, #strong[validated]).
+  Engineering.
+- #strong[`projected=1`] on `koblitz-orbit` and `koblitz-trace-zero`:
+  folds columns by the signed orbits of the cofactor projections `[h]P`,
+  the matrix\'s real column count; `no_fold=1` is the control.
+  Accounting.
+- #strong[Greedy and sampled coverage selection, pruning, frozen
+  `explicit_orbits` recipes, `subgroup_orbits`, 2-torsion saturation]
+  (`koblitz_greedy_base.rs`, `koblitz_greedy_sampled.rs`,
+  `koblitz_factor_base_search.rs`, `ic search`): expected trials at the
+  best column count fall 1.08–1.18× at `r ≤ 2^17`, the selector\'s
+  advantage over random falling to 1.000 at `r = 2^39`
+  (`research/greedy_factor_base_yield_20261014/`). Engineering; past
+  `r ≈ 2^28` use `subgroup`.
+- #strong[`binary-subspace … select=strict4e|gated-rank`]
+  (`ic_framework/subspace_select.rs`): a sieved subspace with every
+  abscissa in `4E`, or the best of several draws by a rank-aware key.
+  Unresolved: 2.11 bits fewer counted operations at `w = 0`, the order
+  flips inside the band, rho cheaper than both arms in every cell
+  (`research/fb_strict4e_20261027/`, gate refuses its
+  `VALIDATION.json`).
+- #strong[`binary-multiplier:size=K,mult=M`]: `[m]P` on the seed\'s
+  column with weight `m`, structure-free; 6.1× cheaper than the best
+  subspace base at degree 28 and still 6–12× rho
+  (`research/ic_improve_20261023/`); \"does not transfer\". Engineering.
+- #strong[`explicit-x`] (binary): as A15. Instrument.
+- #strong[λ-coordinate base] `{P : λ(P) ∈ W}` (`koblitz_ic_leads.rs`,
+  lead L1): a halved affine base, identity-checked on 182 subspaces,
+  \"L1 closed in full\", nothing moves an IC cost
+  (`research/koblitz_ic_leads_build_20261024/`). Closed.
+- #strong[Binary small-x / SECG base] (`binary_small_x.rs`,
+  `ic prime --curve   sect163r2`): yield `2B²/(n − 1)`, loses to rho by
+  `≥ 2^40.9` in trials (`research/secg_small_x_20261014/`). Refuted.
+- #strong[Shantz–Teske δ method] (`delta_method.rs`, Sage
+  `--delta-sweep`): a dimension knob, `m·l = n − δ`; measured fractions
+  track the prediction at `n = 31`, net cost per relation 513 / 257 /
+  213 ms at `δ = +3 / +1 / −1`; \"constant-factor tuning knob, no
+  exponent change\". Engineering (C8 has the clause).
+- #strong[Selection and forecasting instruments]: the planner
+  (`ic plan`, `ic-planner/4`), the degree-of-regularity forecast
+  (`dreg_forecast.rs`, `factor-base-sweep`), relation-yield pruning
+  (`relation_yield_pruning.rs`), `ic fixed` and the 84 frozen
+  `ic workflow --params` documents under `docs/ic/params/`. None carries
+  an `S`; see the technique matrix §7.
+- #strong[N83 frozen bases]: D8 above.
+
 == 6. Jacobians and covers
 - #strong[E1. Degree-1 places on genus 2–4 hyperelliptic Jacobians]
   (Adleman–DeMarrais–Huang / Gaudry; Thériault reduced base with large
@@ -2222,6 +2336,11 @@ merge commit.
   2026-10-30 and the desk audit of 2026-11-07; one taxonomy box and one
   cost row. The `research-kb` server and its CLI were unavailable in the
   authoring container, so the sources were read from the tree directly.
+- #strong[Fourth update round] (2026-11-12). Added A15 and D11,
+  catch-all entries for every plug-in base on `main` that had no family
+  here, from the module-by-module inventory behind the technique matrix
+  revision of the same date; two taxonomy boxes, no new cost row (their
+  records are not mutually comparable).
 - #strong[What is not re-derived.] Entries condensed from long notes
   keep their source\'s status label and are not re-derived here. If a
   source and this page disagree, the source wins.

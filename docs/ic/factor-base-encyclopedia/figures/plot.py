@@ -58,6 +58,7 @@ def taxonomy():
             ("A12 height box, degree-d maps", "open", False),
             ("A13 coset vs low-x/random (stage)", "refuted", False),
             ("A14 hashed affine-threshold (tensor)", "refuted", False),
+            ("A15 other prime plug-in bases (A3-A14 kin)", "engineering", False),
         ]),
         ("Extension fields E(F_{p^k})", [
             ("B1 Gaudry-Diem x in F_p, k=2..5", "refuted", False),
@@ -85,6 +86,7 @@ def taxonomy():
             ("D8 N83 orbit bases: online only", "engineering", False),
             ("D9 one/two large primes", "engineering", False),
             ("D10 solver-cost selection", "engineering", False),
+            ("D11 other Koblitz plug-ins, selection", "engineering", False),
             ("# Jacobians and covers", None, False),
             ("E1 degree-1 places, g=2..4", "not-ECDLP", False),
             ("E2 Joux-Vitse g3 cover", "below-rho-weak-class", False),
@@ -94,9 +96,9 @@ def taxonomy():
             ("E6 genus-3 cover, IC-2LP", "open", False),
         ]),
     ]
-    fig, ax = plt.subplots(figsize=(10, 11.4))
+    fig, ax = plt.subplots(figsize=(10, 11.9))
     ax.set_xlim(0, 3)
-    ax.set_ylim(-21.8, 1.2)
+    ax.set_ylim(-22.9, 1.2)
     ax.axis("off")
     for ci, (title, items) in enumerate(columns):
         x = ci + 0.03
