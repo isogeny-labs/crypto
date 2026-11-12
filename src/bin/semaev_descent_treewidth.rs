@@ -165,8 +165,8 @@ fn split_scopes(equations: &[Equation], num_vars: u32) -> (usize, Vec<Vec<u32>>,
     let mut scopes = Vec::new();
     for eq in equations {
         for &(i, j) in &eq.quadratic {
-            if !and_index.contains_key(&(i, j)) {
-                and_index.insert((i, j), next);
+            if let std::collections::btree_map::Entry::Vacant(slot) = and_index.entry((i, j)) {
+                slot.insert(next);
                 scopes.push(vec![i, j, next]);
                 next += 1;
             }
@@ -180,7 +180,7 @@ fn split_scopes(equations: &[Equation], num_vars: u32) -> (usize, Vec<Vec<u32>>,
         let _ = eq.constant; // folded into the last gadget's tensor
         match terms.len() {
             0 => {}
-            1 | 2 | 3 => scopes.push(terms),
+            1..=3 => scopes.push(terms),
             _ => {
                 // c1 = t0 ^ t1; c_k = c_{k-1} ^ t_k; last: c ^ t_last = constant.
                 let mut carry = next;
