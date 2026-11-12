@@ -83,3 +83,15 @@ use the preregistered walk-limit 60; **p ∈ {1009, 1511, 1823} use walk-limit 2
 `research/jv_weak_coverage_20261111` (which measured 60, 60, 60, 60, 60 admitted walks). A 20-walk sample still
 separates W′ from the rational-root W at p = 1009 (0.05) by the Wilson interval. Disclosed before any large-prime
 run completed past its first walks.
+
+## Amendment 2 (2026-11-12, before any p ≥ 1009 class-group walk completed)
+
+A class-group walk that fails explores up to the cap with a ψ_ℓ factorization at every curve; at cap 10,000 and
+p ≥ 1009 this did not complete on the container (two walks at p = 1009 ran for the whole budget). The large-prime
+comparison is therefore made **paired at a reduced cap**: p ∈ {1009, 1511, 1823}, cap 3,000, walk-limit 30, and
+**both** the rational-root walk (`examples/jv_weak_coverage`, `walk_to_weak_record`) and the class-group walk
+(`walk_to_weak_classgroup`) are run on the **same seeded admitted curves** (identical `random_curve` sequence,
+seed 20261111). W (rational-root) and W′ (class-group) are then compared per curve at the same cap, so the
+comparison is valid independent of the cap. The small primes p ∈ {37, 53} keep the preregistered cap 10,000 and
+walk-limit 60. The published rational-root W of `research/jv_weak_coverage_20261111` (cap 10,000) is reported
+alongside as the reference, not the paired baseline. Disclosed before any large-prime walk completed.
