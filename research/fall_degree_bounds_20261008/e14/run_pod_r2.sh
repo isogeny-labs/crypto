@@ -64,7 +64,7 @@ log "source verified $SRC_COMMIT"; pack
 # Amendment 28: record the CPU quota and pressure, run a short parallel probe, and bound the build
 { echo "cpu.max: $(cat /sys/fs/cgroup/cpu.max 2>/dev/null || echo n/a)"; echo "cpu.pressure: $(head -1 /proc/pressure/cpu 2>/dev/null || echo n/a)"; } >>"$OUT/host.txt"
 { set +x; } 2>/dev/null   # Amendment 29: never trace the busy loops
-P0=$(date +%s%N); for i in $(seq 1 32); do ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ) & done; wait; P1=$(date +%s%N)
+P0=$(date +%s%N); PIDS=""; for i in $(seq 1 32); do ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ) & PIDS="$PIDS $!"; done; wait $PIDS; P1=$(date +%s%N)   # Amendment 30: wait only on the probe jobs
 S0=$(date +%s%N); ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ); S1=$(date +%s%N)
 PAR=$(awk -v p=$((P1-P0)) -v s=$((S1-S0)) 'BEGIN{ printf "%.1f", 32*s/p }')
 set -x

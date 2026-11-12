@@ -1312,3 +1312,15 @@ about 04:52 UTC (about USD 0.4); no build or gate ran; record `e14/pod-r2/launch
 
 **Change for r2i (`e14/run_pod_r2.sh`, sha256 `cd2c4679dbc5c775…`):** tracing is switched off for the probe
 and back on after it. Pod name prefix `fd-e14-r2i-`. Nothing else changes.
+
+## Amendment 30 (2026-11-12 UTC, before any draw below): the CPU probe's bare `wait` blocked on the snapshot and watchdog loops; relaunch r2j
+
+r2i (`jrizifz5p2wv18`) verified its source at 04:53:09 UTC and then sat at 0 % CPU: the probe ended
+with a bare `wait`, which waits for every background child of the script, including the 10-minute
+snapshot loop and the deadline watchdog, neither of which exits. The probe loops themselves had
+finished. Deleted at about 04:58 UTC (about USD 0.2); record `e14/pod-r2/launch-r2i.json`.
+
+**Change for r2j (`e14/run_pod_r2.sh`, sha256 `40bd8720b8bb79d2…`):** the probe records the PIDs of its 32
+jobs and waits only on those. Tested on the authoring host with an unrelated long-lived background
+job present: the probe returned and read 4.0 of 8 on a 4-core machine. The only other `wait` in the
+script names a specific PID. Pod name prefix `fd-e14-r2j-`. Nothing else changes.
