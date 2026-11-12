@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0103Z-mt-fieldops-v4",
+  "latest_record": "20261112T0348Z-j2-percolation-fb-size",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 110,
+    "measured": 111,
     "open": 0
   },
   "repo": "crypto",
@@ -8865,6 +8865,66 @@
       ],
       "problem": "kernel:m4gb_gf_p_addmul",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.672,
+      "latest": 0.672,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl1_cost_ratio_c1.60_vs_c2.00_k21_heldout",
+      "points": [
+        {
+          "commit": "dccf37b62bf6",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T0348Z-j2-percolation-fb-size",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.66,
+            0.685
+          ],
+          "summary": "J2: N4v2 DL1 factor-base constant. Threshold c50 in (1.50,1.60) at k=16..22; held-out c=1.60 charged cost 0.655-0.685x the frozen c=2.00 at k=21,22, order holds across w in {0,0.1,1}; falsified at k=16. Engineering, weak GHS family, unvalidated [pcc:unverified].",
+          "value": 0.672
+        }
+      ],
+      "problem": "plane-quartic-dl1",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.66,
+      "latest": 0.66,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl1_cost_ratio_c1.60_vs_c2.00_k22_heldout",
+      "points": [
+        {
+          "commit": "dccf37b62bf6",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T0348Z-j2-percolation-fb-size",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.655,
+            0.666
+          ],
+          "summary": "J2: N4v2 DL1 factor-base constant. Threshold c50 in (1.50,1.60) at k=16..22; held-out c=1.60 charged cost 0.655-0.685x the frozen c=2.00 at k=21,22, order holds across w in {0,0.1,1}; falsified at k=16. Engineering, weak GHS family, unvalidated [pcc:unverified].",
+          "value": 0.66
+        }
+      ],
+      "problem": "plane-quartic-dl1",
+      "unit": "ratio"
     },
     {
       "better": "neutral",

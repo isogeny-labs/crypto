@@ -76,7 +76,13 @@ Against the preregistered predictions:
   k ≥ 20.
 - **Post-hoc arm.** c = 1.60 is cheaper than the preregistered c = 1.75 at k ≥ 18 (0.65–0.80). It was selected after
   reading the grid, so it was frozen as a held-out test (amendment 05:00 UTC; seeds 4–8, k = 21 and 22):
-  J2_HELDOUT
+  **confirmed.** Seeds 4–8 at k = 21 (q = 2,097,091, not in the grid) and k = 22: first-attempt success 10/10 at
+  c = 1.60 and 10/10 at 1.75; paired ratio to c = 2.00 at w = 0 of 0.655–0.685 at c = 1.60 (predicted [0.60, 0.72]) and
+  0.771–0.775 at c = 1.75 (predicted [0.72, 0.82]); per-seed order 1.60 < 1.75 < 2.00 at w = 0, 0.1 and 1; every unit
+  recovers the planted log. (`j2/heldout/`; 26 units first ran after the artifact-store bot removed the binary from
+  the worktree and produced empty output: kept in `j2/heldout/failed-binary-missing/` and rerun with the
+  hash-identical build; the first loop's log printed `rc=0` for them because `$?` captured `date`, fixed in
+  `tools/j2_heldout.sh`.)
 
 Class: engineering (one parameter of the frozen pipeline; same algorithm), on the programme's weak-family quartic
 row (N4v2 DL1, itself about 0.005× matched negation rho at q = 2^21 per its README). Not validated: no replay

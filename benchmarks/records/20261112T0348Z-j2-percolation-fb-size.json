@@ -1,6 +1,6 @@
 {
   "branch": "claude/cool-davinci-szm3om",
-  "closed_utc": null,
+  "closed_utc": "2026-11-12T05:15:48+00:00",
   "commands": [
     {
       "argv": [
@@ -25,6 +25,18 @@
       "exit": 0,
       "started_utc": "2026-11-12T04:54:56+00:00",
       "wall_s": 126.099
+    },
+    {
+      "argv": [
+        "bash",
+        "research/leads_chase_20261112/tools/j2_heldout.sh",
+        "research/leads_chase_20261112/j2/v2.bin",
+        "research/leads_chase_20261112/j2/heldout"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T04:57:25+00:00",
+      "wall_s": 1027.142
     }
   ],
   "commit": "dccf37b62bf6481f873fecdd176d2f52a0b9bc28",
@@ -40,19 +52,62 @@
     "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
   },
   "id": "20261112T0348Z-j2-percolation-fb-size",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "dl1_cost_ratio_c1.60_vs_c2.00_k22_heldout",
+      "note": "charged DL1 M-eq, w=0, paired per seed, seeds 4-8, q=4194271; derived from recorded counters",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.655,
+        0.666
+      ],
+      "unit": "ratio",
+      "value": 0.66
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "dl1_cost_ratio_c1.60_vs_c2.00_k21_heldout",
+      "note": "q=2097091, size not in the grid",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.66,
+        0.685
+      ],
+      "unit": "ratio",
+      "value": 0.672
+    }
+  ],
   "problem": "plane-quartic-dl1",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 58532,
+      "path": "research/leads_chase_20261112/j2/raw-units.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4a/4a60e8b9e8eb8488e01d111120be6b20de92ed9b9e7eb59022ac995962b252d2",
+      "sha256": "4a60e8b9e8eb8488e01d111120be6b20de92ed9b9e7eb59022ac995962b252d2",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/leads_chase_20261112/reports/run-20261112T0348Z/REPORT.pdf",
+    "png": [
+      "research/leads_chase_20261112/figures/j2_threshold_cost.png"
+    ],
+    "svg": [
+      "research/leads_chase_20261112/figures/j2_threshold_cost.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "j2-percolation-fb-size",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "J2: N4v2 DL1 factor-base constant. Threshold c50 in (1.50,1.60) at k=16..22; held-out c=1.60 charged cost 0.655-0.685x the frozen c=2.00 at k=21,22, order holds across w in {0,0.1,1}; falsified at k=16. Engineering, weak GHS family, unvalidated [pcc:unverified].",
   "validation": null
 }
