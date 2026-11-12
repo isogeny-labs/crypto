@@ -27,9 +27,11 @@ pub mod network;
 pub mod partial;
 pub mod primality;
 pub mod reduction;
+pub mod relations;
 pub mod ring;
 pub mod structured;
 pub mod structured_runner;
+pub mod treewidth;
 pub mod weighted;
 pub mod width;
 
