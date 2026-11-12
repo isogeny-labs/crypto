@@ -2098,6 +2098,45 @@ fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) -> usize {
     ops
 }
 
+/// A pivot row's non-zero entries from `col` on, as `(column, value)`, when
+/// they are at most a quarter of the tail; `None` for a denser tail, which
+/// [`eliminate`] scans as it is.  Computed once for the pivot, it saves
+/// every row below (or above) it the test of each zero entry.
+fn sparse_tail(pivot: &[u64], col: usize) -> Option<Vec<(u32, u64)>> {
+    let tail = &pivot[col..];
+    if tail.len() < 32 || pivot.len() > u32::MAX as usize {
+        return None;
+    }
+    let nnz = tail.iter().filter(|&&y| y != 0).count();
+    if nnz * 4 > tail.len() {
+        return None;
+    }
+    Some(
+        tail.iter()
+            .enumerate()
+            .filter(|&(_, &y)| y != 0)
+            .map(|(j, &y)| ((col + j) as u32, y))
+            .collect(),
+    )
+}
+
+/// [`eliminate`] by a pivot given as its non-zero entries
+/// ([`sparse_tail`]): the same entries are updated, in the same order, and
+/// the same row operations are returned.
+#[inline]
+fn eliminate_sparse(row: &mut [u64], nz: &[(u32, u64)], col: usize, fp: Barrett) -> usize {
+    let f = row[col];
+    if f == 0 {
+        return 0;
+    }
+    let neg = fp.p - f;
+    for &(j, y) in nz {
+        let x = &mut row[j as usize];
+        *x = fp.reduce(*x + neg * y);
+    }
+    nz.len()
+}
+
 /// As [`eliminate`], on narrow rows; returns the row operations.
 #[inline]
 fn eliminate32(row: &mut [u32], pivot: &[u32], col: usize, fp: Barrett32) -> usize {
@@ -2790,7 +2829,12 @@ fn rref_ckpt(
             let (head, tail) = rows.split_at_mut(pr + 1);
             let prow = &head[pr];
             let parallel = tail.len() * (n_cols - c) > PAR_WORK;
-            eliminate_rows(tail, parallel, |row| eliminate(row, prow, c, fp));
+            match sparse_tail(prow, c) {
+                Some(nz) => {
+                    eliminate_rows(tail, parallel, |row| eliminate_sparse(row, &nz, c, fp))
+                }
+                None => eliminate_rows(tail, parallel, |row| eliminate(row, prow, c, fp)),
+            }
             pivots.push(c);
             pr += 1;
         }
@@ -2819,7 +2863,10 @@ fn rref_ckpt(
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
         let parallel = head.len() * (n_cols - c) > PAR_WORK;
-        eliminate_rows(head, parallel, |row| eliminate(row, prow, c, fp));
+        match sparse_tail(prow, c) {
+            Some(nz) => eliminate_rows(head, parallel, |row| eliminate_sparse(row, &nz, c, fp)),
+            None => eliminate_rows(head, parallel, |row| eliminate(row, prow, c, fp)),
+        }
     }
     Some(pivots)
 }
@@ -6819,6 +6866,40 @@ mod packed_set_tests {
         assert_eq!(first_divisor(&lms[..3], 2, lm(&[0, 5])), None);
         assert_eq!(first_divisor(&lms, 4, lm(&[0, 5])), None);
         assert_eq!(first_divisor(&[], 0, x), None);
+    }
+
+    /// Elimination by a pivot's non-zero list is the elimination by the
+    /// pivot row: same entries, same row operations.
+    #[test]
+    fn sparse_pivot_elimination_matches_the_dense_scan() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(23);
+        for &p in &[786_433u64, 65_521, 4_294_967_291] {
+            let fp = Barrett::new(p);
+            for round in 0..60 {
+                let n = 40 + round * 3;
+                let col = rng.gen_range(0..8usize);
+                let density = [0.02, 0.1, 0.24, 0.5][round % 4];
+                let mut pivot: Vec<u64> = (0..n)
+                    .map(|_| if rng.gen_bool(density) { rng.gen_range(1..p) } else { 0 })
+                    .collect();
+                pivot[col] = 1;
+                let row: Vec<u64> = (0..n).map(|_| rng.gen_range(0..p)).collect();
+                let mut dense = row.clone();
+                let ops = eliminate(&mut dense, &pivot, col, fp);
+                match sparse_tail(&pivot, col) {
+                    Some(nz) => {
+                        let mut sparse = row.clone();
+                        assert_eq!(eliminate_sparse(&mut sparse, &nz, col, fp), ops);
+                        assert_eq!(sparse, dense, "p = {p}, density {density}");
+                    }
+                    None => {
+                        let nnz = pivot[col..].iter().filter(|&&y| y != 0).count();
+                        assert!(pivot.len() - col < 32 || nnz * 4 > pivot.len() - col);
+                    }
+                }
+            }
+        }
     }
 
     /// The half-word divisibility scan agrees with [`packed_divides`] on
