@@ -1,33 +1,34 @@
-# Resume: crypto @ claude/zealous-meitner-85ipb5
+# Resume: crypto @ claude/ecstatic-thompson-0jpmjv
 
 ## Goal
-Owner (2026-11-12): "Speed it all up" (M4GB and Gröbner-basis decomposition engines). Two tracks:
-(A) M4GB patch 0004, divisibility signatures in update() (this run); (B) inherited-f4 per-call
-speed-up by an Opus subagent working in this checkout (koblitz_groebner.rs, gf2_elim.rs, pq_f4_f2.rs,
-inherited part of ic_framework/solvers.rs; engine name inherited-f4-next for a paired A/B).
+Owner (2026-11-12): run the frozen wide-modulus sparse-LA pack on RunPod ("1 but on runpod").
+Protocol: research/ic_techniques_20261012/wide_sparse_la/PROTOCOL.md + PROTOCOL_AMENDMENT_1.md
+(RunPod cpu5g 4 vCPU/16 GiB, one pod per seed, A/A per pod, USD 25 ceiling, 40 h pod deadline).
 
 ## Lead / hypothesis
-Callgrind: update() is 70 % of a 24-variable M4GB solve, divisibility on degrevlex-ranked monomials
-decoded per variable. Exact two-mask signatures cut instructions to 0.47x / 0.43x. Expectation and
-falsifier: research/m4gb_update_signatures_20261112/README.md.
+Size law: row_ops/D grows as D^(beta-1), beta in [1.9, 2.1] (Krylov). Width law: ns per row_op
+t(L) = c0 + c2 L^2 over limbs L = 1..4. Extrapolate U192@129 (ECC2K-130 order) to D = 1e9 with
+interval; falsifiers in PROTOCOL.md "How the extrapolation model is falsified".
 
 ## Spec
-research/m4gb_update_signatures_20261112/ab_corpus.py under tools/benchrec.py run (record benchmarks/records/20261112T0517Z-m4gb-update-signatures.json):
-corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old (patches 0001-0003,
-scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
+research/ic_techniques_20261012/wide_sparse_la/runpod/{launch.py, pod_run.sh, make_bundle.py}.
+launch.py bundles HEAD, uploads to s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/<stamp>-<sha>/,
+creates 3 RunPod CPU pods (REST v1) that build la_engine_bench and run the grid for their seed.
+Record: benchmarks/records/<id>-wide-sparse-la.json (benchrec).
 
 ## State
-2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
-
-Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
-(merged main 2026-11-12). Corpus run starting.
+2026-11-12: amendment + launcher committed; local smoke test of pod_run.sh (D=2^8..2^9) run.
+Launch manifest: research/ic_techniques_20261012/wide_sparse_la/launch.json (pod ids, S3 prefix).
 
 ## Runs in flight
-Paired ic descent inherited-f4 vs inherited-f4-batched vs fes-f2 (research/inherited_f4_batched_20261112/run_ab.sh, record benchmarks/records/20261112T1829Z-inherited-f4-batched-ab.json, IC_BIN scratchpad ic-batched built at 4f0eca9eb4); then the end-to-end ladder (run_e2e.sh) under its own record. Validated isolab degree-13 run frozen (research/fes_k13_validated_20261112/) and blocked on the exhausted monthly budget.
+3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
+Pods self-terminate via podTerminate; if not, terminate via REST DELETE /v1/pods/<id>.
 
 ## Stop and success conditions
-Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
+Fixed grid; per-run 3600 s timeout and per-arm stop rule; pod deadline 40 h; A/A determinism failure voids.
+Success = complete raw data + frozen analysis (fits, intervals, falsification outcomes), whatever the outcome.
 
 ## Next steps
-1. summarize/make_report; close record; benchmarks entry; session log; commit; push.
-2. Integrate track B result (paired A/B under its own record), then PR update.
+1. Monitor pods (~13-16 h). 2. Pull raw/*.jsonl into wide_sparse_la/raw/, sha256 + S3.
+3. analysis.py per frozen Analysis section -> results.json; research-visuals report/PDF/graphs.
+4. benchrec add-raw/metric/close; benchmarks/<date>-wide-sparse-la/ + README row; progress report; PR.
