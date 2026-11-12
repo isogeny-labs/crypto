@@ -11,8 +11,10 @@ T0=$(date +%s)
 log() { echo "$(date -u +%FT%TZ) $*" | tee -a "$OUT/run.log"; }
 pack() { tar czf "$W/out.tgz.part" -C "$W" out 2>/dev/null && mv -f "$W/out.tgz.part" "$SERVE/out.tgz" && sha256sum "$SERVE/out.tgz" | cut -d' ' -f1 >"$SERVE/out.tgz.sha256"; }
 delete_self() {
+  { set +x; } 2>/dev/null
   [ -n "${RUNPOD_POD_ID:-}" ] && [ -n "${POD_CTL_KEY:-}" ] && \
     curl -sS -m 60 -X DELETE -H "Authorization: Bearer $POD_CTL_KEY" "https://rest.runpod.io/v1/pods/$RUNPOD_POD_ID" >>"$OUT/run.log" 2>&1
+  set -x
 }
 finish() {
   log "finish: $1"; echo "$1" >"$OUT/final_status"; pack
@@ -20,10 +22,19 @@ finish() {
   sleep 21600; delete_self; sleep infinity
 }
 ln -sfn "$OUT" "$SERVE/out"
-( cd "$W/serve" && python3 -m http.server 8080 --bind 0.0.0.0 >"$OUT/http.log" 2>&1 ) &
-apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq jq git build-essential pkg-config libssl-dev curl time >/dev/null 2>&1
+echo "$(date -u +%FT%TZ) boot: script started (pid $$)" >>"$OUT/run.log"
+# Amendment 24: full command trace to a served file; the HTTP server is started by the pod's start
+# command before this script runs (python3 is in the image), so a stall anywhere below is visible.
+PS4='+ $(date -u +%T) '; exec 2>>"$OUT/trace.log"; set -x
+pgrep -f 'http.server 8080' >/dev/null || ( cd "$W/serve" && python3 -m http.server 8080 --bind 0.0.0.0 >"$OUT/http.log" 2>&1 ) &
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -qq >"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt update exit=$?" >>"$OUT/run.log"
+apt-get install -y -qq jq curl git >>"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt base exit=$?" >>"$OUT/run.log"
+apt-get install -y -qq build-essential pkg-config libssl-dev time >>"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt build tools exit=$?" >>"$OUT/run.log"
 # USD 100 hard cap: deadline = min(36 h, floor(100 / costPerHr) h) from start
+{ set +x; } 2>/dev/null
 COST=$(curl -sS -m 60 -H "Authorization: Bearer ${POD_CTL_KEY:-}" "https://rest.runpod.io/v1/pods/${RUNPOD_POD_ID:-x}" | jq -r '.costPerHr // empty')
+set -x
 HRS=$(awk -v c="$COST" 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(100 / c); print (h < 36 ? h : 36) }')
 [ "$HRS" -gt 0 ] || { HRS=${MAX_HOURS_FALLBACK:-18}; COST="unread (fallback limit ${HRS} h)"; }
 DEADLINE_EPOCH=$(( T0 + HRS*3600 ))
@@ -36,10 +47,11 @@ if ! command -v cargo >/dev/null; then
   curl -sSf https://sh.rustup.rs -o "$W/rustup.sh" && sh "$W/rustup.sh" -y --profile minimal >"$OUT/rustup.log" 2>&1 || finish "rustup_failed"
   . "$HOME/.cargo/env"
 fi
-rustc --version >>"$OUT/host.txt"
+rustc --version >>"$OUT/host.txt"; log "rust ready"; pack
 # --- source: sparse partial clone of the frozen commit (Amendment 20, G-src-a/b/c)
 S=research/fall_degree_bounds_20261008
-curl -sS -m 120 -o "$W/source_paths.txt" "https://raw.githubusercontent.com/isogeny-labs/crypto/$SRC_COMMIT/$S/e13/source_paths.txt" || finish "paths_download_failed"
+# Amendment 26: the path list postdates the frozen commit; fetch it from PATHS_COMMIT (hash-pinned by PATHS_SHA256)
+curl -sS -m 120 -o "$W/source_paths.txt" "https://raw.githubusercontent.com/isogeny-labs/crypto/${PATHS_COMMIT:-43438f5ab6eb6d1844b8d0465c933ad079099326}/$S/e13/source_paths.txt" || finish "paths_download_failed"
 echo "$PATHS_SHA256  $W/source_paths.txt" | sha256sum -c - >>"$OUT/run.log" 2>&1 || finish "G-src-b_failed"
 cd "$SRC" && git init -q . && git remote add origin https://github.com/isogeny-labs/crypto.git \
   && git sparse-checkout init --no-cone && git sparse-checkout set --stdin <"$W/source_paths.txt" \
@@ -47,7 +59,7 @@ cd "$SRC" && git init -q . && git remote add origin https://github.com/isogeny-l
 [ "$(git rev-parse HEAD)" = "$SRC_COMMIT" ] || finish "G-src-a_failed"
 TREE=$(git ls-tree -r HEAD -- $(tr '\n' ' ' <"$W/source_paths.txt") | sha256sum | cut -d' ' -f1)
 echo "tree $TREE" >>"$OUT/run.log"; [ "$TREE" = "$TREE_SHA256" ] || finish "G-src-c_failed"
-log "source verified $SRC_COMMIT"
+log "source verified $SRC_COMMIT"; pack
 # --- builds
 cargo build --release --example dreg_linear_guess --example hky_par >"$OUT/build.log" 2>&1 || finish "build_failed"
 P=$SRC/target/release/examples/dreg_linear_guess; H=$SRC/target/release/examples/hky_par
@@ -64,25 +76,25 @@ g1() { # threads -> wall seconds; output in g1_<threads>.jsonl
   diff <(jq -c "$k" research/dreg_invariant_guess_20261029/runs/S3.d0.b4.jsonl) <(jq -c "$k" "$OUT/g1_$th.jsonl") >"$OUT/g1_$th.diff" || return 2
   echo $(( $(date +%s) - s ))
 }
-log "G1 (64 threads)"
-T64=$(g1 64) || finish "G1_failed"
+log "G1 (32 threads)"
+T32=$(g1 32) || finish "G1_failed"
 # --- G2: hky_par reproduces the E10 (3,21,7) records at degree 4
 log "G2"
-RAYON_NUM_THREADS=64 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4 >"$OUT/g2.jsonl" 2>"$OUT/g2.err" || finish "G2_exit"
-k2='{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree}'
+RAYON_NUM_THREADS=32 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4 >"$OUT/g2.jsonl" 2>"$OUT/g2.err" || finish "G2_exit"
+k2='{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}'   # Amendment 27: timings excluded
 diff <(jq -c "$k2" $S/e10/run-r3-B/out/E_3-21-7.jsonl) <(jq -c "$k2" "$OUT/g2.jsonl") >"$OUT/g2.diff" || finish "G2_differs"
-# --- G3: pe scaling pilot (8, 16 threads; 64 from G1)
+# --- G3: pe scaling pilot (8, 16 threads; 32 from G1; Amendment 25: 32 vCPU is the provider maximum)
 log "G3"
 T8=$(g1 8) || finish "G3_failed_8"; T16=$(g1 16) || finish "G3_failed_16"
-TH_PE=64; T_PE=$T64
+TH_PE=32; T_PE=$T32
 [ "$T16" -lt "$T_PE" ] && { TH_PE=16; T_PE=$T16; }
 [ "$T8" -lt "$T_PE" ] && { TH_PE=8; T_PE=$T8; }
-printf '{"t8":%s,"t16":%s,"t64":%s,"th_pe":%s,"t_pe":%s}\n' "$T8" "$T16" "$T64" "$TH_PE" "$T_PE" >"$OUT/g3.json"
+printf '{"t8":%s,"t16":%s,"t32":%s,"th_pe":%s,"t_pe":%s}\n' "$T8" "$T16" "$T32" "$TH_PE" "$T_PE" >"$OUT/g3.json"
 log "gates passed; pe threads $TH_PE ($T_PE s at 140k columns)"; pack
 TIMEV=""; [ -x /usr/bin/time ] && TIMEV="/usr/bin/time -v"
 # --- E14a: hky_par degree-5 closure at (3,21,7); 12 h without a finished draw -> killed
-log "start A_3-21-7 (hky_par cmax 5, 64 threads)"; sA=$(date +%s)
-( $TIMEV env RAYON_NUM_THREADS=64 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 5 >"$OUT/A_3-21-7.jsonl" 2>"$OUT/A_3-21-7.err"; echo "exit=$?" >>"$OUT/A_3-21-7.err" ) &
+log "start A_3-21-7 (hky_par cmax 5, 32 threads)"; sA=$(date +%s)
+( $TIMEV env RAYON_NUM_THREADS=32 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 5 >"$OUT/A_3-21-7.jsonl" 2>"$OUT/A_3-21-7.err"; echo "exit=$?" >>"$OUT/A_3-21-7.err" ) &
 APID=$!
 while kill -0 $APID 2>/dev/null; do
   sleep 60
