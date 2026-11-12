@@ -230,6 +230,10 @@
    "path": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
    "sha256": "41b2bcd995ec15956deaa3630278dbf5aac68c02be9b1f38f81c1045320765c1"
   },
+  "jv_sieve_line_vs_rho": {
+   "path": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+   "sha256": "0a83239fe76f0502abba05bea81c4e3f2deafe3e6c0b4cbd3b562821d5c56501"
+  },
   "d4_char2_m12": {
    "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
    "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
@@ -337670,6 +337674,186 @@
   "report": "research/ic_cover_weakclass_20261023/REPORT.pdf",
   "source": "research/ic_cover_weakclass_20261023/summary.json",
   "validation": "validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)",
+  "validated": true
+ },
+ "jv_sieve_line_vs_rho_component": {
+  "rows": [
+   {
+    "arm": "P",
+    "scope": "p=1009",
+    "s": 0.0655539187151,
+    "lo": 0.0456320120172,
+    "hi": 0.095642256794,
+    "band": [
+     0.0655539187151,
+     0.360136160222,
+     0.37773649205
+    ],
+    "band_hi": 0.535019309018,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "p=1511",
+    "s": 0.0177305888539,
+    "lo": 0.0134586055363,
+    "hi": 0.0246184001338,
+    "band": [
+     0.0177305888539,
+     0.132812786411,
+     0.139679305028
+    ],
+    "band_hi": 0.185019036199,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "p=1823",
+    "s": 0.0124697020568,
+    "lo": 0.0103038234838,
+    "hi": 0.0156697529965,
+    "band": [
+     0.0124697020568,
+     0.0915106956848,
+     0.0962333170502
+    ],
+    "band_hi": 0.108795750427,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "pooled",
+    "s": 0.0243814369733,
+    "lo": 0.0206242795361,
+    "hi": 0.029211410898,
+    "band": [
+     0.0243814369733,
+     0.163578476241,
+     0.171876098955
+    ],
+    "band_hi": 0.200297877312,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1009",
+    "s": 0.031444072554,
+    "lo": 0.0239179616109,
+    "hi": 0.0435132757989,
+    "band": [
+     0.031444072554,
+     0.167474162514,
+     0.17560694896
+    ],
+    "band_hi": 0.235815238091,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1511",
+    "s": 0.0124458385197,
+    "lo": 0.00990341401228,
+    "hi": 0.0165114055796,
+    "band": [
+     0.0124458385197,
+     0.0749911373646,
+     0.0787343743116
+    ],
+    "band_hi": 0.103585209947,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1823",
+    "s": 0.00935252854054,
+    "lo": 0.00784441623607,
+    "hi": 0.0112668074913,
+    "band": [
+     0.00935252854054,
+     0.0596346041697,
+     0.0626404585689
+    ],
+    "band_hi": 0.0684369619791,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "pooled",
+    "s": 0.0154109944692,
+    "lo": 0.0134819723036,
+    "hi": 0.0180146132027,
+    "band": [
+     0.0154109944692,
+     0.090813838352,
+     0.0953206515249
+    ],
+    "band_hi": 0.109342741029,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1009",
+    "s": 0.030627281014,
+    "lo": 0.0224057375407,
+    "hi": 0.043953054463,
+    "band": [
+     0.030627281014,
+     0.157732188289,
+     0.165322067149
+    ],
+    "band_hi": 0.224520858806,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1511",
+    "s": 0.0114790066189,
+    "lo": 0.00853370191629,
+    "hi": 0.016041517393,
+    "band": [
+     0.0114790066189,
+     0.0711443618248,
+     0.0747083958451
+    ],
+    "band_hi": 0.0990789905816,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1823",
+    "s": 0.00805786451023,
+    "lo": 0.00735042810788,
+    "hi": 0.00884030110609,
+    "band": [
+     0.00805786451023,
+     0.0560590814556,
+     0.0589320061384
+    ],
+    "band_hi": 0.0613590987925,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "pooled",
+    "s": 0.0141496024091,
+    "lo": 0.0122283213378,
+    "hi": 0.0167371308959,
+    "band": [
+     0.0141496024091,
+     0.0856844995776,
+     0.0899533112196
+    ],
+    "band_hi": 0.103303142808,
+    "below": true
+   }
+  ],
+  "class": "transfer (weak class only)",
+  "walk_note": "The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. That charge covers starts within the implemented walk's reach: from a random admitted curve it reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route.",
+  "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+  "study": "research/jv_sieve_line_vs_rho_20261103/",
+  "report": "research/jv_sieve_line_vs_rho_20261103/REPORT.pdf",
+  "source": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+  "validation": "validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)",
   "validated": true
  },
  "d4_char2_frob_roots_component": {
