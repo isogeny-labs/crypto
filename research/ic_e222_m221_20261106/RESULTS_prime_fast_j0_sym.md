@@ -100,3 +100,16 @@ at 26 bits it ties `rho_parallel`. So no valid automorphism-aware matched rho ex
 Phase timing added to `examples/prime_fast_j0_multi.rs` (28 bit, B=159, 20 targets, 2 curves, all targets verified): setup 23-28 ms = orbit pair table 6-7 ms + relation collection 16-22 ms + Gauss-Jordan 0.5 ms; `ic_multi_solve_ex` setup (batched, bucketed) 31-35 ms. The setup is collection-dominated (about 400 unbatched scans of 3B candidates), not elimination.
 Tried: exact-x keys for all three rotations of each entry (`ROTKEYS=1`, no canonicalisation at probe): table build +30%, collection unchanged within noise; sym/base setup ratio 0.76 (canonical) vs 0.92 (rot keys), 24 runs each: no gain. A B sweep (100,159,230,330) was inconclusive: the same baseline config varied 25-45 ms setup between runs (host noise ~1.8x), so no setup-optimal B is claimed.
 Lever left: a lock-step batched per-scan collector for the symmetric arm (as `collect_setup_batched` does for the plain arm) needs a quiet host to measure; nothing measured here beats noise.
+
+## Experiment: setup-optimal B for the symmetric multi-target arm (2026-11-11/12) — `[pcc:unverified]`
+28 bits, T=20, 2 curves, interleaved rounds (5 rounds x 3 B values, 20 rows per B, all targets verified in both arms; `ic_multi_solve_ex` c=0.5 as the in-run noise reference):
+
+| B | sym setup ms (table / collection) | baseline setup ms | sym/baseline setup (median of per-run ratios) |
+|---|---|---|---|
+| 159 | 19.5 (5.7 / 13.4) | 26.6 | 0.73 |
+| 190 | 20.9 (7.8 / 12.1) | 26.3 | 0.73 |
+| 230 | 22.4 (11.6 / 10.6) | 25.9 | 0.86 |
+
+Reading: collection falls roughly as 1/B and the table build grows as B^2, so the setup is flat between B=159 and 190 and worse above; the balance point is at B ~ p^(1/3) x 0.25-0.3, as in the single-target tuning. Setup is
+about 1.37x lower than the batched baseline's. A lock-step batched collector would not help: one inversion per scan is about 2% of a scan's cost (3B multiplications dominate), unlike the plain arm whose per-target step is cheap. So the symmetric
+setup cost is bounded by about 0.73x of the baseline's here; no further constant is visible without changing the relation yield. Not a holdout run; no claim.
