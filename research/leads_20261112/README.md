@@ -40,7 +40,7 @@ is a lower bound on F4 work; enumeration priced at one unit per tuple (a quadrat
 
 ## 2. Proposals
 
-Three `idea-generator` lanes (Sonnet) and one `idea-synthesist` (Opus) worked from the same briefing; I read every
+Three `idea-generator` lanes (Sonnet) and one `idea-synthesist` (Opus) worked from the same briefing (the fourth lane, Koblitz and binary, is §2e); I read every
 record and re-derived the numbers I quote. Lane reports are in `lanes/`. Every claim below is `[pcc:unverified]`.
 "Nearest existing" names the closest atlas or sweep id; bodies of the atlas were not readable.
 
@@ -135,6 +135,40 @@ evaluation-matrix kernel (12,951 monomials and 665 s at D = 5, k = 12, against a
 presentations (Kummer, coset, t = 0, map image, Dickson, Vélu) at D = 3, 4, 5. A kill screen, not a certificate; every
 future prime-field base proposal would report its closedness depth at intake.
 
+
+### 2e. Koblitz curves and binary fields (open cell D4)
+
+Lane finding first (`research/ecbench_pair_claw_20261003/README.md`, `research/subgroup_trap_20261107/README.md`):
+the Koblitz rows sit against a generic floor. The pair claw, with no relation phase at all, is 2.195× matched rho
+pooled over six Koblitz curves (2.51× at f2m41), while the orbit-IC arm is 18.16× at n41 with relations 69–77% of
+its cost and no linear-algebra phase to speak of. Any two-summand scheme has exponent 2/3 (derived), so no fold,
+table layout or linear-algebra trick changes the class; only an algebraic decomposition with four or more summands
+can, and Koblitz curves proper are excluded from that route by the group-order trap (a curve over F_2 on F_{2^{dm}}
+has prime-order part at most about Q^{φ(d)}, so rho costs about Q and no Gaudry line wins). The family where a fold
+helps is E/F_16 with j ∉ F_4, n = 4k, k odd: a weak class, not Koblitz. The flat binary degree at m = 2 is worth
+nothing on its own for the same reason (no exponent below 2/3 at m = 2).
+
+**K1 `LEAD-KOB-fold-twisted-line-d4`.** On E/F_16 with Q = 2^k, the twisted line θ·F_Q (θ ∈ F_16 ∖ F_4) is stable
+under the order-k F_16-Frobenius; folding identifies the k points of each orbit, so the relations needed fall by k
+at unchanged per-relation cost (`research/c1_twisted_line_ladder_20261027`: same yield 1.024 and per-trial cost
+0.961 as the standard line, no fold, no end-to-end run). Against a matched rho that itself gains √(2k) on this class,
+folded IC predicts R0/√k, i.e. about 1.34 [0.62, 3.9] × rho at m = k = 15 instead of 5.2, moving the crossover from
+m* ≈ 17.6 to about 15.5 [14.2, 17.1]; unfolded IC would be R0·√k, so the fold is needed just to keep pace. Cheapest
+test: relations-to-full-rank counts at k = 5, 7, 9 in the existing Rust ladder, predicted folded/unfolded 0.27, 0.17,
+0.11–0.12 (±25%). Prerequisites: a matched-rho arm with base-field exponent 16 and a general-a₁ path in
+`gaudry_quartic_bin.rs`. Whether GGMP (eprint 2020/1315) already folds Gaudry-type lines could not be confirmed
+(paper fetch returned 403); the literature check is owed.
+
+**K2 `LEAD-KOB-flat-degree-crossover-bar`.** Price flatness: under a flat F_2 closure degree the m = 4 Weil-descent
+IC crosses rho-frob at n* ≈ 205, 280, 345 for D = 4, 5, 6 (derived, ±30), and at n = 163 with D = 4 it is still
+about 190× above rho. The premise that matters is whether m = 3 and m = 4 square systems stall at D ≤ 4; test with a
+native GF(2) closure at degree ≤ 4 on N = 27, 30, 33 (m = 3) and 24, 28, 32 (m = 4); registered prior of flatness
+0.15. Pairs with M1 (prime m = 3) as one arity grid.
+
+**K3 `LEAD-KOB-fold-twisted-line-d3`.** The same fold at Gaudry n = 3 over F_8, linear-algebra-bound; one unknown
+decides it (cost of one solve × trials per relation ≤ 3.8·10⁴ F_Q multiplications at k = 13), and the scaling guess
+is about 30× over that threshold. Expected clean negative; run only after K1's fold audit. Prior about 0.1.
+
 ### 2d. Main-session items not covered above
 
 **M1 arity grid at m = 3 (prime).** Certified LFD(k) for three-summand μ_{2^k} chains at k = 3..7 with the existing
@@ -146,15 +180,87 @@ measured row. Nearest: `LEAD-ICP-full-width-arity-grid`.
 **M2 free-extension solver.** Subsumed by P2 (the lift seeded from the free extension) and S3.
 
 ## 3. Ranking and next steps
+ [pcc:unverified]
+Ranked by decisiveness per unit cost, then by the size of the measured improvement it could produce. No proposal is
+predicted to beat matched rho; the measured improvements in reach are engineering-class, and the value of the top
+tier is that each one closes or narrows an open cell for a few CPU-hours.
+
+| # | lead | cell | what it decides | cost | predicted measured outcome |
+|--:|:--|:--|:--|:--|:--|
+| 1 | S1 char-and-generator crossing | 0.1, binary | whether locality (one equation, large characteristic) is what makes the prime law; which of L / Dm / F / S explains prime vs binary | ≤ 35 CPU-h, existing engine | pattern on 5 cells; any outcome is informative |
+| 2 | P1 quotient law, stages 0–1 | 0.1 | a slope-free size floor (about 3B per target) for closure-type solvers | 30 min desk + 2 CPU-h | q/B in [2.5, 6.0] out of sample; demotes 0.1 to engineering |
+| 3 | J2 percolation factor-base size | E6 ratchet row | threshold law c_50 ≈ 1.55; first test of HEUR-RELATION-RANK on a scaling family | < 1 h local, 54 units | DL1 × 0.77 at c = 1.75, × 0.65 adaptive (engineering) |
+| 4 | J1 quartic DL1 on cofactor-one Jacobians | E6 / Tian route | family independence of the only closest-to-rho non-sieve solver | about 1 h local | exponent 1.00 [0.93, 1.10]; gates J3 |
+| 5 | M1 + K2 arity grid at m = 3, 4 | 0.1, binary | turns the §1 entropy bar into measured rows; whether m ≥ 3 systems stall at D ≤ 4 | CPU hours; native GF(2) closure for K2 | prime: m = 3 closes (one record already above the line); binary: flatness prior 0.15 |
+| 6 | K1 twisted-line fold, Gaudry n = 4 | D4 neighbourhood (weak class over F_16) | whether the fold moves the IC/rho crossover from m* ≈ 17.6 to about 15.5 | 1–2 days (rho arm, a₁ path), then minutes | folded/unfolded relations 0.27 / 0.17 / 0.11 at k = 5 / 7 / 9 |
+| 7 | S3 no-wrap closedness screen | all prime-field bases | a closure-free kill criterion for bounded LFD; intake metric for future proposals | ≤ 5 CPU-h tier 1; tier 2 after the tower port | Vélu row is the measured one |
+| 8 | S2 Vélu tower exact LFD | 0.2 | the open solver axis of 0.2 and whether the prime law is presentation-free | tower port 1–2 days; ≤ 22 CPU-h; stage 2 about $24–95 GPU | prior for "same law" raised by the encyclopedia's F4 degrees |
+| 9 | P2 free-extension lift to k = 18 | 0.1 slope | first data past k = 15; stage 3 (1 ∉ V_7(18)) is the only measurement that could reopen 0.1 on slope | about 6 H200-h stage 1, more for lifts | plateau of four confirmed (about 0.9) |
+| 10 | P3 radix presentation | 0.1 | matrix-size gain without degree gain | cheap at k ≤ 12 | null for ECDLP cost |
+| 11 | J3 Tian transport to a quartic | non-weak classes | the only mechanism that reaches prime-order curves | census hours; isogeny engine weeks | start only after J1 |
+| 12 | J4, P5, K3 | k = 4 covers; A12; n = 3 fold | model tests and paper closures | hours each | low prior or expected negative |
+
+Next steps for the top tier, in the lab's tiers (AGENTS.md "Model tiers"; the director freezes the card, the
+executor runs it unchanged, the director assesses):
+
+1. **S1.** Frontier: freeze the instance lists, the four-hypothesis scoring rule and the multi-input decision (2 h).
+   Director: card for arms (a)–(d), k = 4..10, D ≤ 5, D = 6 only for unit certification; resume checkpoint first.
+   Executor: ≤ 35 CPU-h on isolab-eks. Director: score the pattern table, visuals. If S wins, the binary
+   multiplicative-base cell (μ_{3^k} cubing tower over F_{2^n}) is the follow-up card.
+2. **P1.** Director: stage 0, recompute the 12 committed q values with a native tool (30 min). Executor: stage 1,
+   D = 3, 4 on three fresh primes, k = 2..9 (2 h). Frontier: write the length-Θ(B) scheme conjecture as a checkable
+   statement and compare with q at D = 4. Stage 2 (D = 6 at k = 15 on a GPU) only if stages 0–1 hold and the owner
+   authorises the rented-GPU route.
+3. **J2.** Director: freeze the c × k grid and the instrumentation fields; confirm c = 1.75 is not already on disk
+   as a first attempt. Executor: 54 units locally with the resume checkpoint. Director: fit the success curve and
+   the paired cost ratios; the validation gate is requested only after a held-out rerun at k = 21, 22 against the
+   frozen rho records.
+4. **J1.** Frontier: read the N4v2 entry points and state whether (C, P, Q, l) can be passed without the GHS builder
+   (1 h). Director: card with the generator, k = 12..18, controls C1–C5 and the rho_E price rule. Executor: k ≤ 16
+   locally, k = 17, 18 if memory allows. Director: ratio table against both references at w = 0, 0.1, 1.
+5. **M1 + K2.** Director: one card for the prime m = 3 cells (k = 3..7, existing engines) and the binary m = 3, 4
+   cells (native GF(2) closure at degree ≤ 4, to be written in Rust per AGENTS.md). Pass line for the prime side:
+   LFD/k against the §1 table at ω = 2 and 2.81.
+
+Before any of these becomes a task card: the `research-kb` pass (`kb_status`, `search_knowledge` with the negative
+form, `search_theorems`) and a read of the atlas bodies for the nearest ids named in each record. Both were
+unavailable here.
 
 ## 4. Proposed atlas verdict changes (proposals only)
 
 - 0.1 Kummer g·μ_{2^t}: "open" → "open only for m ≥ 3 with LFD/k < 0.184, or slope < 0.083 at m = 2" (§1).
 - C5 trace-zero: today's k = 11 binary measurement (LFD 5, every law) is consistent with "engineering".
+- 0.2 Isogeny tower x(R'+⟨Q⟩): "open" → "open on the solver axis only; S2 decides whether its graded algebra
+  changes the degree law". Lane P's P4 reading of 0.2 was a misreading and is withdrawn.
+- E3 P-192 CM class ideals: "open" → "closed by structure" once `cm_closed_walk_scalar_action` is written: a closed
+  class walk acts as one scalar on P and Q.
+- D4 cyclotomic (Koblitz): "open" → "engineering; the two-summand floor is exponent 2/3 and Koblitz curves proper are
+  excluded from the m ≥ 4 Gaudry route by the group-order trap" (lane K; the fold K1 lives on the weak class over F_16).
 - A4 subgroup/coset: if its refutation is cited through the fall degree, the coset case of the k + 2 bound is written
   only, not kernel-checked.
 
 ## 5. Considered and not proposed
+ [pcc:unverified]
+Each lane file lists its rejections with reasons. The ones worth repeating because they recur in proposals:
+Hilbert early stop on the prime Kummer chain (not a complete intersection; P2 covers the instance-independence);
+dual or inverse-system closure (constants only); target-adapted base translation (breaks the shared base);
+steering to exceptional targets (about p candidates per hit); additive, arithmetic-progression or interval bases in
+the chain presentation (A4, A9 refuted; F_p has no additive subgroups); large-prime variants on prime fields (a
+birthday search with rho's exponent); the claw on the Koblitz panel (already measured, floor 2.26×); SAT/XOR
+hybrids (no exponent change); Z[τ], halving and Verschiebung classes (about one addition per class element);
+multi-line factor bases (not one algebraic system); base change to F_{p^12} (loses at every size); the pairing
+with E3 as a "two-for-one" with 0.2 (no shared lever: every LFD input is invariant under moving the target in its
+isogeny class, and A11 already recorded "solving degree does not differ").
 
 ## Sources checked
+
+Repository paths are quoted in each lane file and above; the ones every section rests on:
+`docs/ic/factor-base-encyclopedia/README.md` (§0.1, §0.2, A10–A13, D4, E2–E6), `docs/ic/LEADERBOARD.md`,
+`docs/ecdlp-hardness-corpus/ATTACK_GRAPH.md` and `WEAKNESSES.md`, `research/leads_20261111/` (PR #3938),
+`research/ecbench_pair_claw_20261003/README.md`, `research/quartic_n4v2_20261020/`,
+`research/weil_restriction_isogeny_census_20261018/REPORT.md`, `research/c1_twisted_line_ladder_20261027/`,
+`research/subgroup_trap_20261107/README.md`; ml-cryptanalysis `docs/proofs/N8-growth.md`, `U1-upper-bounds.md`,
+`experiments/ic-bounds-k14/RESULTS.md`, `experiments/ic-bounds-binary-deep/PLAN.md`; the atlas ids
+(`atlas_lead_ids.txt`). Web: Garcia–Voloch 1987 and Voloch 1985 (for the growth draft's Theorem 3.1); GGMP eprint
+2020/1315 abstract only. `research-kb`: not reachable (no MCP server, no CLI executable in this container).
 
