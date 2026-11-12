@@ -12,14 +12,15 @@ No claim here is independently validated: `[pcc:unverified]` throughout.
 ## Results (one line each, then the tables)
 
 All rows: `rows/*.json`, laid out in `TABLE.md`; graphs `treewidth_vs_bits.svg`, `exponents_vs_bits.svg`;
-report `REPORT.pdf`. Schoolbook networks were measured at b = 8–36 (40 in a reduced run if present in
-`rows/`), Fourier networks at b = 8–24 (plus S3 at 28 and 36 if present): the 2-hour runtime budget of the
-sweeps cut the rest, said so here rather than extrapolated.
+report `REPORT.pdf`. Schoolbook networks were measured at b = 8–40 for all four relations (the 40-bit
+rows with one restart, because the first sweep reached its 2-hour budget after 36 bits); Fourier networks
+at b = 8–24 for all four relations and S3 alone at 28 and 36 (that sweep reached the budget after 24 bits).
 
 1. **The encoding is the bottleneck, not the solver.** The treewidth *lower* bound — what no elimination
    order can beat — exceeds the enumeration/rho exponent b/2 by 4–5× at every size and grows about
    2 per bit against 0.5 per bit for enumeration **[bound, measured]**: schoolbook S3 lb = 22, 39, 53, 69,
-   74 at b = 8, 16, 24, 32, 36 (b/2 = 4, 8, 12, 16, 18); hashed group law lb = 27, 48, 67, 84, 95. So
+   74, 81 at b = 8, 16, 24, 32, 36, 40 (b/2 = 4, 8, 12, 16, 18, 20); hashed group law lb = 27, 48, 67,
+   84, 95, 104. So
    even a treewidth-optimal exact contraction costs at least 2^{~2b} on these graphs, against 2^{b/2}
    for enumerating one slot. No solver that treats the bit-level network as a Boolean tensor network
    can reach enumeration, let alone rho.
@@ -38,8 +39,8 @@ sweeps cut the rest, said so here rather than extrapolated.
    still far from 1 **[measured, derived]**.
 5. **The Fourier gadget is the worst choice for a structure-exploiting solver.** Its transform vertex is a
    clique of 132 (b ≤ 12), 260 (b = 16–32) or 520 variables, so the width is set by the multiplier, not
-   the relation: lb 139–405 and ub 181–870 at b = 8–24 for every relation **[bound, heuristic]**, i.e.
-   35–60× b/2. The O(b)-edge encoding minimises s (what the generic bound charges) by maximising
+   the relation: lb 139–405 and ub 181–870 at b = 8–24 for every relation, and for S3 lb 788 / ub 1,477
+   at b = 36 once the 520-variable transform applies **[bound, heuristic]**, i.e. 35–60× b/2 (44× at 36). The O(b)-edge encoding minimises s (what the generic bound charges) by maximising
    width (what a decomposition pays). s grows with slope 1.2 in log–log for Fourier against 1.8 for
    schoolbook **[derived]**, as the audit's gadget count predicts.
 6. **Contraction cost tracks the widest bag**: log₂ of the exact table work along the best order is the
