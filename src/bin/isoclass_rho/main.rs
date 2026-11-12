@@ -241,7 +241,7 @@ fn cmd_walk(o: &Opts, command: String) {
         if !(5..1 << 62).contains(&p) || !field::is_prime(p) {
             die("--curve needs a prime 5 <= p < 2^62");
         }
-        let f = Fp { p };
+        let f = Fp::new(p);
         let e = Curve { a: a % p, b: b % p };
         if f.ec_j(&e).is_none() {
             die("singular curve");
@@ -342,9 +342,7 @@ fn cmd_measure(o: &Opts, command: String) {
         let f = F2m::new(m, poly);
         measure::run_measure(&f, &w, &params, &out);
     } else {
-        let f = Fp {
-            p: field["p"].as_u64().unwrap(),
-        };
+        let f = Fp::new(field["p"].as_u64().unwrap());
         measure::run_measure(&f, &w, &params, &out);
     }
 }
@@ -384,7 +382,7 @@ fn selftest(seed: u64) {
 
     // ---- prime field
     let p: u64 = 1090993606999;
-    let f = Fp { p };
+    let f = Fp::new(p);
     let c = Curve {
         a: 690282649366,
         b: 1050606678233,
@@ -929,7 +927,7 @@ mod tests {
         // E: y² = x³ + 4x + 2 over F₅ has three points.  The incorrect
         // candidate 6 is still Hasse-admissible and kills every point, so
         // an annihilator-only check cannot distinguish it.
-        let f = Fp { p: 5 };
+        let f = Fp::new(5);
         let curve = Curve { a: 4, b: 2 };
         let mut rng = SmallRng::seed_from_u64(1);
         assert_eq!(search::group_order(&f, 5, &curve, &mut rng), Some(3));
