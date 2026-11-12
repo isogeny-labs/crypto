@@ -21455,7 +21455,7 @@ mod tests {
                 idxs.iter().enumerate().map(|(p, &i)| (i, p)).collect();
             let adjacent = idxs
                 .iter()
-                .filter(|&&i| twin[i].map_or(false, |t| (t as isize - i as isize).abs() == 1))
+                .filter(|&&i| twin[i].is_some_and(|t| (t as isize - i as isize).abs() == 1))
                 .count();
             let mut same_block = 0usize;
             for shift in 0..8usize {
