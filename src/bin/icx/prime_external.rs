@@ -25,7 +25,7 @@ pub(super) fn generate_route(args: &PrimeRouteGenerateArgs) -> Result<Value, Str
 
 #[derive(Args)]
 pub struct PrimeArgs {
-    /// Prime field modulus (5..=40000000).
+    /// Prime field modulus (5..=2^50; above 40000000 `group_order` is required).
     #[arg(long)]
     p: u64,
     /// Short-Weierstrass coefficient a.
@@ -75,6 +75,11 @@ pub struct PrimeArgs {
     /// calculus counters. Zero (default) skips it.
     #[arg(long, default_value_t = 0)]
     matched_rho_runs: usize,
+    /// The order of the whole curve group, for a prime `p` too large to count points
+    /// by brute force (above 4e7 it is required; at or below, if given, it must equal the count).
+    /// The Hasse bound and `n | order` are checked; correctness of the order is the caller's.
+    #[arg(long)]
+    group_order: Option<u64>,
 }
 
 #[derive(Args)]
@@ -125,6 +130,8 @@ struct PrimeTargetInput {
     gy: u64,
     qx: u64,
     qy: u64,
+    #[serde(default)]
+    group_order: Option<u64>,
 }
 
 pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
@@ -152,6 +159,7 @@ pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
         gy: target.gy,
         qx: target.qx,
         qy: target.qy,
+        group_order: target.group_order,
         fb_size: args.fb_size,
         extra_relations: args.extra_relations,
         max_trials_per_relation: args.max_trials_per_relation,
@@ -203,12 +211,18 @@ pub(super) fn count_curve_order(p: u64, a: u64, b: u64) -> u64 {
     order
 }
 
+/// Largest prime field (and subgroup order) accepted: trial-division primality is about 2^25 steps here.
+const MAX_PRIME_FIELD: u64 = 1 << 50;
+/// Largest field whose point count is done by brute force.
+const COUNTABLE_FIELD: u64 = 40_000_000;
+
 pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
-    if !(5..=40_000_000).contains(&args.p) || !prime(args.p) {
-        return Err("p must be prime and in 5..=40000000".into());
+    // Trial-division primality bounds the sizes (about 2^25 steps at 2^50).
+    if !(5..=MAX_PRIME_FIELD).contains(&args.p) || !prime(args.p) {
+        return Err(format!("p must be prime and in 5..={MAX_PRIME_FIELD}"));
     }
-    if !(3..=80_000_000).contains(&args.n) || !prime(args.n) {
-        return Err("n must be prime and in 3..=80000000".into());
+    if !(3..=MAX_PRIME_FIELD).contains(&args.n) || !prime(args.n) {
+        return Err(format!("n must be prime and in 3..={MAX_PRIME_FIELD}"));
     }
     if [args.a, args.b, args.gx, args.gy, args.qx, args.qy]
         .iter()
@@ -229,9 +243,36 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
     if (4 * a * a * a + 27 * b * b).is_multiple_of(p) {
         return Err("singular curve: discriminant is zero modulo p".into());
     }
-    let curve_order = count_curve_order(args.p, args.a, args.b);
+    let curve_order = if args.p <= COUNTABLE_FIELD {
+        let counted = count_curve_order(args.p, args.a, args.b);
+        if let Some(given) = args.group_order {
+            if given != counted {
+                return Err(format!(
+                    "group_order {given} differs from the counted order {counted}"
+                ));
+            }
+        }
+        counted
+    } else {
+        // Too large to count by brute force: the caller supplies the group order; only the
+        // Hasse bound and divisibility are checked here.
+        let given = args
+            .group_order
+            .ok_or("p above 40000000 needs group_order (the whole group's order)")?;
+        let slack = 2 * (args.p as f64).sqrt() as u64 + 2;
+        if given.abs_diff(args.p + 1) > slack {
+            return Err(format!(
+                "group_order {given} violates the Hasse bound for p = {}",
+                args.p
+            ));
+        }
+        given
+    };
     if !curve_order.is_multiple_of(args.n) {
-        return Err("subgroup order does not divide the counted curve order".into());
+        return Err("subgroup order does not divide the curve order".into());
+    }
+    if curve_order / args.n > u64::from(u32::MAX) {
+        return Err("cofactor does not fit u32".into());
     }
     let curve = CurveParams {
         name: "external-prime",
@@ -433,6 +474,7 @@ mod tests {
     #[test]
     fn rejects_invalid_prime_and_target() {
         let mut args = PrimeArgs {
+            group_order: None,
             p: 271,
             a: 1,
             b: 19,
@@ -462,6 +504,7 @@ mod tests {
     #[test]
     fn certified_isogeny_route_preserves_public_scalar() {
         let args = PrimeArgs {
+            group_order: None,
             p: 271,
             a: 1,
             b: 19,
@@ -498,6 +541,7 @@ mod tests {
     fn accepts_a_prime_subgroup_with_nontrivial_cofactor() {
         // Independently enumerated: #E(F_17) = 21, and [7](6,7) = O.
         let args = PrimeArgs {
+            group_order: None,
             p: 17,
             a: 2,
             b: 8,
@@ -526,6 +570,7 @@ mod tests {
     fn rejects_other_order_three_subgroup_when_three_divides_cofactor() {
         // E/F_7: y^2 = x^3 + 2 has order 9 and independent 3-torsion.
         let mut args = PrimeArgs {
+            group_order: None,
             p: 7,
             a: 0,
             b: 2,
@@ -554,6 +599,7 @@ mod tests {
     #[test]
     fn seeded_prime_relation_search_replays_counts_and_scalar() {
         let args = PrimeArgs {
+            group_order: None,
             p: 271,
             a: 1,
             b: 19,
@@ -589,6 +635,79 @@ mod tests {
             "trials_per_relation_max",
         ] {
             assert_eq!(first["ic"]["stages"][field], second["ic"]["stages"][field]);
+        }
+    }
+
+    /// A field above the brute-force counting limit (p = 67108859 > 40000000) with the group order
+    /// supplied: recovers the planted logarithm, rejects a missing or Hasse-violating order, and
+    /// rejects a supplied order that disagrees with the count when p is small enough to count.
+    #[test]
+    fn large_field_with_a_supplied_group_order() {
+        let base = || PrimeArgs {
+            group_order: Some(67097977),
+            p: 67108859,
+            a: 52052391,
+            b: 47114804,
+            n: 67097977,
+            gx: 56481491,
+            gy: 3021856,
+            qx: 57454885,
+            qy: 41976207,
+            fb_size: 64,
+            extra_relations: 2,
+            max_trials_per_relation: 2_000_000,
+            max_relation_attempts: 64,
+            seed: Some(5),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+            project_cofactor: false,
+            matched_rho_runs: 2,
+        };
+        let report = solve(&base()).unwrap();
+        assert_eq!(report["status"], "complete");
+        assert_eq!(report["ic"]["scalar"], "44020072");
+        assert_eq!(report["matched_rho"]["all_verified"], true);
+        let mut missing = base();
+        missing.group_order = None;
+        assert!(solve(&missing).unwrap_err().contains("needs group_order"));
+        let mut hasse = base();
+        hasse.group_order = Some(67097977 + 100_000);
+        assert!(solve(&hasse).unwrap_err().contains("Hasse"));
+    }
+
+    #[test]
+    fn small_field_rejects_a_group_order_that_disagrees_with_the_count() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let input = root.join("docs/ic/fixtures/prime271_target_input_20261023.json");
+        let bytes = fs::read(&input).unwrap();
+        let target: PrimeTargetInput = serde_json::from_slice(&bytes).unwrap();
+        let args = PrimeArgs {
+            group_order: Some(target.p + 1),
+            p: target.p,
+            a: target.a,
+            b: target.b,
+            n: target.n,
+            gx: target.gx,
+            gy: target.gy,
+            qx: target.qx,
+            qy: target.qy,
+            fb_size: 8,
+            extra_relations: 16,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            seed: Some(42),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+            project_cofactor: false,
+            matched_rho_runs: 0,
+        };
+        let counted = count_curve_order(target.p, target.a, target.b);
+        if counted != target.p + 1 {
+            assert!(solve(&args)
+                .unwrap_err()
+                .contains("differs from the counted order"));
         }
     }
 

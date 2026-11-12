@@ -100,3 +100,43 @@ at 26 bits it ties `rho_parallel`. So no valid automorphism-aware matched rho ex
 Phase timing added to `examples/prime_fast_j0_multi.rs` (28 bit, B=159, 20 targets, 2 curves, all targets verified): setup 23-28 ms = orbit pair table 6-7 ms + relation collection 16-22 ms + Gauss-Jordan 0.5 ms; `ic_multi_solve_ex` setup (batched, bucketed) 31-35 ms. The setup is collection-dominated (about 400 unbatched scans of 3B candidates), not elimination.
 Tried: exact-x keys for all three rotations of each entry (`ROTKEYS=1`, no canonicalisation at probe): table build +30%, collection unchanged within noise; sym/base setup ratio 0.76 (canonical) vs 0.92 (rot keys), 24 runs each: no gain. A B sweep (100,159,230,330) was inconclusive: the same baseline config varied 25-45 ms setup between runs (host noise ~1.8x), so no setup-optimal B is claimed.
 Lever left: a lock-step batched per-scan collector for the symmetric arm (as `collect_setup_batched` does for the plain arm) needs a quiet host to measure; nothing measured here beats noise.
+
+## Experiment: setup-optimal B for the symmetric multi-target arm (2026-11-11/12) — `[pcc:unverified]`
+28 bits, T=20, 2 curves, interleaved rounds (5 rounds x 3 B values, 20 rows per B, all targets verified in both arms; `ic_multi_solve_ex` c=0.5 as the in-run noise reference):
+
+| B | sym setup ms (table / collection) | baseline setup ms | sym/baseline setup (median of per-run ratios) |
+|---|---|---|---|
+| 159 | 19.5 (5.7 / 13.4) | 26.6 | 0.73 |
+| 190 | 20.9 (7.8 / 12.1) | 26.3 | 0.73 |
+| 230 | 22.4 (11.6 / 10.6) | 25.9 | 0.86 |
+
+Reading: collection falls roughly as 1/B and the table build grows as B^2, so the setup is flat between B=159 and 190 and worse above; the balance point is at B ~ p^(1/3) x 0.25-0.3, as in the single-target tuning. Setup is
+about 1.37x lower than the batched baseline's. A lock-step batched collector would not help: one inversion per scan is about 2% of a scan's cost (3B multiplications dominate), unlike the plain arm whose per-target step is cheap. So the symmetric
+setup cost is bounded by about 0.73x of the baseline's here; no further constant is visible without changing the relation yield. Not a holdout run; no claim.
+
+## Experiment: native x6-folded rho with short-cycle escape (2026-11-12) — `[pcc:unverified]`
+`examples/prime_fast_j0_rho.rs` with `CYCFIX=1`: remember the last 8 canonical x of the walk; when the next point repeats one, leave the cycle with a different table jump
+(coefficients stay exact). 60 targets per curve, 360/360 verified. Median over 60 targets; expected steps sqrt(pi n / 12).
+
+| bits | curve | steps (expected) | folded ms (unbatched, 1 thread) | `rho_parallel` ms (negation, batched) |
+|---|---|---|---|---|
+| 26 | b15 / b17 | 3.7k / 3.1k (4.2k) | 2.1 / 1.9 | 2.8 / 2.9 |
+| 26 | b18 / b22 (fresh) | 4.3k / 3.5k (4.2k) | 2.6 / 2.6 | 3.0 / 3.2 |
+| 28 | b3 / b5 | 8.3k / 8.1k (8.4k) | 4.0 / 3.8 | 3.5 / 3.4 |
+| 30 | b17 / b26 | 14.8k / 16.6k (16.8k) | 5.5 / 6.8 | 4.4 / 4.3 |
+| 30 | b28 / b41 (fresh) | 15.4k / 14.0k (16.8k) | 5.9 / 5.9 | 4.4 / 4.4 |
+
+Without the fix the same walk needed 2x-8x more steps beyond 26 bits (fruitless cycles), so the earlier "no valid folded rho" reading is superseded: the fold reaches the sqrt(pi n/12) step count. Its time is tied with
+`rho_parallel` (unbatched inversion per step; batching would lower it further), so the matched rho for the symmetric IC is min(folded, `rho_parallel`): sym3 / matched rho = 3.5x-5x at 26 bits (8.9-11.6 ms against 1.9-2.6 ms),
+about 21x at 30 bits (93-102 ms against 4.3-4.4 ms). Gap unchanged at 28-30 bits where `rho_parallel` is the matched reference; grows with size. No claim.
+
+## Experiment: fingerprinted linear-probe pair table (2026-11-12) — `[pcc:unverified]`
+Hypothesis: the setup collection (about 70% of the symmetric setup) is memory-bound on the pair-table probe, so a linear-probe slot table with a 32-bit fingerprint (dereference the entry only on a fingerprint match) should cut cache misses.
+`LINPROBE=1` in `examples/prime_fast_j0_multi.rs`; 28 bits, B=159, T=20, 2 curves, 5 interleaved rounds (20 rows per arm), all targets verified in both arms:
+
+| layout | table ms | collection ms | setup ms | sym/baseline setup |
+|---|---|---|---|---|
+| chained (`heads`/`next`) | 6.2 | 13.6 | 20.5 | 0.75 |
+| linear probe + fingerprint | 6.3 | 14.0 | 20.8 | 0.74 |
+
+No difference: the probe is not the bottleneck (the table is about 1-2 MB and cache-resident); the per-candidate field arithmetic is. The symmetric setup stays at about 0.75x of the baseline's. Setup-cost levers tried and exhausted: B retune (flat 159-190), rotated keys (no gain), batched collector (cannot help), fingerprinted layout (no gain).
