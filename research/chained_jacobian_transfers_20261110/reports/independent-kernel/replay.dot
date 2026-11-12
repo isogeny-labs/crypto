@@ -1,0 +1,12 @@
+digraph Replay {
+  rankdir=LR;
+  graph [bgcolor="white",pad="0.15",ranksep="0.45",nodesep="0.4"];
+  node [shape=box,style="rounded,filled",fillcolor="#edf5fc",color="#315c83",fontname="DejaVu Sans",fontsize=11];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#315c83"];
+  input [label="Frozen Psi / Psi2 TSVs\n49 balanced classes each\nT0 / T1 over F101^6"];
+  chart [label="Checked branch chart\nw=L/(x-a), V=y w^3/L\nL=F'(a), all u(a) nonzero"];
+  odd [label="Monic quintic G\nvalid Mumford classes\nK maps to 2W"];
+  legacy [label="Existing generic Cantor\njv_cover::Hyp\nthin FpR trait adapter"];
+  pass [label="Both groups\n2401 additions each\n7-annihilators + inverses",fillcolor="#e6f4e8",color="#39734b"];
+  input -> chart -> odd -> legacy -> pass;
+}

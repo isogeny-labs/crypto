@@ -1,3 +1,42 @@
+# Current — CT24 published1494; C2 norms integration/independent group replay
+
+Consumer CT24 is43a8e80ea4d01c564499e678751f44c51dae5243/tree45203707fffa24911113aad9610c4fe4854b899e,
+readyPR1494 against immediate1493. COMPLETE guard15 passes25native/80ref
+unit+five integrations,one old ignored;source15 exact/archive5383d3/root
+13bdd9. Exact-head focused43125719626 initiallyrunning,nextcheck01:04UTC.
+Do not repeat the completed matrix or move that parent head. [pcc:unverified]
+
+Fresh consumer research/chained-transfer-successor-norms-20261112 starts43a.
+Explicit C2 factory01 passes both norms vs generic onALL12317 classes,
+all exceptions/repeats/infinities/orders/paired sums,0355ab/root562797.
+Production/generic Phi2 graphs/source/geometric filter02 and strictClippy
+pass;full Psi2 generic/source filter03 runs in99781,
+raw/workspace/scratch/ct25-psi2-03.txt. Three exact source02 snapshots in
+consumer evidence. Keep generic Phi2/quarter/naive references;no broad
+whitelist expansion. After actual graphs pass,written C2 specialization,
+full changed guard/report/ready child against1494 remain. [pcc:unverified]
+
+Second existing generic jv_cover Cantor engine now replays BOTH49-point
+Psi/Psi2 groups,all2401 additions each/7-annihilators/inverses. Complete8
+standalone tests/strictClippy03 pass,9ebcf7;source guard permits only identical
+tuple alias/signature repair after retained Clippy02 failure. Current proof
+INDEPENDENT_GROUP_REPLAY_V2.md/40a568 and inspected two-page report explain
+the branch-quintic/Picard bridge. No independent isogeny-map/kernel-membership
+or arbitrary-class replay claim. New7 SuccessorNorms and4 KernelChart Lean
+helpers gate/bindingspass;source census125/geometry partial,1fa370. Standing
+unsigned. Constructor snapshot bb640465 stays unchanged. [pcc:unverified]
+
+Root last publishedecf190beda has focused43123069073 initiallyrunning,
+nextcheck00:43;new root component head will require its ownCI. Parent1488
+00:22 check unchanged success/mergeable on featurebase,nextquiet04:22.
+1493 next00:26;1490quiet03:29/1484quiet01:09. No busyCIwait/feature auto-merge.
+Fresh vault00:10 locked/clean,180714tracked,8edec422a. Frozen forks/root
+archive-clock/oldC findings/S3-livebudget/KB/ecdb limits persist. No benchmark,
+solver,paidjob,checkpointbypass,historyrewrite or canonicalgraph promotion.
+[pcc:unverified]
+
+# Historical checkpoints below — superseded by current section
+
 # Current CT24 — second Phi/Psi chain implemented; final guard15 running
 
 Current prose-lint-clean proof is SUCCESSOR_CHAIN_PROOF_V2.md/6dd50c;

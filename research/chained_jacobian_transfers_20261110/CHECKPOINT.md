@@ -1,3 +1,18 @@
+# Current 2026-11-12 — CT24 published; C2 norms and second-engine replay
+
+CT24 is43a8e80ea/ready1494 against1493,complete25native/80reference unit+
+five integrations/one old ignored,5383d3/root13bdd9. Exact focused43125719626
+initiallyrunning,next01:04. New C2 child starts43a,all12317 norm comparison
+and integrated Phi2 graphs pass;Psi2 generic graphs03 run99781. Read
+SUCCESSOR_CHECKPOINT.md/CT25_PLAN.md;proof/fullguard/report/childPR next.
+Second existing Cantor engine replays both49 groups/all2401 sums,full8/
+strictClippy03 pass9ebcf7;bridge40a568,partial125 source census1fa370.
+Freshvault00:10 locked/clean;admission/frozenfork/KB limits unchanged.
+All scientificstanding unsigned;no measured computational advantage.
+[pcc:unverified]
+
+# Historical checkpoints below
+
 # Current — actual second chain; full consumer guard15 running
 
 Read SUCCESSOR_CHECKPOINT.md/SUCCESSOR_CHAIN_PROOF.md and inspected

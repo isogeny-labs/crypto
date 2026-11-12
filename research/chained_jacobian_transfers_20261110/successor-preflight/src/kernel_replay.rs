@@ -5,6 +5,9 @@ use isogeny_algos::fpr::{FpR, ER};
 use isogeny_algos::poly;
 use std::collections::HashSet;
 
+#[path = "kernel_group_replay.rs"]
+mod group_replay;
+
 fn parse_polynomial(f: &FpR, text: &str, basis: &[ER; 6]) -> Vec<ER> {
     if text == "[]" {
         return vec![];

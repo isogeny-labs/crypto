@@ -1,3 +1,36 @@
+# CT24 current — published43a/ready1494, complete guard15 passes
+
+Consumer43a8e80ea4d01c564499e678751f44c51dae5243/tree45203707fffa24911113aad9610c4fe4854b899e
+is ready1494 against immediate1493. COMPLETE check.sh15 passes25native/
+80reference unit+five integrations,one old ignored,all guards/fmt/strictClippy.
+Exact source15 and full raw/archive SHA256/roundtrip5383d3/root13bdd9 retained.
+Focused43125719626 initiallyrunning,nextcheck01:04;no CI pass inferred.
+[pcc:unverified]
+
+Fresh child research/chained-transfer-successor-norms-20261112 starts43a.
+C2 explicit norm factory01 passes both generic comparisons onALL12317
+classes/all exceptions/repeats/infinities,0355ab/root562797. Integrated
+Phi2 generic/source/geometric filter02/strictClippy pass;Psi2 full generic
+filter03 runs99781,raw/workspace/scratch/ct25-psi2-03.txt. Exact source02
+snapshots retained. Next complete actual graph03,written specialization,
+one complete changed guard/report/ready child against1494. [pcc:unverified]
+
+Separate existing Cantor engine replays both49-point groups/all2401 sums,
+7-annihilators/inverses,full8/Clippy03 pass9ebcf7. Current bridge
+INDEPENDENT_GROUP_REPLAY_V2.md/40a568 and inspected independent-kernel PDF;
+sourcealias guard allows only type-equivalent signature change. Independent
+map-kernel membership/arbitrary-class replay remain open. Seven C2/four
+chart Lean helpers pass,c2aaaa/2026a6;125 written source declarations/partial
+geometry,1fa370. New workflow covers all21 modules/standalone8 with source
+guards;new root exact-headCI remains separate. [pcc:unverified]
+
+Fresh vault00:10 locked/clean;frozen-ledger/admission/KB/ecdb/rootarchive/C
+findings unchanged.1494 check01:04,oldrootecf00:43,1488nextquiet04:22,
+1493next00:26,1490quiet03:29/1484quiet01:09. No benchmark/solver/paidjob,
+rebase/force/rechain or canonicalatlas promotion. [pcc:unverified]
+
+# Historical component checkpoint below
+
 # CT24 current — actual Phi2/Psi2 pass components; final guard15 running
 
 Current prose-lint-clean proof:SUCCESSOR_CHAIN_PROOF_V2.md/6dd50c,

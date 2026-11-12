@@ -36,8 +36,9 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT21 | actual transported Psi;fixed-head retry CI succeeds;unsigned | Continue the accepted target through the actual odd kernel and Richelot transport. | SEVEN_CHAIN_CHECKPOINT.md/PROOF.md;all full geometric/rational/source controls retained. Fixed7c1 retry43113992769 succeeds25/65+three,consumer984027. Initial43097723254 startup_failure/4baafc remains immutable. Ready1488 against1484;frozen-ledger fork blocks bottom-up integration. |
 | CT22 | integrated and complete local checks; unsigned | Direct base-field norms with all exceptional balanced support. | DIRECT_NORMS_CHECKPOINT.md/PROOF.md; both norms agree with generic maps on all12317 C0/C1 classes. Integrated guard06 passes25native/66reference unit+three integrations,one old ignored; all Phi/Psi/source controls and full generic/direct Phi comparisons pass. ConsumerPCCb6af61/3f2084,rootc23653/8eaf58;97 helpers. No measured cost claim. |
 | CT23 | complete/ready1493/exact CI succeeds;unsigned | Closed Richelot fibres and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md;four full12317 domains,actual49-class TSV/2401 sums/Frobenius/dualR0,explicit geometric boundaries. Fullguard25/70+three,1f1423/9f98fd. Exact5d5 focused43114643386 succeeds25/70+three,3c9865;independent flat validity/Frobenius replay retained. |
-| CT24 | actual second Phi/Psi chain component controls pass;finalguard15 running;unsigned | Another nondual7-hop and transported Richelot continuation. | SUCCESSOR_CHECKPOINT.md/GLOBAL_PROOF.md/CHAIN_PROOF.md;both complete12317 Phi2/R2/Psi2 domains,all109/113 source/geometric2/kernel49 controls,6a2cfe/a31794. ActualR2scale50/T2[95,93,43,39,92,17,1];global proof6e531a,two-hop reverse196/inverses104/64,Fp42 composite kernel. Standalone6/flat replay78b6c4,partial114Lean census/cbb605. Full consumer exact-source guard15 running79899;publish ready child against1493 after pass. |
-| CT25 | queued after CT24 publication | Direct C2 endpoint norms with complete generic references and exception controls. | CT25_PLAN.md;explicit C2 factory,all12317 norm comparisons/full Phi2-Psi2 generic graphs,109/113 source controls,fullguard/readyPR. No blind whitelist expansion or measured gain. Admission/livebudget still block matched benchmarks. |
+| CT24 | complete local acceptance,published1494;unsigned | Two consecutive nondual Jacobian seven-transfers overF101. | SUCCESSOR_CHECKPOINT.md/SUCCESSOR_CHAIN_PROOF_V2.md;43a8e80ea ready1494 against1493. Complete25native/80reference unit+five integrations,one old ignored,5383d3/root13bdd9. Both Phi2/R2/Psi2 domains/all109/113 source/geometric controls;reverse196,Fp42 composite kernel. Exact43a focused43125719626 initiallyrunning,next01:04. |
+| CT24a | second existing Cantor replay complete within fixed49-class scope;unsigned | Independently check both exported kernel groups beyond validity/Frobenius. | INDEPENDENT_GROUP_REPLAY_V2.md/40a568;existing generic engine,thin FpR/chart adapter,all2401 sums each/7-annihilators/inverses,full8/strictClippy03 pass9ebcf7. Exact alias-only/source guards;initial02 failure preserved. Four partial KernelChart plus7 C2 helpers bring written census125,1fa370;no independent map-kernel membership/whole-class claim. Inspected two-page report. |
+| CT25 | C2 all-class norms/integrated Phi2 pass;Psi2 full generic graphs running | Direct C2 endpoint norms with genuine generic references and all exceptions. | CT25_PLAN.md;child research/chained-transfer-successor-norms-20261112 starts43a. Factory01 ALL12317/exception controls pass0355ab/562797;Phi2 full generic graphs/source/geometry/strictClippy02 pass. Psi2 generic/source03 runs99781;then exact C2 proof/full changed guard/report/ready child against1494. No cost claim. |
 
 ## Session constraints
 
@@ -52,13 +53,15 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read SUCCESSOR_CHECKPOINT.md and frozen SUCCESSOR_CHAIN_PROOF.md. Full
-consumer guard15 runs in79899;raw/workspace/scratch/ct-successor-complete-15.txt,
-exact source15 frozen. Preserve it;after pass archive/register/publish ready
-child against1493,then CT25_PLAN.md. Component Phi2/R2/Psi2 full domains and
-source/geometric controls already pass;do not mistake them for final guard.
-Parent1488 retry and1493 exact-headCI now succeed;nextchecks00:22/00:26,
-1490quiet03:29/1484quiet01:09Nov12. Root new headCI separate. Frozen forks,
-admission/livebudget/KB/vault limits persist;no benchmark/solver/paidjob,
-rebase/force/rechain/lineage choice or canonicalgraph promotion.
+Read .resume/RESUME.md and SUCCESSOR_CHECKPOINT.md. CT24 is43a/ready1494,
+complete25/80+five guard15/5383d3/root13bdd9;exactCI43125719626 initially
+running,next01:04. New consumer C2 child starts43a,factory all12317 and
+integrated Phi2 graphs pass;Psi2 generic/source03 runs99781 at
+/workspace/scratch/ct25-psi2-03.txt. Preserve exact source02;finish actual
+fullgraphs,proof/fullguard/report/ready child against1494. Separate existing
+Cantor replay8/strictClippy03 and125 partial source census are checkpointed;
+no independent map-membership claim. Root new headCI separate;oldECF00:43,
+1488quiet04:22,1493next00:26,1490quiet03:29/1484quiet01:09. Frozen forks,
+admission/livebudget/KB/ecdb/lockedvault00:10 remain. No solver/benchmark/
+paidjob,force/rebase/rechain/historychoice or canonicalgraph promotion.
 [pcc:unverified]

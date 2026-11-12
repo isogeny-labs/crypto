@@ -1,0 +1,61 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T00:07:18Z",
+ "id": "PCC-20261112-2026a6",
+ "kind": "statement",
+ "producer": {
+  "commit": "ecf190bedaf12fadbe3743136920d464721cd7f2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "005418592216af571d8fc71321cf19a04667b0d6820f6f294ea35fdd3dc0e71d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/KernelChart.lean",
+   "theorem": "KernelChart.quadratic_mobius_identity"
+  },
+  {
+   "decl_sha256": "6ac0d0d9c765eb9dc15a107d69e5d5d92bc1ded83d2461eec569beaff7a73991",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/KernelChart.lean",
+   "theorem": "KernelChart.quadratic_support_cleared"
+  },
+  {
+   "decl_sha256": "1ef296cd332ac671f631f851f398c78317a1174e213cab90a5d4abf4d9538741",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/KernelChart.lean",
+   "theorem": "KernelChart.monic_quadratic_support"
+  },
+  {
+   "decl_sha256": "c0eda684d9dea2246ab3626773bce48ae1e3ec77da69b3f9f07a86848e0642ec",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/KernelChart.lean",
+   "theorem": "KernelChart.ordinate_support_transform"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/kernel-chart-lean-gate-01.txt",
+    "sha256": "2a215c4276d710763e43f258e020923e9d6d99a89e9f7494d10516ab239b8050"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/kernel-chart-lean-build-01.txt",
+    "sha256": "a3cb6c6cd72f0e32ac98dd6654a7df69e3eaee80f333c446728bccc26b78c95a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/kernel-chart-lean-audit-01.txt",
+    "sha256": "766af86617ab46e8dbd28b995a6ab137bccae225b073c786a13648998f881a7a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned partial KernelChart formalization:4 faithful commutative-ring cleared support,monic support and ordinate identities for second-Cantor branch Mobius adapter,with explicit inverse/chart hypotheses. Lean4.35.0 kernel/axiom gate passes4,0trusted. Smooth projective completion,actual curves/fields/Picard K~2W remain written,not assumed formally constructed."
+}

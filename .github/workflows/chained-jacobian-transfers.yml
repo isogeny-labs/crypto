@@ -9,6 +9,7 @@ on:
       - 'research/chained_jacobian_transfers_20261110/lean/**'
       - 'research/chained_jacobian_transfers_20261110/successor-preflight/**'
       - 'src/prime_hyperelliptic/fp2.rs'
+      - 'src/cryptanalysis/jv_cover.rs'
       - '.github/workflows/chained-jacobian-transfers.yml'
   workflow_dispatch:
 
@@ -50,9 +51,13 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           persist-credentials: false
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
             research/chained_jacobian_transfers_20261110/successor-preflight
             isogeny_algos
+            src/cryptanalysis/jv_cover.rs
       - name: Check the frozen constructor and successor/kernel replay
         env:
           RUSTUP_TOOLCHAIN: 1.99.1
@@ -61,6 +66,7 @@ jobs:
           rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
           cd research/chained_jacobian_transfers_20261110/successor-preflight
           sha256sum -c reference.sha256
+          sha256sum -c legacy.sha256
           cargo fmt -- --check
           cargo clippy --all-targets --offline --locked -- -D warnings
           cargo test --release --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/successor-tests.txt"
@@ -90,7 +96,7 @@ jobs:
       - name: Build and audit the proof files
         run: |
           set -euo pipefail
-          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport; do
+          for source in ChainTransfer PolynomialIdentities SuccessorCollapse CubicPullback BalancedDivisors FrobeniusPairings RichelotAlgebra ShiftedCover TargetFrobenius SplitQuotients OddKernelProjectors EllipticSeven SevenJacobian ChainTransport RichelotDescent DirectNorms ClosedFibres CyclicFortyNine TwoHopTransport SuccessorNorms KernelChart; do
             tools/lean/proof-gate.sh "research/chained_jacobian_transfers_20261110/lean/$source.lean" --out "$RUNNER_TEMP/proofs-$source"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

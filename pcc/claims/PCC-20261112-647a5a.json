@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T00:05:31Z",
+ "id": "PCC-20261112-647a5a",
+ "kind": "statement",
+ "producer": {
+  "commit": "ecf190bedaf12fadbe3743136920d464721cd7f2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/second-cantor-clippy-02-attempt.txt",
+    "sha256": "d0bf10d5a721abbba4e3375a52952f226d7d58991f517998236ea7105576ea7c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/second-cantor-complete-02.txt",
+    "sha256": "ded3075901258f2693683d19bc6e24d22cc5e958728216b9ab3df5d166f1f345"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/legacy-jv-cantor-source-01.rs",
+    "sha256": "392c71c374d1b865418424bf55393d046a454a0873d45cf07793a6467d0acf74"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned second-engine full standalone02 passes8 tests including both49-point groups/all2401 sums. StrictClippy02 FAILS on legacy pxgcd tuple return type complexity. Original exact-byte engine/source01 and compiler diagnostic retained;no lint exemption. Next version may use a type alias with identical tuple type and untouched arithmetic bodies,requiring new exact transformation guard/full8/strictClippy acceptance."
+}
