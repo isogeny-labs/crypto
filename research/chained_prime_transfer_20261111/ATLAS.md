@@ -15,8 +15,13 @@ a *different curve of a different order*, and it changes as the cover changes.
 So: by varying the cover, **what orders can `E'` take, and can the discrete
 logarithm ever follow to one that is easier?**
 
-The load-bearing fact: a DLP-preserving homomorphism `E → E'` exists **iff**
-`E` and `E'` are isogenous, and over `F_p` isogenous **iff** `#E = #E'` (Tate).
+The load-bearing fact: a DLP-preserving algebraic map `E → E'` over `F_p` is
+an isogeny, so it exists **only if** `E` and `E'` are isogenous, and over
+`F_p` isogenous **iff** `#E = #E'` (Tate). *Correction (2026-11-12, proof
+note T4 and its review):* the converse was overstated. Tate gives an isogeny
+when the orders agree, but not necessarily one of degree prime to `r`, which
+is what carries the order-`r` log. See
+`research/chained_transfer_proof_20261112/PROOF.md`.
 So a map to a genuinely *different-order* curve cannot preserve the log —
 `Hom(E, E') = 0` for non-isogenous curves. The atlas measures how hard this
 bites.

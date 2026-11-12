@@ -197,6 +197,16 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
   - At 0.1 and 1 GAE it is 5.8× and 31× rho, so the §5a band does not show this known win at lab sizes.
   - The verdicts here are unaffected: every transfer row loses at 0 GAE or reduces to a search on `E`. The general consequence is filed as `problems/section5a-band-cannot-show-a-known-ic-win.md`.
 
+## Proof note (2026-11-12 addendum)
+
+`research/chained_transfer_proof_20261112/PROOF.md` states the obstruction once.
+- **Established in the note** (argument given there, unverified by pcc) [pcc:unverified]: `c_*c^* = [d]`, `J_C ~ E × P`, and pull-back injective on `E[r]` for `r ∤ d`.
+- **Fibre rigidity (T5).** For hyperelliptic `C`, `d ≤ g` and `c ∘ ι_h = [−1] ∘ c`, every `Q` outside an explicit finite set has `c^*Q` as the reduced representative of `c^*[Q − O]`.
+- **Collision equivalence (T7).** Every dependency among the fibre rows is a collision `Q_i = ±Q_j` on `E`. So an IC whose relations lie in the transferred subgroup cannot beat the matched collision search on `E`.
+- **`φ2_*φ1^* = 0` (T8).**
+- **Open:** a cross-characteristic map, lifting (only the conditional `C₀/p` bound), and an IC that draws relations from all of `J_C`.
+- **Correction:** the ATLAS "iff" is now an "only if". Tate gives an isogeny when the orders agree, but not necessarily one of degree prime to `r`.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -213,3 +223,4 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - 2026-11-12: small-D_E addendum; the adapted base saves only by folding, which a
   generic control matches.
 - 2026-11-12: degree-3 fibre and positive-control addendum.
+- 2026-11-12: proof note added; ATLAS iff narrowed to only-if.
