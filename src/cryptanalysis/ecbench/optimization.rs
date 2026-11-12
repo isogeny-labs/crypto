@@ -542,6 +542,81 @@ const POLICIES: &[PolicyDecl] = &[
         DiagnosticOnly,
         StandardBand
     ),
+    // rho.negation's walk in lock-step lanes with a batched inversion
+    // (docs/perf/20261112-rust-deep-audit.md): a diagnostic until a reviewed
+    // paired session admits it.
+    policy!(
+        "rho.negation_lanes_v1",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v5",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.signed_frobenius_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.negation_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v3",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
     policy!(
         "rho.cubic_v2",
         ImplementationAb,

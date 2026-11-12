@@ -137,6 +137,19 @@ by sequence number, `--replay-all` replays every one).
 ./target/release/ecbench compare --dir /tmp/ecbench/smoke-1 --a rho-neg --b bsgs-neg
 ```
 
+A study run as one session per size is pooled by repeating `--dir`
+(`--dir S1 --dir S2 …`): runs pair within each session by workload and
+round, never across sessions, and the headline is the ratio of total cost
+`Σ S_B·√r / Σ S_A·√r` (total GAE, priced at `--weight` when given) over
+every pair, with the single-session linearised `t` and cluster-bootstrap
+intervals over the `(session, workload)` clusters (the ratio of summed `S`
+is reported beside it as `s_pooled`). It refuses a repeated session,
+sessions whose arms run different `method_id`s or units, and incomplete
+sessions unless `--allow-interrupted`; the JSON
+(`ecbench.pooled_comparison/v1`) lists each session's dir, id, pairs and
+own ratio, `--save` and `--b-dir` are refused, and one `--dir` is the
+single-session comparison, unchanged.
+
 ```bash
 ./target/release/ecbench table --dir /tmp/ecbench/smoke-1
 ```

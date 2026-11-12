@@ -1,35 +1,35 @@
-# Resume: crypto @ claude/exponent-study-20261108
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-Exponent study (owner preregistration 2026-11-08): fit the exponent of the cost T(E,m,L) of ONE
-decomposition system against |V| for multiplicative-subgroup bases on the Curve25519-family
-miniatures, m = 2, 3, 4, symmetrised system in the elementary symmetric polynomials. Success rule:
-every verified measured improvement counts; report distance to rho.
+Owner (2026-11-12): "Speed it all up" (M4GB and Gröbner-basis decomposition engines). Two tracks:
+(A) M4GB patch 0004, divisibility signatures in update() (this run); (B) inherited-f4 per-call
+speed-up by an Opus subagent working in this checkout (koblitz_groebner.rs, gf2_elim.rs, pq_f4_f2.rs,
+inherited part of ic_framework/solvers.rs; engine name inherited-f4-next for a paired A/B).
 
 ## Lead / hypothesis
-Lever iff m = 4 exponent < 0.5 (upper 95% bound too) or m = 3 exponent < 0. Prediction: m = 2 about 1.5,
-m = 3 about 3.5, m = 4 >= 4.5 or capped; no lever.
+Callgrind: update() is 70 % of a 24-variable M4GB solve, divisibility on degrevlex-ranked monomials
+decoded per variable. Exact two-mask signatures cut instructions to 0.47x / 0.43x. Expectation and
+falsifier: research/m4gb_update_signatures_20261112/README.md.
 
 ## Spec
-research/curve25519_exponent_study_20261108/PROTOCOL.md (frozen, data/frozen.sha256). Code:
-src/cryptanalysis/ic_framework/subgroup_semaev.rs (6 unit tests pass), `curve25519_family f4sub` and
-`subcensus`. Binary /home/user/ctarget-f1/release/curve25519_family. Run: python3 scripts/run_grid.py
-(4 workers, cells/*.json, resumable: finished cells skipped). Analysis: scripts/analyse.py.
+research/m4gb_update_signatures_20261112/ab_corpus.py under tools/benchrec.py run (record benchmarks/records/20261112T0517Z-m4gb-update-signatures.json):
+corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old (patches 0001-0003,
+scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
 
 ## State
-Local worktree /home/user/crypto, branch claude/exponent-study-20261108 (not pushed by instruction).
-Conductor, ecdb and research-kb unreachable. Disk about 2.6 GB free: no second target dir.
+2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
 
-## Next steps
-1. Run the grid; census (subcensus); calibration (bits base vs tower f4cost G=0).
-2. analyse.py; README.md with [pcc:unverified] result sentences; figure; REPORT.pdf; pcc lint-prose.
-3. Session log docs/session-logs/2026-11-08.md; local commits with the two attribution lines.
-
-## Stop and success conditions
-Stop when every grid cell is complete or censored, the analysis, README, figure, PDF and session log
-are written and committed locally. Success: fitted exponents with intervals per m (or a stated
-censoring), verdicts on the preregistered thresholds, failed predictions kept as failed.
+Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
+(merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
-Grid launched by scripts/run_grid.py in the background on this machine; cells land in
-research/curve25519_exponent_study_20261108/cells/. Relaunch the same command to resume.
+Paired per-call A/B inherited-f4 vs inherited-f4-next vs fes-f2 (research/inherited_f4_next_20261112/run_ab.sh, record benchmarks/records/20261112T0630Z-inherited-f4-next-ab.json); then an end-to-end ic bench ladder adding fes-f2 and inherited-f4-next to the oracle.
+
+Local corpus A/B (this record). Subagent B (inherited-f4) in the background.
+
+## Stop and success conditions
+Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
+
+## Next steps
+1. summarize/make_report; close record; benchmarks entry; session log; commit; push.
+2. Integrate track B result (paired A/B under its own record), then PR update.

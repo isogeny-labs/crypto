@@ -126,6 +126,7 @@
 
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
+use std::hash::BuildHasherDefault;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -150,6 +151,7 @@ use crate::cryptanalysis::ec_index_calculus::{
 };
 use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
 use crate::cryptanalysis::group_op_count;
+use crate::cryptanalysis::ic_boundary::MixHasher;
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastCurve, FastPoint, FrobeniusCanon};
 use crate::cryptanalysis::koblitz_fast_arith::{pack_fast, FastPoint as ArithFastPoint};
@@ -182,6 +184,130 @@ use crate::utils::mod_inverse;
 /// boundary-ledger rungs through `n = 53`.  What actually bounds a run
 /// is the `2^dim` factor base and, for the meet-in-the-middle oracle,
 /// its `|F|²` pair table.
+/// **In-scan stage counters** for R04
+/// (`research/ic_tool_program/rounds/R04-scan-probes/PROTOCOL.md`),
+/// compiled only with the `scan-probes` feature.
+///
+/// The collection scan reads the time-stamp counter at its stage
+/// boundaries and adds the cycles to one total per stage.  Without the
+/// feature none of this exists, and every probe in the scan is a
+/// `#[cfg]`-gated statement, so the default build compiles the same code
+/// it always did.  Scans outside relation collection (the descent's)
+/// are kept apart, under `other`.
+#[cfg(feature = "scan-probes")]
+pub mod scan_probes {
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering::Relaxed};
+
+    pub const SUBTRACT: usize = 0;
+    pub const KEY: usize = 1;
+    pub const FILTER: usize = 2;
+    pub const ADMITTED: usize = 3;
+    /// The rest of a collection trial: its whole time less the scan's.
+    pub const TRIAL: usize = 4;
+    pub const STAGES: [&str; 5] = ["subtract", "key", "filter", "admitted", "trial"];
+
+    pub const TRIALS: usize = 0;
+    pub const SUMMANDS: usize = 1;
+    pub const BLOCKS: usize = 2;
+    pub const ADMITTED_KEYS: usize = 3;
+    pub const PAIRS: usize = 4;
+    pub const COUNTS: [&str; 5] = ["trials", "summands", "blocks", "admitted", "pairs"];
+
+    /// `[collection, other]` × stage.
+    static CYCLES: [[AtomicU64; 5]; 2] = [const { [const { AtomicU64::new(0) }; 5] }; 2];
+    static TALLY: [[AtomicU64; 5]; 2] = [const { [const { AtomicU64::new(0) }; 5] }; 2];
+    static COLLECTING: AtomicBool = AtomicBool::new(false);
+
+    fn side() -> usize {
+        usize::from(!COLLECTING.load(Relaxed))
+    }
+
+    /// The time-stamp counter, or the monotonic clock in nanoseconds
+    /// where there is none.
+    #[inline(always)]
+    pub fn now() -> u64 {
+        #[cfg(target_arch = "x86_64")]
+        {
+            // SAFETY: `rdtsc` has no preconditions on x86-64.
+            unsafe { core::arch::x86_64::_rdtsc() }
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            use std::sync::OnceLock;
+            static START: OnceLock<std::time::Instant> = OnceLock::new();
+            START
+                .get_or_init(std::time::Instant::now)
+                .elapsed()
+                .as_nanos() as u64
+        }
+    }
+
+    /// Charge the cycles since `*since` to `stage`, and move `*since` on.
+    #[inline(always)]
+    pub fn lap(stage: usize, since: &mut u64) {
+        let t = now();
+        CYCLES[side()][stage].fetch_add(t.wrapping_sub(*since), Relaxed);
+        *since = t;
+    }
+
+    #[inline(always)]
+    pub fn count(which: usize, k: u64) {
+        TALLY[side()][which].fetch_add(k, Relaxed);
+    }
+
+    /// The scan's four stages so far, on the collection side.
+    #[inline(always)]
+    pub fn scan_cycles() -> u64 {
+        CYCLES[0][..TRIAL].iter().map(|c| c.load(Relaxed)).sum()
+    }
+
+    /// Charge a collection trial's time beyond its scan to `trial`.
+    #[inline(always)]
+    pub fn close_trial(began: u64, scan_before: u64) {
+        let whole = now().wrapping_sub(began);
+        let scan = scan_cycles().wrapping_sub(scan_before);
+        CYCLES[0][TRIAL].fetch_add(whole.saturating_sub(scan), Relaxed);
+        TALLY[0][TRIALS].fetch_add(1, Relaxed);
+    }
+
+    pub fn collecting(on: bool) {
+        COLLECTING.store(on, Relaxed);
+    }
+
+    /// Counter ticks a second, against the monotonic clock over 50 ms.
+    pub fn rate_hz() -> f64 {
+        let (t0, i0) = (now(), std::time::Instant::now());
+        while i0.elapsed() < std::time::Duration::from_millis(50) {
+            std::hint::spin_loop();
+        }
+        now().wrapping_sub(t0) as f64 / i0.elapsed().as_secs_f64()
+    }
+
+    /// Every total, as the report writes it.
+    pub fn snapshot() -> serde_json::Value {
+        let side = |s: usize| {
+            let stages: serde_json::Map<String, serde_json::Value> = STAGES
+                .iter()
+                .zip(&CYCLES[s])
+                .map(|(k, v)| (k.to_string(), v.load(Relaxed).into()))
+                .collect();
+            let counts: serde_json::Map<String, serde_json::Value> = COUNTS
+                .iter()
+                .zip(&TALLY[s])
+                .map(|(k, v)| (k.to_string(), v.load(Relaxed).into()))
+                .collect();
+            serde_json::json!({"stages": stages, "counts": counts})
+        };
+        let mut out = side(0);
+        out["other"] = side(1);
+        out["tsc_hz"] = serde_json::json!(rate_hz());
+        out["what"] = serde_json::json!(
+            "cycles per stage of the collection scan (R04); `other` holds scans outside collection"
+        );
+        out
+    }
+}
+
 pub const MAX_N: u32 = 127;
 
 // ── F_2[x] helpers on `u64` bitmasks ───────────────────────────────
@@ -1409,11 +1535,21 @@ pub fn points_with_x(curve: &BinaryCurve, x: &F2mElement) -> Vec<BinaryPoint> {
 /// therefore the floor everything else in that phase is measured
 /// against (`examples/koblitz_select_decomposition.rs`).
 pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint> {
+    let (lifts, count) = lift_x_packed(curve, curve.field.from_element(x));
+    lifts[..count].iter().map(|&p| curve.lower(p)).collect()
+}
+
+/// [`points_with_x_fast`] on a packed abscissa, before lowering: the
+/// points above `coordinate` in the same order, `count` of them (0, 1 or
+/// 2). The single-word factor-base selection builds on this so that a
+/// point is lowered to a `BinaryPoint` once, at the end.
+fn lift_x_packed(curve: &FastCurve, coordinate: u64) -> ([FastPoint; 2], usize) {
     debug_assert!(curve.n % 2 == 1);
     let field = &curve.field;
-    let coordinate = field.from_element(x);
+    let none = [FastPoint::INFINITY; 2];
     if coordinate == 0 {
-        return vec![curve.lower(FastPoint::affine(0, field.sqr_k(curve.b, curve.n - 1)))];
+        let point = FastPoint::affine(0, field.sqr_k(curve.b, curve.n - 1));
+        return ([point, FastPoint::INFINITY], 1);
     }
     let inverse = field.inv(coordinate);
     let rhs = coordinate ^ curve.a ^ field.mul(curve.b, field.sqr(inverse));
@@ -1426,11 +1562,29 @@ pub fn points_with_x_fast(curve: &FastCurve, x: &F2mElement) -> Vec<BinaryPoint>
     // H(rhs)^2 + H(rhs) = rhs + Tr(rhs) for odd degree. Testing the
     // equation is the same trace-zero admission check as the general solver.
     if field.sqr(root) ^ root != rhs {
-        return Vec::new();
+        return (none, 0);
     }
     let point = FastPoint::affine(coordinate, field.mul(coordinate, root));
-    vec![curve.lower(point), curve.lower(curve.neg(point))]
+    ([point, curve.neg(point)], 2)
 }
+
+/// [`FastCurve::lower`] without the `BigUint` round trip: the same
+/// `BinaryPoint`, built from the words directly.
+fn lower_packed(n: u32, p: FastPoint) -> BinaryPoint {
+    if p.infinity {
+        BinaryPoint::Infinity
+    } else {
+        BinaryPoint::Affine {
+            x: F2mElement::from_words(&[p.x], n),
+            y: F2mElement::from_words(&[p.y], n),
+        }
+    }
+}
+
+/// A `u64`-keyed set and map hashed by [`MixHasher`]: the keys are packed
+/// points or abscissa words, and SipHash dominated the probes.
+type WordSet = HashSet<u64, BuildHasherDefault<MixHasher>>;
+type WordMap<V> = HashMap<u64, V, BuildHasherDefault<MixHasher>>;
 
 /// The scalar `λ` with `π(Q) = [λ]Q` for all `Q ∈ ⟨G⟩`.
 ///
@@ -3064,6 +3218,23 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
         return Err("a factor base needs at least one point".into());
     }
     let curve = FastCurve::new(&kc.curve).ok_or("field too wide for single-word arithmetic")?;
+    if curve.n % 2 == 1 && kc.frobenius_is_endomorphism {
+        return build_subgroup_orbit_factor_base_packed(kc, &curve, seed, points);
+    }
+    build_subgroup_orbit_factor_base_reference(kc, &curve, seed, points)
+}
+
+/// The selection in the general representation: abscissae as `BigUint`
+/// keys, Frobenius by [`KoblitzCurve::frobenius_x`], each rebuild through
+/// [`build_explicit_frobenius_orbit_factor_base`]. The only path for an
+/// even degree or a non-endomorphic Frobenius, and the reference
+/// [`build_subgroup_orbit_factor_base_packed`] is checked against.
+fn build_subgroup_orbit_factor_base_reference(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    seed: u64,
+    points: usize,
+) -> Result<(FrobeniusFactorBase, FactorBaseSelectionCost), String> {
     let cofactor = &kc.cofactor;
     let mut rng = StdRng::seed_from_u64(seed);
     let mut representatives: Vec<F2mElement> = Vec::new();
@@ -3099,7 +3270,7 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
             }
             let x = F2mElement::from_biguint(&BigUint::from(rng.gen_range(1..cap)), kc.n);
             let lifts = if curve.n % 2 == 1 {
-                points_with_x_fast(&curve, &x)
+                points_with_x_fast(curve, &x)
             } else {
                 points_with_x(&kc.curve, &x)
             };
@@ -3143,6 +3314,179 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
     cost.abscissae_drawn = drawn;
     base.map(|b| (b, cost))
         .ok_or_else(|| "subgroup orbit sampling produced no base".into())
+}
+
+/// [`build_subgroup_orbit_factor_base_reference`] in single-word
+/// arithmetic, for an odd degree below 64 with an endomorphic Frobenius.
+///
+/// The same draws from the same generator in the same order, the same
+/// decisions and the same base, bit for bit, with the same counters: the
+/// selection cost and the thread's Frobenius-map count. What changes is
+/// the representation. Abscissae and their orbits are `u64` words squared
+/// by the field's `sqr_k` and kept in a [`MixHasher`] set, not `BigUint`
+/// keys squared by `F2mElement`; the base is built from the sorted words
+/// (the `BTreeMap<BigUint, _>` order of the reference), its points lifted
+/// and its orbits walked packed, and each point is lowered once.
+/// `subgroup_orbit_selection_agrees_in_both_representations` pins it.
+fn build_subgroup_orbit_factor_base_packed(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    seed: u64,
+    points: usize,
+) -> Result<(FrobeniusFactorBase, FactorBaseSelectionCost), String> {
+    debug_assert!(curve.n % 2 == 1 && kc.frobenius_is_endomorphism && kc.n < 64);
+    let field = &curve.field;
+    let cofactor = &kc.cofactor;
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut representatives: Vec<u64> = Vec::new();
+    let mut seen = WordSet::default();
+    let mut base: Option<FrobeniusFactorBase> = None;
+    let batch = 8usize;
+    let cap = 1u64 << kc.n;
+    let mut drawn = 0u64;
+    let budget = 1024u64 * points as u64;
+    let mut abscissae = WordSet::default();
+    let mut cost = FactorBaseSelectionCost::default();
+    let extension = kc.extension_degree();
+    while base.as_ref().is_none_or(|b| b.points.len() < points) {
+        let mut added = 0usize;
+        while added < batch {
+            drawn += 1;
+            if drawn > budget {
+                return Err(format!(
+                    "drew {drawn} abscissae without reaching {points} subgroup points on {}",
+                    kc.label()
+                ));
+            }
+            let (lifts, count) = lift_x_packed(curve, rng.gen_range(1..cap));
+            if count == 0 {
+                continue;
+            }
+            cost.lifts_found += 1;
+            cost.cofactor_multiplications += 1;
+            let projected = curve.mul(lifts[0], cofactor);
+            if projected.infinity {
+                continue;
+            }
+            if !seen.insert(projected.x) {
+                continue;
+            }
+            let mut orbit = projected.x;
+            for _ in 0..extension {
+                abscissae.insert(orbit);
+                // `kc.frobenius_x`, counted as it counts.
+                group_op_count::count_frobenius_maps(1);
+                orbit = field.sqr_k(orbit, kc.k);
+                cost.frobenius_squarings += u64::from(kc.k);
+            }
+            representatives.push(projected.x);
+            added += 1;
+        }
+        if 2 * abscissae.len() < points {
+            continue;
+        }
+        cost.rebuilds += 1;
+        // The reference rebuild closes every representative under
+        // Frobenius again, which is the set `abscissae` already holds.
+        group_op_count::count_frobenius_maps(representatives.len() as u64 * u64::from(extension));
+        base = explicit_orbit_base_packed(kc, curve, &representatives, &abscissae);
+    }
+    cost.abscissae_drawn = drawn;
+    base.map(|b| (b, cost))
+        .ok_or_else(|| "subgroup orbit sampling produced no base".into())
+}
+
+/// [`build_explicit_frobenius_orbit_factor_base`] followed by
+/// [`finish_factor_base_domain`], from the Frobenius-closed abscissa
+/// words: the same base, built packed and lowered once.
+///
+/// A point is lifted once per Frobenius orbit, not once per abscissa. For
+/// odd `n` the lift of `x` is `(x, x·H(rhs(x)))` with `H` the half-trace,
+/// and `rhs` and `H` commute with `q`-th powering, so the lift of `x^q` is
+/// the `q`-th power of the lift of `x`, `P` and `-P` in the same order: the
+/// orbit's other points are two `sqr_k` each instead of an inversion and a
+/// half-trace. Should a representative not lift to two points, every
+/// abscissa is lifted on its own, as the reference does.
+fn explicit_orbit_base_packed(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    representatives: &[u64],
+    abscissae: &WordSet,
+) -> Option<FrobeniusFactorBase> {
+    if representatives.is_empty() {
+        return None;
+    }
+    let field = &curve.field;
+    let mut lifted: Vec<(u64, u64)> =
+        Vec::with_capacity(representatives.len() * kc.extension_degree() as usize);
+    let mut by_orbit = true;
+    for &r in representatives {
+        let (lifts, count) = lift_x_packed(curve, r);
+        if count != 2 {
+            by_orbit = false;
+            break;
+        }
+        let (mut x, mut y) = (lifts[0].x, lifts[0].y);
+        for _ in 0..kc.extension_degree() {
+            lifted.push((x, y));
+            x = field.sqr_k(x, kc.k);
+            y = field.sqr_k(y, kc.k);
+        }
+    }
+    if by_orbit {
+        lifted.sort_unstable();
+        lifted.dedup_by_key(|p| p.0);
+        by_orbit =
+            lifted.len() == abscissae.len() && lifted.iter().all(|(x, _)| abscissae.contains(x));
+    }
+    if !by_orbit {
+        let mut xs: Vec<u64> = abscissae.iter().copied().collect();
+        xs.sort_unstable();
+        lifted.clear();
+        for &x in &xs {
+            let (lifts, count) = lift_x_packed(curve, x);
+            lifted.push((x, if count == 0 { u64::MAX } else { lifts[0].y }));
+        }
+    }
+    let mut fast: Vec<FastPoint> = Vec::with_capacity(2 * lifted.len());
+    for &(x, y) in &lifted {
+        if y == u64::MAX {
+            continue;
+        }
+        let point = FastPoint::affine(x, y);
+        if x == 0 {
+            fast.push(point);
+        } else {
+            fast.extend_from_slice(&[point, curve.neg(point)]);
+        }
+    }
+    let xs = lifted;
+    let (orbit_of, orbits, signed_orbit_of, signed_orbits) =
+        orbit_maps_from_packed(kc, curve, &fast)?;
+    if signed_orbits.iter().map(Vec::len).sum::<usize>() != fast.len() {
+        return None;
+    }
+    Some(FrobeniusFactorBase {
+        domain: FactorBaseDomain::ExplicitFrobeniusOrbits {
+            representatives: representatives.len(),
+        },
+        ell: kc.n,
+        f_j: 0,
+        linearised_exponents: Vec::new(),
+        subspace: xs
+            .iter()
+            .map(|&(x, _)| F2mElement::from_words(&[x], kc.n))
+            .collect(),
+        subspace_basis: (0..kc.n)
+            .map(|i| F2mElement::from_bit_positions(&[i], kc.n))
+            .collect(),
+        points: fast.iter().map(|&p| lower_packed(kc.n, p)).collect(),
+        orbits,
+        orbit_of,
+        signed_orbits,
+        signed_orbit_of,
+        derived: Default::default(),
+    })
 }
 
 /// **Keep only the listed signed orbits** of a factor base.
@@ -3268,7 +3612,19 @@ fn orbit_maps_packed(
         return orbit_maps_bigint(kc, points);
     }
     let fast: Vec<FastPoint> = points.iter().map(|p| curve.lift(p)).collect();
-    let mut index_of: HashMap<u64, usize> = HashMap::with_capacity(points.len() * 2);
+    orbit_maps_from_packed(kc, curve, &fast)
+}
+
+/// The walks of [`orbit_maps_packed`] on points already packed.
+fn orbit_maps_from_packed(
+    kc: &KoblitzCurve,
+    curve: &FastCurve,
+    fast: &[FastPoint],
+) -> Option<OrbitMaps> {
+    debug_assert!(kc.frobenius_is_endomorphism);
+    let points = fast;
+    let mut index_of: WordMap<usize> =
+        WordMap::with_capacity_and_hasher(points.len() * 2, Default::default());
     for (i, p) in fast.iter().enumerate() {
         index_of.insert(p.pack(), i);
     }
@@ -4399,6 +4755,13 @@ enum Targets {
         doubled: Vec<u32>,
         doubled_x: Vec<u64>,
         doubled_y: Vec<u64>,
+        /// The subset as abscissa-sharing pairs, read cyclically:
+        /// `pair_x[j]` is the abscissa of summands `2j` and `2j + 1` (mod
+        /// `len`), `pair_ya`/`pair_yb` their ordinates.  Empty unless the
+        /// subset is wholly such pairs and pairing is on.
+        pair_x: Vec<u64>,
+        pair_ya: Vec<u64>,
+        pair_yb: Vec<u64>,
         len: usize,
         window: usize,
     },
@@ -4437,6 +4800,9 @@ impl Targets {
                 doubled,
                 doubled_x,
                 doubled_y,
+                pair_x,
+                pair_ya,
+                pair_yb,
                 window,
                 ..
             } => {
@@ -4444,10 +4810,22 @@ impl Targets {
                 if doubled_x.is_empty() {
                     Scan::Indices(idxs)
                 } else {
+                    // Whole pairs from the one holding the window's first
+                    // summand to the one holding its last.
+                    let pairs = (!pair_x.is_empty()).then(|| {
+                        let (first, end) = (offset / 2, (offset + *window).div_ceil(2));
+                        PairedScan {
+                            px: &pair_x[first..end],
+                            pya: &pair_ya[first..end],
+                            pyb: &pair_yb[first..end],
+                            skip: offset % 2,
+                        }
+                    });
                     Scan::Gathered {
                         idxs,
                         xs: &doubled_x[offset..offset + *window],
                         ys: &doubled_y[offset..offset + *window],
+                        pairs,
                     }
                 }
             }
@@ -4492,7 +4870,32 @@ pub enum Scan<'a> {
         idxs: &'a [u32],
         xs: &'a [u64],
         ys: &'a [u64],
+        /// The same summands as abscissa-sharing pairs, when the unit's
+        /// subset is made of them ([`PairedScan`]); `None` otherwise.
+        pairs: Option<PairedScan<'a>>,
     },
+}
+
+/// A [`Scan::Gathered`] window as whole pairs of summands sharing an
+/// abscissa (a base point's ± twins, adjacent in the base): pair `j` is
+/// `(px[j], pya[j])` then `(px[j], pyb[j])`.  The pairs cover the window
+/// and at most one summand either side of it: the window's first summand is
+/// pair output `skip`, and its `len` summands follow.  The folding kernel
+/// then forms both sums of a pair from one inverse; the outputs outside the
+/// window are formed and never read.
+#[derive(Clone, Copy, Debug)]
+pub struct PairedScan<'a> {
+    pub px: &'a [u64],
+    pub pya: &'a [u64],
+    pub pyb: &'a [u64],
+    pub skip: usize,
+}
+
+/// Whether aimed scans pair ± twins (`KIC_SCAN_PAIRED=0` turns it off,
+/// the control arm).  The same rests either way.
+fn scan_paired_enabled() -> bool {
+    static PAIRED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PAIRED.get_or_init(|| std::env::var("KIC_SCAN_PAIRED").map_or(true, |v| v != "0"))
 }
 
 impl Scan<'_> {
@@ -6927,6 +7330,10 @@ impl PairSumTable {
         if len == 0 {
             return;
         }
+        #[cfg(feature = "scan-probes")]
+        let mut probe = scan_probes::now();
+        #[cfg(feature = "scan-probes")]
+        scan_probes::count(scan_probes::SUMMANDS, len as u64);
         // Every buffer below is borrowed from `scratch`, so a scan
         // allocates nothing; `add_many` appends, so `rests` is cleared
         // rather than re-created.
@@ -6944,6 +7351,8 @@ impl PairSumTable {
         rests.clear();
         lambdas.clear();
         x3s.clear();
+        // Outputs of a paired scan before the window's first summand.
+        let mut skip = 0usize;
         // A cyclic window is `negated[start..start + tail]` and then, if it
         // wraps, `negated[..len − tail]`.
         let (start, tail) = match scan {
@@ -6992,19 +7401,36 @@ impl PairSumTable {
                     self.curve
                         .add_many_lazy_soa(target, gather_x, gather_y, x3s, lambdas, batch)
                 }
-                Scan::Gathered { idxs, xs, ys } => {
-                    // A shorter slice would scan fewer summands than
-                    // `Scan::len` counts; a longer one would index past
-                    // `idxs` when a rest is matched.
-                    debug_assert!(
-                        xs.len() == idxs.len() && ys.len() == idxs.len(),
-                        "Scan::Gathered: {} indices, {} and {} coordinates",
-                        idxs.len(),
-                        xs.len(),
-                        ys.len()
-                    );
-                    self.curve
-                        .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
+                Scan::Gathered {
+                    idxs,
+                    xs,
+                    ys,
+                    pairs,
+                } => {
+                    if let Some(p) = pairs {
+                        if self.curve.add_many_lazy_soa_paired(
+                            target, p.px, p.pya, p.pyb, x3s, lambdas, batch, len as u64,
+                        ) {
+                            skip = p.skip;
+                            debug_assert!(x3s.len() >= skip + len, "pairs cover the window");
+                        }
+                    }
+                    if skip > 0 || x3s.len() >= len {
+                        true
+                    } else {
+                        // A shorter slice would scan fewer summands than
+                        // `Scan::len` counts; a longer one would index past
+                        // `idxs` when a rest is matched.
+                        debug_assert!(
+                            xs.len() == idxs.len() && ys.len() == idxs.len(),
+                            "Scan::Gathered: {} indices, {} and {} coordinates",
+                            idxs.len(),
+                            xs.len(),
+                            ys.len()
+                        );
+                        self.curve
+                            .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
+                    }
                 }
             };
             if !done {
@@ -7053,13 +7479,17 @@ impl PairSumTable {
         const LOOKAHEAD: usize = 32;
         let mut admitted_offsets = Vec::with_capacity(BLOCK / 8);
         let mut hashes = Vec::with_capacity(BLOCK);
-        let count = if fused { x3s.len() } else { rests.len() };
+        #[cfg(feature = "scan-probes")]
+        scan_probes::lap(scan_probes::SUBTRACT, &mut probe);
+        let count = if fused { len } else { rests.len() };
         for lo in (0..count).step_by(BLOCK) {
             let hi = (lo + BLOCK).min(count);
             match canon {
-                Some(canon) if fused => canon.x_keys(&x3s[lo..hi], keys),
+                Some(canon) if fused => canon.x_keys(&x3s[skip + lo..skip + hi], keys),
                 _ => self.keys_of(&rests[lo..hi], keys),
             }
+            #[cfg(feature = "scan-probes")]
+            scan_probes::lap(scan_probes::KEY, &mut probe);
             hashes.clear();
             hashes.extend(keys.iter().copied().map(pair_filter_hash));
             admitted_offsets.clear();
@@ -7077,6 +7507,13 @@ impl PairSumTable {
                 self.prefetch_bucket_hash(keys[within], h);
                 admitted_offsets.push(within);
             }
+            #[cfg(feature = "scan-probes")]
+            {
+                scan_probes::lap(scan_probes::FILTER, &mut probe);
+                scan_probes::count(scan_probes::BLOCKS, 1);
+                scan_probes::count(scan_probes::ADMITTED_KEYS, admitted_offsets.len() as u64);
+            }
+            // (R12's run prefetch below is counted with the admitted keys.)
             // The bucket entries arrived during the filter pass: read them
             // and send for every admitted key's run before looking any up,
             // so the runs' misses overlap instead of following one another.
@@ -7096,21 +7533,27 @@ impl PairSumTable {
                     Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => idxs[offset] as usize,
                 };
                 let rest = if fused {
-                    FastPoint::affine(x3s[offset], 0)
+                    FastPoint::affine(x3s[skip + offset], 0)
                 } else {
                     rests[offset]
                 };
-                let rest = match lambdas.get(offset) {
+                let rest = match lambdas.get(skip + offset) {
                     Some(&lambda) => self.curve.finish_lazy(target, rest, lambda),
                     None => rest,
                 };
                 self.pairs_for_key_hash(rest, keys[within], hashes[within], pairs);
+                #[cfg(feature = "scan-probes")]
+                scan_probes::count(scan_probes::PAIRS, pairs.len() as u64);
                 for &(i, j) in pairs.iter() {
                     if !sink(&[i as usize, j as usize, k]) {
+                        #[cfg(feature = "scan-probes")]
+                        scan_probes::lap(scan_probes::ADMITTED, &mut probe);
                         return;
                     }
                 }
             }
+            #[cfg(feature = "scan-probes")]
+            scan_probes::lap(scan_probes::ADMITTED, &mut probe);
         }
     }
 
@@ -11004,7 +11447,7 @@ fn projected_signed_orbit_map_fast(
     let fc = FastCurve::new(&kc.curve)?;
     let (projected, _) = project_by_frobenius_orbits(kc, &fc, fb);
     let mut representatives: Vec<FastPoint> = Vec::new();
-    let mut seen: HashSet<u64> = HashSet::new();
+    let mut seen = WordSet::with_capacity_and_hasher(projected.len(), Default::default());
     for &point in &projected {
         if point.infinity || seen.contains(&point.pack()) {
             continue;
@@ -11027,7 +11470,10 @@ fn projected_signed_orbit_map_fast(
     }
     representatives.sort_unstable_by_key(|p| p.pack());
 
-    let mut location_by_key: HashMap<u64, (usize, u32, bool)> = HashMap::new();
+    let mut location_by_key: WordMap<(usize, u32, bool)> = WordMap::with_capacity_and_hasher(
+        2 * kc.n as usize * representatives.len(),
+        Default::default(),
+    );
     for (orbit, &representative) in representatives.iter().enumerate() {
         let mut current = representative;
         for k in 0..kc.n {
@@ -14191,10 +14637,33 @@ impl<'a> RelationCollector<'a> {
             }
             _ => (Vec::new(), Vec::new()),
         };
+        // The ± twins of a column sit side by side in the base, so a subset
+        // of whole columns is pairs `(2j, 2j + 1)` sharing an abscissa; the
+        // folding kernel then takes one inverse for each pair.  Read
+        // cyclically, the pairs cover every window `scan` can name (its
+        // offset is below `len`, its end at most `len + window`).
+        let paired = scan_paired_enabled()
+            && !doubled_x.is_empty()
+            && len.is_multiple_of(2)
+            && (0..len / 2).all(|j| doubled_x[2 * j] == doubled_x[2 * j + 1]);
+        let (pair_x, pair_ya, pair_yb) = if paired {
+            let pairs = (len + window).div_ceil(2);
+            let at = |v: &[u64], t: usize| v[t % len];
+            (
+                (0..pairs).map(|j| at(&doubled_x, 2 * j)).collect(),
+                (0..pairs).map(|j| at(&doubled_y, 2 * j)).collect(),
+                (0..pairs).map(|j| at(&doubled_y, 2 * j + 1)).collect(),
+            )
+        } else {
+            (Vec::new(), Vec::new(), Vec::new())
+        };
         Some(Targets::Subset {
             doubled,
             doubled_x,
             doubled_y,
+            pair_x,
+            pair_ya,
+            pair_yb,
             len,
             window,
         })
@@ -14424,6 +14893,8 @@ impl<'a> RelationCollector<'a> {
             // per probe.
             let mut scratch = ScanScratch::default();
             for t in run_start..run_end {
+                #[cfg(feature = "scan-probes")]
+                let (trial_began, scan_before) = (scan_probes::now(), scan_probes::scan_cycles());
                 measurement::mark(Phase::Pdp);
                 let pdp = if !point.infinity && a != 0 {
                     let scan = targets.scan(unit.seed, t, base);
@@ -14444,9 +14915,13 @@ impl<'a> RelationCollector<'a> {
                 // re-deriving the run's anchor.
                 a = ((a as u128 + stride as u128) % self.r_u64.max(2) as u128) as u64;
                 point = fc.add(point, stride_point);
+                #[cfg(feature = "scan-probes")]
+                scan_probes::close_trial(trial_began, scan_before);
             }
             found
         };
+        #[cfg(feature = "scan-probes")]
+        scan_probes::collecting(true);
         let mut collected = if measurement::enabled() {
             (first_run..=last_run)
                 .map(run_probes)
@@ -14457,6 +14932,8 @@ impl<'a> RelationCollector<'a> {
                 .map(run_probes)
                 .reduce(CollectionChunk::default, CollectionChunk::merge)
         };
+        #[cfg(feature = "scan-probes")]
+        scan_probes::collecting(false);
         measurement::mark(Phase::Queries);
         collected.relations.sort_by_key(|r| r.trial);
         collected.attempts.sort_by_key(|r| r.trial);
@@ -15229,6 +15706,121 @@ pub fn solve_factor_base_logs_from_relations(
         },
         solver.report(),
     ))
+}
+
+/// Cumulative collection cost up to and including one relation of a
+/// [`RelationPool`].  `trials` is exact (the relation's own trial index
+/// plus one); the seconds and scanned summands are reported per batch by
+/// the collector and are pro-rated by trial within the batch.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize)]
+pub struct RelationPoolCost {
+    pub trials: u64,
+    pub collection_seconds_prorated: f64,
+    pub summands_scanned_prorated: f64,
+}
+
+/// One relation pool drawn by the exact collector, batches and probe
+/// sequence of [`solve_factor_base_logs`], continued past full column
+/// rank so that prefixes of it can be solved and compared.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct RelationPool {
+    pub columns: usize,
+    #[serde(skip)]
+    pub relations: Vec<CollectedRelation>,
+    /// One entry per relation, in pool order; nondecreasing in every field.
+    #[serde(skip)]
+    pub cumulative: Vec<RelationPoolCost>,
+    /// Prefix length at which the coefficient rank first equals `columns`.
+    pub full_rank_relations: Option<usize>,
+    /// Prefix length at which [`solve_factor_base_logs`] would make its
+    /// first solve attempt (the end of the batch where rank became full).
+    pub logs_first_attempt_relations: Option<usize>,
+    pub trials: usize,
+    pub collection_seconds: f64,
+    pub summands_scanned: u64,
+    /// Collector construction (pair table included), shared by every prefix.
+    pub setup_seconds: f64,
+    pub batch_trials: usize,
+}
+
+/// Collect one relation pool for a paired oversampling comparison: draw
+/// batches exactly as [`solve_factor_base_logs`] does, track coefficient
+/// rank, and stop after the batch in which the pool reaches
+/// `full_rank + ceil(surplus · columns)` relations (or the trial budget is
+/// spent).  No solve is attempted.
+/// `None` for a degenerate base or a subgroup wider than a word.
+pub fn collect_factor_base_log_pool(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    opts: &KoblitzIcOptions,
+    surplus: f64,
+) -> Option<RelationPool> {
+    if kc.subgroup_order.bits() > 64 || !surplus.is_finite() || surplus < 0.0 {
+        return None;
+    }
+    let setup = std::time::Instant::now();
+    let mut system = LogSystem::new(kc, fb, opts)?;
+    let collector = RelationCollector::new(kc, fb, opts)?;
+    let r_u64 = kc.subgroup_order.to_u64_digits().first().copied()?;
+    let mut pool = RelationPool {
+        columns: system.n_cols,
+        setup_seconds: setup.elapsed().as_secs_f64(),
+        batch_trials: opts.relation_batch_size.max(PRECOMPUTE_BATCH_TRIALS),
+        ..RelationPool::default()
+    };
+    let extra = (surplus * system.n_cols as f64).ceil() as usize;
+    let mut ranker = U64RankTracker::new(r_u64, system.n_cols);
+    let mut target = usize::MAX;
+    while pool.trials < opts.max_trials && pool.relations.len() < target {
+        let count = pool.batch_trials.min(opts.max_trials - pool.trials);
+        let start = pool.trials as u64;
+        let before = pool.relations.len();
+        let unit = RelationWorkUnit {
+            seed: opts.seed,
+            start,
+            count: count as u64,
+        };
+        let (relations, creport) = collector.collect(unit);
+        let unit_trials = creport.trials.max(1) as f64;
+        // Whole batches are kept, as `solve_factor_base_logs` keeps them,
+        // so the pool always reaches `logs_first_attempt_relations`.
+        for rel in relations {
+            system.push(&rel);
+            let row = system
+                .dense_matrix
+                .last()
+                .cloned()
+                .or_else(|| system.sparse_rows.last_dense(system.n_cols))?;
+            let rank = ranker.insert(
+                row.iter()
+                    .map(|coefficient| to_u64_mod(coefficient, r_u64))
+                    .collect(),
+            );
+            let share = (rel.trial + 1 - start) as f64 / unit_trials;
+            pool.cumulative.push(RelationPoolCost {
+                trials: rel.trial + 1,
+                collection_seconds_prorated: pool.collection_seconds
+                    + share * creport.elapsed_seconds,
+                summands_scanned_prorated: pool.summands_scanned as f64
+                    + share * creport.summands_scanned as f64,
+            });
+            pool.relations.push(rel);
+            if rank == system.n_cols && pool.full_rank_relations.is_none() {
+                pool.full_rank_relations = Some(pool.relations.len());
+                target = pool.relations.len() + extra;
+            }
+        }
+        pool.trials += creport.trials;
+        pool.collection_seconds += creport.elapsed_seconds;
+        pool.summands_scanned += creport.summands_scanned;
+        if pool.full_rank_relations.is_some() && pool.logs_first_attempt_relations.is_none() {
+            // `solve_factor_base_logs` attempts at the end of this batch,
+            // over every relation the batch produced (not only those kept
+            // here under `target`).
+            pool.logs_first_attempt_relations = Some(before + creport.relations);
+        }
+    }
+    Some(pool)
 }
 
 /// What an individual-logarithm descent did.
@@ -20476,6 +21068,100 @@ mod tests {
     /// the only thing the round moved is the time selection takes. If
     /// they ever disagree, the measured gain is meaningless and the base
     /// is wrong, in that order of importance.
+    /// The single-word subgroup selection against its `BigUint`
+    /// reference: the same base field for field (points, abscissae, both
+    /// orbit maps, domain), the same selection cost, the same thread
+    /// counters, and the same projected signed-orbit map as the
+    /// general-field construction gives. Rule v10 rests on this.
+    #[test]
+    fn subgroup_orbit_selection_agrees_in_both_representations() {
+        let mut curves: Vec<KoblitzCurve> = Vec::new();
+        for a in [0u8, 1] {
+            for n in [13u32, 17, 19, 23, 29, 31, 37, 41, 43, 47] {
+                if let Some(kc) = KoblitzCurve::new(a, n) {
+                    curves.push(kc);
+                }
+            }
+        }
+        // Subfield curves: Frobenius is the q-power map, k squarings.
+        for (k, n) in [(3u32, 33u32), (3, 39), (3, 45), (5, 35), (5, 45), (7, 35)] {
+            for (a, b) in [(0u64, 1u64), (1, 1), (1, 3)] {
+                if let Some(kc) = KoblitzCurve::subfield(k, n, a, b) {
+                    curves.push(kc);
+                }
+            }
+        }
+        let mut checked = 0;
+        let mut subfield_checked = 0;
+        for kc in &curves {
+            let Some(curve) = FastCurve::new(&kc.curve) else {
+                continue;
+            };
+            if curve.n % 2 == 0 || !kc.frobenius_is_endomorphism {
+                continue;
+            }
+            for (seed, points) in [(1u64, 64usize), (7, 600), (201, 1500)] {
+                let (fast, fast_ops) = group_op_count::counted(|| {
+                    build_subgroup_orbit_factor_base_packed(kc, &curve, seed, points)
+                });
+                let (slow, slow_ops) = group_op_count::counted(|| {
+                    build_subgroup_orbit_factor_base_reference(kc, &curve, seed, points)
+                });
+                let label = format!("{} seed {seed}, {points} points", kc.label());
+                let (fast, fast_cost, slow, slow_cost) = match (fast, slow) {
+                    (Ok((f, fc)), Ok((s, sc))) => (f, fc, s, sc),
+                    (Err(f), Err(s)) => {
+                        assert_eq!(f, s, "{label}: the errors differ");
+                        continue;
+                    }
+                    (f, s) => panic!("{label}: one path failed: {:?} / {:?}", f.err(), s.err()),
+                };
+                assert_eq!(fast_cost, slow_cost, "{label}: selection cost");
+                assert_eq!(fast_ops, slow_ops, "{label}: thread counters");
+                assert_eq!(fast.domain, slow.domain, "{label}: domain");
+                assert_eq!(fast.ell, slow.ell, "{label}: ell");
+                assert_eq!(fast.f_j, slow.f_j, "{label}: f_j");
+                assert_eq!(fast.linearised_exponents, slow.linearised_exponents);
+                assert_eq!(fast.subspace, slow.subspace, "{label}: abscissae");
+                assert_eq!(fast.subspace_basis, slow.subspace_basis, "{label}: basis");
+                assert_eq!(fast.points, slow.points, "{label}: points");
+                assert_eq!(fast.orbits, slow.orbits, "{label}: orbits");
+                assert_eq!(fast.orbit_of, slow.orbit_of, "{label}: orbit_of");
+                assert_eq!(
+                    fast.signed_orbits, slow.signed_orbits,
+                    "{label}: signed_orbits"
+                );
+                assert_eq!(
+                    fast.signed_orbit_of, slow.signed_orbit_of,
+                    "{label}: signed_orbit_of"
+                );
+                // The public entry point takes the packed path here.
+                let (public, _) = build_subgroup_orbit_factor_base_with_cost(kc, seed, points)
+                    .expect("public selection");
+                assert_eq!(public.points, slow.points, "{label}: public entry point");
+                // The projection: the single-word map, as the projection
+                // phase builds it, against the general-field construction.
+                let fast_map = projected_signed_orbit_map_fast(kc, &fast).expect("fast map");
+                let (projected, _) = project_by_frobenius_orbits_generic(kc, &slow);
+                let slow_map = projected_signed_orbit_map_slow(kc, &slow, projected);
+                assert_eq!(
+                    fast_map.orbit_of, slow_map.orbit_of,
+                    "{label}: projected orbit_of"
+                );
+                assert_eq!(
+                    fast_map.representatives, slow_map.representatives,
+                    "{label}: projected representatives"
+                );
+                checked += 1;
+                if kc.k > 1 {
+                    subfield_checked += 1;
+                }
+            }
+        }
+        assert!(checked >= 30, "only {checked} cases compared");
+        assert!(subfield_checked >= 1, "no subfield curve was compared");
+    }
+
     #[test]
     fn factor_base_orbit_maps_agree_in_both_representations() {
         let mut checked = 0;
@@ -20696,6 +21382,7 @@ mod tests {
                     idxs: &idxs,
                     xs: &xs,
                     ys: &ys,
+                    pairs: None,
                 };
                 folded.witnesses_fast_scan(target, 3, gathered, &mut scratch_b, &mut |w| {
                     b.push(w.to_vec());
@@ -20709,6 +21396,7 @@ mod tests {
                         idxs: &idxs,
                         xs: &xs_off,
                         ys: &ys_off,
+                        pairs: None,
                     };
                     folded.witnesses_fast_scan(target, 3, shifted, &mut scratch_c, &mut |w| {
                         c.push(w.to_vec());
@@ -20742,6 +21430,53 @@ mod tests {
     /// every offset a trial can draw, wraparound included: `xs[i]` and
     /// `ys[i]` of a [`Scan::Gathered`] scan are those of `idxs[i]`.  And
     /// they exist only where the folding kernel can read them.
+    /// Lever 2 falsifier (untimed): how often an aimed summand's negated twin
+    /// shares its aligned 8-lane kernel group, over the eight alignments.
+    #[test]
+    #[ignore]
+    fn lever2_twin_in_block_fraction() {
+        for (a, n, points, seed) in [(0u8, 53u32, 27984usize, 201u64), (0, 61, 39040, 201)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, seed, points).unwrap();
+            // twin of each index: same signed orbit, same k, other sign
+            let mut by_key = std::collections::HashMap::new();
+            for (i, &(o, k, neg)) in fb.signed_orbit_of.iter().enumerate() {
+                by_key.insert((o, k, neg), i);
+            }
+            let twin: Vec<Option<usize>> = fb
+                .signed_orbit_of
+                .iter()
+                .map(|&(o, k, neg)| by_key.get(&(o, k, !neg)).copied())
+                .collect();
+            let with_twin = twin.iter().filter(|t| t.is_some()).count();
+            // whole columns, as aimed collection scans them: every base index, sorted
+            let idxs: Vec<usize> = (0..fb.points.len()).collect();
+            let pos: std::collections::HashMap<usize, usize> =
+                idxs.iter().enumerate().map(|(p, &i)| (i, p)).collect();
+            let adjacent = idxs
+                .iter()
+                .filter(|&&i| twin[i].is_some_and(|t| (t as isize - i as isize).abs() == 1))
+                .count();
+            let mut same_block = 0usize;
+            for shift in 0..8usize {
+                for (p, &i) in idxs.iter().enumerate() {
+                    if let Some(t) = twin[i] {
+                        if (p + shift) / 8 == (pos[&t] + shift) / 8 {
+                            same_block += 1;
+                        }
+                    }
+                }
+            }
+            eprintln!(
+                "n={n}: {} points, {} with a twin in the base, twin adjacent {:.4}, twin in same 8-group {:.4} (mean over 8 alignments)",
+                idxs.len(),
+                with_twin,
+                adjacent as f64 / idxs.len() as f64,
+                same_block as f64 / (8 * idxs.len()) as f64
+            );
+        }
+    }
+
     #[test]
     fn aimed_scans_carry_the_coordinates_of_their_indices() {
         let kc = KoblitzCurve::new(0, 19).unwrap();
@@ -20775,7 +21510,7 @@ mod tests {
             let mut gathered_scans = 0;
             for t in 0..2 * subset as u64 {
                 match targets.scan(0x5eed, t, base) {
-                    Scan::Gathered { idxs, xs, ys } => {
+                    Scan::Gathered { idxs, xs, ys, .. } => {
                         assert!(expect_gathered, "gathered where the kernel cannot run");
                         assert_eq!(idxs.len(), targets.len());
                         assert_eq!(xs.len(), idxs.len());

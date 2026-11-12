@@ -63,6 +63,7 @@ SOURCES = {
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
     "koblitz_s23": "research/ic_single_target_20260930/analysis.json",
     "koblitz_rule_v7": "research/ic_tool_program/rule/v7/analysis.json",
+    "koblitz_rule_v9": "research/ic_tool_program/rule/v9/analysis.json",
     "oracles": "docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json",
     "n37_rank_columns": "research/ecbench_n37_rank_columns_20261004/RESULT.json",
     "n37_k8_k16": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -107,6 +108,7 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+    "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -149,6 +151,7 @@ SOURCES = {
     "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
+    "mt_fieldops_component": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
@@ -175,6 +178,7 @@ GITHUB = "https://github.com/aburan28/crypto/blob/main/"
 S22_RUNS = "research/ic_descent_20260930/runs-isolated/main"
 S23_RUNS = "research/ic_single_target_20260930/runs"
 RULE_V7_RUNS = "research/ic_tool_program/rule/v7/runs"
+RULE_V9_RUNS = "research/ic_tool_program/rule/v9/runs"
 
 # Phases, in pipeline order, as the page groups them.
 PHASES = [
@@ -218,16 +222,16 @@ REGIME_NAME = {"prime": "Prime field", "char2": "Random binary", "koblitz": "Kob
 FAMILY_OF = {"koblitz": "A", "prime": "B", "char2": "B", "koblitz_batch": "C"}
 FAMILIES = {
     "A": {
-        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v7",
+        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at main as rule v9 against a matched rho",
         "status": "primary comparison: one target, as AGENTS.md's one-target rule requires",
         "targets": "one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks",
         "unit": "one batched affine addition (`add_many` over 1,024 subgroup points), per √r",
         "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, "
                     "and divides by this unit, measured around each repetition (§20, §23). Each process measures its own "
                     "unit, so S here is not "
-                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
+                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
+                     "in the same unit and the same process; its answer replayed and verified (§23; rule v9 at main, with rule v8's matched rho: batched canonicalisation).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -488,7 +492,9 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 
 
 # These engineering components also carry validation gates outside tables A-C.
-COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather",)
+COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
+                           "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
+                           "benchmarks/20261112-mt-fieldops-v5")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -631,23 +637,25 @@ def koblitz_rows(names: Names) -> list[dict]:
 
 def koblitz_one_target_rows(names: Names) -> list[dict]:
     """Ledger §23's comparison: one unseen public point per process, 64 per
-    size, re-run at the IC tool programme's baseline v7 as rule v7.  The
+    size, re-run at main as rule v9 against rule v8's matched rho (rule v7's
+    figures, against rho as then, are the before marks).  The
     primary comparison under AGENTS.md's one-target rule.  S here is cold,
     the reusable set-up plus the online interval, against one-target rho's
     set-up plus its walk; the online speedup, the canonical-step reading and
     the Bernstein–Lange precomputation model ride beside it, never alone.
-    §23's figures on the same curve are the row's before marks.  Each
+    §23 still fixes each size's curve.  Each
     process prices S in its own batched addition, so a row's S is not
     compared with §23's; the ratios carry no unit."""
     rows = []
     s23 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_s23"])["sizes"]}
-    for x in load(SOURCES["koblitz_rule_v7"])["sizes"]:
+    v7 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_rule_v7"])["sizes"]}
+    for x in load(SOURCES["koblitz_rule_v9"])["sizes"]:
         a, n = x["a"], x["n"]
-        before = s23[(a, n)]
-        c = names(before["curve"])
-        if c["slug"] != x["curve"]:
-            raise SystemExit(f"rule v7's {x['curve']} is not §23's {before['curve']}")
-        par = json.loads((REPO / RULE_V7_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
+        s23_row, before = s23[(a, n)], v7[(a, n)]
+        c = names(s23_row["curve"])
+        if c["slug"] != x["curve"] or before["curve"] != x["curve"]:
+            raise SystemExit(f"rule v9's {x['curve']} is not §23's {s23_row['curve']} or rule v7's {before['curve']}")
+        par = json.loads((REPO / RULE_V9_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
         columns = int(re.search(r"-c(\d+)-", par["name"]).group(1))
         d = x["diagnostics"]
         sh = d["online_phase_shares"]
@@ -668,8 +676,9 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
                          "verify": online * sh["recovery_check"]},
             "ratio_rho": x["cold_ratio_ic_over_rho"]["value"],
             "ratio_rho_ci": list(x["cold_ratio_ic_over_rho"]["ci95"]),
-            "ratio_rho_section23": before["cold_ratio_ic_over_rho"]["value"],
-            "online_speedup_section23": before["online_speedup"]["mean_ratio"],
+            "ratio_rho_rule_before": before["cold_ratio_ic_over_rho"]["value"],
+            "online_speedup_rule_before": before["online_speedup"]["mean_ratio"],
+            "before_label": "rule v7, rho as then",
             "online_speedup": x["online_speedup"]["mean_ratio"],
             "online_speedup_ci": list(x["online_speedup"]["ci95"]),
             "online_speedup_canonical_step": x["online_speedup_rho_model"]["mean_ratio"],
@@ -685,12 +694,12 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         rows.append({
             "regime": "koblitz", "slug": c["slug"], "ec1": x.get("curve_id") or ec1_of(c),
             "legacy": before["curve"], "log2_r": x["log2_r"], "cofactor": None,
-            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
+            "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
-            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
-            "before_source": SOURCES["koblitz_s23"],
-            "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-            "class": "accounting",
+            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v9"],
+            "before_source": SOURCES["koblitz_rule_v7"],
+            "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+            "class": "measurement",
         })
     return rows
 
@@ -881,6 +890,59 @@ def prime_base_size_component() -> dict:
                            f"reference with the §5a band are filed in `{study}/VALIDATION.json`. The promoted "
                            "result is the 20-bit `N=45` engineering baseline only; it is one curve, counted "
                            "pricing-band evidence, and not a scaling or wall-time claim.") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def prime_ksum_component() -> dict:
+    """Pooled k-sum decomposition tables against the tuned mitm incumbent on 16 fresh prime-field
+    holdout curves, research/prime_ksum_pooled_20261029 (frozen protocol, selection hashed before the
+    holdout): per size the holdout mean S (mean over the size's 4 curves of the per-curve mean in the
+    study's `ecbench band` table, band.json) and, at w = 0, 0.1 and 1, the paired ratios of totals
+    ksum5-sel / inc-sel, ksum4-sel / inc-sel, ksum5-sel / rho-neg and ksum4-sel / rho-neg with ci95 and
+    pairs, copied from the study's saved `ecbench compare --weight` outputs. Generic decomposition
+    track: bounded by sqrt(r), it cannot beat rho; rho stays ahead (distance remaining). The saved
+    comparisons are the study's pre-2026-11-08 pricing reading (table_insert_attempts not priced).
+    Its standing comes from the study's VALIDATION.json."""
+    study = "research/prime_ksum_pooled_20261029"
+    per = {}
+    for r in load(f"{study}/analysis/band.json")["rows"]:
+        per.setdefault((int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"]), []).append(r["mean_s"])
+    rows = []
+    for bits in (20, 24, 28, 32):
+        means = {}
+        for arm in ("inc-sel", "ksum4-sel", "ksum5-sel", "rho-neg"):
+            ms = per[(bits, arm)]
+            if len(ms) != 4:
+                raise SystemExit(f"{study}: band.json has {len(ms)} curves for P{bits} {arm}, expected 4")
+            means[arm] = [sum(m[i] for m in ms) / len(ms) for i in range(3)]
+        cmps = {}
+        for name, key in (("ksum5_over_inc", "inc-sel__ksum5-sel"), ("ksum4_over_inc", "inc-sel__ksum4-sel"),
+                          ("ksum5_over_rho", "rho-neg__ksum5-sel"), ("ksum4_over_rho", "rho-neg__ksum4-sel")):
+            acc = []
+            for w in ("0", "0.1", "1"):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+            cmps[name] = acc
+        rows.append({"bits": bits, "mean_s": means, **cmps})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/report.pdf",
+            "readme": study + "/README.md",
+            "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
+            "unit": ("S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in "
+                     "the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not "
+                     "charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 "
+                     "distance to rho grows to 6.30x-8.52x"),
+            "validation": ("Validated with caveats: replay certificate (count-identical replay of all 8 sessions, "
+                           "9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean "
+                           "archive of 6edb2cb36d), validator report (independent recompute) and the matched rho "
+                           f"reference with the §5a band are filed in `{study}/VALIDATION.json`. Scope: the counted "
+                           "unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording "
+                           "host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the "
+                           "validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records "
+                           "give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.")
+            if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -1234,6 +1296,49 @@ def ic_cover_weakclass_component() -> dict:
             "validation": ("validated with caveats: replay certificate, validator report and the "
                            "negation-map rho reference with the §5a band "
                            f"({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def jv_sieve_line_vs_rho_component() -> dict:
+    """The Joux-Vitse cover sieve route (arms P, H, U) against a matched negation-map
+    rho on the same weak-class instances, p in {1009, 1511, 1823}, from
+    research/jv_sieve_line_vs_rho_20261103/fit.json (made by the study's Rust tool
+    from its records; every point recomputed independently by the validator,
+    review/validator/recompute.json). Per-prime reference (the frozen homogeneity
+    rule failed), unit U2, layer A of the §5a band (all unemitted cover F_p work
+    priced as native). Weak class only, never prime order: outside tables A-C.
+    Its standing comes from the study's VALIDATION.json."""
+    f = load(SOURCES["jv_sieve_line_vs_rho"])
+    study = "research/jv_sieve_line_vs_rho_20261103"
+    if f["controls"]["primary"] != "per-prime" or not (f["controls"]["c1_pass"] and f["controls"]["c2_pass"]
+                                                       and f["controls"]["replays_ok"]):
+        raise SystemExit(f"{SOURCES['jv_sieve_line_vs_rho']}: controls or primary reference changed")
+    rows = []
+    for arm in "PHU":
+        for scope in ("p=1009", "p=1511", "p=1823", "pooled (24 instances)"):
+            cell = lambda m: f[f"per-prime|{arm}|{scope}|{m}"]
+            band = [cell(f"band A U2 w={w}") for w in ("0", "0.1", "1")]
+            rows.append({"arm": arm, "scope": scope.replace(" (24 instances)", ""),
+                         "s": cell("S/rho U2")["point"], "lo": cell("S/rho U2")["lo"], "hi": cell("S/rho U2")["hi"],
+                         "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
+                         "below": all(b["verdict"] == "below" for b in band)})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    walk = load("research/jv_walk_charge_20261111/analysis.json")
+    w512 = walk["by_M"]["512"]["pooled"]
+    walk_note = (f"The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in "
+                 f"research/jv_walk_charge_20261111 ({walk['verdict']}): pooled {w512['0']['point']:.4f} / "
+                 f"{w512['0.1']['point']:.4f} / {w512['1']['point']:.4f} at w = 0 / 0.1 / 1 with the walk, against "
+                 f"{w512['0']['uncharged_point']:.4f} / {w512['0.1']['uncharged_point']:.4f} / {w512['1']['uncharged_point']:.4f} without it. "
+                 "That charge covers starts within the implemented walk's reach: from a random admitted curve it "
+                 "reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % "
+                 "operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak "
+                 "curve (all depth-1 2-volcanoes) cannot use the route.")
+    return {"rows": rows, "class": "transfer (weak class only)", "walk_note": walk_note,
+            "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["jv_sieve_line_vs_rho"],
+            "validation": ("validated with caveats (weak class only; the isogeny walk is charged in a separate study): "
+                           "replay certificate, validator report and the matched negation-map rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -1719,6 +1824,47 @@ def pkm_symmetric_component() -> dict:
             "report": "research/pkm_symmetric_lead1_20261026/README.md",
             "source": SOURCES["pkm_symmetric_component"],
             "class": "solver-stage diagnostic", "validation": NOT_VALIDATED}
+
+
+MT_FIELDOPS_EVIDENCE = "benchmarks/20261112-mt-fieldops-v5"
+
+
+def mt_fieldops_component() -> dict:
+    """Multi-target IC (icbest = cheapest of ic5, ic5ks, ic5w, ic5rw per configuration and price) against the
+    cheapest multi-target rho of the same counted field layer (rhobest = best of 10 runs of Kuhn-Struik retention
+    rho rho2xks and distinguished-point rho rhodpu) and a paired BSGS, with every arm's native work (step-index
+    hashes, canonicalisations, offset-step indices) counted and priced at h as section 5a requires, from
+    research/mt_fieldops_v5_20261112 (33 fresh prime-order curves at 24-32 bits, 3366 runs). Supersedes v4
+    (research/mt_fieldops_v4_20261112), v3 and v2. Medians and bootstrap intervals are copied from summary.json
+    (analyze.py); I/M = 10, h in {0, 0.1, 1}. A multi-target regime outside tables A-C; its standing comes from the
+    benchmarks directory's VALIDATION.json."""
+    summary = load(SOURCES["mt_fieldops_component"])
+    errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
+    cells = sorted({(x["bits"], x["T"]) for x in summary})
+    rows = []
+    for bits, t in cells:
+        def q(vs, h):
+            x = next(y for y in summary if y["cand"] == "icbest" and y["vs"] == vs and y["cI"] == 10 and y["bits"] == bits
+                     and y["T"] == t and y["h"] == h)
+            return {"median": x["median"], "ci95": [x["lo"], x["hi"]], "n": x["n"]}
+        band = {str(h): q("rhobest", h) for h in (0, 0.1, 1)}
+        verdict = ("cheaper" if all(v["ci95"][1] < 1 for v in band.values())
+                   else "dearer" if all(v["ci95"][0] > 1 for v in band.values()) else "unranked")
+        rows.append({"bits": bits, "T": t, "rho": band, "bsgs": {str(h): q("bsgs2", h) for h in (0, 1)},
+                     "verdict": verdict})
+    return {"rows": rows, "study": "research/mt_fieldops_v5_20261112/",
+            "report": "research/mt_fieldops_v5_20261112/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+            "v4": "research/mt_fieldops_v4_20261112/",
+            "previous": "research/mt_fieldops_v3_20261111/",
+            "correction": "research/mt_rho_start_fix_20261111/",
+            "class": "multi-target method",
+            "validation": ("validated: replay certificate, validator report and the rho reference (cheapest standard "
+                           "multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band "
+                           f"({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else (
+                f"not validated: the gate refuses {MT_FIELDOPS_EVIDENCE}/VALIDATION.json (validator status "
+                "insufficient_evidence for a ranking, strongest_available false); the measurement itself replays "
+                "exactly and recomputes"),
+            "validated": not errs}
 
 
 def _jsonl(rel: str) -> list[dict]:
@@ -2557,6 +2703,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "prime_ksum_component": prime_ksum_component(),
         "packed_filter_component": packed_filter_component(),
         "lazy_members_component": lazy_members_component(),
         "generator_orbit_component": generator_orbit_component(),
@@ -2567,10 +2714,12 @@ def build(allow_unvalidated: bool = False) -> dict:
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
+        "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "aimed_gather_component": aimed_gather_component(),
+        "mt_fieldops_component": mt_fieldops_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
         "quartic_polynomial_component": quartic_polynomial_component(),
@@ -2966,6 +3115,21 @@ def markdown(doc: dict) -> str:
                  f"**{r['ratio']:.3f}** [{r['ratio_min']:.3f}, {r['ratio_max']:.3f}] | {band} | {before} |")
     L += ["", f"[Report]({'../../' + cw['report']}) · [study](../../{cw['study']}) · "
               f"[data](../../{cw['source']}).", "", cw["validation"], ""]
+    js = doc["jv_sieve_line_vs_rho_component"]
+    L += ["## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)", "",
+          "Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} "
+          "(never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per "
+          "prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; "
+          f"`{js['unit']}`. The band is layer A: every unemitted cover F_p operation is also priced as native, the "
+          f"upper-bound convention. {js['walk_note']} Distance remaining is IC ÷ rho; "
+          "\"below\" means the 95% interval's upper end is under 1 at all three prices.", "",
+          "| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |",
+          "|:--|:--|:--|:--|:--|"]
+    for r in js["rows"]:
+        L.append(f"| {r['arm']} | {r['scope']} | **{r['s']:.4f}** [{r['lo']:.4f}, {r['hi']:.4f}] | "
+                 + " / ".join(f"{x:.3f}" for x in r["band"]) + f" | {'yes' if r['below'] else 'no'} |")
+    L += ["", f"[Report]({'../../' + js['report']}) · [study](../../{js['study']}) · "
+              f"[data](../../{js['source']}).", "", js["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -3018,7 +3182,8 @@ def markdown(doc: dict) -> str:
                 (f"2^{r['reference_log2_total_gae']:.2f} GAE" if "reference_log2_total_gae" in r else "—"),
                 g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
-                                                   if "ratio_rho_section23" in b else ""),
+                                                   if "ratio_rho_section23" in b else "")
+                + (f" (was {times(b['ratio_rho_rule_before'])}, {b['before_label']})" if "ratio_rho_rule_before" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
                 "✓" if b["verified"] else "✗", validation_cell(r["validation"])]
             L.append("| " + " | ".join(cells) + " |")
@@ -3320,6 +3485,32 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    L += ["## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)", "",
+          f"Track: {pk['track']}. Registered protocol; the incumbent and both k-sum families were tuned on separate "
+          "train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every "
+          "arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table "
+          f"incumbent. {pk['unit']}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.", "",
+          "| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |",
+          "|--:|:--|:--|:--|:--|--:|"]
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        L.append(f"| {r['bits']} | {m['inc-sel'][0]:.2f} / {m['ksum5-sel'][0]:.2f} / {m['rho-neg'][0]:.2f} | "
+                 f"{pk_q(r['ksum5_over_inc'])} | {pk_q(r['ksum4_over_inc'])} | {pk_g(r['ksum5_over_rho'])} | "
+                 f"{r['ksum5_over_inc'][0]['pairs']} |")
+    L += ["", "The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that "
+          "index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on "
+          "16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its "
+          "limit is BSGS, and it stays above BSGS at every size.", "",
+          f"[Report]({'../../' + pk['report']}) · [README](../../{pk['readme']}) · [study](../../{pk['study']}).", "",
+          pk["validation"], ""]
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -3559,6 +3750,27 @@ def markdown(doc: dict) -> str:
           f"[{c4['paired_min']:.2f}, {c4['paired_max']:.2f}] across paired instances. "
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
+    mt = doc["mt_fieldops_component"]
+    L += ["## Multi-target IC against multi-target rho: the order flips with the hash price, outside tables A–C", "",
+          "Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired "
+          "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
+          "1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point "
+          "canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four "
+          "ic5 variants (4-term x-only table, paired trials with one shared inversion; with or without retention and "
+          "random-walk offsets); the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, "
+          "10 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance "
+          "remaining. The IC is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a "
+          f"decision is unranked. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
+          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |",
+          "|--:|--:|--:|--:|--:|:--|--:|--:|"]
+    for r in mt["rows"]:
+        f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
+        L.append(f"| {r['bits']} | {r['T']} | {f(r['rho']['0'])} | {f(r['rho']['0.1'])} | {f(r['rho']['1'])} | "
+                 f"{r['verdict']} | {r['bsgs']['0']['median']:.2f} | {r['bsgs']['1']['median']:.2f} |")
+    L += ["", f"Study: [{mt['study']}](../../{mt['study']}); [report](../../{mt['report']}); source `{mt['source']}`. "
+          f"v4, without native work priced: [{mt['v4']}](../../{mt['v4']}). "
+          f"Earlier rows were measured against a rho without retention: IC5 (v3, [{mt['previous']}](../../{mt['previous']}); "
+          f"its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [{mt['correction']}](../../{mt['correction']})).", ""]
     pk = doc["pkm_symmetric_component"]
     L += ["## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C", "",
           f"Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion "
@@ -4369,6 +4581,22 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table></div>'
              f'<p>{gh(cw["report"], "Report")} · {gh(cw["study"], "study")} · {gh(cw["source"], "data")}.</p>'
              f'<p class="muted">{esc(cw["validation"])}</p></section>')
+    js = doc["jv_sieve_line_vs_rho_component"]
+    P.append('<section class="panel" id="jv-sieve-line-vs-rho"><h2>Joux–Vitse cover sieve vs matched negation rho '
+             '<span class="chip">weak class only</span></h2>'
+             '<p>Curves over F<sub>p⁶</sub> with full rational 2-torsion whose class has a genus-3 cover over '
+             'F<sub>p²</sub> (never prime order). Arms P, H and U, 8 instances per prime, against a negation-map rho '
+             f'on the same instances in the same binary. Per-prime reference; {esc(js["unit"])}. Layer-A band: every '
+             f'unemitted cover F<sub>p</sub> operation is also priced as native. {esc(js["walk_note"])}</p><div class="scroll"><table><thead><tr><th>arm</th><th>scope</th>'
+             '<th>IC ÷ rho, U2 [95%]</th><th>layer-A band (w = 0 / 0.1 / 1)</th><th>below across band</th>'
+             '</tr></thead><tbody>')
+    for r in js["rows"]:
+        P.append(f'<tr><td>{r["arm"]}</td><td>{esc(r["scope"])}</td><td><b>{r["s"]:.4f}</b> '
+                 f'[{r["lo"]:.4f}, {r["hi"]:.4f}]</td><td>' + " / ".join(f"{x:.3f}" for x in r["band"])
+                 + f'</td><td>{"yes" if r["below"] else "no"}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(js["report"], "Report")} · {gh(js["study"], "study")} · {gh(js["source"], "data")}.</p>'
+             f'<p class="muted">{esc(js["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
@@ -4637,6 +4865,37 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    P.append('<section class="card" id="prime-ksum"><h2>Prime-field k-sum tables against the tuned incumbent '
+             '(2026-10-30) <span class="chip">engineering</span></h2>'
+             f'<p>Track: {esc(pk["track"])}. Registered protocol; the incumbent and both k-sum families were tuned '
+             'on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets '
+             '× 2 rounds, every arm in one session per size). <code>ksum5-sel</code> is the k = 5 sum table, '
+             '<code>inc-sel</code> the tuned pair-table incumbent. '
+             f'{esc(pk["unit"])}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>S holdout mean: inc-sel / ksum5-sel / '
+             'rho-neg (w = 0)</th><th>ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1)</th><th>ksum4-sel ÷ inc-sel</th>'
+             '<th>ksum5-sel ÷ rho-neg: distance remaining</th><th class="n">Pairs</th></tr></thead><tbody>')
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{m["inc-sel"][0]:.2f} / {m["ksum5-sel"][0]:.2f} / '
+                 f'{m["rho-neg"][0]:.2f}</td><td>{pk_q(r["ksum5_over_inc"])}</td><td>{pk_q(r["ksum4_over_inc"])}</td>'
+                 f'<td>{pk_g(r["ksum5_over_rho"])}</td><td class="n">{r["ksum5_over_inc"][0]["pairs"]}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that '
+             'index-calculus baseline. Rho stays ahead at every size and weight (<code>rho-neg</code> &lt; '
+             '<code>ksum5-sel</code> &lt; <code>inc-sel</code> on 16 of 16 curves); the ÷ rho column is the distance '
+             'remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every '
+             'size.</p>'
+             f'<p>{gh(pk["report"], "Report")} · {gh(pk["readme"], "README")} · {gh(pk["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pk["validation"])}</p></section>')
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -4897,6 +5156,27 @@ def page(doc: dict, standalone: bool) -> str:
              f'{c4["paired_max"]:.2f}]. This is a solver-stage change; no full-pipeline row or curve verdict '
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
+    mt = doc["mt_fieldops_component"]
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against multi-target rho: the order flips with the hash price, outside the priced tables</h2>'
+             '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>24</sup> to 2<sup>32</sup>, 33 fresh curves, 22 paired '
+             'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
+             '1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point '
+             'canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four ic5 '
+             'variants; the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, 10 runs per '
+             'configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The IC '
+             'is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a decision is unranked. '
+             f'Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
+             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC/rho h=0</th><th>h=0.1</th><th>h=1</th>'
+             '<th>§5a</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
+                       + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
+                                 f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))
+                       + f'<td>{esc(r["verdict"])}</td><td class="n">{r["bsgs"]["0"]["median"]:.2f}</td>'
+                       f'<td class="n">{r["bsgs"]["1"]["median"]:.2f}</td></tr>' for r in mt["rows"])
+             + f'</tbody></table><p><a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["study"])}">Study</a>; '
+             f'v4 without native work priced: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["v4"])}">v4</a>; '
+             f'earlier rows against a rho without retention: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["previous"])}">IC5 (v3)</a>, '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">IC4 (v2)</a>.</p></section>')
     pk = doc["pkm_symmetric_component"]
     P.append('<section class="card" id="pkm-symmetric-component"><h2>Symmetric PKM tower, F4 stage at m = 4, outside the priced tables</h2>'
              f'<p>Writing the Kummer membership and S<sub>5</sub> in the elementary symmetric functions before expansion '
@@ -4940,6 +5220,9 @@ def page(doc: dict, standalone: bool) -> str:
             if "ratio_rho_section23" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section23"])} cold, '
                        f'{g3(b["online_speedup_section23"])}× online-only ratio (§23, at v0)</span>')
+            if "ratio_rho_rule_before" in b:
+                ci += (f'<br><span class="muted">was {times(b["ratio_rho_rule_before"])} cold, '
+                       f'{g3(b["online_speedup_rule_before"])}× online-only ratio ({b["before_label"]})</span>')
             if "ratio_rho_section21" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
@@ -5000,8 +5283,8 @@ def page(doc: dict, standalone: bool) -> str:
              'and floors, stated at the head of each; S, × ref and × floor are comparable inside a table and '
              'nowhere else. Tables A and B solve one target per row, as AGENTS.md\'s one-target rule requires: '
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
-             're-run at the ic tool programme\'s baseline v7, 64 points per size, §23\'s figures kept as the '
-             'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
+             're-run at main as rule v9 against a matched rho, 64 points per size, rule v7\'s figures, against rho as '
+             'then, kept as the before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
              'diagnostic. For the Koblitz rows of A the archived online-only ratio, the reading with rho at the canonical '
              'step and the generic-precomputation model sit beside the cold ratio as phase diagnostics; '
              'there is no equal-advice online speedup claim. The bar '

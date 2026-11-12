@@ -1,0 +1,536 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T07:51:49+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/amortized_bench",
+        "--targets",
+        "128",
+        "--time-limit-s",
+        "300",
+        "--json",
+        "research/chained_prime_transfer_20261111/amortized/amortized.json",
+        "--svg",
+        "research/chained_prime_transfer_20261111/amortized/amortized.svg"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T05:30:48+00:00",
+      "wall_s": 1146.349
+    },
+    {
+      "argv": [
+        "./target/release/amortized_bench",
+        "--targets",
+        "128",
+        "--time-limit-s",
+        "300",
+        "--json",
+        "research/chained_prime_transfer_20261111/amortized/amortized.json",
+        "--svg",
+        "research/chained_prime_transfer_20261111/amortized/amortized.svg"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T06:00:56+00:00",
+      "wall_s": 3048.312
+    },
+    {
+      "argv": [
+        "./target/release/amortized_bench",
+        "--targets",
+        "128",
+        "--time-limit-s",
+        "300",
+        "--primes",
+        "211,419,821,1619,3203",
+        "--json",
+        "research/chained_prime_transfer_20261111/repro/amortized.repro.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T07:49:14+00:00",
+      "wall_s": 49.357
+    }
+  ],
+  "commit": "1d0afb71100c02da18af000b0c205098278c59da",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T04:02:22+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T0402Z-chained-amortized-ic",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p211",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 420.9296875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 12.094
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p211",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 420.9296875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 11.32
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p211",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 420.9296875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 1432.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p419",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 435.4921875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 12.398
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p419",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 435.4921875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 11.156
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p419",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 435.4921875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 2170.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p821",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 343.1875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 10.477
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p821",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 343.1875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 9.641
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p821",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 343.1875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 3633.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p1619",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 611.5234375,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 15.688
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p1619",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 611.5234375,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 14.93
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p1619",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 611.5234375,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 6891.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p3203",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 532.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 14.727
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p3203",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 532.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 14.242
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p3203",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 532.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 12325.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p6421",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 894.15625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 21.094
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p6421",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 894.15625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 20.594
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p6421",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 894.15625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 26043.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p12841",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 886.90625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 21.602
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p12841",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 886.90625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 21.148
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p12841",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 886.90625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 51427.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p25693",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 398.5390625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 11.055
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p25693",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 398.5390625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 11.07
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p25693",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 398.5390625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 100612.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p51407",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 1370.8046875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 27.711
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p51407",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 1370.8046875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 27.281
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p51407",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 1370.8046875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 205853.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p102829",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 660.265625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 17.164
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p102829",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 660.265625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 16.477
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p102829",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 660.265625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 408512.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_online_ops_p205661",
+      "note": "ic_walk_q90 per-target mean incl certificate; reference plain rho mean",
+      "reference": 1397.8671875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 28.039
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "bl_memory_online_ops_p205661",
+      "note": "BL rho table=fb size per-target mean incl certificate; reference plain rho mean",
+      "reference": 1397.8671875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "count",
+      "value": 27.688
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 128,
+      "name": "ic_star_one_time_gae1_p205661",
+      "note": "IC* one-time group ops + LA ops at 1 GAE per op; reference plain rho online mean (per target)",
+      "reference": 1397.8671875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 808567.0
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 774878,
+      "path": "research/chained_prime_transfer_20261111/amortized/amortized.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/49/49e970cc65d25613cf42236865c5195d57237a6848d1c19cb11f39dd9f5e99b1",
+      "sha256": "49e970cc65d25613cf42236865c5195d57237a6848d1c19cb11f39dd9f5e99b1",
+      "uploaded": false
+    },
+    {
+      "bytes": 2591,
+      "path": "research/chained_prime_transfer_20261111/amortized/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/717ae4997e6eef7b39affc80f2cd7386cd066dd709ac6a1da4582ca8b3ea7824",
+      "sha256": "717ae4997e6eef7b39affc80f2cd7386cd066dd709ac6a1da4582ca8b3ea7824",
+      "uploaded": false
+    },
+    {
+      "bytes": 613027,
+      "path": "research/chained_prime_transfer_20261111/amortized/run1_amortized.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e5/e59a40fa836269134e645add8100edbbc6d7cfc6baad325d560ddd337dd36ce2",
+      "sha256": "e59a40fa836269134e645add8100edbbc6d7cfc6baad325d560ddd337dd36ce2",
+      "uploaded": false
+    },
+    {
+      "bytes": 2588,
+      "path": "research/chained_prime_transfer_20261111/amortized/run1.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/56/5620a17420f6f774828167ebeaab2b2a1701412a867bea18f959bc5dc8eec296",
+      "sha256": "5620a17420f6f774828167ebeaab2b2a1701412a867bea18f959bc5dc8eec296",
+      "uploaded": false
+    },
+    {
+      "bytes": 7605,
+      "path": "research/chained_prime_transfer_20261111/amortized/amortized.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24d65610d760782bc9dc5cd9e1e5eebd1ac4bc66e1a2e50739c190701869612b",
+      "sha256": "24d65610d760782bc9dc5cd9e1e5eebd1ac4bc66e1a2e50739c190701869612b",
+      "uploaded": false
+    },
+    {
+      "bytes": 347190,
+      "path": "research/chained_prime_transfer_20261111/repro/amortized.repro.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/33/338c8e703cd07668d9081fdd6fa839aeabcfe26c9e63ad95c1d3f3d6a1ffc811",
+      "sha256": "338c8e703cd07668d9081fdd6fa839aeabcfe26c9e63ad95c1d3f3d6a1ffc811",
+      "uploaded": false
+    },
+    {
+      "bytes": 1207,
+      "path": "research/chained_prime_transfer_20261111/repro/amortized.repro.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b0/b048f027f717ed8e1cf3d751fefdaf1eb95b94419f75b053771814e36c49d177",
+      "sha256": "b048f027f717ed8e1cf3d751fefdaf1eb95b94419f75b053771814e36c49d177",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_leads_20261112.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/amortized.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "chained-amortized-ic",
+  "status": "measured",
+  "summary": "Amortized IC: online 2-3% of plain rho but 1.3-11% above memory-matched BL rho (frozen rule fails 11/11); fb >= r in every row [pcc:unverified]",
+  "validation": null
+}

@@ -343,6 +343,25 @@ pub fn field_ops_total() -> u64 {
     field_ops_now()
 }
 
+/// Opt-in (counted only while `jv_bitops` counting is on): the share of
+/// [`count_ops`] row operations that are pivot normalisations (`x · inv`, a
+/// product with no addition).  Every other row operation is a
+/// multiply-subtract, so F4's emitted `F_p` additions are
+/// `count_ops − norm_ops`.  Off by default: one relaxed load per pivot.
+static NORM_OPS: AtomicU64 = AtomicU64::new(0);
+
+/// Process-wide pivot-normalisation row operations (see [`NORM_OPS`]).
+pub fn norm_ops_total() -> u64 {
+    NORM_OPS.load(AtomicOrdering::Relaxed)
+}
+
+#[inline]
+fn count_norm(n: usize) {
+    if super::jv_bitops::enabled() {
+        NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
+    }
+}
+
 #[inline]
 fn count_ops(n: usize) {
     FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
@@ -2061,11 +2080,12 @@ const PAR_WORK: usize = 1 << 15;
 /// Subtract `f · pivot` from `row` over the columns `from..`, with
 /// `f = row[col]`.  `p < 2³²`, so `x + (p − f)·y < 2⁶⁴` fits a `u64`
 /// and one Barrett reduction replaces the `u128` remainder of [`mulmod`].
+/// Returns the multiply-subtracts done; [`eliminate_rows`] counts them.
 #[inline]
-fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) {
+fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) -> usize {
     let f = row[col];
     if f == 0 {
-        return;
+        return 0;
     }
     let neg = fp.p - f;
     let mut ops = 0usize;
@@ -2075,20 +2095,43 @@ fn eliminate(row: &mut [u64], pivot: &[u64], col: usize, fp: Barrett) {
             ops += 1;
         }
     }
-    count_ops(ops);
+    ops
 }
 
+/// As [`eliminate`], on narrow rows; returns the row operations.
 #[inline]
-fn eliminate32(row: &mut [u32], pivot: &[u32], col: usize, fp: Barrett32) {
+fn eliminate32(row: &mut [u32], pivot: &[u32], col: usize, fp: Barrett32) -> usize {
     let f = row[col];
     if f == 0 {
-        return;
+        return 0;
     }
     let neg = fp.p - f;
     for (x, &y) in row[col..].iter_mut().zip(&pivot[col..]) {
         *x = fp.reduce(*x + neg * y);
     }
-    count_ops(row.len() - col);
+    row.len() - col
+}
+
+/// Run `elim` on every row, in parallel when `parallel`, and add the row
+/// operations it returns to the counters once per task instead of once
+/// per row (assessment 2026-11-10, R3).  A rayon `fold` hands each split's
+/// sum to `count_ops` on the thread that reduced those rows, so the
+/// process total ([`FIELD_OPS`]), every thread's total
+/// (`F4_FP_THREAD_OPS=1`) and the `jv_bitops` tally (a row with no work
+/// adds nothing either way) are exactly what the per-row calls gave.
+#[inline]
+fn eliminate_rows<R: Send>(
+    rows: &mut [R],
+    parallel: bool,
+    elim: impl Fn(&mut R) -> usize + Sync + Send,
+) {
+    if parallel {
+        rows.par_iter_mut()
+            .fold(|| 0usize, |ops, row| ops + elim(row))
+            .for_each(count_ops);
+    } else {
+        count_ops(rows.iter_mut().map(elim).sum());
+    }
 }
 
 fn rref32(
@@ -2117,15 +2160,11 @@ fn rref32(
             *x = fp.reduce(*x * inv);
         }
         count_ops(n_cols - c);
+        count_norm(n_cols - c);
         let (head, tail) = rows.split_at_mut(pr + 1);
         let prow = &head[pr];
-        if tail.len() * (n_cols - c) > PAR_WORK {
-            tail.par_iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        } else {
-            tail.iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        }
+        let parallel = tail.len() * (n_cols - c) > PAR_WORK;
+        eliminate_rows(tail, parallel, |row| eliminate32(row, prow, c, fp));
         pivots.push(c);
         pr += 1;
     }
@@ -2137,13 +2176,8 @@ fn rref32(
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
-        if head.len() * (n_cols - c) > PAR_WORK {
-            head.par_iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        } else {
-            head.iter_mut()
-                .for_each(|row| eliminate32(row, prow, c, fp));
-        }
+        let parallel = head.len() * (n_cols - c) > PAR_WORK;
+        eliminate_rows(head, parallel, |row| eliminate32(row, prow, c, fp));
     }
     Some(pivots)
 }
@@ -2373,6 +2407,7 @@ fn rref32_deferred(
                 *x = fp32.reduce(*x * inv);
             }
             count_ops(row.len() - c);
+            count_norm(row.len() - c);
             let at = known.partition_point(|(pc, _)| *pc < c);
             known.insert(at, (c, row));
         }
@@ -2751,14 +2786,11 @@ fn rref_ckpt(
                 }
             }
             count_ops(ops);
+            count_norm(ops);
             let (head, tail) = rows.split_at_mut(pr + 1);
             let prow = &head[pr];
-            if tail.len() * (n_cols - c) > PAR_WORK {
-                tail.par_iter_mut()
-                    .for_each(|row| eliminate(row, prow, c, fp));
-            } else {
-                tail.iter_mut().for_each(|row| eliminate(row, prow, c, fp));
-            }
+            let parallel = tail.len() * (n_cols - c) > PAR_WORK;
+            eliminate_rows(tail, parallel, |row| eliminate(row, prow, c, fp));
             pivots.push(c);
             pr += 1;
         }
@@ -2786,12 +2818,8 @@ fn rref_ckpt(
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
-        if head.len() * (n_cols - c) > PAR_WORK {
-            head.par_iter_mut()
-                .for_each(|row| eliminate(row, prow, c, fp));
-        } else {
-            head.iter_mut().for_each(|row| eliminate(row, prow, c, fp));
-        }
+        let parallel = head.len() * (n_cols - c) > PAR_WORK;
+        eliminate_rows(head, parallel, |row| eliminate(row, prow, c, fp));
     }
     Some(pivots)
 }
@@ -3670,6 +3698,9 @@ fn f4_with_arithmetic(
                 for &(c, v) in r {
                     acc[c as usize] = v;
                 }
+                // One count a pair row, on the thread that reduced it: the same
+                // totals as one a reducer (assessment 2026-11-10, R3).
+                let mut row_ops = 0usize;
                 let mut pending = 0usize;
                 for c in r[0].0 as usize..n_cols {
                     if reducer_at[c] == NONE {
@@ -3685,13 +3716,14 @@ fn f4_with_arithmetic(
                     for &(cc, v) in reducer {
                         acc[cc as usize] += neg * v;
                     }
-                    count_ops(reducer.len());
+                    row_ops += reducer.len();
                     pending += 1;
                     if pending == 256 {
                         normalize_lazy(&mut acc, fp);
                         pending = 0;
                     }
                 }
+                count_ops(row_ops);
                 Some(
                     free_cols
                         .iter()
@@ -3761,6 +3793,9 @@ fn f4_with_arithmetic(
                 for &(c, v) in r {
                     acc[c as usize] = v as u32;
                 }
+                // One count a pair row, on the thread that reduced it: the same
+                // totals as one a reducer (assessment 2026-11-10, R3).
+                let mut row_ops = 0usize;
                 for c in r[0].0 as usize..n_cols {
                     let f = acc[c];
                     if f == 0 || reducer_at[c] == NONE {
@@ -3773,8 +3808,9 @@ fn f4_with_arithmetic(
                         let x = &mut acc[cc as usize];
                         *x = fp32.reduce(*x + neg * v as u32);
                     }
-                    count_ops(reducer.len());
+                    row_ops += reducer.len();
                 }
+                count_ops(row_ops);
                 Some(free_cols.iter().map(|&c| acc[c]).collect())
             };
             let reduced: Option<Vec<Vec<u32>>> = if parallel {
@@ -3812,6 +3848,9 @@ fn f4_with_arithmetic(
                 for &(c, v) in r {
                     acc[c as usize] = v;
                 }
+                // One count a pair row, on the thread that reduced it: the same
+                // totals as one a reducer (assessment 2026-11-10, R3).
+                let mut row_ops = 0usize;
                 for c in r[0].0 as usize..n_cols {
                     let f = acc[c];
                     if f == 0 || reducer_at[c] == NONE {
@@ -3824,8 +3863,9 @@ fn f4_with_arithmetic(
                         let x = &mut acc[cc as usize];
                         *x = fp.reduce(*x + neg * v);
                     }
-                    count_ops(reducer.len());
+                    row_ops += reducer.len();
                 }
+                count_ops(row_ops);
                 Some(free_cols.iter().map(|&c| acc[c]).collect())
             };
             // an in-step snapshot stands in for the reducer pass and the finished

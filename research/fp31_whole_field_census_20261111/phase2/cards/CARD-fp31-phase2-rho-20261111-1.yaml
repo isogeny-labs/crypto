@@ -1,0 +1,67 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fp31-phase2-rho-20261111-1
+experiment_id: fp31_whole_field_census_20261111
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 53adef0ef5ba49e5f5ffc4d411eb0553f7800f39
+receipt: research/fp31_whole_field_census_20261111/phase2/cards/CARD-fp31-phase2-rho-20261111-1.receipt.json
+binds:
+  - {path: research/fp31_whole_field_census_20261111/phase2/PROTOCOL.md, sha256: 3d81d9fe603b7297427daca288578f13d25772e4a11b26d1a5c77fcce919c7ba}
+  - {path: research/fp31_whole_field_census_20261111/phase2/manifest.json, sha256: 92635536904cdd49c50600971640e1db6bb8922cd12e4e7d1e3a9a6e05e2465f}
+  - {path: research/fp31_whole_field_census_20261111/phase2/run_phase2.sh, sha256: c42576606d7a73c9aba96f2bec2ba8e81783da65ebab531179d54f2ee0314d2b}
+  - {path: target/release/isoclass-rho, sha256: 4f0897306551c10bd3eebb065dc385aeae38101e81eedc76e5ec73a4917424d3}
+  - {path: research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census, sha256: faeaa6c2b14b9b52f985bd0ba9b9ee481739c81fe2e089df17cbece0cfa125c8}
+must_not_exist:
+  - research/fp31_whole_field_census_20261111/phase2/runs
+  - research/fp31_whole_field_census_20261111/phase2/analysis.json
+commands:
+  - id: run-phase2
+    argv:
+      - research/fp31_whole_field_census_20261111/phase2/run_phase2.sh
+      - target/release/isoclass-rho
+      - research/fp31_whole_field_census_20261111/phase2/manifest.json
+      - research/fp31_whole_field_census_20261111/phase2/runs
+      - "200"
+      - "40"
+    env:
+      BENCHREC: benchmarks/records/20261111T0634Z-fp31-rho-across-classes.json
+      BENCHREC_ISOLATION: L0
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase2/cards/CARD-fp31-phase2-rho-20261111-1.run-phase2.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase2/cards/CARD-fp31-phase2-rho-20261111-1.run-phase2.stderr
+  - id: analyze
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - analyze
+      - --manifest
+      - research/fp31_whole_field_census_20261111/phase2/manifest.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase2/runs
+      - --out
+      - research/fp31_whole_field_census_20261111/phase2/analysis.json
+      - --perms
+      - "20000"
+    env:
+      BENCHREC: benchmarks/records/20261111T0634Z-fp31-rho-across-classes.json
+      BENCHREC_ISOLATION: L0
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase2/cards/CARD-fp31-phase2-rho-20261111-1.analyze.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase2/cards/CARD-fp31-phase2-rho-20261111-1.analyze.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase2/analysis.json]
+bus_address: executor-mechanical-fp31-phase2
+background: true
+write_scope: [research/fp31_whole_field_census_20261111/phase2/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the receipt and the run directory as they are.
+  - The tool reports that a bound digest does not match; run nothing further.
+notes: >-
+  Local route at isolation L0, a deviation recorded in PROTOCOL.md section 7 (no AWS identity; the EKS dispatch
+  accepts only ecbench specs). The metric is the exact iteration count. The benchmark record is
+  benchmarks/records/20261111T0634Z-fp31-rho-across-classes.json and the card sets BENCHREC to it in each command.
+  Run `python3 tools/task_card.py run` on this card. The first command runs detached and the tool exits 4;
+  run `python3 tools/task_card.py wait` on this card and repeat it for as long as it exits 4. The script prints
+  one line per class, beginning with ok or FAILED; a FAILED class is recorded and not retried (PROTOCOL.md section 4).
+  Both binaries are untracked build outputs bound by sha256 only.

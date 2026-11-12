@@ -10,9 +10,11 @@ use std::path::{Path, PathBuf};
 use tokio_postgres::Client;
 
 pub mod certs;
+pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
 pub mod ecbench;
+pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;
 pub mod generated;
@@ -208,6 +210,8 @@ pub enum Selection {
     Siblings,
     /// ℓ-volcano levels, directions and End(E) from the stored census isogeny graphs.
     Volcanoes,
+    /// End(E) of every ordinary curve over F_p, p < 2^10, by Kohel's l^k-torsion criterion.
+    EndRings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
 }
@@ -255,6 +259,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Volcanoes {
         reports.push(volcano::import(ctx).await?);
+    }
+    // After volcanoes: it cross-checks their levels and End(E) rows.
+    if all || what == Selection::EndRings {
+        reports.push(end_ring::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {

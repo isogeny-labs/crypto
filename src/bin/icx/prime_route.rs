@@ -537,6 +537,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -554,6 +555,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let mapped = transport(&target, &path, route_id).unwrap();
         std::fs::remove_file(path).unwrap();
@@ -606,6 +608,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -623,6 +626,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let mapped = transport(&target, &path, two_hop["id"].as_str().unwrap()).unwrap();
         std::fs::remove_file(path).unwrap();
@@ -673,6 +677,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -690,6 +695,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let mapped = transport(&target, &path, &route_id).unwrap();
         assert_eq!(mapped.receipt["hops"], 1);
@@ -743,6 +749,7 @@ mod tests {
         ));
         std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
         let target = PrimeArgs {
+            group_order: None,
             p: input.p,
             a: input.a,
             b: input.b,
@@ -760,6 +767,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let mapped = transport(&target, &path, &route_id).unwrap();
         std::fs::remove_file(path).unwrap();

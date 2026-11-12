@@ -50,7 +50,8 @@ use serde::{Deserialize, Serialize};
 
 use super::methods::PRICED_NATIVE;
 use super::record::Record;
-use crate::cryptanalysis::ic_boundary::pinned_calibration_ratios;
+use crate::cryptanalysis::ic_boundary::{pinned_calibration_ratios, PINNABLE_NATIVE};
+use crate::cryptanalysis::ic_framework::solvers::solver_unit_key;
 
 /// The band every comparison uses unless it states a wider one.
 pub const DEFAULT_WEIGHTS: [f64; 3] = [0.0, 0.1, 1.0];
@@ -133,6 +134,15 @@ impl Pricing {
 /// (`ic_framework/plugins.rs`, `table_counted()`).
 pub const TABLE_WORK_COUNTERS: &[&str] = &["table_insert_attempts"];
 
+/// Native work a sibling-point walk (`wwalk` `sib=m`) counts behind its own
+/// `counted:` marker: the second x-only point of each sibling pair, priced
+/// at `w` like the table work above (the pair itself is one charged group
+/// addition).  Read by [`table_work_counts`] where the marker is present,
+/// so no earlier record changes; it is not part of
+/// [`Pricing::priced_table_work`], whose list names only the
+/// pre-sibling counter, and a row reports it in `table_work_mean_counts`.
+pub const SIBLING_WORK_COUNTERS: &[&str] = &["sibling_second_points", "sibling_lift_products"];
+
 /// The phase sum of each [`TABLE_WORK_COUNTERS`] counter in `r`'s
 /// `work_native` maps, present only where some phase carries the marker
 /// `counted:<name>` (the code that did the work counted it and said so).  A
@@ -140,7 +150,7 @@ pub const TABLE_WORK_COUNTERS: &[&str] = &["table_insert_attempts"];
 /// the count is not known to be complete.
 pub fn table_work_counts(r: &Record) -> BTreeMap<String, u64> {
     let mut out = BTreeMap::new();
-    for name in TABLE_WORK_COUNTERS {
+    for name in TABLE_WORK_COUNTERS.iter().chain(SIBLING_WORK_COUNTERS) {
         let marker = format!("counted:{name}");
         if !r.phases.iter().any(|p| p.work_native.contains_key(&marker)) {
             continue;
@@ -272,7 +282,10 @@ pub fn calibrated_native(r: &Record) -> Result<(f64, u64), String> {
     let mut gae = 0.0;
     let mut ops = 0u64;
     for p in &r.phases {
-        for (counter, unit) in PRICED_NATIVE {
+        // The solver/oracle unit keys of 2026-11-12 are taken back out the
+        // same way once pinned; no record pins one yet, so for every
+        // committed record this adds nothing.
+        for (counter, unit) in PRICED_NATIVE.iter().chain(PINNABLE_NATIVE) {
             let n = p.native.get(*counter).copied().unwrap_or(0);
             if n > 0 && pinned.iter().any(|u| u == unit) {
                 let k = ratio(unit).ok_or_else(|| format!("{}: no ratio {unit}", r.record_id))?;
@@ -282,13 +295,22 @@ pub fn calibrated_native(r: &Record) -> Result<(f64, u64), String> {
         }
     }
     if let Some(s) = &r.solver {
+        let solver_charged = !r.cost.unpriced.iter().any(|u| u.starts_with("solver_"));
         if s.ops > 0
             && s.op_unit.contains("word XOR")
             && pinned.iter().any(|u| u == "ns_per_word_xor")
-            && !r.cost.unpriced.iter().any(|u| u.starts_with("solver_"))
+            && solver_charged
         {
             let k = ratio("ns_per_word_xor")
                 .ok_or_else(|| format!("{}: no ratio ns_per_word_xor", r.record_id))?;
+            gae += s.ops as f64 * k;
+            ops += s.ops;
+        } else if let Some(key) = solver_unit_key(&s.op_unit)
+            .filter(|k| k.refused.is_none())
+            .map(|k| k.key)
+            .filter(|key| s.ops > 0 && solver_charged && pinned.iter().any(|u| u == key))
+        {
+            let k = ratio(key).ok_or_else(|| format!("{}: no ratio {key}", r.record_id))?;
             gae += s.ops as f64 * k;
             ops += s.ops;
         }
@@ -663,6 +685,49 @@ mod tests {
         assert!((g1 - g - u as f64).abs() < 1e-6);
         // At w = 0.1 the F4 work alone is at least ops / 10 GAE.
         assert!(priced_gae(&r, 0.1).unwrap().unwrap() >= g + ops as f64 / 10.0);
+    }
+
+    /// **A pinned solver/oracle unit key is taken back out like any other
+    /// pinned price** (AGENTS.md §5a): on the same `pkm-semaev` record, as
+    /// if its curve pinned `ns_per_f4_muladd` and `ns_per_fp_mul` and the
+    /// record had charged them, `C` and `n_C` gain exactly the F4
+    /// multiply-adds and the pinnable `pkm_*` counters.  Unpinned (the record
+    /// as committed) nothing is taken out.
+    #[test]
+    fn a_pinned_solver_unit_key_is_taken_back_out_by_the_band() {
+        let text = include_str!(
+            "../../../research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json"
+        );
+        let committed: Record = serde_json::from_str(text).unwrap();
+        let (c0, n0) = calibrated_native(&committed).unwrap();
+        assert_eq!((c0, n0), (0.0, 0), "nothing pinned on the committed record");
+
+        let mut r = committed.clone();
+        let ops = r.solver.as_ref().unwrap().ops;
+        if let serde_json::Value::Object(d) = &mut r.detail {
+            d.insert(
+                "calibration_pinned_units".into(),
+                serde_json::json!(["ns_per_f4_muladd", "ns_per_fp_mul"]),
+            );
+            d.insert(
+                "calibration_ratios".into(),
+                serde_json::json!({"ns_per_f4_muladd": 0.5, "ns_per_fp_mul": 0.25}),
+            );
+        }
+        r.cost.unpriced.retain(|u| !u.starts_with("solver_"));
+        let fp: u64 = r
+            .phases
+            .iter()
+            .flat_map(|p| {
+                PINNABLE_NATIVE
+                    .iter()
+                    .filter(|(_, k)| *k == "ns_per_fp_mul")
+                    .map(|(c, _)| p.native.get(*c).copied().unwrap_or(0))
+            })
+            .sum();
+        let (c, n) = calibrated_native(&r).unwrap();
+        assert_eq!(n, ops + fp);
+        assert!((c - (ops as f64 * 0.5 + fp as f64 * 0.25)).abs() < 1e-6 * c.max(1.0));
     }
 
     fn targetwalk_k20_s0() -> Vec<Record> {

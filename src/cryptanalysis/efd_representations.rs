@@ -507,6 +507,93 @@ impl EfdRepresentation {
         self.encode_short(&x, &y)
     }
 
+    /// Formula ids available in this chart for `operation`
+    /// (`addition`, `doubling`, `tripling`, `negation`, `diffadd`, `ladder`)
+    /// plus `scaling`.
+    pub fn formula_ids(&self, operation: &str) -> Vec<String> {
+        catalogue()
+            .formulas
+            .iter()
+            .filter(|formula| {
+                formula.representation == self.chart_id && formula.operation == operation
+            })
+            .map(|formula| formula.id.clone())
+            .collect()
+    }
+
+    /// Add two points using an EFD formula in the selected chart.
+    ///
+    /// `formula_id` defaults to the first imported addition formula for the
+    /// chart.  Quotient charts without an addition formula return an error.
+    pub fn chart_add<F: PrimeField>(
+        &self,
+        field: &F,
+        p: &Pt<F::E>,
+        q: &Pt<F::E>,
+        formula_id: Option<&str>,
+    ) -> Result<Pt<F::E>, String> {
+        let id = formula_id
+            .map(str::to_owned)
+            .or_else(|| self.formula_ids("addition").into_iter().next())
+            .ok_or_else(|| format!("{} has no addition formula", self.chart_id))?;
+        self.chart_formula(field, &id, &[*p, *q])
+    }
+
+    /// Double a point using an EFD formula in the selected chart.
+    pub fn chart_double<F: PrimeField>(
+        &self,
+        field: &F,
+        p: &Pt<F::E>,
+        formula_id: Option<&str>,
+    ) -> Result<Pt<F::E>, String> {
+        let id = formula_id
+            .map(str::to_owned)
+            .or_else(|| self.formula_ids("doubling").into_iter().next())
+            .ok_or_else(|| format!("{} has no doubling formula", self.chart_id))?;
+        self.chart_formula(field, &id, &[*p])
+    }
+
+    fn chart_formula<F: PrimeField>(
+        &self,
+        field: &F,
+        formula_id: &str,
+        points: &[Pt<F::E>],
+    ) -> Result<Pt<F::E>, String> {
+        let chart = self
+            .chart
+            .ok_or("affine representations have no chart formula")?;
+        let formula = catalogue()
+            .formula(formula_id)
+            .ok_or_else(|| format!("unknown EFD formula {formula_id}"))?;
+        if formula.representation != chart.id {
+            return Err(format!(
+                "formula {formula_id} belongs to {}, not {}",
+                formula.representation, chart.id
+            ));
+        }
+        let mut inputs = self.params.clone();
+        for (offset, point) in points.iter().enumerate() {
+            let coords = self.encode_point(field, point)?;
+            for (name, value) in chart.variables.iter().zip(coords) {
+                inputs.insert(format!("{name}{}", offset + 1), value);
+            }
+        }
+        let output = formula
+            .evaluate(&self.modulus, &inputs)
+            .map_err(|e| format!("{formula_id}: {e}"))?;
+        let coords: Vec<FieldElement> = chart
+            .variables
+            .iter()
+            .map(|name| {
+                output
+                    .get(&format!("{name}3"))
+                    .cloned()
+                    .ok_or_else(|| format!("{formula_id} did not compute {name}3"))
+            })
+            .collect::<Result<_, _>>()?;
+        self.decode_point(field, &coords, 0)
+    }
+
     /// Round-trip a few points of the selected chart and return a JSON record.
     ///
     /// This is the check behind `ic prime --efd-check`.  It enumerates small
@@ -898,6 +985,78 @@ mod tests {
         assert_eq!(check["ok"], Value::Bool(true));
         let all = check_all_charts("montgom", &BigUint::from(P), &params).unwrap();
         assert_eq!(all["ok"], Value::Bool(true));
+    }
+
+    #[test]
+    fn chart_arithmetic_uses_the_efd_formulas() {
+        let p = BigUint::from(P);
+        let params = params_for("shortw");
+        let repr = EfdRepresentation::new("shortw", "projective", &p, &params).unwrap();
+        let curve = repr
+            .curve(
+                SmallPrime::new(P),
+                "formula test".into(),
+                BigUint::from(269u64),
+                true,
+                4,
+            )
+            .unwrap();
+        fn first_point<F: PrimeField>(curve: &Curve<F>, field: &mut F) -> Pt<F::E> {
+            for x in 1..P {
+                let x = field.embed_u64(x);
+                let rhs = curve.rhs(field, x);
+                if let Some(y) = curve.sqrt(field, rhs) {
+                    return Pt { x, y };
+                }
+            }
+            panic!("no point");
+        }
+        let mut field = curve.field.clone();
+        let g = first_point(&curve, &mut field);
+        let h = {
+            let mut x = g.x;
+            loop {
+                x = field.add(x, field.one());
+                let rhs = curve.rhs(&mut field, x);
+                if let Some(y) = curve.sqrt(&mut field, rhs) {
+                    break Pt { x, y };
+                }
+            }
+        };
+        let expected = curve
+            .add_points(&mut field, &g, &h)
+            .expect("distinct points");
+        let got = repr
+            .chart_add(
+                &curve.field,
+                &g,
+                &h,
+                Some("shortw/projective/addition/add-2015-rcb"),
+            )
+            .unwrap();
+        assert_eq!(got, expected);
+
+        let mont = EfdRepresentation::new("montgom", "xz", &p, &params_for("montgom")).unwrap();
+        let mont_curve = mont
+            .curve(
+                SmallPrime::new(P),
+                "formula test".into(),
+                BigUint::from(269u64),
+                true,
+                4,
+            )
+            .unwrap();
+        let mut field = mont_curve.field.clone();
+        let g = first_point(&mont_curve, &mut field);
+        let doubled = mont
+            .chart_double(
+                &mont_curve.field,
+                &g,
+                Some("montgom/xz/doubling/dbl-1987-m"),
+            )
+            .unwrap();
+        let expected = mont_curve.add_points(&mut field, &g, &g).unwrap();
+        assert_eq!(doubled.x, expected.x);
     }
 
     #[test]
