@@ -29,10 +29,13 @@
 //! genus-2 index calculus; it is **not** a cryptanalytic speedup and makes no
 //! cross-characteristic claim.
 
+pub mod amortized;
 pub mod atlas;
 pub mod bielliptic;
+pub mod certify;
 pub mod chain;
 pub mod ec;
 pub mod field;
+pub mod hyper64;
 pub mod measure;
 pub mod tower;
