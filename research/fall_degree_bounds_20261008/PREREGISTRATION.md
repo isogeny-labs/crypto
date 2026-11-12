@@ -1283,3 +1283,20 @@ No draw of E14a, E14b or E14c exists.
 `{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}`
 (script sha256 `e6e6d62754a76a66…`). Applied to E10's committed records and to r2f's `g2.jsonl` on the
 authoring host, both sides hash identically. Pod name prefix `fd-e14-r2g-`. Nothing else changes.
+
+## Amendment 28 (2026-11-12 UTC, before any draw below): r2g stalled in the build on a slow host; CPU probe and build time limit; relaunch r2h
+
+**What happened.** r2g (`q0pylpkso8ofd1`, cpu5m, 32 vCPU, EPYC 9575F, 528 GB) verified its source
+at 03:41:13 UTC and then spent more than 55 minutes on the final crate of the build
+(`Compiling crypto v0.1.0`), with the container reporting about 200 % CPU, against 3.5 minutes for
+the whole build on r2f (same host model, same 231 crates). It shared no machine with the sibling pods.
+The container was effectively getting about two of its 32 cores; whether by a quota or by host
+contention is not established. At that rate E14a would also run about 15 times slower than planned,
+so the pod was pulled (`e14/pod-r2/out-r2g/`, key redacted) and deleted at 04:39:46 UTC
+(about USD 2.2). No gate beyond the source checks ran; no draw exists.
+
+**Change for r2h (`e14/run_pod_r2.sh`, sha256 `690f657cf36fe54b…`).** Before the build the script records
+`/sys/fs/cgroup/cpu.max` and `/proc/pressure/cpu` in `host.txt`, runs a 32-way busy-loop probe and
+logs the effective parallelism; below 12 of 32 the run ends with `cpu_probe_low_<value>` before any
+build, so a bad host costs minutes, not an hour. The build is bounded at 25 minutes
+(`build_failed_or_timeout`). Pod name prefix `fd-e14-r2h-`. Nothing else changes.

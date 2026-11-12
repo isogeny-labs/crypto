@@ -61,7 +61,15 @@ TREE=$(git ls-tree -r HEAD -- $(tr '\n' ' ' <"$W/source_paths.txt") | sha256sum 
 echo "tree $TREE" >>"$OUT/run.log"; [ "$TREE" = "$TREE_SHA256" ] || finish "G-src-c_failed"
 log "source verified $SRC_COMMIT"; pack
 # --- builds
-cargo build --release --example dreg_linear_guess --example hky_par >"$OUT/build.log" 2>&1 || finish "build_failed"
+# Amendment 28: record the CPU quota and pressure, run a short parallel probe, and bound the build
+{ echo "cpu.max: $(cat /sys/fs/cgroup/cpu.max 2>/dev/null || echo n/a)"; echo "cpu.pressure: $(head -1 /proc/pressure/cpu 2>/dev/null || echo n/a)"; } >>"$OUT/host.txt"
+P0=$(date +%s%N); for i in $(seq 1 32); do ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ) & done; wait; P1=$(date +%s%N)
+S0=$(date +%s%N); ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ); S1=$(date +%s%N)
+PAR=$(awk -v p=$((P1-P0)) -v s=$((S1-S0)) 'BEGIN{ printf "%.1f", 32*s/p }')
+log "cpu probe: effective parallelism $PAR of 32"; echo "parallelism $PAR" >>"$OUT/host.txt"; pack
+awk -v x="$PAR" 'BEGIN{ exit (x+0 < 12) ? 0 : 1 }' && finish "cpu_probe_low_$PAR"
+timeout 1500 cargo build --release --example dreg_linear_guess --example hky_par >"$OUT/build.log" 2>&1 || finish "build_failed_or_timeout"
+log "build done"
 P=$SRC/target/release/examples/dreg_linear_guess; H=$SRC/target/release/examples/hky_par
 sha256sum "$P" "$H" >"$OUT/sha256_binaries"
 # --- G0, G1 (Amendment 17)
