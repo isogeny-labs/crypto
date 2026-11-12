@@ -407,6 +407,39 @@ mod tests {
         }
     }
 
+    /// `ct_pow4_public` is `ct_pow4`, on random, sparse and edge exponents.
+    #[test]
+    fn ct_pow4_public_matches_ct_pow4() {
+        let mut rng = StdRng::seed_from_u64(0x7075_6232);
+        for m in moduli().into_iter().take(4) {
+            let p = U256::from_biguint(&m);
+            let n0 = compute_minv64(p.0[0]);
+            let one = U256::from_biguint(&((BigUint::from(1u8) << 256) % &m));
+            let r2 = U256::from_biguint(&((BigUint::from(1u8) << 512) % &m));
+            let mut exps = vec![
+                BigUint::from(0u8),
+                BigUint::from(1u8),
+                BigUint::from(15u8),
+                BigUint::from(16u8),
+                &m - 2u32,
+                &m - 1u32,
+                (BigUint::from(1u8) << 256) - 1u32,
+                BigUint::from(1u8) << 255,
+            ];
+            for _ in 0..20 {
+                exps.push(rng.gen_biguint(256));
+            }
+            for e in exps {
+                let b = U256::from_biguint(&rng.gen_biguint_below(&m));
+                let e = U256::from_biguint(&e);
+                assert_eq!(
+                    ct_pow4_public(&b.0, &e.0, &p.0, n0, &r2.0, &one.0),
+                    ct_pow4(&b.0, &e.0, &p.0, n0, &r2.0, &one.0)
+                );
+            }
+        }
+    }
+
     /// `ct_pow4` is `mont_pow_ct`.
     #[test]
     fn ct_pow4_matches_mont_pow_ct() {
@@ -449,4 +482,43 @@ mod tests {
         generic_mul_matches::<9>(&(two(521) - 1u32), &mut rng);
         generic_mul_matches::<9>(&(two(576) - 3u32), &mut rng);
     }
+}
+
+/// [`ct_pow4`] for a **public** exponent: the same power, by a fixed
+/// four-bit window (about 256 squarings and 64 products against the
+/// ladder's 256 and 256).  The sequence of operations follows the bits of
+/// `exp`, so `exp` must not be secret; it does not depend on `base`.
+pub(crate) fn ct_pow4_public(
+    base: &[u64; 4],
+    exp: &[u64; 4],
+    p: &[u64; 4],
+    n0: u64,
+    r2: &[u64; 4],
+    one: &[u64; 4],
+) -> [u64; 4] {
+    let base_m = ct_mont_mul4(base, r2, p, n0);
+    let mut table = [*one; 16];
+    table[1] = base_m;
+    for i in 2..16 {
+        table[i] = ct_mont_mul4(&table[i - 1], &base_m, p, n0);
+    }
+    let mut acc = *one;
+    let mut started = false;
+    for w in (0..64).rev() {
+        let nib = ((exp[w / 16] >> (4 * (w % 16))) & 15) as usize;
+        if started {
+            for _ in 0..4 {
+                acc = ct_mont_mul4(&acc, &acc, p, n0);
+            }
+        }
+        if nib != 0 {
+            acc = if started {
+                ct_mont_mul4(&acc, &table[nib], p, n0)
+            } else {
+                table[nib]
+            };
+            started = true;
+        }
+    }
+    ct_mont_mul4(&acc, &[1, 0, 0, 0], p, n0)
 }

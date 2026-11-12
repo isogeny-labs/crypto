@@ -1828,6 +1828,17 @@ mod pow_256_differential {
                 exps.push(rng.gen_biguint(bits as u64));
             }
             for b in &bases {
+                let fe = FieldElement {
+                    value: b.clone(),
+                    modulus: m.clone(),
+                };
+                if (b % &m).bits() != 0 {
+                    assert_eq!(
+                        fe.inv().unwrap().value,
+                        crate::utils::mod_pow_ct(b, &(&m - 2u32), &m, bits),
+                        "inv m={m} b={b}"
+                    );
+                }
                 for e in &exps {
                     let fe = FieldElement {
                         value: b.clone(),

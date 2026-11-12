@@ -5,7 +5,7 @@
 //! little theorem: a^(p-2) ≡ a^(-1) mod p).
 
 use crate::ct_bignum::{MontgomeryContext, Uint, U256};
-use crate::ecc::mont_vt::ct_pow4;
+use crate::ecc::mont_vt::{ct_pow4, ct_pow4_public};
 use crate::utils::mod_pow_ct;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -126,8 +126,16 @@ impl FieldElement {
     /// `BigUint` arithmetic is still not constant-time at the limb
     /// level — see SECURITY.md.
     pub fn pow(&self, exp: &BigUint) -> Self {
+        self.pow_impl(exp, false)
+    }
+
+    /// [`pow`](Self::pow); with `public_exp` the exponent is a public
+    /// constant (Fermat's `p - 2`), so the 256-bit path may follow its bit
+    /// pattern (a fixed window) instead of the always-multiply ladder: its
+    /// sequence of operations still does not depend on the base.
+    fn pow_impl(&self, exp: &BigUint, public_exp: bool) -> Self {
         let bits = self.modulus.bits() as usize;
-        let value = match pow_ct_256(&self.value, exp, &self.modulus) {
+        let value = match pow_ct_256(&self.value, exp, &self.modulus, public_exp) {
             Some(v) => v,
             None => mod_pow_ct(&self.value, exp, &self.modulus, bits),
         };
@@ -144,7 +152,7 @@ impl FieldElement {
             return None;
         }
         let exp = &self.modulus - BigUint::from(2u32);
-        Some(self.pow(&exp))
+        Some(self.pow_impl(&exp, true))
     }
 
     /// Multiplicative inverse in **variable time**; `None` if `self` is
@@ -209,7 +217,7 @@ thread_local! {
 /// exactly the low 256 bits of `exp`), 256 squarings and 256 products
 /// with no allocation or division.  `None` for any other input, which
 /// keeps the `BigUint` ladder.
-fn pow_ct_256(base: &BigUint, exp: &BigUint, m: &BigUint) -> Option<BigUint> {
+fn pow_ct_256(base: &BigUint, exp: &BigUint, m: &BigUint, public_exp: bool) -> Option<BigUint> {
     if m.bits() != 256 || !m.bit(0) || exp.bits() > 256 {
         return None;
     }
@@ -228,7 +236,12 @@ fn pow_ct_256(base: &BigUint, exp: &BigUint, m: &BigUint) -> Option<BigUint> {
             *slot = Some((m.clone(), ctx));
         }
         let ctx = &slot.as_ref()?.1;
-        let r = ct_pow4(&b.0, &e.0, &ctx.n.0, ctx.n_inv_low, &ctx.r2_mod_n.0, &ctx.r_mod_n.0);
+        let (p, n0, r2, one) = (&ctx.n.0, ctx.n_inv_low, &ctx.r2_mod_n.0, &ctx.r_mod_n.0);
+        let r = if public_exp {
+            ct_pow4_public(&b.0, &e.0, p, n0, r2, one)
+        } else {
+            ct_pow4(&b.0, &e.0, p, n0, r2, one)
+        };
         Some(Uint(r).to_biguint())
     })
 }
