@@ -1,0 +1,103 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T18:35:27+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/inherited_f4_batched_20261112/run_e2e.sh",
+        "research/inherited_f4_batched_20261112/results_e2e"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T18:31:21+00:00",
+      "wall_s": 166.611
+    }
+  ],
+  "commit": "eb01341d3aa27f114ad849babca8cabe93bed881",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T18:31:21+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-inherited-f4-batched"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1831Z-inherited-f4-batched-e2e",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "s_ratio_batched_over_eager_koblitz23",
+      "note": "degree-23 Koblitz: S 1674.3 (1223.1-1999.0) vs 2051.2 (1498.2-2448.6); 0.82-0.89 on all six instances",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.816
+    },
+    {
+      "baseline": 465.5,
+      "better": "lower",
+      "n": 3,
+      "name": "s_batched_koblitz19",
+      "note": "degree-19 Koblitz, binary-subspace dimension 10, descent-algebraic m=2 with inherited-f4-batched (pinned word XORs); baseline inherited-f4 (227.5-594.5)",
+      "reference": 1.35,
+      "reference_kind": "matched_rho",
+      "spread": [
+        202.3,
+        527.9
+      ],
+      "unit": "S",
+      "value": 413.6
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 18,
+      "name": "verified_configurations",
+      "note": "6 instances x (pair table, inherited-f4, inherited-f4-batched), every repeat; matched rho runs too",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 18.0
+    }
+  ],
+  "problem": "study:inherited_f4_batched_20261112:e2e-ladder",
+  "raw": [
+    {
+      "bytes": 85044,
+      "path": "research/inherited_f4_batched_20261112/results_e2e.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/16/161fe7a0a5df2609ec736aeddb81301fcebe18190a9bcea0d520dbe91892f1a1",
+      "sha256": "161fe7a0a5df2609ec736aeddb81301fcebe18190a9bcea0d520dbe91892f1a1",
+      "uploaded": false
+    },
+    {
+      "bytes": 14692,
+      "path": "research/inherited_f4_batched_20261112/results_e2e.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/da/da6d05f5c60e295f5731489e13c2a208b5cdcbcf2cfb23efdeb0c923886c2675",
+      "sha256": "da6d05f5c60e295f5731489e13c2a208b5cdcbcf2cfb23efdeb0c923886c2675",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/inherited_f4_batched_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/inherited_f4_batched_20261112/results_e2e.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "inherited-f4-batched-e2e",
+  "status": "measured",
+  "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 and inherited-f4-batched, 3 repeats: all configurations verified; batched S 0.82-0.89 of inherited-f4 on every instance, below it on every repeat (Koblitz 23: 1674 vs 2051; Koblitz 19: 414 vs 466); below 24 unknowns wall per call 0.99-1.12 of eager. Local container; unverified.",
+  "validation": null
+}

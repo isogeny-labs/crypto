@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T1550Z-cover-pushforward",
+  "latest_record": "20261112T1831Z-inherited-f4-batched-e2e",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 131,
+    "measured": 133,
     "open": 0
   },
   "repo": "crypto",
@@ -16194,6 +16194,175 @@
         }
       ],
       "problem": "study:elliptic_code_list_decoding_20261107",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "disagreements_with_fes",
+      "points": [
+        {
+          "commit": "eb01341d3aa2",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 78,
+          "record": "20261112T1829Z-inherited-f4-batched-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-batched (arena fix 4f0eca9eb4) with fes-f2 as reference, 13 cells 14-32 unknowns, 6 targets x 3 repeats: word XORs 0.70-0.91 per target (median 0.84), never more, 0 disagreements; wall 0.85-0.95 from 24 unknowns up, 1.02-1.14 at 14-22 (pre-stated falsifier fired on R 19:10:2 at 1.08). Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_batched_20261112:descent-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.84,
+      "latest": 0.84,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ops_ratio_batched_over_eager_median",
+      "points": [
+        {
+          "commit": "eb01341d3aa2",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 13,
+          "record": "20261112T1829Z-inherited-f4-batched-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.696,
+            0.908
+          ],
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-batched (arena fix 4f0eca9eb4) with fes-f2 as reference, 13 cells 14-32 unknowns, 6 targets x 3 repeats: word XORs 0.70-0.91 per target (median 0.84), never more, 0 disagreements; wall 0.85-0.95 from 24 unknowns up, 1.02-1.14 at 14-22 (pre-stated falsifier fired on R 19:10:2 at 1.08). Local container; unverified.",
+          "value": 0.84
+        }
+      ],
+      "problem": "study:inherited_f4_batched_20261112:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.02,
+      "latest": 1.02,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "wall_ratio_batched_over_eager_median",
+      "points": [
+        {
+          "commit": "eb01341d3aa2",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 13,
+          "record": "20261112T1829Z-inherited-f4-batched-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.853,
+            1.139
+          ],
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-batched (arena fix 4f0eca9eb4) with fes-f2 as reference, 13 cells 14-32 unknowns, 6 targets x 3 repeats: word XORs 0.70-0.91 per target (median 0.84), never more, 0 disagreements; wall 0.85-0.95 from 24 unknowns up, 1.02-1.14 at 14-22 (pre-stated falsifier fired on R 19:10:2 at 1.08). Local container; unverified.",
+          "value": 1.02
+        }
+      ],
+      "problem": "study:inherited_f4_batched_20261112:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 413.6,
+      "latest": 413.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 306.37037
+      },
+      "metric": "s_batched_koblitz19",
+      "points": [
+        {
+          "commit": "eb01341d3aa2",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 306.37037
+          },
+          "n": 3,
+          "record": "20261112T1831Z-inherited-f4-batched-e2e",
+          "reference": 1.35,
+          "reference_kind": "matched_rho",
+          "spread": [
+            202.3,
+            527.9
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 and inherited-f4-batched, 3 repeats: all configurations verified; batched S 0.82-0.89 of inherited-f4 on every instance, below it on every repeat (Koblitz 23: 1674 vs 2051; Koblitz 19: 414 vs 466); below 24 unknowns wall per call 0.99-1.12 of eager. Local container; unverified.",
+          "value": 413.6
+        }
+      ],
+      "problem": "study:inherited_f4_batched_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.816,
+      "latest": 0.816,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "s_ratio_batched_over_eager_koblitz23",
+      "points": [
+        {
+          "commit": "eb01341d3aa2",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T1831Z-inherited-f4-batched-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 and inherited-f4-batched, 3 repeats: all configurations verified; batched S 0.82-0.89 of inherited-f4 on every instance, below it on every repeat (Koblitz 23: 1674 vs 2051; Koblitz 19: 414 vs 466); below 24 unknowns wall per call 0.99-1.12 of eager. Local container; unverified.",
+          "value": 0.816
+        }
+      ],
+      "problem": "study:inherited_f4_batched_20261112:e2e-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 18.0,
+      "latest": 18.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verified_configurations",
+      "points": [
+        {
+          "commit": "eb01341d3aa2",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 18,
+          "record": "20261112T1831Z-inherited-f4-batched-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 and inherited-f4-batched, 3 repeats: all configurations verified; batched S 0.82-0.89 of inherited-f4 on every instance, below it on every repeat (Koblitz 23: 1674 vs 2051; Koblitz 19: 414 vs 466); below 24 unknowns wall per call 0.99-1.12 of eager. Local container; unverified.",
+          "value": 18.0
+        }
+      ],
+      "problem": "study:inherited_f4_batched_20261112:e2e-ladder",
       "unit": "count"
     },
     {

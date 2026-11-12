@@ -100,6 +100,96 @@ of its cell (the solver is 88 to 100 % of the row's GAE): about 0.85 to 0.9 at
 Koblitz 19 and 23, closer to 1 at the small instances. Falsifier: batched S
 above `inherited-f4`'s on any instance, or not below at Koblitz 19 and 23.
 
-## Results
+## Results `[pcc:unverified]`
 
-Filled after the runs.
+Both runs used the binary built at 4f0eca9eb4 from a clean tree (SHA-256 in
+`results/ic-sha256.txt`, `results_e2e/ic-sha256.txt`), one thread, local
+container, not isolated.
+
+### Run 1: paired per call
+
+Record `benchmarks/records/20261112T1829Z-inherited-f4-batched-ab.json`
+(measured). Full table `RESULTS_AB.md`, graph `results_ab.svg/png`.
+
+| unknowns | word XORs batched / eager, K / R | wall batched / eager, K / R |
+|--:|--:|--:|
+| 14 | 0.851 / 0.855 | 1.13 / 1.08 |
+| 16 | 0.844 / 0.846 | 1.11 / 1.14 |
+| 18 | 0.810 / 0.808 | 0.99 / 0.99 |
+| 20 | 0.878 / 0.883 | 1.04 / 1.08 |
+| 22 | — / 0.840 | — / 1.02 |
+| 24 | 0.830 / 0.828 | 0.91 / 0.95 |
+| 30 (K) | 0.760 | 0.90 |
+| 32 (K) | 0.715 | 0.85 |
+
+Median over targets of the per-target ratio, 6 targets × 3 repeats.
+
+- **The counted work drops on every target**: 0.70 to 0.91 per target, never
+  more, median 0.84 over the cells, more than expected below 20 unknowns
+  (0.81 to 0.86 instead of "closer to 1"). 0 disagreements with `fes-f2`;
+  every target decided by every engine.
+- **Wall time follows from 24 unknowns up** (0.85 to 0.95, batched below
+  eager on 22 of 24 targets there), **but not below**: 1.08 to 1.14 at 14 to
+  16 unknowns, about 1.0 at 18, 1.04 and 1.08 at 20, 1.02 at 22. The
+  pre-stated falsifier (a median paired wall ratio above 1.05 at 20 unknowns
+  and up) **fired on random 19:10:2 (1.08)**. The arena fix removed the
+  allocation cost but not all of the per-row overhead (the composed step-plan
+  lookup per row, which the subagent left in place): on small systems the
+  rows brought current one at a time still cost more than the bulk rewrite
+  they replace.
+
+### Run 2: end to end
+
+Record `benchmarks/records/20261112T1831Z-inherited-f4-batched-e2e.json`
+(measured). Full table `RESULTS_E2E.md`, graph `results_e2e.svg/png`. Every
+configuration recovered its planted logarithm in every repeat, and so did
+every matched rho run.
+
+| instance (unknowns) | rho S | pair table S | `inherited-f4` S | `inherited-f4-batched` S | batched / eager | ms per call eager / batched |
+|:--|--:|--:|--:|--:|--:|:--|
+| Koblitz 13 (14) | 2.89 | 197.8 | 137.9 | 120.2 | 0.871 | 0.83 / 0.93 |
+| random 15 (16) | 2.28 | 473.7 | 262.7 | 223.9 | 0.852 | 1.38 / 1.52 |
+| Koblitz 17 (18) | 1.73 | 493.2 | 304.5 | 249.7 | 0.820 | 2.78 / 2.76 |
+| Koblitz 19 (20) | 1.35 | 1,063.3 | 465.5 | 413.6 | 0.889 | 4.28 / 4.45 |
+| random 21 (22) | 1.24 | 1,975.9 | 4,299.2 | 3,631.1 | 0.845 | 7.68 / 7.80 |
+| Koblitz 23 (24) | 0.88 | 3,986.3 | 2,051.2 | 1,674.3 | 0.816 | 13.81 / 12.55 |
+
+Mean over 3 repeats; the repeat ranges of the two engines are listed in
+`RESULTS_E2E.md` (they overlap, because the repeats differ by target set far
+more than the engines differ; on each repeat the batched row is below the
+eager one).
+
+- **The batched row has the lower S on every instance, 0.82 to 0.89×**, as
+  its word-XOR count drops (the solver is 88 to 100 % of the row's GAE). The
+  expectation held on Koblitz 19 and 23 (0.889, 0.816) and was exceeded on
+  the smaller instances.
+- **At degree 13 the size rule stays the best row**: `fes-then-inherited`
+  runs `fes-f2` there (S 101.9 in `../size_rule_fold_20261112/`), below the
+  batched row's 120.2. Above 14 unknowns the batched row is now the best
+  algebraic row; the pair table stays best on random 21.
+- **What the S drop rests on**: counted work that genuinely disappears
+  (rows never rewritten), at every size. From 24 unknowns up the wall agrees
+  (0.91 per call in the pipeline at Koblitz 23). At 20 unknowns and below,
+  per-call wall in the pipeline is 0.99 to 1.12× of eager: there the drop in
+  S is real counted work, offset by an overhead the counted unit does not
+  see, and should be read with that caveat until the per-row overhead is
+  removed.
+
+No leaderboard row: no replay certificate or validator report (validation
+gate).
+
+## Next
+
+- Remove the remaining per-row overhead (composed step-plan lookup per row,
+  `HashMap` + `RefCell`) so the wall agrees with the count below 24 unknowns.
+- Combine the two gains: a size rule with `fes-f2` up to 14 unknowns and
+  `inherited-f4-batched` above, or make the batched rewrite the default once
+  the small-system wall cost is gone (bump `INHERITED_F4_ACCOUNTING_VERSION`
+  then, since the default count changes).
+
+## Sources checked
+
+KB (`research-kb`) unavailable in this session. `src/cryptanalysis/inherited_f4.rs`,
+`src/cryptanalysis/koblitz_groebner.rs`, `src/cryptanalysis/ic_framework/solvers.rs`,
+the subagent's Callgrind outputs (scratchpad `cgb/`),
+`research/size_rule_fold_20261112/README.md`.
