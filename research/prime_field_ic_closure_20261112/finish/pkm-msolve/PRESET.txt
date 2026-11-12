@@ -1,0 +1,156 @@
+PRESET: pkm-msolve. Frozen 2026-11-12T18:31Z, before any measured system of this study was generated or run.
+Standing: everything in this directory is [pcc:unverified]. Local container, L0 shared VM (4 vCPU, 15 GB RAM).
+No EKS, no benchmark launcher, no bench record, no commit or push.
+
+1. QUESTION
+Measure the F4 solving degree D of PKM (Petit-Kosters-Messeng 2016) tower/chain presentations of the
+Semaev decomposition system at arity m = 4, 5, 6, 7 on 10-16 bit primes. Compare D with the break-even degree
+at which the route would have total exponent < 1/2. This is the one live exponent item of the closure ledger
+(scratchpad closure-ledger.md, "What remains open", item 1).
+
+2. DISCLOSURE (what was run before this file)
+- apt-get install msolve: version 0.6.5-1build2 (the version the repo's prior msolve studies used).
+- One smoke run on a committed repo system, not new data:
+  crypto/research/ic_next10_20261014/03-pkm-degree/systems/pkm_kummer_p2013265921_m4_t2_x1102336260.ms
+  (sha256 594695af...432e). msolve -t 1 -v 2 -g 2: max round degree 6, GB = {1}, 0.08 s.
+  The repo records D = 6 for this system, so this agrees.
+- scripts/breakeven.py was run. It computes the thresholds in section 5 and takes no measurement.
+
+3. OWNER-DECISION SCOPE (checked before data)
+- 2026-11-11 decision (docs/session-logs/2026-11-11.md, 21:45Z entry; research/first_fall_closure_20261111/README.md):
+  "no more measurement time on the first fall degree". The same entry says "the last fall degree is the live question".
+- This study measures the F4 solving degree D. On the repo's G3-gated draws, D >= d_F (last fall degree), so it
+  is not a first-fall measurement, and the decision does not cover or forbid it.
+- The decisive PKM cells (m = 4, N = 20; m = 2, t = 13/14) stay with the owner (EKS). They are not run here.
+
+4. INSTRUMENT AND SYSTEMS
+Engine
+- msolve 0.6.5 (apt). Command: msolve -t T -v 2 -g 2 -f SYS.ms -o SYS.out.
+- T = 1 when N + m - 2 <= 16, else T = 4.
+- Caps: prlimit --as = 14e9 bytes; wall 600 s for small cells (N <= 12) and 2400 s for the rest.
+- Peak RSS and wall time are recorded per run. Runs go one at a time.
+
+System: Kummer tower plus chain, raw presentation, as in the repo's .ms files
+- Variables: y{i}_{j} (i = 0..m-1, j = 0..t-1), then u0..u{m-3}, in that order. Order is DRL, first variable largest.
+- Tower for summand i, with x_i = g*y{i}_0:
+  y{i}_{j+1} - y{i}_j^2  (j = 0..t-2)
+  y{i}_{t-1}^2 - 1
+- Chain:
+  S3(x_0, x_1, u0)
+  S3(u_{k-1}, x_{k+1}, u_k)   (k = 1..m-3)
+  S3(u_{m-3}, x_{m-1}, x_R)
+- S3(a, b, c) = (a-b)^2 c^2 - 2((a+b)(ab+A)+2B) c + (ab-A)^2 - 4B(a+b), on the curve y^2 = x^3 + A x + B.
+
+Data
+- Curves: seeded random curves of prime order (arms A, C). Arm B uses the repo's P1 curve
+  A = 1373482479, B = 486145570 (from ic_next10 gen records).
+- g: a seeded random element of F_p^*.
+- Random target: x_R = x(R) for a seeded random point R of E(F_p).
+- Planted target: x_R = x(sum of P_i), with x(P_i) in V = g*mu_{2^t} and random signs.
+
+Arms
+- A (main): p0 = 40961 = 5*2^13 + 1 (16-bit).
+  - m = 4, 5, 6, 7 at t = 1, 2, 3; also m = 4, t = 4.
+  - 2 random draws per cell.
+  - 1 planted draw per cell at t <= 2, plus m = 4, t = 3.
+- C (replication across 10-16 bit primes): p = 769 (10-bit) and p = 12289 (14-bit), m = 4..7 at t = 2, 2 random draws each.
+- B (control, OUTSIDE the requested 10-16-bit range, labelled as such): P1 = 2013265921 (31-bit, the repo's prime),
+  m = 5, 6, 7 at t = 2, 3, 2 random draws.
+  - Why it is needed: at 16-bit p and m >= 6, t >= 2, a random target has an expected
+    2^N * 2^(m-1) / p > 1 grid zeros (twist decompositions included).
+  - So arm A's random systems there are consistent, not unit ideals. Arm B keeps the refutation regime that the
+    repo's Stage C rows (same prime) measured.
+- C0 (instrument control): the repo's committed systems at P1, m = 4, t = 2 and t = 3, both targets each (4 runs).
+  The repo records D = 6 (t = 2) and D = 7 (t = 3).
+
+Run order (decisive cells first; nothing is re-run except after an instrument defect, which would be disclosed)
+1. C0.
+2. Arm A at t = 1, 2 (all m); planted controls.
+3. Arm A at t = 3 (m = 4, 5, 6, 7).
+4. Arm B (t = 2, then t = 3).
+5. Arm C.
+6. Arm A, m = 4, t = 4.
+
+5. OBSERVABLES, BREAK-EVEN, KILL RULE
+Observables, per run
+- D = max "deg" over msolve's F4 round lines.
+- A run stopped by a cap gives D >= (max deg printed). msolve takes the lowest-degree pairs first.
+- W = max matrix columns over rounds (and the rows at that round).
+- unit = (GB == {1}); GB length.
+- Wall time; peak RSS.
+
+Independent checks
+- (i) Unit vs non-unit: every random draw's verdict is checked against an exhaustive grid enumeration over E(F_{p^2})
+  (meet-in-the-middle on signed points with x in V). Unit should hold iff there are 0 grid decompositions.
+- (ii) Planted: every planted draw must give a non-unit GB, and every GB element must vanish at the planted point.
+- (iii) On consistent random draws, every GB element must vanish at every enumerated solution (with its u-chain).
+A failed check marks the run as an instrument defect, excluded and reported.
+
+Break-even (derived, scripts/breakeven.py -> breakeven.json)
+Cost model (repo research/prime_ic_leads_20261110 sections 2-3, re-derived)
+- Base B = 2^t, N = m*t, per-target cost T = B^s.
+- Total < r^(1/2) iff s < m - 3.
+- A degree-D closure on N multilinear tower bits spans M(N,D) = sum_{k<=D} C(N,k) monomials.
+- With T >= M(N,D)^w, parity needs w * log2 M(N,D) < (1 - 3/m) N.
+- Asymptotically, D ~ alpha*N must have alpha < alpha*(m, w) = H^{-1}((1 - 3/m)/w).
+
+alpha*(m, w)
+|        | m = 4  | m = 5  | m = 6 | m = 7  |
+|--------|--------|--------|-------|--------|
+| w = 1  | 0.0417 | 0.0794 | 0.110 | 0.1352 |
+| w = 2  | 0.0171 | 0.0311 | 0.042 | 0.0498 |
+
+Finite-N break-even D*(m, N, w = 1) at the cells run
+- m = 4: 0 at every t.
+- m = 5: 0, 1, 1 (t = 1, 2, 3).
+- m = 6: 1, 1, 2.
+- m = 7: 1, 2, 3.
+- Every chain system has S3 of degree 4, so D >= 4 > D* at every feasible cell. The cell-wise comparison is decided
+  before measuring. It is REPORTED but is NOT the kill rule: it says the route is far above rho at toy N, which nobody
+  disputes. The open question is the growth of D.
+
+Kill rule (per arity m, on arm A random draws; generous to PKM)
+- Cell value: D_cell = the minimum over its draws. A censored draw gives a lower bound.
+- Degree slope: sigma(m) = (D_cell(t_hi) - D_cell(t_lo)) / (m * (t_hi - t_lo)).
+  - t_lo = 2; t_hi = 3 (= 4 at m = 4 if that cell finishes).
+  - If an arm-A t = 3 cell is censored with no rise, the slope is not computed.
+  - If t = 3 is infeasible at m = 7, use t_lo = 1, t_hi = 2, flagged.
+- KILL(m): sigma(m) >= alpha*(m, w = 1).
+  - For m <= 7 with t in {2, 3}, this is exactly "D rises by >= 1 from t = 2 to t = 3": 1/m >= alpha*(m, 1).
+- WEAK-KILL(m): alpha*(m, 2) <= sigma(m) < alpha*(m, 1).
+- SURVIVE(m): D_cell flat (sigma = 0) over at least two consecutive t-steps with t_hi >= 3.
+  - Only m = 4 can show this, via t = 4.
+- FLAT-INCONCLUSIVE(m): flat over one t-step only.
+- INCONCLUSIVE(m): any other case, including censored cells that leave the slope undetermined.
+- Arms B and C do not change the arm-A reading. They are reported as replication:
+  - B: the same rule applied in the refutation regime;
+  - C: equality of D across primes.
+
+Item verdict for "PKM chain presentation at m >= 6" (closure-ledger open item 1)
+- CLOSED-AT-TOY-SCALE (this presentation, this engine):
+  - KILL or WEAK-KILL at both m = 6 and m = 7, with at least one KILL;
+  - and no m in {4, 5, 6, 7} reads SURVIVE.
+- OPEN: some m in {4..7} reads SURVIVE.
+- INCONCLUSIVE: otherwise.
+
+Secondary cost reading (reported, not part of the kill rule)
+- s_W(m) = log2(W(t_hi) / W(t_hi - 1)), compared with the parity budget m - 3 (since T >= W).
+- At fixed D the dense count grows only polynomially in N. So s_W at toy t is biased toward "kill", and it is not used
+  to decide.
+
+6. PREDICTIONS (before data)
+- P0: C0 reproduces D = 6 (t = 2) and 7 (t = 3) on all 4 runs, all unit.
+- P1: arm A, m = 4: D = 6 (t = 2), 7 (t = 3), the same as at P1 (D is shape-driven).
+- P2: D rises by >= 1 from t = 2 to t = 3 at m = 5, 6 and 7. This is KILL at every m, so the item reads
+  CLOSED-AT-TOY-SCALE.
+- P3: arm B and arm C give the same D as arm A in the unit-ideal cells.
+  Consistent (non-unit) cells may differ, and are reported separately.
+- P4: the m = 7, t = 3 cells (26 variables) and the m = 6, t = 3 cells (22 variables) may hit the caps.
+  Censored rows are reported as lower bounds, never as values.
+
+7. WHAT THIS CANNOT SHOW
+- Toy N <= 28.
+- One presentation (Kummer tower, raw chain).
+- One engine (msolve's F4 normal strategy). D is that engine's degree, not a lower bound for every algorithm.
+- A rise of one degree per t-step at N <= 21 is not an asymptotic theorem.
+- No proof of a growing lower bound on the polynomial-calculus degree is attempted as part of the kill rule.
