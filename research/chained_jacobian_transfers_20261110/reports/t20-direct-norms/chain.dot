@@ -1,0 +1,19 @@
+digraph {
+ graph [rankdir=TB,bgcolor="white",pad="0.1",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,color="#456273",fillcolor="#edf4f4"];
+ edge [fontname="DejaVu Sans",fontsize=11,color="#407758"];
+ C0 [label="Jac(C0)/F101
+y²=x⁶+6x⁴+13x²+56"];
+ C20 [label="Jac(C20)/F101
+y²=18x⁶+75x⁴+45x²+40"];
+ T20 [label="Jac(T20)/F101
+Y²=76z⁶+62z⁵+52z⁴+63z³+69z²+3z+25"];
+ A [label="A=E2×F0/F101
+E2:y²=x³+59x+27; F0:y²=x³+44x+21
+Complete F101 balanced-input norm evaluation",fillcolor="#e4f2e8"];
+ C0 -> C20 [label="Existing Phi49 · global degree49"];
+ C20 -> T20 [label="Existing proper R20 · global degree4"];
+ T20 -> A [label="M=N_C R20† · global degree16
+Two explicit degree4 curve covers
+Both adjoint compositions[4] · public9238 recovery"];
+}

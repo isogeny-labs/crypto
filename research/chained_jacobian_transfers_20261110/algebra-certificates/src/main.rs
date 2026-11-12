@@ -302,9 +302,24 @@ fn richelot_normalization() -> IdentityStatement {
     }
 }
 
+fn linear_image_ordinate_identity() -> IdentityStatement {
+    let [z, a, b, c, r, m] = ["z", "A", "B", "C", "r", "m"].map(Expr::var);
+    IdentityStatement {
+        name: "Quadratic finite-algebra linear-image ordinate cancellation".into(),
+        source: "T20_DIRECT_NORM_PROTOCOL.md;T20_DIRECT_NORM_DERIVATION.md;Lean T20DirectNorms.linear_image_ordinate with D=m*B".into(),
+        variables: ["z", "A", "B", "C", "r", "m"].map(String::from).to_vec(),
+        degree_bound: 3,
+        lhs: Expr::Add(vec![
+            Expr::Mul(vec![m.clone(),Expr::Add(vec![a.clone(),Expr::Mul(vec![b.clone(),z.clone()]),Expr::Neg(Box::new(r.clone()))])]),
+            Expr::Neg(Box::new(Expr::Add(vec![c.clone(),Expr::Mul(vec![m.clone(),b,z])]))),
+        ]),
+        rhs: Expr::Add(vec![Expr::Mul(vec![m,Expr::Add(vec![a,Expr::Neg(Box::new(r))])]),Expr::Neg(Box::new(c))]),
+    }
+}
+
 fn main() {
     let outputs = std::env::args_os().skip(1).collect::<Vec<_>>();
-    let cases: [(IdentityStatement, &[u8], &str, u64); 10] = [
+    let cases: [(IdentityStatement, &[u8], &str, u64); 11] = [
         (
             duplication(),
             include_bytes!("../../lean/QuarticGluing.lean"),
@@ -365,6 +380,12 @@ fn main() {
             "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
             0x4842,
         ),
+        (
+            linear_image_ordinate_identity(),
+            include_bytes!("../../lean/T20DirectNorms.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/T20DirectNorms.lean",
+            0x5241,
+        ),
     ];
     for (i, (statement, source, path, seed)) in cases.into_iter().enumerate() {
         let cert=identity::issue(statement,seed,32,"Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",Some(identity::ProofRef {kind:"lean4;pointer only;requires separate proof gate".into(),path:path.into(),sha256:hex::encode(sha256_native::sha256(source))})).expect("the issuer must reject any false identity");
@@ -379,6 +400,16 @@ fn main() {
         }
         println!("PASS {}:32issuer+64domain-separatedchecker points over fixed2^61-1;existing unchanged checker and SHA;not a signed or all-characteristics proof",cert.id);
     }
+}
+
+#[test]
+fn new_linear_image_identity_mutant_is_rejected() {
+    let mut statement = linear_image_ordinate_identity();
+    statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
+    assert!(matches!(
+        identity::issue(statement, 0x5241, 32, "negative control", None),
+        Err(identity::IssueError::False(_))
+    ));
 }
 
 #[test]

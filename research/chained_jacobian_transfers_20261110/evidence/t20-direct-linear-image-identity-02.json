@@ -1,0 +1,136 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h6de045a64b58c1c8",
+  "statement": {
+    "name": "Quadratic finite-algebra linear-image ordinate cancellation",
+    "source": "T20_DIRECT_NORM_PROTOCOL.md;T20_DIRECT_NORM_DERIVATION.md;Lean T20DirectNorms.linear_image_ordinate with D=m*B",
+    "variables": [
+      "z",
+      "A",
+      "B",
+      "C",
+      "r",
+      "m"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "m"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "A"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "B"
+                    },
+                    {
+                      "op": "var",
+                      "args": "z"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "r"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "add",
+            "args": [
+              {
+                "op": "var",
+                "args": "C"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "m"
+                  },
+                  {
+                    "op": "var",
+                    "args": "B"
+                  },
+                  {
+                    "op": "var",
+                    "args": "z"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "m"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "A"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "r"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "var",
+            "args": "C"
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 21057,
+  "value_digest": "accc1a411c0d99bc1eb87b8df6358a3a04e2e23257d473cb98f02db8547c21af",
+  "independence": "Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",
+  "proof": {
+    "kind": "lean4;pointer only;requires separate proof gate",
+    "path": "research/chained_jacobian_transfers_20261110/lean/T20DirectNorms.lean",
+    "sha256": "499bd624cfcdf09d2980e31bda4d6c628829289bd1c9a8b76dc6889e79889c2d"
+  }
+}

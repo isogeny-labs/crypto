@@ -1,6 +1,8 @@
 //! Proper normalized Richelot divisor push-pull on the actual C20/T20.
 //! Old field/poly/Cantor engines and the phaseA normalized data only.
 use super::*;
+#[path = "t20_direct_norms.rs"]
+mod t20_direct_norms;
 
 struct RawContext<'a> {
     coefficients: Vec<u64>,

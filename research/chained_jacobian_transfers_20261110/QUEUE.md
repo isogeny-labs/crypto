@@ -1,91 +1,65 @@
-# CURRENT — consumer1517/8072 published; ownCI22:51; root archive handoff next
+# CURRENT — completed local direct T20 Fp norms; root scoped commit/publication next
 
-RootLOCAL/REMOTE030ea125bf66d98e9365cc9bc7126480d829bfae/treef3299c3e,
-parentc7/164paths/publication504f37. Own43299283518SUCCESSall4/94f85a:
-25/41/23ten/bothJSONcmp/39modules224compiled198written0trusted/full4logs,
-settledNOrepoll. Allolderroot+c7/30/d87/338d/fdfe/51d/0796 andoldconsumer
-1513/f656/c712CIssettled. Rootmetadata/publication/c7+030eCIreceipts,
-newprimarylead02979e/route6b43e2+3eeb2e/journals/headersUNCOMMITTED.
+RootLOCAL/REMOTE5bec81e36ac9b6f7b91ddc5437766248bf7aacfe/tree430c0258/parent5fcf.
+ConsumerLOCAL/REMOTEc0b8c791ec35577bbae4af5cbcbc7ed34d2ee8a7/tree1aec6fe2/parent8072.
+Exact8072ownCI43315145393SUCCESSall4/b3c8f1/rootmirror1cb363/everywholelog;
+alloldfocusedroot+consumerCIssettledNOrepoll. Actualraw79644+80516archives
+publisheda651bc/realbot5bec/twofullremote replays/artifact0/wiring0.
 
-ConsumerLOCAL/REMOTE807207e1cb7787807c7d32d9402b2cb3bc0ee189/treed519f5b0,
-parent748e/116paths/artifact0;newbranchresearch/chained-transfer-proper-
-t20-20261112,READYPR1517immediate1513(parenthead748e). Exactoriginal
-objects+dates uploaded via/workspace/scratch/publish_checkpoint_objects_
-bearer.py,thenconnectorcreate_branchsha8072. Publication894ebf. First
-CLIpublisherghPOST401/7eec53preserved;norefchanged,diagnosisfreshBearer
-RESTusinginheritedGH_TOKENworks/no secretoutput. Connectorcreate_commit
-omitsdates,donotuseitfororiginalidentity. UseworkingBearerRESThelperfor
-rootpublicationtoo,neverrewritelocalcommittofitAPI. No newCIworkflowneeded.
+NEWUNCOMMITTEDcomponentcomplete:protocolc05a75BEFOREcode;static1bbfec/
+geometry58b615/whole90601c/full43_85436f(old41retained/referencelegacyguards/
+fmtstrictClippy/all628sourcehashes/botholdgeometry6141+kernel24475JSONbytecmp/
+originalexitfinishafter0/whole18file57652tarXZ/memberhash+roundtrip).
+All12317actualbalancedT20classes/runtimeZp-only/noinputsupportroots/both
+actualnorm4/public9238recovery/group/DLP109113/Frob/Chart50roundtrip;
+degrees3,236,12078/repeated118/nonsplit5116/poles2each/missinginfty238each/
+wrongglobalsign12316vs1. Geometry120points+6branches+8poles/bothinfinities/
+128repeateddoubles/16kernel256sums/allkilled4/exactly4killed2/type4,4/6rejects.
+SetupFpR12explicitandcharged;all12317C0comparisonMRPhi49=2diag(alpha49,id)N0
+preserved;no newsolvingadvantage/costcomparisonclaimed.
 
-OwnconsumerworkflowdispatchONCE204 viaBearerREST,initiallistlagfollowup
-resolvedto43315145393inprogress,next22:51UTC. RequireALLFOURcompletejobs:
-oldreference98+5/native25/oneoldignored;oldindependent0796:32/23two/186
-compiled160written32;partial338d35/23seven/203compiled177written35;new
-proper030e41/23ten/bothJSONcmp/39modules224compiled198written0trusted/
-checker4+CLI. NODUPLICATEdispatch/earlypoll. IncidentalPRpcc-gate43315053453
-successnot scientificsignature. Parent1513all3oldCI3ea63dsettledNOrepoll.
+Formal14exactbindings:old12inevidence/t20-direct-lean-02;newBezout775ed8/
+247670inevidence/t20-direct-degree-03;allold12declarationdigestsunchanged.
+FINALcomplete40gate52bbc7:238compiled212written0trusted/all44hashes/
+whole171file39344tarXZ. Earlierfull40/236_4a3e09preserved. Algebra02_9214e7:
+24tests(old23retained)/11IDC/alloldtenpayloadsbyteidentical/24guards/fmtClippy/
+wholearchive29952;finalfixturet20-direct-linear-image-identity-02.json,
+IDC1h6de045a64b58c1c8,ProofRef14sourceSHA499bd624cfcdf09d2980e31bda4d6c628829289bd1c9a8b76dc6889e79889c2d.
+Candidate01_4771ddsameidentityIDonlyProofRefpayloadchanged,immutable.
+CInewmodule+11thoutput+final02fixturecorrectlyregistered. Writtenproof
+bfa422/T20_DIRECT_NORMS_PROOF.md completedglobaldegree4curve/norm16/Picard/
+descent/projective/jet/domain/formalbridges. Mainreportpcc/claims/PCC-20261112-a8db78.json
+51743byte3pages;failurepcc/claims/PCC-20261112-c77443.json34425byte1page;
+ALLfinalpagesinspected/PINNED. OldPATH5176f3/c20986notcovered2andrender77d8b4
+failuresretained. No activeprocess/PCCwriter/sourcefreeze. Allsourceunchanged
+sinceacceptedfinalnative/algebra/proofruns.
 
-CompleteLOCALconsumerfull02/400f38 PASS41/23ten/bothJSONcmp/39modules
-224compiled198written0trusted/checker4+16mutants+CLI0/all719upstream+
-82consumer+184originalhashes/no-rg/originalouterstartfinish+exit0. All
-processesCLOSED/sourcefreezeENDED. Maina5bc14final2page50510PDF/failure
-7d49ad1page38464PDFallinspected;gov2a1946(prefix186/prose/cached0),old35
-Rust/check/pins+3wholejobs/triggerprefix unchanged. Newkernelverifieruses
-existingengines,independentlyencodespsi49via6/7/8/h49denominator/49E7/
-independentC0pulls/2401adds/7records/49globaltableentries/Frob5. FullR20
-suitereplaysproducerimplementation,not independentR20newcode. 163fbf
-checkeracceptance,75eaccprotocol,71036eexactfreshper-runcachereuseallbounds.
-Failuresimmutable:f0c793globalindexmisread;f956ffpreexecutionsyntax;
-4a80d5full01checker5mincoldcompile124NOTaccepted/original183after0/
-late71981explicit;8abc63cachedblankEOFrawlog unchangedPCCSHA,single
-fixturewhitespace=-blank-at-eof followsrepoexistingconvention. No global
-checkdisable. Consumerpubfailure/receipt+currentjournalsDIRTYafter8072.
+NEXT:own5becledgerprefix/prose/diff/current628+44+24guards/gov+scopedstage
+study/PCC/journal/focusedworkflow,UPDATE .resume separatelygitadd--sparse-u,
+assertallattestationproofsubjectsselectedoroldtracked,no ignoredrawarchives;
+write-tree artifactcheck0/CIclosure/commitexactchild5bec. WorkingBearerREST
+publisher/normalexpected5becrefupdate/confirmhead/newautomaticFOURjobCI
+once/nextcheck~50min. AlloldCIsettledno repoll. Rewrite3877title/bodyand3904
+aroundnewactualFp-normcomponent,preserveallmerge/frozenledger/review-C/
+archive/signingrequirements. Thennewconsumerbranchchildc0b8/protocol/pin/
+replay/independentlyencodedFpchecker,new5thjobwithold4jobs/pinsbyte-identical,
+continuousnextunblockedtask(no userwait). BenchmarksrequireactualEKSbudget/
+matchedexternalreferenceadmission;vault8edec422key/KB127gapsremain.
+NativeRust source editsONLYnewt20_direct_norms.rs+parentmodregistration;
+algebraASTtest/11thcaseandnewLean/CI/protocol/proofs/reportsmetadataowned.
+Do notrewrite any frozenprotocol/sourceclaim/report/archive/failedreceipt.
 
-WHOLEOVERSIZEDARCHIVESINTACTLOCAL (NOsplit/prune/fakeS3pointer):
-failed159files79644:/workspace/scratch/ct48-proper-failed-full-01.tar.xz
-SHAa921d348b5cdeddffadfc8341709afe55df9a80518e38ce3706930cdd575cabe;
-positive158files80516:/workspace/scratch/ct48-proper-full-02.tar.xz
-SHA201254e7774ee90b49d7a17dd723dccc3918c01ab10cac4d1dcf0c4064072f19.
-Bothrawtar921600/allmember+rawarchivehash/exactroundtrip;metadataonlyin
-consumer8072,evidence/proper-full-timeout-01 +proper-full-02. Rawremote
-publicationstillPENDING. Rootdocs/artifacts.md explicitlydocuments SAME-
-REPOartifact-autofix migration throughtrustedBASEtool+policy. Crypto has
-workflow,consumerdoesnot. LocalawsCLIabsent. Prior43299290714job131465838251
-successwasNOOP(nochangeddata),not actualS3I/Oproof;3eeb2eclarification+
-whole424494UTF8log→XZ42880persistent. Do notoverread6b43e2/71036e.
-
-NEXTROOT: lead02979evisual/reportDONEdf715c.json;onepage39290PDFinspected;
-intactbotharchives+metadatacopied3bdf4c.json intoownedrootcheckpointforDOCUMENTED
-artifact-autofixhandoff,recordartifactcheckpending2 policyselectedfiles
-(nofakepass/config/bypasslabel). Scopecommitallownedrootmetadatachild030e,
-exactBearerRESTobjects/nonforceexpected030erefupdate triggersnormal
-artifact-autofix;awaitactualupload/remotereplay/botcommit/realmanifests.
-Thenconsumeradditivepublicationreceiptlinksimmutablecanonicalrootobjects
-(avoidchangingoldthreejobs;rawarchivesarereportevidence,not replayinputs).
-Fetchanybotchildexactlybeforefurtherrootpublication,noforce/rebase/lineage
-choice. Consumerready1517canreviewcode/localresultwithrawgapexplicit.
-
-NEXTRESEARCH aftercheckpoint:newprotocolfor02979eprime-fieldT20degree4
-ellipticnormdescent,NOTimplemented. PrimaryBD2.6/7.5/8/oldDirectNorms+
-ClosedFibres/CT50dd4077read;KB127actualreceipts. DesiredM=N_CR20adjoint,
-M†=R20P20,globaldegree16/norm4inheritedwrittenbridges;deriveFpcoefr,s,
-correct2torsiontranslation,rawleading76 normalizationby50,completebalanced
-inputevaluationnoinputsupportroots. PhysicalsetupmayreuseactualFPR12
-factorytosafelypreserveorientation;doNOTclaimsetupFp-only. Coherentcover
-translationsdoNOTchangeJacobiannorm;controlsneedthatinvariance. Expected
-M∘(R20Φ49)=[2]diag(alpha49,id)N_C0 meansnormalizedsourcepipelineequals
-existingdirectbridge:preservethisscopednegativecomparison,nocostgain
-inferred. MorederivationsfromanalysisMUSTbepreregisteredandnative/Lean
-checkedbeforeclaims. No source/dlp-index lookupinevaluator;reuseengines.
-
-No active native/proof/publisherprocess now. Allscientificstandingunsigned.
-No paidrun/benchmark/subagents/historyrewrite. Vault8edec422key/KBbackend/
-paidbudget unavailable. Actualmainledger/C/archive/review/signing gates
-persist. Continueunblockedwork;doNOTfinalizeatcomponentboundary.
-[pcc:unverified]
-
-
-Rootconsumercheckpointmirrorpcc/claims/PCC-20261112-56d181.json;ownCI43315145393next22:51UTC. Rootmetadatahandoffpackaging/publishnext;actualS3migrationstillPENDING. [pcc:unverified]
+ActualFpfunctionsonrawY²=fT20:pi_i=(n_i/q_i²,Y*m_i/q_i³).
+E2(59,27):q=z²+38,n=[53,52,54,0,10],m=[44,47,55,2],infty+(10,100).
+F0(44,21):q=z²+46,n=[49,0,92,96,71],m=[87,17,53,5],infty+(71,48).
+MonicF=[100,12,74,50,6,46,1],Yraw=50Ymonic/inv50=99,globalinverse4=9238,
+componentinverse4=82/85. No arbitraryFp12Jacdomain;FpR12onlysetup/reference.
+Scripts/workspace/scratch/ct52_*record/archivesDONE;publish_checkpoint_objects_
+bearer.pyWORKS(originalghhelper401do notretry);gitfetchworks.
+GitHub3877/1517/3904bodiesupdated23:11consumerCIsettled+local43. Durable
+bodyfilesct52-pr1517-ci-success-body.md,ct52-pr3877-local43-body.md,
+ct52-queue3904-local43-body.md. functionsstoreexpires;usefiles/freshGET.
+No paidbenchmark/signature/subagents/force/rebase. [pcc:unverified]
 
 ---
 # CURRENT — consumer1513 published/CI; root whole37 maps next
