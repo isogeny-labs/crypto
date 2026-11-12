@@ -7,6 +7,30 @@ statements are `[pcc:unverified]`. Nothing in this directory has been run, apart
 from the re-checks listed in "Checks made for this report". Nothing concerns a
 deployed curve or key recovery.
 
+## Status update, 2026-11-12: leads 1 and 2 tested at the owner's request
+
+All results below are `[pcc:unverified]`.
+
+- **Lead 1 (`LEAD-C-jv-nagao-hilbert-at-scale`): prediction held.**
+  - Setup: 9 instances at p = 1301–1601, plus a drift control that reproduced the
+    frozen record exactly.
+  - Counted cost: S_B/S_A = 0.5276–0.5280 at equal relations and equal digest. All
+    four preregistered falsifiers passed.
+  - Distance to matched negation rho, U2 at w = 0: from 1.900 / 1.585 / 1.318
+    (above) to **1.003 (not resolved) / 0.837 (below) / 0.695 (below)**.
+  - The order holds across the §5a band at p = 1451 and 1601.
+  - Local and unvalidated: no leaderboard row.
+  - Write-up: `research/jv_nagao_hilbert_20261112/README.md`.
+- **Lead 2 (`LEAD-A-selector-eta-kernel`): conjecture C1 falsified as stated.**
+  - The nullity equals the trivial kernel M(k−1, e−1) in every infeasible cell
+    tested: n = 23–27 at e = 3, n = 27 at e = 4, and the 9 certificates at
+    n = 33–41.
+  - It exceeds the kernel at the feasible cells, inside the lead's claimed region:
+    - n = 23, e = 4: 1143–1145 against 232;
+    - n = 25, e = 4: 740–741 against 299.
+  - So non-trivial c-only syzygies appear exactly at `e_min`.
+  - Write-up: `research/lfd_lower_bound_20261111/out/lead_A1/RESULT.md`.
+
 | Lane | File | Leads |
 |:--|:--|--:|
 | A — last fall degree and the selector proof system | `lane_A_falldegree.md` | 5 |
