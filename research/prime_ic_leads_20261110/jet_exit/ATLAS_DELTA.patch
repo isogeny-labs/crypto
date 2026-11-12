@@ -1,0 +1,72 @@
+diff --git a/knowledge/leads/ecdlp/exotic/LEAD-EXO-padic-jet-canonical-lift.yaml b/knowledge/leads/ecdlp/exotic/LEAD-EXO-padic-jet-canonical-lift.yaml
+index e2aa3e7aa..471b2cc0e 100644
+--- a/knowledge/leads/ecdlp/exotic/LEAD-EXO-padic-jet-canonical-lift.yaml
++++ b/knowledge/leads/ecdlp/exotic/LEAD-EXO-padic-jet-canonical-lift.yaml
+@@ -46,6 +46,12 @@ evidence:
+ - repo: crypto-autoresearcher
+   path: ledger/evidence/EV-ECDLP-5b61eb.yaml
+   note: Strong support for the repaired chance reading (H-ECDLP-09125b)
++- repo: crypto
++  path: research/prime_ic_leads_20261110/jet_exit/README.md
++  note: "2026-11-11 equation-source question (not the DL channel): dual numbers add only free F_p unknowns (p does not divide r); the Z/p^k torsion section gives k-1 extra cross-summand equations whose digit functions have generic popcount degree on Kummer bases (3, 4, 5 at t = 6, 8, 10, equal to random and to d_full; nine cells, p = 40961, k = 4; widened to t = 12, ten curves, four non-trivial lifts and p = 12289, see rows/). Fails the equation-budget filter at toy scale [pcc:unverified]"
++- repo: crypto
++  path: examples/jet_digit_degree.rs
++  note: "instrument: torsion section over Z/p^k by complete projective formulas, digits on a Kummer base, least popcount degree by echelon; 4 unit tests; tests any lift in seconds"
+ ledger_refs:
+ - H-ECDLP-6a9479
+ - H-ECDLP-09125b
+@@ -76,9 +82,10 @@ forecloses:
+ - Serre-Tate canonical lift attack
+ - extend Smart anomalous attack to ordinary curves
+ - valuation profile of torsion lift
++- "torsion-section p-adic digits as extra cross-summand equations for prime-field tower (PKM) decomposition systems: generic degree on Kummer bases at toy scale"
+ areas:
+ - ECDLP
+ - JET
+ - JETB
+ - CREP
+-last_reviewed: '2026-11-01'
++last_reviewed: '2026-11-11'
+diff --git a/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-pkm-tower-algebraic-oracle.yaml b/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-pkm-tower-algebraic-oracle.yaml
+index d7b09c563..59dc976e3 100644
+--- a/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-pkm-tower-algebraic-oracle.yaml
++++ b/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-pkm-tower-algebraic-oracle.yaml
+@@ -118,6 +118,12 @@ evidence:
+ - repo: crypto
+   path: problems/guarded-fall-degree-lean-exact-pair.md
+   note: 'resolved: complete Lean proof of the exact first/last fall pair (4, 5) for the guarded three-abscissa model'
++- repo: crypto
++  path: research/prime_ic_leads_20261110/README.md
++  note: "2026-11-10/11 development checks on this host [pcc:unverified]: (a) the [2]-multiple consequence presentation (--controls multiples) lowers d_F by at most one at m = 3..5 and leaves both slopes unchanged (section 6); (b) the null control on the S3 support or the width-2 box equals the tower d_F on all 40 cells and the degree is monotone in the box width (section 6b): the growth is a property of the carry-graded one-generator closure, not the curve; (c) the parity gate as a fall-degree slope threshold alpha* = H^-1((1-3/m)/omega) (section 3); (d) the cross-summand equation budget and filter (section 4)"
++- repo: crypto
++  path: problems/prime-field-cross-summand-equation-budget.md
++  note: "problem record: one cross-summand equation per relation over F_p; what would unblock it"
+ ledger_refs:
+ - H-ECDLP-60de36
+ - EXP-ECDLP-f49f75
+@@ -150,4 +156,4 @@ areas:
+ - ECDLP
+ - PFDR
+ - DREG
+-last_reviewed: '2026-10-30'
++last_reviewed: '2026-11-11'
+diff --git a/knowledge/leads/ecdlp/transfer/LEAD-TRF-padic-canonical-section.yaml b/knowledge/leads/ecdlp/transfer/LEAD-TRF-padic-canonical-section.yaml
+index 109ef598d..02b5a802f 100644
+--- a/knowledge/leads/ecdlp/transfer/LEAD-TRF-padic-canonical-section.yaml
++++ b/knowledge/leads/ecdlp/transfer/LEAD-TRF-padic-canonical-section.yaml
+@@ -45,6 +45,9 @@ evidence:
+ - repo: crypto-autoresearcher
+   path: ledger/decisions/DEC-20261024-23d64d.yaml
+   note: "CZLIFT round synthesis: ten round decisions; RQ-CZLIFT-b9f765 cannot close yet (control C1 and a rule-12 review outstanding)"
++- repo: crypto
++  path: research/prime_ic_leads_20261110/jet_exit/README.md
++  note: "2026-11-11: the section used as an equation source for PKM tower systems rather than as a logarithm channel; its x-digits on Kummer bases need the generic popcount degree (about t/2), so the k-1 extra equations enter at a degree growing with the unknown bits [pcc:unverified]"
+ ledger_refs:
+ - H-CZLIFT-6d4ed1
+ - H-CZLIFT-fba874
+@@ -78,4 +81,4 @@ forecloses:
+ - Hensel lift section
+ areas:
+ - CZLIFT
+-last_reviewed: '2026-10-29'
++last_reviewed: '2026-11-11'

@@ -108,6 +108,7 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+    "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -150,7 +151,7 @@ SOURCES = {
     "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
-    "mt_fieldops_component": "research/mt_fieldops_v3_20261111/results/holdout/summary.json",
+    "mt_fieldops_component": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
@@ -492,7 +493,8 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 
 # These engineering components also carry validation gates outside tables A-C.
 COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
-                           "benchmarks/20261111-mt-fieldops-v3")
+                           "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
+                           "benchmarks/20261112-mt-fieldops-v5")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -1244,6 +1246,49 @@ def ic_cover_weakclass_component() -> dict:
             "validated": not errs}
 
 
+def jv_sieve_line_vs_rho_component() -> dict:
+    """The Joux-Vitse cover sieve route (arms P, H, U) against a matched negation-map
+    rho on the same weak-class instances, p in {1009, 1511, 1823}, from
+    research/jv_sieve_line_vs_rho_20261103/fit.json (made by the study's Rust tool
+    from its records; every point recomputed independently by the validator,
+    review/validator/recompute.json). Per-prime reference (the frozen homogeneity
+    rule failed), unit U2, layer A of the §5a band (all unemitted cover F_p work
+    priced as native). Weak class only, never prime order: outside tables A-C.
+    Its standing comes from the study's VALIDATION.json."""
+    f = load(SOURCES["jv_sieve_line_vs_rho"])
+    study = "research/jv_sieve_line_vs_rho_20261103"
+    if f["controls"]["primary"] != "per-prime" or not (f["controls"]["c1_pass"] and f["controls"]["c2_pass"]
+                                                       and f["controls"]["replays_ok"]):
+        raise SystemExit(f"{SOURCES['jv_sieve_line_vs_rho']}: controls or primary reference changed")
+    rows = []
+    for arm in "PHU":
+        for scope in ("p=1009", "p=1511", "p=1823", "pooled (24 instances)"):
+            cell = lambda m: f[f"per-prime|{arm}|{scope}|{m}"]
+            band = [cell(f"band A U2 w={w}") for w in ("0", "0.1", "1")]
+            rows.append({"arm": arm, "scope": scope.replace(" (24 instances)", ""),
+                         "s": cell("S/rho U2")["point"], "lo": cell("S/rho U2")["lo"], "hi": cell("S/rho U2")["hi"],
+                         "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
+                         "below": all(b["verdict"] == "below" for b in band)})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    walk = load("research/jv_walk_charge_20261111/analysis.json")
+    w512 = walk["by_M"]["512"]["pooled"]
+    walk_note = (f"The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in "
+                 f"research/jv_walk_charge_20261111 ({walk['verdict']}): pooled {w512['0']['point']:.4f} / "
+                 f"{w512['0.1']['point']:.4f} / {w512['1']['point']:.4f} at w = 0 / 0.1 / 1 with the walk, against "
+                 f"{w512['0']['uncharged_point']:.4f} / {w512['0.1']['uncharged_point']:.4f} / {w512['1']['uncharged_point']:.4f} without it. "
+                 "That charge covers starts within the implemented walk's reach: from a random admitted curve it "
+                 "reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % "
+                 "operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak "
+                 "curve (all depth-1 2-volcanoes) cannot use the route.")
+    return {"rows": rows, "class": "transfer (weak class only)", "walk_note": walk_note,
+            "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["jv_sieve_line_vs_rho"],
+            "validation": ("validated with caveats (weak class only; the isogeny walk is charged in a separate study): "
+                           "replay certificate, validator report and the matched negation-map rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def d4_char2_frob_roots_component() -> dict:
     """Frobenius-semilinear squaring in the F_q root finding of the char-2 D4
     index calculus (`frob_roots=1`), from research/ic_d4_char2_lever_20261023:
@@ -1728,25 +1773,25 @@ def pkm_symmetric_component() -> dict:
             "class": "solver-stage diagnostic", "validation": NOT_VALIDATED}
 
 
-MT_FIELDOPS_EVIDENCE = "benchmarks/20261111-mt-fieldops-v3"
+MT_FIELDOPS_EVIDENCE = "benchmarks/20261112-mt-fieldops-v5"
 
 
 def mt_fieldops_component() -> dict:
-    """Multi-target IC5 (k = 4 term x-only table, shared inversions, few factor-base unknowns) against the cheapest
-    of four rho arms in the same counted field layer (cheapest of rho, rho2, rho2x, rhoseq x three kappa, per
-    configuration and price, after the restart fix of research/mt_rho_start_fix_20261111) and a paired BSGS,
-    from research/mt_fieldops_v3_20261111 (44 fresh prime-order curves at 22-32 bits, 4488 runs). Supersedes the
-    v2 IC4 rows (corrected in research/mt_rho_start_fix_20261111).
-    Medians and bootstrap intervals are copied from summary.json (analyze.py); I/M = 10, h in {0, 0.1, 1}.
-    A multi-target regime outside tables A-C; its standing comes from the benchmarks directory's
-    VALIDATION.json."""
+    """Multi-target IC (icbest = cheapest of ic5, ic5ks, ic5w, ic5rw per configuration and price) against the
+    cheapest multi-target rho of the same counted field layer (rhobest = best of 10 runs of Kuhn-Struik retention
+    rho rho2xks and distinguished-point rho rhodpu) and a paired BSGS, with every arm's native work (step-index
+    hashes, canonicalisations, offset-step indices) counted and priced at h as section 5a requires, from
+    research/mt_fieldops_v5_20261112 (33 fresh prime-order curves at 24-32 bits, 3366 runs). Supersedes v4
+    (research/mt_fieldops_v4_20261112), v3 and v2. Medians and bootstrap intervals are copied from summary.json
+    (analyze.py); I/M = 10, h in {0, 0.1, 1}. A multi-target regime outside tables A-C; its standing comes from the
+    benchmarks directory's VALIDATION.json."""
     summary = load(SOURCES["mt_fieldops_component"])
     errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
     cells = sorted({(x["bits"], x["T"]) for x in summary})
     rows = []
     for bits, t in cells:
         def q(vs, h):
-            x = next(y for y in summary if y["cand"] == "ic5" and y["vs"] == vs and y["cI"] == 10 and y["bits"] == bits
+            x = next(y for y in summary if y["cand"] == "icbest" and y["vs"] == vs and y["cI"] == 10 and y["bits"] == bits
                      and y["T"] == t and y["h"] == h)
             return {"median": x["median"], "ci95": [x["lo"], x["hi"]], "n": x["n"]}
         band = {str(h): q("rhobest", h) for h in (0, 0.1, 1)}
@@ -1754,19 +1799,18 @@ def mt_fieldops_component() -> dict:
                    else "dearer" if all(v["ci95"][0] > 1 for v in band.values()) else "unranked")
         rows.append({"bits": bits, "T": t, "rho": band, "bsgs": {str(h): q("bsgs2", h) for h in (0, 1)},
                      "verdict": verdict})
-    return {"rows": rows, "study": "research/mt_fieldops_v3_20261111/",
-            "report": "research/mt_fieldops_v3_20261111/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+    return {"rows": rows, "study": "research/mt_fieldops_v5_20261112/",
+            "report": "research/mt_fieldops_v5_20261112/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+            "v4": "research/mt_fieldops_v4_20261112/",
+            "previous": "research/mt_fieldops_v3_20261111/",
             "correction": "research/mt_rho_start_fix_20261111/",
             "class": "multi-target method",
-            "validation": ("validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) "
-                           f"with the §5a band ({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else (
-                "not validated against rho: the gate refuses "
-                f"{MT_FIELDOPS_EVIDENCE}/VALIDATION.json (validator status insufficient_evidence, strongest_available "
-                "false). The rho reference is this harness's anchored, fixed-database family without Kuhn-Struik "
-                "retention of finished walks; against the same family with retention IC5 is 1.07-1.34x at h = 0 and "
-                "1.05-1.18x at h = 0.1, so every §5a decision against a standard multi-target rho is unranked. The "
-                "validator does validate IC5 against IC4, the multi-target IC baseline: cheaper in all 36 (cell, I/M) "
-                "decisions, 0.47-0.99x (engineering)"),
+            "validation": ("validated: replay certificate, validator report and the rho reference (cheapest standard "
+                           "multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band "
+                           f"({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else (
+                f"not validated: the gate refuses {MT_FIELDOPS_EVIDENCE}/VALIDATION.json (validator status "
+                "insufficient_evidence for a ranking, strongest_available false); the measurement itself replays "
+                "exactly and recomputes"),
             "validated": not errs}
 
 
@@ -2616,6 +2660,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
+        "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -3016,6 +3061,21 @@ def markdown(doc: dict) -> str:
                  f"**{r['ratio']:.3f}** [{r['ratio_min']:.3f}, {r['ratio_max']:.3f}] | {band} | {before} |")
     L += ["", f"[Report]({'../../' + cw['report']}) · [study](../../{cw['study']}) · "
               f"[data](../../{cw['source']}).", "", cw["validation"], ""]
+    js = doc["jv_sieve_line_vs_rho_component"]
+    L += ["## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)", "",
+          "Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} "
+          "(never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per "
+          "prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; "
+          f"`{js['unit']}`. The band is layer A: every unemitted cover F_p operation is also priced as native, the "
+          f"upper-bound convention. {js['walk_note']} Distance remaining is IC ÷ rho; "
+          "\"below\" means the 95% interval's upper end is under 1 at all three prices.", "",
+          "| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |",
+          "|:--|:--|:--|:--|:--|"]
+    for r in js["rows"]:
+        L.append(f"| {r['arm']} | {r['scope']} | **{r['s']:.4f}** [{r['lo']:.4f}, {r['hi']:.4f}] | "
+                 + " / ".join(f"{x:.3f}" for x in r["band"]) + f" | {'yes' if r['below'] else 'no'} |")
+    L += ["", f"[Report]({'../../' + js['report']}) · [study](../../{js['study']}) · "
+              f"[data](../../{js['source']}).", "", js["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -3611,23 +3671,26 @@ def markdown(doc: dict) -> str:
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     mt = doc["mt_fieldops_component"]
-    L += ["## Multi-target IC5 against IC4 and this harness's rho family, outside tables A–C", "",
-          "Many targets on one prime-order Weierstrass curve (group orders about 2^22 to 2^32, 44 fresh curves, 22 paired "
+    L += ["## Multi-target IC against multi-target rho: the order flips with the hash price, outside tables A–C", "",
+          "Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired "
           "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
-          "1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table "
-          "of 4-term factor-base sums (few unknown logs, so a small relation phase) and tries x(Q ± W) with one shared "
-          "inversion; the reference is the cheapest of four rho variants (anchored, sibling, x-only sibling, sequential "
-          "database) at three database sizes, chosen per configuration and price, after a restart fix that made rho "
-          "1.4-4.8% cheaper. IC5 / rho and IC5 / BSGS per target, median [95% bootstrap]; the BSGS ratio "
-          f"is the distance remaining. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
-          "| bits | T | IC5/harness rho h=0 | h=0.1 | h=1 | §5a (harness rho) | IC5/BSGS h=0 | h=1 |",
+          "1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point "
+          "canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four "
+          "ic5 variants (4-term x-only table, paired trials with one shared inversion; with or without retention and "
+          "random-walk offsets); the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, "
+          "10 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance "
+          "remaining. The IC is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a "
+          f"decision is unranked. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
+          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |",
           "|--:|--:|--:|--:|--:|:--|--:|--:|"]
     for r in mt["rows"]:
         f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
         L.append(f"| {r['bits']} | {r['T']} | {f(r['rho']['0'])} | {f(r['rho']['0.1'])} | {f(r['rho']['1'])} | "
                  f"{r['verdict']} | {r['bsgs']['0']['median']:.2f} | {r['bsgs']['1']['median']:.2f} |")
     L += ["", f"Study: [{mt['study']}](../../{mt['study']}); [report](../../{mt['report']}); source `{mt['source']}`. "
-          f"The earlier IC4 rows (v2) were re-measured against the fixed rho: [{mt['correction']}](../../{mt['correction']}).", ""]
+          f"v4, without native work priced: [{mt['v4']}](../../{mt['v4']}). "
+          f"Earlier rows were measured against a rho without retention: IC5 (v3, [{mt['previous']}](../../{mt['previous']}); "
+          f"its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [{mt['correction']}](../../{mt['correction']})).", ""]
     pk = doc["pkm_symmetric_component"]
     L += ["## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C", "",
           f"Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion "
@@ -4438,6 +4501,22 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table></div>'
              f'<p>{gh(cw["report"], "Report")} · {gh(cw["study"], "study")} · {gh(cw["source"], "data")}.</p>'
              f'<p class="muted">{esc(cw["validation"])}</p></section>')
+    js = doc["jv_sieve_line_vs_rho_component"]
+    P.append('<section class="panel" id="jv-sieve-line-vs-rho"><h2>Joux–Vitse cover sieve vs matched negation rho '
+             '<span class="chip">weak class only</span></h2>'
+             '<p>Curves over F<sub>p⁶</sub> with full rational 2-torsion whose class has a genus-3 cover over '
+             'F<sub>p²</sub> (never prime order). Arms P, H and U, 8 instances per prime, against a negation-map rho '
+             f'on the same instances in the same binary. Per-prime reference; {esc(js["unit"])}. Layer-A band: every '
+             f'unemitted cover F<sub>p</sub> operation is also priced as native. {esc(js["walk_note"])}</p><div class="scroll"><table><thead><tr><th>arm</th><th>scope</th>'
+             '<th>IC ÷ rho, U2 [95%]</th><th>layer-A band (w = 0 / 0.1 / 1)</th><th>below across band</th>'
+             '</tr></thead><tbody>')
+    for r in js["rows"]:
+        P.append(f'<tr><td>{r["arm"]}</td><td>{esc(r["scope"])}</td><td><b>{r["s"]:.4f}</b> '
+                 f'[{r["lo"]:.4f}, {r["hi"]:.4f}]</td><td>' + " / ".join(f"{x:.3f}" for x in r["band"])
+                 + f'</td><td>{"yes" if r["below"] else "no"}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(js["report"], "Report")} · {gh(js["study"], "study")} · {gh(js["source"], "data")}.</p>'
+             f'<p class="muted">{esc(js["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
@@ -4967,23 +5046,26 @@ def page(doc: dict, standalone: bool) -> str:
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
     mt = doc["mt_fieldops_component"]
-    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC5 against IC4 and this harness\'s rho family, outside the priced tables</h2>'
-             '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>22</sup> to 2<sup>32</sup>, 44 fresh curves, 22 paired '
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against multi-target rho: the order flips with the hash price, outside the priced tables</h2>'
+             '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>24</sup> to 2<sup>32</sup>, 33 fresh curves, 22 paired '
              'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
-             '1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC5 builds an x-only table of 4-term '
-             'factor-base sums (few unknown logs, so a small relation phase) and tries x(Q ± W) with one shared inversion; the '
-             'reference is the cheapest of four rho variants at three database sizes, chosen per configuration and price, after a '
-             'restart fix that made rho 1.4-4.8% cheaper. IC5 / rho and IC5 / BSGS per target, median [95% bootstrap]; '
-             f'the BSGS ratio is the distance remaining. Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
-             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC5/harness rho h=0</th><th>h=0.1</th><th>h=1</th>'
-             '<th>§5a (harness rho)</th><th class="n">IC5/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             '1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point '
+             'canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four ic5 '
+             'variants; the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, 10 runs per '
+             'configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The IC '
+             'is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a decision is unranked. '
+             f'Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
+             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC/rho h=0</th><th>h=0.1</th><th>h=1</th>'
+             '<th>§5a</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
              + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
                        + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
                                  f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))
                        + f'<td>{esc(r["verdict"])}</td><td class="n">{r["bsgs"]["0"]["median"]:.2f}</td>'
                        f'<td class="n">{r["bsgs"]["1"]["median"]:.2f}</td></tr>' for r in mt["rows"])
              + f'</tbody></table><p><a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["study"])}">Study</a>; '
-             f'IC4 (v2) rows re-measured against the fixed rho: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">correction</a>.</p></section>')
+             f'v4 without native work priced: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["v4"])}">v4</a>; '
+             f'earlier rows against a rho without retention: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["previous"])}">IC5 (v3)</a>, '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">IC4 (v2)</a>.</p></section>')
     pk = doc["pkm_symmetric_component"]
     P.append('<section class="card" id="pkm-symmetric-component"><h2>Symmetric PKM tower, F4 stage at m = 4, outside the priced tables</h2>'
              f'<p>Writing the Kummer membership and S<sub>5</sub> in the elementary symmetric functions before expansion '

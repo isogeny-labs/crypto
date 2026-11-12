@@ -371,3 +371,10 @@ adds is that the closure did not fail to allocate within 3 h 10 min under 780 GB
 where the 512 GB host failed after 1,317 s. Spend: at most 14 h × $7.77 ≈ $109. The
 billed figure was not read. A retry needs the result copied off the host as the run
 ends, before the host can expire.
+
+Correction (2026-11-11). Amendment A4 should not have run. C1 had already been measured on 2026-11-04
+by `research/koblitz_ic_leads_build_20261024` (its Amendment 7, `runs/c1pe/`). The incremental engine
+(`pe_closure`) refutes draws 0 and 3 at degree 5, at about 52.5 GB peak on a 128 GB host. That study
+also records the dense engine aborting at 424 GB on the same draws. A4 repeated the dense route without
+checking that study. Its spend, at most about $109, bought no new information. C1's standing is that
+study's result, not "open" as recorded above.
