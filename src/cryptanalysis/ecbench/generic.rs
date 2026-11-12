@@ -306,6 +306,37 @@ impl KangarooShape {
     }
 }
 
+/// `h mod d` for a fixed `d ≥ 1` without a division instruction: Lemire,
+/// Kaser and Kurz, "Faster remainder by direct computation" (2019), the
+/// 64-bit case with the 128-bit constant `M = ⌈2^128 / d⌉`, which is exact
+/// for every 64-bit `h` and every `d < 2^64` (their Theorem 1 with
+/// `F = 128 ≥ N + log₂ d`).  `d = 1` wraps `M` to 0 and returns 0.  The
+/// kangaroo's jump index was a 64-bit `div` per step; the value is the
+/// same remainder.
+#[derive(Clone, Copy)]
+struct FastMod {
+    m: u128,
+    d: u64,
+}
+
+impl FastMod {
+    fn new(d: u64) -> Self {
+        assert!(d > 0, "FastMod of a zero modulus");
+        Self {
+            m: (u128::MAX / d as u128).wrapping_add(1),
+            d,
+        }
+    }
+
+    #[inline]
+    fn rem(self, h: u64) -> u64 {
+        let low = self.m.wrapping_mul(h as u128);
+        let bottom = ((low as u64) as u128 * self.d as u128) >> 64;
+        let top = (low >> 64) * self.d as u128;
+        ((bottom + top) >> 64) as u64
+    }
+}
+
 fn mix(v: u64) -> u64 {
     crate::cryptanalysis::ecbench::canonical::splitmix64(v)
 }
@@ -350,6 +381,7 @@ pub fn kangaroo_with<G: CountedGroup>(
     let shape = KangarooShape::of(r);
     out.count("jump_count", shape.jumps as u64);
     out.count("dp_bits", shape.dp_bits as u64);
+    let jump_of = FastMod::new(shape.jumps as u64);
     let mut jumps: Vec<(G::Elt, u64)> = Vec::with_capacity(shape.jumps as usize);
     let mut p = gen;
     for i in 0..shape.jumps {
@@ -404,7 +436,7 @@ pub fn kangaroo_with<G: CountedGroup>(
         for kind in 0..2u8 {
             let (pos, dist) = roo[kind as usize];
             let h = mix(g.key(&pos));
-            let (jp, jd) = jumps[(h % shape.jumps as u64) as usize];
+            let (jp, jd) = jumps[jump_of.rem(h) as usize];
             let np = g.add(&mut out.search, pos, jp);
             let nd = addmod(dist, jd, r);
             steps += 1;
@@ -445,6 +477,39 @@ mod tests {
     use crate::cryptanalysis::ic_boundary::{
         find_prime_order_curve, koblitz_instance, BinaryGroup,
     };
+
+    #[test]
+    fn fast_mod_is_the_remainder() {
+        let mut s = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        let edges = [
+            0u64,
+            1,
+            2,
+            3,
+            u64::MAX,
+            u64::MAX - 1,
+            1 << 63,
+            (1 << 63) - 1,
+        ];
+        let mut moduli: Vec<u64> = (1..=64).collect();
+        moduli.extend([u64::MAX, u64::MAX - 1, 1 << 63, (1 << 63) + 1, 1_000_003]);
+        for d in moduli {
+            let f = FastMod::new(d);
+            for &h in &edges {
+                assert_eq!(f.rem(h), h % d, "d={d} h={h}");
+            }
+            for _ in 0..4096 {
+                let h = next();
+                assert_eq!(f.rem(h), h % d, "d={d} h={h}");
+            }
+        }
+    }
 
     fn check_all_prime(bits: u32, seed: u64) {
         let inst = find_prime_order_curve(bits, seed);
