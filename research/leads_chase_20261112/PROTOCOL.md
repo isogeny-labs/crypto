@@ -111,3 +111,14 @@ Rescoped S1 (frozen now):
   big engine; the k = 6 versions and the negative control d0 on the growth lib.
 - Arm (a) control unchanged.
 Everything else in the S1 section stands. Cost: the same.
+
+## Amendment 2026-11-12 05:00 UTC: J2 held-out confirmation (frozen before these units run)
+
+The grid (seeds 1–3, k = 16, 18, 20, 22) was read before this amendment; c = 1.60 was the cheapest arm at k ≥ 18,
+which is a post-hoc selection. Held-out test: `v2 ic <q> <seed> D 3.0 <c> 4 4` for c ∈ {1.60, 1.75, 2.00},
+seeds 4–8 (never run), at q = 2097091 (k = 21, a size not in the grid) and q = 4194271 (k = 22). Three
+`v2 calib 2097091 <i>`. Prediction (from the grid): first-attempt success 5/5 at c = 1.60 and 1.75 at both sizes;
+paired charged DL1 M-eq ratio to c = 2.00 in [0.60, 0.72] at c = 1.60 and [0.72, 0.82] at c = 1.75, at w = 0, with
+the order (c = 1.60 < c = 1.75 < c = 2.00) holding at w = 0, 0.1 and 1 (unpriced hash + cmp operations priced at w
+GAE, GAE = gae_mul + r_inv · gae_inv in M-eq, the N4v2 summary rule). Falsifier: any c = 1.60 first-attempt failure,
+or any held-out ratio outside its interval, or the order failing at any w.
