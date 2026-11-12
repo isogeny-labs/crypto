@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T04:49:12Z",
+ "id": "PCC-20261112-ad6883",
+ "kind": "statement",
+ "producer": {
+  "commit": "952e1cb4bc44163a49c097d3d68d8f483f43d8f1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-first-source-02.rs",
+    "sha256": "a1a15bc64c7c0cbf4ab014e87212a00d9161ee3ef40305372e7ced64162640c9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-first-native-02.txt",
+    "sha256": "17076b98d19050fe3e5d48ac81673fc2f19d4e1c7041ac8a3a3ac767c0df97e5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-first-source-02.sha256",
+    "sha256": "174cc5127339fd14ee1cd030872c41c227fde07a4e53a6ce138f8cee8c34a725"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-existing-lagrange-02.rs",
+    "sha256": "426204397c2da50028c32e16c3b5ce28d9a8433c4eb32dabc0b6899572282fc6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-existing-lagrange-guard-02.txt",
+    "sha256": "b5fe05704861e90d9ba185be6e3d319427393297b267b1c9eaff051695d96668"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned first CT28 native02 bounded T0/E109 construction passes1test:centred infinity+q=(14,73),N=[14,0,88,97,14],Q=[63,0,1],M=[41,40,69,73]. Existing-engine exact coefficientwise F*M\u00b2=N\u00b3+a*N*Q\u2074+b*Q\u2076,gcd/smoothness,separable rational xdegree4 and all118 finite rational source point comparisons pass;no rational poles dropped. Existing Lagrange body extracted visibility-only with exact guard,other field/poly/group/Richelot arithmetic reused. Global identification proof/independent certificate replay/arbitrary-class norms and Clippy remain separate;no timing or new-transfer claim. Failed build01/7137fa retained."
+}

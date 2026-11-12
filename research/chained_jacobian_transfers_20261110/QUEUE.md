@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 132 written helper lemmas;global geometry partial;unsigned | Formalize multihop kernel criteria,model identities and descent boundaries. | Previous109 plus5TwoHopTransport/7SuccessorNorms/4KernelChart/6OddFieldDescent/1RootTable. Six odd-module statements individually bound/localpass;three generated equations excluded. Current23named modules;actual finitefields/Picard/quotient/polarization/Torelli/Galois descent remain written. ODD_FIELD_DESCENT_PROOF.md/6b3ff6 and report3c19e0 retain exact hypotheses. |
+| CT03 | 134written helpers/24modules;geometrypartial;unsigned | Formalize transport and descent with faithful hypotheses. | Added two BalancedChart linear-support/infinity-accounting lemmas db2184/9fd61b,local zero-trusted gate7d9a53;132 prior statements unchanged. Actual fields/projective/Picard/quotient/polarization/Torelli/Galois bridges remain written. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -40,9 +40,9 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT24a | second existing Cantor replay complete within fixed49-class scope;unsigned | Independently check both exported kernel groups beyond validity/Frobenius. | INDEPENDENT_GROUP_REPLAY_V2.md/40a568;existing generic engine,thin FpR/chart adapter,all2401 sums each/7-annihilators/inverses,full8/strictClippy03 pass9ebcf7. Exact alias-only/source guards;initial02 failure preserved. Four partial KernelChart plus7 C2 helpers bring written census125,1fa370;no independent map-kernel membership/whole-class claim. Inspected two-page report. |
 | CT25 | complete local acceptance,published1496;ownCI succeeds;unsigned | Direct C2 endpoint norms with genuine generic references and all exceptions. | Consumer65aabe348/ready1496 against1494;FULL guard04 passes25native/81reference+five,one old ignored,consumer03b76b/root714b32. Both norms/all12317/exception controls and all forward/dual Phi2/Psi2 generic graphs pass. Written95693e/consumer7fb16a,inspectedPDF238524. Own exact65a focused43136703928 succeeds25/81+five,full archivee2187d in25fd/1498. No measured cost claim. |
 | CT25a | written global argument/partialLean/even-degree negative control complete locally;unsigned | Explain actual F101 descent using odd coefficient degree,without rational sign witnesses. | ODD_FIELD_DESCENT_PROOF.md/6b3ff6,6written conditional module/ring lemmas and9standalone tests/strictClippyb33222. Stable kernels+targetAut±1+F101³ imply fixed Hom sign. Even-degree twist109/95/all109² additions cd2506 preserves why oddness matters. Old proofs unchanged;new rootCI separate. |
-| CT26 | complete local acceptance,published1498;ownCI running;unsigned | Avoid unused eager reference-table construction and preserve canonical queried roots. | ROOT_TABLE_CHECKPOINT.md/PROOF.md. Consumer25fd0be7c/ready1498 against1496,full25native/82reference+five guard02/3c6362/root089c42. Allsix complete domains preserve exact outputs and no-cache/reference initialization. Canonical control01/3f015c,partial theorem1da835/written718425,132written census9c02c5,inspected report5e1f22. Exact25fd focused43144567065 initiallyrunning,next03:45. No measured advantage. |
-| CT27 | producer fixtures pass;independent replay pending | Independently replay arbitrary balanced degree0/1/2 classes beyond the fixed49 kernels. | CT27_PLAN.md. Fresh consumer child from25fd;isolated prototype01 passesdca7d7:actual full12317 T0 corpus/negation/doubles/paired additions,degree/infinity counts predicted correctly,identity239. Next independent old Cantor replay with explicit(2n+m-2)Q infinity correction. Next actual fixture inspection,then existing second Cantor replay without producer imports. No all151M-pair or independent map-membership claim. |
-| CT28 | prospective;no cover constructed | Replace extension-field evaluation of actual H_i=N_i RiHat by direct degree4 elliptic covers/norms over F101. | CT28_PLAN.md:reconstruct N/Q²,yM/Q³,verify exact curve identity/degree and global identification by correspondence or justified degree-bound certificate. All pole/repeated/infinity cases and full12317 comparisons required. Reuse existing engines;later direct pullbacks/fused Psi. No benchmark or speed claim. |
+| CT26 | complete/ready1498/exactCI succeeds;unsigned | Lazy canonical root tables without arithmetic changes. | Consumer25fd/1498 against1496,full25/82+five3c6362/root089c42. Exact43144567065 succeeds,signedjobskips,full205514 in5ceb. Canonical roots17/1013f015c,written718425/filter1da835/report5e1f22 retained. |
+| CT27 | complete/ready1501;ownCI dispatched;unsigned | Independently replay arbitrary balanced degree0/1/2 classes beyond49kernels. | FULL_CLASS_CHECKPOINT.md:consumer5ceb ready1501 against1498,full25native/83reference+five93b147/root18115e,post-run frozen hashes unchanged. Both full12317 corpora/negations/doubles/paired sums pass existing-Cantor12/Clippy/sourceguards4b2aa9,writtenb71a87,partial7d9a53/final89916e. Timestamp-only correctione15346/root279a08 preserves05. No all151M pairs or independent map-membership claim. |
+| CT28 | first exact candidate constructed locally;global/fullnorm acceptance pending | Direct F101 degree4 elliptic covers/norms for actual Ti. | Native02/ad6883 T0→E109 exact coefficientwise identity,gcd/smoothness/separability,xdegree4/all118finite point comparisons pass:N[14,0,88,97,14],Q[63,0,1],M[41,40,69,73],q(14,73). Existing engines/private interpolation reused. Failed compiler01/7137fa preserved. Next global degree-certificate proof/independent replay,all12317 norms/poles/repeated/infinities,then other components/pullbacks. No measured gain. |
 
 ## Session constraints
 
@@ -57,16 +57,15 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read .resume/RESUME.md and ROOT_TABLE_CHECKPOINT.md. CT26 is25fd/ready1498,
-complete25/82+five guard02/3c6362/root089c42;ownCI43144567065 next03:45.
-Parent1496 exact65a succeeds25/81+five,e2187d. Root previouslypublished01bd
-CI43139941662 succeeds,full logs/API597b08,excludes new132/23 scope. Root broadPCC03 completed
-187 historical missing-subject failures/155not_covered/29localpass;project
-subset97 haszero fail,f117f7. No global/signed pass or unchanged rerun.
-CT27 isolated producer prototype01 passesdca7d7,actual complete fixtures
-in fresh child25fd;next independent
-old Cantor complete-class replay with explicit infinity correction. Never
-broaden the old49-kernel scope before acceptance. Preserve all original
-controls,source subjects,ledger forks and locked-vault/admission limits.
-No solver/benchmark/paidjob,bypass,force/rebase/rechain or graph promotion.
-[pcc:unverified]
+Read .resume/RESUME.md and FULL_CLASS_CHECKPOINT.md. CT27 consumer5ceb/
+ready1501 targets1498;full25/83+five and independent12 complete. Own
+focusedCI dispatched04:49,next~05:40UTC. Rootpublished952 exact43149872098
+succeeds25/23modules/132written/9standalone,4dc04c;this checkpoint adds
+CT27/134/24/12 and needs its own exact-head run. CT28 first native02
+candidatead6883 has exact curve identity/degree4/all118 finite points;
+global identification and all12317 directnorms remain pending. Isolated
+scratch/ct27-prototype/src/ct28_quartic.rs;consumer new quartic childclean.
+Parent1484 nextquiet05:11;green unchanged descendants paused until parent
+activity/fresh check before merge. Frozen ledger/S3/livebudget/vault/KB
+and historical root archive/clock blockers unchanged. Continue next
+unblocked task;do not rerun unchanged broad audits or full baselines.

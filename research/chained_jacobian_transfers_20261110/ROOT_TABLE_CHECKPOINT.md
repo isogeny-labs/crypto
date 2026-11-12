@@ -1,3 +1,5 @@
+Current follow-on:FULL_CLASS_CHECKPOINT.md/ready1501. CT26 parent1498 exact25fd focused43144567065 succeeds;full205514 in5ceb. The following CT26 checkpoint remains historical. [pcc:unverified]
+
 # Current — CT26 ready1498; arbitrary-class replay starts
 
 Consumer25fd0be7cea37cefd298d3ac38b6f863bb9105d5/treece7ac7765b8c2545b3c60ffd1bb37aefadcfb256

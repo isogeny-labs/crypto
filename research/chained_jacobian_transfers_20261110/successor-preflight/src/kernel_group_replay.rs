@@ -5,8 +5,7 @@ use isogeny_algos::field::{Field, Rng};
 use isogeny_algos::fpr::{FpR, ER};
 use isogeny_algos::poly;
 
-#[path = "legacy_jacobian.rs"]
-mod legacy;
+use crate::legacy_jacobian as legacy;
 
 struct Flat<'a>(&'a FpR);
 impl legacy::Fld for Flat<'_> {
