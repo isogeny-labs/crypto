@@ -42,4 +42,5 @@ pub mod field;
 pub mod hyper64;
 pub mod measure;
 pub mod pushforward;
+pub mod small_de;
 pub mod tower;

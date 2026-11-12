@@ -314,6 +314,85 @@ surveys halted at checkpoints (\art{research/full_volcano_graphwide_ic_20261017/
 Weil restriction of ECC2K-130 to extension fields costs at least $2^{131}$,
 $2^{70.19}$ times rho (cluster ``transfer-boundaries'').
 
+\paragraph{Prime-field covers, 11--12 November.} One study carried an
+elliptic logarithm from $E/\FF_p$ to an isogenous curve and to the Jacobians
+of genus-2, -3 and -4 covers $C\to E$, verifying every hop, and measured each
+destination against rho on $E$
+(\art{research/chained_prime_transfer_20261111/}). Genus-2 index calculus
+with the full degree-1 base costs $8.0$--$40.8\times$ matched rho at 0~GAE
+for $p=211$--$1619$, and $47.11\times$ (genus 2) and $141.97\times$ (genus 3)
+at $p=64{,}007$; amortising the factor-base logs leaves an online cost that
+ties a memory-matched precomputed rho table. The measurements are in
+\S\ref{sec:jac-chain}. Two follow-ups explain why no cover of this kind
+helps: the cover's relations push forward to the degenerate
+$[2]Q=Q+Q$ on $E$, and the complementary factor never receives the
+logarithm (\S\ref{sec:obs-pushforward}). Every figure in these studies is
+an unverified assertion (\texttt{[pcc:unverified]} at the source); none
+has a validation file.
+
+\paragraph{Cover images as factor bases.} A cover $\varphi:C\to E$ can
+also be used only to choose the base: $\Fb=x\circ\varphi(V)$ for a
+structured set $V$ of $u$-coordinates on $C$, with relations and linear
+algebra on $E$. Three rounds on 12 November asked whether the summation
+system restricted to $\varphi(V)$ gives F4 smaller matrices than the same
+system with random coefficients (its null) or than PKM's tower base of the
+same size (\art{research/cover_image_fb_20261112/README.md},
+\art{research/cover_image_fb_r2_20261112/README.md},
+\art{research/cover_image_fb_r3_m3_20261112/README.md}). The setting is
+$p=2013265921$, Kummer towers, 3 planted and 3 random targets per cell,
+cover maps of degree 2 to 4 (genus 2 to 5), with no timeouts and 0 planted
+violations. Round~1's preregistered metric, the solving degree $D$, is
+floored by the input degree ($S_3(u^2,\dots)$ has degree 8 in the bottom
+tower variable), so its positive control failed on its letter and the
+$D$-based verdict was not read; matrix width $W$ (the widest F4 matrix) was
+read post hoc and preregistered for rounds 2 and~3. Table~\ref{tab:cover-image-fb}
+gives the widths. At $m=2$ every map sits at its null in $W$: the
+\texttt{quad}/null ratio is $0.97$--$1.02$ for $t=5$--$8$ ($1.31$ at $t=4$,
+$0.81$ at $t=3$), \texttt{cubic} $0.95$--$1.01$, \texttt{generic3} $1.00$, and
+\texttt{quart} $1.31$, $1.00$, $0.96$ at $t=5$, 6, 7, the $1.31$ being the cover
+doing worse and the only cell outside the $1.25$ band; round~2 scored
+\texttt{cubic} and \texttt{generic3} as the falsifier H0 and \texttt{quart} as
+inconclusive. Every map is
+$1.22$--$5.47\times$ wider than the tower at equal $\abs\Fb$, because substituting a degree-$d$ map raises $S_3$ to degree $4d$
+in two summands. One $m=3$, $t=3$ cell had \texttt{cubic} and \texttt{quart}
+narrower than the tower ($1{,}866$ and $1{,}876$ against $3{,}285$); round~3
+tested it at $t=4$ with nulls, and all four maps landed on the falsifier H0
+at $1.55$--$1.99\times$ the tower's width. At $t=3$ the cubic was $0.59\times$
+its own null, at $t=4$ $1.00\times$. The $t=5$ cell exceeded the 16\,GB
+memory limit. The study closes the line at these sizes ($m\le3$, $t\le8$,
+small $p$); it reports no $S$, no relation-phase cost and no rho
+comparison, and all values are \texttt{[pcc:unverified]}. PKM's tower was
+itself already equal to its null (\S\ref{sec:pa-pkm}).
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrrrr@{}}
+\toprule
+$t$ & $\abs\Fb$ & PKM tower & \texttt{quad} & \texttt{quad} null & \texttt{generic} & \texttt{cubic} & \texttt{generic3} & \texttt{quart} \\
+\midrule
+4 & 16 & 280 & 645 & 491 & 565 & -- & -- & -- \\
+5 & 32 & 606 & 1{,}629 & 1{,}601 & 1{,}594 & 1{,}663 & 1{,}749 & 3{,}315 \\
+6 & 64 & 2{,}451 & 3{,}141 & 3{,}233 & 3{,}247 & 3{,}755 & 3{,}728 & 8{,}436 \\
+7 & 128 & 5{,}031 & 6{,}159 & 6{,}355 & 6{,}330 & 17{,}126 & 17{,}313 & 16{,}453 \\
+8 & 256 & 9{,}119 & 11{,}723 & 11{,}570 & 11{,}580 & -- & -- & -- \\
+\midrule
+\multicolumn{9}{@{}l}{$m=3$, $t=4$, $\abs\Fb=16$: width, ratio to tower, ratio to own null, $D$ (input degree)}\\
+\multicolumn{9}{@{}l}{\quad PKM tower $12{,}314$, 1, $0.99$, 6 (4);\quad \texttt{quad} $24{,}482$, $1.99$, $1.00$, 8 (8);\quad \texttt{cubic} $19{,}911$, $1.62$, $1.00$, 12 (12);}\\
+\multicolumn{9}{@{}l}{\quad \texttt{quart} $19{,}079$, $1.55$, $0.96$, 16 (16);\quad \texttt{generic3} $19{,}863$, $1.61$, $1.00$, 13 (13)}\\
+\bottomrule
+\end{tabular}
+\caption[]{Cover-image factor bases: widest F4 matrix $W$ at $m=2$ (Kummer
+tower control), and the $m=3$, $t=4$ cell. \texttt{quad}, \texttt{generic}:
+degree 2, genus 2 and 3 (round~1); \texttt{cubic}, \texttt{generic3},
+\texttt{quart}: degree 3, 3 and 4, genus 4, 5 and 5 (round~2). Rows $t=4$ and
+$t=8$ of round~2 were not run. Sources:
+\art{research/cover_image_fb_20261112/README.md},
+\art{research/cover_image_fb_r2_20261112/README.md},
+\art{research/cover_image_fb_r3_m3_20261112/README.md};
+\texttt{[pcc:unverified]}, stage diagnostic.}
+\label{tab:cover-image-fb}
+\end{table}
+
 \paragraph{Named obstructions.} Blocked requirements are kept open as
 problem records (\art{problems/README.md}), among them the complete-cost
 calibration of root-finding IC
