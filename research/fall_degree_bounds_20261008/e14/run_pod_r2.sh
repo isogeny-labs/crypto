@@ -81,7 +81,7 @@ T32=$(g1 32) || finish "G1_failed"
 # --- G2: hky_par reproduces the E10 (3,21,7) records at degree 4
 log "G2"
 RAYON_NUM_THREADS=32 "$H" newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4 >"$OUT/g2.jsonl" 2>"$OUT/g2.err" || finish "G2_exit"
-k2='{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree}'
+k2='{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}'   # Amendment 27: timings excluded
 diff <(jq -c "$k2" $S/e10/run-r3-B/out/E_3-21-7.jsonl) <(jq -c "$k2" "$OUT/g2.jsonl") >"$OUT/g2.diff" || finish "G2_differs"
 # --- G3: pe scaling pilot (8, 16 threads; 32 from G1; Amendment 25: 32 vCPU is the provider maximum)
 log "G3"

@@ -1265,3 +1265,21 @@ No gate beyond G-src-a was reached; no draw exists.
 sha256 `97b6bbde…`); `G-src-b` still pins its content by that hash, and `G-src-a`/`G-src-c` still
 pin the source tree at `a2be6609`. Env `PATHS_COMMIT` carries the commit; the in-pod script
 (sha256 `a6c9d90cec93b62f…`) defaults to the same value. Pod name prefix `fd-e14-r2f-`. Nothing else changes.
+
+## Amendment 27 (2026-11-12 UTC, before any draw below): G2's comparison key excluded timings as Amendment 20 states; relaunch r2g
+
+**What happened.** r2f (`vx5qv5kjfk21k0`) passed G-src-a/b/c (03:08:04 UTC), G0 and G1 (G1: 597 s at
+32 threads for the 140k-column cell, against 511–586 s at 4 threads in E13, so `pe` gains nothing
+from threads) and ran G2 at 03:26:33 UTC. G2 reported "differs" because the in-pod `jq` key compared
+`per_degree` whole, and each degree entry carries a `secs` wall-time field (E10: 136.7, 140.5,
+134.2, 139.0 s; r2f: 94.2, 90.0, 84.0, 88.0 s). Every non-timing field is identical on all four draws:
+`draw`, `x_r`, `v_basis`, `solutions`, `d_f`, `d_f_at_least`, and `dim`, `of`, `rounds` at
+degrees 2, 3 and 4 (`e14/pod-r2/out-r2f/g2.diff`, `g2.jsonl`). Amendment 20 defines G2 on
+"every non-timing field"; the script's key was wrong, not the engine. The output was pulled, the pod
+deleted at about 03:36 UTC (about USD 1), and the records archived under `e14/pod-r2/out-r2f/`.
+No draw of E14a, E14b or E14c exists.
+
+**Change for r2g.** The G2 key becomes
+`{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}`
+(script sha256 `e6e6d62754a76a66…`). Applied to E10's committed records and to r2f's `g2.jsonl` on the
+authoring host, both sides hash identically. Pod name prefix `fd-e14-r2g-`. Nothing else changes.
