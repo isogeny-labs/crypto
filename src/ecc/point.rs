@@ -1709,10 +1709,7 @@ mod fixed_width_differential {
                     _ => rng.gen_biguint_below(&m),
                 };
                 let (x, y, a) = (draw(&mut rng), draw(&mut rng), draw(&mut rng));
-                let pt = Point::Affine {
-                    x: fe(x),
-                    y: fe(y),
-                };
+                let pt = Point::Affine { x: fe(x), y: fe(y) };
                 let a = fe(a);
                 let mut scalars = vec![
                     BigUint::from(0u8),

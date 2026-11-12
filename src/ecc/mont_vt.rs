@@ -227,7 +227,10 @@ impl<const N: usize> Mont<N> {
         let t = self.add(&j.x, &yy);
         let s = self.sub(&self.sub(&self.mul(&t, &t), &xx), &yyyy);
         let s = self.add(&s, &s);
-        let m = self.add(&self.add(&self.add(&xx, &xx), &xx), &self.mul(a, &self.mul(&zz, &zz)));
+        let m = self.add(
+            &self.add(&self.add(&xx, &xx), &xx),
+            &self.mul(a, &self.mul(&zz, &zz)),
+        );
         let x3 = self.sub(&self.sub(&self.mul(&m, &m), &s), &s);
         let yyyy8 = {
             let d = self.add(&yyyy, &yyyy);
@@ -451,7 +454,14 @@ mod tests {
                 let b = U256::from_biguint(&rng.gen_biguint_below(&m));
                 let e = U256::from_biguint(&rng.gen_biguint(256));
                 assert_eq!(
-                    ct_pow4(&b.0, &e.0, &ctx.n.0, ctx.n_inv_low, &ctx.r2_mod_n.0, &ctx.r_mod_n.0),
+                    ct_pow4(
+                        &b.0,
+                        &e.0,
+                        &ctx.n.0,
+                        ctx.n_inv_low,
+                        &ctx.r2_mod_n.0,
+                        &ctx.r_mod_n.0
+                    ),
                     mont_pow_ct(&b, &e, &ctx).0
                 );
             }
