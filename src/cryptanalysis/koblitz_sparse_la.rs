@@ -2772,7 +2772,8 @@ pub struct BlockWiedemannReport {
 /// right vectors), the residual `[a | I] · [f; g] mod λ^L` (column-major
 /// `m`-vectors per order), and the shifted degree bound `δ`.
 struct BasisColumn<W: ModWord> {
-    f: Vec<Vec<W>>,
+    /// `f_0, f_1, …` back to back (`n` entries per power of `λ`).
+    f: Vec<W>,
     residual: Vec<W>,
     delta: usize,
 }
@@ -2800,7 +2801,7 @@ fn minimal_approximant_basis<W: ModWord>(
             }
         }
         cols.push(BasisColumn {
-            f: vec![e],
+            f: e,
             residual,
             delta: 0,
         });
@@ -2809,7 +2810,7 @@ fn minimal_approximant_basis<W: ModWord>(
         let mut residual = vec![W::zero(); big_l * m];
         residual[i] = W::one();
         cols.push(BasisColumn {
-            f: vec![vec![W::zero(); n]],
+            f: vec![W::zero(); n],
             residual,
             delta: 1,
         });
@@ -2835,17 +2836,15 @@ fn minimal_approximant_basis<W: ModWord>(
                 };
                 let width = pp.f.len();
                 if pj.f.len() < width {
-                    pj.f.resize(width, vec![W::zero(); n]);
+                    pj.f.resize(width, W::zero());
                 }
                 // `c` scales a whole column: one fixed-multiplier set-up,
                 // then a few multiplications per element instead of a
                 // division (and no test for a zero entry, which the
                 // product leaves be).
                 let c = W::fixed(c, md);
-                for (fj, fp) in pj.f.iter_mut().zip(&pp.f) {
-                    for (a, &b) in fj.iter_mut().zip(fp) {
-                        *a = W::fixed_sub_from(&c, *a, b, md);
-                    }
+                for (a, &b) in pj.f.iter_mut().zip(&pp.f) {
+                    *a = W::fixed_sub_from(&c, *a, b, md);
                 }
                 let span = t * m..big_l * m;
                 for (a, &b) in pj.residual[span.clone()].iter_mut().zip(&pp.residual[span]) {
@@ -2860,10 +2859,8 @@ fn minimal_approximant_basis<W: ModWord>(
                 if inv != W::one() {
                     let inv = W::fixed(inv, md);
                     let col = &mut cols[j];
-                    for fk in col.f.iter_mut() {
-                        for a in fk.iter_mut() {
-                            *a = W::fixed_mul(&inv, *a, md);
-                        }
+                    for a in col.f.iter_mut() {
+                        *a = W::fixed_mul(&inv, *a, md);
                     }
                     for a in &mut col.residual[t * m..big_l * m] {
                         *a = W::fixed_mul(&inv, *a, md);
@@ -2874,7 +2871,11 @@ fn minimal_approximant_basis<W: ModWord>(
         }
         for &(p, _) in &pivots {
             let col = &mut cols[p];
-            col.f.insert(0, vec![W::zero(); n]);
+            // `f ← λ·f`: shift every power up one slot.
+            let len = col.f.len();
+            col.f.resize(len + n, W::zero());
+            col.f.copy_within(0..len, n);
+            col.f[..n].fill(W::zero());
             col.residual
                 .copy_within(t * m..(big_l - 1) * m, (t + 1) * m);
             col.residual[t * m..(t + 1) * m]
@@ -3008,15 +3009,19 @@ pub fn block_wiedemann_kernel<W: ModWord>(
     };
     for &j in &order {
         let col = &basis[j];
-        let Some(e) = col.f.iter().rposition(|fk| fk.iter().any(|a| !a.is_zero())) else {
+        let Some(e) = col
+            .f
+            .chunks(n)
+            .rposition(|fk| fk.iter().any(|a| !a.is_zero()))
+        else {
             continue;
         };
         // Horner from the top power: u = Σ_{k≤e} M^{e−k} Z f_k, so f_0
         // multiplies Mᵉ and f_e multiplies the identity.  The recurrence
         // gives M^{δ−e+1} u = 0, so some Mⁱu below that is in the kernel.
         let mut u = vec![W::zero(); big_n];
-        z_times(&col.f[0], &mut u);
-        for fk in &col.f[1..=e] {
+        z_times(&col.f[..n], &mut u);
+        for fk in col.f.chunks(n).skip(1).take(e) {
             op.apply(&u, 1, &mut buf);
             report.products += 1;
             z_times(fk, &mut u);
@@ -4443,15 +4448,15 @@ mod tests {
         // f(λ) = f_0 + f_1 λ + … with Σ_k s_{t−k} f_k = 0 for t ≥ 5.
         for t in 5..40 {
             let mut acc = 0;
-            for (k, fk) in best.f.iter().enumerate() {
+            for (k, fk) in best.f.chunks(1).enumerate() {
                 acc = addmod(acc, mulmod(s[t - k], fk[0], modulus), modulus);
             }
             assert_eq!(acc, 0, "recurrence at t = {t}");
         }
         // And it is the true connection polynomial up to scaling.
-        let scale = invmod(best.f[0][0], modulus).unwrap();
+        let scale = invmod(best.f[0], modulus).unwrap();
         for (k, &c) in coeffs.iter().enumerate() {
-            assert_eq!(mulmod(best.f[k + 1][0], scale, modulus), negmod(c, modulus));
+            assert_eq!(mulmod(best.f[k + 1], scale, modulus), negmod(c, modulus));
         }
     }
 
@@ -4504,7 +4509,7 @@ mod tests {
             for col in &basis {
                 for t in col.delta..big_l {
                     let mut acc = vec![0u64; m];
-                    for (k, fk) in col.f.iter().enumerate() {
+                    for (k, fk) in col.f.chunks(n).enumerate() {
                         if k > t {
                             break;
                         }
