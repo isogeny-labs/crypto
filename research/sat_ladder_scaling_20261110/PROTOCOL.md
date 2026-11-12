@@ -62,3 +62,64 @@ the reduction is `prod + q·c = q·2^n + rem`, `c = 2^n − p`, `rem < p` as no 
 7 tests pass and the `n = 6` planted test is `#[ignore]`d (≈ 3·10⁵ conflicts). Expectation stated
 before the run: `α_FRESH` well above 1 and P1 failing upward; the amended grid is for measuring
 the exponent, not for reaching rho.
+
+## 7. Replication prescribed by rule 2 (preregistered 2026-11-11, after F4-RUN-02, before F4-REP-01)
+
+**Trigger.** F4-RUN-02 (CaDiCaL 3.0.1, `n ∈ {4..9}`, 10 targets) gave REUSE/FRESH median ratios
+0.005, 0.003, 0.005, 0.003 at `n = 4..7`: rule 2's clause-reuse clause fires, so "replicate with a
+second solver and 40 targets". The per-order decomposition of run-02 (first REUSE solve ≈ FRESH
+cost; later solves near zero at `n ≤ 7`, decaying at `n = 8`, gone at `n = 9`) was read **after**
+the data and is disclosed here as the motivation for the extra observables below; it does not
+change rules 1–3.
+
+**Second solver (fixed).** BatSat `=0.6.0`, a pure-Rust port of the MiniSat 2.2 core: a different
+CDCL lineage from CaDiCaL, incremental under assumptions (`solve_limited`), per-solve
+`conflicts`/`decisions`/`propagations` as deltas. Budget: BatSat has no settable conflict budget,
+so the tool stops the solve through the `Callbacks::stop()` hook once a learnt-clause counter,
+reset per solve, reaches the budget; the solve then returns UNDEF and is recorded as **censored**
+(never imputed). The solver's own conflict counter is reported and may exceed the budget by the
+conflicts of the chain that ends before the next poll. `propagations` is not the same counter as
+CaDiCaL's `propagations.search` and is **not compared across solvers**; conflicts are compared
+in meaning only (one BCP conflict each). `--solver cadical` leaves the run-02 path byte-identical
+on the rows (checked on `n ∈ {4,5}`, 4 targets, against the frozen run-02 source).
+
+**Design (fixed).**
+- Arm pair as in §2 (FRESH: new solver per target; REUSE: one incremental solver per curve,
+  `x_Q` bits as assumptions, targets in the seeded order), **40 targets per `n`**, seeds
+  `F4/rep/target/<n>/<i>`; curve and order seeds unchanged (`F4/curve/<n>`, `F4/order/<n>`), so
+  the curves are those of run-02.
+- Grid `n ∈ {4, 5, 6, 7, 8}` for BatSat; `n = 9` is excluded because run-02's FRESH arm was 80 %
+  censored there (no ratio is defined and it would dominate the cost). Budget `4·10⁶`, `--threads 2`.
+- Control: CaDiCaL at the **same 40 seeds** on `n ∈ {4, 5, 6, 7}` (same-target solver comparison).
+- New observables (both solvers): per `n`, the REUSE arm's **first-solve** conflicts
+  (`solve_order = 0`) and **warm median** (`solve_order ≥ 1`); `α_REUSE_warm` fitted like
+  `α_FRESH` on the warm medians over the `n` where every warm solve finished (`log₂ max(median, 1)`,
+  the floor only matters for zero medians and is stated when used).
+
+**Predictions (fixed before the run).**
+- R1. With BatSat the REUSE/FRESH median ratio is `< 0.2` at two consecutive `n ∈ {4..7}` (the
+  effect is solver-generic). Prior 0.8.
+- R2. The first REUSE solve costs within a factor 3 of the FRESH median at every uncensored `n`
+  (the saving is after a set-up at full cost). Prior 0.8.
+- R3. `α_REUSE_warm` upper 95 % CI `≥ 0.6` in BatSat and in the CaDiCaL control (warm per-target
+  cost is not sub-generic). Prior 0.9.
+- P3 (all found models decode to `k' ∈ {k, r−k}`) holds for both solvers.
+
+**Decision rules for the replication (fixed).**
+- **Instrument failure:** P3 fails for either solver, or fewer than three `n` have every warm
+  REUSE solve uncensored in the BatSat run.
+- **Lead alive after replication:** R1 holds **and** `α_REUSE_warm` upper 95 % CI `< 0.6` on at
+  least three uncensored `n` in the BatSat run **and** in the CaDiCaL control. Then a third
+  replication on larger curves is designed before anything is claimed.
+- **Closed:** otherwise. Reading to be stated with `α_REUSE_warm` and R2: clause reuse amortises a
+  one-off set-up whose cost is the FRESH solve; the per-target warm cost scales exhaustive-like
+  or worse in `n`, so incremental CDCL on the ladder circuit does not amortise below the generic
+  bound at these sizes. If R1 fails with BatSat, the run-02 ratios are additionally recorded as a
+  CaDiCaL-specific effect (inprocessing/phase behaviour), not a property of the circuit.
+
+**Freeze and card.** The run-02 freeze is kept as `FREEZE-run02.sha256`; `FREEZE.sha256` now binds
+this protocol (with §7), `tool/src/main.rs`, `tool/Cargo.toml` and `tool/Cargo.lock` of the
+two-solver tool. Card `F4-REP-01` runs the BatSat grid, then the CaDiCaL control, writing
+`results/rep-batsat.json` and `results/rep-cadical.json`, after `FREEZE.sha256`. Local host,
+shared with the F2/F3 cards; wall time descriptive only. Expected cost: hours (BatSat ≈ 2·10⁴
+conflicts/s in development runs, so a censored solve is ≈ 200 s; `n = 8` dominates).
