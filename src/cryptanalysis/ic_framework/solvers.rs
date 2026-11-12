@@ -77,7 +77,9 @@ use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
 };
-use crate::cryptanalysis::m4gb_oracle::{run_m4gb, select_binary, M4gbError, M4gbOptions};
+use crate::cryptanalysis::m4gb_oracle::{
+    run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
+};
 use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
 use crate::cryptanalysis::pq_groebner_f2::{
     groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
@@ -348,58 +350,97 @@ impl SystemSolver for M4gbF2 {
         _params: &Params,
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
-        let started = Instant::now();
-        let mut cost = SolverCost {
-            ops: 0,
-            op_unit: "none (external process; wall time only)".into(),
-            ..SolverCost::default()
-        };
-        let Some(options) = M4gbOptions::from_env() else {
-            eprintln!("m4gb-f2: M4GB_BINARY is not set");
+        solve_m4gb(system, budget, run_m4gb)
+    }
+}
+
+/// [`M4gbF2`] against one long-lived `--serve` process per binary.
+pub struct M4gbF2Server;
+
+impl SystemSolver for M4gbF2Server {
+    fn name(&self) -> &str {
+        "m4gb-f2-server"
+    }
+
+    fn describe(&self) -> String {
+        "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis, one long-lived `--serve` process per binary (process start, field tables and thread pool paid once)"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        M4gbF2.parameters()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        M4gbF2.accepts(shape)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_m4gb(system, budget, run_m4gb_persistent)
+    }
+}
+
+/// Shared body of the M4GB solvers: `run` is the one-shot or the persistent client.
+fn solve_m4gb(
+    system: &BooleanSystem,
+    budget: Option<Duration>,
+    run: fn(&BooleanSystem, &M4gbOptions, Option<Duration>) -> Result<M4gbRun, M4gbError>,
+) -> (SolverVerdict, SolverCost) {
+    let started = Instant::now();
+    let mut cost = SolverCost {
+        ops: 0,
+        op_unit: "none (external process; wall time only)".into(),
+        ..SolverCost::default()
+    };
+    let Some(options) = M4gbOptions::from_env() else {
+        eprintln!("m4gb: M4GB_BINARY is not set");
+        cost.extra.insert("m4gb_error".into(), 1);
+        cost.wall_ns = started.elapsed().as_nanos() as u64;
+        return (SolverVerdict::BudgetExceeded, cost);
+    };
+    let run = match run(system, &options, budget) {
+        Ok(run) => run,
+        Err(M4gbError::Timeout(_)) => {
+            cost.timed_out = true;
+            cost.wall_ns = started.elapsed().as_nanos() as u64;
+            return (SolverVerdict::BudgetExceeded, cost);
+        }
+        Err(e) => {
+            static REPORTED: std::sync::Once = std::sync::Once::new();
+            REPORTED.call_once(|| eprintln!("m4gb: {e}"));
             cost.extra.insert("m4gb_error".into(), 1);
             cost.wall_ns = started.elapsed().as_nanos() as u64;
             return (SolverVerdict::BudgetExceeded, cost);
-        };
-        let run = match run_m4gb(system, &options, budget) {
-            Ok(run) => run,
-            Err(M4gbError::Timeout(_)) => {
-                cost.timed_out = true;
-                cost.wall_ns = started.elapsed().as_nanos() as u64;
-                return (SolverVerdict::BudgetExceeded, cost);
+        }
+    };
+    let mut tests = 0u64;
+    let verdict = match solutions_from_reduced_basis(&run.basis, system.n_vars, 24, &mut tests) {
+        None => SolverVerdict::BudgetExceeded,
+        Some(points) => {
+            let points = verified(points, system, &mut tests);
+            if points.is_empty() {
+                SolverVerdict::Unsatisfiable
+            } else {
+                SolverVerdict::Solved(points)
             }
-            Err(e) => {
-                static REPORTED: std::sync::Once = std::sync::Once::new();
-                REPORTED.call_once(|| eprintln!("m4gb-f2: {e}"));
-                cost.extra.insert("m4gb_error".into(), 1);
-                cost.wall_ns = started.elapsed().as_nanos() as u64;
-                return (SolverVerdict::BudgetExceeded, cost);
-            }
-        };
-        let mut tests = 0u64;
-        let verdict = match solutions_from_reduced_basis(&run.basis, system.n_vars, 24, &mut tests)
-        {
-            None => SolverVerdict::BudgetExceeded,
-            Some(points) => {
-                let points = verified(points, system, &mut tests);
-                if points.is_empty() {
-                    SolverVerdict::Unsatisfiable
-                } else {
-                    SolverVerdict::Solved(points)
-                }
-            }
-        };
-        cost.peak_bytes = run.peak_mib.unwrap_or(0).saturating_mul(1 << 20);
-        cost.degree_reached = run.max_lcm_degree;
-        cost.extra.insert(
-            "m4gb_cpu_ms".into(),
-            run.cpu_seconds.map_or(0, |s| (s * 1000.0).round() as u64),
-        );
-        cost.extra
-            .insert("m4gb_basis_len".into(), run.basis.len() as u64);
-        cost.extra.insert("extraction_tests".into(), tests);
-        cost.wall_ns = started.elapsed().as_nanos() as u64;
-        (verdict, cost)
-    }
+        }
+    };
+    cost.peak_bytes = run.peak_mib.unwrap_or(0).saturating_mul(1 << 20);
+    cost.degree_reached = run.max_lcm_degree;
+    cost.extra.insert(
+        "m4gb_cpu_ms".into(),
+        run.cpu_seconds.map_or(0, |s| (s * 1000.0).round() as u64),
+    );
+    cost.extra
+        .insert("m4gb_basis_len".into(), run.basis.len() as u64);
+    cost.extra.insert("extraction_tests".into(), tests);
+    cost.wall_ns = started.elapsed().as_nanos() as u64;
+    (verdict, cost)
 }
 
 // ── The Koblitz oracle's hybrid engines ────────────────────────────
@@ -1283,6 +1324,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(F4F2),
         Box::new(BuchbergerF2),
         Box::new(M4gbF2),
+        Box::new(M4gbF2Server),
         Box::new(HybridF4 {
             kind: HybridKind::MatrixF4,
         }),
