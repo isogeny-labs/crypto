@@ -5,7 +5,7 @@
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 129,
+    "measured": 130,
     "open": 0
   },
   "repo": "crypto",
@@ -16978,6 +16978,111 @@
         }
       ],
       "problem": "study:pkm_falldegree_unblock_20261107:pfd-x-t12",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "fold_minus_legacy_s_max_abs",
+      "points": [
+        {
+          "commit": "a62f4c7cc669",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 6,
+          "record": "20261112T1612Z-size-rule-fold-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 (next kernels folded in), inherited-f4-legacy and fes-then-inherited, 3 repeats: all 24 configurations verified; size rule best algebraic row everywhere (degree 13: S 101.9 vs inherited-f4 138.0, 0.74x, 35.3x rho vs 47.8x; equal to inherited-f4 elsewhere); folded and legacy inherited-f4 S identical. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:size_rule_fold_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 101.91,
+      "latest": 101.91,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 35.262976
+      },
+      "metric": "s_size_rule_koblitz13",
+      "points": [
+        {
+          "commit": "a62f4c7cc669",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 35.262976
+          },
+          "n": 3,
+          "record": "20261112T1612Z-size-rule-fold-e2e",
+          "reference": 2.89,
+          "reference_kind": "matched_rho",
+          "spread": [
+            83.71,
+            116.31
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 (next kernels folded in), inherited-f4-legacy and fes-then-inherited, 3 repeats: all 24 configurations verified; size rule best algebraic row everywhere (degree 13: S 101.9 vs inherited-f4 138.0, 0.74x, 35.3x rho vs 47.8x; equal to inherited-f4 elsewhere); folded and legacy inherited-f4 S identical. Local container; unverified.",
+          "value": 101.91
+        }
+      ],
+      "problem": "study:size_rule_fold_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "size_rule_minus_inherited_s_other_instances",
+      "points": [
+        {
+          "commit": "a62f4c7cc669",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 5,
+          "record": "20261112T1612Z-size-rule-fold-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 (next kernels folded in), inherited-f4-legacy and fes-then-inherited, 3 repeats: all 24 configurations verified; size rule best algebraic row everywhere (degree 13: S 101.9 vs inherited-f4 138.0, 0.74x, 35.3x rho vs 47.8x; equal to inherited-f4 elsewhere); folded and legacy inherited-f4 S identical. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:size_rule_fold_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 24.0,
+      "latest": 24.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verified_configurations",
+      "points": [
+        {
+          "commit": "a62f4c7cc669",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261112T1612Z-size-rule-fold-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4 (next kernels folded in), inherited-f4-legacy and fes-then-inherited, 3 repeats: all 24 configurations verified; size rule best algebraic row everywhere (degree 13: S 101.9 vs inherited-f4 138.0, 0.74x, 35.3x rho vs 47.8x; equal to inherited-f4 elsewhere); folded and legacy inherited-f4 S identical. Local container; unverified.",
+          "value": 24.0
+        }
+      ],
+      "problem": "study:size_rule_fold_20261112:e2e-ladder",
       "unit": "count"
     },
     {

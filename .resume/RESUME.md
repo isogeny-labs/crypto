@@ -23,9 +23,7 @@ Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15
 (merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
-Paired per-call A/B inherited-f4 vs inherited-f4-next vs fes-f2 (research/inherited_f4_next_20261112/run_ab.sh, record benchmarks/records/20261112T0630Z-inherited-f4-next-ab.json); then an end-to-end ic bench ladder adding fes-f2 and inherited-f4-next to the oracle.
-
-Local corpus A/B (this record). Subagent B (inherited-f4) in the background.
+End-to-end ladder of inherited-f4 (folded), inherited-f4-legacy, fes-then-inherited (research/size_rule_fold_20261112/run_e2e.sh, record benchmarks/records/20261112T1612Z-size-rule-fold-e2e.json, IC_BIN scratchpad ic-sizerule). Subagents: kept-row rewrite batching (inherited_f4.rs, koblitz_groebner.rs, default-off switch); validated isolab degree-13 preparation (research/fes_k13_validated_20261112/, no submission).
 
 ## Stop and success conditions
 Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
