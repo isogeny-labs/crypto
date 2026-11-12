@@ -67,7 +67,8 @@ for seed in a.seeds:
     else:
         req = urllib.request.Request("https://rest.runpod.io/v1/pods", data=json.dumps(body).encode(), method="POST",
                                      headers={"Authorization": f"Bearer {os.environ['RUNPOD_API_KEY']}",
-                                              "Content-Type": "application/json"})
+                                              "Content-Type": "application/json",
+                                              "User-Agent": "wsla-launcher/1.0"})
         try:
             r = json.load(urllib.request.urlopen(req, timeout=120))
         except urllib.error.HTTPError as e:
