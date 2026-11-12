@@ -220,6 +220,7 @@ pub mod hashed_ecdl;
 /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
 pub use ecdl_tensor_ic as tensor_ic;
 pub mod dreg_forecast;
+pub mod dreg_prior_table;
 pub mod hec_dlp;
 pub mod hilbert_class_poly;
 pub mod hky_fp_tower;
