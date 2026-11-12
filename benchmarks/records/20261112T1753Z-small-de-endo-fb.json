@@ -1,0 +1,1655 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T18:18:07+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/small_de_ic",
+        "--sizes",
+        "12,16,20,24,28",
+        "--reps",
+        "12:20,16:20,20:10,24:6,28:3",
+        "--targets",
+        "16",
+        "--out-dir",
+        "research/small_de_endo_fb_20261112"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T18:00:48+00:00",
+      "wall_s": 104.335
+    }
+  ],
+  "commit": "b7e8c685661e65c7361cb976c9af3fccacce98b2",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T17:53:24+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T1753Z-small-de-endo-fb",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm11_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 12347.18125,
+      "reference_kind": "matched_rho",
+      "spread": [
+        27666923.090904653,
+        28088877.90492869
+      ],
+      "unit": "gae",
+      "value": 27877900.497916672
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm11_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 12347.18125,
+      "reference_kind": "matched_rho",
+      "spread": [
+        27653271.725124322,
+        28075216.00820902
+      ],
+      "unit": "gae",
+      "value": 27864243.86666667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm11_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3234.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm11_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm11_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 12347.18125,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112232181.25960515,
+        113712407.36122821
+      ],
+      "unit": "gae",
+      "value": 112972294.31041668
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm11_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 12347.18125,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112217150.75809903,
+        113697373.17523433
+      ],
+      "unit": "gae",
+      "value": 112957261.96666668
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm11_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12935.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm11_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm8_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6037.45625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28890728.07349638,
+        29507908.67233696
+      ],
+      "unit": "gae",
+      "value": 29199318.37291667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm8_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6037.45625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28875103.612544212,
+        29492272.320789125
+      ],
+      "unit": "gae",
+      "value": 29183687.96666667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm8_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3234.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm8_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm8_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6037.45625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112312345.16339071,
+        113235979.77827595
+      ],
+      "unit": "gae",
+      "value": 112774162.47083333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm8_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6037.45625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112295905.25771016,
+        113219533.60895652
+      ],
+      "unit": "gae",
+      "value": 112757719.43333334
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm8_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12936.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm8_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm7_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 7037.712500000001,
+      "reference_kind": "matched_rho",
+      "spread": [
+        27307628.148910403,
+        28478594.1760896
+      ],
+      "unit": "gae",
+      "value": 27893111.1625
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm7_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 7037.712500000001,
+      "reference_kind": "matched_rho",
+      "spread": [
+        27288379.370302815,
+        28459335.229697186
+      ],
+      "unit": "gae",
+      "value": 27873857.3
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm7_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3234.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm7_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm7_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 7037.712500000001,
+      "reference_kind": "matched_rho",
+      "spread": [
+        113117002.94641344,
+        113907034.22858657
+      ],
+      "unit": "gae",
+      "value": 113512018.5875
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm7_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 7037.712500000001,
+      "reference_kind": "matched_rho",
+      "spread": [
+        113103344.26462078,
+        113893373.33537924
+      ],
+      "unit": "gae",
+      "value": 113498358.80000001
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm7_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12936.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm7_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm4_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6890.15625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        55787734.252784014,
+        56981772.534715995
+      ],
+      "unit": "gae",
+      "value": 56384753.393750004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm4_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6890.15625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        55774707.15414926,
+        56968744.645850755
+      ],
+      "unit": "gae",
+      "value": 56371725.900000006
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm4_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6468.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm4_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm4_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6890.15625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112588454.05873282,
+        114013331.53710054
+      ],
+      "unit": "gae",
+      "value": 113300892.79791668
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm4_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6890.15625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112575459.4571502,
+        114000336.27618314
+      ],
+      "unit": "gae",
+      "value": 113287897.86666667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm4_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12936.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm4_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm3_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 4486.16875,
+      "reference_kind": "matched_rho",
+      "spread": [
+        37743455.5979081,
+        37880724.77709191
+      ],
+      "unit": "gae",
+      "value": 37812090.18750001
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm3_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 4486.16875,
+      "reference_kind": "matched_rho",
+      "spread": [
+        37729809.10746069,
+        37867065.49253932
+      ],
+      "unit": "gae",
+      "value": 37798437.300000004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm3_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 4311.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm3_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_dm3_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 4486.16875,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112404827.6339665,
+        112734476.71603355
+      ],
+      "unit": "gae",
+      "value": 112569652.17500003
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_dm3_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 4486.16875,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112390470.57550505,
+        112720112.224495
+      ],
+      "unit": "gae",
+      "value": 112555291.40000002
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_dm3_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12933.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_dm3_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_d0_a3",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 14322.35,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28378683.330432277,
+        28725190.361234393
+      ],
+      "unit": "gae",
+      "value": 28551936.845833335
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_d0_a3",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 14322.35,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28365695.05507431,
+        28712197.01159236
+      ],
+      "unit": "gae",
+      "value": 28538946.033333335
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_d0_a3",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3234.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_d0_a3",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m2_d0_a0",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 14322.35,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112342613.69010037,
+        113150088.47239968
+      ],
+      "unit": "gae",
+      "value": 112746351.08125003
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m2_d0_a0",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 14322.35,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112328936.76641254,
+        113136406.0335875
+      ],
+      "unit": "gae",
+      "value": 112732671.40000002
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m2_d0_a0",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12934.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m2_d0_a0",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm11_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 14194.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28481426.269757133,
+        42679644.19690953
+      ],
+      "unit": "gae",
+      "value": 35580535.233333334
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm11_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 14194.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28133646.594027013,
+        42331649.27263966
+      ],
+      "unit": "gae",
+      "value": 35232647.93333334
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm11_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 138.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm11_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm11_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 14194.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        115304438.57460988,
+        154138101.7253902
+      ],
+      "unit": "gae",
+      "value": 134721270.15000004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm11_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 14194.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        114888212.61419196,
+        153721718.38580808
+      ],
+      "unit": "gae",
+      "value": 134304965.50000003
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm11_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 552.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm11_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm8_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6235.70625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        46589469.18813408,
+        47712993.43686593
+      ],
+      "unit": "gae",
+      "value": 47151231.31250001
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm8_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6235.70625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        46176468.465671085,
+        47295465.134328924
+      ],
+      "unit": "gae",
+      "value": 46735966.800000004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm8_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 138.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm8_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm8_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6235.70625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        117023472.37787858,
+        121624233.51378813
+      ],
+      "unit": "gae",
+      "value": 119323852.94583336
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm8_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6235.70625,
+      "reference_kind": "matched_rho",
+      "spread": [
+        116569812.46325704,
+        121169094.00340965
+      ],
+      "unit": "gae",
+      "value": 118869453.23333335
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm8_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 552.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm8_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm7_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 7791.25,
+      "reference_kind": "matched_rho",
+      "spread": [
+        29630447.392766915,
+        39085271.08223309
+      ],
+      "unit": "gae",
+      "value": 34357859.237500004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm7_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 7791.25,
+      "reference_kind": "matched_rho",
+      "spread": [
+        29312634.4040363,
+        38767179.19596371
+      ],
+      "unit": "gae",
+      "value": 34039906.800000004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm7_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 138.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm7_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm7_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 7791.25,
+      "reference_kind": "matched_rho",
+      "spread": [
+        118500696.98742932,
+        119490831.95423734
+      ],
+      "unit": "gae",
+      "value": 118995764.47083333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm7_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 7791.25,
+      "reference_kind": "matched_rho",
+      "spread": [
+        118098740.42451017,
+        119071699.24215649
+      ],
+      "unit": "gae",
+      "value": 118585219.83333333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm7_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 552.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm7_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm4_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6533.375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        51903633.821416765,
+        56864718.836916566
+      ],
+      "unit": "gae",
+      "value": 54384176.329166666
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm4_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6533.375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        51523415.37086242,
+        56483699.56247092
+      ],
+      "unit": "gae",
+      "value": 54003557.46666667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm4_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 276.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm4_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm4_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 6533.375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        111776621.25702003,
+        117272322.66797996
+      ],
+      "unit": "gae",
+      "value": 114524471.96249999
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm4_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 6533.375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        111422608.04499094,
+        116916624.75500904
+      ],
+      "unit": "gae",
+      "value": 114169616.39999999
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm4_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 552.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm4_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm3_a2",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 4508.39375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        37939692.7159415,
+        38165365.22572516
+      ],
+      "unit": "gae",
+      "value": 38052528.97083333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm3_a2",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 4508.39375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        37532047.99565064,
+        37716060.07101602
+      ],
+      "unit": "gae",
+      "value": 37624054.03333333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm3_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 184.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm3_a2",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_dm3_a1",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 4508.39375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        109682787.2858529,
+        114589040.28914712
+      ],
+      "unit": "gae",
+      "value": 112135913.78750001
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_dm3_a1",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 4508.39375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        109314216.45523626,
+        114220061.74476376
+      ],
+      "unit": "gae",
+      "value": 111767139.10000001
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_dm3_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 552.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_dm3_a1",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_d0_a3",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 13367.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        28041524.41854849,
+        41219770.18145152
+      ],
+      "unit": "gae",
+      "value": 34630647.300000004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_d0_a3",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 13367.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        27743611.15914433,
+        40921680.44085568
+      ],
+      "unit": "gae",
+      "value": 34332645.800000004
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_d0_a3",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 138.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_d0_a3",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 16,
+      "name": "ic_single_instance_w0p1_b28_m3_d0_a0",
+      "note": "relation phase + mean target stage; w=0.1 GAE per native op; reference = best matched rho per target (same w); spread = +-1 SE of the repetitions",
+      "reference": 13367.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112522292.39815362,
+        119860453.16851307
+      ],
+      "unit": "gae",
+      "value": 116191372.78333335
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "ic_relation_phase_w0p1_b28_m3_d0_a0",
+      "note": "relation phase incl. base build, mean of repetitions; reference = best matched rho per target at the same w",
+      "reference": 13367.9375,
+      "reference_kind": "matched_rho",
+      "spread": [
+        112154459.76906852,
+        119492075.29759817
+      ],
+      "unit": "gae",
+      "value": 115823267.53333335
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "columns_b28_m3_d0_a0",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 552.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 16,
+      "name": "targets_certified_b28_m3_d0_a0",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm11_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8690957644794349
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm11_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8620108969242836
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm8_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7564780690685815
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm8_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8673257263632276
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm7_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7738809734511856
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm7_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8657852119177164
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm4_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8706887125628998
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm4_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8637440974829166
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm3_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8626746270681439
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_dm3_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8651696546058137
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_d0_a3",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8675877999984714
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m2_d0_a0",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.8662368424740995
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm11_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7077075624561658
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm11_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7197128158694169
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm8_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.6893069421716692
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm8_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7241608251809302
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm7_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.6805605606056511
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm7_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7137904898098743
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm4_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7548218506979781
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm4_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7376846225949222
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm3_a2",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7505724917704307
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_dm3_a1",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.759405558703968
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_d0_a3",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7060756793121404
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "decomposition_probability_b28_m3_d0_a0",
+      "note": "share of trials with at least one decomposition",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.7443042741701399
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 1584609,
+      "path": "research/small_de_endo_fb_20261112/small_de.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8bcdde7cb6974b8aaa6756b759eb3dbf28d4d89fa827193a0bfe3b728a6e0ae7",
+      "sha256": "8bcdde7cb6974b8aaa6756b759eb3dbf28d4d89fa827193a0bfe3b728a6e0ae7",
+      "uploaded": false
+    },
+    {
+      "bytes": 8573,
+      "path": "research/small_de_endo_fb_20261112/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/53/537b83f40397b7e60a1d472d1f592b9d2fe572377ed156d48627d2fad5026f4a",
+      "sha256": "537b83f40397b7e60a1d472d1f592b9d2fe572377ed156d48627d2fad5026f4a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_small_de_20261112.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/small_de.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "small-de-endo-fb",
+  "status": "measured",
+  "summary": "Small D_E with endomorphism-adapted base: solving work per trial unchanged (ratio 1.000), decomposition probability unchanged or lower; the cost drop is column folding, matched by a generic scalar-folded control; no arm below matched rho (min 7.62x at w=0.1) [pcc:unverified]",
+  "validation": null
+}

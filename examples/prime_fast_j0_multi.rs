@@ -138,6 +138,8 @@ struct Ctx<'a> {
     ents: Vec<(u64, u32, u32, u8, u8, u8)>,
     heads: Vec<u32>,
     next: Vec<u32>,
+    slots: Vec<(u32, u32)>,
+    lp: bool,
     hmask: usize,
     beta: u64,
     beta2: u64,
@@ -197,6 +199,8 @@ impl<'a> Ctx<'a> {
             ents: vec![],
             heads: vec![],
             next: vec![],
+            slots: vec![],
+            lp: std::env::var_os("LINPROBE").is_some(),
             hmask: 0,
             beta,
             beta2,
@@ -253,12 +257,23 @@ impl<'a> Ctx<'a> {
         }
         let hs = (ents.len() * 2).next_power_of_two().max(16);
         me.hmask = hs - 1;
-        me.heads = vec![u32::MAX; hs];
-        me.next = vec![u32::MAX; ents.len()];
-        for (e, ent) in ents.iter().enumerate() {
-            let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
-            me.next[e] = me.heads[h];
-            me.heads[h] = e as u32;
+        if me.lp {
+            me.slots = vec![(u32::MAX, 0); hs];
+            for (e, ent) in ents.iter().enumerate() {
+                let mut h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
+                while me.slots[h].0 != u32::MAX {
+                    h = (h + 1) & me.hmask;
+                }
+                me.slots[h] = (e as u32, (ent.0 >> 17) as u32);
+            }
+        } else {
+            me.heads = vec![u32::MAX; hs];
+            me.next = vec![u32::MAX; ents.len()];
+            for (e, ent) in ents.iter().enumerate() {
+                let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
+                me.next[e] = me.heads[h];
+                me.heads[h] = e as u32;
+            }
         }
         me.ents = ents;
         me
@@ -286,13 +301,34 @@ impl<'a> Ctx<'a> {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
                 let (key, sft0) = if self.rot { (x3, 0) } else { self.canon(x3) };
                 let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.hmask;
-                let mut e = self.heads[h];
-                while e != u32::MAX {
-                    let ent = self.ents[e as usize];
-                    e = self.next[e as usize];
-                    if ent.0 != key {
-                        continue;
+                let mut hits = [0u32; 16];
+                let mut nh = 0usize;
+                if self.lp {
+                    let fp = (key >> 17) as u32;
+                    let mut i = h;
+                    loop {
+                        let (idx, sfp) = self.slots[i];
+                        if idx == u32::MAX {
+                            break;
+                        }
+                        if sfp == fp && self.ents[idx as usize].0 == key && nh < 16 {
+                            hits[nh] = idx;
+                            nh += 1;
+                        }
+                        i = (i + 1) & self.hmask;
                     }
+                } else {
+                    let mut e = self.heads[h];
+                    while e != u32::MAX {
+                        if self.ents[e as usize].0 == key && nh < 16 {
+                            hits[nh] = e;
+                            nh += 1;
+                        }
+                        e = self.next[e as usize];
+                    }
+                }
+                for &e in &hits[..nh] {
+                    let ent = self.ents[e as usize];
                     let (ei, ej, em, sg) = (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
                     let sft = if self.rot {
                         ent.5 as usize

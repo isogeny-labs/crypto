@@ -65,6 +65,19 @@ beyond, noisy under tie-breaking); MMD+ lower bounds are valid but weak; the mod
 contraction, so it does not credit algebraic structure inside a tensor.
 
 
+## Follow-up (2026-11-12, PR #3952)
+
+- **Field-level elimination** ([`FIELD_LEVEL.md`](FIELD_LEVEL.md), rows `rows/field-level-8-30.json`,
+  binary `src/bin/semaev_descent_treewidth.rs`): the Weil-descended binary S3 system (the object
+  the lab's F4 and refutation harnesses solve) has primal treewidth equal to its variable count,
+  `2n' − 1` exactly, at every `n = 8–30`, so a tree-decomposition contraction of it is enumeration
+  of both slots; the refutation harness refutes the same instances at Macaulay degree 2–4 with
+  37–1,471 columns. The exploitable structure is algebraic degree, not graph width.
+- **Lead atlas** ([`ATLAS_DELTA.md`](ATLAS_DELTA.md)): the edits this study implies, recorded here
+  because the atlas repository is vault-encrypted and this session had no key.
+- **Tighter upper bounds**: building an external PACE heuristic was refused by the sandbox twice;
+  the `.gr` export and `.td` verifier are ready for it.
+
 ## Question
 
 The audit closed the hashed-relation lead on admission and constants: the generic contraction theorem

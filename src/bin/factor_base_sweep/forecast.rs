@@ -7,6 +7,7 @@
 use super::model::{read, Request, Result};
 use crypto_lib::cryptanalysis::{
     dreg_forecast::{Advice, Forecast, Forecaster, Outcome, SolveObservation, SystemShape},
+    dreg_prior_table,
     ecbench::{methods::FactorBaseDump, workload::CurveSpec},
     f4_fp::Poly,
     ic_boundary::{generic_floor_ops, IncrementalGauss},
@@ -83,7 +84,27 @@ pub fn forecaster(request: &Request, dump: &FactorBaseDump, r: u64, cofactor: u6
         automorphisms(&request.candidate.curve),
     ));
     f.set_inventory(dump.points.len(), r, cofactor);
+    // Calibrated prior point for the cells the table covers (Boolean, m = 2,
+    // binary subspace shapes); everywhere else the semi-regular prior stays.
+    if let (Some(shape), Some(n)) = (
+        request.candidate.shape.as_deref(),
+        binary_degree(&request.candidate.curve),
+    ) {
+        if let Some(d) =
+            dreg_prior_table::calibrated_prior_degree(n, request.candidate.dimension, shape)
+        {
+            f.set_prior_degree(d, dreg_prior_table::SOURCE);
+        }
+    }
     f
+}
+
+/// The extension degree of a binary curve, or `None` for a prime-field curve.
+fn binary_degree(curve: &CurveSpec) -> Option<u32> {
+    match curve {
+        CurveSpec::Koblitz { n, .. } | CurveSpec::BinaryRandom { n, .. } => Some(*n),
+        _ => None,
+    }
 }
 
 /// One trial record as a forecaster observation.  The positive control is

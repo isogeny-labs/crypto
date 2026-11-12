@@ -1173,7 +1173,23 @@ fn run_single(
             ("cold_ratio_ic_over_rho", "store_ratio_ic_over_rho"),
         ],
     );
-    Ok(report)
+    Ok(with_scan_probes(report))
+}
+
+/// The report with R04's in-scan stage totals added, in a build that has
+/// them (`--features scan-probes`); the report as it is otherwise.
+fn with_scan_probes(report: Value) -> Value {
+    #[cfg(feature = "scan-probes")]
+    {
+        let mut report = report;
+        report["scan_probes"] =
+            crypto_lib::cryptanalysis::koblitz_index_calculus::scan_probes::snapshot();
+        report
+    }
+    #[cfg(not(feature = "scan-probes"))]
+    {
+        report
+    }
 }
 
 /// Where the log table of a report's passes came from, made explicit.

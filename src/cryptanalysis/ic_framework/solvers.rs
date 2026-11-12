@@ -17,6 +17,11 @@
 //! | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree, then splitting | word XORs (elimination only) |
 //! | `matrix-f5` | the same hybrid, rows the Boolean F5 criterion predicts to vanish left out | word XORs (elimination only) |
 //! | `inherited-f4` | the same hybrid, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-next` | alias of `inherited-f4` (the next kernels are its default since 2026-11-12) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-legacy` | `inherited-f4` with its kernels before 2026-11-12: identical rows, decisions and count (the A/B arm of the fold) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-batched` | `inherited-f4` with kept rows rewritten only when read or when the node splits: identical rows, decisions and tree, fewer counted rewrites | word XORs (elimination, specialisation and linear elimination only) |
+//! | `fes-then-batched` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4-batched` otherwise | word XORs (of the engine that ran) |
+//! | `fes-then-inherited` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4` otherwise | word XORs (of the engine that ran) |
 //! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
@@ -48,6 +53,16 @@
 //! native count stays in the report as the engine's own regression
 //! measure.
 //!
+//! Since PR #1774 the framework matches the whole `word XORs (…)` family to
+//! `ns_per_word_xor`.  Every other unit has its own calibration key
+//! ([`solver_unit_key`], 2026-11-12), which charges the count only once
+//! `docs/ic/calibration.json` pins that key for the curve.  No key is pinned
+//! yet, so every unit below is still priced by wall time as described above.
+//! The rule in this section still holds after a pin: a unit whose count
+//! does not cover the engine's whole run is refused, and the solver block
+//! says why (`pricing_qualification`).  Today that is `crossbred-f2`'s
+//! `word operations (partial…)` and `xl-f2`'s modelled count.
+//!
 //! ## Adding an engine — F4, F5, or anything else
 //!
 //! Implement [`SystemSolver`] and register it in [`solver_registry`].
@@ -77,12 +92,16 @@ use crate::cryptanalysis::bitop_tally;
 use crate::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
 };
-use crate::cryptanalysis::m4gb_oracle::{run_m4gb, select_binary, M4gbError, M4gbOptions};
+use crate::cryptanalysis::m4gb_oracle::{
+    run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
+};
 use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
 use crate::cryptanalysis::pq_groebner_f2::{
     groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
 };
 use crate::cryptanalysis::semaev_sat::XorEncoding;
+
+pub use super::solver_units::{solver_unit_key, SolverUnitKey};
 
 /// The largest system `exhaustive` and the model-enumerating solvers
 /// will attempt, since they are `2^n` in the variable count.
@@ -348,58 +367,97 @@ impl SystemSolver for M4gbF2 {
         _params: &Params,
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
-        let started = Instant::now();
-        let mut cost = SolverCost {
-            ops: 0,
-            op_unit: "none (external process; wall time only)".into(),
-            ..SolverCost::default()
-        };
-        let Some(options) = M4gbOptions::from_env() else {
-            eprintln!("m4gb-f2: M4GB_BINARY is not set");
+        solve_m4gb(system, budget, run_m4gb)
+    }
+}
+
+/// [`M4gbF2`] against one long-lived `--serve` process per binary.
+pub struct M4gbF2Server;
+
+impl SystemSolver for M4gbF2Server {
+    fn name(&self) -> &str {
+        "m4gb-f2-server"
+    }
+
+    fn describe(&self) -> String {
+        "M4GB (Makarim–Stevens, ISSAC 2017), external process: GF(2) with field equations, reduced degrevlex basis, solutions read off the basis, one long-lived `--serve` process per binary (process start, field tables and thread pool paid once)"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        M4gbF2.parameters()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        M4gbF2.accepts(shape)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_m4gb(system, budget, run_m4gb_persistent)
+    }
+}
+
+/// Shared body of the M4GB solvers: `run` is the one-shot or the persistent client.
+fn solve_m4gb(
+    system: &BooleanSystem,
+    budget: Option<Duration>,
+    run: fn(&BooleanSystem, &M4gbOptions, Option<Duration>) -> Result<M4gbRun, M4gbError>,
+) -> (SolverVerdict, SolverCost) {
+    let started = Instant::now();
+    let mut cost = SolverCost {
+        ops: 0,
+        op_unit: "none (external process; wall time only)".into(),
+        ..SolverCost::default()
+    };
+    let Some(options) = M4gbOptions::from_env() else {
+        eprintln!("m4gb: M4GB_BINARY is not set");
+        cost.extra.insert("m4gb_error".into(), 1);
+        cost.wall_ns = started.elapsed().as_nanos() as u64;
+        return (SolverVerdict::BudgetExceeded, cost);
+    };
+    let run = match run(system, &options, budget) {
+        Ok(run) => run,
+        Err(M4gbError::Timeout(_)) => {
+            cost.timed_out = true;
+            cost.wall_ns = started.elapsed().as_nanos() as u64;
+            return (SolverVerdict::BudgetExceeded, cost);
+        }
+        Err(e) => {
+            static REPORTED: std::sync::Once = std::sync::Once::new();
+            REPORTED.call_once(|| eprintln!("m4gb: {e}"));
             cost.extra.insert("m4gb_error".into(), 1);
             cost.wall_ns = started.elapsed().as_nanos() as u64;
             return (SolverVerdict::BudgetExceeded, cost);
-        };
-        let run = match run_m4gb(system, &options, budget) {
-            Ok(run) => run,
-            Err(M4gbError::Timeout(_)) => {
-                cost.timed_out = true;
-                cost.wall_ns = started.elapsed().as_nanos() as u64;
-                return (SolverVerdict::BudgetExceeded, cost);
+        }
+    };
+    let mut tests = 0u64;
+    let verdict = match solutions_from_reduced_basis(&run.basis, system.n_vars, 24, &mut tests) {
+        None => SolverVerdict::BudgetExceeded,
+        Some(points) => {
+            let points = verified(points, system, &mut tests);
+            if points.is_empty() {
+                SolverVerdict::Unsatisfiable
+            } else {
+                SolverVerdict::Solved(points)
             }
-            Err(e) => {
-                static REPORTED: std::sync::Once = std::sync::Once::new();
-                REPORTED.call_once(|| eprintln!("m4gb-f2: {e}"));
-                cost.extra.insert("m4gb_error".into(), 1);
-                cost.wall_ns = started.elapsed().as_nanos() as u64;
-                return (SolverVerdict::BudgetExceeded, cost);
-            }
-        };
-        let mut tests = 0u64;
-        let verdict = match solutions_from_reduced_basis(&run.basis, system.n_vars, 24, &mut tests)
-        {
-            None => SolverVerdict::BudgetExceeded,
-            Some(points) => {
-                let points = verified(points, system, &mut tests);
-                if points.is_empty() {
-                    SolverVerdict::Unsatisfiable
-                } else {
-                    SolverVerdict::Solved(points)
-                }
-            }
-        };
-        cost.peak_bytes = run.peak_mib.unwrap_or(0).saturating_mul(1 << 20);
-        cost.degree_reached = run.max_lcm_degree;
-        cost.extra.insert(
-            "m4gb_cpu_ms".into(),
-            run.cpu_seconds.map_or(0, |s| (s * 1000.0).round() as u64),
-        );
-        cost.extra
-            .insert("m4gb_basis_len".into(), run.basis.len() as u64);
-        cost.extra.insert("extraction_tests".into(), tests);
-        cost.wall_ns = started.elapsed().as_nanos() as u64;
-        (verdict, cost)
-    }
+        }
+    };
+    cost.peak_bytes = run.peak_mib.unwrap_or(0).saturating_mul(1 << 20);
+    cost.degree_reached = run.max_lcm_degree;
+    cost.extra.insert(
+        "m4gb_cpu_ms".into(),
+        run.cpu_seconds.map_or(0, |s| (s * 1000.0).round() as u64),
+    );
+    cost.extra
+        .insert("m4gb_basis_len".into(), run.basis.len() as u64);
+    cost.extra.insert("extraction_tests".into(), tests);
+    cost.wall_ns = started.elapsed().as_nanos() as u64;
+    (verdict, cost)
 }
 
 // ── The Koblitz oracle's hybrid engines ────────────────────────────
@@ -411,6 +469,18 @@ enum HybridKind {
     MatrixF4,
     MatrixF5,
     InheritedF4,
+    /// `InheritedF4` with the next kernels
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_next_kernels`]): the
+    /// same computation, decisions and count, done faster.
+    InheritedF4Next,
+    /// `InheritedF4` with the kernels it used before 2026-11-12 (the
+    /// paired A/B arm of the fold; identical rows, decisions and count).
+    InheritedF4Legacy,
+    /// `InheritedF4` with the batched rewrite
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_batched_rewrite`]):
+    /// kept rows rewritten only when read or when the node splits; identical
+    /// rows, decisions and tree, fewer word XORs.
+    InheritedF4Batched,
 }
 
 /// Macaulay matrices to a fixed degree, reduced with the bit-packed
@@ -433,7 +503,10 @@ impl HybridF4 {
         match self.kind {
             HybridKind::MatrixF4 => SolverEngine::MatrixF4 { max_degree },
             HybridKind::MatrixF5 => SolverEngine::MatrixF5 { max_degree },
-            HybridKind::InheritedF4 => SolverEngine::InheritedF4 { max_degree },
+            HybridKind::InheritedF4
+            | HybridKind::InheritedF4Next
+            | HybridKind::InheritedF4Legacy
+            | HybridKind::InheritedF4Batched => SolverEngine::InheritedF4 { max_degree },
         }
     }
 }
@@ -457,6 +530,9 @@ impl SystemSolver for HybridF4 {
             HybridKind::MatrixF4 => "matrix-f4",
             HybridKind::MatrixF5 => "matrix-f5",
             HybridKind::InheritedF4 => "inherited-f4",
+            HybridKind::InheritedF4Next => "inherited-f4-next",
+            HybridKind::InheritedF4Legacy => "inherited-f4-legacy",
+            HybridKind::InheritedF4Batched => "inherited-f4-batched",
         }
     }
 
@@ -464,7 +540,10 @@ impl SystemSolver for HybridF4 {
         match self.kind {
             HybridKind::MatrixF4 => "boolean Macaulay matrices to a fixed degree, propagation, splitting (koblitz_groebner MatrixF4)",
             HybridKind::MatrixF5 => "the same with rows the Boolean F5 criterion predicts to vanish left out (MatrixF5)",
-            HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default)",
+            HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default), with the next kernels since 2026-11-12: SIMD re-reduction, fused tallies, exact fused builders, reused Four Russians tables",
+            HybridKind::InheritedF4Next => "alias of inherited-f4 since the next kernels became its default (2026-11-12); kept so earlier sweeps reproduce",
+            HybridKind::InheritedF4Legacy => "inherited-f4 with its kernels before 2026-11-12: identical rows, decisions and word-XOR count, slower (the A/B arm of the fold)",
+            HybridKind::InheritedF4Batched => "inherited-f4 with each kept row rewritten only when read or when the node splits (batched rewrite): identical rows, decisions and tree, fewer word XORs",
         }
         .into()
     }
@@ -512,7 +591,18 @@ impl SystemSolver for HybridF4 {
         let resolved = opts.resolve();
         let before = f4_word_ops_thread();
         let tally_before = bitop_tally::snapshot();
-        let (points, st) = solve_boolean_system(&system.equations, system.n_vars, &opts);
+        // The next kernels are inherited-f4's default since 2026-11-12;
+        // `inherited-f4-legacy` keeps the earlier kernels for paired A/B.
+        let next = matches!(
+            self.kind,
+            HybridKind::InheritedF4 | HybridKind::InheritedF4Next | HybridKind::InheritedF4Batched
+        );
+        let batched = matches!(self.kind, HybridKind::InheritedF4Batched);
+        let (points, st) = crate::cryptanalysis::koblitz_groebner::with_next_kernels(next, || {
+            crate::cryptanalysis::koblitz_groebner::with_batched_rewrite(batched, || {
+                solve_boolean_system(&system.equations, system.n_vars, &opts)
+            })
+        });
         let ops = f4_word_ops_thread().wrapping_sub(before);
         let mut tests = 0u64;
         let points = verified(points, system, &mut tests);
@@ -546,7 +636,10 @@ impl SystemSolver for HybridF4 {
         let cost = SolverCost {
             ops,
             op_unit: match self.kind {
-                HybridKind::InheritedF4 => {
+                HybridKind::InheritedF4
+                | HybridKind::InheritedF4Next
+                | HybridKind::InheritedF4Legacy
+                | HybridKind::InheritedF4Batched => {
                     "word XORs (elimination, specialisation and linear elimination only)"
                 }
                 _ => "word XORs (elimination only)",
@@ -819,6 +912,148 @@ impl SystemSolver for FesF2 {
             timed_out: false,
             extra,
         };
+        (verdict, cost)
+    }
+}
+
+/// The default `fes_max_vars` of [`FesThenInherited`]: the largest number
+/// of unknowns at which `fes-f2`'s word-XOR count per call was below
+/// `inherited-f4`'s on the descent ladder (14 unknowns: about 33 thousand
+/// against 49 to 52 thousand; 16 unknowns: 132 thousand against 102 to 124
+/// thousand; `research/inherited_f4_next_20261112/RESULTS_AB.md`).
+pub const FES_THEN_INHERITED_MAX_VARS: u64 = 14;
+
+/// A size rule between two engines priced in the same unit: `fes-f2` for
+/// quadratic systems of at most `fes_max_vars` unknowns (and at most 64
+/// equations), `inherited-f4` for everything else.  Both count word XORs,
+/// so the oracle's S stays on one pricing basis; the cost record says which
+/// engine ran (`size_rule_fes` = 1 for `fes-f2`).
+pub struct FesThenInherited;
+
+/// [`FesThenInherited`] with `inherited-f4-batched` above the threshold:
+/// `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns,
+/// `inherited-f4-batched` (same decisions as `inherited-f4`, fewer counted
+/// rewrites) otherwise.  Both count word XORs.
+pub struct FesThenBatched;
+
+impl SystemSolver for FesThenInherited {
+    fn name(&self) -> &str {
+        "fes-then-inherited"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4 otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4,
+            }
+            .solve(system, params, budget)
+        };
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
+        (verdict, cost)
+    }
+}
+
+impl SystemSolver for FesThenBatched {
+    fn name(&self) -> &str {
+        "fes-then-batched"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4-batched otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4-batched: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4-batched: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4Batched,
+            }
+            .solve(system, params, budget)
+        };
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
         (verdict, cost)
     }
 }
@@ -1283,6 +1518,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(F4F2),
         Box::new(BuchbergerF2),
         Box::new(M4gbF2),
+        Box::new(M4gbF2Server),
         Box::new(HybridF4 {
             kind: HybridKind::MatrixF4,
         }),
@@ -1292,6 +1528,17 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(HybridF4 {
             kind: HybridKind::InheritedF4,
         }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Next,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Legacy,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }),
+        Box::new(FesThenInherited),
+        Box::new(FesThenBatched),
         Box::new(CrossbredF2),
         Box::new(XlF2),
         Box::new(SatCdcl),
@@ -1367,6 +1614,68 @@ mod tests {
             }
             other => panic!("m4gb-f2 did not solve the fixture: {other:?}"),
         }
+    }
+
+    /// The size rule runs `fes-f2` at or below `fes_max_vars` and
+    /// `inherited-f4` above it, says which in the cost record, reports that
+    /// engine's unit, and both branches return the exhaustive reference's
+    /// solutions.  The folded `inherited-f4` and `inherited-f4-legacy` give
+    /// the same solutions and the same word-XOR count.
+    #[test]
+    fn size_rule_and_inherited_fold_match_the_reference() {
+        let sys = fixture();
+        let set = |v: SolverVerdict| -> std::collections::BTreeSet<Mask> {
+            match v {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                SolverVerdict::Unsatisfiable => Default::default(),
+                other => panic!("undecided: {other:?}"),
+            }
+        };
+        let reference = set(Exhaustive.solve(&sys, &Params::default(), None).0);
+        for (max, expect_fes) in [(sys.n_vars as u64, true), (sys.n_vars as u64 - 1, false)] {
+            let mut params = Params::default();
+            params.set("fes_max_vars", max.to_string());
+            let (verdict, cost) = FesThenInherited.solve(&sys, &params, None);
+            let (verdict_b, cost_b) = FesThenBatched.solve(&sys, &params, None);
+            assert_eq!(
+                cost_b.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost_b.ops <= cost.ops, "{} > {}", cost_b.ops, cost.ops);
+            assert_eq!(
+                set(verdict_b),
+                reference,
+                "fes-then-batched, fes_max_vars = {max}"
+            );
+            assert_eq!(
+                cost.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost.op_unit.starts_with("word XORs"), "{}", cost.op_unit);
+            assert_eq!(set(verdict), reference, "fes_max_vars = {max}");
+        }
+        let folded = HybridF4 {
+            kind: HybridKind::InheritedF4,
+        }
+        .solve(&sys, &Params::default(), None);
+        let legacy = HybridF4 {
+            kind: HybridKind::InheritedF4Legacy,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert_eq!(folded.1.ops, legacy.1.ops);
+        let folded_set = set(folded.0);
+        assert_eq!(folded_set, set(legacy.0));
+        let batched = HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert!(
+            batched.1.ops <= folded.1.ops,
+            "{} > {}",
+            batched.1.ops,
+            folded.1.ops
+        );
+        assert_eq!(set(batched.0), folded_set);
     }
 
     /// Keep the historical CNF default distinct from an explicitly
