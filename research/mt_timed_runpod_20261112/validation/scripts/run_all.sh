@@ -44,3 +44,5 @@ sha256sum $W/prod_summary.json $W/prod_analysis.txt $W/prod_runs.json $S/results
 # 8. evidence and reports (scripts/findings.json and scripts/claim.json hold the validator's written judgement)
 python3 -I $V/scripts/make_artifacts.py $W $V
 python3 $REPO/scripts/validation_gate.py evidence $V || true
+# 9. issue 2 of claim-report.json (at dd80a7c4d7, after the producer adopted the proposed wording; reads issue 1 from git)
+python3 -I $V/scripts/reissue_claim.py $REPO $V/claim-report.json

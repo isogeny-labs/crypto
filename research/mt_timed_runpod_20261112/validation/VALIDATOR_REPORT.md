@@ -13,8 +13,11 @@ reruns on the session VM.
   recompute within rounding. 388 of 388 `summary.json` fields match exactly. Nine non-blocking RESULTS/protocol
   amendments are required (R-F3 to R-F11). R-F12 is a note with no change asked.
 - **Replay certificate** (`replay-certificate.json`): **verified.**
-- **Claim statement** (`claim-report.json`): **fail, insufficient_evidence.** Every number in it is correct, but it
-  is not endorsed as worded (R-F1, R-F2). A proposed wording is given and endorsed.
+- **Claim statement** (`claim-report.json`): issue 1 (at `43fc3b0e61`) was **fail, insufficient_evidence**: every
+  number was correct, but the statement was not endorsed as worded (R-F1, R-F2), and a proposed wording was given.
+  **Issue 2 (at `dd80a7c4d7`): pass, validated.** The producer adopted the proposed wording byte for byte, sha256
+  `381a7d99e5889436805774c1bc80b83f69ae5a21851dcc82fc5ea37f21129b20`. Data are unchanged, and all 14 clauses and
+  27 numbers recompute (`scripts/reissue_claim.py`).
 
 ## Requirements
 
@@ -114,7 +117,10 @@ in `validator-report.json` and `scripts/findings.json`.
 Judged statement: sha256 `3fd446d9b35ba809e2a8eae29c1e802b2c1a12763c7c15c433ade25228af6b6b`. It is not endorsed.
 
 Endorsed alternative (`claim-report.json` `proposed_wording`, sha256
-`a8be619270b5eee0c323cd8d25535e3f043e3e08b6fd66351df30cd192a23ef9`):
+`381a7d99e5889436805774c1bc80b83f69ae5a21851dcc82fc5ea37f21129b20`). Correction: issue 1 of this report printed
+`a8be619270b5...` here, which is the hash of an earlier draft ("fastest rho by 0-15%"). The text below, and the
+`proposed_wording` field in issue 1's `claim-report.json`, were always the final text. The producer adopted that
+final text, and issue 2 of `claim-report.json` endorses it as the statement:
 
 > On one pinned CPU of a RunPod Secure Cloud cpu5c pod (AMD EPYC 9575F; a shared cloud host, so the seconds are diagnostic), in this harness's implementation, 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds (std HashMap with SipHash; a fast multiplicative hasher, with identical counted operations), every target verified: per (size, T) cell, the median over its 4 configurations of the solve-phase wall time of the fastest of four multi-target index-calculus variants divided by that of the fastest of ten multi-target rho runs is 0.70-0.88 (std) and 0.71-0.89 (fast) at 2^24 and 0.79-0.95 and 0.74-0.94 at 2^28 (faster in all 3 cells and in 12 of 12 configurations at each size and build; single configurations 0.70-0.99), and 1.05-1.18 at 2^32 in the std build (slower in all 3 cells; 12 of 12 configurations above 1) and 1.01-1.15 in the fast build (slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of a median of 4 equals their range). By cell median, the fast hasher cuts the solve time of the fastest IC by 4-11% and of the fastest rho by up to 15% (0.3% slower in the 2^32, T = 1024 cell), and the IC takes 1.41-1.62x the time of a paired BSGS; the A/A control drifted (the first of three interleaved rounds about 3% slower), disclosed.
 

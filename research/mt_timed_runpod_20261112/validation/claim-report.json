@@ -2,15 +2,14 @@
  "schema": "validator.report/v1",
  "independent": true,
  "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validator code in validation/scripts/, not the producer's",
- "validated_commit": "43fc3b0e61907dbc12b95ddd471678535311b011",
- "scope": "this one statement exactly as worded; nothing else in the study",
- "statement_judged": "On one pinned CPU of a RunPod Secure Cloud cpu5c pod (AMD EPYC 9575F; a shared cloud host, so the seconds are diagnostic), in this harness's implementation, 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds (std HashMap with SipHash; a fast multiplicative hasher, with identical counted operations), every target verified: the fastest of four multi-target index-calculus variants takes 0.70-0.88x (std) and 0.71-0.89x (fast) the solve-phase wall time of the fastest of ten multi-target rho runs at 2^24 and 0.79-0.95x and 0.74-0.94x at 2^28 (faster in 12 of 12 configurations at each size and build), and 1.05-1.18x (std; 12 of 12 configurations above 1) and 1.01-1.15x (fast; 11 of 12 above 1) at 2^32; the fast hasher speeds the fastest IC by 4-11% and the fastest rho by 0-15%; the IC takes 1.41-1.62x the time of a paired BSGS; the A/A control drifted (the first of three interleaved rounds about 3% slower), disclosed.",
- "statement_sha256": "3fd446d9b35ba809e2a8eae29c1e802b2c1a12763c7c15c433ade25228af6b6b",
- "status": "fail",
- "disposition": "insufficient_evidence",
- "verdict": "not endorsed as worded: every number recomputes, but the ranges are cell medians presented beside per-configuration counts without saying so (per configuration 0.70-0.98 at 2^24 in the std build, not 0.70-0.88), the fast build's unranked 2^32 T = 1024 cell is omitted, and the 4-of-4 sign-rule disclosure of the validated predecessor is dropped. The proposed wording is endorsed.",
- "proposed_wording": "On one pinned CPU of a RunPod Secure Cloud cpu5c pod (AMD EPYC 9575F; a shared cloud host, so the seconds are diagnostic), in this harness's implementation, 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds (std HashMap with SipHash; a fast multiplicative hasher, with identical counted operations), every target verified: per (size, T) cell, the median over its 4 configurations of the solve-phase wall time of the fastest of four multi-target index-calculus variants divided by that of the fastest of ten multi-target rho runs is 0.70-0.88 (std) and 0.71-0.89 (fast) at 2^24 and 0.79-0.95 and 0.74-0.94 at 2^28 (faster in all 3 cells and in 12 of 12 configurations at each size and build; single configurations 0.70-0.99), and 1.05-1.18 at 2^32 in the std build (slower in all 3 cells; 12 of 12 configurations above 1) and 1.01-1.15 in the fast build (slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of a median of 4 equals their range). By cell median, the fast hasher cuts the solve time of the fastest IC by 4-11% and of the fastest rho by up to 15% (0.3% slower in the 2^32, T = 1024 cell), and the IC takes 1.41-1.62x the time of a paired BSGS; the A/A control drifted (the first of three interleaved rounds about 3% slower), disclosed.",
- "proposed_wording_sha256": "381a7d99e5889436805774c1bc80b83f69ae5a21851dcc82fc5ea37f21129b20",
+ "validated_commit": "dd80a7c4d7deb4f6e64eeca849c6a4a877c8d86b",
+ "data_commit_note": "raw data, harness, launcher, receipts, instances and the build inputs are byte-identical to 43fc3b0e61907dbc12b95ddd471678535311b011, where they were validated; dd80a7c4d7 changes RESULTS.md, PROTOCOL.md (A1 time only), REPORT.pdf, ratios.svg, the bench record and adds validation/",
+ "scope": "this one statement exactly as worded (the validator's proposed wording from issue 1, adopted byte for byte by the producer); nothing else in the study",
+ "statement_judged": "On one pinned CPU of a RunPod Secure Cloud cpu5c pod (AMD EPYC 9575F; a shared cloud host, so the seconds are diagnostic), in this harness's implementation, 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds (std HashMap with SipHash; a fast multiplicative hasher, with identical counted operations), every target verified: per (size, T) cell, the median over its 4 configurations of the solve-phase wall time of the fastest of four multi-target index-calculus variants divided by that of the fastest of ten multi-target rho runs is 0.70-0.88 (std) and 0.71-0.89 (fast) at 2^24 and 0.79-0.95 and 0.74-0.94 at 2^28 (faster in all 3 cells and in 12 of 12 configurations at each size and build; single configurations 0.70-0.99), and 1.05-1.18 at 2^32 in the std build (slower in all 3 cells; 12 of 12 configurations above 1) and 1.01-1.15 in the fast build (slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of a median of 4 equals their range). By cell median, the fast hasher cuts the solve time of the fastest IC by 4-11% and of the fastest rho by up to 15% (0.3% slower in the 2^32, T = 1024 cell), and the IC takes 1.41-1.62x the time of a paired BSGS; the A/A control drifted (the first of three interleaved rounds about 3% slower), disclosed.",
+ "statement_sha256": "381a7d99e5889436805774c1bc80b83f69ae5a21851dcc82fc5ea37f21129b20",
+ "status": "pass",
+ "disposition": "validated",
+ "verdict": "endorsed exactly as worded: every clause recomputes from runs.json and the validator's replays at dd80a7c4d7 (data unchanged since 43fc3b0e61)",
  "raw_data": [
   {
    "path": "../results/holdout/runs.json",
@@ -22,390 +21,164 @@
   }
  ],
  "supporting": {
-  "replay_certificate": "replay-certificate.json (sha256 c88ee9466ee267bde3230551cfb3b69173892b469a63206cf13e2d524af0d995)",
-  "validator_report": "validator-report.json (sha256 6b4c3812d6fa8da19778326cedf4467cd6698d784338bb1ce879dd17ad435217)",
-  "recompute": "recompute.json",
+  "replay_certificate": "replay-certificate.json (status verified; unchanged, sha256 c88ee9466ee267bde3230551cfb3b69173892b469a63206cf13e2d524af0d995)",
+  "validator_report": "validator-report.json (status pass; unchanged, sha256 6b4c3812d6fa8da19778326cedf4467cd6698d784338bb1ce879dd17ad435217)",
+  "recompute": "recompute.json (re-run at dd80a7c4d7: byte-identical)",
   "results_check": "results_check.json"
  },
  "clause_checks": [
   {
    "clause": "On one pinned CPU of a RunPod Secure Cloud cpu5c pod (AMD EPYC 9575F; a shared cloud host, so the seconds are diagnostic)",
    "ok": true,
-   "recomputed": "create.json cloudType SECURE, cpuFlavorId cpu5c; host.json 'AMD EPYC 9575F 64-Core Processor', pin 91 within cpuset 27,56,91,120; not L2"
+   "recomputed": "launch/create.json cloudType SECURE, cpuFlavorId cpu5c; host.json 'AMD EPYC 9575F 64-Core Processor', pin 91 within cpuset 27,56,91,120"
   },
   {
-   "clause": "36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds",
+   "clause": "in this harness's implementation, 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, seed 43, T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats for each of two builds",
    "ok": true,
-   "recomputed": "3672 rows = 2 x 36 x 17 x 3 in the pre-registered shuffled order; instances prime order, cofactor 1 (ec_check.json)"
+   "recomputed": "3672 rows = 2 x 36 x 17 x 3 in the pre-registered order; seed 43; instances prime order, cofactor 1 (ec_check.json)"
   },
   {
    "clause": "(std HashMap with SipHash; a fast multiplicative hasher, with identical counted operations)",
    "ok": true,
-   "recomputed": "source diff = alias/feature only; binaries rebuilt bit-identical; 1224/1224 keys replay exactly; counters equal across builds in all 612 configuration keys"
+   "recomputed": "source_diff.json (alias/feature only); binaries rebuilt bit-identical; 1224/1224 keys replay exactly; counters equal across builds"
   },
   {
    "clause": "every target verified",
    "ok": true,
-   "recomputed": "ok = targets in all 3672 rows (26320896 targets); 301056 recovered logs re-verified with validator EC code, 0 failures"
+   "recomputed": "ok = targets in all 3672 rows; 301,056 recovered logs re-verified with validator EC code, 0 failures"
   },
   {
-   "clause": "takes 0.70-0.88x (std) and 0.71-0.89x (fast) ... at 2^24 and 0.79-0.95x and 0.74-0.94x at 2^28",
-   "ok": false,
-   "recomputed": "numbers are cell medians (0.7003-0.8838, 0.7124-0.8935, 0.7913-0.9533, 0.7389-0.9444); the statement does not say so and per configuration they are 0.6969-0.9843, 0.7044-0.9744, 0.7656-0.9948, 0.7193-0.9754 (R-F1)"
-  },
-  {
-   "clause": "(faster in 12 of 12 configurations at each size and build)",
+   "clause": "per (size, T) cell, the median over its 4 configurations of the solve-phase wall time of the fastest of four multi-target index-calculus variants divided by that of the fastest of ten multi-target rho runs",
    "ok": true,
-   "recomputed": "12/12 below 1 at 2^24 and 2^28 in both builds; all 6 cells faster"
+   "recomputed": "definition matches recompute.py: per configuration min over ic5/ic5ks/ic5w/ic5rw key times / min over 4 rho2xks + 6 rhodpu key times (key time = median of 3 repeats of ms_arm); median over the cell's 4 configurations"
   },
   {
-   "clause": "1.05-1.18x (std; 12 of 12 configurations above 1) and 1.01-1.15x (fast; 11 of 12 above 1) at 2^32",
-   "ok": false,
-   "recomputed": "cell medians 1.0526-1.1794 / 1.0107-1.1485, counts 12/12 and 11/12 correct; the fast build's T = 1024 cell is unranked (1.011 [0.996, 1.031]) and is not mentioned (R-F2); per configuration 1.0288-1.1950 / 0.9963-1.1707"
+   "clause": "is 0.70-0.88 (std) and 0.71-0.89 (fast) at 2^24 and 0.79-0.95 and 0.74-0.94 at 2^28",
+   "ok": true,
+   "recomputed": "cell medians std 24 0.7003-0.8838, fast 24 0.7124-0.8935, std 28 0.7913-0.9533, fast 28 0.7389-0.9444"
   },
   {
-   "clause": "the fast hasher speeds the fastest IC by 4-11% and the fastest rho by 0-15%",
-   "ok": "conditional",
-   "recomputed": "cell medians of fast/std: IC 0.8896-0.9634 (3.7-11.0% less time), rho 0.8454-1.0033 (-0.3% to 15.5%); per configuration IC 0.82-0.98, rho 0.81-1.07: correct only as cell medians (R-F1)"
+   "clause": "(faster in all 3 cells and in 12 of 12 configurations at each size and build; single configurations 0.70-0.99)",
+   "ok": true,
+   "recomputed": "decisions faster in 6/6 cells; 12/12 below 1 at 2^24 and 2^28 in both builds; single configurations 0.6969-0.9948"
   },
   {
-   "clause": "the IC takes 1.41-1.62x the time of a paired BSGS",
-   "ok": "conditional",
-   "recomputed": "cell medians 1.4142-1.6185; per configuration 1.31-1.67 (R-F1)"
+   "clause": "and 1.05-1.18 at 2^32 in the std build (slower in all 3 cells; 12 of 12 configurations above 1)",
+   "ok": true,
+   "recomputed": "cell medians 1.0526-1.1794; decisions ['slower', 'slower', 'slower']; above 1: 12/12"
+  },
+  {
+   "clause": "and 1.01-1.15 in the fast build (slower in 2 cells, unranked at T = 1024; 11 of 12 configurations above 1)",
+   "ok": true,
+   "recomputed": "cell medians 1.0107-1.1485; decisions (T = 1024, 4096, 16384) ['unranked', 'slower', 'slower']; above 1: 11/12"
+  },
+  {
+   "clause": "Each cell decision is a 4-of-4 sign rule (the bootstrap interval of a median of 4 equals their range)",
+   "ok": true,
+   "recomputed": "protocol bootstrap interval == exact 4^4 bootstrap interval == range of the 4 configuration ratios in all 18 build-cells"
+  },
+  {
+   "clause": "By cell median, the fast hasher cuts the solve time of the fastest IC by 4-11%",
+   "ok": true,
+   "recomputed": "IC fast/std cell medians 0.8896-0.9634 (3.7-11.0% less time)"
+  },
+  {
+   "clause": "and of the fastest rho by up to 15% (0.3% slower in the 2^32, T = 1024 cell)",
+   "ok": true,
+   "recomputed": "rho fast/std cell medians 0.8454-1.0033 (up to 15.5% less time); the only cell above 1 is ['32/1024'] (1.0033)"
+  },
+  {
+   "clause": "and the IC takes 1.41-1.62x the time of a paired BSGS",
+   "ok": true,
+   "recomputed": "IC/BSGS cell medians 1.4142-1.6185 over both builds (fastest of 3 bsgs2 keys per configuration)"
   },
   {
    "clause": "the A/A control drifted (the first of three interleaved rounds about 3% slower), disclosed",
    "ok": true,
-   "recomputed": "median key time relative to its key median by round [1.0319, 1.0, 1.0]; A/A interval contains 1 in 4/9 (std) and 3/9 (fast) cells"
+   "recomputed": "median key time relative to its key median by round [1.0319, 1.0, 1.0] (both builds); RESULTS 'Controls and their limits'"
   }
  ],
  "headline": [
   {
-   "name": "std ic/rho 24/1024",
-   "claimed": 0.884,
-   "recomputed": 0.8837722561126816,
-   "rel_tol": 0.0005656108607285068
-  },
-  {
-   "name": "fast ic/rho 24/1024",
-   "claimed": 0.893,
-   "recomputed": 0.893482583873244,
-   "rel_tol": 0.0005599104153337066
-  },
-  {
-   "name": "ic fast/std 24/1024",
-   "claimed": 0.892,
-   "recomputed": 0.8923672847345695,
-   "rel_tol": 0.0005605381175919282
-  },
-  {
-   "name": "rho fast/std 24/1024",
-   "claimed": 0.878,
-   "recomputed": 0.8777334515366431,
-   "rel_tol": 0.0005694760830045558
-  },
-  {
-   "name": "std ic/bsgs 24/1024",
-   "claimed": 1.52,
-   "recomputed": 1.5182926829268295,
-   "rel_tol": 0.003289473685210526
-  },
-  {
-   "name": "fast ic/bsgs 24/1024",
-   "claimed": 1.53,
-   "recomputed": 1.534159159159159,
-   "rel_tol": 0.0032679738572091504
-  },
-  {
-   "name": "std ic/rho 24/4096",
-   "claimed": 0.733,
-   "recomputed": 0.7334328202814555,
-   "rel_tol": 0.0006821282411091405
-  },
-  {
-   "name": "fast ic/rho 24/4096",
-   "claimed": 0.776,
-   "recomputed": 0.7758373205741627,
-   "rel_tol": 0.0006443298979072165
-  },
-  {
-   "name": "ic fast/std 24/4096",
-   "claimed": 0.89,
-   "recomputed": 0.8895645161290322,
-   "rel_tol": 0.0005617977538089888
-  },
-  {
-   "name": "rho fast/std 24/4096",
-   "claimed": 0.845,
-   "recomputed": 0.8454033559492616,
-   "rel_tol": 0.000591715977331361
-  },
-  {
-   "name": "std ic/bsgs 24/4096",
-   "claimed": 1.47,
-   "recomputed": 1.473372781065089,
-   "rel_tol": 0.0034013605452176874
-  },
-  {
-   "name": "fast ic/bsgs 24/4096",
-   "claimed": 1.46,
-   "recomputed": 1.459256429844665,
-   "rel_tol": 0.0034246575352465756
-  },
-  {
-   "name": "std ic/rho 24/16384",
+   "name": "std 24b cell-median IC/rho min",
    "claimed": 0.7,
    "recomputed": 0.7003262438045046,
-   "rel_tol": 0.0007142857152857144
+   "rel_tol": 0.007142857143857144
   },
   {
-   "name": "fast ic/rho 24/16384",
-   "claimed": 0.712,
+   "name": "std 24b cell-median IC/rho max",
+   "claimed": 0.88,
+   "recomputed": 0.8837722561126816,
+   "rel_tol": 0.005681818182818182
+  },
+  {
+   "name": "fast 24b cell-median IC/rho min",
+   "claimed": 0.71,
    "recomputed": 0.7123600746268656,
-   "rel_tol": 0.000702247192011236
+   "rel_tol": 0.007042253522126761
   },
   {
-   "name": "ic fast/std 24/16384",
-   "claimed": 0.9,
-   "recomputed": 0.8999205399085684,
-   "rel_tol": 0.0005555555565555556
+   "name": "fast 24b cell-median IC/rho max",
+   "claimed": 0.89,
+   "recomputed": 0.893482583873244,
+   "rel_tol": 0.005617977529089888
   },
   {
-   "name": "rho fast/std 24/16384",
-   "claimed": 0.886,
-   "recomputed": 0.8858146684233641,
-   "rel_tol": 0.000564334086778781
-  },
-  {
-   "name": "std ic/bsgs 24/16384",
-   "claimed": 1.46,
-   "recomputed": 1.464403675234206,
-   "rel_tol": 0.0034246575352465756
-  },
-  {
-   "name": "fast ic/bsgs 24/16384",
-   "claimed": 1.41,
-   "recomputed": 1.4142011834319526,
-   "rel_tol": 0.003546099291780142
-  },
-  {
-   "name": "std ic/rho 28/1024",
-   "claimed": 0.791,
+   "name": "std 28b cell-median IC/rho min",
+   "claimed": 0.79,
    "recomputed": 0.791309629075926,
-   "rel_tol": 0.0006321112525802781
+   "rel_tol": 0.006329113925050633
   },
   {
-   "name": "fast ic/rho 28/1024",
-   "claimed": 0.739,
-   "recomputed": 0.7388712798413999,
-   "rel_tol": 0.0006765899874682003
-  },
-  {
-   "name": "ic fast/std 28/1024",
-   "claimed": 0.918,
-   "recomputed": 0.9179242843144754,
-   "rel_tol": 0.0005446623103681917
-  },
-  {
-   "name": "rho fast/std 28/1024",
-   "claimed": 0.981,
-   "recomputed": 0.9813156787625987,
-   "rel_tol": 0.0005096839969225281
-  },
-  {
-   "name": "std ic/bsgs 28/1024",
-   "claimed": 1.44,
-   "recomputed": 1.4421377823658004,
-   "rel_tol": 0.0034722222232222225
-  },
-  {
-   "name": "fast ic/bsgs 28/1024",
-   "claimed": 1.46,
-   "recomputed": 1.457193515704154,
-   "rel_tol": 0.0034246575352465756
-  },
-  {
-   "name": "std ic/rho 28/4096",
-   "claimed": 0.833,
-   "recomputed": 0.8325486148843573,
-   "rel_tol": 0.0006002400970384154
-  },
-  {
-   "name": "fast ic/rho 28/4096",
-   "claimed": 0.779,
-   "recomputed": 0.7794358598931507,
-   "rel_tol": 0.0006418485247483953
-  },
-  {
-   "name": "ic fast/std 28/4096",
-   "claimed": 0.926,
-   "recomputed": 0.9264012299935591,
-   "rel_tol": 0.0005399568044557236
-  },
-  {
-   "name": "rho fast/std 28/4096",
-   "claimed": 0.989,
-   "recomputed": 0.988671747385108,
-   "rel_tol": 0.0005055611739019211
-  },
-  {
-   "name": "std ic/bsgs 28/4096",
-   "claimed": 1.48,
-   "recomputed": 1.4847124910320404,
-   "rel_tol": 0.0033783783793783786
-  },
-  {
-   "name": "fast ic/bsgs 28/4096",
-   "claimed": 1.5,
-   "recomputed": 1.4971909938369103,
-   "rel_tol": 0.0033333333343333335
-  },
-  {
-   "name": "std ic/rho 28/16384",
-   "claimed": 0.953,
+   "name": "std 28b cell-median IC/rho max",
+   "claimed": 0.95,
    "recomputed": 0.9532602607974054,
-   "rel_tol": 0.0005246589726684155
+   "rel_tol": 0.005263157895736843
   },
   {
-   "name": "fast ic/rho 28/16384",
-   "claimed": 0.944,
+   "name": "fast 28b cell-median IC/rho min",
+   "claimed": 0.74,
+   "recomputed": 0.7388712798413999,
+   "rel_tol": 0.0067567567577567576
+  },
+  {
+   "name": "fast 28b cell-median IC/rho max",
+   "claimed": 0.94,
    "recomputed": 0.944439400597118,
-   "rel_tol": 0.0005296610179491525
+   "rel_tol": 0.005319148937170214
   },
   {
-   "name": "ic fast/std 28/16384",
-   "claimed": 0.946,
-   "recomputed": 0.945865201260208,
-   "rel_tol": 0.0005285412272156448
-  },
-  {
-   "name": "rho fast/std 28/16384",
-   "claimed": 0.961,
-   "recomputed": 0.9610847694197888,
-   "rel_tol": 0.0005202913641633715
-  },
-  {
-   "name": "std ic/bsgs 28/16384",
-   "claimed": 1.54,
-   "recomputed": 1.5358230553287182,
-   "rel_tol": 0.0032467532477532465
-  },
-  {
-   "name": "fast ic/bsgs 28/16384",
-   "claimed": 1.62,
-   "recomputed": 1.6151445699455347,
-   "rel_tol": 0.0030864197540864196
-  },
-  {
-   "name": "std ic/rho 32/1024",
-   "claimed": 1.053,
+   "name": "std 32b cell-median IC/rho min",
+   "claimed": 1.05,
    "recomputed": 1.0526463335710114,
-   "rel_tol": 0.0004748338091671415
+   "rel_tol": 0.004761904762904762
   },
   {
-   "name": "fast ic/rho 32/1024",
-   "claimed": 1.011,
-   "recomputed": 1.0107078216454843,
-   "rel_tol": 0.0004945598427408507
-  },
-  {
-   "name": "ic fast/std 32/1024",
-   "claimed": 0.963,
-   "recomputed": 0.9633557100219818,
-   "rel_tol": 0.0005192108005846313
-  },
-  {
-   "name": "rho fast/std 32/1024",
-   "claimed": 1.003,
-   "recomputed": 1.0032527296053741,
-   "rel_tol": 0.0004985044875403789
-  },
-  {
-   "name": "std ic/bsgs 32/1024",
-   "claimed": 1.52,
-   "recomputed": 1.519593291807904,
-   "rel_tol": 0.003289473685210526
-  },
-  {
-   "name": "fast ic/bsgs 32/1024",
-   "claimed": 1.6,
-   "recomputed": 1.6017796369824162,
-   "rel_tol": 0.0031250000009999997
-  },
-  {
-   "name": "std ic/rho 32/4096",
-   "claimed": 1.17,
-   "recomputed": 1.1696448392876966,
-   "rel_tol": 0.0004273504283504274
-  },
-  {
-   "name": "fast ic/rho 32/4096",
-   "claimed": 1.108,
-   "recomputed": 1.108392614457929,
-   "rel_tol": 0.00045126353890613714
-  },
-  {
-   "name": "ic fast/std 32/4096",
-   "claimed": 0.938,
-   "recomputed": 0.9383143297136501,
-   "rel_tol": 0.0005330490415117271
-  },
-  {
-   "name": "rho fast/std 32/4096",
-   "claimed": 0.986,
-   "recomputed": 0.985981040626652,
-   "rel_tol": 0.0005070993924807302
-  },
-  {
-   "name": "std ic/bsgs 32/4096",
-   "claimed": 1.6,
-   "recomputed": 1.6000150723003677,
-   "rel_tol": 0.0031250000009999997
-  },
-  {
-   "name": "fast ic/bsgs 32/4096",
-   "claimed": 1.62,
-   "recomputed": 1.61852615652518,
-   "rel_tol": 0.0030864197540864196
-  },
-  {
-   "name": "std ic/rho 32/16384",
-   "claimed": 1.179,
+   "name": "std 32b cell-median IC/rho max",
+   "claimed": 1.18,
    "recomputed": 1.179377500435212,
-   "rel_tol": 0.0004240882113477523
+   "rel_tol": 0.004237288136593221
   },
   {
-   "name": "fast ic/rho 32/16384",
-   "claimed": 1.148,
+   "name": "fast 32b cell-median IC/rho min",
+   "claimed": 1.01,
+   "recomputed": 1.0107078216454843,
+   "rel_tol": 0.004950495050504951
+  },
+  {
+   "name": "fast 32b cell-median IC/rho max",
+   "claimed": 1.15,
    "recomputed": 1.1484594017395127,
-   "rel_tol": 0.0004355400706864112
-  },
-  {
-   "name": "ic fast/std 32/16384",
-   "claimed": 0.949,
-   "recomputed": 0.9485336630413845,
-   "rel_tol": 0.0005268703908840886
-  },
-  {
-   "name": "rho fast/std 32/16384",
-   "claimed": 0.975,
-   "recomputed": 0.9746025289516704,
-   "rel_tol": 0.0005128205138205128
-  },
-  {
-   "name": "std ic/bsgs 32/16384",
-   "claimed": 1.58,
-   "recomputed": 1.5776521731128348,
-   "rel_tol": 0.0031645569630253164
-  },
-  {
-   "name": "fast ic/bsgs 32/16384",
-   "claimed": 1.6,
-   "recomputed": 1.5993783907566987,
-   "rel_tol": 0.0031250000009999997
+   "rel_tol": 0.004347826087956522
   },
   {
    "name": "std 24b configurations below 1",
+   "claimed": 12,
+   "recomputed": 12,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "fast 24b configurations below 1",
    "claimed": 12,
    "recomputed": 12,
    "rel_tol": 1e-09
@@ -417,207 +190,201 @@
    "rel_tol": 1e-09
   },
   {
-   "name": "std 32b configurations below 1",
-   "claimed": 0,
-   "recomputed": 0,
-   "rel_tol": 1e-09
-  },
-  {
-   "name": "fast 24b configurations below 1",
-   "claimed": 12,
-   "recomputed": 12,
-   "rel_tol": 1e-09
-  },
-  {
    "name": "fast 28b configurations below 1",
    "claimed": 12,
    "recomputed": 12,
    "rel_tol": 1e-09
   },
   {
-   "name": "fast 32b configurations below 1",
-   "claimed": 1,
-   "recomputed": 1,
+   "name": "std 32b configurations above 1",
+   "claimed": 12,
+   "recomputed": 12,
    "rel_tol": 1e-09
   },
   {
-   "name": "std 24b cell-median ic/rho min",
+   "name": "fast 32b configurations above 1",
+   "claimed": 11,
+   "recomputed": 11,
+   "rel_tol": 1e-09
+  },
+  {
+   "name": "single configurations 2^24-2^28 min",
    "claimed": 0.7,
-   "recomputed": 0.7003262438045046,
+   "recomputed": 0.6968503937007874,
    "rel_tol": 0.007142857143857144
   },
   {
-   "name": "std 24b cell-median ic/rho max",
-   "claimed": 0.88,
-   "recomputed": 0.8837722561126816,
-   "rel_tol": 0.005681818182818182
+   "name": "single configurations 2^24-2^28 max",
+   "claimed": 0.99,
+   "recomputed": 0.9948150708606982,
+   "rel_tol": 0.005050505051505051
   },
   {
-   "name": "std 28b cell-median ic/rho min",
-   "claimed": 0.79,
-   "recomputed": 0.791309629075926,
-   "rel_tol": 0.006329113925050633
+   "name": "IC time cut by fast hasher, min % (cell median)",
+   "claimed": 4,
+   "recomputed": 3.6644289978018163,
+   "rel_tol": 0.125000000001
   },
   {
-   "name": "std 28b cell-median ic/rho max",
-   "claimed": 0.95,
-   "recomputed": 0.9532602607974054,
-   "rel_tol": 0.005263157895736843
+   "name": "IC time cut by fast hasher, max % (cell median)",
+   "claimed": 11,
+   "recomputed": 11.04354838709678,
+   "rel_tol": 0.045454545455545455
   },
   {
-   "name": "std 32b cell-median ic/rho min",
-   "claimed": 1.05,
-   "recomputed": 1.0526463335710114,
-   "rel_tol": 0.004761904762904762
+   "name": "rho time cut by fast hasher, max % (cell median)",
+   "claimed": 15,
+   "recomputed": 15.459664405073836,
+   "rel_tol": 0.03333333333433333
   },
   {
-   "name": "std 32b cell-median ic/rho max",
-   "claimed": 1.18,
-   "recomputed": 1.179377500435212,
-   "rel_tol": 0.004237288136593221
+   "name": "rho 2^32 T=1024 fast slower by %",
+   "claimed": 0.3,
+   "recomputed": 0.32527296053741495,
+   "rel_tol": 0.1666666666676667
   },
   {
-   "name": "fast 24b cell-median ic/rho min",
-   "claimed": 0.71,
-   "recomputed": 0.7123600746268656,
-   "rel_tol": 0.007042253522126761
-  },
-  {
-   "name": "fast 24b cell-median ic/rho max",
-   "claimed": 0.89,
-   "recomputed": 0.893482583873244,
-   "rel_tol": 0.005617977529089888
-  },
-  {
-   "name": "fast 28b cell-median ic/rho min",
-   "claimed": 0.74,
-   "recomputed": 0.7388712798413999,
-   "rel_tol": 0.0067567567577567576
-  },
-  {
-   "name": "fast 28b cell-median ic/rho max",
-   "claimed": 0.94,
-   "recomputed": 0.944439400597118,
-   "rel_tol": 0.005319148937170214
-  },
-  {
-   "name": "fast 32b cell-median ic/rho min",
-   "claimed": 1.01,
-   "recomputed": 1.0107078216454843,
-   "rel_tol": 0.004950495050504951
-  },
-  {
-   "name": "fast 32b cell-median ic/rho max",
-   "claimed": 1.15,
-   "recomputed": 1.1484594017395127,
-   "rel_tol": 0.004347826087956522
-  },
-  {
-   "name": "IC fast/std cell-median min",
-   "claimed": 0.89,
-   "recomputed": 0.8895645161290322,
-   "rel_tol": 0.005617977529089888
-  },
-  {
-   "name": "IC fast/std cell-median max",
-   "claimed": 0.96,
-   "recomputed": 0.9633557100219818,
-   "rel_tol": 0.005208333334333334
-  },
-  {
-   "name": "rho fast/std cell-median min",
-   "claimed": 0.85,
-   "recomputed": 0.8454033559492616,
-   "rel_tol": 0.005882352942176471
-  },
-  {
-   "name": "rho fast/std cell-median max",
-   "claimed": 1.0,
-   "recomputed": 1.0032527296053741,
-   "rel_tol": 0.0050000000010000005
-  },
-  {
-   "name": "IC/BSGS cell-median min (both builds)",
+   "name": "IC/BSGS cell-median min",
    "claimed": 1.41,
    "recomputed": 1.4142011834319526,
    "rel_tol": 0.003546099291780142
   },
   {
-   "name": "IC/BSGS cell-median max (both builds)",
+   "name": "IC/BSGS cell-median max",
    "claimed": 1.62,
    "recomputed": 1.61852615652518,
    "rel_tol": 0.0030864197540864196
   },
   {
-   "name": "round-0 drift (median key time rel. to key median)",
-   "claimed": 1.032,
+   "name": "round-1 drift (median key time rel. to key median)",
+   "claimed": 1.03,
    "recomputed": 1.0319355813813142,
-   "rel_tol": 0.00048449612503100774
-  },
-  {
-   "name": "A/A median |log dev| (all keys)",
-   "claimed": 0.008,
-   "recomputed": 0.008168652773453768,
-   "rel_tol": 0.062500000001
-  },
-  {
-   "name": "A/A p95 |log dev|",
-   "claimed": 0.11,
-   "recomputed": 0.10758146033805352,
-   "rel_tol": 0.045454545455545455
-  },
-  {
-   "name": "GAE ns min",
-   "claimed": 98,
-   "recomputed": 98.458,
-   "rel_tol": 0.005102040817326531
-  },
-  {
-   "name": "GAE ns max",
-   "claimed": 140,
-   "recomputed": 140.016,
-   "rel_tol": 0.0035714285724285713
-  },
-  {
-   "name": "I/M min",
-   "claimed": 23,
-   "recomputed": 23.19457128361238,
-   "rel_tol": 0.021739130435782607
-  },
-  {
-   "name": "I/M max",
-   "claimed": 27,
-   "recomputed": 27.245583905789992,
-   "rel_tol": 0.018518518519518516
-  },
-  {
-   "name": "std lookup GAE 2^22-2^24 min",
-   "claimed": 0.74,
-   "recomputed": 0.7436435835904468,
-   "rel_tol": 0.0067567567577567576
-  },
-  {
-   "name": "std lookup GAE 2^22-2^24 max",
-   "claimed": 1.45,
-   "recomputed": 1.4525279814743344,
-   "rel_tol": 0.003448275863068966
-  },
-  {
-   "name": "std lookup GAE 2^10-2^16 min",
-   "claimed": 0.06,
-   "recomputed": 0.0583504742315164,
-   "rel_tol": 0.08333333333433335
-  },
-  {
-   "name": "std lookup GAE 2^10-2^16 max",
-   "claimed": 0.11,
-   "recomputed": 0.10999100386304704,
-   "rel_tol": 0.045454545455545455
+   "rel_tol": 0.004854368933038835
   }
  ],
  "headline_mismatches": [],
+ "checks": {
+  "changed_since_data_commit": [],
+  "study_files_changed": [
+   "research/mt_timed_runpod_20261112/PROTOCOL.md",
+   "research/mt_timed_runpod_20261112/REPORT.pdf",
+   "research/mt_timed_runpod_20261112/RESULTS.md",
+   "research/mt_timed_runpod_20261112/ratios.svg",
+   "research/mt_timed_runpod_20261112/validation/VALIDATOR_REPORT.md",
+   "research/mt_timed_runpod_20261112/validation/claim-report.json",
+   "research/mt_timed_runpod_20261112/validation/ec_check.json",
+   "research/mt_timed_runpod_20261112/validation/payload_check.json",
+   "research/mt_timed_runpod_20261112/validation/payload_check_a1.json",
+   "research/mt_timed_runpod_20261112/validation/recompute.json",
+   "research/mt_timed_runpod_20261112/validation/replay-certificate.json",
+   "research/mt_timed_runpod_20261112/validation/replay_check.json",
+   "research/mt_timed_runpod_20261112/validation/results_check.json",
+   "research/mt_timed_runpod_20261112/validation/scripts/claim.json",
+   "research/mt_timed_runpod_20261112/validation/scripts/ec_check.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/findings.json",
+   "research/mt_timed_runpod_20261112/validation/scripts/make_artifacts.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/mk_dump_crate.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/payload_check.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/recompute.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/replay.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/results_check.py",
+   "research/mt_timed_runpod_20261112/validation/scripts/run_all.sh",
+   "research/mt_timed_runpod_20261112/validation/scripts/source_diff.py",
+   "research/mt_timed_runpod_20261112/validation/source_diff.json",
+   "research/mt_timed_runpod_20261112/validation/validator-report.json"
+  ],
+  "protocol_md_diff": [
+   "-## Amendment A1 (2026-11-12 16:40Z, after attempt 1, before any measurement)",
+   "+## Amendment A1 (2026-11-12 16:32Z, after attempt 1, before any measurement)"
+  ],
+  "validation_evidence_sha256_at_head": {
+   "replay-certificate.json": "c88ee9466ee267bde3230551cfb3b69173892b469a63206cf13e2d524af0d995",
+   "validator-report.json": "6b4c3812d6fa8da19778326cedf4467cd6698d784338bb1ce879dd17ad435217",
+   "recompute.json": "69dcb81f5a37717609eb87a90304cccd349baa7726eaac6399344cfe37a365f3",
+   "results_check.json": "526a13e30e1107b1dfc4a90d84d07466904b06534cd103f9d506eaec7e73d15c",
+   "ec_check.json": "95c1912c117260922bffeae666afe2e3971003784c011abb2ba62c9b9d20623f",
+   "replay_check.json": "c444388aace56fad8e901aaed3dd6d7c1b2cbc33965804fe3dd2289e96305239"
+  },
+  "statement_equals_issue1_proposed_wording": true,
+  "sha256_correction": "issue 1's VALIDATOR_REPORT.md and the validator's hand-off cited a8be619270b5eee0c323cd8d25535e3f043e3e08b6fd66351df30cd192a23ef9 for the proposed wording; that is the hash of an earlier draft ('fastest rho by 0-15%'). The proposed_wording in claim-report.json (and quoted in VALIDATOR_REPORT.md) is the final text, sha256 381a7d99e5889436805774c1bc80b83f69ae5a21851dcc82fc5ea37f21129b20, as its own proposed_wording_sha256 field says. This statement is that final text.",
+  "amendments_check": [
+   {
+    "id": "R-F1",
+    "applied": true,
+    "note": "RESULTS: 'These ranges are per configuration; the table gives the cell medians ... 4-of-4 sign rule'; the statement says 'per (size, T) cell, the median over its 4 configurations' and states the sign rule"
+   },
+   {
+    "id": "R-F2",
+    "applied": true,
+    "note": "statement: 'slower in 2 cells, unranked at T = 1024'; RESULTS already stated it"
+   },
+   {
+    "id": "R-F3",
+    "applied": true,
+    "note": "'load average 37.6-93.5' (twice)"
+   },
+   {
+    "id": "R-F4",
+    "applied": true,
+    "note": "'whether the pinned CPU's SMT sibling was idle was not recorded'"
+   },
+   {
+    "id": "R-F5",
+    "applied": true,
+    "note": "prediction 1: 'magnitudes within 10% in 5 of 9 cells (up to 21% off, at 28 b T = 4096)' (recomputes: 4 cells beyond 10%, 28/4096 0.790); prediction 2 now quotes PROTOCOL.md line 50 '(ic5rw about 0.6x, ic5ks about 0.8x)' and reports ic5rw about 0.85x; ic5ks (0.84, holds) and rho2xks (0.84, not predicted) are not reported (minor)"
+   },
+   {
+    "id": "R-F6",
+    "applied": true,
+    "note": "'1.03-1.19x'; rho2xks fastest in 1 of 4 configurations at 28 b T = 1024 (fast)"
+   },
+   {
+    "id": "R-F7",
+    "applied": "partly",
+    "note": "0.020 without the self-term and the fast 2^32/1024 cell vs drift are added; '(0.020 without it; 95th percentile 0.11)': 0.11 is the percentile with the self-term (0.12 without); '2^24 (12-30%)' is the std build only (fast 11-29%) and 'most 2^32 cells (5-20%)' still mixes cell medians (5-18%) with a per-configuration maximum (19.5%)"
+   },
+   {
+    "id": "R-F8",
+    "applied": true,
+    "note": "PROTOCOL.md A1 heading 16:40Z -> 16:32Z; the only PROTOCOL.md change since 43fc3b0e61"
+   },
+   {
+    "id": "R-F9",
+    "applied": false,
+    "note": "not applied; the producer says 'the artifact-store bot moves the runs.jsonl files when the PR opens', but .github/workflows/artifacts.yml only fails a PR that adds such a file (it 'touches no remote'); it passes only under the owner/reviewer label large-file-ok. Still open"
+   },
+   {
+    "id": "R-F10",
+    "applied": true,
+    "note": "Limits now state that the payload is reproducible only with the gzip time; host.json commit field not added (future runs)"
+   },
+   {
+    "id": "R-F11",
+    "applied": false,
+    "note": "producer keeps consumerUserId (redaction would change receipt hashes the validation pins) and flags it to the owner; acceptable"
+   },
+   {
+    "id": "RESULTS validation sentence",
+    "applied": null,
+    "note": "RESULTS says 'its amendments are applied here'; R-F9 is not applied and R-F7 only partly (non-blocking wording)"
+   }
+  ]
+ },
+ "history": [
+  {
+   "issue": 1,
+   "commit": "dd80a7c4d7deb4f6e64eeca849c6a4a877c8d86b (committed by the producer; written by the validator against 43fc3b0e61)",
+   "status": "fail",
+   "disposition": "insufficient_evidence",
+   "statement_sha256": "3fd446d9b35ba809e2a8eae29c1e802b2c1a12763c7c15c433ade25228af6b6b",
+   "sha256": "6c040dc7e27c46e38e74476b19b19e7709c450c4c90332553568806a8325f8b0",
+   "judged": "the producer's original statement",
+   "reason": "R-F1 (cell medians not labelled), R-F2 (fast 2^32 T = 1024 unranked omitted)"
+  }
+ ],
  "notes": [
-  "Endorsed wording = proposed_wording byte for byte; any change to it needs a new judgement.",
-  "RESULTS.md's own headline and table are validated (validator-report.json, status pass); this report judges only the statement."
+  "Any change to the statement needs a new judgement.",
+  "RESULTS.md's headline and table are validated in validator-report.json (unchanged); this report judges only the statement.",
+  "Non-blocking open items in RESULTS/the PR: R-F7 partly, R-F9 not applied (see checks.amendments_check)."
  ]
 }

@@ -6,10 +6,11 @@ may use CPUs 27, 56, 91, 120; every execution pinned to CPU 91), image `runpod/b
 yt43r1gavrm8w3 (created, payload uploaded and deleted by `launch.py`; receipts in `launch/`). **3672 executions
 (2 builds x 36 configurations x 17 keys x 3 interleaved repeats), 0 errors, every target verified.** Data:
 `results/holdout/runs.jsonl`, `opcost.jsonl`, `host.json`, `job.log`, `analysis.txt`, `summary.json`; compact table
-`runs.json` (`mk_runs.py`). Every number here is [pcc:unverified] until the claim is signed. Independent validation:
+`runs.json` (`mk_runs.py`). Every number here is [pcc:unverified] (claim PCC-20261112-dc58b3) until the claim is signed. Independent validation:
 `validation/VALIDATOR_REPORT.md` (pass: both binaries rebuild bit for bit, all 3672 rows replay exactly in their
 counters, 301k recovered logs checked with independent EC code, every number recomputes; its amendments are applied
-here). The seconds are
+here, except that the large `.jsonl` files reach the artifact store through the repository's PR workflow, not in
+this commit). The seconds are
 diagnostic: a shared cloud host (load average 37.6-93.5 on 128 threads during the run; steal 0), not an isolated lab node.
 
 ## Result (solve-phase wall time, fastest IC key / fastest rho key per configuration; median of 4 per cell)
@@ -36,7 +37,8 @@ diagnostic: a shared cloud host (load average 37.6-93.5 on 128 threads during th
 - **Fast hasher.** It makes both sides faster: the fastest IC by 4-11% (fast/std 0.89-0.96) and the fastest rho by
   0-15% (0.85-1.00), more for rho at 2^24 and more for the IC at 2^28-2^32. It narrows the IC's deficit at 2^32
   (1.05-1.18 to 1.01-1.15) but does not reverse it. The size pattern does not depend on the std hasher. By arm, the
-  retention variant ic5rw gains about 15% (fast/std about 0.85), much less than the predicted 0.6.
+  retention variants gain about 15-16% (fast/std: ic5rw about 0.85, ic5ks about 0.84; rho2xks about 0.84), much less
+  than the predicted 0.6 for ic5rw.
 - **Fixed-key control** (each side's key chosen on repeat 0, scored on repeats 1-2): std faster in the six cells up to
   2^28 and slower in the three at 2^32 (0.69-1.18); fast the same except unranked at 32 b T = 1024 (0.72-1.13).
 - **Distance to BSGS:** the IC takes 1.41-1.62x the time of the fastest paired BSGS in every cell of both builds.
@@ -51,8 +53,8 @@ diagnostic: a shared cloud host (load average 37.6-93.5 on 128 threads during th
   2 and 3 (median key time relative to its median: 1.032, 1.000, 1.000), with a drop in host load late in the run.
   Within each round the order of all keys of both builds was a single shuffle, so the drift applies to both sides
   of every comparison; the median |log(repeat/median)| over all keys is 0.008 counting each key's median repeat
-  (0.020 without it; 95th percentile 0.11). The IC/rho effects at 2^24 (12-30%) and in most 2^32 cells (5-20%) are
-  larger than the drift; the fast build's 2^32, T = 1024 cell (1%) is not, and single-cell magnitudes should be read
+  (0.020 without it; 95th percentile 0.11 with it, 0.12 without). The IC/rho effects at 2^24 (cell medians 12-30% std,
+  11-29% fast) and in most 2^32 cells (cell medians 5-18%) are larger than the drift; the fast build's 2^32, T = 1024 cell (1%) is not, and single-cell magnitudes should be read
   with the drift in mind.
 - With n = 4 configurations per cell the bootstrap interval of the median equals the range: each cell decision is a
   4-of-4 sign rule; the size-level counts above (12 of 12) are the strongest evidence.
