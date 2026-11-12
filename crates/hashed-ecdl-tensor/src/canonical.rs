@@ -45,29 +45,36 @@ pub struct IrProvenance {
 /// modulus above one, indexing it returns the very residue `modpow` computed.
 /// Too large a table (or modulus one) yields `None` and callers take the
 /// per-term `modpow` path. Equality and debugging ignore the cache.
-#[derive(Default)]
-pub(crate) struct PowerTable(OnceLock<Option<Vec<BigUint>>>);
+pub(crate) struct Cached<T>(OnceLock<T>);
+pub(crate) type PowerTable = Cached<Option<Vec<BigUint>>>;
+/// `[omega^(column*t) mod modulus for t < count]` of one column, cached.
+pub(crate) type TwistTable = Cached<Vec<BigUint>>;
 
-impl Clone for PowerTable {
+impl<T> Default for Cached<T> {
+    fn default() -> Self {
+        Self(OnceLock::new())
+    }
+}
+impl<T> Clone for Cached<T> {
     fn clone(&self) -> Self {
         Self::default()
     }
 }
-impl PartialEq for PowerTable {
+impl<T> PartialEq for Cached<T> {
     fn eq(&self, _: &Self) -> bool {
         true
     }
 }
-impl Eq for PowerTable {}
-impl std::fmt::Debug for PowerTable {
+impl<T> Eq for Cached<T> {}
+impl<T> std::fmt::Debug for Cached<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("PowerTable")
+        f.write_str("Cached")
     }
 }
 
 const POWER_TABLE_LIMIT: usize = 1 << 16;
 
-impl PowerTable {
+impl Cached<Option<Vec<BigUint>>> {
     pub(crate) fn get(
         &self,
         omega: &BigUint,
@@ -92,6 +99,33 @@ impl PowerTable {
                 Some(table)
             })
             .as_deref()
+    }
+}
+
+impl Cached<Vec<BigUint>> {
+    /// One `modpow` and a running product (modulus one keeps the direct path).
+    pub(crate) fn get(
+        &self,
+        omega: &BigUint,
+        column: usize,
+        count: usize,
+        modulus: &BigUint,
+    ) -> &[BigUint] {
+        self.0.get_or_init(|| {
+            if modulus <= &BigUint::one() {
+                return (0..count)
+                    .map(|t| omega.modpow(&(BigUint::from(column) * BigUint::from(t)), modulus))
+                    .collect();
+            }
+            let step = omega.modpow(&BigUint::from(column), modulus);
+            let mut out = Vec::with_capacity(count);
+            let mut current = BigUint::one();
+            for _ in 0..count {
+                out.push(current.clone());
+                current = current * &step % modulus;
+            }
+            out
+        })
     }
 }
 
@@ -234,6 +268,7 @@ impl ValueOperation {
         values: &[BigUint],
         meter: &mut Meter,
         powers: &PowerTable,
+        self_twists: &TwistTable,
     ) -> Result<Vec<BigUint>> {
         self.validate()?;
         let (inputs, _) = self.shape();
@@ -269,13 +304,13 @@ impl ValueOperation {
                 column,
             } => {
                 let table = powers.get(omega, *second, *first, modulus);
+                let twists = self_twists.get(omega, *column, *first, modulus);
                 let mut out = Vec::with_capacity(*first);
                 for t1 in 0..*first {
                     let sum = fourier_sum(values, *first, t1, table, omega, *second, modulus, || {
                         meter.charge(1, "canonical Fourier column transform")
                     })?;
-                    let twist = BigUint::from(*column) * BigUint::from(t1);
-                    out.push(sum * omega.modpow(&twist, modulus) % modulus);
+                    out.push(sum * &twists[t1] % modulus);
                 }
                 Ok(out)
             }
@@ -319,6 +354,7 @@ pub struct PredicateProgram {
     input_words: usize,
     operation: ValueOperation,
     powers: PowerTable,
+    twists: TwistTable,
 }
 impl PredicateProgram {
     pub(crate) fn define(
@@ -351,6 +387,7 @@ impl PredicateProgram {
             input_words,
             operation,
             powers: PowerTable::default(),
+            twists: TwistTable::default(),
         };
         program.validate(port)?;
         Ok(program)
@@ -398,7 +435,7 @@ impl PredicateProgram {
         }
         let expected = self
             .operation
-            .evaluate(&values[..self.input_words], meter, &self.powers)?;
+            .evaluate(&values[..self.input_words], meter, &self.powers, &self.twists)?;
         Ok(expected == values[self.input_words..])
     }
 
@@ -450,6 +487,7 @@ impl PredicateProgram {
             input_words,
             operation,
             powers: PowerTable::default(),
+            twists: TwistTable::default(),
         })
     }
 }

@@ -1,7 +1,7 @@
 //! Linear-edge arithmetic and curve encodings from Bochum §2–3.
 
 use crate::arithmetic::inverse;
-use crate::canonical::{fourier_sum, PowerTable, PredicateProgram, ValueOperation};
+use crate::canonical::{fourier_sum, PowerTable, PredicateProgram, TwistTable, ValueOperation};
 use crate::curve::{Curve, Point};
 use crate::finite::{Domain, PrimeDomain};
 use crate::network::{
@@ -584,6 +584,7 @@ impl Encoder {
                 .collect();
             let (omega, modulus, p) = (omega.clone(), modulus.clone(), params.clone());
             let powers = column_powers.clone();
+            let twist_cache = TwistTable::default();
             let operation = ValueOperation::FourierColumn {
                 omega: omega.clone(),
                 modulus: modulus.clone(),
@@ -596,12 +597,13 @@ impl Encoder {
                 &vec![width; p.first],
                 Arc::new(move |v, work| {
                     let table = powers.get(&omega, p.second, p.first, &modulus);
+                    let twists = twist_cache.get(&omega, j2, p.first, &modulus);
                     let mut out = Vec::with_capacity(p.first);
                     for t1 in 0..p.first {
                         let sum = fourier_sum(v, p.first, t1, table, &omega, p.second, &modulus, || {
                             work.charge(1, "Fourier column transform")
                         })?;
-                        out.push(sum * omega.modpow(&BigUint::from(j2 * t1), &modulus) % &modulus);
+                        out.push(sum * &twists[t1] % &modulus);
                     }
                     Ok(out)
                 }),
