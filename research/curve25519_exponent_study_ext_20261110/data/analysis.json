@@ -395,9 +395,9 @@
      "capped": true,
      "T": null,
      "done": null,
-     "origin": "parent",
+     "origin": "ext",
      "failure": "exit -6",
-     "wall_s": null,
+     "wall_s": 5285.9,
      "first_target_x": null
     }
    ],
@@ -474,6 +474,13 @@
    "sym",
    0,
    19
+  ],
+  [
+   22,
+   3,
+   "sym",
+   0,
+   55
   ]
  ],
  "predictions": {
@@ -526,16 +533,16 @@
   },
   "P5": {
    "claim": "k22 m3 d55 censors again (memory)",
-   "outcome": "pending",
+   "outcome": "pass",
    "cell": {
     "d": 55,
     "v_size": 55,
     "capped": true,
     "T": null,
     "done": null,
-    "origin": "parent",
+    "origin": "ext",
     "failure": "exit -6",
-    "wall_s": null,
+    "wall_s": 5285.9,
     "first_target_x": null
    }
   },
@@ -559,10 +566,23 @@
      "ext_target_x": null,
      "comparable": false,
      "equal": null
+    },
+    {
+     "cell": [
+      22,
+      3,
+      "sym",
+      0,
+      55
+     ],
+     "parent_target_x": null,
+     "ext_target_x": null,
+     "comparable": false,
+     "equal": null
     }
    ],
    "outcome": "pass; d57 part not testable (not rerun); rerun cells recorded no target_x (engine aborted before the first target finished)"
   }
  },
- "all_done": false
+ "all_done": true
 }
