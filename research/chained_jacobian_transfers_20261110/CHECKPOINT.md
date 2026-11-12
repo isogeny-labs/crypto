@@ -1,3 +1,37 @@
+# Latest active resume — input closure repair
+
+RootLOCALdd03b491ad37124cfe9f384688b5ffbf0ddac237/treefcfe3afa6020f631b54d31d28962acce2d5cb8a8
+parent16c tracks the exacttestedCargo.lock. Objects published29,NO GitHubref
+CASyet;REMOTErootstill16c. Both4e/43215479664 and16c/43221639639 overall
+failedonlyalgebra missinglock;3otherjobsnative/proofs pass. Fullreceipts
+13ece5/23b8cf kept,do notpollunchangedfailedheads. [pcc:unverified]
+
+Consumerfreshbranchresearch/chained-transfer-independent-replay-20261112
+HEADc712/parent1508;13referenceRustsources/check.sh/oldpin75a unchanged.
+Newsecondpincurrentlydd03. Positive01failedmissinglock56d812/rootab6a48;
+02failedmissingbundledSchoenhageJSONinclude d11dfb/root688eaa,afterall32
+nativepassed. Algebra23/proofsNOTRUN bothattempts;do notclaimwholepass.
+Fullrawtrees tar.xz/hash/roundtrip retained. No currentnativeactive.
+[pcc:unverified]
+
+NEXT:commitrootfixtureclosure childofdd03 now (workflowSC+thirdreferencehash
+andfailure/auditcustody,allcryptographiccodeunchanged),publishBOTH sourcefix
+commits fromexpectedREMOTE16c inone nonforceCAS. Thennewown4jobCI. Update
+consumersecondpin/protocolV3tonewroothead,addJSONpath toisolatedcloneSC,
+checkoutnewhead,specificwrongHEAD+dirtyfixtureguardcontrols,fullpositive03
+all32/23/32modules with160written/actual186compiled,allsourcehashes/twocerts.
+Keep--locked/everytest/proofgate,do notdisablelibraryunit. Sourceliteral
+read audit complete:twoRustimports,twoLeanfiles,oneJSONfixture. Thenfinal
+consumerreport/packaging/readychild1508/ownfull98+independentCI. [pcc:unverified]
+
+Coremathsource32/956a3e+23/e13811/160written32modules/proof492496/report04e86b
+unchanged;onlysourcepackagingclosure repaired. Allsigning/ledger/C merge/
+budget/S3/vault/KB blockers persist. Continueaftercomponent,no subagents.
+
+---
+Prior detailed scientific checkpoint and history follow. Laterstatusabove
+supersedesoldpendingCI/publicationphrasing below.
+
 # Current checkpoint — full4-primary quotient maps and degree obstruction
 
 Continue Chained ECDLP Transfers from cryptoPR3877/queue3904 across crypto,
