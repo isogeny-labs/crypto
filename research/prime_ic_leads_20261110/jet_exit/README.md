@@ -206,7 +206,8 @@ equal to random and to `d_full`; `y₀ → 1`, `y₀y₁ → 2`.
 **refuting** the prediction of a plateau through `t = 9`; every completed cell is monotone in `W` and
 `t`. `W = 1` and `W = 2` both step every four levels, offset by two (`d_F(1, t) = 3 + ⌊t/4⌋`,
 `d_F(2, t) = 4 + ⌊(t − 2)/4⌋` on `t = 2..11`, fits to the recorded steps). Table and censoring in
-`devcheck/README.md`; the `W = 3, 4` cells at `t = 10, 11` are still running.
+`devcheck/README.md`; the `W = 3, 4` cells at `t = 10` are budget-censored lower bounds (`≥ 6`) and
+`t = 11` was not run for them (the pilot stops a ladder whose every run timed out).
 
 **Standing after 7a and 7b.** The `Z/p^k` exit now fails filter item 4 on the trivial lift (42
 cells), on the canonical lift of two CM curves (16 cells), and on the Dickson base (9 cells). The

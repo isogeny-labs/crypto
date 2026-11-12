@@ -75,8 +75,8 @@ rows `nullw{1,3,4}_m2_t9-11.jsonl` (every value `[pcc:unverified]`). Combined wi
 |--:|:--|:--|:--|:--|:--|
 | 1 | 3, 3, 4, 4, 4, 4, 5 | 5 | 5 | 5 | `t = 4`, `t = 8` |
 | 2 (= tower) | 4, 4, 4, 4, 5, 5, 5 | 5 | 6 (stage A) | 6 (stage A) | `t = 6`, `t = 10` |
-| 3 | 5, 5, 5, 5, 5, 5, 5 | 6 | ≥ 6 (draw 0 censored at `c = 6`; draw 1 running) | running | `t = 9` |
-| 4 | 5, 5, 5, 5, 5, 5, 5 | 6 / ≥ 6 (draw 0 censored) | ≥ 6 (draw 0 censored) | running | `t = 9` (one draw) |
+| 3 | 5, 5, 5, 5, 5, 5, 5 | 6 | ≥ 6 (both draws, budget-censored at `c = 6`) | not run | `t = 9` |
+| 4 | 5, 5, 5, 5, 5, 5, 5 | 6 / ≥ 6 (draw 0 budget-censored) | ≥ 6 (both draws, budget-censored) | not run | `t = 9` (one draw) |
 
 Against the predictions of §6c:
 - **`W = 1`: consistent.** It stays at 5 through `t = 11`; the prediction was a step at `t = 12` or later
@@ -91,3 +91,9 @@ offset by two levels between the two widths (`W = 1` at `t ≡ 0`, `W = 2` at `t
 `d_F(1, t) = 3 + ⌊t/4⌋` and `d_F(2, t) = 4 + ⌊(t − 2)/4⌋` on `t = 2..11`; and for `W ≥ 3` a plateau at
 5 over `t = 2..8` followed by a step at `t = 9`, which is not of the same form. These are fits to the
 recorded steps, not a law.
+
+Final (2026-11-12T05:55Z): all three jobs exited 0. The `W = 3, 4` cells at `t = 10` were stopped by the
+900 s budget during the `c = 6` closure (1,004–1,340 s wall on the shared host), so they read `≥ 6`;
+the pilot then stops a ladder whose every run timed out, so `t = 11` was not run for `W = 3, 4`. The
+readings above stand: `W = 1` consistent with its prediction, `W = 3` refuted (step at `t = 9`),
+monotone in `W` and `t` on every completed cell.
