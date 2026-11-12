@@ -37,10 +37,12 @@ included, so the IC figure is a lower bound on its total cost.
    9.8× to 42.9× the matched rho, and the ratio grows with `p`.
 4. **F3 (IC exponent).** A least-squares fit of ln(IC group operations)
    against ln p over the four sizes gives slope **1.01** (derived; four points,
-   no interval). This is the `Ω(p)` relation count of genus-2 index calculus
-   (about `p/2` degree-1 places, smoothness about 1/2, so about `p` trials).
-   Rho scales as `√r ≤ √p`. The gap widens as `p` grows: the boundary is
-   structural, not a tuning constant.
+   no interval). This is the cost of this instrument: the full degree-1
+   factor base has about `p/2` places and smoothness is about 1/2, so it needs
+   about `p` trials. It matches the usual small-genus estimate
+   `Õ(p^{2-2/g})`, whose exponent is at least 1 for `g ≥ 2`. That is a
+   limitation of this approach, not a lower bound on the problem. Rho scales
+   as `√r ≤ √p`, so the gap widens as `p` grows.
 
 ## What it does not establish
 
@@ -79,6 +81,11 @@ next section.
   stderr.
 - **F7, set-up dominance.** At these `r` (71–401), rho is dominated by fixed
   set-up (S = 34–44). The 0-GAE ratio is a loose bound.
+- **Ω(p) wording (owner review, 2026-11-12).** Earlier text, including the
+  frozen `PROTOCOL.md`, called the IC cost an `Ω(p)` relation count. It is
+  the measured cost of this instrument, consistent with the usual
+  `Õ(p^{2-2/g})` estimate, and not a lower bound on the problem.
+  `PROTOCOL.md` is left as frozen; the other documents are corrected.
 - **F13/F14, bindings.** Some bench records bind a dirty commit that does
   not contain the measured files, and no solve certificates were emitted. The
   v2 run is recorded from a clean commit.
