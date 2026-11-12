@@ -1,0 +1,13 @@
+digraph transfers {
+  graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.35",ranksep="0.4"];
+  node [shape=box,style="rounded,filled",fillcolor="#e5f2e8",fontname="DejaVu Sans",fontsize=11,margin="0.1,0.1",color="#49616c"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#49616c",style=dashed];
+  c0 [label="C0\nE0 × F0\nGamma0 / A0",fillcolor="#eef4f5"];
+  c1 [label="Cpi1\n84x⁶+77x⁴+25x²+52\nGamma24 / A24\n118 finite + 2 infinity"];
+  c2 [label="Cpi2\n93x⁶+14x⁴+85x²+72\nGamma12 / A12\n120 finite + 0 infinity"];
+  c0 -> c1 [label="(pi_E,id)\ndegree101\nwritten map"];
+  c1 -> c2 [label="(pi_E,id)\ndegree101\nwritten map"];
+  c2 -> c0 [label="third two-graph closes\nrational loop = identity",constraint=false];
+  note [shape=note,fillcolor="#fff6df",fontsize=10,label="Actual graph + model checks: full35 / f04008\nAll 623 source hashes unchanged · unsigned\nFour-graph loop closes after relative E sign\nDashed maps: global proof; whole evaluation pending"];
+  {rank=same;c1;note;}
+}

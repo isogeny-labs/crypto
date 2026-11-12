@@ -2,6 +2,8 @@
 //! All arithmetic is the existing field/poly/Kohel/elliptic/Cantor code.
 use super::*;
 use isogeny_algos::genus2;
+#[path = "partial_frobenius.rs"]
+mod partial_frobenius;
 
 #[derive(Clone, Copy, Debug)]
 struct EvenCover {

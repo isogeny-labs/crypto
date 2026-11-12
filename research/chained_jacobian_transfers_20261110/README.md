@@ -1,3 +1,17 @@
+# New component: actual partial-Frobenius gluing transfers
+
+Full35/f04008 andsixboundlocalLean177written35modulesacceptactualA24/A12,
+Cpi1/Cpi2equations/covers/graphs andallrationalfactorchecks. Writtend67ccf
+givespurelyinseparabledegree101^k/connectedkernelscheme/F101DLPpreservation
+andprovesnormalizedrationalagreementwithexistingdirectproductbridge.
+This component establishes no additionalfactorstageevaluationgainoverthat
+bridge. Mainreportpcc/claims/PCC-20261112-644ced.json: [partial Frobenius](reports/partial-frobenius/REPORT.md),
+editablefigures/recordedcounts/inspected2pagePDF;threefailedattemptsretained.
+WholeMumfordmaps are nextgenericchart/normtask forbothCpiandC10/C20.
+Consumer1509f656 exactCIbothjobsSUCCESS/f58004(root6236a7). Allscientific
+standingunsigned;newrootownCIstillrequired. [pcc:unverified]
+
+---
 # New component: two actual unbalanced-transfer models
 
 C10/C20 are constructed overF101 withoutretwist;fullnative34/925b02,

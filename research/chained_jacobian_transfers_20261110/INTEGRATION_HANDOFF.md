@@ -1,3 +1,89 @@
+# Latest completed component — partial Frobenius ready to commit
+
+RootLOCAL/REMOTEfdfe8c832bf586403537677466e3a5815db63717/tree16ba4454,own
+43254417926 next16:53UTC fixed34scope. NewUNCOMMITTEDfull35/f04008/all623
+hashesunchanged,whole89109→XZ10120;6boundLean177written35modules/0trusted.
+Written d67ccf:globalpurelyinseparable101^k/connectedkernel1geometricpoint;
+actualA24/A12/Cpi1/Cpi2;rationalrouteagreesexistingdirectbridge(noextra
+factorstagegain). Mainpcc/claims/PCC-20261112-644ced.json final49558-byte2pagePDF,failurepcc/claims/PCC-20261112-22be53.json
+37149-byte1page,consumerpcc/claims/PCC-20261112-2a1fa3.json38907-byte1page;all4pagesinspected.
+Governancepcc/claims/PCC-20261112-8fe298.jsonownprefix906/prose0/diffpass;benchrec189existinggaps106records.
+[pcc:unverified]
+
+NEXT scopedrootcommit(parentfdfe)/artifact/exactobjects/nonforcedexpectedfdfe
+CAS/ready3877+queue3904/ownpushCI. Expectedscope25/35/23/sevencerts/177written
+35modules,203compiledexpectednotobserved. No duplicate manualdispatch.
+Thennewconsumerintegrationrungchild1509f656consumesthisroot35;includeCI
+receipt/report/resolvedproblem,oldpinsstayfixed. RootgenericnonmonicChart/
+covernormadapterthenwhole12317mapsisnext. Noactiveprocess.
+
+Consumerf656CI43246121013SUCCESSbothjobs/fullf58004(root6236a7),settled.
+Original25/98+five/1oldignored+independent32/23/twocert/186compiled160written
+32modules/0trusted;wholeUTF8logs249035+110929bytes. No paidrun/benchmark/
+subagents/force/rebase/rechain/lineagechoice. Allledger/C/archive/signing/
+budget/S3/vault8edec422/KB gatespersist;continueaftercheckpoint.
+
+---
+# Current active checkpoint — partial Frobenius native/formal/written complete
+
+RootLOCAL/REMOTEfdfe8c832bf586403537677466e3a5815db63717/tree16ba4454,
+ownCI43254417926 next16:53UTC;fixed34/23/sevencerts/171written34modules.
+NewUNCOMMITTEDpartialfull35/f04008/all623hashesunchanged/whole89109→XZ10120;
+selected6bbfba1/34filtered. ActualA24/A12/Gamma24/Gamma12/thirdEnegativeclosure;
+Cpi1raw52,0,25,0,77,0,84 finite118+2infinities,Cpi2raw72,0,85,0,14,0,93 finite120+0;
+fullcovers/extensioncorners/6roots/zeta accepted,noretwist. All109+113rational
+factorpointsfixed/all12317productpairsidentityk1/k2/signedCRT6103. [pcc:unverified]
+
+SixboundlocalLean:e9174e/e19537/106caa/72739d/4b1b04/f99da7,gate02six/0trusted;
+177written35modules,203compiledexpectednotownCIobserved. Writtend67ccf
+globalpurelyinseparabledegree101^k/group-schemekernel/onegeometricpoint,
+nonuniformnorms/F101/DLP,andnegativecomparison:normalizedrationalmapagrees
+with existingdirectproductbridge(noextraidentityfactorstageadvantage).
+Two-glue3looprationalidentitybeforeoptionalEnegative;four-graphnegative
+identificationgives6103. WholeMumfordmapsnotexecuted. Noactivejob.
+[pcc:unverified]
+
+Failuresimmutable:336266static01,21c177Leanreservedpartial01,a31d7bbinding
+PATH02/e9174enot_covered;03reusesfirstclaimandpassesall6. Protocole60790
+frozen,writtend67ccf/newLeanimmutable;newnativebodiesexcept2linereg unchanged.
+NEXT reports(main+failed3),figures/PDFinspection/governance/rootcommitpublish
+parentfdfe/nonforcedCAS/ownpushCI,no manualduplicate. Then genericnonmonic
+Chart/covernormfromMumfordadapterforCpiandC10/C20whole12317maps;T20open.
+
+Consumer1509f656own43246121013SUCCESSbothjobs,fullf58004/root6236a7:
+25/98+five/1oldignored and32/23/twocert/186compiled160written32modules/0trusted.
+FullUTF8logs249035+110929→XZ30776+17424/hash/API/roundtrip;settlednorepoll.
+Problemresolvedmetadata/receipt/journalscurrentlydirty;reportthenmeaningful
+newintegrationrungaftercurrentroot35published. Old13Rust/check.sh/75a and
+independent0796pinsfixed. Root51dCIsettled2c4744. Allledger/C/archive/signing/
+budget/S3/vault8edec422/KB gatesremain;no paidrun/benchmark/subagents/force.
+
+---
+# Current active checkpoint — fdfe models published; partial Frobenius next
+
+RootLOCAL/REMOTEfdfe8c832bf586403537677466e3a5815db63717/tree16ba4454,
+parent51d/108paths/artifact/exactobjects/nonforcedCAS/refconfirmed. Portable
+publicationpcc/claims/PCC-20261112-e065c1.json;ownpushCI43254417926 initialinprogress,next16:53UTC.
+Source34native/23algebra/sevencerts/171written34modules;197compiledexpected
+notyetownCIobserved. Old51down43239467137SUCCESS/full2c4744settled.
+Consumerf656own43246121013 next16:07UTC;oldpinsunchanged. [pcc:unverified]
+
+Protocolpcc/claims/PCC-20261112-e60790.json PARTIAL_FROBENIUS_PROTOCOL.md frozenbeforecode/run;newactual
+A24/A12/three-stepclosure/CRT6103predictions UNEXECUTED. Nextnewchildadapter
+nativegraph/cover/product-rationalidentitycheck witholdbodiespreserved and
+allsourcehashes/full35 acceptance,thenfaithfulLean/writtenproof/report.
+Wholeunbalanced7/49 phaseB/primitivefourT20phaseCstayqueued. Noactivejobs.
+
+PublishedphaseA full34/925b02,algebra23/f404e3,twoboundLean1bde23/d03d51,
+written128eb1/report7ae0d2 final54768-byte2pagePDF/governance9ee593. Ownprefix
+888/prose0;benchrec189existinggaps/106unchangedrecordsNOTgreen. Earlier
+3e6bc7temporaryscratchproofretained;portablepublicationclaimabovecorrects.
+[pcc:unverified]
+
+No paidrun/solver/benchmark/subagents/force/rebase/rechain/lineagechoice.
+Budget/S3/vault8edec422/KB/mainledger/C/signing gatespersist. Continue.
+
+---
 # Latest completed component — unbalanced models ready to commit
 
 Full34/925b02+622guards,algebra23/f404e3+11guards/sevencerts/oldfivebyteidentical,
