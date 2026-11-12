@@ -33,7 +33,7 @@ fi
 [ "${DRY_RUN:-0}" = 1 ] && { echo "dry run: admitted, not launching"; exit 0; }
 # --- create the pod
 SCRIPT_B64=$(base64 -w0 "$S/e14/run_pod_r2.sh")
-payload=$(jq -n --arg name "fd-e14-r2h-$(date -u +%Y%m%dT%H%MZ)" --arg pub "${EXTRA_PUBKEY:-}" --arg b64 "$SCRIPT_B64" --arg key "$RUNPOD_API_KEY" \
+payload=$(jq -n --arg name "fd-e14-r2i-$(date -u +%Y%m%dT%H%MZ)" --arg pub "${EXTRA_PUBKEY:-}" --arg b64 "$SCRIPT_B64" --arg key "$RUNPOD_API_KEY" \
   --arg c "$SRC_COMMIT" --arg p "$PATHS_SHA256" --arg t "$TREE_SHA256" --arg tok "$OUT_TOKEN" '{
   name: $name, imageName: "runpod/base:1.0.2-ubuntu2404", cloudType: "SECURE", computeType: "CPU",
   cpuFlavorIds: ["cpu5m","cpu3m"], cpuFlavorPriority: "custom", vcpuCount: 32, containerDiskInGb: 150,
@@ -48,5 +48,5 @@ pod_id=$(echo "$resp" | jq -r '.id // empty')
 jq -n --arg id "$pod_id" --arg tok "$OUT_TOKEN" --arg sha "$script_sha" --arg bal "$bal" --arg other "$other_rate" --argjson ov "$override" \
   --arg when "$(date -u +%FT%TZ)" --argjson resp "$resp" \
   '{admitted:true, owner_override:$ov, pod_id:$id, out_token:$tok, run_pod_r2_sha256:$sha, balance_usd:$bal, other_pods_usd_per_h:$other,
-    launched_at:$when, amendment:28, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,imageName,ports})}' | tee "$R/launch.json"
+    launched_at:$when, amendment:29, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,imageName,ports})}' | tee "$R/launch.json"
 echo "pull with: $S/e14/pull_r2.sh"

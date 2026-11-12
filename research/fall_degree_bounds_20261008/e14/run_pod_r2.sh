@@ -63,9 +63,11 @@ log "source verified $SRC_COMMIT"; pack
 # --- builds
 # Amendment 28: record the CPU quota and pressure, run a short parallel probe, and bound the build
 { echo "cpu.max: $(cat /sys/fs/cgroup/cpu.max 2>/dev/null || echo n/a)"; echo "cpu.pressure: $(head -1 /proc/pressure/cpu 2>/dev/null || echo n/a)"; } >>"$OUT/host.txt"
+{ set +x; } 2>/dev/null   # Amendment 29: never trace the busy loops
 P0=$(date +%s%N); for i in $(seq 1 32); do ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ) & done; wait; P1=$(date +%s%N)
 S0=$(date +%s%N); ( n=0; while [ $n -lt 300000 ]; do n=$((n+1)); done ); S1=$(date +%s%N)
 PAR=$(awk -v p=$((P1-P0)) -v s=$((S1-S0)) 'BEGIN{ printf "%.1f", 32*s/p }')
+set -x
 log "cpu probe: effective parallelism $PAR of 32"; echo "parallelism $PAR" >>"$OUT/host.txt"; pack
 awk -v x="$PAR" 'BEGIN{ exit (x+0 < 12) ? 0 : 1 }' && finish "cpu_probe_low_$PAR"
 timeout 1500 cargo build --release --example dreg_linear_guess --example hky_par >"$OUT/build.log" 2>&1 || finish "build_failed_or_timeout"

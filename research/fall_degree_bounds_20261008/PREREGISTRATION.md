@@ -1300,3 +1300,15 @@ so the pod was pulled (`e14/pod-r2/out-r2g/`, key redacted) and deleted at 04:39
 logs the effective parallelism; below 12 of 32 the run ends with `cpu_probe_low_<value>` before any
 build, so a bad host costs minutes, not an hour. The build is bounded at 25 minutes
 (`build_failed_or_timeout`). Pod name prefix `fd-e14-r2h-`. Nothing else changes.
+
+## Amendment 29 (2026-11-12 UTC, before any draw below): the CPU probe ran under the command trace; relaunch r2i
+
+r2h (`7zs8zqc7idamg6`) verified its source at 04:41:18 UTC and started the Amendment 28 probe with
+`set -x` still active, so every iteration of the 32 busy loops was written to `trace.log`. Ten
+minutes later the loops were at about 82 % with the container at 2,672 % CPU (about 27 cores busy)
+and `cpu.max: max 100000` (no quota), so the host was healthy and the probe itself was the stall;
+its result would also have been distorted by 32 writers contending on one file. The pod was deleted at
+about 04:52 UTC (about USD 0.4); no build or gate ran; record `e14/pod-r2/launch-r2h.json`.
+
+**Change for r2i (`e14/run_pod_r2.sh`, sha256 `cd2c4679dbc5c775…`):** tracing is switched off for the probe
+and back on after it. Pod name prefix `fd-e14-r2i-`. Nothing else changes.
