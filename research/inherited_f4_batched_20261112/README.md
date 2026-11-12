@@ -138,6 +138,20 @@ Median over targets of the per-target ratio, 6 targets × 3 repeats.
   rows brought current one at a time still cost more than the bulk rewrite
   they replace.
 
+### Run 3: paired per call after the plan-builder change (protocol, stated before the run)
+
+cd4dcfb3f1 (branch-light plan builder, cached own-step plan, short-list epoch
+count, pooled arena chunks; `inherited_f4.rs` only, counts pinned by
+`batched_rewrite_counts_are_pinned`). Same launcher and cells as run 1,
+frozen binary, results in `results_run3/`, own record.
+
+Expectation: per-target `ops` of both engines identical to run 1 on every
+target (same seeds, counts pinned); 0 disagreements; wall batched/eager about
+1.06 at 14 unknowns, 1.12 at 16, at or below 1.0 from 20 up (the subagent's
+unpaired check: 1.061, 1.126, 1.001, 0.934). Falsifier: any per-target `ops`
+differing from run 1, any disagreement, or a median paired wall ratio above
+1.05 at 20 unknowns and up.
+
 ### Run 2: end to end
 
 Record `benchmarks/records/20261112T1831Z-inherited-f4-batched-e2e.json`
