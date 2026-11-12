@@ -326,7 +326,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees and literal binary S4 display disproof | Full polynomial symmetry, absolute irreducibility and arbitrary-split normalization |
-| 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius | Generic torsion rank/determinant/Weil bridges and complete p<500 census |
+| 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112. |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite controls and exhaustive F25Miller tables with actual quotient-domain bilinearity/nondegeneracy and base-restriction disproofs | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |

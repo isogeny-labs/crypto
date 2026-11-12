@@ -55,3 +55,9 @@ standing are separate. [pcc:unverified]
 cd research/three_torsion_rank_audit_20261112/lean
 lake build
 ```
+
+Local packet PCC-20261112-1c1db4 passes full replay at2026-11-12T23:28:09Z,
+producer0b4d2073, complete declarationbc2b6a00543ebea346b7104d0f7ae8b394f450e7644277c7d8c960e168630793.
+All11 formal/config source pins and artifact hashes match. Signed standing
+remains unverified. [Exact source plan](sources.json) and
+[actual verification receipt](verification.json). [pcc:unverified]
