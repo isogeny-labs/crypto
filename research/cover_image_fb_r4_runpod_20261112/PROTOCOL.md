@@ -34,3 +34,13 @@ out of memory locally. This round runs those cells on a RunPod CPU pod (memory-o
 
 No `S`, no relation-phase cost, no rho comparison, no leaderboard or `benchmarks/` row. A stage
 diagnostic of the decomposition solve, counts only.
+
+## Amendment 1 (19:22Z, before any m = 4 cell had started)
+
+- **Observed.** At 19:18Z the first (planted) system of `m3t5-none`, `m3t5-cubic` and
+  `m3t5-quart` had each hit the 3,600 s budget. Set A is therefore censored for those three maps,
+  and a censored cell enters no gate. The widths reached by the timeout (97,456 / 158,133 /
+  94,973) are not final values and are not compared.
+- **Change.** The remaining set-A work (the random targets of those three, and the `generic3` and
+  `quad` arms at t = 5) cannot change a censored cell's status, so it is stopped. Set B (m = 4,
+  t = 2 and 3) runs now, three arms at a time, unchanged otherwise (`pod_run_m4.sh`).
