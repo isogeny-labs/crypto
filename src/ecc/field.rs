@@ -4,7 +4,8 @@
 //! The modulus p must be prime for `inv()` to work correctly (Fermat's
 //! little theorem: a^(p-2) ≡ a^(-1) mod p).
 
-use crate::ct_bignum::{mont_pow_ct, MontgomeryContext, U256};
+use crate::ct_bignum::{MontgomeryContext, Uint, U256};
+use crate::ecc::mont_vt::ct_pow4;
 use crate::utils::mod_pow_ct;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -227,7 +228,8 @@ fn pow_ct_256(base: &BigUint, exp: &BigUint, m: &BigUint) -> Option<BigUint> {
             *slot = Some((m.clone(), ctx));
         }
         let ctx = &slot.as_ref()?.1;
-        Some(mont_pow_ct(&b, &e, ctx).to_biguint())
+        let r = ct_pow4(&b.0, &e.0, &ctx.n.0, ctx.n_inv_low, &ctx.r2_mod_n.0, &ctx.r_mod_n.0);
+        Some(Uint(r).to_biguint())
     })
 }
 

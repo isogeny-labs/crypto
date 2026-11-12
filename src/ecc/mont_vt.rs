@@ -282,3 +282,171 @@ impl<const N: usize> Mont<N> {
         })
     }
 }
+
+/// Constant-time Montgomery product of four-word residues: `a·b·R⁻¹ mod p`
+/// for `a, b < p`, `R = 2^256`, `n0 = -p⁻¹ mod 2^64`, in `[0, p)` — the
+/// value of [`Uint::mont_mul`](crate::ct_bignum::Uint::mont_mul) for every
+/// such input, by one interleaved (CIOS) pass instead of a full product
+/// followed by a reduction, with every loop bound fixed and the final
+/// subtraction selected by a mask (no branch and no table index depends
+/// on a value), as in `ct_bignum`.
+#[inline(always)]
+pub(crate) fn ct_mont_mul4(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4], n0: u64) -> [u64; 4] {
+    let mut t = [0u64; 4];
+    let mut t4: u64 = 0;
+    for i in 0..4 {
+        let bi = b[i] as u128;
+        let mut carry: u128 = 0;
+        for j in 0..4 {
+            let s = t[j] as u128 + a[j] as u128 * bi + carry;
+            t[j] = s as u64;
+            carry = s >> 64;
+        }
+        let s = t4 as u128 + carry;
+        t4 = s as u64;
+        let t5 = (s >> 64) as u64;
+
+        let m = t[0].wrapping_mul(n0) as u128;
+        let s = t[0] as u128 + m * p[0] as u128;
+        let mut carry = s >> 64;
+        for j in 1..4 {
+            let s = t[j] as u128 + m * p[j] as u128 + carry;
+            t[j - 1] = s as u64;
+            carry = s >> 64;
+        }
+        let s = t4 as u128 + carry;
+        t[3] = s as u64;
+        t4 = t5 + (s >> 64) as u64;
+    }
+    // t4·2^256 + t < 2p: subtract p when t4 = 1 or t >= p.
+    let mut d = [0u64; 4];
+    let mut borrow = 0u64;
+    for i in 0..4 {
+        let (v, b1) = t[i].overflowing_sub(p[i]);
+        let (v, b2) = v.overflowing_sub(borrow);
+        d[i] = v;
+        borrow = (b1 | b2) as u64;
+    }
+    let need = t4 | (borrow ^ 1);
+    let mask = 0u64.wrapping_sub(need & 1);
+    [
+        (t[0] & !mask) | (d[0] & mask),
+        (t[1] & !mask) | (d[1] & mask),
+        (t[2] & !mask) | (d[2] & mask),
+        (t[3] & !mask) | (d[3] & mask),
+    ]
+}
+
+/// `base^exp mod p` for a canonical `base < p` and a 256-bit `exp`, by the
+/// fixed 256-iteration square-and-always-multiply ladder of
+/// [`mont_pow_ct`](crate::ct_bignum::mont_pow_ct) (the product is always
+/// computed and kept or dropped by a mask) on [`ct_mont_mul4`]; `r2` is
+/// `R² mod p` and `one` is `R mod p`.  The result is the canonical power.
+pub(crate) fn ct_pow4(
+    base: &[u64; 4],
+    exp: &[u64; 4],
+    p: &[u64; 4],
+    n0: u64,
+    r2: &[u64; 4],
+    one: &[u64; 4],
+) -> [u64; 4] {
+    let base_m = ct_mont_mul4(base, r2, p, n0);
+    let mut acc = *one;
+    for i in (0..256).rev() {
+        acc = ct_mont_mul4(&acc, &acc, p, n0);
+        let prod = ct_mont_mul4(&acc, &base_m, p, n0);
+        let mask = 0u64.wrapping_sub((exp[i / 64] >> (i % 64)) & 1);
+        for k in 0..4 {
+            acc[k] = (acc[k] & !mask) | (prod[k] & mask);
+        }
+    }
+    ct_mont_mul4(&acc, &[1, 0, 0, 0], p, n0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ct_bignum::{compute_minv64, Uint, U256};
+    use num_bigint::RandBigInt;
+    use rand::{rngs::StdRng, SeedableRng};
+
+    fn moduli() -> Vec<BigUint> {
+        let two = |e: u32| BigUint::from(1u8) << e;
+        vec![
+            crate::ecc::curve::CurveParams::p256().p.clone(),
+            crate::ecc::curve::CurveParams::secp256k1().p.clone(),
+            two(256) - 189u32,
+            two(256) - 1u32,
+            two(255) + 95u32,
+            two(192) + 133u32,
+            BigUint::from(3u32),
+        ]
+    }
+
+    /// `ct_mont_mul4` is `Uint::mont_mul`, on random and edge operands.
+    #[test]
+    fn ct_mont_mul4_matches_ct_bignum() {
+        let mut rng = StdRng::seed_from_u64(0x6d75_6c34);
+        for m in moduli() {
+            let p = U256::from_biguint(&m);
+            let n0 = compute_minv64(p.0[0]);
+            let mut vals = vec![BigUint::from(0u8), BigUint::from(1u8), &m - 1u32, &m - 2u32];
+            for _ in 0..200 {
+                vals.push(rng.gen_biguint_below(&m));
+            }
+            for a in &vals {
+                for b in vals.iter().take(24) {
+                    let (ua, ub) = (U256::from_biguint(a), U256::from_biguint(b));
+                    assert_eq!(
+                        ct_mont_mul4(&ua.0, &ub.0, &p.0, n0),
+                        Uint::mont_mul(&ua, &ub, &p, n0).0,
+                        "m={m} a={a} b={b}"
+                    );
+                }
+            }
+        }
+    }
+
+    /// `ct_pow4` is `mont_pow_ct`.
+    #[test]
+    fn ct_pow4_matches_mont_pow_ct() {
+        use crate::ct_bignum::{mont_pow_ct, MontgomeryContext};
+        let mut rng = StdRng::seed_from_u64(0x706f_7734);
+        for m in moduli().into_iter().take(4) {
+            let ctx = MontgomeryContext::new(U256::from_biguint(&m)).unwrap();
+            for _ in 0..24 {
+                let b = U256::from_biguint(&rng.gen_biguint_below(&m));
+                let e = U256::from_biguint(&rng.gen_biguint(256));
+                assert_eq!(
+                    ct_pow4(&b.0, &e.0, &ctx.n.0, ctx.n_inv_low, &ctx.r2_mod_n.0, &ctx.r_mod_n.0),
+                    mont_pow_ct(&b, &e, &ctx).0
+                );
+            }
+        }
+    }
+
+    /// The generic variable-time product against `BigUint`, every width.
+    fn generic_mul_matches<const N: usize>(m: &BigUint, rng: &mut StdRng) {
+        let ctx = Mont::<N>::new(m).unwrap();
+        for _ in 0..200 {
+            let (a, b) = (rng.gen_biguint_below(m), rng.gen_biguint_below(m));
+            let (am, bm) = (ctx.enter(&a).unwrap(), ctx.enter(&b).unwrap());
+            assert_eq!(ctx.leave(&ctx.mul(&am, &bm)), (&a * &b) % m);
+            assert_eq!(ctx.leave(&ctx.add(&am, &bm)), (&a + &b) % m);
+            assert_eq!(ctx.leave(&ctx.sub(&am, &bm)), (m + &a - &b) % m);
+        }
+    }
+
+    #[test]
+    fn generic_arithmetic_matches_biguint() {
+        let mut rng = StdRng::seed_from_u64(0x6765_6e31);
+        let two = |e: u32| BigUint::from(1u8) << e;
+        generic_mul_matches::<1>(&BigUint::from(u64::MAX), &mut rng);
+        generic_mul_matches::<1>(&BigUint::from(97u32), &mut rng);
+        generic_mul_matches::<2>(&(two(128) - 159u32), &mut rng);
+        generic_mul_matches::<4>(&(two(256) - 189u32), &mut rng);
+        generic_mul_matches::<4>(&(two(200) + 235u32), &mut rng);
+        generic_mul_matches::<9>(&(two(521) - 1u32), &mut rng);
+        generic_mul_matches::<9>(&(two(576) - 3u32), &mut rng);
+    }
+}
