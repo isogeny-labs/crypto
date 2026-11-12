@@ -19,6 +19,7 @@
 //! | `inherited-f4` | the same hybrid, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) |
 //! | `inherited-f4-next` | alias of `inherited-f4` (the next kernels are its default since 2026-11-12) | word XORs (elimination, specialisation and linear elimination only) |
 //! | `inherited-f4-legacy` | `inherited-f4` with its kernels before 2026-11-12: identical rows, decisions and count (the A/B arm of the fold) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-batched` | `inherited-f4` with kept rows rewritten only when read or when the node splits: identical rows, decisions and tree, fewer counted rewrites | word XORs (elimination, specialisation and linear elimination only) |
 //! | `fes-then-inherited` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4` otherwise | word XORs (of the engine that ran) |
 //! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
@@ -474,6 +475,11 @@ enum HybridKind {
     /// `InheritedF4` with the kernels it used before 2026-11-12 (the
     /// paired A/B arm of the fold; identical rows, decisions and count).
     InheritedF4Legacy,
+    /// `InheritedF4` with the batched rewrite
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_batched_rewrite`]):
+    /// kept rows rewritten only when read or when the node splits; identical
+    /// rows, decisions and tree, fewer word XORs.
+    InheritedF4Batched,
 }
 
 /// Macaulay matrices to a fixed degree, reduced with the bit-packed
@@ -498,7 +504,8 @@ impl HybridF4 {
             HybridKind::MatrixF5 => SolverEngine::MatrixF5 { max_degree },
             HybridKind::InheritedF4
             | HybridKind::InheritedF4Next
-            | HybridKind::InheritedF4Legacy => SolverEngine::InheritedF4 { max_degree },
+            | HybridKind::InheritedF4Legacy
+            | HybridKind::InheritedF4Batched => SolverEngine::InheritedF4 { max_degree },
         }
     }
 }
@@ -524,6 +531,7 @@ impl SystemSolver for HybridF4 {
             HybridKind::InheritedF4 => "inherited-f4",
             HybridKind::InheritedF4Next => "inherited-f4-next",
             HybridKind::InheritedF4Legacy => "inherited-f4-legacy",
+            HybridKind::InheritedF4Batched => "inherited-f4-batched",
         }
     }
 
@@ -534,6 +542,7 @@ impl SystemSolver for HybridF4 {
             HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default), with the next kernels since 2026-11-12: SIMD re-reduction, fused tallies, exact fused builders, reused Four Russians tables",
             HybridKind::InheritedF4Next => "alias of inherited-f4 since the next kernels became its default (2026-11-12); kept so earlier sweeps reproduce",
             HybridKind::InheritedF4Legacy => "inherited-f4 with its kernels before 2026-11-12: identical rows, decisions and word-XOR count, slower (the A/B arm of the fold)",
+            HybridKind::InheritedF4Batched => "inherited-f4 with each kept row rewritten only when read or when the node splits (batched rewrite): identical rows, decisions and tree, fewer word XORs",
         }
         .into()
     }
@@ -585,10 +594,13 @@ impl SystemSolver for HybridF4 {
         // `inherited-f4-legacy` keeps the earlier kernels for paired A/B.
         let next = matches!(
             self.kind,
-            HybridKind::InheritedF4 | HybridKind::InheritedF4Next
+            HybridKind::InheritedF4 | HybridKind::InheritedF4Next | HybridKind::InheritedF4Batched
         );
+        let batched = matches!(self.kind, HybridKind::InheritedF4Batched);
         let (points, st) = crate::cryptanalysis::koblitz_groebner::with_next_kernels(next, || {
-            solve_boolean_system(&system.equations, system.n_vars, &opts)
+            crate::cryptanalysis::koblitz_groebner::with_batched_rewrite(batched, || {
+                solve_boolean_system(&system.equations, system.n_vars, &opts)
+            })
         });
         let ops = f4_word_ops_thread().wrapping_sub(before);
         let mut tests = 0u64;
@@ -625,7 +637,8 @@ impl SystemSolver for HybridF4 {
             op_unit: match self.kind {
                 HybridKind::InheritedF4
                 | HybridKind::InheritedF4Next
-                | HybridKind::InheritedF4Legacy => {
+                | HybridKind::InheritedF4Legacy
+                | HybridKind::InheritedF4Batched => {
                     "word XORs (elimination, specialisation and linear elimination only)"
                 }
                 _ => "word XORs (elimination only)",
@@ -1453,6 +1466,9 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(HybridF4 {
             kind: HybridKind::InheritedF4Legacy,
         }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }),
         Box::new(FesThenInherited),
         Box::new(CrossbredF2),
         Box::new(XlF2),
@@ -1567,7 +1583,19 @@ mod tests {
         }
         .solve(&sys, &Params::default(), None);
         assert_eq!(folded.1.ops, legacy.1.ops);
-        assert_eq!(set(folded.0), set(legacy.0));
+        let folded_set = set(folded.0);
+        assert_eq!(folded_set, set(legacy.0));
+        let batched = HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert!(
+            batched.1.ops <= folded.1.ops,
+            "{} > {}",
+            batched.1.ops,
+            folded.1.ops
+        );
+        assert_eq!(set(batched.0), folded_set);
     }
 
     /// Keep the historical CNF default distinct from an explicitly

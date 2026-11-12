@@ -2325,6 +2325,50 @@ pub fn with_next_kernels<T>(on: bool, f: impl FnOnce() -> T) -> T {
     f()
 }
 
+// ── Batched rewrite (`inherited-f4-batched`) ──────────────────────
+//
+// Under the inherited engine every specialisation rewrites every kept row
+// of every basis into the child's column layout at once (the eager
+// rewrite).  Between two splits a node specialises several times — the
+// split variable on entry, then each variable its tail forces — and a node
+// that is refuted or reaches a leaf never reads most of its rows at all, so
+// most of those rewrites are overwritten by the next one or never read.
+// With this per-thread switch on, a specialisation leaves its kept rows in
+// the layout they were last written in; a row is rewritten when something
+// reads it (a pivot a displaced row reduces against, a tail row, a
+// completion or closure step) and, at a split, every row still stale is
+// rewritten once, through the composition of every step since it was last
+// written, before the two children share the basis
+// (`ReducedBasis::materialise_shared`).  Each such rewrite runs the eager
+// kernel through the composed map and is charged exactly as the eager
+// rewrite charges one row.  The rows are the same polynomials in the same
+// order with the same pivots, so every reduction, tail, verdict, root and
+// tree statistic is that of the default path; only the specialisation
+// word count drops, by the rewrites no longer done.  Off by default.
+
+thread_local! {
+    static BATCHED_REWRITE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Whether the batched rewrite is switched on for this thread.
+#[inline]
+pub(crate) fn batched_rewrite() -> bool {
+    BATCHED_REWRITE.with(std::cell::Cell::get)
+}
+
+/// Run `f` with the batched rewrite switched `on` for this thread,
+/// restoring the previous setting afterwards (also on unwind).
+pub fn with_batched_rewrite<T>(on: bool, f: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            BATCHED_REWRITE.with(|c| c.set(self.0));
+        }
+    }
+    let _restore = Restore(BATCHED_REWRITE.with(|c| c.replace(on)));
+    f()
+}
+
 /// An environment switch that the next kernels read once per process and
 /// the default path reads per call, as it always has.
 fn env_is(
@@ -6683,6 +6727,28 @@ impl InheritedBases {
         });
         (Self { bases }, child.system().clone())
     }
+
+    /// Under the batched rewrite ([`with_batched_rewrite`]): bring every
+    /// basis's rows into the node's layout before the children share them,
+    /// charged in the stage unit as a specialisation's rewrite is, and its
+    /// wall time to the build phase.  Nothing to do otherwise.
+    fn materialise_for_split(&mut self) {
+        if self.bases.is_empty() || !batched_rewrite() {
+            return;
+        }
+        let started = std::time::Instant::now();
+        let mut total = InheritCost::default();
+        for b in &mut self.bases {
+            b.materialise_shared(&mut total);
+        }
+        let word_ops = total.word_ops();
+        charge_word_ops(word_ops);
+        f4_profile_add(|p| {
+            p.build_ns += started.elapsed().as_nanos();
+            p.word_ops += word_ops;
+            p.specialise_word_ops += total.specialise_word_ops;
+        });
+    }
 }
 
 /// How the solver treats the inherited bases at a node, resolved once per
@@ -8207,6 +8273,7 @@ fn solve_rec(
         }
         Some(free) => {
             stats.splits += 1;
+            bases.materialise_for_split();
             for value in [false, true] {
                 bitop_tally::word_ops((assignment.len() as u64).div_ceil(8));
                 let mut branch = assignment.clone();
@@ -9719,19 +9786,10 @@ mod tests {
         systems
     }
 
-    /// **`inherited-f4-next` is `inherited-f4`, faster.**  The next kernels
-    /// ([`with_next_kernels`]) must leave every decision and every counted
-    /// word XOR where the default kernels put them: the same roots, the same
-    /// tree (reductions, splits, propagations, refuted branches, eliminated
-    /// variables, degree reached) and the same `f4_word_ops_thread` delta, on
-    /// the determinism probe's small sparse systems (support-local roots,
-    /// linear elimination, degree drops) and on dense random quadratic
-    /// systems of the oracle's shape (12 to 16 unknowns, as many equations,
-    /// satisfiable and not; their roots reach the Four Russians kernel).
-    /// Each system is solved twice per mode on a fresh thread, cold and then
-    /// with the thread's layout caches warm, so both builder paths are pinned.
-    #[test]
-    fn next_kernels_leave_decisions_and_word_xors_unchanged() {
+    /// The 33 systems the next-kernel pinning test fixes: the word-XOR
+    /// probe's 24 sparse ones and 9 dense random quadratic systems of 12, 14
+    /// and 16 unknowns.  Shared with the batched-rewrite pinning test.
+    fn next_kernels_pin_systems() -> Vec<(Vec<F2BoolPoly>, usize)> {
         let mut systems = inherited_f4_word_xor_probe_systems();
         let mut seed = 0x0dd5_eed0_f4f4_9e37u64;
         let mut next = || {
@@ -9763,6 +9821,23 @@ mod tests {
                 .collect();
             systems.push((system, n_vars));
         }
+        systems
+    }
+
+    /// **`inherited-f4-next` is `inherited-f4`, faster.**  The next kernels
+    /// ([`with_next_kernels`]) must leave every decision and every counted
+    /// word XOR where the default kernels put them: the same roots, the same
+    /// tree (reductions, splits, propagations, refuted branches, eliminated
+    /// variables, degree reached) and the same `f4_word_ops_thread` delta, on
+    /// the determinism probe's small sparse systems (support-local roots,
+    /// linear elimination, degree drops) and on dense random quadratic
+    /// systems of the oracle's shape (12 to 16 unknowns, as many equations,
+    /// satisfiable and not; their roots reach the Four Russians kernel).
+    /// Each system is solved twice per mode on a fresh thread, cold and then
+    /// with the thread's layout caches warm, so both builder paths are pinned.
+    #[test]
+    fn next_kernels_leave_decisions_and_word_xors_unchanged() {
+        let systems = next_kernels_pin_systems();
         type Run = (Vec<Mask>, [usize; 7], u32, bool, u64);
         let solve_twice = |system: &[F2BoolPoly], n_vars: usize, on: bool| -> Vec<Run> {
             let system = system.to_vec();
@@ -9824,6 +9899,156 @@ mod tests {
             }
         }
         assert!(solved > 0 && refuted > 0, "both outcomes are pinned");
+    }
+
+    /// **`inherited-f4-batched` decides exactly as `inherited-f4`, with no
+    /// more work.**  The batched rewrite ([`with_batched_rewrite`]) leaves
+    /// every decision where the eager rewrite puts it — the same roots and
+    /// the same tree (reductions, refuted branches, propagations, splits,
+    /// eliminated variables, oversize matrices, tail enumerations, degree
+    /// reached, exhaustion) — and charges at most the eager rewrite's word
+    /// XORs, on the 33 systems of the next-kernel pinning test and on dense
+    /// random quadratic systems of 12, 14, 16 and 20 unknowns.  Each system
+    /// is solved twice per mode on a fresh thread (cold, then warm), with
+    /// the next kernels on as `inherited-f4` runs them.  Prints the
+    /// per-system ratio of the batched count to the eager one
+    /// (`--nocapture`).
+    #[test]
+    fn batched_rewrite_leaves_decisions_and_never_adds_word_xors() {
+        let mut systems = next_kernels_pin_systems();
+        let mut seed = 0xba7c_4ed0_f4f4_2026u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        for n_vars in [12usize, 14, 16, 20, 12, 14, 16, 20] {
+            let system: Vec<F2BoolPoly> = (0..n_vars)
+                .map(|_| {
+                    let mut monos = Vec::new();
+                    for i in 0..n_vars {
+                        for j in i..n_vars {
+                            if next() % 2 == 0 {
+                                monos.push(F2BoolMono::from_mask(mask_from64(
+                                    (1u64 << i) | (1u64 << j),
+                                )));
+                            }
+                        }
+                    }
+                    if next() % 2 == 0 {
+                        monos.push(F2BoolMono::from_mask(0));
+                    }
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        type Run = (Vec<Mask>, [usize; 7], u32, bool, u64, [(u64, u64); 3]);
+        let solve_twice = |system: &[F2BoolPoly], n_vars: usize, on: bool| -> Vec<Run> {
+            let system = system.to_vec();
+            std::thread::spawn(move || {
+                (0..2)
+                    .map(|_| {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let _ = crate::cryptanalysis::inherited_f4::take_rewrite_tally();
+                        let before = f4_word_ops_thread();
+                        let (mut roots, st) = with_next_kernels(true, || {
+                            with_batched_rewrite(on, || {
+                                solve_boolean_system(&system, n_vars, &opts)
+                            })
+                        });
+                        assert!(
+                            !BATCHED_REWRITE.with(std::cell::Cell::get),
+                            "the switch is restored"
+                        );
+                        let ops = f4_word_ops_thread() - before;
+                        let tally = crate::cryptanalysis::inherited_f4::take_rewrite_tally();
+                        roots.sort_unstable();
+                        (
+                            roots,
+                            [
+                                st.reductions,
+                                st.infeasible_branches,
+                                st.propagations,
+                                st.splits,
+                                st.eliminated,
+                                st.oversize,
+                                st.tail_enumerations,
+                            ],
+                            st.max_degree_built,
+                            st.exhausted,
+                            ops,
+                            tally,
+                        )
+                    })
+                    .collect()
+            })
+            .join()
+            .unwrap()
+        };
+        let (mut solved, mut refuted, mut cheaper) = (0, 0, 0);
+        let (mut old_total, mut new_total) = (0u64, 0u64);
+        let mut worst = 0.0f64;
+        for (k, (system, n_vars)) in systems.iter().enumerate() {
+            let old = solve_twice(system, *n_vars, false);
+            let new = solve_twice(system, *n_vars, true);
+            for (o, n) in old.iter().zip(&new) {
+                assert_eq!(
+                    (&o.0, o.1, o.2, o.3),
+                    (&n.0, n.1, n.2, n.3),
+                    "system {k} ({n_vars} unknowns): the batched rewrite changed a decision"
+                );
+                // Everything but the rewrites — root builds, re-reduction,
+                // tail reads, linear elimination — is the same work.
+                let rewrites = |t: &[(u64, u64); 3]| t.iter().map(|x| x.1).sum::<u64>();
+                assert_eq!(
+                    o.4 - rewrites(&o.5),
+                    n.4 - rewrites(&n.5),
+                    "system {k}: work other than the rewrites differs"
+                );
+                assert!(
+                    n.4 <= o.4,
+                    "system {k} ({n_vars} unknowns): batched {} > eager {} word XORs",
+                    n.4,
+                    o.4
+                );
+            }
+            assert_eq!(old[0].4, old[1].4, "system {k}: eager cold = warm");
+            assert_eq!(new[0].4, new[1].4, "system {k}: batched cold = warm");
+            for &point in &old[0].0 {
+                assert!(vanish_at(system, point), "system {k}: a root solves it");
+            }
+            let ratio = new[0].4 as f64 / old[0].4.max(1) as f64;
+            worst = worst.max(ratio);
+            eprintln!(
+                "batched/eager system {k:2} n={n_vars:2} splits={:3} propagations={:3}: \
+                 {} / {} = {ratio:.4}; rewrites (rows, words) bulk/single/displaced \
+                 eager {:?} batched {:?}",
+                old[0].1[3], old[0].1[2], new[0].4, old[0].4, old[0].5, new[0].5
+            );
+            old_total += old[0].4;
+            new_total += new[0].4;
+            cheaper += usize::from(new[0].4 < old[0].4);
+            if old[0].0.is_empty() {
+                refuted += 1;
+            } else {
+                solved += 1;
+            }
+        }
+        eprintln!(
+            "batched/eager over {} systems: {new_total} / {old_total} = {:.4}, \
+             worst {worst:.4}, {cheaper} cheaper",
+            systems.len(),
+            new_total as f64 / old_total as f64
+        );
+        assert!(solved > 0 && refuted > 0, "both outcomes are pinned");
+        assert!(cheaper > 0, "the batched rewrite saves work somewhere");
     }
 
     /// One configuration of the word-XOR determinism probe.  It runs in its
