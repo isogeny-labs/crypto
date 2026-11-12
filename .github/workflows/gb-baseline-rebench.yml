@@ -1,0 +1,169 @@
+name: Gröbner baseline re-benchmark
+# Re-runs every (curve, m) cell of benchmarks/gb-baseline/panel.json whenever
+# the in-house F4 / Gröbner engine code changes, compares against the
+# committed baseline, and regenerates the figures, REPORT.md and REPORT.pdf.
+#
+# - pull_request: measure, compare, publish the comparison as the job summary
+#   and an artifact (fails only if a cell's *answer* changed). Nothing is
+#   committed.
+# - push to main / manual dispatch: measure, regenerate the report, promote
+#   the new rows to the baseline, and open a refresh PR
+#   (`gb-baseline/refresh-<sha>`) with the images, report, PDF and baseline.
+#
+# The paths below mirror `python3 tools/gb_baseline.py paths`.
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/groebner_f4.rs'
+      - 'src/cryptanalysis/groebner_cache.rs'
+      - 'src/cryptanalysis/f4_*.rs'
+      - 'src/cryptanalysis/inherited_f4.rs'
+      - 'src/cryptanalysis/inherited_f4/**'
+      - 'src/cryptanalysis/pq_f4_f2.rs'
+      - 'src/cryptanalysis/pq_groebner_f2.rs'
+      - 'src/cryptanalysis/matrix_f5_f2.rs'
+      - 'src/cryptanalysis/sig_fp_tower*.rs'
+      - 'src/cryptanalysis/koblitz_groebner.rs'
+      - 'src/cryptanalysis/koblitz_groebner/**'
+      - 'src/cryptanalysis/wide_groebner.rs'
+      - 'src/cryptanalysis/gf2_elim.rs'
+      - 'src/cryptanalysis/fp_backend*.rs'
+      - 'src/cryptanalysis/semaev_*.rs'
+      - 'src/cryptanalysis/binary_semaev*.rs'
+      - 'examples/groebner_stage_bench.rs'
+      - 'examples/pkm_tower_pilot.rs'
+      - 'benchmarks/gb-baseline/panel.json'
+      - 'tools/gb_baseline.py'
+      - '.github/workflows/gb-baseline-rebench.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/cryptanalysis/groebner_f4.rs'
+      - 'src/cryptanalysis/groebner_cache.rs'
+      - 'src/cryptanalysis/f4_*.rs'
+      - 'src/cryptanalysis/inherited_f4.rs'
+      - 'src/cryptanalysis/inherited_f4/**'
+      - 'src/cryptanalysis/pq_f4_f2.rs'
+      - 'src/cryptanalysis/pq_groebner_f2.rs'
+      - 'src/cryptanalysis/matrix_f5_f2.rs'
+      - 'src/cryptanalysis/sig_fp_tower*.rs'
+      - 'src/cryptanalysis/koblitz_groebner.rs'
+      - 'src/cryptanalysis/koblitz_groebner/**'
+      - 'src/cryptanalysis/wide_groebner.rs'
+      - 'src/cryptanalysis/gf2_elim.rs'
+      - 'src/cryptanalysis/fp_backend*.rs'
+      - 'src/cryptanalysis/semaev_*.rs'
+      - 'src/cryptanalysis/binary_semaev*.rs'
+      - 'examples/groebner_stage_bench.rs'
+      - 'examples/pkm_tower_pilot.rs'
+      - 'benchmarks/gb-baseline/panel.json'
+      - 'tools/gb_baseline.py'
+      - '.github/workflows/gb-baseline-rebench.yml'
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Comma-separated curve ids (blank = whole panel)'
+        required: false
+        default: ''
+      m:
+        description: 'Comma-separated m values (blank = panel m_values)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Superseded PR runs are cancelled; main runs queue so every engine change
+  # on main gets its own refresh.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  rebench:
+    # Same runner routing as the other benchmark workflows: the EKS pool when
+    # this workflow is listed in CRYPTO_EKS(_HIGHMEM)_WORKFLOWS, else hosted.
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-highmem' || (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|gb-baseline-rebench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: gb-baseline
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet matplotlib==3.9.2
+
+      - name: Measure the panel and compare with the committed baseline
+        env:
+          ONLY: ${{ inputs.only }}
+          MS: ${{ inputs.m }}
+        run: |
+          args=(--out /tmp/gbb --report-dir /tmp/gbb/report --strict)
+          [ -n "$ONLY" ] && args+=(--only "$ONLY")
+          [ -n "$MS" ] && args+=(--m "$MS")
+          python tools/gb_baseline.py all "${args[@]}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gb-baseline-${{ github.sha }}
+          path: /tmp/gbb
+
+  refresh:
+    # Only main (or a manual run) rewrites the committed report and baseline.
+    needs: rebench
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # A PAT lets the refresh PR run its own checks; GITHUB_TOKEN works
+          # but its PRs do not trigger workflows.
+          token: ${{ secrets.GB_BASELINE_PUSH_TOKEN || github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet matplotlib==3.9.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: gb-baseline-${{ github.sha }}
+          path: /tmp/gbb
+
+      - name: Regenerate report, figures and PDF; promote baseline
+        run: |
+          python tools/gb_baseline.py render --rows /tmp/gbb/rows.jsonl --out benchmarks/gb-baseline
+          python tools/gb_baseline.py promote --rows /tmp/gbb/rows.jsonl
+          cp /tmp/gbb/compare.md benchmarks/gb-baseline/LAST_CHANGE.md
+
+      - name: Open the refresh PR
+        env:
+          GH_TOKEN: ${{ secrets.GB_BASELINE_PUSH_TOKEN || github.token }}
+        run: |
+          if git diff --quiet -- benchmarks/gb-baseline && [ -z "$(git ls-files --others --exclude-standard benchmarks/gb-baseline)" ]; then
+            echo "Report and baseline unchanged; nothing to commit."; exit 0
+          fi
+          short=${GITHUB_SHA::10}
+          branch="gb-baseline/refresh-$short"
+          git config user.name "gb-baseline-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add benchmarks/gb-baseline
+          git commit -m "gb-baseline: re-benchmark panel after $short" \
+                     -m "Automatic refresh by gb-baseline-rebench.yml (run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)."
+          git push origin "$branch"
+          {
+            echo "Automatic re-benchmark of the Gröbner baseline panel after \`$short\` changed engine code."
+            echo
+            cat benchmarks/gb-baseline/LAST_CHANGE.md
+            echo
+            echo "Regenerated: \`benchmarks/gb-baseline/{REPORT.md,REPORT.pdf,*.png,*.svg,baseline.json}\`."
+          } > /tmp/body.md
+          gh pr create --base main --head "$branch" \
+            --title "gb-baseline: re-benchmark after $short" --body-file /tmp/body.md

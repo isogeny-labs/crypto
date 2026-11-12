@@ -1,0 +1,33 @@
+{
+  "schema": "gb-baseline.panel/v1",
+  "description": "Baseline curve panel for the in-house Gröbner (F4 / F5-style) engines. Every change to the engine code re-runs every cell below (tools/gb_baseline.py, .github/workflows/gb-baseline-rebench.yml) and regenerates the figures, REPORT.md and REPORT.pdf in this directory. Edit this file to add curves or m values; the workflow also re-runs when it changes.",
+  "m_values": [2, 3, 4, 5, 6, 7, 8, 9],
+  "cell_timeout_s": 600,
+  "curves": [
+    {
+      "id": "N31",
+      "label": "Koblitz K_0/2^31 (binary, Frobenius-invariant factor base 0)",
+      "field": "binary",
+      "harness": "groebner_stage_bench",
+      "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
+      "a": 0,
+      "n": 31,
+      "factor_index": 0,
+      "targets": 4,
+      "first_target": 0
+    },
+    {
+      "id": "M31",
+      "label": "p = 2^31 - 1 (Mersenne prime), Dickson torus tower (2^t | p + 1)",
+      "field": "prime",
+      "harness": "pkm_tower_pilot",
+      "engine": "f4_tower_generic (F4 over F_p)",
+      "p": "2147483647",
+      "kind": "dickson-torus",
+      "engine_flag": "generic",
+      "t": 2,
+      "planted": 2,
+      "random": 2
+    }
+  ]
+}
