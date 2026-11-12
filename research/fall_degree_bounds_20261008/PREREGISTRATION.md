@@ -1146,3 +1146,26 @@ USD 100 cap stand.
   allowed for the 2026-11-11 oversampling run.
 
 Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.
+
+## Amendment 22 (2026-11-12 UTC, before any draw below): pod r2a failed to bootstrap; relaunch r2b with observability
+
+**What happened.** Pod `vvek50lemifzcw` (`fd-e14-r2-20261112T0205Z`, created 02:05:40 UTC) ran for
+13 minutes with the container reporting 0 % CPU and nothing listening on port 8080 (proxy 502, then
+timeouts), so its in-pod script either stopped early (most likely in `finish`, idle in the
+post-finish grace) or never started its HTTP server (if `python3` is absent from
+`runpod/base:1.0.2-ubuntu2404`; the sibling pod on the same image installs Python packages through
+`apt` as a fallback, which suggests exactly that). Its log could not be read, so the cause is **not
+established**. It computed no gate and no draw. It was deleted at 02:21:09 UTC (about USD 0.66).
+Its launch record is kept as `e14/pod-r2/launch-r2a.json`.
+
+**Changes for r2b (`e14/run_pod_r2.sh`, sha256 recorded in `launch.json`).**
+- `apt-get install python3 openssh-server …` runs **before** the HTTP server starts; the first
+  `run.log` lines ("boot: script started", "boot: apt exit=…", "boot: sshd started") are written
+  before any network-dependent step, and `pack` runs after the Rust toolchain and after the source
+  check, so a failure in any later step leaves a readable log.
+- `sshd` is started with RunPod's account `PUBLIC_KEY` (and `EXTRA_PUBKEY` if given; none given,
+  the authoring session has no SSH client) and port `22/tcp` is exposed, so the owner can inspect
+  the pod from the RunPod console if needed. Root login is key-only.
+- Pod name prefix `fd-e14-r2b-`. Nothing else changes: engines, gates, readings, predictions, the
+  USD 100 cap and Amendment 21's owner override all stand. No draw of r2a exists, so no draw is
+  retried.

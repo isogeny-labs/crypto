@@ -20,8 +20,15 @@ finish() {
   sleep 21600; delete_self; sleep infinity
 }
 ln -sfn "$OUT" "$SERVE/out"
+echo "$(date -u +%FT%TZ) boot: script started (pid $$)" >>"$OUT/run.log"
+export DEBIAN_FRONTEND=noninteractive
+# Amendment 22: python3 may be absent from the image; install it before the HTTP server starts, and
+# enable SSH (RunPod's PUBLIC_KEY plus EXTRA_PUBKEY) so the pod can be inspected if a later step fails.
+apt-get update -qq >"$OUT/apt.log" 2>&1; apt-get install -y -qq python3 openssh-server jq git build-essential pkg-config libssl-dev curl time >>"$OUT/apt.log" 2>&1
+echo "$(date -u +%FT%TZ) boot: apt exit=$? python3=$(command -v python3 || echo missing)" >>"$OUT/run.log"
 ( cd "$W/serve" && python3 -m http.server 8080 --bind 0.0.0.0 >"$OUT/http.log" 2>&1 ) &
-apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq jq git build-essential pkg-config libssl-dev curl time >/dev/null 2>&1
+mkdir -p /run/sshd ~/.ssh && chmod 700 ~/.ssh && { echo "${PUBLIC_KEY:-}"; echo "${EXTRA_PUBKEY:-}"; } | grep -v '^$' >>~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+/usr/sbin/sshd -o PermitRootLogin=prohibit-password -o PasswordAuthentication=no >>"$OUT/run.log" 2>&1 && echo "$(date -u +%FT%TZ) boot: sshd started" >>"$OUT/run.log"
 # USD 100 hard cap: deadline = min(36 h, floor(100 / costPerHr) h) from start
 COST=$(curl -sS -m 60 -H "Authorization: Bearer ${POD_CTL_KEY:-}" "https://rest.runpod.io/v1/pods/${RUNPOD_POD_ID:-x}" | jq -r '.costPerHr // empty')
 HRS=$(awk -v c="$COST" 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(100 / c); print (h < 36 ? h : 36) }')
@@ -36,7 +43,7 @@ if ! command -v cargo >/dev/null; then
   curl -sSf https://sh.rustup.rs -o "$W/rustup.sh" && sh "$W/rustup.sh" -y --profile minimal >"$OUT/rustup.log" 2>&1 || finish "rustup_failed"
   . "$HOME/.cargo/env"
 fi
-rustc --version >>"$OUT/host.txt"
+rustc --version >>"$OUT/host.txt"; log "rust ready"; pack
 # --- source: sparse partial clone of the frozen commit (Amendment 20, G-src-a/b/c)
 S=research/fall_degree_bounds_20261008
 curl -sS -m 120 -o "$W/source_paths.txt" "https://raw.githubusercontent.com/isogeny-labs/crypto/$SRC_COMMIT/$S/e13/source_paths.txt" || finish "paths_download_failed"
@@ -47,7 +54,7 @@ cd "$SRC" && git init -q . && git remote add origin https://github.com/isogeny-l
 [ "$(git rev-parse HEAD)" = "$SRC_COMMIT" ] || finish "G-src-a_failed"
 TREE=$(git ls-tree -r HEAD -- $(tr '\n' ' ' <"$W/source_paths.txt") | sha256sum | cut -d' ' -f1)
 echo "tree $TREE" >>"$OUT/run.log"; [ "$TREE" = "$TREE_SHA256" ] || finish "G-src-c_failed"
-log "source verified $SRC_COMMIT"
+log "source verified $SRC_COMMIT"; pack
 # --- builds
 cargo build --release --example dreg_linear_guess --example hky_par >"$OUT/build.log" 2>&1 || finish "build_failed"
 P=$SRC/target/release/examples/dreg_linear_guess; H=$SRC/target/release/examples/hky_par
