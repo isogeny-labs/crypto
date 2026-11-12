@@ -3166,13 +3166,25 @@ fn block_gram<W: ModWord>(
 ) -> Vec<W> {
     let mut out = vec![W::zero(); lanes * lanes];
     if let Some(lazy) = W::lazy(modulus, W::max_residue(modulus)) {
+        // One pass over the rows per `i`, four `j` lanes at a time (then
+        // singly): the same exact sums, one reduction each.
         for i in 0..lanes {
-            for j in 0..lanes {
+            let mut j = 0;
+            while j + 4 <= lanes {
+                let mut acc = LazyLanes::<W, 4>::plain(&lazy);
+                for row in 0..rows {
+                    acc.add(left[row * lanes + i], &right[row * lanes + j..]);
+                }
+                acc.finish(&mut out[i * lanes + j..i * lanes + j + 4]);
+                j += 4;
+            }
+            while j < lanes {
                 let mut acc = LazyLanes::<W, 1>::plain(&lazy);
                 for row in 0..rows {
                     acc.add(left[row * lanes + i], &right[row * lanes + j..]);
                 }
                 acc.finish(&mut out[i * lanes + j..i * lanes + j + 1]);
+                j += 1;
             }
         }
         return out;
@@ -3218,6 +3230,40 @@ fn block_axpy_small<W: ModWord>(
     subtract: bool,
     modulus: &W::Modulus,
 ) {
+    if let Some(lazy) = W::lazy(modulus, W::max_residue(modulus)) {
+        // `value_j = Σ_k small[k][j] · block[k]` as one exact sum per
+        // lane (four lanes at a time), reduced once: the chain of
+        // per-product reductions and modular adds gives the same residue.
+        let mut value = vec![W::zero(); lanes];
+        for row in 0..rows {
+            let b = &block[row * lanes..(row + 1) * lanes];
+            let mut j = 0;
+            while j + 4 <= lanes {
+                let mut acc = LazyLanes::<W, 4>::plain(&lazy);
+                for (k, &bk) in b.iter().enumerate() {
+                    acc.add(bk, &small[k * lanes + j..]);
+                }
+                acc.finish(&mut value[j..j + 4]);
+                j += 4;
+            }
+            while j < lanes {
+                let mut acc = LazyLanes::<W, 1>::plain(&lazy);
+                for (k, &bk) in b.iter().enumerate() {
+                    acc.add(bk, &small[k * lanes + j..]);
+                }
+                acc.finish(&mut value[j..j + 1]);
+                j += 1;
+            }
+            for (slot, &v) in target[row * lanes..(row + 1) * lanes].iter_mut().zip(&value) {
+                *slot = if subtract {
+                    slot.sub(v, modulus)
+                } else {
+                    slot.add(v, modulus)
+                };
+            }
+        }
+        return;
+    }
     let fixed: Vec<W::Fixed> = small.iter().map(|&s| W::fixed(s, modulus)).collect();
     for row in 0..rows {
         for j in 0..lanes {
