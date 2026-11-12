@@ -517,7 +517,7 @@ mod tests {
         let c = Genus2Curve::x5_plus_b(251, 3).unwrap();
         let order = c.jacobian_order().unwrap();
         let r = largest_cyclic_prime(order);
-        if r < 20 || (order / r) % r == 0 {
+        if r < 20 || (order / r).is_multiple_of(r) {
             return;
         }
         let x = 17 % r;
