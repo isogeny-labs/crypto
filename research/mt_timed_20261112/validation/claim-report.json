@@ -2,13 +2,14 @@
  "schema": "validator.report/v1",
  "independent": true,
  "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validator code in validation/scripts/, not the producer's",
- "validated_commit": "544f8320631c9d71b7636d0c51ae031472457cf7",
- "scope": "this one statement exactly as worded; nothing else in the study",
- "statement_judged": "On one CPU of a 4-vCPU cloud VM (Intel Xeon @ 2.10 GHz; not an isolated lab node, so the seconds are diagnostic), in this harness's implementation, 36 configurations (12 fresh prime-order Weierstrass curves of group order about 2^24, 2^28 and 2^32; T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats, every target verified: the fastest of four multi-target index-calculus variants per configuration takes 0.78-0.83x the solve-phase wall time of the fastest of ten multi-target rho runs at 2^24 (faster in all 3 cells), 0.93x at 2^28 with T = 1024, is unranked at 2^28 with T = 4096 and 16384, and takes 1.11-1.29x at 2^32 (slower in all 3 cells); it takes 1.33-1.59x the time of a paired BSGS. Measured prices: one affine addition 214-294 ns, I/M 23-31, a native operation 0.005-0.009 GAE, a hash-table lookup 0.04-0.85 GAE depending on table size.",
- "statement_sha256": "bfd7b59345a69e0d2cb9703be4fd1e0d88cdfb75f0155f473cf15d3e71fca7d3",
- "status": "fail",
- "verdict": "not endorsed as worded: every number in it recomputes from runs.json and opcost.jsonl, but 'fresh' curves is wrong (v5 curves), 'a native operation 0.005-0.009 GAE' prices two counted native operations, and the statement omits that the pre-registered selection-bias control is unranked in 3 of 9 cells (one at each end and 28 b T = 1024) and that 28 b T = 1024 is 0.98x in the validator's rerun. The proposed wording is endorsed.",
- "disposition": "insufficient_evidence",
+ "validated_commit": "fd91337ccee71167f000e4ea254b10a3692e7216",
+ "data_commit_note": "raw data, harness, protocol and analysis code are byte-identical to 544f8320631c9d71b7636d0c51ae031472457cf7, where they were validated; fd91337ccee71167f000e4ea254b10a3692e7216 changes RESULTS.md, REPORT.pdf, ratios.svg, the bench record and adds validation/",
+ "scope": "this one statement exactly as worded (the validator's proposed wording from the first issue, adopted byte for byte by the producer); nothing else in the study",
+ "statement_judged": "On one CPU of a 4-vCPU cloud VM (Intel Xeon @ 2.10 GHz; not an isolated lab node, so the seconds are diagnostic), in this harness's implementation (std HashMap with SipHash), 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, with a new seed; T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats, every target verified: the fastest of four multi-target index-calculus variants per configuration takes 0.78-0.83x the solve-phase wall time of the fastest of ten multi-target rho runs at 2^24 (faster in all 3 cells; 12 of 12 configurations below 1), 0.93x at 2^28 with T = 1024 (faster under the primary rule, but unranked under the pre-registered fixed-key control and 0.98x in the validator's rerun), is unranked at 2^28 with T = 4096 and 16384, and takes 1.11-1.29x at 2^32 (slower in all 3 cells; 12 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of the median of 4 equals their range). The pre-registered fixed-key control (0.75-1.28x) is unranked in one cell at each end (2^24 with T = 16384, 2^32 with T = 1024); an independent pinned rerun with the same keys (8 repeats) reproduces all 9 decisions at 0.77-0.84x (2^24) and 1.11-1.22x (2^32). The IC takes 1.33-1.59x the time of a paired BSGS. Measured prices (opcost microbenchmarks; lookups and native operations timed as independent-iteration loops): one affine addition 214-294 ns, I/M 23-31, a canonicalisation plus one hash of x (two counted native operations) 0.005-0.009 GAE and a step index 0.002-0.006 GAE, a std HashMap lookup 0.04-0.85 GAE at 2^10-2^24 entries.",
+ "statement_sha256": "9d7d8785bebbaefceffe3314bf2fd597e15f2b2260027f2cf979aa63ef9db037",
+ "status": "pass",
+ "disposition": "validated",
+ "verdict": "endorsed exactly as worded: every clause recomputes from runs.json, opcost.jsonl and the validator's replays and pinned rerun at fd91337cce (data unchanged since 544f832063)",
  "raw_data": [
   {
    "path": "../results/holdout/runs.json",
@@ -25,128 +26,161 @@
   }
  ],
  "supporting": {
-  "replay_certificate": "replay-certificate.json (status verified)",
-  "validator_report": "validator-report.json (status fail: headline as stated)",
+  "replay_certificate": "replay-certificate.json (status verified; unchanged)",
+  "validator_report": "validator-report.json (re-issued, see its status)",
   "results_check": "results_check.json",
-  "scalar_check": "scalar_check.json"
+  "scalar_check": "scalar_check.json",
+  "recompute": "recompute.json"
  },
  "clause_checks": [
   {
    "clause": "On one CPU of a 4-vCPU cloud VM (Intel Xeon @ 2.10 GHz; not an isolated lab node, so the seconds are diagnostic)",
    "ok": true,
-   "recomputed": "rows host: 'Intel(R) Xeon(R) Processor @ 2.10GHz', nproc 4, pin 2; taskset -c 2 in every argv; not L2"
+   "recomputed": "rows host 'Intel(R) Xeon(R) Processor @ 2.10GHz', nproc 4, taskset -c 2; not L2"
   },
   {
-   "clause": "in this harness's implementation",
+   "clause": "in this harness's implementation (std HashMap with SipHash)",
    "ok": true,
-   "recomputed": "examples/mt_fieldops.rs at a992ed6c80; binary rebuilt bit-identical"
+   "recomputed": "examples/mt_fieldops.rs (a992ed6c80) uses std::collections::HashMap with the default RandomState/SipHash; binary rebuilt bit-identical"
   },
   {
-   "clause": "12 fresh prime-order Weierstrass curves of group order about 2^24, 2^28 and 2^32",
-   "ok": false,
-   "recomputed": "valid prime-order curves (n of 24-25, 28-29, 32-33 bits) but they are the v5 instances W{24,28,32}-{0..3}, already used in v5 (seeds 41, 42): not fresh (T-F5)"
+   "clause": "the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, with a new seed",
+   "ok": true,
+   "recomputed": "W{24,28,32}-{0..3} of research/mt_fieldops_v5_20261112/instances; n bits [24, 25, 28, 29, 32, 33]; seed 43 (v5 used 41, 42)"
   },
   {
    "clause": "T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats, every target verified",
    "ok": true,
-   "recomputed": "1836 rows = 36 x 17 x 3, order re-derived; ok = targets in every row; 319,488 logs re-verified with validator EC code"
+   "recomputed": "1836 = 36 x 17 x 3 rows, order re-derived; ok = targets in every row; 319488 recovered logs re-verified with validator EC code, 0 failures"
   },
   {
-   "clause": "0.78-0.83x ... at 2^24 (faster in all 3 cells)",
+   "clause": "takes 0.78-0.83x ... at 2^24 (faster in all 3 cells; 12 of 12 configurations below 1)",
    "ok": true,
-   "recomputed": "0.7777-0.8288, faster in 3/3 under the frozen rule (recomputed exactly); reproduced in validator round 2 and pooled (0.77-0.84); but the fixed-key control and validator round 1 put 2^24 T = 16384 at unranked, and each decision is a 4-of-4 sign rule (T-F1, T-F3, T-F4) - not disclosed"
+   "recomputed": "0.7777-0.8288; faster 3/3; 12/12 below 1"
   },
   {
-   "clause": "0.93x at 2^28 with T = 1024",
+   "clause": "0.93x at 2^28 with T = 1024 (faster under the primary rule, but unranked under the pre-registered fixed-key control and 0.98x in the validator's rerun)",
    "ok": true,
-   "recomputed": "0.9319, faster under the frozen rule; not robust: fixed-key control unranked (0.975), validator rounds 1 and 2 unranked, pooled 0.980 [0.959, 0.999] - not disclosed"
+   "recomputed": "0.9319 faster; control unranked (0.975); validator pooled 0.9795"
   },
   {
    "clause": "is unranked at 2^28 with T = 4096 and 16384",
    "ok": true,
-   "recomputed": "1.053 [0.987, 1.101], 1.007 [0.954, 1.193]; reproduced"
+   "recomputed": "both unranked"
   },
   {
-   "clause": "takes 1.11-1.29x at 2^32 (slower in all 3 cells)",
+   "clause": "takes 1.11-1.29x at 2^32 (slower in all 3 cells; 12 of 12 configurations above 1)",
    "ok": true,
-   "recomputed": "1.1144-1.2885, slower in 3/3 (recomputed exactly); reproduced pooled 1.11-1.22 (slower 3/3); fixed-key control and validator round 1 unranked at T = 1024 - not disclosed"
+   "recomputed": "1.1144-1.2885; slower 3/3; 12/12 above 1"
   },
   {
-   "clause": "it takes 1.33-1.59x the time of a paired BSGS",
+   "clause": "Each cell decision is a 4-of-4 sign rule (the bootstrap interval of the median of 4 equals their range)",
+   "ok": true,
+   "recomputed": "lo == min and hi == max of the 4 configuration ratios in all 9 cells (protocol and exact bootstrap)"
+  },
+  {
+   "clause": "The pre-registered fixed-key control (0.75-1.28x) is unranked in one cell at each end (2^24 with T = 16384, 2^32 with T = 1024)",
+   "ok": true,
+   "recomputed": "0.7518-1.2843; unranked at the 2^24 and 2^32 ends: ['24/16384', '32/1024'] (the control is also unranked at all three 2^28 cells, which the statement covers for T = 1024 and which are unranked under the primary rule at T = 4096 and 16384)"
+  },
+  {
+   "clause": "an independent pinned rerun with the same keys (8 repeats) reproduces all 9 decisions at 0.77-0.84x (2^24) and 1.11-1.22x (2^32)",
+   "ok": true,
+   "recomputed": "pooled validator rounds (3 + 5 repeats, producer's keys, CPU 2): 9/9 decisions; 2^24 0.7684-0.8449; 2^32 1.1073-1.2158"
+  },
+  {
+   "clause": "The IC takes 1.33-1.59x the time of a paired BSGS",
    "ok": true,
    "recomputed": "cell medians 1.3265-1.5899"
   },
   {
    "clause": "one affine addition 214-294 ns, I/M 23-31",
    "ok": true,
-   "recomputed": "214.4-293.8 ns; 22.97-30.58; padd chain is exactly I + 2M + S per step"
+   "recomputed": "214.4-293.8 ns; 22.97-30.58"
   },
   {
-   "clause": "a native operation 0.005-0.009 GAE",
-   "ok": false,
-   "recomputed": "0.0049-0.0094 is canonicalisation + one hash of x = two counted native operations; per counted native operation 0.0025-0.0047, a step index 0.0024-0.0057 (T-F2)"
-  },
-  {
-   "clause": "a hash-table lookup 0.04-0.85 GAE depending on table size",
+   "clause": "a canonicalisation plus one hash of x (two counted native operations) 0.005-0.009 GAE and a step index 0.002-0.006 GAE",
    "ok": true,
-   "recomputed": "std HashMap (SipHash) lookup at 2^10-2^24 entries: 0.0375-0.8528; independent-probe loop"
+   "recomputed": "canon_hash/padd 0.0049-0.0094 (rhodpu's canon counts 2 native operations); step_index/padd 0.0024-0.0057"
+  },
+  {
+   "clause": "a std HashMap lookup 0.04-0.85 GAE at 2^10-2^24 entries",
+   "ok": true,
+   "recomputed": "0.0375-0.8528 over the 6 opcost runs and 8 table sizes"
   }
  ],
  "headline": [
   {
-   "name": "executions",
-   "claimed": 1836,
-   "recomputed": 1836
-  },
-  {
-   "name": "errors or unverified",
-   "claimed": 0,
-   "recomputed": 0
-  },
-  {
-   "name": "ic/rho solve 2^24 min",
+   "name": "ic/rho 2^24 min",
    "claimed": 0.78,
    "recomputed": 0.7776964862952125,
    "rel_tol": 0.0064102564112564105
   },
   {
-   "name": "ic/rho solve 2^24 max",
+   "name": "ic/rho 2^24 max",
    "claimed": 0.83,
    "recomputed": 0.8288248547988808,
    "rel_tol": 0.006024096386542169
   },
   {
-   "name": "cells faster at 2^24 (primary rule)",
-   "claimed": 3,
-   "recomputed": 3
-  },
-  {
-   "name": "ic/rho solve 2^28 T=1024",
+   "name": "ic/rho 28/1024",
    "claimed": 0.93,
    "recomputed": 0.9318617164586132,
    "rel_tol": 0.005376344087021505
   },
   {
-   "name": "cells unranked at 2^28 T=4096,16384",
-   "claimed": 2,
-   "recomputed": 2
-  },
-  {
-   "name": "ic/rho solve 2^32 min",
+   "name": "ic/rho 2^32 min",
    "claimed": 1.11,
    "recomputed": 1.1144071828980056,
    "rel_tol": 0.004504504505504505
   },
   {
-   "name": "ic/rho solve 2^32 max",
+   "name": "ic/rho 2^32 max",
    "claimed": 1.29,
    "recomputed": 1.2885020349125165,
    "rel_tol": 0.003875968993248062
   },
   {
-   "name": "cells slower at 2^32 (primary rule)",
-   "claimed": 3,
-   "recomputed": 3
+   "name": "fixed-key min",
+   "claimed": 0.75,
+   "recomputed": 0.7518252183013685,
+   "rel_tol": 0.0066666666676666675
+  },
+  {
+   "name": "fixed-key max",
+   "claimed": 1.28,
+   "recomputed": 1.2842975890130073,
+   "rel_tol": 0.003906250001
+  },
+  {
+   "name": "validator pooled 28/1024",
+   "claimed": 0.98,
+   "recomputed": 0.979529781603075,
+   "rel_tol": 0.0051020408173265315
+  },
+  {
+   "name": "validator pooled 2^24 min",
+   "claimed": 0.77,
+   "recomputed": 0.7683670572728882,
+   "rel_tol": 0.0064935064945064935
+  },
+  {
+   "name": "validator pooled 2^24 max",
+   "claimed": 0.84,
+   "recomputed": 0.8448628369148738,
+   "rel_tol": 0.005952380953380953
+  },
+  {
+   "name": "validator pooled 2^32 min",
+   "claimed": 1.11,
+   "recomputed": 1.1073011545965956,
+   "rel_tol": 0.004504504505504505
+  },
+  {
+   "name": "validator pooled 2^32 max",
+   "claimed": 1.22,
+   "recomputed": 1.2157749832986844,
+   "rel_tol": 0.0040983606567377056
   },
   {
    "name": "ic/bsgs min",
@@ -197,35 +231,131 @@
    "rel_tol": 0.05555555555655556
   },
   {
-   "name": "std lookup 2^10-2^16 GAE min",
+   "name": "step index GAE min",
+   "claimed": 0.002,
+   "recomputed": 0.002389779098624345,
+   "rel_tol": 0.250000000001
+  },
+  {
+   "name": "step index GAE max",
+   "claimed": 0.006,
+   "recomputed": 0.005671059872587701,
+   "rel_tol": 0.08333333333433333
+  },
+  {
+   "name": "std lookup GAE min",
    "claimed": 0.04,
    "recomputed": 0.03754880834448223,
    "rel_tol": 0.125000000001
   },
   {
-   "name": "std lookup 2^10-2^16 GAE max",
-   "claimed": 0.15,
-   "recomputed": 0.14790316555409377,
-   "rel_tol": 0.03333333333433333
-  },
-  {
-   "name": "std lookup 2^22-2^24 GAE min",
-   "claimed": 0.27,
-   "recomputed": 0.26836334174181536,
-   "rel_tol": 0.018518518519518516
-  },
-  {
-   "name": "std lookup 2^22-2^24 GAE max",
+   "name": "std lookup GAE max",
    "claimed": 0.85,
    "recomputed": 0.8527572072378106,
    "rel_tol": 0.005882352942176471
+  },
+  {
+   "name": "configurations below 1 at 2^24",
+   "claimed": 12,
+   "recomputed": 12
+  },
+  {
+   "name": "configurations above 1 at 2^32",
+   "claimed": 12,
+   "recomputed": 12
+  },
+  {
+   "name": "validator pooled decisions reproduced",
+   "claimed": 9,
+   "recomputed": 9
   }
  ],
  "headline_mismatches": [],
- "notes": [
-  "Every number in the statement recomputes from the raw data at its quoted precision; the failures are wording (fresh; native-operation unit) and omitted robustness information.",
-  "The proposed wording adds the 4-of-4 nature of each cell decision, the fixed-key control's unranked cells, and the validator's reproduction (pooled 8 repeats: all 9 decisions, 0.77-0.84x at 2^24, 1.11-1.22x at 2^32)."
+ "checks": {
+  "unchanged_since_first_validation": {
+   "research/mt_timed_20261112/results/holdout/runs.json": {
+    "sha256": "fec25670306811f3af5e3441e2235ab10f95e6a38d5daf1f2efec5e04aabc3c6",
+    "identical": true
+   },
+   "research/mt_timed_20261112/results/holdout/runs.jsonl": {
+    "sha256": "bdcfabf94f93c2a65f752fd00952f2abcad4cca701e26750f3c886d74ace2683",
+    "identical": true
+   },
+   "research/mt_timed_20261112/results/holdout/opcost.jsonl": {
+    "sha256": "76bdb48972eb64872e5967d655edc7f9b86b5a8b9cde228e101ddb6e82eec702",
+    "identical": true
+   },
+   "research/mt_timed_20261112/results/holdout/summary.json": {
+    "sha256": "853ea6fba67d329500c1927849dc6329e6d6862648e64ae57d8ee2c77c6aa880",
+    "identical": true
+   },
+   "research/mt_timed_20261112/results/holdout/analysis.txt": {
+    "sha256": "51c1efbc9eeda861cea323f7f72d8c5c49cea5bbddc73c6e2743f57a990cd94f",
+    "identical": true
+   },
+   "research/mt_timed_20261112/PROTOCOL.md": {
+    "sha256": "9d21825d41a79b2757207922dbb8d16ddf3e9726ad12c33af8e5bd0be04c216a",
+    "identical": true
+   },
+   "research/mt_timed_20261112/run.py": {
+    "sha256": "fef69e1b6eb32c421b126943ac782a0c3a2e70f2d40d2fc4a0ea5ade3d4de248",
+    "identical": true
+   },
+   "research/mt_timed_20261112/analyze.py": {
+    "sha256": "c83cfc1363f571b6f7c8a7b97a3aae420326efea442b8c8c74af67d2122add89",
+    "identical": true
+   },
+   "examples/mt_fieldops.rs": {
+    "sha256": "a26f880271eb1c4ddea239cdf8316524db1789378e0a0c65966f5263130f98a0",
+    "identical": true
+   }
+  },
+  "results_md_carries_statement_verbatim": true,
+  "committed_validation_evidence_identical": true,
+  "files_changed": [
+   "benchmarks/records/20261112T0422Z-mt-timed-ic-vs-rho.json",
+   "research/mt_timed_20261112/REPORT.pdf",
+   "research/mt_timed_20261112/RESULTS.md",
+   "research/mt_timed_20261112/ratios.svg",
+   "research/mt_timed_20261112/validation/VALIDATOR_REPORT.md",
+   "research/mt_timed_20261112/validation/claim-report.json",
+   "research/mt_timed_20261112/validation/price_model.json",
+   "research/mt_timed_20261112/validation/recompute.json",
+   "research/mt_timed_20261112/validation/replay-certificate.json",
+   "research/mt_timed_20261112/validation/replay_check.json",
+   "research/mt_timed_20261112/validation/results_check.json",
+   "research/mt_timed_20261112/validation/scalar_check.json",
+   "research/mt_timed_20261112/validation/scripts/claim.json",
+   "research/mt_timed_20261112/validation/scripts/compact_evidence.py",
+   "research/mt_timed_20261112/validation/scripts/ec_check.py",
+   "research/mt_timed_20261112/validation/scripts/ecv.py",
+   "research/mt_timed_20261112/validation/scripts/findings.json",
+   "research/mt_timed_20261112/validation/scripts/make_artifacts.py",
+   "research/mt_timed_20261112/validation/scripts/patch_dump.py",
+   "research/mt_timed_20261112/validation/scripts/price_model.py",
+   "research/mt_timed_20261112/validation/scripts/recompute.py",
+   "research/mt_timed_20261112/validation/scripts/replay.py",
+   "research/mt_timed_20261112/validation/scripts/results_check.py",
+   "research/mt_timed_20261112/validation/scripts/run_all.sh",
+   "research/mt_timed_20261112/validation/scripts/timing.py",
+   "research/mt_timed_20261112/validation/scripts/timing_analysis.py",
+   "research/mt_timed_20261112/validation/scripts/timing_pooled.py",
+   "research/mt_timed_20261112/validation/scripts/timing_round2.py",
+   "research/mt_timed_20261112/validation/timing_reproduction.json",
+   "research/mt_timed_20261112/validation/validator-report.json"
+  ]
+ },
+ "history": [
+  {
+   "issue": 1,
+   "commit": "544f8320631c9d71b7636d0c51ae031472457cf7",
+   "statement": "the producer's original statement (see VALIDATOR_REPORT.md)",
+   "status": "fail",
+   "sha256": "2ea2b24ed82c308d9f3f50135a953c114f5d1ffdef185b2df878f2b19576b47b"
+  }
  ],
- "proposed_wording": "On one CPU of a 4-vCPU cloud VM (Intel Xeon @ 2.10 GHz; not an isolated lab node, so the seconds are diagnostic), in this harness's implementation (std HashMap with SipHash), 36 configurations (the 12 prime-order Weierstrass curves of the v5 study, group orders about 2^24, 2^28 and 2^32, with a new seed; T = 1024/4096/16384) x 17 run keys x 3 interleaved repeats, every target verified: the fastest of four multi-target index-calculus variants per configuration takes 0.78-0.83x the solve-phase wall time of the fastest of ten multi-target rho runs at 2^24 (faster in all 3 cells; 12 of 12 configurations below 1), 0.93x at 2^28 with T = 1024 (faster under the primary rule, but unranked under the pre-registered fixed-key control and 0.98x in the validator's rerun), is unranked at 2^28 with T = 4096 and 16384, and takes 1.11-1.29x at 2^32 (slower in all 3 cells; 12 of 12 configurations above 1). Each cell decision is a 4-of-4 sign rule (the bootstrap interval of the median of 4 equals their range). The pre-registered fixed-key control (0.75-1.28x) is unranked in one cell at each end (2^24 with T = 16384, 2^32 with T = 1024); an independent pinned rerun with the same keys (8 repeats) reproduces all 9 decisions at 0.77-0.84x (2^24) and 1.11-1.22x (2^32). The IC takes 1.33-1.59x the time of a paired BSGS. Measured prices (opcost microbenchmarks; lookups and native operations timed as independent-iteration loops): one affine addition 214-294 ns, I/M 23-31, a canonicalisation plus one hash of x (two counted native operations) 0.005-0.009 GAE and a step index 0.002-0.006 GAE, a std HashMap lookup 0.04-0.85 GAE at 2^10-2^24 entries.",
- "proposed_wording_sha256": "9d7d8785bebbaefceffe3314bf2fd597e15f2b2260027f2cf979aa63ef9db037"
+ "notes": [
+  "The statement says the control is unranked 'in one cell at each end'; it is also unranked at all three 2^28 cells (stated for T = 1024; T = 4096 and 16384 are unranked under the primary rule as well), so it is unranked in 5 of 9 cells in all.",
+  "The rerun figures are the validator's (two rounds pooled; round 2 was added after round 1 and is not pre-registered); the seconds are diagnostic, on the same shared VM."
+ ]
 }

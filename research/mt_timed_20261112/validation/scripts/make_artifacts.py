@@ -127,7 +127,7 @@ report = dict(
     schema="validator.report/v1", status="fail", independent=True,
     verdict=("headline as stated NOT validated. The measurement is validated: every counter replays, every recovered log verifies, the binary rebuilds bit for bit, "
              "and every headline number recomputes exactly from runs.json under the frozen rule; the validator's pinned rerun reproduces the directions and, pooled over 8 repeats, all 9 cell decisions. "
-             "Two parts of the headline as stated are not supported by the data: the selection-bias control does not show 'the same pattern' (its decisions are unranked in 3 of 9 cells: 24 b T = 16384, 28 b T = 1024, 32 b T = 1024), "
+             "Two parts of the headline as stated are not supported by the data: the selection-bias control does not show 'the same pattern' (its decisions differ from the primary rule in 3 of 9 cells, unranked at 24 b T = 16384, 28 b T = 1024 and 32 b T = 1024; it is unranked in 5 of 9 cells overall, counting 28 b T = 4096 and 16384, which are unranked under both), "
              "and the 0.005-0.009 GAE 'native operation' price is for a canonicalisation plus a hash, two counted native operations (one is 0.002-0.005 GAE; a step index 0.002-0.006). "
              "The 28 b T = 1024 '0.93x faster' is fragile (unranked under the control and in each validator round alone; 0.98x pooled). The amended headline in accepted_results_headline is validated."),
     disposition="insufficient_evidence",
@@ -207,8 +207,8 @@ creport = dict(
     statement_judged=st_, statement_sha256=hashlib.sha256(st_.encode()).hexdigest(),
     status="fail",
     verdict=("not endorsed as worded: every number in it recomputes from runs.json and opcost.jsonl, but 'fresh' curves is wrong (v5 curves), "
-             "'a native operation 0.005-0.009 GAE' prices two counted native operations, and the statement omits that the pre-registered selection-bias control is unranked in "
-             "3 of 9 cells (one at each end and 28 b T = 1024) and that 28 b T = 1024 is 0.98x in the validator's rerun. The proposed wording is endorsed."),
+             "'a native operation 0.005-0.009 GAE' prices two counted native operations, and the statement omits that the pre-registered selection-bias control departs from the primary "
+             "decision in 3 of 9 cells (unranked at one cell at each end and at 28 b T = 1024; unranked in 5 of 9 overall) and that 28 b T = 1024 is 0.98x in the validator's rerun. The proposed wording is endorsed."),
     disposition="insufficient_evidence",
     raw_data=[dict(path="../results/holdout/runs.json", sha256=sha(runs_json)),
               dict(path="../results/holdout/opcost.jsonl", sha256=art["research/mt_timed_20261112/results/holdout/opcost.jsonl"]),

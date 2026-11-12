@@ -40,3 +40,5 @@ python3 -I $V/scripts/timing_pooled.py $W/timing.jsonl $W/timing_r2.jsonl $W/rec
 # 6. evidence and reports (scripts/findings.json and scripts/claim.json hold the validator's written judgement)
 python3 -I $V/scripts/compact_evidence.py $W $V
 python3 -I $V/scripts/make_artifacts.py $V $W/frozen/research/mt_timed_20261112 $W/nonce.txt
+# 7. re-issue after the producer's amendment commit fd91337cce (adopted wording = scripts/claim.json proposed_wording)
+python3 -I $V/scripts/reissue.py $V $REPO 4e92ffe8a92df02886a5a826e2f1b1df039aa3a75a1b6cdd7e4d90f377c6e09c 2ea2b24ed82c308d9f3f50135a953c114f5d1ffdef185b2df878f2b19576b47b

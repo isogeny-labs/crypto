@@ -3,7 +3,7 @@
 Protocol: `PROTOCOL.md` (frozen in a992ed6c80 before data). **1836 executions (36 configurations x 17 keys x 3
 interleaved repeats), 0 errors, every target of every run verified**, sequential and pinned to one CPU of the
 session host (4-vCPU cloud VM, Intel Xeon @ 2.10 GHz). Data: `results/holdout/runs.jsonl`, `opcost.jsonl`,
-`analysis.txt`, `summary.json`. Every number here is [pcc:unverified] until the claim is signed. Independent
+`analysis.txt`, `summary.json`. Every number here is [pcc:unverified] (claim PCC-20261112-ec2f3f) until the claim is signed. Independent
 validation: `validation/VALIDATOR_REPORT.md` (counters replay exactly for all 1836 executions, 319k recovered logs
 checked with independent EC code, every number recomputes, an independent pinned rerun of 8 repeats reproduces all 9
 decisions); its amendments are applied here. The configurations reuse the 12 v5 curves (not fresh) with a new seed.
@@ -37,7 +37,8 @@ control) are reported with them.
   range, so a decision is a 4-of-4 sign rule (p = 0.125 per cell). The strong evidence is at the size level: 12 of 12
   configurations below 1 at 2^24 and 12 of 12 above 1 at 2^32.
 - Selection-bias control (each side's key fixed on repeat 0, scored on repeats 1-2): 0.75-1.28x, the same direction
-  by size, but unranked in 3 of 9 cells (24 b T = 16384, 28 b T = 1024, 32 b T = 1024).
+  by size; unranked in 5 of 9 cells, and its decision differs from the main analysis in 3 (24 b T = 16384,
+  28 b T = 1024, 32 b T = 1024).
 - 28 b T = 1024 (0.93x) is fragile: unranked under the control, 0.98x [0.959, 0.999] in the validator's pooled rerun.
 - Independent reproduction (validator, same host and binary, pinned, producer's keys): 6 of 9 decisions in a
   3-repeat round, 8 of 9 in a 5-repeat round, 9 of 9 pooled (2^24 0.77-0.84x, 2^32 1.11-1.22x); per-configuration
@@ -55,8 +56,8 @@ control) are reported with them.
 - One affine addition (1 GAE): 214-294 ns. Inversion: I = 23-31 M (the section 5a band's c_I = 30 is the matching
   price; c_I = 3 and 10 are far from this implementation).
 - A canonicalisation plus one hash of x (two counted native operations) costs 0.005-0.009 GAE, so one counted native
-  operation 0.0025-0.0047 GAE; a step index 0.002-0.006 GAE; both at the loop baseline: **in practice h_native is
-  about 0**.
+  operation 0.0025-0.0047 GAE; a step index 0.002-0.006 GAE (1.05-1.38x the empty-loop baseline; canonicalisation plus hash is 1.9-3.2x it):
+  **in practice h_native is about 0**.
 - A std HashMap lookup (SipHash, the harness's table): 0.04-0.15 GAE at 2^10-2^16 entries, 0.11-0.42 at 2^18-2^20,
   0.27-0.85 at 2^22-2^24 (cache misses). A fast multiplicative hasher is 1.2-6.1x cheaper (`opcost.jsonl`). Lookups and native operations are timed
   as independent-iteration loops (independent probes; the hit/miss mix varies with table size; single loop segments
@@ -64,15 +65,16 @@ control) are reported with them.
 
 ## Answer to the v5 question (interpretation)
 
-A price model from the measured lookup prices predicts 1.14-1.22x at 2^32 (consistent with the measurement) but
+A price model from the measured lookup prices predicts 1.14-1.22x at 2^32 with the before-run prices and 1.09-1.15x
+with the after-run prices (consistent with the measurement) but
 0.85-1.02x at 2^24 against the measured 0.78-0.83x, so the model does not explain the small-group advantage fully
 (`validation/price_model.json`).
 
 v5 priced native work and hash-table operations at the same h. On this host they differ by one to two orders of
 magnitude: native work is nearly free (h_native about 0) while lookups cost h_hash about 0.05-0.85 depending on
 table size. That combination favours the distinguished-point rho, which does many native operations and few
-lookups, and it is the rho that wins in time (30 of 36 configurations), although it won only 4 of 198
-configurations in v5's counted model. At small groups the IC still wins (its tables are small and cache-resident, and its per-target work is
+lookups, and it is the rho that wins in time (30 of 36 configurations), although in v5's counted model it won
+only at h = 1 (4 of 198 configurations at I = 10 M, 27 at I = 3 M) and never at h = 0 or 0.1. At small groups the IC still wins (its tables are small and cache-resident, and its per-target work is
 lower); at 2^32 its table and trials are larger, lookups become expensive (that this is cache misses is an
 interpretation; there is no PMU on this host), and the distinguished-point rho is faster by
 11-29% [pcc:unverified]. So in this implementation on this host the multi-target IC does not beat Pollard rho at the largest size

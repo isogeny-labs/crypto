@@ -4,21 +4,51 @@ Validator: independent `validator` subagent (Opus 5.5), 2026-11-12. All validato
 `scripts/`; none of it is the producer's. Every figure below is the validator's observation or
 recomputation; none is a signed claim yet [pcc:unverified].
 
-**Disposition: headline as stated not validated (`validator-report.json` status `fail`,
-disposition `insufficient_evidence`). The measurement is validated, and so is an amended headline.**
+## Re-issue at `fd91337cce` (2026-11-12, after the producer's amendments)
+
+**Current disposition: `validated`.** `validator-report.json` and `claim-report.json` now have
+status `pass`; `replay-certificate.json` is unchanged and `verified`.
+
+- **What the producer did.** It adopted the validator's proposed claim wording byte for byte
+  (sha256 `9d7d8785…037`). RESULTS.md at `fd91337cce` carries that wording verbatim as its
+  headline.
+- **What did not change.** Raw data, harness, protocol, run.py and analyze.py are
+  byte-identical to `544f832063`. The committed `validation/` evidence is byte-identical to the
+  validator's files. So the replay, the recompute and the timing reproduction all stand.
+- **Claim re-check.** `claim-report.json` judges the adopted wording. All 15 clauses and all 27
+  headline numbers hold (`scripts/reissue.py`).
+- **Amendments** (`validator-report.json` → `amendments_check`).
+  - Applied: T-F2, T-F3/T-F4, T-F5, T-F7 and T-F14.
+  - Applied in part:
+    - **T-F1.** RESULTS says the control is "unranked in 3 of 9 cells". It is unranked in
+      5 of 9 and departs from the primary decision in 3 (24/16384, 28/1024, 32/1024). The
+      validator's first-issue verdict text had the same imprecision; it is corrected here.
+    - **T-F6.** v5's "4 of 198" holds only at I = 10 M and h = 1. At I = 3 M and h = 1 it is
+      27 of 198.
+  - Open (non-blocking): T-F13, runs.jsonl still in Git.
+  - New minor point: "both at the loop baseline" holds for the step index (1.05-1.38x the
+    baseline) but not for the canonicalisation + hash (1.9-3.2x).
+  - None of these touches the headline.
+
+The rest of this report is the first issue at `544f832063`.
+
+**First-issue disposition: headline as stated not validated** (`validator-report.json`
+status `fail`, disposition `insufficient_evidence`, sha256 `4e92ffe8…e09c`). The measurement was
+validated, and so was an amended headline.
 
 - `replay-certificate.json`: **verified**. Counters replay exactly, every sampled recovered log
   verifies with the validator's EC code, and the binary rebuilds bit for bit.
-- `validator-report.json`: **fail** for the headline as stated. Every headline number
-  recomputes exactly, but two parts of the headline are not supported:
-  - The selection-bias control does not show "the same pattern": its decisions are unranked in
-    3 of 9 cells.
+- `validator-report.json` (first issue): **fail** for the headline as stated. Every headline
+  number recomputes exactly, but two parts of the headline are not supported:
+  - The selection-bias control does not show "the same pattern". Its decisions depart from the
+    primary rule in 3 of 9 cells, which it leaves unranked (24/16384, 28/1024, 32/1024). It is
+    unranked in 5 of 9 cells overall.
   - "A native operation 0.005-0.009 GAE" is the price of two counted native operations.
 
   The 28 b T = 1024 "0.93x faster" is fragile.
-- `claim-report.json`: **fail**. The statement is not endorsed byte for byte, because of
-  "fresh" curves, the native-operation unit and the omitted robustness information. The
-  validator endorses the proposed wording in it.
+- `claim-report.json` (first issue, sha256 `2ea2b24e…b47b`): **fail**. The statement was not
+  endorsed byte for byte, because of "fresh" curves, the native-operation unit and the omitted
+  robustness information. The validator endorsed the proposed wording in it.
 
 What holds:
 
@@ -249,7 +279,7 @@ matches.
 
 | id | severity | finding |
 |---|---|---|
-| T-F1 | blocking (headline wording) | fixed-key control unranked at 24/16384, 28/1024, 32/1024; "same pattern" holds for the medians (0.75-1.28) only |
+| T-F1 | blocking (headline wording) | fixed-key control departs from the primary decision at 24/16384, 28/1024, 32/1024 (unranked there; unranked in 5 of 9 overall); "same pattern" holds for the medians (0.75-1.28) only |
 | T-F2 | blocking (claim unit) | 0.005-0.009 GAE is canonicalisation + hash = 2 counted native ops; one is 0.0025-0.0047, a step index 0.0024-0.0057 |
 | T-F3 | disclosure | rerun: 6/9 decisions (round 1), 8/9 (round 2), 9/9 pooled; 28/1024 0.98 not 0.93 |
 | T-F4 | disclosure | n = 4 bootstrap interval = range; each decision is 4-of-4; size level 12/12 is the strong evidence |
