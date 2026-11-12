@@ -19,7 +19,7 @@ wall times are secondary and are "local, unisolated, [pcc:unverified]"
 | 5 | `3e78c74f8b` | hashed-ecdl-tensor: Fourier column/row ops use a table of `(omega^stride)^k` and one final reduction instead of a `modpow` per term | seeded solve+replay, tiny curve (4 runs) | 63,154,038,992 -> 26,710,398,826 |
 | 6 | `23b34dd160` | hashed-ecdl-tensor: cache the Fourier column twist powers | same | 26,710,398,826 -> 19,963,503,739 |
 | 7 | `e139a09155` | hashed-ecdl-tensor: validate a `PredicateProgram` once per arity, drop the redundant operation re-validation, share identical power tables process-wide (16 tables / 2^18 elements cap) | same | 19,963,503,739 -> 15,502,157,419 |
-| 8 | (this branch tip before the note) | hashed-ecdl-tensor: reuse port/input scratch vectors in `Network::evaluate` / `Program::evaluate` | same | 15,502,157,419 -> 14,018,268,371 |
+| 8 | `bccf3476de` | hashed-ecdl-tensor: reuse port/input scratch vectors in `Network::evaluate` / `Program::evaluate` | same | 15,502,157,419 -> 14,018,268,371 |
 
 Cumulative: `ecdldemo` 3.47 G -> 1.68 G Ir (-51.6%); hashed-ecdl-tensor
 identity run 63.15 G -> 14.02 G Ir (-77.8%).
