@@ -1,6 +1,6 @@
 # Chained ECDLP transfers — persistent queue
 
-Owner: autonomous research session, starting from PR #3877. Updated 2026-11-11 after CT22 direct norms; historical interruption is resolved at custody/access scope.
+Owner: autonomous research session, starting from PR #3877. Updated 2026-11-12 after CT25 publication and odd coefficient descent; historical interruption is resolved at custody/access scope.
 This is the canonical queue; completed entries stay here. Results require their
 own evidence and PCC standing; a checked box is not a verification verdict.
 
@@ -8,7 +8,7 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 |---|---|---|---|
 | CT01 | implemented; unsigned local tests | Native whole-fiber pullback and both source norms, with exceptional support. | `native/`, all 102 elliptic inputs and 10404 rational classes. Original receipt retained. |
 | CT02 | thirteen replay PRs merged; latest elliptic7 replay CI passes; unsigned | Compare arbitrary rational class arithmetic with pre-existing implementations. | PR1469/1471/1473/1474/1475/1476/1477/1478/1479/1480/1481/1482 merged; latest29c4d7206. Consumer ef9a54259/PR1483 exact-head43038507853 passes native25/reference51 unit+two integrations,one old benchmark ignored. PR1483 merged52fe5eba0 after required checks/CodeQL completion;DNS infrastructure failures retained. Existing independent flat-Fp6 and separate branch/Montgomery oracles retained. |
-| CT03 | 109 written helper lemmas;global geometry partial | Formalize multihop kernel criteria,model identities and descent boundaries. | Eight SevenJacobian/six ChainTransport/four RichelotDescent helpers gate/localbindings pass,PCCb320bb/7409b3/f4ced8. New oddsign witness/quarter inverses support actualdescent. Seven new DirectNorms cleared algebra helpers pass gate/local bindings,PCC8eaf58. Six ClosedFibres elimination helpers also pass gate/localbindings,a97f41. Six CyclicFortyNine finite-ring certificates pass82b8fb. Source census109;finitefields/Picard/regularquotient/polarization/Torelli/ellipticuniqueness remain written. Frozen identity-source pointers unchanged;all standing unsigned. |
+| CT03 | 131 written helper lemmas;global geometry partial;unsigned | Formalize multihop kernel criteria,model identities and descent boundaries. | Previous109 plus5TwoHopTransport/7SuccessorNorms/4KernelChart/6OddFieldDescent. Six odd-module statements individually bound/localpass;three generated equations excluded. Current22named modules;actual finitefields/Picard/quotient/polarization/Torelli/Galois descent remain written. ODD_FIELD_DESCENT_PROOF.md/6b3ff6 and report3c19e0 retain exact hypotheses. |
 | CT04 | complete fixed-fixture map; target equivalence found; unsigned | Explicit genuine Jacobian-to-Jacobian hop, kernel, dual and nonzero subgroup transport. | All10404 classes, kernel4/image2601, both dual norms[2]. C2 is isomorphic to C: this is an endomorphism after model identification (PCC-a282a9), not a new destination. |
 | CT05 | blocked: checkpoint + budget visibility | Freeze controlled native source/destination/chain DLP comparisons including construction, transport, solver, recovery and verification. | Restore S3 checkpoint access and establish live IsoLab budget/capacity; use EKS skill before launch. Local unit tests are development work, not benchmarks. |
 | CT06 | partially blocked | Reconcile cross-repository prior art and update the lead atlas without duplicating closed leads. | `crypto-autoresearcher` at `8edec422a60d87b2cbc656fb02f99f42eba959c7` is vault locked; no KEY binding. KB MCP/CLI unavailable. Preserve an integration handoff here; never store plaintext there. |
@@ -36,9 +36,11 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 | CT21 | actual transported Psi;fixed-head retry CI succeeds;unsigned | Continue the accepted target through the actual odd kernel and Richelot transport. | SEVEN_CHAIN_CHECKPOINT.md/PROOF.md;all full geometric/rational/source controls retained. Fixed7c1 retry43113992769 succeeds25/65+three,consumer984027. Initial43097723254 startup_failure/4baafc remains immutable. Ready1488 against1484;frozen-ledger fork blocks bottom-up integration. |
 | CT22 | integrated and complete local checks; unsigned | Direct base-field norms with all exceptional balanced support. | DIRECT_NORMS_CHECKPOINT.md/PROOF.md; both norms agree with generic maps on all12317 C0/C1 classes. Integrated guard06 passes25native/66reference unit+three integrations,one old ignored; all Phi/Psi/source controls and full generic/direct Phi comparisons pass. ConsumerPCCb6af61/3f2084,rootc23653/8eaf58;97 helpers. No measured cost claim. |
 | CT23 | complete/ready1493/exact CI succeeds;unsigned | Closed Richelot fibres and actual geometric Psi kernel. | CLOSED_FIBRES_CHECKPOINT.md/PROOF.md;four full12317 domains,actual49-class TSV/2401 sums/Frobenius/dualR0,explicit geometric boundaries. Fullguard25/70+three,1f1423/9f98fd. Exact5d5 focused43114643386 succeeds25/70+three,3c9865;independent flat validity/Frobenius replay retained. |
-| CT24 | complete local acceptance,published1494;unsigned | Two consecutive nondual Jacobian seven-transfers overF101. | SUCCESSOR_CHECKPOINT.md/SUCCESSOR_CHAIN_PROOF_V2.md;43a8e80ea ready1494 against1493. Complete25native/80reference unit+five integrations,one old ignored,5383d3/root13bdd9. Both Phi2/R2/Psi2 domains/all109/113 source/geometric controls;reverse196,Fp42 composite kernel. Exact43a focused43125719626 initiallyrunning,next01:04. |
+| CT24 | complete local acceptance,published1494;unsigned | Two consecutive nondual Jacobian seven-transfers overF101. | SUCCESSOR_CHECKPOINT.md/SUCCESSOR_CHAIN_PROOF_V2.md;43a8e80ea ready1494 against1493. Complete25native/80reference unit+five integrations,one old ignored,5383d3/root13bdd9. Both Phi2/R2/Psi2 domains/all109/113 source/geometric controls;reverse196,Fp42 composite kernel. Exact43a focused43125719626 succeeds25/80+five,complete consumer archived942e6;gatepass/signskip,parent head fixed. |
 | CT24a | second existing Cantor replay complete within fixed49-class scope;unsigned | Independently check both exported kernel groups beyond validity/Frobenius. | INDEPENDENT_GROUP_REPLAY_V2.md/40a568;existing generic engine,thin FpR/chart adapter,all2401 sums each/7-annihilators/inverses,full8/strictClippy03 pass9ebcf7. Exact alias-only/source guards;initial02 failure preserved. Four partial KernelChart plus7 C2 helpers bring written census125,1fa370;no independent map-kernel membership/whole-class claim. Inspected two-page report. |
-| CT25 | C2 all-class norms/integrated Phi2 pass;Psi2 full generic graphs running | Direct C2 endpoint norms with genuine generic references and all exceptions. | CT25_PLAN.md;child research/chained-transfer-successor-norms-20261112 starts43a. Factory01 ALL12317/exception controls pass0355ab/562797;Phi2 full generic graphs/source/geometry/strictClippy02 pass. Psi2 generic/source03 runs99781;then exact C2 proof/full changed guard/report/ready child against1494. No cost claim. |
+| CT25 | complete local acceptance,published1496;ownCI running;unsigned | Direct C2 endpoint norms with genuine generic references and all exceptions. | Consumer65aabe348/ready1496 against1494;FULL guard04 passes25native/81reference+five,one old ignored,consumer03b76b/root714b32. Both norms/all12317/exception controls and all forward/dual Phi2/Psi2 generic graphs pass. Written95693e/consumer7fb16a,inspectedPDF238524. Own exact65a focused43136703928 initiallyrunning,next02:37. No measured cost claim. |
+| CT25a | written global argument/partialLean/even-degree negative control complete locally;unsigned | Explain actual F101 descent using odd coefficient degree,without rational sign witnesses. | ODD_FIELD_DESCENT_PROOF.md/6b3ff6,6written conditional module/ring lemmas and9standalone tests/strictClippyb33222. Stable kernels+targetAut±1+F101³ imply fixed Hom sign. Even-degree twist109/95/all109² additions cd2506 preserves why oddness matters. Old proofs unchanged;new rootCI separate. |
+| CT26 | candidate canonical-root control passes,whole guard running | Avoid unused eager reference-table construction and preserve canonical queried roots. | CT26_PLAN.md;fresh child research/chained-transfer-root-cache-20261112 from65a. stdOnceLock/coordinate-axis candidates;original exhaustive builder retained as reference. StrictClippy/every-discriminant17/101 control01 pass consumer3f015c,exact3sources01 frozen. Whole guard02 runs27663 at scratch/ct26-complete-02.txt with allsix full closed/pointwise graphs/separate instances/cache controls. Full acceptance/report/readychild pending;no timing claim. |
 
 ## Session constraints
 
@@ -53,15 +55,15 @@ own evidence and PCC standing; a checked box is not a verification verdict.
 
 ## Immediate resume
 
-Read .resume/RESUME.md and SUCCESSOR_CHECKPOINT.md. CT24 is43a/ready1494,
-complete25/80+five guard15/5383d3/root13bdd9;exactCI43125719626 initially
-running,next01:04. New consumer C2 child starts43a,factory all12317 and
-integrated Phi2 graphs pass;Psi2 generic/source03 runs99781 at
-/workspace/scratch/ct25-psi2-03.txt. Preserve exact source02;finish actual
-fullgraphs,proof/fullguard/report/ready child against1494. Separate existing
-Cantor replay8/strictClippy03 and125 partial source census are checkpointed;
-no independent map-membership claim. Root new headCI separate;oldECF00:43,
-1488quiet04:22,1493next00:26,1490quiet03:29/1484quiet01:09. Frozen forks,
-admission/livebudget/KB/ecdb/lockedvault00:10 remain. No solver/benchmark/
-paidjob,force/rebase/rechain/historychoice or canonicalgraph promotion.
+Read the current top section of .resume/RESUME.md and SUCCESSOR_CHECKPOINT.md.
+CT25 is65a/ready1496,complete25/81+five guard04/03b76b/root714b32;ownCI
+43136703928 initiallyrunning,next02:37. Parent1494/root1e4 CI both succeed
+with full archived exact-head scope. Fresh CT26 child has candidate edits,
+strictClippy/every-discriminant control01 pass3f015c;stable-source whole
+guard02 runs27663. Inspect actual completion before full acceptance.
+Odd coefficient-descent proof6b3ff6/even-degree controlcd2506/6partialLean
+lemmas/131source census/9standalone tests and inspected report3c19e0 are
+checkpointed. Preserve old proofs,all original/generic/naive controls and
+frozen ledger forks. No repeated unchanged completed matrix,solver,
+benchmark,paidjob,force/rebase/rechain or canonicalgraph promotion.
 [pcc:unverified]

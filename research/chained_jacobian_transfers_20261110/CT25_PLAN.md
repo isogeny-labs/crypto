@@ -1,14 +1,28 @@
+# CT25 current acceptance — published ready1496
+
+Exact consumer65aabe34879630ad4d973021fb21307e1d856dc1 passes complete
+changed guard04:25native/81reference unit+five integrations,one old ignored,
+all guards/fmt/strictClippy. Complete C2 norms and Phi2/Psi2 generic graphs,
+source/exception/geometric controls pass,consumer03b76b/root714b32. Exact
+sources/archive/hash/roundtrip and inspected report238524 are durable.
+Written SUCCESSOR_NORMS_PROOF.md/95693e is identical to consumer7fb16a.
+OwnCI43136703928 starts65a,next~02:37;standing unsigned,formalization
+partial,no measured stage/pipeline/ECDLP advantage. Next CT26_PLAN.md.
+[pcc:unverified]
+
+# Original prospective protocol below
+
 # CT25 — direct successor endpoint norms before performance claims
 
 Prospective correctness work after CT24 final publication. No C2 direct-norm
-runtime acceptance or speed claim is made here.
+runtime acceptance or speed claim is made here. [pcc:unverified]
 
 CT24 retains generic divisor norms on C2 while C0/C1 use the proved direct
 prime-field formulas. Can the exact C2 endpoint use those formulas on every
 balanced class,with all exceptions and actual chart/scaling identities?
 Frozen CT24 source15/full guard will be the implementation baseline.
 A measured cost baseline does not exist;S3 admission/livebudget still block
-performance experiments.
+performance experiments. [pcc:unverified]
 
 1. After publishing CT24,create its child branch. Keep the C0/C1 constructor
    whitelist/negative controls unchanged. Add an explicit C2 factory using
@@ -31,7 +45,7 @@ performance experiments.
 Predicted outcome:formula equality should hold because C2 has the same
 proved even split-infinity cover form. A mismatch falsifies integration
 until its exceptional/model/chart cause is resolved;generic endpoint remains.
-This is bounded local correctness,not a benchmark or paid job.
+This is bounded local correctness,not a benchmark or paid job. [pcc:unverified]
 
 After admission/current budget return,publish a frozen matched protocol
 before timing. Compare CT24/CT25 on identical arbitrary valid inputs,cold
@@ -40,6 +54,7 @@ transferred-DLP solver must also be compared with the frozen current
 index-calculus baseline and matched Pollard rho,including setup/conversion/
 recovery. A norm-stage gain alone establishes no pipeline/ECDLP advantage.
 No timing is authorized by this plan while existing gates are unavailable.
+[pcc:unverified]
 
 Independent whole-Jacobian addition replay,large-prime/catalog support,
 full geometric Lean and vault/ledger integration remain open. Do not replace

@@ -1,3 +1,72 @@
+# Current 2026-11-12 01:51 UTC — CT25 published; odd coefficient descent
+
+Consumer CT25 is65aabe34879630ad4d973021fb21307e1d856dc1/treeb9a7279bdf5039a86b109c5d437aa96a4e87361b,
+ready1496 against immediate1494 at43a8e80ea4d01c564499e678751f44c51dae5243.
+FULL guard04 passes25native/81reference unit+five integrations,one old
+ignored benchmark,all guards/fmt/strictClippy,consumer03b76b/root714b32.
+Both C2 norms/all12317 classes and every forward/dual Phi2/Psi2 generic
+comparison pass;all prior/source109/113/naive/geometric controls remain.
+Exact three source04 snapshots/full96421-byte raw→xz11612/hash/roundtrip
+are frozen. Written specialization95693e/consumer7fb16a and inspected
+2-page report238524 retain all exceptions and partial formalization.
+Own focused43136703928 initiallyrunning,next~02:37. Do not move65a or
+repeat its completed unchanged full matrix. Scientific standing unsigned.
+[pcc:unverified]
+
+CT24 parent1494 exact43a CI43125719626 succeeds25/80+five,gatepasses/
+signskips,complete consumer archived942e6;its body now records this success.
+Root published1e4f8e795f770ea39320ab694623cafe8b7563ad exact focused
+43128425128 succeeds25native/21named Lean modules/125written declarations/
+standalone8;full logs/APIa10b74. Oldecf focused43123069073 succeeds25/
+19modules/standalone6,796e7e. Neither covers later changes. [pcc:unverified]
+
+New ODD_FIELD_DESCENT_PROOF.md/6b3ff6 gives an alternative global F101
+argument for actual R0/R1/R2:stable scheme kernel,target polarizedAut±1,
+coefficientsF101³ and torsion-free Hom rule out the negative Galois sign.
+Keep old odd-witness proofs/tests. Even-degree quadratic-twist counterexample
+E(1,46)order109→(4,65)order95 checks all109² sums/108 nonrational negative
+Frobenius images,cd2506. Six separately bound OddFieldDescent lemmas
+localpass;source census131 excludes3generated iterate equations. Complete
+standalone9/strictClippy02 passb33222. New diagram/inspected2-page PDF3c19e0;
+workflow now22named modules/9tests. Geometry remains written/partial;new
+root head requires its own CI. No measured computational advantage.
+[pcc:unverified]
+
+Fresh consumer child research/chained-transfer-root-cache-20261112 starts65a.
+CT26_PLAN.md predicts a lazy,axis-restricted reference root table preserves
+canonical roots. Source audit325922 retains the lower-degree no-op candidate.
+Candidate source edits exist in nonsplit_map.rs/seven_chain.rs/
+seven_successor_chain.rs;strictClippy01 and every-discriminant native
+control01 pass consumer3f015c. Exact three source01 snapshots/hashmanifest
+are frozen. Full changed guard02 runs27663 at
+/workspace/scratch/ct26-complete-02.txt since01:52. No full-graph result
+accepted yet;inspect actual completion,hash-check unchanged sources,then
+archive/report/PCC/readychild against1496. Separate production/reference
+instances enforce no-cache controls on allsix full domains. Original exhaustive p² builder is a test
+reference. No new arithmetic engine,benchmark or solver.
+
+Vault00:10 locked/clean,180714tracked,8edec422a;fresh00:28 fingerprint
+confirms KEY unavailable without printing it. KB/ecdb/S3/livebudget remain
+unavailable. Frozen root/consumer ledgers and unchanged rootarchive-clock/
+parent1484 C failures remain;no rechain/rebase/force/lineage selection.
+Parent1484 check01:11 unchanged conflict/failures,nextquiet05:11;1490quiet
+03:29,1488quiet04:22,1493quiet04:26. No feature-base auto-merge;integrate
+bottom-up only after actual gates,retarget/rerun after each parent lands.
+Continue unblocked work;independent map/kernel membership,whole arbitrary-
+class second engine,larger prime/catalog support and full geometric Lean
+remain open. No canonical atlas/graph promotion while locked/unsigned.
+[pcc:unverified]
+
+Broader root verify-all03 remains running26259. Its frozen PARTIAL prefix
+94583f has304 records:187fail/109not_covered/8localpass,all failing proof
+reasons missing historical subjects/projects in this sparse checkout.
+Examples are already tracked at1e4;this is not a blanket project/PCC pass.
+The six new theorem local verdicts are separately pinned b33222. Preserve
+final output when complete;do not rerun the unchanged broad audit.
+[pcc:unverified]
+
+# Historical checkpoints below — current section above supersedes status
+
 # CT24 current — published43a/ready1494, complete guard15 passes
 
 Consumer43a8e80ea4d01c564499e678751f44c51dae5243/tree45203707fffa24911113aad9610c4fe4854b899e

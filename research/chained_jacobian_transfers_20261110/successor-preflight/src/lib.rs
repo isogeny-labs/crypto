@@ -3,6 +3,8 @@
 #[cfg(test)]
 mod kernel_replay;
 #[cfg(test)]
+mod odd_descent;
+#[cfg(test)]
 #[path = "seven-reference.rs"]
 mod seven;
 #[cfg(test)]

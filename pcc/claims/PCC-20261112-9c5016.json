@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T01:04:42Z",
+ "id": "PCC-20261112-9c5016",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e4f8e795f770ea39320ab694623cafe8b7563ad",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "eed07330b0ea0dcba22785439bbe1f544584cbf961a881c1f268d10bd8517ed7",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/OddFieldDescent.lean",
+   "theorem": "OddFieldDescent.iterate_odd_negative"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Formal conditional algebra only;actual finite fields,Galois action,Hom groups and geometric descent remain written bridges.",
+ "statement": "theorem iterate_odd_negative {H : Type} [IntModule H] (f : H \u2192 H) (a : H) (hneg : \u2200 x, f (-x) = -f x) (ha : f a = -a) (n : Nat) : iterate f (2*n+1) a = -a"
+}

@@ -7,7 +7,7 @@
   [consumer PR #1484](https://github.com/isogeny-labs/cryptanalysis/pull/1484),
   [CT05–CT07](../research/chained_jacobian_transfers_20261110/QUEUE.md)
 - **Next action owner:** continuing research session; ledger policy reconciliation requires the repository's accepted procedure
-- **Last updated:** 2026-11-11
+- **Last updated:** 2026-11-12
 
 ## Problem
 
@@ -50,6 +50,17 @@ also has a PCC ledger fork relative to current main. [pcc:unverified]
   targetwalk records.jsonl; two require absent container time-namespace
   metadata. Raw failure and targeted reruns are retained in the study evidence.
   The full run remains failed; no raw archive or kernel metadata was fabricated.
+  [pcc:unverified]
+- **Observed sparse-workspace PCC gap:** the broad local verify-all03
+  partial snapshot/PCC94583f has304 records with187 missing-subject/project
+  failures,109not_covered and8localpass. Every failed proof reason in that
+  prefix is a missing historical file/project;examples are tracked in1e4
+  but omitted by the current sparse profile. The process remains running,
+  so these are partial totals. The new odd-descent theorem statements have
+  separately frozen local pass verdicts in b33222. Neither a scoped pass
+  nor this diagnostic supplies signed standing or a global PCC pass.
+  Retain the final archive before deciding any materialization/recheck;
+  no ledger/claim/subject rewrite or unchanged repeated audit.
   [pcc:unverified]
 - **What this does not establish:** a speed advantage, its absence for all
   algorithms, security, or nonexistence of cross-characteristic computation.
