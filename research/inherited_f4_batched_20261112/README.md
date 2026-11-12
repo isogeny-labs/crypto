@@ -55,16 +55,28 @@ Tests: `koblitz_groebner::tests::batched_rewrite_leaves_decisions_and_never_adds
 batched/eager on the 41 test systems: 0.9843 in total, 1.0 worst, 21 systems
 cheaper `[pcc:unverified]`.
 
-## Known cost before measuring
+## Known cost before measuring, and the fix
 
-The subagent's unpaired check on Koblitz 19:10:2 and 23:12:2 (5 alternating
-invocations each, shared host) found 0.879 and 0.830 of the ops per target and
-**8 to 13 % more wall time** `[pcc:unverified]`: rows brought current one at a
-time each pay an allocation and a kernel call instead of sharing one bulk
-pass. That overhead is outside the counted unit. So a lower S from this
-engine rests on counted work that genuinely disappears, while uncounted
-per-row overhead grows; both are reported, and the wall cost is the next
-thing to fix (shared buffer per epoch).
+The first version (1da7694876, merged in #4005) was checked unpaired by the
+subagent on Koblitz 19:10:2 and 23:12:2: 0.879 and 0.830 of the ops per
+target and **8 to 13 % more wall time** `[pcc:unverified]`. Callgrind put
+the cost in the allocator: one allocation and free per row brought current
+on its own (about 27 M allocator instructions against 9 M for eager on
+23:12:2, while the batched arm already executed about 3 % fewer
+instructions overall).
+
+4f0eca9eb4 rewrites such rows into spans of a per-thread write-once arena
+(zeroed 16K-word chunks; rows above 4K words keep their own buffer) and reads
+every row through a pointer and length with an owner that keeps the buffer
+alive. No counted value moves: the test
+`koblitz_groebner::tests::batched_rewrite_counts_are_pinned` pins `ops`,
+`bitop/v1` word ops and hash probes of the 41 systems, cold and warm, to the
+values of 1da7694876. Callgrind after the fix, `HybridF4::solve` on 23:12:2:
+eager 273.2 M, batched 249.5 M instructions (0.913); the subagent's unpaired
+wall check: batched 0.92 to 0.96 of eager at 23:12:2 and parity within noise
+at 19:10:2 `[pcc:unverified]`. The overhead outside the counted unit no longer
+grows, so a lower S here rests on counted work that disappears without a
+hidden wall cost.
 
 ## Run 1: paired per call (`run_ab.sh`)
 
@@ -72,10 +84,12 @@ thing to fix (shared buffer per epoch).
 fes-f2`, the 13 cells of the previous study (14 to 32 unknowns), 6 targets × 3
 repeats, one thread, frozen binary (`IC_BIN`).
 
-Expectation: ops batched/old ≤ 1 on every target, about 0.83 to 0.88 at 20 to
-24 unknowns, closer to 1 below; 0 disagreements; wall batched/old above 1
-(about 1.05 to 1.15). Falsifier: any target with more ops, any disagreement,
-or no ops reduction at 20 unknowns and up.
+Measured at 4f0eca9eb4 (the arena fix), frozen binary. Expectation: ops
+batched/old ≤ 1 on every target, about 0.83 to 0.88 at 20 to 24 unknowns,
+closer to 1 below; 0 disagreements; wall batched/old at or below 1 (about
+0.9 to 1.0) from 20 unknowns up, near 1 below. Falsifier: any target with
+more ops, any disagreement, no ops reduction at 20 unknowns and up, or a
+median paired wall ratio above 1.05 at 20 unknowns and up.
 
 ## Run 2: end to end (`run_e2e.sh`)
 
