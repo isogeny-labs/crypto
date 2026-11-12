@@ -44,19 +44,21 @@ Reach of the weak class (admitted classes from which the walk reaches a weak cur
 | p | class-group walk W′ | rational-root walk W (`jv_weak_coverage`) | the new odd steps are used |
 |--:|--|--|--|
 | 37 | **41 / 60 = 68%** [56, 80] | 24 / 60 = 40% [29, 53] | 38 of 41 found walks (93%) |
-| 53 | **10 / 14 = 71%** [45, 88] (partial) | 25 / 60 = 42% [30, 54] | 9 of 10 found walks (90%) |
+| 53 | **17 / 25 = 68%** [49, 83] (partial) | 25 / 60 = 42% [30, 54] | 16 of 17 found walks (94%) |
 
 - At p = 37 the class-group walk reaches **1.7× more** of the class, with non-overlapping Wilson intervals.
 - The improvement is **caused by the new isogenies**: 93% and 90% of the successful class-group walks use at
   least one odd kernel-polynomial step, which the rational-root walk could not take.
-- p = 53 is a partial sample: the walk-limit-60 run was cut at 14 walks by the study's 3,000 s per-prime wall
+- p = 53 is a partial sample: the walk-limit-60 run reached 25 walks when cut by the study's 3,000 s per-prime wall
   limit (the class-group walk factors ψ_ℓ at every curve, so it is far slower than the rational-root walk).
 
 ## Large p: the weak locus is beyond a feasible search radius
 
 At p ∈ {1009, 1511, 1823} the comparison is **paired** at cap 3,000 (Amendment 2): both walks on the same
-admitted curves. `(filled in from runs/big_walls.txt; see analysis.json)`. Both the rational-root and the
-class-group walk reach the weak class rarely at this cap: the number of 2-, 3-, 5- and 7-isogeny steps to the
+admitted curves. The rational-root paired arm reaches a weak curve **0 / 9, 0 / 8, 0 / 23** times; the
+class-group arm reaches **0 / 3, 0 / 0, 0 / 2** (its few completed walks — the class-group walk factors ψ_ℓ at
+every one of up to 3,000 curves per failed walk, so it is too slow to accumulate a large large-prime sample on
+the container). Both walks reach the weak class rarely at this cap: the number of 2-, 3-, 5- and 7-isogeny steps to the
 nearest weak curve grows with the class, and the weak locus (density ≈ 3/q among full-2-torsion curves) sits
 beyond the explored region. The class-group walk improves **connectivity within the explored region**, which
 moves the reach when the weak curve is within range (small p) but not when it is beyond any feasible cap. The

@@ -2615,18 +2615,18 @@ fn irreducible_factors_deg(f: &Fq3, poly: &[E6], d: u32, rng: &mut StdRng) -> Ve
     // equal-degree split of gd into degree-d irreducibles
     let mut out = Vec::new();
     let qd_minus_1_half = (BigUint::from(f.f.p).pow(6 * d) - BigUint::one()) >> 1;
-    edf_split(f, &pmonic(f, &gd), d as usize, &qd_minus_1_half, rng, &mut out);
+    edf_split(
+        f,
+        &pmonic(f, &gd),
+        d as usize,
+        &qd_minus_1_half,
+        rng,
+        &mut out,
+    );
     out
 }
 
-fn edf_split(
-    f: &Fq3,
-    g: &[E6],
-    d: usize,
-    e: &BigUint,
-    rng: &mut StdRng,
-    out: &mut Vec<P6>,
-) {
+fn edf_split(f: &Fq3, g: &[E6], d: usize, e: &BigUint, rng: &mut StdRng, out: &mut Vec<P6>) {
     let deg = g.len() - 1;
     if deg == 0 {
         return;
@@ -2739,10 +2739,7 @@ pub fn kernel_polys(ctx: &WalkCtx, curve: &Curve2, ell: u64, rng: &mut StdRng) -
             for i in 0..lin.len() {
                 for j in i + 1..lin.len() {
                     for k in j + 1..lin.len() {
-                        cands.push(pmonic(
-                            f,
-                            &pmul(f, &lin[i], &pmul(f, &lin[j], &lin[k])),
-                        ));
+                        cands.push(pmonic(f, &pmul(f, &lin[i], &pmul(f, &lin[j], &lin[k]))));
                     }
                 }
             }
@@ -2787,10 +2784,7 @@ fn velu_sums(f: &Fq3, a: &[E6], hh: &[E6], hp: &[E6], xp: &E6) -> (E6, E6, E6) {
     // S3 = ½ r'' = ½[(P''h − P h'')h − 2h'(P'h − P h')]/h³
     let num = f.sub(
         &f.mul(&f.sub(&f.mul(&p2, &h0), &f.mul(&p0, &h2)), &h0),
-        &f.mul(
-            &f.add(&h1, &h1),
-            &f.sub(&f.mul(&p1, &h0), &f.mul(&p0, &h1)),
-        ),
+        &f.mul(&f.add(&h1, &h1), &f.sub(&f.mul(&p1, &h0), &f.mul(&p0, &h1))),
     );
     let inv2 = f.inv(&f.from_fq(E2([2 % f.f.p, 0])));
     let s3 = f.mul(&f.mul(&num, &f.mul(&hi2, &hi)), &inv2);
@@ -2822,11 +2816,7 @@ pub fn velu_image_through_h(ctx: &WalkCtx, curve: &Curve2, h: &[E6]) -> Option<C
     let c2 = f.from_fq(E2([2 % f.f.p, 0]));
     let c4 = f.from_fq(E2([4 % f.f.p, 0]));
     let term1 = pscale6(f, &pmul(f, &pfp, h), &c2);
-    let term2 = pscale6(
-        f,
-        &psub(f, &pmul(f, &pf, &hp), &pmul(f, &pf1, h)),
-        &c4,
-    );
+    let term2 = pscale6(f, &psub(f, &pmul(f, &pf, &hp), &pmul(f, &pf1, h)), &c4);
     let num = padd(f, &term0, &padd(f, &term1, &term2));
     if num.len() != 2 * d + 2 {
         return None; // degree ≠ ℓ = 2d+1
@@ -2841,11 +2831,8 @@ pub fn velu_image_through_h(ctx: &WalkCtx, curve: &Curve2, h: &[E6]) -> Option<C
         }
         let (s1f, _, _) = velu_sums(f, &fp, h, &hp, xp); // A = F'
         let (_, s2big, _) = velu_sums(f, &big_f, h, &hp, xp); // A = F
-        // X = x + 2 S1[F'] + 4 S2[F]
-        Some(f.add(
-            xp,
-            &f.add(&f.mul(&c2, &s1f), &f.mul(&c4, &s2big)),
-        ))
+                                                              // X = x + 2 S1[F'] + 4 S2[F]
+        Some(f.add(xp, &f.add(&f.mul(&c2, &s1f), &f.mul(&c4, &s2big))))
     };
     let e0 = img(&E6::ZERO)?;
     let e1 = img(&u)?;
@@ -3203,10 +3190,8 @@ mod tests {
                 // completeness: every rational root of ψ_ℓ is covered once
                 let roots = roots_q3(f, &psi, &mut rng);
                 for r in &roots {
-                    let covering: usize = polys
-                        .iter()
-                        .filter(|h| peval6(f, h, r) == E6::ZERO)
-                        .count();
+                    let covering: usize =
+                        polys.iter().filter(|h| peval6(f, h, r) == E6::ZERO).count();
                     assert_eq!(
                         covering, 1,
                         "ℓ={ell}: rational root covered {covering} times"

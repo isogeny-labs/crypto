@@ -34,7 +34,9 @@ fn main() {
     let first: u64 = get("--first", "0").parse().expect("--first");
     let seed: u64 = get("--seed", "20261111").parse().expect("--seed");
     let cap: u64 = get("--cap", "10000").parse().expect("--cap");
-    let walk_limit: u64 = get("--walk-limit", "1000000").parse().expect("--walk-limit");
+    let walk_limit: u64 = get("--walk-limit", "1000000")
+        .parse()
+        .expect("--walk-limit");
     let jumps: Vec<u64> = get("--jumps", "3,5,7")
         .split(',')
         .map(|v| v.parse().expect("--jumps"))
@@ -53,7 +55,8 @@ fn main() {
         let q3 = (p as i128).pow(6);
         let trace = q3 + 1 - order as i128;
         let admitted = trace_may_hold_weak_curve(p, trace);
-        let (mut walk, mut found, mut p2, mut po, mut muls_walk) = (false, false, 0usize, 0usize, 0u64);
+        let (mut walk, mut found, mut p2, mut po, mut muls_walk) =
+            (false, false, 0usize, 0usize, 0u64);
         if admitted && walked < walk_limit {
             walked += 1;
             walk = true;

@@ -35,7 +35,7 @@ ax.set_ylabel("admitted classes reaching a weak curve (Wilson 95%)")
 ax.set_ylim(0,1.0); ax.grid(alpha=0.3,axis="y"); ax.legend(fontsize=8,loc="upper right")
 ax.set_title("Weak-class reach: class-group vs rational-root odd isogenies",fontsize=9)
 ax.text(0.02,0.96,"p=37,53: cap 10,000, 60 walks",transform=ax.transAxes,fontsize=7,va="top",color="#555")
-ax.text(0.62,0.96,"p≥1009: paired, cap 3,000\n(weak locus beyond feasible cap)",
+ax.text(0.56,0.50,"p≥1009: paired, cap 3,000\nboth walks 0 found\n(weak locus beyond feasible cap)",
         transform=ax.transAxes,fontsize=7,va="top",color="#555")
 # right: odd kernel-polynomial steps are what reaches the weak curve
 od=[]; lab=[]

@@ -9,8 +9,13 @@ def wilson(k, n, z=1.96):
 # published rational-root W (jv_weak_coverage_20261111, cap 10000, 60 walks)
 RR_PUB={"37":[24,60],"53":[25,60],"1009":[3,60],"1511":[0,60],"1823":[0,60]}
 def load(tag,p):
-    try: return [json.loads(l) for l in open(f"runs/{tag}_p{p}.jsonl") if l.strip()]
+    try: rows=open(f"runs/{tag}_p{p}.jsonl").read().splitlines()
     except FileNotFoundError: return None
+    out=[]
+    for l in rows:
+        try: out.append(json.loads(l))
+        except Exception: pass
+    return out
 out={"small_cap":10000,"small_walklimit":60,"big_cap":3000,"big_walklimit":30,"primes":{}}
 for p in ("37","53","1009","1511","1823"):
     row={}

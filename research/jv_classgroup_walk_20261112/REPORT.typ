@@ -11,7 +11,7 @@ _Kernel-polynomial odd isogenies; protocol frozen before the runs, two disclosed
 
 *Result* (small p, cap 10,000, 60 walks).
 - p = 37: class-group 41/60 = 68 percent vs rational-root 24/60 = 40 percent (non-overlapping intervals); 93 percent of found walks use a new odd step.
-- p = 53: class-group 10/14 = 71 percent (partial) vs 25/60 = 42 percent; 90 percent use a new odd step.
+- p = 53: class-group 17/25 = 68 percent (partial) vs 25/60 = 42 percent; 94 percent use a new odd step.
 
 *Large p.* At p = 1009, 1511, 1823, paired at cap 3,000, both walks reach the weak class rarely: the nearest weak curve is beyond a feasible 2-, 3-, 5-, 7-isogeny search radius. The class-group walk improves connectivity within the explored region, which helps when the target is in range (small p), not when it is beyond any feasible cap.
 
