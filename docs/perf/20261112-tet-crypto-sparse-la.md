@@ -62,3 +62,17 @@ candidate `af423b8c85cb82720196175a74c0bf5ab484f363ea7dae891175866eca2e5b64`.
 Disk was at 1.5-3.4 GB free; the worktree is sparse (docs/, research/ omitted) and
 the large build dirs were deleted at the end. SpMV inner loop (about 50% of BW Ir) is at its
 mul/add/adc floor (4 lanes x 3 instructions per entry).
+
+## Independent review (Claude Opus 5.5)
+- Re-ran the 34 `koblitz_sparse_la` tests in the standalone crate (debug assertions on): pass.
+- Differential check base vs candidate (u64 moduli 7, 2^31-1, 2^61-1, 2^62-57, 2^63-25,
+  plus two above 2^63; dims 1..2500; block sizes 1..8; `mul_block_transpose` against a
+  naive u128 reference and `block_lanczos_solve` over 6 seeds): identical outputs and hashes.
+  Moduli above 2^63 mismatch the naive reference in base and candidate alike (no lazy path,
+  pre-existing `add` limit); unchanged by this branch.
+- `symdiff` branch-free merge vs the branchy merge: 300k random sorted pairs plus empty and
+  `u32::MAX` edge cases, equal.
+- Saved perfbench binaries (sha256 as above): fingerprints equal; Callgrind Ir on
+  `sparse_solve_r45_c4800_w3` base/cand ratio 0.894, matching the claimed -10.6%.
+- Costs to know: the cached `Aᵀ` roughly doubles CSR memory once a transpose product is used.
+- Not run: full-lib `cargo test` and a rebuild of perfbench from HEAD (sparse worktree lacks fixtures).
