@@ -335,7 +335,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks | General n!dⁿ bound and decomposition-system hypotheses |
 | 9 Gröbner heuristics | Partial: Lean counterexample to universal regularity reading | Generic/Joux–Vitse statements and requested exact system measurements |
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
-| 11 Standards | Partial: actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate | Generic p-adic/complexity/native refinement and matched SafeCurves benchmark |
+| 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Blocked for the requested other-machine replay | Prior dispatch HTTP404 ran no job; one runtime available; a different authorized host or registered workflow is required |
 | 14 Negative control | Current control passes locally | Historical runs were not preregistered with it; no retroactive promotion |
@@ -471,3 +471,22 @@ principal-divisor/valuation identification of Miller expressions and generic
 MOV/Frey–Rück remain open. All other original requirements retain the
 matrix's remaining obligations. No paid compute or new native experiment
 belongs to this formal extension. [pcc:unverified]
+
+### 2026-11-12 finite repository rho measurement
+
+The requested finite benchmark component of item11 is now recorded in
+[the rho audit](../research/rho_constant_audit_20261112/README.md): 768/768
+verified calls, 576 measured replays, 192 measured and 64 warmup identical
+same-seed pairs, with a separate detected counter-corruption control.
+The protocols were committed before their data, all counts and fixed setup
+remain explicit, and the completed main export passes file/contract checks.
+All scientific clocks are invalid; no timing conclusion is made.
+[pcc:unverified]
+
+The separate Lean report project passes 11 declarations, zero failures and
+zero trusted-native exceptions. It proves exact arithmetic on the recorded
+totals, rational mean intervals and emitted-counter ordering reversal. The
+finite means above sqrt(pi/4) do not contradict its qualified asymptotic
+average. Native execution and signed independent validation remain separate
+assurance scopes. This closes this measurement component, not every open
+method in the original fourteen-item request. [pcc:unverified]

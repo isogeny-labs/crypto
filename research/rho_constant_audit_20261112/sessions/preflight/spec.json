@@ -1,0 +1,67 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Separate one-target preflight for fixed repository rho-count audit",
+  "description": "Twelve fixed correctness and budget calibration calls, before main data. Not pooled with main population.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_roster",
+        "bits": 14
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 16
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 18
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 20
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261112001
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261112002,
+    "isolation_required": "L0",
+    "timeout_seconds": 15
+  }
+}

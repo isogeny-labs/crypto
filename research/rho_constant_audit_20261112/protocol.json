@@ -70,7 +70,7 @@
       "description": "Actual unmodified registered native method; no tuning",
       "instrument": {
         "repo": "crypto",
-        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "commit": null,
         "build": [
           [
             "cargo",
@@ -81,7 +81,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
         "threads": 1,
         "flags": {
           "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
@@ -102,7 +102,7 @@
       "description": "Actual unmodified registered native method; no tuning",
       "instrument": {
         "repo": "crypto",
-        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "commit": null,
         "build": [
           [
             "cargo",
@@ -113,7 +113,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
         "threads": 1,
         "flags": {
           "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
@@ -135,7 +135,7 @@
       "description": "Actual unmodified registered native method; no tuning",
       "instrument": {
         "repo": "crypto",
-        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "commit": null,
         "build": [
           [
             "cargo",
@@ -146,7 +146,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
         "threads": 1,
         "flags": {
           "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
@@ -300,11 +300,11 @@
       "note": "No hypothesis test/power claim. Fixed finite descriptive coverage and exact answers/replay; alpha unused schema metadata. Main16 targets per curve, three independent algorithm rounds; not sufficient to establish limiting constant."
     },
     "preflight_runtime": {
-      "fixed_seconds": null,
-      "per_sample_seconds": null,
+      "fixed_seconds": 2,
+      "per_sample_seconds": 0.02,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": "Pilot budget is prospective conservative cap, not observed runtime; prerequisite binary build/plan not experiment data. Main estimate filled from separately frozen pilot before main freeze; do not pool pilot."
+      "estimated_total_seconds": 18,
+      "measured_on": "Separate frozen preflight sessionECBS1h9cd21a0011c9:12calls, start/end interval109ms. L0 interval used only for prospective budget planning, not a scientific speed measurement. Conservative18s whole-main estimate; hard180s session cap and15s child cap unchanged."
     }
   },
   "metrics": {
@@ -335,7 +335,7 @@
     "secondary": []
   },
   "measurement": {
-    "isolation_required": "L0",
+    "isolation_required": "none",
     "warmups": 1,
     "order": "alternate",
     "clock": "none",
@@ -408,7 +408,7 @@
     "Missing unpriced counts prevents ranking; no ranking unless stable at0/0.1/1GAE per operation."
   ],
   "decision_rule": {
-    "text": "known_answer_pass only when all planned answers, exact replay and paired A/A count checks pass. Report every curve/arm meanS, ratios and native phase/unpriced counts. A finite mismatch with0.886 is not a refutation of the qualified asymptotic statement.",
+    "text": "known_answer_pass only when all planned answers, exact replay and paired A/A count checks pass. Report every curve/arm meanS, ratios and native phase/unpriced counts. A finite mismatch with0.886 is not a refutation of the qualified asymptotic statement. Native SQL checks every same-seed A/A pair, phase event/native counter and recovered answer, including retained warmups. Native count-integrity row must report0noninteger/oversized costs. Synthetic one-counter corruption must be detected before main.",
     "comparison_ids": [
       "finite-checks"
     ],
@@ -425,8 +425,8 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "analyze.sh",
-      "sha256": "082e83471c2b4329f24f9ed96e8ad924b50241cb162b357afb0b2420e49fa8a5"
+      "path": "analyze-main.sh",
+      "sha256": "15fb9b33396778829fcaa7d1eada9324259d6fa06e005621b217e8e23eb123c6"
     },
     "inputs": [
       "sessions/main"
@@ -469,17 +469,17 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "045a59cc95f45314d5bf2b2c3cf9411aa8819b8e96ab17545fb3900676d014b6",
+    "commit": "1214cbdac994c56d48e1a3f7360ebcb075c67d8e",
+    "frozen_at": "2026-11-12T22:32:41Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
     "spec_sha256": "756b31640515e7deb37b13ed0c5656e6c3613a37f6ddec6b2d3cf947d73aac37",
     "source_review_sha256": "f7e3c0bfad280feb87b005d067b715980480da01b50b27f11a29a157b4cfdec8",
     "run_argv": [
-      "target/release/ecbench",
+      "/workspace/scratch/ecbench-rho-frozen-61030c23",
       "run",
       "--wait",
       "--cpus",
@@ -490,6 +490,45 @@
       "research/rho_constant_audit_20261112/sessions/main"
     ],
     "paid_compute": 0,
-    "scope": "Count-only approved local checkpoint; actual wall intervals are retained but invalid scientific clocks."
+    "scope": "Count-only approved local checkpoint; actual wall intervals are retained but invalid scientific clocks.",
+    "compiled_source_baseline": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+    "build_provenance_sha256": "bee974043fca49997d634e4ddf01082465e0d2e91e2d37eba6925a843f14aa9f",
+    "build_provenance": "evidence/build-provenance.json",
+    "instrument_commit_not_pinned_reason": "Protocol/evidence commits change the runtime worktree Git fact. Authoritative compiled source baseline and every selected Rust/path-dependency/compile-time JSON input are pinned here; binary and threads are pinned in every arm. Actual runtime Git commit is retained in sessions/exports.",
+    "analysis_parent_sha256": "082e83471c2b4329f24f9ed96e8ad924b50241cb162b357afb0b2420e49fa8a5",
+    "analysis_native": {
+      "source_path": "native/sql_analysis.cpp",
+      "source_sha256": "790b1a44115a2685fbe0c3d5baf5d0fc56e31a3e370a4d7581582aaba6f832f8",
+      "binary_path": "/workspace/scratch/rho-sql-analysis",
+      "binary_sha256": "f01732f52bc6a786ee840f1724c6ba59fc0ca4577e8e26595a9bb8bc495e12f0",
+      "queries_path": "native/queries.sql",
+      "queries_sha256": "21e2e658d6cdd4bd6aa07586d04622830f99cee87359f3c821e1a0da35e63324",
+      "sqlite_header_path": "/home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.30.1/sqlite3/sqlite3.h",
+      "sqlite_header_sha256": "d088aa96aa70db50f02acc5c86eca61a5d17556e4c363b9c06079239bf7f87b1",
+      "sqlite_runtime_path": "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+      "sqlite_runtime_sha256": "14c4418a06c5c2e30f5fb57bc8add93762236ae17898c6708984cf15e680ca71",
+      "sqlite_runtime_version": "3.46.1",
+      "build": [
+        "g++",
+        "-O2",
+        "-std=c++20",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I<cached libsqlite3-sys0.30.1>/sqlite3",
+        "native/sql_analysis.cpp",
+        "-l:libsqlite3.so.0",
+        "-o",
+        "/workspace/scratch/rho-sql-analysis"
+      ],
+      "negative_control_index_path": "native/negative-control-index.sql",
+      "negative_control_index_sha256": "744b0c91a1736bec3e6743e1f21586580a8a29ff09f1d93e70d2750590221474",
+      "negative_control_expected": "Exactlyone mismatched A/A pair in the four-pair pilot-index copy; canonical pilot data unchanged. Disclosed analysis-unit control before main data."
+    },
+    "preflight_export_path": "export-preflight-complete.json",
+    "preflight_export_sha256": "d05b5fd4532661b891043d352cdc6f3926387255a21ca4c92c9bcd906242d47d",
+    "preflight_audit_sha256": "28335870bffbd41add37c75c5e72329eea86d6f6f7105e83be00ceb377bbe898",
+    "driver_path": "run-main.sh",
+    "driver_sha256": "4759712ccdbf6ed93db1878f069ea3231d769fcc988034d2dd75c67f1a44166b"
   }
 }

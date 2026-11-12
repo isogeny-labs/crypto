@@ -70,7 +70,7 @@
       "description": "Actual unmodified registered native method; no tuning",
       "instrument": {
         "repo": "crypto",
-        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "commit": null,
         "build": [
           [
             "cargo",
@@ -81,7 +81,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
         "threads": 1,
         "flags": {
           "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
@@ -102,7 +102,7 @@
       "description": "Actual unmodified registered native method; no tuning",
       "instrument": {
         "repo": "crypto",
-        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "commit": null,
         "build": [
           [
             "cargo",
@@ -113,7 +113,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
         "threads": 1,
         "flags": {
           "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
@@ -135,7 +135,7 @@
       "description": "Actual unmodified registered native method; no tuning",
       "instrument": {
         "repo": "crypto",
-        "commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+        "commit": null,
         "build": [
           [
             "cargo",
@@ -146,7 +146,7 @@
             "ecbench"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "61030c23b4e95c0ed56b86a65b980c28e19ed09ba643719248734e13218d718d",
         "threads": 1,
         "flags": {
           "accounting": "unchanged repository cold GAE; all phases; cap_multiple64"
@@ -335,7 +335,7 @@
     "secondary": []
   },
   "measurement": {
-    "isolation_required": "L0",
+    "isolation_required": "none",
     "warmups": 0,
     "order": "alternate",
     "clock": "none",
@@ -469,17 +469,17 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "3892337a84ebace912724965f9008904940611b1784ea987fee8d2921081712e",
+    "commit": "7a2736901b27bacd9e2a1da348e345e62fe5097c",
+    "frozen_at": "2026-11-12T22:24:12Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
     "spec_sha256": "f3b618ff2ffa989243693d47010f5552aa565a8b796d4f21541085a5d2aa1280",
     "source_review_sha256": "f7e3c0bfad280feb87b005d067b715980480da01b50b27f11a29a157b4cfdec8",
     "run_argv": [
-      "target/release/ecbench",
+      "/workspace/scratch/ecbench-rho-frozen-61030c23",
       "run",
       "--wait",
       "--cpus",
@@ -490,6 +490,12 @@
       "research/rho_constant_audit_20261112/sessions/preflight"
     ],
     "paid_compute": 0,
-    "scope": "Count-only approved local checkpoint; actual wall intervals are retained but invalid scientific clocks."
+    "scope": "Count-only approved local checkpoint; actual wall intervals are retained but invalid scientific clocks.",
+    "compiled_source_baseline": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+    "build_provenance_sha256": "bee974043fca49997d634e4ddf01082465e0d2e91e2d37eba6925a843f14aa9f",
+    "build_provenance": "evidence/build-provenance.json",
+    "instrument_commit_not_pinned_reason": "Protocol/evidence commits change the runtime worktree Git fact. Authoritative compiled source baseline and every selected Rust/path-dependency/compile-time JSON input are pinned here; binary and threads are pinned in every arm. Actual runtime Git commit is retained in sessions/exports.",
+    "driver_path": "run-preflight.sh",
+    "driver_sha256": "a4ee6c1fbe45629ae8b5feeaef8ba1d928e90c4298688577180c195ea3046526"
   }
 }
