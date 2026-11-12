@@ -209,7 +209,7 @@ impl Rng {
 }
 
 fn is_square(a: u64, p: u64) -> bool {
-    a % p == 0 || powmod(a as u128, ((p - 1) / 2) as u128, p as u128) == 1
+    a.is_multiple_of(p) || powmod(a as u128, ((p - 1) / 2) as u128, p as u128) == 1
 }
 /// Tonelli-Shanks square root mod odd prime p (a must be a residue).
 fn sqrt_mod(a: u64, p: u64) -> u64 {
@@ -229,7 +229,7 @@ fn sqrt_mod(a: u64, p: u64) -> u64 {
     }
     let (mut m, mut c) = (s, powmod(z, q, pp));
     let mut t = powmod(a, q, pp);
-    let mut r = powmod(a, (q + 1) / 2, pp);
+    let mut r = powmod(a, q.div_ceil(2), pp);
     while t != 1 {
         let mut i = 0;
         let mut tt = t;
@@ -347,7 +347,7 @@ fn check_point(c: &Curve, k: u32, x: u64, y: u64, full: bool, v: &mut Verify) ->
     v.points += 1;
     if full {
         let o = ring.mul_scalar(s, c.r as u128);
-        assert!(o.x % m == 0 && o.z % m == 0, "[r]s != O");
+        assert!(o.x.is_multiple_of(m) && o.z.is_multiple_of(m), "[r]s != O");
         v.order_r += 1;
     }
     xt
