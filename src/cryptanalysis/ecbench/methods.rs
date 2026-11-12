@@ -64,8 +64,8 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
-    ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_v3,
-    rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
+    ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
+    rho_walk_lanes, rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
     signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
     PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
@@ -218,7 +218,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -296,6 +296,19 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     default: Some("64"),
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
+
+const RHO_LANES_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget as a multiple of √r before the run counts as exhausted",
+    },
+    ParamDecl {
+        name: "lanes",
+        default: None,
+        help: "walks advanced in lock-step, one batched field inversion a round (1..=4096)",
+    },
+];
 
 const POOLED_PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -1408,6 +1421,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.negation_lanes_v1",
+            family: "rho",
+            summary: "rho.negation's set-up and walk (A = 2, look-ahead, cycle window, escapes) in `lanes` lock-step walks whose additions share one Montgomery-batched field inversion a round (prime curves, p < 2^62); S charged as rho.negation (one group operation a step, look-ahead addition and escape), field tally the batched one; distinguished points arrive in lane order, so a seed's S differs from rho.negation's; expected S ≈ √(π/4)",
+            entry: "ic_boundary::rho_walk_lanes(NegationClasses, RhoWalk::negation(), lanes)",
+            applies: Applies::PrimeOnly,
+            params: RHO_LANES_PARAMS,
+        },
+        MethodDecl {
             id: "rho.cubic_v2",
             family: "rho",
             summary: "rho.cubic with the set-up [κ]G verification ledger of CubicClasses::new inside total_gae (phase automorphism_setup), plus the walk of rho.negation_v2; refuses any curve without the j = 0 structure",
@@ -1613,6 +1634,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.negation"
         | "rho.negation_v2"
         | "rho.negation_chained"
+        | "rho.negation_lanes_v1"
         | "rho.negation_v3"
         | "rho.negation_v4"
         | "rho.negation_v5"
@@ -2703,6 +2725,23 @@ fn solve_generic<G: CountedGroup>(
             let o = kangaroo(g, gen, target, r, seed, cap()?);
             generic(o, t.elapsed().as_nanos() as u64, 1)
         }
+        "rho.negation_lanes_v1" => {
+            let lanes = param_u64(m, "lanes")?;
+            let lanes =
+                usize::try_from(lanes).map_err(|_| "lanes does not fit usize".to_string())?;
+            let res = rho_walk_lanes(
+                g,
+                &NegationClasses { r },
+                gen,
+                target,
+                r,
+                seed,
+                cap()?,
+                RhoWalk::negation(),
+                lanes,
+            )?;
+            rho(res, t.elapsed().as_nanos() as u64)
+        }
         "rho.negation_chained" => {
             let res = rho_walk_with_policy(
                 g,
@@ -3173,6 +3212,26 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
             }
             if tw > 0 && (!opts.g_jumps || grow != 2) {
                 return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
+            }
+            match or.get("aut") {
+                None | Some("0" | "1" | "off" | "no" | "false") => {}
+                Some("3") => {
+                    if tw == 0 {
+                        return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
+                    }
+                    use crate::cryptanalysis::ic_boundary::CountedGroup;
+                    let mut ops = crate::cryptanalysis::ic_boundary::GroupOps::default();
+                    if i.curve
+                        .order_three_aut(i.generator_point(), i.r, &mut ops)
+                        .is_none()
+                    {
+                        return Err(format!(
+                            "wwalk: aut=3 needs a j = 0 curve over p ≡ 1 (mod 3) with 3 | r − 1 and a nontrivial ζ₃ on the subgroup; {} lacks the structure",
+                            i.name
+                        ));
+                    }
+                }
+                Some(v) => return Err(format!("wwalk: aut is 3 (or off), not `{v}`")),
             }
         }
         _ => {}
@@ -6107,9 +6166,17 @@ fn ic_report(
             }
         }
     }
+    // A `*_uncharged` counter whose solver/oracle unit key is pinned for
+    // this curve (`ic_boundary::PINNABLE_NATIVE`) was charged by
+    // `price_phase` under its frozen name; with no such key pinned — every
+    // curve today — the list is what it always was.
     for phase in &phases {
         for (name, &count) in &phase.native {
-            if count > 0 && name.ends_with("_uncharged") && !unpriced.contains(name) {
+            if count > 0
+                && name.ends_with("_uncharged")
+                && !unpriced.contains(name)
+                && !native_is_pinned(name, calib)
+            {
                 unpriced.push(name.clone());
             }
         }
@@ -6631,6 +6698,7 @@ fn solve_ic_prime(
     let mut prime_blocked = PrimeBatchMitmOracle::blocked();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
+    let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
@@ -6655,6 +6723,7 @@ fn solve_ic_prime(
         "mitm-prime-blocked" => &mut prime_blocked,
         "mitm-fiber" => &mut mitm_fiber,
         "rootfind-mitm" => &mut rootfind_mitm,
+        "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
         "rootfind-subtract" => &mut rootfind,
         other => match plugin_oracle.as_deref_mut() {
@@ -9548,6 +9617,162 @@ mod accounting_rules_tests {
             .is_some_and(|s| s.contains("max_degree")));
     }
 
+    /// **No solver-unit key pinned: an `ic.pipeline` `sat-cdcl` record is
+    /// the one it was.**  Snapshot taken on this checkout before the keys
+    /// existed (2026-11-12, K_1 / GF(2^17), seed 6, k = 4242): the same
+    /// total and phase bits, `solver_conflicts_uncharged` the only unpriced
+    /// entry (so `lower_bound`), the same pinned units, no
+    /// `pricing_qualification` in the solver block.
+    #[test]
+    fn sat_cdcl_record_is_unchanged_with_no_solver_unit_key_pinned() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let sat = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "sat-cdcl"),
+            ],
+        );
+        let rep = run(&sat, &inst, &facts, 4242, 6);
+        let s = rep.solver.as_ref().unwrap();
+        assert_eq!((s.op_unit.as_str(), s.ops), ("conflicts", 376494));
+        assert_eq!(rep.total_gae.to_bits(), 4650515843237975044);
+        assert_eq!(
+            rep.phases
+                .iter()
+                .map(|p| p.gae.to_bits())
+                .collect::<Vec<_>>(),
+            vec![
+                4632812305481666075,
+                0,
+                4649897368651038485,
+                4608088191764273417,
+                4624633867356078080
+            ]
+        );
+        assert_eq!(rep.unpriced, vec!["solver_conflicts_uncharged".to_string()]);
+        assert_eq!(
+            rep.detail["calibration_pinned_units"],
+            json!([
+                "ns_per_double",
+                "ns_per_lookup",
+                "ns_per_row_op",
+                "ns_per_as_solve",
+                "ns_per_word_xor",
+                "ns_per_frobenius",
+                "ns_per_canon"
+            ])
+        );
+        let block = &rep.detail["decomposition"]["solver"];
+        assert_eq!(block["priced_by"], "measured");
+        assert!(block.get("pricing_qualification").is_none());
+    }
+
+    /// **A pinned `ns_per_conflict` keeps the SAT solver's charge in the
+    /// ecbench total** (`priced_by = pinned`), so `solver_conflicts_uncharged`
+    /// leaves `unpriced` and the pin is named in `calibration_pinned_units`;
+    /// unpinned, the same report takes the solver back out as before.  A
+    /// pinned `pkm_*_uncharged` counter likewise leaves `unpriced`.
+    #[test]
+    fn a_pinned_solver_unit_key_is_charged_and_named_by_ic_report() {
+        use crate::cryptanalysis::ic_boundary::{random_binary_instance, BinaryGroup};
+        use crate::cryptanalysis::ic_framework::plugins::{
+            BinarySubspaceBase, DescentAlgebraicOracle,
+        };
+        let inst = random_binary_instance(11, 3, 8).expect("a curve at n = 11");
+        let group = BinaryGroup(&inst.fast);
+        let planted = 1 + 30_011 % (inst.r - 1);
+        let mut scratch = GroupOps::default();
+        let target = group.mul(&mut scratch, inst.generator, planted);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let base = BinarySubspaceBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "binary-subspace".into(),
+            oracle: "descent-algebraic".into(),
+            solver: Some("sat-cdcl".into()),
+            targets: Targets::Walk,
+            max_trials: 200_000,
+            seed: 7,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("dimension", "5");
+        let m = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "koblitz-orbit:divisor=0;1"),
+                ("oracle", "descent-algebraic:m=2"),
+                ("solver", "sat-cdcl"),
+            ],
+        );
+        let report = |calib: &Calibration| {
+            let mut oracle = DescentAlgebraicOracle::new(
+                2,
+                &inst,
+                solver_by_name("sat-cdcl").unwrap(),
+                Params::default(),
+                None,
+            );
+            let (mut rep, _) =
+                run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, planted, calib, None)
+                    .unwrap();
+            // A pkm counter on the relations phase, to read its listing.
+            rep.decomposition
+                .cost
+                .count("pkm_grid_fp_mults_uncharged", 17);
+            ic_report(&m, rep, calib, None, 0, 2)
+        };
+        let mut calib = Calibration {
+            ns_per_add: 1.0,
+            ns_per_double: 1.0,
+            ns_per_conflict: Some(0.5),
+            ns_per_fp_mul: Some(0.25),
+            ..Default::default()
+        };
+        let unpinned = report(&calib);
+        assert!(unpinned
+            .unpriced
+            .contains(&"solver_conflicts_uncharged".to_string()));
+        assert!(unpinned
+            .unpriced
+            .contains(&"pkm_grid_fp_mults_uncharged".to_string()));
+
+        calib.pinned_units = vec!["ns_per_conflict".into(), "ns_per_fp_mul".into()];
+        let pinned = report(&calib);
+        for gone in ["solver_conflicts_uncharged", "pkm_grid_fp_mults_uncharged"] {
+            assert!(
+                !pinned.unpriced.contains(&gone.to_string()),
+                "{:?}",
+                pinned.unpriced
+            );
+        }
+        assert_eq!(
+            pinned.detail["calibration_pinned_units"],
+            json!(["ns_per_conflict", "ns_per_fp_mul"])
+        );
+        let block = &pinned.detail["decomposition"]["solver"];
+        assert_eq!(block["priced_by"], "pinned");
+        let ops = pinned.solver.as_ref().unwrap().ops;
+        let solver_gae = block["gae"].as_f64().unwrap();
+        assert_eq!(solver_gae, ops as f64 * 0.5);
+        let sum: f64 = pinned.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(pinned.total_gae, sum);
+        assert!(
+            pinned.phases[2].gae >= solver_gae,
+            "the solver's charge stays in the relations phase"
+        );
+        assert!(pinned.total_gae > unpinned.total_gae);
+    }
+
     #[test]
     fn the_floor_counts_the_automorphisms_a_curve_has() {
         let (_, f0) = built(&j0());
@@ -11546,6 +11771,87 @@ mod engine_items_tests {
             );
             let su = |c: &BTreeMap<String, u64>| c["setup_additions"] + c["setup_doublings"];
             assert!(su(&res.counters) < su(&legacy.counters));
+        }
+    }
+}
+
+/// `rho.negation_lanes_v1` (docs/perf/20261112-rust-deep-audit.md): with one
+/// lane it is `rho.negation`'s walk exactly (same steps, walks, distinguished
+/// points, group operations and counters, plus its own three); with more it
+/// recovers the logarithm, shares inversions, and charges the same kinds of
+/// operation.
+#[cfg(test)]
+mod rho_lanes_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn curve() -> (Instance, CurveFacts) {
+        let spec = CurveSpec::PrimeSearch {
+            bits: 22,
+            seed: 59297,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        (inst, facts)
+    }
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn one_lane_is_the_serial_walk_and_more_lanes_recover() {
+        let (inst, facts) = curve();
+        let serial = method("rho.negation", &[]);
+        let one = method("rho.negation_lanes_v1", &[("lanes", "1")]);
+        let many = method("rho.negation_lanes_v1", &[("lanes", "16")]);
+        assert_ne!(serial.method_id, one.method_id);
+        assert_ne!(one.method_id, many.method_id);
+        let own = ["lanes", "lane_rounds", "montgomery_conversions_uncharged"];
+        for seed in 0..8u64 {
+            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r - 1);
+            let target = inst.mul_generator_hex(k).expect("a nonzero target");
+            let a = solve(&serial, &inst, &facts, &target, seed).unwrap();
+            let b = solve(&one, &inst, &facts, &target, seed).unwrap();
+            let c = solve(&many, &inst, &facts, &target, seed).unwrap();
+            for rep in [&a, &b, &c] {
+                assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "seed {seed}");
+                assert_eq!(rep.automorphisms_used, 2);
+            }
+            assert_eq!(a.total_gae, b.total_gae, "seed {seed}");
+            let mut bc = b.counters.clone();
+            for key in own {
+                assert!(bc.remove(key).is_some(), "seed {seed}: {key}");
+            }
+            assert_eq!(a.counters, bc, "seed {seed}");
+            assert_eq!(c.counters.get("lanes"), Some(&16));
+            // Batched: fewer inversions than additions on the 16-lane walk;
+            // one lane pays one inversion a round, as the serial law does.
+            let (fb, fc) = (b.field_ops.unwrap(), c.field_ops.unwrap());
+            let fa = a.field_ops.unwrap();
+            assert_eq!(fa.invs, fb.invs, "seed {seed}");
+            assert!(fc.invs * 4 < fa.invs, "seed {seed}: {fc:?} vs {fa:?}");
+        }
+        assert_eq!(
+            expected_s("rho.negation_lanes_v1", 2),
+            expected_s("rho.negation", 2)
+        );
+    }
+
+    #[test]
+    fn lanes_out_of_range_and_other_groups_are_refused() {
+        let (inst, facts) = curve();
+        let target = inst.mul_generator_hex(12345).unwrap();
+        for bad in ["0", "4097"] {
+            let m = method("rho.negation_lanes_v1", &[("lanes", bad)]);
+            assert!(solve(&m, &inst, &facts, &target, 1).is_err(), "lanes={bad}");
         }
     }
 }

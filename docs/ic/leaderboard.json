@@ -230,6 +230,10 @@
    "path": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
    "sha256": "41b2bcd995ec15956deaa3630278dbf5aac68c02be9b1f38f81c1045320765c1"
   },
+  "jv_sieve_line_vs_rho": {
+   "path": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+   "sha256": "0a83239fe76f0502abba05bea81c4e3f2deafe3e6c0b4cbd3b562821d5c56501"
+  },
   "d4_char2_m12": {
    "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
    "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
@@ -399,8 +403,8 @@
    "sha256": "4360d61a47960810d8994e88cea8ebabf938363f0e3288b45fe98f6bde59278b"
   },
   "mt_fieldops_component": {
-   "path": "research/mt_fieldops_v2_20261111/results/holdout/summary.json",
-   "sha256": "da6ae47bec25e2643ee3cb77189562325d85ddaab1773bc4907c32b95b846c2d"
+   "path": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
+   "sha256": "130f9c0da9b3546bf786495c0949937b2997c6ecda2352e01c700cc19aa923eb"
   },
   "ghs_weak_n4": {
    "path": "research/quartic_n4_20261019/results/summary_all.json",
@@ -335822,6 +335826,534 @@
   "validation": "Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.",
   "validated": true
  },
+ "prime_ksum_component": {
+  "rows": [
+   {
+    "bits": 20,
+    "mean_s": {
+     "inc-sel": [
+      10.6589962179,
+      11.5532619911,
+      19.6016539498
+     ],
+     "ksum4-sel": [
+      6.7412672541,
+      7.31645012106,
+      12.4930959237
+     ],
+     "ksum5-sel": [
+      7.45908386562,
+      7.91877520753,
+      12.0559972847
+     ],
+     "rho-neg": [
+      1.24465890439,
+      1.34954600305,
+      2.29352989096
+     ]
+    },
+    "ksum5_over_inc": [
+     {
+      "ratio": 0.699792336269,
+      "ci95": [
+       0.681859594175,
+       0.717657196222
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.685414665886,
+      "ci95": [
+       0.666243624884,
+       0.704598971283
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.615050001166,
+      "ci95": [
+       0.590533055791,
+       0.639912804985
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_inc": [
+     {
+      "ratio": 0.632448601752,
+      "ci95": [
+       0.610904303159,
+       0.653674562881
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.633280031795,
+      "ci95": [
+       0.60998312226,
+       0.65624401979
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.637349070425,
+      "ci95": [
+       0.605510830816,
+       0.669027398187
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum5_over_rho": [
+     {
+      "ratio": 5.99287390248,
+      "ci95": [
+       5.57992744846,
+       6.4474359428
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.86773269651,
+      "ci95": [
+       5.45859748983,
+       6.32112843952
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.25652503253,
+      "ci95": [
+       4.85015964911,
+       5.72546595683
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_rho": [
+     {
+      "ratio": 5.41615637049,
+      "ci95": [
+       5.02403348974,
+       5.84613942059
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.42141587211,
+      "ci95": [
+       5.02086106195,
+       5.8658868936
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.44710403512,
+      "ci95": [
+       4.99742208127,
+       5.9485985667
+      ],
+      "pairs": 192
+     }
+    ]
+   },
+   {
+    "bits": 24,
+    "mean_s": {
+     "inc-sel": [
+      14.2655497497,
+      15.5638464529,
+      27.248516782
+     ],
+     "ksum4-sel": [
+      6.44969432335,
+      7.12845069087,
+      13.2372579985
+     ],
+     "ksum5-sel": [
+      6.3679622211,
+      6.96716413735,
+      12.3599813836
+     ],
+     "rho-neg": [
+      1.09485971644,
+      1.194002821,
+      2.08629076206
+     ]
+    },
+    "ksum5_over_inc": [
+     {
+      "ratio": 0.446387439169,
+      "ci95": [
+       0.432385685364,
+       0.461022475765
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.447650531534,
+      "ci95": [
+       0.432377172056,
+       0.463629228956
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.453601988047,
+      "ci95": [
+       0.43207697973,
+       0.476085953507
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_inc": [
+     {
+      "ratio": 0.452116773382,
+      "ci95": [
+       0.440138851173,
+       0.464603089642
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.458013429549,
+      "ci95": [
+       0.444930286752,
+       0.471761482783
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.485797377687,
+      "ci95": [
+       0.467300984398,
+       0.505405671015
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum5_over_rho": [
+     {
+      "ratio": 5.81623574737,
+      "ci95": [
+       5.35036228862,
+       6.32567449498
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.83513205732,
+      "ci95": [
+       5.3584538624,
+       6.35429385504
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.92438101553,
+      "ci95": [
+       5.38799861415,
+       6.50289461674
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_rho": [
+     {
+      "ratio": 5.89088650036,
+      "ci95": [
+       5.43521793035,
+       6.39732185147
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 5.97021260377,
+      "ci95": [
+       5.50062851064,
+       6.49410605968
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 6.34487686915,
+      "ci95": [
+       5.81047236047,
+       6.93574753227
+      ],
+      "pairs": 192
+     }
+    ]
+   },
+   {
+    "bits": 28,
+    "mean_s": {
+     "inc-sel": [
+      21.4510051004,
+      23.2296951083,
+      39.2379051788
+     ],
+     "ksum4-sel": [
+      7.21512332328,
+      7.83299376084,
+      13.3938276989
+     ],
+     "ksum5-sel": [
+      6.95697727967,
+      7.41251082747,
+      11.5123127577
+     ],
+     "rho-neg": [
+      0.948849490036,
+      1.04086045617,
+      1.8689591514
+     ]
+    },
+    "ksum5_over_inc": [
+     {
+      "ratio": 0.32431940821,
+      "ci95": [
+       0.318048342149,
+       0.330981160139
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.319096345989,
+      "ci95": [
+       0.312189910987,
+       0.326429932159
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.293397741424,
+      "ci95": [
+       0.283745065354,
+       0.303827654132
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_inc": [
+     {
+      "ratio": 0.3363536249,
+      "ci95": [
+       0.329323355465,
+       0.343701380975
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.337197441651,
+      "ci95": [
+       0.329410417542,
+       0.345341135015
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.341349203986,
+      "ci95": [
+       0.329839978805,
+       0.353389020069
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum5_over_rho": [
+     {
+      "ratio": 7.33201350976,
+      "ci95": [
+       6.72989748017,
+       8.05688811136
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 7.12152218246,
+      "ci95": [
+       6.53676903748,
+       7.83100636987
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 6.1597455188,
+      "ci95": [
+       5.64517124944,
+       6.78814152365
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_rho": [
+     {
+      "ratio": 7.6040756717,
+      "ci95": [
+       6.98006360002,
+       8.36767237479
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 7.52549846081,
+      "ci95": [
+       6.90220482176,
+       8.28293217691
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 7.16646358418,
+      "ci95": [
+       6.5468162955,
+       7.90654492152
+      ],
+      "pairs": 192
+     }
+    ]
+   },
+   {
+    "bits": 32,
+    "mean_s": {
+     "inc-sel": [
+      32.1836808475,
+      34.7292063653,
+      57.6389360264
+     ],
+     "ksum4-sel": [
+      8.13938144865,
+      8.8862038377,
+      15.6076053391
+     ],
+     "ksum5-sel": [
+      6.98738282663,
+      7.55881376511,
+      12.7016922114
+     ],
+     "rho-neg": [
+      0.95207081721,
+      1.0465414234,
+      1.89677687911
+     ]
+    },
+    "ksum5_over_inc": [
+     {
+      "ratio": 0.217109499058,
+      "ci95": [
+       0.212104998305,
+       0.222325037824
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.21765005758,
+      "ci95": [
+       0.212083793357,
+       0.223468777739
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.220366528029,
+      "ci95": [
+       0.211979697123,
+       0.229247846618
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_inc": [
+     {
+      "ratio": 0.252903994643,
+      "ci95": [
+       0.247750364629,
+       0.258202953036
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.255871203742,
+      "ci95": [
+       0.250119391239,
+       0.261755153503
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 0.270782329014,
+      "ci95": [
+       0.261834939127,
+       0.280057194204
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum5_over_rho": [
+     {
+      "ratio": 7.33914190029,
+      "ci95": [
+       6.72484236574,
+       8.03040582307
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 7.22266084848,
+      "ci95": [
+       6.61348480912,
+       7.90881634575
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 6.69646090234,
+      "ci95": [
+       6.12227353971,
+       7.3475811304
+      ],
+      "pairs": 192
+     }
+    ],
+    "ksum4_over_rho": [
+     {
+      "ratio": 8.54913447773,
+      "ci95": [
+       7.81481048179,
+       9.37792175385
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 8.49101969497,
+      "ci95": [
+       7.75303425434,
+       9.30723831792
+      ],
+      "pairs": 192
+     },
+     {
+      "ratio": 8.2284877631,
+      "ci95": [
+       7.50263373235,
+       9.03330616923
+      ],
+      "pairs": 192
+     }
+    ]
+   }
+  ],
+  "class": "engineering",
+  "study": "research/prime_ksum_pooled_20261029/",
+  "report": "research/prime_ksum_pooled_20261029/report.pdf",
+  "readme": "research/prime_ksum_pooled_20261029/README.md",
+  "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
+  "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 distance to rho grows to 6.30x-8.52x",
+  "validation": "Validated with caveats: replay certificate (count-identical replay of all 8 sessions, 9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean archive of 6edb2cb36d), validator report (independent recompute) and the matched rho reference with the §5a band are filed in `research/prime_ksum_pooled_20261029/VALIDATION.json`. Scope: the counted unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.",
+  "validated": true
+ },
  "packed_filter_component": {
   "study": "research/ic_packed_filter_20261029/",
   "readme": "research/ic_packed_filter_20261029/README.md",
@@ -337672,6 +338204,186 @@
   "validation": "validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)",
   "validated": true
  },
+ "jv_sieve_line_vs_rho_component": {
+  "rows": [
+   {
+    "arm": "P",
+    "scope": "p=1009",
+    "s": 0.0655539187151,
+    "lo": 0.0456320120172,
+    "hi": 0.095642256794,
+    "band": [
+     0.0655539187151,
+     0.360136160222,
+     0.37773649205
+    ],
+    "band_hi": 0.535019309018,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "p=1511",
+    "s": 0.0177305888539,
+    "lo": 0.0134586055363,
+    "hi": 0.0246184001338,
+    "band": [
+     0.0177305888539,
+     0.132812786411,
+     0.139679305028
+    ],
+    "band_hi": 0.185019036199,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "p=1823",
+    "s": 0.0124697020568,
+    "lo": 0.0103038234838,
+    "hi": 0.0156697529965,
+    "band": [
+     0.0124697020568,
+     0.0915106956848,
+     0.0962333170502
+    ],
+    "band_hi": 0.108795750427,
+    "below": true
+   },
+   {
+    "arm": "P",
+    "scope": "pooled",
+    "s": 0.0243814369733,
+    "lo": 0.0206242795361,
+    "hi": 0.029211410898,
+    "band": [
+     0.0243814369733,
+     0.163578476241,
+     0.171876098955
+    ],
+    "band_hi": 0.200297877312,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1009",
+    "s": 0.031444072554,
+    "lo": 0.0239179616109,
+    "hi": 0.0435132757989,
+    "band": [
+     0.031444072554,
+     0.167474162514,
+     0.17560694896
+    ],
+    "band_hi": 0.235815238091,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1511",
+    "s": 0.0124458385197,
+    "lo": 0.00990341401228,
+    "hi": 0.0165114055796,
+    "band": [
+     0.0124458385197,
+     0.0749911373646,
+     0.0787343743116
+    ],
+    "band_hi": 0.103585209947,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "p=1823",
+    "s": 0.00935252854054,
+    "lo": 0.00784441623607,
+    "hi": 0.0112668074913,
+    "band": [
+     0.00935252854054,
+     0.0596346041697,
+     0.0626404585689
+    ],
+    "band_hi": 0.0684369619791,
+    "below": true
+   },
+   {
+    "arm": "H",
+    "scope": "pooled",
+    "s": 0.0154109944692,
+    "lo": 0.0134819723036,
+    "hi": 0.0180146132027,
+    "band": [
+     0.0154109944692,
+     0.090813838352,
+     0.0953206515249
+    ],
+    "band_hi": 0.109342741029,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1009",
+    "s": 0.030627281014,
+    "lo": 0.0224057375407,
+    "hi": 0.043953054463,
+    "band": [
+     0.030627281014,
+     0.157732188289,
+     0.165322067149
+    ],
+    "band_hi": 0.224520858806,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1511",
+    "s": 0.0114790066189,
+    "lo": 0.00853370191629,
+    "hi": 0.016041517393,
+    "band": [
+     0.0114790066189,
+     0.0711443618248,
+     0.0747083958451
+    ],
+    "band_hi": 0.0990789905816,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "p=1823",
+    "s": 0.00805786451023,
+    "lo": 0.00735042810788,
+    "hi": 0.00884030110609,
+    "band": [
+     0.00805786451023,
+     0.0560590814556,
+     0.0589320061384
+    ],
+    "band_hi": 0.0613590987925,
+    "below": true
+   },
+   {
+    "arm": "U",
+    "scope": "pooled",
+    "s": 0.0141496024091,
+    "lo": 0.0122283213378,
+    "hi": 0.0167371308959,
+    "band": [
+     0.0141496024091,
+     0.0856844995776,
+     0.0899533112196
+    ],
+    "band_hi": 0.103303142808,
+    "below": true
+   }
+  ],
+  "class": "transfer (weak class only)",
+  "walk_note": "The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. That charge covers starts within the implemented walk's reach: from a random admitted curve it reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route.",
+  "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+  "study": "research/jv_sieve_line_vs_rho_20261103/",
+  "report": "research/jv_sieve_line_vs_rho_20261103/REPORT.pdf",
+  "source": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+  "validation": "validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)",
+  "validated": true
+ },
  "d4_char2_frob_roots_component": {
   "rows": [
    {
@@ -338310,146 +339022,97 @@
  "mt_fieldops_component": {
   "rows": [
    {
-    "bits": 22,
-    "T": 1024,
-    "rho": {
-     "0": {
-      "median": 1.0533734123,
-      "ci95": [
-       1.0404985733,
-       1.0584672798
-      ],
-      "n": 22
-     },
-     "0.1": {
-      "median": 1.06556934456,
-      "ci95": [
-       1.05153448778,
-       1.07080893311
-      ],
-      "n": 22
-     },
-     "1": {
-      "median": 1.11986605025,
-      "ci95": [
-       1.1007470537,
-       1.12657441842
-      ],
-      "n": 22
-     }
-    },
-    "bsgs": {
-     "0": {
-      "median": 1.4532105467,
-      "ci95": [
-       1.44789460937,
-       1.4614709764
-      ],
-      "n": 22
-     },
-     "1": {
-      "median": 1.59704325594,
-      "ci95": [
-       1.59034001382,
-       1.61161934038
-      ],
-      "n": 22
-     }
-    },
-    "verdict": "dearer"
-   },
-   {
     "bits": 24,
     "T": 1024,
     "rho": {
      "0": {
-      "median": 1.1062996673,
+      "median": 1.14639460306,
       "ci95": [
-       1.09881991298,
-       1.11840271721
+       1.13758648619,
+       1.15200187427
       ],
       "n": 22
      },
      "0.1": {
-      "median": 1.12145008459,
+      "median": 1.0538927057,
       "ci95": [
-       1.11366272923,
-       1.13432496324
+       1.04619598574,
+       1.06223146071
       ],
       "n": 22
      },
      "1": {
-      "median": 1.1824635956,
+      "median": 0.748294833614,
       "ci95": [
-       1.17374074237,
-       1.19850313621
+       0.74240204712,
+       0.755193721295
       ],
       "n": 22
      }
     },
     "bsgs": {
      "0": {
-      "median": 1.6449426146,
+      "median": 1.28229336583,
       "ci95": [
-       1.63050314799,
-       1.65435411412
+       1.27748997362,
+       1.287039814
       ],
       "n": 22
      },
      "1": {
-      "median": 1.7734299776,
+      "median": 1.40061273949,
       "ci95": [
-       1.75659376139,
-       1.78626788486
+       1.38801105942,
+       1.40361719822
       ],
       "n": 22
      }
     },
-    "verdict": "dearer"
+    "verdict": "unranked"
    },
    {
     "bits": 24,
     "T": 4096,
     "rho": {
      "0": {
-      "median": 0.975711634648,
+      "median": 1.09466638579,
       "ci95": [
-       0.972005578957,
-       0.980328025977
+       1.089480383,
+       1.0961407018
       ],
       "n": 22
      },
      "0.1": {
-      "median": 0.982986988481,
+      "median": 1.02803437649,
       "ci95": [
-       0.978920589893,
-       0.98784980673
+       1.02238291843,
+       1.03053151928
       ],
       "n": 22
      },
      "1": {
-      "median": 1.01568289658,
+      "median": 0.765033084277,
       "ci95": [
-       1.01035059452,
-       1.02210010186
+       0.760905580345,
+       0.768374786067
       ],
       "n": 22
      }
     },
     "bsgs": {
      "0": {
-      "median": 1.32955574719,
+      "median": 1.18081640038,
       "ci95": [
-       1.32375081339,
-       1.33600549952
+       1.17878672575,
+       1.18271555111
       ],
       "n": 22
      },
      "1": {
-      "median": 1.45566712679,
+      "median": 1.32813831996,
       "ci95": [
-       1.44788875427,
-       1.46554921671
+       1.32505256459,
+       1.33254300141
       ],
       "n": 22
      }
@@ -338461,93 +339124,44 @@
     "T": 16384,
     "rho": {
      "0": {
-      "median": 0.933436991684,
+      "median": 1.06330419583,
       "ci95": [
-       0.931654403028,
-       0.937053345371
+       1.05983702275,
+       1.06430979653
       ],
       "n": 22
      },
      "0.1": {
-      "median": 0.934887251595,
+      "median": 1.02010084299,
       "ci95": [
-       0.932874691142,
-       0.938863842507
+       1.01555093138,
+       1.02179319685
       ],
       "n": 22
      },
      "1": {
-      "median": 0.942368475817,
+      "median": 0.79945362705,
       "ci95": [
-       0.939175972844,
-       0.948165070579
+       0.796293803714,
+       0.80169747192
       ],
       "n": 22
      }
     },
     "bsgs": {
      "0": {
-      "median": 1.18491196522,
+      "median": 1.11444448931,
       "ci95": [
-       1.18327167384,
-       1.18868734481
+       1.11343196988,
+       1.11486147563
       ],
       "n": 22
      },
      "1": {
-      "median": 1.30061763416,
+      "median": 1.25607979812,
       "ci95": [
-       1.29767439237,
-       1.30724487189
-      ],
-      "n": 22
-     }
-    },
-    "verdict": "cheaper"
-   },
-   {
-    "bits": 25,
-    "T": 4096,
-    "rho": {
-     "0": {
-      "median": 0.987464929592,
-      "ci95": [
-       0.983159236498,
-       0.993368894836
-      ],
-      "n": 22
-     },
-     "0.1": {
-      "median": 0.996090388277,
-      "ci95": [
-       0.991515562585,
-       1.00235248537
-      ],
-      "n": 22
-     },
-     "1": {
-      "median": 1.03270309001,
-      "ci95": [
-       1.02696270822,
-       1.0402487189
-      ],
-      "n": 22
-     }
-    },
-    "bsgs": {
-     "0": {
-      "median": 1.39662285407,
-      "ci95": [
-       1.39050985625,
-       1.39798427885
-      ],
-      "n": 22
-     },
-     "1": {
-      "median": 1.51299326458,
-      "ci95": [
-       1.50547526285,
-       1.51596064988
+       1.25323037956,
+       1.25737207484
       ],
       "n": 22
      }
@@ -338555,60 +339169,308 @@
     "verdict": "unranked"
    },
    {
-    "bits": 25,
-    "T": 16384,
+    "bits": 28,
+    "T": 1024,
     "rho": {
      "0": {
-      "median": 0.925610538001,
+      "median": 1.13905810988,
       "ci95": [
-       0.923375157846,
-       0.928179088158
+       1.13083187331,
+       1.15061825191
       ],
       "n": 22
      },
      "0.1": {
-      "median": 0.927820499817,
+      "median": 1.02927446738,
       "ci95": [
-       0.925407236159,
-       0.930583809844
+       1.02016977419,
+       1.04030304178
       ],
       "n": 22
      },
      "1": {
-      "median": 0.938434520062,
+      "median": 0.730726325319,
       "ci95": [
-       0.935170850089,
-       0.942158500807
+       0.72409753971,
+       0.735727023782
       ],
       "n": 22
      }
     },
     "bsgs": {
      "0": {
-      "median": 1.22675320811,
+      "median": 1.31408046187,
       "ci95": [
-       1.22434566948,
-       1.22810829205
+       1.30771411941,
+       1.31958362258
       ],
       "n": 22
      },
      "1": {
-      "median": 1.34553975701,
+      "median": 1.43915311545,
       "ci95": [
-       1.34126492895,
-       1.347739288
+       1.42449514254,
+       1.44917303623
       ],
       "n": 22
      }
     },
-    "verdict": "cheaper"
+    "verdict": "unranked"
+   },
+   {
+    "bits": 28,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 1.13568389156,
+      "ci95": [
+       1.12710509424,
+       1.14180822482
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.03496652686,
+      "ci95": [
+       1.02921710108,
+       1.03690357257
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.730829272932,
+      "ci95": [
+       0.723549742082,
+       0.736407346125
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.27414196267,
+      "ci95": [
+       1.27187522609,
+       1.27840907676
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.39753071091,
+      "ci95": [
+       1.39373815171,
+       1.40334318922
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
+   },
+   {
+    "bits": 28,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 1.09642449759,
+      "ci95": [
+       1.09037324611,
+       1.09970817233
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.01522618476,
+      "ci95": [
+       1.00976035855,
+       1.01828933925
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.738886044305,
+      "ci95": [
+       0.734793040681,
+       0.742824448641
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.20356205797,
+      "ci95": [
+       1.20231826683,
+       1.20420582808
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.35455432907,
+      "ci95": [
+       1.35272019231,
+       1.35834948782
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
+   },
+   {
+    "bits": 32,
+    "T": 1024,
+    "rho": {
+     "0": {
+      "median": 1.15857918418,
+      "ci95": [
+       1.14311487499,
+       1.17320845332
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.03695733763,
+      "ci95": [
+       1.02380847918,
+       1.05156257903
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.72838491238,
+      "ci95": [
+       0.717403395452,
+       0.734640104566
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.35867820575,
+      "ci95": [
+       1.35007887742,
+       1.36822692438
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.46796964139,
+      "ci95": [
+       1.45232223077,
+       1.47964368865
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
+   },
+   {
+    "bits": 32,
+    "T": 4096,
+    "rho": {
+     "0": {
+      "median": 1.12974390784,
+      "ci95": [
+       1.12620432621,
+       1.1375045193
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 1.01428159579,
+      "ci95": [
+       1.00980543227,
+       1.0208388762
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.716765817412,
+      "ci95": [
+       0.710151142562,
+       0.718211416721
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.30592065097,
+      "ci95": [
+       1.3029197308,
+       1.31108331007
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.42817403844,
+      "ci95": [
+       1.42507272005,
+       1.43130446176
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
+   },
+   {
+    "bits": 32,
+    "T": 16384,
+    "rho": {
+     "0": {
+      "median": 1.10142958313,
+      "ci95": [
+       1.09717576307,
+       1.10785405947
+      ],
+      "n": 22
+     },
+     "0.1": {
+      "median": 0.99827486142,
+      "ci95": [
+       0.992192088102,
+       1.00510421521
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 0.713475446176,
+      "ci95": [
+       0.711094588961,
+       0.71626795409
+      ],
+      "n": 22
+     }
+    },
+    "bsgs": {
+     "0": {
+      "median": 1.26112628914,
+      "ci95": [
+       1.2600145534,
+       1.26297656449
+      ],
+      "n": 22
+     },
+     "1": {
+      "median": 1.40691771045,
+      "ci95": [
+       1.403679636,
+       1.40848777272
+      ],
+      "n": 22
+     }
+    },
+    "verdict": "unranked"
    }
   ],
-  "study": "research/mt_fieldops_v2_20261111/",
-  "report": "research/mt_fieldops_v2_20261111/REPORT.pdf",
-  "source": "research/mt_fieldops_v2_20261111/results/holdout/summary.json",
+  "study": "research/mt_fieldops_v5_20261112/",
+  "report": "research/mt_fieldops_v5_20261112/REPORT.pdf",
+  "source": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
+  "v4": "research/mt_fieldops_v4_20261112/",
+  "previous": "research/mt_fieldops_v3_20261111/",
+  "correction": "research/mt_rho_start_fix_20261111/",
   "class": "multi-target method",
-  "validation": "validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) with the §5a band (benchmarks/20261111-mt-fieldops-ic4/VALIDATION.json)",
+  "validation": "validated: replay certificate, validator report and the rho reference (cheapest standard multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band (benchmarks/20261112-mt-fieldops-v5/VALIDATION.json)",
   "validated": true
  },
  "quartic_twist_pair_component": {

@@ -166,6 +166,29 @@ On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–
 
 validated with caveats: replay certificate, validator report and the negation-map rho reference with the §5a band (research/ic_cover_weakclass_20261023/VALIDATION.json)
 
+## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)
+
+Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} (never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; `U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each`. The band is layer A: every unemitted cover F_p operation is also priced as native, the upper-bound convention. The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in research/jv_walk_charge_20261111 (walk charged, still below rho): pooled 0.0155 / 0.0858 / 0.0900 at w = 0 / 0.1 / 1 with the walk, against 0.0141 / 0.0857 / 0.0900 without it. That charge covers starts within the implemented walk's reach: from a random admitted curve it reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak curve (all depth-1 2-volcanoes) cannot use the route. Distance remaining is IC ÷ rho; "below" means the 95% interval's upper end is under 1 at all three prices.
+
+| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |
+|:--|:--|:--|:--|:--|
+| P | p=1009 | **0.0656** [0.0456, 0.0956] | 0.066 / 0.360 / 0.378 | yes |
+| P | p=1511 | **0.0177** [0.0135, 0.0246] | 0.018 / 0.133 / 0.140 | yes |
+| P | p=1823 | **0.0125** [0.0103, 0.0157] | 0.012 / 0.092 / 0.096 | yes |
+| P | pooled | **0.0244** [0.0206, 0.0292] | 0.024 / 0.164 / 0.172 | yes |
+| H | p=1009 | **0.0314** [0.0239, 0.0435] | 0.031 / 0.167 / 0.176 | yes |
+| H | p=1511 | **0.0124** [0.0099, 0.0165] | 0.012 / 0.075 / 0.079 | yes |
+| H | p=1823 | **0.0094** [0.0078, 0.0113] | 0.009 / 0.060 / 0.063 | yes |
+| H | pooled | **0.0154** [0.0135, 0.0180] | 0.015 / 0.091 / 0.095 | yes |
+| U | p=1009 | **0.0306** [0.0224, 0.0440] | 0.031 / 0.158 / 0.165 | yes |
+| U | p=1511 | **0.0115** [0.0085, 0.0160] | 0.011 / 0.071 / 0.075 | yes |
+| U | p=1823 | **0.0081** [0.0074, 0.0088] | 0.008 / 0.056 / 0.059 | yes |
+| U | pooled | **0.0141** [0.0122, 0.0167] | 0.014 / 0.086 / 0.090 | yes |
+
+[Report](../../research/jv_sieve_line_vs_rho_20261103/REPORT.pdf) · [study](../../research/jv_sieve_line_vs_rho_20261103/) · [data](../../research/jv_sieve_line_vs_rho_20261103/fit.json).
+
+validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
+
 ## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
 
 On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
@@ -449,6 +472,23 @@ Second-host replay (PROTOCOL.md §13): the 20-bit holdout re-executed on isolab-
 
 Validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band are filed in `research/prime_base_oracle_tuning_20261029/VALIDATION.json`. The promoted result is the 20-bit `N=45` engineering baseline only; it is one curve, counted pricing-band evidence, and not a scaling or wall-time claim.
 
+## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)
+
+Track: generic decomposition, bounded by sqrt(r), cannot beat rho. Registered protocol; the incumbent and both k-sum families were tuned on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table incumbent. S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 distance to rho grows to 6.30x-8.52x. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.
+
+| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |
+|--:|:--|:--|:--|:--|--:|
+| 20 | 10.66 / 7.46 / 1.24 | 0.700 [0.682, 0.718] / 0.685 [0.666, 0.705] / 0.615 [0.591, 0.640] | 0.632 [0.611, 0.654] / 0.633 [0.610, 0.656] / 0.637 [0.606, 0.669] | 5.99 / 5.87 / 5.26 | 192 |
+| 24 | 14.27 / 6.37 / 1.09 | 0.446 [0.432, 0.461] / 0.448 [0.432, 0.464] / 0.454 [0.432, 0.476] | 0.452 [0.440, 0.465] / 0.458 [0.445, 0.472] / 0.486 [0.467, 0.505] | 5.82 / 5.84 / 5.92 | 192 |
+| 28 | 21.45 / 6.96 / 0.95 | 0.324 [0.318, 0.331] / 0.319 [0.312, 0.326] / 0.293 [0.284, 0.304] | 0.336 [0.329, 0.344] / 0.337 [0.329, 0.345] / 0.341 [0.330, 0.353] | 7.33 / 7.12 / 6.16 | 192 |
+| 32 | 32.18 / 6.99 / 0.95 | 0.217 [0.212, 0.222] / 0.218 [0.212, 0.223] / 0.220 [0.212, 0.229] | 0.253 [0.248, 0.258] / 0.256 [0.250, 0.262] / 0.271 [0.262, 0.280] | 7.34 / 7.22 / 6.70 | 192 |
+
+The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on 16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every size.
+
+[Report](../../research/prime_ksum_pooled_20261029/report.pdf) · [README](../../research/prime_ksum_pooled_20261029/README.md) · [study](../../research/prime_ksum_pooled_20261029/).
+
+Validated with caveats: replay certificate (count-identical replay of all 8 sessions, 9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean archive of 6edb2cb36d), validator report (independent recompute) and the matched rho reference with the §5a band are filed in `research/prime_ksum_pooled_20261029/VALIDATION.json`. Scope: the counted unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.
+
 ## Component speed-up: membership filter on the packed pair table (2026-10-29, engineering)
 
 Frozen protocol (backlog XP-20261029-packed-filter); track generic (prime-table; docs/ic/SWEEPER.md, Tracks). Label: whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table, `mitm-prime-blocked:m=2,filter=1` against `mitm-prime-blocked:m=2` at b = 32. It moves no row of tables A–C and is ranked against nothing in them.
@@ -577,20 +617,23 @@ A separate exact 24-action cache diagnostic found only 2 same-residual orbit col
 
 On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay reduces the plain-S₅ solve's mean C₄ from 1.209e+12 to 8.690e+10 counted Fₚ multiplications (13.90×; class: engineering). The committed arm covers 13 solves; the replay arm's mean covers 12 later solves, with 13 total outputs oracle-equal. It includes 11 shape replays and 1 fallback. Paired ratios are 13.90× by ratio of means and [7.24, 15.37] across paired instances. This is a solver-stage change: no full-pipeline row or curve verdict changes. Study: [research/s5_plain_c4_options_20261019/](../../research/s5_plain_c4_options_20261019/); [report](../../research/s5_plain_c4_options_20261019/REPORT.pdf).
 
-## Multi-target IC4 against the cheapest of four rho arms, outside tables A–C
+## Multi-target IC against multi-target rho: the order flips with the hash price, outside tables A–C
 
-Many targets on one prime-order Weierstrass curve (2^22 to 2^26, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash and solver operations at h = 0, 0.1 and 1 GAE. IC4 builds an x-only pair-sum table and tries x(Q ± W) with one shared inversion; the reference is the cheapest of four rho variants (anchored, sibling, x-only sibling, sequential database) at three database sizes, chosen per configuration and price. IC4 / rho and IC4 / BSGS per target, median [95% bootstrap]; the BSGS ratio is the distance remaining. Class: multi-target method. validated: replay certificate, validator report and the rho reference (cheapest of four pre-registered rho arms in this harness) with the §5a band (benchmarks/20261111-mt-fieldops-ic4/VALIDATION.json).
+Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, 1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four ic5 variants (4-term x-only table, paired trials with one shared inversion; with or without retention and random-walk offsets); the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, 10 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The IC is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a decision is unranked. Class: multi-target method. validated: replay certificate, validator report and the rho reference (cheapest standard multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band (benchmarks/20261112-mt-fieldops-v5/VALIDATION.json).
 
-| bits | T | IC4/rho h=0 | h=0.1 | h=1 | §5a | IC4/BSGS h=0 | h=1 |
+| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |
 |--:|--:|--:|--:|--:|:--|--:|--:|
-| 22 | 1024 | 1.053 [1.040, 1.058] | 1.066 [1.052, 1.071] | 1.120 [1.101, 1.127] | dearer | 1.45 | 1.60 |
-| 24 | 1024 | 1.106 [1.099, 1.118] | 1.121 [1.114, 1.134] | 1.182 [1.174, 1.199] | dearer | 1.64 | 1.77 |
-| 24 | 4096 | 0.976 [0.972, 0.980] | 0.983 [0.979, 0.988] | 1.016 [1.010, 1.022] | unranked | 1.33 | 1.46 |
-| 24 | 16384 | 0.933 [0.932, 0.937] | 0.935 [0.933, 0.939] | 0.942 [0.939, 0.948] | cheaper | 1.18 | 1.30 |
-| 25 | 4096 | 0.987 [0.983, 0.993] | 0.996 [0.992, 1.002] | 1.033 [1.027, 1.040] | unranked | 1.40 | 1.51 |
-| 25 | 16384 | 0.926 [0.923, 0.928] | 0.928 [0.925, 0.931] | 0.938 [0.935, 0.942] | cheaper | 1.23 | 1.35 |
+| 24 | 1024 | 1.146 [1.138, 1.152] | 1.054 [1.046, 1.062] | 0.748 [0.742, 0.755] | unranked | 1.28 | 1.40 |
+| 24 | 4096 | 1.095 [1.089, 1.096] | 1.028 [1.022, 1.031] | 0.765 [0.761, 0.768] | unranked | 1.18 | 1.33 |
+| 24 | 16384 | 1.063 [1.060, 1.064] | 1.020 [1.016, 1.022] | 0.799 [0.796, 0.802] | unranked | 1.11 | 1.26 |
+| 28 | 1024 | 1.139 [1.131, 1.151] | 1.029 [1.020, 1.040] | 0.731 [0.724, 0.736] | unranked | 1.31 | 1.44 |
+| 28 | 4096 | 1.136 [1.127, 1.142] | 1.035 [1.029, 1.037] | 0.731 [0.724, 0.736] | unranked | 1.27 | 1.40 |
+| 28 | 16384 | 1.096 [1.090, 1.100] | 1.015 [1.010, 1.018] | 0.739 [0.735, 0.743] | unranked | 1.20 | 1.35 |
+| 32 | 1024 | 1.159 [1.143, 1.173] | 1.037 [1.024, 1.052] | 0.728 [0.717, 0.735] | unranked | 1.36 | 1.47 |
+| 32 | 4096 | 1.130 [1.126, 1.138] | 1.014 [1.010, 1.021] | 0.717 [0.710, 0.718] | unranked | 1.31 | 1.43 |
+| 32 | 16384 | 1.101 [1.097, 1.108] | 0.998 [0.992, 1.005] | 0.713 [0.711, 0.716] | unranked | 1.26 | 1.41 |
 
-Study: [research/mt_fieldops_v2_20261111/](../../research/mt_fieldops_v2_20261111/); [report](../../research/mt_fieldops_v2_20261111/REPORT.pdf); source `research/mt_fieldops_v2_20261111/results/holdout/summary.json`.
+Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_20261112/); [report](../../research/mt_fieldops_v5_20261112/REPORT.pdf); source `research/mt_fieldops_v5_20261112/results/holdout/summary.json`. v4, without native work priced: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/). Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
 
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
@@ -969,6 +1012,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/postgb_linear_stage_20261026/analysis/summary.json` — sha256 `ef9aae284eceddb7…`
 - `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
 - `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
+- `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`
@@ -1011,7 +1055,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
-- `research/mt_fieldops_v2_20261111/results/holdout/summary.json` — sha256 `da6ae47bec25e264…`
+- `research/mt_fieldops_v5_20261112/results/holdout/summary.json` — sha256 `130f9c0da9b3546b…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`

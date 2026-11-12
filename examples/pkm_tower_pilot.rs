@@ -15,7 +15,20 @@
 //! - `naive`: the same `V`, membership as one univariate `x^{2^t} = g^{2^t}`
 //!   (Kummer only);
 //! - `null`: `S₃`'s monomial support with random coefficients and a
-//!   planted zero, under the same tower.
+//!   planted zero, under the same tower;
+//! - `multiples`: the `tower` system plus the "doubled relation"
+//!   consequences of `R = P_1 + … + P_m`, appended after the tower
+//!   equations: at `m = 2` the one polynomial
+//!   `D_1²D_2²·S₃(N(x_1)/D(x_1), N(x_2)/D(x_2), x([2]R))`; at `m ≥ 3` the
+//!   `m − 2` free unknowns `u'_k = x([2](P_1 + … + P_{k+2}))`, the links
+//!   `D(u_k)u'_k − N(u_k)` and the doubled chain cleared of the doubling
+//!   denominators (`N/D` is the doubling map on abscissae). Every appended
+//!   equation vanishes at every planted solution, so the zero set over `F_p`
+//!   is that of `tower`; only the presentation changes. The ring has
+//!   `m − 2` extra free variables at `m ≥ 3`, which the sparse tower
+//!   engines (`tower`, `sig`, `generic`) and `--wide` do not take: the
+//!   control runs under `--engine hky` and `--engine f4` only and is
+//!   skipped (with a printed line) by the others.
 //!
 //! Every tower, every Vélu map and every planted decomposition is checked
 //! before anything is measured, so a construction bug stops the run instead
@@ -47,6 +60,16 @@
 //! `--null-chain` runs the null control at `m ≥ 3` as well, with every `S₃`
 //! link of the chain given random coefficients on its own support
 //! (`research/pkm_dickson_torus_20261015/`).
+//! `--null-width W` (1..=4) changes the null control's support: every
+//! summation equation is replaced by a random polynomial on the full box of
+//! exponents `0..=W` on the variables that equation uses (at `m = 2`, the
+//! two top tower variables `y_{1,0}`, `y_{2,0}` and `x_R`'s slot, i.e. the
+//! raw indices `0` and `t`), coefficients uniform in `1..p` and the planted
+//! value subtracted as before. At `m = 2` the box has 4, 9, 16, 25 monomials
+//! for `W = 1, 2, 3, 4`. `W = 2` is *not* the default null: the default
+//! support is `S₃`'s own 9 monomials, which are not the 9-monomial box.
+//! Every row (all controls) then carries `null_width`; without the flag
+//! the null control draws and builds exactly what it did before.
 //!
 //! The committed runs, their exact flags and the scripts that tabulate and
 //! cross-check them are in `research/pkm_tower_pilot_20260924/` (the pilot,
@@ -340,6 +363,9 @@ struct Tower {
     /// The value the last step must reach.
     c: u64,
     info: Value,
+    /// `--cover-map`: the factor base is `x∘φ(V)`, not `V` (see [`CoverMap`]).
+    /// `None` for every tower unless the flag is given.
+    cover: Option<CoverMap>,
 }
 
 impl Tower {
@@ -500,6 +526,7 @@ fn kummer(p: u64, t: usize, rng: &mut StdRng) -> Tower {
         steps: vec![Step::Square; t],
         c: 1,
         info: json!({"g": g, "zeta": zeta}),
+        cover: None,
     }
 }
 
@@ -531,6 +558,7 @@ fn dickson(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             steps: vec![Step::Dickson; t],
             c: addm(ut, invm(ut, p), p),
             info: json!({"u": u, "zeta": zeta}),
+            cover: None,
         };
     }
 }
@@ -675,6 +703,7 @@ fn dickson_torus(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             steps: vec![Step::Dickson; t],
             c,
             info: json!({"case": "torus", "u": [u.0, u.1], "zeta": [zeta.0, zeta.1], "c": c}),
+            cover: None,
         };
         check_torus(&tower, u, zeta, p);
         return tower;
@@ -806,7 +835,212 @@ fn isogeny(p: u64, t: usize, rng: &mut StdRng) -> Tower {
             steps,
             c: rj.x,
             info,
+            cover: None,
         };
+    }
+}
+
+// ── Cover-image factor bases (`--cover-map`) ───────────────────────
+
+/// The shape of the degree-2 map `x∘φ(u) = N(u)/D(u)` of `--cover-map`.
+///
+/// A degree-2 map `u ↦ X` pulls `E: Y² = f(X)` back to the double cover
+/// `C: v² = h(u)`, `h = D⁴·f(N/D)`, with `φ(u, v) = (N/D, v/D²)`. Its genus
+/// is set by where the map's two critical values fall: both on branch points
+/// of `E` (∞ and a rational root of `f`) gives genus 1, a 2-isogeny (PKM's
+/// Vélu step); one at ∞ (a quadratic polynomial) gives a sextic `h`, genus 2;
+/// neither gives an octic `h`, genus 3. Prime-order curves have no rational
+/// root of `f`, so genus 2 is the smallest cover of this kind that is not an
+/// isogeny.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CoverKind {
+    /// `X = u²`: genus 2, and the positive control. On a Kummer tower it is
+    /// the tower's own first step, so `x∘φ(V)` is the depth-`t − 1` tower.
+    Square,
+    /// `X = λ(u − α)² + β`, `α, β, λ` random: genus 2.
+    Quad,
+    /// `X = N(u)/D(u)`, random coprime quadratics: genus 3.
+    Generic,
+}
+
+impl CoverKind {
+    fn name(self) -> &'static str {
+        match self {
+            CoverKind::Square => "square",
+            CoverKind::Quad => "quad",
+            CoverKind::Generic => "generic",
+        }
+    }
+}
+
+/// `x∘φ(u) = N(u)/D(u)`, coefficients from degree 0 up.
+#[derive(Clone, Copy, Debug)]
+struct CoverMap {
+    kind: CoverKind,
+    num: [u64; 3],
+    den: [u64; 3],
+}
+
+fn upoly_eval(c: &[u64], u: u64, p: u64) -> u64 {
+    c.iter()
+        .rev()
+        .fold(0, |acc, &k| addm(mulm(acc, u, p), k, p))
+}
+
+fn upoly_trim(mut a: Vec<u64>) -> Vec<u64> {
+    while a.last() == Some(&0) {
+        a.pop();
+    }
+    a
+}
+
+fn upoly_mul(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    let mut r = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        for (j, &y) in b.iter().enumerate() {
+            r[i + j] = addm(r[i + j], mulm(x, y, p), p);
+        }
+    }
+    upoly_trim(r)
+}
+
+fn upoly_add(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r = vec![0u64; a.len().max(b.len())];
+    for (i, &x) in a.iter().enumerate() {
+        r[i] = x;
+    }
+    for (i, &y) in b.iter().enumerate() {
+        r[i] = addm(r[i], y, p);
+    }
+    upoly_trim(r)
+}
+
+/// `a mod b` (`b` non-zero).
+fn upoly_rem(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r = upoly_trim(a.to_vec());
+    let lead = invm(*b.last().expect("non-zero divisor"), p);
+    while r.len() >= b.len() {
+        let q = mulm(*r.last().unwrap(), lead, p);
+        let shift = r.len() - b.len();
+        for (i, &y) in b.iter().enumerate() {
+            r[shift + i] = subm(r[shift + i], mulm(q, y, p), p);
+        }
+        r = upoly_trim(r);
+    }
+    r
+}
+
+fn upoly_gcd_degree(a: &[u64], b: &[u64], p: u64) -> usize {
+    let (mut x, mut y) = (upoly_trim(a.to_vec()), upoly_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = upoly_rem(&x, &y, p);
+        x = y;
+        y = r;
+    }
+    x.len().saturating_sub(1)
+}
+
+impl CoverMap {
+    fn draw(kind: CoverKind, p: u64, rng: &mut StdRng) -> CoverMap {
+        match kind {
+            CoverKind::Square => CoverMap {
+                kind,
+                num: [0, 0, 1],
+                den: [1, 0, 0],
+            },
+            CoverKind::Quad => {
+                // λ(u − α)² + β = λu² − 2λα·u + λα² + β.
+                let (al, be, la) = (
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                );
+                CoverMap {
+                    kind,
+                    num: [
+                        addm(mulm(la, mulm(al, al, p), p), be, p),
+                        subm(0, mulm(2, mulm(la, al, p), p), p),
+                        la,
+                    ],
+                    den: [1, 0, 0],
+                }
+            }
+            CoverKind::Generic => loop {
+                let num = [rng.gen_range(0..p), rng.gen_range(0..p), 1];
+                let den = [
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                ];
+                if upoly_gcd_degree(&num, &den, p) == 0 {
+                    break CoverMap { kind, num, den };
+                }
+            },
+        }
+    }
+
+    /// `x∘φ(u)`, or `None` at a pole.
+    fn eval(&self, u: u64, p: u64) -> Option<u64> {
+        let d = upoly_eval(&self.den, u, p);
+        (d != 0).then(|| mulm(upoly_eval(&self.num, u, p), invm(d, p), p))
+    }
+
+    /// `x∘φ(u)` as an argument of [`s3_dbl_args`], `u` a polynomial.
+    fn arg(&self, u: &Pol, n: usize, p: u64) -> Arg {
+        let lift = |c: &[u64; 3]| {
+            let mut f = Pol::constant(n, c[0], p);
+            let mut pw = u.clone();
+            for &k in &c[1..] {
+                f = f.add(&pw.scale(k, p), p);
+                pw = pw.mul(u, p);
+            }
+            f
+        };
+        if self.den == [1, 0, 0] {
+            Arg::Plain(lift(&self.num))
+        } else {
+            Arg::Frac(lift(&self.num), lift(&self.den))
+        }
+    }
+
+    /// `h = D⁴·f(N/D) = N³D + a·N·D³ + b·D⁴`, the cover `C: v² = h(u)`.
+    fn h(&self, a: u64, b: u64, p: u64) -> Vec<u64> {
+        let (nn, dd) = (upoly_trim(self.num.to_vec()), upoly_trim(self.den.to_vec()));
+        let n3 = upoly_mul(&upoly_mul(&nn, &nn, p), &nn, p);
+        let d2 = upoly_mul(&dd, &dd, p);
+        let d3 = upoly_mul(&d2, &dd, p);
+        let d4 = upoly_mul(&d2, &d2, p);
+        let t1 = upoly_mul(&n3, &dd, p);
+        let t2: Vec<u64> = upoly_mul(&nn, &d3, p)
+            .iter()
+            .map(|&c| mulm(c, a, p))
+            .collect();
+        let t3: Vec<u64> = d4.iter().map(|&c| mulm(c, b, p)).collect();
+        upoly_add(&upoly_add(&t1, &upoly_trim(t2), p), &upoly_trim(t3), p)
+    }
+
+    /// The genus of `v² = h(u)` when `h` is squarefree, else `None`.
+    fn genus(&self, a: u64, b: u64, p: u64) -> Option<usize> {
+        let h = self.h(a, b, p);
+        let dh: Vec<u64> = h
+            .iter()
+            .enumerate()
+            .skip(1)
+            .map(|(i, &c)| mulm(i as u64 % p, c, p))
+            .collect();
+        (h.len() >= 2 && upoly_gcd_degree(&h, &upoly_trim(dh), p) == 0)
+            .then(|| (h.len() - 1 - 1) / 2)
+    }
+
+    /// The factor base's abscissae `x∘φ(V)`, distinct, poles dropped.
+    fn image(&self, v: &[u64], p: u64) -> Vec<u64> {
+        let mut out: Vec<u64> = v.iter().filter_map(|&u| self.eval(u, p)).collect();
+        out.sort_unstable();
+        out.dedup();
+        out
     }
 }
 
@@ -845,13 +1079,21 @@ fn plant(
     let p = curve.p;
     let mut ops = GroupOps::default();
     let mut pick: Vec<u64> = Vec::with_capacity(m);
+    // With `--cover-map`, `pick` holds tower values u and `abs` their images
+    // x∘φ(u), distinct; without it the two are the same.
+    let mut abs: Vec<u64> = Vec::with_capacity(m);
     while pick.len() < m {
-        let x = on[rng.gen_range(0..on.len())];
-        if !pick.contains(&x) {
-            pick.push(x);
+        let u = on[rng.gen_range(0..on.len())];
+        let x = match &tower.cover {
+            Some(cv) => cv.eval(u, p).expect("on holds no pole"),
+            None => u,
+        };
+        if !abs.contains(&x) {
+            pick.push(u);
+            abs.push(x);
         }
     }
-    let pts: Vec<PrimePoint> = pick
+    let pts: Vec<PrimePoint> = abs
         .iter()
         .map(|&x| {
             let y = curve.sqrt(curve.rhs(x)).expect("abscissa on the curve");
@@ -881,7 +1123,7 @@ fn plant(
         planted: true,
         x_r,
         solution: Some(sol),
-        xs: pick,
+        xs: abs,
     })
 }
 
@@ -903,6 +1145,11 @@ enum Control {
     Ladder,
     Naive,
     Null,
+    Multiples,
+    /// A random factor base of the same size: two unknowns `x_1, x_2`,
+    /// membership `∏_{f ∈ F}(x_i − f)`, `F` random abscissae on the curve
+    /// (with the planted ones), `|F|` that of the cell's base (m = 2 only).
+    RandBase,
 }
 
 impl Control {
@@ -912,6 +1159,8 @@ impl Control {
             Control::Ladder => "ladder",
             Control::Naive => "naive",
             Control::Null => "null",
+            Control::Multiples => "multiples",
+            Control::RandBase => "randbase",
         }
     }
 }
@@ -925,6 +1174,20 @@ fn summation(tower: &Tower, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) ->
     let (a, b) = (curve.a, curve.b);
     let x = |i: usize| Pol::var(n, i * tower.t).scale(tower.scale, p);
     let xr = Pol::constant(n, x_r, p);
+    if let Some(cv) = &tower.cover {
+        // S₃ at x∘φ(u_i), cleared of φ's denominators.
+        let xa = |i: usize| cv.arg(&x(i), n, p);
+        if m == 2 {
+            return vec![s3_dbl_args([xa(0), xa(1), Arg::Plain(xr)], a, b, p)];
+        }
+        let u = |k: usize| Arg::Plain(Pol::var(n, m * tower.t + k));
+        let mut eqs = vec![s3_dbl_args([xa(0), xa(1), u(0)], a, b, p)];
+        for k in 1..m - 2 {
+            eqs.push(s3_dbl_args([u(k - 1), xa(k + 1), u(k)], a, b, p));
+        }
+        eqs.push(s3_dbl_args([u(m - 3), xa(m - 1), Arg::Plain(xr)], a, b, p));
+        return eqs;
+    }
     if m == 2 {
         return vec![s3(&x(0), &x(1), &xr, a, b, p)];
     }
@@ -934,6 +1197,149 @@ fn summation(tower: &Tower, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) ->
         eqs.push(s3(&u(k - 1), &x(k + 1), &u(k), a, b, p));
     }
     eqs.push(s3(&u(m - 3), &x(m - 1), &xr, a, b, p));
+    eqs
+}
+
+/// An argument of `s3_dbl_args`: a plain polynomial, or a fraction `N/D`
+/// whose denominator the call clears.
+enum Arg {
+    Plain(Pol),
+    Frac(Pol, Pol),
+}
+
+impl Arg {
+    fn parts(&self, n: usize, p: u64) -> (Pol, Pol) {
+        match self {
+            Arg::Plain(f) => (f.clone(), Pol::constant(n, 1, p)),
+            Arg::Frac(num, den) => (num.clone(), den.clone()),
+        }
+    }
+}
+
+/// The numerator and denominator of the doubling map on abscissae,
+/// `x([2]P) = N(x)/D(x)`: `N = x⁴ − 2a x² − 8b x + a²`,
+/// `D = 4(x³ + a x + b)`.
+fn dbl_nd(x: &Pol, a: u64, b: u64, p: u64) -> (Pol, Pol) {
+    let n = x.n;
+    let x2 = x.mul(x, p);
+    let x3 = x2.mul(x, p);
+    let x4 = x2.mul(&x2, p);
+    let num = x4
+        .sub(&x2.scale(mulm(2, a, p), p), p)
+        .sub(&x.scale(mulm(8, b, p), p), p)
+        .add(&Pol::constant(n, mulm(a, a, p), p), p);
+    let den = x3
+        .add(&x.scale(a, p), p)
+        .add(&Pol::constant(n, b, p), p)
+        .scale(4, p);
+    (num, den)
+}
+
+/// `S₃` on three arguments, multiplied by `D_i²` for every `Frac` argument
+/// `N_i/D_i` so that the result is a polynomial. With `(N_i, D_i)` the
+/// parts of each argument (`D_i = 1` for a plain one) the clearing is
+/// `(N₁D₂ − N₂D₁)²N₃² − 2[(N₁D₂ + N₂D₁)(N₁N₂ + aD₁D₂) + 2bD₁²D₂²]N₃D₃
+///  + D₃²[(N₁N₂ − aD₁D₂)² − 4b(N₁D₂ + N₂D₁)D₁D₂]`.
+fn s3_dbl_args(args: [Arg; 3], a: u64, b: u64, p: u64) -> Pol {
+    let n = match &args[0] {
+        Arg::Plain(f) | Arg::Frac(f, _) => f.n,
+    };
+    let (n1, d1) = args[0].parts(n, p);
+    let (n2, d2) = args[1].parts(n, p);
+    let (n3, d3) = args[2].parts(n, p);
+    let n1d2 = n1.mul(&d2, p);
+    let n2d1 = n2.mul(&d1, p);
+    let d1d2 = d1.mul(&d2, p);
+    let n1n2 = n1.mul(&n2, p);
+    let diff = n1d2.sub(&n2d1, p);
+    let sum = n1d2.add(&n2d1, p);
+    let t1 = diff.mul(&diff, p).mul(&n3, p).mul(&n3, p);
+    let inner = sum
+        .mul(&n1n2.add(&d1d2.scale(a, p), p), p)
+        .add(&d1d2.mul(&d1d2, p).scale(mulm(2, b, p), p), p);
+    let t2 = inner.mul(&n3, p).mul(&d3, p).scale(p - 2, p);
+    let q = n1n2.sub(&d1d2.scale(a, p), p);
+    let t3 = q
+        .mul(&q, p)
+        .sub(&sum.mul(&d1d2, p).scale(mulm(4, b, p), p), p)
+        .mul(&d3, p)
+        .mul(&d3, p);
+    t1.add(&t2, p).add(&t3, p)
+}
+
+/// How many equations the `multiples` control appends to the tower system:
+/// one at `m = 2`; at `m ≥ 3` the `m − 2` doubling links and the `m − 1`
+/// doubled chain equations.
+fn multiples_appended(m: usize) -> usize {
+    if m == 2 {
+        1
+    } else {
+        (m - 2) + (m - 1)
+    }
+}
+
+/// `x([2]R) = N(x_R)/D(x_R)` modulo `p`.
+fn double_abscissa(x_r: u64, a: u64, b: u64, p: u64) -> u64 {
+    let xr = Pol::constant(1, x_r, p);
+    let (num, den) = dbl_nd(&xr, a, b, p);
+    let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+    assert!(
+        dv != 0,
+        "the multiples control: D(x_R) = 0, so R has order 2; the curve order is not odd"
+    );
+    mulm(nv, invm(dv, p), p)
+}
+
+/// The doubled-relation equations of the `multiples` control, in the
+/// variables of the `n`-variable system (`n` includes the `u'` unknowns at
+/// `m ≥ 3`).
+fn multiples_equations(
+    tower: &Tower,
+    curve: &PrimeCurve,
+    m: usize,
+    n: usize,
+    x_r: u64,
+) -> Vec<Pol> {
+    let p = curve.p;
+    let (a, b) = (curve.a, curve.b);
+    let x = |i: usize| Pol::var(n, i * tower.t).scale(tower.scale, p);
+    let c = Pol::constant(n, double_abscissa(x_r, a, b, p), p);
+    let frac = |i: usize| {
+        let (num, den) = dbl_nd(&x(i), a, b, p);
+        Arg::Frac(num, den)
+    };
+    if m == 2 {
+        let (n1, d1) = dbl_nd(&x(0), a, b, p);
+        let (n2, d2) = dbl_nd(&x(1), a, b, p);
+        return vec![s3_dbl_args(
+            [Arg::Frac(n1, d1), Arg::Frac(n2, d2), Arg::Plain(c)],
+            a,
+            b,
+            p,
+        )];
+    }
+    let u = |k: usize| Pol::var(n, m * tower.t + k);
+    let up = |k: usize| Pol::var(n, m * tower.t + (m - 2) + k);
+    let mut eqs = Vec::new();
+    for k in 0..m - 2 {
+        let (num, den) = dbl_nd(&u(k), a, b, p);
+        eqs.push(den.mul(&up(k), p).sub(&num, p));
+    }
+    eqs.push(s3_dbl_args([frac(0), frac(1), Arg::Plain(up(0))], a, b, p));
+    for k in 1..m - 2 {
+        eqs.push(s3_dbl_args(
+            [Arg::Plain(up(k - 1)), frac(k + 1), Arg::Plain(up(k))],
+            a,
+            b,
+            p,
+        ));
+    }
+    eqs.push(s3_dbl_args(
+        [Arg::Plain(up(m - 3)), frac(m - 1), Arg::Plain(c)],
+        a,
+        b,
+        p,
+    ));
     eqs
 }
 
@@ -956,6 +1362,29 @@ fn random_quadric(n: usize, at: &[u64], p: u64, rng: &mut StdRng) -> Pol {
     f.sub(&Pol::constant(n, c, p), p)
 }
 
+/// The exponent vectors of the `--null-width W` support of `eq`: every
+/// vector with exponent `0..=W` on each variable that occurs in `eq` and 0 on
+/// the others, in lexicographic order (`(W+1)^|vars|` of them).
+fn null_box(eq: &Pol, n: usize, w: usize) -> Vec<Vec<u32>> {
+    let mut vars: Vec<usize> = (0..n)
+        .filter(|&i| eq.terms.keys().any(|e| e[i] > 0))
+        .collect();
+    vars.sort_unstable();
+    let mut out = vec![vec![0u32; n]];
+    for &v in vars.iter().rev() {
+        let mut next = Vec::with_capacity(out.len() * (w + 1));
+        for d in 0..=w as u32 {
+            for e in &out {
+                let mut e = e.clone();
+                e[v] = d;
+                next.push(e);
+            }
+        }
+        out = next;
+    }
+    out
+}
+
 /// The system for one (control, target), with its number of variables
 /// and the planted solution in that system's variables.
 fn system(
@@ -965,6 +1394,7 @@ fn system(
     m: usize,
     target: &Target,
     g: usize,
+    null_width: Option<usize>,
     rng: &mut StdRng,
 ) -> (Vec<Pol>, usize, Option<Vec<u64>>, std::ops::Range<usize>) {
     let p = curve.p;
@@ -993,7 +1423,40 @@ fn system(
         let sol = target.planted.then(|| target.xs.clone());
         return (vec![s, member(0), member(1)], n, sol, 0..0);
     }
-    let n = m * t + (m - 2);
+    if control == Control::RandBase {
+        assert_eq!(m, 2, "randbase is written for m = 2");
+        let n = 2;
+        let size = match &tower.cover {
+            Some(cv) => cv.image(&tower.v, p).len(),
+            None => tower.v.len(),
+        };
+        let mut base: Vec<u64> = target.xs.clone();
+        while base.len() < size {
+            let x = rng.gen_range(0..p);
+            if !base.contains(&x) && curve.legendre(curve.rhs(x)) == 1 {
+                base.push(x);
+            }
+        }
+        let member = |i: usize| {
+            let xi = Pol::var(n, i);
+            base.iter().fold(Pol::constant(n, 1, p), |acc, &f| {
+                acc.mul(&xi.sub(&Pol::constant(n, f, p), p), p)
+            })
+        };
+        let s = s3(
+            &Pol::var(n, 0),
+            &Pol::var(n, 1),
+            &Pol::constant(n, target.x_r, p),
+            curve.a,
+            curve.b,
+            p,
+        );
+        let sol = target.planted.then(|| target.xs.clone());
+        return (vec![s, member(0), member(1)], n, sol, 0..0);
+    }
+    let multiples = control == Control::Multiples;
+    // The multiples control adds the m − 2 doubled partial sums u'_k.
+    let n = m * t + (m - 2) + if multiples && m >= 3 { m - 2 } else { 0 };
     let mut eqs = summation(tower, curve, m, n, target.x_r);
     if control == Control::Null {
         // S₃'s support, random coefficients, planted zero: at m = 2 the one
@@ -1001,8 +1464,19 @@ fn system(
         // order. At m = 2 the draws are those of the pilot's null.
         for eq in eqs.iter_mut() {
             let mut f = Pol::zero(n);
-            for e in eq.terms.keys() {
-                f.terms.insert(e.clone(), rng.gen_range(1..p));
+            match null_width {
+                None => {
+                    for e in eq.terms.keys() {
+                        f.terms.insert(e.clone(), rng.gen_range(1..p));
+                    }
+                }
+                Some(w) => {
+                    // `--null-width`: the full box of exponents 0..=w on
+                    // every variable the equation uses, 0 elsewhere.
+                    for e in null_box(eq, n, w) {
+                        f.terms.insert(e, rng.gen_range(1..p));
+                    }
+                }
             }
             if let Some(sol) = &target.solution {
                 let c = f.eval(sol, p);
@@ -1016,6 +1490,32 @@ fn system(
         eqs.extend(tower.equations(n, i * t, p));
     }
     let towers = towers_from..eqs.len();
+    let mut sol = target.solution.clone();
+    if multiples {
+        let before = eqs.len();
+        eqs.extend(multiples_equations(tower, curve, m, n, target.x_r));
+        assert_eq!(eqs.len() - before, multiples_appended(m));
+        if let Some(s) = sol.as_mut() {
+            let (a, b) = (curve.a, curve.b);
+            if m >= 3 {
+                // u'_k = x([2](P_1 + … + P_{k+2})) = N(u_k)/D(u_k).
+                for k in 0..m - 2 {
+                    let u = Pol::constant(1, s[m * t + k], p);
+                    let (num, den) = dbl_nd(&u, a, b, p);
+                    let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+                    assert!(dv != 0, "D(u_{k}) = 0 at the planted solution");
+                    s.push(mulm(nv, invm(dv, p), p));
+                }
+            }
+            for (k, e) in eqs.iter().enumerate() {
+                assert_eq!(
+                    e.eval(s, p),
+                    0,
+                    "multiples equation {k} does not vanish at the planted solution"
+                );
+            }
+        }
+    }
     if control == Control::Ladder {
         let sol = target
             .solution
@@ -1025,7 +1525,7 @@ fn system(
             eqs.push(random_quadric(n, sol, p, rng));
         }
     }
-    (eqs, n, target.solution.clone(), towers)
+    (eqs, n, sol, towers)
 }
 
 // ── Measuring ──────────────────────────────────────────────────────
@@ -1320,7 +1820,7 @@ fn measure_hky(
     let ring = if cell.control == Control::Naive {
         HkyRing::new(p, Vec::new(), n)
     } else {
-        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, cell.m - 2)
+        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, n - cell.m * tower.t)
     };
     let gens: Vec<hky_fp_tower::NfPoly> = eqs
         .iter()
@@ -1752,6 +2252,13 @@ struct Args {
     /// link of the chain given random coefficients on its own support (off
     /// by default, so every committed command line runs what it ran).
     null_chain: bool,
+    /// `--null-width W` (1..=4): the null control's support is the full box
+    /// of exponents `0..=W` on the equation's own variables, not `S₃`'s
+    /// support (off by default).
+    null_width: Option<usize>,
+    /// `--cover-map square|quad|generic`: the factor base is the image
+    /// `x∘φ(V)` of the tower set under a degree-2 cover map (off by default).
+    cover: Option<CoverKind>,
     budget: u64,
     seed: u64,
     ladder_ts: Vec<usize>,
@@ -1965,6 +2472,8 @@ fn parse_args() -> Args {
         planted_max_t: usize::MAX,
         random: 3,
         null_chain: false,
+        null_width: None,
+        cover: None,
         budget: 60,
         seed: 0x504B_4D54,
         ladder_ts: vec![4, 6],
@@ -2066,6 +2575,14 @@ fn parse_args() -> Args {
                     .collect()
             }
             "--m" => a.ms = list(&v),
+            "--cover-map" => {
+                a.cover = Some(match v.as_str() {
+                    "square" => CoverKind::Square,
+                    "quad" => CoverKind::Quad,
+                    "generic" => CoverKind::Generic,
+                    other => panic!("unknown --cover-map `{other}` (square, quad, generic)"),
+                })
+            }
             "--controls" => {
                 a.controls = v
                     .split(',')
@@ -2073,6 +2590,8 @@ fn parse_args() -> Args {
                         "tower" => Control::Tower,
                         "null" => Control::Null,
                         "naive" => Control::Naive,
+                        "multiples" => Control::Multiples,
+                        "randbase" => Control::RandBase,
                         other => panic!("unknown control `{other}` (the ladder has its own flags)"),
                     })
                     .collect()
@@ -2103,6 +2622,11 @@ fn parse_args() -> Args {
             }
             "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
             "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--null-width" => {
+                let w: usize = v.parse().expect("--null-width");
+                assert!((1..=4).contains(&w), "--null-width must be 1..=4");
+                a.null_width = Some(w);
+            }
             "--radix" => {
                 let r: u32 = v.parse().expect("--radix");
                 assert!(
@@ -2156,6 +2680,21 @@ fn parse_args() -> Args {
              an isogeny step's leading monomial would change"
         );
     }
+    if a.cover.is_some() {
+        assert!(
+            a.engine == Engine::F4,
+            "--cover-map runs under --engine f4 only: the tower engines rewrite \
+             the summation by the tower, which no longer starts at x"
+        );
+        assert!(
+            !a.controls
+                .iter()
+                .any(|c| matches!(c, Control::Naive | Control::Multiples)),
+            "--cover-map takes the tower, null and randbase controls"
+        );
+        // The generator-count ladder is not written for cover bases.
+        a.ladder_ts.clear();
+    }
     if a.p == 0 {
         // Above 2^63 only the wide builder holds the prime.
         a.wide = true;
@@ -2179,6 +2718,27 @@ fn target_curve(p: u64, tower: &Tower, need: usize, rng: &mut StdRng) -> (PrimeC
             continue;
         }
         let curve = PrimeCurve { p, a, b };
+        if let Some(cv) = &tower.cover {
+            // `on` holds the u of V whose image x∘φ(u) carries a point; the
+            // cover must be a smooth curve (h squarefree).
+            if cv.genus(a, b, p).is_none() {
+                continue;
+            }
+            let on: Vec<u64> = tower
+                .v
+                .iter()
+                .copied()
+                .filter(|&u| {
+                    cv.eval(u, p)
+                        .is_some_and(|x| curve.legendre(curve.rhs(x)) == 1)
+                })
+                .collect();
+            let distinct = cv.image(&on, p).len();
+            if distinct >= need {
+                return (curve, on);
+            }
+            continue;
+        }
         let on: Vec<u64> = tower
             .v
             .iter()
@@ -2207,7 +2767,11 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
         ^ ((cell.t as u64) << 16)
         ^ (cell.g as u64);
     let mut rng = StdRng::seed_from_u64(cell_seed);
-    let tower = build_tower(cell.kind, p, cell.t, &mut rng);
+    let mut tower = build_tower(cell.kind, p, cell.t, &mut rng);
+    if let Some(kind) = a.cover {
+        // Drawn after the tower, so no draw of a run without the flag moves.
+        tower.cover = Some(CoverMap::draw(kind, p, &mut rng));
+    }
     // A cell with planted targets needs m distinct base abscissae on the
     // curve. Random targets need none beyond two. Capping the requirement
     // at |V| changes nothing for a cell that could be drawn before
@@ -2244,10 +2808,21 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             cell.m,
             target,
             cell.g,
+            a.null_width,
             &mut rng,
         );
         if !matches!(a.engine, Engine::F4 | Engine::Hky) && cell.control == Control::Naive {
             // The naive control has no tower to rewrite by.
+            continue;
+        }
+        if cell.control == Control::Multiples && !matches!(a.engine, Engine::F4 | Engine::Hky) {
+            // The extra free variables u'_k are not in the tower engines' rings.
+            eprintln!(
+                "-- multiples runs under --engine f4 and --engine hky only; skipping {} m={} t={}",
+                cell.kind.name(),
+                cell.m,
+                cell.t
+            );
             continue;
         }
         if a.targets.as_ref().is_some_and(|ts| !ts.contains(&k)) {
@@ -2359,6 +2934,24 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             "staircase_at_stop": r.staircase_at_stop,
             "planted_ok": r.planted_ok,
         });
+        if let Some(w) = a.null_width {
+            row["null_width"] = json!(w);
+        }
+        if let Some(cv) = &tower.cover {
+            row["cover"] = json!({
+                "map": cv.kind.name(),
+                "num": cv.num,
+                "den": cv.den,
+                "genus": cv.genus(curve.a, curve.b, p),
+                "h_degree": cv.h(curve.a, curve.b, p).len() - 1,
+                "base_size": cv.image(&tower.v, p).len(),
+                "base_on_curve": cv.image(&on, p).len(),
+            });
+        }
+        if cell.control == Control::Multiples {
+            row["multiples"] = json!(2);
+            row["appended"] = json!(multiples_appended(cell.m));
+        }
         if let (Some(obj), Some(extra)) = (row.as_object_mut(), r.extra.as_object()) {
             for (k, v) in extra {
                 obj.insert(k.clone(), v.clone());
@@ -2529,6 +3122,7 @@ fn export_magma_rows(files: &[String], dir: &str) {
                 steps: vec![Step::Square; t],
                 c: 1,
                 info: r["tower"].clone(),
+                cover: None,
             };
             let curve = PrimeCurve { p, a: ca, b: cb };
             let target = Target {
@@ -2538,7 +3132,16 @@ fn export_magma_rows(files: &[String], dir: &str) {
                 xs: Vec::new(),
             };
             let mut rng = StdRng::seed_from_u64(0);
-            let (eqs, n, _, _) = system(Control::Tower, &tower, &curve, m, &target, 1, &mut rng);
+            let (eqs, n, _, _) = system(
+                Control::Tower,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
             let name = format!("pkm_kummer_p{p}_m{m}_t{t}_x{x_r}");
             let mut names: Vec<String> = Vec::new();
             for i in 0..m {
@@ -2650,6 +3253,8 @@ fn main() {
                     Control::Tower => true,
                     Control::Null => m == 2 || a.null_chain,
                     Control::Naive => m == 2 && kind == Kind::Kummer,
+                    Control::Multiples => true,
+                    Control::RandBase => m == 2,
                     Control::Ladder => false,
                 })
                 .collect();
@@ -2798,12 +3403,239 @@ mod tests {
                 break tg;
             }
         };
-        let (eqs, _, sol, _) = system(Control::Null, &tower, &curve, 3, &target, 1, &mut rng);
+        let (eqs, _, sol, _) = system(Control::Null, &tower, &curve, 3, &target, 1, None, &mut rng);
         let sol = sol.expect("planted");
         assert!(eqs.iter().all(|e| e.eval(&sol, p) == 0));
         // The null changed every chain link's coefficients.
-        let (tw, _, _, _) = system(Control::Tower, &tower, &curve, 3, &target, 1, &mut rng);
+        let (tw, _, _, _) = system(
+            Control::Tower,
+            &tower,
+            &curve,
+            3,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
         assert_ne!(eqs[0].terms, tw[0].terms);
         assert_ne!(eqs[1].terms, tw[1].terms);
+    }
+
+    /// `15·2^27 + 1`.
+    const BB_PRIME: u64 = 2_013_265_921;
+
+    #[test]
+    fn doubling_formula_matches_curve_arithmetic() {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(0xD0B1);
+        let mut checked = 0;
+        while checked < 20 {
+            let curve = PrimeCurve {
+                p,
+                a: rng.gen_range(1..p),
+                b: rng.gen_range(1..p),
+            };
+            let pt = random_point(&curve, &mut rng);
+            if pt.infinity {
+                continue;
+            }
+            let mut ops = GroupOps::default();
+            let two = curve.add(&mut ops, pt, pt);
+            let xr = Pol::constant(1, pt.x, p);
+            let (num, den) = dbl_nd(&xr, curve.a, curve.b, p);
+            let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+            if dv == 0 {
+                assert!(two.infinity);
+                continue;
+            }
+            assert_eq!(mulm(nv, invm(dv, p), p), two.x);
+            assert_eq!(double_abscissa(pt.x, curve.a, curve.b, p), two.x);
+            checked += 1;
+        }
+    }
+
+    /// A Kummer cell with a planted target, for the `multiples` tests.
+    fn multiples_cell(m: usize, t: usize, seed: u64) -> (Tower, PrimeCurve, Target, StdRng) {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(seed);
+        let tower = kummer(p, t, &mut rng);
+        let (curve, on) = target_curve(p, &tower, m, &mut rng);
+        let target = loop {
+            if let Some(tg) = plant(&curve, &tower, m, &on, &mut rng) {
+                break tg;
+            }
+        };
+        (tower, curve, target, rng)
+    }
+
+    fn check_multiples_vanish(m: usize, t: usize, seed: u64) {
+        let (tower, curve, target, mut rng) = multiples_cell(m, t, seed);
+        let (tw, n_tw, _, _) = system(
+            Control::Tower,
+            &tower,
+            &curve,
+            m,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
+        let (eqs, n, sol, _) = system(
+            Control::Multiples,
+            &tower,
+            &curve,
+            m,
+            &target,
+            1,
+            None,
+            &mut rng,
+        );
+        let sol = sol.expect("planted");
+        assert_eq!(sol.len(), n);
+        assert_eq!(eqs.len() - tw.len(), multiples_appended(m));
+        let expect = if m == 2 { 1 } else { (m - 2) + (m - 1) };
+        assert_eq!(eqs.len() - tw.len(), expect);
+        assert_eq!(n, n_tw + if m >= 3 { m - 2 } else { 0 });
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(e.eval(&sol, curve.p), 0, "equation {k}");
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m2() {
+        for seed in 1..=3 {
+            check_multiples_vanish(2, 3, seed);
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m4() {
+        for seed in 1..=3 {
+            check_multiples_vanish(4, 3, seed);
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m3() {
+        check_multiples_vanish(3, 3, 7);
+    }
+
+    #[test]
+    fn multiples_rows_match_tower_on_random_targets_prefix() {
+        for m in [2usize, 4] {
+            let p = BB_PRIME;
+            let mut rng = StdRng::seed_from_u64(0x77 + m as u64);
+            let tower = kummer(p, 3, &mut rng);
+            let (curve, _) = target_curve(p, &tower, m, &mut rng);
+            let target = random_target(&curve, &mut rng);
+            let (tw, _, _, _) = system(
+                Control::Tower,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
+            let (mu, n, sol, _) = system(
+                Control::Multiples,
+                &tower,
+                &curve,
+                m,
+                &target,
+                1,
+                None,
+                &mut rng,
+            );
+            assert!(sol.is_none());
+            assert_eq!(mu.len(), tw.len() + multiples_appended(m));
+            for (k, e) in tw.iter().enumerate() {
+                // Same terms, padded to the larger ring's variable count.
+                assert_eq!(e.terms.len(), mu[k].terms.len(), "equation {k}");
+                for (ex, c) in &e.terms {
+                    let mut padded = ex.clone();
+                    padded.resize(n, 0);
+                    assert_eq!(mu[k].terms.get(&padded), Some(c), "equation {k}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn null_width_support_is_the_full_box() {
+        let (tower, curve, target, _) = multiples_cell(2, 3, 12345);
+        let t = tower.t;
+        for (w, count) in [(1usize, 4usize), (2, 9), (3, 16)] {
+            let mut rng = StdRng::seed_from_u64(99);
+            let (eqs, n, sol, _) = system(
+                Control::Null,
+                &tower,
+                &curve,
+                2,
+                &target,
+                1,
+                Some(w),
+                &mut rng,
+            );
+            let f = &eqs[0];
+            // The planted shift can only change the constant's coefficient.
+            assert_eq!(f.terms.len(), count, "W = {w}");
+            for e in f.terms.keys() {
+                for (i, &d) in e.iter().enumerate() {
+                    if i == 0 || i == t {
+                        assert!(d as usize <= w);
+                    } else {
+                        assert_eq!(d, 0, "index {i}");
+                    }
+                }
+            }
+            assert_eq!(
+                f.terms
+                    .keys()
+                    .filter(|e| e[0] as usize == w && e[t] as usize == w)
+                    .count(),
+                1
+            );
+            if let Some(s) = sol {
+                assert_eq!(f.eval(&s, curve.p), 0);
+            }
+            assert_eq!(n, 2 * t);
+        }
+    }
+
+    #[test]
+    fn null_width_keeps_targets_and_tower() {
+        let (tower, curve, target, rng) = multiples_cell(2, 3, 777);
+        let mut r1 = rng.clone();
+        let mut r2 = rng;
+        let (tw, n1, _, rg1) = system(Control::Tower, &tower, &curve, 2, &target, 1, None, &mut r1);
+        let (nu, n2, _, rg2) = system(
+            Control::Null,
+            &tower,
+            &curve,
+            2,
+            &target,
+            1,
+            Some(3),
+            &mut r2,
+        );
+        assert_eq!((n1, rg1.clone()), (n2, rg2.clone()));
+        for (a, b) in tw[rg1].iter().zip(&nu[rg2]) {
+            assert_eq!(a.terms, b.terms);
+        }
+        assert_eq!(tw.len(), nu.len());
+        assert_ne!(tw[0].terms, nu[0].terms);
+    }
+
+    #[test]
+    fn null_default_unchanged() {
+        // Expected values computed with the code before `--null-width`.
+        let (tower, curve, target, mut rng) = multiples_cell(2, 3, 12345);
+        let (eqs, _, _, _) = system(Control::Null, &tower, &curve, 2, &target, 1, None, &mut rng);
+        assert_eq!(eqs.len(), 7);
+        assert_eq!(eqs[0].terms.len(), 9);
+        let sum = eqs[0].terms.values().fold(0u64, |a, &c| (a + c) % curve.p);
+        assert_eq!(sum, 1_862_312_789);
     }
 }

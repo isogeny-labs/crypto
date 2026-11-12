@@ -65,9 +65,15 @@ function applyPinnedInputView({ cwd, view, manifest }) {
     const revision = item.revision;
     const sourcePath = relative(item.source_path);
     const originalManifest = relative(item.original_manifest);
+    // The original freeze names the input either by a `source_sha256` key or,
+    // for a `files`-style map whose names hold slashes, by an RFC 6901 pointer.
     const sourceKey = item.original_source_key;
+    const sourcePointer = item.original_source_pointer;
     const expected = item.sha256;
-    if (typeof sourceKey !== 'string' || !/^[0-9a-f]{64}$/.test(expected ?? '')
+    if ((sourceKey === undefined) === (sourcePointer === undefined)) {
+      throw new Error(`pinned input needs exactly one of original_source_key or original_source_pointer: ${target}`);
+    }
+    if ((sourceKey !== undefined && typeof sourceKey !== 'string') || !/^[0-9a-f]{64}$/.test(expected ?? '')
         || !/^[0-9a-f]{64}$/.test(item.original_manifest_sha256 ?? '')) {
       throw new Error(`invalid pinned-input digests: ${target}`);
     }
@@ -77,17 +83,35 @@ function applyPinnedInputView({ cwd, view, manifest }) {
     }
     const viewOriginalBytes = regularBytes(view, originalManifest, 'view original freeze manifest');
     if (!viewOriginalBytes.equals(originalBytes)) throw new Error(`view changed original freeze manifest: ${originalManifest}`);
-    const frozen = JSON.parse(originalBytes.toString('utf8'));
-    if (frozen.source_sha256?.[sourceKey] !== expected) {
-      throw new Error(`pinned input does not match original frozen source: ${sourceKey}`);
+    // A coreutils `sha256sum` freeze (`original_manifest_format: "sha256sum"`)
+    // is read as its path-to-digest map, so a pointer names one listed path.
+    const originalFormat = item.original_manifest_format;
+    if (originalFormat !== undefined && (originalFormat !== 'sha256sum' || sourcePointer === undefined)) {
+      throw new Error(`original_manifest_format must be sha256sum with original_source_pointer: ${target}`);
+    }
+    const frozen = originalFormat === 'sha256sum' ? sha256sumDigests(originalBytes)
+      : JSON.parse(originalBytes.toString('utf8'));
+    const frozenDigest = sourceKey !== undefined ? frozen.source_sha256?.[sourceKey]
+      : selectField(frozen, `pointer:${sourcePointer}`);
+    if (frozenDigest !== expected) {
+      throw new Error(`pinned input does not match original frozen source: ${sourceKey ?? sourcePointer}`);
     }
     const live = regularBytes(cwd, target, 'live pinned-input target');
     const currentSources = {};
-    if (!Array.isArray(item.current_equal) || !item.current_equal.some(pair =>
-      Array.isArray(pair) && pair.length === 2 && pair.includes(target))) {
+    // Either the live target is checked against a current twin (lockstep), or,
+    // when it has none because current code moved on, a committed drift note
+    // must name the target: the overlay never hides drift.
+    let driftNote = null;
+    if (item.current_equal === undefined && item.current_drift_note !== undefined) {
+      driftNote = relative(item.current_drift_note);
+      if (!regularBytes(cwd, driftNote, 'current drift note').toString('utf8').includes(target)) {
+        throw new Error(`current drift note does not name the pinned input: ${target}`);
+      }
+    } else if (item.current_drift_note !== undefined || !Array.isArray(item.current_equal)
+      || !item.current_equal.some(pair => Array.isArray(pair) && pair.length === 2 && pair.includes(target))) {
       throw new Error(`pinned input lacks a current-source equality check: ${target}`);
     }
-    for (const pair of item.current_equal) {
+    for (const pair of item.current_equal ?? []) {
       if (!Array.isArray(pair) || pair.length !== 2) throw new Error(`invalid current-source pair: ${target}`);
       const [left, right] = pair.map(relative);
       if (left === right || pair.filter(name => relative(name) === target).length !== 1) {
@@ -113,7 +137,10 @@ function applyPinnedInputView({ cwd, view, manifest }) {
     }
     overlays.push({ target, revision, source_path: sourcePath, sha256: expected,
       original_manifest: originalManifest, original_manifest_sha256: item.original_manifest_sha256,
-      original_source_key: sourceKey, live_target_sha256: sha(live), current_sources: currentSources,
+      ...(originalFormat ? { original_manifest_format: originalFormat } : {}),
+      ...(sourceKey !== undefined ? { original_source_key: sourceKey } : { original_source_pointer: sourcePointer }),
+      live_target_sha256: sha(live), current_sources: currentSources,
+      ...(driftNote ? { current_drift_note: driftNote } : {}),
       view_sha256: sha(historical) });
   }
   return overlays;
@@ -221,11 +248,13 @@ export function withFrozenWorkflow({ cwd = process.cwd(), workflow, revision, ma
       mkdirSync(path.dirname(path.join(view, file)), { recursive: true });
       writeFileSync(path.join(view, file), bytes);
     }
+    // Pinned historical inputs are overlaid first, so the manifest's own
+    // digests then check the restored bytes; any other drift still fails.
+    const pinnedInputViews = inputViewManifest
+      ? applyPinnedInputView({ cwd, view, manifest: inputViewManifest }) : [];
     for (const { file, digest } of ownInputs) {
       if (sha(readFileSync(path.join(view, file))) !== digest) throw new Error(`frozen input drift: ${file}`);
     }
-    const pinnedInputViews = inputViewManifest
-      ? applyPinnedInputView({ cwd, view, manifest: inputViewManifest }) : [];
     // Original preflights retain their Git ancestry assertions, against the
     // current checkout's unchanged object database; no historical code checkout.
     const gitPath = path.join(cwd, '.git');

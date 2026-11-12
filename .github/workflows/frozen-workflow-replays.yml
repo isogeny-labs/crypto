@@ -17,6 +17,7 @@ on:
       - '.github/scripts/frozen-workflow-check.mjs'
       - '.github/scripts/run-frozen-workflow-replays.mjs'
       - '.github/scripts/frozen-workflow-pins.json'
+      - '.github/scripts/*-view-v1.json'
       - 'research/notes/ecc2k130/**'
       - 'research/ecc2k130_factor_base_replication_20260925/**'
       - 'research/ecc2k130_relations/**'
@@ -25,6 +26,8 @@ on:
       - 'research/ecc2k130_oriented_transport_20260924/**'
       - 'research/endomorphism_search_20261005/**'
       - 'tools/endomorphism-search/**'
+      - 'research/p192_extension_cover_20261012/FROZEN_VIEW.md'
+      - 'research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/**'
       - 'src/hash/sha256.rs'
       - '.github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml'
       - '.github/workflows/ecc2k130-factor-base-orbit-holdouts.yml'
@@ -89,6 +92,8 @@ jobs:
             research/ecc2k130_oriented_transport_20260924
             research/endomorphism_search_20261005
             tools/endomorphism-search
+            research/p192_extension_cover_20261012/lean
+            research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight
             src/hash
             tools/artifacts
             .artifacts
@@ -111,6 +116,6 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130 research/p192_extension_cover_20261012
       - name: Custody of every pin, then each replay in its isolated view
         run: node .github/scripts/run-frozen-workflow-replays.mjs

@@ -488,6 +488,112 @@ test('a sha256sum manifest rejects drifted inputs and malformed lines', async ()
   }
 });
 
+// A `files`-style freeze names its inputs by path, so the input view selects
+// the digest by JSON Pointer; with no current twin, a committed drift note
+// must name the target instead of a current-source equality pair.
+function pointerView(config, { note = 'docs/DRIFT.md' } = {}) {
+  const [item] = config.inputs;
+  delete item.original_source_key;
+  delete item.current_equal;
+  item.original_source_pointer = '/source_sha256/cargo_lock';
+  item.current_drift_note = note;
+  return config;
+}
+
+test('a JSON Pointer input view with a drift note overlays the historical input', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    write(options.inputViewManifest, JSON.stringify(pointerView(
+      JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')))) + '\n');
+    write('docs/DRIFT.md', `${lockPath} changed after the freeze.\n`);
+    const logs = [];
+    const log = console.log;
+    console.log = line => logs.push(String(line));
+    try {
+      assert.equal(withFrozenWorkflow(options), 0);
+    } finally {
+      console.log = log;
+    }
+    assert.notEqual(readFileSync(marker, 'utf8'), cwd);
+    assert.equal(readFileSync(path.join(cwd, lockPath), 'utf8'), currentLock);
+    const view = JSON.parse(logs.find(line => line.startsWith('FROZEN_WORKFLOW_METADATA_VIEW ')).slice(30));
+    assert.equal(view.pinned_input_views[0].original_source_pointer, '/source_sha256/cargo_lock');
+    assert.equal(view.pinned_input_views[0].current_drift_note, 'docs/DRIFT.md');
+    assert.equal(view.pinned_input_views[0].view_sha256, sha(historicalLock));
+  }, { withPinnedInput: true });
+});
+
+test('a drift note must exist and name the pinned input', async () => {
+  for (const [noteText, pattern] of [[null, /ENOENT/], ['some other file drifted\n', /drift note does not name the pinned input/]]) {
+    await fixture(async ({ cwd, write, options, marker }) => {
+      write(options.inputViewManifest, JSON.stringify(pointerView(
+        JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')))) + '\n');
+      if (noteText !== null) write('docs/DRIFT.md', noteText);
+      assert.throws(() => withFrozenWorkflow(options), pattern);
+      assert.equal(existsSync(marker), false);
+    }, { withPinnedInput: true });
+  }
+});
+
+test('an input view names its original digest by exactly one selector, and the pointer must match', async () => {
+  const cases = [
+    [config => { config.inputs[0].original_source_key = 'cargo_lock'; }, /exactly one of original_source_key or original_source_pointer/],
+    [config => { delete config.inputs[0].original_source_pointer; }, /exactly one of original_source_key or original_source_pointer/],
+    [config => { config.inputs[0].original_source_pointer = '/source_sha256/other'; }, /does not match original frozen source/],
+    [config => { config.inputs[0].current_equal = [[lockPath, 'Cargo.lock']]; }, /lacks a current-source equality check/],
+    [config => { config.inputs[0].current_drift_note = '../outside.md'; }, /unsafe source-view path/],
+  ];
+  for (const [mutate, pattern] of cases) {
+    await fixture(async ({ cwd, write, options, marker }) => {
+      const config = pointerView(JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')));
+      mutate(config);
+      write(options.inputViewManifest, JSON.stringify(config) + '\n');
+      write('docs/DRIFT.md', `${lockPath} changed after the freeze.\n`);
+      assert.throws(() => withFrozenWorkflow(options), pattern);
+      assert.equal(existsSync(marker), false);
+    }, { withPinnedInput: true });
+  }
+});
+
+test('a tampered historical input revision fails before the validator runs', async () => {
+  await fixture(async ({ cwd, write, options, marker, current }) => {
+    const config = pointerView(JSON.parse(readFileSync(path.join(cwd, options.inputViewManifest), 'utf8')));
+    config.inputs[0].revision = current;
+    write(options.inputViewManifest, JSON.stringify(config) + '\n');
+    write('docs/DRIFT.md', `${lockPath} changed after the freeze.\n`);
+    assert.throws(() => withFrozenWorkflow(options), /pinned Git source hash mismatch/);
+    assert.equal(existsSync(marker), false);
+  }, { withPinnedInput: true });
+});
+
+test('replay runner: input_view_manifest is passed to the view and checked by custody', async () => {
+  const { custodyProblems } = await import('./run-frozen-workflow-replays.mjs');
+  const source = readFileSync(fileURLToPath(new URL('./run-frozen-workflow-replays.mjs', import.meta.url)), 'utf8');
+  assert.match(source, /inputViewManifest: replay\.input_view_manifest/);
+  const repo = mkdtempSync(path.join(os.tmpdir(), 'frozen-replay-input-view-'));
+  try {
+    const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim();
+    git('init', '-q');
+    mkdirSync(path.join(repo, '.github/workflows'), { recursive: true });
+    writeFileSync(path.join(repo, '.github/workflows/a.yml'), 'name: a\n');
+    const pin = sha('name: a\n');
+    writeFileSync(path.join(repo, 'a.json'), pin);
+    git('add', '.');
+    git('-c', 'user.name=t', '-c', 'user.email=t@example.invalid', 'commit', '-qm', 'pins');
+    const index = input_view_manifest => ({ revision: git('rev-parse', 'HEAD'),
+      workflows: { '.github/workflows/a.yml': { pinned_sha256: pin, check: 'replay', pinned_by: ['a.json'] } },
+      replays: [{ id: 'ra', workflow: '.github/workflows/a.yml', extra_workflows: [],
+        ...(input_view_manifest === undefined ? {} : { input_view_manifest }) }] });
+    assert.deepEqual(custodyProblems({ cwd: repo, index: index(undefined) }), []);
+    assert.deepEqual(custodyProblems({ cwd: repo, index: index('.github/scripts/view-v1.json') }), []);
+    for (const bad of ['research/view.json', '.github/scripts/../x.json', 7]) {
+      assert.deepEqual(custodyProblems({ cwd: repo, index: index(bad) }),
+        ['ra: input_view_manifest must be a JSON file under .github/scripts/']);
+    }
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
 // A repository whose workflow has two pinned versions: the index revision holds
 // v2 (pinned by v2.json), and a sha256sum manifest pins v1 at an earlier commit.
 function twoVersionRepo() {
@@ -574,6 +680,97 @@ test('replay runner: a per-replay revision restores its own workflow version in 
     result = run({ ...index, replays: [{ ...replay, revision: second }] });
     assert.equal(result.status, 1);
     assert.match(result.stderr, /custody: replay run: .* does not pin/);
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+// A coreutils sha256sum freeze can pin a source file that a later merge edited.
+// The input view restores it from the run's own commit, selecting its digest
+// from the manifest's path-to-digest map by pointer (`original_manifest_format`).
+function sha256sumInputViewRepo() {
+  const fx = twoVersionRepo();
+  const { git, write, first, m } = fx;
+  const report = 'research/run/REPORT.md';
+  // The pinned report is added at the run's own commit (amend keeps one v1 commit).
+  git('checkout', '-q', first);
+  write(report, 'frozen report\n');
+  write(m, `${sha('{"row":1}\n')}  research/run/out.json\n${sha('frozen report\n')}  ${report}\n${sha('name: v1\n')}  ${fx.w}\n`);
+  git('add', '.');
+  git('commit', '-q', '--amend', '-m', 'v1 run');
+  const run = git('rev-parse', 'HEAD');
+  write(fx.w, 'name: v2\n');
+  write('v2.json', sha('name: v2\n'));
+  git('add', '.');
+  git('commit', '-qm', 'v2 evidence');
+  const second = git('rev-parse', 'HEAD');
+  write(report, 'frozen report\n![figure](fig.svg)\n');
+  write(fx.w, 'name: live\n');
+  write('research/run/DRIFT.md', `${report} gained figure links after the freeze.\n`);
+  const view = '.github/scripts/run-report-view-v1.json';
+  const item = { target: report, revision: run, source_path: report, sha256: sha('frozen report\n'),
+    original_manifest: m, original_manifest_sha256: sha(readFileSync(path.join(fx.repo, m))),
+    original_manifest_format: 'sha256sum', original_source_pointer: '/research~1run~1REPORT.md',
+    current_drift_note: 'research/run/DRIFT.md' };
+  write(view, JSON.stringify({ schema: 'frozen-input-view/v1', inputs: [item] }) + '\n');
+  git('add', '.');
+  git('commit', '-qm', 'figure links and live CI policy');
+  const replay = { ...fx.replay, revision: run, input_view_manifest: view };
+  const index = { ...fx.index, revision: second,
+    workflows: { [fx.w]: { ...fx.index.workflows[fx.w] } }, replays: [replay] };
+  return { ...fx, report, view, item, run, second, replay, index };
+}
+
+test('a sha256sum input view restores a drifted pinned input and the manifest then checks it', () => {
+  const runner = fileURLToPath(new URL('./run-frozen-workflow-replays.mjs', import.meta.url));
+  const { repo, git, write, index, replay, view, item, report, m, second } = sha256sumInputViewRepo();
+  const live = git('rev-parse', 'HEAD');
+  const run = (idx, ...argv) => {
+    write('.github/scripts/frozen-workflow-pins.json', JSON.stringify(idx));
+    return spawnSync(process.execPath, [runner, ...argv], { cwd: repo, encoding: 'utf8' });
+  };
+  const withItem = patch => { write(view, JSON.stringify({ schema: 'frozen-input-view/v1', inputs: [{ ...item, ...patch }] }) + '\n'); };
+  const withoutKey = key => { const { [key]: _, ...rest } = item;
+    write(view, JSON.stringify({ schema: 'frozen-input-view/v1', inputs: [rest] }) + '\n'); };
+  try {
+    assert.throws(() => execFileSync('sha256sum', ['--check', '--quiet', m], { cwd: repo, stdio: 'pipe' }));
+    let result = run(index, '--only', 'run', '--', 'bash', '-eo', 'pipefail', '-c', `sha256sum -c ${m}`);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /research\/run\/REPORT\.md: OK/);
+    assert.match(result.stdout, /"original_manifest_format":"sha256sum"/);
+    assert.equal(readFileSync(path.join(repo, report), 'utf8'), 'frozen report\n![figure](fig.svg)\n');
+    assert.equal(run(index).status, 0);
+    // Without the input view the drifted report fails the manifest's own check.
+    const { input_view_manifest: _, ...plain } = replay;
+    result = run({ ...index, replays: [plain] });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /frozen input drift: research\/run\/REPORT\.md/);
+    // A wrong replay revision fails workflow custody.
+    result = run({ ...index, replays: [{ ...replay, revision: second }] });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /does not pin/);
+    const cases = [
+      [() => withItem({ sha256: sha('tampered\n') }), /does not match original frozen source/],
+      [() => withItem({ original_source_pointer: '/research~1run~1out.json' }), /does not match original frozen source/],
+      [() => withItem({ original_manifest_sha256: sha('other') }), /original freeze manifest changed/],
+      [() => withItem({ revision: live }), /pinned Git source hash mismatch/],
+      [() => withItem({ original_manifest_format: 'files' }), /original_manifest_format must be sha256sum/],
+      [() => { withoutKey('original_source_pointer'); withItem({ original_source_pointer: undefined, original_source_key: 'x' }); },
+        /original_manifest_format must be sha256sum with original_source_pointer/],
+      [() => withoutKey('original_manifest_format'), /Unexpected token|JSON/],
+      [() => withoutKey('current_drift_note'), /lacks a current-source equality check/],
+      [() => { withItem({}); write('research/run/DRIFT.md', 'something else drifted\n'); }, /drift note does not name the pinned input/],
+      [() => { withItem({}); write('research/run/out.json', '{"row":2}\n'); }, /frozen input drift: research\/run\/out\.json/],
+    ];
+    for (const [mutate, pattern] of cases) {
+      mutate();
+      result = run(index, '--only', 'run', '--', 'bash', '-eo', 'pipefail', '-c', `sha256sum -c ${m}`);
+      assert.equal(result.status, 1, String(pattern));
+      assert.match(result.stderr, pattern);
+      withItem({});
+      write('research/run/DRIFT.md', `${report} gained figure links after the freeze.\n`);
+      write('research/run/out.json', '{"row":1}\n');
+    }
   } finally {
     rmSync(repo, { recursive: true, force: true });
   }
