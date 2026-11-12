@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T1938Z-inherited-f4-batched-ab-run3",
+  "latest_record": "20261112T2009Z-fes-then-batched-e2e",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 134,
+    "measured": 135,
     "open": 0
   },
   "repo": "crypto",
@@ -16194,6 +16194,127 @@
         }
       ],
       "problem": "study:elliptic_code_list_decoding_20261107",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.889,
+      "latest": 0.889,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ftb_over_inherited_s_ratio_max",
+      "points": [
+        {
+          "commit": "4900647bcd3f",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261112T2009Z-fes-then-batched-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.739,
+            0.889
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4, fes-then-inherited and fes-then-batched, 3 repeats: all configurations verified; fes-then-batched lowest algebraic row everywhere, 0.74-0.89 of inherited-f4 (Koblitz 13: 101.9 vs 137.9; Koblitz 23: 1674.3 vs 2051.2), lowest IC row on five of six (pair table lower on random 21); Koblitz rows equal the earlier runs exactly. Local container; unverified.",
+          "value": 0.889
+        }
+      ],
+      "problem": "study:fes_then_batched_20261112:e2e-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 101.9,
+      "latest": 101.9,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 35.259516
+      },
+      "metric": "s_fes_then_batched_koblitz13",
+      "points": [
+        {
+          "commit": "4900647bcd3f",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 35.259516
+          },
+          "n": 3,
+          "record": "20261112T2009Z-fes-then-batched-e2e",
+          "reference": 2.89,
+          "reference_kind": "matched_rho",
+          "spread": [
+            83.7,
+            116.3
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4, fes-then-inherited and fes-then-batched, 3 repeats: all configurations verified; fes-then-batched lowest algebraic row everywhere, 0.74-0.89 of inherited-f4 (Koblitz 13: 101.9 vs 137.9; Koblitz 23: 1674.3 vs 2051.2), lowest IC row on five of six (pair table lower on random 21); Koblitz rows equal the earlier runs exactly. Local container; unverified.",
+          "value": 101.9
+        }
+      ],
+      "problem": "study:fes_then_batched_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1674.3,
+      "latest": 1674.3,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1902.613636
+      },
+      "metric": "s_fes_then_batched_koblitz23",
+      "points": [
+        {
+          "commit": "4900647bcd3f",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1902.613636
+          },
+          "n": 3,
+          "record": "20261112T2009Z-fes-then-batched-e2e",
+          "reference": 0.88,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1223.1,
+            1999.0
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4, fes-then-inherited and fes-then-batched, 3 repeats: all configurations verified; fes-then-batched lowest algebraic row everywhere, 0.74-0.89 of inherited-f4 (Koblitz 13: 101.9 vs 137.9; Koblitz 23: 1674.3 vs 2051.2), lowest IC row on five of six (pair table lower on random 21); Koblitz rows equal the earlier runs exactly. Local container; unverified.",
+          "value": 1674.3
+        }
+      ],
+      "problem": "study:fes_then_batched_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 24.0,
+      "latest": 24.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verified_configurations",
+      "points": [
+        {
+          "commit": "4900647bcd3f",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261112T2009Z-fes-then-batched-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4, fes-then-inherited and fes-then-batched, 3 repeats: all configurations verified; fes-then-batched lowest algebraic row everywhere, 0.74-0.89 of inherited-f4 (Koblitz 13: 101.9 vs 137.9; Koblitz 23: 1674.3 vs 2051.2), lowest IC row on five of six (pair table lower on random 21); Koblitz rows equal the earlier runs exactly. Local container; unverified.",
+          "value": 24.0
+        }
+      ],
+      "problem": "study:fes_then_batched_20261112:e2e-ladder",
       "unit": "count"
     },
     {
