@@ -5,7 +5,7 @@
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 121,
+    "measured": 124,
     "open": 0
   },
   "repo": "crypto",
@@ -13781,6 +13781,218 @@
     },
     {
       "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "disagreements_with_fes",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 78,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.745,
+      "latest": 0.745,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_over_old_wall_ratio_24_unknowns",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.745
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.893,
+      "latest": 0.893,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "next_over_old_wall_ratio_median",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 13,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.86,
+            0.941
+          ],
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.893
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "ops_differences",
+      "points": [
+        {
+          "commit": "8ef2534964f8",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 78,
+          "record": "20261112T0630Z-inherited-f4-next-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired ic descent of inherited-f4 and inherited-f4-next (same counted work, faster kernels) with fes-f2 as reference, K and R, 14-24 unknowns plus K 30 and 32, 6 targets x 3 repeats, one thread: next/old 0.86-0.94 per call on every cell (median 0.89), ops equal on every target, 0 disagreements; fes-f2 below both on wall to 24 unknowns, 7.8-14x above at 30-32, word-XOR count below inherited-f4 only at 14 unknowns. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.918,
+      "latest": 0.918,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "next_over_old_wall_per_call_koblitz23",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 0.918
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 94.7,
+      "latest": 94.7,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 34.311594
+      },
+      "metric": "s_fes_f2_koblitz13",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 34.311594
+          },
+          "n": 2,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": 2.76,
+          "reference_kind": "matched_rho",
+          "spread": [
+            83.71,
+            105.69
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 94.7
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "s_next_minus_old_max_abs",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 6,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 24.0,
+      "latest": 24.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verified_configurations",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 24.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
       "first": 87.1,
       "latest": 87.1,
       "latest_derived": {
@@ -14098,6 +14310,113 @@
       ],
       "problem": "study:m4gb_persistent_server_20261111:descent-ab",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "arm_disagreements",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 1350,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.61,
+      "latest": 0.61,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "new_over_old_wall_ratio_24_unknowns",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.61
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.885,
+      "latest": 0.885,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "new_over_old_wall_ratio_degree6",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.885
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.66,
+      "latest": 0.66,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "new_over_old_wall_ratio_range_14_to_24",
+      "points": [
+        {
+          "commit": "0d1de350016e",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 66,
+          "record": "20261112T0517Z-m4gb-update-signatures",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.57,
+            0.75
+          ],
+          "summary": "Paired corpus A/B of M4GB patch 0004 (divisibility signatures in update()) against patches 0001-0003 with an A/A arm: 90 captured descent systems (K and R, 12-24 unknowns m=2, 12 unknowns m=3), 5 repeats, --serve, one thread. 0 disagreements over 1350 requests; per call 0.57-0.75x from 14 to 24 unknowns (65/66 systems below old, A/A 0.93-1.11), no effect at 12 unknowns, 0.88-0.89x on the degree-6 systems. Local container; unverified.",
+          "value": 0.66
+        }
+      ],
+      "problem": "study:m4gb_update_signatures_20261112:corpus-ab",
+      "unit": "ratio"
     },
     {
       "better": "lower",

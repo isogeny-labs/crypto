@@ -1,34 +1,35 @@
 # Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-Owner (2026-11-11): "Any other perf optimizations here? Can we use tricks like dynamic programming
-or things that I'm not aware of for grobner base" — then "Go". Catalogue the levers
-(docs/ic/GROEBNER_PERF_LEVERS_20261111.md) and measure the first one: a persistent M4GB server
-process (patch 0003 `--serve`, Rust `m4gb-f2-server`).
+Owner (2026-11-12): "Speed it all up" (M4GB and Gröbner-basis decomposition engines). Two tracks:
+(A) M4GB patch 0004, divisibility signatures in update() (this run); (B) inherited-f4 per-call
+speed-up by an Opus subagent working in this checkout (koblitz_groebner.rs, gf2_elim.rs, pq_f4_f2.rs,
+inherited part of ic_framework/solvers.rs; engine name inherited-f4-next for a paired A/B).
 
 ## Lead / hypothesis
-Per-call fixed cost (process start, field tables, thread pool, pipes) is 5 to 15 ms and dominates
-decomposition calls at 12 to 16 unknowns. Expectation and falsifier: research/m4gb_persistent_server_20261111/README.md.
+Callgrind: update() is 70 % of a 24-variable M4GB solve, divisibility on degrevlex-ranked monomials
+decoded per variable. Exact two-mask signatures cut instructions to 0.47x / 0.43x. Expectation and
+falsifier: research/m4gb_update_signatures_20261112/README.md.
 
 ## Spec
-research/m4gb_persistent_server_20261111/run_ab.sh under tools/benchrec.py run
-(record benchmarks/records/20261111T1946Z-m4gb-persistent-server.json): ic descent --solver
-inherited-f4 --solver m4gb-f2 --solver m4gb-f2-server, K and R, m=2 n=11..23, m=3 n=11,13,15,
-6 targets x 3 repeats, 60 s budget, one thread. Binaries: scripts/m4gb/build.sh n{16,20,24,28,32}_gf2
-with patches 0001-0003 (scratchpad prefix m4gb-prefix-v3). Local container, unisolated (stage
-diagnostic, no leaderboard row).
+research/m4gb_update_signatures_20261112/ab_corpus.py under tools/benchrec.py run (record benchmarks/records/20261112T0517Z-m4gb-update-signatures.json):
+corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old (patches 0001-0003,
+scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
 
 ## State
-Patch 0003 written and clean-built; Rust client in progress (subagent); record open; run next.
+2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
+
+Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
+(merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
-None yet.
+Paired per-call A/B inherited-f4 vs inherited-f4-next vs fes-f2 (research/inherited_f4_next_20261112/run_ab.sh, record benchmarks/records/20261112T0630Z-inherited-f4-next-ab.json); then an end-to-end ic bench ladder adding fes-f2 and inherited-f4-next to the oracle.
+
+Local corpus A/B (this record). Subagent B (inherited-f4) in the background.
 
 ## Stop and success conditions
-All cells finish or fail individually; summarize.py -> RESULTS.md/results.json/svg; make_report.sh;
-benchrec add-raw/metric/close; session-log entry; PR on the branch (PR #3936 is the open
-predecessor, auto-merge enabled).
+Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
 
 ## Next steps
-1. cargo build --release --bin ic with m4gb-f2-server; cargo test --lib m4gb_oracle.
-2. Run run_ab.sh under the record; summarize; report; close record; benchmarks entry; session log; push; PR.
+1. summarize/make_report; close record; benchmarks entry; session log; commit; push.
+2. Integrate track B result (paired A/B under its own record), then PR update.

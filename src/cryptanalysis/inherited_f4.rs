@@ -79,7 +79,7 @@ use crate::cryptanalysis::fx_hash::{FxMap as HashMap, MaskMap};
 use crate::cryptanalysis::koblitz_groebner::{
     all_variable_mask, build_inherited_macaulay, build_inherited_macaulay_support_local,
     echelon_f2_counted, macaulay_columns, macaulay_rows_monos_with_mask, monomials_up_to_mask,
-    pack_rows, rref_f2_counted, rref_uses_four_russians,
+    next_kernels, pack_rows, rref_f2_counted, rref_uses_four_russians,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, cmp_mono, mask_fold64, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
@@ -1039,6 +1039,67 @@ unsafe fn apply_step_bmi2(plan: &StepPlan, live: &[u64], lead: usize, out: &mut 
     }
 }
 
+/// [`apply_step`] for the next kernels: the same image, and returns the
+/// number of segments applied — the `3 ×` count the `bitop/v1` tally
+/// charges — so the caller need not make a second pass over the row to
+/// count them.
+#[inline]
+fn apply_step_counted(
+    mode: EagerMode,
+    plan: &StepPlan,
+    live: &[u64],
+    lead: usize,
+    out: &mut [u64],
+    lo: usize,
+) -> u64 {
+    match mode {
+        #[cfg(target_arch = "x86_64")]
+        // SAFETY: `eager_mode` returns `Bmi2` only after checking BMI2.
+        EagerMode::Bmi2 => unsafe { apply_step_bmi2_counted(plan, live, lead, out, lo) },
+        _ => {
+            let segments = live
+                .iter()
+                .enumerate()
+                .filter(|(_, &w)| w != 0)
+                .map(|(i, _)| (plan.first[lead + i + 1] - plan.first[lead + i]) as u64)
+                .sum();
+            apply_step_runs(plan, live, lead, out, lo);
+            segments
+        }
+    }
+}
+
+/// [`apply_step_bmi2`], counting the segments it applies, with the plan's
+/// word bounds read pairwise.
+///
+/// # Safety
+/// BMI2 must be available on this CPU.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "bmi2")]
+unsafe fn apply_step_bmi2_counted(
+    plan: &StepPlan,
+    live: &[u64],
+    lead: usize,
+    out: &mut [u64],
+    lo: usize,
+) -> u64 {
+    use std::arch::x86_64::{_pdep_u64, _pext_u64};
+    let mut applied = 0u64;
+    let bounds = &plan.first[lead..lead + live.len() + 1];
+    for (&word, pair) in live.iter().zip(bounds.windows(2)) {
+        if word == 0 {
+            continue;
+        }
+        let segments = &plan.segments[pair[0] as usize..pair[1] as usize];
+        applied += segments.len() as u64;
+        for seg in segments {
+            out[seg.dst_word as usize - lo] ^=
+                _pdep_u64(_pext_u64(word, seg.src_mask), seg.dst_mask);
+        }
+    }
+    applied
+}
+
 /// How a specialisation rewrites its kept rows; see [`eager_mode`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum EagerMode {
@@ -1683,6 +1744,61 @@ fn xor_words(dst: &mut [u64], src: &[u64]) {
     for (d, &s) in d4.into_remainder().iter_mut().zip(s4.remainder()) {
         *d ^= s;
     }
+}
+
+/// [`xor_words`] for the next kernels: the same XORs, compiled for
+/// AVX-512 or AVX2 where the CPU has them (chosen once per process;
+/// `KIC_GF2_FORCE_AVX2=1` caps it at AVX2, as for the Four Russians
+/// kernel, so a profiler that cannot decode AVX-512 can run it).
+#[inline]
+fn xor_words_simd(dst: &mut [u64], src: &[u64]) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        #[derive(Clone, Copy, PartialEq, Eq)]
+        enum Kind {
+            Scalar,
+            Avx2,
+            Avx512,
+        }
+        static KIND: std::sync::OnceLock<Kind> = std::sync::OnceLock::new();
+        let kind = *KIND.get_or_init(|| {
+            let force_avx2 = std::env::var("KIC_GF2_FORCE_AVX2").as_deref() == Ok("1");
+            if !force_avx2 && std::arch::is_x86_feature_detected!("avx512f") {
+                Kind::Avx512
+            } else if std::arch::is_x86_feature_detected!("avx2") {
+                Kind::Avx2
+            } else {
+                Kind::Scalar
+            }
+        });
+        match kind {
+            // SAFETY: the feature was detected on this CPU above.
+            Kind::Avx512 => return unsafe { xor_words_avx512(dst, src) },
+            // SAFETY: as above.
+            Kind::Avx2 => return unsafe { xor_words_avx2(dst, src) },
+            Kind::Scalar => {}
+        }
+    }
+    xor_words(dst, src)
+}
+
+#[inline(always)]
+fn xor_words_plain(dst: &mut [u64], src: &[u64]) {
+    for (d, &s) in dst.iter_mut().zip(src) {
+        *d ^= s;
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn xor_words_avx512(dst: &mut [u64], src: &[u64]) {
+    xor_words_plain(dst, src)
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn xor_words_avx2(dst: &mut [u64], src: &[u64]) {
+    xor_words_plain(dst, src)
 }
 
 /// The monomials occurring an odd number of times in `monos`, in order of
@@ -2670,8 +2786,16 @@ impl ReducedBasis {
         let mut buf = zeroed_words(total);
         {
             let data = Rc::get_mut(&mut buf).expect("just allocated");
+            let fused = next_kernels();
             for (row, &(off, lo)) in self.rows.iter().zip(&spans) {
-                if off != usize::MAX {
+                if off != usize::MAX && fused {
+                    // As below, with the tally counted in the rewrite pass.
+                    let live = row.live();
+                    cost.specialise_word_ops += live.len() as u64;
+                    let out = &mut data[off..off + words - lo];
+                    let segments = apply_step_counted(mode, plan, live, row.lead as usize, out, lo);
+                    bitop_tally::word_ops(3 * segments);
+                } else if off != usize::MAX {
                     let live = row.live();
                     cost.specialise_word_ops += live.len() as u64;
                     // `bitop/v1`: a gather, spread and XOR a segment of
@@ -2735,17 +2859,19 @@ impl ReducedBasis {
         }
         let mut data = zeroed_words(words - lo);
         let out = Rc::get_mut(&mut data).expect("just allocated");
-        apply_step(mode, plan, live, row.lead as usize, out, lo);
         let lead = row.lead as usize;
-        let first_pos = out.iter().position(|&w| w != 0);
-        bitop_tally::word_ops(
+        let segments = if next_kernels() {
+            apply_step_counted(mode, plan, live, lead, out, lo)
+        } else {
+            apply_step(mode, plan, live, lead, out, lo);
             live.iter()
                 .enumerate()
                 .filter(|(_, &w)| w != 0)
-                .map(|(i, _)| 3 * (plan.first[lead + i + 1] - plan.first[lead + i]) as u64)
+                .map(|(i, _)| (plan.first[lead + i + 1] - plan.first[lead + i]) as u64)
                 .sum::<u64>()
-                + first_pos.map_or(out.len() as u64, |f| f as u64 + 1),
-        );
+        };
+        let first_pos = out.iter().position(|&w| w != 0);
+        bitop_tally::word_ops(3 * segments + first_pos.map_or(out.len() as u64, |f| f as u64 + 1));
         let first = first_pos?;
         cost.specialise_word_ops += (words - lo - first) as u64;
         Some(Draft { start: lo, data })
@@ -2866,6 +2992,7 @@ impl ReducedBasis {
     /// Every pivot it hits is materialised first.
     fn insert(&mut self, mut row: Draft, cost: &mut InheritCost) -> Option<usize> {
         let mut from = row.start;
+        let simd = next_kernels();
         loop {
             let c = row.leading_column_from(from)?;
             let w = c / 64;
@@ -2877,7 +3004,11 @@ impl ReducedBasis {
                     self.ensure_current(r as usize, cost);
                     let pivot = &self.rows[r as usize];
                     let at = w - row.start;
-                    xor_words(&mut row.data_mut()[at..], pivot.from_word(w));
+                    if simd {
+                        xor_words_simd(&mut row.data_mut()[at..], pivot.from_word(w));
+                    } else {
+                        xor_words(&mut row.data_mut()[at..], pivot.from_word(w));
+                    }
                     cost.reduce_word_ops += (self.words - w) as u64;
                     from = w;
                 }
@@ -3659,6 +3790,36 @@ mod tests {
     use crate::cryptanalysis::pq_groebner_f2::{
         bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
     };
+
+    /// The next kernels' SIMD row XOR is the scalar one, at every length
+    /// and alignment the re-reduction hands it (`dst` and `src` may differ
+    /// in length; the shorter decides).
+    #[test]
+    fn simd_row_xor_matches_the_scalar_one() {
+        let mut state = 0x2545_f491_4f6c_dd1du64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for len in 0..80usize {
+            for extra in 0..3usize {
+                let src: Vec<u64> = (0..len + extra).map(|_| next()).collect();
+                let dst: Vec<u64> = (0..len).map(|_| next()).collect();
+                let mut a = dst.clone();
+                let mut b = dst.clone();
+                xor_words(&mut a, &src);
+                xor_words_simd(&mut b, &src);
+                assert_eq!(a, b, "len {len} extra {extra}");
+                let mut c = src.clone();
+                let mut d = src.clone();
+                xor_words(&mut c, &dst);
+                xor_words_simd(&mut d, &dst);
+                assert_eq!(c, d, "len {len} extra {extra}, longer dst");
+            }
+        }
+    }
 
     /// A random column layout, random fold and delete steps composed into
     /// one map, random rows: the segment plan rewrites every row exactly as
