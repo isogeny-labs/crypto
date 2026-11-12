@@ -35,3 +35,14 @@ Each run was reproduced from the integrated source
 (`research/chained_prime_transfer_20261111/repro/REPRO.md`). There is no
 advantage over the matched rho in any of them [pcc:unverified]. They are not
 admitted by the validation gate.
+
+## Cover mechanism and endomorphism census (2026-11-12)
+
+The report is `REPORT_cover_census_20261112.pdf`, and the graphs are
+`pushforward.svg` and `census.svg`. The records are
+`20261112T1550Z-cover-pushforward` and `20261112T1558Z-endo-degree-census`.
+
+Genus-2 IC on the transferred subgroup reduces to a birthday search on E.
+Low-degree endomorphisms occur only on curves built to have them. Neither
+result shows an advantage over rho [pcc:unverified]. Neither is validation-gate
+admitted.
