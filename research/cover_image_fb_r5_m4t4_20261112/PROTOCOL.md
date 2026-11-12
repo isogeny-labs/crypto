@@ -32,3 +32,13 @@ replay of round 4's t = 3 cell.
 
 No `S`, no relation-phase cost, no rho comparison, no leaderboard or `benchmarks/` row. A stage
 diagnostic of the decomposition solve, counts only.
+
+## Amendment 1 (23:06Z, at launch, before any result)
+
+- **Host.** No `cpu5m` 32 vCPU capacity was available. The run uses `cpu3m` (32 vCPU, 256 GB, the
+  same memory, $1.76/h). Pod `bdr-coverfb-r5` (`c667gkge6yjsiv`), ready 23:05Z. Arms started
+  23:05:50Z. The container's memory limit reads 256,000,000,000 bytes.
+- **Binary.** The binary is the frozen one from rounds 2–4 (built at `3466f3be9e`, SHA-256
+  `923a1c95…`, verified on the pod). `main` has since gained a performance pass on
+  `src/cryptanalysis/f4_fp.rs` (`fd55624eed`, `3afdf60d9b`, `dc2e674c47`). It is not used here,
+  to keep this cell comparable with rounds 2–4.
