@@ -102,3 +102,11 @@ and `docs/perf`) because the disk had about 2.7 GB free. Build/target dirs
 under `/home/user/wt/tc-*` were deleted at the end. Binary sha256 (first 16 hex):
 ecdldemo base `2a32361f65b6bb70`, final `1631e542ea98fb2d`; hashed identity
 example base `c9c3f4fca07e64f8`, final `0e45221234ea9da4`.
+
+## Merge with main (2026-11-12, after review)
+
+`main` had landed its own `SparseContractor` pass by then (e827d07cf1 word hasher and dense fixed bits, 4c6edcf6ad row keys moved rather than cloned, e90415190d). That pass overlaps 9e08c8c49e, 25625d6e1a (key half) and 75285495da from this branch. The conflict in `crates/ecdl-tensor-ic/src/tensor.rs` was resolved by taking main's version whole. `fasthash.rs`, now unused, was removed.
+
+What survives from this branch in `ecdl-tensor-ic`: the word-size `mul_mod` fast path (`field.rs`) and the branch-free point encode/decode (`relation.rs`). The `ecdldemo` Ir figure above (3.47G → 1.68G) therefore no longer describes the merged tree; it needs re-measuring against the new base. Bit-packed row keys (75285495da) could still be re-ported on top of main's `RowMap<Vec<u8>, _>`; that is an open thread. The `hashed-ecdl-tensor` commits did not conflict.
+
+Verification after the merge: `cargo test --release` in `crates/ecdl-tensor-ic` passed every suite with no warnings.

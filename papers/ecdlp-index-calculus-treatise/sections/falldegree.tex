@@ -186,7 +186,18 @@ is a bijection $K\to K_0\times\FF_2$.
 
 Part (3) is Kosters and Yeo's Corollary 4.11~\cite{kosters2015notes}, seen
 through a different coordinate. The reformulation makes the falls
-explicit.
+explicit. The algebraic identity behind part (3) is checked in Lean 4 over
+any commutative ring of characteristic 2 with an additive trace satisfying
+$\operatorname{Tr}(a^2)=\operatorname{Tr}a$: if $x_3w=1$ then
+$\operatorname{Tr}(\Sem3(X_1,X_2,x_3)w^2)=\operatorname{Tr}X_1+\operatorname{Tr}X_2+\operatorname{Tr}(a_6w^2)$,
+this functional is an $\FF_2$-combination of the coordinate functionals of
+$\Sem3$, and it is affine in the bits (\texttt{traceRelation},
+\texttt{traceRelation\_in\_span}, \texttt{affineInBits}; axioms
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}; no
+\texttt{sorry}). The Weil descent, degrees, the first fall degree and the
+concrete trace of $\FF_{2^n}$ are not formalised
+(\art{research/first_fall_closure_20261111/propA_lean/NOTE.md}; unverified,
+no pcc claim).
 
 \begin{corollary}[First fall degree 2, for every $n$]\label{cor:ffd2}
 Suppose every descended equation has degree exactly 2; this held on
@@ -206,6 +217,19 @@ Semaev states the value 4 for the first fall degree of his
 systems~\cite[\S4.5]{semaev2015}. His argument concerns only the cubic
 equations of the chain. Under the definition he quotes, the trace relation
 makes the value 2.
+
+\paragraph{Subfield bases: the exact count of linear relations.} For
+$n=2n'$ and $V=\FF_{2^{n'}}$, write $\Sem3=(s_2+x_3s_1)^2+x_3s_2+b$ with
+$s_1=X_1+X_2$, $s_2=X_1X_2$, and let $N$ be the dimension of the degree-$\le1$
+part of $\operatorname{span}_{\FF_2}F$. Then $N=n'-1+\operatorname{Tr}(b/x_3^2)$
+when $x_3\notin V$, and the constant 1 lies in the span if and only if
+$\operatorname{Tr}(b/x_3^2)=1$. On the exceptional set $x_3\in V^\times$,
+$N=1$ if $b\in V$ and $N=2$ otherwise. The proof is written in prose; an
+exhaustive check of 122{,}752 pairs $(x_3,b)$ at $n'=2,\ldots,6$ found no
+disagreement, and the one earlier outlier draw ($n=16$, $N=2$) has
+$x_3\in V$ and $b\notin V$
+(\art{research/first_fall_closure_20261111/propB_exact_count/NOTE.md};
+unverified, no pcc claim).
 
 \begin{lemma}[Explicit degree-3 falls]\label{lem:deg3}
 Let $V^\perp$ be the trace-orthogonal of $V$, and
@@ -523,7 +547,8 @@ seconds, memory in GB), transcribed from the published table, beside the
 last fall degree of our instances at the same $n$
 (Table~\ref{tab:fd-binary}). Superscripts give the subspace family. Their
 $m=3,4$ rows ($D_{\rm ff}=D_{\rm reg}=7$ and $13$, $n\le21$) concern
-$\Sem4$ and $\Sem5$ and have no counterpart here.}
+$\Sem4$ and $\Sem5$; the $m=3$ first fall degree is reproduced in
+\S\ref{sec:fd-kw3}.}
 \label{tab:fd-kw}
 \end{table}
 
@@ -546,6 +571,219 @@ regenerated from the committed producer (M4RI 20200125, 4\,min 40\,s on
 \item the closure dimensions $(0,0,64,2968,48068)$ match the record.
 \end{itemize}
 Source: \art{research/paper_opportunities_20261029/REPORT.md}, \S6.
+
+\section{The first fall degree at $m=3$: Kousidis--Wiemers' bound}\label{sec:fd-kw3}
+
+Kousidis and Wiemers prove $d_{\rm ff}\le m^2-m+1$ for the Weil descent of
+$\Sem{m+1}$ and believe the bound sharp for $m\ge3$~\cite{kousidis2019}. A
+study of 11 November reproduces their $m=3$ value and states where it holds
+(\art{research/first_fall_closure_20261111/kw_sharpness/NOTE.md}; every
+number unverified, no pcc claim). Write $n'=\dim V$, $N=3n'$, $\nu_1,\ldots,\nu_{n'}$
+a basis of $V$, and $e_{ab}=\nu_a\nu_b(\nu_a+\nu_b)$.
+\begin{itemize}
+\item The coefficient of $x_1^3x_2^3x_3^3$ in $\Sem4$ is exactly $x_4$, and
+  this is the unique monomial of descended degree 6. The top form of every
+  descended equation is therefore $c\prod_{i=1}^3L_{i,0}L_{i,1}$ with
+  $L_{i,j}=\sum_l\nu_l^{2^j}y_{il}$, up to Frobenius conjugation.
+\item \emph{Theorem A} (proved, given KW's Lemma~3.1, which the study
+  re-derived symbolically for $m=3$). In the top-form convention
+  $d_{\rm ff}\in\{6,7\}$, and $d_{\rm ff}=7$ if and only if
+  $\dim_{\FF_2}\operatorname{span}\{e_pe_qe_r\}=\dim V_F$. Each conjugate is
+  annihilated by six linear forms, which gives at least $6n$ non-trivial
+  syzygies in degree 7.
+\item \emph{Corollary B} (proved). $\dim\operatorname{span}\{e_pe_qe_r\}\le\rho(n')$
+  with $\rho(3,\ldots,7)=10,49,170,475,1141$. Hence $d_{\rm ff}=6$ whenever
+  $n>\rho(n')$, and whenever $V$ lies in a proper subfield. The unqualified
+  reading ``sharp for $n'\ge m$'' is false.
+\item \emph{Open.} That a generic $V$ meets the rank condition for
+  $n\le\rho(n')$, in particular for KW's $n'=\lceil n/3\rceil$. Deligne's
+  bound would suffice numerically for $n'\ge5$, but every member of the
+  relevant degree-9 linear system is singular on a common base locus.
+\end{itemize}
+Table~\ref{tab:fd-kw3} gives the measurements. Wherever the top forms are
+independent (1{,}276 of 2{,}400 instances, every KW cell among them) both
+the top-form and the operational first fall degree are 7 and the degree-7
+nullity is exactly $6n$ for $n'\ge4$. All 1{,}124 dependent instances have
+top-form value 6. At $n'=3$ the share of independent instances falls from
+330 of 330 at $n=7$ to 0 at $n\ge11=\rho(3)+1$. Nothing here bears on the
+degree of regularity or the last fall degree.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrll@{}}
+\toprule
+$n$ & $n'$ & $N$ & instances & independent & $d_{\rm ff}$, top form & $d_{\rm ff}$, operational \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{KW's Table~1 cells, $n'=\lceil n/3\rceil$; degree-7 nullity $6n$ in every instance}} \\
+13--15 & 5 & 15 & 20 each & all & 7 (all) & 7 (all) \\
+16--18 & 6 & 18 & 6 each & all & 7 (all) & 7 (all) \\
+19--21 & 7 & 21 & 2 each & all & 7 (all) & 7 (all) \\
+\addlinespace
+\multicolumn{7}{@{}l}{\emph{Smallest admissible base, $n'=3$, $\rho(3)=10$}} \\
+7 & 3 & 9 & 330 & 330 & 7:330 & 7:330 \\
+8 & 3 & 9 & 330 & 277 & 6:53, 7:277 & 6:1, 7:329 \\
+9 & 3 & 9 & 330 & 243 & 6:87, 7:243 & 7:330 \\
+10 & 3 & 9 & 330 & 116 & 6:214, 7:116 & 6:21, 7:309 \\
+11 & 3 & 9 & 330 & 0 & 6:330 & 6:77, 7:253 \\
+12 & 3 & 9 & 330 & 0 & 6:330 & 6:189, 7:141 \\
+\bottomrule
+\end{tabular}
+\caption[]{First fall degree of the Weil descent of $\Sem4$ ($m=3$; KW's
+bound $m^2-m+1=7$), random curve, random subspace, $x_4$ the abscissa of a
+random point. ``Independent'': the top forms are linearly independent,
+equivalently $\dim\operatorname{span}\{e_pe_qe_r\}=n$ (Theorem~A). Entries
+$v{:}c$ count instances with value $v$. Further cells at $n'=4,5,6$ ($n=9$--20)
+are all independent with value 7 in both readings. Unverified, no pcc claim.
+Source: \art{research/first_fall_closure_20261111/kw_sharpness/table_measured.md}.}
+\label{tab:fd-kw3}
+\end{table}
+
+\section{Attempts at a growing lower bound}\label{sec:fd-growth}
+
+The treatise's open problem is a last-fall lower bound for the binary
+descent of $\Sem3$ that grows with $n$. A note of 11--12 November attempts
+it and records where each route stops
+(\art{research/lfd_lower_bound_20261111/NOTE.md}). No growing lower bound on
+$d_{\tilde F}$ is proved. Every statement below is unverified (no pcc claim
+exists); the labels proved, measured and conjectured are the note's.
+
+\paragraph{Presentation.} The literal question ``for any presentation'' has
+a negative answer (proved). Add a variable $y_m$ for every monomial $m$ with
+$2\le\abs m\le D$, the instance-independent quadratic axioms
+$x_iY(m)+Y(m\cup\{i\})$, and the linearised generators. The new system has
+the same Boolean solutions and $1\in W_2$, at the cost of
+$\sum_{j=2}^{D}\binom Nj$ extra variables. The check gave $1\notin W_1$ and
+$1\in W_2$ on six instances at $n=7,9,11$ (92--298 variables). A meaningful
+bound must fix the presentation or bound its size. Within the orbit of
+re-encodings (bases of $K$ and $V$, affine changes of variable, bases of the
+equation span) $d_{\tilde F}$ is one number (proved).
+
+\paragraph{Three routes with barriers.}
+\begin{itemize}
+\item \emph{Generator degree} (proved): if every generator outside a
+  satisfiable part has degree $\ge D_1$, then $d_F\ge D_1$. This is the
+  mechanism of every growing bound in the repository, the guarded chain's
+  $B+1$ (Theorem~\ref{thm:guarded}) and the naive Kummer presentation's
+  $2^t$ (Theorem~\ref{thm:pkm}(5)). It gives nothing for a quadratic system.
+\item \emph{Restriction} (proved): $d_F$ is monotone in $V$, and a
+  restriction of $c$ to a $j$-flat has $d_F\le j+2$, so restriction can
+  transfer a lower bound but not create one.
+\item \emph{Locality} (proved invariant, measured size): every non-trivial
+  generator, in any coordinates of the orbit, depends on at least
+  $2\min_\delta\operatorname{rank}M_\delta$ variables. The measured minimum
+  rank is 1--2, 2, 2--3, 2--3 and 3--4 at $(n,k)=(7,4)$, $(9,5)$, $(11,6)$,
+  $(13,7)$, $(15,8)$. The expansion method of Alekhnovich--Razborov and
+  Ben-Sasson--Impagliazzo has no constant-arity presentation to work on.
+\end{itemize}
+
+\paragraph{The selector proof system.} The proof of
+Theorem~\ref{thm:upper} refutes with multipliers in $c=a+b$ only. Let
+$e_{\min}$ be the least multiplier degree of such a refutation and
+$d_{\rm SEL}=e_{\min}+2$. Then
+$d_{\tilde F}\le d_{\rm NS}\le d_{\rm SEL}\le k+2$. Proposition~S (proved)
+recasts the selector system as a field statement over the $2^k$ points of
+$V$, and Proposition~S$^*$ (proved) gives its exact dual. A conjecture
+$e_{\min}\ge\lceil k/3\rceil$ on the diagonal fitted $k=4$--12 and failed at
+$k=13$ (Table~\ref{tab:fd-selector}). At $n=25$ both instances have
+$e_{\min}=4<5$, certified in both directions: a degree-4 selector satisfying
+all $114{,}688$ constraints, re-checked by separate field arithmetic, and an
+infeasible degree-3 system (838 points; coefficient rank $9{,}371$, augmented
+rank $9{,}372$, by a second row builder with PLUQ elimination). At $k=14,15$
+the value is back at $\lceil k/3\rceil$. Above $n=29$ only lower bounds were
+reached on the 15\,GB container. The selector degree bounds a weaker proof
+system than the closure, and the measured $d_{\tilde F}$ lies one or two
+below it (Table~\ref{tab:fd-selector-gap}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrlrr@{}}
+\toprule
+$n$ & $k$ & $e_{\min}$ (per instance) & $\lceil k/3\rceil$ & instances \\
+\midrule
+7 & 4 & 2 ($\times5$), 1 ($\times1$) & 2 & 6 \\
+9 & 5 & 2 & 2 & 6 \\
+11 & 6 & 2--3 & 2 & 6 \\
+13 & 7 & 3 & 3 & 4 \\
+15 & 8 & 3 & 3 & 4 \\
+17 & 9 & 3 & 3 & 4 \\
+19 & 10 & 4 & 4 & 3 \\
+21 & 11 & 4 & 4 & 2 \\
+23 & 12 & 4, 4 & 4 & 2 \\
+\textbf{25} & \textbf{13} & \textbf{4, 4} & \textbf{5} & 2 \\
+27 & 14 & 5, 5 & 5 & 2 \\
+29 & 15 & 5, 5 & 5 & 2 \\
+31, 33, 35 & 16, 17, 18 & $>4$ & 6 & 2 each \\
+37, 39, 41 & 19, 20, 21 & $>3$ & 7 & 2 each \\
+\bottomrule
+\end{tabular}
+\caption[]{Selector degree $e_{\min}$ on the diagonal $k=\lceil n/2\rceil$,
+first unsatisfiable seeds. Rows $n\le23$ pool the Python computation and
+the C port; $n\ge25$ are the C port, every feasible selector re-checked and
+every infeasible point set re-ranked by a second code path. Bold: the
+counterexample to $e_{\min}\ge\lceil k/3\rceil$. The $n=7$ value 1 is an
+instance with $d_{\tilde F}=2$. Rows $n\ge31$ are lower bounds only (memory
+and container restarts). Unverified, no pcc claim. Source:
+\art{research/lfd_lower_bound_20261111/NOTE.md}, \S6.}
+\label{tab:fd-selector}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+$n$ & $k$ & $d_{\tilde F}$ & $d_{\rm PCc}$ & $d_{\rm NS}$ & $d_{\rm SEL}$ \\
+\midrule
+7 & 4 & 3 (one instance 2) & 3 & 4 (2) & 4 (3) \\
+9 & 5 & 3 & 3 & 4 & 4 \\
+11 & 6 & 3 & 3 & 4 & 4--5 \\
+13 & 7 & 3 & 4 & 4 & 5 \\
+15 & 8 & 4 & 4 & 5 & 5 \\
+17 & 9 & 4 & 4 & 5 & 5 \\
+19 & 10 & 4 & 4 & 5 & 6 \\
+21 & 11 & 4 & --- & --- & 6 \\
+\bottomrule
+\end{tabular}
+\caption[]{Four refutation degrees on the same diagonal instances:
+the closure $d_{\tilde F}$, the closure that multiplies by $c$-variables
+only ($d_{\rm PCc}$), the Macaulay degree $d_{\rm NS}$, and the selector
+degree $d_{\rm SEL}$. At $n=13$ the gap $d_{\rm PCc}>d_{\tilde F}$ is made
+by the $a$-multiplied falls of Lemma~\ref{lem:deg3}, which no selector
+produces. The $d_{\tilde F}$ column re-computes
+Theorem~\ref{thm:lfdexact} at sizes it covers and is not evidence about
+growth. Unverified, no pcc claim. Source:
+\art{research/lfd_lower_bound_20261111/NOTE.md}, \S6.}
+\label{tab:fd-selector-gap}
+\end{table}
+
+\paragraph{The selector kernel at $e_{\min}$ (12 November).} Two
+preregistered follow-ups measured the homogeneous selector system.
+\begin{itemize}
+\item \emph{Nullity.} A conjectured kernel dimension $M(k-1,e-1)$ (a
+  trivial family $T_e$) held in four of six cells at $n=23,25,27$ and failed
+  in two: at $(n,e)=(23,4)$ and $(25,4)$ the nullity was $1{,}143$--$1{,}145$
+  and $740$--$741$ against 232 and 299
+  (\art{research/lfd_lower_bound_20261111/out/lead_A1/RESULT.md}).
+\item \emph{Where the excess appears.} Over 37 cells at $n=15$--27 the
+  excess over $T_e$ is 0 at all 18 instances with $e=e_{\min}-1$ and
+  positive at all 19 with $e=e_{\min}$, as preregistered; no bug condition
+  fired. The instance-to-instance variation is exactly $h$, the number of
+  $C\in V$ with $C=X_1+X_2$, $X_1,X_2\in V$, $X_1X_2=z$, which follows from
+  the factorisation $\Phi^*_C(A)=A(A+C)(A^2+CA+z)$. A post-hoc prediction
+  for $n=27$, seed 6 (kernel dimension $10{,}401$) held. A duality
+  identity, proved by hand and checked in 20 of 20 cells, writes the nullity
+  through sections of the annihilator bundle
+  (\art{research/lfd_lower_bound_20261111/out/lead_A1_syzygies/RESULT.md}).
+\item \emph{Feasibility threshold.} A counting ratio
+  $(k+1)M(k,e+1)/(nM(k,e))$ predicted 4 of 5 decided cells on random $V$
+  against 2 of 8 for a Koszul-corrected model, so the preregistered rule
+  chose the counting model. Its one miss is $V\subset\ker\operatorname{Tr}$:
+  $k=13$, $e=4$ is infeasible on all three such instances and feasible on
+  random $V$ (\art{research/lfd_lower_bound_20261111/out/lead_A2/RESULT.md}).
+\end{itemize}
+These describe the selector system only. The note's reason they do not
+extend to $d_{\tilde F}$: the dual object of Proposition~\ref{prop:cert} must
+be closed under multiplication by variables, a condition that is not linear
+in the certificate, so the duality of Proposition~S$^*$ is lost.
 
 \section{Explicit membership over any field: the guarded chain}\label{sec:fd-guarded}
 
@@ -716,6 +954,20 @@ $\ge5$. Source:~\cite[\S6]{icprogram2026}.}
 \label{tab:fd-other}
 \end{table}
 
+The first exact value above 4 in the $(m,\ell)=(3,7)$ cell arrived on
+12 November. Run E14a of the fall-degree study ran the closure engine
+\texttt{hky\_par} at $(m,n,\ell)=(3,21,7)$, 32 threads, on a 32-vCPU
+256\,GB cloud pod. Its draw 0 (42 variables, 42 equations, no solutions)
+reached $1\in W_5$: $d_F=5$ exactly, after $37{,}889.9$\,s, of which
+$37{,}799.0$\,s at degree 5 ($974{,}982$ columns). Its closure dimensions up
+to degree 4 equal the earlier E10 record, so the draw is valid under the
+study's Amendment~20. The cell rule needs three of four draws; draws 1, 3
+and 4 were still running at the last commit, with the pod deadline and the
+account balance allowing at most one more
+(\art{research/fall_degree_bounds_20261008/e14/pod-r2/out-r2j/A_3-21-7.draw0.jsonl},
+\art{research/fall_degree_bounds_20261008/e14/RESUME-E14.md}; one draw,
+producer-reported, no validator report).
+
 Three further measurements bear on the solver rather than the system:
 \begin{itemize}
 \item \emph{Plain refutation tracks the semi-regular degree.} The plain
@@ -756,6 +1008,12 @@ null). None was observed in $n$ at a fixed base.
   only result that would bear on the subexponential claims. The upper
   bounds $k+2$ and $(t-1)k+t$ are linear in $n$, far above every observed
   value.
+  The attempt of \S\ref{sec:fd-growth} shows that the question needs a
+  fixed or size-bounded presentation (extension variables bring every
+  instance to $d_{\tilde F}=2$), and that the selector degree, a weaker
+  proof system, is not $\lceil k/3\rceil+2$ in general ($k=13$). The
+  first fall degree of $\Sem4$ is 6 or 7 by a rank condition, and 6 for all
+  large $n$ at fixed $n'$ (\S\ref{sec:fd-kw3}).
 \item \emph{Missing before submission.} The certificates are committed
   only as hashes; they regenerate (above) but need public hosting. The
   sample is small: two instances per $n$ at $n\ge33$, one polynomial

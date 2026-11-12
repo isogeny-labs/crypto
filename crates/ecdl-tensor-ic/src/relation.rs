@@ -345,7 +345,7 @@ pub fn relation_network(c: &Curve, fb: &FactorBases, r: Point) -> (Network, Vec<
     let want = bits_key(&c.encode_point(r));
     n.vertices.push(Vertex::Pred(PredVertex {
         e: s,
-        p: Rc::new(move |vals: &[bool]| bits_key(vals) == want),
+        p: Rc::new(move |vals: &[bool]| crate::tensor::bits_match_key(vals, &want)),
     }));
     n.num_edges = next;
     (n, a)

@@ -160,6 +160,31 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - **Genus 3 to p = 64,007.** IC3/IC2 stays near 3, smoothness follows `1/g!`,
   and the gap to rho grows about as `√p`.
 
+## Cover mechanism and endomorphism census (2026-11-12 addendum)
+
+- **The cover carries no log onto the target** (`research/cover_pushforward_20261112/PUSHFORWARD.md`) [pcc:unverified].
+  - All 37,866 genus-2 IC relations on the transferred subgroup (189,330 over 15 seeds) are fibres `P + ιP = φ1^*(Q)`. Their push-forward is the degenerate `[2]Q = Q + Q`.
+  - The reason is that the subgroup lies inside `φ1^*(E1)`, whose weight-2 divisors are exactly these fibres.
+  - So genus-2 IC on `J(C)` over this subgroup is a birthday collision search on `X(Q)` in `⟨G_E⟩`. The cover only filters to "X(Q) is a nonzero square", which discards about half of the trials. The same search on `E1` alone accepts identical trials and costs identical group operations at every seed.
+  - Through the other quotient no pushed relation involves the target, because `φ2_*φ1^* = 0`.
+  - The Prym never enters the computation. A cover that helps must supply an explicit map plus a target-side factor base well below `r` on which independent few-term relations occur at a constant rate.
+- **Low-degree endomorphisms occur only by construction** (`research/endo_degree_census_20261112/CENSUS.md`) [pcc:unverified].
+  - An endomorphism of degree `≤ 11` needs `|d_K| ≤ 44`. Among random curves that happens with probability about `4/√p`, matching the exact Hurwitz-class-number prediction at 12–28 bits (largest |z| = 1.45).
+  - The curve itself sits on the crater with probability about `1/p`; the median conductor is about `0.45√p`.
+  - The named standard curves that qualify are all `j = 0` (secp*k1, BN/BLS, Pallas/Vesta), except Bandersnatch (`D = −8`).
+  - P-256/384/521, brainpool, Curve25519/448, GOST and SM2 have `|d_K| > 44`.
+  - The lab registry already holds constructed curves with `D = −7, −8, −11, −19, −43` at 37–61 bits, so the small-`D_E` experiment needs no new construction. Its results would apply to designed curves, not deployed ones.
+
+## Small D_E with an endomorphism-adapted factor base (2026-11-12 addendum)
+
+`research/small_de_endo_fb_20261112/RESULTS.md`. The protocol was frozen by hash before data [pcc:unverified].
+
+- **Solving work does not change.** The S_3/S_4 solving work per trial is identical in the adapted and standard arms (ratio 1.000) at every `D ∈ {−3, −4, −7, −8, −11}`, `m ∈ {2, 3}` and size from 12 to 28 bits. The decomposition probability is unchanged for `D = −3, −4` and 0.09–0.11 lower for the layered `D = −7, −8` bases.
+- **The only saving is folded columns.** Columns fall by exactly `|Aut|/2` or the layer count, and the relation-phase cost falls with them.
+- **A generic curve gets the same saving.** Its base was folded by a random scalar in the same 4 layers and saves as much: 0.22–0.30 of its unfolded twin, within 0.1 of the layered `D` arms at 24–28 bits. It even costs less than the `j = 0` and `j = 1728` automorphism arms [pcc:unverified].
+- **Verdict.** The frozen rule passes for `D = −3, −4, −7, −8` as written, but the control shows the gain is the fold factor, not `D_E`. Small `D_E` does not reduce the actual solving cost.
+- **Distance to rho.** No arm is below its matched rho in 120 arm-cells, including rho with the same automorphism group. The smallest ratio is 7.62× at 0.1 GAE, and the gap grows about like `√p`.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -171,3 +196,7 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
   applied (F1–F3, F6, F8–F12) and the bench rerun as `results_v2.json`.
 - 2026-11-12: amortized-IC / certificate / larger-p genus-3 addendum; the
   obstruction holds against matched precomputed rho.
+- 2026-11-12: cover push-forward and endomorphism-degree census addendum; the
+  transferred subgroup's genus-2 IC is a birthday search on `E`.
+- 2026-11-12: small-D_E addendum; the adapted base saves only by folding, which a
+  generic control matches.
