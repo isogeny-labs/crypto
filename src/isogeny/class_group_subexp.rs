@@ -1478,6 +1478,15 @@ pub fn index_by_det_gcd(
                 None => d.clone(),
                 Some(acc) => acc.gcd(d),
             });
+            // the same early stop as for a computed subset (a resumed run must
+            // not compute a determinant the restored ones already make redundant)
+            if let (Some(acc), Some((log2_h_star, tol))) = (&g, early_stop) {
+                if s >= 1 && (2f64.powf(log2_big(acc.magnitude()) - log2_h_star) - 1.0).abs() <= tol
+                {
+                    eprintln!("[class_group_subexp]   restored determinants already match the analytic estimate; stopping");
+                    break;
+                }
+            }
             continue;
         }
         let t_sel = std::time::Instant::now();
