@@ -50,16 +50,26 @@ an easier curve. **24 reports, 5,641 covers** `[pcc:unverified]`:
 
 - The complement ranges over up to **141 distinct orders** (at `p = 8009`)
   across the full Hasse interval — many different-order curves reached.
-- **3,479 of 5,641 covers have a *smoother* complement** (smaller largest
-  prime) than the target, and 85 are supersingular.
-- `cover_never_carries_log` is **true in every report** (`φ2_*φ1^* = 0`).
-- `easier_and_reachable` is **0 in every report**: a reachable (isogenous)
-  complement has the same order, hence the same trace, embedding degree and
-  prime factorisation — identical hardness.
+- **3,479 of 5,641 covers have a *smoother* complement** than the target, and
+  85 are supersingular. "Smoother" here means a smaller largest prime that
+  divides the order exactly once (`atlas.rs`). With the ordinary largest
+  prime factor the count is 3,469 (replay F11).
+- `cover_never_carries_log` was true wherever it was tested. The sweep tests
+  `φ2_*φ1^* = 0` on the first 40 covers of each report, 16 samples each, in
+  the E1 → E2 direction only (replay F9). It is vacuous in the 7 reports that
+  have no valid cover. The census below is the broader check: both
+  directions on every curve, with at least 14,371 generic fibres per prime.
+- `easier_and_reachable` is 0 in every report. This is a consequence of the
+  theorem, not independent evidence (replay F8). "Reachable" is tested as
+  `#E2 = #E`, and equal order forces equal trace, embedding degree and prime
+  factorisation, so the counter cannot be nonzero.
 
-The figure `cover-spectrum.svg` shows one target (`F_1009`, order 990): 63
-distinct complement orders over `[948, 1072]`, 470/504 smoother, 0 reachable
-and easier.
+The figure `cover-spectrum.svg` shows one target (`F_1009`, order 990): 504
+covers, 63 distinct complement orders over `[948, 1072]`, **87** of them
+smoother, 22 isogenous (reachable) and none both reachable and easier.
+*Correction (2026-11-12):* the original note and figure said "470/504
+smoother". That figure belongs to the order-998 target, not the order-990
+one (replay F10).
 
 ### An adversarial catch, and the correction
 
@@ -70,7 +80,9 @@ supersingular target is supersingular too, but **not easier** than an
 already-supersingular start. "Easier" must be measured *relative to the
 target* (a strictly smaller largest prime, or special when the target is not).
 With that correction the count is 0 everywhere, and the fix is covered by a
-unit test. The adversarial pass did exactly its job.
+unit test. What the adversarial pass caught was a faulty definition, not a
+mathematical counterexample. With the definition corrected, the counter
+cannot be nonzero (see above).
 
 ## Census (random covers, not the sweep)
 
@@ -84,9 +96,15 @@ unit test. The adversarial pass did exactly its job.
 | 4001 | 300 | 7 | 300 | 0 | 3 | 0 | 0 |
 | 8009 | 300 | 3 | 300 | 0 | 2 | 0 | 0 |
 
-`cross-map 0` = `φ2_*φ1^* = 0` on every sample (300/300). `facts differ` = a
-same-order pair with differing hardness facts (0: same order ⇒ same facts).
-`free easier` = a non-special start with a reachable easier node (0).
+`cross-map 0` = `φ2_*φ1^* = 0` in both directions on every sampled generic
+fibre. The replay re-checked it and found it non-vacuous: 14,371–14,397 of
+14,400 samples per prime were generic, and the control `φ1_*φ1^* = [2]` held
+on all of them.
+
+`facts differ` and `free easier` are zero by construction, not by
+observation (replay F8). Node facts depend only on `(p, #E)`, and both
+counters are tested only when `#E1 = #E2`. They restate the theorem, and the
+observed evidence is the cross-map column.
 
 ## Positive control: the easy node is real
 
