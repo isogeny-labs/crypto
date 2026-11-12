@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T0630Z-inherited-f4-next-ab",
+  "latest_record": "20261112T0633Z-inherited-f4-next-e2e",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 117,
+    "measured": 118,
     "open": 0
   },
   "repo": "crypto",
@@ -10570,6 +10570,115 @@
         }
       ],
       "problem": "study:inherited_f4_next_20261112:descent-ab",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.918,
+      "latest": 0.918,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "next_over_old_wall_per_call_koblitz23",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 0.918
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 94.7,
+      "latest": 94.7,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 34.311594
+      },
+      "metric": "s_fes_f2_koblitz13",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 34.311594
+          },
+          "n": 2,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": 2.76,
+          "reference_kind": "matched_rho",
+          "spread": [
+            83.71,
+            105.69
+          ],
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 94.7
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "s_next_minus_old_max_abs",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {},
+          "n": 6,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 24.0,
+      "latest": 24.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "verified_configurations",
+      "points": [
+        {
+          "commit": "ca15f345e1d5",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 24,
+          "record": "20261112T0633Z-inherited-f4-next-e2e",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ic bench --sweep on the six e2e-ladder instances (Koblitz 13/17/19/23, random 15/21), algebraic oracle with inherited-f4, inherited-f4-next and fes-f2, 2 repeats, 16 matched rho runs: all 24 configurations verified; degree 13 fes-f2 S 94.7 vs inherited-f4 123.1 (0.77x, 34.3x rho vs 44.6x); fes-f2 higher S from 16 unknowns up; inherited-f4-next S identical to inherited-f4, wall per call 0.74-0.99x. Local container; unverified.",
+          "value": 24.0
+        }
+      ],
+      "problem": "study:inherited_f4_next_20261112:e2e-ladder",
       "unit": "count"
     },
     {

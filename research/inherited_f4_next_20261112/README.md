@@ -127,6 +127,58 @@ differing beyond run noise, or `fes-f2` S at degree 13 not below
 - The `ops` are unchanged, so the S of an `inherited-f4` row priced from its
   pinned word-XOR count does not move; the change lowers wall time only.
 
-### Run 2
+### Run 2 `[pcc:unverified]`
 
-Filled after the run.
+2026-11-12 06:33 to 06:36 Z, record
+`benchmarks/records/20261112T0633Z-inherited-f4-next-e2e.json` (measured;
+raw `results_e2e.tar.gz`, `results_e2e.json`). Full table `RESULTS_E2E.md`,
+graph `results_e2e.svg/png`. Every one of the 24 configurations recovered its
+planted logarithm in every repeat, and so did every matched rho run.
+
+| instance (unknowns) | rho S | pair table S | `inherited-f4` S | `-next` S | `fes-f2` S | ms per call `inherited-f4` / `-next` / `fes-f2` |
+|:--|--:|--:|--:|--:|--:|:--|
+| Koblitz 13 (14) | 2.76 | 197.7 | 123.1 (117.8–128.4) | 123.1 | **94.7 (83.7–105.7)** | 0.76 / 0.74 / 0.06 |
+| random 15 (16) | 2.64 | 474.0 | 357.5 | 357.5 | 426.5 | 1.91 / 1.41 / 0.18 |
+| Koblitz 17 (18) | 2.02 | 493.0 | 249.1 | 249.1 | 494.0 | 2.80 / 2.78 / 0.30 |
+| Koblitz 19 (20) | 1.48 | 1,063.2 | 411.0 | 411.0 | 2,548.0 | 4.57 / 4.12 / 0.73 |
+| random 21 (22) | 1.36 | 1,975.8 | 2,758.3 | 2,758.3 | 21,807.9 | 8.83 / 7.70 / 3.13 |
+| Koblitz 23 (24) | 0.92 | 3,986.2 | 1,852.5 | 1,852.5 | 18,444.0 | 16.14 / 14.82 / 12.00 |
+
+S = total group-addition equivalents / sqrt(r), mean over 2 repeats (range
+for degree 13). Every algebraic row is priced from its solver's word-XOR
+count (`pinned` on the Koblitz instances, `measured` ratio on the random
+ones), the same basis for all three engines.
+
+- **Degree 13: `fes-f2` lowers the best index-calculus row from 123.1 to
+  94.7 (0.77×), 34.3× the matched rho instead of 44.6×.** The two repeats of
+  each engine do not overlap (83.7–105.7 against 117.8–128.4). At 14
+  unknowns, two word XORs per Gray-code point over 2^14 points cost less than
+  the inherited tree's eliminations. This is the expectation stated before
+  the run; the falsifier did not fire. The distance remaining to rho at
+  degree 13 is 34.3×.
+- **From 16 unknowns up `fes-f2` has the higher S** (1.2× at random 15, 2×
+  at Koblitz 17, 6 to 10× from 19 up): its count doubles per unknown while
+  the inherited tree's grows far more slowly. `inherited-f4` stays the best
+  algebraic row there, and the pair table stays best on random 21.
+- **`inherited-f4-next` has exactly the S of `inherited-f4` on every
+  instance** (same counted work) and a lower wall per call inside the whole
+  pipeline: 0.74 at random 15, 0.87 at random 21, 0.90 at Koblitz 19, 0.92
+  at 23, 0.97 to 0.99 at 13 and 17.
+- `fes-f2` tried 47 targets for 31 relations at degree 13 against 42 for 28
+  with the inherited engines (hit rate 0.657 against 0.654); S counts all of
+  them.
+
+Not a leaderboard row: the row has no replay certificate or validator
+report (validation gate), the run is local and unisolated, and 2 repeats is
+a small sample. The next step for degree 13 is a validated isolab run of the
+`fes-f2` configuration; a size rule in the oracle (`fes-f2` up to 14
+unknowns, `inherited-f4` above) would carry the gain into any sweep without
+choosing the engine per instance.
+
+## Sources checked
+
+KB (`research-kb`) unavailable in this session. `docs/ic/FRAMEWORK.md`
+(engine table: `fes-f2` and `inherited-f4` both priced in word XORs),
+`research/m4gb_e2e_ic_ladder_20261110/README.md` and its sweeps,
+`research/m4gb_descent_ladder_20261110/RESULTS.md`,
+`docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md`; the subagent's Callgrind files.
