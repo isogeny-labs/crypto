@@ -1509,6 +1509,8 @@ fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
         r: m.r,
         cofactor: 8,
         generator: (m.g.x, m.g.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &inst.curve,
@@ -1795,6 +1797,8 @@ fn f4cost_m(
         r: m.r,
         cofactor: 8,
         generator: (m.g.x, m.g.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &inst.curve,
@@ -2138,6 +2142,8 @@ fn t0size(k: u32, t: u32, lo_from: u64, lo_to: u64) -> Vec<Value> {
         r: m.r,
         cofactor: 8,
         generator: (m.g.x, m.g.y),
+
+        representation: None,
     };
     let span = 1u64 << t;
     let n = (0..span)

@@ -1,0 +1,9 @@
+{"arms": {"ic_c1": {"batched": true, "table": true, "c": 1.0}, "ic_c2": {"batched": true, "table": true, "c": 2.0},
+          "bsgs_tuned": {"mode": "tuned"},
+          "rho_multi": {"mode": "multi-target DP rho, 32-step r-adding walk over multiples of G, restart after every DP at Q_t + A_i + B_j (4096 x 4096 starts), no negation map, 2002 lanes, signed union-find with anchor Q_0 = G"}},
+ "T": [1000, 10000], "bits": [25, 29, 31], "instances": {"25": 2, "29": 2, "31": 1},
+ "identical_targets": "all arms draw k_t from the same seed formula (0xC0DE ^ inst ^ n ^ T)",
+ "order": "per (bits, T): ic_c1, ic_c2, bsgs, rho_multi",
+ "basis": "rho_multi was developed and checked at 27 bits only (first version 872/1000 resolved, second version 1000/1000); the IC arms' c values come from earlier freezes; curves 25/29/31 are not new for the IC and BSGS arms (used in earlier evaluations) but were not used to develop or tune the rho arm",
+ "prediction": "best IC (min of c = 1, 2) / rho_multi <= 0.7 at T = 1000 at 25, 29 and 31 bits (median over rows); every rho_multi run resolves and verifies all T targets",
+ "abandon_if": "best IC / rho_multi median >= 1.0 at 29 bits, T = 1000, or any rho_multi run fails to resolve all targets (then the rho arm is reported as weak)"}

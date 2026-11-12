@@ -152,6 +152,10 @@ enum Comparison {
     V7,
     V8,
     V8C,
+    V9,
+    V9C,
+    V10,
+    V10C,
 }
 
 #[derive(Subcommand)]
@@ -906,6 +910,10 @@ fn rule(step: &str, args: RuleArgs) -> Result<String, String> {
         Comparison::V7 => ("research/ic_tool_program/rule/v7", &rule::V7),
         Comparison::V8 => ("research/ic_tool_program/rule/v8", &rule::V8),
         Comparison::V8C => ("research/ic_tool_program/rule/v8c", &rule::V8C),
+        Comparison::V9 => ("research/ic_tool_program/rule/v9", &rule::V9),
+        Comparison::V9C => ("research/ic_tool_program/rule/v9c", &rule::V9C),
+        Comparison::V10 => ("research/ic_tool_program/rule/v10", &rule::V10),
+        Comparison::V10C => ("research/ic_tool_program/rule/v10c", &rule::V10C),
     };
     let here = abs(&args.dir.clone().unwrap_or_else(|| root.join(default_dir)))?;
     let comparison = rule::Comparison {
@@ -980,20 +988,44 @@ fn rule(step: &str, args: RuleArgs) -> Result<String, String> {
         "claims" => comparison.claims(),
         "analyse" => comparison.analyse().map(|doc| json::dumps(&doc, 1)),
         "matched" => {
-            if args.comparison != Comparison::V8 {
-                return Err("matched reads rule v8 against its control v8c: --comparison v8".into());
-            }
-            let here = comparison.root.join("research/ic_tool_program/rule/v8c");
+            let (control_dir, control_constants, title) = match args.comparison {
+                Comparison::V8 => (
+                    "research/ic_tool_program/rule/v8c",
+                    &rule::V8C,
+                    "Rule v8: the matched rho (batched canonicalisation) against its same-binary \
+                     control (KIC_RHO_CANON=scalar, rho as at rule v7), rows paired by target",
+                ),
+                Comparison::V9 => (
+                    "research/ic_tool_program/rule/v9c",
+                    &rule::V9C,
+                    "Rule v9: main's binary against rule v8's binary run in the same session \
+                     (rule v9c), each against its own in-process matched rho, rows paired by target",
+                ),
+                Comparison::V10 => (
+                    "research/ic_tool_program/rule/v10c",
+                    &rule::V10C,
+                    "Rule v10: the single-word factor-base selection against main's binary at the \
+                     branch base run in the same session (rule v10c), each against its own \
+                     in-process matched rho, rows paired by target",
+                ),
+                _ => {
+                    return Err(
+                        "matched reads a rule against its control: --comparison v8, v9 or v10"
+                            .into(),
+                    )
+                }
+            };
+            let here = comparison.root.join(control_dir);
             let control = rule::Comparison {
                 root: comparison.root.clone(),
                 git: comparison.git.clone(),
                 runs: here.join("runs"),
                 out: here.clone(),
                 here,
-                constants: &rule::V8C,
+                constants: control_constants,
             };
             comparison
-                .matched(&control)
+                .matched(&control, title)
                 .map(|doc| json::dumps(&doc, 1))
         }
         other => Err(format!(

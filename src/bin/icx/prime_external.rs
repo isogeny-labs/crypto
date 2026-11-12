@@ -5,6 +5,9 @@ use crypto_lib::cryptanalysis::ec_index_calculus::{
     ec_index_calculus_dlp_staged, ec_index_calculus_dlp_staged_seeded,
     ec_index_calculus_dlp_staged_seeded_projected, pollard_rho_ecdlp,
 };
+use crypto_lib::cryptanalysis::ic_boundary::{
+    rho_cap, rho_reference_walk, PrimeCurve, PrimePoint, RhoWalk,
+};
 use crypto_lib::ecc::{curve::CurveParams, field::FieldElement, point::Point};
 use num_bigint::BigUint;
 use serde::Deserialize;
@@ -22,7 +25,7 @@ pub(super) fn generate_route(args: &PrimeRouteGenerateArgs) -> Result<Value, Str
 
 #[derive(Args)]
 pub struct PrimeArgs {
-    /// Prime field modulus (5..=40000000).
+    /// Prime field modulus (5..=2^50; above 40000000 `group_order` is required).
     #[arg(long)]
     p: u64,
     /// Short-Weierstrass coefficient a.
@@ -42,9 +45,9 @@ pub struct PrimeArgs {
     qx: u64,
     #[arg(long)]
     qy: u64,
-    #[arg(long, default_value_t = 8)]
+    #[arg(long, default_value_t = 32)]
     fb_size: usize,
-    #[arg(long, default_value_t = 64)]
+    #[arg(long, default_value_t = 2)]
     extra_relations: usize,
     #[arg(long, default_value_t = 5000)]
     max_trials_per_relation: usize,
@@ -66,6 +69,17 @@ pub struct PrimeArgs {
     /// entry lies in the prime-order subgroup <G>; the default path is unchanged.
     #[arg(long)]
     project_cofactor: bool,
+    /// Run the repository's counted negation-map Pollard rho (the matched reference,
+    /// A = 2) this many times on this very instance, in this process, and report
+    /// its charged group operations and its unpriced counters beside the index
+    /// calculus counters. Zero (default) skips it.
+    #[arg(long, default_value_t = 0)]
+    matched_rho_runs: usize,
+    /// The order of the whole curve group, for a prime `p` too large to count points
+    /// by brute force (above 4e7 it is required; at or below, if given, it must equal the count).
+    /// The Hasse bound and `n | order` are checked; correctness of the order is the caller's.
+    #[arg(long)]
+    group_order: Option<u64>,
 }
 
 #[derive(Args)]
@@ -73,9 +87,9 @@ pub struct PrimeFileArgs {
     /// JSON target file or checked store:NAME/sha256:DIGEST reference.
     #[arg(long)]
     input: PathBuf,
-    #[arg(long, default_value_t = 8)]
+    #[arg(long, default_value_t = 32)]
     fb_size: usize,
-    #[arg(long, default_value_t = 64)]
+    #[arg(long, default_value_t = 2)]
     extra_relations: usize,
     #[arg(long, default_value_t = 5000)]
     max_trials_per_relation: usize,
@@ -97,6 +111,12 @@ pub struct PrimeFileArgs {
     /// entry lies in the prime-order subgroup <G>; the default path is unchanged.
     #[arg(long)]
     project_cofactor: bool,
+    /// Run the repository's counted negation-map Pollard rho (the matched reference,
+    /// A = 2) this many times on this very instance, in this process, and report
+    /// its charged group operations and its unpriced counters beside the index
+    /// calculus counters. Zero (default) skips it.
+    #[arg(long, default_value_t = 0)]
+    matched_rho_runs: usize,
 }
 
 #[derive(Deserialize)]
@@ -110,6 +130,8 @@ struct PrimeTargetInput {
     gy: u64,
     qx: u64,
     qy: u64,
+    #[serde(default)]
+    group_order: Option<u64>,
 }
 
 pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
@@ -137,6 +159,7 @@ pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
         gy: target.gy,
         qx: target.qx,
         qy: target.qy,
+        group_order: target.group_order,
         fb_size: args.fb_size,
         extra_relations: args.extra_relations,
         max_trials_per_relation: args.max_trials_per_relation,
@@ -146,6 +169,7 @@ pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
         route_file: args.route_file.clone(),
         route_id: args.route_id.clone(),
         project_cofactor: args.project_cofactor,
+        matched_rho_runs: args.matched_rho_runs,
     };
     let mut report = solve(&solve_args)?;
     report["operation"] = json!("solve-prime-file");
@@ -187,12 +211,18 @@ pub(super) fn count_curve_order(p: u64, a: u64, b: u64) -> u64 {
     order
 }
 
+/// Largest prime field (and subgroup order) accepted: trial-division primality is about 2^25 steps here.
+const MAX_PRIME_FIELD: u64 = 1 << 50;
+/// Largest field whose point count is done by brute force.
+const COUNTABLE_FIELD: u64 = 40_000_000;
+
 pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
-    if !(5..=40_000_000).contains(&args.p) || !prime(args.p) {
-        return Err("p must be prime and in 5..=40000000".into());
+    // Trial-division primality bounds the sizes (about 2^25 steps at 2^50).
+    if !(5..=MAX_PRIME_FIELD).contains(&args.p) || !prime(args.p) {
+        return Err(format!("p must be prime and in 5..={MAX_PRIME_FIELD}"));
     }
-    if !(3..=80_000_000).contains(&args.n) || !prime(args.n) {
-        return Err("n must be prime and in 3..=80000000".into());
+    if !(3..=MAX_PRIME_FIELD).contains(&args.n) || !prime(args.n) {
+        return Err(format!("n must be prime and in 3..={MAX_PRIME_FIELD}"));
     }
     if [args.a, args.b, args.gx, args.gy, args.qx, args.qy]
         .iter()
@@ -213,9 +243,36 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
     if (4 * a * a * a + 27 * b * b).is_multiple_of(p) {
         return Err("singular curve: discriminant is zero modulo p".into());
     }
-    let curve_order = count_curve_order(args.p, args.a, args.b);
+    let curve_order = if args.p <= COUNTABLE_FIELD {
+        let counted = count_curve_order(args.p, args.a, args.b);
+        if let Some(given) = args.group_order {
+            if given != counted {
+                return Err(format!(
+                    "group_order {given} differs from the counted order {counted}"
+                ));
+            }
+        }
+        counted
+    } else {
+        // Too large to count by brute force: the caller supplies the group order; only the
+        // Hasse bound and divisibility are checked here.
+        let given = args
+            .group_order
+            .ok_or("p above 40000000 needs group_order (the whole group's order)")?;
+        let slack = 2 * (args.p as f64).sqrt() as u64 + 2;
+        if given.abs_diff(args.p + 1) > slack {
+            return Err(format!(
+                "group_order {given} violates the Hasse bound for p = {}",
+                args.p
+            ));
+        }
+        given
+    };
     if !curve_order.is_multiple_of(args.n) {
-        return Err("subgroup order does not divide the counted curve order".into());
+        return Err("subgroup order does not divide the curve order".into());
+    }
+    if curve_order / args.n > u64::from(u32::MAX) {
+        return Err("cofactor does not fit u32".into());
     }
     let curve = CurveParams {
         name: "external-prime",
@@ -339,7 +396,75 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
         "ic": ic.map(|(x, stages)| json!({"scalar": x.to_string(), "stages": stages})),
         "isogeny_route": transported.map(|t| t.receipt),
         "rho": rho,
+        "matched_rho": if args.matched_rho_runs > 0 { Some(matched_rho(args)) } else { None },
     }))
+}
+
+/// The counted negation-map walk (the matched reference, A = 2) run `matched_rho_runs`
+/// times on this instance with distinct walk seeds. Everything is in the unit of the
+/// index-calculus arm: charged group additions and doublings (`gae` = adds + doubles) and
+/// the walk's own unpriced counters, summed over the runs and per run.
+fn matched_rho(args: &PrimeArgs) -> Value {
+    let curve = PrimeCurve {
+        p: args.p,
+        a: args.a,
+        b: args.b,
+    };
+    let g = PrimePoint::affine(args.gx, args.gy);
+    let q = PrimePoint::affine(args.qx, args.qy);
+    let cap = rho_cap(args.n, 64.0);
+    let base = args.seed.unwrap_or(1);
+    let k = args.matched_rho_runs;
+    let mut gaes = Vec::with_capacity(k);
+    let mut steps = Vec::with_capacity(k);
+    let mut all_verified = true;
+    let mut counters: std::collections::BTreeMap<String, u64> = Default::default();
+    let mut method = String::new();
+    for i in 0..k {
+        let seed = base ^ (i as u64 + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        let res = rho_reference_walk(&curve, g, q, args.n, seed, cap, RhoWalk::negation());
+        gaes.push(res.gae);
+        steps.push(res.steps);
+        all_verified &= res.verified;
+        method = res.method.clone();
+        for (name, v) in &res.counters {
+            *counters.entry(name.clone()).or_insert(0) += v;
+        }
+    }
+    let mean = |xs: &[f64]| xs.iter().sum::<f64>() / xs.len().max(1) as f64;
+    let mut sorted = gaes.clone();
+    sorted.sort_by(|x, y| x.partial_cmp(y).unwrap());
+    let median = if sorted.is_empty() {
+        0.0
+    } else if sorted.len() % 2 == 1 {
+        sorted[sorted.len() / 2]
+    } else {
+        (sorted[sorted.len() / 2 - 1] + sorted[sorted.len() / 2]) / 2.0
+    };
+    let per_run: std::collections::BTreeMap<String, f64> = counters
+        .iter()
+        .map(|(n, v)| (n.clone(), *v as f64 / k.max(1) as f64))
+        .collect();
+    // j = 0 or j = 1728 carry automorphisms beyond negation; then this walk is not the matched one.
+    let eligible = if args.a == 0 || args.b == 0 {
+        "NOT MATCHED: a = 0 or b = 0 (extra automorphisms)"
+    } else {
+        "negation only (A = 2): a and b are nonzero; no other automorphism checked"
+    };
+    json!({
+        "method": method,
+        "matched_rho_eligible": eligible,
+        "runs": k,
+        "cap": cap,
+        "all_verified": all_verified,
+        "mean_gae": mean(&gaes),
+        "median_gae": median,
+        "mean_steps": steps.iter().sum::<u64>() as f64 / k.max(1) as f64,
+        "gae_per_run": gaes,
+        "counters_summed": counters,
+        "counters_per_run": per_run,
+        "unit": "gae = group additions + doublings, as in ic rho",
+    })
 }
 
 #[cfg(test)]
@@ -349,6 +474,7 @@ mod tests {
     #[test]
     fn rejects_invalid_prime_and_target() {
         let mut args = PrimeArgs {
+            group_order: None,
             p: 271,
             a: 1,
             b: 19,
@@ -366,6 +492,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         args.p = 272;
         assert!(solve(&args).unwrap_err().contains("prime"));
@@ -377,6 +504,7 @@ mod tests {
     #[test]
     fn certified_isogeny_route_preserves_public_scalar() {
         let args = PrimeArgs {
+            group_order: None,
             p: 271,
             a: 1,
             b: 19,
@@ -394,6 +522,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("docs/ic/fixtures/prime271_isogeny_routes.json");
@@ -412,6 +541,7 @@ mod tests {
     fn accepts_a_prime_subgroup_with_nontrivial_cofactor() {
         // Independently enumerated: #E(F_17) = 21, and [7](6,7) = O.
         let args = PrimeArgs {
+            group_order: None,
             p: 17,
             a: 2,
             b: 8,
@@ -429,6 +559,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let report = solve(&args).unwrap();
         assert_eq!(report["input"]["curve_order"], 21);
@@ -439,6 +570,7 @@ mod tests {
     fn rejects_other_order_three_subgroup_when_three_divides_cofactor() {
         // E/F_7: y^2 = x^3 + 2 has order 9 and independent 3-torsion.
         let mut args = PrimeArgs {
+            group_order: None,
             p: 7,
             a: 0,
             b: 2,
@@ -456,6 +588,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         assert!(solve(&args).unwrap_err().contains("outside the subgroup"));
         args.qx = 0;
@@ -466,6 +599,7 @@ mod tests {
     #[test]
     fn seeded_prime_relation_search_replays_counts_and_scalar() {
         let args = PrimeArgs {
+            group_order: None,
             p: 271,
             a: 1,
             b: 19,
@@ -483,6 +617,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let first = solve(&args).unwrap();
         let second = solve(&args).unwrap();
@@ -503,6 +638,112 @@ mod tests {
         }
     }
 
+    /// A field above the brute-force counting limit (p = 67108859 > 40000000) with the group order
+    /// supplied: recovers the planted logarithm, rejects a missing or Hasse-violating order, and
+    /// rejects a supplied order that disagrees with the count when p is small enough to count.
+    #[test]
+    fn large_field_with_a_supplied_group_order() {
+        let base = || PrimeArgs {
+            group_order: Some(67097977),
+            p: 67108859,
+            a: 52052391,
+            b: 47114804,
+            n: 67097977,
+            gx: 56481491,
+            gy: 3021856,
+            qx: 57454885,
+            qy: 41976207,
+            fb_size: 64,
+            extra_relations: 2,
+            max_trials_per_relation: 2_000_000,
+            max_relation_attempts: 64,
+            seed: Some(5),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+            project_cofactor: false,
+            matched_rho_runs: 2,
+        };
+        let report = solve(&base()).unwrap();
+        assert_eq!(report["status"], "complete");
+        assert_eq!(report["ic"]["scalar"], "44020072");
+        assert_eq!(report["matched_rho"]["all_verified"], true);
+        let mut missing = base();
+        missing.group_order = None;
+        assert!(solve(&missing).unwrap_err().contains("needs group_order"));
+        let mut hasse = base();
+        hasse.group_order = Some(67097977 + 100_000);
+        assert!(solve(&hasse).unwrap_err().contains("Hasse"));
+    }
+
+    #[test]
+    fn small_field_rejects_a_group_order_that_disagrees_with_the_count() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let input = root.join("docs/ic/fixtures/prime271_target_input_20261023.json");
+        let bytes = fs::read(&input).unwrap();
+        let target: PrimeTargetInput = serde_json::from_slice(&bytes).unwrap();
+        let args = PrimeArgs {
+            group_order: Some(target.p + 1),
+            p: target.p,
+            a: target.a,
+            b: target.b,
+            n: target.n,
+            gx: target.gx,
+            gy: target.gy,
+            qx: target.qx,
+            qy: target.qy,
+            fb_size: 8,
+            extra_relations: 16,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            seed: Some(42),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+            project_cofactor: false,
+            matched_rho_runs: 0,
+        };
+        let counted = count_curve_order(target.p, target.a, target.b);
+        if counted != target.p + 1 {
+            assert!(solve(&args)
+                .unwrap_err()
+                .contains("differs from the counted order"));
+        }
+    }
+
+    #[test]
+    fn matched_rho_runs_on_the_same_instance_and_reports_its_counters() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let input = root.join("docs/ic/fixtures/prime271_target_input_20261023.json");
+        let args = PrimeFileArgs {
+            input,
+            fb_size: 8,
+            extra_relations: 16,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            seed: Some(42),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+            project_cofactor: false,
+            matched_rho_runs: 6,
+        };
+        let report = solve_file(&args).unwrap();
+        let m = &report["matched_rho"];
+        assert_eq!(m["runs"], 6);
+        assert_eq!(m["all_verified"], true);
+        assert!(m["mean_gae"].as_f64().unwrap() > 0.0);
+        assert!(m["counters_summed"]["canonicalisations_uncharged"]
+            .as_u64()
+            .is_some());
+        assert!(
+            report["ic"]["stages"]["counters"]["group_additions"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+    }
+
     #[test]
     fn prime_target_file_reuses_checked_solver_and_route() {
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -518,6 +759,7 @@ mod tests {
             route_file: None,
             route_id: None,
             project_cofactor: false,
+            matched_rho_runs: 0,
         };
         let report = solve_file(&args).unwrap();
         assert_eq!(report["status"], "complete");

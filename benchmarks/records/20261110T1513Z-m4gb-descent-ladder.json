@@ -1,0 +1,124 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-10T18:47:47+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/m4gb_descent_ladder_20261110/run_ladder.sh",
+        "research/m4gb_descent_ladder_20261110/results"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T17:26:11+00:00",
+      "wall_s": 4781.147
+    }
+  ],
+  "commit": "f14b66786b6b2e46afb203cf4d21da22b5177012",
+  "commit_dirty": false,
+  "created_utc": "2026-11-10T15:13:42+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261110-m4gb-descent-ladder"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39"
+  },
+  "id": "20261110T1513Z-m4gb-descent-ladder",
+  "metrics": [
+    {
+      "baseline": 2058.9,
+      "better": "lower",
+      "n": 6,
+      "name": "k23-m2-24vars-m4gb-wall",
+      "note": "milliseconds despite the unit: median over 6 targets of per-target median wall, m4gb-f2 vs f4-f2 (baseline), Koblitz n=23, m=2, 24 unknowns, one thread",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 489.3
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 6,
+      "name": "r27-m2-28vars-f4-over-m4gb",
+      "note": "f4-f2 median wall / m4gb-f2 median wall, random n=27, m=2, 28 unknowns (40709 ms / 3294 ms)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 12.36
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "k31-m2-32vars-m4gb-over-inherited",
+      "note": "m4gb-f2 median wall / inherited-f4 median wall, Koblitz n=31, m=2, 32 unknowns (21759 ms / 242 ms): the oracle engine stays inherited-f4",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 89.8
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "k31-m2-32vars-m4gb-over-fes",
+      "note": "m4gb-f2 / fes-f2 median wall at 32 unknowns; 158 at 12 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 7.34
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "k11-m3-12vars-m4gb-over-f4",
+      "note": "m4gb-f2 / f4-f2 median wall, Koblitz n=11, m=3 (cubic), 12 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 87.1
+    }
+  ],
+  "problem": "study:m4gb_integration_20261110:descent-ladder",
+  "raw": [
+    {
+      "bytes": 152007,
+      "path": "research/m4gb_descent_ladder_20261110/results.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd730af311f73c7205a2751189652d7862f2503aa033007beb5e18dcdbdc76bc",
+      "sha256": "fd730af311f73c7205a2751189652d7862f2503aa033007beb5e18dcdbdc76bc",
+      "uploaded": false
+    },
+    {
+      "bytes": 37250,
+      "path": "research/m4gb_descent_ladder_20261110/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4b/4bf8a9c8a0db3bed190931fa46ac42134618bb5748b6ed3b7965739cd9369f70",
+      "sha256": "4bf8a9c8a0db3bed190931fa46ac42134618bb5748b6ed3b7965739cd9369f70",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/m4gb_descent_ladder_20261110/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/m4gb_descent_ladder_20261110/results.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "m4gb-descent-ladder",
+  "status": "measured",
+  "summary": "ic descent engine comparison on Koblitz and random binary curves, 12-32 unknowns (m=2) and 12-15 (m=3), 6 targets x 2 repeats, 60 s budget: m4gb-f2 beats the in-house full-basis f4-f2 from about 22 unknowns (0.24x at 24, 0.08x at 28, f4-f2 over budget at 30-32) and never beats inherited-f4 (10-90x slower) or fes-f2; 0 disagreements; m=3 cubic cells 45-87x slower than f4-f2. Local container, one thread; unverified.",
+  "validation": null
+}

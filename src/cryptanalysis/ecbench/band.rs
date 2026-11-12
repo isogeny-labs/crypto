@@ -133,6 +133,15 @@ impl Pricing {
 /// (`ic_framework/plugins.rs`, `table_counted()`).
 pub const TABLE_WORK_COUNTERS: &[&str] = &["table_insert_attempts"];
 
+/// Native work a sibling-point walk (`wwalk` `sib=m`) counts behind its own
+/// `counted:` marker: the second x-only point of each sibling pair, priced
+/// at `w` like the table work above (the pair itself is one charged group
+/// addition).  Read by [`table_work_counts`] where the marker is present,
+/// so no earlier record changes; it is not part of
+/// [`Pricing::priced_table_work`], whose list names only the
+/// pre-sibling counter, and a row reports it in `table_work_mean_counts`.
+pub const SIBLING_WORK_COUNTERS: &[&str] = &["sibling_second_points", "sibling_lift_products"];
+
 /// The phase sum of each [`TABLE_WORK_COUNTERS`] counter in `r`'s
 /// `work_native` maps, present only where some phase carries the marker
 /// `counted:<name>` (the code that did the work counted it and said so).  A
@@ -140,7 +149,7 @@ pub const TABLE_WORK_COUNTERS: &[&str] = &["table_insert_attempts"];
 /// the count is not known to be complete.
 pub fn table_work_counts(r: &Record) -> BTreeMap<String, u64> {
     let mut out = BTreeMap::new();
-    for name in TABLE_WORK_COUNTERS {
+    for name in TABLE_WORK_COUNTERS.iter().chain(SIBLING_WORK_COUNTERS) {
         let marker = format!("counted:{name}");
         if !r.phases.iter().any(|p| p.work_native.contains_key(&marker)) {
             continue;
