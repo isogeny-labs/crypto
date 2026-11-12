@@ -1,3 +1,16 @@
+# New component: actual seven-kernel and cyclic-49 certificates
+
+Full38/9f7c80 accepts625unchangedhashes/actual7kernel and49E7slice,correct
+geometrichalf4/wrong55control42different7equal; exactdegree24h49/psi49degree1200
+division/gcdpsi7/DDF3+21. Written063773 suppliesglobalcyclicity/field42
+bridges;5boundlocalLean188written37modules andalgebra23/eightoutputs
+withold7byte-identical. Mainreport pcc/claims/PCC-20261112-10a47c.json /inspected2page52520PDF:
+[kernel certificates](reports/even-kernel-certificates/REPORT.md).
+No Fp42pointenumeration ormeasuredcostclaim;scientificstandingunsigned.
+Nextactualprimitive-fourT20/Richelotbridge andadditiveconsumerreplay.
+[pcc:unverified]
+
+---
 # New component: four whole rational Jacobian maps
 
 Full37/3c1cb7 and six bound local Lean declarations/183written36modules

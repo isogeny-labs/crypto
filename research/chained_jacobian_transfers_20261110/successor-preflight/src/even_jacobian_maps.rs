@@ -1,6 +1,8 @@
 //! Generic cover adapters around the existing field/poly/elliptic/Cantor code.
 //! No rational logarithm labels enter a norm or pullback.
 use super::*;
+#[path = "even_kernel_certificates.rs"]
+mod even_kernel_certificates;
 
 #[derive(Clone, Copy, Debug)]
 enum EvenPoint {

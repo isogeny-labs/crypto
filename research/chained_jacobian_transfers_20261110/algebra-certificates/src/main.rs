@@ -211,9 +211,35 @@ fn even_cover(direct: bool) -> IdentityStatement {
     }
 }
 
+fn cubic_homogenization() -> IdentityStatement {
+    let [a, b, c, e, x, d] = ["a", "b", "c", "e", "x", "d"].map(Expr::var);
+    let n = Expr::Mul(vec![x.clone(), d.clone()]);
+    IdentityStatement {
+        name: "Cubic kernel polynomial denominator clearing with N=xD".into(),
+        source: "EVEN_KERNEL_CERTIFICATE_PROTOCOL.md;Galbraithch9divisionpolynomials;Lean EvenKernels.cubic_homogenization".into(),
+        variables: ["a", "b", "c", "e", "x", "d"].map(String::from).to_vec(),
+        degree_bound: 7,
+        lhs: Expr::Add(vec![
+            Expr::Mul(vec![a.clone(), power(d.clone(), 3)]),
+            Expr::Mul(vec![b.clone(), n.clone(), power(d.clone(), 2)]),
+            Expr::Mul(vec![c.clone(), power(n.clone(), 2), d.clone()]),
+            Expr::Mul(vec![e.clone(), power(n, 3)]),
+        ]),
+        rhs: Expr::Mul(vec![
+            power(d, 3),
+            Expr::Add(vec![
+                a,
+                Expr::Mul(vec![b, x.clone()]),
+                Expr::Mul(vec![c, power(x.clone(), 2)]),
+                Expr::Mul(vec![e, power(x, 3)]),
+            ]),
+        ]),
+    }
+}
+
 fn main() {
     let outputs = std::env::args_os().skip(1).collect::<Vec<_>>();
-    let cases: [(IdentityStatement, &[u8], &str, u64); 7] = [
+    let cases: [(IdentityStatement, &[u8], &str, u64); 8] = [
         (
             duplication(),
             include_bytes!("../../lean/QuarticGluing.lean"),
@@ -256,6 +282,12 @@ fn main() {
             "research/chained_jacobian_transfers_20261110/lean/UnbalancedCovers.lean",
             0x4642,
         ),
+        (
+            cubic_homogenization(),
+            include_bytes!("../../lean/EvenKernels.lean"),
+            "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+            0x4741,
+        ),
     ];
     for (i, (statement, source, path, seed)) in cases.into_iter().enumerate() {
         let cert=identity::issue(statement,seed,32,"Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",Some(identity::ProofRef {kind:"lean4;pointer only;requires separate proof gate".into(),path:path.into(),sha256:hex::encode(sha256_native::sha256(source))})).expect("the issuer must reject any false identity");
@@ -282,6 +314,7 @@ fn mutated_identities_are_rejected() {
         second_monodromy(),
         even_cover(true),
         even_cover(false),
+        cubic_homogenization(),
     ] {
         statement.rhs = Expr::Add(vec![statement.rhs, Expr::Const(1)]);
         assert!(matches!(

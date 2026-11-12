@@ -1,38 +1,41 @@
-# CURRENT — full37 wholeEven accepted; publish then geometric kernels
+# CURRENT — kernel stageC full38 accepted; commit then T20
 
-Root LOCAL/REMOTE338d154b85e67960908e4a747e14ad18e7fdea99 at packaging.
-UncommittedwholeEven nativefull37/3c1cb7 all624hashesunchanged,all12317
-classes→4targets(C10/C20/Cpi1/Cpi2),actualnorms/forward/adjoints/recovery/
-Frobenius/DLPscalars/three-stepidentity/optionalCantor6103. Wronguniformnorm
-each12208different109equal. Genericnonmonicchart/pulls/basepoints/all4torsion
-full36a6b02d retained. SixboundEvenJacobian localpasses/183written36modules,
-0trusted; formal01failure044c8c immutable. Writtenafd164; mainreport
-pcc/claims/PCC-20261112-e4f934.json final2page48529PDFinspected; failurereportpcc/claims/PCC-20261112-56cfc2.json
-final1page36561PDFinspected. Packagingpcc/claims/PCC-20261112-5f39be.json:own338dledger931chain
-/prose0/diff0,benchrecFAIL189oldgaps106unchangedrecords. [pcc:unverified]
+RootLOCAL/REMOTEd87fd630504090f1f8acb0ce56664d6cad6077af/tree233b4073,
+parent338d/187paths/publicationcd5da9. Own43277728697inprogress/f10843,
+next19:06UTC at25/37/23/seven/209compiledexpected183written36modules0trusted.
+Allolderroot338d/fdfe/51d/0796 andconsumer1513/f656/c712successessettled;
+DO NOTrepoll.
 
-NOactive native/proofprocess; full37session49045 COMPLETE,sourcefreezeENDED.
-NEXT:scopedcommitacceptedcomponentchild338d,artifactgate/exactobjects/nonforce
-CAS/update3877+3904/reuseownpushCI(expected25/37/23/seven/209compiled
-183written36modules/0trusted; newcompiled209NOTYETobservedownCI).
-ThenstageCactual7kernelclasses/Frobenius/all49sums andcyclic49h49degree24
-h1*D1^3*h2(N1/D1),squarefree/dividespsi49/gcdpsi7=h1; optionalDDF3+21.
-Extraall49E[7]controlneedspreregistrationbeforecode:correcthalf4mod7,
-WRONG55predict42different7equal. Neveruse55/57asgeometricmapformula.
-ThenprimitivefourT20andexternalCT49candidateRichelottargets,feedback
-pcc/claims/PCC-20261112-73d2de.json; externalclaims NOTacceptedbycustody. ValidateinRust.
+UNCOMMITTEDkernelCacceptedfull38/9f7c80:0failedignoredfiltered/all625hashes
+unchanged/oldreference+legacyguardsfmtstrictClippy. Whole129135→XZ11128,
+24475-byteJSONbyte-identicalselected19142f. Actual49E7slice/C0pulls/norm2/
+all2401source+targetsumcomparisons/Frob;7actualkernelclasses/49sums/exact
+nonzeroorder7/Frobenius5. Correcthalf4vswrong55=42different7equal.
+h49degree24/exactpsi49degree1200division/fullquotient/gcdpsi7=h1/DDF3+21;
+cyclicity/fullpointfield42written,notFp42enumeration. Protocol779dc2;
+written063773;5boundLean c9aa3b/e1bd7f/f5bb27/063ed6/7310b6,gate03
+5thm0trusted/188written37modules. Algebrad7d12d23/eight/all12hashes,old7
+certsbyte-identical,newIDC1ha31d00e9a1842a62 fixed2^61-1scope. [pcc:unverified]
 
-Root338d own43259612800SUCCESSall4/c5fc9b at25/35/23/seven/203compiled
-177written35modules/0trusted; olderfdfe9c0f27,51d2c4744,0796bfbd6b settled.
-Consumerready1513 LOCAL/REMOTE748e44e22bdf60439c3af7da90298c6644669908,
-parentf656/1509; own43268001587SUCCESSall3fulljobs, pcc/claims/PCC-20261112-3ea63d.json/rootpcc/claims/PCC-20261112-1e1681.json.
-Fullreference25/98plus5/oneoldignored; independent0796:32/23/2/186compiled
-160written32/0trusted; partial338d:35/23/seven/203compiled177written35/0trusted.
-ThreewholeUTF8logs/API/XZ/hash/roundtrip retained. Positive814cfc/root5efc28
-whole143files64540-bytearchive unchanged. Consumerf656/c712settledsuccess.
-DO NOTrepollsettledruns. No paidrun/benchmark/subagents/force/rebase/rechain/
-lineagechoice. Actualledger/C/archive/review/signing gatespersist; vault
-8edec422key/KB/EKSbudget/S3unavailable. Continue nextunblockedresearchrung.
+Mainreportpcc/claims/PCC-20261112-10a47c.json(2page52520PDF),failurepcc/claims/PCC-20261112-edcac0.json(1page38127PDF)
+allinspected/editablesources; governancepcc/claims/PCC-20261112-290033.jsonownd87prefix/prose0/diff0.
+Oldbroadbenchrec189gaps106recordsNOTgreen. Interruptedfull02eb1ebb/algebra01
+2cb5c1NOTaccepted;latechecksnotoriginalreceipts. Alloriginalfailuresretained.
+NOactivenative/proofprocess; full03session72648 COMPLETE/sourcefreezeENDED.
+
+NEXT:scopedcommitkernelcomponentchildd87/artifactgate/exactobjects/nonforce
+CAS/update3877+3904/ownautomaticCI(expected25/38/23/eight/214compiledexpected
+188written37modules0trusted). ThenactualT20primitivefour/Richelotkernel
+P20Q20 matching/rawnonmonictarget/descent/fullMumfordmaps/duals/orientation.
+ReadprimaryBDProp4.3/nativeRic andexternalCT49f7d4c6be candidatepolys first;
+validateinRust,notPython/JS/C++execution. Addnextdistinctconsumerpin/replay.
+
+Consumerready1513 LOCAL/REMOTE748e,parentf656/1509,own43268001587SUCCESS
+all3fulljobs3ea63d/root1e1681 atfixed338d35/23/seven/203compiled177written35;
+oldreference98+five/oldindependent0796allretained. Currentrootwhole37 and
+kernel38arenotcoveredbythatconsumer. Vault8edec422key/KB/EKSbudget/S3
+unavailable. No paidrun/benchmark/subagents/force/rebase/rechain/lineagechoice.
+Actualmainledger/C/archive/review/signing gatespersist. Continue.
 [pcc:unverified]
 
 ---

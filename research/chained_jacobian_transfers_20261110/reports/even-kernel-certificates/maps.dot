@@ -1,0 +1,22 @@
+digraph {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.5",ranksep="0.75"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=10,color="#456273",fillcolor="#edf4f4"];
+  edge [fontname="DejaVu Sans",fontsize=9,color="#4f8b6b",arrowsize=0.7];
+  E0 [label="E0/F101\ny²=x³+x+46"];
+  E1 [label="E1/F101\ny²=x³+26x+58"];
+  E2 [label="E2/F101\ny²=x³+59x+27"];
+  C0 [label="Jac(C0)/F101\ny²=x⁶+6x⁴+13x²+56"];
+  C10 [label="Jac(C10)/F101\ny²=61x⁶+8x⁴+93x²+89",fillcolor="#e4f2e8"];
+  C20 [label="Jac(C20)/F101\ny²=18x⁶+75x⁴+45x²+40",fillcolor="#e4f2e8"];
+  {rank=same;E0;E1;E2;}
+  {rank=same;C0;C10;C20;}
+  E0 -> E1 [label="α · degree7\nh1=[72,100,35,1]"];
+  E1 -> E2 [label="β · degree7\nh2=[99,94,75,1]"];
+  E0 -> C0 [label="actual cover pull\ninjective on odd torsion",color="#456273"];
+  E1 -> C10 [label="actual cover pull",color="#456273"];
+  E2 -> C20 [label="actual cover pull",color="#456273"];
+  C0 -> C10 [label="Φ7 · global degree7 written\nactual7 kernel classes / Frob5"];
+  C0 -> C20 [label="Φ49 · global degree49 written\ncyclic kernel polynomial h49\ndegree24 · x-factors3+21"];
+  note [shape=note,fillcolor="#fff5df",label="full38 /9f7c80 · source625 unchanged\n49 E0[7] inputs · 2401 sums per side\nCorrect geometric half4; wrong55:42 differ/7 equal\nFull point field42:written+finite Lean; no point enumeration\nUnsigned geometric data; no performance claim"];
+  C10 -> note [style=invis];
+}
