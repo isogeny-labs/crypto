@@ -11,8 +11,10 @@ T0=$(date +%s)
 log() { echo "$(date -u +%FT%TZ) $*" | tee -a "$OUT/run.log"; }
 pack() { tar czf "$W/out.tgz.part" -C "$W" out 2>/dev/null && mv -f "$W/out.tgz.part" "$SERVE/out.tgz" && sha256sum "$SERVE/out.tgz" | cut -d' ' -f1 >"$SERVE/out.tgz.sha256"; }
 delete_self() {
+  { set +x; } 2>/dev/null
   [ -n "${RUNPOD_POD_ID:-}" ] && [ -n "${POD_CTL_KEY:-}" ] && \
     curl -sS -m 60 -X DELETE -H "Authorization: Bearer $POD_CTL_KEY" "https://rest.runpod.io/v1/pods/$RUNPOD_POD_ID" >>"$OUT/run.log" 2>&1
+  set -x
 }
 finish() {
   log "finish: $1"; echo "$1" >"$OUT/final_status"; pack
@@ -30,7 +32,9 @@ apt-get update -qq >"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt upda
 apt-get install -y -qq jq curl git >>"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt base exit=$?" >>"$OUT/run.log"
 apt-get install -y -qq build-essential pkg-config libssl-dev time >>"$OUT/apt.log" 2>&1; echo "$(date -u +%FT%TZ) boot: apt build tools exit=$?" >>"$OUT/run.log"
 # USD 100 hard cap: deadline = min(36 h, floor(100 / costPerHr) h) from start
+{ set +x; } 2>/dev/null
 COST=$(curl -sS -m 60 -H "Authorization: Bearer ${POD_CTL_KEY:-}" "https://rest.runpod.io/v1/pods/${RUNPOD_POD_ID:-x}" | jq -r '.costPerHr // empty')
+set -x
 HRS=$(awk -v c="$COST" 'BEGIN{ if (c+0 <= 0) { print 0; exit } h = int(100 / c); print (h < 36 ? h : 36) }')
 [ "$HRS" -gt 0 ] || { HRS=${MAX_HOURS_FALLBACK:-18}; COST="unread (fallback limit ${HRS} h)"; }
 DEADLINE_EPOCH=$(( T0 + HRS*3600 ))
@@ -46,7 +50,8 @@ fi
 rustc --version >>"$OUT/host.txt"; log "rust ready"; pack
 # --- source: sparse partial clone of the frozen commit (Amendment 20, G-src-a/b/c)
 S=research/fall_degree_bounds_20261008
-curl -sS -m 120 -o "$W/source_paths.txt" "https://raw.githubusercontent.com/isogeny-labs/crypto/$SRC_COMMIT/$S/e13/source_paths.txt" || finish "paths_download_failed"
+# Amendment 26: the path list postdates the frozen commit; fetch it from PATHS_COMMIT (hash-pinned by PATHS_SHA256)
+curl -sS -m 120 -o "$W/source_paths.txt" "https://raw.githubusercontent.com/isogeny-labs/crypto/${PATHS_COMMIT:-43438f5ab6eb6d1844b8d0465c933ad079099326}/$S/e13/source_paths.txt" || finish "paths_download_failed"
 echo "$PATHS_SHA256  $W/source_paths.txt" | sha256sum -c - >>"$OUT/run.log" 2>&1 || finish "G-src-b_failed"
 cd "$SRC" && git init -q . && git remote add origin https://github.com/isogeny-labs/crypto.git \
   && git sparse-checkout init --no-cone && git sparse-checkout set --stdin <"$W/source_paths.txt" \

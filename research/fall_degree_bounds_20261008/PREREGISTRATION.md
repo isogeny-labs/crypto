@@ -1247,3 +1247,21 @@ the same way, so delivery is not the cause; the `/workspace` theory of Amendment
 (below the catalogue estimate above), so the USD 100 cap gives the full 36 h deadline. Pod
 `xkgx6mw9roo3zl`, `fd-e14-r2e-20261112T0305Z`, 32 vCPU, 256 GB; balance at launch USD 91.37; the
 sibling pod was at USD 5.35/h.
+
+## Amendment 26 (2026-11-12 UTC, before any draw below): r2e booted correctly and stopped at G-src-b; path list fetched from a commit that contains it; relaunch r2f
+
+**What happened.** r2e (`xkgx6mw9roo3zl`, cpu5m/cpu3m 32 vCPU, 528 GB host, AMD EPYC 9575F) ran the
+start command 2 s after creation, finished `apt` and the Rust toolchain by 03:05:33 UTC, and then
+stopped at gate `G-src-b`: the path list was fetched from
+`raw.githubusercontent.com/.../a2be6609.../e13/source_paths.txt`, but `e13/source_paths.txt` was
+added to the repository after the frozen commit `a2be6609` (it is absent there; the raw URL returns
+404), so the hash check refused the 404 page, as it should. The controller pulled the final output
+(`e14/pod-r2/out-r2e/`: `run.log`, `trace.log`, `apt.log`, `host.txt`) and deleted the pod at
+03:05:49 UTC (under USD 0.05). This confirms Amendment 25's cause: with 32 vCPU the pod starts at once.
+No gate beyond G-src-a was reached; no draw exists.
+
+**Change for r2f.** The path list is fetched from commit
+`43438f5ab6eb6d1844b8d0465c933ad079099326` (main at the start of this session, where it exists with
+sha256 `97b6bbde…`); `G-src-b` still pins its content by that hash, and `G-src-a`/`G-src-c` still
+pin the source tree at `a2be6609`. Env `PATHS_COMMIT` carries the commit; the in-pod script
+(sha256 `a6c9d90cec93b62f…`) defaults to the same value. Pod name prefix `fd-e14-r2f-`. Nothing else changes.
