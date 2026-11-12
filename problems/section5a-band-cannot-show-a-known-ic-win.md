@@ -1,6 +1,6 @@
 # The §5a pricing band cannot show a known index-calculus win at lab sizes
 
-- **Status:** `open`
+- **Status:** `open` (rule amended 2026-11-12; ecbench `band.rs` support pending)
 - **Kind:** methodology gap (pricing calibration)
 - **Affected work:** every cross-method ECDLP comparison priced by AGENTS §5a
   at 0.1 and 1 GAE per native operation; `research/ic_positive_control_20261112/`
@@ -66,3 +66,6 @@ calibrated crossover should be clear of noise.
 
 - 2026-11-12: opened from the IC positive control (step 1 of
   `research/chained_prime_transfer_20261111/NEXT_STEPS_20261112.md`).
+- 2026-11-12: owner approved recalibration. AGENTS §5a gains a calibrated-weight
+  reading for field-arithmetic counters (`w = 0`, `w_cal`, `10·w_cal`); the band is
+  kept. Pending: emit the reading from `src/cryptanalysis/ecbench/band.rs`.
