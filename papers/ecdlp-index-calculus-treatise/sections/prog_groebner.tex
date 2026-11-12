@@ -24,7 +24,20 @@ of engines (\art{docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md}, \S1; file names bel
   \art{sig_fp_tower.rs}): degree-bounded F4 with sparse-by-reducer then
   dense reduction, a Faug\`ere--Lachartre block for the Kummer-tower
   oracle, and a signature variant.
+\item[Exhaustive search] (engine \texttt{fes-f2}): Gray-code enumeration of
+  the Boolean system, charged two word XORs per point, so its counted cost
+  is on the same basis as inherited F4's.
+\item[M4GB] (\art{m4gb_oracle.rs}, engines \texttt{m4gb-f2} and, from 11
+  November, \texttt{m4gb-f2-server}): the upstream M4GB at a pinned commit
+  with repository patches (\path{third_party/m4gb-patches/}), run as an
+  external process per call or as one persistent process per binary. It
+  reports no counted unit, so its rows are priced by wall time.
 \end{description}
+Two variants of inherited F4 were added on 12 November: \texttt{inherited-f4-next}
+(the same eliminations with SIMD row XOR, Four-Russians table reuse and
+the existing exact matrix builders) and \texttt{inherited-f4-batched}
+(kept rows rewritten only when read or at a split). Both leave every
+decision and tree statistic unchanged (\S\ref{sec:bo-ladder}).
 
 \paragraph{Correctness.} The audit pinned every engine against every
 other and against brute force (88+15+9+14+13+12+21+6 passing library
@@ -83,6 +96,14 @@ msolve / ours & single-threaded & ratio & $0.96$--$1.22$ \\
 Ours / msolve, blocked pair reduction & two largest square systems & time & $0.75$--$0.78\times$ \\
  & four others & & $1.11$--$1.49\times$ \\
 msolve faster, a day earlier & & time & $12$--$24\times$ \\
+\addlinespace
+\texttt{inherited-f4-next} / inherited F4 & $m=2$, 14--32 unknowns & wall per call & $0.86$--$0.94$, word XORs equal \\
+\texttt{fes-f2} / inherited F4 & 14--18 unknowns & wall per call & $0.08$--$0.11$ \\
+ & 30, 32 unknowns & & $7.75$, $14.22$ \\
+M4GB server / one-shot & $m=2$, 12--24 unknowns & wall per call & $0.36$--$1.00$ \\
+ & $m=3$, 12 unknowns & & $1.03$--$1.05$ \\
+M4GB with / without patch 0004 & $m=2$, 14--24 unknowns & wall per call & $0.57$--$0.75$ \\
+ & $m=3$, 12 unknowns & & $0.88$--$0.89$ \\
 Boolean decomposition systems, $n=17$, 8 targets & our oracle (decides) & time per target & 7--24\,ms \\
  & msolve, PolyBoRi (full basis) & & 40--52\,s \\
  & Singular & & exceeds 120\,s \\
@@ -94,7 +115,11 @@ is shown; \emph{Case}: target set or size (K13, random-13 and R13 as named
 in the sources; $n$ the field degree, which the sources write $m$; $m$ the
 number of summands; ``---'': no
 case given); \emph{Measure}: the counted or timed quantity; \emph{Ratio or
-value}: as recorded. Groups, top to bottom, with sources: inherited versus
+value}: as recorded. Sources by group follow the table.}
+\label{tab:prog_groebner-engineering}
+\end{table}
+
+Sources for Table~\ref{tab:prog_groebner-engineering}, by group from the top: inherited versus
 matrix F4 (\art{research/f4_f5_f6_cross_family_20261011/}); F5 versus F4;
 F6-IC versus inherited F4 (priced and lower-bound cells:
 \art{research/f4_pricing_jump_20261018/}); kernel routing and rewrite
@@ -109,9 +134,12 @@ results (strip: \art{research/gf2_branchless_strip_20260929/}; seen-set:
 \art{research/boolean_f5_graded_batch_20261002/}); $\FF_p$ F4 to msolve
 parity (\art{research/f4_fp_msolve_parity_20261011/}; blocked pairs:
 \art{research/f4_fp_blocked_pairs_20261016/}; the day-earlier msolve
-reading: \art{research/gb_cas_comparison_20261011/}).}
-\label{tab:prog_groebner-engineering}
-\end{table}
+reading: \art{research/gb_cas_comparison_20261011/}); 12 November
+variants and M4GB, measured on a shared 4-vCPU container, one thread,
+unverified (\art{research/inherited_f4_next_20261112/RESULTS_AB.md},
+\art{research/m4gb_persistent_server_20261111/RESULTS.md},
+\art{research/m4gb_update_signatures_20261112/RESULTS.md};
+\S\ref{sec:bo-ladder}).
 
 Matrix and inherited F4 can return different decompositions, so their
 splitting trees may differ; only matrix F4 and F5 share a tree by

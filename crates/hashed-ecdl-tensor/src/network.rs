@@ -155,9 +155,11 @@ impl Network {
         if assignment.len() != self.edges.len() {
             return Err(invalid("edge assignment width"));
         }
+        let mut ports: Vec<bool> = Vec::new();
         for vertex in &self.vertices {
             meter.charge(1, "Boolean vertex evaluation")?;
-            let ports: Vec<_> = vertex.edges.iter().map(|&e| assignment[e]).collect();
+            ports.clear();
+            ports.extend(vertex.edges.iter().map(|&e| assignment[e]));
             if !vertex.predicate.evaluate(&ports, meter)? {
                 return Ok(false);
             }
@@ -571,6 +573,8 @@ impl Program {
             }
             values[signal] = value;
         }
+        let mut bits: Vec<bool> = Vec::new();
+        let mut input: Vec<BigUint> = Vec::new();
         for (index, step) in self.steps.iter().enumerate() {
             meter.charge(1, "parsimonious program evaluation")?;
             let cutoff = plan.map_or(0, |p| p.step_cutoffs[index]);
@@ -580,7 +584,8 @@ impl Program {
                     outputs,
                     function,
                 } => {
-                    let input: Vec<_> = inputs.iter().map(|word| word.value(&values)).collect();
+                    input.clear();
+                    input.extend(inputs.iter().map(|word| word.value(&values)));
                     let output = function(&input, meter)?;
                     if output.len() != outputs.len() {
                         return Err(integrity("program result arity"));
@@ -602,7 +607,8 @@ impl Program {
                     }
                 }
                 Step::Check { vertex, ports } => {
-                    let bits: Vec<_> = ports.iter().map(|&bit| bit.read(&values)).collect();
+                    bits.clear();
+                    bits.extend(ports.iter().map(|&bit| bit.read(&values)));
                     if !network.vertices[*vertex].predicate.evaluate(&bits, meter)? {
                         return Ok(Evaluation::Rejected(cutoff));
                     }

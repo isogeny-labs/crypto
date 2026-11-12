@@ -1,6 +1,6 @@
 \chapter{Open problems and proposed experiments}\label{sec:open}
 
-% Survey section (drafted 2026-10-15, updated 2026-11-06). Each problem is phrased as the
+% Survey section (drafted 2026-10-15, updated 2026-11-12). Each problem is phrased as the
 % measurement or proof that would settle it, per the repository's
 % "name the obstruction" rule.
 
@@ -17,17 +17,17 @@ paragraphs after it give the experiment in full.
 1 & $d_{\rm ff}$, $d_F$ and solving degree of Weil-descended $\Sem{m+1}$, $m\ge3$, four or more $n$ per $(\ell,m)$ & $d_F\ge5$ at $n=33$--$45$ (certified, independently checked); $\ge4$ at $n=17$--$24$ (census, unverified) & Ch.~\ref{ch:falldegree}, \ref{ch:hardness} \\
 2 & per-arm cold exponents, crossover only where fits separate across the band & no arm below matched rho; validated gaps $3.43$--$11.51\times$ (Table~A), $5.47$--$13.46\times$ prime and $10.62$--$38.21\times$ binary (Table~B) & \art{docs/ic/leaderboard.json} \\
 3 & measured trials per relation against $m!\,r/N^{m-1}$ per base family & ECC2K-130 fit $C=0.27$ at $n=61$, $1.2$--$1.5$ at $n=71,73$, model $0.25$ (unvalidated) & \S\ref{sec:corrections}, item~3 \\
-4 & a sub-$N^2$ non-generic membership test for $\Sem4$ over $\FF_p$, or a counting argument against one & none known; generic $k$-sum exponent $0.521$; generic single-target floor $1.5\times$ rho & Ch.~\ref{ch:distance}; Prop.~\ref{prop:collisionfloor} \\
+4 & a sub-$N^2$ non-generic membership test for $\Sem4$ over $\FF_p$, or a counting argument against one & none known; generic $k$-sum exponent $0.521$; generic single-target floor $1.5\times$ rho; sibling walk with \texttt{aut=3} $0.875$--$0.992\times$ rho-cubic at $w=0$ only (second points priced 0), $2.663$--$3.000\times$ at $w=1$ (validated GAE comparison) & Ch.~\ref{ch:distance}; Prop.~\ref{prop:collisionfloor}; Table~\ref{tab:distance-walk} \\
 5 & IC advice--time curve $(S,T)$ against preprocessing rho at equal $S$ & IC $53$--$317\times$ slower online than Bernstein--Lange rho with an equal or smaller table & \S\ref{sec:ladder} \\
 6 & $k=4$ replication, $m=14$--$17$, eight targets per arm, measured negation rho per rung & $5.2\times$ rho at $m=15$; crossover $m^*\approx17.6$ ($16.3$--$19.2$) extrapolated; E32 $1.5\cdot10^3\times$ at $2^{42.4}$ (validated) & Ch.~\ref{ch:extension}, \ref{ch:glvprogramme} \\
 7 & the shared-rank arm's uncounted work, counted & three categories uncounted; the arm is a lower bound & \S\ref{sec:frontier} \\
 8 & genus-3 GHS IC and negation rho at $q=2^{21}$--$2^{24}$, one cofactor, priced across the band & local exponent $1.356$ at $q=2^{22}$ (target ${<}4/3$); below the strongest rho at $q=2^{16}$ only under the registered price; $q=2^{23}$ exceeds the 4.5\,GB cap (no validation file) & \S\ref{sec:ladder2}, Ch.~\ref{sec:transfer} \\
-9 & N4~v2 on an isolated host with a replayable rho baseline & exponent $0.983$; $0.005\times$ rho near $q=2^{21}$ (L0, no validation file) & Ch.~\ref{sec:transfer} \\
+9 & N4~v2 on an isolated host with a replayable rho baseline & exponent $0.983$; $0.005\times$ rho near $q=2^{21}$; $0.0021\times$ a rho model at $k=25$; factor-base constant $1.60$ costs $0.655$--$0.685$ of $2.00$ at $k=21$, $22$ (all L0, no validation file) & Ch.~\ref{sec:transfer}; \S\ref{sec:ladder4} \\
 10 & a published index calculus (FGHR base, msolve, WDSat) as reference arm in ecbench & not run: no ratio against published IC at matched $(q,n,m)$ & \S\ref{sec:ladder3} \\
-11 & sieve and Nagao arms with F4, descent and linear-algebra additions emitted, at $p\approx1300$--$2000$ on the isolated lab & sieve $0.0065\times$ matched negation rho at $p=1511$ (validated as accounting); Nagao $1.405$, $1.160$, $0.870$ $[0.697,1.183]$ at $p=1301$, $1451$, $1601$ & \S\ref{sec:jac-jv} \\
+11 & sieve and Nagao arms with F4, descent and linear-algebra additions emitted, at $p\approx1300$--$2000$ on the isolated lab & sieve $0.0065\times$ matched negation rho at $p=1511$ and $0.0141\times$ pooled (both validated); sieve additions emitted at $0.816$ of the proxy (local); Nagao with Hilbert stop $1.003$, $0.837$, $0.695$ in U2 at $p=1301$, $1451$, $1601$ (local, lower bound) & \S\S\ref{sec:jac-jv},\ref{sec:ext-jv-nov} \\
 12 & a proof that $d_F$ grows with $n$ or $k$ & no growing bound; best certified value 5 & Ch.~\ref{ch:falldegree} \\
 13 & certificates for about 20 subspaces per $n$, $n=33$--$51$; guarded chain at $B=4$--$8$ & named instances only; guarded chain exact at $B=3$, $(4,5)$ & Ch.~\ref{ch:falldegree} \\
-14 & Kummer-tower stage A at $t=1$--$14$ with closure certificates & session values $d_F=3,4,4,4,4,5,5,5,5,6$ at $t=1$--$10$ (not committed); F4 extrapolated to 1.7\,h, 17\,h, 7 days at $t=12$--$14$ & \S\ref{sec:fd-pkm}; \art{research/prime_ic_program_20261029/} \\
+14 & Kummer-tower stage A at $t=1$--$14$ with closure certificates & session values $d_F=3,4,4,4,4,5,5,5,5,6$ at $t=1$--$10$ (not committed); F4 extrapolated to 1.7\,h, 17\,h, 7 days at $t=12$--$14$; the law $\lfloor(k+14)/4\rfloor$ quoted as measured to $k=15$ in a sibling repository; unchanged at characteristic 19--227 to $k=10$ (local, unverified) & \S\ref{sec:fd-pkm}; \S\ref{sec:open-leads} \\
 \bottomrule
 \end{tabularx}
 \caption[]{Open problems, the measurement or proof that settles each, and
@@ -196,17 +196,29 @@ line search makes it $1.71\times$ cheaper, below rho in additions
 ($0.791$--$0.548$) but above in multiplications ($1.900$--$1.318$), so it
 is unranked across the band; its modelled crossovers are $p^*\approx1185$
 in additions and $1799$ in multiplications, with no validation file
-(\art{research/jv_cover_fbline_20261102/}). The \emph{sieve} arm is
+(\art{research/jv_cover_fbline_20261102/}). On 12 November the Hilbert
+early stop of F4 halved the line-search arm's counted cost at equal
+relations, and the arm moved to $1.003$, $0.837$ and $0.695\times$ rho in
+multiplications at $p=1301$, $1451$ and $1601$, below across the band at
+the two larger primes (local, no validation file;
+\S\ref{sec:ext-jv-nov}). The \emph{sieve} arm is
 $0.0065\times$ a matched negation rho at $p=1511$ in group additions
 ($155\times$ $[125,184]$ below it; $64\times$ in $\FF_p$
 multiplications; at most $0.12\times$ across the band), on the weak class
 only, validated as accounting (\texttt{VAL-20261103-c31c76}); it has no
 \texttt{pcc} claim record, so its statement is a validation-gate result
-and otherwise an unverified assertion. Four questions remain:
+and otherwise an unverified assertion. Five questions remain:
 \begin{itemize}
 \item whether the sieve arm's order survives once its F4, descent and
-  linear-algebra additions are emitted and priced, rather than bounded;
-\item whether the Nagao line-search row validates, in both units;
+  linear-algebra additions are emitted and priced, rather than bounded
+  (emitted locally on 12 November at $0.816$ of the proxy, every cell
+  still below rho; not yet on the isolated lab);
+\item whether the Nagao row with line search and Hilbert stop validates,
+  in both units, with its $\FF_p$ additions emitted;
+\item whether the route reaches the weak class from a typical curve: the
+  implemented isogeny walk reaches a weak curve from 3 of 60 random
+  admitted starts at $p=1009$ and none at $1511$ and $1823$, and odd
+  isogenies with irrational kernels are not implemented;
 \item why the two arms differ by about $30\times$ at $p=1009$;
 \item whether both results hold on the isolated lab rather than a local
   run.
@@ -245,3 +257,118 @@ $d_F=4+\lfloor(t-2)/4\rfloor$; extrapolated F4 times are about 1.7\,h, 17\,h
 and 7 days at $t=12$--$14$ (\art{research/prime_ic_program_20261029/}).
 \emph{Settles:} whether the proved constant first fall degree 4 sits beside
 a last fall degree that keeps growing in the setting PKM introduced.
+The registered prediction equals $\lfloor(t+14)/4\rfloor$, the law that
+the 12 November survey quotes as measured to $k=15$ in the sibling
+\texttt{ml-cryptanalysis} repository, with a written proof of unbounded
+growth at slope $\ge1/14$ (quoted, not checked here;
+\art{research/leads_20261112/README.md}). The chase of
+\S\ref{sec:open-leads} found the law unchanged with one equation at
+characteristic 19--227 to $k=10$, and one degree lower with a second
+equation.
+
+\section{Leads opened, run, closed or killed, 11--12 November}\label{sec:open-leads}
+
+Three lead surveys and one chase ran on 11 and 12 November at the owner's
+request. Each lead was preregistered with a falsifier before its test; the
+skeptic's reading replaces the producer's where they disagree. Every
+outcome is \texttt{[pcc:unverified]}: local runs, no pcc claim, no
+validation file. The novelty checks compared each lead with the 173 lead
+ids of the 10 November sweep and the 176 ids of the crypto-autoresearcher
+lead atlas; the atlas bodies were vault-encrypted and the
+\texttt{research-kb} server unreachable, so ``new'' means new with respect
+to those ids. The atlas itself was last reviewed on 24 October and does
+not yet record these dispositions.
+
+\paragraph{The 11 November survey.} Three idea-generator lanes proposed 13
+leads (\art{research/leads_20261111/README.md}): lane~A on the last fall
+degree and the selector proof system, lane~B on binary-field engineering,
+lane~C on prime and extension fields and covers. All 13 and one follow-up
+were tested on 12 November (Table~\ref{tab:open-leads1111}). Three bear on
+rows: the Nagao Hilbert stop held, the sieve emission was partial
+(accounting), and the sieve Hilbert stop was killed
+(\S\ref{sec:ext-jv-nov}). Lane~A's results bear on problems~12 and 13, not
+on any row.
+
+\begin{table}[tbp]
+\centering\scriptsize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}>{\raggedright}p{0.13\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Lead & Outcome & Decisive measurement (rule) \\
+\midrule
+\texttt{LEAD-C-jv-nagao-hilbert-at-scale} & held & $S_B/S_A=0.5276$--$0.5280$ at equal digests; U2 $1.003$, $0.837$, $0.695$ of rho (falsifiers F1--F4 pass) \\
+\texttt{LEAD-C-jv-sieve-emit-price} & partial & emitted/proxy $0.816$ (ratio of means; per seed $0.44$--$0.93$); kill line $1.20$ not reached \\
+\texttt{LEAD-C-jv-sieve-hilbert-descent} & killed & descent native F4 $1.139\times$ (kill line $1.10$); band order flips at $w=1$ \\
+\texttt{LEAD-C-quartic-n4v2-k26} & inconclusive & $k=25$ reached, $k=26$ over the 3\,GB limit; exponent lower bound $1.1000$--$1.1034$ at the $1.10$ kill line (skeptic) \\
+\addlinespace
+\texttt{LEAD-A-selector-eta-kernel} & falsified & nullity exceeds the trivial kernel at feasible cells: $1143$--$1145$ vs $232$ ($n=23$, $e=4$) \\
+\texttt{LEAD-A-selector-counting-law} & held & model A 4 of 5 cells, model B 2 of 8 (preregistered grid) \\
+\texttt{LEAD-A-fall-effective-variable-law} & falsified & $n=35$ ($v=34$) and $n=36$ ($v=35$) fall at $D=4$, 2 of 2 each, against ``$1\in W_4$ iff $v\le33$'' \\
+\texttt{LEAD-A-closure-dimension-laws} & held & $\dim(W_3\cap B_{\le3})=n(5n+1)/2$ at $n=23$--$33$; $\dim(W_4\cap B_{\le3})=3n(n+2)$ at $n=35$--$43$ \\
+\texttt{LEAD-A-bilinear-lift-size-degree} & partial & $d_F=3$ at $n=11$, 13, 15; the random negative control also drops $4\to3$ \\
+\texttt{FOLLOWUP-selector-extra-syzygies} & held & extra $c$-only syzygies only at $e=e_{\min}$; excess 0 at $e_{\min}-1$ on 18 of 18 \\
+\addlinespace
+\texttt{LEAD-ICB-tableB-binary-\allowbreak known-log-claw} & prediction failed & $0.88$--$1.44\times$ rho-neg at f2m15--27 against $[1.4,2.4]$; a BSGS-class boundary result, outside the IC ratchet (owner, 8 November) \\
+\texttt{LEAD-ICB-d4bin-chain-variable-sweep} & closed & 12 chains, not 16; the alternative gives 28 chains at $2.34\times$ per trial \\
+\texttt{LEAD-ICB-d4bin-exponent-coset} & closed & difference rank 4 on 300 of 300: no index-2 coset \\
+\texttt{LEAD-ICB-d4bin-constant-\allowbreak quadratic-elimination} & falsified as written & quadratic part rank 2, not 3, on 300 of 300 \\
+\bottomrule
+\end{tabularx}
+\caption[]{Dispositions of the 11 November leads, tested 12 November.
+Outcome: the skeptic's reading where it differs from the producer's
+(\texttt{known-log-claw}, \texttt{quartic-n4v2-k26}). All local and
+unverified. Sources: \art{research/leads_20261111/README.md} and
+\art{research/leads_20261111/runs/}; \art{research/jv_nagao_hilbert_20261112/};
+\art{research/jv_sieve_hilbert_descent_20261112/};
+\art{research/lfd_lower_bound_20261111/out/}.}
+\label{tab:open-leads1111}
+\end{table}
+
+\paragraph{The 12 November survey and its chase.} A second survey, by
+field regime, proposed 15 techniques, dropped P4 (a misreading of the
+isogeny-tower cell) and folded M2 into P2 (\art{research/leads_20261112/README.md}). It
+first fixed a bar: with $m$ summands in a coset of $\mu_{2^k}$, a Gröbner
+route on the chain presentation beats brute-force decomposition only if
+$\mathrm{LFD}/k<0.184$ at $m=3$ with sparse linear algebra ($0.083$ at
+$m=2$). A chase ran the top five under a frozen protocol
+(\art{research/leads_chase_20261112/RESULTS.md}):
+\begin{itemize}
+\item \emph{J2} (percolation factor-base size) gave a held-out measured
+  improvement on the N4~v2 row: $0.655$--$0.685$ of the charged cost at
+  $c=1.60$, $k=21$ and $22$, falsified at $k=16$ (\S\ref{sec:ladder4});
+\item \emph{S1} (characteristic and generator crossing) left the number of
+  equations (Dm) as the only surviving hypothesis: a second equation over
+  12289 puts $1$ in $V_5$ at $k=10$, one degree below the law's 6, while characteristic $19$--$227$
+  with one equation leaves the law on every scored cell; the record's
+  Fermat-prime cells were void, since those fields admit no unit instance;
+\item \emph{P1} (penultimate quotient law) reproduced the committed
+  $q/2^k$ exactly on 72 of 72 cells at three fresh primes, which confirms
+  instance independence; its decisive stage, $D=6$ at $k=15$, needs a GPU;
+\item \emph{M1} (three-summand arity) closes at the measured depths from
+  existing records: $\mathrm{LFD}/k=1.4$ at $k=5$ and $\ge1.33$ at $k=6$, with
+  16 and 26 times more columns than enumeration;
+\item \emph{J1} (the quartic solver on generic Jacobians) is blocked: the lab
+  has no genus-3 point counter, and $\ell<2^{64}$ caps instances near
+  $q\approx2^{21}$.
+\end{itemize}
+P2, P3, P5, J3, J4, S2, S3 and K1--K3 were proposed and not run. K1, a
+Frobenius fold on the twisted line of $E/\FF_{16}$, predicts the $k=4$
+crossover of problem~6 moving from $m^*\approx17.6$ to about $15.5$
+$[14.2,17.1]$; it needs a matched-rho arm first. The survey also proposed
+atlas verdict changes for cells 0.1, 0.2, E3, D4, C5 and A4; they are
+proposals, not verdicts.
+
+\paragraph{Curve25519, wave five.} A third survey proposed 13 leads for
+Curve25519 index calculus and ran none
+(\art{research/curve25519_leads_wave5_20261112/README.md}). It checked one
+law against committed cells: the Gröbner solving degree of a decomposition
+system on a subgroup base $\mu_d$ equals $d+1$ at every prime $d$ (20 of 20
+cells), and $e_{\max}+2$ to $3$ ($m=2$) or $e_{\max}+3$ to $5$ ($m=3$) at
+composite $d$, with $e_{\max}$ the largest prime factor; eight
+preregistered $k=22$, $m=3$ values matched. For the real curve,
+$p-1=4\cdot3\cdot65147\cdot C$ with $C$ a 236-bit probable prime, so every
+$\mu_d$ base with $d\nmid12$ has solving degree at least $65{,}148$ on that
+route. That is a security statement for the subgroup-base route, not an
+attack. The two cheapest improvement leads predict $-2\%$ (a final check
+from the stored ladder) and $0.83\times$ at $k=20$ (storing set-up points),
+neither changing an exponent; after all four pipeline levers the source
+puts the $C=2$ track at about $1.7$--$1.8\times$ rho-neg at $k\ge28$.

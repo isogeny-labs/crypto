@@ -664,6 +664,155 @@ records that on the $\Sem3$ chain F4 and F6-IC grow faster in $n$ than the
 meet-in-the-middle floor at $m=3$ and $m=4$, with the slope-difference
 interval above zero.
 
+\section{The $m=2$ descent ladder end to end, 10--12 November}\label{sec:bo-ladder}
+
+Four studies of 10--12 November priced the algebraic $m=2$ oracle inside a
+complete solve and then made its engines faster. All ran on a shared
+4-vCPU container with one solver thread, are local development checks,
+and carry no replay certificate, validator report or pcc claim: every
+number below is unverified, and none is a leaderboard row.
+
+\paragraph{The instrument.} \texttt{ic bench --sweep} builds a
+\texttt{binary-subspace} factor base of dimension $\lceil n/2\rceil$
+($2\lceil n/2\rceil$ Boolean unknowns, $n$ quadratics), collects relations
+until the matrix has full rank, eliminates, recovers planted logarithms and
+prices every phase in group-addition equivalents, $S=\text{GAE}/\sqrt r$,
+beside a matched counted rho of 16 runs on the same subgroup. Inherited F4,
+\texttt{f4-f2} and \texttt{fes-f2} are priced from their word-XOR counts at
+the pinned ratio (``measured'' on the random curves); M4GB reports no count
+and is priced by wall time. Between a count-priced and a wall-priced engine
+$S$ therefore compares pricing bases, not engines, and the M4GB rows are
+upper bounds in that sense (\art{research/m4gb_e2e_ic_ladder_20261110/README.md}).
+The solver is 83--100\% of each algebraic row's GAE, and the hit rate is
+about 0.65 per target, so the per-call cost of the solver is the cost of the
+solve.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+instance (unknowns) & rho & pair table & inherited F4 & \texttt{fes-f2} & \texttt{f4-f2} & M4GB & best/rho \\
+\midrule
+Koblitz 13 (14) & 2.76 & 197.7 & 123.1 & \textbf{94.7} & 455 & 136{,}908 & 34.30 \\
+random 15 (16) & 2.64 & 474.0 & \textbf{357.5} & 426.5 & 1{,}736 & 124{,}118 & 135.58 \\
+Koblitz 17 (18) & 2.02 & 493.0 & \textbf{249.1} & 494.0 & 1{,}844 & 176{,}669 & 123.49 \\
+Koblitz 19 (20) & 1.48 & 1{,}063.2 & \textbf{411.0} & 2{,}548.0 & 6{,}709 & 253{,}620 & 278.04 \\
+random 21 (22) & 1.36 & \textbf{1{,}975.8} & 2{,}758.3 & 21{,}807.9 & 705{,}787 & 1{,}285{,}977 & 1{,}449.00 \\
+Koblitz 23 (24) & 0.92 & 3{,}986.2 & \textbf{1{,}852.5} & 18{,}444.0 & 1{,}657{,}918 & 1{,}834{,}209 & 2{,}014.13 \\
+\bottomrule
+\end{tabular}
+\caption[]{The $m=2$ descent ladder end to end: mean $S$ per configuration,
+every configuration and every matched rho run recovering its planted
+logarithm. Columns rho to \texttt{fes-f2}: the run of 12 November (two
+repeats). Columns \texttt{f4-f2} and M4GB: the run of 10 November (two
+repeats, one at degree 23, where its rho read 0.88). Bold: the lowest IC
+row; best/rho is that row's mean $S$ over matched rho as the source gives
+it, the distance remaining. Inherited F4's $S$ on the random curves differs
+between the runs (287 and 2{,}912 on 10 November) because those rows are priced by
+measured wall. Unverified, local, not a leaderboard row. Sources:
+\art{research/inherited_f4_next_20261112/RESULTS_E2E.md},
+\art{research/m4gb_e2e_ic_ladder_20261110/RESULTS.md}.}
+\label{tab:bo-ladder}
+\end{table}
+
+\paragraph{Exhaustive search at 14 unknowns.} At degree 13 \texttt{fes-f2}
+gives the lowest IC row, $S=94.7$ ($83.7$--$105.7$) against inherited F4's
+$123.1$ ($117.8$--$128.4$): $0.77$ of it, $34.3\times$ matched rho instead of
+$44.6\times$. The two repeats of each engine do not overlap. Two word XORs per
+Gray-code point over $2^{14}$ points cost less than the inherited tree's
+eliminations. From 16 unknowns up the count of \texttt{fes-f2} doubles per
+unknown and its $S$ is $1.2$ (random 15) to $10\times$ inherited F4's.
+The study states the prediction (degree 13 below, degree 17 or 19 up above)
+before the run; it held
+(\art{research/inherited_f4_next_20261112/README.md}). It is an end-to-end
+change over the descent baseline on one curve, producer-reported, with two
+repeats.
+
+The isolated, validated run of this comparison is \emph{frozen, not yet
+run} (\art{research/fes_k13_validated_20261112/README.md}). Its protocol
+fixes one L2 ecbench session on the same curve, 8 public targets, 6
+measured rounds, the strongest Koblitz rho (\texttt{rho.signed\_frobenius\_strong\_v2})
+as reference with an A/A copy, and the hypothesis that \texttt{fes-f2}'s $S$
+is below inherited F4's with a paired interval below 1 and the order holding
+at 0, 0.1 and 1~GAE. Launch was blocked on 12 November because the monthly
+Iso Lab budget read USD $1{,}585.60$ spent against a USD $1{,}300$ limit.
+A local L1 smoke (2 targets, 2 rounds) is not the measurement, and it
+shows what the band will do to these rows. \texttt{ecbench band} prices the
+solver's word XORs like any other native counter: \texttt{fes-f2} reads
+$14.149$, $2{,}664.736$ and $26{,}520.014$ at $w=0$, 0.1 and 1, inherited F4
+$14.641$, $4{,}474.344$ and $44{,}611.669$, and the strong rho $2.483$, $2.544$
+and $3.097$. At $w=0$ the solver is free and the two descent arms differ by
+about 3\% through trial counts alone. The ``$34.3\times$'' above prices word
+XORs at the pinned ratio, a fixed point inside that band.
+
+\paragraph{The same work, faster.} \texttt{inherited-f4-next} runs the same
+eliminations with faster kernels. Per call on 13 cells of 14--32 unknowns
+(6 targets, 3 repeats) it is $0.86$--$0.94\times$ inherited F4, below it on
+74 of 78 targets, with the same word-XOR count on every target and 0
+disagreements; inside the pipeline its wall per call is $0.74$--$0.99\times$
+and its $S$ is identical on every instance. A Callgrind profile puts
+55--64\% of inherited F4's instructions in the specialisation down the
+tree, which is counted work
+(\art{research/inherited_f4_next_20261112/README.md}). The next lever,
+\texttt{inherited-f4-batched}, rewrites a kept row only when it is read or
+at a split; tests pin identical decisions and never more word XORs (ratio
+$0.9843$ over 41 test systems). Its first version cut the counted work per
+target to $0.879$ and $0.830$ on Koblitz 19 and 23 but used 8--13\% more
+wall time, all in the allocator; an arena fix brought Callgrind
+instructions to $0.913$ of eager. Its paired and end-to-end runs are
+\emph{frozen, not yet run}: the README states expectations and falsifiers and
+no results (\art{research/inherited_f4_batched_20261112/README.md}).
+
+\paragraph{M4GB.} On the descent ladder M4GB is never the best row. Per
+call it is 15--25$\times$ slower than inherited F4 on every cell and crosses
+the in-house full-basis \texttt{f4-f2} at 20--22 unknowns ($3.7\times$
+faster at 24). Two engineering changes followed.
+\begin{itemize}
+\item \emph{A persistent server} removes the per-call process start: a
+  paired saving of $3.8$--$7.9$\,ms on the ten $m=2$ cells under 50\,ms,
+  server below one-shot on 55 of 60 targets, ratio $0.36\times$ at 12
+  unknowns rising to $0.95$--$0.99\times$ at 24, 0 disagreements over 20
+  cells. The preregistered falsifier fired on one cell by its summary
+  statistic (Koblitz, 18 unknowns, $1.00\times$; 4 of 6 targets below). On
+  the cubic $m=3$ cells the server is 3--5\% slower, an allocator effect
+  that was not isolated
+  (\art{research/m4gb_persistent_server_20261111/README.md}).
+\item \emph{Divisibility signatures in the Gebauer--M\"oller update}
+  (patch 0004): \texttt{update()} was 70\% of a 24-variable profile.
+  Two 64-bit masks decide divisibility exactly when every exponent is at
+  most 2, which the field equations guarantee over $\FF_2$. Instructions
+  fell to $0.47\times$ and $0.43\times$ on two profiled systems. On 90
+  captured systems, 5 repeats and an A/A server, the patched build is
+  $0.57$--$0.75\times$ per call from 14 unknowns up (below the old build on
+  65 of 66 systems; A/A cell medians $0.93$--$1.11$), $0.88$--$0.89\times$ on
+  the degree-6 $m=3$ systems, and without effect at 12 unknowns, with 0
+  disagreements in 1{,}350 paired requests
+  (\art{research/m4gb_update_signatures_20261112/README.md}).
+\end{itemize}
+Inherited F4 stays 6--28$\times$ below the M4GB server per call at $m=2$ and
+240--290$\times$ at $m=3$. These are stage results, measured on one shared
+4-vCPU container and unverified; none moves the ranking of
+Table~\ref{tab:bo-ladder}.
+
+\paragraph{The size rule, end to end.} A solver \texttt{fes-then-inherited}
+runs \texttt{fes-f2} on quadratic systems of at most 14 unknowns and
+inherited F4 otherwise; the threshold was fixed from earlier per-call
+word-XOR counts before the run. The same study folded the faster kernels
+into \texttt{inherited-f4}, keeping the old ones as
+\texttt{inherited-f4-legacy}. On the six ladder instances (3 repeats, 16
+matched rho runs, one local thread) every configuration recovered its
+planted logarithm. Folded and legacy kernels give identical $S$ on all six
+instances. The size rule is the best algebraic row on each: at degree 13 it
+runs \texttt{fes-f2} and gives $S=101.9$ ($83.7$--$116.3$) against
+inherited F4's $138.0$ ($117.8$--$167.6$), $0.74$ of it and $35.3\times$
+matched rho instead of $47.8\times$; on the other five it equals inherited
+F4. The pair table stays best at random degree 21. The degree-13 figures
+differ from the earlier run ($94.7$ and $123.1$) because this run's third
+repeat is dearer for both engines and its rho mean moved from $2.76$ to
+$2.89$. Rho is cheaper on every instance, by $35.3\times$ at degree 13 and
+more elsewhere. No leaderboard row; \texttt{[pcc:unverified]}
+(\art{research/size_rule_fold_20261112/README.md}).
+
 \section{F6-IC: from closure to lookup}\label{sec:bo-f6}
 
 F6-IC adds to inherited F4 a factor-base domain gate and meet-in-the-middle
@@ -826,6 +975,61 @@ learnable signal. Until conflicts are priced the
 row is unranked, and statistics version~2 flags such arms as upper bounds on
 the wall statistic (\S\ref{sec:em-stats}). Prime-field SAT and SMT
 presentations are in \S\ref{sec:pa-sat}.
+
+\section{CDCL on the scalar ladder}\label{sec:bo-satladder}
+
+A different SAT presentation drops the factor base altogether: the
+bit-level projective x-only Montgomery ladder, Tseitin-encoded with
+schoolbook multipliers, with the $\lceil\log_2r\rceil$ bits of the scalar as
+the only free inputs and $x([k]G)$ fixed. Study F4 of 10--11 November
+measured the median CaDiCaL~3.0.1 conflict count against the field size $n$,
+one prime-order curve per $n$, 10 targets, budget $4\cdot10^6$ conflicts
+(\art{research/sat_ladder_scaling_20261110/README.md}; boundary diagnostic,
+no $S$ and no rho row, unverified). The frozen grid $n=10$--20 was amended
+before the run to $n=4$--9, after development runs censored every solve at
+$n=10,12$. Two arms were run: FRESH builds a solver per target; REUSE keeps
+one incremental solver per curve and passes each target as assumptions, so
+learned clauses carry over. Table~\ref{tab:bo-satladder} gives the counts.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$n$ & $r$ & clauses & FRESH (cens.) & REUSE (cens.) & REUSE, first & REUSE, later \\
+\midrule
+4 & 19 & 31{,}326 & 11{,}393.5 (0) & 57.5 (0) & 14{,}679 & 0 \\
+5 & 29 & 41{,}523 & 9{,}856.0 (0) & 29.5 (0) & 24{,}724 & 25 \\
+6 & 71 & 90{,}762 & 250{,}058.5 (0) & 1{,}240.5 (0) & 351{,}983 & 1{,}064 \\
+7 & 131 & 115{,}102 & 296{,}736.0 (0) & 1{,}027.0 (0) & 301{,}358 & 1{,}021 \\
+8 & 257 & 188{,}187 & censored (6) & 4{,}240.0 (1) & censored & 1{,}033 \\
+9 & 479 & 227{,}543 & censored (8) & 1{,}080{,}637.0 (3) & censored & 640{,}356 \\
+\bottomrule
+\end{tabular}
+\caption[]{CaDiCaL conflicts to invert the x-only Montgomery ladder, 10
+targets per $n$. FRESH, REUSE: median conflicts; ``cens.'': solves
+censored at $4\cdot10^6$ conflicts. The last two columns split REUSE by
+solve order: the first solve, and the median of orders 1--9 (derived in the
+source from the per-solve counts). 102 of 120 solves found
+a model, and all 102 decode to $k$ or $r-k$. Unverified, no pcc claim.
+Source: \art{research/sat_ladder_scaling_20261110/README.md}.}
+\label{tab:bo-satladder}
+\end{table}
+
+The FRESH exponent is $\alpha=1.877$ $[1.675,2.188]$ in
+$\log_2(\text{conflicts})\approx\alpha n+c$ over $n=4$--7, against a
+preregistered $[0.85,1.15]$ and rho's $0.5$: prediction P1 failed upward, as
+the study expected before the run. The REUSE/FRESH ratio is $0.003$--$0.005$
+at $n=4$--7, which fires the clause-reuse branch of decision rule 2 (``lead
+alive''); the alpha branch does not fire. The first REUSE solve costs about
+a FRESH solve ($1.02$--$2.51\times$ its median at $n=4$--7) and later solves
+cost far less. The study names two readings it cannot separate. Learned
+clauses may amount to a partial table of a tiny group: the 10 targets cover
+7 of the 9 $x$-classes at $n=4$. Alternatively they may encode reusable
+structure of the circuit. The prescribed replication (a second solver,
+40 targets, the warm cost against $r$) is preregistered and
+\emph{pending}. Any amortisation across targets is advice in the
+preprocessing sense and falls under the generic preprocessing bound the
+study names ($S\cdot T^2\gtrsim n$ in its notation).
 
 \section{The $n=83$ engine campaign}\label{sec:bo-n83}
 
@@ -1079,6 +1283,79 @@ changes the cost of a multiplication. In ecbench the four PKM tower engines
 (F4, F5, F6 and geometric enumeration) all run and read $4.62$--$5.03\times$
 negation rho on the current binary (\S\ref{sec:em-frontier}); the
 presentations that change the system shape are in \S\ref{sec:pa-pkm}.
+
+\section{The exponent of one decomposition system on subgroup bases}\label{sec:fe-exponent}
+
+The cost model of Petit, Kosters and Messeng~\cite{pkm2016} balances the
+relation and linear-algebra phases on a base of size $\abs V=p^a$. With
+$\omega=2$ an exponent lever exists at $m=4$ only if the cost $T$ of one
+decomposition system grows more slowly than $\abs V^{1/2}$, and at $m=3$
+only if $T$ stays flat in $\abs V$. A preregistered study fits the exponent
+$s$ of $T$ in $\abs V$, with $T$ the $\FF_p$ multiplications of the F4 row
+reduction (\texttt{F4Report.field\_ops}) of one symmetrised system over a
+multiplicative-subgroup base $\abs V=d$ of a Curve25519-family miniature
+(\S\ref{sec:c25519}). The lever rules are: upper 95\% bound of $s$ below
+0.5 at $m=4$, below 0 at $m=3$. The estimator applies only to at least 4
+complete cells with $d\ge9$ spanning $4\times$ in $\abs V$.
+
+The parent study (8--10 November) found no lever at $m=2$ ($s=2.77$
+$[2.31,3.23]$ at $k=20$) and left $m=3,4$ ``undetermined'' under 3.5\,GB
+and 1{,}200\,s per target. The extension (10--12 November) raised the
+limits to 12\,GB of virtual memory and 10{,}800\,s, and added even divisors
+$d$ of $p-1$ (\art{research/curve25519_exponent_study_ext_20261110/README.md}).
+It has a \texttt{validator-report.json} with status \texttt{pass\_with\_errata} and
+disposition \texttt{validated} (independent; 72 of 74 headline values
+agreed, two by $0.01$; errata E1--E11 applied). No pcc claim was
+registered, so its numbers remain unverified assertions under the claim
+rule. It is an engine measurement in counted units, not a solve, and gives
+no gap to rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrlrrrl@{}}
+\toprule
+$k$ & $m$ & $d=\abs V$ & factors & $T$ (field ops) & solving degree & max columns & outcome \\
+\midrule
+20 & 3 & 12 & $2\cdot2\cdot3$ & $7.748\cdot10^8$ & 7 & 7{,}759 & complete \\
+20 & 3 & 14 & $2\cdot7$ & $7.766\cdot10^8$ & 10 & 10{,}651 & complete \\
+20 & 3 & 18 & $2\cdot3\cdot3$ & $2.4275\cdot10^{10}$ & 7 & 13{,}616 & complete \\
+20 & 3 & 28 & $2\cdot2\cdot7$ & $2.0161\cdot10^{11}$ & 11 & 54{,}949 & complete \\
+20 & 3 & 36 & $2\cdot2\cdot3\cdot3$ & --- & --- & --- & memory, 4{,}521\,s \\
+20 & 4 & 12 & $2\cdot2\cdot3$ & --- & --- & --- & memory, 6{,}226\,s \\
+20 & 4 & 19 & 19 & --- & --- & --- & memory, 1{,}027\,s \\
+22 & 3 & 55 & $5\cdot11$ & --- & --- & --- & memory, 5{,}286\,s \\
+\bottomrule
+\end{tabular}
+\caption[]{Exponent-study extension: the eight cells, 6 targets each (all
+inconsistent systems), \texttt{RAYON\_NUM\_THREADS=1}. $T$ is the mean of
+\texttt{field\_ops} over the targets. ``memory'': allocation failure under
+\texttt{ulimit -v 12000000}; no target reached the time cap. The $m=4$,
+$d=19$ cell ran against the protocol's chain rule (erratum E1) and enters no
+fit. Validated (validator report, errata applied); no pcc claim. Source:
+\art{research/curve25519_exponent_study_ext_20261110/README.md}.}
+\label{tab:fe-exponent}
+\end{table}
+
+\begin{itemize}
+\item \emph{Preregistered verdicts.} Still ``undetermined'' at $m=3$ and
+  $m=4$. At $k=20$, $m=3$ there are now 8 complete cells with $d\ge9$, but
+  they span $3.1\times$; the span gate needed $d=36$, which exhausted 12\,GB.
+  At $m=4$ only $d=9$ is complete above the boundary cells. Memory, not
+  wall time, was the binding limit in every censored cell.
+\item \emph{Other readings, not verdicts.} The $d\ge9$ fit at $k=20$, $m=3$,
+  computed despite the gate, is $s=6.08$ $[1.69,10.47]$ over 8 cells (the
+  parent's 4 cells gave $5.56$ $[-8.75,19.88]$); the fit over all 10
+  complete cells gives $6.87$ $[5.01,8.73]$. Every point estimate lies far
+  above both thresholds and no upper bound lies below them.
+\item \emph{Cost does not follow $\abs V$ alone.} $d=18$ cost $110\times$
+  $d=19$, and $d=12$ cost $5\times$ $d=9$. The symmetrised system has one
+  chain variable per prime factor of $d$ per summand. An exploratory joint
+  fit, not preregistered, gives $5.16$ $[4.15,6.16]$ in $\ln d$ and $2.14$
+  $[1.35,2.93]$ per prime factor.
+\end{itemize}
+The study's own next step is an engine change (sparse elimination, or a
+degree-bounded engine) under a new freeze; at $m=4$ the dense F4 cannot
+reach $d=36$ at any plausible memory.
 
 \section{The chain-solve levers on the GLS $\FF_{p^4}$ line}\label{sec:fe-chain}
 
@@ -1554,6 +1831,38 @@ L0, one EKS VM). The larger-field ladder expired with zero executions. The
 README states that these establish exact software behaviour on fixed
 fixtures and no speed-up, matched-rho advantage or large-curve attack.
 
+\section{Collection-stage levers on the Table~A pipeline}\label{sec:in-levers}
+
+Two levers of 12 November act on the aimed collection scan of the Koblitz
+Table~A pipeline (\S\ref{sec:tablea}), on suite row \texttt{M1-T01} at
+\texttt{k0n53} ($\log_2r=44.3$) and \texttt{k0n61} ($47.2$). Both keep
+certificates and counts identical to the default, and both ran on the
+session's container (Intel Xeon at 2.1\,GHz, 4 vCPU, AVX-512) under
+\texttt{isolated\_bench --cpus 2}, one thread.
+\begin{itemize}
+\item \emph{One inverse per $\pm$ twin pair (lever 2).} The base stores each
+  point's negation at the next index (100\% adjacent at $n=53$ and 61), and
+  two twins share the denominator $x_R+x_k$, so one prefix product and one
+  inverse serve both sums. Kernel: $1.985\to1.435$\,ns per summand at
+  $n=53$. A preregistered same-session A/B with its own A/A (39 and 41
+  rounds) found the collect phase $1.040\times$ faster $[1.019,1.059]$ at
+  $2^{44.3}$, established against the A/A ($0.982$ $[0.936,1.017]$); at
+  $2^{47.2}$ ($1.027$ $[1.000,1.056]$) and for the whole set-up at either
+  size no effect is established
+  (\art{research/ic_tool_program/explorations/paired-inverse-20261112/ab/summary.json};
+  bench record \texttt{20261112T0607Z-ic-paired-inverse-ab}). It has no
+  replay certificate, validator report or matched-rho reference, so under
+  the validation gate it has no benchmark row and no leaderboard section.
+\item \emph{A split-block presence filter (lever 3).} One bit in each of the
+  eight words of a 64-byte line, with AVX-512 probe and set, at 8 or 16 bits
+  per key, optionally on 2\,MiB pages. Once vectorised it is within noise of
+  the default filter at both sizes, and slower before that (scalar
+  version: collect $200.3\to247.0$--$268.6$\,ms at \texttt{k0n53}). The patch
+  is kept in the study directory and the default build is unchanged
+  (\art{research/ic_tool_program/explorations/blocked-filter-20261112/README.md};
+  exploration record, not a round).
+\end{itemize}
+
 \section{Component speed-ups and end-to-end changes}\label{sec:in-summary}
 
 Table~\ref{tab:in-summary} sorts the main results of this part by the three
@@ -1572,6 +1881,9 @@ Chained SAT with lookups, $n=83$ & $m$ up to 9 decided & no complete DLP \\
 F4 trace replay (PKM--Semaev) & $0.29$--$0.45$ of plain F4 & $27.9$--$1.13\cdot10^5\times$ \\
 CADO filter port & $10.40\times$ (filter) & LA $<2\%$ of solves \\
 Generic-field tower F4 & $2.18$--$2.57\times$ & not priced \\
+\texttt{inherited-f4-next} & wall per call $0.86$--$0.94$; $S$ unchanged & $44.59$--$2{,}022.93\times$ (ladder) \\
+M4GB divisibility signatures & wall per call $0.57$--$0.75$ & never the best row \\
+Paired inverse, Table~A collect & $1.040\times$ at $2^{44.3}$ only & not priced \\
 \addlinespace
 \multicolumn{3}{@{}l}{\emph{End-to-end changes over an IC baseline}} \\
 Faster \texttt{f4\_fp} in the cover pipeline & $S$ $4.99$--$5.08\times$ lower & $194$--$850\times$ (lower bound) \\
@@ -1580,6 +1892,7 @@ E39 arrival-order pivots (validated) & ahead of A at every weight & $5.15\cdot10
 E40 lead-stored rows (validated) & ahead of A at $w>0$ only & $6.00\cdot10^3\times$ at best \\
 Generator-orbit base, Koblitz (validated) & $1.26$--$3.20\times$ & below rho only at $n=29$, one column (BSGS) \\
 Harvest default, inherited F4 & $+9.6\%$ to $-4.1\%$ by size & $7$--$1{,}250\times$ (frozen strong) \\
+\texttt{fes-f2} oracle, Koblitz $n=13$ & $S$ $0.77\times$ inherited F4 & $34.3\times$ (pinned pricing) \\
 \addlinespace
 \multicolumn{3}{@{}l}{\emph{Accounting and instrument changes}} \\
 Accounting v2 & references resized & gap larger \\
@@ -1590,7 +1903,8 @@ Allocator confound & wall time of small arms & counts identical \\
 \end{tabularx}
 \caption[]{The part's results by class. ``Validated'': a \texttt{VALIDATION.json}
 with a passing validator report; every other row is producer-reported.
-Sources in \S\S\ref{sec:em-accounting}--\ref{sec:in-gpu}.}
+Sources in \S\S\ref{sec:em-accounting}--\ref{sec:in-gpu} and
+\S\S\ref{sec:bo-ladder}, \ref{sec:in-levers}.}
 \label{tab:in-summary}
 \end{table}
 

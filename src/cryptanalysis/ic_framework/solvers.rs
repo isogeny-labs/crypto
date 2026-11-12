@@ -20,6 +20,7 @@
 //! | `inherited-f4-next` | alias of `inherited-f4` (the next kernels are its default since 2026-11-12) | word XORs (elimination, specialisation and linear elimination only) |
 //! | `inherited-f4-legacy` | `inherited-f4` with its kernels before 2026-11-12: identical rows, decisions and count (the A/B arm of the fold) | word XORs (elimination, specialisation and linear elimination only) |
 //! | `inherited-f4-batched` | `inherited-f4` with kept rows rewritten only when read or when the node splits: identical rows, decisions and tree, fewer counted rewrites | word XORs (elimination, specialisation and linear elimination only) |
+//! | `fes-then-batched` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4-batched` otherwise | word XORs (of the engine that ran) |
 //! | `fes-then-inherited` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4` otherwise | word XORs (of the engine that ran) |
 //! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
@@ -929,6 +930,12 @@ pub const FES_THEN_INHERITED_MAX_VARS: u64 = 14;
 /// engine ran (`size_rule_fes` = 1 for `fes-f2`).
 pub struct FesThenInherited;
 
+/// [`FesThenInherited`] with `inherited-f4-batched` above the threshold:
+/// `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns,
+/// `inherited-f4-batched` (same decisions as `inherited-f4`, fewer counted
+/// rewrites) otherwise.  Both count word XORs.
+pub struct FesThenBatched;
+
 impl SystemSolver for FesThenInherited {
     fn name(&self) -> &str {
         "fes-then-inherited"
@@ -981,6 +988,67 @@ impl SystemSolver for FesThenInherited {
         } else {
             HybridF4 {
                 kind: HybridKind::InheritedF4,
+            }
+            .solve(system, params, budget)
+        };
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
+        (verdict, cost)
+    }
+}
+
+impl SystemSolver for FesThenBatched {
+    fn name(&self) -> &str {
+        "fes-then-batched"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4-batched otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4-batched: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4-batched: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4Batched,
             }
             .solve(system, params, budget)
         };
@@ -1470,6 +1538,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
             kind: HybridKind::InheritedF4Batched,
         }),
         Box::new(FesThenInherited),
+        Box::new(FesThenBatched),
         Box::new(CrossbredF2),
         Box::new(XlF2),
         Box::new(SatCdcl),
@@ -1567,6 +1636,17 @@ mod tests {
             let mut params = Params::default();
             params.set("fes_max_vars", max.to_string());
             let (verdict, cost) = FesThenInherited.solve(&sys, &params, None);
+            let (verdict_b, cost_b) = FesThenBatched.solve(&sys, &params, None);
+            assert_eq!(
+                cost_b.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost_b.ops <= cost.ops, "{} > {}", cost_b.ops, cost.ops);
+            assert_eq!(
+                set(verdict_b),
+                reference,
+                "fes-then-batched, fes_max_vars = {max}"
+            );
             assert_eq!(
                 cost.extra.get("size_rule_fes"),
                 Some(&u64::from(expect_fes))

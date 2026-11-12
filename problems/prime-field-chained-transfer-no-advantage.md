@@ -175,6 +175,28 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
   - P-256/384/521, brainpool, Curve25519/448, GOST and SM2 have `|d_K| > 44`.
   - The lab registry already holds constructed curves with `D = −7, −8, −11, −19, −43` at 37–61 bits, so the small-`D_E` experiment needs no new construction. Its results would apply to designed curves, not deployed ones.
 
+## Small D_E with an endomorphism-adapted factor base (2026-11-12 addendum)
+
+`research/small_de_endo_fb_20261112/RESULTS.md`. The protocol was frozen by hash before data [pcc:unverified].
+
+- **Solving work does not change.** The S_3/S_4 solving work per trial is identical in the adapted and standard arms (ratio 1.000) at every `D ∈ {−3, −4, −7, −8, −11}`, `m ∈ {2, 3}` and size from 12 to 28 bits. The decomposition probability is unchanged for `D = −3, −4` and 0.09–0.11 lower for the layered `D = −7, −8` bases.
+- **The only saving is folded columns.** Columns fall by exactly `|Aut|/2` or the layer count, and the relation-phase cost falls with them.
+- **A generic curve gets the same saving.** Its base was folded by a random scalar in the same 4 layers and saves as much: 0.22–0.30 of its unfolded twin, within 0.1 of the layered `D` arms at 24–28 bits. It even costs less than the `j = 0` and `j = 1728` automorphism arms [pcc:unverified].
+- **Verdict.** The frozen rule passes for `D = −3, −4, −7, −8` as written, but the control shows the gain is the fold factor, not `D_E`. Small `D_E` does not reduce the actual solving cost.
+- **Distance to rho.** No arm is below its matched rho in 120 arm-cells, including rho with the same automorphism group. The smallest ratio is 7.62× at 0.1 GAE, and the gap grows about like `√p`.
+
+## Degree-3 covers and the IC positive control (2026-11-12 addendum)
+
+- **Degree-3 covers** (`research/cover_pushforward_deg3_20261112/PUSHFORWARD_DEG3.md`) [pcc:unverified].
+  - On the genus-4 degree-3 cover, all 28,815 IC relations on the transferred subgroup are single full fibres `c^*(Q)`, and they push forward to `[3]Q`.
+  - The `J(C)` arm and the matching collision search on `E` accept identical trials and give identical certified logs in 360 of 360 seed-cells.
+  - The fibre degeneracy therefore holds at degree 3 as at degree 2.
+  - Limits: `p ≤ 251` (the HCurve bound) and `r` 11–83.
+- **Positive control** (`research/ic_positive_control_20261112/RESULTS.md`) [pcc:unverified].
+  - Double-large-prime genus-3 IC on a full Jacobian is below rho in group ops from p = 257 on (0.114× at p = 65,537).
+  - At 0.1 and 1 GAE it is 5.8× and 31× rho, so the §5a band does not show this known win at lab sizes.
+  - The verdicts here are unaffected: every transfer row loses at 0 GAE or reduces to a search on `E`. The general consequence is filed as `problems/section5a-band-cannot-show-a-known-ic-win.md`.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -188,3 +210,6 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
   obstruction holds against matched precomputed rho.
 - 2026-11-12: cover push-forward and endomorphism-degree census addendum; the
   transferred subgroup's genus-2 IC is a birthday search on `E`.
+- 2026-11-12: small-D_E addendum; the adapted base saves only by folding, which a
+  generic control matches.
+- 2026-11-12: degree-3 fibre and positive-control addendum.
