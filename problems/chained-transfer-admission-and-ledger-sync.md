@@ -62,6 +62,15 @@ also has a PCC ledger fork relative to current main. [pcc:unverified]
   Retain the final archive before deciding any materialization/recheck;
   no ledger/claim/subject rewrite or unchanged repeated audit.
   [pcc:unverified]
+- **Final local PCC observation:** full03/PCCf117f7 completes371records,
+  actual exit1:187fail/155not_covered/29localpass. All342 failed proof
+  reasons are missing historical subjects/projects in the sparse workspace.
+  The exact project-subject subset97 has68not_covered/29localpass/zero fail.
+  Whole raw245413bytes→standard-xz20212bytes/hash/exact roundtrip retained;
+  partial94583f is unchanged. Later three records are explicitly excluded;
+  RootTable1da835 has its own local pass. No blanket/signed PCC pass or
+  frozen-history rewrite. Do not rerun unchanged until the missing proof
+  subjects are materially available. [pcc:unverified]
 - **What this does not establish:** a speed advantage, its absence for all
   algorithms, security, or nonexistence of cross-characteristic computation.
 

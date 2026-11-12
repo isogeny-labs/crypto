@@ -1,3 +1,16 @@
+# Current CT26 acceptance — published ready1498
+
+Exact consumer25fd0be7cea37cefd298d3ac38b6f863bb9105d5 passes full
+changed guard02:25native/82reference unit+five integrations,one old ignored,
+all guards/fmt/strictClippy. Allsix complete R0/R1/R2 graphs retain exact
+outputs and prove closed production cache empty/reference initialization.
+Native3f015c/full3c6362/root089c42,exact source01/finalhash02/archive/hash/
+roundtrip,partial theorem1da835/written718425/consumer4ce55c and inspected
+report5e1f22 retained. Own focused43144567065 initiallyrunning,next03:45.
+No measured cost advantage;next CT27_PLAN.md. [pcc:unverified]
+
+# Original prospective protocol below
+
 # CT26 — defer and restrict the reference quadratic root table
 
 Prospective engineering work after CT25 publication. No implementation,

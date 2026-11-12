@@ -1,68 +1,71 @@
-# Current 2026-11-12 01:51 UTC — CT25 published; odd coefficient descent
+# Current — CT26 ready1498; arbitrary-class replay starts
 
-Consumer CT25 is65aabe34879630ad4d973021fb21307e1d856dc1/treeb9a7279bdf5039a86b109c5d437aa96a4e87361b,
-ready1496 against immediate1494 at43a8e80ea4d01c564499e678751f44c51dae5243.
-FULL guard04 passes25native/81reference unit+five integrations,one old
-ignored benchmark,all guards/fmt/strictClippy,consumer03b76b/root714b32.
-Both C2 norms/all12317 classes and every forward/dual Phi2/Psi2 generic
-comparison pass;all prior/source109/113/naive/geometric controls remain.
-Exact three source04 snapshots/full96421-byte raw→xz11612/hash/roundtrip
-are frozen. Written specialization95693e/consumer7fb16a and inspected
-2-page report238524 retain all exceptions and partial formalization.
-Own focused43136703928 initiallyrunning,next~02:37. Do not move65a or
-repeat its completed unchanged full matrix. Scientific standing unsigned.
+Consumer25fd0be7cea37cefd298d3ac38b6f863bb9105d5/treece7ac7765b8c2545b3c60ffd1bb37aefadcfb256
+is published ready1498 against immediate1496 at65aabe34879630ad4d973021fb21307e1d856dc1.
+FULL changed guard02 passes25native/82reference unit+five integrations,
+one old ignored benchmark,all source guards/fmt/strictClippy. Allsix
+complete12317 R0/R1/R2 domains preserve old/closed outputs/dual/group/
+source/geometric controls;separate instances prove closed production
+caches stay empty while quadratic references initialize. Exact source01/
+finalhash02/full100487-byte raw→xz11812/hash/roundtrip are consumer3c6362/
+root089c42. No unchanged full rerun. Report57769bytes/two inspected pages
+5e1f22 is byte-identical upstream. Scientific standing unsigned.
 [pcc:unverified]
 
-CT24 parent1494 exact43a CI43125719626 succeeds25/80+five,gatepasses/
-signskips,complete consumer archived942e6;its body now records this success.
-Root published1e4f8e795f770ea39320ab694623cafe8b7563ad exact focused
-43128425128 succeeds25native/21named Lean modules/125written declarations/
-standalone8;full logs/APIa10b74. Oldecf focused43123069073 succeeds25/
-19modules/standalone6,796e7e. Neither covers later changes. [pcc:unverified]
+CT26 exact focused43144567065 initiallyrunning,next~03:45UTC. Keep25fd
+fixed. Fresh consumer research/chained-transfer-full-class-replay-20261112
+starts25fd. Parent1496 exact65a CI43136703928 succeeds25/81+five,gatepass/
+signskip,full archivee2187d in25fd;parenthead fixed. Parent1494 exact43a
+CI43125719626 succeeds25/80+five,archived942e6. [pcc:unverified]
 
-New ODD_FIELD_DESCENT_PROOF.md/6b3ff6 gives an alternative global F101
-argument for actual R0/R1/R2:stable scheme kernel,target polarizedAut±1,
-coefficientsF101³ and torsion-free Hom rule out the negative Galois sign.
-Keep old odd-witness proofs/tests. Even-degree quadratic-twist counterexample
-E(1,46)order109→(4,65)order95 checks all109² sums/108 nonrational negative
-Frobenius images,cd2506. Six separately bound OddFieldDescent lemmas
-localpass;source census131 excludes3generated iterate equations. Complete
-standalone9/strictClippy02 passb33222. New diagram/inspected2-page PDF3c19e0;
-workflow now22named modules/9tests. Geometry remains written/partial;new
-root head requires its own CI. No measured computational advantage.
+ROOT_TABLE_PROOF.md/718425 equals consumer4ce55c. Ordered-search theorem
+RootTable.first_match_filter/1da835 has bound localpass/one-theorem zero-
+trusted gate,propext only;actual finite fields/basis/grid remain written.
+Original reserved-token parse01 and corrected source02/native01/source
+custody17caa0 preserved. Current WRITTEN census132/workflow23modules,
+9c02c5;three generated odd-iterate equations excluded. Standalone9/
+strictClippy02 b33222 unchanged. Full geometry remains partial,old proofs
+and all source subjects immutable. No measured stage/pipeline/ECDLP gain.
 [pcc:unverified]
 
-Fresh consumer child research/chained-transfer-root-cache-20261112 starts65a.
-CT26_PLAN.md predicts a lazy,axis-restricted reference root table preserves
-canonical roots. Source audit325922 retains the lower-degree no-op candidate.
-Candidate source edits exist in nonsplit_map.rs/seven_chain.rs/
-seven_successor_chain.rs;strictClippy01 and every-discriminant native
-control01 pass consumer3f015c. Exact three source01 snapshots/hashmanifest
-are frozen. Full changed guard02 runs27663 at
-/workspace/scratch/ct26-complete-02.txt since01:52. No full-graph result
-accepted yet;inspect actual completion,hash-check unchanged sources,then
-archive/report/PCC/readychild against1496. Separate production/reference
-instances enforce no-cache controls on allsix full domains. Original exhaustive p² builder is a test
-reference. No new arithmetic engine,benchmark or solver.
+Root previouslypublished01bd06b70d5a343be92d0e59f0e22b612680f534/tree509fa0803f249efb7fc8f66197b48cce4a3e9e92
+has exact focused43139941662 SUCCESS,full logs/API597b08. It covers only
+131written/22modules/9standalone. This checkpoint adds RootTable/132/23;
+its own exact-head CI is separate. Inspect PR3877/queue3904 currenthead
+before any publication retry;compare to local HEAD,do not invent SHAs.
+GitHubqueue3904 records postpublication run IDs and current source state.
 
-Vault00:10 locked/clean,180714tracked,8edec422a;fresh00:28 fingerprint
-confirms KEY unavailable without printing it. KB/ecdb/S3/livebudget remain
-unavailable. Frozen root/consumer ledgers and unchanged rootarchive-clock/
-parent1484 C failures remain;no rechain/rebase/force/lineage selection.
-Parent1484 check01:11 unchanged conflict/failures,nextquiet05:11;1490quiet
-03:29,1488quiet04:22,1493quiet04:26. No feature-base auto-merge;integrate
-bottom-up only after actual gates,retarget/rerun after each parent lands.
-Continue unblocked work;independent map/kernel membership,whole arbitrary-
-class second engine,larger prime/catalog support and full geometric Lean
-remain open. No canonical atlas/graph promotion while locked/unsigned.
-[pcc:unverified]
+Broad root PCC03 COMPLETE/f117f7:371records/187fail/155not_covered/29localpass,
+actual tool exit1. All342 failed proof reasons are sparse-workspace missing
+historical subjects/projects. Project-subject subset97 has68not_covered/
+29localpass/zero fail;this is no global/signed pass. Whole245413-byte raw→
+xz20212/hash/roundtrip retained;partial94583f immutable. Later94583f/1da835/
+718425 excluded. Do not rerun the unchanged broad audit. [pcc:unverified]
 
-Broader root verify-all03 remains running26259. Its frozen PARTIAL prefix
-94583f has304 records:187fail/109not_covered/8localpass,all failing proof
-reasons missing historical subjects/projects in this sparse checkout.
-Examples are already tracked at1e4;this is not a blanket project/PCC pass.
-The six new theorem local verdicts are separately pinned b33222. Preserve
-final output when complete;do not rerun the unchanged broad audit.
+CT27_PLAN.md:independent arbitrary balanced-class replay using the existing
+second Cantor engine,first T0/all12317 degree0/1/2/infinity cases. Isolated
+producer prototype/workspace/scratch/ct27-prototype01 PASSES,dca7d7;raw
+/workspace/scratch/ct27-producer-01.txt,output/workspace/scratch/ct27-fixtures-01,
+source hashes/workspace/scratch/ct27-producer-source-01.sha256. Actual
+[3,236,12078] degree counts/[1,118,12079,118,1] infinity corrections,identity
+index239. Complete semantic fixture sizes61603/24652/24652/24652bytes
+plus420-byte manifest are in consumer fixtures/full-class;no splitting.
+This is producer data,not independent or integrated acceptance. No producer imports in the independent
+checker. It must add(2n+m-2)Q,Q=(w0,V=+L²)-W,to the finite quintic class;
+degree0 plus0/2 are not identities. No plain-Fp Frobenius assertion on the
+Fp6 chart. Keep old49-kernel tests/source guards;no all151M-pair or map-
+kernel membership claim. Prototype is not integrated acceptance.
+
+Vault00:10 locked/clean180714/8edec422a,KEY00:28 absent;KB/ecdb/S3/livebudget
+unavailable. No solver,benchmark,paidjob or bypass. Frozen root/consumer
+ledgers/parent1484 C findings/rootarchive-clock remain;no rebase/force/
+rechain/history choice. Parent1490quiet03:29,1488quiet04:22,1493quiet04:26,
+1484quiet05:11. Integrate bottom-up only after actual gates,retarget/rerun
+after parents land. Independent isogeny/kernel membership,larger-prime/
+catalog support,arbitrary-class second-engine acceptance/full geometry
+remain open. CT28_PLAN.md proposes direct degree4 elliptic covers/norms
+over F101 to replace existing extension-field evaluation,after CT27;no
+cover or advantage accepted. No canonical atlas/graph promotion while locked/unsigned.
 [pcc:unverified]
 
 # Historical checkpoints below — current section above supersedes status
