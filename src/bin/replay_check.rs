@@ -192,7 +192,7 @@ fn cmd_results(path: &str) -> ExitCode {
         );
         r.check(
             &format!("p={p} r || #J (r | e1, r^2 not | e1, r not | e2)"),
-            e1 % rr == 0 && (e1 / rr) % rr != 0 && e2 % rr != 0,
+            e1.is_multiple_of(rr) && !(e1 / rr).is_multiple_of(rr) && !e2.is_multiple_of(rr),
             &format!("e1={e1} e2={e2} r={rr}"),
         );
         r.check(
@@ -436,9 +436,9 @@ fn largest_exact_prime(mut n: u64) -> u64 {
     let mut best = 1;
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             let mut e = 0;
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
                 e += 1;
             }
@@ -1364,7 +1364,7 @@ fn cmd_certs(path: &str) -> ExitCode {
         let nn = n1 * n2;
         r.check(
             &format!("p={p} r prime and r || #J"),
-            isp && nn % d.r == 0 && (nn / d.r) % d.r != 0,
+            isp && nn.is_multiple_of(d.r) && !(nn / d.r).is_multiple_of(d.r),
             &format!("r={} #J={nn}", d.r),
         );
     }
@@ -1442,7 +1442,7 @@ fn largest_prime_factor(mut n: u64) -> u64 {
     let mut best = 1;
     let mut d = 2;
     while d * d <= n {
-        while n % d == 0 {
+        while n.is_multiple_of(d) {
             best = best.max(d);
             n /= d;
         }
@@ -1489,8 +1489,8 @@ fn cmd_tower_certs(path: &str) -> ExitCode {
             && g.is_some()
             && imul(p, e.a2, e.a4, g, t.r).is_none()
             && imul(p, e.a2, e.a4, g, t.x) == tt
-            && n % t.r == 0
-            && (n / t.r) % t.r != 0
+            && n.is_multiple_of(t.r)
+            && !(n / t.r).is_multiple_of(t.r)
             && isp
             && gu(committed, "r") == t.r;
         r.check(
