@@ -1,0 +1,37 @@
+{
+ "schema": "wide-sparse-la.runpod-launch/v1",
+ "commit": "1deacbe9610c990ed8a9b116baaf19b892ed7d86",
+ "s3_prefix": "s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/20261112T2155Z-1deacbe961/",
+ "src_bundle_sha256": "f87339a5e22379b66fc85822bc998955b6a63d0171d2403b8b3a004fc73ae2e1",
+ "pod_run_sh_sha256": "b4602d22cfc4abba6702876c58deb06fc02a7f115d93c7f17d0e35a25358ed74",
+ "image": "rust:1.97.0-bookworm",
+ "flavor": "cpu5g",
+ "vcpu": 4,
+ "cloud": "SECURE",
+ "interruptible": false,
+ "deadline_utc": "2026-11-14T13:56:03+00:00",
+ "launched_utc": "20261112T2155Z",
+ "pods": [
+  {
+   "seed": 1,
+   "s3": "s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/20261112T2155Z-1deacbe961/seed1/",
+   "pod_id": "45bn680fjur7og",
+   "cost_per_hr": 0.184,
+   "machine_id": "jd82biyim28d"
+  },
+  {
+   "seed": 2,
+   "s3": "s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/20261112T2155Z-1deacbe961/seed2/",
+   "pod_id": "igpqnhy2e39anv",
+   "cost_per_hr": 0.184,
+   "machine_id": "9ezc1xpytrfr"
+  },
+  {
+   "seed": 3,
+   "s3": "s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/20261112T2155Z-1deacbe961/seed3/",
+   "pod_id": "yhyso6atk1dqdh",
+   "cost_per_hr": 0.184,
+   "machine_id": "4pbksa7sgygz"
+  }
+ ]
+}
