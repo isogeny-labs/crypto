@@ -51,6 +51,8 @@ The checks cover, for each source characteristic, all five subgroup points, all 
 
 ## Cost and obstruction
 
+The characteristic-two destination is extremal for genus one: Hasse gives `#E(F_2) <= floor((sqrt(2)+1)^2) = 5`; this example has exactly five elements. Thus **no elliptic curve over F_2 can contain a prime-order subgroup larger than five**. A putative genus-one target over `F_(2^m)` must instead have `N <= (2^(m/2)+1)^2`, so `m >= 2 log_2(sqrt(N)-1)`. This is a standard necessary size bound, not a complexity lower bound on higher-genus lifting. [pcc:unverified]
+
 To **apply** \(\mathcal T\) to an encoded source point without knowing its logarithm, this construction first identifies the global torsion preimage by a five-entry lookup table. For order \(N\), analogous enumeration is **O(N) time and space**. It already exceeds the \(\tilde O(\sqrt N)\) Pollard-rho baseline on large generic groups. This toy example therefore proves that cross-characteristic *abstract subgroup transfers can exist*; it does **not** provide a sub-rho reduction, uniform small-degree lift of arbitrary cryptographic points, or any algebraic morphism \(\operatorname{Spec}\mathbb F_3\to\operatorname{Spec}\mathbb F_2\). It also is not an algorithm for arbitrary \(E/\mathbb F_p\), merely for this globally preloaded subgroup.
 
 The actual open question is whether one can derive, from **arbitrary** encoded input \(P,Q\in E(\mathbb F_p)[N]\) with \(Q=[n]P\), simultaneous globally algebraic \(N\)-torsion lifts with size/cost \(N^{o(1)}\), **without first computing \(n\)**. For a global abelian variety \(A/K\) of dimension \(g\), good reduction at a prime above \(q\ne N\) and residue field of size \(q^f\) injects global \(N\)-torsion, forcing \(N\mid\#A(\mathbb F_{q^f})\) and
