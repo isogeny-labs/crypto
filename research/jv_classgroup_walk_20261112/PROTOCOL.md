@@ -73,3 +73,13 @@ curves, jumps 3,5,7. Report, per prime:
 
 The kernel-polynomial step costs one ψ_ℓ factorization over F_{q³} per curve per ℓ (a ppowmod of degree
 (ℓ²−1)/2, i.e. 12 or 24), heavier than the rational-root scan. The walk-cost comparison is reported, not gated.
+
+## Amendment 1 (2026-11-12, before any p ≥ 1009 class-group walk finished)
+
+The class-group walk factors ψ_ℓ at every curve met, so a failed walk (exploring up to the cap) is far costlier
+than the rational-root walk. To keep the large-prime sample tractable on the 4-core container, p ∈ {37, 53}
+use the preregistered walk-limit 60; **p ∈ {1009, 1511, 1823} use walk-limit 20** (a bounded sample). The cap
+(10,000 curves), primes, seeds and jumps are unchanged, so W′ is comparable to the rational-root W of
+`research/jv_weak_coverage_20261111` (which measured 60, 60, 60, 60, 60 admitted walks). A 20-walk sample still
+separates W′ from the rational-root W at p = 1009 (0.05) by the Wilson interval. Disclosed before any large-prime
+run completed past its first walks.
