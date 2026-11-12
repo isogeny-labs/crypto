@@ -382,7 +382,7 @@ fn sort_monos_descending(monos: &mut [F2BoolMono]) {
         for m in monos.iter_mut() {
             m.mask = mask_from64(packed_key(mask_low64(m.mask)));
         }
-        monos.sort_unstable_by(|a, b| b.mask.cmp(&a.mask));
+        monos.sort_unstable_by_key(|a| std::cmp::Reverse(a.mask));
         for m in monos.iter_mut() {
             m.mask = mask_from64(packed_mask(mask_low64(m.mask)));
         }
