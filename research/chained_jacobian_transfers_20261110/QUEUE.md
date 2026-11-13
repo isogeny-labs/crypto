@@ -1,3 +1,16 @@
+Current checkpoint: PUBLIC_TARGET_CHECKPOINT.md; ten closed captures genuinely published and actual bitangent construction.
+
+
+## 2026-11-13T15:50:31.141465+00:00 — all ten closed captures genuinely published
+
+ACTUAL f824e8 run43453551818/job131981714889 succeeds with13remote byte replays BEFOREbot32c51ec50/directparentcbab2b5d/exact15paths. NineWHOLEarchives+fourWHOLElargeindices inS3;oneWHOLEsmallarchive+sixWHOLEsmallindices remain ordinaryGit. All20objects/TENclosedtrees matchoriginalmember/raw/archivehashes andsourceGitblobs. ExactnormalFF/artifact/wiring0/all2334currenthashes+dirtybytespreserved;sourceholdreleasedafterterminal. Genuineconsumerprojection39084d retainsallphysicaloriginalbytes and13actualmanifestentries. FullpublicationAPI/logXZ/push/discovery/FF/manifests/indexretainedDIRECT,no recursivearchive. [pcc:unverified]
+
+Consumerintegrationec826815/72paths/e62645 normalpublished0. Independenttwo-primaryfull25fdf5 all503guards/11positivephasepairs/bothoriginal4theoremgates/4exactbindings/fouractualadmissioncontrols passes. CurrentFIVEownCIc225d2 allSUCCESS/all46nativeJSON and21originalcanonicalPCCdigests match;whole5logs/API/503sourcesretained. Newbitangentnativee887a9 locallypassesall28actualWline/contact/gradient/mutationchecks,all2338hashes unchanged;actualFrobeniuscycles1+3+6+6+6+6 withfixedF/F2/F3/F6=1/1/4/28. Thisdoesnotyetconstructactualtorsionbasis/Weilpairing/kernelcensus/nondualmap. Bitangentwritten/formal/report/sourcecheckpoint next. [pcc:unverified]
+
+Persistentnextqueue: finishbitangentproof/report/normalpublication;then determineactualstableisotropickernels fromactualFrobeniusactionwithindependentfinitealgebra controls,notassumedsemisimpleorder3. Newtwo-primaryfull/CI/bitangentrawtreesrequirelaternewwholedatahandoff. Guard04isnowhistoricalforitsexact2334scope;futurehandoffmustfreezea newactualcompleteversionincludingnewbitangents. No computationaladvantage/benchmarkadmission/fullformalgeometry/globalfixture/mainledger/signing/review/conflict/vault/KB resolution. Continueaftereachrung. [pcc:unverified]
+
+Earlier queue entries are historical.
+
 Current checkpoint: PUBLIC_TARGET_CHECKPOINT.md, actual q223 completed descent and two-primary continuation.
 
 
