@@ -337,7 +337,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
-| 13 Independence | Blocked for the requested other-machine replay | Prior dispatch HTTP404 ran no job; one runtime available; a different authorized host or registered workflow is required |
+| 13 Independence | Pending prospective hosted continuation in ready [PR4072](https://github.com/isogeny-labs/crypto/pull/4072); no actual remote call yet | Frozen main-push two-language plan, unchanged main ledger, normal required merge gates then actual public hosted job/compiler/binary/output evidence. Original manual HTTP404 remains not-completed. |
 | 14 Negative control | Current control passes locally | Historical runs were not preregistered with it; no retroactive promotion |
 
 The accessible runtime has no callable second execution host. A fresh tool
@@ -701,3 +701,21 @@ original Theorem1 and its Remarks already distinguish this boundary.
 Whole gate32/0failures/0trusted and exact local PCC-20261113-da72ba replay pass;
 signed standing remains unverified. Generic all-prime rank/determinant/Weil
 and the complete all-extension census remain open. [pcc:unverified]
+
+
+### Separate-host continuation admitted for infrastructure review
+
+Ready [PR4072](https://github.com/isogeny-labs/crypto/pull/4072) contains a
+prospective canonical protocol frozen at2026-11-13T19:27:20Z, hash
+3bd9bdec28e8a27d0c30bdf8a0448185b53f7a1b020f91d950149a754e5ac8ef,
+bound to public producer6925923d8b7eaa76058a98ffc6063b8c8e1eb8bd.
+The narrow main-based branch changes no ledger. Its new path-filtered
+main-push research job plans two fresh native calls: original C++
+arithmetic with a fixed S3-only entry and the unchanged separate Rust
+validator, exact published sourcee3658b4d6ffc6839e32bad1f5f732f796a2c8e4d.
+All source/entry/generated/compiler/binary/host/output/exits are recorded.
+Only a standard public runner, zero paid spend/no uploads or schedules.
+No actual hosted call has occurred; required checks and a permitted merge
+remain prerequisites. The auto-merge connector attempted disallowed
+squash; it did not merge. Original frozen records remain unchanged.
+[pcc:unverified]
