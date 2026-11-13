@@ -43,3 +43,17 @@ count pencil membership as recovery [pcc:unverified].
 Sources for this proposal: existing exact F17 curve fixture and the elementary
 product/norm identity of two line functions. No novelty or algorithmic speed
 claim. Native/Lean checks are owed before promotion.
+
+## 2026-11-13 exact validation addendum
+
+NormNonconstantControl now checks the proposed construction, two cubic factors,
+actual norm, nonconstant B, explicit Bezout, branch/nonzero evaluation,
+monicity/degrees, six distinct nodes and supplied curve points. It instantiates
+the actual canonical matrix pencil with dimension6. Source audit143 and fresh
+import-inclusive replay complete; all producer standing remains unsigned. See
+../nonconstant-report/README.md for exact scope and evidence. The original
+prediction above is preserved [pcc:unverified].
+
+Restricted rank/corank/adjugate recovery remain open. Their proposed exact
+values are preregistered in ../nonconstant-report/NEXT_RESTRICTED_CONTROL.md;
+they are not promoted by the present pencil-membership check [pcc:unverified].

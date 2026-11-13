@@ -552,3 +552,13 @@ canonical even-degree chart has derived entry bounds and product-basis
 families representing every bounded polynomial pair. Actual branch transfer,
 coordinate injectivity/corank and a public-input finder remain separate.
 Producer standing is unsigned [pcc:unverified].
+
+## 2026-11-13: nonconstant two-line correctness control
+
+[Nonconstant report](nonconstant-report/README.md) /
+[PDF](nonconstant-report/report.pdf): the a3,b1 F17 control has exact two-line
+norm construction, explicit quotient inverse, six distinct nodes, actual
+branch and all canonical matrix-pencil hypotheses instantiated. Dimension6 is
+proved; restricted rank/corank/recovery are separate preregistered checks.
+Source audit143 and fresh kernel replay complete, with all standing unsigned.
+No search-cost or runtime improvement is claimed [pcc:unverified].
