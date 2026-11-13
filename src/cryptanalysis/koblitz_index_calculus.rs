@@ -5510,9 +5510,31 @@ impl PairSumTable {
         byte_budget: u128,
         probes: ProbeBudget,
     ) -> Option<Self> {
+        Self::build_within_for_layout(
+            kc,
+            fb,
+            byte_budget,
+            probes,
+            FilterLayout::for_folded_builds(),
+        )
+    }
+
+    /// [`Self::build_within_for`] with a folded table's filter layout
+    /// named.  The layout changes no answer, but it changes which absent
+    /// keys the filter lets through, and so the bucket reads a run
+    /// counts: a harness that replays records counted under one layout
+    /// must build with that layout ([`FilterLayout::Low`] for every
+    /// record made before the layouts existed).
+    pub fn build_within_for_layout(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        probes: ProbeBudget,
+        layout: FilterLayout,
+    ) -> Option<Self> {
         let (points, orbits) = (fb.points.len(), fb.signed_orbits.len());
         if Self::fold_is_cheaper(points, kc.n, orbits, probes) {
-            if let Some(folded) = Self::build_folded_within(kc, fb, byte_budget) {
+            if let Some(folded) = Self::build_folded_within_layout(kc, fb, byte_budget, layout) {
                 return Some(folded);
             }
         }
@@ -5521,7 +5543,7 @@ impl PairSumTable {
         }
         // Below the crossover but too wide to hold compactly: the fold
         // is dearer per probe and still the only tier that fits.
-        if let Some(folded) = Self::build_folded_within(kc, fb, byte_budget) {
+        if let Some(folded) = Self::build_folded_within_layout(kc, fb, byte_budget, layout) {
             return Some(folded);
         }
         Self::build_full_within(kc, fb, byte_budget)

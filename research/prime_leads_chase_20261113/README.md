@@ -5,6 +5,17 @@
 leaderboard or the validation gate, and nothing here is a cost, security or speed result. This is a
 record of exploratory toy/desk work.
 
+## Continuation postscript (2026-11-13)
+
+A later single-target cost-floor audit changes the experiment priority without changing the historical
+five-lab outcomes below. Under the declared dense entropy charge, enforcing one whole solve removes the
+advertised m=8 gain even if `D(8,3)=9`. The large-memory degree-9 closure is therefore diagnostic, not
+end-to-end decisive. The next lead-changing test is actual positive sparse relation finding with useful
+output, rank and the whole-call floor charged; the optimistic m=8 gate is sparse per-call work below
+`B^(7/2)`. The signed public norm-branch determinant is the next cheap Boolean/tensor falsifier.
+See [`CONTINUATION_PROTOCOL.md`](CONTINUATION_PROTOCOL.md). Every continuation statement is
+`[pcc:unverified]`; no run was taken.
+
 **Task.** The owner's question, relayed as "chase all leads": the best non-generic, sub-√p (ideally
 subexponential) leads for ECDLP over prime fields, from
 [`../notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md`](../notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md)
