@@ -1,3 +1,31 @@
+Current checkpoint — full archive ACTUALLY published / admission archive separate pending
+
+Full147b9f nativeacceptance unchanged;ACTUALfullpublicationrootca8c22/
+consumer505bd4:43356854601/job131660813332ONEwhole2451524SHA9f0b2e6eremote
+bytereplyBEFOREnormalbot9917ca568e3125dec81a9caaf01f0caeb741288d/treece4670ea/
+parent5163351(37paths/1a3ba4,parentcee9). ExactlocalFF0/artifact0/wiring0;
+wholeUTF8log426089/XZ43360/wholepublicationtreeXZ49548/hashes/memberroundtrip.
+Canonical evidence/fp-chain-full-archive-handoff-01/.artifacts.json at9917.
+Dirtyownedadmissionmetadatawasdisjointfrom3botpaths andpreservedbyteexact
+acrossFF. Followup43356919904no-opNOTuploadproof. [pcc:unverified]
+
+Consumerpackaging0ed3e9 ACTUALartifact1 selectsseparate130472byte0556d8
+admissionwholearchive. Preserveoriginalclaim/whole109membertree/stagedunion.
+Rootcd89c8copiesadmissionarchiveSHA0250a35b7ef58a036dc0c07f90cf7704eb43c13f9cc9acdac164fbaa5cad96fb in evidence/fp-chain-admission-archive-handoff-01;
+commit/publishnow AFTERactualfullbot9917,thenactualnewupload/readback/bot.
+AfterACTUALadmissioncanonicalmanifest,projectgenuineentrytoEXACTconsumer
+0556proofpath/git-rm-cachedONLYownnewarchive(physicalbytesstay)/managedignore,
+addEXACTadmissiondatareadtoBOTHexistingPCCgate/sign,verifierunchanged.
+PCCworkflowONEprotectedinputchangesfroma39;other793mustmatchacceptedfull,
+qualifyCIdependencydifference. No broadnative rerunforunexecutedPCCdataread;
+allRust/Lean/proof/old50/FIVEwholejobs unchanged. Freshconsumermetadatagov02
+mustretainfailedgov01/output/stagingunion and passartifact0/hydrationwire0.
+Own6CI43353278346exacta39scheduled03:25/noearlypoll. FullsourcefreezeENDED,
+no nativeprocess. Mainledger/signing/merge/budget/KB/vaultgaps unchanged.
+Continueactualadmissionpublication/consumercheckpoint/CI/nextg3task.
+Earlierfull-publication-pending/activeheaders historical. [pcc:unverified]
+
+---
 Current checkpoint — full C0/T20 replay COMPLETE LOCAL / sourcea39 / own6CI pending
 
 FULL01 pcc147b9f COMPLETE original2026-11-13T02:38:22Z→02:52:52Z,outer+
