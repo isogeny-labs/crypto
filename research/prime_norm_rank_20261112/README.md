@@ -532,3 +532,13 @@ vectors. Final tracked-source gate covers104 declarations, zero failing/extra
 trusted; both fresh replays include imports. All claim standing remains
 unsigned. Matrix/pencil assembly and a public-input finder remain separate
 [pcc:unverified].
+
+## 2026-11-13: actual functional coefficient-pencil identity
+
+[Functional report](functional-report/README.md) / [PDF](functional-report/report.pdf):
+NormPencilFunctional derives mu(G)=0 from the supplied actual scaled norm
+witness and gives the moment-weighted expansion in the actual coefficient
+constraints for every admissible trial norm. Moment linearity and norm degree
+bounds are explicit. This completes the functional pencil-membership step;
+concrete coefficient matrices, branch/corank assembly and public-input finder
+remain separate. Producer standing is unsigned [pcc:unverified].
