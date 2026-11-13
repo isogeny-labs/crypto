@@ -59,7 +59,7 @@ function main(){let a=factorAt29(),b=factorAt2();const ca=orbitLengths([[1,0],[0
   const data={ell:3,field_degree:8,source_prime:29,target_prime:2,source_trace:0,target_trace:-2,
     source_factor_degrees:a,target_factor_degrees:b,source_frobenius_cycles:ca,target_frobenius_cycles:cb,
     source_gcd_degrees:gcdDegrees(a),target_gcd_degrees:gcdDegrees(b),both_squarefree:true,
-    global_lift_algorithm:false,scalable_ecdpl:false};
+    global_lift_algorithm:false,scalable_ecdlp:false};
   // Python uses sort_keys=True, separator without spaces.
   const sorted=Object.fromEntries(Object.keys(data).sort().map(k=>[k,data[k]]));
   process.stdout.write(JSON.stringify(sorted)+'\n');
