@@ -14,7 +14,7 @@ area, and took 1.84× as long. The near-parity at t = 3 does not survive one mor
   row) and 3 (`4f1f8f6871`, cubic rerun alone, before any cover-map row).
 - Host: RunPod CPU pod `bdr-coverfb-r5` (`cpu3m`, 32 vCPU, 256 GB, $1.76/h), 23:04Z–08:36Z
   (about 9.5 h, about $17), then deleted and confirmed gone. The binary is the frozen one from
-  rounds 2–4 (SHA-256 `923a1c95…`, verified on the pod).
+  rounds 2–4 (SHA-256 `923a1c95…`, matched on the pod).
 - Rows and logs: `runs/`. One planted target per arm; both finished systems contain their planted
   solution (0 planted violations).
 
