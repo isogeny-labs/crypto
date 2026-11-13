@@ -326,8 +326,8 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
-| 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius; actual F7allk torsion-image criterion iff3dividesk with infinite excluded-boundary counterexamples (32); generic qualified coefficient-field matrix criterion/Jordan control and actual rational prime-torsion input (22) | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112.  Basefield k1census now complete over95primefields/7013620models,29-declaration actual transport/lowtorsion gate. All-k extension census/rank/determinant still open. |
-| 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges  Basefield p<500prime/divisor native bounds now checked completely; generic geometric/Hasse and further extension-field scope remain. |
+| 2 BK | Partial: actual qualified F5/r3 and excluded F7/r3 criteria at all positive extension degrees; complete p<500 basefield k1census; qualified matrix criterion/actual rational prime-torsion input; generic actual r2geometry/binary basis and characteristic2card1/2/coprimality-deletion control (67) | Generic odd-prime geometric rank, actual Frobenius determinant/representation/descent and all-k extension census over the p<500population |
+| 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67) | General Hasse/supersingular geometric classification, further extension-field censuses and full torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
@@ -804,3 +804,26 @@ Signed standing unverified. The group law is on the coefficient image;
 full ambient group/Picard identification remains open. Order stays2;
 no uniform limiting gap or typical/large-prime asymptotic refutation.
 Gaudry's qualified setting is preserved. [pcc:unverified]
+
+### Actual geometric 2-torsion rank and characteristic boundary
+
+The [actual geometric2torsion packet](../research/two_torsion_rank_audit_20261113/README.md)
+proves the generic r2geometry: actual killed-by2points are finite,
+equivalent to identity plus distinct cubic roots, card≤4; every
+algebraically closed field/scalar extension with2≠0 gives card4 and a
+concrete binary basis (actual0/A/B/A+B generation and F2coefficient
+independence). In characteristic2 the actual geometric cardinality is
+1ifa1=0, otherwise2, derived from actual point negation/equations.
+Concrete ordinary y²+xy=x³+1 has Δ1, actualF2pointcount4, geometric
+2torsioncard2 over actualAlgebraicClosureF2 and all those points already
+in the actual basepoint image. Prime2 and its square divide #E, while
+2∤2^k−1 for everypositivek. A direct concrete point-inclusion/cyclotomic
+equivalence negation tests deletion of coprimality. The full corpus node
+explicitly retains gcd(r,q)=1 andr∤q−1; neither node nor qualified BK
+paper is refuted. Whole gate67/0failures/0trusted and exact local PCC-20261113-3aa5ac
+replay pass at 2026-11-13T23:40:16Z;11formal/config and10artifact pins match,
+57attemptfiles/fivegatefiles and inspected one-page PDF47542B retained.
+Signed standing unverified. Generic odd-prime geometry/Frobenius
+determinant/representation/descent and full supersingular Hasse/geometric
+classification remain open. No native experiment, novelty or group-scheme
+formalization claim. [pcc:unverified]
