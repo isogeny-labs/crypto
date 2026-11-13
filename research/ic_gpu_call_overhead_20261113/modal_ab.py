@@ -14,7 +14,8 @@ import json, os, pathlib, subprocess, tarfile, time, uuid
 import modal
 
 HERE = pathlib.Path(__file__).resolve().parent
-REPO = HERE.parents[1]
+# In the container this file is imported as /root/modal_ab.py, where HERE has one parent only.
+REPO = HERE.parents[1] if len(HERE.parents) > 1 else HERE
 GPU = os.environ.get("AB_GPU", "A100-80GB")
 CUDA = os.environ.get("AB_CUDA", "12.8.1")
 BEFORE, AFTER = os.environ.get("IC_BEFORE", ""), os.environ.get("IC_AFTER", "")
