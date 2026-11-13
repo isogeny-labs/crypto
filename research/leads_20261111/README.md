@@ -53,6 +53,45 @@ All results below are `[pcc:unverified]`.
   - `V` inside `ker Tr` is harder: (13, 25, 4) is infeasible there.
   - Write-up: `research/lfd_lower_bound_20261111/out/lead_A2/RESULT.md`.
 
+## Status update, 2026-11-12 (evening): follow-ups on RunPod, with independent checks
+
+A second workflow ran six follow-ups, using RunPod CPU pods through
+`research/runpod_kit_20261112/`. Each result had an independent check: the
+`validator` agent for the Nagao result, a skeptic for the others. All results are
+`[pcc:unverified]`.
+
+| follow-up | outcome | check |
+|:--|:--|:--|
+| **Nagao Hilbert stop, validation** (`research/jv_nagao_hilbert_20261112/validation/`) | See below. | validator: **insufficient_evidence** |
+| **Exact e_min above n = 29** (`research/lfd_lower_bound_20261111/out/c_runpod/`) | **e_min = 5 at n = 31** (4 of 4 instances) and **e_min = 5 at n = 33** (3 of 3). Model A's n = 31 prediction holds; n = 33 narrows θ_A to (1.2634, 1.2698). n = 35 is undecided: a 32-bit index overflow in M4RI 20200125 at about 442k columns. | skeptic agrees |
+| **Quartic up to k = 26** (`runs/C_quartic_k26/runpod/`) | **Not killed** on any frozen falsifier, but both numeric predictions are missed. DL exponent k = 22..26: 1.068, against a predicted 1.00 [0.95, 1.06]. DL/rho-neg model at k = 26: 0.0016 (w = 0) / 0.0009 (w = 1). | skeptic agrees. k = 22..25 alone gives 1.11, and the rho side is a model. |
+| **Syzygy structure** (`out/lead_A1_syzygies/structure/`) | The extra syzygies are not products of lower-degree solutions, and not an orbit of one element (H_a, H_b refuted). H_c2 held in 6 of 6 cells. | skeptic agrees |
+| **Rank-2 elimination, char-2 D4** (`runs/B_d4bin_probes/rank2/`) | **0.689× counted F_q multiplications** in the `frob_roots` arm at m = 12 (0.727× if the 7,260 Newton node inverses are charged), identical solutions 300/300. No gain in the baseline-roots arm (1.007). At m = 8 the current solver misses 3 solutions with s4 = 0. | skeptic agrees. Per-target rows were not saved. |
+| **Closure falls cross-check** (`runs/A_fall_effective_variable/crosscheck/`) | **Confirmed** by an independently written closure (`iclose.c`, with its own descent). T35 and R36 fall at D = 4 on 4 of 4 instances; the T33 and R35 stall controls match. | skeptic agrees. There is still no exported certificate. |
+
+**Nagao Hilbert stop: what changed after validation.** [pcc:unverified]
+- **Held.**
+  - A replay on RunPod, an independent host, reproduces all 10 records in every counted field.
+  - A fresh same-binary matched-rho sample (runs 14–27, 126 walks) gives U2 at w = 0 of 1.050 / 0.876 / 0.728. The combined 252 runs give 1.026 / 0.856 / 0.711.
+  - In counted F_p multiplications, the Nagao arm is below matched rho at p = 1451 and 1601.
+- **Does not hold yet.** The validator's blocking findings:
+  1. **No independent certificates** for 8 of the 9 cover solves or for the rho solves. `correct: true` is the solver checking itself. Re-running with `JV_DUMP_INSTANCE` fixes this; 1 of 9 was certified independently.
+  2. **§5a.** The cover's native-operation count is a lower bound: F_p additions, F4 pair selection and matrix assembly are not emitted. Priced with an addition proxy, U2 at p = 1451 and 1601 would be *above* rho at w = 0.1 and 1. So "below rho across the band" is **not established**. `VALIDATION.json` now records `order_holds_across_band: false`.
+  3. **The preregistered band was missed.** The prediction put Hilbert/plain in [0.50, 0.62] at w = 0.1 and 1. Measured, it is 0.821 and 0.959. The gain is 1.90× at w = 0 but only 1.04× at w = 1.
+  4. **No S3 `bench.record/v1`**, because the AWS identity is rejected.
+- **A recording defect.** `hilbert_check_muls` in the committed records is inflated by the thread count (6.4e10 recorded; 8.9e9 true, single-threaded). Do not quote it.
+
+**RunPod spend:**
+
+| pod | flavor | hours | cost |
+|:--|:--|--:|--:|
+| Nagao validation | 32 vCPU cpu5c | 1.56 | about $1.74 |
+| exact e_min | 16 vCPU / 128 GB cpu5m | 6.5 | about $6.76 |
+| quartic | 16 vCPU cpu5c | 1.95 | about $1.09 |
+| closure cross-check | 16 vCPU cpu5m | 0.2 | about $0.21 |
+
+All four were deleted, and a final listing shows none of them.
+
 ## Status update, 2026-11-12: the remaining open leads, run in parallel (workflow)
 
 At the owner's request, a workflow ran one agent per open lead against its

@@ -6,6 +6,8 @@
 // speak the same contract, so the Rust side drives all three identically.
 //
 //   fes_solve --in <system-file>      (also accepts a bare positional path)
+//   fes_solve --serve                 the serve protocol of fes_io.hpp, so the
+//                                     Rust client and engine run without a GPU
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -14,7 +16,29 @@
 #include "fes.cuh"
 #include "fes_io.hpp"
 
+// Serve mode: fes_walk_block<6> over the whole cube (prefix 0), the walk the
+// CUDA kernel runs, with no output cap (total == listed always).
+static int serve_main() {
+  FesSystem sys;
+  std::vector<uint64_t> qsym, df, sols;
+  for (;;) {
+    const int r = fes_serve_read(sys, 62);
+    if (r == 0) return 0;
+    if (r < 0) { printf("ERROR malformed request (n in 1..62, m in 0..64)\n"); fflush(stdout); return 2; }
+    qsym.assign((size_t)sys.n * sys.n, 0);
+    fes_build_qsym(sys.quad_tri.data(), sys.n, qsym.data());
+    df.assign(sys.n, 0);
+    sols.clear();
+    struct VecEmit { std::vector<uint64_t> *v; void operator()(uint64_t x) { v->push_back(x); } } emit{&sols};
+    fes_walk_block<6>(sys.cst, sys.lin.data(), sys.quad_tri.data(), qsym.data(), sys.n, sys.n, 0,
+                      df.data(), emit);
+    fes_serve_reply(sols, sols.size());
+  }
+}
+
 int main(int argc, char **argv) {
+  for (int i = 1; i < argc; ++i)
+    if (!strcmp(argv[i], "--serve")) return serve_main();
   // Accept `--in <file>` (the shared worker convention) or a bare positional
   // path, so every worker — fes_solve, fes_cuda, fes_metal — takes the same
   // arguments from the Rust driver.

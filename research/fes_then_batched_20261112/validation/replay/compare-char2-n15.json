@@ -1,0 +1,354 @@
+{
+  "name": "char2-n15",
+  "instance": "icv1-f2m15-tm249-9e24ae34",
+  "calibration": "measured",
+  "leaves_compared": 2110,
+  "leaves_identical": 1933,
+  "differing_volatile": 84,
+  "differing_calibration_ns": 15,
+  "differing_measured_gae": 78,
+  "differing_pinned_gae_float": 0,
+  "pinned_gae_max_rel_diff": 0,
+  "pinned_ratio_max_abs_diff": null,
+  "calibration_pins_identical": true,
+  "mismatches": [],
+  "measured_calibration": {
+    "committed_ratios": {
+      "ns_per_add": 1,
+      "ns_per_as_solve": 0.11846762901711233,
+      "ns_per_double": 0.9941053616934571,
+      "ns_per_frobenius": 0.05231405871672021,
+      "ns_per_lookup": 0,
+      "ns_per_row_op": 0.016659545683436496,
+      "ns_per_word_xor": 0.004738818739189666
+    },
+    "replay_ratios": {
+      "ns_per_add": 1,
+      "ns_per_as_solve": 0.1031701742695488,
+      "ns_per_double": 0.9574485015876402,
+      "ns_per_frobenius": 0.05255331423945321,
+      "ns_per_lookup": 0,
+      "ns_per_row_op": 0.01684338190601569,
+      "ns_per_word_xor": 0.0037762591182831018
+    }
+  },
+  "row_scalars": [
+    {
+      "arm": "pair-table",
+      "seed": 20261110,
+      "targets_tried": 64,
+      "relations_found": 38,
+      "solver_calls": null,
+      "solver_ops": null,
+      "rank": 38,
+      "recovered": 2747,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 35210.457002289644,
+        "replay": 35206.61405973913,
+        "rel": 0.00010914208100924558
+      },
+      "s": {
+        "committed": 474.6482734824958,
+        "replay": 474.5964693821805,
+        "rel": 0.00010914208100927086
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "pair-table",
+      "seed": 20301613,
+      "targets_tried": 32,
+      "relations_found": 22,
+      "solver_calls": null,
+      "solver_ops": null,
+      "rank": 22,
+      "recovered": 4736,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 35099.85811316303,
+        "replay": 35095.98649216179,
+        "rel": 0.00011030303851238088
+      },
+      "s": {
+        "committed": 473.15736492173454,
+        "replay": 473.10517422668914,
+        "rel": 0.00011030303851241895
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "pair-table",
+      "seed": 20342116,
+      "targets_tried": 41,
+      "relations_found": 23,
+      "solver_calls": null,
+      "solver_ops": null,
+      "rank": 23,
+      "recovered": 1223,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 35117.641111810146,
+        "replay": 35113.77813111137,
+        "rel": 0.0001100011440539104
+      },
+      "s": {
+        "committed": 473.3970854571609,
+        "replay": 473.34501123616883,
+        "rel": 0.00011000114405395752
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "inherited-f4",
+      "seed": 20261110,
+      "targets_tried": 64,
+      "relations_found": 38,
+      "solver_calls": 63,
+      "solver_ops": 6924471,
+      "rank": 38,
+      "recovered": 2747,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 33729.269936065044,
+        "replay": 27060.210812776037,
+        "rel": 0.1977231981578739
+      },
+      "s": {
+        "committed": 454.68139592557026,
+        "replay": 364.78033618028,
+        "rel": 0.1977231981578739
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "inherited-f4",
+      "seed": 20301613,
+      "targets_tried": 32,
+      "relations_found": 22,
+      "solver_calls": 32,
+      "solver_ops": 3507171,
+      "rank": 22,
+      "recovered": 4736,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 17350.70576950559,
+        "replay": 13970.972960289855,
+        "rel": 0.19478935635896263
+      },
+      "s": {
+        "committed": 233.89308854080124,
+        "replay": 188.3332043671287,
+        "rel": 0.1947893563589627
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "inherited-f4",
+      "seed": 20342116,
+      "targets_tried": 41,
+      "relations_found": 23,
+      "solver_calls": 41,
+      "solver_ops": 4371745,
+      "rank": 23,
+      "recovered": 1223,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 21478.548240768876,
+        "replay": 17266.620050169935,
+        "rel": 0.19609929606900495
+      },
+      "s": {
+        "committed": 289.53773132591,
+        "replay": 232.75958602748236,
+        "rel": 0.19609929606900495
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "fes-then-inherited",
+      "seed": 20261110,
+      "targets_tried": 64,
+      "relations_found": 38,
+      "solver_calls": 63,
+      "solver_ops": 6924471,
+      "rank": 38,
+      "recovered": 2747,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 33729.269936065044,
+        "replay": 27060.210812776037,
+        "rel": 0.1977231981578739
+      },
+      "s": {
+        "committed": 454.68139592557026,
+        "replay": 364.78033618028,
+        "rel": 0.1977231981578739
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "fes-then-inherited",
+      "seed": 20301613,
+      "targets_tried": 32,
+      "relations_found": 22,
+      "solver_calls": 32,
+      "solver_ops": 3507171,
+      "rank": 22,
+      "recovered": 4736,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 17350.70576950559,
+        "replay": 13970.972960289855,
+        "rel": 0.19478935635896263
+      },
+      "s": {
+        "committed": 233.89308854080124,
+        "replay": 188.3332043671287,
+        "rel": 0.1947893563589627
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "fes-then-inherited",
+      "seed": 20342116,
+      "targets_tried": 41,
+      "relations_found": 23,
+      "solver_calls": 41,
+      "solver_ops": 4371745,
+      "rank": 23,
+      "recovered": 1223,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 21478.548240768876,
+        "replay": 17266.620050169935,
+        "rel": 0.19609929606900495
+      },
+      "s": {
+        "committed": 289.53773132591,
+        "replay": 232.75958602748236,
+        "rel": 0.19609929606900495
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "fes-then-batched",
+      "seed": 20261110,
+      "targets_tried": 64,
+      "relations_found": 38,
+      "solver_calls": 63,
+      "solver_ops": 5862668,
+      "rank": 38,
+      "recovered": 2747,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 28697.577982337247,
+        "replay": 23050.567552205688,
+        "rel": 0.19677655144302333
+      },
+      "s": {
+        "committed": 386.8525717107252,
+        "replay": 310.7290567326238,
+        "rel": 0.1967765514430234
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "fes-then-batched",
+      "seed": 20301613,
+      "targets_tried": 32,
+      "relations_found": 22,
+      "solver_calls": 32,
+      "solver_ops": 2985683,
+      "rank": 22,
+      "recovered": 4736,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 14879.468662843046,
+        "replay": 12001.699145214638,
+        "rel": 0.19340539523529923
+      },
+      "s": {
+        "committed": 200.58001833648726,
+        "replay": 161.78676061381537,
+        "rel": 0.1934053952352992
+      },
+      "priced_by": "measured"
+    },
+    {
+      "arm": "fes-then-batched",
+      "seed": 20342116,
+      "targets_tried": 41,
+      "relations_found": 23,
+      "solver_calls": 41,
+      "solver_ops": 3675973,
+      "rank": 23,
+      "recovered": 1223,
+      "verified": true,
+      "exhausted": false,
+      "counts_identical": true,
+      "total_gae": {
+        "committed": 18181.410848965406,
+        "replay": 14639.204690923862,
+        "rel": 0.19482570343231148
+      },
+      "s": {
+        "committed": 245.09125991679622,
+        "replay": 197.34118279839493,
+        "rel": 0.1948257034323114
+      },
+      "priced_by": "measured"
+    }
+  ],
+  "rho_scalars": [
+    {
+      "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "runs": 16,
+      "per_run_identical": true,
+      "all_verified_committed": true,
+      "all_verified_replay": true,
+      "mean_s": {
+        "committed": 2.2798593397270315,
+        "replay": 2.2798593397270315
+      }
+    },
+    {
+      "method": "r-adding walk, distinguished points, 16 jumps",
+      "runs": 16,
+      "per_run_identical": true,
+      "all_verified_committed": true,
+      "all_verified_replay": true,
+      "mean_s": {
+        "committed": 15.750912918032839,
+        "replay": 15.750912918032839
+      }
+    }
+  ],
+  "rho_selected_same_method": true,
+  "rows_compared": 12,
+  "rows_in_replay": 12,
+  "rho_runs_compared": 32,
+  "identical_counts": true
+}
