@@ -1,0 +1,26 @@
+{
+  "schema": "isolab.github-dispatch/v1",
+  "workflow": ".github/workflows/isolab-experiment.yml",
+  "ref": "main",
+  "inputs": {
+    "source_revision": "FROZEN_PUBLISHED_COMMIT_SHA",
+    "publish_only": false,
+    "spec_path": "taskq/deploy/eks-karpenter/l2-validation.json",
+    "size_sweep": false,
+    "norm_branch_census": true,
+    "instance_type": "c8a.2xlarge",
+    "seconds": "1800",
+    "resumable": false,
+    "checkpoint_seconds": "120",
+    "max_restores": "2"
+  },
+  "resources": {
+    "pool": "cpu-spot",
+    "cpu": 2,
+    "memory": "4Gi",
+    "ephemeral_storage": "10Gi",
+    "retries": 0
+  },
+  "budget_usd": 2.0,
+  "note": "Replace only source_revision with the exact published commit. One original attempt; at most one separately authorized retry after a definite infrastructure failure. Wall time is not a scientific endpoint."
+}
