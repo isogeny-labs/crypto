@@ -10,8 +10,10 @@ launches work and is not used as a read-only budget substitute.
 The user's existing override authorization remains context; no new arbitrary
 financial ceiling or scope is inferred from it. A concrete next request must
 retain the applicable override, finite per-attempt cost limit, source/workload
-and current allowance/reservations. The graph builder/resource configuration
-also remain unimplemented/unfrozen. No new cloud job is launched here.
+and current allowance/reservations. The construction-only graph builder is now
+frozen at00ffe72fbe and its two exports complete; solver consumer validation,
+genuine witness replay and resource configuration remain pending.
+No new cloud job is launched here.
 
 Applied skill: .agents/skills/isolab-eks/SKILL.md, Before launch3:
 "Stop new launches when the budget is exhausted or its remaining balance is

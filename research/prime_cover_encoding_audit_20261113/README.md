@@ -3,6 +3,14 @@
 2026-11-13. Exploratory exact two-record native audit; no new solver or timing run.
 Unsigned data statement PCC-20261113-79248f [pcc:unverified].
 
+Continuation: the [paired builder](builder-report/README.md) now exports both
+representations and checks every equation by exact coefficient substitution.
+The cubic graph system has22 variables/23 equations and maximum input degree4;
+its direct counterpart has18/19 and maximum degree12. Statement
+PCC-20261113-b52e23 is unsigned. Solver performance remains unmeasured.
+The original audit report is retained with its historical predictions and
+receipts [pcc:unverified].
+
 The completed reference and cubic records each describe16 distinct image
 abscissas, but only6 reference and8 cubic abscissas pass the producer's
 nonzero-square filter. The cubic count matches its saved field; the reference
@@ -60,8 +68,9 @@ coordinates in this cover branch [pcc:unverified].
 A standard alternative is to introduce x_i=N(u_i) and use ordinary S3 in x_i.
 For this polynomial cubic cover there are no denominator guards. The proposed
 m4 layout adds four variables/equations to the original18/19; its expected
-maximum input degree is4. These are design predictions for an unimplemented
-builder, not measured solver results. Extra variables may outweigh any benefit;
+maximum input degree is4. These were design predictions at the original audit;
+the continuation builder now checks them, without a solver result.
+Extra variables may outweigh any benefit;
 a smaller input degree does not imply less work or a sub-exponential bound
 [pcc:unverified].
 
