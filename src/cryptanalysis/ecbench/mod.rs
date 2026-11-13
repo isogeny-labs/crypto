@@ -104,6 +104,7 @@ pub mod stats;
 pub mod tensor_cofactor;
 pub mod three_leads;
 pub mod trend;
+pub mod wcal;
 pub mod wordram_price;
 pub mod work;
 pub mod workload;

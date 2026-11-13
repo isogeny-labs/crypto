@@ -971,7 +971,7 @@ impl SystemSolver for FesF2Gpu {
         let (mut used, mut fallback, mut capped, mut gpu_ns) = (0u64, 0u64, 0u64, 0u64);
         let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
             let cpu = |fs: &[crate::cryptanalysis::mq_fes::QuadraticForm]| {
-                if fs.first().map_or(true, |f| f.n <= 32) {
+                if fs.first().is_none_or(|f| f.n <= 32) {
                     gray_incremental_find_all(fs, usize::MAX)
                 } else {
                     None
