@@ -185,6 +185,43 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - **Verdict.** The frozen rule passes for `D = −3, −4, −7, −8` as written, but the control shows the gain is the fold factor, not `D_E`. Small `D_E` does not reduce the actual solving cost.
 - **Distance to rho.** No arm is below its matched rho in 120 arm-cells, including rho with the same automorphism group. The smallest ratio is 7.62× at 0.1 GAE, and the gap grows about like `√p`.
 
+## Degree-3 covers and the IC positive control (2026-11-12 addendum)
+
+- **Degree-3 covers** (`research/cover_pushforward_deg3_20261112/PUSHFORWARD_DEG3.md`) [pcc:unverified].
+  - On the genus-4 degree-3 cover, all 28,815 IC relations on the transferred subgroup are single full fibres `c^*(Q)`, and they push forward to `[3]Q`.
+  - The `J(C)` arm and the matching collision search on `E` accept identical trials and give identical certified logs in 360 of 360 seed-cells.
+  - The fibre degeneracy therefore holds at degree 3 as at degree 2.
+  - Limits: `p ≤ 251` (the HCurve bound) and `r` 11–83.
+- **Positive control** (`research/ic_positive_control_20261112/RESULTS.md`) [pcc:unverified].
+  - Double-large-prime genus-3 IC on a full Jacobian is below rho in group ops from p = 257 on (0.114× at p = 65,537).
+  - At 0.1 and 1 GAE it is 5.8× and 31× rho, so the §5a band does not show this known win at lab sizes.
+  - The verdicts here are unaffected: every transfer row loses at 0 GAE or reduces to a search on `E`. The general consequence is filed as `problems/section5a-band-cannot-show-a-known-ic-win.md`.
+
+## Proof note (2026-11-12 addendum)
+
+`research/chained_transfer_proof_20261112/PROOF.md` states the obstruction once.
+- **Established in the note** (argument given there, unverified by pcc) [pcc:unverified]: `c_*c^* = [d]`, `J_C ~ E × P`, and pull-back injective on `E[r]` for `r ∤ d`.
+- **Fibre rigidity (T5).** For hyperelliptic `C`, `d ≤ g` and `c ∘ ι_h = [−1] ∘ c`, every `Q` outside an explicit finite set has `c^*Q` as the reduced representative of `c^*[Q − O]`.
+- **Collision equivalence (T7).** Every dependency among the fibre rows is a collision `Q_i = ±Q_j` on `E`. So an IC whose relations lie in the transferred subgroup cannot beat the matched collision search on `E`.
+- **`φ2_*φ1^* = 0` (T8).**
+- **Open:** a cross-characteristic map, lifting (only the conditional `C₀/p` bound), and an IC that draws relations from all of `J_C`.
+- **Correction:** the ATLAS "iff" is now an "only if". Tate gives an isogeny when the orders agree, but not necessarily one of degree prime to `r`.
+
+## Instrument fixes (2026-11-12 addendum)
+
+`research/instrument_fixes_20261112/RESULTS.md`; the protocol and Amendment 1 were frozen before the recorded run [pcc:unverified].
+- **Matched rho.** The recorded rho on `E` spent about 400 group ops on jump-table set-up. The negation-map walk with set-up separated is 5–9× cheaper at v3 sizes. So every recorded IC/rho distance was understated.
+- **IC baseline.** Walk collection plus double large primes cut IC group ops 13.4× at p = 1619 (34,521 to 2,583). For genus 3 the new arms beat the old IC in total from p ≥ 2003. This is a measured improvement of the index-calculus baseline. Its gap to the matched rho stays 28.1×, 247× and 1,715× at 0, 0.1 and 1 GAE.
+- **LA counter.** The genus-2 counter was a matrix-size count, but within 2% of the real multiplication count.
+- **Verdicts.** One recorded verdict changes: tower genus 2 at p = 251 goes from "unresolved" to "above" at every price. No arm in v3, tower or small_de is below any matched rho.
+
+## Independent validation (2026-11-13 addendum)
+
+`research/validation_20261112/REPORT.md` [pcc:unverified]:
+- **Admitted:** small_de passed the gate, and `research/small_de_endo_fb_20261112/VALIDATION.json` is written.
+- **Not admitted:** v3, tower_large and cover_pushforward. Their measurements reproduce in independent code, but their matched rho is plain (negation-free) and its native work is not emitted, so the gate fails on the reference.
+- **Next step for those three:** re-measuring them with the negation-map reference from `instrument_rerun` would make them admissible.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -200,3 +237,7 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
   transferred subgroup's genus-2 IC is a birthday search on `E`.
 - 2026-11-12: small-D_E addendum; the adapted base saves only by folding, which a
   generic control matches.
+- 2026-11-12: degree-3 fibre and positive-control addendum.
+- 2026-11-12: proof note added; ATLAS iff narrowed to only-if.
+- 2026-11-13: instrument-fix addendum; the recorded gaps were understated.
+- 2026-11-13: validation addendum; small_de admitted, three targets not (rho reference).

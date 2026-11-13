@@ -1,7 +1,7 @@
 //! Linear-edge arithmetic and curve encodings from Bochum §2–3.
 
 use crate::arithmetic::inverse;
-use crate::canonical::{PredicateProgram, ValueOperation};
+use crate::canonical::{fourier_sum, PowerTable, PredicateProgram, TwistTable, ValueOperation};
 use crate::curve::{Curve, Point};
 use crate::finite::{Domain, PrimeDomain};
 use crate::network::{
@@ -575,11 +575,16 @@ impl Encoder {
     ) -> Result<Vec<Word>> {
         let width = params.j + 1;
         let mut middle = vec![Vec::<Word>::new(); params.second];
+        // Every column shares one root and stride, so one lazily built table
+        // of its powers serves all of them (see `PowerTable`).
+        let column_powers = Arc::new(PowerTable::default());
         for j2 in 0..params.second {
             let inputs: Vec<_> = (0..params.first)
                 .map(|j1| input[params.second * j1 + j2].clone())
                 .collect();
             let (omega, modulus, p) = (omega.clone(), modulus.clone(), params.clone());
+            let powers = column_powers.clone();
+            let twist_cache = TwistTable::default();
             let operation = ValueOperation::FourierColumn {
                 omega: omega.clone(),
                 modulus: modulus.clone(),
@@ -591,15 +596,15 @@ impl Encoder {
                 &inputs,
                 &vec![width; p.first],
                 Arc::new(move |v, work| {
+                    let table = powers.get(&omega, p.second, p.first, &modulus);
+                    let twists = twist_cache.get(&omega, j2, p.first, &modulus);
                     let mut out = Vec::with_capacity(p.first);
                     for t1 in 0..p.first {
-                        let mut sum = BigUint::zero();
-                        for j1 in 0..p.first {
-                            work.charge(1, "Fourier column transform")?;
-                            let exponent = BigUint::from(p.second * j1 * t1);
-                            sum = (sum + &v[j1] * omega.modpow(&exponent, &modulus)) % &modulus;
-                        }
-                        out.push(sum * omega.modpow(&BigUint::from(j2 * t1), &modulus) % &modulus);
+                        let sum =
+                            fourier_sum(v, p.first, t1, table, &omega, p.second, &modulus, || {
+                                work.charge(1, "Fourier column transform")
+                            })?;
+                        out.push(sum * &twists[t1] % &modulus);
                     }
                     Ok(out)
                 }),
@@ -609,11 +614,13 @@ impl Encoder {
             )?;
         }
         let mut out: Vec<Option<Word>> = vec![None; params.length];
+        let row_powers = Arc::new(PowerTable::default());
         for t1 in 0..params.first {
             let inputs: Vec<_> = (0..params.second)
                 .map(|j2| middle[j2][t1].clone())
                 .collect();
             let (omega, modulus, p) = (omega.clone(), modulus.clone(), params.clone());
+            let powers = row_powers.clone();
             let scale = if inverse_scale {
                 inverse(&BigUint::from(params.length), &modulus)?
             } else {
@@ -630,14 +637,13 @@ impl Encoder {
                 &inputs,
                 &vec![width; p.second],
                 Arc::new(move |v, work| {
+                    let table = powers.get(&omega, p.first, p.second, &modulus);
                     let mut out = Vec::with_capacity(p.second);
                     for t2 in 0..p.second {
-                        let mut sum = BigUint::zero();
-                        for j2 in 0..p.second {
-                            work.charge(1, "Fourier row transform")?;
-                            let exponent = BigUint::from(p.first * j2 * t2);
-                            sum = (sum + &v[j2] * omega.modpow(&exponent, &modulus)) % &modulus;
-                        }
+                        let sum =
+                            fourier_sum(v, p.second, t2, table, &omega, p.first, &modulus, || {
+                                work.charge(1, "Fourier row transform")
+                            })?;
                         out.push(sum * &scale % &modulus);
                     }
                     Ok(out)
