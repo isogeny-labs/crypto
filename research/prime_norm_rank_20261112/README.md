@@ -1,5 +1,14 @@
 # Prime-field norm/rank search audit
 
+Latest continuation: [full nonzero norm recovery](recovery-report/README.md)
+derives the polynomial norm identity and nonzero normalization from the actual
+cofactor equations, without assuming a norm identity. In the even chart the
+normalization is alpha squared. There are 16 further statements; source gate
+217/0 extra trusted axioms and import-inclusive fresh replay exit 0. A native
+F17 control keeps rank 4 but rejects changed valid support through nonzero
+cofactor residuals. The public-input finder, divisor/scalar application and
+uniform sub-exponential bit bound remain open [pcc:unverified].
+
 Continuation, 2026-11-13: [public branch coordinates](coordinates-report/README.md)
 now derive numerical corank one and a nonzero diagonal adjugate entry for the
 actual reduced quotient-moment matrix. Its actual coefficient recovery has

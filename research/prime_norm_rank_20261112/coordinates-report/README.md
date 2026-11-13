@@ -1,5 +1,12 @@
 # Public branch coordinates and derived cofactor guards
 
+Later continuation: [NormCertificateRecovery](../recovery-report/README.md)
+now derives the full polynomial norm and its nonzero normalization from the
+actual cofactor equations. Its checked native F17 control demonstrates the
+target distinction at fixed rank. This report retains its original25-statement
+scope and receipts; efficient finding and the divisor/scalar application remain
+separate [pcc:unverified].
+
 2026-11-13. Pure proof continuation, source01e312a94d29edd1b7ce6e86cfe51a6a5ee5d9de.
 Unsigned producer standing [pcc:unverified]. Exact source bindings and final
 kernel receipts accompany this report; no new solver or timing experiment.
