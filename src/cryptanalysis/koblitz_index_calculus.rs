@@ -274,6 +274,24 @@ pub mod scan_probes {
         COLLECTING.store(on, Relaxed);
     }
 
+    /// The folded build's steps ([`super::build_probe`]), in counter ticks.
+    static BUILD: [AtomicU64; super::build_probe::STEPS.len()] =
+        [const { AtomicU64::new(0) }; super::build_probe::STEPS.len()];
+    static BUILDS: AtomicU64 = AtomicU64::new(0);
+    static BUILD_PAIRS: AtomicU64 = AtomicU64::new(0);
+
+    #[inline(always)]
+    pub fn build_lap(step: usize, since: &mut u64) {
+        let t = now();
+        BUILD[step].fetch_add(t.wrapping_sub(*since), Relaxed);
+        *since = t;
+    }
+
+    pub fn build_done(pairs: u64) {
+        BUILDS.fetch_add(1, Relaxed);
+        BUILD_PAIRS.fetch_add(pairs, Relaxed);
+    }
+
     /// Counter ticks a second, against the monotonic clock over 50 ms.
     pub fn rate_hz() -> f64 {
         let (t0, i0) = (now(), std::time::Instant::now());
@@ -300,11 +318,81 @@ pub mod scan_probes {
         };
         let mut out = side(0);
         out["other"] = side(1);
+        let steps: serde_json::Map<String, serde_json::Value> = super::build_probe::STEPS
+            .iter()
+            .zip(&BUILD)
+            .map(|(k, v)| (k.to_string(), v.load(Relaxed).into()))
+            .collect();
+        out["build"] = serde_json::json!({
+            "steps": steps,
+            "builds": BUILDS.load(Relaxed),
+            "stored_pairs": BUILD_PAIRS.load(Relaxed),
+            "what": "ticks per step of the folded pair-table build, summed over builds",
+        });
         out["tsc_hz"] = serde_json::json!(rate_hz());
         out["what"] = serde_json::json!(
             "cycles per stage of the collection scan (R04); `other` holds scans outside collection"
         );
         out
+    }
+}
+
+/// Timing points in the folded pair-table build, charged to
+/// [`scan_probes`] under `--features scan-probes` and nothing otherwise.
+/// With one thread the steps sum to the build; with more, the row and
+/// fill steps are summed over threads.
+pub mod build_probe {
+    /// Rows' base and slices; rows' additions; rows' keys; pushing keys
+    /// into the partition streams; the counting sort and filter fill; the
+    /// filters' merge; the duplicate harvest; assembly; and the wall time
+    /// of the whole build, the check on the others.
+    pub const STEPS: [&str; 9] = [
+        "setup",
+        "row_add",
+        "row_key",
+        "stream_push",
+        "sort_fill",
+        "filter_merge",
+        "dups",
+        "assemble",
+        "whole",
+    ];
+    pub const SETUP: usize = 0;
+    pub const ROW_ADD: usize = 1;
+    pub const ROW_KEY: usize = 2;
+    pub const STREAM_PUSH: usize = 3;
+    pub const SORT_FILL: usize = 4;
+    pub const FILTER_MERGE: usize = 5;
+    pub const DUPS: usize = 6;
+    pub const ASSEMBLE: usize = 7;
+    pub const WHOLE: usize = 8;
+
+    #[inline(always)]
+    pub fn now() -> u64 {
+        #[cfg(feature = "scan-probes")]
+        {
+            super::scan_probes::now()
+        }
+        #[cfg(not(feature = "scan-probes"))]
+        {
+            0
+        }
+    }
+
+    #[inline(always)]
+    pub fn lap(step: usize, since: &mut u64) {
+        #[cfg(feature = "scan-probes")]
+        super::scan_probes::build_lap(step, since);
+        #[cfg(not(feature = "scan-probes"))]
+        let _ = (step, since);
+    }
+
+    #[inline(always)]
+    pub fn done(pairs: u64) {
+        #[cfg(feature = "scan-probes")]
+        super::scan_probes::build_done(pairs);
+        #[cfg(not(feature = "scan-probes"))]
+        let _ = pairs;
     }
 }
 
@@ -5772,6 +5860,7 @@ impl PairSumTable {
                     .collect();
                 for r in here {
                     each_row(r, &mut |keys, orbit, start| {
+                        let mut t = build_probe::now();
                         for (at, &key) in keys.iter().enumerate() {
                             let h = pair_filter_hash(key);
                             let p = (h >> part_shift) as usize;
@@ -5785,11 +5874,13 @@ impl PairSumTable {
                                 ids[p].push((r as u32) << 20 | (start + at) as u32);
                             }
                         }
+                        build_probe::lap(build_probe::STREAM_PUSH, &mut t);
                     });
                 }
                 (hs, ws, ids)
             })
             .collect();
+        let mut probe = build_probe::now();
         let mut part_start = vec![0usize; parts + 1];
         for p in 0..parts {
             let len: usize = streams.iter().map(|(hs, _, _)| hs[p].len()).sum();
@@ -5896,6 +5987,7 @@ impl PairSumTable {
             })
             .collect();
         bucket_start[buckets] = total as u32;
+        build_probe::lap(build_probe::SORT_FILL, &mut probe);
         let present = filters
             .into_iter()
             .reduce(|mut all, run| {
@@ -5905,6 +5997,7 @@ impl PairSumTable {
                 all
             })
             .unwrap_or_else(|| vec![0u64; filter_words]);
+        build_probe::lap(build_probe::FILTER_MERGE, &mut probe);
         // Two pairs of one bucket with one hash: one canonical key twice.
         // The hash of key 0 (the point at infinity) is not a sum of two
         // base points in any useful sense, and every row has one.
@@ -5933,6 +6026,7 @@ impl PairSumTable {
         } else {
             Vec::new()
         };
+        build_probe::lap(build_probe::DUPS, &mut probe);
         (bucket_start, rests, present, present_mask, dups)
     }
 
@@ -6002,6 +6096,8 @@ impl PairSumTable {
         if !kc.frobenius_is_endomorphism {
             return None;
         }
+        let whole_began = build_probe::now();
+        let mut probe = whole_began;
         if matches!(
             fb.domain,
             FactorBaseDomain::StandardSubspace | FactorBaseDomain::CofactorProjection
@@ -6079,9 +6175,11 @@ impl PairSumTable {
         } else {
             (Vec::new(), Vec::new())
         };
+        build_probe::lap(build_probe::SETUP, &mut probe);
         // A row hands its keys over in order, a slice at a time, with
         // its orbit.
         let each_row = |r: usize, f: &mut dyn FnMut(&[u64], u32, usize)| {
+            let mut t = build_probe::now();
             let mut sums = Vec::with_capacity(n_points);
             let mut scratch = BatchScratch::default();
             let (orbit, rep) = reps[r];
@@ -6106,12 +6204,15 @@ impl PairSumTable {
                     &mut lambdas,
                     &mut scratch,
                 );
+                build_probe::lap(build_probe::ROW_ADD, &mut t);
                 let mut keys: Vec<u64> = sums.iter().map(|p| p.x).collect();
                 canon.canon_in_place(&mut keys);
                 for (key, p) in keys.iter_mut().zip(&sums) {
                     *key = if p.infinity { 0 } else { *key + 1 };
                 }
+                build_probe::lap(build_probe::ROW_KEY, &mut t);
                 f(&keys, orbit, 0);
+                t = build_probe::now();
                 if own_end == n_points {
                     return;
                 }
@@ -6125,7 +6226,9 @@ impl PairSumTable {
                     &mut lambdas,
                     &mut scratch,
                 ) {
+                    build_probe::lap(build_probe::ROW_ADD, &mut t);
                     canon.x_keys(&x3s, &mut keys);
+                    build_probe::lap(build_probe::ROW_KEY, &mut t);
                     f(&keys, orbit, own_end - from);
                     return;
                 }
@@ -6213,6 +6316,8 @@ impl PairSumTable {
                 .collect();
             (bucket_start, rests, present, present_mask, Vec::new())
         };
+        let stored = rests.len() as u64;
+        let mut probe = build_probe::now();
         let table = Self::assemble_folded(
             curve,
             points,
@@ -6237,6 +6342,10 @@ impl PairSumTable {
                 suffix: suffix.clone(),
             },
         });
+        build_probe::lap(build_probe::ASSEMBLE, &mut probe);
+        let mut whole = whole_began;
+        build_probe::lap(build_probe::WHOLE, &mut whole);
+        build_probe::done(stored);
         Some((table, harvested))
     }
 }
