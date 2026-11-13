@@ -116,8 +116,9 @@ against rather than a bare matrices-per-second.
   99 KB) and falls back to the global kernel otherwise; `MAC_SMEM=0`
   forces global, `MAC_SMEM_THREADS=256|512|1024` sets the block (default
   1024). Measured on an A100 80GB PCIe (2026-11-13), batch 8192: 718 ms
-  global, 197 ms shared at 1024 threads, with `selftest` passing on both
-  paths and both shapes. Evidence:
+  global, 197 ms shared at 1024 threads, 177 ms with the shared path's 2D
+  update mapping (`MAC_UPDATE_2D`, default there), with `selftest` passing
+  on both paths and both shapes. Evidence:
   `research/ic_gpu_measure_20261112/REPORT.md`.
 - **The pivot search and the inverse are serial**, one per column, 286
   of them. They bound how much a larger block can buy; `./bench

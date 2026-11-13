@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+  "latest_record": "20261113T0057Z-ic-gpu-round2",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 142,
+    "measured": 143,
     "open": 0
   },
   "repo": "crypto",
@@ -2592,6 +2592,33 @@
     },
     {
       "better": "lower",
+      "first": 0.0001635,
+      "latest": 0.0001635,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n26_block6",
+      "points": [
+        {
+          "commit": "27819cf1a1aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T0057Z-ic-gpu-round2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 2 on the A100: FES block-unrolled walk 2.4x (n=26) to 4.1x (n=32) over main's Gray walk, identical outputs; macaulay 2D update 1.11x on the shared path; rootfind launch knobs no gain. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.0001635
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.0003916,
       "latest": 0.0003916,
       "latest_derived": {
@@ -2615,6 +2642,33 @@
           ],
           "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
           "value": 0.0003916
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.001301,
+      "latest": 0.001301,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n30_block6",
+      "points": [
+        {
+          "commit": "27819cf1a1aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T0057Z-ic-gpu-round2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 2 on the A100: FES block-unrolled walk 2.4x (n=26) to 4.1x (n=32) over main's Gray walk, identical outputs; macaulay 2D update 1.11x on the shared path; rootfind launch knobs no gain. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.001301
         }
       ],
       "problem": "ic-gpu-kernels",
@@ -2652,6 +2706,60 @@
     },
     {
       "better": "lower",
+      "first": 0.004834,
+      "latest": 0.004834,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n32_block6",
+      "points": [
+        {
+          "commit": "27819cf1a1aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T0057Z-ic-gpu-round2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 2 on the A100: FES block-unrolled walk 2.4x (n=26) to 4.1x (n=32) over main's Gray walk, identical outputs; macaulay 2D update 1.11x on the shared path; rootfind launch knobs no gain. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.004834
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.1769,
+      "latest": 0.1769,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "macaulay_batch8192_s_2d_update",
+      "points": [
+        {
+          "commit": "27819cf1a1aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T0057Z-ic-gpu-round2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 2 on the A100: FES block-unrolled walk 2.4x (n=26) to 4.1x (n=32) over main's Gray walk, identical outputs; macaulay 2D update 1.11x on the shared path; rootfind launch knobs no gain. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.1769
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.1965,
       "latest": 0.1965,
       "latest_derived": {
@@ -2676,6 +2784,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.994,
+      "latest": 0.994,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_launch_knobs_best_ratio",
+      "points": [
+        {
+          "commit": "27819cf1a1aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T0057Z-ic-gpu-round2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Round 2 on the A100: FES block-unrolled walk 2.4x (n=26) to 4.1x (n=32) over main's Gray walk, identical outputs; macaulay 2D update 1.11x on the shared path; rootfind launch knobs no gain. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.994
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",

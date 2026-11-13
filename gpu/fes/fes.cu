@@ -38,12 +38,18 @@ struct FesGlobalEmit {
 // dynamic shared memory: the walk's row index is the same for every lane
 // of a warp, so each load in the hot loop is a shared-memory broadcast
 // instead of a triangular-index computation, a branch and a global load.
-// The walk is fes_walk_gray (O(1) per point; one qsym load and two XORs),
-// or fes_walk_sym (O(n) per point) with -DFES_WALK_SYM=1; both are checked
-// against fes_search_subcube by `make test`, and emit the same zeros in the
-// same order.
-#ifndef FES_WALK_SYM
-#define FES_WALK_SYM 0
+// The walk is fes_walk_block (FES_WALK=2, default): fes_walk_gray's O(1)
+// steps with the low FES_BLOCK_BITS derivatives in registers; or
+// fes_walk_gray (FES_WALK=1) or fes_walk_sym (FES_WALK=0, O(n) per point).
+// `make test` checks each against fes_search_subcube; they emit the same
+// zeros in the same order.
+// Walk: 2 = fes_walk_block<FES_BLOCK_BITS> (default), 1 = fes_walk_gray,
+// 0 = fes_walk_sym.  All three emit the same zeros in the same order.
+#ifndef FES_WALK
+#define FES_WALK 2
+#endif
+#ifndef FES_BLOCK_BITS
+#define FES_BLOCK_BITS 6
 #endif
 
 __global__ void fes_kernel(uint64_t cst, const uint64_t *__restrict__ lin,
@@ -61,10 +67,12 @@ __global__ void fes_kernel(uint64_t cst, const uint64_t *__restrict__ lin,
 
   uint64_t df[FES_MAX_VARS];
   FesGlobalEmit emit{gout, gcount, max_out};
-#if FES_WALK_SYM
+#if FES_WALK == 0
   fes_walk_sym(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
-#else
+#elif FES_WALK == 1
   fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
+#else
+  fes_walk_block<FES_BLOCK_BITS>(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
 #endif
 }
 

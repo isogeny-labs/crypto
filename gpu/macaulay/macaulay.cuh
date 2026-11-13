@@ -40,6 +40,16 @@
 /* Cap on rows, so the per-pivot factor cache can be a fixed shared
  * array.  226 is the measured shape; 512 leaves room to raise the
  * Macaulay degree. */
+/* Update-loop mapping: 0 = flattened cursor, 1 = 2D (lanes x columns,
+ * warps x rows), -1 (default) = 2D for the shared-memory uint16_t path and
+ * the cursor for the global uint32_t one.  A100, shared path, 1024 threads,
+ * batch 8192: 197.1 ms cursor, 176.9 ms 2D (512 threads: 2D 218 ms);
+ * the global path was not measured with 2D, so it keeps the cursor
+ * (research/ic_gpu_measure_20261112, round 2). */
+#ifndef MAC_UPDATE_2D
+#  define MAC_UPDATE_2D -1
+#endif
+
 #ifndef MAC_MAX_ROWS
 #  define MAC_MAX_ROWS 512
 #endif
@@ -247,6 +257,24 @@ __device__ int mac_rref_block(E* a, int rows, int cols, int* piv,
          *    idx = tid, tid + THREADS, ... < rows * width, as (i, j) =
          *    (idx / width, idx % width), advanced by a cursor instead of
          *    a 64-bit division per element. */
+        constexpr bool two_d = MAC_UPDATE_2D == 1 || (MAC_UPDATE_2D == -1 && sizeof(E) == 2);
+        if constexpr (two_d) {
+        /* 2D variant: lanes take columns (the pivot-row value stays in a
+         * register for the whole column), warps take rows (factor[i] is a
+         * warp-wide shared broadcast); no cursor, uneven rows per warp. */
+        {
+            const int lane = tid & 31, warp = tid >> 5;
+            for (int j = c + lane; j < cols; j += 32) {
+                const uint32_t pj = prow[j];
+                for (int i = warp; i < rows; i += THREADS / 32) {
+                    const uint32_t f = factor[i];
+                    if (!f) continue;
+                    const size_t at = (size_t)i * cols + j;
+                    a[at] = (E)fp_sub(a[at], fp_mul(f, pj));
+                }
+            }
+        }
+        } else {
         const int width = cols - c;
         const int qstep = THREADS / width, rstep = THREADS % width;
         int i = tid / width, j = tid % width;
@@ -255,6 +283,7 @@ __device__ int mac_rref_block(E* a, int rows, int cols, int* piv,
             if (!f) continue;
             size_t at = (size_t)i * cols + c + j;
             a[at] = (E)fp_sub(a[at], fp_mul(f, prow[c + j]));
+        }
         }
         __syncthreads();
 
