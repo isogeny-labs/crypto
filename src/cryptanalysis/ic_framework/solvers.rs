@@ -935,7 +935,9 @@ fn fes_quadratic_solve(
 /// else `fes_cuda`/`fes_metal`/`fes_solve` beside the executable).  The
 /// worker only proposes points: each is re-verified on the CPU, and an
 /// empty answer means `Unsatisfiable` only when the worker reports that its
-/// list is complete.  Same forms, same counted cost (`word XORs (Gray-code
+/// list is complete.  Points are returned in `fes-f2`'s order (Gray rank):
+/// the descent oracle keeps the first solution that lifts, so order decides
+/// which relation a call yields.  Same forms, same counted cost (`word XORs (Gray-code
 /// steps)`) as `fes-f2`; what changes is wall time, which `AGENTS.md` §6
 /// keeps as a practicality note.  Without a worker, or after a worker
 /// error, it runs `fes-f2`'s CPU search (`gpu_fallback` = 1 in the cost
@@ -988,7 +990,11 @@ impl SystemSolver for FesF2Gpu {
                         capped = 1;
                         None
                     } else {
-                        Some(reply.proposed)
+                        // fes-f2's order, so the oracle (first liftable
+                        // solution wins) follows fes-f2's trajectory.
+                        let mut points = reply.proposed;
+                        crate::cryptanalysis::fes_gpu::sort_gray_order(&mut points);
+                        Some(points)
                     }
                 }
                 Ok(None) | Err(_) => {

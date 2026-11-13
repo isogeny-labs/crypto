@@ -281,6 +281,28 @@ fn run_worker(sys: &PackedSystem, worker: &Path) -> Result<FesResult, String> {
     })
 }
 
+/// The position of `x` in the Gray-code walk from 0 (the inverse of
+/// `s ^ (s >> 1)`): `fes-f2`'s CPU search emits its zeros in increasing
+/// order of this rank.
+pub fn gray_rank(x: u64) -> u64 {
+    let mut b = x;
+    let mut shift = 1;
+    while shift < 64 {
+        b ^= b >> shift;
+        shift <<= 1;
+    }
+    b
+}
+
+/// Put worker proposals in the order `fes-f2`'s sequential walk would emit
+/// them.  The CUDA kernel splits the cube over threads and appends zeros
+/// through an atomic counter, so its order is arbitrary; callers that take
+/// the first usable solution (the descent oracle does) would otherwise
+/// follow a different trajectory from `fes-f2` on the same input.
+pub fn sort_gray_order(points: &mut [u64]) {
+    points.sort_unstable_by_key(|&x| gray_rank(x));
+}
+
 /// A worker kept running in `--serve` mode (`gpu/fes/fes_io.hpp`): one
 /// process, one CUDA context and one set of device buffers for a whole run,
 /// so a solver call costs a pipe round trip and a kernel launch instead of a
@@ -634,6 +656,30 @@ mod tests {
             let mut want = sys.cpu_search();
             want.sort_unstable();
             assert_eq!(got, want, "trial {trial} (n = {n}, m = {m})");
+        }
+    }
+
+    /// Shuffled solution lists sort back to exactly the CPU walk's order.
+    #[test]
+    fn sort_gray_order_reproduces_the_cpu_walk_order() {
+        use crate::cryptanalysis::mq_fes::gray_incremental_find_all;
+        let mut nonempty = 0;
+        for trial in 0..60u64 {
+            let n = 1 + (trial as usize % 20);
+            let m = 1 + (trial as usize % 3);
+            let forms = sample_forms(n, m, 77 + trial);
+            let want = gray_incremental_find_all(&forms, usize::MAX).unwrap();
+            let mut got = want.clone();
+            got.reverse();
+            let third = got.len() / 3;
+            got.rotate_left(third);
+            sort_gray_order(&mut got);
+            assert_eq!(got, want, "trial {trial} (n = {n}, m = {m})");
+            nonempty += (want.len() > 1) as u32;
+        }
+        assert!(nonempty > 20, "too few multi-solution systems: {nonempty}");
+        for s in [0u64, 1, 2, 5, 1 << 40, u64::MAX >> 1] {
+            assert_eq!(gray_rank(s ^ (s >> 1)), s);
         }
     }
 }

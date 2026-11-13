@@ -13,7 +13,7 @@ inherited-f4 14-82 ms (research/inherited_f4_next_20261112/RESULTS_AB.md).
 ## Spec
 research/ic_gpu_e2e_20261113/job_e2e.sh on one A100: `ic bench --sweep` for koblitz-n23 (inherited-f4,
 fes-f2, fes-f2-gpu, 2 repeats), char2-n25 (same, 1 repeat), char2-n29 (inherited-f4, fes-f2-gpu).
-ic binary sha256 044dda85…f4 built from 0d28a6e605. Record benchmarks/records/<stamp>-ic-fes-gpu-e2e.json.
+ic binary rebuilt after the order fix (see commit after 343ac0bbc2); first n=23 run kept as raw/run1-unordered-koblitz-n23.json. Record benchmarks/records/<stamp>-ic-fes-gpu-e2e.json.
 
 ## State
 2026-11-13: engine, tests and local smoke (n=13, host serve worker) done. Pod not yet started.
