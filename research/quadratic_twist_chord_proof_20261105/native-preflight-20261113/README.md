@@ -29,4 +29,6 @@ The existing branch upload permission persists. This fresh runtime has no config
 
 First freeze a fixed-case engineering protocol with source, contract, lockfile, binary, input, analysis, dependency and command hashes. Create a fresh manifest with schema `twist.trace-fiber-inputs/v1` and exactly `producer`, `auditor`, `contract` entries, each containing its repository-relative path and SHA256. Pass the manifest hash independently to both instruments. The expected full/fixed scope is a separate auditor argument. Preserve first failures and false payloads. Then freeze a new canonical full-study protocol using the measured engineering resource estimate. The current CONTRACT.json is not that canonical freeze. [pcc:unverified]
 
-No runner, receipt, scientific result, new theorem, identity certificate or signed PCC verdict is claimed. The existing two-page derivation report is unchanged; there is no new result graph for compilation.
+The subsequent `run-fixed.sh` and `ENGINEERING_PROTOCOL.md` now implement the fixed-point engineering launch contract, pinned by `ENGINEERING_INPUTS.json` and `ENGINEERING_PINS.json` before data. The script requires a successful official checkpoint before native commands; it has only syntax/help and prelaunch guards checked. It does not implement the later full census or relation-yield experiment. [pcc:unverified]
+
+No receipt, scientific result, new theorem, identity certificate or signed PCC verdict is claimed. The existing two-page derivation report is unchanged; there is no new result graph for compilation.
