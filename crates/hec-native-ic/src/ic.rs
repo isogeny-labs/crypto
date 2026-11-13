@@ -14,7 +14,7 @@ use crate::instance::factor_base;
 use crate::jac::{Curve, Div};
 use crate::oracle::{split, OracleStats};
 use crate::rng::Rng;
-use crate::solve::{solve_for_last, Row, SolveStats};
+use crate::solve::{solve_for_last, Row, SolveStats, Solver};
 
 #[derive(Clone, Debug)]
 pub struct IcParams {
@@ -22,6 +22,7 @@ pub struct IcParams {
     pub d_step_in: u64,
     pub extra_relations: usize,
     pub max_trials: u64,
+    pub solver: Solver,
     pub seed: u64,
 }
 
@@ -35,6 +36,7 @@ impl Default for IcParams {
             extra_relations: 8,
             max_trials: 50_000_000,
             seed: 20260916,
+            solver: Solver::default(),
         }
     }
 }
@@ -182,7 +184,7 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
         if rows.len() >= wanted {
             let t = Instant::now();
             rep.solve_rounds += 1;
-            let k = solve_for_last(&rows, m, ell, &mut rep.solve);
+            let k = solve_for_last(&rows, m, ell, params.solver, &mut rep.solve);
             rep.solve_ns += t.elapsed().as_nanos();
             if let Some(k) = k {
                 if curve.mul(d1, k) == *d2 {
@@ -217,6 +219,58 @@ mod tests {
                 };
                 let rep = solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params);
                 assert_eq!(rep.k, Some(k_true), "g={g} p={p} seed={seed}");
+            }
+        }
+    }
+
+    /// S2 gate on small rows: the fast solver makes the same pivots and does
+    /// the same arithmetic as the reference, on identical walks.
+    #[test]
+    fn fast_solver_is_exact() {
+        use crate::solve::Solver;
+        for &(g, p) in &[
+            (2usize, 251u64),
+            (2, 503),
+            (3, 61),
+            (3, 211),
+            (4, 31),
+            (4, 61),
+        ] {
+            let inst = pick_instance(p, g).unwrap();
+            let k_true = inst.ell / 3 + 7;
+            let d2 = inst.curve.mul(&inst.d1, k_true);
+            for seed in 0..3u64 {
+                let run = |solver| {
+                    let params = IcParams {
+                        seed: 20260916 + seed,
+                        solver,
+                        ..IcParams::default()
+                    };
+                    solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params)
+                };
+                let (r, f) = (run(Solver::Reference), run(Solver::Fast));
+                assert_eq!(f.k, Some(k_true));
+                assert_eq!(
+                    (
+                        r.k,
+                        r.trials,
+                        r.solve_rounds,
+                        r.solve.pivot_hash,
+                        r.solve.pivots,
+                        r.solve.row_ops,
+                        r.solve.mulmods
+                    ),
+                    (
+                        f.k,
+                        f.trials,
+                        f.solve_rounds,
+                        f.solve.pivot_hash,
+                        f.solve.pivots,
+                        f.solve.row_ops,
+                        f.solve.mulmods
+                    ),
+                    "g={g} p={p} seed={seed}"
+                );
             }
         }
     }

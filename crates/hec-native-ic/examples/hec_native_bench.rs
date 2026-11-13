@@ -15,6 +15,7 @@ use std::time::Instant;
 
 use hec_native_ic::ic::{solve_dlp, IcParams};
 use hec_native_ic::instance::pick_instance_with_budget;
+use hec_native_ic::solve::Solver;
 
 fn main() {
     let rows: Vec<(usize, u64)> = match std::env::var("HEC_ROWS") {
@@ -47,6 +48,15 @@ fn main() {
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(5);
+    // S2 (PLAN §7): `reference`, `fast` (default) or `both`.  `both` runs the
+    // two solvers on every (row, seed) in the same process, alternating the
+    // order by seed parity, and asserts the exactness gate E3.
+    let solver_mode = std::env::var("HEC_SOLVER").unwrap_or_else(|_| "fast".into());
+    let solver_of = |s: &str| match s {
+        "reference" => Solver::Reference,
+        "fast" => Solver::Fast,
+        other => panic!("HEC_SOLVER: unknown solver {other:?}"),
+    };
 
     println!(
         "{:>2} {:>6} {:>12} {:>6} {:>4} {:>9} {:>9} {:>6} {:>9} {:>6} {:>6} {:>6}  ok",
@@ -73,16 +83,32 @@ fn main() {
         let k_true = inst.ell / 3 + 7;
         let d2 = inst.curve.mul(&inst.d1, k_true);
         for s in 0..seeds {
-            let params = IcParams {
-                seed: 20260916 + s,
-                ..IcParams::default()
+            let order: Vec<&str> = match solver_mode.as_str() {
+                "both" if s % 2 == 0 => vec!["reference", "fast"],
+                "both" => vec!["fast", "reference"],
+                one => vec![one],
             };
-            let rep = solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params);
-            let ok = rep.k == Some(k_true);
-            let tot = rep.total_ns as f64;
-            let pct = |x: u128| 100.0 * x as f64 / tot.max(1.0);
-            println!(
-                "{:>2} {:>6} {:>12} {:>6} {:>4} {:>9} {:>9} {:>6.3} {:>9.3} {:>6.1} {:>6.1} {:>6.1}  {}",
+            let mut gate: Vec<(Option<u64>, u64, u64, u64, u64, u64)> = Vec::new();
+            for name in order {
+                let params = IcParams {
+                    seed: 20260916 + s,
+                    solver: solver_of(name),
+                    ..IcParams::default()
+                };
+                let rep = solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params);
+                gate.push((
+                    rep.k,
+                    rep.trials,
+                    rep.solve.pivot_hash,
+                    rep.solve.pivots,
+                    rep.solve.row_ops,
+                    rep.solve.mulmods,
+                ));
+                let ok = rep.k == Some(k_true);
+                let tot = rep.total_ns as f64;
+                let pct = |x: u128| 100.0 * x as f64 / tot.max(1.0);
+                println!(
+                "{:>2} {:>6} {:>12} {:>6} {:>4} {:>9} {:>9} {:>6.3} {:>9.3} {:>6.1} {:>6.1} {:>6.1}  {} {}",
                 g,
                 p,
                 inst.ell,
@@ -95,14 +121,16 @@ fn main() {
                 pct(rep.walk_ns),
                 pct(rep.oracle_ns),
                 pct(rep.solve_ns),
-                if ok { "ok" } else { "UNSOLVED - not a result" }
+                if ok { "ok" } else { "UNSOLVED - not a result" },
+                name
             );
-            println!(
-                "JSON {{\"engine\":\"hec-native-ic\",\"genus\":{},\"p\":{},\"c\":{},\"ell\":{},\"m\":{},\"seed\":{},\
+                println!(
+                "JSON {{\"engine\":\"hec-native-ic\",\"solver\":\"{}\",\"genus\":{},\"p\":{},\"c\":{},\"ell\":{},\"m\":{},\"seed\":{},\
                  \"trials\":{},\"relations\":{},\"group_ops\":{},\"precompute_ops\":{},\"smoothness\":{:.5},\
                  \"oracle_calls\":{},\"parity_rejects\":{},\"frobenius\":{},\"solve_rounds\":{},\"solve_pivots\":{},\
-                 \"solve_mulmods\":{},\"fb_ms\":{:.4},\"walk_ms\":{:.4},\"oracle_ms\":{:.4},\"row_ms\":{:.4},\
+                 \"solve_mulmods\":{},\"solve_row_ops\":{},\"solve_pivot_hash\":\"{:016x}\",\"fb_ms\":{:.4},\"walk_ms\":{:.4},\"oracle_ms\":{:.4},\"row_ms\":{:.4},\
                  \"solve_ms\":{:.4},\"total_ms\":{:.4},\"pick_ms\":{:.3},\"correct\":{}}}",
+                name,
                 g,
                 p,
                 inst.c,
@@ -120,6 +148,8 @@ fn main() {
                 rep.solve_rounds,
                 rep.solve.pivots,
                 rep.solve.mulmods,
+                rep.solve.row_ops,
+                rep.solve.pivot_hash,
                 rep.fb_ns as f64 / 1e6,
                 rep.walk_ns as f64 / 1e6,
                 rep.oracle_ns as f64 / 1e6,
@@ -129,6 +159,14 @@ fn main() {
                 pick_ms,
                 ok
             );
+            }
+            if gate.len() == 2 {
+                assert_eq!(
+                    gate[0], gate[1],
+                    "E3 exactness gate failed: g={g} p={p} seed={s}"
+                );
+                println!("GATE g={g} p={p} seed={s} identical");
+            }
         }
     }
 }
