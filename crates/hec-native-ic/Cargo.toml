@@ -1,0 +1,14 @@
+[package]
+name = "hec-native-ic"
+version = "0.1.0"
+edition = "2021"
+description = "Native u64 index calculus on genus 2, 3 and 4 hyperelliptic Jacobians over F_p (research/hec_ic_speedup_20261113)"
+publish = false
+
+# Standalone: no dependency on the `crypto` crate, so it builds in seconds.
+[workspace]
+
+[dependencies]
+
+[profile.release]
+debug = 1
