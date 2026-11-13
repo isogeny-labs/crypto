@@ -4,7 +4,7 @@
 - **Kind:** proof gaps, implementation gaps and access/tool limits; no impossibility claim
 - **Affected work:** [fourteen-target audit](../research/theorem_audit_20261108/README.md)
 - **Next action owner:** audit continuation; environment owner for credential/host provisioning
-- **Last updated:** 2026-11-10
+- **Last updated:** 2026-11-13
 
 ## Problem
 
@@ -500,3 +500,25 @@ characteristic other than2and3. Explicit coordinate equivalence precedes
 cardinality; whole gate20/0/0, no rank/basis premise. This closes the
 generalr3 geometric count component. Genericallr determinant/BK and
 p<500 census remain open. [pcc:unverified]
+
+### 2026-11-13 nonzero, finite Edwards descent
+
+The [new Edwards project](../research/edwards_descent_audit_20261113/README.md)
+passes its full55-declaration Lean gate with zero failures and zero trusted
+exceptions. It checks a nonsingular twisted-Edwards input over F25, actual
+factor-base points and their Mathlib group sum, the exact source F3
+symmetrization and actual coefficient descent. Both equations are nonzero
+quadratics; an actual algebra equivalence to F5[T]/T² gives dimension2,
+finiteness and an Artinian quotient. Their actual highest homogeneous
+parts directly fail Mathlib regularity. This strengthens the earlier
+[f,0] witness for the literal universal n=2 reading. It supplies no generic
+or n>=3 refutation and does not contradict conditional Theorem4.1.
+[pcc:unverified]
+
+Joux–Vitse's author manuscript is now read at pp4–5/7/9–10, including its
+actual F101³ toy systems and exact Assumption2 about homogenized Gröbner
+computation. That condition is not the Edwards regularity statement.
+Source-known toy cases provide the next concrete native execution targets;
+the specified FGHR/generic/JV finite runs remain open until actually frozen,
+executed and analyzed. No native outcome is inferred from the Lean witness.
+[pcc:unverified]
