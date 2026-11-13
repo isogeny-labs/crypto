@@ -562,3 +562,13 @@ branch and all canonical matrix-pencil hypotheses instantiated. Dimension6 is
 proved; restricted rank/corank/recovery are separate preregistered checks.
 Source audit143 and fresh kernel replay complete, with all standing unsigned.
 No search-cost or runtime improvement is claimed [pcc:unverified].
+
+## 2026-11-13: single-target whole-call accounting correction
+
+[Cost-model audit](cost-floor-report/README.md) / [PDF](cost-floor-report/report.pdf):
+PrimeICCostFloor formalizes the at-least-one-solve floor in the incoming m8
+entropy-charge projection. Its exact inequality concerns the declared charge
+model; actual sparse solver costs require separate evidence. The accompanying
+bounded source review preserves censored measurements, cleared target-validity
+concerns and replay gaps. The revised relation-finder protocol is unexecuted.
+This is separate from the norm certificate/finder work [pcc:unverified].
