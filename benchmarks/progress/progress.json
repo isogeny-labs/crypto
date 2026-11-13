@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261113T1712Z-ic-build-steps",
+  "latest_record": "20261113T1642Z-ic-gpu-call-overhead-a100",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 147,
+    "measured": 149,
     "open": 0
   },
   "repo": "crypto",
@@ -11896,6 +11896,352 @@
       ],
       "problem": "kernel:f6_ic_gate",
       "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "runs_with_different_counted_answers",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 12,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.000475459662,
+      "latest": 0.000475459662,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_after_char2_n25_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000459262891,
+            0.000492921854
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000475459662
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000389113999,
+      "latest": 0.000389113999,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_after_koblitz_n23_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000376943325,
+            0.000398867718
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000389113999
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000734776198,
+      "latest": 0.000734776198,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_before_char2_n25_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000726045567,
+            0.000745081105
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000734776198
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000614796593,
+      "latest": 0.000614796593,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_before_koblitz_n23_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000588522139,
+            0.000631906992
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000614796593
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0003204,
+      "latest": 0.0003204,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "worker_wait_and_read_after_char2_n25_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0003055,
+            0.0003474
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.0003204
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000215666667,
+      "latest": 0.000215666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "worker_wait_and_read_after_koblitz_n23_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002105,
+            0.0002248
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000215666667
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 4.83333333e-06,
+      "latest": 4.83333333e-06,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_after_koblitz_n19",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.5e-06,
+            5.3e-06
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 4.83333333e-06
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 7.4e-06,
+      "latest": 7.4e-06,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_after_koblitz_n23",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.2e-06,
+            7.5e-06
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 7.4e-06
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000169533333,
+      "latest": 0.000169533333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_before_koblitz_n19",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000163,
+            0.0001752
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.000169533333
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0002784,
+      "latest": 0.0002784,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_before_koblitz_n23",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002716,
+            0.000287
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.0002784
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "runs_with_different_answers",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 12,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "count"
     },
     {
       "better": "higher",
