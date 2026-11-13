@@ -177,6 +177,20 @@ middle levels `v` and `v-1`. This does not prove search hardness, but it
 rules out a sparse low-degree-character explanation and names the tensor whose
 compression must be demonstrated.
 
+There is also an exact invariance that must be removed from the statistical
+comparison. In a fixed split/cardinality block, with row subset `A` and
+column subset `B`, the ordinate factor is
+
+```
+product_{i in A union B} y_i
+  = (product_{i in A} y_i) * (product_{i in B} y_i).
+```
+
+Replacing every nonzero `y_i` by another nonzero multiplier therefore scales
+each matrix row and column by a nonzero field element. It **cannot change the
+block rank**. Randomized ordinates are an exact invariance control, not a null,
+and no natural/null gap may be claimed from that arm.
+
 ### B0. Semantic gate
 
 On exhaustive tiny groups, regenerate the same instance in three independent
@@ -198,11 +212,15 @@ possible. Materialize the coefficient tensor by subset cardinality blocks and
 compute exact ranks over `F_p`; compute canonical integer-lift ranks over
 `Q` as a secondary diagnostic.
 
-Paired arms:
+Arms and controls:
 
 - natural curve-derived rows;
-- matched rows with independently randomized nonzero ordinate multipliers;
-- independently randomized nonzero middle-layer coefficients;
+- the same abscissae with independently randomized nonzero ordinate
+  multipliers, as an exact rank-invariance control required to match;
+- independently randomized nonzero middle-layer coefficients, as the actual
+  support-matched null;
+- a second distinct-abscissa Vandermonde family, as a family/general-position
+  control rather than a null;
 - a synthetic separable low-rank positive control;
 - fresh-process A/A regeneration.
 
@@ -210,9 +228,23 @@ Preserve the same support, split, dimensions, nonzero pattern, and target/model
 count stratum wherever applicable. Record full block ranks, certified nonzero
 minors, peak memory, and all cap/censoring outcomes.
 
-- **ADVANCE to B2:** on both largest held-out sizes, natural normalized rank is
-  at most half the matched-null rank and its `log2(rank)` slope is lower by a
-  frozen nonzero margin; the positive control fires.
+Before a scaling panel, try to prove or refute the sharper compound-Vandermonde
+statement
+
+```
+rank C_(a,v-a) = min(binomial(|L|,a), binomial(|R|,v-a))
+```
+
+for every fixed-cardinality block under explicit distinct-abscissa and
+characteristic hypotheses. A proof closes this linear coefficient-tensor
+compression for the whole guarded family. A counterexample, with its exact
+minor/rank certificate, selects the family for the scaling panel.
+
+- **ADVANCE to B2:** the compound-Vandermonde full-rank statement is refuted,
+  and on both largest held-out sizes natural normalized rank is at most half
+  the independently-randomized-coefficient null rank with a lower
+  `log2(rank)` slope by a frozen nonzero margin; the exact ordinate-invariance
+  and positive controls both pass.
 - **KILL the registered linear-message compression:** natural ranks meet the
   available balanced upper bound or track both nulls without a held-out slope
   gap.
