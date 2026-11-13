@@ -1,0 +1,43 @@
+name: CT72 relative Frobenius double-coset alignment audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct72/**'
+      - '.github/workflows/ct72-relative-frobenius-alignment.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct72-alignment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Two independent exact split-nonsplit double-coset audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct72
+          python3 -B "$D/ct72_double_coset.py" > ct72-py.jsonl
+          python3 -O -B "$D/ct72_double_coset.py" > ct72-pyopt.jsonl
+          node "$D/ct72_double_coset_independent.js" > ct72-js.jsonl
+          node --no-opt "$D/ct72_double_coset_independent.js" > ct72-jsnoopt.jsonl
+          cmp ct72-py.jsonl ct72-pyopt.jsonl
+          cmp ct72-py.jsonl ct72-js.jsonl
+          cmp ct72-py.jsonl ct72-jsnoopt.jsonl
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          lines=Path('ct72-py.jsonl').read_text().splitlines()
+          assert len(lines)==4
+          for row in map(json.loads,lines):
+              q=row['ell']
+              assert row['relative_orbits']==q
+              assert row['matrices_per_orbit']==q-1
+              assert row['conjugates']==q*(q-1)
+              assert row['scalar_intersection']==q-1
+              assert row['invariant_u']==list(range(q))
+          assert json.loads(lines[0])['det']==2
+          print('CT72 separate local Frobenius data leave q relative classes; no DLP lift claimed')
+          PY
+          echo '78885691f4964a2d28cdaca83fdb0cefcace6818680f3fc30896f92a875e3fb7  ct72-py.jsonl' | sha256sum -c
