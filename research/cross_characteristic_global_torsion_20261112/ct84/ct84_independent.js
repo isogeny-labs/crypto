@@ -33,7 +33,7 @@ const eq=(u,v)=>u[0]===v[0]&&u[1]===v[1];
 const one=[1,0],X=[2,0],Y=[0,1];
 const lam=fm(X,X),nu=add(Y,fm(lam,X)),xx=add(fm(lam,lam),one),yy=add(add(fm(lam,xx),nu),one);
 check(eq(xx,[17,0])&&eq(yy,[77,1]),'binary group law');
-check(eq(add(fm(Y,Y),Y),add(fm(fm(X,X),X),fm(X,X)),'binary source curve');
+check(eq(add(fm(Y,Y),Y),add(fm(fm(X,X),X),fm(X,X))),'binary source curve');
 console.log(JSON.stringify({
   basis_dimension:9,binary_image_x:xx[0],binary_image_y:yy,
   exact_global_identity:true,experiment:'ct84-selective-rational-recognition',
