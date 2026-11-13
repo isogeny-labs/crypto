@@ -31,6 +31,40 @@ Let m=floor(2sqrt(q)). The x_i are roots of an integer polynomial (the real Weil
 
 At q=2, m=2, B(1)=5. The bound 5^g is sharp for **arbitrary abelian varieties**, since E/F2: y²+y=x³+x has five rational points and E^g has 5^g. The product need not be the Jacobian of a smooth genus-g curve, and having group order 5^g does **not** supply a large odd-prime-order point.
 
+### 1.1. Sharper, Jacobian-specific bound in genus two over F2
+
+The universal abelian-surface bound 5²=25 is **not attainable by a smooth genus-two Jacobian over F2**. The exact maximum is **19**, from the complete genus-two Jacobian classification in Aubry–Haloui–Lachaud, §4 Theorem 4.1, q=2 special case. This is previously published mathematics.
+
+A concrete smooth witness is the weighted hyperelliptic equation
+
+    C/F2: y² + (x³+x+1)y = x⁵+x.
+
+Its affine nonsingularity follows from gcd(h, h'²*f + f'²)=1 over F2[x], with h=x³+x+1 and f=x⁵+x. The weighted chart at infinity has equation v²+(1+u²+u³)v = u+u⁵, so at u=0 there are **two** distinct F2-rational nonsingular points v=0,1 (the v-derivative equals 1). Independent direct F2 and F4 enumerations give
+
+    #C(F2)=6,   #C(F4)=6.
+
+The Frobenius trace sums are s1=3−6=−3 and s2=5−6=−1, hence L_C(T)=1+3T+5T²+6T³+4T⁴. Evaluating at T=1 gives
+
+    #Jac(C)(F2)=19.
+
+Thus an ell-torsion point **in a genuine genus-two Jacobian over F2** can only have odd prime order ell<=19, improving the general g=2 bound ell<=25. The point-count witness itself does not construct a global number-field torsion lift from arbitrary source P,Q.
+
+The bounded exact census independently checks smooth weighted degree-5/6 binary models with h of degree at most 3 and f of degree 5 or 6. It finds 640 passing models, maximum group order 19, and the explicit witness above. **This finite model sweep is not offered as an independent exhaustive classification of all genus-two curves**; the global upper bound comes from the cited theorem. Both Python and JavaScript implement F4 arithmetic and point counting separately. An earlier JS infinity-count expression had incorrect operator precedence, detected by the independent witness test and corrected before commit. Wrongly counting only one of the two rational infinity points is an additional rejected control.
+
+Reproduce:
+
+    python3 -B research/cross_characteristic_global_torsion_20261112/ct56/ct56_genus2_witness.py
+    python3 -O -B research/cross_characteristic_global_torsion_20261112/ct56/ct56_genus2_witness.py
+    node research/cross_characteristic_global_torsion_20261112/ct56/ct56_genus2_independent.js
+    node --no-opt research/cross_characteristic_global_torsion_20261112/ct56/ct56_genus2_independent.js
+
+All four local runs produced the same exact JSON: {"max_j":19,"n1":6,"n2":6,"smooth_models":640,"witness_f":34,"witness_h":11}.
+
+Python witness source SHA-256: 9376e2177bf72fd5d5b6b220e5c9b1601487461832b2732842f8fae7a647ae95.
+JavaScript witness source SHA-256: c0cf9320de69b60de0981998114a359088a81a5af2d5e99f78db4f9247e32b36.
+
+[pcc:unverified]
+
 ## 2. A stronger, dimension-independent gate for entire level structures
 
 Suppose additionally that *all* A[ell] are rational over F_(2^f). Then #A(F_(2^f)) is divisible by ell^(2g). Thus
