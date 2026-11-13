@@ -25,5 +25,8 @@ function add(A,B){if(A===null)return B;if(B===null)return A;let [x,y]=A,[u,v]=B;
 let g=lifted.find(z=>z[0]%p===9n&&z[1]%p===4n),cur=null,mults=[];for(let j=0;j<7;j++){mults.push(cur);cur=add(cur,g);}if(cur!==null)throw Error('point order');
 let sorted=a=>a.map(v=>v.map(x=>String(x)).join(':')).sort().join(';');
 if(sorted(mults.slice(1))!==sorted(lifted))throw Error('Hensel vs group');
+let curveCount=1;
+for(let x=0n;x<p;x++)for(let y=0n;y<p;y++)if(trunc(y*y+y-x*x*x+x*x+10n*x+20n,p)===0n)curveCount++;
+if(curveCount!==35||curveCount%7!==0||curveCount%49===0)throw Error('source curve point count');
 let result={ell:7,experiment:'ct82-fixed-place-prime-to-p-reduction',fully_split_roots_found:3,group_law_verified:true,modulus:Number(mod),oriented_points:6,precision:5,rational_full_rank_excluded:true,source:37,torsion_group_size:7,x_roots:roots.map(Number)};
 console.log(JSON.stringify(result));
