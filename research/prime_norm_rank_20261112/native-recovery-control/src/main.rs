@@ -1,4 +1,5 @@
 //! Fixed finite regression only; no attack solver, benchmark or random search.
+mod public_jets;
 use serde_json::{json, Value};
 use std::{fs::OpenOptions, io::Write};
 const P: u64 = 17;
@@ -393,6 +394,9 @@ fn control() -> Value {
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
+    if args.len() == 3 && args[1] == "--public-jets" {
+        return public_jets::write(&args[2]);
+    }
     if args.len() != 2 {
         return Err("usage: norm-certificate-control FRESH_OUTPUT_JSON".into());
     }

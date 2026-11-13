@@ -46,3 +46,20 @@ and8.4 (Riemann-Roch degree/pole restrictions), existing DERIVATION.md,
 NormCertificateRecovery.lean and NEXT_FINDER.md. KB unavailable: no MCP tools;
 canonical wrapper exits127 (no executable). No novelty or exhaustive review
 claim for these classical local-algebra ingredients.
+
+Pre-native refinement (after symbolic derivation, before native implementation):
+include coupled corrections (A+sH+GJ,B+H), which preserve A-sB modulo G without
+fixing individual residues. Formalize that G|(s²-f) and G|(A-sB), together with
+actual pole bounds and nonzero norm, imply N=cG with c!=0. This alternative is
+not ruled out by componentwise rigidity. It still requires a root-sign choice.
+
+Additional fixed development control, no sign search: take the six public
+branches (0,6),(3,1),(5,1),(6,3),(10,11),(13,7) on the same F17 curve. Construct
+the Lagrange root residue from these points and reconstruct a bounded A/B by
+a six-by-six homogeneous linear solve (degree A<=3, degree B<=1). Supply no
+A,B to that solve; compare its checked output to the existing fixture only
+as an independent known-answer control. This is reconstruction for a supplied
+branch assignment, not a method of selecting signs. Flip the branch at x=13
+and report the actual kernel dimension without assuming global infeasibility
+of the underlying unsigned support. Verify every returned vector by original
+point equations, actual degree bounds, and full norm identity, not rank alone.
