@@ -1,6 +1,7 @@
 # Proposed matched direct-versus-graph cover test
 
-Unexecuted design, not spending authorization or an asymptotic result
+Solver experiment unexecuted; construction-only builder completed separately.
+Not spending authorization or an asymptotic result
 [pcc:unverified].
 
 Question: does a graph encoding reduce actual sparse work enough to offset its
@@ -12,13 +13,17 @@ and degree trace motivate this test; they do not decide it.
 
 ## Before a solver run
 
-Implement a native builder using literal saved p, curve, coset, map and target
+The [native paired builder](builder-report/README.md) is implemented at00ffe72fbe
+and exports both frozen cases with coefficient-level projection checks.
+The following describes its design and remaining solver attachment work.
+Use literal saved p, curve, coset, map and target
 parameters. Build the direct and graph representations from the same input
 object; do not draw new curves/targets by advancing a shared RNG differently.
 For cubic N, add x_i-N(g*y_i0)=0 and use the ordinary S3 chain in x_i. Retain
 all original tower and partial-sum variables. Proposed m4 counts are22
-variables/23 equations and maximum raw degree4; verify these in the actual
-builder rather than treat them as a result [pcc:unverified].
+variables/23 equations and maximum raw degree4; these counts and every
+substituted polynomial are now checked in the builder. No solver cost is
+established [pcc:unverified].
 
 The generic graph solution maps are formalized separately. Connect them to
 actual polynomial evaluation, verify both directions and unique auxiliary
