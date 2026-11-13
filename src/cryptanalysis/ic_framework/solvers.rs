@@ -917,10 +917,14 @@ impl SystemSolver for FesF2 {
 }
 
 /// The solver `descent-algebraic` runs when a command names none
-/// (`ic bench`, `ic run`): the size rule with the batched inherited engine,
-/// the lowest algebraic row on every instance of the 2026-11-12 end-to-end
-/// ladder (research/fes_then_batched_20261112).  A run that names a solver
-/// is unaffected; ecbench specs always name theirs.
+/// (`ic bench`, `ic run`): the size rule with the batched inherited engine.
+/// On the 2026-11-12 end-to-end ladder (research/fes_then_batched_20261112)
+/// its S is 0.74 to 0.89 of `inherited-f4`'s at the pinned word-XOR ratio;
+/// under the AGENTS.md §5a band it ties `inherited-f4` at w = 0 (identical
+/// decisions, solver free) and is lower at w = 0.1 and 1, except at 14
+/// unknowns, where `fes-f2` tries more targets and is above at w = 0
+/// (validation/validator-report.json).  A run that names a solver is
+/// unaffected; ecbench specs always name theirs.
 pub const DEFAULT_DESCENT_SOLVER: &str = "fes-then-batched";
 
 /// The default `fes_max_vars` of [`FesThenInherited`]: the largest number
