@@ -50,6 +50,15 @@ def y_lift(x,y0):
         step=nxt
         check((y*y+y+C)%step==0,'y Hensel')
     return y
+# Exhaustively certify these are ALL simple mod-37 division roots.
+residue_roots=[a for a in range(P) if val(psi7,a,P)==0]
+check(residue_roots==[9,27,28],'unaccounted rational x-root')
+for i,x in enumerate(roots):
+    d=val(D,x,M); z=val(p3,x,M)
+    check(d%P and z%P,'exceptional division denominator')
+    x2=((3*x*x-2*x-10)**2*pow(d,-1,M)+1-2*x)%M
+    x3=(x-d*val(f4,x,M)*pow(z*z,-1,M))%M
+    check(x2==roots[(i+1)%3] and x3==roots[(i+2)%3],'division rational-map root cycle')
 lifted=[]
 for x,x0 in zip(roots,(9,27,28)):
     candidates=[y for y in range(P) if (y*y+y-x0**3+x0*x0+10*x0+20)%P==0]
