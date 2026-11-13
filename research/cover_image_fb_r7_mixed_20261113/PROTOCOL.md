@@ -48,3 +48,19 @@ Hard stops: T pod 3 h, M5 pod 4 h after creation. Budget about $10.
 
 No `S`, no relation-phase cost, no rho comparison, no leaderboard or `benchmarks/` row. Wall time
 on a RunPod pod is a noisy proxy; T is read as a ratio within one pod and one binary only.
+
+## Amendment 1 (17:30Z, before any M5 cell ran)
+
+- **Observed (local construction check).** m = 5 at t = 2 cannot be planted: a planted 5-term
+  relation needs 5 distinct base abscissae, and |V| = 2² = 4. The pilot then searches forever for a
+  curve (a local smoke test sat at 3 MB for 11 min and was stopped by PID). At t = 3 both the PKM
+  and the `cubic` system build (18 unknowns) and each vanishes at its planted solution before F4
+  runs (checked locally with a 5 s budget).
+- **Change.** M5 runs only at m = 5, t = 3. That is the size of m = 4, t = 4 (18 unknowns), where an
+  arm took 3–6 h and 100–190 GB, so it runs like round 6 set L: one arm per `cpu3m` 32 vCPU 256 GB
+  pod, `--planted 1 --random 0`, budget 25,200 s, hard stop 7.5 h. Arms: (none) and `cubic`, the
+  decisive pair (`cubic` stood for the cover maps at m = 4, where the maps' W agreed to within
+  0.03 %).
+- **Gate.** M5-reopen: `W_cubic / W_none ≤ 0.8`; M5-closed: `≥ 1`; otherwise mixed.
+- **Budget.** Round 7 rises from about $10 to at most about $30 (T about $2; M5 at most 2 × 7.5 h ×
+  $1.76/h).
