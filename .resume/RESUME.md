@@ -1,3 +1,22 @@
+Current task — G3 complete encoded-point descent, protocol-first
+
+Source review/proposal pcc/claims/PCC-20261113-394e14.json;nineteen exact sources,firstsplit q5/7/11 fixtures
+with original cubic bases,all794 prior current inputs and WHOLE20796-byte
+six-job workflow frozen before new code/runs. Report TWO final45444PDFpages
+ALL inspected. See G3_DESCENT_PROTOCOL.md and G3_DESCENT_DERIVATION.md.
+Implement the product of conjugate completed fibre ideals,coefficient trace
+descent and actual origin subtraction using original native engines;separate
+FpR6 point/jet oracle/all encoded points/generatingedges/oddscalars and faithful
+partial Lean checks required. No new native process or acceptance yet.
+Previous C0/T20 full/ALLSIXCI/ALLFOURraw complete and GitHub refreshed,
+consumer1644d47/rootd393a223;publication eac940/root and57c164/consumer.
+Native correctness work next;actual benchmark budget/checkpoint and main
+frozen-ledger/signing/merge gaps remain. No paid run or new cost claim.
+This proposal is unsigned;earlier active headers below are historical.
+[pcc:unverified]
+
+---
+
 Current checkpoint — complete F101 chain, all six CI jobs, all four raw archives
 
 Scientific source a39fefaa084756d0a58386253651a667e2ad9de6 pins upstream
