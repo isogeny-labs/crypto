@@ -1,12 +1,28 @@
 {
   "branch": "aburan28/laughing-darwin-3qdnk2",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-13T20:00:50+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=/dev/shm/fl/ic",
+        "ISO=/tmp/claude-0/rulev9/bin/isolated_bench",
+        "bash",
+        "research/ic_tool_program/explorations/filter-layout-20261113/ab/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T18:55:14+00:00",
+      "wall_s": 3847.499
+    }
+  ],
   "commit": "39affc25bf6b4d893c56bb4c4c1b9b46e3723e8b",
   "commit_dirty": false,
   "created_utc": "2026-11-13T18:55:02+00:00",
   "curve_uid": null,
-  "entries": [],
+  "entries": [
+    "benchmarks/20261113-ic-filter-layout"
+  ],
   "host": {
     "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "cpus_online": 4,
@@ -15,19 +31,212 @@
     "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
   },
   "id": "20261113T1855Z-ic-filter-layout-ab",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "build_low_over_top_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0696586617459187,
+        1.1428177274897524
+      ],
+      "unit": "ratio",
+      "value": 1.1042963314837477
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "setup_low_over_top_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0070434467721752,
+        1.0612886977577314
+      ],
+      "unit": "ratio",
+      "value": 1.033397625250923
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "collect_low_over_top_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9484123108439897,
+        1.028485333887169
+      ],
+      "unit": "ratio",
+      "value": 0.9968072667156773
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "build_aa_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9883855408110195,
+        1.0453611311317055
+      ],
+      "unit": "ratio",
+      "value": 1.0190592389511335
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "setup_aa_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9578814929367361,
+        1.0241974770532223
+      ],
+      "unit": "ratio",
+      "value": 0.9914751264309754
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "collect_aa_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9656991131577299,
+        1.032596498470767
+      ],
+      "unit": "ratio",
+      "value": 0.9960436137552416
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "build_low_over_top_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0981906184338237,
+        1.164546115463808
+      ],
+      "unit": "ratio",
+      "value": 1.1422329590660252
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "setup_low_over_top_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9832979172158047,
+        1.0343658371118145
+      ],
+      "unit": "ratio",
+      "value": 1.0005217873604986
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "collect_low_over_top_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.969865336657704,
+        1.0043631460091844
+      ],
+      "unit": "ratio",
+      "value": 0.9912527121835233
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "build_aa_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9648077159836149,
+        1.0425859744896366
+      ],
+      "unit": "ratio",
+      "value": 1.00364416581828
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "setup_aa_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9700102218509661,
+        1.0287223261028817
+      ],
+      "unit": "ratio",
+      "value": 0.9973316718632423
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 42,
+      "name": "collect_aa_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9679907679431274,
+        1.0319382063724678
+      ],
+      "unit": "ratio",
+      "value": 0.9974982213387907
+    }
+  ],
   "problem": "ic:koblitz_setup_phase",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 309844,
+      "path": "/dev/shm/fl/runs.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/95/958b13d1cc1094faa06678b90d7ebeca197ac0f0b1b8a0dda572886bb3b71b92",
+      "sha256": "958b13d1cc1094faa06678b90d7ebeca197ac0f0b1b8a0dda572886bb3b71b92",
+      "uploaded": true
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "benchmarks/20261113-ic-filter-layout/report.pdf",
+    "png": [
+      "benchmarks/20261113-ic-filter-layout/ab.png"
+    ],
+    "svg": [
+      "benchmarks/20261113-ic-filter-layout/ab.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "ic-filter-layout-ab",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
   "validation": null
 }
