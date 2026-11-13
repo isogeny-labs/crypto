@@ -1,6 +1,6 @@
 {
   "branch": "claude/leads-20261113",
-  "closed_utc": null,
+  "closed_utc": "2026-11-13T17:03:15+00:00",
   "commands": [
     {
       "argv": [
@@ -11,6 +11,16 @@
       "exit": 0,
       "started_utc": "2026-11-13T15:59:19+00:00",
       "wall_s": 1802.368
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/dlp_20261113/run_v3.sh",
+        "research/humbert_genus5_cover_20261021/dlp_20261113/campaign_b"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T16:29:50+00:00",
+      "wall_s": 1808.32
     }
   ],
   "commit": "2be5bf345aad820241019aaec965d661b81e6982",
@@ -26,19 +36,117 @@
     "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
   },
   "id": "20261113T1559Z-humbert-genus5-dlp",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 20,
+      "name": "cand_dlp50_over_lp50_max",
+      "note": "R1 counted, max over all 20 instances (holds)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.5126
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "pre_over_dlp50_t_ic_median_q16001",
+      "note": "R2 paired wall time L0, 5/5 seeds faster",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.174,
+        1.952
+      ],
+      "unit": "ratio",
+      "value": 1.406
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "lp50_over_dlp50_t_ic_median_q16001",
+      "note": "exploratory: dlp no faster than single large prime at q=16001",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.967
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "la_mulmods_dlp50_over_lp50_median_q16001",
+      "note": "counted: dlp rows ~2x heavier, same unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 2.13
+    },
+    {
+      "baseline": 2.28,
+      "better": "lower",
+      "n": 5,
+      "name": "ic_over_rho_expected_dlp50_median_q16001",
+      "note": "baseline = pre (iota+precheck); reference = expected-steps rho on the same instance; L0 wall time",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.65
+    }
+  ],
   "problem": "ic:humbert-genus5-toy",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 107487,
+      "path": "research/humbert_genus5_cover_20261021/dlp_20261113/campaign_a/results/v3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7d/7db37a299fba27ed14026175d757e3889f9929c712944f1b5c9036216a01f5a0",
+      "sha256": "7db37a299fba27ed14026175d757e3889f9929c712944f1b5c9036216a01f5a0",
+      "uploaded": false
+    },
+    {
+      "bytes": 36240,
+      "path": "research/humbert_genus5_cover_20261021/dlp_20261113/campaign_b/results/v3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ea/ea64b86684cca367f243206d97a8aa7dc81d1b895aa99cc385902398db81cf10",
+      "sha256": "ea64b86684cca367f243206d97a8aa7dc81d1b895aa99cc385902398db81cf10",
+      "uploaded": false
+    },
+    {
+      "bytes": 5170,
+      "path": "research/humbert_genus5_cover_20261021/dlp_20261113/campaign_a/results/v3.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/25/251149ae0b867a35c430e6c0d14a8166ba48abfe5f252f111c2c88af15015ff7",
+      "sha256": "251149ae0b867a35c430e6c0d14a8166ba48abfe5f252f111c2c88af15015ff7",
+      "uploaded": false
+    },
+    {
+      "bytes": 1795,
+      "path": "research/humbert_genus5_cover_20261021/dlp_20261113/campaign_b/results/v3.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c0/c082f934c3b6a4447b206b12836edc48f8b6c922a5f79c625fbb275ef721c230",
+      "sha256": "c082f934c3b6a4447b206b12836edc48f8b6c922a5f79c625fbb275ef721c230",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/humbert_genus5_cover_20261021/dlp_20261113/REPORT.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/humbert_genus5_cover_20261021/dlp_20261113/figures/dlp_ratios.svg",
+      "research/humbert_genus5_cover_20261021/dlp_20261113/figures/dlp_phases.svg",
+      "research/humbert_genus5_cover_20261021/dlp_20261113/figures/dlp_gap_to_rho.svg",
+      "research/humbert_genus5_cover_20261021/dlp_20261113/figures/dlp_candidates.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "humbert-genus5-dlp",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
   "validation": null
 }

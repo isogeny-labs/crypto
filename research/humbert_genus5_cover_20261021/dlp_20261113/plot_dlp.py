@@ -44,4 +44,16 @@ ax.axhline(1, color="black", lw=0.8, ls="--")
 ax.set_xscale("log"); ax.set_xlabel("q"); ax.set_ylabel("relation candidates dlp:0.5 / lp:0.5")
 ax.set_title("R1 (counted): candidates needed, per instance (<1: dlp:0.5 needs fewer)")
 save(fig, "dlp_candidates")
+ph = rd("phases_v3.csv")
+fig, axs = plt.subplots(1, 2, figsize=(7.6, 3.4))
+for tag, col in [("pre", "#7a7a7a"), ("lp50", "#d9822b"), ("dlp50", "#2a6fb0"), ("dlp35", "#3a9a5b")]:
+    rows = [r for r in ph if r["tag"] == tag]
+    x = [float(r["q"]) for r in rows]
+    axs[0].plot(x, [float(r["candidates"]) for r in rows], marker="o", color=col, label=tag)
+    axs[1].plot(x, [float(r["la_mulmods"]) for r in rows], marker="o", color=col, label=tag)
+for a, yl in zip(axs, ["relation candidates (median)", "linear-algebra mulmods (median)"]):
+    a.set_xscale("log"); a.set_yscale("log"); a.set_xlabel("q"); a.set_ylabel(yl)
+axs[0].legend(fontsize=7)
+fig.suptitle("Counted cost by phase: dlp halves candidates, doubles LA work against lp", fontsize=9)
+save(fig, "dlp_phases")
 print("figures:", sorted(f for f in os.listdir(F) if f.endswith(".svg")))

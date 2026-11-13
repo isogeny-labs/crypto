@@ -101,11 +101,25 @@ pub fn run(out: &str, inputs: &[String]) -> Result<(), String> {
             let _ = writeln!(md, "\nR4 (exploratory): log-log slope of median t_ic, q = {q0} -> {q1}: pre {:.2}, dlp50 {:.2}", slope(10), slope(11));
         }
     }
+    // Phase split (median over complete instances): where each arm spends its time.
+    let mut ph_csv = String::from("q,tag,t_relations,t_linear_algebra,t_descent,candidates,la_mulmods,unknowns\n");
+    md += "\n| q | arm | t_relations | t_linear_algebra | candidates | LA mulmods | unknowns |\n|--:|:--|--:|--:|--:|--:|--:|\n";
+    let qs: Vec<u64> = perq.keys().cloned().collect();
+    for q in qs {
+        for tag in TAGS {
+            let rs: Vec<&Rec> = full.iter().filter(|((qq, _), _)| *qq == q).map(|(_, a)| &a[tag]).collect();
+            let m = |k: &str| med(&rs.iter().map(|r| r.f(k)).collect::<Vec<_>>());
+            let c = med(&rs.iter().map(|r| r.f("rel_candidates") + r.f("quad_candidates")).collect::<Vec<_>>());
+            let _ = writeln!(md, "| {q} | {tag} | {:.2} | {:.2} | {:.0} | {:.3e} | {:.0} |", m("t_relations"), m("t_linear_algebra"), c, m("la_mulmods"), m("unknowns"));
+            let _ = writeln!(ph_csv, "{q},{tag},{:.4},{:.4},{:.4},{c:.0},{:.0},{:.0}", m("t_relations"), m("t_linear_algebra"), m("t_descent"), m("la_mulmods"), m("unknowns"));
+        }
+    }
     let dir = std::path::Path::new(out);
     std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
     std::fs::write(dir.join("summary_v3.md"), &md).map_err(|e| e.to_string())?;
     std::fs::write(dir.join("instances_v3.csv"), &inst_csv).map_err(|e| e.to_string())?;
     std::fs::write(dir.join("summary_v3.csv"), &q_csv).map_err(|e| e.to_string())?;
+    std::fs::write(dir.join("phases_v3.csv"), &ph_csv).map_err(|e| e.to_string())?;
     print!("{md}");
     Ok(())
 }
