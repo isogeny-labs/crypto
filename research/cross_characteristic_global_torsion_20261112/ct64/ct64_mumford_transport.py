@@ -118,7 +118,8 @@ def main():
     check(OMEGA==236,'field model')
     co=[quotient(t)[0] for t in LIFTS]
     check(co==[(941,20,336),(249,534,39)],'explicit quotient')
-    f=(0,0,0,2,0,1);h=(1,)
+    # CT62 classes() indexes h[0:3] directly: retain its canonical padded ABI.
+    f=(0,0,0,2,0,1,0);h=(1,0,0,0)
     group=classes(f,h)
     check(len(group)==31,'wrong source group order')
     G=((0,1),());check(G in group,'generator missing')
