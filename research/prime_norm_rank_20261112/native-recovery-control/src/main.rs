@@ -1,4 +1,5 @@
 //! Fixed finite regression only; no attack solver, benchmark or random search.
+mod branch_repair;
 mod public_jets;
 mod signed_hankel;
 use serde_json::{json, Value};
@@ -400,6 +401,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     if args.len() == 3 && args[1] == "--signed-hankel" {
         return signed_hankel::write(&args[2]);
+    }
+    if args.len() == 3 && args[1] == "--branch-repair" {
+        return branch_repair::write(&args[2]);
     }
     if args.len() != 2 {
         return Err("usage: norm-certificate-control FRESH_OUTPUT_JSON".into());

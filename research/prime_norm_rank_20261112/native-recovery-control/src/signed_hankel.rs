@@ -1,7 +1,7 @@
 //! Public barycentric Hankel representation controls; no branch search or timing.
 use super::public_jets::{interpolate, kernel, norm};
 use super::*;
-fn weights(points: &[(u64, u64)]) -> Vec<u64> {
+pub(super) fn weights(points: &[(u64, u64)]) -> Vec<u64> {
     points
         .iter()
         .enumerate()
@@ -16,7 +16,7 @@ fn weights(points: &[(u64, u64)]) -> Vec<u64> {
         })
         .collect()
 }
-fn hankel(points: &[(u64, u64)], w: &[u64]) -> Mat {
+pub(super) fn hankel(points: &[(u64, u64)], w: &[u64]) -> Mat {
     (0..2)
         .map(|j| {
             (0..2)
