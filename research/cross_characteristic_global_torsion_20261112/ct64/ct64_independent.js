@@ -115,4 +115,4 @@ const chosen=source.filter(P=>(P[0]===0&&P[1]===0)||(P[0]===2&&P[1]===738)||(P[0
 const witness=chosen.map(P=>[P[0],P[1],...encoded.slice(0,2).flatMap(e=>e.coords.get(key(curveMap(P,e.model))))]);
 check(chosen.length===4&&rank(witness.map(row=>row.slice(2)))===4,'fixed witness rank');
 check(maps.every(m=>onE(curveMap([0,0],m),m.coef)),'generator image');
-console.log(JSON.stringify({omega,nonzero_translation_lifts:translations.length,genuine_involutions:involutions.length,order_four_lifts:10,curve_affine_points:source.length,selected_quotients:maps.slice(0,2).map(t=>t.coef),elliptic_points:961,all_pair_ranks:pairs,fixed_rank4_witness:witness},null,0));
+console.log(JSON.stringify({omega,nonzero_translation_parameters:translations.length,involutive_translation_parameters:involutions.length,order_four_translation_parameters:10,curve_affine_points:source.length,selected_quotients:maps.slice(0,2).map(t=>t.coef),elliptic_points:961,all_pair_ranks:pairs,fixed_rank4_witness:witness},null,0));
