@@ -1,0 +1,29 @@
+name: CT77 exhaustive binary reductions and source-compatible CRT gate
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct77/**'
+      - '.github/workflows/ct77-binary-crt-census.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct77-census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independently check binary models, CRT and torsion fields
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct77
+          python3 -B "$D/ct77_census.py" > ct77-py.jsonl
+          python3 -O -B "$D/ct77_census.py" > ct77-pyopt.jsonl
+          node "$D/ct77_independent.js" > ct77-js.jsonl
+          node --no-opt "$D/ct77_independent.js" > ct77-jsopt.jsonl
+          cmp ct77-py.jsonl ct77-pyopt.jsonl
+          cmp ct77-py.jsonl ct77-js.jsonl
+          cmp ct77-py.jsonl ct77-jsopt.jsonl
+          test "$(wc -l < ct77-py.jsonl)" -eq 9
+          echo 'fd91d33f5b5b845a7255c92a79edc7144661600ff36e360aa924a7a440e61006  ct77-py.jsonl' | sha256sum -c
