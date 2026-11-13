@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct55/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct56/**'
       - '.github/workflows/ct55-crosschar-audit.yml'
   workflow_dispatch:
 permissions:
@@ -47,3 +48,26 @@ jobs:
           print("CT55 finite-stage, toy positive/negative controls passed; no uniform global field algorithm tested")
           PY
           sha256sum ct55-python.txt ct55-javascript.txt
+      - name: CT56 sharp Serre bound and full-level pairing controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct56"
+          python3 -B "$base/ct56_serre_gate.py" > ct56-python.txt
+          python3 -O -B "$base/ct56_serre_gate.py" > ct56-python-opt.txt
+          cmp ct56-python.txt ct56-python-opt.txt
+          node "$base/ct56_independent.js" > ct56-javascript.txt
+          node --no-opt "$base/ct56_independent.js" > ct56-javascript-noopt.txt
+          cmp ct56-javascript.txt ct56-javascript-noopt.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          remove=str.maketrans('', '', ',()[]')
+          def normalise(path):
+              return [' '.join(line.translate(remove).split())
+                      for line in Path(path).read_text().splitlines()]
+          assert normalise('ct56-python.txt')==normalise('ct56-javascript.txt'), "independent arithmetic mismatch"
+          assert len(normalise('ct56-python.txt'))==13, "missing test rows"
+          assert "PASS: exact Serre" in Path('ct56-python.txt').read_text()
+          print("CT56 exact independent gates passed; necessity only, no global solver")
+          PY
+          sha256sum ct56-python.txt ct56-javascript.txt
