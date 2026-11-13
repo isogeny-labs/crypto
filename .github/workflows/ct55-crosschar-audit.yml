@@ -71,3 +71,13 @@ jobs:
           print("CT56 exact independent gates passed; necessity only, no global solver")
           PY
           sha256sum ct56-python.txt ct56-javascript.txt
+          python3 -B "$base/ct56_genus2_witness.py" > ct56-genus2-python.txt
+          python3 -O -B "$base/ct56_genus2_witness.py" > ct56-genus2-python-opt.txt
+          cmp ct56-genus2-python.txt ct56-genus2-python-opt.txt
+          node "$base/ct56_genus2_independent.js" > ct56-genus2-js.txt
+          node --no-opt "$base/ct56_genus2_independent.js" > ct56-genus2-js-noopt.txt
+          cmp ct56-genus2-js.txt ct56-genus2-js-noopt.txt
+          cmp ct56-genus2-python.txt ct56-genus2-js.txt
+          grep -q '"max_j":19' ct56-genus2-python.txt
+          grep -q '"smooth_models":640' ct56-genus2-python.txt
+          sha256sum ct56-genus2-python.txt ct56-genus2-js.txt
