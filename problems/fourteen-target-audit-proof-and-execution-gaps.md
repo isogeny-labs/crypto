@@ -328,7 +328,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90) | Higher-arity absolute irreducibility and general splits k≥3 |
 | 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius; actual F7allk torsion-image criterion iff3dividesk with infinite excluded-boundary counterexamples (32) | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112.  Basefield k1census now complete over95primefields/7013620models,29-declaration actual transport/lowtorsion gate. All-k extension census/rank/determinant still open. |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges  Basefield p<500prime/divisor native bounds now checked completely; generic geometric/Hasse and further extension-field scope remain. |
-| 4 Pairings/MOV/FR | Partial: actual composite controls and exhaustive F25Miller tables with actual quotient-domain bilinearity/nondegeneracy and base-restriction disproofs | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
+| 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
@@ -337,15 +337,14 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
-| 13 Independence | Pending prospective hosted continuation in ready [PR4072](https://github.com/isogeny-labs/crypto/pull/4072); no actual remote call yet | Frozen main-push two-language plan, unchanged main ledger, normal required merge gates then actual public hosted job/compiler/binary/output evidence. Original manual HTTP404 remains not-completed. |
+| 13 Independence | Requested actual separate-host primeS3 replay completed in public run43501438026, both languages match all6fields/942models/4188162triples; canonical export2/2/0excluded passes | Compiler/runtime/physical-host proof and independence from the same author remain open. Native attestation PCC-20261113-9b23b3not_covered/unsigned; original manualHTTP404 unchanged. |
 | 14 Negative control | Current control passes locally | Historical runs were not preregistered with it; no retroactive promotion |
 
-The accessible runtime has no callable second execution host. A fresh tool
-capability search did not expose a separate browser/remote execution host;
-the only environment service describes this task's existing managed runtime.
-The user has been asked for the missing host/workflow identifier, not for
-reapproval of the already authorized replay. No paid cloud resource has been
-launched. [pcc:unverified]
+The earlier direct-host capability search and manualHTTP404 were historical
+infrastructure gaps. A new frozen main-push workflow was admitted through
+normal PR/merge gates and actually ran on a standard hosted runner; see
+the separate-host packet below. No paid cloud resource was launched.
+[pcc:unverified]
 
 The source-reading/access gaps and missing mathematical formalizations above
 remain explicit. No claim that all 44 cited sources were read or all fourteen
@@ -703,19 +702,33 @@ signed standing remains unverified. Generic all-prime rank/determinant/Weil
 and the complete all-extension census remain open. [pcc:unverified]
 
 
-### Separate-host continuation admitted for infrastructure review
+### Actual k1 pairing-domain certificate
 
-Ready [PR4072](https://github.com/isogeny-labs/crypto/pull/4072) contains a
-prospective canonical protocol frozen at2026-11-13T19:27:20Z, hash
-3bd9bdec28e8a27d0c30bdf8a0448185b53f7a1b020f91d950149a754e5ac8ef,
-bound to public producer6925923d8b7eaa76058a98ffc6063b8c8e1eb8bd.
-The narrow main-based branch changes no ledger. Its new path-filtered
-main-push research job plans two fresh native calls: original C++
-arithmetic with a fixed S3-only entry and the unchanged separate Rust
-validator, exact published sourcee3658b4d6ffc6839e32bad1f5f732f796a2c8e4d.
-All source/entry/generated/compiler/binary/host/output/exits are recorded.
-Only a standard public runner, zero paid spend/no uploads or schedules.
-No actual hosted call has occurred; required checks and a permitted merge
-remain prerequisites. The auto-merge connector attempted disallowed
-squash; it did not merge. Original frozen records remain unchanged.
-[pcc:unverified]
+The new [actual k1 pairing certificate](../research/pairing_k1_audit_20261113/README.md)
+proves E/F7:y²=x³+3x+2 is cyclic9, with rational3torsion A and actual
+B=E(F7)/3E(F7) both order3 but zero natural A→B map. Prescribed actual
+Miller maps on A×B are bilinear/nondegenerate in both slots, including
+raw field-unit/cubes classes and the finalexponent2 cube-root target.
+Every actual point representative/every valid auxiliary is covered.
+Both rational-torsion restrictions are trivial, with direct Lean negations
+of nondegeneracy; every alternating biadditive map on actual A is trivial.
+Whole gate116/0failures/0trusted and exact local PCC-20261113-39a4c6 replay
+pass;23formal/config and12artifact pins match. Canonical divisor/valuation
+identification and generic MOV/Frey–Rück remain open; original FR94remains
+unread. Signed standing unverified. [pcc:unverified]
+
+### Actual separate-host continuation
+
+Item13 now has an actual [separate-host two-language S3 replay](../research/s3_host_replay_20261113/README.md).
+PR4072merged at43875b707caedfb7b8175de0961e219a1152bbb3 after required checks;
+first main-push run43501438026/job132147937956/attempt1 completes both
+fresh C++andRust calls. Each checks942models/4188162triples/244236zeros,
+with0directional discrepancies and0build/run/compare exits. Complete
+public host/compiler/binary/output records are retained. The canonical
+export validates with all file hashes:2planned/2attempted/2completed,
+0excluded; the prospective protocol3bd9bdec… and original records remain
+unchanged. Native PCC-20261113-9b23b3 is not_covered, signed standing
+unverified; actual separate-host evidence is not a compiler/runtime proof
+or independence from the same author. Existing11-declaration Lean actual
+quadratic-field/point-oracle foundation remains linked separately.
+Zero paid compute/uploads; no scientific clocks. [pcc:unverified]
