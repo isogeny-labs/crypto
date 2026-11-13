@@ -292,3 +292,124 @@ The next live question is constructive: can the coupled Hankel structure of the
 norm-lift constraints support nonlocal rank-one reconstruction? The differential
 operator is characterized here; that question remains a research target rather
 than a claimed algorithm or a reason to declare the full family impossible.
+
+## Cofactor-pencil reconstruction candidate, November13
+
+[NormDualPencil.lean](lean/NormDualPencil.lean) checks a sufficient reconstruction
+criterion. For supplied homogeneous quadratic forms
+q_t(w)=sum_ij Q_t(i,j)w_iw_j, consider a symmetric matrix pencil
+S(lambda)=sum_t lambda_t Q_t. The proposed search asks for a singular S with
+corank one, nonzero adjugate and all cofactor pairings
+sum_ij Q_t(i,j)*adj(S)(i,j)=0. It is not enough to find a determinant root
+[pcc:unverified].
+
+The generic Lean recovery theorem proves: if a supplied symmetric S has det S=0,
+rank(S)+1=dimension, nonzero adjugate and every required pairing zero, then a
+nonzero vector satisfying all q_t exists. It proves adjugate rank<=1 from actual
+matrix rank, derives every minor identity, then uses the scaled outer-product
+extraction. No square root or assumed rank-one primal witness is used. The
+recovery theorem itself does not require S to belong to a particular pencil;
+restricting the search to the norm-derived pencil is the algorithmic proposal
+[pcc:unverified].
+
+For the two-support norm after eliminating the target branch, w=(v,u) gives
+
+    q1 = v²-Uu²,       q2 = 2yvu-Vu²,
+    Q1 = [[1,0],[0,-U]],     Q2 = [[0,y],[y,-V]],
+    S(a,b) = [[a,by],[by,-aU-bV]].
+
+Here U=q+x1+x2 and V=q²+curve_a+qU-x1*x2. Lean proves [pcc:unverified]
+
+    det S = -Ua²-Vab-y²b²,
+    <Q1,adj S> = -2Ua-Vb,
+    <Q2,adj S> = -Va-2y²b.
+
+These are actual determinant and adjugate formulas, not assumed stationarity
+properties [pcc:unverified].
+
+Two exact controls use y²=x³+2x+2 over F17 with support points (5,1),(6,3):
+
+| Target | U,V | S(3,1) | Adjugate-column slope | Actual norm |
+|---|---|---|---|---|
+| Q=(10,6) | 4,10 | [[3,6],[6,12]] | 15 | Satisfied; both cofactor pairings zero |
+| Q=(0,6) | 11,6 | The same matrix | The same15 | Not satisfied; a cofactor pairing is nonzero |
+
+Both matrices have determinant zero and nonzero adjugate. Normalizing its
+second column gives slope15; Lean checks the actual positive norm and the
+actual negative norm failure. These are finite kernel-checked controls, not a
+DLP-solving or empirical timing campaign [pcc:unverified].
+
+A separate generic higher-corank control uses S=diag(1,0,0) in the pencil of
+coordinate-square forms. It is nonzero and singular, adj S=0, and every
+cofactor pairing vanishes, but the coordinate quadrics have no nonzero common
+witness. This control is not an elliptic norm instance. It shows why the
+corank/nonzero-adjugate checks cannot be omitted [pcc:unverified].
+
+![Recovery certificate and both rejection controls](dual-pencil-report/certificate.svg)
+
+[Two-page PDF](dual-pencil-report/report.pdf), editable
+[DOT source](dual-pencil-report/certificate.dot) and
+[LaTeX source](dual-pencil-report/report.tex).
+
+| Statement | Declaration | Formal scope |
+|---|---|---|
+| Rank<=1 supplies minor identities | NormDualPencil.minorsOfRank | Field, finite matrix |
+| Corank one bounds adjugate rank | NormDualPencil.adjugateRank | det S=0 and rank(S)+1=dimension |
+| Cofactor certificate recovers quadratic witness | NormDualPencil.recoverQuadratic | Symmetry, previous rank condition, nonzero adjugate and all supplied pairings zero |
+| Actual two-support determinant | NormDualPencil.pencilDet | Any field |
+| Actual two-support cofactor pairings | NormDualPencil.pencilCofactors | Any field |
+| Same spectral matrix for two targets | NormDualPencil.sameMatrixDifferentTargets | Explicit F17 settings |
+| Positive normalized column and norm | NormDualPencil.positiveRecoveredSlope, NormDualPencil.positiveRecoveredNorm | Explicit positive F17 target |
+| False spectral root | NormDualPencil.falseRoot | det0, nonzero adjugate, nonzero required pairing |
+| False root's actual norm failure | NormDualPencil.falseRootNormResidual | Explicit negative F17 target |
+| Higher-corank negative control | NormDualPencil.spuriousControl | Explicit coordinate-quadrics pencil over F17 |
+
+The new entry-minor constructor is a public API addition to RankOneExtraction;
+all earlier extraction/norm/filter theorem declaration hashes remain unchanged.
+No earlier mathematical definition or proof body was changed [pcc:unverified].
+
+The remaining research obligations are distinct. The higher-dimensional
+norm-to-pencil bridge and its nonzero norm check need faithful formalization;
+completeness of the restricted-pencil certificate needs a general proof.
+A constructive finder must supply a2^{o(n)} bit bound, n=ceil(log2 r).
+Polynomial determinant evaluation, a successful
+small fixture, or a singular-point finder returning higher-corank points does
+not discharge either obligation. No such finder or complexity theorem is
+supplied here [pcc:unverified].
+
+Build005 passed3147 jobs. Actual tracked-source audit passed62 declarations
+with0 additional trusted axioms. Fresh import-inclusive replay exited0; the receipt is in
+dual-pencil-evidence/fresh-status.json. Eight canonical unsigned
+bindings are in [dual-pencil-evidence/claim-pins.json](dual-pencil-evidence/claim-pins.json).
+Source71f1bfb22 and file hashes in dual-pencil-evidence/source-inputs.sha256
+[pcc:unverified].
+
+The existing native issuer/checker accepted the determinant expression record
+[IDC1h25bf8a5444f4976f](dual-pencil-evidence/det.identity.json) and cofactor
+expression record [IDC1h76b1a590e132b252](dual-pencil-evidence/cofactors.identity.json).
+Each uses32 statement-derived plus32 extra stream points and binds the formal
+source hash. These supplement only the two-support expression identities;
+they do not execute Lean or establish general search, completeness or success
+probability. All producer standing remains unsigned [pcc:unverified].
+
+Reproduce:
+
+```sh
+lake -d research/prime_norm_rank_20261112/lean build
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormDualPencil
+cargo run --release --locked --manifest-path research/prime_norm_rank_20261112/certificate/Cargo.toml --bin norm-dual-pencil -- research/prime_norm_rank_20261112/lean/NormDualPencil.lean /tmp/norm-dual-pencil-identities
+```
+
+Sources reviewed: pinned Mathlib Matrix.Adjugate/Matrix.Rank, actual NormRank
+and NormLift, previous common-kernel/jet-completion READMEs and their source
+scope. KB unavailable; no novelty asserted for cofactor or matrix-pencil
+methods. The earlier tensor-origin jet proposal and this norm-pencil candidate
+have different variables and correctness obligations. No old finite failure is
+used as a blanket rejection. No paid run, timing experiment, new benchmark row
+or historical graph change; this addition has its own source-linked diagram.
+
+The next concrete test is recorded separately as the unproved
+[quotient-moment hypothesis](dual-pencil-report/NEXT_HYPOTHESIS.md), with an
+explicit three-support control prediction. No prediction there is a measured or
+kernel-checked result yet, and the construction takes A,B as input for a
+completeness argument rather than providing a public-input finder.
