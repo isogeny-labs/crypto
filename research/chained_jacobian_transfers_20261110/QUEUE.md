@@ -1,3 +1,20 @@
+Current actual different-product52 checkpoint: PUBLIC_TARGET_CHECKPOINT.md.
+
+
+## 2026-11-13T20:50:40.168264+00:00 — actual different-product Jacobian52 and complete data handoff
+
+Consumer3de8c174/265paths/bff7b2/6876d6 normallypublished0. Actual source13de87bd/writtenb9a91f/six partial bindings/report1ea6c9;independentfullb2b04d640guards/13phases/four actual controls;TEN-workflow CI5fee41/all84native50canonicaldigests settled. No unchanged redispatch. [pcc:unverified]
+
+Fresh Aprime model9722d7/all2478guards matchesALL6 old equations/kernels/origins/quotients,all135productkernels/4096pairings/all6newHLP models smooth,THREEsquare(1,0)(1,1)(2,1)+THREEnonsquare retained. Native01e1e62b and API02_9561ce/all2485guards giveALL3complete newPhiNorm/both2 and actual F=PhiNew gamma Nold,G=PhiOld delta NormNew BOTH52/all224old+224newCclasses/36source/public5/exactell/exceptional controls. Reusable tagged original odd-source recovery159985 delta NormNew passes/manualAPI images match/no scalar witness. RationalF kernels2,4,2/G2,2,2/allC4 retained. [pcc:unverified]
+
+Written1fd6e7 audits global Ciani/V4/Weil restriction/polarizations/both52/degree140608 and each new F223 endpoint different from old via disjoint-j products+old unique2kernel. Two faithful exact partial bindings4d1338/95d4e6 passbothoriginalgates/no axioms/zero trusted,52total. First redundant-rfl failurec4ffa9 whole retained. TWO59335-byte final report pages ALLinspected13cfa7. Actual geometric interpretation remains written/partial formal. [pcc:unverified]
+
+NINE new whole closed archives+NINE complete indices+TWO complete native fixtures are prepared as20 objects. Fresh currentguard06 holds 3241 current scientific/source/proof/report/fixture/physical640 inputs until exact genuine botFF/finalguards. Oldguard05 historical3096 released/NOT reused. Whole control-plane API/logXZ/push/FF/manifests remain direct,no recursive archive. All original bytes preserved;remote availability pending. [pcc:unverified]
+
+Next actual unchanged publisher/remote-byte replay/exactFF/genuineconsumerprojections,then source checkpoint and strict clean independent current new-model/map replayCI. After that,transport oldGold through gamma on2torsion for full geometric52kernel types and/or actual new-target publicIC/cost coverage under fresh protocols. Original benchmark S3checkpoint/livebudget/capacity/complete costs/strongest refs remain unresolved;no speed claim. Root authentic fixture/main append-only ledger/signing/reviews/conflict/fullgeometry/vault8edec422/KBecdb gaps persist.20:04root3877conflicting/1519readymergeable;next21:00routine unlessmaterialsignal. Continueaftereachrung. [pcc:unverified]
+
+Earlier entries remain historical.
+
 Current checkpoint: actual seventeen-capture publication completed; new kernel/collapse source next.
 
 
