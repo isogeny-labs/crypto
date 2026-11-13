@@ -2,7 +2,7 @@
 
 - **Status:** investigating
 - **Kind:** construction/proof gap; separate unavailable KB/compute-admission capabilities
-- **Affected work:** [norm derivation](../research/prime_norm_rank_20261112/DERIVATION.md), [next finder](../research/prime_norm_rank_20261112/NEXT_FINDER.md), [public-jet report](../research/prime_norm_rank_20261112/public-jet-report/README.md), [actual group bridge](../research/prime_norm_rank_20261112/group-bridge-report/README.md)
+- **Affected work:** [norm derivation](../research/prime_norm_rank_20261112/DERIVATION.md), [next finder](../research/prime_norm_rank_20261112/NEXT_FINDER.md), [public-jet report](../research/prime_norm_rank_20261112/public-jet-report/README.md), [actual group bridge](../research/prime_norm_rank_20261112/group-bridge-report/README.md), [membership projection](../research/prime_norm_rank_20261112/membership-elimination-report/README.md)
 - **Next action owner:** ongoing research session
 - **Last updated:** 2026-11-13
 
@@ -92,3 +92,20 @@ base. This closes the actual certificate-to-group/supplied-label scalar
 obligation for that stated family; it does not create those successful
 branches or their labels. Next action remains an actual discrete finder
 and a complete expected bit-cost bound [pcc:unverified].
+
+2026-11-13 actual membership-input projection: [report](../research/prime_norm_rank_20261112/membership-elimination-report/README.md),
+sourceccd9e23f1. A bounded raw-source audit keeps the prior RR m5/t4 cell
+unfinished: its timeout/interrupted runs do not give a completed negative
+result. The new construction recovers19 auxiliary variables from four actual
+function coefficients and checks all25 original equations symbolically.
+The remaining five constraints have degree24; expanded input grows from1554
+to191962 bytes. Sixteen universal Lean statements cover target/norm division,
+unique actual tower recovery and degree guards; the concrete compiler binding
+is a separate unsigned native check, claimPCC-20261113-b465d8 [pcc:unverified].
+
+This is an exact representation trade, with no solver or cost comparison yet.
+Next discriminating candidate is a module-aware/circuit-preserving solver
+that uses the projection without paying for expansion, compared on identical
+inputs with the strongest original formulation. It must still produce actual
+successful public inputs and meet the original complete expected bit-cost
+criterion. No new paid or solver campaign was launched [pcc:unverified].
