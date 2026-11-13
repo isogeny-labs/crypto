@@ -100,10 +100,10 @@ Run from repository root:
 
 Local normal/optimized Python and Node independently agreed: 10 quotient models, all 100 ordered rank results, zero 10 complementary maps, and rank two for 80 noncomplementary cross maps. The full-dual Python source recovers all 31 F4 classes and 6 independent target samples; normal and optimized outputs match. GitHub Actions integrated exact-head CI and independent scientific PCC certification must be checked separately. Bounded local validation is not a project-wide cargo or cold ECDLP benchmark.
 
-Local source SHA256 checks before publication:
-* ct66_full_dual.py: 8dc9a851c8c885833ac422012b574400a2a39c27ffaa0f4b36f337fac5242b80
-* ct66_dual_crossfactor.py: 711d3678a67157fd9b4e787ea69409a9c6c0b8e35c75ea7540c21bf9097e0556
-* ct66_dual_crossfactor_independent.js: 55de687f2b6504a62c7182a74e504670c0d143c1064656b5ac2134a568f41be6
+Published Git blob SHAs (these pin the exact source rather than local pre-publication draft hashes):
+* ct66_full_dual.py: `c689f1761167631e15e43c8ba343cf6ee90c34cf`
+* ct66_dual_crossfactor.py: `f8e3391fe456940a04850b67bfa55d30f7d3667f`
+* ct66_dual_crossfactor_independent.js: `682da40d79a8ec5aa532c8e3787d7997812d31fd`
 
 ## Literature, KB gate and next scientific dependency
 
