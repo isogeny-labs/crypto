@@ -848,7 +848,9 @@ fn main() {
         Some("linsummary") => cmd_linsummary(&args),
         Some("s4check") => cmd_s4check(&args),
         Some("analyze") => analysis::cmd_analyze(&args),
-        _ => eprintln!("usage: ic_algebraic_floor run|solve|truth|linpool|linsummary|s4check|analyze …"),
+        _ => eprintln!(
+            "usage: ic_algebraic_floor run|solve|truth|linpool|linsummary|s4check|analyze …"
+        ),
     }
 }
 
@@ -889,8 +891,7 @@ fn cmd_s4check(args: &[String]) {
             .map(|p| cell.inst.fast.lift(p))
             .collect();
         let xs_base: Vec<u64> = base.iter().map(|p| p.x).collect();
-        let lin =
-            linear21::Linear21::new(gf, &cell.inst.fast, n, d as usize, b, base);
+        let lin = linear21::Linear21::new(gf, &cell.inst.fast, n, d as usize, b, base);
         let s4 = |x: [u64; 3], u: u64| -> (u64, u64) {
             let e1 = x[0] ^ x[1] ^ x[2];
             let e2 = gf.mul(x[0], x[1]) ^ gf.mul(x[0], x[2]) ^ gf.mul(x[1], x[2]);
@@ -946,8 +947,11 @@ fn cmd_s4check(args: &[String]) {
             "witnesses": witnesses, "s4_zero": zero, "control_zero": ctl_zero,
             "nonaffine_part_nonzero": rest_nonzero}));
     }
-    std::fs::write(&out, serde_json::to_string_pretty(&json!({"cmd": "s4check", "cells": recs})).unwrap())
-        .unwrap();
+    std::fs::write(
+        &out,
+        serde_json::to_string_pretty(&json!({"cmd": "s4check", "cells": recs})).unwrap(),
+    )
+    .unwrap();
 }
 
 // ── linsummary: the pool-level table of the linear arm against the floor ──
