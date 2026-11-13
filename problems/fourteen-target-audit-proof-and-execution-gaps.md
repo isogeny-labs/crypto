@@ -332,8 +332,8 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
-| 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks | General n!dⁿ bound and decomposition-system hypotheses |
-| 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal and actual source-field/group Lean certificates | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement, minimal cutoff/exact length8 |
+| 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks; literal JV actual quotient dimension/F-length8 versus geometric support1 | General n!dⁿ bound and decomposition-system hypotheses |
+| 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
@@ -577,4 +577,30 @@ statement; this new versioned packet supplies the additional semantic bridge.
 Source whole-curve order1,029,583/scalar relations, the second split example,
 minimal cutoff/exact length8, generic JV and internal F4 refinement remain
 open. No native execution, independent-host or corpus status is promoted.
+[pcc:unverified]
+
+### 2026-11-13 exact JV coordinate algebra and sharp cutoff
+
+The [new exact-algebra project](../research/jv_hilbert_audit_20261113/README.md)
+has a final51-declaration whole gate with zero failures/trusted-native
+exceptions. An actual coefficient functional annihilates every polynomial
+multiple of each literal source generator but takes h³ to1. Its complete
+multiplication annihilator is proved to be an ideal containing the source
+ideal. Thus h³ is outside that ideal and the earlier monomial cutoff4 is
+sharp: the all-high-monomials property at thresholdd holds iff4≤d.
+[pcc:unverified]
+
+All64dual identities prove independence of the proposed actual quotient
+classes. All24coordinate multiplication relations, polynomial induction
+and quotient surjectivity prove spanning. Lean constructs the actual
+basis(1,x,y,h,xh,yh,h²,h³), yielding finrank8 and Module.length(F101,A)=8.
+Over every characteristic101 field, the source equations hold exactly
+at the origin. This separates geometric support1 from scalar-field
+algebra length8, providing a further item8 control. [pcc:unverified]
+
+The earlier39/59packets and176native artifact pins remain unchanged.
+This closes the literal monomial-minimality and scalar-field dimension
+gap; it does not prove internal F4/solving degrees, a canonical graded
+Hilbert-function identification or generic JV/FGHR statements. Source
+whole-curve order/scalar relations and all14 broader obligations remain.
 [pcc:unverified]

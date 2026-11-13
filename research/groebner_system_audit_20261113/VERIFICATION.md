@@ -22,3 +22,12 @@ declarations, zero failures and zero trusted-native exceptions. It confirms
 the source example without proving whole-curve order/scalar relations,
 exact Hilbert length8, generic regularity or internal F4 execution.
 All issued native artifact pins remain unchanged. [pcc:unverified]
+
+The [exact algebra project](../jv_hilbert_audit_20261113/README.md) adds
+a51-declaration Lean certificate constructing the actual eight-element
+quotient basis and proving its scalar-field dimension/length8, geometric
+support1 and sharp monomial cutoff4. It confirms these finite algebra
+features without using the native GB/Hilbert output as a premise.
+Canonical graded Hilbert-function identification and internal F4 degrees
+remain separate. No native artifact or issued source plan is changed.
+[pcc:unverified]
