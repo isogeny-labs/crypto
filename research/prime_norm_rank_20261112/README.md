@@ -163,8 +163,8 @@ They provide no matrix-search algorithm or search-time theorem
 Source commit9cba2446b. Default build004 passed3143 jobs; actual tracked-source
 project audit passed28 declarations with0 additional trusted axioms. Builds002
 and003 are preserved as failed module-interface attempts, not proof evidence.
-Fresh import-inclusive replay status is recorded in
-norm-lift-evidence/fresh-status.json when completed [pcc:unverified].
+Fresh import-inclusive replay exited0; its receipt is recorded in
+norm-lift-evidence/fresh-status.json [pcc:unverified].
 
 Native identity certificate
 [IDC1h2e7ff8ae9d53fc24](norm-lift-evidence/norm-lift.identity.json) covers the
