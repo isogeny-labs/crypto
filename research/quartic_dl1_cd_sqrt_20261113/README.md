@@ -7,6 +7,11 @@ leaderboard or `benchmarks/README.md` row moves (validation gate, AGENTS.md).
 Scope: the GHS-weak family `E0/F_{q^3}`, `#E0(K) = 4 ell`, of `research/quartic_n4v2_20261020` only.
 Not generic, prime-order or standard curves.
 
+> **Follow-up ([`cd_sweep/`](cd_sweep/README.md), frozen before data):** c_D = 1.7 and 1.8 are robust
+> improvements for DL at every k = 18..22 even with additions priced at 1 M-eq (1.7: 0.87–0.88 there,
+> 0.73–0.75 with additions free, CPU 0.72–0.91); 1.55, the rule below, is not robust. Recommended:
+> c_D = 1.7 for k >= 18 `[pcc:unverified]`.
+
 ![ratio](ratio.png)
 
 *Left: cold M-eq of each change divided by the frozen configuration on the same instance (frozen grid

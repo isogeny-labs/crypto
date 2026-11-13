@@ -33,3 +33,17 @@ Local run on the session container (owner decision after the monthly IsoLab budg
 
 == Next
 A c#sub[D] between 1.55 and 2.0, or a lighter cycle basis, to keep the relation saving without the matrix growth; a compiled chain; then a validator report before any leaderboard change.
+
+#pagebreak()
+= Follow-up: c#sub[D] = 1.7 and 1.8 (cd_sweep/, protocol frozen before data)
+60 units at k = 18–22, seeds 1–3, one unit at a time; 90 records reproduce the main study's c#sub[D] = 2.0 and 1.55 units exactly; all verified, no retries. Pre-registered robustness: additions priced at 0.5 and 1 M-eq.
+
+#table(columns: 5, align: (left, right, right, right, left),
+  [DL vs c#sub[D] = 2.0], [additions free], [at 0.5 M-eq], [at 1 M-eq], [CPU (diagnostic)],
+  [c#sub[D] = 1.55], [0.62–0.71], [0.88–0.92], [1.00–1.04 (not robust)], [0.76–1.15],
+  [*c#sub[D] = 1.7*], [0.73–0.75], [0.82–0.83], [*0.87–0.88*], [0.72–0.91],
+  [c#sub[D] = 1.8], [0.81–0.82], [0.87], [0.89–0.90], [0.72–0.99],
+)
+Headline: c#sub[D] = 1.7 and 1.8 are robust improvements for DL at every k = 18–22 (below 1 at every seed with additions free and at 1 M-eq); 1.7 is the best once additions cost anything. Mean cycle-row weight: 24–28 (2.0), 84–90 (1.55), 41–48 (1.7), 32–38 (1.8). DL1 is robust at 1.7 and 1.8; D (plain Lanczos) is dearer at every c#sub[D] below 2.0. Recommendation: c#sub[D] = 1.7 for k ≥ 18.
+
+#figure(image("cd_sweep/sweep.png", width: 100%), caption: [DL (solid), DL1 (dotted), D (dashed) against c#sub[D] = 2.0 by addition price.])
