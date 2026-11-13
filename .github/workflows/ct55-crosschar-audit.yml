@@ -4,6 +4,7 @@ on:
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct55/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct56/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct57/**'
       - '.github/workflows/ct55-crosschar-audit.yml'
   workflow_dispatch:
 permissions:
@@ -81,3 +82,19 @@ jobs:
           grep -q '"max_j":19' ct56-genus2-python.txt
           grep -q '"smooth_models":640' ct56-genus2-python.txt
           sha256sum ct56-genus2-python.txt ct56-genus2-js.txt
+
+      - name: CT57 rational-isogeny group action and local versus global line controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct57"
+          python3 -B "$base/ct57_borel_audit.py" > ct57-python.txt
+          python3 -O -B "$base/ct57_borel_audit.py" > ct57-python-opt.txt
+          cmp ct57-python.txt ct57-python-opt.txt
+          node "$base/ct57_independent.js" > ct57-js.txt
+          node --no-opt "$base/ct57_independent.js" > ct57-js-noopt.txt
+          cmp ct57-js.txt ct57-js-noopt.txt
+          cmp ct57-python.txt ct57-js.txt
+          grep -q 'local_not_global=PASS' ct57-python.txt
+          grep -q 'no proof of Mazur claimed' ct57-js.txt
+          sha256sum "$base/ct57_borel_audit.py" "$base/ct57_independent.js"
