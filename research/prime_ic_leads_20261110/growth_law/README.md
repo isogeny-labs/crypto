@@ -71,7 +71,12 @@ degree-`c` closure applies the top relation only when multiplying by one of the 
 when bits `j … t − 1` of `e` are all set. The rule multiplies only elements of degree `< c`, whose
 monomials have `pop(e) ≤ c − 1`, so `t − j ≤ c − 1`. ∎
 
-**Consequence.** Replace `R_t` by the twisted algebra `F_p(ζ)[z]/(z^K − ζ)`: same monomial basis,
+**Correction (2026-11-13).** The consequence below suggested twisted-algebra points as a route to a
+pseudo-solution. That route is empty: the twisted algebra is isomorphic, degree and closure included,
+to the untwisted one under `z_i ↦ λ_i z_i` with `λ_i^K = ζ_i`, so a twisted curve point is a grid zero
+of a rescaled generator (`lower_bound/README.md`, Proposition 1). The paragraph is kept as written.
+
+**Consequence (as first written).** Replace `R_t` by the twisted algebra `F_p(ζ)[z]/(z^K − ζ)`: same monomial basis,
 same grading, same rewriting except `y_{t−1}² = ζ`. A degree-`c` closure computation that never
 touches the top window is identical in both. Over the twisted algebra, any point of the curve
 `f = 0` with `z_i^K = ζ_i` is a true solution, so `1` never enters. A lower bound `d_F > c` therefore
@@ -160,6 +165,17 @@ monotonicity and the intercepts, and the fit uses the observed step positions (`
 
 ## 6. What remains open, stated exactly
 
+**Update 2026-11-13** (`lower_bound/README.md`, written by a delegated agent and checked by the main
+session; proofs in prose, `[pcc:unverified]`): Proposition 1 (twist = rescaling, which retires the
+twisted-point route of §2); Proposition 2 (an explicit candidate pseudo-solution `λ_f(g) =
+Σ_{x∈μ_K²} x₁x₂ g(x)/f(x)`, which kills every `m·f` with `m` not the top monomial, has a residue form as
+a weighted sum over curve points, and has `λ_f(1) ≠ 0` generically); Theorem 3 (a two-layer support
+criterion that implies `d_F > c`); Lemmas 4 and 5 (no multiple of `f` has degree ≤ 1; information-carrying
+falls go through all-ones carries). The lower half of Conjecture G for `W = 1`, `d_F(1, t) ≥ 3 + ⌊t/4⌋`,
+follows from two stated conjectures: Λ (`λ_f` kills `V_c` whenever `1 ∉ V_c`) and C (the
+degree-`(c − 1)` multipliers occupy levels `0..4(c − 2) − 2` plus one restricted bit). Its
+supporting toy computations were Python and are not admitted (see that note).
+
 - **A lower bound that grows with `t`.** By Theorem 2 it needs, for `c = d_F − 1`, a functional on
   `R_{≤c}` that vanishes on `V_c(f)` and not on `1`, multiplicative except through the top `c − 1`
   levels. Twisted-algebra points (§2) are multiplicative everywhere but are not grid points; the
@@ -175,13 +191,21 @@ monotonicity and the intercepts, and the fit uses the observed step positions (`
 
 | result | statement | Lean | status |
 |:--|:--|:--|:--|
-| Theorem 1 | monotone in `t` (fixed system); generic form via Thm 3 | none | proved in prose |
-| Theorem 2 | top window | none | proved in prose |
+| Theorem 1 | monotone in `t` (fixed system); generic form via Thm 3 | `closure_image`, `closure_one` (abstract core), `pop_mod_le` (degree hypothesis on monomials), `lean/GrowthLaw.lean` | abstract core and monomial lemma checked (2026-11-13); instantiation on the concrete tower algebras not formalised (needs Mathlib) |
+| Theorem 2 | top window | `top_window`, `lean/GrowthLaw.lean` | checked (2026-11-13) |
 | Theorem 3 | generic value; `S₃` support = width-2 box | none | proved in prose (no probability bound) |
 | Lemma, Thm 4 | `ffd = D + 1` under a common top variable; `ffd(W)` | none | proved in prose; `W = 2` by D3 |
 | Conjecture G | growth law | — | fitted, open |
 
-Formalization was not done in this session. The container has no Lean toolchain (`lean`, `lake` and
+**Update 2026-11-13.** `lean/GrowthLaw.lean` (core Lean 4.35.0, no Mathlib, pinned in
+`lean/lean-toolchain`) proves `pop_mod_le`, `top_window`, `closure_image` and `closure_one`.
+`tools/lean/proof-gate.sh` reports PASS, 15 theorems, 0 trusted; the four named theorems use only
+`propext`, `Classical.choice`, `Quot.sound` (the closure theorems use none); receipt in
+`lean/receipts/`. Missing bridge: the instantiation with the concrete group algebras and the identity of
+the inductive `Closure` with the subspace definition, which need polynomial and linear-algebra
+libraries. The Lemma of §4 is not formalised.
+
+As first written: formalization was not done in this session. The container has no Lean toolchain (`lean`, `lake` and
 `elan` are not installed), and the repository's Mathlib-based projects
 (`research/guarded_fall_degree_20261028/formal`) would need a Mathlib cache larger than the remaining
 disk allowance. The faithful Lean statements are small: Theorem 1 is a lemma about the least
