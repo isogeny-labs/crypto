@@ -1,0 +1,40 @@
+{
+ "schema": "validation-gate/v1",
+ "status_note": "DRAFT, not in the evidence directory: written by the validator for use after the artifact set is committed. Admission is withheld because the raw data and the measuring code are not in the repository.",
+ "replay_certificate": {
+  "path": "../validation_20261113/out/gate_draft/replay-certificate.json",
+  "sha256": "0c6eb48b899897e4369a7120541797cd375ca920a6faf3996f9700f8864a5184"
+ },
+ "validator_report": {
+  "path": "../validation_20261113/out/gate_draft/validator-report.json",
+  "sha256": "f65b8a1c7ae276972e9616d56e5e0a50d5af3836ffe13bf2df8972e1301a8f14"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "kind_note": "tuned negation-map walk (RhoWalk::negation); prime-field curves, no Frobenius; no curve has j = 0 or 1728 (validator-checked), so no automorphism fold exists; the plain tuned walk is also measured and the best of the two is reported per price",
+  "protocol": "research/negation_remeasure_20261113/PROTOCOL.md (frozen.sha256 8771b2dc...), \"Matched rho\"",
+  "unit": "group operations of the arm's own group (1 GAE each) + w x native operations (IC: mul mod p, mul mod r and the recorded arms' counters; rho: canonicalisations, partition hashes, DP lookups, DP inserts, word operations). IC arms on J(C) count a Cantor step as 1 GAE although it costs 5-6 elliptic additions (best-of-N), so every IC/rho ratio is understated; the IC-above order is conservative.",
+  "binary_or_process": "src/bin/negation_remeasure.rs: one process runs every IC arm and the rho walks of a section",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "cell": "v3, p = 1619, recorded arm (all 162 arm-rows in ../validation_20261113/out/recompute_tables.json)",
+  "gae_band": {
+   "0": {
+    "ic": 34521.0,
+    "rho": 91.875
+   },
+   "0.1": {
+    "ic": 94893.1,
+    "rho": 109.8125
+   },
+   "1": {
+    "ic": 638242.0,
+    "rho": 271.25
+   }
+  },
+  "order_holds_across_band": true,
+  "order_note": "IC above the negation rho at 0, 0.1 and 1 in 156 of 162 arm-rows; the other 6 (cover first-collision arms, no native counters emitted) are unresolved lower bounds and are not ranked; no row is below."
+ }
+}
