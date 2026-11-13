@@ -325,7 +325,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
-| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0 | Higher-arity absolute irreducibility, permutation invariance beyondm4 and arbitrary-split normalization |
+| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5 | Higher-arity absolute irreducibility/permutation symmetry and general splits k≥3 |
 | 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112.  Basefield k1census now complete over95primefields/7013620models,29-declaration actual transport/lowtorsion gate. All-k extension census/rank/determinant still open. |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges  Basefield p<500prime/divisor native bounds now checked completely; generic geometric/Hasse and further extension-field scope remain. |
 | 4 Pairings/MOV/FR | Partial: actual composite controls and exhaustive F25Miller tables with actual quotient-domain bilinearity/nondegeneracy and base-restriction disproofs | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
@@ -651,3 +651,26 @@ not the qualified Semaev source or the actual canonical family. Binding
 this identity to the canonical recursive polynomials, all variable maps
 and arbitrary splits remains an open item1 obligation, as do higher
 symmetry and absolute irreducibility. [pcc:unverified]
+
+### 2026-11-13 actual source-order two-step normalization
+
+The [new reassociation project](../research/semaev_reassociation_audit_20261113/README.md)
+proves equality of the actual two existing resultantStep polynomials and
+the balanced source-ordered expression with existing lastPolynomial(S4).
+The actual recursivePolynomial W(n+2) is identified with this expression
+at every stage, so the k=2/S4-block split is normalized for every arity≥5.
+All declared sizes are retained; zero P, repeated coordinates and every
+characteristic are included. The source-order theorem uses actual curve
+b-invariants; no nonsingularity is needed for the polynomial identity.
+Whole gate60/0/0 and exact local PCC-20261113-cc3069 replay pass; signed standing remains unverified. [pcc:unverified]
+
+Independent coordinates and a generic leading coefficient are specialized
+by actual ring homomorphisms, and the generic triple evaluation is proved
+the identity on the formal polynomial ring. Actual-curve S4 middle
+transposition and cyclic rotation close the source argument-order gap;
+earlier within-pair/block swaps alone did not supply this bridge. The
+direct rational b=(0,0,0,1) negative control disproves an unrestricted
+independent-b extension, and Lean proves no rational Weierstrass curve
+has these coefficients. No qualified source theorem is refuted.
+General splits k≥3, higher permutation invariance and higher absolute
+irreducibility remain open. [pcc:unverified]
