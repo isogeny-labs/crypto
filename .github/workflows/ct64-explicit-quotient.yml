@@ -96,6 +96,7 @@ jobs:
               if not x:raise AssertionError(msg)
           ok(a['source_31_classes']==31 and a['target_31_torsion_pairs_tested']==6,'full dual/inverse')
           ok(a['dual_scalar']==2 and a['inverse_scalar_mod31']==16,'dual norm scalar')
+          ok(a['ramified_extension_order2'] is True,'F1024 ramified order-two divisor')
           ok(a['types']=={'zero':1,'linear':6,'split':12,'repeated':6,'nonsplit':6},'F1024 divisor supports')
           ok(a['quotients']==[[941,20,336],[941,20,714]],'complementary quotient equations')
           ok(b['rank_matrix']==c['rank_matrix'],'independent ordered cross-factor ranks')
