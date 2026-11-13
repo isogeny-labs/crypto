@@ -519,3 +519,26 @@ No paid compute, benchmark row or old graph was changed.
 The unproved [next general proof outline](quotient-moment-report/NEXT_GENERAL_PROOF.md)
 records the CRT coefficient-reciprocity statement and the remaining radical and
 branch-restriction obligations separately from these checked results.
+
+## 2026-11-13: general CRT and polynomial block radical
+
+[Continuation report](crt-report/README.md) / [PDF](crt-report/report.pdf):
+Lean modules NormCRTReciprocity and NormPairingRadical replace the constant-B
+control's missing reciprocal-pairing dependency with general symbolic CRT,
+weighted remainder and exact polynomial radical components. Under explicit
+monic/Bezout/degree-gap hypotheses, the full block radical is precisely(cF,dH).
+An abstract branch-test lemma identifies when restriction adds no radical
+vectors. Final tracked-source gate covers104 declarations, zero failing/extra
+trusted; both fresh replays include imports. All claim standing remains
+unsigned. Matrix/pencil assembly and a public-input finder remain separate
+[pcc:unverified].
+
+## 2026-11-13: actual functional coefficient-pencil identity
+
+[Functional report](functional-report/README.md) / [PDF](functional-report/report.pdf):
+NormPencilFunctional derives mu(G)=0 from the supplied actual scaled norm
+witness and gives the moment-weighted expansion in the actual coefficient
+constraints for every admissible trial norm. Moment linearity and norm degree
+bounds are explicit. This completes the functional pencil-membership step;
+concrete coefficient matrices, branch/corank assembly and public-input finder
+remain separate. Producer standing is unsigned [pcc:unverified].
