@@ -1,0 +1,38 @@
+name: CT55 cross-characteristic finite-stage audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct55/**'
+      - '.github/workflows/ct55-crosschar-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct55:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python and independently implemented JavaScript controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct55"
+          python3 -B "$base/ct55_universal.py" > ct55-python.txt
+          python3 -O -B "$base/ct55_universal.py" > ct55-python-opt.txt
+          cmp ct55-python.txt ct55-python-opt.txt
+          node "$base/ct55_independent.js" > ct55-javascript.txt
+          node --no-opt "$base/ct55_independent.js" > ct55-javascript-noopt.txt
+          cmp ct55-javascript.txt ct55-javascript-noopt.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          py=Path("ct55-python.txt").read_text().splitlines()
+          js=Path("ct55-javascript.txt").read_text().splitlines()
+          # Separate arithmetic implementations must agree on all 12 binary degrees.
+          assert [s.split()[-2:] for s in py[10:22]] == [s.split()[-2:] for s in js[10:22]]
+          assert len(py)==23 and len(js)==23
+          assert "parity mutant rejected" in py[-1]
+          assert "parity mutant rejected" in js[-1]
+          print("CT55 finite-stage independent check passed; no global field construction tested")
+          PY
+          sha256sum ct55-python.txt ct55-javascript.txt
