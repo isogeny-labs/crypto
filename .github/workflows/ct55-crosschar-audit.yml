@@ -1,4 +1,4 @@
-name: CT55–60 cross-characteristic finite-stage audit
+name: CT55–61 cross-characteristic finite-stage audit
 on:
   pull_request:
     paths:
@@ -8,6 +8,7 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct58/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct59/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct60/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct61/**'
       - '.github/workflows/ct55-crosschar-audit.yml'
   workflow_dispatch:
 permissions:
@@ -159,3 +160,27 @@ jobs:
           grep -q '^counterexample_ell37_trace-1_eigen_orders=12,18$' ct60-python.txt
           grep -q '^PASS exact-order-and-small-degree-recurrence$' ct60-js.txt
           sha256sum ct60-python.txt ct60-js.txt
+
+      - name: CT61 variable binary target ordinary traces and independently enumerated point fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct61"
+          python3 -B "$base/ct61_binary_targets.py" > ct61-py.txt
+          python3 -O -B "$base/ct61_binary_targets.py" > ct61-py-opt.txt
+          cmp ct61-py.txt ct61-py-opt.txt
+          node "$base/ct61_independent.js" > ct61-js.txt
+          node --no-opt "$base/ct61_independent.js" > ct61-js-noopt.txt
+          cmp ct61-js.txt ct61-js-noopt.txt
+          cmp ct61-py.txt ct61-js.txt
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('ct61-py.txt').read_text())
+          assert len(data['rows']) == 11 and len(data['toys']) == 7
+          assert data['rows'][-1] == [4294967291,33,11,8589934582,62]
+          assert data['rows'][-2] == [2147483647,32,3,4294967294,60]
+          assert data['toys'][-1]['ell'] == 163 and data['toys'][-1]['d'] == 7
+          print('CT61 ordinary trace construction and distinct point-counting engines passed')
+          PY
+          sha256sum ct61-py.txt ct61-js.txt
