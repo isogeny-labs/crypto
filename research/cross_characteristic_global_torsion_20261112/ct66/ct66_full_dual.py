@@ -224,4 +224,13 @@ for i in (0,1,5,23,83,137):
     check(push(D,T1)[0]==multE(e1,2,T1['coef']),('target E1',i))
     R=scalar(D,16)
     check(push(R,T0)[0]==e0 and push(R,T1)[0]==e1,('full target inverse',i))
-print(json.dumps({'source_31_classes':checked,'types':support,'target_31_torsion_pairs_tested':6,'quotients':[T0['coef'],T1['coef']],'dual_scalar':2,'inverse_scalar_mod31':16},sort_keys=True,separators=(',',':')))
+# Independent extension-field ramified-divisor control on a different genus-two curve.
+# For y^2+x*y=x^5+1, the smooth ramification point (0,1) yields 2-torsion.
+old_f,old_h=f,h
+f=(1,0,0,0,0,1);h=(0,1)
+ramified=((0,1),(1,))
+check(canon(*ramified)==ramified,'ramified Mumford pair')
+check(compose(ramified,ramified)==O,'ramified divisor must have order two')
+check(scalar(ramified,3)==ramified,'ramified scalar control')
+f,h=old_f,old_h
+print(json.dumps({'source_31_classes':checked,'types':support,'target_31_torsion_pairs_tested':6,'quotients':[T0['coef'],T1['coef']],'dual_scalar':2,'inverse_scalar_mod31':16,'ramified_extension_order2':True},sort_keys=True,separators=(',',':')))
