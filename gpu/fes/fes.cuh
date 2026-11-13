@@ -186,6 +186,60 @@ FES_HD void fes_search_subcube_sym(uint64_t cst, const uint64_t *lin,
   fes_walk_sym(cst, lin, quad_tri, qsym, n, low_bits, prefix, df_scratch, emit);
 }
 
+// The same walk in O(1) per point (the Gray-code bookkeeping of
+// Bouillaguet et al., "Fast exhaustive search for polynomial systems in
+// F_2", CHES 2010).  fes_walk_sym refreshes all n first derivatives at
+// every step; only D_{i1}, the one about to be used, is needed.  Between
+// two consecutive flips of variable k (at s = 2^k(2t-1) and 2^k(2t+1)),
+// every lower variable flips an even number of times (2^(k-j) times for
+// j < k) and exactly one higher variable flips once, k' = ctz(2^(k+1) t),
+// which is ctz(s ^ 2^k) at the second flip.  D_k is affine in the other
+// variables, so it changes by exactly qsym[k][k'] in between.  Before the
+// first flip of k (s = 2^k) the only odd-count lower flip is k - 1, hence
+// the initial df[k] ^= qsym[k][k-1].
+//
+// Every value `val` takes is the one fes_walk_sym computes at the same
+// step, so the zeros are the same points in the same order; df holds the
+// lazily-updated derivatives, not the eager ones (test_cpu.cpp checks the
+// emitted lists against fes_walk_sym and fes_search_subcube).
+template <class Emit>
+FES_HD void fes_walk_gray(uint64_t cst, const uint64_t *lin,
+                          const uint64_t *quad_tri, const uint64_t *qsym, int n,
+                          int low_bits, uint64_t prefix, uint64_t *df_scratch,
+                          Emit &emit) {
+  const uint64_t base = prefix << low_bits;
+  uint64_t *df = df_scratch;
+  for (int i = 0; i < low_bits; ++i) {
+    uint64_t d = lin[i] ^ fes_quad(quad_tri, i, i);
+    for (int j = 0; j < n; ++j) {
+      if (j != i && ((base >> j) & 1ULL)) {
+        d ^= fes_quad(quad_tri, i, j);
+      }
+    }
+    if (i > 0) d ^= qsym[i * n + (i - 1)];
+    df[i] = d;
+  }
+  uint64_t val = fes_eval(cst, lin, quad_tri, n, base);
+  if (val == 0) emit(base);
+  const uint64_t steps = (low_bits >= 63) ? 0 : (1ULL << low_bits);
+  for (uint64_t s = 1; s < steps; ++s) {
+    const int k1 = fes_ctz(s);
+    const uint64_t rest = s & (s - 1);  // s with its lowest set bit cleared
+    if (rest) df[k1] ^= qsym[k1 * n + fes_ctz(rest)];
+    val ^= df[k1];
+    if (val == 0) emit(base | fes_gray(s));
+  }
+}
+
+FES_HD void fes_search_subcube_gray(uint64_t cst, const uint64_t *lin,
+                                    const uint64_t *quad_tri,
+                                    const uint64_t *qsym, int n, int low_bits,
+                                    uint64_t prefix, uint64_t *out, int *found,
+                                    int max_out, uint64_t *df_scratch) {
+  FesArrayEmit emit{out, found, max_out};
+  fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df_scratch, emit);
+}
+
 // Default sub-cube split for the workers when no --low-bits is given: at
 // most 2^16 sub-cubes (threads), each walking 2^low_bits points, and no
 // split below 2^8 points per sub-cube.  The solution set does not depend on
