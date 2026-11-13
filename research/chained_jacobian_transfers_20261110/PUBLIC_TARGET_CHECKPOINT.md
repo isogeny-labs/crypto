@@ -27,3 +27,9 @@ ALLSIXwhole rawarchive/indexobjects ACTUALLYpublished:3archivesf32a84/30806e bef
 ONLYconsumerPCCworkflowdelta frozen9b0cb8/e00dd3 restoreONEfixedfrozen0da3f3diagnostic fromXZ inBOTHexistingjobs BEFOREUNCHANGEDoriginalverifier;wholeinversecheck/actionlint0/exactdecodedbytes/originaldataPCC2not_covered,notmathpass. NativeRust/old9proofmodule/whole7workflow/verifier/keyring/trust unchanged. Allsourcecheckpointgates0aftergenuineindices;originalearlierfailures remain. [pcc:unverified]
 
 NEXT:independentphysicalcleanfull/ownCI onnewpublishedsource,publicrhoansweraccessor andactualP2q223freshconstructor/field/model/P0/origin/completedPhi/norm/bothcompositions;thencomplete-transferdescentoptimization undernewprotocol. Mainrootmerge/ledger/signing/conflict/reviews andauthenticfixtureaccess remain;no globalpass/costadvantage/paidbenchmarkadmission. Routineglobal13:45unlessconcretesignal. [pcc:unverified]
+
+## 2026-11-13T13:41:35.254427+00:00 — P1 independent replay, rho and actual V2 data handoff
+
+Consumer68d source normallypublished;full67baa2 all43phasepairs/435guards pass andexact ownCIa5a143 run43432174569/job131908108813 succeeds/all13non-timing native records/all14canonicalPCCdigests match. Rhoe5d852 allfive recovered native+actualCLI answers checked;V2a5a4a6 bounded32source/224Cclasses/both2compositions/actualnonzerolegacyorigin/basepoint/branches/multiplicity controls pass. Allunsigned/partialformal;no measured advantage. [pcc:unverified]
+
+SEVENwhole closedattempts plusallSEVENindices retained;11largeobjects require genuinepublication,3smallindices inGit. Sourcecurrentguard03 has2283inputs;HOLDuntilactualbotFF/finalguards. Preserve full01/rho01 failures andfirstnull tripledivisor. Nextgenuinepublication/projection,sourceV2/protocol02 normalcheckpoint,thencompleted-transfer individualdescent correctnesscandidate. Rootglobalfixture/merge/signing/frozenledger andbenchmark admission remain unresolved. [pcc:unverified]
