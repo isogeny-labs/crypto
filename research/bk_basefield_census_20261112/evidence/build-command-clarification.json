@@ -1,0 +1,13 @@
+{
+  "schema": "bk-basefield-build-command-clarification/v1",
+  "record_kind": "postdata provenance clarification; no instrument or data change",
+  "working_directory": "/workspace/crypto-audit",
+  "actual_census_argv": ["g++", "-O3", "-std=c++20", "-Wall", "-Wextra", "-Werror", "research/bk_basefield_census_20261112/native/census.cpp", "-o", "/workspace/scratch/bk-base-native/census"],
+  "actual_analyzer_argv": ["g++", "-O2", "-std=c++20", "-Wall", "-Wextra", "-Werror", "-I/home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.30.1/sqlite3", "research/bk_basefield_census_20261112/native/analyze.cpp", "-l:libsqlite3.so.0", "-o", "/workspace/scratch/bk-base-native/analyze"],
+  "frozen_build_field_difference": "The frozen arm build recipe names native/census.cpp relative to the study; the actual observed compiler call uses the full repository-relative name from repository root. The frozen record is preserved unchanged. Assertion __FILE__ strings make this distinction relevant to byte-identical rebuilding.",
+  "actual_census_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+  "actual_analyzer_sha256": "01c69adc79f35c12d228e99b46a38458535bcb3f7649e4b416958c758e1b39ec",
+  "source_and_binary_pins_matched_before_all_data": true,
+  "native_data_rerun": false,
+  "compiled_refinement_proved": false
+}
