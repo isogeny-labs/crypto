@@ -14,7 +14,7 @@
 use std::time::Instant;
 
 use hec_native_ic::ic::{solve_dlp, IcParams};
-use hec_native_ic::instance::pick_instance;
+use hec_native_ic::instance::pick_instance_with_budget;
 
 fn main() {
     let rows: Vec<(usize, u64)> = match std::env::var("HEC_ROWS") {
@@ -39,6 +39,10 @@ fn main() {
             (4, 61),
         ],
     };
+    let bsgs_max: usize = std::env::var("HEC_BSGS_MAX")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(200_000);
     let seeds: u64 = std::env::var("HEC_SEEDS")
         .ok()
         .and_then(|v| v.parse().ok())
@@ -50,7 +54,7 @@ fn main() {
     );
     for (g, p) in rows {
         let t = Instant::now();
-        let Some(inst) = pick_instance(p, g) else {
+        let Some(inst) = pick_instance_with_budget(p, g, bsgs_max) else {
             println!("{g:>2} {p:>6}   skipped: no usable prime-order subgroup");
             continue;
         };
