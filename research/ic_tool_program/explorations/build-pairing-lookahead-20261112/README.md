@@ -28,20 +28,20 @@ run-to-run spread, and the arithmetic says neither could.
   - `koblitz_index_calculus::` and `koblitz_fast::` give 214 passed and
     0 failed.
   - Stored pairs and status are identical in every run below.
-- **Runs:** `M1-T01` at `k0n53` and `k0n61`, four rounds, arm order
+- **Runs:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`, four rounds, arm order
   alternating, under `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`
   ([`run-build.sh`](run-build.sh)). Each figure is the per-process median
   over repetitions, in ms.
 
 | row | arm | build (r1–r4) | collect (r1–r4) |
 |:--|:--|:--|:--|
-| k0n53 | unpaired | 103.3, 108.5, 108.3, 120.6 | 183.5, 193.5, 187.5, 193.8 |
-| k0n53 | paired | 108.2, 108.7, 109.0, 111.5 | 187.3, 193.2, 191.6, 214.4 |
-| k0n61 | unpaired | 209.2, 205.8, 210.5, 182.2 | 950.0, 1064.4, 1076.4, 1075.2 |
-| k0n61 | paired | 198.8, 192.0, 209.3, 195.1 | 1046.1, 1075.4, 1119.6, 1052.7 |
+| icv1-f2m53-tm56619371-dac20a85 | unpaired | 103.3, 108.5, 108.3, 120.6 | 183.5, 193.5, 187.5, 193.8 |
+| icv1-f2m53-tm56619371-dac20a85 | paired | 108.2, 108.7, 109.0, 111.5 | 187.3, 193.2, 191.6, 214.4 |
+| icv1-f2m61-t158598901-ab42b6c5 | unpaired | 209.2, 205.8, 210.5, 182.2 | 950.0, 1064.4, 1076.4, 1075.2 |
+| icv1-f2m61-t158598901-ab42b6c5 | paired | 198.8, 192.0, 209.3, 195.1 | 1046.1, 1075.4, 1119.6, 1052.7 |
 
 - **Why it cannot show (inference):** the build stores 3.71 M pairs at
-  `k0n53` and 6.27 M at `k0n61`. Lever 2's micro-benchmark saved about
+  `icv1-f2m53-tm56619371-dac20a85` and 6.27 M at `icv1-f2m61-t158598901-ab42b6c5`. Lever 2's micro-benchmark saved about
   0.55 ns per summand, which gives about 2 ms of a 108 ms build and about
   3.5 ms of a 200 ms build. That is about 0.6% and 0.3% of set-up, below
   the spread above. The build's remaining time per stored pair, about
@@ -59,8 +59,8 @@ run-to-run spread, and the arithmetic says neither could.
 
 | row | 16 | 32 | 64 | 128 |
 |:--|:--|:--|:--|:--|
-| k0n53 | 200, 199, 215 | 210, 202, 194 | 196, 194, 200 | 170, 193, 192 |
-| k0n61 | 1079, 887, 1095 | 1109, 1102, 1116 | 1097, 1057, 1041 | 1082, 1067, 1135 |
+| icv1-f2m53-tm56619371-dac20a85 | 200, 199, 215 | 210, 202, 194 | 196, 194, 200 | 170, 193, 192 |
+| icv1-f2m61-t158598901-ab42b6c5 | 1079, 887, 1095 | 1109, 1102, 1116 | 1097, 1057, 1041 | 1082, 1067, 1135 |
 
 - **Reading:** no value separates from the others. The filter (8 bits per
   key, 3.7–6.3 MB) is larger than one core's L2, so probes are served from
@@ -89,11 +89,11 @@ mismatches.
 
 | row | build, unpaired / paired | collect, lookahead 32 / 64 | A/A build | A/A collect |
 |:--|:--|:--|:--|:--|
-| k0n53 | 1.044 [1.028, 1.064] | 0.997 [0.978, 1.015] | [0.992, 1.029] | [0.978, 1.010] |
-| k0n61 | 1.036 [0.991, 1.068] | 0.997 [0.966, 1.055] | [0.993, 1.019] | [0.983, 1.010] |
+| icv1-f2m53-tm56619371-dac20a85 | 1.044 [1.028, 1.064] | 0.997 [0.978, 1.015] | [0.992, 1.029] | [0.978, 1.010] |
+| icv1-f2m61-t158598901-ab42b6c5 | 1.036 [0.991, 1.068] | 0.997 [0.966, 1.055] | [0.993, 1.019] | [0.983, 1.010] |
 
 - **Verdict:** neither lever is established, so both stay reverted.
-- **Build pairing:** about 4% faster on the build, but at k0n53 its lower
+- **Build pairing:** about 4% faster on the build, but at icv1-f2m53-tm56619371-dac20a85 its lower
   end misses the A/A's upper end by 0.001. On the whole set-up neither
   lever shows.
 - **Lookahead 64:** no effect.

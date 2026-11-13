@@ -2200,85 +2200,85 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0046 | 44 | 0.9923–1.0298 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0046 | 44 | 0.9923–1.0298 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · build_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0068 | 44 | 0.9932–1.0192 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0068 | 44 | 0.9932–1.0192 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · build_unpaired_over_paired_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0449 | 44 | 1.0285–1.0647 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0449 | 44 | 1.0285–1.0647 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · build_unpaired_over_paired_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0365 | 44 | 0.9915–1.0684 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0365 | 44 | 0.9915–1.0684 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · collect_aa_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0017 | 44 | 0.9777–1.0095 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0017 | 44 | 0.9777–1.0095 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · collect_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0006 | 44 | 0.9829–1.0098 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0006 | 44 | 0.9829–1.0098 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · collect_la32_over_la64_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.9978 | 44 | 0.9786–1.0158 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.9978 | 44 | 0.9786–1.0158 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · collect_la32_over_la64_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.997 | 44 | 0.9656–1.0546 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.997 | 44 | 0.9656–1.0546 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · setup_aa_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.005 | 44 | 0.9973–1.014 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.005 | 44 | 0.9973–1.014 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · setup_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0032 | 44 | 0.9867–1.018 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0032 | 44 | 0.9867–1.018 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · setup_la32_over_la64_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0027 | 44 | 0.9738–1.0134 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0027 | 44 | 0.9738–1.0134 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · setup_la32_over_la64_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.9933 | 44 | 0.9724–1.0447 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.9933 | 44 | 0.9724–1.0447 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · setup_unpaired_over_paired_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0162 | 44 | 0.9897–1.028 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 1.0162 | 44 | 0.9897–1.028 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:koblitz_setup_phase · setup_unpaired_over_paired_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.9958 | 44 | 0.9683–1.0217 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61),  |
+| 2026-11-13 | `20261112T2321Z-ic-build-pairing-lookahead-ab` | `62f1f0a778d8` | 0.9958 | 44 | 0.9683–1.0217 | -0% | – | Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (icv1-f2m53-tm56619371-dac20a85), 1.036 [0.991,1.068] (icv1-f2m61-t158598901-ab42b6c5),  |
 
 ### ic:logs-oversampling · c1_f01_minus_f0_cost_lambda_hat [count]
 

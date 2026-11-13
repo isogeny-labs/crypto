@@ -33,7 +33,7 @@ is kept here.
 
 ## Runs
 
-`M1-T01` at `k0n53` (2^44.3) and `k0n61` (2^47.2) from the suite. Arms are
+`M1-T01` at `icv1-f2m53-tm56619371-dac20a85` (2^44.3) and `icv1-f2m61-t158598901-ab42b6c5` (2^47.2) from the suite. Arms are
 interleaved within each round, three rounds, under `isolated_bench --cpus
 2` with `RAYON_NUM_THREADS=1`. A run the busy gate refused was asked for
 again. Raw outputs are in [`runs.tar.xz`](runs.tar.xz), with hashes in
@@ -44,45 +44,45 @@ of each process's median over its repetitions, in ms.
 
 | row | arm | processes | collect | build | set-up |
 |:--|:--|--:|--:|--:|--:|
-| k0n53 | default | 3 | 200.3 | 106.5 | 357.8 |
-| k0n53 | huge pages | 3 | 200.3 | 112.8 | 375.5 |
-| k0n53 | blocked 8 | 2 | 268.6 | 118.6 | 436.1 |
-| k0n53 | blocked 16 | 2 | 252.2 | 144.9 | 481.3 |
-| k0n53 | blocked 16, huge | 3 | 247.0 | 136.9 | 441.6 |
-| k0n61 | default | 3 | 1120.4 | 202.3 | 1399.7 |
-| k0n61 | huge pages | 3 | 1092.6 | 213.0 | 1397.2 |
-| k0n61 | blocked 8 | 3 | 1408.3 | 243.6 | 1725.0 |
-| k0n61 | blocked 16 | 3 | 1403.0 | 247.4 | 1722.3 |
-| k0n61 | blocked 16, huge | 3 | 1385.6 | 236.5 | 1704.0 |
+| icv1-f2m53-tm56619371-dac20a85 | default | 3 | 200.3 | 106.5 | 357.8 |
+| icv1-f2m53-tm56619371-dac20a85 | huge pages | 3 | 200.3 | 112.8 | 375.5 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 8 | 2 | 268.6 | 118.6 | 436.1 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 16 | 2 | 252.2 | 144.9 | 481.3 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 16, huge | 3 | 247.0 | 136.9 | 441.6 |
+| icv1-f2m61-t158598901-ab42b6c5 | default | 3 | 1120.4 | 202.3 | 1399.7 |
+| icv1-f2m61-t158598901-ab42b6c5 | huge pages | 3 | 1092.6 | 213.0 | 1397.2 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 8 | 3 | 1408.3 | 243.6 | 1725.0 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 16 | 3 | 1403.0 | 247.4 | 1722.3 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 16, huge | 3 | 1385.6 | 236.5 | 1704.0 |
 
 **2. AVX-512 probe, scalar set (`explore3b`)**
 
 | row | arm | processes | collect | build | set-up |
 |:--|:--|--:|--:|--:|--:|
-| k0n53 | default | 3 | 212.9 | 110.3 | 379.7 |
-| k0n53 | blocked 8 | 3 | 202.5 | 124.3 | 393.5 |
-| k0n53 | blocked 16 | 1 | 199.1 | 157.6 | 407.1 |
-| k0n61 | default | 3 | 1101.9 | 199.2 | 1392.6 |
-| k0n61 | blocked 8 | 3 | 1075.0 | 220.2 | 1374.2 |
-| k0n61 | blocked 16 | 3 | 1114.8 | 242.6 | 1443.1 |
+| icv1-f2m53-tm56619371-dac20a85 | default | 3 | 212.9 | 110.3 | 379.7 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 8 | 3 | 202.5 | 124.3 | 393.5 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 16 | 1 | 199.1 | 157.6 | 407.1 |
+| icv1-f2m61-t158598901-ab42b6c5 | default | 3 | 1101.9 | 199.2 | 1392.6 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 8 | 3 | 1075.0 | 220.2 | 1374.2 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 16 | 3 | 1114.8 | 242.6 | 1443.1 |
 
 **3. AVX-512 probe and set (`explore3c`, the final candidate)**
 
 | row | arm | processes | collect | build | set-up |
 |:--|:--|--:|--:|--:|--:|
-| k0n53 | default | 3 | 196.9 | 108.9 | 363.7 |
-| k0n53 | blocked 8 | 3 | 203.1 | 116.7 | 374.4 |
-| k0n53 | blocked 16 | 2 | 185.8 | 117.4 | 360.0 |
-| k0n61 | default | 3 | 1073.7 | 208.2 | 1367.5 |
-| k0n61 | blocked 8 | 3 | 1083.9 | 204.7 | 1371.3 |
-| k0n61 | blocked 16 | 3 | 1083.2 | 223.7 | 1386.6 |
+| icv1-f2m53-tm56619371-dac20a85 | default | 3 | 196.9 | 108.9 | 363.7 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 8 | 3 | 203.1 | 116.7 | 374.4 |
+| icv1-f2m53-tm56619371-dac20a85 | blocked 16 | 2 | 185.8 | 117.4 | 360.0 |
+| icv1-f2m61-t158598901-ab42b6c5 | default | 3 | 1073.7 | 208.2 | 1367.5 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 8 | 3 | 1083.9 | 204.7 | 1371.3 |
+| icv1-f2m61-t158598901-ab42b6c5 | blocked 16 | 3 | 1083.2 | 223.7 | 1386.6 |
 
 ## Reading
 
 - **No layout gains.** In the final candidate, set-up against the default
-  is +2.9% and −1.0% at k0n53 (blocked 8, blocked 16), and +0.3% and +1.4%
-  at k0n61. The A/A spread of these runs is several percent: the default
-  itself moved between 357.8 and 379.7 ms at k0n53 across the three
+  is +2.9% and −1.0% at icv1-f2m53-tm56619371-dac20a85 (blocked 8, blocked 16), and +0.3% and +1.4%
+  at icv1-f2m61-t158598901-ab42b6c5. The A/A spread of these runs is several percent: the default
+  itself moved between 357.8 and 379.7 ms at icv1-f2m53-tm56619371-dac20a85 across the three
   explorations.
 - **Why, by inference:** a probe costs about the same whatever the
   layout, because the filter line's miss dominates. Lowering the
@@ -90,7 +90,7 @@ of each process's median over its repetitions, in ms.
   removes too little of the admitted stage to show, and a filter twice as
   large costs the build.
 - **Huge pages alone** (A16's idea, retried on today's code) gain nothing
-  at k0n53 and 2.5% in collect at k0n61, inside the same spread.
+  at icv1-f2m53-tm56619371-dac20a85 and 2.5% in collect at icv1-f2m61-t158598901-ab42b6c5, inside the same spread.
 - **Consistent with history:** A14–A19 found the filter stage near
   exhausted.
 
