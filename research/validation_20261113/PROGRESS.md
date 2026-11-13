@@ -50,3 +50,6 @@ SP=/tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad
 - sha256sum -c the target lines of out/snapshot_start.sha256 against the committed blobs; record closed and raw uploaded
 - python3 -I scripts/make_gate_drafts.py pass ; write research/negation_remeasure_20261113/VALIDATION.json from out/gate_draft/VALIDATION.draft.json (re-pin hashes; drop status_note DRAFT)
 - python3 scripts/validation_gate.py evidence research/negation_remeasure_20261113 -> valid
+
+## Follow-up 2026-11-13 (separate validator pass)
+- ADMITTED: commit binding confirmed (25/25 at 8bf77ba333; record close in 4c6db51b17 touches only closing keys); make_gate_drafts.py pass (now binding-checked) -> out/gate_draft/; research/negation_remeasure_20261113/VALIDATION.json written; validation_gate.py evidence -> valid. Details and findings: REPORT.md "Follow-up pass".

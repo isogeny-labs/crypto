@@ -1,15 +1,18 @@
 {
  "schema": "replay-certificate/v1",
- "status": "pending_commit_binding",
- "status_note": "The artifact set and the measuring code were uncommitted when validated; this certificate binds the working-tree files by SHA-256 (source_files below and research/validation_20261113/out/snapshot_start.sha256). It may be re-issued as verified only after the exact bytes are committed.",
+ "status": "verified",
+ "status_note": "commit binding checked",
  "independent": true,
  "scalars_verified": true,
  "validator": "validator role (Claude Opus 5.5), not the producer; 2026-11-13",
  "standing": "[pcc:unverified]: no pcc claim id; no keyring signature",
  "source": {
-  "head": "47dc95a934eff93f8b1e0a72d487439872a44392",
-  "dirty": true,
-  "export": "copy of the working tree build inputs (research/validation_20261113/scripts/make_snapshot.py); per-file SHA-256 in research/validation_20261113/out/snapshot_tree.sha256; identical to the working tree at the end of validation",
+  "commit": "8bf77ba333645b98136d0be242ba8a9a1dca5649",
+  "dirty": false,
+  "commit_note": "artifact set and measuring code as committed; all 25 target lines of research/validation_20261113/out/snapshot_start.sha256 (the bytes validated and replayed) hash equal to the blobs of 8bf77ba333645b98136d0be242ba8a9a1dca5649; the record is closed in 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d, which changes only its keys ['closed_utc', 'reports', 'status', 'summary']",
+  "record_close_commit": "4c6db51b17e5e2242db44ccbeb4b9f83a757c22d",
+  "validated_at_head": "4c6db51b17e5e2242db44ccbeb4b9f83a757c22d",
+  "replay_build_tree": "47dc95a934eff93f8b1e0a72d487439872a44392 plus the then-uncommitted working tree (per-file SHA-256 in research/validation_20261113/out/snapshot_tree.sha256). 3,651 of its 3,656 files equal the blobs of 8bf77ba333645b98136d0be242ba8a9a1dca5649; the other 5 (src/bin/ic/bench.rs, src/bin/icx/prime_external.rs, src/cryptanalysis/fes_gpu.rs, src/cryptanalysis/ic_framework/solvers.rs, src/cryptanalysis/ic_run.rs) changed on the base (F2 descent solvers, the fes GPU engine, the ic CLI) and are not referenced from src/cryptanalysis/chained_transfer/ (static check, no rebuild at the commit)",
   "source_files": [
    {
     "path": "src/cryptanalysis/chained_transfer/negation_remeasure.rs",
@@ -24,7 +27,7 @@
     "sha256": "d338e206530b95c6f03fed7e4de6230a610f8fa563f0f64bbf19cad7de7913c3"
    }
   ],
-  "note": "the measured parts were produced by an earlier build of this code (RESULTS.md Deviation 6: rustfmt and a curves_checked field were added after the runs); the replay below shows the current code reproduces every non-timing value"
+  "note": "the measured parts were produced by an earlier build of this code (RESULTS.md Deviation 6: rustfmt and a curves_checked field were added after the runs); the replay below shows the committed code reproduces every non-timing value"
  },
  "build": {
   "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
@@ -84,6 +87,7 @@
   "tower p = 64007 runs (not replayed; its instances, #E and j-invariants were rebuilt and checked)",
   "wall-clock and calibration timings (best-of-N on a shared VM; replay w_cal within about 10 percent, calibrated classes unchanged)",
   "the solvers' operation counts were reproduced by re-running the producer's code, not by an independent implementation",
-  "S3 copies of the raw files (uploaded: false in the record)"
+  "S3 copies of the raw files (uploaded: false in the record)",
+  "a rebuild and replay at the artifact commit itself (the replay binary was built from the snapshot tree; see source.replay_build_tree)"
  ]
 }

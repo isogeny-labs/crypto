@@ -1,10 +1,10 @@
 {
  "schema": "validator-report/v1",
- "target": "research/negation_remeasure_20261113 (bench record 20261113T0320Z-negation-remeasure, status open)",
- "validated_commit": "47dc95a934eff93f8b1e0a72d487439872a44392 (dirty working tree; target files uncommitted; hashes in research/validation_20261113/out/snapshot_start.sha256)",
+ "target": "research/negation_remeasure_20261113 (bench record 20261113T0320Z-negation-remeasure, status measured, closed in 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d)",
+ "validated_commit": "8bf77ba333645b98136d0be242ba8a9a1dca5649 (clean; checks run on 47dc95a934 plus the uncommitted working tree, whose 25 target files hash equal to this commit's blobs; HEAD 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d at the binding check)",
  "validator": "validator role (Claude Opus 5.5), not the producer; 2026-11-13",
- "status": "pending_commit_binding",
- "status_note": "raw data and code are not yet in the repository (uncommitted); re-issue as pass only after the exact bytes are committed",
+ "status": "pass",
+ "status_note": "commit binding checked",
  "independent": true,
  "standing": "[pcc:unverified]: no pcc claim id; no keyring signature",
  "raw_data": [
@@ -2495,5 +2495,9 @@
   "rows_above_at_0_0.1_1": 156,
   "rows_unresolved_lower_bound": 6,
   "rows_below": 0
- }
+ },
+ "findings_outside_evidence_dir": [
+  "record summary (added in the closing commit) says \"recorded gaps understated 5.4-9.2x\"; the recorded plain rho total over the negation rho total is 5.50-9.22 (v3), 5.21-8.00 (cover), 4.35-7.21 (tower) (headlines.json), so 4.35-9.22 over the three targets; 5.4 is not supported. At the headline cells the recorded-arm distance moves by 9.2/7.7/3.1 (v3 p=1619), 6.3/4.4/1.2 (cover p=12841) and 4.3/2.8/0.62 (tower g3 p=64007) at 0/0.1/1 GAE, so the gap is not understated at every price. The same 5.4-9.2 figure is in problems/prime-field-chained-transfer-no-advantage.md (2026-11-13 addendum).",
+  "record summary says the 16 verdict changes are \"all toward 'above'\"; by class they go to {'unresolved (lower bound)': 6, 'above': 10} (RESULTS.md states this correctly)."
+ ]
 }

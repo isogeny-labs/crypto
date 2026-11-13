@@ -1,19 +1,19 @@
 {
  "schema": "validation-gate/v1",
- "status_note": "DRAFT, not in the evidence directory: written by the validator for use after the artifact set is committed. Admission is withheld because the raw data and the measuring code are not in the repository.",
+ "status_note": "Admitted by the follow-up validator on 2026-11-13: artifact set and code bound to 8bf77ba333645b98136d0be242ba8a9a1dca5649 (record closed in 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d); checks and binding in research/validation_20261113/REPORT.md. [pcc:unverified]: no pcc claim id, no keyring signature.",
  "replay_certificate": {
   "path": "../validation_20261113/out/gate_draft/replay-certificate.json",
-  "sha256": "0c6eb48b899897e4369a7120541797cd375ca920a6faf3996f9700f8864a5184"
+  "sha256": "0f29135e1a862ce8908bc4a90e0eb8a58336d76781dbb699eee0b2c30d08f8bb"
  },
  "validator_report": {
   "path": "../validation_20261113/out/gate_draft/validator-report.json",
-  "sha256": "f65b8a1c7ae276972e9616d56e5e0a50d5af3836ffe13bf2df8972e1301a8f14"
+  "sha256": "2b205945fbb1981de510159eaeab1874426cfacb372fc9ab9d5199e34de31030"
  },
  "rho_reference": {
   "kind": "negation",
   "kind_note": "tuned negation-map walk (RhoWalk::negation); prime-field curves, no Frobenius; no curve has j = 0 or 1728 (validator-checked), so no automorphism fold exists; the plain tuned walk is also measured and the best of the two is reported per price",
   "protocol": "research/negation_remeasure_20261113/PROTOCOL.md (frozen.sha256 8771b2dc...), \"Matched rho\"",
-  "unit": "group operations of the arm's own group (1 GAE each) + w x native operations (IC: mul mod p, mul mod r and the recorded arms' counters; rho: canonicalisations, partition hashes, DP lookups, DP inserts, word operations). IC arms on J(C) count a Cantor step as 1 GAE although it costs 5-6 elliptic additions (best-of-N), so every IC/rho ratio is understated; the IC-above order is conservative.",
+  "unit": "group operations of the arm's own group (1 GAE each) + w x native operations (IC: mul mod p, mul mod r and the recorded arms' counters; rho: canonicalisations, partition hashes, DP lookups, DP inserts, word operations). IC arms on a Jacobian count a Cantor step as 1 GAE although it costs 4.3 to 22.5 elliptic additions in best-of-N time (4.3 to 9.8 for the word-implementation and tower Jacobians, 20 to 22.5 for the recorded implementations), so every IC/rho ratio is understated; the IC-above order is conservative.",
   "binary_or_process": "src/bin/negation_remeasure.rs: one process runs every IC arm and the rho walks of a section",
   "matches_protocol": true,
   "strongest_available": true,
