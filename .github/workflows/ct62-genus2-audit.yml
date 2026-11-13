@@ -34,6 +34,10 @@ jobs:
           python3 -O -B "$D/ct62_genus2_cantor.py" > /tmp/ct62-cantor-O.json
           node "$D/ct62_genus2_independent.js" > /tmp/ct62-js.json
           node --no-opt "$D/ct62_genus2_independent.js" > /tmp/ct62-js-noopt.json
+          python3 -B "$D/ct62_elliptic_f32_control.py" > /tmp/ct62-f32.txt
+          python3 -O -B "$D/ct62_elliptic_f32_control.py" > /tmp/ct62-f32-O.txt
+          cmp /tmp/ct62-f32.txt /tmp/ct62-f32-O.txt
+          grep -qx 'models with order31 0' /tmp/ct62-f32.txt
           cmp /tmp/ct62-py.json /tmp/ct62-py-O.json
           cmp /tmp/ct62-cantor.json /tmp/ct62-cantor-O.json
           cmp /tmp/ct62-js.json /tmp/ct62-js-noopt.json
