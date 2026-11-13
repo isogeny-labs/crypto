@@ -28,5 +28,14 @@ if(sorted(mults.slice(1))!==sorted(lifted))throw Error('Hensel vs group');
 let curveCount=1;
 for(let x=0n;x<p;x++)for(let y=0n;y<p;y++)if(trunc(y*y+y-x*x*x+x*x+10n*x+20n,p)===0n)curveCount++;
 if(curveCount!==35||curveCount%7!==0||curveCount%49===0)throw Error('source curve point count');
+const residueRoots=[];
+for(let x=0n;x<p;x++)if(horner(f,x,p)===0n)residueRoots.push(Number(x));
+if(JSON.stringify(residueRoots)!=='[9,27,28]')throw Error('missing source residue x root');
+for(let i=0;i<3;i++){
+  let x=roots[i],d=horner(D,x,mod),v=horner(P3,x,mod);
+  let x2=trunc((3n*x*x-2n*x-10n)**2n*inv(d,mod)+1n-2n*x,mod);
+  let x3=trunc(x-d*horner(F4,x,mod)*inv(v*v,mod),mod);
+  if(x2!==roots[(i+1)%3]||x3!==roots[(i+2)%3])throw Error('division rational-map cycle');
+}
 let result={ell:7,experiment:'ct82-fixed-place-prime-to-p-reduction',fully_split_roots_found:3,group_law_verified:true,modulus:Number(mod),oriented_points:6,precision:5,rational_full_rank_excluded:true,source:37,torsion_group_size:7,x_roots:roots.map(Number)};
 console.log(JSON.stringify(result));
