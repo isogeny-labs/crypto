@@ -133,6 +133,67 @@ static long long run_on_device(const FesSystem &sys, int low_bits,
   return (long long)count;
 }
 
+// Serve mode (`fes_cuda --serve`): one process, one CUDA context and one
+// set of device buffers for a whole run.  Requests arrive on stdin in the
+// system contract of fes_io.hpp, back to back; each reply is
+//     SOLUTIONS <listed> <total>
+//     <x_0> ... <x_{listed-1}>      (one per line)
+// flushed at once.  total > listed means the output cap was hit: the caller
+// must not read the list as complete.  A malformed request gets
+// `ERROR <reason>` and the worker exits; EOF ends it cleanly.
+struct ServeBuffers {
+  uint64_t *lin = nullptr, *quad = nullptr, *qsym = nullptr, *out = nullptr;
+  unsigned int *count = nullptr;
+  int max_out = 1 << 20;
+};
+
+static bool serve_alloc(ServeBuffers &b) {
+  const int n = FES_MAX_VARS, t = n * (n + 1) / 2;
+  return cudaMalloc(&b.lin, n * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.quad, t * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.qsym, (size_t)n * n * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.out, (size_t)b.max_out * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.count, sizeof(unsigned int)) == cudaSuccess;
+}
+
+static int serve_main() {
+  ServeBuffers b;
+  if (!serve_alloc(b)) { printf("ERROR cuda-alloc\n"); fflush(stdout); return 2; }
+  std::vector<uint64_t> qsym, sols;
+  FesSystem sys;
+  for (;;) {
+    const int r = fes_serve_read(sys, FES_MAX_VARS);
+    if (r == 0) break;
+    if (r < 0) { printf("ERROR malformed request (n in 1..%d, m in 0..64)\n", FES_MAX_VARS); fflush(stdout); return 2; }
+    const int t = sys.n * (sys.n + 1) / 2;
+    qsym.assign((size_t)sys.n * sys.n, 0);
+    fes_build_qsym(sys.quad_tri.data(), sys.n, qsym.data());
+    const int lb = fes_default_low_bits(sys.n);
+    bool cu = cudaMemcpy(b.lin, sys.lin.data(), sys.n * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemcpy(b.quad, sys.quad_tri.data(), t * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemcpy(b.qsym, qsym.data(), qsym.size() * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemset(b.count, 0, sizeof(unsigned int)) == cudaSuccess;
+    const uint64_t nprefix = 1ULL << (sys.n - lb);
+    const int threads = 256;
+    const int blocks = (int)((nprefix + threads - 1) / threads);
+    const size_t smem = (size_t)sys.n * sys.n * sizeof(uint64_t);
+    if (cu) {
+      fes_kernel<<<blocks, threads, smem>>>(sys.cst, b.lin, b.quad, b.qsym, sys.n, lb, b.out,
+                                            b.count, b.max_out);
+      cu = cudaGetLastError() == cudaSuccess && cudaDeviceSynchronize() == cudaSuccess;
+    }
+    unsigned int count = 0;
+    cu = cu && cudaMemcpy(&count, b.count, sizeof(unsigned int), cudaMemcpyDeviceToHost) == cudaSuccess;
+    const unsigned int listed = count < (unsigned)b.max_out ? count : (unsigned)b.max_out;
+    sols.resize(listed);
+    cu = cu && (!listed || cudaMemcpy(sols.data(), b.out, listed * sizeof(uint64_t),
+                                      cudaMemcpyDeviceToHost) == cudaSuccess);
+    if (!cu) { printf("ERROR cuda\n"); fflush(stdout); return 2; }
+    fes_serve_reply(sols, count);
+  }
+  return 0;
+}
+
 int main(int argc, char **argv) {
   // Worker mode: `fes_cuda --in <system-file>` reads a system in the shared
   // contract, runs the kernel, and prints SOLUTIONS — this is what the Rust
@@ -140,6 +201,7 @@ int main(int argc, char **argv) {
   const char *in_path = nullptr;
   int low_bits = -1;
   for (int i = 1; i < argc; ++i) {
+    if (!strcmp(argv[i], "--serve")) return serve_main();
     if (!strcmp(argv[i], "--in") && i + 1 < argc) in_path = argv[++i];
     else if (!strcmp(argv[i], "--low-bits") && i + 1 < argc) low_bits = atoi(argv[++i]);
   }
