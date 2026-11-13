@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
 <title id="t">fes-f2-gpu per-call time on an A100: before and after the direct pack, and where the worker spends its time</title>
-<desc id="d">Left: mean whole-call solver wall in milliseconds before and after, at 24 and 26 unknowns. Right: the CUDA worker time per call by phase after the change, in microseconds; the request parse is the largest phase.</desc>
+<desc id="d">Left: mean whole-call solver wall in milliseconds before and after, at 24 and 26 unknowns. Right: the CUDA worker time per call by phase after the change, in microseconds; the first bar is the worker's wait for the next request plus the read, not the parse (corrected: see the report).</desc>
 <style>.bg{fill:#fcfcfb}.b{fill:#eb6834}.a{fill:#1baf7a}.k{fill:#2a78d6}.m{fill:#8b6fd6}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.b{fill:#d95926}.a{fill:#199e70}.k{fill:#3987e5}.m{fill:#a58cf0}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
 <rect class="bg" width="760" height="430"/>
 <text class="p" x="16" y="24" font-size="15" font-weight="600">fes-f2-gpu on an A100-SXM4-80GB: where a call spends its time</text>
@@ -22,13 +22,13 @@
 <rect class="b" x="70" y="408" width="11" height="11" rx="2"/><text class="p" x="86" y="418" font-size="11">before</text><rect class="a" x="140" y="408" width="11" height="11" rx="2"/><text class="p" x="156" y="418" font-size="11">after (direct pack)</text>
 <text class="p" x="370" y="72" font-size="12" font-weight="600">CUDA worker, µs per call, after the change</text>
 <text class="p" x="370" y="104" font-size="11" font-weight="600">24 unknowns</text>
-<text class="q" x="462" y="125" font-size="11" text-anchor="end">request parse (scanf)</text><rect class="m" x="470" y="114" width="166.4" height="14" rx="2"/><text class="p" x="641.4" y="125" font-size="11">216</text>
+<text class="q" x="462" y="125" font-size="11" text-anchor="end">wait + read request (idle incl.)</text><rect class="m" x="470" y="114" width="166.4" height="14" rx="2"/><text class="p" x="641.4" y="125" font-size="11">216</text>
 <text class="q" x="462" y="145" font-size="11" text-anchor="end">kernel + sync</text><rect class="k" x="470" y="134" width="79.1" height="14" rx="2"/><text class="p" x="554.1" y="145" font-size="11">103</text>
 <text class="q" x="462" y="165" font-size="11" text-anchor="end">host to device</text><rect class="a" x="470" y="154" width="28.0" height="14" rx="2"/><text class="p" x="503.0" y="165" font-size="11">36</text>
 <text class="q" x="462" y="185" font-size="11" text-anchor="end">device to host</text><rect class="a" x="470" y="174" width="19.5" height="14" rx="2"/><text class="p" x="494.5" y="185" font-size="11">25</text>
 <text class="q" x="462" y="205" font-size="11" text-anchor="end">reply</text><rect class="a" x="470" y="194" width="8.3" height="14" rx="2"/><text class="p" x="483.3" y="205" font-size="11">11</text>
 <text class="p" x="370" y="236" font-size="11" font-weight="600">26 unknowns</text>
-<text class="q" x="462" y="257" font-size="11" text-anchor="end">request parse (scanf)</text><rect class="m" x="470" y="246" width="247.2" height="14" rx="2"/><text class="p" x="722.2" y="257" font-size="11">320</text>
+<text class="q" x="462" y="257" font-size="11" text-anchor="end">wait + read request (idle incl.)</text><rect class="m" x="470" y="246" width="247.2" height="14" rx="2"/><text class="p" x="722.2" y="257" font-size="11">320</text>
 <text class="q" x="462" y="277" font-size="11" text-anchor="end">kernel + sync</text><rect class="k" x="470" y="266" width="147.8" height="14" rx="2"/><text class="p" x="622.8" y="277" font-size="11">192</text>
 <text class="q" x="462" y="297" font-size="11" text-anchor="end">host to device</text><rect class="a" x="470" y="286" width="28.3" height="14" rx="2"/><text class="p" x="503.3" y="297" font-size="11">37</text>
 <text class="q" x="462" y="317" font-size="11" text-anchor="end">device to host</text><rect class="a" x="470" y="306" width="19.8" height="14" rx="2"/><text class="p" x="494.8" y="317" font-size="11">26</text>

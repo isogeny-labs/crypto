@@ -65,8 +65,8 @@
       "baseline": null,
       "better": "lower",
       "n": 3,
-      "name": "worker_request_parse_after_koblitz_n23_a100",
-      "note": "CUDA worker scanf parse of the request, per call, after the change; the largest worker phase",
+      "name": "worker_wait_and_read_after_koblitz_n23_a100",
+      "note": "CUDA worker wait for the next request plus the read, per call, after the change. Timer error: the idle wait is included, so this is not the parse (corrected 2026-11-13; the parse is about 13 us on the host worker)",
       "reference": null,
       "reference_kind": null,
       "spread": [
@@ -110,8 +110,8 @@
       "baseline": null,
       "better": "lower",
       "n": 3,
-      "name": "worker_request_parse_after_char2_n25_a100",
-      "note": "CUDA worker scanf parse of the request, per call, after the change; the largest worker phase",
+      "name": "worker_wait_and_read_after_char2_n25_a100",
+      "note": "CUDA worker wait for the next request plus the read, per call, after the change. Timer error: the idle wait is included, so this is not the parse (corrected 2026-11-13; the parse is about 13 us on the host worker)",
       "reference": null,
       "reference_kind": null,
       "spread": [
@@ -247,6 +247,6 @@
   "session": null,
   "slug": "ic-gpu-call-overhead-a100",
   "status": "measured",
-  "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The CUDA worker's scanf request parse is now its largest phase (216 us at 24 unknowns, 320 us at 26), more than the kernel. [pcc:unverified]",
+  "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
   "validation": null
 }

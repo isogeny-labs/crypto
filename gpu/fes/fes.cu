@@ -195,7 +195,10 @@ static int serve_main() {
   FesSystem sys;
   for (;;) {
     if (tm.on) {
-      const int c = getc(stdin);  // blocks until a request starts (or EOF): idle time is not counted
+      // Block until the next request's first non-blank byte (or EOF), so the idle wait is not counted.
+      // The previous request's trailing newline is still in the stream, so one getc is not enough.
+      int c = getc(stdin);
+      while (c == ' ' || c == '\n' || c == '\t' || c == '\r') c = getc(stdin);
       if (c == EOF) { tm.report(); break; }
       ungetc(c, stdin);
     }

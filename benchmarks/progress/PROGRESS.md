@@ -408,8 +408,8 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 | kernel:fes_f2_gpu_call_a100 | whole_call_after_koblitz_n23_a100 | wall_s | 0.0003891 | 0.0003891 | 0% | –% | – | 1 |
 | kernel:fes_f2_gpu_call_a100 | whole_call_before_char2_n25_a100 | wall_s | 0.0007348 | 0.0007348 | 0% | –% | – | 1 |
 | kernel:fes_f2_gpu_call_a100 | whole_call_before_koblitz_n23_a100 | wall_s | 0.0006148 | 0.0006148 | 0% | –% | – | 1 |
-| kernel:fes_f2_gpu_call_a100 | worker_request_parse_after_char2_n25_a100 | wall_s | 0.0003204 | 0.0003204 | 0% | –% | – | 1 |
-| kernel:fes_f2_gpu_call_a100 | worker_request_parse_after_koblitz_n23_a100 | wall_s | 0.0002157 | 0.0002157 | 0% | –% | – | 1 |
+| kernel:fes_f2_gpu_call_a100 | worker_wait_and_read_after_char2_n25_a100 | wall_s | 0.0003204 | 0.0003204 | 0% | –% | – | 1 |
+| kernel:fes_f2_gpu_call_a100 | worker_wait_and_read_after_koblitz_n23_a100 | wall_s | 0.0002157 | 0.0002157 | 0% | –% | – | 1 |
 | kernel:fes_f2_gpu_call_prep | prep_per_call_after_koblitz_n19 | wall_s | 4.833e-06 | 4.833e-06 | 0% | –% | – | 1 |
 | kernel:fes_f2_gpu_call_prep | prep_per_call_after_koblitz_n23 | wall_s | 7.4e-06 | 7.4e-06 | 0% | –% | – | 1 |
 | kernel:fes_f2_gpu_call_prep | prep_per_call_before_koblitz_n19 | wall_s | 0.0001695 | 0.0001695 | 0% | –% | – | 1 |
@@ -3457,13 +3457,13 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
 | 2026-11-13 | `20261113T1642Z-ic-gpu-call-overhead-a100` | `4b4a19c82b68` | 0.0006148 | 3 | 0.0005885–0.0006319 | 0% | – | fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 |
 
-### kernel:fes_f2_gpu_call_a100 · worker_request_parse_after_char2_n25_a100 [wall_s]
+### kernel:fes_f2_gpu_call_a100 · worker_wait_and_read_after_char2_n25_a100 [wall_s]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
 | 2026-11-13 | `20261113T1642Z-ic-gpu-call-overhead-a100` | `4b4a19c82b68` | 0.0003204 | 3 | 0.0003055–0.0003474 | 0% | – | fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 |
 
-### kernel:fes_f2_gpu_call_a100 · worker_request_parse_after_koblitz_n23_a100 [wall_s]
+### kernel:fes_f2_gpu_call_a100 · worker_wait_and_read_after_koblitz_n23_a100 [wall_s]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|

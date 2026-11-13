@@ -44,12 +44,14 @@ The whole call is about 36 percent faster at both sizes. The pipe round trip is 
 *Where the worker spends its time (after the change, microseconds per call):*
 
 #table(columns: (auto, auto, auto, auto, auto, auto, auto), align: (left, right, right, right, right, right, right),
-  [*instance*], [*request parse*], [*qsym*], [*host to device*], [*kernel + sync*], [*device to host*], [*reply*],
+  [*instance*], [*wait + read request*], [*qsym*], [*host to device*], [*kernel + sync*], [*device to host*], [*reply*],
   [24 unknowns], [216], [1.7], [36], [103], [25], [11],
   [26 unknowns], [320], [1.8], [37], [192], [26], [11],
 )
 
-The text parse of the request (`scanf` in `fes_serve_read`) is now the largest single phase: 216 µs of the 0.389 ms call at 24 unknowns and 320 µs of 0.475 ms at 26, more than the kernel itself (103 and 192 µs; GPU time from CUDA events 88 and 177 µs). The worker figures are the running mean the worker printed at its last multiple of 200 calls (it is killed at exit), so they cover the first 1800 of 1878 and the first 2200 of 2338 calls.
+*Correction (found after the first version of this report):* the first column is not the parse. The worker's timer started after a one-byte peek meant to skip the idle wait, but the previous request's trailing newline is still in the stream, so the peek returned at once and the timer then ran through the wait for the next request (the Rust side's preparation, write and verification of the previous call) as well as the parse. Replaying the same requests through the host worker confirms it: a pre-buffered stream reads in 6.6 µs per call, a stream with a 600 µs gap between requests in 714 µs, and the corrected timer on the real pipe gives 13 to 15 µs with the `scanf` parse and 4.4 µs with a buffered hand parser at 19 unknowns. So the column is mostly idle time and the parse is about 13 µs of a 0.39 ms call; the claim that the parse is larger than the kernel is withdrawn. The worker figures are the running mean the worker printed at its last multiple of 200 calls (it is killed at exit), so they cover the first 1800 of 1878 and the first 2200 of 2338 calls. They were taken on the A100 with the uncorrected timer and were not repeated.
+
+What is left of the round trip once the worker's own phases (qsym, copies, kernel, reply: about 0.18 ms at 24 unknowns) are subtracted is about 0.2 ms that no phase timer has located. It is pipe wake-up and stdio latency in both directions plus the parse; [pcc:unverified] that split has not been measured on the GPU.
 
 #figure(image("fig_a100.svg", width: 100%), caption: [Whole-call time before and after (left) and the CUDA worker's time per call by phase after the change (right), A100.])
 
@@ -63,7 +65,7 @@ The text parse of the request (`scanf` in `fes_serve_read`) is now the largest s
 
 == Next
 
-The request parse is the next cut: reading the roughly 300 decimal numbers of a request with `scanf` costs more than the kernel. A binary request, or a buffered hand parser, keeps the protocol and the CPU re-verification and should remove most of that phase. It needs its own A/B on the GPU.
+The next cut is not the parse (about 13 µs; a hand parser would save roughly 9 µs of 389, about 2 percent, so it was dropped). The unlocated 0.2 ms of the round trip is the candidate: a persistent worker that is woken by a pipe write, replies by a pipe write, and is read by the Rust side through a line reader. Splitting it needs timestamps on both sides of the pipe on the GPU host, which needs another Modal run.
 
 == Files
 
