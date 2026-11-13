@@ -23,7 +23,8 @@ then use the prime-power divisor theorem and extract coefficients. This
 is a theorem about this explicit leading support, not an assumed regularity
 or an asymptotic solver bound. Also prove the actual remainder-zero criterion.
 The source-to-leading-polynomial binding remains a separate obligation until
-checked symbolically; do not promote a proposed weight profile to observation.
+checked symbolically; do not promote a proposed weight profile to observation
+[pcc:unverified].
 
 Native construction, if admitted: parse only the already frozen reduced.ms
 and independently construct the symbolic X^16 remainder modulo U*. Compare
@@ -69,7 +70,7 @@ the original symbolic norm model; e=0 yields the displayed support. Use
 master recurrence M0=X, M(n+1)=M(n)^2-2e^(2^(n+2)); terminal subtraction
 is c*e^(2^(n+1)). Prove endpoint identities and the four-coefficient zero-set
 criterion. These do not assert a faithful compiler to the reduced.ms input,
-an initial-ideal equality, regularity, flatness or a closure bound.
+an initial-ideal equality, regularity, flatness or a closure bound [pcc:unverified].
 
 The research-visuals identity supplement issues a literal degree6 identity
 certificate for (X^3+a2X^2+a1X)^2-X^3(c0+c1X)^2=X*U*. This is a finite
