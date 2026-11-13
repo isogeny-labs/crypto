@@ -48,3 +48,31 @@ formalizing a certificate or completing this problem record alone does not.
 
 2026-11-13: initial evidence-linked record after exact jet/coupled-chart test.
 Unresolved. Earlier artifacts and canonical claims/ledger entries are retained.
+
+2026-11-13 signed-Hankel update: [new report](../research/prime_norm_rank_20261112/signed-hankel-report/README.md), source17fd598fd,
+supplies the actual public branch-to-Hankel map and publicInputCertificate.
+Singularity of that actual matrix produces the nonzero bounded pair without
+supplied A/B or interpolation/moment oracles. The fixed native artifact
+compares full6x6 and compressed2x2 kernels, checks literal branch updates,
+and retains wrong-weight/changed-branch controls [pcc:unverified].
+
+Next obligation refined: efficient branch selection in that public family,
+keeping the target branch fixed. Investigate constrained determinant repair
+and exact corank/uniqueness geometry; continuous field-weight repair need not
+stay on the curve. Polynomial-size matrices and per-update work alone do not
+bound total visits. The original exit criteria remain open [pcc:unverified].
+
+2026-11-13 exact geometry/repair update: [report](../research/prime_norm_rank_20261112/branch-repair-report/README.md),
+source4b6ed788d. Actual public kernel is one scalar line; singular numerical
+corank1 follows, without a numerical-rank hypothesis. The continuous point
+correction preserves the square iff it is zero or the opposite-branch change.
+The one frozen native control records four off-curve/full-norm failures among
+five continuous determinant repairs, one valid restoration and one zero
+repair direction; fixing target0 excludes one of those repairs. No statistical
+or asymptotic inference from those cases [pcc:unverified].
+
+Next action refined: a constrained discrete/multi-coordinate branch rule or
+a different public factor-base mechanism with fewer counted attempts. A
+larger-corank target is excluded only in the stated actual public family;
+continuous field-weight repair does not discharge branch selection. Original
+exit criteria remain open [pcc:unverified].
