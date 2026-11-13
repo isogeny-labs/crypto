@@ -1,3 +1,17 @@
+# Current research queue — 2026-11-13T22:24:21.857355+00:00
+
+Actual3primefieldJacobian52maps/source45ee and refinementfb9ee/55partialbindings are published in cryptanalysisPR1523. Full703b38c7f/own12CI65dd08108native55canonical settled. NewtargetICnativee869bd solvesall15publiccases/all60attempts/2543guards;consumernew-target-ic source awaiting proof/report/strictCI publication. Standing unsigned,no computational advantage. [pcc:unverified]
+
+1. Finish newtargetIC mathematicalsoundness/faithfulLean/report/strictpublishedsourcefullCI under prospective98c6f0/2aee. Preserveall60attempts includingfailures;costcoverage unknown. [pcc:unverified]
+2. Collect original unfiltered rootlibraryretry03 running:/workspace/scratch/ct68-root-library-regression-03;UNCHANGEDcargo test --release --lib --offline --locked/SAME1800sbound/2137guards. Authenticfixture1ea795 nowrestoredoriginalSHA8970667e andsamebinaryformerlyfailedtestpasses1/6329filtered. Originalglobalgate remainsopen untilterminal;existingcontainernamespace/otherfixturefailures mayremain. [pcc:unverified]
+3. Pack ct65full/CI,ct66native,ct67failedsetup/full02/12CI,ct68newIC+authenticfixture/targeted+fullregression wholecaptures+completeindices viaunchanged genuinepublisher. NEWcurrentguard07 required beforefuturebotFF;guard06 historical/released. [pcc:unverified]
+4. Construct complete odddegree13^3 beta coordinates for matchedtarget;writtenfactor/both13/polarization13 exists,completecoordinatesopen. Noneof3currentgeometrickernelsfree52;wronguntransportedkernelcontrol retained. [pcc:unverified]
+5. Original S3checkpoint/livebudget/capacity/completecold+onlinecost/strongestmatchedICrho references,actualgeometricformal/signedexecution/mainledger/signing/reviews/conflict/vault/KBecdb remain. No benchmarkadmission ormergewaiver. [pcc:unverified]
+
+Authenticateddata route708cb8/3baaworkflow43516010720/job132198018704 successfully originalpull0/verify0/exact2293097bytes;WHOLEartifact14081195285/150168bytesSHA4df508a9/all16members/originalsource-tool-config-manifestbyteexact/localverify0/Gitstatusunchanged. Targetedtest1ea795 usesSAMEbinarySHA82029f63;all2137guards0,2historicalconsumerworkflowversions separatelypreserved. Originalrawfailedpreparation01 andpriorlocalnocreds/anonymous403 failuresremain. Ordinaryunitcheckpointoptout documented7433ce/originalPCCbypass+pushattempt1;performanceadmissionstillclosed. [pcc:unverified]
+
+---
+
 Current source45ee45d2 andgenuinepublication22d22eb0e: PUBLIC_TARGET_CHECKPOINT.md.
 
 

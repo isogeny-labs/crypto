@@ -1,3 +1,31 @@
+# Resume: Chained ECDLP Transfers — current2026-11-13T22:20UTC
+
+## Goal
+Continue actual DLP-preserving/chained Jacobian/prime-field transfers and admitted computational comparisons across crypto/cryptanalysis/locked autoresearcher;continue after each rung. [pcc:unverified]
+
+## Lead / hypothesis
+Actual3Jacobian52maps/transportedkernels/identical-sourceAPI and all15newtargetICpubliccases now work natively;full costs remainunknown. Restore authentic rootfixture through originalCIcredentials,then originalregression,while completing solverproof/report/CI. [pcc:unverified]
+
+## Spec
+Consumer sourcefb9ee147b66/702strictreplay;prospective98c6f0/708cb8 normallypublished2aee BEFOREsolvercode/dataworkflow. RootprotocolROOT_LIBRARY_REPLAY_PROTOCOL_03.md freezes unchangedfullrootcommand/1800s/2137guards afterauthenticrestoration1ea795. Original benchmarkadmission isNOTmet. [pcc:unverified]
+
+## State
+Rootcdfce1bb normallypublished;consumer3baa6d0a normallypublished includes dataonlyworkflow. Refinementfullb38c7f703guards/12CI65dd08108native55canonicalsettled. NewtargetICe869bdall60attempts/all15publiccases/2543guards,sourcecurrentlyuncommitted innew-target-ic;fullproof/report/strictCI next. Authentic originalfixture2293097bytesSHA8970667e restoredvia43516010720/job132198018704/artifact14081195285/wholeZIP4df508a9/all16members/originalverify0;SAMEbinary exactformerfailedtest passes1/6329filtered,all2137guards0,1ea795/consumer67ef1d. Originalrawfailures allretained. [pcc:unverified]
+
+## Next steps
+Collect originalroot library retry03:/workspace/scratch/ct68-root-library-regression-03/{native.log,native.exit,guard.exit};never infer globalpass beforeterminalnative0/unfilteredsummary. ConsumerfinishnewtargetICwritten+faithfulLean+report/strictCI/sourcecommit. UpdatePR1523/root3877/queue3904. Packwholeclosedct65full/CI,ct66native,ct67failedsetup/full/CI,ct68IC+fixture/regression;NEWcurrentguard07 before any rootbotFF. Complete costs/admission/beta coordinates/formal/mainmerge gaps remain. [pcc:unverified]
+
+## Runs in flight
+Starting ordinary originalrootlibraryretry03:bash /workspace/scratch/ct68-root-library-regression-03.sh;host=currentworkspace;native1800stimeout;warmcorrectnesscachect55;wholeoutputinmatchingdirectory. Checknative.exit/guard.exit andpreserveentirelog. No benchmark orpaidschedulerjob. [pcc:unverified]
+
+## Stop and success conditions
+Routineunitretryneedsnative0/all2137guards0/no filters orignores. Timeout/errorisretainedandnextfailurediagnosed,notglobalgreen. PerformanceexperimentsremainblockedbyoriginalS3checkpoint/livebudget/capacity/countercoverage;neverinfercostadvantagefromcorrectness. [pcc:unverified]
+
+## Open questions
+Actualgeometric/formalbridges/completebeta coordinates/allmapcosts/strongestmatchedICrho/mainledger/signing/reviews/conflict/vault8edec422locked/KBecdbunavailable. KeepqueueandGitHubcheckpointcurrent. [pcc:unverified]
+
+---
+
 # Public-target N4 continuation — native/API result, raw publication next
 
 Readychildcryptanalysis1523 under1521;prospective7e016c/f888 ACTUALLYpublishedBEFOREcode,388636. ConsumerP1 source currentlyuncommitted withfrozenwholecaptures. OriginalcompleteN4/B2 reused,FOURwholeoriginalfilesbyteexact/publicsolverONLY4literalplumbing substitutions;legacyk onlyconstructsQ;no witness inactualpublicrequests,no genericDLPfallbackinIC. [pcc:unverified]

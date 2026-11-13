@@ -151,3 +151,11 @@ upload/bypass performed. Acceptance remainsactualadmittedcosts andaccepted
 ledgerintegration/current-headCI/review. Next technicalworkisactualunbalanced
 models/maps andwholeexception/rationalreplay,withallcostrequirementsopen.
 [pcc:unverified]
+
+## 2026-11-13T22:24:21.857355+00:00 — authentic original fixture restored; original library regression retry
+
+Actual1ea795:prospective708cb8/2aeebefore dataonly3baaworkflow;43516010720/job132198018704SUCCESS/original3dtool/config/manifest/pull0verify0;WHOLEartifact14081195285/150168bytesSHA4df508a9/all16members bytechecked. Exactoriginal2293097bytefixtureSHA8970667e restored inignoredoriginalpath/originalverify0/Gitstatusunchanged. SAMEcachedoriginalbinarySHA82029f63/exactformerfailedtestnow1pass/6329filtered/all2137guards0. Firstpreparation01stoppedbefore nativeon2historicalconsumerworkflowhashes;all2131otherinputs unchanged;37e18b keepsbothcurrent+historicalWFguards,no source/WFedit. [pcc:unverified]
+
+Rootoriginalunfilteredretry03 is actuallyrunning at /workspace/scratch/ct68-root-library-regression-03:UNCHANGEDcargo test --release --lib --offline --locked/SAME1800sbound/originalwarmcache/2137guards,protocol7433ce. Ordinaryunitexception explicitlydocumented inAGENTS/checkpointhook;originalPCCappend-bypass0 andoriginalcheckpointpush1(noprofile/token) retained. This is notbenchmarkadmission;globalrootstillnotgreen beforeterminal. Closedderivedcompilerct65/ct67caches deletedonlyafter0/0/fullrawretained;ct55originalbinary andct57warmcache kept. [pcc:unverified]
+
+Consumerrefinementfb9e fullb38c7f703/own12CI65dd08108native55canonical settled. ActualnewtargetICe869bd/all60attempts/all15publiccases/2543guards/82wholeJSON;allreportedanswers actualtarget+independentoriginalsourcechecked. Codecurrentlyuncommittednew-target-ic;nextmathematicalsoundness/faithfulLean/report/strictCIpublication. Fullcosts/strongestalgorithmreference/performanceadmission/completebetacoordinates/actualgeometry/mainmerge/vault/KB gapsremain. [pcc:unverified]
