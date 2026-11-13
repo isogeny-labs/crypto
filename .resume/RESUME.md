@@ -1,32 +1,33 @@
-# Resume: crypto @ claude/index-calculus-gpu-optimization-otouqv
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-User (2026-11-12): "Work on optimizing my index calculus code for gpu". Scope: the IC CUDA
-directories audited today in docs/perf/20261112-ic-gpu-audit.md (gpu/spmv, gpu/fes,
-gpu/macaulay, gpu/rootfind, gpu/semaev; explicit-relations profile only). That audit merged four
-kernel commits (e1810bfafb spmv, 9872924cfe fes, ba14c7d9f0 macaulay, 6b25b221ee rootfind) that
-were never run on a GPU.
+Owner (2026-11-12): "Speed it all up" (M4GB and Gröbner-basis decomposition engines). Two tracks:
+(A) M4GB patch 0004, divisibility signatures in update() (this run); (B) inherited-f4 per-call
+speed-up by an Opus subagent working in this checkout (koblitz_groebner.rs, gf2_elim.rs, pq_f4_f2.rs,
+inherited part of ic_framework/solvers.rs; engine name inherited-f4-next for a paired A/B).
 
 ## Lead / hypothesis
-Step 1: run the audit's cards S/F/M/R/Z on one real GPU (Runpod, sm_89 RTX 4090 preferred),
-BASE=e9d5dbdccd vs CAND=main: device selftests must pass on both; ABAB timing with an A/A arm.
-Step 2: from the measured profile, further kernel optimizations (rootfind sweep unroll R-B,
-semaev clmad fallback, etc.), each measured the same way.
+Callgrind: update() is 70 % of a 24-variable M4GB solve, divisibility on degrevlex-ranked monomials
+decoded per variable. Exact two-mask signatures cut instructions to 0.47x / 0.43x. Expectation and
+falsifier: research/m4gb_update_signatures_20261112/README.md.
 
 ## Spec
-research/ic_gpu_measure_20261112/: job.sh (runs on the pod), rp_gpu.sh (GPU podserver client,
-derived from research/runpod_kit_20261112). Record benchmarks/records/<stamp>-ic-gpu-cards.json.
+research/m4gb_update_signatures_20261112/ab_corpus.py under tools/benchrec.py run (record benchmarks/records/20261112T0517Z-m4gb-update-signatures.json):
+corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old (patches 0001-0003,
+scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
 
 ## State
-2026-11-12: kit and job script being written; no pod started yet.
+2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
+
+Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
+(merged main 2026-11-12). Corpus run starting.
 
 ## Runs in flight
-None. Pods are named icgpu-*; delete with research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
+Paired ic descent inherited-f4 vs inherited-f4-batched vs fes-f2 (research/inherited_f4_batched_20261112/run_ab.sh, record benchmarks/records/20261112T1829Z-inherited-f4-batched-ab.json, IC_BIN scratchpad ic-batched built at 4f0eca9eb4); then the end-to-end ladder (run_e2e.sh) under its own record. Validated isolab degree-13 run frozen (research/fes_k13_validated_20261112/) and blocked on the exhausted monthly budget.
 
 ## Stop and success conditions
-Any selftest/identity failure on the candidate = correctness bug, fix first. A speed change counts
-only outside the A/A spread (median of >= 5 ABAB rounds). Hard ceiling: 3 GPU-hours, ~$5.
+Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
 
 ## Next steps
-1. Launch pod, run job.sh, fetch results tarball, delete pod.
-2. Tabulate, write report, benchrec close, session log, PR.
+1. summarize/make_report; close record; benchmarks entry; session log; commit; push.
+2. Integrate track B result (paired A/B under its own record), then PR update.

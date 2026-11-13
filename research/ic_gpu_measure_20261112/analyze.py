@@ -143,6 +143,32 @@ if o.exists():
     for cand in ("S256", "S512", "S1024"):
         res["macaulay_variants"][cand] = ratio_table(f"macaulay {cand} vs G (ms per batch)", "ms", arms, "G", cand, aa="G2")
 
+# ---------- FES O(1) walk (out_fes/) ----------
+o = D / "out_fes"
+if o.exists():
+    md.append("\n## FES O(1) Gray walk (M = main fes_cuda, S = new tree with -DFES_WALK_SYM=1, G = Gray walk)\n")
+    md.append("```\n" + (o / "identity.txt").read_text().strip() + "\n```")
+    arms = {}
+    for line in (o / "kernel_ms.txt").read_text().splitlines():
+        w, arm, rnd, _, v = line.split()
+        arms.setdefault(w, {}).setdefault(arm, []).append(float(v))
+    res["fes_gray"] = ratio_table("FES kernel, Gray walk G vs main M (ms)", "ms", arms, "M", "G", aa="S")
+
+# ---------- final committed tree (out_final/) ----------
+o = D / "out_final"
+if o.exists():
+    md.append("\n## Final check of the committed tree " + (o / "REV").read_text().strip() + "\n")
+    md.append("```\n" + (o / "digests.txt").read_text().strip() + "\n```")
+    lines = []
+    for f in ("fes-test.log", "mac-test.log", "semaev-test.log", "fes-selftest.log", "mac-selftest.log",
+              "semaev-selftest.log", "semaev-build.log", "spmv-build.log"):
+        t = (o / f).read_text().strip().splitlines()
+        lines.append(f"{f}: {t[-1] if t else ''}")
+    md.append("```\n" + "\n".join(lines) + "\n```")
+    tp = [mac_rows((o / f"mac-tp-{r}.log").read_text()).get(8192) for r in (1, 2, 3)]
+    md.append(f"macaulay batch 8192 at the default path: {tp} ms")
+    res["final"] = {"rev": (o / "REV").read_text().strip(), "mac_8192_ms": tp, "checks": lines}
+
 (D / "results.json").write_text(json.dumps(res, indent=1))
 (D / "RESULTS.md").write_text("\n".join(md) + "\n")
 print("\n".join(md))

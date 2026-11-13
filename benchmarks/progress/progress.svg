@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="19118" viewBox="0 0 900 19118" font-family="Helvetica, Arial, sans-serif" font-size="12">
 <rect width="900" height="19118" fill="white"/>
 <text x="60" y="30" font-size="18" font-weight="bold">Benchmark progress: crypto</text>
-<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 0, measured 138, invalid 3, censored 6.</text>
+<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 0, measured 139, invalid 3, censored 6.</text>
 <text x="60" y="84" font-weight="bold">Cumulative gain vs first record, unit S (derived, %)</text>
 <rect x="60" y="94" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="314.0" x2="620" y2="314.0" stroke="#eee"/>
@@ -3559,38 +3559,50 @@
 <line x1="60" y1="18832.0" x2="620" y2="18832.0" stroke="#eee"/>
 <text x="54" y="18836.0" text-anchor="end" fill="#555">1.2</text>
 <text x="60.0" y="19068" text-anchor="middle" fill="#555">2026-11-10</text>
-<text x="246.7" y="19068" text-anchor="middle" fill="#555">2026-11-10</text>
-<text x="433.3" y="19068" text-anchor="middle" fill="#555">2026-11-11</text>
-<text x="620.0" y="19068" text-anchor="middle" fill="#555">2026-11-11</text>
+<text x="246.7" y="19068" text-anchor="middle" fill="#555">2026-11-11</text>
+<text x="433.3" y="19068" text-anchor="middle" fill="#555">2026-11-12</text>
+<text x="620.0" y="19068" text-anchor="middle" fill="#555">2026-11-13</text>
 <line x1="60" y1="18942.0" x2="620" y2="18942.0" stroke="#bbb" stroke-dasharray="4 3"/>
 <text transform="translate(16,18942.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
+<circle cx="620.0" cy="18942.0" r="4" fill="#167f73"><title>20261112T2313Z-ic-gpu-cards: 0.0003916 wall_s (n=5)</title></circle>
 <rect x="636" y="18837" width="10" height="10" fill="#167f73"/>
-<text x="650" y="18846">ic:split-prime-p1-rr-dickson-torus</text>
-<circle cx="60.0" cy="18942.0" r="4" fill="#637bad"><title>20261110T0551Z-m4gb-arith-kernels-ab: 8.236 wall_s (n=3)</title></circle>
+<text x="650" y="18846">ic-gpu-kernels · fes_kernel_s_n26_</text>
+<circle cx="620.0" cy="18942.0" r="4" fill="#637bad"><title>20261112T2313Z-ic-gpu-cards: 0.0051 wall_s (n=5)</title></circle>
 <rect x="636" y="18853" width="10" height="10" fill="#637bad"/>
-<text x="650" y="18862">kernel:m4gb_gf_p_addmul · bool-roo</text>
-<circle cx="60.0" cy="18942.0" r="4" fill="#aa8b5b"><title>20261110T0551Z-m4gb-arith-kernels-ab: 0.294 wall_s (n=3)</title></circle>
+<text x="650" y="18862">ic-gpu-kernels · fes_kernel_s_n30_</text>
+<circle cx="620.0" cy="18942.0" r="4" fill="#aa8b5b"><title>20261112T2313Z-ic-gpu-cards: 0.1965 wall_s (n=5)</title></circle>
 <rect x="636" y="18869" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="18878">kernel:m4gb_gf_p_addmul · gf31-n14</text>
-<circle cx="60.0" cy="18942.0" r="4" fill="#93a1a4"><title>20261110T0551Z-m4gb-arith-kernels-ab: 2.116 wall_s (n=3)</title></circle>
+<text x="650" y="18878">ic-gpu-kernels · macaulay_batch819</text>
+<circle cx="620.0" cy="18942.0" r="4" fill="#93a1a4"><title>20261112T2313Z-ic-gpu-cards: 0.0005398 wall_s (n=5)</title></circle>
 <rect x="636" y="18885" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="18894">kernel:m4gb_gf_p_addmul · gf31-n16</text>
-<circle cx="60.0" cy="18942.0" r="4" fill="#69879e"><title>20261110T0551Z-m4gb-arith-kernels-ab: 3.749 wall_s (n=3)</title></circle>
+<text x="650" y="18894">ic-gpu-kernels · spmv_kernel_s</text>
 <rect x="636" y="18901" width="10" height="10" fill="#69879e"/>
-<text x="650" y="18910">kernel:m4gb_gf_p_addmul · gf65521-</text>
-<circle cx="60.0" cy="18942.0" r="4" fill="#b05c5c"><title>20261110T0551Z-m4gb-arith-kernels-ab: 0.941 wall_s (n=3)</title></circle>
+<text x="650" y="18910">ic:split-prime-p1-rr-dickson-torus</text>
+<circle cx="60.0" cy="18942.0" r="4" fill="#b05c5c"><title>20261110T0551Z-m4gb-arith-kernels-ab: 8.236 wall_s (n=3)</title></circle>
 <rect x="636" y="18917" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="18926">kernel:m4gb_gf_p_addmul · wd-n16-o</text>
-<circle cx="60.0" cy="18942.0" r="4" fill="#5c8a3a"><title>20261110T1513Z-m4gb-descent-ladder: 489.3 wall_s (n=6)</title></circle>
+<text x="650" y="18926">kernel:m4gb_gf_p_addmul · bool-roo</text>
+<circle cx="60.0" cy="18942.0" r="4" fill="#5c8a3a"><title>20261110T0551Z-m4gb-arith-kernels-ab: 0.294 wall_s (n=3)</title></circle>
 <rect x="636" y="18933" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="18942">study:m4gb_integration_20261110:de</text>
-<circle cx="620.0" cy="18942.0" r="4" fill="#8a5ca8"><title>20261111T1946Z-m4gb-persistent-server: 0.0061 wall_s (n=13)</title></circle>
+<text x="650" y="18942">kernel:m4gb_gf_p_addmul · gf31-n14</text>
+<circle cx="60.0" cy="18942.0" r="4" fill="#8a5ca8"><title>20261110T0551Z-m4gb-arith-kernels-ab: 2.116 wall_s (n=3)</title></circle>
 <rect x="636" y="18949" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="18958">study:m4gb_persistent_server_20261</text>
+<text x="650" y="18958">kernel:m4gb_gf_p_addmul · gf31-n16</text>
+<circle cx="60.0" cy="18942.0" r="4" fill="#167f73"><title>20261110T0551Z-m4gb-arith-kernels-ab: 3.749 wall_s (n=3)</title></circle>
 <rect x="636" y="18965" width="10" height="10" fill="#167f73"/>
-<text x="650" y="18974">study:pkm_falldegree_unblock_20261</text>
+<text x="650" y="18974">kernel:m4gb_gf_p_addmul · gf65521-</text>
+<circle cx="60.0" cy="18942.0" r="4" fill="#637bad"><title>20261110T0551Z-m4gb-arith-kernels-ab: 0.941 wall_s (n=3)</title></circle>
 <rect x="636" y="18981" width="10" height="10" fill="#637bad"/>
-<text x="650" y="18990">study:pkm_falldegree_unblock_20261</text>
+<text x="650" y="18990">kernel:m4gb_gf_p_addmul · wd-n16-o</text>
+<circle cx="60.0" cy="18942.0" r="4" fill="#aa8b5b"><title>20261110T1513Z-m4gb-descent-ladder: 489.3 wall_s (n=6)</title></circle>
 <rect x="636" y="18997" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="19006">study:pkm_falldegree_unblock_20261</text>
+<text x="650" y="19006">study:m4gb_integration_20261110:de</text>
+<circle cx="246.7" cy="18942.0" r="4" fill="#93a1a4"><title>20261111T1946Z-m4gb-persistent-server: 0.0061 wall_s (n=13)</title></circle>
+<rect x="636" y="19013" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="19022">study:m4gb_persistent_server_20261</text>
+<rect x="636" y="19029" width="10" height="10" fill="#69879e"/>
+<text x="650" y="19038">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="19045" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="19054">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="19061" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="19070">study:pkm_falldegree_unblock_20261</text>
 </svg>
