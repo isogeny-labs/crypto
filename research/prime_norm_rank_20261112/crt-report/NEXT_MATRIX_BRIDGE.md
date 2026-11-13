@@ -33,3 +33,13 @@ Each step still needs its own exact formal statement and proof. Even after
 assembly, V and the moments above are constructed using the supplied witness;
 a public-input way to find them, with bit complexity 2^{o(log r)}, remains
 essential. No search-time gain follows solely from this plan [pcc:unverified].
+
+## 2026-11-13 functional continuation
+
+NormPencilFunctional now supplies the genuine quotient linear map, derives
+mu(G)=0 from the scaled norm equation, and gives the actual trial-norm
+coefficient-pencil identity using the proved degree bounds. See
+../functional-report/README.md for exact scope, source and checks. This
+completes the functional obligations in steps1–3 above; concrete bounded
+basis/matrix, branch intersection and corank steps remain open. No public-input
+finder or search bound is supplied [pcc:unverified].
