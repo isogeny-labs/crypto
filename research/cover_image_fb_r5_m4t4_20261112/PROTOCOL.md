@@ -54,3 +54,14 @@ diagnostic of the decomposition solve, counts only.
   identical W at m = 4, t = 2 and t = 3 in round 4, so `cubic` stands for both.
 - **Consequence.** `generic3` and `quart` are censored at m = 4, t = 4. The gates are read for
   `cubic` only.
+
+## Amendment 3 (02:43Z, before any cover-map row existed)
+
+- **Observed.** `m4t4-cubic` was killed by the kernel at 01:51:23Z (exit 137; `oom_kill 2`) while
+  it shared the pod with the reference. The reference `m4t4-none` finished its system at
+  02:07:34Z in 10,884 s, uncensored. All three cover arms are censored so far; no cover-map row
+  exists.
+- **Change.** `cubic` is rerun alone on the same pod (`pod_run_cubic.sh`), with the same flags,
+  binary, seed and 28,800 s budget, so it has the whole 256 GB. The round-5 hard stop (08:35Z)
+  still binds: if the system has not finished by then, `cubic` is censored and no gate is read.
+  The shared-run log of the killed attempt is kept as `runs/m4t4-cubic.shared-run.log`.
