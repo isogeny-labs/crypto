@@ -42,3 +42,15 @@ diagnostic of the decomposition solve, counts only.
   `923a1c95…`, verified on the pod). `main` has since gained a performance pass on
   `src/cryptanalysis/f4_fp.rs` (`fd55624eed`, `3afdf60d9b`, `dc2e674c47`). It is not used here,
   to keep this cell comparable with rounds 2–4.
+
+## Amendment 2 (01:09Z, before any arm had written a row)
+
+- **Observed.** `m4t4-generic3` was killed by the kernel at 00:26:32Z (exit 137; the pod's
+  `memory.events` shows `oom_kill 1`). At 01:08Z the remaining arms held 89 GB (PKM), 67 GB
+  (`cubic`) and 67 GB (`quart`), and the container 242 of 256 GB. No arm had finished a system.
+- **Change.** `m4t4-quart` was stopped by PID at 01:08:39Z, freeing about 67 GB, so that the
+  reference arm (PKM) and one cover arm (`cubic`) can finish. A further OOM kill would most likely
+  take the largest process, the reference, and then no gate could be read. `cubic` and `quart` gave
+  identical W at m = 4, t = 2 and t = 3 in round 4, so `cubic` stands for both.
+- **Consequence.** `generic3` and `quart` are censored at m = 4, t = 4. The gates are read for
+  `cubic` only.
