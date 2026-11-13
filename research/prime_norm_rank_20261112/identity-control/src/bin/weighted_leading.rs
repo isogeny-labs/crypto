@@ -48,7 +48,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         name: "literal special-fiber norm expansion".into(),
         source: "NormWeightedLeading.leadingNormIdentity; literal expansion only, no remainder/weighted-initial-form or regularity assertion".into(),
         variables: ["a1", "a2", "c0", "c1", "x"].map(str::to_owned).to_vec(),
-        degree_bound: 6,
+        degree_bound: 7,
         lhs: sub(pow(&d, 2), Expr::times(pow(&x, 3), pow(&b, 2))),
         rhs: Expr::times(x, u),
     };

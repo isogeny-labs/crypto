@@ -77,3 +77,9 @@ mathematical certificate constructor, separate from the pending fixture
 experiment. Use unchanged canonical checker/hash,32 statement-derived and16
 extra replay points, a new driver/path and source-bound Lean pointer. It
 does not certify the four-equation implication or any experimental execution.
+
+2026-11-13 correction after rejected literal certificate construction:
+the expression's ordinary syntactic degree is7, from X^3*(c1*X)^2,
+so degree6 above was an implementation error. Retain the failed issuance
+and correct the literal issuer bound to7. This changes no polynomial or
+research acceptance criterion. Lean source/statement bindings are unchanged.
