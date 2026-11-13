@@ -55,8 +55,8 @@ use crate::cryptanalysis::ic_measurement::{self as measurement, Phase, Snapshot}
 use crate::cryptanalysis::koblitz_index_calculus::{
     build_subgroup_orbit_factor_base_with_cost, projected_signed_orbit_count, CollectedRelation,
     ColumnCoverage, DecompositionStrategy, FactorBaseLogSolver, FactorBaseSelectionCost,
-    FrobeniusFactorBase, IndividualLogSolver, KoblitzCurve, KoblitzIcOptions, LinearAlgebra,
-    PairSumTable, ProbeBudget, RelationCollector, RelationWorkUnit,
+    FilterLayout, FrobeniusFactorBase, IndividualLogSolver, KoblitzCurve, KoblitzIcOptions,
+    LinearAlgebra, PairSumTable, ProbeBudget, RelationCollector, RelationWorkUnit,
 };
 use crate::cryptanalysis::koblitz_sparse_la::{SparseSolveOptions, SparseSolveReport};
 
@@ -460,8 +460,18 @@ fn pipeline(
         p.descent_summands,
         1,
     );
-    let pair = PairSumTable::build_within_for(kc, &fb, PairSumTable::DEFAULT_BYTE_BUDGET, probes)
-        .ok_or("field too wide for the pair table")?;
+    // The filter layout every committed record of this method was counted
+    // under: a layout lets different absent keys through the filter, so
+    // another would change the counted bucket reads and no record would
+    // replay.
+    let pair = PairSumTable::build_within_for_layout(
+        kc,
+        &fb,
+        PairSumTable::DEFAULT_BYTE_BUDGET,
+        probes,
+        FilterLayout::Low,
+    )
+    .ok_or("field too wide for the pair table")?;
     ledger.lap("oracle_setup");
 
     // 3. The planned units, aimed.
