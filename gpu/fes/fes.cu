@@ -38,8 +38,14 @@ struct FesGlobalEmit {
 // dynamic shared memory: the walk's row index is the same for every lane
 // of a warp, so each load in the hot loop is a shared-memory broadcast
 // instead of a triangular-index computation, a branch and a global load.
-// The walk itself is fes_walk_sym, checked against fes_search_subcube by
-// `make test`.  Untested on a GPU.
+// The walk is fes_walk_gray (O(1) per point; one qsym load and two XORs),
+// or fes_walk_sym (O(n) per point) with -DFES_WALK_SYM=1; both are checked
+// against fes_search_subcube by `make test`, and emit the same zeros in the
+// same order.
+#ifndef FES_WALK_SYM
+#define FES_WALK_SYM 0
+#endif
+
 __global__ void fes_kernel(uint64_t cst, const uint64_t *__restrict__ lin,
                            const uint64_t *__restrict__ quad_tri,
                            const uint64_t *__restrict__ qsym_g, int n,
@@ -55,7 +61,11 @@ __global__ void fes_kernel(uint64_t cst, const uint64_t *__restrict__ lin,
 
   uint64_t df[FES_MAX_VARS];
   FesGlobalEmit emit{gout, gcount, max_out};
+#if FES_WALK_SYM
   fes_walk_sym(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
+#else
+  fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
+#endif
 }
 
 // Launch the kernel over the whole cube of a system and copy back the

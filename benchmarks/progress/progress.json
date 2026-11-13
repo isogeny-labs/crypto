@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T2311Z-instrument-fixes",
+  "latest_record": "20261112T2313Z-ic-gpu-cards",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 140,
+    "measured": 141,
     "open": 0
   },
   "repo": "crypto",
@@ -2589,6 +2589,120 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.0003916,
+      "latest": 0.0003916,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n26_gray",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000391,
+            0.000394
+          ],
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.0003916
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.005144,
+      "latest": 0.005144,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n30_gray",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.005116,
+            0.005151
+          ],
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.005144
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.1965,
+      "latest": 0.1965,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "macaulay_batch8192_s_shared_u16",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.1965
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0005398,
+      "latest": 0.0005398,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "spmv_kernel_s",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.0005398
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
     },
     {
       "better": "lower",
