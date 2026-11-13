@@ -1,0 +1,40 @@
+name: CT70 two-prime point-field factorization vs Frobenius
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct70/**'
+      - '.github/workflows/ct70-two-prime-factorization.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct70-factor-cycles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent finite-field factorization and Frobenius-cycle certificate
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct70
+          python3 -B "$D/ct70_two_prime_factorization.py" > ct70-py.json
+          python3 -O -B "$D/ct70_two_prime_factorization.py" > ct70-py-opt.json
+          node "$D/ct70_two_prime_factorization_independent.js" > ct70-js.json
+          node --no-opt "$D/ct70_two_prime_factorization_independent.js" > ct70-js-noopt.json
+          cmp ct70-py.json ct70-py-opt.json
+          cmp ct70-py.json ct70-js.json
+          cmp ct70-py.json ct70-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('ct70-py.json').read_text())
+          assert r['source_factor_degrees']==[1,1,2,2,2]
+          assert r['target_factor_degrees']==[8]
+          assert r['source_frobenius_cycles']==[1,1,2,2,2]
+          assert r['target_frobenius_cycles']==[8]
+          assert r['both_squarefree'] and not r['global_lift_algorithm']
+          assert not r['scalable_ecdlp']
+          print('CT70 two-prime residue Frobenius certificate passed; no transfer speedup claimed')
+          PY
+          echo '06014aa0236518ce074ec52bb9c92c703bdacd14de2d46092aa7b0857ce0b3ad  ct70-py.json' | sha256sum -c
