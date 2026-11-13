@@ -8,6 +8,7 @@
 mod classify;
 mod cover;
 mod curve;
+mod dlpsummary;
 mod field;
 mod ghsmagic;
 mod la;
@@ -40,6 +41,12 @@ fn main() {
         }
         Some("verify") => verify(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap()),
         Some("ghs-magic") => ghsmagic::run(&args[2..]),
+        Some("summarize-dlp") => {
+            if let Err(e) = dlpsummary::run(&args[2], &args[3..]) {
+                eprintln!("summarize-dlp: {e}");
+                std::process::exit(1);
+            }
+        }
         Some("summarize-lp") => {
             if let Err(e) = lpsummary::run(&args[2]) {
                 eprintln!("summarize-lp: {e}");
