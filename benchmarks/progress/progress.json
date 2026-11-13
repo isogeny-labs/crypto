@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261113T0320Z-negation-remeasure",
+  "latest_record": "20261113T1539Z-ic-m3-linear21-vs-floor",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 145,
+    "measured": 146,
     "open": 0
   },
   "repo": "crypto",
@@ -2589,6 +2589,66 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.0006,
+      "latest": 0.0006,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "counted_slope_delta_trials_minus_floor_adds",
+      "points": [
+        {
+          "commit": "c90b1d9d54aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261113T1539Z-ic-m3-linear21-vs-floor",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            -0.0004,
+            0.0016
+          ],
+          "summary": "Table-free linear 2+1 m=3 decomposition (lin21-ht) vs pair-table floor on the frozen 2026-10-14 targets: 0/16384 verdict disagreements, counted slope delta 0.0006 [-0.0004,0.0016], wall 2.9-10.9x floor online, 15.7 MB vs 2558 MB at n=41, runs to n=59. Stage diagnostic, unverified.",
+          "value": 0.0006
+        }
+      ],
+      "problem": "ic-decomposition-oracle",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 6.37,
+      "latest": 6.37,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "lin21ht_over_floor_online_wall_per_relation_n41",
+      "points": [
+        {
+          "commit": "c90b1d9d54aa",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2048,
+          "record": "20261113T1539Z-ic-m3-linear21-vs-floor",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            6.27,
+            6.48
+          ],
+          "summary": "Table-free linear 2+1 m=3 decomposition (lin21-ht) vs pair-table floor on the frozen 2026-10-14 targets: 0/16384 verdict disagreements, counted slope delta 0.0006 [-0.0004,0.0016], wall 2.9-10.9x floor online, 15.7 MB vs 2558 MB at n=41, runs to n=59. Stage diagnostic, unverified.",
+          "value": 6.37
+        }
+      ],
+      "problem": "ic-decomposition-oracle",
+      "unit": "ratio"
     },
     {
       "better": "lower",
