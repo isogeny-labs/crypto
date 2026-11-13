@@ -522,3 +522,22 @@ Source-known toy cases provide the next concrete native execution targets;
 the specified FGHR/generic/JV finite runs remain open until actually frozen,
 executed and analyzed. No native outcome is inferred from the Lean witness.
 [pcc:unverified]
+
+### 2026-11-13 original-source Gröbner executions
+
+The [new native study](../research/groebner_system_audit_20261113/README.md)
+completes all18frozen calls: two calibrations and eight systems twice,
+including the actual Edwards affine/highest-parts/homogeneous input and
+both original Joux–Vitse F101³ worked examples affine/homogeneous.
+All16solver outputs match independent native GB/source/remainder/S-pair
+checks and all8GB repeats are byte-identical. Canonical export/full file
+checks pass. This closes those finite source-known execution components,
+not the larger generic or m,n populations. [pcc:unverified]
+
+The empty JV homogenized example has a returned GB of degree4 and finite
+staircase length8. Its raw F4selected-pair degree5round adds0new
+polynomials/twozero reductions. The source's internal maximum and intended
+Assumption2 computation are not fully traced or formally refined, so this
+is not promoted to a disproof. Source-field descent and native execution
+remain unsigned/native; the separate55-declaration Edwards kernel proof is
+preserved at its actual scope. [pcc:unverified]
