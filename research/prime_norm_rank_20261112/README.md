@@ -413,3 +413,109 @@ The next concrete test is recorded separately as the unproved
 explicit three-support control prediction. No prediction there is a measured or
 kernel-checked result yet, and the construction takes A,B as input for a
 completeness argument rather than providing a public-input finder.
+
+## Quotient-moment prediction validated, November13
+
+The planted three-support prediction in NEXT_HYPOTHESIS.md now has checked
+proofs in [NormQuotientMoment.lean](lean/NormQuotientMoment.lean). All earlier
+mathematical sources and theorem declaration hashes remain unchanged. This
+phase validates a certificate construction from a supplied A,B; it is not a
+public-input finder [pcc:unverified].
+
+Two new general field lemmas support the proposed quotient pairing. For monic
+F and nonzero P with natDegree P<natDegree F, a complementary monomial Q below
+F makes the top coefficient of P*Q modulo F nonzero. If F is coprime with U,
+the same detection is possible for P*U*Q modulo F. No separability or field
+characteristic hypothesis is required. These are explicit polynomial detection
+statements, not a full general Hankel-radical theorem [pcc:unverified].
+
+For the exact F17 control,
+
+    f=X³+2X+2, A=5X²+11X+6, B=1,
+    G=X*(X-5)*(X-6)*(X-3), target Q=(0,6),
+    A²-fB²=8G.
+
+With Ahat=(X-16)*(X-9), U=7X+6, the inverse identity is verified
+[pcc:unverified], and
+
+    mu(P)=coeff1((P*U) modulo Ahat)=12*(P(16)+P(9))
+
+is proved for every polynomial P over F17. The moments are exactly
+(7,11,15,15,0), and mu(f)=0 [pcc:unverified].
+
+The full4x4 moment form has rank2. Its actual target-branch restriction is
+
+    S=[[15,15,15],[15,0,5],[15,5,14]],
+    adj(S)=[[9,1,7],[1,2,14],[7,14,13]].
+
+It has rank2, lies in the actual coefficient-quadrics pencil with parameters
+(15,15,11), and passes every required cofactor pairing. The normalized third
+adjugate column is (11,5,1), giving the original A and B=1. The actual norm
+identity is checked again using those recovered coefficients. A polynomial
+expansion for arbitrary coordinates verifies that the three matrices really
+encode the coefficient constraints [pcc:unverified].
+
+![Planted control, not a public-input finder](quotient-moment-report/control.svg)
+
+[Report PDF](quotient-moment-report/report.pdf), editable
+[DOT source](quotient-moment-report/control.dot),
+[LaTeX source](quotient-moment-report/report.tex).
+
+| Claim | Declaration | Scope |
+|---|---|---|
+| Complementary-monomial detection | NormQuotientMoment.topCoefficientDetects | Any field, monic F, nonzero P below F |
+| Unit-weighted detection | NormQuotientMoment.twistedCoefficientDetects | Previous hypotheses and IsCoprime F U |
+| Actual inverse identity | NormQuotientMoment.inverseIdentity | Explicit F17 modulus/curve |
+| Actual norm | NormQuotientMoment.actualNorm | Planted three-support fixture |
+| Quotient/evaluation moment equality | NormQuotientMoment.momentEvaluation | Every P over F17 |
+| Actual branch restriction | NormQuotientMoment.momentRestriction | Defined moment form and branch basis |
+| Actual pencil membership | NormQuotientMoment.inActualPencil | Defined coefficient matrices |
+| Full/restricted rank | NormQuotientMoment.fullDualRank, NormQuotientMoment.candidateRank | Ranks2 of dimensions4 and3 |
+| All cofactor pairings | NormQuotientMoment.candidateStationary | Three actual forms |
+| Actual coefficient equations | NormQuotientMoment.formsEvaluate, NormQuotientMoment.normQuadricsExpansion | Arbitrary coordinates over F17 |
+| Generic recovery theorem applies | NormQuotientMoment.genericRecoveryApplies | All required input conditions checked |
+| Actual normalized recovery | NormQuotientMoment.recoveredCoordinates, NormQuotientMoment.recoveredActualNorm | Explicit nonzero adjugate pivot and norm |
+| Integer lifts | NormQuotientInteger.normLift, NormQuotientInteger.inverseLift | Every commutative ring |
+
+Core source3d8417de4; universal integer-lift sourcecbb5e6372. Core build005
+passed3149 jobs; expanded build passed3151 jobs. Actual-source gate passed90
+declarations with0 additional trusted axioms. Core and integer-module fresh import-inclusive
+replays both exited0; their separate receipts are retained in
+quotient-moment-evidence
+[pcc:unverified].
+
+Native records [IDC1h91f69b513509f342](quotient-moment-evidence/norm.identity.json)
+and [IDC1he7eb817a6f348de6](quotient-moment-evidence/inverse.identity.json)
+check the universal integer-lift expressions and bind their exact universal
+Lean source, not just a finite-field specialization. Each has32 statement-derived
+and32 separate stream points. The native checker does not execute Lean or
+establish solver success/runtime. Ten canonical unsigned bindings are in
+[quotient-moment-evidence/claim-pins.json](quotient-moment-evidence/claim-pins.json)
+[pcc:unverified].
+
+Reproduce:
+
+```sh
+lake -d research/prime_norm_rank_20261112/lean build
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormQuotientMoment
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormQuotientInteger
+cargo run --release --locked --manifest-path research/prime_norm_rank_20261112/certificate/Cargo.toml --bin norm-quotient-moment -- research/prime_norm_rank_20261112/lean/NormQuotientInteger.lean /tmp/quotient-moment-identities
+```
+
+This checks a=2 with constant B. It does not establish the general reciprocal
+identity needed for the lower Hankel block at higher a, handle all degree/chart
+cases, or find A,B or the moments from public data. The next mathematical test
+is a generic CRT coefficient-reciprocity lemma and its Hankel-radical consequence.
+A sub-exponential public-input finder remains absent [pcc:unverified].
+
+Sources: pinned polynomial monic-division/degree/quotient-coordinate declarations,
+proof-producing ReduceModChar and actual cofactor recovery. Old-style imports
+exposed equations that required explicit import all in the new module, following
+existing Mathlib usage; no old theorem source was changed. KB unavailable,
+no novelty asserted for classical quotient-pairing ingredients. This is exact
+proof checking of a planted control, not a timing/empirical scaling campaign.
+No paid compute, benchmark row or old graph was changed.
+
+The unproved [next general proof outline](quotient-moment-report/NEXT_GENERAL_PROOF.md)
+records the CRT coefficient-reciprocity statement and the remaining radical and
+branch-restriction obligations separately from these checked results.
