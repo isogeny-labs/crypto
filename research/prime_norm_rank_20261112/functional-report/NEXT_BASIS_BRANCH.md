@@ -43,3 +43,13 @@ Do not infer this matrix conclusion solely from the abstract test lemma
 Resource/mathematical boundaries: constant H and degree drops remain separate;
 KB unavailable, bounded pinned-source review only. No public-input search
 procedure or cost follows from any of the preceding certificate identities.
+
+## 2026-11-13 actual matrix continuation
+
+NormMomentMatrix supplies the actual finite-family moment/coefficient matrix
+identity, their exact norm quadratics, derived family/entry degrees and
+canonical even-chart membership. Product-basis family completeness is also
+supplied. See ../matrix-report/README.md and its scoped unsigned records.
+Actual arbitrary-pair bilinear transfer, coordinate injectivity and branch
+intersection/corank remain open; the new result does not complete them
+[pcc:unverified].

@@ -542,3 +542,13 @@ constraints for every admissible trial norm. Moment linearity and norm degree
 bounds are explicit. This completes the functional pencil-membership step;
 concrete coefficient matrices, branch/corank assembly and public-input finder
 remain separate. Producer standing is unsigned [pcc:unverified].
+
+## 2026-11-13: actual matrix pencil and complete bounded families
+
+[Matrix report](matrix-report/README.md) / [PDF](matrix-report/report.pdf):
+NormMomentMatrix connects actual coefficient-matrix quadratics to assembled
+norm residuals and gives exact moment-weighted matrix-pencil equality. The
+canonical even-degree chart has derived entry bounds and product-basis
+families representing every bounded polynomial pair. Actual branch transfer,
+coordinate injectivity/corank and a public-input finder remain separate.
+Producer standing is unsigned [pcc:unverified].
