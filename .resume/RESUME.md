@@ -1,33 +1,20 @@
-# Resume: crypto @ claude/zealous-meitner-85ipb5
+# Resume: crypto @ aburan28/laughing-darwin-3qdnk2
 
 ## Goal
-Owner (2026-11-12): "Speed it all up" (M4GB and Gröbner-basis decomposition engines). Two tracks:
-(A) M4GB patch 0004, divisibility signatures in update() (this run); (B) inherited-f4 per-call
-speed-up by an Opus subagent working in this checkout (koblitz_groebner.rs, gf2_elim.rs, pq_f4_f2.rs,
-inherited part of ic_framework/solvers.rs; engine name inherited-f4-next for a paired A/B).
-
-## Lead / hypothesis
-Callgrind: update() is 70 % of a 24-variable M4GB solve, divisibility on degrevlex-ranked monomials
-decoded per variable. Exact two-mask signatures cut instructions to 0.47x / 0.43x. Expectation and
-falsifier: research/m4gb_update_signatures_20261112/README.md.
+Owner (2026-11-12): "Keep optimizing" the index calculus. Then "1-2", answered as a proper A/B on both
+null levers: (1) one inverse per ± twin pair in the fold build; (2) filter-probe lookahead 64 in the
+aimed scan.
 
 ## Spec
-research/m4gb_update_signatures_20261112/ab_corpus.py under tools/benchrec.py run (record benchmarks/records/20261112T0517Z-m4gb-update-signatures.json):
-corpus of 90 captured descent systems (capture.sh; scratchpad corpus/), arms old (patches 0001-0003,
-scratchpad m4gb-prefix-v3), new (0001-0004, m4gb-prefix-v4), oldAA; 5 repeats; --serve; one thread.
+research/ic_tool_program/explorations/build-pairing-lookahead-20261112/ab/PROTOCOL.md (frozen before any
+row). Runner: ab/run.sh, with BIN=/dev/shm/blab/ic (SHA-256 in ab/runs/arms.sha256; built from 62f1f0a778
+with --features scan-probes) and ISO=/tmp/claude-0/rulev9/bin/isolated_bench. 44 rounds × 2 rows × 4 labels.
+Bench record: benchmarks/records/20261112T2321Z-ic-build-pairing-lookahead-ab.json.
 
 ## State
-2026-11-12 06:10Z: patch 0004 measured (record 20261112T0517Z, closed), PR #3979 green with auto-merge; cryptanalysis #1504 merged. Subagent B finished: inherited-f4-next (same ops, faster kernels) in the working tree, tests pass.
+2026-11-12 23:2xZ: launching. run.sh resumes: it skips finished rows. If /dev/shm is lost, rebuild the
+binary from 62f1f0a778; the hash will differ, so the session restarts with a new arms.sha256 (declare it).
 
-Patch 0004 written, built clean from pinned commit, byte-identical outputs on 15 inputs. PR #3936 open
-(merged main 2026-11-12). Corpus run starting.
-
-## Runs in flight
-Paired ic descent inherited-f4 vs inherited-f4-batched vs fes-f2 (research/inherited_f4_batched_20261112/run_ab.sh, record benchmarks/records/20261112T1829Z-inherited-f4-batched-ab.json, IC_BIN scratchpad ic-batched built at 4f0eca9eb4); then the end-to-end ladder (run_e2e.sh) under its own record. Validated isolab degree-13 run frozen (research/fes_k13_validated_20261112/) and blocked on the exhausted monthly budget.
-
-## Stop and success conditions
-Fixed sample (90 systems x 5 repeats x 3 arms). Any disagreement = failure. Report per cell ratio vs A/A.
-
-## Next steps
-1. summarize/make_report; close record; benchmarks entry; session log; commit; push.
-2. Integrate track B result (paired A/B under its own record), then PR update.
+## Next
+summarise (adapt lever 2's ab/summarise.sh to the labels a q b l), report and PDF, close the record,
+apply the decision rule (keep or revert each switch), and update PR aburan28/crypto#4014.

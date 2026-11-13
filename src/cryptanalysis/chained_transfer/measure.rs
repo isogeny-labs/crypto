@@ -243,6 +243,36 @@ fn collect_relations(
     }
 }
 
+/// The relation rows of the old collector, exposed so that an instrument can
+/// count the elimination itself (`instrument::solve_linear_counted`). Same
+/// collector, same random stream as [`genus2_index_calculus`].
+pub struct Genus2Rows {
+    /// `(exponents over the factor base, alpha, beta)`.
+    pub rows: Vec<(Vec<i64>, u64, u64)>,
+    pub fb_size: usize,
+    pub group_ops: u64,
+    pub trials: u64,
+}
+
+/// Collect the old collector's relations without eliminating them.
+pub fn genus2_collect_rows(
+    c: &Genus2Curve,
+    gen: &Divisor,
+    target: &Divisor,
+    r: u64,
+    fb_size: usize,
+    max_trials: u64,
+    seed: u64,
+) -> Genus2Rows {
+    let rel = collect_relations(c, gen, target, r, fb_size, max_trials, seed);
+    Genus2Rows {
+        rows: rel.rows,
+        fb_size: rel.nfb,
+        group_ops: rel.ops,
+        trials: rel.trials,
+    }
+}
+
 /// Single-large-prime-free genus-2 index calculus restricted to the cyclic
 /// `r`-part. `gen` has order `r`, `target = [x]gen`. Returns whatever the
 /// elimination yields (F4: no reference value is consulted, so a wrong log is

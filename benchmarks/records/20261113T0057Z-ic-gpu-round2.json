@@ -1,0 +1,138 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-13T01:18:20+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gpu_measure_20261112/rp_gpu.sh",
+        "exec",
+        "icgpu-2",
+        "./job_round2.sh 5"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T00:58:07+00:00",
+      "wall_s": 0.483
+    },
+    {
+      "argv": [
+        "research/ic_gpu_measure_20261112/rp_gpu.sh",
+        "exec",
+        "icgpu-2",
+        "./job_final2.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T01:15:26+00:00",
+      "wall_s": 0.661
+    }
+  ],
+  "commit": "27819cf1a1aacf59832a3367df9ea989ea98c1d8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-13T00:57:16+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/ic_gpu_measure_20261112"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
+  },
+  "id": "20261113T0057Z-ic-gpu-round2",
+  "metrics": [
+    {
+      "baseline": 0.01985,
+      "better": "lower",
+      "n": 5,
+      "name": "fes_kernel_s_n32_block6",
+      "note": "kernel time, A100; baseline = main c5678a98ae Gray walk; A/A 1.000; outputs equal main",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.004834
+    },
+    {
+      "baseline": 0.005043,
+      "better": "lower",
+      "n": 5,
+      "name": "fes_kernel_s_n30_block6",
+      "note": "kernel time, A100; baseline = main Gray walk; A/A 1.000; round-1 O(n) walk 0.1328 s",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001301
+    },
+    {
+      "baseline": 0.0003921,
+      "better": "lower",
+      "n": 5,
+      "name": "fes_kernel_s_n26_block6",
+      "note": "kernel time, A100; baseline = main Gray walk; A/A 1.003",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.0001635
+    },
+    {
+      "baseline": 0.1971,
+      "better": "lower",
+      "n": 5,
+      "name": "macaulay_batch8192_s_2d_update",
+      "note": "kernel time, A100; baseline = main shared u16 cursor update, 1024 threads; A/A 1.0002; selftest identical",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.1769
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "rootfind_launch_knobs_best_ratio",
+      "note": "best ratio vs default (128,0) at |F|=65536 (R64_0 hash/C64), within 1%; defaults kept",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.994
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 16711,
+      "path": "research/ic_gpu_measure_20261112/raw/out2.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/76b4755d8a1865a1186ef1ba70192d0deea2f65e406d9deedb93c26a714ab864",
+      "sha256": "76b4755d8a1865a1186ef1ba70192d0deea2f65e406d9deedb93c26a714ab864",
+      "uploaded": false
+    },
+    {
+      "bytes": 2294,
+      "path": "research/ic_gpu_measure_20261112/raw/out_fin2.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/95/954155333391a98ffa322c39c0730cf1ceb6c982e47f4af970523ba662e27161",
+      "sha256": "954155333391a98ffa322c39c0730cf1ceb6c982e47f4af970523ba662e27161",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_measure_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_measure_20261112/fig_round2.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-round2",
+  "status": "measured",
+  "summary": "Round 2 on the A100: FES block-unrolled walk 2.4x (n=26) to 4.1x (n=32) over main's Gray walk, identical outputs; macaulay 2D update 1.11x on the shared path; rootfind launch knobs no gain. Kernel components only, [pcc:unverified], no rho arm.",
+  "validation": null
+}
