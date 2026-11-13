@@ -203,7 +203,7 @@ supporting toy computations were Python and are not admitted (see that note).
 `propext`, `Classical.choice`, `Quot.sound` (the closure theorems use none); receipt in
 `lean/receipts/`. Missing bridge: the instantiation with the concrete group algebras and the identity of
 the inductive `Closure` with the subspace definition, which need polynomial and linear-algebra
-libraries. The Lemma of §4 is not formalised.
+libraries. The Lemma of §4 is not formalised. No pcc claim is registered for the Lean receipt `[pcc:unverified]`.
 
 As first written: formalization was not done in this session. The container has no Lean toolchain (`lean`, `lake` and
 `elan` are not installed), and the repository's Mathlib-based projects
