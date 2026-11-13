@@ -78,3 +78,23 @@ snapshots. KB unavailable here; no novelty or exhaustive prior-art claim.
 Graph encoding is standard. The missing algorithmic result is a public-input
 relation finder with a uniform sub-exponential bit-cost bound; this export
 does not establish one [pcc:unverified].
+
+## Reproduce the construction checks
+
+From the repository root, with the pinned Cargo dependencies available:
+
+```sh
+cargo test --locked --release --manifest-path research/prime_cover_encoding_audit_20261113/Cargo.toml --bin cover-graph-build
+cargo run --locked --release --manifest-path research/prime_cover_encoding_audit_20261113/Cargo.toml --bin cover-graph-build -- research/cover_image_fb_r5_m4t4_20261112/runs/m4t4-cubic.jsonl /tmp/cover-cubic-export
+```
+
+The output directory must not already exist. Substitute m4t4-none.jsonl and
+a distinct fresh directory for the reference. No command above invokes a
+solver. Check the source/input manifest with sha256sum -c from the repository
+root; the historical manifest is retained separately as source-inputs-at-audit.
+
+For an asymptotic result, the remaining solver theorem must allow parameters
+to grow with the subgroup bit length n. It must bound total expected work,
+including failed attempts, useful relation yield, sparse linear algebra and
+final recovery, by exp(o(n)). A fixed polynomial saving in p, a lower input
+degree, or one favorable finite cell would not meet that obligation.
