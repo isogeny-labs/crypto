@@ -41,6 +41,7 @@ pub mod endo_census;
 pub mod field;
 pub mod hyper64;
 pub mod ic_control;
+pub mod instrument;
 pub mod measure;
 pub mod pushforward;
 pub mod pushforward_deg3;
