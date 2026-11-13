@@ -26,7 +26,7 @@ a^2=r,\qquad b^2+a=\omega r,\qquad b=r^4+\omega r^2,\qquad c^2+c=r^5+\omega r^3.
 \]
 The square of \(\sigma_r\) adds the constant \(ar^2+br\) to \(y\). Thus a lift with \(ar^2+br=0\) is a *genuine involution*; a nonzero constant produces an order-four lift, **not** an elliptic involution.
 
-The bounded \(\mathbb F_{1024}\) search finds 15 distinct nonzero translation parameters with field-rational lifts: five involutions and ten order-four lifts. Two explicit involutions are
+The bounded \(\mathbb F_{1024}\) search finds **15 distinct nonzero translation parameters** with field-rational lifts: five parameters yield order-two lifts and ten yield order-four lifts. Each parameter has **two** lifts, differing by the hyperelliptic involution \(y\mapsto y+1\); thus there are **10 actual order-two** and **20 actual order-four** automorphisms. The auditors choose the first Artin–Schreier root \(c\) as the canonical representative for each parameter. Two explicit involutions are
 
 | \(\sigma_r\) | \(r\) | \(a\) | \(b\) | \(c\) | Quotient \((\alpha,\beta,\gamma)\) |
 |---|---:|---:|---:|---:|---|
@@ -72,7 +72,7 @@ The Python implementation consumes an arbitrary **reduced Mumford pair** \((u(x)
 \]
 The two conjugate images are added using an independently implemented elliptic addition law; the result is explicitly checked to descend to \(\mathbb F_{1024}\). No scalar label, discrete log, divisor lookup table or precomputed inverse specialization is accepted as transport input.
 
-**Local checks:** 31 encoded classes: one zero, 6 linear, 12 split, 6 repeated and 6 nonsplit. Both quotient maps preserved **all 961 ordered source-group additions**; all **62 public known-answer target discrete logarithms** were recovered. Python normal and \`-O\` modes agreed. Independently authored JS enumerated 896 finite points on \(C(\mathbb F_{1024})\), 961 points per elliptic quotient, all five involutions, ten order-four negative controls, and rank four for all ten quotient pairs; Node normal and \`--no-opt\` matched. This is bounded local verification, **not** third-party PCC certification.
+**Local checks:** 31 encoded classes: one zero, 6 linear, 12 split, 6 repeated and 6 nonsplit. Both quotient maps preserved **all 961 ordered source-group additions**; all **62 public known-answer target discrete logarithms** were recovered. Python normal and \`-O\` modes agreed. Independently authored JS enumerated 896 finite points on \(C(\mathbb F_{1024})\), 961 points per elliptic quotient, one representative for each of the five involutive translation parameters, ten order-four translation negative controls, and rank four for all ten quotient pairs; Node normal and \`--no-opt\` matched. This is bounded local verification, **not** third-party PCC certification.
 
 Run from the repository root:
 ~~~sh
