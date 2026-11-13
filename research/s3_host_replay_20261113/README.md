@@ -4,8 +4,7 @@ This narrow infrastructure PR prepares the requested separate-host check
 without modifying either divergent PCC ledger. A new path-filtered
 research workflow runs on `main` after merge, using already published
 frozen source. The earlier failed manual dispatch remains unchanged.
-No new hosted run has occurred. The prospective protocol is being frozen
-before the ready PR is opened. [pcc:unverified]
+No new hosted run has occurred. The prospective protocol is frozen before the ready PR is opened; its canonical hash is `3bd9bdec28e8a27d0c30bdf8a0448185b53f7a1b020f91d950149a754e5ac8ef`, bound to public source producer `6925923d8b7eaa76058a98ffc6063b8c8e1eb8bd`. [pcc:unverified]
 
 The one planned hosted job compiles the original C++ arithmetic through
 a fixed S3-only entry and the separate Rust implementation. Both use the
