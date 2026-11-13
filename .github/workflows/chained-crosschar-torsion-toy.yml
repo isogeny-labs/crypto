@@ -85,3 +85,15 @@ jobs:
           cmp /tmp/ct83-py.json /tmp/ct83-js.json
           cmp /tmp/ct83-py.json /tmp/ct83-jsopt.json
           printf '%s  %s\n' 7625287b302b557c7a444ca6a632f92800c17a2d5864b505100f21041cb9ffd5 /tmp/ct83-py.json | sha256sum -c
+
+      - name: CT84 selective p-adic-to-global Padé reconstruction and independent target law
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct84
+          python3 -B "$D/ct84_selective_pade.py" > /tmp/ct84-py.json
+          python3 -O -B "$D/ct84_selective_pade.py" > /tmp/ct84-pyopt.json
+          node "$D/ct84_independent.js" > /tmp/ct84-js.json
+          node --no-opt "$D/ct84_independent.js" > /tmp/ct84-jsopt.json
+          cmp /tmp/ct84-py.json /tmp/ct84-pyopt.json
+          cmp /tmp/ct84-py.json /tmp/ct84-js.json
+          cmp /tmp/ct84-py.json /tmp/ct84-jsopt.json
+          printf '%s  %s\n' ca0abbaf20ab4c70bfe99eb3a4867c0b3e3285f58daf79142f46df445fd15195 /tmp/ct84-py.json | sha256sum -c
