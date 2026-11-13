@@ -13,3 +13,13 @@
 
 ## Errors (what went wrong, how it was handled)
 - An initial local JSON spacing mismatch was repaired before output freeze; arithmetic agreed. Research-KB/Conductor and signed PCC unavailable. Full cargo suite not run.
+
+
+## What was done (proof strengthening)
+- Derive the exact split/inert criterion from discriminant −4 of X²+2X+2. For every odd ell≡3 (mod4), an F_(2^f)-rational nonzero ell-torsion point forces all ell-torsion rational over that field; ell≡1 (mod4) gives the min/lcm of the two split eigenvalue orders. Expanded two implementation assertions; canonical JSON SHA256 remains unchanged.
+## Decisions made (and why)
+- Keep the conclusion restricted to the actual fixed 11a1 binary model and label the classical Frobenius fact. No general ECDLP work-factor bound.
+## Open threads (unfinished)
+- Full formalization needs a pinned Lean toolchain; independent scientific PCC verification and scoped GitHub CI need separate checks.
+## Errors
+- No mathematical counterexample or code mismatch; Lean unavailable.

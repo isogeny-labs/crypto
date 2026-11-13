@@ -36,6 +36,20 @@ function frobenius(l) {
     if(M.every((v,i)=>v===[1,0,0,1][i])) { full=n; break; }
   }
   check(first!==null && full!==null, 'unresolved Frobenius order');
+  if (l%4===3) check(first===full, 'nonsplit first-point/full mismatch');
+  else {
+    const roots=[];
+    for(let r=0;r<l;r++) if(mod(r*r,l)===l-1) roots.push(r);
+    check(roots.length===2, 'split eigenvalues missing');
+    function order(a) {
+      let z=1;
+      for(let k=1;k<l;k++) { z=mod(z*a,l); if(z===1) return k; }
+      throw Error('unresolved eigenvalue order');
+    }
+    function gcd(a,b) { while(b) { const t=a%b; a=b; b=t; } return a; }
+    const u=order(mod(-1+roots[0],l)), v=order(mod(-1-roots[0],l));
+    check(first===Math.min(u,v) && full===u/gcd(u,v)*v, 'split eigenvalue gate mismatch');
+  }
   return [first,full];
 }
 function main() {

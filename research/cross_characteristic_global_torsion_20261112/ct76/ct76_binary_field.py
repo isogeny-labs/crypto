@@ -86,6 +86,24 @@ def gate(l):
             break
     check(some is not None and full is not None, 'unresolved order')
     check(some <= full and full % some == 0, 'extension incompatibility')
+    if l % 4 == 3:
+        # Nonsplit Frobenius eigenvalues are Galois conjugates; eigenvalue
+        # one for F^f forces all of F^f to equal the identity.
+        check(some == full, 'nonsplit first-point/full-torsion mismatch')
+    else:
+        roots = [r for r in range(l) if r*r % l == l-1]
+        check(len(roots) == 2, 'split eigenvalues missing')
+        def order(a):
+            z = 1
+            for i in range(1, l):
+                z = z*a % l
+                if z == 1:
+                    return i
+            raise ArithmeticError('unresolved eigenvalue order')
+        from math import lcm
+        u, v = order((-1+roots[0]) % l), order((-1-roots[0]) % l)
+        check(some == min(u, v) and full == lcm(u, v),
+              'split eigenvalue order mismatch')
     return some, full
 
 def main():

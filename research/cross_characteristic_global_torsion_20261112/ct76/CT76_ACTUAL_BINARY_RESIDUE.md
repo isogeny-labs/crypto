@@ -46,3 +46,15 @@ Reproduce from repo root:
 - Shared research-KB MCP, its checkout wrapper and Conductor are unavailable in this tool runtime; repository search plus primary sources used as incomplete fallback. Independent PCC remains [pcc:unverified].
 
 **Unfinished:** an actual input-uniform global recognition of *both* encoded source points, one compatible prime over 2, target point evaluation, and full cold solving-cost comparison against matched rho/index calculus. This result supplies a necessary field-of-definition gate for only one fixed global model. No cost advantage or paid compute claim.
+
+
+## Split-versus-inert structural refinement (same binary model)
+
+The fixed Frobenius polynomial X²+2X+2 has discriminant −4. Therefore, for **every odd prime ell ≡ 3 mod 4**, this polynomial is *irreducible* mod ell and its eigenvalues α and α^ell lie in F_(ell²)\\F_ell. If a nonzero ell-torsion point is F_(2^f)-rational, then α^f=1; its conjugate is also 1 and the semisimple Frobenius satisfies F^f=I. Thus **f_some(ell)=f_full(ell) for all ell≡3 mod4**, not only the three table entries (3,7,11).
+
+For **ell ≡ 1 mod 4**, choose i²=−1 mod ell. Frobenius splits with eigenvalues −1+i and −1−i, so
+
+    f_some = min(ord(−1+i), ord(−1−i)),
+    f_full = lcm(ord(−1+i), ord(−1−i)).
+
+For ell=5 these orders are 1 and 4; for ell=13 they are 6 and 12. Both independently authored auditors now check the split-order identities and the inert equality for the listed fixture primes while retaining the exact same 13-line output digest. This is classical finite-field splitting theory specialized to the fixed curve; it is not an obstruction to a different binary model. A faithful Lean statement has not been compiled because no Lean toolchain is present in the runtime.
