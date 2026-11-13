@@ -219,53 +219,6 @@ RF_HD uint64_t rf_thread_count(uint32_t n_targets, uint32_t n_fb, int chunk) {
     return (uint64_t)n_targets * rf_n_chunks(n_fb, chunk);
 }
 
-#ifndef RF_FUSED_SWEEP
-#define RF_FUSED_SWEEP 0
-#endif
-/* RF_FUSED_SWEEP=2 makes the entry a real call on the device (one copy
- * of the probe loop instead of CHUNK); otherwise it is force-inlined. */
-#if RF_FUSED_SWEEP == 2 && defined(__CUDACC__)
-#define RF_ENTRY_QUAL __host__ __device__ __noinline__
-#else
-#define RF_ENTRY_QUAL RF_HD
-#endif
-
-/* One sweep entry: factor-base element i against target k, given
- * inv = 1 / (x_R - x_i) (unused when degenerate). */
-template <class F, class T>
-RF_ENTRY_QUAL void rf_sweep_entry(const DecompArgs<F> &a, const T &table, uint32_t k, uint32_t i,
-                                  const typename F::elt &xr, const typename F::elt &yr,
-                                  const typename F::elt &inv, int degenerate) {
-    typedef typename F::elt elt;
-    const typename F::ctx &f = a.f;
-    const elt xi = a.fb_x[i];
-    const elt yi = a.fb_y[i];
-    if (degenerate) {
-        int8_t eps = F::eq(f, yr, yi) ? (int8_t)1 : (int8_t)-1;
-        rf_emit(a.out, a.out_count, a.out_cap, k, i, i, eps, 0);
-        return;
-    }
-    const elt lam_m = F::mul(f, F::add(f, yr, yi), inv);   /* eps = +1: R - F_i */
-    const elt lam_p = F::mul(f, F::sub(f, yr, yi), inv);   /* eps = -1: R + F_i */
-#pragma unroll
-    for (int s = 0; s < 2; s++) {
-        const int8_t eps = s == 0 ? (int8_t)1 : (int8_t)-1;
-        const elt lam = s == 0 ? lam_m : lam_p;
-        const elt x3 = F::sub(f, F::sub(f, F::sqr(f, lam), xr), xi);
-        const uint64_t key = F::key(f, x3);
-        uint32_t pos = table.begin(key);
-        while (table.valid(pos, key)) {
-            const uint32_t j = table.index(pos);
-            pos = table.next(pos, key);
-            if (j < i) continue;
-            if (!F::eq(f, x3, a.fb_x[j])) continue;   /* 64-bit key collision (P-256 only) */
-            const elt y3 = F::sub(f, F::mul(f, lam, F::sub(f, xr, x3)), yr);
-            const int8_t tau = F::eq(f, y3, a.fb_y[j]) ? (int8_t)1 : (int8_t)-1;
-            rf_emit(a.out, a.out_count, a.out_cap, k, i, j, eps, tau);
-        }
-    }
-}
-
 /* ------------------------------------------------------------------ *
  * The per-thread oracle.  CHUNK must be a multiple of 8 and <= 64.
  * ------------------------------------------------------------------ */
@@ -307,22 +260,6 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         acc = F::mul(f, acc, d[w]);
     }
     elt inv_acc = F::inv(f, acc);
-#if RF_FUSED_SWEEP
-    /* Fused unwind + sweep: each inverse is consumed as the unwind
-     * produces it, so d[] and pre[] are only ever indexed by the
-     * unrolled (compile-time) w and can stay in registers.  The
-     * emission order is descending in i instead of ascending; the set
-     * of relations is the same. */
-#pragma unroll
-    for (int w = CHUNK - 1; w >= 0; w--) {
-        if ((uint32_t)w < cnt) {
-            const elt inv = F::mul(f, inv_acc, pre[w]);
-            inv_acc = F::mul(f, inv_acc, d[w]);
-            rf_sweep_entry<F, T>(a, table, k, i0 + (uint32_t)w, xr, yr, inv, (int)((degenerate >> w) & 1));
-        }
-    }
-}
-#else
 #pragma unroll
     for (int w = CHUNK - 1; w >= 0; w--) {
         elt dw = d[w];
@@ -363,6 +300,5 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         }
     }
 }
-#endif
 
 #endif /* GPU_ROOTFIND_ROOTFIND_CUH */

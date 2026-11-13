@@ -80,7 +80,9 @@ static size_t smem16_bytes() {
  * the device's opt-in shared memory per block holds the matrix (sm_80:
  * 163 KiB, sm_90: 227 KiB; sm_86/sm_89: 99 KiB does not hold 226x286),
  * else the global one.  MAC_SMEM=0 forces global; MAC_SMEM_THREADS picks
- * 256, 512 (default) or 1024 threads for the shared kernel. */
+ * 256, 512 or 1024 (default) threads for the shared kernel.  A100, batch
+ * 8192, 226x286: 718 ms global, 417 / 253 / 197 ms shared at 256 / 512 /
+ * 1024 threads (research/ic_gpu_measure_20261112/REPORT.md). */
 static int smem_threads() {
     static int t = -1;
     if (t >= 0) return t;
@@ -93,8 +95,8 @@ static int smem_threads() {
     CUDA_OK(cudaDeviceGetAttribute(&optin, cudaDevAttrMaxSharedMemoryPerBlockOptin, dev));
     if ((size_t)optin < smem16_bytes()) return t;
     const char* te = getenv("MAC_SMEM_THREADS");
-    int want = te ? atoi(te) : 512;
-    if (want != 256 && want != 1024) want = 512;
+    int want = te ? atoi(te) : 1024;
+    if (want != 256 && want != 512) want = 1024;
     CUDA_OK(cudaFuncSetAttribute(rref_batch_kernel_smem<256>, cudaFuncAttributeMaxDynamicSharedMemorySize, (int)smem16_bytes()));
     CUDA_OK(cudaFuncSetAttribute(rref_batch_kernel_smem<512>, cudaFuncAttributeMaxDynamicSharedMemorySize, (int)smem16_bytes()));
     CUDA_OK(cudaFuncSetAttribute(rref_batch_kernel_smem<1024>, cudaFuncAttributeMaxDynamicSharedMemorySize, (int)smem16_bytes()));
@@ -306,10 +308,10 @@ static void occupancy() {
         &blocks, rref_batch_kernel, MAC_THREADS, shared_bytes()));
     printf("blocks per SM at %d threads: %d (%d resident matrices)\n", MAC_THREADS,
            blocks, blocks * prop.multiProcessorCount);
-    printf("matrix bytes: %zu -- one instance does not fit in shared memory at\n",
-           (size_t)MAC_ROWS * MAC_COLS * sizeof(uint32_t));
-    printf("this shape, so the reduction runs out of global memory.  See the\n");
-    printf("README on the u16 variant, which does fit.\n");
+    printf("matrix bytes: %zu as uint32 (global path), %zu with the shared-u16\n",
+           (size_t)MAC_ROWS * MAC_COLS * sizeof(uint32_t), smem16_bytes());
+    printf("path's scratch; opt-in shared per block %zu.  Reduction path: %s\n",
+           (size_t)prop.sharedMemPerBlockOptin, rref_path());
 }
 
 int main(int argc, char** argv) {
