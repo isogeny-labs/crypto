@@ -911,6 +911,50 @@ mod fes_timing {
     }
 }
 
+/// The form conversion of [`fes_quadratic_solve`]: one [`QuadraticForm`] per equation over the
+/// system's unknowns, with the `bitop/v1` word-op charge of the conversion added to `word_ops`.
+/// `None` when an equation is not quadratic or names an unknown outside its own range.
+fn fes_forms(
+    system: &BooleanSystem,
+    word_ops: &mut u64,
+) -> Option<Vec<crate::cryptanalysis::mq_fes::QuadraticForm>> {
+    use crate::cryptanalysis::mq_fes::QuadraticForm;
+    let n = system.n_vars;
+    system
+        .equations
+        .iter()
+        .map(|p| {
+            *word_ops += fes_form_ops(p.terms.len(), p.n_vars);
+            let mut q = QuadraticForm::from_poly(p)?;
+            // `from_poly` sizes the form by the polynomial's own
+            // variable count; the search needs the system's.
+            if q.n != n {
+                *word_ops += fes_form_ops(p.terms.len(), n);
+                q = QuadraticForm::from_anf_row(
+                    &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                    n,
+                )?;
+            }
+            Some(q)
+        })
+        .collect()
+}
+
+/// The coefficient-scan charge: one test per coefficient set in some form.
+fn fes_setup(forms: Option<&Vec<crate::cryptanalysis::mq_fes::QuadraticForm>>) -> u64 {
+    forms
+        .map(|fs| {
+            fs.iter()
+                .map(|f| {
+                    f.constant as u64
+                        + f.linear.iter().filter(|&&b| b).count() as u64
+                        + f.quad.iter().flatten().filter(|&&b| b).count() as u64
+                })
+                .sum()
+        })
+        .unwrap_or(0)
+}
+
 /// The body of [`FesF2`] with the search step as a parameter: form building,
 /// the `bitop/v1` count, the Gray-code step count (`2 * 2^n + setup` word
 /// XORs) and CPU verification of every returned point are the same for every
@@ -921,47 +965,92 @@ fn fes_quadratic_solve(
     system: &BooleanSystem,
     search: impl FnOnce(&[crate::cryptanalysis::mq_fes::QuadraticForm]) -> Option<Vec<u64>>,
 ) -> (SolverVerdict, SolverCost) {
-    use crate::cryptanalysis::mq_fes::QuadraticForm;
     let started = Instant::now();
-    let n = system.n_vars;
     // `bitop/v1` over the whole call; see `fes_form_ops`,
     // `gray_table_ops` and `gray_walk_ops` for the constants.
     let mut word_ops = 0u64;
     let t_forms = fes_timing::start();
-    let forms: Option<Vec<QuadraticForm>> = system
-        .equations
-        .iter()
-        .map(|p| {
-            word_ops += fes_form_ops(p.terms.len(), p.n_vars);
-            let mut q = QuadraticForm::from_poly(p)?;
-            // `from_poly` sizes the form by the polynomial's own
-            // variable count; the search needs the system's.
-            if q.n != n {
-                word_ops += fes_form_ops(p.terms.len(), n);
-                q = QuadraticForm::from_anf_row(
-                    &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
-                    n,
-                )?;
-            }
-            Some(q)
-        })
-        .collect();
-    let setup: u64 = forms
-        .as_ref()
-        .map(|fs| {
-            fs.iter()
-                .map(|f| {
-                    f.constant as u64
-                        + f.linear.iter().filter(|&&b| b).count() as u64
-                        + f.quad.iter().flatten().filter(|&&b| b).count() as u64
-                })
-                .sum()
-        })
-        .unwrap_or(0);
+    let forms = fes_forms(system, &mut word_ops);
+    let setup = fes_setup(forms.as_ref());
     fes_timing::add(&fes_timing::FORMS, t_forms);
     let t_search = fes_timing::start();
     let found = forms.as_deref().and_then(search);
     fes_timing::add(&fes_timing::SEARCH, t_search);
+    fes_finish(system, started, word_ops, setup, found)
+}
+
+/// The packed system the `gpu/fes` worker takes, built straight from the equations' monomials
+/// without the intermediate [`QuadraticForm`]s, with the same two charges
+/// [`fes_quadratic_solve`] takes from the forms (`word_ops` of the conversion and the
+/// coefficient-scan `setup`).  The packed words are identical to
+/// `PackedSystem::from_quadratic_forms` of the forms, and the charges are the same numbers.
+/// `None` for anything the form path would treat differently or reject (a monomial of degree
+/// above 2, or on an unknown outside the equation's or the system's range, more than 64
+/// equations, more than 62 unknowns): the caller then takes the form path, so behaviour
+/// outside the plain case is unchanged.
+fn fes_pack_direct(
+    system: &BooleanSystem,
+) -> Option<(crate::cryptanalysis::fes_gpu::PackedSystem, u64, u64)> {
+    use crate::cryptanalysis::fes_gpu::PackedSystem;
+    let n = system.n_vars;
+    let m = system.equations.len();
+    if m == 0 || m > 64 || n > 62 {
+        return None;
+    }
+    let tri = |a: usize, b: usize| a * (a + 1) / 2 + b; // a >= b
+    let (mut cst, mut lin, mut quad_tri) = (0u64, vec![0u64; n], vec![0u64; n * (n + 1) / 2]);
+    let mut word_ops = 0u64;
+    for (e, p) in system.equations.iter().enumerate() {
+        let bit = 1u64 << e;
+        word_ops += fes_form_ops(p.terms.len(), p.n_vars);
+        if p.n_vars != n {
+            word_ops += fes_form_ops(p.terms.len(), n);
+        }
+        let limit = p.n_vars.min(n);
+        for term in &p.terms {
+            let mask = term.mask;
+            if limit < Mask::BITS as usize && (mask >> limit) != 0 {
+                return None;
+            }
+            match mask.count_ones() {
+                0 => cst ^= bit,
+                1 => lin[mask.trailing_zeros() as usize] ^= bit,
+                2 => {
+                    let low = mask.trailing_zeros() as usize;
+                    let high = (Mask::BITS - 1 - mask.leading_zeros()) as usize;
+                    quad_tri[tri(high, low)] ^= bit;
+                }
+                _ => return None,
+            }
+        }
+    }
+    let setup = cst.count_ones() as u64
+        + lin.iter().map(|w| w.count_ones() as u64).sum::<u64>()
+        + quad_tri.iter().map(|w| w.count_ones() as u64).sum::<u64>();
+    Some((
+        PackedSystem {
+            n,
+            m,
+            cst,
+            lin,
+            quad_tri,
+        },
+        word_ops,
+        setup,
+    ))
+}
+
+/// Everything after the search of [`fes_quadratic_solve`]: the counted cost, the CPU
+/// re-verification of every point, and the verdict.  Shared with the direct-pack path of
+/// [`FesF2Gpu`], so both report the same cost for the same system.
+fn fes_finish(
+    system: &BooleanSystem,
+    started: Instant,
+    mut word_ops: u64,
+    setup: u64,
+    found: Option<Vec<u64>>,
+) -> (SolverVerdict, SolverCost) {
+    let n = system.n_vars;
     let mut tests = 0u64;
     let mut extra = BTreeMap::new();
     extra.insert("points".into(), 1u64 << n);
@@ -1049,6 +1138,51 @@ impl SystemSolver for FesF2Gpu {
         use crate::cryptanalysis::fes_gpu::{solve_on_shared_server, PackedSystem};
         use crate::cryptanalysis::mq_fes::gray_incremental_find_all;
         let (mut used, mut fallback, mut capped, mut gpu_ns) = (0u64, 0u64, 0u64, 0u64);
+        // Fast path: pack the equations' monomials directly (no `QuadraticForm`s), same packed
+        // words and same counted charges as the form path (`fes_pack_direct`).  Anything it
+        // declines, and any worker miss, goes through the form path below.
+        let started = Instant::now();
+        let t_pack = fes_timing::start();
+        let direct = fes_pack_direct(system);
+        fes_timing::add(&fes_timing::PACK, t_pack);
+        if let Some((packed, word_ops, setup)) = direct {
+            let t = Instant::now();
+            if let Ok(Some((reply, _))) = solve_on_shared_server(&packed) {
+                gpu_ns = t.elapsed().as_nanos() as u64;
+                if fes_timing::on() {
+                    fes_timing::ROUND_TRIP.fetch_add(gpu_ns, std::sync::atomic::Ordering::Relaxed);
+                }
+                let found = if reply.total > reply.proposed.len() as u64 {
+                    capped = 1;
+                    None
+                } else {
+                    let mut points = reply.proposed;
+                    let t_sort = fes_timing::start();
+                    crate::cryptanalysis::fes_gpu::sort_gray_order(&mut points);
+                    fes_timing::add(&fes_timing::SORT, t_sort);
+                    Some(points)
+                };
+                let (verdict, mut cost) = fes_finish(system, started, word_ops, setup, found);
+                cost.extra.insert("gpu_worker".into(), 1);
+                cost.extra.insert("gpu_fallback".into(), 0);
+                cost.extra.insert("gpu_capped".into(), capped);
+                cost.extra.insert("gpu_round_trip_ns".into(), gpu_ns);
+                return (verdict, cost);
+            }
+            // No worker, or it failed: the CPU search over the forms, as before.
+            let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
+                if fs.first().is_none_or(|f| f.n <= 32) {
+                    gray_incremental_find_all(fs, usize::MAX)
+                } else {
+                    None
+                }
+            });
+            cost.extra.insert("gpu_worker".into(), 0);
+            cost.extra.insert("gpu_fallback".into(), 1);
+            cost.extra.insert("gpu_capped".into(), 0);
+            cost.extra.insert("gpu_round_trip_ns".into(), 0);
+            return (verdict, cost);
+        }
         let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
             let cpu = |fs: &[crate::cryptanalysis::mq_fes::QuadraticForm]| {
                 if fs.first().is_none_or(|f| f.n <= 32) {
@@ -2287,6 +2421,53 @@ mod tests {
                 cb.extra.get("bitop_word_ops")
             );
         }
+    }
+
+    /// **The direct pack is the form pack.**  `fes_pack_direct` must give the same packed words
+    /// and the same two charges (`word_ops`, `setup`) as the forms path, including for systems
+    /// wider than their equations, and must decline what the forms path treats differently.
+    #[test]
+    fn direct_pack_equals_the_form_pack_and_its_charges() {
+        use crate::cryptanalysis::fes_gpu::PackedSystem;
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        for trial in 0..90usize {
+            let n = 1 + trial % 20;
+            let mut sys = random_quadratic(n, 1 + trial % 9, &mut rng);
+            if trial % 3 == 0 {
+                sys.n_vars = n + 2; // wider than its equations: the second conversion
+            }
+            let mut word_ops = 0u64;
+            let forms = fes_forms(&sys, &mut word_ops).expect("quadratic forms");
+            let want = PackedSystem::from_quadratic_forms(&forms).expect("packs");
+            let want_setup = fes_setup(Some(&forms));
+            let (got, got_ops, got_setup) = fes_pack_direct(&sys).expect("direct pack");
+            assert_eq!(got, want, "trial {trial}: packed words");
+            assert_eq!(got_ops, word_ops, "trial {trial}: conversion word ops");
+            assert_eq!(got_setup, want_setup, "trial {trial}: coefficient scan");
+        }
+        // Declined, so the form path decides: a cubic monomial, an unknown outside the
+        // equation's range, more than 64 equations, no equations.
+        let cubic = BooleanSystem {
+            equations: vec![F2BoolPoly::from_monos(
+                vec![F2BoolMono::from_mask(mask_from64(0b111))],
+                3,
+            )],
+            n_vars: 3,
+        };
+        assert!(fes_pack_direct(&cubic).is_none());
+        let outside = BooleanSystem {
+            equations: vec![F2BoolPoly::from_monos(
+                vec![F2BoolMono::from_mask(mask_from64(1 << 3))],
+                3,
+            )],
+            n_vars: 3,
+        };
+        assert!(fes_pack_direct(&outside).is_none());
+        let mut many = random_quadratic(4, 65, &mut rng);
+        assert!(fes_pack_direct(&many).is_none());
+        many.equations.clear();
+        assert!(fes_pack_direct(&many).is_none());
     }
 
     /// **The fast exhaustive search is exhaustive**, at every size its
