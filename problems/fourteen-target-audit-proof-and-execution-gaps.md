@@ -325,7 +325,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
-| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees and literal binary S4 display disproof | Full polynomial symmetry, absolute irreducibility and arbitrary-split normalization |
+| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0 | Higher-arity absolute irreducibility, permutation invariance beyondm4 and arbitrary-split normalization |
 | 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112.  Basefield k1census now complete over95primefields/7013620models,29-declaration actual transport/lowtorsion gate. All-k extension census/rank/determinant still open. |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges  Basefield p<500prime/divisor native bounds now checked completely; generic geometric/Hasse and further extension-field scope remain. |
 | 4 Pairings/MOV/FR | Partial: actual composite controls and exhaustive F25Miller tables with actual quotient-domain bilinearity/nondegeneracy and base-restriction disproofs | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
@@ -604,3 +604,29 @@ gap; it does not prove internal F4/solving degrees, a canonical graded
 Hilbert-function identification or generic JV/FGHR statements. Source
 whole-curve order/scalar relations and all14 broader obligations remain.
 [pcc:unverified]
+
+### 2026-11-13 actual S3 absolute irreducibility and symmetry
+
+The [new64-declaration S3 project](../research/semaev_irreducibility_audit_20261113/README.md)
+proves actual short-form S3 irreducibility for every field with2≠0,
+arbitrarya,b, and after every field homomorphism/scalar extension. This
+includes algebraic closure. Its exact evaluation agrees with the earlier
+SemaevS3.S3 definition. Actual permutation symmetry follows from the
+checked elementary-symmetric expression. Whole gate64/0failures/0trusted.
+[pcc:unverified]
+
+The proof includes the actual nested rational-function discriminant,
+odd-degree nonsquare/root exclusion, actual coefficient embedding,
+proved primitive condition, Gauss bridge and explicit algebra equivalences
+to MvPolynomial(Fin3). No irreducibility or isomorphism assumption stands
+in for these steps. The direct F2/a=b0nonirreducibility control factors
+the literal short polynomial as a nonunit square; this tests the
+restriction rather than refuting the qualified source or distinct
+ordinary binary model. [pcc:unverified]
+
+Originalp3uses the algebraic closure of the entire function field K(X3),
+as confirmed by visual inspection of the PDF and enlarged paragraph.
+Text extraction loses the bar; no field-of-definition counterexample
+is asserted. Higher-arity absolute irreducibility, full permutation
+invariance beyondm4 and arbitrary-split normalization remain open.
+No native or corpus status is promoted. [pcc:unverified]
