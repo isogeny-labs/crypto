@@ -61,3 +61,17 @@ owed before promoting the hypothesis [pcc:unverified].
 
 Even a successful completeness proof supplies no fast public-input finder for
 mu or the pencil parameters. That remains the essential algorithmic step.
+
+## Later validation addendum, November13
+
+The specified F17 three-support control has now been kernel-checked in
+NormQuotientMoment. The original predictions above remain as the pre-check
+record. Quotient moments, both matrix ranks, actual pencil membership,
+stationarity, the predicted adjugate and the recovered actual norm are checked.
+See the versioned quotient-moment report linked from the study README
+[pcc:unverified].
+
+The general Hankel-radical/reciprocity construction remains unproved. In
+particular a=2 makes B constant; this control does not test a nontrivial lower
+Hankel block, odd degrees or degree drops. The construction still takes a
+known A,B witness as input and gives no public-input search bound.
