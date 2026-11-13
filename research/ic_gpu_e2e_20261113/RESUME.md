@@ -16,7 +16,7 @@ fes-f2, fes-f2-gpu, 2 repeats), char2-n25 (same, 1 repeat), char2-n29 (inherited
 ic binary rebuilt after the order fix (see commit after 343ac0bbc2); first n=23 run kept as raw/run1-unordered-koblitz-n23.json. Record benchmarks/records/<stamp>-ic-fes-gpu-e2e.json.
 
 ## State
-2026-11-13: engine, tests and local smoke (n=13, host serve worker) done. Pod not yet started.
+2026-11-13 04:25Z: done. Pod deleted; record 20261113T0330Z-ic-fes-gpu-e2e closed; REPORT.md; PR open.
 
 ## Runs in flight
 Pods icgpu-*; research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
@@ -26,4 +26,4 @@ Every row must recover the planted log (verified) and fes-f2-gpu must equal fes-
 Wall time is a practicality note (AGENTS.md section 6). Cap: ~2 GPU-hours, $5. S3: same waiver as before.
 
 ## Next steps
-Launch, fetch out_e2e.tgz, delete pod, tabulate, report, record, PR.
+Track the PR. Then: cut per-call overhead (binary protocol, batching).
