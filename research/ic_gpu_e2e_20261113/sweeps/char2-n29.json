@@ -1,0 +1,26 @@
+{
+  "_what": "End to end, degree-29 char-2 curve: descent systems of 30 unknowns solved by inherited-f4 and fes-f2-gpu. fes-f2 (CPU) is left out: about 0.7 s per call at 30 unknowns (research/inherited_f4_next_20261112) over roughly 13 000 calls, and its counted cost equals fes-f2-gpu's by construction (fes_quadratic_solve).",
+  "instance": {
+    "regime": "char2",
+    "degree": 29,
+    "max_cofactor": 8
+  },
+  "repeats": 1,
+  "seed": 20261113,
+  "configurations": [],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=15"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "inherited-f4",
+      "fes-f2-gpu"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}
