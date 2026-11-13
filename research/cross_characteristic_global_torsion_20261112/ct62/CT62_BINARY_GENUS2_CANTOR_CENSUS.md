@@ -44,6 +44,8 @@ Its rational Jacobian is therefore cyclic of prime order 31. Direct enumeration 
 
 An elliptic curve defined over \(\mathbb F_{2^k}\) cannot carry a rational 31-point subgroup for \(k\le4\) by Hasse. At \(k=5\), the only group order divisible by 31 in Hasse's interval is 31, requiring trace \(t=2\), which is **not** a permitted elliptic trace over \(\mathbb F_{32}\) by Waterhouse's characteristic-two classification. At \(k=6\), trace \(3\) over \(\mathbb F_{64}\) is ordinary and gives group order \(64+1-3=62\). Hence the smallest binary definition field in the elliptic case is degree **6**, while the displayed genus-two Jacobian carries the same prime subgroup in degree **2**.
 
+A second **computational falsifier control** independently enumerates all 2,016 standard characteristic-two elliptic Weierstrass models over \(\mathbb F_{32}\): the 992 ordinary forms \(y^2+xy=x^3+a_2x^2+a_6,\ a_6\ne0\), and 1,024 supersingular forms \(y^2+y=x^3+a_4x+a_6\). Exactly the supersingular traces \(\{-8,0,8\}\) occur; the ordinary traces are odd. **No model has trace 2 or group order 31**, confirming the relevant Waterhouse step by exact point enumeration. Isomorphic duplicates are intentionally retained; this is a finite-parameter sweep, not a performance benchmark. [pcc:unverified]
+
 Moreover, this \(J/\mathbb F_4\) **cannot split over F4 as a product of elliptic curves up to isogeny**: such a product would have rational point count \(31=\#E_1(\mathbb F_4)\#E_2(\mathbb F_4)\), but every elliptic factor has at most \(4+1+2\sqrt4=9\) points. This is a concrete local field-size shortcut in an F4-simple genus-two Jacobian, **not** evidence for a source-to-Jacobian homomorphism or cheaper discrete-log solving.
 
 ## Independent composition and toy DLP controls
@@ -65,6 +67,9 @@ From repository root:
 D=research/cross_characteristic_global_torsion_20261112/ct62
 python3 -B "$D/ct62_genus2_census.py" > /tmp/ct62-py.json
 python3 -O -B "$D/ct62_genus2_census.py" > /tmp/ct62-py-O.json
+python3 -B "$D/ct62_elliptic_f32_control.py" > /tmp/ct62-f32.txt
+python3 -O -B "$D/ct62_elliptic_f32_control.py" > /tmp/ct62-f32-O.txt
+cmp /tmp/ct62-f32.txt /tmp/ct62-f32-O.txt
 python3 -B "$D/ct62_genus2_cantor.py" > /tmp/ct62-cantor.json
 python3 -O -B "$D/ct62_genus2_cantor.py" > /tmp/ct62-cantor-O.json
 node "$D/ct62_genus2_independent.js" > /tmp/ct62-js.json
