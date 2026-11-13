@@ -1,9 +1,9 @@
 ---
-title: "Index-calculus GPU kernels: first hardware measurements and three optimizations"
+title: "Index-calculus GPU kernels: hardware measurements and optimizations (rounds 1 and 2)"
 date: 2026-11-13
 ---
 
-# Index-calculus GPU kernels: first hardware measurements and three optimizations
+# Index-calculus GPU kernels: hardware measurements and optimizations (rounds 1 and 2)
 
 User request (2026-11-12): *"Work on optimizing my index calculus code for gpu."*
 Scope: the IC CUDA directories of [`docs/perf/20261112-ic-gpu-audit.md`](../../docs/perf/20261112-ic-gpu-audit.md)
@@ -144,7 +144,69 @@ Built with each Makefile's defaults (plus `ARCH=sm_80`): all host tests pass; fe
 semaev device selftests pass; worker digests equal the CPU for spmv and fes n=16/24/26/30;
 semaev default build succeeds. `raw/out_final.tgz`.
 
+## Round 2 (2026-11-13): main `c5678a98ae` → `ffebecd472`
+
+User: *"More improvements."* Same machine class and the same physical host as round 1
+(Runpod machine `bwxqa7t7y2yk`, A100 80GB PCIe, CUDA 12.8), pod `o6oa4ymjxo2sgz`,
+00:57Z–01:17Z (~$0.75). Record `benchmarks/records/20261113T0057Z-ic-gpu-round2.json`; raw
+`raw/out2.tgz`, `raw/out_fin2.tgz`; tables `RESULTS2.md`. Rootfind builds ran on the pod's CPUs
+while FES and macaulay were timed; the timers are GPU-side and every A/A arm ran under the same load.
+Round 1's numbers reproduce on round 2's main arm: FES n=26 0.392 → 0.392 ms, macaulay batch 8192
+196.5 → 197.1 ms.
+
+![Round 2 speedups, [pcc:unverified]](fig_round2.svg)
+
+### R2.1 FES: block-unrolled walk (new, default K = 6)
+
+`fes_walk_block<K>` cuts the Gray walk into blocks of 2^K steps. Inside a block the flipped
+variable and its partner are compile-time constants (template recursion over the 2^K − 1 steps), so
+D_0..D_{K−1} and their K(K−1)/2 cross terms live in registers: no `ctz`, no table or local-memory
+load per step. One step per block (variable K + ctz(h)) and K column loads stay dynamic. The values
+are `fes_walk_gray`'s step for step, so the zeros come out in the same order.
+
+Identity: host `make test` on 6 systems (n = 1…20, up to 244 800 zeros) at splits 0..14; device
+sorted outputs equal to the CPU on n = 16, 24 (m=12), 26, 28 (m=16), 30, and equal to main on n = 32
+(no CPU reference at 2^32). K = 8 does not compile (nvcc template depth); capped at 7.
+
+| input | main Gray (ms) | K=4 | K=5 | **K=6** | K=7 | A/A |
+|---|---:|---:|---:|---:|---:|---:|
+| n=24, m=12 | 0.151 | 0.098 | 0.092 | **0.091** (1.66×) | 0.098 | 0.997 |
+| n=26 | 0.392 | 0.180 | 0.168 | **0.164** (2.40×) | 0.180 | 1.003 |
+| n=28, m=16 | 1.328 | 0.462 | 0.415 | **0.398** (3.34×) | 0.449 | 0.999 |
+| n=30 | 5.043 | 1.552 | 1.377 | **1.301** (3.88×) | 1.469 | 1.000 |
+| n=32 | 19.85 | 5.853 | 5.142 | **4.834** (4.11×) | 5.828 | 1.000 |
+
+Cumulative, n=30: 132.8 ms (round 1 main) → 5.14 ms (Gray) → 1.30 ms (block), **102×**, same
+solution list.
+
+### R2.2 Macaulay: 2D update mapping (new, default on the shared path)
+
+Lanes take columns (the pivot-row value stays in a register for the whole column), warps take rows
+(`factor[i]` is a warp-wide broadcast); no flattened cursor. Selftests pass on both shapes.
+
+| batch | main (ms) | 2D, 1024 thr | 2D, 512 thr | A/A |
+|---:|---:|---:|---:|---:|
+| 64 | 2.55 | 2.30 (0.902) | 2.84 | 1.000 |
+| 1024 | 25.89 | 23.18 (0.895) | 28.61 | 1.000 |
+| 8192 | 197.1 | **176.9 (1.11× faster)** | 218.1 | 1.000 |
+
+Default: 2D on the shared u16 path; the global u32 fallback (256 threads, sm_86/89) keeps the
+cursor because 2D was not measured there. Final tree: 176.7 ms ×3. Against base `e9d5dbdccd`:
+831.7 → 176.7 ms, 4.7×.
+
+### R2.3 Rootfind launch knobs (measured, **no change**)
+
+`RF_BLOCK` ∈ {64, 128, 256} × `RF_MIN_BLOCKS` ∈ {0, 2}, on main's source; all pass the selftests.
+The default (128, 0) is best or within 1.5% everywhere; the only gain outside A/A is −1.5% for
+(128, 2) on \|F\|=1024 hash/C16, which costs 9–46% on other configurations. Defaults kept. Nsight
+Compute is unavailable on the pod (`ERR_NVGPUCTRPERM`), so no profile explains where rootfind's time
+goes.
+
 ## Not done / next
+
+- No IC pipeline code calls the FES worker except the `icx fes` demo (`src/cryptanalysis/fes_gpu.rs`),
+  so an end-to-end relation-phase number does not exist yet; at 0.16 ms of kernel per n=26 system,
+  the worker's process start and text I/O dominate that path.
 
 - Other GPU classes (sm_89 cannot take the macaulay shared path; sm_90 can, with more room).
 - End-to-end effect: none of these kernels was timed inside an IC solve, so no ECDLP-cost or

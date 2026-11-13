@@ -14,7 +14,7 @@ research/ic_gpu_measure_20261112/job_round2.sh on one A100 (same class as round 
 c5678a98ae vs this branch. Record benchmarks/records/<stamp>-ic-gpu-round2.json.
 
 ## State
-2026-11-13: code written, host tests pass (FES block walk identical on 6 systems). Pod not yet started.
+2026-11-13 01:20Z: round 2 done, pod deleted, record 20261113T0057Z-ic-gpu-round2 closed, PR open.
 
 ## Runs in flight
 Pods named icgpu-*; delete with research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
@@ -24,4 +24,4 @@ Identity failure on any arm = that arm is excluded. Speed counts only outside th
 Cap: ~2 GPU-hours, $5. S3 checkpoint: unavailable (AWS keys rejected); same waiver as round 1.
 
 ## Next steps
-Launch, fetch out2.tgz, delete pod, analyze, report section "Round 2", record, PR.
+Track the PR. Then: wire the FES worker into a relation phase for an end-to-end number; rootfind profile on a host with GPU counters.
