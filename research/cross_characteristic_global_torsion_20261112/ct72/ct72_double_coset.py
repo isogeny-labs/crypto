@@ -7,6 +7,10 @@ from itertools import product
 
 PRIMES=(3,5,7,11)
 
+def check(condition,message="CT72 assertion failed"):
+    if not condition:
+        raise AssertionError(message)
+
 def nonsquare(a,p):
     return a%p not in {x*x%p for x in range(p)}
 
@@ -35,31 +39,31 @@ def run(p):
     T=(0,(-det)%p,1,tr)
     S=(1,0,0,p-1)
     group=[a for a in product(range(p),repeat=4) if determinant(a,p)]
-    assert len(group)==p*(p-1)**2*(p+1)
+    check(len(group)==p*(p-1)**2*(p+1))
     Cs=[g for g in group if mm(g,S,p)==mm(S,g,p)]
     Ct=[g for g in group if mm(g,T,p)==mm(T,g,p)]
-    assert len(Cs)==(p-1)**2 and len(Ct)==p*p-1
-    assert len({(2*u-tr)%p for u in range(p)})==p
+    check(len(Cs)==(p-1)**2 and len(Ct)==p*p-1)
+    check(len({(2*u-tr)%p for u in range(p)})==p)
     images={conjugate(g,T,p) for g in group}
-    assert len(images)==p*(p-1), 'GL2 conjugacy-class count'
+    check(len(images)==p*(p-1), 'GL2 conjugacy-class count')
     seen=set()
     all_us=set()
     for A in sorted(images):
         if A in seen:continue
         orbit={conjugate(D,A,p) for D in Cs}
-        assert len(orbit)==p-1
-        assert orbit <= images
-        assert {x[0] for x in orbit}=={A[0]}
-        assert {(x[0]-x[3])%p for x in orbit}=={(2*A[0]-tr)%p}
+        check(len(orbit)==p-1)
+        check(orbit <= images)
+        check({x[0] for x in orbit}=={A[0]})
+        check({(x[0]-x[3])%p for x in orbit}=={(2*A[0]-tr)%p})
         seen.update(orbit)
         all_us.add(A[0])
         # A has irreducible characteristic polynomial, so intersection is scalar.
-        assert sum(1 for D in Cs if mm(D,A,p)==mm(A,D,p))==p-1
-    assert seen==images and all_us==set(range(p))
+        check(sum(1 for D in Cs if mm(D,A,p)==mm(A,D,p))==p-1)
+    check(seen==images and all_us==set(range(p)))
     for u in range(p):
         block=[A for A in images if A[0]==u]
-        assert len(block)==p-1
-        assert all(A[3]==(tr-u)%p and determinant(A,p)==det for A in block)
+        check(len(block)==p-1)
+        check(all(A[3]==(tr-u)%p and determinant(A,p)==det for A in block))
     return {'ell':p,'trace':tr,'det':det,'gl2_size':len(group),
             'split_centralizer':len(Cs),'nonsplit_centralizer':len(Ct),
             'scalar_intersection':p-1,'relative_orbits':len(all_us),
