@@ -1,0 +1,29 @@
+name: CT80 seven-torsion point-field and independent two-prime audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct80/**'
+      - '.github/workflows/ct80-seven-point-field.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct80-seven-point-field:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Two independent coefficient, residue-field and DLP auditors
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct80
+          python3 -B "$D/ct80_seven_pointfield.py" >ct80-py.jsonl
+          python3 -O -B "$D/ct80_seven_pointfield.py" >ct80-pyopt.jsonl
+          node "$D/ct80_seven_pointfield_independent.js" >ct80-js.jsonl
+          node --no-opt "$D/ct80_seven_pointfield_independent.js" >ct80-jsopt.jsonl
+          cmp ct80-py.jsonl ct80-pyopt.jsonl
+          cmp ct80-py.jsonl ct80-js.jsonl
+          cmp ct80-py.jsonl ct80-jsopt.jsonl
+          test "$(wc -l <ct80-py.jsonl)" -eq 1
+          echo '65451a652799895b61587f085914e0343da6dc79fbac3535caf292711ac0414c  ct80-py.jsonl' | sha256sum -c
