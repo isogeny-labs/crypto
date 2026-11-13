@@ -195,7 +195,7 @@ is caught by at least one item (§3 table). Three classes are not caught.
    - The decisive question is whether `D` flattens.
 2. **The Riemann–Roch / net encoding on such a tower.** This is the elliptic-net
    direction's surviving form.
-   - At `m = 3` it beat the chain system and traded against flat Semaev on width.
+   - At `m = 3` it beat the chain system and traded against flat Semaev on width, as recorded in `p1_rr_dickson/RESULTS.md` [pcc:unverified].
    - At `m = 5, t = 4` it is undecided: Spot interruptions killed every attempt, and the
      chain arm hit a 56 GiB cap at `D ≥ 9`.
    - The barrier map predicts it cannot move the exponent: the encoding is not the cost.
