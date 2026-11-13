@@ -5,10 +5,12 @@ on:
       - research/ct51-crosschar-degree8-20261112
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct64/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct66/**'
       - '.github/workflows/ct64-explicit-quotient.yml'
   pull_request:
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct64/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct66/**'
       - '.github/workflows/ct64-explicit-quotient.yml'
   workflow_dispatch:
 
@@ -72,3 +74,34 @@ jobs:
               raise ValueError("projection lost its kernel")
           print("CT65 independent orbit and projector checks matched")
           PY
+
+      - name: CT66 complementary elliptic quotient dual and independent 100 cross maps
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct66
+          python3 -B "$D/ct66_full_dual.py" > /tmp/ct66-full.json
+          python3 -O -B "$D/ct66_full_dual.py" | cmp - /tmp/ct66-full.json
+          python3 -B "$D/ct66_dual_crossfactor.py" > /tmp/ct66-py.json
+          python3 -O -B "$D/ct66_dual_crossfactor.py" | cmp - /tmp/ct66-py.json
+          node "$D/ct66_dual_crossfactor_independent.js" > /tmp/ct66-js.json
+          node --no-opt "$D/ct66_dual_crossfactor_independent.js" | cmp - /tmp/ct66-js.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('/tmp/ct66-full.json').read_text())
+          b=json.loads(Path('/tmp/ct66-py.json').read_text())
+          c=json.loads(Path('/tmp/ct66-js.json').read_text())
+          def ok(x,msg):
+              if not x:raise AssertionError(msg)
+          ok(a['source_31_classes']==31 and a['target_31_torsion_pairs_tested']==6,'full dual/inverse')
+          ok(a['dual_scalar']==2 and a['inverse_scalar_mod31']==16,'dual norm scalar')
+          ok(a['types']=={'zero':1,'linear':6,'split':12,'repeated':6,'nonsplit':6},'F1024 divisor supports')
+          ok(a['quotients']==[[941,20,336],[941,20,714]],'complementary quotient equations')
+          ok(b['rank_matrix']==c['rank_matrix'],'independent ordered cross-factor ranks')
+          ok(b['noncomplementary_fullrank']==80 and b['complement_zero']==10,'rank census')
+          ok(c['complementary_phi_ranks']==[[20,4],[534,4],[619,4],[809,4],[832,4]],'product-rank controls')
+          ok(c['example_nonzero_cross'][2]==[[2,2],[25,20]],'nonzero cross-map orientation')
+          print('CT66 independent dual, inverse, F1024 Cantor and all 100 cross maps passed')
+          PY
+          sha256sum "$D/ct66_full_dual.py" "$D/ct66_dual_crossfactor.py" "$D/ct66_dual_crossfactor_independent.js"
