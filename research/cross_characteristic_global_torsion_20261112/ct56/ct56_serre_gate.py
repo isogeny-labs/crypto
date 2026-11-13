@@ -58,6 +58,7 @@ def run():
             'elliptic F2 controls')
     require(b(1) == 5 and b(2) == 9 and b(3) == 14 and b(4) == 25,
             'Serre base regression')
+    # Sharp global Q-rational gate, regardless of adapting A / Q.
     for bits, n in ((127,(1<<127)-1),(255,(1<<255)-19)):
         row = tuple(g_min(n, f) for f in (1,2,4,8))
         cols = tuple(f_min(n, g) for g in (1,2,3,4))
@@ -69,6 +70,8 @@ def run():
                     'f not minimal')
         print('bits',bits,'minimum g for f=1,2,4,8',row,
               'minimum f for g=1,2,3,4',cols)
+    # Demonstrate full 3-torsion cannot fit in F2, even though one
+    # nonzero 3-torsion point does: E0:y^2+y=x^3 has #E0(F2)=3.
     require(3 <= b(1) and not full_level_possible(3,1),
             'full-vs-single control')
     require(full_level_possible(3,2), 'full 3-torsion F4 control')
