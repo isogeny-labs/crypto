@@ -30,3 +30,19 @@ recorded values.
   wrong log (q = 1511) from a linear-algebra bug (unused factor-base columns),
   fixed before the current sweep.
 - `results/host.txt` — host (4 vCPU shared cloud VM, no isolation).
+
+## Double large primes (2026-11-13, `dlp_20261113/`)
+
+Frozen protocol `dlp_20261113/PROTOCOL.md`; 100 runs (q = 4001–16001, 5 seeds, 5 arms); all
+correctness gates pass; report `dlp_20261113/REPORT.pdf`. Unisolated L0 wall time, unverified
+assertion, not a leaderboard row.
+
+- R1 (counted) holds: dlp:0.5 needs 0.47–0.51× the relation candidates of lp:0.5 on all 20 instances.
+- R2 and R3 hold against iota + precheck: dlp:0.5 faster on 5/5 seeds at q = 8009, 12007 and 16001.
+  Median IC / expected-steps rho is 2.18, 2.85 and 1.65, against 2.34, 3.15 and 2.28 for the baseline.
+- Not predicted: dlp:0.5's lead over lp:0.5 falls from 1.71× to 0.97× (q = 4001 → 16001). Its reduced
+  rows are about twice as heavy (2.1× LA mulmods at the same number of unknowns), and the linear
+  algebra dominates at larger q.
+- R4 (exploratory): slope of median t_ic is 1.68 (dlp:0.5) against 1.77 (baseline); no exponent gain.
+  Rho is faster at every q.
+- Next step (proposed): weight-bounded reduction (cap the support of reduced rows or the pivot-chain length).

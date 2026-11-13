@@ -5,7 +5,7 @@
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 147,
+    "measured": 148,
     "open": 0
   },
   "repo": "crypto",
@@ -6198,6 +6198,146 @@
       ],
       "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.5126,
+      "latest": 0.5126,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cand_dlp50_over_lp50_max",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 20,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 0.5126
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.65,
+      "latest": 1.65,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.65
+      },
+      "metric": "ic_over_rho_expected_dlp50_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.65
+          },
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 1.65
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.13,
+      "latest": 2.13,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "la_mulmods_dlp50_over_lp50_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 2.13
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.967,
+      "latest": 0.967,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "lp50_over_dlp50_t_ic_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 0.967
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.406,
+      "latest": 1.406,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "pre_over_dlp50_t_ic_median_q16001",
+      "points": [
+        {
+          "commit": "2be5bf345aad",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 5,
+          "record": "20261113T1559Z-humbert-genus5-dlp",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.174,
+            1.952
+          ],
+          "summary": "Double large primes on the genus-5 cover (toy q 4001-16001, 100 runs, all gates pass, L0 unisolated): R1-R3 hold against iota+precheck; dlp halves candidates vs lp but doubles LA mulmods, so lp50/dlp50 falls 1.71 -> 0.97; slope 1.68 vs 1.77, no exponent gain; rho faster everywhere.",
+          "value": 1.406
+        }
+      ],
+      "problem": "ic:humbert-genus5-toy",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
