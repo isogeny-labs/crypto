@@ -37,7 +37,10 @@ fn main() {
         if field(l, "theta") != Some(1.0) {
             continue;
         }
-        let key = (field(l, "genus").unwrap() as u64, field(l, "p").unwrap() as u64);
+        let key = (
+            field(l, "genus").unwrap() as u64,
+            field(l, "p").unwrap() as u64,
+        );
         b.insert(
             key,
             (
@@ -51,7 +54,10 @@ fn main() {
     // (g, p) -> Vec<(total_ms, smooth, solve_ms, ok, ops)>
     let mut n: BTreeMap<(u64, u64), Vec<(f64, f64, f64, bool, f64, f64)>> = BTreeMap::new();
     for l in nat.lines().filter(|l| l.starts_with("JSON")) {
-        let key = (field(l, "genus").unwrap() as u64, field(l, "p").unwrap() as u64);
+        let key = (
+            field(l, "genus").unwrap() as u64,
+            field(l, "p").unwrap() as u64,
+        );
         n.entry(key).or_default().push((
             field(l, "total_ms").unwrap(),
             field(l, "smoothness").unwrap(),

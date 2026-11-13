@@ -226,10 +226,7 @@ pub(crate) mod tests {
                     let s = c.place(x0, y0);
                     let a2 = c.add(&a, &s);
                     assert_eq!(c.add_place(&a2, x0, y0), c.add(&a2, &s));
-                    assert_eq!(
-                        c.add_place(&a2, x0, c.fp.neg(y0)),
-                        c.add(&a2, &c.neg(&s))
-                    );
+                    assert_eq!(c.add_place(&a2, x0, c.fp.neg(y0)), c.add(&a2, &c.neg(&s)));
                 }
             }
         }

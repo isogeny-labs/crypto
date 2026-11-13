@@ -11,7 +11,10 @@ pub struct Fp {
 
 impl Fp {
     pub fn new(p: u64) -> Self {
-        assert!(p > 2 && p < (1u64 << 62) && p % 2 == 1, "Fp: need odd 2 < p < 2^62");
+        assert!(
+            p > 2 && p < (1u64 << 62) && p % 2 == 1,
+            "Fp: need odd 2 < p < 2^62"
+        );
         // Newton iteration for p^{-1} mod 2^64 (each step doubles the bits).
         let mut inv = p;
         for _ in 0..6 {

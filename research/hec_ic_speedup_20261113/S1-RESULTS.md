@@ -30,7 +30,7 @@ No `S` improvement is claimed.
 | gate | test | result |
 |:--|:--|:--|
 | G1 group law | `jac::tests::group_law_g1`: genus 2–4 at `p ∈ {13, 17, 101, 1009, 65537}`, 60 random triples each. Checks commutativity, associativity, inverse, `2D`, `5D`, and the degree-1 fast path against generic Cantor, including `u(x0) = 0` and the opposite place. | **holds** |
-| G2 oracle | `oracle::tests::oracle_matches_bruteforce`: every monic polynomial of degree 1–3 and a 1-in-7 sample at degree 4, `p ∈ {11, 13, 17, 19}` (both residues mod 4). Decision and root multiset are compared against brute-force division. | **holds** |
+| G2 oracle | `oracle::tests::oracle_matches_bruteforce`: decision and root multiset are compared against brute-force division, at `p ∈ {11, 13, 17, 19}` (both residues mod 4). Degrees 1–3 are exhaustive at every `p`. Degree 4 is exhaustive at `p = 11, 13` and a 1-in-7 sample at `p = 17, 19`. **Protocol deviation:** PLAN fixed `p ∈ {13, 17}` and "every polynomial of degree ≤ 4". The run adds two primes, but at degree 4 it samples rather than enumerates at `p = 17` (and 19). | **holds** |
 | G3 instances | `(ℓ, m)` equals round eight's on all 11 rows. | **holds** (asserted by `s1_compare`) |
 | G4 answers | Every run returns `k` with `k·D₁ = D₂`. | **holds**: 55/55 native and all BigUint runs |
 
@@ -52,6 +52,22 @@ consistency of the eliminated system, points on the curve.
 | 3 | 401 | 31525763 | 40.75 | 5.593 | 5.355–5.765 | **7×** | 55% | 0.155 / 0.149–0.171 | 1298 |
 | 4 | 31 | 239753 | 19.07 | 1.057 | 0.736–1.783 | **18×** | 8% | 0.049 / 0.036–0.068 | 533 |
 | 4 | 61 | 16790591 | 21.61 | 1.633 | 1.542–1.819 | **13×** | 25% | 0.081 / 0.057–0.110 | 610 |
+
+**Post-hoc checks (not registered).**
+
+- **Reproduction at HEAD.** `hec_native_bench` and `instance.rs` changed after the measured binary
+  was built: a BSGS budget knob was added. HEAD (`2e5f987872`) was rebuilt and the default rows
+  re-run ([`s1/native_s1_head_aa.txt`](s1/native_s1_head_aa.txt)). Every deterministic column of
+  all 55 runs is byte-identical to the measured run: trials, relations, group operations, oracle
+  and solve counts, `k`.
+- **Native A/A.** The same re-run gives the wall-clock spread. Per-row mean ratio between the two
+  runs:
+  - 1.00–1.07 on ten rows;
+  - 1.53 on the first row (genus 2 `p = 101`: 0.34 against 0.52 ms). That row is sub-millisecond
+    and first in each process.
+  - No verdict below changes. That row's speedup reads 5× rather than 8× against the re-run.
+  - A BigUint A/A (about 4.5 minutes) was not run. Round eight bounds that engine's A/A at 1.4×
+    per row on its own host.
 
 Group operations match the BigUint engine's `relation_ops` to within seed noise on every row. For
 example, genus 2 at `p = 4001` is 4028 native against 4025 BigUint, and genus 4 at `p = 61` is 610
@@ -77,15 +93,17 @@ against 570. This is expected: it is the same walk with a different random strea
 
 **The solve is about 24 ns per entry update.**
 
-- The two solvers do the same algebra. At genus 2 `p = 4001` that is 0.89 M multiplications mod `ℓ`
+- The two solvers do comparable work. At genus 2 `p = 4001` that is 0.89 M multiplications mod `ℓ`
   native against 1.00 M BigUint (`la_modmuls`).
 - The native solve spends about 24 ns per entry update. Row merges go through freshly allocated
   `Vec`s, holder lists are re-sorted, and the heap carries stale entries.
 - At genus 2 the solve is 75–82% of native wall time.
 
 **The native relation phase is small by comparison.** At genus 2 `p = 4001` the walk, oracle and
-row building take 4.3 ms of the 27 ms. The BigUint engine's per-phase wall time is not reported, so
-the relation-phase speedup alone is not measured here and is not claimed.
+row building take 4.3 ms of the 27 ms. The BigUint engine's per-phase wall time (`ic_solve_ns`,
+`ic_partial_ns` in `head_to_head`) is computed but not printed by the frozen example. So the
+relation-phase speedup alone is not measured here and is not claimed. A small new example printing
+those fields would measure it.
 
 **The rows are near-dense in the step columns.**
 
@@ -114,6 +132,20 @@ the relation-phase speedup alone is not measured here and is not claimed.
 3. **Beyond round eight's sizes.** `pick_instance_with_budget` (BSGS budget via `HEC_BSGS_MAX`) was
    added after this measurement. The full-base walk at larger `p` is descriptive only until the
    solve is fixed.
+
+## Repository process: what is not done yet
+
+These `AGENTS.md` steps apply to a PR that reports timings and are **not done** in this commit:
+
+- a `bench.record/v1` record (`tools/benchrec.py`), with the raw files uploaded to the S3 store;
+  the raw outputs sit in `s1/` (≈ 100 KB) for now;
+- a research-visuals report: a graph and a PDF;
+- a `benchmarks/<date>-<slug>/` entry and its `benchmarks/README.md` row, with "external comparison:
+  not run" (§15: no open hyperelliptic-IC implementation is known);
+- ICV1 slugs for the 11 curves (§11);
+- the S3 resume checkpoint (`scripts/checkpoint.sh`) before the run. The runs took about 4.5
+  minutes on a laptop. The worktree is a sparse checkout without the repo's `.claude/hooks`, so
+  the checkpoint and benchrec hooks did not fire.
 
 ## Scope
 

@@ -77,7 +77,10 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
     let fb = factor_base(curve);
     let m = fb.len();
     rep.m = m;
-    assert!(fp.p <= u32::MAX as u64, "S1 indexes the base by x in a dense table");
+    assert!(
+        fp.p <= u32::MAX as u64,
+        "S1 indexes the base by x in a dense table"
+    );
     let mut by_x = vec![u32::MAX; fp.p as usize];
     for (j, &(x, _)) in fb.iter().enumerate() {
         by_x[x as usize] = j as u32;

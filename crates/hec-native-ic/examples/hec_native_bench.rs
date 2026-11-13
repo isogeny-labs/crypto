@@ -50,7 +50,18 @@ fn main() {
 
     println!(
         "{:>2} {:>6} {:>12} {:>6} {:>4} {:>9} {:>9} {:>6} {:>9} {:>6} {:>6} {:>6}  ok",
-        "g", "p", "ell", "m", "seed", "trials", "ops", "smooth", "total_ms", "walk%", "orac%", "solv%"
+        "g",
+        "p",
+        "ell",
+        "m",
+        "seed",
+        "trials",
+        "ops",
+        "smooth",
+        "total_ms",
+        "walk%",
+        "orac%",
+        "solv%"
     );
     for (g, p) in rows {
         let t = Instant::now();

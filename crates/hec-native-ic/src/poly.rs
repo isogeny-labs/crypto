@@ -379,7 +379,9 @@ mod tests {
             let u = Poly::from_coeffs(&[d, c, b, 1]);
             // b²c² − 4c³ − 4b³d − 27d² + 18bcd
             let i = |v: u64| v as i128;
-            let closed = i(b) * i(b) * i(c) * i(c) - 4 * i(c).pow(3) - 4 * i(b).pow(3) * i(d)
+            let closed = i(b) * i(b) * i(c) * i(c)
+                - 4 * i(c).pow(3)
+                - 4 * i(b).pow(3) * i(d)
                 - 27 * i(d) * i(d)
                 + 18 * i(b) * i(c) * i(d);
             assert_eq!(u.disc_monic(&fp) as i128, closed.rem_euclid(101));
