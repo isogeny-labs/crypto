@@ -28,8 +28,8 @@ Outputs are unchanged by construction and by test.
 
 `ic price --params research/ic_tool_program/suite/v1/params/S/<row>/M1-T01.json
 --json --single-target --rho-seed <the suite's seed>` for two rows:
-- `k0n53` (`icv1-f2m53-tm56619371-dac20a85`, 2^44.3);
-- `k0n61` (`icv1-f2m61-t158598901-ab42b6c5`, 2^47.2).
+- `icv1-f2m53-tm56619371-dac20a85` (`icv1-f2m53-tm56619371-dac20a85`, 2^44.3);
+- `icv1-f2m61-t158598901-ab42b6c5` (`icv1-f2m61-t158598901-ab42b6c5`, 2^47.2).
 
 Every process runs under `isolated_bench run --wait --cpus 2` with
 `RAYON_NUM_THREADS=1`. This is the binary `rule/v9/binaries.sha256` names
@@ -38,7 +38,7 @@ and counted. It is not a measurement.
 
 ## Schedule
 
-42 rounds per row. Round `r` runs both rows, `k0n53` then `k0n61`, each in
+42 rounds per row. Round `r` runs both rows, `icv1-f2m53-tm56619371-dac20a85` then `icv1-f2m61-t158598901-ab42b6c5`, each in
 label order permutation `(r − 1) mod 6` of
 `[a q c, a c q, q a c, q c a, c a q, c q a]`. Over 7 cycles every label
 runs in every position equally often. That is 252 processes in all.
@@ -73,8 +73,8 @@ A/B medians `a / c`:
 
 | row | collect | set-up |
 |:--|:--|:--|
-| k0n53 | [1.02, 1.08] | [1.00, 1.05] |
-| k0n61 | [1.05, 1.13] | [1.03, 1.10] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.02, 1.08] | [1.00, 1.05] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.05, 1.13] | [1.03, 1.10] |
 
 ## Identity
 

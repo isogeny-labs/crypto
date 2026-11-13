@@ -28,14 +28,14 @@ tables word for word with pairing on and off.
   - **b** — build pairing on, lookahead 32;
   - **l** — `KIC_BUILD_PAIRED=0`, `KIC_LOOKAHEAD=64`.
 - **Choice of 64:** made from the exploration's sweep before this
-  protocol. It had the lowest median collect at `k0n61` and the
-  second-lowest at `k0n53`. No other value is tested.
+  protocol. It had the lowest median collect at `icv1-f2m61-t158598901-ab42b6c5` and the
+  second-lowest at `icv1-f2m53-tm56619371-dac20a85`. No other value is tested.
 
 ## Workload
 
 `ic price --params research/ic_tool_program/suite/v1/params/S/<row>/M1-T01.json
---json --single-target --rho-seed <the suite's seed>`, for `k0n53` (2^44.3)
-and `k0n61` (2^47.2).
+--json --single-target --rho-seed <the suite's seed>`, for `icv1-f2m53-tm56619371-dac20a85` (2^44.3)
+and `icv1-f2m61-t158598901-ab42b6c5` (2^47.2).
 
 - Every process runs under `isolated_bench run --wait --cpus 2` with
   `RAYON_NUM_THREADS=1`.
@@ -45,7 +45,7 @@ and `k0n61` (2^47.2).
 ## Schedule
 
 - 44 rounds a row.
-- Round `r` runs `k0n53` then `k0n61`, each in label order `(r − 1) mod 4`
+- Round `r` runs `icv1-f2m53-tm56619371-dac20a85` then `icv1-f2m61-t158598901-ab42b6c5`, each in label order `(r − 1) mod 4`
   of the cyclic Latin square `[a q b l, q b l a, b l a q, l a q b]`.
 - Over 11 cycles every label runs in every position equally often.
 - 352 processes in all.
@@ -83,10 +83,10 @@ Medians from the exploration and the arithmetic:
 
 | lever | row | primary metric (median) | set-up (median) |
 |:--|:--|:--|:--|
-| `a / b` | k0n53 | build in [1.00, 1.03] | [1.00, 1.01] |
-| `a / b` | k0n61 | build in [1.00, 1.04] | [1.00, 1.01] |
-| `a / l` | k0n53 | collect in [0.98, 1.04] | [0.98, 1.03] |
-| `a / l` | k0n61 | collect in [0.98, 1.05] | [0.98, 1.04] |
+| `a / b` | icv1-f2m53-tm56619371-dac20a85 | build in [1.00, 1.03] | [1.00, 1.01] |
+| `a / b` | icv1-f2m61-t158598901-ab42b6c5 | build in [1.00, 1.04] | [1.00, 1.01] |
+| `a / l` | icv1-f2m53-tm56619371-dac20a85 | collect in [0.98, 1.04] | [0.98, 1.03] |
+| `a / l` | icv1-f2m61-t158598901-ab42b6c5 | collect in [0.98, 1.05] | [0.98, 1.04] |
 
 The likely outcome is "not established". The A/A floor in lever 2's
 session was about ±3–6%.
@@ -109,7 +109,7 @@ No board row and no claim against rho.
 ## Amendment 1 (2026-11-13 ~00:50 UTC, before any row of rounds 38–44)
 
 - **What happened:** the session's container was replaced during the run.
-  At that point `k0n53` had rounds 1–38 complete and `k0n61` rounds 1–37,
+  At that point `icv1-f2m53-tm56619371-dac20a85` had rounds 1–38 complete and `icv1-f2m61-t158598901-ab42b6c5` rounds 1–37,
   plus two processes of round 38. All rows on disk survived and are
   committed (`acb591cd5a`).
 - **Binary:** the binary in `/dev/shm` was lost. It was rebuilt from the
@@ -118,9 +118,9 @@ No board row and no claim against rho.
   through `ARMS=`.
 - **Host:** the replacement node reports a different nominal clock
   (`runs/host-a1.txt`, against `runs/host.txt`).
-- **Remaining rounds:** rounds 39–44 of `k0n53` and 38–44 of `k0n61` run on
+- **Remaining rounds:** rounds 39–44 of `icv1-f2m53-tm56619371-dac20a85` and 38–44 of `icv1-f2m61-t158598901-ab42b6c5` run on
   the rebuilt binary and the replacement node.
-- **Set aside:** the two old-binary processes of `k0n61` round 38 are moved
+- **Set aside:** the two old-binary processes of `icv1-f2m61-t158598901-ab42b6c5` round 38 are moved
   to `runs/set-aside/` and not analysed, so that no round mixes binaries.
 - **Analysis:**
   - *Primary:* unchanged. All 44 rounds, the decision rule as stated. The
