@@ -1,3 +1,7 @@
+Current canonical G3:see G3_DESCENT_STATUS.md. Producer CI43388101185/27e47f COMPLETE;all4+8+5 raw publications COMPLETE latest9b93a4/9ee. Root global missing original ecbench fixture2364e3 unresolved. Independent norm readyPR1521/protocolac58df publishedc3b BEFOREcode;static02 strict0/22fb44;full four-test unit01 ACTIVE/357guards. Next collect terminal before edits;main signing/ledger/conflict gates separate. Earlier CURRENT/ACTIVE paragraphs historical. [pcc:unverified]
+
+---
+
 Canonical current G3:see G3_DESCENT_STATUS.md. Componentc162f3/188d44/2d6fec COMPLETE;ACTUALeightpublication920f04/bb6 complete. FirstCI43379511138 rejected0jobs;frozencontextrepairb02647 metadata0/new343ref,actualnewCIpending. Root02timeout124/2133guards0 andmissingoriginalecbenchfixture2364e3 unresolved;NOrootnativeprocess. FIVEnewdataobjects pendingnextautofix. Nextnorm88d09a isproposalonly;consumerprotocolbeforecode. EarlierCURRENT/ACTIVE paragraphs below historical. [pcc:unverified]
 
 ---
