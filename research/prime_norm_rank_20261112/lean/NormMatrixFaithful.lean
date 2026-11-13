@@ -37,7 +37,7 @@ theorem coordinatesInjective (a b : ℕ) (w z : Fin ((a+1)+(b+1)) → K)
       simpa only [lowerProjection] using hB
   exact (Polynomial.degreeLT.basisProd K (a+1) (b+1)).equivFun.symm.injective hpair
 
-theorem upperDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
+theorem assembledUpperDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
     (NormLift.assemble (NormMomentMatrix.upperFamily a b) w).natDegree≤a := by
   rw [← upperProjection]
   have hd := mem_degreeLT.mp (coordinatePair a b w).1.property
@@ -45,7 +45,7 @@ theorem upperDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
   · simp [hz]
   · exact Nat.le_of_lt_succ ((natDegree_lt_iff_degree_lt hz).mpr hd)
 
-theorem lowerDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
+theorem assembledLowerDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
     (NormLift.assemble (NormMomentMatrix.lowerFamily a b) w).natDegree≤b := by
   rw [← lowerProjection]
   have hd := mem_degreeLT.mp (coordinatePair a b w).2.property
@@ -132,10 +132,10 @@ theorem coordinateBranchRadical (F H f U V : Polynomial K) (q y alpha beta : K)
       simpa only [A,B,hzA,hzB] using hz
     · intro h z hz
       rw [bilinearMoment]
-      exact h _ _ (upperDegree _ _ z) (lowerDegree _ _ z) hz
+      exact h _ _ (assembledUpperDegree _ _ z) (assembledLowerDegree _ _ z) hz
   rw [htests,NormBranchRadical.restrictedRadicalWitnessLine F H f
     (NormLift.assemble A w) (NormLift.assemble B w) U V q y alpha beta hf hh hhp hgap hbez
-    hFq halpha hW hbranch (upperDegree _ _ w) (lowerDegree _ _ w)]
+    hFq halpha hW hbranch (assembledUpperDegree _ _ w) (assembledLowerDegree _ _ w)]
   have hscaleA (t : K) : NormLift.assemble A (t • w0)=C (t*alpha)*F := by
     rw [assembleSmul,hA0]
     simp only [smul_eq_C_mul,map_mul]
@@ -168,8 +168,8 @@ end NormMatrixFaithful
 #print axioms NormMatrixFaithful.upperProjection
 #print axioms NormMatrixFaithful.lowerProjection
 #print axioms NormMatrixFaithful.coordinatesInjective
-#print axioms NormMatrixFaithful.upperDegree
-#print axioms NormMatrixFaithful.lowerDegree
+#print axioms NormMatrixFaithful.assembledUpperDegree
+#print axioms NormMatrixFaithful.assembledLowerDegree
 #print axioms NormMatrixFaithful.assembledPairing
 #print axioms NormMatrixFaithful.bilinearMoment
 #print axioms NormMatrixFaithful.assembleSmul
