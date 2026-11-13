@@ -1,3 +1,18 @@
+Current source45ee45d2 andgenuinepublication22d22eb0e: PUBLIC_TARGET_CHECKPOINT.md.
+
+
+## 2026-11-13T21:14:59.139368+00:00 — genuine odd-product publication and current scientific source
+
+Data carrier056ac319/49paths/c10ecd normallypublished0. Actual43505654954/job132162532391 pull_request_targetSUCCESS16 remote-byte replays BEFOREbot22d22eb0e/direct056ac319/EXACT18paths. NINEWHOLEcaptures+NINEcompleteindices+TWOwholefixtures20objects:16S3(9archives5largeindices2fixtures)+4smallwholeGitindices. Whole429122-byteUTF8log/allAPIlosslessXZ/normalpush/FF/manifests/controlindexdirect;no recursivearchive. NormalFF/artifact/wiring0/all3241currentguard06+BOTHereposowned dirtybytes preserved;all20consumerphysical originalsintact/16ignoredgenuine manifests. Root768f4a/consumer0bb0f5;guard06 RELEASED,futureFF needsNEWguard07. [pcc:unverified]
+
+Scientific source45ee45d2/237paths/tree45a23a5f/545f18/b2d415 is normallypublished0. Models9722d7 matchesALL6 old andALL6 newHLP outcomes3square3nonsquare;native9561ce/all2485guards suppliesALL3newcompletePhiNorm/both2 and F=PhiNew gamma Nold,G=PhiOld delta NormNew BOTH52 onALL224old+224newclasses/36source/public5/exactell/completeexceptionalcontrols/reusabletaggedoriginal odd-source recovery159985 delta NormNew. RationalF kernels2,4,2/G2,2,2/allC4 retained. Written1fd6e7 globalCiani/V4/Res/both52/degree140608/oldendpointdistinction;twoexactpartialLean4d1338/95d4e6bothgates/noaxioms/zero trusted,52total. First redundant-rfl failurewholec4ffa9 retained. TWO59335-byte final PDFpagesALLinspected13cfa7. [pcc:unverified]
+
+New ci_odd_product/ELEVENTH workflow675portable348producer+self676/12orderedphases/TWOunfilteredtests/ALL17wholeJSONexact/bothoriginal2gates/2exactbindings is published. Complete fixture120752bytesS3-backed;data-only hydration runs original artifacttool+policy fromimmutable3de8 thirdcheckout+cmp,credentials onlythatstep. Fouractualadmissioncontrols2/nooutput/restored;cleanphysical45ee/original3d full2100s FRESHoutsidecache RUNNING. Ownfull terminal and11workflowaudit101native52canonicaldigests pending. Prior3de8fullb2b04d/CI5fee4184native50digests,alloldernative/fullCI and17oldergenuinecaptures settled,no redispatch. [pcc:unverified]
+
+Next full/CI terminal evidence andsourcecheckpoint;then actual gamma-transported2-kernel/geometric52types and same-output source-map simplification from NoldPhiOld=[2],oractualnewtargetpublicIC/costcoverage underfreshprotocols. Original S3benchmarkcheckpoint/livebudget/capacity/fullcost/strongestrefs stillrequired. Root authenticfixture/globalgate/mainappend-onlyledger/signing/reviews/conflict/fullgeometry/vault8edec422/KBecdb gaps remain. Onlyfourclosed derived compiler caches removed withallrawsourcecapturespreserved;rootregressionbinary/currentwarmcache retained. Continueaftereachrung. [pcc:unverified]
+
+Earlier entries remain historical.
+
 Current actual different-product52 checkpoint: PUBLIC_TARGET_CHECKPOINT.md.
 
 
