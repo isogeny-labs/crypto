@@ -43,6 +43,7 @@ pub mod hyper64;
 pub mod ic_control;
 pub mod instrument;
 pub mod measure;
+pub mod negation_remeasure;
 pub mod pushforward;
 pub mod pushforward_deg3;
 pub mod small_de;
