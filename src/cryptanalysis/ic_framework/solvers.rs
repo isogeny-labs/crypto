@@ -25,6 +25,7 @@
 //! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
+//! | `primo-smt` | Primo 0.2.0 through SMT-LIB `QF_UF`; one checked Boolean model per call | solver-reported SAT conflicts |
 //! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
 //! | `fes-f2-gpu` | `fes-f2` with the search on the `gpu/fes` CUDA serve worker, every point re-verified on the CPU; same count as `fes-f2` | word XORs (Gray-code steps) |
 //! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
@@ -86,6 +87,7 @@
 //! See `docs/ic/FRAMEWORK.md` for a worked example of adding one.
 
 use std::collections::BTreeMap;
+use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use super::stages::{BooleanSystem, Params, SolverCost, SolverVerdict, SystemShape, SystemSolver};
@@ -98,9 +100,15 @@ use crate::cryptanalysis::m4gb_oracle::{
 };
 use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
 use crate::cryptanalysis::pq_groebner_f2::{
-    groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
+    bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
+    MASK_BITS,
 };
 use crate::cryptanalysis::semaev_sat::XorEncoding;
+use crate::cryptanalysis::smt_oracle::{
+    find_solver, format_smtlib_for_solver, parse_smt_stdout, rows_satisfied, run_smt, SmtEncoding,
+    SmtSolveOptions, SmtSolverKind, SmtVerdict,
+};
+use crate::cryptanalysis::wdsat_oracle::AnfRow;
 
 pub use super::solver_units::{solver_unit_key, SolverUnitKey};
 
@@ -1656,10 +1664,33 @@ impl SystemSolver for XlF2 {
 /// cannot return configuration errors, so its own call repeats the check as
 /// a fail-fast invariant.
 pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String> {
-    if name == "sat-cdcl" {
-        sat_xor_encoding(params)?;
+    match name {
+        "sat-cdcl" => {
+            sat_xor_encoding(params)?;
+        }
+        "primo-smt" => {
+            let timeout_ms = params.u64_or("primo_timeout_ms", 600_000)?;
+            if timeout_ms == 0 {
+                return Err("primo_timeout_ms must be positive".into());
+            }
+            primo_binary(params)?;
+        }
+        _ => {}
     }
     Ok(())
+}
+
+fn primo_binary(params: &Params) -> Result<PathBuf, String> {
+    if let Some(raw) = params.get("primo_binary") {
+        let path = PathBuf::from(raw);
+        return path
+            .is_file()
+            .then_some(path)
+            .ok_or_else(|| format!("primo_binary is not a file: `{raw}`"));
+    }
+    find_solver(SmtSolverKind::Primo).ok_or_else(|| {
+        "Primo executable not found; set primo_binary, SMT_PRIMO_BIN, or PATH".into()
+    })
 }
 
 fn sat_xor_encoding(params: &Params) -> Result<XorEncoding, String> {
@@ -1784,6 +1815,156 @@ impl SystemSolver for SatCdcl {
     }
 }
 
+// ── Primo through SMT-LIB ─────────────────────────────────────────
+
+/// Primo as a first-solution engine for the framework's exact Boolean rows.
+///
+/// This is the binary-field Weil-descent route. Primo 0.2.0 has no bit-vector,
+/// finite-field, or nonlinear-arithmetic theory, so prime-field systems do not
+/// reach this engine. Every SAT model is independently checked before it is
+/// converted to the framework's mask representation.
+pub struct PrimoSmt;
+
+impl SystemSolver for PrimoSmt {
+    fn name(&self) -> &str {
+        "primo-smt"
+    }
+
+    fn describe(&self) -> String {
+        "Primo SMT over exact Boolean QF_UF rows; returns one independently checked model".into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "primo_binary",
+                "path to Primo; otherwise SMT_PRIMO_BIN or PATH is used",
+            ),
+            (
+                "primo_timeout_ms",
+                "external wall timeout per call (default 600000; intersected with the pipeline budget)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn finds_every_solution(&self) -> bool {
+        false
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        validate_solver_params(self.name(), params)
+            .expect("primo-smt configuration must be validated before a timed solve");
+        let binary = primo_binary(params)
+            .expect("primo-smt configuration must be validated before a timed solve");
+        let rows: Vec<AnfRow> = system.equations.iter().map(AnfRow::from_poly).collect();
+        let script = format_smtlib_for_solver(
+            system.n_vars as u32,
+            &rows,
+            &[],
+            SmtEncoding::Bool,
+            SmtSolverKind::Primo,
+        );
+        let configured = Duration::from_millis(
+            params
+                .u64_or("primo_timeout_ms", 600_000)
+                .expect("validated Primo timeout"),
+        );
+        let timeout = budget.map_or(configured, |limit| limit.min(configured));
+        let mut options = SmtSolveOptions::new(SmtSolverKind::Primo, binary);
+        options.encoding = SmtEncoding::Bool;
+        options.timeout = timeout;
+
+        let started = Instant::now();
+        let mut extra = BTreeMap::from([
+            ("input_bytes".into(), script.len() as u64),
+            ("rows".into(), rows.len() as u64),
+            ("variables".into(), system.n_vars as u64),
+            ("solver_calls".into(), 1),
+            ("solver_conflicts_available".into(), 0),
+            ("solver_decisions_available".into(), 0),
+            ("decisions".into(), 0),
+            ("invocation_error".into(), 0),
+            ("external_timeout".into(), 0),
+            ("unknown".into(), 0),
+            ("invalid_model".into(), 0),
+            ("model_checked".into(), 0),
+        ]);
+        let run = match run_smt(&script, 0, &options) {
+            Ok(run) => run,
+            Err(error) => {
+                let timed_out = error.contains(" timed out after ");
+                extra.insert("external_timeout".into(), u64::from(timed_out));
+                extra.insert("invocation_error".into(), u64::from(!timed_out));
+                return (
+                    SolverVerdict::BudgetExceeded,
+                    SolverCost {
+                        ops: 0,
+                        op_unit: "Primo SAT conflicts (solver-reported)".into(),
+                        wall_ns: started.elapsed().as_nanos() as u64,
+                        peak_bytes: 0,
+                        degree_reached: None,
+                        solving_degree: None,
+                        timed_out,
+                        extra,
+                    },
+                );
+            }
+        };
+        let conflicts = run.conflicts.unwrap_or(0);
+        extra.insert(
+            "solver_conflicts_available".into(),
+            u64::from(run.conflicts.is_some()),
+        );
+        extra.insert(
+            "solver_decisions_available".into(),
+            u64::from(run.decisions.is_some()),
+        );
+        extra.insert("decisions".into(), run.decisions.unwrap_or(0));
+        let verdict = match parse_smt_stdout(&run.stdout, system.n_vars) {
+            SmtVerdict::Unsat => SolverVerdict::Unsatisfiable,
+            SmtVerdict::Unknown => {
+                extra.insert("unknown".into(), 1);
+                SolverVerdict::BudgetExceeded
+            }
+            SmtVerdict::Sat(model) if rows_satisfied(&rows, &model) => {
+                extra.insert("model_checked".into(), 1);
+                let root = model
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, value)| **value)
+                    .fold(0 as Mask, |mask, (i, _)| mask | bit(i as u32));
+                SolverVerdict::Solved(vec![root])
+            }
+            SmtVerdict::Sat(_) => {
+                extra.insert("invalid_model".into(), 1);
+                SolverVerdict::BudgetExceeded
+            }
+        };
+        (
+            verdict,
+            SolverCost {
+                ops: conflicts,
+                op_unit: "Primo SAT conflicts (solver-reported)".into(),
+                wall_ns: run.elapsed.as_nanos() as u64,
+                peak_bytes: 0,
+                degree_reached: None,
+                solving_degree: None,
+                timed_out: false,
+                extra,
+            },
+        )
+    }
+}
+
 // ── Exhaustive search, the reference ───────────────────────────────
 
 /// Evaluate the equations at every point of `{0,1}^n`, moving to the
@@ -1871,6 +2052,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(CrossbredF2),
         Box::new(XlF2),
         Box::new(SatCdcl),
+        Box::new(PrimoSmt),
         Box::new(FesF2),
         Box::new(FesF2Gpu),
         Box::new(FesWide),
@@ -2062,6 +2244,63 @@ mod tests {
         assert!(std::panic::catch_unwind(|| SatCdcl.solve(&sys, &invalid, None)).is_err());
     }
 
+    /// Runs only when the pinned Primo executable is installed. The adapter
+    /// must return a member of the exact solution set, independently check the
+    /// model, expose the solver's statistics, and accept a real UNSAT verdict.
+    #[test]
+    fn primo_smt_is_first_solution_checked_and_refutes() {
+        let Ok(binary) = primo_binary(&Params::default()) else {
+            return;
+        };
+        let mut params = Params::default();
+        params.set("primo_binary", binary.to_string_lossy().into_owned());
+        params.set("primo_timeout_ms", "60000");
+        validate_solver_params("primo-smt", &params).expect("installed Primo is valid");
+
+        let sys = fixture();
+        let reference: std::collections::BTreeSet<Mask> = [0, 3].into_iter().collect();
+        let (verdict, cost) = PrimoSmt.solve(&sys, &params, Some(Duration::from_secs(60)));
+        let SolverVerdict::Solved(found) = verdict else {
+            panic!("Primo did not solve the fixture: {verdict:?}");
+        };
+        assert_eq!(found.len(), 1);
+        assert!(reference.contains(&found[0]));
+        assert_eq!(cost.extra["model_checked"], 1);
+        assert_eq!(cost.extra["invalid_model"], 0);
+        assert_eq!(cost.extra["solver_calls"], 1);
+        assert_eq!(cost.extra["solver_conflicts_available"], 1);
+        assert!(!cost.timed_out);
+        assert!(!PrimoSmt.finds_every_solution());
+
+        let m = F2BoolMono::from_mask;
+        let inconsistent = BooleanSystem {
+            equations: vec![
+                F2BoolPoly::from_monos(vec![m(1)], 1),
+                F2BoolPoly::from_monos(vec![m(1), m(0)], 1),
+            ],
+            n_vars: 1,
+        };
+        let (verdict, cost) = PrimoSmt.solve(&inconsistent, &params, None);
+        assert!(matches!(verdict, SolverVerdict::Unsatisfiable));
+        assert_eq!(cost.extra["unknown"], 0);
+        assert!(!cost.timed_out);
+    }
+
+    #[test]
+    fn primo_smt_rejects_missing_binary_and_zero_timeout() {
+        let mut zero = Params::default();
+        zero.set("primo_timeout_ms", "0");
+        assert!(validate_solver_params("primo-smt", &zero)
+            .unwrap_err()
+            .contains("must be positive"));
+
+        let mut missing = Params::default();
+        missing.set("primo_binary", "/definitely/not/a/real/primo-executable");
+        assert!(validate_solver_params("primo-smt", &missing)
+            .unwrap_err()
+            .contains("is not a file"));
+    }
+
     /// sat-cdcl prices its whole run in `bitop/v1` word operations, the
     /// count is deterministic, and the completeness flag survives being
     /// totalled over calls (it is a flag, not a sum) until a call that
@@ -2107,13 +2346,14 @@ mod tests {
         assert_eq!(reference, [0 as Mask, 3].into_iter().collect());
 
         for solver in solver_registry() {
-            // An engine that declines the shape (`m4gb-f2` without
-            // `M4GB_BINARY`) is not asked.
-            if !solver.accepts(&sys.shape()) {
+            // An engine that declines the shape or whose external binary is
+            // unavailable is not asked.
+            if !solver.accepts(&sys.shape())
+                || validate_solver_params(solver.name(), &Params::default()).is_err()
+            {
                 continue;
             }
-            // The CDCL solver returns one model rather than all of
-            // them, so it is checked for membership, not equality.
+            // A first-solution engine is checked for membership, not equality.
             let (verdict, cost) = solver.solve(&sys, &Params::default(), None);
             match verdict {
                 SolverVerdict::Solved(found) => {
@@ -2129,7 +2369,7 @@ mod tests {
                             solver.name()
                         );
                     }
-                    if solver.name() != "sat-cdcl" {
+                    if solver.finds_every_solution() {
                         let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
                         assert_eq!(got, reference, "{} missed a solution", solver.name());
                     }
@@ -2158,7 +2398,9 @@ mod tests {
             n_vars: 1,
         };
         for solver in solver_registry() {
-            if !solver.accepts(&sys.shape()) {
+            if !solver.accepts(&sys.shape())
+                || validate_solver_params(solver.name(), &Params::default()).is_err()
+            {
                 continue;
             }
             let (verdict, _) = solver.solve(&sys, &Params::default(), None);
@@ -2251,7 +2493,7 @@ mod tests {
     /// Hold every engine that answers to the reference's answer on one
     /// system.  An engine may decline or run out of budget — that is not
     /// a wrong answer — but a verdict it gives must be the right one,
-    /// and every engine but CDCL (one model) must return every solution.
+    /// and every complete-enumeration engine must return every solution.
     fn agree_with_the_reference(sys: &BooleanSystem, label: &str) -> usize {
         let reference: std::collections::BTreeSet<Mask> =
             match Exhaustive.solve(sys, &Params::default(), None).0 {
@@ -2261,7 +2503,9 @@ mod tests {
             };
         let mut answered = 0;
         for solver in solver_registry() {
-            if !solver.accepts(&sys.shape()) {
+            if !solver.accepts(&sys.shape())
+                || validate_solver_params(solver.name(), &Params::default()).is_err()
+            {
                 continue;
             }
             let (verdict, cost) =
@@ -2280,7 +2524,7 @@ mod tests {
                         "{label}: {} returned a non-solution",
                         solver.name()
                     );
-                    if solver.name() != "sat-cdcl" {
+                    if solver.finds_every_solution() {
                         assert_eq!(
                             got,
                             reference,
