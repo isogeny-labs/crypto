@@ -109,7 +109,7 @@ def main():
         'source_gcd_degrees':source['gcd_degree'],
         'target_gcd_degrees':binary['gcd_degree'],
         'both_squarefree':True,'global_lift_algorithm':False,
-        'scalable_ecdpl':False},sort_keys=True,separators=(',',':')))
+        'scalable_ecdlp':False},sort_keys=True,separators=(',',':')))
 
 
 if __name__=='__main__': main()
