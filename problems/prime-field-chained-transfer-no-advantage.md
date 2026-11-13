@@ -215,6 +215,13 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - **LA counter.** The genus-2 counter was a matrix-size count, but within 2% of the real multiplication count.
 - **Verdicts.** One recorded verdict changes: tower genus 2 at p = 251 goes from "unresolved" to "above" at every price. No arm in v3, tower or small_de is below any matched rho.
 
+## Independent validation (2026-11-13 addendum)
+
+`research/validation_20261112/REPORT.md` [pcc:unverified]:
+- **Admitted:** small_de passed the gate, and `research/small_de_endo_fb_20261112/VALIDATION.json` is written.
+- **Not admitted:** v3, tower_large and cover_pushforward. Their measurements reproduce in independent code, but their matched rho is plain (negation-free) and its native work is not emitted, so the gate fails on the reference.
+- **Next step for those three:** re-measuring them with the negation-map reference from `instrument_rerun` would make them admissible.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -233,3 +240,4 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - 2026-11-12: degree-3 fibre and positive-control addendum.
 - 2026-11-12: proof note added; ATLAS iff narrowed to only-if.
 - 2026-11-13: instrument-fix addendum; the recorded gaps were understated.
+- 2026-11-13: validation addendum; small_de admitted, three targets not (rho reference).
