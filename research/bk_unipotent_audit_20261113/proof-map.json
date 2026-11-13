@@ -1,0 +1,41 @@
+{
+  "namespace": "BKUnipotentAudit",
+  "proofs": [
+    {
+      "file": "CubicCoordinates.lean",
+      "claim": "Literal small polynomial factors, actual quartic coordinate classification and scalar cube identities",
+      "declarations": [
+        "cubic_divides_seventh",
+        "cubic_divides_square",
+        "three_coordinate_classification",
+        "scalar_frob_cube_cubic"
+      ]
+    },
+    {
+      "file": "FrobeniusPeriod.lean",
+      "claim": "Actual point Frobenius cube, allk period3 criterion and actual geometriccard9",
+      "declarations": [
+        "frobenius_cube_fixed",
+        "nonfixed_witness",
+        "all_torsion_fixed_iff_three_dvd",
+        "cyclotomic_divisibility",
+        "embedding_degree_one",
+        "actual_geometric_cardinality"
+      ]
+    },
+    {
+      "file": "ExtensionCounterexample.lean",
+      "claim": "Actual finite-field point images for all compatible embeddings, concrete GaloisField existence/cardinality and infinite family",
+      "declarations": [
+        "chosen_field_criterion",
+        "galois_embedding_exists",
+        "galois_field_criterion",
+        "infinite_image_counterexamples",
+        "all_extension_boundary_certificate"
+      ]
+    }
+  ],
+  "hypotheses": "Actual F7curve over its actual algebraic closure. Every positivek for GaloisField cardinality; chosen finitefield size7^k and compatible embedding. r3 prime-to-characteristic, r dividesq-1 excludedboundary, r²#E. No torsion basis/determinant/Weil assumption.",
+  "local_gate": "32/0failures/0trusted",
+  "signed_standing": "not established"
+}
