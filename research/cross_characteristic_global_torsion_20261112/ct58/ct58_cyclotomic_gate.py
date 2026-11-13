@@ -2,7 +2,7 @@
 """CT58 independent (Python) exact determinant/cyclotomic gate controls.
 
 Mathematical theorem (Weil pairing) is NOT established by these tests.
-Every execution check is unconditional under python -O.
+Every execution check is unconditional under `python -O`.
 """
 
 from math import isqrt
@@ -62,7 +62,14 @@ def run():
                         if determinant==0:
                             continue
                         seen+=1
-                        require((a*d-c*b)%ell==determinant, "symplectic determinant identity")
+                        M=((a,b),(c,d))
+                        J=((0,1),(-1,0))
+                        for i in range(2):
+                            for j in range(2):
+                                lhs=sum(M[k][i]*J[k][r]*M[r][j]
+                                        for k in range(2) for r in range(2)) % ell
+                                require(lhs==(determinant*J[i][j])%ell,
+                                        "symplectic determinant identity")
         require(seen==(ell*ell-1)*(ell*ell-ell), "GL2 group order")
     # 11a1 reduced mod 2: #E(F2)=5, trace=-2, det Frobenius=2.
     require(count_curve_f2()==5, "curve order 5 control")
