@@ -6,7 +6,7 @@
 set -u
 BEFORE=$1; AFTER=$2; SW=$3; OUT=$4; mkdir -p "$OUT"
 export FES_GPU_TIMING=1 ICX_FES_WORKER="${ICX_FES_WORKER:-$PWD/gpu/fes/fes_solve}"
-for inst in koblitz-n19 koblitz-n23; do
+for inst in ${INSTANCES:-koblitz-n19 koblitz-n23}; do
   for rep in 1 2 3; do
     if [ $((rep % 2)) = 1 ]; then order="before after"; else order="after before"; fi
     for arm in $order; do
