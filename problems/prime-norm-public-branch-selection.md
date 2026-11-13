@@ -2,7 +2,7 @@
 
 - **Status:** investigating
 - **Kind:** construction/proof gap; separate unavailable KB/compute-admission capabilities
-- **Affected work:** [norm derivation](../research/prime_norm_rank_20261112/DERIVATION.md), [next finder](../research/prime_norm_rank_20261112/NEXT_FINDER.md), [public-jet report](../research/prime_norm_rank_20261112/public-jet-report/README.md)
+- **Affected work:** [norm derivation](../research/prime_norm_rank_20261112/DERIVATION.md), [next finder](../research/prime_norm_rank_20261112/NEXT_FINDER.md), [public-jet report](../research/prime_norm_rank_20261112/public-jet-report/README.md), [actual group bridge](../research/prime_norm_rank_20261112/group-bridge-report/README.md)
 - **Next action owner:** ongoing research session
 - **Last updated:** 2026-11-13
 
@@ -24,12 +24,12 @@ criterion; it does not claim nonexistence.
 - **Derived, source-bound:** NormPublicJets.firstJet gives explicit modular reachability; poleWindowNoNewNorm excludes new norms by componentwise support-multiple corrections under both old and new pole budgets; publicResidueCertificate handles coupled branch congruences without moment inputs. Exact hypotheses and unsigned claim pins are in the report [pcc:unverified].
 - **Unknown:** whether a structured public branch-selection procedure can exploit the cubic curve constraint to achieve the required bound. No hardness or global impossibility inference from these controls.
 - **Capabilities:** KB MCP absent and canonical wrapper has no executable. No current paid-solver allowance/admission was established; local Lean/Rust development checks do not require a solver campaign.
-- **Not established:** novelty, independent signed scientific standing, an efficient joint finder, the entire divisor/scalar bridge in Lean, or total sub-exponential bit cost. Componentwise rigidity does not exclude coupled/rational corrections or the earlier W-family without a map.
+- **Not established:** novelty, independent signed scientific standing, an efficient joint finder producing the required point labels, full input/exception/subgroup coverage, or total sub-exponential bit cost. The actual norm-to-point and supplied-label scalar bridge is now separately formalized at its exact hypotheses; componentwise rigidity does not exclude coupled/rational corrections or the earlier W-family without a map [pcc:unverified].
 
 ## What would unblock it
 
 - [ ] Explicit public procedure taking curve, subgroup, base and target inputs, selecting valid support/root branches and returning a bounded nonzero A/B without supplied successful witnesses or secret sign labels.
-- [ ] Correctness linked through actual divisor/group relation and scalar verification; exact field, degree, subgroup and exceptional-case hypotheses.
+- [ ] Complete input-to-scalar correctness with exact field, degree, subgroup and exceptional-case hypotheses. Partial: the actual public Hankel norm now implies the actual nonsingular point sum, and other supplied scalar labels give the target integer; see NormGroupBridge.publicHankelTargetScalar, unsigned claim PCC-20261113-3f21d1. Producing those inputs/labels efficiently remains open [pcc:unverified].
 - [ ] Uniform exp(o(log r)) complete expected bit-cost proof including setup, failed candidates, root/linear algebra work and final verification. A fixed power of p fails this criterion.
 - [ ] Source-pinned executable controls and independent replay at the scope claimed. Admit any scaling campaign prospectively with live finite resource bounds.
 
@@ -38,7 +38,7 @@ formalizing a certificate or completing this problem record alone does not.
 
 ## Next discriminating step
 
-- **Action:** derive the actual signed public evaluation-matrix family and a branch-update rule that changes the probability or counted cost of finding a nonzero bounded kernel. Compare with supplied-sign reconstruction; do not assume a useful gradient from rank or determinant alone [pcc:unverified].
+- **Action:** derive a constrained discrete branch or support-selection rule with a counted reduction in visits to a singular actual public matrix. The matrix map, exact corank and norm-to-group bridge are available under their stated hypotheses. Compare discovered-sign work with supplied-sign reconstruction; do not assume a useful gradient from rank or determinant alone [pcc:unverified].
 - **Inputs/controls:** public curve/support/branches, positive fixture, changed branch, exact full norm and degree checks. Distinguish supplied-sign and discovered-sign inputs.
 - **Limits:** local proof/development work first; no paid attack/scaling run authorized by this document. A runtime panel requires a separate frozen protocol and live admission under repository rules.
 - **Outcomes:** a proved structural search advantage leads to an actual public candidate generator and full accounting; an equivalence or a failed rule redirects the finder without a global impossibility claim. Infrastructure errors stay infrastructure errors.
@@ -76,3 +76,19 @@ a different public factor-base mechanism with fewer counted attempts. A
 larger-corank target is excluded only in the stated actual public family;
 continuous field-weight repair does not discharge branch selection. Original
 exit criteria remain open [pcc:unverified].
+
+2026-11-13 actual group-bridge update: [report](../research/prime_norm_rank_20261112/group-bridge-report/README.md),
+source6ba718256. NormGroupBridge identifies the product of actual distinct
+nonsingular point ideals with the actual norm function's principal ideal by
+CRT and equality of finite quotient dimensions. The existing actual Point.toClass
+injection then gives the zero point sum; the public Hankel certificate supplies
+the norm without a divisor/group-relation oracle. The target corollary needs
+only the other supplied integer labels, which remain explicit premises.
+Unsigned theorem claimPCC-20261113-3f21d1 [pcc:unverified].
+
+The fixed native control checks the positive sum as infinity, the flipped
+sum as(10,6), and target integer-31 by multiplication from the stated public
+base. This closes the actual certificate-to-group/supplied-label scalar
+obligation for that stated family; it does not create those successful
+branches or their labels. Next action remains an actual discrete finder
+and a complete expected bit-cost bound [pcc:unverified].
