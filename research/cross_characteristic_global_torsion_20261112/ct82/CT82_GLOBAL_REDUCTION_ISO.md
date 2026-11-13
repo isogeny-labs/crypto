@@ -12,7 +12,15 @@ is a *group isomorphism*. In particular every public seven-torsion point Q over 
 
 **Proof:** E has good reduction at 37, which is unequal to 7. The kernel of reduction at the local field K_v is a pro-37 formal group; hence reduction is injective on 7-torsion, including K-rational torsion. Direct count #E(F37)=35, so the target subgroup E(F37)[7] has order 7. CT80 supplies T of exact order 7 whose reduction P has order 7; thus the injected source subgroup contains seven elements and is the whole target. No full-mod-7 Galois-image assumption is required. The alternative Weil-pairing check says rank-two E[7](K) would imply μ7⊂K, contradicting residue degree one and 7∤36. This is a useful internal consistency check, not an additional computational lower bound.
 
-Consequently E(K)[7]=<T> and the 7-division polynomial has precisely (7−1)/2=3 K-rational x-coordinate roots, corresponding to ±T, ±2T, ±3T. A complete linear-factor listing over K must output three roots, plus six oriented torsion points; **any candidate-list method has Ω(ell) output size** in an analogous prime-ell construction. This does *not* bound the cost of a single prescribed-root recognition algorithm; a selective Hensel/LLL/global factor algorithm could conceivably beat complete enumeration.
+Consequently E(K)[7]=<T>. **A separate local-root argument** is required to conclude that the 7-division polynomial has exactly three K-rational x-roots (because x∈K need not imply y∈K): its leading coefficient 7 is a 37-adic unit; all its K-roots are integral at v; exhaustive residue evaluation gives exactly the three *simple* roots 9,27,28 modulo 37. Hensel's lemma gives at most one root in K_v≅Q_37 above each. The x-coordinates of T, 2T and 3T lie in K and give all three lifts, so there are exactly three K-rational x-roots, corresponding to ±T, ±2T, ±3T. Explicit rational x-coordinate maps
+```
+D(x)=4x^3-4x^2-40x-79,
+psi3(x)=3x^4-4x^3-60x^2-237x-21,
+f4(x)=2x^6-4x^5-100x^4-790x^3-210x^2-1496x-5821,
+x(2R)=(3x^2-2x-10)^2/D(x)+1-2x,
+x(3R)=x-D(x)*f4(x)/psi3(x)^2
+```
+cycle the three Hensel roots 8569986→66115845→55673447→8569986 via doubling and the inverse cycle via tripling, modulo 37^5. Both implementations check invertibility of denominators and every root mapping. A complete linear-factor listing over K must output three roots, plus six oriented torsion points; **any candidate-list method has Ω(ell) output size** in an analogous prime-ell construction. This does *not* bound the cost of a single prescribed-root recognition algorithm; a selective Hensel/LLL/global factor algorithm could conceivably beat complete enumeration.
 
 The mathematical inverse exists uniquely as a map of groups; that does **not** construct a low-cost algorithm to express the K-rational lift in a fixed number-field basis, nor to evaluate it at a different prime. In particular do not conflate the easily computed local Z_37 torsion lift (CT75) with global recognition.
 
