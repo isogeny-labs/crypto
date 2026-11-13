@@ -1,3 +1,17 @@
+# Chained transfers — canonical norm local replay and own CI settled
+
+Independent consumer scientific069644bf/metadataea833df7, readyPR1521 under1520: FULL027b231c exact069/3d all438 guards/23outer+20inner native/tee0; own43400864083 ALL7SUCCESS/new131803082298 ALL36nativeJSON and24 exact original canonical claim digests match,168c99. Whole raw01 partialcollector134968 and raw02 complete790964 retained; raw01 collector raw-vs-canonical assertion fixed via ORIGINAL PCC function after frozenb15b45. Optional artifactZIP storage403/zeroZIPdownload963670; all7 WHOLE logs/API/source retained; no re-poll/re-dispatch. [pcc:unverified]
+
+SIXinitialnormarchives48e581/7cd6ea, BOTHfullarchives82e079/1dd28b and primarysource69520 actual2a1f0f/5327f4 genuinelypublished. Remaining THREEwhole objects awaiting trusted-base migration: existing67172 primarypublicationcollector plus both134968/790964 CIcaptures. No recursive publicationcollector archive will be created for this final control-plane receipt; preserve ALL original APIJSON, whole log losslessXZ, FF/manifests/receipt/hashindex directly. [pcc:unverified]
+
+Use NEW2175guard map evidence/g3-norm-pcc-current-guard-02/current-inputs.json for next artifactFF; oldmap differs only in authorizedreadonlyPCC subjectread frozen451bc2/5327f4. All343producer scientificsource hashes unchanged. Native/math/formal scope unchanged: allfixed5/7/11 classes,partialformalgeometry, no timinggain. [pcc:unverified]
+
+Rootglobal NOTgreen: original6330fixture missing exact2293097/SHA8970667; originalpull2 credentials/anonymousHeadObject403; broadbenchrec historical189problems/106records. MainPR3877 still frozenledger/signing/conflict/reviews; routine09:45d0f30b next13:45 unlessconcrete signal. Vault8edec422locked/KBunavailable/no subagents/no paidbenchmarkadmission. [pcc:unverified]
+
+NEXT: normalpublish this ownedmetadata; retrieve actual migration andWHOLEjob, exactbotFF withNEW2175map; genuineconsumerprojection; consumerCI checkpoint and GitHub queue. Then readychild pre-codeprotocol for existingN4/B2 publicQ API plus additiveV2 q223 field/model/basepoint bridges. Keep legacyN4 sources/V1 controls immutable, withdrawn subgroupenumeration negative result, fixed5/7/11 controls; no genericDLP fallback or new performanceclaim.
+
+---
+
 Current canonical G3:independentnorm FULL02 COMPLETE7b231c exact069/3d/09:26:05→09:33:59UTC/originalnative+driver+portable+cleanliness+outerguards0/all438unchanged/ALL23outer+20innerpairs[0,0]. All12consumer nativeJSON equal75275f/all24producer equalc162f3/3consumerCLIgoldens byteexact/two13theoremgates/13new+11producerbindings. WHOLEfull01failure+full02success originaltrees stagedforgenuinepublication;remoteavailability pending. Own43400864083 exact069 ALLSEVENinitialjobs inprogress,next10:16UTC. Source/ready1521 andPR3877/queue3904 refreshed;no computationaladvantage. Rootoriginalfixture stillaccessblockedadd561/globalNOTgreen;routineglobal09:44. Earlier ACTIVE/PENDING text historical. [pcc:unverified]
 
 ---
