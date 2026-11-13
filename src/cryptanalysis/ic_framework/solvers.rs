@@ -26,6 +26,7 @@
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
 //! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
+//! | `fes-f2-gpu` | `fes-f2` with the search on the `gpu/fes` CUDA serve worker, every point re-verified on the CPU; same count as `fes-f2` | word XORs (Gray-code steps) |
 //! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
 //! | `m4gb-f2` | M4GB (external process, Makarim–Stevens ISSAC 2017), reduced degrevlex basis over GF(2) with field equations | none (wall time only; see `AGENTS.md` §6: a reference arm, not a leaderboard row) |
 //! | `exhaustive` | evaluate every equation at every point, stopping at the first that fails | monomial tests |
@@ -835,83 +836,171 @@ impl SystemSolver for FesF2 {
         _params: &Params,
         _budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
-        use crate::cryptanalysis::mq_fes::{gray_incremental_find_all, QuadraticForm};
-        let started = Instant::now();
-        let n = system.n_vars;
-        // `bitop/v1` over the whole call; see `fes_form_ops`,
-        // `gray_table_ops` and `gray_walk_ops` for the constants.
-        let mut word_ops = 0u64;
-        let forms: Option<Vec<QuadraticForm>> = system
-            .equations
-            .iter()
-            .map(|p| {
-                word_ops += fes_form_ops(p.terms.len(), p.n_vars);
-                let mut q = QuadraticForm::from_poly(p)?;
-                // `from_poly` sizes the form by the polynomial's own
-                // variable count; the search needs the system's.
-                if q.n != n {
-                    word_ops += fes_form_ops(p.terms.len(), n);
-                    q = QuadraticForm::from_anf_row(
-                        &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
-                        n,
-                    )?;
-                }
-                Some(q)
-            })
-            .collect();
-        let setup: u64 = forms
-            .as_ref()
-            .map(|fs| {
-                fs.iter()
-                    .map(|f| {
-                        f.constant as u64
-                            + f.linear.iter().filter(|&&b| b).count() as u64
-                            + f.quad.iter().flatten().filter(|&&b| b).count() as u64
-                    })
-                    .sum()
-            })
-            .unwrap_or(0);
-        let found = forms
-            .as_deref()
-            .and_then(|fs| gray_incremental_find_all(fs, usize::MAX));
-        let mut tests = 0u64;
-        let mut extra = BTreeMap::new();
-        extra.insert("points".into(), 1u64 << n);
-        let (verdict, ops) = match found {
-            None => (SolverVerdict::BudgetExceeded, 0),
-            Some(points) => {
-                // The coefficient scan above (a test a coefficient), the
-                // tables, the walk, and a store per root found.
-                let m = system.equations.len();
-                word_ops += m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
-                    + gray_table_ops(m, n)
-                    + gray_walk_ops(1u64 << n, 1)
-                    + 2 * points.len() as u64;
-                let points = verified(masks(points), system, &mut tests);
-                // Two XORs per Gray-code step, one step per point, plus
-                // one per coefficient scattered into the tables.
-                let ops = 2 * (1u64 << n) + setup;
-                if points.is_empty() {
-                    (SolverVerdict::Unsatisfiable, ops)
+        fes_quadratic_solve(system, |fs| {
+            crate::cryptanalysis::mq_fes::gray_incremental_find_all(fs, usize::MAX)
+        })
+    }
+}
+
+/// The body of [`FesF2`] with the search step as a parameter: form building,
+/// the `bitop/v1` count, the Gray-code step count (`2 * 2^n + setup` word
+/// XORs) and CPU verification of every returned point are the same for every
+/// search, so `fes-f2` and `fes-f2-gpu` report the same counted cost for the
+/// same system.  `search` returns every zero of the forms, or `None` when it
+/// cannot (which becomes `BudgetExceeded`, never `Unsatisfiable`).
+fn fes_quadratic_solve(
+    system: &BooleanSystem,
+    search: impl FnOnce(&[crate::cryptanalysis::mq_fes::QuadraticForm]) -> Option<Vec<u64>>,
+) -> (SolverVerdict, SolverCost) {
+    use crate::cryptanalysis::mq_fes::QuadraticForm;
+    let started = Instant::now();
+    let n = system.n_vars;
+    // `bitop/v1` over the whole call; see `fes_form_ops`,
+    // `gray_table_ops` and `gray_walk_ops` for the constants.
+    let mut word_ops = 0u64;
+    let forms: Option<Vec<QuadraticForm>> = system
+        .equations
+        .iter()
+        .map(|p| {
+            word_ops += fes_form_ops(p.terms.len(), p.n_vars);
+            let mut q = QuadraticForm::from_poly(p)?;
+            // `from_poly` sizes the form by the polynomial's own
+            // variable count; the search needs the system's.
+            if q.n != n {
+                word_ops += fes_form_ops(p.terms.len(), n);
+                q = QuadraticForm::from_anf_row(
+                    &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                    n,
+                )?;
+            }
+            Some(q)
+        })
+        .collect();
+    let setup: u64 = forms
+        .as_ref()
+        .map(|fs| {
+            fs.iter()
+                .map(|f| {
+                    f.constant as u64
+                        + f.linear.iter().filter(|&&b| b).count() as u64
+                        + f.quad.iter().flatten().filter(|&&b| b).count() as u64
+                })
+                .sum()
+        })
+        .unwrap_or(0);
+    let found = forms.as_deref().and_then(search);
+    let mut tests = 0u64;
+    let mut extra = BTreeMap::new();
+    extra.insert("points".into(), 1u64 << n);
+    let (verdict, ops) = match found {
+        None => (SolverVerdict::BudgetExceeded, 0),
+        Some(points) => {
+            // The coefficient scan above (a test a coefficient), the
+            // tables, the walk, and a store per root found.
+            let m = system.equations.len();
+            word_ops += m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
+                + gray_table_ops(m, n)
+                + gray_walk_ops(1u64 << n, 1)
+                + 2 * points.len() as u64;
+            let points = verified(masks(points), system, &mut tests);
+            // Two XORs per Gray-code step, one step per point, plus
+            // one per coefficient scattered into the tables.
+            let ops = 2 * (1u64 << n) + setup;
+            if points.is_empty() {
+                (SolverVerdict::Unsatisfiable, ops)
+            } else {
+                (SolverVerdict::Solved(points), ops)
+            }
+        }
+    };
+    extra.insert("verification_tests".into(), tests);
+    // A verification test is a word test of one term.
+    extra.insert("bitop_word_ops".into(), word_ops + tests);
+    extra.insert("bitop_complete".into(), 1);
+    let cost = SolverCost {
+        ops,
+        op_unit: "word XORs (Gray-code steps)".into(),
+        wall_ns: started.elapsed().as_nanos() as u64,
+        peak_bytes: 0,
+        degree_reached: None,
+        solving_degree: None,
+        timed_out: false,
+        extra,
+    };
+    (verdict, cost)
+}
+
+/// `fes-f2` with the Gray-code search run by the `gpu/fes` worker in serve
+/// mode (one CUDA context per process; `ICX_FES_WORKER` names the worker,
+/// else `fes_cuda`/`fes_metal`/`fes_solve` beside the executable).  The
+/// worker only proposes points: each is re-verified on the CPU, and an
+/// empty answer means `Unsatisfiable` only when the worker reports that its
+/// list is complete.  Same forms, same counted cost (`word XORs (Gray-code
+/// steps)`) as `fes-f2`; what changes is wall time, which `AGENTS.md` §6
+/// keeps as a practicality note.  Without a worker, or after a worker
+/// error, it runs `fes-f2`'s CPU search (`gpu_fallback` = 1 in the cost
+/// record) for systems of at most 32 unknowns and reports `BudgetExceeded`
+/// above that.  Up to 40 unknowns (the CUDA kernel's `FES_MAX_VARS`).
+pub struct FesF2Gpu;
+
+impl SystemSolver for FesF2Gpu {
+    fn name(&self) -> &str {
+        "fes-f2-gpu"
+    }
+
+    fn describe(&self) -> String {
+        "fes-f2 with the Gray-code search on the gpu/fes serve worker (CUDA), every point re-verified on the CPU".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        (1..=40).contains(&shape.n_vars)
+            && shape.n_equations <= 64
+            && shape.degrees.iter().all(|&d| d <= 2)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::fes_gpu::{solve_on_shared_server, PackedSystem};
+        use crate::cryptanalysis::mq_fes::gray_incremental_find_all;
+        let (mut used, mut fallback, mut capped, mut gpu_ns) = (0u64, 0u64, 0u64, 0u64);
+        let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
+            let cpu = |fs: &[crate::cryptanalysis::mq_fes::QuadraticForm]| {
+                if fs.first().map_or(true, |f| f.n <= 32) {
+                    gray_incremental_find_all(fs, usize::MAX)
                 } else {
-                    (SolverVerdict::Solved(points), ops)
+                    None
+                }
+            };
+            let Ok(packed) = PackedSystem::from_quadratic_forms(fs) else {
+                fallback = 1;
+                return cpu(fs);
+            };
+            let t = Instant::now();
+            match solve_on_shared_server(&packed) {
+                Ok(Some((reply, _))) => {
+                    gpu_ns = t.elapsed().as_nanos() as u64;
+                    used = 1;
+                    if reply.total > reply.proposed.len() as u64 {
+                        capped = 1;
+                        None
+                    } else {
+                        Some(reply.proposed)
+                    }
+                }
+                Ok(None) | Err(_) => {
+                    fallback = 1;
+                    cpu(fs)
                 }
             }
-        };
-        extra.insert("verification_tests".into(), tests);
-        // A verification test is a word test of one term.
-        extra.insert("bitop_word_ops".into(), word_ops + tests);
-        extra.insert("bitop_complete".into(), 1);
-        let cost = SolverCost {
-            ops,
-            op_unit: "word XORs (Gray-code steps)".into(),
-            wall_ns: started.elapsed().as_nanos() as u64,
-            peak_bytes: 0,
-            degree_reached: None,
-            solving_degree: None,
-            timed_out: false,
-            extra,
-        };
+        });
+        cost.extra.insert("gpu_worker".into(), used);
+        cost.extra.insert("gpu_fallback".into(), fallback);
+        cost.extra.insert("gpu_capped".into(), capped);
+        cost.extra.insert("gpu_round_trip_ns".into(), gpu_ns);
         (verdict, cost)
     }
 }
@@ -1543,6 +1632,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(XlF2),
         Box::new(SatCdcl),
         Box::new(FesF2),
+        Box::new(FesF2Gpu),
         Box::new(FesWide),
         Box::new(Exhaustive),
     ]
@@ -2057,6 +2147,32 @@ mod tests {
                 };
                 agree_with_the_reference(&sys, &format!("n = {n}, n' = {np}, m = {m}, target {t}"));
             }
+        }
+    }
+
+    /// `fes-f2-gpu` reports `fes-f2`'s counted cost and answer on the same
+    /// system, whichever search ran (the serve worker, or the CPU fallback
+    /// when none is configured): the counting lives in one function.
+    #[test]
+    fn fes_gpu_engine_counts_like_fes_f2() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(4031);
+        for trial in 0..24usize {
+            let n = 2 + trial % 14;
+            let sys = random_quadratic(n, 1 + trial % 4, &mut rng);
+            let (va, ca) = FesF2.solve(&sys, &Params::default(), None);
+            let (vb, cb) = FesF2Gpu.solve(&sys, &Params::default(), None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "trial {trial}: verdict"
+            );
+            assert_eq!(ca.ops, cb.ops, "trial {trial}: counted ops");
+            assert_eq!(ca.op_unit, cb.op_unit);
+            assert_eq!(
+                ca.extra.get("bitop_word_ops"),
+                cb.extra.get("bitop_word_ops")
+            );
         }
     }
 
