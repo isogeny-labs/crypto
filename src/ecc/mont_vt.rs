@@ -366,6 +366,45 @@ pub(crate) fn ct_pow4(
     ct_mont_mul4(&acc, &[1, 0, 0, 0], p, n0)
 }
 
+/// [`ct_pow4`] for a **public** exponent: the same power, by a fixed
+/// four-bit window (about 256 squarings and 64 products against the
+/// ladder's 256 and 256).  The sequence of operations follows the bits of
+/// `exp`, so `exp` must not be secret; it does not depend on `base`.
+pub(crate) fn ct_pow4_public(
+    base: &[u64; 4],
+    exp: &[u64; 4],
+    p: &[u64; 4],
+    n0: u64,
+    r2: &[u64; 4],
+    one: &[u64; 4],
+) -> [u64; 4] {
+    let base_m = ct_mont_mul4(base, r2, p, n0);
+    let mut table = [*one; 16];
+    table[1] = base_m;
+    for i in 2..16 {
+        table[i] = ct_mont_mul4(&table[i - 1], &base_m, p, n0);
+    }
+    let mut acc = *one;
+    let mut started = false;
+    for w in (0..64).rev() {
+        let nib = ((exp[w / 16] >> (4 * (w % 16))) & 15) as usize;
+        if started {
+            for _ in 0..4 {
+                acc = ct_mont_mul4(&acc, &acc, p, n0);
+            }
+        }
+        if nib != 0 {
+            acc = if started {
+                ct_mont_mul4(&acc, &table[nib], p, n0)
+            } else {
+                table[nib]
+            };
+            started = true;
+        }
+    }
+    ct_mont_mul4(&acc, &[1, 0, 0, 0], p, n0)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -492,43 +531,4 @@ mod tests {
         generic_mul_matches::<9>(&(two(521) - 1u32), &mut rng);
         generic_mul_matches::<9>(&(two(576) - 3u32), &mut rng);
     }
-}
-
-/// [`ct_pow4`] for a **public** exponent: the same power, by a fixed
-/// four-bit window (about 256 squarings and 64 products against the
-/// ladder's 256 and 256).  The sequence of operations follows the bits of
-/// `exp`, so `exp` must not be secret; it does not depend on `base`.
-pub(crate) fn ct_pow4_public(
-    base: &[u64; 4],
-    exp: &[u64; 4],
-    p: &[u64; 4],
-    n0: u64,
-    r2: &[u64; 4],
-    one: &[u64; 4],
-) -> [u64; 4] {
-    let base_m = ct_mont_mul4(base, r2, p, n0);
-    let mut table = [*one; 16];
-    table[1] = base_m;
-    for i in 2..16 {
-        table[i] = ct_mont_mul4(&table[i - 1], &base_m, p, n0);
-    }
-    let mut acc = *one;
-    let mut started = false;
-    for w in (0..64).rev() {
-        let nib = ((exp[w / 16] >> (4 * (w % 16))) & 15) as usize;
-        if started {
-            for _ in 0..4 {
-                acc = ct_mont_mul4(&acc, &acc, p, n0);
-            }
-        }
-        if nib != 0 {
-            acc = if started {
-                ct_mont_mul4(&acc, &table[nib], p, n0)
-            } else {
-                table[nib]
-            };
-            started = true;
-        }
-    }
-    ct_mont_mul4(&acc, &[1, 0, 0, 0], p, n0)
 }
