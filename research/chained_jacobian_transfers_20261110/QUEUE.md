@@ -1,3 +1,16 @@
+Current checkpoint: actual seventeen-capture publication completed; new kernel/collapse source next.
+
+
+## 2026-11-13T19:20:18.354616+00:00 — seventeen-capture genuine publication complete
+
+Actuale5f4c5/genuineconsumer74b399:run43488304162/job132102493726/pull_request_targetSUCCESS,26remote byte replays BEFOREbot3bc395c25/directparentf4565b1f/EXACT28paths. All17WHOLEarchives+9WHOLElargeindices S3 and8WHOLEsmallindicesnormalGit;all34objects/sourceGitblobs/manifestSHAs exact. NormalFF/artifact/wiring0/ALL3096selectedinputsandBOTHereposowneddirtybytesunchanged. Guard05releasedAFTERterminal;futureFFrequiresnewactualcompleteversion. Original430522byteUTF8log/wholeAPIlosslessXZ/push/discovery/FF/canonicalmanifest/controlindex DIRECT, no recursivearchive. [pcc:unverified]
+
+Consumer7cf45856 science/full06b112/CIaefb67settled:fouractualgluingPhiNorm/both2and4/public5,clean597guards/21phases/18wholeJSON/11bindings,all8workflows76native41canonicaldigests. SourcefirstAPI/fieldfailures andintermediate02 whole innewS3captures. Newkernel29830a/written2e21d5/threepartialbindingsbothgates determines twofree4cases/nonfree/literal andsameA128collapse;visualreportdraft2pagesawaitsfinalpin/sourcecheckpoint/ownCI. No actualJ4coordinates/fullformal/costclaim. [pcc:unverified]
+
+Queue:checkpointthisactualcontrolplane;publishnewkernelreport/proof/source andstrictownCI;thenfrozenodddegree-sourceisogenyprotocolbeforecode usingactual13divisionpolynomial/Kohel/eigenvalueAPIs (reviewinprogress),sourceproductchangeinsteadofrelabelingsameApath. Completeallaccounting/strongestrefs onlyafteroriginalcheckpoint/livebudget/capacityadmission. Rootauthenticfixture/mainledger/signing/review/conflict/fullformal/vault/KB gapsremain;global1846unchanged,next19:15reviewdue. Continueaftereachrung. [pcc:unverified]
+
+Earlier entries remain historical.
+
 Current checkpoint: PUBLIC_TARGET_CHECKPOINT.md, actual alternative gluing / new chain kernels / whole data handoff.
 
 
