@@ -1,10 +1,11 @@
-name: CT55 cross-characteristic finite-stage audit
+name: CT55–58 cross-characteristic finite-stage audit
 on:
   pull_request:
     paths:
       - 'research/cross_characteristic_global_torsion_20261112/ct55/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct56/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct57/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct58/**'
       - '.github/workflows/ct55-crosschar-audit.yml'
   workflow_dispatch:
 permissions:
@@ -98,3 +99,20 @@ jobs:
           grep -q 'local_not_global=PASS' ct57-python.txt
           grep -q 'no proof of Mazur claimed' ct57-js.txt
           sha256sum "$base/ct57_borel_audit.py" "$base/ct57_independent.js"
+
+      - name: CT58 cyclotomic full-division-field gate and rational-point counterexample
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct58"
+          python3 -B "$base/ct58_cyclotomic_gate.py" > ct58-py.txt
+          python3 -O -B "$base/ct58_cyclotomic_gate.py" > ct58-py-opt.txt
+          cmp ct58-py.txt ct58-py-opt.txt
+          node "$base/ct58_independent.js" > ct58-js.txt
+          node --no-opt "$base/ct58_independent.js" > ct58-js-noopt.txt
+          cmp ct58-js.txt ct58-js-noopt.txt
+          diff -u <(head -n -1 ct58-py.txt) <(head -n -1 ct58-js.txt)
+          grep -q 'ell=163 cyclotomic_global_degree_floor=162 binary_full_basis_residue_degree_floor=162' ct58-py.txt
+          grep -q '11a1 mod2 f=4 fixed_5_torsion=25 all_basis=true' ct58-js.txt
+          grep -q 'theorem is external' ct58-py.txt
+          sha256sum "$base/ct58_cyclotomic_gate.py" "$base/ct58_independent.js" ct58-py.txt ct58-js.txt
