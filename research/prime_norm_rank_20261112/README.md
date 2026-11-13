@@ -1,5 +1,14 @@
 # Prime-field norm/rank search audit
 
+Continuation, 2026-11-13: [public branch coordinates](coordinates-report/README.md)
+now derive numerical corank one and a nonzero diagonal adjugate entry for the
+actual reduced quotient-moment matrix. Its actual coefficient recovery has
+derived structural guards. There are 25 new statements; whole-study source
+audit 201/0 extra trusted axioms and import-inclusive fresh replay exit 0.
+The public-input finder and full norm/scalar attachment remain separate.
+Unsigned source bindings are in coordinates-evidence/claim-pins.json
+[pcc:unverified].
+
 No novel sub-exponential ECDLP algorithm was obtained. Read [REPORT.md](REPORT.md),
 [DERIVATION.md](DERIVATION.md), or the [three-page PDF](report/report.pdf).
 The classical norm representation isolates an unresolved constructive rank-one
