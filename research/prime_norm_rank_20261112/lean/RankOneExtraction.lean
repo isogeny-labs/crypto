@@ -8,6 +8,11 @@ variable {K I : Type*} [Field K]
 def MinorsVanish (M : I → I → K) : Prop :=
   ∀ i j k l, M i j * M k l = M i l * M k j
 
+/-- A vector outer product satisfies every two-by-two minor equation. -/
+theorem outerMinors (w : I → K) : MinorsVanish (fun i j => w i*w j) := by
+  intro i j k l
+  ring
+
 /-- A symmetric nonzero minor-vanishing matrix has a nonzero diagonal pivot. -/
 theorem diagonalPivot (M : I → I → K)
     (hs : ∀ i j, M i j = M j i) (hm : MinorsVanish M)
