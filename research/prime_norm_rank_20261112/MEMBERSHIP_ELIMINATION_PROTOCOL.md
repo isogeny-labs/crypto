@@ -101,3 +101,12 @@ The original cell is a development decomposition fixture, not an end-to-end
 ECDLP measurement. Source summary's generic target-attachment sketch is not
 a universal non-generic lower bound. ePrint2017/1262 and2018/795 full texts
 returned403; no algorithmic conclusion is attributed to unread text.
+
+Identity-certificate supplement, before issue: a separate tiny target_incidence
+binary in the existing canonical-adapter crate seals only the literal identity
+(D+ZB-D)^2-Z^2 B^2=0, degree4, three variables D,B,Z,32 statement-derived
+and16 extra replay points over the v1 fixed modulus. It does not represent
+monic division or certify the concrete25-equation projection. Those have
+separate Lean/source-binding and native coefficient-identity receipts. Reuse
+the unchanged canonical issuer/checker/hash sources, without lint suppression;
+keep the existing adapter and all old identity artifacts intact.
