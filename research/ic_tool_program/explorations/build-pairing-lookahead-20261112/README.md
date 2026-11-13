@@ -77,3 +77,23 @@ of `fold_partitioned` is the next measurement before any further lever.
 
 Raw outputs: [`runs.tar.xz`](runs.tar.xz), with hashes in
 [`SHA256SUMS`](SHA256SUMS).
+
+## Follow-up: the proper A/B (2026-11-13)
+
+The owner asked for a same-session A/B with its own A/A on both levers:
+[`ab/PROTOCOL.md`](ab/PROTOCOL.md), frozen before any row, with amendment 1
+for a container replacement mid-run. The report is
+[`ab/report/report.pdf`](ab/report/report.pdf) and the figures are in
+[`ab/summary.json`](ab/summary.json). 44 rounds a row, zero identity
+mismatches.
+
+| row | build, unpaired / paired | collect, lookahead 32 / 64 | A/A build | A/A collect |
+|:--|:--|:--|:--|:--|
+| k0n53 | 1.044 [1.028, 1.064] | 0.997 [0.978, 1.015] | [0.992, 1.029] | [0.978, 1.010] |
+| k0n61 | 1.036 [0.991, 1.068] | 0.997 [0.966, 1.055] | [0.993, 1.019] | [0.983, 1.010] |
+
+- **Verdict:** neither lever is established, so both stay reverted.
+- **Build pairing:** about 4% faster on the build, but at k0n53 its lower
+  end misses the A/A's upper end by 0.001. On the whole set-up neither
+  lever shows.
+- **Lookahead 64:** no effect.

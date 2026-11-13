@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261112T2149Z-cover-pushforward-deg3",
+  "latest_record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 138,
+    "measured": 139,
     "open": 0
   },
   "repo": "crypto",
@@ -6227,6 +6227,426 @@
         }
       ],
       "problem": "ic:koblitz_rule_cold",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0046336259609188,
+      "latest": 1.0046336259609188,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_aa_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9923266591823625,
+            1.0298320487629378
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.0046336259609188
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0067590450435402,
+      "latest": 1.0067590450435402,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_aa_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9931782211587079,
+            1.0192027265696417
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.0067590450435402
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.044896409924537,
+      "latest": 1.044896409924537,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_unpaired_over_paired_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0284536634517394,
+            1.0647328227507056
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.044896409924537
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.036497063439326,
+      "latest": 1.036497063439326,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_unpaired_over_paired_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9915158056755455,
+            1.0683916493306336
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.036497063439326
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0017417845180656,
+      "latest": 1.0017417845180656,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_aa_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9776723814936331,
+            1.0095494710147337
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.0017417845180656
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.000568372750849,
+      "latest": 1.000568372750849,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_aa_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9828549073736471,
+            1.0098073409592576
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.000568372750849
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9978112341257943,
+      "latest": 0.9978112341257943,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_la32_over_la64_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9786002301460801,
+            1.0157933778755721
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 0.9978112341257943
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9970134563004148,
+      "latest": 0.9970134563004148,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_la32_over_la64_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9655549219765979,
+            1.0546359216707835
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 0.9970134563004148
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0050488198854794,
+      "latest": 1.0050488198854794,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_aa_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9973302569509708,
+            1.0140452484867244
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.0050488198854794
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0032154840727214,
+      "latest": 1.0032154840727214,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_aa_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9867398709995208,
+            1.0180165957886522
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.0032154840727214
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0026708206089747,
+      "latest": 1.0026708206089747,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_la32_over_la64_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9738293051509679,
+            1.0134259107626358
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.0026708206089747
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9933476562814012,
+      "latest": 0.9933476562814012,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_la32_over_la64_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9724384177921293,
+            1.0447218133239395
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 0.9933476562814012
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.016192657270163,
+      "latest": 1.016192657270163,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_unpaired_over_paired_k0n53",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9896854970683377,
+            1.0280329430982231
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 1.016192657270163
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9957773313797067,
+      "latest": 0.9957773313797067,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_unpaired_over_paired_k0n61",
+      "points": [
+        {
+          "commit": "62f1f0a778d8",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 44,
+          "record": "20261112T2321Z-ic-build-pairing-lookahead-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9682506908269128,
+            1.0216832511041
+          ],
+          "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
+          "value": 0.9957773313797067
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
       "unit": "ratio"
     },
     {
