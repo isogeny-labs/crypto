@@ -104,12 +104,10 @@ fn ic_mean(rs: &[Sample]) -> (Arm, Value) {
     let certified = rs.iter().filter(|s| s.good).count();
     let exhausted = rs.iter().filter(|s| s.res.exhausted).count();
     let sr = rs.iter().map(|s| s.smooth_rate).sum::<f64>() / n;
-    let (mn, mx) = rs
-        .iter()
-        .fold((f64::MAX, 0f64), |(a, b), s| {
-            let g = s.res.group_ops() as f64;
-            (a.min(g), b.max(g))
-        });
+    let (mn, mx) = rs.iter().fold((f64::MAX, 0f64), |(a, b), s| {
+        let g = s.res.group_ops() as f64;
+        (a.min(g), b.max(g))
+    });
     let arm = Arm {
         group_ops: go,
         native: vec![(Class::MulP, rm), (Class::MulR, lm)],
@@ -138,7 +136,14 @@ fn ic_mean(rs: &[Sample]) -> (Arm, Value) {
     (arm, j)
 }
 
-fn entry(name: &str, arm: &Arm, t_add: f64, times: &ClassTimes, refs: &RefSet, extra: Value) -> Value {
+fn entry(
+    name: &str,
+    arm: &Arm,
+    t_add: f64,
+    times: &ClassTimes,
+    refs: &RefSet,
+    extra: Value,
+) -> Value {
     let mut v = serde_json::to_value(report_arm(name, arm, t_add, times, refs)).unwrap();
     if let (Some(o), Some(e)) = (v.as_object_mut(), extra.as_object()) {
         for (k, x) in e {
@@ -168,7 +173,9 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
     let Some(ci) = cover_select(p, i) else {
         println!("p={p}: no admissible cover");
         return (
-            Some(json!({"p": p, "stage": stage, "skipped": "no admissible cover candidate in 4000"})),
+            Some(
+                json!({"p": p, "stage": stage, "skipped": "no admissible cover candidate in 4000"}),
+            ),
             false,
         );
     };
@@ -283,7 +290,11 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
     let run_arm = |label: &str| -> Vec<Sample> {
         let jobs: Vec<(usize, u64)> = (0..insts.len())
             .flat_map(|k| {
-                let n = if label.ends_with("_S") { a.ctl_seeds } else { nseeds };
+                let n = if label.ends_with("_S") {
+                    a.ctl_seeds
+                } else {
+                    nseeds
+                };
                 (0..n).map(move |s| (k, s))
             })
             .collect();
@@ -292,7 +303,11 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
                 let c = &insts[k];
                 let (res, rate) = match label {
                     "A" | "B" => {
-                        let arm = if label == "A" { IcArm::Full } else { IcArm::DoubleLp };
+                        let arm = if label == "A" {
+                            IcArm::Full
+                        } else {
+                            IcArm::DoubleLp
+                        };
                         let nb = if label == "A" {
                             0
                         } else {
@@ -314,18 +329,26 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
                         (out.ic, out.smooth_rate)
                     }
                     _ => {
-                        let arm = if label == "A_S" { IcArm::Full } else { IcArm::DoubleLp };
-                        (ic_on_rung(&c.inst, arm, 500 + s + 10 * k as u64, a.max_trials), f64::NAN)
+                        let arm = if label == "A_S" {
+                            IcArm::Full
+                        } else {
+                            IcArm::DoubleLp
+                        };
+                        (
+                            ic_on_rung(&c.inst, arm, 500 + s + 10 * k as u64, a.max_trials),
+                            f64::NAN,
+                        )
                     }
                 };
                 let good = res.recovered.is_some_and(|kk| {
                     let (e, j) = certify_both(&ci, c.x, kk);
-                    res.certified
-                        && c.inst.curve.mul_rtl(c.inst.g, kk) == c.inst.target
-                        && e
-                        && j
+                    res.certified && c.inst.curve.mul_rtl(c.inst.g, kk) == c.inst.target && e && j
                 });
-                Sample { res, good, smooth_rate: rate }
+                Sample {
+                    res,
+                    good,
+                    smooth_rate: rate,
+                }
             })
             .collect()
     };
@@ -403,7 +426,9 @@ fn fits(rows: &[Value], label: &str) -> Value {
     for arm in ["A", "B", "A_S", "B_S"] {
         put(
             &format!("{arm}_group_ops"),
-            rows.iter().map(|r| get(r, arm, &|e| e["group_ops"].as_f64().unwrap())).collect(),
+            rows.iter()
+                .map(|r| get(r, arm, &|e| e["group_ops"].as_f64().unwrap()))
+                .collect(),
         );
         for (i, w) in ["w0", "w0.1", "w1"].iter().enumerate() {
             put(
@@ -422,15 +447,21 @@ fn fits(rows: &[Value], label: &str) -> Value {
     }
     put(
         "rho_E_negation_group_ops",
-        rows.iter().map(|r| r["rho_E"]["negation"]["total_ops"].as_f64().unwrap()).collect(),
+        rows.iter()
+            .map(|r| r["rho_E"]["negation"]["total_ops"].as_f64().unwrap())
+            .collect(),
     );
     put(
         "rho_E_negation_total_w0.1",
-        rows.iter().map(|r| r["rho_E"]["band_negation"][1].as_f64().unwrap()).collect(),
+        rows.iter()
+            .map(|r| r["rho_E"]["band_negation"][1].as_f64().unwrap())
+            .collect(),
     );
     put(
         "rho_J_negation_group_ops",
-        rows.iter().map(|r| r["arms"]["rho_J_negation"]["group_ops"].as_f64().unwrap()).collect(),
+        rows.iter()
+            .map(|r| r["arms"]["rho_J_negation"]["group_ops"].as_f64().unwrap())
+            .collect(),
     );
     let mut v = Value::Object(out);
     v["label"] = json!(label);
@@ -464,7 +495,8 @@ fn verdict(rows: &[Value], fit: &Value) -> Value {
         }
         let lo = fit[format!("{arm}_ratio_to_rho_E_w0.1")]["ci95"][0].as_f64();
         let slope = fit[format!("{arm}_ratio_to_rho_E_w0.1")]["slope"].as_f64();
-        let closed = above_band == rows.len() && above_cal == rows.len() && lo.is_some_and(|v| v > 0.2);
+        let closed =
+            above_band == rows.len() && above_cal == rows.len() && lo.is_some_and(|v| v > 0.2);
         all_closed &= closed;
         per_arm.insert(
             arm.into(),
@@ -489,7 +521,8 @@ fn main() -> ExitCode {
         .build_global()
         .ok();
     let t_all = Instant::now();
-    let parse = |s: &str| -> Vec<u64> { s.split(',').filter_map(|x| x.trim().parse().ok()).collect() };
+    let parse =
+        |s: &str| -> Vec<u64> { s.split(',').filter_map(|x| x.trim().parse().ok()).collect() };
     let s1 = parse(&a.primes);
     let s2 = parse(&a.stage2);
     let mut rows: Vec<Value> = vec![];
@@ -499,7 +532,11 @@ fn main() -> ExitCode {
         all_ok &= ok;
         rows.extend(row);
     }
-    let stage1_rows: Vec<Value> = rows.iter().filter(|r| r.get("arms").is_some()).cloned().collect();
+    let stage1_rows: Vec<Value> = rows
+        .iter()
+        .filter(|r| r.get("arms").is_some())
+        .cloned()
+        .collect();
     let mut stage2_rows: Vec<Value> = vec![];
     let mut not_run: Vec<Value> = vec![];
     for (j, &p) in s2.iter().enumerate() {
@@ -542,7 +579,10 @@ fn main() -> ExitCode {
     });
     let path = format!("{}/full_jacobian.json", a.out_dir);
     std::fs::write(&path, serde_json::to_string_pretty(&out).unwrap()).expect("write json");
-    println!("wrote {path}; ok={all_ok}; verdict: {}", out["verdict"]["verdict"]);
+    println!(
+        "wrote {path}; ok={all_ok}; verdict: {}",
+        out["verdict"]["verdict"]
+    );
     if all_ok {
         ExitCode::SUCCESS
     } else {
