@@ -1,0 +1,53 @@
+name: CT64 explicit genus-two elliptic quotients and Mumford transfer
+on:
+  push:
+    branches:
+      - research/ct51-crosschar-degree8-20261112
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct64/**'
+      - '.github/workflows/ct64-explicit-quotient.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct64/**'
+      - '.github/workflows/ct64-explicit-quotient.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ct64-quotient:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify independent quotients, encoded Mumford transport and toy DLP
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct64
+          python3 -B "$D/ct64_mumford_transport.py" > /tmp/ct64-python.json
+          python3 -O -B "$D/ct64_mumford_transport.py" > /tmp/ct64-python-opt.json
+          cmp /tmp/ct64-python.json /tmp/ct64-python-opt.json
+          node "$D/ct64_independent.js" > /tmp/ct64-js.json
+          node --no-opt "$D/ct64_independent.js" > /tmp/ct64-js-noopt.json
+          cmp /tmp/ct64-js.json /tmp/ct64-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('/tmp/ct64-python.json').read_text())
+          j=json.loads(Path('/tmp/ct64-js.json').read_text())
+          def check(expr,ctx):
+              if not expr: raise ValueError(ctx)
+          check(p['source_classes']==31 and p['homomorphism_pairs']==961,'source group')
+          check(p['destination_logs']==62,'encoded input toy logs')
+          check(p['generator_images']==[[0,0],[0,0]],'oriented generator')
+          check(p['source_support']=={'zero':1,'linear':6,'split':12,'repeated':6,'nonsplit':6},'divisor types')
+          check(p['quotients']==j['selected_quotients'],'independent quotient coefficients')
+          check(j['nonzero_translation_lifts']==15 and j['genuine_involutions']==5 and j['order_four_lifts']==10,'involutions and negative controls')
+          check(j['curve_affine_points']==896 and j['elliptic_points']==961,'group orders')
+          check(len(j['all_pair_ranks'])==10 and all(v[2]==4 for v in j['all_pair_ranks']),'full rank of all quotient pairs')
+          check(len(j['fixed_rank4_witness'])==4,'rank witness rows')
+          print('CT64 independent arithmetic and encoded toy DLP checks passed')
+          PY
+          sha256sum /tmp/ct64-python.json /tmp/ct64-js.json
