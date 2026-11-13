@@ -73,3 +73,15 @@ jobs:
           cmp /tmp/ct82-py.txt /tmp/ct82-js.txt
           cmp /tmp/ct82-py.txt /tmp/ct82-jsopt.txt
           printf '%s  %s\n' a890c3fffb0f89eadc56688b7fa26a8ebb8538c61d528b8b2ea2ccafa6149d12 /tmp/ct82-py.txt | sha256sum -c
+
+      - name: CT83 fixed-place precision obstruction and binary-residue negative control
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct83
+          python3 -B "$D/ct83_precision_gate.py" > /tmp/ct83-py.json
+          python3 -O -B "$D/ct83_precision_gate.py" > /tmp/ct83-pyopt.json
+          node "$D/ct83_precision_independent.js" > /tmp/ct83-js.json
+          node --no-opt "$D/ct83_precision_independent.js" > /tmp/ct83-jsopt.json
+          cmp /tmp/ct83-py.json /tmp/ct83-pyopt.json
+          cmp /tmp/ct83-py.json /tmp/ct83-js.json
+          cmp /tmp/ct83-py.json /tmp/ct83-jsopt.json
+          printf '%s  %s\n' 7625287b302b557c7a444ca6a632f92800c17a2d5864b505100f21041cb9ffd5 /tmp/ct83-py.json | sha256sum -c
