@@ -846,9 +846,108 @@ fn main() {
         Some("truth") => cmd_truth(&args),
         Some("linpool") => cmd_linpool(&args),
         Some("linsummary") => cmd_linsummary(&args),
+        Some("s4check") => cmd_s4check(&args),
         Some("analyze") => analysis::cmd_analyze(&args),
-        _ => eprintln!("usage: ic_algebraic_floor run|solve|truth|linpool|linsummary|analyze …"),
+        _ => eprintln!("usage: ic_algebraic_floor run|solve|truth|linpool|linsummary|s4check|analyze …"),
     }
+}
+
+// ── s4check: the symmetrised fourth summation polynomial on witnesses ──
+
+/// Machine check of the desk derivation in
+/// `research/groebner_free_matched_20261113/README.md`: with
+/// `e₁, e₂, e₃` the elementary symmetric functions of the three summand
+/// abscissae and `u = x(R)`,
+///
+/// ```text
+/// S₄ = e₃⁴ + u⁴e₂⁴ + b²e₁⁴ + b²u⁴ + (b + u⁴)e₃² + b·u²·e₂² + b·u³·e₃      (F₂-affine in e)
+///    + u·e₃³ + u³·e₂²·e₃ + u²·e₁²·e₃² + b·u·e₁²·e₃                        (the rest)
+/// ```
+///
+/// Evaluated on every witness the linear arm finds in the seeded pool
+/// (expected: zero on all), and on the same triples with one abscissa
+/// replaced by another base abscissa (negative control: zero only by
+/// chance or when the replacement is itself a decomposition).
+fn cmd_s4check(args: &[String]) {
+    let cells: Vec<(u8, u32, u32)> = flag(args, "--cells")
+        .expect("--cells a:n:d,...")
+        .split(',')
+        .map(parse_cell)
+        .collect();
+    let pool: usize = num(args, "--pool", 2048);
+    let seed: u64 = num(args, "--seed", 20261014);
+    let out = PathBuf::from(flag(args, "--out").expect("--out FILE.json"));
+    let mut recs = Vec::new();
+    for &(a, n, d) in &cells {
+        let cell = Cell::new(a, n, d);
+        let gf = &cell.inst.gf;
+        let b = cell.inst.b;
+        let base: Vec<_> = cell
+            .fb
+            .points
+            .iter()
+            .map(|p| cell.inst.fast.lift(p))
+            .collect();
+        let xs_base: Vec<u64> = base.iter().map(|p| p.x).collect();
+        let lin =
+            linear21::Linear21::new(gf, &cell.inst.fast, n, d as usize, b, base);
+        let s4 = |x: [u64; 3], u: u64| -> (u64, u64) {
+            let e1 = x[0] ^ x[1] ^ x[2];
+            let e2 = gf.mul(x[0], x[1]) ^ gf.mul(x[0], x[2]) ^ gf.mul(x[1], x[2]);
+            let e3 = gf.mul(gf.mul(x[0], x[1]), x[2]);
+            let sq = |v| gf.sqr(v);
+            let (u2, e12, e22, e32) = (sq(u), sq(e1), sq(e2), sq(e3));
+            let (u3, u4) = (gf.mul(u2, u), sq(u2));
+            let affine = sq(e32)
+                ^ gf.mul(u4, sq(e22))
+                ^ gf.mul(sq(b), sq(e12))
+                ^ gf.mul(sq(b), u4)
+                ^ gf.mul(b ^ u4, e32)
+                ^ gf.mul(gf.mul(b, u2), e22)
+                ^ gf.mul(gf.mul(b, u3), e3);
+            let rest = gf.mul(u, gf.mul(e32, e3))
+                ^ gf.mul(u3, gf.mul(e22, e3))
+                ^ gf.mul(u2, gf.mul(e12, e32))
+                ^ gf.mul(gf.mul(b, u), gf.mul(e12, e3));
+            (affine, rest)
+        };
+        let mut rng = StdRng::seed_from_u64(cell_seed(seed, 3, n, d));
+        let mut ctl = StdRng::seed_from_u64(cell_seed(seed ^ 0x5a5a, 3, n, d));
+        let (mut witnesses, mut zero, mut ctl_zero, mut rest_nonzero) = (0u64, 0u64, 0u64, 0u64);
+        for _ in 0..pool {
+            let k = rng.gen_range(1..cell.r);
+            let target = cell.target(k);
+            let r = cell.inst.fast.lift(&target);
+            let mut c = linear21::Counts::default();
+            let w = lin
+                .decide(r, linear21::Variant::HalfTrace, &mut c, || false)
+                .unwrap();
+            let Some(w) = w else { continue };
+            witnesses += 1;
+            let x = [xs_base[w[0]], xs_base[w[1]], xs_base[w[2]]];
+            let (aff, rest) = s4(x, r.x);
+            zero += u64::from(aff ^ rest == 0);
+            rest_nonzero += u64::from(rest != 0);
+            let mut y = x;
+            loop {
+                let alt = xs_base[ctl.gen_range(0..xs_base.len())];
+                if alt != x[2] {
+                    y[2] = alt;
+                    break;
+                }
+            }
+            let (aff, rest) = s4(y, r.x);
+            ctl_zero += u64::from(aff ^ rest == 0);
+        }
+        eprintln!(
+            "s4check n={n} d={d}: witnesses {witnesses}, S4 = 0 on {zero}, control zeros {ctl_zero}, non-affine part non-zero on {rest_nonzero}"
+        );
+        recs.push(json!({"a": a, "n": n, "d": d, "pool": pool, "seed": seed,
+            "witnesses": witnesses, "s4_zero": zero, "control_zero": ctl_zero,
+            "nonaffine_part_nonzero": rest_nonzero}));
+    }
+    std::fs::write(&out, serde_json::to_string_pretty(&json!({"cmd": "s4check", "cells": recs})).unwrap())
+        .unwrap();
 }
 
 // ── linsummary: the pool-level table of the linear arm against the floor ──
