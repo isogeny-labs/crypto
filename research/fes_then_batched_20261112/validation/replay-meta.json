@@ -1,0 +1,75 @@
+{
+  "snapshot": {
+    "branch": "claude/zealous-meitner-85ipb5",
+    "validated_at_head": "d81dc1241bdfa7e969440867520696cb7571cb8c",
+    "tree_clean": true,
+    "tree_note": "git status --porcelain showed only the untracked validation/ directory the validator writes. The evidence (results/*.json, README.md, sweeps, run_e2e.sh) was last changed in ae48e0d771 (2026-11-12 20:15Z) and is unchanged at d81dc1241b.",
+    "evidence_commit": "ae48e0d771",
+    "producer_binary_commit_asserted": "4900647bcd3f03eac82803fea83c0615d1db10db (benchmark record commit, commit_dirty false); an ancestor of d81dc1241b"
+  },
+  "independence": "Replayed by the validator, a separate session from the producer, with an ic binary the validator built itself (not the producer's 1f566eed... binary) from commit d81dc1241b, and checked with validator-written jq (validation/compare_replay.jq, recompute.jq) that shares no code with the producer's make_report.sh or results.json. Same code lineage and same host class (this container, 4 vCPU Xeon 2.10 GHz): not an independent implementation and not a cross-host replay. The producer's binary is not on the same commit: d81dc1241b adds, over 4900647bcd, src/cryptanalysis/chained_transfer/small_de.rs and src/bin/small_de_ic.rs (not reachable from ic bench) and the default descent solver used only when a sweep names none (every sweep here names its solvers).",
+  "report_independence": "Recomputed by the validator from the committed raw reports results/*.json with validator-written jq (validation/recompute.jq, headline.jq, band.jq, counters.jq, instance_check.jq). The producer's results.json, RESULTS.md and make_report.sh are not read except as the claimed side (README table, RESULTS.md S/rho for F5). The pricing rule was read from src/cryptanalysis/ic_boundary.rs price_phase and src/cryptanalysis/ecbench/band.rs to transcribe it, and is checked by rebuilding every phase's gae from counts.",
+  "binary": {
+    "path": "target/release/ic (frozen copy in the validator's scratch directory, ic-validator)",
+    "sha256": "0836dc461098d0690c266d1b750218c4b5e1f552a6de9c690ee492edecbecb2c",
+    "binary_blake3_reported_by_ic": "c531c4cbdea7c641bd099c46ffa0bc0136530cae9d6112bb6c1f20e6cc0016b5",
+    "built_from_commit": "d81dc1241bdfa7e969440867520696cb7571cb8c",
+    "producer_binary_sha256": "1f566eede415890687c46ff9fcd834f537bc2af3196598d39213edcb9c798ac7",
+    "producer_binary_blake3_reported_by_ic": "df32690031eba5dd5394fd7d689843248734fc68ad30515c08e800d8be91e53d",
+    "producer_binary_present": "the path in results/ic-sha256.txt still exists and hashes to 1f566eed...; not used by the replay"
+  },
+  "build": {
+    "command": "cargo build --release --bin ic -v",
+    "toolchain": "cargo 1.97.0 (c980f4866 2026-06-30), rustc 1.97.0 (2d8144b78 2026-07-07)",
+    "started_utc": "2026-11-13T02:57:57Z",
+    "finished_utc": "2026-11-13T03:06:30Z",
+    "exit": 0,
+    "recompiled": "the crypto crate (crypto_lib and the ic binary) from source; third-party dependencies were fresh in the normal target directory",
+    "tree_binding": "Started at HEAD 6af2220c27 plus four uncommitted files of the coordinator session (src/bin/ic/bench.rs fe0f58c9, src/cryptanalysis/ic_framework/solvers.rs d3a5adce, src/cryptanalysis/ic_run.rs 5dceacdb, docs/ic/FRAMEWORK.md c91425f6); the same blob hashes after the build, no file under src/, Cargo.toml, Cargo.lock modified during it; committed during the build as d81dc1241b, whose blobs for those paths are exactly these and which differs from 6af2220c27 in those four files only. The binary is therefore a build of d81dc1241b's tree.",
+    "aborted_attempt": "A first build at 02:42:54Z from clean 6af2220c27 was killed: the coordinator edited src/ at 02:44:07-02:44:18Z while crypto_lib compiled, so its tree state would have been mixed."
+  },
+  "command": "RAYON_NUM_THREADS=1 IC_BIN=<validator scratch>/ic-validator research/fes_then_batched_20261112/run_e2e.sh <validator scratch>/validation-replay (committed launcher, blob 2ee77969; sweeps unchanged at d81dc1241b; defaults: --solver-budget-seconds 60 --rho-runs 16 --max-trials 2000000); 2026-11-13T03:07:13Z-03:12:08Z, wall 4 m 54 s, exit 0, all six sweeps written",
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "kernel": "6.18.44-fc-v445",
+    "isolation": "local container, not isolated (the producer's run: same container class, kernel 6.18.44-fc-v378)"
+  },
+  "reproduced": [
+    "Every count of every IC row on all six instances (72 rows): targets tried, relations found, solver calls, solver ops, every native and work_native counter, every solver.extra counter including the bitop/v1 tally, group operations, rows, rank, seeds, recovered logarithm, verified and exhausted flags: 0 mismatching leaves.",
+    "Every rho per-run record (seed, planted, steps, s, s_walk, verified) of the selected walk, the candidate walk (Koblitz) and the plain walk: 16 runs each, identical; the same walk selected on every instance.",
+    "Pinned calibration ratios (Koblitz 13, 17, 19, 23) identical to <= 1.2e-16; total_gae, s and every phase gae of every pinned row equal to <= 2.3e-16 relative (last-bit float rounding of ratio x host ns / host ns).",
+    "The 5a band computed from counts (validation/replay/recompute-replay.json band_from_counts) is identical to the committed data's on all six instances, so every band order verdict reproduces."
+  ],
+  "did_not_reproduce": [
+    "Absolute GAE and S on the two random-binary instances, whose native work is priced by ratios measured on the host in each run (calibration_pins.measured). Replay vs committed mean S: random 15 inherited-f4 261.96 vs 326.04, fes-then-batched 223.29 vs 277.51, pair table 473.68 vs 473.73; random 21 inherited-f4 2,973.19 vs 4,411.63, fes-then-batched 2,511.41 vs 3,726.09, pair table 1,975.74 vs 1,975.85. Cause: measured word-XOR ratio 0.003776 vs 0.004739 (random 15) and 0.003310 vs 0.004914 (random 21) GAE per XOR. In both runs the GAE rebuilds from the run's own counts at the run's own ratios to <= 3e-16 (committed) and 0 (replay). The ratio fes-then-batched / inherited-f4 moved from 0.8512 to 0.8524 (random 15) and 0.8446 to 0.8447 (random 21). These README numbers therefore recompute from the committed data but are not reproducible quantities; the count-based band is.",
+    "Wall-clock leaves (not part of S), the markdown rendering and the binary hash, as expected."
+  ],
+  "limitations": [
+    "Same code lineage and same host class: the replay re-executes the repository's ic at a later commit; it is not an independent implementation and not a cross-host replay.",
+    "No IC report or rho record carries the base point or the target, so the discrete-log solves are checked as known-answer equalities (recovered = planted for each repeat, both written by the same process) and not by an independent [k]P = Q computation.",
+    "3 repeats per configuration (16 rho runs); the means carry wide per-repeat spread (e.g. inherited-f4 at Koblitz 17: 102.5 to 415.3), and no confidence interval was computed by the producer or here.",
+    "The pricing rule (price_phase's ten native counters, 1 GAE per group addition or doubling, solver ops at ns_per_op/ns_per_add) and the band's U (table_insert_attempts behind its marker) are transcribed from source; the recompute is independent code, not independent of those definitions. The rebuild of every phase gae from counts confirms the transcription on every row.",
+    "The band's rho side is a lower bound at w > 0: the rho records emit no unpriced counter (F8); a per-step sensitivity is reported, not gate evidence.",
+    "The validator holds no keyring key: pcc/keyring.json lists no keys, so `independent: true` here is a producer-style boolean under docs/SABOTAGE_RESISTANCE.md; pcc would grade the replay and recompute proofs not_covered until a keyring key signs them."
+  ],
+  "validation_report": {
+    "id": "VAL-20261113-fes-then-batched",
+    "dispatch": "Coordinator (main session) brief: replay certificate, validator report, 5a band and VALIDATION.json for research/fes_then_batched_20261112; no leaderboard row (owner).",
+    "artifact_checks": [
+      "results/*.json sha256 = results/.artifacts.json *.log digests = S3 results.tar.gz members (store/sha256/15/15dbded3...); results.json = record raw digest fa200ed1...",
+      "producer binary: results/ic-sha256.txt 1f566eed... = file at the named path; reports carry binary_blake3 df326900..., git_commit null",
+      "benchmark record: commit 4900647bcd, commit_dirty false, argv run_e2e.sh results (IC_BIN not recorded), raw uploaded:false although the objects exist in S3",
+      "sweeps and launcher unchanged since the scaffold commit e5dd44e010 and identical at d81dc1241b"
+    ],
+    "metric_recomputations": [
+      "36/36 README table cells within half a printed unit (validation/headline.json)",
+      "per-row total_gae rebuilt from counts to <= 3e-16 relative on all 72 rows; pinned ratios = docs/ic/calibration.json rows",
+      "S/rho, ftb/inherited-f4, ftb/pair table per instance (recomputed_only)",
+      "5a band at w = 0, 0.1, 1 for every arm and the matched rho (validation/band.json)"
+    ],
+    "control_checks": ["C1-C6 of validation/findings.json"],
+    "verdict": "headline numbers validated; rankings qualified by F2, F3",
+    "verdict_scope": "The README table follows from the committed raw data and every count replays with an independently built binary. It does not validate ranking fes-then-batched as the lowest IC row (F2) or strictly below inherited-f4 (F3) under AGENTS.md 5a."
+  }
+}
