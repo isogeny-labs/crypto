@@ -20,7 +20,8 @@ forbidden highest coefficient. Derive barycentric moment evaluation from the
 actual product nodes using pinned Mathlib Lagrange.coeff_eq_sum, not a supplied
 successful F/H or abstract matrix of assumed rank. Derive B coefficient
 linearity and the literal Hankel matrix-vector identity. A branch update at t
-changes M by delta*w_t*v_t*v_t^T with v_t=(1,x_t,...); a sign flip has delta=-2z_t.
+changes M by delta*w_t*v_t*v_t^T with v_t=(1,x_t,...); a sign flip has delta=-2z_t
+[pcc:unverified].
 
 Local native development controls only: same six public F17 branches as the
 parent contract, f=X³+2X+2, a=3; positive assignment and only y13 flipped.

@@ -65,3 +65,25 @@ sets the next discriminating obligation: an actual signed evaluation family
 and branch-update/search rule with a proved improvement in counted search work.
 Rank, determinant gradients or a passed congruence alone are insufficient.
 No paid/scaling campaign is scheduled by these files [pcc:unverified].
+
+## 2026-11-13 successor: actual public signed Hankel family
+
+[Signed-Hankel report](signed-hankel-report/README.md) supplies the explicit
+public branch-to-matrix map, finite degree equivalence, exact branch-update
+formula and publicInputCertificate. For |S|=2a and a cubic f, singularity of
+M(j,k)=sum_x z(x)x^(j+k)/product_(t!=x)(x-t) produces a bounded nonzero norm
+pair with the actual public Lagrange interpolant. No supplied successful A/B
+or planted moment oracle is required in this certificate [pcc:unverified].
+
+The remaining unknown is selecting branches z(x)²=f(x) to make that actual
+matrix singular. Ordinary kernel extraction for supplied branches is already
+implemented and checked; do not repeat it as the missing finder. Each branch
+change is an explicit outer-product-form update, but continuous determinant
+repair must respect the two allowed branches and a fixed target. Next test the
+constrained update and actual corank/uniqueness geometry before asserting a
+useful rank gradient or an asymptotic search advantage [pcc:unverified].
+
+Earlier candidate contracts and immutable artifacts remain as dated evidence.
+The signed family is not identified with the old W-base jet family. The full
+exp(o(log r)) bit-cost criterion and divisor/scalar obligations are unchanged.
+No sign-search/scaling campaign is scheduled by this document.

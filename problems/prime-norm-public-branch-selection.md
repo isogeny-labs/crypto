@@ -48,3 +48,16 @@ formalizing a certificate or completing this problem record alone does not.
 
 2026-11-13: initial evidence-linked record after exact jet/coupled-chart test.
 Unresolved. Earlier artifacts and canonical claims/ledger entries are retained.
+
+2026-11-13 signed-Hankel update: [new report](../research/prime_norm_rank_20261112/signed-hankel-report/README.md), source17fd598fd,
+supplies the actual public branch-to-Hankel map and publicInputCertificate.
+Singularity of that actual matrix produces the nonzero bounded pair without
+supplied A/B or interpolation/moment oracles. The fixed native artifact
+compares full6x6 and compressed2x2 kernels, checks literal branch updates,
+and retains wrong-weight/changed-branch controls [pcc:unverified].
+
+Next obligation refined: efficient branch selection in that public family,
+keeping the target branch fixed. Investigate constrained determinant repair
+and exact corank/uniqueness geometry; continuous field-weight repair need not
+stay on the curve. Polynomial-size matrices and per-update work alone do not
+bound total visits. The original exit criteria remain open [pcc:unverified].
