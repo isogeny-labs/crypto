@@ -44,7 +44,7 @@ jobs:
           check(p['generator_images']==[[0,0],[0,0]],'oriented generator')
           check(p['source_support']=={'zero':1,'linear':6,'split':12,'repeated':6,'nonsplit':6},'divisor types')
           check(p['quotients']==j['selected_quotients'],'independent quotient coefficients')
-          check(j['nonzero_translation_lifts']==15 and j['genuine_involutions']==5 and j['order_four_lifts']==10,'involutions and negative controls')
+          check(j['nonzero_translation_parameters']==15 and j['involutive_translation_parameters']==5 and j['order_four_translation_parameters']==10,'involutions and negative controls')
           check(j['curve_affine_points']==896 and j['elliptic_points']==961,'group orders')
           check(len(j['all_pair_ranks'])==10 and all(v[2]==4 for v in j['all_pair_ranks']),'full rank of all quotient pairs')
           check(len(j['fixed_rank4_witness'])==4,'rank witness rows')
