@@ -58,9 +58,9 @@ Reproduce:
     node research/cross_characteristic_global_torsion_20261112/ct56/ct56_genus2_independent.js
     node --no-opt research/cross_characteristic_global_torsion_20261112/ct56/ct56_genus2_independent.js
 
-All four local runs produced the same exact JSON: {"max_j":19,"n1":6,"n2":6,"smooth_models":640,"witness_f":34,"witness_h":11}.
+Following a defect fix replacing Python `assert` statements with unconditional `require` checks, all four local runs produced the same exact JSON: {"max_j":19,"n1":6,"n2":6,"smooth_models":640,"witness_f":34,"witness_h":11}.
 
-Python witness source SHA-256: 9376e2177bf72fd5d5b6b220e5c9b1601487461832b2732842f8fae7a647ae95.
+Python witness source SHA-256: 0ea9b7be053fb4618b0a006a770e92b2ceb1c3a2fb780c339c05515d30717c4e.
 JavaScript witness source SHA-256: c0cf9320de69b60de0981998114a359088a81a5af2d5e99f78db4f9247e32b36.
 
 [pcc:unverified]
