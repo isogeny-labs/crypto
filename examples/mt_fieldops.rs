@@ -28,7 +28,30 @@
 //!   bsgs2: param = mf (baby x-classes = mf sqrt(nT)/2)
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::cell::Cell;
-use std::collections::HashMap;
+// The hash tables of every arm. Default build: std HashMap (SipHash, RandomState). With the cargo feature
+// `mt-fasthash`: the same tables with a fast multiplicative hasher (MtFastH). Counted operations are identical in
+// both builds (a hash-table operation is counted per call, whatever the hasher); only wall time differs.
+#[cfg(not(feature = "mt-fasthash"))]
+type HState = std::collections::hash_map::RandomState;
+#[cfg(feature = "mt-fasthash")]
+type HState = std::hash::BuildHasherDefault<MtFastH>;
+type HashMap<K, V> = std::collections::HashMap<K, V, HState>;
+#[derive(Default)]
+#[allow(dead_code)]
+struct MtFastH(u64);
+impl std::hash::Hasher for MtFastH {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, b: &[u8]) {
+        for &c in b {
+            self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);
+        }
+    }
+    fn write_u64(&mut self, v: u64) {
+        self.0 = (self.0 ^ v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    }
+}
 use std::time::Instant;
 
 type Pt = Option<(u64, u64)>;
@@ -318,7 +341,8 @@ fn main() {
             }
             snap.push(("fb".into(), take(&f)));
             // x-only pair-sum table: key x -> (i, j, kind) kind 0: F_i+F_j, 1: F_i-F_j, 2: 2F_i
-            let mut table: HashMap<u64, (u32, u32, u8)> = HashMap::with_capacity(m * m + 8);
+            let mut table: HashMap<u64, (u32, u32, u8)> =
+                HashMap::with_capacity_and_hasher(m * m + 8, Default::default());
             for i in 0..m {
                 let pi = Some(fb[i]);
                 if let Some((x2, _)) = f.padd(pi, pi) {
@@ -368,7 +392,7 @@ fn main() {
             let mut v_log = v0;
             let need = (gfac * m as f64).ceil() as usize;
             let mut rels: Vec<(u32, i8, u32, i8, u64)> = Vec::with_capacity(need);
-            let mut seen_pairs: HashMap<(u32, u32, u8), ()> = HashMap::new();
+            let mut seen_pairs: HashMap<(u32, u32, u8), ()> = HashMap::default();
             let mut p1_trials = 0u64;
             'outer: loop {
                 for k in 0..kw {
@@ -608,7 +632,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -677,7 +701,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -860,7 +884,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -948,7 +972,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -1131,7 +1155,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -1200,7 +1224,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -1276,7 +1300,7 @@ fn main() {
             }
             snap.push(("relations".into(), take(&f)));
             let mut trials = 0u64;
-            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::new();
+            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::default();
             for t in 0..targets {
                 let q = qs[t];
                 let mut kq = 0usize;
@@ -1405,7 +1429,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -1493,7 +1517,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -1569,7 +1593,7 @@ fn main() {
             }
             snap.push(("relations".into(), take(&f)));
             let mut trials = 0u64;
-            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::new();
+            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::default();
             for t in 0..targets {
                 let q = qs[t];
                 let mut kq = 0usize;
@@ -1655,7 +1679,8 @@ fn main() {
             };
             // db: x -> (log, y or u64::MAX for a sibling without y)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
-            let mut db: HashMap<u64, (u64, u64)> = HashMap::with_capacity(db_target * 2);
+            let mut db: HashMap<u64, (u64, u64)> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
@@ -1796,7 +1821,7 @@ fn main() {
             // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
             let mut db: HashMap<u64, (u64, u64, (u64, u64, usize))> =
-                HashMap::with_capacity(db_target * 2);
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
@@ -1939,7 +1964,7 @@ fn main() {
             // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
             let mut db: HashMap<u64, (u64, u64, (u64, u64, usize))> =
-                HashMap::with_capacity(db_target * 2);
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
@@ -2077,7 +2102,8 @@ fn main() {
                 pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
             };
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
-            let mut db: HashMap<u64, (u64, u64)> = HashMap::with_capacity(db_target * 2);
+            let mut db: HashMap<u64, (u64, u64)> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = g;
             let mut ca = 1u64;
             let mut db_steps = 0u64;
@@ -2198,7 +2224,7 @@ fn main() {
                 let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
                 (q1, a1, s1 * b)
             };
-            let mut db: HashMap<u64, u64> = HashMap::new();
+            let mut db: HashMap<u64, u64> = HashMap::default();
             let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
             let mut pre_steps = 0u64;
             let mut sp: Pt = bank[0].0;
@@ -2232,7 +2258,7 @@ fn main() {
                 let q = qs[t];
                 let mut tp: Pt = q;
                 let mut ta = 0u64;
-                let mut pending: HashMap<u64, (u64, i64)> = HashMap::new();
+                let mut pending: HashMap<u64, (u64, i64)> = HashMap::default();
                 let v = 'tgt: loop {
                     let k1 = rng.gen_range(0..BANK);
                     tp = f.padd(tp, bank[k1].0);
@@ -2369,7 +2395,7 @@ fn main() {
                 let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
                 (q1, a1, s1 * b)
             };
-            let mut db: HashMap<u64, u64> = HashMap::new();
+            let mut db: HashMap<u64, u64> = HashMap::default();
             let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
             let mut pre_steps = 0u64;
             let mut sp: Pt = bank[0].0;
@@ -2403,7 +2429,7 @@ fn main() {
                 let q = qs[t];
                 let mut tp: Pt = q;
                 let mut ta = 0u64;
-                let mut pending: HashMap<u64, (u64, i64)> = HashMap::new();
+                let mut pending: HashMap<u64, (u64, i64)> = HashMap::default();
                 let v = 'tgt: loop {
                     let k1 = rng.gen_range(0..BANK);
                     tp = f.padd(tp, bank[k1].0);
@@ -2494,7 +2520,8 @@ fn main() {
                 let l = *b_pts.last().unwrap();
                 b_pts.push(f.padd(l, ugen));
             }
-            let mut baby: HashMap<u64, u64> = HashMap::with_capacity((2 * mx + 4) as usize);
+            let mut baby: HashMap<u64, u64> =
+                HashMap::with_capacity_and_hasher((2 * mx + 4) as usize, Default::default());
             for i in 0..u as usize {
                 f.hash();
                 baby.entry(a_pts[i].unwrap().0).or_insert(i as u64 + 1);
@@ -2582,8 +2609,178 @@ fn main() {
                 ),
             }
         }
+        "opcost" => {
+            // Timed microbenchmark (no counted result): wall-clock ns per operation of this harness's own
+            // implementations on this host, to price the section 5a band: field mul/sqr/inv, one affine
+            // addition (= 1 GAE by definition: I + 2M + S), x-pair (shared inversion), std HashMap lookup and
+            // insert at table sizes 2^10..2^24 (the harness's key/value shape), and the native operations
+            // (step index x mod 32, canonicalisation + one 64-bit hash of x). A fast multiplicative hasher is
+            // timed as a sensitivity (the harness itself uses the std hasher). param = repetition scale.
+            use std::hint::black_box;
+            let scale = param.max(0.01);
+            let reps = |base: f64| -> u64 { ((base * scale) as u64).max(1000) };
+            let time_ns = |n: u64, t: Instant| -> f64 { t.elapsed().as_nanos() as f64 / n as f64 };
+            let p = f.p;
+            let mut res: Vec<String> = Vec::new();
+            // field ops
+            let n1 = reps(2e7);
+            let mut x = 12345u64 % p;
+            let y = 987654321u64 % p;
+            let t = Instant::now();
+            for _ in 0..n1 {
+                x = f.mul(black_box(x), y);
+            }
+            res.push(format!("\"mul_ns\":{:.3}", time_ns(n1, t)));
+            black_box(x);
+            let t = Instant::now();
+            for _ in 0..n1 {
+                x = f.sqr(black_box(x));
+            }
+            res.push(format!("\"sqr_ns\":{:.3}", time_ns(n1, t)));
+            black_box(x);
+            let n2 = reps(1e6);
+            let t = Instant::now();
+            for _ in 0..n2 {
+                x = f.inv(black_box(x) | 1);
+            }
+            res.push(format!("\"inv_ns\":{:.3}", time_ns(n2, t)));
+            black_box(x);
+            // affine addition chain P <- P + Q (one GAE each)
+            let q = f.smul(g, 7);
+            let mut pt = f.smul(g, 3);
+            let t = Instant::now();
+            for _ in 0..n2 {
+                pt = f.padd(black_box(pt), q);
+                if pt.is_none() {
+                    pt = g;
+                }
+            }
+            let gae_ns = time_ns(n2, t);
+            res.push(format!("\"padd_ns\":{:.3}", gae_ns));
+            black_box(pt);
+            let t = Instant::now();
+            let mut acc = 0u64;
+            for _ in 0..n2 {
+                if let Some((a, b)) = f.xpair(black_box(pt), q) {
+                    acc ^= a ^ b;
+                }
+                pt = f.padd(pt, q);
+            }
+            res.push(format!("\"xpair_plus_padd_ns\":{:.3}", time_ns(n2, t)));
+            black_box(acc);
+            // native ops
+            let half = p / 2;
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let n3 = reps(5e7);
+            let mut xs: Vec<(u64, u64)> = Vec::with_capacity(1 << 16);
+            for _ in 0..(1 << 16) {
+                xs.push((rng.gen_range(0..p), rng.gen_range(0..p)));
+            }
+            let t = Instant::now();
+            let mut acc = 0u64;
+            for i in 0..n3 {
+                let (xx, yy) = xs[(i & 0xffff) as usize];
+                let (cx, cy) = if black_box(yy) > half {
+                    (xx, p - yy)
+                } else {
+                    (xx, yy)
+                };
+                acc = acc.wrapping_add(cx ^ cy ^ (mix(cx) >> 40));
+            }
+            res.push(format!("\"canon_hash_ns\":{:.3}", time_ns(n3, t)));
+            let t = Instant::now();
+            for i in 0..n3 {
+                let (xx, _) = xs[(i & 0xffff) as usize];
+                acc = acc.wrapping_add((black_box(xx) as usize % 32) as u64);
+            }
+            res.push(format!("\"step_index_ns\":{:.3}", time_ns(n3, t)));
+            let t = Instant::now();
+            for i in 0..n3 {
+                let (xx, _) = xs[(i & 0xffff) as usize];
+                acc = acc.wrapping_add(black_box(xx));
+            }
+            res.push(format!("\"loop_baseline_ns\":{:.3}", time_ns(n3, t)));
+            black_box(acc);
+            // hash tables: std (as in the harness) and a fast multiplicative hasher (sensitivity)
+            #[derive(Default)]
+            struct FastH(u64);
+            impl std::hash::Hasher for FastH {
+                fn finish(&self) -> u64 {
+                    self.0
+                }
+                fn write(&mut self, b: &[u8]) {
+                    for &c in b {
+                        self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);
+                    }
+                }
+                fn write_u64(&mut self, v: u64) {
+                    self.0 = (v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                }
+            }
+            type Fast = std::hash::BuildHasherDefault<FastH>;
+            let mut tabs: Vec<String> = Vec::new();
+            for lg in [10u32, 12, 14, 16, 18, 20, 22, 24] {
+                let size = 1usize << lg;
+                let keys: Vec<u64> = (0..size).map(|_| rng.gen_range(0..p)).collect();
+                let probes: Vec<u64> = (0..(1 << 20))
+                    .map(|i| {
+                        if i % 2 == 0 {
+                            keys[rng.gen_range(0..size)]
+                        } else {
+                            rng.gen_range(0..p)
+                        }
+                    })
+                    .collect();
+                let nl = reps(4e6);
+                // std hasher, value shape (u64, u64) as the rho databases
+                let mut m: std::collections::HashMap<u64, (u64, u64)> =
+                    std::collections::HashMap::with_capacity(size * 2);
+                let t = Instant::now();
+                for &k in &keys {
+                    m.entry(k).or_insert((k, k));
+                }
+                let ins = time_ns(size as u64, t);
+                let t = Instant::now();
+                let mut hits = 0u64;
+                for i in 0..nl {
+                    if m.contains_key(&probes[(i as usize) & ((1 << 20) - 1)]) {
+                        hits += 1;
+                    }
+                }
+                let look = time_ns(nl, t);
+                black_box(hits);
+                drop(m);
+                let mut m2: std::collections::HashMap<u64, (u64, u64), Fast> =
+                    std::collections::HashMap::with_capacity_and_hasher(size * 2, Fast::default());
+                let t = Instant::now();
+                for &k in &keys {
+                    m2.entry(k).or_insert((k, k));
+                }
+                let ins2 = time_ns(size as u64, t);
+                let t = Instant::now();
+                let mut hits2 = 0u64;
+                for i in 0..nl {
+                    if m2.contains_key(&probes[(i as usize) & ((1 << 20) - 1)]) {
+                        hits2 += 1;
+                    }
+                }
+                let look2 = time_ns(nl, t);
+                black_box(hits2);
+                tabs.push(format!(
+                    "{{\"log2_size\":{},\"std_insert_ns\":{:.3},\"std_lookup_ns\":{:.3},\"fast_insert_ns\":{:.3},\"fast_lookup_ns\":{:.3}}}",
+                    lg, ins, look, ins2, look2
+                ));
+            }
+            res.push(format!("\"tables\":[{}]", tabs.join(",")));
+            Out {
+                ok: 0,
+                extra: res.join(","),
+            }
+        }
         _ => panic!("unknown arm"),
     };
+    // wall time of the method itself (everything before the shared verification pass)
+    let ms_arm = t0.elapsed().as_secs_f64() * 1e3;
     // Verification (counted): every recovered log by double-and-add.
     let mut ok = out.ok;
     for t in 0..targets {
@@ -2598,8 +2795,8 @@ fn main() {
         .map(|(k, v)| format!("\"{}\":[{},{},{},{},{}]", k, v[0], v[1], v[2], v[3], v[4]))
         .collect();
     println!(
-        "{{\"arm\":\"{}\",\"n\":{},\"p\":{},\"targets\":{},\"seed\":{},\"param\":{},\"ok\":{},\"I\":{},\"M\":{},\"S\":{},\"H\":{},\"L\":{},\"N\":{},\"phases\":{{{}}},{},\"ms\":{:.1}}}",
+        "{{\"arm\":\"{}\",\"n\":{},\"p\":{},\"targets\":{},\"seed\":{},\"param\":{},\"ok\":{},\"I\":{},\"M\":{},\"S\":{},\"H\":{},\"L\":{},\"N\":{},\"phases\":{{{}}},{},\"ms_arm\":{:.1},\"ms\":{:.1}}}",
         arm, n, p, targets, seed, param, ok, f.ci.get(), f.cm.get(), f.cs.get(), f.ch.get(), f.cl.get(), f.cn.get(),
-        phases.join(","), out.extra, t0.elapsed().as_secs_f64() * 1e3
+        phases.join(","), out.extra, ms_arm, t0.elapsed().as_secs_f64() * 1e3
     );
 }

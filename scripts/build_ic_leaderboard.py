@@ -893,6 +893,59 @@ def prime_base_size_component() -> dict:
             "validated": not errs}
 
 
+def prime_ksum_component() -> dict:
+    """Pooled k-sum decomposition tables against the tuned mitm incumbent on 16 fresh prime-field
+    holdout curves, research/prime_ksum_pooled_20261029 (frozen protocol, selection hashed before the
+    holdout): per size the holdout mean S (mean over the size's 4 curves of the per-curve mean in the
+    study's `ecbench band` table, band.json) and, at w = 0, 0.1 and 1, the paired ratios of totals
+    ksum5-sel / inc-sel, ksum4-sel / inc-sel, ksum5-sel / rho-neg and ksum4-sel / rho-neg with ci95 and
+    pairs, copied from the study's saved `ecbench compare --weight` outputs. Generic decomposition
+    track: bounded by sqrt(r), it cannot beat rho; rho stays ahead (distance remaining). The saved
+    comparisons are the study's pre-2026-11-08 pricing reading (table_insert_attempts not priced).
+    Its standing comes from the study's VALIDATION.json."""
+    study = "research/prime_ksum_pooled_20261029"
+    per = {}
+    for r in load(f"{study}/analysis/band.json")["rows"]:
+        per.setdefault((int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"]), []).append(r["mean_s"])
+    rows = []
+    for bits in (20, 24, 28, 32):
+        means = {}
+        for arm in ("inc-sel", "ksum4-sel", "ksum5-sel", "rho-neg"):
+            ms = per[(bits, arm)]
+            if len(ms) != 4:
+                raise SystemExit(f"{study}: band.json has {len(ms)} curves for P{bits} {arm}, expected 4")
+            means[arm] = [sum(m[i] for m in ms) / len(ms) for i in range(3)]
+        cmps = {}
+        for name, key in (("ksum5_over_inc", "inc-sel__ksum5-sel"), ("ksum4_over_inc", "inc-sel__ksum4-sel"),
+                          ("ksum5_over_rho", "rho-neg__ksum5-sel"), ("ksum4_over_rho", "rho-neg__ksum4-sel")):
+            acc = []
+            for w in ("0", "0.1", "1"):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+            cmps[name] = acc
+        rows.append({"bits": bits, "mean_s": means, **cmps})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/report.pdf",
+            "readme": study + "/README.md",
+            "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
+            "unit": ("S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in "
+                     "the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not "
+                     "charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 "
+                     "distance to rho grows to 6.30x-8.52x"),
+            "validation": ("Validated with caveats: replay certificate (count-identical replay of all 8 sessions, "
+                           "9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean "
+                           "archive of 6edb2cb36d), validator report (independent recompute) and the matched rho "
+                           f"reference with the §5a band are filed in `{study}/VALIDATION.json`. Scope: the counted "
+                           "unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording "
+                           "host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the "
+                           "validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records "
+                           "give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.")
+            if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def packed_filter_component() -> dict:
     """The membership filter on the packed pair table, research/ic_packed_filter_20261029
     (backlog XP-20261029-packed-filter, frozen protocol, decided at 32 bits): the corrected
@@ -2650,6 +2703,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "prime_ksum_component": prime_ksum_component(),
         "packed_filter_component": packed_filter_component(),
         "lazy_members_component": lazy_members_component(),
         "generator_orbit_component": generator_orbit_component(),
@@ -3431,6 +3485,32 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    L += ["## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)", "",
+          f"Track: {pk['track']}. Registered protocol; the incumbent and both k-sum families were tuned on separate "
+          "train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every "
+          "arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table "
+          f"incumbent. {pk['unit']}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.", "",
+          "| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |",
+          "|--:|:--|:--|:--|:--|--:|"]
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        L.append(f"| {r['bits']} | {m['inc-sel'][0]:.2f} / {m['ksum5-sel'][0]:.2f} / {m['rho-neg'][0]:.2f} | "
+                 f"{pk_q(r['ksum5_over_inc'])} | {pk_q(r['ksum4_over_inc'])} | {pk_g(r['ksum5_over_rho'])} | "
+                 f"{r['ksum5_over_inc'][0]['pairs']} |")
+    L += ["", "The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that "
+          "index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on "
+          "16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its "
+          "limit is BSGS, and it stays above BSGS at every size.", "",
+          f"[Report]({'../../' + pk['report']}) · [README](../../{pk['readme']}) · [study](../../{pk['study']}).", "",
+          pk["validation"], ""]
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -4785,6 +4865,37 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    P.append('<section class="card" id="prime-ksum"><h2>Prime-field k-sum tables against the tuned incumbent '
+             '(2026-10-30) <span class="chip">engineering</span></h2>'
+             f'<p>Track: {esc(pk["track"])}. Registered protocol; the incumbent and both k-sum families were tuned '
+             'on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets '
+             '× 2 rounds, every arm in one session per size). <code>ksum5-sel</code> is the k = 5 sum table, '
+             '<code>inc-sel</code> the tuned pair-table incumbent. '
+             f'{esc(pk["unit"])}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>S holdout mean: inc-sel / ksum5-sel / '
+             'rho-neg (w = 0)</th><th>ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1)</th><th>ksum4-sel ÷ inc-sel</th>'
+             '<th>ksum5-sel ÷ rho-neg: distance remaining</th><th class="n">Pairs</th></tr></thead><tbody>')
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{m["inc-sel"][0]:.2f} / {m["ksum5-sel"][0]:.2f} / '
+                 f'{m["rho-neg"][0]:.2f}</td><td>{pk_q(r["ksum5_over_inc"])}</td><td>{pk_q(r["ksum4_over_inc"])}</td>'
+                 f'<td>{pk_g(r["ksum5_over_rho"])}</td><td class="n">{r["ksum5_over_inc"][0]["pairs"]}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that '
+             'index-calculus baseline. Rho stays ahead at every size and weight (<code>rho-neg</code> &lt; '
+             '<code>ksum5-sel</code> &lt; <code>inc-sel</code> on 16 of 16 curves); the ÷ rho column is the distance '
+             'remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every '
+             'size.</p>'
+             f'<p>{gh(pk["report"], "Report")} · {gh(pk["readme"], "README")} · {gh(pk["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pk["validation"])}</p></section>')
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]

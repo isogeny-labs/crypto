@@ -1,34 +1,21 @@
-# Resume: crypto @ claude/zealous-meitner-85ipb5
+# Resume: crypto @ claude/relation-finding-no-groebner-vrg7ec
 
 ## Goal
-Owner (2026-11-11): "Any other perf optimizations here? Can we use tricks like dynamic programming
-or things that I'm not aware of for grobner base" — then "Go". Catalogue the levers
-(docs/ic/GROEBNER_PERF_LEVERS_20261111.md) and measure the first one: a persistent M4GB server
-process (patch 0003 `--serve`, Rust `m4gb-f2-server`).
-
-## Lead / hypothesis
-Per-call fixed cost (process start, field tables, thread pool, pipes) is 5 to 15 ms and dominates
-decomposition calls at 12 to 16 unknowns. Expectation and falsifier: research/m4gb_persistent_server_20261111/README.md.
+Owner (2026-11-13): "Relation finding that avoids Gröbner bases altogether (probabilistic, SAT or
+lattice-flavoured decomposition) is thinly explored and poorly benchmarked. This needs more exploration."
+Answered with (a) a map of what the repository already measured, and (b) one matched experiment: the
+table-free linear 2+1 decomposition (lin21, lin21-ht) on the frozen 2026-10-14 m=3 cells and targets.
 
 ## Spec
-research/m4gb_persistent_server_20261111/run_ab.sh under tools/benchrec.py run
-(record benchmarks/records/20261111T1946Z-m4gb-persistent-server.json): ic descent --solver
-inherited-f4 --solver m4gb-f2 --solver m4gb-f2-server, K and R, m=2 n=11..23, m=3 n=11,13,15,
-6 targets x 3 repeats, 60 s budget, one thread. Binaries: scripts/m4gb/build.sh n{16,20,24,28,32}_gf2
-with patches 0001-0003 (scratchpad prefix m4gb-prefix-v3). Local container, unisolated (stage
-diagnostic, no leaderboard row).
+research/groebner_free_matched_20261113/PROTOCOL.md, frozen in commit c90b1d9d54 before any claim run.
+Instrument: examples/ic_algebraic_floor (arms lin21, lin21-ht; subcommands linpool, linsummary).
+Runner: research/groebner_free_matched_20261113/run_grid.sh (one cell per process, one job at a time).
 
 ## State
-Patch 0003 written and clean-built; Rust client in progress (subagent); record open; run next.
+2026-11-13: pilot (seed 777) done, 0 disagreements with the floor. Claim grid launching; raw records go
+to research/groebner_free_matched_20261113/runs/. S3 checkpoint unavailable in this container (no AWS
+identity); the branch push is the durable copy.
 
-## Runs in flight
-None yet.
-
-## Stop and success conditions
-All cells finish or fail individually; summarize.py -> RESULTS.md/results.json/svg; make_report.sh;
-benchrec add-raw/metric/close; session-log entry; PR on the branch (PR #3936 is the open
-predecessor, auto-merge enabled).
-
-## Next steps
-1. cargo build --release --bin ic with m4gb-f2-server; cargo test --lib m4gb_oracle.
-2. Run run_ab.sh under the record; summarize; report; close record; benchmarks entry; session log; push; PR.
+## Next
+run_grid.sh; `ic_algebraic_floor analyze --dir runs --out ANALYSIS.json`; `linsummary --dir runs --out
+SUMMARY.json`; figures, REPORT.typ/pdf, README; benchrec close; session log; PR; red-team/validator pass.

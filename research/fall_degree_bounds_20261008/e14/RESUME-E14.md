@@ -16,7 +16,8 @@ CPU probe: 28–30.
 ## Current run
 Pod `fd-e14-r2j-20261112T0457Z` (`gjr9mpprgga8eb`), cpu5m 32 vCPU 256 GB, USD 2.08/h, launched
 2026-11-12T04:57:05Z, deadline 2026-11-13T16:57:18Z (USD 100 cap). Probe 14.5 of 32; build done
-05:00:59; G0 started 05:00:59. Pod id and output token in `e14/pod-r2/launch.json`.
+05:00:59; G0–G3 passed by 05:33:41 (G3: `pe` at 8 threads, 341 s); E14a (`hky_par` cmax 5,
+32 threads) started 05:33:41, time box until 17:33 UTC. Pod id and output token in `e14/pod-r2/launch.json`.
 
 ## How to resume
 1. `bash research/fall_degree_bounds_20261008/e14/pull_r2.sh` (idempotent; pulls every 10 min,
@@ -35,3 +36,9 @@ registered, session log, PR.
 ## Budget
 Balance at launch USD 79.40; other pods on the account about USD 5.6/h; combined about USD 7.7/h,
 so the account runs dry around 15:00 UTC on 2026-11-12 unless topped up.
+
+## Progress (2026-11-12 16:12 UTC)
+E14a draw 0 finished at about 16:05: `d_f = 5`, 37,890 s, degree ≤ 4 equal to E10, so it is valid
+(`pod-r2/out-r2j/A_3-21-7.draw0.jsonl`). E14a continues with draws 1, 3, 4 at about 10.5 h each.
+The pod deadline (11-13 16:57Z) allows at most draw 3. At USD 3.43/h, the account balance
+(USD 34.69 at 16:10) runs out about 02:15Z on 11-13, before draw 1 (about 02:35Z), unless topped up.

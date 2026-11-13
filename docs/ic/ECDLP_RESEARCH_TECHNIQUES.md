@@ -648,9 +648,14 @@ witness gives `log_G Q` without linear algebra.
 Measured: `ksum5` costs 0.700 / 0.446 / 0.324 / 0.217 of the tuned
 pair-table incumbent at 20 / 24 / 28 / 32 bits at `w = 0` over 16 fresh
 curves ([`research/prime_ksum_pooled_20261029/`](../../research/prime_ksum_pooled_20261029/README.md)),
-a record both READMEs label "UNQUALIFIED": no `VALIDATION.json`, not on the
-leaderboard, so it is **not yet** a verified improvement under the success
-criterion and its promotion is the open step. Known-log MITM2 is 1.11 →
+a record that has been **gate-validated** since 2026-11-12
+([`VALIDATION.json`](../../research/prime_ksum_pooled_20261029/VALIDATION.json):
+count-identical replay of all 8 sessions on another host class and build,
+and an independent recompute with `[d]G = Q` on 5,952/5,952 holdout
+records). It is therefore a verified improvement over the tuned pair-table
+incumbent on prime curves at these sizes, within the generic decomposition
+track, and `ksum5` still costs 5.3–7.3× negation rho: the distance
+remaining, bounded below by BSGS. Known-log MITM2 is 1.11 →
 15.6× cheaper than the abscissa pipeline from 12 to 24 bits while rho
 stays 0.43 of it at 24 bits; the precompute-regime control finds no
 single-target cost below rho; `wwalk` with the target in the walk reads
@@ -1684,16 +1689,27 @@ performance verdict".
    and produce the wide-modulus benchmark pack the 2026-10-12 note cites.
 4. Validate the CUDA SpMV worker, the GPU root finder and the FES kernels on
    named hardware without changing their transcripts.
-5. Take the `ksum` record through the validation gate (replay certificate,
-   independent validator, matched rho with the band): it is the one
-   unqualified result below the pair-table baseline on prime curves.
-6. Calibrate `hashed_tensor_steps` (nanoseconds per charged primitive step on
-   the calibration host, pinned in [`calibration.json`](calibration.json)) or
-   charge the contraction in GAE, so the hashed arm gets a priced `S` and can
-   leave `DiagnosticOnly`; until then it stays a stage diagnostic.
-7. Give the algebraic oracles a priced solver unit (word XORs covering the
-   whole run, or conflicts at a pinned price), so `descent-algebraic`,
-   `chained-x`, `pkm-semaev` and the SAT arms stop reading as lower bounds.
+5. Done 2026-11-12 for the pooled `ksum` study (validated). Still open: the
+   external-tool comparison its README owes, and a second-host timed (L2)
+   replay if a wall-time claim is wanted.
+6. Pin `ns_per_hashed_tensor_step` on the calibration host (the key exists
+   since 2026-11-12; protocol in
+   [`calibration-solver-units.md`](calibration-solver-units.md)) and charge
+   the omitted tensor-curve certification work; only then can the hashed arm
+   leave `DiagnosticOnly`. Until pinned it stays a stage diagnostic.
+7. Pin the solver-unit keys added on 2026-11-12 (`ns_per_conflict`,
+   `ns_per_monomial_op`, `ns_per_monomial_test`, `ns_per_vector_xor_8x32` /
+   `_16x32`, `ns_per_f4_muladd`, `ns_per_fp_mul`) per
+   [`calibration-solver-units.md`](calibration-solver-units.md), which first
+   needs its three missing measurement tools (an `ic bench` report reader, an
+   `F_p` multiplication microbenchmark, a contraction-step timer). Until a
+   curve's row pins a key, its unit stays a lower bound exactly as before;
+   `word operations (partial)` (crossbred) and `monomial operations
+   (modelled)` (XL) stay refused even when pinned, because their counts do
+   not cover the whole run. Four pkm counters (`pkm_trace_learn_muladds`,
+   `pkm_t0_*_inversions`, `pkm_crosscheck_fp_mults`) are neither priced nor
+   listed as unpriced: listing them changes frozen ids' unpriced lists and
+   needs its own versioned id.
 8. Pursue G1 (binary F4 trace reuse) and G3 (BooleanSolve refutation) only
    with a preregistered falsifier; both are Backlog with no code.
 9. Attempt general trace-zero or higher-genus GHS integration only after the

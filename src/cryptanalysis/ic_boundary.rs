@@ -234,6 +234,51 @@ pub struct Calibration {
     /// coordinates and the least of `n` rotations, with its shift),
     /// Koblitz regime, measured on the instance's field.
     pub ns_per_canon: Option<f64>,
+    /// The solver and oracle work units below have calibration keys but,
+    /// as of 2026-11-12, no measured ratio: no host measures them and
+    /// `docs/ic/calibration.json` carries none, so each stays `None` and its
+    /// work stays a lower bound (`docs/ic/calibration-solver-units.md`).
+    /// Each is read by [`Calibration::pin`] like the factors above, and
+    /// charges only once pinned ([`Calibration::is_pinned`]); a value that
+    /// is merely present prices nothing.  `None` is not serialised, so a
+    /// report written without a pin is byte-identical to one written before
+    /// these keys existed.
+    ///
+    /// One `sat-cdcl` conflict, the solver call's whole run per conflict.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_conflict: Option<f64>,
+    /// One `buchberger-f2` monomial operation (also the key `xl-f2`'s
+    /// modelled count would need; that count is refused, see
+    /// `ic_framework::solvers::solver_unit_key`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_monomial_op: Option<f64>,
+    /// One `exhaustive` monomial test.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_monomial_test: Option<f64>,
+    /// One `crossbred-f2` word operation (refused while the count is
+    /// partial).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_word_op: Option<f64>,
+    /// One `fes-f2-wide` Gray-code vector XOR, 8 lanes of 32 bits (AVX2).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_vector_xor_8x32: Option<f64>,
+    /// One `fes-f2-wide` Gray-code vector XOR, 16 lanes of 32 bits
+    /// (AVX-512).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_vector_xor_16x32: Option<f64>,
+    /// One `F_p` multiply-add of the `pkm-semaev` oracle's tower F4.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_f4_muladd: Option<f64>,
+    /// One prime-field multiplication outside the group law: the
+    /// `pkm-semaev` oracle's system specialisation, grid search and set-up
+    /// counters ([`PINNABLE_NATIVE`]) and its grid solver block, and the
+    /// line oracles' bare `F_p multiplications` solver blocks.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_fp_mul: Option<f64>,
+    /// One primitive step of the hashed-affine / hashed-tensor
+    /// contraction (`hashed_tensor_steps`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_hashed_tensor_step: Option<f64>,
     /// The factors above that [`Calibration::pin`] replaced with a
     /// ratio from the repository's table, by field name.  A consumer
     /// that labels a price `pinned` must check here: a factor that is
@@ -344,11 +389,18 @@ impl Calibration {
     /// A unit the table does not carry keeps its measured value and is
     /// named in the outcome, so a row priced the old way says so.
     pub fn pin(&mut self, regime: &str, instance: &str) -> PinOutcome {
-        let mut out = PinOutcome::default();
         let table = pinned_ratios(regime, instance);
+        self.pin_with(table.as_ref())
+    }
+
+    /// [`Calibration::pin`] from a given table row (`None`: no row).
+    fn pin_with(
+        &mut self,
+        table: Option<&serde_json::Map<String, serde_json::Value>>,
+    ) -> PinOutcome {
+        let mut out = PinOutcome::default();
         let add = self.ns_per_add;
         let apply = |name: &str, slot: &mut Option<f64>, out: &mut PinOutcome| match table
-            .as_ref()
             .and_then(|t| t.get(name))
             .and_then(serde_json::Value::as_f64)
         {
@@ -383,8 +435,53 @@ impl Calibration {
         ] {
             apply(name, slot, &mut out);
         }
+        // The solver and oracle unit keys (2026-11-12).  The table carries
+        // none of them yet, so for every row this loop pins nothing and
+        // reports nothing: each slot is `None` and stays so.
+        for name in SOLVER_UNIT_KEYS {
+            if let Some(slot) = self.unit_slot(name) {
+                apply(name, slot, &mut out);
+            }
+        }
         self.pinned_units = out.pinned.clone();
         out
+    }
+
+    fn unit_slot(&mut self, key: &str) -> Option<&mut Option<f64>> {
+        Some(match key {
+            "ns_per_conflict" => &mut self.ns_per_conflict,
+            "ns_per_monomial_op" => &mut self.ns_per_monomial_op,
+            "ns_per_monomial_test" => &mut self.ns_per_monomial_test,
+            "ns_per_word_op" => &mut self.ns_per_word_op,
+            "ns_per_vector_xor_8x32" => &mut self.ns_per_vector_xor_8x32,
+            "ns_per_vector_xor_16x32" => &mut self.ns_per_vector_xor_16x32,
+            "ns_per_f4_muladd" => &mut self.ns_per_f4_muladd,
+            "ns_per_fp_mul" => &mut self.ns_per_fp_mul,
+            "ns_per_hashed_tensor_step" => &mut self.ns_per_hashed_tensor_step,
+            _ => return None,
+        })
+    }
+
+    /// The nanoseconds a solver or oracle unit key (one of
+    /// [`SOLVER_UNIT_KEYS`]) prices at, only when the repository's table
+    /// pinned it for this curve.  A merely present value — never written
+    /// by a host measurement — returns `None` and prices nothing.
+    pub fn pinned_unit_ns(&self, key: &str) -> Option<f64> {
+        if !self.is_pinned(key) {
+            return None;
+        }
+        match key {
+            "ns_per_conflict" => self.ns_per_conflict,
+            "ns_per_monomial_op" => self.ns_per_monomial_op,
+            "ns_per_monomial_test" => self.ns_per_monomial_test,
+            "ns_per_word_op" => self.ns_per_word_op,
+            "ns_per_vector_xor_8x32" => self.ns_per_vector_xor_8x32,
+            "ns_per_vector_xor_16x32" => self.ns_per_vector_xor_16x32,
+            "ns_per_f4_muladd" => self.ns_per_f4_muladd,
+            "ns_per_fp_mul" => self.ns_per_fp_mul,
+            "ns_per_hashed_tensor_step" => self.ns_per_hashed_tensor_step,
+            _ => None,
+        }
     }
 
     /// Whether `unit` (a field name such as `ns_per_word_xor`) carries
@@ -393,6 +490,33 @@ impl Calibration {
     pub fn is_pinned(&self, unit: &str) -> bool {
         self.pinned_units.iter().any(|u| u == unit)
     }
+}
+
+/// Calibration keys for solver and oracle work units that had none before
+/// 2026-11-12 (`docs/ic/FRAMEWORK.md`, "Solver and oracle work units").
+/// [`Calibration::pin`] reads each from `docs/ic/calibration.json` like the
+/// older keys; no row carries one yet, so every unit below is still a lower
+/// bound everywhere.  Which solver unit maps to which key, and which counts
+/// are refused even when pinned, is `ic_framework::solvers::solver_unit_key`.
+pub const SOLVER_UNIT_KEYS: &[&str] = &[
+    "ns_per_conflict",
+    "ns_per_monomial_op",
+    "ns_per_monomial_test",
+    "ns_per_word_op",
+    "ns_per_vector_xor_8x32",
+    "ns_per_vector_xor_16x32",
+    "ns_per_f4_muladd",
+    "ns_per_fp_mul",
+    "ns_per_hashed_tensor_step",
+];
+
+pub use crate::cryptanalysis::ic_framework::solver_units::PINNABLE_NATIVE;
+
+/// Whether `counter` is one of [`PINNABLE_NATIVE`] and `calib` pinned its key.
+pub fn native_is_pinned(counter: &str, calib: &Calibration) -> bool {
+    PINNABLE_NATIVE
+        .iter()
+        .any(|(c, k)| *c == counter && calib.pinned_unit_ns(k).is_some())
 }
 
 /// `√(πr/2A)`: expected operations of a generic collision search on a
@@ -3143,6 +3267,431 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
     }
 }
 
+/// One lane of [`rho_walk_lanes`]: the state [`TunedWalker::walk`] keeps in
+/// locals for one walk, plus the pending attempt of the current step.
+struct RhoLane<E> {
+    active: bool,
+    x: E,
+    a: u64,
+    b: u64,
+    key: u64,
+    h: u64,
+    /// The step's first jump and how many attempts it has made (the
+    /// look-ahead's rejections), as `j0` and `tried` in `TunedWalker::walk`.
+    j0: usize,
+    tried: usize,
+    last_escape: Option<u64>,
+    len: u64,
+    /// Walk operations this walk has spent (steps, look-ahead additions,
+    /// escape doublings): what [`WalkTally::lose`] books for a lost walk.
+    spent: u64,
+    ring_keys: Vec<u64>,
+    ring_states: Vec<(E, u64, u64)>,
+    ring_next: usize,
+}
+
+impl<E: Copy> RhoLane<E> {
+    fn idle(identity: E, window: usize) -> Self {
+        Self {
+            active: false,
+            x: identity,
+            a: 0,
+            b: 0,
+            key: 0,
+            h: 0,
+            j0: 0,
+            tried: 0,
+            last_escape: None,
+            len: 0,
+            spent: 0,
+            ring_keys: Vec::with_capacity(window),
+            ring_states: Vec::with_capacity(window),
+            ring_next: 0,
+        }
+    }
+
+    fn forget_recent(&mut self) {
+        self.ring_keys.clear();
+        self.ring_states.clear();
+        self.ring_next = 0;
+    }
+
+    fn remember(&mut self, window: usize, key: u64, x: E, a: u64, b: u64) {
+        if self.ring_keys.len() < window {
+            self.ring_keys.push(key);
+            self.ring_states.push((x, a, b));
+        } else {
+            self.ring_keys[self.ring_next] = key;
+            self.ring_states[self.ring_next] = (x, a, b);
+        }
+        self.ring_next = if self.ring_next + 1 == window {
+            0
+        } else {
+            self.ring_next + 1
+        };
+    }
+
+    fn recent_entry(&self, window: usize, i: usize) -> (u64, E, u64, u64) {
+        let len = self.ring_keys.len();
+        let oldest = if len < window { 0 } else { self.ring_next };
+        let slot = (oldest + i) % window;
+        let (x, a, b) = self.ring_states[slot];
+        (self.ring_keys[slot], x, a, b)
+    }
+
+    fn recent_position(&self, window: usize, key: u64) -> Option<usize> {
+        let hit = self
+            .ring_keys
+            .iter()
+            .fold(false, |any, &k| any | (k == key));
+        if !hit {
+            return None;
+        }
+        (0..self.ring_keys.len()).find(|&i| self.recent_entry(window, i).0 == key)
+    }
+
+    /// End this walk without a distinguished point, booking what it spent.
+    fn lose(&mut self, tally: &mut WalkTally, how: LostHow) {
+        match how {
+            LostHow::Identity => tally.lost_identity += self.spent,
+            LostHow::Abandoned => tally.lost_abandoned += self.spent,
+            LostHow::Capped => tally.lost_capped += self.spent,
+            LostHow::Budget => tally.lost_budget += self.spent,
+        }
+        self.active = false;
+    }
+}
+
+/// Lanes [`rho_walk_lanes`] runs when the caller gives none.
+pub const RHO_LANES_DEFAULT: usize = 32;
+
+/// **`rho.negation_lanes_v1`: the tuned walk in lock-step lanes, one batched
+/// inversion a round.**
+///
+/// The set-up is [`rho_walk_with_policy`]'s under [`WalkPolicy::legacy`],
+/// draw for draw: `G + Q`, the jump table `M_j = [a_j]G + [b_j]Q`, and the
+/// start stride `T` (the same operations, charged the same way).  Each walk
+/// is [`TunedWalker::walk`]'s, step for step: canonical representatives,
+/// the Wiener–Zuccherato look-ahead, the 16-point cycle window with its
+/// escape by doubling the least-key member, the distinguished-point rule
+/// and the walk cap.  Walk `k` starts at `[k]T` as there.
+///
+/// What differs is the schedule.  `lanes` walks advance together: each
+/// round every active lane asks for one addition `X + M_j`, and the round's
+/// additions go through [`CountedGroup::native_lane_walk_adder`] with
+/// `batched = true`, which shares one field inversion among all of them
+/// (Montgomery's trick).  A lane that reaches a distinguished point, loses
+/// its walk, or is rejected by the look-ahead is handled at once, in lane
+/// order; a finished lane takes the next start `[k]T` before the next round.
+/// The distinguished points therefore arrive in another order than in the
+/// serial walk, so the same seed solves after a different number of steps:
+/// this is a new method, not a faster `rho.negation`.
+///
+/// **Counted unit.**  `S` is charged exactly as for `rho.negation`: one
+/// group operation per walk step, per look-ahead rejection (an addition
+/// that was computed and discarded) and per escape doubling, plus the
+/// set-up, the starts and the final check `[d]G`.  A step whose addition
+/// was computed in a round that the solve ended in the middle of is charged
+/// too (it was performed).  The field-operation tally is the batched one
+/// the adder books: per round with `k` ordinary additions, one inversion
+/// and `3k + 1` multiplications, plus `2M + 1S` an addition, and `2M` for
+/// each conversion of a point into Montgomery form (`montgomery_conversions`
+/// counts the conversions back, uncharged).  Escapes, starts, set-up and
+/// the check use the serial group law and its tally.
+///
+/// Requires a group with a native lane adder (prime curves with
+/// `p < 2^prime_fast::MAX_BITS`) and at most 16 jumps (the adder's slots).
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_lanes<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    walk: RhoWalk,
+    lanes: usize,
+) -> Result<RhoResult, String> {
+    if !(1..=4096).contains(&lanes) {
+        return Err(format!("lanes must be 1..=4096, not {lanes}"));
+    }
+    let mut adder = g
+        .native_lane_walk_adder(true)
+        .ok_or("the lane walk needs a native lane adder (a prime curve with p below prime_fast::MAX_BITS bits)")?;
+    let start = Instant::now();
+    let mut ops = GroupOps::default();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let shape = WalkShape::of(r, walk);
+    if shape.jumps > 16 {
+        return Err(format!(
+            "the lane adder holds 16 jump slots; this walk has {} jumps",
+            shape.jumps
+        ));
+    }
+    let short = r.min(1u64 << shape.coefficient_bits).max(2);
+
+    // Set-up: rho_walk_with_policy's under WalkPolicy::legacy(), draw for draw.
+    let gq = g.add(&mut ops, generator, target);
+    let jumps: Vec<(G::Elt, u64, u64)> = (0..shape.jumps)
+        .map(|_| {
+            let a = rng.gen_range(1..short);
+            let b = rng.gen_range(1..short);
+            (
+                joint_mul(g, &mut ops, generator, target, gq, a, b),
+                a % r,
+                b % r,
+            )
+        })
+        .collect();
+    let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
+    let mut stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+    while g.is_identity(&stride) {
+        ta = rng.gen_range(1..r.max(2));
+        tb = rng.gen_range(1..r.max(2));
+        stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+    }
+    let setup = ops;
+
+    let jump_count = shape.jumps;
+    let index_of = |h: u64| -> usize {
+        let n = jump_count as u64;
+        let h = h >> 24;
+        (if n.is_power_of_two() {
+            h & (n - 1)
+        } else {
+            h % n
+        }) as usize
+    };
+    let look_ahead = walk.look_ahead && !classes.trivial();
+    let window = walk.cycle_window;
+    let automorphisms = classes.automorphisms();
+    let expected = generic_floor_ops(r as f64, automorphisms as f64);
+    let mut table: FastMap<(u64, u64)> = fast_map(1024);
+    let mut tally = WalkTally::default();
+    let (mut walks, mut dps, mut start_adds, mut fresh_starts) = (0u64, 0u64, 0u64, 0u64);
+    let (mut useless, mut verification_ops, mut rounds) = (0u64, 0u64, 0u64);
+    let mut recovered = None;
+    let (mut sx, mut sa, mut sb) = (stride, ta % r, tb % r);
+    let mut lane: Vec<RhoLane<G::Elt>> = (0..lanes)
+        .map(|_| RhoLane::idle(g.identity(), window))
+        .collect();
+    let mut requests: Vec<(usize, G::Elt, G::Elt, usize)> = Vec::with_capacity(lanes);
+    let mut outputs: Vec<G::Elt> = Vec::with_capacity(lanes);
+
+    'search: loop {
+        // Every idle lane takes the next start `[k]T`, in lane order, while
+        // the budget lasts (rho_search_from's loop condition).
+        for l in lane.iter_mut() {
+            while !l.active && tally.walk_ops() < max_steps && walks < max_steps {
+                walks += 1;
+                fresh_starts += 1;
+                if fresh_starts > 1 {
+                    sx = g.add(&mut ops, sx, stride);
+                    sa = addmod(sa, ta, r);
+                    sb = addmod(sb, tb, r);
+                    start_adds += 1;
+                }
+                if g.is_identity(&sx) {
+                    continue;
+                }
+                let (x, a, b, _) = rho_canon(
+                    g,
+                    classes,
+                    &mut ops,
+                    sx,
+                    sa,
+                    sb,
+                    r,
+                    &mut tally.canonicalisations,
+                );
+                l.active = true;
+                l.x = x;
+                l.a = a;
+                l.b = b;
+                l.key = g.key(&x);
+                l.h = mix(l.key);
+                l.j0 = index_of(l.h);
+                l.tried = 0;
+                l.last_escape = None;
+                l.len = 0;
+                l.spent = 0;
+                l.forget_recent();
+            }
+        }
+        requests.clear();
+        for (i, l) in lane.iter().enumerate() {
+            if l.active {
+                // `j0` and `tried` are below `jump_count`.
+                let j = if l.j0 + l.tried >= jump_count {
+                    l.j0 + l.tried - jump_count
+                } else {
+                    l.j0 + l.tried
+                };
+                requests.push((i, l.x, jumps[j].0, j));
+            }
+        }
+        if requests.is_empty() {
+            break;
+        }
+        rounds += 1;
+        adder(&mut ops, &requests, &mut outputs);
+        for (k, &(i, _, _, j)) in requests.iter().enumerate() {
+            let l = &mut lane[i];
+            let (_, aj, bj) = jumps[j];
+            let (y, ya, yb, flipped) = rho_canon(
+                g,
+                classes,
+                &mut ops,
+                outputs[k],
+                addmod(l.a, aj, r),
+                addmod(l.b, bj, r),
+                r,
+                &mut tally.canonicalisations,
+            );
+            l.tried += 1;
+            l.spent += 1;
+            let ky = g.key(&y);
+            let hy = mix(ky);
+            if look_ahead
+                && flipped
+                && l.tried < jump_count
+                && !g.is_identity(&y)
+                && index_of(hy) == j
+            {
+                tally.look_ahead_adds += 1;
+                continue;
+            }
+            l.x = y;
+            l.a = ya;
+            l.b = yb;
+            l.key = ky;
+            l.h = hy;
+            tally.steps += 1;
+            l.len += 1;
+            if g.is_identity(&l.x) {
+                l.lose(&mut tally, LostHow::Identity);
+                continue;
+            }
+            if window > 0 {
+                tally.window_word_ops += l.ring_keys.len() as u64;
+                if let Some(pos) = l.recent_position(window, l.key) {
+                    let c = l.ring_keys.len() - pos;
+                    tally.window_word_ops += (pos as u64 + 1) + (c as u64 - 1) + 1;
+                    match c {
+                        2 => tally.cycles_2 += 1,
+                        4 => tally.cycles_4 += 1,
+                        _ => tally.cycles_other += 1,
+                    }
+                    let (min_key, mp, ma, mb) = (pos..l.ring_keys.len())
+                        .map(|e| l.recent_entry(window, e))
+                        .min_by_key(|e| e.0)
+                        .expect("a cycle has members");
+                    if l.last_escape == Some(min_key) {
+                        tally.abandoned += 1;
+                        l.lose(&mut tally, LostHow::Abandoned);
+                        continue;
+                    }
+                    l.last_escape = Some(min_key);
+                    let d2 = g.double(&mut ops, mp);
+                    tally.escapes += 1;
+                    l.spent += 1;
+                    let (e, ea, eb, _) = rho_canon(
+                        g,
+                        classes,
+                        &mut ops,
+                        d2,
+                        addmod(ma, ma, r),
+                        addmod(mb, mb, r),
+                        r,
+                        &mut tally.canonicalisations,
+                    );
+                    l.x = e;
+                    l.a = ea;
+                    l.b = eb;
+                    l.key = g.key(&l.x);
+                    l.h = mix(l.key);
+                    l.forget_recent();
+                    if g.is_identity(&l.x) {
+                        l.lose(&mut tally, LostHow::Identity);
+                        continue;
+                    }
+                }
+                tally.window_word_ops += 2;
+                let (key, x, a, b) = (l.key, l.x, l.a, l.b);
+                l.remember(window, key, x, a, b);
+            }
+            if l.h & shape.dp_mask == 0 {
+                l.active = false;
+                dps += 1;
+                let (x, a, b) = (l.x, l.a, l.b);
+                let key = g.key(&x);
+                match table.get(&key) {
+                    Some(&(a2, b2)) => {
+                        if b2 != b {
+                            let num = submod(a, a2, r);
+                            let den = submod(b2, b, r);
+                            if let Some(inv) = invmod(den, r) {
+                                let d = mulmod(num, inv, r);
+                                let before = ops.gae();
+                                let check = g.mul(&mut ops, generator, d);
+                                verification_ops += (ops.gae() - before) as u64;
+                                if check == target {
+                                    recovered = Some(d);
+                                    break 'search;
+                                }
+                            }
+                        }
+                        useless += 1;
+                    }
+                    None => {
+                        table.insert(key, (a, b));
+                    }
+                }
+                continue;
+            }
+            if l.len > shape.walk_cap {
+                tally.capped += 1;
+                l.lose(&mut tally, LostHow::Capped);
+                continue;
+            }
+            if tally.walk_ops() >= max_steps {
+                l.lose(&mut tally, LostHow::Budget);
+                continue;
+            }
+            l.j0 = index_of(l.h);
+            l.tried = 0;
+        }
+    }
+    let wall_ns = start.elapsed().as_nanos() as u64;
+    let gae = ops.gae();
+    let walked = tally.walk_ops();
+    let mut counters = tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
+    counters.insert("lanes".into(), lanes as u64);
+    counters.insert("lane_rounds".into(), rounds);
+    counters.insert(
+        "montgomery_conversions_uncharged".into(),
+        ops.montgomery_reductions,
+    );
+    Ok(RhoResult {
+        method: format!("{}_lanes", classes.method()),
+        automorphisms,
+        group_ops: ops,
+        steps: tally.steps,
+        walks,
+        distinguished_points: dps,
+        gae,
+        s: gae / (r as f64).sqrt(),
+        s_walk: walked as f64 / (r as f64).sqrt(),
+        expected_steps: expected,
+        steps_over_expected: walked as f64 / expected,
+        wall_ns,
+        verified: recovered.is_some(),
+        recovered,
+        work_native: tally.work_native(),
+        counters,
+    })
+}
 /// How [`rho_walk_v3`] builds its table.
 ///
 /// The legacy walks pay about `1.75·w` operations a jump (a joint
@@ -13526,6 +14075,13 @@ pub fn price_phase(phase: &mut PhaseCost, calib: &Calibration) {
     gae += conv("frobenius_maps", calib.ns_per_frobenius);
     gae += conv("canonicalisations", calib.ns_per_canon);
     gae += conv("target_guard_probes", Some(calib.ns_per_lookup));
+    // Pinned solver/oracle unit keys only; with none pinned this adds
+    // nothing and `gae` is bit-for-bit what it was.
+    for (counter, key) in PINNABLE_NATIVE {
+        if let Some(ns) = calib.pinned_unit_ns(key) {
+            gae += calib.gae(phase.get(counter), ns);
+        }
+    }
     phase.gae = gae;
 }
 
@@ -20417,5 +20973,98 @@ mod efd_instance_tests {
         assert!(
             PrimeInstance::from_efd("montgom", "xz", 1019, &params, 268, 4, &[604, 1], 0).is_err()
         );
+    }
+}
+
+#[cfg(test)]
+mod solver_unit_key_tests {
+    use super::*;
+
+    /// **A table row that carries a solver/oracle unit key pins it** like
+    /// any other key (named in the outcome, which `ic bench` writes as
+    /// `calibration_pins`, and in `pinned_units`), and a row without one —
+    /// every row of `docs/ic/calibration.json` today — pins nothing new.
+    #[test]
+    fn a_solver_unit_key_in_the_table_is_pinned_and_named() {
+        let base = || Calibration {
+            ns_per_add: 2.0,
+            ns_per_double: 2.0,
+            ..Default::default()
+        };
+        let row: serde_json::Map<String, serde_json::Value> = serde_json::from_str(
+            r#"{"ns_per_double": 1.0, "ns_per_conflict": 0.75, "ns_per_hashed_tensor_step": 0.125}"#,
+        )
+        .unwrap();
+        let mut c = base();
+        let out = c.pin_with(Some(&row));
+        assert_eq!(
+            out.pinned,
+            vec![
+                "ns_per_double",
+                "ns_per_conflict",
+                "ns_per_hashed_tensor_step"
+            ]
+        );
+        // `ns_per_lookup` / `ns_per_row_op` always carry a host value, so
+        // they are reported measured; an absent solver key is not.
+        assert_eq!(out.measured, vec!["ns_per_lookup", "ns_per_row_op"]);
+        assert_eq!(c.pinned_units, out.pinned);
+        assert_eq!(c.ns_per_conflict, Some(1.5), "ratio × ns_per_add");
+        assert_eq!(c.pinned_unit_ns("ns_per_conflict"), Some(1.5));
+        assert_eq!(c.pinned_unit_ns("ns_per_hashed_tensor_step"), Some(0.25));
+        assert_eq!(c.pinned_unit_ns("ns_per_f4_muladd"), None);
+        let json = serde_json::to_string(&c).unwrap();
+        assert!(json.contains(r#""ns_per_conflict":1.5"#), "{json}");
+        assert!(!json.contains("ns_per_f4_muladd"), "{json}");
+
+        // Every committed row: no new key pinned, none serialised.
+        let doc: serde_json::Value = serde_json::from_str(PINNED_CALIBRATION).unwrap();
+        for (name, row) in doc["instances"].as_object().unwrap() {
+            let mut c = base();
+            let out = c.pin_with(row.as_object());
+            for key in SOLVER_UNIT_KEYS {
+                assert!(!out.pinned.iter().any(|u| u == key), "{name}: {key}");
+                assert!(c.pinned_unit_ns(key).is_none(), "{name}: {key}");
+            }
+            let json = serde_json::to_string(&c).unwrap();
+            for key in SOLVER_UNIT_KEYS {
+                assert!(!json.contains(key), "{name}: {key} serialised");
+            }
+        }
+    }
+
+    /// `price_phase` charges a [`PINNABLE_NATIVE`] counter only at a
+    /// pinned key; present-but-unpinned or absent, the phase is priced
+    /// bit for bit as before.
+    #[test]
+    fn a_pinnable_native_counter_is_charged_only_when_pinned() {
+        let mut phase = PhaseCost::default();
+        phase.count("pkm_grid_fp_mults_uncharged", 1000);
+        phase.count("hashed_tensor_steps", 64);
+        phase.count("lookups", 10);
+        let mut c = Calibration {
+            ns_per_add: 2.0,
+            ns_per_double: 2.0,
+            ns_per_lookup: 1.0,
+            ns_per_fp_mul: Some(0.5),
+            ns_per_hashed_tensor_step: Some(4.0),
+            ..Default::default()
+        };
+        let mut unpinned = phase.clone();
+        price_phase(&mut unpinned, &c);
+        assert_eq!(unpinned.gae, 5.0, "lookups only");
+        assert!(!native_is_pinned("pkm_grid_fp_mults_uncharged", &c));
+
+        c.pinned_units = vec!["ns_per_fp_mul".into()];
+        let mut fp = phase.clone();
+        price_phase(&mut fp, &c);
+        assert_eq!(fp.gae, 5.0 + 1000.0 * 0.5 / 2.0);
+        assert!(native_is_pinned("pkm_grid_fp_mults_uncharged", &c));
+        assert!(!native_is_pinned("hashed_tensor_steps", &c));
+
+        c.pinned_units.push("ns_per_hashed_tensor_step".into());
+        let mut both = phase;
+        price_phase(&mut both, &c);
+        assert_eq!(both.gae, 5.0 + 250.0 + 64.0 * 4.0 / 2.0);
     }
 }

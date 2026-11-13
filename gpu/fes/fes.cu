@@ -13,30 +13,67 @@
 #include "system.h"
 
 // Upper bound on variables, so per-thread scratch is a fixed-size local array.
+// The worker rejects larger systems (the contract allows n <= 62, and a
+// larger n would write past df[]).
 #ifndef FES_MAX_VARS
 #define FES_MAX_VARS 40
 #endif
-// Per-sub-cube solution cap before spilling to the global counter only.
-#ifndef FES_LOCAL_CAP
-#define FES_LOCAL_CAP 64
+
+// Appends each zero straight to the global list.  The previous kernel kept
+// up to 64 per thread in a local array and silently dropped any further
+// zeros of the same sub-cube (and the count with them); appending directly
+// lists every zero (up to max_out) and drops the 512-byte local buffer.
+struct FesGlobalEmit {
+  uint64_t *gout;
+  unsigned int *gcount;
+  int max_out;
+  __device__ void operator()(uint64_t x) {
+    unsigned int idx = atomicAdd(gcount, 1u);
+    if ((int)idx < max_out) gout[idx] = x;
+  }
+};
+
+// One thread per sub-cube.  The block first stages the symmetric
+// second-derivative table (n*n words, zero diagonal; fes_build_qsym) in
+// dynamic shared memory: the walk's row index is the same for every lane
+// of a warp, so each load in the hot loop is a shared-memory broadcast
+// instead of a triangular-index computation, a branch and a global load.
+// The walk is fes_walk_block (FES_WALK=2, default): fes_walk_gray's O(1)
+// steps with the low FES_BLOCK_BITS derivatives in registers; or
+// fes_walk_gray (FES_WALK=1) or fes_walk_sym (FES_WALK=0, O(n) per point).
+// `make test` checks each against fes_search_subcube; they emit the same
+// zeros in the same order.
+// Walk: 2 = fes_walk_block<FES_BLOCK_BITS> (default), 1 = fes_walk_gray,
+// 0 = fes_walk_sym.  All three emit the same zeros in the same order.
+#ifndef FES_WALK
+#define FES_WALK 2
+#endif
+#ifndef FES_BLOCK_BITS
+#define FES_BLOCK_BITS 6
 #endif
 
-__global__ void fes_kernel(uint64_t cst, const uint64_t *lin,
-                           const uint64_t *quad_tri, int n, int low_bits,
-                           uint64_t *gout, unsigned int *gcount, int max_out) {
+__global__ void fes_kernel(uint64_t cst, const uint64_t *__restrict__ lin,
+                           const uint64_t *__restrict__ quad_tri,
+                           const uint64_t *__restrict__ qsym_g, int n,
+                           int low_bits, uint64_t *gout, unsigned int *gcount,
+                           int max_out) {
+  extern __shared__ uint64_t qsym[];
+  for (int t = threadIdx.x; t < n * n; t += blockDim.x) qsym[t] = qsym_g[t];
+  __syncthreads();
+
   const uint64_t prefix = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x;
   const uint64_t nprefix = 1ULL << (n - low_bits);
   if (prefix >= nprefix) return;
 
-  uint64_t local[FES_LOCAL_CAP];
   uint64_t df[FES_MAX_VARS];
-  int found = 0;
-  fes_search_subcube(cst, lin, quad_tri, n, low_bits, prefix, local, &found,
-                     FES_LOCAL_CAP, df);
-  for (int i = 0; i < found && i < FES_LOCAL_CAP; ++i) {
-    unsigned int idx = atomicAdd(gcount, 1u);
-    if ((int)idx < max_out) gout[idx] = local[i];
-  }
+  FesGlobalEmit emit{gout, gcount, max_out};
+#if FES_WALK == 0
+  fes_walk_sym(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
+#elif FES_WALK == 1
+  fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
+#else
+  fes_walk_block<FES_BLOCK_BITS>(cst, lin, quad_tri, qsym, n, low_bits, prefix, df, emit);
+#endif
 }
 
 // Launch the kernel over the whole cube of a system and copy back the
@@ -46,7 +83,13 @@ static long long run_on_device(const FesSystem &sys, int low_bits,
                                std::vector<uint64_t> &sols) {
   const int quad_len = sys.n * (sys.n + 1) / 2;
   const int max_out = 1 << 20;
-  uint64_t *d_lin = nullptr, *d_quad = nullptr, *d_out = nullptr;
+  if (sys.n > FES_MAX_VARS) {
+    fprintf(stderr, "fes_cuda: n=%d exceeds FES_MAX_VARS=%d\n", sys.n, FES_MAX_VARS);
+    return -1;
+  }
+  uint64_t *d_lin = nullptr, *d_quad = nullptr, *d_qsym = nullptr, *d_out = nullptr;
+  std::vector<uint64_t> qsym((size_t)sys.n * sys.n ? (size_t)sys.n * sys.n : 1, 0);
+  fes_build_qsym(sys.quad_tri.data(), sys.n, qsym.data());
   unsigned int *d_count = nullptr;
 #define TRY(call)                                                              \
   do {                                                                        \
@@ -57,19 +100,22 @@ static long long run_on_device(const FesSystem &sys, int low_bits,
   } while (0)
   TRY(cudaMalloc(&d_lin, (sys.n ? sys.n : 1) * sizeof(uint64_t)));
   TRY(cudaMalloc(&d_quad, (quad_len ? quad_len : 1) * sizeof(uint64_t)));
+  TRY(cudaMalloc(&d_qsym, qsym.size() * sizeof(uint64_t)));
   TRY(cudaMalloc(&d_out, max_out * sizeof(uint64_t)));
   TRY(cudaMalloc(&d_count, sizeof(unsigned int)));
   if (sys.n)
     TRY(cudaMemcpy(d_lin, sys.lin.data(), sys.n * sizeof(uint64_t), cudaMemcpyHostToDevice));
   if (quad_len)
     TRY(cudaMemcpy(d_quad, sys.quad_tri.data(), quad_len * sizeof(uint64_t), cudaMemcpyHostToDevice));
+  TRY(cudaMemcpy(d_qsym, qsym.data(), qsym.size() * sizeof(uint64_t), cudaMemcpyHostToDevice));
   TRY(cudaMemset(d_count, 0, sizeof(unsigned int)));
 
   const uint64_t nprefix = 1ULL << (sys.n - low_bits);
   const int threads = 256;
   const int blocks = (int)((nprefix + threads - 1) / threads);
-  fes_kernel<<<blocks, threads>>>(sys.cst, d_lin, d_quad, sys.n, low_bits, d_out,
-                                  d_count, max_out);
+  const size_t smem = (size_t)sys.n * sys.n * sizeof(uint64_t);
+  fes_kernel<<<blocks, threads, smem>>>(sys.cst, d_lin, d_quad, d_qsym, sys.n,
+                                        low_bits, d_out, d_count, max_out);
   TRY(cudaGetLastError());
   TRY(cudaDeviceSynchronize());
   unsigned int count = 0;
@@ -80,10 +126,72 @@ static long long run_on_device(const FesSystem &sys, int low_bits,
     TRY(cudaMemcpy(sols.data(), d_out, listed * sizeof(uint64_t), cudaMemcpyDeviceToHost));
   cudaFree(d_lin);
   cudaFree(d_quad);
+  cudaFree(d_qsym);
   cudaFree(d_out);
   cudaFree(d_count);
 #undef TRY
   return (long long)count;
+}
+
+// Serve mode (`fes_cuda --serve`): one process, one CUDA context and one
+// set of device buffers for a whole run.  Requests arrive on stdin in the
+// system contract of fes_io.hpp, back to back; each reply is
+//     SOLUTIONS <listed> <total>
+//     <x_0> ... <x_{listed-1}>      (one per line)
+// flushed at once.  total > listed means the output cap was hit: the caller
+// must not read the list as complete.  A malformed request gets
+// `ERROR <reason>` and the worker exits; EOF ends it cleanly.
+struct ServeBuffers {
+  uint64_t *lin = nullptr, *quad = nullptr, *qsym = nullptr, *out = nullptr;
+  unsigned int *count = nullptr;
+  int max_out = 1 << 20;
+};
+
+static bool serve_alloc(ServeBuffers &b) {
+  const int n = FES_MAX_VARS, t = n * (n + 1) / 2;
+  return cudaMalloc(&b.lin, n * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.quad, t * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.qsym, (size_t)n * n * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.out, (size_t)b.max_out * sizeof(uint64_t)) == cudaSuccess &&
+         cudaMalloc(&b.count, sizeof(unsigned int)) == cudaSuccess;
+}
+
+static int serve_main() {
+  ServeBuffers b;
+  if (!serve_alloc(b)) { printf("ERROR cuda-alloc\n"); fflush(stdout); return 2; }
+  std::vector<uint64_t> qsym, sols;
+  FesSystem sys;
+  for (;;) {
+    const int r = fes_serve_read(sys, FES_MAX_VARS);
+    if (r == 0) break;
+    if (r < 0) { printf("ERROR malformed request (n in 1..%d, m in 0..64)\n", FES_MAX_VARS); fflush(stdout); return 2; }
+    const int t = sys.n * (sys.n + 1) / 2;
+    qsym.assign((size_t)sys.n * sys.n, 0);
+    fes_build_qsym(sys.quad_tri.data(), sys.n, qsym.data());
+    const int lb = fes_default_low_bits(sys.n);
+    bool cu = cudaMemcpy(b.lin, sys.lin.data(), sys.n * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemcpy(b.quad, sys.quad_tri.data(), t * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemcpy(b.qsym, qsym.data(), qsym.size() * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemset(b.count, 0, sizeof(unsigned int)) == cudaSuccess;
+    const uint64_t nprefix = 1ULL << (sys.n - lb);
+    const int threads = 256;
+    const int blocks = (int)((nprefix + threads - 1) / threads);
+    const size_t smem = (size_t)sys.n * sys.n * sizeof(uint64_t);
+    if (cu) {
+      fes_kernel<<<blocks, threads, smem>>>(sys.cst, b.lin, b.quad, b.qsym, sys.n, lb, b.out,
+                                            b.count, b.max_out);
+      cu = cudaGetLastError() == cudaSuccess && cudaDeviceSynchronize() == cudaSuccess;
+    }
+    unsigned int count = 0;
+    cu = cu && cudaMemcpy(&count, b.count, sizeof(unsigned int), cudaMemcpyDeviceToHost) == cudaSuccess;
+    const unsigned int listed = count < (unsigned)b.max_out ? count : (unsigned)b.max_out;
+    sols.resize(listed);
+    cu = cu && (!listed || cudaMemcpy(sols.data(), b.out, listed * sizeof(uint64_t),
+                                      cudaMemcpyDeviceToHost) == cudaSuccess);
+    if (!cu) { printf("ERROR cuda\n"); fflush(stdout); return 2; }
+    fes_serve_reply(sols, count);
+  }
+  return 0;
 }
 
 int main(int argc, char **argv) {
@@ -93,6 +201,7 @@ int main(int argc, char **argv) {
   const char *in_path = nullptr;
   int low_bits = -1;
   for (int i = 1; i < argc; ++i) {
+    if (!strcmp(argv[i], "--serve")) return serve_main();
     if (!strcmp(argv[i], "--in") && i + 1 < argc) in_path = argv[++i];
     else if (!strcmp(argv[i], "--low-bits") && i + 1 < argc) low_bits = atoi(argv[++i]);
   }
@@ -103,7 +212,11 @@ int main(int argc, char **argv) {
       fprintf(stderr, "fes_cuda: could not parse %s\n", in_path);
       return 2;
     }
-    int lb = (low_bits >= 1 && low_bits <= sys.n) ? low_bits : sys.n;
+    // Without --low-bits the previous default was low_bits = n: a single
+    // thread walked the whole cube.  fes_default_low_bits shards it over up
+    // to 2^16 threads; the solution set does not depend on the split.
+    int lb = (low_bits >= 1 && low_bits <= sys.n) ? low_bits
+                                                  : fes_default_low_bits(sys.n);
     std::vector<uint64_t> sols;
     long long count = run_on_device(sys, lb, sols);
     if (count < 0) return 2;

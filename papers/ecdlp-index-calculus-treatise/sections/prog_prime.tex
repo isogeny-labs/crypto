@@ -179,7 +179,12 @@ curve, so no factor-base test was ever selected
 Lemma~\ref{lem:conservation} a homomorphic transfer could change only
 bounded constants in any case. The class of a 61-bit curve has a
 certified order of $358{,}094{,}304$ with adjacency still open
-(\art{research/p61_terminal_closure_20261023/}).
+(\art{research/p61_terminal_closure_20261023/}). Over $\FF_{2^{31}-1}$ the
+relation yield of a prime-abscissa base at $m=2$ and 3, measured on 332
+curves of 48 prime-order classes (526{,}111 relations), does not depend on
+the class or on the curve within it, and neither does the time per
+decomposition attempt (\S\ref{sec:rv-isogeny}, Table~\ref{tab:rv-fp31};
+\texttt{[pcc:unverified]}).
 
 \section{Lattices}
 
@@ -470,10 +475,12 @@ invalid-curve attack on an unvalidated ECDH oracle
 constructive: GLV-2 scalar multiplication $1.25$--$1.50\times$ faster via
 isogeny-chain endomorphisms (\art{research/cryptopro_b_chain_sweep_20261006/},
 \art{research/endo_native_bench_20261016/}). Cheon's attack with auxiliary
-inputs is cheaper than matched negation rho at most sizes from 36 bits in
-ecbench's counted unit (dearer at 32 and 40 bits; no exponent separation;
-not validated;
-\S\ref{sec:gf-cheon}), and only for the DLP with auxiliary inputs; an
+inputs is cheaper than matched negation rho in ecbench's counted unit: a
+validated study on eleven sizes of 36--56 bits gives pooled comb/rho
+$0.525$ ($r-1$) and $0.367$ ($r+1$) at $w=0$ and separates the fitted
+exponents over that range, for $r-1$ by $0.002$ (\S\ref{sec:gf-cheon}); the
+earlier six-size study had overlapping intervals and was dearer at 32 and 40
+bits. This holds only for the DLP with auxiliary inputs; an
 earlier study's ``beats rho from 24 bits up''
 (\art{research/torsion_auxiliary_inputs_20260918/}) was not priced across
 the band, and the P-224-shape Cheon/rho ratios of a different study were
