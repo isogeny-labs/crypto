@@ -1,3 +1,11 @@
+CURRENT G3: unit01 COMPLETE FAILED before point tests,7f48f6/all807guards0;Lean02 local12audited0trusted,d9f9f6;corrective model transport frozen pcc/claims/PCC-20261113-6a3cfe.json before code/unit02. See G3_DESCENT_STATUS.md. No native process;whole raw publication pending. [pcc:unverified]
+
+---
+
+Current G3 status: see `G3_DESCENT_STATUS.md`. Static03 passes locally;original unit01 ACTIVE04:45:15Z/900seconds/807inputfreeze;Lean01 failed/02 pending;whole static archive publication pending. Protocol394e14/de0b472 preceded code. No new unit acceptance yet. [pcc:unverified]
+
+---
+
 Current task — G3 complete encoded-point descent, protocol-first
 
 Source review/proposal pcc/claims/PCC-20261113-394e14.json;nineteen exact sources,firstsplit q5/7/11 fixtures
