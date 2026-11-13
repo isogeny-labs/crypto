@@ -1,0 +1,31 @@
+{
+ "_what": "End to end, degree-25 char-2 curve: descent systems of 26 unknowns solved by inherited-f4, fes-f2 and fes-f2-gpu (same counted cost as fes-f2). Counted S is the metric; solver wall time is a practicality note.",
+ "instance": {
+  "regime": "char2",
+  "degree": 25,
+  "max_cofactor": 8
+ },
+ "repeats": 1,
+ "seed": 20261113,
+ "configurations": [
+  {
+   "factor_base": "binary-subspace:dimension=13",
+   "oracle": "mitm:m=2",
+   "targets": "walk"
+  }
+ ],
+ "matrix": {
+  "factor_base": [
+   "binary-subspace:dimension=13"
+  ],
+  "oracle": [
+   "descent-algebraic:m=2"
+  ],
+  "solver": [
+   "fes-f2-gpu"
+  ],
+  "targets": [
+   "walk"
+  ]
+ }
+}

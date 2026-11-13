@@ -140,3 +140,20 @@ Hypothesis: the setup collection (about 70% of the symmetric setup) is memory-bo
 | linear probe + fingerprint | 6.3 | 14.0 | 20.8 | 0.74 |
 
 No difference: the probe is not the bottleneck (the table is about 1-2 MB and cache-resident); the per-candidate field arithmetic is. The symmetric setup stays at about 0.75x of the baseline's. Setup-cost levers tried and exhausted: B retune (flat 159-190), rotated keys (no gain), batched collector (cannot help), fingerprinted layout (no gain).
+
+## Experiment: native multi-target folded rho vs the symmetric multi-target IC (2026-11-13) — `[pcc:unverified]`
+`examples/prime_fast_j0_rho_multi.rs`: multi-target distinguished-point rho on j=0 curves, x6 folding with the short-cycle escape, G-only r-adding steps (32), walks restart at a random
+`aG + bQ_t` after each DP, affine union-find over the target logs (anchor Q=G, signed/affine relations b1 k_i - b2 k_j = c mod n). Unbatched (one inversion per step), one thread. Same curves and
+planted targets as the symmetric multi-target IC (`prime_fast_j0_multi`: B=100, extra 8, c=0.5 baseline), 26 bits, medians; every target of every row verified (rho 18/18 rows, IC 18/18 rows).
+
+| T | sym multi IC ms | folded multi rho ms (steps) | rho / IC |
+|---|---|---|---|
+| 20 | 8.7 | 9.2 (28k) | 1.06 |
+| 200 | 20.2 | 47.0 (166k) | 2.3 |
+| 1000 | 70.4 | 386 (1.24M) | 5.5 |
+
+(28 bits, rho only: T=20 22 ms, T=200 103 ms; the IC arm was not re-run at 28 bits against it.)
+
+Reading: at these toy sizes the symmetric multi-target IC is faster than an unbatched matched multi-target folded rho, with the advantage growing with T (rho steps grow about T^0.9, the IC total about T^0.4).
+**Not a claim:** the rho is unbatched (about 310 ns per step at T=1000); a lock-step batched rho would be several times faster, which would shrink the ratio and could reverse it at small T. A batched
+folded multi-target rho and the §5a pricing band are needed before ranking; the earlier tuned-BSGS comparison (a=-3 curves) is also not repeated on j=0. This is the first regime in the campaign where an IC arm is ahead of a rho-type arm on a measured total, and it is unverified and not yet fairly matched.
