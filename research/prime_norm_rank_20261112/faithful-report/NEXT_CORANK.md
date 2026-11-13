@@ -1,5 +1,10 @@
 # Explicit public branch basis for the next corank proof
 
+Further continuation: [full nonzero norm recovery](../recovery-report/README.md)
+closes the polynomial normalization step from the actual cofactor equations.
+The efficient finder and divisor/scalar application remain open. The original
+plan and earlier component receipts below are preserved [pcc:unverified].
+
 Continuation: [NormBranchCoordinates](../coordinates-report/README.md), frozen
 source01e312a94, now constructs this public branch basis and proves the actual
 reduced radical, numerical corank and nonzero diagonal cofactor. Conditional
