@@ -9,9 +9,10 @@
 ## Problem
 
 The request for all fourteen source audits, experiments and faithful Lean proofs
-is incomplete: local checkpoints are now authorized and bounded native
-components have run, while independent-host execution/main integration and
-several actual curve/Jacobian/implementation bridges remain unresolved.
+is incomplete: local checkpoints and bounded native components have run,
+including the requested separate-host prime S3 replay. Main integration,
+further independent replays and several actual curve/Jacobian/implementation
+bridges remain unresolved.
 [pcc:unverified]
 
 ## Evidence and uncertainty
@@ -237,8 +238,7 @@ with its exact PDF hash retained. Its literal missing-plus binaryS4 display
 is refuted by actual F4 zero-sum points; the additive repair universally
 equals the actual resultant and all16F2tuples agree. Gate28/localPCC95607fPASS,
 signedunverified. Historical source-read receipts remain unchanged;
-generic polynomial symmetry/irreducibility/arbitrary-split normalization
-remain open. See [the original-source study](../research/semaev_source_audit_20261110/README.md).
+All-arity polynomial symmetry and arbitrary-split normalization are now proved in the later packets below; higher-arity absolute irreducibility remains open. See [the original-source study](../research/semaev_source_audit_20261110/README.md).
 [pcc:unverified]
 
 For actual E/F5:y²=x³+1/r3, the geometric-torsion-inclusion criterion is
@@ -325,7 +325,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
-| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43) | Higher-arity absolute irreducibility and general splits k≥3 |
+| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius; actual F7allk torsion-image criterion iff3dividesk with infinite excluded-boundary counterexamples (32); generic qualified coefficient-field matrix criterion/Jordan control and actual rational prime-torsion input (22) | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112.  Basefield k1census now complete over95primefields/7013620models,29-declaration actual transport/lowtorsion gate. All-k extension census/rank/determinant still open. |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges  Basefield p<500prime/divisor native bounds now checked completely; generic geometric/Hasse and further extension-field scope remain. |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
@@ -626,8 +626,7 @@ ordinary binary model. [pcc:unverified]
 Originalp3uses the algebraic closure of the entire function field K(X3),
 as confirmed by visual inspection of the PDF and enlarged paragraph.
 Text extraction loses the bar; no field-of-definition counterexample
-is asserted. Higher-arity absolute irreducibility, full permutation
-invariance beyondm4 and arbitrary-split normalization remain open.
+is asserted. The later full-symmetry and general-split packets below close those obligations. Higher-arity absolute irreducibility remains open.
 No native or corpus status is promoted. [pcc:unverified]
 
 ### 2026-11-13 degree-drop control and corrected resultant interchange
@@ -646,10 +645,7 @@ x+1,y−2 and Q bidegrees1. Lean directly proves strict intermediate
 degree loss and natural-size sides−1 versus2; retained formal sizes give
 2both. The natural-size compatibility corollary explicitly requires
 sharp intermediate degree equalities. This refutes an unrestricted helper,
-not the qualified Semaev source or the actual canonical family. Binding
-this identity to the canonical recursive polynomials, all variable maps
-and arbitrary splits remains an open item1 obligation, as do higher
-symmetry and absolute irreducibility. [pcc:unverified]
+not the qualified Semaev source or the actual canonical family. The later full-symmetry and general-split packets below bind the actual canonical recursive polynomials, variable maps and all splits. Higher-arity absolute irreducibility remains open. [pcc:unverified]
 
 ### 2026-11-13 actual source-order two-step normalization
 
@@ -671,8 +667,7 @@ earlier within-pair/block swaps alone did not supply this bridge. The
 direct rational b=(0,0,0,1) negative control disproves an unrestricted
 independent-b extension, and Lean proves no rational Weierstrass curve
 has these coefficients. No qualified source theorem is refuted.
-General splits k≥3, higher permutation invariance and higher absolute
-irreducibility remain open. [pcc:unverified]
+The subsequent full-symmetry and general-split packets close those obligations. Higher-arity absolute irreducibility remains open. [pcc:unverified]
 
 
 ### Full actual canonical input-permutation symmetry
@@ -684,8 +679,7 @@ Its actual multivariate image is IsSymmetric through explicit ring equivalences;
 input coordinates, coefficient-field fixation and outer coordinate0=X are
 proved. No characteristic/nonsingularity restriction is needed for this
 polynomial identity. Whole gate90/0failures/0trusted and exact local PCC-20261113-cda3d2
-replay pass; signed standing remains unverified. Higher absolute irreducibility
-and general splits k≥3 remain open. The inherited rational independent-b
+replay pass; signed standing remains unverified. The subsequent general-split packet closes all source splits. Higher absolute irreducibility remains open. The inherited rational independent-b
 negative control refutes only that unrestricted extension. [pcc:unverified]
 
 
@@ -747,7 +741,7 @@ provably unequal to the ordinary polynomial. No qualified ordinary source
 is refuted. Whole gate43/0failures/0trusted and exact local PCC-20261113-1e2412replay
 pass;24formal/config and10artifact pins match,33attemptfiles/fivegatefiles
 and inspected one-page report retained. Signed standing unverified.
-General higherarity absolute irreducibility and splitsk≥3remainopen.
+The subsequent general-split packet proves all source splits. Higher-arity absolute irreducibility remains open.
 [pcc:unverified]
 
 ### Qualified BK linear step and actual rational input
@@ -768,3 +762,23 @@ determinant, actual-to-representation transport, torsion-field descent
 and characteristic-order rank remain open. The matrix step is proved;
 abstract Jordan is not labeled computed curve Frobenius. Qualified
 original BK remains unrefuted. [pcc:unverified]
+
+### Every literal source-ordered Semaev resultant split
+
+The [general source-split packet](../research/semaev_general_split_audit_20261113/README.md)
+now proves the literal canonical resultant recursion for every permitted
+split. The elimination variable is last and both factor degrees are
+proved exactly:2^(m+1)/2^(n+1), with total arityN=(m+2)+(n+2).
+Every original N≥4,1≤k≤N−3 is covered byk=n+1. Universal evaluation in
+the actual MVpolynomial ring binds the literal equality; injective
+independent-variable coefficient maps prove the natural dimensions.
+All domain specializations under arbitrary coefficient maps retain
+prescribed dimensions, allowing repetitions and degree drops. Exact
+natural-degree-reset and independent-b/noncurve negative controls remain
+explicit, without refuting the qualified source recursion. Whole gate82/
+0failures/0trusted and exact local PCC-20261113-31f9cd replay pass at 2026-11-13T22:34:15Z.
+All60formal/config and10artifact pins match;93attemptfiles/fivegatefiles
+and inspected one-page PDF46864B retained. Signed standing unverified.
+General splits are now proved; higher-arity absolute irreducibility
+remains open. No new native experiment, novelty or source-refutation
+claim. [pcc:unverified]
