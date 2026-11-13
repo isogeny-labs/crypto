@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Independent genus-two F2 binary model census; elementary F4/group counts."""
 
+def require(ok, msg):
+ if not ok: raise AssertionError(msg)
+
 def deg(a): return a.bit_length()-1
 
 def mul_poly(a,b):
@@ -59,16 +62,16 @@ for h in range(1,16):
   n1=count_points(h,f,2)
   n2=count_points(h,f,4)
   s1,s2=3-n1,5-n2
-  assert (s1*s1-s2)%2==0
+  require((s1*s1-s2)%2==0, "zeta integrality")
   a1=-s1;a2=(s1*s1-s2)//2
   nJ=5+3*a1+a2
   rows.append((nJ,h,f,n1,n2,a1,a2))
 import json
-assert max(r[0] for r in rows)==19
+require(max(r[0] for r in rows)==19, "maximum mismatch")
 w=[r for r in rows if r[1]==11 and r[2]==34][0]
-assert w==(19,11,34,6,6,3,5)
-assert len(rows)==640
+require(w==(19,11,34,6,6,3,5), "witness mismatch")
+require(len(rows)==640, "model count mismatch")
 print(json.dumps(dict(max_j=19,n1=6,n2=6,smooth_models=640,witness_f=34,witness_h=11),sort_keys=True,separators=(',',':')))
 # If infinity is incorrectly counted as one point, N1 becomes 5 and N2 becomes 5,
 # and the derived Jacobian order cannot equal the genuine 19.
-assert points_at_infinity(11,34,2)==2 and points_at_infinity(11,34,4)==2
+require(points_at_infinity(11,34,2)==2 and points_at_infinity(11,34,4)==2, "infinity points mismatch")
