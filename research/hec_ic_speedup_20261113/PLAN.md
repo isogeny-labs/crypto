@@ -215,3 +215,55 @@ ability to run T1–T4 at sizes the BigUint engine cannot reach.
 **Host.** Apple-silicon laptop (arm64), single thread. Results land in `S1-RESULTS.md` beside this
 file, with the command, the binary hash and the raw output. Records go to the artifact store per
 `AGENTS.md` §13 if they exceed the in-Git limit.
+
+## 7. Slice S2: the native solve, protocol frozen before measuring
+
+Written 2026-11-13, after S1 (`S1-RESULTS.md`). S1 found the native Markowitz solve takes 55–82%
+of native wall time at genus 2 and 33–58% at genus 3, at about 24 ns per entry update. Its count of
+multiplications mod `ℓ` is comparable to the BigUint engine's.
+
+**Diagnosis to test.** `solve_for_last` pushes the row id onto the holder list of *every* column of
+every updated row, including columns the row already held.
+
+- The ≈ 64 step columns appear in nearly every row, so their holder lists grow by one entry per
+  row operation.
+- Each pivot sorts, dedups and re-filters its column's list.
+- The `k` column's list grows without ever being read.
+
+**Change (S2a).**
+
+- Push a row id only for columns new to that row: the columns the pivot row brings in.
+- Keep no holder list for `k`.
+- Reuse merge buffers instead of allocating one per row operation.
+
+None of this changes which pivots are chosen. The holder set after dedup and filter is the same
+set, and ties break the same way.
+
+**Gate (must hold before timing).** Both solvers stay in the crate, the S1 one as
+`Solver::Reference`. On all 55 S1 runs (11 rows × 5 seeds), both run on identical row sets and must
+agree exactly on:
+
+- the pivot sequence (a hash of `(column, row)` per pivot);
+- `pivots`, `row_ops` and `solve_mulmods`;
+- `k`.
+
+A unit test does the same on the small rows.
+
+**Measurement.** The same binary runs both solvers on the same rows (`HEC_SOLVER=reference|fast`),
+alternating by row, on the same host as S1. Five seeds per row; report solve ms and total ms.
+
+**Pre-registered expectations.**
+
+- **E3 (exactness).** The gate holds on all 55 runs. Falsified by any difference.
+- **E4 (solve cost).** At genus 2, `p ≥ 503`, the mean native solve time falls by at least 2×
+  against `Solver::Reference`. Falsified by any such row under 2×.
+
+**Class.** Engineering on the native engine's solve stage: wall clock falls, counted work is
+identical by construction. It is not an `S` claim and not an advance.
+
+If E4 fails, or the solve still exceeds half of native wall time at genus 2, the next change (S2b)
+gets its own protocol:
+
+- hold the step columns and `k` as a dense block per row;
+- eliminate the sparse columns first;
+- solve the residual block densely.
