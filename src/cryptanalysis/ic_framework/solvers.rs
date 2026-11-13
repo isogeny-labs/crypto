@@ -916,6 +916,13 @@ impl SystemSolver for FesF2 {
     }
 }
 
+/// The solver `descent-algebraic` runs when a command names none
+/// (`ic bench`, `ic run`): the size rule with the batched inherited engine,
+/// the lowest algebraic row on every instance of the 2026-11-12 end-to-end
+/// ladder (research/fes_then_batched_20261112).  A run that names a solver
+/// is unaffected; ecbench specs always name theirs.
+pub const DEFAULT_DESCENT_SOLVER: &str = "fes-then-batched";
+
 /// The default `fes_max_vars` of [`FesThenInherited`]: the largest number
 /// of unknowns at which `fes-f2`'s word-XOR count per call was below
 /// `inherited-f4`'s on the descent ladder (14 unknowns: about 33 thousand
@@ -1614,6 +1621,13 @@ mod tests {
             }
             other => panic!("m4gb-f2 did not solve the fixture: {other:?}"),
         }
+    }
+
+    /// The default descent solver is a registered engine.
+    #[test]
+    fn default_descent_solver_is_registered() {
+        let solver = solver_by_name(DEFAULT_DESCENT_SOLVER).expect("registered");
+        assert_eq!(solver.name(), DEFAULT_DESCENT_SOLVER);
     }
 
     /// The size rule runs `fes-f2` at or below `fes_max_vars` and
