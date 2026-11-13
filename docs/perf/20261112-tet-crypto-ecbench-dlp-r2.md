@@ -158,3 +158,28 @@ valgrind --tool=callgrind --instr-atstart=no --callgrind-out-file=/dev/null \
   perfbench run --filter field_ec/point_scalar_mul_p256_x8 --exact --instr --samples 1
 perfbench run --filter field_ec/,dlp/ --full --samples 1     # fingerprints
 ```
+
+## Independent review (skeptical re-check, 2026-11-13)
+
+[pcc:unverified] Rebuilt base `761b5ac3b5` and the branch head from clean
+checkouts (`cargo build --release --example perfbench -j2`, separate
+`CARGO_TARGET_DIR`): `perfbench run --filter field_ec/,dlp/ --full
+--samples 1` gives 37 id/fingerprint lines, `diff` empty.
+`cargo test --release --lib ecc::` on the head: 335 passed, 0 failed, 2
+ignored. Callgrind `field_ec/point_scalar_mul_p256_x8`: base 165,249,830 Ir
+(equal to the table), head 9,480,975 Ir (table: 9,481,005; the 30 Ir
+difference is build noise from the rustfmt commit).
+
+Constant-time reading of the diff: the only variable-time code
+(`mont_vt::Mont`, `Point::scalar_mul`'s fixed-width ladder) is reached only
+from `Point::scalar_mul`, which was already documented and implemented as
+variable time (branches on the bits of `k`) for public inputs;
+`scalar_mul_ct` calls it only on the public point and `2^scalar_bits`.
+`ct_mont_mul4` and `ct_pow4` have fixed loop bounds and mask selects, as
+`ct_bignum` did. `FieldElement::inv` now follows the bits of `p - 2` (the
+fixed 4-bit window), so its operation sequence depends on the modulus, never
+on the base: valid only because a `FieldElement` modulus is public (every
+curve and group modulus in this tree is). A caller that built a
+`FieldElement` over a secret modulus would leak that modulus through `inv`;
+none does. The per-thread Montgomery cache holds only the public modulus and
+its constants and is keyed on full modulus equality.
