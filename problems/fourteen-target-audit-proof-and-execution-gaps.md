@@ -541,3 +541,20 @@ Assumption2 computation are not fully traced or formally refined, so this
 is not promoted to a disproof. Source-field descent and native execution
 remain unsigned/native; the separate55-declaration Edwards kernel proof is
 preserved at its actual scope. [pcc:unverified]
+
+### 2026-11-13 literal JV algebraic cutoff
+
+The [new39-declaration Lean project](../research/jv_macaulay_certificate_20261113/README.md)
+proves the first printed JVtoy affine coordinate ideal is unit, and its
+actual homogeneous ideal is proper and contains every monomial of total
+degree at least4. Explicit polynomial identities precede actual ideal
+membership and quotient relations; no generic regularity or native GB
+oracle is assumed. Wholegate39/0failures/0trusted. This provides an
+algebraic uppercutoff and an independent mathematical control for the
+native degree5zero-reduction diagnostic. [pcc:unverified]
+
+The cutoff's minimality, exact Hilbert function/length8, actual F101³curve
+and coefficient-descent identification, and full internal F4execution
+refinement remain separate. No generic/JV computation-degree refutation
+is claimed. Primary source scopes and failed attempts remain explicit.
+[pcc:unverified]
