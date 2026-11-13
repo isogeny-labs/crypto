@@ -62,7 +62,7 @@ For a globally split abelian variety \(J\sim E\times B\) in characteristic zero,
 
 ## Reproduction
 
-\`\`\`sh
+```sh
 D=research/cross_characteristic_global_torsion_20261112/ct85
 python3 -B "$D/ct85_rigidity.py" >/tmp/ct85-py.json
 python3 -O -B "$D/ct85_rigidity.py" >/tmp/ct85-pyopt.json
@@ -72,7 +72,7 @@ cmp /tmp/ct85-py.json /tmp/ct85-pyopt.json
 cmp /tmp/ct85-py.json /tmp/ct85-js.json
 cmp /tmp/ct85-py.json /tmp/ct85-jsopt.json
 printf '%s  %s\n' c0e58ecce5818071114aead61c71114a59619ed60dbd4881bb604fb2cc55a148 /tmp/ct85-py.json | sha256sum -c
-\`\`\`
+```
 
 All four producer-local modes completed and matched the pinned SHA256. These are locally run checks, **not** signed independent scientific PCC certification.
 
@@ -83,6 +83,6 @@ Classical background: Silverman, *Arithmetic of Elliptic Curves*, Chapter III; [
 
 **KB unavailable** in this connector runtime; no research-KB MCP function or checked-out wrapper was accessible. Prior repo reports and referenced primary sources substituted, but this is an incomplete cross-repo survey.
 
-The CT84 scoped workflow initially failed because its independent JavaScript file had a syntax error at the binary source-curve assertion. Commit \`034dfae0\` repaired the error. Separately the prior PCC gate failed because one claim-bearing PR-body sentence lacked the mandated unverified tag; the sentence was corrected without weakening the lint. Exact-head CI/review and external scientific PCC verdict must be checked separately; no paid EKS or GPU compute, protected merge or speedup claim is made.
+The CT84 scoped workflow initially failed because its independent JavaScript file had a syntax error at the binary source-curve assertion. Commit `034dfae0` repaired the error. Separately the prior PCC gate failed because one claim-bearing PR-body sentence lacked the mandated unverified tag; the sentence was corrected without weakening the lint. Exact-head CI/review and external scientific PCC verdict must be checked separately; no paid EKS or GPU compute, protected merge or speedup claim is made.
 
 **Next accepted experiment:** reconstruct arbitrary input-conditioned \(K\)-rational torsion points without assuming a small multiplication-polynomial degree, validate source and binary specializations with the **same fixed pair of places**, and account for coefficient heights, field construction, root selection, evaluation, and one-target solving. Whenever a globally certified endomorphism is returned, extract \(|m|\) from its leading coefficient before separately charging a destination DLP.
