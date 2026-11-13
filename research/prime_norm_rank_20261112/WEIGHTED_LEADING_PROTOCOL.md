@@ -61,3 +61,19 @@ confined to new weighted proof/control/report paths under this study, its
 Lean manifest, session journal and append-only PCC records. Keep all existing
 scientific sources and sealed evidence unchanged. Deliver source-bound
 unsigned claims, proof map, editable diagram/SVG and inspected report PDF.
+
+Proof-construction supplement before source freeze: use an explicit family
+with curve X^3+e^4*a*X+e^6*b, target(e^2*r,e^3*z), the unchanged actual
+completeTarget operation and its canonical norm quotient. At e=1 this is
+the original symbolic norm model; e=0 yields the displayed support. Use
+master recurrence M0=X, M(n+1)=M(n)^2-2e^(2^(n+2)); terminal subtraction
+is c*e^(2^(n+1)). Prove endpoint identities and the four-coefficient zero-set
+criterion. These do not assert a faithful compiler to the reduced.ms input,
+an initial-ideal equality, regularity, flatness or a closure bound.
+
+The research-visuals identity supplement issues a literal degree6 identity
+certificate for (X^3+a2X^2+a1X)^2-X^3(c0+c1X)^2=X*U*. This is a finite
+mathematical certificate constructor, separate from the pending fixture
+experiment. Use unchanged canonical checker/hash,32 statement-derived and16
+extra replay points, a new driver/path and source-bound Lean pointer. It
+does not certify the four-equation implication or any experimental execution.
