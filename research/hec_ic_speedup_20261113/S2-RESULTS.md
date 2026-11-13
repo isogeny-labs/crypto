@@ -82,6 +82,16 @@ genus 2. It does on the larger rows. The fast solve's share of total time is:
 
 At genus 3 the share falls to 18–35%; at genus 4, to 3–10%.
 
+**The trigger rests cleanly only on p = 503 (59–64% in both runs).** At p = 2003 and 4001 the
+share is 53–57%, within run-to-run noise of 50%. The same binary's p = 2003 reference solve
+took 22.8 ms in run 1 and 12.9 ms in run 2; the S1 binary took 11.0 ms.
+
+Per-row medians next to the means are in `s2/s2_table_medians.md`. The median solve ratios at
+genus 2, p ≥ 503 are 3.2–4.3×, so E4 does not depend on mean versus median.
+
+S2b's gains will be smaller relative to this noise. Its protocol should pre-register median-based
+metrics and more repeats than five seeds × two runs.
+
 ## Protocol deviations
 
 1. **Alternation was by seed within each row, not by row.** Seeds 0, 2 and 4 run the reference
