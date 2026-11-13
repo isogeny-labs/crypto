@@ -12,7 +12,7 @@ estimates are labelled as such.
 
 ## 0. Headline (read this first)
 
-**The honest prediction is "no index-calculus improvement."** Stange's
+**The honest prediction is "no index-calculus improvement."** Stange's [pcc:unverified]
 construction (arXiv:2503.15428) changes which *normalised function* is attached
 to an isogeny whose kernel does not sum to the identity. No stage of the
 repository's index-calculus pipeline consumes such an object, and the closest
@@ -34,7 +34,7 @@ Three records follow. They are independent and none is bundled with another.
 
 ## 1. Obstruction named (AGENTS.md "Name the obstruction")
 
-- **Attack target.** For prime-order `E(F_p)` the cost exponent stays 1/2
+- **Attack target.** For prime-order `E(F_p)` the cost exponent stays 1/2 [pcc:unverified]
   because (i) relations need *membership* of decomposition parts in a factor
   base (barrier map L1-L3), and (ii) a relation source that supplies relations
   only among base points cannot attach an arbitrary target faster than
@@ -405,7 +405,7 @@ lean_obligation: >
 
 ## 6. Scope and honesty notes
 
-- The success criterion (CLAUDE.md) counts only verified, measured
+- The success criterion (CLAUDE.md) counts only verified, measured [pcc:unverified]
   improvements over the current IC baseline. Nothing here is a predicted
   improvement; the gap to the matched rho is predicted **unchanged**. Recent
   matched rows read from `docs/ic/LEADERBOARD.md` sit at 1.27x-1.31x IC/rho for
@@ -432,7 +432,7 @@ All statements in this record are [pcc:unverified] reasoning; nothing was run.
 sum_i phi_i(P_i) = O on E, with P_i in factor bases F_i on E_i. Equivalently,
 Stange's product-of-curves net polynomial at coefficient vector v = (1,...,1).
 
-**Expected obstruction.** Each phi_i is a homomorphism and, for deg phi_i != r,
+**Expected obstruction.** Each phi_i is a homomorphism and, for deg phi_i != r, [pcc:unverified]
 a bijection on E[r]. The relation is Semaev's S_m on E evaluated at
 x(phi_i(P_i)), rational functions of degree ~ell_i in x_i: degree per variable
 grows by ~ell_i, and the factor base {phi_i(P)} is just another subset of E[r]
@@ -443,7 +443,7 @@ The non-split direction (gluing E_1, E_2 into a genus-2 Jacobian, Kani/Richelot)
 is prior work under the ecdlp-surfaces tooling, and genus-2 index calculus does
 not beat rho.
 
-**Preregistered prediction.** The pulled-back S_m and the (1,1,1) net polynomial
+**Preregistered prediction.** The pulled-back S_m and the (1,1,1) net polynomial [pcc:unverified]
 have the same zero set as S_m on E (up to known factors), strictly higher degree,
 and never solve faster at matched factor-base size.
 
