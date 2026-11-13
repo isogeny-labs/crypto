@@ -60,10 +60,14 @@ logarithm in every repeat, and so did every matched rho run.
 Mean over 3 repeats; bold where `fes-then-batched` is the lowest index-calculus
 row of the instance.
 
-- **`fes-then-batched` is the lowest algebraic row on every instance** and the
-  lowest index-calculus row on five of six (the pair table stays below it on
-  random 21): 0.74 to 0.89× of `inherited-f4`. At degree 13 it runs `fes-f2`
-  (S 101.9, as `fes-then-inherited`); above it runs the batched engine.
+- **At the pinned word-XOR ratio (the calibration point), `fes-then-batched`
+  has the lowest S of the algebraic rows on every instance** (tied with
+  `fes-then-inherited` at degree 13, where both run `fes-f2`) and the lowest
+  index-calculus S on five of six (the pair table is lower on random 21):
+  0.74 to 0.89× of `inherited-f4`. At degree 13 it runs `fes-f2`; above it
+  runs the batched engine. **Under the §5a band these orders do not hold**
+  (validation below): it ties `inherited-f4` at w = 0 on five instances and
+  is above it at w = 0 at degree 13.
 - **The Koblitz instances reproduce exactly**: S equals `fes-then-inherited`'s
   at degree 13 and the batched study's `inherited-f4-batched` S at degrees 17,
   19 and 23 to every digit, since those rows are priced from pinned counts.
@@ -74,13 +78,46 @@ row of the instance.
   pinned one. The ratio to `inherited-f4` in the same run is unchanged (0.851
   and 0.845 in both runs). The falsifier did not fire: no failed recovery,
   degree 13 equal to `fes-then-inherited`, and below `inherited-f4` everywhere.
-- Distance remaining to the matched rho with `fes-then-batched`: 35.3× at
-  degree 13, 144× at Koblitz 17, 306× at 19, 1,903× at 23 (and 122× / 3,005×
-  on the random instances).
+- Distance remaining to the matched rho with `fes-then-batched` (at the
+  calibration point): 35.24× at degree 13, 144.7× at Koblitz 17, 305.5× at
+  19, 1,907.8× at 23, and 121.7× / 3,012.6× on random 15 / 21 (corrected by
+  the validator; the first version computed them from rounded values).
 
 No leaderboard row: no replay certificate or validator report (validation
 gate); wall time per call carries the batched engine's caveat below 22
 unknowns (`../inherited_f4_batched_20261112/`, runs 1 and 3).
+
+## Validation (independent validator, 2026-11-13) `[pcc:unverified]`
+
+An independent validator (a separate agent; no keyring key exists in
+`pcc/keyring.json`, so under the sabotage contract these remain unsigned and
+unverified) wrote `VALIDATION.json`, `validation/replay-certificate.json`,
+`validation/validator-report.json` and its own jq code in `validation/`.
+`python3 scripts/validation_gate.py evidence research/fes_then_batched_20261112`
+prints `valid`.
+
+- **Replay**: its own build of d81dc1241b (sha256 0836dc46…), the six sweeps
+  re-run: every counted scalar of all 72 IC rows and all 256 rho runs
+  identical; pinned rows' S equal to float rounding; random-binary rows'
+  absolute S moved with the host-measured word-XOR ratio (their GAE rebuilds
+  exactly from each run's counts at its recorded ratio), their ratio to
+  `inherited-f4` held (0.851 → 0.852, 0.845 → 0.845).
+- **Recompute**: all 36 table cells agree within half a printed unit.
+- **§5a band** (S(w) = [G − C + w(U + n_C)]/√r at w = 0, 0.1, 1 GAE per
+  native operation):
+  - each IC arm vs rho: rho below at every weight on every instance (order
+    holds); the IC rows stay 2.96× rho or more even at w = 0;
+  - `fes-then-batched` vs `inherited-f4`: exact tie at w = 0 on five
+    instances (identical decisions, solver free), lower at w = 0.1 and 1
+    (0.816 to 0.888); at degree 13 above at w = 0 (16.23 vs 15.71, `fes-f2`
+    tried 50.7 vs 47.3 targets) and below at 0.1 and 1. The strict order holds
+    on none of the six; the weak order on five. **The ranking is unresolved
+    inside the band**;
+  - `fes-then-batched` vs the pair table: flips on every instance.
+
+So what this study establishes is the measurement and the calibration-point
+comparison; it does not rank `fes-then-batched` above `inherited-f4` or the
+pair table under AGENTS.md §5a. No leaderboard row (owner, 2026-11-13).
 
 ## Sources checked
 
