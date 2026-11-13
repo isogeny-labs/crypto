@@ -87,3 +87,22 @@ Earlier candidate contracts and immutable artifacts remain as dated evidence.
 The signed family is not identified with the old W-base jet family. The full
 exp(o(log r)) bit-cost criterion and divisor/scalar obligations are unchanged.
 No sign-search/scaling campaign is scheduled by this document.
+
+## 2026-11-13 exact kernel geometry and constrained repair
+
+The [branch-repair report](branch-repair-report/README.md) derives the actual
+public kernel line and numerical corank1 under the cubic chart's point and
+degree hypotheses, rather than assuming rank. A larger-corank target is thus
+not feasible in this family. The exact curve-square condition permits only
+Delta=0 or Delta=-2z, with coincident alternatives in characteristic2
+[pcc:unverified].
+
+The frozen continuous repair controls preserve determinant0/rank1 but leave
+the curve and fail the full norm for four of five field-valued repairs.
+One repair restores the known positive fixture; one coordinate has no repair
+direction. This does not estimate natural success probability or prove a
+lower bound for a discrete branch finder. The next candidate needs an actual
+constrained discrete/multi-coordinate rule or a materially different public
+factor-base construction, plus fewer counted attempts and all full validity
+checks. Do not substitute another supplied-kernel lemma for that algorithm
+[pcc:unverified].

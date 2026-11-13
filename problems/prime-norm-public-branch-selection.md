@@ -61,3 +61,18 @@ keeping the target branch fixed. Investigate constrained determinant repair
 and exact corank/uniqueness geometry; continuous field-weight repair need not
 stay on the curve. Polynomial-size matrices and per-update work alone do not
 bound total visits. The original exit criteria remain open [pcc:unverified].
+
+2026-11-13 exact geometry/repair update: [report](../research/prime_norm_rank_20261112/branch-repair-report/README.md),
+source4b6ed788d. Actual public kernel is one scalar line; singular numerical
+corank1 follows, without a numerical-rank hypothesis. The continuous point
+correction preserves the square iff it is zero or the opposite-branch change.
+The one frozen native control records four off-curve/full-norm failures among
+five continuous determinant repairs, one valid restoration and one zero
+repair direction; fixing target0 excludes one of those repairs. No statistical
+or asymptotic inference from those cases [pcc:unverified].
+
+Next action refined: a constrained discrete/multi-coordinate branch rule or
+a different public factor-base mechanism with fewer counted attempts. A
+larger-corank target is excluded only in the stated actual public family;
+continuous field-weight repair does not discharge branch selection. Original
+exit criteria remain open [pcc:unverified].
