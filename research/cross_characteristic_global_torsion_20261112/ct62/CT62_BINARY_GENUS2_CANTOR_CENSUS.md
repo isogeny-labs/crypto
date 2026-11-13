@@ -48,6 +48,16 @@ A second **computational falsifier control** independently enumerates all 2,016 
 
 Moreover, this \(J/\mathbb F_4\) **cannot split over F4 as a product of elliptic curves up to isogeny**: such a product would have rational point count \(31=\#E_1(\mathbb F_4)\#E_2(\mathbb F_4)\), but every elliptic factor has at most \(4+1+2\sqrt4=9\) points. This is a concrete local field-size shortcut in an F4-simple genus-two Jacobian, **not** evidence for a source-to-Jacobian homomorphism or cheaper discrete-log solving.
 
+### Exact vanishing cross-factor maps over F4
+
+There is a further **proved negative result** for this particular witness:
+\[
+\boxed{\operatorname{Hom}_{\mathbb F_4}(E,J)=0
+\quad\text{and}\quad
+\operatorname{Hom}_{\mathbb F_4}(J,E)=0}
+\]
+for **every** elliptic curve \(E/\mathbb F_4\), where \(J=J(C)\) has 31 rational points. A nonzero elliptic-to-Jacobian map has positive-dimensional elliptic image, contradicting F4-simplicity; a nonzero Jacobian-to-elliptic map has an elliptic quotient, contradicting F4-simplicity (equivalently, apply Poincaré complete reducibility). Thus this concrete low-field-degree target gives a **vanishing** cross-factor Hom test, not an undiscovered nonzero split-Jacobian transfer. The Hom statement is over **F4**, not automatically over its extensions or the algebraic closure. [pcc:unverified]
+
 ## Independent composition and toy DLP controls
 
 The standalone CT62 Python Cantor implementation uses polynomial extended gcd, composition, and reduction for the two explicitly given odd-degree genus-two models over F4, **not** the concurrent native Rust/Ciani/Jacobian work in root PR #3877. It enumerates every rational divisor class, checks closure and inverse/identity/commutativity for every ordered pair and associativity for every ordered triple:
