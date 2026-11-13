@@ -1,0 +1,603 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "s3-hosted-continuation-20261113",
+  "version": 1,
+  "created": "2026-11-13",
+  "repository": "crypto",
+  "study_dir": "research/s3_host_replay_20261113",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "audit_pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "predecessor": "https://github.com/isogeny-labs/crypto/tree/e3658b4d6ffc6839e32bad1f5f732f796a2c8e4d/research/independent_s3_validator_20261109",
+    "infrastructure_pr": "Created after freeze; actual URL recorded in publication receipt."
+  },
+  "question": "Do fresh hosted compilations of the original C++ S3 arithmetic and separate Rust implementation each reproduce the fixed six-field known answer on a standard GitHub-hosted machine, with actual public job evidence?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Actual finite quadratic extensions supply all base-coordinate square lifts and the actual Mathlib pair oracle matches S3, under its stated hypotheses. Decided by Lean.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Both fresh hosted native populations exactly match all six seen known-answer records and internal controls; there are two planned native calls, not imported historical execution rows.",
+      "class": "exact_computation",
+      "decided_by": [
+        "known_answer"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Separate-host replication requires actual standard GitHub-hosted job/compiler/binary/output evidence. Prepared code, registration failure, missing job or inferred hostname is not completed validation.",
+      "class": "exact_computation",
+      "decided_by": [
+        "known_answer"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "Compiler/runtime proofs, signed execution verification, binary/S4/S5/degree validation and full independence from the producing author are outside scope.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "cpp-hosted",
+      "role": "reference",
+      "description": "Fresh compilation of unchanged original C++ arithmetic prefix plus fixed S3-only entry, on the same hosted runner",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I",
+            "<PINNED_SOURCE>/research/theorem_census_20261109/native",
+            "<OUT>/cpp/s3-only.cpp",
+            "-o",
+            "<OUT>/cpp/validator"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "entry": "cpp-entry.cpp, component hash pinned; arithmetic/header exact published source",
+          "translation_unit": "byte-identical semaev.cpp prefix before unique original main marker, then fixed entry; source/prefix/entry/generated hashes recorded",
+          "binary_identity": "compiled separately on hosted machine; recorded before native work",
+          "runner": "standard ubuntu-24.04; clock invalid"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "workflow": ".github/workflows/theorem-audit-s3-host-replay.yml",
+        "fields": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19
+        ],
+        "models": 942,
+        "tuples": 4188162,
+        "known_zeros": 244236
+      }
+    },
+    {
+      "id": "rust-hosted",
+      "role": "candidate",
+      "description": "Fresh compilation of unchanged separate Rust source/driver on the standard hosted runner",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3658b4d6ffc6839e32bad1f5f732f796a2c8e4d",
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=3",
+            "-C",
+            "overflow-checks=yes",
+            "-D",
+            "warnings",
+            "src/main.rs",
+            "-o",
+            "<OUT>/validator"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "mode": "--prime-s3",
+          "binary_identity": "compiled separately per host; measured before native work",
+          "runner": "standard ubuntu-24.04; record actual compiler/source checkout/binary/OS/kernel/CPU, invalid clocks"
+        },
+        "env": {
+          "S3_VALIDATOR_ARM": "github-hosted"
+        }
+      },
+      "parameters": {
+        "workflow": ".github/workflows/theorem-audit-s3-host-replay.yml",
+        "fields": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19
+        ],
+        "models": 942,
+        "tuples": 4188162,
+        "known_zeros": 244236
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact known-answer replication, no variance or timing inference. Host/compiler variation is measured, not an A/A noise claim."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Actual Lean F3 control54zeros and held-out Rust p3/p23 calibration pass; complete seen C++ population is the fixed known answer."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No sampling or null-distribution inference; exhaustive fixed model/tuple population and exact equality."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "population",
+        "levels": [
+          "Complete six-prime S3 model/tuple population; identical to recorded C++ bounds."
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "language_instrument",
+        "treatment": "fixed",
+        "value": [
+          "original C++ arithmetic with S3-only entry",
+          "separate unchanged Rust"
+        ],
+        "how": "Pin every original source/header/driver/comparator/reference and every new component; no shared EC arithmetic helper."
+      },
+      {
+        "name": "host_compiler_binary",
+        "treatment": "measured",
+        "value": "one standard public Ubuntu24.04 hosted job; compiler/binary measured separately per arm",
+        "how": "Actual public event/job identity, source checkout, generated CPP unit, compiler, binary, OS/kernel/CPU before native calls; no clock comparison."
+      },
+      {
+        "name": "reference",
+        "treatment": "fixed",
+        "value": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf",
+        "how": "Previously seen complete six-field C++known answer, not a blind discovery."
+      },
+      {
+        "name": "order_seeds",
+        "treatment": "fixed",
+        "value": "C++thenRust, noRNG",
+        "how": "Two deterministic exhaustive calls; no warmups, statistical inference or outcome-dependent retries."
+      },
+      {
+        "name": "availability",
+        "treatment": "measured",
+        "value": "new main-push path-filtered research job after normal ready PR/merge gates",
+        "how": "Old manual404 remains not-completed. No PR/feature trigger, trusted-workflow repurposing or ledger integration."
+      },
+      {
+        "name": "budget",
+        "treatment": "fixed",
+        "value": {
+          "paid_spend": 0,
+          "repository": "isogeny-labs/crypto",
+          "visibility": "public",
+          "runner": "ubuntu-24.04 standard",
+          "no_eks": true,
+          "no_gpu": true,
+          "no_larger_runner": true,
+          "no_secrets": true,
+          "no_cache": true,
+          "no_artifact_upload": true,
+          "no_schedule": true
+        },
+        "how": "Official billing reviewed2026-11-13; public standard runner only; job logs as evidence."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "known_answer",
+        "arms": [
+          "cpp-hosted",
+          "rust-hosted"
+        ],
+        "differs_in": [
+          "language_instrument",
+          "host_compiler_binary"
+        ],
+        "design": "absolute",
+        "threshold": "Each actual full native call must exactly match942models/4188162tuples/244236zeros, all six per-field known-answer records, both discrepancy counts0 and all inline controls. Actual hosted evidence required; failures/absence remain not_completed or discrepancy."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "C++thenRust; both fixed exhaustive known-answer populations, no clock or statistical inference.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "No RNG; exhaustive fixed populations."
+    },
+    "instance_sampling": {
+      "rule": "One complete identical known-answer six-field population per fresh hosted arm, no sampling or imported historical execution rows.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Seen C++ known-answer replication; every field/model/tuple retained."
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "No statistical test or confidence interval; alpha is unused schema metadata. Exact complete known-answer checks only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 150,
+      "per_sample_seconds": 60,
+      "threads": 1,
+      "estimated_total_seconds": 270,
+      "measured_on": "Prior local unchanged Rust preflightp3=0.005s,p23=0.746s; original C++ complete broader census already passed a10minute deadline. New C++entry syntax-only preflight emits no scientific data. Hosted machine unvisited: these are conservative resource reservations/proxies, not invented hosted timings; compile60s per arm, CPPnative60s/Rustnative30s, job300s."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "fields",
+        "name": "Complete fields",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "Six expected prime-field records, no duplicates/missing fields.",
+        "source": "actual.jsonl/comparison.json",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "models",
+        "name": "Nonsingular models",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "942short models across the six fields.",
+        "source": "actual.jsonl:curves",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "tuples",
+        "name": "Ordered triples",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "4188162ordered base-coordinate triples.",
+        "source": "actual.jsonl:tuples",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "zeros",
+        "name": "S3 zeros",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "244236known-answer zero tuples; both directional discrepancy counts must0.",
+        "source": "actual.jsonl:zeros,false_zeros,missing_zeros",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      },
+      {
+        "id": "comparison",
+        "name": "Known-answer equality",
+        "unit": "exact count",
+        "kind": "exact",
+        "definition": "Exact per-field aggregate comparison to the pinned seen C++reference.",
+        "source": "comparison.json",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "integer equality"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "new workflow/protocol SHA256 and actual main event/run/attempt identity",
+      "all original source/header/driver/comparator/reference SHA256",
+      "actual source checkout, compiler, binary, OS/kernel/CPU per arm",
+      "CPPunchangedprefix/entry/generatedtranslationunit SHA256",
+      "all complete build/native/comparison outputs/exits and skipped/failure states"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "ephemeral",
+    "queue": "GitHub Actions standard public ubuntu24.04, main-push path-filter only",
+    "measurement_class": "search",
+    "timeout_seconds": 300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly two fresh hosted native calls, C++thenRust, one first-attempt main-push job. Retain every output/failure; no correctness/timeout rerun. No new local full-population call.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "CPPcompile60s/native60s;Rustcompile60s/native30s;wholejob300s;zero paid spend. No alternate runner, secrets/cache/artifacts/schedule.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "known_answer_pass only for each actually completed exact full match; separate-host replication requires actual public standard hosted job/source/compiler/binary/host evidence. A missing/rejected/skipped/failed job is not_completed, never inferred from prepared code.",
+    "comparison_ids": [
+      "known_answer"
+    ],
+    "statistic": "exact complete per-field integer equality and native inverse/root/point checks",
+    "interval": "none_exact",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancies from the fixed reference; no population inference",
+    "verdict_vocabulary": [
+      "known_answer_pass",
+      "not_validated",
+      "discrepancy"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "compare-cpp.mjs",
+      "sha256": "2157434ab5c8d71f7281f370387cf228212f1df80534d7c0a183ec58f3fa7ecb"
+    },
+    "inputs": [
+      "actual hosted C++six-field output",
+      "actual hosted Rustsix-field output",
+      "fixed original historical C++known-answer file"
+    ],
+    "outputs": [
+      "evidence/hosted-job.log and extracted complete records",
+      "export.json",
+      "reports/run-20261113-host-continuation/report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "reports/run-20261113-host-continuation/validation.svg"
+    ],
+    "report_dir": "reports/run-20261113-host-continuation"
+  },
+  "inadmissible": [
+    "Claiming remote execution from preparation, missing/skipped/rejected job, changed hostname or local recompilation.",
+    "Calling previously seen inputs or known-answer aggregates a blind discovery.",
+    "Editing old frozen source/driver/protocol/export/manualworkflow/reference or either divergent ledger.",
+    "Feature/PR-triggered research, paid/EKS/larger runner, secrets/cache/artifact upload, recurring schedule or outcome-based rerun.",
+    "Reporting clocks, speedups, generic formulas, signed execution/compiler/runtime proof, binary/S4/S5 or full independent authorship from this correctness study."
+  ],
+  "literature": [
+    {
+      "ref": "Existing actual S3Roots/S3Completion and IndependentS3Audit.ValidatorFoundation, local PCC-20261109-e789dd",
+      "provenance": "internal",
+      "claim": "Actual quadratic square-lift/field-cardinality/Mathlib point-oracle foundations; not native compiler/runtime or hosted execution proof."
+    },
+    {
+      "ref": "Pinned original C++semaev.cpp/finite.hpp, separate Rust validator and prior frozen protocol/export",
+      "provenance": "internal",
+      "claim": "Reuse exact arithmetic and known-answer population; previous manual404 is not a native execution."
+    },
+    {
+      "ref": "AGENTS.md main97a8e0 workflow and merge policy; canonical experiment-protocol normative document/schema/checker",
+      "provenance": "internal",
+      "claim": "Research only main/schedule/manual; freeze prospective inputs, preserve all failures, use normal PR/merge gates and unchanged main ledger."
+    },
+    {
+      "ref": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+      "provenance": "retrieved",
+      "claim": "Fresh2026-11-13billing excerpt: standard public runners remainfree, larger runners billed; zero-paid/no upload scope."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "infrastructure-continuation",
+      "filed": "2026-11-13",
+      "filed_before_affected_data": true,
+      "reason": "Prior independent-s3-20261109 manual workflow dispatch404 ran no job; default-branch registration absent, dispatch tool unavailable and audit/main ledgers divergent. New separate main-based research job follows allowed main-push policy and normal merge gates.",
+      "changes": [
+        "Separate new protocol; original record44eea2cae6e05da1f23450dab8373984e369929ce9abf8a2d2227786db67e820/export/source unchanged.",
+        "Two fresh hosted language calls instead of importing historical local result; fixed S3-only C++entry does not alter arithmetic.",
+        "Main-push path-filtered first-attempt job, no schedule/feature/PR trigger; same zero-paid standard public-host budget."
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "original_item": 13,
+    "predecessor_protocol_id": "independent-s3-20261109",
+    "predecessor_protocol_sha256": "44eea2cae6e05da1f23450dab8373984e369929ce9abf8a2d2227786db67e820",
+    "source_checkout": "e3658b4d6ffc6839e32bad1f5f732f796a2c8e4d",
+    "source_files": [
+      {
+        "path": ".github/workflows/theorem-audit-independent-s3.yml",
+        "bytes": 1233,
+        "sha256": "dd140f522e063b64cb362d9004c3420172058359b63d37c043c71b5941ee6b6a"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/.gitignore",
+        "bytes": 22,
+        "sha256": "6df71855f603e3e9f0bc3fb8266822c08c7e7670a9ed0c6a95de127ced030225"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/PROTOCOL.md",
+        "bytes": 4209,
+        "sha256": "277b3aa79521c8ddd562f14e93dc351ec27079cb101f335adebba350b9d85b57"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/check-protocol.mjs",
+        "bytes": 910,
+        "sha256": "2f36faf263606df3d7c0ceb2f0ac19f088620ffb81eb7d80b0e9c0968b5c84c4"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/compare.mjs",
+        "bytes": 1346,
+        "sha256": "dbba767122d1a35870cad030b85991f874fbb53ab8afd04c5c0626c634b8d202"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/frozen-files.sha256",
+        "bytes": 803,
+        "sha256": "945e889f26fe504830d0000a71869988dad96b41a7ec9a22430d0ab3634b465f"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/protocol.json",
+        "bytes": 16353,
+        "sha256": "ad37ddddc472a249b9825dfc25c73de2aa18261d731e1cedfa55001e05e9e8b3"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/provenance.json",
+        "bytes": 2194,
+        "sha256": "e43368b1e37a949f42c9dedb47b0b1b84425a15af3b20e2f02eb45d0572f6581"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/run-driver.sh",
+        "bytes": 2755,
+        "sha256": "e6506dcd2051988dc912564b062c5b95bea26eb8cf20e03a5d44be3d31244942"
+      },
+      {
+        "path": "research/independent_s3_validator_20261109/src/main.rs",
+        "bytes": 8741,
+        "sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1"
+      },
+      {
+        "path": "research/theorem_census_20261109/evidence/semaev-native.jsonl",
+        "bytes": 2971,
+        "sha256": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf"
+      },
+      {
+        "path": "research/theorem_census_20261109/native/finite.hpp",
+        "bytes": 4223,
+        "sha256": "52bc0de38bd477be7a5712d27ad28178156e2973c2de87083428abb869a58b75"
+      },
+      {
+        "path": "research/theorem_census_20261109/native/semaev.cpp",
+        "bytes": 10297,
+        "sha256": "4d7b03deded10cf62650c868c04f0074e0ce505fa46f63da44a7f5d4e33a819b"
+      }
+    ],
+    "component_files": [
+      {
+        "path": ".github/workflows/theorem-audit-s3-host-replay.yml",
+        "bytes": 1744,
+        "sha256": "342f7483d58992952ac3d6d7b0d830e96383696488f3b349ca60b003489c3825"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/cpp-entry.cpp",
+        "bytes": 341,
+        "sha256": "f01f8228f216eb87d7f7ebb155fc37f963d3842684b8787a86276b778111422e"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/check-plan.mjs",
+        "bytes": 1992,
+        "sha256": "a3623773aa75e2ceea70c3d12fa66c068118aeaa495988f14ca5d684e9d29fba"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/prepare-cpp.mjs",
+        "bytes": 1945,
+        "sha256": "bf0a5039e142857a52691dc9a72b3bf317a132d76a5a1647ae0d4c1e355e8742"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/compare-cpp.mjs",
+        "bytes": 1352,
+        "sha256": "2157434ab5c8d71f7281f370387cf228212f1df80534d7c0a183ec58f3fa7ecb"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/run-hosted.sh",
+        "bytes": 2416,
+        "sha256": "1437cb4f1b2bf0932705da50180578a0d7f664ad829fbf0992c2d9236a95707f"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/PROTOCOL.md",
+        "bytes": 3719,
+        "sha256": "ee0ea820df09b1424d426fc3a0a6c0d007b59200f2a2f41fe837390cdf654f85"
+      },
+      {
+        "path": "research/s3_host_replay_20261113/source-review.json",
+        "bytes": 5390,
+        "sha256": "777ed9404927303cc7876a4ad2454a3704f7fd3fbe0a3d98bc82dacf1a13ab35"
+      }
+    ],
+    "workflow_sha256": "342f7483d58992952ac3d6d7b0d830e96383696488f3b349ca60b003489c3825",
+    "old_rust_analysis_sha256": "dbba767122d1a35870cad030b85991f874fbb53ab8afd04c5c0626c634b8d202",
+    "planned_hosted_native_calls": 2,
+    "imported_historical_execution_rows": 0,
+    "new_native_calls_so_far": 0,
+    "paid_spend": 0,
+    "agent_uploads": 0,
+    "clock_valid": false,
+    "remote_binary_identity": "Unknown until compiled; measured before each native call, never fabricated or inferred.",
+    "formal_foundation": "IndependentS3Audit actual quadratic lifts/AdjoinRoot/cardinality/Mathlib S3 equivalence; gate11/localPCCe789dd only. Native compiler/runtime and signed execution out of scope."
+  }
+}
