@@ -116,6 +116,17 @@ cd lean
 lake build
 ```
 
+Repository artifact automation moved the two pilot JSONL records to
+`runs/preflight/.artifacts.json` in commitb8f13387581c3057238e46004a62c4a947d0e88f.
+Both retained local copies match its hashes and sizes. A fresh checkout first
+hydrates and checks the pilot with the official artifact tool; this does not
+supply the separately local-only main records. [pcc:unverified]
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/bk_basefield_census_20261112/runs/preflight
+python3 tools/artifacts/artifacts.py verify research/bk_basefield_census_20261112/runs/preflight
+```
+
 The frozen protocol's build field uses the study-relative source name.
 The actual compile ran from the repository root with the full repository-relative
 name. Source and executable hashes matched the frozen records throughout.
