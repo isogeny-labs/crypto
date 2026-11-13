@@ -9,6 +9,7 @@ mod classify;
 mod cover;
 mod curve;
 mod field;
+mod ghsmagic;
 mod la;
 mod lpsummary;
 mod poly;
@@ -38,6 +39,7 @@ fn main() {
             }
         }
         Some("verify") => verify(args[2].parse().unwrap(), args[3].parse().unwrap(), args[4].parse().unwrap()),
+        Some("ghs-magic") => ghsmagic::run(&args[2..]),
         Some("summarize-lp") => {
             if let Err(e) = lpsummary::run(&args[2]) {
                 eprintln!("summarize-lp: {e}");
@@ -139,8 +141,14 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         "full" => (false, None),
         "iota" => (true, None),
         a if a.starts_with("lp:") => (true, Some(a[3..].parse().expect("lp:<alpha>"))),
-        _ => panic!("arm must be full, iota or lp:<alpha>"),
+        a if a.starts_with("dlp:") => (true, Some(a[4..].parse().expect("dlp:<alpha>"))),
+        _ => panic!("arm must be full, iota, lp:<alpha> or dlp:<alpha>"),
     };
+    // dlp: relations with up to two large primes, reduced by an incremental
+    // elimination over the large-prime columns (one pivot row per large prime);
+    // a row whose large primes all cancel is a full relation (a cycle in the
+    // large-prime graph). lp keeps its single-large-prime pairing unchanged.
+    let dlp = arm.starts_with("dlp:");
     let mut rng = Rng(seed);
     let t_all = Instant::now();
     // ---- cover construction ------------------------------------------------
@@ -287,6 +295,9 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let mut partials: std::collections::HashMap<usize, Vec<(usize, u64)>> = std::collections::HashMap::new();
     let mut lp_combined = 0u64;
     let mut lp_dropped = 0u64;
+    let mut pivot_order: Vec<usize> = Vec::new();
+    let mut dlp_cycles = 0u64;
+    let mut dlp_reductions = 0u64;
     let mut target = ncols + 5;
     // HUMBERT_LA_PRECHECK=1: never start a Wiedemann solve while a column is empty
     let la_precheck = std::env::var("HUMBERT_LA_PRECHECK").map(|v| v == "1").unwrap_or(false);
@@ -325,6 +336,55 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
             }
             let row = if iota {
                 let lps: Vec<(usize, u64)> = big.iter().cloned().filter(|&(k, _)| k < nx && !is_small[k]).collect();
+                if dlp {
+                    if lps.len() > 2 {
+                        lp_dropped += 1;
+                        continue;
+                    }
+                    let mut cur = big.clone();
+                    let mut steps = 0;
+                    let reduced = loop {
+                        let lpc: Vec<(usize, u64)> = cur.iter().cloned().filter(|&(k, _)| k < nx && !is_small[k]).collect();
+                        if lpc.is_empty() {
+                            break Some(cur);
+                        }
+                        match lpc.iter().find(|(k, _)| partials.contains_key(k)) {
+                            Some(&(k, a)) => {
+                                // cur * b - pivot * a cancels Y_k
+                                let piv = &partials[&k];
+                                let b = piv.iter().find(|e| e.0 == k).unwrap().1;
+                                let mut comb: Vec<(usize, u64)> = cur.iter().map(|&(c, v)| (c, mulr(v, b, r))).collect();
+                                comb.extend(piv.iter().map(|&(c, v)| (c, (r - mulr(v, a, r)) % r)));
+                                cur = merge(comb);
+                                dlp_reductions += 1;
+                                steps += 1;
+                                assert!(steps < 100_000, "large-prime reduction did not terminate");
+                            }
+                            None => {
+                                if lpc.len() > 2 {
+                                    // fill-in beyond two large primes: not expected from the
+                                    // pivot forest; drop rather than store a wide pivot
+                                    lp_dropped += 1;
+                                    break None;
+                                }
+                                partials.insert(lpc[0].0, cur.clone());
+                                pivot_order.push(lpc[0].0);
+                                break None;
+                            }
+                        }
+                    };
+                    match reduced {
+                        None => continue,
+                        Some(full) => {
+                            dlp_cycles += 1;
+                            let c = compact(&full);
+                            if c.is_empty() {
+                                continue;
+                            }
+                            c
+                        }
+                    }
+                } else {
                 match lps.len() {
                     0 => compact(&big),
                     1 => {
@@ -354,6 +414,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                         lp_dropped += 1;
                         continue;
                     }
+                }
                 }
             } else {
                 row
@@ -440,17 +501,29 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
                 yv[k].unwrap()
             }
         };
-        for (&j, row) in &partials {
-            let mut acc = 0u64;
-            let mut coef = 0u64;
-            for &(k, v) in row {
-                if k == j {
-                    coef = v;
-                } else {
-                    acc = (acc + mulr(v, big_val(k, &yv), r)) % r;
+        // a pivot row solves its own large prime once every other entry is known
+        // (single large primes: always at once; dlp: iterate to a fixed point)
+        loop {
+            let mut progress = false;
+            for (&j, row) in &partials {
+                if yv[j].is_some() || !row.iter().all(|&(k, _)| k == j || k >= nx || yv[k].is_some()) {
+                    continue;
                 }
+                let mut acc = 0u64;
+                let mut coef = 0u64;
+                for &(k, v) in row {
+                    if k == j {
+                        coef = v;
+                    } else {
+                        acc = (acc + mulr(v, big_val(k, &yv), r)) % r;
+                    }
+                }
+                yv[j] = Some(mulr((r - acc) % r, invr(coef, r), r));
+                progress = true;
             }
-            yv[j] = Some(mulr((r - acc) % r, invr(coef, r), r));
+            if !progress {
+                break;
+            }
         }
     }
     let lp_known = (0..nx).filter(|&j| !is_small[j] && yv[j].is_some()).count();
@@ -534,7 +607,7 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let expected_rho_steps = (std::f64::consts::PI * r as f64 / 2.0).sqrt();
     println!(
         "{{\"kind\":\"attack\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"arm\":\"{arm}\",\"E_order\":{},\"r\":{r},\"D_order\":{},\
-\"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
+\"fb_x\":{nx},\"fb_points\":{nfb},\"small_x\":{nsmall},\"lp_alpha\":{},\"lp_partials\":{},\"lp_combined\":{lp_combined},\"lp_dropped\":{lp_dropped},\"dlp\":{dlp},\"dlp_cycles\":{dlp_cycles},\"dlp_reductions\":{dlp_reductions},\"lp_known\":{lp_known},\"unknowns\":{ncols},\
 \"rel_candidates\":{},\"rel_degenerate\":{},\"rel_symmetric_found\":{},\"rel_symmetric_rows\":{sym_rows},\"rel_nondeg_found\":{},\"residual_root_hist\":{:?},\"relations\":{},\"duplicate_relations\":{dup_found},\"quadric_switch_at_rows\":{},\"quad_candidates\":{},\"quad_found\":{},\"quad_rows\":{quad_rows},\"la_rounds\":{la_rounds},\"la_precheck\":{la_precheck},\"precheck_extensions\":{precheck_extensions},\"la_method\":\"{}\",\"rank\":{},\"la_mulmods\":{la_mulmods},\
 \"target_multipliers\":{:?},\"place_degrees\":{:?},\"descent_candidates\":{},\"descent_relations\":{},\
 \"pushforward_8P\":{push_ok},\"T_P_nonzero\":{tp_nonzero},\"iota_pairs_constant\":{iota_pairs_const},\"x_inf_eq_4c\":{xinf_eq_4c},\
