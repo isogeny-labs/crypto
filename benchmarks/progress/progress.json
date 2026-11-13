@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261113T0320Z-negation-remeasure",
+  "latest_record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 145,
+    "measured": 146,
     "open": 0
   },
   "repo": "crypto",
@@ -11592,6 +11592,149 @@
       ],
       "problem": "kernel:f6_ic_gate",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 4.83333333e-06,
+      "latest": 4.83333333e-06,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_after_koblitz_n19",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.5e-06,
+            5.3e-06
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 4.83333333e-06
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 7.4e-06,
+      "latest": 7.4e-06,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_after_koblitz_n23",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.2e-06,
+            7.5e-06
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 7.4e-06
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000169533333,
+      "latest": 0.000169533333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_before_koblitz_n19",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000163,
+            0.0001752
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.000169533333
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0002784,
+      "latest": 0.0002784,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_before_koblitz_n23",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002716,
+            0.000287
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.0002784
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "runs_with_different_answers",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 12,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "count"
     },
     {
       "better": "higher",
