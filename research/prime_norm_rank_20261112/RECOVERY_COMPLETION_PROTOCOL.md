@@ -28,3 +28,11 @@ actual NormMomentMatrix.quadraticCoefficient, NormLift.norm, and pinned
 polynomial Monic/natDegree/coefficient lemmas. Existing normOfWitnessLine
 inspected specifically to avoid its circular use. Standard certificate
 algebra, no priority/novelty claim [pcc:unverified].
+
+Prospective refinement before implementation: first prove nonzero norm from
+the Bezout inverse, branch nonvanishing and deg H<deg F. A zero norm forces
+F|H, contradicting the gap. This permits a general nonzero scalar conclusion
+under explicit degree upper bounds2 deg F<=deg G and deg f+2 deg H<=deg G,
+without assuming the even chart or first calculating its leading coefficient.
+The even-chart alpha^2 normalization can remain a corollary. No new oracle,
+rank or assumed norm relation is introduced [pcc:unverified].
