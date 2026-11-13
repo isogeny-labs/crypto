@@ -842,6 +842,75 @@ impl SystemSolver for FesF2 {
     }
 }
 
+/// Opt-in per-phase wall clock of the FES engines (`FES_GPU_TIMING=1`), printed to
+/// stderr every 500 calls and at process exit.  Off by default: no output, and the
+/// only cost is one cached flag read per call.  It measures; it changes no result.
+mod fes_timing {
+    use std::sync::atomic::{AtomicU64, Ordering::Relaxed};
+    use std::sync::OnceLock;
+    use std::time::Instant;
+
+    pub static CALLS: AtomicU64 = AtomicU64::new(0);
+    pub static FORMS: AtomicU64 = AtomicU64::new(0);
+    pub static PACK: AtomicU64 = AtomicU64::new(0);
+    pub static ROUND_TRIP: AtomicU64 = AtomicU64::new(0);
+    pub static SORT: AtomicU64 = AtomicU64::new(0);
+    pub static SEARCH: AtomicU64 = AtomicU64::new(0);
+    pub static VERIFY: AtomicU64 = AtomicU64::new(0);
+    pub static POINTS: AtomicU64 = AtomicU64::new(0);
+
+    extern "C" {
+        fn atexit(callback: extern "C" fn()) -> i32;
+    }
+    extern "C" fn at_exit() {
+        report();
+    }
+
+    pub fn on() -> bool {
+        static ON: OnceLock<bool> = OnceLock::new();
+        *ON.get_or_init(|| {
+            let on = std::env::var_os("FES_GPU_TIMING").is_some();
+            if on {
+                // SAFETY: registers a plain `extern "C"` function with libc.
+                unsafe { atexit(at_exit) };
+            }
+            on
+        })
+    }
+
+    pub fn add(counter: &AtomicU64, since: Option<Instant>) {
+        if let Some(t) = since {
+            counter.fetch_add(t.elapsed().as_nanos() as u64, Relaxed);
+        }
+    }
+
+    pub fn start() -> Option<Instant> {
+        on().then(Instant::now)
+    }
+
+    pub fn call_done() {
+        if on() && CALLS.fetch_add(1, Relaxed) % 500 == 499 {
+            report();
+        }
+    }
+
+    pub fn report() {
+        let calls = CALLS.load(Relaxed).max(1);
+        let ms = |c: &AtomicU64| c.load(Relaxed) as f64 / 1e6 / calls as f64;
+        eprintln!(
+            "fes-timing: calls={} points/call={:.2} per call (ms): forms={:.4} pack={:.4} round_trip={:.4} sort={:.4} search_total={:.4} verify={:.4}",
+            CALLS.load(Relaxed),
+            POINTS.load(Relaxed) as f64 / calls as f64,
+            ms(&FORMS),
+            ms(&PACK),
+            ms(&ROUND_TRIP),
+            ms(&SORT),
+            ms(&SEARCH),
+            ms(&VERIFY)
+        );
+    }
+}
+
 /// The body of [`FesF2`] with the search step as a parameter: form building,
 /// the `bitop/v1` count, the Gray-code step count (`2 * 2^n + setup` word
 /// XORs) and CPU verification of every returned point are the same for every
@@ -858,6 +927,7 @@ fn fes_quadratic_solve(
     // `bitop/v1` over the whole call; see `fes_form_ops`,
     // `gray_table_ops` and `gray_walk_ops` for the constants.
     let mut word_ops = 0u64;
+    let t_forms = fes_timing::start();
     let forms: Option<Vec<QuadraticForm>> = system
         .equations
         .iter()
@@ -888,7 +958,10 @@ fn fes_quadratic_solve(
                 .sum()
         })
         .unwrap_or(0);
+    fes_timing::add(&fes_timing::FORMS, t_forms);
+    let t_search = fes_timing::start();
     let found = forms.as_deref().and_then(search);
+    fes_timing::add(&fes_timing::SEARCH, t_search);
     let mut tests = 0u64;
     let mut extra = BTreeMap::new();
     extra.insert("points".into(), 1u64 << n);
@@ -902,7 +975,13 @@ fn fes_quadratic_solve(
                 + gray_table_ops(m, n)
                 + gray_walk_ops(1u64 << n, 1)
                 + 2 * points.len() as u64;
+            if fes_timing::on() {
+                fes_timing::POINTS
+                    .fetch_add(points.len() as u64, std::sync::atomic::Ordering::Relaxed);
+            }
+            let t_verify = fes_timing::start();
             let points = verified(masks(points), system, &mut tests);
+            fes_timing::add(&fes_timing::VERIFY, t_verify);
             // Two XORs per Gray-code step, one step per point, plus
             // one per coefficient scattered into the tables.
             let ops = 2 * (1u64 << n) + setup;
@@ -913,6 +992,7 @@ fn fes_quadratic_solve(
             }
         }
     };
+    fes_timing::call_done();
     extra.insert("verification_tests".into(), tests);
     // A verification test is a word test of one term.
     extra.insert("bitop_word_ops".into(), word_ops + tests);
@@ -977,7 +1057,10 @@ impl SystemSolver for FesF2Gpu {
                     None
                 }
             };
-            let Ok(packed) = PackedSystem::from_quadratic_forms(fs) else {
+            let t_pack = fes_timing::start();
+            let packed = PackedSystem::from_quadratic_forms(fs);
+            fes_timing::add(&fes_timing::PACK, t_pack);
+            let Ok(packed) = packed else {
                 fallback = 1;
                 return cpu(fs);
             };
@@ -985,6 +1068,10 @@ impl SystemSolver for FesF2Gpu {
             match solve_on_shared_server(&packed) {
                 Ok(Some((reply, _))) => {
                     gpu_ns = t.elapsed().as_nanos() as u64;
+                    if fes_timing::on() {
+                        fes_timing::ROUND_TRIP
+                            .fetch_add(gpu_ns, std::sync::atomic::Ordering::Relaxed);
+                    }
                     used = 1;
                     if reply.total > reply.proposed.len() as u64 {
                         capped = 1;
@@ -993,7 +1080,9 @@ impl SystemSolver for FesF2Gpu {
                         // fes-f2's order, so the oracle (first liftable
                         // solution wins) follows fes-f2's trajectory.
                         let mut points = reply.proposed;
+                        let t_sort = fes_timing::start();
                         crate::cryptanalysis::fes_gpu::sort_gray_order(&mut points);
+                        fes_timing::add(&fes_timing::SORT, t_sort);
                         Some(points)
                     }
                 }

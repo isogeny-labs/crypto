@@ -5,6 +5,8 @@
 // algorithm lives in fes.cuh and is checked by `make test` without a GPU.
 #include <cstdint>
 #include <cstdio>
+#include <chrono>
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 
@@ -156,40 +158,97 @@ static bool serve_alloc(ServeBuffers &b) {
          cudaMalloc(&b.count, sizeof(unsigned int)) == cudaSuccess;
 }
 
+// Opt-in phase timing for serve mode (`FES_SERVE_TIMING=1`): wall clock of each phase of a
+// request, plus the kernel's own GPU time from CUDA events, printed to stderr every 200 requests
+// and at EOF.  The wait for the next request is excluded (timing starts when the first byte has
+// arrived), so the numbers are the worker's share of a round trip.  Off by default; no output and
+// no extra CUDA calls then.
+struct ServeTiming {
+  bool on = false;
+  unsigned long long calls = 0;
+  double read_ns = 0, qsym_ns = 0, h2d_ns = 0, kernel_wall_ns = 0, kernel_gpu_ns = 0, d2h_ns = 0, reply_ns = 0;
+  cudaEvent_t e0 = nullptr, e1 = nullptr;
+  using clock = std::chrono::steady_clock;
+  static double ns(clock::time_point a, clock::time_point b) {
+    return (double)std::chrono::duration_cast<std::chrono::nanoseconds>(b - a).count();
+  }
+  void init() {
+    const char *v = getenv("FES_SERVE_TIMING");
+    on = v && v[0] && v[0] != '0';
+    if (on) { cudaEventCreate(&e0); cudaEventCreate(&e1); }
+  }
+  void report() const {
+    if (!on || !calls) return;
+    const double c = (double)calls * 1e3;  // ns -> us per call
+    fprintf(stderr,
+            "serve-timing: calls=%llu per call (us): read=%.1f qsym=%.1f h2d=%.1f kernel_wall=%.1f kernel_gpu=%.1f d2h=%.1f reply=%.1f\n",
+            calls, read_ns / c, qsym_ns / c, h2d_ns / c, kernel_wall_ns / c, kernel_gpu_ns / c, d2h_ns / c, reply_ns / c);
+  }
+};
+
 static int serve_main() {
   ServeBuffers b;
   if (!serve_alloc(b)) { printf("ERROR cuda-alloc\n"); fflush(stdout); return 2; }
+  ServeTiming tm;
+  tm.init();
   std::vector<uint64_t> qsym, sols;
   FesSystem sys;
   for (;;) {
+    if (tm.on) {
+      const int c = getc(stdin);  // blocks until a request starts (or EOF): idle time is not counted
+      if (c == EOF) { tm.report(); break; }
+      ungetc(c, stdin);
+    }
+    const auto t0 = ServeTiming::clock::now();
     const int r = fes_serve_read(sys, FES_MAX_VARS);
-    if (r == 0) break;
+    if (r == 0) { tm.report(); break; }
     if (r < 0) { printf("ERROR malformed request (n in 1..%d, m in 0..64)\n", FES_MAX_VARS); fflush(stdout); return 2; }
+    const auto t1 = ServeTiming::clock::now();
     const int t = sys.n * (sys.n + 1) / 2;
     qsym.assign((size_t)sys.n * sys.n, 0);
     fes_build_qsym(sys.quad_tri.data(), sys.n, qsym.data());
     const int lb = fes_default_low_bits(sys.n);
+    const auto t2 = ServeTiming::clock::now();
     bool cu = cudaMemcpy(b.lin, sys.lin.data(), sys.n * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
               cudaMemcpy(b.quad, sys.quad_tri.data(), t * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
               cudaMemcpy(b.qsym, qsym.data(), qsym.size() * sizeof(uint64_t), cudaMemcpyHostToDevice) == cudaSuccess &&
               cudaMemset(b.count, 0, sizeof(unsigned int)) == cudaSuccess;
+    const auto t3 = ServeTiming::clock::now();
     const uint64_t nprefix = 1ULL << (sys.n - lb);
     const int threads = 256;
     const int blocks = (int)((nprefix + threads - 1) / threads);
     const size_t smem = (size_t)sys.n * sys.n * sizeof(uint64_t);
     if (cu) {
+      if (tm.on) cudaEventRecord(tm.e0);
       fes_kernel<<<blocks, threads, smem>>>(sys.cst, b.lin, b.quad, b.qsym, sys.n, lb, b.out,
                                             b.count, b.max_out);
+      if (tm.on) cudaEventRecord(tm.e1);
       cu = cudaGetLastError() == cudaSuccess && cudaDeviceSynchronize() == cudaSuccess;
     }
+    const auto t4 = ServeTiming::clock::now();
     unsigned int count = 0;
     cu = cu && cudaMemcpy(&count, b.count, sizeof(unsigned int), cudaMemcpyDeviceToHost) == cudaSuccess;
     const unsigned int listed = count < (unsigned)b.max_out ? count : (unsigned)b.max_out;
     sols.resize(listed);
     cu = cu && (!listed || cudaMemcpy(sols.data(), b.out, listed * sizeof(uint64_t),
                                       cudaMemcpyDeviceToHost) == cudaSuccess);
+    const auto t5 = ServeTiming::clock::now();
     if (!cu) { printf("ERROR cuda\n"); fflush(stdout); return 2; }
     fes_serve_reply(sols, count);
+    if (tm.on) {
+      const auto t6 = ServeTiming::clock::now();
+      float kms = 0;
+      cudaEventElapsedTime(&kms, tm.e0, tm.e1);
+      ++tm.calls;
+      tm.read_ns += ServeTiming::ns(t0, t1);
+      tm.qsym_ns += ServeTiming::ns(t1, t2);
+      tm.h2d_ns += ServeTiming::ns(t2, t3);
+      tm.kernel_wall_ns += ServeTiming::ns(t3, t4);
+      tm.kernel_gpu_ns += (double)kms * 1e6;
+      tm.d2h_ns += ServeTiming::ns(t4, t5);
+      tm.reply_ns += ServeTiming::ns(t5, t6);
+      if (tm.calls % 200 == 0) tm.report();
+    }
   }
   return 0;
 }
