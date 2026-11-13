@@ -112,3 +112,89 @@ LinearAlgebra/Matrix/Rank.lean (rank conventions), the earlier Galbraith norm
 references in sources.json, and the newly merged closure note. KB remained
 unavailable (no MCP tools and wrapper reported no executable); no novelty is
 claimed for elementary field linear algebra.
+
+## Exact polynomial lift addition, November13
+
+[NormLift.lean](lean/NormLift.lean) instantiates the previously abstract
+coefficient map. For any field K, finite index set I, polynomial families
+A_i,B_i, polynomial f and weights w, define
+
+    A_w = sum_i w_i A_i,       B_w = sum_i w_i B_i,
+    L(M) = sum_ij M_ij (A_i A_j - f B_i B_j),
+    ell_i = A_i(q) - y B_i(q).
+
+Lean proves L(w w^T)=A_w²-f B_w² and
+sum_i w_i ell_i=A_w(q)-y B_w(q). These are actual polynomial/evaluation
+identities, not assumed properties of an unspecified map [pcc:unverified].
+
+For a nonzero prescribed polynomial G, it then proves the following exact
+equivalence [pcc:unverified]:
+
+- There exist w and c!=0 with A_w²-f B_w²=cG and A_w(q)-y B_w(q)=0.
+- There exist a nonzero symmetric M and c!=0 with all2x2 minors vanishing,
+  M*ell=0 and L(M)=cG.
+
+The forward direction uses the outer product. The reverse direction extracts a
+pivot column and rescales c. No square root, numerical-rank oracle or relaxed
+linear feasibility assumption is used [pcc:unverified].
+
+![Exact algebraic witness equivalence](norm-lift-report/equivalence.svg)
+
+[Two-page report PDF](norm-lift-report/report.pdf), editable diagram source
+[norm-lift-report/equivalence.dot](norm-lift-report/equivalence.dot) and
+[LaTeX source](norm-lift-report/report.tex).
+
+| Statement | Declaration | Exact scope |
+|---|---|---|
+| Outer-product norm expansion | NormLift.outerNorm | Any field, finite polynomial families, defined actual lift |
+| Target-branch identity | NormLift.branchEval | Actual polynomial evaluation at q,y |
+| Nonzero-vector condition | NormLift.witnessVectorNonzero | c!=0, G!=0 and actual norm equation |
+| Forward witness construction | NormLift.normToMatrix | Norm witness and G!=0 |
+| Reverse witness construction | NormLift.matrixToNorm | Every explicit matrix constraint; no G!=0 assumption needed in this direction |
+| Two-way equivalence | NormLift.witnessEquivalence | Any field and finite families; G!=0 |
+| Outer-product minor constructor | RankOneExtraction.outerMinors | Any field; no nonzero hypothesis required |
+
+These statements apply to the spans of the supplied polynomial families. They
+do not yet formalize that a chosen monomial family spans exactly the degree
+bounds in DERIVATION.md, or the complete elliptic-curve divisor/group bridge.
+They provide no matrix-search algorithm or search-time theorem
+[pcc:unverified].
+
+Source commit9cba2446b. Default build004 passed3143 jobs; actual tracked-source
+project audit passed28 declarations with0 additional trusted axioms. Builds002
+and003 are preserved as failed module-interface attempts, not proof evidence.
+Fresh import-inclusive replay status is recorded in
+norm-lift-evidence/fresh-status.json when completed [pcc:unverified].
+
+Native identity certificate
+[IDC1h2e7ff8ae9d53fc24](norm-lift-evidence/norm-lift.identity.json) covers the
+four-component expansion only and binds the NormLift source hash. The existing
+issuer/checker accepted32 statement-derived and32 extra stream points. It does
+not execute Lean, establish an algorithmic bound or certify all arities by
+sampling; the universal finite-index theorem is separately checked in Lean.
+No certificate confidence number is used as an algorithmic success claim
+[pcc:unverified].
+
+Reproduce the native certificate with the standalone adapter (the old default
+binary remains selected by default-run):
+
+```sh
+cargo run --release --locked --manifest-path research/prime_norm_rank_20261112/certificate/Cargo.toml --bin norm-lift -- research/prime_norm_rank_20261112/lean/NormLift.lean /tmp/norm-lift.identity.json
+lake -d research/prime_norm_rank_20261112/lean build
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormLift
+```
+
+Canonical source bindings are in
+[norm-lift-evidence/claim-pins.json](norm-lift-evidence/claim-pins.json).
+The five earlier extraction theorem declaration hashes remain unchanged;
+outerMinors is an addition to that module. Historical full-file replay receipts
+remain tied to their original commits, not relabelled as current receipts.
+All new claims remain unsigned producer standing [pcc:unverified].
+
+Sources: earlier Galbraith norm/divisor references in sources.json; pinned
+Mathlib polynomial evaluation/sum and linear-map declarations; the Nov13
+non-Semaev note, read as scoped context rather than a universal exclusion.
+KB unavailable (MCP absent; wrapper has no executable). No novelty claim for
+this elementary lifting construction. No empirical campaign, performance row or
+existing canonical graph was changed; the new diagram describes the formal
+bridge only.
