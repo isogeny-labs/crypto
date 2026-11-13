@@ -198,3 +198,97 @@ KB unavailable (MCP absent; wrapper has no executable). No novelty claim for
 this elementary lifting construction. No empirical campaign, performance row or
 existing canonical graph was changed; the new diagram describes the formal
 bridge only.
+
+## Algorithmic shortcut test: sparse differential filter, November13
+
+The proposed filter is W_G(N)=G*N'-G'*N with N=A²-fB². It replaces coefficient
+matching by sparse derivative/convolution equations. The test asks whether this
+supplies new constraints or loses witnesses in characteristic p. It is an exact
+algebraic test, not a timing or scaling experiment [pcc:unverified].
+
+[NormWronskian.lean](lean/NormWronskian.lean) establishes:
+
+- If G is monic and coprime with G', and deg N<=deg G, then W_G(N)=0 exactly
+  when N=cG. Nonzero N forces c!=0.
+- A product of distinct rational node factors X-x is monic and coprime with
+  its derivative. The usual norm pole-degree bounds imply the degree cap.
+- Applied to the actual NormLift output, the filter and nonzero scalar norm
+  matching admit exactly the same matrices under the stated degree cap.
+- Without that cap, characteristic-p factors are invisible. In F17, every
+  G*H^17 passes; specifically X*(X-1)^17 passes W_X but is not cX.
+
+These are kernel-checked implications and a finite-field counterexample;
+the full project source audit is separate from independent signed standing
+[pcc:unverified].
+
+![Exact scope of the differential filter](wronskian-report/filter.svg)
+
+[Two-page PDF](wronskian-report/report.pdf), editable [DOT source](wronskian-report/filter.dot),
+[LaTeX source](wronskian-report/report.tex).
+
+The useful result is a precise filter contract. Within the correct window,
+differentiation does not strengthen the norm coefficient constraints and does
+not remove rank one. Outside that window, accepting its solutions can be wrong.
+Kernel equivalence alone does not rule out an implementation benefit from the
+sparse representation; no runtime comparison was run [pcc:unverified].
+
+The derivative remains
+
+    N' = 2*A*A' - f'*B² - 2*f*B*B'.
+
+It is quadratic in the unknown A,B coefficients. Returning N=cG from a linear
+solver does not return its decomposition A²-fB², the remaining constructive
+problem [pcc:unverified].
+
+| Statement | Declaration | Exact scope |
+|---|---|---|
+| Zero filter forces divisibility | NormWronskian.filterDivisibility | G coprime with G'; no degree cap needed |
+| Differential kernel is scalar span | NormWronskian.filterZeroIff | Monic G, coprimality, natDegree N<=natDegree G |
+| Nonzero scalar recovered | NormWronskian.nonzeroFilterIff | Previous hypotheses and N!=0 |
+| Actual matrix lift has same feasible set | NormWronskian.liftedFilterIff | Same conditions on the defined NormLift output |
+| Actual norm derivative | NormWronskian.normDerivative | Any field and polynomials f,A,B |
+| Norm degree cap | NormWronskian.normDegreeBound | 2*natDegree A<=D and natDegree f+2*natDegree B<=D |
+| Split-node conditions | NormWronskian.splitProductConditions | Finite set of distinct field nodes |
+| Characteristic-p ghost | NormWronskian.frobeniusGhost | G,H over F17; no degree cap |
+| Explicit ghost passes | NormWronskian.ghostPasses | G=X, N=X*(X-1)^17 |
+| Explicit ghost is not cG | NormWronskian.ghostNotScalar | Same F17 fixture |
+
+Default build004 passed3145 jobs. Actual-source gate passed39 declarations with
+0 additional trusted axioms. Failed builds001--003 are retained as failures.
+Import-inclusive replay exited0; the receipt is in
+wronskian-evidence/fresh-status.json. Source commit923a40182; pinned Lean4.35.0/dependencies unchanged
+[pcc:unverified].
+
+The existing native identity issuer/checker accepted
+[IDC1hd9711b7c88619f6b](wronskian-evidence/residual.identity.json), binding the
+expanded differential residual and NormWronskian source hash. It is an expression
+identity supplement with32 statement-derived and32 separate-stream points;
+it does not execute Lean, prove the finite-characteristic implications, or
+establish solver success. Those mathematical implications are checked in Lean.
+No certificate confidence value is used as an algorithmic claim [pcc:unverified].
+
+Reproduce with:
+
+```sh
+lake -d research/prime_norm_rank_20261112/lean build
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormWronskian
+cargo run --release --locked --manifest-path research/prime_norm_rank_20261112/certificate/Cargo.toml --bin norm-wronskian -- research/prime_norm_rank_20261112/lean/NormWronskian.lean /tmp/norm-wronskian.identity.json
+```
+
+Seven canonical unsigned bindings are in
+[wronskian-evidence/claim-pins.json](wronskian-evidence/claim-pins.json).
+Earlier theorem modules and historical reports remain unchanged. New evidence
+is appended and source-pinned; all producer standing remains unsigned
+[pcc:unverified].
+
+Sources: pinned Mathlib polynomial derivative, separability, coprime-divisibility
+and monic-degree results; existing norm references in sources.json; the primary
+barrier-map blob's stated p-adic scope. KB unavailable; bounded searches of
+sparsely available notes do not establish novelty. Main's journal records the
+monthly isolab budget exhausted, so no paid experiment was launched. No new
+empirical panel, timing result, benchmark row or historical graph is changed.
+
+The next live question is constructive: can the coupled Hankel structure of the
+norm-lift constraints support nonlocal rank-one reconstruction? The differential
+operator is characterized here; that question remains a research target rather
+than a claimed algorithm or a reason to declare the full family impossible.
