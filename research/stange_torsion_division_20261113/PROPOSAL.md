@@ -423,3 +423,33 @@ lean_obligation: >
   `search_knowledge` including negative form, `search_theorems`) remain
   **not attempted** for lack of tool access; the last ~48k characters of the
   paper's HTML remain unread.
+
+## STANGE-SP-04: summation polynomials over isogenous curves (added 2026-11-13)
+
+All statements in this record are [pcc:unverified] reasoning; nothing was run.
+
+**Mechanism.** Curves E_1..E_m with isogenies phi_i: E_i -> E; seek relations
+sum_i phi_i(P_i) = O on E, with P_i in factor bases F_i on E_i. Equivalently,
+Stange's product-of-curves net polynomial at coefficient vector v = (1,...,1).
+
+**Expected obstruction.** Each phi_i is a homomorphism and, for deg phi_i != r,
+a bijection on E[r]. The relation is Semaev's S_m on E evaluated at
+x(phi_i(P_i)), rational functions of degree ~ell_i in x_i: degree per variable
+grows by ~ell_i, and the factor base {phi_i(P)} is just another subset of E[r]
+with no Weil-descent structure over F_p. The "linear in subgroup size" cost of
+the net zero test arises from scanning v, which is not needed at v = (1,...,1);
+the remaining wall is the ordinary summation-polynomial one (degree ~2^(m-2)).
+The non-split direction (gluing E_1, E_2 into a genus-2 Jacobian, Kani/Richelot)
+is prior work under the ecdlp-surfaces tooling, and genus-2 index calculus does
+not beat rho.
+
+**Preregistered prediction.** The pulled-back S_m and the (1,1,1) net polynomial
+have the same zero set as S_m on E (up to known factors), strictly higher degree,
+and never solve faster at matched factor-base size.
+
+**Cheapest discriminating test.** Toy prime, m = 3, 2-isogenous curves: build
+both polynomials, check zero-set agreement, compare degrees and Groebner solve
+time against plain S_m on E at the same |F| and relation yield.
+
+**Falsification.** The isogenous variant yields relations at lower measured cost
+than plain S_m at matched factor-base size and relation yield (A/A-banded).
