@@ -1,0 +1,16 @@
+{
+  "schema": "primary_source_scope_review_v1",
+  "repo": "flintlib/flint",
+  "commit": "979b0d658ea1326099a08e392601a65c8863b5c0",
+  "source": "src/gr_mat/charpoly_berkowitz.c",
+  "url": "https://github.com/flintlib/flint/blob/979b0d658ea1326099a08e392601a65c8863b5c0/src/gr_mat/charpoly_berkowitz.c",
+  "findings": [
+    "The generic-ring Berkowitz implementation computes characteristic polynomials through ring sums/products and small determinant bases, without requiring inversion of Newton indices2or4.",
+    "In characteristic2, Newton traces cannot recover e2/e4 by dividing by their indices. A trace-only nilpotency shortcut therefore needs explicit counterexamples and full coefficient checks.",
+    "Berkowitz, Newton identities, trace/Frobenius arithmetic and Bernstein bounds are classical; no novelty certification follows from implementing these components."
+  ],
+  "scope": "Primary implementation source review, not exhaustive literature novelty review or a performance measurement.",
+  "next": "If actualchar2supportcontrols pass, investigate a separately proved conditional Frobenius-image stratum and its intersection with the actual affine normfamily; preserve all original branches.",
+  "novelty_established": false,
+  "gate_passed": false
+}
