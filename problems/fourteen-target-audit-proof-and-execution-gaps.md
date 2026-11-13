@@ -630,3 +630,24 @@ Text extraction loses the bar; no field-of-definition counterexample
 is asserted. Higher-arity absolute irreducibility, full permutation
 invariance beyondm4 and arbitrary-split normalization remain open.
 No native or corpus status is promoted. [pcc:unverified]
+
+### 2026-11-13 degree-drop control and corrected resultant interchange
+
+The [new resultant-interchange project](../research/resultant_interchange_audit_20261113/README.md)
+proves the fixed-size iterated Sylvester-resultant identity over every
+commutative integral domain and derives both intermediate degree bounds
+from explicit bidegree bounds. Root multisets retain multiplicity;
+injective coefficient/swap maps descend through algebraic closure and
+fraction field. Whole gate46/0failures/0trusted, with standard foundations
+only; exact local PCC-20261113-97e420 replay passes, signed standing
+unverified. [pcc:unverified]
+
+The actual rational control P=y²−y,Q=xy+1,R=2x+1 has inner polynomials
+x+1,y−2 and Q bidegrees1. Lean directly proves strict intermediate
+degree loss and natural-size sides−1 versus2; retained formal sizes give
+2both. The natural-size compatibility corollary explicitly requires
+sharp intermediate degree equalities. This refutes an unrestricted helper,
+not the qualified Semaev source or the actual canonical family. Binding
+this identity to the canonical recursive polynomials, all variable maps
+and arbitrary splits remains an open item1 obligation, as do higher
+symmetry and absolute irreducibility. [pcc:unverified]

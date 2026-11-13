@@ -391,6 +391,18 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Original fourteen requirements
 
+The additional [resultant-interchange component](../resultant_interchange_audit_20261113/README.md)
+proves the fixed-size iterated Sylvester identity and both intermediate
+degree bounds over every commutative integral domain. Its direct rational
+counterexample gives natural-size sides−1/2 versus fixed-size sides2/2,
+with both bidegrees1 and a proved strict degree drop. The natural-size
+corollary exposes sharp intermediate degree equalities. Whole gate46/0/0;
+exact local PCC-20261113-97e420 replay passes, signed standing unverified.
+This is an item1 helper, not a qualified
+Semaev refutation or a completed canonical arbitrary-split normalization
+proof. The original fourteen requirements retain their scope below.
+[pcc:unverified]
+
 This adds formal evidence to items1,2,3and9 and primary-source review to
 items6and10. It does **not** complete the fourteen-item
 request. The original hypotheses and all gaps are retained in the
