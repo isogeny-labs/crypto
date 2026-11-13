@@ -1,3 +1,40 @@
+Current checkpoint — 2026-11-13, complete chain adapter native run01 ACTIVE
+
+Root927a4efe/science6298 unchanged;consumer ready1519/b9 complete local3043e8
+and own43338033189ALL5/1d21f5(root156149),SETTLEDNOrepoll. Actual TWO whole
+archives remote-replayed/publishedb83ad3/canonical9bc7;roota3172f/consumer
+b3ac97 report copies byte-identical/one35707PDFpage inspected. NormalGit
+root927/consumerb9/protocol635 publication receipts and scheduled01:44root
+merge snapshot retained75c539:basec7c4,mergeablefalse/dirty/automergeenabled,
+zero reviewthreads/submittedreviews,visible review+migrate success. Not all
+mainledger/signing/merge requirements are established. Next routine root
+check05:44UTC unless concrete new signal. [pcc:unverified]
+
+New readyPR1520/head635bd2d branchresearch/chained-transfer-fp-chain-20261113
+under1519. Frozen8f3da8/fixture+primary+baseline50nonworkflow/FIVEwholejob
+prefix/one40463page diagram0d2ec8 precedes implementation. NEW C0norm/
+completed degree2pull/oldSevenEdge dependency/forward55,57/inverse104,85/
+alternates/fourtests/36boundedCLI implemented,strictClippy02pass75beb9.
+FirstClippy01 original101 unusedoldmoduleimport retained;correction ONLY
+compatibility attribute in newwrapper. No oldsource/job/pin changed.
+Native tests01 original2026-11-13T01:50:50Z ACTIVE at
+/workspace/scratch/ct54-fp-chain-tests-01,script same name.sh,cache separate
+ct54-fp-chain-tests-01-build-cache. Frozen784 inputs until original tests.exit,
+finish/guard.exit/after.json/guards.json. Preserve original timeout900 incl
+compile;do not rerun/rewrite if toolsession expires. Mathematical acceptance
+PENDING. Read original tests.log,then preserve whole run/custody/PCC before
+citing. Add Lean/written proof/CLI/strictdriver/admission/full55min replay/
+new6thjob/report/commit/ownCI next. Old50 nonworkflow/five whole jobprefix
+must stay byte-identical;whole workflow SHA necessarily changes at append.
+No cost/globalinverse/newattack claim from diagram equality. [pcc:unverified]
+
+All old science and its CI remain settled. No paid experiment without actual
+budget/checkpointadmission. KB127/vault8edec422 key absent,mainledger/signing
+conflict/broadbenchrec189 oldgaps106unchangedrecords remain open. No force/
+rebase/rechain/lineagechoice/subagents. Continuous queue3904/PR3877/1519/1520.
+Earlier current/active headers below are historical/additively superseded.
+
+---
 # Current checkpoint 2026-11-13T01:09:25.702913+00:00 — independent norms/replay/raw publication complete
 
 RootLOCAL/remote9bc7bb08b2465603cbaaf6648e85dd2568b80686/tree76049ba9,
