@@ -25,9 +25,11 @@
 #if defined(__CUDACC__)
 #define FES_HD __host__ __device__
 #define FES_HDM __host__ __device__
+#define FES_FI __host__ __device__ __forceinline__
 #else
 #define FES_HD static inline
 #define FES_HDM inline
+#define FES_FI inline
 #endif
 
 // Lower-triangular index for the unordered pair {i, j}.
@@ -238,6 +240,94 @@ FES_HD void fes_search_subcube_gray(uint64_t cst, const uint64_t *lin,
                                     int max_out, uint64_t *df_scratch) {
   FesArrayEmit emit{out, found, max_out};
   fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df_scratch, emit);
+}
+
+// fes_walk_gray with the walk cut into blocks of 2^K steps, s = h*2^K + l.
+// Inside a block (l = 1 .. 2^K - 1) the flipped variable k1 = ctz(l) and,
+// when l has a second set bit, the partner k2 = ctz(l & (l - 1)) are
+// compile-time constants: the unrolled steps keep D_0..D_{K-1} and the
+// K(K-1)/2 second derivatives among them in registers, with no ctz and no
+// table load.  When l = 2^k1 the partner is the block's lowest high bit,
+// c = K + ctz(h) (none in block 0), so the K values qsym[j][c] are loaded
+// once per block.  The step at l = 0 (s = h*2^K) flips variable K + ctz(h)
+// and is the walk's only run-time-indexed step.  The arithmetic is
+// fes_walk_gray's, step for step, so the zeros are the same points in the
+// same order; sub-cubes with low_bits < K fall back to fes_walk_gray.
+template <int K, int L, class Emit>
+FES_FI void fes_block_steps(uint64_t (&dl)[K], const uint64_t (&q)[K][K],
+                            const uint64_t (&qc)[K], bool high, uint64_t &val,
+                            uint64_t point, Emit &emit) {
+  constexpr int k1 = (L & 1) ? 0 : (L & 2) ? 1 : (L & 4) ? 2 : (L & 8) ? 3
+                   : (L & 16) ? 4 : (L & 32) ? 5 : (L & 64) ? 6 : 7;
+  constexpr int r = L & (L - 1);
+  constexpr int k2 = r == 0 ? -1 : (r & 1) ? 0 : (r & 2) ? 1 : (r & 4) ? 2
+                   : (r & 8) ? 3 : (r & 16) ? 4 : (r & 32) ? 5 : (r & 64) ? 6 : 7;
+  if constexpr (k2 >= 0) {
+    dl[k1] ^= q[k1][k2];
+  } else {
+    if (high) dl[k1] ^= qc[k1];
+  }
+  val ^= dl[k1];
+  // point = base | gray(h * 2^K); gray is linear over GF(2) and h * 2^K, L
+  // have disjoint bits, so gray(h * 2^K + L) = gray(h * 2^K) ^ gray(L).
+  if (val == 0) emit(point ^ (uint64_t)(L ^ (L >> 1)));
+  if constexpr (L + 1 < (1 << K)) fes_block_steps<K, L + 1>(dl, q, qc, high, val, point, emit);
+}
+
+template <int K, class Emit>
+FES_HD void fes_walk_block(uint64_t cst, const uint64_t *lin,
+                           const uint64_t *quad_tri, const uint64_t *qsym, int n,
+                           int low_bits, uint64_t prefix, uint64_t *df_scratch,
+                           Emit &emit) {
+  static_assert(K >= 1 && K <= 8, "block of 2..256 steps");
+  if (low_bits < K) {
+    fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df_scratch, emit);
+    return;
+  }
+  const uint64_t base = prefix << low_bits;
+  uint64_t *df = df_scratch;
+  for (int i = 0; i < low_bits; ++i) {
+    uint64_t d = lin[i] ^ fes_quad(quad_tri, i, i);
+    for (int j = 0; j < n; ++j) {
+      if (j != i && ((base >> j) & 1ULL)) d ^= fes_quad(quad_tri, i, j);
+    }
+    if (i > 0) d ^= qsym[i * n + (i - 1)];
+    df[i] = d;
+  }
+  uint64_t val = fes_eval(cst, lin, quad_tri, n, base);
+  if (val == 0) emit(base);
+  uint64_t dl[K], q[K][K], qc[K];
+#pragma unroll
+  for (int i = 0; i < K; ++i) {
+    dl[i] = df[i];
+    qc[i] = 0;
+#pragma unroll
+    for (int j = 0; j < K; ++j) q[i][j] = (i < j) ? qsym[i * n + j] : 0ULL;
+  }
+  const uint64_t nblocks = 1ULL << (low_bits - K);
+  for (uint64_t h = 0; h < nblocks; ++h) {
+    const uint64_t s0 = h << K;
+    const uint64_t point = base | fes_gray(s0);
+    if (h) {
+      const int c = K + fes_ctz(h);
+      const uint64_t rest = h & (h - 1);
+      if (rest) df[c] ^= qsym[c * n + K + fes_ctz(rest)];
+      val ^= df[c];
+      if (val == 0) emit(point);
+#pragma unroll
+      for (int j = 0; j < K; ++j) qc[j] = qsym[j * n + c];
+    }
+    fes_block_steps<K, 1>(dl, q, qc, h != 0, val, point, emit);
+  }
+}
+
+FES_HD void fes_search_subcube_block6(uint64_t cst, const uint64_t *lin,
+                                      const uint64_t *quad_tri,
+                                      const uint64_t *qsym, int n, int low_bits,
+                                      uint64_t prefix, uint64_t *out, int *found,
+                                      int max_out, uint64_t *df_scratch) {
+  FesArrayEmit emit{out, found, max_out};
+  fes_walk_block<6>(cst, lin, quad_tri, qsym, n, low_bits, prefix, df_scratch, emit);
 }
 
 // Default sub-cube split for the workers when no --low-bits is given: at
