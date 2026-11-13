@@ -1,5 +1,13 @@
 # Explicit public branch basis for the next corank proof
 
+Continuation: [NormBranchCoordinates](../coordinates-report/README.md), frozen
+source01e312a94, now constructs this public branch basis and proves the actual
+reduced radical, numerical corank and nonzero diagonal cofactor. Conditional
+recovery is instantiated on the actual reduced coefficient matrices. The
+original plan below is retained; its public-basis/rank/adjugate obligations
+are superseded by these checked statements. Full normalized norm/scalar
+attachment and the public-input finder remain open [pcc:unverified].
+
 Unproved continuation plan, not an additional formal result or search-cost
 claim [pcc:unverified].
 
