@@ -1,65 +1,68 @@
-# CT85 — Non-CM endomorphism rigidity and the hidden-log diagnostic
+# CT85 — Non-CM endomorphism rigidity and hidden-log diagnostic
 
-**Standing:** [pcc:unverified]. This is a fixed-curve algebraic obstruction for a restricted class of reconstructions, **not** a general lower bound for the selective global-lift problem and **not** a claim of ECDLP speedup.
+**Standing:** [pcc:unverified]. This is a fixed-curve algebraic obstruction for a restricted class of reconstructions, **not** a general complexity lower bound for global lifting.
 
-## Question and result
+## Mathematical question and theorem
 
-CT84 reconstructed an input-conditioned rational function (R(X)) from 37-adic source coordinates. Its exact global certificate identified (R(X)=x([2]T)). Does such recovery move the log computation exclusively to the binary destination? **No, when the recovered rational function is certified as the x-map of a globally defined elliptic-curve endomorphism.** The rational function itself exposes the multiplication magnitude.
+CT84 recovered a rational function \(R(X)\) from 37-adic source coordinates and certified \(R(X)=x([2]T)\). Does a recovered endomorphism x-map defer all DLP computation to the characteristic-two destination? **No:** after an exact global endomorphism certificate, the x-map's coefficient at infinity reveals the multiplication magnitude.
 
-For the CT80/84 model (E/mathbb{Q}: y^2+y=x^3-x^2-10x-20), its general-Weierstrass invariants are
-[
- c_4=496,qquad Delta=-161051=-11^5,qquad
- j(E)= -122023936/161051.
-]
-As (11
-mid496), this rational (j) is nonintegral. A complex-multiplication elliptic curve has algebraic-integral (j); therefore (E) has no CM and
-[
- operatorname{End}_{\overline{mathbb Q}}(E)=mathbb Z.
-]
-Consequently every nonzero global **group endomorphism** (f:E\to E) in characteristic zero is (f=[m]) for some nonzero integer (m). For the local parameter (t=-x/y) at the identity, ([m]^*t=mt+O(t^2)) while (x=t^{-2}+O(t^{-1})). Thus
-[
- oxed{x([m]T)= X/m^2+O(1)quad (X=x(T)\to\infty).}
-]
-If a certified endomorphism's reduced x-map is (A(X)/B(X)) with (deg A=deg B+1), its coefficient at infinity satisfies (operatorname{lc}(A)/operatorname{lc}(B)=1/m^2). It therefore reveals (|m|), and the oriented source ordinate separates (m) from (-m). On an order-seven subgroup this recovers (m\bmod7) before evaluating the map at the binary destination.
+For the CT80–84 model
+\[
+E/\mathbb Q:\quad y^2+y=x^3-x^2-10x-20,
+\]
+the general-Weierstrass invariants are
+\[
+c_4=496,\qquad \Delta=-161051=-11^5,\qquad j(E)=-122023936/161051.
+\]
+Since \(11\nmid496\), this rational \(j\) is not an integer. Every CM elliptic curve has algebraic-integral \(j\), so \(E\) is non-CM and
+\[
+\operatorname{End}_{\overline{\mathbb Q}}(E)=\mathbb Z.
+\]
+Every global **group endomorphism** \(f:E\to E\) in characteristic zero therefore has the form \([m]\). Using the local parameter \(t=-x/y\) at the identity,
+\[
+[m]^*t=mt+O(t^2),\qquad x=t^{-2}+O(t^{-1}).
+\]
+It follows that, as \(X=x(T)\to\infty\),
+\[
+\boxed{x([m]T)=X/m^2+O(1).}
+\]
+Consequently, for a **certified endomorphism** x-map \(A(X)/B(X)\), reduced with \(\deg A=\deg B+1\), the leading coefficient ratio equals \(1/m^2\). This reveals \(|m|\), and the oriented source ordinate determines the sign. On \(E[7]\), reduction of \(m\) modulo seven is the source DLP.
 
-**Scope:** This says *if* an input-conditioned recognizer returns an actual **global endomorphism** satisfying (f(P)=Q), it has already produced a representation encoding the source DLP. It does not forbid such a recognizer from being faster than rho, nor does it rule out more general algebraic-number expressions or point-specific functions that are **not** endomorphisms. The claim applies to maps of the entire elliptic curve, not merely assignments to seven torsion points.
+This is a **conditional rigidity statement**, not a theorem that a general selective p-adic number-field reconstruction must be expensive or must yield an endomorphism. A different algebraic method may yet be more efficient than rho. What cannot be done is charge the recovered global [m] map as a "free" representation change and then count binary DLP recovery as the first discovery of \(m\).
 
-## Two exact witnesses, independent of logarithm labels
+## Two exact witnesses
 
-Set
-[
- D=4X^3-4X^2-40X-79,quad
- psi_3=3X^4-4X^3-60X^2-237X-21,
-]
-and
-[
- f_4=2X^6-4X^5-100X^4-790X^3-210X^2-1496X-5821.
-]
-The exact multiplication-formula identities give
-[
-egin{aligned}
+Let
+\[
+D=4X^3-4X^2-40X-79,\quad
+\psi_3=3X^4-4X^3-60X^2-237X-21
+\]
+and \(f_4=2X^6-4X^5-100X^4-790X^3-210X^2-1496X-5821\).
+The classical division-polynomial formulas give
+\[
+\begin{aligned}
 x([2]T)&=\frac{(3X^2-2X-10)^2+(1-2X)D}{D},\\
 x([3]T)&=\frac{X\psi_3^2-Df_4}{\psi_3^2}.
-end{aligned}
-]
+\end{aligned}
+\]
 
-| Certified map | Numerator degree | Denominator degree | Leading ratio | Source x at 9 | Binary x |
+| Map | Numerator degree | Denominator degree | Leading ratio | Source x | Binary x |
 |---|---:|---:|---:|---:|---:|
-| [1] | 1 | 0 | 1 | 9 | 2 |
-| [2] | 4 | 3 | 1/4 | 27 | 17 |
-| [3] | 9 | 8 | 1/9 | 28 | 1562 |
+| \([1]\) | 1 | 0 | \(1\) | 9 | 2 |
+| \([2]\) | 4 | 3 | \(1/4\) | 27 | 17 |
+| \([3]\) | 9 | 8 | \(1/9\) | 28 | 1562 |
 
-Both independent programs reconstruct the integer coefficients and then test reductions in F37 and the *same* CT80 binary residue representation F_(2^12), using the irreducible polynomial (Z^{12}+Z^9+Z^5+Z^2+1). The F_(2^24) ordinate and full seven-target group tests remain covered by CT80; the CT85 scripts check x only, not all oriented binary ordinates. A negative point or an incorrect target embedding can have the same x, so **the x ratio alone cannot certify signed discrete logs**. CT80's fixed-place oriented group-law certificate is required for the ordinate/sign check.
+The independent Python and JavaScript programs construct these polynomials with separate integer-arithmetic code; both evaluate all three at the chosen source x-coordinate \(9\) over \(\mathbb F_{37}\), and at CT80's **same** binary residue of the global x-generator \(\alpha\) over \(\mathbb F_{2^{12}}\) (irreducible modulus \(Z^{12}+Z^9+Z^5+Z^2+1\)).
 
-This expands the independently checked global x-map degree control from CT84's [2] case to [3], the remaining nonzero x-coordinate class in the order-seven source subgroup. **It is not Padé/LLL recognition of [3] from a public target**, and the second map was explicitly constructed using classical division polynomials. It supplies a falsifiable diagnostic for future selective-recognition output.
+This expands the independently checked global x-map witness from CT84's doubling case to tripling, covering the remaining nonzero **x-coordinate class** in the order-seven source subgroup. It **does not** reconstruct tripling using LLL or prove an arbitrary-input recognizer. Full oriented binary \(y\)-coordinates and all seven recovered logs are tested separately by CT80; CT85's independent programs check x-coordinate relations only. Because \(x([m]T)=x([-m]T)\), the orientation/sign is **not** established by the leading-coefficient diagnostic alone.
 
-## Cross-factor implication for multi-hop chains (classical conditional gate)
+## Cross-factor obstruction for multi-hop chains (classical conditional statement)
 
-For a *globally* split abelian variety (J\sim E\times B) over a characteristic-zero field, with (B) containing no abelian subvariety isogenous to (E), (operatorname{Hom}(E,B)=0). Every composite (E\to J\to B) vanishes. A nonzero component into (B) requires (B) to contain an (E)-isogenous factor (or a failure of the claimed global splitting/field of definition). This **does not follow from a merely finite-field split reduction** and does not prohibit improvements inside a genuine isogenous factor. It is a filter for proposed genus-2/3 transfers, not new enumeration of all explicit covers.
+For a globally split abelian variety \(J\sim E\times B\) in characteristic zero, if \(B\) has no abelian factor isogenous to \(E\), then \(\operatorname{Hom}(E,B)=0\). Thus a composition from \(E\) into \(J\), followed by projection to the \(B\)-factor, vanishes. Nonzero cross-factor images require a shared isogeny factor, or else the purported global decomposition/field of definition is invalid. **A splitting observed only after reduction modulo a prime does not establish global splitting**. This is a mathematical filter, not a new computed classification of the native genus-two or genus-three maps in PR #3877.
 
-## Reproduction / observed checks
+## Reproduction
 
-```sh
+\`\`\`sh
 D=research/cross_characteristic_global_torsion_20261112/ct85
 python3 -B "$D/ct85_rigidity.py" >/tmp/ct85-py.json
 python3 -O -B "$D/ct85_rigidity.py" >/tmp/ct85-pyopt.json
@@ -69,17 +72,17 @@ cmp /tmp/ct85-py.json /tmp/ct85-pyopt.json
 cmp /tmp/ct85-py.json /tmp/ct85-js.json
 cmp /tmp/ct85-py.json /tmp/ct85-jsopt.json
 printf '%s  %s\n' c0e58ecce5818071114aead61c71114a59619ed60dbd4881bb604fb2cc55a148 /tmp/ct85-py.json | sha256sum -c
-```
+\`\`\`
 
-Producer-local Python normal/-O and Node normal/--no-opt completed and matched this SHA-256. The existing CT84 JavaScript syntax defect in the scoped CI was separately repaired in commit `034dfae0`, and its PR body PCC prose-lint citation was corrected; exact-head new workflow status and independent scientific signing are separate gates.
+All four producer-local modes completed and matched the pinned SHA256. These are locally run checks, **not** signed independent scientific PCC certification.
 
-## Prior work and remaining tasks
+### Governance and sources
 
-- Repository CT80, CT82, CT83, CT84; root crypto PR #3877, cryptanalysis PR #1523, and cross-char PR #4074.
-- Silverman, *The Arithmetic of Elliptic Curves*, III.4/III.7 (classical morphisms, division polynomials, endomorphisms and formal groups).
-- [MathWorld j-invariant formulas](https://mathworld.wolfram.com/j-Invariant.html) and [CM j algebraic integrality](https://www.math.columbia.edu/~calebji/CM-Final.pdf).
-- [Snowden, prime-to-characteristic torsion specialization](https://websites.umich.edu/asnowden/teaching/2013/679/L08.html).
-- [CT84 Padé/LLL and explicit height limitation](../ct84/CT84_SELECTIVE_PADE.md).
-- **KB unavailable:** shared research-KB MCP is absent from this runtime and a checked-out wrapper is unavailable; the repo reports, primary references and GitHub PRs are the fallback. No novelty claim for standard End=Z or multiplication identities.
+Prior repository reports: CT80–84; root [crypto PR #3877](https://github.com/isogeny-labs/crypto/pull/3877), [cryptanalysis PR #1523](https://github.com/isogeny-labs/cryptanalysis/pull/1523), and [cross-characteristic PR #4074](https://github.com/isogeny-labs/crypto/pull/4074).
+Classical background: Silverman, *Arithmetic of Elliptic Curves*, Chapter III; [Weierstrass j formula](https://mathworld.wolfram.com/j-Invariant.html); [CM j integrality](https://www.math.columbia.edu/~calebji/CM-Final.pdf); [prime-to-characteristic torsion reduction](https://websites.umich.edu/asnowden/teaching/2013/679/L08.html). No novelty claim for endomorphism rigidity, CM-integrality or division-polynomial formulas.
 
-**Next discriminating task:** reconstruct an arbitrary input's global **point** in the degree-48 field without assuming it comes from a low-degree multiplication endomorphism, and independently validate its minimal polynomial / source residue / binary residue at one fixed pair of primes. Record the search for degree and height bounds and all rejected short relations. On any candidate with a globally certified endomorphism, extract the leading coefficient before charging a separate binary DLP step, to avoid counting an already-recovered log as a speedup. No EKS or other paid compute was used.
+**KB unavailable** in this connector runtime; no research-KB MCP function or checked-out wrapper was accessible. Prior repo reports and referenced primary sources substituted, but this is an incomplete cross-repo survey.
+
+The CT84 scoped workflow initially failed because its independent JavaScript file had a syntax error at the binary source-curve assertion. Commit \`034dfae0\` repaired the error. Separately the prior PCC gate failed because one claim-bearing PR-body sentence lacked the mandated unverified tag; the sentence was corrected without weakening the lint. Exact-head CI/review and external scientific PCC verdict must be checked separately; no paid EKS or GPU compute, protected merge or speedup claim is made.
+
+**Next accepted experiment:** reconstruct arbitrary input-conditioned \(K\)-rational torsion points without assuming a small multiplication-polynomial degree, validate source and binary specializations with the **same fixed pair of places**, and account for coefficient heights, field construction, root selection, evaluation, and one-target solving. Whenever a globally certified endomorphism is returned, extract \(|m|\) from its leading coefficient before separately charging a destination DLP.
