@@ -1,0 +1,37 @@
+name: CT69 explicit degree-eight two-prime point field
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct69/**'
+      - '.github/workflows/ct69-pointfield.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct69-pointfield:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exact global Q-algebra and independent finite-field replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct69
+          python3 -B "$D/ct69_pointfield.py" > ct69-py.json
+          python3 -O -B "$D/ct69_pointfield.py" > ct69-py-opt.json
+          node "$D/ct69_pointfield_independent.js" > ct69-js.json
+          node --no-opt "$D/ct69_pointfield_independent.js" > ct69-js-noopt.json
+          cmp ct69-py.json ct69-py-opt.json
+          cmp ct69-py.json ct69-js.json
+          cmp ct69-py.json ct69-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.loads(Path('ct69-py.json').read_text())
+          assert t['global_point_degree']==8 and t['source_group_order']==30
+          assert t['target_group_order']==225 and t['recovered_dlogs']==[0,1,2]
+          assert t['root_lookup'] and not t['scalable']
+          print('CT69 exact toy two-prime point-field bridge passed; lookup not scalable')
+          PY
+          sha256sum ct69-py.json ct69-js.json
