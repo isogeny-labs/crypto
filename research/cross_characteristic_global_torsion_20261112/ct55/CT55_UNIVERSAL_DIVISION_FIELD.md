@@ -51,6 +51,31 @@ Normal/alternative-mode output matches bytewise for each language. All 9 source 
 
 These are **finite-stage and exact algebra controls**, not independent global division-field construction or a full end-to-end measured solve. The previously committed CT51 tests provide a separate explicit 3-torsion lift in degree eight, but the CT55 models are different and were not transferred by the programs in this directory.
 
+## Explicit positive and falsifying toy controls
+
+The **genuine global** three-torsion control is the first CRT curve at (p,ell)=(5,3):
+
+    Etilde/Q : y² + 5y = x³ + 6,
+    T=(0,1), [2]T=(0,-6), [3]T=O.
+
+Both primes 5 and 2 are good. The three exact rational points O,T,2T reduce to three distinct group elements modulo 5 and 2. The transfer is a homomorphism on all nine ordered addition pairs, and independently implemented finite-field target solvers recover all three planted public logarithms. This is an explicit **3-element** prime-to-binary DLP test, not scalable. Python recomputes rational additions using Fraction arithmetic; JavaScript independently checks all source and destination group laws and logs.
+
+The **naive coordinate-lift falsifier** is the second CRT curve at (p,ell)=(7,5):
+
+    Etilde/Q : y² + 7y = x³ + 8x + 8,
+    R=(0,1).
+
+The rational coordinate point R is on Etilde and its reduction R7=(0,1) on E(F7) has **order 5**. Yet the same coordinate point reduces to R2=(0,1) on E0(F2), which has **order 3**; a rational calculation also confirms [5]R != O on Etilde(Q). Thus the map that merely lifts a source point's coordinates into an integral model and reduces again **does not preserve the original subgroup order or its logarithms**. The unique *ell-torsion* global lift in the full division field is a different algebraic point. Independent Python/JS negative controls reject this incorrect shortcut.
+
+Reproduce:
+
+    python3 -B research/cross_characteristic_global_torsion_20261112/ct55/ct55_toy_controls.py
+    python3 -O -B research/cross_characteristic_global_torsion_20261112/ct55/ct55_toy_controls.py
+    node research/cross_characteristic_global_torsion_20261112/ct55/ct55_toy_independent.js
+    node --no-opt research/cross_characteristic_global_torsion_20261112/ct55/ct55_toy_independent.js
+
+All modes passed locally and the first two result lines match between independent implementations. Scientific status remains [pcc:unverified]; the toy success does not solve the encoded-input global lift.
+
 ## Asymptotic obstruction and missing implementation
 
 ord_ell(-2) | ell-1, so f_full <= 2(ell-1). This bound does not provide a uniform polylogarithmic guarantee. Examples with f_full=44 (ell=23) and 72 (ell=37) already show linear-sized binary field degrees at those orders. Full division-field degree has a general O(ell^4) upper bound and attains that order for full mod-ell Galois images; this is **not** a lower bound for all engineered low-image families. This construction supplies no lift of arbitrary *encoded* points in time poly(log ell), and no complete source-to-target solver or matched-rho advantage.
