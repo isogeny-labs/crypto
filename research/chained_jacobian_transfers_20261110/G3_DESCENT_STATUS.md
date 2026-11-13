@@ -1,40 +1,17 @@
-# Current G3 checkpoint — original unit failure retained,model repair frozen
+# Current G3 checkpoint — complete encoded-point native map
 
-Protocol394e14/de0b472 preceded code. Strict all-targets static03 passes8c3b6a;
-static01/02 fail604a22/65bae1 and remain whole. NativeUNIT01 is COMPLETE
-original2026-11-13T04:45:15Z→04:49:45Z/101/fourfailed/zero passed/ignored/
-filtered/all807 hashes unchanged,7f48f6. ALL failures occur at historical
-quartic model matching BEFORE point tests. FreezeENDED;no native process.
-No full-point/ideal/group acceptance yet. [pcc:unverified]
+Protocol394e14/de0b472 preceded implementation. Nativeunit03c162f3 (whole2c86a8) COMPLETE original05:39:45→05:45:34UTC/native0/guard0/all811 including794 prior inputs unchanged;fourtestsPASS/zeroignoredfiltered. All148/356/1324 source coordinates andFp6 fibre/localjet cubicspace+class comparisons;generatingedges592/1424/5296;odd scalarimages37/89/331/exactorders;observedevenkernel2each. Exactrationalbranches0/4/4 plusALL12 geometric branchpoints with actual localindex2/nonzero doubled-fibre jet. [pcc:unverified]
 
-Lean02 d9f9f6 passes original4.35 kernel+audit:9 named declarations plus3
-repeatAdd generated helpers=12 audited,zero trusted;all796guards0. Same
-statements as failed01/224f01,explicitmodulelaws replace failed genericgrind.
-Actual curves/Picard/Cartier/Galois/reducer bridges remain written/native.
-Exact PCC theorem bindings still pending scientific source checkpoint.
-[pcc:unverified]
+Model6a3cfe andcoverage d664a3 were frozen BEFORE their corrective code/runs. Originalscalar-only Moore assumption failsunit01 7f48f6;explicit full quartic basis identity repairs it. Unit02b8e858is3pass1fail(false per-field rationalbranch expectation);all-nine diagnostic69e6a0 explainsq5nonsquare norms3/2. Allprimaryfixtures/oldfourtests/completeinputs retained. Static04strict0a50c9passes. [pcc:unverified]
 
-Corrective pcc/claims/PCC-20261113-6a3cfe.json freezes G3_MODEL_TRANSPORT_ADDENDUM.md BEFORE corrected
-code/unit02. Actual original builder source a10f0d2d uses primitive gamma=g+s
-for Moore basis,whereas Diem uses polynomial g. Preserve exact cubic basis
-and u coefficients;recover original s,validate FULL actual historical
-quartic(B_s W)=nonzero scalar*corequartic,transport cover inverse byB_s^-1,
-use historical target coefficients. Separate FpR6 oracle builds gamma rows
-directly. All3fixtures/4tests/15minbound/negativecriteria unchanged.
-Proposed repair is not yet implemented or accepted. [pcc:unverified]
+CLI188d44/whole6849fe COMPLETE originalnative0/guard0/all820;THREErequests9points andEIGHTactualexit2 processcontrols/nooutput/overwritebytepreservation. Localproofscopee6590f:9named+3generated12audited Descent/2ModelTransport/zero trusted;ALL11exactoriginalPCCbindings locallypass. Actualcurves/Picard/Cartier/Galois/reducer bridges explicit inG3_PROOF_MAP.md. ReportTHREEfinal50024PDFpages ALL inspected;reports/genus3-complete-native-01. [pcc:unverified]
 
-FOUR whole original oversized raw archives staged:static01/02/03
-462844/462020/463208 bytes via75e2dd;failedunit01 460872bytes. Exact source/
-command/outputs/exits/finalguards/memberrawarchivehash/roundtrip,cacheoutside.
-Existing trusted-base upload/whole remote replay/realmanifest/normalbot
-PENDING;no fake pointer/split/prune/direct unhydrated raw proof subject.
-Lean01 whole41916 andLean02 whole41688 small archives retained directly.
-Earlier active paragraphs in journals/handoffs remain historical.
-[pcc:unverified]
+FOURpreviouswhole rawobjects ACTUALLYpublished0775c2:trusted-base43370167545/job131703822791 FOURremote byte replays BEFOREnormalbotf95/directparenteab/exact8paths/normalFF0/artifact0/wiring0. LatestFOURwhole static04/unit02/unit03/CLI archives plus0775c2whole74964byte publicationarchive are separately PENDING genuine migration. Exact latter proofsubject gets data-only hydration in BOTHrootPCCgate/sign using originalhelper;no verifier/trust/policy edits. [pcc:unverified]
 
-NEXT:publish this metadata/raw recovery checkpoint,then implement frozen
-coordinate transport and run nativeunit02 with fresh cache and unchanged
-full criteria. Add faithful cleared model-transport Lean lemma;complete exact
-bindings/reports/CLI/scientific source commit/consumer replay. No native
-process in flight now. Rootmain frozen-ledger/signing/merge,budget/checkpoint,
-KB127/vault gaps remain;no paid benchmark or cost claim. [pcc:unverified]
+Focused integration2d6fec/whole d0004b COMPLETE:originalnative/driver/finalportable/outerguards0,all341selectedhashes unchanged,TWENTYpipepairs[0,0],all4native/9CLI/2proofmodules14auditedincl3generated0trusted/11exactbindings. Sourcefreeze for focused run ENDED. Requiredroot01 original124 after900seconds coldcompile atcrypto BEFOREtests,all2133guards0,wholeae818d9277888bytes;NOTgreen. Original341selectedmanifest is immutable;actual originaltrusttxtfiles separately covered bysimultaneous2133guard spanningfocusedrun. [pcc:unverified]
+
+ACTIVE requiredroot02 warmcorrectnessresume91d775: /workspace/scratch/ct55-g3-root-regression-02.sh,rawsameprefixdir,1800seconds from06:14UTC,SAMEunfiltered originalcommand/source/compiler/Cargo;REUSEroot01cache explicitly,no coldcostclaim. Require originalterminal/all2133guards;do not edit selectedsource. Latest7wholeobjects (5in78330bplus2integrationhandoff) PENDING actual remote replay. IntegrationreportONEfinal33148PDFpage ALL inspected. [pcc:unverified]
+
+DedicatedfocusedCIcontract6b95c7 addsoneworkflow;WHOLEoldroot4job andconsumer6job workflows unchanged. Sourcecheckpoint/push triggersnew job;actualCIseparatepending. Global05:44 rootmergeablefalse/no reviews/threads,child1520andparent1519readyopen/unlanded;nextglobal09:44unlessconcretesignal. Mainfrozenledger/signing/merge and actualbenchmarkbudget/checkpoint gaps remain. KB127/vault8edec422 unchanged. No paid benchmark. [pcc:unverified]
+
+NEXT:originalfocused/rootterminal,latestwhole raw publication,scientific sourcecommit/updatePR3877+queue3904;independentcryptanalysis consumer. Reviewnextnormroute fromcanonicalPicard degree3 representative viaoriginal quotient algebra and original polynomial roots;this is a proposed independent actualnorm,not implemented or accepted. Then destinationIC/chargedcostcomparison when admitted. PreviousC0/T20full/ALL6CI/ALL4rawcomplete stayssettled.

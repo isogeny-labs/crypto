@@ -1,3 +1,11 @@
+Current canonical G3 checkpoint: completeunitc162f3/CLI188d44/focused2d6fec (20native+teepairs0/341guards0)/11exactformalbindings e6590f. Native3page50024PDF andintegration1page33148PDF ALL inspected. Rootcold01timeout124beforetests retained;root02warmresume91d775 ACTIVE/1800s/2133sourcefreeze. LatestSEVENwhole rawobjects pending actualmigration. See G3_DESCENT_STATUS.md. Earlier CURRENT/ACTIVE text below is historical. [pcc:unverified]
+
+---
+
+Current canonical G3 checkpoint: see G3_DESCENT_STATUS.md. Completeunit03c162f3/CLI188d44/local11exactformalbindings e6590f/THREEinspectedPDFpages. Originalfocused341guards and requiredrootregression ACTIVE;latest5raw publication/sourcecheckpoint pending. Oldunit01failure andunit02partial retained with frozenrepairs. Earlier CURRENT/ACTIVE text below is HISTORICAL, superseded here. [pcc:unverified]
+
+---
+
 Current task — G3 complete encoded-point descent, protocol-first
 
 Source review/proposal pcc/claims/PCC-20261113-394e14.json;nineteen exact sources,firstsplit q5/7/11 fixtures

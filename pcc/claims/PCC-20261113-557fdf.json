@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:13:10Z",
+ "id": "PCC-20261113-557fdf",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "3dadb5f036bf1a1e65b605a3602287f3fc09182e854b98bc75ccc32674a53168",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+   "theorem": "G3PrimeDescent.unique_finite_zero_parameter"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem unique_finite_zero_parameter {K : Type} [CommRing K] (t alpha beta inverse : K) (unit : inverse*alpha=1) (finite_root : alpha*t+beta=0) : t= -inverse*beta"
+}

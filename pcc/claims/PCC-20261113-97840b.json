@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:13:03Z",
+ "id": "PCC-20261113-97840b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "c026923f729c8b3318ce36be7ab6b793e1a34a74bb5743a7305bf8231063de44",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+   "theorem": "G3PrimeDescent.actual_finite_zero_branch"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem actual_finite_zero_branch {K : Type} [CommRing K] (t B s alpha beta y x Y : K) (finite_root : alpha*t+beta=0) (ordinate_y : y= -(t^2+B*t+s)) (abscissa : x=2*(y+t^2+B*t+s)) (ordinate_Y : Y=2*x*t+B*x+alpha) : y^2=(t^2+B*t+s)^2+alpha*t+beta \u2227 x=0 \u2227 Y=alpha"
+}

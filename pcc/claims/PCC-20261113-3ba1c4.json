@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T05:12:37Z",
+ "id": "PCC-20261113-3ba1c4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eab262e36c633668ac0550254eb90679f7283bc6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "731004b0921205ee84d858dd450dbdab1b196f4df00b2c9cb448c6dc12e41742",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/genus3-prime-descent/lean/Descent.lean",
+   "theorem": "G3PrimeDescent.quartic_to_weierstrass"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "G3 complete encoded-point descent algebra and conditional group implications plus exact primitive-shift coordinate algebra. Actual curves/Picard/Cartier-ideal products/Galois descent/cover and reducer identification remain written/native bridges. Not full geometric formalization or acceptance of the initially failed native model. Local binding/kernel results remain unsigned until main CI verdict.",
+ "statement": "theorem quartic_to_weierstrass {K : Type} [CommRing K] (t y B s alpha beta x Y : K) (curve : y^2=(t^2+B*t+s)^2+alpha*t+beta) (abscissa : x=2*(y+t^2+B*t+s)) (ordinate : Y=2*x*t+B*x+alpha) : Y^2=x^3+(B^2-4*s)*x^2+(2*B*alpha-4*beta)*x+alpha^2"
+}

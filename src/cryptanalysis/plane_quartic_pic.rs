@@ -668,6 +668,20 @@ impl PlaneQuartic {
         out
     }
 
+    /// Access to the existing counted linear kernel for divisor adapters.
+    pub fn linear_kernel(&self, eqs: Vec<Vec<u32>>, n: usize) -> Vec<Vec<u32>> {
+        assert!(eqs.iter().all(|row| row.len() == n));
+        assert!(eqs.iter().flatten().all(|&c| c < self.q));
+        self.nullspace(eqs, n)
+    }
+
+    /// Complete a degree-six divisor's generating space and extract its cubics.
+    /// The original completeness and rank requirements apply unchanged.
+    pub fn cubic_space_deg6(&self, z6: &Gen) -> Vec<Vec<u32>> {
+        let (k, w) = self.complete(z6.clone(), 6);
+        self.forms_through(&w, k, 3)
+    }
+
     fn quot_from(&self, mut rows: Vec<Vec<u32>>, n: usize) -> Quot {
         let piv = self.rref(&mut rows, n);
         let mut free_rank = vec![None; n];
