@@ -1,7 +1,8 @@
 module
 public section
 namespace CoverGraph
-variable {U X : Type*}
+universe u v
+variable {U : Type u} {X : Type v}
 
 /-- Original variables, with all residuals evaluated at the prescribed image. -/
 @[expose] def Original (phi : U → X) (residual : U → X → Prop) :=
