@@ -46,3 +46,16 @@ quotient-coordinate and coefficient declarations. More exact library lookup and
 a faithful Lean proof are owed before promotion. No priority is asserted for
 this standard CRT/quotient-pairing route. Even complete certificate existence
 would not compute the moments from public data: that finder remains essential.
+
+## 2026-11-13 continuation
+
+The CRT/remainder/weighted identities and the general bounded polynomial
+block radical are now Lean components in NormCRTReciprocity and
+NormPairingRadical, with fresh replay and tracked-source receipts. An abstract
+branch-test lemma is also supplied. See ../crt-report/README.md for exact
+hypotheses, source commits, failed attempts and unsigned standing. The original
+plan above is retained as the pre-proof prediction [pcc:unverified].
+
+Actual coefficient-matrix/pencil membership, monic normalization, concrete
+branch intersection, degree charts and the public-input finder are still open;
+the new results must not be treated as their completion [pcc:unverified].
