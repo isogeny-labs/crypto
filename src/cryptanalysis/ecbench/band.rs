@@ -194,6 +194,48 @@ pub fn is_non_operation(name: &str) -> bool {
     NON_OPERATION_COUNTERS.contains(&name)
 }
 
+/// Unpriced counters that count base-field (or mod-`r`) multiplications and
+/// squarings: the "mulmod class" of AGENTS.md §5a (owner, 2026-11-12).  A
+/// calibrated reading ([`WCal`]) prices exactly these at `0`, `w_cal` and
+/// `10·w_cal` GAE; every other native counter keeps the band.  Listed by
+/// name, like [`NON_OPERATION_COUNTERS`], so committed records are read
+/// unchanged.  Inversions, square roots, additions, row operations and the
+/// lumped `field_arithmetic_uncharged` / `modular_combination_uncharged`
+/// tallies are not single multiplications and are left to the band; byte
+/// counters are never in this class.
+pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
+    "factor_base_fp_muls_uncharged",
+    "root_search_field_muls_uncharged",
+    "oracle_fp_muls_uncharged",
+    "native_field_muls_uncharged",
+    "native_field_sqrs_uncharged",
+    "linalg_mulmods_uncharged",
+    "smoothness_field_muls_uncharged",
+    "endomorphism_field_muls_uncharged",
+    "transfer_field_muls_uncharged",
+    "scalar_mulmod_uncharged",
+    "lift_field_multiplies_uncharged",
+    "lift_field_squares_uncharged",
+    "min_key_field_squares_uncharged",
+    "base_point_sqrt_field_multiplications_uncharged",
+    "aps_f4_multiplications_uncharged",
+    "aps_root_multiplications_uncharged",
+    "aps_core_expression_multiplications_uncharged",
+    "pkm_grid_fp_mults_uncharged",
+    "pkm_system_fp_mults_uncharged",
+    "pkm_shared_poly_fp_mults_uncharged",
+    "pkm_trace_learn_spec_fp_mults_uncharged",
+    "pkm_t0_target_fp_mults_uncharged",
+    "pkm_t0_base_map_fp_mults_uncharged",
+    "pkm_base_check_fp_mults_uncharged",
+];
+
+/// Whether `name` is a field-multiplication counter ([`FIELD_ARITHMETIC_COUNTERS`]).
+/// Memory-size counters are not: the two classes are disjoint.
+pub fn is_field_arithmetic(name: &str) -> bool {
+    FIELD_ARITHMETIC_COUNTERS.contains(&name) && !is_non_operation(name)
+}
+
 /// The unpriced counters of `r` that the band charges per operation: every
 /// entry of [`unpriced_counts`] except [`NON_OPERATION_COUNTERS`].
 pub fn priced_counts(r: &Record) -> BTreeMap<String, Option<u64>> {
@@ -408,6 +450,71 @@ pub struct BandReport {
     pub priced_table_work: Vec<String>,
     pub rows: Vec<BandRow>,
     pub ranks: Vec<BandRank>,
+    /// The calibrated reading of AGENTS.md §5a (2026-11-12), present only
+    /// when a [`WCal`] was supplied; absent otherwise, so the serialised
+    /// report is byte-identical to the one written before it existed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedReport>,
+}
+
+/// The calibrated per-host weight of AGENTS.md §5a: the time of one native
+/// mulmod divided by the time of one group addition on the same curve and
+/// host, with the method that measured it.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct WCal {
+    pub w_cal: f64,
+    /// `perf-ipc` (hardware counters on an isolated host) or
+    /// `best-of-N timing` (a labelled timing, never called perf-ipc).
+    pub method: String,
+    pub host: String,
+}
+
+/// The two labels a [`WCal`] may carry.
+pub const WCAL_METHODS: [&str; 2] = ["perf-ipc", "best-of-N timing"];
+
+impl WCal {
+    pub fn validate(&self) -> Result<(), String> {
+        if !(self.w_cal.is_finite() && self.w_cal > 0.0) {
+            return Err(format!("w_cal must be finite and > 0, got {}", self.w_cal));
+        }
+        if !WCAL_METHODS.contains(&self.method.as_str()) {
+            return Err(format!(
+                "w_cal method {:?} must be one of {WCAL_METHODS:?}",
+                self.method
+            ));
+        }
+        if self.host.trim().is_empty() {
+            return Err("w_cal host must be named".into());
+        }
+        Ok(())
+    }
+}
+
+/// One pair on one curve under the calibrated reading.
+#[derive(Clone, Debug, Serialize)]
+pub struct CalibratedPair {
+    pub curve: String,
+    pub a: String,
+    pub b: String,
+    /// Order at field weight `0`, `w_cal` and `10·w_cal`, other native
+    /// counters taking every weight of the band (the order must hold at
+    /// each).
+    pub order_at: BTreeMap<String, String>,
+    /// The same order at all three weights, strictly.
+    pub ranked_at_calibrated_price: bool,
+    /// The band verdict, repeated so both read side by side.
+    pub band_verdict: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct CalibratedReport {
+    pub w_cal: f64,
+    pub method: String,
+    pub host: String,
+    /// The field weights the orders were evaluated at: `[0, w_cal, 10·w_cal]`.
+    pub field_weights: Vec<f64>,
+    pub field_counters: Vec<String>,
+    pub pairs: Vec<CalibratedPair>,
 }
 
 /// The band report over `records` (warm-ups ignored), default pricing.
@@ -421,6 +528,77 @@ pub fn band_with(
     weights: &[f64],
     pricing: Pricing,
 ) -> Result<BandReport, String> {
+    band_with_wcal(records, weights, pricing, None)
+}
+
+/// Per-arm sums for the calibrated reading: over the verified runs,
+/// `Σ (G − C)`, the operations of the non-field native work (`U_other +
+/// n_C`) and of the field-arithmetic class, with whether each is fully
+/// counted.
+#[derive(Clone, Copy, Debug, Default)]
+struct SplitSums {
+    charged: f64,
+    other: u64,
+    field: u64,
+    other_ok: bool,
+    field_ok: bool,
+    n: usize,
+}
+
+fn split_sums(ok: &[&&Record], pricing: Pricing) -> Result<SplitSums, String> {
+    let mut t = SplitSums {
+        other_ok: true,
+        field_ok: true,
+        n: ok.len(),
+        ..Default::default()
+    };
+    for r in ok {
+        let (c, n_c) = calibrated_native(r)?;
+        t.charged += r.cost.total_gae.unwrap_or(0.0) - c;
+        t.other += n_c;
+        for (name, v) in priced_counts_with(r, pricing) {
+            let slot_ok = if is_field_arithmetic(&name) {
+                &mut t.field_ok
+            } else {
+                &mut t.other_ok
+            };
+            match v {
+                Some(n) if is_field_arithmetic(&name) => t.field += n,
+                Some(n) => t.other += n,
+                None => *slot_ok = false,
+            }
+        }
+        if r.cost.total_gae.is_none() {
+            t.other_ok = false;
+        }
+    }
+    Ok(t)
+}
+
+/// Mean priced `S` of an arm with the field class at `wf` and every other
+/// native counter at `wo`; `None` where an uncounted class would be priced
+/// above zero.
+fn split_mean_s(t: &SplitSums, sqrt_r: f64, wf: f64, wo: f64) -> Option<f64> {
+    if t.n == 0 || (wo > 0.0 && !t.other_ok) || (wf > 0.0 && !t.field_ok) {
+        return None;
+    }
+    Some((t.charged + wo * t.other as f64 + wf * t.field as f64) / t.n as f64 / sqrt_r)
+}
+
+/// [`band_with`] plus, when `wcal` is given, the calibrated reading of
+/// AGENTS.md §5a (2026-11-12): every pair's order with the
+/// [`FIELD_ARITHMETIC_COUNTERS`] priced at `0`, `w_cal` and `10·w_cal`
+/// while every other native counter keeps the band `weights`.  With
+/// `wcal = None` the report is exactly [`band_with`]'s.
+pub fn band_with_wcal(
+    records: &[Record],
+    weights: &[f64],
+    pricing: Pricing,
+    wcal: Option<&WCal>,
+) -> Result<BandReport, String> {
+    if let Some(w) = wcal {
+        w.validate()?;
+    }
     let mut by: BTreeMap<(String, String), Vec<&Record>> = BTreeMap::new();
     for r in records.iter().filter(|r| !r.warmup) {
         by.entry((r.workload.curve.slug.clone(), r.arm.clone()))
@@ -500,6 +678,7 @@ pub fn band_with(
             .then(a.arm.cmp(&b.arm))
     });
     let mut ranks = Vec::new();
+    let mut cal_pairs = Vec::new();
     for (i, a) in rows.iter().enumerate() {
         for b in rows[i + 1..].iter().filter(|b| b.curve == a.curve) {
             let verdict = if a.verified < a.runs || b.verified < b.runs {
@@ -523,6 +702,53 @@ pub fn band_with(
                     _ => "unresolved inside the band".to_string(),
                 }
             };
+            if let Some(w) = wcal {
+                let sums = |row: &BandRow| -> Result<SplitSums, String> {
+                    let rs = &by[&(row.curve.clone(), row.arm.clone())];
+                    let ok: Vec<&&Record> = rs.iter().filter(|r| r.counts()).collect();
+                    split_sums(&ok, pricing)
+                };
+                let (sa, sb) = (sums(a)?, sums(b)?);
+                let complete = a.verified == a.runs && b.verified == b.runs;
+                let sqrt_r =
+                    (by[&(a.curve.clone(), a.arm.clone())][0].workload.curve.r as f64).sqrt();
+                let mut order_at = BTreeMap::new();
+                let mut dirs = Vec::new();
+                for (label, wf) in [("0", 0.0), ("w_cal", w.w_cal), ("10*w_cal", 10.0 * w.w_cal)] {
+                    let (mut lt, mut gt, mut known) = (true, true, complete);
+                    for &wo in weights {
+                        match (
+                            split_mean_s(&sa, sqrt_r, wf, wo),
+                            split_mean_s(&sb, sqrt_r, wf, wo),
+                        ) {
+                            (Some(x), Some(y)) => {
+                                lt &= x < y;
+                                gt &= x > y;
+                            }
+                            _ => known = false,
+                        }
+                    }
+                    let (text, dir) = if !known {
+                        ("unrankable".to_string(), 0i8)
+                    } else if lt {
+                        (format!("{} < {}", a.arm, b.arm), -1)
+                    } else if gt {
+                        (format!("{} < {}", b.arm, a.arm), 1)
+                    } else {
+                        ("flips".to_string(), 0)
+                    };
+                    order_at.insert(label.to_string(), text);
+                    dirs.push(dir);
+                }
+                cal_pairs.push(CalibratedPair {
+                    curve: a.curve.clone(),
+                    a: a.arm.clone(),
+                    b: b.arm.clone(),
+                    order_at,
+                    ranked_at_calibrated_price: dirs[0] != 0 && dirs.iter().all(|d| *d == dirs[0]),
+                    band_verdict: verdict.clone(),
+                });
+            }
             ranks.push(BandRank {
                 curve: a.curve.clone(),
                 a: a.arm.clone(),
@@ -541,6 +767,17 @@ pub fn band_with(
         priced_table_work: pricing.priced_table_work(),
         rows,
         ranks,
+        calibrated: wcal.map(|w| CalibratedReport {
+            w_cal: w.w_cal,
+            method: w.method.clone(),
+            host: w.host.clone(),
+            field_weights: vec![0.0, w.w_cal, 10.0 * w.w_cal],
+            field_counters: FIELD_ARITHMETIC_COUNTERS
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+            pairs: cal_pairs,
+        }),
     })
 }
 
@@ -582,6 +819,29 @@ pub fn markdown(rep: &BandReport) -> String {
             "\nTable work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): {}; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.\n",
             rep.priced_table_work.join(", ")
         ));
+    }
+    if let Some(c) = &rep.calibrated {
+        s.push_str(&format!(
+            "\nCalibrated reading (AGENTS.md §5a, 2026-11-12): w_cal = {} GAE per field multiplication, method {}, host {}; field-arithmetic counters priced at 0, w_cal, 10*w_cal, other native work over the band. The band verdict above still governs.\n\n| curve | pair | order at 0 | at w_cal | at 10*w_cal | ranked at calibrated price | band verdict |\n|:--|:--|:--|:--|:--|:--|:--|\n",
+            c.w_cal, c.method, c.host
+        ));
+        for p in &c.pairs {
+            s.push_str(&format!(
+                "| {} | {} vs {} | {} | {} | {} | {} | {} |\n",
+                p.curve,
+                p.a,
+                p.b,
+                p.order_at["0"],
+                p.order_at["w_cal"],
+                p.order_at["10*w_cal"],
+                if p.ranked_at_calibrated_price {
+                    "yes"
+                } else {
+                    "no"
+                },
+                p.band_verdict
+            ));
+        }
     }
     s
 }
@@ -1018,5 +1278,183 @@ mod tests {
         }
         assert!(!is_non_operation("hash_probes_uncharged"));
         assert!(!is_non_operation("residual_table_entries"));
+    }
+    // ── Calibrated reading (AGENTS.md §5a, 2026-11-12) ────────────────
+
+    fn session(rel: &str) -> Vec<Record> {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(rel);
+        crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap()
+    }
+
+    fn wcal(w: f64) -> WCal {
+        WCal {
+            w_cal: w,
+            method: "best-of-N timing".into(),
+            host: "test-host".into(),
+        }
+    }
+
+    /// Without `w_cal` the serialised band is exactly `band_with`'s and has
+    /// no `calibrated` key; with it, every other field is unchanged.  Three
+    /// committed sessions of different families.
+    #[test]
+    fn without_w_cal_the_band_output_is_unchanged_on_committed_records() {
+        for rel in [
+            "research/ic_planner_validation_20261020/sessions/r24",
+            "research/ic_planner_validation_20261020/sessions/c24",
+            "research/ic_planner_validation_20261020/sessions/r26",
+        ] {
+            let recs = session(rel);
+            for pricing in [Pricing::default(), Pricing::pre_2026_11_08()] {
+                let old = serde_json::to_string_pretty(
+                    &band_with(&recs, &DEFAULT_WEIGHTS, pricing).unwrap(),
+                )
+                .unwrap();
+                let none = serde_json::to_string_pretty(
+                    &band_with_wcal(&recs, &DEFAULT_WEIGHTS, pricing, None).unwrap(),
+                )
+                .unwrap();
+                assert_eq!(old, none, "{rel}");
+                assert!(!old.contains("calibrated"), "{rel}");
+                let w = wcal(0.01);
+                let with = band_with_wcal(&recs, &DEFAULT_WEIGHTS, pricing, Some(&w)).unwrap();
+                let mut v = serde_json::to_value(&with).unwrap();
+                assert!(v.as_object_mut().unwrap().remove("calibrated").is_some());
+                assert_eq!(
+                    v,
+                    serde_json::from_str::<serde_json::Value>(&old).unwrap(),
+                    "{rel}: additive only"
+                );
+            }
+        }
+    }
+
+    /// Two arms on one curve from a committed record: `ic` has `g_ic` GAE
+    /// and `muls` field multiplications, `rho` has `g_rho` GAE and nothing
+    /// unpriced.
+    fn synth(g_ic: f64, muls: u64, g_rho: f64, extra: &[(&str, u64)]) -> Vec<Record> {
+        let mut base = session("research/ic_planner_validation_20261020/sessions/r24")
+            .into_iter()
+            .find(|r| r.counts() && r.cost.total_gae.is_some() && !r.warmup)
+            .unwrap();
+        if let Some(o) = base.detail.as_object_mut() {
+            o.remove("calibration_pinned_units");
+        }
+        base.solver = None;
+        base.counters.clear();
+        let mut ic = base.clone();
+        ic.arm = "ic".into();
+        ic.cost.total_gae = Some(g_ic);
+        ic.cost.unpriced = vec!["linalg_mulmods_uncharged".into()];
+        ic.counters.insert("linalg_mulmods_uncharged".into(), muls);
+        for (n, v) in extra {
+            ic.cost.unpriced.push(n.to_string());
+            ic.counters.insert(n.to_string(), *v);
+        }
+        let mut rho = base;
+        rho.arm = "rho".into();
+        rho.cost.total_gae = Some(g_rho);
+        rho.cost.unpriced = vec![];
+        vec![ic, rho]
+    }
+
+    fn pair(rep: &BandReport) -> &CalibratedPair {
+        &rep.calibrated.as_ref().unwrap().pairs[0]
+    }
+
+    #[test]
+    fn order_flipping_in_the_band_but_holding_at_calibrated_price_is_ranked() {
+        // ic = 100 + 1500 w, rho = 200 (S scaled alike): ic < rho at w = 0,
+        // but not at the band's 0.1 and 1.
+        let recs = synth(100.0, 1500, 200.0, &[]);
+        let rep = band_with_wcal(
+            &recs,
+            &DEFAULT_WEIGHTS,
+            Pricing::default(),
+            Some(&wcal(0.005)),
+        )
+        .unwrap();
+        assert_eq!(rep.ranks[0].verdict, "unresolved inside the band");
+        let p = pair(&rep);
+        assert!(p.ranked_at_calibrated_price, "{p:?}");
+        assert_eq!(p.order_at["0"], "ic < rho");
+        assert_eq!(p.order_at["w_cal"], "ic < rho");
+        assert_eq!(p.order_at["10*w_cal"], "ic < rho");
+        assert_eq!(p.band_verdict, "unresolved inside the band");
+    }
+
+    #[test]
+    fn order_flipping_at_ten_times_w_cal_is_not_ranked() {
+        let recs = synth(100.0, 1500, 200.0, &[]);
+        // 10 w_cal = 0.1: ic = 250 > 200.
+        let rep = band_with_wcal(
+            &recs,
+            &DEFAULT_WEIGHTS,
+            Pricing::default(),
+            Some(&wcal(0.01)),
+        )
+        .unwrap();
+        let p = pair(&rep);
+        assert!(!p.ranked_at_calibrated_price, "{p:?}");
+        assert_eq!(p.order_at["0"], "ic < rho");
+        assert_eq!(p.order_at["10*w_cal"], "rho < ic");
+    }
+
+    #[test]
+    fn other_native_counters_keep_the_band_under_the_calibrated_reading() {
+        // 1000 non-field probes: priced at 0.1 and 1 they flip the order
+        // whatever w_cal is, so the pair is not ranked at calibrated price.
+        let recs = synth(100.0, 10, 200.0, &[("test_probes_uncharged", 1000)]);
+        let rep = band_with_wcal(
+            &recs,
+            &DEFAULT_WEIGHTS,
+            Pricing::default(),
+            Some(&wcal(0.005)),
+        )
+        .unwrap();
+        let p = pair(&rep);
+        assert!(!p.ranked_at_calibrated_price, "{p:?}");
+        assert_eq!(p.order_at["w_cal"], "flips");
+    }
+
+    #[test]
+    fn the_field_class_excludes_byte_counters_and_is_never_priced_from_them() {
+        for n in FIELD_ARITHMETIC_COUNTERS {
+            assert!(n.ends_with("_uncharged"), "{n}");
+            assert!(!is_non_operation(n) && !n.contains("bytes"), "{n}");
+            assert!(is_field_arithmetic(n));
+        }
+        for n in NON_OPERATION_COUNTERS {
+            assert!(!is_field_arithmetic(n), "{n}");
+        }
+        assert!(!is_field_arithmetic("hash_probes_uncharged"));
+        // A huge byte counter on the ic arm changes no calibrated order.
+        let recs = synth(
+            100.0,
+            1500,
+            200.0,
+            &[("residual_table_bytes_uncharged", 1_000_000_000)],
+        );
+        let rep = band_with_wcal(
+            &recs,
+            &DEFAULT_WEIGHTS,
+            Pricing::default(),
+            Some(&wcal(0.005)),
+        )
+        .unwrap();
+        assert!(pair(&rep).ranked_at_calibrated_price);
+    }
+
+    #[test]
+    fn a_w_cal_needs_a_known_method_a_host_and_a_positive_weight() {
+        let mut w = wcal(0.01);
+        assert!(w.validate().is_ok());
+        w.method = "perf".into();
+        assert!(w.validate().is_err());
+        assert!(wcal(0.0).validate().is_err());
+        assert!(wcal(f64::NAN).validate().is_err());
+        let mut w = wcal(0.01);
+        w.host = " ".into();
+        assert!(w.validate().is_err());
     }
 }
