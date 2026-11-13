@@ -325,7 +325,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
-| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90) | Higher-arity absolute irreducibility and general splits k≥3 |
+| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43) | Higher-arity absolute irreducibility and general splits k≥3 |
 | 2 BK | Partial: excluded-case disproof, actual qualified F5/r3 criterion at every positive extension degree, and actual geometric cardinality9/basis/Frobenius; actual F7allk torsion-image criterion iff3dividesk with infinite excluded-boundary counterexamples (32) | Generic torsion rank/determinant/Weil bridges and complete p<500 census  General actual geometric3-torsion cardinality9 now passes separate20-declaration gate and PCC-20261112-1c1db4; no rank/basis premise. All-prime rank/determinant and fullp500 remain open. See ../three_torsion_rank_audit_20261112.  Basefield k1census now complete over95primefields/7013620models,29-declaration actual transport/lowtorsion gate. All-k extension census/rank/determinant still open. |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges  Basefield p<500prime/divisor native bounds now checked completely; generic geometric/Hasse and further extension-field scope remain. |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
@@ -732,3 +732,20 @@ unverified; actual separate-host evidence is not a compiler/runtime proof
 or independence from the same author. Existing11-declaration Lean actual
 quadratic-field/point-oracle foundation remains linked separately.
 Zero paid compute/uploads; no scientific clocks. [pcc:unverified]
+
+### Actual ordinary binary S3absolute irreducibility
+
+The [ordinary binary S3project](../research/binary_semaev_irreducibility_audit_20261113/README.md)
+proves the literal (xy+xz+yz)²+xyz+b is symmetric and irreducible after
+every field scalar extension over every characteristic2field, for allb.
+Actual evaluation and nonsingular ordinary Mathlib group zero-sum semantics
+are bound in the same closed certificate. An actual Artin–Schreier change,
+proved degree1pole obstruction, primitive Gauss bridge, injective algebraic
+closure coefficient map and explicit MVequivalence supply the proof.
+The short F2expression is a nonunit square/directly nonirreducible and
+provably unequal to the ordinary polynomial. No qualified ordinary source
+is refuted. Whole gate43/0failures/0trusted and exact local PCC-20261113-1e2412replay
+pass;24formal/config and10artifact pins match,33attemptfiles/fivegatefiles
+and inspected one-page report retained. Signed standing unverified.
+General higherarity absolute irreducibility and splitsk≥3remainopen.
+[pcc:unverified]
