@@ -41,3 +41,27 @@ Sources: the exact full-norm recovery theorem and native control, the earlier
 explicit public basis plan, and the saved direct-versus-graph cover audit.
 KB unavailable; no priority or exhaustive absence claim. No run is scheduled
 by this document.
+
+## 2026-11-13 continuation: explicit public residue chart
+
+The [public-jet report](public-jet-report/README.md) tests the specified
+polynomial correction family, including its actual degree budget. It does not
+supply a map from the older W-family. Componentwise G-multiple corrections are
+rigid in that window; coupled corrections preserve A-sB moduloG and are not
+excluded. The publicResidueCertificate theorem gives a direct target-aware
+certificate from G|(s²-f), G|(A-sB), monicity, pole bounds and nonzero norm,
+without F,H,V or moment/cofactor inputs [pcc:unverified].
+
+Thus the earlier F,H,V selection contract above remains the contract of the
+moment route, while a new residue-chart finder may instead select root branches
+s and a nonzero bounded A/B. Native reconstruction from supplied public branch
+coordinates is checked on a fixed positive and flipped assignment; it does not
+select those branches. The original exp(o(log r)) full bit-cost requirement is
+unchanged. Do not replace joint branch selection with another given-branch
+certificate extension [pcc:unverified].
+
+The [problem record](../../problems/prime-norm-public-branch-selection.md)
+sets the next discriminating obligation: an actual signed evaluation family
+and branch-update/search rule with a proved improvement in counted search work.
+Rank, determinant gradients or a passed congruence alone are insufficient.
+No paid/scaling campaign is scheduled by these files [pcc:unverified].
