@@ -1,3 +1,7 @@
+Current canonical G3:producer CI27e47f and all4+8+5 raw publications complete. Independent norm ready1521/unit02 75275f FOURpass/full148,356,1324domains/both2compositions/explicitcontrols;CLIaf3d78/nineclasses12processcontrols;13exactbindings localpass/formalscopec88b36. SIXwholeconsumerarchives4ea88c pending actualtrustedpublication. Rootfixture authenticread2 unablecredentials/anonymous1 HeadObject403,add561;globalregression NOTgreen. Next genuine6objectmigration/consumerreport/source/independentCI;no computationaladvantage yet. Earlier active text historical. [pcc:unverified]
+
+---
+
 Current canonical G3:see G3_DESCENT_STATUS.md. Producer CI43388101185/27e47f COMPLETE;all4+8+5 raw publications COMPLETE latest9b93a4/9ee. Root global missing original ecbench fixture2364e3 unresolved. Independent norm readyPR1521/protocolac58df publishedc3b BEFOREcode;static02 strict0/22fb44;full four-test unit01 ACTIVE/357guards. Next collect terminal before edits;main signing/ledger/conflict gates separate. Earlier CURRENT/ACTIVE paragraphs historical. [pcc:unverified]
 
 ---

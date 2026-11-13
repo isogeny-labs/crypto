@@ -1,3 +1,7 @@
+Current canonical G3:producer CI27e47f and all4+8+5 raw publications complete. Independent norm ready1521/unit02 75275f FOURpass/full148,356,1324domains/both2compositions/explicitcontrols;CLIaf3d78/nineclasses12processcontrols;13exactbindings localpass/formalscopec88b36. SIXwholeconsumerarchives4ea88c pending actualtrustedpublication. Rootfixture authenticread2 unablecredentials/anonymous1 HeadObject403,add561;globalregression NOTgreen. Next genuine6objectmigration/consumerreport/source/independentCI;no computationaladvantage yet. Earlier active text historical. [pcc:unverified]
+
+---
+
 # Current G3 checkpoint — producer CI and all published raw complete
 
 Scientific source a719f6f75f67576ce3835d8acc6e47bb25a3cbe4 and corrected CI control source3d49af7f3d0a28e76b79e4825c9d2324e85853d2 are published. Dedicated own CI43388101185/job131761241701 SUCCESS,actual27e47f/custody279820:four native tests,nine bounded CLI points/golden comparisons,two original proof gates and11 exact bindings. All24 native JSON records equal accepted unit03. Whole45,679-byte UTF8 job/API/standard9-file15,108-byte archive retained. Actual CI is settled;do not repoll or redispatch. Initial zero-job failure1fd396 and frozen context repaira6d76b/b02647 remain immutable. [pcc:unverified]
