@@ -198,3 +198,218 @@ KB unavailable (MCP absent; wrapper has no executable). No novelty claim for
 this elementary lifting construction. No empirical campaign, performance row or
 existing canonical graph was changed; the new diagram describes the formal
 bridge only.
+
+## Algorithmic shortcut test: sparse differential filter, November13
+
+The proposed filter is W_G(N)=G*N'-G'*N with N=A²-fB². It replaces coefficient
+matching by sparse derivative/convolution equations. The test asks whether this
+supplies new constraints or loses witnesses in characteristic p. It is an exact
+algebraic test, not a timing or scaling experiment [pcc:unverified].
+
+[NormWronskian.lean](lean/NormWronskian.lean) establishes:
+
+- If G is monic and coprime with G', and deg N<=deg G, then W_G(N)=0 exactly
+  when N=cG. Nonzero N forces c!=0.
+- A product of distinct rational node factors X-x is monic and coprime with
+  its derivative. The usual norm pole-degree bounds imply the degree cap.
+- Applied to the actual NormLift output, the filter and nonzero scalar norm
+  matching admit exactly the same matrices under the stated degree cap.
+- Without that cap, characteristic-p factors are invisible. In F17, every
+  G*H^17 passes; specifically X*(X-1)^17 passes W_X but is not cX.
+
+These are kernel-checked implications and a finite-field counterexample;
+the full project source audit is separate from independent signed standing
+[pcc:unverified].
+
+![Exact scope of the differential filter](wronskian-report/filter.svg)
+
+[Two-page PDF](wronskian-report/report.pdf), editable [DOT source](wronskian-report/filter.dot),
+[LaTeX source](wronskian-report/report.tex).
+
+The useful result is a precise filter contract. Within the correct window,
+differentiation does not strengthen the norm coefficient constraints and does
+not remove rank one. Outside that window, accepting its solutions can be wrong.
+Kernel equivalence alone does not rule out an implementation benefit from the
+sparse representation; no runtime comparison was run [pcc:unverified].
+
+The derivative remains
+
+    N' = 2*A*A' - f'*B² - 2*f*B*B'.
+
+It is quadratic in the unknown A,B coefficients. Returning N=cG from a linear
+solver does not return its decomposition A²-fB², the remaining constructive
+problem [pcc:unverified].
+
+| Statement | Declaration | Exact scope |
+|---|---|---|
+| Zero filter forces divisibility | NormWronskian.filterDivisibility | G coprime with G'; no degree cap needed |
+| Differential kernel is scalar span | NormWronskian.filterZeroIff | Monic G, coprimality, natDegree N<=natDegree G |
+| Nonzero scalar recovered | NormWronskian.nonzeroFilterIff | Previous hypotheses and N!=0 |
+| Actual matrix lift has same feasible set | NormWronskian.liftedFilterIff | Same conditions on the defined NormLift output |
+| Actual norm derivative | NormWronskian.normDerivative | Any field and polynomials f,A,B |
+| Norm degree cap | NormWronskian.normDegreeBound | 2*natDegree A<=D and natDegree f+2*natDegree B<=D |
+| Split-node conditions | NormWronskian.splitProductConditions | Finite set of distinct field nodes |
+| Characteristic-p ghost | NormWronskian.frobeniusGhost | G,H over F17; no degree cap |
+| Explicit ghost passes | NormWronskian.ghostPasses | G=X, N=X*(X-1)^17 |
+| Explicit ghost is not cG | NormWronskian.ghostNotScalar | Same F17 fixture |
+
+Default build004 passed3145 jobs. Actual-source gate passed39 declarations with
+0 additional trusted axioms. Failed builds001--003 are retained as failures.
+Import-inclusive replay exited0; the receipt is in
+wronskian-evidence/fresh-status.json. Source commit923a40182; pinned Lean4.35.0/dependencies unchanged
+[pcc:unverified].
+
+The existing native identity issuer/checker accepted
+[IDC1hd9711b7c88619f6b](wronskian-evidence/residual.identity.json), binding the
+expanded differential residual and NormWronskian source hash. It is an expression
+identity supplement with32 statement-derived and32 separate-stream points;
+it does not execute Lean, prove the finite-characteristic implications, or
+establish solver success. Those mathematical implications are checked in Lean.
+No certificate confidence value is used as an algorithmic claim [pcc:unverified].
+
+Reproduce with:
+
+```sh
+lake -d research/prime_norm_rank_20261112/lean build
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormWronskian
+cargo run --release --locked --manifest-path research/prime_norm_rank_20261112/certificate/Cargo.toml --bin norm-wronskian -- research/prime_norm_rank_20261112/lean/NormWronskian.lean /tmp/norm-wronskian.identity.json
+```
+
+Seven canonical unsigned bindings are in
+[wronskian-evidence/claim-pins.json](wronskian-evidence/claim-pins.json).
+Earlier theorem modules and historical reports remain unchanged. New evidence
+is appended and source-pinned; all producer standing remains unsigned
+[pcc:unverified].
+
+Sources: pinned Mathlib polynomial derivative, separability, coprime-divisibility
+and monic-degree results; existing norm references in sources.json; the primary
+barrier-map blob's stated p-adic scope. KB unavailable; bounded searches of
+sparsely available notes do not establish novelty. Main's journal records the
+monthly isolab budget exhausted, so no paid experiment was launched. No new
+empirical panel, timing result, benchmark row or historical graph is changed.
+
+The next live question is constructive: can the coupled Hankel structure of the
+norm-lift constraints support nonlocal rank-one reconstruction? The differential
+operator is characterized here; that question remains a research target rather
+than a claimed algorithm or a reason to declare the full family impossible.
+
+## Cofactor-pencil reconstruction candidate, November13
+
+[NormDualPencil.lean](lean/NormDualPencil.lean) checks a sufficient reconstruction
+criterion. For supplied homogeneous quadratic forms
+q_t(w)=sum_ij Q_t(i,j)w_iw_j, consider a symmetric matrix pencil
+S(lambda)=sum_t lambda_t Q_t. The proposed search asks for a singular S with
+corank one, nonzero adjugate and all cofactor pairings
+sum_ij Q_t(i,j)*adj(S)(i,j)=0. It is not enough to find a determinant root
+[pcc:unverified].
+
+The generic Lean recovery theorem proves: if a supplied symmetric S has det S=0,
+rank(S)+1=dimension, nonzero adjugate and every required pairing zero, then a
+nonzero vector satisfying all q_t exists. It proves adjugate rank<=1 from actual
+matrix rank, derives every minor identity, then uses the scaled outer-product
+extraction. No square root or assumed rank-one primal witness is used. The
+recovery theorem itself does not require S to belong to a particular pencil;
+restricting the search to the norm-derived pencil is the algorithmic proposal
+[pcc:unverified].
+
+For the two-support norm after eliminating the target branch, w=(v,u) gives
+
+    q1 = v²-Uu²,       q2 = 2yvu-Vu²,
+    Q1 = [[1,0],[0,-U]],     Q2 = [[0,y],[y,-V]],
+    S(a,b) = [[a,by],[by,-aU-bV]].
+
+Here U=q+x1+x2 and V=q²+curve_a+qU-x1*x2. Lean proves [pcc:unverified]
+
+    det S = -Ua²-Vab-y²b²,
+    <Q1,adj S> = -2Ua-Vb,
+    <Q2,adj S> = -Va-2y²b.
+
+These are actual determinant and adjugate formulas, not assumed stationarity
+properties [pcc:unverified].
+
+Two exact controls use y²=x³+2x+2 over F17 with support points (5,1),(6,3):
+
+| Target | U,V | S(3,1) | Adjugate-column slope | Actual norm |
+|---|---|---|---|---|
+| Q=(10,6) | 4,10 | [[3,6],[6,12]] | 15 | Satisfied; both cofactor pairings zero |
+| Q=(0,6) | 11,6 | The same matrix | The same15 | Not satisfied; a cofactor pairing is nonzero |
+
+Both matrices have determinant zero and nonzero adjugate. Normalizing its
+second column gives slope15; Lean checks the actual positive norm and the
+actual negative norm failure. These are finite kernel-checked controls, not a
+DLP-solving or empirical timing campaign [pcc:unverified].
+
+A separate generic higher-corank control uses S=diag(1,0,0) in the pencil of
+coordinate-square forms. It is nonzero and singular, adj S=0, and every
+cofactor pairing vanishes, but the coordinate quadrics have no nonzero common
+witness. This control is not an elliptic norm instance. It shows why the
+corank/nonzero-adjugate checks cannot be omitted [pcc:unverified].
+
+![Recovery certificate and both rejection controls](dual-pencil-report/certificate.svg)
+
+[Two-page PDF](dual-pencil-report/report.pdf), editable
+[DOT source](dual-pencil-report/certificate.dot) and
+[LaTeX source](dual-pencil-report/report.tex).
+
+| Statement | Declaration | Formal scope |
+|---|---|---|
+| Rank<=1 supplies minor identities | NormDualPencil.minorsOfRank | Field, finite matrix |
+| Corank one bounds adjugate rank | NormDualPencil.adjugateRank | det S=0 and rank(S)+1=dimension |
+| Cofactor certificate recovers quadratic witness | NormDualPencil.recoverQuadratic | Symmetry, previous rank condition, nonzero adjugate and all supplied pairings zero |
+| Actual two-support determinant | NormDualPencil.pencilDet | Any field |
+| Actual two-support cofactor pairings | NormDualPencil.pencilCofactors | Any field |
+| Same spectral matrix for two targets | NormDualPencil.sameMatrixDifferentTargets | Explicit F17 settings |
+| Positive normalized column and norm | NormDualPencil.positiveRecoveredSlope, NormDualPencil.positiveRecoveredNorm | Explicit positive F17 target |
+| False spectral root | NormDualPencil.falseRoot | det0, nonzero adjugate, nonzero required pairing |
+| False root's actual norm failure | NormDualPencil.falseRootNormResidual | Explicit negative F17 target |
+| Higher-corank negative control | NormDualPencil.spuriousControl | Explicit coordinate-quadrics pencil over F17 |
+
+The new entry-minor constructor is a public API addition to RankOneExtraction;
+all earlier extraction/norm/filter theorem declaration hashes remain unchanged.
+No earlier mathematical definition or proof body was changed [pcc:unverified].
+
+The remaining research obligations are distinct. The higher-dimensional
+norm-to-pencil bridge and its nonzero norm check need faithful formalization;
+completeness of the restricted-pencil certificate needs a general proof.
+A constructive finder must supply a2^{o(n)} bit bound, n=ceil(log2 r).
+Polynomial determinant evaluation, a successful
+small fixture, or a singular-point finder returning higher-corank points does
+not discharge either obligation. No such finder or complexity theorem is
+supplied here [pcc:unverified].
+
+Build005 passed3147 jobs. Actual tracked-source audit passed62 declarations
+with0 additional trusted axioms. Fresh import-inclusive replay exited0; the receipt is in
+dual-pencil-evidence/fresh-status.json. Eight canonical unsigned
+bindings are in [dual-pencil-evidence/claim-pins.json](dual-pencil-evidence/claim-pins.json).
+Source71f1bfb22 and file hashes in dual-pencil-evidence/source-inputs.sha256
+[pcc:unverified].
+
+The existing native issuer/checker accepted the determinant expression record
+[IDC1h25bf8a5444f4976f](dual-pencil-evidence/det.identity.json) and cofactor
+expression record [IDC1h76b1a590e132b252](dual-pencil-evidence/cofactors.identity.json).
+Each uses32 statement-derived plus32 extra stream points and binds the formal
+source hash. These supplement only the two-support expression identities;
+they do not execute Lean or establish general search, completeness or success
+probability. All producer standing remains unsigned [pcc:unverified].
+
+Reproduce:
+
+```sh
+lake -d research/prime_norm_rank_20261112/lean build
+lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormDualPencil
+cargo run --release --locked --manifest-path research/prime_norm_rank_20261112/certificate/Cargo.toml --bin norm-dual-pencil -- research/prime_norm_rank_20261112/lean/NormDualPencil.lean /tmp/norm-dual-pencil-identities
+```
+
+Sources reviewed: pinned Mathlib Matrix.Adjugate/Matrix.Rank, actual NormRank
+and NormLift, previous common-kernel/jet-completion READMEs and their source
+scope. KB unavailable; no novelty asserted for cofactor or matrix-pencil
+methods. The earlier tensor-origin jet proposal and this norm-pencil candidate
+have different variables and correctness obligations. No old finite failure is
+used as a blanket rejection. No paid run, timing experiment, new benchmark row
+or historical graph change; this addition has its own source-linked diagram.
+
+The next concrete test is recorded separately as the unproved
+[quotient-moment hypothesis](dual-pencil-report/NEXT_HYPOTHESIS.md), with an
+explicit three-support control prediction. No prediction there is a measured or
+kernel-checked result yet, and the construction takes A,B as input for a
+completeness argument rather than providing a public-input finder.
