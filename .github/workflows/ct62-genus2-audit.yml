@@ -1,0 +1,64 @@
+name: CT62 binary genus-two finite arithmetic audit
+
+on:
+  push:
+    branches:
+      - research/ct51-crosschar-degree8-20261112
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct62/**'
+      - '.github/workflows/ct62-genus2-audit.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct62/**'
+      - '.github/workflows/ct62-genus2-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ct62-finite-arithmetic:
+    name: CT62 exact F2/F4 arithmetic and independent Cantor audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python, optimized Python, JS, no-opt JS independent checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct62
+          python3 -B "$D/ct62_genus2_census.py" > /tmp/ct62-py.json
+          python3 -O -B "$D/ct62_genus2_census.py" > /tmp/ct62-py-O.json
+          python3 -B "$D/ct62_genus2_cantor.py" > /tmp/ct62-cantor.json
+          python3 -O -B "$D/ct62_genus2_cantor.py" > /tmp/ct62-cantor-O.json
+          node "$D/ct62_genus2_independent.js" > /tmp/ct62-js.json
+          node --no-opt "$D/ct62_genus2_independent.js" > /tmp/ct62-js-noopt.json
+          python3 -B "$D/ct62_elliptic_f32_control.py" > /tmp/ct62-f32.txt
+          python3 -O -B "$D/ct62_elliptic_f32_control.py" > /tmp/ct62-f32-O.txt
+          cmp /tmp/ct62-f32.txt /tmp/ct62-f32-O.txt
+          grep -qx 'models with order31 0' /tmp/ct62-f32.txt
+          cmp /tmp/ct62-py.json /tmp/ct62-py-O.json
+          cmp /tmp/ct62-cantor.json /tmp/ct62-cantor-O.json
+          cmp /tmp/ct62-js.json /tmp/ct62-js-noopt.json
+          python3 - <<'PY'
+          import json
+          py=json.load(open('/tmp/ct62-py.json'))['results']
+          js=json.load(open('/tmp/ct62-js.json'))['results']
+          for a,b in zip(py,js,strict=True):
+              for k in ('q','models_total','smooth','distinct_orders','min_J',
+                        'max_J','orders','prime_divisors'):
+                  if a[k]!=b[k]:raise RuntimeError((a['q'],k,a[k],b[k]))
+              for k,v in b['infinity_types'].items():
+                  if a['infinity_types'].get(k,0)!=v:
+                      raise RuntimeError((a['q'],k,a['infinity_types'].get(k,0),v))
+          if [(a['q'],a['models_total'],a['smooth'],a['max_J']) for a in py] != [
+              (2,1280,640,19),(4,65536,49152,49)
+          ]:raise RuntimeError('census fixture changed')
+          c=json.load(open('/tmp/ct62-cantor.json'))['tests']
+          if c[0]['J']!=31 or c[0]['checked_all_triples']!=29791 or c[0]['independent_target_bsgs_pairs']!=930:
+              raise RuntimeError('prime-31 Cantor fixture changed')
+          if c[1]['J']!=16 or not c[1]['ramified_order2']:
+              raise RuntimeError('ramified Cantor fixture changed')
+          print('CT62 independent field/census/Cantor/DLP checks passed')
+          PY

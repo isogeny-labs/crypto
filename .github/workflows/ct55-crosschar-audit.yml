@@ -1,0 +1,186 @@
+name: CT55–61 cross-characteristic finite-stage audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct55/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct56/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct57/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct58/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct59/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct60/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct61/**'
+      - '.github/workflows/ct55-crosschar-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct55:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python and independently implemented JavaScript controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct55"
+          python3 -B "$base/ct55_universal.py" > ct55-python.txt
+          python3 -O -B "$base/ct55_universal.py" > ct55-python-opt.txt
+          cmp ct55-python.txt ct55-python-opt.txt
+          node "$base/ct55_independent.js" > ct55-javascript.txt
+          node --no-opt "$base/ct55_independent.js" > ct55-javascript-noopt.txt
+          cmp ct55-javascript.txt ct55-javascript-noopt.txt
+          python3 -B "$base/ct55_toy_controls.py" > ct55-toy-python.txt
+          python3 -O -B "$base/ct55_toy_controls.py" > ct55-toy-python-opt.txt
+          cmp ct55-toy-python.txt ct55-toy-python-opt.txt
+          node "$base/ct55_toy_independent.js" > ct55-toy-js.txt
+          node --no-opt "$base/ct55_toy_independent.js" > ct55-toy-js-noopt.txt
+          cmp ct55-toy-js.txt ct55-toy-js-noopt.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          py=Path("ct55-python.txt").read_text().splitlines()
+          js=Path("ct55-javascript.txt").read_text().splitlines()
+          # Separate arithmetic implementations must agree on all 12 binary degrees.
+          assert [s.split()[-2:] for s in py[10:22]] == [s.split()[-2:] for s in js[10:22]]
+          assert len(py)==23 and len(js)==23
+          assert "parity mutant rejected" in py[-1]
+          assert "parity mutant rejected" in js[-1]
+          toy_py=Path("ct55-toy-python.txt").read_text().splitlines()
+          toy_js=Path("ct55-toy-js.txt").read_text().splitlines()
+          assert toy_py[:2]==toy_js[:2]
+          assert "positive p5 to p2" in toy_py[0]
+          assert "negative p7 to p2" in toy_py[1]
+          print("CT55 finite-stage, toy positive/negative controls passed; no uniform global field algorithm tested")
+          PY
+          sha256sum ct55-python.txt ct55-javascript.txt
+      - name: CT56 sharp Serre bound and full-level pairing controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct56"
+          python3 -B "$base/ct56_serre_gate.py" > ct56-python.txt
+          python3 -O -B "$base/ct56_serre_gate.py" > ct56-python-opt.txt
+          cmp ct56-python.txt ct56-python-opt.txt
+          node "$base/ct56_independent.js" > ct56-javascript.txt
+          node --no-opt "$base/ct56_independent.js" > ct56-javascript-noopt.txt
+          cmp ct56-javascript.txt ct56-javascript-noopt.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          remove=str.maketrans('', '', ',()[]')
+          def normalise(path):
+              return [' '.join(line.translate(remove).split())
+                      for line in Path(path).read_text().splitlines()]
+          assert normalise('ct56-python.txt')==normalise('ct56-javascript.txt'), "independent arithmetic mismatch"
+          assert len(normalise('ct56-python.txt'))==13, "missing test rows"
+          assert "PASS: exact Serre" in Path('ct56-python.txt').read_text()
+          print("CT56 exact independent gates passed; necessity only, no global solver")
+          PY
+          sha256sum ct56-python.txt ct56-javascript.txt
+          python3 -B "$base/ct56_genus2_witness.py" > ct56-genus2-python.txt
+          python3 -O -B "$base/ct56_genus2_witness.py" > ct56-genus2-python-opt.txt
+          cmp ct56-genus2-python.txt ct56-genus2-python-opt.txt
+          node "$base/ct56_genus2_independent.js" > ct56-genus2-js.txt
+          node --no-opt "$base/ct56_genus2_independent.js" > ct56-genus2-js-noopt.txt
+          cmp ct56-genus2-js.txt ct56-genus2-js-noopt.txt
+          cmp ct56-genus2-python.txt ct56-genus2-js.txt
+          grep -q '"max_j":19' ct56-genus2-python.txt
+          grep -q '"smooth_models":640' ct56-genus2-python.txt
+          sha256sum ct56-genus2-python.txt ct56-genus2-js.txt
+
+      - name: CT57 rational-isogeny group action and local versus global line controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct57"
+          python3 -B "$base/ct57_borel_audit.py" > ct57-python.txt
+          python3 -O -B "$base/ct57_borel_audit.py" > ct57-python-opt.txt
+          cmp ct57-python.txt ct57-python-opt.txt
+          node "$base/ct57_independent.js" > ct57-js.txt
+          node --no-opt "$base/ct57_independent.js" > ct57-js-noopt.txt
+          cmp ct57-js.txt ct57-js-noopt.txt
+          # Only the four numeric rows are intended to be text-identical;
+          # the independently authored final prose sentinels differ.
+          test "$(wc -l < ct57-python.txt)" -eq 5
+          test "$(wc -l < ct57-js.txt)" -eq 5
+          diff -u <(head -n 4 ct57-python.txt) <(head -n 4 ct57-js.txt)
+          grep -q 'Mazur input is external theorem' ct57-python.txt
+          grep -q 'no proof of Mazur claimed' ct57-js.txt
+          grep -q 'local_not_global=PASS' ct57-python.txt
+          grep -q 'no proof of Mazur claimed' ct57-js.txt
+          sha256sum "$base/ct57_borel_audit.py" "$base/ct57_independent.js"
+
+      - name: CT58 cyclotomic full-division-field gate and rational-point counterexample
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct58"
+          python3 -B "$base/ct58_cyclotomic_gate.py" > ct58-py.txt
+          python3 -O -B "$base/ct58_cyclotomic_gate.py" > ct58-py-opt.txt
+          cmp ct58-py.txt ct58-py-opt.txt
+          node "$base/ct58_independent.js" > ct58-js.txt
+          node --no-opt "$base/ct58_independent.js" > ct58-js-noopt.txt
+          cmp ct58-js.txt ct58-js-noopt.txt
+          diff -u <(head -n -1 ct58-py.txt) <(head -n -1 ct58-js.txt)
+          grep -q 'ell=163 cyclotomic_global_degree_floor=162 binary_full_basis_residue_degree_floor=162' ct58-py.txt
+          grep -q '11a1 mod2 f=4 fixed_5_torsion=25 all_basis=true' ct58-js.txt
+          grep -q 'theorem is external' ct58-py.txt
+          sha256sum "$base/ct58_cyclotomic_gate.py" "$base/ct58_independent.js" ct58-py.txt ct58-js.txt
+
+      - name: CT59 single oriented point Frobenius degree floor and twist falsifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct59"
+          python3 -B "$base/ct59_single_point_degree.py" > ct59-python.txt
+          python3 -O -B "$base/ct59_single_point_degree.py" > ct59-python-opt.txt
+          cmp ct59-python.txt ct59-python-opt.txt
+          node "$base/ct59_independent.js" > ct59-js.txt
+          node --no-opt "$base/ct59_independent.js" > ct59-js-noopt.txt
+          cmp ct59-js.txt ct59-js-noopt.txt
+          cmp ct59-python.txt ct59-js.txt
+          test "$(wc -l < ct59-python.txt)" -eq 29
+          grep -q 'ell=4294967291 single_f=2147483645 full_f=4294967290 ord_minus2=2147483645' ct59-python.txt
+          grep -q 'five-point twist defeats universal single-point' ct59-js.txt
+          sha256sum ct59-python.txt ct59-js.txt
+
+      - name: CT60 all F2 elliptic Frobenius trace classes and single-point residue floor
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct60"
+          python3 -B "$base/ct60_binary_trace.py" > ct60-python.txt
+          python3 -O -B "$base/ct60_binary_trace.py" > ct60-python-opt.txt
+          cmp ct60-python.txt ct60-python-opt.txt
+          node "$base/ct60_binary_trace_independent.js" > ct60-js.txt
+          node --no-opt "$base/ct60_binary_trace_independent.js" > ct60-js-noopt.txt
+          cmp ct60-js.txt ct60-js-noopt.txt
+          cmp ct60-python.txt ct60-js.txt
+          test "$(wc -l < ct60-python.txt)" -eq 19
+          grep -q '^4294967291|17179869160,18446744030759878680,2147483645,18446744030759878680,17179869160|2147483645$' ct60-js.txt
+          grep -q '^counterexample_ell37_trace-1_eigen_orders=12,18$' ct60-python.txt
+          grep -q '^PASS exact-order-and-small-degree-recurrence$' ct60-js.txt
+          sha256sum ct60-python.txt ct60-js.txt
+
+      - name: CT61 variable binary target ordinary traces and independently enumerated point fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct61"
+          python3 -B "$base/ct61_binary_targets.py" > ct61-py.txt
+          python3 -O -B "$base/ct61_binary_targets.py" > ct61-py-opt.txt
+          cmp ct61-py.txt ct61-py-opt.txt
+          node "$base/ct61_independent.js" > ct61-js.txt
+          node --no-opt "$base/ct61_independent.js" > ct61-js-noopt.txt
+          cmp ct61-js.txt ct61-js-noopt.txt
+          cmp ct61-py.txt ct61-js.txt
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('ct61-py.txt').read_text())
+          assert len(data['rows']) == 11 and len(data['toys']) == 7
+          assert data['rows'][-1] == [4294967291,33,11,8589934582,62]
+          assert data['rows'][-2] == [2147483647,32,3,4294967294,60]
+          assert data['toys'][-1]['ell'] == 163 and data['toys'][-1]['d'] == 7
+          print('CT61 ordinary trace construction and distinct point-counting engines passed')
+          PY
+          sha256sum ct61-py.txt ct61-js.txt

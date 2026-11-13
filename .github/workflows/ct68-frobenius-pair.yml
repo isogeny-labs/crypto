@@ -1,0 +1,38 @@
+name: CT68 simultaneous two-prime Frobenius centralizers
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct68/**'
+      - '.github/workflows/ct68-frobenius-pair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct68-frobenius-pair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exhaustive centralizers and independent parametric replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct68
+          python3 -B "$D/ct68_frobenius_pair.py" > ct68-py.json
+          python3 -O -B "$D/ct68_frobenius_pair.py" > ct68-py-opt.json
+          node "$D/ct68_frobenius_pair_independent.js" > ct68-js.json
+          node --no-opt "$D/ct68_frobenius_pair_independent.js" > ct68-js-noopt.json
+          cmp ct68-py.json ct68-py-opt.json
+          cmp ct68-py.json ct68-js.json
+          cmp ct68-py.json ct68-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.loads(Path('ct68-py.json').read_text())
+          assert [x['ell'] for x in t['cases']]==[3,5,7,11]
+          assert t['cases'][0]['joint_11a1_ell3_matrix_model']=={'target_centralizer':8,'joint_centralizer':2,'joint_line_orbit':2}
+          assert all(x['irreducible']['orbit_eigen']==x['ell']**2-1 for x in t['cases'])
+          assert all(x['joint_split_irreducible']['fixed_oriented_point']==1 for x in t['cases'])
+          print('CT68 exact finite matrix gate passed; no global point lift claimed')
+          PY
+          sha256sum ct68-py.json ct68-js.json

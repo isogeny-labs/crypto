@@ -1,0 +1,28 @@
+name: CT73 shared specialization and independent orientation audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct73/**'
+      - '.github/workflows/ct73-common-place.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct73-orientation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute independent exact orientation controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct73
+          python3 -B "$D/ct73_common_place.py" > ct73-py.jsonl
+          python3 -O -B "$D/ct73_common_place.py" > ct73-pyopt.jsonl
+          node "$D/ct73_common_place_independent.js" > ct73-js.jsonl
+          node --no-opt "$D/ct73_common_place_independent.js" > ct73-jsopt.jsonl
+          cmp ct73-py.jsonl ct73-pyopt.jsonl
+          cmp ct73-py.jsonl ct73-js.jsonl
+          cmp ct73-py.jsonl ct73-jsopt.jsonl
+          echo '717eca797dcbe13c8b0bd9719fc916813766b7025c38a5af1fd4cc7252cdfc88  ct73-py.jsonl' | sha256sum -c
