@@ -1,4 +1,4 @@
-name: CT55–59 cross-characteristic finite-stage audit
+name: CT55–60 cross-characteristic finite-stage audit
 on:
   pull_request:
     paths:
@@ -7,6 +7,7 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct57/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct58/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct59/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct60/**'
       - '.github/workflows/ct55-crosschar-audit.yml'
   workflow_dispatch:
 permissions:
@@ -140,3 +141,21 @@ jobs:
           grep -q 'ell=4294967291 single_f=2147483645 full_f=4294967290 ord_minus2=2147483645' ct59-python.txt
           grep -q 'five-point twist defeats universal single-point' ct59-js.txt
           sha256sum ct59-python.txt ct59-js.txt
+
+      - name: CT60 all F2 elliptic Frobenius trace classes and single-point residue floor
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct60"
+          python3 -B "$base/ct60_binary_trace.py" > ct60-python.txt
+          python3 -O -B "$base/ct60_binary_trace.py" > ct60-python-opt.txt
+          cmp ct60-python.txt ct60-python-opt.txt
+          node "$base/ct60_binary_trace_independent.js" > ct60-js.txt
+          node --no-opt "$base/ct60_binary_trace_independent.js" > ct60-js-noopt.txt
+          cmp ct60-js.txt ct60-js-noopt.txt
+          cmp ct60-python.txt ct60-js.txt
+          test "$(wc -l < ct60-python.txt)" -eq 19
+          grep -q '^4294967291|17179869160,18446744030759878680,2147483645,18446744030759878680,17179869160|2147483645$' ct60-js.txt
+          grep -q '^counterexample_ell37_trace-1_eigen_orders=12,18$' ct60-python.txt
+          grep -q '^PASS exact-order-and-small-degree-recurrence$' ct60-js.txt
+          sha256sum ct60-python.txt ct60-js.txt
