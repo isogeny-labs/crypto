@@ -53,8 +53,9 @@ an assumed number of useful relations.
 
 ## Resource and decision rules
 
-No solver/timing job is currently admitted. Restore budget/resource admission
-first under the repository run skill. Freeze host inventory, thread policy,
+No solver/timing job is currently admitted. Read current admission under the
+repository run skill and retain the user's existing override where applicable.
+Freeze a finite per-attempt ceiling, host inventory, thread policy,
 memory/wall caps and panel before execution; perform a bounded feasibility
 cell before requesting large memory. Preserve all OOMs/timeouts as censored.
 The original cubic needed about190GB according to its producer; added variables

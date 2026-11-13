@@ -1,6 +1,6 @@
 # Saved cover inputs: base occupancy and representation
 
-2026-11-13. Exact two-record native audit; no new solver or timing run.
+2026-11-13. Exploratory exact two-record native audit; no new solver or timing run.
 Unsigned data statement PCC-20261113-79248f [pcc:unverified].
 
 The completed reference and cubic records each describe16 distinct image
@@ -90,7 +90,8 @@ cargo run --locked --release --manifest-path research/prime_cover_encoding_audit
 lake -d research/prime_cover_encoding_audit_20261113/lean build
 ```
 
-The protocol froze the two input hashes before native execution. Test001
+The protocol was committed locally before native execution and first published
+with the results; this is an exploratory saved-record audit. Test001
 failed because the maintained SHA-256 tests needed the omitted hex development
 dependency; test002 passes16 tests after that pinned dependency fix. All
 native output and failed/successful logs are retained. There is no timing
@@ -115,8 +116,10 @@ KB MCP/wrapper unavailable. Three bounded GitHub queries covered auxiliary
 covers, cover-map auxiliary variables and cover-map lift references; best hits
 were read. No priority or repository-wide absence claim. Conductor unavailable.
 No Python mathematical research was executed. Native correctness checking only;
-no paid job, new target, solver, timing or scaling run. Monthly isolab budget
-remains exhausted. No benchmark, leaderboard or ecdb result is added.
+no paid job, new target, solver, timing or scaling run. Earlier admission
+reported monthly exhaustion; current live admission has not been read back
+here. The prior user override remains context for the next concrete request.
+No benchmark, leaderboard or ecdb result is added.
 
 The data artifact attestation is unsigned; maintained PCC reports not_covered,
 not an independent signed verdict. The graph lemmas have separate source
