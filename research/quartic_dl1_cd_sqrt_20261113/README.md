@@ -15,7 +15,7 @@ matched rho, before and after (rho-neg is missing at k = 19, 20 by the frozen ca
 
 ## Result under the pre-registered rule: improvement (headline arm DL)
 
-All 116 units ran (k = 12..22, frozen instances and seeds) and every logarithm verified. Gates:
+All 116 units ran (k = 12..22, frozen instances and seeds) and every logarithm verified `[pcc:unverified]`. Gates:
 
 | gate | result |
 |:--|:--|
@@ -47,7 +47,7 @@ them, which is why D gets dearer.
 
 - With additions priced at w_add M-eq each, BOTH / BASE for DL is 0.74–0.66 (w_add = 0.1), 0.91–0.85
   (0.5) and 1.02–0.98 (1.0) over k = 18..22; at 1.0 it is no longer below 1 at every seed except k = 22.
-  DL1 loses its improvement from w_add = 0.25 at k = 18, 19.
+  DL1 loses its improvement from w_add = 0.25 at k = 18, 19 `[pcc:unverified]`.
 - CPU seconds (diagnostic: shared 4-core container, L0, four units in parallel): relations 0.54–0.79×,
   linear algebra 1.10–1.48× for DL; the DL arm's total is about 1.0 at k = 18..21 and 0.77–0.87 at
   k = 22. DL1 and D are slower in CPU at every size.
