@@ -69,7 +69,7 @@ matrix is asserted [pcc:unverified].
 ## Formal map, failures and provenance
 
 [NormMatrixFaithful.lean](../lean/NormMatrixFaithful.lean), frozen source
-d9fddfca0af3efce3714a0242d7a9416d983bffb; ten current declaration bindings in
+69c822e1c; ten preferred declaration bindings and two compatibility bindings in
 [faithful-evidence](../faithful-evidence/) [pcc:unverified].
 
 | Declaration | Exact scope |
@@ -82,9 +82,11 @@ d9fddfca0af3efce3714a0242d7a9416d983bffb; ten current declaration bindings in
 | assembleSmul | Actual coefficient scaling transfers to polynomials |
 | coordinateBranchRadical | Branch radical is exactly the witness coefficient line |
 | witnessCoordinates | Actual nonzero witness coordinates exist |
+| upperDegree, lowerDegree | Statement-compatible wrappers for the initial records |
 
-Pinned Lean4.35.0, CryptoLean148f5dc, Mathlibcfc55fc. Builds007 and008
-complete3151 jobs. Build008 has unique new degree lemma names. The current
+Pinned Lean4.35.0, CryptoLean148f5dc, Mathlibcfc55fc. Builds007-009
+complete3151 jobs. Build008 has unique preferred degree names;009 adds the
+original-name compatibility wrappers. The current
 tracked-source gate and import-inclusive fresh replay have attributable
 completion receipts; no additional trusted axiom is admitted. All producer
 standing remains unsigned [pcc:unverified].
@@ -101,15 +103,31 @@ preservation audit: maintained PCC lookup matches short names, so new
 lowerDegree shadowed the older nonconstant control's theorem. The Lean
 namespaces were distinct and older source unchanged. Rename the new degree
 lemmas to assembledUpperDegree/assembledLowerDegree. Two new unsigned bindings
-replace the initial degree records; original files/ledger entries and a note
-are retained. Current and earlier source/declaration bindings then match.
+provide preferred citations; original files/ledger entries and a note are
+retained. The workflow also checks retained records, so replacement alone was
+insufficient. The canonical crypto-owned PCC lookup now resolves qualified
+namespaces exactly, rejects ambiguous unqualified matches and fails closed on
+unsupported scope layouts. Original-name wrappers preserve initial statement
+hashes. All127 stored study bindings then match, including the initial records.
+All25 PCC tests and the62-class canary pass. Shared lock digests are updated;
+downstream identical-copy rollout follows the canonical owner change.
 See replaced-degree-bindings.json; no signed verdict or retraction authority
 is invented [pcc:unverified].
 
 Fresh001 was deliberately terminated with143 before renaming the source;
-it is not a pass. Fresh002 checks the refrozen renamed source. No mathematical
+it is not a pass. Fresh002 completed on the renamed source before compatibility
+wrappers; its historical receipt is retained. Fresh003 checks the final source.
+No mathematical
 Python research or timing campaign was run. The only Python use here was the
-maintained PCC administrative registration/binding audit.
+maintained PCC administration and its regression tests.
+
+The repository-wide source-only check in this sparse workspace exits1 on151
+other records; the old verifier exits1 on152. The comparison introduces no
+new failures and removes the old nonconstant degree-binding failure. All21
+new claim records are not_covered with Lean absent from the default PATH;
+the actual theorem modules have separate toolchain-specific gate/kernel
+receipts. No clean repository-wide verdict or signed standing is claimed
+[pcc:unverified].
 
 ## Sources and next step
 
