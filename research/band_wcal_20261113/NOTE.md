@@ -101,3 +101,76 @@ so informational only). [pcc:unverified] `scripts/build_ic_leaderboard.py`
 reads `band.json["rows"]` only. Its `--check` already differs here for an
 unrelated reason (missing VALIDATION.json artifacts), so it was not usable as
 a gate.
+
+## Follow-up 2026-11-13: records carry w_cal, every band reader surfaces it
+
+Owner-approved follow-up to the section above. The band verdict still
+governs; every addition is optional and absent without a `w_cal`.
+
+### Where a w_cal lives and who reads it
+
+- `session.json` `options.w_cal` `{w_cal, method, host}`, written by
+  `ecbench run --w-cal W --w-cal-method M --w-cal-host H`. The key is
+  skipped when absent, so a session written before this change reads and
+  re-serialises as before.
+- The sidecar `<session>/w_cal.json`, written by
+  `ecbench wcal --p P --b B --host H --session DIR` (the measured JSON
+  `ecbench.wcal/v1`, method `best-of-N timing`). `session.json` is not
+  rewritten after it is sealed. The sidecar wins over `options.w_cal`.
+  `runner::read_wcal` validates both (positive finite value, method one of
+  `perf-ipc` and `best-of-N timing`, host named).
+- `ecbench band`: the `--w-cal*` flags override; without them the sessions'
+  own value is used. Several sessions must agree (all carry the same
+  reading, or none does); otherwise the command refuses and asks for the
+  flags (`runner::shared_wcal`).
+
+### Where the calibrated reading appears
+
+- `band`: `calibrated` (as before).
+- `compare`: `ops.band.calibrated`, a `CalibratedGrid`: `Σ S_B / Σ S_A` over
+  the matched pairs that passed the check [pcc:unverified] with the field class at `0`, `w_cal`,
+  `10*w_cal` (rows) and every other native counter at 0, 0.1, 1 (columns),
+  `order_at` per field weight (`B < A`, `A < B`, `flips`, `unrankable`) and
+  `ranked_at_calibrated_price`. `ops.band.order` is unchanged. Not in the
+  pooled multi-session comparison, and not with `--unit bitop/v1`.
+- `challenge verdict` (procedure 2): top-level `calibrated`, the same grid
+  with candidate as B and incumbent as A. No axis, outcome or `band` field
+  changes.
+- `bound fit` (fit version 2, not a weighted fit): `sizes[].calibrated`,
+  the mean `S` per size on the same 3 x 3 grid. A bound fitted from sessions
+  without a `w_cal` has no such key and keeps its id.
+
+### Class membership test
+
+`band::tests::field_multiplication_lookalikes_are_classed_or_excluded`
+collects every name in the `cost.unpriced` lists of all committed
+`research/**/records.jsonl` and every `"..._uncharged"` literal in `src/`.
+A name with a word beginning `mul`, `sqr` or `squar` must be in
+`FIELD_ARITHMETIC_COUNTERS` or in the new `FIELD_ARITHMETIC_EXCLUSIONS`
+(each with a reason), else the test fails. It found, and this change
+settles:
+
+- added to the class: `cm_formula_muls`, `cm_formula_sqrs`,
+  `elimination_modular_multiplications`, `large_prime_mulmods`,
+  `explicit_x_zero_lift_squarings`, `scalar_muls` and
+  `scalar_multiplications` (mod-`r` ring products), `linalg_mulmod`, and
+  the solver-block names `solver_F_p_multiplications_(grid)` and the two
+  `solver_F_p_multiply-adds_(...)` (a multiply-add counted as one
+  multiplication). A phase-qualified label (`linear_algebra.linalg_mulmod_uncharged`)
+  is classed by the part after the last dot, and the dynamic
+  `complete_route_f2m<n>_{mul,square}_uncharged` is matched by pattern.
+- excluded, with reasons: `aps_core_scalar_mults` (curve-point scalar
+  multiplication), `aps_core_square_roots`, `sqrt_mod_p_calls`,
+  `sqrt_solves` (square roots), `fp2_mul` (extension field),
+  `line_field_multiplications` and `line_field_squarings` (trace-line
+  extension field).
+
+Adding these names changes only the `calibrated` readings, which exist only
+with a `w_cal`; the band's rows and verdicts do not read the class.
+
+### Limits
+
+Evidence is by the tests named in the PR; none has a pcc claim.
+[pcc:unverified] The pooled comparison and `--unit bitop/v1` carry no
+calibrated block. `compare`, `challenge` and `bound fit` take the w_cal from
+the sessions only; the override flags exist on `run` and `band`.
