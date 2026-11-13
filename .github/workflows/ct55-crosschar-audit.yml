@@ -24,6 +24,12 @@ jobs:
           node "$base/ct55_independent.js" > ct55-javascript.txt
           node --no-opt "$base/ct55_independent.js" > ct55-javascript-noopt.txt
           cmp ct55-javascript.txt ct55-javascript-noopt.txt
+          python3 -B "$base/ct55_toy_controls.py" > ct55-toy-python.txt
+          python3 -O -B "$base/ct55_toy_controls.py" > ct55-toy-python-opt.txt
+          cmp ct55-toy-python.txt ct55-toy-python-opt.txt
+          node "$base/ct55_toy_independent.js" > ct55-toy-js.txt
+          node --no-opt "$base/ct55_toy_independent.js" > ct55-toy-js-noopt.txt
+          cmp ct55-toy-js.txt ct55-toy-js-noopt.txt
           python3 - <<'PY'
           from pathlib import Path
           py=Path("ct55-python.txt").read_text().splitlines()
@@ -33,6 +39,11 @@ jobs:
           assert len(py)==23 and len(js)==23
           assert "parity mutant rejected" in py[-1]
           assert "parity mutant rejected" in js[-1]
-          print("CT55 finite-stage independent check passed; no global field construction tested")
+          toy_py=Path("ct55-toy-python.txt").read_text().splitlines()
+          toy_js=Path("ct55-toy-js.txt").read_text().splitlines()
+          assert toy_py[:2]==toy_js[:2]
+          assert "positive p5 to p2" in toy_py[0]
+          assert "negative p7 to p2" in toy_py[1]
+          print("CT55 finite-stage, toy positive/negative controls passed; no uniform global field algorithm tested")
           PY
           sha256sum ct55-python.txt ct55-javascript.txt
