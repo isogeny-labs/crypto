@@ -1,0 +1,46 @@
+[
+  {
+    "name": "boot-id",
+    "command": [
+      "cat",
+      "/proc/sys/kernel/random/boot_id"
+    ],
+    "original_exit": 0,
+    "stdout_bytes": 37,
+    "stdout_sha256": "e80260cc36b7399df720cc101af0dce62b7c702b83e6c91cd3b4830b432fb046",
+    "stderr": ""
+  },
+  {
+    "name": "time-namespace",
+    "command": [
+      "readlink",
+      "/proc/self/ns/time"
+    ],
+    "original_exit": 1,
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": ""
+  },
+  {
+    "name": "time-offsets",
+    "command": [
+      "cat",
+      "/proc/self/timens_offsets"
+    ],
+    "original_exit": 1,
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "cat: /proc/self/timens_offsets: No such file or directory\n"
+  },
+  {
+    "name": "kernel",
+    "command": [
+      "uname",
+      "-sr"
+    ],
+    "original_exit": 0,
+    "stdout_bytes": 14,
+    "stdout_sha256": "2c1c174fdf57a30b12e6753e3ea16e723f8abd5d06c26ddf8ecb475dc0d61d5d",
+    "stderr": ""
+  }
+]

@@ -167,3 +167,17 @@ ActualnewICe869bd/all2543guards/ALL60attempts/all15publiccases/82wholeJSON;writt
 TWELVEwholeclosedcaptures+TWELVEcompleteindices+ONEwholefinalPDF25objects require 13genuineS3migrations;other12 wholeobjectsordinaryGit. Freshcurrentguard07 holds 3455 scientific/code/proof/report/canonicalPDF+link/current729CI/latest703full/root2137 input bytes until exactgenuinebotFF/finalguards. Guard06historical3241/released/NOT reused. FinalPDFexplicitwholebyte .pdf.bin carrier appliesoriginalstricterdata policy;canonicaldocsPDF+researchsymlink preserveunchangedPCCdocs hydration/pins,negativecontrolsmissing/substitutionfail. No split/prune/threshold/policy/gate/verifier/trustchange;remoteavailabilitypending. [pcc:unverified]
 
 Rootfull03 actuallyterminal124/1800s/all2137guards0/two visible diagnostic-reap failures;fulltotalsunknown. Wholecapture/log retained;next exact original failurediagnostics afterthisdataFF,not unchangedfullretry. OriginalS3checkpoint/livebudget/capacity/countercoverage/reference admission andfullgeometry/mainledger/signing/reviews/conflict/vault/KB gapsremain. Nextmateriallydifferent checkpoint route:originaluploader inCIcredentials withoutkeyexport/gateedit. Continue aftereachrung. [pcc:unverified]
+
+## 2026-11-13T23:22:36.238211+00:00 — original diagnostic-reap failures located
+
+### What was done (commands, files, features)
+pcc/claims/PCC-20261113-633ab0.json:SAMEoriginalbinary exacttwo failures EACH101/onefailed6329filtered/all2137guards0. BOTHpanic at originalDiagnosticSessionClock::begin().unwrap beforepublicationassertions. Originalrequiredbootidread0;readonlynamespace/time-offset reads1/missingfiles. Wholelogs/backtraces/exits/sourceexcerpt/environmentreads retained. [pcc:unverified]
+
+### Decisions made (and why)
+Thiscontainer lacks mandatory/proc/self/ns/time and/proc/self/timens_offsets. Preserveoriginalclock/securitychecks/tests;futureoriginalglobalregression requirescapableLinuxhost. No unchangedglobalretry orsource/privilege/namespacechange. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Rootfull03 remains124/unknowntotals;publicationinvariants notexecuted bytheseexactfailures. Actualdata43525890255/13replays/e563da1b1/exact15paths/3455guards hold07released43d6ba/genuineconsumerbabda6. NextconsumerICsourcecheckpoint/730full/14CI;originalS3uploaderCIroute/costcoverage/commonoriginbridge. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+Exact101failures preserved;originalS3checkpointpush1/KBconductor127 unchanged. No globalpass/benchmarkadmission ormergewaiver. [pcc:unverified]

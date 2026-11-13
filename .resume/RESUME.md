@@ -1,3 +1,28 @@
+# Resume: Chained ECDLP Transfers — 2026-11-13T23:29:21.914982+00:00
+
+## Goal
+Continue DLP-preserving transfers,chained Jacobian maps,prime-field descent and admitted computational comparisons acrosscrypto/cryptanalysis/lockedautoresearcher. Continueaftereachrung. [pcc:unverified]
+
+## Lead / hypothesis
+Actualthree F223 Jacobians now solveall15publicICcases;currenttestingchecks class-inputsolver/affinelog cancellation andsame-outputFastSourceChain. Nextsame-origin compatibility/completecostcoverage/completeodddegreecoordinates areopen;correctnessisnotcostevidence. [pcc:unverified]
+
+## Spec
+Consumerprospective98c6f0/2aee BEFOREcode;scientific1816c3b99cb69e2072a7f0a246bdeb98b9f005e8 normallypublished;nativee869bd/written1e65f0/twofaithfulbindings/57total/reportd1027f. Strictci_new_target_ic729+self730/ninephasepairs/82wholeJSONexceptdeclaredwalls/bothoriginal2declgates/2bindings. Originalroot3d scientificpin unchanged. [pcc:unverified]
+
+## State
+Rootbote563da1b1734d353b751868f8f57cb3fac6f570c afternormal4125274f. Genuine43d6ba/babda6 12wholecaptures+12indices+wholePDF25objects13S3+12Git;43525890255/132231419911 actual13remote replays/exactFF15paths/all3455guard07+dirtybytes+PDFlinktypes preserved/hold07released. FutureFFfreezeNEWguard08. Originalfixture restored1ea795/67ef1d/2293097bytesSHA8970667e/originalverify0/sameoriginalbinarytargetedpass. Fullrootretry03 remains124/1800s/2137guards0/unknowntotals;633ab0 twoexact101failures occur atDiagnosticSessionClock initialization,mandatory/proc/self/ns/time and/proc/self/timens_offsets absent. No unchangedwhole retry. [pcc:unverified]
+
+## Next steps
+Collectcurrent730full/native.exit/guard.exit/driver phases andfouractualcontrols;fetchALL14source1816workflows/190native57canonicaldigests,wholeAPI/logs/sourcecopies;checkpointinGitHubPR1523/root3877/queue3904. ThenoriginalS3uploaderCIroute withtrustedpinnedtool andno keyexport;nativecommonorigin/costcoverage/completebeta coordinates. Preserveallfailuresandgenuinewholedata. [pcc:unverified]
+
+## Runs in flight
+Routineboundedcleanphysicalindependentfull:bash /workspace/scratch/ct69-new-target-IC-full-01.sh;source1816/original3d,730guards/2100sbound/freshoutsidecache. Raw/log/exits at /workspace/scratch/ct69-new-target-IC-full-01. Own14sourceCI auditpending;no paidbenchmark oradmittedperformancerun. [pcc:unverified]
+
+## Stop and success conditions
+Currentfullrequiresnine native+tee0/0/oneunfiltered/82wholeJSONexceptdeclaredrawwalls/bothoriginal2declgates/2canonicalbindings/all730guards0/fouractual2nooutput/restored. Nativefailure/timeout retainedanddiagnosed. PerformanceonlyafterORIGINALS3gate/livebudget/capacity/isolation/completecosts/strongestrefs;rootglobal/mainledger/signing/reviews/conflict/geometry/vault/KB gapsareseparate. Continuewhileusefulauthorizedworkavailable. [pcc:unverified]
+
+---
+
 # Resume: Chained ECDLP Transfers — current2026-11-13T22:20UTC
 
 ## Goal
@@ -1354,3 +1379,31 @@ ActualnewICe869bd/all2543guards/ALL60attempts/all15publiccases/82wholeJSON;writt
 TWELVEwholeclosedcaptures+TWELVEcompleteindices+ONEwholefinalPDF25objects require 13genuineS3migrations;other12 wholeobjectsordinaryGit. Freshcurrentguard07 holds 3455 scientific/code/proof/report/canonicalPDF+link/current729CI/latest703full/root2137 input bytes until exactgenuinebotFF/finalguards. Guard06historical3241/released/NOT reused. FinalPDFexplicitwholebyte .pdf.bin carrier appliesoriginalstricterdata policy;canonicaldocsPDF+researchsymlink preserveunchangedPCCdocs hydration/pins,negativecontrolsmissing/substitutionfail. No split/prune/threshold/policy/gate/verifier/trustchange;remoteavailabilitypending. [pcc:unverified]
 
 Rootfull03 actuallyterminal124/1800s/all2137guards0/two visible diagnostic-reap failures;fulltotalsunknown. Wholecapture/log retained;next exact original failurediagnostics afterthisdataFF,not unchangedfullretry. OriginalS3checkpoint/livebudget/capacity/countercoverage/reference admission andfullgeometry/mainledger/signing/reviews/conflict/vault/KB gapsremain. Nextmateriallydifferent checkpoint route:originaluploader inCIcredentials withoutkeyexport/gateedit. Continue aftereachrung. [pcc:unverified]
+
+## 2026-11-13T23:18:22.296280+00:00 — original diagnostic-reap failure isolation
+
+### What was done (commands, files, features)
+Prospective pcc/claims/PCC-20261113-5145aa.json freezes SAMEoriginalbinary/two exact failing tests separately120s/backtraces/all2137guards. Unfilteredroot03 remains124/fulltotalsunknown;hold07 remains active. [pcc:unverified]
+
+### Decisions made (and why)
+Read original runner tests/clock call and whole timeout labels before choosing isolation. KB unavailable (wrapper no executable,three receipts);conductor127. Diagnose first actual panics without changing source/environment or repeating whole suite. Ordinaryunit documentedoptout/PCCrecord/originalcheckpointattempt,not performance. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Run/collect /workspace/scratch/ct69-original-root-reap-diagnostics-01.sh;native codes/backtraces/guards at matchingdirectory. Original artifactpublisher43525890255 inprogress for4125274f/13objects;then exactFF/all3455guards/genuineconsumer report/source730full/14CI. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+Whole root retry03 timeout124/two visiblefailures retained;cause unknown until exact diagnostics. No gate/test weakening. [pcc:unverified]
+
+## 2026-11-13T23:22:36.238211+00:00 — original diagnostic-reap failures located
+
+### What was done (commands, files, features)
+pcc/claims/PCC-20261113-633ab0.json:SAMEoriginalbinary exacttwo failures EACH101/onefailed6329filtered/all2137guards0. BOTHpanic at originalDiagnosticSessionClock::begin().unwrap beforepublicationassertions. Originalrequiredbootidread0;readonlynamespace/time-offset reads1/missingfiles. Wholelogs/backtraces/exits/sourceexcerpt/environmentreads retained. [pcc:unverified]
+
+### Decisions made (and why)
+Thiscontainer lacks mandatory/proc/self/ns/time and/proc/self/timens_offsets. Preserveoriginalclock/securitychecks/tests;futureoriginalglobalregression requirescapableLinuxhost. No unchangedglobalretry orsource/privilege/namespacechange. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Rootfull03 remains124/unknowntotals;publicationinvariants notexecuted bytheseexactfailures. Actualdata43525890255/13replays/e563da1b1/exact15paths/3455guards hold07released43d6ba/genuineconsumerbabda6. NextconsumerICsourcecheckpoint/730full/14CI;originalS3uploaderCIroute/costcoverage/commonoriginbridge. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+Exact101failures preserved;originalS3checkpointpush1/KBconductor127 unchanged. No globalpass/benchmarkadmission ormergewaiver. [pcc:unverified]

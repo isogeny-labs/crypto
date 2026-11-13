@@ -1,3 +1,19 @@
+# Current research queue — 2026-11-13T23:29:21.914982+00:00
+
+Consumer actualIC scientific1816c3b9/tree6e2872f8/direct3baa/245paths/governance58030b normallypublished0. All15publiccases/60attempts/82wholeJSONe869bd/57partialbindings/reportd1027f;canonicalwhole69377-bytePDFgenuineS3+relativeGitlink. Correctedgovernance02 allchecks0;failed01cachedwhitespace2 andexactpath literalEOFclassification a04732 preserveALL2543/729scientificbytes. [pcc:unverified]
+
+1. Collect cleanphysical730full exact1816/original3d:fouractualadmissioncontrols/ninephasepairs/oneunfiltered/82JSONexceptdeclaredrawwalls/both2gates2bindings;raw /workspace/scratch/ct69-new-target-IC-full-01. ALL14ownsourceCI190native57canonicaldigests pending. [pcc:unverified]
+2. Common-origin nativecompatibility withoriginalrandomP0/legacyaffinetriples,thencompleteFpR/source-model/maps/admission/verification/cold+onlinecostcoverage. No costclaim untiladmittedmatchedreferences. [pcc:unverified]
+3. Materiallydifferent originalS3checkpointCIroute:originalpinneduploader/gate only/cleancommittedsource+completeResume/keysconfinedtrustedstep/wholegenuine receipt/no tokenexport. Record IAMdenialoractual remote success;onlyoriginalgate onexactlocalstate decidesadmission. Livebudget/capacity/isolation/referencesstillrequired. [pcc:unverified]
+4. Matchedtarget completeodddegree13^3beta coordinates;writtenfactor/both13 exists,currentthree52kernelsnonfree;geometric/formalbridges remainopen. [pcc:unverified]
+5. Originalglobalrootregression requirescapableLinuxhost. Retry03 unfiltered124/1800s/2137guards0/unknowntotals;633ab0 SAMEbinarytwoexact101failures locatedatmandatoryclocknamespacefilesabsent BEFOREpublicationassertions. No unchangedglobalretry orclock/sourceweakening. Mainledger/signing/reviews/conflict/vault/KB gapsremain. [pcc:unverified]
+
+Actual43d6ba/genuineconsumerbabda6:43525890255/job132231419911 SUCCESS/13remote replays BEFOREe563da1b1/direct4125274f/EXACT15paths. TWELVEwholecaptures+TWELVEcompleteindices+ONEwholefinalPDF25objects13S3+12Git/all3455guard07+BOTHereposdirtybytes+PDFlinktypes preserved;hold07 RELEASED. Whole434959-byteUTF8log/allAPI losslessXZ/push/FF/manifestsDIRECT. FuturedataFF MUSTfreezeNEWguard08 includingcurrent729 andalllaterwork;old3455map07 historical/released. [pcc:unverified]
+
+Originalfixture1ea795/67ef1d genuine2293097bytesSHA8970667e restoredoriginalverify0/samebinaryformerlyfailedtest1pass6329filtered. Refinement703fullb38c7f/own12CI65dd08108native55digests settled;actual52full417921/11CI0ba3a0 settled. Continueaftereachrung. [pcc:unverified]
+
+---
+
 
 ## 2026-11-13T23:09:58.433906+00:00 — whole new-target IC data handoff and fresh guard07
 
