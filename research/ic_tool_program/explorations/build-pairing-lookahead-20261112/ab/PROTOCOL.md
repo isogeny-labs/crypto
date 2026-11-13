@@ -105,3 +105,27 @@ reads 0. The result holds for this host class only.
 ## Not in scope
 
 No board row and no claim against rho.
+
+## Amendment 1 (2026-11-13 ~00:50 UTC, before any row of rounds 38–44)
+
+- **What happened:** the session's container was replaced during the run.
+  At that point `k0n53` had rounds 1–38 complete and `k0n61` rounds 1–37,
+  plus two processes of round 38. All rows on disk survived and are
+  committed (`acb591cd5a`).
+- **Binary:** the binary in `/dev/shm` was lost. It was rebuilt from the
+  same commit (`62f1f0a778`, `--features scan-probes`) but hashes
+  differently. Its hash is in `runs/arms-a1.sha256`, and `run.sh` takes it
+  through `ARMS=`.
+- **Host:** the replacement node reports a different nominal clock
+  (`runs/host-a1.txt`, against `runs/host.txt`).
+- **Remaining rounds:** rounds 39–44 of `k0n53` and 38–44 of `k0n61` run on
+  the rebuilt binary and the replacement node.
+- **Set aside:** the two old-binary processes of `k0n61` round 38 are moved
+  to `runs/set-aside/` and not analysed, so that no round mixes binaries.
+- **Analysis:**
+  - *Primary:* unchanged. All 44 rounds, the decision rule as stated. The
+    ratios are formed within a round, so a change of binary or node between
+    rounds moves every arm of a round together.
+  - *Sensitivity:* added now. The same statistics on the rounds run before
+    the restart only, reported alongside the primary and not used for the
+    decision.

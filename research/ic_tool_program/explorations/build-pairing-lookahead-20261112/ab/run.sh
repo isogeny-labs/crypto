@@ -7,7 +7,7 @@
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"; repo="$(cd "$here/../../../../.." && pwd)"
 runs="$here/runs"; : "${BIN:?}" "${ISO:?}"
-echo "$(sha256sum "$BIN" | cut -d' ' -f1)  ic" | cmp - "$runs/arms.sha256"
+echo "$(sha256sum "$BIN" | cut -d' ' -f1)  ic" | cmp - "${ARMS:-$runs/arms.sha256}"
 suite="$repo/research/ic_tool_program/suite/v1"
 refusals="$runs/refusals.count"; [ -e "$refusals" ] || echo 0 > "$refusals"
 perms=("a q b l" "q b l a" "b l a q" "l a q b")
