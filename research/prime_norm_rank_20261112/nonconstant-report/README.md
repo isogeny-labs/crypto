@@ -74,6 +74,8 @@ measurement protocol and full cost accounting [pcc:unverified].
 
 This is a correctness control with a supplied witness. It is not evidence of
 out-of-sample success, scaling or sub-exponential search complexity.
+The supports are constructed along with the witness; this does not test finding
+a relation over an independently generated known-label online factor base.
 
 ## Source and proof map
 
