@@ -105,12 +105,20 @@ against rather than a bare matrices-per-second.
 
 ## Known limits
 
-- **The matrix does not fit in shared memory at this shape.**
-  `226 × 286 × 4 B = 258 KB` against 228 KB on Hopper, so the reduction
-  runs out of global memory and is bandwidth-bound. At `p < 2^16` — which
-  covers every size `gaudry_cubic` runs, and `p` grows only as `n^{1/3}`
-  — a `u16` variant is 129 KB and fits. That is the first optimisation
-  to try and it is not implemented.
+- **The `u32` matrix does not fit in shared memory at this shape.**
+  `226 × 286 × 4 B = 258 KB` against 228 KB on Hopper, so the global path
+  is bandwidth-bound. At `p < 2^16` — which covers every size
+  `gaudry_cubic` runs, and `p` grows only as `n^{1/3}` — the matrix is
+  staged in shared memory as `u16` (129 KB + 3 KB scratch,
+  `rref_batch_kernel_smem`, the same `mac_rref_block` with `uint16_t`
+  storage). `bench.cu` takes that path when the device's opt-in shared
+  memory per block holds it (sm_80: 163 KB, sm_90: 227 KB; not sm_86/89 at
+  99 KB) and falls back to the global kernel otherwise; `MAC_SMEM=0`
+  forces global, `MAC_SMEM_THREADS=256|512|1024` sets the block (default
+  1024). Measured on an A100 80GB PCIe (2026-11-13), batch 8192: 718 ms
+  global, 197 ms shared at 1024 threads, with `selftest` passing on both
+  paths and both shapes. Evidence:
+  `research/ic_gpu_measure_20261112/REPORT.md`.
 - **The pivot search and the inverse are serial**, one per column, 286
   of them. They bound how much a larger block can buy; `./bench
   occupancy` reports the launch configuration to tune against.

@@ -171,8 +171,12 @@ MAC_HD void mac_cursor_advance(int* i, int* j, int width, int qstep,
  * write, because the update overwrites column `c` of every row and the
  * factor is read from it.
  */
-template <int THREADS>
-__device__ int mac_rref_block(uint32_t* a, int rows, int cols, int* piv,
+/* `E` is the matrix storage: uint32_t for a matrix in global memory,
+ * or uint16_t for a copy staged in shared memory (valid when p < 2^16:
+ * every Montgomery residue is < p).  Every value is computed in 32 bits
+ * either way; only the stores narrow, so both give the same matrix. */
+template <int THREADS, class E = uint32_t>
+__device__ int mac_rref_block(E* a, int rows, int cols, int* piv,
                               uint32_t* scratch) {
     static_assert(THREADS % 32 == 0, "the pivot search reduces whole warps");
     uint32_t* factor = scratch;              /* [MAC_MAX_ROWS] */
@@ -211,7 +215,7 @@ __device__ int mac_rref_block(uint32_t* a, int rows, int cols, int* piv,
         /* 2. Swap rows r and pr. */
         if (pr != r) {
             for (int j = tid; j < cols; j += THREADS) {
-                uint32_t t = a[(size_t)r * cols + j];
+                E t = a[(size_t)r * cols + j];
                 a[(size_t)r * cols + j] = a[(size_t)pr * cols + j];
                 a[(size_t)pr * cols + j] = t;
             }
@@ -227,7 +231,7 @@ __device__ int mac_rref_block(uint32_t* a, int rows, int cols, int* piv,
         uint32_t inv = ctl[1];
         for (int j = c + tid; j < cols; j += THREADS) {
             uint32_t v = fp_mul(a[(size_t)r * cols + j], inv);
-            a[(size_t)r * cols + j] = v;
+            a[(size_t)r * cols + j] = (E)v;
             prow[j] = v;
         }
         __syncthreads();
@@ -250,7 +254,7 @@ __device__ int mac_rref_block(uint32_t* a, int rows, int cols, int* piv,
             uint32_t f = factor[i];
             if (!f) continue;
             size_t at = (size_t)i * cols + c + j;
-            a[at] = fp_sub(a[at], fp_mul(f, prow[c + j]));
+            a[at] = (E)fp_sub(a[at], fp_mul(f, prow[c + j]));
         }
         __syncthreads();
 

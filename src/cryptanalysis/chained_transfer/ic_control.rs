@@ -1056,8 +1056,19 @@ fn wiedemann(
     }
 }
 
+/// Walk length between fresh random starts in [`run_ic`].
+pub const RESTART_DEFAULT: u64 = 4096;
+
 /// Run one index-calculus arm on an instance.
 pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
+    run_ic_with(inst, prm, RESTART_DEFAULT)
+}
+
+/// [`run_ic`] with the walk restarted at a random start `[a]G + [b]T` every
+/// `restart` steps.  A walk in a subgroup of order `r` revisits itself after
+/// about `sqrt(r)` steps, so when `r` is small the default of 4096 wastes
+/// trials on repeats; `instrument::ic_on_rung` passes `~sqrt(r)`.
+pub fn run_ic_with(inst: &Instance, prm: IcParams, restart: u64) -> IcResult {
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1131,7 +1142,7 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= 4096 {
+            if since_restart >= restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1149,7 +1160,7 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 since_restart += 1;
             }
             res.trials += 1;
-            if cur.deg != 3 {
+            if u32::from(cur.deg) != curve.genus() {
                 continue;
             }
             let u: Poly = cur.u_coeffs();

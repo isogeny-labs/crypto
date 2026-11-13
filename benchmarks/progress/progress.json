@@ -5,7 +5,7 @@
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 139,
+    "measured": 142,
     "open": 0
   },
   "repo": "crypto",
@@ -2589,6 +2589,120 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.0003916,
+      "latest": 0.0003916,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n26_gray",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000391,
+            0.000394
+          ],
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.0003916
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.005144,
+      "latest": 0.005144,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_kernel_s_n30_gray",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.005116,
+            0.005151
+          ],
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.005144
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.1965,
+      "latest": 0.1965,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "macaulay_batch8192_s_shared_u16",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.1965
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0005398,
+      "latest": 0.0005398,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "spmv_kernel_s",
+      "points": [
+        {
+          "commit": "7fd7c580b6f6",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261112T2313Z-ic-gpu-cards",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "First GPU measurements of the IC CUDA kernels (A100): audit commits verified (spmv 15.1x; fes truncation bug confirmed and fixed); new O(1) FES walk 18.6-25.8x and macaulay shared-u16 3.66x vs main; rootfind fused sweep rejected. Kernel components only, [pcc:unverified], no rho arm.",
+          "value": 0.0005398
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
     },
     {
       "better": "lower",
@@ -8870,6 +8984,276 @@
     },
     {
       "better": "lower",
+      "first": 0.8935,
+      "latest": 0.8935,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_24b_t1024",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8088,
+            0.9744
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.8935
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7124,
+      "latest": 0.7124,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_24b_t16384",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7044,
+            0.726
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7124
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7758,
+      "latest": 0.7758,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_24b_t4096",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7647,
+            0.7986
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7758
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7389,
+      "latest": 0.7389,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_28b_t1024",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7193,
+            0.7543
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7389
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9444,
+      "latest": 0.9444,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_28b_t16384",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.929,
+            0.9754
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.9444
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7794,
+      "latest": 0.7794,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_28b_t4096",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7511,
+            0.7941
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7794
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0107,
+      "latest": 1.0107,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_32b_t1024",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9963,
+            1.0308
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 1.0107
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1485,
+      "latest": 1.1485,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_32b_t16384",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1101,
+            1.1707
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 1.1485
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1084,
+      "latest": 1.1084,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_fast_32b_t4096",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0758,
+            1.1447
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 1.1084
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 0.7777,
       "latest": 0.7777,
       "latest_derived": {
@@ -9133,6 +9517,276 @@
           ],
           "summary": "wall time IC/rho: 0.78-0.83 at 2^24, 1.11-1.29 at 2^32 (session VM, diagnostic); IC/bsgs 1.33-1.59 [pcc:unverified]",
           "value": 1.2026
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8838,
+      "latest": 0.8838,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_24b_t1024",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8611,
+            0.9843
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.8838
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7003,
+      "latest": 0.7003,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_24b_t16384",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6969,
+            0.7116
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7003
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7334,
+      "latest": 0.7334,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_24b_t4096",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7184,
+            0.8252
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7334
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7913,
+      "latest": 0.7913,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_28b_t1024",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7656,
+            0.8238
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.7913
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9533,
+      "latest": 0.9533,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_28b_t16384",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9361,
+            0.9948
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.9533
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8325,
+      "latest": 0.8325,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_28b_t4096",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8188,
+            0.8347
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 0.8325
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0526,
+      "latest": 1.0526,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_32b_t1024",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0288,
+            1.0832
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 1.0526
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1794,
+      "latest": 1.1794,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_32b_t16384",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1607,
+            1.192
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 1.1794
+        }
+      ],
+      "problem": "ic:multi-target-prime-w24-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1696,
+      "latest": 1.1696,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "icbest_over_rhobest_walltime_std_32b_t4096",
+      "points": [
+        {
+          "commit": "fde73fb4056a",
+          "date": "2026-11-12",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261112T1629Z-mt-timed-runpod",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1362,
+            1.195
+          ],
+          "summary": "RunPod: IC/rho solve time std/fast 0.70-0.89 at 2^24, 0.74-0.95 at 2^28, 1.01-1.18 at 2^32; fast hasher does not flip 2^32 [pcc:unverified]",
+          "value": 1.1696
         }
       ],
       "problem": "ic:multi-target-prime-w24-32",
@@ -20073,6 +20727,93 @@
       "unit": "count"
     },
     {
+      "better": "lower",
+      "first": 515.8755048849767,
+      "latest": 515.8755048849767,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 515.875505
+      },
+      "metric": "smallde_min_ratio_neg_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 515.875505
+          },
+          "n": 48,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 515.8755048849767
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.6262949609621007,
+      "latest": 1.6262949609621007,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.626295
+      },
+      "metric": "smallde_min_ratio_neg_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.626295
+          },
+          "n": 48,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 1.6262949609621007
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 2946.9555495858517,
+      "latest": 2946.9555495858517,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 2946.95555
+      },
+      "metric": "smallde_min_ratio_neg_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 2946.95555
+          },
+          "n": 48,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 2946.9555495858517
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
       "better": "higher",
       "first": 16.0,
       "latest": 16.0,
@@ -20721,6 +21462,528 @@
       "unit": "count"
     },
     {
+      "better": "lower",
+      "first": 274217.9583333333,
+      "latest": 274217.9583333333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1309.258035
+      },
+      "metric": "tower_p16001_g2_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1309.258035
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 209.4453125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 274217.9583333333
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 15683.666666666666,
+      "latest": 15683.666666666666,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 79.781263
+      },
+      "metric": "tower_p16001_g2_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 79.781263
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 196.58333333333334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 15683.666666666666
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 2601026.583333333,
+      "latest": 2601026.583333333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 7998.159868
+      },
+      "metric": "tower_p16001_g2_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 7998.159868
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 325.203125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 2601026.583333333
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 583519.2416666667,
+      "latest": 583519.2416666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 2786.021968
+      },
+      "metric": "tower_p16001_g3_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 2786.021968
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 209.4453125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 583519.2416666667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 14457.333333333334,
+      "latest": 14457.333333333334,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 73.543027
+      },
+      "metric": "tower_p16001_g3_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 73.543027
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 196.58333333333334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 14457.333333333334
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 5705076.416666666,
+      "latest": 5705076.416666666,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 17543.116834
+      },
+      "metric": "tower_p16001_g3_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 17543.116834
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 325.203125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 5705076.416666666
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 4342.141666666667,
+      "latest": 4342.141666666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 61.690015
+      },
+      "metric": "tower_p251_g2_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 61.690015
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 70.38645833333334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 4342.141666666667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 751.6666666666666,
+      "latest": 751.6666666666666,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 10.964066
+      },
+      "metric": "tower_p251_g2_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 10.964066
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 68.55729166666667,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 751.6666666666666
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 36656.416666666664,
+      "latest": 36656.416666666664,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 422.070885
+      },
+      "metric": "tower_p251_g2_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 422.070885
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 86.84895833333334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 36656.416666666664
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 10043.916666666666,
+      "latest": 10043.916666666666,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 142.696719
+      },
+      "metric": "tower_p251_g3_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 142.696719
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 70.38645833333334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 10043.916666666666
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 845.4166666666666,
+      "latest": 845.4166666666666,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 12.331535
+      },
+      "metric": "tower_p251_g3_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 12.331535
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 68.55729166666667,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 845.4166666666666
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 92830.41666666667,
+      "latest": 92830.41666666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1068.871964
+      },
+      "metric": "tower_p251_g3_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1068.871964
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 86.84895833333334,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 92830.41666666667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 73802.41666666667,
+      "latest": 73802.41666666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 681.692244
+      },
+      "metric": "tower_p4001_g2_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 681.692244
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 108.26354166666667,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 73802.41666666667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 6154.25,
+      "latest": 6154.25,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 59.371721
+      },
+      "metric": "tower_p4001_g2_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 59.371721
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 103.65625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 6154.25
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 682635.9166666667,
+      "latest": 682635.9166666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 4559.137888
+      },
+      "metric": "tower_p4001_g2_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 4559.137888
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 149.72916666666666,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 682635.9166666667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 141546.8583333333,
+      "latest": 141546.8583333333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1307.42867
+      },
+      "metric": "tower_p4001_g3_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1307.42867
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 108.26354166666667,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 141546.8583333333
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 4977.916666666667,
+      "latest": 4977.916666666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 48.023314
+      },
+      "metric": "tower_p4001_g3_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 48.023314
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 103.65625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 4977.916666666667
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 1370667.3333333333,
+      "latest": 1370667.3333333333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 9154.310839
+      },
+      "metric": "tower_p4001_g3_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 9154.310839
+          },
+          "n": 12,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 149.72916666666666,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 1370667.3333333333
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
       "better": "neutral",
       "first": 159508.0,
       "latest": 159508.0,
@@ -20761,6 +22024,470 @@
           "spread": null,
           "summary": "Degree-3 cover: all 28,815 IC relations on the transferred subgroup are single full fibres c^*(Q); J(C) and E arms identical in 360/360 seed-cells; p<=251 [pcc:unverified]",
           "value": 159508.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 23440.45,
+      "latest": 23440.45,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 246.741579
+      },
+      "metric": "v3_p1619_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 246.741579
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 95.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 23440.45
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 2583.25,
+      "latest": 2583.25,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 28.117007
+      },
+      "metric": "v3_p1619_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 28.117007
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 91.875,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 2583.25
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 211155.25,
+      "latest": 211155.25,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1714.966497
+      },
+      "metric": "v3_p1619_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1714.966497
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 123.125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 211155.25
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 605131.0,
+      "latest": 605131.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.002336
+      },
+      "metric": "v3_p1619_la_counted_mulmods",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.002336
+          },
+          "n": 1,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 603721.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 605131.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 3337.9625,
+      "latest": 3337.9625,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 51.927467
+      },
+      "metric": "v3_p211_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 51.927467
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 64.28125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 3337.9625
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 670.5,
+      "latest": 670.5,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 10.701247
+      },
+      "metric": "v3_p211_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 10.701247
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 62.65625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 670.5
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 27345.125,
+      "latest": 27345.125,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 346.552079
+      },
+      "metric": "v3_p211_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 346.552079
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 78.90625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 27345.125
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 14993.0,
+      "latest": 14993.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.024602
+      },
+      "metric": "v3_p211_la_counted_mulmods",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.024602
+          },
+          "n": 1,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 14633.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 14993.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 11593.7,
+      "latest": 11593.7,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 173.566503
+      },
+      "metric": "v3_p419_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 173.566503
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 66.796875,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 11593.7
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 1993.125,
+      "latest": 1993.125,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 30.692974
+      },
+      "metric": "v3_p419_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 30.692974
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 64.9375,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 1993.125
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 97998.875,
+      "latest": 97998.875,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1173.20015
+      },
+      "metric": "v3_p419_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1173.20015
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 83.53125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 97998.875
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 52288.0,
+      "latest": 52288.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.006003
+      },
+      "metric": "v3_p419_la_counted_mulmods",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.006003
+          },
+          "n": 1,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 51976.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 52288.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 14849.375,
+      "latest": 14849.375,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 218.353093
+      },
+      "metric": "v3_p821_ic_c_total_w0.1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 218.353093
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 68.00625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 14849.375
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 1953.25,
+      "latest": 1953.25,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 29.399812
+      },
+      "metric": "v3_p821_ic_c_total_w0",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 29.399812
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 66.4375,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 1953.25
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 130914.5,
+      "latest": 130914.5,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1594.08828
+      },
+      "metric": "v3_p821_ic_c_total_w1",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1594.08828
+          },
+          "n": 8,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 82.125,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 130914.5
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 165008.0,
+      "latest": 165008.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.001092
+      },
+      "metric": "v3_p821_la_counted_mulmods",
+      "points": [
+        {
+          "commit": "a76290e2a40c",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.001092
+          },
+          "n": 1,
+          "record": "20261112T2311Z-instrument-fixes",
+          "reference": 164828.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Instrument fixes: walk collection + double large primes cut IC group ops 13.4x at p=1619 (measured IC-baseline improvement); corrected matched rho (negation, set-up separated) is 5-9x cheaper than recorded, so recorded gaps were understated; one verdict changes (tower g2 p=251 unresolved -> above) [pcc:unverified]",
+          "value": 165008.0
         }
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
