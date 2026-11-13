@@ -1,3 +1,18 @@
+Current checkpoint: PUBLIC_TARGET_CHECKPOINT.md, actual alternative gluing / new chain kernels / whole data handoff.
+
+
+## 2026-11-13T18:57:12.575893+00:00 — actual alternative gluing and full raw handoff
+
+Consumer7cf45856/244paths/024ef5/394650 normallypublished0. Nativef33c42 sixclassicalmodels/foursquare+twononsquare;native7c9bf4 allfourcompletePhiPrime/NPrime/both2/both4/public5/2401guards. Written5f7e4c distinguishes threeF223targetsfromold;11newpartialbindings/bothoriginalgates/41total;THREE63028PDFpagesALLinspected/a96d2b. Cleanindependentfull06b112 all597guards/21phases/18wholeJSON/11exactbindings/fouradmissioncontrols;allEIGHTownCIaefb67/all76native41canonicaldigests match. [pcc:unverified]
+
+Nextnative29830a all2432guards/135intersectionhist64,56,14,1/9x9wholeactualA2table/128actualsameAmapcollapses. Written2e21d5 givesgeometrickernelC4^(3-d)C2^(2d),twofree4cases andnonfree/literalcontrols;threeexactpartialLeanbindingscbaaa0/580339/0cc751bothgates/zero trusted. No J4coordinates orcostclaim. Kernelvisualreport/ownCIremainnext. [pcc:unverified]
+
+SEVENTEENwhole closedtrees/all34objects are prepared, originalpolicyselects26S3objects/8smallwholeGitobjects. Freshguard05 holds3096actualselectedinputs untilEXACTgenuinepublisherbotFF/finalguards. Old2334guard04released/notreused. PreserveallwholeAPI/logXZ/push/FF/manifests directly,no recursivepublicationarchive. Sourceb023 beforedatacarrier;originalsource/workflows/verifiers/benchmarkcatalogs unchanged. [pcc:unverified]
+
+Queue:finishactualgenuinepublisher/remote-byte replay/exactFF/consumerprojection;publishnewkernelproof/report/CI;thenrevieworiginaloddsourceisogenyAPI (kernelpolynomials overK avoidunavailablehigherpointfields),freshprotocolbeforenewdegree/source-product code. Repeatedroutes throughSAMEA collapse toknownscalartimesdirectmap;thisisnotacostlowerbound. OriginalS3checkpoint/livebudget/capacity/fullmapcounters/strongestrefs,fullformalgeometry/mainledger/signing/reviews/conflict/authenticfixture/vault/KB gaps persist. Global1846rootmainc7c4conflict/1519open unchanged;next19:15UTCunlessmaterialsignal. Continueaftereachrung. [pcc:unverified]
+
+Earlier entries remain historical.
+
 Current checkpoint: PUBLIC_TARGET_CHECKPOINT.md; ten closed captures genuinely published and actual bitangent construction.
 
 
