@@ -55,3 +55,14 @@ Norm.lean, FreeModule/IdealQuotient.lean, Ideal/Operations.lean and quotient
 operations, plus Angdinata-Xu DOI10.4230/LIPIcs.ITP.2023.6. No freshness,
 exhaustiveness or source-only-as-proof inference. Results need source-bound
 unsigned PCC claims, readable proof map and linked diagram/SVG/PDF.
+
+Identity-certificate supplement, before certificate issue: reuse the unchanged
+canonical src/cryptanalysis/identity_certificate.rs and src/hash/sha256.rs in
+a separate minimal native Cargo target. Seal only the literal two-by-two
+expansion det[[A,-F*B],[-B,A]]=A*A-F*B*B, degree3, variables A,B,F, v1
+modulus2^61-1,32 statement-derived points and16 extra replay points with
+domain-separated fixed seeds in source. This certificate does not interpret
+an algebra norm, factor ideals, establish a point sum or execute Lean. Its
+formal pointer refers separately to normFunctionNorm and the checked module.
+Keep certificate and canonical replay receipt unsigned. No change to either
+canonical issuer/checker source or the historical native control dependency lock.
