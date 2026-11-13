@@ -292,7 +292,10 @@ impl SmtSolverKind {
                 .map(|s| s.to_string())
                 .collect(),
             Self::Z3 => ["-smt2", "-st"].iter().map(|s| s.to_string()).collect(),
-            Self::Primo => vec!["--quiet".to_string()],
+            Self::Primo => ["--quiet", "--stats"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
             Self::Generic => Vec::new(),
         }
     }

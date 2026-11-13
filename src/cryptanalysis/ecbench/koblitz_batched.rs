@@ -51,8 +51,8 @@ use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::koblitz_factor_base_search::FactorBaseSpec;
 use crate::cryptanalysis::koblitz_index_calculus::{
     projected_signed_orbit_count, CollectedRelation, DecompositionStrategy, FactorBaseLogSolver,
-    IndividualLogSolver, KoblitzCurve, KoblitzIcOptions, LinearAlgebra, PairSumTable,
-    RelationCollector, RelationWorkUnit,
+    FilterLayout, IndividualLogSolver, KoblitzCurve, KoblitzIcOptions, LinearAlgebra, PairSumTable,
+    ProbeBudget, RelationCollector, RelationWorkUnit,
 };
 use crate::cryptanalysis::koblitz_sparse_la::SparseSolveOptions;
 
@@ -233,7 +233,16 @@ fn pipeline(
     ledger.lap("factor_base");
 
     // 2. The pair table.
-    let pair = PairSumTable::build(kc, &fb).ok_or("pair table unavailable")?;
+    // `PairSumTable::build`'s ladder at the filter layout every committed
+    // record of this method was counted under (see `koblitz_descent`).
+    let pair = PairSumTable::build_within_for_layout(
+        kc,
+        &fb,
+        PairSumTable::DEFAULT_BYTE_BUDGET,
+        ProbeBudget::default(),
+        FilterLayout::Low,
+    )
+    .ok_or("pair table unavailable")?;
     ledger.lap("oracle_setup");
 
     // 3-4. Collect `batch_trials` queries, push them, try to solve: the

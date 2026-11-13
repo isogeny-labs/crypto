@@ -231,6 +231,14 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - **Validation.** Admitted 2026-11-13: `research/negation_remeasure_20261113/VALIDATION.json`, with the commit binding confirmed against `8bf77ba333`.
 - **Verdict-change count.** Of the 16 verdict changes, 10 go to "above" and 6 to "unresolved (lower bound)".
 
+## Whole-Jacobian IC, open case O3 (2026-11-13 addendum)
+
+`research/full_jacobian_ic_20261113/RESULTS.md` [pcc:unverified]; not validated.
+- **Setup.** Gaudry-style IC on the whole `J_C(F_p)` with full relations (A) and with double large primes (B), plus the subgroup-restricted controls, at p = 211 to 51,203. Protocol frozen before data.
+- **Result.** All 36 IC cells (four arms, nine primes) are above the negation rho on `E1` at the band and at the calibrated reading. At w = 0.1, A and B cost 406 to 7.5e6 times rho.
+- **Verdict.** Unresolved under the frozen rule, because the slope-CI condition fails (lower bounds −0.07 for A and −0.65 for B). Rho costs about √r, and the selection let r vary from 71 to 3191 independently of p.
+- **Next step.** A decisive rerun freezes r ≈ p.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`

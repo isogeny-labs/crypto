@@ -81,7 +81,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::cryptanalysis::ecbench::band::{
-    priced_s_with, table_work_counts, unpriced_counts, Pricing, DEFAULT_WEIGHTS,
+    calibrated_ratio_grid, matched_verified, priced_s_with, table_work_counts, unpriced_counts,
+    CalibratedGrid, Pricing, WCal, DEFAULT_WEIGHTS,
 };
 use crate::cryptanalysis::ecbench::canonical::short_id;
 use crate::cryptanalysis::ecbench::record::Record;
@@ -232,6 +233,13 @@ pub struct OpsBand {
     /// (`--no-price-table-work`) and in every comparison before that date.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub priced_table_work: Vec<String>,
+    /// The calibrated reading of AGENTS.md §5a (2026-11-12): the same pairs
+    /// with the field-multiplication counters priced at `0`, `w_cal` and
+    /// `10·w_cal`.  Present only when the sessions carry (or the options
+    /// give) a `w_cal`; additive: `order`, `ratio_b_over_a` and every other
+    /// field are unchanged, and the band's `order` still governs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedGrid>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -480,6 +488,11 @@ pub struct CompareOptions {
     /// prices operations in GAE), and the unit enters `comparison_id`.
     /// Refused with a weight.
     pub bitop: bool,
+    /// The calibrated weight to surface beside the band
+    /// (`ops.band.calibrated`); `None` reads the sessions' own
+    /// (`options.w_cal`, or the `w_cal.json` sidecar via
+    /// [`compare_weighted_with`]).
+    pub w_cal: Option<WCal>,
 }
 
 // ── Tail diagnostics ───────────────────────────────────────────────
@@ -957,6 +970,7 @@ pub fn band_report(
         pairs: exact.len() as u64,
         note,
         priced_table_work: Vec::new(),
+        calibrated: None,
     })
 }
 
@@ -997,6 +1011,7 @@ pub fn compare_weighted(
             allow_interrupted: false,
             pricing: Pricing::default(),
             bitop: false,
+            w_cal: None,
         },
         weight,
     )
@@ -1036,6 +1051,16 @@ pub fn compare_weighted_with(
         .as_ref()
         .map(|s| s.measurement.isolation_required)
         .unwrap_or(Level::L2);
+    let mut with_wcal;
+    let opts = if opts.w_cal.is_none() {
+        let mut dirs = vec![a_dir.to_path_buf()];
+        dirs.extend(b_dir.map(Path::to_path_buf));
+        with_wcal = opts.clone();
+        with_wcal.w_cal = crate::cryptanalysis::ecbench::runner::shared_wcal(&dirs)?;
+        &with_wcal
+    } else {
+        opts
+    };
     compare_loaded_weighted(&sa, &ra, &sb, &rb, a_arm, b_arm, required, opts, weight)
 }
 
@@ -1187,7 +1212,35 @@ pub fn compare_loaded_weighted(
         .collect();
     let incomplete = a.verified < a.measured || b.verified < b.measured;
     let priced_table_work = opts.pricing.priced_table_work();
+    let wcal = if opts.bitop {
+        None
+    } else {
+        match &opts.w_cal {
+            Some(w) => Some(w.clone()),
+            None if sa.options.w_cal == sb.options.w_cal => sa.options.w_cal.clone(),
+            None => {
+                return Err(
+                    "the two sessions carry different w_cal; pass one in CompareOptions".into(),
+                )
+            }
+        }
+    };
+    let calibrated = match &wcal {
+        Some(w) => {
+            let pairs = matched_verified(ma.iter().copied(), mb.iter().copied());
+            Some(calibrated_ratio_grid(
+                &pairs,
+                &DEFAULT_WEIGHTS,
+                opts.pricing,
+                w,
+                a_arm,
+                b_arm,
+            )?)
+        }
+        None => None,
+    };
     let band = band_report(&strata, a_arm, b_arm, rep.censored_pairs).map(|mut b| {
+        b.calibrated = calibrated;
         if !priced_table_work.is_empty() {
             b.note.push_str(&format!(
                 "; counted table work priced in U with the unpriced counters: {}",
@@ -2257,6 +2310,7 @@ mod tests {
                 allow_interrupted: allow,
                 pricing: Pricing::default(),
                 bitop: false,
+                w_cal: None,
             },
         )
     }
@@ -2674,6 +2728,7 @@ mod tests {
             allow_interrupted: false,
             pricing: Pricing::default(),
             bitop: false,
+            w_cal: None,
         };
         let unweighted = compare_loaded_weighted(
             &session,
@@ -2742,6 +2797,7 @@ mod tests {
                 allow_interrupted: false,
                 pricing,
                 bitop: false,
+                w_cal: None,
             };
             compare_loaded_weighted(
                 &session,

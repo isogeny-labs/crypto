@@ -39,6 +39,7 @@ pub mod chain;
 pub mod ec;
 pub mod endo_census;
 pub mod field;
+pub mod full_jacobian_ic;
 pub mod hyper64;
 pub mod ic_control;
 pub mod instrument;

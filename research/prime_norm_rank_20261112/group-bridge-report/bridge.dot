@@ -1,0 +1,17 @@
+digraph bridge {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.20, ranksep=0.28, pad=0.1];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fa", color="#254d70", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.08"];
+  edge [color="#254d70", arrowsize=0.65];
+  public [label="Actual public branches + singular signed Hankel\nExisting interpolation certificate gives A, B and c != 0"];
+  norm [label="Actual h = A - BY in the Weierstrass coordinate ring\nAlgebra norm(h) = c G; degree norm(h) = |S|"];
+  ideals [label="Distinct actual nonsingular point ideals m_x\nh in each m_x; pairwise coprime; residue fields = K"];
+  quotient [label="Surjection R/(h) -> R/(product m_x)\nBoth actual K-vector spaces have dimension |S|"];
+  principal [label="Equal actual ideals: (h) = product m_x\nTheir product class is principal"];
+  sum [label="Existing additive, injective Point.toClass\nActual elliptic sum of selected points = infinity"];
+  scalar [label="Other integer labels supplied: P_x = m_x P\nTarget Q = (- sum of other labels) P"];
+  finder [label="OPEN: produce branches/support and labels efficiently\nCount every attempt; prove complete sub-exponential bit cost", fillcolor="#fff1d8", color="#90631f"];
+  public -> norm -> quotient -> principal -> sum -> scalar;
+  ideals -> quotient;
+  norm -> ideals;
+  finder -> public [style=dashed, label="not supplied by this bridge", fontname="DejaVu Sans", fontsize=9];
+}
