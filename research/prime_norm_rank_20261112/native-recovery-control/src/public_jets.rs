@@ -48,13 +48,14 @@ fn kernel(mut m: Mat) -> Vec<Vec<u64>> {
             for x in &mut m[row] {
                 *x = mul(*x, pivot);
             }
-            for r in 0..m.len() {
+            let pivot_row = m[row].clone();
+            for (r, target) in m.iter_mut().enumerate() {
                 if r == row {
                     continue;
                 }
-                let factor = m[r][c];
-                for j in 0..cols {
-                    m[r][j] = sub(m[r][j], mul(factor, m[row][j]));
+                let factor = target[c];
+                for (dst, src) in target.iter_mut().zip(&pivot_row) {
+                    *dst = sub(*dst, mul(factor, *src));
                 }
             }
             pivots.push(c);
