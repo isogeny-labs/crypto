@@ -279,7 +279,8 @@ FES_HD void fes_walk_block(uint64_t cst, const uint64_t *lin,
                            const uint64_t *quad_tri, const uint64_t *qsym, int n,
                            int low_bits, uint64_t prefix, uint64_t *df_scratch,
                            Emit &emit) {
-  static_assert(K >= 1 && K <= 8, "block of 2..256 steps");
+  // K = 8 (255 unrolled steps) exceeds nvcc's template instantiation depth.
+  static_assert(K >= 1 && K <= 7, "block of 2..128 steps");
   if (low_bits < K) {
     fes_walk_gray(cst, lin, quad_tri, qsym, n, low_bits, prefix, df_scratch, emit);
     return;
