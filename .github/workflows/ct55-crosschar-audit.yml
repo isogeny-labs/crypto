@@ -1,4 +1,4 @@
-name: CT55–58 cross-characteristic finite-stage audit
+name: CT55–59 cross-characteristic finite-stage audit
 on:
   pull_request:
     paths:
@@ -6,6 +6,7 @@ on:
       - 'research/cross_characteristic_global_torsion_20261112/ct56/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct57/**'
       - 'research/cross_characteristic_global_torsion_20261112/ct58/**'
+      - 'research/cross_characteristic_global_torsion_20261112/ct59/**'
       - '.github/workflows/ct55-crosschar-audit.yml'
   workflow_dispatch:
 permissions:
@@ -95,7 +96,13 @@ jobs:
           node "$base/ct57_independent.js" > ct57-js.txt
           node --no-opt "$base/ct57_independent.js" > ct57-js-noopt.txt
           cmp ct57-js.txt ct57-js-noopt.txt
-          cmp ct57-python.txt ct57-js.txt
+          # Only the four numeric rows are intended to be text-identical;
+          # the independently authored final prose sentinels differ.
+          test "$(wc -l < ct57-python.txt)" -eq 5
+          test "$(wc -l < ct57-js.txt)" -eq 5
+          diff -u <(head -n 4 ct57-python.txt) <(head -n 4 ct57-js.txt)
+          grep -q 'Mazur input is external theorem' ct57-python.txt
+          grep -q 'no proof of Mazur claimed' ct57-js.txt
           grep -q 'local_not_global=PASS' ct57-python.txt
           grep -q 'no proof of Mazur claimed' ct57-js.txt
           sha256sum "$base/ct57_borel_audit.py" "$base/ct57_independent.js"
@@ -116,3 +123,20 @@ jobs:
           grep -q '11a1 mod2 f=4 fixed_5_torsion=25 all_basis=true' ct58-js.txt
           grep -q 'theorem is external' ct58-py.txt
           sha256sum "$base/ct58_cyclotomic_gate.py" "$base/ct58_independent.js" ct58-py.txt ct58-js.txt
+
+      - name: CT59 single oriented point Frobenius degree floor and twist falsifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="research/cross_characteristic_global_torsion_20261112/ct59"
+          python3 -B "$base/ct59_single_point_degree.py" > ct59-python.txt
+          python3 -O -B "$base/ct59_single_point_degree.py" > ct59-python-opt.txt
+          cmp ct59-python.txt ct59-python-opt.txt
+          node "$base/ct59_independent.js" > ct59-js.txt
+          node --no-opt "$base/ct59_independent.js" > ct59-js-noopt.txt
+          cmp ct59-js.txt ct59-js-noopt.txt
+          cmp ct59-python.txt ct59-js.txt
+          test "$(wc -l < ct59-python.txt)" -eq 29
+          grep -q 'ell=4294967291 single_f=2147483645 full_f=4294967290 ord_minus2=2147483645' ct59-python.txt
+          grep -q 'five-point twist defeats universal single-point' ct59-js.txt
+          sha256sum ct59-python.txt ct59-js.txt
