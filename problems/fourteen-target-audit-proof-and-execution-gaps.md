@@ -333,7 +333,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks | General n!dⁿ bound and decomposition-system hypotheses |
-| 9 Gröbner heuristics | Partial: Lean counterexample to universal regularity reading | Generic/Joux–Vitse statements and requested exact system measurements |
+| 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal and actual source-field/group Lean certificates | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement, minimal cutoff/exact length8 |
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
@@ -557,4 +557,24 @@ The cutoff's minimality, exact Hilbert function/length8, actual F101³curve
 and coefficient-descent identification, and full internal F4execution
 refinement remain separate. No generic/JV computation-degree refutation
 is claimed. Primary source scopes and failed attempts remain explicit.
+[pcc:unverified]
+
+### 2026-11-13 actual JV source-field and group bridge
+
+The separate [59-declaration source-field project](../research/jv_source_field_audit_20261113/README.md)
+closes the first empty example's actual field/curve/descent/group gap.
+Lean constructs F101[t]/(t³+t+1), proves irreducibility and field cardinality
+1,030,301, checks the nonsingular source curve and nonzero printed target,
+and extracts exactly the three printed coefficient equations through actual
+basis-coordinate maps. The earlier affine unit-ideal certificate and checked
+S3 group equivalence imply that every sum or signed sum of two actual
+factor-base points avoids this target. Whole gate59/0failures/0trusted;
+standard foundations only. This confirms the stated example's behavior.
+[pcc:unverified]
+
+The earlier cutoff project remains scoped to its original polynomial-ideal
+statement; this new versioned packet supplies the additional semantic bridge.
+Source whole-curve order1,029,583/scalar relations, the second split example,
+minimal cutoff/exact length8, generic JV and internal F4 refinement remain
+open. No native execution, independent-host or corpus status is promoted.
 [pcc:unverified]

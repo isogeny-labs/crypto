@@ -14,3 +14,11 @@ affine unit ideal, homogeneous properness and every monomial of degree>=4
 in the actual ideal. It is an algebraic uppercutoff, not minimality,
 length8, source extension-field descent or internal F4execution refinement.
 The original176native artifact pins remain unchanged. [pcc:unverified]
+
+The newer [actual source-field project](../jv_source_field_audit_20261113/README.md)
+now closes the first empty JV example's field/curve/coefficient-descent and
+actual point-group obstruction in Lean. Its separate whole gate passes59
+declarations, zero failures and zero trusted-native exceptions. It confirms
+the source example without proving whole-curve order/scalar relations,
+exact Hilbert length8, generic regularity or internal F4 execution.
+All issued native artifact pins remain unchanged. [pcc:unverified]
