@@ -572,3 +572,23 @@ model; actual sparse solver costs require separate evidence. The accompanying
 bounded source review preserves censored measurements, cleared target-validity
 concerns and replay gaps. The revised relation-finder protocol is unexecuted.
 This is separate from the norm certificate/finder work [pcc:unverified].
+
+## 2026-11-13: actual target-branch polynomial radical
+
+[Branch report](branch-report/README.md) / [PDF](branch-report/report.pdf):
+NormBranchRadical supplies a degree-preserving target-branch projection and
+proves that the actual restricted polynomial radical is the nonzero supplied
+witness line. Its norm scales exactly by the square of the line parameter.
+Explicit monic/Bezout/degree/nonzero guards remain in the theorem; faithful
+coordinate/corank transfer and the public-input finder are separate. Producer
+standing is unsigned [pcc:unverified].
+
+## 2026-11-13: faithful coordinates and actual finite branch radical
+
+[Faithful-coordinate report](faithful-report/README.md) /
+[PDF](faithful-report/report.pdf): NormMatrixFaithful establishes actual
+product-basis projections, injectivity, assembled degree caps and the
+arbitrary-pair bilinear matrix identity. The coordinate-space branch radical
+is exactly the witness line, with nonzero witness coordinates supplied by
+completeness. Reduced branch-basis corank/adjugate recovery and the public-input
+finder remain separate. Producer standing is unsigned [pcc:unverified].

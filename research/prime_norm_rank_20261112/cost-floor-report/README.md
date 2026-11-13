@@ -155,3 +155,11 @@ gain no measured result and remain unchanged.
 
 Editable [DOT](floor.dot), [SVG](floor.svg), [diagram PDF](floor.pdf),
 [report PDF](report.pdf) and [LaTeX](report.tex) accompany this report.
+
+### Bounded recovery follow-up
+
+GitHub code search for pcclosure3 in isogeny-labs/crypto returned only the
+verdict reference at the indexed snapshot. The named closure/src/main.rs
+commit-history path returned an empty list. Retained exact bounded query
+outputs; neither result proves repository-wide source absence. Recovery or
+replacement of the native implementation remains open [pcc:unverified].
