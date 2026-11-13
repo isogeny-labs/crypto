@@ -164,6 +164,15 @@ theorem witnessCoordinates (F H : Polynomial K) (q alpha beta : K)
   apply NormBranchRadical.witnessNonzero F q alpha hFq halpha
   rw [← hA,hw]
   simp only [NormLift.assemble,Pi.zero_apply,zero_smul,Finset.sum_const_zero]
+/-- Compatibility declaration for the initial unsigned source binding. -/
+theorem upperDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
+    (NormLift.assemble (NormMomentMatrix.upperFamily a b) w).natDegree≤a :=
+  assembledUpperDegree a b w
+
+/-- Compatibility declaration for the initial unsigned source binding. -/
+theorem lowerDegree (a b : ℕ) (w : Fin ((a+1)+(b+1)) → K) :
+    (NormLift.assemble (NormMomentMatrix.lowerFamily a b) w).natDegree≤b :=
+  assembledLowerDegree a b w
 end NormMatrixFaithful
 #print axioms NormMatrixFaithful.upperProjection
 #print axioms NormMatrixFaithful.lowerProjection
@@ -175,3 +184,5 @@ end NormMatrixFaithful
 #print axioms NormMatrixFaithful.assembleSmul
 #print axioms NormMatrixFaithful.coordinateBranchRadical
 #print axioms NormMatrixFaithful.witnessCoordinates
+#print axioms NormMatrixFaithful.upperDegree
+#print axioms NormMatrixFaithful.lowerDegree
