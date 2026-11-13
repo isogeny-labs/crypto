@@ -1,3 +1,7 @@
+Canonical current G3:see G3_DESCENT_STATUS.md. Componentc162f3/188d44/2d6fec COMPLETE;ACTUALeightpublication920f04/bb6 complete. FirstCI43379511138 rejected0jobs;frozencontextrepairb02647 metadata0/new343ref,actualnewCIpending. Root02timeout124/2133guards0 andmissingoriginalecbenchfixture2364e3 unresolved;NOrootnativeprocess. FIVEnewdataobjects pendingnextautofix. Nextnorm88d09a isproposalonly;consumerprotocolbeforecode. EarlierCURRENT/ACTIVE paragraphs below historical. [pcc:unverified]
+
+---
+
 Current canonical G3 checkpoint: completeunitc162f3/CLI188d44/focused2d6fec (20native+teepairs0/341guards0)/11exactformalbindings e6590f. Native3page50024PDF andintegration1page33148PDF ALL inspected. Rootcold01timeout124beforetests retained;root02warmresume91d775 ACTIVE/1800s/2133sourcefreeze. LatestSEVENwhole rawobjects pending actualmigration. See G3_DESCENT_STATUS.md. Earlier CURRENT/ACTIVE text below is historical. [pcc:unverified]
 
 ---

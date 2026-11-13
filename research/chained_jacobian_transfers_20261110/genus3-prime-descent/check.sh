@@ -8,7 +8,7 @@ cd "$root"
 study=research/chained_jacobian_transfers_20261110
 out=$(realpath -m "$1")
 mkdir "$out"
-reference="$study/genus3-prime-descent/reference.sha256"
+reference="$study/genus3-prime-descent/reference-02.sha256"
 date -u +%Y-%m-%dT%H:%M:%SZ > "$out/start.txt"
 finish() {
   status=$?

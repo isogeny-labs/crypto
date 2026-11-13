@@ -25,7 +25,6 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.99.1
       ELAN_TOOLCHAIN: leanprover/lean4:v4.35.0
-      CARGO_TARGET_DIR: ${{ runner.temp }}/genus3-build-cache
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
@@ -59,6 +58,8 @@ jobs:
           sh "$RUNNER_TEMP/elan-init.sh" -y --no-modify-path --default-toolchain "$ELAN_TOOLCHAIN"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Replay complete native maps, bounded CLI and exact proofs
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/genus3-build-cache
         run: |
           set -euo pipefail
           bash research/chained_jacobian_transfers_20261110/genus3-prime-descent/check.sh "$RUNNER_TEMP/genus3-output"
