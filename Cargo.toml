@@ -192,6 +192,9 @@ redis-native-tls = ["redis/tls-native-tls"]
 wide-vars = []
 # Explicit selected-bin CLI contracts; production builds keep their behavior.
 ic-cli-contracts = []
+# examples/mt_fieldops.rs: fast multiplicative hasher for every arm's hash tables (timing sensitivity only;
+# counted operations are identical with and without it).
+mt-fasthash = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []
@@ -207,6 +210,9 @@ endo-chain-opcount = []
 # Field-operation counters in the one-word field of `semaev_decomp` (`semaev_decomp::opcount`),
 # for PS-0 of research/pdp_oracle_speedup_20261011; timing builds leave it off.
 pdp-opcount = []
+# R04's in-scan stage counters (research/ic_tool_program/rounds/R04-scan-probes):
+# a separate build that prices the collection scan's stages, never the default.
+scan-probes = []
 
 [lints.rust]
 # `hashclash_linked` is set by a downstream build script that links the
@@ -335,3 +341,22 @@ path = "src/bin/classgroup_structure.rs"
 [[bin]]
 name = "semaev-descent-treewidth"
 path = "src/bin/semaev_descent_treewidth.rs"
+# `lab` — an opt-in build profile for long measured runs (assessment
+# 2026-11-10, R8). One codegen unit and thin LTO let the compiler inline
+# across modules (for example the `#[target_feature]` pclmul kernels into
+# their callers) and keep line tables for profilers. It changes machine code
+# only: values, counted units and RNG consumption are those of `release`,
+# but `binary_sha256` in host records differs, so name the profile beside
+# any wall-time figure and never pool timings across profiles. `release`
+# is unchanged (CI build budgets), and `panic` stays `unwind`: 31
+# `catch_unwind` sites depend on it. Build and use:
+#
+#     cargo build --profile lab --bin ecbench      # -> target/lab/ecbench
+#     ./target/lab/ecbench run --spec SPEC --out DIR
+#
+# Expect a markedly longer build than `release` (single codegen unit).
+[profile.lab]
+inherits = "release"
+codegen-units = 1
+lto = "thin"
+debug = "line-tables-only"

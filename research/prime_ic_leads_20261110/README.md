@@ -370,8 +370,9 @@ a degree that grows with the unknown bits. The atlas dispositions re-read from t
 `open_next_step` (extension embedding; jet lead, as a logarithm channel) and `closed_obstructed`
 (canonical section); the delta that records the equation-source result is `jet_exit/ATLAS_DELTA.patch`
 (this session cannot push to the atlas repository). All three exits are closed at toy scale
-(`t ≤ 13`, 14- and 16-bit primes; the filter's `Θ(N)` is a requirement, not a measured asymptotic);
-the instrument tests any other lift in seconds.
+(`t ≤ 13`, 14- and 16-bit primes; the filter's `Θ(N)` is a requirement, not a measured asymptotic).
+The reopening case named there, a structured lift, was then tested (`jet_exit/README.md` §7): the
+canonical lifts of two class-number-one CM curves and the Dickson base read the generic degree too.
 
 ## 8. What this note does not claim
 

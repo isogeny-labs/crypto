@@ -274,7 +274,9 @@ are not met'' (\art{research/rho_parity_20260915/RESULTS.md}).
 Chapter~\ref{sec:prime} records, from the September study, that Cheon's
 attack beats rho from 24 bits up for the discrete logarithm with auxiliary
 inputs; that reading was not priced across the band and is superseded by
-the ecbench measurement below, which finds no exponent separation. That problem is the largest generic line of the programme absent
+the ecbench measurements below. The first found no exponent separation; a
+study on eleven sizes, validated on 7 November, separates the fitted
+exponents over 36--56 bits. That problem is the largest generic line of the programme absent
 from the treatise, and its boundary with the plain ECDLP is exact.
 
 \paragraph{The floors.} Given $G,[\alpha]G,\ldots,[\alpha^d]G$, a generic
@@ -329,13 +331,60 @@ validated.}
 The comb arms' order against rho holds across the twelve-cell band of
 native price and oracle price, so they are ranked below rho in operations;
 rho stays on every oracle domain's frontier because it makes no oracle
-queries. \emph{No exponent separation is established}: the Cheon and rho
-exponent intervals overlap. Per size, the $r-1$ comb is cheaper than rho
+queries. In this six-size study the Cheon and rho exponent intervals
+overlap. Per size, the $r-1$ comb is cheaper than rho
 with an interval excluding 1 at 36 and 44--56 bits and dearer at 32 and 40.
 The original sessions mix the 32-bit toy curve with medium-tier curves, so
-frontier procedure~2 cannot rank them; a re-run on the medium tier alone is
-frozen as a protocol with no results yet
-(\art{research/cheon_ecbench_medium_20261106/PROTOCOL.md}).
+frontier procedure~2 cannot rank them. A re-run of the medium-tier curves
+as sessions of their own (\art{research/cheon_ecbench_medium_20261106/REPORT.md})
+reproduced 272 of 272 runs count for count and made all 18 bounds rankable:
+in each of the six oracle domains the comb arm is the operations leader and
+shares the frontier with rho, which makes no oracle queries.
+
+\paragraph{Exponent separation over 36--56 bits.} The wide study
+(\art{research/cheon_ecbench_wide_20261106/REPORT.md}; protocol frozen
+before any session, three amendments, each pushed before the data it
+governs) ran both comb arms and matched \texttt{rho.negation} on 11 sizes,
+36 to 56 bits in 2-bit steps, with 24 planted targets each: 1{,}056 runs,
+every one recovered and replayed exactly. Its benchmark row
+(\art{benchmarks/20261107-cheon-wide/}) carries a \texttt{VALIDATION.json}
+with an independent validator report and replay certificate, negation the
+strongest reference and the order holding across the band; no \texttt{pcc}
+claim is recorded. By its preregistered rule (rho's lower end above comb's
+upper end at all three weights) the fitted exponents separate in both
+families (Table~\ref{tab:gf-cheon-wide}); for $r-1$ the gap at $w=0$ is
+$0.002$. The intervals narrowed against the six-size fits; the point
+estimates barely moved. The pooled cost of comb over rho is $0.525$
+$[0.473,0.584]$ ($r-1$) and $0.367$ $[0.318,0.422]$ ($r+1$) at $w=0$, and
+$0.398$ and $0.216$ at $w=1$, every interval below 1, with oracle queries
+on a separate axis. Eight of eleven sizes per family are resolved below 1
+at all three weights. The study was capped at 56 bits after host restarts
+(amendment~3), so the separation is of exponents fitted over 36--56 bits,
+not of asymptotic ones. It is a cost of the DLP with auxiliary inputs and
+makes no plain-ECDLP claim.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllr@{}}
+\toprule
+Family & $w$ & comb $\alpha$ & rho $\alpha$ & gap \\
+\midrule
+$r-1$ & 0 & $0.455$ $[0.428,0.479]$ & $0.508$ $[0.481,0.538]$ & $+0.002$ \\
+ & 0.1 & $0.453$ $[0.427,0.477]$ & $0.508$ $[0.481,0.538]$ & $+0.004$ \\
+ & 1 & $0.443$ $[0.418,0.463]$ & $0.508$ $[0.481,0.538]$ & $+0.018$ \\
+$r+1$ & 0 & $0.432$ $[0.416,0.447]$ & $0.510$ $[0.473,0.542]$ & $+0.026$ \\
+ & 0.1 & $0.432$ $[0.416,0.446]$ & $0.510$ $[0.473,0.542]$ & $+0.027$ \\
+ & 1 & $0.429$ $[0.414,0.442]$ & $0.510$ $[0.474,0.542]$ & $+0.032$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Fitted exponents of $S$ against $r$ (fit version 2, 11 sizes,
+36--56 bits) for the Cheon comb arms and matched negation rho, with 95\%
+intervals; gap is rho's lower end minus comb's upper end. On the frontier
+at $w=0$ the operations axis ($S$ over the floor) reads $0.717$ ($r-1$) and
+$0.687$ ($r+1$) for comb against $1.057$ and $1.100$ for rho. Validated row. Source:
+\art{research/cheon_ecbench_wide_20261106/REPORT.md}.}
+\label{tab:gf-cheon-wide}
+\end{table}
 
 \paragraph{A retraction: Cheon/rho on the P-224 shape.} A study built
 prime-order curves of 32--56 bits whose $r\mp1$ smooth parts have P-224's
@@ -874,6 +923,58 @@ $B\ge4{,}096$ walks after one fitted residual per field
 (\art{benchmarks/20261016-hwcost-rho-model/}). ECCp-131 throughput is in
 Chapter~\ref{sec:prime}; GPU walks are in \S\ref{sec:rv-scale}.
 
+\paragraph{Cheap jump tables.} Three ecbench variants build the
+negation-map jump table more cheaply than \texttt{rho.negation}:
+\texttt{rho.negation\_chained}, whose jumps satisfy
+$M_j=M_{j-1}+M_{j-2}$, and the ladder tables \texttt{rho.negation\_v5} and
+\texttt{\_v6}, which use $k\approx\sqrt F$ jumps and refuse every
+three-term relation among them before spending an operation. One session
+paired all four on six prime curves of $2^{17.7}$--$2^{28}$, 32 targets
+$\times$ 6 rounds (1{,}152 pairs per comparison), with an A/A arm that read
+$1.0000$ (\art{research/ecbench_rho_chained_vs_v5v6_20261111/}; L0, counted
+GAE, 6{,}720 records verified, 5{,}760 replays reproduced; benchmark row with
+a \texttt{VALIDATION.json} and an independent validator report, no
+\texttt{pcc} claim). Table~\ref{tab:mr-jumps} gives the paired ratios. Both
+cheap tables cut set-up to about $0.05\sqrt r$, but the chained table's
+three-term relation becomes a short fruitless cycle under negation: cycle
+escapes rise from $0.003\sqrt r$ to $0.045\sqrt r$ and the walk from
+$1.009\sqrt r$ to $3.708\sqrt r$, while \texttt{v5} walks $0.884\sqrt r$
+with rare escapes (270 of 1{,}152 runs, mean $0.0004\sqrt r$). Per curve,
+chained over \texttt{rho.negation} rises from $1.75$ at $2^{17.7}$ to $7.62$
+at $2^{28}$, in the direction of the chained method's own study, which had
+rejected it. The validator found that chained and \texttt{rho.negation}
+leave their distinguished-point probes undeclared while \texttt{v5} and
+\texttt{v6} declare theirs; charging all at 1\,GAE gives \texttt{v5}/chained
+$0.258$--$0.260$ and chained/\texttt{rho.negation} $3.38$--$3.40$, with no
+ranking changed. The sealed bounds put \texttt{v5} at $1.103$ of the floor
+($\alpha=0.461$) and \texttt{rho.negation} at $1.328$ ($\alpha=0.426$) over
+these six sizes, below the calibrated range at four of them.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Comparison & paired ratio [95\%] & $w=0$ / $0.1$ / $1$ \\
+\midrule
+\texttt{v5} / chained & $0.256$ $[0.236,0.277]$ & $0.256$ / $0.257$ / $0.261$ \\
+\texttt{v6} / chained & $0.261$ $[0.240,0.284]$ & $0.261$ / $0.263$ / $0.269$ \\
+chained / \texttt{rho.negation} & $3.25$ $[2.98,3.54]$ & $3.25$ / $3.28$ / $3.42$ \\
+\texttt{v5} / \texttt{rho.negation} & $0.831$ $[0.797,0.865]$ & $0.831$ / $0.841$ / $0.894$ \\
+\texttt{v6} / \texttt{rho.negation} & $0.849$ $[0.814,0.885]$ & $0.849$ / $0.861$ / $0.919$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Negation-map rho with cheap jump tables, pooled over six prime
+curves of $2^{17.7}$--$2^{28}$, counted GAE at L0. Every order holds across
+the band. Measured on one local host; validated benchmark row
+\art{benchmarks/20261111-rho-chained-vs-v5v6/}. Source:
+\art{research/ecbench_rho_chained_vs_v5v6_20261111/reports/run-20261111T0324Z/REPORT.md}.}
+\label{tab:mr-jumps}
+\end{table}
+
+A prime-field row matched to \texttt{rho.negation} at these sizes is
+matched to a reference that \texttt{v5} undercuts by the factor in
+Table~\ref{tab:mr-jumps}.
+
 \paragraph{Harness overhead in small wall ratios.} Until 22 October ecbench
 parsed its 4.7~MB curve registry on every lookup. Parsing it once cut the
 timed solve window of every rho, BSGS and kangaroo arm to $0.03$--$0.07\times$
@@ -1144,6 +1245,49 @@ $p=0.97$), and generator-level heterogeneity is recorded as unresolved
 (\art{research/isogeny-class-rho-n45/README.md}; L0, no ecbench records, so
 it supports no comparison claim).
 
+\paragraph{A whole field.} The census of 11--12 November
+(\art{research/fp31_whole_field_census_20261111/}; exact computations and
+frozen-protocol runs, every result \texttt{[pcc:unverified]}, no
+leaderboard row) took every isogeny class of $\FF_p$, $p=2^{31}-1$: one row
+for each of the 185{,}363 traces, with $\sum_tH(4p-t^2)=2p$ curves exactly.
+8{,}646 classes (4.66\%) have prime order and hold 2.64\% of the curves.
+The only systematic cross-class effect is that larger classes have smoother
+orders (Spearman $-0.141$ between $\log_2r$ and $\log_2H$), which is
+Lenstra's divisibility bias, matched for every $\ell\le47$ to a relative
+error of at most $1.3\cdot10^{-4}$. Weak classes are weak for textbook
+reasons only, and no class with $r\ge2^{20}$ has embedding degree below 31.
+Four measured phases followed (Table~\ref{tab:rv-fp31}). Counted rho cost
+and IC relation yield do not depend on the class, its size, conductor,
+number of endomorphism rings or $\abs{D_K}$, nor on the curve within a
+class. In wall time per group operation a per-curve spread of about 1\% SD
+remains after the curve order was randomised, but an isomorphic model of a
+curve differs from it as much as an unrelated curve does, so the spread
+belongs to the model and coordinates, not to the curve; the step formula
+uses neither $a$ nor $b$, and the mechanism was not identified. The phase-5
+rule requires a preregistered replication on fresh seeds before any model
+is called cheaper.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{1.9cm}>{\raggedright}p{2.3cm}>{\raggedright}X>{\raggedright\arraybackslash}p{2.1cm}@{}}
+\toprule
+Phase & population, scale & result & frozen verdict \\
+\midrule
+2: counted rho & 57 classes, 394 curves; 281{,}240 runs & normalised by $\sqrt{\pi r/2}$: Kruskal--Wallis $p=0.076$, Spearman $p\ge0.45$, per-class KS $p=0.20$; controls: planted fold $0.741$, A/A $1.003$, isomorphic $0.998$, $\sqrt r$ scaling $1.009$, $j=0$ fold $0.449$ (ideal $0.408$) & null supported \\
+3: IC yield, $m=3$ and 2 & 48 classes, 332 curves; 526{,}111 relations & Kruskal--Wallis $p=0.58$, $0.64$; all 14 tests $p>0.05/14$; planted $+20\%$ reads $1.198$, $1.200$ & null supported \\
+4: rho ns per GAE & 45 of 48 classes; 150{,}144 runs & within-class Friedman KS $p=3.5\cdot10^{-15}$; between-curve SD $0.95\%$; curve confounded with execution order & effect suspected; inconclusive \\
+5: ns per GAE and per attempt, curve order randomised & 47--48 classes; 727 of 768 sessions & rho KS $p=7.7\cdot10^{-7}$, SD $0.91\%$, isomorphic-pair test $0.47$ (chance $0.5$, bar $0.75$); IC $p=0.48$, $0.62$ & rho: effect suspected, not intrinsic; IC: null \\
+\bottomrule
+\end{tabularx}
+\caption[]{Rho and index calculus across the prime-order isogeny classes
+of $\FF_{2^{31}-1}$. Phase 2 ran at L0; phases 4 and 5 graded most rows L2
+on a local host. Sources:
+\art{research/fp31_whole_field_census_20261111/README.md},
+\art{research/fp31_whole_field_census_20261111/phase4/REPORT_PHASE4.typ},
+\art{research/fp31_whole_field_census_20261111/phase5/REPORT_PHASE5.typ}.}
+\label{tab:rv-fp31}
+\end{table}
+
 \paragraph{In ecbench.} A preregistered ecbench study on six 24-bit
 volcanoes found rho's floor-over-crater ratio $1.022$ $[0.983,1.062]$ (90\%)
 and BSGS identical on every curve and model; its v2 found rho $1.004$
@@ -1259,6 +1403,25 @@ This is an \textbf{accounting correction}: no index-calculus count changed.
 Its successor is Table~C of the Koblitz leaderboard, priced against batch
 rho on the same 32 targets at $3.62$--$14.9\times$ and still pre-gate
 (\S\ref{sec:tablea}).
+
+\paragraph{Retention and distinguished points on prime curves.} The
+multi-target index-calculus studies of \S\ref{sec:pg-multitarget} built the
+two standard multi-target rhos in a counted field layer on prime-order
+curves of $2^{22}$--$2^{32}$ and found that the reference itself needed
+work. A rho that dropped the walk points of finished targets made a
+multi-target IC look cheaper; Kuhn--Struik retention reversed that. The
+first distinguished-point rho reused step values (about 39\% of its steps
+duplicated another), so 1--34\% of its steps went to abandoned walks, and a
+variant with distinct steps cost $0.81$--$0.99$ of it at $h=1$
+(\art{research/mt_fieldops_v4_20261112/RESULTS.md}). Which multi-target rho
+is cheapest depends on the price of a hash operation. In counted field
+operations the retention rho wins at $h=0$ and $0.1$ in all 198 v5
+configurations at $c_I=10$, often at the smallest database fraction of the
+grid ($\kappa=0.05$); in wall time on one CPU the distinguished-point rho is
+the fastest in 30 of 36 configurations. There a canonicalisation plus a
+hash costs $0.005$--$0.009$\,GAE and a step index $0.002$--$0.006$\,GAE,
+while a hash-table lookup costs up to $0.85$\,GAE at $2^{24}$ entries
+(\art{research/mt_timed_20261112/RESULTS.md}).
 
 \section{Advice tables}\label{sec:rv-advice}
 

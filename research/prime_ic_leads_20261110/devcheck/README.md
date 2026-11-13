@@ -64,3 +64,36 @@ Outcome (2026-11-11): all 12 width groups completed (`run_nullw.log`); the readi
 §6b. Caveat recorded there: at `m ≥ 3` the `W ≥ 3` boxes raise the raw degree in the chain's free
 unknowns `u_k`, which the closure ring does not reduce, so those rows are not a like-for-like width
 comparison.
+
+## Width law at larger `t` (pre-registered as jet_exit §6c): interim reading, 2026-11-12T05:40Z
+
+Null arm alone (`--controls null`), `m = 2`, cmax 7, `--hky-max-entries 3·10⁸`, budget 900 s;
+rows `nullw{1,3,4}_m2_t9-11.jsonl` (every value `[pcc:unverified]`). Combined with the earlier
+`t = 2..8` width rows, the last fall degree by `t` (both draws equal unless noted):
+
+| `W` | `t = 2..8` | `t = 9` | `t = 10` | `t = 11` | step positions seen |
+|--:|:--|:--|:--|:--|:--|
+| 1 | 3, 3, 4, 4, 4, 4, 5 | 5 | 5 | 5 | `t = 4`, `t = 8` |
+| 2 (= tower) | 4, 4, 4, 4, 5, 5, 5 | 5 | 6 (stage A) | 6 (stage A) | `t = 6`, `t = 10` |
+| 3 | 5, 5, 5, 5, 5, 5, 5 | 6 | ≥ 6 (both draws, budget-censored at `c = 6`) | not run | `t = 9` |
+| 4 | 5, 5, 5, 5, 5, 5, 5 | 6 / ≥ 6 (draw 0 budget-censored) | ≥ 6 (both draws, budget-censored) | not run | `t = 9` (one draw) |
+
+Against the predictions of §6c:
+- **`W = 1`: consistent.** It stays at 5 through `t = 11`; the prediction was a step at `t = 12` or later
+  (its steps so far are four levels apart, `t = 4` and `t = 8`, like C-step's for `W = 2`). `t = 12`
+  was not run.
+- **`W = 3` (and `W = 4`): the prediction is refuted.** It was "stay at 5 through `t = 9`, step at 10 or
+  11"; the step is at `t = 9`. The censored cells are lower bounds and agree with the step.
+- **Monotone in `W` and in `t`:** holds on every completed cell.
+
+What a derivation of `d_F(W, N)` now has to reproduce: for `W = 1, 2` a step every four levels,
+offset by two levels between the two widths (`W = 1` at `t ≡ 0`, `W = 2` at `t ≡ 2 (mod 4)`), giving
+`d_F(1, t) = 3 + ⌊t/4⌋` and `d_F(2, t) = 4 + ⌊(t − 2)/4⌋` on `t = 2..11`; and for `W ≥ 3` a plateau at
+5 over `t = 2..8` followed by a step at `t = 9`, which is not of the same form. These are fits to the
+recorded steps, not a law.
+
+Final (2026-11-12T05:55Z): all three jobs exited 0. The `W = 3, 4` cells at `t = 10` were stopped by the
+900 s budget during the `c = 6` closure (1,004–1,340 s wall on the shared host), so they read `≥ 6`;
+the pilot then stops a ladder whose every run timed out, so `t = 11` was not run for `W = 3, 4`. The
+readings above stand: `W = 1` consistent with its prediction, `W = 3` refuted (step at `t = 9`),
+monotone in `W` and `t` on every completed cell.

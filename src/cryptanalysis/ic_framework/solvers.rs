@@ -17,10 +17,16 @@
 //! | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree, then splitting | word XORs (elimination only) |
 //! | `matrix-f5` | the same hybrid, rows the Boolean F5 criterion predicts to vanish left out | word XORs (elimination only) |
 //! | `inherited-f4` | the same hybrid, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-next` | alias of `inherited-f4` (the next kernels are its default since 2026-11-12) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-legacy` | `inherited-f4` with its kernels before 2026-11-12: identical rows, decisions and count (the A/B arm of the fold) | word XORs (elimination, specialisation and linear elimination only) |
+//! | `inherited-f4-batched` | `inherited-f4` with kept rows rewritten only when read or when the node splits: identical rows, decisions and tree, fewer counted rewrites | word XORs (elimination, specialisation and linear elimination only) |
+//! | `fes-then-batched` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4-batched` otherwise | word XORs (of the engine that ran) |
+//! | `fes-then-inherited` | size rule: `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns (default 14), `inherited-f4` otherwise | word XORs (of the engine that ran) |
 //! | `crossbred-f2` | Joux–Vitse: a Macaulay left kernel, then `2^k` linear solves | word operations (partial) |
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
 //! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
+//! | `fes-f2-gpu` | `fes-f2` with the search on the `gpu/fes` CUDA serve worker, every point re-verified on the CPU; same count as `fes-f2` | word XORs (Gray-code steps) |
 //! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
 //! | `m4gb-f2` | M4GB (external process, Makarim–Stevens ISSAC 2017), reduced degrevlex basis over GF(2) with field equations | none (wall time only; see `AGENTS.md` §6: a reference arm, not a leaderboard row) |
 //! | `exhaustive` | evaluate every equation at every point, stopping at the first that fails | monomial tests |
@@ -47,6 +53,16 @@
 //! its count covers and the runner prices it by wall time instead.  The
 //! native count stays in the report as the engine's own regression
 //! measure.
+//!
+//! Since PR #1774 the framework matches the whole `word XORs (…)` family to
+//! `ns_per_word_xor`.  Every other unit has its own calibration key
+//! ([`solver_unit_key`], 2026-11-12), which charges the count only once
+//! `docs/ic/calibration.json` pins that key for the curve.  No key is pinned
+//! yet, so every unit below is still priced by wall time as described above.
+//! The rule in this section still holds after a pin: a unit whose count
+//! does not cover the engine's whole run is refused, and the solver block
+//! says why (`pricing_qualification`).  Today that is `crossbred-f2`'s
+//! `word operations (partial…)` and `xl-f2`'s modelled count.
 //!
 //! ## Adding an engine — F4, F5, or anything else
 //!
@@ -85,6 +101,8 @@ use crate::cryptanalysis::pq_groebner_f2::{
     groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask, MASK_BITS,
 };
 use crate::cryptanalysis::semaev_sat::XorEncoding;
+
+pub use super::solver_units::{solver_unit_key, SolverUnitKey};
 
 /// The largest system `exhaustive` and the model-enumerating solvers
 /// will attempt, since they are `2^n` in the variable count.
@@ -452,6 +470,18 @@ enum HybridKind {
     MatrixF4,
     MatrixF5,
     InheritedF4,
+    /// `InheritedF4` with the next kernels
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_next_kernels`]): the
+    /// same computation, decisions and count, done faster.
+    InheritedF4Next,
+    /// `InheritedF4` with the kernels it used before 2026-11-12 (the
+    /// paired A/B arm of the fold; identical rows, decisions and count).
+    InheritedF4Legacy,
+    /// `InheritedF4` with the batched rewrite
+    /// ([`crate::cryptanalysis::koblitz_groebner::with_batched_rewrite`]):
+    /// kept rows rewritten only when read or when the node splits; identical
+    /// rows, decisions and tree, fewer word XORs.
+    InheritedF4Batched,
 }
 
 /// Macaulay matrices to a fixed degree, reduced with the bit-packed
@@ -474,7 +504,10 @@ impl HybridF4 {
         match self.kind {
             HybridKind::MatrixF4 => SolverEngine::MatrixF4 { max_degree },
             HybridKind::MatrixF5 => SolverEngine::MatrixF5 { max_degree },
-            HybridKind::InheritedF4 => SolverEngine::InheritedF4 { max_degree },
+            HybridKind::InheritedF4
+            | HybridKind::InheritedF4Next
+            | HybridKind::InheritedF4Legacy
+            | HybridKind::InheritedF4Batched => SolverEngine::InheritedF4 { max_degree },
         }
     }
 }
@@ -498,6 +531,9 @@ impl SystemSolver for HybridF4 {
             HybridKind::MatrixF4 => "matrix-f4",
             HybridKind::MatrixF5 => "matrix-f5",
             HybridKind::InheritedF4 => "inherited-f4",
+            HybridKind::InheritedF4Next => "inherited-f4-next",
+            HybridKind::InheritedF4Legacy => "inherited-f4-legacy",
+            HybridKind::InheritedF4Batched => "inherited-f4-batched",
         }
     }
 
@@ -505,7 +541,10 @@ impl SystemSolver for HybridF4 {
         match self.kind {
             HybridKind::MatrixF4 => "boolean Macaulay matrices to a fixed degree, propagation, splitting (koblitz_groebner MatrixF4)",
             HybridKind::MatrixF5 => "the same with rows the Boolean F5 criterion predicts to vanish left out (MatrixF5)",
-            HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default)",
+            HybridKind::InheritedF4 => "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default), with the next kernels since 2026-11-12: SIMD re-reduction, fused tallies, exact fused builders, reused Four Russians tables",
+            HybridKind::InheritedF4Next => "alias of inherited-f4 since the next kernels became its default (2026-11-12); kept so earlier sweeps reproduce",
+            HybridKind::InheritedF4Legacy => "inherited-f4 with its kernels before 2026-11-12: identical rows, decisions and word-XOR count, slower (the A/B arm of the fold)",
+            HybridKind::InheritedF4Batched => "inherited-f4 with each kept row rewritten only when read or when the node splits (batched rewrite): identical rows, decisions and tree, fewer word XORs",
         }
         .into()
     }
@@ -553,7 +592,18 @@ impl SystemSolver for HybridF4 {
         let resolved = opts.resolve();
         let before = f4_word_ops_thread();
         let tally_before = bitop_tally::snapshot();
-        let (points, st) = solve_boolean_system(&system.equations, system.n_vars, &opts);
+        // The next kernels are inherited-f4's default since 2026-11-12;
+        // `inherited-f4-legacy` keeps the earlier kernels for paired A/B.
+        let next = matches!(
+            self.kind,
+            HybridKind::InheritedF4 | HybridKind::InheritedF4Next | HybridKind::InheritedF4Batched
+        );
+        let batched = matches!(self.kind, HybridKind::InheritedF4Batched);
+        let (points, st) = crate::cryptanalysis::koblitz_groebner::with_next_kernels(next, || {
+            crate::cryptanalysis::koblitz_groebner::with_batched_rewrite(batched, || {
+                solve_boolean_system(&system.equations, system.n_vars, &opts)
+            })
+        });
         let ops = f4_word_ops_thread().wrapping_sub(before);
         let mut tests = 0u64;
         let points = verified(points, system, &mut tests);
@@ -587,7 +637,10 @@ impl SystemSolver for HybridF4 {
         let cost = SolverCost {
             ops,
             op_unit: match self.kind {
-                HybridKind::InheritedF4 => {
+                HybridKind::InheritedF4
+                | HybridKind::InheritedF4Next
+                | HybridKind::InheritedF4Legacy
+                | HybridKind::InheritedF4Batched => {
                     "word XORs (elimination, specialisation and linear elimination only)"
                 }
                 _ => "word XORs (elimination only)",
@@ -783,83 +836,330 @@ impl SystemSolver for FesF2 {
         _params: &Params,
         _budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
-        use crate::cryptanalysis::mq_fes::{gray_incremental_find_all, QuadraticForm};
-        let started = Instant::now();
-        let n = system.n_vars;
-        // `bitop/v1` over the whole call; see `fes_form_ops`,
-        // `gray_table_ops` and `gray_walk_ops` for the constants.
-        let mut word_ops = 0u64;
-        let forms: Option<Vec<QuadraticForm>> = system
-            .equations
-            .iter()
-            .map(|p| {
-                word_ops += fes_form_ops(p.terms.len(), p.n_vars);
-                let mut q = QuadraticForm::from_poly(p)?;
-                // `from_poly` sizes the form by the polynomial's own
-                // variable count; the search needs the system's.
-                if q.n != n {
-                    word_ops += fes_form_ops(p.terms.len(), n);
-                    q = QuadraticForm::from_anf_row(
-                        &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
-                        n,
-                    )?;
-                }
-                Some(q)
-            })
-            .collect();
-        let setup: u64 = forms
-            .as_ref()
-            .map(|fs| {
-                fs.iter()
-                    .map(|f| {
-                        f.constant as u64
-                            + f.linear.iter().filter(|&&b| b).count() as u64
-                            + f.quad.iter().flatten().filter(|&&b| b).count() as u64
-                    })
-                    .sum()
-            })
-            .unwrap_or(0);
-        let found = forms
-            .as_deref()
-            .and_then(|fs| gray_incremental_find_all(fs, usize::MAX));
-        let mut tests = 0u64;
-        let mut extra = BTreeMap::new();
-        extra.insert("points".into(), 1u64 << n);
-        let (verdict, ops) = match found {
-            None => (SolverVerdict::BudgetExceeded, 0),
-            Some(points) => {
-                // The coefficient scan above (a test a coefficient), the
-                // tables, the walk, and a store per root found.
-                let m = system.equations.len();
-                word_ops += m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
-                    + gray_table_ops(m, n)
-                    + gray_walk_ops(1u64 << n, 1)
-                    + 2 * points.len() as u64;
-                let points = verified(masks(points), system, &mut tests);
-                // Two XORs per Gray-code step, one step per point, plus
-                // one per coefficient scattered into the tables.
-                let ops = 2 * (1u64 << n) + setup;
-                if points.is_empty() {
-                    (SolverVerdict::Unsatisfiable, ops)
+        fes_quadratic_solve(system, |fs| {
+            crate::cryptanalysis::mq_fes::gray_incremental_find_all(fs, usize::MAX)
+        })
+    }
+}
+
+/// The body of [`FesF2`] with the search step as a parameter: form building,
+/// the `bitop/v1` count, the Gray-code step count (`2 * 2^n + setup` word
+/// XORs) and CPU verification of every returned point are the same for every
+/// search, so `fes-f2` and `fes-f2-gpu` report the same counted cost for the
+/// same system.  `search` returns every zero of the forms, or `None` when it
+/// cannot (which becomes `BudgetExceeded`, never `Unsatisfiable`).
+fn fes_quadratic_solve(
+    system: &BooleanSystem,
+    search: impl FnOnce(&[crate::cryptanalysis::mq_fes::QuadraticForm]) -> Option<Vec<u64>>,
+) -> (SolverVerdict, SolverCost) {
+    use crate::cryptanalysis::mq_fes::QuadraticForm;
+    let started = Instant::now();
+    let n = system.n_vars;
+    // `bitop/v1` over the whole call; see `fes_form_ops`,
+    // `gray_table_ops` and `gray_walk_ops` for the constants.
+    let mut word_ops = 0u64;
+    let forms: Option<Vec<QuadraticForm>> = system
+        .equations
+        .iter()
+        .map(|p| {
+            word_ops += fes_form_ops(p.terms.len(), p.n_vars);
+            let mut q = QuadraticForm::from_poly(p)?;
+            // `from_poly` sizes the form by the polynomial's own
+            // variable count; the search needs the system's.
+            if q.n != n {
+                word_ops += fes_form_ops(p.terms.len(), n);
+                q = QuadraticForm::from_anf_row(
+                    &crate::cryptanalysis::wdsat_oracle::AnfRow::from_poly(p),
+                    n,
+                )?;
+            }
+            Some(q)
+        })
+        .collect();
+    let setup: u64 = forms
+        .as_ref()
+        .map(|fs| {
+            fs.iter()
+                .map(|f| {
+                    f.constant as u64
+                        + f.linear.iter().filter(|&&b| b).count() as u64
+                        + f.quad.iter().flatten().filter(|&&b| b).count() as u64
+                })
+                .sum()
+        })
+        .unwrap_or(0);
+    let found = forms.as_deref().and_then(search);
+    let mut tests = 0u64;
+    let mut extra = BTreeMap::new();
+    extra.insert("points".into(), 1u64 << n);
+    let (verdict, ops) = match found {
+        None => (SolverVerdict::BudgetExceeded, 0),
+        Some(points) => {
+            // The coefficient scan above (a test a coefficient), the
+            // tables, the walk, and a store per root found.
+            let m = system.equations.len();
+            word_ops += m as u64 * (1 + n + n * n.saturating_sub(1) / 2) as u64
+                + gray_table_ops(m, n)
+                + gray_walk_ops(1u64 << n, 1)
+                + 2 * points.len() as u64;
+            let points = verified(masks(points), system, &mut tests);
+            // Two XORs per Gray-code step, one step per point, plus
+            // one per coefficient scattered into the tables.
+            let ops = 2 * (1u64 << n) + setup;
+            if points.is_empty() {
+                (SolverVerdict::Unsatisfiable, ops)
+            } else {
+                (SolverVerdict::Solved(points), ops)
+            }
+        }
+    };
+    extra.insert("verification_tests".into(), tests);
+    // A verification test is a word test of one term.
+    extra.insert("bitop_word_ops".into(), word_ops + tests);
+    extra.insert("bitop_complete".into(), 1);
+    let cost = SolverCost {
+        ops,
+        op_unit: "word XORs (Gray-code steps)".into(),
+        wall_ns: started.elapsed().as_nanos() as u64,
+        peak_bytes: 0,
+        degree_reached: None,
+        solving_degree: None,
+        timed_out: false,
+        extra,
+    };
+    (verdict, cost)
+}
+
+/// `fes-f2` with the Gray-code search run by the `gpu/fes` worker in serve
+/// mode (one CUDA context per process; `ICX_FES_WORKER` names the worker,
+/// else `fes_cuda`/`fes_metal`/`fes_solve` beside the executable).  The
+/// worker only proposes points: each is re-verified on the CPU, and an
+/// empty answer means `Unsatisfiable` only when the worker reports that its
+/// list is complete.  Points are returned in `fes-f2`'s order (Gray rank):
+/// the descent oracle keeps the first solution that lifts, so order decides
+/// which relation a call yields.  Same forms, same counted cost (`word XORs (Gray-code
+/// steps)`) as `fes-f2`; what changes is wall time, which `AGENTS.md` §6
+/// keeps as a practicality note.  Without a worker, or after a worker
+/// error, it runs `fes-f2`'s CPU search (`gpu_fallback` = 1 in the cost
+/// record) for systems of at most 32 unknowns and reports `BudgetExceeded`
+/// above that.  Up to 40 unknowns (the CUDA kernel's `FES_MAX_VARS`).
+pub struct FesF2Gpu;
+
+impl SystemSolver for FesF2Gpu {
+    fn name(&self) -> &str {
+        "fes-f2-gpu"
+    }
+
+    fn describe(&self) -> String {
+        "fes-f2 with the Gray-code search on the gpu/fes serve worker (CUDA), every point re-verified on the CPU".into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        (1..=40).contains(&shape.n_vars)
+            && shape.n_equations <= 64
+            && shape.degrees.iter().all(|&d| d <= 2)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        _params: &Params,
+        _budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::fes_gpu::{solve_on_shared_server, PackedSystem};
+        use crate::cryptanalysis::mq_fes::gray_incremental_find_all;
+        let (mut used, mut fallback, mut capped, mut gpu_ns) = (0u64, 0u64, 0u64, 0u64);
+        let (verdict, mut cost) = fes_quadratic_solve(system, |fs| {
+            let cpu = |fs: &[crate::cryptanalysis::mq_fes::QuadraticForm]| {
+                if fs.first().is_none_or(|f| f.n <= 32) {
+                    gray_incremental_find_all(fs, usize::MAX)
                 } else {
-                    (SolverVerdict::Solved(points), ops)
+                    None
+                }
+            };
+            let Ok(packed) = PackedSystem::from_quadratic_forms(fs) else {
+                fallback = 1;
+                return cpu(fs);
+            };
+            let t = Instant::now();
+            match solve_on_shared_server(&packed) {
+                Ok(Some((reply, _))) => {
+                    gpu_ns = t.elapsed().as_nanos() as u64;
+                    used = 1;
+                    if reply.total > reply.proposed.len() as u64 {
+                        capped = 1;
+                        None
+                    } else {
+                        // fes-f2's order, so the oracle (first liftable
+                        // solution wins) follows fes-f2's trajectory.
+                        let mut points = reply.proposed;
+                        crate::cryptanalysis::fes_gpu::sort_gray_order(&mut points);
+                        Some(points)
+                    }
+                }
+                Ok(None) | Err(_) => {
+                    fallback = 1;
+                    cpu(fs)
                 }
             }
+        });
+        cost.extra.insert("gpu_worker".into(), used);
+        cost.extra.insert("gpu_fallback".into(), fallback);
+        cost.extra.insert("gpu_capped".into(), capped);
+        cost.extra.insert("gpu_round_trip_ns".into(), gpu_ns);
+        (verdict, cost)
+    }
+}
+
+/// The solver `descent-algebraic` runs when a command names none
+/// (`ic bench`, `ic run`): the size rule with the batched inherited engine.
+/// On the 2026-11-12 end-to-end ladder (research/fes_then_batched_20261112)
+/// its S is 0.74 to 0.89 of `inherited-f4`'s at the pinned word-XOR ratio;
+/// under the AGENTS.md §5a band it ties `inherited-f4` at w = 0 (identical
+/// decisions, solver free) and is lower at w = 0.1 and 1, except at 14
+/// unknowns, where `fes-f2` tries more targets and is above at w = 0
+/// (validation/validator-report.json).  A run that names a solver is
+/// unaffected; ecbench specs always name theirs.
+pub const DEFAULT_DESCENT_SOLVER: &str = "fes-then-batched";
+
+/// The default `fes_max_vars` of [`FesThenInherited`]: the largest number
+/// of unknowns at which `fes-f2`'s word-XOR count per call was below
+/// `inherited-f4`'s on the descent ladder (14 unknowns: about 33 thousand
+/// against 49 to 52 thousand; 16 unknowns: 132 thousand against 102 to 124
+/// thousand; `research/inherited_f4_next_20261112/RESULTS_AB.md`).
+pub const FES_THEN_INHERITED_MAX_VARS: u64 = 14;
+
+/// A size rule between two engines priced in the same unit: `fes-f2` for
+/// quadratic systems of at most `fes_max_vars` unknowns (and at most 64
+/// equations), `inherited-f4` for everything else.  Both count word XORs,
+/// so the oracle's S stays on one pricing basis; the cost record says which
+/// engine ran (`size_rule_fes` = 1 for `fes-f2`).
+pub struct FesThenInherited;
+
+/// [`FesThenInherited`] with `inherited-f4-batched` above the threshold:
+/// `fes-f2` for quadratic systems of at most `fes_max_vars` unknowns,
+/// `inherited-f4-batched` (same decisions as `inherited-f4`, fewer counted
+/// rewrites) otherwise.  Both count word XORs.
+pub struct FesThenBatched;
+
+impl SystemSolver for FesThenInherited {
+    fn name(&self) -> &str {
+        "fes-then-inherited"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4 otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4,
+            }
+            .solve(system, params, budget)
         };
-        extra.insert("verification_tests".into(), tests);
-        // A verification test is a word test of one term.
-        extra.insert("bitop_word_ops".into(), word_ops + tests);
-        extra.insert("bitop_complete".into(), 1);
-        let cost = SolverCost {
-            ops,
-            op_unit: "word XORs (Gray-code steps)".into(),
-            wall_ns: started.elapsed().as_nanos() as u64,
-            peak_bytes: 0,
-            degree_reached: None,
-            solving_degree: None,
-            timed_out: false,
-            extra,
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
+        (verdict, cost)
+    }
+}
+
+impl SystemSolver for FesThenBatched {
+    fn name(&self) -> &str {
+        "fes-then-batched"
+    }
+
+    fn describe(&self) -> String {
+        format!(
+            "size rule: fes-f2 for quadratic systems of at most fes_max_vars unknowns (default {FES_THEN_INHERITED_MAX_VARS}), inherited-f4-batched otherwise; both priced in word XORs"
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "fes_max_vars",
+                "largest number of unknowns solved by fes-f2 (default 14)",
+            ),
+            (
+                "max_degree",
+                "inherited-f4-batched: highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "inherited-f4-batched: reductions before the run gives up (default 4096)",
+            ),
+        ]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let max = params
+            .u64_or("fes_max_vars", FES_THEN_INHERITED_MAX_VARS)
+            .unwrap_or(FES_THEN_INHERITED_MAX_VARS) as usize;
+        let quadratic = system
+            .equations
+            .iter()
+            .all(|p| p.terms.iter().all(|m| m.degree() <= 2));
+        let use_fes =
+            (1..=max.min(32)).contains(&system.n_vars) && system.equations.len() <= 64 && quadratic;
+        let (verdict, mut cost) = if use_fes {
+            FesF2.solve(system, params, budget)
+        } else {
+            HybridF4 {
+                kind: HybridKind::InheritedF4Batched,
+            }
+            .solve(system, params, budget)
         };
+        cost.extra
+            .insert("size_rule_fes".into(), u64::from(use_fes));
         (verdict, cost)
     }
 }
@@ -1334,10 +1634,22 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(HybridF4 {
             kind: HybridKind::InheritedF4,
         }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Next,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Legacy,
+        }),
+        Box::new(HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }),
+        Box::new(FesThenInherited),
+        Box::new(FesThenBatched),
         Box::new(CrossbredF2),
         Box::new(XlF2),
         Box::new(SatCdcl),
         Box::new(FesF2),
+        Box::new(FesF2Gpu),
         Box::new(FesWide),
         Box::new(Exhaustive),
     ]
@@ -1409,6 +1721,75 @@ mod tests {
             }
             other => panic!("m4gb-f2 did not solve the fixture: {other:?}"),
         }
+    }
+
+    /// The default descent solver is a registered engine.
+    #[test]
+    fn default_descent_solver_is_registered() {
+        let solver = solver_by_name(DEFAULT_DESCENT_SOLVER).expect("registered");
+        assert_eq!(solver.name(), DEFAULT_DESCENT_SOLVER);
+    }
+
+    /// The size rule runs `fes-f2` at or below `fes_max_vars` and
+    /// `inherited-f4` above it, says which in the cost record, reports that
+    /// engine's unit, and both branches return the exhaustive reference's
+    /// solutions.  The folded `inherited-f4` and `inherited-f4-legacy` give
+    /// the same solutions and the same word-XOR count.
+    #[test]
+    fn size_rule_and_inherited_fold_match_the_reference() {
+        let sys = fixture();
+        let set = |v: SolverVerdict| -> std::collections::BTreeSet<Mask> {
+            match v {
+                SolverVerdict::Solved(v) => v.into_iter().collect(),
+                SolverVerdict::Unsatisfiable => Default::default(),
+                other => panic!("undecided: {other:?}"),
+            }
+        };
+        let reference = set(Exhaustive.solve(&sys, &Params::default(), None).0);
+        for (max, expect_fes) in [(sys.n_vars as u64, true), (sys.n_vars as u64 - 1, false)] {
+            let mut params = Params::default();
+            params.set("fes_max_vars", max.to_string());
+            let (verdict, cost) = FesThenInherited.solve(&sys, &params, None);
+            let (verdict_b, cost_b) = FesThenBatched.solve(&sys, &params, None);
+            assert_eq!(
+                cost_b.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost_b.ops <= cost.ops, "{} > {}", cost_b.ops, cost.ops);
+            assert_eq!(
+                set(verdict_b),
+                reference,
+                "fes-then-batched, fes_max_vars = {max}"
+            );
+            assert_eq!(
+                cost.extra.get("size_rule_fes"),
+                Some(&u64::from(expect_fes))
+            );
+            assert!(cost.op_unit.starts_with("word XORs"), "{}", cost.op_unit);
+            assert_eq!(set(verdict), reference, "fes_max_vars = {max}");
+        }
+        let folded = HybridF4 {
+            kind: HybridKind::InheritedF4,
+        }
+        .solve(&sys, &Params::default(), None);
+        let legacy = HybridF4 {
+            kind: HybridKind::InheritedF4Legacy,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert_eq!(folded.1.ops, legacy.1.ops);
+        let folded_set = set(folded.0);
+        assert_eq!(folded_set, set(legacy.0));
+        let batched = HybridF4 {
+            kind: HybridKind::InheritedF4Batched,
+        }
+        .solve(&sys, &Params::default(), None);
+        assert!(
+            batched.1.ops <= folded.1.ops,
+            "{} > {}",
+            batched.1.ops,
+            folded.1.ops
+        );
+        assert_eq!(set(batched.0), folded_set);
     }
 
     /// Keep the historical CNF default distinct from an explicitly
@@ -1790,6 +2171,32 @@ mod tests {
                 };
                 agree_with_the_reference(&sys, &format!("n = {n}, n' = {np}, m = {m}, target {t}"));
             }
+        }
+    }
+
+    /// `fes-f2-gpu` reports `fes-f2`'s counted cost and answer on the same
+    /// system, whichever search ran (the serve worker, or the CPU fallback
+    /// when none is configured): the counting lives in one function.
+    #[test]
+    fn fes_gpu_engine_counts_like_fes_f2() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(4031);
+        for trial in 0..24usize {
+            let n = 2 + trial % 14;
+            let sys = random_quadratic(n, 1 + trial % 4, &mut rng);
+            let (va, ca) = FesF2.solve(&sys, &Params::default(), None);
+            let (vb, cb) = FesF2Gpu.solve(&sys, &Params::default(), None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "trial {trial}: verdict"
+            );
+            assert_eq!(ca.ops, cb.ops, "trial {trial}: counted ops");
+            assert_eq!(ca.op_unit, cb.op_unit);
+            assert_eq!(
+                ca.extra.get("bitop_word_ops"),
+                cb.extra.get("bitop_word_ops")
+            );
         }
     }
 

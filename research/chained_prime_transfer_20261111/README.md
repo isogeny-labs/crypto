@@ -29,7 +29,7 @@ instance in Python. This effort:
 
 ## Results
 
-See `RESULTS.md`, `results.json` and `REPORT.pdf`. The result is reported as an
+See `RESULTS.md`, `results.json` and `REPORT.pdf`; the replay-corrected rerun is `results_v2.json` and `REPORT_v2.pdf`. The result is reported as an
 unverified assertion (no independent validator has signed it). Summary: the
 chain is verified at p = 211 to 1619. Rho on each destination stays within the
 scatter of the source rho. Genus-2 index calculus on J(C) costs 9.8× to 42.9×
@@ -47,6 +47,8 @@ cargo run   --release --bin chained_transfer_bench -- run --json \
 ## Scope and obstruction
 
 The genus-2 destination is not cheaper: see
-`problems/prime-field-chained-transfer-no-advantage.md`. The boundary is the
-`Ω(p)` relation count of genus-2 index calculus over `F_p` against rho's
-`√p` — a structural obstruction, not a tuning gap.
+`problems/prime-field-chained-transfer-no-advantage.md`. The boundary
+measured here is the cost of genus-2 index calculus with a full degree-1
+factor base over `F_p`: about `p` group operations, against rho's `√p`. That
+matches the usual `Õ(p^{2-2/g})` estimate and is a limit of this approach,
+not a lower bound on the problem.

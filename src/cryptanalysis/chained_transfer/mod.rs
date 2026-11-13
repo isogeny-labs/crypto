@@ -24,15 +24,27 @@
 //! order, and it **measures** that the discrete log is not cheaper in the
 //! destination: rho costs the same number of group operations on an isogenous
 //! curve and on the order-`r` subgroup of `J(C)`, while genus-2 index calculus
-//! on `J(C)` over `F_p` costs `Ω(p)` group operations — above rho's `√p`.
+//! on `J(C)` over `F_p` with a full degree-1 factor base costs about `p`
+//! group operations (the usual `Õ(p^{2-2/g})` estimate; a limit of this
+//! approach, not a lower bound), above rho's `√p`.
 //! This is a boundary result, consistent with the dimension/relation count of
 //! genus-2 index calculus; it is **not** a cryptanalytic speedup and makes no
 //! cross-characteristic claim.
 
+pub mod amortized;
 pub mod atlas;
 pub mod bielliptic;
+pub mod certify;
 pub mod chain;
 pub mod ec;
+pub mod endo_census;
 pub mod field;
+pub mod hyper64;
+pub mod ic_control;
+pub mod instrument;
 pub mod measure;
+pub mod negation_remeasure;
+pub mod pushforward;
+pub mod pushforward_deg3;
+pub mod small_de;
 pub mod tower;
