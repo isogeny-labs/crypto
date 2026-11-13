@@ -8,6 +8,10 @@ variable {K I : Type*} [Field K]
 def MinorsVanish (M : I → I → K) : Prop :=
   ∀ i j k l, M i j * M k l = M i l * M k j
 
+/-- Public constructor for imported modules whose entry identities are proved directly. -/
+theorem minorsOfEntries (M : I → I → K)
+    (h : ∀ i j k l, M i j*M k l=M i l*M k j) : MinorsVanish M := h
+
 /-- A vector outer product satisfies every two-by-two minor equation. -/
 theorem outerMinors (w : I → K) : MinorsVanish (fun i j => w i*w j) := by
   intro i j k l
