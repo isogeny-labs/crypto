@@ -54,6 +54,8 @@ so all four coefficients vanish. No characteristic restriction is needed.
 The actual remainder criterion also has a converse at every exponent n>=5
 [pcc:unverified].
 
+At e=0 the curve equation is `y^2=x^3`. This endpoint is used only for
+the coefficient equations; no elliptic-group transport through it is asserted.
 The zero tuple of this special fiber is not a recovered solution of the
 original parameter-one problem. No theorem transports that tuple across
 the family, assumes flatness, proves regularity or supplies an efficient
