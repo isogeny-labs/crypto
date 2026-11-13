@@ -51,3 +51,25 @@ jobs:
           python3 -O -B research/cross_characteristic_global_torsion_20261112/ct53/ct53_orbits.py
           node research/cross_characteristic_global_torsion_20261112/ct53/ct53_independent.js
           node --no-opt research/cross_characteristic_global_torsion_20261112/ct53/ct53_independent.js
+
+      - name: CT81 fixed-source-prime compatibility, independent implementations
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct81
+          python3 -B "$D/ct81_source_prime_alignment.py" > /tmp/ct81-py.txt
+          python3 -O -B "$D/ct81_source_prime_alignment.py" > /tmp/ct81-pyopt.txt
+          node "$D/ct81_alignment_independent.js" > /tmp/ct81-js.txt
+          node --no-opt "$D/ct81_alignment_independent.js" > /tmp/ct81-jsopt.txt
+          cmp /tmp/ct81-py.txt /tmp/ct81-pyopt.txt
+          cmp /tmp/ct81-py.txt /tmp/ct81-js.txt
+          cmp /tmp/ct81-py.txt /tmp/ct81-jsopt.txt
+      - name: CT82 prime-to-37 global reduction and independent Hensel, pinned digest
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct82
+          python3 -B "$D/ct82_local_inverse.py" > /tmp/ct82-py.txt
+          python3 -O -B "$D/ct82_local_inverse.py" > /tmp/ct82-pyopt.txt
+          node "$D/ct82_local_inverse_independent.js" > /tmp/ct82-js.txt
+          node --no-opt "$D/ct82_local_inverse_independent.js" > /tmp/ct82-jsopt.txt
+          cmp /tmp/ct82-py.txt /tmp/ct82-pyopt.txt
+          cmp /tmp/ct82-py.txt /tmp/ct82-js.txt
+          cmp /tmp/ct82-py.txt /tmp/ct82-jsopt.txt
+          printf '%s  %s\n' a890c3fffb0f89eadc56688b7fa26a8ebb8538c61d528b8b2ea2ccafa6149d12 /tmp/ct82-py.txt | sha256sum -c
