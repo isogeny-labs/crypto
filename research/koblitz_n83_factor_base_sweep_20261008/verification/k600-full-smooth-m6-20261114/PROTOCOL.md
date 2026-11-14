@@ -44,7 +44,8 @@ repository reports linked above are the primary execution receipts.
   `760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd`,
   and `1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f`.
   The [local staging receipt](staging.json) records byte counts and SHA-256
-  for the six copied inputs under source commit `0c38b582caa71aa9b94e0f0a5bb4e92ff72d19fd`.
+  for the six copied inputs. Its commit field records the checkout at
+  staging time; the execution lock must bind the final corrected source.
 - Target: first sealed public corpus point, supplied as a point to the
   worker. The known-answer sidecar is read only after scalar production.
   Identity pattern 0 is the all-affine chained-S3 arm; other patterns
@@ -78,14 +79,16 @@ fails or the remaining allowance cannot cover the next stage.
 3. Use the new `primary-k600-m6-xcnf positive-pinned` and
    `positive-unpinned` exports on this *same* retained base and circuit.
    The release example suite passes 22 tests [pcc:unverified];
-   [the raw test log](cargo-test.txt) is retained, but the new exporter
+   [the corrected-source test log](cargo-test-fixture0.txt) is retained;
+   the [earlier pre-correction log](cargo-test.txt) remains for provenance.
+   The new exporter
    has not yet been run on the full archive. Preserve its actual six points,
    proper partial sums and public target. Require a checked model against
    the original CNF/XOR rows, complete point sum, subgroup, and
    signed-Frobenius relation row. Freeze any source addition before running
    it. A capped or invalid control stops the ordinary arm.
 4. Export `primary-k600-m6-xcnf natural` and run at most one ordinary
-   fixture-1 query with the same source, base,
+   fixture-0 query with the same source, base,
    circuit and resource caps. Independently replay any solver model against
    the original formula, all point lifts and group equation, and the
    relation row. Record rank contribution. Retain timeout, OOM,

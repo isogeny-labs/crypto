@@ -740,7 +740,7 @@ pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result
             BinaryPoint::Infinity => Err("K600 representative is infinity".into()),
         })
         .collect::<Result<_>>()?;
-    let (public, corpus_blake3) = public_target_fixture(root, &base.curve, 1)?;
+    let (public, corpus_blake3) = public_target_fixture(root, &base.curve, 0)?;
     let pinned = mode == "positive-pinned";
     let constructed = mode != "natural";
     let mut positive = None;
@@ -853,7 +853,7 @@ pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result
         "binary_sha256":binary_sha256,"object":row["object"],
         "object_sha256":OBJECT_SHA256,"point_set_blake3":row["point_set_blake3"],
         "panel_manifest_blake3":manifest_blake3,"public_corpus_blake3":corpus_blake3,
-        "public_fixture":if mode == "natural" { Some(1) } else { None },
+        "public_fixture":if mode == "natural" { Some(0) } else { None },
         "target":point_json(words(&target)),"shape":shape,
         "positive":positive_receipt,
         "xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
