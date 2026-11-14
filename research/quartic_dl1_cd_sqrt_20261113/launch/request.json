@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "quartic-dl1-cdsqrt-20261113-a1",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:903d3fb561b719b100677d5abdbd3f72d4bc4566e7760411973e748869cd5af9",
+    "command": [
+      "/opt/study/job.sh"
+    ],
+    "cpu": 4,
+    "memory": "8Gi",
+    "seconds": 3600,
+    "isolation_profile": "standard",
+    "instance_type": "c8a.2xlarge",
+    "retries": 0,
+    "wait_seconds": 600
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "source_revision": "978de1aef2c9708714cbf00b1147c08315192215",
+    "study": "quartic_dl1_cd_sqrt_20261113",
+    "protocol_sha256": "0dae6b46b609e69d2254f344e6f614240d6fa7cb525ef4757e0d42dc55f02186",
+    "note": "research/quartic_dl1_cd_sqrt_20261113/PROTOCOL.md: command Job, no L2 admission (seconds diagnostic; counted operations deterministic); 116 units, 4 at a time; budget ceiling USD 15"
+  }
+}

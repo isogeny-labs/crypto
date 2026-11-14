@@ -2603,6 +2603,7 @@ mod tests {
     /// pair count around the eight-lane boundaries, and counts the additions
     /// it is told to.
     #[test]
+    #[cfg(target_arch = "x86_64")]
     fn the_paired_kernel_forms_the_interleaved_list_s_sums() {
         use crate::cryptanalysis::koblitz_index_calculus::{
             build_subgroup_orbit_factor_base, KoblitzCurve,
@@ -2679,6 +2680,7 @@ mod tests {
     /// `--ignored`): ns a summand for the fused kernel as it is, without
     /// `λ²`, and with one inverse shared by each ± twin pair.
     #[test]
+    #[cfg(target_arch = "x86_64")]
     #[ignore]
     fn lever_kernel_microbench() {
         use crate::cryptanalysis::koblitz_index_calculus::{

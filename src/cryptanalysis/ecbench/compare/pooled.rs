@@ -466,6 +466,7 @@ mod tests {
             allow_interrupted: false,
             pricing: Pricing::default(),
             bitop: false,
+            w_cal: None,
         }
     }
 

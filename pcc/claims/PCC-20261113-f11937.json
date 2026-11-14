@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-13T22:03:43Z",
+ "id": "PCC-20261113-f11937",
+ "kind": "statement",
+ "producer": {
+  "commit": "cc1716dfc7c31e7e3186fd5ed2f22468130a2ab9",
+  "model": "",
+  "session": "actual-norm-group-bridge-20261113"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_norm_rank_20261112/group-bridge-evidence/norm-matrix-identity.json",
+    "sha256": "88a7da3360a8a9c9e371b57ee93a4ca456b09c946a692cf3676f10dc1522a962"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal polynomial expansion only, unsigned producer invocation of unchanged canonical checker. Formal norm interpretation and elliptic bridge are separate Lean statements; certificate proof pointer does not execute Lean.",
+ "statement": "Canonical native identity certificate seals and replays the literal determinant expansion det[[A,-F B],[-B,A]]=A squared minus F B squared, over the v1 fixed modulus, using 32 statement-derived and 16 extra replay points."
+}

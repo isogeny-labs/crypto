@@ -1,0 +1,1868 @@
+{
+  "schema": "validator-report/v1",
+  "study": "research/fes_then_batched_20261112",
+  "snapshot": {
+    "branch": "claude/zealous-meitner-85ipb5",
+    "validated_at_head": "d81dc1241bdfa7e969440867520696cb7571cb8c",
+    "tree_clean": true,
+    "tree_note": "git status --porcelain showed only the untracked validation/ directory the validator writes. The evidence (results/*.json, README.md, sweeps, run_e2e.sh) was last changed in ae48e0d771 (2026-11-12 20:15Z) and is unchanged at d81dc1241b.",
+    "evidence_commit": "ae48e0d771",
+    "producer_binary_commit_asserted": "4900647bcd3f03eac82803fea83c0615d1db10db (benchmark record commit, commit_dirty false); an ancestor of d81dc1241b"
+  },
+  "status": "pass",
+  "status_scope": "pass = every number of the README table (the headline the dispatch names) recomputes from the committed raw reports within half a unit of its printed precision. It does not rank fes-then-batched first among IC rows or against inherited-f4 under AGENTS.md 5a (findings F2, F3), and it does not cover the README's distance figures (F5).",
+  "independent": true,
+  "independence": "Recomputed by the validator from the committed raw reports results/*.json with validator-written jq (validation/recompute.jq, headline.jq, band.jq, counters.jq, instance_check.jq). The producer's results.json, RESULTS.md and make_report.sh are not read except as the claimed side (README table, RESULTS.md S/rho for F5). The pricing rule was read from src/cryptanalysis/ic_boundary.rs price_phase and src/cryptanalysis/ecbench/band.rs to transcribe it, and is checked by rebuilding every phase's gae from counts.",
+  "raw_data_paths_relative_to": "research/fes_then_batched_20261112/ (the evidence directory; each entry also carries repo_path). For pcc, a recompute proof over this report needs evidence_dir = research/fes_then_batched_20261112.",
+  "raw_data": [
+    {
+      "path": "results/koblitz-n13.json",
+      "repo_path": "research/fes_then_batched_20261112/results/koblitz-n13.json",
+      "sha256": "5df21bc49169b16cdd0433b7f1ec012f93ae6c0e600ce427842a96b0341cd9cc"
+    },
+    {
+      "path": "results/char2-n15.json",
+      "repo_path": "research/fes_then_batched_20261112/results/char2-n15.json",
+      "sha256": "f97c727fc884be221627cf3692a5084d37c44dff49b685e580cd3877d1a8c7f3"
+    },
+    {
+      "path": "results/koblitz-n17.json",
+      "repo_path": "research/fes_then_batched_20261112/results/koblitz-n17.json",
+      "sha256": "510fafeb487d2a642b4201906b57a8aaa787f71156ef4f724672ab70124b37ed"
+    },
+    {
+      "path": "results/koblitz-n19.json",
+      "repo_path": "research/fes_then_batched_20261112/results/koblitz-n19.json",
+      "sha256": "aae2883c033232e46c73606d64f3bfc3339e031090e740c5c1faa5123228f40a"
+    },
+    {
+      "path": "results/char2-n21.json",
+      "repo_path": "research/fes_then_batched_20261112/results/char2-n21.json",
+      "sha256": "1d643ac7877c9028a22f53e32bf8b844f307c90465f5cc463f26c43cff0d78b8"
+    },
+    {
+      "path": "results/koblitz-n23.json",
+      "repo_path": "research/fes_then_batched_20261112/results/koblitz-n23.json",
+      "sha256": "81957663a91b750c2aca0ec0da1a04f1eef458b08578ce742bde85e2c2668883"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "README.md",
+      "repo_path": "research/fes_then_batched_20261112/README.md",
+      "sha256": "aefc37f4815019ba26507090af06ce14340bb03baad3cc88ebf07e105249eebc",
+      "role": "claimed side: the table at lines 53-58 (transcribed in validation/claimed-readme-table.json) and the distance bullet"
+    },
+    {
+      "path": "RESULTS.md",
+      "sha256": "2f0955c6c1193acb7c0f7fd5e9a23c1ecee8c1d2f4549386d323218bc93abf11",
+      "role": "read only for its S/rho column (F5)"
+    },
+    {
+      "path": "../../docs/ic/calibration.json",
+      "repo_path": "docs/ic/calibration.json",
+      "sha256": "f0c0a873dc7b27c8baa86c5ac1debe9643d799e93ce0110175d0622cc8f7fff2",
+      "role": "pinned ratios, cross-checked against the Koblitz reports"
+    },
+    {
+      "path": "../../benchmarks/records/20261112T2009Z-fes-then-batched-e2e.json",
+      "repo_path": "benchmarks/records/20261112T2009Z-fes-then-batched-e2e.json",
+      "sha256": "3b1c0fc40445ef5465725cdd3af61369b1de95a2221d1fec37561a181150b999",
+      "role": "provenance (commit, dirty flag, command, raw-data digests)"
+    },
+    {
+      "path": "results/ic-sha256.txt",
+      "sha256": "30e93cb79282a1aceed8c36be90859f89b24a587b74992a8ae6c0b60a90e619a",
+      "role": "the producer binary digest"
+    },
+    {
+      "path": "results.json",
+      "sha256": "fa200ed14d3bc1f6e34e6961f4da5aec3a5a4d037c02b664da5715f2f8713418",
+      "role": "producer summary: NOT read by the recompute"
+    }
+  ],
+  "scripts": [
+    {
+      "path": "validation/recompute.jq",
+      "sha256": "f5cc0cac741f2c5d83dff641e08533d8e8b10a49f0ccefc8661080eb6276402f"
+    },
+    {
+      "path": "validation/headline.jq",
+      "sha256": "d0efb4a518dd7560f526a0e34f86a6b9bb3990168395e188781a4516e07da626"
+    },
+    {
+      "path": "validation/band.jq",
+      "sha256": "6139b93e10b838d81ff0102a36ec94e2df08743a0bbb9209b51cb004d5159a40"
+    },
+    {
+      "path": "validation/counters.jq",
+      "sha256": "b46203fd943a65f342635495c9b99ea5bc06b45543016f5e5cc4fe3f3ac67f47"
+    },
+    {
+      "path": "validation/instance_check.jq",
+      "sha256": "a6cf4229943bb3f409b8858ab40650dbbd054d2ccbd393511902bf361cad4661"
+    },
+    {
+      "path": "validation/compare_replay.jq",
+      "sha256": "89dcab1d44725e9ece99ae96345b68d55eeb701f01afed8736c066b0187fbd22"
+    },
+    {
+      "path": "validation/assemble_certificate.jq",
+      "sha256": "ee5e970329c4a203161c5537e29de46c1f429fc6dc9426975ee4866c9ea2d160"
+    },
+    {
+      "path": "validation/assemble_report.jq",
+      "sha256": "e5e0aef8b5db589fba18a5285f727fdb45e293f2278ed6b2f7eb1f00d68b5e32"
+    },
+    {
+      "path": "validation/make_validation_json.jq",
+      "sha256": "a6697638b2829202fad1c55763ede67c3a2629ef1e6683444f56281d02ae3483"
+    },
+    {
+      "path": "validation/recompute.sh",
+      "sha256": "2a72f81f9c5688020c96b97272f308f589f1847bcf9fbd8f55e1f08989b03700"
+    },
+    {
+      "path": "validation/validate.sh",
+      "sha256": "ef4717af0d8e4d439c8b83ef7d4d57d29fa27e4cc44418f1014ff33eaa37232f"
+    },
+    {
+      "path": "validation/assemble.sh",
+      "sha256": "e474c15328886564ab5b9a6da0c1c4a468ab84930e9ae6e233d4e156582aa6bf"
+    },
+    {
+      "path": "validation/claimed-readme-table.json",
+      "sha256": "dbfceac06259182373642e8d7534ffe840565a2b149c976bd9022df8ec4ccc8e"
+    },
+    {
+      "path": "validation/findings.json",
+      "sha256": "d20e0ae02c1369a6c5695fbc268c649a3212fa2413991bc62bdf3331425e094f"
+    },
+    {
+      "path": "validation/replay-meta.json",
+      "sha256": "13453b27c68e0e830a347cd60eef89b28c6e1baf2d4f325f06a323e1cb4881b8"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "validation/recompute.json",
+      "sha256": "8de5b190ac35518ac6853e0210b99debc3ea68024e92aa39a9177cd123a147cc"
+    },
+    {
+      "path": "validation/headline.json",
+      "sha256": "468787a41a6aa47b6301148cdeff1051f9d346a2cd2ed620010a91c47fec91fe"
+    },
+    {
+      "path": "validation/band.json",
+      "sha256": "2241e8ff622a90875ddaa0a12c91dc8663919d2d1af5c668d02aae530cdc7f9d"
+    },
+    {
+      "path": "validation/counters.json",
+      "sha256": "8b2d804d9be55ab218e87fa75315bd6a863eddc43e890f2f70e8848f047d0a45"
+    },
+    {
+      "path": "validation/instance-check.json",
+      "sha256": "89209a3151b4feefdfc46757c4361682bd51dcbc5f15ccc3481c6fd17bf74c3d"
+    }
+  ],
+  "rule": "S(w) = [G - C + w (U + n_C)] / sqrt r, computed exactly as (group adds + doubles + w (U + n_C)) / sqrt r (G - C equals the group ops to <= 1e-12 GAE/sqrt r, recompute.json band_formula_vs_counts_max_abs_err). C, n_C: price_phase's ten native counters with a non-null unit (pinned on Koblitz, measured on random binary) plus the solver's own ops. U: *_uncharged natives (none in these reports) plus work_native.table_insert_attempts behind counted:table_insert_attempts (2026-11-08 default reading; the pair table's per-step inserts; 0 for descent-algebraic). Rho: no unpriced counter emitted, U_rho = 0, S_rho(w) = mean s (lower bound at w > 0). Mean over the arm's 3 repeats (rho: 16 runs).",
+  "headline": [
+    {
+      "name": "koblitz-n13/S(matched rho)",
+      "claimed": 2.89,
+      "recomputed": 2.8921421945358907,
+      "rel_tol": 0.0017301038072283738,
+      "printed": "2.89",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n13/S(pair-table)",
+      "claimed": 197.8,
+      "recomputed": 197.77592030683306,
+      "rel_tol": 0.00025278058745096057,
+      "printed": "197.8",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n13/S(inherited-f4)",
+      "claimed": 137.9,
+      "recomputed": 137.94599157901436,
+      "rel_tol": 0.00036258158185569254,
+      "printed": "137.9",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n13/S(fes-then-inherited)",
+      "claimed": 101.9,
+      "recomputed": 101.90548388541748,
+      "rel_tol": 0.0004906771354455348,
+      "printed": "101.9",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n13/S(fes-then-batched)",
+      "claimed": 101.9,
+      "recomputed": 101.90548388541748,
+      "rel_tol": 0.0004906771354455348,
+      "printed": "101.9",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n13/S(fes-then-batched)/S(inherited-f4)",
+      "claimed": 0.739,
+      "recomputed": 0.7387346505610265,
+      "rel_tol": 0.0006765899874682003,
+      "printed": "0.739",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n15/S(matched rho)",
+      "claimed": 2.28,
+      "recomputed": 2.2798593397270315,
+      "rel_tol": 0.002192982457140351,
+      "printed": "2.28",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n15/S(pair-table)",
+      "claimed": 473.7,
+      "recomputed": 473.7342412871305,
+      "rel_tol": 0.00010555203815431708,
+      "printed": "473.7",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n15/S(inherited-f4)",
+      "claimed": 326.0,
+      "recomputed": 326.0374052640938,
+      "rel_tol": 0.00015337423412883436,
+      "printed": "326.0",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n15/S(fes-then-inherited)",
+      "claimed": 326.0,
+      "recomputed": 326.0374052640938,
+      "rel_tol": 0.00015337423412883436,
+      "printed": "326.0",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n15/S(fes-then-batched)",
+      "claimed": 277.5,
+      "recomputed": 277.50794998800285,
+      "rel_tol": 0.00018018018118018018,
+      "printed": "277.5",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n15/S(fes-then-batched)/S(inherited-f4)",
+      "claimed": 0.851,
+      "recomputed": 0.851153718890685,
+      "rel_tol": 0.0005875440668049353,
+      "printed": "0.851",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n17/S(matched rho)",
+      "claimed": 1.73,
+      "recomputed": 1.72515895083561,
+      "rel_tol": 0.0028901734114046246,
+      "printed": "1.73",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n17/S(pair-table)",
+      "claimed": 493.2,
+      "recomputed": 493.17414873475377,
+      "rel_tol": 0.00010137875201378751,
+      "printed": "493.2",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n17/S(inherited-f4)",
+      "claimed": 304.5,
+      "recomputed": 304.5028810702545,
+      "rel_tol": 0.00016420361347947455,
+      "printed": "304.5",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n17/S(fes-then-inherited)",
+      "claimed": 304.5,
+      "recomputed": 304.5028810702545,
+      "rel_tol": 0.00016420361347947455,
+      "printed": "304.5",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n17/S(fes-then-batched)",
+      "claimed": 249.7,
+      "recomputed": 249.6630393672519,
+      "rel_tol": 0.00020024028934601524,
+      "printed": "249.7",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n17/S(fes-then-batched)/S(inherited-f4)",
+      "claimed": 0.820,
+      "recomputed": 0.8199037016981459,
+      "rel_tol": 0.0006097560985609756,
+      "printed": "0.820",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n19/S(matched rho)",
+      "claimed": 1.35,
+      "recomputed": 1.3541944158049875,
+      "rel_tol": 0.0037037037047037034,
+      "printed": "1.35",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n19/S(pair-table)",
+      "claimed": 1063.3,
+      "recomputed": 1063.2573946747616,
+      "rel_tol": 0.00004702341866199568,
+      "printed": "1063.3",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n19/S(inherited-f4)",
+      "claimed": 465.5,
+      "recomputed": 465.45227929221073,
+      "rel_tol": 0.00010741138660687433,
+      "printed": "465.5",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n19/S(fes-then-inherited)",
+      "claimed": 465.5,
+      "recomputed": 465.45227929221073,
+      "rel_tol": 0.00010741138660687433,
+      "printed": "465.5",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n19/S(fes-then-batched)",
+      "claimed": 413.6,
+      "recomputed": 413.6429251478514,
+      "rel_tol": 0.00012088974954932301,
+      "printed": "413.6",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n19/S(fes-then-batched)/S(inherited-f4)",
+      "claimed": 0.889,
+      "recomputed": 0.8886902987710293,
+      "rel_tol": 0.0005624296972879641,
+      "printed": "0.889",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n21/S(matched rho)",
+      "claimed": 1.24,
+      "recomputed": 1.236852691768793,
+      "rel_tol": 0.004032258065516129,
+      "printed": "1.24",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n21/S(pair-table)",
+      "claimed": 1975.9,
+      "recomputed": 1975.8534727419612,
+      "rel_tol": 0.00002530492533827623,
+      "printed": "1975.9",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n21/S(inherited-f4)",
+      "claimed": 4411.6,
+      "recomputed": 4411.627175036939,
+      "rel_tol": 0.000011333757460241182,
+      "printed": "4411.6",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n21/S(fes-then-inherited)",
+      "claimed": 4411.6,
+      "recomputed": 4411.627175036939,
+      "rel_tol": 0.000011333757460241182,
+      "printed": "4411.6",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n21/S(fes-then-batched)",
+      "claimed": 3726.1,
+      "recomputed": 3726.08856942955,
+      "rel_tol": 0.0000134188571766995,
+      "printed": "3726.1",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "char2-n21/S(fes-then-batched)/S(inherited-f4)",
+      "claimed": 0.845,
+      "recomputed": 0.8446064052088335,
+      "rel_tol": 0.000591715977331361,
+      "printed": "0.845",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n23/S(matched rho)",
+      "claimed": 0.88,
+      "recomputed": 0.8776249303242816,
+      "rel_tol": 0.005681818182818182,
+      "printed": "0.88",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n23/S(pair-table)",
+      "claimed": 3986.3,
+      "recomputed": 3986.3299992406196,
+      "rel_tol": 0.000012542960636755889,
+      "printed": "3986.3",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n23/S(inherited-f4)",
+      "claimed": 2051.2,
+      "recomputed": 2051.1670718726286,
+      "rel_tol": 0.000024375976039001564,
+      "printed": "2051.2",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n23/S(fes-then-inherited)",
+      "claimed": 2051.2,
+      "recomputed": 2051.1670718726286,
+      "rel_tol": 0.000024375976039001564,
+      "printed": "2051.2",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n23/S(fes-then-batched)",
+      "claimed": 1674.3,
+      "recomputed": 1674.3269780864368,
+      "rel_tol": 0.00002986322742298274,
+      "printed": "1674.3",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    },
+    {
+      "name": "koblitz-n23/S(fes-then-batched)/S(inherited-f4)",
+      "claimed": 0.816,
+      "recomputed": 0.8162801563296583,
+      "rel_tol": 0.0006127450990392158,
+      "printed": "0.816",
+      "agrees": true,
+      "recomputed_rounds_to_printed": true
+    }
+  ],
+  "headline_summary": {
+    "total": 36,
+    "agree": 36,
+    "rounds_to_printed": 36,
+    "max_rel_diff": 0.0030973512783938283
+  },
+  "unknowns": [
+    {
+      "name": "koblitz-n13/unknowns",
+      "claimed": 14,
+      "recomputed": [
+        14
+      ],
+      "agrees": true
+    },
+    {
+      "name": "char2-n15/unknowns",
+      "claimed": 16,
+      "recomputed": [
+        16
+      ],
+      "agrees": true
+    },
+    {
+      "name": "koblitz-n17/unknowns",
+      "claimed": 18,
+      "recomputed": [
+        18
+      ],
+      "agrees": true
+    },
+    {
+      "name": "koblitz-n19/unknowns",
+      "claimed": 20,
+      "recomputed": [
+        20
+      ],
+      "agrees": true
+    },
+    {
+      "name": "char2-n21/unknowns",
+      "claimed": 22,
+      "recomputed": [
+        22
+      ],
+      "agrees": true
+    },
+    {
+      "name": "koblitz-n23/unknowns",
+      "claimed": 24,
+      "recomputed": [
+        24
+      ],
+      "agrees": true
+    }
+  ],
+  "recomputed_only": [
+    {
+      "instance": "koblitz-n13",
+      "mean_S": {
+        "pair-table": 197.77592030683306,
+        "inherited-f4": 137.94599157901436,
+        "fes-then-inherited": 101.90548388541748,
+        "fes-then-batched": 101.90548388541748,
+        "rho": 2.8921421945358907
+      },
+      "S_over_rho": {
+        "pair-table": 68.3838853706744,
+        "inherited-f4": 47.69682204410108,
+        "fes-then-inherited": 35.235295165620485,
+        "fes-then-batched": 35.235295165620485
+      },
+      "ftb_over_if4": 0.7387346505610265,
+      "ftb_over_pair": 0.5152572857571311,
+      "ftb_over_fti": 1,
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "rho_runs": 16,
+      "arms_all_verified": true,
+      "max_total_gae_rebuild_rel_err": 2.0561910183422345E-16
+    },
+    {
+      "instance": "char2-n15",
+      "mean_S": {
+        "pair-table": 473.7342412871305,
+        "inherited-f4": 326.0374052640938,
+        "fes-then-inherited": 326.0374052640938,
+        "fes-then-batched": 277.50794998800285,
+        "rho": 2.2798593397270315
+      },
+      "S_over_rho": {
+        "pair-table": 207.79099527423077,
+        "inherited-f4": 143.00768454563098,
+        "fes-then-inherited": 143.00768454563098,
+        "fes-then-batched": 121.72152253095973
+      },
+      "ftb_over_if4": 0.851153718890685,
+      "ftb_over_pair": 0.5857882453968641,
+      "ftb_over_fti": 0.851153718890685,
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "rho_runs": 16,
+      "arms_all_verified": true,
+      "max_total_gae_rebuild_rel_err": 2.0718810785205338E-16
+    },
+    {
+      "instance": "koblitz-n17",
+      "mean_S": {
+        "pair-table": 493.17414873475377,
+        "inherited-f4": 304.5028810702545,
+        "fes-then-inherited": 304.5028810702545,
+        "fes-then-batched": 249.6630393672519,
+        "rho": 1.72515895083561
+      },
+      "S_over_rho": {
+        "pair-table": 285.87171547055215,
+        "inherited-f4": 176.5071449925025,
+        "fes-then-inherited": 176.5071449925025,
+        "fes-then-batched": 144.71886155552414
+      },
+      "ftb_over_if4": 0.8199037016981459,
+      "ftb_over_pair": 0.5062370767157331,
+      "ftb_over_fti": 0.8199037016981459,
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "rho_runs": 16,
+      "arms_all_verified": true,
+      "max_total_gae_rebuild_rel_err": 1.7537324310793387E-16
+    },
+    {
+      "instance": "koblitz-n19",
+      "mean_S": {
+        "pair-table": 1063.2573946747616,
+        "inherited-f4": 465.45227929221073,
+        "fes-then-inherited": 465.45227929221073,
+        "fes-then-batched": 413.6429251478514,
+        "rho": 1.3541944158049875
+      },
+      "S_over_rho": {
+        "pair-table": 785.158602240077,
+        "inherited-f4": 343.71156302215826,
+        "fes-then-inherited": 343.71156302215826,
+        "fes-then-batched": 305.4531316332193
+      },
+      "ftb_over_if4": 0.8886902987710293,
+      "ftb_over_pair": 0.38903366881768087,
+      "ftb_over_fti": 0.8886902987710293,
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "rho_runs": 16,
+      "arms_all_verified": true,
+      "max_total_gae_rebuild_rel_err": 2.1363997577845998E-16
+    },
+    {
+      "instance": "char2-n21",
+      "mean_S": {
+        "pair-table": 1975.8534727419612,
+        "inherited-f4": 4411.627175036939,
+        "fes-then-inherited": 4411.627175036939,
+        "fes-then-batched": 3726.08856942955,
+        "rho": 1.236852691768793
+      },
+      "S_over_rho": {
+        "pair-table": 1597.4848790734661,
+        "inherited-f4": 3566.81697375617,
+        "fes-then-inherited": 3566.81697375617,
+        "fes-then-batched": 3012.5564622420484
+      },
+      "ftb_over_if4": 0.8446064052088335,
+      "ftb_over_pair": 1.8858121924692755,
+      "ftb_over_fti": 0.8446064052088335,
+      "rho_method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+      "rho_runs": 16,
+      "arms_all_verified": true,
+      "max_total_gae_rebuild_rel_err": 2.145033596058826E-16
+    },
+    {
+      "instance": "koblitz-n23",
+      "mean_S": {
+        "pair-table": 3986.3299992406196,
+        "inherited-f4": 2051.1670718726286,
+        "fes-then-inherited": 2051.1670718726286,
+        "fes-then-batched": 1674.3269780864368,
+        "rho": 0.8776249303242816
+      },
+      "S_over_rho": {
+        "pair-table": 4542.17953649935,
+        "inherited-f4": 2337.179586631301,
+        "fes-then-inherited": 2337.179586631301,
+        "fes-then-batched": 1907.7933183458845
+      },
+      "ftb_over_if4": 0.8162801563296583,
+      "ftb_over_pair": 0.42001715322248523,
+      "ftb_over_fti": 0.8162801563296583,
+      "rho_method": "signed-Frobenius r-adding walk, distinguished points (koblitz_signed_frobenius_rho_reference)",
+      "rho_runs": 16,
+      "arms_all_verified": true,
+      "max_total_gae_rebuild_rel_err": 2.060092156030198E-16
+    }
+  ],
+  "secondary_claims": {
+    "ftb_over_if4_range": [
+      {
+        "name": "ftb_over_if4 range (min)",
+        "printed": "0.74",
+        "claimed": 0.74,
+        "recomputed": 0.7387346505610265,
+        "agrees": true
+      },
+      {
+        "name": "ftb_over_if4 range (max)",
+        "printed": "0.89",
+        "claimed": 0.89,
+        "recomputed": 0.8886902987710293,
+        "agrees": true
+      }
+    ],
+    "distance_to_rho": [
+      {
+        "name": "koblitz-n13/distance S(ftb)/S(rho)",
+        "printed": "35.3",
+        "claimed": 35.3,
+        "recomputed": 35.235295165620485,
+        "agrees_at_printed_precision": false,
+        "from_rounded_table_values": 35.259515570934255
+      },
+      {
+        "name": "koblitz-n17/distance S(ftb)/S(rho)",
+        "printed": "144",
+        "claimed": 144,
+        "recomputed": 144.71886155552414,
+        "agrees_at_printed_precision": false,
+        "from_rounded_table_values": 144.33526011560693
+      },
+      {
+        "name": "koblitz-n19/distance S(ftb)/S(rho)",
+        "printed": "306",
+        "claimed": 306,
+        "recomputed": 305.4531316332193,
+        "agrees_at_printed_precision": false,
+        "from_rounded_table_values": 306.3703703703704
+      },
+      {
+        "name": "koblitz-n23/distance S(ftb)/S(rho)",
+        "printed": "1903",
+        "claimed": 1903,
+        "recomputed": 1907.7933183458845,
+        "agrees_at_printed_precision": false,
+        "from_rounded_table_values": 1902.6136363636363
+      },
+      {
+        "name": "char2-n15/distance S(ftb)/S(rho)",
+        "printed": "122",
+        "claimed": 122,
+        "recomputed": 121.72152253095973,
+        "agrees_at_printed_precision": true,
+        "from_rounded_table_values": 121.71052631578948
+      },
+      {
+        "name": "char2-n21/distance S(ftb)/S(rho)",
+        "printed": "3005",
+        "claimed": 3005,
+        "recomputed": 3012.5564622420484,
+        "agrees_at_printed_precision": false,
+        "from_rounded_table_values": 3004.9193548387098
+      }
+    ],
+    "lowest_ic_row": [
+      {
+        "name": "koblitz-n13/fes-then-batched lowest IC row at the run's calibration point",
+        "claimed": true,
+        "recomputed": true,
+        "strictly_lowest": true,
+        "tied_with_fes_then_inherited": true,
+        "band_order_vs_pair_table": "flips inside the band: unresolved",
+        "band_order_vs_inherited_f4": "flips inside the band: unresolved"
+      },
+      {
+        "name": "char2-n15/fes-then-batched lowest IC row at the run's calibration point",
+        "claimed": true,
+        "recomputed": true,
+        "strictly_lowest": true,
+        "tied_with_fes_then_inherited": false,
+        "band_order_vs_pair_table": "flips inside the band: unresolved",
+        "band_order_vs_inherited_f4": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "koblitz-n17/fes-then-batched lowest IC row at the run's calibration point",
+        "claimed": true,
+        "recomputed": true,
+        "strictly_lowest": true,
+        "tied_with_fes_then_inherited": false,
+        "band_order_vs_pair_table": "flips inside the band: unresolved",
+        "band_order_vs_inherited_f4": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "koblitz-n19/fes-then-batched lowest IC row at the run's calibration point",
+        "claimed": true,
+        "recomputed": true,
+        "strictly_lowest": true,
+        "tied_with_fes_then_inherited": false,
+        "band_order_vs_pair_table": "flips inside the band: unresolved",
+        "band_order_vs_inherited_f4": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "char2-n21/fes-then-batched lowest IC row at the run's calibration point",
+        "claimed": false,
+        "recomputed": false,
+        "strictly_lowest": false,
+        "tied_with_fes_then_inherited": false,
+        "band_order_vs_pair_table": "flips inside the band: unresolved",
+        "band_order_vs_inherited_f4": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      },
+      {
+        "name": "koblitz-n23/fes-then-batched lowest IC row at the run's calibration point",
+        "claimed": true,
+        "recomputed": true,
+        "strictly_lowest": true,
+        "tied_with_fes_then_inherited": false,
+        "band_order_vs_pair_table": "flips inside the band: unresolved",
+        "band_order_vs_inherited_f4": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+      }
+    ]
+  },
+  "band": {
+    "path": "validation/band.json",
+    "gae_band": {
+      "0": {
+        "ic": 4.013223011397812,
+        "rho": 1.3541944158049875
+      },
+      "0.1": {
+        "ic": 3723.718401340424,
+        "rho": 2.8921421945358907
+      },
+      "1": {
+        "ic": 37091.12175535938,
+        "rho": 2.8921421945358907
+      }
+    },
+    "gae_band_basis": "for each weight, the instance with the smallest S(fes-then-batched)/S(rho) (docs/ic/runs/VALIDATION.json convention)",
+    "gae_band_detail": {
+      "0": {
+        "ic": 4.013223011397812,
+        "rho": 1.3541944158049875,
+        "instance": "koblitz-n19",
+        "ratio": 2.9635501110910956
+      },
+      "0.1": {
+        "ic": 3723.718401340424,
+        "rho": 2.8921421945358907,
+        "instance": "koblitz-n13",
+        "ratio": 1287.5295026557221
+      },
+      "1": {
+        "ic": 37091.12175535938,
+        "rho": 2.8921421945358907,
+        "instance": "koblitz-n13",
+        "ratio": 12824.791887976824
+      }
+    },
+    "per_instance": [
+      {
+        "name": "koblitz-n13",
+        "S": {
+          "fes-then-batched": {
+            "0": 16.229139782761838,
+            "0.1": 3723.718401340424,
+            "1": 37091.12175535938
+          },
+          "inherited-f4": {
+            "0": 15.70778146023163,
+            "0.1": 5310.133573051476,
+            "1": 52959.96569737266
+          },
+          "fes-then-inherited": {
+            "0": 16.229139782761838,
+            "0.1": 3723.718401340424,
+            "1": 37091.12175535938
+          },
+          "pair-table": {
+            "0": 197.48308459840757,
+            "0.1": 217.00646418195674,
+            "1": 392.7168804338991
+          },
+          "rho": {
+            "0": 2.8921421945358907,
+            "0.1": 2.8921421945358907,
+            "1": 2.8921421945358907
+          }
+        },
+        "ratio_ftb_over_if4": {
+          "0": 1.0331910858226647,
+          "0.1": 0.7012475957738638,
+          "1": 0.7003615139652455
+        },
+        "ratio_ftb_over_rho": {
+          "0": 5.611459842266216,
+          "0.1": 1287.5295026557221,
+          "1": 12824.791887976824
+        },
+        "orders": {
+          "ftb_vs_if4": {
+            "order": {
+              "0": ">",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_pair": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "if4_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "fti_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "pair_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "ftb_vs_if4_diag_bitop": {
+            "order": {
+              "0": ">",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ic_min_vs_rho_ext_kn1": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          }
+        }
+      },
+      {
+        "name": "char2-n15",
+        "S": {
+          "fes-then-batched": {
+            "0": 10.36187363865097,
+            "0.1": 5638.803121757472,
+            "1": 56294.774354826855
+          },
+          "inherited-f4": {
+            "0": 10.36187363865097,
+            "0.1": 6662.886505128018,
+            "1": 66535.60818853231
+          },
+          "fes-then-inherited": {
+            "0": 10.36187363865097,
+            "0.1": 6662.886505128018,
+            "1": 66535.60818853231
+          },
+          "pair-table": {
+            "0": 473.2761070531448,
+            "0.1": 520.3152388826564,
+            "1": 943.667425348261
+          },
+          "rho": {
+            "0": 2.2798593397270315,
+            "0.1": 2.2798593397270315,
+            "1": 2.2798593397270315
+          }
+        },
+        "ratio_ftb_over_if4": {
+          "0": 1,
+          "0.1": 0.8463003410635358,
+          "1": 0.8460849143410926
+        },
+        "ratio_ftb_over_rho": {
+          "0": 4.544961813254497,
+          "0.1": 2473.3118502094117,
+          "1": 24692.213845774826
+        },
+        "orders": {
+          "ftb_vs_if4": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ftb_vs_pair": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "if4_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "fti_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "pair_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "ftb_vs_if4_diag_bitop": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ic_min_vs_rho_ext_kn1": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          }
+        }
+      },
+      {
+        "name": "koblitz-n17",
+        "S": {
+          "fes-then-batched": {
+            "0": 5.423671314665525,
+            "0.1": 12496.434687596751,
+            "1": 124915.53383413551
+          },
+          "inherited-f4": {
+            "0": 5.423671314665525,
+            "0.1": 15302.977251721755,
+            "1": 152980.95947538555
+          },
+          "fes-then-inherited": {
+            "0": 5.423671314665525,
+            "0.1": 15302.977251721755,
+            "1": 152980.95947538555
+          },
+          "pair-table": {
+            "0": 492.99050679816963,
+            "0.1": 542.4935145922194,
+            "1": 988.0205847386673
+          },
+          "rho": {
+            "0": 1.72515895083561,
+            "0.1": 1.72515895083561,
+            "1": 1.72515895083561
+          }
+        },
+        "ratio_ftb_over_if4": {
+          "0": 1,
+          "0.1": 0.8166015332859992,
+          "1": 0.8165430146503576
+        },
+        "ratio_ftb_over_rho": {
+          "0": 3.143867590889801,
+          "0.1": 7243.642495402462,
+          "1": 72408.1301457066
+        },
+        "orders": {
+          "ftb_vs_if4": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ftb_vs_pair": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "if4_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "fti_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "pair_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "ftb_vs_if4_diag_bitop": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ic_min_vs_rho_ext_kn1": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          }
+        }
+      },
+      {
+        "name": "koblitz-n19",
+        "S": {
+          "fes-then-batched": {
+            "0": 4.013223011397812,
+            "0.1": 25920.437855715532,
+            "1": 259168.25955005272
+          },
+          "inherited-f4": {
+            "0": 4.013223011397812,
+            "0.1": 29199.51090282689,
+            "1": 291958.9900211662
+          },
+          "fes-then-inherited": {
+            "0": 4.013223011397812,
+            "0.1": 29199.51090282689,
+            "1": 291958.9900211662
+          },
+          "pair-table": {
+            "0": 1063.0929524630844,
+            "0.1": 1169.7080046903227,
+            "1": 2129.2434747354687
+          },
+          "rho": {
+            "0": 1.3541944158049875,
+            "0.1": 1.3541944158049875,
+            "1": 1.3541944158049875
+          }
+        },
+        "ratio_ftb_over_if4": {
+          "0": 1,
+          "0.1": 0.8877010968428961,
+          "1": 0.8876872040530889
+        },
+        "ratio_ftb_over_rho": {
+          "0": 2.9635501110910956,
+          "0.1": 19140.85418843452,
+          "1": 191381.86993334536
+        },
+        "orders": {
+          "ftb_vs_if4": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ftb_vs_pair": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "if4_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "fti_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "pair_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "ftb_vs_if4_diag_bitop": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ic_min_vs_rho_ext_kn1": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          }
+        }
+      },
+      {
+        "name": "char2-n21",
+        "S": {
+          "fes-then-batched": {
+            "0": 4.343028240500238,
+            "0.1": 75725.35306294866,
+            "1": 757214.443375322
+          },
+          "inherited-f4": {
+            "0": 4.343028240500238,
+            "0.1": 89674.69299189786,
+            "1": 896707.8426648141
+          },
+          "fes-then-inherited": {
+            "0": 4.343028240500238,
+            "0.1": 89674.69299189786,
+            "1": 896707.8426648141
+          },
+          "pair-table": {
+            "0": 1975.3638823993108,
+            "0.1": 2173.5465832713758,
+            "1": 3957.1908911199594
+          },
+          "rho": {
+            "0": 1.236852691768793,
+            "0.1": 1.236852691768793,
+            "1": 1.236852691768793
+          }
+        },
+        "ratio_ftb_over_if4": {
+          "0": 1,
+          "0.1": 0.8444450773842123,
+          "1": 0.8444382967868899
+        },
+        "ratio_ftb_over_rho": {
+          "0": 3.511354480127604,
+          "0.1": 61224.2295035601,
+          "1": 612210.6928452798
+        },
+        "orders": {
+          "ftb_vs_if4": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ftb_vs_pair": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "if4_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "fti_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "pair_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "ftb_vs_if4_diag_bitop": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ic_min_vs_rho_ext_kn1": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          }
+        }
+      },
+      {
+        "name": "koblitz-n23",
+        "S": {
+          "fes-then-batched": {
+            "0": 3.2961794403779137,
+            "0.1": 139357.70839874932,
+            "1": 1393547.4183725296
+          },
+          "inherited-f4": {
+            "0": 3.2961794403779137,
+            "0.1": 170787.24082462015,
+            "1": 1707842.742631238
+          },
+          "fes-then-inherited": {
+            "0": 3.2961794403779137,
+            "0.1": 170787.24082462015,
+            "1": 1707842.742631238
+          },
+          "pair-table": {
+            "0": 3986.1437652208533,
+            "0.1": 4385.307304307319,
+            "1": 7977.779156085511
+          },
+          "rho": {
+            "0": 0.8776249303242816,
+            "0.1": 0.8776249303242816,
+            "1": 0.8776249303242816
+          }
+        },
+        "ratio_ftb_over_if4": {
+          "0": 1,
+          "0.1": 0.8159725968162602,
+          "1": 0.8159694002186173
+        },
+        "ratio_ftb_over_rho": {
+          "0": 3.755795131252685,
+          "0.1": 158789.5963110993,
+          "1": 1587862.1609548114
+        },
+        "orders": {
+          "ftb_vs_if4": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ftb_vs_pair": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "ftb_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "if4_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "fti_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "pair_vs_rho": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          },
+          "ftb_vs_if4_diag_bitop": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+          },
+          "ic_min_vs_rho_ext_kn1": {
+            "order": {
+              "0": ">",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "holds: first above second at every w"
+          }
+        }
+      }
+    ],
+    "summary": {
+      "ftb_vs_if4": [
+        {
+          "name": "koblitz-n13",
+          "order": {
+            "0": ">",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "flips inside the band: unresolved"
+        },
+        {
+          "name": "char2-n15",
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+        },
+        {
+          "name": "koblitz-n17",
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+        },
+        {
+          "name": "koblitz-n19",
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+        },
+        {
+          "name": "char2-n21",
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+        },
+        {
+          "name": "koblitz-n23",
+          "order": {
+            "0": "=",
+            "0.1": "<",
+            "1": "<"
+          },
+          "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)"
+        }
+      ],
+      "ftb_vs_if4_strict_holds_on": 0,
+      "ftb_vs_pair_strict_holds_on": 0,
+      "every_ic_arm_above_rho_at_every_w": true,
+      "instances": 6
+    }
+  },
+  "instance_checks": [
+    {
+      "name": "koblitz-n13",
+      "instance": "icv1-f2m13-t181-515ee569",
+      "regime": "koblitz",
+      "n": 13,
+      "trace_from_slug": 181,
+      "group_order": 8012,
+      "r": 2003,
+      "all_rows_same_instance": true,
+      "order_equals_2n_plus_1_minus_t": true,
+      "r_prime": true,
+      "r_divides_order": true,
+      "cofactor": 4,
+      "cofactor_le_8": true,
+      "koblitz_trace_a0": 181,
+      "koblitz_trace_a1": -181,
+      "koblitz_trace_matches": true,
+      "known_answer_all_ok": true,
+      "rho_planted_cycle_ok": true
+    },
+    {
+      "name": "char2-n15",
+      "instance": "icv1-f2m15-tm249-9e24ae34",
+      "regime": "char2",
+      "n": 15,
+      "trace_from_slug": -249,
+      "group_order": 33018,
+      "r": 5503,
+      "all_rows_same_instance": true,
+      "order_equals_2n_plus_1_minus_t": true,
+      "r_prime": true,
+      "r_divides_order": true,
+      "cofactor": 6,
+      "cofactor_le_8": true,
+      "koblitz_trace_a0": null,
+      "koblitz_trace_a1": null,
+      "koblitz_trace_matches": null,
+      "known_answer_all_ok": true,
+      "rho_planted_cycle_ok": true
+    },
+    {
+      "name": "koblitz-n17",
+      "instance": "icv1-f2m17-tm101-00378d4e",
+      "regime": "koblitz",
+      "n": 17,
+      "trace_from_slug": -101,
+      "group_order": 131174,
+      "r": 65587,
+      "all_rows_same_instance": true,
+      "order_equals_2n_plus_1_minus_t": true,
+      "r_prime": true,
+      "r_divides_order": true,
+      "cofactor": 2,
+      "cofactor_le_8": true,
+      "koblitz_trace_a0": 101,
+      "koblitz_trace_a1": -101,
+      "koblitz_trace_matches": true,
+      "known_answer_all_ok": true,
+      "rho_planted_cycle_ok": true
+    },
+    {
+      "name": "koblitz-n19",
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "regime": "koblitz",
+      "n": 19,
+      "trace_from_slug": -797,
+      "group_order": 525086,
+      "r": 262543,
+      "all_rows_same_instance": true,
+      "order_equals_2n_plus_1_minus_t": true,
+      "r_prime": true,
+      "r_divides_order": true,
+      "cofactor": 2,
+      "cofactor_le_8": true,
+      "koblitz_trace_a0": 797,
+      "koblitz_trace_a1": -797,
+      "koblitz_trace_matches": true,
+      "known_answer_all_ok": true,
+      "rho_planted_cycle_ok": true
+    },
+    {
+      "name": "char2-n21",
+      "instance": "icv1-f2m21-tm1325-b6925563",
+      "regime": "char2",
+      "n": 21,
+      "trace_from_slug": -1325,
+      "group_order": 2098478,
+      "r": 1049239,
+      "all_rows_same_instance": true,
+      "order_equals_2n_plus_1_minus_t": true,
+      "r_prime": true,
+      "r_divides_order": true,
+      "cofactor": 2,
+      "cofactor_le_8": true,
+      "koblitz_trace_a0": null,
+      "koblitz_trace_a1": null,
+      "koblitz_trace_matches": null,
+      "known_answer_all_ok": true,
+      "rho_planted_cycle_ok": true
+    },
+    {
+      "name": "koblitz-n23",
+      "instance": "icv1-f2m23-tm5197-1f85e9e1",
+      "regime": "koblitz",
+      "n": 23,
+      "trace_from_slug": -5197,
+      "group_order": 8393806,
+      "r": 4196903,
+      "all_rows_same_instance": true,
+      "order_equals_2n_plus_1_minus_t": true,
+      "r_prime": true,
+      "r_divides_order": true,
+      "cofactor": 2,
+      "cofactor_le_8": true,
+      "koblitz_trace_a0": 5197,
+      "koblitz_trace_a1": -5197,
+      "koblitz_trace_matches": true,
+      "known_answer_all_ok": true,
+      "rho_planted_cycle_ok": true
+    }
+  ],
+  "certificate_discipline": "No IC report or rho record emits the base point or the target, so no [k]P = Q check with code independent of the solver is possible from the committed artifacts. What was checked independently: every recovered logarithm equals the planted value the same process recorded for that repeat and lies in [1, r); r is prime, the cofactor <= 8 and the group order equals 2^n + 1 - t from the slug; the Koblitz traces are recomputed from the Frobenius recurrence (validation/instance-check.json). The verified flags themselves are the binary's.",
+  "replay_certificate": {
+    "path": "validation/replay-certificate.json",
+    "sha256": "45883799a6d99d1770abe48cf9af567997ac690074bedba85601d7802bf874ee"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "info",
+      "title": "The README table reproduces from the raw reports",
+      "text": "All 36 cells of the README table (rho S, pair table, inherited-f4, fes-then-inherited, fes-then-batched, ftb/inherited-f4 on six instances) recomputed from results/*.json agree within half a unit of the printed precision and round to the printed figure (36/36; largest relative difference 3.1e-3, a 2-significant-figure rho column). Every row's total_gae is rebuilt from its counts (group adds + doubles at 1 GAE, price_phase's ten native counters at ns_unit/ns_per_add, solver ops at ns_per_op/ns_per_add) to <= 3e-16 relative, and every phase's gae likewise; the four Koblitz reports' ratios equal the docs/ic/calibration.json rows K_0/GF(2^13), K_1/GF(2^17), K_1/GF(2^19), K_1/GF(2^23) to <= 7e-18. ftb/inherited-f4 is a ratio of means, as printed.",
+      "evidence": [
+        "validation/headline.json",
+        "validation/recompute.json"
+      ]
+    },
+    {
+      "id": "F2",
+      "severity": "major",
+      "title": "'Lowest index-calculus row on five of six' does not hold across the 5a band",
+      "text": "At each run's calibration point fes-then-batched is below the pair table on five instances (not random 21). Under the band (G - C + w (U + n_C)) / sqrt r the order flips on all six: at w = 0 the solver's word XORs are free and fes-then-batched is far below the pair table (e.g. Koblitz 23: 3.30 vs 3986.1), at w = 0.1 and 1 it is far above (139,358 vs 4,385; 1,393,547 vs 7,978). AGENTS.md 5a: rank only where the order holds at every weight; the pair-table vs fes-then-batched ranking is unresolved on every instance, including random 21 where the README ranks the pair table first.",
+      "evidence": [
+        "validation/band.json orders.ftb_vs_pair",
+        "validation/headline.json secondary.lowest_ic_row"
+      ]
+    },
+    {
+      "id": "F3",
+      "severity": "major",
+      "title": "fes-then-batched vs inherited-f4: a tie at w = 0 on five instances and a flip at degree 13",
+      "text": "Above 14 unknowns both arms make identical decisions (same targets tried, relations, rank and group operations; only solver ops differ), so at w = 0 their S is equal: the strict order does not hold across the band, the weak order (fes-then-batched <= inherited-f4) holds on random 15, Koblitz 17, 19, random 21 and Koblitz 23, with ftb/if4 = 1.000 at w = 0 and 0.816-0.888 at w = 0.1 and 1. At degree 13 fes-f2 tried more targets (mean 50.67 vs 47.33; group GAE 726.3 vs 703.0), so fes-then-batched is ABOVE inherited-f4 at w = 0 (S 16.229 vs 15.708, ratio 1.033) and below at w = 0.1 and 1 (0.701, 0.700): unresolved. The headline 0.74-0.89x is the ratio at the calibration point (word XORs at the pinned or measured ratio), a further point the band never replaces.",
+      "evidence": [
+        "validation/band.json orders.ftb_vs_if4, ratio_ftb_over_if4"
+      ]
+    },
+    {
+      "id": "F4",
+      "severity": "minor",
+      "title": "At degree 13 the two solvers count different units",
+      "text": "fes-then-batched runs fes-f2 there, whose ops are 'word XORs (Gray-code steps)'; inherited-f4 counts 'word XORs (elimination, specialisation and linear elimination only)'. The repository prices both at one word-XOR ratio, which src/bin/ic/sweep/trial.rs (unit_key) calls right for pricing and wrong for ranking. Diagnostic: with the solver priced by its complete bitop/v1 tally (bitop_word_ops + hash probes + field operations) the order is the same (above at w = 0, below at w = 0.1 and 1) and the w > 0 gap is wider (S(0.1) 13,024 vs 37,566). Above 14 unknowns both arms report the same unit string.",
+      "evidence": [
+        "validation/recompute.json arms.*.op_units, diag_bitop_band",
+        "validation/band.json diagnostics"
+      ]
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "title": "Five of the six 'distance remaining' figures are off at their printed precision",
+      "text": "README line 77-78 quotes S(ftb)/S(rho) as 35.3x, 144x, 306x, 1,903x (Koblitz 13, 17, 19, 23) and 122x, 3,005x (random 15, 21). From the raw reports: 35.24x, 144.72x, 305.45x, 1,907.79x, 121.72x, 3,012.56x (RESULTS.md has the right values). The README figures equal the rounded table S divided by the rounded rho S (35.26, 144.34, 306.37, 1,902.61, 121.71, 3,004.92). The error is at most 0.4% and changes no conclusion; it is outside the headline table, so it is reported here and not in headline.",
+      "evidence": [
+        "validation/headline.json secondary.distance_to_rho"
+      ]
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "title": "At degree 13 'the lowest algebraic row' is a tie",
+      "text": "fes-then-batched and fes-then-inherited run the same engine (fes-f2) at 14 unknowns and their rows are identical in every count (validation/recompute.json; control C2 below); the README bolds fes-then-batched alone.",
+      "evidence": [
+        "validation/recompute.json koblitz-n13 arms"
+      ]
+    },
+    {
+      "id": "F7",
+      "severity": "info",
+      "title": "Every IC arm stays above the matched rho at every weight",
+      "text": "On all six instances the pair table, inherited-f4, fes-then-inherited and fes-then-batched are above the matched rho at w = 0, 0.1 and 1 (order holds). At w = 0, the most IC-favourable end, fes-then-batched is 2.96x (Koblitz 19) to 5.61x (Koblitz 13) rho; at w = 0.1 it is 1,288x to 158,790x; at w = 1 12,825x to 1,587,862x. The order also holds against rho charged k = 1 or n + 1 native operations per walk step (sensitivity rho_ext_*).",
+      "evidence": [
+        "validation/band.json orders.*_vs_rho, ratio_ftb_over_rho, diagnostics.rho_ext_*"
+      ]
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "title": "The matched rho emits no unpriced counter (implementation gap)",
+      "text": "rho_reference.per_run carries planted, seed, s, s_walk, steps, steps_over_expected and verified only: no count of canonicalisations, distinguished-point tests, Frobenius maps or table operations, which AGENTS.md 5a says rho leaves unpriced. In the strict band U_rho = 0 and S_rho(w) = S_rho(0), a lower bound at w > 0. Because rho is below every IC arm at w = 0 and the IC arms only rise with w, the gap cannot change the IC-vs-rho order; a per-step charge (rho_ext_k1, rho_ext_kn1) confirms it. The missing emission should be fixed in ic bench's rho reference.",
+      "evidence": [
+        "validation/counters.json rho",
+        "validation/band.json diagnostics"
+      ]
+    },
+    {
+      "id": "F9",
+      "severity": "info",
+      "title": "Measured lookup price is 0.0 on the random instances",
+      "text": "On random 15 and 21 the host-measured ns_per_lookup is 0.0, so lookups and target-guard probes are free at those runs' calibration point (the pinned K_0/GF(2^23) row in docs/ic/calibration.json also has 0.0; it is not used here). Immaterial to S (a few hundred to ten thousand operations per run); the band charges them at w.",
+      "evidence": [
+        "validation/recompute.json calibration_ratios"
+      ]
+    },
+    {
+      "id": "F10",
+      "severity": "minor",
+      "title": "Provenance of the producer's binary rests on the record, not on the reports",
+      "text": "Every report has software.git_commit = null and git_dirty = null. The binding of the measuring binary (sha256 1f566eed..., results/ic-sha256.txt, path /tmp/claude-0/.../scratchpad/ic-ftb, still present and hashing to that value) to commit 4900647bcd rests on the benchmark record (commit 4900647bcd, commit_dirty false at 20:09:33Z, binary mtime 20:09, run 20:09:38Z) and on the producer's README. The record's argv does not show IC_BIN. The record lists both raw entries as uploaded: false; the objects are in fact in s3://setec-astronomy-artifacts (store/sha256/15/15dbded3..., store/sha256/fa/fa200ed1...), and results.tar.gz is byte-identical to the committed results/*.json and ic-sha256.txt (its *.log members are byte-identical copies of the JSONs).",
+      "evidence": [
+        "benchmarks/records/20261112T2009Z-fes-then-batched-e2e.json",
+        "results/ic-sha256.txt",
+        "results/.artifacts.json"
+      ]
+    },
+    {
+      "id": "F11",
+      "severity": "info",
+      "title": "The bitop/v1 diagnostic tally is not identical between configurations that run the same engine",
+      "text": "Above 14 unknowns fes-then-inherited and inherited-f4 have identical solver ops, targets and relations, but their bitop_hash_probes and bitop_word_ops differ slightly (Koblitz 17 repeat 1: 3,420,478 vs 3,402,246 probes; 301,031,725 vs 300,859,208 word ops), and this study's fes-then-batched and the batched study's inherited-f4-batched differ by 65 word ops at identical solver ops. src/cryptanalysis/bitop_tally.rs says every count is a deterministic function of the input; the tally appears to depend on in-process state (the order of configurations in one process). The replay, running the same sequence, reproduced every bitop counter exactly. It enters no S here (diagnostic band only).",
+      "evidence": [
+        "results/koblitz-n17.json rows 3 and 6",
+        "research/inherited_f4_batched_20261112/results_e2e/koblitz-n17.json"
+      ]
+    },
+    {
+      "id": "F12",
+      "severity": "info",
+      "title": "The pre-stated expectation, checked against the sibling studies' committed data",
+      "text": "Degree 13: fes-then-batched rows are identical to fes-then-inherited's in every count (C2). Koblitz 17, 19, 23 and both random instances: fes-then-batched solver ops equal the batched study's inherited-f4-batched ops run for run (research/inherited_f4_batched_20261112/results_e2e); on the Koblitz instances S agrees to the last float bit (e.g. 84.46324870999565 vs 84.46324870999564), on the random instances S differs only through the host-measured ratio, as the README says. inherited-f4's solver ops equal the batched study's on all six instances.",
+      "evidence": [
+        "research/inherited_f4_batched_20261112/results_e2e/*.json",
+        "research/size_rule_fold_20261112/results/*.json"
+      ]
+    },
+    {
+      "id": "F13",
+      "severity": "info",
+      "title": "Commit d81dc1241b repeats the unqualified ranking in source",
+      "text": "The doc comment of DEFAULT_DESCENT_SOLVER (src/cryptanalysis/ic_framework/solvers.rs, added in d81dc1241b) calls fes-then-batched 'the lowest algebraic row on every instance of the 2026-11-12 end-to-end ladder'. That holds at the calibration point; under the band it is a tie at w = 0 on five instances and unresolved at degree 13 (F3).",
+      "evidence": [
+        "git show d81dc1241b -- src/cryptanalysis/ic_framework/solvers.rs"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "C1",
+      "what": "fes-then-inherited = inherited-f4 above 14 unknowns (the size rule dispatches to inherited-f4)",
+      "result": "identical targets, relations, rank, group ops, native counts, solver calls and solver ops on all 15 repeats of the five instances; only the diagnostic bitop tally differs (F11)"
+    },
+    {
+      "id": "C2",
+      "what": "fes-then-batched = fes-then-inherited at 14 unknowns (both run fes-f2)",
+      "result": "identical in every count on all 3 repeats"
+    },
+    {
+      "id": "C3",
+      "what": "pair table: the reference IC row, priced in the same process",
+      "result": "priced; its per-step table inserts (setup work_native.table_insert_attempts behind counted:table_insert_attempts) are charged at w per the 2026-11-08 reading"
+    },
+    {
+      "id": "C4",
+      "what": "matched rho, same process, same seeds for both Koblitz walks",
+      "result": "16 runs per walk, all verified; selected walk has the lower mean S (negation at Koblitz 13, 17, 19; signed-Frobenius at 23; negation only on random binary); seeds identical across candidates"
+    },
+    {
+      "id": "C5",
+      "what": "known answer",
+      "result": "all 72 IC rows recovered the planted logarithm recorded for their repeat; recovered in [1, r); r prime, cofactor <= 8, group order = 2^n + 1 - t; Koblitz traces recomputed from the Frobenius recurrence (validation/instance-check.json)"
+    },
+    {
+      "id": "C6",
+      "what": "external fastest implementation (AGENTS.md 15)",
+      "result": "not part of this study; the claim is an in-repository component comparison, not a fastest-implementation claim"
+    }
+  ],
+  "limitations": [
+    "Same code lineage and same host class: the replay re-executes the repository's ic at a later commit; it is not an independent implementation and not a cross-host replay.",
+    "No IC report or rho record carries the base point or the target, so the discrete-log solves are checked as known-answer equalities (recovered = planted for each repeat, both written by the same process) and not by an independent [k]P = Q computation.",
+    "3 repeats per configuration (16 rho runs); the means carry wide per-repeat spread (e.g. inherited-f4 at Koblitz 17: 102.5 to 415.3), and no confidence interval was computed by the producer or here.",
+    "The pricing rule (price_phase's ten native counters, 1 GAE per group addition or doubling, solver ops at ns_per_op/ns_per_add) and the band's U (table_insert_attempts behind its marker) are transcribed from source; the recompute is independent code, not independent of those definitions. The rebuild of every phase gae from counts confirms the transcription on every row.",
+    "The band's rho side is a lower bound at w > 0: the rho records emit no unpriced counter (F8); a per-step sensitivity is reported, not gate evidence.",
+    "The validator holds no keyring key: pcc/keyring.json lists no keys, so `independent: true` here is a producer-style boolean under docs/SABOTAGE_RESISTANCE.md; pcc would grade the replay and recompute proofs not_covered until a keyring key signs them."
+  ],
+  "validation_report": {
+    "id": "VAL-20261113-fes-then-batched",
+    "dispatch": "Coordinator (main session) brief: replay certificate, validator report, 5a band and VALIDATION.json for research/fes_then_batched_20261112; no leaderboard row (owner).",
+    "artifact_checks": [
+      "results/*.json sha256 = results/.artifacts.json *.log digests = S3 results.tar.gz members (store/sha256/15/15dbded3...); results.json = record raw digest fa200ed1...",
+      "producer binary: results/ic-sha256.txt 1f566eed... = file at the named path; reports carry binary_blake3 df326900..., git_commit null",
+      "benchmark record: commit 4900647bcd, commit_dirty false, argv run_e2e.sh results (IC_BIN not recorded), raw uploaded:false although the objects exist in S3",
+      "sweeps and launcher unchanged since the scaffold commit e5dd44e010 and identical at d81dc1241b"
+    ],
+    "metric_recomputations": [
+      "36/36 README table cells within half a printed unit (validation/headline.json)",
+      "per-row total_gae rebuilt from counts to <= 3e-16 relative on all 72 rows; pinned ratios = docs/ic/calibration.json rows",
+      "S/rho, ftb/inherited-f4, ftb/pair table per instance (recomputed_only)",
+      "5a band at w = 0, 0.1, 1 for every arm and the matched rho (validation/band.json)"
+    ],
+    "control_checks": [
+      "C1-C6 of validation/findings.json"
+    ],
+    "verdict": "headline numbers validated; rankings qualified by F2, F3",
+    "verdict_scope": "The README table follows from the committed raw data and every count replays with an independently built binary. It does not validate ranking fes-then-batched as the lowest IC row (F2) or strictly below inherited-f4 (F3) under AGENTS.md 5a."
+  }
+}

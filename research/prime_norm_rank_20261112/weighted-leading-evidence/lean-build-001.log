@@ -1,0 +1,123 @@
+✖ [3138/3139] Building NormWeightedLeading (5.5s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/NormWeightedLeading.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormWeightedLeading.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormWeightedLeading.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormWeightedLeading.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormWeightedLeading.setup.json --json
+error: NormWeightedLeading.lean:28:72: unsolved goals
+case p1.h.h_add_right.ddf
+K : Type u_1
+inst✝ : Field K
+a1 a2 c0 c1 : K
+⊢ 1 ≤ max (max (max (max (5 * 1) (0 + 4 * 1)) (0 + 3 * 1)) (0 + 2 * 1)) (0 + 1)
+
+case p1.h.h_add_left.h_add_right.ddf
+K : Type u_1
+inst✝ : Field K
+a1 a2 c0 c1 : K
+⊢ 2 ≤ max (max (max (max (5 * 1) (0 + 4 * 1)) (0 + 3 * 1)) (0 + 2 * 1)) (0 + 1)
+
+case p1.h.h_add_left.h_add_left.h_add_right.ddf
+K : Type u_1
+inst✝ : Field K
+a1 a2 c0 c1 : K
+⊢ 3 ≤ max (max (max (max (5 * 1) (0 + 4 * 1)) (0 + 3 * 1)) (0 + 2 * 1)) (0 + 1)
+
+case p1.h.h_add_left.h_add_left.h_add_left.h_add_left.h_exp
+K : Type u_1
+inst✝ : Field K
+a1 a2 c0 c1 : K
+⊢ 5 ≤ max (max (max (max (5 * 1) (0 + 4 * 1)) (0 + 3 * 1)) (0 + 2 * 1)) (0 + 1)
+
+case p1.h.h_add_left.h_add_left.h_add_left.h_add_right.ddf
+K : Type u_1
+inst✝ : Field K
+a1 a2 c0 c1 : K
+⊢ 4 ≤ max (max (max (max (5 * 1) (0 + 4 * 1)) (0 + 3 * 1)) (0 + 2 * 1)) (0 + 1)
+error: NormWeightedLeading.lean:46:21: Unknown identifier `pow_eq_zero`
+error: NormWeightedLeading.lean:49:10: Unknown identifier `pow_eq_zero`
+error: NormWeightedLeading.lean:52:10: Unknown identifier `pow_eq_zero`
+error: NormWeightedLeading.lean:55:10: Unknown identifier `pow_eq_zero`
+warning: NormWeightedLeading.lean:45:28: This simp argument is unused:
+  coeff_C_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [support, coeff_add, coeff_X_pow] at h1 h2 h3 h4
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:48:20: This simp argument is unused:
+  mul_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, zero_mul, zero_sub, neg_eq_zero] at h2
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:48:30: This simp argument is unused:
+  zero_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, mul_zero, zero_sub, neg_eq_zero] at h2
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:48:40: This simp argument is unused:
+  zero_sub
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, mul_zero, zero_mul, neg_eq_zero] at h2
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:48:50: This simp argument is unused:
+  neg_eq_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, mul_zero, zero_mul, zero_sub] at h2
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:51:25: This simp argument is unused:
+  mul_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, hc0, zero_mul, add_zero, sub_zero] at h3
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:51:35: This simp argument is unused:
+  zero_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, hc0, mul_zero, add_zero, sub_zero] at h3
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:51:45: This simp argument is unused:
+  add_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, hc0, mul_zero, zero_mul, sub_zero] at h3
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:51:55: This simp argument is unused:
+  sub_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha1, hc0, mul_zero, zero_mul, add_zero] at h3
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:54:20: This simp argument is unused:
+  mul_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha2, zero_sub, neg_eq_zero] at h4
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:54:30: This simp argument is unused:
+  zero_sub
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha2, mul_zero, neg_eq_zero] at h4
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: NormWeightedLeading.lean:54:40: This simp argument is unused:
+  neg_eq_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [ha2, mul_zero, zero_sub] at h4
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+Some required targets logged failures:
+- NormWeightedLeading
+error: build failed

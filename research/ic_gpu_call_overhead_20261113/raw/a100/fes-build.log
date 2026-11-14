@@ -1,0 +1,3 @@
+python3 fref.py system --n 18 --m 20 --seed 1 > system.h
+nvcc -O3 -std=c++17 -arch=sm_80 -lineinfo -o fes_cuda fes.cu
+g++ -O2 -std=c++17 -Wall -Wextra -I. -o fes_solve fes_solve.cpp

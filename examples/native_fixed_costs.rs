@@ -41,7 +41,7 @@ fn main() {
         let mut t_tab = vec![];
         let mut entries = 0usize;
         let mut fb = vec![];
-        let mut table = Default::default();
+        let mut table = build_pair_sum_table(&curve, &[]);
         for _ in 0..reps {
             let t = Instant::now();
             fb = if projected {
@@ -62,7 +62,7 @@ fn main() {
         let mut hit = 0usize;
         for i in 0..n_look {
             let key = (&probe.0 + BigUint::from(i as u64), probe.1.clone());
-            if table.contains_key(&key) {
+            if table.find(&key.0, &key.1).is_some() {
                 hit += 1;
             }
         }

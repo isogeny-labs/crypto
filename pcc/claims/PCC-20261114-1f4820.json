@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:47:53Z",
+ "id": "PCC-20261114-1f4820",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e3f20752022a341a4612e6a72e8e5690f8c6baa",
+  "model": "",
+  "session": "norm-split-base-descent-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "f3b6fc17f90cd8780d2dbc26b0169883002f7b55740d66461ee3df41af088a28",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormSplitBaseDescent.normWindow"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration/context: Field L; prime p and CharP for Frobenius descent; explicitly fixed public abscissas and public square roots; actual monic norm divisor of public nodal polynomial; pole degree window proved, selected support and successful signs derived. Actual chart uses target outside base and computed support remainder0. DecidableEq on finite-set insertion helper, classically supplied by caller. General arbitrary-arity rigidity versus fixed degree5 actual specialization distinguished. No successful finder algorithm, coverage/retry, weighted closure/normal form or sub-exponential expected bit-cost theorem. Unsigned, fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormSplitBaseDescent.normWindow: theorem normWindow (f A B : L[X]) (a : \u2115) (hm : A.Monic) (hA : A.natDegree=a) (hf : f.natDegree\u22643) (hB : B.natDegree<a-1) : (A^2-f*B^2).Monic \u2227 (A^2-f*B^2).natDegree=2*a"
+}

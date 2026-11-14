@@ -64,12 +64,12 @@ impl Nat {
 // ── arithmetic modulo p (p < 2^31) ──────────────────────────────────────
 
 #[inline]
-fn pm(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
+pub(crate) fn pm(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     n.mul += 1;
     a * b % p
 }
 #[inline]
-fn pa(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
+pub(crate) fn pa(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
     n.add += 1;
     let s = a + b;
     if s >= p {
@@ -87,7 +87,7 @@ fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
         a + p - b
     }
 }
-fn ppow(p: u64, a: u64, mut e: u64, n: &mut Nat) -> u64 {
+pub(crate) fn ppow(p: u64, a: u64, mut e: u64, n: &mut Nat) -> u64 {
     let mut res = 1u64;
     let mut base = a % p;
     while e > 0 {
@@ -177,7 +177,7 @@ impl ModU {
     }
 }
 
-type Poly = Vec<u64>;
+pub(crate) type Poly = Vec<u64>;
 
 fn ptrim(a: &mut Poly) {
     while a.last() == Some(&0) {
@@ -248,7 +248,7 @@ fn pgcd_monic(p: u64, a: &Poly, b: &Poly, n: &mut Nat) -> Poly {
 
 /// `u | x^p − x` for monic `u` of degree 1..=3 (so `u` is squarefree and
 /// splits completely over `F_p`).
-fn splits_completely(p: u64, u: &Poly, n: &mut Nat) -> bool {
+pub(crate) fn splits_completely(p: u64, u: &Poly, n: &mut Nat) -> bool {
     let d = u.len() - 1;
     let mut uu = [0u64; 3];
     uu[..d].copy_from_slice(&u[..d]);
@@ -260,7 +260,7 @@ fn splits_completely(p: u64, u: &Poly, n: &mut Nat) -> bool {
 
 /// The roots of a monic squarefree `u` known to split completely
 /// (Cantor–Zassenhaus).  `None` only if `u` does not split.
-fn roots_of(p: u64, u: &Poly, rng: &mut StdRng, n: &mut Nat) -> Option<Vec<u64>> {
+pub(crate) fn roots_of(p: u64, u: &Poly, rng: &mut StdRng, n: &mut Nat) -> Option<Vec<u64>> {
     let d = u.len() - 1;
     if d == 0 {
         return Some(Vec::new());
@@ -293,7 +293,7 @@ fn roots_of(p: u64, u: &Poly, rng: &mut StdRng, n: &mut Nat) -> Option<Vec<u64>>
 // ── arithmetic modulo r (prime, < 2^50 for the fast path) ───────────────
 
 #[inline]
-fn mulmod(a: u64, b: u64, r: u64) -> u64 {
+pub(crate) fn mulmod(a: u64, b: u64, r: u64) -> u64 {
     if r < (1u64 << 50) {
         let q = ((a as f64) * (b as f64) / (r as f64)) as u64;
         let t = a.wrapping_mul(b).wrapping_sub(q.wrapping_mul(r)) as i64;
@@ -310,7 +310,7 @@ fn mulmod(a: u64, b: u64, r: u64) -> u64 {
     }
 }
 #[inline]
-fn addm(a: u64, b: u64, r: u64) -> u64 {
+pub(crate) fn addm(a: u64, b: u64, r: u64) -> u64 {
     let s = a + b;
     if s >= r {
         s - r
@@ -319,7 +319,7 @@ fn addm(a: u64, b: u64, r: u64) -> u64 {
     }
 }
 #[inline]
-fn subm(a: u64, b: u64, r: u64) -> u64 {
+pub(crate) fn subm(a: u64, b: u64, r: u64) -> u64 {
     if a >= b {
         a - b
     } else {
@@ -632,10 +632,10 @@ impl Rel {
     }
 }
 
-type Row = (Vec<(u32, u64)>, u64);
+pub(crate) type Row = (Vec<(u32, u64)>, u64);
 
 /// `sa·a + sb·b` as sorted sparse vectors; `neg*` flips the sign.
-fn combine(
+pub(crate) fn combine(
     a: &[(u32, u64)],
     neg_a: bool,
     b: &[(u32, u64)],
@@ -666,15 +666,15 @@ fn combine(
     out
 }
 
-struct Dsu {
-    parent: Vec<u32>,
-    edges: Vec<u32>,
-    verts: Vec<u32>,
-    ops: u64,
+pub(crate) struct Dsu {
+    pub(crate) parent: Vec<u32>,
+    pub(crate) edges: Vec<u32>,
+    pub(crate) verts: Vec<u32>,
+    pub(crate) ops: u64,
 }
 
 impl Dsu {
-    fn new() -> Dsu {
+    pub(crate) fn new() -> Dsu {
         Dsu {
             parent: vec![0],
             edges: vec![0],
@@ -682,14 +682,14 @@ impl Dsu {
             ops: 0,
         }
     }
-    fn add_vertex(&mut self) -> u32 {
+    pub(crate) fn add_vertex(&mut self) -> u32 {
         let id = self.parent.len() as u32;
         self.parent.push(id);
         self.edges.push(0);
         self.verts.push(1);
         id
     }
-    fn find(&mut self, mut x: u32) -> u32 {
+    pub(crate) fn find(&mut self, mut x: u32) -> u32 {
         while self.parent[x as usize] != x {
             let gp = self.parent[self.parent[x as usize] as usize];
             self.parent[x as usize] = gp;
@@ -698,7 +698,7 @@ impl Dsu {
         }
         x
     }
-    fn edge(&mut self, a: u32, b: u32) {
+    pub(crate) fn edge(&mut self, a: u32, b: u32) {
         let (ra, rb) = (self.find(a), self.find(b));
         if ra == rb {
             self.edges[ra as usize] += 1;
@@ -710,7 +710,7 @@ impl Dsu {
         self.ops += 1;
     }
     /// Independent cycles in the component of the vertex "1".
-    fn cycles0(&mut self) -> i64 {
+    pub(crate) fn cycles0(&mut self) -> i64 {
         let r0 = self.find(0) as usize;
         self.edges[r0] as i64 - self.verts[r0] as i64 + 1
     }
@@ -813,7 +813,7 @@ fn build_rows(rels: &[Rel], nverts: usize, tcol: u32, r: u64, nat: &mut Nat) -> 
 /// Peel columns of weight one (and the rows holding them) from `rows`; the
 /// column `tcol` is never peeled.  Returns the surviving rows and the number
 /// of surviving columns, columns renumbered densely, `t` last.
-fn peel(rows: &[Row], ncols: usize, tcol: u32, nat: &mut Nat) -> (Vec<Row>, usize, u32) {
+pub(crate) fn peel(rows: &[Row], ncols: usize, tcol: u32, nat: &mut Nat) -> (Vec<Row>, usize, u32) {
     let mut colrows: Vec<Vec<u32>> = vec![Vec::new(); ncols];
     let mut w = vec![0u32; ncols];
     for (i, (t, _)) in rows.iter().enumerate() {
@@ -975,7 +975,7 @@ fn berlekamp_massey(s: &[u64], r: u64, nat: &mut Nat) -> Vec<u64> {
 /// Solve `A x = c` (rows × cols, full column rank) by Wiedemann on
 /// `AᵀDA x = AᵀD c`.  `None` if the recurrence is degenerate or the residual
 /// is nonzero.
-fn wiedemann(
+pub(crate) fn wiedemann(
     rows: &[Row],
     ncols: usize,
     r: u64,
