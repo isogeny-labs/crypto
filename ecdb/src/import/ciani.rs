@@ -81,12 +81,19 @@
 //! curve (family `ciani-quotient`) with its class, invariants and zeta row;
 //! the three maps as `curve_morphism` rows of kind `quotient` (constructions
 //! `ciani_quotient_x_v1`, `_y_`, `_z_`), and `av_component` rows
-//! (`isogeny_factor`) from Jac(C) to each E_i. Insert-or-update only.
+//! (`isogeny_factor`) from Jac(C) to each E_i. Insert or fill-NULL only:
+//! before writing, the stored rows each quartic would meet (its curve, class
+//! link, zeta, equation model, generation row, maps and components, and its
+//! quotient curves' slug, class link, zeta and invariants) are compared with
+//! the computed values; a quartic meeting any disagreement is refused whole
+//! (`ciani_refused_conflict`, one problem per conflict), and after the
+//! inserts every kept quartic's three maps must be stored exactly
+//! (`ciani_morphisms_missing`).
 
 use super::cover_lpoly::l_from_power_sums;
 use super::registry::{
     class_row as genus1_class_row, invariant_row, prime_field, ALIAS_SQL, CLASS_SQL as G1_CLASS_SQL, CURVE_SQL,
-    FIELD_SQL, INVARIANT_SQL, LINK_CLASS_SQL,
+    FIELD_SQL, INVARIANT_SQL,
 };
 use super::siblings::prime_icv1;
 use super::{bulk, bulk1, Ctx, Report};
@@ -446,7 +453,12 @@ impl Quotient {
 }
 
 /// The three quotients of a smooth Ciani quartic (module docs), or an error
-/// when a step is undefined (never for a smooth quartic over p >= 5).
+/// when a step is undefined. That happens for some smooth quartics over tiny
+/// fields: when every F_p-point of a D_i is a branch point (w = 0) the chart
+/// search finds no point with q != 0 and the quartic is refused (reported,
+/// never stored); e.g. 3x^4 + y^4 + z^4 + 3x^2y^2 over F_5 (test
+/// `quartics_without_a_usable_chart_point_are_refused`). No generator sample
+/// meets this.
 pub fn quotients(p: u64, c: &Ciani) -> Result<[Quotient; 3], String> {
     let [a, b, cc, d, e, f] = c.map(|x| x as i128);
     let mk = |inv: char, st: (char, char), w: [i128; 3], abg: [i128; 3]| -> Result<Quotient, String> {
@@ -748,7 +760,7 @@ fn link_sql() -> String {
         "UPDATE ec.abelian_variety av SET isogeny_class_id = ic.id",
         ", label text",
         "JOIN ec.isogeny_class_fq ic ON ic.label = r.label
-WHERE av.curve_id = c.id AND av.isogeny_class_id IS DISTINCT FROM ic.id",
+WHERE av.curve_id = c.id AND av.isogeny_class_id IS NULL",
     )
 }
 
@@ -758,6 +770,7 @@ fn zeta_sql() -> String {
 SELECT c.id, ic.id, r.point_counts, 'proved', r.method, $2::bigint",
         ", label text, point_counts numeric[], method text",
         "JOIN ec.isogeny_class_fq ic ON ic.label = r.label
+JOIN ec.abelian_variety av ON av.curve_id = c.id AND av.isogeny_class_id = ic.id
 ON CONFLICT (curve_id) DO NOTHING",
     )
 }
@@ -797,13 +810,129 @@ ON CONFLICT DO NOTHING",
     )
 }
 
+/// Links an E_i's Jacobian to its class only where no class is stored (a
+/// stored different class is refused by the pre-check, never overwritten).
+const E_LINK_SQL: &str = "
+UPDATE ec.abelian_variety av SET isogeny_class_id = ic.id
+FROM jsonb_to_recordset($1::jsonb) AS r(key text, label text)
+JOIN ec.curve c ON c.icv1_slug = r.key
+JOIN ec.isogeny_class_fq ic ON ic.label = r.label
+WHERE av.curve_id = c.id AND av.isogeny_class_id IS NULL";
+
 const E_ZETA_SQL: &str = "
 INSERT INTO ec.curve_zeta (curve_id, isogeny_class_id, point_counts, order_check, order_method, provenance_id)
-SELECT c.id, av.isogeny_class_id, r.point_counts, 'proved', r.method, $2::bigint
-FROM jsonb_to_recordset($1::jsonb) AS r(key text, point_counts numeric[], method text)
+SELECT c.id, ic.id, r.point_counts, 'proved', r.method, $2::bigint
+FROM jsonb_to_recordset($1::jsonb) AS r(key text, label text, point_counts numeric[], method text)
 JOIN ec.curve c ON c.icv1_slug = r.key
-JOIN ec.abelian_variety av ON av.curve_id = c.id
+JOIN ec.isogeny_class_fq ic ON ic.label = r.label
+JOIN ec.abelian_variety av ON av.curve_id = c.id AND av.isogeny_class_id = ic.id
 ON CONFLICT (curve_id) DO NOTHING";
+
+// ------------------------------------------------- conflicts with stored rows
+//
+// Every statement above inserts or fills NULL only. Before anything is
+// written, the stored rows that the inserts would meet are compared with the
+// computed values; a quartic whose rows (or whose quotient curves' rows)
+// disagree with anything stored is refused whole and reported as a problem.
+// After the inserts every kept quartic's morphisms must be present exactly.
+
+/// `a` and `b` agree on their common prefix (point counts of different lengths).
+const PREFIX_DIFFERS: &str =
+    "(SELECT bool_or(x IS DISTINCT FROM y) FROM unnest(%A%[1:least(cardinality(%A%), cardinality(%B%))],
+     %B%[1:least(cardinality(%A%), cardinality(%B%))]) AS u(x, y))";
+
+fn prefix_differs(a: &str, b: &str) -> String {
+    PREFIX_DIFFERS.replace("%A%", a).replace("%B%", b)
+}
+
+/// Stored rows of a quartic that contradict the computed ones: (qi, reasons).
+fn quartic_check_sql() -> String {
+    format!(
+        "SELECT r.qi, concat_ws('; ',
+       CASE WHEN c.genus <> 3 THEN 'stored genus ' || c.genus END,
+       CASE WHEN c.is_smooth = false THEN 'stored as singular' END,
+       CASE WHEN ic.id IS NOT NULL AND ic.label <> r.label THEN 'Jacobian linked to class ' || ic.label END,
+       CASE WHEN z.curve_id IS NOT NULL AND {zc} THEN 'stored zeta counts ' || z.point_counts::text END,
+       CASE WHEN zic.id IS NOT NULL AND zic.label <> r.label THEN 'zeta row names class ' || zic.label END,
+       CASE WHEN em.curve_id IS NOT NULL AND (em.ambient <> 'P^2' OR em.generators <> r.generators)
+            THEN 'stored equation model differs' END,
+       CASE WHEN gp.curve_id IS NOT NULL AND (gp.method <> 'seeded_generator' OR gp.seed IS DISTINCT FROM r.seed
+                 OR gp.generator_call IS DISTINCT FROM r.call) THEN 'stored generation provenance differs' END,
+       CASE WHEN lc.id IS NOT NULL AND (lc.g <> 3 OR lc.l_polynomial::numeric[] <> r.l_polynomial)
+            THEN 'class ' || lc.label || ' stores another L-polynomial' END)
+FROM jsonb_to_recordset($1::jsonb) AS r(qi int, field text, coefficients jsonb, label text, point_counts numeric[],
+     generators jsonb, seed text, call text, l_polynomial numeric[])
+JOIN ec.field f ON f.icv1_field = r.field
+LEFT JOIN ec.isogeny_class_fq lc ON lc.label = r.label
+LEFT JOIN ec.curve c ON c.field_id = f.id AND c.model = 'plane_curve' AND c.coefficients = r.coefficients
+LEFT JOIN ec.abelian_variety av ON av.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
+LEFT JOIN ec.curve_zeta z ON z.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq zic ON zic.id = z.isogeny_class_id
+LEFT JOIN ec.curve_equation_model em ON em.curve_id = c.id
+LEFT JOIN ec.generation_provenance gp ON gp.curve_id = c.id",
+        zc = prefix_differs("(z.point_counts::numeric[])", "r.point_counts")
+    )
+}
+
+/// Stored rows of a quotient curve that contradict the computed ones: (slug, reasons).
+fn quotient_check_sql() -> String {
+    format!(
+        "SELECT r.key, concat_ws('; ',
+       CASE WHEN c.id IS NOT NULL AND (c.genus <> 1 OR c.model_sha256 IS DISTINCT FROM r.model_sha256
+                 OR c.field_id IS DISTINCT FROM f.id) THEN 'slug stored for another curve' END,
+       CASE WHEN o.id IS NOT NULL THEN 'the same model is stored under slug ' || coalesce(o.icv1_slug, 'NULL') END,
+       CASE WHEN ic.id IS NOT NULL AND ic.label <> r.label THEN 'Jacobian linked to class ' || ic.label END,
+       CASE WHEN z.curve_id IS NOT NULL AND {zc} THEN 'stored zeta counts ' || z.point_counts::text END,
+       CASE WHEN zic.id IS NOT NULL AND zic.label <> r.label THEN 'zeta row names class ' || zic.label END,
+       CASE WHEN gi.curve_id IS NOT NULL AND (gi.a4 IS DISTINCT FROM r.a4 OR gi.a6 IS DISTINCT FROM r.a6
+                 OR gi.j_invariant IS DISTINCT FROM r.j_invariant) THEN 'stored invariants differ' END)
+FROM jsonb_to_recordset($1::jsonb) AS r(key text, field text, coefficients jsonb, model_sha256 text, label text,
+     point_counts numeric[], a4 text, a6 text, j_invariant text)
+JOIN ec.field f ON f.icv1_field = r.field
+LEFT JOIN ec.curve c ON c.icv1_slug = r.key
+LEFT JOIN ec.curve o ON o.field_id = f.id AND o.model = 'short_weierstrass' AND o.coefficients = r.coefficients
+     AND o.icv1_slug IS DISTINCT FROM r.key
+LEFT JOIN ec.abelian_variety av ON av.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
+LEFT JOIN ec.curve_zeta z ON z.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq zic ON zic.id = z.isogeny_class_id
+LEFT JOIN ec.genus1_invariants gi ON gi.curve_id = c.id",
+        zc = prefix_differs("(z.point_counts::numeric[])", "r.point_counts")
+    )
+}
+
+/// Stored morphisms and components that contradict the computed ones: (qi, reasons).
+const MAP_CHECK_SQL: &str = "
+SELECT r.qi, concat_ws('; ',
+       CASE WHEN m.id IS NOT NULL AND (m.map <> r.map OR m.degree IS DISTINCT FROM 2 OR m.status <> 'proved'
+                 OR m.method IS DISTINCT FROM r.method)
+            THEN 'stored morphism ' || r.construction || ' differs' END,
+       CASE WHEN ac.av_id IS NOT NULL AND (ac.multiplicity <> r.multiplicity OR ac.status <> 'proved')
+            THEN 'stored av_component to ' || r.target || ' differs' END)
+FROM jsonb_to_recordset($1::jsonb) AS r(qi int, field text, coefficients jsonb, target text, construction text,
+     map jsonb, method text, multiplicity int)
+JOIN ec.field f ON f.icv1_field = r.field
+JOIN ec.curve c ON c.field_id = f.id AND c.model = 'plane_curve' AND c.coefficients = r.coefficients
+JOIN ec.curve e ON e.icv1_slug = r.target
+LEFT JOIN ec.curve_morphism m ON m.source_curve_id = c.id AND m.target_curve_id = e.id AND m.kind = 'quotient'
+     AND m.construction = r.construction
+LEFT JOIN ec.abelian_variety ja ON ja.curve_id = c.id
+LEFT JOIN ec.abelian_variety ea ON ea.curve_id = e.id
+LEFT JOIN ec.av_component ac ON ac.av_id = ja.id AND ac.component_av_id = ea.id AND ac.relation = 'isogeny_factor'";
+
+/// After the inserts: morphisms of kept quartics that are not stored exactly.
+const MAP_PRESENT_SQL: &str = "
+SELECT r.qi, r.construction
+FROM jsonb_to_recordset($1::jsonb) AS r(qi int, field text, coefficients jsonb, target text, construction text,
+     map jsonb)
+WHERE NOT EXISTS (
+  SELECT 1 FROM ec.field f
+  JOIN ec.curve c ON c.field_id = f.id AND c.model = 'plane_curve' AND c.coefficients = r.coefficients
+  JOIN ec.curve e ON e.icv1_slug = r.target
+  JOIN ec.curve_morphism m ON m.source_curve_id = c.id AND m.target_curve_id = e.id AND m.kind = 'quotient'
+       AND m.construction = r.construction AND m.map = r.map AND m.status = 'proved'
+  WHERE f.icv1_field = r.field)";
 
 #[derive(Default)]
 struct Rows {
@@ -822,10 +951,13 @@ struct Rows {
     e_aliases: BTreeMap<String, Value>,
     morphisms: Vec<Value>,
     components: Vec<Value>,
+    /// Inputs of the conflict checks: one per quartic, one per quotient curve.
+    checks: Vec<Value>,
+    e_checks: BTreeMap<String, Value>,
 }
 
 /// The rows of one verified quartic.
-fn rows_of(v: &Verified, rows: &mut Rows) -> Result<()> {
+fn rows_of(qi: usize, v: &Verified, rows: &mut Rows) -> Result<()> {
     let p = BigInt::from(v.p);
     let fid = format!("fp-{}", v.p);
     let spec = prime_field(&fid, &p)?;
@@ -841,7 +973,7 @@ fn rows_of(v: &Verified, rows: &mut Rows) -> Result<()> {
             "ordinary": !v.l[3].mod_floor(&p).is_zero(),
         })
     });
-    let key = json!({ "field": fid, "coefficients": coefficients });
+    let key = json!({ "qi": qi, "field": fid, "coefficients": coefficients });
     let with = |extra: Value| -> Value {
         let mut o = key.clone();
         if let (Some(m), Value::Object(x)) = (o.as_object_mut(), extra) {
@@ -859,6 +991,12 @@ fn rows_of(v: &Verified, rows: &mut Rows) -> Result<()> {
         "label": label, "point_counts": v.counts.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
         "method": METHOD_L,
     })));
+    rows.checks.push(with(json!({
+        "label": label, "point_counts": v.counts.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+        "generators": generators(&v.coeffs), "seed": format!("{SEED:#018x}"),
+        "call": format!("ciani::sample({}, {PER_PRIME})", v.p),
+        "l_polynomial": v.l.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+    })));
     rows.generation.push(with(json!({
         "seed": format!("{SEED:#018x}"), "procedure": "ecdb/src/import/ciani.rs (ciani_quartic_seeded_v1)",
         "call": format!("ciani::sample({}, {PER_PRIME})", v.p),
@@ -874,7 +1012,7 @@ fn rows_of(v: &Verified, rows: &mut Rows) -> Result<()> {
         let inv = invariant_row(&slug, &spec.fq, "short_weierstrass", coeff.as_object().unwrap(), None)?;
         let mut inv = inv;
         inv["status"] = json!("proved");
-        rows.e_invariants.entry(slug.clone()).or_insert(inv);
+        rows.e_invariants.entry(slug.clone()).or_insert(inv.clone());
         rows.e_curves.entry(slug.clone()).or_insert_with(|| {
             json!({
                 "field": fid, "model": "short_weierstrass", "form": "y^2=x^3+a*x+b", "coefficients": coeff,
@@ -884,9 +1022,15 @@ fn rows_of(v: &Verified, rows: &mut Rows) -> Result<()> {
             })
         });
         rows.e_links.entry(slug.clone()).or_insert_with(|| json!({ "key": slug, "label": elabel }));
-        rows.e_zeta
-            .entry(slug.clone())
-            .or_insert_with(|| json!({ "key": slug, "point_counts": [n.to_string()], "method": METHOD_E }));
+        rows.e_zeta.entry(slug.clone()).or_insert_with(
+            || json!({ "key": slug, "label": elabel, "point_counts": [n.to_string()], "method": METHOD_E }),
+        );
+        rows.e_checks.entry(slug.clone()).or_insert_with(|| {
+            json!({
+                "key": slug, "field": fid, "coefficients": coeff, "model_sha256": sha, "label": elabel,
+                "point_counts": [n.to_string()], "a4": inv["a4"], "a6": inv["a6"], "j_invariant": inv["j_invariant"],
+            })
+        });
         rows.e_aliases
             .entry(slug.clone())
             .or_insert_with(|| json!({ "key": slug, "namespace": "icv1_slug", "alias": slug, "retired": false }));
@@ -895,8 +1039,14 @@ fn rows_of(v: &Verified, rows: &mut Rows) -> Result<()> {
         })));
         *mult.entry(slug).or_default() += 1;
     }
-    for (slug, m) in mult {
+    for (slug, m) in &mult {
         rows.components.push(with(json!({ "target": slug, "multiplicity": m })));
+    }
+    // the morphism rows also carry the component multiplicity, for the conflict check
+    let n = rows.morphisms.len();
+    for m in rows.morphisms[n - 3..].iter_mut() {
+        let t = m["target"].as_str().unwrap_or_default().to_string();
+        m["multiplicity"] = json!(mult.get(&t).copied().unwrap_or(0));
     }
     Ok(())
 }
@@ -929,18 +1079,31 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let client = ctx.client;
     let (results, rejected) = tokio::task::spawn_blocking(run_all).await?;
     report.count("ciani_rejected_singular", rejected as u64);
-    let mut rows = Rows::default();
+    let mut verified: Vec<&Verified> = Vec::new();
     for r in &results {
         report.count("ciani_sampled", 1);
         match r {
             Ok(v) => {
-                rows_of(v, &mut rows)?;
+                verified.push(v);
                 report.count("ciani_verified", 1);
             }
             Err((p, c, msg)) => {
                 report.count("ciani_crosscheck_failures", 1);
                 report.problem(format!("Ciani quartic {c:?} over F_{p}: cross-check failed, nothing stored: {msg}"));
             }
+        }
+    }
+    // Compare with what is stored; a quartic meeting any conflicting row is refused whole.
+    let mut all = Rows::default();
+    for (qi, v) in verified.iter().enumerate() {
+        rows_of(qi, v, &mut all)?;
+    }
+    let refused = conflicts(client, &all, &mut report).await?;
+    report.count("ciani_refused_conflict", refused.len() as u64);
+    let mut rows = Rows::default();
+    for (qi, v) in verified.iter().enumerate() {
+        if !refused.contains(&qi) {
+            rows_of(qi, v, &mut rows)?;
         }
     }
     let src = ctx
@@ -967,12 +1130,73 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     report.count("ciani_quotient_curves", bulk(client, CURVE_SQL, &vals(rows.e_curves), prov_e).await?);
     report.count("ciani_quotient_invariants", bulk(client, INVARIANT_SQL, &vals(rows.e_invariants), prov_e).await?);
     bulk1(client, ALIAS_SQL, &vals(rows.e_aliases)).await?;
-    report.count("ciani_quotient_links", bulk1(client, LINK_CLASS_SQL, &vals(rows.e_links)).await?);
+    report.count("ciani_quotient_links", bulk1(client, E_LINK_SQL, &vals(rows.e_links)).await?);
     report.count("ciani_quotient_zeta", bulk(client, E_ZETA_SQL, &vals(rows.e_zeta), prov_e).await?);
 
     report.count("ciani_morphisms", bulk(client, &morphism_sql(), &rows.morphisms, prov_m).await?);
     report.count("ciani_av_components", bulk(client, &component_sql(), &rows.components, prov_m).await?);
+
+    // Every kept quartic's three maps must now be stored exactly.
+    let missing = client.query(MAP_PRESENT_SQL, &[&Value::Array(rows.morphisms.clone())]).await?;
+    for r in &missing {
+        let (qi, construction): (i32, String) = (r.get(0), r.get(1));
+        let v = verified[qi as usize];
+        report.count("ciani_morphisms_missing", 1);
+        report.problem(format!(
+            "Ciani quartic {:?} over F_{}: morphism {construction} is not stored after the import",
+            v.coeffs, v.p
+        ));
+    }
     Ok(report)
+}
+
+/// The quartics (indices into the verified list) whose rows, or whose
+/// quotient curves' rows, conflict with stored values; each conflict is a
+/// problem. Read-only.
+async fn conflicts(client: &tokio_postgres::Client, rows: &Rows, report: &mut Report) -> Result<BTreeSet<usize>> {
+    let mut refused = BTreeSet::new();
+    let describe = |rows: &Rows, qi: usize| -> String {
+        rows.checks
+            .iter()
+            .find(|r| r["qi"] == json!(qi))
+            .map(|r| format!("{} {}", r["field"], r["coefficients"]))
+            .unwrap_or_default()
+    };
+    for r in client.query(&quartic_check_sql(), &[&Value::Array(rows.checks.clone())]).await? {
+        let (qi, why): (i32, String) = (r.get(0), r.get(1));
+        if !why.is_empty() {
+            refused.insert(qi as usize);
+            report.problem(format!(
+                "Ciani quartic {}: conflicts with stored rows, nothing stored: {why}",
+                describe(rows, qi as usize)
+            ));
+        }
+    }
+    let e_rows: Vec<Value> = rows.e_checks.values().cloned().collect();
+    for r in client.query(&quotient_check_sql(), &[&Value::Array(e_rows)]).await? {
+        let (slug, why): (String, String) = (r.get(0), r.get(1));
+        if !why.is_empty() {
+            for m in rows.morphisms.iter().filter(|m| m["target"] == json!(slug)) {
+                let qi = m["qi"].as_u64().unwrap_or_default() as usize;
+                refused.insert(qi);
+                report.problem(format!(
+                    "Ciani quartic {}: its quotient {slug} conflicts with stored rows, nothing stored: {why}",
+                    describe(rows, qi)
+                ));
+            }
+        }
+    }
+    for r in client.query(MAP_CHECK_SQL, &[&Value::Array(rows.morphisms.clone())]).await? {
+        let (qi, why): (i32, String) = (r.get(0), r.get(1));
+        if !why.is_empty() {
+            refused.insert(qi as usize);
+            report.problem(format!(
+                "Ciani quartic {}: conflicts with stored rows, nothing stored: {why}",
+                describe(rows, qi as usize)
+            ));
+        }
+    }
+    Ok(refused)
 }
 
 #[cfg(test)]
@@ -1185,12 +1409,33 @@ mod tests {
     const FIRST_DRAW_P5: Ciani = [1, 2, 4, 4, 3, 0];
 
     #[test]
+    fn quartics_without_a_usable_chart_point_are_refused() {
+        // smooth, but D_x: w^2 = alpha y^4 + beta y^2 z^2 + gamma z^4 has only branch points over F_5
+        let c = [3, 1, 1, 0, 0, 3];
+        assert!(is_smooth(5, &c));
+        let err = quotients(5, &c).unwrap_err();
+        assert!(err.contains("D_x"), "{err}");
+        // independently: every F_5-point of D_x has w = 0, or lies at t = 0 with alpha a non-square
+        let [a, b, cc, d, e, f] = c.map(|x| x as i64);
+        let (al, be, ga) = (
+            (f * f - 4 * a * b).rem_euclid(5),
+            (2 * e * f - 4 * a * d).rem_euclid(5),
+            (e * e - 4 * a * cc).rem_euclid(5),
+        );
+        assert_eq!(chi(al as u64, 5), -1);
+        for u in 0..5i64 {
+            let val = (al * u.pow(4) + be * u * u + ga).rem_euclid(5) as u64;
+            assert!(chi(val, 5) != 1, "u = {u}: a point with w != 0");
+        }
+    }
+
+    #[test]
     fn rows_have_the_registry_shape() {
         let p = 7;
         let c = sample(p, 1).0[0];
         let v = verify(&fields(p), &c, &quotients(p, &c).unwrap()).unwrap();
         let mut rows = Rows::default();
-        rows_of(&v, &mut rows).unwrap();
+        rows_of(0, &v, &mut rows).unwrap();
         assert_eq!(rows.quartics.len(), 1);
         assert_eq!(rows.morphisms.len(), 3);
         let m = &rows.morphisms[0];

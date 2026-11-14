@@ -291,6 +291,25 @@ migration: every row fits an existing table and enum value.
 | `curve_morphism` | kind `quotient`, constructions `ciani_quotient_x_v1`, `ciani_quotient_y_v1`, `ciani_quotient_z_v1`, degree 2, cover genus 3, `C -> E`, same field, proved; `map` holds the involution, the quotient model (s, t, w and alpha, beta, gamma), the chart (u, v, u0, q and the translated quartic), the long Weierstrass coefficients A1..A6 and the change to short form |
 | `av_component` | Jac(C) to each E_i, relation `isogeny_factor` (multiplicity = how many of the three quotients are that curve), proved by the equal L-polynomials (Tate) |
 
+**Existing rows.** Every statement inserts or fills NULL only (a Jacobian's
+class link is set only where none is stored). Before writing, the importer
+compares the stored rows each quartic would meet with the computed values:
+the quartic curve (genus, smoothness), its Jacobian's class link, zeta counts
+(common prefix) and class, equation model, generation row and the class's
+L-polynomial; each quotient curve's slug (model hash), a same-model curve
+stored under another slug, class link, zeta counts and invariants; the three
+maps (map, degree, status, method) and the `av_component` multiplicities. A
+quartic meeting any disagreement is refused whole (`ciani_refused_conflict`,
+one problem line per conflict) and nothing of it is written; after the
+inserts every kept quartic's three maps must be stored exactly
+(`ciani_morphisms_missing`, a problem).
+
+**Limit.** The Weierstrass chart needs an F_p-point of D_i with w != 0. For
+some smooth quartics over tiny fields every F_p-point of a D_i is a branch
+point (e.g. 3x^4 + y^4 + z^4 + 3x^2y^2 over F_5); such a quartic is reported
+as a cross-check failure and not stored. No quartic of the generator's sample
+meets this.
+
 Counts of the first import into an empty database: 16 fields, 128 quartics,
 120 genus-3 classes, 384 morphisms, 346 distinct quotient curves in 133
 genus-1 classes, 381 `av_component` rows; a second import inserts 0.
