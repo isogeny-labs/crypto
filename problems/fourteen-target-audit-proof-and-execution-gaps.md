@@ -17,6 +17,8 @@ bridges remain unresolved.
 
 ## Evidence and uncertainty
 
+The [request-level scope comparison](../research/theorem_census_20261109/REQUEST_SCOPE.md) records completed original bounded checks separately from stronger follow-ups. In particular, item1 does not require higher-arity absolute irreducibility; the concrete Smart/rho/prime-S3-host/degree-control components have completed their documented requested scopes. Actual Jacobian/Hasse/canonical pairing and C-refinement obligations remain open. [pcc:unverified]
+
 The first two infrastructure observations below describe the original local session. Approved local checkpoints and the completed hosted prime-S3 replay supersede those original launch/second-host dependencies; compiler/runtime/author independence and signed standing remain separate. Current formal coverage is in the all-fourteen table and later additive receipts. [pcc:unverified]
 
 - Observed: a complete resume document was supplied to `scripts/checkpoint.sh
@@ -57,8 +59,8 @@ The first two infrastructure observations below describe the original local sess
 ## Next discriminating steps
 
 1. The bounded Semaev census, all-arity zero-sum/degree/symmetry/source-split
-   proofs and p<500 base-field k1 census have run. Continue higher-arity
-   absolute irreducibility, geometric rank at odd primes beyond3, actual
+   proofs and p<500 base-field k1 census have run. Continue
+   geometric rank at odd primes beyond3, actual
    other-prime/canonical-pairing geometry beyond the now-proved qualified prime3 all-model criterion, general supersingular geometry and remaining all-k census
    obligations. New native work needs its own frozen protocol; finite
    agreement does not prove a universal statement. [pcc:unverified]

@@ -83,3 +83,5 @@ No holes/custom axioms/native proof evaluation/global flags/raised limits/
 waivers/new cryptographic experiment/paid compute/agent upload. No novelty
 claim. General r≥5 BK, canonical Weil necessity, complete all-k census and
 the other original fourteen-item gaps remain separate. [pcc:unverified]
+
+Public replay snapshot: commit`e0171ad2a597f001d419f7694ee622538716c0b8`, identical tree`e522bc7614b7d8d3c8c4c0f09a74fc2be51a66ed` to local receipt139b25b2546e4a239c67c132efc4e188b01bdec9. Completed anonymous fetch and exacttree check; see [publication metadata](publication.json). Signed standing remains unverified. [pcc:unverified]

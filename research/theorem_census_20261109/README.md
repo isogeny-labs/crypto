@@ -391,6 +391,8 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Original fourteen requirements
 
+The [original-request scope map](REQUEST_SCOPE.md) separates completed requested bounded checks from stronger follow-ups and unfinished mathematical bridges. Higher-arity absolute irreducibility is an optional item1 extension; generic p-adic/limiting theory and stronger author/runtime independence are separate from the completed concrete Smart/rho/prime-S3-host components. The full14 request remains partial. [pcc:unverified]
+
 The [complete actual BK wrapper](../bk_full_binding_audit_20261114/README.md)
 repairs the concrete old receipt by addition. **PCC-20261114-8c5c1e** exact local replay
 PASS at 2026-11-14T15:14:07Z, signed standing unverified. The actual F₅/r3/all-k theorem
