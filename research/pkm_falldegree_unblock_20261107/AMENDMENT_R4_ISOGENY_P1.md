@@ -73,8 +73,11 @@ Draws, seeds and targets are as frozen: `--planted 0 --random 2`, the pilot's de
 
 ## 6. Route, cost, records
 
-- Execution: the RunPod reserved-pod route of draft R3 (`AMENDMENT_R3_RUNPOD.md`), with a binary built from the commit that
-  adds `--aux-order`. Its SHA-256s are recorded in the receipt. This needs a new pinned binary set, because the frozen
-  `f13a690df0` binaries have no `--aux-order`. Kummer rows stay on the frozen binaries.
+- Execution: the RunPod reserved-pod route of draft R3 (`AMENDMENT_R3_RUNPOD.md`).
+- **Binary.** `pkm_tower_pilot` is built from the frozen source f13a690df016d0a457bd40579fbb9d054f486adf plus `gaux/aux_order.patch`
+  only (musl static, SHA-256 `705b151b6f35b3fdfd7a6b2ae80630edaf5fb1b7f0b75bf3c81f8e3882aa4888`). It is not built from `main`,
+  whose F4 engine has changed since. The other three study binaries are the frozen ones (`runpod/REBUILD.md`).
+- **Threads.** `RAYON_NUM_THREADS=12` (Amendment 9). F4's `muladds` counter depends on the thread count (`gaux/GAUX.md`).
+- Gate G-AUX result: `gaux/GAUX.md` (pass in `gaux/v3/`, after two failures that are kept on record).
 - Cost: owner decision 4 ceilings (US$40 per job, US$400 study).
 - Records: resume checkpoint, `bench.record/v1`, director card and receipt, as for every job of this study.

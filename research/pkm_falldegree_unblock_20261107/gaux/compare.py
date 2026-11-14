@@ -2,7 +2,7 @@
 must equal the admitted values in results/R9/analysis/pfdA_summary.json, field by field."""
 import json, sys
 here = sys.argv[1]
-adm = {(r["t"], r["target_index"]): r for r in json.load(open(f"{here}/../results/R9/analysis/pfdA_summary.json"))["draws"]
+adm = {(r["t"], r["target_index"]): r for r in json.load(open(__import__("os").path.join(__import__("os").path.dirname(__import__("os").path.abspath(__file__)), "../results/R9/analysis/pfdA_summary.json")))["draws"]
        if r["kind"] == "isogeny" and r["p"] == 786433 and r["m"] == 2 and r["control"] == "tower"}
 A = {(r["t"], r["target_index"]): r for r in map(json.loads, open(f"{here}/A-m2-iso-p0-mestre.jsonl")) if "t" in r}
 DA = {(r["t"], r["target_index"]): r for r in map(json.loads, open(f"{here}/DA-m2-iso-p0-mestre.jsonl")) if "t" in r}
