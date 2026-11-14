@@ -4,7 +4,7 @@
 - **Kind:** proof gaps, implementation gaps and access/tool limits; no impossibility claim
 - **Affected work:** [fourteen-target audit](../research/theorem_audit_20261108/README.md)
 - **Next action owner:** audit continuation; environment owner for credential/host provisioning
-- **Last updated:** 2026-11-13
+- **Last updated:** 2026-11-14
 
 ## Problem
 
@@ -16,6 +16,8 @@ bridges remain unresolved.
 [pcc:unverified]
 
 ## Evidence and uncertainty
+
+The first two infrastructure observations below describe the original local session. Approved local checkpoints and the completed hosted prime-S3 replay supersede those original launch/second-host dependencies; compiler/runtime/author independence and signed standing remain separate. Current formal coverage is in the all-fourteen table and later additive receipts. [pcc:unverified]
 
 - Observed: a complete resume document was supplied to `scripts/checkpoint.sh
   gate`; upload failed because neither the configured AWS profile nor an
@@ -54,14 +56,17 @@ bridges remain unresolved.
 
 ## Next discriminating steps
 
-1. The documented bounded Semaev census has run. Continue remaining
-   resultant proofs beyond m4/degree proofs and the all-p<500torsion/binary/ternary census
-   obligations under their exact original scope, with a new frozen protocol
-   before affected native work. Never convert finite agreement into a
-   universal theorem. [pcc:unverified]
-2. For item7, provide the concrete Jacobian/factor-base/subgroup family and a
-   faithful Lean group/divisor bridge; the abstract confinement theorem is
-   already available and is insufficient by itself. [pcc:unverified]
+1. The bounded Semaev census, all-arity zero-sum/degree/symmetry/source-split
+   proofs and p<500 base-field k1 census have run. Continue higher-arity
+   absolute irreducibility, generic odd-prime torsion/Frobenius/determinant/
+   descent, general supersingular geometry and remaining all-k census
+   obligations. New native work needs its own frozen protocol; finite
+   agreement does not prove a universal statement. [pcc:unverified]
+2. For item7, extend the checked concrete Cantor groups, growing-genus prime
+   family and fixed-genus unbounded-field family to the full ambient
+   Jacobian/Picard group/divisor identification. The actual image-group
+   counterfamilies do not alone supply that geometric bridge or a qualified
+   typical-subgroup asymptotic theorem. [pcc:unverified]
 3. For item12, bind recorded C matrix rows to monomial/prior-polynomial
    certificates and total degrees; separate ordinary GB, trace replay and
    saturation. A source comment naming F4 is not a refinement proof.
@@ -328,7 +333,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Partial: actual qualified F5/r3 and excluded F7/r3 criteria at all positive extension degrees; complete p<500 basefield k1census; qualified matrix criterion/actual rational prime-torsion input; generic actual r2geometry/binary basis and characteristic2card1/2/coprimality-deletion control (67) | Generic odd-prime geometric rank, actual Frobenius determinant/representation/descent and all-k extension census over the p<500population |
 | 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67) | General Hasse/supersingular geometric classification, further extension-field censuses and full torsion-field bridges |
-| 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
+| 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
@@ -872,3 +877,25 @@ projective isolated-point/positive-dimensional geometry, equal-multidegree
 n!dⁿ and Rojas/C refinement remain open; qualified source/node unrefuted.
 Existing16 msolve calls unchanged; no new native experiment or novelty.
 [pcc:unverified]
+
+### Original Verheul distortion formula and actual repair
+
+The [original Verheul source audit](../research/verheul_distortion_audit_20261114/README.md)
+checks the published p288 formula and original Theorem5 hypotheses. The
+printed y-scaling map for y²=x³+a sends an actual p29/l5 point off the
+curve; both primes exceed3. The repaired x-scaling is proved as an actual
+point-group automorphism over every field/nonzero-discriminant model,
+with group law, bijection and period3. Actual F29/F841, nonbase primitive
+cube root, point count30/source trace0 and base/extensionP=(4,6)order5
+are bound. CorrectedQ has order5 and is outside the actual cyclic P;
+every nonzero subgroup member is distorted. Actual order3point(0,1) is
+fixed as a boundary control. Whole gate49/0 failures/0 trusted and exact
+local PCC-20261114-0c4538 replay pass at 2026-11-14T01:10:05Z; eight formal/config and eleven
+artifact pins match, 68 attempt files/five gate files and inspected
+one-page PDF47805B retained. Signed standing unverified. This refutes
+the explicit printed formula, not general existence Theorem5. Its
+endomorphism-ring/Tate-module and canonical pairing/scheme bridges remain
+open. Original publisher/author sources and exact corpus node were read
+at recorded scope; additive [coverage](../research/verheul_distortion_audit_20261114/coverage.json)
+does not promote the frozen unread labels or imply a full-paper read.
+No novelty or native experiment claimed. [pcc:unverified]
