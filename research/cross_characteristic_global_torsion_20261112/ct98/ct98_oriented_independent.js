@@ -78,6 +78,43 @@ for(let ix=0;ix<specs.length;ix++){
 rows.sort((a,b)=>a.source[0]-b.source[0]||a.source[1]-b.source[1]);
 const positive=rows.filter(z=>z.multiplier_from_x_map<4);
 ck(equal(positive.map(r=>r.target_x),[2,17,1562]),'three binary x roots');
+
+// Independently solve each public toy DLP with generic BSGS on *both* fibers.
+// This checks logs, but the transported ordinate already leaked the source log.
+const md=v=>((v%37)+37)%37;
+function isource(v){for(let i=1;i<37;i++)if(md(i*v)===1)return i;throw Error('nonunit 37')}
+function sourceAdd(P,Q){
+ if(!P)return Q;if(!Q)return P;
+ let [x,y]=P,[z,w]=Q;
+ if(x===z&&md(y+w+1)===0)return null;
+ let lambda;
+ if(x===z){ck(y===w,'wrong source doubling');lambda=md((3*x*x-2*x-10)*isource(md(2*y+1)))}
+ else lambda=md((w-y)*isource(md(z-x)));
+ let xx=md(lambda*lambda+1-x-z);
+ return [xx,md(lambda*(x-xx)-y-1)];
+}
+function genericBsgs(P,Q,add,neg,key){
+ let m=3,baby=null,table=new Map();
+ for(let j=0;j<m;j++){table.set(key(baby),j);baby=add(baby,P)}
+ let step=null;for(let i=0;i<m;i++)step=add(step,P);
+ step=neg(step);let cur=Q;
+ for(let i=0;i<=m;i++){
+  const j=table.get(key(cur));
+  if(j!==undefined)return (i*m+j)%7;
+  cur=add(cur,step);
+ }
+ throw Error('BSGS failed');
+}
+const sG=[9,4], sNeg=P=>P===null?null:[P[0],md(-P[1]-1)];
+const tNeg=P=>P===null?null:[P[0],[P[1][0]^1,P[1][1]]];
+for(const row of rows){
+ const sLog=genericBsgs(sG,row.source,sourceAdd,sNeg,a=>JSON.stringify(a));
+ const tPoint=[[row.target_x,0],row.target_y];
+ const tLog=genericBsgs(original,tPoint,plus,tNeg,a=>JSON.stringify(a));
+ ck(sLog===tLog&&sLog===row.multiplier_from_x_map,
+    'toy end-to-end source/target logs mismatch');
+}
+
 const output={experiment:'CT98-differential-ordinate-certificate',orientation_transport:true,
  scalar_independent_transfer:false,leaked_source_log:true,source_rows:rows};
 function stable(v){if(Array.isArray(v))return '['+v.map(stable).join(',')+']';
