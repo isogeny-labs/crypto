@@ -1,0 +1,14 @@
+digraph nodes {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.35,ranksep=0.42];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4ff",fontname="Helvetica",fontsize=13,margin="0.16,0.11",color="#385b80"];
+ edge [color="#385b80"];
+ a [label="Same actual W(T), every retained node t\nNo assumed nonzero local first jet"];
+ {rank=same;b [label="Derived graded base + correction\nEvery coefficient, including anchor zeros"];c [label="Actual row congruence and denominators\nNearOne precision v-u+1"]}
+ a -> b;a -> c;
+ {rank=same;d [label="Normalized constant zero\nCoefficient n+1 has weight at least n"];e [label="Literal representative factors\n2^v labels; exact at full refinement"]}
+ b -> d;c -> e;
+ f [label="v=u: polynomial crossing factors\nNormalized residual 1; weighted residual w+1"];
+ d -> f;e -> f;
+ g [label="OPEN: full polynomial higher precision\nactual mode inventory + complete expected bit cost",fillcolor="#fff2d9",color="#9b6d1d"];
+ f -> g [style=dashed];
+}
