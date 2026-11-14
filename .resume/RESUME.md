@@ -1,3 +1,21 @@
+# Whole fixed-twist and negative-census bytes genuinely published through transport20
+
+Actualpcc/claims/PCC-20261114-ccd0a6.json/pcc/claims/PCC-20261114-0ed674.json: original43652162428/job132622813840SUCCESS/SEVENremote replays BEFORE52a6443b5/direct88345729/exact9paths. ALL40443heldinputs/150links/ownedbytes preserved, fetch-FF-artifact-wiring0, exacttwo-bytepart reassembly retains original150067144B/archiveSHA/all7359members. HOLD20RELEASED. Original925a2b44/GH001 attempt19 staysFAILED/singleobjectcriterionUNMET; completefailedcommit/archive/claimedsubjects/rejection retained, no publishedhistory rewrite/force/rebase. [pcc:unverified]
+
+## What was done
+Published allclosedct78-ct80sources/actualbinaries/librarycopies/failures/proofs/reports/checkpoints/full147memberCI; canonicalTHREEoriginalentrydicts plusONE56644BexactGitpartialvector/FOURrelativealiases. Original2a0549 supportedseparateinstance and215bcc conditionalobstruction plusb3a1bc14oldwholepacketparity/c4fbde fullcoldnegative remainunchanged. [pcc:unverified]
+
+## Decisions made
+Keep rejected single-object19 separate from accepted exactbyte transport20; no fakefullarchiveS3entry or failedcensusacceptance. No newscientific/signed/performance promotion. [pcc:unverified]
+
+## Open threads
+Strictadditive23rdpairreplay/physicalownsourceCI; NEWpairedfixedfourth-edge protocol BEFOREcode; actualoriginalJacchain-or-separateinstanceextension, completeJacpointmap/direct-vs-chaincosts. FuturedatahandoffNEW21. [pcc:unverified]
+
+## Errors
+Original19push rejected143.12MiB>GitHub100MiB; originalsamearchive retained and exact80MiB+63.12MiBparts accepted. Fullcold04actual124/18complete102missing andbothreuse0 remainnegative/fullgates101. Root124-clock101/mainledger-signing-reviews-conflicts/globalgeometry-program/livebenchmarkcapacity-image-strongestrefs/vault8edec422/KB gapsremain. No paidlaunch/waiver/novelty/advantage. [pcc:unverified]
+
+---
+
 # Exact-byte transport20 replaces rejected unpublished payload19
 
 Actual925a2b44 normalpush1/GH001: whole150067144B archive exceeds GitHub100MiB; no remote ref moved. Original failed commit retained on local research/chained-jacobian-transfer-20261110-rejected19; every original claimed subject and whole archive stays exact. Fresh candidate has SAME unchanged remoteparent4b0871aa; no published history rewrite/force/rebase. Two original-policy byte segments reconstruct the identical archive, not a repack or filtered dataset. Original19 single-object publication is UNMET; transport20 requires genuine seven-object replay BEFOREactualbot/exactFF/full ordered reassembly hash/all40437+sixsubject guards/150links/ownedbytes. All consumer source/metadata/ledger remainHELD. [pcc:unverified]
