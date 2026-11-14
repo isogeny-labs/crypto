@@ -235,6 +235,9 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         REGION,
     )?;
     let (quote, quote_time) = latest_quote(&history, now)?;
+    // This is read-only. A plan is ready only when the exact security group,
+    // instance profile, bucket, and no-overlapping-allocation gates pass too.
+    preflight_provider()?;
     let zone = |stratum| {
         json!({"stratum":stratum,"zone":ZONE,"subnet_id":SUBNET,
         "zone_id":zone_id,"spot_placement_score":score,"quote_usd_per_hour":quote,
