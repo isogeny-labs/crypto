@@ -66,7 +66,9 @@ def check_lock(lock, repo, output):
     for key, hash_key in (("solver", "solver_sha256"),
                           ("formula", "formula_sha256"),
                           ("export_receipt", "export_receipt_sha256"),
-                          ("known_model_audit", "known_model_audit_sha256")):
+                          ("known_model_audit", "known_model_audit_sha256"),
+                          ("pinned_replay", "pinned_replay_sha256"),
+                          ("pinned_stdout", "pinned_stdout_sha256")):
         require(sha256(Path(lock[key])) == lock[hash_key], key + " hash")
     formula = Path(lock["formula"])
     require(formula.stat().st_size == 20_533_971, "formula byte count")
@@ -74,6 +76,7 @@ def check_lock(lock, repo, output):
             "formula header")
     export = json.loads(Path(lock["export_receipt"]).read_text())
     audit = json.loads(Path(lock["known_model_audit"]).read_text())
+    replay = json.loads(Path(lock["pinned_replay"]).read_text())
     require(export["mode"] == "positive-sorted-unpinned" and
             export["status"] == "PASS_XCNF_EXPORT_ONLY" and
             export["source_commit"] == lock["export_source_commit"] and
@@ -84,8 +87,15 @@ def check_lock(lock, repo, output):
             export["target"] == lock["target"], "export identity")
     require(audit["status"] == "PASS_ORIGINAL_XCNF" and
             audit["xcnf_sha256"] == lock["formula_sha256"] and
+            audit["archived_stdout_sha256"] == lock["pinned_stdout_sha256"] and
             (audit["checked_cnf"], audit["checked_xor"]) == (1_141_545, 4_980),
             "known-model audit")
+    require(replay["status"] == "PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY" and
+            replay["xcnf_sha256"] == audit["archived_positive_sha256"] and
+            replay["solver_stdout_sha256"] == lock["pinned_stdout_sha256"] and
+            replay["checked_archive_rows"] == 339_968 and
+            replay["columns"] == [1, 3, 4, 0, 2] and
+            replay["target"] == lock["target"], "pinned group replay")
     require(lock["solver_sha256"] ==
             "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
             "solver differs from paired arm")
