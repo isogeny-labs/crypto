@@ -27,6 +27,19 @@ Use the fixed tower F_(2²⁴)=F4096[Y]/(Y²+Y+g), g=x³+x² and x=2. For every 
 
 Starting from one oriented generator of each of the two cubics, apply binary Frobenius σ:(x,y)↦(x²,y²). Each cyclic line has an exact orbit of **4 lines**, and the two orbits are disjoint. Each line contributes 6 nonzero points; the eight lines contain **48 distinct nonzero order-seven points** in F_(2²⁴). Since E[7](overline F2) has 7²−1=48 nonzero geometric torsion points (7 is prime to characteristic), the programs have exhaustively accounted for E[7]. In each seed line, σ⁴ acts as [3], so σ¹²=[3³]=[−1] on the oriented points, σ²⁴=identity. The selected CT80 generator has exact Frobenius degree 24 (checked at every proper divisor 1,2,3,4,6,8,12), independently certifying the need for the quadratic ordinate step over F4096.
 
+
+## Intrinsic Frobenius proof (independent of the finite-field enumeration)
+
+The same partition has a short endomorphism-theoretic explanation. Counting E(F2) directly for E: y²+y=x³+x² gives exactly five points, hence the Frobenius trace is t=2+1−5=−2. The characteristic polynomial of the binary Frobenius endomorphism π is
+
+    π² + 2π + [2] = 0.
+
+Squaring and substituting the same identity yields **π⁴ = [−4]** exactly as an endomorphism, not merely on the order-seven subgroup. Consequently on E[7], π⁴=[3], π¹²=[3³]=[−1] and π²⁴=[1]. The mod-seven characteristic polynomial T²+2T+2 has discriminant −4≡3 (mod 7), a nonsquare. Thus π has no eigenline on E[7] over F7, and since π²=−2π−2, neither π² nor π³ fixes any projective line. Its projective action has exact order four and therefore partitions the eight projective seven-torsion lines into **exactly two four-cycles**. This independently proves the line-orbit structure checked by both programs.
+
+Every nonzero oriented 7-torsion point has **exact Frobenius degree 24**: it is fixed by π²⁴, but π⁸=[16]=[2] and π¹²=[−1] fix no nonzero order-seven point. All proper divisors of 24 divide either 8 or 12. The unordered x-coordinates have degree 12 because π¹²=[−1] fixes x and π has no smaller projective-return divisor of 12. This is a fixed characteristic-two residue-field obstruction to representing the *oriented point* over a smaller binary field, **not** a cross-characteristic algorithmic or generic-group DLP lower bound.
+
+The direct Frobenius trace and endomorphism identity are classical and were already implicit in the CT88 trace computation; the new contribution here is the explicit connection to CT90's **two** CRT cubic factors and their complete, independently enumerated point orbits. [pcc:unverified].
+
 ## Public toy compatibility controls
 
 Using the CT80-compatible oriented root **((2,0),(0,1))** rather than an arbitrary cubic root, both programs independently run the generalized Weierstrass group law over F37 from P=(9,4) and the binary law in F_(2²⁴). The 7 public source and image points agree exactly with CT80 (including infinity) and a target-side exhaustive scan recovers the seven toy logarithms. This is a known-answer group-homomorphism check; the chosen starting orientation and verification scan are **not** a non-enumerative algorithm for mapping arbitrary encoded source Q through the global field.
