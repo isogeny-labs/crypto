@@ -100,6 +100,19 @@ fails or the remaining allowance cannot cover the next stage.
    relation row. Record rank contribution. Retain timeout, OOM,
    `UNKNOWN_solver_cap` and producer failure as distinct outcomes.
 
+The standalone [model replayer](replay_model.py) takes the export JSON,
+original XCNF, solver stdout and receipt, retained input root, and the
+source-commit and binary-hash values from the frozen execution lock. It
+requires a complete SAT assignment, checks every original CNF and XOR row,
+verifies the exact K600 archive, and checks fixture 0 for natural queries
+or the archived six-point witness for positive controls. It lifts all six
+model x-coordinates through the stored point/column coefficients, checks the
+four intermediate x-coordinates and final group sum, and writes a fresh receipt
+only after all checks pass. Preserve invalid and incomplete models as
+failures. Its arithmetic, model parser and XCNF selftest passed
+[pcc:unverified]; [the raw selftest log](replay-selftest.txt) is retained.
+The replayer has not yet checked a full K600 solver model.
+
 The admission result can justify expanding to multiple ordinary relations
 and then a full same-point single-target IC/rho comparison. Select a base
 only after relation collection, rank and logarithm recovery, sparse linear
