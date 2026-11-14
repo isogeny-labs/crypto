@@ -84,8 +84,8 @@ check(sorted(z["x"] for z in algebraic_roots)==[9,27,28],
       "source x roots not exhaustive")
 check(sorted(z["x_binary"] for z in algebraic_roots)==[2,17,1562],
       "binary x roots not exhaustive")
-rows=[]
-for xx,yy in ((9,4),(9,32),(27,9),(27,27),(28,0),(28,36)):
+def transport(xx,yy):
+    """Public-input online selector: no supplied scalar or target-side root."""
     candidates=[z for z in algebraic_roots if z["x"]==xx]
     check(len(candidates)==1,"not a unique public x lift")
     z=candidates[0]
@@ -95,12 +95,33 @@ for xx,yy in ((9,4),(9,32),(27,9),(27,27),(28,0),(28,36)):
         check(yy==(-1-z["y_line_source"])%p,"wrong source y orientation")
         out_y=[z["y_line_binary"][0]^1,z["y_line_binary"][1]]
     check(on_binary(z["x_binary"],out_y),"binary oriented point fails curve")
-    rows.append(dict(source=[xx,yy],target_x=z["x_binary"],target_y=out_y))
+    return dict(source=[xx,yy],target_x=z["x_binary"],target_y=out_y)
+
+public=((9,4),(9,32),(27,9),(27,27),(28,0),(28,36))
+rows=[transport(*q) for q in public]
+# Nonmembers and wrong ordinates cannot be silently transported.
+for bad in ((10,4),(27,10),(9,10)):
+    try:
+        transport(*bad)
+    except ArithmeticError:
+        pass
+    else:
+        raise ArithmeticError("nonmember or wrong orientation was accepted")
 check([z["target_y"] for z in rows]==
       [[0,1],[1,1],[77,1],[76,1],[2879,1],[2878,1]],
       "fixed oriented CT91/98 known-answer fixtures")
-print(json.dumps(dict(
-    binary_line_certificate=True,experiment="CT99-cubic-chord-orientation",
-    fixed_source_place=True,fixed_target_place=True,global_line_certificate=True,
-    online_scalar_observed=False,scalar_independent_online_selection=True,
-    source_rows=rows),sort_keys=True,separators=(",",":")))
+import sys
+if len(sys.argv)>1:
+    check(len(sys.argv)==3 and sys.argv[1]=="--point",
+          "usage: ct99_cubic_chord_orientation.py --point x,y")
+    fields=sys.argv[2].split(",")
+    check(len(fields)==2 and all(t.isdigit() for t in fields),
+          "expected public x,y")
+    q=tuple(map(int,fields))
+    print(json.dumps(transport(*q),sort_keys=True,separators=(",",":")))
+else:
+    print(json.dumps(dict(
+        binary_line_certificate=True,experiment="CT99-cubic-chord-orientation",
+        fixed_source_place=True,fixed_target_place=True,global_line_certificate=True,
+        online_scalar_observed=False,scalar_independent_online_selection=True,
+        source_rows=rows),sort_keys=True,separators=(",",":")))
