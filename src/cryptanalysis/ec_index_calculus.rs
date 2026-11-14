@@ -1973,8 +1973,8 @@ pub fn ec_index_calculus_dlp_staged_seeded_projected(
 pub type PairSumTableExact =
     std::collections::HashMap<(BigUint, BigUint), (usize, i64, usize, i64)>;
 
-/// Largest factor base the compact table indexes (13 bits per index).
-pub const PAIR_SUM_TABLE_MAX_FB: usize = 1 << 13;
+/// Largest factor base the compact table indexes (14 bits per index).
+pub const PAIR_SUM_TABLE_MAX_FB: usize = 1 << 14;
 
 fn x_fingerprint(x: &BigUint) -> u64 {
     // splitmix64 fold over the 32-bit limbs; only a probe key (every hit is checked against the point)
@@ -2012,16 +2012,16 @@ impl PairSumTable {
 
     fn pack(i: usize, s_i: i64, j: usize, s_j: i64) -> u32 {
         let sign = |s: i64| u32::from(s < 0);
-        1 + ((((i as u32) << 13 | j as u32) << 2) | sign(s_i) << 1 | sign(s_j))
+        1 + ((((i as u32) << 14 | j as u32) << 2) | sign(s_i) << 1 | sign(s_j))
     }
 
     fn unpack(v: u32) -> (usize, i64, usize, i64) {
         let v = v - 1;
         let sg = |b: u32| if b == 1 { -1i64 } else { 1 };
         (
-            (v >> 15) as usize,
+            (v >> 16) as usize,
             sg((v >> 1) & 1),
-            ((v >> 2) & 0x1FFF) as usize,
+            ((v >> 2) & 0x3FFF) as usize,
             sg(v & 1),
         )
     }
@@ -3164,6 +3164,11 @@ mod tests {
         assert!(hits > 0, "no pair sum was hit");
         let packed = PairSumTable::pack(11, -1, 7, 1);
         assert_eq!(PairSumTable::unpack(packed), (11, -1, 7, 1));
+        let top = PairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
+        assert_eq!(
+            PairSumTable::unpack(top),
+            (PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1)
+        );
     }
 
     /// Every relation found by the table lookup and by the restarted walk
