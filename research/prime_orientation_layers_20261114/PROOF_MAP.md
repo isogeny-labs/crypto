@@ -1,0 +1,92 @@
+# Actual orientation layers: declaration proof map
+
+Frozen source `e422291022ee713b7097438f322baa4a0bf794f2`.
+All82 records are unsigned; exact statements/hypotheses and declaration hashes
+are retained in [claim-pins.json](evidence/claim-pins.json).
+This scope is all-source base integrality and the first crossing-jet lowest
+2-adic layer. It does not supply full higher-precision factorization or cost.
+
+| Declaration | Source | Unsigned claim |
+| --- | --- | --- |
+| `OrientationBaseBridge.node_injective` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-ddcceb |
+| `OrientationBaseBridge.node_center` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-e6b93c |
+| `OrientationBaseBridge.grid_eq_image` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-84013e |
+| `OrientationBaseBridge.puncture_grid` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-ba9c37 |
+| `OrientationBaseBridge.normalizer_center_product` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-fb00a4 |
+| `OrientationBaseBridge.normalizer_eq_centerDen` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-8aa8df |
+| `OrientationBaseBridge.base_eval_old` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-c1e888 |
+| `OrientationBaseBridge.chart_polynomial` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-bbdb2c |
+| `OrientationBaseBridge.vbound_of_norm_le_one` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-cbc665 |
+| `OrientationBaseBridge.indexed_base_content` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-185e2e |
+| `OrientationBaseBridge.actual_base_content` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-41e249 |
+| `OrientationBaseBridge.actual_completed_content` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-ab220a |
+| `OrientationBaseBridge.actual_completed_crossing_content` | [source](lean/OrientationBaseBridge.lean) | PCC-20261114-91f07d |
+| `OrientationDiagonal.pole_cast` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-4164f5 |
+| `OrientationDiagonal.pole_ne_zero` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-a9e369 |
+| `OrientationDiagonal.pole_valuation` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-1ca8de |
+| `OrientationDiagonal.pole_in_grid` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-41677a |
+| `OrientationDiagonal.factor_eval` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-f3f681 |
+| `OrientationDiagonal.diagonal_correction` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-dfed5d |
+| `OrientationDiagonal.diagonal_value_product` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-2f444e |
+| `OrientationDiagonal.diagonal_positive` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-f1b627 |
+| `OrientationDiagonal.valuation_prod` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-313278 |
+| `OrientationDiagonal.sum_two_power_valuation` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-ac6022 |
+| `OrientationDiagonal.diagonal_factor_valuation` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-7bf62e |
+| `OrientationDiagonal.diagonal_valuation` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-5ea1bc |
+| `OrientationDiagonal.matching_value_mul` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-1bd225 |
+| `OrientationDiagonal.matching_ratio_one` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-62d078 |
+| `OrientationDiagonal.nonmatching_ratio_even` | [source](lean/OrientationDiagonal.lean) | PCC-20261114-d38cda |
+| `OrientationHierarchy.masked_baseline` | [source](lean/OrientationHierarchy.lean) | PCC-20261114-03c271 |
+| `OrientationHierarchy.omitted_high_gain` | [source](lean/OrientationHierarchy.lean) | PCC-20261114-cb79f5 |
+| `OrientationHierarchy.low_order_gain` | [source](lean/OrientationHierarchy.lean) | PCC-20261114-affde1 |
+| `OrientationHierarchy.strict_crossing_gain` | [source](lean/OrientationHierarchy.lean) | PCC-20261114-25b905 |
+| `OrientationHierarchy.actual_strict_crossing_content` | [source](lean/OrientationHierarchy.lean) | PCC-20261114-61729b |
+| `OrientationJet.poleQ_ne_zero` | [source](lean/OrientationJet.lean) | PCC-20261114-835cb1 |
+| `OrientationJet.chart_first` | [source](lean/OrientationJet.lean) | PCC-20261114-fde1ed |
+| `OrientationJet.nodal_derivative` | [source](lean/OrientationJet.lean) | PCC-20261114-2f20b6 |
+| `OrientationJet.nodal_derivative_ne_zero` | [source](lean/OrientationJet.lean) | PCC-20261114-e69786 |
+| `OrientationJet.base_at_other_node` | [source](lean/OrientationJet.lean) | PCC-20261114-5edff5 |
+| `OrientationJet.base_times_linear` | [source](lean/OrientationJet.lean) | PCC-20261114-63d7bf |
+| `OrientationJet.base_derivative` | [source](lean/OrientationJet.lean) | PCC-20261114-44fc50 |
+| `OrientationJet.completed_first` | [source](lean/OrientationJet.lean) | PCC-20261114-227fd3 |
+| `OrientationJet.pole_member` | [source](lean/OrientationJet.lean) | PCC-20261114-2db7d8 |
+| `OrientationJet.crossing_displacement_ne_pole` | [source](lean/OrientationJet.lean) | PCC-20261114-21cc95 |
+| `OrientationJet.jetScalar_ne_zero` | [source](lean/OrientationJet.lean) | PCC-20261114-c929a7 |
+| `OrientationJet.firstJet_formula` | [source](lean/OrientationJet.lean) | PCC-20261114-bf7775 |
+| `OrientationJet.diagonalJet_formula` | [source](lean/OrientationJet.lean) | PCC-20261114-8bc3f3 |
+| `OrientationJet.diagonalJet_ne_zero` | [source](lean/OrientationJet.lean) | PCC-20261114-6be149 |
+| `OrientationJet.normalized_firstJet` | [source](lean/OrientationJet.lean) | PCC-20261114-e9e4c2 |
+| `OrientationJet.derivative_ratio_rho` | [source](lean/OrientationJet.lean) | PCC-20261114-a1c49e |
+| `OrientationJet.jetScalar_valuation` | [source](lean/OrientationJet.lean) | PCC-20261114-2208b8 |
+| `OrientationJet.diagonalJet_valuation` | [source](lean/OrientationJet.lean) | PCC-20261114-bdaedb |
+| `OrientationLeading.poleQ_value` | [source](lean/OrientationLeading.lean) | PCC-20261114-62ffe1 |
+| `OrientationLeading.matching_bits` | [source](lean/OrientationLeading.lean) | PCC-20261114-c4748e |
+| `OrientationLeading.crossing_denominator` | [source](lean/OrientationLeading.lean) | PCC-20261114-a7e0f2 |
+| `OrientationLeading.crossing_base_ratio_integral` | [source](lean/OrientationLeading.lean) | PCC-20261114-fb9e34 |
+| `OrientationLeading.matching_base_ratio_one` | [source](lean/OrientationLeading.lean) | PCC-20261114-f76b47 |
+| `OrientationLeading.matching_firstJet_one` | [source](lean/OrientationLeading.lean) | PCC-20261114-af4157 |
+| `OrientationLeading.nonmatching_firstJet_even` | [source](lean/OrientationLeading.lean) | PCC-20261114-8464cf |
+| `OrientationLeading.left_integral` | [source](lean/OrientationLeading.lean) | PCC-20261114-2bf29c |
+| `OrientationLeading.right_integral` | [source](lean/OrientationLeading.lean) | PCC-20261114-19f5e5 |
+| `OrientationLeading.factor_entry` | [source](lean/OrientationLeading.lean) | PCC-20261114-b7edfb |
+| `OrientationLeading.actual_leading_factorization` | [source](lean/OrientationLeading.lean) | PCC-20261114-800c08 |
+| `OrientationLeading.weighted_product` | [source](lean/OrientationLeading.lean) | PCC-20261114-f2f4e7 |
+| `OrientationLeading.weighted_left_bound` | [source](lean/OrientationLeading.lean) | PCC-20261114-591ecb |
+| `OrientationLeading.crossing_first_scale` | [source](lean/OrientationLeading.lean) | PCC-20261114-b9bede |
+| `OrientationLeading.actual_weighted_factorization` | [source](lean/OrientationLeading.lean) | PCC-20261114-f93c33 |
+| `OrientationLeading.weighted_left_integral` | [source](lean/OrientationLeading.lean) | PCC-20261114-9ba2ee |
+| `OrientationResidue.vbound_div` | [source](lean/OrientationResidue.lean) | PCC-20261114-f56b8a |
+| `OrientationResidue.OneModTwo.integral` | [source](lean/OrientationResidue.lean) | PCC-20261114-37abd3 |
+| `OrientationResidue.OneModTwo.one` | [source](lean/OrientationResidue.lean) | PCC-20261114-806558 |
+| `OrientationResidue.OneModTwo.mul` | [source](lean/OrientationResidue.lean) | PCC-20261114-812ae9 |
+| `OrientationResidue.OneModTwo.pow` | [source](lean/OrientationResidue.lean) | PCC-20261114-756d6f |
+| `OrientationResidue.OneModTwo.prod` | [source](lean/OrientationResidue.lean) | PCC-20261114-389eb3 |
+| `OrientationResidue.one_sub_ne_zero` | [source](lean/OrientationResidue.lean) | PCC-20261114-dc0034 |
+| `OrientationResidue.one_sub_valuation` | [source](lean/OrientationResidue.lean) | PCC-20261114-810c4a |
+| `OrientationResidue.inv_one_sub` | [source](lean/OrientationResidue.lean) | PCC-20261114-b763ea |
+| `OrientationResidue.ratio_one` | [source](lean/OrientationResidue.lean) | PCC-20261114-e41028 |
+| `OrientationResidue.two_power_valuation` | [source](lean/OrientationResidue.lean) | PCC-20261114-2eead2 |
+| `OrientationResidue.displacement_bound` | [source](lean/OrientationResidue.lean) | PCC-20261114-1ca3b7 |
+| `OrientationResidue.matching_mask` | [source](lean/OrientationResidue.lean) | PCC-20261114-782e03 |
+| `OrientationResidue.order_lt_of_residue_ne` | [source](lean/OrientationResidue.lean) | PCC-20261114-1ba092 |
+| `OrientationResidue.anchor_ratio_one` | [source](lean/OrientationResidue.lean) | PCC-20261114-2abd78 |

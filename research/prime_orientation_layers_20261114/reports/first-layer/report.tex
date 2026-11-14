@@ -1,0 +1,207 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=0.75in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}
+{\Large Actual first crossing-jet factors}\\[4pt]
+Base-content bridge and one precision layer, 14 November 2026\\
+Source \texttt{e422291022ee713b7097438f322baa4a0bf794f2}
+\end{center}
+
+\textbf{Result scope.} The actual completed orientation kernel has explicit
+weighted first-jet factors with $2^u$ labels. The residual is one bit above
+the actual diagonal weight. The actual base chart's integrality is derived
+through a literal polynomial identity to an existing construction. These
+are source-bound component claims; all PCC records are unsigned
+[pcc:unverified].
+
+\textbf{The same deformation.} Let $L=2^a$, $S=\{-L,\ldots,L-1\}$,
+$C(T)=\prod_{s\in S}(T-s)$, $\kappa=C'(0)$ and $\alpha=2^{a+1}$.
+For actual ports $0\le x,y<L$, set $\delta=y-x$ and
+\begin{align*}
+M_{xy}&=\{j<u:\operatorname{bit}_j(x)=\operatorname{bit}_j(y)\},\\
+B_\delta(T)&=\kappa^{-1}\prod_{s\in S\setminus\{\delta\}}(T-s),\\
+F_{xy}(T)&=\prod_{j\in M_{xy}}\left(\frac{2^j-T}{2^j-\delta}\right)^{m_j},
+\qquad W_{xy}(T)=B_\delta(T)F_{xy}(T),\\
+G_i&=m_i-\sum_{i<j<u}(j-i)m_j.
+\end{align*}
+The first-layer theorem requires $i<u\le a$ and $m_j>0$ for every
+retained $j$. Global chart integrality uses feasible $G_j\ge0$ at every
+retained level. All previous source values, origin identity and degree
+bounds apply to this same $W$; it is not replaced separately at each level.
+
+\textbf{Actual base-content bridge.} Prior normalizer and common-scalar
+sources already construct the actual local base polynomial over the
+concrete rational subring
+\[\mathbb Z_{(2)}=\{q:\operatorname{padicNorm}_2(q)\le1\}.\]
+Their actual finite-product normalizer unit is derived from Lucas parity and
+factorial identities. These prior results are reused, not claimed as new.
+
+The new bridge proves the exact grid bijection $k\mapsto k-L$, transports
+punctured products and identifies the derivative normalization with the
+prior center product. It then proves a literal rational-polynomial identity
+\[
+\operatorname{map}(\mathrm{subtype})(\mathrm{localBase}_{m,s})
+ =B_{\operatorname{node}(s)}\bigl(\operatorname{node}(m)+\alpha Z\bigr).
+\]
+Equality uses every rational evaluation over an infinite field, not a finite
+sample. Mapping actual coefficients gives the desired base-content bound in
+every literal signed source chart, including zero and $-L$. Multiplication
+by the actual correction yields whole-kernel chart integrality. The old
+exposed base-content premise is no longer supplied.
+PCC-20261114-bbdb2c/ab220a [pcc:unverified].
+
+\textbf{Content convention.} The predicate $\mathrm{VBound}(k,q)$ means
+$q=0$ or $v_2(q)\ge k$. It therefore handles zero without using the valuation
+API's default zero value as a finite valuation bound.
+
+\newpage
+\begin{center}{\Large Actual diagonal and normalized residues}\end{center}
+
+Put $t=-2^i$, and let $J_{xy}$ be coefficient one of the actual polynomial
+$W_{xy}(t+\alpha Z)$. The diagonal correction value is
+\[
+D_i=F_{00}(t)=\prod_{j<u}\left(\frac{2^j+2^i}{2^j}\right)^{m_j}>0.
+\]
+The numerator valuation is $i+1$ for $j=i$, and $\min(i,j)$ otherwise.
+Consequently $v_2(D_i)=G_i$ exactly. A lower bound alone would not justify
+dividing the strict margin by this diagonal.
+
+\textbf{Actual first coefficient.} Differentiate the punctured-polynomial
+identity at the actual source node. A crossing has equal bit $i$, hence
+$\delta\ne t$, and $B_\delta(t)=0$. The derivative product rule gives
+\begin{align*}
+\Gamma&=\alpha C'(t)/\kappa,&
+J_{xy}&=\frac{\Gamma}{t-\delta}F_{xy}(t),\\
+c&=J_{00}=\frac{\Gamma}{t}D_i,&
+\frac{J_{xy}}{c}&=\frac{t}{t-\delta}\frac{F_{xy}(t)}{D_i}.
+\end{align*}
+The actual derivative ratio equals the prior actual $\mathrm{cauchyRho}$,
+whose valuation is zero. Thus $\Gamma\ne0$, $v_2(\Gamma)=a+1$, $c\ne0$,
+and the exact public scalar weight is
+\[
+w=v_2(c)=a+1-i+G_i.
+\]
+No favorable scalar, unspecified unit or desired rank is supplied.
+PCC-20261114-e9e4c2/bdaedb [pcc:unverified].
+
+\textbf{Matching retained classes.} If $x\equiv y\pmod{2^u}$, every
+retained bit agrees and the actual mask is the full retained range. Then
+\[
+\frac{F_{xy}(t)}{D_i}=\prod_{j<u}
+ \left(\frac{2^j}{2^j-\delta}\right)^{m_j}\equiv1\pmod2.
+\]
+Each ratio is the inverse of $1-\delta/2^j$ with strictly even perturbation.
+The base ratio $t/(t-\delta)$ also equals one modulo two since $i<u$.
+Their product gives $J_{xy}/c\equiv1\pmod2$.
+
+\textbf{Nonmatching retained classes.} The actual first differing bit $s$
+is below $u$, omitted by the mask, and $s\ne i$ at a crossing. If $s<i$,
+anchor $i$ contributes extra $(i-s)m_i$. If $i<s<u$, omitting anchor $s$
+avoids loss $(s-i)m_s$. Positivity of all retained multiplicities gives at
+least one extra bit. The actual correction chart has content $G_i+1$;
+its constant coefficient therefore does too. Dividing by $D_i$ leaves
+content one. The actual base ratio is integral because
+$v_2(t-\delta)\le i$. Hence $J_{xy}/c\equiv0\pmod2$ outside a matching
+retained class. These are quantified source proofs [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Explicit weighted factors}\end{center}
+
+Zero out noncrossing entries and call the normalized first-jet matrix $R$.
+For labels $r\in\{0,\ldots,2^u-1\}$, define actual rational $0/1$ matrices
+\[
+U_{xr}=[x\bmod2^u=r],\qquad V_{ry}=[y\bmod2^u=r].
+\]
+The exact finite matrix product is
+$(UV)_{xy}=[x\bmod2^u=y\bmod2^u]$. Both factors are integral. The actual
+kernel analysis on page2 gives
+\[
+\mathrm{VBound}\bigl(1,R_{xy}-(UV)_{xy}\bigr).
+\]
+For actual weighted row factors $A=cU$ and actual unnormalized crossing
+first-jet matrix $J_{\rm cross}$,
+\[
+\mathrm{VBound}(w,A_{xr}),\qquad
+\mathrm{VBound}\bigl(w+1,(J_{\rm cross}-AV)_{xy}\bigr).
+\]
+Feasibility $G_i\ge0$ makes weighted row factors integral as well. Every
+entry, normalization and error is derived from the same actual polynomial
+family. No factorization oracle or assumed low-rank matrix appears.
+PCC-20261114-800c08/f93c33/9ba2ee [pcc:unverified].
+
+\begin{center}
+\includegraphics[width=.88\linewidth,height=.48\textheight,keepaspectratio]{layers.pdf}
+\end{center}
+
+\textbf{Cost qualification.} The count $2^u$ covers both bit classes in the
+full port crossing matrix. It may exceed the old $2^{i+1}$ tile count. It
+is not the rank or factor count of the entire higher-precision/higher-jet
+kernel. No asymptotic speedup follows from this one layer; all residual
+layers, source modes, precision, degree, recovery and recursion still need
+complete accounting. Additive weights must remain additive.
+
+\newpage
+\begin{center}{\Large Evidence and unresolved algorithmic obligations}\end{center}
+
+\textbf{Formal artifacts.} Six new modules contain 82 authored statements.
+Frozen source:\\
+\texttt{e422291022ee713b7097438f322baa4a0bf794f2}.
+
+The pinned shared axiom gate audits 82 declarations with 0 extra trusted
+axioms. Import-inclusive fresh OrientationLeading exits0 with default imports. New theorem records are source-bound and unsigned; producer
+checks do not manufacture signed standing [pcc:unverified].
+
+The proof map includes every exact declaration, quantifier and hypothesis.
+Source/dependency hashes retain the prior normalizer and common-scalar
+sources. Failed attempts and raw outputs are preserved. The earlier 66
+orientation statements and their claims remain unchanged; the old exposed
+base-content dependency is addressed by the new bridge.
+
+\textbf{Literal identity artifact.} Certificate
+\texttt{IDC1h57849461da3c8854} checks only
+$(N-UV)c=cN-c(UV)$ over the schema's field, at 32+16 points. It does not
+certify masks, nodal derivatives, valuations, matrix sums, rank or expected
+cost. Those quantified statements use Lean. The 3 new adapter-library tests,
+formatting and strict Clippy pass. No cryptographic fixture, solve,
+performance/scaling run or old native panel was launched [pcc:unverified].
+
+\textbf{Primary sources.} KB unavailable; bounded fallback queries and
+primary openings are recorded in the protocol/journal. Read actual
+\texttt{LocalCharts}, \texttt{LocalIntegral} and the normalized-square
+normalizer before implementation, with matching Git blob IDs. Read pinned
+Oct25 D.4.3/D.4.5 for the original kernel/mode interface and the previous
+repeated-anchor/common-kernel notes for counterexamples and retained-$u$
+Fibonacci costs. Reused arithmetic is not a novelty claim; a bounded search
+does not establish priority.
+
+\textbf{Requirement status.}
+\begin{center}
+\begin{tabular}{p{.38\linewidth}p{.53\linewidth}}
+Actual base-content binding & Constructed literal polynomial bridge\\
+Actual scalar and first jet & Nonzero diagonal and exact weight derived\\
+First-jet lowest precision layer & Explicit integral factors and residual\\
+Pinned source axiom audit &82 statements,0 extra trusted axioms\\
+Fresh replay &Exit0, default imports\\
+All higher jets/precision layers &Open\\
+Expected ECDLP bit cost/existence &Open\\
+PR integration &Protected concurrent ledger conflict; no reconciliation\\
+\end{tabular}
+\end{center}
+
+\textbf{Next discriminating work.} Extend the actual factorization to the
+source's required chart precision and jets, with every new direction and
+weight charged. Then prove uniform packet/child bounds, immutable entry
+costs, recovery and complete recursion. A full ECDLP statement also needs
+the charged public-input reduction/finder/extraction and expected bit cost.
+These targets are not completed by a first-layer component.
+
+\path{research/prime_orientation_layers_20261114/PROOF_MAP.md}\\
+\path{research/prime_orientation_layers_20261114/evidence/source-freeze.json}\\
+\path{research/prime_orientation_layers_20261114/evidence/claim-pins.json}
+
+The diagram is explanatory. Canonical performance/solve graphs contain no
+new value from this round.
+\end{document}

@@ -1,0 +1,494 @@
+[
+  {
+    "theorem": "OrientationBaseBridge.node_injective",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem node_injective (a : \u2115) : Function.Injective (node a)",
+    "decl_sha256": "8afc8e1ee0842a2d66ddca10662d28d4664cafd75ab7712bee0aa5049239c2df"
+  },
+  {
+    "theorem": "OrientationBaseBridge.node_center",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem node_center (a : \u2115) : node a (center a) = 0",
+    "decl_sha256": "c2bcce556f2d3ade661fb1e1b4fca597ea26da0d0fac2b38f38800372f63144d"
+  },
+  {
+    "theorem": "OrientationBaseBridge.grid_eq_image",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem grid_eq_image (a : \u2115) : grid a = univ.image (node a)",
+    "decl_sha256": "928d6b4489272198004f85b4ae48a56a39a91f52f7201fd986f180e89a53e4b7"
+  },
+  {
+    "theorem": "OrientationBaseBridge.puncture_grid",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem puncture_grid (a : \u2115) (s : Nodes a) : puncture (grid a) (node a s) = \u220f j \u2208 univ.erase s, (X-C (node a j))",
+    "decl_sha256": "02ffa8bf3db19d597f543d80f843c5be1a089df6f5cc59de0b8ff212f45a2d49"
+  },
+  {
+    "theorem": "OrientationBaseBridge.normalizer_center_product",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem normalizer_center_product (a : \u2115) : normalizer (grid a) = \u220f j \u2208 univ.erase (center a), (0-node a j)",
+    "decl_sha256": "50c266dbde443645379231cd75e60a35d186ec210e9cb3e4017d64ef583f7034"
+  },
+  {
+    "theorem": "OrientationBaseBridge.normalizer_eq_centerDen",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem normalizer_eq_centerDen (a : \u2115) : normalizer (grid a) = LocalCharts.centerDen a",
+    "decl_sha256": "915cec12f77a8a51c76c336c013944895ec3802165f9ad9607f4da9109bada84"
+  },
+  {
+    "theorem": "OrientationBaseBridge.base_eval_old",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem base_eval_old (a : \u2115) (s : Nodes a) (T : \u211a) : (base (grid a) (node a s)).eval T = CauchyNormalizer.baseKernel a s.val T",
+    "decl_sha256": "b3c62b22f7cace7fc866d9413eb89cfa7a1cc9b7348c83c39975ad71946bcf6b"
+  },
+  {
+    "theorem": "OrientationBaseBridge.chart_polynomial",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem chart_polynomial (a : \u2115) (m s : Nodes a) : (LocalCharts.localBase a m s).map LocalIntegral.integralRing.subtype = (base (grid a) (node a s)).comp (C (node a m)+C ((2:\u211a)^(a+1))*X)",
+    "decl_sha256": "b074fba22841a7d22b827b4526f0d1216733c654b648805e8c233924b264ddde"
+  },
+  {
+    "theorem": "OrientationBaseBridge.vbound_of_norm_le_one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem vbound_of_norm_le_one (q : \u211a) (h : padicNorm 2 q \u2264 1) : VBound 0 q",
+    "decl_sha256": "1b96f1351d1f5feeacf5b5c0449f56bd3986306a7768a6e3cb0e5f1b591ba396"
+  },
+  {
+    "theorem": "OrientationBaseBridge.indexed_base_content",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem indexed_base_content (a : \u2115) (m s : Nodes a) : Content 0 ((base (grid a) (node a s)).comp (C (node a m)+C ((2:\u211a)^(a+1))*X))",
+    "decl_sha256": "4b2b97144df5a3c2687f1a708649cde2d2bf859f65312482c49bbb46b0c6ba65"
+  },
+  {
+    "theorem": "OrientationBaseBridge.actual_base_content",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem actual_base_content (a : \u2115) (d : \u211a) (t : \u2124) (hd : d \u2208 grid a) (ht : t \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)) : Content 0 (chart a t (base (grid a) d))",
+    "decl_sha256": "7699a720c5806f8e10a5ed67661dbe528eb0a11c78cfebb8fe26fb7864385c6b"
+  },
+  {
+    "theorem": "OrientationBaseBridge.actual_completed_content",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem actual_completed_content (a u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (ht : t \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)) (hu : u \u2264 a) (hm : \u2200 j < u, 0 \u2264 schedule u j m) : Content 0 (chart a t (completed (grid a) u x y m))",
+    "decl_sha256": "2c75eaa37311b75d2df25e71367842e756ddd142f09e7ded61af71e04de1e2f1"
+  },
+  {
+    "theorem": "OrientationBaseBridge.actual_completed_crossing_content",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationBaseBridge.lean",
+    "statement": "theorem actual_completed_crossing_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (g : \u2124) (hx : x < 2^a) (hy : y < 2^a) (ht : t \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)) (ht0 : t \u2260 0) (hi : padicValInt 2 t = i) (hiu : i < u) (hc : x.testBit i = y.testBit i) (hg : g \u2264 schedule u i m) : Content g (chart a t (completed (grid a) u x y m))",
+    "decl_sha256": "1a163a2537d258a4f9a0c634d867d56f109dfd9b077b0947486305ff4cbe2b85"
+  },
+  {
+    "theorem": "OrientationDiagonal.pole_cast",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem pole_cast (i : \u2115) : ((pole i:\u2124):\u211a) = poleQ i",
+    "decl_sha256": "104d20580885861b10f705b20a285423d1a8b2a491a263f79a8cedd065bb87a3"
+  },
+  {
+    "theorem": "OrientationDiagonal.pole_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem pole_ne_zero (i : \u2115) : pole i \u2260 0",
+    "decl_sha256": "c1c198ad58f9cb98a93318440b5172f92d1704e6938971f6460d69285aa2baf3"
+  },
+  {
+    "theorem": "OrientationDiagonal.pole_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem pole_valuation (i : \u2115) : padicValInt 2 (pole i) = i",
+    "decl_sha256": "88051336bc2f94f457d5f4bf8f41e7886a942c83bfbc8fd796f04e57d7d4cc09"
+  },
+  {
+    "theorem": "OrientationDiagonal.pole_in_grid",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem pole_in_grid (a i : \u2115) (hi : i \u2264 a) : pole i \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)",
+    "decl_sha256": "00ee378c7d2aa28481214db95ae627c7223cef4c3c77df564ded06aa608d8228"
+  },
+  {
+    "theorem": "OrientationDiagonal.factor_eval",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem factor_eval (d T : \u211a) (j : \u2115) : (factor d j).eval T = ((2:\u211a)^j-T)/((2:\u211a)^j-d)",
+    "decl_sha256": "5b7ac5a72ec03e54155fc11efbba68869f1fa9600538b52bc1627f8c6f189aa1"
+  },
+  {
+    "theorem": "OrientationDiagonal.diagonal_correction",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem diagonal_correction (u x : \u2115) (m : \u2115 \u2192 \u2115) : correction u x x m = correction u 0 0 m",
+    "decl_sha256": "e23d5518df585bd632511823ad1e3136c47339fabb4538b55feeef24fdb487f6"
+  },
+  {
+    "theorem": "OrientationDiagonal.diagonal_value_product",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem diagonal_value_product (u i : \u2115) (m : \u2115 \u2192 \u2115) : diagonalValue u i m = \u220f j \u2208 range u, (((2:\u211a)^j+(2:\u211a)^i)/((2:\u211a)^j))^m j",
+    "decl_sha256": "8b388b47be2494de8778209507ab7f709e619d80e1860f884cfa23204e02d9c5"
+  },
+  {
+    "theorem": "OrientationDiagonal.diagonal_positive",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem diagonal_positive (u i : \u2115) (m : \u2115 \u2192 \u2115) : 0 < diagonalValue u i m",
+    "decl_sha256": "d08135b774024dee1a34f083f283b3541b437d5bc090998bd95feab9496398d9"
+  },
+  {
+    "theorem": "OrientationDiagonal.valuation_prod",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem valuation_prod {\u03b9 : Type*} (S : Finset \u03b9) (q : \u03b9 \u2192 \u211a) (h : \u2200 j \u2208 S, q j \u2260 0) : padicValRat 2 (\u220f j \u2208 S, q j) = \u2211 j \u2208 S, padicValRat 2 (q j)",
+    "decl_sha256": "7cc3ca2ee3dd6b29ccc7cd63186870347040fb8074bd0324a05a0e1e8ab2397d"
+  },
+  {
+    "theorem": "OrientationDiagonal.sum_two_power_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem sum_two_power_valuation (i j : \u2115) : padicValRat 2 ((2:\u211a)^j+(2:\u211a)^i) = if j=i then (i:\u2124)+1 else min (i:\u2124) j",
+    "decl_sha256": "cc53880ed515e8651185baa7d2e83c36c5ffdd88c6d5ea886b386a85512143cb"
+  },
+  {
+    "theorem": "OrientationDiagonal.diagonal_factor_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem diagonal_factor_valuation (i j : \u2115) : padicValRat 2 (((2:\u211a)^j+(2:\u211a)^i)/((2:\u211a)^j)) = (if j=i then (i:\u2124)+1 else min (i:\u2124) j)-j",
+    "decl_sha256": "2a6bd20873fed67b125eb967865bbba5cbd0489215004aaaccff529edb079035"
+  },
+  {
+    "theorem": "OrientationDiagonal.diagonal_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem diagonal_valuation (u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) : padicValRat 2 (diagonalValue u i m) = schedule u i m",
+    "decl_sha256": "a52adb824aa35c1b4d43beb951f4a5fdba6c1aef3af8132df76ad4790af7a37e"
+  },
+  {
+    "theorem": "OrientationDiagonal.matching_value_mul",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem matching_value_mul (u x y i : \u2115) (m : \u2115 \u2192 \u2115) (h : x % 2^u = y % 2^u) : (correction u x y m).eval (poleQ i) = diagonalValue u i m * \u220f j \u2208 range u, (((2:\u211a)^j)/((2:\u211a)^j-delta x y))^m j",
+    "decl_sha256": "7de0aa987051d26f5fd00971ef025dfeb12d87ad383836268f61f29669dbac28"
+  },
+  {
+    "theorem": "OrientationDiagonal.matching_ratio_one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem matching_ratio_one (u x y i : \u2115) (m : \u2115 \u2192 \u2115) (h : x % 2^u = y % 2^u) : OneModTwo ((correction u x y m).eval (poleQ i)/diagonalValue u i m)",
+    "decl_sha256": "aacb9b37529fc11a579d6edbda5a5c4b34d6396071228e23159ecb59207eef3c"
+  },
+  {
+    "theorem": "OrientationDiagonal.nonmatching_ratio_even",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationDiagonal.lean",
+    "statement": "theorem nonmatching_ratio_even (u x y i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hc : x.testBit i = y.testBit i) (hn : x % 2^u \u2260 y % 2^u) (hm : \u2200 j < u, 0 < m j) : VBound 1 ((correction u x y m).eval (poleQ i)/diagonalValue u i m)",
+    "decl_sha256": "9cdf09cb5bd891a5da30532555d78538d51686e1d17ad85039b58d9e26460779"
+  },
+  {
+    "theorem": "OrientationHierarchy.masked_baseline",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationHierarchy.lean",
+    "statement": "theorem masked_baseline (u x y i s : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2208 mask u x y) : (m i:\u2124) - \u2211 j \u2208 mask u x y, loss i m j \u2264 gain u x y i s m",
+    "decl_sha256": "b33eb2e24d322966bff643cbba905943ff072da87d9c4574edaf8b2691536cf2"
+  },
+  {
+    "theorem": "OrientationHierarchy.omitted_high_gain",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationHierarchy.lean",
+    "statement": "theorem omitted_high_gain (u x y i s : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2208 mask u x y) (hs : s < u) (hn : s \u2209 mask u x y) : schedule u i m + loss i m s \u2264 gain u x y i s m",
+    "decl_sha256": "bcaae18dae66d5ede68a8c66dc46e370cbec391b9b8e0ad74ff8154512a8ac9c"
+  },
+  {
+    "theorem": "OrientationHierarchy.low_order_gain",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationHierarchy.lean",
+    "statement": "theorem low_order_gain (u x y i s : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2208 mask u x y) (hs : s < i) : schedule u i m + ((i-s:\u2115):\u2124)*m i \u2264 gain u x y i s m",
+    "decl_sha256": "305b286d4116d2a4d32c104fc58a465dea6958caee5705944157ac9cccf207e5"
+  },
+  {
+    "theorem": "OrientationHierarchy.strict_crossing_gain",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationHierarchy.lean",
+    "statement": "theorem strict_crossing_gain (u x y i s : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2208 mask u x y) (hs : s < u) (hn : s \u2209 mask u x y) (hm : \u2200 j < u, 0 < m j) : schedule u i m + 1 \u2264 gain u x y i s m",
+    "decl_sha256": "325c5797990779d45bfd0a2fae9e037b6dad4f5d086b895c31d6f8dbfe14492f"
+  },
+  {
+    "theorem": "OrientationHierarchy.actual_strict_crossing_content",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationHierarchy.lean",
+    "statement": "theorem actual_strict_crossing_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hit : padicValInt 2 t = i) (hia : i \u2264 a) (hiu : i < u) (hc : x.testBit i = y.testBit i) (hxy : x \u2260 y) (hs : order x y < u) (hm : \u2200 j < u, 0 < m j) : Content (schedule u i m+1) (chart a t (correction u x y m))",
+    "decl_sha256": "a71d867250496907324e2123f2a5b8d25486558af3af196602d65d47e21c4a60"
+  },
+  {
+    "theorem": "OrientationJet.poleQ_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem poleQ_ne_zero (i : \u2115) : poleQ i \u2260 0",
+    "decl_sha256": "520587818d332d9b2c45c7c25c7b4786d7f674a21583b39de33e0c4f7a1fdf3c"
+  },
+  {
+    "theorem": "OrientationJet.chart_first",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem chart_first (a : \u2115) (t : \u2124) (P : \u211a[X]) : (chart a t P).coeff 1 = (2:\u211a)^(a+1)*P.derivative.eval (t:\u211a)",
+    "decl_sha256": "2efa4990facedbd64ee4d8af9b37561f6c0e45fd55129ba7200eb16d327434ed"
+  },
+  {
+    "theorem": "OrientationJet.nodal_derivative",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem nodal_derivative (S : Finset \u211a) (t : \u211a) (ht : t \u2208 S) : (nodal S).derivative.eval t = (puncture S t).eval t",
+    "decl_sha256": "d407a69e2e2940e3459fc340076146106564a69fc62fbc51bada1668a25363c9"
+  },
+  {
+    "theorem": "OrientationJet.nodal_derivative_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem nodal_derivative_ne_zero (S : Finset \u211a) (t : \u211a) (ht : t \u2208 S) : (nodal S).derivative.eval t \u2260 0",
+    "decl_sha256": "01d05c8460e2d129b40987c7577bb85d756164fedd30ab181109940b0976dc30"
+  },
+  {
+    "theorem": "OrientationJet.base_at_other_node",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem base_at_other_node (S : Finset \u211a) (d t : \u211a) (ht : t \u2208 S) (hdt : d \u2260 t) : (base S d).eval t = 0",
+    "decl_sha256": "0037aef3816bce21f30068e772adcdde5edd0276174b261d5af48d1ac65f86f7"
+  },
+  {
+    "theorem": "OrientationJet.base_times_linear",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem base_times_linear (S : Finset \u211a) (d : \u211a) (hd : d \u2208 S) : base S d*(X-C d) = C ((normalizer S)\u207b\u00b9)*nodal S",
+    "decl_sha256": "ee1ec10b8f71a30f7bc1cbee2eff060155440a582c785c1b031cb62de69f2963"
+  },
+  {
+    "theorem": "OrientationJet.base_derivative",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem base_derivative (S : Finset \u211a) (d t : \u211a) (hd : d \u2208 S) (ht : t \u2208 S) (hdt : d \u2260 t) : (base S d).derivative.eval t = ((normalizer S)\u207b\u00b9*(nodal S).derivative.eval t)/(t-d)",
+    "decl_sha256": "21a5e3d272567bf551afda51ee8f62c80aa3e5f0e2cda192d904773db8cee65c"
+  },
+  {
+    "theorem": "OrientationJet.completed_first",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem completed_first (S : Finset \u211a) (a u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (hd : delta x y \u2208 S) (ht : (t:\u211a) \u2208 S) (hdt : delta x y \u2260 (t:\u211a)) : (chart a t (completed S u x y m)).coeff 1 = ((2:\u211a)^(a+1)*(normalizer S)\u207b\u00b9*(nodal S).derivative.eval (t:\u211a)) / ((t:\u211a)-delta x y) * (correction u x y m).eval (t:\u211a)",
+    "decl_sha256": "4a9eb6a625bfddcc9915c001d9ea6b511f5f8e275d000e048632a3b07fc954ea"
+  },
+  {
+    "theorem": "OrientationJet.pole_member",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem pole_member (a i : \u2115) (hi : i \u2264 a) : poleQ i \u2208 grid a",
+    "decl_sha256": "d1c635ac2fb9a9beceabc743a6d33195097e5b962cc5b3d5b628fe5e31f68e7d"
+  },
+  {
+    "theorem": "OrientationJet.crossing_displacement_ne_pole",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem crossing_displacement_ne_pole (x y i : \u2115) (hc : x.testBit i = y.testBit i) : delta x y \u2260 poleQ i",
+    "decl_sha256": "893dd20a71c92705ec7ba8c6368d45077f9773317d16a3d14587846a66da4d7e"
+  },
+  {
+    "theorem": "OrientationJet.jetScalar_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem jetScalar_ne_zero (a i : \u2115) (hi : i \u2264 a) : jetScalar a i \u2260 0",
+    "decl_sha256": "39e5534261a832657a55ac01f546a5a2957cef7b47318771ae3a412f21b0b4fc"
+  },
+  {
+    "theorem": "OrientationJet.firstJet_formula",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem firstJet_formula (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i \u2264 a) (hc : x.testBit i = y.testBit i) : firstJet a u i x y m = jetScalar a i/(poleQ i-delta x y)* (correction u x y m).eval (poleQ i)",
+    "decl_sha256": "9d6fb90be9d3408a807a88c1f4cddd3b633bd7438b8970da24e51de03645fe81"
+  },
+  {
+    "theorem": "OrientationJet.diagonalJet_formula",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem diagonalJet_formula (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2264 a) : diagonalJet a u i m = jetScalar a i/poleQ i * diagonalValue u i m",
+    "decl_sha256": "83f1e23e57ceee9ba887407f5d43ba236289ff23877ceb9e83c2e089d0886cd8"
+  },
+  {
+    "theorem": "OrientationJet.diagonalJet_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem diagonalJet_ne_zero (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2264 a) : diagonalJet a u i m \u2260 0",
+    "decl_sha256": "82a15e25df16e872636dc34ea55d130b9112bb842c2f3e5fc479ae42c7a23e21"
+  },
+  {
+    "theorem": "OrientationJet.normalized_firstJet",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem normalized_firstJet (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i \u2264 a) (hc : x.testBit i = y.testBit i) : firstJet a u i x y m/diagonalJet a u i m = (poleQ i/(poleQ i-delta x y))* ((correction u x y m).eval (poleQ i)/diagonalValue u i m)",
+    "decl_sha256": "a8d767716129bd4ccecf7cbcf339736a84f2ce97718593904dfedcf838a5090e"
+  },
+  {
+    "theorem": "OrientationJet.derivative_ratio_rho",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem derivative_ratio_rho (a : \u2115) (m : Nodes a) : (nodal (grid a)).derivative.eval (node a m)/normalizer (grid a) = CauchyNormalizer.cauchyRho a m.val",
+    "decl_sha256": "aaa35c49014d010d7677c85c3b1e7483e7b04760b9aba198dfbead5ac67d7b99"
+  },
+  {
+    "theorem": "OrientationJet.jetScalar_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem jetScalar_valuation (a i : \u2115) (hi : i \u2264 a) : padicValRat 2 (jetScalar a i) = (a+1:\u2115)",
+    "decl_sha256": "25f40f4c0b30a0cf4950f073b3eac7aaa7f434fd429d1408fbd173e10b60972b"
+  },
+  {
+    "theorem": "OrientationJet.diagonalJet_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationJet.lean",
+    "statement": "theorem diagonalJet_valuation (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) : padicValRat 2 (diagonalJet a u i m) = (a:\u2124)+1-i+schedule u i m",
+    "decl_sha256": "70af1df1ee477bddd350306a17c0d18cad1ecdbc9da8bd7c60193d7e081fb917"
+  },
+  {
+    "theorem": "OrientationLeading.poleQ_value",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem poleQ_value (i : \u2115) : padicValRat 2 (poleQ i) = (i:\u2124)",
+    "decl_sha256": "c51661caa65af11c1454fa44c73897cd858c8c8b394b22eb2cc4a14acacc0970"
+  },
+  {
+    "theorem": "OrientationLeading.matching_bits",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem matching_bits (u x y i : \u2115) (hi : i < u) (h : x % 2^u = y % 2^u) : x.testBit i = y.testBit i",
+    "decl_sha256": "050a0f4c8113f9e079f14a6f8b1cbf5338a3c5a499c9ec42349aea195124875f"
+  },
+  {
+    "theorem": "OrientationLeading.crossing_denominator",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem crossing_denominator (x y i : \u2115) (hxy : x \u2260 y) (hc : x.testBit i = y.testBit i) : padicValRat 2 (poleQ i-delta x y) = min (i:\u2124) (order x y)",
+    "decl_sha256": "3a0716fe2cc5cf924e4782cfa6b9149f76e47bfcadf79f71ebe700325729943d"
+  },
+  {
+    "theorem": "OrientationLeading.crossing_base_ratio_integral",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem crossing_base_ratio_integral (x y i : \u2115) (hc : x.testBit i = y.testBit i) : VBound 0 (poleQ i/(poleQ i-delta x y))",
+    "decl_sha256": "9460a392d480d93da10112b3d57f2363ee7a6d3f3e8b409b364ebf5ea75ad59b"
+  },
+  {
+    "theorem": "OrientationLeading.matching_base_ratio_one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem matching_base_ratio_one (u x y i : \u2115) (hi : i < u) (h : x % 2^u = y % 2^u) : OneModTwo (poleQ i/(poleQ i-delta x y))",
+    "decl_sha256": "8c8b8dd8b79673f13fe675f24eb3ca69c6aee175a8b39f6a4738c009e5f16e6d"
+  },
+  {
+    "theorem": "OrientationLeading.matching_firstJet_one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem matching_firstJet_one (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (h : x % 2^u = y % 2^u) : OneModTwo (firstJet a u i x y m/diagonalJet a u i m)",
+    "decl_sha256": "aee74005fbd1d41230d347be3fbab6ab3f9f7d9c357aac22f19a5f5fcec39e91"
+  },
+  {
+    "theorem": "OrientationLeading.nonmatching_firstJet_even",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem nonmatching_firstJet_even (a u i x y : \u2115) (m : \u2115 \u2192 \u2115) (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u \u2264 a) (hc : x.testBit i = y.testBit i) (hn : x % 2^u \u2260 y % 2^u) (hm : \u2200 j < u, 0 < m j) : VBound 1 (firstJet a u i x y m/diagonalJet a u i m)",
+    "decl_sha256": "ad55ccc136bdcee6921e14c0a40822014e069f0f256f34d1bb7cf365c61e6cf6"
+  },
+  {
+    "theorem": "OrientationLeading.left_integral",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem left_integral (a u : \u2115) (x : Ports a) (r : Labels u) : VBound 0 (leftFactor a u x r)",
+    "decl_sha256": "4e82b7d191b5bb6f60d82124ac28ac1d1ba02dde536f668893c8f3b17df10a24"
+  },
+  {
+    "theorem": "OrientationLeading.right_integral",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem right_integral (a u : \u2115) (r : Labels u) (y : Ports a) : VBound 0 (rightFactor a u r y)",
+    "decl_sha256": "76c553e3fb9214100b2afe9d5bebd6dc9827712caf54eb1eb213c9c5724b3508"
+  },
+  {
+    "theorem": "OrientationLeading.factor_entry",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem factor_entry (a u : \u2115) (x y : Ports a) : (leftFactor a u*rightFactor a u) x y = if x.val % 2^u = y.val % 2^u then 1 else 0",
+    "decl_sha256": "4f0c00d9e3a6ed716d2e48a32d5ebe3ca31a06a81ae2397730189cd6d3b58b22"
+  },
+  {
+    "theorem": "OrientationLeading.actual_leading_factorization",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem actual_leading_factorization (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hm : \u2200 j < u, 0 < m j) (x y : Ports a) : VBound 1 (normalizedCrossing a u i m x y-(leftFactor a u*rightFactor a u) x y)",
+    "decl_sha256": "e213160a091d171c99514062d280fa5764bbb0ada7d56c78952ac38f3f5b2af0"
+  },
+  {
+    "theorem": "OrientationLeading.weighted_product",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem weighted_product (a u i : \u2115) (m : \u2115 \u2192 \u2115) (x y : Ports a) : (weightedLeft a u i m*rightFactor a u) x y = diagonalJet a u i m*(leftFactor a u*rightFactor a u) x y",
+    "decl_sha256": "7a680cc5f0e3f88f4797add51c9c205ce9dd34d60ec56ebc607bb06e3ebbc575"
+  },
+  {
+    "theorem": "OrientationLeading.weighted_left_bound",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem weighted_left_bound (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (x : Ports a) (r : Labels u) : VBound (jetWeight a u i m) (weightedLeft a u i m x r)",
+    "decl_sha256": "ea57c630343e978eb548bb510ab7a4e31193fb6eafb296636997a0ec79c8b97c"
+  },
+  {
+    "theorem": "OrientationLeading.crossing_first_scale",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem crossing_first_scale (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hia : i \u2264 a) (x y : Ports a) : crossingFirst a u i m x y = diagonalJet a u i m*normalizedCrossing a u i m x y",
+    "decl_sha256": "0c98dc2237b2622f2c2b5684a3da158e475a01ed906514601807e9f895ed5021"
+  },
+  {
+    "theorem": "OrientationLeading.actual_weighted_factorization",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem actual_weighted_factorization (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hm : \u2200 j < u, 0 < m j) (x y : Ports a) : VBound (jetWeight a u i m+1) (crossingFirst a u i m x y-(weightedLeft a u i m*rightFactor a u) x y)",
+    "decl_sha256": "91c0674394a228ddba611e090ca29ae8105699b9c883f4cdcfac738a07997c85"
+  },
+  {
+    "theorem": "OrientationLeading.weighted_left_integral",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationLeading.lean",
+    "statement": "theorem weighted_left_integral (a u i : \u2115) (m : \u2115 \u2192 \u2115) (hi : i < u) (hu : u \u2264 a) (hg : 0 \u2264 schedule u i m) (x : Ports a) (r : Labels u) : VBound 0 (weightedLeft a u i m x r)",
+    "decl_sha256": "027fd8634e4258aba44a87620e89aebd0765fb1d058aac6b3f083726b66b158c"
+  },
+  {
+    "theorem": "OrientationResidue.vbound_div",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem vbound_div {k : \u2124} {q r : \u211a} (h : VBound k q) : VBound (k-padicValRat 2 r) (q/r)",
+    "decl_sha256": "0e52196f1a9ac35364ea62037cc4a2a5ce8bcc3ff4144e722cb579b7a834230e"
+  },
+  {
+    "theorem": "OrientationResidue.OneModTwo.integral",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem integral {q : \u211a} (h : OneModTwo q) : VBound 0 q",
+    "decl_sha256": "16e967b3469c7ce0c771d9790a11712a9d928353ffe1af8a76ec8def9ac96340"
+  },
+  {
+    "theorem": "OrientationResidue.OneModTwo.one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem one : OneModTwo 1",
+    "decl_sha256": "a825f02d338eeb917a2d90dd8f972eb3ae67ab451b199499a910fb40e676a7c3"
+  },
+  {
+    "theorem": "OrientationResidue.OneModTwo.mul",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem mul {q r : \u211a} (hq : OneModTwo q) (hr : OneModTwo r) : OneModTwo (q*r)",
+    "decl_sha256": "50e1bfbfe157d4d06e1935fc22ebd6e575ab570f999ae50c5d72424b5f50de1c"
+  },
+  {
+    "theorem": "OrientationResidue.OneModTwo.pow",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem pow {q : \u211a} (h : OneModTwo q) (n : \u2115) : OneModTwo (q^n)",
+    "decl_sha256": "4021ad96ba6193a2f98b2499b109d9299fe48f117d194abf8836f81b9df90eae"
+  },
+  {
+    "theorem": "OrientationResidue.OneModTwo.prod",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem prod {\u03b9 : Type*} (S : Finset \u03b9) (q : \u03b9 \u2192 \u211a) (h : \u2200 j \u2208 S, OneModTwo (q j)) : OneModTwo (\u220f j \u2208 S, q j)",
+    "decl_sha256": "72af4ba3457788e46bdda3ce8b4373880bcf395628f1fccdc49fd2c7bfadf710"
+  },
+  {
+    "theorem": "OrientationResidue.one_sub_ne_zero",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem one_sub_ne_zero {e : \u211a} (h : VBound 1 e) : 1-e \u2260 0",
+    "decl_sha256": "9d481febde55dea04ed79230aaf98e0a8126c582c118aebef7f2c90fc499df5e"
+  },
+  {
+    "theorem": "OrientationResidue.one_sub_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem one_sub_valuation {e : \u211a} (h : VBound 1 e) : padicValRat 2 (1-e) = 0",
+    "decl_sha256": "eddf280a2bb6a55c163bfce28178339446acd0de56d83047d9b25c8ebbf5f5ed"
+  },
+  {
+    "theorem": "OrientationResidue.inv_one_sub",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem inv_one_sub {e : \u211a} (h : VBound 1 e) : OneModTwo ((1-e)\u207b\u00b9)",
+    "decl_sha256": "48f1fdb186a672d8b470cb873c19a11535e337219c2d006fa719c01235aa4d7b"
+  },
+  {
+    "theorem": "OrientationResidue.ratio_one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem ratio_one {q d : \u211a} (hq : q \u2260 0) (hd : VBound 1 (d/q)) : OneModTwo (q/(q-d))",
+    "decl_sha256": "14cb7a81c39bee731ddd24ec8916d4d261b9b2725c31b7616465db8743a3f7a1"
+  },
+  {
+    "theorem": "OrientationResidue.two_power_valuation",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem two_power_valuation (j : \u2115) : padicValRat 2 ((2:\u211a)^j) = (j:\u2124)",
+    "decl_sha256": "a8ce3ccef5425b0c2e6045e89d702aadb4926c6321ac36b20015055777cdd4f1"
+  },
+  {
+    "theorem": "OrientationResidue.displacement_bound",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem displacement_bound (u x y : \u2115) (h : x % 2^u = y % 2^u) : VBound u (delta x y)",
+    "decl_sha256": "1366b951f15c1f16c2870f29474f3a35ee7e7a7bb8737c4f7dc65b0c6920df4c"
+  },
+  {
+    "theorem": "OrientationResidue.matching_mask",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem matching_mask (u x y : \u2115) (h : x % 2^u = y % 2^u) : mask u x y = range u",
+    "decl_sha256": "8cb4de7257789c893c9d77961f5404d8597be1f3940f47b8eb07bce2a0a5f9b4"
+  },
+  {
+    "theorem": "OrientationResidue.order_lt_of_residue_ne",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem order_lt_of_residue_ne (u x y : \u2115) (h : x % 2^u \u2260 y % 2^u) : order x y < u",
+    "decl_sha256": "c7f1168ba61e817622b747771149d58cb0451632ff05115b21ea847f33e60a6e"
+  },
+  {
+    "theorem": "OrientationResidue.anchor_ratio_one",
+    "source": "research/prime_orientation_layers_20261114/lean/OrientationResidue.lean",
+    "statement": "theorem anchor_ratio_one (u x y j : \u2115) (hj : j < u) (h : x % 2^u = y % 2^u) : OneModTwo (((2:\u211a)^j)/((2:\u211a)^j-delta x y))",
+    "decl_sha256": "e2d008d5ca59ac398f44f1fec71078898e2844297833d8e47a4164c99a9b58ad"
+  }
+]

@@ -71,3 +71,12 @@ Read pinned Oct25 D.4.3 and D.4.5 for the actual kernel and mode interface.
 The preceding orientation protocol/source and strict-margin draft022 supply
 the proposed new leading-layer mechanism. No bounded search establishes
 priority, and no report summary replaces exact source inspection.
+
+## Proof-artifact packaging
+
+The repository-required native identity certificate checks only the fixed
+ring rearrangement `(N-U*V)c=cN-c(UV)`, using the existing checker and
+three positive/negative development controls. It supplies a literal artifact,
+not a parameterized kernel certificate, fixture, search or performance run.
+This does not grant experiment/backend admission. Quantified actual-family
+claims require the pinned Lean gate and fresh replay [pcc:unverified].
