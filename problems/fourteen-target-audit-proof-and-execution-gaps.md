@@ -333,7 +333,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50); originalnine-pointprime3formwithoutaddedcoprime/generalchar3actualcard1or3/rank0or1 (22); directoriginalr2/r3finite-fieldcountformswithonlyAlgebraFK/cardq^k/noauxiliaryclosure-tower/noaddedcoprime (7) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
 | 3 Supersingular | Partial: actual r=2 exact-degree-two counterexamples; complete F2/F3/F4/F9 and p<500 basefield checks. Generic char2/3 actual geometric j/torsion/module criteria; all-model F2/F3 kernel source/geometry/Hasse/count/order4/6(44) and F5/F7 Hasse/source-trace0/count6/8/composite-order/named cyclic6/8(29). **Every finite field of characteristic2 or3, every actual nonsingular general model: exact source-trace iff j0 iff actual geometric p-torsion card1/rank0, with finite-extension source invariance.** Char2 also rational-geometric equality/rank; imperfect-field control rejects deleting finiteness(26). Char3 uses actual complete-square, finite cube roots, paired twist three-point construction and actual counts(55); rational replacement and trace-zero strengthening are directly refuted. Generic odd-field actual twist count/trace/source invariance and literal Galbraith9.5.3 special-j F7 counter(42) retained. [pcc:unverified] | General p>=5 trace-geometric and Endrank identifications; Hasse beyond checked cohorts; embedding/full-torsion-field bridges; further explicit extension censuses |
-| 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49); genericodd-fieldactualtwistcount/tracenegation/sourceinvariance/literalF7special-jcoordinateandactualAddEquivcounter/hypothesiscontrols(42) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
+| 4 Pairings/MOV/FR | Partial: literal composite-order/nontrivial-root Tate source counterexamples on actual F3/F5 curves(50); actual F25 Weil/Tate Miller tables/proper quotient domains and rational restriction disproofs(126); actual k1 F7 true quotients/all-valid-auxiliary nondegeneracy and torsion-restriction controls(116); original Verheul printed formula actual F29/F841 counter and actual group-automorphism repair(49); generic odd-field twist counts/source invariance and special-j literal counter(42). **Characteristic-order actual domains(37): anychar-p unit roots, finite power target1, actual E/nE=kernel cardinalities, unbounded ordinarychar2 and pairedordinarychar3 domain obstructions; imperfectF2(X) target control; direct weakened-claim negations and proved prime-root=>coprime source guard.** Qualified source and group-scheme pairings retained. [pcc:unverified] | Canonical divisor/valuation identification, generic MOV/FR and general End/Tate-module theorems; original FR94 unread |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
@@ -1291,3 +1291,37 @@ canonicalcorpuspromotion. Generalp>=5trace-geometric, Endrank, general
 Hasse/embedding/fulltorsionfield and other14gaps remain open. Further
 explicit native extension censuses are not automatically discharged.
 No newnativeexperiment/paidcompute/agentupload. [pcc:unverified]
+
+### Characteristic-order pairing domains: source guards and imperfect-field control
+
+The [characteristic-order pairing-domain packet](../research/char_p_pairing_domain_audit_20261114/README.md)
+proves every characteristic-p field has only identity p^k-th unit roots;
+over every finite such field the power homomorphism is surjective and its
+actual quotient has cardinality1. Actual finite E/nE and actual E[n] have
+equal cardinality. Every finite ordinary characteristic-two general model
+has actual left/right/target sizes2/2/1 and excludes unit-target candidates
+over any characteristic-two field and candidates on proper Tate domains.
+The credited actual y²+xy=x³+1 model has a rational order2 point over every
+characteristic-two field. Every finite characteristic-three ordinary cubic
+and nonsquare partner have a constructed nonzero3-point on one partner;
+that partner has actual domain sizes3/3/1 and the same impossibility. The
+credited F3 twist point(1,1) has exact order3. Prior actual torsion/group/
+twist construction proofs are credited. Over F2(X), the actual X-unit has
+nonidentity square class, target cardnot1 and squaremap nonsurjective;
+unitroots of1 remain trivial. Lean directly negates a universal trivial
+target after deleting finiteness. It also directly negates a prime-order/
+actual-order-divisibility unit-pairing existence claim after deleting
+coprimality, and separately an unqualified Tate claim omitting both
+coprimality and root hypotheses. A proved prime-nonidentity-root=>coprime
+lemma preserves the source guard: no counter to a retained-prime-root Tate
+statement is claimed. Galbraithauthorch26Def26.2.2/Thm26.2.3/Ex26.3.1/
+Thm26.3.3 selectedread, PDF2–5/printed574–577 fullyinspected. Qualified
+sources/group-scheme perfect pairings notrefuted; canonical divisor/
+valuation Weil/Tate/MOV/FR and generalEnd/Tatemodule remainopen.
+Exactlocal PCC-20261114-f7faf2 PASSat2026-11-14T08:22:13Z, whole37/0failures/0trusted,
+complete1986-character binding,117formal/config+11artifactpins; all113
+build/provenancefiles/34objects/46310B lossless archive, fivegatefiles,
+inspectedone-pagePDF46932B. Signedstandingunverified. KB/Conductor
+unavailable, explicit bounded fallback/source-fidelity correction recorded.
+No fullbookread/novelty/corpuspromotion/nativeexperiment/paidcompute/upload.
+[pcc:unverified]

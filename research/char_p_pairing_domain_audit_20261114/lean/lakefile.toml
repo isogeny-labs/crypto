@@ -1,0 +1,15 @@
+name = "char_p_pairing_domain_audit"
+version = "0.1.0"
+defaultTargets = ["CharPPairingDomainAudit"]
+
+[[require]]
+name = "finite_char_two_trace_audit"
+path = "../../finite_char_two_trace_audit_20261114/lean"
+
+[[require]]
+name = "finite_char_three_trace_audit"
+path = "../../finite_char_three_trace_audit_20261114/lean"
+
+[[lean_lib]]
+name = "CharPPairingDomainAudit"
+roots = ["PowerTargets", "ActualPQuotients", "CharTwoDomains", "CharThreeDomains", "ImperfectTarget", "CharPPairingCertificate"]
