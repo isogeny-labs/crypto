@@ -515,6 +515,7 @@ fn launch(
     script: &str,
     run_id: &str,
     output: &Path,
+    dry_run: bool,
 ) -> Result<String> {
     let user_data_path = output.join(format!("userdata-s{stratum}.sh"));
     let mut script_file = OpenOptions::new()
@@ -544,43 +545,57 @@ fn launch(
     let token = format!("n83-{run_id}-{stratum}");
     let profile = format!("Name={PROFILE}");
     let script_arg = format!("file://{}", user_data_path.display());
-    let result = cli(
-        &[
-            "ec2",
-            "run-instances",
-            "--image-id",
-            field(plan, "image_id")?,
-            "--instance-type",
-            INSTANCE,
-            "--min-count",
-            "1",
-            "--max-count",
-            "1",
-            "--client-token",
-            &token,
-            "--subnet-id",
-            SUBNET,
-            "--security-group-ids",
-            SECURITY_GROUP,
-            "--iam-instance-profile",
-            &profile,
-            "--instance-market-options",
-            &market,
-            "--metadata-options",
-            &metadata,
-            "--instance-initiated-shutdown-behavior",
-            "terminate",
-            "--block-device-mappings",
-            &disk,
-            "--tag-specifications",
-            &tags,
-            "--user-data",
-            &script_arg,
-        ],
-        REGION,
-    );
+    let args = [
+        "ec2",
+        "run-instances",
+        "--image-id",
+        field(plan, "image_id")?,
+        "--instance-type",
+        INSTANCE,
+        "--count",
+        "1",
+        "--client-token",
+        &token,
+        "--subnet-id",
+        SUBNET,
+        "--security-group-ids",
+        SECURITY_GROUP,
+        "--iam-instance-profile",
+        &profile,
+        "--instance-market-options",
+        &market,
+        "--metadata-options",
+        &metadata,
+        "--instance-initiated-shutdown-behavior",
+        "terminate",
+        "--block-device-mappings",
+        &disk,
+        "--tag-specifications",
+        &tags,
+        "--user-data",
+        &script_arg,
+    ];
+    let mut command = Command::new("aws");
+    command
+        .args(args)
+        .args(["--region", REGION, "--output", "json", "--no-cli-pager"]);
+    if dry_run {
+        command.arg("--dry-run");
+    }
+    let result = command.output();
     fs::remove_file(user_data_path)?;
     let result = result?;
+    let error = String::from_utf8_lossy(&result.stderr);
+    if dry_run {
+        if !result.status.success() && error.contains("(DryRunOperation)") {
+            return Ok("DRY_RUN_PASS".to_owned());
+        }
+        return Err(format!("EC2 RunInstances dry run failed: {}", error.trim()).into());
+    }
+    if !result.status.success() {
+        return Err(format!("EC2 RunInstances failed: {}", error.trim()).into());
+    }
+    let result: Value = serde_json::from_slice(&result.stdout)?;
     let instances = result["Instances"]
         .as_array()
         .ok_or("EC2 launch instances absent")?;
@@ -796,6 +811,8 @@ pub fn allocate(
         return Err("approved image or zone changed before allocation".into());
     }
     let run_id = run_id()?;
+    // Exercise the exact CLI argument shape before creating S3 objects.
+    launch(&plan, 0, "#!/bin/bash\ntrue\n", &run_id, output, true)?;
     let deadline = now_epoch()? + CAP_SECONDS;
     let receipt_path = output.join("allocation.json");
     let mut receipt = json!({"schema":"n83.crossfamily-aws-controller/v1",
@@ -916,7 +933,7 @@ pub fn allocate(
                 &run_id,
                 root,
             )?;
-            let id = launch(&plan, stratum, &script, &run_id, output)?;
+            let id = launch(&plan, stratum, &script, &run_id, output, false)?;
             receipt["instance_ids"]
                 .as_array_mut()
                 .ok_or("instance IDs absent")?
