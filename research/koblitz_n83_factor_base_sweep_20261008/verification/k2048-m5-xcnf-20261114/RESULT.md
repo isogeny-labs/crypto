@@ -6,8 +6,10 @@ CryptoMiniSat 5.14.7 returned SAT in 839 conflicts; independent replay checked
 all 1,141,221 original CNF clauses, 4,980 XOR rows, the curve group sum,
 subgroup membership and the 2,048-column relation row. The first same-public-
 point natural query reached the frozen one-million-conflict cap and returned
-`INDETERMINATE` after 137.253 seconds. This is one censored query; it supplies
-no relation-yield estimate or end-to-end factor-base ranking.
+`INDETERMINATE` after 137.253 seconds. These are historical Python-orchestrated
+local diagnostics; the repository's native-implementation rule requires a
+native runner and replay before further research comparisons. The one censored
+query supplies no relation-yield estimate or end-to-end factor-base ranking.
 
 | Cell | Positive control | Public natural query |
 | --- | ---: | ---: |
@@ -65,7 +67,8 @@ is `PASS_RAW_CUSTODY_AND_TERMINAL_CLASSIFICATION`. The full uncompressed files
 remain under `/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw`.
 The host's three 15-second preflight samples stayed below load 24 in each
 arm, and swapouts stayed 164,320. This is a local L0 diagnostic, so its wall
-times are not a Tier 0 or Tier 1 speedup comparison. [pcc:unverified]
+times are not a Tier 0 or Tier 1 speedup comparison and are not promoted as
+native performance measurements. [pcc:unverified]
 
 The next selection gate on `a=0` needs a common-query yield and novel-rank
 panel, full-width logarithm solve, unseen-target descent, charged cold and

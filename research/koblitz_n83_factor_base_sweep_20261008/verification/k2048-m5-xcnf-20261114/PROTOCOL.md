@@ -67,6 +67,33 @@ XOR rows. Its XCNF SHA-256 is
 `02d07716333e073f7eb40a7646ae3652b86b2129cb4d226f5dcc611d6bda7fff`.
 The exact solver lock below binds the one public query before search.
 
+### 11:30 UTC provenance correction
+
+The first positive and natural external-solver calls were orchestrated and
+replayed by Python scripts before the repository's native-implementation rule
+was noticed. Their frozen raw bytes and terminal statuses remain historical
+evidence. A Rust runner and independent Rust replay, followed by a separately
+locked native repeat, are required before extending the comparison or using
+the recorded process walls for performance claims. The earlier protocol,
+locks and raw measurements are retained unchanged.
+
+### 11:35 UTC native-repeat protocol
+
+Use the retained positive and natural XCNF bytes without regenerating their
+circuits. First, independently verify the existing positive model with the
+new Rust XCNF/curve/row replay as a verifier sanity check. Then run the same
+constructed positive through the Rust host/process gate with the exact
+CryptoMiniSat binary, flags, 1,000,000-conflict and 600-second solver limits,
+660-second process-group guard, and three 15-second load/swap samples. Replay
+the new model in Rust against every original CNF/XOR constraint, archived
+factor-base point, subgroup and relation row. Only that native positive
+releases one native public natural query on the same retained formula and
+public point. Preserve every run, host rejection and terminal state. Freeze
+the native source/binary/formula hashes in a new committed lock before each
+solver run. The native repeat remains an L0 diagnostic; any wall-time factor-
+base ranking requires a separate calibrated Tier 1 or Tier 0 comparison and
+complete end-to-end IC/rho evidence.
+
 ## Bounded search and interpretation
 
 The first public natural query uses the same solver flags, at most 1,000,000
