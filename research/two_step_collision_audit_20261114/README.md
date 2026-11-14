@@ -30,3 +30,27 @@ lake build
 From repository root run `tools/lean/proof-gate.sh research/two_step_collision_audit_20261114/lean`. Inside evidence verify `sha256sum -c attempts.tar.xz.sha256`; from the study directory restore every raw source/config/log/exit/protocol byte with `python restore_attempts.py /tmp/two-step-attempts`. All finite enumerations use kernel decisions, no native proof evaluator. No holes/custom axioms, global elaboration flags, raised limits, linter waivers, new native cryptographic experiment, paid compute or agent storage upload. Only propext/Classical.choice/Quot.sound. Publication/current receipts remain outside immutable pin sets. [pcc:unverified]
 
 Published in existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743) as `786c61653153767fbe75805d2c0a1abc5881210c`, identical to local receipt tree `d3ac94f47ee4fcc8fd94d6c6288f801d50fed8dc`; all40paths/7large-or-binary blobs checked, completed anonymous fetch and fresh PRhead/bodyv102 confirmed. Immutable ledger prefix584 preserved through585entries. No current-head CI pass asserted; parent immutable-ledger fork remains needs-human. Publication metadata is outside frozen pin sets. [pcc:unverified]
+
+## Additive general actual-group probability proof
+
+The [general actual degree-two collision proof](../general_two_step_collision_audit_20261114/README.md)
+closes the actual finite-group/support coefficient gap. For every finite
+additive commutative group, finite labels/nonnegative normalized law and
+literal source-qualified increment table, Lean derives actual four-query
+injectivity, fresh-pair↔admissible-label/hash-agreement equivalence with
+both inverses, fixedterminal expected count c=1−I2−I2²+I4 and global
+expected count |G|c. The genuine joint static-hash/uniform ordered-start
+PMF has real pointmass productlabelweights/|G|²; the actual fresh-event
+outermeasure is ofReal(c/|G|). Query independence/count/coefficient/probability
+are derived, not premises. Independent uniform starts are with replacement;
+fresh event requires x,Fx,y,Fy distinct and F²x=F²y. Known Bernstein–Lange2013
+local calculation credited; no novelty/qualified-source refutation.
+Limiting firstcollision penalty/constants, higher-degree asymptotic correction
+and practical fixed/keyedhash refinement remain open.
+Exact local **PCC-20261114-7a948c** PASS at 2026-11-14T18:05:58Z, signed standing unverified;
+whole35/0/0, complete777-character binding`5802fbd3152989fdd4805235c86098686c69810ad95be92dadfca6606495d47c`,
+independent native1full/0prefix/0unresolved;11custom/29formal-config+
+14artifact pins,85provenance files/34objects/12032-byte lossless XZ/
+fivegate/inspected onepagePDF47185bytes. Seven builds/two failures retained.
+Original generic cylinder/label/finite controls/sourceguards/claims unchanged.
+No new crypto experiment/spend/upload. [pcc:unverified]
