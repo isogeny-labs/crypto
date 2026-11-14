@@ -72,7 +72,7 @@ fn run_arm(fld: &Fld, arm: &str, form: Form, g: &Bi, wts: (usize, usize), k: usi
     let sumdeg: i64 = red.degs.iter().sum();
     let kn = (k * n) as i64;
     let short: Vec<usize> = (0..red.rows.len()).filter(|&i| red.degs[i] < kn).collect();
-    let pred1 = det / dim as i64 < kn;
+    let pred1 = det / (dim as i64) < kn;
     let wp = popov::is_weak_popov(&red.rows);
     // vanishing diagnostics (uses planted root)
     let mut vanish = -1i64;
@@ -209,7 +209,7 @@ fn cmd_uni(a: &[String]) {
         }
         let sumdeg: i64 = red.degs.iter().sum();
         println!("{{\"n\":{},\"d\":{},\"k\":{},\"l\":{},\"arm\":\"uni\",\"trial\":{},\"dim\":{},\"det_deg\":{},\"det_identity\":{},\"kn\":{},\"pred_ge1_short\":{},\"short_rows\":{},\"deg_min\":{},\"transforms\":{},\"word_xors\":{},\"genuine\":{},\"recovered\":{}}}",
-            n, d, k, l, t, lat.dim(), det, sumdeg == det, kn, det / lat.dim() as i64 < kn, short.len(), red.degs[0], red.st.transforms, red.st.word_xors, ngen, recovered);
+            n, d, k, l, t, lat.dim(), det, sumdeg == det, kn, det / (lat.dim() as i64) < kn, short.len(), red.degs[0], red.st.transforms, red.st.word_xors, ngen, recovered);
     }}}
 }
 
