@@ -339,7 +339,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual length/support/native16/JV8; literal F2torus-helper disproof/point-chart repair (31); generic actual solution/quotient-map equivalence and finite scalar-length bound, unbounded actual bivariate nilpotent family with m0/m1/domain controls (44) | General n!dⁿ/decomposition node unrefuted; scheme-cycle/local multiplicity, isolated points in positive-dimensional components, projective geometry and Rojas/C runtime/refinement |
 | 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
-| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
+| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations Actual independent PMF cycle coupling51: everyZModn n>=2/t>0 everyevent distance<=n²/(4t), explicitcoalescence/potentialdrift/bothmarginalexpectations/uniformstationarity; allprime two distinct equalweights by time-dependentaffinepermutation. Deterministicalltime1/2/directnever-mixes and t0controls. Qualified k2/equalweight progress, not source refutation; unequalweights/k>=3/randomsupport/staticrho/collisionconstants open. [pcc:unverified] | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Requested actual separate-host primeS3 replay completed in public run43501438026, both languages match all6fields/942models/4188162triples; canonical export2/2/0excluded passes | Compiler/runtime/physical-host proof and independence from the same author remain open. Native attestation PCC-20261113-9b23b3not_covered/unsigned; original manualHTTP404 unchanged. |
@@ -1381,3 +1381,26 @@ all73build/processing/provenancefiles/29objects/39289Blosslessarchive,
 fivegatefiles/inspectedone-pagePDF47103B. Signedstandingunverified.
 OriginalFR94/Serre citedtheorem notmarkedread/refuted. No corpuspromotion/
 full14closure/nativeexperiment/paidcompute/upload. [pcc:unverified]
+
+### Actual independent cyclic coupling and qualified k2 mixing
+
+The [independent cycle-coupling packet](../research/cycle_coupling_audit_20261114/README.md)
+proves every-event distance to uniform<=n²/(4t) for the actual independent
+half-stay/half-add-one PMF on everyZModn, n>=2/t>0, with no cutoff. Actual
+fairBool map/bind expectation, concrete coalescent pair map, both marginal
+expectations, exact potential drift and actual uniform stationarity are
+proved. Everyprimefield/two distinct equalweight increments inherits the
+bound by exact time-dependent affine coordinates/permutation, not a fixed
+kernel conjugacy. Actual deterministic two-cycle walk has eventdistance1/2
+for everytime/directeventual-mixing-negation; timezero extension is directly
+refuted. Selected Hildebrand1994 Theorems1–2/proof2 and credited LPW
+coupling/potential sources read; no fullsource/noveltyclaim. This is a
+quantitative k2/equalweight component of qualified Hildebrand, not a
+refutation. General unequalweights/k>=3/randomsupport asymptotics,
+staticrho mixing/random-table collision penalty/constants remainopen.
+Exactlocal PCC-20261114-13f615 PASSat2026-11-14T09:48:10Z, whole51/0failures/0trusted,
+full1270characterbindingdbd609ef808defc71765389c4746628d85d20739fc39bec056a270e1855631f0,
+fivecustommodules/11formal-config+11artifactpins; all92build/processing/
+provenancefiles/33objects/18181Blosslessarchive/fivegatefiles/inspected
+onepagePDF46941B. Signedstandingunverified. No corpuspromotion/full14closure/
+nativeexperiment/paidcompute/upload. [pcc:unverified]
