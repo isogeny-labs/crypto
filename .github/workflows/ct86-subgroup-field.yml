@@ -8,6 +8,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
       - "research/cross_characteristic_global_torsion_20261112/ct88/**"
       - "research/cross_characteristic_global_torsion_20261112/ct89/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct90/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   pull_request:
     paths:
@@ -15,6 +16,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
       - "research/cross_characteristic_global_torsion_20261112/ct88/**"
       - "research/cross_characteristic_global_torsion_20261112/ct89/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct90/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   workflow_dispatch:
 
@@ -83,3 +85,18 @@ jobs:
           cmp /tmp/ct89-py.json /tmp/ct89-jsopt.json
           printf '%s  %s\n' c7ff3a7388db0d05797b758d707e0cf2bdbaa77c3a4a6d0eb55c1a4ebb3d8a1b /tmp/ct89-py.json | sha256sum -c
           cat /tmp/ct89-py.json
+
+      - name: Verify CT90 two F16 residue projections and CT80 target-place selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct90
+          python3 -B "$D/ct90_binary_projections.py" > /tmp/ct90-py.json
+          python3 -O -B "$D/ct90_binary_projections.py" > /tmp/ct90-opt.json
+          node "$D/ct90_binary_projections_independent.js" > /tmp/ct90-js.json
+          node --no-opt "$D/ct90_binary_projections_independent.js" > /tmp/ct90-jsopt.json
+          cmp /tmp/ct90-py.json /tmp/ct90-opt.json
+          cmp /tmp/ct90-py.json /tmp/ct90-js.json
+          cmp /tmp/ct90-py.json /tmp/ct90-jsopt.json
+          printf '%s  %s\n' ab40a0b47b997abb6e6cbf5f6854a6eb10bdcbf15da2776a0850c798f87f6417 /tmp/ct90-py.json | sha256sum -c
+          cat /tmp/ct90-py.json
