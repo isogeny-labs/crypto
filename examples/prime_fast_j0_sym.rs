@@ -519,7 +519,7 @@ fn main() {
                     extra,
                     ins + 1,
                     summ,
-                    std::env::var_os("SHIFTFIX").is_some(),
+                    std::env::var_os("NOSHIFTFIX").is_none(),
                 );
                 let t0 = Instant::now();
                 let plain = if std::env::var_os("NOPLAIN2").is_some() {
@@ -541,7 +541,7 @@ fn main() {
                 let row = json!({
                     "plain3_ok": p3.as_ref().map(|s| s.0 == k).unwrap_or(false), "plain3_ms": p3_ms, "plain3_fb": fbs3,
                     "curve": c.name, "rho_neg_median_ms": rho1, "p": c.f.p, "n": c.n, "B": bsz, "inst": ins,
-                    "summands": summ, "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
+                    "summands": summ, "shiftfix": std::env::var_os("NOSHIFTFIX").is_none(), "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
                     "sym_ms": sym.as_ref().map(|s| s.1.ms_total),
                     "sym_fb_ms": sym.as_ref().map(|s| s.1.ms_fb),
                     "sym_collect_ms": sym.as_ref().map(|s| s.1.ms_collect),
