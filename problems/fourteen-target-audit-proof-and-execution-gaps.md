@@ -332,7 +332,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50); originalnine-pointprime3formwithoutaddedcoprime/generalchar3actualcard1or3/rank0or1 (22); directoriginalr2/r3finite-fieldcountformswithonlyAlgebraFK/cardq^k/noauxiliaryclosure-tower/noaddedcoprime (7) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
-| 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67); generalactualchar3killed3card1or3/finiteness/modulefinrank0or1 (22), concretebranchescredited; genericactualchar2killed2card1or2/finiteness/never4overeveryfieldwithoutalgclosedpremise (7); actualgeometricp-torsion/j0/count/module-rank/triviality/scalar-extensioncriterion char2/3, actualF3rational/geometriccontrol/directalgclosed-deletionnegation(30); completeactualall-modelF2/F3kernelcensus/source-trace↔geometricp-torsion/Hasse/tracecases/allcountdivisororderbounds4/6/namedpointcontrols(44); genericactualshortnormalization/AddEquiv/card-trace-source transport andall-modelF5/F7Hasse/sourceSSifftrace0iffpointcount6/8/allcompositecountdivisororder2ifr>2/namedcyclic6/8controls/singularDelta-deletionnegation(29) | General Hasse beyondF2/F3/F5/F7; FSTtrace-Endrank-geometricidentification beyondF2/F3; further extension-field censuses/full torsion-field bridges |
+| 3 Supersingular | Partial: actual r2 exact-degree-two counterexamples; complete F2/F3/F4/F9/p<500 checks; generic char2/3 geometric j/torsion/module criteria(30); all-model F2/F3 source/geometry/Hasse/order4/6(44); all-model F5/F7 actual Hasse/source-trace0/count6/8/compositeorder2/namedcyclic6/8controls(29). **Unbounded every finite char2 field source-trace iff j0 iff odd point count iff rational/geometric2tor1, actual rank0/1, scalar invariance, imperfect/wrong-characteristic direct universal negations(26).** | General char3/other-prime trace-geometric and Endrank identifications; Hasse beyond checked cohorts; embedding/full-torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
@@ -1193,4 +1193,37 @@ officialMathlibNormalForms/actualshiftEquiv credited. Sourcep>=5condition
 retained, no full-paper/book reading, corpus promotion or novelty claim.
 Generalprime/extensionfieldHasse/trace-geometric-Endrankidentifications,
 field-degree/full-torsion-field bridges and remaining original14 obligations
+stay open. No nativeexperiment/paidcompute/agentupload. [pcc:unverified]
+
+### Every finite characteristic-two field: source trace and geometric torsion
+
+The [all-finite-characteristic-two packet](../research/finite_char_two_trace_audit_20261114/README.md)
+proves the exact source gcd(trace,q)!=1 criterion iff a1=0 iff j=0 iff
+odd actual point count iff rational two-torsion cardinality1 iff geometric
+two-torsion cardinality1, for every finite characteristic-two field and
+every nonsingular general Weierstrass model. No field-size/degree bound.
+Actual rational torsion count1/2 and induced ZMod2 rank0/1 depend on j;
+rational/geometric torsion counts agree over every algebraically closed
+scalar extension. The source predicate is invariant under every finite
+field extension. The finite-field bridge uses official finite reduced-ring
+squares to construct the actual ordinary two-point, Cauchy/Lagrange,
+positiveq=2^n and coprime-power/parity arithmetic. No Hasse, trace-square,
+Endrank, rank/basis or rational-torsion-existence premise. Prior actual
+geometric j/module/Cauchy proofs credited. An actual F2(X) curve
+ y²+xy=x³+X has DeltaX≠0/a1=1/j≠0/rational2tor1/geometric2tor2;
+X is not a square by integer-degree parity, and Lean directly negates
+ordinary rational descent after deleting finiteness. The credited F3
+curve with actual#E5/rational3tor1/sourcepredicatefalse directly negates
+changing characteristic two to three in the rational-source criterion.
+These are hypothesis controls, not qualified-source refutations.
+Wholegate26/0failures/0trusted, exactlocal PCC-20261114-8d2918 replayPASS at2026-11-14T06:48:42Z,
+full1718character binding,91recursiveformal/config+11artifactpinsmatch;
+all65build/provenancefiles/26objects/33868Barchive/fivegatefiles and
+inspectedone-pagePDF47585B. One unsuppressed legacy/modern-module
+compatibility advisory remains; failed migration/reversion retained,
+no frozen migration/flags/waivers. Signedstandingunverified. Selected
+FSTpp230/237 and MilneRemark3.16/contextpp98–99/p75notes reread,
+priorPDF104/80inspectioncredited; no fullread/corpuspromotion/novelty.
+General characteristic-three/other-prime trace-geometric and Endrank
+identifications, Hasse/embedding bounds and remaining original14 gaps
 stay open. No nativeexperiment/paidcompute/agentupload. [pcc:unverified]
