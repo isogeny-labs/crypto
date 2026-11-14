@@ -60,10 +60,26 @@
 //!   which determine L for genus 2) must equal L(E1) L(E2) = (1 - t1 T +
 //!   pT^2)(1 - t2 T + pT^2), with t1, t2 the traces ecdb holds.
 //!
+//! - the kernel: the two stored maps send each Weierstrass pair {(±r, 0)} of
+//!   C to (a_i, 0) on E1 and (b_i, 0) on E2 for the same i (see
+//!   [`kernel_is_graph_of_psi`]). Since phi1^*(T1 - O1) - phi2^*(T2 - O2) is
+//!   the divisor of u, each (T1, psi(T1)) lies in the order-4 kernel of
+//!   phi1^* + phi2^*, which is therefore the graph of psi. For j = 0 or 1728
+//!   several isomorphisms Q -> E exist (they differ by automorphisms that
+//!   permute E[2]); a pair that realizes psi is kept, the others are not.
+//!
 //! A failure is a problem line (`gluing_crosscheck_failures`) and nothing of
-//! that gluing is stored. The isogeny and its kernel are the theorem's; ecdb
-//! verifies the isogeny class (Tate: equal L-polynomials) and the two maps, not
-//! the kernel.
+//! that gluing is stored. That the kernel has order 4 (phi^* injective for a
+//! degree-2 map not factoring through an isogeny) is the theorem's (Frey–Kani,
+//! Kani); ecdb verifies the isogeny class (Tate: equal L-polynomials), the two
+//! maps and the correspondence of the 2-torsion above.
+//!
+//! **Existing rows.** Before any write, the stored rows of every glued curve
+//! (curve, hyperelliptic_model, curve_zeta, the Jacobian's class, its
+//! gluing_2_2 morphisms, the class under the computed label) are compared with
+//! the computed values. A stored NULL is no disagreement; any other difference
+//! refuses that curve as a whole (`gluing_existing_conflicts`, a problem line,
+//! nothing of it written). Agreeing rows are left as they are.
 //!
 //! # Scope
 //!
@@ -81,8 +97,9 @@
 //! map factors through, so a self-gluing E1 = E2 keeps both maps; degree 2,
 //! the map and the gluing data in
 //! `map`), `isogeny_class_fq` (status `proved`), `abelian_variety.isogeny_class_id`
-//! and `curve_zeta`. A Jacobian already linked to another class is a problem,
-//! never overwritten.
+//! and `curve_zeta`. A curve whose stored rows disagree with the gluing (a
+//! Jacobian linked to another class among them) is a problem, never
+//! overwritten, and nothing of it is written.
 
 use super::cover_lpoly::{class_row, count_hyperelliptic_fp, count_hyperelliptic_fp2, Computed, Method, CLASS_SQL};
 use super::{bulk, bulk1, Ctx, Report};
@@ -102,7 +119,8 @@ pub const CONSTRUCTION_Z: &str = "hlp_2_2_gluing_v1_qz";
 const METHOD: &str = "Howe–Leprévost–Poonen 2000, Prop. 4 ((2,2) Frey–Kani gluing along psi: (a_i,0) -> (b_i,0)); \
                       C smooth (deg h = 6, gcd(h, h') = 1); maps C -> E1, E2 re-proved as polynomial identities over F_p; \
                       L(Jac C) from exhaustive #C(F_p), #C(F_p^2) equals L(E1) L(E2) with the census traces in ecdb \
-                      (recounted). The kernel of the isogeny is the theorem's and is not re-verified";
+                      (recounted); kernel: the stored maps send each Weierstrass pair of C to psi-corresponding 2-torsion \
+                      points of E1 and E2";
 
 const ZETA_METHOD: &str =
     "exhaustive count of #C(F_p) and #C(F_p^2) of the glued curve; L(T) = 1 + a1 T + a2 T^2 + p a1 T^3 \
@@ -295,21 +313,24 @@ pub enum Quotient {
     Z,
 }
 
-/// An F_p-isomorphism of the quotient `qt` of C (even sextic `h`) onto
-/// E: y^2 = x^3 + a x + b with roots `e`, composed into a map C -> E.
-fn map_through(h: &[u64], qt: Quotient, a: u64, b: u64, e: [u64; 3], p: u64) -> Option<Map> {
+/// Every F_p-isomorphism of the quotient `qt` of C (even sextic `h`) onto
+/// E: y^2 = x^3 + a x + b with roots `e`, each composed into a map C -> E
+/// (one per admissible matching of the roots; for j = 0 or 1728 they differ by
+/// automorphisms of E, which permute E[2]).
+fn maps_through(h: &[u64], qt: Quotient, a: u64, b: u64, e: [u64; 3], p: u64) -> Vec<Map> {
     let g = match qt {
         Quotient::X => [h[0], h[2], h[4], h[6]],
         Quotient::Z => [h[6], h[4], h[2], h[0]],
     };
     if g[3] == 0 {
-        return None;
+        return vec![];
     }
     let roots: Vec<u64> = (0..p).filter(|&x| peval(&g, x, p) == 0).collect();
     if roots.len() != 3 {
-        return None;
+        return vec![];
     }
     const PERMS: [[usize; 3]; 6] = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+    let mut out = vec![];
     for s in PERMS {
         let es = [e[s[0]], e[s[1]], e[s[2]]];
         let lam = mul(sub(roots[1], roots[0], p), inv(sub(es[1], es[0], p), p), p);
@@ -332,11 +353,51 @@ fn map_through(h: &[u64], qt: Quotient, a: u64, b: u64, e: [u64; 3], p: u64) -> 
                 yd: vec![0, 0, 0, 1],
             },
         };
-        if map_is_morphism(h, &m, a, b, p) {
-            return Some(m);
+        if map_is_morphism(h, &m, a, b, p) && !out.contains(&m) {
+            out.push(m);
         }
     }
-    None
+    out
+}
+
+/// f(u) for an even polynomial f at u^2 = s (f has only even powers of u).
+fn peval_even(f: &[u64], s: u64, p: u64) -> Option<u64> {
+    if f.iter().skip(1).step_by(2).any(|&c| c != 0) {
+        return None;
+    }
+    let half: Vec<u64> = f.iter().step_by(2).copied().collect();
+    Some(peval(&half, s, p))
+}
+
+/// The x-coordinate on E of the image of the Weierstrass pair {(r, 0), (-r, 0)}
+/// of C, r^2 = s a root of G, under x = xn(u)/xd(u).
+fn image_of_pair(m: &Map, s: u64, p: u64) -> Option<u64> {
+    let (n, d) = (peval_even(&m.xn, s, p)?, peval_even(&m.xd, s, p)?);
+    (d != 0).then(|| mul(n, inv(d, p), p))
+}
+
+/// The kernel cross-check: the maps C -> E1 and C -> E2 send each Weierstrass
+/// pair {(±r, 0)} of C to 2-torsion points T1 of E1 and T2 of E2, and
+/// phi1^*(T1 - O1) and phi2^*(T2 - O2) differ by a difference of two fibres of
+/// u, which is principal; so (T1, T2) lies in the kernel of
+/// phi1^* + phi2^*: E1 x E2 -> Jac C, a group of order 4. The kernel is the
+/// graph of psi exactly when every pair gives T2 = psi(T1).
+pub fn kernel_is_graph_of_psi(h: &[u64], m1: &Map, m2: &Map, a: [u64; 3], b: [u64; 3], p: u64) -> bool {
+    let g = [h[0], h[2], h[4], h[6]];
+    let roots: Vec<u64> = (0..p).filter(|&x| peval(&g, x, p) == 0).collect();
+    if roots.len() != 3 {
+        return false;
+    }
+    let mut seen = vec![];
+    for s in roots {
+        let (Some(x1), Some(x2)) = (image_of_pair(m1, s, p), image_of_pair(m2, s, p)) else { return false };
+        let Some(i) = a.iter().position(|&ai| ai == x1) else { return false };
+        if b[i] != x2 || seen.contains(&i) {
+            return false;
+        }
+        seen.push(i);
+    }
+    true
 }
 
 /// One elliptic curve of the census: y^2 = x^3 + a x + b over F_p, trace t.
@@ -384,13 +445,26 @@ pub fn glue(p: u64, e1: Ell, e2: Ell, sigma: [usize; 3]) -> Result<Gluing, Glue>
         return fail(format!("HLP sextic {h:?} over F_{p} is not a separable sextic"));
     }
     let both = [Quotient::Z, Quotient::X];
-    let mut found = None;
-    for (i, &q1) in both.iter().enumerate() {
+    let (mut found, mut maps_exist) = (None, false);
+    'search: for (i, &q1) in both.iter().enumerate() {
         let q2 = both[1 - i];
-        if let (Some(m1), Some(m2)) = (map_through(&h, q1, e1.a, e1.b, a, p), map_through(&h, q2, e2.a, e2.b, b0, p)) {
-            found = Some(((q1, m1), (q2, m2)));
-            break;
+        let c1 = maps_through(&h, q1, e1.a, e1.b, a, p);
+        let c2 = maps_through(&h, q2, e2.a, e2.b, b0, p);
+        for m1 in &c1 {
+            for m2 in &c2 {
+                maps_exist = true;
+                if kernel_is_graph_of_psi(&h, m1, m2, a, b, p) {
+                    found = Some(((q1, m1.clone()), (q2, m2.clone())));
+                    break 'search;
+                }
+            }
         }
+    }
+    if found.is_none() && maps_exist {
+        return fail(format!(
+            "C: v^2 = {h:?} maps onto E1 and E2 over F_{p}, but no pair of maps sends the Weierstrass pairs of C to \
+             psi-corresponding 2-torsion points (a = {a:?}, psi(a) = {b:?})"
+        ));
     }
     let Some((to_e1, to_e2)) = found else {
         return fail(format!(
@@ -490,14 +564,29 @@ JOIN ec.curve c ON c.field_id = r.field_id AND c.model = 'hyperelliptic' AND c.c
 JOIN ec.isogeny_class_fq ic ON ic.label = r.label
 WHERE av.curve_id = c.id AND av.isogeny_class_id IS NULL";
 
-/// Glued curves whose Jacobian is linked to a class other than the computed one.
-const CONFLICT_SQL: &str = "
-SELECT c.id, ic.label, r.label
-FROM jsonb_to_recordset($1::jsonb) AS r(field_id bigint, coefficients jsonb, label text)
+/// What ecdb already holds for the glued curves (matched by field and
+/// coefficients), read before any write: `r.idx` is the curve's index.
+const EXISTING_SQL: &str = "
+SELECT r.idx, c.id, c.genus::int8, c.is_smooth, hm.f, hm.h, hm.deg_f::int8, hm.infinity_type,
+       hm.points_at_infinity::int8, z.point_counts::text[], zic.label, aic.label
+FROM jsonb_to_recordset($1::jsonb) AS r(idx int8, field_id bigint, coefficients jsonb)
 JOIN ec.curve c ON c.field_id = r.field_id AND c.model = 'hyperelliptic' AND c.coefficients = r.coefficients
-JOIN ec.abelian_variety av ON av.curve_id = c.id
-JOIN ec.isogeny_class_fq ic ON ic.id = av.isogeny_class_id
-WHERE ic.label <> r.label";
+LEFT JOIN ec.hyperelliptic_model hm ON hm.curve_id = c.id
+LEFT JOIN ec.curve_zeta z ON z.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq zic ON zic.id = z.isogeny_class_id
+LEFT JOIN ec.abelian_variety av ON av.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq aic ON aic.id = av.isogeny_class_id";
+
+/// The stored gluing_2_2 morphisms of the glued curves.
+const EXISTING_MORPH_SQL: &str = "
+SELECT r.idx, m.target_curve_id, coalesce(m.construction, ''), m.map, m.degree::int8, m.status::text, c.id
+FROM jsonb_to_recordset($1::jsonb) AS r(idx int8, field_id bigint, coefficients jsonb)
+JOIN ec.curve c ON c.field_id = r.field_id AND c.model = 'hyperelliptic' AND c.coefficients = r.coefficients
+JOIN ec.curve_morphism m ON m.source_curve_id = c.id AND m.kind = 'gluing_2_2'";
+
+/// Stored isogeny classes under the labels the gluings compute.
+const EXISTING_CLASS_SQL: &str = "
+SELECT label, l_polynomial::text[] FROM ec.isogeny_class_fq WHERE label = ANY($1::text[])";
 
 const ZETA_SQL: &str = "
 INSERT INTO ec.curve_zeta (curve_id, isogeny_class_id, point_counts, order_check, order_method, provenance_id)
@@ -513,6 +602,141 @@ struct Census {
     field_id: i64,
     slug: String,
     e: Ell,
+}
+
+/// What the importer would write for one glued curve.
+#[derive(Clone, Debug)]
+pub struct Want {
+    pub f: Vec<u64>,
+    pub infinity_type: &'static str,
+    pub points_at_infinity: i64,
+    pub counts: [u64; 2],
+    pub label: String,
+}
+
+/// What ecdb already holds for that curve (None: no row or NULL).
+#[derive(Clone, Debug, Default)]
+pub struct Have {
+    pub curve_id: i64,
+    pub genus: Option<i64>,
+    pub is_smooth: Option<bool>,
+    pub model_f: Option<Value>,
+    pub model_h: Option<Value>,
+    pub deg_f: Option<i64>,
+    pub infinity_type: Option<String>,
+    pub points_at_infinity: Option<i64>,
+    pub zeta_counts: Option<Vec<String>>,
+    pub zeta_label: Option<String>,
+    pub jacobian_label: Option<String>,
+}
+
+/// A stored gluing_2_2 morphism of a glued curve.
+#[derive(Clone, Debug)]
+pub struct HaveMorph {
+    pub source_id: i64,
+    pub target_id: i64,
+    pub construction: String,
+    pub map: Option<Value>,
+    pub degree: Option<i64>,
+    pub status: String,
+}
+
+fn ints(v: &Value) -> Option<Vec<BigInt>> {
+    v.as_array()?
+        .iter()
+        .map(|x| match x {
+            Value::String(s) => s.trim().parse().ok(),
+            Value::Number(n) => n.to_string().parse().ok(),
+            _ => None,
+        })
+        .collect()
+}
+
+/// Every way the stored rows of a glued curve disagree with what the gluing
+/// computes. A NULL (unknown) stored value is no disagreement.
+pub fn curve_conflicts(want: &Want, have: &Have) -> Vec<String> {
+    let mut out = vec![];
+    if have.genus.is_some_and(|g| g != 2) {
+        out.push(format!("curve genus {:?} stored, 2 computed", have.genus));
+    }
+    if have.is_smooth == Some(false) {
+        out.push("curve stored as not smooth, gcd(h, h') = 1 computed".into());
+    }
+    let wf: Vec<BigInt> = want.f.iter().map(|&c| BigInt::from(c)).collect();
+    if let Some(f) = &have.model_f {
+        if ints(f).as_ref() != Some(&wf) {
+            out.push(format!("hyperelliptic_model f = {f} stored, {:?} computed", want.f));
+        }
+    }
+    if let Some(h) = &have.model_h {
+        if ints(h).is_none_or(|v| v.iter().any(|c| c != &BigInt::from(0))) {
+            out.push(format!("hyperelliptic_model h = {h} stored, 0 computed"));
+        }
+    }
+    if have.deg_f.is_some_and(|d| d != 6) {
+        out.push(format!("hyperelliptic_model deg_f = {:?} stored, 6 computed", have.deg_f));
+    }
+    if have.infinity_type.as_deref().is_some_and(|t| t != want.infinity_type) {
+        out.push(format!("infinity_type {:?} stored, {} computed", have.infinity_type, want.infinity_type));
+    }
+    if have.points_at_infinity.is_some_and(|n| n != want.points_at_infinity) {
+        out.push(format!(
+            "points_at_infinity {:?} stored, {} computed",
+            have.points_at_infinity, want.points_at_infinity
+        ));
+    }
+    if let Some(z) = &have.zeta_counts {
+        let stored: Option<Vec<BigInt>> = z.iter().map(|s| s.trim().parse().ok()).collect();
+        let k = z.len().min(2);
+        let wc: Vec<BigInt> = want.counts[..k].iter().map(|&c| BigInt::from(c)).collect();
+        if stored.map(|s| s[..k].to_vec()) != Some(wc) {
+            out.push(format!("curve_zeta point_counts {z:?} stored, {:?} computed", want.counts));
+        }
+    }
+    if have.zeta_label.as_deref().is_some_and(|l| l != want.label) {
+        out.push(format!("curve_zeta class {:?} stored, {} computed", have.zeta_label, want.label));
+    }
+    if have.jacobian_label.as_deref().is_some_and(|l| l != want.label) {
+        out.push(format!("Jacobian linked to class {:?}, {} computed", have.jacobian_label, want.label));
+    }
+    out
+}
+
+/// A stored morphism under the same (source, target, kind, construction) key
+/// that differs from the computed one.
+pub fn morphism_conflict(want_map: &Value, have: &HaveMorph) -> Option<String> {
+    let mut why = vec![];
+    if have.map.as_ref() != Some(want_map) {
+        why.push("map");
+    }
+    if have.degree != Some(2) {
+        why.push("degree");
+    }
+    if have.status != "proved" {
+        why.push("status");
+    }
+    (!why.is_empty()).then(|| {
+        format!(
+            "curve {}: curve_morphism to curve {} ({}) stored with a different {}",
+            have.source_id,
+            have.target_id,
+            have.construction,
+            why.join(", ")
+        )
+    })
+}
+
+/// A stored class under the computed label with another L-polynomial.
+pub fn class_conflict(want_l: &[BigInt], have_l: &[String]) -> bool {
+    let stored: Option<Vec<BigInt>> = have_l.iter().map(|s| s.trim().parse().ok()).collect();
+    stored.as_deref() != Some(want_l)
+}
+
+struct Out {
+    row: Value,
+    class: Value,
+    want: Want,
+    l: Vec<BigInt>,
 }
 
 pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
@@ -531,7 +755,8 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let prov = ctx.provenance(src, METHOD, None).await?;
 
     let max_p = MAX_P as i64;
-    let mut by_p: BTreeMap<u64, Vec<Census>> = BTreeMap::new();
+    // Keyed by (p, field_id): a pair is glued only within one stored field.
+    let mut by_field: BTreeMap<(u64, i64), Vec<Census>> = BTreeMap::new();
     for r in client.query(CURVES_SQL, &[&max_p]).await? {
         let id: i64 = r.get(0);
         let p = r.get::<_, i64>(2) as u64;
@@ -553,13 +778,16 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             continue;
         }
         report.count("gluing_full_two_torsion", 1);
-        by_p.entry(p).or_default().push(Census { id, field_id: r.get(1), slug: r.get(6), e: Ell { a, b, t } });
+        let field_id: i64 = r.get(1);
+        by_field.entry((p, field_id)).or_default().push(Census { id, field_id, slug: r.get(6), e: Ell { a, b, t } });
     }
 
-    // (field_id, h) -> rows; the first gluing that produces a curve names it.
-    let mut curves: BTreeMap<(i64, Vec<u64>), (Value, Value)> = BTreeMap::new();
-    let mut morphisms = Vec::new();
-    for (&p, list) in &by_p {
+    // (field_id, h) -> index into `outs`; the first gluing that produces a curve names it.
+    let mut index: BTreeMap<(i64, Vec<u64>), usize> = BTreeMap::new();
+    let mut outs: Vec<Out> = Vec::new();
+    // (curve index, target, construction) -> morphism row; the first gluing names it.
+    let mut morphisms: BTreeMap<(usize, i64, &'static str), Value> = BTreeMap::new();
+    for (&(p, _), list) in &by_field {
         for (i, c1) in list.iter().enumerate() {
             for c2 in &list[i..] {
                 report.count("gluing_pairs", 1);
@@ -583,44 +811,66 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                     report.count("gluing_computed", 1);
                     let fstr: Vec<String> = g.h.iter().map(|c| c.to_string()).collect();
                     let coefficients = json!({ "f": fstr, "h": Vec::<String>::new() });
-                    let c = Computed {
-                        g: 2,
-                        q: BigInt::from(p),
-                        p: BigInt::from(p),
-                        r: 1,
-                        l: g.l.clone(),
-                        method: Method::G2Count,
-                    };
-                    let (label, class) = class_row(&c, "proved")?;
                     let key = (c1.field_id, g.h.clone());
-                    let lead_square = sqrt_small(g.h[6], p).is_some();
-                    curves.entry(key).or_insert_with(|| {
-                        (
-                            json!({
-                                "field_id": c1.field_id, "coefficients": coefficients,
-                                "equation": format!("y^2 = {}", poly_text(&g.h)),
-                                "infinity_type": if lead_square { "split" } else { "inert" },
-                                "points_at_infinity": if lead_square { 2 } else { 0 },
-                                "label": label,
-                                "point_counts": [g.counts[0].to_string(), g.counts[1].to_string()],
-                                "method": ZETA_METHOD,
-                            }),
-                            class,
-                        )
-                    });
+                    let idx = match index.get(&key) {
+                        Some(&k) => k,
+                        None => {
+                            let c = Computed {
+                                g: 2,
+                                q: BigInt::from(p),
+                                p: BigInt::from(p),
+                                r: 1,
+                                l: g.l.clone(),
+                                method: Method::G2Count,
+                            };
+                            let (label, class) = class_row(&c, "proved")?;
+                            let lead_square = sqrt_small(g.h[6], p).is_some();
+                            let infinity_type = if lead_square { "split" } else { "inert" };
+                            let points_at_infinity = if lead_square { 2 } else { 0 };
+                            let k = outs.len();
+                            outs.push(Out {
+                                row: json!({
+                                    "idx": k, "field_id": c1.field_id, "coefficients": coefficients,
+                                    "equation": format!("y^2 = {}", poly_text(&g.h)),
+                                    "infinity_type": infinity_type,
+                                    "points_at_infinity": points_at_infinity,
+                                    "label": label,
+                                    "point_counts": [g.counts[0].to_string(), g.counts[1].to_string()],
+                                    "method": ZETA_METHOD,
+                                }),
+                                class,
+                                want: Want {
+                                    f: g.h.clone(),
+                                    infinity_type,
+                                    points_at_infinity,
+                                    counts: g.counts,
+                                    label,
+                                },
+                                l: g.l.clone(),
+                            });
+                            index.insert(key, k);
+                            k
+                        }
+                    };
                     let gluing = json!({
                         "formula": "Howe–Leprévost–Poonen 2000, Prop. 4",
                         "n": 2,
                         "e1": { "curve_id": c1.id, "slug": c1.slug, "two_torsion_x": g.a },
                         "e2": { "curve_id": c2.id, "slug": c2.slug, "two_torsion_x_psi_images": g.b },
                         "psi": "(a_i, 0) -> (b_i, 0), i = 1..3",
-                        "kernel": "graph of psi in E1[2] x E2[2] (the theorem's; not re-verified)",
+                        "kernel": "graph of psi in E1[2] x E2[2]: checked, each Weierstrass pair of C maps to (a_i, 0) \
+                                   on E1 and (b_i, 0) on E2 under the two stored maps",
                     });
                     for (target, (qt, m)) in [(c1, &g.to_e1), (c2, &g.to_e2)] {
                         let construction = match qt {
                             Quotient::X => CONSTRUCTION_X,
                             Quotient::Z => CONSTRUCTION_Z,
                         };
+                        let mkey = (idx, target.id, construction);
+                        if morphisms.contains_key(&mkey) {
+                            report.count("gluing_morphisms_duplicate", 1);
+                            continue;
+                        }
                         let mut map = m.json();
                         map["quotient"] = json!(match qt {
                             Quotient::X => "X = u^2, Y = v",
@@ -631,37 +881,120 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                              y^2 = x^3 + a x + b; ascending coefficients mod p"
                         );
                         map["gluing"] = gluing.clone();
-                        morphisms.push(json!({
-                            "field_id": c1.field_id, "coefficients": coefficients, "target_id": target.id,
-                            "construction": construction, "map": map, "method": METHOD,
-                        }));
+                        morphisms.insert(
+                            mkey,
+                            json!({
+                                "idx": idx, "field_id": c1.field_id, "coefficients": coefficients,
+                                "target_id": target.id, "construction": construction, "map": map, "method": METHOD,
+                            }),
+                        );
                     }
                 }
             }
         }
     }
-    report.count("gluing_distinct_curves", curves.len() as u64);
-    let (rows, classes): (Vec<Value>, Vec<Value>) = curves.into_values().unzip();
-    let mut uniq: BTreeMap<String, Value> = BTreeMap::new();
-    for c in classes {
-        uniq.entry(c["label"].as_str().unwrap_or_default().to_string()).or_insert(c);
+    report.count("gluing_distinct_curves", outs.len() as u64);
+
+    // Existing rows: a glued curve whose stored rows disagree with the gluing is
+    // refused as a whole (a problem, nothing of it written); agreeing or NULL
+    // stored values are left as they are.
+    let mut refused: BTreeMap<usize, Vec<String>> = BTreeMap::new();
+    let all_rows: Vec<Value> = outs.iter().map(|o| o.row.clone()).collect();
+    for chunk in all_rows.chunks(2000) {
+        let arr = Value::Array(chunk.to_vec());
+        for r in client.query(EXISTING_SQL, &[&arr]).await? {
+            let idx = r.get::<_, i64>(0) as usize;
+            let have = Have {
+                curve_id: r.get(1),
+                genus: r.get(2),
+                is_smooth: r.get(3),
+                model_f: r.get(4),
+                model_h: r.get(5),
+                deg_f: r.get(6),
+                infinity_type: r.get(7),
+                points_at_infinity: r.get(8),
+                zeta_counts: r.get(9),
+                zeta_label: r.get(10),
+                jacobian_label: r.get(11),
+            };
+            let why = curve_conflicts(&outs[idx].want, &have);
+            if !why.is_empty() {
+                refused
+                    .entry(idx)
+                    .or_default()
+                    .extend(why.into_iter().map(|w| format!("curve {}: {w}", have.curve_id)));
+            }
+        }
+        for r in client.query(EXISTING_MORPH_SQL, &[&arr]).await? {
+            let idx = r.get::<_, i64>(0) as usize;
+            let have = HaveMorph {
+                source_id: r.get(6),
+                target_id: r.get(1),
+                construction: r.get(2),
+                map: r.get(3),
+                degree: r.get(4),
+                status: r.get(5),
+            };
+            let key = match have.construction.as_str() {
+                CONSTRUCTION_X => (idx, have.target_id, CONSTRUCTION_X),
+                CONSTRUCTION_Z => (idx, have.target_id, CONSTRUCTION_Z),
+                _ => continue,
+            };
+            if let Some(want) = morphisms.get(&key) {
+                if let Some(why) = morphism_conflict(&want["map"], &have) {
+                    refused.entry(idx).or_default().push(why);
+                }
+            }
+        }
     }
+    let labels: Vec<String> =
+        outs.iter().map(|o| o.want.label.clone()).collect::<std::collections::BTreeSet<_>>().into_iter().collect();
+    let mut bad_labels = std::collections::BTreeSet::new();
+    for r in client.query(EXISTING_CLASS_SQL, &[&labels]).await? {
+        let label: String = r.get(0);
+        let stored: Vec<String> = r.get(1);
+        if let Some(o) = outs.iter().find(|o| o.want.label == label) {
+            if class_conflict(&o.l, &stored) {
+                report.count("gluing_class_conflicts", 1);
+                report.problem(format!(
+                    "isogeny_class_fq {label}: stored L = {stored:?}, the gluings compute {:?}; left unchanged",
+                    o.l.iter().map(|x| x.to_string()).collect::<Vec<_>>()
+                ));
+                bad_labels.insert(label);
+            }
+        }
+    }
+    for (k, o) in outs.iter().enumerate() {
+        if bad_labels.contains(&o.want.label) {
+            refused.entry(k).or_default().push(format!("class {} conflicts with the stored row", o.want.label));
+        }
+    }
+    for (k, why) in &refused {
+        report.count("gluing_existing_conflicts", 1);
+        report.problem(format!(
+            "glued curve y^2 = {}: stored rows disagree, nothing of it written: {}",
+            poly_text(&outs[*k].want.f),
+            why.join("; ")
+        ));
+    }
+
+    let mut rows = Vec::new();
+    let mut uniq: BTreeMap<String, Value> = BTreeMap::new();
+    for (k, o) in outs.into_iter().enumerate() {
+        if refused.contains_key(&k) {
+            continue;
+        }
+        uniq.entry(o.want.label.clone()).or_insert(o.class);
+        rows.push(o.row);
+    }
+    let morphisms: Vec<Value> =
+        morphisms.into_iter().filter(|((k, _, _), _)| !refused.contains_key(k)).map(|(_, v)| v).collect();
     let classes: Vec<Value> = uniq.into_values().collect();
     report.count("gluing_curves_inserted", bulk(client, CURVE_SQL, &rows, prov).await?);
     report.count("gluing_models_inserted", bulk(client, MODEL_SQL, &rows, prov).await?);
     report.count("gluing_morphisms_inserted", bulk(client, MORPHISM_SQL, &morphisms, prov).await?);
     report.count("gluing_classes_inserted", bulk(client, CLASS_SQL, &classes, prov).await?);
     report.count("gluing_jacobians_linked", bulk1(client, LINK_SQL, &rows).await?);
-    let arr = Value::Array(rows.clone());
-    for r in client.query(CONFLICT_SQL, &[&arr]).await? {
-        report.count("gluing_link_conflicts", 1);
-        report.problem(format!(
-            "curve {}: Jacobian already linked to class {}, the gluing computes {}; left unchanged",
-            r.get::<_, i64>(0),
-            r.get::<_, String>(1),
-            r.get::<_, String>(2)
-        ));
-    }
     report.count("gluing_zeta_inserted", bulk(client, ZETA_SQL, &rows, prov).await?);
     Ok(report)
 }
@@ -756,6 +1089,7 @@ mod tests {
                                 assert!(map_is_morphism(&g.h, &g.to_e1.1, e1.a, e1.b, p));
                                 assert!(map_is_morphism(&g.h, &g.to_e2.1, e2.a, e2.b, p));
                                 assert!(squarefree(&g.h, p));
+                                assert!(kernel_is_graph_of_psi(&g.h, &g.to_e1.1, &g.to_e2.1, g.a, g.b, p));
                                 ok += 1;
                             }
                             Err(Glue::Degenerate) => degenerate += 1,
@@ -862,6 +1196,114 @@ mod tests {
             }
         }
         eprintln!("census range: {ok} gluings, {degenerate} degenerate");
+    }
+
+    /// Regression (review, 2026-11-14): the stored maps must realize the stored
+    /// psi. For j = 1728 the automorphism [i] permutes E[2], so the first
+    /// isomorphism found for each quotient can send the Weierstrass pairs of C
+    /// to 2-torsion points that do not correspond under psi; the first version
+    /// stored such maps next to a psi they did not realize. Over F_5,
+    /// E: y^2 = x^3 + x glued to itself along sigma = [2, 0, 1] is one case.
+    #[test]
+    fn stored_maps_realize_psi() {
+        let p = 5u64;
+        let e = Ell { a: 1, b: 0, t: count_trace(1, 0, p) };
+        let sigma = [2, 0, 1];
+        let a = two_torsion(e.a, e.b, p).unwrap();
+        let b = [a[sigma[0]], a[sigma[1]], a[sigma[2]]];
+        let h = hlp_sextic(a, b, p).unwrap();
+        // Some pair of genuine morphisms C -> E, C -> E does not realize psi ...
+        let mut wrong = 0;
+        for (q1, q2) in [(Quotient::Z, Quotient::X), (Quotient::X, Quotient::Z)] {
+            for m1 in maps_through(&h, q1, e.a, e.b, a, p) {
+                for m2 in maps_through(&h, q2, e.a, e.b, a, p) {
+                    assert!(map_is_morphism(&h, &m1, e.a, e.b, p) && map_is_morphism(&h, &m2, e.a, e.b, p));
+                    if !kernel_is_graph_of_psi(&h, &m1, &m2, a, b, p) {
+                        wrong += 1;
+                    }
+                }
+            }
+        }
+        assert!(wrong > 0, "the j = 1728 case should offer maps that do not realize psi");
+        // ... and glue keeps only a pair that does.
+        let g = glue(p, e, e, sigma).unwrap();
+        assert!(kernel_is_graph_of_psi(&g.h, &g.to_e1.1, &g.to_e2.1, g.a, g.b, p));
+        // A psi permuted after the fact is not realized by the stored maps.
+        let b_bad = [g.b[1], g.b[0], g.b[2]];
+        assert!(!kernel_is_graph_of_psi(&g.h, &g.to_e1.1, &g.to_e2.1, g.a, b_bad, p));
+    }
+
+    fn want() -> Want {
+        Want {
+            f: vec![18, 0, 14, 0, 2, 0, 12],
+            infinity_type: "inert",
+            points_at_infinity: 0,
+            counts: [28, 606],
+            label: "2.23.e_bu".into(),
+        }
+    }
+
+    fn agreeing() -> Have {
+        Have {
+            curve_id: 1,
+            genus: Some(2),
+            is_smooth: Some(true),
+            model_f: Some(json!(["18", "0", "14", "0", "2", "0", "12"])),
+            model_h: Some(json!([])),
+            deg_f: Some(6),
+            infinity_type: Some("inert".into()),
+            points_at_infinity: Some(0),
+            zeta_counts: Some(vec!["28".into(), "606".into(), "12000".into()]),
+            zeta_label: Some("2.23.e_bu".into()),
+            jacobian_label: Some("2.23.e_bu".into()),
+        }
+    }
+
+    /// Existing rows: agreement (numbers or strings, a longer zeta prefix) and
+    /// NULLs pass; every disagreeing stored value is reported, so the curve is
+    /// refused rather than written next to a contradiction or skipped silently.
+    #[test]
+    fn existing_rows_agree_or_are_refused() {
+        let w = want();
+        assert!(curve_conflicts(&w, &agreeing()).is_empty());
+        assert!(curve_conflicts(&w, &Have { curve_id: 1, ..Default::default() }).is_empty());
+        let numeric = Have { model_f: Some(json!([18, 0, 14, 0, 2, 0, 12])), ..agreeing() };
+        assert!(curve_conflicts(&w, &numeric).is_empty());
+        let corrupt: Vec<Have> = vec![
+            Have { genus: Some(3), ..agreeing() },
+            Have { is_smooth: Some(false), ..agreeing() },
+            Have { model_f: Some(json!(["18", "0", "14", "0", "2", "0", "11"])), ..agreeing() },
+            Have { model_h: Some(json!(["1"])), ..agreeing() },
+            Have { deg_f: Some(5), ..agreeing() },
+            Have { infinity_type: Some("split".into()), ..agreeing() },
+            Have { points_at_infinity: Some(2), ..agreeing() },
+            Have { zeta_counts: Some(vec!["29".into()]), ..agreeing() },
+            Have { zeta_counts: Some(vec!["28".into(), "607".into()]), ..agreeing() },
+            Have { zeta_label: Some("2.23.a_a".into()), ..agreeing() },
+            Have { jacobian_label: Some("2.23.a_a".into()), ..agreeing() },
+        ];
+        for h in &corrupt {
+            assert_eq!(curve_conflicts(&w, h).len(), 1, "{h:?}");
+        }
+
+        let map = json!({ "x": { "num": ["1", "0", "3"], "den": ["1"] } });
+        let stored = HaveMorph {
+            source_id: 1,
+            target_id: 7,
+            construction: CONSTRUCTION_X.into(),
+            map: Some(map.clone()),
+            degree: Some(2),
+            status: "proved".into(),
+        };
+        assert!(morphism_conflict(&map, &stored).is_none());
+        assert!(morphism_conflict(&json!({ "x": { "num": ["2", "0", "3"], "den": ["1"] } }), &stored).is_some());
+        assert!(morphism_conflict(&map, &HaveMorph { degree: Some(4), ..stored.clone() }).is_some());
+        assert!(morphism_conflict(&map, &HaveMorph { status: "unknown".into(), ..stored.clone() }).is_some());
+        assert!(morphism_conflict(&map, &HaveMorph { map: None, ..stored }).is_some());
+
+        let l: Vec<BigInt> = REF_L.iter().map(|&x| BigInt::from(x)).collect();
+        assert!(!class_conflict(&l, &["1", "4", "46", "92", "529"].map(String::from)));
+        assert!(class_conflict(&l, &["1", "4", "46", "92", "528"].map(String::from)));
     }
 
     #[test]

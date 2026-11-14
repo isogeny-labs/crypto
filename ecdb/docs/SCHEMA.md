@@ -283,8 +283,13 @@ existed.
   b xd^3) over F_p. L(Jac C) from exhaustive counts of #C(F_p) and #C(F_p^2)
   must equal L(E1) L(E2) with the traces ecdb holds. A failure is
   `gluing_crosscheck_failures` with a problem line, and nothing of that gluing
-  is stored. ecdb verifies the isogeny class (equal L-polynomials, Tate) and
-  the maps, not the kernel of the isogeny, which is the theorem's.
+  is stored. ecdb verifies the isogeny class (equal L-polynomials, Tate), the
+  maps, and the kernel's 2-torsion correspondence: the two stored maps send
+  each Weierstrass pair {(±r, 0)} of C to (a_i, 0) on E1 and (b_i, 0) on E2
+  for the same i, so the graph of psi lies in the order-4 kernel (the order
+  is the theorem's). For j = 0 or 1728 several isomorphisms of a quotient onto
+  E exist; only a pair of maps that realizes psi is stored (the first version
+  could store maps that realized psi composed with an automorphism).
 - **Writes (insert only).** `curve` (family `gluing`, model `hyperelliptic`,
   `smoothness_status` `proved`); `hyperelliptic_model` (deg f = 6, `split` with
   2 points at infinity when the leading coefficient is a square, else `inert`);
@@ -294,8 +299,17 @@ existed.
   `minimal_degree` 2, `subgroup_transfer` `not_tested`, status `proved`; an
   `isogeny_class_fq` row (status `proved`) and `abelian_variety.isogeny_class_id`
   where it is NULL; a `curve_zeta` row with [#C(F_p), #C(F_p^2)]. When several
-  (pair, psi) give the same C, the first names it. A Jacobian already linked to
-  another class is reported (`gluing_link_conflicts`) and never overwritten.
+  (pair, psi) give the same C, the first names it and its maps
+  (`gluing_morphisms_duplicate` counts the rest).
+- **Existing rows.** Before any write the importer reads what ecdb holds for
+  each glued curve: the curve (genus, smoothness), its hyperelliptic_model
+  (f, h, deg f, infinity type and points), curve_zeta (the counts as a prefix,
+  its class), the Jacobian's class, its gluing_2_2 morphisms with the same
+  target and construction (map, degree, status), and the class stored under
+  the computed label (its L-polynomial). A NULL is no disagreement; any other
+  difference refuses the curve as a whole (`gluing_existing_conflicts`, or
+  `gluing_class_conflicts` for a class, with a problem line), and nothing of
+  it is written or overwritten.
 - **Verified so far (no deployed run yet).** Without a database, the ignored
   test `census_range_sweep` covers the whole range (one curve per
   F_p-isomorphism class): 3,877 gluings and 227 degenerate psi, every gluing
@@ -305,6 +319,15 @@ existed.
   classes, 3,841 Jacobians linked and 3,841 zeta rows, 0 problems; a second run
   inserted 0. A corrupted stored census trace was refused with its curve, and
   a glued Jacobian relinked to a wrong class was reported and left unchanged.
+  After the review fixes (kernel check, existing-row comparison), a fresh
+  throwaway database seeded the same way gave the same counts (3,841 curves,
+  7,682 morphisms, 72 duplicate maps of an already-named curve not
+  re-offered, 199 classes, 0 problems), a rerun inserted 0, and an
+  independent script re-checked every stored map identity and the
+  Weierstrass-pair correspondence with the stored psi. Corrupting a stored
+  zeta count, an infinity type, a map, a morphism status, a Jacobian link or
+  the L-polynomial of a stored class each refused the affected curves with a
+  problem line and left the stored rows unchanged.
 - **Not computed.** n = 3 ((3,3) Frey–Kani gluings along anti-isometries of
   E1[3] and E2[3]), and pairs without full rational 2-torsion (the general
   2-torsion gluing over the splitting field).
