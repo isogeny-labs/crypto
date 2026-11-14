@@ -85,6 +85,7 @@ fn checked_lock(mode: &str, lock: &Value, out: &Path) -> Result<(PathBuf, PathBu
     if lock["schema"] != "n83.k2048-m5-native-gate-lock/v1"
         || lock["mode"] != mode
         || !["positive", "natural"].contains(&mode)
+        || lock["out_path"].as_str() != out.to_str()
         || out.exists()
     {
         return Err("native gate mode, lock or output path differs".into());
