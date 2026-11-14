@@ -1501,7 +1501,7 @@ pub fn relation_system_polys(
         }
     }
     // S_3 chain. Slot: Some(var) or None for the constant X.
-    let s3_poly = |a: Option<usize>, b: usize, c: Option<usize>| -> Vec<(Vec<u32>, u64)> {
+    let s3_poly = |a: Option<usize>, b: usize, last: Option<usize>| -> Vec<(Vec<u32>, u64)> {
         let m2 = p - 2;
         let terms: [([u32; 3], u64); 13] = [
             ([2, 0, 2], 1),
@@ -1522,7 +1522,7 @@ pub fn relation_system_polys(
         for (ex, c) in terms {
             let mut mono = vec![0u32; n_vars];
             let mut coef = c;
-            for (k, slot) in [a, Some(b), c].iter().enumerate() {
+            for (k, slot) in [a, Some(b), last].iter().enumerate() {
                 match slot {
                     Some(v) => mono[*v] += ex[k],
                     None => coef = mulm(coef, powm(xr, ex[k] as u64, p), p),
@@ -1676,7 +1676,7 @@ pub fn enumerate_decompositions(
     let mut ops = 0u64;
     let logp = 64 - p.leading_zeros() as u64;
     // Roots in F_p of c2 X² + c1 X + c0, with its multiplications counted.
-    let mut quad_roots = |c: [u64; 3], ops: &mut u64| -> Vec<u64> {
+    let quad_roots = |c: [u64; 3], ops: &mut u64| -> Vec<u64> {
         if c[2] == 0 {
             if c[1] == 0 {
                 return vec![];
@@ -1720,7 +1720,7 @@ pub fn enumerate_decompositions(
     ops += base.len() as u64 * 6 * logp; // lifting V once
     let vset: HashSet<u64> = v.iter().copied().collect();
     let mut rels: Vec<Vec<(u64, u64)>> = vec![];
-    let mut push = |pts: Vec<(u64, u64)>, rels: &mut Vec<Vec<(u64, u64)>>| {
+    let push = |pts: Vec<(u64, u64)>, rels: &mut Vec<Vec<(u64, u64)>>| {
         for rel in signed_relations(e, &pts, r) {
             if !rels.contains(&rel) {
                 rels.push(rel);
