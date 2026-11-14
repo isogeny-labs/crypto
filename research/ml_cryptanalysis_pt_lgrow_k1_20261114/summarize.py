@@ -123,7 +123,8 @@ def build() -> dict:
         "schema": "crypto.ic_k1_pt_lgrow_summary/v1",
         "source": {"repository": "github.com/aburan28/ml-cryptanalysis", "branch": "main",
                    "commit": "7d4e8e0fccb43148c80fd2004821fd7e48f9df76",
-                   "path": "experiments/fb-pt-lgrow-k1", "validation_id": "VAL-20261114-d9190c"},
+                   "path": "experiments/fb-pt-lgrow-k1", "validation_id": "VAL-20261114-d9190c",
+                   "validator_files_redacted_at": "b504b611 (ml-cryptanalysis PR #314: model id redacted, sha256 re-pinned)"},
         "unit": "ecbench counted GAE per sqrt(r); IC native operations and rho *_uncharged counters at w GAE each "
                 "(AGENTS.md section 5a); bitop/v1 as a calibration-free cross-check",
         "isolation": "L0 (counted cost only; wall time not certified)",

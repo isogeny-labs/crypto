@@ -204,7 +204,7 @@ One target per process, cold (every phase, the pair table included, priced for t
 - K1 n = 29 has r = 2^15.37 (cofactor 12646), a smaller prime subgroup than K1 n = 17's 2^16.0, so n here is the field degree, not a problem size; at n = 29 rho is set-up dominated.
 - Dimensions 9 and 10 were chosen on two disclosed sizing targets per n, separate from the measured targets. Records are L0 (counted cost; wall time not certified); the replays used the producer's binary.
 
-[Report](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/report.md) · [study](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/) · [data](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json). Evidence copied from github.com/aburan28/ml-cryptanalysis experiments/fb-pt-lgrow-k1 at main 7d4e8e0f (VAL-20261114-d9190c).
+[Report](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/report.md) · [study](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/) · [data](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json). Evidence copied from github.com/aburan28/ml-cryptanalysis experiments/fb-pt-lgrow-k1 at main 7d4e8e0f (VAL-20261114-d9190c); validator files from b504b611 (ml-cryptanalysis PR #314: model id redacted, sha256 re-pinned).
 
 validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched strong signed-Frobenius rho reference with the §5a band (research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json)
 
@@ -1101,7 +1101,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
 - `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
 - `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
-- `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `9c4e4fae39e238c0…`
+- `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `06b648eb1b7beacb…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`

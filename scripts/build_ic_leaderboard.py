@@ -1462,7 +1462,8 @@ def k1_pt_lgrow_text(k: dict) -> dict:
         "Records are L0 (counted cost; wall time not certified); the replays used the producer's binary.",
     ]
     prov = (f"Evidence copied from {pv['repository']} {pv['path']} at {pv['branch']} {pv['commit'][:8]} "
-            f"({pv['validation_id']}).")
+            f"({pv['validation_id']})"
+            + (f"; validator files from {pv['validator_files_redacted_at']}" if pv.get("validator_files_redacted_at") else "") + ".")
     return {"cells": cells, "intro": intro, "caveats": caveats, "provenance": prov}
 
 
