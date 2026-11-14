@@ -12,6 +12,11 @@ the capped arm has no measured completion time. [pcc:unverified]
 Claim `PCC-20261114-2bd98e` has `unverified` standing because its retained
 local transcript and replay are unsigned.
 
+The first public-target natural query then reached its one-million-conflict
+cap with `INDETERMINATE` status after 424.60 seconds. It supplies one censored
+query with zero verified relations, not a natural-yield estimate.
+[pcc:unverified] Claim `PCC-20261114-d174b0` has `unverified` standing.
+
 | Item | Frozen result |
 | --- | --- |
 | Curve/base | primary N83 `a=0`, D18: 5,418,738 subgroup points, 32,643 folded columns |
@@ -23,18 +28,23 @@ local transcript and replay are unsigned.
 | Independent replay | all 2,807,999 CNF clauses, 3,901 XOR rows; four archived subgroup points sum to the target, and their four relation columns replay to the same target |
 | First natural target | public corpus point `(1834913121178197242856238, 8797964190732846213981377)` |
 | Natural export | `PASS_XCNF_EXPORT_ONLY`, 52.3456487 s process wall; XCNF SHA-256 `bafed0f783ad93fcc91dcbd4c0ab45a505fc4ee3f2b0607a561e63995d0c89c3`; 329,808 variables, 2,807,501 CNF clauses, 3,901 XOR rows |
-| Natural solver | `HOST_LOAD_GATE_FAILED_BEFORE_LAUNCH`; three one-minute samples 42.98, 45.49, 46.89 exceeded the frozen maximum 24; no solver result or natural relation is inferred |
+| First natural solver preflight | `HOST_LOAD_GATE_FAILED_BEFORE_LAUNCH`; three one-minute samples 42.98, 45.49, 46.89 exceeded the frozen maximum 24 |
+| Second natural solver preflight | loads 16.48, 15.48, 15.30; swapouts unchanged at 164,320 |
+| Natural solver | `INDETERMINATE`, exit 15 after 1,000,001 reported conflicts and 424.5995106 s process wall; 421.023898 s user CPU, 1.512929 s system CPU; 478,880 KiB sampled peak RSS, no new swapouts; all 28 Gaussian matrices used |
 
 The [positive protocol](PROTOCOL.md), [natural protocol](NATURAL_PROTOCOL.md),
 and both solver locks were committed before their respective executions.
 The [raw manifest](evidence/RAW_MANIFEST.json) binds the archived positive
 solver transcript, receipt, complete original-XCNF replay, group replay,
-natural export receipt, and the rejected host preflight. The two 50 MB XCNFs
-remain in the local raw root named by that manifest; their hashes are pinned
-in committed locks. The natural solver directory was not created.
+natural export receipt, and the rejected host preflight. The separate
+[natural cap manifest](evidence/NATURAL_RAW_MANIFEST.json) binds the second
+host preflight, terminal solver transcript, receipt, and independent status
+audit. The two 50 MB XCNFs remain in the local raw root named by those
+manifests; their hashes are pinned in committed locks.
 
-The next step is a fresh three-sample host preflight and the already frozen
-natural solver command. A returned natural model still requires original-XCNF
-and independent group/row replay. Measuring natural relation yield, useful
-rank, subgroup logs, unseen-target descent and matched same-point rho remains
-the path to an end-to-end factor-base selection on both N83 curves.
+The next experiment must change a frozen solver, encoding, or base policy
+and re-establish a constructed positive gate before more natural queries.
+Any returned natural model needs original-XCNF and independent group/row
+replay. Measuring natural relation yield, useful rank, subgroup logs,
+unseen-target descent and matched same-point rho remains the path to an
+end-to-end factor-base selection on both N83 curves.
