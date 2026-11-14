@@ -237,3 +237,27 @@ Same code and frozen B rule as the holdout (B = round(100 (p/2^26)^(1/3)): 400 a
 | 34 | b128 | 738-798 | 1533 | 1858 | 2407 | 2.08-2.40 | 9.3-10.3 | ~72x |
 
 Reading: the 2.0x-2.4x improvement over the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) holds at 32 and 34 bits on fresh curves, with B extrapolated by the frozen rule and not retuned (c=1.0 arms: 2.6x-3.4x, a worse baseline). The gap to the matched negation rho keeps growing with size (about 4x at 26 bits, 21x at 30, about 40x at 32, 60x-70x at 34), consistent with an engineering constant gain on a worse exponent. Same limits as before: one host, no isolation, wall clock, one twist group per size, no §5a band.
+
+## Experiment: tuned dp bits for the multi-target rho (2026-11-14) — `[pcc:unverified]`
+After the Kuhn-Struik restart fix the rho was still 1.4x-4.8x above `W = sqrt(2nT/6)` steps. Its dp-bit formula, `bits/2 - 10 + log2(T)/2`, grows with T, but the work per extra log, about `W/T`, shrinks with T, so at large T each target's last walk to a distinguished point dominated.
+`examples/prime_fast_j0_rho_multi.rs` gains `DP=<k>`, `DPRULE=ks` (`dp = round(log2(W/T) - DPDIV)`) and `INST0` (instance offset). Kuhn-Struik restarts, 128 lanes, 2 curves x 2 instances per cell; every target of every row checked against its planted log.
+
+**Tuning, on held-out targets** (`INST0=10`, `run_dp_sweep.sh`, dp 2-12, `results/pf_j0/dpsweep/`): the optimum is flat and sits at `log2(W/T) - 1` to `- 3` in every cell. The rule `DPDIV=1.5` was fixed from this sweep and is within about 10% of the best dp everywhere (largest gap: 30 bits, T = 200, 25 against 23 ms).
+
+**Confirmation, on the IC comparison's own targets** (`INST0=0`, `run_dp_confirm.sh`, `results/pf_j0/rhotuned_*.jsonl`), medians:
+
+| bits | T | dp old → rule | IC ms | rho, old dp ms | **rho, tuned ms** | tuned steps / W | tuned / old dp | **rho/IC** | folded BSGS ms (section above) |
+|---|---|---|---|---|---|---|---|---|---|
+| 26 | 20 | 5 → 9 | 8.7 | 4.9 | **3.4** | 3.31 | 0.70 | **0.40** | 2.0 |
+| 26 | 200 | 6 → 7 | 20.2 | 16.8 | **7.3** | 1.94 | 0.43 | **0.36** | 5.0 |
+| 26 | 1000 | 7 → 6 | 70.4 | 27.8 | **22.6** | 1.63 | 0.81 | **0.32** | 10.9 |
+| 28 | 200 | 7 → 8 | 42.8 | 16.8 | **13.9** | 2.00 | 0.83 | **0.32** | 12.5 |
+| 28 | 1000 | 8 → 7 | 125.4 | 45.7 | **31.2** | 1.65 | 0.68 | **0.25** | 30.4 |
+| 28 | 3000 | 9 → 6 | 357.7 | 152.4 | **79.4** | 1.45 | 0.52 | **0.22** | 60.2 |
+| 30 | 200 | 8 → 9 | 95.2 | 27.1 | **26.3** | 2.07 | 0.97 | **0.28** | 27.3 |
+| 30 | 1000 | 9 → 8 | 303.2 | 85.7 | **54.6** | 1.69 | 0.64 | **0.18** | 58.7 |
+| 30 | 3000 | 10 → 7 | 836.6 | 286.7 | **110.0** | 1.47 | 0.38 | **0.13** | 132.8 |
+
+Graph: `figures/multirho_dp_tune.{svg,png,pdf}` (`figures/plot_multirho_dp_tune.py`). Bench record: `benchmarks/records/20261114T1854Z-j0-multirho-dp-tune.json`.
+
+Reading: the tuned rho takes 0.38x-0.97x the time of the same rho with the old dp formula, the gain growing with T. Against the symmetric multi-target IC it is 2.5x-7.6x faster in every cell, and the gap widens with T and with size (rho/IC 0.40 → 0.13). At 30 bits it is level with or ahead of the folded multi-target BSGS (0.83x-0.96x of its time: 26.3 vs 27.3, 54.6 vs 58.7, 110.0 vs 132.8 ms) and still behind it at 26-28 bits (BSGS figures come from a different run, same targets, same host class; not interleaved). Remaining rho overhead is 1.45x-2.1x of W except at 26 bits, T = 20, where 128 lanes times 2^9 steps in flight exceed W (3.3x). Not a claim: one host, no isolation, no §5a band, IC arm not retuned per T. [pcc:unverified]
