@@ -54,3 +54,19 @@ the record is `20261112T1753Z-small-de-endo-fb`. Solving work per trial is
 unchanged. The saving is column folding, and a generic scalar-folded control
 matches it. No arm comes in below the matched rho [pcc:unverified]. This run is
 not admitted by the validation gate.
+
+## Degree-3 covers and the IC positive control (2026-11-12)
+
+Reports: `REPORT_cover_deg3_20261112.pdf` and `REPORT_ic_positive_control_20261112.pdf`.
+Graphs: `deg3.svg` and `control.svg`. Records: `20261112T2149Z-cover-pushforward-deg3`
+and `20261112T2145Z-ic-positive-control`. On degree-3 covers the IC is again a search on E.
+The positive control shows a known IC win in group operations, but not at the
+§5a prices of 0.1 or 1 GAE [pcc:unverified]. Neither run is validation-gate admitted.
+
+## Instrument fixes (2026-11-12)
+
+The report is `REPORT_instrument_fixes_20261112.pdf`, the graph is `rerun.svg` and
+the record is `20261112T2311Z-instrument-fixes`. The recorded matched rho was 5–9×
+too expensive, so the recorded IC gaps were understated. Walk collection with
+double large primes cut IC group operations 13.4× at p = 1619 but did not reach
+rho [pcc:unverified]. This run is not validation-gate admitted.

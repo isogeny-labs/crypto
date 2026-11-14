@@ -1388,6 +1388,38 @@ fn lazy_axpy(acc: &mut [u64], a: u32, b: &[u32], m: u64) {
     }
 }
 
+/// `acc += a · b` with no reduction at all: the caller has bounded the
+/// number of products an entry can take (see [`Kernel::with_budget`]) so
+/// the sum stays below `2⁶⁴`, and reads every entry through
+/// [`Fp::reduce`].
+#[inline(always)]
+fn exact_axpy(acc: &mut [u64], a: u32, b: &[u32]) {
+    let n = acc.len().min(b.len());
+    for (x, &y) in acc[..n].iter_mut().zip(&b[..n]) {
+        *x += u64::from(a) * u64::from(y);
+    }
+}
+
+/// [`exact_axpy`] compiled for AVX2.
+///
+/// # Safety
+/// The CPU must support AVX2.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn exact_axpy_avx2(acc: &mut [u64], a: u32, b: &[u32]) {
+    exact_axpy(acc, a, b)
+}
+
+/// [`exact_axpy`] compiled for AVX-512.
+///
+/// # Safety
+/// The CPU must support AVX-512F.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn exact_axpy_avx512(acc: &mut [u64], a: u32, b: &[u32]) {
+    exact_axpy(acc, a, b)
+}
+
 /// [`lazy_axpy`] compiled for AVX2.
 ///
 /// # Safety
@@ -1442,11 +1474,21 @@ struct Kernel {
     /// The largest multiple of `p` at most `2⁶³`, when `p < 2³¹`.
     lazy: Option<u64>,
     lanes: Lanes,
+    /// No entry can take enough products to reach `2⁶⁴`: nothing is
+    /// subtracted at all and every read goes through [`Fp::reduce`].
+    exact: bool,
 }
 
 impl Kernel {
-    fn new(fp: Fp) -> Self {
-        Self::with_lanes(fp, Lanes::detect())
+    /// A kernel for accumulators that take at most `max_products` products
+    /// each between two full reductions, all read through [`Fp::reduce`]:
+    /// when `max_products · (p − 1)² + p < 2⁶⁴` the entries are only added
+    /// to, with no conditional subtraction of a multiple of `p`.
+    fn with_budget(fp: Fp, max_products: usize) -> Self {
+        let mut k = Self::with_lanes(fp, Lanes::detect());
+        let worst = max_products as u128 * u128::from(fp.p - 1).pow(2) + u128::from(fp.p);
+        k.exact = worst < 1 << 64;
+        k
     }
 
     fn with_lanes(fp: Fp, lanes: Lanes) -> Self {
@@ -1454,6 +1496,7 @@ impl Kernel {
             fp,
             lazy: (fp.p < 1 << 31).then(|| ((1u64 << 63) / fp.p) * fp.p),
             lanes,
+            exact: false,
         }
     }
 
@@ -1461,6 +1504,18 @@ impl Kernel {
     /// below `2⁶³` (lazy) or below `p` (otherwise), and stays so.
     #[inline]
     fn axpy(self, acc: &mut [u64], a: u32, b: &[u32]) {
+        if self.exact {
+            match self.lanes {
+                #[cfg(target_arch = "x86_64")]
+                // SAFETY: `Lanes::detect` found AVX-512F on this CPU.
+                Lanes::Avx512 => unsafe { exact_axpy_avx512(acc, a, b) },
+                #[cfg(target_arch = "x86_64")]
+                // SAFETY: `Lanes::detect` found AVX2 on this CPU.
+                Lanes::Avx2 => unsafe { exact_axpy_avx2(acc, a, b) },
+                _ => exact_axpy(acc, a, b),
+            }
+            return;
+        }
         match (self.lazy, self.lanes) {
             #[cfg(target_arch = "x86_64")]
             // SAFETY: `Lanes::detect` found AVX-512F on this CPU.
@@ -1559,7 +1614,12 @@ fn eliminate(
     full_rank_exit: bool,
     st: &mut ElimStats,
 ) -> Result<Echelon, Stop> {
-    let kern = Kernel::new(fp);
+    // An entry of an accumulator takes at most one product per column of
+    // its row at a pivot column (at most `n_cols`), and later one per
+    // earlier lead (at most `nq ≤ n_cols`, the old and the chunk's new
+    // leads together), the rest being reduced in between: `2 · n_cols`
+    // products bound every entry between two reductions.
+    let kern = Kernel::with_budget(fp, 2 * n_cols + 4);
     // Q, ascending; `q_start[c]` is the first Q index at or after `c`.
     let mut q_of = vec![NONE; n_cols];
     let mut q_start = vec![0u32; n_cols];
@@ -1730,7 +1790,9 @@ fn eliminate(
                         }
                     }
                 }
-                ents.sort_unstable();
+                // (column, row) is unique, so the key orders the entries
+                // exactly as the whole tuple did
+                ents.sort_unstable_by_key(|&(c, r, _)| u64::from(c) << 32 | u64::from(r));
                 for &(c, r, v) in &ents {
                     let (off, end) = (
                         r as usize * nq + q_start[c as usize] as usize,
@@ -2952,6 +3014,17 @@ mod tests {
                     }
                     let got: Vec<u128> = acc.iter().map(|&x| u128::from(f.reduce(x))).collect();
                     assert_eq!(got, exact, "p = {p}, {l:?}");
+                }
+                // the unreduced kernel, where the budget allows it
+                let kern = Kernel::with_budget(f, steps.len() + 1);
+                assert_eq!(kern.exact, p == 3 || p == 786433, "p = {p}");
+                if kern.exact {
+                    let mut acc = init.clone();
+                    for (a, b) in &steps {
+                        kern.axpy(&mut acc, *a, b);
+                    }
+                    let got: Vec<u128> = acc.iter().map(|&x| u128::from(f.reduce(x))).collect();
+                    assert_eq!(got, exact, "p = {p}, exact");
                 }
             }
         }

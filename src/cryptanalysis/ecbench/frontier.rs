@@ -1590,6 +1590,7 @@ mod tests {
             levels: BTreeMap::new(),
             axes,
             band: vec![point(0.0), point(0.1), point(1.0)],
+            calibrated: None,
         }
     }
 

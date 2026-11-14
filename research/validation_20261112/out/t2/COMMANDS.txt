@@ -1,0 +1,8 @@
+cwd: $SCR/exp_c5678a9/tree (git archive of c5678a98aef6bbee34df3f277e618dd0a00f8ab1); release build, rustc 1.97.0
+tower_large --primes 250,500 --instances 3 --seeds 8 --rho-seeds 64 --threads 2 --json replay_tower_large_250_500.json   (exit 0, 7.1 s)
+  compare_tower_replay.py tower_large.json replay -> 6 instances, 2 rows, crosscheck identical, 0 differences
+  json_diff.py repro/tower_large.repro.json replay -> 533 leaves, 0 non-timing differences (timing keys: solve_wall_s_bookkeeping, transfer_wall_s, transfer_wall_s_mean)
+val_tower_solves 251,503,1009,2003 3 8 64 ; check_tower_solves.py -> 12 instances, 960 solver logs certified by vlib, 204 fields = tower_large.json, 0 errors
+val_tower_solves 4001,8009,16001 3 8 64 ; check_tower_solves.py -> 9 instances, 720 logs certified, 153 fields equal, 0 errors
+negative control (5 tampers: IC k+1 genus 3, rho k+1, genus-3 T, genus-2 f0, jac_order+r) -> all rejected
+not replayed: p = 32003, 64007 (cost)

@@ -55,8 +55,8 @@ use crate::cryptanalysis::ic_measurement::{self as measurement, Phase, Snapshot}
 use crate::cryptanalysis::koblitz_index_calculus::{
     build_subgroup_orbit_factor_base_with_cost, projected_signed_orbit_count, CollectedRelation,
     ColumnCoverage, DecompositionStrategy, FactorBaseLogSolver, FactorBaseSelectionCost,
-    FrobeniusFactorBase, IndividualLogSolver, KoblitzCurve, KoblitzIcOptions, LinearAlgebra,
-    PairSumTable, ProbeBudget, RelationCollector, RelationWorkUnit,
+    FilterLayout, FrobeniusFactorBase, IndividualLogSolver, KoblitzCurve, KoblitzIcOptions,
+    LinearAlgebra, PairSumTable, ProbeBudget, RelationCollector, RelationWorkUnit,
 };
 use crate::cryptanalysis::koblitz_sparse_la::{SparseSolveOptions, SparseSolveReport};
 
@@ -401,6 +401,29 @@ pub fn run(
     q: &BinaryPoint,
     p: &DescentParams,
 ) -> Result<DescentOutcome, String> {
+    run_with_filter_layout(kc, q, p, FilterLayout::Low)
+}
+
+/// Run the current pipeline with the partition-local folded-table filter.
+///
+/// The unversioned [`run`] stays pinned to [`FilterLayout::Low`] so its
+/// committed records replay exactly. New measurements use this entry point,
+/// whose [`FilterLayout::Top`] build is the measured CPU default used by
+/// `ic price`.
+pub fn run_top(
+    kc: &KoblitzCurve,
+    q: &BinaryPoint,
+    p: &DescentParams,
+) -> Result<DescentOutcome, String> {
+    run_with_filter_layout(kc, q, p, FilterLayout::Top)
+}
+
+fn run_with_filter_layout(
+    kc: &KoblitzCurve,
+    q: &BinaryPoint,
+    p: &DescentParams,
+    filter_layout: FilterLayout,
+) -> Result<DescentOutcome, String> {
     let pool = rayon::ThreadPoolBuilder::new()
         .num_threads(1)
         .thread_name(|_| "ic-koblitz-descent".into())
@@ -409,7 +432,7 @@ pub fn run(
     pool.install(|| {
         let single = rayon::current_num_threads() == 1 && rayon::current_thread_index() == Some(0);
         let session = measurement::Session::begin().map_err(|e| e.to_string())?;
-        let out = pipeline(kc, q, p);
+        let out = pipeline(kc, q, p, filter_layout);
         let snapshot = session.finish().map_err(|e| e.to_string());
         let mut out = out?;
         out.snapshot = snapshot;
@@ -422,6 +445,7 @@ fn pipeline(
     kc: &KoblitzCurve,
     q: &BinaryPoint,
     p: &DescentParams,
+    filter_layout: FilterLayout,
 ) -> Result<DescentOutcome, String> {
     if kc.n >= 64 || kc.subgroup_order.bits() > 64 || kc.n.is_multiple_of(2) {
         return Err("ic.koblitz_descent needs odd n < 64 and r ≤ 2^64".into());
@@ -460,8 +484,18 @@ fn pipeline(
         p.descent_summands,
         1,
     );
-    let pair = PairSumTable::build_within_for(kc, &fb, PairSumTable::DEFAULT_BYTE_BUDGET, probes)
-        .ok_or("field too wide for the pair table")?;
+    // The filter layout every committed record of this method was counted
+    // under: a layout lets different absent keys through the filter, so
+    // another would change the counted bucket reads and no record would
+    // replay.
+    let pair = PairSumTable::build_within_for_layout(
+        kc,
+        &fb,
+        PairSumTable::DEFAULT_BYTE_BUDGET,
+        probes,
+        filter_layout,
+    )
+    .ok_or("field too wide for the pair table")?;
     ledger.lap("oracle_setup");
 
     // 3. The planned units, aimed.

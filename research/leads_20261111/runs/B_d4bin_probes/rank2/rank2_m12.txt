@@ -1,0 +1,36 @@
+RANK2-ELIM m 12 curve seed 1 trials 300 (paired rows 300)
+current fails 0; elim errors 0 {}; agree 300; disagree 0
+agree on the s4 != 0 solutions (the only ones that can split into t_i >= 2): 300
+rational solutions 324 (1.080/trial); with s4 = 0: 0
+flags {}
+deg F (deg_s4, deg_P, total) after s4-strip: {"[(10, 12, 12), (10, 10, 10)]": 300}
+s4 strips (F1, F2), R: {"F [0, 2] R 0": 300}
+evaluation points histogram {121: 300}
+deg R (after stripping s4^k) histogram {120: 300}
+rational nonzero roots of R histogram {0: 41, 1: 78, 2: 78, 3: 51, 4: 29, 5: 15, 6: 6, 7: 1, 8: 1}
+current        baseline   frob_roots
+weil               1431         1431
+triang              128          128
+echelon           54809        54809
+nf                21913        21913
+charpoly          87728        87728
+roots             55505        22977
+eigvec             1837         1837
+verify              224          224
+TOTAL            223575       191046
+elim           baseline   frob_roots
+weil               1431         1431
+reduce              131          131
+build              1428         1428
+resultant         40161        40161
+interp            14520        14520
+roots            165979        72640
+backsub             872          871
+s4zero              364          225
+verify              238          238
+PAIRED baseline: current 223575 elim 225123 muls/trial; ratio elim/current 1.0069 [95% boot 1.0061, 1.0077]; elim cheaper on 47/300 trials
+PAIRED frob_roots: current 191046 elim 131645 muls/trial; ratio elim/current 0.6891 [95% boot 0.6885, 0.6896]; elim cheaper on 300/300 trials
+
+real	2m36.243s
+user	2m33.174s
+sys	0m2.558s

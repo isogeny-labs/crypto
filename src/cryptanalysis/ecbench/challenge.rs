@@ -656,6 +656,13 @@ pub struct Verdict {
     pub multiplicity: Option<Multiplicity>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub band: Option<BandVerdict>,
+    /// The calibrated reading of AGENTS.md §5a (2026-11-12) of the same
+    /// pairs: the field-multiplication counters at `0`, `w_cal` and
+    /// `10·w_cal`, candidate over incumbent.  Present only for a procedure-2
+    /// verdict whose session carries a `w_cal` (`options.w_cal` or the
+    /// `w_cal.json` sidecar); it changes no axis, outcome or band field.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<crate::cryptanalysis::ecbench::band::CalibratedGrid>,
 }
 
 impl Verdict {
@@ -1650,6 +1657,27 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
             control.as_ref().and_then(|c| c.ratio.map(|r| format!("; A/A {} {r:.4}{}", if v2 { "determinism check" } else { "control" }, fmt_ci(c.ci95)))).unwrap_or_default(),
         ),
     };
+    let calibrated = match (v2, crate::cryptanalysis::ecbench::runner::read_wcal(dir)?) {
+        (true, Some(w)) => {
+            use crate::cryptanalysis::ecbench::band as bd;
+            let pick = |arm: &str| {
+                recs.iter()
+                    .filter(|r| !r.warmup && r.arm == arm)
+                    .collect::<Vec<_>>()
+            };
+            let (inc, cand) = (pick(inputs.incumbent_arm), pick(inputs.candidate_arm));
+            let pairs = bd::matched_verified(inc.iter().copied(), cand.iter().copied());
+            Some(bd::calibrated_ratio_grid(
+                &pairs,
+                &BAND_WEIGHTS,
+                bd::Pricing::default(),
+                &w,
+                inputs.incumbent_arm,
+                inputs.candidate_arm,
+            )?)
+        }
+        _ => None,
+    };
     let mut v = Verdict {
         schema: VERDICT_SCHEMA.into(),
         verdict_id: String::new(),
@@ -1701,6 +1729,7 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         },
         multiplicity,
         band: band_verdict,
+        calibrated,
     };
     let verdict_text = v.seal()?;
 

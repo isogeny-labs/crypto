@@ -16,8 +16,10 @@ per D). Every number below is an unverified assertion produced by that run
 Question: after choosing coordinates and a factor base adapted to a low-degree
 endomorphism, does small `D_E` reduce the actual solving cost? No. The cost of
 solving one trial (the `S_3` quadratic for `m = 2`, the `S_4` quartic as two
-nested quadratics for `m = 3`) is the same, to the operation, in every arm of
-every cell: field operations per trial are identical for A2 and A1 (ratio
+nested quadratics for `m = 3`) is the same in every arm of every cell, to the
+operation for `m = 2` and within 0.85% for `m = 3` (correction 2026-11-13, from
+the independent validation: 12 of 60 `m = 3` cells vary between repetitions,
+and A2/A1 is 1.0007 in one cell): field operations per trial are identical for A2 and A1 (ratio
 1.000) because the sweep runs over the same number of base points
 `[pcc:unverified]`. The decomposition probability per trial is unchanged for
 `D = -3, -4` (19 of 20 cells within 2 standard errors, the other at 2.7)
@@ -108,7 +110,7 @@ standard errors, with every target certified and the 90% rule met.
 - The solving cost per trial depends only on the number of base points and `m`:
   for example 5209 field operations at 20 bits and 90546 at 28 bits for
   `D = -11`, `m = 2`; 50148 and 2137896 for `m = 3` (the nested quadratics),
-  with the same value in A0, A1, A2 and A3 of a cell `[pcc:unverified]`.
+  with the same value in A0, A1, A2 and A3 of a cell (for `m = 3` within 0.85%; see the correction above) `[pcc:unverified]`.
   The degree of the univariate solved is 2 for `m = 2` and 4 (as 2 x 2) for
   `m = 3`; no Groebner or Macaulay matrix is built, so there is no largest
   matrix for the solving step, only the elimination sizes in the tables.

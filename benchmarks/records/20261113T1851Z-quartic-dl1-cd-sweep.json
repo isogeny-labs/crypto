@@ -1,0 +1,96 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-13T18:51:20+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/quartic_dl1_cd_sqrt_20261113/cd_sweep/run-local.sh",
+        "<published image v2, sha256 183810cf...>",
+        "<scratch>/sweep-out"
+      ],
+      "cwd": "research/quartic_dl1_cd_sqrt_20261113/cd_sweep",
+      "exit": 0,
+      "started_utc": "2026-11-13T18:28:38+00:00",
+      "wall_s": 1246.0
+    }
+  ],
+  "commit": "693de1b9d2286ae6ab4980372592fa1b185244d5",
+  "commit_dirty": false,
+  "created_utc": "2026-11-13T18:51:01+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261113-quartic-dl1-cd-sqrt"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
+  },
+  "id": "20261113T1851Z-quartic-dl1-cd-sweep",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 3,
+      "name": "dl_meq_cd170_over_cd200_k22_wadd1",
+      "note": "additions priced at 1 M-eq; frozen grid constants",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.874
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 3,
+      "name": "dl_meq_cd170_over_cd200_k22",
+      "note": "frozen model (additions free)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.728
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 3,
+      "name": "dl_meq_cd155_over_cd200_k22_wadd1",
+      "note": "not below 1 at every seed",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.999
+    }
+  ],
+  "problem": "ic:ghs-weak-quartic-dl-k12-22",
+  "raw": [
+    {
+      "bytes": 40148,
+      "path": "research/quartic_dl1_cd_sqrt_20261113/cd_sweep/runs-cd-sweep-20261113.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a3cdddbd34edc965233680247a6123f75ef4002f37f33ef29cdbdfbb24f254f2",
+      "sha256": "a3cdddbd34edc965233680247a6123f75ef4002f37f33ef29cdbdfbb24f254f2",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf",
+    "png": [
+      "research/quartic_dl1_cd_sqrt_20261113/cd_sweep/sweep.png"
+    ],
+    "svg": [
+      "research/quartic_dl1_cd_sqrt_20261113/cd_sweep/sweep.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "quartic-dl1-cd-sweep",
+  "status": "measured",
+  "summary": "c_D sweep: 1.7 and 1.8 robust DL improvements at k=18..22 (1.7: 0.73-0.75 additions free, 0.87-0.88 at 1 M-eq, CPU 0.72-0.91); 1.55 not robust; D dearer at every c_D < 2. Local, unvalidated.",
+  "validation": null
+}

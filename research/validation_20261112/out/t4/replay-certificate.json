@@ -1,0 +1,56 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "validator": "validator role (Claude Opus 5.5), not the producer; restart 3, 2026-11-13",
+ "standing": "[pcc:unverified]: no pcc claim id; this report carries no keyring signature",
+ "source": {
+  "commit": "c5678a98aef6bbee34df3f277e618dd0a00f8ab1",
+  "export": "git archive (no checkout of the working tree)",
+  "note": "src/cryptanalysis/chained_transfer/small_de.rs, src/bin/small_de_ic.rs and src/cryptanalysis/ic_boundary.rs are identical between e0f476bd0f (first commit of this code) and c5678a9"
+ },
+ "build": {
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "profile": "release (opt-level 3)",
+  "binaries_sha256": [
+   "e712d4d9ed00f00164afaf1dfda80531de65dc189af14d868a0f41043e310ba4  target/release/small_de_ic",
+   "5ffc054d1f6aeacc99f96268452c77488252ce898d22b9f0cb66dc94afd8f6f5  target/release/val_sd_dump",
+   "d12b516d53ccc20981e588a4c1a64afc089058842487b893b94f4774ce4d2bcd  target/release/val_sd_rho"
+  ]
+ },
+ "runs": [
+  {
+   "command": "small_de_ic --sizes 12,16,20,24,28 --reps 12:20,16:20,20:10,24:6,28:3 --targets 16 --out-dir <scratch>",
+   "recorded_command": [
+    "./target/release/small_de_ic",
+    "--sizes",
+    "12,16,20,24,28",
+    "--reps",
+    "12:20,16:20,20:10,24:6,28:3",
+    "--targets",
+    "16",
+    "--out-dir",
+    "research/small_de_endo_fb_20261112"
+   ],
+   "exit": 0,
+   "result": "every non-timing value reproduced: render.py(replay) -> small_de_derived.json, tables.md, small_de.svg byte-identical to the committed files; run.log identical after removing '(N ms)'; 120/120 record metrics equal (rel 1e-9)",
+   "replay_raw_sha256": "3c76110e5a2ee5e7fc185fb00be8184b1e0140be14b0942843776cef0677ec7b (differs from the store pin 8bcdde7c... through timing fields; store bytes not fetched)"
+  },
+  {
+   "command": "val_sd_rho (validator tool: the run_cell / rho_cost calls with the same instances, target stream and seeds)",
+   "exit": 0,
+   "result": "2,240 rho runs; gae and native equal small_de.json run by run; every recovered log certified [k]G = T by vlib"
+  },
+  {
+   "command": "val_sd_dump (validator tool: construct() and the target stream)",
+   "exit": 0,
+   "result": "30 curves; 1,920 IC target logs in the replay certified by vlib; CM discriminant, j-invariant, lambda checked"
+  }
+ ],
+ "not_verified": [
+  "store bytes of small_de.json (sha256 8bcdde7c...)",
+  "wall-clock fields (construction_ms, wall_ms)",
+  "the IC solver's operation counts were reproduced by re-running the producer's code, not by an independent implementation"
+ ]
+}

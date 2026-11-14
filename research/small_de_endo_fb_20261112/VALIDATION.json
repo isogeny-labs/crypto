@@ -1,0 +1,41 @@
+{
+ "schema": "validation-gate/v1",
+ "status_note": "Validated by the independent validator (restart 3, 2026-11-13) against origin/main c5678a98ae. Caveats: (1) the store copy of small_de.json (sha256 8bcdde7c...) was not fetched (S3 credentials rejected in the validator's environment); the recompute is from a replay whose rendering reproduces small_de_derived.json, tables.md and small_de.svg byte for byte; (2) record commit b7e8c68 is dirty and predates the code (first committed in e0f476b); (3) Amendment 1's pre-data status is the producer's statement; (4) rho's partition hashes and DP-table operations are not emitted; reversing any order would need at least 78.6 extra native operations per rho walk operation. Standing: [pcc:unverified] until a pcc claim is signed.",
+ "replay_certificate": {
+  "path": "../validation_20261112/out/t4/replay-certificate.json",
+  "sha256": "cd2ad500136d6c4cf090427f94bf4a08fa91a20b3c88167349af8bb7315a4807"
+ },
+ "validator_report": {
+  "path": "../validation_20261112/out/t4/validator-report.json",
+  "sha256": "348cc46bf7835fed0b950b9958659b1f97076cafc29356cab08daa35e07d09aa"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "kind_note": "best matched rho per cell and weight among plain (A=1), negation (A=2) and, for D=-3 and D=-4, the automorphism fold (CubicClasses A=6, QuarticClasses A=4); D=-7,-8,-11 and generic curves have no automorphism beyond negation (their endomorphisms have degree 2 or 3)",
+  "protocol": "research/small_de_endo_fb_20261112/PROTOCOL.md, Amendment 1 'Costs': rho_walk_with on the same curve and the same 16 targets, plain, negation and (D=-3,-4) CubicClasses/QuarticClasses; priced cost = run GAE (+ setup), native = canonicalisations_uncharged",
+  "unit": "GAE: priced group additions and doublings + w x native operations (IC: field muls, inversions, membership tests, elimination multiply-adds; rho: canonicalisations)",
+  "binary_or_process": "src/bin/small_de_ic.rs (one process runs every IC arm and every rho variant of a cell); replayed from c5678a98ae, rustc 1.97.0 release",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "cell": "bits=28, m=2, D=-11, arm A2 (the record's first metric); all 120 arm-cells are in ../validation_20261112/out/t4/band.json",
+  "gae_band": {
+   "0": {
+    "ic": 34399.6875,
+    "rho": 11259.5
+   },
+   "0.1": {
+    "ic": 27877900.497916672,
+    "rho": 12347.18125
+   },
+   "1": {
+    "ic": 278469407.7916667,
+    "rho": 16359.8125
+   }
+  },
+  "order_holds_across_band": true,
+  "order_note": "IC above the best matched rho at w = 0, 0.1 and 1 in 120 of 120 arm-cells (minimum IC/rho 2.325, 7.616, 40.156). IC also exceeds every rho variant (plain, negation, automorphism) at w = 0 and w = 1 in every arm-cell (minimum 1.16), and each total is linear in w, so the order holds for every w in [0, 1], including any calibrated weight w_cal and 10 w_cal up to 1; no w_cal was recorded (the run predates the 2026-11-12 calibrated-weight rule).",
+  "context": "research/instrument_fixes_20261112 (merged) found the chained-transfer matched rho 5-9x too expensive in set-up; for small_de it reports the recorded best-of reference reproduced exactly and set-up a minor part (negation walk 80.5-96.4% of the negation total at 24 and 28 bits)."
+ }
+}

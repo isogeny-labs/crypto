@@ -116,3 +116,11 @@ the class-number-one curves `D = −43` (`p = 40961`) and `D = −163` (`p = 122
 `t = 10, 12`, the torsion-section digits read the generic degree, identical to the trivial lift;
 the Dickson base reads the same at `t = 6, 8, 10` (`research/prime_ic_leads_20261110/jet_exit/README.md`
 §7). The first unblock item still has no candidate.
+
+## Update 2026-11-12 (growth-law derivation)
+
+`research/prime_ic_leads_20261110/growth_law/README.md` proves monotonicity in `t`, the top-window
+lemma, the generic value by support (with `S₃` filling the width-2 box) and the first fall degree by
+width, and fits the growth as `d_F = ffd(W) + max(0, ⌊(t − s_W)/4⌋)` with falsifying predictions.
+The third unblock item (a derivation of the one-generator closure degree) is reduced to one open
+statement, a top-window pseudo-solution; it is not met `[pcc:unverified]`.

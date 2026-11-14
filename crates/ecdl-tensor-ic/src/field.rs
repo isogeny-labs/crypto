@@ -5,7 +5,12 @@ use rand::Rng;
 
 /// Returns a*b mod m for a, b < m.
 pub fn mul_mod(a: u64, b: u64, m: u64) -> u64 {
-    ((a as u128 * b as u128) % m as u128) as u64
+    // Word-sized products (every toy field here) take the 64-bit remainder
+    // instead of the `__umodti3` call; same value either way.
+    match a.checked_mul(b) {
+        Some(t) => t % m,
+        None => ((a as u128 * b as u128) % m as u128) as u64,
+    }
 }
 
 pub fn add_mod(a: u64, b: u64, m: u64) -> u64 {

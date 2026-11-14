@@ -1,0 +1,36 @@
+    Checking norm-bridge-identity-control v0.1.0 (/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/identity-control)
+error: using `chunks_exact` with a constant chunk size
+   --> src/bin/../../../../../src/hash/sha256.rs:135:25
+    |
+135 |     for block in padded.chunks_exact(64) {
+    |                         ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/bin/../../../../../src/hash/sha256.rs:154:25
+    |
+154 |     for block in padded.chunks_exact(64) {
+    |                         ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/bin/../../../../../src/hash/sha256.rs:241:25
+    |
+241 |     for block in blocks.chunks_exact(64) {
+    |                         ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/bin/../../../../../src/hash/sha256.rs:298:29
+    |
+298 |         for block in blocks.chunks_exact(64) {
+    |                             ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<64>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: could not compile `norm-bridge-identity-control` (bin "target_incidence") due to 4 previous errors

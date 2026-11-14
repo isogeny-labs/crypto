@@ -449,8 +449,8 @@ unsatisfiable ones):
 | 25 | 13 | 5, 6 | **4, 4** | 5 | 27,325 |
 | 27 | 14 | 3, 6 | 5, 5 | 5 | 93,771 |
 | 29 | 15 | 3, 4 | 5, 5 | 5 | 143,376 |
-| 31 | 16 | 2, 3 | `> 4`, `> 4` | 6 | 78,027 |
-| 33 | 17 | 1, 5 | `> 4`, `> 4` | 6 | 106,062 |
+| 31 | 16 | 2, 3 (+2 on RunPod) | **5** (4 of 4; RunPod, `out/c_runpod/`) | 6 | 213,435 |
+| 33 | 17 | 1, 5 (+1 on RunPod) | **5** (3 of 3; RunPod) | 6 | 310,266 |
 | 35 | 18 | 6, 7 | `> 4`, `> 4` | 6 | 141,680 |
 | 37 | 19 | 1, 3 | `> 3`, `> 3` | 7 | 42,920 |
 | 39 | 20 | 3, 7 | `> 3`, `> 3` | 7 | 52,689 |
@@ -470,7 +470,8 @@ unsatisfiable ones):
 
   The same ranks hold for both seeds at each `n`. Raw outputs are in
   `out/c/verify_*.txt`.
-- **Above `n = 29` the rows are lower bounds only.** The next `e` needs
+- **Exact at `n = 31` and `33`, from a 128 GB RunPod pod.** Both give `e_min = 5` (`out/c_runpod/RESULT.md`), which is below `ceil(k/3) = 6`. Every feasible `lambda` was checked with `verify_lambda.py`, and the `e = 4` infeasibility with `emin verify`. `n = 35` at `e = 5` (442k columns) hit a 32-bit index overflow in M4RI 20200125. [pcc:unverified]
+- **Above `n = 33` the rows are lower bounds only.** The next `e` needs
   `n * sum_{d<=e} C(k,d)` unknowns:
   - 213k (`n = 31`, `e = 5`), 310k (`n = 33`, `e = 5`), 442k (`n = 35`, `e = 5`),
     186k (`n = 37`, `e = 4`), 242k (`n = 39`, `e = 4`), 309k (`n = 41`, `e = 4`).
@@ -488,6 +489,13 @@ This form is a CONJECTURE fitted to the same data that falsified the original, s
 is not evidence. The data at `k >= 16` cannot test it. Those rows are lower bounds of
 4 or 3, below both `ceil(k/3)` and `ceil((k-1)/3)`, so they agree with either form and
 decide nothing.
+
+**Update, from the RunPod runs.**
+- At n = 33 (k = 17) the exact `e_min` is 5. That is below the weaker form
+  `ceil((k-1)/3) = 6`, so **the weaker form is also falsified** `[pcc:unverified]`.
+- At n = 31 (k = 16), `e_min = 5 = ceil(15/3)`, consistent with it.
+- Model A, the plain counting ratio with a threshold in (1.2634, 1.2698), remains
+  consistent with every exact value measured.
 
 Even a proof of Conjecture S would show only that the strategy of the `k+2` upper
 bound cannot be improved to constant degree with `c`-only multipliers. It says

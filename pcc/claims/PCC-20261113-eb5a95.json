@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T04:00:14Z",
+ "id": "PCC-20261113-eb5a95",
+ "kind": "theorem",
+ "producer": {
+  "commit": "923a401825f94193bfeb4dc7e81521b1da1344ca",
+  "model": "",
+  "session": "norm-wronskian-20261113"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "7a8dc33c102dda6dd83a3f9ed0ab7bf889db51ef957bbeacb5b016025bb48915",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormWronskian.filterZeroIff"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "exact polynomial differential-filter characterization and finite-characteristic counterexample; no timing gain, lower bound, rank-one solver or algorithm-existence decision",
+ "statement": "For a monic polynomial G coprime with its derivative over any field, and polynomial N with natDegree N at most natDegree G, the sparse differential filter G*Nprime-Gprime*N vanishes exactly when N is a scalar multiple of G."
+}

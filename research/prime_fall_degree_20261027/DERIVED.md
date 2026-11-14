@@ -185,3 +185,14 @@ has to see the curve. No specialisation to finitely many points can give one.
   - This is open.
 - No theorem for isogeny towers. Their reduced `S₃` has degree 4, and
   *measured* `ffd = 5` = degree + 1.
+
+## Addendum, 2026-11-12 (pointer; nothing above is changed)
+
+Four further results, with prose proofs, are in
+`research/prime_ic_leads_20261110/growth_law/README.md`: monotonicity of `d_F` in `t` for a fixed
+system (reduction modulo `z^{2^t} − 1` maps closures into closures); the top-window lemma (a
+degree-`c` closure uses `y_{t−1}² = 1` only through the top `c − 1` variables, which is the precise
+form of the "pseudo-solution near the top" hint above); the generic value of `d_F` by support, with
+`S₃` filling the width-2 box; and `ffd = 3, 4, 5, 5` for the width-`W` boxes, `W = 1 … 4`. The growth
+in `t` is still only fitted there (`d_F = ffd(W) + max(0, ⌊(t − s_W)/4⌋)`), so the first item of
+"What is not derived" stays open.

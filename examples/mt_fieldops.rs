@@ -28,7 +28,30 @@
 //!   bsgs2: param = mf (baby x-classes = mf sqrt(nT)/2)
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::cell::Cell;
-use std::collections::HashMap;
+// The hash tables of every arm. Default build: std HashMap (SipHash, RandomState). With the cargo feature
+// `mt-fasthash`: the same tables with a fast multiplicative hasher (MtFastH). Counted operations are identical in
+// both builds (a hash-table operation is counted per call, whatever the hasher); only wall time differs.
+#[cfg(not(feature = "mt-fasthash"))]
+type HState = std::collections::hash_map::RandomState;
+#[cfg(feature = "mt-fasthash")]
+type HState = std::hash::BuildHasherDefault<MtFastH>;
+type HashMap<K, V> = std::collections::HashMap<K, V, HState>;
+#[derive(Default)]
+#[allow(dead_code)]
+struct MtFastH(u64);
+impl std::hash::Hasher for MtFastH {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, b: &[u8]) {
+        for &c in b {
+            self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);
+        }
+    }
+    fn write_u64(&mut self, v: u64) {
+        self.0 = (self.0 ^ v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    }
+}
 use std::time::Instant;
 
 type Pt = Option<(u64, u64)>;
@@ -318,7 +341,8 @@ fn main() {
             }
             snap.push(("fb".into(), take(&f)));
             // x-only pair-sum table: key x -> (i, j, kind) kind 0: F_i+F_j, 1: F_i-F_j, 2: 2F_i
-            let mut table: HashMap<u64, (u32, u32, u8)> = HashMap::with_capacity(m * m + 8);
+            let mut table: HashMap<u64, (u32, u32, u8)> =
+                HashMap::with_capacity_and_hasher(m * m + 8, Default::default());
             for i in 0..m {
                 let pi = Some(fb[i]);
                 if let Some((x2, _)) = f.padd(pi, pi) {
@@ -368,7 +392,7 @@ fn main() {
             let mut v_log = v0;
             let need = (gfac * m as f64).ceil() as usize;
             let mut rels: Vec<(u32, i8, u32, i8, u64)> = Vec::with_capacity(need);
-            let mut seen_pairs: HashMap<(u32, u32, u8), ()> = HashMap::new();
+            let mut seen_pairs: HashMap<(u32, u32, u8), ()> = HashMap::default();
             let mut p1_trials = 0u64;
             'outer: loop {
                 for k in 0..kw {
@@ -608,7 +632,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -677,7 +701,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -860,7 +884,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -948,7 +972,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -1131,7 +1155,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -1200,7 +1224,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -1276,7 +1300,7 @@ fn main() {
             }
             snap.push(("relations".into(), take(&f)));
             let mut trials = 0u64;
-            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::new();
+            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::default();
             for t in 0..targets {
                 let q = qs[t];
                 let mut kq = 0usize;
@@ -1405,7 +1429,7 @@ fn main() {
             snap.push(("combos".into(), take(&f)));
             // table: x -> (combo id, l, sign of F_l)
             let mut table: HashMap<u64, (u32, u16, i8)> =
-                HashMap::with_capacity(kstar as usize + 16);
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
                 for l in (last + 1)..m {
@@ -1493,7 +1517,7 @@ fn main() {
             // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
             let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
             let mut rank = 0usize;
-            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::new();
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
             let mut nrel = 0usize;
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
@@ -1569,7 +1593,7 @@ fn main() {
             }
             snap.push(("relations".into(), take(&f)));
             let mut trials = 0u64;
-            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::new();
+            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::default();
             for t in 0..targets {
                 let q = qs[t];
                 let mut kq = 0usize;
@@ -1655,7 +1679,8 @@ fn main() {
             };
             // db: x -> (log, y or u64::MAX for a sibling without y)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
-            let mut db: HashMap<u64, (u64, u64)> = HashMap::with_capacity(db_target * 2);
+            let mut db: HashMap<u64, (u64, u64)> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
@@ -1796,7 +1821,7 @@ fn main() {
             // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
             let mut db: HashMap<u64, (u64, u64, (u64, u64, usize))> =
-                HashMap::with_capacity(db_target * 2);
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
@@ -1939,7 +1964,7 @@ fn main() {
             // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
             let mut db: HashMap<u64, (u64, u64, (u64, u64, usize))> =
-                HashMap::with_capacity(db_target * 2);
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
@@ -2077,7 +2102,8 @@ fn main() {
                 pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
             };
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
-            let mut db: HashMap<u64, (u64, u64)> = HashMap::with_capacity(db_target * 2);
+            let mut db: HashMap<u64, (u64, u64)> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = g;
             let mut ca = 1u64;
             let mut db_steps = 0u64;
@@ -2198,7 +2224,7 @@ fn main() {
                 let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
                 (q1, a1, s1 * b)
             };
-            let mut db: HashMap<u64, u64> = HashMap::new();
+            let mut db: HashMap<u64, u64> = HashMap::default();
             let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
             let mut pre_steps = 0u64;
             let mut sp: Pt = bank[0].0;
@@ -2232,7 +2258,7 @@ fn main() {
                 let q = qs[t];
                 let mut tp: Pt = q;
                 let mut ta = 0u64;
-                let mut pending: HashMap<u64, (u64, i64)> = HashMap::new();
+                let mut pending: HashMap<u64, (u64, i64)> = HashMap::default();
                 let v = 'tgt: loop {
                     let k1 = rng.gen_range(0..BANK);
                     tp = f.padd(tp, bank[k1].0);
@@ -2369,7 +2395,7 @@ fn main() {
                 let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
                 (q1, a1, s1 * b)
             };
-            let mut db: HashMap<u64, u64> = HashMap::new();
+            let mut db: HashMap<u64, u64> = HashMap::default();
             let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
             let mut pre_steps = 0u64;
             let mut sp: Pt = bank[0].0;
@@ -2403,7 +2429,7 @@ fn main() {
                 let q = qs[t];
                 let mut tp: Pt = q;
                 let mut ta = 0u64;
-                let mut pending: HashMap<u64, (u64, i64)> = HashMap::new();
+                let mut pending: HashMap<u64, (u64, i64)> = HashMap::default();
                 let v = 'tgt: loop {
                     let k1 = rng.gen_range(0..BANK);
                     tp = f.padd(tp, bank[k1].0);
@@ -2494,7 +2520,8 @@ fn main() {
                 let l = *b_pts.last().unwrap();
                 b_pts.push(f.padd(l, ugen));
             }
-            let mut baby: HashMap<u64, u64> = HashMap::with_capacity((2 * mx + 4) as usize);
+            let mut baby: HashMap<u64, u64> =
+                HashMap::with_capacity_and_hasher((2 * mx + 4) as usize, Default::default());
             for i in 0..u as usize {
                 f.hash();
                 baby.entry(a_pts[i].unwrap().0).or_insert(i as u64 + 1);
@@ -2706,7 +2733,8 @@ fn main() {
                     .collect();
                 let nl = reps(4e6);
                 // std hasher, value shape (u64, u64) as the rho databases
-                let mut m: HashMap<u64, (u64, u64)> = HashMap::with_capacity(size * 2);
+                let mut m: std::collections::HashMap<u64, (u64, u64)> =
+                    std::collections::HashMap::with_capacity(size * 2);
                 let t = Instant::now();
                 for &k in &keys {
                     m.entry(k).or_insert((k, k));
@@ -2722,8 +2750,8 @@ fn main() {
                 let look = time_ns(nl, t);
                 black_box(hits);
                 drop(m);
-                let mut m2: HashMap<u64, (u64, u64), Fast> =
-                    HashMap::with_capacity_and_hasher(size * 2, Fast::default());
+                let mut m2: std::collections::HashMap<u64, (u64, u64), Fast> =
+                    std::collections::HashMap::with_capacity_and_hasher(size * 2, Fast::default());
                 let t = Instant::now();
                 for &k in &keys {
                     m2.entry(k).or_insert((k, k));

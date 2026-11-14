@@ -106,6 +106,92 @@ int main() {
     }
   }
 
+  // The O(1) walk (fes_walk_gray) must emit exactly fes_search_subcube's
+  // list, in the same order, for every prefix at every split, including
+  // the tiny sub-cubes (low_bits 0..3) where the initial correction and
+  // the "no second set bit" case dominate.
+  {
+    std::vector<uint64_t> qsym((size_t)FES_N * FES_N);
+    fes_build_qsym(FES_QUAD_TRI, FES_N, qsym.data());
+    std::vector<uint64_t> oa(1u << 16), ob(1u << 16), da(FES_N), db(FES_N);
+    long prefixes = 0, mismatches = 0, zeros = 0;
+    for (int pb = 0; pb <= FES_N && pb <= 12; ++pb) {
+      const int low = FES_N - pb;
+      for (uint64_t p = 0; p < (1ULL << pb); ++p) {
+        int fa = 0, fb = 0;
+        fes_search_subcube(FES_CONST, FES_LIN, FES_QUAD_TRI, FES_N, low, p,
+                           oa.data(), &fa, (int)oa.size(), da.data());
+        fes_search_subcube_gray(FES_CONST, FES_LIN, FES_QUAD_TRI, qsym.data(),
+                                FES_N, low, p, ob.data(), &fb, (int)ob.size(),
+                                db.data());
+        ++prefixes;
+        zeros += fa;
+        bool same = fa == fb;
+        for (int i = 0; same && i < fa && i < (int)oa.size(); ++i)
+          same = oa[i] == ob[i];
+        if (!same) ++mismatches;
+      }
+    }
+    for (int low = 0; low <= 3 && low <= FES_N; ++low) {
+      for (uint64_t p = 0; p < (1ULL << (FES_N - low)) && p < 4096; ++p) {
+        int fa = 0, fb = 0;
+        fes_search_subcube(FES_CONST, FES_LIN, FES_QUAD_TRI, FES_N, low, p,
+                           oa.data(), &fa, (int)oa.size(), da.data());
+        fes_search_subcube_gray(FES_CONST, FES_LIN, FES_QUAD_TRI, qsym.data(),
+                                FES_N, low, p, ob.data(), &fb, (int)ob.size(),
+                                db.data());
+        ++prefixes;
+        bool same = fa == fb;
+        for (int i = 0; same && i < fa && i < (int)oa.size(); ++i)
+          same = oa[i] == ob[i];
+        if (!same) ++mismatches;
+      }
+    }
+    if (mismatches) {
+      printf("FAIL: O(1) Gray walk differs on %ld of %ld sub-cubes\n",
+             mismatches, prefixes);
+      ++failures;
+    } else {
+      printf("ok: O(1) Gray walk identical on %ld sub-cubes (%ld zeros at splits 0..12)\n",
+             prefixes, zeros);
+    }
+  }
+
+  // The block-unrolled walk (fes_walk_block<6>, the kernel default) must
+  // emit exactly fes_search_subcube's list in the same order, at every split;
+  // low_bits < 6 exercises the fallback to fes_walk_gray.
+  {
+    std::vector<uint64_t> qsym((size_t)FES_N * FES_N);
+    fes_build_qsym(FES_QUAD_TRI, FES_N, qsym.data());
+    std::vector<uint64_t> oa(1u << 16), ob(1u << 16), da(FES_N), db(FES_N);
+    long prefixes = 0, mismatches = 0, zeros = 0;
+    for (int pb = 0; pb <= FES_N && pb <= 14; ++pb) {
+      const int low = FES_N - pb;
+      for (uint64_t p = 0; p < (1ULL << pb); ++p) {
+        int fa = 0, fb = 0;
+        fes_search_subcube(FES_CONST, FES_LIN, FES_QUAD_TRI, FES_N, low, p,
+                           oa.data(), &fa, (int)oa.size(), da.data());
+        fes_search_subcube_block6(FES_CONST, FES_LIN, FES_QUAD_TRI, qsym.data(),
+                                  FES_N, low, p, ob.data(), &fb, (int)ob.size(),
+                                  db.data());
+        ++prefixes;
+        zeros += fa;
+        bool same = fa == fb;
+        for (int i = 0; same && i < fa && i < (int)oa.size(); ++i)
+          same = oa[i] == ob[i];
+        if (!same) ++mismatches;
+      }
+    }
+    if (mismatches) {
+      printf("FAIL: block walk differs on %ld of %ld sub-cubes\n", mismatches,
+             prefixes);
+      ++failures;
+    } else {
+      printf("ok: block walk (K=6) identical on %ld sub-cubes (%ld zeros at splits 0..14)\n",
+             prefixes, zeros);
+    }
+  }
+
   // The workers' default split must also find exactly the brute-force set.
   {
     const int low = fes_default_low_bits(FES_N);

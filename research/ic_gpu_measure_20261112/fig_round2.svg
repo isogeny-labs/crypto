@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 316" width="760" height="316" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">IC GPU kernel speedups, round 2 (A100)</title>
+<desc id="d">Speedup (old median kernel time over new), log scale; each row names the two arms. Medians of 5 interleaved runs; A/A spread at most 0.7 percent.</desc>
+<style>.s{fill:#fcfcfb}.b{fill:#2a78d6}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.s{fill:#1a1a19}.b{fill:#3987e5}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="s" width="760" height="316"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">Round 2: speedups over main c5678a98ae (A100 80GB PCIe)</text>
+<text class="q" x="16" y="42" font-size="12">old median ÷ new median kernel time, log scale; identical outputs in every arm</text>
+<line class="g" x1="300.0" x2="300.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="300.0" y="298" font-size="11" text-anchor="middle">1×</text>
+<line class="g" x1="430.0" x2="430.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="430.0" y="298" font-size="11" text-anchor="middle">2×</text>
+<line class="g" x1="560.0" x2="560.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="560.0" y="298" font-size="11" text-anchor="middle">4×</text>
+<line class="g" x1="690.0" x2="690.0" y1="52" y2="282" stroke-width="1"/>
+<text class="q" x="690.0" y="298" font-size="11" text-anchor="middle">8×</text>
+<text class="p" x="290" y="71.4" font-size="12" text-anchor="end">FES, n=32: Gray walk → block walk (K=6)</text>
+<g><title>FES, n=32: Gray walk → block walk (K=6): 4.11× faster</title><path class="b" d="M300,56 h260.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-260.9 z"/></g>
+<text class="p" x="570.9" y="71.4" font-size="12" font-weight="600">4.11×</text>
+<text class="p" x="290" y="107.4" font-size="12" text-anchor="end">FES, n=30: Gray walk → block walk (K=6)</text>
+<g><title>FES, n=30: Gray walk → block walk (K=6): 3.88× faster</title><path class="b" d="M300,92 h250.1 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-250.1 z"/></g>
+<text class="p" x="560.1" y="107.4" font-size="12" font-weight="600">3.88×</text>
+<text class="p" x="290" y="143.4" font-size="12" text-anchor="end">FES, n=26: Gray walk → block walk (K=6)</text>
+<g><title>FES, n=26: Gray walk → block walk (K=6): 2.40× faster</title><path class="b" d="M300,128 h160.1 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-160.1 z"/></g>
+<text class="p" x="470.1" y="143.4" font-size="12" font-weight="600">2.40×</text>
+<text class="p" x="290" y="179.4" font-size="12" text-anchor="end">FES, n=24 m=12: Gray walk → block walk</text>
+<g><title>FES, n=24 m=12: Gray walk → block walk: 1.66× faster</title><path class="b" d="M300,164 h90.6 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-90.6 z"/></g>
+<text class="p" x="400.6" y="179.4" font-size="12" font-weight="600">1.66×</text>
+<text class="p" x="290" y="215.4" font-size="12" text-anchor="end">macaulay, batch 8192: cursor → 2D update</text>
+<g><title>macaulay, batch 8192: cursor → 2D update: 1.11× faster</title><path class="b" d="M300,200 h16.3 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-16.3 z"/></g>
+<text class="p" x="326.3" y="215.4" font-size="12" font-weight="600">1.11×</text>
+<text class="p" x="290" y="251.4" font-size="12" text-anchor="end">rootfind best knob vs default (hash/C64)</text>
+<g><title>rootfind best knob vs default (hash/C64): 1.00× faster</title><path class="b" d="M300,236 h-2.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h2.0 z"/></g>
+<text class="p" x="308.0" y="251.4" font-size="12" font-weight="600">1.00×</text>
+</svg>

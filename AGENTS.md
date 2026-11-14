@@ -1113,6 +1113,23 @@ Every cross-method comparison and every ranking must:
   group-addition equivalents per native operation, applied the same way
   to every arm. Pinned calibrations may be added as a further point, but
   they never replace the band.
+- **A calibrated weight for field-arithmetic counters** (owner, 2026-11-12).
+  Some counters count base-field multiplications: the `mod p` or `mod r`
+  mulmods of linear algebra, smoothness tests and root finding. Price those
+  counters at a per-host calibrated weight `w_cal` as well as the band. Here
+  `w_cal` is the time of one native mulmod divided by the time of one group
+  addition on the same curve and host. Measure it with `perf-ipc` on an
+  isolated host where one is available. Otherwise use a best-of-N timing,
+  labelled as such. Record `w_cal`, its method and the host in the run's
+  metadata. Report the order of the arms at `w = 0`, at `w_cal` and at
+  `10·w_cal`. When it holds at all three, report the pair as **ranked at
+  calibrated price** next to the band verdict. The band verdict is still
+  reported and still governs the leaderboard tables. Reason: the IC positive
+  control (`research/ic_positive_control_20261112/`,
+  `problems/section5a-band-cannot-show-a-known-ic-win.md`) measured a mulmod
+  at about 0.005–0.013 GAE on lab hosts. At the band's 0.1 and 1 GAE, an IC
+  expected to cost less than rho read 5.8× and 31× rho at p = 65,537, so the
+  band alone could not tell that win from a loss.
 - **Rank only where the conclusion holds at every weight in the band.**
   If the order of two arms changes inside the band, report them as
   unresolved at that boundary, never as a win for either side.

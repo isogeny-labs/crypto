@@ -1,0 +1,10 @@
+cwd: $SCR/exp_c5678a9/tree (git archive of c5678a98aef6bbee34df3f277e618dd0a00f8ab1); release build, rustc 1.97.0
+cover_pushforward --seeds 3 --json t3/replay_primary.json --svg t3/replay_primary.svg   (exit 0)
+  json_diff vs pushforward.json: 3205 leaves, 0 non-timing differences; run.log identical (minus 'wrote' lines)
+  SVG: differs from committed pushforward.svg in two rows (separator ' , ' committed vs ' / ' from the committed writer) -> svg_diff.txt
+cover_pushforward --seeds 15 --json t3/replay_15.json   (exit 0)
+  json_diff vs pushforward_15seeds.json: 14125 leaves, 0 non-timing differences; run_15seeds.log identical
+val_cp_dump 211,419,821,1619,3203,6421,12841 15 > t3/cp_dump.jsonl  (validator copy of cover_pushforward.rs, main() replaced by an instance dump; diff checked)
+check_cp_instances.py -> 105 instances checked, 882 recorded logs checked by vlib ([k]G_E = T_E on E1, [k]G = T on J(C)), 0 errors
+  negative control: 2 tampered logs -> 3 rejections (EC and Jacobian certificates)
+recompute_pushforward.py -> 0 errors; check_pushforward_md.py -> 217 numbers, 0 mismatches; check_record_metrics.py -> 48 metrics, 0 mismatches

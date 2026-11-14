@@ -86,9 +86,17 @@ SEM_HD uint64_t gf_mask(const Gf2n& f) {
 
 /* Use the native carry-less multiply-add where the target has it.
  * Override with -DGF2N_CLMAD=0 to force the portable path, which is how
- * the two are compared. */
+ * the two are compared.
+ *
+ * The default also needs a toolkit whose ptxas knows `clmad`: CUDA 12.8
+ * (A100 pod, 2026-11-12) and 12.9 (docs/perf/20261112-ic-gpu-audit.md)
+ * reject it ("Not a name of any known instruction"), and the default
+ * build failed there.  13.3 is the version the 22.4% measurement above
+ * used; 13.0-13.2 are untested, so they take the portable path unless
+ * -DGF2N_CLMAD=1 is given.  Both paths give the same result. */
 #ifndef GF2N_CLMAD
-#  if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800)
+#  if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800) && defined(__CUDACC_VER_MAJOR__) && \
+      (__CUDACC_VER_MAJOR__ > 13 || (__CUDACC_VER_MAJOR__ == 13 && __CUDACC_VER_MINOR__ >= 3))
 #    define GF2N_CLMAD 1
 #  else
 #    define GF2N_CLMAD 0
