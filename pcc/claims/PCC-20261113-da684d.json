@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T07:57:31Z",
+ "id": "PCC-20261113-da684d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d42ef187472f366c32dada33a381abfa4eb6ba53",
+  "model": "",
+  "session": "prime-ic-cost-floor-20261113"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1965a177a7560e6a1607766b54ddcea6a8717d554788565bbb5140f6c986d1dc",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "PrimeICCostFloor.entropyWorkNoBeat"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "declared single-target cost-accounting model only; not a lower bound on an actual solver or ECDLP algorithm",
+ "statement": "For every real p>1,b>=1, the single-target work with the defined entropy charge and max-one-call floor has square strictly greater than p."
+}

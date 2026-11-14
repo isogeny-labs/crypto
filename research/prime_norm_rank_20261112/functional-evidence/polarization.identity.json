@@ -1,0 +1,259 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h345f3824264d232a",
+  "statement": {
+    "name": "Universal norm polarization",
+    "source": "NormPencilFunctional.normPolarization; universal CommRing polynomial identity",
+    "variables": [
+      "A",
+      "B",
+      "Q",
+      "T",
+      "f"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "A"
+                        },
+                        {
+                          "op": "var",
+                          "args": "Q"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "add",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "A"
+                        },
+                        {
+                          "op": "var",
+                          "args": "Q"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "f"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "B"
+                              },
+                              {
+                                "op": "var",
+                                "args": "T"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "add",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "B"
+                              },
+                              {
+                                "op": "var",
+                                "args": "T"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "A"
+                      },
+                      {
+                        "op": "var",
+                        "args": "A"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "f"
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "B"
+                            },
+                            {
+                              "op": "var",
+                              "args": "B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "Q"
+                  },
+                  {
+                    "op": "var",
+                    "args": "Q"
+                  }
+                ]
+              },
+              {
+                "op": "neg",
+                "args": {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "f"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "T"
+                        },
+                        {
+                          "op": "var",
+                          "args": "T"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 2
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "A"
+                },
+                {
+                  "op": "var",
+                  "args": "Q"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "f"
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "B"
+                      },
+                      {
+                        "op": "var",
+                        "args": "T"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111304,
+  "value_digest": "d1b51d4f71571ecdceb776697574b30078a4ba7e56417ac4efb09f6d522a22f4",
+  "independence": "Unsigned universal expression check; separate Lean proof supplies functional/degree hypotheses",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormPencilFunctional.lean",
+    "sha256": "10ec069e5790298e6b29cb33ad061a4d962c16a339829074d743e21f5af9a8dc"
+  }
+}

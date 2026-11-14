@@ -20,7 +20,7 @@
 //! `m ≥ 3` Semaev systems are cubic and are refused here.
 
 use super::wdsat_oracle::AnfRow;
-use crate::cryptanalysis::pq_groebner_f2::{mask_from64, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{mask_from64, F2BoolPoly, Mask};
 
 /// Packed quadratic form over `n` Boolean variables: constant, linear
 /// coefficients, and upper-triangular quadratic coefficients.
@@ -69,8 +69,43 @@ impl QuadraticForm {
         Some(form)
     }
 
+    /// The form of a quadratic polynomial, read straight off its term masks:
+    /// the same coefficients as `from_anf_row(&AnfRow::from_poly(poly), n)`
+    /// (constant, `x_i`, and `x_i x_j` toggled once per term; `None` for a
+    /// term of degree above 2 or a variable `>= n`) without building the
+    /// per-monomial variable lists (`AnfRow::from_poly` was about 80% of a
+    /// `fes-f2` call outside its search at 30 unknowns).
     pub fn from_poly(poly: &F2BoolPoly) -> Option<Self> {
-        Self::from_anf_row(&AnfRow::from_poly(poly), poly.n_vars)
+        let n = poly.n_vars;
+        let mut form = Self {
+            n,
+            constant: false,
+            linear: vec![false; n],
+            quad: (0..n).map(|i| vec![false; i]).collect(),
+        };
+        for term in &poly.terms {
+            let mask = term.mask;
+            match mask.count_ones() {
+                0 => form.constant = !form.constant,
+                1 => {
+                    let v = mask.trailing_zeros() as usize;
+                    if v >= n {
+                        return None;
+                    }
+                    form.linear[v] = !form.linear[v];
+                }
+                2 => {
+                    let b = mask.trailing_zeros() as usize;
+                    let a = (Mask::BITS - 1 - mask.leading_zeros()) as usize;
+                    if a >= n {
+                        return None;
+                    }
+                    form.quad[a][b] = !form.quad[a][b];
+                }
+                _ => return None,
+            }
+        }
+        Some(form)
     }
 
     /// Evaluate at a bit-packed point (`bit i` = value of `x_i`).
@@ -1228,5 +1263,62 @@ mod tests {
         for x in roots.unwrap() {
             assert!(forms.iter().all(|f| !f.eval(x)), "bad Monica root {x:#x}");
         }
+    }
+
+    /// `from_poly` reads coefficients straight off the term masks; it must
+    /// give exactly what the two-step route through `AnfRow` gives, including
+    /// `None` for degree-3 terms and variables at or beyond `n`.
+    #[test]
+    fn from_poly_equals_the_anf_row_route() {
+        use super::{AnfRow, F2BoolPoly, QuadraticForm};
+        use crate::cryptanalysis::pq_groebner_f2::F2BoolMono;
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(4044);
+        let (mut some, mut none) = (0, 0);
+        for trial in 0..3000usize {
+            let n = 1 + trial % 40;
+            // Even trials: valid quadratic terms only (every bit < n); odd
+            // trials may reach past n and include degree-3 terms (rejected).
+            let valid = trial % 2 == 0;
+            let span = if valid { n } else { (n + 2).min(60) };
+            let k = rng.gen_range(0..40);
+            let terms: Vec<F2BoolMono> = (0..k)
+                .map(|_| {
+                    let deg = match rng.gen_range(0..100) {
+                        0..=4 => 0,
+                        5..=39 => 1,
+                        40..=97 => 2,
+                        _ if valid => 2,
+                        _ => 3,
+                    };
+                    let mut m = 0u64;
+                    while (m.count_ones() as usize) < deg.min(span) {
+                        m |= 1u64 << rng.gen_range(0..span);
+                    }
+                    F2BoolMono {
+                        mask: mask_from64(m),
+                    }
+                })
+                .collect();
+            let poly = F2BoolPoly { terms, n_vars: n };
+            let a = QuadraticForm::from_poly(&poly);
+            let b = QuadraticForm::from_anf_row(&AnfRow::from_poly(&poly), n);
+            match (a, b) {
+                (None, None) => none += 1,
+                (Some(a), Some(b)) => {
+                    assert_eq!(
+                        (a.n, a.constant, &a.linear, &a.quad),
+                        (b.n, b.constant, &b.linear, &b.quad),
+                        "trial {trial}"
+                    );
+                    some += 1;
+                }
+                (a, b) => panic!("trial {trial}: {:?} vs {:?}", a.is_some(), b.is_some()),
+            }
+        }
+        assert!(
+            some > 1000 && none > 300,
+            "coverage: {some} forms, {none} rejections"
+        );
     }
 }

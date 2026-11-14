@@ -635,6 +635,48 @@ Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^
 
 Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_20261112/); [report](../../research/mt_fieldops_v5_20261112/REPORT.pdf); source `research/mt_fieldops_v5_20261112/results/holdout/summary.json`. v4, without native work priced: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/). Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
 
+## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)
+
+The live source tree now exposes **104 top-level ECBench methods** and **33 nested algorithms** (20 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
+
+### Solver and GPU diagnostics
+
+The newly registered `primo-smt` backend is correctness-qualified for binary-field `descent-algebraic` systems and returns one independently checked Boolean model. It has no matched performance record and no prime-field route, so it changes the implementation census but not the measured frontier. [Integration boundary](../../integrations/primo/README.md).
+
+The validated `fes-then-batched` composition costs 0.739–0.889× inherited F4 at the calibration points, but remains 35.24–3012.56× matched rho. Across the §5a band its strict order against inherited F4 is unresolved, so this is a solver-local result, not a frontier promotion. [Study](../../research/fes_then_batched_20261112/README.md).
+
+The GPU FES end-to-end probe is one-pod, `[pcc:unverified]`, with no independent replay. Wall time improves sharply while counted work becomes worse, so the wall column cannot substitute for the ranked cost column:
+
+| instance | GPU FES counted / inherited F4 | inherited-F4 wall / GPU wall | CPU-FES wall / GPU wall | inherited F4 / rho | GPU FES / rho |
+|:--|--:|--:|--:|--:|--:|
+| char2-n25 | 53.0× | 10.4× | 44.1× | 4362× | 231367× |
+| char2-n29 | 106.0× | 23.1× | — | 30856× | 3270693× |
+| koblitz-n23 | 10.0× | 17.7× | 12.3× | 2014× | 20054× |
+
+At kernel scope, Gray-code FES is 18.6× (n=26) and 25.8× (n=30) faster than the old kernel; block-six then adds 3.88× at n=30 and 4.11× at n=32 (about 100× cumulative at n=30). Shared-1024 Macaulay is 3.41–4.15× faster than the old global kernel; the later 2-D change adds only 1.11–1.12×. These are component results only. [GPU E2E report](../../research/ic_gpu_e2e_20261113/REPORT.md).
+
+### Rho, root finding, transfer and whole-Jacobian probes
+
+The unverified L0 rho lane diagnostic trades more counted operations for lower wall time: lanes=8 is 1.043× operations and 0.761× E2E wall; lanes=32 is 1.149× operations and 0.639× wall. The §5a ranking still selects base negation rho. Prime batched root finding preserves counted S exactly and changes wall ns/GAE by 0.486× [0.468, 0.504]. [Audit](../../docs/perf/20261112-rust-deep-audit.md).
+
+The admitted transfer remeasurement has **0/162 below rho**, 156 above and 6 unresolved lower-bound rows. The whole-Jacobian L0 probe is above the calibrated band in 7/7 cells for both arms and has a minimum group-only ratio of 18.0×, but remains unresolved because the frozen slope rule fails (A slope 0.421, CI lower -0.070; B slope -0.053, CI lower -0.654).
+
+### Current construction bottlenecks
+
+The table-free `lin21-ht` collector uses 15.7 MB at n=41 versus 2558.1 MB for the pair-table floor, and reaches n=59 at 518.7 MB. Its online count is still 2.89–10.87× the floor; the counted slope delta 0.0006 has CI [-0.0004, 0.0016], crossing zero. This removes a memory barrier, not the work barrier.
+
+- `k0n53` folded-pair construction: 34.58 ns/pair; streaming plus sort/fill is 26.70 ns/pair (77.2% of the whole).
+- `k0n61` folded-pair construction: 35.48 ns/pair; streaming plus sort/fill is 26.73 ns/pair (75.4% of the whole).
+
+The current Top filter layout is identity-equivalent in these A/B rounds but slower to build than the frozen Low layout:
+
+| cell | Top / Low build [95%] | rounds | dropped | identity mismatches |
+|:--|--:|--:|--:|--:|
+| k0n53 | 1.104 [1.070, 1.143] | 41 | 1 | 0 |
+| k0n61 | 1.142 [1.098, 1.165] | 42 | 0 | 0 |
+
+The old ECBench IDs therefore remain frozen on Low while the explicit `_v2` IDs name Top; this prevents a silent benchmark mutation. The prime-leads chase remains prospective/inconclusive and has no sub-square-root prime result. All entries in this reconciliation are diagnostic unless separately marked admitted above.
+
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
 Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion (m = 4, N = 12, f4_fp, p = 786433, two random targets, uncontended) reduces the F4 stage from 1.102e+11 to 4.010e+05 counted field operations (2.75e+05×), the widest matrix from 21,619 to 3,663 columns (5.90×) and the time per system from 70.2 s to 0.0087 s (8.07e+03×). Class: solver-stage diagnostic; no pipeline is priced and no curve verdict changes. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
@@ -822,6 +864,33 @@ Crossover against negation-map rho:
 - DL, M-eq w=0.1: resolved from q = 991, interpolated q* = 456.2 [343.7, 639.0]
 - DL, M-eq w=1: resolved from q = 991, interpolated q* = 276.3 [231.9, 319.4]
 - DL, wall: resolved from q = 8191, interpolated q* = 5704.2 [1495.3, 7612.6]
+
+
+## GHS-weak E0/F_{q^3}: c_D = 1.7 with a fixed-exponent square root against the frozen DL, outside tables A–C
+
+Same instances as the N4 v2 section (k = 18..22, seeds 1–3): the double-large-prime factor base shrunk from c_D = 2.0 to 1.7 and the per-pair square root computed by a fixed addition chain (same values). Cold M-eq of the new configuration divided by the frozen DL on the same instance; geometric mean over seeds, with mod-ell and F_q additions priced at 0 (the frozen model), 0.5 and 1 M-eq each. ✓ = below 1 at every seed. Class: component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family). validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json).
+
+| IC arm | k | additions 0 | 0.5 | 1 |
+|:--|--:|--:|--:|--:|
+| DL | 18 | 0.726 ✓ | 0.814 ✓ | 0.860 ✓ |
+| DL | 19 | 0.737 ✓ | 0.831 ✓ | 0.877 ✓ |
+| DL | 20 | 0.694 ✓ | 0.796 ✓ | 0.848 ✓ |
+| DL | 21 | 0.710 ✓ | 0.812 ✓ | 0.862 ✓ |
+| DL | 22 | 0.681 ✓ | 0.794 ✓ | 0.851 ✓ |
+| DL1 | 18 | 0.729 ✓ | 0.878 ✓ | 0.942 ✓ |
+| DL1 | 19 | 0.754 ✓ | 0.913 ✓ | 0.975 ✓ |
+| DL1 | 20 | 0.668 ✓ | 0.846 ✓ | 0.921 ✓ |
+| DL1 | 21 | 0.700 ✓ | 0.871 ✓ | 0.941 ✓ |
+| DL1 | 22 | 0.644 ✓ | 0.841 ✓ | 0.922 ✓ |
+| D | 18 | 1.092 | 1.100 | 1.106 |
+| D | 19 | 1.122 | 1.127 | 1.130 |
+| D | 20 | 1.072 | 1.083 | 1.090 |
+| D | 21 | 1.089 | 1.098 | 1.104 |
+| D | 22 | 1.078 | 1.089 | 1.098 |
+
+DL with both changes against the frozen negation-map rho at k = 22 (mean cold M-eq, §5a band): w = 0: 0.0027, w = 0.1: 0.0025, w = 1: 0.0018.
+
+Study: [research/quartic_dl1_cd_sqrt_20261113/](../../research/quartic_dl1_cd_sqrt_20261113/); [report](../../research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf); source `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json`. Wall time is not claimed (local L0 runs; CPU diagnostic in the study).
 
 
 ## N83 Tier 1 one-target cold factor-base holdout
@@ -1056,9 +1125,28 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
 - `research/mt_fieldops_v5_20261112/results/holdout/summary.json` — sha256 `130f9c0da9b3546b…`
+- `research/fes_then_batched_20261112/validation/headline.json` — sha256 `468787a41a6aa47b…`
+- `research/fes_then_batched_20261112/README.md` — sha256 `6dc894448c5dcbff…`
+- `research/ic_gpu_e2e_20261113/results.json` — sha256 `9ec25e5885ed5cb5…`
+- `research/ic_gpu_e2e_20261113/REPORT.md` — sha256 `6146ddab0f94a6d1…`
+- `research/ic_gpu_measure_20261112/results.json` — sha256 `23ddce3bb25d9594…`
+- `research/ic_gpu_measure_20261112/results2.json` — sha256 `e39fadca413cea84…`
+- `docs/perf/20261112-rust-deep-audit.md` — sha256 `e995c613c4a3e50c…`
+- `research/negation_remeasure_20261113/summary.json` — sha256 `34c71b094865a835…`
+- `research/negation_remeasure_20261113/VALIDATION.json` — sha256 `eba6273e3ff0f482…`
+- `research/full_jacobian_ic_20261113/full_jacobian.json` — sha256 `e65114ea8bf019ac…`
+- `research/groebner_free_matched_20261113/SUMMARY.json` — sha256 `c69cfd5628ea8e20…`
+- `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
+- `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
+- `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `1452c4c7672603e5…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
+- `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
+- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`
+- `research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json` — sha256 `d363ee50d3da05c2…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

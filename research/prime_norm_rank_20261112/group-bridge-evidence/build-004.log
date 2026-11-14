@@ -1,0 +1,29 @@
+✖ [2060/2061] Building NormGroupBridge (2.3s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/NormGroupBridge.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormGroupBridge.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/lib/lean/NormGroupBridge.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormGroupBridge.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_norm_rank_20261112/lean/.lake/build/ir/NormGroupBridge.setup.json --json
+error: NormGroupBridge.lean:136:15: Unknown constant `Units.val_prod`
+error: NormGroupBridge.lean:139:45: Application type mismatch: The argument
+  hu
+has type
+  ∏ i, ↑(u i) = ↑(∏ i, CoordinateRing.XYIdeal W (x i) (C (y i)))
+but is expected to have type
+  ↑(∏ x, u x) = ↑(∏ i, CoordinateRing.XYIdeal W (x i) (C (y i)))
+in the application
+  ClassGroup.mk_eq_one_of_coe_ideal hu
+error: NormGroupBridge.lean:142:36: Unknown constant `Additive.ofMul_prod`
+error: NormGroupBridge.lean:142:2: Type mismatch: After simplification, term
+  have this := rfl;
+  this
+ has type
+  Additive.ofMul 1 = 0
+but is expected to have type
+  ∑ x_1, (ClassGroup.mk W.FunctionField) (CoordinateRing.XYIdeal' ⋯) = 0
+info: NormGroupBridge.lean:154:0: 'NormGroupBridge.quotientFinite' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:155:0: 'NormGroupBridge.idealsEqualOfDimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:156:0: 'NormGroupBridge.pointIdealsCoprime' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:157:0: 'NormGroupBridge.pointQuotientDimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:158:0: 'NormGroupBridge.principalPointProduct' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:159:0: 'NormGroupBridge.pointSumOfPrincipal' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: NormGroupBridge.lean:160:0: 'NormGroupBridge.normDegreePointSum' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- NormGroupBridge
+error: build failed

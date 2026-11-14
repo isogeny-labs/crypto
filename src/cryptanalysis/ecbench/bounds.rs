@@ -279,6 +279,26 @@ pub struct SizeRow {
     /// priced.  Empty for a bound fitted at a weight.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub band: Vec<BandPoint>,
+    /// Fit version 2 on sessions that carry a `w_cal`
+    /// ([`super::runner::read_wcal`]) and a fit not at a weight; absent
+    /// otherwise, so every earlier bound re-derives with the same id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedPoint>,
+}
+
+/// The calibrated reading of AGENTS.md §5a (2026-11-12) on one size: mean `S`
+/// over the verified runs with the field-multiplication counters at
+/// `field_weights` and every other native counter at `other_weights`
+/// (`mean_s[i][j]`; `None` where a run's counter has no count).  A point
+/// reading beside [`BandPoint`]; it replaces nothing.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CalibratedPoint {
+    pub w_cal: f64,
+    pub method: String,
+    pub host: String,
+    pub field_weights: Vec<f64>,
+    pub other_weights: Vec<f64>,
+    pub mean_s: Vec<Vec<Option<f64>>>,
 }
 
 /// One axis on one size.
@@ -1253,6 +1273,11 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             .push(r);
     }
     let mut sizes: Vec<SizeRow> = Vec::new();
+    let wcal = if v2 && opts.weight.is_none() {
+        super::runner::shared_wcal(inputs.dirs)?
+    } else {
+        None
+    };
     // Intervals fit version 2 refused for excluding their estimate.
     let mut refused: Vec<String> = Vec::new();
     for (slug, rs) in &by_slug {
@@ -1336,6 +1361,10 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             }),
             axes: size_axes,
             band: size_band,
+            calibrated: match (&wcal, v2 && opts.weight.is_none()) {
+                (Some(w), true) => Some(calibrated_point(&ok, w)?),
+                _ => None,
+            },
         });
     }
     sizes.sort_by_key(|a| a.r);
@@ -2004,6 +2033,35 @@ fn size_axes_and_band(
         }
     }
     (axes, band)
+}
+
+fn calibrated_point(ok: &[&&Record], w: &super::band::WCal) -> Result<CalibratedPoint, String> {
+    w.validate()?;
+    let fw = [0.0, w.w_cal, 10.0 * w.w_cal];
+    let mut mean_s = Vec::new();
+    for wf in fw {
+        let mut row = Vec::new();
+        for wo in BAND_WEIGHTS {
+            let mut vals = Vec::new();
+            let mut all = !ok.is_empty();
+            for r in ok {
+                match super::band::priced_s_split(r, wf, wo, super::band::Pricing::default())? {
+                    Some(v) => vals.push(v),
+                    None => all = false,
+                }
+            }
+            row.push(all.then(|| vals.iter().sum::<f64>() / vals.len() as f64));
+        }
+        mean_s.push(row);
+    }
+    Ok(CalibratedPoint {
+        w_cal: w.w_cal,
+        method: w.method.clone(),
+        host: w.host.clone(),
+        field_weights: fw.to_vec(),
+        other_weights: BAND_WEIGHTS.to_vec(),
+        mean_s,
+    })
 }
 
 /// Re-derive a committed bound from the sessions it names and require the

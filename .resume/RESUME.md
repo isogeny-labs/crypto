@@ -1,20 +1,15 @@
-# Resume: crypto @ aburan28/laughing-darwin-3qdnk2
+# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-Owner (2026-11-12): "Keep optimizing" the index calculus. Then "1-2", answered as a proper A/B on both
-null levers: (1) one inverse per ± twin pair in the fold build; (2) filter-probe lookahead 64 in the
-aimed scan.
+Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
 
 ## Spec
-research/ic_tool_program/explorations/build-pairing-lookahead-20261112/ab/PROTOCOL.md (frozen before any
-row). Runner: ab/run.sh, with BIN=/dev/shm/blab/ic (SHA-256 in ab/runs/arms.sha256; built from 62f1f0a778
-with --features scan-probes) and ISO=/tmp/claude-0/rulev9/bin/isolated_bench. 44 rounds × 2 rows × 4 labels.
-Bench record: benchmarks/records/20261112T2321Z-ic-build-pairing-lookahead-ab.json.
+Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
+Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
+Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
 
 ## State
-2026-11-12 23:2xZ: launching. run.sh resumes: it skips finished rows. If /dev/shm is lost, rebuild the
-binary from 62f1f0a778; the hash will differ, so the session restarts with a new arms.sha256 (declare it).
+2026-11-14: patch written, release build running. No rows yet.
 
 ## Next
-summarise (adapt lever 2's ab/summarise.sh to the labels a q b l), report and PDF, close the record,
-apply the decision rule (keep or revert each switch), and update PR aburan28/crypto#4014.
+Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.

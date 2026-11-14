@@ -406,6 +406,78 @@
    "path": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
    "sha256": "130f9c0da9b3546bf786495c0949937b2997c6ecda2352e01c700cc19aa923eb"
   },
+  "fes_then_batched": {
+   "path": "research/fes_then_batched_20261112/validation/headline.json",
+   "sha256": "468787a41a6aa47b6301148cdeff1051f9d346a2cd2ed620010a91c47fec91fe"
+  },
+  "fes_then_batched_readme": {
+   "path": "research/fes_then_batched_20261112/README.md",
+   "sha256": "6dc894448c5dcbffb9fab014d239a1890767c50fc6e32d9303faafc3a52b8d1e"
+  },
+  "gpu_fes_e2e": {
+   "path": "research/ic_gpu_e2e_20261113/results.json",
+   "sha256": "9ec25e5885ed5cb5dec28ed27b44a780ade2f3e7d3db935377a3b63029ae530a"
+  },
+  "gpu_fes_e2e_report": {
+   "path": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "sha256": "6146ddab0f94a6d1a763e1d6ad7fcf760bf391f725b1c25865bb29e06de12b62"
+  },
+  "gpu_kernel_round1": {
+   "path": "research/ic_gpu_measure_20261112/results.json",
+   "sha256": "23ddce3bb25d959405818707042095bf445e2031f32ee5a5e74d051548207522"
+  },
+  "gpu_kernel_round2": {
+   "path": "research/ic_gpu_measure_20261112/results2.json",
+   "sha256": "e39fadca413cea84fb33ced2e89507c364fe174c66bbc0ab4152759b11f4e088"
+  },
+  "rust_deep_audit": {
+   "path": "docs/perf/20261112-rust-deep-audit.md",
+   "sha256": "e995c613c4a3e50cf3dd70c089035cdf067a566959a2fbfe7536179d7d55b494"
+  },
+  "transfer_negation_remeasure": {
+   "path": "research/negation_remeasure_20261113/summary.json",
+   "sha256": "34c71b094865a8358c46001712991b0d155819eb3821ea47d729d83bc0b01dec"
+  },
+  "transfer_negation_validation": {
+   "path": "research/negation_remeasure_20261113/VALIDATION.json",
+   "sha256": "eba6273e3ff0f48251fb28e41627539de89bf78656ebbd18670e7418e6090e4a"
+  },
+  "full_jacobian_ic": {
+   "path": "research/full_jacobian_ic_20261113/full_jacobian.json",
+   "sha256": "e65114ea8bf019ac4e4ae76f6eb5bf2f036dfb496b95816532ba49c8fa7c9d7c"
+  },
+  "groebner_free": {
+   "path": "research/groebner_free_matched_20261113/SUMMARY.json",
+   "sha256": "c69cfd5628ea8e20b6753c975f0ea2d99320e4531eb3c0d898e29f346032608c"
+  },
+  "folded_build_steps": {
+   "path": "research/ic_tool_program/explorations/build-steps-20261113/summary.json",
+   "sha256": "34edc872ae14d24b301e129b880a3d7c6639f9059f10036ac6a4b4f4e7c91817"
+  },
+  "folded_filter_layout": {
+   "path": "research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json",
+   "sha256": "3ace18c28337e08bfce03c90555302295e457ef83d779265bc416b9f22d053d0"
+  },
+  "prime_leads_chase": {
+   "path": "research/prime_leads_chase_20261113/README.md",
+   "sha256": "1c894b6f2b41a373a433b79fc8b8ff4f57291a04e486b61a585081068e465bcb"
+  },
+  "ecbench_methods_source": {
+   "path": "src/cryptanalysis/ecbench/methods.rs",
+   "sha256": "1452c4c7672603e52c2ee7e0538d7ca0a15fdc0b291230de47f7eb6274a4a6b8"
+  },
+  "solver_registry_source": {
+   "path": "src/cryptanalysis/ic_framework/solvers.rs",
+   "sha256": "f8f9a75589e9690274d655b5996301729be1cd58bbcd048e7d7a169298eb31a8"
+  },
+  "primo_readme": {
+   "path": "integrations/primo/README.md",
+   "sha256": "4ec69082225f9f8867f170bf054fae567a894329987c80a760997c0cf538c59f"
+  },
+  "optimization_source": {
+   "path": "src/cryptanalysis/ecbench/optimization.rs",
+   "sha256": "6d71ad769ca27a3e3d8595ebe34c58e6c649a6fbc2852d87865e6878e99f83c9"
+  },
   "ghs_weak_n4": {
    "path": "research/quartic_n4_20261019/results/summary_all.json",
    "sha256": "fd5598a2860d965c8b47ca9163cb1ff101150c3b04690ea208d05d8c87b067e7"
@@ -417,6 +489,10 @@
   "ghs_weak_n4v2": {
    "path": "research/quartic_n4v2_20261020/results/summary.json",
    "sha256": "a8d6c823f4b90829f409ef20e51df7de70fae6789a6458e272a730e71483ad7c"
+  },
+  "ghs_weak_cd_chain": {
+   "path": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
+   "sha256": "d363ee50d3da05c23085ae383ffadc61bcfe77e77711e756559ae79ed3656c79"
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -339473,6 +339549,261 @@
   "validation": "validated: replay certificate, validator report and the rho reference (cheapest standard multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band (benchmarks/20261112-mt-fieldops-v5/VALIDATION.json)",
   "validated": true
  },
+ "nov13_frontier_diagnostics": {
+  "as_of": "2026-11-14",
+  "ranking_effect": "none: no row of tables A-C changes",
+  "live_census": {
+   "top_level_methods": 104,
+   "solver_backends": 20,
+   "pdp3_engines": 9,
+   "pkm_tower_engines": 4,
+   "nested_algorithms": 33,
+   "pdp3_names": [
+    "inherited-f4",
+    "f6-ic",
+    "f6-ic-pair",
+    "matrix-f4",
+    "matrix-f5",
+    "rootfind",
+    "rootfind-window",
+    "rootfind-negfold",
+    "rootfind-window-negfold"
+   ],
+   "pkm_tower_names": [
+    "f4",
+    "sig-f5",
+    "f6",
+    "enum"
+   ],
+   "new_unbenchmarked_backends": [
+    {
+     "id": "primo-smt",
+     "scope": "binary-field descent through descent-algebraic",
+     "status": "correctness-qualified; no matched performance record",
+     "prime_field_route": false,
+     "source": "integrations/primo/README.md"
+    }
+   ]
+  },
+  "fes_then_batched": {
+   "ftb_over_inherited_f4_range": [
+    0.738734650561,
+    0.888690298771
+   ],
+   "distance_to_rho": [
+    {
+     "cell": "koblitz-n13",
+     "ratio": 35.2352951656
+    },
+    {
+     "cell": "koblitz-n17",
+     "ratio": 144.718861556
+    },
+    {
+     "cell": "koblitz-n19",
+     "ratio": 305.453131633
+    },
+    {
+     "cell": "koblitz-n23",
+     "ratio": 1907.79331835
+    },
+    {
+     "cell": "char2-n15",
+     "ratio": 121.721522531
+    },
+    {
+     "cell": "char2-n21",
+     "ratio": 3012.55646224
+    }
+   ],
+   "validation": "validated arithmetic; no ranked row"
+  },
+  "gpu_fes_e2e": {
+   "rows": [
+    {
+     "instance": "char2-n25",
+     "gpu_over_inherited_counted": 53.0404669412,
+     "inherited_over_gpu_wall": 10.4406607718,
+     "inherited_over_rho": 4362.08514098,
+     "gpu_over_rho": 231367.032715,
+     "cpu_fes_over_gpu_wall": 44.0528809246
+    },
+    {
+     "instance": "char2-n29",
+     "gpu_over_inherited_counted": 105.997373458,
+     "inherited_over_gpu_wall": 23.1388321432,
+     "inherited_over_rho": 30856.3591934,
+     "gpu_over_rho": 3270693.02896,
+     "cpu_fes_over_gpu_wall": null
+    },
+    {
+     "instance": "koblitz-n23",
+     "gpu_over_inherited_counted": 9.95656693362,
+     "inherited_over_gpu_wall": 17.7268036221,
+     "inherited_over_rho": 2014.13116948,
+     "gpu_over_rho": 20053.831802,
+     "cpu_fes_over_gpu_wall": 12.2725712819
+    }
+   ],
+   "validation": "pcc:unverified; one pod; no independent replay"
+  },
+  "gpu_components": {
+   "gray_over_old": {
+    "fes26": 0.0538600134788,
+    "fes30": 0.0387293852255
+   },
+   "block_b6_over_gray": {
+    "fes30": 0.258021655495,
+    "fes32": 0.24358192711
+   },
+   "fes30_block_b6_over_old": 0.0099930200922,
+   "macaulay_shared1024_over_old_range": [
+    0.241185647426,
+    0.29354094579
+   ],
+   "macaulay_2d_over_shared1024_range": [
+    0.895326380842,
+    0.901960784314
+   ],
+   "validation": "component-only; no end-to-end promotion"
+  },
+  "rust_diagnostics": {
+   "rho_lanes8": {
+    "ops_ratio": 1.043,
+    "ops_ci95": [
+     1.028,
+     1.058
+    ],
+    "e2e_wall_ratio": 0.761,
+    "e2e_wall_ci95": [
+     0.735,
+     0.788
+    ]
+   },
+   "rho_lanes32": {
+    "ops_ratio": 1.149,
+    "ops_ci95": [
+     1.1,
+     1.2
+    ],
+    "e2e_wall_ratio": 0.639,
+    "e2e_wall_ci95": [
+     0.608,
+     0.67
+    ]
+   },
+   "rootfind_prime_batch": {
+    "ops_ratio": 1.0,
+    "wall_ns_per_gae_ratio": 0.486,
+    "wall_ci95": [
+     0.468,
+     0.504
+    ],
+    "mean_solve_wall_ms": [
+     342.9,
+     166.5
+    ]
+   },
+   "validation": "pcc:unverified L0 diagnostics"
+  },
+  "transfer_remeasure": {
+   "rows": 162,
+   "below": 0,
+   "above": 156,
+   "unresolved_lower_bound": 6,
+   "validation": "admitted follow-up validator; pcc:unverified"
+  },
+  "full_jacobian": {
+   "min_group_only_ratio": 17.9602993817,
+   "per_arm": {
+    "A": {
+     "above_band": 7,
+     "above_cal": 7,
+     "cells": 7,
+     "meets_closed_rule": false,
+     "ratio_slope_ci95_lower": -0.0699108171544,
+     "ratio_slope_w0.1": 0.420994434656
+    },
+    "B": {
+     "above_band": 7,
+     "above_cal": 7,
+     "cells": 7,
+     "meets_closed_rule": false,
+     "ratio_slope_ci95_lower": -0.654094357494,
+     "ratio_slope_w0.1": -0.0527563964745
+    }
+   },
+   "verdict": "unresolved: the frozen rule is not met by both arms; blocking cells listed",
+   "validation": "pcc:unverified L0"
+  },
+  "groebner_free": {
+   "lin_over_pair_floor_range": [
+    2.88971886643,
+    10.8674271218
+   ],
+   "n41_memory_mb": {
+    "linear": 15.656,
+    "pair_floor": 2558.132
+   },
+   "n59_linear_memory_mb": 518.692,
+   "counted_slope_delta": 0.000606492026394,
+   "counted_slope_delta_ci95": [
+    -0.00039835222467,
+    0.00164708957247
+   ],
+   "validation": "pcc:unverified stage diagnostic"
+  },
+  "folded_pair_build": {
+   "steps": [
+    {
+     "cell": "k0n53",
+     "whole_ns_per_pair": 34.5753153041,
+     "stream_and_sort_ns_per_pair": 26.6952375465,
+     "stream_and_sort_share": 0.772089489617
+    },
+    {
+     "cell": "k0n61",
+     "whole_ns_per_pair": 35.4750722894,
+     "stream_and_sort_ns_per_pair": 26.7337749306,
+     "stream_and_sort_share": 0.753593247463
+    }
+   ],
+   "layout": [
+    {
+     "cell": "k0n53",
+     "top_over_low_build": {
+      "median": 1.10429633148,
+      "ci95": [
+       1.06965866175,
+       1.14281772749
+      ]
+     },
+     "rounds": 41,
+     "dropped": 1,
+     "identity_mismatches": 0
+    },
+    {
+     "cell": "k0n61",
+     "top_over_low_build": {
+      "median": 1.14223295907,
+      "ci95": [
+       1.09819061843,
+       1.16454611546
+      ]
+     },
+     "rounds": 42,
+     "dropped": 0,
+     "identity_mismatches": 0
+    }
+   ],
+   "keep_top_default": true,
+   "validation": "component A/B; no E2E claim"
+  },
+  "prime_leads_chase": {
+   "result": "prospective/inconclusive; no sub-sqrt prime result",
+   "validation": "desk analysis only"
+  }
+ },
  "quartic_twist_pair_component": {
   "rows": [
    {
@@ -345930,6 +346261,331 @@
   "headline_arm": "DL",
   "study": "research/quartic_n4v2_20261020/",
   "report": "research/quartic_n4v2_20261020/README.md"
+ },
+ "ghs_weak_cd_chain_component": {
+  "rows": [
+   {
+    "arm": "DL",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.726364292069,
+     "max": 0.729344705894,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.814061093689,
+     "max": 0.821587911593,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.859603846917,
+     "max": 0.871991812188,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.737400181003,
+     "max": 0.739506827839,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.830815463661,
+     "max": 0.832386397864,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.876852551566,
+     "max": 0.879178209152,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.693963433674,
+     "max": 0.696094243199,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.796492952379,
+     "max": 0.797853860013,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.848309698216,
+     "max": 0.849253441859,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.71046267916,
+     "max": 0.711600017823,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.81189375135,
+     "max": 0.816038566031,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.862209497737,
+     "max": 0.867695541896,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.680518098261,
+     "max": 0.68089709246,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.79448235449,
+     "max": 0.799194888629,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.850718193914,
+     "max": 0.857406969368,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.728590269242,
+     "max": 0.734736210517,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.877547217673,
+     "max": 0.888656617679,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.94240952795,
+     "max": 0.960844455693,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.75387213011,
+     "max": 0.758186533597,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.912602834409,
+     "max": 0.915623900256,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.975237671644,
+     "max": 0.9783113274,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.668277459138,
+     "max": 0.672679118211,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.845846563704,
+     "max": 0.848265541811,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.921387907077,
+     "max": 0.922897280807,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.699967686795,
+     "max": 0.702108135873,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.870648236775,
+     "max": 0.877327666678,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.941373854155,
+     "max": 0.949600831136,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.643925508633,
+     "max": 0.64464741842,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.840683429437,
+     "max": 0.848287281497,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.921908272717,
+     "max": 0.931990278542,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "D",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 1.09179603745,
+     "max": 1.133822797,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.10009345388,
+     "max": 1.14179691808,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.1058858913,
+     "max": 1.1473595738,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 1.12244882796,
+     "max": 1.13213121385,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.12683843757,
+     "max": 1.1369143937,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.12984511774,
+     "max": 1.14019109841,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 1.07239004845,
+     "max": 1.07663037029,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.0828500205,
+     "max": 1.08708711273,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.09009394098,
+     "max": 1.09433046372,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 1.08869994492,
+     "max": 1.09933785313,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.0975345145,
+     "max": 1.10831824336,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.10362451982,
+     "max": 1.11450723579,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 1.07752736947,
+     "max": 1.0909653251,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.08936182752,
+     "max": 1.10303063001,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.09751798271,
+     "max": 1.11134419636,
+     "all_below_1": false
+    }
+   }
+  ],
+  "headline": true,
+  "rho_band_k22": {
+   "0": {
+    "ic": 1038514332.42,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1208511467.82,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2738485686.42,
+    "rho": 1492814000000.0
+   }
+  },
+  "study": "research/quartic_dl1_cd_sqrt_20261113/",
+  "report": "research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf",
+  "source": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
+  "class": "component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family)",
+  "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json)",
+  "validated": true
  },
  "phases": [
   {

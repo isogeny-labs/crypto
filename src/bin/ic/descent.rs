@@ -284,7 +284,7 @@ fn run_engines(
             "not a speed: this prices one decomposition oracle call on one target, which AGENTS.md section 2 calls a stage diagnostic and never a speed",
             "not a common unit: each engine counts in its own unit (ops column, unit named per engine); only wall time is common, and it is a host-dependent practicality note",
             "not a group relation: a boolean root is not yet a point decomposition until it is lifted and checked on the curve, which the whole-pipeline run does",
-            "not one leaderboard: a first-solution engine (sat-cdcl) and the complete-enumeration engines are different workloads and are listed apart"
+            "not one leaderboard: first-solution engines (sat-cdcl and primo-smt) and the complete-enumeration engines are different workloads and are listed apart"
         ],
         "config": {
             "families": args.families,
