@@ -21,7 +21,7 @@ unavailable in this container.
   gcd(quartic, L_V mod quartic)). It had never been counted against the descent
   engines on the same instances. The owner is right on (a) only in that narrow sense.
 
-**What was measured here, for (a).** A lane-local Rust harness (`src/l4bench.rs`)
+**What was measured here, for (a).** A lane-local Rust harness (`src/l4bench.rs`) [pcc:unverified]
 counts the field operations of the literal gcd-with-L_V oracle. It runs on exactly the
 targets that the repository's `ic descent` drew and solved with `inherited-f4` and
 `fes-f2`: 13 cells on the Koblitz family K, n from 11 to 29, m = 2 and 3, 136 targets.
@@ -30,7 +30,7 @@ negative control differs on 45 targets.
 
 **Findings.**
 
-* m = 2: G costs about 2^l (2l + 8) multiplications. It is below FES at all three
+* m = 2: G costs about 2^l (2l + 8) multiplications. It is below FES at all three [pcc:unverified]
   prices from l = 10, and 231× below at P4 at l = 15. Against `inherited-f4` it has
   the same exponent (log2 slope 1.11 against 1.10 per unit of l in the regime cells).
   The ratio is a flat factor of 2.2 to 2.6 at P4, and its sign flips inside the
@@ -41,7 +41,7 @@ negative control differs on 45 targets.
 * G is 7 to 14× (m = 2) and 300 to 1500× (m = 3) above the pair-table / subtract
   oracles that the current IC baseline rows actually use.
 
-**Verdict.** The frozen rule is ambiguous. Its literal clause gives IMPROVES as a
+**Verdict.** The frozen rule is ambiguous. Its literal clause gives IMPROVES as a [pcc:unverified]
 stage result against `inherited-f4` at m = 3. Against the baseline rows' own oracle the
 result is NEGATIVE. In either reading, **no improvement of the index-calculus
 baseline**, and no change to the exponent.

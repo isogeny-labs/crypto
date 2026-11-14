@@ -3,7 +3,7 @@
 The subagent could not write this file, so the main session saved its report. Full write-up:
 `RESULTS.md`, `results.json`, `figures/`. All claims `[pcc:unverified]`.
 
-Main-session checks:
+Main-session checks: [pcc:unverified]
 - `raw/SHA256SUMS` verifies.
 - The frozen PROTOCOL.md hash `2d1b64cd…` matches the version committed in `2416ce330f`
   (08:20Z). The first scored rows were written at 08:36Z.

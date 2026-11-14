@@ -23,7 +23,7 @@ of each `ic` engine, 120 s budget. Seed-2 top-up: `raw/run-identity-s2.txt`.
 **(a) under the frozen rule.** The rule is internally inconsistent (Amendment 2), so
 both readings are given:
 
-* **Literal IMPROVES clause** ("below I at all three prices at some m = 3 cell"): it is
+* **Literal IMPROVES clause** ("below I at all three prices at some m = 3 cell"): it is [pcc:unverified]
   met at `13:5:3`, where I/G is 75.5, 27.5 and 5.0 at P1, P4 and P2n. It is also met at
   `19:6:3`, where I hit its budget at ≥1.46e8 native word XORs against G's 2.11e7 at
   P2n, so I/G ≥ 7. This is a **stage** result against the default descent oracle. It
@@ -34,7 +34,7 @@ both readings are given:
   (G/S at P4 is 7.2 to 14.2 for m = 2 and 305 to 1547 for m = 3). Read this way the
   result is **NEGATIVE**, which is what `l4bench summarize` printed.
 
-There is no improvement of the index-calculus baseline. The gcd-with-L_V oracle is a
+There is no improvement of the index-calculus baseline. The gcd-with-L_V oracle is a [pcc:unverified]
 real but known constant-factor stage alternative to `inherited-f4`. It is not a new
 route.
 
@@ -86,7 +86,7 @@ The complete `bitop/v1` count for I, which includes matrix builds and hash probe
 
 ### Crossovers [pcc:unverified]
 
-* **G vs F (m = 2).** In the descent regime (n' = ceil(n/2)), G is below F at P1 from
+* **G vs F (m = 2).** In the descent regime (n' = ceil(n/2)), G is below F at P1 from [pcc:unverified]
   l = 6, at P4 from l = 7 (n = 13), and at all three prices from l = 10 (n = 19). In
   the n = 29 l-sweep it is below F at all prices from l = 12. Above that the
   advantage grows like 2^l / l: F/G at P4 is 231 at l = 15.

@@ -4,7 +4,7 @@
 data and made no new measurement. All claims `[pcc:unverified]`. The subagent could not write
 Markdown reports, so the main session saved its narrative here.
 
-Main-session checks:
+Main-session checks: [pcc:unverified]
 - `raw/SHA256SUMS` verifies.
 - `results.json` has 147 rows and 8 exclusions.
 - The quoted slopes (0.047 for FC w=0, 0.113 for LB-A) appear in `results.json`.

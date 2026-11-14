@@ -9,7 +9,7 @@ novelty claim. The main session re-read two of the cited figures from source and
 
 ## The owner's claim, part by part
 
-1. **"Weil descent needs a subspace base, and at n=131 no stable subspace of useful size
+1. **"Weil descent needs a subspace base, and at n=131 no stable subspace of useful size [pcc:unverified]
    exists."** Correct. The repos already say it:
    - `cryptanalysis:ecc2k130/runner/research/candidates/goal22/codegen/decomp.py`, header.
    - `cryptanalysis:experiments/frobenius-quotient-m4/README.md`.
