@@ -1,6 +1,6 @@
 {
   "branch": "claude/index-calculus-gpu-optimization-otouqv",
-  "closed_utc": null,
+  "closed_utc": "2026-11-14T07:01:56+00:00",
   "commands": [
     {
       "argv": [
@@ -30,19 +30,76 @@
     "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
   },
   "id": "20261114T0620Z-ic-gpu-replay",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 14,
+      "name": "replay_counted_fields_identical_rows",
+      "note": "rows whose solver calls, counted ops, hit rate and verification equal research/ic_gpu_e2e_20261113 exactly (validator-confirmed)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 14.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1006,
+      "name": "batching_bound_s_per_call_24_unknowns",
+      "note": "round trip minus kernel GPU time per call, Koblitz n=23 repeat 2 (no worker start-up)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 5.49e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8977,
+      "name": "batching_bound_s_per_call_30_unknowns",
+      "note": "char-2 n=29, includes one worker start-up (over-estimate); kernel is 93.3% of the round trip",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 9.2e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "rootfind_probe_share_hash_c16_f65536",
+      "note": "sampled clock64 cycles in table probes, instrumented build; sorted/C16 62.3%",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 79.9
+    }
+  ],
   "problem": "ic-gpu-kernels",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 35549,
+      "path": "research/ic_gpu_replay_20261114/raw/out_rp.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/76fa075a5f7fde542205f575814b0d73b03b29f62aea6a9b96045dca1b7ad633",
+      "sha256": "76fa075a5f7fde542205f575814b0d73b03b29f62aea6a9b96045dca1b7ad633",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/ic_gpu_replay_20261114/REPORT.pdf",
     "png": [],
     "svg": []
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "ic-gpu-replay",
-  "status": "open",
-  "summary": "",
-  "validation": null
+  "status": "measured",
+  "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+  "validation": "research/ic_gpu_replay_20261114/VALIDATION_REVIEW.json"
 }

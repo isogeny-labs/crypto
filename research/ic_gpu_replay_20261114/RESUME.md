@@ -16,7 +16,7 @@ research/ic_gpu_replay_20261114/job.sh on one A100; ic built from fa75167c45 (Ru
 9b88564250). Record benchmarks/records/<stamp>-ic-gpu-replay.json.
 
 ## State
-2026-11-14: code and job ready; pod not started.
+2026-11-14 07:30Z: done; pod deleted; validator review in; record 20261114T0620Z-ic-gpu-replay closed; PR open.
 
 ## Runs in flight
 Pods icgpu-*; research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
@@ -26,4 +26,4 @@ Replay: rows verified; S/rho and calls compared with the original runs. Cap ~1.5
 S3: same waiver as before.
 
 ## Next steps
-Launch, fetch, delete pod, validator agent, report, record, PR.
+Track the PR. Next round candidates: rootfind lookup layout (see REPORT.md section 3).

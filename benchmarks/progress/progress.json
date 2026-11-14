@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+  "latest_record": "20261114T0620Z-ic-gpu-replay",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 157,
+    "measured": 158,
     "open": 0
   },
   "repo": "crypto",
@@ -2652,6 +2652,60 @@
     },
     {
       "better": "lower",
+      "first": 5.49e-05,
+      "latest": 5.49e-05,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "batching_bound_s_per_call_24_unknowns",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1006,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 5.49e-05
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 9.2e-05,
+      "latest": 9.2e-05,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "batching_bound_s_per_call_30_unknowns",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8977,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 9.2e-05
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.013434,
       "latest": 0.013434,
       "latest_derived": {
@@ -3002,6 +3056,33 @@
       "unit": "wall_s"
     },
     {
+      "better": "higher",
+      "first": 14.0,
+      "latest": 14.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "replay_counted_fields_identical_rows",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 14,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 14.0
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "count"
+    },
+    {
       "better": "lower",
       "first": 0.994,
       "latest": 0.994,
@@ -3027,6 +3108,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 79.9,
+      "latest": 79.9,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_probe_share_hash_c16_f65536",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 79.9
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "percent"
     },
     {
       "better": "lower",
