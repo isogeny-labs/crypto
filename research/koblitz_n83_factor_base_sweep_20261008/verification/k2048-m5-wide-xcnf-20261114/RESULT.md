@@ -1,18 +1,23 @@
 # N83 a=0 K2048 wide-XOR host-gate result
 
-The first `--maxmatrixcols 25000` positive-control attempt retained a
+The second `--maxmatrixcols 25000` positive-control attempt returned SAT at
+839 conflicts in 0.3113 seconds of solver process wall. Independent Rust
+replay checked all 1,141,221 original CNF clauses, 4,980 XOR rows, 339,968
+archived subgroup points, the group sum and the signed-Frobenius relation
+row. The first attempt retained a
 three-sample host preflight and stopped before the solver call. Its recorded
 one-minute load was 82.0376, 76.6616 and 74.8535 against the frozen maximum
 24; swapouts stayed 164,320. The existing baseline and both exact XCNFs are
-unchanged. The wide public-natural arm remains gated on a SAT positive with
-independent original-XCNF and group replay.
+unchanged. The wide public-natural arm is now admitted under the committed
+natural lock; its outcome remains open until the bounded run completes.
 
 | Arm | Attempt | Gate status | Load samples | Solver status | Relation |
 | --- | ---: | --- | --- | --- | --- |
 | K2048 m5 wide positive | 1 | `HOST_REJECTED_LOAD` | 82.0376, 76.6616, 74.8535 | `NOT_STARTED` | not observed |
-| K2048 m5 wide public natural | 0 | `AWAITING_POSITIVE` | — | `NOT_STARTED` | not observed |
+| K2048 m5 wide positive | 2 | `SAT`, replay passed | 5.6504, 4.9146, 5.2529 | 839 conflicts, 0.3113 s | 5 verified columns and relation row |
+| K2048 m5 wide public natural | 0 | `LOCKED_PENDING_RUN` | — | `NOT_STARTED` | not observed |
 
-The [positive lock](NATIVE_POSITIVE_LOCK.json) binds clean source commit
+The [first positive lock](NATIVE_POSITIVE_LOCK.json) binds clean source commit
 `b4477fd36b70e3fea1a232135fbcabe437329a65`, Rust runner source SHA-256
 `5463e06fdb6bc9f015c972963477bd18c1460b51d2aa1ece4ec0ac0ec4ce9cc1`,
 runner binary SHA-256
@@ -24,7 +29,13 @@ it is the only file the gate wrote in the output directory. Its local process
 returned exit code 1 with `native host load or swapout gate failed; preflight
 retained`. The unchanged swapout counts isolate load as the rejecting sample.
 
-The next action is to wait for a local host preflight at load at most 24,
-then commit a new lock with a fresh output path and repeat the positive.
-The separately running R13 integrated-target process was live at the time of
-this gate; this study will not alter it or relax the frozen resource rule.
+The [second positive lock](NATIVE_POSITIVE_LOCK_02.json) retained the same
+formula, source, solver, and flags with a fresh output path. Its
+[preflight](native-evidence/positive-02/host-preflight.json),
+[solver receipt](native-evidence/positive-02/receipt.json), and
+[replay](native-evidence/positive-02/replay.json) have SHA-256 digests
+`b772a8e8cac622e721dc65cbb909c1a62acd7a2df58cbaae2d8c586e06b3e8f6`,
+`1921ff716185c64d4bba29e17ed4eddb23f56df1020d0cc926e29dacca10d69f`, and
+`4b18a7b7ebf5057189aee32bd26260c86ce58e089a2c7c5dbfc394b68406c388`,
+respectively. The [natural lock](NATIVE_NATURAL_LOCK.json) binds the replay
+hash, exact public-natural XCNF, and unused raw output path before dispatch.
