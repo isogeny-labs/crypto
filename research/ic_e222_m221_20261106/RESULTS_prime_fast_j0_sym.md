@@ -188,6 +188,27 @@ Same planted targets for both arms, 2 curves x 2 instances (n=4 rows per cell), 
 Reading: the symmetric multi-target IC loses to the batched folded rho for T up to about 1000 and is 2.0x-2.5x faster at T=3000 (28 and 30 bits); the crossover moves up slowly with size (about T=800 at 26 bits, about T=1100 at 28 bits, between 1000 and 3000 at 30 bits), consistent with the IC total growing about T^0.4 against rho about T^0.9.
 Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relative setup, so the IC number is probably conservative), the rho is lightly tuned, one host, no isolation, no §5a band, and the comparison to a tuned, folded **BSGS** on j=0 curves is missing: on the a=-3 curves a tuned multi-target BSGS was 2x-4x ahead of the non-symmetric IC, and a x6-folded BSGS on j=0 would gain about sqrt(6), so the decisive comparator is still BSGS, not rho.
 
+## Correction: the multi-target rho restarted walks from solved targets (2026-11-14) — `[pcc:unverified]`
+Audit trigger: the batched folded rho above needed 8x-35x more steps than Kuhn-Struik's `sqrt(2 T n / 6)`, and the excess grew with T, exactly where the IC arm "won".
+Cause: `new_lane` in `examples/prime_fast_j0_rho_multi.rs` drew each new walk's start from all T targets (plus G) uniformly, solved or not. Once most logs are known, almost every walk works on a known log, and the last unknown ones are reached coupon-collector style.
+Fix: new walks start only from unsolved targets (plus G as the anchor), as in Kuhn-Struik. `RESTART=all` keeps the old policy. Same curves, same planted targets (seed `0xC0DE ^ inst ^ n ^ T` in both examples), 2 curves x 2 instances, 128 lanes, same dp bits. Every target of every row verified in both policies. One local 4-core host, not isolated, medians:
+
+| bits | T | IC ms | rho, old restarts ms (steps) | rho, Kuhn-Struik ms (steps) | K-S `sqrt(2Tn/6)` | rho/IC old | **rho/IC fixed** |
+|---|---|---|---|---|---|---|---|
+| 26 | 20 | 8.7 | 4.5 (35.9k) | 4.9 (29.2k) | 21.2k | 0.51 | **0.56** |
+| 26 | 200 | 20.2 | 14.2 (165k) | 16.8 (102k) | 66.9k | 0.70 | **0.83** |
+| 26 | 1000 | 70.4 | 100.7 (1.22M) | 27.8 (340k) | 150k | 1.43 | **0.39** |
+| 28 | 200 | 42.8 | 24.9 (335k) | 16.8 (203k) | 134k | 0.58 | **0.39** |
+| 28 | 1000 | 125.4 | 161.7 (2.37M) | 45.7 (680k) | 299k | 1.29 | **0.36** |
+| 28 | 3000 | 357.7 | 942.5 (16.8M) | 152.4 (2.48M) | 518k | 2.63 | **0.43** |
+| 30 | 200 | 95.2 | 42.0 (701k) | 27.1 (430k) | 268k | 0.44 | **0.28** |
+| 30 | 1000 | 303.2 | 274.0 (4.45M) | 85.7 (1.41M) | 598k | 0.90 | **0.28** |
+| 30 | 3000 | 836.6 | 1736.9 (31.8M) | 286.7 (4.96M) | 1.04M | 2.08 | **0.34** |
+
+IC ms are the committed `symmulti_*` rows (26 bits: the logged medians above; those rows were not committed). Raw: `results/pf_j0/rhoks_*.jsonl`, `rhoall_*.jsonl`. Graph: `figures/multirho_restart_fix.{svg,png,pdf}` (`figures/plot_multirho_restart.py`). Bench record: `benchmarks/records/20261114T0627Z-j0-multirho-restart-fix.json`.
+
+Reading: the old policy reproduces the earlier rows (942 vs 909 ms at 28/3000, 1,737 vs 1,676 ms at 30/3000), so the earlier numbers were measured correctly; the rho was weak. With Kuhn-Struik restarts **rho is faster than the symmetric multi-target IC at every cell, by 1.2x-3.6x**, and the ratio no longer moves in IC's favour with T at 28-30 bits. The "IC 2.0x-2.5x ahead at T = 3000" reading and the crossover near T ≈ 1000 are withdrawn. The fixed rho is still 1.4x-4.8x above the K-S step count (dp-bit overhead with many short walks), so this rho is itself not optimal and the gap to a tuned rho is larger, not smaller. Replication under the bench record (30 bits, T = 3000, fixed rho): median 288 ms against 287 ms, all 12,000 targets verified (`rhoks_30_T3000_rep.jsonl`). Not a claim either way: one host, no isolation, no §5a band, no folded BSGS.
+
 ## Experiment: folded multi-target BSGS on j=0 curves — the decisive comparator (2026-11-14) — `[pcc:unverified]`
 `examples/prime_fast_j0_bsgs_multi.rs`: multi-target BSGS folded by the order-6 automorphism group: baby table of the canonical orbit key of jG (j=1..m, open-addressing, 8-byte key + 5-byte value), giant steps P_i = Q_t - i*S (S = (2m+1) G) batched in lock-step across all unsolved targets (one inversion per round), a hit gives k = i*stride + (mu_j / mu') j with the stored/observed orbit multipliers, verified kG = Q for every target. m = MC * sqrt(T n / 6); MC tuned at 26 bits, T=1000 on the tuning curves (0.5 / 1.0 / 2.0: 15.8 / 14.2 / 15.0 ms, flat), MC=1 used throughout. Same curves and planted targets as the IC and rho arms; n=4 rows per cell, every target verified (36/36 rows).
 
@@ -204,3 +225,15 @@ Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relativ
 | 30 | 3000 | 132.8 | 836.6 (6.3x) | 1675.8 (12.6x) |
 
 Reading: the folded multi-target BSGS is the strongest implemented multi-target arm in every cell: 3.4x-6.5x ahead of the symmetric multi-target IC, and ahead of the batched folded rho by 1.6x-15x. The IC's advantage over the rho at T=3000 does not survive the right comparator, and the IC/BSGS gap grows with T and with size (4.4x -> 6.5x at 26 bits, T=20 -> 1000; 3.4x -> 6.3x at 28-30 bits, T=200 -> 3000), as the exponents predict (BSGS total about sqrt(T n), IC setup about p^(2/3) plus a per-target cost). So there is **no regime in this campaign where an IC arm beats the strongest implemented comparator**; the verified gain remains the single-target 2.0x-2.4x over the 3-summand `ic_solve` baseline. One host, toy sizes, no isolation, no §5a band: not a claim in either direction beyond this ordering of implemented arms.
+
+## Experiment: the single-target gain at 32 and 34 bits, fresh curves (2026-11-14) — `[pcc:unverified]`
+Same code and frozen B rule as the holdout (B = round(100 (p/2^26)^(1/3)): 400 at 32 bits, 635 at 34 bits), fresh curves (idx 7 and 8: b65/b69 at 32 bits, b116/b128 at 34 bits), 4 targets per curve, extra 8, every solve verified (kG=Q) in both arms (n=4 per cell, 24 rows per bit size per arm). `ic_solve` 3-summand baseline at c in {0.5, 0.7, 1.0} x p^(1/3); medians:
+
+| bits | curve | sym3 ms | plain3 c=0.5 | c=0.7 | c=1.0 | ratio vs best of c=0.5/0.7 | rho (negation) ms | sym3 / rho |
+|---|---|---|---|---|---|---|---|---|
+| 32 | b65 | 230-240 | 492 | 454 | 660 | 1.96-2.14 | 5.2 | ~44x |
+| 32 | b69 | 224-246 | 519 | 500 | 578 | 2.03-2.22 | 5.4-6.7 | ~40x |
+| 34 | b116 | 684-825 | 1658 | 1782 | 2289 | 2.16-2.32 | 11.8 | ~60x |
+| 34 | b128 | 738-798 | 1533 | 1858 | 2407 | 2.08-2.40 | 9.3-10.3 | ~72x |
+
+Reading: the 2.0x-2.4x improvement over the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) holds at 32 and 34 bits on fresh curves, with B extrapolated by the frozen rule and not retuned (c=1.0 arms: 2.6x-3.4x, a worse baseline). The gap to the matched negation rho keeps growing with size (about 4x at 26 bits, 21x at 30, about 40x at 32, 60x-70x at 34), consistent with an engineering constant gain on a worse exponent. Same limits as before: one host, no isolation, wall clock, one twist group per size, no §5a band.
