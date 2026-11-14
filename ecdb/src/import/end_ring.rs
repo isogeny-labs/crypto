@@ -312,7 +312,7 @@ fn factor(mut n: u64) -> Vec<(u64, u32)> {
     out
 }
 
-fn is_fundamental(d: i64) -> bool {
+pub(super) fn is_fundamental(d: i64) -> bool {
     if d >= 0 {
         return false;
     }

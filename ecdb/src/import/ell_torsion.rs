@@ -60,7 +60,7 @@
 //! supersingular classes). Insert only (`ON CONFLICT DO NOTHING`): a stored row
 //! is checked, never changed. A rerun inserts nothing.
 
-use super::end_ring::{division_polys, is_prime, monic, powmod, scalar_on, trim};
+use super::end_ring::{division_polys, is_fundamental, is_prime, monic, powmod, scalar_on, trim};
 use super::{bulk, Ctx, Report};
 use anyhow::Result;
 use serde_json::json;
@@ -575,6 +575,19 @@ pub fn curve_torsion(p: u64, a: u64, b: u64, t: i64) -> Result<Vec<Torsion>, Str
     ELLS.iter().filter(|&&l| l != p).map(|&l| ell_torsion(p, a, b, t, l)).collect()
 }
 
+/// (v, D_K) of an ordinary class when the stored values satisfy
+/// t^2 - 4p = v^2 D_K with v > 0 and D_K a negative fundamental discriminant;
+/// otherwise None (the depth v_l(v) and the splitting are then unknown). Without
+/// the fundamental check a stored (v / m, m^2 D_K) would satisfy the identity
+/// and give a wrong depth and splitting.
+pub fn verified_vd(supersingular: bool, t: i64, p: u64, v: Option<i64>, d_k: Option<i64>) -> Option<(u64, i64)> {
+    if supersingular {
+        return None;
+    }
+    let (v, d) = (v?, d_k?);
+    (v > 0 && is_fundamental(d) && t * t - 4 * p as i64 == v * v * d).then_some((v as u64, d))
+}
+
 /// v_l(n), n > 0.
 fn val(mut n: u64, l: u64) -> u32 {
     let mut k = 0;
@@ -791,24 +804,26 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     });
 
     // per class: verified (v, D_K) for ordinary classes
-    let class_vd = |r: &Row| -> Option<(u64, i64)> {
-        if r.supersingular {
-            return None;
-        }
-        let (v, d) = (r.v?, r.d_k?);
-        (v > 0 && r.t * r.t - 4 * r.p as i64 == v * v * d).then_some((v as u64, d))
-    };
+    let class_vd = |r: &Row| -> Option<(u64, i64)> { verified_vd(r.supersingular, r.t, r.p, r.v, r.d_k) };
 
     let (mut ins_census, mut ins_other) = (Vec::new(), Vec::new());
     // class -> l -> (all members fine, the per-curve isogeny counts)
     let mut class_ok: BTreeMap<(i64, u64), (bool, Vec<u64>)> = BTreeMap::new();
     let mut class_rep: BTreeMap<i64, &Row> = BTreeMap::new();
+    let mut bad_vd_classes: BTreeSet<i64> = BTreeSet::new();
     for (r, res) in rows.iter().zip(&computed) {
         report.count(if r.census { "ell_torsion_curves_census_fp" } else { "ell_torsion_curves_other" }, 1);
         class_rep.entry(r.class_id).or_insert(r);
         let vd = class_vd(r);
         if vd.is_none() && !r.supersingular {
             report.count("ell_torsion_ordinary_curves_without_verified_conductor", 1);
+            if (r.v.is_some() || r.d_k.is_some()) && bad_vd_classes.insert(r.class_id) {
+                report.problem(format!(
+                    "class {} (p = {}, t = {}): stored v = {:?}, D_K = {:?} fail t^2 - 4p = v^2 D_K with D_K a \
+                     negative fundamental discriminant; depth, splitting and count left NULL",
+                    r.class_id, r.p, r.t, r.v, r.d_k
+                ));
+            }
         }
         let tors = match res {
             Ok(t) => t,
@@ -1305,6 +1320,19 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// A stored (v, D_K) that satisfies t^2 - 4p = v^2 D_K but with D_K not
+    /// fundamental must not give a depth: p = 101, t = 2 has t^2 - 4p = -400 =
+    /// 10^2 (-4), and (5, -16) and (1, -400) satisfy the identity too.
+    #[test]
+    fn non_fundamental_discriminant_is_not_trusted() {
+        assert_eq!(verified_vd(false, 2, 101, Some(10), Some(-4)), Some((10, -4)));
+        assert_eq!(verified_vd(false, 2, 101, Some(5), Some(-16)), None);
+        assert_eq!(verified_vd(false, 2, 101, Some(1), Some(-400)), None);
+        assert_eq!(verified_vd(false, 2, 101, Some(10), Some(-3)), None);
+        assert_eq!(verified_vd(true, 0, 101, Some(2), Some(-101)), None);
+        assert_eq!(verified_vd(false, 2, 101, None, Some(-4)), None);
     }
 
     #[test]
