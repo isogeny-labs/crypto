@@ -622,3 +622,39 @@ first. That is a design question for a new amendment, not a result.
 Binary: `dreg_linear_guess` sha256 `f902edfd…321a99`, built on the pod from the frozen source
 archive `fd-src-a2be6609.tgz` (hash checked: OK). Cost: about 6.3 h × 2.56 USD/h ≈ 16 USD,
 including the idle first hour.
+
+## E14 r2 (Amendments 20, 21, 25, 27–30): first exact last fall degree above 4, cell "split"
+
+**E14a: two of four draws measured, both read "`d_F = 5`"; cell reading "split".** The run used
+RunPod pod `gjr9mpprgga8eb` (32 vCPU AMD EPYC 9575F, 503 GiB, USD 2.08/h) from 2026-11-12 04:57 UTC
+to its deadline at 2026-11-13 16:57 UTC, with source `a2be6609` (tree hash checked) and `hky_par`
+sha256 `f4264c24…6ea6`. Gates G0–G3 passed. G1 and G2 gave empty diffs, so `hky_par` at the frozen
+commit reproduces E10 on (3, 21, 7). Records: `e14/score.json` (section `r2`) and
+`e14/pod-r2/out-r2j/`. Report: `reports/run-20261114-e14r2/`.
+
+| Unit | What happened | Registered reading | Prediction outcome |
+|---|---|---|---|
+| E14a draw 0 | `d_f = 5` in 37,890 s; degree ≤ 4 equal to E10 | "`d_F = 5`" `[pcc:unverified]` | |
+| E14a draw 1 | `d_f = 5` in 38,240 s; degree ≤ 4 equal to E10 | "`d_F = 5`" `[pcc:unverified]` | |
+| E14a draw 3 | running at the last pull (2026-11-13 02:50 UTC); record lost with the pod | not completed | |
+| E14a draw 4 | cut off by the deadline | not completed | |
+| **E14a cell** | 2 measured, both 5; "`d_F = 5`" needs ≥ 3 of 4 | **split** | "split" (0.05) occurred |
+| E14b 6:10:3 controls | not started; E14a held the pod until the deadline | **not completed** | "not completed" (0.35) occurred |
+| E14c 4:28:7 | not started | **no reading** | "no reading" (0.80) occurred |
+| G2 | passed | — | 0.90, occurred |
+
+"Split" here comes from the count alone. No measured draw disagrees: both closed degree 5 at full
+rank (974,982 of 974,982 columns, 4 rounds) and read 5. The combined statement "independent agreement
+(E13b + E14b)" is not made, and E13b stays "disagreement". No Lean row is added, because the cell
+registers no value of `d_F`.
+
+**Process failures.** The check-ins scheduled for 13:35 and 17:10 UTC on 2026-11-13 reached the
+session only at 19:08 UTC on 2026-11-14. By then the pod returned 404, and no pull had been taken
+after 02:50 UTC. Draw 3's record, if one was written, was lost: whether draw 3 finished is unknown.
+The in-pod script kept its output only on the pod's disk. The cost was not read from billing; at
+USD 2.08/h, the 36 h to the deadline plus up to 6 h of grace is at most about USD 87.
+
+**Design observation (not a reading).** Degree 5 on (3, 21, 7) costs about 10.6 h per draw on 32
+threads. Four draws in one invocation cannot finish inside a 36 h deadline, so E14b and E14c could
+never run in this order. A follow-up needs a new amendment. One option is draws 3 and 4 alone, about
+22 h and USD 46, with an upload after every draw.

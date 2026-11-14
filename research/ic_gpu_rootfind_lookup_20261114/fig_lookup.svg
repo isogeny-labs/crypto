@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 396" width="760" height="396" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">rootfind lookup variants: speedup at the best configuration</title>
+<desc id="d">For each lookup variant, main best-configuration kernel time divided by the variant best-configuration time, for |F| = 65536 and |F| = 1024 on an A100.</desc>
+<style>.bg{fill:#fcfcfb}.s1{fill:#2a78d6}.s2{fill:#eb6834}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}.z{stroke:#8f8e89}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.s1{fill:#3987e5}.s2{fill:#d95926}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}.z{stroke:#8f8e89}}</style>
+<rect class="bg" width="760" height="396"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">rootfind lookups: speedup over main at each arm's best configuration</text>
+<text class="q" x="16" y="42" font-size="12">main's best kernel time ÷ the arm's best, A100, medians of 5 rounds; A/A within 0.06%; every arm passed the device selftests</text>
+<rect class="s1" x="16" y="52" width="12" height="12" rx="2"/><text class="p" x="34" y="62" font-size="12">|F| = 65536, 65536 targets</text>
+<rect class="s2" x="230" y="52" width="12" height="12" rx="2"/><text class="p" x="248" y="62" font-size="12">|F| = 1024, 262144 targets</text>
+<line class="g" x1="200.0" x2="200.0" y1="74" y2="366" stroke-width="1"/>
+<text class="q" x="200.0" y="382" font-size="11" text-anchor="middle">0.95×</text>
+<line class="z" x1="320.0" x2="320.0" y1="74" y2="366" stroke-width="1"/>
+<text class="q" x="320.0" y="382" font-size="11" text-anchor="middle">1.00×</text>
+<line class="g" x1="440.0" x2="440.0" y1="74" y2="366" stroke-width="1"/>
+<text class="q" x="440.0" y="382" font-size="11" text-anchor="middle">1.05×</text>
+<line class="g" x1="560.0" x2="560.0" y1="74" y2="366" stroke-width="1"/>
+<text class="q" x="560.0" y="382" font-size="11" text-anchor="middle">1.10×</text>
+<line class="g" x1="680.0" x2="680.0" y1="74" y2="366" stroke-width="1"/>
+<text class="q" x="680.0" y="382" font-size="11" text-anchor="middle">1.15×</text>
+<text class="p" x="190" y="95.0" font-size="12" text-anchor="end">Eytzinger</text>
+<g><title>Eytzinger, |F| = 65536: 1.050× (sorted/C16 382.62 ms against main 401.70 ms)</title><rect class="s1" x="320.0" y="78" width="119.7" height="15" rx="3"/></g>
+<text class="p" x="445.7" y="89.7" font-size="11">1.050× (sorted/C16)</text>
+<g><title>Eytzinger, |F| = 1024: 1.000× (hash/C16 19.87 ms against main 19.87 ms)</title><rect class="s2" x="320.0" y="96" width="2.0" height="15" rx="3"/></g>
+<text class="p" x="326.1" y="107.7" font-size="11">1.000× (hash/C16)</text>
+<text class="p" x="190" y="142.0" font-size="12" text-anchor="end">packed hash</text>
+<g><title>packed hash, |F| = 65536: 1.000× (sorted/C16 401.75 ms against main 401.70 ms)</title><rect class="s1" x="319.7" y="125" width="2.0" height="15" rx="3"/></g>
+<text class="p" x="326.0" y="136.7" font-size="11">1.000× (sorted/C16)</text>
+<g><title>packed hash, |F| = 1024: 1.112× (hash/C16 17.88 ms against main 19.87 ms)</title><rect class="s2" x="320.0" y="143" width="268.2" height="15" rx="3"/></g>
+<text class="p" x="594.2" y="154.7" font-size="11">1.112× (hash/C16)</text>
+<text class="p" x="190" y="189.0" font-size="12" text-anchor="end">paired</text>
+<g><title>paired, |F| = 65536: 0.999× (sorted/C16 401.97 ms against main 401.70 ms)</title><rect class="s1" x="318.4" y="172" width="2.0" height="15" rx="3"/></g>
+<text class="p" x="326.0" y="183.7" font-size="11">0.999× (sorted/C16)</text>
+<g><title>paired, |F| = 1024: 1.019× (hash/C16 19.51 ms against main 19.87 ms)</title><rect class="s2" x="320.0" y="190" width="45.3" height="15" rx="3"/></g>
+<text class="p" x="371.3" y="201.7" font-size="11">1.019× (hash/C16)</text>
+<text class="p" x="190" y="236.0" font-size="12" text-anchor="end">Eytzinger + paired</text>
+<g><title>Eytzinger + paired, |F| = 65536: 1.116× (sorted/C16 359.96 ms against main 401.70 ms)</title><rect class="s1" x="320.0" y="219" width="278.3" height="15" rx="3"/></g>
+<text class="p" x="604.3" y="230.7" font-size="11">1.116× (sorted/C16)</text>
+<g><title>Eytzinger + paired, |F| = 1024: 1.019× (hash/C16 19.50 ms against main 19.87 ms)</title><rect class="s2" x="320.0" y="237" width="46.0" height="15" rx="3"/></g>
+<text class="p" x="372.0" y="248.7" font-size="11">1.019× (hash/C16)</text>
+<text class="p" x="190" y="283.0" font-size="12" text-anchor="end">packed + paired</text>
+<g><title>packed + paired, |F| = 65536: 1.000× (sorted/C16 401.90 ms against main 401.70 ms)</title><rect class="s1" x="318.8" y="266" width="2.0" height="15" rx="3"/></g>
+<text class="p" x="326.0" y="277.7" font-size="11">1.000× (sorted/C16)</text>
+<g><title>packed + paired, |F| = 1024: 1.120× (hash/C16 17.75 ms against main 19.87 ms)</title><rect class="s2" x="320.0" y="284" width="287.8" height="15" rx="3"/></g>
+<text class="p" x="613.8" y="295.7" font-size="11">1.120× (hash/C16)</text>
+<text class="p" x="190" y="330.0" font-size="12" text-anchor="end">all three (new default)</text>
+<g><title>all three (new default), |F| = 65536: 1.115× (sorted/C16 360.19 ms against main 401.70 ms)</title><rect class="s1" x="320.0" y="313" width="276.6" height="15" rx="3"/></g>
+<text class="p" x="602.6" y="324.7" font-size="11">1.115× (sorted/C16)</text>
+<g><title>all three (new default), |F| = 1024: 1.121× (hash/C16 17.73 ms against main 19.87 ms)</title><rect class="s2" x="320.0" y="331" width="289.8" height="15" rx="3"/></g>
+<text class="p" x="615.8" y="342.7" font-size="11">1.121× (hash/C16)</text>
+</svg>
