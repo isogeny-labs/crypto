@@ -1684,8 +1684,11 @@ unsafe fn least_rotation16_funnel_avx512(c: &[u64; 16], n: u32) -> [u64; 16] {
     let (hi_a, lo_a) = doubled(_mm512_loadu_si512(c.as_ptr().cast()));
     let (hi_b, lo_b) = doubled(_mm512_loadu_si512(c.as_ptr().add(8).cast()));
     // Rotation 0 is `hi` itself.  Odd and even rotations fold into two
-    // minima a vector, merged at the end: one chain of `n` dependent
-    // minima a vector was latency-bound (3.9 → 3.5 ns a key at n = 61,
+    // minima a vector, merged at the end, where the default kernel
+    // ([`least_rotation16_funnel_one_chain_avx512`]) keeps one chain of
+    // `n` dependent minima a vector.  Faster alone (3.9 → 3.5 ns a key at
+    // n = 61), but not established in collection by its A/B, so it is
+    // opt-in (`KIC_KEY_CHAINS=2`;
     // `research/ic_tool_program/explorations/key-chains-20261114/`).
     let (mut best_a, mut best_b) = (hi_a, hi_b);
     let (mut odd_a, mut odd_b) = (hi_a, hi_b);
@@ -1719,8 +1722,8 @@ unsafe fn least_rotation16_funnel_avx512(c: &[u64; 16], n: u32) -> [u64; 16] {
 }
 
 /// [`least_rotation16_funnel_avx512`] with all its minima in one chain a
-/// vector, as it was before the chain was split: the same words, kept as
-/// the same-binary control (`KIC_KEY_CHAINS=1`).
+/// vector: the same words, and the default (the split chains are opt-in,
+/// `KIC_KEY_CHAINS=2`).
 ///
 /// # Safety
 ///
@@ -1775,11 +1778,14 @@ unsafe fn least_rotation16_funnel_one_chain_avx512(c: &[u64; 16], n: u32) -> [u6
     out
 }
 
-/// Whether the funnel kernel splits its minima into two chains a vector
-/// (`KIC_KEY_CHAINS=1` keeps one, the control).
+/// Whether the funnel kernel splits its minima into two chains a vector:
+/// only under `KIC_KEY_CHAINS=2`.  Its A/B measured collection about 2%
+/// faster but did not establish it against the same session's A/A, so the
+/// default stays one chain
+/// (`research/ic_tool_program/explorations/key-chains-20261114/`).
 fn key_chains_split() -> bool {
     static SPLIT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *SPLIT.get_or_init(|| std::env::var("KIC_KEY_CHAINS").map_or(true, |v| v != "1"))
+    *SPLIT.get_or_init(|| std::env::var("KIC_KEY_CHAINS").as_deref() == Ok("2"))
 }
 
 /// Invert an `n × n` matrix over `F_2` given as its columns, returning
