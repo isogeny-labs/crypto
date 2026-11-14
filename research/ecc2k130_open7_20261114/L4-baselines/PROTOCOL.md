@@ -161,3 +161,17 @@ Falsifier of the prediction: F/G < 1 at P1 for some l >= 10 at m = 2, or I/G
 No end-to-end S, no rho arm: this is a decomposition-stage cost study in which
 every arm prices one target; there is no cross-method ECDLP row, so the §5a
 GAE band does not apply and no gap to rho is computed beyond quoting it.
+
+## Amendment 1 (2026-11-14, before any measured run; after a smoke run at seed 9, not part of the data)
+
+* The `ic descent --json` report has its cells under `cells` (not `measured`); the
+  harness reads either. `--out` is not used; JSON goes to stdout.
+* The smoke run showed that every engine also reports a **complete** `bitop/v1` tally
+  (`extra.bitop_*`, `bitop_complete = 1`; `crypto:src/cryptanalysis/bitop_tally.rs`:
+  word ops including matrix builds, hash probes, field ops). It is added as a
+  **secondary** I and F metric: word ops + hash probes + field adds at 1, field
+  mul/sqr/inv at the same P1/P4/P2n band as G; minimum over the repetitions (the first
+  repetition of a process can carry a one-time tally, e.g. 175,680 vs 144,569 at the
+  smoke's first target, while the native `ops` were equal). The frozen primary (native
+  `ops`) and the decision rule are unchanged; the report states whether the complete
+  count changes any order.

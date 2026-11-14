@@ -1210,6 +1210,8 @@ fn summarize(args: &[String]) {
     let mut js = String::from("{\"cells\":[");
     md.push_str("| n | l | m | targets | sat | G mul (geo-mean) | G P1 | G P4 | G P2n | I word XORs (geo-mean; range) | I budget hits | F word XORs | I/G P1 | I/G P4 | I/G P2n | F/G P1 | F/G P4 | F/G P2n | S cited (P4) | G/S P4 | gate fails | brute fails | neg-ctrl differs |\n");
     md.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n");
+    let mut md2 = String::from("\n### Complete counts (bitop/v1: word ops + hash probes + field ops priced at the band; min over repeats)\n\n| n | l | m | I complete (P4) | F complete | I/G P1 | I/G P4 | I/G P2n | F/G P1 | F/G P4 | F/G P2n |\n|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n");
+    let mut js2 = String::new();
     let mut first = true;
     let mut gate_total = 0;
     let mut neg_bad = 0;
@@ -1233,6 +1235,13 @@ fn summarize(args: &[String]) {
             }
         };
         let gs = [g[0] / s_p("P1"), g[1] / s_p("P4"), g[2] / s_p("P2n")];
+        let icg = [gm(&a.ic[0]), gm(&a.ic[1]), gm(&a.ic[2])];
+        let fcg = gm(&a.fc);
+        let rr = |x: f64, y: f64| if x.is_nan() || y.is_nan() { "—".to_string() } else { format!("{:.3}", x / y) };
+        writeln!(md2, "| {n} | {l} | {m} | {} | {} | {} | {} | {} | {} | {} | {} |", if icg[1].is_nan() { "—".into() } else { format!("{:.3e}", icg[1]) }, if fcg.is_nan() { "—".into() } else { format!("{:.3e}", fcg) }, rr(icg[0], g[0]), rr(icg[1], g[1]), rr(icg[2], g[2]), rr(fcg, g[0]), rr(fcg, g[1]), rr(fcg, g[2])).unwrap();
+        if !js2.is_empty() { js2.push(','); }
+        let ff = |x: f64| if x.is_nan() { "null".to_string() } else { format!("{x:.6e}") };
+        write!(js2, "{{\"n\":{n},\"l\":{l},\"m\":{m},\"i_complete_P1\":{},\"i_complete_P4\":{},\"i_complete_P2n\":{},\"f_complete\":{}}}", ff(icg[0]), ff(icg[1]), ff(icg[2]), ff(fcg)).unwrap();
         if gs.iter().all(|&x| x < 1.0) {
             s_beaten = true;
         }
@@ -1271,7 +1280,9 @@ fn summarize(args: &[String]) {
     } else {
         "NO-CHANGE"
     };
+    write!(js, "],\"complete_counts\":[{js2}").unwrap();
     write!(js, "],\"gate_failures\":{gate_total},\"cells_negative_control_failed\":{neg_bad},\"engine_ops_nondeterministic\":{ops_nondet},\"verdict\":\"{verdict}\"}}").unwrap();
+    md.push_str(&md2);
     md.push_str(&format!("\nVERDICT: {verdict} (gate failures {gate_total}; cells whose negative control could not fail {neg_bad}; nondeterministic engine ops {ops_nondet})\n"));
     std::fs::create_dir_all(&outdir).unwrap();
     std::fs::write(format!("{outdir}/summary.md"), &md).unwrap();

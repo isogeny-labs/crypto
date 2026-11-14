@@ -107,3 +107,19 @@ Conflicts and propagations are unpriced native operations. Per target they are p
 1 GAE per propagation as a band. No end-to-end IC number exists in this lane (no relation-yield or
 linear-algebra phase), so no gap to matched rho is reported: a saving here is a stage ratio of the
 decomposition oracle only.
+
+## Amendment 1 (2026-11-14, after the C1 data, before any C3 data; rules and predictions unchanged)
+- **C3 changed from m=29, k=2, w=3 to m=23, k=2, w=2.** An unscored timing smoke at m=29, w=3
+  (`$SP/lanes/L3/dev/dev_c3.jsonl`) censored the first A0 target at the 2,000,000-conflict budget
+  (149 s). The section 5 censoring clause would then fire by construction. m=23 has a type-II
+  ONB (47 is prime, ord_47(2) = 23), but 2 is not primitive mod 23. That breaks the "mirror
+  m=131" preference, and it is the only odd m between 11 and 29 with a type-II ONB. An unscored
+  smoke on 2 targets (`dev_m23.jsonl`) finished: A0 about 7e4 conflicts per target, A1 and B about
+  1.3e5 to 2e5. The prediction P2 statements about "C3" now refer to m=23.
+- **C4 (m=53) dropped**, because it is harder than m=29.
+- **C3 runs as two processes,** {A0, AA, A1, B} and {BS, CI, CA, CK}. The target stream is
+  identical (same seed), and the arm order rotates within each process. Counted metrics do not
+  depend on process placement.
+- Note recorded before the C3 data: the C1 positive-control ratio (0.438) is about the same as the
+  C1 stream B/A1 ratio (0.426). So the repeat block does not separate target-specific reuse from
+  general warm-up. The pass/fail criterion is unchanged.

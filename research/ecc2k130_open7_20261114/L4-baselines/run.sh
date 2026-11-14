@@ -17,9 +17,9 @@ for c in $CELLS; do
   f="$raw/ic-$tag.json"
   if [ ! -s "$f" ]; then
     echo "ic $tag $(date -u +%FT%TZ)"
-    timeout 3600 prlimit --as=2000000000 "$IC" descent --json --out "$f" --families K --cells "$c" \
+    timeout 3600 prlimit --as=2000000000 "$IC" descent --json --families K --cells "$c" \
       --targets "$TARGETS" --repeats "$REPEATS" --seed "$SEED" --budget-seconds "$BUDGET" \
-      --solver inherited-f4 --solver fes-f2 > "$raw/ic-$tag.log" 2>&1 || echo "ic $tag exit $?"
+      --solver inherited-f4 --solver fes-f2 > "$f" 2> "$raw/ic-$tag.log" || echo "ic $tag exit $?"
   fi
   if [ -s "$f" ] && [ ! -s "$raw/g-$tag.jsonl" ]; then
     echo "G $tag $(date -u +%FT%TZ)"
