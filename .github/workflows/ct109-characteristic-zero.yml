@@ -15,6 +15,10 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct109
+          sparse-checkout-cone-mode: true
       - name: Independent exact integer identity and index
         shell: bash
         run: |
