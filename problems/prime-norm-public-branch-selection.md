@@ -162,3 +162,27 @@ own faithful map. The fixed native fixture experiment remains unlaunched
 due checkpoint upload admission; no solver, paid or attack campaign was run.
 Original public finder, field extraction and expected bit-cost exit criteria
 remain open [pcc:unverified].
+
+
+2026-11-14 normalized scaling/full-closure test: [report](../research/prime_norm_rank_20261112/target-grading-report/README.md),
+source85c57a726a644a6d2138a5c97785ab1119a06aff. The normalized actual target
+row has exact inverse-pair weight-(d-3) transport, retaining d>=3, e*l=1
+and the curve premise. Separately, its row change is a public constant
+field-linear recombination in the coefficient algebra. The old/new input
+spans, and their full iterated degree-budgeted closures, coincide whenever
+both input families fit the budget. Multiplication of newly derived rows
+is included; the degree function is explicit. Actual symbolic remainder
+binding is not a finite-field pointwise surrogate. Central unsigned
+PCC-20261114-46dee9/5f67e7/044d98/d07690; validation6643d4 records15 authored
+theorems plus one generated recursor, whole-study gate369/0 and fresh0
+[pcc:unverified].
+
+This excludes attributing a closure reduction above input admission to
+constant row recombination alone. It does not prove the original closure
+large or exclude short derivations exposed by a different row basis,
+lower-budget effects, implementation gains or nonlinear mechanisms.
+Exact multivariate degree29 binding and full growing-family closure remain
+open. Next, obtain actual bounded derivations or test a mechanism beyond
+constant row recombination; preserve all original public finder, extraction
+and expected bit-cost criteria. No solver/native fixture experiment was
+launched, and no global non-generic impossibility is inferred [pcc:unverified].

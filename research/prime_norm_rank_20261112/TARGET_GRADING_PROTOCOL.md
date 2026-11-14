@@ -13,7 +13,7 @@ original target. Derive target evaluation of the existing full-remainder
 transport, and cancel only the explicit nonzero parameter factor e^3.
 Acceptance is an exact theorem under e*l=1 and the original curve premise,
 for every tower depth satisfying d>=3. The quotient must remain actual
-monic division, not an independently supplied witness.
+monic division, not an independently supplied witness [pcc:unverified].
 
 Next bind that law to a formal multivariate weighted polynomial or its
 injective homogenization, over polynomial coefficient rings rather than
@@ -60,7 +60,7 @@ nonzero field scalar. Prove the old/new input spans coincide and that the
 full iterated degree-budgeted closure is identical whenever the budget
 admits every old and new input. Use the existing ML Closure.lean semantics,
 including multiplication of newly derived rows, with an explicit degree
-function so ordinary or weighted degree can be instantiated.
+function so ordinary or weighted degree can be instantiated [pcc:unverified].
 
 This would reject row recombination alone as a mechanism for reducing
 closure beyond the input-admission threshold, not rule out a lower budget,
