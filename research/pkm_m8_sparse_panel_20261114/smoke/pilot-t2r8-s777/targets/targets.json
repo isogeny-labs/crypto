@@ -1,0 +1,83 @@
+{
+  "Q": {
+    "x": 201806,
+    "y": 176508
+  },
+  "cell_sha256": "d4e10674dcb3c2ddb528efdc4bffbb2962d587cf72f858ba3ac70c47ab3cb10a",
+  "draws": {
+    "draws_total": 471,
+    "empirical_natural_sat_rate": 0.0021231422505307855,
+    "identity_draws": 0,
+    "real_sat_draw_indices": [
+      470
+    ],
+    "real_sat_draws": 1,
+    "selected_draw_indices": [
+      0,
+      470
+    ],
+    "stopping_rule": "draw in order until 1 real-SAT and 1 real-UNSAT are kept; SAT = at least one real signed multiset of size 8 sums to R"
+  },
+  "enumeration": {
+    "alg_entries": 966,
+    "alg_leaves": 6435,
+    "definition": "real decomposition = signed multiset of m real base points with sum exactly R; algebraic = unsigned multiset of V with a sign pattern (first sign +) whose sum over F_{p^2} has abscissa x_R (gen.py decomposable)",
+    "real_entries": 636,
+    "real_leaves": 1287,
+    "seconds": 0.002778075,
+    "total_seconds": 0.0063053
+  },
+  "hidden_sha256": "175ff4b9d24afc8d2e5d0a95192588821cbb8f0ee6b3b49b5acfcaf6d26d31be",
+  "label_leak_note": "label (sat/unsat/planted) and the real/algebraic counts are classifier metadata needed for the panel's stratification; they are NOT inputs to a solver. a, b are the attacker's own multipliers of R = aP + bQ (needed to form relation rows), k is hidden.",
+  "m": 8,
+  "schema": "pkm.m8-panel.targets/v1",
+  "seed": 777,
+  "sha256": "2f95eea0f435f0c3a19b8f57a968d51ab5de6f5523396eda0abafc117e665cf4",
+  "targets": [
+    {
+      "a": 26932,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 89657,
+      "draw_index": 0,
+      "label": "unsat",
+      "name": "d000000",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "x_r": 164453
+    },
+    {
+      "a": 199828,
+      "algebraic_count": 20,
+      "algebraic_signed_classes": 20,
+      "b": 63352,
+      "draw_index": 470,
+      "label": "sat",
+      "name": "d000470",
+      "ordered_algebraic_solutions": 84464,
+      "planted": false,
+      "real_count": 10,
+      "x_r": 162753
+    },
+    {
+      "a": null,
+      "algebraic_count": 10,
+      "algebraic_signed_classes": 10,
+      "b": null,
+      "draw_index": null,
+      "label": "planted",
+      "name": "planted0",
+      "ordered_algebraic_solutions": 39912,
+      "planted": true,
+      "real_count": 6,
+      "x_r": 47474
+    }
+  ],
+  "tool": {
+    "git_commit": "4cce8f0830ee8191bf9e38c33aa12aa3afa388df",
+    "git_note": "null when run outside a git checkout and PKM_M8_GIT_COMMIT was not set at build",
+    "name": "pkm_m8_panel",
+    "source_sha256": "97ebacdd57444fcfd8d4710b98fe27945cf8a6c24e817e6b22c171b3804052f4"
+  }
+}

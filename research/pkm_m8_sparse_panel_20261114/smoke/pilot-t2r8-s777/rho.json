@@ -1,0 +1,64 @@
+{
+  "bits": 18,
+  "cell_sha256": "d4e10674dcb3c2ddb528efdc4bffbb2962d587cf72f858ba3ac70c47ab3cb10a",
+  "instance": "log_P(Q) of the cell's hidden instance (log never read; checked by xP = Q)",
+  "mean_group_additions": 288.0,
+  "method": "prime_fast::rho_parallel, negation map, r-adding table, DP table",
+  "predicted_walk_steps": 453.6676912856642,
+  "r": 262051,
+  "reference_only": "decides nothing; unit is one affine group addition (GAE) per walk step",
+  "runs": [
+    {
+      "cpu_secs": 0.0013188500000000003,
+      "distinguished_points": 174,
+      "dp_bits": 0,
+      "log_verified_xP_eq_Q": true,
+      "seed": 777,
+      "setup_combines_lower_bound": 1056,
+      "setup_note": "each combine is one Straus double-scalar multiplication (about 1.5*bits Jacobian operations); restarts after fruitless cycles are not counted: group additions are a lower bound",
+      "solved": true,
+      "threads": 1,
+      "walk_steps_group_additions": 160,
+      "walkers_per_thread": 32,
+      "wall_secs": 0.00131346
+    },
+    {
+      "cpu_secs": 0.0012241040000000002,
+      "distinguished_points": 402,
+      "dp_bits": 0,
+      "log_verified_xP_eq_Q": true,
+      "seed": 778,
+      "setup_combines_lower_bound": 1056,
+      "setup_note": "each combine is one Straus double-scalar multiplication (about 1.5*bits Jacobian operations); restarts after fruitless cycles are not counted: group additions are a lower bound",
+      "solved": true,
+      "threads": 1,
+      "walk_steps_group_additions": 384,
+      "walkers_per_thread": 32,
+      "wall_secs": 0.00123254
+    },
+    {
+      "cpu_secs": 0.0011802610000000002,
+      "distinguished_points": 344,
+      "dp_bits": 0,
+      "log_verified_xP_eq_Q": true,
+      "seed": 779,
+      "setup_combines_lower_bound": 1056,
+      "setup_note": "each combine is one Straus double-scalar multiplication (about 1.5*bits Jacobian operations); restarts after fruitless cycles are not counted: group additions are a lower bound",
+      "solved": true,
+      "threads": 1,
+      "walk_steps_group_additions": 320,
+      "walkers_per_thread": 32,
+      "wall_secs": 0.001180298
+    }
+  ],
+  "schema": "pkm.m8-panel.rho/v1",
+  "sha256": "216e0e24f5f0fb3216bc792f6480ce688ca3c581d90e9aeb53e2ae126e65dd65",
+  "targets_sha256": "2f95eea0f435f0c3a19b8f57a968d51ab5de6f5523396eda0abafc117e665cf4",
+  "tool": {
+    "git_commit": "4cce8f0830ee8191bf9e38c33aa12aa3afa388df",
+    "git_note": "null when run outside a git checkout and PKM_M8_GIT_COMMIT was not set at build",
+    "name": "pkm_m8_panel",
+    "source_sha256": "ba0a04209dd97914307fdb1e2a4c0d3ef15884da77348c91a32e51f125120ac7"
+  },
+  "vm_hwm_kb": 4492
+}
