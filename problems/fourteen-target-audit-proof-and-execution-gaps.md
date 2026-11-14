@@ -332,7 +332,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50); originalnine-pointprime3formwithoutaddedcoprime/generalchar3actualcard1or3/rank0or1 (22); directoriginalr2/r3finite-fieldcountformswithonlyAlgebraFK/cardq^k/noauxiliaryclosure-tower/noaddedcoprime (7) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
-| 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67); generalactualchar3killed3card1or3/finiteness/modulefinrank0or1 (22), concretebranchescredited; genericactualchar2killed2card1or2/finiteness/never4overeveryfieldwithoutalgclosedpremise (7); actualgeometricp-torsion/j0/count/module-rank/triviality/scalar-extensioncriterion char2/3, actualF3rational/geometriccontrol/directalgclosed-deletionnegation(30) | General Hasse/FSTtrace-Endrank geometric identification, further extension-field censuses and full torsion-field bridges |
+| 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67); generalactualchar3killed3card1or3/finiteness/modulefinrank0or1 (22), concretebranchescredited; genericactualchar2killed2card1or2/finiteness/never4overeveryfieldwithoutalgclosedpremise (7); actualgeometricp-torsion/j0/count/module-rank/triviality/scalar-extensioncriterion char2/3, actualF3rational/geometriccontrol/directalgclosed-deletionnegation(30); completeactualall-modelF2/F3kernelcensus/source-trace↔geometricp-torsion/Hasse/tracecases/allcountdivisororderbounds4/6/namedpointcontrols(44) | General Hasse/FSTtrace-Endrank geometric identification beyond F2/F3, further extension-field censuses and full torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
@@ -1137,3 +1137,31 @@ Remark3.16/context/pp98–99andp75notes read/PDFpages104/80inspected;
 no fullbookread/Endrank↔p-rank/FSTtrace↔geometry/Hasse/embeddingtheorem
 or otherprime/all14closure. No qualified-source refutation/novelty/corpus
 promotion/nativeexperiment/spend/upload. [pcc:unverified]
+
+### Complete actual F2/F3 source-trace and geometric torsion census
+
+The [all-model F2/F3 trace and geometry packet](../research/small_prime_trace_geometry_audit_20261114/README.md)
+proves a complete kernel census of actual general Weierstrass coefficient
+models:32/243 raw,16/162 nonsingular,8/54 source-supersingular. A generic
+finite-field point equivalence proves actual point cardinality equals
+literal equation-pair count plus identity, hence actual trace equals counted
+trace. For every nonsingular F2/F3 model, source gcd(trace,q)!=1 is equivalent
+to actual geometric killed-p subgroup cardinality one. Actual Hasse bounds
+and source trace-square/count cases are proved, with no classification
+premise. Every actual source-supersingular count divisor, including composite,
+has gcd(r,q)=1 and modular order dividing4/6, with bounds4/6 respectively.
+This does not assert that every divisor occurs as a cyclic point order.
+Explicit F2 point(0,0) on y²+y=x³+x has order5/modular order4; explicit F3
+point(0,1) on y²=x³+2x+1 has order7/modular order6. The source p>=5 prime-field
+clause is retained; these controls do not refute it. Prior native178-model
+baseline/conditional modular arithmetic/geometric j criterion credited.
+Whole gate44/0failures/0trusted, exact local PCC-20261114-6fec58 replay PASS at2026-11-14T06:12:46Z,
+87recursive formal/config+11artifact pins match, all83attempt files/
+32unique objects/36791B archive/five gate files retained,
+inspected one-page PDF47307B. Signed standing unverified. FST2010 selected
+pp230/237/Definition2.1/Remark2.2/Section3 and Milne IV9/Theorem9.4 proof
+reviewed, rendered pages inspected; no full-paper/book read or corpus
+promotion. General prime/extension-field Hasse, trace/Endrank/geometric
+identifications beyond F2/F3 and field-degree/full-torsion-field bridges
+remain open. No qualified-source refutation, novelty, native experiment,
+paid compute or agent upload. [pcc:unverified]
