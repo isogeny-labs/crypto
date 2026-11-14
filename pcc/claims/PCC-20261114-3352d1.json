@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T18:47:21Z",
+ "id": "PCC-20261114-3352d1",
+ "kind": "theorem",
+ "producer": {
+  "commit": "eedce945208bf58a980e3e133bd11c9b135f3e6a",
+  "model": "",
+  "session": "orientation-transport-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "706b001416f3e8a40906e517ae97fb51ae643b5bd80c9f6f1e59120055d7aad9",
+   "kind": "lean",
+   "project": "research/prime_orientation_layers_20261114/transport/lean",
+   "theorem": "OrientationAbsolutePrecision.actual_absolute_rational_right"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source premises; same actual auxiliary crossing W/nonzero retained nodes and feasible schedule. Constructed absolute precision and actual integral coefficient reduction/evaluation in characteristic2^p rings; all literal labels retained. Source eedce945208bf58a980e3e133bd11c9b135f3e6a shared57/0, import-inclusive fresh pending. Standard p-adic reduction and finite polynomial/matrix algebra reused. No original immutable creation/mode-density/entry/bit/child/recursion/public finder/scalar/expected cost theorem. Unsigned/defaultnot_covered.",
+ "statement": "Exact source-bound declaration OrientationAbsolutePrecision.actual_absolute_rational_right: theorem actual_absolute_rational_right (a u i p : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : (t:\u211a) \u2208 grid a) (ht0 : t \u2260 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hu : u\u2264a) (z : \u211a) (hz : VBound 0 z) (rb : LabelsAt a u i p m) (y : Ports a) : VBound 0 (evalMatrix z (absoluteRight a u i p t m) rb y)"
+}

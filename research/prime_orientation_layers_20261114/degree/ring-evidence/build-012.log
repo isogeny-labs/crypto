@@ -1,0 +1,71 @@
+'OrientationModeProfile.actual_weighted_left_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.actual_right_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.weight_fiber_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.negative_pole_polynomial_width' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationAbsolutePrecision.creation_index_covers' depends on axioms: [propext, Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_polynomial_precision' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_rational_precision' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_rational_profile' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCoefficientReduction.reduce_zero_of_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.integral_den_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_compatible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_finite_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.actual_integral_polynomial_product' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+../ring-evidence/draft-012.lean.txt:474:43: error: unsolved goals
+p : ℕ
+R : Type u_1
+inst✝² : CommRing R
+inst✝¹ : CharP R (2 ^ p)
+I : Type u_2
+J : Type u_3
+K : Type u_4
+inst✝ : Fintype K
+W : Matrix I J ℚ[X]
+A : Matrix I K ℚ[X]
+B : Matrix K J ℚ[X]
+hW : ∀ (x : I) (y : J), Content 0 (W x y)
+hA : ∀ (x : I) (y : K), Content 0 (A x y)
+hB : ∀ (x : K) (y : J), Content 0 (B x y)
+herr : ∀ (x : I) (y : J), Content (↑p) ((W - A * B) x y)
+E : Matrix I J (↥integralRationals)[X] := ⋯
+he : mapPolys integralRationals.subtype E = W - A * B
+⊢ ∀ (i : I) (j : J), mapPolys (reduceTo p R) E i j = 0 i j
+../ring-evidence/draft-012.lean.txt:476:8: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce
+
+p : ℕ
+R : Type u_1
+inst✝² : CommRing R
+inst✝¹ : CharP R (2 ^ p)
+I : Type u_2
+J : Type u_3
+K : Type u_4
+inst✝ : Fintype K
+W : Matrix I J ℚ[X]
+A : Matrix I K ℚ[X]
+B : Matrix K J ℚ[X]
+hW : ∀ (x : I) (y : J), Content 0 (W x y)
+hA : ∀ (x : I) (y : K), Content 0 (A x y)
+hB : ∀ (x : K) (y : J), Content 0 (B x y)
+herr : ∀ (x : I) (y : J), Content (↑p) ((W - A * B) x y)
+E : Matrix I J (↥integralRationals)[X] := liftMatrix W hW - liftMatrix A hA * liftMatrix B hB
+he : mapPolys integralRationals.subtype E = W - A * B
+hz : mapPolys (reduceTo p R) E = 0
+⊢ mapPolys (reduceTo p R) (liftMatrix W hW) =
+    mapPolys (reduceTo p R) (liftMatrix A hA) * mapPolys (reduceTo p R) (liftMatrix B hB)
+../ring-evidence/draft-012.lean.txt:479:4: error: unexpected token 'have'; expected command
+'OrientationCoefficientReduction.integral_matrix_product' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'OrientationCoefficientReduction.actual_reduced_absolute_factors' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

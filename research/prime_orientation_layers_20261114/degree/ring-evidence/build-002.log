@@ -1,0 +1,105 @@
+../ring-evidence/draft-002.lean.txt:10:11: error(lean.unknownIdentifier): Unknown identifier `Fact`
+
+Note: A public declaration `Fact` exists but is imported privately; consider adding `public import Mathlib.Basic.Logic.Basic`.
+../ring-evidence/draft-002.lean.txt:12:24: error(lean.unknownIdentifier): Unknown identifier `Subring`
+
+Note: A public declaration `Subring` exists but is imported privately; consider adding `public import Mathlib.Algebra.Ring.Subring.Defs`.
+../ring-evidence/draft-002.lean.txt:20:40: error(lean.unknownIdentifier): Unknown identifier `VBound`
+
+Note: A public declaration `VBound` exists but is imported privately; consider adding `public import OrientationContent`.
+../ring-evidence/draft-002.lean.txt:21:4: error(lean.unknownIdentifier): Unknown identifier `padicNorm`
+
+Note: A public declaration `padicNorm` exists but is imported privately; consider adding `public import Mathlib.NumberTheory.Padics.PadicNorm`.
+../ring-evidence/draft-002.lean.txt:32:35: error(lean.unknownIdentifier): Unknown identifier `VBound`
+
+Note: A public declaration `VBound` exists but is imported privately; consider adding `public import OrientationContent`.
+../ring-evidence/draft-002.lean.txt:32:49: error(lean.unknownIdentifier): Unknown identifier `padicNorm`
+
+Note: A public declaration `padicNorm` exists but is imported privately; consider adding `public import Mathlib.NumberTheory.Padics.PadicNorm`.
+../ring-evidence/draft-002.lean.txt:35:14: error(lean.unknownIdentifier): Unknown constant `RingHom`
+
+Note: A public declaration `RingHom` exists but is imported privately; consider adding `public import Mathlib.Algebra.Ring.Hom.Defs`.
+../ring-evidence/draft-002.lean.txt:44:21: error(lean.unknownIdentifier): Unknown constant `RingHom`
+
+Note: A public declaration `RingHom` exists but is imported privately; consider adding `public import Mathlib.Algebra.Ring.Hom.Defs`.
+../ring-evidence/draft-002.lean.txt:47:30: warning: Variable name `p` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _p
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../ring-evidence/draft-002.lean.txt:49:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+../ring-evidence/draft-002.lean.txt:50:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+../ring-evidence/draft-002.lean.txt:52:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+../ring-evidence/draft-002.lean.txt:53:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+../ring-evidence/draft-002.lean.txt:54:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+../ring-evidence/draft-002.lean.txt:49:2: warning: Unused tactic linter: `change PadicInt.toZModPow p (toPadic q) = 0` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../ring-evidence/draft-002.lean.txt:50:2: warning: Unused tactic linter: `rw [← RingHom.mem_ker, PadicInt.ker_toZModPow, ←
+  PadicInt.norm_le_pow_iff_mem_span_pow]` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../ring-evidence/draft-002.lean.txt:52:2: warning: Unused tactic linter: `change ‖(q.val : ℚ_[2])‖ ≤ (2 : ℝ) ^ (-(p : ℤ))` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../ring-evidence/draft-002.lean.txt:53:2: warning: Unused tactic linter: `rw [Padic.eq_padicNorm]` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../ring-evidence/draft-002.lean.txt:54:2: warning: Unused tactic linter: `exact_mod_cast norm_bound p h` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../ring-evidence/draft-002.lean.txt:56:44: error(lean.unknownIdentifier): Unknown identifier `VBound`
+
+Note: A public declaration `VBound` exists but is imported privately; consider adding `public import OrientationContent`.
+../ring-evidence/draft-002.lean.txt:56:58: error(lean.unknownIdentifier): Unknown identifier `padicValNat`
+
+Note: A public declaration `padicValNat` exists but is imported privately; consider adding `public import Mathlib.Data.Nat.PadicValNat`.
+../ring-evidence/draft-002.lean.txt:58:2: error: unsolved goals
+case pos
+h : sorry
+⊢ sorry () = 0
+../ring-evidence/draft-002.lean.txt:56:83: error: unsolved goals
+case neg
+q : ℚ
+h : sorry
+hq : ¬q = 0
+⊢ sorry = 0
+../ring-evidence/draft-002.lean.txt:65:42: error(lean.unknownIdentifier): Unknown identifier `VBound`
+
+Note: A public declaration `VBound` exists but is imported privately; consider adding `public import OrientationContent`.
+../ring-evidence/draft-002.lean.txt:65:71: error: unsolved goals
+q : ℚ
+h : sorry
+⊢ ¬2 ∣ q.den
+../ring-evidence/draft-002.lean.txt:72:38: error(lean.unknownIdentifier): Unknown identifier `VBound`
+
+Note: A public declaration `VBound` exists but is imported privately; consider adding `public import OrientationContent`.
+../ring-evidence/draft-002.lean.txt:72:52: error(lean.unknownIdentifier): Unknown identifier `Odd`
+
+Note: A public declaration `Odd` exists but is imported privately; consider adding `public import Mathlib.Algebra.Ring.Parity`.
+../ring-evidence/draft-002.lean.txt:75:37: warning: Variable name `hmn` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hmn
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../ring-evidence/draft-002.lean.txt:77:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+../ring-evidence/draft-002.lean.txt:77:2: warning: Unused tactic linter: `exact DFunLike.congr_fun (PadicInt.zmod_cast_comp_toZModPow m n hmn) (toPadic q)` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../ring-evidence/draft-002.lean.txt:80:14: error(lean.unknownIdentifier): Unknown constant `OrientationCoefficientReduction.reduce_zero_of_bound`
+'OrientationCoefficientReduction.integral_den_odd' does not depend on any axioms
+../ring-evidence/draft-002.lean.txt:82:14: error(lean.unknownIdentifier): Unknown constant `OrientationCoefficientReduction.reduce_compatible`
