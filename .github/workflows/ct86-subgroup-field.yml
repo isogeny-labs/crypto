@@ -1,0 +1,34 @@
+name: "CT86 subgroup field and Frobenius orientation (bounded)"
+on:
+  push:
+    branches:
+      - research/ct81-fixed-prime-orientation-20261113
+    paths:
+      - "research/cross_characteristic_global_torsion_20261112/ct86/**"
+      - ".github/workflows/ct86-subgroup-field.yml"
+  pull_request:
+    paths:
+      - "research/cross_characteristic_global_torsion_20261112/ct86/**"
+      - ".github/workflows/ct86-subgroup-field.yml"
+  workflow_dispatch:
+
+jobs:
+  independent-exact-arithmetic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Python and independent Node controls at the exact head
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct86
+          python3 -B "$D/ct86_subgroup_field.py" > /tmp/ct86-py.txt
+          python3 -O -B "$D/ct86_subgroup_field.py" > /tmp/ct86-pyopt.txt
+          node "$D/ct86_subgroup_field_independent.js" > /tmp/ct86-js.txt
+          node --no-opt "$D/ct86_subgroup_field_independent.js" > /tmp/ct86-js-noopt.txt
+          cmp /tmp/ct86-py.txt /tmp/ct86-pyopt.txt
+          cmp /tmp/ct86-py.txt /tmp/ct86-js.txt
+          cmp /tmp/ct86-py.txt /tmp/ct86-js-noopt.txt
+          printf '%s  %s\n' ac4efd15c28c904c5eb88394736b42e4dbca637fac1ff51953ab94c824aaed96 /tmp/ct86-py.txt | sha256sum -c
+          cat /tmp/ct86-py.txt
