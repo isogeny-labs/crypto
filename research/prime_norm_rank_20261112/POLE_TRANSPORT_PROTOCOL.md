@@ -42,3 +42,11 @@ run the full proof gate and import-inclusive fresh replay, create unsigned
 PCC bindings and a source-linked visual/PDF proof map before reporting.
 No earlier source or ledger rewrite, fabricated signature, vault access,
 force push, gate edit or unrelated automation/PR change.
+
+Literal certificate supplement before source freeze: seal only
+e^12*(A^2-F*B^2)=(e^6*A)^2-(e^6*F)*(e^3*B)^2, syntactic degree15
+in(e,A,F,B),32 statement-derived and16 extra points with unchanged canonical
+issuer/checker/hash. This is an unconditional intermediate ring identity,
+not the inverse-pair condition, actual polynomial quotient or remainder map.
+Retain the certificate separately from Lean execution receipts; no signer
+or native fixture experiment is inferred from finite certificate issuance.
