@@ -478,6 +478,7 @@ default; the ids are:
 |---|---|---|
 | `ic.aps_v1` | ic | bounded APS polynomial instrument, exclusive cold/online wall phases and retained failures; only independent-check group work is priced, so native operation totals remain incomplete |
 | `ic.aps_v2` | ic | `ic.aps_v1` with its core work counted: the same instrument and charges, plus five `aps_core_*_uncharged` counters (the module's own `FastCurve` scalar multiplications, `u·G + v·Q` combinations, point additions and square roots, and the coefficient multiplications of polynomial construction); `unpriced` names counters only. Supersedes `ic.aps_v1` (§9) |
+| `ic.aps_v3` | ic | explicit unequal profiles, arbitrary coordinate guessing, checked F4 trace reuse, a two-variable line chart with horizontal coverage, and retained-base full/frontier controls; diagnostic GAE remains incomplete; optional inclusive Ir is a separate unit |
 | `ic.three_leads_genus2_pencil_symbolic_v3` | ic | `ic.three_leads_genus2_pencil_symbolic_v2` with its ledger lifted into counters: the same solve and group-only GAE, `pencil_native_*`, `pencil_symbolic_*` and `pencil_logical_*` `_uncharged` counters, and `unpriced` listing exactly the `_uncharged` counters. Supersedes the `_v2` id (§9) |
 | `ic.residual_batch_v2` | rho | `ic.residual_batch` with the derivation of the base point `P0` inside the total (phase `base_point`). Supersedes `ic.residual_batch` (§9) |
 | `rho.frozen_reference` | rho | the frozen r-adding walk every ledger row was priced against through §17 (A = 1); the historical "before" mark |
@@ -2036,6 +2037,27 @@ two counters of attempts whose solver report was absent. Allocation, hashing,
 polynomial additions and term collection and the field arithmetic of decoding
 and modular recovery are not counted at all and are recorded in
 `detail.uncounted_work`; S and bitop totals remain lower bounds.
+
+`ic.aps_v3` adds explicit `subset_profile` (with `subset_size=0`),
+`guess=none|INDEX`, `trace=off|certified` with entry/word caps,
+`growth=none|retained_full|frontier` with a ceiling, and `line_chart3`.
+It requires exact roots. Each target owns a cold trace pool; a replay must
+pass input reductions and Buchberger-pair checks or fall back to native F4.
+Both retained growth modes keep identical seeded point/label draws; only
+`frontier` can omit a previously complete region. Partial traversals cannot
+authorize that omission. The chart keeps a separate horizontal cell unless
+the existing orbit/label certificate authorizes pruning. New literal cells,
+fixed guesses, draw histories and trace diagnostics remain in the record.
+
+Its counted but unpriced `aps_trace_certification_term_steps_uncharged`
+and coefficient-multiplication diagnostics do not close complete GAE
+accounting. The optional independent export path sums all Callgrind Ir
+parts inside the existing method frame and a separate ordinary-residue
+scalar-check frame. It requires a separately sealed replay with matching
+trajectory, counters and binary. This simulated instruction unit is not
+wall time, S, whole-process startup cost or signed execution evidence.
+See [the precise accounting boundary](../../research/aps_cost_leads_20261106/ACCOUNTING.md)
+and [unfrozen four-size design](../../research/aps_cost_leads_20261106/PROTOCOL.md).
 
 [The instrument study](../../research/aps_measurement_20261029/README.md) has
 control specs and the remaining protocol/export/accounting/launch prerequisites.
