@@ -104,6 +104,56 @@ def lead_cells():
     plt.close(fig)
 
 
+PAGES = [("p1", ["FB", "ORACLE"]), ("p2", ["LIFT", "TRANSFER"]), ("p3", ["BARRIER", "ENG"])]
+WRAP = 40
+
+
+def lead_cells_paged():
+    """Same cells, split over three A4-portrait pages; a column longer than WRAP rows wraps."""
+    bycol = defaultdict(list)
+    for r in ROWS:
+        bycol[r["column"]].append(r)
+    for c in bycol:
+        bycol[c].sort(key=sort_key)
+    titles = dict(COLUMNS)
+    for name, keys in PAGES:
+        subcols = []
+        for k in keys:
+            items = bycol.get(k, [])
+            parts = [items[i:i + WRAP] for i in range(0, max(len(items), 1), WRAP)] or [[]]
+            for pi, part in enumerate(parts):
+                subcols.append((k, pi, len(parts), part, len(items)))
+        n = len(subcols)
+        nrows = max(len(sc[3]) for sc in subcols)
+        cell_h = 0.62
+        fig, ax = plt.subplots(figsize=(2.75 * n, 1.6 + nrows * cell_h * 0.42))
+        ax.set_xlim(0, n)
+        ax.set_ylim(-(nrows * cell_h) - 0.3, 1.1)
+        ax.axis("off")
+        for ci, (k, pi, nparts, items, total) in enumerate(subcols):
+            cont = f" ({pi + 1}/{nparts})" if nparts > 1 else ""
+            ax.text(ci + 0.5, 0.78, f"{titles[k]}{cont}\n(n = {total})", ha="center", va="center",
+                    fontsize=9, fontweight="bold")
+            for ri, r in enumerate(items):
+                y = -ri * cell_h
+                x = ci + 0.025
+                flag = bool(r.get("flagship"))
+                ax.add_patch(FancyBboxPatch((x, y - cell_h * 0.46), 0.95, cell_h * 0.9,
+                                            boxstyle="round,pad=0.01,rounding_size=0.05",
+                                            fc=VERDICT_COLOR[r["verdict"]], ec="black" if flag else "white",
+                                            lw=2.2 if flag else 0.5, alpha=0.92))
+                dots = STRENGTH_DOTS[r["evidence_strength"]]
+                dark = r["verdict"] in ("refuted", "open", "blocked")
+                ax.text(x + 0.03, y, f"{SOURCE_GLYPH.get(r['source_kind'], '?')} {r['label'][:38]}", ha="left",
+                        va="center", fontsize=6.4, color="white" if dark else "black",
+                        fontweight="bold" if flag else "normal")
+                ax.text(x + 0.935, y, "\u25cf" * dots + "\u25cb" * (4 - dots), ha="right", va="center",
+                        fontsize=5.0, color="white" if dark else "black")
+        fig.tight_layout()
+        fig.savefig(HERE / f"lead_cells_{name}.svg")
+        plt.close(fig)
+
+
 def verdict_matrix():
     counts = Counter((r["column"], r["verdict"]) for r in ROWS)
     scounts = Counter((r["verdict"], r["evidence_strength"]) for r in ROWS)
@@ -145,5 +195,6 @@ def verdict_matrix():
 
 if __name__ == "__main__":
     lead_cells()
+    lead_cells_paged()
     verdict_matrix()
     print("wrote", HERE / "lead_cells.svg", HERE / "verdict_matrix.svg")
