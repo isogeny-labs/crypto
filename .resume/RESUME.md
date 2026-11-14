@@ -8,7 +8,7 @@ research/ic_e222_m221_20261106/interleaved_rho_bsgs/PROTOCOL.md (frozen before d
 examples/prime_fast_j0_bsgs_multi.rs gained INST0.
 
 ## State
-Protocol + runner committed; build running; no rows yet.
+Complete: BSGS faster at 26-28 bits, tied at 30. Record closed; PR next.
 
 ## Next
 Run under benchrec run, analyse (geomean ratio + bootstrap, A/A), README + graph, close record, PR.
