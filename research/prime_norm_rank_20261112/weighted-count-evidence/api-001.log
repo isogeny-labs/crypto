@@ -1,0 +1,13 @@
+Nat.mul_add_div {m : ℕ} (m_pos : m > 0) (x y : ℕ) : (m * x + y) / m = x + y / m
+Nat.add_mul_div_left (x z : ℕ) {y : ℕ} (H : 0 < y) : (x + y * z) / y = x / y + z
+Nat.add_mul_div_right (x y : ℕ) {z : ℕ} (H : 0 < z) : (x + y * z) / z = x / z + y
+research/prime_norm_rank_20261112/weighted-count-evidence/api-001.lean:5:7: error(lean.unknownIdentifier): Unknown constant `Nat.mul_add_div_left`
+research/prime_norm_rank_20261112/weighted-count-evidence/api-001.lean:6:7: error(lean.unknownIdentifier): Unknown constant `Nat.mul_add_div_right`
+Fintype.card_prod.{u_3, u_4} (α : Type u_3) (β : Type u_4) [Fintype α] [Fintype β] :
+  Fintype.card (α × β) = Fintype.card α * Fintype.card β
+Fintype.card_coe.{u_1} {α : Type u_1} (s : Finset α) [Fintype ↥s] : Fintype.card ↥s = s.card
+Fin.prod_univ_eq_prod_range.{u_1} {α : Type u_1} [CommMonoid α] (f : ℕ → α) (n : ℕ) :
+  ∏ i, f ↑i = ∏ i ∈ Finset.range n, f i
+Finset.prod_fin_eq_prod_range.{u_2} {β : Type u_2} [CommMonoid β] {n : ℕ} (c : Fin n → β) :
+  ∏ i, c i = ∏ i ∈ Finset.range n, if h : i < n then c ⟨i, h⟩ else 1
+Nat.choose_symm_add {a b : ℕ} : (a + b).choose a = (a + b).choose b
