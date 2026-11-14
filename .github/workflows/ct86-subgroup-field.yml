@@ -7,12 +7,14 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct86/**"
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
       - "research/cross_characteristic_global_torsion_20261112/ct88/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct89/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   pull_request:
     paths:
       - "research/cross_characteristic_global_torsion_20261112/ct86/**"
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
       - "research/cross_characteristic_global_torsion_20261112/ct88/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct89/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   workflow_dispatch:
 
@@ -66,3 +68,18 @@ jobs:
           cmp /tmp/ct88-py.json /tmp/ct88-jsopt.json
           printf '%s  %s\n' 4953ec9689c3ce372eda1d53cc53eceb3340f7dc013270bcd3d0cf909956f096 /tmp/ct88-py.json | sha256sum -c
           cat /tmp/ct88-py.json
+
+      - name: Verify CT89 2-maximal basis, products and binary CRT factors
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct89
+          python3 -B "$D/ct89_basis.py" > /tmp/ct89-py.json
+          python3 -O -B "$D/ct89_basis.py" > /tmp/ct89-opt.json
+          node "$D/ct89_basis_independent.js" > /tmp/ct89-js.json
+          node --no-opt "$D/ct89_basis_independent.js" > /tmp/ct89-jsopt.json
+          cmp /tmp/ct89-py.json /tmp/ct89-opt.json
+          cmp /tmp/ct89-py.json /tmp/ct89-js.json
+          cmp /tmp/ct89-py.json /tmp/ct89-jsopt.json
+          printf '%s  %s\n' c7ff3a7388db0d05797b758d707e0cf2bdbaa77c3a4a6d0eb55c1a4ebb3d8a1b /tmp/ct89-py.json | sha256sum -c
+          cat /tmp/ct89-py.json
