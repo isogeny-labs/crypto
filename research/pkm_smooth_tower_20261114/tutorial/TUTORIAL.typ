@@ -294,17 +294,48 @@ Code: `src/cryptanalysis/pkm_smooth_tower.rs` (library, 8 unit tests) and
 
 = What is known, and what is not
 
-- *Construction is easy.* Building $V$, the maps and the system is fast and
-  fully checkable, as in all the examples here.
-- *Solving is the hard part.* Each relation needs a solution of the §7 system,
-  normally by Gröbner-basis methods. PKM's complexity estimates rest on
-  heuristic assumptions about how high the degrees go during that
-  computation. Whether this beats Pollard rho at any useful size is *not*
-  established. This tutorial does not claim it [pcc:unverified]; the repository
-  measures such questions separately.
-- *Choices that matter.* Which degrees $q_j$ to use, Kummer versus isogeny,
-  which auxiliary curve, and $m$ all change the system's shape. The tool lets
-  you vary them, but it does not say which is best.
+*Building is easy.* Building $V$, the maps and the system is fast and fully
+checkable, as in every example here.
+
+*What this repository has measured.* These are results from earlier studies,
+quoted from their reports. They have no pcc claim id yet [pcc:unverified].
+
+- *End to end against rho, degree-2 towers.* Index calculus on PKM's Kummer
+  tower ran in the `ecbench` harness, with every group operation charged. On
+  five curves of 20–28 bits it cost *29–141 times Pollard rho* (with the
+  negation map), and the ratio grows with the curve size
+  (`research/pkm_tower_ecbench_20261013/`). The isogeny tower, with its
+  auxiliary-curve search charged, cost 1.00–1.33 times a plain factor base of
+  the same size and stayed *18–136 times above rho*
+  (`research/pkm_isogeny_tower_ecbench_20261015/`).
+- *Why the tower did not help there.* Those runs decompose with tables and
+  root finding over $V$ ($m = 2$), and for that $V$ is just a set. The tower
+  base cost the same as a plain base of equal size, within 1 %. In that
+  study's words: "PKM's structure helps an algebraic solver, not a table."
+- *The algebraic (Gröbner/F4) side.* Here the tower's shape does matter.
+  On degree-2 Kummer towers, the F4 solving degree climbs slowly with the
+  tower depth (3, 4, 4, 4, 4, 5, 5, 5, 5, 6 at one 31-bit prime;
+  `research/pkm_matched_prime_20261106/`). Regrouping the levels into
+  degree-4 or degree-8 steps cut F4's work by a *constant* factor in three of
+  four cells (×0.17 to ×0.34). In the fourth (×0.54) the study's preset rule
+  found no material effect. In no cell did it change how the work grows. A random system with the
+  same shape gained the same, so the gain comes from the system's shape, not
+  from the curve (`research/pkm_radix_grading_20261104/`).
+- *At real sizes.* For P-192 ($m = 4$), the isogeny route's auxiliary-curve
+  search alone is estimated, not measured, at about $2^74$ group operations,
+  against rho's $2^95.8$ (`research/pkm_isogeny_tower_ecbench_20261015/`).
+  The deciding cost, solving the systems at $m >= 3$, has not been measured
+  at any size near that.
+
+*Not yet tried.* Every Gröbner measurement above used maps of degree 2 (or
+groupings of them). Towers with *odd* degrees $q_j = 3, 5, 7, dots$, or mixed
+ones, which is what this tool adds, have not been through F4. Neither has
+any comparison between towers of the same $|V|$ but different degree mixes.
+That is the cheapest open experiment this tutorial points to.
+
+*Bottom line.* At the sizes measured, this attack is slower than Pollard
+rho, by 18–141 times. Whether some tower shape changes how the cost *grows*
+is open. The tutorial makes no speed claim.
 
 = Exercises
 
