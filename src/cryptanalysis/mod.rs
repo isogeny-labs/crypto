@@ -333,6 +333,7 @@ pub mod pc_degree_harness;
 pub mod pdp_split;
 pub mod petit_quisquater;
 pub mod pkm_criterion;
+pub mod pkm_smooth_tower;
 pub mod plane_quartic_pic;
 pub mod pohlig_hellman;
 pub mod pollard_collab;
