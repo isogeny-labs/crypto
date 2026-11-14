@@ -185,6 +185,9 @@ enum ImportWhat {
     /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
     /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
     FactorBases,
+    /// Cl(End(E)) of every census-fp curve with End(E) known and the order of the class above l = 2, 3, 5, 7
+    /// (src/import/class_group.rs).
+    ClassGroups,
     /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
     Generated { paths: Vec<String> },
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
@@ -285,6 +288,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
                 ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
+                ImportWhat::ClassGroups => import::run(&ctx, Selection::ClassGroups, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };

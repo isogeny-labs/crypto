@@ -35,6 +35,11 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "fb_designs_ic_claims",
         sql: include_str!("../migrations/0012_fb_designs_ic_claims.sql"),
     },
+    Migration {
+        version: 13,
+        name: "order_class_groups",
+        sql: include_str!("../migrations/0013_order_class_groups.sql"),
+    },
 ];
 
 pub fn schema_version() -> i32 {

@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use tokio_postgres::Client;
 
 pub mod certs;
+pub mod class_group;
 pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
@@ -214,6 +215,8 @@ pub enum Selection {
     EndRings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
+    /// Cl(End(E)) of the census-fp curves and the orders of the l-classes, l = 2, 3, 5, 7.
+    ClassGroups,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -263,6 +266,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After volcanoes: it cross-checks their levels and End(E) rows.
     if all || what == Selection::EndRings {
         reports.push(end_ring::import(ctx).await?);
+    }
+    // After end-rings and volcanoes: it reads End(E) and cross-checks the craters.
+    if all || what == Selection::ClassGroups {
+        reports.push(class_group::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {
