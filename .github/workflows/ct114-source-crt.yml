@@ -1,0 +1,35 @@
+name: CT114 oriented local CRT and prime-switch gate
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct114/**'
+      - '.github/workflows/ct114-source-crt.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct114/**'
+      - '.github/workflows/ct114-source-crt.yml'
+  workflow_dispatch:
+jobs:
+  ct114:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct114
+      - name: Verify source etale idempotents and negative prime-switch gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct114
+          python3 -B "$D/ct114_local_crt.py" > /tmp/ct114-py.json
+          python3 -O -B "$D/ct114_local_crt.py" > /tmp/ct114-pyopt.json
+          node "$D/ct114_local_crt_independent.js" > /tmp/ct114-js.json
+          node --no-opt "$D/ct114_local_crt_independent.js" > /tmp/ct114-jsopt.json
+          cmp /tmp/ct114-py.json /tmp/ct114-pyopt.json
+          cmp /tmp/ct114-py.json /tmp/ct114-js.json
+          cmp /tmp/ct114-py.json /tmp/ct114-jsopt.json
+          printf '%s  %s\n' 9d35c4a290f6d4fb42462bbadd86fdbbe7e09425745053ed169b4975071f1e76 /tmp/ct114-py.json | sha256sum -c
+          cat /tmp/ct114-py.json
