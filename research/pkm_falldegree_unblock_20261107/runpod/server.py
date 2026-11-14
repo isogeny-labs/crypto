@@ -14,7 +14,7 @@ import hashlib, hmac, io, json, os, subprocess, tarfile, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 TOKEN = os.environ["RUNNER_TOKEN"].encode()
-IN, RES = "/opt/in", "/results"
+IN, RES = "/opt/in", os.environ.get("RESULTS_DIR", "/results")  # rp.sh sets /workspace/results: the pod volume (E3.5)
 BIN = ["pkm_tower_pilot", "prime_fall_degree_tools", "hky_fp_tower_check", "pfd_grid_zeros", "entry_r2.sh"]
 STUDY = ["run.sh", "build-info.json"]
 # Amendment R4 (draft): the isogeny-at-P1 job set. The R4 pilot binary, plus `repo.tar`, a `git archive` of the committed
@@ -25,13 +25,38 @@ ALLOWED = set(BIN + STUDY + ISO_BIN + ["repo.tar"])
 SHIM = """#!/bin/bash
 # aws shim: `aws s3 sync|cp SRC s3://local/PATH` -> copy into /results/PATH (entry_r2.sh stays byte-identical)
 [ "$1" = s3 ] || exit 0
-src=$3; dst=${4#s3://local}; dst=/results/${dst#/}
+src=$3; dst=${4#s3://local}; dst=${RESULTS_DIR:-/results}/${dst#/}
 case "$2" in
   sync) mkdir -p "$dst" && cp -a "$src/." "$dst/" ;;
   cp) mkdir -p "$(dirname "$dst")" && cp -a "$src" "$dst" ;;
 esac
 """
 state = {"state": "idle", "exit": None, "started": None, "ended": None, "stages": None}
+RUNNER_SHA256 = os.environ.get("RUNNER_SHA256", "")  # set by rp.sh create to sha256(server.py); recorded, E3.8
+
+
+def cgroup_memory_bytes():
+    """The container's memory limit: cgroup v2 memory.max, else v1, else MemTotal (E3.3)."""
+    for p in ("/sys/fs/cgroup/memory.max", "/sys/fs/cgroup/memory/memory.limit_in_bytes"):
+        try:
+            v = open(p).read().strip()
+            if v != "max" and int(v) < 1 << 60:
+                return int(v)
+        except (OSError, ValueError):
+            pass
+    return int(open("/proc/meminfo").read().split()[1]) * 1024
+
+
+def cgroup_cpus():
+    """CPUs this container may use: cgroup v2 cpu.max quota, else the affinity set (E3.4)."""
+    n = len(os.sched_getaffinity(0))
+    try:
+        q, per = open("/sys/fs/cgroup/cpu.max").read().split()
+        if q != "max":
+            n = min(n, int(q) // int(per))
+    except (OSError, ValueError):
+        pass
+    return n
 os.makedirs(IN, exist_ok=True); os.makedirs(RES, exist_ok=True)
 
 def sha(p):
@@ -40,13 +65,34 @@ def sha(p):
         for b in iter(lambda: f.read(1 << 20), b""): h.update(b)
     return h.hexdigest()
 
-def run(entry, stages, rayon):
+def oom_kills():
+    """oom_kill count from the cgroup (v2), or None if unreadable (E3.3)."""
+    try:
+        for line in open("/sys/fs/cgroup/memory.events"):
+            k, v = line.split()
+            if k == "oom_kill":
+                return int(v)
+    except OSError:
+        return None
+    return None
+
+
+def run(entry, stages, rayon, seconds):
     env = dict(os.environ, PATH="/opt/shim:" + os.environ.get("PATH", ""), ISOLAB_RESULTS_URI="s3://local",
                RAYON_NUM_THREADS=str(rayon), HOME="/work")
     env.pop("RUNNER_TOKEN", None)
+    oom0 = oom_kills()
     with open(f"{RES}/entry.stdout", "wb") as o, open(f"{RES}/entry.stderr", "wb") as e:
-        rc = subprocess.call([entry, *stages], env=env, stdout=o, stderr=e, cwd="/work")
-    subprocess.call("cp -a /work/study/runs /work/study/gates /work/study/progress.txt /results/ 2>/dev/null", shell=True)
+        proc = subprocess.Popen([entry, *stages], env=env, stdout=o, stderr=e, cwd="/work", start_new_session=True)
+        try:
+            rc = proc.wait(timeout=seconds)            # E3.2: the job's registered time limit, enforced here
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid, 9)
+            proc.wait()
+            rc = "deadline"
+    oom1 = oom_kills()
+    state["oom_kill_delta"] = None if oom0 is None or oom1 is None else oom1 - oom0
+    subprocess.call(f"cp -a /work/study/runs /work/study/gates /work/study/progress.txt {RES}/ 2>/dev/null", shell=True)
     state.update(state="done", exit=rc, ended=time.strftime("%FT%TZ", time.gmtime()))
     with open(f"{RES}/runner_state.json", "w") as f: json.dump(state, f)
 
@@ -73,6 +119,23 @@ class H(BaseHTTPRequestHandler):
         req = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         got = {n: sha(f"{IN}/{n}") for n in ALLOWED if os.path.exists(f"{IN}/{n}")}
         iso = req.get("entry") == "iso"
+        # E3.2/E3.3/E3.4: refuse before anything runs.
+        seconds = int(req.get("seconds", 0))
+        cost_per_hr, max_usd = float(req.get("cost_per_hr", 0)), float(req.get("max_usd", 40))
+        if seconds <= 0 or cost_per_hr <= 0:
+            return self.reply(409, {"error": "seconds and cost_per_hr are required"})
+        if cost_per_hr * (seconds + 3600) / 3600 > max_usd:     # one hour of idle billing included
+            return self.reply(409, {"error": "cost at the time limit exceeds max_usd",
+                                    "projected_usd": cost_per_hr * (seconds + 3600) / 3600, "max_usd": max_usd})
+        mem = cgroup_memory_bytes()
+        floor = int(req.get("memory_floor_gib", 56)) * 2**30
+        if mem < floor:
+            return self.reply(409, {"error": "memory below floor", "memory_bytes": mem, "floor_bytes": floor})
+        if oom_kills() is None:                                  # E3.3: OOM must be classifiable
+            return self.reply(409, {"error": "cgroup memory.events (oom_kill) unreadable"})
+        cpus = cgroup_cpus()
+        if cpus < 12:
+            return self.reply(409, {"error": "fewer than 12 vCPU", "cpus": cpus})
         required = set(ISO_BIN) | {"repo.tar"} if iso else set(BIN) | {"run.sh"}  # build-info.json: recorded only
         bad = {n: [req["sha256"].get(n), got.get(n)] for n in required if not got.get(n) or req["sha256"].get(n) != got.get(n)}
         if bad: return self.reply(409, {"error": "sha256 mismatch", "detail": bad})
@@ -98,7 +161,9 @@ class H(BaseHTTPRequestHandler):
         with open(f"{RES}/runner_request.json", "w") as f: json.dump({**req, "verified_sha256": got}, f, indent=1)
         state.update(state="running", started=time.strftime("%FT%TZ", time.gmtime()), stages=req["stages"])
         entry = ISO_ENTRY if iso else "/usr/local/bin/entry_r2.sh"
-        threading.Thread(target=run, args=(entry, req["stages"], 12), daemon=True).start()  # rayon pinned at 12
+        state.update(seconds=seconds, cost_per_hr=cost_per_hr, max_usd=max_usd, memory_bytes=mem, cpus=cpus,
+                     runner_sha256=RUNNER_SHA256, commit=req.get("commit"))
+        threading.Thread(target=run, args=(entry, req["stages"], 12, seconds), daemon=True).start()  # rayon pinned at 12
         self.reply(200, state)
     def do_GET(self):
         if not self.ok(): return
@@ -108,11 +173,20 @@ class H(BaseHTTPRequestHandler):
                 if os.path.exists(p): tail = open(p).read()[-4000:]
             mem = open("/proc/meminfo").read().splitlines()[:3]
             return self.reply(200, {**state, "progress": tail, "meminfo": mem, "nproc": os.cpu_count()})
-        if self.path == "/results.tar.gz":
-            subprocess.call("cp -a /work/study/runs /work/study/gates /work/study/progress.txt /results/ 2>/dev/null", shell=True)
-            buf = io.BytesIO()
-            with tarfile.open(fileobj=buf, mode="w:gz") as t: t.add(RES, arcname="results")
-            return self.reply(200, body=buf.getvalue(), ctype="application/gzip")
+        if self.path in ("/results.tar.gz", "/manifest"):
+            subprocess.call("cp -a /work/study/runs /work/study/gates /work/study/progress.txt /work/study/binary.sha256 "
+                            f"/work/study/host.txt {RES}/ 2>/dev/null", shell=True)
+            man = {}
+            for root, _, files in os.walk(RES):
+                for n in files:
+                    p = os.path.join(root, n)
+                    man[os.path.relpath(p, RES)] = sha(p)
+            if self.path == "/manifest":                    # E3.5: the pod's own hashes, checked against the fetch
+                return self.reply(200, {"files": man, "state": state})
+            tmp = "/tmp/results.tar.gz"                      # on disk, not in memory (F10)
+            with tarfile.open(tmp, mode="w:gz") as t: t.add(RES, arcname="results")
+            data = open(tmp, "rb").read()
+            return self.reply(200, body=data, ctype="application/gzip")
         self.reply(404, {"error": "path"})
     def log_message(self, *a): pass
 

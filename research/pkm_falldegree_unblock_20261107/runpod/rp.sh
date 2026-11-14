@@ -16,14 +16,14 @@ case "$1" in
   create)
     name=$2 vcpu=$3; t=$(python3 -c 'import secrets;print(secrets.token_hex(24))')
     boot="import base64;exec(base64.b64decode('$(base64 -w0 "$here/server.py")'))"
-    body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" '{name:$n,computeType:"CPU",
+    body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" --arg h "$(sha256sum "$here/server.py" | cut -c1-64)" '{name:$n,computeType:"CPU",
       cpuFlavorIds:["cpu5m","cpu3m"],cpuFlavorPriority:"custom",vcpuCount:$v,interruptible:false,
-      imageName:"python:3.12-slim",containerDiskInGb:20,ports:["8000/http"],env:{RUNNER_TOKEN:$t},
+      imageName:"python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",containerDiskInGb:20,ports:["8000/http"],env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},volumeInGb:20,volumeMountPath:"/workspace",
       dockerEntrypoint:["python3","-u","-c"],dockerStartCmd:[$b]}')
     out=$(curl -sS -X POST "$API/pods" "${H[@]}" -d "$body"); id=$(jq -r '.id // empty' <<<"$out")
     [ -n "$id" ] || { echo "$out" >&2; exit 1; }
-    umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,costPerHr,vcpuCount,memoryInGb,interruptible,machine}' <<<"$out" ;;
-  pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,desiredStatus,costPerHr,vcpuCount,memoryInGb,interruptible,lastStartedAt}' ;;
+    umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,costPerHr,vcpuCount,memoryInGb,interruptible,machine,imageName}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
+  pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,desiredStatus,costPerHr,vcpuCount,memoryInGb,interruptible,lastStartedAt,machine}' ;;
   upload) for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json; do
       [ -f "$3/$f" ] || continue; curl -sS -f -X PUT -H "X-Token: $(tok $2)" --data-binary "@$3/$f" "$(url $2)/upload/$f"; echo; done ;;
   start) shas=$(jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json")
@@ -41,11 +41,19 @@ case "$1" in
       commit=$(cut -d' ' -f4 "$TOKDIR/$2.repo.tar.sha256"); repo=$(cd "$here/../../.." && pwd)
       pins=$(git -C "$repo" show "$commit:research/pkm_falldegree_unblock_20261107/iso/BUNDLE.sha256" |
         jq -R 'split("  ") | {(.[1]): .[0]}' | jq -s add)
-      jq -n --argjson s "$3" --argjson h "$shas" --argjson b "$pins" --arg c "$commit" \
-        '{entry:"iso",stages:$s,sha256:$h,bundle_sha256:$b,commit:$c,rayon:12}' |
+      cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .costPerHr)   # the pod's live price (E3.2)
+      jq -n --argjson s "$3" --argjson h "$shas" --argjson b "$pins" --arg c "$commit" --argjson sec "${SECONDS_LIMIT:?}" \
+        --argjson cph "$cph" --argjson mx "${MAX_USD:-40}" --argjson mf "${MEMORY_FLOOR_GIB:-56}" \
+        '{entry:"iso",stages:$s,sha256:$h,bundle_sha256:$b,commit:$c,rayon:12,seconds:$sec,cost_per_hr:$cph,max_usd:$mx,memory_floor_gib:$mf}' |
       curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
   status) curl -sS -H "X-Token: $(tok $2)" "$(url $2)/status" ;;
-  fetch) curl -sS -f -H "X-Token: $(tok $2)" -o "$3" "$(url $2)/results.tar.gz" && sha256sum "$3" ;;
+  fetch) # rp.sh fetch ID OUT.tar.gz : pod manifest first, then the tarball, then every file checked against the manifest (E3.5)
+      curl -sS -f -H "X-Token: $(tok $2)" -o "$3.manifest.json" "$(url $2)/manifest"
+      curl -sS -f -H "X-Token: $(tok $2)" -o "$3" "$(url $2)/results.tar.gz"
+      d=$(mktemp -d); tar -xzf "$3" -C "$d"
+      jq -r '.files | to_entries[] | "\(.value)  \(.key)"' "$3.manifest.json" | (cd "$d/results" && sha256sum -c --quiet -) \
+        && echo "manifest check: all files match" || echo "manifest check: MISMATCH (files written after the manifest are expected while running)"
+      rm -rf "$d"; sha256sum "$3" ;;
   delete) curl -sS -X DELETE "$API/pods/$2" "${H[@]}"; echo "deleted $2" ;;
   *) echo "unknown command" >&2; exit 2 ;;
 esac
