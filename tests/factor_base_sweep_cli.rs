@@ -434,7 +434,9 @@ fn a_second_supervisor_cannot_write_into_an_active_run() {
     let t = Temp::new();
     let p = plan(&t, true);
     let mut v = value(&p);
-    v["candidates"][0]["curve"] = json!({"kind":"prime_search","bits":32,"seed":19});
+    v["candidates"][0]["curve"] = json!({"kind":"prime_search","bits":19,"seed":19});
+    v["train"] = json!(4096);
+    v["holdout"] = json!(4096);
     v["candidate_seconds"] = json!(30);
     fs::write(&p, serde_json::to_vec(&v).unwrap()).unwrap();
     let dir = t.0.join("active");
