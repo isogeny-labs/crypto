@@ -189,6 +189,25 @@ Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover
 
 validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)
 
+## K1 Koblitz, one target, ecbench counted GAE: pair-table factor base sized for n (outside tables A–C)
+
+One target per process, cold (every phase, the pair table included, priced for the one target), on two K1 Koblitz curves. Unit: ecbench counted GAE per sqrt(r); IC native operations and rho *_uncharged counters at w GAE each (AGENTS.md section 5a); bitop/v1 as a calibration-free cross-check. Reference: strong signed-Frobenius rho (all 2n automorphisms, negation × Frobenius) on the same targets in the same ecbench session and binary; every solve of every arm verified. The before mark is the same pipeline with the fixed pair-table dimension 7 on the same targets, the figure this row supersedes. Gap = log2(S_IC / S_rho) at w = 0 / 0.1 / 1 GAE per native operation: the distance remaining to rho, not a pass/fail gate. L0 (counted cost only; wall time not certified). Class: engineering (parameter re-selection at fixed n).
+
+| curve | n | r | recipe | gap to rho, bits (w = 0 / 0.1 / 1) [95%] | before: dimension 7 | improvement, bits [95%] | S, IC (w = 0 / 0.1 / 1) | S, rho (w = 0 / 0.1 / 1) | bitop/v1 gap | targets × rounds |
+|:--|--:|:--|:--|:--|:--|:--|:--|:--|:--|:--|
+| `icv1-f2m23-tm5197-1f85e9e1` | 23 | 2^22.00 (4196903, cofactor 2) | `ic.pipeline: koblitz-standard-subspace:dimension=9, pdp3-koblitz:m=3,engine=rootfind-negfold` | **5.59 / 5.66 / 5.95** [5.54, 5.65] / [5.60, 5.73] / [5.85, 6.06] | 6.91 / 6.94 / 7.09 | 1.32 / 1.28 / 1.14 [1.26, 1.36] / [1.23, 1.33] / [1.08, 1.20] | 43.90 / 49.39 / 98.88 | 0.908 / 0.978 / 1.601 | 5.52 (before 5.96) | 8 × 5 |
+| `icv1-f2m29-tm40309-30c52b96` | 29 | 2^15.37 (42457, cofactor 12646) | `ic.pipeline: koblitz-standard-subspace:dimension=10, pdp3-koblitz:m=3,engine=rootfind-negfold` | **9.47 / 9.52 / 9.86** [9.38, 9.54] / [9.43, 9.59] / [9.74, 9.95] | 10.36 / 10.46 / 11.06 | 0.89 / 0.94 / 1.20 [0.67, 1.06] / [0.72, 1.11] / [0.98, 1.38] | 3181.65 / 3375.46 / 5119.79 | 4.490 / 4.592 / 5.510 | 9.23 (before 10.13) | 8 × 5 |
+
+- Rho is cheaper than both rows at every weight and in bitop/v1: these gaps are the distance remaining.
+- The improvement over dimension 7 is an engineering improvement at fixed n. D (slope difference over n = 17..29) equals (R_n23 + 7 R_n29) / 84 by construction: an offset, not a bent slope; it is not shown as a row.
+- These rows rank only against their own before mark, never against tables A–C or other sections: table C's K1 n = 23 figure is a 32-target batch, pre-gate figure in another unit (a batched-addition clock against batch rho), table A is a clock reading too, and the Frobenius-orbit component sections above measure other methods on K1 n = 29 under other protocols.
+- K1 n = 29 has r = 2^15.37 (cofactor 12646), a smaller prime subgroup than K1 n = 17's 2^16.0, so n here is the field degree, not a problem size; at n = 29 rho is set-up dominated.
+- Dimensions 9 and 10 were chosen on two disclosed sizing targets per n, separate from the measured targets. Records are L0 (counted cost; wall time not certified); the replays used the producer's binary.
+
+[Report](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/report.md) · [study](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/) · [data](../../research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json). Evidence copied from github.com/aburan28/ml-cryptanalysis experiments/fb-pt-lgrow-k1 at main 7d4e8e0f (VAL-20261114-d9190c).
+
+validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched strong signed-Frobenius rho reference with the §5a band (research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json)
+
 ## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)
 
 On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction (`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. These curves have no row in tables A–C. S = counted cost in GAE per sqrt(r), ecbench; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.
@@ -1082,6 +1101,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_cover_weakclass_20261023/summary.json` — sha256 `3fa28e7ff48dc590…`
 - `research/ic_cover_weakclass_20261023/validation/rho-neg.json` — sha256 `41b2bcd995ec1595…`
 - `research/jv_sieve_line_vs_rho_20261103/fit.json` — sha256 `0a83239fe76f0502…`
+- `research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json` — sha256 `9c4e4fae39e238c0…`
 - `research/ic_d4_char2_lever_20261023/results/table-m12.tsv` — sha256 `ddce0fe79f6693a5…`
 - `research/ic_d4_char2_lever_20261023/results/table-m14.tsv` — sha256 `5c8e0a776a8d99a8…`
 - `research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json` — sha256 `b17171b59d16d34f…`

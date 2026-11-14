@@ -109,6 +109,7 @@ SOURCES = {
     "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
     "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+    "k1_pt_lgrow": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -514,7 +515,8 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
                            "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
                            "benchmarks/20261112-mt-fieldops-v5",
-                           "research/quartic_dl1_cd_sqrt_20261113/combo/validation")
+                           "research/quartic_dl1_cd_sqrt_20261113/combo/validation",
+                           "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -1360,6 +1362,108 @@ def jv_sieve_line_vs_rho_component() -> dict:
                            "replay certificate, validator report and the matched negation-map rho reference "
                            f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
+
+
+K1_PT_LGROW_EVIDENCE = "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1"
+
+
+def k1_pt_lgrow_component(names: Names) -> dict:
+    """Two K1 Koblitz one-target cold rows in ecbench's counted GAE: the ic.pipeline pair-table
+    factor base sized for n (dimension 9 at n = 23, 10 at n = 29) against the fixed dimension 7
+    (the before mark) and strong signed-Frobenius rho, all three arms on the same 8 targets x 5
+    rounds in the same ecbench session (ml-cryptanalysis experiments/fb-pt-lgrow-k1, copied with
+    its validation into research/ml_cryptanalysis_pt_lgrow_k1_20261114).  The numbers are copied
+    from the directory's summary.json (recomputed there from the session records with the
+    section 5a band) and cross-checked here against the validated VALIDATION.json.  The unit is
+    not table A's (a clock reading in batched additions), table B's (GAE from the ic boundary
+    calibration, prime and random-binary curves, negation rho) or table C's (32-target batch), so
+    the rows sit in their own section outside tables A-C and are never ranked against them."""
+    summ = load(SOURCES["k1_pt_lgrow"])
+    errs = gate.check_evidence_dir(REPO / K1_PT_LGROW_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{K1_PT_LGROW_EVIDENCE}: not validated; the K1 pair-table rows cannot be shown: "
+                         + "; ".join(errs))
+    man = json.loads((REPO / K1_PT_LGROW_EVIDENCE / gate.MANIFEST).read_text())
+    ref = man["rho_reference"]
+    if (summ.get("schema") != "crypto.ic_k1_pt_lgrow_summary/v1" or ref.get("kind") != "negation_frobenius"
+            or ref.get("order_holds_across_band") is not True or len(summ["rows"]) != 2):
+        raise SystemExit(f"{SOURCES['k1_pt_lgrow']}: review the summary and its VALIDATION.json")
+    rows = []
+    for r in summ["rows"]:
+        n = str(r["n"])
+        c = names(r["slug"])
+        if c["slug"] != r["slug"] or int(c["order"]) != r["group_order"] or r["r"] * r["cofactor"] != r["group_order"]:
+            raise SystemExit(f"{r['slug']}: curve identity disagrees with docs/curves/registry.json")
+        if abs(r["log2_r"] - ref["log2_r_by_n"][n]) > 5e-5:
+            raise SystemExit(f"{r['slug']}: log2 r disagrees with VALIDATION.json")
+        for w, b in r["band"].items():
+            checks = ((b["gap_after_bits"], ref["gap_to_rho_bits"]["ic_lstar"][n][w]),
+                      (b["gap_before_bits"], ref["gap_to_rho_bits"]["ic_pt_l7"][n][w]),
+                      (b["delta_bits"], ref["R_lstar_vs_l7_bits"][f"n{n}"][w]["R"]),
+                      (b["s_after"], ref["gae_band_by_n"][n][w]["ic_lstar"]),
+                      (b["s_before"], ref["gae_band_by_n"][n][w]["ic_pt_l7"]),
+                      (b["s_rho"], ref["gae_band_by_n"][n][w]["rho"]))
+            if any(not math.isclose(x, y, rel_tol=5e-5, abs_tol=5e-5) for x, y in checks):
+                raise SystemExit(f"{r['slug']} w = {w}: summary.json disagrees with VALIDATION.json")
+            if not (b["gap_after_ci95"][0] > 0 and b["delta_ci95"][0] > 0):
+                raise SystemExit(f"{r['slug']} w = {w}: the row's order no longer holds")
+        rows.append({**r, "ec1": c.get("ec1"), "first_ic_on_curve": r["n"] == 29})
+    return {"rows": rows, "source": SOURCES["k1_pt_lgrow"], "unit": summ["unit"], "isolation": summ["isolation"],
+            "provenance": summ["source"], "class": "engineering (parameter re-selection at fixed n)",
+            "study": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/",
+            "report": K1_PT_LGROW_EVIDENCE + "/report.md",
+            "figure": K1_PT_LGROW_EVIDENCE + "/figures/fig_lgrow_gap.png",
+            "not_a_row": summ["not_a_row"],
+            "validation": ("validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched "
+                           "strong signed-Frobenius rho reference with the §5a band "
+                           f"({K1_PT_LGROW_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def k1_pt_lgrow_text(k: dict) -> dict:
+    """The K1 pair-table section's prose and cells, shared by the Markdown and the HTML."""
+    W = ("0", "0.1", "1")
+    cells = []
+    for r in k["rows"]:
+        b = r["band"]
+        cells.append({
+            "slug": r["slug"], "n": r["n"],
+            "r": f"2^{r['log2_r']:.2f} ({r['r']}, cofactor {r['cofactor']})",
+            "recipe": f"{r['recipe']['method']}: {r['recipe']['factor_base']}, {r['recipe']['oracle']}",
+            "gap": " / ".join(f"{b[w]['gap_after_bits']:.2f}" for w in W),
+            "gap_ci": " / ".join(f"[{b[w]['gap_after_ci95'][0]:.2f}, {b[w]['gap_after_ci95'][1]:.2f}]" for w in W),
+            "before": " / ".join(f"{b[w]['gap_before_bits']:.2f}" for w in W),
+            "delta": " / ".join(f"{b[w]['delta_bits']:.2f}" for w in W),
+            "delta_ci": " / ".join(f"[{b[w]['delta_ci95'][0]:.2f}, {b[w]['delta_ci95'][1]:.2f}]" for w in W),
+            "s": " / ".join(f"{b[w]['s_after']:.2f}" for w in W),
+            "s_rho": " / ".join(f"{b[w]['s_rho']:.3f}" for w in W),
+            "bitop": f"{r['bitop']['gap_after_bits']:.2f} (before {r['bitop']['gap_before_bits']:.2f})",
+            "targets": f"{r['targets']} × {r['rounds']}",
+        })
+    pv = k["provenance"]
+    intro = ("One target per process, cold (every phase, the pair table included, priced for the one target), on two "
+             "K1 Koblitz curves. Unit: " + k["unit"] + ". Reference: strong signed-Frobenius rho (all 2n automorphisms, "
+             "negation × Frobenius) on the same targets in the same ecbench session and binary; every solve of every "
+             "arm verified. The before mark is the same pipeline with the fixed pair-table dimension 7 on the same "
+             "targets, the figure this row supersedes. Gap = log2(S_IC / S_rho) at w = 0 / 0.1 / 1 GAE per native "
+             "operation: the distance remaining to rho, not a pass/fail gate. " + k["isolation"] + ". Class: "
+             + k["class"] + ".")
+    caveats = [
+        "Rho is cheaper than both rows at every weight and in bitop/v1: these gaps are the distance remaining.",
+        "The improvement over dimension 7 is an engineering improvement at fixed n. " + k["not_a_row"]
+        + "; it is not shown as a row.",
+        "These rows rank only against their own before mark, never against tables A–C or other sections: table C's "
+        "K1 n = 23 figure is a 32-target batch, pre-gate figure in another unit (a batched-addition clock against batch "
+        "rho), table A is a clock reading too, and the Frobenius-orbit component sections above measure other methods "
+        "on K1 n = 29 under other protocols.",
+        "K1 n = 29 has r = 2^15.37 (cofactor 12646), a smaller prime subgroup than K1 n = 17's 2^16.0, so n here is "
+        "the field degree, not a problem size; at n = 29 rho is set-up dominated.",
+        "Dimensions 9 and 10 were chosen on two disclosed sizing targets per n, separate from the measured targets. "
+        "Records are L0 (counted cost; wall time not certified); the replays used the producer's binary.",
+    ]
+    prov = (f"Evidence copied from {pv['repository']} {pv['path']} at {pv['branch']} {pv['commit'][:8]} "
+            f"({pv['validation_id']}).")
+    return {"cells": cells, "intro": intro, "caveats": caveats, "provenance": prov}
 
 
 def d4_char2_frob_roots_component() -> dict:
@@ -2955,6 +3059,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
         "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
+        "k1_pt_lgrow_component": k1_pt_lgrow_component(names),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -3372,6 +3477,20 @@ def markdown(doc: dict) -> str:
                  + " / ".join(f"{x:.3f}" for x in r["band"]) + f" | {'yes' if r['below'] else 'no'} |")
     L += ["", f"[Report]({'../../' + js['report']}) · [study](../../{js['study']}) · "
               f"[data](../../{js['source']}).", "", js["validation"], ""]
+    kp = doc["k1_pt_lgrow_component"]
+    kt = k1_pt_lgrow_text(kp)
+    L += ["## K1 Koblitz, one target, ecbench counted GAE: pair-table factor base sized for n (outside tables A–C)", "",
+          kt["intro"], "",
+          "| curve | n | r | recipe | gap to rho, bits (w = 0 / 0.1 / 1) [95%] | before: dimension 7 | "
+          "improvement, bits [95%] | S, IC (w = 0 / 0.1 / 1) | S, rho (w = 0 / 0.1 / 1) | bitop/v1 gap | targets × rounds |",
+          "|:--|--:|:--|:--|:--|:--|:--|:--|:--|:--|:--|"]
+    for c in kt["cells"]:
+        L.append(f"| `{c['slug']}` | {c['n']} | {c['r']} | `{c['recipe']}` | **{c['gap']}** {c['gap_ci']} | "
+                 f"{c['before']} | {c['delta']} {c['delta_ci']} | {c['s']} | {c['s_rho']} | {c['bitop']} | "
+                 f"{c['targets']} |")
+    L += [""] + [f"- {x}" for x in kt["caveats"]]
+    L += ["", f"[Report](../../{kp['report']}) · [study](../../{kp['study']}) · [data](../../{kp['source']}). "
+              + kt["provenance"], "", kp["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -4926,6 +5045,25 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table></div>'
              f'<p>{gh(js["report"], "Report")} · {gh(js["study"], "study")} · {gh(js["source"], "data")}.</p>'
              f'<p class="muted">{esc(js["validation"])}</p></section>')
+    kp = doc["k1_pt_lgrow_component"]
+    kt = k1_pt_lgrow_text(kp)
+    P.append('<section class="panel" id="k1-pair-table-lgrow"><h2>K1 Koblitz, one target, ecbench counted GAE: '
+             'pair-table factor base sized for n <span class="chip">outside tables A–C</span> '
+             '<span class="chip">engineering</span></h2>'
+             f'<p>{esc(kt["intro"])}</p><div class="scroll"><table><thead><tr><th>Curve</th><th>n</th><th>r</th>'
+             '<th>Recipe</th><th>Gap to rho, bits (w = 0 / 0.1 / 1) [95%]</th><th>Before: dimension 7</th>'
+             '<th>Improvement, bits [95%]</th><th>S, IC (w = 0 / 0.1 / 1)</th><th>S, rho (w = 0 / 0.1 / 1)</th>'
+             '<th>bitop/v1 gap</th>'
+             '<th>Targets × rounds</th></tr></thead><tbody>')
+    for c in kt["cells"]:
+        P.append(f'<tr><td><code>{esc(c["slug"])}</code></td><td>{c["n"]}</td><td>{esc(c["r"])}</td>'
+                 f'<td><code>{esc(c["recipe"])}</code></td><td><b>{c["gap"]}</b> {c["gap_ci"]}</td>'
+                 f'<td>{c["before"]}</td><td>{c["delta"]} {c["delta_ci"]}</td><td>{c["s"]}</td><td>{c["s_rho"]}</td>'
+                 f'<td>{esc(c["bitop"])}</td><td>{c["targets"]}</td></tr>')
+    P.append('</tbody></table></div><ul>' + "".join(f"<li>{esc(x)}</li>" for x in kt["caveats"]) + '</ul>'
+             f'<p>{gh(kp["report"], "Report")} · {gh(kp["study"], "study")} · {gh(kp["source"], "data")}. '
+             f'{esc(kt["provenance"])}</p>'
+             f'<p class="muted">{esc(kp["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'

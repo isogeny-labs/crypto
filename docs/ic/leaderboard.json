@@ -234,6 +234,10 @@
    "path": "research/jv_sieve_line_vs_rho_20261103/fit.json",
    "sha256": "0a83239fe76f0502abba05bea81c4e3f2deafe3e6c0b4cbd3b562821d5c56501"
   },
+  "k1_pt_lgrow": {
+   "path": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
+   "sha256": "9c4e4fae39e238c0d2f65aa2a0aa3c12c362ba3f53d2e970f0fce5db7052b292"
+  },
   "d4_char2_m12": {
    "path": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
    "sha256": "ddce0fe79f6693a5ee3d42c290052a55742e473c98b0d2a80af9996b0715d967"
@@ -338458,6 +338462,225 @@
   "report": "research/jv_sieve_line_vs_rho_20261103/REPORT.pdf",
   "source": "research/jv_sieve_line_vs_rho_20261103/fit.json",
   "validation": "validated with caveats (weak class only; the isogeny walk is charged in a separate study): replay certificate, validator report and the matched negation-map rho reference with the §5a band (research/jv_sieve_line_vs_rho_20261103/VALIDATION.json)",
+  "validated": true
+ },
+ "k1_pt_lgrow_component": {
+  "rows": [
+   {
+    "slug": "icv1-f2m23-tm5197-1f85e9e1",
+    "n": 23,
+    "r": 4196903,
+    "log2_r": 22.000893689,
+    "cofactor": 2,
+    "group_order": 8393806,
+    "icv1": "ICV1:f2m-23-c07a6b8c:-5197:8393806:0x1:-7:unk:r:1f85e9e1acf0",
+    "targets": 8,
+    "rounds": 5,
+    "solves_per_arm": 40,
+    "arm": "ic-pt-l9",
+    "before_arm": "ic-pt-l7",
+    "reference_arm": "rho-strong",
+    "recipe": {
+     "method": "ic.pipeline",
+     "factor_base": "koblitz-standard-subspace:dimension=9",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "before_recipe": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold"
+    },
+    "reference": "rho.signed_frobenius_strong",
+    "pair_table_dimension": 9,
+    "binary_sha256": [
+     "a0be1b2a3a02f5385c9b9654622b01923f3f54a52904bd157861e0cbe8796d29"
+    ],
+    "band": {
+     "0": {
+      "s_after": 43.8957648962,
+      "s_before": 109.346058751,
+      "s_rho": 0.908225448905,
+      "gap_after_bits": 5.59488748138,
+      "gap_before_bits": 6.91163504343,
+      "delta_bits": 1.31674756204,
+      "gap_after_ci95": [
+       5.54293800365,
+       5.65227720565
+      ],
+      "gap_before_ci95": [
+       6.86364463768,
+       6.97771955566
+      ],
+      "delta_ci95": [
+       1.26474903171,
+       1.36333559551
+      ]
+     },
+     "0.1": {
+      "s_after": 49.3937224002,
+      "s_before": 120.219849725,
+      "s_rho": 0.977505745278,
+      "gap_after_bits": 5.65907870483,
+      "gap_before_bits": 6.94235422459,
+      "delta_bits": 1.28327551976,
+      "gap_after_ci95": [
+       5.59806878257,
+       5.72671142478
+      ],
+      "gap_before_ci95": [
+       6.89207205107,
+       7.01249277039
+      ],
+      "delta_ci95": [
+       1.22905933257,
+       1.33094304149
+      ]
+     },
+     "1": {
+      "s_after": 98.8753399358,
+      "s_before": 218.08396849,
+      "s_rho": 1.60102841263,
+      "gap_after_bits": 5.94853993365,
+      "gap_before_bits": 7.08974099924,
+      "delta_bits": 1.14120106559,
+      "gap_after_ci95": [
+       5.8459260484,
+       6.06336919035
+      ],
+      "gap_before_ci95": [
+       7.02223694706,
+       7.1875834396
+      ],
+      "delta_ci95": [
+       1.07665350978,
+       1.19726850989
+      ]
+     }
+    },
+    "bitop": {
+     "gap_after_bits": 5.52352394025,
+     "gap_before_bits": 5.96170194775
+    },
+    "ec1": null,
+    "first_ic_on_curve": false
+   },
+   {
+    "slug": "icv1-f2m29-tm40309-30c52b96",
+    "n": 29,
+    "r": 42457,
+    "log2_r": 15.373714814,
+    "cofactor": 12646,
+    "group_order": 536911222,
+    "icv1": "ICV1:f2m-29-1a13acc8:-40309:536911222:0x1:-7:unk:r:30c52b963005",
+    "targets": 8,
+    "rounds": 5,
+    "solves_per_arm": 40,
+    "arm": "ic-pt-l10",
+    "before_arm": "ic-pt-l7",
+    "reference_arm": "rho-strong",
+    "recipe": {
+     "method": "ic.pipeline",
+     "factor_base": "koblitz-standard-subspace:dimension=10",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "before_recipe": {
+     "factor_base": "koblitz-standard-subspace:dimension=7",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold"
+    },
+    "reference": "rho.signed_frobenius_strong",
+    "pair_table_dimension": 10,
+    "binary_sha256": [
+     "a0be1b2a3a02f5385c9b9654622b01923f3f54a52904bd157861e0cbe8796d29"
+    ],
+    "band": {
+     "0": {
+      "s_after": 3181.64623189,
+      "s_before": 5891.51719108,
+      "s_rho": 4.49036979597,
+      "gap_after_bits": 9.4687234553,
+      "gap_before_bits": 10.3575892309,
+      "delta_bits": 0.88886577565,
+      "gap_after_ci95": [
+       9.38432510627,
+       9.53783118279
+      ],
+      "gap_before_ci95": [
+       10.1338967365,
+       10.5240346441
+      ],
+      "delta_ci95": [
+       0.669399989685,
+       1.06142013249
+      ]
+     },
+     "0.1": {
+      "s_after": 3375.46095187,
+      "s_before": 6478.26219979,
+      "s_rho": 4.59237125975,
+      "gap_after_bits": 9.52162953615,
+      "gap_before_bits": 10.4621518672,
+      "delta_bits": 0.94052233105,
+      "gap_after_ci95": [
+       9.43378049993,
+       9.59320858763
+      ],
+      "gap_before_ci95": [
+       10.2401975297,
+       10.6268528707
+      ],
+      "delta_ci95": [
+       0.721654864143,
+       1.11336757326
+      ]
+     },
+     "1": {
+      "s_after": 5119.79343171,
+      "s_before": 11758.9672781,
+      "s_rho": 5.5103844338,
+      "gap_after_bits": 9.85971691524,
+      "gap_before_bits": 11.0593207693,
+      "delta_bits": 1.1996038541,
+      "gap_after_ci95": [
+       9.74431645926,
+       9.95267299158
+      ],
+      "gap_before_ci95": [
+       10.836835288,
+       11.2241286698
+      ],
+      "delta_ci95": [
+       0.978655579968,
+       1.37885089546
+      ]
+     }
+    },
+    "bitop": {
+     "gap_after_bits": 9.23129599957,
+     "gap_before_bits": 10.1261748656
+    },
+    "ec1": null,
+    "first_ic_on_curve": true
+   }
+  ],
+  "source": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
+  "unit": "ecbench counted GAE per sqrt(r); IC native operations and rho *_uncharged counters at w GAE each (AGENTS.md section 5a); bitop/v1 as a calibration-free cross-check",
+  "isolation": "L0 (counted cost only; wall time not certified)",
+  "provenance": {
+   "repository": "github.com/aburan28/ml-cryptanalysis",
+   "branch": "main",
+   "commit": "7d4e8e0fccb43148c80fd2004821fd7e48f9df76",
+   "path": "experiments/fb-pt-lgrow-k1",
+   "validation_id": "VAL-20261114-d9190c"
+  },
+  "class": "engineering (parameter re-selection at fixed n)",
+  "study": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/",
+  "report": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/report.md",
+  "figure": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/figures/fig_lgrow_gap.png",
+  "not_a_row": "D (slope difference over n = 17..29) equals (R_n23 + 7 R_n29) / 84 by construction: an offset, not a bent slope",
+  "validation": "validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched strong signed-Frobenius rho reference with the §5a band (research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/VALIDATION.json)",
   "validated": true
  },
  "d4_char2_frob_roots_component": {
