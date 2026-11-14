@@ -208,3 +208,47 @@ public finder, growing-family normal forms and complete expected bit cost
 remain obligations. Field-of-definition correctness is distinct from the
 cost of extraction. Original W-jet mapping and all original exit criteria
 remain open; no native/solver/paid experiment was launched [pcc:unverified].
+
+
+2026-11-14 finite weighted counting: [report](../research/prime_norm_rank_20261112/weighted-count-report/README.md),
+source740732e95389e5185ed9a6547c18d8d889a6c580. For positive weights,
+all weighted exponent vectors under budgetD satisfy
+M*product(weights)<=choose(D+sum(weights),v), and
+M*product(weights)*v!<=(D+sum(weights))^v. Consecutive weights1,...,v give
+M(v,D)*(v!)^2<=(D+v^2)^v, including zero variables and zero budget.
+Exact finite count/completeness and mixed-radix injection are source-bound
+in unsignedPCC-20261114-cc1d70/621b19/9932d5. This is an elementary
+combinatorial component, with no novelty claim for the counting argument
+[pcc:unverified].
+
+The full study gate reports394 theorem declarations/0 extra trusted axioms;
+final import-inclusive replay status and hashed receipts are in the linked
+report. This does not bind actual growing norm input weights, construct a
+small full closure, or supply a public finder. A quadratic weighted budget
+would require a separately justified construction; the count does not
+supply it. Keep original W-jet map, coverage, field extraction, retries and
+complete expected bit-cost criteria open. No solver/native fixture or paid
+experiment was launched [pcc:unverified].
+
+
+2026-11-14 actual growing input grading: [report](../research/prime_norm_rank_20261112/growing-input-report/README.md),
+source0a12a195c66785b5b8b4b4409ab0cc02ee991f64. The literal multivariate
+coefficient support of the actual computed membership remainder has budget
+2*deg(P), with coefficient-j weightedTotalDegree<=2*deg(P)-2*j. Actual
+retained weights are exactly1,...,2a-2 via a proved bijection for all a>=2.
+The norm/support are monic of degrees2a/2a-1, actual target incidence gives
+exact norm multiplication, and an exact polynomial-ring renaming binds
+h=1 to the unchanged four-variable norm/support/full remainder. Central
+PCC-20261114-3a3e7b/cad062/253550/2c4a15/6c253b/3a3330/69b0f2, all
+unsigned. Forty authored new statements plus generated finSumFinEquiv.eq_1;
+whole-study435/0, fresh NormGrowingInput0, receiptsdc7d16/41a33c
+[pcc:unverified].
+
+This closes the actual growing input-budget obligation for the openly
+specified rational-point-base norm chart. It does not bind the original
+W-jet family or the separately unlaunched reduced.ms native fixture,
+prove the normalized-row degree29 claim, or establish a low full-closure
+cutoff. The next discriminating question is constructive bounded full
+closure on this actual family. Preserve public finder, coverage,
+field-extraction, retry and complete expected bit-cost exit criteria;
+no solver/native/paid experiment was launched [pcc:unverified].

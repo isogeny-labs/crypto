@@ -463,6 +463,168 @@ fn full_d18_load(root: &Path) -> Result<(PrimaryBase, Value)> {
     Ok((base, row))
 }
 
+/// Export the retained K2048 five-summand orbit circuit for an external XOR
+/// solver. The constructed control pins x coordinates but leaves every
+/// representative and Frobenius-phase selector free.
+pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result<Value> {
+    const OBJECT: &str = "objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz";
+    const OBJECT_SHA256: &str = "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a";
+    const MANIFEST_SHA256: &str = "68b43524198394a2f0d112f86df0d1c1f69ea1ff817695cf21efe2767b7d17b8";
+    const REPLAY_SHA256: &str = "5ad374ef0042b2ebd6562746b7ca67e46c6b0f4d46c4ba25abae83fd2dd411e2";
+    const STORAGE_SHA256: &str = "f1139c1dd61beac0e1d9e80a1d02e983f98c7b1abc6887f1816f013d4693bf4c";
+    const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
+    if !["positive", "natural"].contains(&mode)
+        || output.exists()
+        || output.with_extension("xcnf").exists()
+    {
+        return Err("K2048 m5 mode or fresh output differs from protocol".into());
+    }
+    for (name, expected) in [
+        (OBJECT, OBJECT_SHA256),
+        ("manifest.json", MANIFEST_SHA256),
+        ("replay.json", REPLAY_SHA256),
+        ("upload-receipt.json", STORAGE_SHA256),
+        ("probe-corpus.json", CORPUS_SHA256),
+    ] {
+        if sha256_hex(&fs::read(root.join(name))?) != expected {
+            return Err(format!("K2048 m5 input {name} differs from frozen SHA-256").into());
+        }
+    }
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
+    let started = Instant::now();
+    let (base, row, manifest_blake3) =
+        load_panel_selected(root, 2_048, "public_x_hash", SEEDS[0])?;
+    let fb = &base.factor_base;
+    if fb.points.len() != 339_968 || fb.signed_orbits.len() != 2_048 {
+        return Err("K2048 m5 imported base size differs".into());
+    }
+    let representatives: Vec<BigUint> = fb
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &fb.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("K2048 representative is infinity".into()),
+        })
+        .collect::<Result<_>>()?;
+    let (public, corpus_blake3) = public_target(root, &base.curve)?;
+    if point_json(words(&public))
+        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    {
+        return Err("K2048 m5 public target differs from frozen fixture".into());
+    }
+    let mut positive = None;
+    let target = if mode == "positive" {
+        let indices: [usize; 5] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+        let mut partial = Vec::with_capacity(5);
+        let mut sum = BinaryPoint::Infinity;
+        for &index in &indices {
+            sum = base.curve.add(&sum, &fb.points[index]);
+            partial.push(sum.clone());
+        }
+        if partial.iter().any(|point| !matches!(point, BinaryPoint::Affine { .. })) {
+            return Err("K2048 m5 positive has an identity intermediate".into());
+        }
+        let relation = checked_primary_relation_row(&base.curve, fb, &indices, &sum)?;
+        positive = Some((indices, partial, relation));
+        sum
+    } else {
+        public
+    };
+    let BinaryPoint::Affine { x: target_x, .. } = &target else {
+        return Err("K2048 m5 target is identity".into());
+    };
+    let model_started = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        5,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        200_000,
+    )
+    .map_err(|_| "K2048 m5 chained-S3 circuit construction failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        200_000,
+        3_000_000,
+    )
+    .map_err(|_| "K2048 m5 shared-root orbit domain failed")?;
+    if let Some((indices, partial, _)) = &positive {
+        let points: Vec<&BinaryPoint> = indices
+            .iter()
+            .map(|&index| &fb.points[index])
+            .chain(partial[1..4].iter())
+            .chain(std::iter::once(&target))
+            .collect();
+        if points.len() != 9 {
+            return Err("K2048 m5 positive block count differs".into());
+        }
+        for (block, point) in points.iter().enumerate() {
+            let BinaryPoint::Affine { x, .. } = point else {
+                return Err("K2048 m5 positive pin is identity".into());
+            };
+            let x = x.to_biguint();
+            for bit in 0..83usize {
+                let wire = (block * 83 + bit + 1) as i32;
+                if !enc.solver.add_clause(vec![if x.bit(bit as u64) { wire } else { -wire }]) {
+                    return Err("K2048 m5 positive pin contradicted circuit".into());
+                }
+            }
+        }
+    }
+    let model_ms = model_started.elapsed().as_secs_f64() * 1000.0;
+    let shape = json!({
+        "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
+        "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
+        "summands":5,"identity_mask":0,"root_encoding":"shared_root_bits",
+        "domain_representatives":representatives.len(),
+        "positive_x_pins":if positive.is_some() { 9*83 } else { 0 },
+    });
+    let export_started = Instant::now();
+    let xcnf = to_dimacs_xor(&enc.solver);
+    if xcnf.len() > 200_000_000 {
+        return Err("K2048 m5 XCNF exceeds frozen output cap".into());
+    }
+    let xcnf_path = output.with_extension("xcnf");
+    let mut file = OpenOptions::new().write(true).create_new(true).open(&xcnf_path)?;
+    file.write_all(xcnf.as_bytes())?;
+    file.sync_all()?;
+    let xcnf_sha256 = sha256_hex(xcnf.as_bytes());
+    let positive_receipt = if let Some((indices, _, row)) = positive {
+        let row_bytes = serde_json::to_vec(
+            &row.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        )?;
+        Some(json!({
+            "indices":indices,
+            "relation_row_decimal_blake3":blake3::hash(&row_bytes).to_hex().to_string(),
+        }))
+    } else {
+        None
+    };
+    let result = json!({
+        "schema":"n83.k2048-m5-xcnf-export/v1",
+        "status":"PASS_XCNF_EXPORT_ONLY", "mode":mode,
+        "curve_id":base.curve.label(),"curve_a":0,
+        "source_commit":source_commit,"source_attestation_mode":source_attestation_mode,
+        "binary_sha256":binary_sha256,"object":row["object"],
+        "object_sha256":OBJECT_SHA256,"point_set_blake3":row["point_set_blake3"],
+        "panel_manifest_blake3":manifest_blake3,"public_corpus_blake3":corpus_blake3,
+        "target":point_json(words(&target)),"shape":shape,
+        "positive":positive_receipt,
+        "xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
+        "xcnf_path":xcnf_path.to_string_lossy(),
+        "export_ms":export_started.elapsed().as_secs_f64()*1000.0,
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "process_usage":process_usage(),"solver_search_executed":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &result)?;
+    Ok(result)
+}
+
 pub(super) fn check_full_d18_export(root: &Path) -> Result<Value> {
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
@@ -903,6 +1065,31 @@ pub(super) fn full_d18_m4_l0_xcnf_cli(
     )
 }
 
+/// Export the ordered-first-pair D18 formula used by the native cadence-32
+/// control. The cadence affects native search only; no solver runs here.
+pub(super) fn full_d18_m4_l0_ordered_xcnf_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        false,
+        true,
+        32,
+    )
+}
+
 /// Export the unchanged constructed full-D18 XCNF and save one native SAT
 /// assignment so an independent verifier can test every exported constraint.
 pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
@@ -1049,8 +1236,8 @@ fn full_d18_m4_impl(
             || encoding != FrobeniusOrbitRootEncoding::SharedBits
             || !phase_zero_first
             || choice_pins != "none"
-            || export_xcnf
-            || native_xcnf_witness)
+            || native_xcnf_witness
+            || (export_xcnf && xor_decision_cadence != 32))
     {
         return Err("ordered first pair differs from the frozen symmetry arm".into());
     }
@@ -1617,7 +1804,7 @@ pub(super) fn check_panel(root: &Path, columns: usize) -> Result<Value> {
 fn checked_primary_relation_row(
     kc: &KoblitzCurve,
     fb: &FrobeniusFactorBase,
-    indices: &[usize; 4],
+    indices: &[usize],
     target: &BinaryPoint,
 ) -> Result<Vec<BigUint>> {
     let r = &kc.subgroup_order;
