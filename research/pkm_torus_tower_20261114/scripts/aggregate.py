@@ -1,16 +1,28 @@
 #!/usr/bin/env python3
-"""Aggregate runs/*.jsonl into results.csv, a Markdown table, and figures/d_vs_n.svg (no plotting library).
-Usage: aggregate.py  (run from the research directory)"""
+"""Aggregate the native closure results (runs/native/*.jsonl, computed by closure/pc_closure) into
+results.csv, results_table.md and figures/d_vs_n.svg (no plotting library), and cross-check them against
+the Python instrument's runs (runs/*.jsonl) cell by cell.  Usage: aggregate.py  (from the research dir)"""
 import csv, glob, json, os, re
 from collections import defaultdict
 
 ARMS = {'K': 'K: Kummer y²', 'S': 'S: G_m Möbius σ', 'T': 'T: T₂ Möbius τ',
         'M': 'M: Kummer + Möbius link', 'C': 'C: T₂ circle + link'}
+def load(f):
+    return [json.loads(l) for l in open(f) if l.strip()]
+# Python cross-check runs: tag -> (certified D or None, per-D ranks)
+pyruns = {}
+for f in glob.glob('runs/*.jsonl'):
+    recs = load(f)
+    if recs and 'header' in recs[0]:
+        pyruns[os.path.basename(f)[:-6]] = (next((r['certified_D'] for r in recs if 'certified_D' in r), None),
+                                            {r['D']: r['rank'] for r in recs if 'D' in r})
 rows = []
-for f in sorted(glob.glob('runs/*.jsonl')):
-    recs = [json.loads(l) for l in open(f) if l.strip()]
-    if not recs or 'header' not in recs[0]: continue
-    h = recs[0]['header']
+for f in sorted(glob.glob('runs/native/*.jsonl')):
+    tag = os.path.basename(f)[:-6]
+    recs = load(f)
+    sysf = f'runs/systems/{tag}.json'
+    if not recs or not os.path.exists(sysf): continue
+    h = json.load(open(sysf))['header']
     cert = next((r['certified_D'] for r in recs if 'certified_D' in r), None)
     cens = next((r['censored_D_ge'] for r in recs if 'censored_D_ge' in r), None)
     done = [r for r in recs if 'D' in r]
@@ -21,10 +33,18 @@ for f in sorted(glob.glob('runs/*.jsonl')):
         status = 'timeout'
     else:
         status = 'certified' if cert else 'censored'
+    py = pyruns.get(tag)
+    if py is None: xc = 'none'
+    else:
+        pyD, pyr = py
+        ranks_eq = all(pyr.get(r['D']) == r['rank'] for r in done if r['D'] in pyr)
+        shared = [r['D'] for r in done if r['D'] in pyr]
+        if pyD is not None and cert is not None: xc = ('agree' if pyD == cert and ranks_eq else 'DISAGREE')
+        else: xc = (f'partial D<={max(shared)}' if shared and ranks_eq else ('DISAGREE' if shared else 'none'))
     rows.append(dict(arm=h['arm'], p=h['p'], m=h['m'], t=h['t'], N=h['N'], n_vars=h['n_vars'], seed=h['seed'],
                      target=h['target'], consistent=h['consistent_by_enum'], D=cert, D_ge=cens, status=status,
                      cols_at_D=next((r['cols'] for r in done if r['D'] == (cert or lastD)), None),
-                     seconds=round(sum(r['seconds'] for r in done), 1), file=os.path.basename(f)))
+                     seconds=round(sum(r['seconds'] for r in done), 2), python_crosscheck=xc, file=tag))
 rows.sort(key=lambda r: (r['target'], r['m'], r['t'], r['arm'], r['p'], r['seed']))
 with open('results.csv', 'w', newline='') as fh:
     w = csv.DictWriter(fh, fieldnames=list(rows[0].keys())); w.writeheader(); w.writerows(rows)
@@ -48,6 +68,10 @@ for (m, t) in sorted(tab):
         e = sorted(tab[(m, t)].get(k, []))
         vals.append(', '.join(f"{d}" for s, d, sec in e) if e else '')
     lines.append(f"| {m} | {t} | {m*t} | " + ' | '.join(vals) + ' |')
+xs = [r['python_crosscheck'] for r in rows]
+lines += ['', f"Python cross-check (same dumped system): {xs.count('agree')} cells agree on D and every per-degree rank, "
+          f"{sum(x.startswith('partial') for x in xs)} agree on the degrees Python finished, {xs.count('DISAGREE')} disagree, "
+          f"{xs.count('none')} not run in Python."]
 ctrl = [r for r in rows if r['target'] == 'planted']
 lines += ['', 'Planted (consistent) controls, `1 ∈ W_D` must stay false:', '']
 lines += ['| arm | p | m | t | result |', '|---|---|---|---|---|']
