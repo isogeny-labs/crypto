@@ -37,3 +37,11 @@ another session at about 00:27Z on 2026-11-11). All Iso Lab cluster launches and
 project `isolab-experiment-launcher`, so no job can be submitted from any session. Stage B unit job 1 stopped at its
 pool check with `AccountLimitExceededException`; nothing ran. Raising the quota is an owner action. The image builds run
 on GitHub Actions and are not affected.
+
+## B1/B2 benchmark records
+
+The bench records named in the frozen B1 and B2 protocols (`benchmarks/records/20261114T1957Z-b1-prime-ic-n-ext-fp20.json`,
+`…-b2-kangaroo-medium-tier.json`) were opened on 2026-11-14 and then taken out of the pull request again, because the
+`records` check fails on records that are open with no run. Their exact files are in git history at commit `9278a12fb9`
+(sha256 `a11f8d91…` and `80068f10…`). They are restored unchanged, at the same paths, in the pull request that lands the
+runs, and closed there.
