@@ -123,3 +123,11 @@ decomposition oracle only.
 - Note recorded before the C3 data: the C1 positive-control ratio (0.438) is about the same as the
   C1 stream B/A1 ratio (0.426). So the repeat block does not separate target-specific reuse from
   general warm-up. The pass/fail criterion is unchanged.
+
+## Amendment 2 (2026-11-14, during the C2 and C3 runs)
+- **C2 reduced.** The full eight-arm C2 run (m=11, k=3, w=2) took about 7 min per target: A1, B
+  and C* cost about 1e6 conflicts each at load average 8.9, on a host shared by seven lanes. That
+  projects to more than 5 h. It was stopped after 2 complete target positions. Its rows are kept
+  as `raw/rows_m11k3w2_aborted.jsonl` and are not scored. C2 is rerun with arms {A0, AA, A1, B}
+  only, 20 targets and 3 repeats, and the same seed, so the first 20 targets are the same stream.
+  The C* arms are measured on C1 and C3 only.

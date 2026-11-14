@@ -2,7 +2,7 @@
 # L5 measured runs (seed 20261114), frozen grid of PROTOCOL.md §3. Sequential, 1 core.
 set -euo pipefail
 SP=/tmp/claude-0/-home-user/e01afaa4-f4f8-52ad-ba5a-6c307eb9b47e/scratchpad
-B=$SP/lanes/L5/target/release/ffcop
+B=$SP/lanes/L5/target-v2/release/ffcop
 D=$(cd "$(dirname "$0")" && pwd)/raw
 S=20261114
 ARMS=s3p,s3u,genp,genu,gsp,gsu,e3p,e3u,k2p

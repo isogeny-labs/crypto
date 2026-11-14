@@ -143,3 +143,19 @@ planted instance (it cannot contain a 2-term decomposition). The summarizer drop
 reports their count. All runs are restarted from scratch with the fixed binary (the partial
 outputs of the first launch are discarded); grid, metrics, predictions and decision rule unchanged.
 The existence-count table of the first launch was viewed while writing the summarizer.
+
+## Amendment 2 (2026-11-14 ~09:10 UTC, after partial data: extraction fix, no rule change)
+
+Partial v1 data (n <= 37 complete, n = 53/61 partial) showed the positive control failing only
+in over-provisioned cells (tiny l, k >= 3): e.g. n = 29, k = 5, l = 3: 117 of 121 rows short and
+all vanish at the planted root, but every resultant among the first 8 short rows was zero. Cause:
+the lowest-degree short rows share a common factor (multiples of g, of monomials, or of one
+exceptionally short polynomial), so the 8-row/X2-only resultant cannot separate the root. This is
+a limitation of the extraction step, not of the lattice. Extraction v2 (`extract_version: 2`):
+(1) divide each short row by every exact factor of g and by its monomial content; (2) drop
+duplicates; (3) scan all pairs of short rows, screening each pair by gcds at two random
+specializations, and compute Res_{X2} and Res_{X1} for the first pair that passes; (4) solve the
+partner coordinate of every candidate from the arm polynomial mod f (a quadratic over F_{2^n},
+by half-trace); (5) verify mod f. Extraction still never uses the planted root.
+All runs restart with the v2 binary; v1 partial outputs are kept in `raw_v1_discarded/` and are
+not used for any verdict. Grid, metrics, predictions and decision rule unchanged.
