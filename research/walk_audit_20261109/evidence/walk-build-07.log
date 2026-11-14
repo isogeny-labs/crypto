@@ -1,0 +1,12 @@
+WalkBoundary.lean:189:27: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HPow ℚ ℕ ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+WalkBoundary.lean:191:27: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HPow ℚ ℕ ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+WalkBoundary.lean:195:2: error: Expected type must not contain metavariables
+  (∑ h, ↑{x | x + ↑↑(h x) + 1 = 0}.card) / ↑8 = 1 ∧
+    (∑ h, (↑{x | x + ↑↑(h x) + 1 = 0}.card - 1) ^ 2) / 8 = 1 / 2 ∧
+      (∑ h, (↑{x | x + ↑↑(h x) + 1 = 0}.card - 1) ^ 2) / 8 ≠ 2

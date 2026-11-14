@@ -1,0 +1,8 @@
+research/groebner_system_audit_20261113/native/analyze.cpp: In function ‘void sourceChecks(const std::string&)’:
+research/groebner_system_audit_20261113/native/analyze.cpp:178:7: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  178 |       if(k==0)term(g,{0,2,0},1);require(g==source.fs[k],"actual JV source input binding");}}
+      |       ^~
+research/groebner_system_audit_20261113/native/analyze.cpp:178:33: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  178 |       if(k==0)term(g,{0,2,0},1);require(g==source.fs[k],"actual JV source input binding");}}
+      |                                 ^~~~~~~
+cc1plus: all warnings being treated as errors

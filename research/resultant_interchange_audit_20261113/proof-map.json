@@ -1,0 +1,61 @@
+{
+  "namespace": "ResultantInterchangeAudit",
+  "proofs": [
+    {
+      "claim": "Literal degrees/inner polynomials/natural-size disproof and fixed-size control",
+      "file": "DegreeDropControl.lean",
+      "declarations": [
+        "control_innerY",
+        "control_innerX",
+        "control_bidegrees",
+        "control_actual_degree_drop",
+        "control_natural_left",
+        "control_natural_right",
+        "control_fixed_left",
+        "control_fixed_right",
+        "natural_interchange_counterexample"
+      ]
+    },
+    {
+      "claim": "Root products, actual degree bounds and fixed-size Fubini for split boundary polynomials",
+      "file": "SplitInterchange.lean",
+      "declarations": [
+        "innerY_prod",
+        "innerX_prod",
+        "innerY_degree",
+        "innerX_degree",
+        "innerY_eval",
+        "innerX_eval",
+        "fixed_interchange_of_splits"
+      ]
+    },
+    {
+      "claim": "Actual coefficient-map/variable-swap compatibility and field descent",
+      "file": "FieldInterchange.lean",
+      "declarations": [
+        "swap_mapBiv",
+        "innerY_map",
+        "innerX_map",
+        "leftFixed_map",
+        "rightFixed_map",
+        "fixed_interchange",
+        "innerY_degree_field",
+        "innerX_degree_field"
+      ]
+    },
+    {
+      "claim": "All-domain descent, exact-degree sufficient condition, closed combined certificate",
+      "file": "DomainInterchange.lean",
+      "declarations": [
+        "fixed_interchange_domain",
+        "innerY_degree_domain",
+        "innerX_degree_domain",
+        "natural_interchange_of_exact_degrees",
+        "resultant_interchange_with_degree_drop_control"
+      ]
+    }
+  ],
+  "hypotheses": "Every commutative integral domain; Q degree<=dy and swapped Q degree<=dx. Natural-size corollary additionally assumes both intermediate degree bounds sharp. Literal counterexample overQ.",
+  "local_gate": "46/0failures/0trusted",
+  "signed_standing": "not established"
+}

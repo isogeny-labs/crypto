@@ -1,0 +1,44 @@
+{
+  "schema": "semaev-general-split-source-review/v1",
+  "primary": {
+    "source_id": "S-SEMAEV-2004",
+    "title": "Summation polynomials and the discrete logarithm problem on elliptic curves",
+    "author": "Igor Semaev",
+    "document_date": "2004-02-05",
+    "url": "https://www.researchgate.net/profile/Igor-Semaev-3/publication/2869464_Summation_Polynomials_and_the_Discrete_Logarithm_Problem_on_Elliptic_Curves/links/5440f69f0cf228087b6a11ba/Summation-Polynomials-and-the-Discrete-Logarithm-Problem-on-Elliptic-Curves.pdf",
+    "bytes": 131064,
+    "sha256": "1cab0ae675996cdba6393b1e369a22113fd2e74bcf1223595743dc140631c7d6",
+    "pages": 6
+  },
+  "general_model": {
+    "id": "Kosters-Yeo2015",
+    "url": "https://arxiv.org/pdf/1503.08001",
+    "version": "arXiv1503.08001v3",
+    "pdf_sha256": "b5ea5e4c5de7dcacf579e283168d9463b2b6977b031002ddee134a3a0d7868eb",
+    "text_sha256": "49a35941e7f8b2a7d33c7d4a387a967354c48a16b172f66d443e72ee57e85345",
+    "read_scope": "Section2 p3 general b-invariant S3 formula and Proposition2.1, including visual PDF inspection; not a claim to audit all r, NP-completeness or first-fall results."
+  },
+  "reread_scope": "Semaev2004 Theorem1 equation2 and proof, original characteristic not2/3; all arities N>=4, 1<=k<=N-3. Literal S3, symmetry, individual degree, leading coefficient and separate absolute irreducibility statements. Source mapping N=(m+2)+(n+2), k=n+1 proved in Lean. General invariant S3 from Kosters-Yeo2015 Section2/p3 previously text/PDF reviewed; previous exact review pinned by path.",
+  "parent_review": "research/semaev_symmetry_audit_20261113/evidence/source-review.json",
+  "repository_scope": [
+    "Actual canonical degree/all-input symmetry and tower/MV scalar-variable equivalences",
+    "SourceOrder actual S4 block reassociation and independent-b/noncurve controls",
+    "DomainInterchange fixed-size Fubini and explicit natural-degree-reset failure",
+    "PrescribedDegree generic-leading specialization and all-map naturality"
+  ],
+  "library_scope": [
+    "Polynomial resultant_map_map preserves explicit Sylvester dimensions",
+    "Polynomial coefficient-map injectivity and natDegree preservation",
+    "MV eval2/rename injectivity/ring-hom extensionality",
+    "Fin cast/append/snoc and List.ofFn/Perm exact position equivalences"
+  ],
+  "method": "Prove fully prescribed outer-degree Fubini by independent generic leading coefficients and specialization. Derive exact S3 convolution transfer with generic even-sign commutation. Actual canonical recurrence and all-input symmetry yield two-block list induction. Evaluate universally in the actual MVpolynomial ring, not merely finite-field inputs. Prove independent-variable coefficient maps injective, recover true factor degrees, and identify source-last partial evaluation with the actual source-first kernel.",
+  "control_scope": "Natural-degree resetting can break general resultant interchange (-1 versus2), whereas retained dimensions agree. Independent b=(0,0,0,1) breaks S4 symmetry, but Lean proves no actual rational curve has these invariants. Neither control refutes the qualified source recursion.",
+  "boundary": "General literal polynomial recursion is proved. Higher-arity absolute irreducibility remains open; no new group/zero-sum claim for singular models. Other all14 gaps remain in current maps.",
+  "kb": "KB MCP absent; wrapper127, bounded primary/repository/Mathlib fallback recorded before edits.",
+  "conductor": "No executable/service; research scope recorded before edits.",
+  "novelty_claim": false,
+  "qualified_source_refuted": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

@@ -1,0 +1,433 @@
+{
+  "schema": "random-support-average-source-plan/v1",
+  "created": "2026-11-14T13:24:48.971132+00:00",
+  "formal": {
+    "project": "research/random_support_average_audit_20261114/lean",
+    "theorem": "RandomSupportAverageAudit.random_support_average_certificate",
+    "statement": "theorem random_support_average_certificate : (∀ (p d : ℕ) [Fact p.Prime] (h : d ≤ p-1) (a : Sample (ZMod p) (d+1)), (fullSupportLaw p d h a).toReal=1/(p.descFactorial (d+1) : ℝ)) ∧ (∀ (p d : ℕ) [Fact p.Prime], Function.Bijective (allSupportEquiv : (ZMod p × Sample (Choice p) d) ≃ Sample (ZMod p) (d+1))) ∧ (∀ (p d : ℕ) [Fact p.Prime] (h : d ≤ p-1) (F : Sample (ZMod p) (d+1) → ℝ), expectation (fullSupportLaw p d h) F = expectation (uniformLaw (ZMod p)) (fun a₀ => expectation (sampleLaw (Choice p) d (Eq.mpr (congrArg (fun n => d ≤ n) choice_card) h)) (fun e => F (allSupportEquiv (a₀,e))))) ∧ (∀ (p : ℕ) [Fact p.Prime], Function.Bijective (frequencyCharacter p)) ∧ (∀ (p d : ℕ) [Fact p.Prime] (h : d ≤ p-1) (q : PMF (Fin (d+1))) (ω : ℝ), 0<ω → (∀ i, ω ≤ weight q i) → ∀ (t : ℕ), 0<t → ∀ x : ZMod p, (expectedDistance p d h q t x)^2 ≤ expectedSquaredDistance p d h q t x ∧ expectedSquaredDistance p d h q t x ≤ ((p-1 : ℕ) : ℝ)/4 * (sqrt (Real.pi/((8*ω^2*(t : ℝ))/(p : ℝ)^2)))^d/((p-1).descFactorial d : ℝ)) ∧ (∀ (d : ℕ), 1 ≤ d → ∀ (q : PMF (Fin (d+1))), (∀ i, 0<weight q i) → ∀ ε : ℝ, 0<ε → ∃ γ : ℝ, 0<γ ∧ ∃ N : ℕ, d+1 ≤ N ∧ ∀ (p : ℕ) [Fact p.Prime] (h : d ≤ p-1), N ≤ p → ∀ x : ZMod p, expectedDistance p d h q ⌊γ*(p : ℝ)^((2 : ℝ)/(d : ℝ))⌋₊ x<ε) ∧ (∀ (p d : ℕ) [Fact p.Prime] (h : d ≤ p-1) (t : ℕ) (x : ZMod p), (1/2 : ℝ) ≤ expectedDistance p d h (PMF.pure (0 : Fin (d+1))) t x) ∧ (∀ d : ℕ, ¬ ∃ γ : ℝ, 0<γ ∧ ∃ N : ℕ, d+1 ≤ N ∧ ∀ (p : ℕ) [Fact p.Prime] (h : d ≤ p-1), N ≤ p → ∀ x : ZMod p, expectedDistance p d h (PMF.pure (0 : Fin (d+1))) ⌊γ*(p : ℝ)^((2 : ℝ)/(d : ℝ))⌋₊ x<(1/4 : ℝ))",
+    "decl_sha256": "83b7a165067e380a276ddcf08733e5cdecb404684ee336251d3560d70d5af070",
+    "scope": "Qualified Hildebrand1994Theorem1 expected random-support mixing for every fixed k=d+1>=2 and every fixed strictly positive normalized finite label PMF. The actual recursively defined iid walk and genuine uniform law on all ordered injective supports are used, not a conditional surrogate. Positive gamma and N are derived before prime modulus/support, exact time floor(gamma*p^(2/d)), all sufficiently large primes and every start have actual expected halfL1<epsilon. Full support pointmass and first-point/relative-injective-sample expectation decomposition proved; actual support-coordinate independence is never assumed. Standard frequency indexing onto every complex additive character derived. Actual finite Gaussian moment and mean-square TV bounds, weighted Cauchy, falling-factorial denominator limit, fourth-power estimate and exact real-power/floor controls derive the source exponent. Actual zero-weight pure-label walk is deterministic, actual full-support expected distance>=1/2 for all prime moduli/times/starts and no gamma/threshold can give<1/4: strict-weight-deletion negation over unbounded primes, not qualified source refutation. Prior literal intermediate Gaussian/k2 counting errors retain their valid repairs and author correction credit. Standard foundations/default settings, no holes/custom axioms/native evaluation/raised limits/global flags/waivers/native experiment/spend/upload. Static rho/collision penalty/limiting constants and original fourteen-item gaps remain open. No novelty/absence/canonical-corpus promotion claim.",
+    "sources": [
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+        "bytes": 4718,
+        "sha256": "b52bbe21e0157df1def29b77daa23dc6ba816ccd2abfe42ac29c9e885d0659bd"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/FourierAlgebra.lean",
+        "bytes": 2933,
+        "sha256": "1853676b13a6b90dc8660146c39935da3060f63c8ada1c8ea34db08ef44f257f"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/NormalizationControl.lean",
+        "bytes": 1586,
+        "sha256": "3cb025dfff9ed7d687266d93b195c506e383e27c5f3ca348c7d1bcd05a407df5"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/TVDistance.lean",
+        "bytes": 4514,
+        "sha256": "994c057b9397277d6d3eb4d8e385db418f2f7c01a2c095209584f5c593df9164"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/UpperBoundCertificate.lean",
+        "bytes": 3966,
+        "sha256": "a1cdb09af81497a1d173f5e982319609a016d84af2e0067cb2681562023928e8"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/WalkUpperBound.lean",
+        "bytes": 3999,
+        "sha256": "3de4dab0a4c86378b089749698c38cfd24ab45eae0a9cc84f53c04e121ba043e"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/DenominatorLimits.lean",
+        "bytes": 2529,
+        "sha256": "adf214266606cef15b1961f529648bb942446726ef552723d6820e885c600b47"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/CenteredCell.lean",
+        "bytes": 3713,
+        "sha256": "b54ec689b1a3cb11cbc241729d8bd31280129134f282c87248d1dab06cf8c158"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+        "bytes": 3524,
+        "sha256": "ada870ea6fd8545943f33542161c09ce2cfab73922b8022988a1340da22557f0"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/GeneralSupports.lean",
+        "bytes": 3997,
+        "sha256": "6ca43ada50ac3fea0010e53b9d71bce575fa31f6af3708b66d271456fce52974"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/InjectiveSampling.lean",
+        "bytes": 3431,
+        "sha256": "c7add4beaf1aa2f5e98a536f847bfb67090e070a3a5408a45c21e65a439be0bb"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/IntegerCounts.lean",
+        "bytes": 1525,
+        "sha256": "b7f30750940945c8067e9ce30b0bdc5c83a51c8455721f4fbd96d43e99bebc2d"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/PrimeFieldBoxes.lean",
+        "bytes": 5801,
+        "sha256": "e768e03339bd2153a9a39647b4435d6854a10a0689d13db1c65c7e0fad40061c"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/UniformEvents.lean",
+        "bytes": 2076,
+        "sha256": "b9ffb9280d6a38a815e5c79bfb8910577c6371efc5f2a6167110a572499ce915"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/AsymptoticMixing.lean",
+        "bytes": 6804,
+        "sha256": "2bab9a37db1ddfa6370f42e87c8bbba8499c6ac44277095f03f94e536b238875"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/AverageCertificate.lean",
+        "bytes": 3160,
+        "sha256": "cb0e5a3f46af94f5befb093767c654d44de8ee371f03c13eeb11141a8543772b"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/FieldGaussian.lean",
+        "bytes": 3897,
+        "sha256": "4aad008dcfc0196bcb631d9fc84515e4aed02446f1e12dbfd368901225cef7e9"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/FiniteAverage.lean",
+        "bytes": 5224,
+        "sha256": "9030ef07ea65a028ed1040393131acd1ca3e1abab6d8b76cbde39bba6170176a"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/SupportAverages.lean",
+        "bytes": 4098,
+        "sha256": "da07f7e328f0a4ee95ce0b3eb2d2d8c45217391c6fead1941de292bd71794211"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/ZeroWeightControl.lean",
+        "bytes": 2539,
+        "sha256": "04c94fcfa6db5c25bcb48b2a049950a19f61756ce4cf605faa1e090a7ea57816"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/CenteredContraction.lean",
+        "bytes": 7136,
+        "sha256": "0d1f680a0e015142e92c1aea3927720f67f534082b49b385f23abbf8e091bf35"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/DiscreteGaussian.lean",
+        "bytes": 9583,
+        "sha256": "32cb22be2f1ad90c2fd4179df6b2ffebf342929e9a61b64bc6ad6b4842f4eec7"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/GaussianCertificate.lean",
+        "bytes": 3516,
+        "sha256": "39adbc9a83c4c67a94914ccd598b93cfdb003ca01ce8cb4c00f862d0093c0c68"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/InjectiveProducts.lean",
+        "bytes": 2062,
+        "sha256": "3b38c0b9bdfd3bab5c75ccc64c33d592ccd8f37646652b6d2d78f63786663353"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/CharacterCertificate.lean",
+        "bytes": 3680,
+        "sha256": "0ac8e07da465600993e8411ba561a17b32642cd9ee8daae090b5068ab1f94a8e"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/CharacterWalk.lean",
+        "bytes": 2240,
+        "sha256": "abfae10d61d947e936a32c7eb28fe8e30ca359518e3e2f766b0ffdf073b43c3f"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/ComplexExpectation.lean",
+        "bytes": 1668,
+        "sha256": "8772dde72f7b241968e1acb299b45fc670a4bc5774789b7ccf5ab1d787cdec8a"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/PhaseVariance.lean",
+        "bytes": 4252,
+        "sha256": "b3722c8023becfd64bc8e95adb97080d9f0c4e99de41c275c6d0e4946b24ee93"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/SpectralContraction.lean",
+        "bytes": 5725,
+        "sha256": "2c6650135267f67f9152f40bea6c24ba7fe7b06538b6bf68ad753e532459a5da"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean",
+        "bytes": 5558,
+        "sha256": "22c81842c4402fc536128b11218617d9b63bf90bb648d65ee941e48f305c3fed"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/lakefile.toml",
+        "bytes": 374,
+        "sha256": "b7e69658f86e09b1296cb08d1796de15ea63ca697b7b0475585381d7f360214a"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/lake-manifest.json",
+        "bytes": 6501,
+        "sha256": "32524de35ea8bd0c05692327afc1628236d140044bf0fe5eba760287f5f357e4"
+      },
+      {
+        "path": "research/random_support_average_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/lakefile.toml",
+        "bytes": 464,
+        "sha256": "db2f451e318521ff13f86aa556dc83c59744257c4b5131da28c5c2ec4cfae6de"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5902,
+        "sha256": "371e9c13939be044b8496a8261251c671a5b57d22a6b34bf22a4362a832fe371"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/lakefile.toml",
+        "bytes": 458,
+        "sha256": "19225d6a309bbe240c70940c66cb9e3f68b5eee15892beac85cbada61f8afbef"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4666,
+        "sha256": "7baeb5cfc327926c20ab75c21bdae3bd3a17ff643a813cf233bd328b36137daa"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lakefile.toml",
+        "bytes": 353,
+        "sha256": "d8997d8b100ce8e3da6f6bd04eb360f2ae4bae23a4e2273b7b59db16fa107222"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4042,
+        "sha256": "d169e80eecc0d6e301421d51547ec7bb13b50062e438c6d4ec14d2c00c1e5709"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 376,
+        "sha256": "e78ce13d461503c1e1cfcd78289586d99f17f00c1a757f4e0b2d61e0d430e129"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3690,
+        "sha256": "0bb802dd0905e950265a6f107ceff9f534c12d5036a89a552d643b0508f447f8"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 306,
+        "sha256": "5cf902fcb4908f6a1935ba0cd3735d4e91e2c4d2a1ba37617302439679d91af1"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3397,
+        "sha256": "c1f50dd86468022811659b7d11f1bc3e613ece5e63048a972635635f8bd5bb91"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lakefile.toml",
+        "bytes": 325,
+        "sha256": "aa47cdee2c72cf15656c69065a620af69ea1a7bd98e72b63c0f514864af3f41c"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4043,
+        "sha256": "e8067fb860c1ccd6159daa180ee871af2d94d72a3fd65cdd97f205e4f4cc6a3d"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lakefile.toml",
+        "bytes": 343,
+        "sha256": "cf5f5773ce63826f5b6bac191b74157d94945ff26972b23ad8ead49927f89c68"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4825,
+        "sha256": "6351d41de90a95b7bbe7ebcf16fb5e52d419703e05d5a9b040100fc44488476e"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lakefile.toml",
+        "bytes": 347,
+        "sha256": "51f6b7a49f25e089a4d586312110e6ae7251f567e0065cf8f0de29c078f2c32a"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4412,
+        "sha256": "5cc2de693ffc8ce870fcbd704af2e4c419c7862bb13d6d30f7f5a5c5c08b9b73"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AsymptoticMixing",
+    "AverageCertificate",
+    "CenteredCell",
+    "CenteredContraction",
+    "CharacterCertificate",
+    "CharacterWalk",
+    "ComplexExpectation",
+    "DenominatorLimits",
+    "DiscreteGaussian",
+    "FairKernel",
+    "FieldGaussian",
+    "FiniteAverage",
+    "FourierAlgebra",
+    "GaussianCertificate",
+    "GeneralSupports",
+    "InjectiveProducts",
+    "InjectiveSampling",
+    "IntegerCounts",
+    "NormalizationControl",
+    "PhaseVariance",
+    "PrimeFieldBoxes",
+    "SpectralContraction",
+    "SupportAverages",
+    "TVDistance",
+    "UniformChoices",
+    "UniformEvents",
+    "UpperBoundCertificate",
+    "WalkUpperBound",
+    "WeightedKernel",
+    "ZeroWeightControl"
+  ],
+  "artifacts": [
+    {
+      "path": "research/random_support_average_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 20528,
+      "sha256": "c3ffb287daf479e35ba6590db2846affe1f93d1af1de44fa6bcbfe09de50e115"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/evidence/attempts.json",
+      "bytes": 23460,
+      "sha256": "ddc81d23e48c5aac7081f70c6860e1a8d8407ceb1f91ceb7e416c9753aab3566"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1272,
+      "sha256": "c1be03ac895034df50ca28ad671ba03c07cedf6139d489f330f6418eb4bc4651"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/evidence/gate.json",
+      "bytes": 1257,
+      "sha256": "4652de5148cdccf628a5a1c32e9b2481c1d8fdee497836f42b1ebfaff3ae701b"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/evidence/source-review.json",
+      "bytes": 8251,
+      "sha256": "83f07bd340c441a4e1466cf1b756afaaf8c1ebdc270e01f55fa2c7ce6aced167"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/proof-map.json",
+      "bytes": 4699,
+      "sha256": "88e38f2f384c6ff32cd8a3e17dbdb82337e505f8ac61696426059f77dae92668"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/render_report.py",
+      "bytes": 6525,
+      "sha256": "f58d2c2fa6b54d2849e8eddec546e5a567b09d49ff821c425b1153c4a43ff43e"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/restore_attempts.py",
+      "bytes": 1016,
+      "sha256": "f7f877a20ba801a14592f27377e5ec1d142d77fd91e8346130995731b8adfbe4"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/reports/layout.json",
+      "bytes": 285,
+      "sha256": "169c456e4082569216ca017d9721b8be8e6b19fe6e41228b177966f33f5504fe"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/reports/random-support-average.svg",
+      "bytes": 1469,
+      "sha256": "31c4b54c00f5d1df8a3b1a3b707a432c412ca1993b8f9c3fcf185a990cbe2f7e"
+    },
+    {
+      "path": "research/random_support_average_audit_20261114/reports/report.pdf",
+      "bytes": 46364,
+      "sha256": "f6cfe2286d8949217f91e17f2f0fb90a3c3692676d774fcc781e81d7ce2b4123"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 34,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_full_uniform_ordered_distinct_support_law": true,
+    "actual_support_expectation_decomposition": true,
+    "all_standard_characters_indexed": true,
+    "actual_finite_mean_square_TV_bound": true,
+    "exact_source_floor_and_exponent": true,
+    "constants_chosen_before_modulus_support": true,
+    "stronger_expected_random_support_mixing_closed": true,
+    "zero_weight_all_time_average_lower": true,
+    "unbounded_prime_strict_weight_deletion_refuted": true,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

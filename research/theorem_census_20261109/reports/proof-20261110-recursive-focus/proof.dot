@@ -1,0 +1,10 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.2,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=11];
+ a [label="Actual nonzero f in S[old][E]; E-degree at most D\nActual rotation: S[old][Z][T] -> S[Z][T][old]"];
+ c [label="D quadratic columns: old-degree 0\n2 f columns: old-degree at most d"];
+ d [label="Determinant old-degree at most 2d\nCoefficient at 2d = Res_D(old leading f, S3)"];
+ e [label="Old leading f nonzero, E-degree at most D\nEarlier resultant theorem makes its resultant nonzero"];
+ f [label="Sharp surviving old-variable degree = 2d\nCanonical third-newest: degree 2^(m-2), all m >= 5",fillcolor="#dcf1e2"];
+ a -> c; c -> d; d -> e; e -> f;
+}

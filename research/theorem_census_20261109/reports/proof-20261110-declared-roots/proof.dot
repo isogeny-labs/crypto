@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.2,ranksep=0.35];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=11];
+ a [label="Algebraically closed field; positive declared m,n\nActual degree bounds deg(f) <= m, deg(g) <= n"];
+ b [label="One declared top is nonzero\nSelect full-degree side; it splits\nRoot-product criterion"];
+ c [label="Both declared tops are zero\nBoth actual degrees drop\nFixed-size determinant vanishes"];
+ d [label="Res = 0 iff common finite root\nOR both declared top coefficients zero",fillcolor="#dcf1e2"];
+ e [label="Lean hypothesis controls\nPadded constants: extra case needed\nX²+1 over Q: closure needed",fillcolor="#fff1cf"];
+ {rank=same;b;c}
+ a -> b; a -> c; b -> d; c -> d; d -> e;
+}

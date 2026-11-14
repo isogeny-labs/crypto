@@ -1,0 +1,64 @@
+{
+  "namespace": "VerheulDistortionAudit",
+  "proofs": [
+    {
+      "file": "CubeScaling.lean",
+      "claim": "Generic printed formula failure and actual corrected equation/nonsingularity",
+      "declarations": [
+        "printed_map_fails",
+        "corrected_equation",
+        "corrected_nonsingular"
+      ]
+    },
+    {
+      "file": "CubeAutomorphism.lean",
+      "claim": "Actual raw slope/addition, point-group hom/bijection/period3, explicit inverse",
+      "declarations": [
+        "scaled_slope",
+        "scaled_addX",
+        "scaled_addY",
+        "correctedPoint_add",
+        "correctedHom",
+        "correctedPoint_cube",
+        "correctedEquiv"
+      ]
+    },
+    {
+      "file": "Field29.lean",
+      "claim": "Actual F29/F841/nonbase root, actual Porder5 and pointcard30/source trace0",
+      "declarations": [
+        "extension_card",
+        "omega_primitive",
+        "omega_not_in_base",
+        "baseP_order",
+        "P_order",
+        "basePointEquivCode",
+        "actual_base_point_card",
+        "actual_source_trace_zero"
+      ]
+    },
+    {
+      "file": "ConcreteDistortion.lean",
+      "claim": "Actual source-qualified formula negation, cyclic independence/allmemberdistortion and order3control",
+      "declarations": [
+        "printed_formula_not_on_curve",
+        "no_point_map_with_printed_coordinates",
+        "Q_order",
+        "Q_not_in_cyclic",
+        "repaired_distorts_cyclic",
+        "threeControl_order",
+        "threeControl_fixed"
+      ]
+    },
+    {
+      "file": "DistortionCertificate.lean",
+      "claim": "Complete closed formula/source-boundary certificate",
+      "declarations": [
+        "actual_distortion_formula_certificate"
+      ]
+    }
+  ],
+  "local_gate": "49/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "General theorem5/endomorphism-ring/Tate modules/odd-prime rank and canonical pairings; full paper queue."
+}

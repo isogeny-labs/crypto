@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.35,ranksep=0.36];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f2f8",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#34556b"];
+ a [label="Actual Sylvester determinant\nOver the polynomial coefficient ring"];
+ f [label="Coefficient4 = S3(other inputs)^2\nDegree <=4; all four input positions"];
+ m [label="Actual map/evaluation compatibility\nNo finite-field interpolation"];
+ g [label="Other three inputs formal\nS3 nonzero: coefficient2=(x1-x2)^2"];
+ s [label="Other three inputs specialized\nS3 may vanish",fillcolor="#fff2cf"];
+ d [label="Generic individual degree =4\nIn each of the four inputs",fillcolor="#d4eedb"];
+ c [label="Actual smooth F5 control\ny^2=x^3-x; S4(0,1,4,T)=1\nSpecialized degree =0",fillcolor="#fff2cf"];
+ a -> f; a -> m; f -> g; f -> s; g -> d; s -> c;
+}

@@ -1,0 +1,76 @@
+-- Candidate witness refinements only. No proof or kernel acceptance is asserted.
+-- Inputs 0,0; expected representative 0
+refine ⟨(1),(1),0,0,(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,1; expected representative 1
+refine ⟨(1),(X),(1),(X^4),(1),(X),(1),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,2; expected representative 2
+refine ⟨(1),(X^2),(1),(X^3),(1),(X^2),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,3; expected representative 3
+refine ⟨(1),(X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^3),(1),(X^2),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,4; expected representative 4
+refine ⟨(1),(X),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^4),(1),(X),(Polynomial.C (2:K)),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,0; expected representative 1
+refine ⟨(1),(X),(1),(X^4),(X),(1),(1),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,1; expected representative 2
+refine ⟨(1),(X^2),(1),(Polynomial.C (2:K)*X^3),(X),(X),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,2; expected representative 3
+refine ⟨(1),(X^3),(1),(Polynomial.C (2:K)*X^2),(X),(X^2),(Polynomial.C (2:K)),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 1,3; expected representative 4
+refine ⟨(X),(X),(Polynomial.C (2:K)),0,(1),(X),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,4; expected representative 0
+refine ⟨(X),(1),0,(1),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,0; expected representative 2
+refine ⟨(1),(X^2),(1),(X^3),(X^2),(1),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,1; expected representative 3
+refine ⟨(1),(X^3),(1),(Polynomial.C (2:K)*X^2),(X^2),(X),(Polynomial.C (2:K)),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 2,2; expected representative 4
+refine ⟨(1),(X^4),(1),(Polynomial.C (2:K)*X),(X^2),(X^2),(Polynomial.C (2:K)),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 2,3; expected representative 0
+refine ⟨(X^2),(1),0,(1),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,4; expected representative 1
+refine ⟨(X),(X),(1),0,(X),(1),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,0; expected representative 3
+refine ⟨(1),(X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^3),(X^2),(1),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,1; expected representative 4
+refine ⟨(X),(X),(Polynomial.C (2:K)),0,(X),(1),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,2; expected representative 0
+refine ⟨(X^2),(1),0,(Polynomial.C (2:K)),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,3; expected representative 1
+refine ⟨(1),(X^4),(Polynomial.C (2:K)),(X),(X^2),(X^2),(1),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 3,4; expected representative 2
+refine ⟨(1),(X^3),(Polynomial.C (2:K)),(X^2),(X^2),(X),(1),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 4,0; expected representative 4
+refine ⟨(1),(X),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^4),(X),(1),(Polynomial.C (2:K)),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,1; expected representative 0
+refine ⟨(X),(1),0,(Polynomial.C (2:K)),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,2; expected representative 1
+refine ⟨(X),(X),(1),0,(1),(X),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,3; expected representative 2
+refine ⟨(1),(X^3),(Polynomial.C (2:K)),(X^2),(X),(X^2),(1),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 4,4; expected representative 3
+refine ⟨(1),(X^2),(Polynomial.C (2:K)),(X^3),(X),(X),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩

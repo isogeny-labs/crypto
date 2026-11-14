@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-10T00:54:20Z",
+ "id": "PCC-20261110-785828",
+ "kind": "theorem",
+ "producer": {
+  "commit": "a88c6fa0f0692b471cb9472fece886b4fa3ee127",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1444b26c13cfb84accd07ff49d360d7a3253ee8dedeefe8475c7855d44cebb89",
+   "kind": "lean",
+   "project": "research/walk_audit_20261109/lean",
+   "theorem": "WalkWeightedAudit.weighted_variance_audit_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact finite weighted random-function ensemble at vertex0. Validates the variance component for this model, not the collision-time penalty, an asymptotic mixing/collision constant, a practical hash-family claim or a new native experiment. Qualified Hildebrand and general support sizes remain separate.",
+ "statement": "For every real0<=a<=1, a genuine PMF on all8actual hashes Z/3->Fin2assigns independent vertex labels with probabilitiesaand1-a, producing the two distinct nonzero increments+1and+2. Actual in-degree at vertex0has mean1and variance1-(a\u00b2+(1-a)\u00b2). The unequal3/4,1/4control has mean1and exact variance3/8. Every finite graph/count and probability normalization is checked in Lean."
+}

@@ -1,0 +1,69 @@
+{
+  "schema": "theriault-iid-verification/v1",
+  "source_commit": "ce0734f6d358c528a6511f3ad54194ea5951811a",
+  "claim_id": "PCC-20261114-0a4692",
+  "declaration_sha256": "035eb0bb9f1f2a542ded17bb754cb52f07f544dcfb3eda14eb407631cad742ea",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 7,
+  "gate_declarations": 32,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 59,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-0a4692",
+    "claim_sha256": "6f601c5e9613c1ba98bc42e9c5be1fd09221847d394741d9fd1b78253083f427",
+    "commit": "ce0734f6d358c528a6511f3ad54194ea5951811a",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/theriault_iid_audit_20261114/lean (IidCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T01:46:59Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-0a4692",
+    "claim_sha256": "6f601c5e9613c1ba98bc42e9c5be1fd09221847d394741d9fd1b78253083f427",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47284,
+    "sha256": "15a17cfeeee33e58b1ed04dc580d27da55c39c8ba9c846e63cb045b8b113a97e",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 32,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_paired_iid_recurrence_bridge_proved": true,
+    "unbounded_source_domain_counterfamily": true,
+    "general_source_runtime_refuted": false,
+    "full_paper_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

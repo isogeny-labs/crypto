@@ -1,0 +1,24 @@
+BivariateMultiplicity.lean:23:2: error: Type mismatch: After simplification, term
+  h
+ has type
+  Polynomial.eval₂ (algebraMap K (AdjoinRoot (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X)))
+      (AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X))
+      (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X) =
+    0
+but is expected to have type
+  AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X) ^ 2 =
+    (algebraMap K (Q K c)) c * AdjoinRoot.root (Polynomial.X ^ 2 - Polynomial.C c * Polynomial.X)
+BivariateMultiplicity.lean:41:6: error: ring failed, ring expressions not equal
+K : Type u_1
+inst✝ : Field K
+c : K
+f : P K
+hf : f ∈ equationsIdeal K c
+⊢ (AdjoinRoot.of (quadratic K c)) c * AdjoinRoot.root (quadratic K c) -
+      AdjoinRoot.root (quadratic K c) * (algebraMap K (Q K c)) c =
+    0
+BivariateMultiplicity.lean:91:8: error: ring failed, ring expressions not equal
+K : Type u_1
+inst✝ : Field K
+c : K
+⊢ (backward K c) ((AdjoinRoot.of (quadratic K c)) c) - (algebraMap K (A K c)) c = 0

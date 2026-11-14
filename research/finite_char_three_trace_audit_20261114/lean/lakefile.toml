@@ -1,0 +1,11 @@
+name = "finite_char_three_trace_audit"
+version = "0.1.0"
+defaultTargets = ["FiniteCharThreeTraceAudit"]
+
+[[require]]
+name = "quadratic_twist_count_audit"
+path = "../../quadratic_twist_count_audit_20261114/lean"
+
+[[lean_lib]]
+name = "FiniteCharThreeTraceAudit"
+roots = ["CubicThreeTorsion", "CubicTraceCriterion", "GeneralThreeTrace", "FiniteCharThreeCertificate"]

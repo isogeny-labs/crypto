@@ -1,0 +1,215 @@
+{
+  "schema": "bk-basefield-source-plan/v1",
+  "created": "2026-11-13T00:28:42.787920+00:00",
+  "formal": {
+    "project": "research/bk_basefield_census_20261112/lean",
+    "theorem": "BKBasefieldScalingAudit.scaling_audit_certificate",
+    "statement": "theorem scaling_audit_certificate (a b u : K) (hu : u≠0) : (Nat.card (shortCurve a b).Point=Nat.card (shortCurve (u^4*a) (u^6*b)).Point) ∧ (∀ n : ℕ,Nat.card (killedPoints a b n)= Nat.card (killedPoints (u^4*a) (u^6*b) n))",
+    "decl_sha256": "ea805922e38e216481a54a4eb41ed98f399797393c7e791c4775f1c1a58033e3",
+    "scope": "Actual additive scaling bijection, point cardinality and alln torsion cardinality invariance. Actual rational2/3torsion root counts and geometric4/9counts with explicit characteristic/discriminant hypotheses. No arbitrary-r geometric rank/basis, Hasse, determinant, native/compiled refinement or fullallk BK theorem.",
+    "sources": [
+      {
+        "path": "research/bk_basefield_census_20261112/lean/CensusBridge.lean",
+        "bytes": 1127,
+        "sha256": "31d5fdfb70e93b5317c771202a63ca987516c7068c77672d88e6b714bba8bb05"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/RationalTwo.lean",
+        "bytes": 4279,
+        "sha256": "a2f3df2651ca29d69050fdae03cb455908b79b4c908ea43b7a89eb45a8faed44"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/Scaling.lean",
+        "bytes": 2994,
+        "sha256": "43f4c6a397bc0a3d79c933ea493859efdda893e277443c1725ecdf7dacd6b59a"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/ScalingGroup.lean",
+        "bytes": 3522,
+        "sha256": "2cadffafa4bea79bd2f406b819df1ec0a9d5155050133a9a2c1102274f13cab3"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/TorsionTransport.lean",
+        "bytes": 2001,
+        "sha256": "8d24866ef78d009b1fb59515707bf52d23b9b39d861ab55578f9a57a84973636"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/lake-manifest.json",
+        "bytes": 4103,
+        "sha256": "8d62caa30aa42d06051de93ce0cf4792f757fc231a801fbc4f63f4c97e6e6a86"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/lakefile.toml",
+        "bytes": 331,
+        "sha256": "b418a5c7e27e2b0d11e9ced9fe6c993f4cc9ce029158fec1a053bbef57733f1f"
+      },
+      {
+        "path": "research/bk_basefield_census_20261112/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/ActualTorsion.lean",
+        "bytes": 3428,
+        "sha256": "2219c9455c4abfe0f087a8456d3c8a3aba8f82c36556651352c44d0f5a8e106b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/GeometricCardinality.lean",
+        "bytes": 2969,
+        "sha256": "78064d83b97715888a0fe9665b7b6779420ede16f33137949f33c536d456da19"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/QuarticRoots.lean",
+        "bytes": 2524,
+        "sha256": "cd22c5dda5d05d15f0f9003600d9d66469eaf1aff2f0a2f720781a8eb6547971"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lake-manifest.json",
+        "bytes": 3819,
+        "sha256": "e8b97409bd1aff9d12b3d184c53712a4bbd9b2ea93bf745253383d4a95ffdfb2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lakefile.toml",
+        "bytes": 285,
+        "sha256": "5f4264d079b43d11acf3cf999d7d942799e7614094d2c587d0ccbe7eb2655152"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261112/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "certificates": [
+    {
+      "project": "research/bk_basefield_census_20261112/lean",
+      "theorem": "BKBasefieldScalingAudit.scaling_audit_certificate",
+      "statement": "theorem scaling_audit_certificate (a b u : K) (hu : u≠0) : (Nat.card (shortCurve a b).Point=Nat.card (shortCurve (u^4*a) (u^6*b)).Point) ∧ (∀ n : ℕ,Nat.card (killedPoints a b n)= Nat.card (killedPoints (u^4*a) (u^6*b) n))",
+      "decl_sha256": "ea805922e38e216481a54a4eb41ed98f399797393c7e791c4775f1c1a58033e3"
+    },
+    {
+      "project": "research/bk_basefield_census_20261112/lean",
+      "theorem": "BKBasefieldScalingAudit.rational_low_torsion_certificate",
+      "statement": "theorem rational_low_torsion_certificate (a b : K) (hd : 4*a^3+27*b^2≠0) (h2 : (2:K)≠0) (h3 : (3:K)≠0) : (Nat.card (killedPoints a b 2)=Fintype.card (twoRoots a b)+1) ∧ (Nat.card (killedPoints a b 3)= (∑ x : xRoots a b,Fintype.card (yRoots a b x))+1)",
+      "decl_sha256": "e7a1c1dfe15f98c695eaf8f24c7f880cf61bfc3936ebe42061d6041589b37f0b"
+    },
+    {
+      "project": "research/bk_basefield_census_20261112/lean",
+      "theorem": "BKBasefieldScalingAudit.geometric_low_torsion_certificate",
+      "statement": "theorem geometric_low_torsion_certificate [IsAlgClosed K] (a b : K) (hd : 4*a^3+27*b^2≠0) (h2 : (2:K)≠0) (h3 : (3:K)≠0) : Nat.card (killedPoints a b 2)=4 ∧ Nat.card (killedPoints a b 3)=9",
+      "decl_sha256": "d1c3672dca7385299f2dfb8ff09b2fae9f6492628d8c1deae56393be72a39ff1"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/attempts.tar.gz",
+      "bytes": 17357,
+      "sha256": "88f3443750ada38d24ed448ce05c46d4bfbf6e3340ab5e22c12f876d94b35ae8"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/attempts.json",
+      "bytes": 4895,
+      "sha256": "43d067d5bfd2615578862f9bfa568d95421b32abe767dd9019536b3071db7598"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/gate.tar.gz",
+      "bytes": 2376,
+      "sha256": "275f013c852845454e198dce5bd5d6c01a8f0c92b1e7dd4047bd67438c107e95"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/gate.json",
+      "bytes": 1149,
+      "sha256": "8c230c229f02788a5d3cf8122ec5635cccea2ea3e99210887faf99c565cde136"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/source-review.json",
+      "bytes": 1366,
+      "sha256": "5169fa498f9419c9ece4241ab3587a22c09dca63b74a9b9fd0eb146cce38b5c2"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/kb-status.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/kb-status.stderr",
+      "bytes": 81,
+      "sha256": "c6469ac928dfdb446054c9d34486cd5d7a3243e7c20444e8da1bf1b0dbd77238"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/kb-status.exit",
+      "bytes": 4,
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/sql-prepare.cpp",
+      "bytes": 1262,
+      "sha256": "c31ac36664d3aa9103b337381240e8a4274d7c13e2a530297708d24c3e8354d3"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/sql-prepare-01.log",
+      "bytes": 84,
+      "sha256": "d05ca7ea710328968759b50eabfb47e914325efbd53f70562ddf3df59ec6689e"
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/evidence/sql-prepare-01.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  ],
+  "gate": {
+    "archive": "research/bk_basefield_census_20261112/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 29,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/bk_basefield_census_20261112/evidence/attempts.tar.gz",
+    "files": 30,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "rank_or_basis_premise": false,
+    "native_counts_proved_by_Lean": false,
+    "paid_compute": 0
+  }
+}

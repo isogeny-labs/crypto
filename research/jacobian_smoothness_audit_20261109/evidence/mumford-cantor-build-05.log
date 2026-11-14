@@ -1,0 +1,13 @@
+MumfordCantor.lean:64:49: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+MumfordCantor.lean:64:49: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+MumfordCantor.lean:68:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (∏ i ∈ ?m.9, ?f i).natDegree
+in the target expression
+  (∏ k, if m k = true then factor k else 1).natDegree = ∑ k, if m k = true then factorWeight k else 0
+
+m : Mask
+⊢ (∏ k, if m k = true then factor k else 1).natDegree = ∑ k, if m k = true then factorWeight k else 0

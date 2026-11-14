@@ -1,0 +1,50 @@
+{
+  "schema": "bk-actual-case-verification/v1",
+  "created": "2026-11-10T12:27:06.492Z",
+  "source_commit": "11189a29ea05d8e381f4bc7d454a175151b8e7cc",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/bk_actual_case_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 37,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "first_gate": {
+    "archive": "research/bk_actual_case_audit_20261110/evidence/gate-first.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 36,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-99983d",
+    "claim_sha256": "d0a034c62ee653ea80daf1376198e7a95f7c7f2a3e3463297c0749fcab33e242",
+    "commit": "11189a29ea05d8e381f4bc7d454a175151b8e7cc",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/bk_actual_case_audit_20261110/lean (BKCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T12:23:10Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-99983d",
+    "claim_sha256": "d0a034c62ee653ea80daf1376198e7a95f7c7f2a3e3463297c0749fcab33e242",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "Actual E/F5:y²=x³+1,card6,r3prime,coprime,divisor and exclusion. Every actual geometric3torsion point fixed by Frobenius²; actual order3point with y²2 satisfies FrobeniusP=−P≠P and is outside F5pointimage. For everyk actual full geometric3torsion fixed iff evenk iff3divides5^k−1. Actual chosenfinitefield point-image criterion, plus construction/cardinality/embedding of GaloisField5k for everypositivek. No generic rank2/determinant/Weil pairing, actual3torsion cardinality9 or allp<500census claim."
+}

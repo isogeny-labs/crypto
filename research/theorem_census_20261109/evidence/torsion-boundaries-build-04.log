@@ -1,0 +1,44 @@
+TorsionBoundaries.lean:33:14: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  SkepticalAudit.rationalCurve.Nonsingular ?m.101 ?m.102
+in the target expression
+  xy.2 ^ 2 = xy.1 ^ 3 + 1 ↔ (fun xy => SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2) xy
+
+xy : ZMod 5 × ZMod 5
+⊢ xy.2 ^ 2 = xy.1 ^ 3 + 1 ↔ (fun xy => SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2) xy
+TorsionBoundaries.lean:30:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:62:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:111:14: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  bkCurve.Nonsingular ?m.107 ?m.108
+in the target expression
+  xy.2 ^ 2 = xy.1 ^ 3 + 3 * xy.1 + 2 ↔ (fun xy => bkCurve.Nonsingular xy.1 xy.2) xy
+
+xy : F × F
+⊢ xy.2 ^ 2 = xy.1 ^ 3 + 3 * xy.1 + 2 ↔ (fun xy => bkCurve.Nonsingular xy.1 xy.2) xy
+TorsionBoundaries.lean:109:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:162:55: warning: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp at hc
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`

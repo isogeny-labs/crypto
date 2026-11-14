@@ -1,0 +1,11 @@
+digraph audit {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",nodesep="0.3",ranksep="0.4"];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f4ed",fontname="DejaVu Sans",fontsize=10];
+ edge [color="#355c49"];
+ field [label="F5[t]/(t²−2)\nIrreducible; 25 elements"];
+ point [label="E: y²=x³+x+1\nLifted (2,1) ≠ O\n3P=O; nonsingular"];
+ sym [label="Actual S3 identity\ne1=x+y, e2=xy"];
+ descent [label="Monic-remainder coordinates\nActual descent [f,0]"];
+ fail [label="Not regular\nTop parts not regular",fillcolor="#ffe5dc"];
+ field -> point -> sym -> descent -> fail;
+}

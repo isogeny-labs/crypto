@@ -1,0 +1,127 @@
+{
+  "schema": "three-torsion-rank-source-review/v1",
+  "primary": {
+    "title": "The Improbability That an Elliptic Curve Has Subexponential Discrete Log Problem under the Menezes–Okamoto–Vanstone Algorithm",
+    "authors": [
+      "R. Balasubramanian",
+      "N. Koblitz"
+    ],
+    "year": 1998,
+    "url": "https://link.springer.com/content/pdf/10.1007/s001459900040.pdf",
+    "pdf_bytes": 73656,
+    "pdf_sha256": "ac837b8edc47b346dbb341f787c41de0402c95371a159f9786b747bb2c987499"
+  },
+  "printed_title": "The Improbability That an Elliptic Curve Has Subexponential Discrete Log Problem under the Menezes–Okamoto–Vanstone Algorithm",
+  "citation": "R.Balasubramanian and N.Koblitz, Journal of Cryptology11(1998),141–145",
+  "doi": "10.1007/s001459900040",
+  "prior_primary_review": {
+    "path": "research/bk_linear_audit_20261113/evidence/source-review.json",
+    "bytes": 1917,
+    "sha256": "67487223cac3958d1b9d8216e325d0bb082ebff7b28e6072ea23f8dc7b627132"
+  },
+  "reread_scope": "Theorem1/proof/Remarks pp142–143; full five-page paper not claimed read here. Both exact pages rendered and fully visually inspected; geometric torsion/basis input isolated from Frobenius/determinant/descent.",
+  "visual_inspection": [
+    {
+      "printed_page": 142,
+      "pdf_page": 2,
+      "bytes": 333733,
+      "sha256": "939101db58979f284958f40eff52a85337754843005382e71a73efdf9a0b7f1d",
+      "full_visual_inspection": true
+    },
+    {
+      "printed_page": 143,
+      "pdf_page": 3,
+      "bytes": 332120,
+      "sha256": "4556e50089a4864379a3a36633e604ed4c67d27b3a7157e1cea9ccadf0b1868b",
+      "full_visual_inspection": true
+    }
+  ],
+  "source_qualifications": "Prime r divides #E(Fq), r does not divide q−1; r∤q follows when r|q^k−1. Corpus also explicitly includes gcd(r,q)=1. These qualifications preserved; no qualified-source counterexample claimed.",
+  "terminology": "The ℓ-torsion subgroup includes identity: cardinality9 atℓ3. Exact-order3 points number8. Source points-of-order shorthand is not promoted as a terminology counterexample.",
+  "corpus": {
+    "path": "docs/ecdlp-hardness-corpus/lit-transfer.json",
+    "bytes": 123574,
+    "sha256": "99f4686b3ecb6f845fb98fc5c2db45696968e9c302b47b5873919202ddca8b9f",
+    "node": {
+      "id": "THM-XT-BK-WEIL-SUFFICES",
+      "label": "Balasubramanian-Koblitz: E[r] lies in E(F_{q^k}) iff r | q^k - 1",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "Let r be a prime dividing #E(F_q) with r not dividing q - 1 and gcd(r,q) = 1. Then E[r] is contained in E(F_{q^k}) if and only if r divides q^k - 1.",
+      "scope": "So for r not dividing q-1 the Weil-pairing MOV attack can work in E(F_{q^k}) with k the embedding degree; the case r | q-1 is excluded.",
+      "assumptions": [
+        "r prime, r | #E(F_q)",
+        "r does not divide q-1",
+        "gcd(r,q) = 1"
+      ],
+      "source_refs": [
+        "S-XT-BK-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "embedding-degree",
+        "MOV"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Theorem 26.4.1, p. 584 (proof deferred to BK 1998)"
+      ],
+      "evidence_class": "theorem"
+    },
+    "promoted": false
+  },
+  "formal_primary_read": {
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      "Mathlib/AlgebraicGeometry/EllipticCurve/DivisionPolynomial/Basic.lean",
+      "Mathlib/AlgebraicGeometry/EllipticCurve/DivisionPolynomial/Degree.lean",
+      "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Basic.lean",
+      "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Formula.lean",
+      "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean",
+      "Mathlib/FieldTheory/Separable.lean",
+      "Mathlib/FieldTheory/IsAlgClosed/Basic.lean",
+      "Mathlib/Algebra/Module/ZMod.lean",
+      "Mathlib/FieldTheory/Finiteness.lean",
+      "Mathlib/LinearAlgebra/Dimension/Free.lean"
+    ],
+    "scope": "Literal Ψ3/degree and invariants, actual nonsingular point/group/doubling formulas, monic ordinate polynomial map/degree2, root/derivative separation/counts, actual induced ZMod module and finite-cardinality-to-finrank/basis APIs. Prior RootEquiv/OddCardinality/BinaryBasis methods read; no custom frozen import or full Silverman-book read."
+  },
+  "method": "First independent short-curve proof/count/basis and char3control. Then universal Ψ3coordinate identity with curve equation, nochar2division. Actual nonsingularity forces nonzero y-derivative at Ψ3root; actual3P0 iffΨ3root allcharacteristics. Monic degree2 ordinate existence plus derivative tests prove Ψ3separable allchar≠3 and ordinate fibers2; actual root4/fiber8/Option identity equivalence→actual subgroup9. Induced actual ZMod3module rank2 and actual Fin2basis derived from count, no rank premise. Exact-order subtype8 counted separately. Everyalgclosed scalar extension inheritscard9.",
+  "controls": {
+    "characteristic2": "Actual AlgebraicClosure(ZMod2), modely²+y=x³+1, CharP2/nonzeroΔ/pointsubgroupcard9/modulefinrank2/basis.",
+    "characteristic3": "Actual AlgebraicClosure(ZMod3), modely²=x³−x, CharP3/nonzeroΔ/subgroupcard1/≠9; stronger everychar3field point criterion proved.",
+    "short_crosscheck": "Independent short proof retained, shared author/Mathlib/kernel; not claimed independent-host or validator implementation.",
+    "finite_proof": "Torsion finiteness established from actual OptionFibers equivalence before card/rank argument; no Nat.card(infinite)=0 loophole."
+  },
+  "boundary": "This closes actual geometric rank2 at prime3 for all nonsingular Weierstrass models/allchar≠3, includingchar2. Other primes, actual Frobenius action/matrix/determinantq and fixed-field descent/canonical pairings/fullBK theorem/allkp500census remainopen. Point subgroup, not finite-group-scheme étaleness/length theorem. Source qualifiedBK statement remains unrefuted.",
+  "scalar_identity_supplement": {
+    "id": "IDC1h64000045fc926a9e",
+    "variables": [
+      "a1",
+      "a2",
+      "a3",
+      "a4",
+      "a6",
+      "x",
+      "y"
+    ],
+    "syntactic_degree_bound": 5,
+    "official_checker": "src/cryptanalysis/identity_certificate.rs",
+    "official_checker_sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "points": 32,
+    "extra_points": 32,
+    "same_host": true,
+    "lean_symbolic_proof": "ThreeTorsionRankAudit.General.psi_coordinate_identity",
+    "does_not_prove_geometric_count_or_basis": true
+  },
+  "kb": "MCP/wrapper status earlier unavailable127; positive three-torsion/negative char3 queries and theorem query127. Primary/repository/pinned Mathlib fallback, no absence or novelty claim.",
+  "conductor": "Scoped project/log check unavailable127 before edits; general-model extension stays within same reserved project.",
+  "full_paper_read": false,
+  "full_book_read": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "qualified_source_refuted": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

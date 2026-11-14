@@ -1,0 +1,44 @@
+{
+  "schema": "msolve-reindex-source-review/v1",
+  "created": "2026-11-10T17:48:22.380553+00:00",
+  "primary": [
+    {
+      "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/la_ff_32.c",
+      "read_scope": "17bit known-pivot reducer and exact_sparse_reduced_echelon_form remap2619–2623; actual source bytes pinned in native provenance.",
+      "effect": "Known row COEFFS becomes a matrix-table index, but old17bit known-pivot branch reads basis table."
+    },
+    {
+      "url": "https://github.com/algebraic-solving/msolve/blob/5e72b9d99eaea55fe87eb8ac945ec9e914a69327/src/neogb/la_ff_16.c",
+      "read_scope": "Known-pivot reducer160–190 and exact remap1045–1085.",
+      "effect": "Pinned16bit implementation already uses matrix coefficient table."
+    },
+    {
+      "url": "https://github.com/algebraic-solving/msolve/blob/ef2e6aa39cca7b25f63a9a15a0779bf516718b3c/src/neogb/la_ff_32.c",
+      "read_scope": "17bit reducer355–390; current source SHA in native evidence, commitmetadata retained.",
+      "effect": "Currentupstream matrix lookup already matches the tested one-expression backport. No novel upstream bug claim."
+    },
+    {
+      "url": "https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html",
+      "read_scope": "Address/undefined and first-error sections; retained earlier source review.",
+      "effect": "First-error UB diagnostics and later address-only fault sites have separate scope. Earlier shift remains unrepaired."
+    }
+  ],
+  "observed_snapshot": {
+    "old_indices": [
+      0,
+      2,
+      0
+    ],
+    "new_indices": [
+      2,
+      3,
+      4
+    ],
+    "live_basis_count": 3,
+    "first_failing_lookup": 3,
+    "proof_of_C_execution": false
+  },
+  "scope": "Operational finite-table copy semantics of the observed snapshot. For every possible coefficient type/content, matrix lookup preserves copied coefficients; rewritten basis lookup3 is outside live prefix3, and in-range slot2 can denote a different source. Direct universal reindex invariant negation; signed32/unsigned-bit representability arithmetic. Native trace authenticity, C parser, pointer/allocation semantics and wholeF4Run refinement are not proved.",
+  "novelty": "Formal audit and concrete backport of existing upstream behavior, no novelty claim.",
+  "KB": "MCP absent/wrapper127; bounded pinned source/current upstream/GCC/Mathlib fallback. Conductor absent."
+}

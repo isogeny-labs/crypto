@@ -1,0 +1,37 @@
+MumfordFiveControl.lean:49:65: error: maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+MumfordFiveControl.lean:119:4: error: No goals to be solved
+MumfordFiveControl.lean:118:62: warning: This simp argument is unused:
+  sub_eq_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Valid, CoefficientValid, uPolynomial, vPolynomial, Polynomial.modByMonic_X_sub_C_eq_C_eval,
+    curvePolynomial]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+MumfordFiveControl.lean:212:65: error: maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+MumfordFiveControl.lean:271:26: warning: This simp argument is unused:
+  map_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [quadraticU, map_sub, map_neg, map_mul, map_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+MumfordFiveControl.lean:301:44: error: failed to synthesize
+  Decidable
+    (∀ (D : Candidate),
+      CoefficientValid D →
+        match D with
+        | Candidate.identity => True
+        | Candidate.linear a b => b = 0
+        | Candidate.quadratic a b c d => c = 0 ∧ d = 0)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+MumfordFiveControl.lean:326:2: error: No goals to be solved
+'MumfordFiveControlAudit.mumford_five_control_certificate' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

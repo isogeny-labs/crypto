@@ -1,0 +1,71 @@
+{
+  "schema": "coordinate-length-verification/v1",
+  "source_commit": "26a054745989610db62682f462a3e4fe638bafc8",
+  "claim_id": "PCC-20261114-c3ba4f",
+  "declaration_sha256": "45e5050754fe1a848b93c690d371bd04461ab21ed476c39019b4f9b42c24fde6",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 8,
+  "gate_declarations": 44,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 62,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-c3ba4f",
+    "claim_sha256": "4d0e546991933aacf065418db4ab2f729fcea777ff2fba8cb04abe1dc4400774",
+    "commit": "26a054745989610db62682f462a3e4fe638bafc8",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/coordinate_length_audit_20261114/lean (LengthCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T00:34:55Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-c3ba4f",
+    "claim_sha256": "4d0e546991933aacf065418db4ab2f729fcea777ff2fba8cb04abe1dc4400774",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47161,
+    "sha256": "47b4f18de793b94f183ec41c6e16a18297a3ad0aac4787f62bbbbf075ee5cbdd",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 44,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_solution_quotient_equivalence": true,
+    "actual_finite_support_length_bound": true,
+    "actual_unbounded_bivariate_nilpotent_family": true,
+    "m0_m1_controls": true,
+    "target_domain_deletion_counter": true,
+    "scalar_module_length_only": true,
+    "scheme_cycle_or_local_multiplicity_identification": false,
+    "qualified_source_or_node_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

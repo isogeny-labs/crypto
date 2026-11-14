@@ -1,0 +1,55 @@
+{
+  "schema": "general-s3-verification/v1",
+  "created": "2026-11-09T16:04:48.609Z",
+  "formal_source_commit": "3cefe6f1ac406f89244d258d729722409552771f",
+  "formal_gate": {
+    "path": "evidence/general-s3-gate.log",
+    "sha256": "cb855406247b8b467195a3978a0be1635a069e78121c3c8e53f4cf899e8491e2",
+    "declarations": 167,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "pcc": [
+    {
+      "claim_id": "PCC-20261109-4d5cd7",
+      "path": "evidence/pcc-general-s3-check.json",
+      "sha256": "b0ef6ca6e9fd0ab6273b60dafed686031ca96fe648e317668d22d653feaf2725",
+      "verdict": "pass",
+      "verified_at": "2026-11-09T15:57:49Z",
+      "standing": "unsigned producer check"
+    },
+    {
+      "claim_id": "PCC-20261109-b32b34",
+      "path": "evidence/pcc-general-s3-controls-check.json",
+      "sha256": "f12d407c3a44f04dc91ae47a25ce5cf4fafb72755e49471df5f5160625384325",
+      "verdict": "pass",
+      "verified_at": "2026-11-09T16:03:50Z",
+      "standing": "unsigned producer check"
+    }
+  ],
+  "identity": {
+    "id": "IDC1h392e1740fcb7cf05",
+    "path": "general-s3-identity-certificate.json",
+    "sha256": "14f6ba8965eba922b66dd5f5fa7e3f850770fb1d57ec38fd0f057ad7f76a1777",
+    "points": 32,
+    "extra_points": 11,
+    "modulus_decimal": "2305843009213693951",
+    "degree_bound": 5,
+    "source_sha256": "cb00540e00cdde95ccbbe4677cfd084d68059f4a78b3b6621c636487c5a898af",
+    "proof_source": "research/theorem_census_20261109/lean/GeneralS3.lean",
+    "proof_sha256": "13ffefd385f4e20e60df00483802c80c00cc21c9f25caf41987d41845d375633",
+    "proof_pointer_matches": true,
+    "issue_and_extra_check_exit": 0,
+    "independence": "One host; same unchanged repository checker; no signed or independent-host promotion"
+  },
+  "source_publication": {
+    "branch": "research/theorem-census-native-20261109",
+    "commit": "29d09a8c4f32a4060a657b70529a9e22c8bb02d2",
+    "tree": "7b4eadfcbc10006d5c508b6a210533cbdc252c29",
+    "local_commit": "3cefe6f1ac406f89244d258d729722409552771f",
+    "files": 25
+  },
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

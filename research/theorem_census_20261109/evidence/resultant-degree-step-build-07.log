@@ -1,0 +1,15 @@
+ResultantDegreeStep.lean:193:6: error: Type mismatch
+  secondLift_coeff_top b2 b4 b6 b8 (↑i - ↑j0)
+has type
+  ((secondLift b2 b4 b6 b8).coeff (↑i - ↑j0)).coeff 2 = ((X - C X) ^ 2).coeff (↑i - ↑j0)
+but is expected to have type
+  (((secondLift b2 b4 b6 b8).coeff (↑i - ↑j0)).coeff 2).coeff n✝ = (((X - C X) ^ 2).coeff (↑i - ↑j0)).coeff n✝
+ResultantDegreeStep.lean:250:0: error: (deterministic) timeout at `whnf`, maximum number of heartbeats (1000000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+'ResultantDegreeStepAudit.determinant_coeff_column_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.secondLift_coeff_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.resultantStep_coeff_top' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'ResultantDegreeStepAudit.symbolicS5_last_natDegree' does not depend on any axioms

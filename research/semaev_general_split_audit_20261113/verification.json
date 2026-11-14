@@ -1,0 +1,72 @@
+{
+  "schema": "semaev-general-split-verification/v1",
+  "source_commit": "09ed8b8115d5cd21591966ba11ad32d9f73fa047",
+  "claim_id": "PCC-20261113-31f9cd",
+  "declaration_sha256": "62189b29ec246a78c9593dc275e1038d8c5e770627fbc6e269f98511c44089a1",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 60,
+  "gate_declarations": 82,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 93,
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-31f9cd",
+    "claim_sha256": "fb8688fdec49460868a3c238547b0e9012abc6e5db5701919cb346eb0ab826eb",
+    "commit": "09ed8b8115d5cd21591966ba11ad32d9f73fa047",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/semaev_general_split_audit_20261113/lean (SplitCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-13T22:34:15Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-31f9cd",
+    "claim_sha256": "fb8688fdec49460868a3c238547b0e9012abc6e5db5701919cb346eb0ab826eb",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46864,
+    "sha256": "180d36252697f62eb87ed65d3e0b207efcbb5c6e05ddd2a8f2ec4649adb0da32",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 82,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "literal_all_source_splits": true,
+    "actual_natural_factor_degrees": true,
+    "actual_source_last_variable_order": true,
+    "universal_polynomial_binding": true,
+    "all_domain_specializations_fixed_dimensions": true,
+    "source_index_coverage": true,
+    "negative_controls": true,
+    "higher_arity_absolute_irreducibility_proved": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

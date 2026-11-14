@@ -1,0 +1,37 @@
+{
+  "schema": "geometric-torsion-source-review/v1",
+  "created": "2026-11-12T21:54:05.056326+00:00",
+  "KB": "Unavailable MCP and wrapper127; bounded repository/primary/Mathlib fallback.",
+  "prior_primary_review": {
+    "path": "research/pairing_miller_audit_20261110/evidence/source-review.json",
+    "sha256": "ebeb2847b12a1f77fc038b4e14c130c1a28f88955ed38b309c70bedb97c1db61",
+    "scope": "Prior selected Galbraith ch26 pairing/torsion domain reading retained; no new full-paper or original FR94 reading claimed."
+  },
+  "formal_sources": [
+    "Frozen BKActualThreeAudit.three_coordinate_classification and actual_equation",
+    "Frozen PairingMillerTorsionAudit.torsionEquiv and actual_torsion_cardinality",
+    "Frozen PairingMillerBaseDescentAudit.indexed_frobenius and base_rational_indexed_iff"
+  ],
+  "Mathlib": {
+    "commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      {
+        "path": "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean",
+        "read_scope": "Actual group point map, map_injective, map_some and baseChange lines813–865"
+      },
+      {
+        "path": "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Basic.lean",
+        "read_scope": "Actual baseChange_nonsingular lines305–326"
+      },
+      {
+        "path": "Mathlib/FieldTheory/IsAlgClosed/Basic.lean",
+        "read_scope": "Actual IsAlgClosed.lift lines320–361, existence from algebraic extension into algebraically closed field"
+      }
+    ]
+  },
+  "scope": "Concrete y²=x³+1/F5, r3: actual3-torsion descent from F25 into every field with an F5-algebra embedding; actual additive equivalence/cardinality9/basis. Actual algebraically closed extensions get constructed embedding; Frobenius matrix(a,-b) and actual base-rational line proved.",
+  "remaining": "Generic all-curve BK rank/determinant and p<500 census; canonical divisor/valuation Miller identification and generic MOV/FR reductions.",
+  "no_new_native_experiment": true,
+  "paid_compute": 0,
+  "novelty": "Concrete formal bridge between already checked finite points and geometric torsion, no novelty or source refutation claim."
+}

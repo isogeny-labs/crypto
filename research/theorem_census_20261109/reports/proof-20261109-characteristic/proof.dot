@@ -1,0 +1,16 @@
+digraph CharacteristicBoundary {
+  graph [rankdir=TB,bgcolor="white",pad=.12,nodesep=.25,ranksep=.35];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11];
+  edge [color="#34546a",fontname="DejaVu Sans",fontsize=10];
+  torsion [label="Actual geometric E[2]\n2 points: infinity and (0,1)"];
+  rational [label="Actual E(F2)\n4 points; full geometric E[2] is rational"];
+  source [label="Original BK condition: r^2 = 4 torsion points\nFalse here; source theorem is not refuted",fillcolor="#fff2cc"];
+  mu [label="Actual mu2(F2bar)\n1 point: {1}"];
+  fail [label="Set-inclusion iff fails at q=r=2, k=1\nAll geometric torsion rational, yet 2 does not divide 1",fillcolor="#f8d7da"];
+  pairing [label="Every E[2] x E[2] -> mu2\nis pointwise degenerate",fillcolor="#f8d7da"];
+  torsion -> rational [label="subset of the rational image"];
+  torsion -> source [style=dashed,label="2 differs from 4"];
+  rational -> fail;
+  torsion -> pairing;
+  mu -> pairing;
+}

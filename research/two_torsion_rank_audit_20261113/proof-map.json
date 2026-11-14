@@ -1,0 +1,73 @@
+{
+  "namespace": "TwoTorsionRankAudit",
+  "proofs": [
+    {
+      "file": "RootEquiv.lean",
+      "claim": "Actual killed-by2 subgroup/root equivalence, existence and coordinate uniqueness",
+      "declarations": [
+        "pointRootEquiv"
+      ]
+    },
+    {
+      "file": "OddCardinality.lean",
+      "claim": "Finite actual roots/discriminant/cardinality/scalar extension",
+      "declarations": [
+        "torsion_card_eq",
+        "geometric_two_torsion_card",
+        "geometric_scalar_extension_card"
+      ]
+    },
+    {
+      "file": "CharTwoGeometry.lean",
+      "claim": "Actual characteristic2negation/equation/point existence/uniqueness",
+      "declarations": [
+        "char_two_killed_iff",
+        "only_zero_when_a1_zero",
+        "ordinary_nonzero_killed"
+      ]
+    },
+    {
+      "file": "CharTwoCardinality.lean",
+      "claim": "Complete actual characteristic2card1/2classification",
+      "declarations": [
+        "char_two_geometric_classification"
+      ]
+    },
+    {
+      "file": "CharTwoModels.lean",
+      "claim": "Concrete actual models and coordinatewise field inclusion",
+      "declarations": [
+        "ordinary_classification",
+        "ordinary_all_torsion_in_image",
+        "supersingular_torsion_card"
+      ]
+    },
+    {
+      "file": "BaseControl.lean",
+      "claim": "Actual F2count/closure/positive-k cyclotomic and direct dropped-condition counter",
+      "declarations": [
+        "ordinary_base_point_card",
+        "actual_geometric_card",
+        "actual_geometric_torsion_in_base",
+        "concrete_geometric_point_criterion_false"
+      ]
+    },
+    {
+      "file": "BinaryBasis.lean",
+      "claim": "Explicit actual binary generation/independence from proved geometry",
+      "declarations": [
+        "actual_geometric_binary_basis"
+      ]
+    },
+    {
+      "file": "RankCertificate.lean",
+      "claim": "Complete closed rank/characteristic/source-boundary certificate",
+      "declarations": [
+        "actual_two_torsion_rank_certificate"
+      ]
+    }
+  ],
+  "local_gate": "67/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Generic odd-prime geometric rank/Frobenius determinant/representation/descent, full supersingular geometric classification and canonical pairing identification."
+}

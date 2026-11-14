@@ -1,0 +1,128 @@
+⚠ [3155/3189] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [9048/9052] Built RationalCounterexample (3.4s)
+warning: RationalCounterexample.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+✖ [9050/9052] Building DescentCounterexample (5.0s)
+warning: DescentCounterexample.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/theorem_census_20261109/lean/DescentCounterexample.lean -o /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/DescentCounterexample.olean -i /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/DescentCounterexample.ilean -c /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/DescentCounterexample.c --setup /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/DescentCounterexample.setup.json --json
+error: DescentCounterexample.lean:14:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instSub', which is 'noncomputable'
+error: DescentCounterexample.lean:26:4: 'change' tactic failed, pattern
+  x ^ 2 - 2 ≠ 0
+is not definitionally equal to target
+  ¬extensionPolynomial.IsRoot x
+error: DescentCounterexample.lean:34:0: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'AdjoinRoot.instField', which is 'noncomputable'
+error: DescentCounterexample.lean:44:4: Unknown constant `Polynomial.modByMonic_eq_self`
+error: DescentCounterexample.lean:40:60: unsolved goals
+c : F
+i : ℕ
+⊢ ((AdjoinRoot.modByMonicHom extensionPolynomial_monic) ((AdjoinRoot.of extensionPolynomial) c)).coeff i =
+    if i = 0 then c else 0
+warning: DescentCounterexample.lean:43:20: This simp argument is unused:
+  AdjoinRoot.modByMonicHom_mk
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coordinate, Polynomial.modByMonic_eq_self, extensionPolynomial_degree]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: DescentCounterexample.lean:44:35: This simp argument is unused:
+  extensionPolynomial_degree
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coordinate, AdjoinRoot.modByMonicHom_mk, Polynomial.modByMonic_eq_self]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: DescentCounterexample.lean:47:4: Invalid field `mapRange`: The environment does not contain `AddMonoidAlgebra.mapRange`, so it is not possible to project the field `mapRange` from an expression
+  g
+of type
+  AddMonoidAlgebra K (Fin 2 →₀ ℕ)
+error: DescentCounterexample.lean:51:59: unsolved goals
+case left
+g : MvPolynomial (Fin 2) F
+s : Fin 2 →₀ ℕ
+⊢ (sorry ()).coeff s = g.coeff s
+
+case right
+g : MvPolynomial (Fin 2) F
+s : Fin 2 →₀ ℕ
+⊢ (sorry ()).coeff s = 0
+warning: DescentCounterexample.lean:53:10: declaration uses `sorry`
+warning: DescentCounterexample.lean:53:19: This simp argument is unused:
+  MvPolynomial.coeff_map
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [descend, coordinate_constant]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: DescentCounterexample.lean:53:43: This simp argument is unused:
+  coordinate_constant
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [descend, MvPolynomial.coeff_map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: DescentCounterexample.lean:57:49: failed to synthesize
+  Decidable (descentCurve.Nonsingular 2 1)
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+error: DescentCounterexample.lean:59:54: Tactic `decide` failed to reduce
+  @decide (3 • target = 0) (WeierstrassCurve.Affine.instDecidableEqPoint (3 • target) 0)
+to `true` or `false`.
+
+After unfolding the instances `instDecidableAnd`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, `WeierstrassCurve.Affine.instDecidableEqPoint`, `ZMod.decidableEq._aux_3`, and `WeierstrassCurve.Affine.instDecidableEqPoint.decEq`, reduction got stuck at
+  match 3 • target, 0 with
+  | WeierstrassCurve.Affine.Point.zero, WeierstrassCurve.Affine.Point.zero => isTrue ⋯
+  | WeierstrassCurve.Affine.Point.zero, WeierstrassCurve.Affine.Point.some x y h => isFalse ⋯
+  | WeierstrassCurve.Affine.Point.some x y h, WeierstrassCurve.Affine.Point.zero => isFalse ⋯
+  | WeierstrassCurve.Affine.Point.some a a_1 a_2, WeierstrassCurve.Affine.Point.some b b_1 b_2 =>
+    if h : a = b then
+      Eq.ndrec (motive := fun b =>
+        (b_3 : descentCurve.Nonsingular b b_1) →
+          Decidable (WeierstrassCurve.Affine.Point.some a a_1 a_2 = WeierstrassCurve.Affine.Point.some b b_1 b_3))
+        (fun b =>
+          if h : a_1 = b_1 then
+            Eq.ndrec (motive := fun b =>
+              (b_3 : descentCurve.Nonsingular a b) →
+                Decidable (WeierstrassCurve.Affine.Point.some a a_1 a_2 = WeierstrassCurve.Affine.Point.some a b b_3))
+              (fun b =>
+                have h := ⋯;
+                h ▸ isTrue ⋯)
+              h b
+          else isFalse ⋯)
+        h b_2
+    else isFalse ⋯
+error: DescentCounterexample.lean:78:49: unsolved goals
+h : symmetricS3 = 0
+hh : -(MvPolynomial.constantCoeff 4 * MvPolynomial.constantCoeff 2) + 1 = 0
+⊢ False
+warning: DescentCounterexample.lean:94:2: Try this: 
+  haveI̵
+
+The goal is a proposition, so `have` is preferred over `haveI`.
+The difference between `have` and `haveI` is that `haveI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+error: DescentCounterexample.lean:96:8: Function expected at
+  IsSMulRegular.not_zero ?m.58
+but this term has type
+  False
+
+Note: Expected a function because this term is being applied to the argument
+  hz
+Some required targets logged failures:
+- DescentCounterexample
+error: build failed

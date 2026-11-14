@@ -1,0 +1,289 @@
+import MumfordSmoothness
+import Mathlib.Algebra.Group.TransferInstance
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.RingTheory.Coprime.Lemmas
+
+/-! Cantor arithmetic on the complete reduced-pair model for y²=x⁵-x/F3.
+The polynomial composition and reduction relation is checked before transporting
+the group structure. Identification with geometric Pic^0 remains separate. -/
+namespace MumfordCantorAudit
+noncomputable section
+open Polynomial MumfordSmoothnessAudit
+
+-- Permit definitional unfolding of the concrete field's inferred structures.
+-- This changes elaboration only; the resulting proof still passes the kernel.
+set_option backward.isDefEq.respectTransparency false
+
+abbrev Mask := Fin 4 → Bool
+
+def factor : Fin 4 → K[X]
+  | 0 => X
+  | 1 => X-1
+  | 2 => X+1
+  | _ => X^2+1
+
+def factorProduct (m : Mask) : K[X] :=
+  ∏ k : Fin 4, if m k then factor k else 1
+
+def repMask (i : Fin 8) : Mask :=
+  match i with
+  | 0 => ![false,false,false,false]
+  | 1 => ![true,false,false,false]
+  | 2 => ![false,true,false,false]
+  | 3 => ![true,true,false,false]
+  | 4 => ![false,false,true,false]
+  | 5 => ![true,false,true,false]
+  | 6 => ![false,true,true,false]
+  | _ => ![false,false,false,true]
+
+def commonMask (m n : Mask) : Mask := fun k=>m k && n k
+def residualMask (m n : Mask) : Mask := fun k=>m k && !n k
+def differenceMask (m n : Mask) : Mask := fun k=>xor (m k) (n k)
+
+theorem factor_monic (k : Fin 4) : (factor k).Monic := by
+  fin_cases k
+  · exact monic_X
+  · simpa [factor] using monic_X_sub_C (1:K)
+  · simpa [factor] using monic_X_add_C (1:K)
+  · apply monic_of_degree_le 2
+    · simp only [factor]; compute_degree!
+    · norm_num [factor,Polynomial.coeff_X,Polynomial.coeff_one]
+
+theorem factorProduct_monic (m : Mask) : (factorProduct m).Monic := by
+  apply monic_prod_of_monic
+  intro k _
+  split_ifs
+  · exact factor_monic k
+  · exact monic_one
+
+theorem polynomial_three_zero : (3:K[X])=0 := by
+  simpa only [Polynomial.C_ofNat,map_zero] using
+    congrArg (C : K→K[X]) (by decide : (3:K)=0)
+
+theorem factor_coprime01 : IsCoprime (factor 0) (factor 1) := by
+  refine ⟨1,-1,?_⟩
+  simp [factor]
+
+theorem factor_coprime02 : IsCoprime (factor 0) (factor 2) := by
+  refine ⟨-1,1,?_⟩
+  simp [factor]
+
+theorem factor_coprime12 : IsCoprime (factor 1) (factor 2) := by
+  refine ⟨1,-1,?_⟩
+  have h := polynomial_three_zero
+  simp only [factor,one_mul,neg_mul] at *
+  linear_combination -h
+
+theorem factor_coprime03 : IsCoprime (factor 0) (factor 3) := by
+  refine ⟨-X,1,?_⟩
+  simp only [factor]
+  ring
+
+theorem factor_coprime13 : IsCoprime (factor 1) (factor 3) := by
+  refine ⟨X+1,-1,?_⟩
+  have h := polynomial_three_zero
+  simp only [factor] at *
+  linear_combination -h
+
+theorem factor_coprime23 : IsCoprime (factor 2) (factor 3) := by
+  refine ⟨X-1,-1,?_⟩
+  have h := polynomial_three_zero
+  simp only [factor] at *
+  linear_combination -h
+
+theorem factors_pairwise_coprime (i j : Fin 4) (hne : i≠j) :
+    IsCoprime (factor i) (factor j) := by
+  fin_cases i <;> fin_cases j
+  · exact False.elim (hne rfl)
+  · exact factor_coprime01
+  · exact factor_coprime02
+  · exact factor_coprime03
+  · exact factor_coprime01.symm
+  · exact False.elim (hne rfl)
+  · exact factor_coprime12
+  · exact factor_coprime13
+  · exact factor_coprime02.symm
+  · exact factor_coprime12.symm
+  · exact False.elim (hne rfl)
+  · exact factor_coprime23
+  · exact factor_coprime03.symm
+  · exact factor_coprime13.symm
+  · exact factor_coprime23.symm
+  · exact False.elim (hne rfl)
+
+theorem disjoint_products_coprime (m n : Mask)
+    (h : ∀ k, m k=true → n k=true → False) :
+    IsCoprime (factorProduct m) (factorProduct n) := by
+  apply IsCoprime.prod_left
+  intro i _
+  apply IsCoprime.prod_right
+  intro j _
+  by_cases hi : m i=true
+  · by_cases hj : n j=true
+    · simp only [hi,hj,ite_true]
+      apply factors_pairwise_coprime
+      intro he
+      subst j
+      exact h i hi hj
+    · simpa only [hj,Bool.false_eq_true,ite_false] using
+        (isCoprime_one_right : IsCoprime (if m i then factor i else 1) 1)
+  · simpa only [hi,Bool.false_eq_true,ite_false] using
+      (isCoprime_one_left : IsCoprime 1 (if n j then factor j else 1))
+
+theorem common_residual_product (m n : Mask) :
+    factorProduct (commonMask m n)*factorProduct (residualMask m n)=
+      factorProduct m := by
+  rw [factorProduct,factorProduct,← Finset.prod_mul_distrib]
+  apply Finset.prod_congr rfl
+  intro k _
+  cases hm : m k <;> cases hn : n k <;>
+    simp [commonMask,residualMask,hm,hn]
+
+theorem residual_difference_product (m n : Mask) :
+    factorProduct (residualMask m n)*factorProduct (residualMask n m)=
+      factorProduct (differenceMask m n) := by
+  rw [factorProduct,factorProduct,← Finset.prod_mul_distrib]
+  apply Finset.prod_congr rfl
+  intro k _
+  cases hm : m k <;> cases hn : n k <;>
+    simp [residualMask,differenceMask,hm,hn]
+
+theorem commonMask_comm (m n : Mask) : commonMask m n=commonMask n m := by
+  funext k
+  exact Bool.and_comm _ _
+
+theorem residual_products_coprime (m n : Mask) :
+    IsCoprime (factorProduct (residualMask m n))
+      (factorProduct (residualMask n m)) := by
+  apply disjoint_products_coprime
+  intro k
+  cases hm : m k <;> cases hn : n k <;> simp [residualMask,hm,hn]
+
+theorem gcd_of_common_coprime (d a b : K[X]) (hd : d.Monic)
+    (hab : IsCoprime a b) : gcd (d*a) (d*b)=d := by
+  obtain ⟨s,t,hst⟩ := hab
+  have hg : gcd (d*a) (d*b) ∣ d := by
+    have he : s*(d*a)+t*(d*b)=d := by
+      calc
+        _=d*(s*a+t*b) := by ring
+        _=d := by rw [hst,mul_one]
+    have hsum : gcd (d*a) (d*b) ∣ s*(d*a)+t*(d*b) :=
+      dvd_add (dvd_mul_of_dvd_right (gcd_dvd_left (d*a) (d*b)) s)
+        (dvd_mul_of_dvd_right (gcd_dvd_right (d*a) (d*b)) t)
+    simpa only [he] using hsum
+  exact (gcd_eq_normalize hg
+    (dvd_gcd (dvd_mul_right d a) (dvd_mul_right d b))).trans hd.normalize_eq_self
+
+theorem factorProduct_gcd (m n : Mask) :
+    gcd (factorProduct m) (factorProduct n)=factorProduct (commonMask m n) := by
+  nth_rw 1 [← common_residual_product m n]
+  rw [← common_residual_product n m]
+  rw [commonMask_comm n m]
+  exact gcd_of_common_coprime _ _ _ (factorProduct_monic _)
+    (residual_products_coprime m n)
+
+theorem factorProduct_composition (m n : Mask) :
+    factorProduct (commonMask m n)^2*factorProduct (differenceMask m n)=
+      factorProduct m*factorProduct n := by
+  rw [← residual_difference_product]
+  have hm := common_residual_product m n
+  have hn := common_residual_product n m
+  rw [commonMask_comm n m] at hn
+  rw [← hm,← hn]
+  ring
+
+theorem representative_u_factorization (i : Fin 8) :
+    uPolynomial (representative i)=factorProduct (repMask i) := by
+  fin_cases i <;>
+    norm_num [representative,uPolynomial,factorProduct,repMask,factor,
+      Fin.prod_univ_succ,C_two] <;> ring
+
+theorem representative_v_zero (i : Fin 8) :
+    vPolynomial (representative i)=0 := by
+  fin_cases i <;> simp [representative,vPolynomial]
+
+theorem representative_valid (i : Fin 8) : Valid (representative i) :=
+  (valid_iff_coefficientValid _).mpr
+    ((coefficient_valid_iff_representative _).mpr ⟨i,rfl⟩)
+
+def point (i : Fin 8) : ReducedPair := candidatePair ⟨representative i,representative_valid i⟩
+
+theorem point_injective : Function.Injective point := by
+  intro i j hij
+  apply representative_injective
+  exact congrArg Subtype.val (candidatePair_injective hij)
+
+theorem point_surjective : Function.Surjective point := by
+  intro P
+  obtain ⟨D,hD⟩ := candidatePair_surjective P
+  obtain ⟨i,hi⟩ := (coefficient_valid_iff_representative D.val).mp
+    ((valid_iff_coefficientValid _).mp D.property)
+  refine ⟨i,?_⟩
+  rw [← hD]
+  apply congrArg candidatePair
+  exact Subtype.ext hi
+
+def pointEquiv : Fin 8 ≃ ReducedPair :=
+  Equiv.ofBijective point ⟨point_injective,point_surjective⟩
+
+theorem every_v_zero (P : ReducedPair) : P.v=0 := by
+  obtain ⟨i,rfl⟩ := point_surjective P
+  exact representative_v_zero i
+
+def sumIndex (i j : Fin 8) : Fin 8 :=
+  ⟨(Nat.xor i.val j.val)%8,Nat.mod_lt _ (by decide)⟩
+
+/-- The zero-v specialization of Cantor composition followed by reduction.
+The gcd is the actual normalized polynomial gcd. The intermediate polynomial
+is monic and its exact quotient equation is required. In the reduction branch
+the exact quotient of f is required; the result is already a ReducedPair. -/
+def ZeroCantorStep (P Q R : ReducedPair) : Prop :=
+  P.v=0 ∧ Q.v=0 ∧ R.v=0 ∧ ∃ w : K[X], w.Monic ∧
+    (gcd P.u Q.u)^2*w=P.u*Q.u ∧
+    ((w.natDegree≤2 ∧ R.u=w) ∨ (2<w.natDegree ∧ w*R.u=curvePolynomial))
+
+theorem representative_reduction (i j : Fin 8) :
+    let w := factorProduct (differenceMask (repMask i) (repMask j))
+    (w.natDegree≤2 ∧ factorProduct (repMask (sumIndex i j))=w) ∨
+    (2<w.natDegree ∧ w*factorProduct (repMask (sumIndex i j))=curvePolynomial) := by
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sumIndex,repMask,differenceMask,factorProduct,factor,Fin.prod_univ_succ]
+  all_goals first
+    | left; constructor
+      · compute_degree!
+      · ring
+    | right; constructor
+      · compute_degree!
+      · unfold curvePolynomial; ring
+
+theorem cantor_all_pairs (i j : Fin 8) :
+    ZeroCantorStep (point i) (point j) (point (sumIndex i j)) := by
+  refine ⟨every_v_zero _,every_v_zero _,every_v_zero _,
+    factorProduct (differenceMask (repMask i) (repMask j)),factorProduct_monic _,?_,?_⟩
+  · change (gcd (uPolynomial (representative i)) (uPolynomial (representative j)))^2*_
+      =uPolynomial (representative i)*uPolynomial (representative j)
+    rw [representative_u_factorization,representative_u_factorization,factorProduct_gcd]
+    exact factorProduct_composition _ _
+  · change (_ ∧ uPolynomial (representative (sumIndex i j))=_) ∨
+      (_ ∧ _*uPolynomial (representative (sumIndex i j))=curvePolynomial)
+    rw [representative_u_factorization]
+    exact representative_reduction i j
+
+theorem cantor_output_unique (P Q R S : ReducedPair)
+    (hR : ZeroCantorStep P Q R) (hS : ZeroCantorStep P Q S) : R=S := by
+  obtain ⟨_,_,hvR,w,hw,heR,hr⟩ := hR
+  obtain ⟨_,_,hvS,z,hz,heS,hs⟩ := hS
+  have hg : (gcd P.u Q.u)^2≠0 := pow_ne_zero _ (gcd_ne_zero_of_left P.monic_u.ne_zero)
+  have hwz : w=z := mul_left_cancel₀ hg (heR.trans heS.symm)
+  subst z
+  apply ReducedPair.ext
+  · rcases hr with ⟨hd,huR⟩ | ⟨hd,huR⟩ <;>
+      rcases hs with ⟨hdS,huS⟩ | ⟨hdS,huS⟩
+    · exact huR.trans huS.symm
+    · omega
+    · omega
+    · exact mul_left_cancel₀ hw.ne_zero (huR.trans huS.symm)
+  · exact hvR.trans hvS.symm
+
+end
+end MumfordCantorAudit

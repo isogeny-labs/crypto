@@ -1,0 +1,118 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T05:13:28.692543+00:00",
+  "source_commit": "2d252c2b1d54c11c0a02aad352a17f2afb2507cd",
+  "source_plan_sha256": "205186161e7f6b743e12f90364dd16df20f6144ebd46503c040940ebf4511c8a",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "RecursiveSemaevGeometryAudit.geometric_domain_audit_certificate",
+    "statement": "theorem geometric_domain_audit_certificate : (∀ (F : Type*) [Field F] [DecidableEq F] [IsAlgClosed F] (W : WeierstrassCurve.Affine F),W.Δ≠0 → ∀ (n : ℕ) (xs : Fin (n+3)→F), evalCanonical W n xs=0 ↔ ∃ P : Fin (n+3)→W.Point, (∀ i,pointX (P i)=some (xs i)) ∧ (∑ i,P i)=0) ∧ (SkepticalAudit.rationalCurve.Δ≠0 ∧ ¬ ∀ (n : ℕ) (xs : Fin (n+3)→ZMod 5), evalCanonical SkepticalAudit.rationalCurve n xs=0 → ManyPoints SkepticalAudit.rationalCurve xs)",
+    "decl_sha256": "b1319c4ac6fa643b6e824774356411461346ecc523cff7512ee7a6b822ce5f60",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/SemaevPointLists.lean",
+        "bytes": 9713,
+        "sha256": "4f2581ab3a5f9647882600605367cd3694d48c90867adc2a6e6d89e626d9e734"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevEvaluation.lean",
+        "bytes": 7032,
+        "sha256": "525b56734270937c8b207978f085df454bdb86bf0dd0a51fd83129a3336b448e"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevGeometry.lean",
+        "bytes": 4655,
+        "sha256": "80c2813e560f5df10cee80531b9b9eb6af0c1ff90164dd91205081fb81b34f36"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevDegree.lean",
+        "bytes": 6783,
+        "sha256": "cea5acca394aa203c125416ce1d69247079749e48de38ce4d67faaf7a5ae9edf"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/ResultantDegreeStep.lean",
+        "bytes": 13874,
+        "sha256": "3a360ba0006ff7112f6c54cd389dcf8719d0c59c0cc816be4075e9a4970231f6"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/S4Degree.lean",
+        "bytes": 17208,
+        "sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS3.lean",
+        "bytes": 13770,
+        "sha256": "13ffefd385f4e20e60df00483802c80c00cc21c9f25caf41987d41845d375633"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS4.lean",
+        "bytes": 11447,
+        "sha256": "1d73c0555b406b7c54796796f11f4ca720708060b2d5dba4de95c9d455bc378b"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/DeclaredResultantRoots.lean",
+        "bytes": 5614,
+        "sha256": "b0b9cf067feab2f8375d2e287f242192a604ef3188ea8ead25458a91bea335ba"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      }
+    ],
+    "gate": {
+      "path": "evidence/semaev-geometry-gate.log",
+      "declarations": 471,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every algebraically closed field, every nonsingular general Weierstrass model, every aritym=n+3>=3: actual canonical recursive polynomial evaluates to0 iff actual Mathlib point family with prescribed affine xcoordinates sums0. Includes all characteristics/repeated inputs/zero intermediate sums. Same binding directly refutes the rational-only universal converse on actual nonsingular F5y²=x³+1. Separate actual arity6 point-list control refutes closure-free unrestricted coordinates. Full polynomial permutation invariance and irreducibility remain open."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-af2329",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-af2329",
+      "claim_sha256": "66b297dd4f9359d2ee0dbb28d00192f9a7c8aebbfa777652a8f74e98f17e1a38",
+      "commit": "2d252c2b1d54c11c0a02aad352a17f2afb2507cd",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (RecursiveSemaevGeometry.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T05:12:28Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-af2329",
+      "claim_sha256": "66b297dd4f9359d2ee0dbb28d00192f9a7c8aebbfa777652a8f74e98f17e1a38",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-semaev-geometry/report.pdf",
+    "bytes": 61211,
+    "sha256": "9b2488e412851761c3f20ecf8b027c9f5e4c80a68eb664ac1928db6a79a5ca7a",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Every algebraically closed field, every nonsingular general Weierstrass model, every aritym=n+3>=3: actual canonical recursive polynomial evaluates to0 iff actual Mathlib point family with prescribed affine xcoordinates sums0. Includes all characteristics/repeated inputs/zero intermediate sums. Same binding directly refutes the rational-only universal converse on actual nonsingular F5y²=x³+1. Separate actual arity6 point-list control refutes closure-free unrestricted coordinates. Full polynomial permutation invariance and irreducibility remain open.",
+  "paid_compute": 0,
+  "commands": [
+    "timeout 180s lake env lean -o .lake/build/lib/lean/SemaevPointLists.olean SemaevPointLists.lean",
+    "timeout 180s lake env lean -o .lake/build/lib/lean/RecursiveSemaevEvaluation.olean RecursiveSemaevEvaluation.lean",
+    "timeout 180s lake env lean -o .lake/build/lib/lean/RecursiveSemaevGeometry.olean RecursiveSemaevGeometry.lean",
+    "tools/lean/proof-gate.sh --out research/theorem_census_20261109/evidence/semaev-geometry-gate research/theorem_census_20261109/lean",
+    "python3 tools/pcc/pcc.py verify PCC-20261110-af2329 --json"
+  ]
+}

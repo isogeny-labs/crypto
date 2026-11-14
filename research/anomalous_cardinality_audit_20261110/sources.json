@@ -1,0 +1,148 @@
+{
+  "schema": "anomalous-cardinality-source-plan/v1",
+  "created": "2026-11-10T10:38:00.139510+00:00",
+  "status": "Preissue frozen sources; whole17gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/anomalous_cardinality_audit_20261110/lean",
+    "theorem": "AnomalousCardinalityAudit.anomalous_curve_cardinality_certificate",
+    "statement": "theorem anomalous_curve_cardinality_certificate : Nat.Prime p ∧ 2^159≤p ∧ p<2^160 ∧ formulaCurve.Δ≠0 ∧ Nat.card formulaCurve.Point=p ∧ addOrderOf G=p ∧ knownScalar • G=Q ∧ ¬ (∀ (q : ℕ) [Fact (Nat.Prime q)] (E : WeierstrassCurve.Affine (ZMod q)) (P : E.Point), E.Δ≠0 → addOrderOf P=q → Nat.card E.Point=q)",
+    "decl_sha256": "e0d396b42c9c01bdba78f9fa0c46412314a1076a9d3259633029907507c54a87",
+    "sources": [
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/AnomalousCardinality.lean",
+        "bytes": 1804,
+        "sha256": "591266a629eec8d1ecfc57b446a8451777f540fc7d766effe01a0d281f51ce16"
+      },
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/CardinalityControls.lean",
+        "bytes": 1937,
+        "sha256": "79a5cb6aef2f08fb195bb45bba57aa6aa03678fe13c3e98f2a1120d49df1959b"
+      },
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/MissingFiber.lean",
+        "bytes": 955,
+        "sha256": "f98b1c8db86ba1538a5980531042843f1a49ce88a709989f3a627ebfc11caa62"
+      },
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/ShortPointCount.lean",
+        "bytes": 3999,
+        "sha256": "5e62ff6c4253665539291b8f3d8d24f0c3dd4c95543fd9e9cce92f94b6ab775e"
+      },
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/lakefile.toml",
+        "bytes": 435,
+        "sha256": "7ef4a5ed7d02e8f52153834b74a4acd413613c9aa74fdb46f50f08221b4aa64d"
+      },
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4666,
+        "sha256": "9158d4ae8d3ed356638414f9d0467c3473b3e96a3e869a7adef25504d48230b7"
+      },
+      {
+        "path": "research/anomalous_cardinality_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/AffineCertificates.lean",
+        "bytes": 1928,
+        "sha256": "98666778dc23561bd080aa911780f4fd680f83e505cfa28baaab6c6c2085a9e9"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/AnomalousPrime.lean",
+        "bytes": 22550,
+        "sha256": "116092e7d601559bfe132d3ea27b9098a50554eae0c5ea44ce4472a9cb74f9db"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/CurveData.lean",
+        "bytes": 2678,
+        "sha256": "3d041db780c57a6e97ecd96d8c2b13c5f33ab9ff60ad3abe851b8a4aaccd1352"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/PointTrace.lean",
+        "bytes": 469137,
+        "sha256": "21250b694ff0c30e15c0047f16cb0b638d28d69c00b946b9e88894094f56a6d8"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/PrattCertificate.lean",
+        "bytes": 688,
+        "sha256": "0a66bc5ec0e671a683b2ec9cce0e0b6d4198f87166cd36d7fa2a1b433a8cf56e"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/AllPrimeFieldModels.lean",
+        "bytes": 6106,
+        "sha256": "b5f94cf22cb8d78fec024b136725a6302c8a0e0cc029e2f8491b07da307d3e45"
+      },
+      {
+        "path": "research/supersingular_small_characteristic_20261110/lean/PrimeFieldControls.lean",
+        "bytes": 6492,
+        "sha256": "beb959fa2bea5c702af27bcff9139bd760099db66e169fd9697d27db6f6ac057"
+      }
+    ],
+    "scope": "Actual corrected160-bit curve has exactlyp rational points, with primality/bitbounds/nonsingularity/certified orderp/knownanswer relation. Generic emptyfiber cardinal bound, closedEuler nonresidue certificate and finite-group Lagrange composition. Actual F5curve has10points/order5point and directly refutes orderp-alone cardinality inference. No genericSmarttransfer,complexity,nativeexecutionrefinement or screenedNISTrefutation."
+  },
+  "artifacts": [
+    {
+      "path": "research/anomalous_cardinality_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 2901,
+      "sha256": "0051574825f4791acac4c9bd3613ef914a49e692f886bb6bf13143a959a99c5a"
+    },
+    {
+      "path": "research/anomalous_cardinality_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 13131,
+      "sha256": "dd85f6d1bf4bb926c662e79c82215d1f4e85b610ef388c1c9836c34f9d1c4405"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/point-sources.json",
+      "bytes": 7814,
+      "sha256": "4ff91b913121cef8878874cca71b1433a90fe919193815defdb59b560db44664"
+    },
+    {
+      "path": "research/supersingular_small_characteristic_20261110/sources.json",
+      "bytes": 4744,
+      "sha256": "790049f75f2d446ca6ec5022792f4506d29fa654bdf16866dc493781a8ebe496"
+    }
+  ],
+  "gate": {
+    "public_theorems": 17,
+    "failing": 0,
+    "trusted_native": 0,
+    "archive": "research/anomalous_cardinality_audit_20261110/evidence/gate.tar.gz",
+    "archive_files": 5,
+    "roundtrip_equal": true,
+    "generated": "Includes autogenerated equations; private chosen-root proof is audited transitively."
+  },
+  "attempts": {
+    "archive": "research/anomalous_cardinality_audit_20261110/evidence/attempts.tar.gz",
+    "files": 14,
+    "roundtrip_equal": true
+  },
+  "proof_outline": [
+    "Closedpprimality and actualGorderp are imported from frozen parent certificate.",
+    "Closed b^(p/2)=−1 and Eulercriterion prove emptyx0fiber.",
+    "Actual nonsingular point-set injection into (Kminus{x0})×Bool plus infinity provesN<2p.",
+    "Actual finite positive point count and Lagrange givep∣N; thereforeN=p.",
+    "ActualF3#7refutes dropping the missingfiber bound premise; actualF5#10/order5refutes orderp-alone inference."
+  ],
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Hasse_assumption": false,
+    "paid_compute": 0,
+    "native_experiment": false,
+    "lean4checker": "Unavailable; kernel/transitive axiom gate used.",
+    "advisories": "Legacy module-import advisories retained because modern modules cannot import pinned legacy dependencies; no options/waivers or issued dependency edits."
+  },
+  "sources_checked": [
+    "Original anomalous-paper/preprint/authorerratum and SmartHPL97-128; parent readscopes/hashes retained.",
+    "Mathlib Affine.Point.nonsingularPointEquiv and Nonsingular/Equation definitions.",
+    "Mathlib Fintype injection/subtype/Option cardinality lemmas and addOrderOf_dvd_natCard.",
+    "Mathlib ZMod.euler_criterion and square-root equality factorization."
+  ],
+  "retrieval": "KBtool discovery empty; Conductor unavailable; bounded primary/repository/Mathlib fallback. No novelty claim."
+}

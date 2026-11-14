@@ -1,0 +1,150 @@
+{
+  "schema": "cubic-permutation-family-source-plan/v1",
+  "created": "2026-11-14T15:37:12.082486+00:00",
+  "formal": {
+    "project": "research/cubic_permutation_count_audit_20261114/lean",
+    "theorem": "CubicPermutationCountAudit.cubic_permutation_count_certificate",
+    "statement": "theorem cubic_permutation_count_certificate : (∀ (K : Type*) [Field K] [Fintype K] [DecidableEq K], Fintype.card K % 3 = 2 → (2 : K) ≠ 0 → (3 : K) ≠ 0 → ∀ b : K, b ≠ 0 → Function.Bijective (fun x : K => x ^ 3) ∧ (curve b).Δ ≠ 0 ∧ Nonempty ((curve b).Point ≃ Option K) ∧ Nat.card (curve b).Point = Fintype.card K + 1 ∧ pointTrace b = 0 ∧ (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (Fintype.card K : ZMod r) = 2) ∧ (∀ P : (curve b).Point, 2 < addOrderOf P → orderOf (Fintype.card K : ZMod (addOrderOf P)) = 2)) ∧ (∀ (p : ℕ) [Fact (Nat.Prime p)], 5 ≤ p → p % 3 = 2 → ∀ b : ZMod p, b ≠ 0 → (curve b).Δ ≠ 0 ∧ Nat.card (curve b).Point = p + 1 ∧ pointTrace b = 0 ∧ (∀ r : ℕ, 2 < r → r ∣ Nat.card (curve b).Point → orderOf (p : ZMod r) = 2)) ∧ (Nat.card (curve (0 : ZMod 5)).Point = 5 ∧ ¬∀ b : ZMod 5, Nat.card (curve b).Point = 6) ∧ (Nat.card (curve (1 : ZMod 2)).Point = 2 ∧ ¬Nat.card (curve (1 : ZMod 2)).Point = Fintype.card (ZMod 2) + 1) ∧ (Nat.card (curve (1 : ZMod 7)).Point = 12 ∧ ¬Nat.card (curve (1 : ZMod 7)).Point = Fintype.card (ZMod 7) + 1) ∧ ((curve (1 : ZMod 5)).Δ ≠ 0 ∧ Nat.card (curve (1 : ZMod 5)).Point = 6 ∧ 2 ∣ Nat.card (curve (1 : ZMod 5)).Point ∧ orderOf (5 : ZMod 2) = 1 ∧ ¬orderOf (5 : ZMod 2) = 2)",
+    "decl_sha256": "bb894ca30f297e8548c0a85fdbce66f660ae55191557c09b50f5f846b9c3dcaa",
+    "scope": "Actual finite-field elliptic curve E_b:y²=x³+b for q mod3=2, explicit char≠2,3 and b≠0. Derived cube permutation inverse x^((2q−1)/3), actual nonsingularity, actual Point≃OptionK equivalence, Nat.card E_b.Point=q+1 and actual point-count trace0. For every divisor r>2 of actual cardinality and every actual point of additive order>2, modular embedding order of q is exactly2, including composite orders. Primefield specialization for every prime p≥5/pmod3=2 derives characteristic guards, no upper p bound. Kernel controls prove actual nonsingular-point cardinalities5(F5,b0),2(F2,b1),12(F7,b1), directly refuting omitted coefficient/characteristic/congruence count strengthenings, and actual F5b1r2 order1 exception. Credits Galbraith Exercise9.10.4/Example9.11.4 and prior elementary minus-one order proof; no novelty or qualified source refutation. No assumed Hasse/count/point-equivalence/rank/determinant/geometric supersingularity/endomorphism/p-rank/fulltorsionfield conclusion; these general bridges remain open. Independent native written-header observation is procedural, not kernel refinement of parser/hash/execution. Standard foundations/default settings; no holes/custom axioms/native proof evaluation/global flags/raised limits/waivers/new cryptographic experiment/paid compute/agent upload.",
+    "sources": [
+      {
+        "path": "research/cubic_permutation_count_audit_20261114/lean/CubePermutation.lean",
+        "bytes": 1405,
+        "sha256": "873f3594f1cae6afa3c24c1a741f701a3d6f4f59ba702e8b78f11452dfaeb21d"
+      },
+      {
+        "path": "research/cubic_permutation_count_audit_20261114/lean/CubicCountCertificate.lean",
+        "bytes": 8289,
+        "sha256": "b1e56ca07f59b3f2bd60643495ef2bcef789fd92df7ab79ddbb6e15376961b59"
+      },
+      {
+        "path": "research/cubic_permutation_count_audit_20261114/lean/CubicCurveCount.lean",
+        "bytes": 2313,
+        "sha256": "46a6e0eab55a899d64d82689293160ccc62ae697634878599820e13c1f817831"
+      },
+      {
+        "path": "research/cubic_permutation_count_audit_20261114/lean/lakefile.toml",
+        "bytes": 367,
+        "sha256": "64c10ca1704bc808dea2513c442a6a53a309e3e06d93099596d2ca0ffa55f607"
+      },
+      {
+        "path": "research/cubic_permutation_count_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3180,
+        "sha256": "b7222520fc66f8dae236850ffd68f74f7171236a24ddf710637386402cc14c53"
+      },
+      {
+        "path": "research/cubic_permutation_count_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CubePermutation",
+    "CubicCountCertificate",
+    "CubicCurveCount"
+  ],
+  "artifacts": [
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/attempts.tar.xz",
+      "bytes": 10268,
+      "sha256": "3a9eb4928bafaee3b31d22e69667fbed2e98c6f2ec81a4c51d108d88b90acfef"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "a711a65f998598f259c248d70662ab01a7ebfc5a230452c47f28f56ff7855648"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/attempts.json",
+      "bytes": 232,
+      "sha256": "4d018eb0dc6f866ed75a96a51d0befab86f046b438ef7d13a3f39bc9029bb156"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1118,
+      "sha256": "054a6b30f93ae2e286976e5370c0ce966a28c83f5e8094db3efebeab7f08a40a"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/gate.json",
+      "bytes": 1265,
+      "sha256": "6d9070e8e1f58b482e2201c82e90d71ca40de18f09f80e0f76e9805b54cd3260"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/source-review.json",
+      "bytes": 6122,
+      "sha256": "733a2cfa37203c5641724b14bc0f2faf7659d4aa78576a151033899c0c5bd09a"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/evidence/binding-check.json",
+      "bytes": 5726,
+      "sha256": "8ed04d61ed558da097dcf36fcf912a8aa33cafb71391a7c4ef38ae631b7a4e72"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/proof-map.json",
+      "bytes": 3766,
+      "sha256": "95fa614001816586dd6a22eecb74148df2057095b680957ead2114921abffe4a"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/render_report.py",
+      "bytes": 6527,
+      "sha256": "cdc6d89eaf39f1bc2735a47483af228e2f5d9bfd539ffb189496ccf3675b9857"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/export_binding_input.py",
+      "bytes": 1756,
+      "sha256": "3bb7f6f315a897d2132d41434d686e24ba2e036fedab5f9fb8fc238cb0951a4f"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/reports/cubic-family.svg",
+      "bytes": 1353,
+      "sha256": "80839036fb246b73784d5d61aaff0d7ffad6fc703d6dbe8e46466884ee9e7cb3"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/reports/layout.json",
+      "bytes": 273,
+      "sha256": "7bfd78b18baa9bb85097244a1d519b356b75e531d7ef5ad722ab9cfe41567355"
+    },
+    {
+      "path": "research/cubic_permutation_count_audit_20261114/reports/report.pdf",
+      "bytes": 46954,
+      "sha256": "93c6a30cbc039f1d4b1ef568eedbe78de332148ed2e333b443bf0dea954c61cb"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 26,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "point_count_not_assumed": true,
+    "point_equivalence_not_assumed": true,
+    "actual_point_order_consequence": true,
+    "general_geometric_supersingularity_proved": false,
+    "Hasse_proved": false,
+    "fulltorsionfield_bridge_proved": false,
+    "qualified_source_refuted": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

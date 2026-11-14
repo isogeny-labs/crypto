@@ -1,0 +1,106 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T03:59:57.920492+00:00",
+  "source_commit": "fd9ee4c629baf9bd75ed1d8b7edf4763efd8021c",
+  "source_plan_sha256": "557b7f443f1f9a3aafe64c09bafc545fa4f7bb8f822785a597de88167a579972",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "RecursiveSemaevAllDegreesAudit.all_input_degree_audit_certificate",
+    "statement": "theorem all_input_degree_audit_certificate : (\u2200 (F : Type*) [Field F] (W : WeierstrassCurve.Affine F), (seedZero F (initialZero F)=(X : Polynomial (InputRing F 0)) \u2227 (seedZero F).trans (seedZero F) (initialOne F)=(X : Polynomial (InputRing F 0))) \u2227 (seedZero F (recursivePolynomial W 0)).natDegree=2 \u2227 ((seedZero F).trans (seedZero F) (recursivePolynomial W 0)).natDegree=2 \u2227 (\u2200 n : \u2115, seededTransport F (seedZero F) n (liftInitial F (initialZero F) n)= (X : Polynomial (InputRing F n)) \u2227 (Polynomial.Bivariate.swap (R",
+    "decl_sha256": "17bec5038a9e364da89ee78538fbe8da35eae418674dde6d45af9b4826000cd1",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/S4Degree.lean",
+        "bytes": 17208,
+        "sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/ResultantDegreeStep.lean",
+        "bytes": 13874,
+        "sha256": "3a360ba0006ff7112f6c54cd389dcf8719d0c59c0cc816be4075e9a4970231f6"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevDegree.lean",
+        "bytes": 6783,
+        "sha256": "cea5acca394aa203c125416ce1d69247079749e48de38ce4d67faaf7a5ae9edf"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevSymmetry.lean",
+        "bytes": 3484,
+        "sha256": "09e0206649e749081ab65eff3d5dcbd88c56ed85c353c58699a79d22581a2f3e"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevFocus.lean",
+        "bytes": 10979,
+        "sha256": "3f32120f2621966715310381b20fd5ceb6e494a75b1b90ce9cfeed9c14819331"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevTransport.lean",
+        "bytes": 8842,
+        "sha256": "5221b9b1d86961473f7b3edf3a2c775ff7e4dc8e82b34797af0499cf9281d8d8"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevSeededTransport.lean",
+        "bytes": 6957,
+        "sha256": "6625edeea25194e50c5a2e4b7a3b1b99cc5f8413447658bc20fb6a212e903977"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevInitialDegrees.lean",
+        "bytes": 12712,
+        "sha256": "3408b25320bbb4595ff4383a8932eabea40d06758d1db9fd14f94131b3ab9d26"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevAllDegrees.lean",
+        "bytes": 6024,
+        "sha256": "6de0b6fcbb9efd7a2a201ecf414367c99b808e740f09c77b9c6d3a2f2a36dcd4"
+      }
+    ],
+    "gate": {
+      "path": "evidence/recursive-all-input-gate.log",
+      "declarations": 423,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every canonical input family has sharp individual formal variable degree2^(m\u22122)for all aritiesm\u22653over every field, read by actual polynomial variable permutations. The combined binding checks actual selected-coordinate images, arity3cycles, firsttwo seeded S4base/future degrees, every introduced-input future degree, last-input degree and Fin-position coverage. Full permutation invariance of the family, higher geometric zero-sum recursion and irreducibility remain open; no degree preservation after evaluating formal variables."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-007c40",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-007c40",
+      "claim_sha256": "e1fd1fb91812c39f9b17f985c052c6fae32459ad21b15783691362d9f1319e32",
+      "commit": "fd9ee4c629baf9bd75ed1d8b7edf4763efd8021c",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (RecursiveSemaevAllDegrees.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T03:57:30Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-007c40",
+      "claim_sha256": "e1fd1fb91812c39f9b17f985c052c6fae32459ad21b15783691362d9f1319e32",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-all-input-degrees/report.pdf",
+    "bytes": 59254,
+    "sha256": "8f66bb17c5aa068b1c71a51c5fd6c69980113b63d5232f7af88e9bb7f63709d8",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Every canonical input family has sharp individual formal variable degree2^(m\u22122)for all aritiesm\u22653over every field, read by actual polynomial variable permutations. The combined binding checks actual selected-coordinate images, arity3cycles, firsttwo seeded S4base/future degrees, every introduced-input future degree, last-input degree and Fin-position coverage. Full permutation invariance of the family, higher geometric zero-sum recursion and irreducibility remain open; no degree preservation after evaluating formal variables.",
+  "paid_compute": 0
+}

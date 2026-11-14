@@ -1,0 +1,493 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "walk-census-20261109",
+  "version": 1,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/walk_audit_20261109",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "original_requirements": "../theorem_census_20261109/README.md",
+    "formal_source": "lean/WalkBoundary.lean"
+  },
+  "question": "What are the exact small-prime iid mixing times and fixed-hash first-repeat distributions for every registered support/map, and do independent exact implementations and actual Lean boundary controls agree?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "An actual four-step PMF has a fixed-support nonmixing witness for6t+2≤p, including prime101,t10. Decided by Lean, not this census.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Actual normalized Z/3 hash-graph in-degree variance is1/2 for two distinct nonzero steps, rather than the literal printed reciprocal2. Decided by Lean.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "Every registered finite population is enumerated and the inline independent matrix/Floyd/mass/variance checks and deterministic repeats agree; censored mixing cells remain explicit.",
+      "class": "exact_computation",
+      "decided_by": [
+        "finite_checks"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "Hildebrand random-support asymptotics, nonuniform p_i penalties, limiting collision constants, practical hash functions and overall DLP security are outside this finite decision.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "mix",
+      "role": "reference",
+      "description": "Complete iid mixing population:3930supports atp5,7,11,13 with sizes2,3,4,6wherepossible",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "8c376a41754c03c8baa045e316ea2514f3363491",
+        "build": [
+          [
+            "g++",
+            "-O2",
+            "-std=c++20",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "research/walk_audit_20261109/native/census.cpp",
+            "-o",
+            "/workspace/scratch/walk-census",
+            "-lgmpxx",
+            "-lgmp"
+          ]
+        ],
+        "binary_sha256": "35de6f81723fb12ea2f9756634ec7b7bbbcf32da10aa4bc6636d4256ceb90080",
+        "threads": 1,
+        "flags": {
+          "arithmetic": "GMP exact integers/rationals",
+          "randomness": "none; exhaustive enumeration"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "argv": [
+          "--mix"
+        ],
+        "primes": [
+          5,
+          7,
+          11,
+          13
+        ],
+        "support_sizes": [
+          2,
+          3,
+          4,
+          6
+        ],
+        "supports": 3930,
+        "threshold": "TV≤1/4",
+        "cap": "4*p*p"
+      }
+    },
+    {
+      "id": "rho",
+      "role": "reference",
+      "description": "Complete fixed-hash first-repeat population:80supports,82034maps atp3,5,7 sizes2,3",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "8c376a41754c03c8baa045e316ea2514f3363491",
+        "build": [
+          [
+            "g++",
+            "-O2",
+            "-std=c++20",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "research/walk_audit_20261109/native/census.cpp",
+            "-o",
+            "/workspace/scratch/walk-census",
+            "-lgmpxx",
+            "-lgmp"
+          ]
+        ],
+        "binary_sha256": "35de6f81723fb12ea2f9756634ec7b7bbbcf32da10aa4bc6636d4256ceb90080",
+        "threads": 1,
+        "flags": {
+          "arithmetic": "GMP exact integers/rationals",
+          "randomness": "none; exhaustive enumeration"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "argv": [
+          "--rho"
+        ],
+        "primes": [
+          3,
+          5,
+          7
+        ],
+        "support_sizes": [
+          2,
+          3
+        ],
+        "supports": 80,
+        "maps": 82034,
+        "start": 0,
+        "strata": [
+          "all",
+          "no_zero"
+        ]
+      },
+      "same_instrument_as": "mix"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact exhaustive computations, no noise-floor or timing inference. Two deterministic repeats must match byte-for-byte."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded mathematical known answers and two independent algorithms per task replace a statistical detector; preflight p3mix and p2rho pass, full-support p3rho has a prescribed mapping control."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No sampled population or null-hypothesis inference. Every registered support/map is included; no statistical unusualness or scaling claim."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "population_cell",
+        "levels": [
+          "One whole finite population per arm; both repetitions include all its prescribed cells."
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "35de6f81723fb12ea2f9756634ec7b7bbbcf32da10aa4bc6636d4256ceb90080",
+        "how": "Same pinned C++/GMP binary, one thread; frozen inline checks."
+      },
+      {
+        "name": "process_model",
+        "treatment": "fixed",
+        "value": [
+          "fresh iid increments",
+          "one fixed hash function"
+        ],
+        "how": "Separate arms and metrics; no causal comparison of their different workloads."
+      },
+      {
+        "name": "support_map_population",
+        "treatment": "fixed",
+        "value": "3930mix supports;80rho supports/82034maps",
+        "how": "All unordered distinct supports, all uniform label functions, increasing lexicographic enumeration; no sampling."
+      },
+      {
+        "name": "host_layout",
+        "treatment": "measured",
+        "value": {
+          "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+          "kernel": "6.18.57",
+          "arch": "x64",
+          "isolation": "none; local shared host; no timing metric"
+        },
+        "how": "provenance.json; pure integer results and no accepted clock."
+      },
+      {
+        "name": "order_warmups",
+        "treatment": "fixed",
+        "value": "rep0:mix,rho;rep1:mix,rho;0warmups",
+        "how": "Frozen run.sh; interleaved modes and no timing metric."
+      },
+      {
+        "name": "seeds",
+        "treatment": "fixed",
+        "value": 0,
+        "how": "No RNG. Seed0 denotes deterministic exhaustive enumeration, not an omitted random draw."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unmasked exact checks",
+        "how": "Frozen code/known answers before affected data, not a hypothesis-selected subset."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "value": "independent120-second local calls",
+        "how": "Approved local checkpoints; no restore, no outcome-based retry, retained failures."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "finite_checks",
+        "arms": [
+          "mix",
+          "rho"
+        ],
+        "differs_in": [
+          "process_model"
+        ],
+        "design": "absolute",
+        "threshold": "Complete planned population, zero independent-check mismatches/nonzero exits, exact repeat agreement; report every censored cell without extending cap."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "No RNG; deterministic exhaustive enumeration of the frozen finite populations."
+    },
+    "instance_sampling": {
+      "rule": "One exhaustive population workload per arm; both repeats include every prescribed support/map.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact mathematical identities/complete enumeration; no subset selection or statistical effect decision."
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "No sampling test or confidence interval; alpha is unused schema metadata. Finite exhaustive counts and exact algorithm agreement only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 23.58,
+      "threads": 1,
+      "estimated_total_seconds": 120,
+      "measured_on": "Final held-out probes:mix0.006s including largest-cell p17r2;rho0.038s including177147maps atp11r3. Conservative mix upper estimate3930*0.006=23.58s/call;4calls bounded estimate120s. No clock evidence; completed builds/Lean proofs excluded."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "population",
+        "name": "Enumerated supports",
+        "unit": "exact count or rational numerator/denominator",
+        "kind": "exact",
+        "definition": "Native emitted3930mix supports or80rho supports per full call, including censored ones.",
+        "source": "evidence/runs/*jsonl and *stderr:final mode summary",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "exact"
+      },
+      {
+        "id": "checks",
+        "name": "Inline exact verification",
+        "unit": "exact count or rational numerator/denominator",
+        "kind": "exact",
+        "definition": "All sparse/matrix, mass/contraction or visited/Floyd, mass/pigeonhole/in-degree checks complete without a mismatch.",
+        "source": "process exit and per-cell check flags",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "exact"
+      },
+      {
+        "id": "censored",
+        "name": "Censored mixing supports",
+        "unit": "exact count or rational numerator/denominator",
+        "kind": "exact",
+        "definition": "Number not reaching TV1/4 by4p²; never silently excluded or extended.",
+        "source": "mix stderr:censored",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact",
+        "resolution": "exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "mixing_frontier",
+        "name": "Exact quarter-TV frontier",
+        "unit": "exact count or rational numerator/denominator",
+        "kind": "exact",
+        "definition": "First step with TV≤1/4, prior exact TV, normalized integer histogram;null if censored.",
+        "source": "mix JSONL:quarter_step,tv_num,tv_den,histogram",
+        "aggregation": "distribution",
+        "uncertainty": "none_exact",
+        "resolution": "exact"
+      },
+      {
+        "id": "first_repeat",
+        "name": "Exact first-repeat distribution",
+        "unit": "exact count or rational numerator/denominator",
+        "kind": "exact",
+        "definition": "Every fixed-hash function from start0, with exact mean fractions and in-degree moments.",
+        "source": "rho JSONL:first_repeat_histogram,mean_num,mean_den,variance_num,variance_den",
+        "aggregation": "distribution",
+        "uncertainty": "none_exact",
+        "resolution": "exact"
+      },
+      {
+        "id": "finite_baseline",
+        "name": "Exact mapping baseline and heuristic reference",
+        "unit": "exact count or rational numerator/denominator",
+        "kind": "exact",
+        "definition": "E(T)=sum_k product_i(1−i/p); compare exact observed/baseline rational to equal-weight penalty squared r/(r−1), descriptively only.",
+        "source": "rho population stderr:mapping_baseline,relative,heuristic_penalty_squared",
+        "aggregation": "distribution",
+        "uncertainty": "none_exact",
+        "resolution": "exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "native source/binary SHA256 and source commit",
+      "GMP/compiler/CPU/kernel in provenance.json",
+      "argv/exit/output/summary/start-end epoch",
+      "exact population and verifier flags"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "measurement_class": "search",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly four full population calls:two arms,two repeats; preserve every outcome.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Each process capped120seconds; each mixing support capped4p²steps. Preserve censoring and timeouts without outcome-based extension.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "finite_checks_pass only if both complete populations and all checks/repeats pass. Censored supports remain reported, not hidden. Any check failure is invalid/error, never repaired under this version. Finite values do not decide source asymptotics.",
+    "comparison_ids": [
+      "finite_checks"
+    ],
+    "statistic": "exact polynomial/integer/rational identities, complete population counts and deterministic byte agreement",
+    "interval": "none_exact",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "exact finite mixing steps and collision/variance/baseline fractions; no population inference",
+    "verdict_vocabulary": [
+      "finite_checks_pass",
+      "censored",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/census.cpp",
+      "sha256": "d9057ad43ea91aff1b13511901b8d0e4ff3b78e49e6aba01568fd3dcbed3d776"
+    },
+    "inputs": [
+      "fixed populations embedded in frozen source"
+    ],
+    "outputs": [
+      "evidence/runs/*.jsonl",
+      "evidence/runs/*.stderr",
+      "export.json",
+      "reports/run-20261109-walk/report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "reports/run-20261109-walk/mixing.svg",
+      "reports/run-20261109-walk/collisions.svg"
+    ],
+    "report_dir": "reports/run-20261109-walk"
+  },
+  "inadmissible": [
+    "Calling disclosed preflight probes confirmatory or out-of-sample.",
+    "Changing source, support population, cap, strata, verifier or analysis after affected data without a new labelled version.",
+    "Inferring asymptotic failure or nonuniform p_i conclusions from these finite equal-label populations.",
+    "Conflating iid terminal mixing with fixed-hash first collisions.",
+    "Claiming clock speed, independent machine, signed promotion or generic implementation theorem."
+  ],
+  "literature": [
+    {
+      "ref": "Hildebrand1994 DOI10.1007/BF01199265, Theorems1–2",
+      "provenance": "retrieved",
+      "claim": "Random-support expectation with fixed positive weights; worst-case arc supports are slower. No unqualified all-support subquadratic statement."
+    },
+    {
+      "ref": "Galbraith ch14 version2.0 §14.2.5,p297, primary page visually inspected",
+      "provenance": "retrieved",
+      "claim": "Collision factor is heuristic; literal reciprocal in-degree-variance sentence is separately tested with an actual Lean finite model."
+    },
+    {
+      "ref": "lean/WalkBoundary.lean; Mathlib PMF.ofFintype/map; repo proof gate",
+      "provenance": "internal",
+      "claim": "Actual probabilistic/group operations, normalized expectation/cardinality, finite counterexamples; no assumed walk table."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "dfd90b02047a4dd8c59453d4f5f1099ecbf3cbd9667fb041218b14f9a6677452",
+    "commit": "8c376a41754c03c8baa045e316ea2514f3363491",
+    "frozen_at": "2026-11-09T04:54:48Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "provenance_sha256": "bf3b03371bd97033cb85d0f8b7a7d194a11a64ef52c5335adf00a738e807f4da",
+    "original_item": 10,
+    "preflight_data_seen": [
+      "evidence/preflight/*",
+      "evidence/preflight-final/*",
+      "evidence/preflight-frozen-binary/*"
+    ],
+    "code_commit": "8c376a41754c03c8baa045e316ea2514f3363491",
+    "paid_spend": 0,
+    "checkpoint_exception": "User approved local checkpoints for this audit; bounded independent files, no paid cloud."
+  }
+}
