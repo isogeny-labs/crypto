@@ -57,7 +57,9 @@
 //! `cover_lpoly_computed`, `cover_lpoly_skipped` (with `cover_lpoly_skipped_*`
 //! per reason), `cover_lpoly_crosscheck_failures` (each also a problem and
 //! never inserted), `cover_lpoly_classes`, `cover_lpoly_jacobians_linked`,
-//! `cover_lpoly_zeta`.
+//! `cover_lpoly_zeta`, `cover_lpoly_refused_conflict` (a stored class link or
+//! zeta row that contradicts the computation: each a problem, nothing written
+//! for that source, nothing overwritten).
 
 use super::covers::fq_from_parts;
 use super::schoof;
@@ -70,7 +72,7 @@ use num_bigint::BigInt;
 use num_integer::Integer;
 use num_traits::{ToPrimitive, Zero};
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::hash::Hash;
 
 /// Largest prime field (bits of p) point-counted by baby-step giant-step.
@@ -1342,18 +1344,31 @@ const LINK_SQL: &str = "
 UPDATE ec.abelian_variety av SET isogeny_class_id = ic.id
 FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, label text)
 JOIN ec.isogeny_class_fq ic ON ic.label = r.label
-WHERE av.curve_id = r.curve_id AND av.isogeny_class_id IS DISTINCT FROM ic.id";
+WHERE av.curve_id = r.curve_id AND av.isogeny_class_id IS NULL";
 
 const ZETA_SQL: &str = "
 INSERT INTO ec.curve_zeta (curve_id, isogeny_class_id, point_counts, order_check, order_method, provenance_id)
 SELECT r.curve_id, ic.id, r.point_counts, r.status::ec.fact_status, r.method, $2::bigint
 FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, label text, point_counts numeric[], status text, method text)
 JOIN ec.isogeny_class_fq ic ON ic.label = r.label
-ON CONFLICT (curve_id) DO UPDATE SET isogeny_class_id = EXCLUDED.isogeny_class_id,
-       point_counts = EXCLUDED.point_counts, order_check = EXCLUDED.order_check,
-       order_method = EXCLUDED.order_method, provenance_id = EXCLUDED.provenance_id
-WHERE (ec.curve_zeta.isogeny_class_id, ec.curve_zeta.point_counts, ec.curve_zeta.order_check, ec.curve_zeta.order_method)
-      IS DISTINCT FROM (EXCLUDED.isogeny_class_id, EXCLUDED.point_counts, EXCLUDED.order_check, EXCLUDED.order_method)";
+ON CONFLICT (curve_id) DO UPDATE SET isogeny_class_id = EXCLUDED.isogeny_class_id
+WHERE ec.curve_zeta.isogeny_class_id IS NULL AND ec.curve_zeta.point_counts::numeric[] = EXCLUDED.point_counts::numeric[]";
+
+/// Sources whose stored Jacobian class or zeta row contradicts the computed
+/// L-polynomial (a different class, or a point count that differs where both
+/// are recorded). Their link and zeta rows are refused and reported, never
+/// overwritten. Runs after `CLASS_SQL`, so the computed class row exists.
+const CONFLICT_SQL: &str = "
+SELECT r.curve_id
+FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, label text, point_counts numeric[])
+JOIN ec.abelian_variety av ON av.curve_id = r.curve_id
+LEFT JOIN ec.isogeny_class_fq ic ON ic.label = r.label
+LEFT JOIN ec.curve_zeta z ON z.curve_id = r.curve_id
+WHERE ic.id IS NULL
+   OR (av.isogeny_class_id IS NOT NULL AND av.isogeny_class_id <> ic.id)
+   OR (z.isogeny_class_id IS NOT NULL AND z.isogeny_class_id <> ic.id)
+   OR EXISTS (SELECT 1 FROM unnest(z.point_counts::numeric[], r.point_counts) AS u(stored, computed)
+               WHERE u.stored IS NOT NULL AND u.computed IS NOT NULL AND u.stored <> u.computed)";
 
 /// Compute and store the L-polynomial of every cover source that lacks one.
 pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
@@ -1445,6 +1460,23 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
         let prov = ctx.provenance(src, method.text(), None).await?;
         let class_rows: Vec<Value> = classes.remove(&method).map(|m| m.into_values().collect()).unwrap_or_default();
         report.count("cover_lpoly_classes", bulk(client, CLASS_SQL, &class_rows, prov).await?);
+        // Stored rows that disagree with the computation are refused, not overwritten.
+        let mut refused: BTreeSet<i64> = BTreeSet::new();
+        for chunk in zetas.chunks(1000) {
+            for r in client.query(CONFLICT_SQL, &[&Value::Array(chunk.to_vec())]).await? {
+                refused.insert(r.get(0));
+            }
+        }
+        for id in &refused {
+            report.problem(format!(
+                "cover source curve id {id}: the stored Jacobian class or zeta row contradicts the computed \
+                 L-polynomial; nothing written for this source"
+            ));
+        }
+        report.count("cover_lpoly_refused_conflict", refused.len() as u64);
+        let keep = |v: &Value| v["curve_id"].as_i64().is_some_and(|id| !refused.contains(&id));
+        let links: Vec<Value> = links.into_iter().filter(|v| keep(v)).collect();
+        let zetas: Vec<Value> = zetas.into_iter().filter(|v| keep(v)).collect();
         report.count("cover_lpoly_jacobians_linked", bulk1(client, LINK_SQL, &links).await?);
         report.count("cover_lpoly_zeta", bulk(client, ZETA_SQL, &zetas, prov).await?);
     }

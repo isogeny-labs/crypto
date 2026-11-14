@@ -226,8 +226,13 @@ abelian variety:
 - a `curve_zeta` row with `point_counts` = [#H(F_{q^k}), k = 1..g], the same
   status and `order_method` = the method text.
 
-The pass is idempotent and only inserts or updates (a source that already has
-both is left alone; nothing is deleted).
+The pass is idempotent and only inserts or fills NULLs (a source that already
+has both is left alone; nothing is deleted). A stored value is never
+overwritten: when the source's Jacobian is already linked to a different class,
+or its `curve_zeta` row names a different class or records a different point
+count, nothing is written for that source and it is reported as a problem
+(`cover_lpoly_refused_conflict`). A `curve_zeta` row with the same counts and a
+NULL class only gets the class filled in.
 
 | Construction | Field | Method |
 |:--|:--|:--|
