@@ -765,7 +765,11 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         let mut reps: BTreeMap<(u64, u64), usize> = BTreeMap::new();
         for (i, r) in rows.iter().enumerate() {
             if is_singular(p, r.a, r.b) {
-                continue; // field_graph refuses the field below via the class count
+                // not an elliptic curve: it gets nothing; the field is still complete when every class
+                // has another model (field_graph counts the classes)
+                report.count("ell_isogeny_curves_refused_singular", 1);
+                report.problem(format!("curve {}: y^2 = x^3 + {} x + {} is singular over F_{p}", r.id, r.a, r.b));
+                continue;
             }
             let key = tab.iso_key(r.a, r.b);
             match reps.get(&key) {
@@ -800,55 +804,24 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                 }
             };
             // agreement with what ecdb already holds
-            let (mut field_rows, mut field_fills) = (Vec::new(), Vec::new());
-            let mut skip: BTreeSet<usize> = BTreeSet::new();
-            let mut conflict = None;
-            for (ci, r) in chosen.iter().enumerate() {
-                for (eid, tgt, kernel) in existing.get(&(r.id, l)).into_iter().flatten().map(|(t, k)| (r.id, t, k)) {
-                    let found = g.edges.iter().position(|e| {
-                        e.source == ci && chosen[e.target].id == *tgt && kernel.as_ref().is_none_or(|k| *k == e.kernel)
-                    });
-                    match found {
-                        Some(k) if !skip.contains(&k) => {
-                            skip.insert(k);
-                        }
-                        _ => conflict = Some(format!("stored l = {l} isogeny {eid} -> {tgt} is not a computed edge")),
-                    }
+            let plan = match reconcile(l, &chosen, &existing, &g) {
+                Ok(plan) => plan,
+                Err(why) => {
+                    report.count(&format!("ell_isogeny_fields_refused_l{l}"), 1);
+                    report.problem(format!("F_{p}, l = {l}: {why}"));
+                    continue;
                 }
-                let (action, n) = g.curves[ci];
-                let action = action.map(Action::as_str);
-                for (tl, tn, ta) in &r.torsion {
-                    if *tl != l {
-                        continue;
-                    }
-                    if tn.is_some_and(|x| x as usize != n) || ta.as_deref().is_some_and(|x| Some(x) != action) {
-                        conflict = Some(format!(
-                            "curve {}: stored curve_ell_torsion ({tn:?}, {ta:?}) at l = {l}, ecdb computes ({n}, {action:?})",
-                            r.id
-                        ));
-                    }
-                }
-                let row = json!({ "curve_id": r.id, "ell": l, "action": action, "n": n });
-                if r.torsion.iter().any(|x| x.0 == l) {
-                    field_fills.push(row);
-                } else {
-                    field_rows.push(row);
-                }
-            }
-            if let Some(why) = conflict {
-                report.count(&format!("ell_isogeny_fields_refused_l{l}"), 1);
-                report.problem(format!("F_{p}, l = {l}: {why}"));
-                continue;
-            }
+            };
+            let skip = plan.skip;
             report.count(&format!("ell_isogeny_fields_ok_l{l}"), 1);
             report.count(&format!("ell_isogeny_curves_complete_l{l}"), chosen.len() as u64);
             report.count(&format!("ell_isogeny_edges_computed_l{l}"), g.edges.len() as u64);
             report.count(&format!("ell_isogeny_edges_already_stored_l{l}"), skip.len() as u64);
             report.count(&format!("ell_isogeny_curves_phi_excess_roots_l{l}"), g.phi_excess_curves);
             report.count(&format!("ell_isogeny_phi_roots_l{l}"), g.phi_roots);
-            report.count("curve_ell_torsion_existing_agree", field_fills.len() as u64);
-            torsion.extend(field_rows);
-            fills.extend(field_fills);
+            report.count("curve_ell_torsion_existing_agree", plan.agree as u64);
+            torsion.extend(plan.inserts);
+            fills.extend(plan.fills);
             for (k, e) in g.edges.iter().enumerate() {
                 if skip.contains(&k) {
                     continue;
@@ -869,10 +842,93 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             }
         }
     }
-    report.count("isogenies_ell_7_11_13", bulk(client, ISOGENY_SQL, &isogenies, prov).await?);
-    report.count("curve_ell_torsion_inserted", bulk(client, TORSION_SQL, &torsion, prov).await?);
-    report.count("curve_ell_torsion_filled_null_count", bulk1(client, TORSION_FILL_SQL, &fills).await?);
+    // Every row sent was checked against what ecdb held when it was read; a row the database still
+    // turns away (ON CONFLICT DO NOTHING, or the guard of TORSION_FILL_SQL) is a conflict that
+    // appeared since, or an external id taken by a different row. Nothing is overwritten, but say so.
+    let inserted = bulk(client, ISOGENY_SQL, &isogenies, prov).await?;
+    report.count("isogenies_ell_7_11_13", inserted);
+    shortfall(&mut report, "isogeny rows (external id already taken by another row)", isogenies.len(), inserted);
+    let inserted = bulk(client, TORSION_SQL, &torsion, prov).await?;
+    report.count("curve_ell_torsion_inserted", inserted);
+    shortfall(&mut report, "curve_ell_torsion rows (a row for that curve and l appeared)", torsion.len(), inserted);
+    let filled = bulk1(client, TORSION_FILL_SQL, &fills).await?;
+    report.count("curve_ell_torsion_filled_null_count", filled);
+    shortfall(&mut report, "curve_ell_torsion NULL-count fills (the stored row changed)", fills.len(), filled);
     Ok(report)
+}
+
+/// Report rows the database refused to write although they passed every check against what was read.
+fn shortfall(report: &mut Report, what: &str, sent: usize, written: u64) {
+    if let Some(msg) = shortfall_problem(what, sent, written) {
+        report.count("ell_isogeny_rows_refused_by_database", sent as u64 - written);
+        report.problem(msg);
+    }
+}
+
+fn shortfall_problem(what: &str, sent: usize, written: u64) -> Option<String> {
+    (written < sent as u64)
+        .then(|| format!("{} of {sent} {what} were not written: nothing was overwritten", sent as u64 - written))
+}
+
+/// What one accepted field writes, after comparing the computed graph with what ecdb holds.
+#[derive(Debug, Default)]
+struct Plan {
+    /// Computed edges (indices into `FieldGraph::edges`) already stored: not inserted again.
+    skip: BTreeSet<usize>,
+    /// New `curve_ell_torsion` rows.
+    inserts: Vec<Value>,
+    /// Stored rows with a NULL count, to fill.
+    fills: Vec<Value>,
+    /// Stored rows whose count and action already agree.
+    agree: usize,
+}
+
+/// Compare the computed graph of one field with the stored ℓ-isogenies and `curve_ell_torsion`
+/// rows of its curves. Any disagreement refuses the whole field (the error); nothing stored is
+/// ever replaced.
+fn reconcile(
+    l: u64,
+    chosen: &[&Row],
+    existing: &BTreeMap<(i64, u64), Vec<StoredEdge>>,
+    g: &FieldGraph,
+) -> Result<Plan, String> {
+    let mut plan = Plan::default();
+    for (ci, r) in chosen.iter().enumerate() {
+        for (tgt, kernel) in existing.get(&(r.id, l)).into_iter().flatten() {
+            let found = g.edges.iter().enumerate().position(|(k, e)| {
+                !plan.skip.contains(&k)
+                    && e.source == ci
+                    && chosen[e.target].id == *tgt
+                    && kernel.as_ref().is_none_or(|k| *k == e.kernel)
+            });
+            match found {
+                Some(k) => {
+                    plan.skip.insert(k);
+                }
+                None => return Err(format!("stored l = {l} isogeny {} -> {tgt} is not a computed edge", r.id)),
+            }
+        }
+        let (action, n) = g.curves[ci];
+        let action = action.map(Action::as_str);
+        let row = json!({ "curve_id": r.id, "ell": l, "action": action, "n": n });
+        match r.torsion.iter().find(|x| x.0 == l) {
+            None => plan.inserts.push(row),
+            Some((_, tn, ta)) => {
+                if tn.is_some_and(|x| x < 0 || x as usize != n) || ta.as_deref().is_some_and(|x| Some(x) != action) {
+                    return Err(format!(
+                        "curve {}: stored curve_ell_torsion ({tn:?}, {ta:?}) at l = {l}, ecdb computes ({n}, {action:?})",
+                        r.id
+                    ));
+                }
+                if tn.is_none() {
+                    plan.fills.push(row);
+                } else {
+                    plan.agree += 1;
+                }
+            }
+        }
+    }
+    Ok(plan)
 }
 
 #[cfg(test)]
@@ -1146,6 +1202,91 @@ mod tests {
         let k = curves.iter().position(|c| c.t != 0).unwrap();
         curves[k].t = -curves[k].t;
         assert!(field_graph(p, 7, &curves, &phi(7, p)).is_err());
+    }
+
+    /// The stored-row comparison: agreeing rows are kept (not inserted twice, not rewritten), NULL counts
+    /// are filled, and any conflicting stored edge or curve_ell_torsion value refuses the field.
+    #[test]
+    fn reconcile_refuses_conflicts_and_never_rewrites() {
+        let (p, l) = (43u64, 7u64);
+        let curves = census(p);
+        let g = field_graph(p, l, &curves, &phi(l, p)).unwrap();
+        let rows: Vec<Row> = curves
+            .iter()
+            .enumerate()
+            .map(|(i, c)| Row {
+                id: 1000 + i as i64,
+                census: true,
+                slug: Some(format!("s{i}")),
+                a: c.a,
+                b: c.b,
+                t: c.t,
+                torsion: Vec::new(),
+            })
+            .collect();
+        let chosen: Vec<&Row> = rows.iter().collect();
+        let none = BTreeMap::new();
+        // nothing stored: every curve gets a new row, every edge is inserted
+        let plan = reconcile(l, &chosen, &none, &g).unwrap();
+        assert_eq!((plan.inserts.len(), plan.fills.len(), plan.agree, plan.skip.len()), (curves.len(), 0, 0, 0));
+
+        let e = &g.edges[0];
+        let (src, tgt) = (rows[e.source].id, rows[e.target].id);
+        // a stored edge equal to a computed one is recognised and not inserted again (also with no kernel)
+        for kernel in [Some(e.kernel.clone()), None] {
+            let stored = BTreeMap::from([((src, l), vec![(tgt, kernel)])]);
+            let plan = reconcile(l, &chosen, &stored, &g).unwrap();
+            assert_eq!(plan.skip.len(), 1);
+            let k = *plan.skip.iter().next().unwrap();
+            assert_eq!((g.edges[k].source, g.edges[k].target), (e.source, e.target));
+        }
+        // a stored edge with a corrupted kernel, a wrong target, or stored twice is refused
+        let mut bad_kernel = e.kernel.clone();
+        bad_kernel[0] = (bad_kernel[0] + 1) % p;
+        let wrong_target =
+            rows.iter().find(|r| g.edges.iter().all(|x| x.source != e.source || rows[x.target].id != r.id));
+        let mut corrupt = vec![
+            BTreeMap::from([((src, l), vec![(tgt, Some(bad_kernel))])]),
+            BTreeMap::from([((src, l), vec![(tgt, Some(e.kernel.clone())), (tgt, Some(e.kernel.clone()))])]),
+        ];
+        corrupt.push(BTreeMap::from([((src, l), vec![(wrong_target.unwrap().id, None)])]));
+        for stored in &corrupt {
+            assert!(reconcile(l, &chosen, stored, &g).unwrap_err().contains("not a computed edge"));
+        }
+
+        // curve_ell_torsion: agree, fill a NULL count, refuse a wrong count or action
+        let (action, n) = g.curves[e.source];
+        let action = action.unwrap().as_str().to_string();
+        let with = |tors: (u64, Option<i32>, Option<String>)| {
+            let mut rows2: Vec<Row> =
+                rows.iter().map(|r| Row { torsion: Vec::new(), slug: r.slug.clone(), ..*r }).collect();
+            rows2[e.source].torsion = vec![tors];
+            rows2
+        };
+        let r = with((l, Some(n as i32), Some(action.clone())));
+        let plan = reconcile(l, &r.iter().collect::<Vec<_>>(), &none, &g).unwrap();
+        assert_eq!((plan.agree, plan.fills.len(), plan.inserts.len()), (1, 0, curves.len() - 1));
+        let r = with((l, None, None));
+        let plan = reconcile(l, &r.iter().collect::<Vec<_>>(), &none, &g).unwrap();
+        assert_eq!((plan.agree, plan.fills.len()), (0, 1));
+        assert_eq!(plan.fills[0]["n"], json!(n));
+        // a row for another l is not this l's row
+        let r = with((11, Some(99), Some("bogus".into())));
+        let plan = reconcile(l, &r.iter().collect::<Vec<_>>(), &none, &g).unwrap();
+        assert_eq!(plan.inserts.len(), curves.len());
+        for bad in [(l, Some(n as i32 + 1), None), (l, None, Some("inert-or-other".to_string())), (l, Some(-1), None)] {
+            let r = with(bad);
+            assert!(reconcile(l, &r.iter().collect::<Vec<_>>(), &none, &g)
+                .unwrap_err()
+                .contains("stored curve_ell_torsion"));
+        }
+    }
+
+    #[test]
+    fn database_shortfall_is_a_problem() {
+        assert_eq!(shortfall_problem("rows", 5, 5), None);
+        assert_eq!(shortfall_problem("rows", 0, 0), None);
+        assert!(shortfall_problem("rows", 5, 3).unwrap().starts_with("2 of 5 rows"));
     }
 
     #[test]
