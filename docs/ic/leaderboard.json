@@ -406,6 +406,74 @@
    "path": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
    "sha256": "130f9c0da9b3546bf786495c0949937b2997c6ecda2352e01c700cc19aa923eb"
   },
+  "fes_then_batched": {
+   "path": "research/fes_then_batched_20261112/validation/headline.json",
+   "sha256": "468787a41a6aa47b6301148cdeff1051f9d346a2cd2ed620010a91c47fec91fe"
+  },
+  "fes_then_batched_readme": {
+   "path": "research/fes_then_batched_20261112/README.md",
+   "sha256": "6dc894448c5dcbffb9fab014d239a1890767c50fc6e32d9303faafc3a52b8d1e"
+  },
+  "gpu_fes_e2e": {
+   "path": "research/ic_gpu_e2e_20261113/results.json",
+   "sha256": "9ec25e5885ed5cb5dec28ed27b44a780ade2f3e7d3db935377a3b63029ae530a"
+  },
+  "gpu_fes_e2e_report": {
+   "path": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "sha256": "3bc11173520ab3e3cdc6a4968a98556686a420bd01e7c961efabb87e6af16b66"
+  },
+  "gpu_kernel_round1": {
+   "path": "research/ic_gpu_measure_20261112/results.json",
+   "sha256": "23ddce3bb25d959405818707042095bf445e2031f32ee5a5e74d051548207522"
+  },
+  "gpu_kernel_round2": {
+   "path": "research/ic_gpu_measure_20261112/results2.json",
+   "sha256": "e39fadca413cea84fb33ced2e89507c364fe174c66bbc0ab4152759b11f4e088"
+  },
+  "rust_deep_audit": {
+   "path": "docs/perf/20261112-rust-deep-audit.md",
+   "sha256": "e995c613c4a3e50cf3dd70c089035cdf067a566959a2fbfe7536179d7d55b494"
+  },
+  "transfer_negation_remeasure": {
+   "path": "research/negation_remeasure_20261113/summary.json",
+   "sha256": "34c71b094865a8358c46001712991b0d155819eb3821ea47d729d83bc0b01dec"
+  },
+  "transfer_negation_validation": {
+   "path": "research/negation_remeasure_20261113/VALIDATION.json",
+   "sha256": "eba6273e3ff0f48251fb28e41627539de89bf78656ebbd18670e7418e6090e4a"
+  },
+  "full_jacobian_ic": {
+   "path": "research/full_jacobian_ic_20261113/full_jacobian.json",
+   "sha256": "e65114ea8bf019ac4e4ae76f6eb5bf2f036dfb496b95816532ba49c8fa7c9d7c"
+  },
+  "groebner_free": {
+   "path": "research/groebner_free_matched_20261113/SUMMARY.json",
+   "sha256": "c69cfd5628ea8e20b6753c975f0ea2d99320e4531eb3c0d898e29f346032608c"
+  },
+  "folded_build_steps": {
+   "path": "research/ic_tool_program/explorations/build-steps-20261113/summary.json",
+   "sha256": "34edc872ae14d24b301e129b880a3d7c6639f9059f10036ac6a4b4f4e7c91817"
+  },
+  "folded_filter_layout": {
+   "path": "research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json",
+   "sha256": "3ace18c28337e08bfce03c90555302295e457ef83d779265bc416b9f22d053d0"
+  },
+  "prime_leads_chase": {
+   "path": "research/prime_leads_chase_20261113/README.md",
+   "sha256": "1c894b6f2b41a373a433b79fc8b8ff4f57291a04e486b61a585081068e465bcb"
+  },
+  "ecbench_methods_source": {
+   "path": "src/cryptanalysis/ecbench/methods.rs",
+   "sha256": "1452c4c7672603e52c2ee7e0538d7ca0a15fdc0b291230de47f7eb6274a4a6b8"
+  },
+  "solver_registry_source": {
+   "path": "src/cryptanalysis/ic_framework/solvers.rs",
+   "sha256": "8bab5f869cfde3be2bd982136c5192609a434bcd6a2d78168f062f3ef381f93b"
+  },
+  "optimization_source": {
+   "path": "src/cryptanalysis/ecbench/optimization.rs",
+   "sha256": "6d71ad769ca27a3e3d8595ebe34c58e6c649a6fbc2852d87865e6878e99f83c9"
+  },
   "ghs_weak_n4": {
    "path": "research/quartic_n4_20261019/results/summary_all.json",
    "sha256": "fd5598a2860d965c8b47ca9163cb1ff101150c3b04690ea208d05d8c87b067e7"
@@ -336390,8 +336458,8 @@
   },
   "host": "c8a.2xlarge (AMD EPYC 9R45) on EKS, L2",
   "other_sizes": "At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); 28 bits is undecidable (infrastructure); see the README.",
-  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_packed_filter_20261029/VALIDATION.json); single session, not replicated. Caveats: the validator re-priced the bitops with its own code rather than re-running `ecbench work`; the image digest is bound through the binary hashes, not pod status",
-  "validated": true
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "lazy_members_component": {
   "rows": [
@@ -337122,8 +337190,8 @@
   "study": "research/ecbench_generator_orbit_20261022/",
   "report": "research/ecbench_generator_orbit_20261022/REPORT.pdf",
   "source": "research/ecbench_generator_orbit_20261022/figures/summary.json",
-  "validated": true,
-  "validation": "Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference)."
+  "validated": false,
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file."
  },
  "lazy_columns2_component": {
   "rows": [
@@ -338478,8 +338546,8 @@
   "study": "research/ic_d4_char2_lever_20261023/",
   "report": "research/ic_d4_char2_lever_20261023/REPORT.pdf",
   "source": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
-  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)",
-  "validated": true
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "algebraic_ladder": {
   "source": "research/ic_m2_linear_ladder_20261024/fit.json",
@@ -339016,8 +339084,8 @@
   "study": "research/ic_aimed_gather_20261023/",
   "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
   "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
-  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json)",
-  "validated": true
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
+  "validated": false
  },
  "mt_fieldops_component": {
   "rows": [
@@ -339472,6 +339540,252 @@
   "class": "multi-target method",
   "validation": "validated: replay certificate, validator report and the rho reference (cheapest standard multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band (benchmarks/20261112-mt-fieldops-v5/VALIDATION.json)",
   "validated": true
+ },
+ "nov13_frontier_diagnostics": {
+  "as_of": "2026-11-13",
+  "ranking_effect": "none: no row of tables A-C changes",
+  "live_census": {
+   "top_level_methods": 104,
+   "solver_backends": 19,
+   "pdp3_engines": 9,
+   "pkm_tower_engines": 4,
+   "nested_algorithms": 32,
+   "pdp3_names": [
+    "inherited-f4",
+    "f6-ic",
+    "f6-ic-pair",
+    "matrix-f4",
+    "matrix-f5",
+    "rootfind",
+    "rootfind-window",
+    "rootfind-negfold",
+    "rootfind-window-negfold"
+   ],
+   "pkm_tower_names": [
+    "f4",
+    "sig-f5",
+    "f6",
+    "enum"
+   ]
+  },
+  "fes_then_batched": {
+   "ftb_over_inherited_f4_range": [
+    0.738734650561,
+    0.888690298771
+   ],
+   "distance_to_rho": [
+    {
+     "cell": "koblitz-n13",
+     "ratio": 35.2352951656
+    },
+    {
+     "cell": "koblitz-n17",
+     "ratio": 144.718861556
+    },
+    {
+     "cell": "koblitz-n19",
+     "ratio": 305.453131633
+    },
+    {
+     "cell": "koblitz-n23",
+     "ratio": 1907.79331835
+    },
+    {
+     "cell": "char2-n15",
+     "ratio": 121.721522531
+    },
+    {
+     "cell": "char2-n21",
+     "ratio": 3012.55646224
+    }
+   ],
+   "validation": "validated arithmetic; no ranked row"
+  },
+  "gpu_fes_e2e": {
+   "rows": [
+    {
+     "instance": "char2-n25",
+     "gpu_over_inherited_counted": 53.0404669412,
+     "inherited_over_gpu_wall": 10.4406607718,
+     "inherited_over_rho": 4362.08514098,
+     "gpu_over_rho": 231367.032715,
+     "cpu_fes_over_gpu_wall": 44.0528809246
+    },
+    {
+     "instance": "char2-n29",
+     "gpu_over_inherited_counted": 105.997373458,
+     "inherited_over_gpu_wall": 23.1388321432,
+     "inherited_over_rho": 30856.3591934,
+     "gpu_over_rho": 3270693.02896,
+     "cpu_fes_over_gpu_wall": null
+    },
+    {
+     "instance": "koblitz-n23",
+     "gpu_over_inherited_counted": 9.95656693362,
+     "inherited_over_gpu_wall": 17.7268036221,
+     "inherited_over_rho": 2014.13116948,
+     "gpu_over_rho": 20053.831802,
+     "cpu_fes_over_gpu_wall": 12.2725712819
+    }
+   ],
+   "validation": "pcc:unverified; one pod; no independent replay"
+  },
+  "gpu_components": {
+   "gray_over_old": {
+    "fes26": 0.0538600134788,
+    "fes30": 0.0387293852255
+   },
+   "block_b6_over_gray": {
+    "fes30": 0.258021655495,
+    "fes32": 0.24358192711
+   },
+   "fes30_block_b6_over_old": 0.0099930200922,
+   "macaulay_shared1024_over_old_range": [
+    0.241185647426,
+    0.29354094579
+   ],
+   "macaulay_2d_over_shared1024_range": [
+    0.895326380842,
+    0.901960784314
+   ],
+   "validation": "component-only; no end-to-end promotion"
+  },
+  "rust_diagnostics": {
+   "rho_lanes8": {
+    "ops_ratio": 1.043,
+    "ops_ci95": [
+     1.028,
+     1.058
+    ],
+    "e2e_wall_ratio": 0.761,
+    "e2e_wall_ci95": [
+     0.735,
+     0.788
+    ]
+   },
+   "rho_lanes32": {
+    "ops_ratio": 1.149,
+    "ops_ci95": [
+     1.1,
+     1.2
+    ],
+    "e2e_wall_ratio": 0.639,
+    "e2e_wall_ci95": [
+     0.608,
+     0.67
+    ]
+   },
+   "rootfind_prime_batch": {
+    "ops_ratio": 1.0,
+    "wall_ns_per_gae_ratio": 0.486,
+    "wall_ci95": [
+     0.468,
+     0.504
+    ],
+    "mean_solve_wall_ms": [
+     342.9,
+     166.5
+    ]
+   },
+   "validation": "pcc:unverified L0 diagnostics"
+  },
+  "transfer_remeasure": {
+   "rows": 162,
+   "below": 0,
+   "above": 156,
+   "unresolved_lower_bound": 6,
+   "validation": "admitted follow-up validator; pcc:unverified"
+  },
+  "full_jacobian": {
+   "min_group_only_ratio": 17.9602993817,
+   "per_arm": {
+    "A": {
+     "above_band": 7,
+     "above_cal": 7,
+     "cells": 7,
+     "meets_closed_rule": false,
+     "ratio_slope_ci95_lower": -0.0699108171544,
+     "ratio_slope_w0.1": 0.420994434656
+    },
+    "B": {
+     "above_band": 7,
+     "above_cal": 7,
+     "cells": 7,
+     "meets_closed_rule": false,
+     "ratio_slope_ci95_lower": -0.654094357494,
+     "ratio_slope_w0.1": -0.0527563964745
+    }
+   },
+   "verdict": "unresolved: the frozen rule is not met by both arms; blocking cells listed",
+   "validation": "pcc:unverified L0"
+  },
+  "groebner_free": {
+   "lin_over_pair_floor_range": [
+    2.88971886643,
+    10.8674271218
+   ],
+   "n41_memory_mb": {
+    "linear": 15.656,
+    "pair_floor": 2558.132
+   },
+   "n59_linear_memory_mb": 518.692,
+   "counted_slope_delta": 0.000606492026394,
+   "counted_slope_delta_ci95": [
+    -0.00039835222467,
+    0.00164708957247
+   ],
+   "validation": "pcc:unverified stage diagnostic"
+  },
+  "folded_pair_build": {
+   "steps": [
+    {
+     "cell": "k0n53",
+     "whole_ns_per_pair": 34.5753153041,
+     "stream_and_sort_ns_per_pair": 26.6952375465,
+     "stream_and_sort_share": 0.772089489617
+    },
+    {
+     "cell": "k0n61",
+     "whole_ns_per_pair": 35.4750722894,
+     "stream_and_sort_ns_per_pair": 26.7337749306,
+     "stream_and_sort_share": 0.753593247463
+    }
+   ],
+   "layout": [
+    {
+     "cell": "k0n53",
+     "top_over_low_build": {
+      "median": 1.10429633148,
+      "ci95": [
+       1.06965866175,
+       1.14281772749
+      ]
+     },
+     "rounds": 41,
+     "dropped": 1,
+     "identity_mismatches": 0
+    },
+    {
+     "cell": "k0n61",
+     "top_over_low_build": {
+      "median": 1.14223295907,
+      "ci95": [
+       1.09819061843,
+       1.16454611546
+      ]
+     },
+     "rounds": 42,
+     "dropped": 0,
+     "identity_mismatches": 0
+    }
+   ],
+   "keep_top_default": true,
+   "validation": "component A/B; no E2E claim"
+  },
+  "prime_leads_chase": {
+   "result": "prospective/inconclusive; no sub-sqrt prime result",
+   "validation": "desk analysis only"
+  }
  },
  "quartic_twist_pair_component": {
   "rows": [

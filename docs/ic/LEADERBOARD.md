@@ -133,7 +133,7 @@ Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` n
 
 [Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
 
-Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference).
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file.
 
 ## Component tuning: two orbit columns under the lazy oracle (2026-10-18, engineering)
 
@@ -204,7 +204,7 @@ Paired lever ÷ base (ecbench compare): m = 12: 0.8543 [0.8543, 0.8543] over 3 p
 
 [Report](../../research/ic_d4_char2_lever_20261023/REPORT.pdf) · [study](../../research/ic_d4_char2_lever_20261023/) · [data](../../research/ic_d4_char2_lever_20261023/results/table-m12.tsv).
 
-validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 ## Table A: Koblitz, one target (§23, re-run at main as rule v9 against a matched rho)
 
@@ -502,7 +502,7 @@ Frozen protocol (backlog XP-20261029-packed-filter); track generic (prime-table;
 
 [README](../../research/ic_packed_filter_20261029/README.md) · [report PDF](../../research/ic_packed_filter_20261029/REPORT.pdf).
 
-validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_packed_filter_20261029/VALIDATION.json); single session, not replicated. Caveats: the validator re-priced the bitops with its own code rather than re-running `ecbench work`; the image digest is bound through the binary hashes, not pod status
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
 ## Linear-algebra engine, outside tables A–C
 
@@ -529,7 +529,7 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 
 ## Aimed-subset gather in relation collection, outside tables A–C
 
-`ic price` on icv1-f2m53-tm56619371-dac20a85 (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the change that gathers the aimed subset's coordinates once per unit instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the change and is not re-priced. Callgrind instructions per process, main / candidate: 1.023 at n53, 1.029 at n61. Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its lower end clears 1 and the same-session A/A's upper end. Intervals are corrected: the bootstrap as first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only under the correction is marked marginal and not claimed. 126 processes, none contended. validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json). Study: [research/ic_aimed_gather_20261023/](../../research/ic_aimed_gather_20261023/).
+`ic price` on icv1-f2m53-tm56619371-dac20a85 (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the change that gathers the aimed subset's coordinates once per unit instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the change and is not re-priced. Callgrind instructions per process, main / candidate: 1.023 at n53, 1.029 at n61. Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its lower end clears 1 and the same-session A/A's upper end. Intervals are corrected: the bootstrap as first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only under the correction is marked marginal and not claimed. 126 processes, none contended. Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Study: [research/ic_aimed_gather_20261023/](../../research/ic_aimed_gather_20261023/).
 
 | metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |
 |:--|:--|--:|:--|:--|:--|:--|:--|
@@ -634,6 +634,46 @@ Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^
 | 32 | 16384 | 1.101 [1.097, 1.108] | 0.998 [0.992, 1.005] | 0.713 [0.711, 0.716] | unranked | 1.26 | 1.41 |
 
 Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_20261112/); [report](../../research/mt_fieldops_v5_20261112/REPORT.pdf); source `research/mt_fieldops_v5_20261112/results/holdout/summary.json`. v4, without native work priced: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/). Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
+
+## 13 November live-source frontier reconciliation (diagnostic; no ranked-row change)
+
+The live source tree now exposes **104 top-level ECBench methods** and **32 nested algorithms** (19 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled on 2026-11-13; none satisfies the conditions for changing Tables A–C.
+
+### Solver and GPU diagnostics
+
+The validated `fes-then-batched` composition costs 0.739–0.889× inherited F4 at the calibration points, but remains 35.24–3012.56× matched rho. Across the §5a band its strict order against inherited F4 is unresolved, so this is a solver-local result, not a frontier promotion. [Study](../../research/fes_then_batched_20261112/README.md).
+
+The GPU FES end-to-end probe is one-pod, `[pcc:unverified]`, with no independent replay. Wall time improves sharply while counted work becomes worse, so the wall column cannot substitute for the ranked cost column:
+
+| instance | GPU FES counted / inherited F4 | inherited-F4 wall / GPU wall | CPU-FES wall / GPU wall | inherited F4 / rho | GPU FES / rho |
+|:--|--:|--:|--:|--:|--:|
+| char2-n25 | 53.0× | 10.4× | 44.1× | 4362× | 231367× |
+| char2-n29 | 106.0× | 23.1× | — | 30856× | 3270693× |
+| koblitz-n23 | 10.0× | 17.7× | 12.3× | 2014× | 20054× |
+
+At kernel scope, Gray-code FES is 18.6× (n=26) and 25.8× (n=30) faster than the old kernel; block-six then adds 3.88× at n=30 and 4.11× at n=32 (about 100× cumulative at n=30). Shared-1024 Macaulay is 3.41–4.15× faster than the old global kernel; the later 2-D change adds only 1.11–1.12×. These are component results only. [GPU E2E report](../../research/ic_gpu_e2e_20261113/REPORT.md).
+
+### Rho, root finding, transfer and whole-Jacobian probes
+
+The unverified L0 rho lane diagnostic trades more counted operations for lower wall time: lanes=8 is 1.043× operations and 0.761× E2E wall; lanes=32 is 1.149× operations and 0.639× wall. The §5a ranking still selects base negation rho. Prime batched root finding preserves counted S exactly and changes wall ns/GAE by 0.486× [0.468, 0.504]. [Audit](../../docs/perf/20261112-rust-deep-audit.md).
+
+The admitted transfer remeasurement has **0/162 below rho**, 156 above and 6 unresolved lower-bound rows. The whole-Jacobian L0 probe is above the calibrated band in 7/7 cells for both arms and has a minimum group-only ratio of 18.0×, but remains unresolved because the frozen slope rule fails (A slope 0.421, CI lower -0.070; B slope -0.053, CI lower -0.654).
+
+### Current construction bottlenecks
+
+The table-free `lin21-ht` collector uses 15.7 MB at n=41 versus 2558.1 MB for the pair-table floor, and reaches n=59 at 518.7 MB. Its online count is still 2.89–10.87× the floor; the counted slope delta 0.0006 has CI [-0.0004, 0.0016], crossing zero. This removes a memory barrier, not the work barrier.
+
+- `k0n53` folded-pair construction: 34.58 ns/pair; streaming plus sort/fill is 26.70 ns/pair (77.2% of the whole).
+- `k0n61` folded-pair construction: 35.48 ns/pair; streaming plus sort/fill is 26.73 ns/pair (75.4% of the whole).
+
+The current Top filter layout is identity-equivalent in these A/B rounds but slower to build than the frozen Low layout:
+
+| cell | Top / Low build [95%] | rounds | dropped | identity mismatches |
+|:--|--:|--:|--:|--:|
+| k0n53 | 1.104 [1.070, 1.143] | 41 | 1 | 0 |
+| k0n61 | 1.142 [1.098, 1.165] | 42 | 0 | 0 |
+
+The old ECBench IDs therefore remain frozen on Low while the explicit `_v2` IDs name Top; this prevents a silent benchmark mutation. The prime-leads chase remains prospective/inconclusive and has no sub-square-root prime result. All entries in this reconciliation are diagnostic unless separately marked admitted above.
 
 ## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C
 
@@ -1056,6 +1096,23 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/s5_plain_c4_options_20261019/raw/summary_r13.json` — sha256 `d5ae9560f6cf3cad…`
 - `research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl` — sha256 `4360d61a47960810…`
 - `research/mt_fieldops_v5_20261112/results/holdout/summary.json` — sha256 `130f9c0da9b3546b…`
+- `research/fes_then_batched_20261112/validation/headline.json` — sha256 `468787a41a6aa47b…`
+- `research/fes_then_batched_20261112/README.md` — sha256 `6dc894448c5dcbff…`
+- `research/ic_gpu_e2e_20261113/results.json` — sha256 `9ec25e5885ed5cb5…`
+- `research/ic_gpu_e2e_20261113/REPORT.md` — sha256 `3bc11173520ab3e3…`
+- `research/ic_gpu_measure_20261112/results.json` — sha256 `23ddce3bb25d9594…`
+- `research/ic_gpu_measure_20261112/results2.json` — sha256 `e39fadca413cea84…`
+- `docs/perf/20261112-rust-deep-audit.md` — sha256 `e995c613c4a3e50c…`
+- `research/negation_remeasure_20261113/summary.json` — sha256 `34c71b094865a835…`
+- `research/negation_remeasure_20261113/VALIDATION.json` — sha256 `eba6273e3ff0f482…`
+- `research/full_jacobian_ic_20261113/full_jacobian.json` — sha256 `e65114ea8bf019ac…`
+- `research/groebner_free_matched_20261113/SUMMARY.json` — sha256 `c69cfd5628ea8e20…`
+- `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
+- `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
+- `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `1452c4c7672603e5…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `8bab5f869cfde3be…`
+- `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
 - `research/quartic_n4v2_20261020/results/summary.json` — sha256 `a8d6c823f4b90829…`

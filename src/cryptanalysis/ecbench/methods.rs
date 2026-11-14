@@ -1311,6 +1311,22 @@ pub fn registry() -> &'static [MethodDecl] {
             applies: Applies::KoblitzOnly,
             params: KOBLITZ_BATCHED_PARAMS,
         },
+        MethodDecl {
+            id: "ic.koblitz_descent_v2",
+            family: "ic",
+            summary: "ic.koblitz_descent with the current partition-local Top filter layout for folded pair tables; the algorithm and counted group-operation contract are unchanged, while filter false positives and their unpriced bucket reads belong to this versioned identity",
+            entry: "ecbench::koblitz_descent::run_top",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_DESCENT_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.koblitz_batched_v2",
+            family: "ic",
+            summary: "ic.koblitz_batched with the current partition-local Top filter layout for folded pair tables; the algorithm and counted group-operation contract are unchanged, while filter false positives and their unpriced bucket reads belong to this versioned identity",
+            entry: "ecbench::koblitz_batched::run_top",
+            applies: Applies::KoblitzOnly,
+            params: KOBLITZ_BATCHED_PARAMS,
+        },
         // ── `_v2`: the same algorithms under the accounting rules of README
         // §7 "Accounting v2".  The ids above keep the counts they were
         // recorded with; these are the ones to read new work against.
@@ -3055,14 +3071,22 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`{id}` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
         )),
-        Instance::Binary(i) if id == "ic.koblitz_descent" => koblitz_descent_applicable(m, i),
-        _ if id == "ic.koblitz_descent" => Err(format!(
-            "`ic.koblitz_descent` runs on one-word Koblitz curves only; {} is {}",
+        Instance::Binary(i)
+            if matches!(id, "ic.koblitz_descent" | "ic.koblitz_descent_v2") =>
+        {
+            koblitz_descent_applicable(m, i)
+        }
+        _ if matches!(id, "ic.koblitz_descent" | "ic.koblitz_descent_v2") => Err(format!(
+            "`{id}` runs on one-word Koblitz curves only; {} is {}",
             curve.slug, curve.family
         )),
-        Instance::Binary(i) if id == "ic.koblitz_batched" => koblitz_batched_applicable(m, i),
-        _ if id == "ic.koblitz_batched" => Err(format!(
-            "`ic.koblitz_batched` runs on one-word Koblitz curves only; {} is {}",
+        Instance::Binary(i)
+            if matches!(id, "ic.koblitz_batched" | "ic.koblitz_batched_v2") =>
+        {
+            koblitz_batched_applicable(m, i)
+        }
+        _ if matches!(id, "ic.koblitz_batched" | "ic.koblitz_batched_v2") => Err(format!(
+            "`{id}` runs on one-word Koblitz curves only; {} is {}",
             curve.slug, curve.family
         )),
         _ => Ok(()),
@@ -3781,10 +3805,20 @@ fn solve_inner(
         (Instance::Binary(i), _) if m.id == "ic.shared_rank" => {
             solve_shared_rank(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
-        (Instance::Binary(i), _) if m.id == "ic.koblitz_descent" => {
+        (Instance::Binary(i), _)
+            if matches!(
+                m.id.as_str(),
+                "ic.koblitz_descent" | "ic.koblitz_descent_v2"
+            ) =>
+        {
             solve_koblitz_descent(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
-        (Instance::Binary(i), _) if m.id == "ic.koblitz_batched" => {
+        (Instance::Binary(i), _)
+            if matches!(
+                m.id.as_str(),
+                "ic.koblitz_batched" | "ic.koblitz_batched_v2"
+            ) =>
+        {
             solve_koblitz_batched(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _)
@@ -7792,10 +7826,15 @@ fn solve_koblitz_descent(
     let p = KoblitzDescentParams::from_method(&m.params, kc.n, kc.a, seed)?;
     let q = inst.fast.lower(target);
     let started = Instant::now();
-    let out = koblitz_descent::run(kc, &q, &p)?;
+    let top_layout = m.id == "ic.koblitz_descent_v2";
+    let out = if top_layout {
+        koblitz_descent::run_top(kc, &q, &p)?
+    } else {
+        koblitz_descent::run(kc, &q, &p)?
+    };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
-        return Err("ic.koblitz_descent did not run on its one counting thread".into());
+        return Err(format!("{} did not run on its one counting thread", m.id));
     }
     let phases: Vec<PhaseRecord> = out
         .phases
@@ -7873,7 +7912,7 @@ fn solve_koblitz_descent(
         p.seed,
     )?;
     let online = match &out.snapshot {
-        Ok(snap) => koblitz_descent_online(snap),
+        Ok(snap) => koblitz_descent_online(&m.id, snap),
         Err(_) => None,
     };
     let online_error = match (&out.snapshot, &online) {
@@ -7900,7 +7939,7 @@ fn solve_koblitz_descent(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_descent::detail_of(&out, &p),
+        detail: koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout),
         online,
         online_error,
         solver: None,
@@ -7910,8 +7949,8 @@ fn solve_koblitz_descent(
 
 /// The descent's online window from the session the pipeline ran under:
 /// the five claim phases, which sum to the interval.
-fn koblitz_descent_online(snap: &Snapshot) -> Option<OnlineWindow> {
-    let mut w = online_window("ic", "ic.koblitz_descent", snap)?;
+fn koblitz_descent_online(method_id: &str, snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut w = online_window("ic", method_id, snap)?;
     w.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q, the walks' start), after the factor base, pair table and every column log are ready".into();
     w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
     w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
@@ -7934,10 +7973,15 @@ fn solve_koblitz_batched(
     let p = KoblitzBatchedParams::from_method(&m.params, seed)?;
     let q = inst.fast.lower(target);
     let started = Instant::now();
-    let out = koblitz_batched::run(kc, &q, &p)?;
+    let top_layout = m.id == "ic.koblitz_batched_v2";
+    let out = if top_layout {
+        koblitz_batched::run_top(kc, &q, &p)?
+    } else {
+        koblitz_batched::run(kc, &q, &p)?
+    };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
-        return Err("ic.koblitz_batched did not run on its one counting thread".into());
+        return Err(format!("{} did not run on its one counting thread", m.id));
     }
     let phases: Vec<PhaseRecord> = out
         .phases
@@ -8009,7 +8053,7 @@ fn solve_koblitz_batched(
         p.fb_seed,
     )?;
     let online = match &out.snapshot {
-        Ok(snap) => koblitz_batched_online(snap),
+        Ok(snap) => koblitz_batched_online(&m.id, snap),
         Err(_) => None,
     };
     let online_error = match (&out.snapshot, &online) {
@@ -8036,7 +8080,7 @@ fn solve_koblitz_batched(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_batched::detail_of(&out, &p),
+        detail: koblitz_filter_detail(koblitz_batched::detail_of(&out, &p), top_layout),
         online,
         online_error,
         solver: None,
@@ -8046,12 +8090,21 @@ fn solve_koblitz_batched(
 
 /// The batched pipeline's online window: the same interval and phases as
 /// `ic.koblitz_descent`'s, the descent over a solved log table.
-fn koblitz_batched_online(snap: &Snapshot) -> Option<OnlineWindow> {
-    let mut w = online_window("ic", "ic.koblitz_batched", snap)?;
+fn koblitz_batched_online(method_id: &str, snap: &Snapshot) -> Option<OnlineWindow> {
+    let mut w = online_window("ic", method_id, snap)?;
     w.start_event = "the descent's first target-dependent operation ([a0]G + [b]Q, the walks' start), after the factor base, pair table and every column log are ready".into();
     w.stop_event = "[d]G = Q checked inside the descent (one-word arithmetic)".into();
     w.mapping = "one-target descent over a solved log table: building the walks and stepping them by G is target_query, keying each state and probing the pair table is target_PDP, the witness re-check is target_relation_check, combining the column logs into d is target_descent, and the descent's [d]G = Q is target_recovery_check; the relations and logs are target-independent set-up outside the window".into();
     (w.phases_ns.values().sum::<u64>() == w.wall_ns).then_some(w)
+}
+
+/// Add the layout tag only to the new method identities. Historical report
+/// bytes stay unchanged for replay.
+fn koblitz_filter_detail(mut detail: Value, top_layout: bool) -> Value {
+    if top_layout {
+        detail["pair_filter_layout"] = json!("top");
+    }
+    detail
 }
 
 #[cfg(test)]
@@ -8059,7 +8112,7 @@ mod koblitz_batched_tests {
     use super::*;
     use crate::cryptanalysis::ecbench::workload::CurveSpec;
 
-    fn method(batch: &str) -> ResolvedMethod {
+    fn method_with_id(id: &str, batch: &str) -> ResolvedMethod {
         let params: BTreeMap<String, String> = [
             ("factor_base_points", "78"),
             ("batch_trials", batch),
@@ -8069,17 +8122,21 @@ mod koblitz_batched_tests {
         .map(|(k, v)| (k.to_string(), v.to_string()))
         .collect();
         resolve(&MethodSpec {
-            id: "ic.koblitz_batched".into(),
+            id: id.into(),
             params,
         })
         .unwrap()
     }
 
-    fn solve_at(batch: &str, scalar: u64) -> SolveReport {
+    fn method(batch: &str) -> ResolvedMethod {
+        method_with_id("ic.koblitz_batched", batch)
+    }
+
+    fn solve_at_with_id(id: &str, batch: &str, scalar: u64) -> SolveReport {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let inst = spec.build().unwrap();
         let facts = inst.facts(&spec);
-        let m = method(batch);
+        let m = method_with_id(id, batch);
         applicable(&m, &inst, &facts).unwrap();
         let Instance::Binary(bi) = &inst else {
             unreachable!()
@@ -8093,6 +8150,10 @@ mod koblitz_batched_tests {
             3,
         )
         .unwrap()
+    }
+
+    fn solve_at(batch: &str, scalar: u64) -> SolveReport {
+        solve_at_with_id("ic.koblitz_batched", batch, scalar)
     }
 
     #[test]
@@ -8136,6 +8197,14 @@ mod koblitz_batched_tests {
     }
 
     #[test]
+    fn the_v2_top_layout_identity_resolves_and_solves() {
+        let rep = solve_at_with_id("ic.koblitz_batched_v2", "64", 1_234);
+        assert_eq!(rep.recovered, Some(ExactScalar::from(1_234u128)));
+        assert_eq!(rep.detail["pair_filter_layout"], json!("top"));
+        assert!(rep.online.is_some());
+    }
+
+    #[test]
     fn the_worker_limits_are_enforced() {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let inst = spec.build().unwrap();
@@ -8159,7 +8228,7 @@ mod koblitz_descent_tests {
     use super::*;
     use crate::cryptanalysis::ecbench::workload::CurveSpec;
 
-    fn method(explicit: bool) -> ResolvedMethod {
+    fn method_with_id(id: &str, explicit: bool) -> ResolvedMethod {
         let params: BTreeMap<String, String> = if explicit {
             [
                 ("descent_summands", "2"),
@@ -8177,10 +8246,14 @@ mod koblitz_descent_tests {
             BTreeMap::new()
         };
         resolve(&MethodSpec {
-            id: "ic.koblitz_descent".into(),
+            id: id.into(),
             params,
         })
         .unwrap()
+    }
+
+    fn method(explicit: bool) -> ResolvedMethod {
+        method_with_id("ic.koblitz_descent", explicit)
     }
 
     #[test]
@@ -8255,6 +8328,31 @@ mod koblitz_descent_tests {
         assert_eq!(ints(&rep), ints(&again));
         assert_eq!(rep.counters, again.counters);
         assert_eq!(rep.factor_base, again.factor_base);
+    }
+
+    #[test]
+    fn the_v2_top_layout_identity_resolves_and_solves() {
+        let spec = CurveSpec::Koblitz { a: 0, n: 23 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let m = method_with_id("ic.koblitz_descent_v2", true);
+        applicable(&m, &inst, &facts).unwrap();
+        let Instance::Binary(bi) = &inst else {
+            unreachable!()
+        };
+        let scalar = 777_777 % bi.r;
+        let target = bi.fast.mul_u64(bi.generator, scalar);
+        let rep = solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            3,
+        )
+        .unwrap();
+        assert_eq!(rep.recovered, Some(ExactScalar::from(u128::from(scalar))));
+        assert_eq!(rep.detail["pair_filter_layout"], json!("top"));
+        assert!(rep.online.is_some());
     }
 
     #[test]
@@ -10732,7 +10830,9 @@ mod accounting_rules_tests {
             "ic.hyperelliptic_thread", // hyper_ic tests
             "ic.known_log_mitm2_v1",
             "ic.koblitz_batched", // koblitz_batched tests
+            "ic.koblitz_batched_v2",
             "ic.koblitz_descent", // koblitz_descent tests
+            "ic.koblitz_descent_v2",
             "ic.pipeline_wordram",
             "ic.trace_line_2lp",
             "rho.best2_model_v1", // best2_model tests

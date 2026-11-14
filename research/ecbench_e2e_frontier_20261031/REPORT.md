@@ -2,7 +2,7 @@
 title: "The ECBench ECDLP Performance Frontier"
 subtitle: "End-to-end boundary, implementation census, bottlenecks, and the next isolated campaign"
 author: "ECBench frontier audit"
-date: "1 November 2026"
+date: "13 November 2026"
 lang: en-US
 geometry: margin=0.72in
 fontsize: 10pt
@@ -23,7 +23,7 @@ header-includes:
     \pagestyle{fancy}
     \fancyhf{}
     \lhead{ECBench ECDLP frontier}
-    \rhead{2026-11-01}
+    \rhead{2026-11-13}
     \cfoot{\thepage}
     ```
 ---
@@ -94,6 +94,19 @@ clear:
    remains unpromoted because no L2 wall session completed. The new campaign
    therefore uses accounting-v2 rho, a same-target A/A rho control, and also
    measures BSGS and kangaroo where they can be finite-size leaders.
+6. **The 13 November live-source reconciliation changes implementation and
+   bottleneck visibility, not the admitted ECDLP ranking.** The source tree now
+   has 104 top-level ECBench methods and 32 nested algorithms (19 system
+   solvers, nine PDP3 engines, and four PKM-tower engines). Validated
+   `fes-then-batched` work is 0.739--0.889 of inherited F4 at its calibration
+   points but remains 35.24--3,012.56 times matched rho there. GPU FES and
+   prime batched root finding produce large local wall reductions, while their
+   admitted counted-work conclusions are respectively worse and unchanged.
+   The transfer remeasurement has 0/162 rows below rho (156 above, six
+   unresolved lower bounds). The validated multi-target study flips with the
+   price assigned to hash/native work: IC/rho is 1.063--1.159 at $h=0$ and
+   0.713--0.799 at $h=1$, so it is unranked across the required pricing band.
+   None of these observations moves Tables A--C in the canonical leaderboard.
 
 ![Boundary markers. A ratio is meaningful only inside its row's exact domain and unit.](figures/boundary-map.png){width=100%}
 
@@ -114,6 +127,12 @@ files, reproduces 720/720 optimized-rho rows with the current binary, and
 retains a new F4/F5/F6 compatibility failure (72/144 rows reproduce). A pass
 means the versioned evidence statements agree; it does not turn the draft EKS
 campaign into data.
+
+This 13 November refresh also reconciles the later committed component and
+end-to-end diagnostics into the canonical leaderboard and this report. It
+does not retroactively change the frozen 74/11, 78-method, or 79-method
+campaign censuses below; those remain dated descriptions of their exact
+binaries. The current live-source census is stated separately.
 
 # 1 November 78-method snapshot addendum
 
@@ -239,6 +258,52 @@ The machine-readable evidence is the
 and
 [j=1728 comparison](../ecbench_registry_optimization_20261101/execution/prime-orbit-j1728-crosscheck-l0-20261101/comparisons/rho-quartic-reference__orbit-affine-o8-r1_5.json).
 
+## 13 November live-source reconciliation
+
+The live registry now contains **104 top-level method IDs**. The optimization
+surface separately contains **32 nested algorithms**: 19 system-solver
+backends, nine PDP3 engines, and four PKM-tower engines. The system solvers now
+include F4, Buchberger, M4GB client/server, matrix F4/F5, four inherited-F4
+variants, FES-then-inherited, FES-then-batched, Crossbred, XL, SAT-CDCL,
+scalar/GPU/wide FES, and exhaustive search. This is a source census at the
+report date, not an experimental claim and not a rewrite of the frozen binary
+censuses above.
+
+The latest results separate into three evidence classes:
+
+| Workstream | Best observed change | ECDLP/rho reading | Admission |
+|:--|:--|:--|:--|
+| FES then batched elimination | 0.739--0.889 of inherited F4 at the six calibration points | 35.24--3,012.56 times matched rho at those points; strict order against inherited F4 flips or ties inside the pricing band | validator arithmetic agrees; no ranked row |
+| GPU FES kernel | Gray code 18.6--25.8 times old kernel; block-six adds 3.88 times at n=30 and 4.11 times at n=32; about 100 times cumulative at n=30 | GPU FES counted S remains 20,054--3,270,693 times rho in the one-pod E2E probe | `[pcc:unverified]`; component/E2E diagnostic only |
+| Prime root-find batch | counted S unchanged; wall ns/GAE 0.486 [0.468, 0.504], mean solve wall 342.9 to 166.5 ms | no counted-work rank change | `[pcc:unverified]` L0 diagnostic |
+| Rho negation lanes | lanes 8: 1.043 operations, 0.761 E2E wall; lanes 32: 1.149 operations, 0.639 wall | base negation rho wins every $w=0,0.1,1$ decision | `[pcc:unverified]` L0 diagnostic |
+| Transfer/negation remeasurement | 156/162 rows above, six unresolved lower bounds | 0/162 below matched rho | admitted follow-up validation; no crossing |
+| Whole-Jacobian IC | both arms above the band and calibrated price in 7/7 stage-one cells; minimum group-only ratio 17.96 | unresolved because both frozen slope tests fail | `[pcc:unverified]` L0 |
+| Table-free `lin21-ht` | n=41 peak 15.656 MB versus 2,558.132 MB pair-table floor; reaches n=59 at 518.692 MB | online work still 2.89--10.87 times the pair-table floor | `[pcc:unverified]` stage diagnostic |
+
+The validated multi-target prime-field study is a separate target-law domain.
+Across 33 fresh 24--32-bit curves and 3,366 runs, its best IC variant divided
+by the cheapest measured multi-target rho is 1.063--1.159 at zero hash price,
+roughly tied at $h=0.1$, and 0.713--0.799 at $h=1$. Because the ordering flips
+inside the mandatory $h\in\{0,0.1,1\}$ band, every cell is unranked. This is a
+useful boundary: native hash/canonicalization work is large enough to control
+the multi-target order, but there is no price-independent win.
+
+The current folded-pair construction profile localizes the Koblitz setup
+bottleneck. At k0n53, streaming plus sort/fill consumes 26.70 of 34.58
+ns/pair (77.2%); at k0n61 it consumes 26.73 of 35.48 ns/pair (75.4%). A
+paired layout A/B found the current Top filter slower to build than the frozen
+Low filter: Top/Low is 1.104 [1.070, 1.143] at k0n53 and 1.142 [1.098,
+1.165] at k0n61, with zero identity mismatches. To preserve benchmark
+identity, the old `ic.koblitz_descent_v1` and `ic.koblitz_batched_v1` IDs stay
+on Low; explicit `_v2` IDs name Top. This prevents a default change from
+silently mutating historical measurements.
+
+The prime-leads chase remains prospective and inconclusive; it establishes no
+sub-square-root prime result. The canonical generated
+[leaderboard](../../docs/ic/LEADERBOARD.md) carries these diagnostics and
+their source hashes without promoting them into its priced tables.
+
 ## Boundary by domain
 
 | Domain | Current finite boundary | Leader | Evidence reading |
@@ -321,7 +386,8 @@ before execution. The image digest itself is already published and recorded.
 
 # Implementation census
 
-The release binary exposes **74 top-level method IDs**:
+The pinned October release binary used to establish the original campaign
+exposes **74 top-level method IDs**:
 
 | Family | Count |
 |:--|--:|
@@ -331,7 +397,7 @@ The release binary exposes **74 top-level method IDs**:
 | Kangaroo | 2 |
 | Pair-claw | 2 |
 
-The algebraic pipeline separately exposes **11 nested solver backends**:
+That binary's algebraic pipeline separately exposes **11 nested solver backends**:
 `f4-f2`, Buchberger, matrix F4, matrix F5, inherited F4, Crossbred, XL,
 SAT-CDCL, scalar FES, wide FES, and exhaustive search. These are not eleven
 additional top-level ECDLP methods; they are solver choices inside a complete
@@ -348,7 +414,9 @@ primary campaign.
 
 The exact native registry is preserved in [method-registry.json](method-registry.json).
 This prevents “all implementations” from silently meaning only the arms that
-appeared in an older report.
+appeared in an older report. The current live-source count is 104 top-level
+methods and 32 nested algorithms; see the dated reconciliation above. Both
+counts are retained because they describe different exact source states.
 
 # Generic prime-field frontier
 
@@ -639,6 +707,27 @@ universal gate was not cleared on every cell. The fresh all-backend spec keeps
 both implementations, their timeouts, and their native counters, while ranking
 only common E2E outcomes.
 
+The 12 November composition study adds a stronger current-source result.
+`fes-then-batched` is 0.739--0.889 of inherited F4 at the run's six
+calibration points. Across the required native-price band, however, it is
+strictly lower than inherited F4 in no cell: five cells tie at $w=0$, and K13
+is above inherited F4 at $w=0$. Every IC arm remains at least 2.96 times rho
+even at $w=0$; at the calibration points the composed arm is
+35.24--3,012.56 times rho. It is therefore the local composed-solver leader in
+some calibrated cells, but not an E2E ECDLP frontier change.
+
+GPU measurements sharpen the same distinction. Gray-code enumeration reduces
+the old kernel wall by 18.6 times at n=26 and 25.8 times at n=30; block-six
+unrolling adds 3.88 times at n=30 and 4.11 times at n=32. Shared-1024 Macaulay
+storage is about 3.4--4.1 times faster than the old global kernel, while the
+later two-dimensional layout adds only about 1.11 times. In the one-pod E2E
+probe, GPU FES wall is 12.3 times faster than CPU FES at K23 and 44.1 times at
+char2-n25, and 17.7, 10.4, and 23.1 times faster in wall than inherited F4 on
+K23, char2-n25, and char2-n29. Yet its counted S is 9, 53, and 106 times
+inherited F4 and 20,054, 231,367, and 3,270,693 times rho. The probe has no
+independent replay and is `[pcc:unverified]`; wall acceleration cannot promote
+the much larger counted-work algorithm.
+
 ## Crossbred, XL, Buchberger, and exhaustive controls
 
 These backends remain important controls:
@@ -694,6 +783,17 @@ and independently recomputes 1,995,304,985 legacy versus 1,600,543,701
 optimized instructions; the current binary also reproduces all 720 measured
 deterministic rows. The old L0 wall ratio is not promoted.
 
+Two newer L0 diagnostics explore wall-time implementation limits without
+weakening the counted reference. Batched negation walks at eight lanes use
+1.043 [1.028, 1.058] times the base walk's operations but 0.761 [0.735,
+0.788] of its end-to-end wall; 32 lanes use 1.149 [1.100, 1.200] operations
+and 0.639 [0.608, 0.670] wall. The required pricing band ranks the base
+negation walk below both lane variants because their unfinished lanes and
+Montgomery conversions are charged. Prime batched root finding preserves
+every counted S value and measures 0.486 [0.468, 0.504] wall ns/GAE, with
+mean solve wall 342.9 to 166.5 ms. Both studies are `[pcc:unverified]` and L0:
+they identify implementation headroom, not admitted wall rankings.
+
 For the new campaign:
 
 - prime uses `rho.negation_v2` and a byte-identical A/A arm;
@@ -712,6 +812,8 @@ For the new campaign:
 | Relation probability / trials | prime and binary IC gaps grow across several ladders | solver improvements do not change the probability of a useful decomposition | algebraic factor-base constraint inside the system; four-size E2E sweep |
 | Structured factor-base yield | six PFDR lines over three families and 16--32 bits have slope -0.0047 to 0.0068; largest upper 95% limit 0.0147 versus 1/3 | the tested structures do not make useful coincidences grow fast enough | test a new mechanism or integrate the base constraint into a fully priced E2E solver; do not extend these families by default |
 | Factor-base and pair-table setup | 98.7–99.6% of central cold Koblitz rows; $O(|F|^2)$ pair materialization | online-only improvements disappear when one target pays setup | cold primary result; equal-advice online secondary result |
+| Folded-pair construction | streaming plus sort/fill is 75.4--77.2% of 34.6--35.5 ns/pair; Top layout is 1.104--1.142 times Low | representation and movement, not row arithmetic, now dominate this setup kernel | preserve Low IDs; optimize stream/sort path behind new IDs and rerun paired identity A/B |
+| Pair-table memory | table-free `lin21-ht` uses 15.656 MB versus 2,558.132 MB at n=41 and reaches n=59 at 518.692 MB | memory barrier falls, but online work remains 2.89--10.87 times the pair floor and wall slope grows faster | keep the table-free arm for memory-limited cells; change its trial cost before E2E promotion |
 | N83 root-index layout | two independently replayed K1107 pairs favor FP2 by 1.017× and 1.294× whole-process, but shared-host load changes sharply | the fingerprint trades reconstruction work for side-array memory; K1107 does not predict K5500 peak RSS or cost | larger-memory K5500 paired Tier-1 run with matched rho, fixed order policy, and peak-RSS receipt |
 | N83 degree-two image transfer | exact 1+2 fiber labels are $P,[2]P$ and contribute zero independent logarithmic rank | raw upstairs components collapse to a known source-group identity; ambient fallback remains about 70.17 exponent bits above rho | require a mechanism-distinct growing-degree or target-local router and freeze its information-rank model before collection |
 | Tensor contraction separator | exact finite nonzero-minor certificates and the linear-separator implication are proved; production family lemma absent | finite architecture bounds do not establish the rank growth or cover other algorithms | generate a production semantic cut and prove a uniform family lower bound before making an asymptotic claim |
@@ -720,9 +822,10 @@ For the new campaign:
 | Solver-counter mismatch | XORs, conflicts, vector steps, multiply-adds | cross-solver ratios lack semantic equality | E2E wall or complete common pricing; native counters remain diagnostics |
 | Linear algebra | large stage-only speedups, small E2E changes in several pipelines | relation collection and setup dominate | measure phase share before further LA work |
 | Rho reference quality | 19.8% instruction cut; toy BSGS sometimes below rho | a weak reference creates false IC wins | current accounting-v2 rho, A/A, BSGS/kangaroo finite-size controls |
+| Rho lane bookkeeping | lanes reduce L0 wall to 0.761/0.639 but raise work to 1.043/1.149 and lose every pricing-band decision | unused lane tails and Montgomery conversions erase the wall-local gain in counted work | keep base negation rho ranked; optimize persistent Montgomery state and lane retirement, then repeat L2 A/B |
 | Prime algebraic coverage | no complete native prime F4/F5 factor-base-constrained arm | generic root finding cannot answer the algebraic claim | implement and validate a prime algebraic reference arm |
 | Evidence portability | mixed L0/L1 historical wall, one-curve studies | host effects and curve effects are confounded | L2 second host, at least 8 targets, 5 rounds, and 4 sizes |
-| GPU integration | verified 62-bit standalone result, no matched rho | capability result cannot enter the ECBench Pareto set | native adapter, same fixtures, matched reference, isolated clocks |
+| GPU integration | E2E adapter now measures 12--44 times CPU-FES wall reduction, but GPU FES is 20,054--3,270,693 times rho in counted S; one pod/no independent replay | fast kernels accelerate an algorithm whose counted search remains far from rho | independent replay, isolated clocks, and a search/work reduction rather than another kernel-only gain |
 
 The dominant pattern is that improvements are arriving after the point that
 currently controls total cost. Fast root extraction does not fix relation
@@ -851,10 +954,13 @@ The performance frontier is now explicit:
   evidence for Dickson, geometric, and quadratic x-bases through 32 bits; it is
   structural evidence, not an E2E comparison.
 - **Algebraic solvers:** F5 and F6 win component metrics; inherited F4 wins the
-  tested common E2E lower-bound comparison; rho wins the ECDLP comparison.
+  tested common E2E lower-bound comparison; `fes-then-batched` adds a
+  0.739--0.889 calibrated solver-local improvement but is still
+  35.24--3,012.56 times rho there. Rho wins the ECDLP comparison.
 - **SAT/WDSAT/FES:** implemented or historically explored, but not yet on one
   common, validated E2E frontier; WDSAT also carries a retained correctness
-  failure in an old path.
+  failure in an old path. GPU FES produces large kernel and wall gains but
+  much worse counted S, so it remains diagnostic.
 - **Koblitz implementation loop:** the four-byte FP2 N83 root index passes two
   alternating full K1107 replays and is faster in both observed pairs, but
   remains unselected until a stable K5500 Tier-1 comparison prices its added
@@ -867,9 +973,17 @@ The performance frontier is now explicit:
   proof bridge are established; the production-family rank-growth lemma is
   still open, so no ECDLP or leaderboard claim follows.
 - **Root finding:** valuable generic decomposition machinery, not evidence for
-  an algebraic sub-square-root attack.
+  an algebraic sub-square-root attack. Prime batching halves local wall per
+  counted GAE while leaving S unchanged.
 - **Rho:** instruction-level optimization is real and verified; isolated native
-  wall promotion is still open.
+  wall promotion is still open. Lane batching is a wall-local lead but loses
+  counted work and every required pricing-band decision.
+- **Transfers and whole Jacobians:** the admitted remeasurement has no crossing
+  in 162 rows, and the new whole-Jacobian arms are above the band in every
+  stage-one cell while failing their frozen slope rule.
+- **Multi-target domain:** IC/rho flips between $h=0$ and $h=1$; there is no
+  price-independent leader, so this result remains outside the one-target
+  tables and unranked across its own required band.
 
 The highest-value next work is therefore:
 
@@ -879,13 +993,16 @@ The highest-value next work is therefore:
 2. implement the missing prime factor-base-constrained algebraic arm;
 3. attack relation yield and cold setup before further optimizing stages that
    are already a small share;
-4. integrate the GPU relation engine with a matched ECBench reference;
+4. reduce GPU FES counted search work and independently replay the existing
+   matched ECBench adapter before spending another round on kernel-only speed;
 5. run the paired N83 four-byte/FP2 K5500 Tier-1 memory and E2E gate;
 6. specify and information-rank a mechanism-distinct N83 growing-degree or
    target-local router before any collector run;
 7. prove or falsify the production tensor-family rank-growth obligation;
 8. preserve the GHS-weak win as a separate domain rather than using it to
    headline generic curves.
+9. optimize folded-pair streaming and sort/fill behind explicit versioned
+   method IDs; do not silently replace the faster frozen Low layout.
 
 # Reproduction and evidence index
 
@@ -898,7 +1015,18 @@ sources are:
 - [ECBench contract](../../docs/ecbench/README.md);
 - [backend-frontier contract](../../docs/ecbench/BACKEND_FRONTIER.md);
 - [F4/F5/F6 result](../f4_f5_f6_cross_family_20261011/RESULT.md);
+- [FES-then-batched validation](../fes_then_batched_20261112/README.md);
+- [GPU FES end-to-end probe](../ic_gpu_e2e_20261113/REPORT.md) and
+  [GPU component measurements](../ic_gpu_measure_20261112/RESULTS.md);
+- [Rust rho/root-find audit](../../docs/perf/20261112-rust-deep-audit.md);
 - [rho optimization](../ecbench_rho_optimized_20261014/README.md);
+- [transfer/negation remeasurement](../negation_remeasure_20261113/RESULTS.md);
+- [whole-Jacobian IC probe](../full_jacobian_ic_20261113/RESULTS.md);
+- [table-free matched collector](../groebner_free_matched_20261113/ANALYSIS.md);
+- [folded-pair build steps](../ic_tool_program/explorations/build-steps-20261113/README.md)
+  and [filter-layout A/B](../ic_tool_program/explorations/filter-layout-20261113/README.md);
+- [validated multi-target field-operation study](../mt_fieldops_v5_20261112/REPORT.pdf);
+- [prime-leads chase](../prime_leads_chase_20261113/README.md);
 - [prime factor-base second-host replay](../prime_base_oracle_tuning_20261029/second-host/README.md);
 - [PFDR structured-factor-base screen](../pfdr_other_families_20261101/README.md);
 - [N83 four-byte paired root-index replay](../n83_fourbyte_pair_20261027/README.md);
