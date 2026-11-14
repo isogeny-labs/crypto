@@ -1,0 +1,75 @@
+{
+  "schema": "momose-cubic-homography-verification/v1",
+  "source_commit": "d1efcf612db7b627162fc13015304b1b815d56f9",
+  "claim_id": "PCC-20261114-8dd57c",
+  "declaration_sha256": "180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 10,
+  "gate_declarations": 40,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 89,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-8dd57c",
+    "claim_sha256": "6cd1c04b03d6be542edf8f8e24db7414a902c2279994cc6b8c1e8acbac2f843b",
+    "commit": "d1efcf612db7b627162fc13015304b1b815d56f9",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/momose_cubic_homography_audit_20261114/lean (MomoseCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T23:18:14Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-8dd57c",
+    "claim_sha256": "6cd1c04b03d6be542edf8f8e24db7414a902c2279994cc6b8c1e8acbac2f843b",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 48032,
+    "sha256": "5e6f7222f5997d18acefebe9807c26523a962b62c2560e2de3131053c745e63e",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 40,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "source_lemma_one_proved": true,
+    "actual_GL2_PGL_scalar_uniqueness_proved": true,
+    "finite_source_card_and_generator_bridge_proved": true,
+    "source_explicit_matrix_proved": true,
+    "actual_quadratic_negative_control_and_hypothesis_deletion_refutation_proved": true,
+    "qualified_primary_lemma_refuted": false,
+    "whole_cover_classification_density_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

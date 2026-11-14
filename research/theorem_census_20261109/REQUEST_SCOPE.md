@@ -38,6 +38,8 @@ The broader [Vélu Frobenius qualification audit](../velu_frobenius_audit_202611
 
 The broader [HPS2014 primary-paper audit](../hps_first_fall_audit_20261114/README.md) adds actual Fp[X]/X^p counterexamples to the printed general-field rank bound and its upstream positivity lemma, with exact degree/rank/homology/minimum and controls. Original corpus item9 uses the binary q2 specialization: that result and m²+1 remain unrefuted and not fully proved. The new source refutation does not discharge generic-system or solver-runtime obligations. [pcc:unverified]
 
+The broader [Momose–Chao homography audit](../momose_cubic_homography_audit_20261114/README.md) proves the complete sourceLemma1/explicitmatrix with actual finite-field degree/intersection bridges, actualGL2/PGL/unit-scalar uniqueness, and actualF9 quadratic counter-control to deleting the degree hypothesis. The qualified source lemma survives; whole weak-cover classification/isogeny/kernel/density/runtime claims and original14 obligations remain separately open. [pcc:unverified]
+
 The most substantial requested mathematical gaps are general-prime BK and
 supersingular geometry, canonical pairing/MOV–FR constructions, actual
 Jacobian/Picard counting and subgroup bridges, qualified intersection

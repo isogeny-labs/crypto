@@ -1990,3 +1990,34 @@ independent native1complete/0prefix/0unresolved,7custom/10formal-config+
 visually inspected one-page48268byte report. Eleven build snapshots/nine
 failed states/defaulttimeout plus corrected report-count draft retained.
 No nativecrypto/spend/upload. [pcc:unverified]
+
+
+### Momose–Chao: actual cubic homography lemma and degree control
+
+The [Momose cubic homography audit](../research/momose_cubic_homography_audit_20261114/README.md)
+recovers actual primary eprint2005/277 and checks complete sourceLemma1
+and its printed explicit matrix. Full21page extracted text reviewed;
+exactLemma1/PDF6 andLemma3/PDF11 visuallyinspected; glyphlimitations
+outsidecheckedtarget retained, notallformulas/tables verified.
+For actual K,L/algebraembedding/cardK=q²/cardL=q⁶/q≥2,
+derive degree3 and εoutsideK from ε^(q³)=ε/ε^q≠ε.
+Actual cubicgeneration/powerbasis/quadraticindependence yield an actual
+GL2(K) matrix with nonzero denominator sendingε to every targetoutsideK,
+unique in actual MathlibPGL and up to actualunit scalars.
+The printed matrix[a(ar+c)−b²,a²e−bc;a,−b] is verified whenε³=rε+e.
+ActualF9/F3/card9/degree2/a²2/nonbasea has a nonidentityactualPGL
+matrix[0,2;1,0] fixinga, directly refuting uniqueness ifcubicdegree is
+deleted. QualifiedsourceLemma1 is proved/notrefuted; wholecover/
+Jacobian/isogeny/kernel/density/Lemma3–5/classification/runtime claims
+remain open. No zero-witness shortcut for nonzero normalization,
+novelty/canonicalpromotion; historical44snapshot unchanged.
+Exact local **PCC-20261114-8dd57c** PASS at 2026-11-14T23:18:14Z, signedstandingunverified;
+whole40/0/0/full1206-character binding
+`180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a`,
+independent native1complete/0prefix/0unresolved,7custom/10formal-config+
+14artifactpins,89files/45objects/61248-byte losslessXZ/fivegate and
+visuallyinspected one-page48032byte report. Seven snapshots/fourfailed
+buildstates and earlier two-page report draft retained. No nativecrypto/
+spend/upload. DiemoddGHS original33pages retrieved but onlyselectedPDF3
+OCRread duefontissues; separateCoverAttacks2003 onlypages1–10read.
+Those partialsources notpromoted tofullaudits. [pcc:unverified]
