@@ -4,7 +4,7 @@
 
 ## Reviewed dependencies and hypotheses
 
-Read repository \`AGENTS.md\`, the latest Nov. 14 session log, root [PR #3877](https://github.com/isogeny-labs/crypto/pull/3877), stacked [PR #4102](https://github.com/isogeny-labs/crypto/pull/4102), CT94's Frobenius gate and CT100's chord-capacity/rational-five control. Queried GitHub for a CT101 branch or PR (none as of this run), checked the current CT100 exact-head 12 workflow runs (all successful before new edits), and inspected the prior cryptanalysis Richelot and public-target work. Research-KB MCP and its repository wrapper were not available; no absence-of-prior-art or novelty claim follows. Primary documentation checked: [Magma division polynomial definition](https://docs.magma-maths.org/ArithmeticGeometry/EllipticCurves/function_field.html), [Sage finite-field Frobenius polynomial](https://sporadic.stanford.edu/reference/arithmetic_curves/sage/schemes/elliptic_curves/ell_finite_field.html). The classical formulas are not newly discovered here.
+Read repository `AGENTS.md`, the latest Nov. 14 session log, root [PR #3877](https://github.com/isogeny-labs/crypto/pull/3877), stacked [PR #4102](https://github.com/isogeny-labs/crypto/pull/4102), CT94's Frobenius gate and CT100's chord-capacity/rational-five control. Queried GitHub for a CT101 branch or PR (none as of this run), checked the current CT100 exact-head 12 workflow runs (all successful before new edits), and inspected the prior cryptanalysis Richelot and public-target work. Research-KB MCP and its repository wrapper were not available; no absence-of-prior-art or novelty claim follows. Primary documentation checked: [Magma division polynomial definition](https://docs.magma-maths.org/ArithmeticGeometry/EllipticCurves/function_field.html), [Sage finite-field Frobenius polynomial](https://sporadic.stanford.edu/reference/arithmetic_curves/sage/schemes/elliptic_curves/ell_finite_field.html). The classical formulas are not newly discovered here.
 
 Fixed global curve
 
@@ -60,9 +60,9 @@ The **same integral polynomial** modulo two factors exactly as three monic irred
 
 | Factor mask | Explicit polynomial |
 |---|---|
-| \`0x130027\` | \(X^{20}+X^{17}+X^{16}+X^5+X^2+X+1\) |
-| \`0x131203\` | \(X^{20}+X^{17}+X^{16}+X^{12}+X^9+X+1\) |
-| \`0x131211\` | \(X^{20}+X^{17}+X^{16}+X^{12}+X^9+X^4+1\) |
+| `0x130027` | \(X^{20}+X^{17}+X^{16}+X^5+X^2+X+1\) |
+| `0x131203` | \(X^{20}+X^{17}+X^{16}+X^{12}+X^9+X+1\) |
+| `0x131211` | \(X^{20}+X^{17}+X^{16}+X^{12}+X^9+X^4+1\) |
 
 The programs multiply the factors back to the exact mod-two division polynomial, and check each factor's irreducibility with Rabin's finite-field criterion: \(X^{2^{20}}\equiv X\) and the required gcd checks at exponents \(2^4\) and \(2^{10}\) give one. The factors are squarefree, so the complete binary x-field pattern is \(20^3\).
 
@@ -88,12 +88,12 @@ This does **not** compute the special target point corresponding to a particular
 
 Files:
 
-- \`ct101_eleven_torsion.py\`: exact integer \(\psi_{11}\), modular polynomial gcd/Frobenius, carryless binary polynomials, \(\mathbb F_{2^{20}}\) arithmetic, quadratic oriented extension, 363 binary ordered group-law checks and source order-11 fixture.
-- \`ct101_eleven_independent.js\`: independently coded F59 polynomial recurrence and group law; BigInt bit-polynomial Rabin tests; separate 20-bit carryless field arithmetic, trace, 363 ordered group laws and 120 Frobenius point controls. The two programs do not borrow one another's calculation routines.
+- `ct101_eleven_torsion.py`: exact integer \(\psi_{11}\), modular polynomial gcd/Frobenius, carryless binary polynomials, \(\mathbb F_{2^{20}}\) arithmetic, quadratic oriented extension, 363 binary ordered group-law checks and source order-11 fixture.
+- `ct101_eleven_independent.js`: independently coded F59 polynomial recurrence and group law; BigInt bit-polynomial Rabin tests; separate 20-bit carryless field arithmetic, trace, 363 ordered group laws and 120 Frobenius point controls. The two programs do not borrow one another's calculation routines.
 
 From repository root:
 
-\`\`\`sh
+```sh
 D=research/cross_characteristic_global_torsion_20261112/ct101
 python3 -B "$D/ct101_eleven_torsion.py" >/tmp/ct101-py.json
 python3 -O -B "$D/ct101_eleven_torsion.py" >/tmp/ct101-pyopt.json
@@ -103,15 +103,15 @@ cmp /tmp/ct101-py.json /tmp/ct101-pyopt.json
 cmp /tmp/ct101-py.json /tmp/ct101-js.json
 cmp /tmp/ct101-py.json /tmp/ct101-jsopt.json
 sha256sum /tmp/ct101-py.json
-\`\`\`
+```
 
 Locally, all four modes produced byte-identical JSON with SHA-256
-\`b02f900029347e23300a6871cde8dbe35f4a2f497bcdfd9024bad93abeedc082\`.
+`b02f900029347e23300a6871cde8dbe35f4a2f497bcdfd9024bad93abeedc082`.
 The repository-scoped exact-head CI run is a *separate* required check after commit. These are independent finite-field implementations, **not** independent global number-field lifting or signed scientific PCC.
 
 ## Exact cost and remaining transfer obligations
 
-The output is a finite-field representation feasibility certificate. No globally compatible oriented root is recognized from an arbitrary encoded source point. It charges no relation collection, coefficient-height search, number-field field-defining polynomial construction, or cold target DLP; therefore it is **not** a complete-cost benchmark. The four-way output explicitly sets \`cross_characteristic_lift_evaluated=false\`.
+The output is a finite-field representation feasibility certificate. No globally compatible oriented root is recognized from an arbitrary encoded source point. It charges no relation collection, coefficient-height search, number-field field-defining polynomial construction, or cold target DLP; therefore it is **not** a complete-cost benchmark. The four-way output explicitly sets `cross_characteristic_lift_evaluated=false`.
 
 The next gate is to construct and certify the degree-60 global x-point algebra for \(\ell=11\), select a *fixed* degree-one prime above 59 and a *fixed* target prime over 2 in the same algebra, then build an **input-scalar-independent** exact global root witness and oriented reduction. Factor masks and 40-degree arithmetic supplied here are necessary target prerequisites, not a substitute. The full cold comparison must include those number-field costs and an actual same-input target DLP against optimized source BSGS/rho and the admitted index-calculus baseline.
 
