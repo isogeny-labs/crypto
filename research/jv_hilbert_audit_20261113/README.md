@@ -106,3 +106,26 @@ retained attempts are recorded in the evidence packet. Sources checked
 include the original printed equations and the prior actual ideal,
 cubic normal-form and source-field proofs. No novelty claim.
 [pcc:unverified]
+
+## Additive canonical graded-piece identification
+
+The [canonical JV graded-piece proof](../jv_graded_hilbert_audit_20261114/README.md)
+closes the prior finite per-degree identification gap. For the unchanged
+literal homogeneous F101 source ideal I, Lean proves actual ideal
+homogeneity and that the kernel of the actual quotient map restricted
+to Mathlib P_d is exactly I∩P_d. The canonical piece P_d/(I∩P_d) is
+linearly equivalent to the actual image, which is proved equal to the
+matching-degree span of the inherited actual quotient basis. Matrix-degree
+propagation and monomial/homogeneous induction derive that equality;
+no grading/Hilbert/GB/regularity/native result is a premise. Exact canonical
+piece dimensions are1,3,3,1,0 thereafter, zero iff d≥4. Total scalar
+dimension/length8 remain distinct, with a direct HF0≠totaldim control.
+This does not prove internal F4 degrees, generic JV/FGHR claims or a
+general graded-module Hilbert polynomial theorem. Exact local **PCC-20261114-aec576**
+replay PASS at 2026-11-14T16:06:12Z, signed standing unverified; whole26/0/0,
+complete712-character binding`288fa232f61b729eee2a64e17f2741efcf7c144c019684d0bc676e5fcd2db8b6`,
+independent native1full/0prefix/0unresolved;11custom/20formal-config+
+14artifact pins,62provenance files/32objects/11452-byte lossless XZ/
+fivegate/inspected onepagePDF47096bytes. Four failed states retained.
+Original sources/claims untouched; generic/larger/internalF4/wholecurve
+and remaining original14 gaps stay open. [pcc:unverified]

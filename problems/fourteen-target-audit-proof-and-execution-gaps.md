@@ -340,7 +340,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual length/support/native16/JV8; literal F2torus-helper disproof/point-chart repair (31); generic actual solution/quotient-map equivalence and finite scalar-length bound, unbounded actual bivariate nilpotent family with m0/m1/domain controls (44) | General n!dⁿ/decomposition node unrefuted; scheme-cycle/local multiplicity, isolated points in positive-dimensional components, projective geometry and Rojas/C runtime/refinement |
-| 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
+| 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 Canonical actual P_d/(I∩P_d) Hilbert function now proved1/3/3/1/0, zeroiffd≥4, actual idealhomogeneity/kernel/image/basis-span bridge and HF0≠totaldim control; generic/internalF4 remain open. [pcc:unverified] | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
 | 10 Rho walks | Partial overall; qualified expected-support/uniform quadratic mixing components closed. Actual product-PMF in-degree mean/variance and finite collision populations, plus unbounded-prime fixed-support collision obstruction. Qualified HildebrandTheorem2 uniform quadratic mixing and Theorem1 expected random-support exponent now proved for all fixed k>=2/strict positive normalized weights/prime moduli, actual iid walk laws. Theorem1 retains full uniform ordered-distinct-support PMF, exact floor(gamma*p^(2/(k-1))), constants before modulus/support and all starts; finite Fourier/Gaussian/without-replacement/denominator bridges derived. Zero-weight all-support expected distance>=1/2 for all primes/times and direct no-gamma/N negation. Known literal k2 counting and Gaussian equality errors have valid repairs; no qualified theorem refuted. See ../random_support_average_audit_20261114/README.md and ../rho_collision_audit_20261110. Static rho/random-table collision penalty and limiting constants remain open. [pcc:unverified] | Static-rho random-table collision penalty and limiting constants; full original item10 remains partial |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
@@ -1669,3 +1669,26 @@ independent native full-header1complete/0prefix/0unresolved;3custom modules/
 lossless XZ archive/fivegate/inspected onepagePDF46954bytes. All failed
 buildstates retained; original14/general source bridges remain open.
 [pcc:unverified]
+
+### Canonical literal JV graded-piece dimensions identified
+
+The [canonical JV graded-piece proof](../research/jv_graded_hilbert_audit_20261114/README.md)
+closes the prior finite per-degree identification gap. For the unchanged
+literal homogeneous F101 source ideal I, Lean proves actual ideal
+homogeneity and that the kernel of the actual quotient map restricted
+to Mathlib P_d is exactly I∩P_d. The canonical piece P_d/(I∩P_d) is
+linearly equivalent to the actual image, which is proved equal to the
+matching-degree span of the inherited actual quotient basis. Matrix-degree
+propagation and monomial/homogeneous induction derive that equality;
+no grading/Hilbert/GB/regularity/native result is a premise. Exact canonical
+piece dimensions are1,3,3,1,0 thereafter, zero iff d≥4. Total scalar
+dimension/length8 remain distinct, with a direct HF0≠totaldim control.
+This does not prove internal F4 degrees, generic JV/FGHR claims or a
+general graded-module Hilbert polynomial theorem. Exact local **PCC-20261114-aec576**
+replay PASS at 2026-11-14T16:06:12Z, signed standing unverified; whole26/0/0,
+complete712-character binding`288fa232f61b729eee2a64e17f2741efcf7c144c019684d0bc676e5fcd2db8b6`,
+independent native1full/0prefix/0unresolved;11custom/20formal-config+
+14artifact pins,62provenance files/32objects/11452-byte lossless XZ/
+fivegate/inspected onepagePDF47096bytes. Four failed states retained.
+Original sources/claims untouched; generic/larger/internalF4/wholecurve
+and remaining original14 gaps stay open. [pcc:unverified]
