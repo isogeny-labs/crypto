@@ -74,6 +74,15 @@ frozen matched protocol, the same instances and host for every solver, the
 repository's strongest applicable reference, and its normal benchmark and
 validation gates.
 
+The production adapter sends SMT-LIB to Primo on standard input and observes
+child completion every 250 microseconds. `primo-smt-file` retains the previous
+temporary-file transport and 5 ms polling interval as a matched benchmark
+control; it is not a second solving algorithm or the recommended production
+route. Both adapters report full adapter wall time (encoding, transport,
+process, parsing, and model checking) plus the solver-process interval and
+transport settings in `cost.extra`. These implementation facts do not by
+themselves establish a speedup.
+
 For a solver-stage diagnostic on identical seeded systems:
 
 ```sh
@@ -117,8 +126,9 @@ SMT_PRIMO_BIN="$PWD/.tools/primo/bin/primo" \
   cargo test --release cryptanalysis::ic_framework::solvers::tests::primo_smt_
 ```
 
-It checks both a satisfiable Boolean system and a contradictory one through
-the `SystemSolver` contract.
+It checks both transport paths on a satisfiable Boolean system and a
+contradictory one, requiring the same model and deterministic solver counters
+under the `SystemSolver` contract.
 
 ## Sources checked
 
