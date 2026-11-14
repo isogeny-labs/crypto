@@ -90,3 +90,53 @@ skipped, and the only remaining use of delta is class-pruning candidate pairs (a
 effect on F4 cost unmeasured). "digits", "square-bits" and "edwards-bits" remain untested.
 No figure or PDF (matplotlib is not installed here), no cost claim, no matched rho.
 Everything here is [pcc:unverified].
+
+## The remaining bases (PROTOCOL_other_bases.md, frozen at `a579737e0f` before its data)
+
+[`classify_other_bases.py`](classify_other_bases.py), output `other_bases.out.txt`. Same miniature,
+delta = chi(x_M); "too few" means fewer than 8 on-curve abscissae, which cannot count either way.
+
+| base | cell | on-curve | class +1 | class −1 | verdict |
+|---|---|---|---|---|---|
+| square-bits | lo = 0, t = 4 / 5 / 6 | 11 / 20 / 35 | all | 0 | **fixed class (+1)** |
+| square-bits | lo = 984071, t = 4; lo = 414271, t = 5 | 14; 22 | all | 0 | **fixed class (+1)** |
+| edwards-bits | t = 4 / 5 / 6 | 7 / 14 / 29 | 3 / 9 / 15 | 4 / 5 / 14 | too few / mixed / mixed |
+| t0-bits | lo = 0, t = 4 / 5 / 6 | 6 / 14 / 32 | 4 / 10 / 18 | 2 / 4 / 14 | too few / mixed / mixed |
+| digits | `0:1;2;4;8;16` | 11 | 4 | 7 | mixed |
+| digits | `113971:289589;761384;273167;963514;602728` | 22 | 19 | 3 | mixed (14% minority) |
+| digits | `51134:293482;1015139;374525;914144;700453;505371` | 43 | 36 | 7 | mixed (16% minority) |
+
+- **square-bits is the fixed-class base**, by construction (x_M = w²). Supplementary t = 9, lo = 0:
+  510 base points; 197 hits over 200 targets × 8 lifts, **all on lifts with delta(R+K) = +1 and none
+  on the four lifts with delta = −1**. So for this base exactly half of the 8 lifts are provably dead.
+  I read the oracle only partly; the code I saw skips lifts whose abscissa was already tried and
+  I did not find a class-based skip. That is a reading of the code, not an established absence.
+- The two selected digit sets lean toward class +1 (86% and 84%). They were chosen for coverage on
+  the even cosets, and the parent study notes that frame selection "already puts the coverage on
+  coset 0"; class +1 is the even half of the group. So selection may already capture much of the
+  effect, without an explicit class filter. This is consistent with, not a test of, that note.
+- edwards-bits and t0-bits are mixed where the cell is large enough. In t0-bits z and 1/z share a class
+  (translation by the 2-torsion point multiplies the class by B = 1), so classes come in pairs.
+
+## Correction: this mechanism is not new to the repository
+
+My earlier notes presented the 2-isogeny descent class as a finding. It is lever T2 of
+[`research/curve25519_torsion_leads_20261103`](../curve25519_torsion_leads_20261103/README.md): the
+`square-bits` base (x = w² + A/3) was built so that every base point lies in 2E(F_p), tested on five
+miniatures with 0 odd-coset points, and measured in the F4 engine: coverage about 2×, but F4
+mul-adds per relation 1.28× (t = 4) to 1.71× (t = 5) higher, "T2 is closed in its bit-encoded F4
+form". My first search for the idea listed a 2026-11-03 session log that I did not open; I should
+have. What my notes add is small:
+
+- a derivation of why the class is constant on a line through the 2-torsion abscissa, and the
+  trace-zero toy fields where it explains the b = 0 deficit;
+- a check that the other repository bases are mixed, so the lift filter applies to `square-bits` only;
+- the value delta(P) = chi(x_M(P)) is one Legendre symbol per base point, whereas the parent study
+  prices frame selection with [r]P per column. Whether a one-bit class label is enough for its
+  selection (its labels are full cosets in Z/8) is not tested here, and no saving is claimed.
+
+Correction to a detail in the toy-test and miniature scripts: the class of (0,0) on y² = x(x²+Ax+B) is
+B mod squares, which is +1 here; `descent_class.py` used chi(A²−4) at x = 0, a point no base
+contains, so no result changes.
+
+No cost claim, no matched rho, no figure or PDF (matplotlib missing). All of it [pcc:unverified].

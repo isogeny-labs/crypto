@@ -5,7 +5,7 @@
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 154,
+    "measured": 155,
     "open": 0
   },
   "repo": "crypto",
@@ -6308,6 +6308,60 @@
           "spread": null,
           "summary": "c_D sweep: 1.7 and 1.8 robust DL improvements at k=18..22 (1.7: 0.73-0.75 additions free, 0.87-0.88 at 1 M-eq, CPU 0.72-0.91); 1.55 not robust; D dearer at every c_D < 2. Local, unvalidated.",
           "value": 0.999
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.851,
+      "latest": 0.851,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd170_chain_over_cd200_k22_wadd1",
+      "points": [
+        {
+          "commit": "a595db838d07",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T0413Z-quartic-dl1-cd17-chain",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D=1.7 + sqrt chain: robust DL improvement at k=18..22 (0.68-0.74 additions free, 0.85-0.88 at 1 M-eq, CPU 0.80-0.91); chain adds 0.6-6.5% counted, no CPU gain; D dearer. Local, unvalidated.",
+          "value": 0.851
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.681,
+      "latest": 0.681,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd170_chain_over_cd200_k22",
+      "points": [
+        {
+          "commit": "a595db838d07",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T0413Z-quartic-dl1-cd17-chain",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D=1.7 + sqrt chain: robust DL improvement at k=18..22 (0.68-0.74 additions free, 0.85-0.88 at 1 M-eq, CPU 0.80-0.91); chain adds 0.6-6.5% counted, no CPU gain; D dearer. Local, unvalidated.",
+          "value": 0.681
         }
       ],
       "problem": "ic:ghs-weak-quartic-dl-k12-22",
