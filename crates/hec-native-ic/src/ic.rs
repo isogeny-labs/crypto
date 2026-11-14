@@ -23,6 +23,7 @@ pub struct IcParams {
     pub extra_relations: usize,
     pub max_trials: u64,
     pub solver: Solver,
+    pub reference_oracle: bool,
     pub seed: u64,
 }
 
@@ -37,6 +38,7 @@ impl Default for IcParams {
             max_trials: 50_000_000,
             seed: 20260916,
             solver: Solver::default(),
+            reference_oracle: false,
         }
     }
 }
@@ -133,7 +135,11 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
         let t2 = Instant::now();
         rep.walk_ns += (t2 - t).as_nanos();
 
-        let roots = split(&r.u, fp, &mut rep.oracle);
+        let roots = if params.reference_oracle {
+            crate::oracle::split_reference(&r.u, fp, &mut rep.oracle)
+        } else {
+            split(&r.u, fp, &mut rep.oracle)
+        };
         let t3 = Instant::now();
         rep.oracle_ns += (t3 - t2).as_nanos();
         let Some(roots) = roots else {
@@ -184,7 +190,11 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
         if rows.len() >= wanted {
             let t = Instant::now();
             rep.solve_rounds += 1;
-            let k = solve_for_last(&rows, m, ell, params.solver, &mut rep.solve);
+            let k = if params.solver == Solver::Hybrid {
+                crate::hybrid::solve(&rows, m, ell, &steps, &mut rep.solve)
+            } else {
+                solve_for_last(&rows, m, ell, params.solver, &mut rep.solve)
+            };
             rep.solve_ns += t.elapsed().as_nanos();
             if let Some(k) = k {
                 if curve.mul(d1, k) == *d2 {
@@ -219,6 +229,41 @@ mod tests {
                 };
                 let rep = solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params);
                 assert_eq!(rep.k, Some(k_true), "g={g} p={p} seed={seed}");
+            }
+        }
+    }
+
+    #[test]
+    fn hybrid_all_round_eight_rows() {
+        for (g, p) in [
+            (2, 101),
+            (2, 251),
+            (2, 503),
+            (2, 1009),
+            (2, 2003),
+            (2, 4001),
+            (3, 61),
+            (3, 211),
+            (3, 401),
+            (4, 31),
+            (4, 61),
+        ] {
+            let i = pick_instance(p, g).unwrap();
+            let k = i.ell / 3 + 7;
+            let target = i.curve.mul(&i.d1, k);
+            for s in 0..5 {
+                let r = solve_dlp(
+                    &i.curve,
+                    &i.d1,
+                    &target,
+                    i.ell,
+                    &IcParams {
+                        seed: 20260916 + s,
+                        solver: Solver::Hybrid,
+                        ..IcParams::default()
+                    },
+                );
+                assert_eq!(r.k, Some(k), "g={g} p={p} seed={s}");
             }
         }
     }

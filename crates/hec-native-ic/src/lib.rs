@@ -11,9 +11,11 @@
 //! Every discrete logarithm this crate returns has been checked (`k·D₁ = D₂`).
 
 pub mod fp;
+pub mod hybrid;
 pub mod ic;
 pub mod instance;
 pub mod jac;
+pub mod large_prime;
 pub mod oracle;
 pub mod poly;
 pub mod rng;

@@ -35,6 +35,8 @@ pub enum Solver {
     /// list for `k`, merge buffers reused.
     #[default]
     Fast,
+    /// Sparse elimination followed by a dense block (caller supplies hot columns).
+    Hybrid,
 }
 
 #[inline]
@@ -52,6 +54,7 @@ pub fn solve_for_last(
     match solver {
         Solver::Reference => solve_reference(rows, m, ell, stats),
         Solver::Fast => solve_fast(rows, m, ell, stats),
+        Solver::Hybrid => crate::hybrid::solve(rows, m, ell, &[], stats),
     }
 }
 

@@ -49,6 +49,15 @@ pub struct OracleStats {
 
 /// `Some(roots)` iff `u` splits completely (sorted by root).
 pub fn split(u: &Poly, fp: &Fp, stats: &mut OracleStats) -> Option<Roots> {
+    split_impl(u, fp, stats, true)
+}
+
+/// Original oracle retained for exactness comparisons.
+pub fn split_reference(u: &Poly, fp: &Fp, stats: &mut OracleStats) -> Option<Roots> {
+    split_impl(u, fp, stats, false)
+}
+
+fn split_impl(u: &Poly, fp: &Fp, stats: &mut OracleStats, direct: bool) -> Option<Roots> {
     stats.calls += 1;
     debug_assert_eq!(u.lc(), 1);
     let d = u.deg();
@@ -90,7 +99,14 @@ pub fn split(u: &Poly, fp: &Fp, stats: &mut OracleStats) -> Option<Roots> {
     }
     stats.frobenius += 1;
     let xp = Poly::x().powmod(fp.p, u, fp);
-    let w = Poly::gcd(u, &xp.sub(&Poly::x(), fp), fp);
+    let w = if direct && disc != 0 {
+        if xp != Poly::x() {
+            return None;
+        }
+        *u
+    } else {
+        Poly::gcd(u, &xp.sub(&Poly::x(), fp), fp)
+    };
     if disc != 0 && w.deg() < d {
         return None;
     }
@@ -101,6 +117,14 @@ pub fn split(u: &Poly, fp: &Fp, stats: &mut OracleStats) -> Option<Roots> {
     let mut roots = [0u64; 4];
     let mut nr = 0usize;
     edf(&w, fp, &mut roots, &mut nr);
+    if direct && disc != 0 {
+        for &x0 in &roots[..nr] {
+            out.push(x0, 1);
+        }
+        out.sort();
+        stats.smooth += 1;
+        return Some(out);
+    }
     let mut rest = *u;
     let mut total = 0isize;
     for &x0 in &roots[..nr] {
@@ -208,6 +232,11 @@ mod tests {
                     let splits = rest.deg() == 0;
                     let mut st = OracleStats::default();
                     let got = split(&u, &fp, &mut st);
+                    assert_eq!(
+                        got,
+                        split_reference(&u, &fp, &mut OracleStats::default()),
+                        "p={p} u={cs:?}"
+                    );
                     assert_eq!(got.is_some(), splits, "p={p} u={:?}", &cs);
                     if let Some(r) = got {
                         assert_eq!(r.as_slice(), &bf[..], "p={p} u={:?}", &cs);
