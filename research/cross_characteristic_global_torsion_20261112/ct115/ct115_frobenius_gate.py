@@ -111,12 +111,15 @@ check(scalar(11,P) is None and all(scalar(i,P) is not None for i in range(1,11))
 
 points=[scalar(i,P) for i in range(1,11)]
 check(len(set(points))==10,'ten unique oriented points')
+check(len({Q[0] for Q in points})==5,'five Kummer x classes')
 for i,V in enumerate(points,1):
     check(on_curve(V),'multiple on curve')
     check(frob(V,4)==scalar(7,V),'Frob4=[7]')
     check(frob(V,20)==neg(V),'Frob20=-1')
     check(frob(V,40)==V,'Frob40=1')
     check(frob(V,20)[0]==V[0] and frob(V,20)[1]!=V[1],'x in 2^20, y outside')
+    check(all(frob(V,d)[0]!=V[0] for d in range(1,20)),'x exact degree20')
+    check(len({frob(V,4*j)[0] for j in range(5)})==5,'x Frobenius-four cycle')
     check(all(frob(V,d)!=V for d in range(1,40)),'no smaller oriented field')
 for i in range(1,11):
     for j in range(1,11):
@@ -143,6 +146,8 @@ print(json.dumps({
     'fixed_vector_counts_first_39':[1]*39,'fixed_vector_count_at_40':121,
     'frobenius_4_scalar_mod_11':7,'frobenius_20_scalar_mod_11':10,
     'nonzero_target_subgroup_checked':10,'group_law_pairs_checked':100,
+    'kummer_x_classes':5,'kummer_x_orbit_length_under_frob4':5,
+    'kummer_x_residue_degree':20,
     'hom_constant_z11_into_11_torsion_over_f2_20':1,
     'hom_constant_z11_into_11_torsion_over_f2_40':121,
     'hom_constant_z11_into_fixed_cyclic_target_over_f2_40':11,
