@@ -1312,7 +1312,7 @@ fn main() -> Result<()> {
             println!("{receipt}");
         },
         Some("primary-k2048-m5-xcnf")=>{
-            if args.len()!=5 { return Err("primary-k2048-m5-xcnf positive|natural BASE_DIR NEW_OUTPUT_JSON (source-bound K2048 five-summand XCNF export only)".into()); }
+            if args.len()!=5 { return Err("primary-k2048-m5-xcnf positive|positive-unpinned|natural BASE_DIR NEW_OUTPUT_JSON (source-bound K2048 five-summand XCNF export only)".into()); }
             let receipt=primary_adapter::k2048_m5_xcnf_cli(
                 &args[2],Path::new(&args[3]),Path::new(&args[4]))?;
             println!("{receipt}");
