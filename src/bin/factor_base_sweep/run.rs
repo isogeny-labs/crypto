@@ -65,8 +65,12 @@ impl Log {
     pub fn event(&mut self, candidate: Option<&str>, event: &str, data: Value) -> Result<()> {
         self.sequence += 1;
         let record = json!({"schema":"factor_base_sweep.event/v1","sequence":self.sequence,"unix_ms":SystemTime::now().duration_since(UNIX_EPOCH).map_err(|e|e.to_string())?.as_millis(),"candidate":candidate,"event":event,"data":data});
-        serde_json::to_writer(&mut self.file, &record).map_err(|e| e.to_string())?;
-        writeln!(self.file)
+        // One write per event: the record and its newline go out together, so a supervisor
+        // killed between events never leaves a partial final line (which `open` refuses).
+        let mut line = serde_json::to_vec(&record).map_err(|e| e.to_string())?;
+        line.push(b'\n');
+        self.file
+            .write_all(&line)
             .and_then(|_| self.file.flush())
             .map_err(|e| e.to_string())?;
         if self.json {

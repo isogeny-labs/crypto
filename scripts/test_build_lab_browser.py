@@ -22,6 +22,9 @@ class RepositoryInputsTests(unittest.TestCase):
         (self.root / "tracked" / "nested").mkdir()
         (self.root / "tracked" / "off.json").write_text('{"source":"head"}\n', encoding="utf-8")
         (self.root / "tracked" / "live.json").write_text('{"source":"old"}\n', encoding="utf-8")
+        (self.root / "tracked" / "deleted.json").write_text(
+            '{"source":"deleted"}\n', encoding="utf-8"
+        )
         (self.root / "tracked" / "nested" / "inside.json").write_text(
             '{"source":"nested"}\n', encoding="utf-8"
         )
@@ -30,6 +33,7 @@ class RepositoryInputsTests(unittest.TestCase):
         self.off_oid = self.git("rev-parse", "HEAD:tracked/off.json", capture=True).strip()
         self.git("update-index", "--skip-worktree", "tracked/off.json")
         os.unlink(self.root / "tracked" / "off.json")
+        os.unlink(self.root / "tracked" / "deleted.json")
         (self.root / "tracked" / "live.json").write_text('{"source":"worktree"}\n', encoding="utf-8")
         (self.root / "tracked" / "untracked.json").write_text(
             '{"source":"untracked"}\n', encoding="utf-8"
@@ -58,6 +62,10 @@ class RepositoryInputsTests(unittest.TestCase):
             source.glob_files("tracked/*.json"),
             ["tracked/live.json", "tracked/off.json"],
         )
+        self.assertEqual(
+            source.glob_files("tracked/**/*.json"),
+            ["tracked/live.json", "tracked/nested/inside.json", "tracked/off.json"],
+        )
         self.assertEqual(source.read_text("tracked/off.json"), '{"source":"head"}\n')
         self.assertEqual(source.read_text("tracked/live.json"), '{"source":"worktree"}\n')
         self.assertEqual(source.size("tracked/off.json"), 18)
@@ -80,6 +88,11 @@ class RepositoryInputsTests(unittest.TestCase):
         self.assertTrue(
             browser._glob_match("tracked/.hidden.json", "tracked/.hidden.json")
         )
+        self.assertTrue(browser._glob_match("tracked", "tracked/**"))
+        self.assertTrue(browser._glob_match("tracked/nested", "tracked/**"))
+        self.assertTrue(browser._glob_match("tracked/nested/inside.json", "**/*.json"))
+        self.assertFalse(browser._glob_match("tracked/.hidden", "tracked/**"))
+        self.assertFalse(browser._glob_match("tracked/.hidden/inside.json", "**/*.json"))
 
     def test_missing_sparse_blob_fails_closed_with_its_path(self):
         source = browser.RepositoryInputs(str(self.root))

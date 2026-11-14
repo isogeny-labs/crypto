@@ -1,6 +1,6 @@
 # The §5a pricing band cannot show a known index-calculus win at lab sizes
 
-- **Status:** `open` (rule amended 2026-11-12; ecbench `band.rs` support pending)
+- **Status:** `open` (rule amended 2026-11-12; ecbench `band.rs` support implemented 2026-11-13, `research/band_wcal_20261113/NOTE.md`)
 - **Kind:** methodology gap (pricing calibration)
 - **Affected work:** every cross-method ECDLP comparison priced by AGENTS §5a
   at 0.1 and 1 GAE per native operation; `research/ic_positive_control_20261112/`

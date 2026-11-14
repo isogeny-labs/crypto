@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:47:53Z",
+ "id": "PCC-20261114-68c109",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e3f20752022a341a4612e6a72e8e5690f8c6baa",
+  "model": "",
+  "session": "norm-split-base-descent-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1c2164e4a18dcd5ddd6b395611accb8051605d0990dc5bfeceb030f5093bda5b",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormSplitBaseDescent.frobeniusFixedIff"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration/context: Field L; prime p and CharP for Frobenius descent; explicitly fixed public abscissas and public square roots; actual monic norm divisor of public nodal polynomial; pole degree window proved, selected support and successful signs derived. Actual chart uses target outside base and computed support remainder0. DecidableEq on finite-set insertion helper, classically supplied by caller. General arbitrary-arity rigidity versus fixed degree5 actual specialization distinguished. No successful finder algorithm, coverage/retry, weighted closure/normal form or sub-exponential expected bit-cost theorem. Unsigned, fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormSplitBaseDescent.frobeniusFixedIff: theorem frobeniusFixedIff (P : L[X]) : P.map (frobenius L p)=P \u2194 \u2200 j, P.coeff j\u2208(\u22a5 : Subfield L)"
+}

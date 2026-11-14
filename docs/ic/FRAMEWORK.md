@@ -781,7 +781,10 @@ configurations or a **matrix** whose product is taken.
   refused with an error that names the `;`, not read as `divisor=1`.
 - The keys are the stages: `factor_base`, `oracle`, `targets`,
   `solver` (for `descent-algebraic`) and `linalg`. A key left out takes
-  the command line's value.
+  the command line's value. When neither names a solver,
+  `descent-algebraic` runs `fes-then-batched` (`fes-f2` up to 14 unknowns,
+  `inherited-f4-batched` above; `solvers::DEFAULT_DESCENT_SOLVER`, since
+  2026-11-13); before, it refused to run.
 - `configurations` takes an explicit list instead of, or as well as, a
   matrix — the way to put a reference row (the pair-table oracle on the
   same base) beside a matrix of candidates.

@@ -1,0 +1,311 @@
+{
+  "schema": "norm.membership-elimination-query-review/v1",
+  "repositories": [
+    "isogeny-labs/crypto",
+    "isogeny-labs/cryptanalysis",
+    "isogeny-labs/ml-cryptanalysis",
+    "isogeny-labs/cryptanalysis-rl",
+    "isogeny-labs/ecbench"
+  ],
+  "kb": "unavailable; no MCP or executable wrapper",
+  "standing": "unsigned producer source-review receipt",
+  "limitations": "Multiword hits may be token matches; revisions vary. Bounded review, not exhaustive absence or novelty evidence.",
+  "queries": [
+    {
+      "query": "Frobenius Stickelberger",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/non_semaev_decomposition_20261113/README.md",
+          "path": "research/non_semaev_decomposition_20261113/README.md",
+          "excerpts": [
+            "   exponent level, before any pricing.\n4. **What survives** (§5). Only one proposal class passes every filter: an algebraic\n   solver whose working degree stays bounded on a membership tower. The elliptic-net\n   idea's surviving form is the Riemann–Roch (Frobenius–Stickelberger) addition encoding on such a tower.\n   - It was stage-level positive at `m = 3`.\n   - It is undecided at `m = 5`.\n   - It is a constant-level lever unless the tower degree flattens."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/ecdlp_leads_20261018/README.md",
+          "path": "research/ecdlp_leads_20261018/README.md",
+          "excerpts": [
+            "\nOver all conjugates, these are exactly the Frobenius eigenvalues ζπ_E, ζπ̄_E\n(ζ ≠ 1) of T_n. By Tate's theorem, A_{f⊗χ} mod 2 is isogenous to T_n. So T_n",
+            "- Fermat quotients y^N = x^a(1−x)^b of level N = 7ℓ, genus about 3.5ℓ ≈ 7n,\n  tested with a Stickelberger check that the Jacobi-sum character matches\n  ψ_E·χ;"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/notes/ecc2k130/curve_construction_20261006/PROTOCOL.md",
+          "path": "research/notes/ecc2k130/curve_construction_20261006/PROTOCOL.md",
+          "excerpts": [
+            "(`ord_131(2) = 130`), so `t^n − 1 = (t − 1)·Φ_n(t)` with `Φ_n` irreducible over\n`F_2` — the same Frobenius-module structure. The workstream's usual\nexploratory sizes (31, 53, 83) would need genus ≥ 30 curves and cannot be",
+            "  of the Prym's Weil numbers); its toy analogue checked on Kummer covers\n  `y^5 = f` of `E_0` (n = 5) by explicit point counting; a Stickelberger scan\n  of Fermat quotients of exponent `7·263 = 1841`."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/benchmarks/README.md",
+          "path": "benchmarks/README.md",
+          "excerpts": [
+            "| 2026-10-14 | [`20261014-rootfinding-buffers`](20261014-rootfinding-buffers/) | Prime synchronized lane collector reuses request, native left/right, and output vectors; baseline-candidate-baseline on eight public targets with serial-8, batch-8, rho and rho A/A arms | 384/384 verified sealed executions, 288/288 identical measured replays, zero deterministic differences across 128 candidate/baseline pairs; batch-8 relation-phase wall ratio 0.937 (0.786–1.122) and whole-solve 0.993 (0.803–1.251), L0 descriptive; no resolved wall gain and native costs remain unpriced | macOS arm64, shared, L0 | [`research/ecbench_rootfinding_alloc_20261014`](../research/ecbench_rootfinding_alloc_20261014/) ([PDF](20261014-rootfinding-buffers/REPORT.pdf)) |\n| 2026-10-15 | [`20261015-gaudry-k4-d4-char2`](20261015-gaudry-k4-d4-char2/) | one `k = 4` D₄ decomposition over `F_{(2^m)^4}` (`C₄`, `F_q` multiplications; plain, weighted and Frobenius-reduced forms) and end-to-end ecbench `S` against rho at `m = 6–14` (sessions `ECBS1h03a1d62aba88`, `ECBS1h4d63e1551dc1`, `ECBS1hb9229e3a0f30`) | Frobenius form `C₄` **1.98·10⁵**, **481×** below plain (479–483) at `m = 8`; `S` Frobenius ÷ plain 0.0057 at `m = 6`; IC ÷ rho theory 5,080 (`m = 6`) → **6.06** (`m = 14`); fitted slope −0.248, crossover extrapolated `2^{68.1}` — engineering, no crossover measured | 4 vCPU Xeon 2.10 GHz, one core reserved; deterministic counts, wall L1 | [`research/gaudry_quartic_d4_char2_20261015`](../research/gaudry_quartic_d4_char2_20261015/) ([report](../research/gaudry_quartic_d4_char2_20261015/REPORT.pdf)) |\n| 2026-10-14 | [`",
+            "| 2026-10-11 | [`20261011-lit2026-w11-generic-engineering`](20261011-lit2026-w11-generic-engineering/) | lit2026 W11: `bsgs_fast` step kernels (chain, paired, co-Z) in counted field operations per visited point and full-group wall time; binary x-only isogeny evaluators in the torsion walk; k = 2 cubical-ladder Tate pairing; challenge-ladder rho diagnostics (row added 2026-10-17: the entry's copies landed in the 2026-10-12 integration without a row) | BSGS chain→paired: 16.75→3.71 M-equivalents per visited point; original/paired wall ratios 1.145–1.670 on the measured ladder; end-to-end binary class walk: no-change; external comparison: not run (the study predates AGENTS.md §15 and names no external tool) | Shared Apple M4 Pro, 14 cores; L0; load 72–155 | [research/lit2026_w11_generic_engineering_20261011](../research/lit2026_w11_generic_engineering_20261011/README.md) ([PDF](../research/lit2026_w11_generic_engineering_20261011/reports/run-20261011T2049Z/report.pdf)) |\n| 2026-10-15 | [`20261015-ic-improve3-01-genus3-relations`](20261015-ic-improve3-01-genus3-relations/) | genus-3 IC after cubic GHS, relation phase: R1 = one-inversion Cantor addition + Stickelberger split pre-filter + root finding reusing x^((q−1)/2) mod u (identical walk and relations, shadow-verified every trial); R2 = R1 + κ re-tuned on training (κ = 1.306·0.9102^(log2 q − 20)); each against round-2 item 06's `sched:lpsgebw2`, paired on instance/target/walk, held-out curves 0–4, q = 2^12–2^22 (group order widened to u128); F_q-mult equivalents | R1 TRADES: relation phase 0.471×, whole 0.635× at 2^22, fitte"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "elliptic codes decoding subset sum",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/elliptic_code_list_decoding_20261107/README.md",
+          "path": "research/elliptic_code_list_decoding_20261107/README.md",
+          "excerpts": [
+            "- research-kb: NOT available in this session (`/home/user/crypto/scripts/research-kb` is not executable). No KB query was made; this is a gap.\n- `tools/lead_atlas.py --match` and `tools/build_frontier_map.py --match` in the crypto-autoresearcher checkout: both fail at import (`ModuleNotFoundError: orchestration`; the sparse checkout lacks that package), even with `sys.path` extended. No hits recorded from them. Instead I read the two lead YAMLs, `knowledge/literature/KN-LIT-643.md` and the 2026-11-04 desk report `docs/reports/ecdlp-leads-desk-20261104/elliptic-code-desk.md`, and grepped the leads tree: the lead appears only in the two YAMLs and `notes/exotic-leads-20261103.md`.\n- Conductor: not installed here; not installed by me.",
+            "\nR1 (proved, from Cheng Lemma 3 and the pole-order count). For the code ev_D(L((k-1)O)) and Cheng's received word R = ev_D(f'), every codeword has agreement at most k with R, and the codewords with agreement exactly k are in bijection with the k-subsets of D that sum to Q (each subset gives exactly one codeword once f' is normalised to coefficient 1). So the output of any exact list decoder at agreement k is the full relation set: decoding and relation finding are the same problem.\n"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/elliptic_code_list_decoding_20261107/sources/NOTES.md",
+          "path": "research/elliptic_code_list_decoding_20261107/sources/NOTES.md",
+          "excerpts": [
+            "\n> \"We provide a new approach to the elliptic curve discrete logarithm problem (ECDLP). First, we construct Elliptic Codes (EC codes) from the ECDLP. Then we propose an algorithm of finding the minimum weight codewords for algebraic geometry codes, especially for the elliptic code, via list decoding. Finally, with the minimum weight codewords, we show how to solve ECDLP. This work may provide a potential approach to speeding up the computation of ECDLP.\"\n",
+            "- Theorem 1 (cheng.txt line 238 ff.). Code of evaluating L(Q + (k-1)O) at P_i = a_i G, with G of order q and Q = bG: min distance n-k iff some k of the a_i sum to b mod q (else n-k+1). Proof: a weight n-k codeword has k zeros in D; divisor (f) = P_i1+...+P_ik - Q - (k-1)O, so the points sum to Q.\n- One-point divisors (line 298 ff.): \"We can also use one point divisor codes by reducing the following problem to MDPAGC. The detail will be left in the full paper.\" (subset sum with target 0.) So the one-point case is only announced in arXiv v1, as the lead says.\n- Lemma 3 (line 365 ff.). Received word R = (f'(P_1),...,f'(P_n)) with f' in L(Q+(k-1)O) \\ L((k-1)O), code from L((k-1)O) (dimension k-1). (1) distance(R, code) is n-k or n-k+1; (2) it is n-k iff some k of the P_i sum to Q. Proof of (1): f'-f in L(Q+(k-1)O) has at most k poles so at most k zeros. Suggested f': f' = l1/l2, l1 the line through Q' and Q'' = Q - Q', l2 the line through Q and -Q."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/notes/ecdlp-general/RESEARCH_NZMS_AMS_AUSTMS_2024_IDEAS.md",
+          "path": "research/notes/ecdlp-general/RESEARCH_NZMS_AMS_AUSTMS_2024_IDEAS.md",
+          "excerpts": [
+            "| 15 | S. Palau (with A. Blancas), *Coalescent point process of branching trees…*; C. Burden (with R. Griffiths), *Coalescence for Feller diffusions*; G. Froyland et al., quenched hitting-time statistics (Probability; Ergodic Theory) | model the merging of distinguished-point trails in parallel rho | no lever | closed | Known (van Oorschot–Wiener 1999). Cross-target sharing is excluded by the one-target rule |\n| 16 | D. Maclagan, *Toric Bertini theorems in arbitrary characteristic*; F. Sottile, *The Critical Point Degree of a Bloch Variety*; A. Deopurkar, *How twisty is that orbit?* (Computations in AG/CA) | Newton-polytope (BKK) root counts and coordinate choice for summation systems | R3 fails | closed | The field equations make the solution set Boolean, so BKK counts `F̄_2`-solutions of a different system. Model choice is covered by `RESEARCH_EXOTIC_COORDINATES.md` |\n| 17 | B. Creutz, *Quartic del Pezzo surfaces without quadratic points* (Computational NT, Mon); B. Viray, *Number fields generated by points in linear systems on curves* (Arithmetic Geometry, Tue) | splitting types of fibres in Riemann–Roch decompositions; closed points of low degree | no lever | closed | The complete-splitting fraction `1/k!` is the counting factor (§4.3), not a tunable. The Riemann–Roch encoding is measured (RR panel §2, §8) |\n| 18 | F. Voloch, *Irreducibility of curves over finite fields* (Arithmetic Geometry, Fri) | decomposition as list decoding of elliptic AG codes | R3 fails | closed | Decompositions of `R` over `F` are exactly the minimum-weight codewords of the elliptic code `C_L(F"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/ic_mega_pass_20261031/ideas/coding_comb.json",
+          "path": "research/ic_mega_pass_20261031/ideas/coding_comb.json",
+          "excerpts": [
+            "{\"lens\":\"coding theory and combinatorial algorithms\",\"file\":\"/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/ideas/coding_comb.json\",\"ideas\":[\n{\"id\":\"MP-coding_comb-1\",\"title\":\"PDP as bounded-distance decoding of the elliptic code C_L(D,(m+1)O) restricted to a subspace base: key-equation presentation vs Semaev\",\"statement\":\"For base F (|F|=B, x(F) an F_2-subspace or prime-field interval), an m-decomposition of R is a codeword of weight m+1 in the dual-type elliptic code on support F u {-R}; Welch-Berlekamp/Beelen-Neiger key equations give a module-basis (Popov form) presentation whose degree in the unknown error locator may differ from S_{m+1}'s Macaulay presentation.\",\"mechanism\":\"Cheng/Wan: deep-hole/subset-sum on elliptic codes == m-sum on E. Decoding linearises the error-locator Lambda in L(kO) instead of the symmetric polynomial in x_i; for subspace bases, the evaluation map is F_2-linear in Weil coordinates, so the key equation becomes a bilinear (not degree-2^{m-1}) system after descent.\",\"wall_bypassed\":\"First-fall-degree constant / last fall degree measured on Semaev presentation (presentation-dependent per §2: 'd_F depends on presentation, not ideal')\",\"why_wall_hypotheses_fail\":\"The fall-degree closure is a statement about the S_{m+1} (and PKM) presentation; the key-equation presentation introduces locator coefficients as new variables, a different presentation of the same ideal, never measured.\",\"nongenericity_argument\":\"Uses field representation (Weil coordinates) of x(P); not a group-operation oracle, so CGK generic bound does not apply. It coul"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Petit Kosters Messeng",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/experiments/ic-dreg/README.md",
+          "path": "experiments/ic-dreg/README.md",
+          "excerpts": [
+            "| source | what it fixed here |\n|---|---|\n| Kosters, Yeo, *Notes on summation polynomials*, [arXiv 1503.08001](https://arxiv.org/abs/1503.08001) (§4, Cor. 4.11, Remark 4.12 table) | First fall degree is 2 for S_3 by a trace identity. F4 degree 3, 3, 4, 4, 4, ≥5 at n = 12, 16, 17, 20, 30, 40, with a random V of dimension ⌈n/2⌉. This is positive control PC-KY. |\n| Petit, Kosters, Messeng, *Algebraic approaches for the ECDLP over prime fields*, PKC 2016 ([pdf](https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf)) §3.3, Table 4 | The prime-field factor base (subgroup of order 2^n1 of F_p^*, chain x -> x^2) and D_corr = 4, 4, 4, 4, 4, 5, 5 for n1 = 1..7. This is positive control PC-PKM. |\n| Galbraith, Granger, Merz, Petit, *On index calculus algorithms for subfield curves*, SAC 2020, [ePrint 2020/1315](https://eprint.iacr.org/2020/1315) (Lemma 3.3, Thm 3.4, Lemma 4.1, Table 2) | Frobenius-invariant factor bases exist only in dimensions k·ord_n(2) + ε. A single invariant factor base saves a factor n' in relations and n² in linear algebra. Invariant and random V had similar F4 times at n = 31, m = 3, n' = 5. This is PC-GGMP and block K. |\n| Petit, Quisquater, [ePrint 2012/146](https://eprint.iacr.org/2012/146); Kousidis, Wiemers, J. Math. Cryptol. 2019 ([doi](https://doi.org/10.1515/jmc-2017-0022)) | The first-fall-degree assumption and its bounds m² + 1 and m² − m + 1. These are the optimistic \"ffd\" degree scenario. |\n| Huang, Kosters, Yeo, *Last fall degree, HFE, and Weil descent attacks on ECDLP*, CRYPTO 2015, [ePrint 2015/573](https://eprint.iacr.org/2015/573) | Evi"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/cryptanalysis/blob/c5e98ac3618327cb03eac69f564efdd7ea6a82a3/suite/examples/pkm_audit_demo.rs",
+          "path": "suite/examples/pkm_audit_demo.rs",
+          "excerpts": [
+            "//! Run the Petit–Kosters–Messeng resistance audit on every\n//! standardised prime-field curve in the zoo.\n//!\n//! Direct response to the CryptoPro / Nikolaev CTCrypt 2024 slide\n//! (\"yes, P-224 satisfies the criterion\") — produces an at-a-glance\n//! resistance table for NIST, SECG, Brainpool, FRP, SM2, and GOST\n//! curves."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/docs/IC_NOVELTY_AUDIT.md",
+          "path": "docs/IC_NOVELTY_AUDIT.md",
+          "excerpts": [
+            "| Huang, Kosters, Yeo, [CRYPTO 2015](https://www.iacr.org/archive/crypto2015/92160209/92160209.pdf), *Last fall degree, HFE, and Weil descent attacks on ECDLP* | Primary publication abstract/introduction and search-visible definition passages; distinguish from the four-author journal expansion | Doubt about substituting FFD for solving complexity already appears explicitly in the ECDLP literature |\n| Caminata, Gorla, [arXiv:2112.05579v2](https://arxiv.org/abs/2112.05579v2), *Solving degree, last fall degree, and related invariants* | Full PDF; definitions, Theorem 2.8, and comparisons in Section 4 | General FFD/LFD separation is known. Their syzygy definition and the affine strict-fall definition must be distinguished. Our finite separation instances alone do not establish a new general phenomenon |\n| Kosters, Yeo, [arXiv:1503.08001](https://arxiv.org/abs/1503.08001), *Notes on summation polynomials* | Full PDF; Corollary 4.11 and Remark 4.12 | The binary S3 trace identity and the usual low FFD observation are prior art; the text discusses qualifications and increasing observed solver degrees. We must not turn “usually” into an all-target theorem |\n| Petit, Kosters, Messeng, [PKC 2016 author PDF](https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf), *Algebraic approaches for the ECDLP over prime fields* | Full PDF; subgroup-chain construction and degree experiments | Prime-field subgroup chains, presentation-dependent preprocessing, and their experimental degrees are prior art. Our raw leading-term syzygy must not be sold as a low-degree normalized solver theorem"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/docs/IC_PAPER_DRAFT.md",
+          "path": "docs/IC_PAPER_DRAFT.md",
+          "excerpts": [
+            "\n- Huang, Kosters, Yang, Yeo, *On the last fall degree of zero-dimensional Weil descent systems*, [arXiv:1505.02532](https://arxiv.org/abs/1505.02532).\n- Caminata, Gorla, *Solving degree, last fall degree, and related invariants*, [arXiv:2112.05579](https://arxiv.org/abs/2112.05579).\n- Petit, Kosters, Messeng, *Algebraic approaches for the ECDLP over prime fields*, [PKC 2016 author manuscript](https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf).\n- Kosters, Yeo, *Notes on summation polynomials*, [arXiv:1503.08001](https://arxiv.org/abs/1503.08001).\n- Kousidis, Wiemers, *On the first fall degree of summation polynomials*, [arXiv:1906.05594](https://arxiv.org/abs/1906.05594).\n- Huang, Petit, Shinohara, Takagi, *On Generalized First Fall Degree Assumptions*, [ePrint 2015/358](https://eprint.iacr.org/2015/358)."
+          ]
+        }
+      ]
+    },
+    {
+      "query": "sign branch determinant search",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/prime_norm_rank_20261112/BRANCH_REPAIR_PROTOCOL.md",
+          "path": "research/prime_norm_rank_20261112/BRANCH_REPAIR_PROTOCOL.md",
+          "excerpts": [
+            "A rank repair over the full field is not automatically a branch update.\n\nNative fixed correctness contract, no sign-search/timing panel: use the same\nF17 six public points and the flipped(13,10) assignment, with target branch at\nx=0 fixed for any actual target-oriented interpretation. For each coordinate,\ncompute q=v^T adj(M) v and coefficient w*q. If nonzero, compute\nDelta=-det(M)/(w*q), rebuild the actual matrix and verify determinant0."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/problems/prime-norm-public-branch-selection.md",
+          "path": "problems/prime-norm-public-branch-selection.md",
+          "excerpts": [
+            "\n## Next discriminating step\n\n- **Action:** derive the actual signed public evaluation-matrix family and a branch-update rule that changes the probability or counted cost of finding a nonzero bounded kernel. Compare with supplied-sign reconstruction; do not assume a useful gradient from rank or determinant alone [pcc:unverified].\n- **Inputs/controls:** public curve/support/branches, positive fixture, changed branch, exact full norm and degree checks. Distinguish supplied-sign and discovered-sign inputs.\n- **Limits:** local proof/development work first; no paid attack/scaling run authorized by this document. A runtime panel requires a separate frozen protocol and live admission under repository rules.\n- **Outcomes:** a proved structural search advantage leads to an actual public candidate generator and full accounting; an equivalence or a failed rule redirects the finder without a global impossibility claim. Infrastructure errors stay infrastructure errors."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/prime_norm_rank_20261112/native-recovery-control/src/branch_repair.rs",
+          "path": "research/prime_norm_rank_20261112/native-recovery-control/src/branch_repair.rs",
+          "excerpts": [
+            "    json!({\"schema\":\"norm.continuous-branch-repair/v1\",\"p\":P,\"curve_coefficients\":f,\n        \"public_points\":points,\"initial_matrix\":m,\"initial_determinant\":d,\"weights\":w,\n        \"coordinate_controls\":rows,\"all_coordinates\":{\"repairs\":repaired,\"off_curve\":off_curve,",
+            "        \"physical_artifact_invocations\":1,\"random_branch_search_executed\":false,\"timing_measured\":false,\n        \"scope\":\"one frozen supplied-branch algebra correctness control; no yield, global infeasibility or sub-exponential search bound\",\n        \"standing\":\"unsigned producer evidence\"})"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/new_leads_20261019/reports/search-report.typ",
+          "path": "research/new_leads_20261019/reports/search-report.typ",
+          "excerpts": [
+            "\nAt ell=3, q=1, t=1, the companion and scalar models have 1 and 16 stable Lagrangians. At ell=5, q=1, t=2, the counts are 1 and 36. Thus trace and determinant do not determine the candidate population. Companion ell=3, q=1, t=0 has zero.\n",
+            "\nOnly then freeze a disjoint cohort and compare complete source-to-answer cost with source rho and destination generic solving. Include kernel search, construction and every map evaluation. A geometric quotient alone is insufficient.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Riemann Roch eliminate auxiliary variables norm remainder",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/ic_tree_gluing_20261103/round7_beyond/DIRECTIONS.md",
+          "path": "research/ic_tree_gluing_20261103/round7_beyond/DIRECTIONS.md",
+          "excerpts": [
+            "   For odd m = 2h−1, the system is A² − fC² = (X − r_x)·U₀ with U₀ | X^d − c,\n   imposed by a quadratic remainder tower V_j² = Q_jU₀ + V_{j+1}. It has\n   O(mt) variables and input degree 2. Status: 162 correctness checks on F₁₇",
+            "  - Semaev, *New algorithm for the discrete logarithm problem on elliptic\n    curves*, ePrint 2015/310 *(confident)*. This is auxiliary-variable\n    splitting."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/docs/session-logs/2026-11-13.md",
+          "path": "docs/session-logs/2026-11-13.md",
+          "excerpts": [
+            "\n## 02:42 UTC — exact polynomial norm/matrix equivalence compiles\n",
+            "- New in `examples/ic_algebraic_floor/`: `linear21.rs`; arms `lin21` (the repository's linear S3 solve in\n  a 2+1 scan) and `lin21-ht` (p eliminated by the half-trace, batched inversions, root-formula split);\n  subcommands `linpool`, `linsummary`, `s4check`; `VmHWM` in records."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool/README.md",
+          "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool/README.md",
+          "excerpts": [
+            "The protocol is `research/pkm_dickson_torus_20261015/PROTOCOL.md` §2. In both\nkinds the base points are the x in the base set for which f(x) is a nonzero square.\n\n### RR: Riemann–Roch norm-divisibility\n\nThis is a port of `research/ic_tree_gluing_20261103/round7_rr/genrr.sing`, sat = 0.\nm must be odd, m = 2h − 1. The auxiliary variable Z is eliminated by taking coefficients."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/papers/ecdlp-index-calculus-program/sections/companion_catalogue.tex",
+          "path": "papers/ecdlp-index-calculus-program/sections/companion_catalogue.tex",
+          "excerpts": [
+            "\\art{experiments/EXP-ECDLP-422afc}\\newline {\\scriptsize 2026-10-12 Semaev S3 enumeration fraction m=2, beta=1/\\allowbreak{}2} & null & On y\\textasciicircum{}2=x\\textasciicircum{}3+x+1, decomposing fraction 0.1683 (p=101), 0.1327 (p=211), 0.1987 (p=307), all within the derived bound \\textbar{}F\\textbar{}(\\textbar{}F\\textbar{}-1); hypothesis (within 0.25 of 1/\\allowbreak{}2) false by derivation, normalization error. EV-ECDLP-9d41e7 contradicts, preliminary. & current\\\\[1pt]\n\\art{research/rr_2adic_chain_dreg_20261015}\\newline {\\scriptsize 2026-10-15 Riemann-Roch 2-adic chain solving degree} & diagnostic & Six-point Riemann-Roch decompositions over 2-adic chain bases at p\\textasciitilde{}2\\textasciicircum{}28: D=5 at k=3, D\\textgreater{}=7 at k=4, 14 GB exhausted at D=6 for k\\textgreater{}=5; consistent with solving degree growing with k. & current\\\\[1pt]\n\\art{knowledge/findings/KN-FIND-14f145.md}\\newline {\\scriptsize 2026-10-16 secp256k1 CM self-isogeny degree 2\\textasciicircum{}44497-1} & engineering & secp256k1 admits a compact known-CM separable self-isogeny of prime degree 2\\textasciicircum{}44497-1, independently replayed (13 native entries, 11 PASS + 2 trusted); endpoint evidence, no timing ratio or security claim. & current\\\\[1pt]",
+            "\\multicolumn{4}{@{}p{0.98\\linewidth}@{}}{\\scriptsize \\hspace*{1em}Members: \\art{experiments/f4-gpu-20260925}, \\art{experiments/f4-gpu-panel-20261007}, \\art{experiments/f4-gpu-query-20261008}, \\art{experiments/f4-gpu-runpod-20261006}}\\\\[2pt]\n\\textbf{Separator-conditioned Boolean elimination (F6) for S3 chains} (15 entries, 2026-10-08..2026-10-10) & engineering & 15 members on GF(2\\textasciicircum{}9) toy S3 chains: exact width-bounded elimination, best stage gain cutset bitplanes 12.308x over message arm (m=4); boundary stays 12-16 variables; all exactness gates pass; no ECDLP-scale or rho comparison. & current\\\\*\n\\multicolumn{4}{@{}p{0.98\\linewidth}@{}}{\\scriptsize \\hspace*{1em}Members: \\art{experiments/groebner-f6-20261008}, \\art{experiments/groebner-f6-affine-target-20261009}, \\art{experiments/groebner-f6-bitplane-target-20261009}, \\art{experiments/groebner-f6-boundary-compact-20261009}, \\art{experiments/groebner-f6-chain-scaling-20261009}, \\art{experiments/groebner-f6-cutset-20261009}, \\art{experiments/groebner-f6-cutset-bitplane-20261010}, \\art{experiments/groebner-f6-cutset-packed-20261009}, \\art{experiments/groebner-f6-grouped-factor-20261009}, \\art{experiments/groebner-f6-message-20261009}, \\art{experiments/groebner-f6-packed-20261009}, \\art{experiments/groebner-f6-packed-target-20261009}, \\art{experiments/groebner-f6-prepared-20261009}, \\art{experiments/groebner-f6-replay-plan-20261009}, \\art{experiments/groebner-f6-wide-boundary-20261009}}\\\\[2pt]"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ecbench/blob/256dbcb19fcfe5afb1075bb790e71c593a7424f5/research/summation_dreg_20261023/surveys/survey_A_dreg.jsonl",
+          "path": "research/summation_dreg_20261023/surveys/survey_A_dreg.jsonl",
+          "excerpts": [
+            "{\"id\": \"D05\", \"name\": \"F4 early stop: staircase stop at the Bezout bound (stop 64) and certified Hilbert-series stop with chunked pair selection\", \"lever_class\": \"solver: F4 termination\", \"mechanism\": \"stop64: stop once the staircase has <=64 = 2^6 standard monomials (six quadrics in six unknowns). hilbert:N: certify the leading forms are a regular sequence (F4 on top forms, finite staircase), then take <=N lowest-degree pairs per step and drop every pending pair of degree <=d once leading monomials match the complete-intersection Hilbert function prod(1-t^d_i)/(1-t)^n; fall back to the plain run if the certificate fails.\", \"curve_family\": \"generic prime-field: Joux-Vitse cover-and-decomposition, E over F_{p^6} -> genus-3 Jacobian over F_{p^2}, Nagao 6-quadric systems over F_p\", \"parameters\": \"p in {53,101,251}, seed 1, 100 random + 20 planted residuals, --max-degree 24, budget 300, 2 threads\", \"measured_outcomes\": \"max F4 step degree 8 (full) -> 7 (stop64 and hilbert) on all 120 systems per p; same decompositions and F_p solutions in every mode (120/120). Counted F_p multiplications (p=101): full 88.43M; stop64 83.98M (-5%); hilbert 95.33M incl. 11.02M certificate muls (+8%); hilbert_chunk1 17.78M (+3.29M check) i.e. ~4-5x fewer; hilbert applied 118/120 (2 fallbacks). jv_cover summary: F4 degree 8.0 rows 231 cols 255 (full) vs 7.0 rows 142 cols 204 (hilbert:1).\", \"vs_baseline\": \"plain F4 (full)\", \"vs_semiregular\": \"Macaulay bound sum(d_i-1)+1 = 7 for six quadrics\", \"verdict\": \"lowers max degree reached by 1 (8 -> 7); chunked Hilbert stop cuts counted F4 work ~4-5x; perform",
+            "{\"id\": \"D09\", \"name\": \"Hamming-weight ideals (C/FC/QFC) for a normal-basis weight factor base + ISD-like MultiSolve oracle\", \"lever_class\": \"presentation: bounded-degree membership ideal + guess-and-truncated-GB\", \"mechanism\": \"Factor base F_w = {P : wt_NB(x(P)) <= w}; membership encoded by Boolean ESF digits with O(n) auxiliary variables, generator degree <=2 (C, QFC) or <=floor(log2 n)+1 (FC); S3 descended in normal-basis coordinates; MultiSolve branches on coordinates and calls a Boolean F4 truncated at pair degree 6 with a 2^28 row-word XOR budget.\", \"curve_family\": \"binary Koblitz K0: y^2+xy=x^3+1 over F_{2^n}, n in {7,11,13,17,19}, m=2\", \"parameters\": \"w=2 at every n (deviation from w=3 at 17,19), 24 targets (8 at n>=17), tau=2^28, matrix cap 2^26 words; tau sweep 2^26-2^30 at n=11\", \"measured_outcomes\": \"100% correct vs exhaustive labels; tame depth near full summand (7.4-10.4 of 13 at n=13; 17.8-18.2 of 19 at n=19); calls/target exponents in |F_w|: FC 1.87, C 2.43, QFC 2.48 (threshold 0.8); calls/|F| 0.10-0.12 (n=11) -> 0.49-0.59 (n=19); subspace baseline tame at the root; 16x budget removes 1-2 tree levels.\", \"vs_baseline\": \"exhaustive oracle (Prange analogue) and subspace factor base through the same solver\", \"vs_semiregular\": \"n/a\", \"verdict\": \"neutral/raises (bounded generator degree does not buy algebraic resolution; H1 refuted)\", \"confidence_tier\": \"T3\", \"tier_rationale\": \"frozen raw JSONL per cell; the n=7 cell is replayed in CI (replay_check.py, counted units equal) -> T2 for n=7 only\", \"retractions_contradictions\": \"Protocol deviations recorded before affec"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Dickson norm coefficient substitution quotient remainder",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/benchmarks/README.md",
+          "path": "benchmarks/README.md",
+          "excerpts": [
+            "| 2026-10-16 | [`20261016-binary-mitm-ladder-l11-l12`](20261016-binary-mitm-ladder-l11-l12/) | binary MITM oracle ladder, `ℓ = 11` over `F_{2^33}` and `ℓ = 12` over `F_{2^37}` on the non-Koblitz `y^2+xy=x^3+zx+1` (2,017 / 4,023-point bases; pair tables 2,033,876 / 8,092,016 sums, 65 / 259 MB), 64 targets each, vs Gaudry pairs-and-solve on the same subspace | 0 disagreements on all 128 targets; median 1.746 ms vs 1.62 s (928.0×) at ℓ=11 and 8.566 ms vs 18.7 s (2,187.2×) at ℓ=12 — the largest rung pairs-and-solve was historically usable at; max 8,068 / 16,092 counted point-adds vs 2,098,176 / 8,390,656 quartic solves; all witnesses group-verified — engineering, no exponent or vs_rho claim | arm64 macOS, shared, unpinned (L0 wall, contended by other builds) | [`research/binary_mitm_oracle_l11_l12_20261016`](../research/binary_mitm_oracle_l11_l12_20261016/) ([PDF](20261016-binary-mitm-ladder-l11-l12/REPORT.pdf)) |\n| 2026-10-16 | [`20261016-isogeny-large-ell`](20261016-isogeny-large-ell/) | isogeny_algos kernel → codomain and one point image at large prime degree ℓ = 101–10007 (pair-by-pair vs remainder tree to ℓ = 250007), 256- and 511-bit p: √élu (Montgomery, short Weierstrass) vs projective / x-only Vélu; CSIDH-512 with √élu leaves | Montgomery √élu codomain 5.58× (256-bit) / 5.27× (511-bit) Vélu at ℓ = 10007 (was 1.51× / 1.62×), crossover ≈ ℓ 150 (was ≈ 1000); images 1.27–1.51×; Weierstrass √élu 2.7–2.8× x-only Vélu (was slower), x-only Vélu itself 15–25 % faster; remainder-tree path slower than pair-by-pair to ℓ = 250007; CSIDH-512 no change outside noise; all outputs equal",
+            "| 2026-10-13 | [`20261013-rootfinding-pair-size`](20261013-rootfinding-pair-size/) | ecbench cold one-target two-summand prime pair-table IC with 32 versus 64 abscissae, paired on eight fresh public targets, matched rho and A/A | 24/24 verified measured per arm; B64/B32 counted-GAE ratio 0.830225 (95% target-cluster interval 0.697026–0.961546), 96/96 identical measured replays; prime native work unpriced, wall not admitted; B64/rho counted ratio 18.873 | macOS arm64, 14 logical CPUs, shared, L0 | [`research/ecbench_rootfinding_tuning_20261013`](../research/ecbench_rootfinding_tuning_20261013/) ([run report](../research/ecbench_rootfinding_tuning_20261013/reports/run-20261013T1630Z/report.pdf), [results report](../research/ecbench_rootfinding_tuning_20261013/report.pdf)) |\n| 2026-10-13 | [`20261013-gaudry-quartic-d4`](20261013-gaudry-quartic-d4/) | `C₄`, one `k = 4` decomposition over `F_{p⁴}` at `p = 269`: FGHR's `D₄`-symmetric system on a curve with rational 2-torsion (`Y`-line base) against Gaudry's `S₄` system (`x`-line base); 20 targets, exactness against meet in the middle, decomposition rates on 8,000 targets | `C₄` `1.21·10¹²` → `2.54·10¹⁰` `F_p` multiplications (47.5–48.4×), quotient dimension 4,096 → 512, 3 min → 5 s a solve; on §11.16's model the crossover with rho moves from `2^{150}` to `2^{135}` (`h = 2`); **annotation 2026-10-16 (claim audit): rho there is `rho4`'s walk without the negation map**; E18 (`research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` §9.3) measured unfolded/negation at 1.32× and re-derived the plain handover against the n"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/research/prime_one_shot_20261029/continuation/reviews/rationality.md",
+          "path": "research/prime_one_shot_20261029/continuation/reviews/rationality.md",
+          "excerpts": [
+            "\nEach polynomial is squarefree with nonzero finite roots, since E is nonsingular and w is nonzero. In any nonempty product of distinct f(wG), a root belonging to exactly one factor has odd valuation. Therefore their squareclasses are independent in Fpbar(G)^*/squares. Shared ramification at infinity does not undermine this argument: the distinct finite branch valuations already detect every nonempty product.\n\nThe argument covers special j, including j=0, provided the curve-order and 2-power assumptions hold. It should not be extended automatically to even curve order, a subgroup H with an order-three factor, Dickson/norm-one torus fibres, or auxiliary isogeny towers.\n\n## 2. Semaev substitution is nonzero\n"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/docs/session-logs/2026-11-12.md",
+          "path": "docs/session-logs/2026-11-12.md",
+          "excerpts": [
+            "\nPrepared a generic polynomial norm-defect identity and finite F17 rank-one\ncounterexample in a standalone Lean project. First build failed before proofs:",
+            "- User: \"we want this growth-law derivation\". Read `research/prime_fall_degree_20261027/DERIVED.md` (D1–D8 and its \"not derived\" list), `PREREGISTRATION.md` §2, the PKM note §3.3, and `research/first_fall_closure_20261111/` (binary; no overlap).\n- Wrote `research/prime_ic_leads_20261110/growth_law/README.md` with four prose-proved results (no pcc claim registered, `[pcc:unverified]`): Theorem 1, `d_F` non-decreasing in `t` for a fixed system (reduction mod `z^{2^t} − 1` is a filtered ring map sending variables to variables or 1; closures map into closures); Theorem 2, the top window (wraps only through the top `c − 1` variables); Theorem 3, generic value by support, `S₃` fills the width-2 box (nine coefficients listed), so null = tower means `S₃` is in the generic stratum; Theorem 4, `ffd = D + 1` under a common top variable, giving `ffd = 3, 4, 5, 5` for `W = 1..4`, equal to every measured row and explaining `W = 3 ≡ W = 4`. Conjecture G (fitted, open): `d_F = ffd(W) + max(0, ⌊(t − s_W)/4⌋)`, `s = 0, 2, 5, 5`, with falsifying predictions (`W = 1` → 6 at `t = 12`; `W = 3` → 7 at `t = 13`; `W = 2` → 7 at `t = 14`).\n- `fig_growth.svg/.png` (recorded values and the fitted law; `scripts/plot_growth.py`), `REPORT.typ` → `REPORT.pdf` (2 pages, read). Pointers appended to `DERIVED.md` and the problem record. `pcc lint-prose`: 0 findings on the new note."
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/docs/session-logs/2026-11-03.md",
+          "path": "docs/session-logs/2026-11-03.md",
+          "excerpts": [
+            "- `research/ic_tree_gluing_20261103/`:\n  - `THEORY.md`: Ritt dichotomy, i.e. the lab's Kummer/Dickson/Lattès towers are Ritt's three families. Lemma A (rigidity) is proved. Elekes–Szabó barrier reading and Conjecture B are heuristic. Phylogenetic tree-gluing proposal.\n  - `gen.sing` (native Singular; byte-identical to a Python pilot kept out of the repo), `run.sh` (msolve 0.6.5), `parse.sh`, `rows.tsv`, `logs/`, `d_vs_t.svg`, `report.pdf`.",
+            "\nTwo packaging-only generator attempts failed on duplicate fixture substitution and source line layout; preserved both records and fixed exact transformations. Sole native attempt passes with2 inherited unused-field warnings. No cloud job, timing claim or old-source mutation. Frozen SESSION.md remains untouched; post-check handoff is PUBLICATION.md.\n"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/00e5ae853988948151dc35cd44f1910eb0d7f385/docs/session-logs/2026-11-02.md",
+          "path": "docs/session-logs/2026-11-02.md",
+          "excerpts": [
+            "- `identity.sh`: macaulay, chain, chain-sparsest, chain --karatsuba, chain-sparsest-est --karatsuba at p = 101 seed 2 all bit-identical to E33's canonical hashes / stored record.\n- `e36_checks` (v1, `df82b2e4b3`): perturbed coefficient caught 22/22 for every rule; F/L digests differ from A's on 32/32; **registered S/H corrupted-inverse control detected 0/32**. v2 (`ab560e5cf1` files): that corruption changed row contents on 32/32 calls but no output; a pivot-row variant (post hoc) changed the output on 27/32.\n",
+            "### What was done\n- Ran the three frozen cells of `research/ecgfp5_quotient_bw_finish_20261102` (PROTOCOL.md frozen in `3d3f68d70`, merged #3297), `run_cell.sh` for p = 4111, 262231, 33554371, 06:17:55Z–11:20:02Z, one at a time, nothing else on the host.\n- Every exit code is 0. `eliminant_equals_w0=true` at all three. The planted point is recovered. D = 65,536 and `stab_fail=0`."
+          ]
+        }
+      ]
+    },
+    {
+      "query": "Riemann Roch four variables eliminate coefficients",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/cryptanalysis/blob/c5e98ac3618327cb03eac69f564efdd7ea6a82a3/ecc2k130/runner/codegen/nagaodecomp.py",
+          "path": "ecc2k130/runner/codegen/nagaodecomp.py",
+          "excerpts": [
+            "        raise ValueError('target is not on y^2+xy=x^3+1')\n    lits = {}\n\n    def variables(name):\n        result = [c.newVar() for _ in range(m)]\n        for j, lit in enumerate(result):\n            lits[(name, j)] = lit"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/a57a1230189796622a4807acfd76392b1f64c2b9/ecc2k130/codegen/nagaodecomp.py",
+          "path": "ecc2k130/codegen/nagaodecomp.py",
+          "excerpts": [
+            "        raise ValueError('target is not on y^2+xy=x^3+1')\n    lits = {}\n\n    def variables(name):\n        result = [c.newVar() for _ in range(m)]\n        for j, lit in enumerate(result):\n            lits[(name, j)] = lit"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/cryptanalysis/blob/c5e98ac3618327cb03eac69f564efdd7ea6a82a3/ecc2k130/runner/research/candidates/goal22/codegen/nagaodecomp.py",
+          "path": "ecc2k130/runner/research/candidates/goal22/codegen/nagaodecomp.py",
+          "excerpts": [
+            "        raise ValueError('target is not on y^2+xy=x^3+1')\n    lits = {}\n\n    def variables(name):\n        result = [c.newVar() for _ in range(m)]\n        for j, lit in enumerate(result):\n            lits[(name, j)] = lit"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/a57a1230189796622a4807acfd76392b1f64c2b9/research/ic_solver_selection_20260915/baseline/codegen/nagaodecomp.py",
+          "path": "research/ic_solver_selection_20260915/baseline/codegen/nagaodecomp.py",
+          "excerpts": [
+            "        raise ValueError('target is not on y^2+xy=x^3+1')\n    lits = {}\n\n    def variables(name):\n        result = [c.newVar() for _ in range(m)]\n        for j, lit in enumerate(result):\n            lits[(name, j)] = lit"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "norm divisibility direct remainder elimination",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/a57a1230189796622a4807acfd76392b1f64c2b9/research/twist_index_calculus_20261020/endomorphism_image_base/native/src/joint.rs",
+          "path": "research/twist_index_calculus_20261020/endomorphism_image_base/native/src/joint.rs",
+          "excerpts": [
+            "    g\n}\n\nfn remainder(f: Field, g: &[u64], divisor: &[Polynomial]) -> Vec<Polynomial> {\n    let degree = divisor.len() - 1;\n    assert_eq!(divisor[degree], Polynomial::scalar(f, 1));\n    let mut r: Vec<_> = g.iter().map(|&c| Polynomial::scalar(f, c)).collect();"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/a57a1230189796622a4807acfd76392b1f64c2b9/research/f4_f5_row_build_20261011/records/library-remainder-already-tested.txt",
+          "path": "research/f4_f5_row_build_20261011/records/library-remainder-already-tested.txt",
+          "excerpts": [
+            "cryptanalysis::degree_reduction_anf::tests::degenerate_elimination_is_flagged\ncryptanalysis::degree_reduction_anf::tests::elimination_raises_the_generator_degree\ncryptanalysis::degree_reduction_anf::tests::multilinear_monomials_are_complete_and_distinct",
+            "cryptanalysis::ic_oracle_pricing::tests::every_oracle_agrees_on_a_small_cell\ncryptanalysis::ic_oracle_pricing::tests::s4_agreement_is_checked_in_both_directions\ncryptanalysis::ic_progress::tests::hms_formats"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/a57a1230189796622a4807acfd76392b1f64c2b9/research/nagao_relations/README.md",
+          "path": "research/nagao_relations/README.md",
+          "excerpts": [
+            "The implementation gate is zero missing or invalid projected decompositions,\nwith exhaustive direct group arithmetic as the reference. Every Semaev model\nis lifted and verified; any spurious model is blocked and its work retained.",
+            "2. **Exploit coefficient structure before elimination.** Test conditioning one\n   coefficient block, incremental row reduction and modular-remainder circuits.\n   Include the best symmetrized S4 frontend, not only chained S3, before claiming"
+          ]
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/a57a1230189796622a4807acfd76392b1f64c2b9/research/prime_one_shot_20261029/continuation/README.md",
+          "path": "research/prime_one_shot_20261029/continuation/README.md",
+          "excerpts": [
+            "\nThe setup bound here uses classical modular-curve point counting rather than the paper's heuristic near1/d auxiliary-curve probability. Primary-source checks establish at least1/(24d^2) probability that a random short model over Fp has a rational exact-order-d point when d=2^t>=8 and p>=256d^4. Schoof's unconditional polynomial-time cardinality algorithm and an actual point-order test then give expected O(d^2 poly(log p)) charged construction work. Divisibility of a group order is not substituted for existence of a cyclic subgroup.\n",
+            "\nThe compute-route audit corrected the old blanket blocker. The main-branch ecbench route and ARC research runners exist. A direct arbitrary-command endpoint is still unavailable here; registered-runner and Actions-variable reads return403. The existing read-only EKS smoke workflow was actually dispatched as [run40979213857](https://github.com/isogeny-labs/crypto/actions/runs/40979213857), pool linux. It executed zero steps and was cancelled after the 600-second queue-wait limit; terminal state is retained in `readiness-run.json`. The bounded probe did not establish runner readiness. It was not a solver experiment or timing admission. There is no remaining job from this dispatch.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}

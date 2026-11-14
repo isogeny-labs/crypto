@@ -1,0 +1,222 @@
+{
+  "schema": "validation-gate/v1",
+  "scope": "Evidence for the study's rows (six instances x pair table, inherited-f4, fes-then-inherited, fes-then-batched). No leaderboard row is proposed (owner); this file is the gate evidence only.",
+  "replay_certificate": {
+    "path": "validation/replay-certificate.json",
+    "sha256": "45883799a6d99d1770abe48cf9af567997ac690074bedba85601d7802bf874ee"
+  },
+  "validator_report": {
+    "path": "validation/validator-report.json",
+    "sha256": "db6df87c6934845d64c03dd7e16351917adc85693f157e1d88006bded13594b2"
+  },
+  "rho_reference": {
+    "kind": "negation_frobenius",
+    "kind_per_instance": {
+      "koblitz-n13": "negation",
+      "char2-n15": "negation",
+      "koblitz-n17": "negation",
+      "koblitz-n19": "negation",
+      "char2-n21": "negation",
+      "koblitz-n23": "frobenius"
+    },
+    "kind_note": "Koblitz: the signed-Frobenius walk (A = 2n, the automorphism fold) and the negation walk (A = 2) on the same 16 seeds, the lower mean S prices the reference (negation at degrees 13, 17, 19, where the Frobenius walk's set-up dominates; signed-Frobenius at 23); random binary: negation, the only automorphism.",
+    "protocol": "README 'Protocol': ic bench --sweep, 16 matched rho runs in the same process, rho_reference_rule of each report (Koblitz: lower mean of signed-Frobenius and negation walks on the same seeds; random binary: negation only); one planted target per repeat, 3 repeats per IC configuration, verified recovery.",
+    "unit": "group-addition equivalents (GAE) per sqrt(r)",
+    "binary_or_process": "the same ic bench process per instance writes every IC row and the matched rho (producer binary sha256 1f566eed..., built at 4900647bcd per the benchmark record; replayed with the validator's build of d81dc1241b, sha256 0836dc46..., every count identical)",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 4.013223011397812,
+        "rho": 1.3541944158049875
+      },
+      "0.1": {
+        "ic": 3723.718401340424,
+        "rho": 2.8921421945358907
+      },
+      "1": {
+        "ic": 37091.12175535938,
+        "rho": 2.8921421945358907
+      }
+    },
+    "gae_band_basis": "for each weight, the instance with the smallest S(fes-then-batched)/S(rho) (docs/ic/runs/VALIDATION.json convention); the IC arm is fes-then-batched",
+    "gae_band_detail": {
+      "0": {
+        "ic": 4.013223011397812,
+        "rho": 1.3541944158049875,
+        "instance": "koblitz-n19",
+        "ratio": 2.9635501110910956
+      },
+      "0.1": {
+        "ic": 3723.718401340424,
+        "rho": 2.8921421945358907,
+        "instance": "koblitz-n13",
+        "ratio": 1287.5295026557221
+      },
+      "1": {
+        "ic": 37091.12175535938,
+        "rho": 2.8921421945358907,
+        "instance": "koblitz-n13",
+        "ratio": 12824.791887976824
+      }
+    },
+    "gae_band_rows": "validation/band.json (every instance, every arm, w = 0, 0.1, 1)",
+    "band_formula": "S(w) = mean over repeats of [G - C + w (U + n_C)] / sqrt r: G total GAE; C and n_C the GAE and count of the calibration-priced native counters (price_phase's ten counters with a non-null unit, pinned on Koblitz and measured on random binary, plus the solver's ops at ns_per_op); U the arm's unpriced counts (no *_uncharged counter occurs; work_native.table_insert_attempts behind counted:table_insert_attempts, the 2026-11-08 default reading, i.e. the pair table's per-step inserts). Rho: no unpriced counter emitted, U_rho = 0 (lower bound at w > 0).",
+    "order_holds_across_band": true,
+    "order_holds_across_band_means": "The matched rho is below fes-then-batched, and below every IC arm (pair table, inherited-f4, fes-then-inherited), at w = 0, 0.1 and 1 on all six instances; no IC arm is ranked ahead of rho anywhere. It does NOT mean fes-then-batched ranks first among the IC rows: see component_orders.",
+    "component_orders": {
+      "fes_then_batched_vs_inherited_f4": {
+        "per_instance": {
+          "koblitz-n13": {
+            "order": {
+              "0": ">",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "flips inside the band: unresolved",
+            "ratio": {
+              "0": 1.0331910858226647,
+              "0.1": 0.7012475957738638,
+              "1": 0.7003615139652455
+            }
+          },
+          "char2-n15": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+            "ratio": {
+              "0": 1,
+              "0.1": 0.8463003410635358,
+              "1": 0.8460849143410926
+            }
+          },
+          "koblitz-n17": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+            "ratio": {
+              "0": 1,
+              "0.1": 0.8166015332859992,
+              "1": 0.8165430146503576
+            }
+          },
+          "koblitz-n19": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+            "ratio": {
+              "0": 1,
+              "0.1": 0.8877010968428961,
+              "1": 0.8876872040530889
+            }
+          },
+          "char2-n21": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+            "ratio": {
+              "0": 1,
+              "0.1": 0.8444450773842123,
+              "1": 0.8444382967868899
+            }
+          },
+          "koblitz-n23": {
+            "order": {
+              "0": "=",
+              "0.1": "<",
+              "1": "<"
+            },
+            "verdict": "weak: first <= second, tie at some w (strict order does not hold across the band)",
+            "ratio": {
+              "0": 1,
+              "0.1": 0.8159725968162602,
+              "1": 0.8159694002186173
+            }
+          }
+        },
+        "strict_order_holds_across_band_on": 0,
+        "order_holds_across_band": false,
+        "reading": "A tie at w = 0 on random 15, Koblitz 17, 19, random 21, Koblitz 23 (identical decisions; solver word XORs free), fes-then-batched lower at w = 0.1 and 1; at Koblitz 13 fes-then-batched is above at w = 0 (fes-f2 tried more targets) and below at w = 0.1 and 1: unresolved there. Weak order (<=) on five of six."
+      },
+      "fes_then_batched_vs_pair_table": {
+        "per_instance": {
+          "koblitz-n13": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "char2-n15": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "koblitz-n17": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "koblitz-n19": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "char2-n21": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          },
+          "koblitz-n23": {
+            "order": {
+              "0": "<",
+              "0.1": ">",
+              "1": ">"
+            },
+            "verdict": "flips inside the band: unresolved"
+          }
+        },
+        "strict_order_holds_across_band_on": 0,
+        "order_holds_across_band": false,
+        "reading": "Flips on all six: fes-then-batched below the pair table at w = 0, above at w = 0.1 and 1. 'Lowest IC row on five of six' is a calibration-point statement, unresolved under AGENTS.md 5a."
+      }
+    },
+    "sensitivity": "rho charged k = 1 or k = n + 1 native operations per walk step (validation/band.json diagnostics.rho_ext_*) and fes-then-batched / inherited-f4 priced by the complete bitop/v1 solver tally (diagnostics.bitop_band_*): no order verdict changes.",
+    "caveats": [
+      "3 repeats per IC configuration, 16 rho runs per walk; no confidence intervals",
+      "local container, not isolated (operation counts only; wall time is not part of S)",
+      "both rows of every pair (IC arm and matched rho, and every IC-vs-IC pair) come from one ic bench process per instance",
+      "random-binary rows are priced by host-measured ratios: their S at the run's calibration point is not reproducible (replay: -20% to -33% on the algebraic rows); the band, computed from counts, is",
+      "the matched rho emits no unpriced counter (canonicalisations, distinguished-point tests, Frobenius maps): its band is flat, a lower bound at w > 0",
+      "discrete-log recovery is a known-answer check (recovered = planted per repeat); the reports carry no base point or target for an independent [k]P = Q check",
+      "the validator holds no keyring key; under docs/SABOTAGE_RESISTANCE.md the independent booleans here are unsigned and pcc grades these proofs not_covered"
+    ]
+  }
+}

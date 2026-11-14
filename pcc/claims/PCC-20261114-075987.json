@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T01:28:42Z",
+ "id": "PCC-20261114-075987",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "model": "",
+  "session": "norm-target-fiber-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "279a3e12e2d5d231fcb3bb945102c4aed6d4db189958594d5900a5e1e767e0bf",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetFiber.normDerivativeRing"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual declaration/context hypotheses: CommRing, Nontrivial ring where needed, and Field for field specializations/factor removal. Curve equation, d>=3, bounded remainder and e!=0 premises are explicit. Actual computed norm/division/remainder and base change only; no weighted-degree29, low closure, finder or sub-exponential claim. Unsigned source-bound evidence.",
+ "statement": "Exact source-bound theorem NormTargetFiber.normDerivativeRing: theorem normDerivativeRing (f A B : R[X]) : (A^2-f*B^2).derivative= C (2 : R)*A*A.derivative-f.derivative*B^2-C (2 : R)*f*B*B.derivative"
+}

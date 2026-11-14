@@ -15,9 +15,10 @@
 //! reference is the algorithm in `fes.cuh` ported to Rust, so a worker's output
 //! must equal it exactly.
 
-use std::io::Write;
+use std::io::{BufReader, Read, Write};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
+use std::sync::Mutex;
 
 use crate::cryptanalysis::mq_fes::QuadraticForm;
 
@@ -280,6 +281,145 @@ fn run_worker(sys: &PackedSystem, worker: &Path) -> Result<FesResult, String> {
     })
 }
 
+/// The position of `x` in the Gray-code walk from 0 (the inverse of
+/// `s ^ (s >> 1)`): `fes-f2`'s CPU search emits its zeros in increasing
+/// order of this rank.
+pub fn gray_rank(x: u64) -> u64 {
+    let mut b = x;
+    let mut shift = 1;
+    while shift < 64 {
+        b ^= b >> shift;
+        shift <<= 1;
+    }
+    b
+}
+
+/// Put worker proposals in the order `fes-f2`'s sequential walk would emit
+/// them.  The CUDA kernel splits the cube over threads and appends zeros
+/// through an atomic counter, so its order is arbitrary; callers that take
+/// the first usable solution (the descent oracle does) would otherwise
+/// follow a different trajectory from `fes-f2` on the same input.
+pub fn sort_gray_order(points: &mut [u64]) {
+    points.sort_unstable_by_key(|&x| gray_rank(x));
+}
+
+/// A worker kept running in `--serve-bin` mode (`gpu/fes/fes_io.hpp`): one
+/// process, one CUDA context and one set of device buffers for a whole run,
+/// so a solver call costs a pipe round trip and a kernel launch instead of a
+/// process start and a CUDA initialisation.  Like [`run_worker`], it only
+/// proposes candidates; callers re-verify them.
+pub struct ServeWorker {
+    child: Child,
+    stdin: ChildStdin,
+    stdout: BufReader<ChildStdout>,
+    path: PathBuf,
+}
+
+/// One serve-mode reply: the listed candidates and the worker's total count.
+/// `total > proposed.len()` means the worker's output cap was hit, so the
+/// list is incomplete and must not be read as the whole solution set.
+#[derive(Clone, Debug)]
+pub struct ServeReply {
+    pub proposed: Vec<u64>,
+    pub total: u64,
+}
+
+impl ServeWorker {
+    /// Start `worker --serve-bin`.
+    pub fn spawn(worker: &Path) -> Result<Self, String> {
+        let mut child = Command::new(worker)
+            .arg("--serve-bin")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .map_err(|e| format!("failed to start {} --serve-bin: {e}", worker.display()))?;
+        let stdin = child.stdin.take().ok_or("no stdin on serve worker")?;
+        let stdout = BufReader::new(child.stdout.take().ok_or("no stdout on serve worker")?);
+        Ok(Self {
+            child,
+            stdin,
+            stdout,
+            path: worker.to_path_buf(),
+        })
+    }
+
+    /// The worker executable.
+    pub fn path(&self) -> &Path {
+        &self.path
+    }
+
+    /// Send one system and read its reply (the binary protocol of
+    /// `gpu/fes/fes_io.hpp`: little-endian words, no text formatting).
+    pub fn solve(&mut self, sys: &PackedSystem) -> Result<ServeReply, String> {
+        const MAGIC: u32 = 0x3153_4546;
+        let mut req = Vec::with_capacity(16 + 8 * (1 + sys.lin.len() + sys.quad_tri.len()));
+        for w in [MAGIC, sys.n as u32, sys.m as u32, 0] {
+            req.extend_from_slice(&w.to_le_bytes());
+        }
+        req.extend_from_slice(&sys.cst.to_le_bytes());
+        for v in sys.lin.iter().chain(sys.quad_tri.iter()) {
+            req.extend_from_slice(&v.to_le_bytes());
+        }
+        self.stdin
+            .write_all(&req)
+            .and_then(|_| self.stdin.flush())
+            .map_err(|e| format!("serve worker write: {e}"))?;
+        let mut head = [0u8; 24];
+        self.stdout
+            .read_exact(&mut head)
+            .map_err(|e| format!("serve worker read: {e}"))?;
+        let word = |i: usize| u32::from_le_bytes(head[i..i + 4].try_into().unwrap());
+        let quad = |i: usize| u64::from_le_bytes(head[i..i + 8].try_into().unwrap());
+        if word(0) != MAGIC {
+            return Err(format!("serve worker: bad reply magic {:#x}", word(0)));
+        }
+        if word(4) != 0 {
+            return Err(format!("serve worker: status {}", word(4)));
+        }
+        let (listed, total) = (quad(8), quad(16));
+        let mut body = vec![0u8; 8 * listed as usize];
+        self.stdout
+            .read_exact(&mut body)
+            .map_err(|e| format!("serve worker read: {e}"))?;
+        let proposed = body
+            .chunks_exact(8)
+            .map(|c| u64::from_le_bytes(c.try_into().unwrap()))
+            .collect();
+        Ok(ServeReply { proposed, total })
+    }
+}
+
+impl Drop for ServeWorker {
+    fn drop(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+static SHARED_SERVER: Mutex<Option<ServeWorker>> = Mutex::new(None);
+
+/// Solve on the process-wide serve worker, starting it on first use from
+/// [`discover_worker`] (`ICX_FES_WORKER` first).  `Ok(None)` when no worker
+/// is available; any worker error drops it, so the next call starts afresh.
+pub fn solve_on_shared_server(sys: &PackedSystem) -> Result<Option<(ServeReply, PathBuf)>, String> {
+    let mut guard = SHARED_SERVER.lock().unwrap_or_else(|p| p.into_inner());
+    if guard.is_none() {
+        match discover_worker() {
+            Some(w) => *guard = Some(ServeWorker::spawn(&w)?),
+            None => return Ok(None),
+        }
+    }
+    let server = guard.as_mut().expect("server present");
+    match server.solve(sys) {
+        Ok(reply) => Ok(Some((reply, server.path().to_path_buf()))),
+        Err(e) => {
+            *guard = None;
+            Err(e)
+        }
+    }
+}
+
 /// Generate a pseudo-random quadratic Boolean system in `n` variables and `m`
 /// equations with a planted common zero, returned with that planted point.
 /// Deterministic in `seed`; used by `icx fes` to exercise the backends.
@@ -458,5 +598,80 @@ mod tests {
             .collect();
         assert!(verified.iter().all(|&x| sys.is_solution(x)));
         assert!(!verified.contains(&bogus) || sys.is_solution(bogus));
+    }
+
+    /// Build `gpu/fes/fes_solve` (the host worker) into a temp directory, or
+    /// `None` when there is no C++ compiler.
+    fn build_host_worker() -> Option<PathBuf> {
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("gpu/fes/fes_solve.cpp");
+        let dir = std::env::temp_dir().join(format!("fes-serve-test-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).ok()?;
+        let out = dir.join("fes_solve");
+        for cxx in ["c++", "g++", "clang++"] {
+            let ok = Command::new(cxx)
+                .args(["-O2", "-std=c++17", "-o"])
+                .arg(&out)
+                .arg(&src)
+                .status()
+                .map(|s| s.success())
+                .unwrap_or(false);
+            if ok {
+                return Some(out);
+            }
+        }
+        None
+    }
+
+    /// The serve protocol end to end against the host worker: one process
+    /// answers many systems back to back, each reply complete
+    /// (`total == listed`) and equal to the CPU search.
+    #[test]
+    fn serve_worker_answers_many_systems_like_the_cpu_search() {
+        let Some(worker) = build_host_worker() else {
+            eprintln!("no C++ compiler: serve-worker test skipped");
+            return;
+        };
+        let mut server = ServeWorker::spawn(&worker).expect("spawn host worker --serve");
+        for trial in 0..40u64 {
+            let n = 1 + (trial as usize % 22);
+            let m = 1 + (trial as usize % 5);
+            let forms = sample_forms(n, m, 1000 + trial);
+            let sys = PackedSystem::from_quadratic_forms(&forms).unwrap();
+            let reply = server.solve(&sys).expect("serve reply");
+            assert_eq!(
+                reply.total,
+                reply.proposed.len() as u64,
+                "trial {trial}: host worker never caps"
+            );
+            let mut got = reply.proposed.clone();
+            got.sort_unstable();
+            let mut want = sys.cpu_search();
+            want.sort_unstable();
+            assert_eq!(got, want, "trial {trial} (n = {n}, m = {m})");
+        }
+    }
+
+    /// Shuffled solution lists sort back to exactly the CPU walk's order.
+    #[test]
+    fn sort_gray_order_reproduces_the_cpu_walk_order() {
+        use crate::cryptanalysis::mq_fes::gray_incremental_find_all;
+        let mut nonempty = 0;
+        for trial in 0..60u64 {
+            let n = 1 + (trial as usize % 20);
+            let m = 1 + (trial as usize % 3);
+            let forms = sample_forms(n, m, 77 + trial);
+            let want = gray_incremental_find_all(&forms, usize::MAX).unwrap();
+            let mut got = want.clone();
+            got.reverse();
+            let third = got.len() / 3;
+            got.rotate_left(third);
+            sort_gray_order(&mut got);
+            assert_eq!(got, want, "trial {trial} (n = {n}, m = {m})");
+            nonempty += (want.len() > 1) as u32;
+        }
+        assert!(nonempty > 20, "too few multi-solution systems: {nonempty}");
+        for s in [0u64, 1, 2, 5, 1 << 40, u64::MAX >> 1] {
+            assert_eq!(gray_rank(s ^ (s >> 1)), s);
+        }
     }
 }

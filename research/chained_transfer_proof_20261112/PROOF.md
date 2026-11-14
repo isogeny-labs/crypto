@@ -380,6 +380,16 @@ the reachable-set census is in `atlas.rs` and
   for rho on the target subgroup: worse for every `g ≥ 2`. That is a comparison of
   best-known algorithms, not a lower bound, and the `tower_large` and
   `hyper64.rs` notes measure it only at toy size.
+  Measured on the transferred instance (2026-11-13,
+  `research/full_jacobian_ic_20261113/RESULTS.md`, `[pcc:unverified]`):
+  the whole-`J` IC was run in full-relation and double-large-prime variants
+  at p = 211 to 51,203. Every cell is above the matched negation rho on `E1`
+  at the §5a band and at the calibrated reading. At `w = 0.1` the arm costs
+  406 to 7.5e6 times rho; no cell is below at any price. The frozen
+  "closed by data" rule is not met: the lower 95% bound of the ratio's slope in
+  `p` is −0.07 (full) and −0.65 (double large prime), because the instance
+  selection did not bind `r` to `p`, and rho costs about `√r`. O3 stays open.
+  A decisive rerun freezes `r ≈ p`.
 * **Measured results are toy-size.** Every experiment cited has `p` at most
   12,841 (degree 2) or 251 (degree 3), a handful of covers per prime, and no
   signed pcc claim: they are `[pcc:unverified]`, and none is a row in the

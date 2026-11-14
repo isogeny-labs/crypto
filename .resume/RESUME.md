@@ -1,25 +1,15 @@
-# Resume: crypto @ aburan28/intelligent-ride-v0k039
+# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-User (2026-11-13): "Chase all leads" for non-generic sub-sqrt / subexponential prime-field ECDLP.
-Five open leads from research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md and
-RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md: L1 PKM tower m>=8; L2 small roots beyond Coppersmith
-(S4 at delta>=1/4, S5 at ~1/5); L3 digit-presentation solving degree; L4 lifting with growing rank
-(Silverman-Suzuki); L5 compact full-summation message for two-isogeny fibre bases (KN-OPEN-08ba7e).
-
-## Lead / hypothesis
-Each lab writes PROTOCOL.md (frozen sha256, predictions, kill/survive rule) before any run.
+Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
 
 ## Spec
-Toy local runs only (4 vCPU / 15 GB shared; per-lab cap 1 core, 3 GB). Evidence under
-scratchpad chase/L*/ (path in session); to be copied into research/prime_leads_chase_20261113/.
+Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
+Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
+Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
 
 ## State
-2026-11-13: labs dispatched as parallel subagents. msolve build denied (external code); in-repo F4 used.
-No AWS CLI, no checkpoint upload token: S3 checkpoint upload impossible in this container.
+2026-11-14: patch written, release build running. No rows yet.
 
-## Runs in flight
-L1-L5 subagents.
-
-## Stop and success conditions
-Per-lab frozen rule. Success = verified measured movement of an exponent or a closing argument with checker.
+## Next
+Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.

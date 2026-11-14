@@ -262,6 +262,18 @@ enum Cmd {
         /// Explicit diagnostic launch provenance (producer activation pending).
         #[arg(long)]
         diagnostic_launch: Option<PathBuf>,
+        /// Calibrated weight of AGENTS.md §5a (from `ecbench wcal` or a
+        /// perf-ipc reading), recorded in `session.json` (`options.w_cal`)
+        /// and read by `band`, `compare`, `challenge` and `bound fit`.
+        /// Needs --w-cal-method and --w-cal-host.
+        #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+        w_cal: Option<f64>,
+        /// `perf-ipc` or `best-of-N timing`.
+        #[arg(long)]
+        w_cal_method: Option<String>,
+        /// The host `w_cal` was measured on.
+        #[arg(long)]
+        w_cal_host: Option<String>,
         /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
@@ -460,6 +472,41 @@ enum Cmd {
         /// band files written before that date.
         #[arg(long)]
         no_price_table_work: bool,
+        /// Calibrated weight of AGENTS.md §5a (2026-11-12): time of one
+        /// native mulmod over time of one group addition on the same curve
+        /// and host. Adds the additive `calibrated` block (field-arithmetic
+        /// counters ordered at 0, w_cal, 10*w_cal); without it the output
+        /// is unchanged. Needs --w-cal-method and --w-cal-host.
+        #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+        w_cal: Option<f64>,
+        /// `perf-ipc` or `best-of-N timing`.
+        #[arg(long)]
+        w_cal_method: Option<String>,
+        /// The host `w_cal` was measured on.
+        #[arg(long)]
+        w_cal_host: Option<String>,
+    },
+    /// Measure w_cal (AGENTS.md §5a) by best-of-N timing of a mulmod and a
+    /// group addition on y^2 = x^3 + a x + b over F_p; prints JSON labelled
+    /// `best-of-N timing`, never perf-ipc.
+    Wcal {
+        #[arg(long)]
+        p: u64,
+        #[arg(long, default_value_t = 0)]
+        a: u64,
+        #[arg(long)]
+        b: u64,
+        #[arg(long, default_value_t = 15)]
+        rounds: usize,
+        #[arg(long, default_value_t = 200_000)]
+        ops: u64,
+        /// Host name to record with the reading.
+        #[arg(long)]
+        host: String,
+        /// Also attach the reading to this session directory as the
+        /// sidecar `w_cal.json` (`session.json` is not rewritten).
+        #[arg(long)]
+        session: Option<PathBuf>,
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
@@ -1607,6 +1654,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         }
         Cmd::Run {
             diagnostic_launch,
+            w_cal,
+            w_cal_method,
+            w_cal_host,
             spec: path,
             out,
             cpus,
@@ -1628,7 +1678,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("ecbench: no CPU topology on this OS; running with --cpus none (every run is recorded at L0, operation counts unaffected)");
                 req = isolation::CpuRequest::None;
             }
+            let w_cal = wcal_from_flags(w_cal, w_cal_method, w_cal_host)?;
             let opts = runner::RunOptions {
+                w_cal,
                 diagnostic_launch: diagnostic_launch
                     .as_deref()
                     .map(crypto_lib::cryptanalysis::ecbench::diagnostic_launch::DiagnosticLaunch::load)
@@ -1874,6 +1926,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     table_work: !no_price_table_work,
                 },
                 bitop,
+                w_cal: None,
             };
             if dir.len() > 1 {
                 return compare_pooled_cmd(
@@ -2046,7 +2099,58 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             ranks,
             price_table_work: _,
             no_price_table_work,
-        } => band_cmd(&dir, &weights, json.as_deref(), ranks, !no_price_table_work)?,
+            w_cal,
+            w_cal_method,
+            w_cal_host,
+        } => {
+            // The flags override; without them the sessions' own w_cal is read.
+            let wcal = match wcal_from_flags(w_cal, w_cal_method, w_cal_host)? {
+                Some(w) => Some(w),
+                None => runner::shared_wcal(&dir)?,
+            };
+            band_cmd(
+                &dir,
+                &weights,
+                json.as_deref(),
+                ranks,
+                !no_price_table_work,
+                wcal.as_ref(),
+            )?
+        }
+        Cmd::Wcal {
+            p,
+            a,
+            b,
+            rounds,
+            ops,
+            host,
+            session,
+        } => {
+            let m = crypto_lib::cryptanalysis::ecbench::wcal::measure(p, a, b, rounds, ops)?;
+            let w = m.to_wcal(&host);
+            let doc = serde_json::json!({
+                    "schema": "ecbench.wcal/v1",
+                    "w_cal": w.w_cal, "method": w.method, "host": w.host,
+                    "curve": {"p": p, "a": a, "b": b},
+                    "rounds": m.rounds, "ops_per_round": m.ops_per_round,
+                    "mul_ns": m.mul_ns, "add_ns": m.add_ns,
+                    "mul_spread": m.mul_spread, "add_spread": m.add_spread,
+                    "note": "wall-clock minimum of N rounds, same process; not perf-ipc",
+            });
+            if let Some(d) = session {
+                let f = d.join(runner::WCAL_SIDECAR);
+                if f.exists() {
+                    return Err(format!("{} exists; not overwriting", f.display()));
+                }
+                std::fs::write(
+                    &f,
+                    serde_json::to_string_pretty(&doc).map_err(|e| e.to_string())? + "\n",
+                )
+                .map_err(|e| format!("{}: {e}", f.display()))?;
+                eprintln!("attached w_cal to {}", f.display());
+            }
+            println!("{doc}");
+        }
         Cmd::Resources { dir, out } => {
             let report = resources::session(&dir)?;
             if let Some(path) = out {
@@ -2724,6 +2828,22 @@ fn audit_ir_one(
     }))
 }
 
+/// The `--w-cal*` flags as a validated [`WCal`], `None` without `--w-cal`.
+fn wcal_from_flags(
+    w_cal: Option<f64>,
+    method: Option<String>,
+    host: Option<String>,
+) -> Result<Option<crypto_lib::cryptanalysis::ecbench::band::WCal>, String> {
+    let Some(w) = w_cal else { return Ok(None) };
+    let w = crypto_lib::cryptanalysis::ecbench::band::WCal {
+        w_cal: w,
+        method: method.unwrap_or_default(),
+        host: host.unwrap_or_default(),
+    };
+    w.validate()?;
+    Ok(Some(w))
+}
+
 fn write_or_print(out: Option<&Path>, text: &str) -> Result<(), String> {
     match out {
         Some(o) => {
@@ -2753,6 +2873,7 @@ fn band_cmd(
     json: Option<&std::path::Path>,
     ranks: bool,
     price_table_work: bool,
+    wcal: Option<&crypto_lib::cryptanalysis::ecbench::band::WCal>,
 ) -> Result<(), String> {
     let weights: Vec<f64> = weights
         .split(',')
@@ -2769,7 +2890,8 @@ fn band_cmd(
     let pricing = crypto_lib::cryptanalysis::ecbench::band::Pricing {
         table_work: price_table_work,
     };
-    let rep = crypto_lib::cryptanalysis::ecbench::band::band_with(&recs, &weights, pricing)?;
+    let rep =
+        crypto_lib::cryptanalysis::ecbench::band::band_with_wcal(&recs, &weights, pricing, wcal)?;
     print!(
         "{}",
         crypto_lib::cryptanalysis::ecbench::band::markdown(&rep)
