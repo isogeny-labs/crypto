@@ -51,11 +51,17 @@ def cgroup_cpus():
     """CPUs this container may use: cgroup v2 cpu.max quota, else the affinity set (E3.4)."""
     n = len(os.sched_getaffinity(0))
     try:
-        q, per = open("/sys/fs/cgroup/cpu.max").read().split()
+        q, per = open("/sys/fs/cgroup/cpu.max").read().split()                      # cgroup v2
         if q != "max":
             n = min(n, int(q) // int(per))
     except (OSError, ValueError):
-        pass
+        try:                                                                       # cgroup v1
+            q = int(open("/sys/fs/cgroup/cpu/cpu.cfs_quota_us").read())
+            per = int(open("/sys/fs/cgroup/cpu/cpu.cfs_period_us").read())
+            if q > 0:
+                n = min(n, q // per)
+        except (OSError, ValueError):
+            pass
     return n
 os.makedirs(IN, exist_ok=True); os.makedirs(RES, exist_ok=True)
 
@@ -67,13 +73,14 @@ def sha(p):
 
 def oom_kills():
     """oom_kill count from the cgroup (v2), or None if unreadable (E3.3)."""
-    try:
-        for line in open("/sys/fs/cgroup/memory.events"):
-            k, v = line.split()
-            if k == "oom_kill":
-                return int(v)
-    except OSError:
-        return None
+    for p in ("/sys/fs/cgroup/memory.events", "/sys/fs/cgroup/memory/memory.oom_control"):  # cgroup v2, then v1
+        try:
+            for line in open(p):
+                k, v = line.split()
+                if k == "oom_kill":
+                    return int(v)
+        except (OSError, ValueError):
+            continue
     return None
 
 
@@ -124,9 +131,12 @@ class H(BaseHTTPRequestHandler):
         cost_per_hr, max_usd = float(req.get("cost_per_hr", 0)), float(req.get("max_usd", 40))
         if seconds <= 0 or cost_per_hr <= 0:
             return self.reply(409, {"error": "seconds and cost_per_hr are required"})
-        if cost_per_hr * (seconds + 3600) / 3600 > max_usd:     # one hour of idle billing included
+        idle = int(req.get("idle_seconds", 14400))  # F-R3-2: billed until the next check-in deletes the pod (up to ~4 h)
+        if cost_per_hr * (seconds + idle) / 3600 > max_usd:
             return self.reply(409, {"error": "cost at the time limit exceeds max_usd",
-                                    "projected_usd": cost_per_hr * (seconds + 3600) / 3600, "max_usd": max_usd})
+                                    "projected_usd": cost_per_hr * (seconds + idle) / 3600, "max_usd": max_usd})
+        if any(os.scandir(RES)):                    # F-R3-4: a relaunch uses a new pod; never mix into old results
+            return self.reply(409, {"error": "RESULTS_DIR not empty"})
         mem = cgroup_memory_bytes()
         floor = int(req.get("memory_floor_gib", 56)) * 2**30
         if mem < floor:

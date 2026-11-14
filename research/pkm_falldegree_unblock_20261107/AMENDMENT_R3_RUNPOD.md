@@ -1,6 +1,6 @@
 # DRAFT Amendment R3 (proposed number 15): reserved RunPod CPU pods as an execution route
 
-**Status: draft, revision 2 (2026-11-14), NOT frozen.** Revision 1 was reviewed by an independent red team
+**Status: draft, revision 3 (2026-11-14), NOT frozen.** Revision 1 was reviewed by an independent red team
 (`REVIEW_R3_R4.md`): "freeze with edits", blocking edits E3.1–E3.9. This revision applies them; §8 maps each edit to its place.
 
 The owner's instructions of 2026-11-14 were: "unblock the fall-degree study and root solver. Run this on runpod", then "do the
@@ -54,13 +54,23 @@ reserved compute needs the owner's confirmation. Until then, no job on this rout
     hashes, as the EKS route did.
 - **Identity** (E3.8). Each receipt records the pod's `create.json` (including `machine`), the runner SHA-256, the image digest,
   `runner_request.json` (with verified file hashes and the commit) and `host.txt` (CPU model, `nproc`, cgroup `memory.max`).
-- **Tested locally** (`iso/INTEGRATION.md` and the runner checks of 2026-11-14 22:01Z), on the 4-vCPU, 15 GB session machine:
-  - refused: cost at the limit US$50.96 (16 vCPU × 172,800 s) against US$40; memory below a 56 GiB floor; 4 CPUs < 12;
-    no time limit;
-  - a job past its limit was killed and recorded as `deadline`;
-  - the manifest endpoint listed every result file.
-  
-  The `oom_kill` counter was not readable on that machine. The runner refuses to start any job where it is unreadable.
+- **Tested locally, partly on modified copies** (F-R3-1). On the 4-vCPU, 15 GB session machine (cgroup v1), 2026-11-14 about
+  22:01Z. The logs are not committed; this is a description, not evidence.
+  - The committed runner refused: cost at the limit US$50.96 (16 vCPU × 172,800 s, then with a 1-hour idle allowance) against
+    US$40; memory below a 56 GiB floor; a request with no time limit.
+  - The "4 CPUs < 12" refusal and the deadline kill (exit `deadline` after 3 s) were seen only on a scratch copy with the CPU
+    floor lowered.
+  - The guarded runner has **not yet run a job with every guard passing**. That first happens on a real pod, where its R4
+    `gaux` stage is the check.
+  - Since then: a cgroup-v1 fallback for the `oom_kill` counter (`memory.oom_control`) and the CPU quota (`cpu.cfs_*`), an
+    idle allowance of 14,400 s, and a refusal when `RESULTS_DIR` is not empty.
+- **Idle billing** (F-R3-2). The cost refusal includes `idle_seconds` (default 14,400 s), because a pod is billed until the next
+  check-in deletes it. With 4 hours, `iso-a` (172,800 s) fits US$40 only at a live price of about US$0.769/h or less.
+- **OOM rule scope** (F-R3-3). "Exit 137 plus an `oom_kill` increment" is used as Amendment 14's `OOMKilled` only in jobs with a
+  single heavy stage: the `cap:`/`x:` jobs. In multi-stage jobs, a whole-job counter cannot say which stage was killed. There, an
+  exit 137 with an increment is recorded as OOM of an unidentified stage, and the job's rows are checked one by one.
+- **No mixing** (F-R3-4). A relaunch always uses a new pod. The runner refuses `/start` when `RESULTS_DIR` is not empty, so a
+  container restarted on the same volume cannot write a second job into the first job's results.
 
 ## 4. Host dependence (E3.6)
 
@@ -108,3 +118,7 @@ Otherwise it stays the owner's decision 8 (E3.10).
 | E3.8 identity | §3; image digest pin, `RUNNER_SHA256`, `create.json` with `machine` |
 | E3.9 losses | §7 |
 | E3.10 (optional) R2-G | §7 |
+| F-R3-1 test statement, cgroup v1 | §3 "Tested locally"; `server.py` v1 fallback |
+| F-R3-2 idle allowance 4 h | §3; `server.py` `idle_seconds` |
+| F-R3-3 OOM rule scope | §3 |
+| F-R3-4 new pod per relaunch, no mixing | §3; `server.py` refuses a non-empty `RESULTS_DIR` |

@@ -1,6 +1,6 @@
 # DRAFT Amendment R4 (proposed number 16): the 2-isogeny arm at `P1`
 
-**Status: draft, revision 3 (2026-11-14), NOT frozen.** Revision 1 was reviewed by an independent red team
+**Status: draft, revision 4 (2026-11-14), NOT frozen.** Revision 1 was reviewed by an independent red team
 (`REVIEW_R3_R4.md`): "freeze with edits", E4.1–E4.8. Revision 2 applied those, and its re-review asked for R2-E1–R2-E7.
 This revision applies those too. Section 9 maps every edit to the text and the evidence. The text is written on the owner's instruction "do the isogeny arm at P1 first" (2026-11-14). Target
 when frozen: `research/prime_fall_degree_20261027/PREREGISTRATION.md`, appended as Amendment 16, **before any isogeny row at
@@ -55,8 +55,9 @@ The predictions in section 5 were written knowing all of the above.
   `mestre_and_naive_build_the_same_isogeny_tower`; they pass on main + patch and on frozen + patch (`gaux/TESTS_FROZEN.md`). Check 3:
   the 16 stage A `P0` isogeny draws, rerun with `--aux-order mestre`, equal `pfdA_summary.json` on `x_r`, `closure_dF`, `falls`,
   `ffd`, `closure_muladds`, `closure_max_cols`, `D` and `f4_muladds`.
-  - Check 3 passed in `gaux/v3/`. It also passed through the runner, run on this machine as the integration test
-    (`iso/INTEGRATION.md`).
+  - Check 3 passed in `gaux/v3/`. It also passed through the runner on this machine (`iso/INTEGRATION.md`), on the
+    runner versions at `1e1e0f596b` and `172ce02e28`. Those predate the R3 guards. The guarded runner first runs it on a real
+    pod (F-R4-2).
   - Check 3 is also the `gaux` stage of every R4 job, on the job's own host, before any `P1` row: edit E4.7.
   - The pass configuration (binary `705b151b…`, 12 threads) is pinned. Any later mismatch under it is final.
 - **G1** (frozen): `hky_fp_tower_check` prints "G1: 6 cases pass" (stage `g1`).
@@ -106,7 +107,11 @@ and the re-review's cases A–E, each with its required outcome.
   - an empty interval (`L > U`);
   - an exact closure value outside the F4 interval (for example, closure exact 5 while a completed cap-5 run does not refute);
   - a closure lower bound above a refuting `D` (G2 in bound form);
-  - sources of one draw disagreeing on `x_R` or on the auxiliary curve.
+  - sources of one draw disagreeing on `x_R` or on the auxiliary curve;
+  - a refuted draw whose certificate finds `V × V` solutions (case F: a refuted system has none);
+  - a row not at `P1` or not built with `--aux-order mestre` (case H).
+  
+  On a STOP the scorer exits with status 2.
   
   Each draw lists its sources, with the bound each gives (Amendment 7 D.2's per-draw source).
 - **Admission.** A draw enters a median only if it is refuted (an exact closure, or an F4 refutation) or certified inconsistent
@@ -161,8 +166,9 @@ and the re-review's cases A–E, each with its required outcome.
 2. S3 works. `pkm_tower_pilot_r4` (`705b151b…`) is in the artifact store by hash, and the resume checkpoint and
    `bench.record/v1` are written.
 3. The owner has ruled on reserved-pod ceilings (decision 4 set US$40 per job and US$400 for the study for Spot compute).
-4. This amendment is frozen. The freeze commit is named in `PREREGISTRATION.md`, and every job's `repo.tar` is
-   `git archive` of `iso/BUNDLE_PATHS` at that commit, verified on the pod against `iso/BUNDLE.sha256` at that commit
+4. This amendment is frozen. `PREREGISTRATION.md` names the SHA-256 of `iso/BUNDLE.sha256` and of `iso/PINS.json` (a
+   commit cannot name itself; F-R4-3). Every job's `repo.tar` is `git archive` of `iso/BUNDLE_PATHS` at a commit whose
+   `iso/BUNDLE.sha256` and `iso/PINS.json` have those hashes, and it is verified on the pod against `iso/BUNDLE.sha256`
    (`iso/INTEGRATION.md`: a tampered pin is refused).
 
 **Pods.** Reserved (`interruptible: false`) CPU pods only. Flavor `cpu5m` or `cpu3m` (memory-optimised), 12 vCPU, which
@@ -222,4 +228,7 @@ Kummer rows, frozen binaries, §6 rules for other arms, seeds, draws and budgets
 | R2-E5 bundle pins verified after unpacking; commit recorded | §6 precondition 4; `iso/BUNDLE.sha256`, `iso/make_bundle_pins.sh`; runner `iso` mode; `iso/INTEGRATION.md` (second run) |
 | R2-E6 12-vCPU memory-optimised pods; no job above US$40 or before the ceiling decision; no censored-by-cost | §6; `runpod/rp.sh` flavors `cpu5m`, `cpu3m` |
 | R2-E7 preconditions and loss rule | §6 |
+| F-R4-1 case F (and H) stop; non-zero exit | §5; `score_iso.py` (`--selftest` cases F, H) |
+| F-R4-2 integration-test runner versions | §3 |
+| F-R4-3 freeze by bundle hashes | §6 precondition 4 |
 | R2-E8 (optional) gaux log scan | `iso/entry_iso.sh` `panicked()` now scans `gates/gaux/` |

@@ -19,6 +19,7 @@ import glob, json, os, re, sys
 
 P0_MEDIANS = {1: 3, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5, 8: 5}  # admitted, results/R9/analysis/pfdA_summary.json
 T_ALL, T_P1, T_P2 = range(1, 14), range(1, 9), range(9, 14)
+P1 = 2013265921
 
 
 def d_f(r):
@@ -66,6 +67,9 @@ def score(runs):
     def src(x, path, r, what):
         x["sources"].append({"file": os.path.basename(path), "what": what, "x_r": r.get("x_r"),
                              "aux": [r.get("tower", {}).get("aux_a"), r.get("tower", {}).get("aux_b")]})
+        # Case H: every R4 row is at P1 and built with --aux-order mestre.
+        if r.get("p") != P1 or r.get("tower", {}).get("aux_order_method") != "mestre":
+            x["conflicts"].append(f"{os.path.basename(path)}: row not at P1 or not built with --aux-order mestre")
     for p in sorted(glob.glob(os.path.join(runs, "A-m2-iso-p1*.jsonl"))):
         for r in rows_of(p):
             x = d(r["t"], r["target_index"])
@@ -129,6 +133,9 @@ def score(runs):
             x["conflicts"].append(f"empty interval [{L}, {U}]")
         x["dF"] = None if L is None else ((L, "") if U is not None and L == U else (L, ">="))
         x["decomposable"] = x["solutions"] is not None and x["solutions"] > 0
+        # Case F: a refuted system has no solution on the grid (verify.py's cross-check); both at once is a conflict.
+        if x["decomposable"] and x["refuted"]:
+            x["conflicts"].append(f"refuted, but the certificate finds {x['solutions']} V x V solutions")
         x["admitted"] = not x["decomposable"] and x["dF"] is not None and (x["refuted"] or x["solutions"] == 0)
         # G2 (registered for m = 2, t <= 10): exact closure d_F <= D.
         x["g2"] = None if (cc != "" or x["D"] is None or t > 10) else cv <= x["D"]
@@ -184,7 +191,8 @@ def _selftest():
     import tempfile
     tmp = tempfile.mkdtemp()
     def row(t, k, **kw):
-        r = {"x_r": 1000 + 10 * t + k, "kind": "isogeny", "m": 2, "control": "tower", "t": t, "target_index": k}
+        r = {"x_r": 1000 + 10 * t + k, "kind": "isogeny", "m": 2, "control": "tower", "t": t, "target_index": k,
+             "p": P1, "tower": {"aux_a": 1, "aux_b": 2, "aux_order_method": "mestre"}}
         r.update(kw)
         return json.dumps(r)
     A = [row(t, k, last_fall_degree=P0_MEDIANS.get(t, 5), closures=[{"c": 5, "censored": None}])
@@ -196,7 +204,8 @@ def _selftest():
     open(os.path.join(tmp, "A-m2-iso-p1.jsonl"), "w").write("\n".join(A[:20]) + "\n")
     open(os.path.join(tmp, "A-m2-iso-p1-big.jsonl"), "w").write("\n".join(A[20:]) + "\n")
     DA = [row(t, k, inconsistent=True, solving_degree_max=(P0_MEDIANS.get(t, 5) if t <= 11 else 6), timed_out=False)
-          for t in range(1, 14) for k in (0, 1)]
+          for t in range(1, 14) for k in (0, 1) if (t, k) != (13, 1)]
+    DA.append(row(13, 1, inconsistent=False, timed_out=True))   # draw 1 at t = 13 is decomposable: F4 cannot refute it
     open(os.path.join(tmp, "DA-m2-iso-p1.jsonl"), "w").write("\n".join(DA) + "\n")
     # t = 12: closure '>' 6 and DA U = 6 -> exact 6 (CAP at 5 not refuting agrees); t = 13 draw 0: closure censored at 4,
     # X cap 5 not refuting -> L = 6, DA U = 6 -> exact 6; draw 1 is decomposable and excluded.
@@ -226,7 +235,7 @@ def _selftest_review_cases():
     import tempfile
     def base(t=13, k=0, **kw):
         r = {"x_r": 777, "kind": "isogeny", "m": 2, "control": "tower", "t": t, "target_index": k,
-             "tower": {"aux_a": 1, "aux_b": 2}}
+             "p": P1, "tower": {"aux_a": 1, "aux_b": 2, "aux_order_method": "mestre"}}
         r.update(kw)
         return r
     def run(files):
@@ -257,7 +266,19 @@ def _selftest_review_cases():
     rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=None, closures=[{"c": 5, "censored": None}]) for k in (0, 1)],
               "DA-m2-iso-p1.jsonl": [base(k=k, x_r=999, inconsistent=True, solving_degree_max=6, timed_out=False) for k in (0, 1)]})
     assert rd["STOP"] and any("x_R" in c[2] for c in rd["conflicts"]), ("E", rd["conflicts"])
-    print("selftest (review cases A-E): pass")
+    # F: closure refutes (exact 5) on both draws, but the certificate finds solutions on draw 1 -> conflict, STOP.
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=5, closures=[]) for k in (0, 1)],
+              "CERT-m2-iso-p1.jsonl": [{"t": 13, "target_index": 0, "x_r": 777, "solutions": 0},
+                                       {"t": 13, "target_index": 1, "x_r": 777, "solutions": 2}]})
+    assert rd["STOP"] and any("certificate finds" in c[2] for c in rd["conflicts"]), ("F", rd["conflicts"])
+    # H: a row at the wrong prime, or without the mestre flag -> conflict, STOP.
+    bad = base(k=0, last_fall_degree=5, closures=[]); bad["p"] = 786433
+    rd = run({"A-m2-iso-p1-big.jsonl": [bad, base(k=1, last_fall_degree=5, closures=[])]})
+    assert rd["STOP"], ("H1", rd["conflicts"])
+    bad = base(k=0, last_fall_degree=5, closures=[]); bad["tower"] = {"aux_a": 1, "aux_b": 2}
+    rd = run({"A-m2-iso-p1-big.jsonl": [bad, base(k=1, last_fall_degree=5, closures=[])]})
+    assert rd["STOP"], ("H2", rd["conflicts"])
+    print("selftest (review cases A-F, H): pass")
 
 
 if __name__ == "__main__":
@@ -269,3 +290,4 @@ if __name__ == "__main__":
         rd = readings(ds)
         json.dump({"schema": "pfd.iso-score/v1", "draws": ds, "readings": rd}, open(sys.argv[2], "w"), indent=1, default=str)
         print(json.dumps(rd, indent=1))
+        sys.exit(2 if rd["STOP"] else 0)   # F-R4-1: a STOP is a non-zero exit

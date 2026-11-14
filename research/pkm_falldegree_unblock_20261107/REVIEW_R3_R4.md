@@ -611,3 +611,163 @@ Yes.
   - Scan `gates/gaux/*.log` in `panicked()`.
   - Pin `naive_count`'s build command and hash.
   - State that no reading is reported before the recount passes.
+
+## Final re-review (R3 rev 2, R4 rev 3)
+
+Reviewer: Red Team, 2026-11-14. Reviewed: commit `69142b169675ab7aaac31623604d7db9215e2e4e` on
+`aburan28/loving-heisenberg-rbzzbu` (working tree clean). That commit contains R4 revision 3 (`9fe6e242a3`) and R3 revision 2.
+`examples/pkm_tower_pilot.rs`, `examples/prime_fall_degree_tools.rs` and the preregistration are unchanged. Nothing was edited
+and nothing was run at P1. Every study number is `[pcc:unverified]`; **derived** marks this review's arithmetic.
+
+### F.1 Verdicts
+
+| draft | verdict |
+|:--|:--|
+| R3 revision 2 | **freeze with edits**: four text edits, F-R3-1 to F-R3-4 (one has a two-line code fallback) |
+| R4 revision 3 | **freeze with edits**: three edits, F-R4-1 to F-R4-3 (one scorer rule) |
+
+Every earlier finding is closed in substance. What remains:
+- two statements that overstate what was tested;
+- one wrong statement about the session machine;
+- an idle allowance that does not match the check-in cadence;
+- one instrument contradiction the scorer still swallows (case F).
+
+Once those are fixed, the first run is gated only by the owner decisions and external preconditions in F.6.
+
+### F.2 What this re-review ran (measured (review), `[pcc:unverified]`)
+
+- `python3 -I iso/score_iso.py --selftest`: "selftest: pass" and "selftest (review cases A-E): pass".
+- `sha256sum -c iso/BUNDLE.sha256` at the repository root: all 17 pinned files match HEAD. `git ls-files` of `BUNDLE_PATHS`
+  gives the same 17 files.
+- `python3 -m py_compile runpod/server.py` and `bash -n runpod/rp.sh`: both pass.
+- Further `score_iso.py` cases, synthetic rows, imported from the committed module:
+
+  | case | input | output | correct reading |
+  |:--|:--|:--|:--|
+  | F | t = 9: draw 0 refuted (closure exact 5), but its certificate finds 2 `V × V` solutions | no conflict. Draw 0 is excluded as decomposable, the cell counts as complete, and it reads "flat at 5" from draw 1 | a refuted system cannot have a solution: this is `verify.py`'s own cross-check, so it is an instrument conflict and R4 stops |
+  | G | certificate `x_R` differs from the rows' `x_R` | STOP | correct |
+  | H | rows at `p = 786433` with no `aux_order_method` | admitted | R2-E4 asked for a `p` and `mestre` check. Low, because `entry_iso.sh` always uses the wrapper |
+  | I | `{5 exact, ≥6 certified}` | median 5, "flat at 5", `draws_dF_ge_6` = 1 | as registered: lower median, disclosed in R4 §5 |
+- **cgroup on the session machine.** It is cgroup **v1**. `/sys/fs/cgroup/memory/memory.oom_control` reads `oom_kill 0`, so the
+  counter **is readable**. `server.py`'s `oom_kills()` reads only the v2 `memory.events`, and `cgroup_cpus()` reads only the v2
+  `cpu.max` (the v1 `cpu.cfs_quota_us` is ignored).
+- **RunPod API spec** (OpenAPI saved in the session scratchpad):
+  - `volumeInGb`: "The data on the Pod volume is persisted across Pod restarts";
+  - `volumeMountPath` defaults to `/workspace`;
+  - `containerDiskInGb`: "wiped when the Pod restarts";
+  - there is no balance endpoint (only `/billing/pods`, `/billing/endpoints` and `/billing/networkvolumes`).
+
+### F.3 R3 revision 2: edit by edit
+
+| edit | status | note |
+|:--|:--|:--|
+| E3.1 authority | **closed** | Authority table: only R4 on the route. The Kummer retries, `t = 14`, `m = 4` and the reserved ceilings wait for the owner. "Until then, no job on this route starts." |
+| E3.2 deadline, cost | **closed in code; one gap** | Process-group kill at `seconds`, recorded as `deadline`. Refusal at `cost_per_hr × (seconds + 3600)/3600 > max_usd`. Running total and balance are procedural, the balance through the owner. **Gap:** §6 deletes pods "at the first check-in after their job ends", and the cadence allows about 4 h between check-ins, but the guard allows 1 h of idle. With 4 h of idle, `iso-a` at about US$0.78/h costs about US$40.6 (**derived**), over the ceiling. |
+| E3.3 memory, OOM | **closed for v2 hosts** | Memory floor against cgroup `memory.max` (v1 fallback present); `m` flavors only; refusal when `oom_kill` is unreadable. The OOM counter has no v1 fallback, so on a v1 host every job is refused. That fails safe, but it blocks the route. |
+| E3.4 threads, vCPU | **closed for v2 hosts** | Rayon is always 12. The CPU check ignores the v1 CFS quota (low). |
+| E3.5 durability | **closed** | `RESULTS_DIR=/workspace/results` from `rp.sh create`; read by `server.py`; inherited by the shim (`${RESULTS_DIR:-/results}`) through `run()`'s environment. The wiring is correct. `/manifest` exists; the tarball is built on disk, though still read whole into memory to send (low). No job starts without S3. |
+| E3.6 host dependence | **closed** | §4. |
+| E3.7 Kummer control | **closed (text)** | No Kummer job is on the route. `rp.sh start` (Kummer mode) sends no `seconds` or `cost_per_hr`, so the runner would refuse it. It must be updated before the owner authorises any Kummer job (not blocking now). |
+| E3.8 identity | **closed** | Image pinned by digest; `RUNNER_SHA256`, computed client-side, is recorded and checkable against `create.json`'s `dockerStartCmd`; `create.json` has `machine`; the commit is in `runner_request.json`. |
+| E3.9 losses | **closed** | §7. See Q2 on reusing a pod. |
+
+### F.4 R4 revision 3: edit by edit
+
+| edit | status | note |
+|:--|:--|:--|
+| R2-E1 conflicts stop | **closed except case F** | Cases A and D give STOP. A refutation contradicted by the certificate (F) is not flagged. `main` still exits 0 when STOPPED (low; the readings say "STOPPED"). |
+| R2-E2 certified-only admission | **closed** | Case B. |
+| R2-E3 both draws | **closed** | Case C. |
+| R2-E4 identity, sources | **closed except the `p`/`mestre` check** | Case E gives STOP; per-draw sources are listed. Case H is low. |
+| R2-E5 pins | **closed** | `iso/BUNDLE.sha256` matches HEAD. The runner verifies the unpacked files and refuses a tampered pin (`iso/INTEGRATION.md`, second run); the commit is sent. Wording: a commit cannot name itself in `PREREGISTRATION.md`. Name the bundle commit, or the SHA-256 of `iso/BUNDLE.sha256`, in the frozen text (F-R4-3). |
+| R2-E6 pods, ceilings, no censored-by-cost | **closed** | 12-vCPU `cpu5m`/`cpu3m`. US$37 at the limit, US$38.2 with the runner's one idle hour (**derived**). Refusal above US$40; censored-by-cost removed; the bracket worst case is stated and exceeds US$400, with a running-total stop. The worst case assumes 3 bracket steps, but Amendment 7 B steps until a refutation or a limit; the running-total rule bounds the spend anyway (low). |
+| R2-E7 preconditions, loss rule | **closed** | §6. |
+
+### F.5 The coordinator's three questions
+
+**Q1. Is "OOM = stage exit 137 plus an `oom_kill` increment over the whole job" good enough for Amendment 14's `-m112` rule?**
+
+For the X and `cap:` jobs, yes. Their only heavy process is one pilot run.
+- An entry-logged "exit 137" means the pilot got SIGKILL while bash survived. The runner's deadline kill takes the whole process
+  group, so it never produces that line.
+- The only other SIGKILL source in the container is the OOM killer. The kernel counts `oom_kill` on the victim's memory cgroup,
+  so a host-level OOM increments it as well.
+- The two conditions together identify an OOM kill of that run.
+
+Limits:
+- (a) v2 only. On a v1 host the runner refuses every job, although the counter is readable (F.2).
+- (b) For multi-stage jobs (`iso-a`, stage B) a whole-job delta cannot be attributed to a stage. Amendment 14 does not apply to
+  them, but §3 states the rule without that restriction.
+
+**Q2. Does the `/workspace` volume survive a container restart, and is `RESULTS_DIR` wired correctly?**
+- **Survival:** per RunPod's own API spec, yes. Untested here. The volume is host-local (not a network volume), so it is lost
+  with a host failure; §7 already says "fetched if reachable".
+- **Wiring:** correct (F.3, E3.5). Data up to the last 300 s sync survives; `/work` (container disk) does not.
+- **New hazard:** after a restart the runner comes back idle on the same volume. A new `/start` on that pod would merge a new
+  attempt's files into the old attempt's `results/`. `iso/INTEGRATION.md`'s second run shows the same kind of mixing
+  ("`progress.txt` also holds the first run's four lines").
+
+**Q3. Does either text still overstate what is tested?**
+
+Yes, in three places.
+1. **R3 §3, "Tested locally (… the runner checks of 2026-11-14 22:01Z)".** No log of those checks is committed; commit
+   `69142b1696` changes only the amendment, `rp.sh` and `server.py`. On that machine the committed runner refuses at the
+   memory-floor or `oom_kill` step before it reaches the CPU check or starts a job. So "4 CPUs < 12" and the deadline kill could
+   only be observed on a modified copy with checks disabled, as the coordinator's note says for the deadline test. The committed
+   runner's success path, with every guard passing, has never run.
+2. **R3 §3, "The `oom_kill` counter was not readable on that machine".** Wrong. It is readable through cgroup v1; the runner
+   reads only v2.
+3. **R4 §3, "It also passed through the runner, run on this machine as the integration test".** True only of the pre-guard
+   runners (`1e1e0f596b`, `172ce02e28`). The runner R4 will use (`69142b1696`) has not run `gaux`.
+
+### F.6 Exact edits
+
+**R3:**
+- **F-R3-1** (replace the "Tested locally" bullet and its last line in §3): "**Tested locally** on the 4-vCPU, 15 GB, cgroup-v1
+  session machine, partly on modified copies of `server.py` with refusal checks disabled (logs not committed): the cost refusal
+  (US$50.96 against US$40), the memory-floor refusal, the CPU refusal, the missing-time-limit refusal, a `deadline` kill after
+  3 s, and the manifest endpoint. The committed runner, with all guards passing, has not yet run a job; its first run on a pod is
+  that job's `gaux` (R4) or the E3.7 control (Kummer)." Delete "The `oom_kill` counter was not readable on that machine." Either
+  add a cgroup-v1 fallback (read `oom_kill` from `/sys/fs/cgroup/memory/memory.oom_control`, and the quota from
+  `cpu.cfs_quota_us`/`cpu.cfs_period_us`), or add: "The runner reads cgroup v2 only. On a cgroup-v1 pod it refuses every job."
+- **F-R3-2** (§6 and the runner's idle term): replace "plus one hour of idle billing" and "Pods are deleted at the first check-in
+  after their job ends" with: "The idle allowance is 4 h, the longest check-in interval in force, unless the pod is deleted within
+  1 h of the job's end." Set the runner's `3600` to the allowance sent with the request (`idle_seconds`, default 14,400). Note:
+  with 4 h, `iso-a` fits US$40 only at or below about US$0.769/h (**derived**).
+- **F-R3-3** (§3, OOM sentence): append: "This classification is per job. It is used for Amendment 14's `-m112` rule only in jobs
+  with one heavy stage (`cap:` and R4's `x:` jobs). In other jobs an `oom_kill` increment marks the job as lost to memory, and no
+  stage is re-run on that basis."
+- **F-R3-4** (§7): append: "A relaunch uses a new pod. The runner refuses `/start` when `RESULTS_DIR` is not empty." Add that
+  check to `server.py`'s `/start`.
+
+**R4:**
+- **F-R4-1** (§5 conflicts and `score_iso.py`): add the conflict "a refuted draw (closure exact or any F4 refutation) whose
+  certificate has `solutions > 0`". Implement it in `score()` and add case F to `--selftest`. Make `main` exit 2 when
+  `readings["STOP"]` is true. Optional: reject rows with `p ≠ 2013265921` or without `aux_order_method = "mestre"` (case H).
+- **F-R4-2** (§3, G-AUX bullet): replace "It also passed through the runner, run on this machine as the integration test" with
+  "It also passed through the pre-guard runner (`1e1e0f596b`, `172ce02e28`) on this machine (`iso/INTEGRATION.md`). The guarded
+  runner of R3 revision 2 has not run it; the `gaux` stage of the first job on a pod is that run."
+- **F-R4-3** (§6, precondition 4): replace "The freeze commit is named in `PREREGISTRATION.md`" with "`PREREGISTRATION.md` names
+  the SHA-256 of `iso/BUNDLE.sha256` and of `iso/PINS.json` as frozen. Each job's `repo.tar` is built from a commit whose two
+  files have exactly those hashes, and the receipt records that commit." This avoids a commit having to name itself.
+  Re-generate `BUNDLE.sha256` after F-R4-1 changes `score_iso.py`.
+
+### F.7 What still gates the first run once the edits are in (owner decisions and external preconditions, not text defects)
+
+1. **Owner:** whether US$40 per job and US$400 for the study apply to reserved compute (R3 §2, R4 §6.3).
+2. **Owner:** a one-time confirmation that the RunPod balance covers the projected spend. The API has no balance endpoint
+   (R3 §6).
+3. **External:** S3 works. `705b151b…` is in the artifact store by hash, and the resume checkpoint and `bench.record/v1` are
+   written (R3 §3, R4 §6.2).
+4. **Procedure:** R3 and R4 appended to `PREREGISTRATION.md`, with the bundle pins named (F-R4-3).
+5. **External, found at pod creation:**
+   - RunPod accepts the digest-pinned image;
+   - a 12-vCPU `cpu5m`/`cpu3m` pod exists at a live `costPerHr` the guard admits (≤ about US$0.816/h with a 1 h allowance, ≤
+     about US$0.769/h with 4 h, for `iso-a`; **derived**);
+   - the pod's cgroup exposes `memory.events` (v2) or the v1 fallback is added;
+   - `memory.max` ≥ 56 GiB and at least 12 usable CPUs.
+
+   The runner refuses otherwise, and such a refusal is not a loss.
+6. **Not for R4:**
+   - any Kummer job on this route needs the owner's answers in R3 §2 and an updated `rp.sh start`;
+   - the `m = 4` cells at `t = 5, c = 7` and `t = 6, c = 6` still need their own amendment.
