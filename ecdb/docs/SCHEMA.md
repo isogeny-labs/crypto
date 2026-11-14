@@ -292,8 +292,13 @@ the Prym variety of H -> E).
     The two must agree.
   - The field's ICV1 name, recomputed from its modulus, must equal the
     stored one.
-  - A curve that already has the same model must carry the same slug, and an
-    existing class must have the same trace.
+  - A curve that already has the same model must carry the same slug. If its
+    Jacobian is already linked to a class, that class must be of genus 1 with
+    trace t'; if it has a `curve_zeta`, its #E(F_q) must be #E'. The class link
+    is only filled where it is NULL, never replaced. A relation or
+    `av_component` row already present is counted
+    (`prym_relations_already_present`, `prym_av_components_already_present`),
+    not replaced.
 - **Status.** The status is that of the L-polynomial (`proved`, or
   `probable` when the field is not proved). The invariants are `proved`.
 - **Idempotence.** A source whose Jacobian already has `isogeny_factor` rows

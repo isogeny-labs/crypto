@@ -63,14 +63,14 @@
 //! `prym_order_exhaustive`, `prym_curves_seen`, `prym_curves_existing`,
 //! `prym_curves_new`, `prym_curve_conflicts`, `prym_invariants`,
 //! `prym_isogeny_classes`, `prym_jacobians_linked`, `prym_zeta`,
-//! `prym_aliases`, `prym_relations`, `prym_self_complements`,
-//! `prym_av_components`.
+//! `prym_aliases`, `prym_relations`, `prym_relations_already_present`,
+//! `prym_self_complements`, `prym_av_components`,
+//! `prym_av_components_already_present`.
 
 use super::cover_lpoly::{gpow, group_order, Bsgs, ExtField, Fp64, Gf, PRIME_CONSTRUCTION};
 use super::covers::fq_from_parts;
 use super::registry::{
     class_row, extension_field, invariant_row, prime_field, FieldSpec, ALIAS_SQL, CLASS_SQL, CURVE_SQL, INVARIANT_SQL,
-    LINK_CLASS_SQL,
 };
 use super::siblings::prime_icv1;
 use super::{bulk, bulk1, Ctx, Report};
@@ -368,15 +368,59 @@ JOIN ec.abelian_variety hav ON hav.id = c.av_id
 JOIN ec.curve h ON h.id = hav.curve_id
 WHERE c.relation = 'isogeny_factor' AND h.genus = 2 AND h.family = 'cover'";
 
-/// Existing curves that share a model (field, coefficients) or a slug with an E'.
+/// Existing curves that share a model (field, coefficients) or a slug with an E',
+/// with the class their Jacobian is linked to (any g) and their stored #E(F_q).
 const EXISTING_SQL: &str = "
-SELECT r.slug, c.icv1_slug, eic.trace::text
+SELECT r.slug, c.icv1_slug, eic.trace::text, eic.g, z.point_counts[1]::text
 FROM jsonb_to_recordset($1::jsonb) AS r(slug text, field text, coefficients jsonb)
 JOIN ec.field f ON f.icv1_field = r.field
 JOIN ec.curve c ON (c.field_id = f.id AND c.model = 'short_weierstrass' AND c.coefficients = r.coefficients)
                 OR c.icv1_slug = r.slug
 LEFT JOIN ec.abelian_variety av ON av.curve_id = c.id
-LEFT JOIN ec.isogeny_class_fq eic ON eic.id = av.isogeny_class_id AND eic.g = 1";
+LEFT JOIN ec.isogeny_class_fq eic ON eic.id = av.isogeny_class_id
+LEFT JOIN ec.curve_zeta z ON z.curve_id = c.id";
+
+/// Link E''s Jacobian to the class of t' only where no class is linked yet
+/// (registry's LINK_CLASS_SQL replaces a different link; this never does).
+const LINK_SQL: &str = "
+UPDATE ec.abelian_variety av SET isogeny_class_id = ic.id
+FROM jsonb_to_recordset($1::jsonb) AS r(key text, label text)
+JOIN ec.curve c ON c.icv1_slug = r.key
+JOIN ec.isogeny_class_fq ic ON ic.label = r.label
+WHERE av.curve_id = c.id AND av.isogeny_class_id IS NULL";
+
+/// Whether an existing curve found by model or slug agrees with E' (`slug`, t', #E'):
+/// the same slug, a linked class (if any) of genus 1 and trace t', a stored
+/// #E(F_q) (if any) equal to #E'. Err names the disagreement.
+pub fn existing_agrees(
+    slug: &str,
+    have: Option<&str>,
+    class_g: Option<i32>,
+    class_trace: Option<&str>,
+    zeta_order: Option<&str>,
+    tp: &BigInt,
+    order: &BigInt,
+) -> Result<(), String> {
+    if have != Some(slug) {
+        return Err(format!("an existing curve with this model or slug is named {have:?}"));
+    }
+    if let Some(g) = class_g {
+        if g != 1 {
+            return Err(format!("the existing curve's Jacobian is linked to a class of genus {g}"));
+        }
+    }
+    if let Some(t) = class_trace {
+        if t.parse::<BigInt>().ok().as_ref() != Some(tp) {
+            return Err(format!("the existing class has trace {t}, t' = {tp}"));
+        }
+    }
+    if let Some(n) = zeta_order {
+        if n.parse::<BigInt>().ok().as_ref() != Some(order) {
+            return Err(format!("the existing curve_zeta has #E(F_q) = {n}, #E' = {order}"));
+        }
+    }
+    Ok(())
+}
 
 const ZETA_SQL: &str = "
 INSERT INTO ec.curve_zeta (curve_id, isogeny_class_id, point_counts, order_check, order_method, provenance_id)
@@ -406,6 +450,14 @@ const METHOD_BSGS: &str = "Prym complement E' of a prime_quadratic_pullback_v1 c
     w^2 = x G(x) taken to Y^2 = X^3 + A X + B by X = g0/x + g1/3, Y = g0 w/x^2; t' = -a1 - t from the stored \
     L-polynomial of Jac(H) and the target trace t, with a2 = 2q + t t'; #E' = q + 1 - t' equal to the group order of \
     (A, B) found by baby-step giant-step in the Hasse interval (unique candidate); j(E') equal from (A, B) and from \
+    the invariants I, J of the quartic x G(x)";
+/// The provenance of every row this pass writes: which order search ran for a
+/// given E' is in its `curve_zeta.order_method` (METHOD_BSGS or METHOD_COUNT).
+const METHOD_PROV: &str = "Prym complement E' of a prime_quadratic_pullback_v1 cover source H: v^2 = G(u^2): \
+    w^2 = x G(x) taken to Y^2 = X^3 + A X + B by X = g0/x + g1/3, Y = g0 w/x^2; t' = -a1 - t from the stored \
+    L-polynomial of Jac(H) and the target trace t, with a2 = 2q + t t'; #E' = q + 1 - t' equal to the group order of \
+    (A, B) found by baby-step giant-step in the Hasse interval (unique candidate), or by an exhaustive count when \
+    q < 2^20 and the search is inconclusive (curve_zeta.order_method says which); j(E') equal from (A, B) and from \
     the invariants I, J of the quartic x G(x)";
 const METHOD_COUNT: &str = "Prym complement E' of a prime_quadratic_pullback_v1 cover source H: v^2 = G(u^2): \
     w^2 = x G(x) taken to Y^2 = X^3 + A X + B by X = g0/x + g1/3, Y = g0 w/x^2; t' = -a1 - t from the stored \
@@ -585,19 +637,30 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
             let slug: String = r.get(0);
             let have: Option<String> = r.get(1);
             let trace: Option<String> = r.get(2);
+            let g: Option<i32> = r.get(3);
+            let zeta: Option<String> = r.get(4);
             let want = &curves[&slug].0;
-            let tp = ready.iter().find(|x| x.slug == slug).map(|x| x.prym.trace.to_string());
-            if have.as_deref() != Some(slug.as_str()) {
-                report.problem(format!(
-                    "E' {slug} (model {}): an existing curve with this model or slug is named {have:?}; not stored",
-                    want["equation"].as_str().unwrap_or_default()
-                ));
-                conflicts.insert(slug);
-            } else if trace.is_some() && trace != tp {
-                report.problem(format!("E' {slug}: the existing class has trace {trace:?}, t' = {tp:?}; not stored"));
-                conflicts.insert(slug);
-            } else {
-                existing.insert(slug);
+            let Some(x) = ready.iter().find(|x| x.slug == slug) else { continue };
+            let verdict = existing_agrees(
+                &slug,
+                have.as_deref(),
+                g,
+                trace.as_deref(),
+                zeta.as_deref(),
+                &x.prym.trace,
+                &x.prym.order,
+            );
+            match verdict {
+                Ok(()) => {
+                    existing.insert(slug);
+                }
+                Err(why) => {
+                    report.problem(format!(
+                        "E' {slug} (model {}): {why}; not stored",
+                        want["equation"].as_str().unwrap_or_default()
+                    ));
+                    conflicts.insert(slug);
+                }
             }
         }
     }
@@ -626,7 +689,7 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
         )
         .await?
         .get::<_, i64>(0);
-    let prov = ctx.provenance(src, METHOD_BSGS, None).await?;
+    let prov = ctx.provenance(src, METHOD_PROV, None).await?;
     let new: Vec<Value> = curves.iter().filter(|(s, _)| !existing.contains(*s)).map(|(_, v)| v.0.clone()).collect();
     let (mut invs, mut classes, mut links, mut zetas, mut aliases) = (vec![], vec![], vec![], vec![], vec![]);
     let mut seen_class = BTreeSet::new();
@@ -643,7 +706,7 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
     report.count("prym_invariants", bulk(client, INVARIANT_SQL, &invs, prov).await?);
     report.count("prym_aliases", bulk1(client, ALIAS_SQL, &aliases).await?);
     report.count("prym_isogeny_classes", bulk(client, CLASS_SQL, &classes, prov).await?);
-    report.count("prym_jacobians_linked", bulk1(client, LINK_CLASS_SQL, &links).await?);
+    report.count("prym_jacobians_linked", bulk1(client, LINK_SQL, &links).await?);
     report.count("prym_zeta", bulk(client, ZETA_SQL, &zetas, prov).await?);
 
     let (mut relations, mut components) = (vec![], vec![]);
@@ -691,8 +754,13 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
             }));
         }
     }
-    report.count("prym_relations", bulk(client, RELATION_SQL, &relations, prov).await?);
-    report.count("prym_av_components", bulk(client, COMPONENT_SQL, &components, prov).await?);
+    // A row already present (the same E -> E' from another source H) is counted, not replaced.
+    let n_rel = bulk(client, RELATION_SQL, &relations, prov).await?;
+    report.count("prym_relations", n_rel);
+    report.count("prym_relations_already_present", (relations.len() as u64).saturating_sub(n_rel));
+    let n_comp = bulk(client, COMPONENT_SQL, &components, prov).await?;
+    report.count("prym_av_components", n_comp);
+    report.count("prym_av_components_already_present", (components.len() as u64).saturating_sub(n_comp));
     Ok(())
 }
 
@@ -913,6 +981,26 @@ mod tests {
             derive(&fp(3), &elts(&fp(3), &[1, 0, 0, 0, 0, 0, 1]), &good, &BigInt::from(0)),
             Outcome::Skip(_)
         ));
+    }
+
+    /// An existing curve is reused only when it agrees with E' in every stored
+    /// fact; a different slug, a non-genus-1 or wrong-trace class link, or a
+    /// wrong stored #E(F_q) is a conflict (never overwritten).
+    #[test]
+    fn existing_curves_must_agree() {
+        let (tp, n) = (BigInt::from(-37), BigInt::from(609));
+        let s = "icv1-fp10-tm37-338863bc";
+        assert_eq!(existing_agrees(s, Some(s), None, None, None, &tp, &n), Ok(()));
+        assert_eq!(existing_agrees(s, Some(s), Some(1), Some("-37"), Some("609"), &tp, &n), Ok(()));
+        assert!(existing_agrees(s, None, None, None, None, &tp, &n).is_err());
+        assert!(existing_agrees(s, Some("icv1-fp10-tm37-00000000"), None, None, None, &tp, &n).is_err());
+        assert!(existing_agrees(s, Some(s), Some(2), Some("-37"), None, &tp, &n).is_err());
+        assert!(existing_agrees(s, Some(s), Some(1), Some("37"), None, &tp, &n).is_err());
+        assert!(existing_agrees(s, Some(s), None, None, Some("610"), &tp, &n).is_err());
+        assert!(existing_agrees(s, Some(s), Some(1), Some("-37"), Some("x"), &tp, &n).is_err());
+        // The class link never replaces a stored one.
+        assert!(LINK_SQL.contains("isogeny_class_id IS NULL"));
+        assert!(!LINK_SQL.contains("IS DISTINCT FROM"));
     }
 
     /// The two j formulas agree on random models over a 61-bit prime, and the
