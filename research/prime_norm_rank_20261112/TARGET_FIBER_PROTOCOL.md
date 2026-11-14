@@ -65,3 +65,18 @@ The pending Copilot4087 journal conflict is separate: do not edit Nov13 journal
 while pending. New work stays under this study, its manifest, Nov14 journal
 and append-only PCC paths. No old source, protected evidence, ledger rewrite,
 signature, vault access, force push, gate bypass or unrelated automation edit.
+
+Before source freeze, add a separate literal certificate for
+2ZBD-FB^2-2Z^2BC=B*(2ZD-FB-2Z^2C), degree4 in(B,Z,D,F,C),32 statement-
+derived plus16 extra replay points using unchanged canonical checker/hash.
+This only seals the unconditional factoring step after target substitution;
+it does not encode the curve premise, parameter-polynomial factor,
+specialization or full row equivalence. Those remain distinct Lean statements.
+
+Additional proof obligations before source freeze strengthen the original
+test: prove monicity/degree over nontrivial coefficient rings, base change
+of actual computed monic remainders, specialization to the existing field
+family, and equivalence of the full five equations after target-row
+replacement. Removing e^3 is permitted only with the explicit field premise
+e!=0. None of these obligations changes the original formulas or supplies
+a first-fall/last-fall or algorithmic cost conclusion [pcc:unverified].
