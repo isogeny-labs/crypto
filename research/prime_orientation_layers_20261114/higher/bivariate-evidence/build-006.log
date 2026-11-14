@@ -1,0 +1,15 @@
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-006.lean.txt:275:26: error(lean.unknownIdentifier): Unknown identifier `two_power_valuation`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/higher/bivariate-evidence/draft-006.lean.txt:274:69: error: unsolved goals
+a u i k : ℕ
+t : ℤ
+m : ℕ → ℕ
+ht : ↑t ∈ grid a
+ht0 : t ≠ 0
+hi : padicValInt 2 t = i
+hiu : i < u
+hu : u ≤ a
+rb : MomentLabels u k
+y : Ports a
+hc : (↑rb.1).testBit i = (↑y).testBit i
+hb : Content (↑↑rb.2) ((approxRows a u i (↑rb.1) (↑y) k t m).coeff ↑rb.2)
+⊢ -↑↑rb.2 ≤ -padicValRat 2 (2 ^ ↑rb.2)
