@@ -128,14 +128,14 @@ ON CONFLICT (curve_id, ell) DO NOTHING";
 
 type Poly = Vec<u64>; // ascending coefficients in [0, p)
 
-fn trim(mut a: Poly) -> Poly {
+pub(super) fn trim(mut a: Poly) -> Poly {
     while a.last() == Some(&0) {
         a.pop();
     }
     a
 }
 
-fn pmul(a: &[u64], b: &[u64], p: u64) -> Poly {
+pub(super) fn pmul(a: &[u64], b: &[u64], p: u64) -> Poly {
     if a.is_empty() || b.is_empty() {
         return Vec::new();
     }
@@ -164,7 +164,7 @@ fn pscale(a: &[u64], c: u64, p: u64) -> Poly {
     trim(a.iter().map(|x| x * (c % p) % p).collect())
 }
 
-fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
+pub(super) fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1 % p;
     b %= p;
     while e > 0 {
@@ -198,7 +198,7 @@ fn prem(a: &[u64], g: &[u64], p: u64) -> Poly {
     trim(r)
 }
 
-fn monic(g: &[u64], p: u64) -> Poly {
+pub(super) fn monic(g: &[u64], p: u64) -> Poly {
     let li = inv(*g.last().unwrap(), p);
     pscale(g, li, p)
 }
@@ -220,7 +220,7 @@ fn xpow(e: u64, g: &[u64], p: u64) -> Poly {
 
 /// The x-only division polynomials f_0..=f_n of y^2 = x^3 + A x + B:
 /// psi_n = f_n for n odd and psi_n = 2y f_n for n even.
-fn division_polys(n: usize, a: u64, b: u64, p: u64) -> Vec<Poly> {
+pub(super) fn division_polys(n: usize, a: u64, b: u64, p: u64) -> Vec<Poly> {
     let m = |v: i64| v.rem_euclid(p as i64) as u64;
     let (ai, bi) = (a as i64, b as i64);
     let big_f = trim(vec![b % p, a % p, 0, 1]);
@@ -262,7 +262,14 @@ fn division_polys(n: usize, a: u64, b: u64, p: u64) -> Vec<Poly> {
 }
 
 /// Whether pi acts on E[N] as the scalar ±a (a a unit mod N, 1 <= a < N).
-fn scalar_on(n: u64, a: u64, xp_cache: &mut BTreeMap<u64, Poly>, fs: &[Poly], big_f: &[u64], p: u64) -> bool {
+pub(super) fn scalar_on(
+    n: u64,
+    a: u64,
+    xp_cache: &mut BTreeMap<u64, Poly>,
+    fs: &[Poly],
+    big_f: &[u64],
+    p: u64,
+) -> bool {
     let n_us = n as usize;
     let g = if n.is_multiple_of(2) { monic(&pmul(big_f, &fs[n_us], p), p) } else { monic(&fs[n_us], p) };
     let xp = xp_cache.entry(n).or_insert_with(|| xpow(p, &g, p)).clone();
@@ -281,7 +288,7 @@ fn scalar_on(n: u64, a: u64, xp_cache: &mut BTreeMap<u64, Poly>, fs: &[Poly], bi
 
 // ------------------------------------------------------------- integers
 
-fn is_prime(n: u64) -> bool {
+pub(super) fn is_prime(n: u64) -> bool {
     n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| !n.is_multiple_of(d))
 }
 

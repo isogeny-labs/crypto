@@ -14,6 +14,7 @@ pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
 pub mod ecbench;
+pub mod ell_torsion;
 pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;
@@ -214,6 +215,8 @@ pub enum Selection {
     EndRings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
+    /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10 (curve_ell_torsion, frobenius_ell).
+    EllTorsion,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -263,6 +266,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After volcanoes: it cross-checks their levels and End(E) rows.
     if all || what == Selection::EndRings {
         reports.push(end_ring::import(ctx).await?);
+    }
+    // After volcanoes and end-rings: it cross-checks the census graph and the stored levels.
+    if all || what == Selection::EllTorsion {
+        reports.push(ell_torsion::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {
