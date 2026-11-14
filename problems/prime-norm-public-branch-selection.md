@@ -109,3 +109,24 @@ that uses the projection without paying for expansion, compared on identical
 inputs with the strongest original formulation. It must still produce actual
 successful public inputs and meet the original complete expected bit-cost
 criterion. No new paid or solver campaign was launched [pcc:unverified].
+
+2026-11-13 explicit special-fiber update: [report](../research/prime_norm_rank_20261112/weighted-leading-report/README.md),
+source5e342cafb. The actual target-completed pole family and Dickson tower
+have Lean endpoint identities; at the special fiber, its four nonconstant
+remainder coefficient equations force the zero retained tuple over every
+field. The support is monic degree5; a vanishing pure-power remainder makes
+it a monic divisor of X^16, hence X^5, and triangular nilpotence forces all
+four coefficients to zero. Eighteen new statements, whole-study gate304/0,
+import-inclusive fresh replay0; centralPCC-20261113-7b7707 and receipt
+PCC-20261113-582ee7 are unsigned [pcc:unverified].
+
+The special-fiber origin is not a recovered parameter-one solution. Exact
+weighted initial-form binding to the concrete reduced.ms input, regularity,
+flatness, a weighted closure/normal-form bound and complete expected bit
+cost remain separate. The prospectively frozen fixed native binding
+experiment was not launched: checkpoint upload transport is unavailable
+after the resume was supplied (PCC-20261113-cefb51). Continue the universal
+pole-normalization/filtration proof independently; use an admitted symbolic
+fixture check when its infrastructure is available. Original W-jet/public
+finder exit criteria remain open, without identifying the families or
+inferring a non-generic impossibility result [pcc:unverified].
