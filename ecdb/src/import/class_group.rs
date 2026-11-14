@@ -49,7 +49,8 @@
 //! - where ecdb holds the l-volcano (l = 2, 3, 5, `volcano_vertex`), every
 //!   census curve with End(E) = O and l ∤ f sits at level 0, and its crater
 //!   size equals the order (1 when l is inert);
-//! - stored `order_class_group` / `order_ell_class` rows and a stored
+//! - stored `order_class_group` / `order_ell_class` rows must agree exactly in
+//!   every value column ([`compare_existing`]), and a stored
 //!   `number_field.class_group` must agree exactly.
 //!
 //! A discriminant that fails any check is a reported problem and nothing is
@@ -113,9 +114,13 @@ WHERE c.family = 'census-fp' AND NOT er.over_closure AND er.kind = 'imaginary_qu
   AND mod(er.conductor_f, iv.ell) <> 0
 GROUP BY 1, 2, 3, 4";
 
+/// Every stored value of a row: a rerun must agree with all of them (ON CONFLICT DO NOTHING would otherwise skip a
+/// conflicting row silently).
 const EXISTING_SQL: &str = "
-SELECT g.discriminant::int8, g.class_number::int8, g.class_group::int8[],
-       (SELECT coalesce(jsonb_agg(jsonb_build_array(e.ell::int8, e.class_order::int8)), '[]'::jsonb)
+SELECT g.discriminant::int8, g.fundamental_discriminant::int8, g.conductor_f::int8, g.class_number::int8,
+       g.class_group::int8[], g.class_number_fundamental::int8, g.unit_index::int8, g.two_rank,
+       (SELECT coalesce(jsonb_agg(jsonb_build_array(e.ell::int8, e.splitting, e.prime_form::int8[],
+                                                    e.class_order::int8)), '[]'::jsonb)
           FROM ec.order_ell_class e WHERE e.discriminant = g.discriminant)
 FROM ec.order_class_group g WHERE abs(g.discriminant) < $1::int8";
 
@@ -706,8 +711,61 @@ pub fn check_craters(od: &OrderData, craters: &[Crater]) -> Result<BTreeSet<i64>
 
 /// (f, D_K, stored proved h(D_K), curves) of one discriminant.
 type DiscInput = (i64, i64, Option<i64>, i64);
-/// (class number, invariant factors, [(l, class order)]) of a stored row.
-type Existing = (i64, Vec<i64>, Vec<(i64, i64)>);
+/// The stored values of an `order_class_group` row and its `order_ell_class` rows.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Existing {
+    pub d_k: i64,
+    pub f: i64,
+    pub h: i64,
+    pub class_group: Vec<i64>,
+    pub h_k: i64,
+    pub unit_index: i64,
+    pub two_rank: i32,
+    /// (l, splitting, prime form, class order)
+    pub ells: Vec<(i64, String, Vec<i64>, i64)>,
+}
+
+/// Does a stored row agree exactly with what ecdb computes? Every stored column is compared; an l-class row ecdb
+/// would not write (l | f or l inert) is a disagreement too.
+pub fn compare_existing(od: &OrderData, ex: &Existing) -> Result<(), String> {
+    let inv: Vec<i64> = od.group.invariants.iter().map(|&n| n as i64).collect();
+    let want = (od.d_k, od.f as i64, od.group.h() as i64, &inv, od.h_k as i64, od.unit_index as i64);
+    let have = (ex.d_k, ex.f, ex.h, &ex.class_group, ex.h_k, ex.unit_index);
+    if want != have || ex.two_rank as u32 != od.group.two_rank() {
+        return Err(format!(
+            "stored (d_K, f, h, Cl, h(d_K), unit index, 2-rank) = ({}, {}, {}, {:?}, {}, {}, {}) disagrees with ecdb's \
+             ({}, {}, {}, {inv:?}, {}, {}, {})",
+            ex.d_k,
+            ex.f,
+            ex.h,
+            ex.class_group,
+            ex.h_k,
+            ex.unit_index,
+            ex.two_rank,
+            od.d_k,
+            od.f,
+            od.group.h(),
+            od.h_k,
+            od.unit_index,
+            od.group.two_rank()
+        ));
+    }
+    for (l, splitting, form, order) in &ex.ells {
+        let ok = od.ells.iter().any(|e| {
+            e.ell == *l
+                && e.splitting == splitting
+                && *form == [e.form.a, e.form.b, e.form.c]
+                && e.order as i64 == *order
+        });
+        if !ok {
+            return Err(format!(
+                "stored {l}-class row ({splitting}, form {form:?}, order {order}) disagrees with ecdb's {:?}",
+                od.ells.iter().find(|e| e.ell == *l)
+            ));
+        }
+    }
+    Ok(())
+}
 
 pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let mut report = Report {
@@ -735,10 +793,29 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     }
     let mut existing: BTreeMap<i64, Existing> = BTreeMap::new();
     for r in client.query(EXISTING_SQL, &[&MAX_ABS_D]).await? {
-        let ells: Value = r.get(3);
-        let ells =
-            ells.as_array().into_iter().flatten().filter_map(|x| Some((x[0].as_i64()?, x[1].as_i64()?))).collect();
-        existing.insert(r.get(0), (r.get(1), r.get(2), ells));
+        let rows: Value = r.get(8);
+        let mut ells = Vec::new();
+        for x in rows.as_array().into_iter().flatten() {
+            let form: Option<Vec<i64>> = x[2].as_array().map(|v| v.iter().filter_map(Value::as_i64).collect());
+            match (x[0].as_i64(), x[1].as_str(), form, x[3].as_i64()) {
+                (Some(l), Some(sp), Some(form), Some(o)) => ells.push((l, sp.to_string(), form, o)),
+                // an unreadable stored row can never agree: keep a sentinel that compare_existing refuses
+                _ => ells.push((-1, x.to_string(), Vec::new(), -1)),
+            }
+        }
+        existing.insert(
+            r.get(0),
+            Existing {
+                d_k: r.get(1),
+                f: r.get(2),
+                h: r.get(3),
+                class_group: r.get(4),
+                h_k: r.get(5),
+                unit_index: r.get(6),
+                two_rank: r.get(7),
+                ells,
+            },
+        );
     }
     let mut fields: BTreeMap<i64, (Option<i64>, Option<Vec<i64>>)> = BTreeMap::new();
     for r in client.query(NUMBER_FIELD_SQL, &[&MAX_ABS_D]).await? {
@@ -775,15 +852,9 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             }
         };
         let inv: Vec<i64> = od.group.invariants.iter().map(|&n| n as i64).collect();
-        if let Some((h, cg, old_ells)) = existing.get(&d) {
-            let mut bad = (*h as u64 != od.group.h() || *cg != inv).then(|| format!("stored Cl = {cg:?} (h = {h})"));
-            for &(l, o) in old_ells {
-                if od.ells.iter().find(|e| e.ell == l).map(|e| e.order as i64) != Some(o) {
-                    bad = Some(format!("stored order {o} of the {l}-class"));
-                }
-            }
-            if let Some(b) = bad {
-                refuse(&mut report, format!("{b} disagrees with ecdb's Cl = {inv:?}"));
+        if let Some(ex) = existing.get(&d) {
+            if let Err(why) = compare_existing(&od, ex) {
+                refuse(&mut report, why);
                 continue;
             }
             report.count("existing_rows_agree", 1);
@@ -958,6 +1029,62 @@ mod tests {
         assert!(check_craters(&od, &[(3, Some(2), 0, 4)]).is_err());
         assert!(check_craters(&od, &[(3, Some(4), 1, 4)]).is_err());
         assert_eq!(check_craters(&od, &[(3, Some(4), 0, 4), (5, Some(4), 0, 4)]).unwrap(), BTreeSet::from([3, 5]));
+    }
+
+    fn stored(od: &OrderData) -> Existing {
+        Existing {
+            d_k: od.d_k,
+            f: od.f as i64,
+            h: od.group.h() as i64,
+            class_group: od.group.invariants.iter().map(|&n| n as i64).collect(),
+            h_k: od.h_k as i64,
+            unit_index: od.unit_index as i64,
+            two_rank: od.group.two_rank() as i32,
+            ells: od
+                .ells
+                .iter()
+                .map(|e| (e.ell, e.splitting.to_string(), vec![e.form.a, e.form.b, e.form.c], e.order as i64))
+                .collect(),
+        }
+    }
+
+    #[test]
+    fn existing_rows_must_agree_in_every_column() {
+        // D = -144: f = 6, D_K = -4, h = 4 (Cl = Z/4), unit index 2
+        let od = order_data(-144, 6, -4, None).unwrap();
+        assert_eq!((od.group.h(), od.unit_index), (4, 2));
+        let ok = stored(&od);
+        assert!(compare_existing(&od, &ok).is_ok());
+        // a row that agrees on h and Cl but conflicts in any other column is refused, never silently kept
+        let mut bad = ok.clone();
+        bad.h_k = 2;
+        assert!(compare_existing(&od, &bad).is_err());
+        let mut bad = ok.clone();
+        bad.unit_index = 1;
+        assert!(compare_existing(&od, &bad).is_err());
+        let mut bad = ok.clone();
+        bad.two_rank = 0;
+        assert!(compare_existing(&od, &bad).is_err());
+        let mut bad = ok.clone();
+        bad.class_group = vec![2, 2];
+        assert!(compare_existing(&od, &bad).is_err());
+        let od = order_data(-56, 1, -56, None).unwrap();
+        let ok = stored(&od);
+        assert!(compare_existing(&od, &ok).is_ok());
+        let mut bad = ok.clone();
+        bad.ells[0].2[1] += 4; // a different prime form with the right order
+        assert!(compare_existing(&od, &bad).is_err());
+        let mut bad = ok.clone();
+        bad.ells[0].1 = "split".into(); // l = 2 ramifies in Z[sqrt -14]
+        assert!(compare_existing(&od, &bad).is_err());
+        let mut bad = ok.clone();
+        bad.ells[1].3 = 2;
+        assert!(compare_existing(&od, &bad).is_err());
+        // an l-class row for an inert l (here l = 5 for D = -23) is refused
+        let od = order_data(-23, 1, -23, None).unwrap();
+        let mut bad = stored(&od);
+        bad.ells.push((5, "split".into(), vec![5, 1, 2], 3));
+        assert!(compare_existing(&od, &bad).is_err());
     }
 
     // ---------------------------------------------- brute force on tiny fields
