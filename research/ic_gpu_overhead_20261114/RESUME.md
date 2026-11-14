@@ -16,7 +16,7 @@ vs new (this branch, binary serve) on koblitz-n23 (fes-f2, fes-f2-gpu), char2-n2
 (fes-f2-gpu). Record benchmarks/records/<stamp>-ic-fes-gpu-overhead.json.
 
 ## State
-2026-11-14 05:00Z: done; pod deleted; record 20261114T0436Z-ic-fes-gpu-overhead closed; REPORT.md; PR open.
+2026-11-14 05:50Z: both A/Bs done, pods deleted, records 20261114T0436Z and 20261114T0528Z closed; REPORT.md; PR open.
 
 ## Second A/B (after merging main)
 main (3e432229fc: the other session's fes_pack_direct, text serve) vs merged (this branch: + --serve-bin,

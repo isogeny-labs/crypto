@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="28382" viewBox="0 0 900 28382" font-family="Helvetica, Arial, sans-serif" font-size="12">
 <rect width="900" height="28382" fill="white"/>
 <text x="60" y="30" font-size="18" font-weight="bold">Benchmark progress: crypto</text>
-<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 0, measured 154, invalid 3, censored 6.</text>
+<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 0, measured 155, invalid 3, censored 6.</text>
 <text x="60" y="84" font-weight="bold">Cumulative gain vs first record, unit S (derived, %)</text>
 <rect x="60" y="94" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="314.0" x2="620" y2="314.0" stroke="#eee"/>
@@ -5198,15 +5198,15 @@
 <text x="60" y="27742" font-weight="bold">Series in unit wall_s: gain vs first record (derived, %)</text>
 <rect x="60" y="27752" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="27972.0" x2="620" y2="27972.0" stroke="#eee"/>
-<text x="54" y="27976.0" text-anchor="end" fill="#555">-5.49</text>
+<text x="54" y="27976.0" text-anchor="end" fill="#555">-6.08</text>
 <line x1="60" y1="27917.0" x2="620" y2="27917.0" stroke="#eee"/>
-<text x="54" y="27921.0" text-anchor="end" fill="#555">11</text>
+<text x="54" y="27921.0" text-anchor="end" fill="#555">12.2</text>
 <line x1="60" y1="27862.0" x2="620" y2="27862.0" stroke="#eee"/>
-<text x="54" y="27866.0" text-anchor="end" fill="#555">27.5</text>
+<text x="54" y="27866.0" text-anchor="end" fill="#555">30.4</text>
 <line x1="60" y1="27807.0" x2="620" y2="27807.0" stroke="#eee"/>
-<text x="54" y="27811.0" text-anchor="end" fill="#555">43.9</text>
+<text x="54" y="27811.0" text-anchor="end" fill="#555">48.6</text>
 <line x1="60" y1="27752.0" x2="620" y2="27752.0" stroke="#eee"/>
-<text x="54" y="27756.0" text-anchor="end" fill="#555">60.4</text>
+<text x="54" y="27756.0" text-anchor="end" fill="#555">66.9</text>
 <text x="60.0" y="27988" text-anchor="middle" fill="#555">2026-11-10</text>
 <text x="246.7" y="27988" text-anchor="middle" fill="#555">2026-11-11</text>
 <text x="433.3" y="27988" text-anchor="middle" fill="#555">2026-11-13</text>
@@ -5216,13 +5216,19 @@
 <circle cx="620.0" cy="27953.7" r="4" fill="#167f73"><title>20261114T0436Z-ic-fes-gpu-overhead: 0.0134 wall_s (n=4)</title></circle>
 <rect x="636" y="27757" width="10" height="10" fill="#167f73"/>
 <text x="650" y="27766">ic-gpu-kernels · fes_f2_cpu_solver</text>
+<polyline fill="none" stroke="#637bad" stroke-width="2" points="620.0,27953.7 620.0,27880.8"/>
 <circle cx="620.0" cy="27953.7" r="4" fill="#637bad"><title>20261114T0436Z-ic-fes-gpu-overhead: 0.000484 wall_s (n=2)</title></circle>
+<circle cx="620.0" cy="27880.8" r="4" fill="#637bad"><title>20261114T0528Z-ic-fes-gpu-binary-protocol: 0.000367 wall_s (n=2)</title></circle>
 <rect x="636" y="27773" width="10" height="10" fill="#637bad"/>
 <text x="650" y="27782">ic-gpu-kernels · fes_f2_gpu_solver</text>
+<polyline fill="none" stroke="#aa8b5b" stroke-width="2" points="620.0,27953.7 620.0,27934.1"/>
 <circle cx="620.0" cy="27953.7" r="4" fill="#aa8b5b"><title>20261114T0436Z-ic-fes-gpu-overhead: 0.0015 wall_s (n=2)</title></circle>
+<circle cx="620.0" cy="27934.1" r="4" fill="#aa8b5b"><title>20261114T0528Z-ic-fes-gpu-binary-protocol: 0.0014 wall_s (n=2)</title></circle>
 <rect x="636" y="27789" width="10" height="10" fill="#aa8b5b"/>
 <text x="650" y="27798">ic-gpu-kernels · fes_f2_gpu_solver</text>
+<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="620.0,27953.7 620.0,27817.0"/>
 <circle cx="620.0" cy="27953.7" r="4" fill="#93a1a4"><title>20261114T0436Z-ic-fes-gpu-overhead: 0.000236 wall_s (n=2)</title></circle>
+<circle cx="620.0" cy="27817.0" r="4" fill="#93a1a4"><title>20261114T0528Z-ic-fes-gpu-binary-protocol: 0.000129 wall_s (n=2)</title></circle>
 <rect x="636" y="27805" width="10" height="10" fill="#93a1a4"/>
 <text x="650" y="27814">ic-gpu-kernels · fes_f2_gpu_solver</text>
 <circle cx="480.0" cy="27953.7" r="4" fill="#69879e"><title>20261113T0057Z-ic-gpu-round2: 0.0001635 wall_s (n=5)</title></circle>
@@ -5252,9 +5258,10 @@
 <circle cx="480.0" cy="27953.7" r="4" fill="#69879e"><title>20261113T0330Z-ic-fes-gpu-e2e: 3.22 wall_s (n=1)</title></circle>
 <rect x="636" y="27949" width="10" height="10" fill="#69879e"/>
 <text x="650" y="27958">ic-gpu-kernels · whole_solve_wall_</text>
-<polyline fill="none" stroke="#b05c5c" stroke-width="2" points="480.0,27953.7 620.0,27770.3"/>
+<polyline fill="none" stroke="#b05c5c" stroke-width="2" points="480.0,27953.7 620.0,27788.1 620.0,27770.3"/>
 <circle cx="480.0" cy="27953.7" r="4" fill="#b05c5c"><title>20261113T0330Z-ic-fes-gpu-e2e: 38.7 wall_s (n=1)</title></circle>
-<circle cx="620.0" cy="27770.3" r="4" fill="#b05c5c"><title>20261114T0436Z-ic-fes-gpu-overhead: 17.45 wall_s (n=2)</title></circle>
+<circle cx="620.0" cy="27788.1" r="4" fill="#b05c5c"><title>20261114T0436Z-ic-fes-gpu-overhead: 17.45 wall_s (n=2)</title></circle>
+<circle cx="620.0" cy="27770.3" r="4" fill="#b05c5c"><title>20261114T0528Z-ic-fes-gpu-binary-protocol: 15.17 wall_s (n=2)</title></circle>
 <rect x="636" y="27965" width="10" height="10" fill="#b05c5c"/>
 <text x="650" y="27974">ic-gpu-kernels · whole_solve_wall_</text>
 <circle cx="480.0" cy="27953.7" r="4" fill="#5c8a3a"><title>20261113T0330Z-ic-fes-gpu-e2e: 2.18 wall_s (n=2)</title></circle>

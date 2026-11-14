@@ -1,7 +1,20 @@
 {
   "branch": "claude/index-calculus-gpu-optimization-otouqv",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-14T05:48:58+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gpu_measure_20261112/rp_gpu.sh",
+        "exec",
+        "icgpu-5",
+        "./job2.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T05:29:01+00:00",
+      "wall_s": 0.259
+    }
+  ],
   "commit": "40587624bb57982e51ae577b681d3a111b434a56",
   "commit_dirty": false,
   "created_utc": "2026-11-14T05:28:14+00:00",
@@ -17,19 +30,78 @@
     "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
   },
   "id": "20261114T0528Z-ic-fes-gpu-binary-protocol",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 0.001547,
+      "better": "lower",
+      "n": 2,
+      "name": "fes_f2_gpu_solver_s_per_call_char2_n29",
+      "note": "binary serve protocol on top of main 3e432229fc (fes_pack_direct); same-arm spread 1.000; counted ops identical",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001443
+    },
+    {
+      "baseline": 0.000423,
+      "better": "lower",
+      "n": 2,
+      "name": "fes_f2_gpu_solver_s_per_call_char2_n25",
+      "note": "on top of main; same-arm spread 1.088; counted ops identical",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000367
+    },
+    {
+      "baseline": 0.000204,
+      "better": "lower",
+      "n": 2,
+      "name": "fes_f2_gpu_solver_s_per_call_koblitz_n23_t2",
+      "note": "second target; first target (worker start-up) shows no difference within 1.31 spread",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000129
+    },
+    {
+      "baseline": 16.4,
+      "better": "lower",
+      "n": 2,
+      "name": "whole_solve_wall_s_char2_n29_fes_f2_gpu",
+      "note": "practicality note",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 15.17
+    }
+  ],
   "problem": "ic-gpu-kernels",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 2216031,
+      "path": "research/ic_gpu_overhead_20261114/raw/out_ab2.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8d/8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3",
+      "sha256": "8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/ic_gpu_overhead_20261114/REPORT.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/ic_gpu_overhead_20261114/fig_overhead.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "ic-fes-gpu-binary-protocol",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
   "validation": null
 }
