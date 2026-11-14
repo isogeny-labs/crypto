@@ -1,0 +1,14 @@
+../evidence/hierarchy-draft-021.lean.txt:50:4: error: unsolved goals
+case pos
+u x y i s : ℕ
+m : ℕ → ℕ
+hi : i ∈ mask u x y
+hs : s < i
+hj : i ∈ mask u x y
+hdiff : ↑(i - s) = ↑i - ↑s
+hmin : min ↑s ↑i = ↑s
+⊢ ↑(m i) + ↑(m i) * ↑i - ↑(m i) * ↑s ≤ ↑(m i) + ↑(m i) * ↑i - ↑(m i) * ↑s
+../evidence/hierarchy-draft-021.lean.txt:93:25: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲

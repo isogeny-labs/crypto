@@ -83,3 +83,13 @@ qualification motivate the candidate. The code/packing source limits exact
 pair filtering; this entrywise completion does not assume that template.
 No exhaustive novelty claim. Conductor executable unavailable. Scope this
 new study/project, current journal and append-only claim records.
+
+## Proof-artifact packaging, 2026-11-14
+
+The result package includes the repository-required native
+`identity.certificate/v1` adapter for the fixed universal rearrangement
+`c*p*(1+z*q)-c*p=(p*z)*(c*q)`. It is a literal ring substep only: it does
+not certify the parameterized mask/valuation family, search candidates,
+benchmark, or launch the draft native fixture. Lean source binding, axiom
+audit and fresh replay remain the evidence for the quantified construction.
+This administrative proof-artifact check adds no experiment admission.

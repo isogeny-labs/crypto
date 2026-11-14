@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Orientation-guarded anchor integral rank gap](orientation-anchor-integral-rank-gap.md) | investigating | turning actual correction-content gain into a recursive weighted-rank improvement | literal Cauchy base-content proof and actual integral U,V factors with every mask refinement, degree/precision and recursive cost charged |
 | [Primo has no prime-field or bit-vector route for index calculus](primo-prime-field-theory-gap.md) | open | using `primo-smt` on prime-field IC or claiming a prime-field performance advantage from the binary adapter | exact native frontend or qualified Primo theory support, SAT/UNSAT controls with independent model checks, and a matched stage benchmark |
 | [Lift to characteristic zero, reduce at a second prime p′](lift-reduce-second-prime-transfer.md) | open (proposed lead; untracked route) | deciding whether lifting to an abelian variety over a number field and reducing at a second prime can weaken a prime-field ECDLP | atlas/KB lookup for a duplicate; review of the derived g = 1 and non-torsion reductions; a bound on the field of definition of an N-torsion lift for g ≥ 2 |
 | [P3 census rho walk: bimodal, curve-reproducible cost above √n](p3census-rho-walk-bimodal.md) | resolved (walk v2, 2026-11-08) | reading P3's rho outcome as a statement about Pollard rho | identify the binary property on 50 small curves; a corrected walk with flat, unimodal per-curve cost; re-run Y1 |
