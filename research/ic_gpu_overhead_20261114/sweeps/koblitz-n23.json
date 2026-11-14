@@ -1,0 +1,26 @@
+{
+  "_what": "Per-call overhead A/B of fes-f2-gpu (old: abecd26901 text serve, slow from_poly; new: binary serve, direct from_poly), same instance and seed as research/ic_gpu_e2e_20261113. Counted S must be identical across arms; wall time is a practicality note.",
+  "instance": {
+    "regime": "koblitz",
+    "degree": 23,
+    "max_cofactor": 8
+  },
+  "repeats": 2,
+  "seed": 20261110,
+  "configurations": [],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=12"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "fes-f2",
+      "fes-f2-gpu"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}

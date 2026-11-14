@@ -305,6 +305,7 @@ mod typed_wrapper_tests {
             allow_busy: false,
             thresholds: isolation::Thresholds::default(),
             exe: "synthetic-never-executed".into(),
+            w_cal: None,
         };
         let env = if mutation == "session_environment" {
             "changed".to_string()

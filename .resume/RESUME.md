@@ -1,21 +1,15 @@
-# Resume: crypto @ claude/relation-finding-no-groebner-vrg7ec
+# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-Owner (2026-11-13): "Relation finding that avoids Gröbner bases altogether (probabilistic, SAT or
-lattice-flavoured decomposition) is thinly explored and poorly benchmarked. This needs more exploration."
-Answered with (a) a map of what the repository already measured, and (b) one matched experiment: the
-table-free linear 2+1 decomposition (lin21, lin21-ht) on the frozen 2026-10-14 m=3 cells and targets.
+Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
 
 ## Spec
-research/groebner_free_matched_20261113/PROTOCOL.md, frozen in commit c90b1d9d54 before any claim run.
-Instrument: examples/ic_algebraic_floor (arms lin21, lin21-ht; subcommands linpool, linsummary).
-Runner: research/groebner_free_matched_20261113/run_grid.sh (one cell per process, one job at a time).
+Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
+Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
+Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
 
 ## State
-2026-11-13: pilot (seed 777) done, 0 disagreements with the floor. Claim grid launching; raw records go
-to research/groebner_free_matched_20261113/runs/. S3 checkpoint unavailable in this container (no AWS
-identity); the branch push is the durable copy.
+2026-11-14: patch written, release build running. No rows yet.
 
 ## Next
-run_grid.sh; `ic_algebraic_floor analyze --dir runs --out ANALYSIS.json`; `linsummary --dir runs --out
-SUMMARY.json`; figures, REPORT.typ/pdf, README; benchrec close; session log; PR; red-team/validator pass.
+Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.

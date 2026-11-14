@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261113T1539Z-ic-m3-linear21-vs-floor",
+  "latest_record": "20261114T0620Z-ic-gpu-replay",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 146,
+    "measured": 159,
     "open": 0
   },
   "repo": "crypto",
@@ -775,6 +775,114 @@
         }
       ],
       "problem": "ecdlp-per-curve-cost-isogeny-invariance",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.39,
+      "latest": 0.39,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_ks_over_ic_26b_t1000",
+      "points": [
+        {
+          "commit": "5f832cf95ac6",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T0627Z-j0-multirho-restart-fix",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
+          "value": 0.39
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.43,
+      "latest": 0.43,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_ks_over_ic_28b_t3000",
+      "points": [
+        {
+          "commit": "5f832cf95ac6",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T0627Z-j0-multirho-restart-fix",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
+          "value": 0.43
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.28,
+      "latest": 0.28,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_ks_over_ic_30b_t1000",
+      "points": [
+        {
+          "commit": "5f832cf95ac6",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T0627Z-j0-multirho-restart-fix",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
+          "value": 0.28
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.34,
+      "latest": 0.34,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_ks_over_ic_30b_t3000",
+      "points": [
+        {
+          "commit": "5f832cf95ac6",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T0627Z-j0-multirho-restart-fix",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
+          "value": 0.34
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
       "unit": "ratio"
     },
     {
@@ -2652,6 +2760,216 @@
     },
     {
       "better": "lower",
+      "first": 5.49e-05,
+      "latest": 5.49e-05,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "batching_bound_s_per_call_24_unknowns",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1006,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 5.49e-05
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 9.2e-05,
+      "latest": 9.2e-05,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "batching_bound_s_per_call_30_unknowns",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8977,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 9.2e-05
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.013434,
+      "latest": 0.013434,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_f2_cpu_solver_s_per_call_koblitz_n23",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.013434
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000484,
+      "latest": 0.000367,
+      "latest_derived": {
+        "improvement_vs_first_percent": 24.1736,
+        "improvement_vs_previous_percent": 24.1736
+      },
+      "metric": "fes_f2_gpu_solver_s_per_call_char2_n25",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.000484
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 24.1736,
+            "improvement_vs_previous_percent": 24.1736
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 0.000367
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.001543,
+      "latest": 0.001443,
+      "latest_derived": {
+        "improvement_vs_first_percent": 6.4809,
+        "improvement_vs_previous_percent": 6.4809
+      },
+      "metric": "fes_f2_gpu_solver_s_per_call_char2_n29",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.001543
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 6.4809,
+            "improvement_vs_previous_percent": 6.4809
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 0.001443
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000236,
+      "latest": 0.000129,
+      "latest_derived": {
+        "improvement_vs_first_percent": 45.339,
+        "improvement_vs_previous_percent": 45.339
+      },
+      "metric": "fes_f2_gpu_solver_s_per_call_koblitz_n23_t2",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.000236
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 45.339,
+            "improvement_vs_previous_percent": 45.339
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 0.000129
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.0001635,
       "latest": 0.0001635,
       "latest_derived": {
@@ -2846,6 +3164,33 @@
       "unit": "wall_s"
     },
     {
+      "better": "higher",
+      "first": 14.0,
+      "latest": 14.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "replay_counted_fields_identical_rows",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 14,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 14.0
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "count"
+    },
+    {
       "better": "lower",
       "first": 0.994,
       "latest": 0.994,
@@ -2871,6 +3216,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 79.9,
+      "latest": 79.9,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_probe_share_hash_c16_f65536",
+      "points": [
+        {
+          "commit": "fa75167c4562",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T0620Z-ic-gpu-replay",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Replay of the fes-f2-gpu end-to-end runs on a fresh host reproduces every counted field (14 rows); batching bound 55-92 us per call (<=6.1% of the solve at 30 unknowns), not pursued; rootfind is lookup-bound (41-85% of sampled cycles in table probes). Validator review attached. [pcc:unverified]",
+          "value": 79.9
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "percent"
     },
     {
       "better": "lower",
@@ -3012,9 +3384,10 @@
     {
       "better": "lower",
       "first": 38.7,
-      "latest": 38.7,
+      "latest": 15.17,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 60.801,
+        "improvement_vs_previous_percent": 13.0659
       },
       "metric": "whole_solve_wall_s_char2_n29_fes_f2_gpu",
       "points": [
@@ -3031,6 +3404,36 @@
           "spread": null,
           "summary": "fes-f2-gpu (gpu/fes serve worker as the descent solver) end to end on an A100: identical calls, hit rate and counted S to fes-f2; whole solve 12.3x/44.1x faster than fes-f2 at 24/26 unknowns and 23.1x faster than inherited-f4 at 30; counted S unchanged (inherited-f4 stays cheapest). [pcc:unverified]",
           "value": 38.7
+        },
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 54.9096,
+            "improvement_vs_previous_percent": 54.9096
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 17.45
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 60.801,
+            "improvement_vs_previous_percent": 13.0659
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 15.17
         }
       ],
       "problem": "ic-gpu-kernels",
@@ -6200,6 +6603,257 @@
       "unit": "S"
     },
     {
+      "better": "lower",
+      "first": 1.568,
+      "latest": 1.568,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "d_meq_both_over_frozen_k22",
+      "points": [
+        {
+          "commit": "598c6358b52d",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1718Z-quartic-dl1-cd-sqrt",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Pre-registered: improvement for DL (0.684..0.584 at k=18..22, all seeds and w); DL1 improves, D regresses; c-rule gain largely relies on unpriced additions (CPU: DL about even at k=18..21, 0.77-0.87 at k=22); chain lowers counted multiplications only. Local run (owner decision, monthly budget exceeded). Unvalidated.",
+          "value": 1.568
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.684,
+      "latest": 0.684,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_both_over_frozen_k18",
+      "points": [
+        {
+          "commit": "598c6358b52d",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1718Z-quartic-dl1-cd-sqrt",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.675,
+            0.698
+          ],
+          "summary": "Pre-registered: improvement for DL (0.684..0.584 at k=18..22, all seeds and w); DL1 improves, D regresses; c-rule gain largely relies on unpriced additions (CPU: DL about even at k=18..21, 0.77-0.87 at k=22); chain lowers counted multiplications only. Local run (owner decision, monthly budget exceeded). Unvalidated.",
+          "value": 0.684
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.584,
+      "latest": 0.584,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_both_over_frozen_k22",
+      "points": [
+        {
+          "commit": "598c6358b52d",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1718Z-quartic-dl1-cd-sqrt",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.579,
+            0.591
+          ],
+          "summary": "Pre-registered: improvement for DL (0.684..0.584 at k=18..22, all seeds and w); DL1 improves, D regresses; c-rule gain largely relies on unpriced additions (CPU: DL about even at k=18..21, 0.77-0.87 at k=22); chain lowers counted multiplications only. Local run (owner decision, monthly budget exceeded). Unvalidated.",
+          "value": 0.584
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.999,
+      "latest": 0.999,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd155_over_cd200_k22_wadd1",
+      "points": [
+        {
+          "commit": "693de1b9d228",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1851Z-quartic-dl1-cd-sweep",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D sweep: 1.7 and 1.8 robust DL improvements at k=18..22 (1.7: 0.73-0.75 additions free, 0.87-0.88 at 1 M-eq, CPU 0.72-0.91); 1.55 not robust; D dearer at every c_D < 2. Local, unvalidated.",
+          "value": 0.999
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.851,
+      "latest": 0.851,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd170_chain_over_cd200_k22_wadd1",
+      "points": [
+        {
+          "commit": "a595db838d07",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T0413Z-quartic-dl1-cd17-chain",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D=1.7 + sqrt chain: robust DL improvement at k=18..22 (0.68-0.74 additions free, 0.85-0.88 at 1 M-eq, CPU 0.80-0.91); chain adds 0.6-6.5% counted, no CPU gain; D dearer. Local, unvalidated.",
+          "value": 0.851
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.681,
+      "latest": 0.681,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd170_chain_over_cd200_k22",
+      "points": [
+        {
+          "commit": "a595db838d07",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261114T0413Z-quartic-dl1-cd17-chain",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D=1.7 + sqrt chain: robust DL improvement at k=18..22 (0.68-0.74 additions free, 0.85-0.88 at 1 M-eq, CPU 0.80-0.91); chain adds 0.6-6.5% counted, no CPU gain; D dearer. Local, unvalidated.",
+          "value": 0.681
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.874,
+      "latest": 0.874,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd170_over_cd200_k22_wadd1",
+      "points": [
+        {
+          "commit": "693de1b9d228",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1851Z-quartic-dl1-cd-sweep",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D sweep: 1.7 and 1.8 robust DL improvements at k=18..22 (1.7: 0.73-0.75 additions free, 0.87-0.88 at 1 M-eq, CPU 0.72-0.91); 1.55 not robust; D dearer at every c_D < 2. Local, unvalidated.",
+          "value": 0.874
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.728,
+      "latest": 0.728,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "dl_meq_cd170_over_cd200_k22",
+      "points": [
+        {
+          "commit": "693de1b9d228",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1851Z-quartic-dl1-cd-sweep",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "c_D sweep: 1.7 and 1.8 robust DL improvements at k=18..22 (1.7: 0.73-0.75 additions free, 0.87-0.88 at 1 M-eq, CPU 0.72-0.91); 1.55 not robust; D dearer at every c_D < 2. Local, unvalidated.",
+          "value": 0.728
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0021,
+      "latest": 0.0021,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.0021
+      },
+      "metric": "dl_meq_over_plain_rho_k22",
+      "points": [
+        {
+          "commit": "598c6358b52d",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.0021
+          },
+          "n": null,
+          "record": "20261113T1718Z-quartic-dl1-cd-sqrt",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Pre-registered: improvement for DL (0.684..0.584 at k=18..22, all seeds and w); DL1 improves, D regresses; c-rule gain largely relies on unpriced additions (CPU: DL about even at k=18..21, 0.77-0.87 at k=22); chain lowers counted multiplications only. Local run (owner decision, monthly budget exceeded). Unvalidated.",
+          "value": 0.0021
+        }
+      ],
+      "problem": "ic:ghs-weak-quartic-dl-k12-22",
+      "unit": "ratio"
+    },
+    {
       "better": "neutral",
       "first": 148.0,
       "latest": 148.0,
@@ -6705,9 +7359,10 @@
     {
       "better": "higher",
       "first": 1.0046336259609188,
-      "latest": 1.0046336259609188,
+      "latest": 0.994456746981451,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": -1.013,
+        "improvement_vs_previous_percent": -2.4142
       },
       "metric": "build_aa_k0n53",
       "points": [
@@ -6727,6 +7382,42 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 1.0046336259609188
+        },
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 1.4359,
+            "improvement_vs_previous_percent": 1.4359
+          },
+          "n": 41,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9883855408110195,
+            1.0453611311317055
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 1.0190592389511335
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -1.013,
+            "improvement_vs_previous_percent": -2.4142
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9715302500873212,
+            1.017926125278575
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.994456746981451
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -6735,9 +7426,10 @@
     {
       "better": "higher",
       "first": 1.0067590450435402,
-      "latest": 1.0067590450435402,
+      "latest": 0.9996567560327823,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": -0.7055,
+        "improvement_vs_previous_percent": -0.3973
       },
       "metric": "build_aa_k0n61",
       "points": [
@@ -6757,6 +7449,346 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 1.0067590450435402
+        },
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.3094,
+            "improvement_vs_previous_percent": -0.3094
+          },
+          "n": 42,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9648077159836149,
+            1.0425859744896366
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 1.00364416581828
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.7055,
+            "improvement_vs_previous_percent": -0.3973
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9901661616614386,
+            1.0154342949305444
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.9996567560327823
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1042963314837477,
+      "latest": 1.1042963314837477,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_low_over_top_k0n53",
+      "points": [
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0696586617459187,
+            1.1428177274897524
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 1.1042963314837477
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1422329590660252,
+      "latest": 1.1422329590660252,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_low_over_top_k0n61",
+      "points": [
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0981906184338237,
+            1.164546115463808
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 1.1422329590660252
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 9.375174351789854,
+      "latest": 9.375174351789854,
+      "latest_derived": {},
+      "metric": "build_row_add_share_k0n53",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 9.375174351789854
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 7.736884153946501,
+      "latest": 7.736884153946501,
+      "latest_derived": {},
+      "metric": "build_row_add_share_k0n61",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 7.736884153946501
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 11.825607924374507,
+      "latest": 11.825607924374507,
+      "latest_derived": {},
+      "metric": "build_row_key_share_k0n53",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 11.825607924374507
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 12.094235968328338,
+      "latest": 12.094235968328338,
+      "latest_derived": {},
+      "metric": "build_row_key_share_k0n61",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 12.094235968328338
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 33.62852825584937,
+      "latest": 33.62852825584937,
+      "latest_derived": {},
+      "metric": "build_sort_fill_share_k0n53",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 33.62852825584937
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 36.3145286310363,
+      "latest": 36.3145286310363,
+      "latest_derived": {},
+      "metric": "build_sort_fill_share_k0n61",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 36.3145286310363
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 43.5804207058484,
+      "latest": 43.5804207058484,
+      "latest_derived": {},
+      "metric": "build_stream_push_share_k0n53",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 43.5804207058484
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "neutral",
+      "first": 39.04479611531359,
+      "latest": 39.04479611531359,
+      "latest_derived": {},
+      "metric": "build_stream_push_share_k0n61",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 39.04479611531359
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "percent"
+    },
+    {
+      "better": "higher",
+      "first": 1.244204834254296,
+      "latest": 1.244204834254296,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_two_over_packed_k0n53",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2146403684540803,
+            1.2764097822915617
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.244204834254296
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2522538427209544,
+      "latest": 1.2522538427209544,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_two_over_packed_k0n61",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.223131180925845,
+            1.2666285188567135
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.2522538427209544
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -6823,11 +7855,72 @@
       "unit": "ratio"
     },
     {
+      "better": "lower",
+      "first": 0.12820112010964727,
+      "latest": 0.12820112010964727,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "build_whole_wall_s_k0n53",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.11723842942918218,
+            0.14109000662638538
+          ],
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 0.12820112010964727
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.22228396495955863,
+      "latest": 0.22228396495955863,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "build_whole_wall_s_k0n61",
+      "points": [
+        {
+          "commit": "234cd661e7fd",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261113T1712Z-ic-build-steps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.20327524851492476,
+            0.236770649913783
+          ],
+          "summary": "Folded build step probe: stream push 15.1/13.9 and counting sort+filter fill 11.6/12.9 of 34.6/35.5 ns per stored pair (k0n53/k0n61); additions+keys about 7 ns.",
+          "value": 0.22228396495955863
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "wall_s"
+    },
+    {
       "better": "higher",
       "first": 1.0017417845180656,
-      "latest": 1.0017417845180656,
+      "latest": 0.9858291501793495,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": -1.5885,
+        "improvement_vs_previous_percent": -1.0255
       },
       "metric": "collect_aa_k0n53",
       "points": [
@@ -6847,6 +7940,42 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 1.0017417845180656
+        },
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.5688,
+            "improvement_vs_previous_percent": -0.5688
+          },
+          "n": 41,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9656991131577299,
+            1.032596498470767
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 0.9960436137552416
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -1.5885,
+            "improvement_vs_previous_percent": -1.0255
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9738582964037926,
+            1.0121349291581818
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.9858291501793495
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -6855,9 +7984,10 @@
     {
       "better": "higher",
       "first": 1.000568372750849,
-      "latest": 1.000568372750849,
+      "latest": 1.0077730878400717,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 0.7201,
+        "improvement_vs_previous_percent": 1.0301
       },
       "metric": "collect_aa_k0n61",
       "points": [
@@ -6877,6 +8007,42 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 1.000568372750849
+        },
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.3068,
+            "improvement_vs_previous_percent": -0.3068
+          },
+          "n": 42,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9679907679431274,
+            1.0319382063724678
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 0.9974982213387907
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.7201,
+            "improvement_vs_previous_percent": 1.0301
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.992272703063639,
+            1.0234724550386374
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0077730878400717
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -6944,10 +8110,131 @@
     },
     {
       "better": "higher",
-      "first": 1.0050488198854794,
-      "latest": 1.0050488198854794,
+      "first": 0.9968072667156773,
+      "latest": 0.9968072667156773,
       "latest_derived": {
         "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_low_over_top_k0n53",
+      "points": [
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9484123108439897,
+            1.028485333887169
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 0.9968072667156773
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9912527121835233,
+      "latest": 0.9912527121835233,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_low_over_top_k0n61",
+      "points": [
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.969865336657704,
+            1.0043631460091844
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 0.9912527121835233
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.9814972203776974,
+      "latest": 0.9814972203776974,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_two_over_packed_k0n53",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9728695878300276,
+            1.004800727348046
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.9814972203776974
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0091003978222433,
+      "latest": 1.0091003978222433,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_two_over_packed_k0n61",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.987431034914418,
+            1.019095889122887
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0091003978222433
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0050488198854794,
+      "latest": 1.0052391975524457,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0189,
+        "improvement_vs_previous_percent": 1.3882
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -6967,6 +8254,42 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 1.0050488198854794
+        },
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -1.3506,
+            "improvement_vs_previous_percent": -1.3506
+          },
+          "n": 41,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9578814929367361,
+            1.0241974770532223
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 0.9914751264309754
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0189,
+            "improvement_vs_previous_percent": 1.3882
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9818940046398614,
+            1.0169114326157993
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0052391975524457
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -6975,9 +8298,10 @@
     {
       "better": "higher",
       "first": 1.0032154840727214,
-      "latest": 1.0032154840727214,
+      "latest": 1.0136484493851134,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.0
+        "improvement_vs_first_percent": 1.04,
+        "improvement_vs_previous_percent": 1.636
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -6997,6 +8321,42 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 1.0032154840727214
+        },
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.5865,
+            "improvement_vs_previous_percent": -0.5865
+          },
+          "n": 42,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9700102218509661,
+            1.0287223261028817
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 0.9973316718632423
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.04,
+            "improvement_vs_previous_percent": 1.636
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9948304853239935,
+            1.0255453950216007
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0136484493851134
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7057,6 +8417,126 @@
           ],
           "summary": "Same-session A/B with A/A, 44 rounds: build pairing a/b build 1.044 [1.028,1.064] (k0n53), 1.036 [0.991,1.068] (k0n61), not established; lookahead 64 no effect. Both reverted.",
           "value": 0.9933476562814012
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.033397625250923,
+      "latest": 1.033397625250923,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_low_over_top_k0n53",
+      "points": [
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0070434467721752,
+            1.0612886977577314
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 1.033397625250923
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0005217873604986,
+      "latest": 1.0005217873604986,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_low_over_top_k0n61",
+      "points": [
+        {
+          "commit": "39affc25bf6b",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261113T1855Z-ic-filter-layout-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9832979172158047,
+            1.0343658371118145
+          ],
+          "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
+          "value": 1.0005217873604986
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0685505425912554,
+      "latest": 1.0685505425912554,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_two_over_packed_k0n53",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0515910340682824,
+            1.0802107639301255
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0685505425912554
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0386805300536524,
+      "latest": 1.0386805300536524,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_two_over_packed_k0n61",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0201629310801397,
+            1.0504592593014068
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0386805300536524
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -11652,6 +13132,352 @@
       ],
       "problem": "kernel:f6_ic_gate",
       "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "runs_with_different_counted_answers",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 12,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.000475459662,
+      "latest": 0.000475459662,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_after_char2_n25_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000459262891,
+            0.000492921854
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000475459662
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000389113999,
+      "latest": 0.000389113999,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_after_koblitz_n23_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000376943325,
+            0.000398867718
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000389113999
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000734776198,
+      "latest": 0.000734776198,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_before_char2_n25_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000726045567,
+            0.000745081105
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000734776198
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000614796593,
+      "latest": 0.000614796593,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "whole_call_before_koblitz_n23_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000588522139,
+            0.000631906992
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000614796593
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0003204,
+      "latest": 0.0003204,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "worker_wait_and_read_after_char2_n25_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0003055,
+            0.0003474
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.0003204
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000215666667,
+      "latest": 0.000215666667,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "worker_wait_and_read_after_koblitz_n23_a100",
+      "points": [
+        {
+          "commit": "4b4a19c82b68",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1642Z-ic-gpu-call-overhead-a100",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002105,
+            0.0002248
+          ],
+          "summary": "fes-f2-gpu on a Modal A100-SXM4-80GB: whole solver call 0.6148 to 0.3891 ms at 24 unknowns and 0.7348 to 0.4755 ms at 26 (about 36 percent) after packing straight from the monomials; counted answers identical in 12 of 12 runs. The worker's first phase timer (216 us at 24 unknowns, 320 us at 26) includes the wait for the next request and is not the parse; the parse is about 13 us on the host worker, so the earlier statement that it was the largest phase is withdrawn. [pcc:unverified]",
+          "value": 0.000215666667
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_a100",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 4.83333333e-06,
+      "latest": 4.83333333e-06,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_after_koblitz_n19",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.5e-06,
+            5.3e-06
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 4.83333333e-06
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 7.4e-06,
+      "latest": 7.4e-06,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_after_koblitz_n23",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.2e-06,
+            7.5e-06
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 7.4e-06
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000169533333,
+      "latest": 0.000169533333,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_before_koblitz_n19",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.000163,
+            0.0001752
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.000169533333
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.0002784,
+      "latest": 0.0002784,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prep_per_call_before_koblitz_n23",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.0002716,
+            0.000287
+          ],
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.0002784
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "runs_with_different_answers",
+      "points": [
+        {
+          "commit": "b935040a0412",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 12,
+          "record": "20261113T1632Z-ic-gpu-call-overhead-direct-pack",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Rust-side preparation cost of a fes-f2-gpu call (form conversion plus packing) cut 97 percent by packing straight from the monomials: 0.1695 to 0.0048 ms per call at 20 unknowns and 0.2784 to 0.0074 ms at 24, host serve worker, no GPU; answers identical in 12 of 12 runs; counted cost unchanged. [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "kernel:fes_f2_gpu_call_prep",
+      "unit": "count"
     },
     {
       "better": "higher",
@@ -21853,6 +23679,58 @@
     },
     {
       "better": "neutral",
+      "first": 0.421,
+      "latest": 0.421,
+      "latest_derived": {},
+      "metric": "ratio_slope_w0.1_a",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 7,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            -0.07,
+            0.912
+          ],
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 0.421
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": -0.053,
+      "latest": -0.053,
+      "latest_derived": {},
+      "metric": "ratio_slope_w0.1_b",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {},
+          "n": 7,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            -0.654,
+            0.549
+          ],
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": -0.053
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
       "first": 6.0,
       "latest": 6.0,
       "latest_derived": {},
@@ -23359,6 +25237,528 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 28546000.0,
+      "latest": 28546000.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 123232.201136
+      },
+      "metric": "total_w0.1_a_p12841",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 123232.201136
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 231.644,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 28546000.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 4770880.0,
+      "latest": 4770880.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 43554.963163
+      },
+      "metric": "total_w0.1_a_p1619",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 43554.963163
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 109.537,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 4770880.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 498213.0,
+      "latest": 498213.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 7002.704306
+      },
+      "metric": "total_w0.1_a_p211",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 7002.704306
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 71.1458,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 498213.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 488718000.0,
+      "latest": 488718000.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6212348.478685
+      },
+      "metric": "total_w0.1_a_p25601",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6212348.478685
+          },
+          "n": 2,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 78.6688,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 488718000.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 3306850.0,
+      "latest": 3306850.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 33510.401667
+      },
+      "metric": "total_w0.1_a_p3203",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 33510.401667
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 98.6813,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 3306850.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 1847680.0,
+      "latest": 1847680.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 24034.861789
+      },
+      "metric": "total_w0.1_a_p419",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 24034.861789
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 76.875,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 1847680.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 1232010000.0,
+      "latest": 1232010000.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 7475788.834951
+      },
+      "metric": "total_w0.1_a_p51203",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 7475788.834951
+          },
+          "n": 2,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 164.8,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 1232010000.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 4874280.0,
+      "latest": 4874280.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 23720.278359
+      },
+      "metric": "total_w0.1_a_p6421",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 23720.278359
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 205.49,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 4874280.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 4059150.0,
+      "latest": 4059150.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 56094.662291
+      },
+      "metric": "total_w0.1_a_p821",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 56094.662291
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 72.3625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 4059150.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 204121.0,
+      "latest": 204121.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 881.184058
+      },
+      "metric": "total_w0.1_b_p12841",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 881.184058
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 231.644,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 204121.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 188843.0,
+      "latest": 188843.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1724.011065
+      },
+      "metric": "total_w0.1_b_p1619",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1724.011065
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 109.537,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 188843.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 28889.2,
+      "latest": 28889.2,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 406.056296
+      },
+      "metric": "total_w0.1_b_p211",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 406.056296
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 71.1458,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 28889.2
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 451664.0,
+      "latest": 451664.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 5741.335828
+      },
+      "metric": "total_w0.1_b_p25601",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5741.335828
+          },
+          "n": 2,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 78.6688,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 451664.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 122458.0,
+      "latest": 122458.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1240.944333
+      },
+      "metric": "total_w0.1_b_p3203",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1240.944333
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 98.6813,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 122458.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 134991.0,
+      "latest": 134991.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1755.980488
+      },
+      "metric": "total_w0.1_b_p419",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1755.980488
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 76.875,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 134991.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 769174.0,
+      "latest": 769174.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 4667.317961
+      },
+      "metric": "total_w0.1_b_p51203",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 4667.317961
+          },
+          "n": 2,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 164.8,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 769174.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 128723.0,
+      "latest": 128723.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 626.419777
+      },
+      "metric": "total_w0.1_b_p6421",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 626.419777
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 205.49,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 128723.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
+    },
+    {
+      "better": "lower",
+      "first": 313496.0,
+      "latest": 313496.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 4332.299188
+      },
+      "metric": "total_w0.1_b_p821",
+      "points": [
+        {
+          "commit": "28da34a03b92",
+          "date": "2026-11-13",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 4332.299188
+          },
+          "n": 12,
+          "record": "20261113T1722Z-full-jacobian-ic",
+          "reference": 72.3625,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+          "value": 313496.0
+        }
+      ],
+      "problem": "prime-field-chained-transfer-no-advantage",
+      "unit": "gae"
     },
     {
       "better": "lower",

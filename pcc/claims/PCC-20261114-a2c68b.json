@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:07:21Z",
+ "id": "PCC-20261114-a2c68b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "model": "",
+  "session": "norm-target-grading-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "bd1a908e6add86085dfa57326728dbceeffac531b29828456b206eecaca2568e",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormRowClosure.rowsMembership"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source declaration/context hypotheses. Field K, CommRing coefficient algebra A; Nontrivial A where monic degree guards need it. Curve equation, e!=0, d>=3 explicit for actual normalized binding. Full iterated closure with literal deg(a)+deg(f)<=D multiplier budget; requires both old/new input families admitted. No invariance below admission threshold, runtime impossibility, weighted-degree29, growing-family low closure or sub-exponential claim. Unsigned; fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormRowClosure.rowsMembership: theorem rowsMembership (W : Submodule K A) (V : A[X]) (hV : V.natDegree\u22644) (q c : K) (hc : c\u22600) : (\u2200 i : Fin 5, V.coeff i.val\u2208W) \u2194 c \u2022 V.eval (algebraMap K A q)\u2208W \u2227 \u2200 i : Fin 4, V.coeff (i.val+1)\u2208W"
+}

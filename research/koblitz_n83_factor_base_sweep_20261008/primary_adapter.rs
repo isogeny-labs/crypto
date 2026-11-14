@@ -903,6 +903,31 @@ pub(super) fn full_d18_m4_l0_xcnf_cli(
     )
 }
 
+/// Export the ordered-first-pair D18 formula used by the native cadence-32
+/// control. The cadence affects native search only; no solver runs here.
+pub(super) fn full_d18_m4_l0_ordered_xcnf_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        false,
+        true,
+        32,
+    )
+}
+
 /// Export the unchanged constructed full-D18 XCNF and save one native SAT
 /// assignment so an independent verifier can test every exported constraint.
 pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
@@ -1049,8 +1074,8 @@ fn full_d18_m4_impl(
             || encoding != FrobeniusOrbitRootEncoding::SharedBits
             || !phase_zero_first
             || choice_pins != "none"
-            || export_xcnf
-            || native_xcnf_witness)
+            || native_xcnf_witness
+            || (export_xcnf && xor_decision_cadence != 32))
     {
         return Err("ordered first pair differs from the frozen symmetry arm".into());
     }

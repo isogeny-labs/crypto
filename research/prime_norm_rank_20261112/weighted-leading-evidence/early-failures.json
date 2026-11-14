@@ -1,0 +1,11 @@
+{
+  "schema": "producer-transcribed-tool-failures/v1",
+  "standing": "unsigned; transcription, not an execution receipt",
+  "events": [
+    {"command": "conductor check --summary 'Weighted leading-form norm analysis and fixed certificate controls' --scope path:research/prime_norm_rank_20261112 --scope path:docs/session-logs/2026-11-13.md --scope path:pcc", "exit": 127, "output": "conductor: command not found"},
+    {"command": "bash scripts/checkpoint.sh gate", "exit": 2, "output": "missing .resume/RESUME.md (run: scripts/checkpoint.sh init, then fill it in)", "scope": "first gate, before resume was supplied"},
+    {"command": "lake -d research/prime_norm_rank_20261112/lean env lean NormWeightedLeading.lean", "exit": 1, "output": "no such file or directory (error code: 2)\n  file: NormWeightedLeading.lean", "remedy": "use the explicitly configured lake build target"},
+    {"action": "apply_patch", "output": "invalid patch: multiple operations target .resume/RESUME.md", "effect": "no changes"},
+    {"action": "apply_patch", "output": "Failed to find expected lines in lean/lakefile.toml", "effect": "no changes", "remedy": "used exact context and separately updated manifest target list"}
+  ]
+}
