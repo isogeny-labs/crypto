@@ -108,8 +108,10 @@ def main():
     ap.add_argument("--runs", default="runs")
     ap.add_argument("--out", default="results.json")
     a = ap.parse_args()
-    rows = load(a.runs)
-    out = {"schema": "pkm-odd-tower-f4.results/v1", "rows": len(rows)}
+    allrows = load(a.runs)
+    rows = [r for r in allrows if r.get("schema") == "pkm-odd-tower-f4.row/v1"]
+    brows = [r for r in allrows if r.get("schema") == "pkm-algebraic-oracle.row/v1"]
+    out = {"schema": "pkm-odd-tower-f4.results/v1", "rows": len(rows), "part_b_rows": len(brows)}
 
     # Validity (C1, C2, A/A).
     done = [r for r in rows if not r["censored"]]
@@ -188,6 +190,48 @@ def main():
             "P2": p2.get("verdict"), "P2_at_S": p2.get("at_S"),
             "replicated": p1.get("verdict") == p2.get("verdict")}
 
+    # Part B: algebraic oracle vs enumeration.
+    decided = [r for r in brows if not r["alg_undetermined"]]
+    out["C7_part_b_agree"] = {"rows": len(brows), "decided": len(decided),
+                              "disagree": [(r["cell"], r["index"]) for r in decided if not r["agree"]]}
+    pb = {}
+    by = {}
+    for r in brows:
+        key = (r["m"], r["form"], r["cell"].split("-")[2])  # B-M2-A3-k3 -> arm A3
+        by.setdefault(key, {}).setdefault(r["cell"], []).append(r)
+    for (m, form, arm), cellmap in sorted(by.items()):
+        pts = []
+        for cell, rs in sorted(cellmap.items(), key=lambda kv: kv[1][0]["S"]):
+            cens = any(r["alg_undetermined"] for r in rs)
+            ratios = [r["ratio_alg_over_enum"] for r in rs]
+            pts.append({"cell": cell, "S": rs[0]["S"], "censored": cens, "ratios": ratios,
+                        "median": statistics.median(ratios),
+                        "alg_field_ops": [r["alg_field_ops"] for r in rs],
+                        "enum_field_ops": [r["enum_field_ops"] for r in rs],
+                        "relations": [r["enum_relations"] for r in rs]})
+        done_pts = [p for p in pts if not p["censored"]]
+        if not done_pts:
+            pb[f"m{m}_{form}_{arm}"] = {"verdict": "no_completed_cell", "points": pts}
+            continue
+        last = done_pts[-1]
+        if all(x <= GAIN for x in last["ratios"]):
+            v = "advantage"
+        elif all(x >= LOSS for x in last["ratios"]):
+            v = "disadvantage"
+        else:
+            v = "parity"
+        trend = "flat"
+        if len(done_pts) >= 3:
+            t = [p["median"] for p in done_pts[-3:]]
+            if all(b < a for a, b in zip(t, t[1:])):
+                trend = "closing"
+            elif all(b > a for a, b in zip(t, t[1:])):
+                trend = "widening"
+        pb[f"m{m}_{form}_{arm}"] = {"verdict": v, "trend": trend, "at_S": last["S"],
+                                    "ratios_at_S": last["ratios"], "points": pts}
+    out["part_b"] = pb
+    out["part_b_valid"] = not out["C7_part_b_agree"]["disagree"]
+
     with open(a.out, "w") as f:
         json.dump(out, f, indent=1)
     print(json.dumps({k: out[k] for k in ("rows", "valid", "C1_agree", "C2_planted", "AA")}, indent=1))
@@ -197,6 +241,10 @@ def main():
             print(f"m={m} {arm}: tower {v.get('verdict')} growing={v.get('growing')} at S={v.get('at_S')} "
                   f"r={[round(x, 3) for x in v.get('r_at_S', [])]}; null {out['attribution'][f'm{m}_{arm}']['null']}")
     print("order", json.dumps(order))
+    print("part B valid", out["part_b_valid"], out["C7_part_b_agree"])
+    for k, v in pb.items():
+        print("partB", k, v["verdict"], v.get("trend"), "at S", v.get("at_S"),
+              [f"{x:.3g}" for x in v.get("ratios_at_S", [])])
     for k, v in form.items():
         print("form", k, v["verdict"], "at S", v.get("at_S"))
     print("positive control (one bit)", out["positive_control_one_bit"]["all_detected"])

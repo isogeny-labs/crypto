@@ -1,4 +1,4 @@
-# Odd and mixed-degree PKM towers under F4: does the degree mix change the cost at equal |V|?
+# Odd and mixed-degree PKM towers under F4, and the algebraic relation oracle against enumeration
 
 **DRAFT, not yet frozen: the ladder top and budget await the pre-flight probe.** 2026-11-14. Study id `EXP-PKM-ODD-001`.
 Machine-readable form: [`protocol.json`](protocol.json) (`experiment.protocol/v1`). Runner:
@@ -19,6 +19,15 @@ and target policy, does writing `V` with steps of degree 3, 5, or mixed 2/3 chan
 (`field_ops`) by a factor of 2 or more against the degree-2 tower *at the same information* `log₂ S`? If it
 does, does the factor grow with `S`? Does the order of a mixed sequence (2,3,… vs 3,2,…) matter at equal `S`?
 
+**Part B question (the slides' proposed advantage).** PKM propose to find relations by *solving* the
+low-degree system (slide 17), not by enumerating `V`. Until now no relation in this repository came from that:
+the ecbench runs decompose with tables and root finding over `V`. Part B runs the algebraic oracle
+(`pkm_smooth_tower::algebraic_decompose`: F4 and substitution on the system, solutions lifted and checked by
+point addition) against enumeration over the factor base (`enumerate_decompositions`), on the same targets,
+both counted in `F_p` multiplications. Does the algebraic oracle cost less than enumeration at any cell, and
+does its ratio to enumeration fall as `S` grows (the slides' hope at `m ≥ 3`, where enumeration costs
+`|F|^{m−1}`)?
+
 **Why it matters.** The prime-field barrier note's reading is that the cost is governed by information
 (`log₂|V|`), not by how the membership is written. A degree mix that changes F4's work by a factor that grows
 with `S` would contradict that reading. A constant factor would be engineering. No outcome here moves an
@@ -33,6 +42,9 @@ exponent at cryptographic size, and no outcome is a claim about Pollard rho.
 | C3 | Arm `X` changes refutation `field_ops` by the reported ratio `r_X(S)` against the interpolated degree-2 tower | exact computation per system; comparative across the ladder | main ladder |
 | C4 | The ratio grows, fades or holds with `S` | comparative, descriptive only over the ladder below | §5 rule |
 | C5 | Order of a mixed sequence: `A32 / A23` at equal `S` | exact per system; comparative | `n = 4, 6` |
+| C6 | Form: isogeny (auxiliary curve, Vélu steps) over Kummer for the same degree sequence, refutation `field_ops` | exact per system; comparative | `I*` cells |
+| C7 | The algebraic oracle returns exactly the relation set enumeration returns, on every target it decides | exact computation | part B, every row |
+| C8 | Algebraic oracle `F_p` multiplications over enumeration's, per target, and its trend with `S` | exact per target; comparative | part B ladder |
 | — | Anything about larger `S`, `m ≥ 4`, cryptographic sizes, isogeny towers or rho | out of scope | not established |
 
 ## 3. Arms, controls, cells
@@ -46,6 +58,13 @@ exponent at cryptographic size, and no outcome is a claim about Pollard rho.
 | A5 | `5^k`, `k = 2…4` | 25, 125, 625 | 4.64 … 9.29 |
 | A23 | `2,3,2,3,…`, length `n = 4…7` | 36, 72, 216, 432 | 5.17 … 8.75 |
 | A32 | `3,2,3,2,…`, length `n = 4…7` | 36, 108, 216, 648 | 5.17 … 9.34 |
+| I2 (isogeny) | `2^t`, `t = 4…8`, Vélu steps | 16 … 256 | 4 … 8 |
+| I3 (isogeny) | `3^k`, `k = 3…5`, Vélu steps | 27, 81, 243 | 4.75 … 7.92 |
+| I23 (isogeny) | `2,3,…`, `n = 4…6`, Vélu steps | 36, 72, 216 | 5.17 … 7.75 |
+
+The isogeny arms use an auxiliary curve `E'/F_{P1}` with a point of order exactly `S`, found by
+`search_aux_exact` from the seed. **The search is not charged** (owner, 2026-11-14): no metric includes it, and
+rows record its count (`aux_curves_tried_uncharged`) for information only.
 
 **Fixed across arms.** One prime `P1 = 1399680001` (`P1 − 1 = 3·2^10·3^6·5^4`, so every `S` above divides
 `P1 − 1`), one seed `20261114`, hence one `g` (the tower's first draw), one curve
@@ -68,6 +87,11 @@ recorded by `run_cells.sh`), grevlex, degree bound `D = 64`, `RAYON_NUM_THREADS=
 - *Replication:* a second prime `P2 = 3265920001` (`P2 − 1 = 7·2^10·3^6·5^4`) on a subset (A2 `t = 4, 6, 8`;
   A3 `k = 3, 4, 5`; A5 `k = 3`), tower only.
 
+**Part B cells** (`examples/pkm_algebraic_oracle.rs`, 2 planted and 2 random targets per cell, the same
+targets for both oracles). `m = 2`: Kummer A2 `t = 4, 6, 8`, A3 `k = 3, 5`, A23 `n = 4, 6`; isogeny I3
+`k = 3, 4`, I23 `n = 4, 5`. `m = 3`: Kummer A2 `t = 2…5`, A3 `k = 2, 3`, A23 `n = 2…4`; isogeny I23
+`n = 2, 3`.
+
 **Cells.** `m = 2` main ladder: every arm × size above, `tower` and `null`, 3 refutation draws each.
 `m = 3` secondary ladder (`n_vars = 3n' + 1`): A2 `t = 2…5`, A3 `k = 2, 3`, A5 `k = 2`, A23 `n = 2…4`,
 tower and null, 3 draws. Planted: A2 `t = 4…8`, A3 `k = 3…5`, A5 `k = 2, 3`, A23 `n = 4…6`. Replication
@@ -85,6 +109,10 @@ is rerun with a larger budget to get a different outcome.
 
 - **Primary:** `field_ops`, the `F_p` multiplications of F4's row reductions (counted, exact, per system).
 - **Secondary:** `solving_degree_max`, `max_cols`, `steps`, per system.
+- **Part B:** `alg_field_ops` (F4 row-reduction multiplications over the substitution tree; the root
+  finding of univariates is *not* counted, which favours the algebraic oracle) and `enum_field_ops` (every
+  multiplication of the enumeration, square roots and inversions counted as their exponentiations, lifting `V`
+  once included). Ratio `alg / enum` per target.
 - **Clock:** `ms` is recorded, not used. The host is unisolated.
 - **Reduction:** the three draws of a cell are separate systems. Per-draw ratios are computed; the cell value
   is their median, and the band rule below needs every draw in one band.
@@ -106,10 +134,21 @@ non-censored A2 cells, as a function of `x = log₂ S`, on the same `(m, control
    bands → "elliptic-specific at these sizes".
 4. **Order (C5).** `A32/A23` per draw at `n = 4, 6`, same bands.
 5. **Replication.** A3 and A5 at `P2` must give the same band as at `P1`, or the verdict is `not_replicated`.
-6. **Descriptive only:** least-squares slope of `log₂ field_ops` against `log₂ S` per arm. No interval, no
+6. **Form (C6).** `W(I*) / W(A*)` per draw for the same degree sequence (different `V`, same shape), at the
+   largest common completed `S`, same bands, tower and null.
+7. **Part B validity (C7).** Every row with a decided algebraic run must have `agree = true`. Otherwise part B
+   is `instrument_invalid`.
+8. **Part B verdict (C8)**, per `(m, form, arm)` at the largest completed cell: `advantage` if every target's
+   `alg/enum ≤ 0.5`; `disadvantage` if every target's `≥ 2`; `parity` otherwise. Trend: `closing` if the median
+   ratio falls over the arm's last three completed cells, `widening` if it rises, else `flat`.
+9. **Descriptive only:** least-squares slope of `log₂ field_ops` against `log₂ S` per arm. No interval, no
    decision.
 
-**Pre-registered prediction (this author's, from the barrier note's information reading):**
+**Pre-registered predictions (this author's).** Form: isogeny is *not cheaper* than Kummer
+(`no_material_effect` or `loss` for every `I*`), falsified by `gain`. Part B: `disadvantage` with trend
+`widening` at every `(m, arm)`, falsified by `advantage` anywhere or `closing` at `m = 3`.
+
+**Pre-registered prediction for the degree mix (from the barrier note's information reading):**
 `no_material_effect` for A3, A5, A23 and A32 at `m = 2` and `m = 3`, on tower and null alike, and no order
 effect. **It is falsified by** `gain` or `loss` for any arm on the tower at `m = 2`.
 
@@ -146,4 +185,7 @@ amendment in §8 that states whether it preceded the data it affects.
 
 ## 8. Amendments
 
-None at freeze.
+None at freeze. Before freezing (disclosed): the pre-flight probe ran `A2 t = 8, 9, 10`, `A3 k = 5, 6`,
+`A5 k = 3, 4` and `A23/A32 n = 7` once each (`smoke/`). The isogeny arm, part B and the uncharged auxiliary
+search were added after the user asked whether the auxiliary-curve system is better and asked for the
+algebraic solver to be implemented; no study row existed then.

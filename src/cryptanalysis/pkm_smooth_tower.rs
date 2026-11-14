@@ -1454,6 +1454,312 @@ pub fn cm_aux(p: u64, bound: u64, min_size: u64, seed: u64) -> Result<(AuxFound,
     })
 }
 
+// ------------------------------------- algebraic decomposition oracle (slide 17)
+
+/// Slide 17's system as polynomials over `F_p` for [`crate::cryptanalysis::f4_fp`]:
+/// unknowns `x_{i,j}` (index `i·n' + j`) then the `m − 2` chain helpers
+/// `u_k`; equations `x_{i,j+1}·D_j(x_{i,j}) − N_j(x_{i,j})`,
+/// `N_{n'}(x_{i,n'}) − c·D_{n'}(x_{i,n'})`, and the `S_3` chain
+/// `S_3(x_{1,1}, x_{2,1}, u_1), …, S_3(u_{m−2}, x_{m,1}, X)` (just
+/// `S_3(x_{1,1}, x_{2,1}, X)` at `m = 2`). Returns `(terms, n_vars)`.
+pub fn relation_system_polys(
+    e: &Curve,
+    tower: &SmoothTower,
+    m: usize,
+    xr: u64,
+) -> (Vec<Vec<(Vec<u32>, u64)>>, usize) {
+    assert!(m >= 2);
+    let p = e.p;
+    let n = tower.steps.len();
+    let n_vars = m * n + (m - 2);
+    let xv = |i: usize, j: usize| i * n + j;
+    let mut out = vec![];
+    for i in 0..m {
+        for j in 0..n {
+            let st = &tower.steps[j];
+            let mut eq: HashMap<Vec<u32>, u64> = HashMap::new();
+            let mut put = |mono: Vec<u32>, c: u64| {
+                let e = eq.entry(mono).or_insert(0);
+                *e = addm(*e, c % p, p);
+            };
+            for (k, &c) in st.num.iter().enumerate() {
+                let mut mono = vec![0u32; n_vars];
+                mono[xv(i, j)] = k as u32;
+                put(mono, p - c % p);
+            }
+            for (k, &c) in st.den.iter().enumerate() {
+                let mut mono = vec![0u32; n_vars];
+                mono[xv(i, j)] = k as u32;
+                if j + 1 < n {
+                    mono[xv(i, j + 1)] += 1;
+                    put(mono, c);
+                } else {
+                    put(mono, mulm(c, tower.c, p));
+                }
+            }
+            out.push(eq.into_iter().filter(|&(_, c)| c != 0).collect());
+        }
+    }
+    // S_3 chain. Slot: Some(var) or None for the constant X.
+    let s3_poly = |a: Option<usize>, b: usize, c: Option<usize>| -> Vec<(Vec<u32>, u64)> {
+        let m2 = p - 2;
+        let terms: [([u32; 3], u64); 13] = [
+            ([2, 0, 2], 1),
+            ([0, 2, 2], 1),
+            ([1, 1, 2], m2),
+            ([2, 1, 1], m2),
+            ([1, 2, 1], m2),
+            ([1, 0, 1], mulm(m2, e.a, p)),
+            ([0, 1, 1], mulm(m2, e.a, p)),
+            ([0, 0, 1], mulm(p - 4, e.b, p)),
+            ([2, 2, 0], 1),
+            ([1, 1, 0], mulm(m2, e.a, p)),
+            ([0, 0, 0], mulm(e.a, e.a, p)),
+            ([1, 0, 0], mulm(p - 4, e.b, p)),
+            ([0, 1, 0], mulm(p - 4, e.b, p)),
+        ];
+        let mut acc: HashMap<Vec<u32>, u64> = HashMap::new();
+        for (ex, c) in terms {
+            let mut mono = vec![0u32; n_vars];
+            let mut coef = c;
+            for (k, slot) in [a, Some(b), c].iter().enumerate() {
+                match slot {
+                    Some(v) => mono[*v] += ex[k],
+                    None => coef = mulm(coef, powm(xr, ex[k] as u64, p), p),
+                }
+            }
+            let t = acc.entry(mono).or_insert(0);
+            *t = addm(*t, coef, p);
+        }
+        acc.into_iter().filter(|&(_, c)| c != 0).collect()
+    };
+    let u = |k: usize| m * n + k; // u_1 … u_{m−2} at indices m·n + 0 …
+    if m == 2 {
+        out.push(s3_poly(Some(xv(0, 0)), xv(1, 0), None));
+    } else {
+        out.push(s3_poly(Some(xv(0, 0)), xv(1, 0), Some(u(0))));
+        for k in 2..m {
+            let right = if k == m - 1 { None } else { Some(u(k - 1)) };
+            out.push(s3_poly(Some(u(k - 2)), xv(k, 0), right));
+        }
+    }
+    (out, n_vars)
+}
+
+/// What the algebraic oracle did on one target.
+#[derive(Clone, Debug)]
+pub struct AlgebraicDecomposition {
+    /// Relations `P_1 + … + P_m = R` with every `x(P_i) ∈ V`, each checked by
+    /// point addition (sorted, as point lists).
+    pub relations: Vec<Vec<(u64, u64)>>,
+    /// Solutions of the system in `F_p` (all unknowns), before lifting.
+    pub solutions: usize,
+    /// Solutions whose abscissae do not all lift to `E(F_p)` (points over
+    /// `F_{p²}`): not relations, dropped.
+    pub unlifted: usize,
+    /// `F_p` multiplications of F4's row reductions over the substitution
+    /// tree (root finding of univariates is not included).
+    pub field_ops: u64,
+    pub solving_degree: u32,
+    pub f4_runs: usize,
+    pub max_cols: usize,
+    pub ms: f64,
+    /// The solver stopped (deadline or degree bound) before deciding.
+    pub undetermined: bool,
+}
+
+/// Every sign choice of `pts` that sums to `r`, as sorted point lists.
+fn signed_relations(e: &Curve, pts: &[(u64, u64)], r: (u64, u64)) -> Vec<Vec<(u64, u64)>> {
+    let m = pts.len();
+    let mut out = vec![];
+    for mask in 0u32..(1 << m) {
+        let chosen: Vec<(u64, u64)> = pts
+            .iter()
+            .enumerate()
+            .map(|(i, &q)| {
+                if mask >> i & 1 == 1 {
+                    e.neg(Some(q)).unwrap()
+                } else {
+                    q
+                }
+            })
+            .collect();
+        let s = chosen.iter().fold(None, |acc, &q| e.add(acc, Some(q)));
+        if s == Some(r) {
+            let mut c = chosen;
+            c.sort_unstable();
+            if !out.contains(&c) {
+                out.push(c);
+            }
+        }
+    }
+    out
+}
+
+/// The slides' relation search: solve the low-degree system of
+/// [`relation_system_polys`] by F4 and substitution
+/// ([`crate::cryptanalysis::f4_fp::solve`], grevlex, degree bound `dmax`),
+/// then lift every solution's `x_{i,1}` to points and keep the sign choices
+/// whose sum is `r`. Nothing is enumerated over `V`.
+pub fn algebraic_decompose(
+    e: &Curve,
+    tower: &SmoothTower,
+    m: usize,
+    r: (u64, u64),
+    dmax: u32,
+    budget: std::time::Duration,
+) -> AlgebraicDecomposition {
+    use crate::cryptanalysis::f4_fp::{self, F4Options, Ordering, Verdict};
+    let p = e.p;
+    assert!(p < 1 << 32, "f4_fp needs p < 2^32");
+    let (terms, n_vars) = relation_system_polys(e, tower, m, r.0);
+    let input: Vec<f4_fp::Poly> = terms
+        .iter()
+        .map(|t| f4_fp::normalise(t, p, Ordering::Grevlex))
+        .collect();
+    let mut opts = F4Options::new(Ordering::Grevlex, dmax);
+    opts.deadline = Some(std::time::Instant::now() + budget);
+    let rep = f4_fp::solve(&input, n_vars, p, &opts);
+    let n = tower.steps.len();
+    let mut relations: Vec<Vec<(u64, u64)>> = vec![];
+    let (mut solutions, mut unlifted) = (0, 0);
+    let undetermined = matches!(rep.verdict, Verdict::Undetermined) || rep.timed_out;
+    if let Verdict::Solutions(sols) = &rep.verdict {
+        solutions = sols.len();
+        for sol in sols {
+            let xs: Vec<u64> = (0..m).map(|i| sol[i * n]).collect();
+            let lifted: Option<Vec<(u64, u64)>> = xs
+                .iter()
+                .map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                .collect();
+            match lifted {
+                None => unlifted += 1,
+                Some(pts) => {
+                    for rel in signed_relations(e, &pts, r) {
+                        if !relations.contains(&rel) {
+                            relations.push(rel);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    relations.sort();
+    AlgebraicDecomposition {
+        relations,
+        solutions,
+        unlifted,
+        field_ops: rep.field_ops,
+        solving_degree: rep.solving_degree,
+        f4_runs: rep.f4_runs,
+        max_cols: rep.max_cols,
+        ms: rep.ms,
+        undetermined,
+    }
+}
+
+/// The baseline the oracle must beat: enumeration over the factor base, with
+/// every `F_p` multiplication counted (a square root by Tonelli–Shanks
+/// counted as its exponentiations). `m = 2`: for each `P_1`, the quadratic
+/// `S_3(x_1, ·, x(R))`, roots looked up in `V`. `m = 3`: for each pair
+/// `(P_1, P_2)`, the abscissae `u` of `P_1 ± P_2` (quadratic `S_3(x_1, x_2, ·)`),
+/// then the quadratic `S_3(u, ·, x(R))`. Returns relations (as in
+/// [`algebraic_decompose`]) and the multiplication count.
+pub fn enumerate_decompositions(
+    e: &Curve,
+    v: &[u64],
+    m: usize,
+    r: (u64, u64),
+) -> (Vec<Vec<(u64, u64)>>, u64) {
+    assert!(m == 2 || m == 3, "enumeration baseline for m = 2, 3");
+    let p = e.p;
+    let mut ops = 0u64;
+    let logp = 64 - p.leading_zeros() as u64;
+    // Roots in F_p of c2 X² + c1 X + c0, with its multiplications counted.
+    let mut quad_roots = |c: [u64; 3], ops: &mut u64| -> Vec<u64> {
+        if c[2] == 0 {
+            if c[1] == 0 {
+                return vec![];
+            }
+            *ops += 2 * logp + 1;
+            return vec![mulm(p - c[0] % p, invm(c[1], p), p)];
+        }
+        *ops += 3;
+        let disc = subm(mulm(c[1], c[1], p), mulm(4, mulm(c[2], c[0], p), p), p);
+        *ops += 4 * logp; // Legendre + square root, as exponentiations
+        let Some(sd) = sqrtm(disc, p) else {
+            return vec![];
+        };
+        *ops += 2 * logp + 2;
+        let i = invm(mulm(2, c[2], p), p);
+        vec![
+            mulm(subm(sd, c[1], p), i, p),
+            mulm(subm(p - sd, c[1], p), i, p),
+        ]
+    };
+    // S_3(a, b, X) as a quadratic in X (12 multiplications).
+    let s3_in_last = |a: u64, b: u64, ops: &mut u64| -> [u64; 3] {
+        *ops += 12;
+        let d = subm(a, b, p);
+        let s = addm(a, b, p);
+        let pr = mulm(a, b, p);
+        let c2 = mulm(d, d, p);
+        let c1 = subm(
+            0,
+            mulm(2, addm(mulm(s, addm(pr, e.a, p), p), mulm(2, e.b, p), p), p),
+            p,
+        );
+        let pa = subm(pr, e.a, p);
+        let c0 = subm(mulm(pa, pa, p), mulm(4, mulm(e.b, s, p), p), p);
+        [c0, c1, c2]
+    };
+    let base: Vec<(u64, u64)> = v
+        .iter()
+        .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+        .collect();
+    ops += base.len() as u64 * 6 * logp; // lifting V once
+    let vset: HashSet<u64> = v.iter().copied().collect();
+    let mut rels: Vec<Vec<(u64, u64)>> = vec![];
+    let mut push = |pts: Vec<(u64, u64)>, rels: &mut Vec<Vec<(u64, u64)>>| {
+        for rel in signed_relations(e, &pts, r) {
+            if !rels.contains(&rel) {
+                rels.push(rel);
+            }
+        }
+    };
+    let lift = |x: u64| sqrtm(e.rhs(x), p).map(|y| (x, y));
+    if m == 2 {
+        for &p1 in &base {
+            let q = s3_in_last(p1.0, r.0, &mut ops); // symmetric: S_3(x1, X, x2)
+            for x2 in quad_roots(q, &mut ops) {
+                if vset.contains(&x2) {
+                    if let Some(p2) = lift(x2) {
+                        push(vec![p1, p2], &mut rels);
+                    }
+                }
+            }
+        }
+    } else {
+        for (i, &p1) in base.iter().enumerate() {
+            for &p2 in &base[i..] {
+                let q = s3_in_last(p1.0, p2.0, &mut ops);
+                for uu in quad_roots(q, &mut ops) {
+                    let q2 = s3_in_last(uu, r.0, &mut ops);
+                    for x3 in quad_roots(q2, &mut ops) {
+                        if vset.contains(&x3) {
+                            if let Some(p3) = lift(x3) {
+                                push(vec![p1, p2, p3], &mut rels);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    rels.sort();
+    (rels, ops)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1654,6 +1960,60 @@ mod tests {
         for degs in [[2u64, 3, 2, 3], [3, 2, 3, 2], [3, 3, 2, 2]] {
             let t = isogeny_tower_on(f.aux, f.order, f.q, &degs, 1, f.curves_tried).unwrap();
             t.verify().unwrap();
+        }
+    }
+
+    #[test]
+    fn algebraic_oracle_finds_exactly_the_enumerated_relations() {
+        let p = 10_009; // p − 1 = 2^3 · 3^2 · 139
+        let e = Curve { p, a: 3, b: 7 };
+        let mut rng = Rng(12);
+        for degs in [vec![2u64, 2, 2], vec![3, 3], vec![2, 3]] {
+            let t = kummer_tower(p, &degs, None, 5).unwrap();
+            let base: Vec<(u64, u64)> =
+                t.v.iter()
+                    .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                    .collect();
+            assert!(base.len() >= 2);
+            for m in [2usize, 3] {
+                for trial in 0..3 {
+                    // planted target (trial 0, 1) and a random one (trial 2)
+                    let r = if trial < 2 {
+                        let pts: Vec<_> = (0..m)
+                            .map(|_| base[rng.below(base.len() as u64) as usize])
+                            .collect();
+                        match pts.iter().fold(None, |a, &q| e.add(a, Some(q))) {
+                            Some(r) => r,
+                            None => continue,
+                        }
+                    } else {
+                        e.random_point(&mut rng).unwrap()
+                    };
+                    let alg =
+                        algebraic_decompose(&e, &t, m, r, 40, std::time::Duration::from_secs(60));
+                    assert!(!alg.undetermined, "degs {degs:?} m {m}");
+                    let (en, ops) = enumerate_decompositions(&e, &t.v, m, r);
+                    assert!(ops > 0);
+                    assert_eq!(alg.relations, en, "degs {degs:?} m {m} trial {trial}");
+                    if trial < 2 {
+                        assert!(!en.is_empty(), "planted relation missing");
+                    }
+                }
+            }
+        }
+        // isogeny form too
+        let f = search_aux_exact(p, 6, 3, 50_000).unwrap();
+        let t = isogeny_tower_on(f.aux, f.order, f.q, &[2, 3], 2, 0).unwrap();
+        let base: Vec<(u64, u64)> =
+            t.v.iter()
+                .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                .collect();
+        if base.len() >= 2 {
+            let r = e.add(Some(base[0]), Some(base[1])).unwrap();
+            let alg = algebraic_decompose(&e, &t, 2, r, 40, std::time::Duration::from_secs(60));
+            let (en, _) = enumerate_decompositions(&e, &t.v, 2, r);
+            assert_eq!(alg.relations, en);
+            assert!(!en.is_empty());
         }
     }
 }

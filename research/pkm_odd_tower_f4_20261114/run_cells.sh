@@ -9,6 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 ROOT="$(git rev-parse --show-toplevel)"
 BIN="$ROOT/target/release/examples/pkm_odd_tower_f4"
+ORACLE="$ROOT/target/release/examples/pkm_algebraic_oracle"
 export RAYON_NUM_THREADS="${RAYON_NUM_THREADS:-4}"
 P1=1399680001
 P2=3265920001
@@ -16,7 +17,7 @@ SEED=20261114
 BUDGET="${BUDGET:-1800}"
 DMAX=64
 
-sha256sum "$BIN" | cut -d' ' -f1 > binary.sha256
+sha256sum "$BIN" "$ORACLE" > binary.sha256
 git -C "$ROOT" rev-parse HEAD > commit.txt
 rustc -Vv > rustc.txt
 mkdir -p runs runs/partial
@@ -93,5 +94,28 @@ done
 
 # A/A determinism: rerun one main cell under a new name; counts must be bit-identical.
 run "AA-M2-A3-k5-tower" 3 --p $P1 --m 2 --degrees "$(deg 3 5)" --control tower --kind refute --draws 3
+
+# Part B: algebraic oracle vs enumeration (2 planted + 2 random targets per cell).
+runb() {
+  local name="$1"; shift
+  local f="runs/B-$name.jsonl"
+  if [ -f "$f" ] && [ "$(wc -l < "$f")" -ge 4 ]; then return 0; fi
+  if [ -f "$f" ]; then mv "$f" "runs/partial/B-$name.$(date -u +%s).jsonl"; echo "rerun B-$name (partial)" >> progress.txt; fi
+  local t0=$(date +%s)
+  "$ORACLE" --seed "$SEED" --budget "$BUDGET" --dmax "$DMAX" --cell "B-$name" --out "$f" --planted 2 --random 2 "$@" > /dev/null
+  echo "done B-$name rows=$(wc -l < "$f") secs=$(( $(date +%s) - t0 ))" >> progress.txt
+}
+for c in "A2-t4:2:4" "A3-k3:3:3" "A23-n4:23:4" "A2-t6:2:6" "A23-n6:23:6" "A3-k5:3:5" "A2-t8:2:8"; do
+  IFS=: read -r name q n <<< "$c"; runb "M2-$name" --p $P1 --m 2 --form kummer --degrees "$(degs_of "$q" "$n")"
+done
+for c in "I3-k3:3:3" "I23-n4:23:4" "I23-n5:23:5" "I3-k4:3:4"; do
+  IFS=: read -r name q n <<< "$c"; runb "M2-$name" --p $P1 --m 2 --form isogeny --degrees "$(degs_of "$q" "$n")"
+done
+for c in "A2-t2:2:2" "A23-n2:23:2" "A2-t3:2:3" "A3-k2:3:2" "A23-n3:23:3" "A2-t4:2:4" "A3-k3:3:3" "A23-n4:23:4" "A2-t5:2:5"; do
+  IFS=: read -r name q n <<< "$c"; runb "M3-$name" --p $P1 --m 3 --form kummer --degrees "$(degs_of "$q" "$n")"
+done
+for c in "I23-n2:23:2" "I23-n3:23:3"; do
+  IFS=: read -r name q n <<< "$c"; runb "M3-$name" --p $P1 --m 3 --form isogeny --degrees "$(degs_of "$q" "$n")"
+done
 
 echo "end $(date -u +%FT%TZ)" >> progress.txt
