@@ -467,7 +467,12 @@ fn full_d18_load(root: &Path) -> Result<(PrimaryBase, Value)> {
 /// solver. The constructed control can pin witness x coordinates or leave
 /// them free while retaining the same public target and validation witness.
 pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result<Value> {
-    k2048_m5_xcnf_export(mode, root, output, 0)
+    k2048_m5_xcnf_export(
+        mode,
+        root,
+        output,
+        if mode == "natural-sorted" { 1 } else { 0 },
+    )
 }
 
 /// Export a frozen public corpus fixture with the same retained K2048 base.
@@ -488,7 +493,15 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
     const REPLAY_SHA256: &str = "5ad374ef0042b2ebd6562746b7ca67e46c6b0f4d46c4ba25abae83fd2dd411e2";
     const STORAGE_SHA256: &str = "f1139c1dd61beac0e1d9e80a1d02e983f98c7b1abc6887f1816f013d4693bf4c";
     const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
-    if !["positive", "positive-unpinned", "natural"].contains(&mode)
+    if ![
+        "positive",
+        "positive-unpinned",
+        "natural",
+        "positive-sorted-pinned",
+        "positive-sorted-unpinned",
+        "natural-sorted",
+    ]
+    .contains(&mode)
         || output.exists()
         || output.with_extension("xcnf").exists()
     {
@@ -528,9 +541,30 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
     {
         return Err("K2048 m5 public target differs from frozen fixture".into());
     }
+    let sorted = matches!(
+        mode,
+        "positive-sorted-pinned" | "positive-sorted-unpinned" | "natural-sorted"
+    );
+    let pinned = matches!(mode, "positive" | "positive-sorted-pinned");
+    let constructed = matches!(
+        mode,
+        "positive" | "positive-unpinned" | "positive-sorted-pinned" | "positive-sorted-unpinned"
+    );
     let mut positive = None;
-    let target = if mode == "positive" || mode == "positive-unpinned" {
-        let indices: [usize; 5] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+    let target = if constructed {
+        let mut indices: [usize; 5] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+        if indices
+            .iter()
+            .any(|&index| matches!(fb.points[index], BinaryPoint::Infinity))
+        {
+            return Err("K2048 constructed representative is identity".into());
+        }
+        if sorted {
+            indices.sort_by_key(|&index| match &fb.points[index] {
+                BinaryPoint::Affine { x, .. } => x.to_biguint(),
+                BinaryPoint::Infinity => unreachable!("representatives checked nonidentity"),
+            });
+        }
         let mut partial = Vec::with_capacity(5);
         let mut sum = BinaryPoint::Infinity;
         for &index in &indices {
@@ -569,7 +603,11 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         3_000_000,
     )
     .map_err(|_| "K2048 m5 shared-root orbit domain failed")?;
-    if mode == "positive" {
+    if sorted {
+        enc.order_all_summands(200_000)
+            .map_err(|_| "K2048 m5 all-summand ordering failed")?;
+    }
+    if pinned {
         let (indices, partial, _) = positive.as_ref().ok_or("K2048 positive witness missing")?;
         let points: Vec<&BinaryPoint> = indices
             .iter()
@@ -602,7 +640,8 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "summands":5,"identity_mask":0,"root_encoding":"shared_root_bits",
         "domain_representatives":representatives.len(),
-        "positive_x_pins":if mode == "positive" { 9*83 } else { 0 },
+        "positive_x_pins":if pinned { 9*83 } else { 0 },
+        "summand_ordering":if sorted { "all_nondecreasing_x" } else { "none" },
     });
     let export_started = Instant::now();
     let xcnf = to_dimacs_xor(&enc.solver);
@@ -635,7 +674,7 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         "binary_sha256":binary_sha256,"object":row["object"],
         "object_sha256":OBJECT_SHA256,"point_set_blake3":row["point_set_blake3"],
         "panel_manifest_blake3":manifest_blake3,"public_corpus_blake3":corpus_blake3,
-        "public_fixture":if mode == "natural" { Some(fixture) } else { None },
+        "public_fixture":if mode == "natural" || mode == "natural-sorted" { Some(fixture) } else { None },
         "target":point_json(words(&target)),"shape":shape,
         "positive":positive_receipt,
         "xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
