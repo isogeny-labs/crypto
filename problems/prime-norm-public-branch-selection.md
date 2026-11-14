@@ -130,3 +130,35 @@ pole-normalization/filtration proof independently; use an admitted symbolic
 fixture check when its infrastructure is available. Original W-jet/public
 finder exit criteria remain open, without identifying the families or
 inferring a non-generic impossibility result [pcc:unverified].
+
+
+2026-11-14 exact pole-transport update: [report](../research/prime_norm_rank_20261112/pole-transport-report/README.md),
+source23d78212afe6b379e51040abf66622305250f62b, merged in4087. Actual
+norm/support/master/full-remainder transport holds for every stated tower
+depth under the inverse-pair premise e*l=1 and explicit target-curve premise.
+Twenty-three new statements, whole-study gate327/0, import-inclusive fresh
+replay0; centralPCC-20261114-d754b9 and PCC-20261114-9e7aa6, receipt
+PCC-20261114-5a59a9, all unsigned. This is exact polynomial transport, not a
+low full-closure bound [pcc:unverified].
+
+2026-11-14 actual target-row update: [report](../research/prime_norm_rank_20261112/target-fiber-report/README.md),
+source d265c35a0efc1efb609a396e451fd543ab838c21. From actual monic division,
+the target-evaluated membership remainder has a uniform factor e^3 over a
+commutative ring, including the polynomial parameter ring. Monic base change
+recovers the existing field model. For a field and e!=0, replacing the
+constant coefficient equation by the normalized target equation, while
+retaining all four nonconstant equations, preserves exactly the degree5
+chart's five-equation solution set. Twenty-six new statements, whole-study
+gate353/0, fresh replay0; factorPCC-20261114-76f2d5,
+polynomial-divisibilityPCC-20261114-af9c9e,
+specializationPCC-20261114-ca75bf, lossless-rowsPCC-20261114-2ceac7,
+receiptPCC-20261114-7ad52b, all unsigned [pcc:unverified].
+
+Next, bind this transformed row to its exact grading, then establish a
+constructive full weighted closure/normal-form bound for a growing family.
+Uniform divisibility is not an exact order3 claim, weighted degree29 claim,
+last-fall bound or fast finder. The original W-jet chart still requires its
+own faithful map. The fixed native fixture experiment remains unlaunched
+due checkpoint upload admission; no solver, paid or attack campaign was run.
+Original public finder, field extraction and expected bit-cost exit criteria
+remain open [pcc:unverified].
