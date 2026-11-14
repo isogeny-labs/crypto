@@ -210,6 +210,8 @@ Decision key: (a) already tested for real, (b) real test now, (c) needs new nati
 
 ## 4. The (b) specs, ranked by information per cost
 
+**Update 2026-11-14:** specs 1 and 2 were made freeze-ready and superseded by `B1/` and `B2/` (PROTOCOL.md, spec JSON, PLAN.txt, SMOKE.txt). Where they differ (B1: 96 targets x 6 rounds, positive-control direction `--a inc-n32 --b n45`; B2: 24 targets per curve plus a separate PC job), `B1/` and `B2/` govern. The draft files in `specs/` are retained only as history.
+
 Only three leads have a runnable, unrun, real measurement with code that exists in the tree today. They
 are ranked below by information per CPU-hour (estimates). None is an attack and none can change the
 sub-sqrt(p) question; each reports a distance or a baseline. Draft spec files are in
