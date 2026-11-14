@@ -341,7 +341,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual length/support/native16/JV8; literal F2torus-helper disproof/point-chart repair (31); generic actual solution/quotient-map equivalence and finite scalar-length bound, unbounded actual bivariate nilpotent family with m0/m1/domain controls (44) Actual self-module length=m and positive-m locality now proved for truncated/bivariate family, all-extension support1/unbounded local-length gap/m0nonlocal controls; actual F4/F2 ringlength1≠scalarlength2. General cycle/intersection remains open. [pcc:unverified] | General n!dⁿ/decomposition node unrefuted; scheme-cycle/local multiplicity, isolated points in positive-dimensional components, projective geometry and Rojas/C runtime/refinement |
 | 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 Canonical actual P_d/(I∩P_d) Hilbert function now proved1/3/3/1/0, zeroiffd≥4, actual idealhomogeneity/kernel/image/basis-span bridge and HF0≠totaldim control; generic/internalF4 remain open. [pcc:unverified] | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
-| 10 Rho walks | Partial overall; qualified expected-support/uniform quadratic mixing components closed. Actual product-PMF in-degree mean/variance and finite collision populations, plus unbounded-prime fixed-support collision obstruction. Qualified HildebrandTheorem2 uniform quadratic mixing and Theorem1 expected random-support exponent now proved for all fixed k>=2/strict positive normalized weights/prime moduli, actual iid walk laws. Theorem1 retains full uniform ordered-distinct-support PMF, exact floor(gamma*p^(2/(k-1))), constants before modulus/support and all starts; finite Fourier/Gaussian/without-replacement/denominator bridges derived. Zero-weight all-support expected distance>=1/2 for all primes/times and direct no-gamma/N negation. Known literal k2 counting and Gaussian equality errors have valid repairs; no qualified theorem refuted. See ../random_support_average_audit_20261114/README.md and ../rho_collision_audit_20261110. Static rho/random-table collision penalty and limiting constants remain open. [pcc:unverified] | Static-rho random-table collision penalty and limiting constants; full original item10 remains partial |
+| 10 Rho walks | Partial overall; qualified expected-support/uniform quadratic mixing components closed. Actual product-PMF in-degree mean/variance and finite collision populations, plus unbounded-prime fixed-support collision obstruction. Qualified HildebrandTheorem2 uniform quadratic mixing and Theorem1 expected random-support exponent now proved for all fixed k>=2/strict positive normalized weights/prime moduli, actual iid walk laws. Theorem1 retains full uniform ordered-distinct-support PMF, exact floor(gamma*p^(2/(k-1))), constants before modulus/support and all starts; finite Fourier/Gaussian/without-replacement/denominator bridges derived. Zero-weight all-support expected distance>=1/2 for all primes/times and direct no-gamma/N negation. Known literal k2 counting and Gaussian equality errors have valid repairs; no qualified theorem refuted. See ../random_support_average_audit_20261114/README.md and ../rho_collision_audit_20261110. Static rho/random-table collision penalty and limiting constants remain open. [pcc:unverified] Exact actual static-hash versus iid firstcollision survival/tail/finiteexpectation bridge now proved for arbitrary finite update/label law; actualZ3distinctnonzero-step postcollision word0,1,1 staticmass0≠iid1/8 direct control. Limiting randomtable penalty/practicalhash remain open. [pcc:unverified] | Static-rho random-table collision penalty and limiting constants; full original item10 remains partial |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Requested actual separate-host primeS3 replay completed in public run43501438026, both languages match all6fields/942models/4188162triples; canonical export2/2/0excluded passes Native independent Lean surface-header audit resolves62bindings:61complete/1issued BKprefix/0unresolved; genuine controls/model proof separate from procedural counts. Actual BK wrapper is now complete; ambient/dependency/shared-verifier semantic contract remains open. [pcc:unverified] | Compiler/runtime/physical-host proof and independence from the same author remain open. Native attestation PCC-20261113-9b23b3not_covered/unsigned; original manualHTTP404 unchanged. |
@@ -1715,3 +1715,28 @@ independent native1full/0prefix/0unresolved;7custom/13formal-config+
 fivegate/inspected onepagePDF46331bytes. Three failed states retained.
 No qualified-source refutation, novelty, new crypto experiment/spend/upload.
 [pcc:unverified]
+
+### Exact static-hash firstcollision survival and finite expectation
+
+The [exact static-hash collision proof](../research/static_hash_collision_audit_20261114/README.md)
+closes the first-collision model bridge: any finite state update and any
+nonnegative normalized label law, actual independent static vertex-label
+PMF survival equals actual iid chronological-word selfavoidance at every
+time. Actual queried-state injectivity is derived from the word path;
+the generic actual cylinder theorem supplies product probabilities.
+The unchanged actual leastrepeat Nat.find on every nonzero Z/p is linked
+to prefix injectivity, giving exact tail probabilities and finite tail-sum
+expectation, with arbitrary update/start. Actual primeZ3/steps1,2distinct
+nonzero/positiveuniformlabels gives word0,1,1 staticmass0versusiid1/8
+and directly disproves deleting selfavoidance from chronological word mass.
+It does not identify unrestricted postcollision histories or a practical
+fixed/keyedhash with iid labels. Limiting random-increment-table collision
+penalty/constants remain open. Known Bernstein–Lange2013higher-degree
+anticollision corrections are credited, not claimed as a newly disproved
+qualified source theorem or proved asymptotic correction.
+Exact local **PCC-20261114-25d8e2** PASS at 2026-11-14T17:05:51Z, signed standing unverified;
+whole37/0/0, complete1421-character binding`be9c6e9f61b3fd7984f70666f38565d4b55df432cbeecdc75723d02c47859a1f`,
+independent native1full/0prefix/0unresolved;10custom/22formal-config+
+14artifact pins,97provenance files/41objects/14148-byte lossless XZ/
+fivegate/inspected onepagePDF46588bytes. Six failed states retained.
+No new crypto experiment/spend/upload/novelty. [pcc:unverified]
