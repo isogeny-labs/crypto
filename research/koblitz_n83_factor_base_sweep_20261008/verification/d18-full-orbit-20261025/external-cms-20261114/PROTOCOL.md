@@ -28,6 +28,8 @@ FIXTURE_DIR NEW_OUTPUT_JSON` from the pinned worker. The export is a
 target-independent/target-specific construction charge as appropriate;
 record process wall, CPU, peak RSS, XCNF bytes/hash, model shape, and exact
 output paths for both modes. The worker's 400 MB XCNF output cap applies.
+Apply a 310-second outer process-group guard to each export; a timed-out or
+nonzero export is a retained producer failure and stops the panel.
 Each export must have a terminal exit `0`, exact source and input identities,
 and the expected positive/natural public point. Preserve the XCNF bytes.
 
