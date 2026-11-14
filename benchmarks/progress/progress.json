@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T0413Z-quartic-dl1-cd17-chain",
+  "latest_record": "20261114T0422Z-ic-fold-pack-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 154,
+    "measured": 155,
     "open": 0
   },
   "repo": "crypto",
@@ -6956,10 +6956,10 @@
     {
       "better": "higher",
       "first": 1.0046336259609188,
-      "latest": 1.0190592389511335,
+      "latest": 0.994456746981451,
       "latest_derived": {
-        "improvement_vs_first_percent": 1.4359,
-        "improvement_vs_previous_percent": 1.4359
+        "improvement_vs_first_percent": -1.013,
+        "improvement_vs_previous_percent": -2.4142
       },
       "metric": "build_aa_k0n53",
       "points": [
@@ -6997,6 +6997,24 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 1.0190592389511335
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -1.013,
+            "improvement_vs_previous_percent": -2.4142
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9715302500873212,
+            1.017926125278575
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.994456746981451
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7005,10 +7023,10 @@
     {
       "better": "higher",
       "first": 1.0067590450435402,
-      "latest": 1.00364416581828,
+      "latest": 0.9996567560327823,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.3094,
-        "improvement_vs_previous_percent": -0.3094
+        "improvement_vs_first_percent": -0.7055,
+        "improvement_vs_previous_percent": -0.3973
       },
       "metric": "build_aa_k0n61",
       "points": [
@@ -7046,6 +7064,24 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 1.00364416581828
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.7055,
+            "improvement_vs_previous_percent": -0.3973
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9901661616614386,
+            1.0154342949305444
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.9996567560327823
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7297,6 +7333,66 @@
     },
     {
       "better": "higher",
+      "first": 1.244204834254296,
+      "latest": 1.244204834254296,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_two_over_packed_k0n53",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2146403684540803,
+            1.2764097822915617
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.244204834254296
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2522538427209544,
+      "latest": 1.2522538427209544,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "build_two_over_packed_k0n61",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.223131180925845,
+            1.2666285188567135
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.2522538427209544
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
       "first": 1.044896409924537,
       "latest": 1.044896409924537,
       "latest_derived": {
@@ -7418,10 +7514,10 @@
     {
       "better": "higher",
       "first": 1.0017417845180656,
-      "latest": 0.9960436137552416,
+      "latest": 0.9858291501793495,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.5688,
-        "improvement_vs_previous_percent": -0.5688
+        "improvement_vs_first_percent": -1.5885,
+        "improvement_vs_previous_percent": -1.0255
       },
       "metric": "collect_aa_k0n53",
       "points": [
@@ -7459,6 +7555,24 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 0.9960436137552416
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -1.5885,
+            "improvement_vs_previous_percent": -1.0255
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9738582964037926,
+            1.0121349291581818
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.9858291501793495
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7467,10 +7581,10 @@
     {
       "better": "higher",
       "first": 1.000568372750849,
-      "latest": 0.9974982213387907,
+      "latest": 1.0077730878400717,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.3068,
-        "improvement_vs_previous_percent": -0.3068
+        "improvement_vs_first_percent": 0.7201,
+        "improvement_vs_previous_percent": 1.0301
       },
       "metric": "collect_aa_k0n61",
       "points": [
@@ -7508,6 +7622,24 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 0.9974982213387907
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.7201,
+            "improvement_vs_previous_percent": 1.0301
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.992272703063639,
+            1.0234724550386374
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0077730878400717
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7635,11 +7767,71 @@
     },
     {
       "better": "higher",
-      "first": 1.0050488198854794,
-      "latest": 0.9914751264309754,
+      "first": 0.9814972203776974,
+      "latest": 0.9814972203776974,
       "latest_derived": {
-        "improvement_vs_first_percent": -1.3506,
-        "improvement_vs_previous_percent": -1.3506
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_two_over_packed_k0n53",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9728695878300276,
+            1.004800727348046
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 0.9814972203776974
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0091003978222433,
+      "latest": 1.0091003978222433,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "collect_two_over_packed_k0n61",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.987431034914418,
+            1.019095889122887
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0091003978222433
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0050488198854794,
+      "latest": 1.0052391975524457,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0189,
+        "improvement_vs_previous_percent": 1.3882
       },
       "metric": "setup_aa_k0n53",
       "points": [
@@ -7677,6 +7869,24 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 0.9914751264309754
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0189,
+            "improvement_vs_previous_percent": 1.3882
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9818940046398614,
+            1.0169114326157993
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0052391975524457
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7685,10 +7895,10 @@
     {
       "better": "higher",
       "first": 1.0032154840727214,
-      "latest": 0.9973316718632423,
+      "latest": 1.0136484493851134,
       "latest_derived": {
-        "improvement_vs_first_percent": -0.5865,
-        "improvement_vs_previous_percent": -0.5865
+        "improvement_vs_first_percent": 1.04,
+        "improvement_vs_previous_percent": 1.636
       },
       "metric": "setup_aa_k0n61",
       "points": [
@@ -7726,6 +7936,24 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 0.9973316718632423
+        },
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 1.04,
+            "improvement_vs_previous_percent": 1.636
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9948304853239935,
+            1.0255453950216007
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0136484493851134
         }
       ],
       "problem": "ic:koblitz_setup_phase",
@@ -7846,6 +8074,66 @@
           ],
           "summary": "Top-bits filter layout: build low/top 1.104 [1.069,1.142] (k0n53), 1.142 [1.098,1.164] (k0n61), established vs A/A; set-up not established; no collect regression. Kept as default.",
           "value": 1.0005217873604986
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0685505425912554,
+      "latest": 1.0685505425912554,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_two_over_packed_k0n53",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 41,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0515910340682824,
+            1.0802107639301255
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0685505425912554
+        }
+      ],
+      "problem": "ic:koblitz_setup_phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0386805300536524,
+      "latest": 1.0386805300536524,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "setup_two_over_packed_k0n61",
+      "points": [
+        {
+          "commit": "9ffb57124595",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 42,
+          "record": "20261114T0422Z-ic-fold-pack-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0201629310801397,
+            1.0504592593014068
+          ],
+          "summary": "Packed single stream: build two/packed 1.244 [1.214,1.276] (k0n53), 1.252 [1.223,1.266] (k0n61), established; set-up 1.068 [1.051,1.080] at k0n53 established, 1.038 at k0n61 not; no collect regression. Kept as default.",
+          "value": 1.0386805300536524
         }
       ],
       "problem": "ic:koblitz_setup_phase",
