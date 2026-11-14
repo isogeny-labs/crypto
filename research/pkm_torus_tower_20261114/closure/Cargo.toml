@@ -1,0 +1,20 @@
+[package]
+name = "pc_closure"
+version = "0.1.0"
+edition = "2021"
+description = "Degree-D polynomial-calculus closure W_D over F_p (Rust port of raw_closure.py closure_degree)"
+publish = false
+
+[[bin]]
+name = "pc_closure"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+codegen-units = 1
