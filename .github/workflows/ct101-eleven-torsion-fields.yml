@@ -1,0 +1,39 @@
+name: CT101 constructive eleven-torsion fields
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct101/**'
+      - '.github/workflows/ct101-eleven-torsion-fields.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct101/**'
+      - '.github/workflows/ct101-eleven-torsion-fields.yml'
+  workflow_dispatch:
+
+jobs:
+  ct101:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independently replay source and degree-40 target arithmetic
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct101
+          python3 -B "$D/ct101_eleven_torsion.py" >/tmp/ct101-py.json
+          python3 -O -B "$D/ct101_eleven_torsion.py" >/tmp/ct101-pyopt.json
+          node "$D/ct101_eleven_independent.js" >/tmp/ct101-js.json
+          node --no-opt "$D/ct101_eleven_independent.js" >/tmp/ct101-jsopt.json
+          cmp /tmp/ct101-py.json /tmp/ct101-pyopt.json
+          cmp /tmp/ct101-py.json /tmp/ct101-js.json
+          cmp /tmp/ct101-py.json /tmp/ct101-jsopt.json
+          printf 'b02f900029347e23300a6871cde8dbe35f4a2f497bcdfd9024bad93abeedc082  %s\n' /tmp/ct101-py.json | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          obj=json.load(open('/tmp/ct101-py.json'))
+          assert obj['cross_characteristic_lift_evaluated'] is False
+          assert obj['target_group_pairs']==363
+          assert all(x['oriented_orbit']==40 for x in obj['binary_factors'])
+          print('CT101 exact arithmetic validated; no source-to-target lift asserted')
+          PY

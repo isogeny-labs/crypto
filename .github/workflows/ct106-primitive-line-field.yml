@@ -1,0 +1,30 @@
+name: CT106 primitive eleven-torsion line field
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct106/**'
+      - '.github/workflows/ct106-primitive-line-field.yml'
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct106/**'
+      - '.github/workflows/ct106-primitive-line-field.yml'
+  workflow_dispatch:
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independently replay primitive invariant / mod-13 and fixed places
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct106
+          python3 -B "$D/ct106_primitive_line_field.py" >/tmp/ct106-py.json
+          python3 -O -B "$D/ct106_primitive_line_field.py" >/tmp/ct106-pyopt.json
+          node "$D/ct106_primitive_line_field_independent.js" >/tmp/ct106-js.json
+          node --no-opt "$D/ct106_primitive_line_field_independent.js" >/tmp/ct106-jsopt.json
+          cmp /tmp/ct106-py.json /tmp/ct106-pyopt.json
+          cmp /tmp/ct106-py.json /tmp/ct106-js.json
+          cmp /tmp/ct106-py.json /tmp/ct106-jsopt.json
+          printf '%s  %s\n' e2cac923b8426e70a4a62162e7d7d1cdf5b3f9807e405034288e5969d36fb882 /tmp/ct106-py.json | sha256sum -c

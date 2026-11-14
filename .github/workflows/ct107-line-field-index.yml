@@ -1,0 +1,30 @@
+name: CT107 line-field local-order certificate
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct107/**'
+      - '.github/workflows/ct107-line-field-index.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct107/**'
+      - '.github/workflows/ct107-line-field-index.yml'
+  workflow_dispatch:
+jobs:
+  ct107:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify four independent execution modes
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct107
+          python3 -B "$D/ct107_line_field_reduction.py" >/tmp/ct107-py.json
+          python3 -O -B "$D/ct107_line_field_reduction.py" >/tmp/ct107-pyopt.json
+          node "$D/ct107_line_field_independent.js" >/tmp/ct107-js.json
+          node --no-opt "$D/ct107_line_field_independent.js" >/tmp/ct107-jsopt.json
+          cmp /tmp/ct107-py.json /tmp/ct107-pyopt.json
+          cmp /tmp/ct107-py.json /tmp/ct107-js.json
+          cmp /tmp/ct107-py.json /tmp/ct107-jsopt.json
+          printf '%s  %s\n' 7979a45b3bbae601893fb2b3282ebe79465dd70438df04fa798c9bdb57ace455 /tmp/ct107-py.json | sha256sum -c

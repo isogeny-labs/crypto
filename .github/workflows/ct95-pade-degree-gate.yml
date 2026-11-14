@@ -1,0 +1,26 @@
+name: CT95 Padé degree gate
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct95/**'
+      - '.github/workflows/ct95-pade-degree-gate.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct95/**'
+      - '.github/workflows/ct95-pade-degree-gate.yml'
+  workflow_dispatch:
+jobs:
+  ct95:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repeat CT95 normal / optimized exact rational arithmetic
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct95
+          python3 -B "$D/ct95_degree_gate.py" | tee /tmp/ct95-normal.txt
+          python3 -O -B "$D/ct95_degree_gate.py" | tee /tmp/ct95-optimized.txt
+          diff -u /tmp/ct95-normal.txt /tmp/ct95-optimized.txt
+          grep -F 'PASS: short (4,3) template cannot globally represent tripling' /tmp/ct95-normal.txt

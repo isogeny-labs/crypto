@@ -1,0 +1,31 @@
+name: CT104 endomorphism rigidity gate
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct104/**'
+      - '.github/workflows/ct104-endomorphism-rigidity.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct104/**'
+      - '.github/workflows/ct104-endomorphism-rigidity.yml'
+  workflow_dispatch:
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent Python/BigInt JS full 121-pair and polynomial certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct104
+          python3 -B "$D/ct104_endomorphism_gate.py" > /tmp/ct104-py.json
+          python3 -O -B "$D/ct104_endomorphism_gate.py" > /tmp/ct104-pyopt.json
+          node "$D/ct104_endomorphism_gate_independent.js" > /tmp/ct104-js.json
+          node --no-opt "$D/ct104_endomorphism_gate_independent.js" > /tmp/ct104-jsopt.json
+          cmp /tmp/ct104-py.json /tmp/ct104-pyopt.json
+          cmp /tmp/ct104-py.json /tmp/ct104-js.json
+          cmp /tmp/ct104-py.json /tmp/ct104-jsopt.json
+          printf '%s  %s\n' 8c70653b82e879a6719b9beebbf3e62c5c861b4692c4d46dc1283213c1b9bbfa /tmp/ct104-py.json | sha256sum -c
+          cat /tmp/ct104-py.json
