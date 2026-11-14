@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck and implementation gap
 - **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [external XOR handoff](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/PROTOCOL.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md)
 - **Next action owner:** N83 factor-base research task
-- **Last updated:** 2026-10-26
+- **Last updated:** 2026-11-14 UTC; [native cadence-32 attempt 7](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-7/REPORT.md) and [external CryptoMiniSat probe](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/external-cms-20261114/RESULT.md)
 
 ## Problem
 
@@ -26,6 +26,22 @@ requested selection criterion is minimum total index-calculus runtime,
 including setup and online phases, over the finite declared design grid.
 
 ## Evidence and uncertainty
+
+- **2026-11-14 D18 update:** A source-bound ordered-first-pair, cadence-32
+  constructed control completed in 50.414 seconds with independent group,
+  row, and assignment replay. Its first public natural query returned
+  `UNKNOWN_search_cap` at 100,000 conflicts after 161.878 seconds, with zero
+  models or relations. A separately frozen free-first-pair,
+  phase-zero-first XCNF export was checked against the exact D18 object;
+  CryptoMiniSat 5.14.7 reached its 1,000,000-conflict cap on the constructed
+  positive after 420.708 seconds and returned `INDETERMINATE`. The second
+  probe withheld its natural solver arm by protocol. These are distinct
+  encodings and do not establish a backend speed ratio. Their raw hashes,
+  terminal statuses and resource receipts are retained at the links above.
+  The external run's sampled peak RSS was 341,072 KiB with unchanged
+  swapouts, so its censor is a bounded search outcome under this cap rather
+  than a memory-admission failure. No D18 natural relation or useful-rank
+  observation was promoted.
 
 - **Observed:** The [independently replayed hosted 5+1 split panel](../research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-split-panel-20261025/attempt-1/replay-receipt.json) reached 20,000 native conflicts and zero models in each Gray/hash arm. Worker walls were 1,470,249 and 1,223,792 ms respectively on that Linux host; both statuses are `UNKNOWN_search_cap`. The prior 4+2 panel is likewise capped. The [local external-XOR receipt](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/receipt.json) records four first-pattern 5+1/4+2 Gray/hash arms, each ending `INDETERMINATE` at 2,000,001–2,000,002 conflicts with zero models after 119.2–192.5 seconds of L0 process wall. Its [replay](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/replay.json) rebuilds all four formulas from exact archive bytes and checks the raw-output hashes and counters.
 - **Observed capacity and access gates:** The [full-D18 native preflight](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PREFLIGHT.md) checked the exact 5,418,738-row S3 object, distinct producer and custody manifests, full-object provider checksums, clean source and release binaries. Its local one-minute load remained 55.95–74.19 against the frozen maximum of 24 while cumulative swapouts increased, so the cadence-32 worker was not launched. A [second source-bound preflight](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-2/REPORT.md) at `45ce91d5` again matched both S3 object hashes but sampled load 26.44–66.14 and 390,448 new swapouts; neither worker arm launched. Configured AWS spot and RunPod SSH endpoints were unavailable at bounded checks. The exact two-object read grant is now applied and read back, while PR #2649 GitHub Actions still stop before runner assignment at the account billing gate. These are resource/access conditions, not evidence about solver yield.
@@ -126,7 +142,7 @@ failure in `ecbench/methods.rs`; PR #2649's N83 delimiter repair is pushed,
 but full post-merge Cargo validation remains open. These backend and source
 conditions do not change the frozen positive-then-natural stop rule.
 
-**Hosted exit criterion:** either the account owner authorizes an exact
+**2026-10-26 hosted exit criterion (historical route):** either the account owner authorizes an exact
 non-Spot launch exception or supplies another non-Spot runner, then a
 self-terminating no-source smoke must show an allocated instance, uploaded
 output and termination. The deployed runner also needs the separate exact
@@ -134,7 +150,7 @@ two-object cross-account S3 read grant, with fresh full-object GET receipts.
 The attempted smoke's explicit deny is an access policy, not a solver or
 capacity observation; do not retry the same launch parameters unchanged.
 
-**Next action:** obtain a resource-qualified execution host, verify fresh
+**2026-10-26 next action (superseded for the local D18 probes):** obtain a resource-qualified execution host, verify fresh
 full-object S3 GETs and the exact frozen source/binary identities there, run
 one constructed positive at its 300-second internal cap, and launch at most
 one 2,400-second public natural query only after separate group and retained
@@ -143,4 +159,15 @@ When the hosted attempt ends or is cancelled, remove the temporary inline
 read policy and verify `NoSuchEntity`; then continue the remaining yield,
 rank/log, unseen-target, matched-rho and finite-grid gates before selection.
 
-**Next discriminating step:** run the committed native D18 positive and natural pair on a host with recorded memory limit, CPU isolation and fresh provider-checked GET of the exact object/wrapper. Require a clean source and binary identity, positive original-field and original-CNF/XOR independent replay, then preserve the natural terminal result or explicit censoring with charged resource use. If the positive reaches a verified model, launch the natural arm; if it caps before import, change host capacity before solver interpretation; if a natural model fails group replay, block or repair the encoding and rerun. A checked natural partial advances only the first gate: independent multi-equation yield, closure, rank/logs, unseen-target descent, matched rho and finite-grid coverage remain required for total-runtime selection.
+**Next discriminating step:** preserve the completed D18 runs as separate
+candidate cells and prepare one versioned, source-bound external XCNF export
+for the ordered-first-pair positive that native cadence-32 already solved.
+Freeze the exact formula, native witness, solver version and resource caps
+before a new external solver call. First independently replay the planted
+assignment against every original CNF and XOR row. Then test whether that
+ordered encoding lets the external solver pass the positive gate under its
+declared cap. Launch a public natural arm only after a complete positive
+model and group replay. Retain every censored or failed arm. Any checked
+natural relation advances only the first gate: independent multi-equation
+yield, closure, rank/logs, unseen-target descent, matched rho and finite-grid
+coverage remain required for total-runtime selection.
