@@ -34,7 +34,7 @@ def divexact(a, b):
         q[d] = v
         for i, x in enumerate(b):
             a[d + i] -= v * x
-        m.trim(a)
+        a = m.trim(a)
     ck(a == [0], "nonzero exact-division remainder")
     return m.trim(q)
 
