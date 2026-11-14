@@ -438,3 +438,176 @@ Sources consulted outside the repository: RunPod CPU flavor documentation ([cpu 
 [list CPU types](https://docs.runpod.io/api-reference-v2/catalog/list-cpu-types.md)); the RunPod OpenAPI spec the producer saved
 in the session scratchpad (`PodCreateInput`: `interruptible`, `cpuFlavorIds`, `vcpuCount`, `containerDiskInGb` "wiped when the
 Pod restarts").
+
+## Re-review of R4 revision 2
+
+Reviewer: Red Team, 2026-11-14. Reviewed: commit `46e371d09d6a1027b34d52dbf51b533609356032` on
+`aburan28/loving-heisenberg-rbzzbu` (working tree clean). `examples/pkm_tower_pilot.rs`, `examples/prime_fall_degree_tools.rs`
+and the preregistration are unchanged since `507593ee09`. Nothing was edited and no `P1` isogeny cell was run. Every study
+number is `[pcc:unverified]`; **derived** marks this review's arithmetic.
+
+### R2.1 Verdict: freeze with edits
+
+The instrument and the route plumbing are now in good shape: the argv, the wrapper, G3 through the wrapper, the certificate,
+the recount, the on-host G-AUX and a reproducible patch. What remains blocking is in two places:
+- `iso/score_iso.py`, which is part of what gets frozen, mis-reads five cases I constructed (R2.4 N1).
+- The cost and run plan, which leans on an R3 cost stop that does not exist (R2.4 N2).
+
+Both are fixed by the exact edits in R2.5. R4 also cannot run until R3 is frozen with the edits listed in R2.3b Q4.
+
+### R2.2 What this re-review ran (measured (review), `[pcc:unverified]`)
+
+- `python3 -I iso/score_iso.py --selftest`: "selftest: pass".
+- `python3 -I iso/certify_m2.py --selftest iso/selftest/planted-iso-p0.jsonl iso/selftest/planted-kummer-p1.jsonl
+  gaux/v3/A-m2-iso-p0-mestre.jsonl`: "40 rows, 0 mismatches". `iso/selftest/cert.jsonl` holds:
+  - 12 planted P0 isogeny rows, all decomposable;
+  - 12 planted P1 Kummer rows, all decomposable;
+  - 16 random-target P0 isogeny rows, all with 0 solutions (all 16 refuted in stage A, so this agrees).
+- `git apply gaux/aux_order_f13a690df0.patch` on the f13a690df0 version of the pilot applies cleanly and gives
+  `9c63c61a0db94842e8f3c9240b07c154b89e6ffbb403c8e3472fd220970e374d`.
+- **G3 through the wrapper, at P0** (no P1 row). In a scratch directory I ran the frozen `prime_fall_degree_tools gate3`
+  (`7e8a6703…`) with `PILOT = iso/pilot_mestre.sh` (which execs `/usr/local/bin/pkm_tower_pilot_r4`, `705b151b…`, left
+  installed by the integration test), `RAYON_NUM_THREADS=12`, `--max-n 20 --jobs 2 --budget 900`, over the 16
+  `gaux/v3/A-m2-iso-p0-mestre.jsonl` rows. Result: "G3: 32 capped runs, 0 disagreements"; 32/32 `agree`, 32/32 `seed_match`,
+  0 timeouts.
+- **Edge cases of `score_iso.py`** (synthetic rows, own scratch script that imports the committed module):
+
+  | case | input | `score_iso` output | correct reading |
+  |:--|:--|:--|:--|
+  | A | t = 10: closure reached cmax 7 without 1 (`d_F ≥ 8`); DA refuted at D = 6 | `≥8`, P-ISO-2 "grows", G2 0 violations | contradiction of the G2 theorem (`d_F ≤ D`): instrument failure, R4 stops |
+  | B | t = 13: both closures `≥6` (cmax 5, no 1), **no certificate row** | `≥6`, "grows" | R4 §5 requires "certified inconsistent": undecided |
+  | C | t = 12: draw 0 exact 5, draw 1 has **no row** | median 5, "flat at 5" | one-draw cell; R4 defines no reading, so it should be undecided |
+  | D | t = 12: closure exact 5 on both draws; `X-iso-m2-t12-k0-c5` completed and did **not** refute (`d_F ≥ 6`) | 5, "flat at 5"; conflict silent | closure/capped-F4 disagreement: G3-type failure, R4 stops |
+  | E | t = 12 draw 0: closure `≥6` (x_R 1120); an `X…-c6` row from a **different system** (x_R 999) refutes | exact 6, "grows" | rows of different systems must not combine (the frozen scorer keys by `x_r`) |
+
+### R2.3 Edit by edit
+
+| edit | status | evidence and what is left |
+|:--|:--|:--|
+| E4.1 argv, wrapper, pins | **mostly closed** | Every argv is in `iso/entry_iso.sh`; it matches `run.sh`/`entry_r2.sh` flags with `--kinds isogeny` and `BIN` = wrapper. Runner `iso` mode installs and hash-checks the three binaries (`iso/PINS.json`) and `repo.tar`; rayon is pinned at 12. Integration test (`g1 gaux`, local) passed and used the same `entry_iso.sh` and `server.py` bytes as `46e371d09d` (no change since `1e1e0f596b`). **Open:** the entry script, wrapper, certifier, scorer, `compare.py`, `pfdA_summary.json` and `verify.py` are not pinned. They arrive in `repo.tar` built from "the job's commit", any commit, and the runner checks `repo.tar` only against the hash the client computed. `entry_iso.sh` records some of those hashes in `binary.sha256` but compares them with nothing. R4 §7 says `runner_request.json` carries the commit; `start-iso` does not send it. |
+| E4.2 G2, G3 | **closed in mechanics; G2 incomplete** | G3 through the wrapper works (R2.2: 32/32 at P0). `score_iso` G2 is a faithful port of the frozen check (exact closure `d_F` against a refuting, completed D; slightly stricter, since it requires `inconsistent`). But the new interval logic turns a bound-form violation into a reading (case A), which the frozen scorer never did. |
+| E4.3 decomposability | **closed in the certifier; not enforced by the scorer** | `certify_m2.py` is exact. S3 is symmetric, so counting `U ∈ V` roots of `S3(x1, x_R, U)` per `x1` equals the `V × V` count, including the `x1 = x_R` linear case. It agrees with brute force on 40 rows. `score_iso` treats a draw with no certificate as inconsistent (case B), contrary to R4 §5. |
+| E4.4 readings | **text closed; implementation gaps** | P-ISO-1 and P-ISO-2 rules and their aggregation match the text in code, apart from cases B and C. |
+| E4.5 scorer, bracket | **partly closed** | Scorer named and self-tested; `c*_iso = 6`, cap 5 first. Open: the scorer's SHA-256 is not pinned; cases A, D, E; the per-draw source label that Amendment 7 D.2 requires ("closure", "=D (F4)", "bracket") is not produced. |
+| E4.6 reproducible binary | **closed, one precondition missing** | `git apply` patch and patched-source hash verified (R2.2); tests on frozen + patch recorded (`gaux/TESTS_FROZEN.md`). The artifact-store copy of `705b151b…` "waits on S3". R4 should say no job starts until it exists. |
+| E4.7 on-host control, recount, panic | **closed** | `gaux` stage in every job, compared by `compare.py`. `naive_count.c`/`recount.py` equal Mestre on the 8 P0 curves (`iso/selftest/recount-p0.json`). Exit 3 on "Mestre: #E ambiguous". Minor: `panicked()` scans `runs/*.log` and `gates/*.log` but not `gates/gaux/*.log`. A gaux panic still stops the job, through `compare.py` failing, but with exit 1 instead of 3. |
+| E4.8 resources, cost, disclosure | **disclosure closed; cost plan not** | §0 now lists the bracket results, the Kummer null, stage C and the rows made while preparing. §6 cost: see Q3 and N2. |
+
+### R2.3b The coordinator's four questions
+
+**Q1. Is the bound combination in `score_iso.py` faithful to Amendments 3, 5 and 7?**
+- **Each bound is registered.**
+  - "Refuting uncapped F4 at D ⇒ `d_F ≤ D`" is Amendment 3's own sentence ("which gives `D`, so `d_F ≤ D`") and the §4 G2 theorem.
+  - "Cap C refutes ⇒ `d_F ≤ C`" is §3's soundness argument and needs no gate.
+  - "Cap C completes without refuting ⇒ `d_F ≥ C + 1`" is the converse. It needs G3, and above `N = 20` it is the same extension
+    Kummer's Amendment 7 B makes.
+  - "Stopped by budget or `--max-dense` ⇒ no bound" (`f4_done`) is Amendment 7 B.
+- **Intersecting the intervals reproduces every value Amendment 7 D.2 names:** "=D (F4)", the bracket, and the closure one-sided
+  bound.
+- **It adds exact values only where two valid bounds meet**, for example closure `> 5` with a refuting D = 6 and no cap-5 row.
+  That is sound, but it is a generalisation the text should state, and D.2's per-row source label is missing.
+- **Not faithful in three respects:**
+  - it has no conflict detection (cases A and D);
+  - it does not key by `x_r` (case E; the frozen `Key` includes `x_r`);
+  - a missing draw yields a one-draw median (case C).
+
+  With interval logic, a conflict becomes a reading instead of a stop. That is the decisive difference from the frozen scorer.
+
+**Q2. Is the G3 directory layout within Amendment 11's scope?**
+
+Yes.
+- `gate3` reads `DIR/runs/*.jsonl` with prefixes `A-`/`B-`/`C-` and writes `DIR/gates/g3.jsonl`, so the copy into
+  `gates/g3dir/runs` is what it needs.
+- The copied rows are random-target, tower-control, `m = 2` closure rows. `--max-n 20` keeps exactly t = 1..10 and drops
+  `A-m2-iso-p1-big` (N ≥ 22). That is Amendment 11's scope (prefix `A-`, not naive, `N ≤ 20`, `m ≤ 6`), restricted to R4's new
+  cells.
+- Running `gate3` on the job's own `runs/` would select the same rows: `CAP-`, `CERT-`, `DA-` and `X-` do not match `C-`/`A-`.
+- The layout works mechanically (R2.2: 32/32 at P0).
+- The 900 s budget per capped run is wall-clock, and `gate3` counts a timeout as a disagreement (Amendment 11 stop rule), so host
+  speed matters (F4, E3.6). R4 does not say so.
+
+**Q3. Are the §6 projections and ceilings honest?**
+- **Expected figures:** plausible. US$2–7 for `iso-a` at 2–6 h. `pfd-a` ran the larger Kummer stage A in 3.5 h with the same
+  request: 12 vCPU, 56Gi, 172,800 s (`requests_r2c/pfd-a.json`).
+- **At-limit figures** (US$50 for `iso-a`, US$26 per `iso-x`) assume a 16-vCPU / 128 GB pod at US$1.04/h. The table asks for
+  "≥ 12 vCPU / 56Gi". A 12-vCPU memory-optimised pod (96 GB) at about US$0.78/h gives about US$37 at the 172,800 s limit
+  (**derived**). Pinning that pod would bring `iso-a` under US$40 before idle time, and removes the need for any cost stop.
+- **Not honest in full:**
+  - Idle billing after the job is not priced.
+  - R4's own worst case is not totalled against the US$400 study ceiling. The bracket can take up to four cap steps (4..7) × 2
+    draws × t = 11..13, each about US$26 at the limit (**derived**), so the worst case far exceeds US$400 even though the
+    expected cost is small.
+  - "Until then `iso-a` runs under the US$40 stop of R3's cost guard (E3.2)" relies on a stop that no code implements. The runner
+    has no deadline, so the 172,800 s and 90,000 s time limits are not enforced either. The sentence also contradicts E3.2 as
+    written: do not start a job whose projection exceeds US$40; ask the owner.
+  - "Censored-by-cost … rows up to the stop are kept" is a new censoring class with no reading. Combined with case C it can turn
+    a stopped job into a one-draw "flat at 5".
+
+**Q4. Which of R3's edits does R4 still need before it can run?**
+- **E3.1:** the owner's decision on reserved-pod ceilings. R4 asks for it separately. R4 needs no retry authority, since its cells
+  are new.
+- **E3.2:** a runner deadline enforcing 172,800 s and 90,000 s, plus the pre-launch cost projection with refusal, the US$400
+  running total and the balance check.
+- **E3.3:** memory floor and OOM classification. The X runs inherit Amendment 14's `-m112` rule, which needs `OOMKilled`.
+  `entry_iso.sh` records `memory.max`, but nothing refuses an undersized pod, and `rp.sh create` still allows `g` flavors.
+- **E3.4:** done for rayon in `iso` mode. vCPU ≥ 12 is still unchecked.
+- **E3.5:** durability. Results are still on the container disk, and S3 is blocked; R4 §7 says so.
+- **E3.6:** the host-dependence sentence. It applies to R4's 1,800 s closure, 900 s G3 and 86,400 s X budgets.
+- **E3.7:** satisfied for R4 by its own `gaux` stage. No speed calibration.
+- **E3.8:** runner and image identity. `server.py` and the base image are still unpinned and unrecorded.
+- **E3.9:** a loss rule. R4 says nothing about a lost pod (relaunch or not, attempt count).
+
+### R2.4 New findings introduced by revision 2
+
+- **N1 (high, wrong): `score_iso.py` reads conflicts and gaps as results.** Cases A to E in R2.2. Cases A and D hide what §3
+  calls gate failures. Case E combines different systems. Case B contradicts R4 §5. Case C reads a one-draw cell.
+- **N2 (high, unpriced): the cost plan depends on an unimplemented stop and adds an undefined censoring class.** See Q3.
+- **N3 (medium, unsupported): the bundle is not pinned.** Any commit's `repo.tar` passes. R4 §7 says the commit is in
+  `runner_request.json`, but `rp.sh start-iso` keeps it only in the client's `$TOKDIR`.
+- **N4 (low): untested stages.** The integration test exercised `g1 gaux` only. `cap-A` and `x:` were not run end to end. Their
+  argv mirror the frozen `run.sh`/`entry_r2.sh`, and their output names match the scorer's regex, so the risk is low. `g3` is now
+  covered by R2.2 at P0. `cap-A` takes D from any DA row, including a timed-out one, as the frozen `run.sh` does. That is harmless
+  to scoring, because the scorer reads the cap from the file name and ignores stopped runs.
+- **N5 (low):** `panicked()` misses `gates/gaux/*.log` (E4.7 row above). `naive_count` has no pinned build or hash, and the
+  recount host and order are unstated: readings should not be reported before the recount passes.
+
+### R2.5 Exact edits for freezing R4 (blocking: R2-E1 to R2-E7)
+
+- **R2-E1 (scorer: conflicts).** In `score_iso.score()`, after combining:
+  - flag a draw as `conflict` when `L > U`, or when a closure-exact value lies outside `[L, U]`;
+  - extend G2 to "closure lower bound `L` > refuting D at t ≤ 10";
+  - make `readings()` return `"instrument conflict"` and a non-zero exit when any conflict or G2 violation exists. R4 §3 then
+    treats it as a gate failure (R4 stops).
+  - Add cases A and D to `--selftest`.
+- **R2-E2 (scorer: certification).** A draw with no refutation (no exact value and no `U`) enters a median only if a certificate
+  record with `solutions == 0` exists for its `(t, k, x_r)`. Otherwise it is `uncertified` and its `t` reads "undecided". Add
+  case B.
+- **R2-E3 (scorer: missing draws).** For every `t` in 1..13, expect `k ∈ {0, 1}`. Only a certificate-excluded (decomposable) draw
+  may be absent, as Amendment 7 C. A draw missing for any other reason (lost or stopped job, ladder stop) makes its `t` read
+  "undecided". Add case C.
+- **R2-E4 (scorer: identity).** Key draws by `(t, k)` and require every source (A, DA, CAP, X, CERT) to carry the same `x_r`, and
+  the same `aux_a`/`aux_b`/`aux_order` where present, with `p = 2013265921` and `aux_order_method = "mestre"`. A mismatch is an
+  instrument failure. Add case E. Print the source of `L` and `U` per draw ("closure", "=D (F4)", "bracket"), as Amendment 7 D.2
+  requires.
+- **R2-E5 (pins).**
+  - Add SHA-256 entries to `iso/PINS.json` for `iso/entry_iso.sh`, `iso/pilot_mestre.sh`, `iso/certify_m2.py`,
+    `iso/score_iso.py` (after R2-E1 to E4), `gaux/compare.py`, `results/R9/analysis/pfdA_summary.json` and
+    `research/pkm_tower_pilot_20260924/verify.py`.
+  - Have the runner (or `entry_iso.sh`, before any stage) verify the unpacked files against them.
+  - Send the commit in the `start-iso` body so `runner_request.json` records it.
+  - Name the freeze commit in the amendment.
+- **R2-E6 (cost and run plan).**
+  - Set the `iso-a` and `iso-x` pod to 12 vCPU on `cpu5m`/`cpu3m` only. State the projection at the limit with an idle
+    allowance, and R4's worst-case total against US$400.
+  - Replace "Until then `iso-a` runs under the US$40 stop … censored-by-cost, and its rows up to the stop are kept" with: "No R4
+    job starts while its projection, idle allowance included, exceeds US$40, or while the owner has not decided the reserved-pod
+    ceilings. R4 defines no censored-by-cost reading. A job stopped for any reason leaves its unfinished draws missing, and R2-E3
+    applies."
+- **R2-E7 (preconditions).** Add to R4 §6: "No R4 job starts until (i) R3 is frozen with E3.2, E3.3, E3.5, E3.8 and E3.9 in its
+  runner, (ii) `705b151b…` is in the artifact store and S3 upload works, and (iii) the owner has decided the reserved-pod
+  ceilings." Add a loss rule for R4 pods: one relaunch under a new name, both attempts kept, and further attempts go to the owner.
+- **R2-E8 (low, optional).**
+  - Add the E3.6 sentence: wall budgets and G3 timeouts depend on the host; record the CPU model.
+  - Scan `gates/gaux/*.log` in `panicked()`.
+  - Pin `naive_count`'s build command and hash.
+  - State that no reading is reported before the recount passes.
