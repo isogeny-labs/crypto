@@ -464,8 +464,8 @@ fn full_d18_load(root: &Path) -> Result<(PrimaryBase, Value)> {
 }
 
 /// Export the retained K2048 five-summand orbit circuit for an external XOR
-/// solver. The constructed control pins x coordinates but leaves every
-/// representative and Frobenius-phase selector free.
+/// solver. The constructed control can pin witness x coordinates or leave
+/// them free while retaining the same public target and validation witness.
 pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result<Value> {
     k2048_m5_xcnf_export(mode, root, output, 0)
 }
@@ -488,7 +488,7 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
     const REPLAY_SHA256: &str = "5ad374ef0042b2ebd6562746b7ca67e46c6b0f4d46c4ba25abae83fd2dd411e2";
     const STORAGE_SHA256: &str = "f1139c1dd61beac0e1d9e80a1d02e983f98c7b1abc6887f1816f013d4693bf4c";
     const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
-    if !["positive", "natural"].contains(&mode)
+    if !["positive", "positive-unpinned", "natural"].contains(&mode)
         || output.exists()
         || output.with_extension("xcnf").exists()
     {
@@ -529,7 +529,7 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         return Err("K2048 m5 public target differs from frozen fixture".into());
     }
     let mut positive = None;
-    let target = if mode == "positive" {
+    let target = if mode == "positive" || mode == "positive-unpinned" {
         let indices: [usize; 5] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
         let mut partial = Vec::with_capacity(5);
         let mut sum = BinaryPoint::Infinity;
@@ -569,7 +569,8 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         3_000_000,
     )
     .map_err(|_| "K2048 m5 shared-root orbit domain failed")?;
-    if let Some((indices, partial, _)) = &positive {
+    if mode == "positive" {
+        let (indices, partial, _) = positive.as_ref().ok_or("K2048 positive witness missing")?;
         let points: Vec<&BinaryPoint> = indices
             .iter()
             .map(|&index| &fb.points[index])
@@ -601,7 +602,7 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "summands":5,"identity_mask":0,"root_encoding":"shared_root_bits",
         "domain_representatives":representatives.len(),
-        "positive_x_pins":if positive.is_some() { 9*83 } else { 0 },
+        "positive_x_pins":if mode == "positive" { 9*83 } else { 0 },
     });
     let export_started = Instant::now();
     let xcnf = to_dimacs_xor(&enc.solver);
