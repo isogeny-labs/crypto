@@ -1,3 +1,15 @@
+# Complete replay and blocking whole-log publication — 2026-11-14T10:58:24.849069+00:00
+
+Complete b691 physical replay666cb7 passes20expectedphases/threeactual101controls/882unchangedguards/whole3nativeJSONNOmasks/bothoriginal44+1proofgates/sevenbindings. Automatic b691CI has19success+onePCCmissingPNGfailure423f66; newcomplete43585724236 succeeded. No all20greenclaim. Data routing8397ab preserves allreport subjects/workflows/881scienceinputs using canonicaldocsPNG+seventhrelativeGitlink. Originalartifactgate1 nowrequires genuinepublication ofwhole68044Bfailurelog (7b651f); no policy exception. All unsigned. [pcc:unverified]
+
+NEWguard13 publication covers unchangedwholePCCfailurelog, completependingconsumer/baseb691/patch/ledger/resume plusWHOLE freshCfull/driver/own20CIcaptures(all20logs/fourwholeZIPs/everymember) checkpoint, andwholecurrentinputmap. HOLD allcurrent scientificpaths/actualproofsources andbothrepoownedbytes until original remote-byte replays/exactpublisherFF/terminalguards. ALL6210guard12 paths remainpresent andbyte-identical; report manifest/ignore were never inthatmap, andtheir priorbytes arealso retained in the failure capture. Existingsevenlinktypes pinned. No scienceedit duringhold. [pcc:unverified]
+
+Afterrelease projectlogentryinto canonicaldocs plusrelative evidence link, preserve alloldclaims, completeconsumer datafixcommit andownautomatic20CI/audit419native/73canonical75actualverdicts/whole7113census/allphaseguards. Freshb691full remainsvalid forbyte-identical881inputs. Remainingwholeca9/398/A-B/C77largecaptures (includingsealedBfullcache) move toNEWguard14; do notdrop them. Then prospectiveprimary/KB-reviewed directNormhalving vsstrongnorm-assistedbaseline, no newcodeorperformanceclaimyet. Rootclock124/101/mainledger/reviews/signing/conflict/fullformalgeometry/globalclosedcoords/calibratedcost/livebudgetcapacity/vaultKB remainopen. Continueunblockedwork/no paidlaunch/nowaiver. [pcc:unverified]
+
+Handoff pcc/claims/PCC-20261114-3a8e88.json; actualpublisherpending/guard13HOLD. [pcc:unverified]
+
+---
+
 # Whole report PNG and source checkpoint publication active — 2026-11-14T10:09:46.899356+00:00
 
 Native3f1ade/threeunfilteredpasses/all845guards0/all448exceptionals; conditionalgroup1e2420/original44declgates andIntd0400f/original1declgates/sevenbindings73partialunique; correctedreal-sitecounts[16,16]Phi/[1,1]origins/[8,8]isogenies withlegacy32actual101/fullthree-accounting-pathaudit/noothermathchanges. Reportf4a048 finalTWO48469BpagesALLviewed/frozen. [pcc:unverified]
