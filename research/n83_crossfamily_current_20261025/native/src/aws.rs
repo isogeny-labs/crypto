@@ -12,9 +12,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub const ACCOUNT: &str = "590183823895";
 pub const REGION: &str = "us-east-1";
-pub const ZONE: &str = "us-east-1a";
+pub const ZONE: &str = "us-east-1d";
 pub const VPC: &str = "vpc-0da45a1bf46c94fa9";
-pub const SUBNET: &str = "subnet-04e6765fae0326ef3";
+pub const SUBNET: &str = "subnet-0561480728d2b1ffd";
 pub const INSTANCE: &str = "g5g.4xlarge";
 pub const SECURITY_GROUP: &str = "sg-030ffadf6a62d2ce2";
 pub const PROFILE: &str = "n83-online-screen-ssm-20261019";
