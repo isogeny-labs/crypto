@@ -97,6 +97,21 @@ int rf256_decompose(const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
                     rf_relation *out, uint32_t cap,
                     const rf_options *opt, rf_result *res);
 
+/* Persistent 64-bit session (the rootfind_serve worker): the factor base
+ * and its lookup table are set up once and kept (on the device for the
+ * CUDA backend); each rf64_session_decompose call then takes one batch of
+ * at most `max_targets` targets.  Results and their meaning are those of
+ * rf64_decompose on the same factor base and targets; `cap` bounds the
+ * relations one batch may report (overflow returns RF_ERR_OVERFLOW with
+ * res->n_found set, and the caller may retry with a smaller batch). */
+typedef struct rf64_session rf64_session;
+int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
+                        uint32_t max_targets, uint32_t cap, const rf_options *opt,
+                        rf64_session **out, rf_result *info);
+int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const uint64_t *ty,
+                           uint32_t n_targets, rf_relation *out, uint32_t cap, rf_result *res);
+void rf64_session_destroy(rf64_session *s);
+
 /* 1 if the CUDA backend is compiled in and at least one device answers. */
 int rf_cuda_available(void);
 
