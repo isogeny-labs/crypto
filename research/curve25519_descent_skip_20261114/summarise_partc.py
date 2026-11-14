@@ -2,7 +2,7 @@
 """Part C table (PROTOCOL.md A2). Run: python3 -I summarise_partc.py > runs_c_summary.txt"""
 import json, math, os
 here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs_c")
-def pois_cdf(k, mu): return sum(math.exp(-mu) * mu ** i / math.factorial(i) for i in range(k + 1))
+def pois_cdf(k, mu): return sum(math.exp(-mu + i * math.log(mu) - math.lgamma(i + 1)) for i in range(k + 1)) if mu > 0 else 1.0
 def garwood(k, a=0.05):
     lo = 0.0
     if k > 0:
