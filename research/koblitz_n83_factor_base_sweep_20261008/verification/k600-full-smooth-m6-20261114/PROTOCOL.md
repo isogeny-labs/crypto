@@ -73,13 +73,17 @@ fails or the remaining allowance cannot cover the next stage.
    350,000 maximum domain clauses, one model, and a 10,000-conflict ceiling.
    Record actual CNF/XOR shape, cgroup peak, source, archive and terminal
    status. A static threshold pass alone does not admit search.
-3. Implement and test a K600 m6 constructed-target positive control on
-   this *same* retained base and circuit. Preserve its actual six points,
+3. Use the new `primary-k600-m6-xcnf positive-pinned` and
+   `positive-unpinned` exports on this *same* retained base and circuit.
+   The release example suite passes 22 tests [pcc:unverified];
+   [the raw test log](cargo-test.txt) is retained, but the new exporter
+   has not yet been run on the full archive. Preserve its actual six points,
    proper partial sums and public target. Require a checked model against
    the original CNF/XOR rows, complete point sum, subgroup, and
    signed-Frobenius relation row. Freeze any source addition before running
    it. A capped or invalid control stops the ordinary arm.
-4. Run at most one ordinary fixture-1 query with the same source, base,
+4. Export `primary-k600-m6-xcnf natural` and run at most one ordinary
+   fixture-1 query with the same source, base,
    circuit and resource caps. Independently replay any solver model against
    the original formula, all point lifts and group equation, and the
    relation row. Record rank contribution. Retain timeout, OOM,
