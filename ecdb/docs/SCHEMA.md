@@ -180,7 +180,7 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | `isogeny_route`, `isogeny_route_step` | ordered chains (IW1 routes) with total degree |
 | `isogeny_volcano`, `volcano_vertex` | components of the l-isogeny graph: depth, crater size and shape, completeness, vertex levels |
 | `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism |
-| `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing, Frey–Kani, Satoh, quotient. Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
+| `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing (rows from `import gluings`, below), Frey–Kani, Satoh, quotient. Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
 | `dlp_transfer` | routes that move a DLP to another group: Jacobian, Weil restriction, F_{q^k}^* (MOV / Frey–Rück), additive group (anomalous), isogenous curve, extension-field curve, Pohlig–Hellman factor. Each carries invariants, the full cost record, log2 transfer / target / total / matched-reference costs, the ratio, the verdict and notes; the cost model is stored once in the provenance |
 | `certificate` | volcano-level, order, kernel, Jacobian-gluing, cover, primality and irreducibility certificates with their hypotheses |
 
@@ -247,6 +247,67 @@ F_{2^{2m}} need 2^24 elements or fewer). They need SEA or a Kloosterman-sum
 algorithm; no value is guessed. In the pinned `covers.json` the skipped sources
 are 301 genus-2 sources over F_p (63 to 638 bits), 959 over GF(p^k) (49 to 253
 bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
+
+### Genus-2 gluings of census-fp pairs (`ecdb import gluings`)
+
+`src/import/gluing.rs` (also part of `ecdb import all`, after `end-rings`)
+glues pairs of census-fp curves along their 2-torsion. For every pair
+{E1, E2} (E1 = E2 included) of short-Weierstrass census-fp curves over F_p,
+5 <= p < 50, whose cubics split into three distinct linear factors over F_p,
+and for each of the six bijections psi: (a_i, 0) -> (b_i, 0) of the sorted
+2-torsion abscissae, it builds the genus-2 curve C whose Jacobian is
+(2,2)-isogenous to E1 x E2 with kernel the graph of psi. No migration: the
+rows go into existing tables, and `curve_morphism` kind `gluing_2_2` already
+existed.
+
+- **Formula.** Howe, Leprévost and Poonen, "Large torsion subgroups of split
+  Jacobians of curves of genus two or three", Forum Math. 12 (2000),
+  Proposition 4 (the n = 2 case of Frey–Kani 1991):
+  C: y^2 = -prod_i (A (a_j - a_i)(a_i - a_k) x^2 + B (b_j - b_i)(b_i - b_k)), with
+  A = Δ2 A1 / A2 and B = Δ1 B1 / B2 as in the module documentation. A psi
+  for which A1, B1, A2 or B2 vanishes (among them the restriction of an
+  isomorphism E1 -> E2) is counted `gluing_degenerate` and skipped.
+- **Maps.** The sextic is even, h(u) = G(u^2), so C has the quotients
+  Q_X: Y^2 = G(X) (X = u^2, Y = v) and Q_Z: W^2 = Z^3 G(1/Z) (Z = 1/u^2,
+  W = v/u^3). The importer finds an F_p-isomorphism X = lambda x + mu,
+  Y = w y of one quotient onto E1 and of the other onto E2 (a quadratic twist
+  is refused), and stores each composite C -> E as
+  `map` = {"x": {"num", "den"}, "y": {"v_num", "den"}}: x = num(u)/den(u),
+  y = v v_num(u)/den(u), ascending residues mod p, with `quotient`, `convention`
+  and `gluing` (E1, E2, their 2-torsion abscissae, psi, the formula). Degree 2
+  (x o phi has degree 4 on C).
+- **Checks, before any write.** Each census trace is recounted and must equal
+  the trace in ecdb (otherwise `gluing_census_refused` and a problem). C is
+  smooth of genus 2: deg h = 6 and gcd(h, h') = 1 over F_p. Each map is
+  re-proved as the polynomial identity h yn^2 xd^3 = yd^2 (xn^3 + a xn xd^2 +
+  b xd^3) over F_p. L(Jac C) from exhaustive counts of #C(F_p) and #C(F_p^2)
+  must equal L(E1) L(E2) with the traces ecdb holds. A failure is
+  `gluing_crosscheck_failures` with a problem line, and nothing of that gluing
+  is stored. ecdb verifies the isogeny class (equal L-polynomials, Tate) and
+  the maps, not the kernel of the isogeny, which is the theorem's.
+- **Writes (insert only).** `curve` (family `gluing`, model `hyperelliptic`,
+  `smoothness_status` `proved`); `hyperelliptic_model` (deg f = 6, `split` with
+  2 points at infinity when the leading coefficient is a square, else `inert`);
+  two `curve_morphism` rows of kind `gluing_2_2`, construction
+  `hlp_2_2_gluing_v1_qx` or `hlp_2_2_gluing_v1_qz` by the quotient the map
+  factors through (so a self-gluing keeps both maps), degree 2,
+  `minimal_degree` 2, `subgroup_transfer` `not_tested`, status `proved`; an
+  `isogeny_class_fq` row (status `proved`) and `abelian_variety.isogeny_class_id`
+  where it is NULL; a `curve_zeta` row with [#C(F_p), #C(F_p^2)]. When several
+  (pair, psi) give the same C, the first names it. A Jacobian already linked to
+  another class is reported (`gluing_link_conflicts`) and never overwritten.
+- **Verified so far (no deployed run yet).** Without a database, the ignored
+  test `census_range_sweep` covers the whole range (one curve per
+  F_p-isomorphism class): 3,877 gluings and 227 degenerate psi, every gluing
+  passing. On a throwaway database seeded with every F_p-isomorphism class of
+  curves over 5 <= p < 50 (682 curves, 113 with full 2-torsion, 684 pairs):
+  3,877 gluings computed, 3,841 distinct curves, 7,682 morphisms, 199 genus-2
+  classes, 3,841 Jacobians linked and 3,841 zeta rows, 0 problems; a second run
+  inserted 0. A corrupted stored census trace was refused with its curve, and
+  a glued Jacobian relinked to a wrong class was reported and left unchanged.
+- **Not computed.** n = 3 ((3,3) Frey–Kani gluings along anti-isometries of
+  E1[3] and E2[3]), and pairs without full rational 2-torsion (the general
+  2-torsion gluing over the splitting field).
 
 ### Global curves, security, evidence (`0007`)
 

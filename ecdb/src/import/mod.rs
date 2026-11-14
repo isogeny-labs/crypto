@@ -18,6 +18,7 @@ pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;
 pub mod generated;
+pub mod gluing;
 pub mod lmfdb;
 pub mod pack;
 pub mod registry;
@@ -212,6 +213,8 @@ pub enum Selection {
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10, by Kohel's l^k-torsion criterion.
     EndRings,
+    /// Genus-2 (2,2)-gluings of census-fp pairs with full rational 2-torsion (src/import/gluing.rs).
+    Gluings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
 }
@@ -263,6 +266,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After volcanoes: it cross-checks their levels and End(E) rows.
     if all || what == Selection::EndRings {
         reports.push(end_ring::import(ctx).await?);
+    }
+    // After the census: it reads the census-fp curves and their traces.
+    if all || what == Selection::Gluings {
+        reports.push(gluing::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {
