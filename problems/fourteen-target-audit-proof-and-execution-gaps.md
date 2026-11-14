@@ -332,8 +332,8 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50); originalnine-pointprime3formwithoutaddedcoprime/generalchar3actualcard1or3/rank0or1 (22); directoriginalr2/r3finite-fieldcountformswithonlyAlgebraFK/cardq^k/noauxiliaryclosure-tower/noaddedcoprime (7) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
-| 3 Supersingular | Partial: actual r2 exact-degree-two counterexamples; complete F2/F3/F4/F9/p<500 checks; generic char2/3 geometric j/torsion/module criteria(30); all-model F2/F3 source/geometry/Hasse/order4/6(44); all-model F5/F7 actual Hasse/source-trace0/count6/8/compositeorder2/namedcyclic6/8controls(29). **Unbounded every finite char2 field source-trace iff j0 iff odd point count iff rational/geometric2tor1, actual rank0/1, scalar invariance, imperfect/wrong-characteristic direct universal negations(26).** | General char3/other-prime trace-geometric and Endrank identifications; Hasse beyond checked cohorts; embedding/full-torsion-field bridges |
-| 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
+| 3 Supersingular | Partial: actual r2 exact-degree-two counterexamples; complete F2/F3/F4/F9/p<500 checks; generic char2/3 geometric j/torsion/module criteria(30); all-model F2/F3 source/geometry/Hasse/order4/6(44); all-model F5/F7 actual Hasse/source-trace0/count6/8/compositeorder2/namedcyclic6/8controls(29). **Unbounded every finite char2 field source-trace iff j0 iff odd point count iff rational/geometric2tor1, actual rank0/1, scalar invariance, imperfect/wrong-characteristic direct universal negations(26).**; genericodd-fieldactualtwistcount/tracenegation/sourceinvariance/literalF7special-jcoordinateandactualAddEquivcounter/hypothesiscontrols(42) | General char3/other-prime trace-geometric and Endrank identifications; Hasse beyond checked cohorts; embedding/full-torsion-field bridges |
+| 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49); genericodd-fieldactualtwistcount/tracenegation/sourceinvariance/literalF7special-jcoordinateandactualAddEquivcounter/hypothesiscontrols(42) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
@@ -1227,3 +1227,33 @@ priorPDF104/80inspectioncredited; no fullread/corpuspromotion/novelty.
 General characteristic-three/other-prime trace-geometric and Endrank
 identifications, Hasse/embedding bounds and remaining original14 gaps
 stay open. No nativeexperiment/paidcompute/agentupload. [pcc:unverified]
+
+### Actual odd-field quadratic twists: counts and literal special-j counterexample
+
+The [actual quadratic-twist packet](../research/quadratic_twist_count_audit_20261114/README.md)
+proves every finite odd field/nonsingular cubic y²=x³+a*x²+b*x+c/nonsquare
+d scaled to(d*a,d²*b,d³*c) has actual point-count sum2(q+1), opposite
+actual traces and equal source gcd(trace,q) predicates. Actual equation/
+sigma-root fiber equivalences, complementary square-root count2, x-reindexing
+and Delta scalingd6 supply the proof without nonisomorphism/Frobenius-trace/
+point-count premise. Galbraith short-count Exercise9.5.4 and the explicit
+cubic-with-x² extension are proved. Literal authorversion2Exercise9.5.3
+nonisomorphism-if-nonsquare fails: F7y²=x³+x/j1728/nonsquare3 gives
+y²=x³+2x with actual admissible C(u4), coordinate(4x,y)/inverse(2x,y),
+actual AddEquiv/bothcounts8, and universal homogeneous/inverse identities
+over every commutative ring of characteristic7. Lean directly negates the
+universal no-admissible-change assertion. This special-j counterexample
+retains separately qualified Lemma9.5.7's exceptions; no novelty or
+previously-unreported-error claim. F3actual#5/d1 count10not8 directly
+refutes deleting nonsquare; F5singularcusp#5/nonsquared2 count10not12
+directly refutes deleting Delta. Prior actual models/counts credited.
+Wholegate42/0failures/0trusted, exactlocal PCC-20261114-501186 replayPASS at2026-11-14T07:21:51Z,
+full1423character binding,97formal/config+11artifactpinsmatch; all64build/
+primary-processing/provenancefiles/25objects/36300Barchive/fivegatefiles,
+inspectedone-pagePDF47600B. Signedstandingunverified. Authorchapter9
+387389B/36pages/SHAf9a3272a… selectedTheorem9.3.4/Definition9.5.1/
+Example9.5.2/Exercises9.5.3–9.5.4read, PDF7/printed171fullyinspected;
+authorlanding/erratareadincludingadjacent9.5.8correction, no fullbookread/
+corpuspromotion. MilneIV7char≠2,3restrictionretained. Generalchar3trace-
+geometricbridge/Hasse/Endrank/embedding/fulltorsionfield/other14gapsopen.
+No nativeexperiment/paidcompute/agentupload. [pcc:unverified]
