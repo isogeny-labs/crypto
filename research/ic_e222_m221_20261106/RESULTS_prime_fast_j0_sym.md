@@ -157,3 +157,17 @@ planted targets as the symmetric multi-target IC (`prime_fast_j0_multi`: B=100, 
 Reading: at these toy sizes the symmetric multi-target IC is faster than an unbatched matched multi-target folded rho, with the advantage growing with T (rho steps grow about T^0.9, the IC total about T^0.4).
 **Not a claim:** the rho is unbatched (about 310 ns per step at T=1000); a lock-step batched rho would be several times faster, which would shrink the ratio and could reverse it at small T. A batched
 folded multi-target rho and the §5a pricing band are needed before ranking; the earlier tuned-BSGS comparison (a=-3 curves) is also not repeated on j=0. This is the first regime in the campaign where an IC arm is ahead of a rho-type arm on a measured total, and it is unverified and not yet fairly matched.
+
+## Correction: batched multi-target folded rho (2026-11-14) — `[pcc:unverified]`
+The previous section compared the symmetric multi-target IC with an **unbatched** folded rho and was flagged as not fairly matched. `examples/prime_fast_j0_rho_multi.rs` now runs the walks in lock-step (128 lanes, one batch inversion per round; the rare cycle-escape and
+degenerate steps fall back to unbatched adds). Same curves and planted targets, 26 bits, medians, every target of every row verified (18/18 rho rows, 18/18 IC rows):
+
+| T | sym multi IC ms | folded multi rho, batched ms (steps) | rho / IC | (unbatched rho, previous section) |
+|---|---|---|---|---|
+| 20 | 8.7 | 4.1 (35k) | 0.47 | 1.06 |
+| 200 | 20.2 | 14.1 (160k) | 0.70 | 2.3 |
+| 1000 | 70.4 | 80.0 (1.22M) | 1.14 | 5.5 |
+
+Reading: the earlier "IC ahead of rho" was an artifact of the unbatched rho. Against a batched, folded multi-target rho the symmetric multi-target IC is **behind** at T=20 and T=200 (2.1x and 1.4x) and about tied at T=1000
+(rho/IC 1.14, inside the host-noise scale seen in these runs). The trend is the one the exponent argument predicts (rho/IC grows with T: 0.47, 0.70, 1.14), which puts a crossover near T of a few hundred to a thousand at 26 bits;
+at larger sizes it moves with the setup cost p^(2/3) against the rho's sqrt(nT). Not a claim: one host, toy size, no §5a band, no tuned BSGS on j=0, one lane count (128), and the IC arm is not tuned per T.
