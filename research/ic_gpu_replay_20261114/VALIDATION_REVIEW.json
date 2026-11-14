@@ -1,0 +1,771 @@
+{
+ "schema": "validator-review/v1 (not a validation-gate/v1 validator report; admits no row)",
+ "validator": "validator agent (claude-opus-5-5)",
+ "date": "2026-11-14",
+ "frozen_commit": "95dce785b3859d93cc9ca39052ec3cb908bef7d8",
+ "head_during_review": [
+  "95dce785b3",
+  "f83254d5f6",
+  "8bc8377356"
+ ],
+ "artifacts_read_from": "git objects of the frozen commit; tarballs extracted to fresh directories",
+ "artifacts": {
+  "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz": "9d1fbae0d91b2b1a48586a2e1e9639437b29a37f777d4f9cad9016c0f29830ae",
+  "research/ic_gpu_e2e_20261113/raw/run1-unordered-koblitz-n23.json": "33387faefde7da548dcbe4755e60e1df2d4745d8671cc0254dad0d9356efcf5f",
+  "out_ab.tgz (artifact store, local copy)": "dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62",
+  "out_ab2.tgz (artifact store, local copy)": "8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3",
+  "research/ic_gpu_replay_20261114/raw/out_rp.tgz": "76fa075a5f7fde542205f575814b0d73b03b29f62aea6a9b96045dca1b7ad633"
+ },
+ "hashes_match_records": true,
+ "certificates": {
+  "rows": 76,
+  "files": 30,
+  "planted_log_recomputed_and_equal": 76,
+  "prefix_run_rows": 8,
+  "prefix_run_equal": 8,
+  "method": "planted = 1 + spec.seed mod (r-1) (src/bin/ic/bench.rs:504); recovered == planted mod r; r prime; r | order; Hasse; Koblitz n=23 order by trace recurrence"
+ },
+ "dispositions": {
+  "research/ic_gpu_e2e_20261113/REPORT.md": "validated (counted claims and table); refuted rounding 9x -> 9.96x; wall times single-observation, not reproduced by the replay (different code and host)",
+  "research/ic_gpu_overhead_20261114/REPORT.md": "validated (both A/B tables, spreads, counted identity); refuted: char-2 S spread 'about +-0.5%'",
+  "research/ic_gpu_replay_20261114/raw/out_rp.tgz": "validated as a reproduction of all counted fields of report 1; not an independent replay (launched by the producer)"
+ },
+ "uncheckable": [
+  "binaries built from the stated commits (software.git_commit/git_dirty null; no rebuild)",
+  "unit tests and the local from_poly probe (no raw output; cargo not run)",
+  "pod/host identifiers and dollar costs",
+  "report 1 kernel times 0.1/0.2/1.3 ms (not in its raw; consistent with replay 0.069/0.141/1.273 ms)"
+ ],
+ "claims": [
+  {
+   "name": "koblitz-n23 inherited-f4 table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6238,
+    "calls": 2487,
+    "s_over_rho": 2014.13,
+    "solver_wall_s": 38.46,
+    "whole_solve_s": 38.68
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/koblitz-n23.json"
+  },
+  {
+   "name": "koblitz-n23 fes-f2 table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6225,
+    "calls": 1878,
+    "s_over_rho": 20053.83,
+    "solver_wall_s": 26.6,
+    "whole_solve_s": 26.78
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/koblitz-n23.json"
+  },
+  {
+   "name": "koblitz-n23 fes-f2-gpu table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6225,
+    "calls": 1878,
+    "s_over_rho": 20053.83,
+    "solver_wall_s": 1.88,
+    "whole_solve_s": 2.18
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/koblitz-n23.json"
+  },
+  {
+   "name": "char2-n25 inherited-f4 table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6396,
+    "calls": 1193,
+    "s_over_rho": 4362.09,
+    "solver_wall_s": 33.51,
+    "whole_solve_s": 33.64
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/char2-n25.json"
+  },
+  {
+   "name": "char2-n25 fes-f2 table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6369,
+    "calls": 2338,
+    "s_over_rho": 231367.03,
+    "solver_wall_s": 141.5,
+    "whole_solve_s": 141.94
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/char2-n25.json"
+  },
+  {
+   "name": "char2-n25 fes-f2-gpu table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6369,
+    "calls": 2338,
+    "s_over_rho": 231367.03,
+    "solver_wall_s": 2.77,
+    "whole_solve_s": 3.22
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/char2-n25.json"
+  },
+  {
+   "name": "char2-n29 inherited-f4 table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6305,
+    "calls": 8977,
+    "s_over_rho": 30856.36,
+    "solver_wall_s": 893.02,
+    "whole_solve_s": 895.51
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/char2-n29.json"
+  },
+  {
+   "name": "char2-n29 fes-f2-gpu table row",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": null,
+   "recomputed": {
+    "verified": true,
+    "cert": true,
+    "hit_rate": 0.6305,
+    "calls": 8977,
+    "s_over_rho": 3270693.03,
+    "solver_wall_s": 32.5,
+    "whole_solve_s": 38.7
+   },
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz:out_e2e/char2-n29.json"
+  },
+  {
+   "name": "fes-f2 -> fes-f2-gpu whole solve n=23",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 12.3,
+   "recomputed": 12.273,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "fes-f2 -> fes-f2-gpu whole solve n=25",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 44.1,
+   "recomputed": 44.053,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "inherited-f4 -> fes-f2-gpu whole solve koblitz-n23",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 17.7,
+   "recomputed": 17.727,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "counted S gap fes-f2-gpu / inherited-f4 koblitz-n23",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 9,
+   "recomputed": 9.957,
+   "verdict": "refuted (rounding: 9.96x rounds to 10x)",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "inherited-f4 -> fes-f2-gpu whole solve char2-n25",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 10.4,
+   "recomputed": 10.441,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "counted S gap fes-f2-gpu / inherited-f4 char2-n25",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 53,
+   "recomputed": 53.04,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "inherited-f4 -> fes-f2-gpu whole solve char2-n29",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 23.1,
+   "recomputed": 23.139,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "counted S gap fes-f2-gpu / inherited-f4 char2-n29",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": 106,
+   "recomputed": 105.997,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "pre-fix run calls fes-f2-gpu vs fes-f2",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": [
+    2642,
+    1878
+   ],
+   "recomputed": [
+    2642,
+    1878
+   ],
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/run1-unordered-koblitz-n23.json"
+  },
+  {
+   "name": "fes-f2-gpu equals fes-f2 per repeat (calls, ops, hit rate, S, all counted leaves)",
+   "report": "research/ic_gpu_e2e_20261113/REPORT.md",
+   "claimed": true,
+   "recomputed": true,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_e2e_20261113/raw/out_e2e.tgz"
+  },
+  {
+   "name": "A/B 1 koblitz-n23 fes-f2-gpu|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "1.094->0.580 (1.89x); 0.49->0.10; 1.07->0.64 (1.68x)",
+   "recomputed": {
+    "ms": [
+     1.0938,
+     0.5802
+    ],
+    "ms_ratio": 1.885,
+    "rest": [
+     0.4873,
+     0.1032
+    ],
+    "rt": [
+     0.6064,
+     0.477
+    ],
+    "whole": [
+     1.074,
+     0.639
+    ],
+    "whole_ratio": 1.682,
+    "same_arm_ms_maxmin": 1.1474,
+    "same_arm_S_maxmin": [
+     1.0,
+     1.0
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62)"
+  },
+  {
+   "name": "A/B 1 koblitz-n23 fes-f2-gpu|rep1",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "0.653->0.236 (2.77x); 0.41->0.11; 0.78->0.39 (1.97x)",
+   "recomputed": {
+    "ms": [
+     0.6529,
+     0.236
+    ],
+    "ms_ratio": 2.766,
+    "rest": [
+     0.4056,
+     0.1051
+    ],
+    "rt": [
+     0.2473,
+     0.1309
+    ],
+    "whole": [
+     0.775,
+     0.394
+    ],
+    "whole_ratio": 1.967,
+    "same_arm_ms_maxmin": 1.0113,
+    "same_arm_S_maxmin": [
+     1.0,
+     1.0
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62)"
+  },
+  {
+   "name": "A/B 1 char2-n25 fes-f2-gpu|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "1.107->0.484 (2.29x); 0.60->0.13; 3.04->1.61 (1.89x)",
+   "recomputed": {
+    "ms": [
+     1.107,
+     0.484
+    ],
+    "ms_ratio": 2.287,
+    "rest": [
+     0.6037,
+     0.1252
+    ],
+    "rt": [
+     0.5033,
+     0.3588
+    ],
+    "whole": [
+     3.044,
+     1.612
+    ],
+    "whole_ratio": 1.888,
+    "same_arm_ms_maxmin": 1.1991,
+    "same_arm_S_maxmin": [
+     1.0044,
+     1.013
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62)"
+  },
+  {
+   "name": "A/B 1 char2-n29 fes-f2-gpu|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "2.619->1.543 (1.70x); 1.04->0.18; 27.35->17.45 (1.57x)",
+   "recomputed": {
+    "ms": [
+     2.6185,
+     1.5433
+    ],
+    "ms_ratio": 1.697,
+    "rest": [
+     1.039,
+     0.1757
+    ],
+    "rt": [
+     1.5795,
+     1.3676
+    ],
+    "whole": [
+     27.346,
+     17.448
+    ],
+    "whole_ratio": 1.567,
+    "same_arm_ms_maxmin": 1.0036,
+    "same_arm_S_maxmin": [
+     1.006,
+     1.0029
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62)"
+  },
+  {
+   "name": "A/B 1 koblitz-n23 fes-f2|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "13.65->13.44 (1.5%) [both repeats]",
+   "recomputed": {
+    "ms": [
+     13.6368,
+     13.4366
+    ],
+    "ms_ratio": 1.015,
+    "rest": null,
+    "rt": null,
+    "whole": [
+     11.961,
+     11.786
+    ],
+    "whole_ratio": 1.015,
+    "same_arm_ms_maxmin": 1.0028,
+    "same_arm_S_maxmin": [
+     1.0,
+     1.0
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed within rounding (computed 1.6%)",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62)",
+   "note": "computed over both repeats: 13.651 -> 13.434 ms (1.6%); per repeat 1.5% and 1.7%"
+  },
+  {
+   "name": "A/B 2 koblitz-n23 fes-f2-gpu|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "0.527->0.539 (no change); 0.53->0.53; 1.31",
+   "recomputed": {
+    "ms": [
+     0.5272,
+     0.5392
+    ],
+    "ms_ratio": 0.978,
+    "rest": [
+     0.0115,
+     0.0116
+    ],
+    "rt": [
+     0.5157,
+     0.5276
+    ],
+    "whole": [
+     0.526,
+     0.531
+    ],
+    "whole_ratio": 0.991,
+    "same_arm_ms_maxmin": 1.3113,
+    "same_arm_S_maxmin": [
+     1.0,
+     1.0
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)"
+  },
+  {
+   "name": "A/B 2 koblitz-n23 fes-f2-gpu|rep1",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "0.204->0.129 (1.59x); 0.28->0.20 (1.43x)",
+   "recomputed": {
+    "ms": [
+     0.2045,
+     0.1286
+    ],
+    "ms_ratio": 1.59,
+    "rest": [
+     0.0114,
+     0.0112
+    ],
+    "rt": [
+     0.1931,
+     0.1174
+    ],
+    "whole": [
+     0.284,
+     0.198
+    ],
+    "whole_ratio": 1.433,
+    "same_arm_ms_maxmin": 1.0557,
+    "same_arm_S_maxmin": [
+     1.0,
+     1.0
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)"
+  },
+  {
+   "name": "A/B 2 char2-n25 fes-f2-gpu|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "0.423->0.367 (1.15x); 1.25->1.11 (1.12x); 1.09",
+   "recomputed": {
+    "ms": [
+     0.4235,
+     0.367
+    ],
+    "ms_ratio": 1.154,
+    "rest": [
+     0.0146,
+     0.0145
+    ],
+    "rt": [
+     0.4089,
+     0.3526
+    ],
+    "whole": [
+     1.246,
+     1.114
+    ],
+    "whole_ratio": 1.119,
+    "same_arm_ms_maxmin": 1.0881,
+    "same_arm_S_maxmin": [
+     1.0143,
+     1.1649
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)"
+  },
+  {
+   "name": "A/B 2 char2-n29 fes-f2-gpu|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "1.547->1.443 (1.07x); 16.40->15.17 (1.08x); 1.000",
+   "recomputed": {
+    "ms": [
+     1.547,
+     1.4425
+    ],
+    "ms_ratio": 1.072,
+    "rest": [
+     0.0224,
+     0.0219
+    ],
+    "rt": [
+     1.5246,
+     1.4207
+    ],
+    "whole": [
+     16.398,
+     15.174
+    ],
+    "whole_ratio": 1.081,
+    "same_arm_ms_maxmin": 1.0001,
+    "same_arm_S_maxmin": [
+     1.3576,
+     1.0137
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)"
+  },
+  {
+   "name": "A/B 2 koblitz-n23 fes-f2|rep0",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "12.42->13.12, spread 1.09",
+   "recomputed": {
+    "ms": [
+     12.4162,
+     13.1204
+    ],
+    "ms_ratio": 0.946,
+    "rest": null,
+    "rt": null,
+    "whole": [
+     10.91,
+     11.519
+    ],
+    "whole_ratio": 0.947,
+    "same_arm_ms_maxmin": 1.0913,
+    "same_arm_S_maxmin": [
+     1.0,
+     1.0
+    ],
+    "counted_identical_all_runs": true
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)"
+  },
+  {
+   "name": "A/B 1 largest same-arm max/min (n=25, n=23, n=29)",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": [
+    1.2,
+    1.15,
+    1.004
+   ],
+   "recomputed": [
+    1.1991,
+    1.1474,
+    1.0036
+   ],
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62)"
+  },
+  {
+   "name": "char-2 S varies about +-0.5% between runs of the same arm",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": "about +-0.5%",
+   "recomputed": {
+    "A/B 1 char2-n25 old": 1.0044,
+    "A/B 1 char2-n25 new": 1.013,
+    "A/B 1 char2-n29 old": 1.006,
+    "A/B 1 char2-n29 new": 1.0029,
+    "A/B 2 char2-n25 main": 1.0143,
+    "A/B 2 char2-n25 merged": 1.1649,
+    "A/B 2 char2-n29 main": 1.3576,
+    "A/B 2 char2-n29 merged": 1.0137
+   },
+   "verdict": "refuted",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62); out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)",
+   "note": "counted ops identical in every run; the spread is the per-run measured ns_per_word_xor/ns_per_add"
+  },
+  {
+   "name": "counted ops, calls and hit rate identical per repeat in every run of every arm",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": true,
+   "recomputed": true,
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62); out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3)"
+  },
+  {
+   "name": "CUDA worker replies equal host worker on 30 systems (459050 solutions), both pods",
+   "report": "research/ic_gpu_overhead_20261114/REPORT.md",
+   "claimed": 459050,
+   "recomputed": {
+    "brute_force_true_solutions": 459050,
+    "cuda_equal_truth": true,
+    "host_equal_truth": true,
+    "mismatches": 0
+   },
+   "verdict": "confirmed",
+   "evidence": "out_ab.tgz (artifact store; sha256 dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62):out_ab/serve-smoke.*; out_ab2.tgz (artifact store; sha256 8d090bd4b1855aefcc67bd8350d0562fe153e732fdc1bea5a5ebe86e16f461a3):out_ab2/serve-smoke.*"
+  },
+  {
+   "name": "replay reproduces every counted integer leaf of report 1 (14 rows)",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": true,
+   "verdict": "confirmed",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz"
+  },
+  {
+   "name": "replay S/rho ratio to report 1 per sweep",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": {
+    "koblitz-n23": [
+     1.0
+    ],
+    "char2-n25": [
+     0.94305,
+     0.94308,
+     0.99997
+    ],
+    "char2-n29": [
+     1.06111,
+     1.06112
+    ]
+   },
+   "verdict": "explained by calibration (priced_by pinned on Koblitz, measured on char-2)",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz",
+   "note": "replay counts re-priced at the e2e word-XOR price reproduce e2e S within 6.4e-5 relative"
+  },
+  {
+   "name": "batching bound koblitz-n23",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": {
+    "kernel_us": 68.96,
+    "busy_us": 100.38,
+    "rt_us_all_reps": 406.1,
+    "bound_us_all_reps": 337.2,
+    "reps": [
+     {
+      "rep": 0,
+      "includes_worker_startup": true,
+      "rt_us": 731.8
+     },
+     {
+      "rep": 1,
+      "includes_worker_startup": false,
+      "rt_us": 123.9
+     }
+    ],
+    "bound_us_steady_reps": 54.9
+   },
+   "verdict": "computed",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz:out_rp/progress.log, out_rp/koblitz-n23.json"
+  },
+  {
+   "name": "batching bound char2-n25",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": {
+    "kernel_us": 140.86,
+    "busy_us": 192.56,
+    "rt_us_all_reps": 304.8,
+    "bound_us_all_reps": 164.0,
+    "reps": [
+     {
+      "rep": 0,
+      "includes_worker_startup": true,
+      "rt_us": 304.8
+     }
+    ]
+   },
+   "verdict": "computed",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz:out_rp/progress.log, out_rp/char2-n25.json"
+  },
+  {
+   "name": "batching bound char2-n29",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": {
+    "kernel_us": 1272.9,
+    "busy_us": 1304.96,
+    "rt_us_all_reps": 1364.9,
+    "bound_us_all_reps": 92.0,
+    "reps": [
+     {
+      "rep": 0,
+      "includes_worker_startup": true,
+      "rt_us": 1364.9
+     }
+    ]
+   },
+   "verdict": "computed",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz:out_rp/progress.log, out_rp/char2-n29.json"
+  },
+  {
+   "name": "rootfind profile split consistent across 3 rounds",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": 0.10000000000000853,
+   "verdict": "confirmed (max spread 0.1 pp)",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz:out_rp/rf-profile-*.log"
+  },
+  {
+   "name": "rootfind instrumented/plain ms ratio per config",
+   "report": "replay",
+   "claimed": null,
+   "recomputed": {
+    "large:sorted-16": 0.922,
+    "large:sorted-32": 0.718,
+    "large:sorted-64": 1.028,
+    "large:hash-16": 1.21,
+    "large:hash-32": 1.011,
+    "large:hash-64": 1.007,
+    "small:sorted-16": 0.284,
+    "small:sorted-32": 0.73,
+    "small:sorted-64": 1.026,
+    "small:hash-16": 1.006,
+    "small:hash-32": 0.777,
+    "small:hash-64": 1.013
+   },
+   "verdict": "computed; sorted-16 confounded by first-launch cost in the plain build; chunk 16/32 differ in registers and occupancy",
+   "evidence": "research/ic_gpu_replay_20261114/raw/out_rp.tgz:out_rp/rf-profile-*.log, rf-plain-*.log, rf-build-*.log"
+  }
+ ],
+ "scripts": {
+  "vload.py": "ac35c084f84afc3189f52d1fe0c30977932106dfd6103685c37fba937dedfdf3",
+  "check_e2e.py": "eab38705a10144e46b2f5b0c5f8f46684d8b6cc4785f3b10ed00f860f3d14f7d",
+  "check_ab.py": "ed0aa5747a63d87fc162902e7c6b7afcdc005b48dcfd649e9df32571cc01e673",
+  "check_cross.py": "111e1e5d3ed12680d945ba0063e48234332cc26ffa3e5787b83853c69d425566",
+  "check_reprice.py": "77a7ae9aa72c5871b479158ed7ef2fb6887a763efab65e6d29d5e505584986e7",
+  "check_band.py": "2bf016b248eb279b1a47a291d654a1725f08a17bb3e8526b9798d71f18cc6d67",
+  "check_batching.py": "b2d5fe9a480cf696cb0319e61cd4df2d4c43c9a81ad664cf7643f452edfaf340",
+  "check_rootfind.py": "af8f0d210624791fb05511ec43b4ca4caf7531a6071df662c47158fb1b1af9d1",
+  "check_smoke.py": "14a3667796678ee2fea9afea9f00df67b34d1e1eb908753d1975e5a2dc560b62",
+  "make_review_json.py": "1c295e00a0eafa1128dc8848005340e263c8e438bd9ed0442ac221376eb8ed4b"
+ },
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "os": "Linux 6.18.44-fc-v470"
+ }
+}
