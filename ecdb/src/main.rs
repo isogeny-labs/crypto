@@ -182,6 +182,8 @@ enum ImportWhat {
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10 (Kohel's l^k-torsion criterion, src/import/end_ring.rs).
     EndRings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith, src/import/supersingular.rs).
+    SupersingularEndRings,
     /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
     /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
     FactorBases,
@@ -284,6 +286,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
                 ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
+                ImportWhat::SupersingularEndRings => import::run(&ctx, Selection::SupersingularEndRings, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],

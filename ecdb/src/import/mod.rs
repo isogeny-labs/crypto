@@ -23,6 +23,7 @@ pub mod pack;
 pub mod registry;
 pub mod results;
 pub mod siblings;
+pub mod supersingular;
 pub mod traits;
 pub mod transfers;
 pub mod volcano;
@@ -212,6 +213,8 @@ pub enum Selection {
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10, by Kohel's l^k-torsion criterion.
     EndRings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith; Deuring for j = 0, 1728).
+    SupersingularEndRings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
 }
@@ -263,6 +266,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     // After volcanoes: it cross-checks their levels and End(E) rows.
     if all || what == Selection::EndRings {
         reports.push(end_ring::import(ctx).await?);
+    }
+    if all || what == Selection::SupersingularEndRings {
+        reports.push(supersingular::import(ctx).await?);
     }
     // After ecbench, results and siblings: it links their rows.
     if all || what == Selection::FactorBases {
