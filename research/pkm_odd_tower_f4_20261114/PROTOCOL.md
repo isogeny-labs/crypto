@@ -228,3 +228,21 @@ out of memory); only that text field changed. Censored cells: `M3-A2-t5` and `M3
 `B-M3-A23-n4` and `B-M3-A2-t5`. `B-M3-A2-t5` first lost its runner to the session's 2-hour background limit, with no
 rows; it was rerun from the start (§7) and then killed for memory. The run ended 2026-11-14T11:46Z.
 
+**Amendment 4 (2026-11-14, a second host for the cells censored by memory; filed before any row from that host).**
+The user asked to rerun the `m = 3` cells censored on the 15 GiB host with more memory. EKS is not reachable
+from this session (no AWS identity for the command bridge; the GitHub route runs `ecbench.spec/v1` only), so,
+at the user's choice, they run on a RunPod high-memory CPU pod (`runpod/base:1.0.2-ubuntu2404`). That is a
+deviation from the lab's EKS default, recorded here.
+- *Same instrument:* the two binaries recorded in `binary.sha256` (uploaded and re-hashed on the pod),
+  `RAYON_NUM_THREADS=4`, the same seeds, budget (1,800 s), degree bound and arguments
+  (`remote/run_tail_remote.sh`). Only the host's memory and CPU change.
+- *Host-equivalence gate:* the pod first reruns three committed cells (`M2-A3-k5-tower`, `M3-A2-t4-tower`,
+  `B-M3-A2-t4`) as `HE-*` cells. Their counted metrics must equal the committed rows exactly; otherwise no
+  pod row is read and the cells stay censored.
+- *Rows:* the six censored cells (`M3-A2-t5`, `M3-A23-n4` tower and null; `B-M3-A23-n4`, `B-M3-A2-t5`) are
+  recorded in `runs/highmem/`, keyed to the pod. If the gate passes, `analyze.py` reads them in place of
+  the censored placeholders, which are kept in `runs/censored-15gib/`. A system that still times out or dies is
+  censored, as before.
+- *Cost:* ceiling $20 for all attempts; the pod is stopped and deleted when the cells end.
+- *Order:* as in `remote/run_tail_remote.sh`; order cannot change a counted metric (§3).
+
