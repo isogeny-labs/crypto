@@ -35,7 +35,7 @@ solvers, on:
 
 Each run prints a `GATE … identical` line for every pair (55 per run); the bench asserts it. All
 110 solves per run verify `k·D1 = D2`. `solve_mulmods` also equals the S1 run (`s1/native_s1.txt`)
-on every row.
+on every row. [pcc:unverified]
 
 The unit tests `solve::tests::recovers_planted_k` and `ic::tests::fast_solver_is_exact` assert the
 same gate on small rows. All 9 crate tests pass in release and in debug.
@@ -57,7 +57,7 @@ construction and by the gate. Wall clock falls. This is not an `S` claim and not
 ## What it buys end to end
 
 Against the S1 native binary's own solve times (`s1/native_s1.txt`, a different process on another
-day), the fast solve is 2.5–3.4× faster at genus 2, p ≥ 503:
+day), the fast solve is 2.5–3.4× faster at genus 2, p ≥ 503: [pcc:unverified]
 
 | p | S1 solve (ms) | S2 fast solve (ms) |
 |---|---|---|

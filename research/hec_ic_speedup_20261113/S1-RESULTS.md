@@ -5,7 +5,7 @@ frozen in commit `a4db7afc2d` before any timing below.
 
 **Class: infrastructure.** The algorithm is unchanged: full degree-1 base, factor-base walk
 (64 places, `d_step_in = 4`), parity filter then `gcd(u, x^p − x)`, Markowitz elimination mod `ℓ`.
-No `S` improvement is claimed.
+No `S` improvement is claimed. [pcc:unverified]
 
 ## What ran
 
@@ -67,7 +67,7 @@ consistency of the eliminated system, points on the curve.
     and first in each process.
   - No verdict below changes. That row's speedup reads 5× rather than 8× against the re-run.
   - A BigUint A/A (about 4.5 minutes) was not run. Round eight bounds that engine's A/A at 1.4×
-    per row on its own host.
+    per row on its own host. [pcc:unverified]
 
 Group operations match the BigUint engine's `relation_ops` to within seed noise on every row. For
 example, genus 2 at `p = 4001` is 4028 native against 4025 BigUint, and genus 4 at `p = 61` is 610
@@ -103,7 +103,7 @@ against 570. This is expected: it is the same walk with a different random strea
 row building take 4.3 ms of the 27 ms. The BigUint engine's per-phase wall time (`ic_solve_ns`,
 `ic_partial_ns` in `head_to_head`) is computed but not printed by the frozen example. So the
 relation-phase speedup alone is not measured here and is not claimed. A small new example printing
-those fields would measure it.
+those fields would measure it. [pcc:unverified]
 
 **The rows are near-dense in the step columns.**
 

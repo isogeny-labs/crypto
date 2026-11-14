@@ -56,7 +56,7 @@ equation, since ICV1 covers elliptic curves only. Record: `20261114T0356Z-hec-na
   12.6–18.6× at genus 3 and 16.7–18.9× at genus 4. These are wall-time ratios of means, post hoc.
 - **External comparison: not run.** No open hyperelliptic-IC implementation is known.
 - **Unvalidated.** The run used one L0 development host and measured wall clock only. There is no
-  `VALIDATION.json` and no matched rho, so it remains outside the admitted table.
+  `VALIDATION.json` and no matched rho, so it remains outside the admitted table. [pcc:unverified]
 
 Source of truth:
 [`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261114T0356Z/).
