@@ -18,3 +18,26 @@ The existing [16-call msolve calibration](../solver_multiplicity_audit_20261109/
 Sources checked before implementation: Diem (2011), Proposition 2.5, DOI [10.1112/S0010437X10005075](https://doi.org/10.1112/S0010437X10005075); the existing bivariate multiplicity and JV quotient-basis/length proofs; Mathlib's actual quotient lift/ext, evaluation uniqueness, finite algebra-map independence/cardinality, monic AdjoinRoot power basis and module length proofs. Exact Stacks [09HS](https://stacks.math.columbia.edu/tag/09HS) and [0CKM](https://stacks.math.columbia.edu/tag/0CKM) were downloaded and read. Their statements concern field extensions and are narrower than the checked nonreduced-ring algebra theorem: citation annotations are not substituted for actual hypotheses. No full-paper read or novelty claim. KB unavailable (status/two distinct searches/theorem query all127); bounded fallback and source hashes retained. [pcc:unverified]
 
 The closed main declaration is `CoordinateLengthAudit.actual_coordinate_length_certificate` in [LengthCertificate.lean](lean/LengthCertificate.lean). Lean 4.35.0 and Mathlib 56a005855ea17e0b0958f73ec801ae140b0a1679 are pinned. Whole gate 44/0 failures/0 trusted passes. Exact local **PCC-20261114-c3ba4f** replay passed at 2026-11-14T00:34:55Z; all eight formal/config and ten artifact pins match. The 62 attempt files, five gate files and inspected one-page PDF47161B/SVG are retained in the [receipt](verification.json). Signed standing remains unverified. No holes, custom axioms, native evaluator, raised limits, new global elaboration flags or linter waivers. No new native experiment, paid compute or agent storage upload. README/publication/current receipts remain outside the immutable source/artifact pin sets. [pcc:unverified]
+
+## Additive actual ring-length and locality proof
+
+The [actual local-algebra length proof](../local_algebra_length_audit_20261114/README.md)
+now derives self-module length m for actual K[t]/(t^m) and
+K[x,y]/(x^m,y−x), for every field K and natural m. The proof constructs
+actual multiplication-closed tail ideals and a strict chain from a nilpotent
+power basis; scalar restriction gives the opposite bound. Positive m gives
+actual local rings with support1 over every extension field, arbitrarily
+large local length at support1. The m0 zero rings have length0 and are not
+local. Actual F4/F2 is a local field with ring length1 versus scalar length2,
+with a direct inequality proving why a residue-degree qualification matters.
+No ring-length/locality/cycle/intersection result is assumed. This closes
+self-module length/locality for the actual truncated/bivariate family,
+not general scheme-cycle/localization/intersection geometry, positive-dimensional
+component extraction, Diem's qualified n!d^n bound or JV ringlength8.
+Exact local **PCC-20261114-81195a** PASS at 2026-11-14T16:43:35Z, signed standing unverified;
+whole28/0/0, complete771-character binding`58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249`,
+independent native1full/0prefix/0unresolved;7custom/13formal-config+
+14artifact pins,64provenance files/30objects/10964-byte lossless XZ/
+fivegate/inspected onepagePDF46331bytes. Three failed states retained.
+No qualified-source refutation, novelty, new crypto experiment/spend/upload.
+[pcc:unverified]

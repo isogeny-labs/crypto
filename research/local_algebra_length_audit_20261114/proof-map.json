@@ -1,0 +1,74 @@
+{
+  "main": "LocalAlgebraLengthAudit.actual_local_algebra_length_certificate",
+  "binding": "58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249",
+  "custom_imports": {
+    "Bivariate": "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+    "LocalLengthCertificate": "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+    "PowerBasisLength": "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+    "ResidueDegreeControl": "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+    "Solutions": "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+    "Thickening": "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+    "TruncatedLocal": "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean"
+  },
+  "modules": [
+    {
+      "file": "PowerBasisLength.lean",
+      "role": "Actual trailing spans, all-element multiplication closure, actual ideals and strict LTSeries; restriction-of-scalars upperbound and generic nilpotent powerbasis ring length."
+    },
+    {
+      "file": "TruncatedLocal.lean",
+      "role": "Actual monic truncated quotient powerbasis and mapped bivariate powerbasis; self-module lengths, positive-m local structure, zero-m nonlocal controls and unbounded local length."
+    },
+    {
+      "file": "ResidueDegreeControl.lean",
+      "role": "Actual F4 over F2, field/local selflength1 versus scalar length2, direct negated equality."
+    },
+    {
+      "file": "LocalLengthCertificate.lean",
+      "role": "Full closed explicit family/locality/support/zero/unbounded/residue-degree main binding."
+    }
+  ],
+  "claims": [
+    {
+      "declaration": "nilpotent_powerBasis_ring_length",
+      "hypotheses": "Field K, commutative K-algebra B, actual PowerBasis whose generator^dim=0",
+      "conclusion": "Module.length B B=pb.dim via derived strict chain and scalar upperbound."
+    },
+    {
+      "declaration": "thick_ring_length / bi_ring_length",
+      "hypotheses": "Every field K and natural m, actual quotients",
+      "conclusion": "Self-module lengths equal m."
+    },
+    {
+      "declaration": "thick_local / bi_local",
+      "hypotheses": "Every field K, positive m",
+      "conclusion": "Actual quotients are local rings."
+    },
+    {
+      "declaration": "thick_zero_not_local / bi_zero_not_local",
+      "hypotheses": "Every field K, m=0",
+      "conclusion": "Zero quotients are not local rings; self-module lengths zero."
+    },
+    {
+      "declaration": "unbounded_ring_length",
+      "hypotheses": "Every field K and natural bound b",
+      "conclusion": "A positive local bivariate quotient has ring length>b, geometric support1 over every extension field."
+    },
+    {
+      "declaration": "residue_degree_control",
+      "hypotheses": "Actual GaloisField2^2 over ZMod2",
+      "conclusion": "Card4,locality,residue dimension2,selflength1,scalar length2 and their inequality."
+    }
+  ],
+  "gate_declarations": 28,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "not established",
+  "open": "General multihomogeneous isolated-cycle/localization/intersection comparison, positive-dimensional components, source n!d^n bound and JV self-module length8. No qualified source theorem refuted."
+}

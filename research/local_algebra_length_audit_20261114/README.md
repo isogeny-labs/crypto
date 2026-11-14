@@ -1,0 +1,22 @@
+# Actual local-algebra length and residue-degree control
+
+Lean proves that the actual algebras `K[t]/(t^m)` and `K[x,y]/(x^m,y−x)` have self-module length m for every field K and every natural m. For positive m they are local rings and their geometric support has exactly one point over every field extension. Thus actual local ring length is unbounded at fixed support size1. Signed standing remains unverified. [pcc:unverified]
+
+The generic proof builds multiplication-closed tail ideals from an actual nilpotent power basis. Their strict chain gives the lower bound; restriction of scalars embeds the ring-submodule lattice into the scalar-subspace lattice and gives the upper bound. Actual monic AdjoinRoot power bases and the unchanged proved bivariate algebra equivalence instantiate the lemma. No length/locality/cycle/intersection conclusion is a premise. [pcc:unverified]
+
+Lean derives positive-m locality from an explicit scalar-plus-nilpotent decomposition. At m=0 both actual quotients have length0 and fail Mathlib's nontrivial local-ring condition. A separate actual `GaloisField 2 2` over `ZMod 2` control is a local field with self-module length1 and scalar-module length2; Lean directly disproves their equality. Locality alone does not remove the residue-degree factor. [pcc:unverified]
+
+This closes the actual ring-module length and locality gap for the truncated/bivariate family in [the earlier coordinate-length study](../coordinate_length_audit_20261114/README.md). General isolated scheme cycles, localization/intersection comparison, positive-dimensional component extraction, Diem's qualified multihomogeneous bound and the separate JV self-module length8 remain open. The existing native16-call calibration is unchanged. This family is not a counterexample to Diem's source theorem. [pcc:unverified]
+
+The closed main declaration is `LocalAlgebraLengthAudit.actual_local_algebra_length_certificate` in [LocalLengthCertificate.lean](lean/LocalLengthCertificate.lean); [proof map](proof-map.json), [source plan](sources.json), [source review](evidence/source-review.json), [one-page report](reports/report.pdf) and [diagram](reports/local-length.svg) describe its scope. Whole project gate28/0 failures/0 trusted native, complete771-character binding`58235242b9dd4b2995d959c49454952926fbd7657a0cd011701e36af26bd4249`, independent native1complete/0prefix/0unresolved. Five build snapshots retain all three failures:64files/30objects/10964-byte lossless XZ plus five gate files. Exact local **PCC-20261114-81195a** replay PASS at 2026-11-14T16:43:35Z; signed standing remains unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Sources checked before implementation: Diem2011Prop2.5, DOI[10.1112/S0010437X10005075](https://doi.org/10.1112/S0010437X10005075), printed79–81/PDF6–8 fully read and visually inspected; Stacks[00IY](https://stacks.math.columbia.edu/tag/00IY),[00J2](https://stacks.math.columbia.edu/tag/00J2),[06GG](https://stacks.math.columbia.edu/tag/06GG) selected full statements/proofs, with residue-degree qualification retained; prior actual coordinate algebra proofs and official Mathlib length, power-basis, AdjoinRoot, local-ring, nilpotent and finite-field APIs. Classical composition-length method, no novelty or fullpaper-read claim. KB/Conductor unavailable127; primary/prior/official fallback completed before code. [pcc:unverified]
+
+Reproduce with Lean4.35.0 and pinned Mathlib56a005855ea17e0b0958f73ec801ae140b0a1679:
+
+```sh
+cd research/local_algebra_length_audit_20261114/lean
+lake build
+```
+
+Run the default whole-project gate from repository root with `tools/lean/proof-gate.sh research/local_algebra_length_audit_20261114/lean`. Verify `sha256sum -c attempts.tar.xz.sha256` inside evidence, then restore every deduplicated attempt byte with `python restore_attempts.py /tmp/local-length-attempts` from the study directory. The archive contains its complete inventory, snapshots, source/config files, logs, exits and predeclared native-header protocol. The header check is procedural evidence, not a kernel theorem about source parsing, hashing or compiler execution. No holes, custom axioms, native proof evaluation, raised limits, global elaboration flags, linter waivers, new cryptographic experiment, paid compute or agent storage upload. [pcc:unverified]
