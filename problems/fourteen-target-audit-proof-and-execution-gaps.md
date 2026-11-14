@@ -33,8 +33,8 @@ The first two infrastructure observations below describe the original local sess
   the Frobenius, branch, pairing and subgroup lemmas expose their missing
   bridges. An arithmetic identity is not labeled a full Jacobian, pairing or
   algorithm-refinement theorem. [pcc:unverified]
-- Missing formal bridges: E[r]'s Frobenius representation/characteristic
-  polynomial; supersingularity and Hasse trace-zero result; actual Weil/Tate
+- Missing formal bridges: general-prime E[r] geometry and Frobenius determinant;
+  prime3 actual representation/descent is closed below, while its generic determinant remains open; supersingularity and Hasse trace-zero result; actual Weil/Tate
   constructions and domains; Diem ramification and intersection geometry;
   reduced-divisor/Jacobian definitions and smoothness counting; msolve row
   arithmetic/provenance/degree refinement; probabilistic mixing/collision
@@ -59,7 +59,7 @@ The first two infrastructure observations below describe the original local sess
 1. The bounded Semaev census, all-arity zero-sum/degree/symmetry/source-split
    proofs and p<500 base-field k1 census have run. Continue higher-arity
    absolute irreducibility, geometric rank at odd primes beyond3, actual
-   Frobenius/determinant coupling to existing descent components, general supersingular geometry and remaining all-k census
+   Frobenius determinantq/canonical-pairing coupling (prime3representation/descent now closed), general supersingular geometry and remaining all-k census
    obligations. New native work needs its own frozen protocol; finite
    agreement does not prove a universal statement. [pcc:unverified]
 2. For item7, extend the checked concrete Cantor groups, growing-genus prime
@@ -331,7 +331,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
-| 2 BK | Partial: actual qualified F5/r3 and excluded F7/r3 criteria at all positive extension degrees; complete p<500 basefield k1census; qualified matrix criterion/actual rational prime-torsion input; generic actual r2geometry/binary basis and characteristic2card1/2/coprimality-deletion control (67); general actual prime3geometriccard9/exactorder8/ZMod3modulefinrank2/Fin2basis for all nonsingular Weierstrass models/allchar≠3inclchar2, scalar extensions and char3control (77), extending prior short-only20count | Other odd-prime rank, actual Frobenius determinant/representation coupling with existing descent components and all-k extension census over the p<500population |
+| 2 BK | Partial: actual qualified F5/r3 and excluded F7/r3 criteria at all positive extension degrees; complete p<500 basefield k1census; qualified matrix criterion/actual rational prime-torsion input; generic actual r2geometry/binary basis and characteristic2card1/2/coprimality-deletion control (67); general actual prime3geometriccard9/exactorder8/ZMod3modulefinrank2/Fin2basis for all nonsingular Weierstrass models/allchar≠3inclchar2, scalar extensions and char3control (77), extending prior short-only20count; actual general3torsion Frobenius/basis matrix/powers/finitefielddescent integration, concreteF2actualdet2/criterion and constructedF7matrixboundary (31), genericdetq criterion explicitly conditional | Other odd-prime rank≥5, actual genericdetq/canonical Weil-pairing necessity and all-k extension census over the p<500population |
 | 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67) | General Hasse/supersingular geometric classification, further extension-field censuses and full torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
@@ -992,3 +992,26 @@ retained, no qualified-source refutation/fullpaper/book/novelty claim.
 [Post-issue prior-art reconciliation](../research/three_torsion_rank_audit_20261114/prior-art-reconciliation.json)
 records the late discovery of the earlier short proof; frozen records are
 unchanged and no earlier review is invented. No native experiment. [pcc:unverified]
+
+### Actual prime3Frobenius representation and chosen-field descent
+
+The [actual Frobenius bridge](../research/bk_frobenius_bridge_audit_20261114/README.md)
+constructs the actual general geometric3torsion linear map/basis matrix,
+proves its coordinate action, powers and basis-independent nonzero determinant,
+and integrates existing chosen finite-field descent. Actual point-count
+3divisibility supplies the nonzero fixed vector; a basis is constructed from
+actual geometric rank, not assumed. The generic qualified criterion remains
+explicitly conditional on the actual determinantq and qmod3≠1. Concrete
+F2:y²+y=x³+1 has3rationalpoints/9geometrictorsionpoints, actualFrobenius²I
+and nonidentity; kernel-checked finite matrix classification proves actualdet2.
+It therefore satisfies the all-chosen-extension criterion without a determinant
+premise. The earlier F7nonfixed witness gives a constructed actual matrix
+nonidentity/q1boundary. Whole gate31/0failures/0trusted; exact local PCC-20261114-e203ff
+replay PASS at2026-11-14T03:36:21Z,39recursiveformal/config and16artifact pins match,
+135attemptfiles losslessly stored as41uniqueobjects/34320Barchive/fivegatefiles,
+inspected one-page PDF47356B. Scalar IDC1h6d1cab18310b048b has universal Lean
+identity/official32+32-point check. Signed standing unverified. OriginalBK
+qualifications retained; generic actualdetq/canonicalpairings, otherprimes≥5
+and fullallkp500remainopen. Prior F5/F7/F25cases/generaldescent/shortcount
+credited, no fullpaper/bookread/novelty/source-refutation/native experiment.
+[pcc:unverified]
