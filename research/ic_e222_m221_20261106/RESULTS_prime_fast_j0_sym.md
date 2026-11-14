@@ -171,3 +171,19 @@ degenerate steps fall back to unbatched adds). Same curves and planted targets, 
 Reading: the earlier "IC ahead of rho" was an artifact of the unbatched rho. Against a batched, folded multi-target rho the symmetric multi-target IC is **behind** at T=20 and T=200 (2.1x and 1.4x) and about tied at T=1000
 (rho/IC 1.14, inside the host-noise scale seen in these runs). The trend is the one the exponent argument predicts (rho/IC grows with T: 0.47, 0.70, 1.14), which puts a crossover near T of a few hundred to a thousand at 26 bits;
 at larger sizes it moves with the setup cost p^(2/3) against the rho's sqrt(nT). Not a claim: one host, toy size, no §5a band, no tuned BSGS on j=0, one lane count (128), and the IC arm is not tuned per T.
+
+## Experiment: where the multi-target crossover sits at 28 and 30 bits (2026-11-14) — `[pcc:unverified]`
+Same planted targets for both arms, 2 curves x 2 instances (n=4 rows per cell), all targets verified in both arms. Symmetric multi-target IC (B=159 at 28 bits, 252 at 30 bits, extra 8, not retuned per T) against the batched folded multi-target rho (128 lanes, dp bits from the same formula, 32-step table), medians:
+
+| bits | T | IC ms | batched rho ms | rho / IC |
+|---|---|---|---|---|
+| 26 | 20 / 200 / 1000 | 8.7 / 20.2 / 70.4 | 4.1 / 14.1 / 80.0 | 0.47 / 0.70 / 1.14 |
+| 28 | 200 | 42.8 | 24.3 | 0.57 |
+| 28 | 1000 | 125.4 | 117.2 | 0.93 |
+| 28 | 3000 | 357.7 | 909.1 | 2.54 |
+| 30 | 200 | 95.2 | 42.9 | 0.45 |
+| 30 | 1000 | 303.2 | 191.4 | 0.63 |
+| 30 | 3000 | 836.6 | 1675.8 | 2.00 |
+
+Reading: the symmetric multi-target IC loses to the batched folded rho for T up to about 1000 and is 2.0x-2.5x faster at T=3000 (28 and 30 bits); the crossover moves up slowly with size (about T=800 at 26 bits, about T=1100 at 28 bits, between 1000 and 3000 at 30 bits), consistent with the IC total growing about T^0.4 against rho about T^0.9.
+Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relative setup, so the IC number is probably conservative), the rho is lightly tuned, one host, no isolation, no §5a band, and the comparison to a tuned, folded **BSGS** on j=0 curves is missing: on the a=-3 curves a tuned multi-target BSGS was 2x-4x ahead of the non-symmetric IC, and a x6-folded BSGS on j=0 would gain about sqrt(6), so the decisive comparator is still BSGS, not rho.
