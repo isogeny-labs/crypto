@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout: |
             research/cross_characteristic_global_torsion_20261112/ct109
             research/cross_characteristic_global_torsion_20261112/ct112
