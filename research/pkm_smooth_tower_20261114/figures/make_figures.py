@@ -142,7 +142,33 @@ def method1_trials():
     fig.savefig(os.path.join(HERE, "method1_trials.png"), dpi=150, bbox_inches="tight")
 
 
+def cm_hilbert():
+    primes = [1000003, 1000033, 1000039]
+    fig, axes = plt.subplots(1, 3, figsize=(10, 3.4), sharey=True)
+    for ax, p in zip(axes, primes):
+        d = load(f"cm_hilbert_p{p}_D1000_h16.json")
+        xs = [c["h"] for c in d["curves"]]
+        ys = [math.log2(max(c["smooth_part"], 1)) for c in d["curves"]]
+        ok = [c["smooth_part"] >= 300 for c in d["curves"]]
+        ax.scatter([x for x, k in zip(xs, ok) if not k], [y for y, k in zip(ys, ok) if not k],
+                   s=9, color="#9bb3d6", label="smooth part < 300")
+        ax.scatter([x for x, k in zip(xs, ok) if k], [y for y, k in zip(ys, ok) if k],
+                   s=12, color="#2c5aa0", label="smooth part ≥ 300")
+        ax.axhline(math.log2(300), color="#b36b00", ls="--", lw=1)
+        sc = d["scan"]
+        tw = f"tower: D = {d['tower_D']}, S = {d['tower']['S']}" if "tower" in d else "no tower"
+        ax.set_title(f"p = {p}\n{len(d['curves'])} curves, {sc['split']} split D; {tw}", fontsize=8)
+        ax.set_xlabel("class number h(D)")
+    axes[0].set_ylabel("log2 of 13-smooth part of #E")
+    axes[0].legend(fontsize=7, loc="upper left")
+    fig.suptitle("Method 2 with Hilbert class polynomials: |D| ≤ 1000, h(D) ≤ 16 (recorded)", fontsize=9)
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, "cm_hilbert.svg"), bbox_inches="tight")
+    fig.savefig(os.path.join(HERE, "cm_hilbert.png"), dpi=150, bbox_inches="tight")
+
+
 if __name__ == "__main__":
+    cm_hilbert()
     pipeline()
     cm_orders()
     method1_trials()

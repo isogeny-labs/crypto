@@ -4,7 +4,7 @@
 
 = PKM factor bases from smooth maps: `pkm-smooth-tower`
 
-2026-11-14 · isogeny-labs/crypto PR \#4091 · code at commit `a894bbdaa9` ·
+2026-11-14 · isogeny-labs/crypto PR \#4091 · code at PR head ·
 status: construction and checking tooling; tests pass, nothing benchmarked
 [pcc:unverified].
 
@@ -26,7 +26,10 @@ any ordered list of small primes $q_1, dots, q_(n')$, with $S = product q_j$:
   part $S$; the number of curves tried is recorded.
 - *Method 2, CM* (slide 16), for the *given* $p$: the 13 class-number-1
   orders, Cornacchia for $4p = t^2 + |D| v^2$, every twist, orders certified
-  on random points. Choosing $p$ itself ("kind of trapdoor") is out of scope.
+  on random points; and with class number $> 1$: every $|D| <= M$ with
+  $h(D) <= H$, the class polynomial $H_D$ (`isogeny_algos::cm`) reduced
+  mod $p$, its roots by Cantor–Zassenhaus, every twist certified as
+  $p + 1 minus.plus t$. Choosing $p$ itself ("kind of trapdoor") is out of scope.
 - *Checks*: $|V| = S$ distinct values, $L(v) = c$ on $V$, and below $2^22$
   no other root in $FF_p$. *System* (slide 17): msolve export with
   $S_(m+1)$ written as an $S_3$ chain; an exact $m = 2$ finder checks every
@@ -59,19 +62,44 @@ any ordered list of small primes $q_1, dots, q_(n')$, with $S = product q_j$:
   caption: [Method 1 at $p = 1000003$, $B = 13$, $S >= 500$: curves tried
   per seed, $n = 20$ (recorded).])
 
+== Class number $> 1$ (Hilbert class polynomials)
+
+`cm --p P --bound 13 --min-size 300 --max-disc 1000 --max-h 16`, recorded in
+`data/cm_hilbert_p*_D1000_h16.json`; wall time 1.1–1.5 s each on this
+container (measured once, unisolated).
+
+#table(columns: 6, align: left,
+  [$p$], [$D$ scanned / split], [roots], [rejected / incomplete], [CM curves], [tower],
+  [1000003], [452 / 54], [262], [0 / 0], [528], [$D = -28$, $S = 1408 = 2^7 dot 11$ (as class number 1)],
+  [1000033], [452 / 78], [388], [0 / 0], [782], [$D = -99$, $S = 891 = 3^4 dot 11$],
+  [1000039], [452 / 48], [263], [0 / 0], [530], [$D = -124$, $S = 800 = 2^5 dot 5^2$],
+)
+
+At $p = 1000033$ and $1000039$ no class-number-1 curve fits $S >= 300$; the
+larger scan finds one at each. Every split $D$ gave $h(D)$ roots and every
+root a certified curve, which is the check that the rounded $H_D$ is right
+for that use.
+
+#figure(image("figures/cm_hilbert.svg", width: 100%),
+  caption: [Smooth part of every CM curve order against $h(D)$ at three primes
+  (recorded).])
+
 == Checks
 
-`cargo test --release --lib pkm_smooth_tower`: 6 passed. The tests cover:
+`cargo test --release --lib pkm_smooth_tower`: 8 passed. The tests cover:
 - Vélu x-maps agreeing with the point map, and codomain orders equal to domain orders.
 - Mixed Kummer and mixed isogeny towers.
 - Real $m = 2$ decompositions.
 - CM orders matching the generic point count, with the expected number of twists per $D$, at 4 primes up to 998244353.
 - A CM curve feeding a verified tower.
+- Root finding mod $p$ against planted roots (with an irreducible quadratic factor).
+- The Hilbert scan at two primes: no failed polynomial, no incomplete split, no rejected root. Its orders for $h > 1$ match the generic count, and it reproduces every class-number-1 curve.
 
 == Scope and next steps
 
 Single-word arithmetic ($p < 2^62$); order counting is practical to about 48
 bits. No ecbench plug-in, so nothing is priced against the index-calculus
-baseline or rho. Next: CM with class number $> 1$ from
-`isogeny_algos::cm::hilbert_class_poly` roots mod $p$; an `ic_framework`
-factor-base plug-in so the mixed tower can be charged in ecbench's unit.
+baseline or rho. The class polynomial is computed over $CC$ in fixed point,
+and has been run here only to $|D| <= 1000$, $h <= 16$. `cm_aux_from` is first-fit, not
+best-fit. Next: an `ic_framework` factor-base plug-in so the mixed tower can
+be charged in ecbench's unit.
