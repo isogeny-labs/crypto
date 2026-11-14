@@ -63,6 +63,7 @@ SOURCES = {
     "koblitz_s22": "research/ic_descent_20260930/analysis-isolated.json",
     "koblitz_s23": "research/ic_single_target_20260930/analysis.json",
     "koblitz_rule_v7": "research/ic_tool_program/rule/v7/analysis.json",
+    "koblitz_rule_v9": "research/ic_tool_program/rule/v9/analysis.json",
     "oracles": "docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json",
     "n37_rank_columns": "research/ecbench_n37_rank_columns_20261004/RESULT.json",
     "n37_k8_k16": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -107,6 +108,7 @@ SOURCES = {
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
     "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+    "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -149,9 +151,29 @@ SOURCES = {
     "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
+    "mt_fieldops_component": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
+    "fes_then_batched": "research/fes_then_batched_20261112/validation/headline.json",
+    "fes_then_batched_readme": "research/fes_then_batched_20261112/README.md",
+    "gpu_fes_e2e": "research/ic_gpu_e2e_20261113/results.json",
+    "gpu_fes_e2e_report": "research/ic_gpu_e2e_20261113/REPORT.md",
+    "gpu_kernel_round1": "research/ic_gpu_measure_20261112/results.json",
+    "gpu_kernel_round2": "research/ic_gpu_measure_20261112/results2.json",
+    "rust_deep_audit": "docs/perf/20261112-rust-deep-audit.md",
+    "transfer_negation_remeasure": "research/negation_remeasure_20261113/summary.json",
+    "transfer_negation_validation": "research/negation_remeasure_20261113/VALIDATION.json",
+    "full_jacobian_ic": "research/full_jacobian_ic_20261113/full_jacobian.json",
+    "groebner_free": "research/groebner_free_matched_20261113/SUMMARY.json",
+    "folded_build_steps": "research/ic_tool_program/explorations/build-steps-20261113/summary.json",
+    "folded_filter_layout": "research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json",
+    "prime_leads_chase": "research/prime_leads_chase_20261113/README.md",
+    "ecbench_methods_source": "src/cryptanalysis/ecbench/methods.rs",
+    "solver_registry_source": "src/cryptanalysis/ic_framework/solvers.rs",
+    "primo_readme": "integrations/primo/README.md",
+    "optimization_source": "src/cryptanalysis/ecbench/optimization.rs",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
+    "ghs_weak_cd_chain": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -175,6 +197,7 @@ GITHUB = "https://github.com/aburan28/crypto/blob/main/"
 S22_RUNS = "research/ic_descent_20260930/runs-isolated/main"
 S23_RUNS = "research/ic_single_target_20260930/runs"
 RULE_V7_RUNS = "research/ic_tool_program/rule/v7/runs"
+RULE_V9_RUNS = "research/ic_tool_program/rule/v9/runs"
 
 # Phases, in pipeline order, as the page groups them.
 PHASES = [
@@ -218,16 +241,16 @@ REGIME_NAME = {"prime": "Prime field", "char2": "Random binary", "koblitz": "Kob
 FAMILY_OF = {"koblitz": "A", "prime": "B", "char2": "B", "koblitz_batch": "C"}
 FAMILIES = {
     "A": {
-        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at baseline v7",
+        "title": "Koblitz, one target", "regimes": ["koblitz"], "section": "§23, re-run at main as rule v9 against a matched rho",
         "status": "primary comparison: one target, as AGENTS.md's one-target rule requires",
         "targets": "one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks",
         "unit": "one batched affine addition (`add_many` over 1,024 subgroup points), per √r",
         "unit_how": "A clock reading, not a count: `ic price` times each phase exclusively, on one thread, "
                     "and divides by this unit, measured around each repetition (§20, §23). Each process measures its own "
                     "unit, so S here is not "
-                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
+                    "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md; rule/v9/PROTOCOL.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
+                     "in the same unit and the same process; its answer replayed and verified (§23; rule v9 at main, with rule v8's matched rho: batched canonicalisation).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -488,7 +511,10 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 
 
 # These engineering components also carry validation gates outside tables A-C.
-COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather",)
+COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
+                           "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
+                           "benchmarks/20261112-mt-fieldops-v5",
+                           "research/quartic_dl1_cd_sqrt_20261113/combo/validation")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -631,23 +657,25 @@ def koblitz_rows(names: Names) -> list[dict]:
 
 def koblitz_one_target_rows(names: Names) -> list[dict]:
     """Ledger §23's comparison: one unseen public point per process, 64 per
-    size, re-run at the IC tool programme's baseline v7 as rule v7.  The
+    size, re-run at main as rule v9 against rule v8's matched rho (rule v7's
+    figures, against rho as then, are the before marks).  The
     primary comparison under AGENTS.md's one-target rule.  S here is cold,
     the reusable set-up plus the online interval, against one-target rho's
     set-up plus its walk; the online speedup, the canonical-step reading and
     the Bernstein–Lange precomputation model ride beside it, never alone.
-    §23's figures on the same curve are the row's before marks.  Each
+    §23 still fixes each size's curve.  Each
     process prices S in its own batched addition, so a row's S is not
     compared with §23's; the ratios carry no unit."""
     rows = []
     s23 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_s23"])["sizes"]}
-    for x in load(SOURCES["koblitz_rule_v7"])["sizes"]:
+    v7 = {(x["a"], x["n"]): x for x in load(SOURCES["koblitz_rule_v7"])["sizes"]}
+    for x in load(SOURCES["koblitz_rule_v9"])["sizes"]:
         a, n = x["a"], x["n"]
-        before = s23[(a, n)]
-        c = names(before["curve"])
-        if c["slug"] != x["curve"]:
-            raise SystemExit(f"rule v7's {x['curve']} is not §23's {before['curve']}")
-        par = json.loads((REPO / RULE_V7_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
+        s23_row, before = s23[(a, n)], v7[(a, n)]
+        c = names(s23_row["curve"])
+        if c["slug"] != x["curve"] or before["curve"] != x["curve"]:
+            raise SystemExit(f"rule v9's {x['curve']} is not §23's {s23_row['curve']} or rule v7's {before['curve']}")
+        par = json.loads((REPO / RULE_V9_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
         columns = int(re.search(r"-c(\d+)-", par["name"]).group(1))
         d = x["diagnostics"]
         sh = d["online_phase_shares"]
@@ -668,8 +696,9 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
                          "verify": online * sh["recovery_check"]},
             "ratio_rho": x["cold_ratio_ic_over_rho"]["value"],
             "ratio_rho_ci": list(x["cold_ratio_ic_over_rho"]["ci95"]),
-            "ratio_rho_section23": before["cold_ratio_ic_over_rho"]["value"],
-            "online_speedup_section23": before["online_speedup"]["mean_ratio"],
+            "ratio_rho_rule_before": before["cold_ratio_ic_over_rho"]["value"],
+            "online_speedup_rule_before": before["online_speedup"]["mean_ratio"],
+            "before_label": "rule v7, rho as then",
             "online_speedup": x["online_speedup"]["mean_ratio"],
             "online_speedup_ci": list(x["online_speedup"]["ci95"]),
             "online_speedup_canonical_step": x["online_speedup_rho_model"]["mean_ratio"],
@@ -685,12 +714,12 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         rows.append({
             "regime": "koblitz", "slug": c["slug"], "ec1": x.get("curve_id") or ec1_of(c),
             "legacy": before["curve"], "log2_r": x["log2_r"], "cofactor": None,
-            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
+            "reference": "one-target matched rho on the same point, its set-up plus its walk (§23's rule; rule v8's batched canonicalisation, at main)",
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
-            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
-            "before_source": SOURCES["koblitz_s23"],
-            "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
-            "class": "accounting",
+            "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v9"],
+            "before_source": SOURCES["koblitz_rule_v7"],
+            "round": "rule v9: §23's comparison at main f465f2fb against a matched rho (2026-11-11, Iso Lab EKS); before marks rule v7 (2026-10-16, rho as then)",
+            "class": "measurement",
         })
     return rows
 
@@ -881,6 +910,59 @@ def prime_base_size_component() -> dict:
                            f"reference with the §5a band are filed in `{study}/VALIDATION.json`. The promoted "
                            "result is the 20-bit `N=45` engineering baseline only; it is one curve, counted "
                            "pricing-band evidence, and not a scaling or wall-time claim.") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def prime_ksum_component() -> dict:
+    """Pooled k-sum decomposition tables against the tuned mitm incumbent on 16 fresh prime-field
+    holdout curves, research/prime_ksum_pooled_20261029 (frozen protocol, selection hashed before the
+    holdout): per size the holdout mean S (mean over the size's 4 curves of the per-curve mean in the
+    study's `ecbench band` table, band.json) and, at w = 0, 0.1 and 1, the paired ratios of totals
+    ksum5-sel / inc-sel, ksum4-sel / inc-sel, ksum5-sel / rho-neg and ksum4-sel / rho-neg with ci95 and
+    pairs, copied from the study's saved `ecbench compare --weight` outputs. Generic decomposition
+    track: bounded by sqrt(r), it cannot beat rho; rho stays ahead (distance remaining). The saved
+    comparisons are the study's pre-2026-11-08 pricing reading (table_insert_attempts not priced).
+    Its standing comes from the study's VALIDATION.json."""
+    study = "research/prime_ksum_pooled_20261029"
+    per = {}
+    for r in load(f"{study}/analysis/band.json")["rows"]:
+        per.setdefault((int(r["curve"].split("-fp")[1].split("-")[0]), r["arm"]), []).append(r["mean_s"])
+    rows = []
+    for bits in (20, 24, 28, 32):
+        means = {}
+        for arm in ("inc-sel", "ksum4-sel", "ksum5-sel", "rho-neg"):
+            ms = per[(bits, arm)]
+            if len(ms) != 4:
+                raise SystemExit(f"{study}: band.json has {len(ms)} curves for P{bits} {arm}, expected 4")
+            means[arm] = [sum(m[i] for m in ms) / len(ms) for i in range(3)]
+        cmps = {}
+        for name, key in (("ksum5_over_inc", "inc-sel__ksum5-sel"), ("ksum4_over_inc", "inc-sel__ksum4-sel"),
+                          ("ksum5_over_rho", "rho-neg__ksum5-sel"), ("ksum4_over_rho", "rho-neg__ksum4-sel")):
+            acc = []
+            for w in ("0", "0.1", "1"):
+                o = load(f"{study}/analysis/compare-P{bits}-{key}-w{w}.json")["ops"]
+                if o.get("status") != "ok" or not o.get("same_seeds") or o.get("censored_pairs"):
+                    raise SystemExit(f"{study}: compare P{bits} {key} w={w} not ok")
+                acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
+            cmps[name] = acc
+        rows.append({"bits": bits, "mean_s": means, **cmps})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/report.pdf",
+            "readme": study + "/README.md",
+            "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
+            "unit": ("S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation, in "
+                     "the study's pre-2026-11-08 pricing reading (counted table work, table_insert_attempts, is not "
+                     "charged); under the 2026-11-08 default no rank changes but the w > 0 figures move, and the w = 1 "
+                     "distance to rho grows to 6.30x-8.52x"),
+            "validation": ("Validated with caveats: replay certificate (count-identical replay of all 8 sessions, "
+                           "9,216 of 9,216 replays identical, on an x86 Linux host with an ecbench built from a clean "
+                           "archive of 6edb2cb36d), validator report (independent recompute) and the matched rho "
+                           f"reference with the §5a band are filed in `{study}/VALIDATION.json`. Scope: the counted "
+                           "unit under the pre-2026-11-08 reading; 16 fresh public synthetic curves, one recording "
+                           "host, isolation L0, no external ECDLP tool run. One non-blocking discrepancy in the "
+                           "validator report: README §4(c) gives inc-w0 / inc-rec at 32 bits as 0.88, the records "
+                           "give 0.87 (0.8737); a secondary derived remark, no registered test or headline uses it.")
+            if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -1234,6 +1316,49 @@ def ic_cover_weakclass_component() -> dict:
             "validation": ("validated with caveats: replay certificate, validator report and the "
                            "negation-map rho reference with the §5a band "
                            f"({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def jv_sieve_line_vs_rho_component() -> dict:
+    """The Joux-Vitse cover sieve route (arms P, H, U) against a matched negation-map
+    rho on the same weak-class instances, p in {1009, 1511, 1823}, from
+    research/jv_sieve_line_vs_rho_20261103/fit.json (made by the study's Rust tool
+    from its records; every point recomputed independently by the validator,
+    review/validator/recompute.json). Per-prime reference (the frozen homogeneity
+    rule failed), unit U2, layer A of the §5a band (all unemitted cover F_p work
+    priced as native). Weak class only, never prime order: outside tables A-C.
+    Its standing comes from the study's VALIDATION.json."""
+    f = load(SOURCES["jv_sieve_line_vs_rho"])
+    study = "research/jv_sieve_line_vs_rho_20261103"
+    if f["controls"]["primary"] != "per-prime" or not (f["controls"]["c1_pass"] and f["controls"]["c2_pass"]
+                                                       and f["controls"]["replays_ok"]):
+        raise SystemExit(f"{SOURCES['jv_sieve_line_vs_rho']}: controls or primary reference changed")
+    rows = []
+    for arm in "PHU":
+        for scope in ("p=1009", "p=1511", "p=1823", "pooled (24 instances)"):
+            cell = lambda m: f[f"per-prime|{arm}|{scope}|{m}"]
+            band = [cell(f"band A U2 w={w}") for w in ("0", "0.1", "1")]
+            rows.append({"arm": arm, "scope": scope.replace(" (24 instances)", ""),
+                         "s": cell("S/rho U2")["point"], "lo": cell("S/rho U2")["lo"], "hi": cell("S/rho U2")["hi"],
+                         "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
+                         "below": all(b["verdict"] == "below" for b in band)})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    walk = load("research/jv_walk_charge_20261111/analysis.json")
+    w512 = walk["by_M"]["512"]["pooled"]
+    walk_note = (f"The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in "
+                 f"research/jv_walk_charge_20261111 ({walk['verdict']}): pooled {w512['0']['point']:.4f} / "
+                 f"{w512['0.1']['point']:.4f} / {w512['1']['point']:.4f} at w = 0 / 0.1 / 1 with the walk, against "
+                 f"{w512['0']['uncharged_point']:.4f} / {w512['0.1']['uncharged_point']:.4f} / {w512['1']['uncharged_point']:.4f} without it. "
+                 "That charge covers starts within the implemented walk's reach: from a random admitted curve it "
+                 "reaches a weak curve in 3 of 60 classes at p = 1009 and 0 of 60 at p = 1511 and 1823, about 1 % "
+                 "operational coverage of all curves (research/jv_weak_coverage_20261111). Classes without a weak "
+                 "curve (all depth-1 2-volcanoes) cannot use the route.")
+    return {"rows": rows, "class": "transfer (weak class only)", "walk_note": walk_note,
+            "unit": "U2: textbook F_p multiplications / (331 sqrt l); native operations at w GAE each",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["jv_sieve_line_vs_rho"],
+            "validation": ("validated with caveats (weak class only; the isogeny walk is charged in a separate study): "
+                           "replay certificate, validator report and the matched negation-map rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
 
 
@@ -1721,6 +1846,204 @@ def pkm_symmetric_component() -> dict:
             "class": "solver-stage diagnostic", "validation": NOT_VALIDATED}
 
 
+MT_FIELDOPS_EVIDENCE = "benchmarks/20261112-mt-fieldops-v5"
+
+
+def mt_fieldops_component() -> dict:
+    """Multi-target IC (icbest = cheapest of ic5, ic5ks, ic5w, ic5rw per configuration and price) against the
+    cheapest multi-target rho of the same counted field layer (rhobest = best of 10 runs of Kuhn-Struik retention
+    rho rho2xks and distinguished-point rho rhodpu) and a paired BSGS, with every arm's native work (step-index
+    hashes, canonicalisations, offset-step indices) counted and priced at h as section 5a requires, from
+    research/mt_fieldops_v5_20261112 (33 fresh prime-order curves at 24-32 bits, 3366 runs). Supersedes v4
+    (research/mt_fieldops_v4_20261112), v3 and v2. Medians and bootstrap intervals are copied from summary.json
+    (analyze.py); I/M = 10, h in {0, 0.1, 1}. A multi-target regime outside tables A-C; its standing comes from the
+    benchmarks directory's VALIDATION.json."""
+    summary = load(SOURCES["mt_fieldops_component"])
+    errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
+    cells = sorted({(x["bits"], x["T"]) for x in summary})
+    rows = []
+    for bits, t in cells:
+        def q(vs, h):
+            x = next(y for y in summary if y["cand"] == "icbest" and y["vs"] == vs and y["cI"] == 10 and y["bits"] == bits
+                     and y["T"] == t and y["h"] == h)
+            return {"median": x["median"], "ci95": [x["lo"], x["hi"]], "n": x["n"]}
+        band = {str(h): q("rhobest", h) for h in (0, 0.1, 1)}
+        verdict = ("cheaper" if all(v["ci95"][1] < 1 for v in band.values())
+                   else "dearer" if all(v["ci95"][0] > 1 for v in band.values()) else "unranked")
+        rows.append({"bits": bits, "T": t, "rho": band, "bsgs": {str(h): q("bsgs2", h) for h in (0, 1)},
+                     "verdict": verdict})
+    return {"rows": rows, "study": "research/mt_fieldops_v5_20261112/",
+            "report": "research/mt_fieldops_v5_20261112/REPORT.pdf", "source": SOURCES["mt_fieldops_component"],
+            "v4": "research/mt_fieldops_v4_20261112/",
+            "previous": "research/mt_fieldops_v3_20261111/",
+            "correction": "research/mt_rho_start_fix_20261111/",
+            "class": "multi-target method",
+            "validation": ("validated: replay certificate, validator report and the rho reference (cheapest standard "
+                           "multi-target rho of this harness: retention rho or distinguished-point rho) with the §5a band "
+                           f"({MT_FIELDOPS_EVIDENCE}/VALIDATION.json)") if not errs else (
+                f"not validated: the gate refuses {MT_FIELDOPS_EVIDENCE}/VALIDATION.json (validator status "
+                "insufficient_evidence for a ranking, strongest_available false); the measurement itself replays "
+                "exactly and recomputes"),
+            "validated": not errs}
+
+
+def nov13_frontier_diagnostics() -> dict:
+    """Dated reconciliation of live implementations and recent diagnostics.
+
+    These studies do not alter tables A-C: several are component-only, and
+    the end-to-end GPU/full-Jacobian studies are not independently admitted.
+    Keeping them in the generated document makes that boundary auditable.
+    """
+    methods = (REPO / SOURCES["ecbench_methods_source"]).read_text()
+    method_registry = methods.split("pub fn registry()", 1)[1].split("pub fn resolve", 1)[0]
+    top_level = len(re.findall(r"MethodDecl\s*\{", method_registry))
+
+    solvers = (REPO / SOURCES["solver_registry_source"]).read_text()
+    solver_registry = solvers.split("pub fn solver_registry()", 1)[1].split(
+        "pub fn solver_by_name", 1
+    )[0]
+    solver_count = len(re.findall(r"Box::new\(", solver_registry))
+    if '"primo-smt"' not in solvers:
+        raise SystemExit("live census: current Primo solver backend is absent")
+
+    optimization = (REPO / SOURCES["optimization_source"]).read_text()
+
+    def rust_string_array(name: str) -> list[str]:
+        m = re.search(rf"const {name}:.*?=\s*&\[(.*?)\];", optimization, re.S)
+        if not m:
+            raise SystemExit(f"live census: cannot find {name}")
+        return re.findall(r'"([^"]+)"', m.group(1))
+
+    pdp3 = rust_string_array("PDP3_ENGINES")
+    pkm = rust_string_array("PKM_TOWER_ENGINES")
+    if min(top_level, solver_count, len(pdp3), len(pkm)) <= 0:
+        raise SystemExit("live census unexpectedly found an empty implementation class")
+
+    ftb = load(SOURCES["fes_then_batched"])
+    ftb_range = [x["recomputed"] for x in ftb["secondary"]["ftb_over_if4_range"]]
+    ftb_rho = [{"cell": x["name"].split("/", 1)[0], "ratio": x["recomputed"]}
+               for x in ftb["secondary"]["distance_to_rho"]]
+
+    gpu_raw = load(SOURCES["gpu_fes_e2e"])
+    gpu_rows = []
+    for instance, rec in sorted(gpu_raw.items()):
+        by_solver = {r["solver"]: r for r in rec["rows"]}
+        inherited, gpu = by_solver["inherited-f4"], by_solver["fes-f2-gpu"]
+        mean = statistics.mean
+        row = {
+            "instance": instance,
+            "gpu_over_inherited_counted": mean(gpu["s"]) / mean(inherited["s"]),
+            "inherited_over_gpu_wall": mean(inherited["row_wall_s"]) / mean(gpu["row_wall_s"]),
+            "inherited_over_rho": mean(inherited["s_over_rho"]),
+            "gpu_over_rho": mean(gpu["s_over_rho"]),
+        }
+        cpu = by_solver.get("fes-f2")
+        row["cpu_fes_over_gpu_wall"] = (
+            mean(cpu["row_wall_s"]) / mean(gpu["row_wall_s"]) if cpu else None
+        )
+        gpu_rows.append(row)
+
+    kernel1, kernel2 = load(SOURCES["gpu_kernel_round1"]), load(SOURCES["gpu_kernel_round2"])
+    gray = {k: v["ratio_cand_over_base"] for k, v in kernel1["fes_gray"].items()}
+    block = {k: v["B6"]["ratio"] for k, v in kernel2["fes"].items()}
+    mac1 = [v["ratio_cand_over_base"] for v in kernel1["macaulay_variants"]["S1024"].values()]
+    mac2 = [v["D1024"]["ratio"] for v in kernel2["mac"].values()]
+
+    audit = (REPO / SOURCES["rust_deep_audit"]).read_text()
+    for required in ("1.043 [1.028, 1.058]", "wall ns/GAE ratio 0.486", "342.9 →"):
+        if required not in audit:
+            raise SystemExit(f"Rust audit changed; reconcile missing fragment {required!r}")
+
+    transfer = load(SOURCES["transfer_negation_remeasure"])
+    transfer_total = sum(transfer["counts"].values())
+    transfer_unresolved = sum(v for k, v in transfer["counts"].items() if "unresolved" in k)
+
+    full_j = load(SOURCES["full_jacobian_ic"])
+    full_j_min_group = min(
+        arm["ratio_best_band"][0]
+        for row in full_j["rows"]
+        for name, arm in row["arms"].items()
+        if name in {"A", "B"}
+    )
+
+    groebner = load(SOURCES["groebner_free"])
+    paired_cells = [c for c in groebner["cells"] if c["floor"] is not None]
+    lin_over_floor = [c["floor"]["lin_over_floor_online"] for c in paired_cells]
+    n41 = next(c for c in groebner["cells"] if c["n"] == 41)
+    n59 = next(c for c in groebner["cells"] if c["n"] == 59)
+
+    build_steps = load(SOURCES["folded_build_steps"])
+    build_rows = []
+    for cell, rec in sorted(build_steps.items()):
+        med = {k: v["median"] for k, v in rec["per_pair_ns"].items()}
+        build_rows.append({"cell": cell, "whole_ns_per_pair": med["whole"],
+                           "stream_and_sort_ns_per_pair": med["stream_push"] + med["sort_fill"],
+                           "stream_and_sort_share": (med["stream_push"] + med["sort_fill"]) / med["whole"]})
+
+    layout = load(SOURCES["folded_filter_layout"])
+    layout_rows = [{"cell": cell, "top_over_low_build": rec["ab_build"],
+                    "rounds": rec["rounds"], "dropped": rec["dropped"],
+                    "identity_mismatches": rec["identity_mismatches"]}
+                   for cell, rec in sorted(layout.items()) if cell != "keep_top_default"]
+
+    return {
+        "as_of": "2026-11-14",
+        "ranking_effect": "none: no row of tables A-C changes",
+        "live_census": {"top_level_methods": top_level, "solver_backends": solver_count,
+                        "pdp3_engines": len(pdp3), "pkm_tower_engines": len(pkm),
+                        "nested_algorithms": solver_count + len(pdp3) + len(pkm),
+                        "pdp3_names": pdp3, "pkm_tower_names": pkm,
+                        "new_unbenchmarked_backends": [{
+                            "id": "primo-smt",
+                            "scope": "binary-field descent through descent-algebraic",
+                            "status": "correctness-qualified; no matched performance record",
+                            "prime_field_route": False,
+                            "source": SOURCES["primo_readme"],
+                        }]},
+        "fes_then_batched": {"ftb_over_inherited_f4_range": ftb_range,
+                             "distance_to_rho": ftb_rho, "validation": "validated arithmetic; no ranked row"},
+        "gpu_fes_e2e": {"rows": gpu_rows, "validation": "pcc:unverified; one pod; no independent replay"},
+        "gpu_components": {
+            "gray_over_old": {k: gray[k] for k in ("fes26", "fes30")},
+            "block_b6_over_gray": {k: block[k] for k in ("fes30", "fes32")},
+            "fes30_block_b6_over_old": gray["fes30"] * block["fes30"],
+            "macaulay_shared1024_over_old_range": [min(mac1), max(mac1)],
+            "macaulay_2d_over_shared1024_range": [min(mac2), max(mac2)],
+            "validation": "component-only; no end-to-end promotion",
+        },
+        "rust_diagnostics": {
+            "rho_lanes8": {"ops_ratio": 1.043, "ops_ci95": [1.028, 1.058],
+                           "e2e_wall_ratio": .761, "e2e_wall_ci95": [.735, .788]},
+            "rho_lanes32": {"ops_ratio": 1.149, "ops_ci95": [1.100, 1.200],
+                            "e2e_wall_ratio": .639, "e2e_wall_ci95": [.608, .670]},
+            "rootfind_prime_batch": {"ops_ratio": 1.0, "wall_ns_per_gae_ratio": .486,
+                                     "wall_ci95": [.468, .504],
+                                     "mean_solve_wall_ms": [342.9, 166.5]},
+            "validation": "pcc:unverified L0 diagnostics",
+        },
+        "transfer_remeasure": {"rows": transfer_total, "below": len(transfer["below_any"]),
+                               "above": transfer_total - transfer_unresolved,
+                               "unresolved_lower_bound": transfer_unresolved,
+                               "validation": "admitted follow-up validator; pcc:unverified"},
+        "full_jacobian": {"min_group_only_ratio": full_j_min_group,
+                          "per_arm": full_j["verdict"]["per_arm"],
+                          "verdict": full_j["verdict"]["verdict"],
+                          "validation": "pcc:unverified L0"},
+        "groebner_free": {"lin_over_pair_floor_range": [min(lin_over_floor), max(lin_over_floor)],
+                          "n41_memory_mb": {"linear": n41["lin_vm_hwm_kb"] / 1000,
+                                            "pair_floor": n41["floor"]["vm_hwm_kb"] / 1000},
+                          "n59_linear_memory_mb": n59["lin_vm_hwm_kb"] / 1000,
+                          "counted_slope_delta": groebner["counted_slopes"]["delta"],
+                          "counted_slope_delta_ci95": groebner["counted_slopes"]["delta_ci95"],
+                          "validation": "pcc:unverified stage diagnostic"},
+        "folded_pair_build": {"steps": build_rows, "layout": layout_rows,
+                              "keep_top_default": layout["keep_top_default"],
+                              "validation": "component A/B; no E2E claim"},
+        "prime_leads_chase": {"result": "prospective/inconclusive; no sub-sqrt prime result",
+                              "validation": "desk analysis only"},
+    }
+
+
 def _jsonl(rel: str) -> list[dict]:
     return [json.loads(x) for x in (REPO / rel).read_text().splitlines() if x.strip()]
 
@@ -1763,6 +2086,69 @@ def ghs_weak_n4v2() -> dict:
             "class": "improvement over the frozen N4 B0 (restricted to the GHS-weak family)",
             "baseline_arm": "B0", "headline_arm": "DL", "study": "research/quartic_n4v2_20261020/",
             "report": "research/quartic_n4v2_20261020/README.md"}
+
+
+GHS_CD_CHAIN_EVIDENCE = "research/quartic_dl1_cd_sqrt_20261113/combo/validation"
+
+
+def ghs_weak_cd_chain() -> dict:
+    """c_D = 1.7 with the fixed-exponent square-root chain against the frozen N4 v2 DL (c_D = 2.0), same instances,
+    k = 18..22 (research/quartic_dl1_cd_sqrt_20261113/combo). Ratios copied from analysis.json (geometric means over
+    seeds 1..3 of the per-seed cold M-eq ratio, frozen grid constants; additions priced at 0, 0.5 and 1 M-eq). Its
+    standing comes from combo/validation/VALIDATION.json."""
+    a = load(SOURCES["ghs_weak_cd_chain"])
+    errs = gate.check_evidence_dir(REPO / GHS_CD_CHAIN_EVIDENCE, REPO)
+    qs = (262111, 524287, 1048507, 2097091, 4194271)
+    rows = []
+    for y in ("DL", "DL1", "D"):
+        for q in qs:
+            r = {"arm": y, "q": q, "k": q.bit_length()}
+            for w in ("0.0", "0.5", "1.0"):
+                x = a["ratios"][f"B170/BASE/{y}/{q}/{w}"]
+                r[w] = {"geomean": x["geomean"], "max": x["max"], "all_below_1": x["all_below_1"]}
+            rows.append(r)
+    manifest = json.loads((REPO / GHS_CD_CHAIN_EVIDENCE / gate.MANIFEST).read_text()) if not errs else {}
+    band = manifest.get("rho_reference", {}).get("gae_band", {})
+    return {"rows": rows, "headline": a["headline_DL_robust_all_k"], "rho_band_k22": band,
+            "study": "research/quartic_dl1_cd_sqrt_20261113/",
+            "report": "research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf", "source": SOURCES["ghs_weak_cd_chain"],
+            "class": "component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family)",
+            "validation": (f"validated: replay certificate, validator report and the negation-map rho reference with the "
+                           f"§5a band ({GHS_CD_CHAIN_EVIDENCE}/VALIDATION.json)") if not errs else (
+                "not validated: " + "; ".join(errs)),
+            "validated": not errs}
+
+
+def ghs_cd_chain_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3}: c_D = 1.7 with a fixed-exponent square root against the frozen DL, outside tables A–C", "",
+         "Same instances as the N4 v2 section (k = 18..22, seeds 1–3): the double-large-prime factor base shrunk from "
+         "c_D = 2.0 to 1.7 and the per-pair square root computed by a fixed addition chain (same values). Cold M-eq of the "
+         "new configuration divided by the frozen DL on the same instance; geometric mean over seeds, with mod-ell and "
+         "F_q additions priced at 0 (the frozen model), 0.5 and 1 M-eq each. ✓ = below 1 at every seed. "
+         f"Class: {g['class']}. {g['validation']}.", "",
+         "| IC arm | k | additions 0 | 0.5 | 1 |", "|:--|--:|--:|--:|--:|"]
+    f = lambda x: f"{x['geomean']:.3f}" + (" ✓" if x["all_below_1"] else "")
+    for r in g["rows"]:
+        L.append(f"| {r['arm']} | {r['k']} | {f(r['0.0'])} | {f(r['0.5'])} | {f(r['1.0'])} |")
+    b = g["rho_band_k22"]
+    if b:
+        L += ["", "DL with both changes against the frozen negation-map rho at k = 22 (mean cold M-eq, §5a band): "
+              + ", ".join(f"w = {w}: {b[w]['ic'] / b[w]['rho']:.4f}" for w in ("0", "0.1", "1")) + "."]
+    L += ["", f"Study: [{g['study']}](../../{g['study']}); [report](../../{g['report']}); source `{g['source']}`. "
+          "Wall time is not claimed (local L0 runs; CPU diagnostic in the study).", ""]
+    return L
+
+
+def ghs_cd_chain_html(g: dict) -> str:
+    md = ghs_cd_chain_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| IC arm")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-cd-chain-20261114"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>: c<sub>D</sub> = 1.7 with a '
+            'fixed-exponent square root against the frozen DL</h2>' + body +
+            '<div class="scroll"><table><thead><tr><th>IC arm</th><th>k</th><th>additions 0</th><th>0.5</th>'
+            '<th>1</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_cd_chain"], "Analysis") + '</section>')
 
 
 def _ci(v, lo, hi, i):
@@ -2557,6 +2943,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "prime_ksum_component": prime_ksum_component(),
         "packed_filter_component": packed_filter_component(),
         "lazy_members_component": lazy_members_component(),
         "generator_orbit_component": generator_orbit_component(),
@@ -2567,10 +2954,13 @@ def build(allow_unvalidated: bool = False) -> dict:
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
+        "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "aimed_gather_component": aimed_gather_component(),
+        "mt_fieldops_component": mt_fieldops_component(),
+        "nov13_frontier_diagnostics": nov13_frontier_diagnostics(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
         "quartic_polynomial_component": quartic_polynomial_component(),
@@ -2582,6 +2972,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "pkm_symmetric_component": pkm_symmetric_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
         "ghs_weak_n4v2_component": ghs_weak_n4v2(),
+        "ghs_weak_cd_chain_component": ghs_weak_cd_chain(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -2966,6 +3357,21 @@ def markdown(doc: dict) -> str:
                  f"**{r['ratio']:.3f}** [{r['ratio_min']:.3f}, {r['ratio_max']:.3f}] | {band} | {before} |")
     L += ["", f"[Report]({'../../' + cw['report']}) · [study](../../{cw['study']}) · "
               f"[data](../../{cw['source']}).", "", cw["validation"], ""]
+    js = doc["jv_sieve_line_vs_rho_component"]
+    L += ["## Joux–Vitse cover sieve against a matched negation rho, weak class only (outside tables A–C)", "",
+          "Curves over F_{p^6} with full rational 2-torsion whose class has a genus-3 cover over F_{p^2} "
+          "(never prime order). Arms P (plain), H (Horner line search) and U (table line search), 8 instances per "
+          "prime, against a negation-map rho on the same instances in the same binary. Per-prime reference; "
+          f"`{js['unit']}`. The band is layer A: every unemitted cover F_p operation is also priced as native, the "
+          f"upper-bound convention. {js['walk_note']} Distance remaining is IC ÷ rho; "
+          "\"below\" means the 95% interval's upper end is under 1 at all three prices.", "",
+          "| arm | scope | IC ÷ rho, U2 [95%] | layer-A band (w = 0 / 0.1 / 1) | below rho across the band |",
+          "|:--|:--|:--|:--|:--|"]
+    for r in js["rows"]:
+        L.append(f"| {r['arm']} | {r['scope']} | **{r['s']:.4f}** [{r['lo']:.4f}, {r['hi']:.4f}] | "
+                 + " / ".join(f"{x:.3f}" for x in r["band"]) + f" | {'yes' if r['below'] else 'no'} |")
+    L += ["", f"[Report]({'../../' + js['report']}) · [study](../../{js['study']}) · "
+              f"[data](../../{js['source']}).", "", js["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -3018,7 +3424,8 @@ def markdown(doc: dict) -> str:
                 (f"2^{r['reference_log2_total_gae']:.2f} GAE" if "reference_log2_total_gae" in r else "—"),
                 g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
-                                                   if "ratio_rho_section23" in b else ""),
+                                                   if "ratio_rho_section23" in b else "")
+                + (f" (was {times(b['ratio_rho_rule_before'])}, {b['before_label']})" if "ratio_rho_rule_before" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
                 "✓" if b["verified"] else "✗", validation_cell(r["validation"])]
             L.append("| " + " | ".join(cells) + " |")
@@ -3320,6 +3727,32 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    L += ["## Prime-field k-sum tables against the tuned incumbent (2026-10-30, engineering)", "",
+          f"Track: {pk['track']}. Registered protocol; the incumbent and both k-sum families were tuned on separate "
+          "train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets × 2 rounds, every "
+          "arm in one session per size). `ksum5-sel` is the k = 5 sum table, `inc-sel` the tuned pair-table "
+          f"incumbent. {pk['unit']}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.", "",
+          "| bits | S holdout mean: inc-sel / ksum5-sel / rho-neg (w = 0) | ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum4-sel ÷ inc-sel (w = 0 / 0.1 / 1) | ksum5-sel ÷ rho-neg, distance remaining (w = 0 / 0.1 / 1) | pairs |",
+          "|--:|:--|:--|:--|:--|--:|"]
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        L.append(f"| {r['bits']} | {m['inc-sel'][0]:.2f} / {m['ksum5-sel'][0]:.2f} / {m['rho-neg'][0]:.2f} | "
+                 f"{pk_q(r['ksum5_over_inc'])} | {pk_q(r['ksum4_over_inc'])} | {pk_g(r['ksum5_over_rho'])} | "
+                 f"{r['ksum5_over_inc'][0]['pairs']} |")
+    L += ["", "The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that "
+          "index-calculus baseline. Rho stays ahead at every size and weight (`rho-neg` < `ksum5-sel` < `inc-sel` on "
+          "16 of 16 curves); the ÷ rho column is the distance remaining, not a gate. The method is generic, so its "
+          "limit is BSGS, and it stays above BSGS at every size.", "",
+          f"[Report]({'../../' + pk['report']}) · [README](../../{pk['readme']}) · [study](../../{pk['study']}).", "",
+          pk["validation"], ""]
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -3559,6 +3992,113 @@ def markdown(doc: dict) -> str:
           f"[{c4['paired_min']:.2f}, {c4['paired_max']:.2f}] across paired instances. "
           f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
           f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
+    mt = doc["mt_fieldops_component"]
+    L += ["## Multi-target IC against multi-target rho: the order flips with the hash price, outside tables A–C", "",
+          "Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^32, 33 fresh curves, 22 paired "
+          "configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, "
+          "1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point "
+          "canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four "
+          "ic5 variants (4-term x-only table, paired trials with one shared inversion; with or without retention and "
+          "random-walk offsets); the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, "
+          "10 runs per configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance "
+          "remaining. The IC is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a "
+          f"decision is unranked. Class: {mt['class']}. {mt['validation'].rstrip('.')}.", "",
+          "| bits | T | IC/rho h=0 | h=0.1 | h=1 | §5a | IC/BSGS h=0 | h=1 |",
+          "|--:|--:|--:|--:|--:|:--|--:|--:|"]
+    for r in mt["rows"]:
+        f = lambda v: f"{v['median']:.3f} [{v['ci95'][0]:.3f}, {v['ci95'][1]:.3f}]"
+        L.append(f"| {r['bits']} | {r['T']} | {f(r['rho']['0'])} | {f(r['rho']['0.1'])} | {f(r['rho']['1'])} | "
+                 f"{r['verdict']} | {r['bsgs']['0']['median']:.2f} | {r['bsgs']['1']['median']:.2f} |")
+    L += ["", f"Study: [{mt['study']}](../../{mt['study']}); [report](../../{mt['report']}); source `{mt['source']}`. "
+          f"v4, without native work priced: [{mt['v4']}](../../{mt['v4']}). "
+          f"Earlier rows were measured against a rho without retention: IC5 (v3, [{mt['previous']}](../../{mt['previous']}); "
+          f"its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [{mt['correction']}](../../{mt['correction']})).", ""]
+    d13 = doc["nov13_frontier_diagnostics"]
+    census = d13["live_census"]
+    ftb = d13["fes_then_batched"]
+    gpu = d13["gpu_fes_e2e"]
+    gcomp = d13["gpu_components"]
+    rust = d13["rust_diagnostics"]
+    transfer = d13["transfer_remeasure"]
+    fullj = d13["full_jacobian"]
+    groebner = d13["groebner_free"]
+    folded = d13["folded_pair_build"]
+    L += ["## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)", "",
+          f"The live source tree now exposes **{census['top_level_methods']} top-level ECBench methods** and "
+          f"**{census['nested_algorithms']} nested algorithms** ({census['solver_backends']} system-solver backends, "
+          f"{census['pdp3_engines']} PDP3 engines and {census['pkm_tower_engines']} PKM-tower engines). This is a live "
+          "source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. "
+          "The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.", "",
+          "### Solver and GPU diagnostics", "",
+          "The newly registered `primo-smt` backend is correctness-qualified for binary-field `descent-algebraic` "
+          "systems and returns one independently checked Boolean model. It has no matched performance record and "
+          "no prime-field route, so it changes the implementation census but not the measured frontier. "
+          f"[Integration boundary](../../{SOURCES['primo_readme']}).", "",
+          f"The validated `fes-then-batched` composition costs {ftb['ftb_over_inherited_f4_range'][0]:.3f}–"
+          f"{ftb['ftb_over_inherited_f4_range'][1]:.3f}× inherited F4 at the calibration points, but remains "
+          f"{min(x['ratio'] for x in ftb['distance_to_rho']):.2f}–"
+          f"{max(x['ratio'] for x in ftb['distance_to_rho']):.2f}× matched rho. Across the §5a band its strict order "
+          "against inherited F4 is unresolved, so this is a solver-local result, not a frontier promotion. "
+          f"[Study](../../{SOURCES['fes_then_batched_readme']}).", "",
+          "The GPU FES end-to-end probe is one-pod, `[pcc:unverified]`, with no independent replay. Wall time improves "
+          "sharply while counted work becomes worse, so the wall column cannot substitute for the ranked cost column:", "",
+          "| instance | GPU FES counted / inherited F4 | inherited-F4 wall / GPU wall | CPU-FES wall / GPU wall | inherited F4 / rho | GPU FES / rho |",
+          "|:--|--:|--:|--:|--:|--:|"]
+    for r in gpu["rows"]:
+        cpu = "—" if r["cpu_fes_over_gpu_wall"] is None else f"{r['cpu_fes_over_gpu_wall']:.1f}×"
+        L.append(f"| {r['instance']} | {r['gpu_over_inherited_counted']:.1f}× | "
+                 f"{r['inherited_over_gpu_wall']:.1f}× | {cpu} | {r['inherited_over_rho']:.0f}× | "
+                 f"{r['gpu_over_rho']:.0f}× |")
+    L += ["", f"At kernel scope, Gray-code FES is {1/gcomp['gray_over_old']['fes26']:.1f}× (n=26) and "
+          f"{1/gcomp['gray_over_old']['fes30']:.1f}× (n=30) faster than the old kernel; block-six then adds "
+          f"{1/gcomp['block_b6_over_gray']['fes30']:.2f}× at n=30 and {1/gcomp['block_b6_over_gray']['fes32']:.2f}× "
+          f"at n=32 (about {1/gcomp['fes30_block_b6_over_old']:.0f}× cumulative at n=30). Shared-1024 Macaulay "
+          f"is {1/max(gcomp['macaulay_shared1024_over_old_range']):.2f}–"
+          f"{1/min(gcomp['macaulay_shared1024_over_old_range']):.2f}× faster than the old global kernel; the later 2-D "
+          f"change adds only {1/max(gcomp['macaulay_2d_over_shared1024_range']):.2f}–"
+          f"{1/min(gcomp['macaulay_2d_over_shared1024_range']):.2f}×. These are component results only. "
+          f"[GPU E2E report](../../{SOURCES['gpu_fes_e2e_report']}).", "",
+          "### Rho, root finding, transfer and whole-Jacobian probes", "",
+          f"The unverified L0 rho lane diagnostic trades more counted operations for lower wall time: lanes=8 is "
+          f"{rust['rho_lanes8']['ops_ratio']:.3f}× operations and {rust['rho_lanes8']['e2e_wall_ratio']:.3f}× E2E "
+          f"wall; lanes=32 is {rust['rho_lanes32']['ops_ratio']:.3f}× operations and "
+          f"{rust['rho_lanes32']['e2e_wall_ratio']:.3f}× wall. The §5a ranking still selects base negation rho. "
+          f"Prime batched root finding preserves counted S exactly and changes wall ns/GAE by "
+          f"{rust['rootfind_prime_batch']['wall_ns_per_gae_ratio']:.3f}× "
+          f"[{rust['rootfind_prime_batch']['wall_ci95'][0]:.3f}, {rust['rootfind_prime_batch']['wall_ci95'][1]:.3f}]. "
+          f"[Audit](../../{SOURCES['rust_deep_audit']}).", "",
+          f"The admitted transfer remeasurement has **0/{transfer['rows']} below rho**, "
+          f"{transfer['above']} above and {transfer['unresolved_lower_bound']} unresolved lower-bound rows. The whole-"
+          f"Jacobian L0 probe is above the calibrated band in 7/7 cells for both arms and has a minimum group-only "
+          f"ratio of {fullj['min_group_only_ratio']:.1f}×, but remains unresolved because the frozen slope rule fails "
+          f"(A slope {fullj['per_arm']['A']['ratio_slope_w0.1']:.3f}, CI lower "
+          f"{fullj['per_arm']['A']['ratio_slope_ci95_lower']:.3f}; B slope "
+          f"{fullj['per_arm']['B']['ratio_slope_w0.1']:.3f}, CI lower "
+          f"{fullj['per_arm']['B']['ratio_slope_ci95_lower']:.3f}).", "",
+          "### Current construction bottlenecks", "",
+          f"The table-free `lin21-ht` collector uses {groebner['n41_memory_mb']['linear']:.1f} MB at n=41 versus "
+          f"{groebner['n41_memory_mb']['pair_floor']:.1f} MB for the pair-table floor, and reaches n=59 at "
+          f"{groebner['n59_linear_memory_mb']:.1f} MB. Its online count is still "
+          f"{groebner['lin_over_pair_floor_range'][0]:.2f}–{groebner['lin_over_pair_floor_range'][1]:.2f}× the floor; "
+          f"the counted slope delta {groebner['counted_slope_delta']:.4f} has CI "
+          f"[{groebner['counted_slope_delta_ci95'][0]:.4f}, {groebner['counted_slope_delta_ci95'][1]:.4f}], crossing zero. "
+          "This removes a memory barrier, not the work barrier.", ""]
+    for s in folded["steps"]:
+        L.append(f"- `{s['cell']}` folded-pair construction: {s['whole_ns_per_pair']:.2f} ns/pair; streaming plus "
+                 f"sort/fill is {s['stream_and_sort_ns_per_pair']:.2f} ns/pair "
+                 f"({100*s['stream_and_sort_share']:.1f}% of the whole).")
+    L += ["", "The current Top filter layout is identity-equivalent in these A/B rounds but slower to build than the "
+          "frozen Low layout:", "",
+          "| cell | Top / Low build [95%] | rounds | dropped | identity mismatches |",
+          "|:--|--:|--:|--:|--:|"]
+    for r in folded["layout"]:
+        q = r["top_over_low_build"]
+        L.append(f"| {r['cell']} | {q['median']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}] | "
+                 f"{r['rounds']} | {r['dropped']} | {r['identity_mismatches']} |")
+    L += ["", "The old ECBench IDs therefore remain frozen on Low while the explicit `_v2` IDs name Top; this "
+          "prevents a silent benchmark mutation. The prime-leads chase remains prospective/inconclusive and has no "
+          "sub-square-root prime result. All entries in this reconciliation are diagnostic unless separately marked "
+          "admitted above.", ""]
     pk = doc["pkm_symmetric_component"]
     L += ["## Symmetric PKM tower, F4 stage at m = 4, outside tables A–C", "",
           f"Writing the Kummer membership and S₅ in the elementary symmetric functions before expansion "
@@ -3654,6 +4194,7 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['a']} | {r['n']} | {r['d']} | {r['cofactor']} | {r['targets']} | {r['mean_ic_trials']:,.0f} | "
                  f"{r['mean_ic_s']:.4g} | {r['mean_rho_s']:.3g} | {r['ic_over_rho_wall']:,.0f} |")
     L += ghs2_md(doc["ghs_weak_n4v2_component"])
+    L += ghs_cd_chain_md(doc["ghs_weak_cd_chain_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -4369,6 +4910,22 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table></div>'
              f'<p>{gh(cw["report"], "Report")} · {gh(cw["study"], "study")} · {gh(cw["source"], "data")}.</p>'
              f'<p class="muted">{esc(cw["validation"])}</p></section>')
+    js = doc["jv_sieve_line_vs_rho_component"]
+    P.append('<section class="panel" id="jv-sieve-line-vs-rho"><h2>Joux–Vitse cover sieve vs matched negation rho '
+             '<span class="chip">weak class only</span></h2>'
+             '<p>Curves over F<sub>p⁶</sub> with full rational 2-torsion whose class has a genus-3 cover over '
+             'F<sub>p²</sub> (never prime order). Arms P, H and U, 8 instances per prime, against a negation-map rho '
+             f'on the same instances in the same binary. Per-prime reference; {esc(js["unit"])}. Layer-A band: every '
+             f'unemitted cover F<sub>p</sub> operation is also priced as native. {esc(js["walk_note"])}</p><div class="scroll"><table><thead><tr><th>arm</th><th>scope</th>'
+             '<th>IC ÷ rho, U2 [95%]</th><th>layer-A band (w = 0 / 0.1 / 1)</th><th>below across band</th>'
+             '</tr></thead><tbody>')
+    for r in js["rows"]:
+        P.append(f'<tr><td>{r["arm"]}</td><td>{esc(r["scope"])}</td><td><b>{r["s"]:.4f}</b> '
+                 f'[{r["lo"]:.4f}, {r["hi"]:.4f}]</td><td>' + " / ".join(f"{x:.3f}" for x in r["band"])
+                 + f'</td><td>{"yes" if r["below"] else "no"}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(js["report"], "Report")} · {gh(js["study"], "study")} · {gh(js["source"], "data")}.</p>'
+             f'<p class="muted">{esc(js["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
@@ -4637,6 +5194,37 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    pk = doc["prime_ksum_component"]
+
+    def pk_q(qs):
+        return " / ".join(f"{q['ratio']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]" for q in qs)
+
+    def pk_g(qs):
+        return " / ".join(f"{q['ratio']:.2f}" for q in qs)
+
+    P.append('<section class="card" id="prime-ksum"><h2>Prime-field k-sum tables against the tuned incumbent '
+             '(2026-10-30) <span class="chip">engineering</span></h2>'
+             f'<p>Track: {esc(pk["track"])}. Registered protocol; the incumbent and both k-sum families were tuned '
+             'on separate train curves by one rule and decided on 16 fresh holdout curves (4 per size, 24 targets '
+             '× 2 rounds, every arm in one session per size). <code>ksum5-sel</code> is the k = 5 sum table, '
+             '<code>inc-sel</code> the tuned pair-table incumbent. '
+             f'{esc(pk["unit"])}. Ratios are paired Σ B ÷ Σ A with cluster-bootstrap 95% intervals.</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th><th>S holdout mean: inc-sel / ksum5-sel / '
+             'rho-neg (w = 0)</th><th>ksum5-sel ÷ inc-sel (w = 0 / 0.1 / 1)</th><th>ksum4-sel ÷ inc-sel</th>'
+             '<th>ksum5-sel ÷ rho-neg: distance remaining</th><th class="n">Pairs</th></tr></thead><tbody>')
+    for r in pk["rows"]:
+        m = r["mean_s"]
+        P.append(f'<tr><td class="n">{r["bits"]}</td><td>{m["inc-sel"][0]:.2f} / {m["ksum5-sel"][0]:.2f} / '
+                 f'{m["rho-neg"][0]:.2f}</td><td>{pk_q(r["ksum5_over_inc"])}</td><td>{pk_q(r["ksum4_over_inc"])}</td>'
+                 f'<td>{pk_g(r["ksum5_over_rho"])}</td><td class="n">{r["ksum5_over_inc"][0]["pairs"]}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>The k-sum arms are below the tuned incumbent at every size and weight, an improvement over that '
+             'index-calculus baseline. Rho stays ahead at every size and weight (<code>rho-neg</code> &lt; '
+             '<code>ksum5-sel</code> &lt; <code>inc-sel</code> on 16 of 16 curves); the ÷ rho column is the distance '
+             'remaining, not a gate. The method is generic, so its limit is BSGS, and it stays above BSGS at every '
+             'size.</p>'
+             f'<p>{gh(pk["report"], "Report")} · {gh(pk["readme"], "README")} · {gh(pk["study"], "study")}.</p>'
+             f'<p class="muted">{esc(pk["validation"])}</p></section>')
     pf = doc["packed_filter_component"]
     pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
     pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
@@ -4897,6 +5485,96 @@ def page(doc: dict, standalone: bool) -> str:
              f'{c4["paired_max"]:.2f}]. This is a solver-stage change; no full-pipeline row or curve verdict '
              f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
+    mt = doc["mt_fieldops_component"]
+    P.append('<section class="card" id="mt-fieldops-component"><h2>Multi-target IC against multi-target rho: the order flips with the hash price, outside the priced tables</h2>'
+             '<p>Many targets on one prime-order Weierstrass curve (group orders about 2<sup>24</sup> to 2<sup>32</sup>, 33 fresh curves, 22 paired '
+             'configurations per cell), every operation counted in one field layer and priced at I = 10M, S = M, '
+             '1 GAE = I + 2M + S, with hash-table, solver and native operations (rho step-index hashes, distinguished-point '
+             'canonicalisations, IC offset-step indices) at h = 0, 0.1 and 1 GAE each (§5a). The IC is the cheapest of four ic5 '
+             'variants; the reference is the cheapest of Kuhn-Struik retention rho and distinguished-point rho, 10 runs per '
+             'configuration. IC / rho and IC / BSGS per target, median [95% bootstrap]; both are the distance remaining. The IC '
+             'is dearer at h = 0, about tied at h = 0.1 and cheaper at h = 1 in every cell, so every §5a decision is unranked. '
+             f'Class: {esc(mt["class"])}. {esc(mt["validation"].rstrip("."))}.</p>'
+             '<table><thead><tr><th class="n">bits</th><th class="n">T</th><th>IC/rho h=0</th><th>h=0.1</th><th>h=1</th>'
+             '<th>§5a</th><th class="n">IC/BSGS h=0</th><th class="n">h=1</th></tr></thead><tbody>'
+             + "".join(f'<tr><td class="n">{r["bits"]}</td><td class="n">{r["T"]}</td>'
+                       + "".join(f'<td>{r["rho"][h]["median"]:.3f} <span class="muted">[{r["rho"][h]["ci95"][0]:.3f}, '
+                                 f'{r["rho"][h]["ci95"][1]:.3f}]</span></td>' for h in ("0", "0.1", "1"))
+                       + f'<td>{esc(r["verdict"])}</td><td class="n">{r["bsgs"]["0"]["median"]:.2f}</td>'
+                       f'<td class="n">{r["bsgs"]["1"]["median"]:.2f}</td></tr>' for r in mt["rows"])
+             + f'</tbody></table><p><a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["study"])}">Study</a>; '
+             f'v4 without native work priced: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["v4"])}">v4</a>; '
+             f'earlier rows against a rho without retention: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["previous"])}">IC5 (v3)</a>, '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">IC4 (v2)</a>.</p></section>')
+    d13 = doc["nov13_frontier_diagnostics"]
+    census, ftb = d13["live_census"], d13["fes_then_batched"]
+    gpu, gcomp = d13["gpu_fes_e2e"], d13["gpu_components"]
+    rust, transfer = d13["rust_diagnostics"], d13["transfer_remeasure"]
+    fullj, groebner, folded = d13["full_jacobian"], d13["groebner_free"], d13["folded_pair_build"]
+    P.append('<section class="card" id="nov13-frontier"><h2>14 November live-source frontier reconciliation</h2>'
+             f'<p><strong>Diagnostic; no ranked-row change.</strong> The live source tree exposes '
+             f'{census["top_level_methods"]} top-level ECBench methods and {census["nested_algorithms"]} nested '
+             f'algorithms ({census["solver_backends"]} solver backends, {census["pdp3_engines"]} PDP3 engines and '
+             f'{census["pkm_tower_engines"]} PKM-tower engines). This does not rewrite the frozen historical '
+             'campaign censuses.</p>'
+             f'<p>The newly registered <code>primo-smt</code> backend is correctness-qualified for binary-field '
+             f'<code>descent-algebraic</code> systems, but has no matched performance record and no prime-field route. '
+             f'It changes the census, not the measured frontier. <a href="https://github.com/aburan28/crypto/blob/main/'
+             f'{esc(SOURCES["primo_readme"])}">Integration boundary</a>.</p>'
+             f'<p>Validated <code>fes-then-batched</code> costs '
+             f'{ftb["ftb_over_inherited_f4_range"][0]:.3f}–{ftb["ftb_over_inherited_f4_range"][1]:.3f}× inherited '
+             f'F4 at the calibration points, but remains '
+             f'{min(x["ratio"] for x in ftb["distance_to_rho"]):.2f}–'
+             f'{max(x["ratio"] for x in ftb["distance_to_rho"]):.2f}× matched rho. Its strict §5a order against '
+             'inherited F4 is unresolved.</p>'
+             '<h3>GPU FES end-to-end probe</h3><p>One pod, <code>[pcc:unverified]</code>, no independent replay. '
+             'Wall improves while counted work worsens.</p><table><thead><tr><th>instance</th>'
+             '<th>GPU counted / F4</th><th>F4 wall / GPU</th><th>CPU FES wall / GPU</th>'
+             '<th>F4 / rho</th><th>GPU / rho</th></tr></thead><tbody>')
+    for r in gpu["rows"]:
+        cpu = "—" if r["cpu_fes_over_gpu_wall"] is None else f'{r["cpu_fes_over_gpu_wall"]:.1f}×'
+        P.append(f'<tr><td>{esc(r["instance"])}</td><td>{r["gpu_over_inherited_counted"]:.1f}×</td>'
+                 f'<td>{r["inherited_over_gpu_wall"]:.1f}×</td><td>{cpu}</td>'
+                 f'<td>{r["inherited_over_rho"]:.0f}×</td><td>{r["gpu_over_rho"]:.0f}×</td></tr>')
+    P.append('</tbody></table>'
+             f'<p>Kernel scope: Gray-code FES is {1/gcomp["gray_over_old"]["fes26"]:.1f}× at n=26 and '
+             f'{1/gcomp["gray_over_old"]["fes30"]:.1f}× at n=30; block-six adds '
+             f'{1/gcomp["block_b6_over_gray"]["fes30"]:.2f}× at n=30 and '
+             f'{1/gcomp["block_b6_over_gray"]["fes32"]:.2f}× at n=32 (about '
+             f'{1/gcomp["fes30_block_b6_over_old"]:.0f}× cumulative at n=30). Component-only.</p>'
+             '<h3>Rho, root finding, transfer and whole-Jacobian probes</h3>'
+             f'<p>Lanes=8 uses {rust["rho_lanes8"]["ops_ratio"]:.3f}× operations at '
+             f'{rust["rho_lanes8"]["e2e_wall_ratio"]:.3f}× E2E wall; lanes=32 uses '
+             f'{rust["rho_lanes32"]["ops_ratio"]:.3f}× operations at '
+             f'{rust["rho_lanes32"]["e2e_wall_ratio"]:.3f}× wall. Base negation rho still wins the §5a ranking. '
+             f'Prime batched root finding preserves S and measures '
+             f'{rust["rootfind_prime_batch"]["wall_ns_per_gae_ratio"]:.3f}× wall ns/GAE '
+             f'[{rust["rootfind_prime_batch"]["wall_ci95"][0]:.3f}, '
+             f'{rust["rootfind_prime_batch"]["wall_ci95"][1]:.3f}]. These are unverified L0 diagnostics.</p>'
+             f'<p>The admitted transfer remeasurement has <strong>0/{transfer["rows"]} below rho</strong>: '
+             f'{transfer["above"]} above and {transfer["unresolved_lower_bound"]} unresolved lower bounds. The '
+             f'whole-Jacobian L0 probe is above the calibrated band in 7/7 cells for both arms and bottoms at '
+             f'{fullj["min_group_only_ratio"]:.1f}× group-only, but its frozen slope rule fails, so it remains unresolved.</p>'
+             '<h3>Construction bottlenecks</h3>'
+             f'<p>Table-free <code>lin21-ht</code> uses {groebner["n41_memory_mb"]["linear"]:.1f} MB at n=41 '
+             f'versus {groebner["n41_memory_mb"]["pair_floor"]:.1f} MB for the pair floor and reaches n=59 at '
+             f'{groebner["n59_linear_memory_mb"]:.1f} MB. Its online count remains '
+             f'{groebner["lin_over_pair_floor_range"][0]:.2f}–{groebner["lin_over_pair_floor_range"][1]:.2f}× the '
+             'floor: a memory improvement, not a work-frontier change.</p><ul>')
+    for s in folded["steps"]:
+        P.append(f'<li><code>{esc(s["cell"])}</code>: {s["whole_ns_per_pair"]:.2f} ns/pair; streaming plus '
+                 f'sort/fill is {s["stream_and_sort_ns_per_pair"]:.2f} ns/pair '
+                 f'({100*s["stream_and_sort_share"]:.1f}%).</li>')
+    P.append('</ul><table><thead><tr><th>cell</th><th>Top / Low build [95%]</th><th>rounds</th>'
+             '<th>dropped</th><th>identity mismatches</th></tr></thead><tbody>')
+    for r in folded["layout"]:
+        q = r["top_over_low_build"]
+        P.append(f'<tr><td><code>{esc(r["cell"])}</code></td><td>{q["median"]:.3f} '
+                 f'[{q["ci95"][0]:.3f}, {q["ci95"][1]:.3f}]</td><td>{r["rounds"]}</td>'
+                 f'<td>{r["dropped"]}</td><td>{r["identity_mismatches"]}</td></tr>')
+    P.append('</tbody></table><p>The old ECBench IDs remain frozen on Low; explicit <code>_v2</code> IDs name Top, '
+             'preventing a silent benchmark mutation. The prime-leads chase is prospective/inconclusive and has no '
+             'sub-square-root prime result.</p></section>')
     pk = doc["pkm_symmetric_component"]
     P.append('<section class="card" id="pkm-symmetric-component"><h2>Symmetric PKM tower, F4 stage at m = 4, outside the priced tables</h2>'
              f'<p>Writing the Kummer membership and S<sub>5</sub> in the elementary symmetric functions before expansion '
@@ -4940,6 +5618,9 @@ def page(doc: dict, standalone: bool) -> str:
             if "ratio_rho_section23" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section23"])} cold, '
                        f'{g3(b["online_speedup_section23"])}× online-only ratio (§23, at v0)</span>')
+            if "ratio_rho_rule_before" in b:
+                ci += (f'<br><span class="muted">was {times(b["ratio_rho_rule_before"])} cold, '
+                       f'{g3(b["online_speedup_rule_before"])}× online-only ratio ({b["before_label"]})</span>')
             if "ratio_rho_section21" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
@@ -5000,8 +5681,8 @@ def page(doc: dict, standalone: bool) -> str:
              'and floors, stated at the head of each; S, × ref and × floor are comparable inside a table and '
              'nowhere else. Tables A and B solve one target per row, as AGENTS.md\'s one-target rule requires: '
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
-             're-run at the ic tool programme\'s baseline v7, 64 points per size, §23\'s figures kept as the '
-             'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
+             're-run at main as rule v9 against a matched rho, 64 points per size, rule v7\'s figures, against rho as '
+             'then, kept as the before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
              'diagnostic. For the Koblitz rows of A the archived online-only ratio, the reading with rho at the canonical '
              'step and the generic-precomputation model sit beside the cold ratio as phase diagnostics; '
              'there is no equal-advice online speedup claim. The bar '
@@ -5318,6 +5999,7 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["ic_over_rho_wall"]:,.0f}</td></tr>')
     P.append('</tbody></table>' + gh(al["study"], 'Study, report, raw records and validation') + '</section>')
     P.append(ghs2_html(doc["ghs_weak_n4v2_component"]))
+    P.append(ghs_cd_chain_html(doc["ghs_weak_cd_chain_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

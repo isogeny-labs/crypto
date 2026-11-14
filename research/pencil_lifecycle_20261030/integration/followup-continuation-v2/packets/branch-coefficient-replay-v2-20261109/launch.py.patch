@@ -1,0 +1,20 @@
+--- failed/launch.py
++++ successor/launch.py
+@@ -3,7 +3,7 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-branch-coefficient-20261109')
++W=Path('/home/ec2-user/pencil-native-branch-coefficient-v2-20261109')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1794287499
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+@@ -149,7 +149,7 @@
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=3600,'insufficient remaining phase allowance'
+-  unit='pencil-branch-coefficient-20261109-'+phase
++  unit='pencil-branch-coefficient-v2-20261109-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',

@@ -237,6 +237,8 @@ fn certify(curve: PrimeCurve, p: GapParams, level: GapLevel) -> Option<PrimeInst
         r: p.n,
         cofactor: 1,
         generator: (pt.x, pt.y),
+
+        representation: None,
     };
     inst.name = inst.curve_id().slug;
     Some(inst)

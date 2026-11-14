@@ -1,0 +1,31 @@
+{
+  "schema": "native-log.archival-readback/v1",
+  "source_sha256": "9bf9b24a6d0105060dbcb499350665cf229af1f3b20c48c1724e58ccb5952d21",
+  "recorded_passed": true,
+  "stdout_equals_result": true,
+  "worker_invocation_join": true,
+  "actual_log_files": [
+    {
+      "path": "unit.stdout",
+      "bytes": 27,
+      "sha256": "135dda7e44a1f69a1240a98749c88d33f2016fa48ca74b318e7263f54afa5d82",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0o600"
+    },
+    {
+      "path": "unit.stderr",
+      "bytes": 27,
+      "sha256": "28854c30b3d9272bf01b7ed5a63f714ba24cd3e60bd35d55381e5b2c64737a91",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0o600"
+    }
+  ],
+  "prefixes_remain_sealed_false": true,
+  "current_cgroup_absent": true,
+  "owned_cleanup_recorded": true,
+  "no_fixture_rerun": true,
+  "independent_systemd_journal_readback": false,
+  "scope": "File bytes/metadata and rawreceipt consistency; fixture itself records native ownership/cleanup checks."
+}

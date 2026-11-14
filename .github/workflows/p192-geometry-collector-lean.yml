@@ -27,6 +27,7 @@ jobs:
           # unpack the Lean toolchain; the package needs only its own directory.
           sparse-checkout: |
             research/p192_extension_cover_20261012/lean
+            research/p192_extension_cover_20261012/reports/run-20261024
             tools/artifacts
             .artifacts
       - name: Pull store data this workflow reads (tools/artifacts)
@@ -167,4 +168,10 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/screen_cross_cubic_anchor.py
           python3 -B research/p192_extension_cover_20261012/verify_cross_cubic_anchor_degree_eight.py
           python3 -B research/p192_extension_cover_20261012/analyze_cross_cubic_anchor_combined_rows.py
-          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256
+      # The manifest pins this workflow and REPORT.md at their 2026-10-24 bytes;
+      # the replay's isolated view restores both (.github/CI.md, Frozen workflow pins).
+      - name: Check the frozen anchor-eight manifest in its replay view
+        env:
+          FROZEN_VIEW_STEP: |
+            sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only p192_anchor_eight_20261024 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

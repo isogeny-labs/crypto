@@ -1,0 +1,86 @@
+{
+  "schema": "fall_degree_e14_score/v1",
+  "amendment": 19,
+  "pod": {
+    "provider": "RunPod",
+    "id": "oubpztzdbbbo4s",
+    "cpu": "AMD EPYC 7702P",
+    "vcpu": 64,
+    "mem_kib": 527951232,
+    "cost_per_hr_usd": 2.56,
+    "job_start": "2026-11-09T05:07:22Z",
+    "gates_passed": "2026-11-09T05:43:39Z",
+    "last_upload": "2026-11-09T10:17:27Z",
+    "terminated": "between 2026-11-09T10:17:27Z and 10:27:27Z (next 10-min upload missing); pod 404 at 13:07:49Z; account balance -0.04 USD",
+    "termination_cause": "provider termination at zero account balance (inferred from balance and 404; no provider event log read)",
+    "binary_sha256": "f902edfdb4166d6e956a11396c4cf0b1c7b5606c5ffc2ab559a5a8b96c321a99",
+    "last_out_tgz_sha256": "0f8603c6d51b303b885d3b34ec183198dae33bd29c1b1227f2e3b0c93c751965"
+  },
+  "gates": {
+    "G0": "7 passed, 0 failed",
+    "G1": "pe m3-22-8 draw 0 equals S3.d0.b4.jsonl (empty diff)"
+  },
+  "E14b": {
+    "draws": [
+      {
+        "cell": "6-10-3",
+        "draw": 1,
+        "status": "not completed",
+        "ran_s_at_least": 16428,
+        "note": "started 05:43:39Z, no output by last upload 10:17:27Z; hky_par reference d_F=4 in 190.4 s"
+      },
+      {
+        "cell": "6-10-3",
+        "draw": 3,
+        "status": "not started"
+      },
+      {
+        "cell": "6-10-3",
+        "draw": 4,
+        "status": "not started"
+      }
+    ],
+    "reading": "not completed",
+    "prediction": {
+      "controls confirmed": 0.85
+    },
+    "prediction_outcome": "failed"
+  },
+  "E14a": {
+    "draws": [
+      {
+        "draw": 0,
+        "status": "not started"
+      },
+      {
+        "draw": 1,
+        "status": "not started"
+      },
+      {
+        "draw": 3,
+        "status": "not started"
+      },
+      {
+        "draw": 4,
+        "status": "not started"
+      }
+    ],
+    "measured": 0,
+    "reading": "not completed",
+    "prediction": {
+      "d_F = 5": 0.55,
+      "d_F >= 6": 0.3,
+      "not completed": 0.15
+    },
+    "prediction_outcome": "'not completed' (p=0.15) occurred"
+  },
+  "E14c": {
+    "status": "not started",
+    "reading": "no reading",
+    "prediction": {
+      "no reading": 0.75
+    },
+    "prediction_outcome": "occurred"
+  },
+  "combined_statement": "not made (E14b not completed); E13b reading stays 'disagreement'"
+}

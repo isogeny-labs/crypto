@@ -1,0 +1,41 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "../../research/ecbench_rho_v5_20261107/validation/replay-certificate.json",
+  "sha256": "169aecfed181f952e2d4414fdf1f8849639b6786384aa67dd14097f95fe358ef"
+ },
+ "validator_report": {
+  "path": "../../research/ecbench_rho_v5_20261107/validation/validator-report.json",
+  "sha256": "eae64f1d4407d152114767e6cde8ca25a6c89f0ac503731f8ce301422573fca3"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "rho row: rho.negation_v5 against rho.negation_v3 (A = 2) on the prime ladder, same curves, targets and seeds, interleaved; the Koblitz session of the same study is covered by the same validator report and replay certificate",
+  "unit": "ecbench.gae (counted group-addition equivalents), S = GAE / sqrt(r)",
+  "binary_or_process": "ecbench binary sha256 9fde9d8babe202901c390d3d4b3d77df65e4f44776294f8f3422b74a088549cf, session ECBS1h288d047c6183",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 0.9874787988618188,
+    "rho": 1.0161838267548609
+   },
+   "0.1": {
+    "ic": 1.0885231314202999,
+    "rho": 1.1153703960397179
+   },
+   "1": {
+    "ic": 1.9979221244466305,
+    "rho": 2.0080495196034316
+   }
+  },
+  "order_holds_across_band": true,
+  "arms": {
+   "ic": "candidate",
+   "rho": "incumbent"
+  }
+ },
+ "note": "Local L0 container session; GAE is deterministic and replayed. 'ic' is the candidate arm, 'rho' the reference arm named in arms. Band values: run-weighted means of ecbench band mean_s."
+}

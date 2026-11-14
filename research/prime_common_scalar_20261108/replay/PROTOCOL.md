@@ -79,3 +79,25 @@ Planned raw paths: runs/0/panel.tsv, runs/0/stderr.log, runs/1/panel.tsv,
 runs/1/stderr.log; metadata and export beside runs, not invented physical rows.
 Verdicts: exact_pass, invalid, incomplete, not_run. No measured benchmark row,
 leaderboard promotion, asymptotic exponent or novelty claim.
+
+## Version2 — checkpoint transport amendment, before data
+
+The owner authorized committed/pushed GitHub checkpoints in place of the
+unavailable S3 gate on November9,2026. protocol-v1.json preserves the exact
+original freeze. Version2 changes checkpoint admission/transport only; checker,
+analyzer, fixture census, precision formula, controls, interpretation and
+resource/stopping criteria remain unchanged. Authorization scope is recorded
+in checkpoint-authorization.json without publishing conversation transcripts.
+
+Before execution, validate canonical protocol hash, source/binary pins, a clean
+committed source and its presence at git origin. Commit/push a run-start marker
+before launching each physical process and its raw outcome afterwards. A
+started/interrupted directory cannot be overwritten or retried. Checkpoint
+failures stop admission; no S3 upload success is asserted. Metadata formatting
+uses native jq, SHA256 tools and the existing native JSON-schema validator;
+its canonical hashing is checked against the preserved v1 freeze. The existing
+Rust metadata utility deliberately disallows amended freeze, so v2's reviewed
+metadata amendment is filed explicitly using those native primitives.
+
+Recount verification is separately capped at1CPU,2GiB,60s; it does not invoke
+the census or add a third experimental process. No clock is a primary metric.

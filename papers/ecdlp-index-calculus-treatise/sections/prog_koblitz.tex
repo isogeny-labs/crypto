@@ -410,6 +410,8 @@ v6 & & $3.78$--$12.06\times$ & rho reference $0.57$--$0.85$ of strong walk$^{a}$
 v7 & & $3.43$--$11.51\times$ & rho reference $0.57$--$0.85$ of strong walk$^{a}$ \\
 v8 & 19 October & $4.67$ $[4.34,5.07]$ to $18.07$ $[15.98,20.58]\times$ & matched GFNI rho; \texttt{VALIDATION.json} present$^{b}$ \\
 v4 recipe & 24 October & $9.2$--$42.1\times$ & validation file withheld$^{c}$ \\
+v9 & 11 November & $4.08$ $[3.76,4.44]$ to $11.13$ $[9.92,12.60]\times$ & Iso Lab EKS; \texttt{VALIDATION.json} present; Table~A reads it$^{d}$ \\
+v10 & 11 November & $3.75$ $[3.49,4.07]$ to $13.64$ $[12.11,15.54]\times$ & local L0, another host; no validation file$^{e}$ \\
 \bottomrule
 \addlinespace
 \multicolumn{4}{@{}l}{(b) Pipeline baselines, 16--17 October: cold speed-up} \\
@@ -432,13 +434,17 @@ and v7: \art{benchmarks/20261016-ic-rule-v7/}; v8:
 $^{b}$$1.30$--$1.58\times$ the v7 control, fitted slope $0.168$ per $\ln r$;
 its directory carries a \texttt{VALIDATION.json} with a replay certificate
 and a passing validator report
-(\art{research/ic_tool_program/rule/v8/VALIDATION.json}); it is not on the
-board, which still carries v7. $^{c}$A paired
+(\art{research/ic_tool_program/rule/v8/VALIDATION.json}); it was not on the
+board, which carried v7 until rule v9. $^{c}$A paired
 retuning improved one size of six; rho is priced in the same process at the
 canonical batched step (the range is the v4 column, $9.20$--$42.12$; the v3
 recipe at the same step reads $9.89$--$43.46$), and the validation file is
 withheld because that reference may not be the strongest, so it is not an
-admitted row either.
+admitted row either. $^{d}$Rule v8's matched rho re-run at main; validator
+report, replay certificate and independent review admit it with caveats
+(\art{research/ic_tool_program/rule/v9/VALIDATION.json}). $^{e}$Paired
+against its own control on one host; not comparable with v9's absolute
+figures (\art{research/ic_tool_program/rule/v10/REPORT.md}).
 (b)~Each baseline's recorded speed-up, and the combined cold factor over
 v4 (\art{benchmarks/20261017-ic-r12-admitted-prefetch/}).}
 \label{tab:prog_koblitz-tablea}
@@ -457,6 +463,61 @@ $1.7$--$2.0\times$, and the 24 October validation gate did not check Table~A
 (\art{research/ic_validation_gate_20261024/}). Rules v8 and v4 measure the
 same sizes against differently built rho references and are kept apart
 (Definition~\ref{def:domain}).
+
+\paragraph{Rule v9: rule v8's matched rho at main, 11 November.} Two runs in
+one session on one Iso Lab EKS node (\texttt{c8a.2xlarge} Spot, AMD EPYC
+9R45, no L2 admission): v9, the \texttt{ic} of main, and v9c, rule v8's
+\texttt{ic} rebuilt as a control, each timed against its own in-process
+matched rho over §23's six sizes, 64 targets and four A/A repeats a size.
+All 408 rows of each run pass, the two runs' rho walks take the same steps
+on 64 of 64 paired targets at every size, and the validator verified every
+scalar (838 and 840 certificates) and replayed 8 of 8 seeded runs
+identically. Cold IC/rho for v9 runs from $4.08$ $[3.76,4.44]$ at
+$\log_2r=36.64$ to $11.13$ $[9.92,12.60]$ at $47.21$; the paired ratio v9/v9c
+is $1.013$ at $36.64$ and $0.936$ to $0.980$ at the five larger sizes, from a
+set-up $4.7$\% faster at $n=53$ and $7.8$\% faster at $2^{47.2}$. The fitted
+slope of $\ln(\text{cold ratio})$ on $\ln r$ is $0.113$ $[0.056,0.169]$
+(v9c: $0.119$). Rule v8's figures came from another host and are quoted,
+not paired: on this host v8's own code reads $0.60$--$0.86$ of them, so the
+host moves the ratio more than the code does. A first reading of the
+declared prediction in each binary's own unit (1.025, outside the band) was
+corrected to wall-clock time (0.953 at $n=53$, inside $[0.85,1.00]$),
+because the unit is measured per binary
+(\art{research/ic_tool_program/rule/v9/report/report.pdf}). Rho is cheaper
+cold at every size, across the §5a band. Distance remaining:
+$4.08$--$11.13\times$.
+
+\paragraph{Rule v10: single-word factor-base selection, 11 November.} For
+odd $n<64$ with an endomorphic Frobenius the base is built and projected in
+one machine word per element (one lift per Frobenius orbit, hashed tables,
+one lowering), under a protocol committed before the change and before any
+row. Run locally (L0, 4 vCPU Xeon) against the branch base as control, the
+factor base and every logarithm are unchanged (408 of 408 rows a run;
+prediction P1 met). Selection plus projection costs $0.34$--$0.39$ of the
+control's, short of P2's $0.25$ at every size. The paired cold ratio
+v10/v10c is $0.851$ $[0.848,0.855]$ at $n=47$, inside P3's declared
+$0.81$--$0.86$, and $0.872$--$0.963$ elsewhere ($0.892$ at $n=57$, outside
+its declared band). Set-up is about 99\% of the cold cost. The matched rho
+remains cheaper cold: $3.75\times$ $[3.49,4.07]$ at $n=47$ (control
+$4.41$), $4.43\times$ at $n=57$ and $13.64\times$ at $n=61$. The source
+records this as a measured improvement over the baseline [pcc:unverified]:
+an engineering change to set-up, with the algorithm and its counted work
+unchanged. It has no replay certificate, validator report or EKS rerun, so
+Table~A still reads v9 (\art{research/ic_tool_program/rule/v10/REPORT.md}).
+
+\paragraph{Oversampling the factor-base logarithms, 11 November.} The
+precompute collects relations until the coefficient matrix has full rank,
+then filters and solves. A study frozen before any row (05:54Z, 11 November)
+asked whether a surplus of $\lceil f\cdot\text{columns}\rceil$ relations,
+$f\in\{0.1,0.25,0.5\}$, spent by the filter on the heaviest rows, lowers the
+total cost. It ran four Koblitz cells, 30 seeds and 180 rows each (720 rows,
+no failed arm); linear algebra was $0.8$--$15.7$\% of the $f=0$ wall time. The
+frozen rule chose H0 in every cell: the surplus never lowered total cost.
+Where it did cut linear-algebra row operations ($f=0.1$ in two cells, by
+$17.9$ and $4.2$ on average), it would break even only at a price per row
+operation $98$ and $14{,}389$ times the measured one
+(\art{research/logs_oversampling_20261111/full/break_even.json};
+\texttt{[pcc:unverified]}).
 
 \section{ECC2K-130}\label{sec:ecc2k130}
 

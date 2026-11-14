@@ -3,9 +3,9 @@ prime order $r$ with $A$ efficiently computable automorphisms in about $(\pi r/(
 group operations, and no index calculus has beaten it
 on a curve of cryptographic shape. This treatise collects what one
 research programme proved and measured about index calculus on elliptic
-curves between July and 6 November 2026. Its sibling ledger holds
-1{,}402 decisions and 2{,}074 run directories to 30 September; this
-repository holds 1{,}402 study directories, 745 ecbench sessions with
+curves between July and 12 November 2026. Its sibling ledger holds
+1{,}402 decisions and 2{,}074 run directories to 30 September; on
+6 November this repository held 1{,}402 study directories, 745 ecbench sessions with
 129{,}945 sealed records, 145 admitted benchmark rows and 28 leaderboard
 rows, 19 of them validated. Each number
 states its boundary (oracle stage, complete solve, cold one-target cost or
@@ -49,8 +49,8 @@ runs at exponent $\approx1$.
 \emph{Frontier.} A priced campaign of 4{,}848 executions found no index
 calculus below rho on any prime or prime-degree binary curve at any weight
 of a pricing band applied to every arm. On the validated board the gap to
-a matched rho is $3.4$--$11.5\times$ on Koblitz curves of 37--47 bits
-(rule v7; $4.7$--$18\times$ against rule v8's same-binary rho),
+a matched rho is $4.1$--$11.1\times$ on Koblitz curves of 37--47 bits
+(rule v9, 11 November),
 $5.5$--$13.5\times$ on prime curves of 10--24 bits and $10.6$--$38\times$
 on random binary curves. The closest prime arms, generic collision
 searches at rho's exponent, are $1.3$--$1.7\times$ at 36--42 bits ($w=0$).
@@ -63,6 +63,6 @@ strongest rho at $q=2^{16}$ under the registered unit price (neither has a
 validation file); $k=4$ in characteristic two at $5.2\times$ rho at
 $m=15$, with a crossover near $m\approx17.6$ only by extrapolation. The
 plain Nagao arm of the Joux--Vitse cover is above a matched negation rho at
-$p=1301$ and $1451$, so its extrapolated crossing near $p\approx1330$ does
-not hold. An equal-advice audit against Bernstein--Lange rho retired every
+$p=1301$ and $1451$; with a Hilbert stop it reads $1.003$, $0.837$ and
+$0.695$ of that rho at $p=1301$, 1451 and 1601 (local, unverified). An equal-advice audit against Bernstein--Lange rho retired every
 online win. Nothing here concerns a deployed curve or key recovery.

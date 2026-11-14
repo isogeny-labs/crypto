@@ -742,6 +742,122 @@ against rho or against the programme's own previous arm. Defining and running
 that reference arm (open problem~10) is the precondition for any claim of
 improving on the state of the art.
 
+\section{The ladder continued, 8--12 November}\label{sec:ladder4}
+
+Work of 8--12 November falls into three groups
+(Table~\ref{tab:ladder4}): the Joux--Vitse cover of $E(\FF_{p^6})$, the
+plane-quartic route after cubic GHS, and the walk arms of the generic
+prime-field track. The reading rules of \S\ref{sec:ladder} apply: each row
+is against its own incumbent and on its study's boundary, and the last
+column is the distance to the matched rho that remains. Every value is
+\texttt{[pcc:unverified]} in its source and no row has a pcc claim; one
+row, the aut=3 sibling walk against rho-cubic, has a validation file for
+its GAE comparison. Several rows are lead tests from the surveys of 11 and
+12 November, whose dispositions are in \S\ref{sec:open-leads}.
+
+\begin{table}[p]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\toprule
+Change & Cl. & Ratio [95\%] & To rho \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Joux--Vitse cover of $E(\FF_{p^6})$, weak class, local runs}}\\
+Hilbert early stop, Nagao arm, $p=1301$--$1601$ & E & $0.5276$--$0.5280$ in counted $S$; native F4 $0.983$ & U2: $1.003$, $0.837$, $0.695$ matched negation rho \\
+Hilbert early stop, sieve descent, $p=1511$ & T & $0.856$ in $S$; native F4 $1.139$ (kill limit $1.10$) & unchanged; killed \\
+Sieve F4, descent, LA additions emitted & A & $0.816$ of the upper-bound proxy & U2 at $w=1$: $0.1196$ \\
+Isogeny walk into the class charged, $M=512$ & A & $0.0141\to0.0155$ (pooled, U2) & $0.0155$ $[0.0125,0.0200]$ \\
+Reach of the weak class from a random start & N & walk reaches 3/60 ($p=1009$), 0/60 ($1511$, $1823$) & --- \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Plane quartic (N4~v2 DL1) after cubic GHS, weak family}}\\
+Factor-base constant $c=2.00\to1.60$, held out at $k=21$, $22$ & E & $0.655$--$0.685$ & row's own: $0.005\times$ near $q=2^{21}$ \\
+128-bit arithmetic, $k$ to 25 & N & exponent $1.099$ $[1.098,1.100]$ ($k=17$--$25$) & $0.0021$ $[0.0017,0.0026]$ rho model, $k=25$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Generic prime-field track: walk arms on miniatures}}\\
+\texttt{twcj}: 4 or 8 jumps vs 16, $k=20$, $24$ & R & $1.220$ $[1.186,1.256]$, $1.268$ $[1.193,1.348]$ (4); $1.008$, $1.050$ (8) & 16 jumps: $1.36\times$, $1.34\times$ rho-neg \\
+\texttt{twcj}: 32 or 64 vs 16 jumps, $k=28$, $32$ & N & $0.997$ $[0.954,1.041]$, $0.985$ $[0.930,1.044]$ (32) & 16 jumps: $1.395\times$, $1.366\times$ \\
+\texttt{twcj}, no collision recomputation (\texttt{cv=0}) & Ic & $0.879$ $[0.876,0.881]$, $0.950$ $[0.948,0.951]$ & $1.217\times$, $1.259\times$ \\
+Chained jump set-up for rho-neg (reference) & R & $1.532$ $[1.402,1.673]$, $2.738$ $[2.583,2.903]$ & rejected as reference \\
+Sibling points, \texttt{tw2cj}, 256-point pool, $k=32$ & Ic & $0.488$ $[0.463,0.515]$ at $w=0$; $0.984$ $[0.932,1.039]$ at $w=1$ & $0.827$ ($w=0$), $1.671$ ($w=1$) \\
+Sibling points, three prime-field shapes, 31--40 bits, best pool & Ic & $0.452$--$0.505$ at $w=0$ & $0.78$--$0.91$ ($w=0$), $1.60$--$1.87$ ($w=1$) \\
+Orbit keys under the order-3 automorphism, $j=0$ & Ic & $0.567$--$0.608$ at $w=0$; $0.839$--$0.902$ at $w=1$ & $0.875$--$0.992$ rho-cubic ($w=0$), $2.663$--$3.000$ ($w=1$) \\
+2-descent class filter on cofactor lifts, $k=20$ & N & both classes $\ge33\%$ of the base; filter gain $1\times$ & --- \\
+\bottomrule
+\end{tabularx}
+\caption[]{Changes that landed 8--12 November 2026, against their own
+incumbents; columns and classes as in Table~\ref{tab:ladder} (N = null
+or diagnostic, no cost row). Ratios at $w=0$ unless marked; two values
+are two sizes or two primes in the order listed. \texttt{twcj}: the F$=1$
+target-in-walk arm, not decomposition-based; \texttt{tw2cj}: the $C=2$
+two-seed walk. Distances: Joux--Vitse in U2 against matched negation rho;
+walks in GAE against rho-neg, or rho-cubic on $j=0$ curves, with table
+inserts priced. All values unverified; the aut=3 row's GAE comparison is
+validated (stage~4b \texttt{VALIDATION.json}), with the order not holding
+across the band. Sources under \art{research/}:
+\texttt{jv\_nagao\_hilbert\_20261112/}, \texttt{jv\_sieve\_hilbert\_descent\_20261112/},
+\texttt{leads\_20261111/runs/}, \texttt{jv\_walk\_charge\_20261111/},
+\texttt{jv\_weak\_coverage\_20261111/}, \texttt{leads\_chase\_20261112/},
+\texttt{curve25519\_tw\_jumps\_20261108/}, \texttt{curve25519\_tw\_scaling\_20261108/},
+\texttt{curve25519\_engine\_items\_20261110/},
+\texttt{curve25519\_autolab\_20261104/siblings/},
+\texttt{curve25519\_miniature\_descent\_class\_20261111/}.}
+\label{tab:ladder4}
+\end{table}
+
+\paragraph{The Joux--Vitse Nagao arm below rho in multiplications, locally.} The
+Hilbert early stop of F4, measured at $p\le503$ in October and never used
+at scale, halves the Nagao arm's counted cost at equal relations
+($0.5276$--$0.5280$) while its native F4 counter falls to $0.983$. Against
+the matched negation rho of \S\ref{sec:jac-jv} the arm moves from
+$1.318$--$1.900\times$ rho in textbook $\FF_p$ multiplications to $1.003$,
+$0.837$ and $0.695$ at $p=1301$, $1451$ and $1601$, with the order below
+rho at every weight of the band at the two larger primes
+(\S\ref{sec:ext-jv-nov}). The cover's $\FF_p$ additions are still not
+emitted, so these are lower-bound comparisons, on a local run without a
+validation file. The same stop in the sieve route's descent was killed by
+its preregistered native-operation limit.
+
+\paragraph{The sieve row: priced, charged and bounded.} The validated sieve
+row was accounting with an upper-bound proxy for the cover's unemitted
+additions. Emitting them gives $0.816$ of the proxy; with the isogeny walk
+into the class charged, the pooled table-line arm moves from $0.0141$ to
+$0.0155$ of rho at $w=0$ and stays below rho at every weight. A coverage
+study bounds where that holds: the implemented walk reaches a weak curve
+from 3 of 60 random admitted starts at $p=1009$ and from none at $1511$
+and $1823$ (\S\ref{sec:ext-jv-nov}). The row stands for curves in the
+class.
+
+\paragraph{The plane-quartic row's constant.} On the N4~v2 DL1 solver, a
+percolation model of the large-prime graph put the threshold factor-base
+constant near $1.55$; lowering the frozen $c=2.00$ to $1.60$ cuts the
+charged cost to $0.655$--$0.685$ at $k=21$ and $22$ on held-out seeds,
+with the order holding across the band, and gives no gain at $k=16$
+(\art{research/leads_chase_20261112/RESULTS.md}; engineering,
+unvalidated). A 128-bit fork carried the solver to $k=25$
+($\ell\approx2^{73}$), all 81 records verified; against a calibrated
+rho-neg model, not a measured rho, DL is $0.0021$ $[0.0017,0.0026]$ at
+$k=25$ (\art{research/leads_20261111/runs/C_quartic_k26/RESULT.md}). The
+skeptic's calibrations put the exponent's lower bound at
+$1.1000$--$1.1034$, at or above the lead's kill line of $1.10$; the rise
+comes from the 128-bit arithmetic step at $k=23$.
+
+\paragraph{The walk arms: a constant, not a crossing.} On the generic
+prime-field track the target-in-walk arm \texttt{twcj} sits at
+$1.343$--$1.395\times$ rho-neg from $k=20$ to $32$; no tested jump count
+beats 16, and \texttt{cv=0} brings it to $1.217$ and $1.259$ at $k=20$ and
+$24$. On the two-seed walk, sibling points halve the counted cost at
+$w=0$, flat in $r$ from $2^{30}$ to $2^{40}$, and orbit keys under the
+order-3 automorphism bring the $j=0$ arm to $0.875$--$0.992$ of rho-cubic
+at $w=0$. At $w=1$ every walk arm is above its rho: the sibling arms
+$1.60$--$1.87\times$ rho-neg and the aut=3 arm $2.663$--$3.000\times$
+rho-cubic, so none is ranked below rho (Table~\ref{tab:distance-walk}). A design note derives the gap from the
+collision count, three collisions against rho's one
+(\art{research/curve25519_autolab_20261104/siblings/stage5-design/README.md}).
+A frozen check of the descent-class filter on the $k=20$ miniature found
+both 2-descent classes in the ``bits'' and ``isogeny'' bases, so no
+cofactor lift can be skipped and the expected gain is $1\times$, not the
+$2\times$ an earlier note assumed
+(\art{research/curve25519_miniature_descent_class_20261111/README.md}).
+
 \section{Three frontiers}
 
 \paragraph{Cold, one target, set-up included.} Unchanged: generic rho.
@@ -751,7 +867,11 @@ at $1.55\times$ strong signed-Frobenius rho at $n=13$; the closest
 lower-bound arms are $1.08\times$ (compact orbit with a counted Frobenius
 table) and $6.97\times$ (matrix F4/F5 against rho-negation at K13).
 Prime-field arms are $12$--$239\times$ rho and diverge with size (the
-30-bit Kummer-tower row of \S\ref{sec:ladder3} is $159\times$). Off the
+30-bit Kummer-tower row of \S\ref{sec:ladder3} is $159\times$). The
+generic-track walk arms of \S\ref{sec:ladder4} are the exception at
+$w=0$ only: the sibling walks are $0.78$--$0.927$ of rho-neg and the aut=3
+sibling walk $0.875$--$0.992$ of rho-cubic, while at $w=1$ all are above
+rho, so none is below rho across the band. Off the
 prime and prime-degree binary fields, three families are within a
 single-digit factor of rho or go below it, all in weak classes: genus three after cubic GHS
 (below the strongest rho at $q=2^{16}$ under the registered pricing,
@@ -759,10 +879,13 @@ unresolved at the other sizes to $2^{20}$, above it under a heavier
 sensitivity pricing), $k=4$ over $\FF_{(2^m)^4}$
 ($4.3\times$ a measured rho at $n\approx2^{56}$ on one target, $5.2\times$
 at $m=15$ after corrections; crossover unsupported), and the Joux--Vitse
-cover of $E(\FF_{p^6})$ (plain Nagao arm $1.16$--$1.41\times$ a matched
-negation rho at $p=1301$ and $1451$, unresolved at $1601$, a lower-bound
-comparison; its sieve arm is $0.0065\times$ a matched negation rho at
-$p=1511$, validated, \S\ref{sec:jac-jv}).
+cover of $E(\FF_{p^6})$ (the Nagao arm with line search and Hilbert stop
+is $1.003$, $0.837$ and $0.695\times$ a matched negation rho in $\FF_p$
+multiplications at $p=1301$, $1451$ and $1601$, below across the band at
+the two larger primes, a local lower-bound comparison,
+\S\ref{sec:ext-jv-nov}; its sieve arm is $0.0065\times$ a matched negation
+rho at $p=1511$ and $0.0141\times$ pooled over $p=1009$--$1823$ with the
+table line, both validated, \S\ref{sec:jac-jv}).
 
 \paragraph{Online, after retained set-up.} Generic again: Bernstein--Lange
 preprocessing rho. The admitted compact-orbit point at Koblitz $n=61$,
@@ -819,8 +942,10 @@ on the Joux--Vitse cover family at $p\ge503$ (or a size where it can be run)
 and emit the cover arm's unpriced counters, so that the $p^{-2}$ trend can be
 ranked under the band and tested past $p\approx1330$ (the matched rho now
 exists: for the sieve arm at $p=1511$, and for the Nagao arm at
-$p=1301$--$1601$, where the crossing near 1330 failed; the unpriced counters
-are still not emitted); (x) define and run a
+$p=1301$--$1601$, where the crossing near 1330 failed; on 12 November the
+sieve route's F4, descent and linear-algebra additions were emitted, at
+$0.816$ of their proxy, while the Nagao arm's $\FF_p$ additions are still
+not emitted, \S\ref{sec:ext-jv-nov}); (x) define and run a
 published-index-calculus reference arm (open problem~10); and (viii) bears
 less on the binary question than it first appeared, since the $m=4$ row at $w=2$ is
 about $+46$ bits over rho even if degree 5 holds (\S\ref{sec:ladder3}).

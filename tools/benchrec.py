@@ -46,12 +46,28 @@ import sys
 import tempfile
 import time
 import zlib
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 SCHEMA = "bench.record/v1"
 PROGRESS_SCHEMA = "bench.progress/v1"
 BUCKET = "setec-astronomy-artifacts"
 STORE_PREFIX = "store/sha256"
+# The artifact bucket lives in us-east-2. CI exports AWS_REGION=us-west-2 for
+# other jobs; every call here names the bucket region so S3 does not answer
+# each request with a cross-region redirect (about +55% per call, measured).
+BUCKET_REGION = "us-east-2"
+# Every aws call is bounded. A call that exceeds its limit raises S3Error with
+# the command and the limit, instead of hanging until the job is cancelled.
+AWS_CONNECT_TIMEOUT_S = 10
+AWS_READ_TIMEOUT_S = 60
+AWS_CALL_TIMEOUT_S = 120      # sts, head-object
+AWS_TRANSFER_TIMEOUT_S = 300  # get-object, s3 cp
+AWS_LIST_TIMEOUT_S = 300      # one paginated list-objects-v2 over a prefix
+# --verify-s3 lists a prefix once when it needs at least this many keys under
+# it; below that it HEADs each object. HEADs run concurrently.
+LIST_MIN_KEYS = 16
+HEAD_WORKERS = 16
 DEFAULT_CONFIG = {
     "records_dir": "benchmarks/records",
     "progress_dir": "benchmarks/progress",
@@ -59,6 +75,7 @@ DEFAULT_CONFIG = {
     "entry_re": r"^\d{8}-[A-Za-z0-9_.-]+$",
     "bucket": BUCKET,
     "store_prefix": STORE_PREFIX,
+    "region": BUCKET_REGION,
     "living_paths": [],
 }
 OPEN_LIST = ".benchrec/open.jsonl"
@@ -330,15 +347,18 @@ def cmd_metric(a, root: Path, cfg: dict) -> int:
     return 0
 
 
-def aws_available() -> bool:
-    if not shutil.which("aws"):
-        return False
-    env = dict(os.environ)
-    for k in ("ARTIFACTS_AWS_ACCESS_KEY_ID", "ARTIFACTS_AWS_SECRET_ACCESS_KEY"):
-        if k in env:
-            env[k.replace("ARTIFACTS_", "")] = env[k]
-    p = subprocess.run(["aws", "sts", "get-caller-identity"], capture_output=True, env=env)
-    return p.returncode == 0
+class S3Error(RuntimeError):
+    """An S3 call that could not complete: timed out, or failed for a reason
+    other than "this object is not there". The check fails closed on it."""
+
+
+class S3Timeout(S3Error):
+    """An aws call that did not finish within its limit."""
+
+
+def s3_region(cfg: dict | None = None) -> str:
+    return (os.environ.get("BENCHREC_S3_REGION")
+            or (cfg or {}).get("region") or BUCKET_REGION)
 
 
 def aws_env() -> dict:
@@ -346,16 +366,149 @@ def aws_env() -> dict:
     for k in ("ARTIFACTS_AWS_ACCESS_KEY_ID", "ARTIFACTS_AWS_SECRET_ACCESS_KEY"):
         if k in env:
             env[k.replace("ARTIFACTS_", "")] = env[k]
-    env.setdefault("AWS_REGION", os.environ.get("ARTIFACTS_AWS_REGION", "us-east-2"))
+    # Never prompt: no pager, no interactive input.
+    env["AWS_PAGER"] = ""
+    env.setdefault("AWS_REGION", os.environ.get("ARTIFACTS_AWS_REGION", BUCKET_REGION))
     env.setdefault("AWS_DEFAULT_REGION", env["AWS_REGION"])
     return env
 
 
-def s3_exists(uri: str) -> bool:
-    bucket, key = uri[5:].split("/", 1)
-    p = subprocess.run(["aws", "s3api", "head-object", "--bucket", bucket, "--key", key],
-                       capture_output=True, env=aws_env())
+def aws_call(args: list[str], *, timeout: float, cfg: dict | None = None,
+             capture: bool = True) -> subprocess.CompletedProcess:
+    """Run `aws <service> <op> ...` with connect/read timeouts, the bucket
+    region, no stdin, and a hard wall-clock limit. The global options go right
+    after the operation so a trailing positional (get-object's outfile) stays last."""
+    cmd = ["aws", args[0], args[1],
+           "--cli-connect-timeout", str(AWS_CONNECT_TIMEOUT_S),
+           "--cli-read-timeout", str(AWS_READ_TIMEOUT_S),
+           "--region", s3_region(cfg), *args[2:]]
+    try:
+        return subprocess.run(cmd, capture_output=capture, text=True, env=aws_env(),
+                              stdin=subprocess.DEVNULL, timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        raise S3Timeout(f"aws {args[0]} {args[1]} {' '.join(args[2:])[:200]} "
+                      f"did not finish within {timeout:g}s") from exc
+
+
+def aws_available(cfg: dict | None = None) -> bool:
+    if not shutil.which("aws"):
+        return False
+    p = aws_call(["sts", "get-caller-identity"], timeout=AWS_CALL_TIMEOUT_S, cfg=cfg)
     return p.returncode == 0
+
+
+def split_s3(uri: str) -> tuple[str, str]:
+    if not uri.startswith("s3://") or "/" not in uri[5:]:
+        raise ValueError(f"not an s3://bucket/key URI: {uri!r}")
+    bucket, key = uri[5:].split("/", 1)
+    return bucket, key
+
+
+def s3_head_size(uri: str, cfg: dict | None = None) -> int | None:
+    """Object size, or None when HEAD fails (absent or not readable).
+    Raises S3Error on a timeout."""
+    bucket, key = split_s3(uri)
+    p = aws_call(["s3api", "head-object", "--bucket", bucket, "--key", key,
+                  "--query", "ContentLength", "--output", "text"],
+                 timeout=AWS_CALL_TIMEOUT_S, cfg=cfg)
+    if p.returncode:
+        return None
+    try:
+        return int(p.stdout.strip())
+    except ValueError:
+        # Some aws versions print JSON even with --query/--output text.
+        try:
+            return int(json.loads(p.stdout)["ContentLength"])
+        except (ValueError, KeyError, TypeError):
+            raise S3Error(f"head-object {uri}: unreadable size {p.stdout.strip()[:80]!r}")
+
+
+def s3_exists(uri: str, cfg: dict | None = None) -> bool:
+    return s3_head_size(uri, cfg) is not None
+
+
+def s3_list(bucket: str, prefix: str, cfg: dict | None = None) -> dict[str, int]:
+    """key -> size for every object under prefix, in one paginated call."""
+    p = aws_call(["s3api", "list-objects-v2", "--bucket", bucket, "--prefix", prefix,
+                  "--query", "Contents[].[Key,Size]", "--output", "json"],
+                 timeout=AWS_LIST_TIMEOUT_S, cfg=cfg)
+    if p.returncode:
+        raise S3Error(f"list-objects-v2 s3://{bucket}/{prefix} failed: "
+                      f"{(p.stderr or '').strip()[:300]}")
+    try:
+        rows = json.loads(p.stdout or "null") or []
+        return {str(k): int(n) for k, n in rows}
+    except (ValueError, TypeError) as exc:
+        raise S3Error(f"list-objects-v2 s3://{bucket}/{prefix}: unreadable output") from exc
+
+
+class S3Inventory:
+    """What --verify-s3 knows about the objects it must find.
+
+    The check used to start one `aws s3api head-object` process per raw file,
+    serially: 1561 objects at 0.7-1.0 s each outran the 15-minute CI limit.
+    A prefix that holds at least LIST_MIN_KEYS of the wanted keys is listed
+    once (keys and sizes); any other key is HEADed, concurrently. A listing
+    that is refused falls back to the HEADs, so a missing ListBucket permission
+    costs time, not coverage; a listing that times out fails the check. Presence is decided per key either way, and the
+    listed or HEAD size is returned so callers can compare it to the record.
+    """
+
+    def __init__(self, cfg: dict):
+        self.cfg = cfg
+        self.listings: dict[tuple[str, str], dict[str, int]] = {}
+        self.sizes: dict[str, int | None] = {}
+        self.stats = {"listed_prefixes": 0, "listed_objects": 0, "heads": 0}
+
+    def _prefix(self, key: str) -> str:
+        store = self.cfg.get("store_prefix", STORE_PREFIX).strip("/") + "/"
+        if key.startswith(store):
+            return store
+        return key.rsplit("/", 1)[0] + "/" if "/" in key else ""
+
+    def prefetch(self, uris) -> None:
+        groups: dict[tuple[str, str], set[str]] = {}
+        for u in set(uris):
+            if u in self.sizes:
+                continue
+            try:
+                bucket, key = split_s3(u)
+            except ValueError:
+                continue
+            groups.setdefault((bucket, self._prefix(key)), set()).add(u)
+        heads: list[str] = []
+        for (bucket, prefix), members in sorted(groups.items()):
+            listing = self.listings.get((bucket, prefix))
+            if listing is None and len(members) >= LIST_MIN_KEYS:
+                try:
+                    listing = s3_list(bucket, prefix, self.cfg)
+                except S3Timeout:
+                    raise
+                except S3Error as exc:
+                    print(f"benchrec: {exc}; falling back to {len(members)} HEAD requests",
+                          file=sys.stderr)
+                else:
+                    self.listings[(bucket, prefix)] = listing
+                    self.stats["listed_prefixes"] += 1
+                    self.stats["listed_objects"] += len(listing)
+            if listing is not None:
+                for u in members:
+                    self.sizes[u] = listing.get(split_s3(u)[1])
+            else:
+                heads.extend(sorted(members))
+        if heads:
+            with ThreadPoolExecutor(max_workers=HEAD_WORKERS) as pool:
+                for u, n in zip(heads, pool.map(lambda x: s3_head_size(x, self.cfg), heads)):
+                    self.sizes[u] = n
+            self.stats["heads"] += len(heads)
+
+    def size(self, uri: str) -> int | None:
+        if uri not in self.sizes:
+            self.prefetch([uri])
+        return self.sizes.get(uri)
+
+    def exists(self, uri: str) -> bool:
+        return self.size(uri) is not None
 
 
 def archived_raw_matches(root: Path, cfg: dict, raw: dict, *, remote: bool) -> bool:
@@ -382,33 +535,26 @@ def archived_raw_matches(root: Path, cfg: dict, raw: dict, *, remote: bool) -> b
                 return cache_ok
         if not remote:
             return False
-        bucket, key = raw["s3_uri"][5:].split("/", 1)
-        head = subprocess.run(
-            ["aws", "s3api", "head-object", "--bucket", bucket, "--key", key,
-             "--query", "ContentLength", "--output", "text"],
-            capture_output=True, env=aws_env(), timeout=180,
-        )
-        if head.returncode or int(head.stdout.strip()) != size:
+        bucket, key = split_s3(raw["s3_uri"])
+        if s3_head_size(raw["s3_uri"], cfg) != size:
             return False
         with tempfile.TemporaryDirectory(prefix="benchrec-archive-") as temp:
             path = Path(temp) / "raw"
             # One extra byte detects an oversized object if it changes after
             # HEAD; the original exact size/hash still decide acceptance.
-            args = ["aws", "s3api", "get-object", "--bucket", bucket, "--key", key]
+            args = ["s3api", "get-object", "--bucket", bucket, "--key", key]
             if size:
                 args += ["--range", f"bytes=0-{size}"]
-            result = subprocess.run(
-                [*args, str(path)], capture_output=True, env=aws_env(), timeout=180,
-            )
+            result = aws_call([*args, str(path)], timeout=AWS_TRANSFER_TIMEOUT_S, cfg=cfg)
             return (result.returncode == 0 and path.is_file()
                     and path.stat().st_size == size and sha256_file(path) == digest)
-    except (OSError, ValueError, subprocess.TimeoutExpired):
+    except (OSError, ValueError):
         return False
 
 
 def cmd_upload(a, root: Path, cfg: dict) -> int:
     path, rec = load_record(root, a.record)
-    if not aws_available():
+    if not aws_available(cfg):
         print("benchrec: no AWS credentials here; CI uploads files that are in Git, "
               "push larger ones with tools/artifacts/artifacts.py push where credentials exist",
               file=sys.stderr)
@@ -425,17 +571,18 @@ def cmd_upload(a, root: Path, cfg: dict) -> int:
         if sha256_file(src) != r["sha256"]:
             if (rec["status"] in ("measured", "invalid", "censored")
                     and archived_raw_matches(root, cfg, r, remote=True)
-                    and s3_exists(r["s3_uri"])):
+                    and s3_exists(r["s3_uri"], cfg)):
                 print(f"benchrec: {r['path']}: original archive bytes verified; "
                       "checkout differs, no upload performed")
                 continue
             print(f"benchrec: {r['path']} changed since it was recorded", file=sys.stderr)
             rc = 1
             continue
-        if s3_exists(r["s3_uri"]):
+        if s3_exists(r["s3_uri"], cfg):
             r["uploaded"] = True
             continue
-        p = subprocess.run(["aws", "s3", "cp", "--only-show-errors", str(src), r["s3_uri"]], env=aws_env())
+        p = aws_call(["s3", "cp", "--only-show-errors", str(src), r["s3_uri"]],
+                     timeout=AWS_TRANSFER_TIMEOUT_S, cfg=cfg, capture=False)
         if p.returncode == 0:
             r["uploaded"] = True
         else:
@@ -487,8 +634,11 @@ def cmd_close(a, root: Path, cfg: dict) -> int:
 
 def record_errors(root: Path, cfg: dict, rec: dict, name: str, *, require_closed: bool,
                   verify_s3: bool = False, manifests: dict | None = None,
-                  allow_archived_raw: bool = True) -> list[str]:
+                  allow_archived_raw: bool = True,
+                  inventory: S3Inventory | None = None) -> list[str]:
     e: list[str] = []
+    if verify_s3 and inventory is None:
+        inventory = S3Inventory(cfg)
     for k in ("schema", "id", "slug", "problem", "repo", "created_utc", "status", "commit",
               "branch", "host", "entries", "commands", "raw", "metrics", "reports"):
         if k not in rec:
@@ -559,8 +709,13 @@ def record_errors(root: Path, cfg: dict, rec: dict, name: str, *, require_closed
             if not covered and not r.get("uploaded"):
                 e.append(f"{name}: raw {r.get('path')} is neither in Git, nor in a .artifacts.json "
                          "manifest, nor marked uploaded; run benchrec.py upload or artifacts.py push")
-        if verify_s3 and not s3_exists(r["s3_uri"]):
-            e.append(f"{name}: raw {r['path']} is not at {r['s3_uri']}")
+        if verify_s3 and str(r.get("s3_uri", "")).startswith("s3://"):
+            found = inventory.size(r["s3_uri"])
+            if found is None:
+                e.append(f"{name}: raw {r['path']} is not at {r['s3_uri']}")
+            elif isinstance(r.get("bytes"), int) and found != r["bytes"]:
+                e.append(f"{name}: raw {r['path']} at {r['s3_uri']} holds {found} bytes, "
+                         f"the record says {r['bytes']}")
     def stored_ok(p: str, what: str) -> bool:
         """True if p is in the checkout, or is store-backed through a .artifacts.json manifest
         (docs/artifacts.md). With verify_s3, a store-backed file must also exist in the store."""
@@ -569,7 +724,7 @@ def record_errors(root: Path, cfg: dict, rec: dict, name: str, *, require_closed
         digest = manifests.get(p) if manifests is not None else None
         if not digest:
             return False
-        if verify_s3 and not s3_exists(store_uri(cfg, digest)):
+        if verify_s3 and not inventory.exists(store_uri(cfg, digest)):
             e.append(f"{name}: {what} {p} is in a .artifacts.json manifest but not at {store_uri(cfg, digest)}")
         return True
     for k in ("pdf",):
@@ -646,19 +801,30 @@ def new_entries(root: Path, cfg: dict, paths: list[str]) -> set[str]:
 
 def cmd_check(a, root: Path, cfg: dict) -> int:
     problems: list[str] = []
-    if a.verify_s3 and not aws_available():
+    if a.verify_s3 and not aws_available(cfg):
         print("FAIL: --verify-s3 asked for but no AWS credentials or aws CLI here; "
               "the S3 side of the records cannot be verified")
         return 1
     recs = all_records(root, cfg)
     manifests = artifact_manifests(root)
+    inventory = S3Inventory(cfg) if a.verify_s3 else None
+    if inventory is not None:
+        started = time.monotonic()
+        wanted = [str(r.get("s3_uri", "")) for _, rec in recs if rec.get("schema") == SCHEMA
+                  for r in rec.get("raw", []) if isinstance(r, dict)]
+        inventory.prefetch(u for u in wanted if u.startswith("s3://"))
+        st = inventory.stats
+        print(f"benchrec: S3 inventory for {len(wanted)} raw object(s): "
+              f"{st['listed_prefixes']} prefix listing(s) ({st['listed_objects']} objects), "
+              f"{st['heads']} HEAD(s), {time.monotonic() - started:.1f}s")
     referenced: set[str] = set()
     for name, rec in recs:
         if rec.get("schema") != SCHEMA:
             problems.append(f"{name}: not a {SCHEMA} record")
             continue
         problems += record_errors(root, cfg, rec, name, require_closed=True,
-                                  verify_s3=a.verify_s3, manifests=manifests)
+                                  verify_s3=a.verify_s3, manifests=manifests,
+                                  inventory=inventory)
         referenced.update(rec.get("entries", []))
     if a.base:
         changed = changed_paths(root, a.base)
@@ -1294,7 +1460,8 @@ def main(argv=None) -> int:
     p = sub.add_parser("check")
     p.add_argument("--base", default=None, help="compare against this ref (CI: origin/<base>)")
     p.add_argument("--local", action="store_true", help="also fail on records opened here and not closed")
-    p.add_argument("--verify-s3", action="store_true", help="HEAD every raw object (needs AWS credentials)")
+    p.add_argument("--verify-s3", action="store_true",
+                   help="confirm every raw object is in S3 at its recorded size (needs AWS credentials)")
     p.set_defaults(fn=cmd_check)
 
     p = sub.add_parser("gate")
@@ -1308,7 +1475,12 @@ def main(argv=None) -> int:
     cfg = load_config(root)
     if a.cmd == "run" and a.command and a.command[0] == "--":
         a.command = a.command[1:]
-    return a.fn(a, root, cfg)
+    try:
+        return a.fn(a, root, cfg)
+    except S3Error as exc:
+        print(f"FAIL: S3 could not be verified: {exc}")
+        print(f"benchrec: S3 error: {exc}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":

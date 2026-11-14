@@ -1,0 +1,18 @@
+digraph Branch {
+ graph [rankdir=TB, bgcolor="white", nodesep=0.3, ranksep=0.32, fontname="Helvetica"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fb", fontname="Helvetica", fontsize=12];
+ edge [fontname="Helvetica", fontsize=10];
+ public_input [label="Actual public polynomial families and branch (q,y)\nell_0 = 1; columns T_j = e_(j+1) - ell_(j+1)e_0"];
+ maps [label="Public insertion T and tail deletion L\nLT = I; TL = I on branch"];
+ given [label="Conditional quotient-moment chart\nF,H,V and branch witness hypotheses", fillcolor="#fff1d9"];
+ restricted [label="Actual matrix S_red = T^transpose S T\nExact radical line = span(Lw_0)"];
+ guards [label="Derived numerical corank 1\nNonzero diagonal adjugate entry", fillcolor="#e7f3e7"];
+ recovery [label="Actual residual coefficient matrices + cofactor equations\nRecover a nonzero quadratic witness"];
+ missing [label="Still missing: efficient public-input moment/equation finder\nFull norm/scalar attachment and uniform total bit bound", fillcolor="#fff1d9"];
+ public_input -> maps;
+ maps -> restricted;
+ given -> restricted;
+ restricted -> guards;
+ guards -> recovery;
+ recovery -> missing [style=dashed];
+}

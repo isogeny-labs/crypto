@@ -1,0 +1,83 @@
+{
+  "schema": "norm-weighted-count-validation/v1",
+  "created_at": "2026-11-14T06:26:48.292698+00:00",
+  "source_commit": "740732e95389e5185ed9a6547c18d8d889a6c580",
+  "source_build_exit": 0,
+  "gate": {
+    "command": "PATH=/workspace/audit/toolchains/lean-4.35.0-linux/bin:$PATH bash tools/lean/proof-gate.sh --out research/prime_norm_rank_20261112/weighted-count-evidence/gate-001 research/prime_norm_rank_20261112/lean",
+    "exit": 0,
+    "whole_study_theorems": 394,
+    "extra_trusted_axioms": 0,
+    "new_authored_theorems": 10,
+    "generated_declarations": [
+      "NormWeightedCount.simplexCode.congr_simp"
+    ]
+  },
+  "fresh": {
+    "command": "PATH=/workspace/audit/toolchains/lean-4.35.0-linux/bin:$PATH lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormWeightedCount",
+    "exit": 0,
+    "includes_imports": true
+  },
+  "standing": "Unsigned producer receipt; no execution or signed verification assertion",
+  "experiments": {
+    "native_fixture_attempted": 0,
+    "solver_or_paid_runs": 0
+  },
+  "artifacts": [
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/source-freeze.json",
+      "bytes": 996,
+      "sha256": "735f7252b03aac8d4436949f7ffdadefa4e8d52e978fd990ac19c616c60adf99"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/claim-pins.json",
+      "bytes": 2484,
+      "sha256": "ac8500e654dfac258696ee0ca014696bbc8bc952d2d89af7541bb125900405ac"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/build-003.log",
+      "bytes": 89,
+      "sha256": "dd7127caa1fc83cfeaea7aaf7230c905b19435803b1f3558317a849ae09471bb"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/gate-001.log",
+      "bytes": 84,
+      "sha256": "ca4140e48394b5b77f2eacc4de9c56cbc68df04a41c6467df98f160d6f4082e2"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/gate-001/research_prime_norm_rank_20261112_lean/audit.log",
+      "bytes": 33065,
+      "sha256": "674c5a481b31302c5fe095330e403d6b5240bd18d484c4f7c55f66daf3a67a0a"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/gate-001/research_prime_norm_rank_20261112_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/gate-001/research_prime_norm_rank_20261112_lean/source-build.log",
+      "bytes": 284624,
+      "sha256": "8c5be3ce64e470b2b63cd180f314d651072fe7f73bb9f1efe2db5433c60929c5"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/fresh-001.log",
+      "bytes": 41,
+      "sha256": "86a71a0adb7020d8b6d10804ece11a900d078d58a0e7d11e85b3c69b4f0815ab"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/fresh-001.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/default-verification-001.json",
+      "bytes": 7853,
+      "sha256": "ab9fbc267378f96c4fd8b2f72930f21ddc07439581890e4f6e7e39507351e05e"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/weighted-count-evidence/report-build-003.log",
+      "bytes": 5090,
+      "sha256": "e476a9fcd187074d944baf84b268b0f9ddaf338f5a24e61acb2cd46d78fab509"
+    }
+  ]
+}

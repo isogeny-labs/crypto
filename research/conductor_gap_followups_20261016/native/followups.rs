@@ -63,6 +63,8 @@ fn inst(v: &Value) -> PrimeInstance {
         r: u(v, "N"),
         cofactor: 1,
         generator: (u(v, "Gx"), u(v, "Gy")),
+
+        representation: None,
     }
 }
 fn target(c: &PrimeCurve, r: u64, label: &str) -> PrimePoint {

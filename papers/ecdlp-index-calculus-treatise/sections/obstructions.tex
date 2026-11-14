@@ -147,6 +147,85 @@ theorems, standard axioms only).
   unresolved.
 \end{itemize}
 
+\section{A cover's relations are collisions on the curve}\label{sec:obs-pushforward}
+
+For a cover $c:C\to E$ over $\FF_p$, $J_C\sim E\times P$ with $P$ the Prym and
+$c_*c^*=[\deg c]$. Pulling back preserves the logarithm on the order-$r$
+subgroup when $r\nmid\deg c$, but a shortcut must say how it computes
+logarithms on the embedded elliptic subgroup. Two studies of 11--12
+November made this a measurement for bielliptic covers
+$C:y^2=F(x^2)$ with $\varphi_1(x,y)=(x^2,y)$ and the complementary map
+$\varphi_2$. Every value is \texttt{[pcc:unverified]} at the source.
+\begin{itemize}
+\item \emph{Across to the complement.} The complement $E_2$ has a
+  different order, so $\operatorname{Hom}(E,E_2)=0$ unless $\#E_2=\#E$
+  (Tate), and the composite $\varphi_{2*}\varphi_1^*$ is identically zero,
+  forced by the deck involution $\sigma:(x,y)\mapsto(-x,y)$ with
+  $\varphi_2\circ\sigma=-\varphi_2$. A sweep of 5{,}641 covers over
+  $p\in\{1009,2003,4001,8009\}$ reached up to 141 distinct complement orders
+  and 3{,}479 complements smoother than the target; a census of 300 covers
+  per prime found $\varphi_{2*}\varphi_1^*=0$ in both directions on every
+  sampled generic fibre (14{,}371--14{,}397 of 14{,}400 per prime), with the
+  control $\varphi_{1*}\varphi_1^*=[2]$ holding on all
+  (\art{research/chained_prime_transfer_20261111/ATLAS.md}). The counter of
+  complements both reachable and easier is 0 by the theorem, not by
+  observation.
+\item \emph{Pushed forward to $E$.} The reduced class of $[\alpha]G+[\beta]T$
+  in $J(C)$ is the fibre $P+\iota(P)$ of $Q=[\alpha]G_E+[\beta]T_E$, which
+  splits into rational places exactly when $X(Q)$ is a nonzero square, and
+  both places map to $Q$. A genus-2 relation therefore pushes forward to
+  $[2]Q=Q+Q$, one factor-base element, not a two-term decomposition
+  (\art{research/cover_pushforward_20261112/PUSHFORWARD.md}). At 7 primes
+  from 211 to 12{,}841, all 37{,}866 relations of the primary run (189{,}330
+  in a 15-seed run) were of this fibre type and valid on $E_1$ and $E_2$,
+  none of the pushed $E_2$ rows involved the target, and the base
+  $B=\varphi_1(C(\FF_p))$ held $0.4707$--$0.5367$ of $\#E_1$. The matrix is a
+  collision table on $\pm Q$, with exactly twice the columns of a native
+  $E_1$ arm that uses the same random stream; the two arms have identical
+  group-operation counts at every seed.
+\end{itemize}
+Table~\ref{tab:obs-pushforward} gives the costs. Index calculus on $J(C)$,
+the same search on $E_1$, and a generic two-term index calculus on $E_1$ over
+$B\cap\langle G_E\rangle$ are above the matched rho on $E_1$ at every prime and
+all three prices. The two-term arm was below rho on 1 of 15 seeds at
+$p=821$ (472 against 475). Stopped at the first repeated $X(Q)$, the $J(C)$
+search is a birthday collision on $\langle G_E\rangle$ that discards about
+half its trials; a control on $E_1$ without the square-abscissa filter is
+never worse. Both are below the median rho on 13 to 15 of 15 seeds at the
+three smallest primes, where rho's fixed set-up dominates, and the cover arm
+is above it on 13 of 15 seeds at $p=6421$ and 12 of 15 at $p=12{,}841$. To help, a cover would have to supply a target-side
+factor base well below $r$ (about $r^{1/2}$ times a polylogarithm) on which
+relations with independent terms are found at a constant rate; here the
+base is half the group and the two terms coincide. A smaller Prym does not
+enter: $\varphi_{1*}$ kills it, and nothing computed on it sees the target.
+The scope is degree-2 bielliptic covers, one curve per prime, weight-2
+relations and $p\le12{,}841$.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$p$ & $r$ & rho $E_1$ & IC $J(C)$ & IC $E_1$ two-term (base) & \multicolumn{2}{c}{total/rho, $w=0$/$0.1$/$1$} \\
+ & & & & & IC $J(C)$ & IC $E_1$ two-term \\
+\midrule
+211 & 109 & 441 & 3354 & 761 (107) & 7.61/10.92/40.79 & 1.73/2.63/10.37 \\
+419 & 113 & 393 & 8694 & 679 (111) & 23.74/37.72/156.75 & 1.73/2.43/8.79 \\
+821 & 71 & 377 & 11353 & 469 (69) & 30.50/73.76/467.20 & 1.24/1.68/5.55 \\
+1619 & 401 & 485 & 34521 & 2754 (399) & 70.50/194.98/1315.29 & 5.68/16.49/113.80 \\
+3203 & 313 & 614 & 60059 & 2194 (311) & 97.13/482.88/3954.64 & 3.62/8.48/56.07 \\
+6421 & 3191 & 963 & 188130 & 28546 (3189) & 198.21/1225.97/10475.79 & 29.47/446.60/4200.83 \\
+12841 & 3169 & 942 & 372157 & 28897 (3167) & 393.59/4720.07/43658.40 & 30.37/485.52/4585.04 \\
+\bottomrule
+\end{tabular}
+\caption[]{Bielliptic cover push-forward: medians over 3 seeds, counted
+group operations; the two-term arm's base build is in parentheses and
+included; linear-algebra multiplications priced at $w$ GAE. The $E_1$ fibre
+arm equals IC $J(C)$ in operations at every seed. Source:
+\art{research/cover_pushforward_20261112/PUSHFORWARD.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:obs-pushforward}
+\end{table}
+
 \section{What the obstructions leave open}
 
 None of the obstructions above concerns the cost of \emph{solving} the
