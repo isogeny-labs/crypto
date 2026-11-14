@@ -104,14 +104,79 @@ def fetch(token: str, out: str) -> None:
         for chunk in volume.read_file(f"{token}/results.tgz"):
             f.write(chunk)
     with tarfile.open(tgz) as archive:
-        archive.extractall(dest, filter="data")
+        try:
+            archive.extractall(dest, filter="data")
+        except TypeError:  # Python < 3.12
+            archive.extractall(dest)
     tgz.unlink()
     print("results in", dest)
 
 
+@app.function(image=image, gpu=DEFAULT_GPU, cpu=8, timeout=HOUR, volumes={DATA: volume})
+def bench(kernel_text: str, token: str, batches: str = "") -> dict:
+    """Time an already-generated kernel against the reference, no LLM involved."""
+    results = "/results"
+    os.makedirs(results, exist_ok=True)
+    with open(os.path.join(results, "kernel.py"), "w") as f:
+        f.write(kernel_text)
+    env = dict(os.environ, PYTHONPATH=KA_DIR)
+    started = time.time()
+    with open(os.path.join(results, "job.log"), "w") as log:
+        cmd = ["python3", f"{REMOTE}/bench_candidate.py",
+               "--kernel", os.path.join(results, "kernel.py"), "--out", results]
+        if batches:
+            cmd += ["--batches", batches]
+        rc = sh(cmd, log, env, cwd=results)
+    meta = {"benchExitCode": rc, "seconds": time.time() - started, "token": token}
+    with open(os.path.join(results, "meta.json"), "w") as f:
+        json.dump(meta, f, indent=2)
+    out = os.path.join(DATA, token)
+    os.makedirs(out, exist_ok=True)
+    with tarfile.open(os.path.join(out, "results.tgz"), "w:gz") as archive:
+        archive.add(results, arcname=".")
+    volume.commit()
+    return meta
+
+
+@app.function(image=image, gpu=DEFAULT_GPU, cpu=8, timeout=HOUR, volumes={DATA: volume})
+def script(rel_path: str, token: str) -> dict:
+    """Run a helper script from the harness directory on the GPU."""
+    results = "/results"
+    os.makedirs(results, exist_ok=True)
+    env = dict(os.environ, PYTHONPATH=KA_DIR)
+    started = time.time()
+    with open(os.path.join(results, "job.log"), "w") as log:
+        rc = sh(["python3", os.path.join(REMOTE, rel_path)], log, env, cwd=results)
+    meta = {"script": rel_path, "exitCode": rc, "seconds": time.time() - started, "token": token}
+    with open(os.path.join(results, "meta.json"), "w") as f:
+        json.dump(meta, f, indent=2)
+    out = os.path.join(DATA, token)
+    os.makedirs(out, exist_ok=True)
+    with tarfile.open(os.path.join(out, "results.tgz"), "w:gz") as archive:
+        archive.add(results, arcname=".")
+    volume.commit()
+    return meta
+
+
 @app.local_entrypoint()
 def main(out: str, model: str = "", gpu: str = "", workers: int = 4, rounds: int = 10,
-         fetch_token: str = ""):
+         fetch_token: str = "", bench_kernel: str = "", run_script: str = "",
+         batches: str = ""):
+    if run_script:
+        token = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:8]
+        print("script token", token)
+        meta = script.remote(run_script, token)
+        print(json.dumps(meta, indent=2))
+        fetch(token, out)
+        return
+    if bench_kernel:
+        token = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:8]
+        text = pathlib.Path(bench_kernel).read_text()
+        print("bench token", token)
+        meta = bench.remote(text, token, batches)
+        print(json.dumps(meta, indent=2))
+        fetch(token, out)
+        return
     if fetch_token:
         fetch(fetch_token, out)
         return
@@ -124,7 +189,8 @@ def main(out: str, model: str = "", gpu: str = "", workers: int = 4, rounds: int
          "workers": workers, "rounds": rounds, "kernelagentCommit": KA_COMMIT}, indent=2))
     print("token", token, "- if this client dies: modal run modal_kernelagent.py --fetch-token",
           token, "--out", out)
-    fn = run.with_options(gpu=gpu) if gpu else run
-    meta = fn.remote(model, workers, rounds, token)
+    if gpu and gpu.upper() != DEFAULT_GPU.upper():
+        print("note: Modal sets the GPU at decoration time; set ECC_GPU to change it. Using %s" % DEFAULT_GPU)
+    meta = run.remote(model, workers, rounds, token)
     print(json.dumps(meta, indent=2))
     fetch(token, out)
