@@ -339,7 +339,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual length/support/native16/JV8; literal F2torus-helper disproof/point-chart repair (31); generic actual solution/quotient-map equivalence and finite scalar-length bound, unbounded actual bivariate nilpotent family with m0/m1/domain controls (44) | General n!dⁿ/decomposition node unrefuted; scheme-cycle/local multiplicity, isolated points in positive-dimensional components, projective geometry and Rojas/C runtime/refinement |
 | 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
-| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations Actual independent PMF cycle coupling51: everyZModn n>=2/t>0 everyevent distance<=n²/(4t), explicitcoalescence/potentialdrift/bothmarginalexpectations/uniformstationarity; allprime two distinct equalweights by time-dependentaffinepermutation. Deterministicalltime1/2/directnever-mixes and t0controls. Earlier k2/equalweight packet retains its sharperconstant; the general-weight uniformquadratic extension follows below. Stronger randomsupport/staticrho/collisionconstant gaps remain. [pcc:unverified] Generalweight packet59 proves qualifieduniformquadraticHildebrandTheorem2 foranyfixedfinitek>=2/allstrictpositiveweights/allprime/injectivesupports, actualPMF/productindependence/margins/drift/stationarity and explicitp²/(8w_aw_bt)/gamma independentofsupport/modulus. Actualpositive-halfweight distinctincrements0/2 onZMod4 givealltimegap1/2/directnoquadraticconstant afterprime-deletion. Full13pageprimaryread/inspection; sourceitselfwarnscomposites. StrongerrandomsupportTheorem1exponent/staticrho/collisionlaws remainopen. [pcc:unverified] | Stronger expected random-support Theorem1 exponent, random-table collision penalty and limiting constants |
+| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations Actual independent PMF cycle coupling51: everyZModn n>=2/t>0 everyevent distance<=n²/(4t), explicitcoalescence/potentialdrift/bothmarginalexpectations/uniformstationarity; allprime two distinct equalweights by time-dependentaffinepermutation. Deterministicalltime1/2/directnever-mixes and t0controls. Earlier k2/equalweight packet retains its sharperconstant; the general-weight uniformquadratic extension follows below. Stronger randomsupport/staticrho/collisionconstant gaps remain. [pcc:unverified] Generalweight packet59 proves qualifieduniformquadraticHildebrandTheorem2 foranyfixedfinitek>=2/allstrictpositiveweights/allprime/injectivesupports, actualPMF/productindependence/margins/drift/stationarity and explicitp²/(8w_aw_bt)/gamma independentofsupport/modulus. Actualpositive-halfweight distinctincrements0/2 onZMod4 givealltimegap1/2/directnoquadraticconstant afterprime-deletion. Full13pageprimaryread/inspection; sourceitselfwarnscomposites. StrongerrandomsupportTheorem1exponent/staticrho/collisionlaws remainopen. [pcc:unverified] Acknowledgedliteral1994Lemma4k2counter30: epsilon1/m2=4/a1=0/j1, actualfullconditionaluniformsupports/canonicalcenter/literalformulas, singletonprobability1/(p-1)>11/(40p)forallprimep>=3/directnoeventualprimebound. Laterauthorpreprintk>=3repair/knownexercisecredited, independentvalidk2mixingretained; Theorems1/2notrefuted. [pcc:unverified] | Stronger expected random-support Theorem1 exponent, random-table collision penalty and limiting constants |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Requested actual separate-host primeS3 replay completed in public run43501438026, both languages match all6fields/942models/4188162triples; canonical export2/2/0excluded passes | Compiler/runtime/physical-host proof and independence from the same author remain open. Native attestation PCC-20261113-9b23b3not_covered/unsigned; original manualHTTP404 unchanged. |
@@ -1433,3 +1433,27 @@ provenancefiles/35objects/20486Blosslessarchive/fivegatefiles/inspected
 onepagePDF47254B. Signedstandingunverified. Historical44-unreadlabelsnapshot
 notpromoted; possibleLemma4k2boundarycandidate notprovedinthispacket.
 No nativeexperiment/paidcompute/upload/full14closure. [pcc:unverified]
+
+### Author-acknowledged original Hildebrand k2 cell-bound failure
+
+The [acknowledged Hildebrand cell-bound counter](../research/hildebrand_cell_audit_20261114/README.md)
+refutes literaloriginal1994Lemma4 at k2/epsilon1/m2=4/a1=0/j1 for everyprime
+p>=3. The literalReal.rpowcell endpoints/decimalbound reduce inLean to
+1/p,5/(4p),11/(40p). Actualnonzerochoicecardp-1/fullconditionalinjectivesupport
+equivalence/uniformPMFpushforward/sourceargument areproved. Actualcentered
+representativecongruence/halfopenrange/uniqueness proves the celliffa2=-1;
+its actualuniformprobability1/(p-1)>11/(40p). Lean directlynegates any
+eventualprimebound usingEuclid, no cutoff. Independentvalidpositiveweight
+k2mixingcontrol retained. Laterauthorpreprintmath/0401189v1section4.2
+explicitlyhandlesk2separately/restrictscountinglemmatok>=3/acknowledgesolder
+failureexercise; reference14p36 identifiesoriginal1994paper. Thisis aknown
+boundaryformalization/no novelty, not a refutationofTheorems1/2orcorrected
+k>=3countingbound. Original1994full13pageprimaryread/inspectioncredited;
+laterpreprintselected13–16/referencep36read/visual15–16only. Authorcorrection
+attachmentunreadafterrecordedfailures. Strongergeneralrandomsupportexponent
+andother14gapsremainopen. ExactlocalPCC-20261114-4dc478PASSat2026-11-14T10:38:01Z, whole30/0failures/
+0trusted, full1213characterbindinge378e39300818a69d943d83ce16522687b10d1131ccbf76cfa654c5a0fd12a22,
+12custommodules/24formal-config+11artifactpins;54build/processing/provenance
+files/25objects/9000Blosslessarchive/fivegatefiles/inspectedonepagePDF47123B.
+Signedstandingunverified. No corpuspromotion/full14closure/nativeexperiment/
+paidcompute/upload. [pcc:unverified]
