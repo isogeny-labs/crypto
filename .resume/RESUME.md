@@ -1,15 +1,16 @@
 # Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
+Owner (2026-11-14): "tune the rho dp bits and rerun" — after PR #4107 (Kuhn-Struik restarts), the multi-target rho was still 1.4-4.8x above sqrt(2Tn/6) steps, partly because dp bits grow with T.
 
 ## Spec
-Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
-Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
-Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
+examples/prime_fast_j0_rho_multi.rs: DP=<k> override, DPRULE=ks (2^dp ~ W/(T*2^DPDIV)), INST0 offset.
+Tune: DP sweep 2..12 on held-out instances INST0=10 (2 curves x 2 inst), cells 26/{20,200,1000}, 28/{200,1000,3000}, 30/{200,1000,3000}; pick a rule.
+Confirm: chosen rule on INST0=0 (the IC's planted targets) vs research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl.
+Outputs: results/pf_j0/dpsweep/*.jsonl, results/pf_j0/rhotuned_*.jsonl.
 
 ## State
-2026-11-14: patch written, release build running. No rows yet.
+2026-11-14 ~19:00Z: complete. DPDIV=1.5 fixed on held-out sweep; confirmed on INST0=0: rho/IC 0.13-0.40. Record 20261114T1854Z-j0-multirho-dp-tune closed; PR #4144 open with auto-merge.
 
 ## Next
-Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.
+Track PR #4144 to merge. Open threads: 26-bit T=20 lane overhead; interleaved rho vs folded BSGS; isolated host and §5a band.
