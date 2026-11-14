@@ -55,6 +55,18 @@ positive x pins. Its XCNF SHA-256 is
 `f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c`.
 This amendment was recorded before the external solver run.
 
+### 11:19 UTC natural-formula lock
+
+The constructed positive returned SAT and independently passed all original
+CNF/XOR constraints, the group sum and relation row. Its replay SHA-256 is
+`d648542575b7aa2bd8dbbeebc32727531449ecf38f5d8a87c8f00d56b13e0296`.
+The unpinned public formula was then exported from clean commit
+`9c993d2f2b2b4835dca4b480045ea337d66f472f`, with the same compiled
+exporter binary. It has 111,478 variables, 1,140,557 CNF clauses and 4,980
+XOR rows. Its XCNF SHA-256 is
+`02d07716333e073f7eb40a7646ae3652b86b2129cb4d226f5dcc611d6bda7fff`.
+The exact solver lock below binds the one public query before search.
+
 ## Bounded search and interpretation
 
 The first public natural query uses the same solver flags, at most 1,000,000
