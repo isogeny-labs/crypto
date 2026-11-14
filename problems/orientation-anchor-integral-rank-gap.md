@@ -79,3 +79,7 @@ hierarchical cheapest-layer construction; actual U,V factors and the
 complete precision-layer count are still missing. It is outside the66
 project audit/fresh source, with unsigned elaboration data only in
 PCC-20261114-6f9128 [pcc:unverified].
+
+Integration is separately blocked by a protected concurrent PCC ledger append
+in PR4118; see [existing provenance conflict](pkm-pcc-ledger-divergence.md).
+This does not resolve or invalidate the mathematical exit criteria above.
