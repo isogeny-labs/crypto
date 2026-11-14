@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck and implementation gap
 - **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [K2048 native XCNF gate](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-xcnf-20261114/RESULT.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md), [separate a=1 cross-family panel](../research/n83_crossfamily_current_20261025/native/README.md)
 - **Next action owner:** N83 factor-base research task
-- **Last updated:** 2026-11-14 UTC; K2048 native evidence merged in [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126), with a [separately frozen wide-XOR follow-up](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-wide-xcnf-20261114/RESULT.md); earlier [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remains a distinct cell
+- **Last updated:** 2026-11-14 UTC; the same-public-point D18/K2048 solver pair and independent raw audit merged in [PR #4131](https://github.com/isogeny-labs/crypto/pull/4131). The earlier K2048 native [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126) and [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remain separate cells.
 
 ## Problem
 
@@ -27,6 +27,18 @@ requested selection criterion is minimum total index-calculus runtime,
 including setup and online phases, over the finite declared design grid.
 
 ## Evidence and uncertainty
+
+- **2026-11-14 same-point D18/K2048 pair [pcc:unverified]:** The
+  [frozen result](../research/koblitz_n83_factor_base_sweep_20261008/verification/a0-matched-public-solver-20261114/RESULT.md)
+  binds both original XCNFs to sealed public fixture 1 on the primary `a=0`
+  subgroup. The D18 ordered m4 arm returned `INDETERMINATE` at 1,000,001
+  conflicts after 427.082 seconds; the K2048 m5 wide-XOR arm returned
+  `INDETERMINATE` at 1,000,002 conflicts after 156.853 seconds. Both
+  original solver transcripts, commands, host samples, and terminal receipts
+  passed the separate raw audit. The arms produced no checked ordinary row
+  at their caps, so natural yield, novel rank, and complete runtime remain
+  unmeasured. These local solver-stage walls had different background loads
+  and do not rank the complete candidates.
 
 - **2026-11-14 K2048 m5 native gate [pcc:unverified]:** The retained
   339,968-point, 2,048-column `a=0` base has a source-bound five-summand
@@ -100,10 +112,10 @@ criterion. A checked partial relation would resolve only the first gate.
 
 ## Next discriminating step
 
-- **Primary `a=0` action:** After the separate R13 run finishes and the local host qualifies, execute the committed [second K2048 wide-XOR positive lock](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-wide-xcnf-20261114/NATIVE_POSITIVE_LOCK_02.json) and independently replay its original XCNF and group row before releasing one public natural query. Keep the K2048 and full-D18 encodings, arities, bases and capped outcomes as separate candidate cells. A later D18 solver-policy change requires its own positive gate.
+- **Primary `a=0` action:** The second K2048 wide-XOR positive and its public natural query are complete, as is the same-point D18/K2048 pair. Develop a relation-producing ordinary-query path with an independently checked positive gate, then measure common-query useful yield and novel rank across the retained bases. Keep the K2048 and full-D18 encodings, arities, bases and capped outcomes as separate candidate cells.
 - **Inputs and controls:** Bind the exact compressed S3 object and provider checksums, pilot public corpus, target point, positive model, formula bytes, solver binary, source commit, and resource caps before timing.
 - **Execution limits:** Retain `INDETERMINATE`, timeout, OOM, and producer failure as terminal rows without assigning zero cost or natural yield. A checked natural relation advances to multi-query yield and rank measurement.
-- **Cross-curve action:** The distinct `a=1` 53-bit-subgroup [current-source panel](../research/n83_crossfamily_current_20261025/native/README.md) freezes K3300, K3450, K3500 and K3596 on 16 unseen public points with paired same-point IC/rho and separate online/cold selectors. Its owner-approved `us-east-1a` two-instance Spot route with security group `sg-030ffadf6a62d2ce2` remains price-gated: the latest 2026-11-14 read-only quote was $0.396900/hour against the $0.27 bid, though placement scored 7 for two units. No allocation has occurred. Do not pool its data with the primary `a=0` subgroup.
+- **Cross-curve action:** The distinct `a=1` 53-bit-subgroup [current-source panel](../research/n83_crossfamily_current_20261025/native/README.md) freezes K3300, K3450, K3500 and K3596 on 16 unseen public points with paired same-point IC/rho and separate online/cold selectors. Its owner-approved `us-east-1a` two-instance Spot route with security group `sg-030ffadf6a62d2ce2` remains price-gated: the latest 2026-11-14 read-only quote was $0.396900/hour against the $0.27 bid, though placement scored 8 for two units. No allocation has occurred. Keep its results separate from the primary `a=0` subgroup.
 - **Recheck trigger:** A changed solver or encoding with a positive pass, a checked natural relation, a completed matched panel, or a qualified cloud route for the `a=1` comparison.
 
 ## Resolution and history
