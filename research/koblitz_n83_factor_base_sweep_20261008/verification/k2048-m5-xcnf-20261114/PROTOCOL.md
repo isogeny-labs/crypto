@@ -45,6 +45,16 @@ independent replay of every original CNF and XOR row, then characteristic-two
 curve, subgroup, group-sum and signed-Frobenius relation-row replay. Only
 that result releases the public natural query.
 
+### 11:15 UTC bounded-control amendment
+
+The constructed positive also uses a 1,000,000-conflict and 600-second
+CryptoMiniSat limit with a 660-second process-group watchdog. The source-bound
+positive export from commit `54753787383afe3a2a0fe7e7773dc47941e50025`
+has 111,478 variables, 1,141,221 CNF clauses, 4,980 XOR rows, and 747
+positive x pins. Its XCNF SHA-256 is
+`f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c`.
+This amendment was recorded before the external solver run.
+
 ## Bounded search and interpretation
 
 The first public natural query uses the same solver flags, at most 1,000,000
