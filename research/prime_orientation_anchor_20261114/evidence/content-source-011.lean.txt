@@ -1,0 +1,164 @@
+module
+public import OrientationValuation
+import all OrientationAnchor
+import all OrientationValuation
+public section
+noncomputable section
+namespace OrientationAnchor
+open Polynomial Finset
+
+/-- Zero has every valuation bound; the ordinary valuation API sends zero to zero. -/
+def VBound (k : ℤ) (q : ℚ) : Prop := q = 0 ∨ k ≤ padicValRat 2 q
+
+theorem VBound.zero (k : ℤ) : VBound k 0 := Or.inl rfl
+
+theorem VBound.mono {k l : ℤ} {q : ℚ} (h : VBound k q) (hl : l ≤ k) : VBound l q :=
+  h.imp_right fun hk => hl.trans hk
+
+theorem VBound.neg {k : ℤ} {q : ℚ} (h : VBound k q) : VBound k (-q) := by
+  rcases h with h | h
+  · simp [h, VBound]
+  · exact Or.inr (by rwa [padicValRat.neg])
+
+theorem VBound.add {k : ℤ} {q r : ℚ} (hq : VBound k q) (hr : VBound k r) :
+    VBound k (q+r) := by
+  by_cases hz : q+r=0
+  · exact Or.inl hz
+  rcases hq with rfl | hq
+  · simpa using hr
+  rcases hr with rfl | hr
+  · right
+    simpa only [add_zero] using hq
+  exact Or.inr ((le_min hq hr).trans (padicValRat.min_le_padicValRat_add hz))
+
+theorem VBound.mul {k l : ℤ} {q r : ℚ} (hq : VBound k q) (hr : VBound l r) :
+    VBound (k+l) (q*r) := by
+  by_cases hqz : q=0
+  · simp [hqz, VBound]
+  by_cases hrz : r=0
+  · simp [hrz, VBound]
+  exact Or.inr (by rw [padicValRat.mul hqz hrz]; exact add_le_add (hq.resolve_left hqz) (hr.resolve_left hrz))
+
+theorem VBound.sum {ι : Type*} (S : Finset ι) (f : ι → ℚ) (k : ℤ)
+    (h : ∀ i ∈ S, VBound k (f i)) : VBound k (∑ i ∈ S, f i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using VBound.zero k
+  | @insert i S hi ih =>
+    rw [sum_insert hi]
+    exact (h i (mem_insert_self _ _)).add (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+
+/-- Coefficientwise rational 2-adic content, with zero handled exactly. -/
+def Content (k : ℤ) (P : ℚ[X]) : Prop := ∀ n, VBound k (P.coeff n)
+
+theorem Content.mono {k l : ℤ} {P : ℚ[X]} (h : Content k P) (hl : l ≤ k) : Content l P :=
+  fun n => (h n).mono hl
+
+theorem Content.one : Content 0 (1 : ℚ[X]) := by
+  intro n
+  by_cases hn : n=0 <;> simp [coeff_one, VBound, hn]
+
+theorem Content.C {k : ℤ} {q : ℚ} (h : VBound k q) : Content k (C q) := by
+  intro n
+  by_cases hn : n=0
+  · simpa [hn] using h
+  · simp [coeff_C, hn, VBound]
+
+theorem Content.X : Content 0 (X : ℚ[X]) := by
+  intro n
+  by_cases hn : n=1
+  · simp [coeff_X, hn, VBound]
+  · simp [coeff_X, hn, Ne.symm hn, VBound]
+
+theorem Content.add {k : ℤ} {P Q : ℚ[X]} (hP : Content k P) (hQ : Content k Q) :
+    Content k (P+Q) := by
+  intro n
+  simpa only [coeff_add] using (hP n).add (hQ n)
+
+theorem Content.mul {k l : ℤ} {P Q : ℚ[X]} (hP : Content k P) (hQ : Content l Q) :
+    Content (k+l) (P*Q) := by
+  intro n
+  rw [coeff_mul]
+  exact VBound.sum _ _ _ fun ij _ => (hP ij.1).mul (hQ ij.2)
+
+theorem Content.pow {k : ℤ} {P : ℚ[X]} (h : Content k P) (n : ℕ) :
+    Content ((n:ℤ)*k) (P^n) := by
+  induction n with
+  | zero => simpa using Content.one
+  | succ n ih =>
+    simpa [pow_succ, Nat.cast_add, add_mul] using ih.mul h
+
+theorem Content.prod {ι : Type*} (S : Finset ι) (P : ι → ℚ[X]) (k : ι → ℤ)
+    (h : ∀ i ∈ S, Content (k i) (P i)) :
+    Content (∑ i ∈ S, k i) (∏ i ∈ S, P i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using Content.one
+  | @insert i S hi ih =>
+    rw [sum_insert hi, prod_insert hi]
+    exact (h i (mem_insert_self _ _)).mul (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+
+theorem int_bound_of_dvd (t : ℤ) (k : ℕ) (h : (2:ℤ)^k ∣ t) :
+    VBound k (t : ℚ) := by
+  by_cases ht : t=0
+  · simp [ht, VBound]
+  · right
+    rw [padicValRat.of_int]
+    exact_mod_cast ((padicValInt_dvd_iff (p:=2) k t).mp h).resolve_left ht
+
+/-- Equal 2-adic orders of an integer and 2^i force one extra factor of two. -/
+theorem numerator_extra_dvd (t : ℤ) (i : ℕ) (ht : t ≠ 0)
+    (hi : padicValInt 2 t = i) : (2:ℤ)^(i+1) ∣ (2:ℤ)^i-t := by
+  have hd : (2:ℤ)^i ∣ t := by simpa [hi] using padicValInt_dvd (p:=2) t
+  have hn : ¬(2:ℤ)^(i+1) ∣ t := by
+    intro h
+    rcases (padicValInt_dvd_iff (p:=2) (i+1) t).mp h with h | h
+    · exact ht h
+    · omega
+  obtain ⟨k, hk⟩ := hd
+  have hnk : ¬ (2:ℤ) ∣ k := by
+    rintro ⟨l, hl⟩
+    apply hn
+    refine ⟨l, ?_⟩
+    rw [hk, hl, pow_succ]
+    ring
+  have hm : k % 2 ≠ 0 := fun h => hnk (Int.dvd_of_emod_eq_zero h)
+  have h2 : (2:ℤ) ∣ 1-k := by apply Int.dvd_of_emod_eq_zero; omega
+  obtain ⟨l, hl⟩ := h2
+  refine ⟨l, ?_⟩
+  rw [hk, pow_succ]
+  linear_combination (2:ℤ)^i * hl
+
+/-- The literal local chart; no coefficient bounds are supplied as input. -/
+def chart (a : ℕ) (t : ℤ) (P : ℚ[X]) : ℚ[X] :=
+  P.comp (C (t:ℚ) + C ((2:ℚ)^(a+1))*X)
+
+/-- Coefficient content of the actual affine anchor numerator. -/
+theorem chart_numerator_content (a i j : ℕ) (t : ℤ)
+    (ht : t ≠ 0) (hi : padicValInt 2 t = i) (hia : i ≤ a) :
+    Content (if j=i then (i:ℤ)+1 else min (i:ℤ) j)
+      ((C ((2:ℚ)^j)-X).comp (C (t:ℚ)+C ((2:ℚ)^(a+1))*X)) := by
+  let k : ℤ := if j=i then (i:ℤ)+1 else min (i:ℤ) j
+  have hk : k ≤ a+1 := by dsimp [k]; split_ifs <;> omega
+  have hnum : VBound k ((2:ℚ)^j-(t:ℚ)) := by
+    by_cases he : j=i
+    · subst j
+      have h := int_bound_of_dvd ((2:ℤ)^i-t) (i+1) (numerator_extra_dvd t i ht hi)
+      simpa [k] using h
+    · have h1 : VBound (min (i:ℤ) j) ((2:ℚ)^j) :=
+        Or.inr (by rw [padicValRat.pow, show padicValRat 2 (2:ℚ)=1 from padicValRat.self (p:=2) (by decide), mul_one]; omega)
+      have h2 : VBound (min (i:ℤ) j) (t:ℚ) :=
+        Or.inr (by rw [padicValRat.of_int, hi]; omega)
+      simpa [k, he, sub_eq_add_neg] using h1.add h2.neg
+  have ha : VBound k (-((2:ℚ)^(a+1))) := by
+    apply VBound.neg
+    right
+    rw [padicValRat.pow, show padicValRat 2 (2:ℚ)=1 from padicValRat.self (p:=2) (by decide), mul_one]
+    exact hk
+  have hp : Content k (C ((2:ℚ)^j-(t:ℚ)) + C (-((2:ℚ)^(a+1)))*X) := by
+    exact (Content.C hnum).add (by simpa only [add_zero] using (Content.C ha).mul Content.X)
+  convert hp using 1
+  simp only [sub_comp, C_comp, X_comp, map_sub, map_neg]
+  ring
+
+end OrientationAnchor

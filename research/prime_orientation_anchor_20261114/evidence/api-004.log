@@ -1,0 +1,20 @@
+Finset.prod_erase_mul.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [CommMonoid M] [DecidableEq ι] (s : Finset ι) (f : ι → M)
+  {a : ι} (h : a ∈ s) : (∏ x ∈ s.erase a, f x) * f a = ∏ x ∈ s, f x
+../evidence/api-004.lean.txt:4:7: error(lean.unknownIdentifier): Unknown constant `Finset.card_Ico`
+Int.card_Ico (a b : ℤ) : #(Ico a b) = (b - a).toNat
+Finset.card_image_of_injective.{u_1, u_2} {α : Type u_1} {β : Type u_2} {f : α → β} [DecidableEq β] (s : Finset α)
+  (H : Function.Injective f) : #(image f s) = #s
+Polynomial.natDegree_C_mul_le.{u} {R : Type u} [Semiring R] (a : R) (f : R[X]) : (C a * f).natDegree ≤ f.natDegree
+../evidence/api-004.lean.txt:8:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.degree_C_mul_le`
+Polynomial.degree_mul_le.{u} {R : Type u} [Semiring R] (p q : R[X]) : (p * q).degree ≤ p.degree + q.degree
+Polynomial.degree_C_le.{u} {R : Type u} {a : R} [Semiring R] : (C a).degree ≤ 0
+Polynomial.natDegree_prod.{u, w} {R : Type u} {ι : Type w} (s : Finset ι) [CommSemiring R] [NoZeroDivisors R]
+  (f : ι → R[X]) (h : ∀ i ∈ s, f i ≠ 0) : (∏ i ∈ s, f i).natDegree = ∑ i ∈ s, (f i).natDegree
+../evidence/api-004.lean.txt:12:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.natDegree_prod_X_sub_C`
+Finset.sum_le_sum_of_subset_of_nonneg.{u_1, u_5} {ι : Type u_1} {N : Type u_5} [AddCommMonoid N] [Preorder N]
+  {f : ι → N} {s t : Finset ι} [AddLeftMono N] (h : s ⊆ t) (hf : ∀ i ∈ t, i ∉ s → 0 ≤ f i) : ∑ i ∈ s, f i ≤ ∑ i ∈ t, f i
+padicValRat.add_eq_min {p : ℕ} [hp : Fact (Nat.Prime p)] {q r : ℚ} (hqr : q + r ≠ 0) (hq : q ≠ 0) (hr : r ≠ 0)
+  (hval : padicValRat p q ≠ padicValRat p r) : padicValRat p (q + r) = min (padicValRat p q) (padicValRat p r)
+../evidence/api-004.lean.txt:15:7: error(lean.unknownIdentifier): Unknown constant `padicValRat.sub_eq_min`
+padicValRat.neg {p : ℕ} (q : ℚ) : padicValRat p (-q) = padicValRat p q
+padicValRat.self {p : ℕ} (hp : 1 < p) : padicValRat p ↑p = 1

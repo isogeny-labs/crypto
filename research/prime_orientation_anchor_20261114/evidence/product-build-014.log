@@ -1,0 +1,23 @@
+✖ [9059/9060] Building OrientationProduct (3.5s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean/OrientationProduct.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean/OrientationProduct.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/ir/OrientationProduct.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/ir/OrientationProduct.setup.json --json
+info: OrientationProduct.lean:121:2: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+error: OrientationProduct.lean:106:42: unsolved goals
+a j : ℕ
+d : ℚ
+hj : j ≤ a
+hd : padicValRat 2 (2 ^ j - d) ≤ ↑j
+hpow : VBound (↑j) (2 ^ j)
+halpha : VBound (↑j) (-2 ^ (a + 1))
+hn : Content (↑j) (C (2 ^ j) + C (-2 ^ (a + 1)) * X)
+hi : Content (-padicValRat 2 (2 ^ j - d)) (C (2 ^ j - d)⁻¹)
+hp : Content 0 ((C (2 ^ j) + C (-2 ^ (a + 1)) * X) * C (2 ^ j - d)⁻¹)
+⊢ C (2 ^ j) * C (-d + 2 ^ j)⁻¹ - C (2 ^ a * 2) * X * C (-d + 2 ^ j)⁻¹ =
+    C (2 ^ j) * C (-d + 2 ^ j)⁻¹ + X * C (-d + 2 ^ j)⁻¹ * C (-(2 ^ a * 2))
+Some required targets logged failures:
+- OrientationProduct
+error: build failed
