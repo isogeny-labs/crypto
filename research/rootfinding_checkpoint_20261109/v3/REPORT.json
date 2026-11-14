@@ -1,0 +1,182 @@
+{
+  "experiments": {
+    "dual-ladder-controls-20261109-v3": {
+      "status": "passed",
+      "summary": "Dual certificates passed independent small box and root-multiset oracles.",
+      "metrics": {
+        "certificates_retained_in_raw_stdout": true,
+        "closed_maps": 20,
+        "complete_global_root_search": false,
+        "controls_complete": true,
+        "false_exclusions": 0,
+        "independent_box_tuples": 3674760,
+        "independent_python_certificates": 20,
+        "independent_root_multisets": 1680,
+        "maps": 240,
+        "memory_metric": "wait4 per-process peak RSS KiB, not aggregate descendants",
+        "original_root_count_exact": null,
+        "positive_maps": 20,
+        "qualified_speedup": null,
+        "release_gate_claim": false,
+        "tamper_rejections": 60
+      },
+      "stage_metrics": [
+        {
+          "peak_process_rss_kib": 200556,
+          "returncode": 0,
+          "stage": "compile",
+          "timed_out": false,
+          "wall_seconds": 3.220280023999294
+        },
+        {
+          "peak_process_rss_kib": 13312,
+          "returncode": 0,
+          "stage": "linked-libraries",
+          "timed_out": false,
+          "wall_seconds": 0.005338451999705285
+        },
+        {
+          "peak_process_rss_kib": 13312,
+          "returncode": 0,
+          "stage": "native-controls",
+          "timed_out": false,
+          "wall_seconds": 0.08365980000053241
+        }
+      ],
+      "result_path": "lab/ledger/attempts/dual-ladder-controls-20261109-v3/0001/scientific_result.json"
+    },
+    "dual-ladder-profile-20261109-v3": {
+      "status": "passed",
+      "summary": "Three cold expanded five-NIST dual-certificate panels and planted repeated-source nonrejection controls completed.",
+      "metrics": {
+        "all_round_outcomes_match": true,
+        "bounded_profile_complete": true,
+        "cold_repetitions": 3,
+        "complete_global_root_search": false,
+        "conditional_lines_per_round": 320,
+        "fields": 5,
+        "full_certificates_retained_in_raw_stdout": true,
+        "independent_positive_norm_checks": 15,
+        "memory_metric": "wait4 per-process peak RSS KiB, not aggregate descendants",
+        "original_root_count_exact": null,
+        "planted_artifact": "research/dual_ladder_20261109_v3/planted_inputs.json",
+        "planted_control_label": "PLANTED_NOT_BENCHMARK",
+        "planted_positive_checks": 15,
+        "planted_positive_fields": 5,
+        "qualified_speedup": null,
+        "release_gate_claim": false,
+        "repeat_relative_range": 0.01624676588513239
+      },
+      "stage_metrics": [
+        {
+          "peak_process_rss_kib": 200268,
+          "returncode": 0,
+          "stage": "compile",
+          "timed_out": false,
+          "wall_seconds": 2.815917284000534
+        },
+        {
+          "peak_process_rss_kib": 11648,
+          "returncode": 0,
+          "stage": "linked-libraries",
+          "timed_out": false,
+          "wall_seconds": 0.010860418999072863
+        },
+        {
+          "peak_process_rss_kib": 32704,
+          "returncode": 0,
+          "stage": "exact-field-group-setup-0",
+          "timed_out": false,
+          "wall_seconds": 0.6361695320010767
+        },
+        {
+          "peak_process_rss_kib": 23352,
+          "returncode": 0,
+          "stage": "positive-controls-0",
+          "timed_out": false,
+          "wall_seconds": 0.24287661299968022
+        },
+        {
+          "stage": "verified-positive-artifact-export"
+        },
+        {
+          "peak_process_rss_kib": 23532,
+          "returncode": 0,
+          "stage": "native-profile-0",
+          "timed_out": false,
+          "wall_seconds": 12.896428080000987
+        },
+        {
+          "peak_process_rss_kib": 32572,
+          "returncode": 0,
+          "stage": "exact-field-group-setup-1",
+          "timed_out": false,
+          "wall_seconds": 0.5874202830000286
+        },
+        {
+          "peak_process_rss_kib": 26732,
+          "returncode": 0,
+          "stage": "positive-controls-1",
+          "timed_out": false,
+          "wall_seconds": 0.2239318789997924
+        },
+        {
+          "peak_process_rss_kib": 26732,
+          "returncode": 0,
+          "stage": "native-profile-1",
+          "timed_out": false,
+          "wall_seconds": 12.866013409000516
+        },
+        {
+          "peak_process_rss_kib": 32396,
+          "returncode": 0,
+          "stage": "exact-field-group-setup-2",
+          "timed_out": false,
+          "wall_seconds": 0.5967174910001631
+        },
+        {
+          "peak_process_rss_kib": 29804,
+          "returncode": 0,
+          "stage": "positive-controls-2",
+          "timed_out": false,
+          "wall_seconds": 0.22874076900006912
+        },
+        {
+          "peak_process_rss_kib": 29804,
+          "returncode": 0,
+          "stage": "native-profile-2",
+          "timed_out": false,
+          "wall_seconds": 13.079746405999686
+        }
+      ],
+      "result_path": "lab/ledger/attempts/dual-ladder-profile-20261109-v3/0001/scientific_result.json"
+    },
+    "primal-enum-20261109-v3": {
+      "status": "inconclusive",
+      "summary": "Primal enumeration incomplete; raw stages retained.",
+      "metrics": {
+        "complete_global_root_search": false,
+        "conditional_ordered_root_count_exact": null,
+        "error": "compile incomplete",
+        "memory_metric": "wait4 per-process high-water KiB, not aggregate descendants",
+        "original_root_count_exact": null,
+        "qualified_speedup": null,
+        "release_gate_claim": false,
+        "scope_complete": false
+      },
+      "stage_metrics": [
+        {
+          "peak_process_rss_kib": 134924,
+          "returncode": 1,
+          "stage": "compile",
+          "timed_out": false,
+          "wall_seconds": 0.6821375929994247
+        }
+      ],
+      "result_path": "lab/ledger/attempts/primal-enum-20261109-v3/0001/scientific_result.json"
+    }
+  },
+  "scientific_goal_complete": false,
+  "qualified_speedup": null,
+  "requested_speed_target": 8
+}

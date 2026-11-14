@@ -1,0 +1,5 @@
+# Next hypotheses and headroom review
+
+ActualexpandedprofilehaszeroBernsteinchecks:all80emptyfibersalreadyclosedbyold5D. Lazyproposal/replaycanonlybeoverheadhere. On aneligiblefreshpanel, non-excludinguncheckedproposalsremovenothing, exclusionsrequireindependent27transform/congruence/phaseproof, andearlyexitafteroneverifiedfiberexclusionissound. Noheadroomorbenefitfollowshere.
+
+The source-coupled c=2lambda0-gamma transformation hasdeterminant-1 and preservesindexp³. Substitutiongamma=2lambda0-c gives the statedcongruences. Exactgamma mustnotbe independentlycentered afterpreservingc; phasesremainexact. Metricquality/pruning/runtimeareuntested. Neweligiblepanels/cost-onlydiscoverycomparisons needfrozeninputs,budgetsandchargedselection. Repeateddomainexpansiontosuccesswithoutafixedruleisnotadmitted.

@@ -1,0 +1,7 @@
+# Review of the unexecuted point-query successor
+
+The fresh joint_query_plan_20261112_v1 separates the measured all-target cache from on-demand queries. Its direct-coordinate comparator is the strong specialized reference for the particular basis and linear first equation: coordinate inversion is valid for this map even though coordinate labels are not integer ring encodings. A charged linear Frobenius matrix diag(1,-1) is classical in this basis. Generic exponentiation, a prepared matrix and direct coordinate inversion must solve the same queries with their complete setup and verification costs.
+
+The planned small-field oracle and separately registered wide32-query diagnostics are bounded and do not authorize a fourth experiment in the present cycle. Wide fields must use a pair-arithmetic oracle and explicit allocation preflight, not a q-element table. Existing NIST prime proofs, nonsquare selection/certification, field representation and setup must be pinned and charged or truthfully reused. Generated positive/negative queries remain structured calibration, not independently hard arbitrary root systems.
+
+The rank/domain premise and characteristic restriction are correctly retained. A generic curve chart, singular/kernel fibers, poles and original auxiliary branches remain separate proof obligations. No new execution, timing, novelty or curve coverage was supplied by this review. The frozen current sources and results remain unchanged.

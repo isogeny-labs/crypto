@@ -1,0 +1,57 @@
+{
+  "artifacts": [
+    "raw-controls.json.gz",
+    "raw-profile.json.gz",
+    "planted_inputs.json"
+  ],
+  "budgets": {
+    "cores": 1,
+    "memory_limit_mb": 4096,
+    "whole_worker_seconds": 90
+  },
+  "commands": [
+    [
+      "python",
+      "-m",
+      "research.dual_ladder_20261109_v3.worker",
+      "dual-ladder-controls-20261109-v3",
+      "controls"
+    ],
+    [
+      "python",
+      "-m",
+      "research.dual_ladder_20261109_v3.worker",
+      "dual-ladder-profile-20261109-v3",
+      "profile"
+    ]
+  ],
+  "planted_schema": "planted-nist-positive-cases/v1;public solverdata separate from expected witness",
+  "profile_rule": {
+    "LLL_cap_per_line": 1024,
+    "cold_repetitions": 3,
+    "fields": 5,
+    "h": [
+      0,
+      1,
+      -1,
+      2,
+      -2,
+      3,
+      -3,
+      4
+    ],
+    "pairs": 8
+  },
+  "schema": "expanded-dual-ladder/v1",
+  "scientific_execution": false,
+  "sha256": {
+    "EXTERNAL_DEPENDENCIES.json": "681d74286118421d526897195a3a7dc309138ea0ec6da5ca71049126b8199cc6",
+    "EXTERNAL_GMP.json": "edd39099d523d2679f4a7b9ab0d09717b3701c3c1824197d9926206bee4d7301",
+    "EXTRACTION.json": "53af3c69bd9f541fcf1e152678c83829e8e6605c669b1c324b92367e613e2133",
+    "PROOF.md": "16d54b4963b7329e2a324ecb93b1796c270f4629cf5dc8c09e6885f744da706c",
+    "checker.py": "30b4681d407f778c5fa09e8a68b92eddb03d040f1421279b3cdf11ab9f36e05d",
+    "frozen_prefix.hpp": "607da94a0e9489043614216aff3b654055f8abc43bf16a8525a66f45263de078",
+    "native.cpp": "4d2bd2819f7077a2657b7cddb892b5f122b715b90c348169adbfb6d1385c52e1",
+    "worker.py": "a70f2d7f6199d8394a6d4aacb89c3064824d36b3d83a6234716c74efe3f37949"
+  }
+}
