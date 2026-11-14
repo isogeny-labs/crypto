@@ -46,6 +46,10 @@
 //!
 //! # Cross-checks (a failure refuses the class and ℓ, reported, never written)
 //!
+//! - the stored invariants are consistent: |t| < 2√p, p ∤ t, and
+//!   t^2 - 4p = v^2 D_K with D_K a negative fundamental discriminant (the depth
+//!   and (D_K/ℓ) are read off v and D_K; a failure refuses the class at both ℓ
+//!   and is counted as `levels57_classes_refused_invariants`);
 //! - the stored trace equals the exhaustive count of the census model;
 //! - N ∈ {1, ℓ + 1} (d ≥ 1) or N = 1 + (D_K/ℓ) (d = 0) at every curve and
 //!   every walk step;
@@ -58,8 +62,9 @@
 //!   curve one at d - 1;
 //! - across every stored ℓ = 5 Vélu edge, levels differ by at most 1;
 //! - an exact level already stored (volcano.rs from the ℓ = 5 graph, or
-//!   end_ring.rs from Kohel's torsion test) must be equal, and a stored
-//!   `level_at_most` must not be below the certified level;
+//!   end_ring.rs from Kohel's torsion test) must be equal, a stored
+//!   `level_at_most` must not be below the certified level, and a stored
+//!   `depth` must equal v_ℓ(v);
 //! - where End(E) is stored with status proved, level = v_ℓ(conductor_f).
 //!
 //! A class that fails any check at ℓ is refused whole at that ℓ.
@@ -67,8 +72,9 @@
 //! # Writes (insert-or-update, never delete)
 //!
 //! `endomorphism_level` (status `proved`): inserted where missing; a row that
-//! has only `level_at_most` (level NULL) gets the certified level, keeping its
-//! bound; an exact row is never touched (it was cross-checked above). End(E)
+//! has only `level_at_most` (level NULL) and a NULL or equal depth gets the
+//! certified level, keeping its bound and naming the bound's earlier method
+//! in `method`; an exact row is never touched (it was cross-checked above). End(E)
 //! itself is not written here: `end_ring.rs` (Kohel's l^k-torsion criterion)
 //! stores it for every ordinary census curve, and this importer runs after it
 //! so that its levels at ℓ = 5, 7 are checked against an independent method.
@@ -79,7 +85,8 @@
 //! (each refusal also a problem), `levels57_kernels_checked`,
 //! `levels57_edges_checked`, `levels57_walk_steps`,
 //! `levels57_agree_stored_level`, `levels57_agree_end_conductor`,
-//! `levels57_stored_l5_edges_checked`, `endomorphism_levels_l5_l7_written`.
+//! `levels57_stored_l5_edges_checked`, `levels57_classes_refused_invariants`,
+//! `endomorphism_levels_l5_l7_written`.
 //!
 //! ℓ = p (p = 5 at ℓ = 5, p = 7 at ℓ = 7) has no volcano and is skipped;
 //! supersingular classes are skipped.
@@ -566,6 +573,56 @@ pub fn val(mut n: i64, l: i64) -> u32 {
     k
 }
 
+/// Checks the stored Frobenius invariants of an ordinary class over F_p:
+/// |t| < 2√p, p ∤ t, t^2 - 4p = v^2 D_K with v ≥ 1 and D_K a negative
+/// fundamental discriminant. The depth and (D_K/ℓ) are read off v and D_K,
+/// so a class whose stored v or D_K does not match its trace is refused.
+pub fn check_invariants(p: u64, t: i64, v: i64, d_k: i64) -> Result<(), String> {
+    let pi = p as i64;
+    let disc = t * t - 4 * pi;
+    if disc >= 0 {
+        return Err(format!("t = {t} violates the Hasse bound over F_{p}"));
+    }
+    if t % pi == 0 {
+        return Err(format!("t = {t} is divisible by p = {p}: supersingular"));
+    }
+    if v < 1 || v.checked_mul(v).and_then(|w| w.checked_mul(d_k)) != Some(disc) {
+        return Err(format!("t^2 - 4p = {disc} != v^2 D_K = {v}^2 * {d_k}"));
+    }
+    let squarefree = |n: i64| (2..).take_while(|q: &i64| q * q <= n).all(|q| n % (q * q) != 0);
+    let fundamental = match d_k.rem_euclid(4) {
+        1 => squarefree(-d_k),
+        0 => matches!((d_k / 4).rem_euclid(4), 2 | 3) && squarefree(-d_k / 4),
+        _ => false,
+    };
+    if !fundamental {
+        return Err(format!("D_K = {d_k} is not a negative fundamental discriminant"));
+    }
+    Ok(())
+}
+
+/// A stored `endomorphism_level` row: (level, level_at_most, depth).
+pub type StoredLevel = (Option<i32>, Option<i32>, Option<i32>);
+
+/// A stored `endomorphism_level` row (level, level_at_most, depth) against the
+/// certified `level` at depth `depth`: Ok(true) when it already holds the same
+/// exact level, Ok(false) when it may be filled, Err on any conflict (a
+/// different level or depth, or a bound below the level).
+pub fn compare_stored(id: i64, l: u64, depth: u32, level: u32, stored: StoredLevel) -> Result<bool, String> {
+    let (old, at_most, old_depth) = stored;
+    if old_depth.is_some_and(|d| i64::from(d) != i64::from(depth)) {
+        return Err(format!("curve {id}: stored depth {old_depth:?}, computed v_{l}(v) = {depth}"));
+    }
+    match old {
+        Some(o) if i64::from(o) != i64::from(level) => Err(format!("curve {id}: stored level {o}, certified {level}")),
+        Some(_) => Ok(true),
+        None if at_most.is_some_and(|m| i64::from(m) < i64::from(level)) => {
+            Err(format!("curve {id}: stored level_at_most {at_most:?} < certified {level}"))
+        }
+        None => Ok(false),
+    }
+}
+
 /// What one class gave at one ℓ.
 #[derive(Debug, Default)]
 pub struct ClassLevels {
@@ -688,11 +745,14 @@ INSERT INTO ec.endomorphism_level AS el (curve_id, ell, depth, level, level_at_m
 SELECT r.curve_id, r.ell, r.depth, r.level, NULL, r.method, 'proved', $2::bigint
 FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, ell numeric, depth int, level int, method text)
 ON CONFLICT (curve_id, ell) DO UPDATE SET depth = EXCLUDED.depth, level = EXCLUDED.level,
-       method = EXCLUDED.method, status = 'proved', provenance_id = EXCLUDED.provenance_id
-WHERE el.level IS NULL";
+       method = CASE WHEN el.method IS NULL OR el.level_at_most IS NULL THEN EXCLUDED.method
+                     ELSE EXCLUDED.method || '; level_at_most kept from: ' || el.method END,
+       status = 'proved', provenance_id = EXCLUDED.provenance_id
+WHERE el.level IS NULL AND (el.depth IS NULL OR el.depth = EXCLUDED.depth)";
 
 struct Class {
     p: u64,
+    t: i64,
     order: u64,
     v: i64,
     d_k: i64,
@@ -753,7 +813,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
             continue;
         }
         let order = (p as i64 + 1 - t) as u64;
-        let c = classes.entry(class_id).or_insert_with(|| Class { p, order, v, d_k, curves: Vec::new() });
+        let c = classes.entry(class_id).or_insert_with(|| Class { p, t, order, v, d_k, curves: Vec::new() });
         c.curves.push((id, a, b));
     }
     report.count("levels57_classes", classes.len() as u64);
@@ -761,6 +821,11 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
 
     let mut jobs = Vec::new();
     for (class_id, c) in &classes {
+        if let Err(why) = check_invariants(c.p, c.t, c.v, c.d_k) {
+            report.count("levels57_classes_refused_invariants", 1);
+            report.problem(format!("class {class_id}: {why}"));
+            continue;
+        }
         for l in ELLS {
             if l == c.p {
                 report.count(&format!("classes_skipped_l{l}_equals_p"), 1);
@@ -793,9 +858,9 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         });
     }
 
-    let mut existing: BTreeMap<(i64, u64), (Option<i32>, Option<i32>)> = BTreeMap::new();
+    let mut existing: BTreeMap<(i64, u64), StoredLevel> = BTreeMap::new();
     for r in client.query(EXISTING_SQL, &[]).await? {
-        existing.insert((r.get(0), r.get::<_, i64>(1) as u64), (r.get(2), r.get(3)));
+        existing.insert((r.get(0), r.get::<_, i64>(1) as u64), (r.get(2), r.get(3), r.get(4)));
     }
     let mut end_f: BTreeMap<i64, BigInt> = BTreeMap::new();
     for r in client.query(END_EXISTING_SQL, &[]).await? {
@@ -822,17 +887,11 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
         let mut conflict = None;
         let (mut ok_existing, mut ok_end) = (0u64, 0u64);
         for (&id, &lv) in &cl.levels {
-            if let Some(&(old, at_most)) = existing.get(&(id, l)) {
-                match old {
-                    Some(o) if o as u32 != lv => {
-                        conflict = Some(format!("curve {id}: stored level {o}, certified {lv}"));
-                    }
-                    Some(_) => ok_existing += 1,
-                    None => {
-                        if at_most.is_some_and(|m| (m as i64) < lv as i64) {
-                            conflict = Some(format!("curve {id}: stored level_at_most {at_most:?} < certified {lv}"));
-                        }
-                    }
+            if let Some(stored) = existing.get(&(id, l)) {
+                match compare_stored(id, l, job.depth, lv, *stored) {
+                    Ok(true) => ok_existing += 1,
+                    Ok(false) => {}
+                    Err(why) => conflict = Some(why),
                 }
             }
             if let Some(f) = end_f.get(&id) {
@@ -1172,5 +1231,40 @@ mod tests {
         let f = Fp::new(13);
         assert_eq!(division_polynomial(&f, 1, 1, 5).len(), 13);
         assert_eq!(division_polynomial(&f, 1, 1, 7).len(), 25);
+    }
+
+    #[test]
+    fn stored_invariants_must_match_the_trace() {
+        // p = 499, t = 11: t^2 - 4p = -1875 = 25^2 * (-3) (the depth-2 5-volcano)
+        assert!(check_invariants(499, 11, 25, -3).is_ok());
+        // p = 101, t = 2: -400 = 10^2 * (-4)
+        assert!(check_invariants(101, 2, 10, -4).is_ok());
+        // a v with an extra factor 5 (a fake depth) or a D_K that is not fundamental is refused,
+        // even when v^2 D_K still equals t^2 - 4p
+        assert!(check_invariants(499, 11, 5, -75).is_err());
+        assert!(check_invariants(101, 2, 5, -16).is_err());
+        assert!(check_invariants(101, 2, 50, -4).is_err());
+        assert!(check_invariants(101, 2, 10, -3).is_err());
+        // supersingular, Hasse bound, v = 0
+        assert!(check_invariants(101, 0, 2, -101).is_err());
+        assert!(check_invariants(101, 21, 1, -3).is_err());
+        assert!(check_invariants(101, 2, 0, -4).is_err());
+    }
+
+    #[test]
+    fn stored_rows_agree_or_are_refused() {
+        // nothing stored but a bound at or above the level, depth NULL or equal: may be filled
+        assert_eq!(compare_stored(1, 5, 1, 1, (None, Some(1), Some(1))), Ok(false));
+        assert_eq!(compare_stored(1, 5, 1, 0, (None, Some(1), None)), Ok(false));
+        assert_eq!(compare_stored(1, 5, 1, 1, (None, None, None)), Ok(false));
+        // the same exact level (depth NULL as walks.rs stores it, or equal)
+        assert_eq!(compare_stored(1, 5, 2, 1, (Some(1), None, None)), Ok(true));
+        assert_eq!(compare_stored(1, 5, 2, 1, (Some(1), None, Some(2))), Ok(true));
+        // conflicts: a different level, a bound below the level, a different depth (regression:
+        // a level_at_most row with a conflicting depth used to have its depth overwritten)
+        assert!(compare_stored(1, 5, 2, 1, (Some(2), None, None)).is_err());
+        assert!(compare_stored(1, 5, 2, 2, (None, Some(1), None)).is_err());
+        assert!(compare_stored(1, 5, 1, 1, (None, Some(1), Some(0))).is_err());
+        assert!(compare_stored(1, 5, 1, 1, (Some(1), None, Some(0))).is_err());
     }
 }
