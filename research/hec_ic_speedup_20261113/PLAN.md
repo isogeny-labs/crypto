@@ -267,3 +267,68 @@ gets its own protocol:
 - hold the step columns and `k` as a dense block per row;
 - eliminate the sparse columns first;
 - solve the residual block densely.
+
+## 8. Slice S2b: a dense step-column block in the solve, protocol frozen before code
+
+Written 2026-11-14, before any S2b code. S2a (`S2-RESULTS.md`, record
+`20261114T0356Z-hec-native-ic`) made the solve pivot-identical and 2.9–4.3× faster. The genus-2 solve
+is still 47–64% of native wall time at p ≥ 503. Every row is absolute, so it carries the cumulative
+counts of the ≈ 64 step places plus `k`. Those ≈ 65 columns are dense, and at genus 2, p = 4001,
+1,695 pivots cost 24,174 row operations.
+
+**Change (S2b, `Solver::Dense`).**
+
+- **Split each row.** A row becomes:
+  - a *sparse part* over the factor-base columns that are not step places;
+  - a *dense part*: a fixed array over the step columns and `k` (`d ≤ 65` entries), in the order
+    `ic.rs` chose the steps, with `k` last.
+
+  `ic.rs` passes the step columns to the solver. Reference and Fast ignore them.
+- **Phase 1.** Markowitz elimination over the sparse columns only. The pivot column is the one with
+  the fewest holders; the pivot row is the holder with the shortest sparse part, ties to the lowest
+  row id. A row operation merges the sparse parts and applies `row −= c·pivot` to the dense array.
+  Pivot rows are dropped, as now.
+- **Phase 2.** The rows left with an empty sparse part form a dense system over the `d` columns.
+  Eliminate the non-`k` columns in order, dropping pivot rows. A remaining row with non-zero `k`
+  gives `k`.
+
+The pivot order differs from Reference/Fast, so pivot identity is no longer the gate. Any exact
+elimination mod ℓ returns `k` exactly when the row set determines `k`. The Jacobians' ℓ-part is
+cyclic, so every derived `k`-only row gives the true `k`. Every solve round must therefore agree.
+
+**Gates (must hold before timing).**
+
+- **G5 (unit).** On random sparse systems mod ℓ with a dense block, `Dense` and `Fast` return the same
+  `Option<k>`. Some systems are full rank for `k` and some are deliberately not, so `None` is
+  exercised.
+- **G6 (runs).** On all 55 runs (11 rows × 5 seeds), `Dense` and `Fast` give identical `k`, `trials`,
+  `relations` and `solve_rounds`, and every `k` verifies `k·D₁ = D₂`. The walk depends on the seed
+  only, so identical solve outcomes mean identical runs.
+- All crate tests pass in release and in debug.
+
+**Measurement.**
+
+- One binary runs `HEC_SOLVER=fast,dense`: both solvers per (row, seed) in one process, order
+  alternating by seed parity.
+- The process is repeated **5 times**, giving 25 paired runs per row.
+- **Primary statistic:** per row, the median over the 25 pairs of `solve_ms(Fast) / solve_ms(Dense)`.
+- Also reported: median solve share of total for each solver, mean solve times, and
+  `solve_mulmods` and `row_ops` for both. These count different work now, so they are reported,
+  not gated.
+- Same host as S1 and S2 (arm64 laptop, single thread, L0). The run is recorded with
+  `tools/benchrec.py`, and the S3 checkpoint is pushed before it.
+
+**Pre-registered expectations.**
+
+- **E5 (exactness).** G5 and G6 hold. Falsified by any differing `Option<k>` or run.
+- **E6 (solve cost).** At genus 2, p ≥ 503, the median paired ratio `Fast / Dense` is ≥ 2× on every
+  row. Falsified by any such row under 2×.
+- **E7 (balance).** At genus 2, p ≥ 503, the median `Dense` solve share of native total time is below
+  35% on every row. Falsified by any row at or above 35%.
+
+**Class.** Engineering on the solve stage. The relation search and group-operation counts are
+unchanged by construction, and G6 checks it. Solve multiplications change and are reported. The
+native engine does not compute `S`, so no `S` claim is made, and nothing here is an advance.
+
+**If E6 fails:** report it. The next lever is the per-trial cost at genus 3 and 4 (track T2), not
+more solver work. Plan §1 sets the genus-2 limit: only constants can move there.
