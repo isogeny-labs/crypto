@@ -61,3 +61,32 @@ inconclusive (4, 8, 11), and none shows a SAT arm at or below the linear 2+1 sca
 - drat-trim, Kissat, cvc5, WDSat, research-kb and the lead atlas were not available.
 
 `workflow_result.json` holds the structured producer and skeptic returns.
+
+## Follow-ups (same day)
+
+Two further local pilots, each with a producer and an independent skeptic. Same standing as above:
+pilots, every number `[pcc:unverified]`.
+
+| Follow-up | Decision per its pre-written rule | After skeptic | Directory |
+|---|---|---|---|
+| Sub-scan test: can a learning solver refute a block of x1 values for less than its leaf count? | kill | kill by the letter; the total-work leg is solid at l <= 8, the exponent leg rests on l = 4 only | [followup-subcube](followup-subcube/README.md), [review](followup-subcube/SKEPTIC.md) |
+| Idea 8 powered rerun (60 targets per cell, best fresh arm as baseline, A/A floor) | inconclusive | inconclusive, knife-edge and baseline-dependent | [followup-08-powered](followup-08-powered/README.md), [review](followup-08-powered/SKEPTIC.md) |
+
+- **Sub-scan.** (leaves + conflicts)/2^l is at least 2.48 at l = 8 against the linear 2+1 scan count;
+  the lowest arm is the one that attempts no subcube refutation. In the skeptic's instrumented run a
+  warm solver refuted one 64-leaf subcube for 0 marginal conflicts and a 32-leaf one for 2; neither
+  amortises to the root.
+- **Dual-rail encoding.** With x1 assigned, CryptoMiniSat needs about 1.6 conflicts per leaf warm
+  (about 20 for a fresh solver), against 151 (l = 4) to more than 19,570 (l = 8) with plain AND
+  gates. The skeptic confirmed it with identical solver options; the gain needs rails on the
+  u&p, u&s and s&z gates as well as the XOR parity, not only the gate the producer named. This is
+  the first SAT arm in these pilots within a small constant of the scan count.
+- **Idea 8.** Incremental/best-fresh conflict ratio on non-decomposable targets: 0.590, 0.747,
+  0.793 (0.773..0.812) at l = 3, 4, 5; the threshold was 0.8. The ratio rises with l (corrected
+  interval for the l = 5 minus l = 4 difference: 0.014..0.106). Along a sequence it keeps falling
+  but decelerates (skeptic's 510-target run at l = 4: 0.85, 0.76, 0.65, 0.60 near positions 10, 50,
+  200, 450). Propagations are at least 1.14x the fresh arm and wall time 2.1 to 2.4x. Reading: a
+  bounded constant in conflicts that shrinks with l and does not carry over to work done.
+- Known defects, no measured row affected: the sub-scan encoding gives a false SAT at u = 0 through
+  twist points; idea 8's CNF has no rationality constraint; both protocols predate the data by file
+  times only.
