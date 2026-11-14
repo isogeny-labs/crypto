@@ -109,3 +109,15 @@ jobs:
           cmp /tmp/ct85-py.json /tmp/ct85-js.json
           cmp /tmp/ct85-py.json /tmp/ct85-jsopt.json
           printf '%s  %s\n' c0e58ecce5818071114aead61c71114a59619ed60dbd4881bb604fb2cc55a148 /tmp/ct85-py.json | sha256sum -c
+
+      - name: CT93 place/embedding fiber counts - two independent exact implementations
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct93
+          python3 -B "$D/ct93_place_transport.py" >/tmp/ct93-py.json
+          python3 -O -B "$D/ct93_place_transport.py" >/tmp/ct93-pyopt.json
+          node "$D/ct93_place_transport_independent.js" >/tmp/ct93-js.json
+          node --no-opt "$D/ct93_place_transport_independent.js" >/tmp/ct93-jsopt.json
+          cmp /tmp/ct93-py.json /tmp/ct93-pyopt.json
+          cmp /tmp/ct93-py.json /tmp/ct93-js.json
+          cmp /tmp/ct93-py.json /tmp/ct93-jsopt.json
+          printf '%s  %s\n' cf1fa25a5a26a19bdf1fa7d4c72e1e60c2dc9b04eb3e5c1b73b62740443f773d /tmp/ct93-py.json | sha256sum -c
