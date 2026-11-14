@@ -76,9 +76,25 @@ aws_() {
 
 have_profile() { aws configure list-profiles 2>/dev/null | grep -qx "$PROFILE"; }
 
+token_expiry() { printf '%s' "$1" | python3 -c 'import base64,json,sys;print(json.loads(base64.b64decode(sys.stdin.read()))["expires"])' 2>/dev/null; }
+
+# $CHECKPOINT_UPLOAD_TOKEN wins, except when it has expired and the token file holds one that has not
+# (a session environment can carry a stale token after a fresh one was installed with presign-upload --install).
 upload_token() {
-  if [ -n "${CHECKPOINT_UPLOAD_TOKEN:-}" ]; then printf '%s' "$CHECKPOINT_UPLOAD_TOKEN"
-  elif [ -s "$TOKEN_FILE" ]; then tr -d '[:space:]' < "$TOKEN_FILE"
+  local env_tok="${CHECKPOINT_UPLOAD_TOKEN:-}" file_tok="" now exp
+  [ -s "$TOKEN_FILE" ] && file_tok="$(tr -d '[:space:]' < "$TOKEN_FILE")"
+  if [ -n "$env_tok" ] && [ -n "$file_tok" ] && [ "$env_tok" != "$file_tok" ]; then
+    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"; exp="$(token_expiry "$env_tok")"
+    if [ -n "$exp" ] && [[ "$exp" < "$now" ]]; then
+      exp="$(token_expiry "$file_tok")"
+      if [ -n "$exp" ] && ! [[ "$exp" < "$now" ]]; then
+        echo "checkpoint: \$CHECKPOINT_UPLOAD_TOKEN has expired; using $TOKEN_FILE" >&2
+        printf '%s' "$file_tok"; return
+      fi
+    fi
+  fi
+  if [ -n "$env_tok" ]; then printf '%s' "$env_tok"
+  elif [ -n "$file_tok" ]; then printf '%s' "$file_tok"
   fi
 }
 
