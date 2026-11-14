@@ -37,9 +37,13 @@ including setup and online phases, over the finite declared design grid.
   process wall. The [merged report](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-xcnf-20261114/RESULT.md)
   preserves the native receipts and earlier Python-orchestrated provenance.
   The separately frozen `--maxmatrixcols 25000` [follow-up](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-wide-xcnf-20261114/RESULT.md)
-  stopped before its positive solver call: load samples 82.0376, 76.6616,
-  74.8535 exceeded the frozen maximum 24, with stable swapouts. Its public
-  natural arm remains withheld pending a fresh locked positive and replay.
+  retained a first `HOST_REJECTED_LOAD` preflight at loads 82.0376, 76.6616,
+  74.8535 with stable swapouts. The second locked positive returned SAT at
+  839 conflicts and passed independent original-XCNF, group, archive, and
+  relation-row replay. The locked public natural arm admitted three
+  332-by-20,916 Gaussian matrices, then returned `INDETERMINATE` at the
+  1,000,001-conflict cap after 151.8622 seconds. It produced no model or
+  verified natural relation on that query; all raw transcripts are retained.
 
 - **2026-11-14 D18 update:** A source-bound ordered-first-pair, cadence-32
   constructed control completed in 50.414 seconds with independent group,
