@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T2126Z-k1-pair-table-dimension",
+  "latest_record": "20261114T2258Z-ic-gpu-rootfind-ic",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 164,
+    "measured": 165,
     "open": 0
   },
   "repo": "crypto",
@@ -3420,6 +3420,93 @@
     },
     {
       "better": "lower",
+      "first": 0.246,
+      "latest": 0.246,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.217314
+      },
+      "metric": "ic_rf2_relations_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.217314
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.246
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 26009.6,
+      "latest": 26009.6,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 22976.678445
+      },
+      "metric": "ic_rf2_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 22976.678445
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 26009.6
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.643,
+      "latest": 0.643,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.568021
+      },
+      "metric": "ic_rf2_solve_s_r31_f4096",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.568021
+          },
+          "n": 4,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": 1.132,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 0.643
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.1769,
       "latest": 0.1769,
       "latest_derived": {
@@ -3552,6 +3639,33 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.312,
+      "latest": 1.312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_eyt_prefetch_d5_sorted_c16_ratio",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T2258Z-ic-gpu-rootfind-ic",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind-subtract-gpu in complete ecbench IC solves on an A100: identical S in 24/24 CPU/GPU pairs (72/72 verified, 72 replays reproduced); relation phase 21-121x and solve 2.5-43.5x faster in wall time at log2 r 27.5-31.3; S stays 3700-23000x matched rho. Eytzinger prefetch 1.2-1.9x slower, default off. The pod job (job.sh via rp_gpu.sh exec) was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+          "value": 1.312
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",

@@ -21,10 +21,11 @@ rf2-{cpu,gpu}-F{4096,16384}, rho-neg-aa. job.sh on one A100: Part 1 ecbench smok
 5 rotated rounds of ./bench throughput at |F| = 65536 and |F| = 1024.
 
 ## State
-2026-11-14: code + local checks done; pod run next.
+2026-11-14 23:45Z: done. Pod deleted. IC: 72/72 verified, replays reproduced, 24/24 pairs equal S; relation
+phase 21-121x, solve 2.5-43.5x faster (REPORT.md). Prefetch: 1.2-1.9x slower, default off. Record closed.
 
 ## Runs in flight
-Pod icgpu-ric (research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-ric).
+None (icgpu-ric deleted 23:43Z).
 
 ## Stop and success conditions
 Part 1: any cpu/gpu S or relation mismatch, or a failed replay, voids the IC comparison. A wall gain is
@@ -33,4 +34,4 @@ arm; a prefetch gain counts only outside the D/D2 spread at the best configurati
 Cap ~1.5 GPU-hours, $4. S3: same waiver as the earlier rounds (session AWS keys rejected).
 
 ## Next steps
-Run job.sh; pull out_ric.tgz to raw/; analyze; report/PDF/figure; benchrec; PR.
+Track the PR. Open: m = 3 on the GPU; a validator check of REPORT.md.
