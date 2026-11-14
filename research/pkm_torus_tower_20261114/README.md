@@ -25,16 +25,21 @@ isogeny chain the repository already found as a 7 ms shortcut at P-192 *is* the
 `T₂` tower (verified numerically, §2). Since `2^{64} | p + 1` at P-192, `2^{96}` at
 P-256 and `2^{521}` at P-521, **the auxiliary-curve search phase is never needed
 for the NIST primes**; (ii) the raw polynomial-calculus solving degree is **not**
-presentation-invariant: writing the tower in the natural rational coordinate of
-the torus (`a ↦ (a² ∓ 1)/(2a)`) costs one degree at every cell with `t ≥ 2`,
-while a polynomial presentation of the same set (the circle `u² + v² = 1`, arm C)
-matches the Kummer tower up to the largest cell that finished (§3). (iii) None of
-this moves the exponent: the staircase `D(m,t)` that closes the lane
-(`research/prime_leads_chase_20261113/L1-pkm`) is reproduced, not changed. The
-improvement is a removed phase (a constant: the aux-curve search was 0.8–25 % of
+presentation-invariant (the frozen prediction P1 is refuted, replicated on a
+second seed and a second prime): writing the tower in the natural rational
+coordinate of the torus (`a ↦ (a² ∓ 1)/(2a)`) costs one degree from `t = 2` on,
+and a polynomial presentation of the same set (the circle `u² + v² = 1` with the
+stereographic link, arm C; or the Kummer tower with a Möbius link, arm M) costs
+one degree from `t = 3` on; all presentations rejoin the Kummer value at the
+largest cells (`m = 2, t = 6`; `m = 3, t = 3`), so the difference is a shift of
+the staircase, not a different growth law (§3). (iii) None of this moves the
+exponent: the staircase `D(m,t)` that closes the lane
+(`research/prime_leads_chase_20261113/L1-pkm`) is reproduced, not changed. What
+is gained is a removed phase (a constant: the aux-curve search was 0.8–25 % of
 `S` in `research/pkm_isogeny_tower_ecbench_20261015`, and a derived `2^{74}` GAE at
-P-192), plus a presentation rule for anyone who runs the `T₂` tower: use the
-circle, not the Möbius coordinate.
+P-192), the answer to the C6 question (the shortcut is usable, at a cost of at
+most one degree in these cells), and a presentation rule for anyone who runs the
+`T₂` tower: the circle, never the Möbius coordinate.
 
 ## 1. What the slides propose and what the repository already knows
 
@@ -91,7 +96,76 @@ measured here.
 
 ## 3. Does the presentation change the solving degree?
 
-RESULTS_PLACEHOLDER
+Instrument: the native closure `closure/` (`pc_closure`, Rust, dense `u32`
+rows, exact mod-`p` elimination) on systems dumped by `scripts/raw_closure.py`
+(curve, base, target with the exhaustive non-decomposability check, the same
+split-`S3` chain as L1's `gen.py`). The Python closure in the same script is the
+independent cross-check: on every cell it finished it agrees with the native
+crate on the certified degree **and on every per-degree rank and expansion
+count** (`python_crosscheck` column of `results.csv`; counts below the table).
+Two random inconsistent targets per cell (seeds 1, 2; both values shown), raw
+polynomial-calculus degree `D`; a cell reads `≥D` when the dense column budget
+(`C(n+D, D) ≤ 45,000`) or the 1200 s cap stopped it with `1 ∉ W_{D−1}` certified.
+
+| m | t | N | K (p=40961) | S (p=40961) | T (p=8191) | T (p=73727) | M (p=40961) | C (p=8191) |
+|---|---|---|---|---|---|---|---|---|
+| 2 | 1 | 2 | 4, 4 | 4, 4 | 4, 4 |  | 4, 4 | 4, 4 |
+| 2 | 2 | 4 | 4, 4 | 5, 5 | 5, 5 | 5 | 4, 4 | 4, 4 |
+| 2 | 3 | 6 | 4, 4 | 5, 5 | 5, 5 | 5 | 5, 5 | 5, 5 |
+| 2 | 4 | 8 | 4, 4 | 5, 5 | 5, 5 | 5 | 5, 5 | 5, 5 |
+| 2 | 5 | 10 | 4, 4 | 5, 5 | 5, 5 | 5 | 5, 5 | ≥5, ≥5 |
+| 2 | 6 | 12 | 5, 5 | 5, 5 | 5, 5 |  | 5, 5 | ≥5, ≥5 |
+| 2 | 7 | 14 | 5 |  | 5 |  |  |  |
+| 3 | 1 | 3 | 5, 5 | 5, 5 | 5, 5 |  | 5, 5 | 5, 5 |
+| 3 | 2 | 6 | 5, 5 | 6, 6 | 6, 6 |  | 5, 5 | 5, 5 |
+| 3 | 3 | 9 | 6, 6 | 6, 6 | 6, 6 |  | 6, 6 |  |
+
+Python cross-check (same dumped system): 41 cells agree on D and every per-degree rank, 7 agree on the degrees Python finished, 0 disagree, 51 not run in Python.
+
+Planted (consistent) controls, `1 ∈ W_D` must stay false:
+
+| arm | p | m | t | result |
+|---|---|---|---|---|
+| C | 8191 | 2 | 3 | no 1 up to D=6 |
+| K | 40961 | 2 | 3 | no 1 up to D=14 |
+| M | 40961 | 2 | 3 | no 1 up to D=10 |
+| S | 40961 | 2 | 3 | no 1 up to D=14 |
+| T | 8191 | 2 | 3 | no 1 up to D=14 |
+
+![raw PC solving degree against N, five presentations](figures/d_vs_n.svg)
+
+99 cells, 713 s of native closure in total, largest dense matrix 43,758 columns.
+
+**Reading, against the frozen rule.**
+
+- *Positive control.* Arm K reproduces the L1 certified ladder wherever
+  `D ≥ 4`: `m = 2`: 4,4,4,4,5,5 at `t = 2..7` (L1: 4,4,4,4,5,5), `m = 3`: 5,6 at
+  `t = 2,3` (L1: 5,6). At `t = 1` the raw degree is 4 where L1's normal-form
+  closure gives 3, the one-degree raw/NF difference below `D = 4` that THEORY.md
+  and the protocol anticipate. The instrument is not suspect.
+- *Negative control.* No planted (consistent) target reached `1 ∈ W_D` within the
+  budget (`D ≤ 10–14`).
+- *Prediction P1 (presentation invariance): REFUTED.* At every cell with
+  `2 ≤ t ≤ 5` (`m = 2`) and at `t = 2` (`m = 3`) the Möbius-coordinate arms S and
+  T are exactly one degree above K, on both seeds, at two primes for T. The
+  polynomial-doubling arms M and C equal K at `t ≤ 2` and are one above at
+  `t = 3..5`; A1's prediction that the *link* costs the degree was wrong at
+  `t = 2` and right from `t = 3` on.
+- *The shape of the difference.* It is a **shift of the staircase, not a new
+  law**: at `m = 2, t = 6` all four non-Kummer arms read 5 and K steps up to 5;
+  at `m = 3, t = 3` all finished arms read 6. The penalty is one degree over the
+  `t`-range where K sits on a tread; nothing here distinguishes a bounded offset
+  from a slower-growing one, and at larger `t` the arms rejoin. The growth of
+  `D` with `N` that governs the lane is the same in every presentation.
+- *Prediction P2 (consequence).* Holds in the weak form: the supersingular
+  `j = 1728` shortcut is usable, and the torus `T₂` tower, written as the circle
+  (arm C), is never more than one degree above the Kummer tower in these cells
+  and equal to it at the largest ones. The strong form ("the same solver cost
+  per relation at every size") is not supported: `D(C) − D(K) ∈ {0, 1}` here, and
+  one degree multiplies the Macaulay size by about `N`.
+- *Verdict under the decision rule:* P1 **REFUTED**, replicated (seed 2, second
+  prime for T); the direction is "torus/Möbius presentations are worse by ≤ 1
+  degree", so no new lead is opened for the L1 instrument.
 
 ## 4. What this does and does not change
 
@@ -101,18 +175,22 @@ RESULTS_PLACEHOLDER
   rho is quoted. This does not "beat" anything.
 - **The C6 question** (`research/pkm_isogeny_tower_p192_20261015`): a
   supersingular `E'` is acceptable to the relation phase in the sense that its
-  tower, written as the circle, has the same solving degree as the Kummer tower
-  at every finished cell; written in the Möbius coordinate it is one degree
-  worse. The ecbench plug-in should therefore present `T₂` bases as the circle
-  tower (two variables per level, one bilinear link), not as `x`-maps of the
-  Vélu chain.
+  tower, written as the circle, is within one degree of the Kummer tower at
+  every finished cell and equal at the largest; written in the Möbius
+  coordinate (the literal `x`-maps of the Vélu chain) it is one degree worse
+  from `t = 2`. The ecbench plug-in should therefore present `T₂` bases as the
+  circle tower (two variables per level, one bilinear link), not as `x`-maps.
 - **Theory.** The circle tower is the Weil restriction of the split Kummer
   tower in `z ∈ F_{p²}`, so over `F_{p²}` it is linearly equivalent to arm M
   (Kummer + bilinear link); PC degree is invariant under field extension, which
-  predicts `D(C) = D(M)` — observed at every finished cell. The one-degree
-  penalty of arms S/T is therefore a property of the *rational* doubling
-  (`a=0 ↦ ∞`: no affine coordinate of the non-split torus makes doubling
-  polynomial over `F_p`), not of the torus.
+  predicts `D(C) = D(M)` — observed at every finished cell (both seeds). The
+  earlier onset of the penalty in arms S/T (`t = 2` instead of `t = 3`) is
+  therefore a property of the *rational* doubling (`a = 0 ↦ ∞`: no affine
+  coordinate of the non-split torus makes doubling polynomial over `F_p`); the
+  later penalty shared by M and C is the bilinear link `x·(…) = …` replacing
+  the linear `x = g·y₀`. Both are shifts; the Kummer tower is the best of the
+  five presentations of this set and is the one the lane's certified ladder
+  already uses.
 - **Next tests (not run).** (a) The circle tower at `m = 4`, `t = 4..5` against
   the certified Kummer values (needs the native closure on a larger host);
   (b) `prime_tower.rs`: add the `T₂` circle base and re-run the 2026-10-15
