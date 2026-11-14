@@ -124,3 +124,18 @@ Pure Python 3 (stdlib only), exact arithmetic, file `l2filters.py` in this direc
 
 Symmetrised S4 / Gaudry e-variable encodings (only m=2 S3 and the m=3 split chain are
 built); n = 131 itself; wall time (noted only).
+
+## Amendment 1 (2026-11-14, appended after the first `cells` run, before any analysis)
+
+- Instrument language: per COMMON.md Amendment 1 (no Python), the Python prototype was
+  deleted unrun and the instrument is the std-only Rust crate in this directory
+  (`Cargo.toml`, `src/main.rs`), built with a lane-private CARGO_TARGET_DIR under
+  `$SP/lanes/L2/target` (the shared target lock was held by long repository builds; this
+  crate has no dependencies and shares no build products). Same design, same cells.
+- k = 3 is also evaluated at n = 19 (protocol said k <= 2 there): a superset, no arm dropped.
+- n = 13, a = 1 is not run: its r-primary subgroup has order 79 (#E = 2*53*79), too small
+  for a meaningful universe. a = 1 is run at n = 11 only (r = 991).
+- Reading rule made explicit for T1 (already implied by NC1): a cell's dim_k counts as a
+  filter only if it exceeds the NC1 random-subset dim_k for the same |D cap U|; dims equal to
+  the null are interpolation artefacts of |D cap U| < #monomials.
+- Frozen body sha256 recorded in `raw/PROTOCOL.frozen.sha256` (copy `raw/PROTOCOL.frozen.md`).

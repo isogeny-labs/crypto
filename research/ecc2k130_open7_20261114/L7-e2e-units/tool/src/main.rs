@@ -229,6 +229,10 @@ fn src_records(repo: &Path, lane: &Path, rows: &mut Vec<Row>, excl: &mut Vec<Val
             let fz = frozen.get(&(a.slug.clone(), arm.clone()));
             if let Some(fz) = fz {
                 row.s_frozen = fz.0;
+                row.note = format!("S_alt = frozen band file {}", frozen_band.unwrap());
+            } else {
+                row.s_frozen = [Some(a.s), None, None];
+                row.note = "S_alt = mean record cost.s (the source's own full-price reading, w = 0 slot only)".into();
             }
             match (c, rho_cur) {
                 (Some(c), Some(rc)) => {
@@ -669,6 +673,13 @@ fn main() {
                 x.push(g[0].log2_r); xn.push(g[0].n.unwrap_or(f64::NAN)); yi.push(m(&ys)); yr.push(m(&rr)); yq.push(m(&ys) - m(&rr));
             }
             if x.len() < 4 { continue; }
+            let mut idx: Vec<usize> = (0..x.len()).collect();
+            idx.sort_by(|&i, &j| x[i].partial_cmp(&x[j]).unwrap());
+            let x: Vec<f64> = idx.iter().map(|&i| x[i]).collect();
+            let xn: Vec<f64> = idx.iter().map(|&i| xn[i]).collect();
+            let yi: Vec<f64> = idx.iter().map(|&i| yi[i]).collect();
+            let yr: Vec<f64> = idx.iter().map(|&i| yr[i]).collect();
+            let yq: Vec<f64> = idx.iter().map(|&i| yq[i]).collect();
             let fi = ols(&x, &yi).unwrap(); let fr = ols(&x, &yr).unwrap(); let fq = ols(&x, &yq).unwrap();
             let t = tq(fq.df());
             let at = |ft: &Fit, x0: f64| { let p = ft.pred(x0); let se = (ft.s2 + ft.se_mean(x0).powi(2)).sqrt(); json!({"x": x0, "log2_ratio": p, "ratio": 2f64.powf(p), "pred_interval95_ratio": [2f64.powf(p - t * se), 2f64.powf(p + t * se)]}) };
@@ -681,6 +692,7 @@ fn main() {
                 o["x_axis_n"] = json!({"ic_log2_cost": fin.js(), "rho_log2_cost": frn.js(), "log2_ratio": fqn.js(),
                     "crossing": crossing(&fin, &frn, 131.0, 0x51ed27f1 ^ (wi as u64 + 7) ^ (name.len() as u64) << 24)});
                 o["x_axis_n"]["n_values"] = json!(xn);
+                if x.len() >= 6 { o["two_variable_log2_ratio_on_n_and_log2_r"] = ols2(&xn, &x, &yq, 131.0, 129.0); }
             }
             fits.push(o);
         }
@@ -696,7 +708,7 @@ fn main() {
         csv.push('\n');
         jrows.push(json!({"source": r.source, "regime": r.regime, "n": nz(r.n), "slug": r.slug, "log2_r": r.log2_r, "arm": r.arm, "series": r.series, "method": r.method,
             "columns": nz(r.columns), "m": nz(r.m), "relations": nz(r.relations), "trials_per_relation": nz(r.trials_per_rel), "cost_per_relation": nz(r.cost_per_rel), "la_cost": nz(r.la_cost),
-            "S": [nz(r.s[0]), nz(r.s[1]), nz(r.s[2])], "S_frozen_band": [nz(r.s_frozen[0]), nz(r.s_frozen[1]), nz(r.s_frozen[2])], "unit": r.unit,
+            "S": [nz(r.s[0]), nz(r.s[1]), nz(r.s[2])], "S_alt": [nz(r.s_frozen[0]), nz(r.s_frozen[1]), nz(r.s_frozen[2])], "unit": r.unit,
             "log2_total_cost_w0": nz(r.log2_total(0)), "rho_kind": r.rho_kind, "rho_S": [nz(r.rho_s[0]), nz(r.rho_s[1]), nz(r.rho_s[2])],
             "ratio_to_rho": [nz(r.ratio(0)), nz(r.ratio(1)), nz(r.ratio(2))], "band_reading": r.band_reading, "validation": r.validation, "large_prime": r.large_prime,
             "runs": nz(r.runs), "verified": nz(r.verified), "phase_shares_w0": r.phases.iter().map(|(k, v)| (k.clone(), json!(v))).collect::<Map<_, _>>(), "note": r.note, "source_path": r.source_path}));
@@ -771,4 +783,33 @@ fn svg(lane: &Path, rows: &[Row], fits: &[Value]) {
     }
     s += &format!("<text x='{}' y='{}' fill='#555'>GK: vs rho THEORY;</text><text x='{}' y='{}' fill='#555'>composite degree 4m,</text><text x='{}' y='{}' fill='#555'>subfield-dependent (§8b)</text></svg>", w - r_ + 15.0, t + 200.0, w - r_ + 15.0, t + 214.0, w - r_ + 15.0, t + 228.0);
     fs::write(lane.join("fig2_ratio_vs_log2r.svg"), s).unwrap();
+}
+
+/// log2 ratio = a + b n + c log2 r (OLS), with the 95% prediction interval at (n0, l0).
+fn ols2(n: &[f64], l: &[f64], y: &[f64], n0: f64, l0: f64) -> Value {
+    let k = y.len();
+    let xs: Vec<[f64; 3]> = (0..k).map(|i| [1.0, n[i], l[i]]).collect();
+    let mut a = [[0.0; 3]; 3];
+    let mut v = [0.0; 3];
+    for i in 0..k { for p in 0..3 { v[p] += xs[i][p] * y[i]; for q in 0..3 { a[p][q] += xs[i][p] * xs[i][q]; } } }
+    let det = a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) - a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) + a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+    if det.abs() < 1e-9 { return Value::Null; }
+    let mut inv = [[0.0; 3]; 3];
+    for p in 0..3 { for q in 0..3 {
+        let (r1, r2) = ((q + 1) % 3, (q + 2) % 3); let (c1, c2) = ((p + 1) % 3, (p + 2) % 3);
+        inv[p][q] = (a[r1][c1] * a[r2][c2] - a[r1][c2] * a[r2][c1]) / det;
+    } }
+    let beta: Vec<f64> = (0..3).map(|p| (0..3).map(|q| inv[p][q] * v[q]).sum()).collect();
+    let sse: f64 = (0..k).map(|i| (y[i] - (0..3).map(|p| beta[p] * xs[i][p]).sum::<f64>()).powi(2)).sum();
+    let df = k as f64 - 3.0;
+    let s2 = sse / df;
+    let x0 = [1.0, n0, l0];
+    let pred: f64 = (0..3).map(|p| beta[p] * x0[p]).sum();
+    let h: f64 = (0..3).map(|p| (0..3).map(|q| x0[p] * inv[p][q] * x0[q]).sum::<f64>()).sum();
+    let t = tq(df);
+    let se = (s2 * (1.0 + h)).sqrt();
+    let ci = |p: usize| { let s = (s2 * inv[p][p]).sqrt(); json!([beta[p] - t * s, beta[p] + t * s]) };
+    json!({"model": "log2(IC/rho) = a + b*n + c*log2_r", "a": beta[0], "b_per_n": beta[1], "b_ci95": ci(1), "c_per_log2_r": beta[2], "c_ci95": ci(2), "df": df,
+           "at": {"n": n0, "log2_r": l0, "log2_ratio": pred, "ratio": 2f64.powf(pred), "pred_interval95_ratio": [2f64.powf(pred - t * se), 2f64.powf(pred + t * se)]},
+           "warning": "extrapolation far outside the (n, log2 r) hull of the data; leverage h = ".to_string() + &format!("{h:.1}")})
 }
