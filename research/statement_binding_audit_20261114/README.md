@@ -100,3 +100,21 @@ separately captured system under test. The deterministic XZ archive retains ever
 file losslessly, including failed controls, the first incomplete pass and the
 public-tree replay. Exact counts/bytes are in [archive metadata](evidence/attempts.json);
 the complete per-file inventory is inside the archive. [pcc:unverified]
+
+## Additive concrete receipt repair
+
+The [complete actual BK wrapper](../bk_full_binding_audit_20261114/README.md)
+repairs the concrete old receipt by addition. **PCC-20261114-8c5c1e** exact local replay
+PASS at 2026-11-14T15:14:07Z, signed standing unverified. The actual F₅/r3/all-k theorem
+is unchanged; the new written934-character type explicitly quantifies L and
+all field assumptions, with actual point-map helpers. Frozen extractor and
+independent native official Lean parser agree on complete binding
+`255334b4de88ddc92803431efa042b40aa02db63affd414666c7a20c01cb02ed`:
+1complete/0prefix/0unresolved. Whole new project gate1/0/0;
+14custom modules/26formal-config+14artifact pins,44provenance files/25objects/
+8824-byte lossless XZ archive/five final gate files/inspected one-page
+PDF47183bytes. Both failed elaboration states are retained. Old issued
+PCC-20261110-99983d/source/ledger and shared verifier stay unchanged;
+no false mathematical theorem inferred. The local concrete binding repair
+is closed; canonical semantic parser/telescope/dependency contract and other
+original14 proof/execution gaps remain open. [pcc:unverified]

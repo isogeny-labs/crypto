@@ -40,8 +40,8 @@ separate evidence; this observation does not refute that theorem.
   simple delimiter-prefix model and checks the genuine semantic controls.
   It does **not** formally refine the Python regex or the native auditor.
 - **Missing capability:** a canonical full-signature binding contract and
-  parser implementation; a versioned complete binding for the affected BK
-  theorem is still needed. The independent comparator deliberately reports
+  parser implementation; the versioned complete BK binding below repairs
+  the concrete local receipt. The independent comparator deliberately reports
   comments/string-literal normalization cases as unsupported; all62 actual
   corpus headers in this bounded audit are covered.
 - **What this evidence does not establish:** no false BK theorem, kernel
@@ -59,7 +59,7 @@ independent surface parser does not establish that stronger property.
 
 ## What would unblock it
 
-- [ ] Add a versioned BK wrapper with the same actual-object quantified type,
+- [x] Add a versioned BK wrapper with the same actual-object quantified type,
   parser-compatible complete signature, full source/config pins, whole gate
   and complete exact statement hash. Preserve the original claim/ledger/source.
 - [ ] Update the canonical shared verifier through its dependency process to
@@ -76,8 +76,8 @@ fix the shared parser globally or settle the remaining fourteen-item gaps.
 
 ## Next discriminating step
 
-- **Action:** complete and publish the bounded audit/model-control packet,
-  then add the actual BK full-signature wrapper.
+- **Action:** review the complete additive BK wrapper, then address the
+  canonical shared-parser semantic binding contract.
 - **Inputs and controls:** immutable65-plan inventory, actual frozen verifier
   hash`5e1a97036633b9798adc39aded657708decb244ca9ed98e4a41408be9ac17010`,
   native official Lean4.35 parser, seven genuine controls, existing BK proof.
@@ -92,8 +92,24 @@ fix the shared parser globally or settle the remaining fourteen-item gaps.
 
 ## Resolution and history
 
-Unresolved. The bounded audit is complete with one affected issued binding;
+Canonical contract unresolved. The bounded audit is complete with one affected issued binding;
 the original proof and immutable evidence remain unchanged. No approval or
 integration waiver is inferred from this record. [pcc:unverified]
 
 2026-11-14: model exact local **PCC-20261114-286b6f** replay PASS at 2026-11-14T14:37:43Z, gate8/0/0; native bounded61/1/0 and public-tree replay retained separately. Complete actual BK wrapper remains the next step; this is not a retroactive signed upgrade or a false-theorem finding. [pcc:unverified]
+
+2026-11-14: local concrete wrapper repair closed. The [complete actual BK wrapper](../research/bk_full_binding_audit_20261114/README.md)
+repairs the concrete old receipt by addition. **PCC-20261114-8c5c1e** exact local replay
+PASS at 2026-11-14T15:14:07Z, signed standing unverified. The actual F₅/r3/all-k theorem
+is unchanged; the new written934-character type explicitly quantifies L and
+all field assumptions, with actual point-map helpers. Frozen extractor and
+independent native official Lean parser agree on complete binding
+`255334b4de88ddc92803431efa042b40aa02db63affd414666c7a20c01cb02ed`:
+1complete/0prefix/0unresolved. Whole new project gate1/0/0;
+14custom modules/26formal-config+14artifact pins,44provenance files/25objects/
+8824-byte lossless XZ archive/five final gate files/inspected one-page
+PDF47183bytes. Both failed elaboration states are retained. Old issued
+PCC-20261110-99983d/source/ledger and shared verifier stay unchanged;
+no false mathematical theorem inferred. The local concrete binding repair
+is closed; canonical semantic parser/telescope/dependency contract and other
+original14 proof/execution gaps remain open. [pcc:unverified]
