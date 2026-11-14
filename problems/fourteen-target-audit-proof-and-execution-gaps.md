@@ -331,8 +331,8 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | Item | Status at this checkpoint | Concrete remainder |
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
-| 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
-| 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67) | General Hasse/supersingular geometric classification, further extension-field censuses and full torsion-field bridges |
+| 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50); originalnine-pointprime3formwithoutaddedcoprime/generalchar3actualcard1or3/rank0or1 (22) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
+| 3 Supersingular | Partial: actual exact-degree-two counterexamples and complete F2/F3/F4/F9model/p<500basefield checks; generic characteristic2geometric2torsioncard1/2and actual Δ1models (67); generalactualchar3killed3card1or3/finiteness/modulefinrank0or1 (22), concretebranchescredited | General Hasse/supersingular geometric classification, further extension-field censuses and full torsion-field bridges |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
@@ -1066,4 +1066,28 @@ the earlier arbitrary-model normalization/qualified prime-three criterion
 gap. Other primes≥5, canonical Weil identification, the full all-k p<500
 census and other original fourteen-item obligations remain open.
 No full-source-read/novelty/corpus promotion/native experiment/spend/upload.
+[pcc:unverified]
+
+### General characteristic-three torsion and original source form
+
+The [characteristic-three/source-form packet](../research/three_torsion_char3_audit_20261114/README.md)
+proves every nonsingular general Weierstrass model over every
+characteristic-three field has exactly one or three actual points killed
+by three, actual subgroup finiteness and induced ZMod3 module rank zero
+or one. Nontrivial torsion yields actual tangent normalization; the literal
+normal-form division polynomial/curve equation give an explicit actual
+subgroup/OptionBool bijection. The trivial branch is an actual singleton.
+It proves the original prime-three nine-point BK criterion without adding
+coprimality: with3dividing actual#E and3notdividingq−1, exactly nine
+killed-three points in each compatible chosen extension of cardinalityq^k
+iff3dividesq^k−1. Outsidechar3, finiteCauchy/field3nonzero derivescoprime;
+inchar3 both sides are false. Actual card1/card3 controls are credited.
+The inclusion paraphrase remains coprime-qualified. Wholegate22/0failures/
+0trusted; exactlocal PCC-20261114-72d986 replay PASS at 2026-11-14T05:02:48Z,60recursiveformal/config
+and11artifact pins match;55attemptfiles/21uniqueobjects/16561Barchive,
+fivegatefiles and inspectedone-pagePDF47261B retained. Initialbuild01
+manifest-snapshot gap is explicit; subsequentchangedbuild snapshots complete.
+Signedstandingunverified. Otherprimes≥5/canonicalWeil/fullallkp500,
+supersingularitydefinition/traceclassification and original14 gaps stayopen.
+No fullpaper/bookread/novelty/source-refutation/corpuspromotion/nativeexperiment.
 [pcc:unverified]
