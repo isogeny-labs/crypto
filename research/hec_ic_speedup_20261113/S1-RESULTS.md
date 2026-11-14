@@ -147,6 +147,11 @@ These `AGENTS.md` steps apply to a PR that reports timings and are **not done** 
   minutes on a laptop. The worktree is a sparse checkout without the repo's `.claude/hooks`, so
   the checkpoint and benchrec hooks did not fire.
 
+**Addendum (PR prep, 2026-11-13).** These steps are now done for S1 and S2 together, through a
+recorded rerun. See S2-RESULTS.md, "Process steps", and
+`benchmarks/records/20261114T0356Z-hec-native-ic.json`. The S1 runs above stay as they were;
+they ran before any checkpoint existed.
+
 ## Scope
 
 - Full base only, so these are toy sizes (`p ≤ 4001`).

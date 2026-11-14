@@ -8,7 +8,7 @@
 # engine's mean over its five seeds), ref_* and fast_* (native engine,
 # Solver::Reference = the S1 solver and Solver::Fast = S2a; solve_ms and
 # total_ms means and medians over five seeds), the derived ratios, and the
-# fast solve's share of fast total time.
+# fast solve's share of fast total time, and the fast arm's per-phase means.
 set -euo pipefail
 out=${1:?usage: summarise.sh OUT_DIR}
 big=$(grep '^JSON' "$out/biguint.txt" | sed 's/^JSON //' |
@@ -25,6 +25,8 @@ grep '^JSON' "$out/native_both.txt" | sed 's/^JSON //' | jq -c -s --argjson big 
    fast_solve_ms: ([$F[].solve_ms] | mean), fast_solve_med: ([$F[].solve_ms] | med),
    ref_total_ms: ([$R[].total_ms] | mean), fast_total_ms: ([$F[].total_ms] | mean),
    fast_total_med: ([$F[].total_ms] | med),
+   fast_fb_ms: ([$F[].fb_ms] | mean), fast_walk_ms: ([$F[].walk_ms] | mean),
+   fast_oracle_ms: ([$F[].oracle_ms] | mean), fast_row_ms: ([$F[].row_ms] | mean),
    solve_mulmods: ([$F[].solve_mulmods] | mean), all_correct: ([.[].correct] | all)}
   | .solve_ratio = (.ref_solve_ms / .fast_solve_ms)
   | .solve_ratio_med = (.ref_solve_med / .fast_solve_med)

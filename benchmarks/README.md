@@ -45,6 +45,22 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [13 November native hyperelliptic IC engine and solver](20261113-hec-native-ic/)
+([PDF](20261113-hec-native-ic/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of an engineering
+before/after on round eight's genus 2–4 rows, eleven rows at five seeds each. The rows are named by
+equation, since ICV1 covers elliptic curves only. Record: `20261114T0356Z-hec-native-ic`.
+
+- **Solver.** The S2a sparse solver makes the same pivots and the same multiplications mod ℓ as the
+  S1 solver on all 55 (row, seed) pairs. At genus 2, p ≥ 503, its solve is 3.19–3.44× faster.
+- **End to end.** The native engine with S2a is 7.6–13× faster than the BigUint engine at genus 2,
+  12.6–18.6× at genus 3 and 16.7–18.9× at genus 4. These are wall-time ratios of means, post hoc.
+- **External comparison: not run.** No open hyperelliptic-IC implementation is known.
+- **Unvalidated.** The run used one L0 development host and measured wall clock only. There is no
+  `VALIDATION.json` and no matched rho, so it remains outside the admitted table.
+
+Source of truth:
+[`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261114T0356Z/).
+
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
 frozen re-measurement of the ledger incumbent (`wwalkGg-x09-sr-n2`) against matched

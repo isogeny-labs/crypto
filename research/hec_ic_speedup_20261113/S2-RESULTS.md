@@ -100,12 +100,22 @@ metrics and more repeats than five seeds × two runs.
 2. **The run was repeated twice.** The protocol named a single measurement. Both runs are reported,
    and both pass.
 
-## Not done (needed before a PR, AGENTS.md)
+## Process steps (AGENTS.md), done in the PR
 
-The same items are open as for S1:
+These cover both S1 and S2.
 
-- a bench.record/v1 record with the raw data on S3;
-- a visual report with a PDF;
-- a `benchmarks/` entry and README row;
-- ICV1 slugs;
-- an S3 resume checkpoint.
+- **Recorded rerun.** `run_record.sh` and `summarise.sh` were run under
+  `benchmarks/records/20261114T0356Z-hec-native-ic.json`. Raw output is in `rec-20261113/`; the
+  small text files are in Git, and CI uploads them to the store.
+  - E3 held a third time: 55/55.
+  - E4 held at 3.19–3.44×.
+- **Run report.** `reports/run-20261114T0356Z/` holds `report.typ`, `report.pdf`, and three
+  graphs as SVG and PNG from `plots.py`. Copies are in `benchmarks/20261113-hec-native-ic/`.
+- **`benchmarks/README.md` note.** It sits outside the admitted table, because the run is
+  unvalidated.
+- **ICV1.** Not applicable. ICV1 names elliptic curves only, so these Jacobians are named by
+  equation and ℓ.
+- **External comparison.** Not run. No open hyperelliptic-IC implementation is known. See the
+  report.
+- **S3 resume checkpoint.** Pushed under
+  `checkpoints/crypto/research__hec-native-ic-20261113/`.
