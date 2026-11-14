@@ -1,0 +1,334 @@
+module
+public import OrientationCompletion
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationBaseBridge
+import all OrientationMoment
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+import all OrientationFullChart
+import all LocalIntegral
+public section
+noncomputable section
+namespace OrientationGradedNode
+open Polynomial Finset OrientationAnchor OrientationMoment OrientationBaseBridge OrientationFullChart OrientationResidue OrientationDiagonal OrientationJet OrientationLeading
+
+/-- Weighted coefficient content, retaining every coefficient degree. -/
+def Graded (k : ℤ) (P : ℚ[X]) : Prop := ∀ n : ℕ, VBound (k+(n:ℤ)) (P.coeff n)
+
+theorem Graded.mono {k l : ℤ} {P : ℚ[X]} (h : Graded k P) (hl : l ≤ k) :
+    Graded l P := fun n => (h n).mono (by omega)
+
+theorem Graded.C {k : ℤ} {q : ℚ} (h : VBound k q) : Graded k (C q) := by
+  intro n
+  by_cases hn : n=0
+  · subst n; simpa using h
+  · simp [coeff_C, hn, VBound]
+
+theorem Graded.one : Graded 0 (1:ℚ[X]) := by
+  simpa using (Graded.C (by simp [VBound] : VBound 0 (1:ℚ)))
+
+theorem Graded.X : Graded (-1) (X:ℚ[X]) := by
+  intro n
+  by_cases hn : n=1
+  · subst n; simp [VBound]
+  · simp [coeff_X, Ne.symm hn, VBound]
+
+theorem Graded.add {k : ℤ} {P Q : ℚ[X]} (hP : Graded k P) (hQ : Graded k Q) :
+    Graded k (P+Q) := by
+  intro n
+  rw [coeff_add]
+  exact (hP n).add (hQ n)
+
+theorem Graded.mul {k l : ℤ} {P Q : ℚ[X]} (hP : Graded k P) (hQ : Graded l Q) :
+    Graded (k+l) (P*Q) := by
+  intro n
+  rw [coeff_mul]
+  apply VBound.sum
+  intro ij hij
+  have hs := mem_antidiagonal.mp hij
+  have he : (k+(ij.1:ℤ))+(l+(ij.2:ℤ))=k+l+(n:ℤ) := by omega
+  simpa only [he] using (hP ij.1).mul (hQ ij.2)
+
+theorem Graded.pow {k : ℤ} {P : ℚ[X]} (h : Graded k P) (n : ℕ) :
+    Graded ((n:ℤ)*k) (P^n) := by
+  induction n with
+  | zero => simpa using Graded.one
+  | succ n ih =>
+    simpa only [pow_succ, Nat.cast_add, Nat.cast_one, add_mul, one_mul] using ih.mul h
+
+theorem Graded.prod {ι : Type*} (S : Finset ι) (P : ι → ℚ[X]) (k : ι → ℤ)
+    (h : ∀ j ∈ S, Graded (k j) (P j)) : Graded (∑ j ∈ S, k j) (∏ j ∈ S, P j) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using Graded.one
+  | @insert i S hi ih =>
+    rw [sum_insert hi, prod_insert hi]
+    exact (h i (mem_insert_self _ _)).mul
+      (ih (by intro j hj; exact h j (mem_insert_of_mem hj)))
+
+theorem Graded.sum {ι : Type*} (S : Finset ι) (P : ι → ℚ[X]) (k : ℤ)
+    (h : ∀ j ∈ S, Graded k (P j)) : Graded k (∑ j ∈ S, P j) := by
+  intro n
+  rw [finsetSum_coeff]
+  exact VBound.sum S (fun j => (P j).coeff n) (k+(n:ℤ)) (fun j hj => h j hj n)
+
+/-- Direct affine-factor bound, permitting a zero chart value. -/
+theorem actual_factor_graded (a i j : ℕ) (t : ℤ) (d : ℚ)
+    (ht : t ≠ 0) (hi : padicValInt 2 t=i) (hia : i<a) :
+    Graded ((if j=i then (i:ℤ)+1 else min (i:ℤ) j)-padicValRat 2 ((2:ℚ)^j-d))
+      (chart a t (factor d j)) := by
+  let k : ℤ := (if j=i then (i:ℤ)+1 else min (i:ℤ) j)-padicValRat 2 ((2:ℚ)^j-d)
+  have he : chart a t (factor d j) =
+      C (((2:ℚ)^j-(t:ℚ))*((2:ℚ)^j-d)⁻¹)+
+      C (-((2:ℚ)^(a+1))*((2:ℚ)^j-d)⁻¹)*X := by
+    apply Polynomial.funext
+    intro z
+    simp only [chart, eval_comp, eval_add, eval_mul, eval_C, eval_X, factor_eval, div_eq_mul_inv]
+    ring
+  have h0 := chart_factor_content a i j t d ht hi (by omega) 0
+  have hinv : VBound (-padicValRat 2 ((2:ℚ)^j-d)) (((2:ℚ)^j-d)⁻¹) :=
+    Or.inr (by rw [padicValRat.inv])
+  have hb := (power_integral (a+1)).neg.mul hinv
+  have hslope : VBound (k+1) (-((2:ℚ)^(a+1))*((2:ℚ)^j-d)⁻¹) :=
+    hb.mono (by dsimp [k]; split_ifs <;> omega)
+  intro n
+  by_cases hn0 : n=0
+  · subst n; simpa [k] using h0
+  by_cases hn1 : n=1
+  · subst n
+    have h1 : (chart a t (factor d j)).coeff 1 = -((2:ℚ)^(a+1))*((2:ℚ)^j-d)⁻¹ := by
+      rw [he]
+      simp only [coeff_add, coeff_C_mul, coeff_C, coeff_X]
+      norm_num
+    change VBound (k+1) ((chart a t (factor d j)).coeff 1)
+    rw [h1]
+    exact hslope
+  · have hz : (chart a t (factor d j)).coeff n = 0 := by
+      rw [he]
+      simp only [coeff_add, coeff_C_mul, coeff_C, coeff_X]
+      simp [hn0, Ne.symm hn1]
+    rw [hz]
+    exact VBound.zero _
+
+theorem actual_correction_graded (a u x y i : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : t ≠ 0) (hi : padicValInt 2 t=i) (hia : i<a) :
+    Graded (gain u x y i (chartOrder u x y) m) (chart a t (correction u x y m)) := by
+  have h : ∀ j ∈ mask u x y,
+      Graded ((m j:ℤ)*beta i (chartOrder u x y) j) ((chart a t (factor (delta x y) j))^m j) := by
+    intro j hj
+    have hb := actual_factor_graded a i j t (delta x y) ht hi hia
+    rw [selected_denominator_valuation u x y j hj] at hb
+    simpa only [beta, min_comm (j:ℤ)] using hb.pow (m j)
+  have hp := Graded.prod (mask u x y) (fun j => (chart a t (factor (delta x y) j))^m j)
+    (fun j => (m j:ℤ)*beta i (chartOrder u x y) j) h
+  simpa only [gain, chart, correction, Polynomial.prod_comp, pow_comp] using hp
+
+theorem actual_crossing_graded (a u x y i : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : t ≠ 0) (hi : padicValInt 2 t=i) (hia : i<a)
+    (hiu : i<u) (hc : x.testBit i=y.testBit i) :
+    Graded (schedule u i m) (chart a t (correction u x y m)) := by
+  apply (actual_correction_graded a u x y i t m ht hi hia).mono
+  exact crossing_gain u x y i (chartOrder u x y) m (mem_filter.mpr ⟨mem_range.mpr hiu,hc⟩)
+
+theorem indexed_base_graded (a i : ℕ) (m s : Nodes a) (hsm : s ≠ m)
+    (hv : padicValRat 2 (node a m-node a s) ≤ (i:ℤ)) :
+    Graded ((a:ℤ)-i) ((base (grid a) (node a s)).comp
+      (C (node a m)+C ((2:ℚ)^(a+1))*X)) := by
+  have hr : VBound ((a:ℤ)+1-i)
+      ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):ℚ) := by
+    rw [chartRatio_value]
+    have hb := vbound_div (power_integral (a+1)) (r:=node a m-node a s)
+    exact hb.mono (by omega)
+  have hu : VBound 0 ((LocalIntegral.rhoUnit a m:LocalIntegral.integralRing):ℚ) :=
+    vbound_of_norm_le_one _ (LocalIntegral.rhoUnit a m:LocalIntegral.integralRing).property
+  have hrest : Graded 0 ((restPolynomial a m s).map LocalIntegral.integralRing.subtype) := by
+    intro n
+    simpa only [zero_add] using actual_rest_weighted a m s n
+  rw [← chart_polynomial, mapped_localBase_factor a m s hsm]
+  have hh := ((Graded.C hu).mul ((Graded.C hr).mul Graded.X)).mul hrest
+  have he : (0+(((a:ℤ)+1-i)+(-1)))+0=(a:ℤ)-i := by omega
+  simpa only [he] using hh
+
+/-- Equal crossing bits exclude the actual source translation at any chart node. -/
+theorem actual_displacement_ne_node (x y i : ℕ) (t : ℤ)
+    (ht : t ≠ 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) :
+    delta x y ≠ (t:ℚ) := by
+  intro he
+  have hxy : x ≠ y := by
+    intro h
+    subst y
+    have htQ : (t:ℚ)=0 := by simpa [delta] using he.symm
+    exact ht (by exact_mod_cast htQ)
+  have hv : (order x y:ℤ)=(i:ℤ) := by
+    calc
+      (order x y:ℤ) = padicValRat 2 (delta x y) := (delta_valuation x y).symm
+      _ = padicValRat 2 (t:ℚ) := by rw [he]
+      _ = (i:ℤ) := by rw [padicValRat.of_int, hi]
+  have ho : order x y=i := by exact_mod_cast hv
+  exact order_bit_diff x y hxy (by simpa only [ho] using hc)
+
+theorem actual_node_denominator_le (x y i : ℕ) (t : ℤ)
+    (ht : t ≠ 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) :
+    padicValRat 2 ((t:ℚ)-delta x y) ≤ (i:ℤ) := by
+  have hv : padicValRat 2 (t:ℚ)=(i:ℤ) := by rw [padicValRat.of_int, hi]
+  by_cases he : x=y
+  · subst y
+    simpa only [delta, sub_self, sub_zero, hv] using (le_rfl : (i:ℤ) ≤ i)
+  · have ho : order x y ≠ i := by
+      intro h
+      exact order_bit_diff x y he (by simpa only [h] using hc)
+    have htQ : (t:ℚ) ≠ 0 := by exact_mod_cast ht
+    have hd : delta x y ≠ 0 := by
+      rw [delta_as_int]
+      exact_mod_cast signed_ne_zero x y he
+    have hdiff := sub_ne_zero.mpr (Ne.symm (actual_displacement_ne_node x y i t ht hi hc))
+    have hvne : padicValRat 2 (t:ℚ) ≠ padicValRat 2 (-delta x y) := by
+      rw [hv, padicValRat.neg, delta_valuation]
+      exact_mod_cast Ne.symm ho
+    rw [sub_eq_add_neg, padicValRat.add_eq_min
+      (by simpa only [← sub_eq_add_neg] using hdiff) htQ (neg_ne_zero.mpr hd) hvne, hv]
+    exact min_le_left _ _
+
+/-- The indexed base bound is discharged by actual source nodes and crossing bits. -/
+theorem actual_base_graded (a i x y : ℕ) (t : ℤ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hc : x.testBit i=y.testBit i) :
+    Graded ((a:ℤ)-i) (chart a t (base (grid a) (delta x y))) := by
+  have hd := delta_in_grid a x y hx hy
+  rw [grid_eq_image] at ht hd
+  obtain ⟨m,_,hm⟩ := mem_image.mp ht
+  obtain ⟨s,_,hs⟩ := mem_image.mp hd
+  have hsm : s ≠ m := by
+    intro he
+    subst s
+    exact actual_displacement_ne_node x y i t ht0 hi hc (hs.symm.trans hm)
+  have hv : padicValRat 2 (node a m-node a s) ≤ (i:ℤ) := by
+    rw [hm,hs]
+    exact actual_node_denominator_le x y i t ht0 hi hc
+  have hb := indexed_base_graded a i m s hsm hv
+  rw [hm,hs] at hb
+  simpa only [chart] using hb
+
+theorem actual_completed_graded (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u≤a)
+    (hc : x.testBit i=y.testBit i) :
+    Graded (jetWeight a u i m-1) (chart a t (completed (grid a) u x y m)) := by
+  have hb := actual_base_graded a i x y t hx hy ht ht0 hi hc
+  have hd := actual_crossing_graded a u x y i t m ht0 hi (by omega) hiu hc
+  have he : (a:ℤ)-i+schedule u i m=jetWeight a u i m-1 := by
+    unfold jetWeight
+    ring
+  simpa only [he, chart, completed, mul_comp] using hb.mul hd
+
+def normalizedNodeEntry (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ) : ℚ[X] :=
+  C ((diagonalJet a u i m)⁻¹)*chart a t (completed (grid a) u x y m)
+
+/-- Normalization uses the existing actual nonzero negative-pole diagonal,
+not the potentially zero first derivative at this arbitrary node. -/
+theorem actual_normalized_graded (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u≤a)
+    (hc : x.testBit i=y.testBit i) :
+    Graded (-1) (normalizedNodeEntry a u i x y t m) := by
+  have hv : VBound (-jetWeight a u i m) ((diagonalJet a u i m)⁻¹) :=
+    Or.inr (by rw [padicValRat.inv, diagonalJet_valuation a u i m hiu hua]; rfl)
+  have hh := (Graded.C hv).mul (actual_completed_graded a u i x y t m hx hy ht ht0 hi hiu hua hc)
+  have he : -jetWeight a u i m+(jetWeight a u i m-1)=(-1:ℤ) := by omega
+  simpa only [he, normalizedNodeEntry] using hh
+
+theorem actual_node_coefficient_weight (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u≤a)
+    (hc : x.testBit i=y.testBit i) (n : ℕ) :
+    VBound (n:ℤ) ((normalizedNodeEntry a u i x y t m).coeff (n+1)) := by
+  have h := actual_normalized_graded a u i x y t m hx hy ht ht0 hi hiu hua hc (n+1)
+  simpa using h
+
+theorem actual_node_constant (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (ht : (t:ℚ) ∈ grid a) (ht0 : t ≠ 0) (hi : padicValInt 2 t=i)
+    (hc : x.testBit i=y.testBit i) :
+    (normalizedNodeEntry a u i x y t m).coeff 0=0 := by
+  have hz : (completed (grid a) u x y m).eval (t:ℚ)=0 := by
+    rw [completed, eval_mul, base_at_other_node (grid a) (delta x y) (t:ℚ) ht
+      (actual_displacement_ne_node x y i t ht0 hi hc), zero_mul]
+  simp only [normalizedNodeEntry, coeff_C_mul, coeff_zero_eq_eval_zero, chart,
+    eval_comp, eval_add, eval_C, eval_mul, eval_X, mul_zero, add_zero, hz]
+
+theorem actual_node_first (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ) :
+    (normalizedNodeEntry a u i x y t m).coeff 1=
+      (chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m := by
+  rw [normalizedNodeEntry, coeff_C_mul, div_eq_mul_inv]
+  ring
+
+theorem actual_node_leading_entry (a u i x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hx : x<2^a) (hy : y<2^a) (ht : (t:ℚ) ∈ grid a)
+    (ht0 : t ≠ 0) (hi : padicValInt 2 t=i) (hiu : i<u) (hua : u≤a)
+    (hc : x.testBit i=y.testBit i) :
+    Content 1 (normalizedNodeEntry a u i x y t m-
+      C ((chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m)*X) := by
+  let q : ℚ := (chart a t (completed (grid a) u x y m)).coeff 1/diagonalJet a u i m
+  intro n
+  cases n with
+  | zero =>
+    have hlinear : (C q*X).coeff 0=0 := by rw [coeff_C_mul]; simp
+    rw [coeff_sub, actual_node_constant a u i x y t m ht ht0 hi hc, hlinear, sub_self]
+    exact VBound.zero _
+  | succ n =>
+    by_cases hn : n=0
+    · subst n
+      have hlinear : (C q*X).coeff 1=q := by rw [coeff_C_mul]; simp
+      rw [coeff_sub, actual_node_first, hlinear, sub_self]
+      exact VBound.zero _
+    · have hlinear : (C q*X).coeff (n+1)=0 := by
+        rw [coeff_C_mul]
+        have hX : (X:ℚ[X]).coeff (n+1)=0 := by
+          simp only [coeff_X, show ¬(1:ℕ)=n+1 by omega, ite_false]
+        rw [hX, mul_zero]
+      rw [coeff_sub, hlinear, sub_zero]
+      exact (actual_node_coefficient_weight a u i x y t m hx hy ht ht0 hi hiu hua hc n).mono (by omega)
+
+theorem positive_anchor_member (a i : ℕ) (hi : i<a) : (2:ℚ)^i ∈ grid a := by
+  have hp0 : 0 < (2:ℤ)^i := by positivity
+  have hpa0 : 0 < (2:ℤ)^a := by positivity
+  have hnext : (2:ℤ)^(i+1) ≤ (2:ℤ)^a := pow_le_pow_right₀ (by norm_num) (by omega)
+  have hsmall : (2:ℤ)^i < (2:ℤ)^a := by rw [pow_succ] at hnext; omega
+  apply mem_image.mpr
+  refine ⟨(2:ℤ)^i, mem_Ico.mpr ⟨by omega,hsmall⟩, ?_⟩
+  push_cast
+  rfl
+
+theorem positive_anchor_correction_zero (u i x y : ℕ) (m : ℕ → ℕ)
+    (hi : i<u) (hc : x.testBit i=y.testBit i) (hm : 0<m i) :
+    (correction u x y m).eval ((2:ℚ)^i)=0 := by
+  rw [correction, eval_prod]
+  apply prod_eq_zero (mem_filter.mpr ⟨mem_range.mpr hi,hc⟩)
+  rw [eval_pow, factor_eval]
+  simp [Nat.ne_of_gt hm]
+
+/-- A positive retained anchor may have zero first crossing jet; no local
+first-jet unit is assumed by the arbitrary-node bounds. -/
+theorem positive_anchor_first_zero (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hi : i<u) (hua : u≤a) (hc : x.testBit i=y.testBit i) (hm : 0<m i) :
+    (chart a ((2:ℤ)^i) (completed (grid a) u x y m)).coeff 1=0 := by
+  have hdt : delta x y ≠ (2:ℚ)^i := by intro h; exact anchor_flips x y i h hc
+  have hb := base_at_other_node (grid a) (delta x y) ((2:ℚ)^i)
+    (positive_anchor_member a i (by omega)) hdt
+  have hd := positive_anchor_correction_zero u i x y m hi hc hm
+  rw [chart_first, completed, derivative_mul]
+  simp only [Int.cast_pow, Int.cast_ofNat, eval_add, eval_mul, hd, hb, mul_zero, zero_mul, add_zero]
+
+end OrientationGradedNode
+#print axioms OrientationGradedNode.actual_crossing_graded
+#print axioms OrientationGradedNode.indexed_base_graded
+
+#print axioms OrientationGradedNode.actual_completed_graded
+#print axioms OrientationGradedNode.actual_node_coefficient_weight
+
+#print axioms OrientationGradedNode.actual_node_leading_entry
+#print axioms OrientationGradedNode.positive_anchor_first_zero

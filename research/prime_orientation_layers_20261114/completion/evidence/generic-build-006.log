@@ -1,0 +1,46 @@
+../evidence/generic-draft-006.lean.txt:260:34: warning: This simp argument is unused:
+  coeff_C_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [normalizedNodeEntry, coeff_zero_eq_eval_zero, chart, eval_comp, eval_add, eval_C, eval_mul, eval_X,
+    mul_zero, add_zero, hz]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/generic-draft-006.lean.txt:307:52: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Matroid ?m.4) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Matroid ?m.4
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../evidence/generic-draft-006.lean.txt:308:45: error: unsolved goals
+u i x y : ℕ
+m : ℕ → ℕ
+hi : i < u
+hc : x.testBit i = y.testBit i
+hm : sorry <m sorry
+⊢ ¬m i = 0
+../evidence/generic-draft-006.lean.txt:317:64: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Matroid ?m.6) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Matroid ?m.6
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../evidence/generic-draft-006.lean.txt:322:13: error(lean.unknownIdentifier): Unknown identifier `positive_anchor_correction_zero`
+../evidence/generic-draft-006.lean.txt:318:66: error: unsolved goals
+a u i x y : ℕ
+m : ℕ → ℕ
+hi : i < u
+hua : u ≤ a
+hc : x.testBit i = y.testBit i
+hm : sorry <m sorry
+hdt : delta x y ≠ 2 ^ i
+hb : eval (2 ^ i) (base (grid a) (delta x y)) = 0
+⊢ (chart a (2 ^ i) (completed (grid a) u x y m)).coeff 1 = 0
+'OrientationGradedNode.actual_crossing_graded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationGradedNode.indexed_base_graded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationGradedNode.actual_completed_graded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationGradedNode.actual_node_coefficient_weight' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationGradedNode.actual_node_leading_entry' depends on axioms: [propext, Classical.choice, Quot.sound]
+../evidence/generic-draft-006.lean.txt:334:14: error(lean.unknownIdentifier): Unknown constant `OrientationGradedNode.positive_anchor_first_zero`
