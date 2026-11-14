@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# STUB instrument for the dry run only: records its argv; `native-solve` is declared unavailable.
+# STUB instrument for the dry run only. verify writes a marker; native-solve "hog" allocates memory (watchdog test); others exit 3.
 case "$1" in
   verify) while [ $# -gt 0 ]; do [ "$1" = --out ] && o=$2; shift; done; echo '{"stub":true,"note":"dry-run stub verify"}' > "$o";;
+  native-solve) case "$*" in *hog*) python3 -c "
+import time
+l=[]
+for i in range(60):
+    l.append(b'x'*50*1024*1024); time.sleep(0.5)
+";; *) echo "stub: native-solve not implemented" >&2; exit 3;; esac;;
   *) echo "stub: $1 not implemented" >&2; exit 3;;
 esac

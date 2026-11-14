@@ -2,7 +2,7 @@
 """Tabulate an msolve 0.6.5 `-v 2` log (stdout trace, optionally with the stderr INPUT DATA box appended).
 Tabulation only: no estimate, no model. Per F4 round: degree, sel pairs, pairs, matrix rows x cols,
 density, new, zero reductions, real and cpu seconds. Totals: rounds, max round degree, sum rows*cols*density
-("nonzero-entries work proxy", counts the matrix entries each round's matrix holds, nothing else), wall.
+("nonzero-entries work proxy"; `up_to_degree_8` = cumulative real/cpu seconds of the rounds with degree <= 8 (canary drift metric), counts the matrix entries each round's matrix holds, nothing else), wall.
 A log cut by timeout/rlimit has an unfinished last row: it is reported as `incomplete_last_row`, not parsed.
 `-P 1` runs without `-g` may hold several passes (variable-order retry, extra linear form `A`): each pass is
 tabulated separately (banners are recorded) and totals are over all passes.
@@ -61,6 +61,11 @@ def totals(passes, incomplete):
              sum_round_real_s=sum(r['real_s'] for r in rows), sum_round_cpu_s=sum(r['cpu_s'] for r in rows),
              completed=all(p['final'] for p in passes) and bool(passes) and incomplete is None,
              incomplete_last_row=incomplete)
+    # canary/drift metric: cumulative time of the rounds of degree <= 8 (all passes, file order); also the first-degree-9 cut
+    le = [r for r in rows if r['deg'] <= 8]
+    t['up_to_degree_8'] = dict(rounds=len(le), real_s=round(sum(r['real_s'] for r in le), 3), cpu_s=round(sum(r['cpu_s'] for r in le), 3),
+                               entries=sum(r['entries'] for r in le), reached_degree_9=any(r['deg'] > 8 for r in rows),
+                               rounds_before_first_degree_gt_8=next((n for n, r in enumerate(rows) if r['deg'] > 8), len(rows)))
     if rows:
         b = max(rows, key=lambda r: r['entries']); t['largest_matrix_round'] = dict(deg=b['deg'], rows=b['rows'], cols=b['cols'], density_pct=b['density_pct'])
     return t

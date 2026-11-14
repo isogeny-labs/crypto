@@ -1,21 +1,36 @@
-2026-11-14T21:47:23.469688348Z msolve sha256 c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa (expected c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa) install_rc=0 dry=1
-2026-11-14T21:47:23.521995759Z plan rows: 9; instrument: 292f273efcf593e95acc650e9035da28de27e58b656da3715201796e4f019c25
-2026-11-14T21:47:23.585088221Z row 001_tiny_a_msolve_param: start (threads=2 cpus=0,1 timeout=120s cap=2097152kB)
-2026-11-14T21:47:23.676748519Z row 001_tiny_a_msolve_param: rc=0 wall=0.007106781005859375s
-2026-11-14T21:47:23.745796790Z row 002_tiny_b_msolve_param: start (threads=2 cpus=0,1 timeout=120s cap=2097152kB)
-2026-11-14T21:47:23.836867063Z row 002_tiny_b_msolve_param: rc=0 wall=0.008898258209228516s
-2026-11-14T21:47:23.904798675Z row 003_tiny_c_msolve_gb: start (threads=2 cpus=0,1 timeout=120s cap=2097152kB)
-2026-11-14T21:47:23.977967117Z row 003_tiny_c_msolve_gb: rc=0 wall=0.008762359619140625s
-2026-11-14T21:47:24.056089274Z row 004_tiny_nosol_msolve_param: start (threads=2 cpus=0,1 timeout=120s cap=2097152kB)
-2026-11-14T21:47:24.142311004Z row 004_tiny_nosol_msolve_param: rc=0 wall=0.008777379989624023s
-2026-11-14T21:47:24.203654666Z row 005_tiny_posdim_msolve_param: start (threads=2 cpus=0,1 timeout=120s cap=2097152kB)
-2026-11-14T21:47:24.290605663Z row 005_tiny_posdim_msolve_param: rc=0 wall=0.007500410079956055s
-2026-11-14T21:47:24.359800627Z row 006_tiny_cyc10_msolve_param: start (threads=2 cpus=0,1 timeout=5s cap=2097152kB)
-2026-11-14T21:47:29.430651449Z row 006_tiny_cyc10_msolve_param: rc=124 wall=5.015656232833862s
-2026-11-14T21:47:29.492807579Z row 007_tiny_cyc8_msolve_param: start (threads=2 cpus=0,1 timeout=120s cap=1048576kB)
-2026-11-14T21:47:29.551753353Z row 007_tiny_cyc8_msolve_param: rc=139 wall=0.006237030029296875s
-2026-11-14T21:47:29.608570901Z row 008_tiny_cyc8_msolve_gb: start (threads=2 cpus=0,1 timeout=120s cap=2097152kB)
-2026-11-14T21:47:30.603728747Z row 008_tiny_cyc8_msolve_gb: rc=0 wall=0.9247744083404541s
-2026-11-14T21:47:30.670192486Z row 009_tiny_a_native_native: start (threads=1 cpus=0 timeout=120s cap=2097152kB)
-2026-11-14T21:47:30.711450659Z row 009_tiny_a_native_native: rc=3 wall=0.006810188293457031s
-2026-11-14T21:47:30.875453525Z done: {"schema":"pkm.m8-panel.done/v1","rows_planned":9,"rows_recorded":9,"by_status":{"ok":6,"timeout":1,"rlimit_or_crash":1,"error":1},"total_row_wall_s":5.994523048400879,"total_user_s":10.09,"total_sys_
+2026-11-14T21:54:44.885667766Z msolve sha256 c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa (expected c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa) install_rc=0 dry=1 pod=dry-run cgroup_limit_kb=16473776
+2026-11-14T21:54:44.919629335Z plan rows: 11
+2026-11-14T21:54:47.023689010Z WARNING: msolve already running before row 001_tiny_trivial_msolve_gb: 12724 
+2026-11-14T21:54:47.025912473Z row 001_tiny_trivial_msolve_gb kind=timer_floor: start (threads=1 cpus=0 timeout=60s rss_cap=2097152kB)
+2026-11-14T21:54:47.189717610Z row 001_tiny_trivial_msolve_gb: rc=0 wall=0.03959345817565918s censored=ok maxrss_kb=5112 vmpeak_kb=0
+2026-11-14T21:54:49.308820254Z WARNING: msolve already running before row 002_tiny_canary_msolve_gb: 12724 
+2026-11-14T21:54:49.310951062Z row 002_tiny_canary_msolve_gb kind=canary: start (threads=8 cpus=0,1,2,3 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:54:51.483465876Z row 002_tiny_canary_msolve_gb: rc=0 wall=2.044142007827759s censored=ok maxrss_kb=32024 vmpeak_kb=1585384
+2026-11-14T21:54:53.615992886Z WARNING: msolve already running before row 003_tiny_a_msolve_param: 12724 
+2026-11-14T21:54:53.624288678Z row 003_tiny_a_msolve_param kind=aa: start (threads=2 cpus=0,1 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:54:53.790666917Z row 003_tiny_a_msolve_param: rc=0 wall=0.03596806526184082s censored=ok maxrss_kb=5676 vmpeak_kb=0
+2026-11-14T21:54:55.912173004Z WARNING: msolve already running before row 004_tiny_b_msolve_param: 12724 
+2026-11-14T21:54:55.914971891Z row 004_tiny_b_msolve_param kind=natural: start (threads=2 cpus=0,1 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:54:58.061566637Z row 004_tiny_b_msolve_param: rc=0 wall=2.0489892959594727s censored=ok maxrss_kb=7344 vmpeak_kb=2724
+2026-11-14T21:55:00.152839600Z WARNING: msolve already running before row 005_tiny_c_msolve_gb: 12724 
+2026-11-14T21:55:00.154779926Z row 005_tiny_c_msolve_gb kind=gb_check: start (threads=2 cpus=0,1 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:55:02.292756461Z row 005_tiny_c_msolve_gb: rc=0 wall=2.0524117946624756s censored=ok maxrss_kb=5148 vmpeak_kb=0
+2026-11-14T21:55:04.385403700Z WARNING: msolve already running before row 006_tiny_nosol_msolve_param: 12724 
+2026-11-14T21:55:04.388341287Z row 006_tiny_nosol_msolve_param kind=natural: start (threads=2 cpus=0,1 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:55:04.555235726Z row 006_tiny_nosol_msolve_param: rc=0 wall=0.04399919509887695s censored=ok maxrss_kb=5120 vmpeak_kb=0
+2026-11-14T21:55:06.656465898Z WARNING: msolve already running before row 007_tiny_posdim_msolve_param: 12724 
+2026-11-14T21:55:06.659416868Z row 007_tiny_posdim_msolve_param kind=planted: start (threads=2 cpus=0,1 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:55:06.835240976Z row 007_tiny_posdim_msolve_param: rc=0 wall=0.04279971122741699s censored=ok maxrss_kb=5260 vmpeak_kb=0
+2026-11-14T21:55:08.945684308Z WARNING: msolve already running before row 008_tiny_cyc10_msolve_param: 12724 
+2026-11-14T21:55:08.947720476Z row 008_tiny_cyc10_msolve_param kind=probe: start (threads=2 cpus=0,1 timeout=5s rss_cap=2097152kB)
+2026-11-14T21:55:15.102788700Z row 008_tiny_cyc10_msolve_param: rc=124 wall=6.058611631393433s censored=timeout maxrss_kb=210056 vmpeak_kb=1332376
+2026-11-14T21:55:17.208784675Z WARNING: msolve already running before row 009_tiny_cyc8_msolve_param: 12724 
+2026-11-14T21:55:17.211120535Z row 009_tiny_cyc8_msolve_param kind=natural: start (threads=2 cpus=0,1 timeout=120s rss_cap=1048576kB)
+2026-11-14T21:55:19.368226607Z row 009_tiny_cyc8_msolve_param: rc=0 wall=2.045600175857544s censored=ok maxrss_kb=31232 vmpeak_kb=1207976
+2026-11-14T21:55:21.470874457Z WARNING: msolve already running before row 010_tiny_hog_native_native: 12724 
+2026-11-14T21:55:21.475540058Z row 010_tiny_hog_native_native kind=native: start (threads=2 cpus=0,1 timeout=60s rss_cap=1228800kB)
+2026-11-14T21:55:36.095461896Z row 010_tiny_hog_native_native: rc=143 wall=14.561374425888062s censored=rss_cap maxrss_kb=None vmpeak_kb=1418068
+2026-11-14T21:55:38.235981989Z WARNING: msolve already running before row 011_tiny_a_native_native: 12724 
+2026-11-14T21:55:38.243712495Z row 011_tiny_a_native_native kind=native: start (threads=2 cpus=0,1 timeout=120s rss_cap=2097152kB)
+2026-11-14T21:55:38.324788276Z row 011_tiny_a_native_native: rc=2 wall=0.003996849060058594s censored=error maxrss_kb=None vmpeak_kb=None
+2026-11-14T21:55:38.518846691Z done: {"schema":"pkm.m8-panel.done/v2","rows_planned":11,"rows_recorded":11,"by_status":{"ok":8,"timeout":1,"rss_cap":1,"error":1},"total_row_wall_s":28.977486610412598,"total_user_s":11.15,"total_sys_s":0.

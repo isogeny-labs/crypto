@@ -1,6 +1,6 @@
 {
- "schema": "pkm.m8-panel.plan/v1",
- "plan_id": "dryrun-tiny-20261114",
+ "schema": "pkm.m8-panel.plan/v2",
+ "plan_id": "dryrun-tiny-v2",
  "instrument": "bin/pkm_m8_panel",
  "msolve": {
   "version": "0.6.5-1build2",
@@ -9,75 +9,99 @@
  "defaults": {
   "threads": 2,
   "timeout_s": 120,
-  "mem_cap_kb": 2097152
+  "rss_cap_kb": 2097152
  },
  "rows": [
   {
+   "kind": "timer_floor",
    "cell": "tiny",
-   "target": "a",
+   "target": "trivial",
    "solver": "msolve",
-   "mode": "param",
    "order": 1
   },
   {
+   "kind": "canary",
    "cell": "tiny",
-   "target": "b",
+   "target": "canary",
    "solver": "msolve",
-   "mode": "param",
+   "system": "systems/tiny/canary.ms",
    "order": 2
   },
   {
+   "kind": "aa",
    "cell": "tiny",
-   "target": "c",
+   "target": "a",
    "solver": "msolve",
-   "mode": "gb",
    "order": 3
   },
   {
+   "kind": "natural",
    "cell": "tiny",
-   "target": "nosol",
+   "target": "b",
    "solver": "msolve",
-   "mode": "param",
    "order": 4
   },
   {
+   "kind": "gb_check",
    "cell": "tiny",
-   "target": "posdim",
+   "target": "c",
    "solver": "msolve",
-   "mode": "param",
+   "msolve_mode": "gb",
    "order": 5
   },
   {
+   "kind": "natural",
    "cell": "tiny",
-   "target": "cyc10",
+   "target": "nosol",
    "solver": "msolve",
-   "mode": "param",
-   "timeout_s": 5,
    "order": 6
   },
   {
+   "kind": "planted",
    "cell": "tiny",
-   "target": "cyc8",
+   "target": "posdim",
    "solver": "msolve",
-   "mode": "param",
-   "mem_cap_kb": 1048576,
    "order": 7
   },
   {
+   "kind": "probe",
    "cell": "tiny",
-   "target": "cyc8",
+   "target": "cyc10",
    "solver": "msolve",
-   "mode": "gb",
-   "threads": 2,
+   "timeout_s": 5,
    "order": 8
   },
   {
+   "kind": "natural",
+   "cell": "tiny",
+   "target": "cyc8",
+   "solver": "msolve",
+   "rss_cap_kb": 1048576,
+   "order": 9
+  },
+  {
+   "kind": "native",
+   "cell": "tiny",
+   "target": "hog",
+   "solver": "native",
+   "rss_cap_kb": 1228800,
+   "timeout_s": 60,
+   "order": 10
+  },
+  {
+   "kind": "native",
    "cell": "tiny",
    "target": "a",
    "solver": "native",
-   "system_native": "systems/tiny/a.ms",
-   "threads": 1,
-   "order": 9
+   "order": 11
+  },
+  {
+   "kind": "aa",
+   "cell": "tiny",
+   "target": "a",
+   "solver": "msolve",
+   "on_replacement": true,
+   "order": 12
   }
  ]
 }
