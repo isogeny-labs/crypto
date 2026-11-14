@@ -199,3 +199,11 @@ algebraic solver to be implemented; no study row existed then. The repository's 
 one), so the oracle uses the linear stage above instead. Part B smoke at `P1` (`smoke/partB_smoke.jsonl`, 14
 targets, `m = 2` S ≤ 64 and `m = 3` S ≤ 8) was seen before freeze: every row `agree = true`, ratios
 `alg/enum` from 212 to 43,300. The part B prediction above was written after seeing it.
+
+**Amendment 1 (2026-11-14, order only; filed while `M3-A3-k3-tower` was running and before any of its rows was
+written).** The first `m = 3` cell at `S = 27` ran 840 s on its first system at 5 GB. At the frozen 1,800 s per
+system, the three `m = 3` cells with `S ≥ 27` (parts A and B) could take most of a day, ahead of the replication,
+A/A and part B cells. Those cells now run last (`L3_TAIL` in `run_cells.sh`). No cell, budget, bound or rule
+changes, and §3 says order cannot change a counted metric. The interrupted cell had no rows; it reruns from the
+start under the same name (§7).
+

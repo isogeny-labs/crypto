@@ -77,7 +77,9 @@ for c in "${I2_CELLS[@]}"; do
 done
 
 # Secondary ladder, m = 3 (small S).
-L3_CELLS=( "A2-t2:2:2" "A23-n2:23:2" "A2-t3:2:3" "A3-k2:3:2" "A23-n3:23:3" "A2-t4:2:4" "A5-k2:5:2" "A3-k3:3:3" "A2-t5:2:5" "A23-n4:23:4" )
+L3_CELLS=( "A2-t2:2:2" "A23-n2:23:2" "A2-t3:2:3" "A3-k2:3:2" "A23-n3:23:3" "A2-t4:2:4" "A5-k2:5:2" )
+# Amendment 1: the m = 3 cells with S >= 27 run last (L3_TAIL, below).
+L3_TAIL=( "A3-k3:3:3" "A2-t5:2:5" "A23-n4:23:4" )
 for c in "${L3_CELLS[@]}"; do
   IFS=: read -r name q n <<< "$c"
   d="$(degs_of "$q" "$n")"
@@ -110,11 +112,22 @@ done
 for c in "I3-k3:3:3" "I23-n4:23:4" "I23-n5:23:5" "I3-k4:3:4"; do
   IFS=: read -r name q n <<< "$c"; runb "M2-$name" --p $P1 --m 2 --form isogeny --degrees "$(degs_of "$q" "$n")"
 done
-for c in "A2-t2:2:2" "A23-n2:23:2" "A2-t3:2:3" "A3-k2:3:2" "A23-n3:23:3" "A2-t4:2:4" "A3-k3:3:3" "A23-n4:23:4" "A2-t5:2:5"; do
+for c in "A2-t2:2:2" "A23-n2:23:2" "A2-t3:2:3" "A3-k2:3:2" "A23-n3:23:3" "A2-t4:2:4"; do
   IFS=: read -r name q n <<< "$c"; runb "M3-$name" --p $P1 --m 3 --form kummer --degrees "$(degs_of "$q" "$n")"
 done
 for c in "I23-n2:23:2" "I23-n3:23:3"; do
   IFS=: read -r name q n <<< "$c"; runb "M3-$name" --p $P1 --m 3 --form isogeny --degrees "$(degs_of "$q" "$n")"
+done
+
+# Amendment 1 tail: the heavy m = 3 cells (parts A and B), last.
+for c in "${L3_TAIL[@]}"; do
+  IFS=: read -r name q n <<< "$c"
+  d="$(degs_of "$q" "$n")"
+  run "M3-$name-tower" 3 --p $P1 --m 3 --degrees "$d" --control tower --kind refute --draws 3
+  run "M3-$name-null" 3 --p $P1 --m 3 --degrees "$d" --control null --kind refute --draws 3
+done
+for c in "A3-k3:3:3" "A23-n4:23:4" "A2-t5:2:5"; do
+  IFS=: read -r name q n <<< "$c"; runb "M3-$name" --p $P1 --m 3 --form kummer --degrees "$(degs_of "$q" "$n")"
 done
 
 echo "end $(date -u +%FT%TZ)" >> progress.txt
