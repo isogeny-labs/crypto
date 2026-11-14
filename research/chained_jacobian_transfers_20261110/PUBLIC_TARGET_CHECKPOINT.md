@@ -1,3 +1,29 @@
+# Exact-byte transport20 replaces rejected unpublished payload19
+
+Actual925a2b44 normalpush1/GH001: whole150067144B archive exceeds GitHub100MiB; no remote ref moved. Original failed commit retained on local research/chained-jacobian-transfer-20261110-rejected19; every original claimed subject and whole archive stays exact. Fresh candidate has SAME unchanged remoteparent4b0871aa; no published history rewrite/force/rebase. Two original-policy byte segments reconstruct the identical archive, not a repack or filtered dataset. Original19 single-object publication is UNMET; transport20 requires genuine seven-object replay BEFOREactualbot/exactFF/full ordered reassembly hash/all40437+sixsubject guards/150links/ownedbytes. All consumer source/metadata/ledger remainHELD. [pcc:unverified]
+
+## What was done
+Preserved exact rejection/receipt/localcommit and all held bytes; segmented unchanged archive and recorded complete byte offsets/SHA256. Original343science/policy/tools/workflows remain unchanged. [pcc:unverified]
+
+## Decisions made
+Use existing trusted artifact publisher on each GitHub-sized part, retain complete logical archive/member criteria and the failed original publication. No fake single-object manifest entry or hold release. [pcc:unverified]
+
+## Open threads
+Normalpublish transport20, genuine original remote replay/exactFF/whole reassembly/terminal checks, then canonical newpair fixtures/additive23CI and NEWfixedfourth-edge protocol beforecode. [pcc:unverified]
+
+## Errors
+Original wholedata19 preparation/governance passed; publication alone was rejectedGH001. No scientific negative or criterion acceptance is inferred. [pcc:unverified]
+
+---
+
+
+
+# Whole fixed-twist / observer census handoff19 ready
+
+pcc/claims/PCC-20261114-d03ff8.json: ALL24853prior18inputs/23oldlinks/sixreleasedmetadataupdates/oldb77ledgerprefix; everydeclaredclosedct78-ct80run/control/source/actualexe/library/failure/CI/proof/report/checkpoint/member retained, currentownedscience held plusimmutable2850Gitbase/pendingmetadata. Originalpolicy-selectedobjects HELDuntilactualremote-byte replays BEFOREpublisherbot/exactFF/terminal19guards+ownedbytes. Newinstance2a0549/conditionaloldprime215bcc andnegativecoldf0f3ae/partialb3a1bc stayunsigned; no completeJacobianmap, original-logtwisttransfer, fullcold120, paidlaunch/waiver/novelty/advantage. Afterrelease canonicalfixtures/additive23CI andnewpairedfixedfourth-edge protocol beforecode. [pcc:unverified]
+
+---
+
 # Whole model/third-edge publication18 settled
 
 Actual0e8aa2/consumer85aac5: original43627710330/job132547213547SUCCESS/EIGHTremote replays BEFORE3a689cf8b/directc350/EXACT10paths, ninth134690BmemberindexplainGitunchanged. All24853guards/all24445priorkeys/23links/ownedbytes retained; originalfetch-FF-artifact-wiring0/HOLD18RELEASED. All20closedroots/416wholemembers/actualbinaries/source/failures/nativefixtures/stdouts/pending4metadatafiles+immutableb77Gitbase genuinelypublished. SIXcanonicaldocsoriginalentrydicts/SIXtransparentconsumerlinks exactbytes; no newremote-read/scientificstandingclaim. [pcc:unverified]
