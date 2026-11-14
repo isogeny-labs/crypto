@@ -135,6 +135,36 @@ static int selftest(int bits, uint32_t n_fb, uint32_t n_targets) {
     return bad ? 1 : 0;
 }
 
+extern "C" int rf_profile_reset(void);
+extern "C" int rf_profile_read(unsigned long long *out8);
+
+/* `profile` (RF_PROFILE=1 builds): where a thread's cycles go, per
+ * (lookup, chunk), from the sampled clock64() phases in rootfind.cuh.
+ * A sample of cycles, not a timing; the kernel time printed beside it is
+ * the instrumented build's and runs slower than the plain build. */
+static int profile(int bits, uint32_t n_fb, uint32_t n_targets) {
+    std::printf("profile: %d-bit p, |F| = %u, %u targets\n", bits, n_fb, n_targets);
+    if (rf_profile_reset() != 0) { std::printf("  not an RF_PROFILE build (make bench RF_PROFILE=1)\n"); return 2; }
+    Instance I = make_instance(bits, n_fb, n_targets, 2);
+    std::printf("  %-6s %-5s %9s %8s | %% of sampled cycles: %6s %6s %6s %6s %8s %8s\n", "lookup", "chunk", "ms", "threads",
+                "load", "prefix", "inv", "unwind", "sweep-ar", "probes");
+    for (int lookup : {RF_LOOKUP_SORTED, RF_LOOKUP_HASH}) {
+        for (uint32_t chunk : {16u, 32u, 64u}) {
+            rf_profile_reset();
+            RelSet got; rf_result r;
+            int rc = run64(I, RF_BACKEND_CUDA, lookup, chunk, got, r);
+            unsigned long long c[8];
+            if (rc != RF_OK || rf_profile_read(c) != 0) { std::printf("  %s chunk=%u: failed\n", lname(lookup), chunk); continue; }
+            const double tot = (double)(c[0] + c[1] + c[2] + c[3] + c[4]);
+            const double sweep_ar = (double)c[4] - (double)c[5];
+            std::printf("  %-6s %-5u %9.3f %8llu | %26s %6.1f %6.1f %6.1f %6.1f %8.1f %8.1f\n", lname(lookup), chunk, r.seconds * 1e3,
+                        c[6], "", 100.0 * c[0] / tot, 100.0 * c[1] / tot, 100.0 * c[2] / tot, 100.0 * c[3] / tot,
+                        100.0 * sweep_ar / tot, 100.0 * c[5] / tot);
+        }
+    }
+    return 0;
+}
+
 static int throughput(int bits, uint32_t n_fb, uint32_t n_targets) {
     std::printf("throughput: %d-bit p, |F| = %u, %u targets\n", bits, n_fb, n_targets);
     Instance I = make_instance(bits, n_fb, n_targets, 2);
@@ -220,6 +250,7 @@ int main(int argc, char **argv) {
     if (cmd == "selftest") return selftest((int)arg(2, 61), (uint32_t)arg(3, 1024), (uint32_t)arg(4, 4096));
     if (cmd == "throughput") return throughput((int)arg(2, 61), (uint32_t)arg(3, 65536), (uint32_t)arg(4, 65536));
     if (cmd == "p256") return p256((uint32_t)arg(2, 256), (uint32_t)arg(3, 1024));
-    std::printf("usage: %s selftest|throughput|p256 [args]\n", argv[0]);
+    if (cmd == "profile") return profile((int)arg(2, 61), (uint32_t)arg(3, 65536), (uint32_t)arg(4, 65536));
+    std::printf("usage: %s selftest|throughput|p256|profile [args]\n", argv[0]);
     return 2;
 }
