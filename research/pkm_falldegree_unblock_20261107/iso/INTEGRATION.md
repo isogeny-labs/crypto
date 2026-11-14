@@ -17,3 +17,13 @@ Measured. Not data. No `P1` row was produced.
   `gates/gaux.log`: **"pass 16 draws, 0 mismatched"**.
 - The runner's local files (`/results`, `/work`, `/opt/repo`, three binaries in `/usr/local/bin`) were left on the throwaway
   sandbox. Removing them was refused by a safety check; they leave with the container.
+
+## Second run, with bundle pins (re-review edit R2-E5), 2026-11-14 19:08–19:09Z
+
+Commit `172ce02e2894`; `repo.tar` `d869e98482e3…` (`git archive` of `iso/BUNDLE_PATHS`); pins from `iso/BUNDLE.sha256` at that commit.
+
+- **Negative control.** The same request with the pin of `iso/score_iso.py` replaced by `00` was refused: HTTP 409,
+  `{"error": "bundle sha256 mismatch", "detail": {"…/iso/score_iso.py": ["00", "b89aa304ea0b…"]}}`. Nothing ran.
+- **True pins.** State `done`, exit 0. `g1` exit 0; `gaux` exit 0, 19:08:42 to 19:09:23Z.
+  `gates/gaux.log`: **"pass 16 draws, 0 mismatched"**.
+- `progress.txt` also holds the first run's four lines, because `/work` from the first run was not removed (see above).

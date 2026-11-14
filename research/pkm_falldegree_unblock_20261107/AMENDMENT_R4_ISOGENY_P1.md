@@ -1,8 +1,8 @@
 # DRAFT Amendment R4 (proposed number 16): the 2-isogeny arm at `P1`
 
-**Status: draft, revision 2 (2026-11-14), NOT frozen.** Revision 1 was reviewed by an independent red team
-(`REVIEW_R3_R4.md`): "freeze with edits", blocking edits E4.1–E4.8. This revision applies all eight; section 9 maps each edit to
-the text and the evidence. The text is written on the owner's instruction "do the isogeny arm at P1 first" (2026-11-14). Target
+**Status: draft, revision 3 (2026-11-14), NOT frozen.** Revision 1 was reviewed by an independent red team
+(`REVIEW_R3_R4.md`): "freeze with edits", E4.1–E4.8. Revision 2 applied those, and its re-review asked for R2-E1–R2-E7.
+This revision applies those too. Section 9 maps every edit to the text and the evidence. The text is written on the owner's instruction "do the isogeny arm at P1 first" (2026-11-14). Target
 when frozen: `research/prime_fall_degree_20261027/PREREGISTRATION.md`, appended as Amendment 16, **before any isogeny row at
 `P1` exists**. None exists. Every number is `[pcc:unverified]`.
 
@@ -97,11 +97,24 @@ Every argv is fixed in `iso/entry_iso.sh`. The table is a summary; the script is
 - **`t = 14`** (λ = 0.133) is not included. With the certificate it would be valid. Adding it is the owner's decision, and
   cells would follow the same table.
 
-## 5. Readings (fixed now; E4.4)
+## 5. Readings (fixed now; E4.4, R2-E1–R2-E4)
 
-The scorer is `iso/score_iso.py`, committed and self-tested on synthetic rows that use the R4 file names (E4.5).
+The scorer is `iso/score_iso.py`, pinned in `iso/BUNDLE.sha256`. Its `--selftest` runs synthetic rows with the R4 file names,
+and the re-review's cases A–E, each with its required outcome.
 
-- **Per-draw `d_F`.**
+- **Conflicts stop R4.** Any one of these is an instrument conflict, and the readings become "STOPPED":
+  - an empty interval (`L > U`);
+  - an exact closure value outside the F4 interval (for example, closure exact 5 while a completed cap-5 run does not refute);
+  - a closure lower bound above a refuting `D` (G2 in bound form);
+  - sources of one draw disagreeing on `x_R` or on the auxiliary curve.
+  
+  Each draw lists its sources, with the bound each gives (Amendment 7 D.2's per-draw source).
+- **Admission.** A draw enters a median only if it is refuted (an exact closure, or an F4 refutation) or certified inconsistent
+  (`solutions = 0`). A decomposable draw is excluded.
+- **Complete cells.** A `t` needs both draws admitted, unless a draw is certified decomposable. Otherwise it reads
+  "undecided", whatever its one-draw median is.
+
+- **Per-draw `d_F`** (within the rules above).
   - The closure gives an exact value, or a lower bound (the frozen `d_f` semantics).
   - A refuting F4 run at degree `D` gives an upper bound `D` (G2).
   - A completed capped run at cap `C` gives `≥ C + 1` if it does not refute, and `≤ C` if it does.
@@ -135,23 +148,44 @@ The scorer is `iso/score_iso.py`, committed and self-tested on synthetic rows th
     need the relation cost, the auxiliary-curve search (`aux_curves_tried`) and the matched rho reference (AGENTS.md §5a), and
     none of those is measured here.
 
-## 6. Jobs, resources and cost (E4.8)
+## 6. Preconditions, jobs, resources and cost (E4.8, R2-E6, R2-E7)
 
-Route: the RunPod reserved-pod route of draft R3. R3 itself must be frozen with its own edits (E3.1–E3.9) before R4 runs; R4
-adds the runner's `iso` mode (`runpod/server.py`): the R4 binaries plus `repo.tar`, a `git archive` of `iso/BUNDLE_PATHS` at
-the job's commit.
+**Preconditions.** No R4 job starts until all of these hold:
+1. R3 is frozen with its edits E3.1–E3.9, including:
+   - the runner deadline and cost guard (E3.2);
+   - the memory floor and out-of-memory classification (E3.3; Amendment 14's `-m112` rule needs it for the X runs);
+   - the vCPU ≥ 12 check (E3.4);
+   - durable results (E3.5);
+   - runner and image identity (E3.8);
+   - the loss rule (E3.9).
+2. S3 works. `pkm_tower_pilot_r4` (`705b151b…`) is in the artifact store by hash, and the resume checkpoint and
+   `bench.record/v1` are written.
+3. The owner has ruled on reserved-pod ceilings (decision 4 set US$40 per job and US$400 for the study for Spot compute).
+4. This amendment is frozen. The freeze commit is named in `PREREGISTRATION.md`, and every job's `repo.tar` is
+   `git archive` of `iso/BUNDLE_PATHS` at that commit, verified on the pod against `iso/BUNDLE.sha256` at that commit
+   (`iso/INTEGRATION.md`: a tampered pin is refused).
 
-| job | stages | vCPU / memory | time limit | projected wall | projected cost |
-|:--|:--|:--|:--|:--|:--|
-| `iso-a` | `g1 gaux A A-big DA g3 cert cap-A` | ≥ 12 vCPU (12 rayon threads) / 56Gi | 172,800 s | 2–6 h (heuristic) | US$2–7 expected, US$50 at the limit |
-| `iso-x-tT-kK-cC` | `gaux x:T:K:C:12800000000` (one per bracket step) | ≥ 12 / 56Gi | 90,000 s | cap 5: minutes; cap 6: 0.5–4 h (Kummer t = 12/13) | under US$5 each expected, about US$26 at the limit |
-| recount | `recount.py` on this side | — | — | under 1 h | none |
+**Pods.** Reserved (`interruptible: false`) CPU pods only. Flavor `cpu5m` or `cpu3m` (memory-optimised), 12 vCPU, which
+gives 12 rayon threads and at least 56Gi at about 8 GB per vCPU.
 
-- **Pricing** (derived). About US$0.065 per vCPU-hour on memory-optimised reserved CPU pods. That is the review's figure, from
-  a 32 vCPU / 256 GB pod at US$2.08/h, so 16 vCPU / 128 GB costs about US$1.04/h.
-- **Ceilings.** The `iso-a` limit exceeds the US$40 per-job ceiling at worst. Whether reserved-pod ceilings change is the owner's
-  decision, asked separately. Until then `iso-a` runs under the US$40 stop of R3's cost guard (E3.2). A stop is reported as
-  censored-by-cost, and its rows up to the stop are kept.
+| job | stages | time limit | projected wall | cost at the limit (12 vCPU, about US$0.78/h, derived) |
+|:--|:--|:--|:--|:--|
+| `iso-a` | `g1 gaux A A-big DA g3 cert cap-A` | 172,800 s | 2–6 h (heuristic) | about US$37; expected US$2–5 |
+| `iso-x-tT-kK-cC` | `gaux x:T:K:C:12800000000`, one per bracket step | 90,000 s | cap 5: minutes; cap 6: 0.5–4 h (Kummer t = 12, 13) | about US$20; expected under US$4 |
+| recount | `recount.py` on this side | — | under 1 h | none |
+
+- **Pricing** (derived). About US$0.065 per vCPU-hour, from the review's price record (32 vCPU / 256 GB at US$2.08/h). Idle
+  time between a job's end and the pod's deletion is billed. The runner's cost guard (E3.2) counts it, and pods are deleted at
+  the first check-in after a job ends.
+- **Ceilings.**
+  - No job starts if its cost at the limit exceeds US$40, or before the owner's ceiling decision.
+  - Worst case for the brackets: up to 3 steps × 2 draws × 3 `t` = 18 X jobs at about US$20 each, about US$360 at their
+    limits. Together with `iso-a` that exceeds the US$400 study ceiling. A running total is kept against the ceiling, and no
+    job starts that would cross it at its limit.
+  - There is no "censored-by-cost" reading. A job either runs to its registered limit or does not start.
+- **Loss rule.** A pod lost for any reason (host failure, a stop by RunPod, a balance stop) is recorded with its reason.
+  Its partial rows are kept as evidence and enter no reading. The cell may be relaunched once, and the attempt count is per
+  cell across routes (E3.9).
 
 ## 7. Records
 
@@ -181,3 +215,11 @@ Kummer rows, frozen binaries, §6 rules for other arms, seeds, draws and budgets
 | E4.7 on-host control, recount, panic | §3; stage `gaux` in every job; `iso/naive_count.c`, `iso/recount.py`; exit 3 on panic |
 | E4.8 resources, cost, disclosure | §0, §6 |
 | E4.9 (optional) null | §5, stated as a limitation instead |
+| R2-E1 conflicts stop; G2 in bound form | §5; `score_iso.py` (cases A, D) |
+| R2-E2 certified-only admission | §5; `score_iso.py` (case B) |
+| R2-E3 both draws per cell | §5; `score_iso.py` (case C) |
+| R2-E4 `x_R` and curve agreement; per-draw sources | §5; `score_iso.py` (case E) |
+| R2-E5 bundle pins verified after unpacking; commit recorded | §6 precondition 4; `iso/BUNDLE.sha256`, `iso/make_bundle_pins.sh`; runner `iso` mode; `iso/INTEGRATION.md` (second run) |
+| R2-E6 12-vCPU memory-optimised pods; no job above US$40 or before the ceiling decision; no censored-by-cost | §6; `runpod/rp.sh` flavors `cpu5m`, `cpu3m` |
+| R2-E7 preconditions and loss rule | §6 |
+| R2-E8 (optional) gaux log scan | `iso/entry_iso.sh` `panicked()` now scans `gates/gaux/` |
