@@ -1,0 +1,29 @@
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/compact/degree-evidence/draft-003.lean.txt:213:30: error: Ambiguous term
+  weightedLeft
+Possible interpretations:
+  OrientationBivariate.weightedLeft : (a u : ℕ) → ℕ → (k : ℕ) → (ℕ → ℕ) → Matrix (Ports a) (MomentLabels u k) ℚ[X]
+  
+  OrientationLeading.weightedLeft : (a u : ℕ) → ℕ → (ℕ → ℕ) → Matrix (Ports a) (Labels u) ℚ
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/compact/degree-evidence/draft-003.lean.txt:212:79: error: unsolved goals
+a u i k : ℕ
+t : ℤ
+m : ℕ → ℕ
+x y : Ports a
+rb : MomentLabels u k
+a✝ : rb ∈ univ
+⊢ OrientationBivariate.weightedLeft a u i k m x rb * trimmedRight a u i k t m rb y =
+    trimmedRight a u i k t m rb y * C (diagonalJet a u i m) * polyLeft a u k x rb
+'OrientationChartDegree.actual_approx_rows_mixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationChartDegree.actual_poly_right_graded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationChartDegree.trimmed_right_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationChartDegree.actual_degree_limited_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationChartDegree.actual_degree_limited_profile' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
