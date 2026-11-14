@@ -3,11 +3,15 @@
 //!
 //! ```text
 //! pkm-smooth-tower kummer  --p P --degrees 3,2,5 [--g G] [--seed S]
+//! pkm-smooth-tower cm      --p P --bound B [--min-size N] [--seed S]
 //! pkm-smooth-tower search  --p P --bound B --min-size N [--seed S] [--max-curves K]
 //! pkm-smooth-tower isogeny --p P --bound B --min-size N [--seed S] [--max-curves K]
 //!                          [--curve A,B --target-x X --m M --system OUT.ms]
 //! ```
 //!
+//! `cm` is Method 2 for the given `p`: every class-number-1 CM curve over
+//! `F_p`, its certified order and smooth part; with `--min-size` it also
+//! builds and verifies the isogeny tower on the first one that fits.
 //! `kummer` needs `∏ degrees | p − 1`. `search` is Method 1 only (the
 //! auxiliary curve). `isogeny` searches and builds the Vélu chain; with
 //! `--curve` and `--target-x` it also writes slide 17's system for `m`
@@ -21,7 +25,7 @@ use std::collections::HashMap;
 
 fn usage() -> ! {
     eprintln!(
-        "usage: pkm-smooth-tower kummer|search|isogeny --p P [options]; see the source header"
+        "usage: pkm-smooth-tower kummer|cm|search|isogeny --p P [options]; see the source header"
     );
     std::process::exit(2)
 }
@@ -84,6 +88,23 @@ fn main() {
             let t = kummer_tower(p, &degs, o.get("g").map(|g| g.parse().unwrap_or(1)), seed)?;
             t.verify()?;
             Ok(tower_json(&t))
+        }
+        "cm" => {
+            let bound = num("bound", None);
+            let cs = cm_curves(p, bound, seed)?;
+            let mut out = json!({"p": p, "curves": cs.iter().map(|c| json!({
+                "D": c.d, "j": c.j, "a": c.curve.a, "b": c.curve.b, "order": c.order,
+                "trace": c.trace, "smooth": c.smooth, "cofactor": c.cofactor,
+                "smooth_part": c.smooth.iter().product::<u64>()})).collect::<Vec<_>>()});
+            if let Some(ms) = o.get("min-size") {
+                let ms: u64 = ms.parse().map_err(|_| "bad --min-size")?;
+                let (f, d) = cm_aux(p, bound, ms, seed)?;
+                let t = isogeny_tower_on(f.aux, f.order, f.q, &f.degrees, seed, 0)?;
+                t.verify()?;
+                out["tower_D"] = json!(d);
+                out["tower"] = tower_json(&t);
+            }
+            Ok(out)
         }
         "search" | "isogeny" => {
             let f = search_aux(

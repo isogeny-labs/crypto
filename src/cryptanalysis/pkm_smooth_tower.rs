@@ -30,8 +30,15 @@
 //!   `m − 2` auxiliary unknowns (same solutions in the `x_{i,1}`), and
 //!   an exact `m = 2` relation finder over `V` checks it on small cases.
 //!
-//! Choosing `p` itself so that one of the above is cheap (slide 16,
-//! "Method 2 … kind of trapdoor") is out of scope here: every routine
+//! * **Method 2** (slide 16, complex multiplication) for the given `p`:
+//!   for each of the 13 class-number-1 orders in which `p` splits,
+//!   Cornacchia gives `4p = t² + |D|v²`, hence every CM trace (six twists
+//!   for `D = −3`, four for `D = −4`), and the curves are built from
+//!   `j(D)` with each order certified on random points. A handful of
+//!   candidate orders per `p`, against Method 1's random search.
+//!
+//! The slide's other use of Method 2, choosing `p` itself so that a CM
+//! order is smooth ("kind of trapdoor"), is out of scope: every routine
 //! takes `p` as given.
 //!
 //! Single-word arithmetic: `p < 2^62`. Order computation is a baby-step
@@ -962,6 +969,225 @@ pub fn relation_system_msolve(e: &Curve, tower: &SmoothTower, m: usize, xr: u64)
     format!("{}\n{}\n{}\n", vars.join(","), e.p, eqs.join(",\n"))
 }
 
+// ------------------------------------------------- Method 2: CM, fixed p
+
+/// The 13 imaginary quadratic orders of class number 1, with `j`.
+pub const CLASS_NUMBER_ONE: [(i64, i128); 13] = [
+    (-3, 0),
+    (-4, 1728),
+    (-7, -3375),
+    (-8, 8000),
+    (-11, -32768),
+    (-12, 54000),
+    (-16, 287496),
+    (-19, -884736),
+    (-27, -12288000),
+    (-28, 16581375),
+    (-43, -884736000),
+    (-67, -147197952000),
+    (-163, -262537412640768000),
+];
+
+/// Cornacchia for `4p = t² + |D| v²` (`D < 0`, `D ≡ 0, 1 mod 4`): `(t, v)`
+/// with `t, v ≥ 0`, or `None` when `p` is not a norm from the order.
+pub fn cornacchia_4p(p: u64, d: i64) -> Option<(u64, u64)> {
+    let ad = d.unsigned_abs();
+    let dm = ((d % p as i64) + p as i64) as u64 % p;
+    let mut x0 = sqrtm(dm, p)?;
+    if (x0 & 1) != (ad & 1) {
+        x0 = p - x0;
+    }
+    let (mut a, mut b) = (2 * p as u128, x0 as u128);
+    let l = (2.0 * (p as f64).sqrt()).floor() as u128;
+    while b > l {
+        let r = a % b;
+        a = b;
+        b = r;
+    }
+    let rem = 4 * p as u128 - b * b;
+    if rem % ad as u128 != 0 {
+        return None;
+    }
+    let c = rem / ad as u128;
+    let v = (c as f64).sqrt().round() as u128;
+    for w in [v.saturating_sub(1), v, v + 1] {
+        if w * w == c {
+            return Some((b as u64, w as u64));
+        }
+    }
+    None
+}
+
+/// Every trace `t'` of a curve with CM by the order of discriminant `d`
+/// over `F_p`, given `4p = t² + |d|v²` (twists included: six for `d = −3`,
+/// four for `d = −4`, two otherwise).
+pub fn cm_traces(d: i64, t: u64, v: u64) -> Vec<i64> {
+    let (t, v) = (t as i64, v as i64);
+    let mut out = match d {
+        -3 => vec![t, (t + 3 * v) / 2, (t - 3 * v) / 2],
+        -4 => vec![t, 2 * v],
+        _ => vec![t],
+    };
+    out.extend(out.clone().iter().map(|x| -x));
+    out.sort_unstable();
+    out.dedup();
+    out
+}
+
+/// One CM curve over the given `p` with its order certified on random
+/// points, and that order's smooth split.
+#[derive(Clone, Debug)]
+pub struct CmCurve {
+    pub d: i64,
+    pub j: u64,
+    pub curve: Curve,
+    pub order: u64,
+    pub trace: i64,
+    pub smooth: Vec<u64>,
+    pub cofactor: u64,
+}
+
+fn j_mod(j: i128, p: u64) -> u64 {
+    (j.rem_euclid(p as i128)) as u64
+}
+
+/// The order of `e` among `candidates`, identified by annihilating random
+/// points (exhaustive count below 2^16).
+fn identify_order(e: &Curve, candidates: &[u64], rng: &mut Rng) -> Option<u64> {
+    if e.p < 1 << 16 {
+        let n = e.order(rng)?;
+        return candidates.contains(&n).then_some(n);
+    }
+    let mut left: Vec<u64> = candidates.to_vec();
+    for _ in 0..32 {
+        let pt = e.random_point(rng);
+        left.retain(|&n| e.mul(n, pt).is_none());
+        if left.len() <= 1 {
+            break;
+        }
+    }
+    (left.len() == 1).then(|| left[0])
+}
+
+/// Method 2 for a **given** prime `p`: for each class-number-1
+/// discriminant in which `p` splits, every CM curve over `F_p` (one per
+/// trace), its order (checked on random points), and the `bound`-smooth
+/// part of that order. Nothing here chooses or changes `p`.
+pub fn cm_curves(p: u64, bound: u64, seed: u64) -> Result<Vec<CmCurve>, String> {
+    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+        return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
+    }
+    let mut rng = Rng(seed);
+    let mut out = vec![];
+    for &(d, j) in CLASS_NUMBER_ONE.iter() {
+        if (d.unsigned_abs() as u64) % p == 0 {
+            continue;
+        }
+        let Some((t, v)) = cornacchia_4p(p, d) else {
+            continue;
+        };
+        let traces = cm_traces(d, t, v);
+        let cands: Vec<u64> = traces
+            .iter()
+            .map(|&tr| (p as i64 + 1 - tr) as u64)
+            .collect();
+        let jm = j_mod(j, p);
+        let mut seen: HashSet<u64> = HashSet::new();
+        // Draw curves with this j (all twists) until every trace is covered.
+        for _ in 0..64 * cands.len() {
+            if seen.len() == cands.len() {
+                break;
+            }
+            let u = 1 + rng.below(p - 1);
+            let e = if j == 0 {
+                Curve { p, a: 0, b: u }
+            } else if j == 1728 {
+                Curve { p, a: u, b: 0 }
+            } else {
+                // j ≡ 0 or 1728 (mod p) for another order: the curves are the
+                // j = 0 / 1728 ones, already handled by d = −3 / −4.
+                let den = subm(1728 % p, jm, p);
+                if den == 0 || jm == 0 {
+                    break;
+                }
+                let k = mulm(jm, invm(den, p), p);
+                let (u2, u3) = (mulm(u, u, p), mulm(mulm(u, u, p), u, p));
+                Curve {
+                    p,
+                    a: mulm(mulm(3, k, p), u2, p),
+                    b: mulm(mulm(2, k, p), u3, p),
+                }
+            };
+            if e.is_singular() {
+                continue;
+            }
+            let Some(n) = identify_order(&e, &cands, &mut rng) else {
+                continue;
+            };
+            if !seen.insert(n) {
+                continue;
+            }
+            let (smooth, cofactor) = smooth_split(n, bound);
+            out.push(CmCurve {
+                d,
+                j: jm,
+                curve: e,
+                order: n,
+                trace: p as i64 + 1 - n as i64,
+                smooth,
+                cofactor,
+            });
+        }
+    }
+    Ok(out)
+}
+
+/// The first CM curve (in `cm_curves` order) whose order has a cyclic
+/// `bound`-smooth part of at least `min_size`, as an [`AuxFound`].
+pub fn cm_aux(p: u64, bound: u64, min_size: u64, seed: u64) -> Result<(AuxFound, i64), String> {
+    let mut rng = Rng(seed ^ 0xc0ffee);
+    for c in cm_curves(p, bound, seed)? {
+        let e = c.curve;
+        let n = c.order;
+        let mut sel = vec![];
+        let mut s = 1u64;
+        for &q in &c.smooth {
+            if q == p {
+                continue;
+            }
+            sel.push(q);
+            s *= q;
+            if s >= min_size {
+                break;
+            }
+        }
+        if s < min_size {
+            continue;
+        }
+        let mut primes = sel.clone();
+        primes.dedup();
+        for _ in 0..32 {
+            let qpt = e.mul(n / s, e.random_point(&mut rng));
+            if primes.iter().all(|&l| e.mul(s / l, qpt).is_some()) {
+                return Ok((
+                    AuxFound {
+                        aux: e,
+                        order: n,
+                        degrees: sel,
+                        q: qpt.unwrap(),
+                        curves_tried: 0,
+                        orders_failed: 0,
+                    },
+                    c.d,
+                ));
+            }
+        }
+    }
+    Err(format!(
+        "no class-number-1 CM curve over p = {p} has a cyclic {bound}-smooth part ≥ {min_size}"
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1064,5 +1290,46 @@ mod tests {
         let _ = rng.next();
         let sys = relation_system_msolve(&e, &t, 3, r.0);
         assert!(sys.lines().next().unwrap().contains("u1"));
+    }
+
+    #[test]
+    fn cm_curves_have_the_predicted_orders() {
+        for p in [10007u64, 100_003, 1_000_003, 998_244_353] {
+            let cs = cm_curves(p, 50, 3).unwrap();
+            assert!(!cs.is_empty());
+            let mut rng = Rng(8);
+            for c in &cs {
+                assert!(c.trace.unsigned_abs() as f64 <= 2.0 * (p as f64).sqrt() + 1.0);
+                // order agrees with the generic count, and twists per d
+                assert_eq!(c.curve.order(&mut rng), Some(c.order), "p={p} d={}", c.d);
+            }
+            for &(d, _) in CLASS_NUMBER_ONE.iter() {
+                let k = cs.iter().filter(|c| c.d == d).count();
+                if let Some((t, v)) = cornacchia_4p(p, d) {
+                    assert_eq!(
+                        4 * p as u128,
+                        (t as u128).pow(2) + d.unsigned_abs() as u128 * (v as u128).pow(2)
+                    );
+                    assert_eq!(k, cm_traces(d, t, v).len(), "p={p} d={d}");
+                } else {
+                    assert_eq!(k, 0);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn cm_aux_feeds_the_isogeny_tower() {
+        // a fixed prime; scan a few until one CM order is smooth enough
+        let mut done = false;
+        for p in (100_000u64..101_000).filter(|&q| is_prime(q)) {
+            if let Ok((f, _d)) = cm_aux(p, 13, 40, 5) {
+                let t = isogeny_tower_on(f.aux, f.order, f.q, &f.degrees, 2, 0).unwrap();
+                t.verify().unwrap();
+                done = true;
+                break;
+            }
+        }
+        assert!(done);
     }
 }
