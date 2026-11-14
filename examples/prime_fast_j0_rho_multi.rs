@@ -252,7 +252,9 @@ fn multi_rho(
     // Kuhn-Struik: new walks start only from targets whose log is still
     // unknown (plus G as the anchor). `RESTART=all` keeps the earlier policy,
     // which drew from every target, solved or not, for A/B comparison.
-    let restart_all = std::env::var("RESTART").map(|v| v == "all").unwrap_or(false);
+    let restart_all = std::env::var("RESTART")
+        .map(|v| v == "all")
+        .unwrap_or(false);
     let mut unsolved: Vec<usize> = (0..=t_count).collect();
     let new_lane = |rng: &mut StdRng, unsolved: &[usize]| -> Lane {
         loop {
@@ -282,7 +284,9 @@ fn multi_rho(
             };
         }
     };
-    let mut lanes: Vec<Lane> = (0..lanes_n).map(|_| new_lane(&mut rng, &unsolved)).collect();
+    let mut lanes: Vec<Lane> = (0..lanes_n)
+        .map(|_| new_lane(&mut rng, &unsolved))
+        .collect();
     let mut d = vec![0u64; lanes_n];
     let mut scratch: Vec<u64> = Vec::new();
     loop {
