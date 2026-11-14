@@ -15,7 +15,9 @@
 //!   j != 0, 1728 are isomorphic when their traces agree and quadratic twists
 //!   when the traces are opposite (t != 0);
 //! * cyclic group structure where gcd(#E, q - 1) shows no l with l^2 | #E
-//!   and l | q - 1, and the p-rank / a-number of genus-1 Jacobians.
+//!   and l | q - 1, and the p-rank / a-number of genus-1 Jacobians;
+//! * exact embedding degrees ord_r(q) of the prime-order subgroups that have
+//!   none, or a proved lower bound (src/import/embedding.rs).
 
 use super::{bulk, bulk1, Ctx, Report};
 use crate::ec::{glv_basis, modpow, root_of_unity, sqrt_mod, Curve, Point};
@@ -358,6 +360,22 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let prov_grp = ctx.provenance(src, "E(F_q) cyclic: no prime l with l | gcd(#E, q - 1) and l^2 | #E", None).await?;
     let prov_padic =
         ctx.provenance(src, "genus 1: p-rank 1 (ordinary) or 0 (supersingular); a-number 1 - p-rank", None).await?;
+    let emb_params = json!({ "trial_bound": super::embedding::TRIAL_BOUND, "rho_steps": super::embedding::RHO_STEPS,
+                             "rho_tries": super::embedding::RHO_TRIES, "scan": super::embedding::SCAN });
+    let prov_emb = ctx
+        .provenance(
+            src,
+            "embedding degree ord_r(q): r - 1 factored (trial division, Pollard-Brent), k reduced over its primes; checked q^k = 1, q^(k/p) != 1 for each prime p of k, and a factorization-free scan",
+            Some(&emb_params),
+        )
+        .await?;
+    let prov_emb_bound = ctx
+        .provenance(
+            src,
+            "embedding degree lower bound B (k > B): r - 1 = F C with C unfactored, all its primes above the trial bound T, q^F != 1; B = ord(q^C) T when gcd(F, C) = 1 and ord(q^C) rests on proved primes, else T",
+            Some(&emb_params),
+        )
+        .await?;
 
     // ---- modular polynomials
     let mut polys = vec![];
@@ -603,6 +621,9 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     // ---- p-adic invariants
     report.count("p_adic_invariants", client.execute(PADIC_SQL, &[&prov_padic]).await?);
     report.count("class_p_rank_updates", client.execute(CLASS_PRANK_SQL, &[]).await?);
+
+    // ---- exact embedding degrees (src/import/embedding.rs)
+    super::embedding::import(client, &mut report, prov_emb, prov_emb_bound).await?;
     Ok(report)
 }
 

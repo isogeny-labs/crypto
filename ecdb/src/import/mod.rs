@@ -14,6 +14,7 @@ pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
 pub mod ecbench;
+pub mod embedding;
 pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;

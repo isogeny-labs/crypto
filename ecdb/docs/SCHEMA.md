@@ -169,7 +169,7 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | `descent_data` | least field containing j, least field of definition, base curve, base trace, whether its sign is an invariant |
 | `twist_data` | quadratic, cubic, quartic and sextic twist orders, largest prime, cofactor |
 | `group_structure` | A(F_{q^k}) = Z/n_1 x Z/n_2 x ..., order factorization |
-| `pairing_data` | embedding degree ord_r(q) or its lower bound, (r - 1)/k bits, target field size, rho-value, pairing family, distortion map |
+| `pairing_data` | embedding degree ord_r(q) or its lower bound (k > bound), (r - 1)/k bits, target field size, rho-value, pairing family, distortion map; filled by `import enrich` where no degree is held (below, "Exact embedding degrees") |
 | `p_adic_invariants` | p-rank, a-number, Hasse–Witt and Cartier–Manin matrices, Ekedahl–Oort type, superspecial flag, Newton polygon |
 
 ### Maps (`0005`)
@@ -247,6 +247,52 @@ F_{2^{2m}} need 2^24 elements or fewer). They need SEA or a Kloosterman-sum
 algorithm; no value is guessed. In the pinned `covers.json` the skipped sources
 are 301 genus-2 sources over F_p (63 to 638 bits), 959 over GF(p^k) (49 to 253
 bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
+
+### Exact embedding degrees
+
+`import enrich` ends by computing k = ord_r(q) for every `subgroup` of prime
+order r (`is_prime_order`, primality `proved` or `probable`) over a finite
+field of q elements (`src/import/embedding.rs`). It writes `pairing_data`
+only where no `embedding_degree` is held: a new row, the degree of a row that
+has none, or a larger `embedding_lower_bound`. An existing degree is never
+changed, an existing lower bound stays when an exact degree is added (it is
+still true), a row marked `not_applicable` is left alone, and nothing is
+deleted. A second run writes nothing.
+
+- **r - 1 factored.** Trial division by every prime up to 2^20, then
+  Pollard–Brent rho (3 polynomials, 2^16 steps each) on what is left; every
+  factor is tested with deterministic Miller–Rabin below 3.3 * 10^24 (proved)
+  and the same test above it (probable). k starts at r - 1 and is divided by
+  each prime p while q^(k/p) = 1 mod r.
+- **r - 1 not factored.** r - 1 = F C, C composite with no prime factor up to
+  the trial bound T. If q^F = 1, k | F and k is computed exactly. Otherwise
+  k / gcd(k, F) > 1 divides C, so k > T; with gcd(F, C) = 1 and k1 = ord(q^C)
+  resting on proved primes, k = k1 ord(q^F) > k1 T. The stored
+  `embedding_lower_bound` B always means k > B (status `bounded`), which also
+  satisfies the weaker reading k >= B.
+- **Status.** An exact k is `proved` when r is proved prime and every prime of
+  k is proved prime, else `probable`. r | q (r = p) has no embedding degree and
+  is only counted.
+- **Cross-checks** (a failure is a problem line, `embedding_degree_crosscheck_failures`,
+  and nothing is written): q^(r-1) = 1 mod r; q^k = 1 mod r; q^(k/p) != 1 for
+  every prime p of k, whose prime powers must multiply to k (so no proper
+  divisor of k works); a factorization-free scan of q^i, i <= 2000, whose first
+  1 must be k (or absent when k > 2000 or only a bound is known); every
+  existing `embedding_degree` must equal the computed k (or, when only a bound
+  is computed, exceed it with q^k = 1); an existing lower bound must not exceed
+  the computed k.
+- **Report.** `embedding_degree_targets`, `_exact_proved`, `_exact_probable`,
+  `_bounded`, `_not_applicable`, `_inserted`, `_updated`,
+  `embedding_lower_bound_raised`, `_existing_agree`, `_existing_consistent`,
+  `_crosscheck_failures`.
+- **On the pinned registry and traits** (local Postgres 16, `import registry`,
+  `traits`, `enrich`): 144 targets; 6 exact degrees (probable: the 104- to
+  158-bit subgroups of six prime-power-field curves whose r is only probable
+  prime), 120 lower bounds raised from k > 1000 to k > 2^20 or more (up to
+  109 bits; 109 of them above 2^20), 18 with r = p; the 2,432 existing degrees
+  agree (2,139 recomputed exactly, 293 consistent with a computed bound);
+  0 problems. `security_assessment.embedding_degree` is a copy taken by
+  `import derived`, which runs before `enrich` and does not update.
 
 ### Global curves, security, evidence (`0007`)
 
@@ -364,7 +410,7 @@ the import's own checks.
 | level and Jacobian certificates | 19 + 1 certificates |
 | derived in SQL | 21,080 automorphism groups (79 C6, 14 C4), 21,082 attack-surface rows, 21,080 Frobenius endomorphisms, 73 subfield-tau records with their endomorphisms |
 | an LMFDB `av_fq_isog` export (optional) | label recomputed from the polynomial and required to match: 10 sample rows matched |
-| `enrich` (computed in Rust from the rows above) | 8 modular polynomials Phi_l (l = 2..19, over Z, sparse, both orders of each coefficient); 13 Hilbert class polynomials H_D for the class-number-one discriminants, each checked against every curve with that j (409 checks, 0 failed); Semaev S_2 and S_3, generic in (a, b), S_3 checked to vanish on sums; 84,320 division polynomials psi_2..psi_5 over prime fields (84,191 distinct after content addressing, which shares them between curves with the same model), checked to vanish exactly on the torsion points of small test curves; 93 GLV endomorphisms (j = 0 and 1728), 55 with the eigenvalue checked on the recorded generator and a reduced decomposition lattice (secp256k1: components of 129 bits); 471 relations (245 quadratic twists, 219 isomorphisms, 7 birational model changes); 1,126 cyclic group structures (628 proved, 498 probable; 1,756 left undecided because gcd(n, q - 1) does not settle them); 21,080 p-adic rows (p-rank, Hasse invariant) |
+| `enrich` (computed in Rust from the rows above) | 8 modular polynomials Phi_l (l = 2..19, over Z, sparse, both orders of each coefficient); 13 Hilbert class polynomials H_D for the class-number-one discriminants, each checked against every curve with that j (409 checks, 0 failed); Semaev S_2 and S_3, generic in (a, b), S_3 checked to vanish on sums; 84,320 division polynomials psi_2..psi_5 over prime fields (84,191 distinct after content addressing, which shares them between curves with the same model), checked to vanish exactly on the torsion points of small test curves; 93 GLV endomorphisms (j = 0 and 1728), 55 with the eigenvalue checked on the recorded generator and a reduced decomposition lattice (secp256k1: components of 129 bits); 471 relations (245 quadratic twists, 219 isomorphisms, 7 birational model changes); 1,126 cyclic group structures (628 proved, 498 probable; 1,756 left undecided because gcd(n, q - 1) does not settle them); 21,080 p-adic rows (p-rank, Hasse invariant); exact embedding degrees or proved lower bounds for the prime-order subgroups without one ("Exact embedding degrees" above) |
 
 The import re-runs idempotently. Against a local Postgres 16 it takes about 13 s.
 
