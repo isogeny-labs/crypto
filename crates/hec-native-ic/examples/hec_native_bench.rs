@@ -48,13 +48,17 @@ fn main() {
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(5);
-    // S2 (PLAN §7): `reference`, `fast` (default) or `both`.  `both` runs the
-    // two solvers on every (row, seed) in the same process, alternating the
-    // order by seed parity, and asserts the exactness gate E3.
+    // `reference`, `fast` (default), `dense`, or a pair `a,b` (`both` =
+    // `reference,fast`, S2 PLAN §7).  A pair runs both solvers on every
+    // (row, seed) in one process, order alternating by seed parity, and
+    // asserts the run gate: the same k, trials, relations and solve rounds
+    // (G6, PLAN §8), plus identical pivots and arithmetic for
+    // `reference,fast` (E3, PLAN §7).
     let solver_mode = std::env::var("HEC_SOLVER").unwrap_or_else(|_| "fast".into());
     let solver_of = |s: &str| match s {
         "reference" => Solver::Reference,
         "fast" => Solver::Fast,
+        "dense" => Solver::Dense,
         other => panic!("HEC_SOLVER: unknown solver {other:?}"),
     };
 
@@ -83,12 +87,16 @@ fn main() {
         let k_true = inst.ell / 3 + 7;
         let d2 = inst.curve.mul(&inst.d1, k_true);
         for s in 0..seeds {
-            let order: Vec<&str> = match solver_mode.as_str() {
-                "both" if s % 2 == 0 => vec!["reference", "fast"],
-                "both" => vec!["fast", "reference"],
-                one => vec![one],
+            let mut order: Vec<&str> = match solver_mode.as_str() {
+                "both" => vec!["reference", "fast"],
+                list => list.split(',').map(str::trim).collect(),
             };
-            let mut gate: Vec<(Option<u64>, u64, u64, u64, u64, u64)> = Vec::new();
+            assert!(order.len() <= 2, "HEC_SOLVER: one solver or a pair");
+            if s % 2 == 1 {
+                order.reverse();
+            }
+            let exact_pair = order.contains(&"reference") && order.contains(&"fast");
+            let mut gate: Vec<(Option<u64>, u64, u64, u32, (u64, u64, u64, u64))> = Vec::new();
             for name in order {
                 let params = IcParams {
                     seed: 20260916 + s,
@@ -96,14 +104,17 @@ fn main() {
                     ..IcParams::default()
                 };
                 let rep = solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params);
-                gate.push((
-                    rep.k,
-                    rep.trials,
-                    rep.solve.pivot_hash,
-                    rep.solve.pivots,
-                    rep.solve.row_ops,
-                    rep.solve.mulmods,
-                ));
+                let pivots = if exact_pair {
+                    (
+                        rep.solve.pivot_hash,
+                        rep.solve.pivots,
+                        rep.solve.row_ops,
+                        rep.solve.mulmods,
+                    )
+                } else {
+                    (0, 0, 0, 0)
+                };
+                gate.push((rep.k, rep.trials, rep.relations, rep.solve_rounds, pivots));
                 let ok = rep.k == Some(k_true);
                 let tot = rep.total_ns as f64;
                 let pct = |x: u128| 100.0 * x as f64 / tot.max(1.0);
@@ -161,10 +172,7 @@ fn main() {
             );
             }
             if gate.len() == 2 {
-                assert_eq!(
-                    gate[0], gate[1],
-                    "E3 exactness gate failed: g={g} p={p} seed={s}"
-                );
+                assert_eq!(gate[0], gate[1], "run gate failed: g={g} p={p} seed={s}");
                 println!("GATE g={g} p={p} seed={s} identical");
             }
         }

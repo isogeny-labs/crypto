@@ -82,6 +82,17 @@ impl Fp {
     pub fn mul(&self, a: u64, b: u64) -> u64 {
         self.reduce128(a as u128 * b as u128)
     }
+    /// `b·R mod p`, for [`Fp::mul_pre`]: a factor used many times costs one
+    /// REDC per product instead of two.
+    #[inline]
+    pub fn pre(&self, b: u64) -> u64 {
+        self.redc(b as u128 * self.r2 as u128)
+    }
+    /// `a·b mod p` given `bm = pre(b)`; `a, b < p`.
+    #[inline]
+    pub fn mul_pre(&self, a: u64, bm: u64) -> u64 {
+        self.redc(a as u128 * bm as u128)
+    }
 
     /// Reduce a signed integer.
     #[inline]
