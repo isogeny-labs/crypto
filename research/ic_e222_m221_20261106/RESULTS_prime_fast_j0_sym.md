@@ -187,3 +187,24 @@ Same planted targets for both arms, 2 curves x 2 instances (n=4 rows per cell), 
 
 Reading: the symmetric multi-target IC loses to the batched folded rho for T up to about 1000 and is 2.0x-2.5x faster at T=3000 (28 and 30 bits); the crossover moves up slowly with size (about T=800 at 26 bits, about T=1100 at 28 bits, between 1000 and 3000 at 30 bits), consistent with the IC total growing about T^0.4 against rho about T^0.9.
 Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relative setup, so the IC number is probably conservative), the rho is lightly tuned, one host, no isolation, no §5a band, and the comparison to a tuned, folded **BSGS** on j=0 curves is missing: on the a=-3 curves a tuned multi-target BSGS was 2x-4x ahead of the non-symmetric IC, and a x6-folded BSGS on j=0 would gain about sqrt(6), so the decisive comparator is still BSGS, not rho.
+
+## Correction: the multi-target rho restarted walks from solved targets (2026-11-14) — `[pcc:unverified]`
+Audit trigger: the batched folded rho above needed 8x-35x more steps than Kuhn-Struik's `sqrt(2 T n / 6)`, and the excess grew with T, exactly where the IC arm "won".
+Cause: `new_lane` in `examples/prime_fast_j0_rho_multi.rs` drew each new walk's start from all T targets (plus G) uniformly, solved or not. Once most logs are known, almost every walk works on a known log, and the last unknown ones are reached coupon-collector style.
+Fix: new walks start only from unsolved targets (plus G as the anchor), as in Kuhn-Struik. `RESTART=all` keeps the old policy. Same curves, same planted targets (seed `0xC0DE ^ inst ^ n ^ T` in both examples), 2 curves x 2 instances, 128 lanes, same dp bits. Every target of every row verified in both policies. One local 4-core host, not isolated, medians:
+
+| bits | T | IC ms | rho, old restarts ms (steps) | rho, Kuhn-Struik ms (steps) | K-S `sqrt(2Tn/6)` | rho/IC old | **rho/IC fixed** |
+|---|---|---|---|---|---|---|---|
+| 26 | 20 | 8.7 | 4.5 (35.9k) | 4.9 (29.2k) | 21.2k | 0.51 | **0.56** |
+| 26 | 200 | 20.2 | 14.2 (165k) | 16.8 (102k) | 66.9k | 0.70 | **0.83** |
+| 26 | 1000 | 70.4 | 100.7 (1.22M) | 27.8 (340k) | 150k | 1.43 | **0.39** |
+| 28 | 200 | 42.8 | 24.9 (335k) | 16.8 (203k) | 134k | 0.58 | **0.39** |
+| 28 | 1000 | 125.4 | 161.7 (2.37M) | 45.7 (680k) | 299k | 1.29 | **0.36** |
+| 28 | 3000 | 357.7 | 942.5 (16.8M) | 152.4 (2.48M) | 518k | 2.63 | **0.43** |
+| 30 | 200 | 95.2 | 42.0 (701k) | 27.1 (430k) | 268k | 0.44 | **0.28** |
+| 30 | 1000 | 303.2 | 274.0 (4.45M) | 85.7 (1.41M) | 598k | 0.90 | **0.28** |
+| 30 | 3000 | 836.6 | 1736.9 (31.8M) | 286.7 (4.96M) | 1.04M | 2.08 | **0.34** |
+
+IC ms are the committed `symmulti_*` rows (26 bits: the logged medians above; those rows were not committed). Raw: `results/pf_j0/rhoks_*.jsonl`, `rhoall_*.jsonl`. Graph: `figures/multirho_restart_fix.{svg,png,pdf}` (`figures/plot_multirho_restart.py`). Bench record: `benchmarks/records/20261114T0627Z-j0-multirho-restart-fix.json`.
+
+Reading: the old policy reproduces the earlier rows (942 vs 909 ms at 28/3000, 1,737 vs 1,676 ms at 30/3000), so the earlier numbers were measured correctly; the rho was weak. With Kuhn-Struik restarts **rho is faster than the symmetric multi-target IC at every cell, by 1.2x-3.6x**, and the ratio no longer moves in IC's favour with T at 28-30 bits. The "IC 2.0x-2.5x ahead at T = 3000" reading and the crossover near T ≈ 1000 are withdrawn. The fixed rho is still 1.4x-4.8x above the K-S step count (dp-bit overhead with many short walks), so this rho is itself not optimal and the gap to a tuned rho is larger, not smaller. Replication under the bench record (30 bits, T = 3000, fixed rho): median 288 ms against 287 ms, all 12,000 targets verified (`rhoks_30_T3000_rep.jsonl`). Not a claim either way: one host, no isolation, no §5a band, no folded BSGS.
