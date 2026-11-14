@@ -1,15 +1,14 @@
 # Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
+Owner (2026-11-14): "run the interleaved rho vs BSGS comparison" — tuned multi-target rho (PR #4144) vs folded multi-target BSGS on j=0 curves, same targets, interleaved.
 
 ## Spec
-Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
-Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
-Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
+research/ic_e222_m221_20261106/interleaved_rho_bsgs/PROTOCOL.md (frozen before data); runner run.sh; rows in rows/.
+examples/prime_fast_j0_bsgs_multi.rs gained INST0.
 
 ## State
-2026-11-14: patch written, release build running. No rows yet.
+26-30 complete (PR #4169). Addendum A (32/34 bits) frozen in e8c0fd72da; 32/34 complete: rho faster at 32/3000, 34/1000, 34/3000; record closed; pushed to PR #4169.
 
 ## Next
-Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.
+Run under benchrec run, analyse (geomean ratio + bootstrap, A/A), README + graph, close record, PR.
