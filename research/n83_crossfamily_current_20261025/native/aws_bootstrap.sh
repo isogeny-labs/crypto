@@ -15,7 +15,7 @@ finish() {
   printf '%s %s\n' "$code" "$(date -u +%FT%TZ)" > "$base/bootstrap.exit"
   if [ -d "$base/results" ]; then
     if tar -C "$base" -czf "$base/raw_results.tar.gz" results; then
-      raw_bytes=$(stat -c %s "$base/raw_results.tar.gz")
+      raw_bytes=$(wc -c < "$base/raw_results.tar.gz")
       if [ "$raw_bytes" -le "$N83_RESULT_ARCHIVE_MAX_BYTES" ]; then
         sha256sum "$base/raw_results.tar.gz" > "$base/raw_results.sha256"
         curl --fail --retry 5 --retry-delay 5 --silent --show-error \
@@ -33,7 +33,7 @@ finish() {
     --exclude=results --exclude=raw_results.tar.gz -czf \
     /var/tmp/n83-crossfamily-status.tar.gz . || true
   if [ -f /var/tmp/n83-crossfamily-status.tar.gz ]; then
-    status_bytes=$(stat -c %s /var/tmp/n83-crossfamily-status.tar.gz)
+    status_bytes=$(wc -c < /var/tmp/n83-crossfamily-status.tar.gz)
     if [ "$status_bytes" -gt "$N83_STATUS_ARCHIVE_MAX_BYTES" ]; then
       printf 'ARCHIVE_CAP status=%s limit=%s\n' "$status_bytes" \
         "$N83_STATUS_ARCHIVE_MAX_BYTES" > "$base/status.archive_failure"
@@ -42,7 +42,7 @@ finish() {
         tar -C "$base" -czf /var/tmp/n83-crossfamily-status.tar.gz \
           bootstrap.exit status.archive_failure || true
     fi
-    status_bytes=$(stat -c %s /var/tmp/n83-crossfamily-status.tar.gz)
+    status_bytes=$(wc -c < /var/tmp/n83-crossfamily-status.tar.gz)
     if [ "$status_bytes" -gt "$N83_STATUS_ARCHIVE_MAX_BYTES" ]; then
       return
     fi
