@@ -48,8 +48,10 @@ repository reports linked above are the primary execution receipts.
   staging time; the execution lock must bind the final corrected source.
 - Target: first sealed public corpus point, supplied as a point to the
   worker. The known-answer sidecar is read only after scalar production.
-  Identity pattern 0 is the all-affine chained-S3 arm; other patterns
-  require separate coverage and remain outside this first admission.
+  The XCNF exports use the worker's per-representative orbit-root encoding.
+  Identity pattern 0 is the all-affine chained-S3 control arm. The native
+  worker starts with that pattern and may continue to the other patterns
+  within its frozen conflict and wall caps.
 
 ## Admission sequence and proposed local resource envelope
 
@@ -77,9 +79,13 @@ fails or the remaining allowance cannot cover the next stage.
    Record actual CNF/XOR shape, cgroup peak, source, archive and terminal
    status. A static threshold pass alone does not admit search.
 3. Use the new `primary-k600-m6-xcnf positive-pinned` and
-   `positive-unpinned` exports on this *same* retained base and circuit.
+   `positive-unpinned` exports on this *same* retained base and pattern-0
+   core circuit as the native worker. The pinned export adds witness clauses;
+   the unpinned export changes the target to a constructed point.
    The release example suite passes 22 tests [pcc:unverified];
-   [the corrected-source test log](cargo-test-fixture0.txt) is retained;
+   [the per-representative source test log](cargo-test-per-rep.txt) is retained;
+   [the earlier fixture-zero test log](cargo-test-fixture0.txt) records the
+   source before the encoding correction;
    the [earlier pre-correction log](cargo-test.txt) remains for provenance.
    The new exporter
    has not yet been run on the full archive. Preserve its actual six points,
