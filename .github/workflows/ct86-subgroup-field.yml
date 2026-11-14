@@ -1,4 +1,4 @@
-name: "CT86 subgroup field and Frobenius orientation (bounded)"
+name: "CT86–91 subgroup tower, CRT and full binary torsion (bounded)"
 on:
   push:
     branches:
@@ -9,6 +9,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct88/**"
       - "research/cross_characteristic_global_torsion_20261112/ct89/**"
       - "research/cross_characteristic_global_torsion_20261112/ct90/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct91/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   pull_request:
     paths:
@@ -17,6 +18,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct88/**"
       - "research/cross_characteristic_global_torsion_20261112/ct89/**"
       - "research/cross_characteristic_global_torsion_20261112/ct90/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct91/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   workflow_dispatch:
 
@@ -100,3 +102,18 @@ jobs:
           cmp /tmp/ct90-py.json /tmp/ct90-jsopt.json
           printf '%s  %s\n' ab40a0b47b997abb6e6cbf5f6854a6eb10bdcbf15da2776a0850c798f87f6417 /tmp/ct90-py.json | sha256sum -c
           cat /tmp/ct90-py.json
+
+      - name: Verify CT91 both CRT cubics and all 48 geometric 7-torsion points
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct91
+          python3 -B "$D/ct91_binary_subgroup_partition.py" > /tmp/ct91-py.json
+          python3 -O -B "$D/ct91_binary_subgroup_partition.py" > /tmp/ct91-opt.json
+          node "$D/ct91_binary_partition_independent.js" > /tmp/ct91-js.json
+          node --no-opt "$D/ct91_binary_partition_independent.js" > /tmp/ct91-jsopt.json
+          cmp /tmp/ct91-py.json /tmp/ct91-opt.json
+          cmp /tmp/ct91-py.json /tmp/ct91-js.json
+          cmp /tmp/ct91-py.json /tmp/ct91-jsopt.json
+          printf '%s  %s\\n' 380218d31be6e794362d2f362725da5037d4e15264361ae2d61f082101aa3790 /tmp/ct91-py.json | sha256sum -c
+          cat /tmp/ct91-py.json
