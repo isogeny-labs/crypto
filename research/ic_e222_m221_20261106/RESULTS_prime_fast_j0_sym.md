@@ -277,3 +277,18 @@ Same fresh curves as the `fix_hold_*` rows (curve idx 9, 10), all targets verifi
 (The batched folded rho at T=1 includes the multi-target code's anchor starts, so its step count (about 38k at 32 bits, about 82k-95k at 34) is above the single-target folded count (32k, 60k-71k); a single-target batched version would be a little faster, making the gap slightly larger.)
 
 Reading: the best implemented single-target rho is the batched, folded multi-target rho example at T=1 from 32 bits on, and `rho_parallel` below. Against it the shift-fixed symmetric IC is about 6x-7x behind at 28 bits, 14x-15x at 30, 37x-57x at 32 and 68x-88x at 34, so the earlier figures against the negation-only rho (up to 59x) understated the matched-rho gap. The 2.8x-3.0x gain over `ic_solve` is a constant factor; the gap to the matched rho still grows with size. Same limits: one host, wall clock, one twist group per size, no §5a band.
+
+## Experiment: B sweep for the shift-fixed single-target IC at 28 and 32 bits (2026-11-14) — `[pcc:unverified]`
+Fresh curves (idx 13, 14), 4 targets per curve (n=8 rows per B), baseline `ic_solve` c=0.7, shift applied (default), every solve verified. Medians:
+
+| bits | B | sym ms | targets needed | ratio vs plain3 |
+|---|---|---|---|---|
+| 28 | 50 / 64 / 80 | 31.5 / 23.4 / 21.0 | 3573 / 1928 / 1368 | 1.61 / 2.46 / 2.45 |
+| 28 | **100 / 159** | **19.7 / 19.8** | 806 / 318 | 2.87 / 2.80 |
+| 28 | 250 / 400 | 33.5 / 46.2 | 124 / 47 | 1.87 / 1.18 |
+| 32 | 130 / 160 | 257.8 / 234.3 | 7795 / 4882 | 2.08 / 2.25 |
+| 32 | **200 / 250** | **178.6 / 176.9** | 3094 / 1908 | 2.97 / 2.95 |
+| 32 | 400 (frozen rule) | 198.5 | 750 | 2.75 |
+| 32 | 630 / 1000 | 247.9 / 382.4 | 315 / 119 | 2.06 / 1.25 |
+
+Reading: the frozen B rule (B = round(100 (p/2^26)^(1/3))) is within about 11% of the best B (28 bits: flat optimum over B=100-159, frozen 159; 32 bits: optimum B=200-250, frozen 400 costs 199 vs 177 ms). The optimum grows more slowly than p^(1/3) (about 100 at 26 bits, 100-159 at 28, 200-250 at 32: exponent about 0.2), because the pair-table build (B^2) overtakes the collection saving. A retuned B would lift the 32-bit ratio from about 2.75 to about 2.95: a small constant, below the cell-to-cell spread, and not a new claim. The setup-cost levers on this line (B, layout, keys, batching) are now exhausted: what is left is the arithmetic per candidate and the relation yield per scan.
