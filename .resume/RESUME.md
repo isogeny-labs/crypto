@@ -1,15 +1,14 @@
-# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
+# Resume: crypto @ claude/ecstatic-edison-cgo57l
 
 ## Goal
-Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
+Owner (2026-11-14): work on hyperelliptic index calculus and make cross-genus statistical experiments possible: HCDLP at genus 2, 3, 4, 5 on one field, difficulty differences, Smith's isogeny, non-hyperelliptic curves.
 
 ## Spec
-Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
-Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
-Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
+Frozen protocol: research/genus_ladder_20261114/PROTOCOL.md (frozen.sha256 beside it). Code: src/cryptanalysis/genus_ladder.rs, src/cryptanalysis/quartic_ladder.rs, src/bin/genus_ladder.rs, src/bin/genus_ladder_analyze.rs.
+Run (section 6 of the protocol): two `genus_ladder run` invocations -> part_a.jsonl, part_b.jsonl -> ladder.jsonl; then `genus_ladder_analyze ladder.jsonl analysis.json`; then `python3 render.py analysis.json` in the study directory.
 
 ## State
-2026-11-14: patch written, release build running. No rows yet.
+2026-11-14: code and unit tests done (5 ladder tests pass), protocol frozen, grid launched locally (4 vCPU container, no AWS identity, so no isolab-eks and no S3 push).
 
 ## Next
-Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.
+Collect part_a/part_b, analyze, RESULTS.md with the H1..H9 scorecard, figures, PDF, bench record, session log, PR.
