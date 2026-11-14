@@ -42,3 +42,20 @@ E14a draw 0 finished at about 16:05: `d_f = 5`, 37,890 s, degree ≤ 4 equal to 
 (`pod-r2/out-r2j/A_3-21-7.draw0.jsonl`). E14a continues with draws 1, 3, 4 at about 10.5 h each.
 The pod deadline (11-13 16:57Z) allows at most draw 3. At USD 3.43/h, the account balance
 (USD 34.69 at 16:10) runs out about 02:15Z on 11-13, before draw 1 (about 02:35Z), unless topped up.
+
+## Outcome (scored 2026-11-14 19:15 UTC)
+The run is over and scored. E14a: draws 0 and 1 valid, both "`d_F = 5`". Draw 3's record was lost
+with the pod, and draw 4 was cut off by the deadline. Cell reading "split" (2 measured; ≥ 3 needed).
+E14b "not completed" and E14c "no reading". See `score.json` (`r2`), `RESULTS.md` and
+`reports/run-20261114-e14r2/`. Pod `gjr9mpprgga8eb` returned 404 at 2026-11-14T19:09Z. Nothing
+further runs without a new amendment.
+
+## E14 r3 (Amendment 31), prepared 2026-11-14, not launched
+Part a: E14a draw 3 alone via `hky_par ladder` on E10's draw-3 record. If it reads 5, the cell
+reads "`d_F = 5`" (3 of 4). Part b: the three 6:10:3 `pe` controls, run concurrently at 8 threads.
+Launch with `MODE=a research/fall_degree_bounds_20261008/e14/launch_r3.sh` (dry run first with
+`DRY_RUN=1`). Part b goes the same way once its admission passes. Pull with
+`MODE=a research/fall_degree_bounds_20261008/e14/pull_r3.sh`: it starts a stopped pod, pulls, and
+deletes the pod after `final_status`. Pods stop themselves 2 h after finishing; they never delete
+themselves. Expected: part a about 11 h (USD 23), part b at most about 7 h (USD 15).
+Status at 19:40 UTC: the launch was blocked by the session's permission check; it waits for the owner.

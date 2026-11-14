@@ -23,6 +23,7 @@ mod f25519;
 pub mod field;
 pub mod gost_3410_2012;
 pub mod keys;
+mod mont_vt;
 pub mod p256_field;
 pub mod p256_point;
 pub mod p521_field;
