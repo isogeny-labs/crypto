@@ -206,6 +206,17 @@ impl Dsu {
     }
 }
 
+struct Lane {
+    p: Pt,
+    a: u64,
+    b: u64,
+    t: usize,
+    len: u64,
+    ring: [u64; 8],
+    ri: usize,
+}
+
+#[allow(clippy::too_many_arguments)]
 fn multi_rho(
     c: &FastCurve,
     g: Pt,
@@ -213,6 +224,7 @@ fn multi_rho(
     qs: &[Pt],
     dp_bits: u32,
     seed: u64,
+    lanes_n: usize,
 ) -> Option<(Vec<u64>, u64)> {
     let f = c.f;
     let n = c.n;
@@ -237,83 +249,114 @@ fn multi_rho(
     let mut steps = 0u64;
     let mask = (1u64 << dp_bits) - 1;
     let cap = 40u64 << dp_bits;
-    let mut since_check = 0u32;
-    let anchor_pt = g;
-    loop {
-        let t = rng.gen_range(0..=t_count);
-        let qt = if t == t_count { anchor_pt } else { qs[t] };
-        let (a0, b0) = (rng.gen_range(1..n), rng.gen_range(1..n));
-        let Some(p0) = c.combine(g, qt, a0, b0) else {
-            continue;
-        };
-        let (mut p, s0, neg0) = canon_pt(c, beta, beta2, p0);
-        let mut mu = lams[s0];
-        if neg0 {
-            mu = (n - mu) % n;
-        }
-        let (mut a, mut b) = (mulm(a0, mu), mulm(b0, mu));
-        let mut len = 0u64;
-        let mut ring = [u64::MAX; 8];
-        let mut ri = 0usize;
+    let new_lane = |rng: &mut StdRng| -> Lane {
         loop {
-            if f.from_mont(p.x) & mask == 0 {
-                let key = f.from_mont(p.x) ^ (f.from_mont(p.y) << 32);
-                if let Some(&(t2, a2, b2)) = dps.get(&key) {
-                    // a + b k_t = a2 + b2 k_t2
-                    let diff = (a2 + n - a) % n;
-                    if dsu.merge(t, t2, b, b2, diff) {
-                        since_check += 1;
+            let t = rng.gen_range(0..=t_count);
+            let qt = if t == t_count { g } else { qs[t] };
+            let (a0, b0) = (rng.gen_range(1..n), rng.gen_range(1..n));
+            let Some(p0) = c.combine(g, qt, a0, b0) else {
+                continue;
+            };
+            let (p, s0, neg0) = canon_pt(c, beta, beta2, p0);
+            let mut mu = lams[s0];
+            if neg0 {
+                mu = (n - mu) % n;
+            }
+            return Lane {
+                p,
+                a: mulm(a0, mu),
+                b: mulm(b0, mu),
+                t,
+                len: 0,
+                ring: [u64::MAX; 8],
+                ri: 0,
+            };
+        }
+    };
+    let mut lanes: Vec<Lane> = (0..lanes_n).map(|_| new_lane(&mut rng)).collect();
+    let mut d = vec![0u64; lanes_n];
+    let mut scratch: Vec<u64> = Vec::new();
+    loop {
+        for (i, ln) in lanes.iter().enumerate() {
+            let h = (f.from_mont(ln.p.x) as usize) % R;
+            let dd = f.sub(tb[h].0.x, ln.p.x);
+            d[i] = if dd == 0 { f.one } else { dd };
+        }
+        f.batch_inv(&mut d, &mut scratch);
+        for i in 0..lanes_n {
+            let (h, p, dx0) = {
+                let ln = &lanes[i];
+                let h = (f.from_mont(ln.p.x) as usize) % R;
+                (h, ln.p, f.sub(tb[h].0.x, ln.p.x))
+            };
+            let (mut t_pt, mut u) = tb[h];
+            let p1 = if dx0 == 0 {
+                match c.add(Some(p), Some(t_pt)) {
+                    Some(q) => q,
+                    None => {
+                        lanes[i] = new_lane(&mut rng);
+                        continue;
                     }
+                }
+            } else {
+                c.add_with_inv(p, t_pt, d[i])
+            };
+            let (mut p2, mut s, mut neg) = canon_pt(c, beta, beta2, p1);
+            if lanes[i].ring.contains(&p2.x) {
+                (t_pt, u) = tb[(h + 1) % R];
+                match c.add(Some(p), Some(t_pt)) {
+                    Some(q1) => {
+                        (p2, s, neg) = canon_pt(c, beta, beta2, q1);
+                    }
+                    None => {
+                        lanes[i] = new_lane(&mut rng);
+                        continue;
+                    }
+                }
+            }
+            let mut mu = lams[s];
+            if neg {
+                mu = (n - mu) % n;
+            }
+            let ln = &mut lanes[i];
+            ln.ring[ln.ri & 7] = p2.x;
+            ln.ri += 1;
+            ln.a = mulm((ln.a + u) % n, mu);
+            ln.b = mulm(ln.b, mu);
+            ln.p = p2;
+            ln.len += 1;
+            steps += 1;
+            let is_dp = f.from_mont(p2.x) & mask == 0;
+            if is_dp {
+                let key = f.from_mont(p2.x) ^ (f.from_mont(p2.y) << 32);
+                let (t, a, b) = (ln.t, ln.a, ln.b);
+                let mut learned = false;
+                if let Some(&(t2, a2, b2)) = dps.get(&key) {
+                    let diff = (a2 + n - a) % n;
+                    learned = dsu.merge(t, t2, b, b2, diff);
                 } else {
                     dps.insert(key, (t, a, b));
                 }
-                if since_check >= 1 {
-                    since_check = 0;
+                lanes[i] = new_lane(&mut rng);
+                if learned {
                     let mut all = true;
-                    for i in 0..t_count {
-                        if dsu.find(i).0 != t_count {
+                    for k in 0..t_count {
+                        if dsu.find(k).0 != t_count {
                             all = false;
                             break;
                         }
                     }
                     if all {
                         let mut ks = Vec::with_capacity(t_count);
-                        for i in 0..t_count {
-                            let (_, al, be) = dsu.find(i);
-                            ks.push((al + be) % n); // k_i = al*1 + be (anchor value 1)
+                        for k in 0..t_count {
+                            let (_, al, be) = dsu.find(k);
+                            ks.push((al + be) % n);
                         }
                         return Some((ks, steps));
                     }
                 }
-                break;
-            }
-            let h = (f.from_mont(p.x) as usize) % R;
-            let (mut t_pt, mut u) = tb[h];
-            let Some(mut p1) = c.add(Some(p), Some(t_pt)) else {
-                break;
-            };
-            let (mut p2, mut s, mut neg) = canon_pt(c, beta, beta2, p1);
-            if ring.contains(&p2.x) {
-                (t_pt, u) = tb[(h + 1) % R];
-                let Some(q1) = c.add(Some(p), Some(t_pt)) else {
-                    break;
-                };
-                p1 = q1;
-                (p2, s, neg) = canon_pt(c, beta, beta2, p1);
-            }
-            ring[ri & 7] = p2.x;
-            ri += 1;
-            let mut mu = lams[s];
-            if neg {
-                mu = (n - mu) % n;
-            }
-            a = mulm((a + u) % n, mu);
-            b = mulm(b, mu);
-            p = p2;
-            steps += 1;
-            len += 1;
-            if len > cap {
-                break;
+            } else if ln.len > cap {
+                lanes[i] = new_lane(&mut rng);
             }
         }
     }
@@ -339,7 +382,18 @@ fn main() {
             let ks: Vec<u64> = (0..t_count).map(|_| rng.gen_range(2..c.n)).collect();
             let qs: Vec<Pt> = ks.iter().map(|&k| c.mul(Some(g), k).unwrap()).collect();
             let t0 = Instant::now();
-            let res = multi_rho(&c, g, lam, &qs, dp_bits, ins + 1);
+            let res = multi_rho(
+                &c,
+                g,
+                lam,
+                &qs,
+                dp_bits,
+                ins + 1,
+                std::env::var("LANES")
+                    .ok()
+                    .and_then(|v| v.parse().ok())
+                    .unwrap_or(128),
+            );
             let ms = t0.elapsed().as_secs_f64() * 1e3;
             let (ok, steps) = match &res {
                 Some((got, st)) => (got.iter().zip(&ks).filter(|(x, k)| x == k).count(), *st),
