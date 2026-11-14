@@ -391,6 +391,29 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Original fourteen requirements
 
+The [subgroup extraction audit](../subgroup_extraction_audit_20261114/README.md)
+formalizes another original Thériault condition: coefficients modulo the
+full ambient order cannot be tested only for being nonzero before
+extracting a prime-subgroup logarithm. Generic recovery is proved for
+every additive group/exact prime-order point when β is nonzero in the
+subgroup field. Actual ZMod(2r),P2/orderr/card2r gives unbounded prime-order
+cofactor examples with βr ambient-nonzero/nonunit yet no log information.
+Actual nonsingular E/F29:y²=x³+1 has30points and P(4,6)order5; β5nonzero
+mod30 gives an uninformative relation and the raw-inverse recovery fails.
+Useful3P+2P0 recovers1mod5 althoughβ2is nonunit mod30; ambientunitβ1control
+passes. A universal ambient extraction implication is directly negated.
+Whole gate28/0failures/0trusted, exact local PCC-20261114-bf5572 replay PASS at2026-11-14T02:00:34Z;
+seven formal/config and sixteen artifact pins match,63attemptfiles/
+fivegatefiles and inspected one-page PDF47950B retained. Scalar supplement
+IDC1hc2ffb42b1e7ce04d has a symbolic Lean proof/official32+32-point check.
+Signed standing unverified. Originalp78/§§2.1/2.4/2.5/5.10 inspected;
+this is an algebraic inference/actual elliptic point-group audit, not a
+full genus≥3 Jacobian/Picard or realized algorithm-trace counterexample.
+Full runtime and failure-probability claims remain unrefuted/open; no
+coefficient distribution is proved. No full-paper-read/corpus promotion/
+novelty/native experiment. [pcc:unverified]
+
+
 The [generic actual iid bridge](../theriault_iid_audit_20261114/README.md)
 now derives the source collision closedform and recurrence from actual
 uniform finite samples, with no recurrence hypothesis. Missing-color
