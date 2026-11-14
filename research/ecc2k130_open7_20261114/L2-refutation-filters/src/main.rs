@@ -5,6 +5,7 @@
 //! l2filters linz N A M D SAMPLES SEED OUT.json D1,D2,..   Q-b2 Macaulay linearisation refutation
 //!
 //! Every count is exact. Every claim is [pcc:unverified].
+mod analyze;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;
 use std::io::Write;
@@ -810,6 +811,7 @@ fn main() {
                 println!("planted m={} d={} checked={} ok", m, d, okc);
             }
         }
+        "analyze" => analyze::run(&a[2], &a[3]),
         "cells" => run_cells(p(2) as u32, p(3) as u32, &a[4]),
         "linz" => {
             let ds: Vec<u32> = a[9].split(',').map(|x| x.parse().unwrap()).collect();
