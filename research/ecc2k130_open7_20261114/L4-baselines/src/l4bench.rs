@@ -975,7 +975,7 @@ fn gcd_cmd(args: &[String]) {
     let ic = std::fs::read_to_string(&args[0]).unwrap();
     let out = &args[1];
     let j = parse(&ic);
-    let cells = j.get("measured").map(|x| x.arr().to_vec()).unwrap_or_default();
+    let cells = j.get("cells").or(j.get("measured")).map(|x| x.arr().to_vec()).unwrap_or_default();
     let mut lines = String::new();
     for cell in &cells {
         let family = cell.get("family").unwrap().str().to_string();
@@ -994,6 +994,7 @@ fn gcd_cmd(args: &[String]) {
             let runs = t.get("runs").unwrap();
             // engines
             let mut eng: BTreeMap<String, (String, Vec<u128>, Vec<u64>)> = BTreeMap::new();
+            let mut bit: BTreeMap<String, Vec<[u64; 6]>> = BTreeMap::new();
             if let J::O(kv) = runs {
                 for (name, rs) in kv {
                     let rs = rs.arr();
@@ -1007,6 +1008,8 @@ fn gcd_cmd(args: &[String]) {
                             eprintln!("WARN: {name} solutions differ across repeats");
                         }
                     }
+                    let bv: Vec<[u64; 6]> = rs.iter().filter_map(|r| { let e = r.get("extra")?; let g = |k: &str| e.get(k).map(|x| x.u64()).unwrap_or(0); if g("bitop_complete") == 1 { Some([g("bitop_word_ops"), g("bitop_hash_probes"), g("bitop_field_adds"), g("bitop_field_muls"), g("bitop_field_sqrs"), g("bitop_field_invs")]) } else { None } }).collect();
+                    bit.insert(name.clone(), bv);
                     eng.insert(name.clone(), (verdict, sols, ops));
                 }
             }
@@ -1080,9 +1083,10 @@ fn gcd_cmd(args: &[String]) {
                 let ag = match agree[name] { Some(b) => b.to_string(), None => "null".into() };
                 write!(
                     line,
-                    "\"{name}\":{{\"verdict\":\"{verdict}\",\"solutions\":{},\"ops\":[{}],\"agrees_with_g\":{ag}}}",
+                    "\"{name}\":{{\"verdict\":\"{verdict}\",\"solutions\":{},\"ops\":[{}],\"bitop\":[{}],\"agrees_with_g\":{ag}}}",
                     sols.len(),
-                    ops.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
+                    ops.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(","),
+                    bit[name].iter().map(|b| format!("[{},{},{},{},{},{}]", b[0], b[1], b[2], b[3], b[4], b[5])).collect::<Vec<_>>().join(",")
                 )
                 .unwrap();
             }

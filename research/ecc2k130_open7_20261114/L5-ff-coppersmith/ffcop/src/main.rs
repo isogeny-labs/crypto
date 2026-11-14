@@ -49,6 +49,15 @@ fn generic_poly(r: &[P; 4]) -> Bi {
 }
 fn eval_mod(fld: &Fld, g: &Bi, a: &P, b: &P) -> P { fld.red(&bi_eval(g, a, b)) }
 
+
+/// at least two valid x-coordinates of degree < l (else the cell has no 2-term planted instance)
+fn fb_has_two(fld: &Fld, l: usize) -> bool {
+    let mut c = 0;
+    let lim: u64 = if l >= 63 { u64::MAX } else { 1u64 << l };
+    let mut x = 1u64;
+    while x < lim { if fld.is_x(&P::from_u64(x)) { c += 1; if c >= 2 { return true; } } x += 1; }
+    false
+}
 struct Planted { p1: Pt, p2: Pt, r: Pt }
 fn plant(fld: &Fld, rng: &mut Rng, l: usize) -> Planted {
     loop {
@@ -127,6 +136,7 @@ fn cmd_lattice(a: &[String]) {
     let fld = Fld::new(n);
     for &k in &ks { for &l in &ls { for t in 0..trials {
         let mut rng = Rng::new(derive_seed(&[seed, n as u64, k as u64, l as u64, t as u64]));
+        if !fb_has_two(&fld, l) { println!("{{\"n\":{},\"k\":{},\"l\":{},\"arm\":\"skip_fb_lt2\",\"trial\":{}}}", n, k, l, t); continue; }
         let pl = plant(&fld, &mut rng, l);
         let (x1, x2, c) = (pl.p1.x.clone(), pl.p2.x.clone(), pl.r.x.clone());
         assert!(fld.s3(&x1, &x2, &c).is_zero());
@@ -232,6 +242,7 @@ fn cmd_kobaug(a: &[String]) {
     let fld = Fld::new(n);
     for &k in &ks { for &l in &ls { for t in 0..trials {
         let mut rng = Rng::new(derive_seed(&[seed, 11, n as u64, k as u64, l as u64, t as u64]));
+        if !fb_has_two(&fld, l) { println!("{{\"n\":{},\"k\":{},\"l\":{},\"arm\":\"skip_fb_lt2\",\"trial\":{}}}", n, k, l, t); continue; }
         let pl = plant(&fld, &mut rng, l);
         let (x1, x2, c) = (pl.p1.x.clone(), pl.p2.x.clone(), pl.r.x.clone());
         let g = s3_poly(&fld, &c);

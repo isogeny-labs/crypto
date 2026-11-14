@@ -60,7 +60,9 @@ pub fn summarize(raw: &str, out: &str) {
     let mut cells: BTreeMap<(usize, usize, String, usize), Cell> = BTreeMap::new();
     let mut all_det = true; let mut all_wp = true; let mut all_vanish = true;
     let mut unplanted_genuine = vec![];
-    for r in lat.iter().chain(highk.iter()) {
+    let nskip = lat.iter().chain(highk.iter()).filter(|r| s(r, "arm").starts_with("skip")).count();
+    res.insert("skipped_cells_fb_lt2".into(), json!(nskip));
+    for r in lat.iter().chain(highk.iter()).filter(|r| !s(r, "arm").starts_with("skip")) {
         let key = (u(r, "n") as usize, u(r, "k") as usize, s(r, "arm").to_string(), u(r, "l") as usize);
         let c = cells.entry(key.clone()).or_insert(Cell { det_ok: true, wp_ok: true, vanish_ok: true, ..Default::default() });
         c.n += 1;
@@ -152,7 +154,7 @@ pub fn summarize(raw: &str, out: &str) {
 
     // kobaug
     let mut kob = vec![];
-    for n in [29, 61, 131] { kob.extend(load(&format!("{}/kobaug_n{}.jsonl", raw, n))); }
+    for n in [29, 61, 131] { kob.extend(load(&format!("{}/kobaug_n{}.jsonl", raw, n)).into_iter().filter(|r| !s(r, "arm").starts_with("skip"))); }
     let keq = kob.iter().filter(|r| b(r, "profiles_equal")).count();
     let kh = kob.iter().all(|r| b(r, "H_eq_g2_mod_f"));
     let kimp = kob.iter().filter(|r| u(r, "short_aug") >= 2 && u(r, "short_plain") < 2).count();

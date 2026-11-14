@@ -92,7 +92,37 @@ impl Onb {
     fn one(&self) -> u64 {
         (1u64 << self.m) - 1
     }
+    /// fast multiply: symmetric representation in Z2[x]/(x^n - 1), n = 2m+1 <= 127
     fn mul(&self, a: u64, b: u64) -> u64 {
+        let n = 2 * self.m + 1;
+        let sym = |a: u64| -> u128 {
+            let mut u = 0u128;
+            for i in 1..=self.m {
+                if (a >> (i - 1)) & 1 == 1 {
+                    u |= (1u128 << i) | (1u128 << (n - i));
+                }
+            }
+            u
+        };
+        let (sa, sb) = (sym(a), sym(b));
+        let full: u128 = if n == 128 { !0 } else { (1u128 << n) - 1 };
+        let mut c = 0u128;
+        let mut x = sa;
+        while x != 0 {
+            let i = x.trailing_zeros() as usize;
+            x &= x - 1;
+            let rot = if i == 0 { sb } else { ((sb << i) | (sb >> (n - i))) & full };
+            c ^= rot;
+        }
+        let mut out = 0u64;
+        for i in 1..=self.m {
+            if (c >> i) & 1 == 1 {
+                out |= 1 << (i - 1);
+            }
+        }
+        out
+    }
+    fn mul_terms(&self, a: u64, b: u64) -> u64 {
         let mut c = 0u64;
         for (k, ts) in self.terms.iter().enumerate() {
             let mut bit = 0u64;
@@ -479,6 +509,39 @@ fn ground_truth(f: &Onb, k: usize, w: usize, targets: &HashSet<u64>) -> HashMap<
         out.insert(t, BTreeSet::new());
     }
     if k == 2 {
+        // per target: S3 is symmetric, so for each u in the base the partners v are the roots of S3(u, ., r)
+        let inw: HashSet<u64> = wl.iter().cloned().collect();
+        for &r in targets {
+            let s = out.get_mut(&r).unwrap();
+            for &u in &wl {
+                for v in f.s3_roots(u, r) {
+                    if inw.contains(&v) && lex_key(u, m) <= lex_key(v, m) {
+                        s.insert(vec![u, v]);
+                    }
+                }
+            }
+        }
+        if m > 11 {
+            return out;
+        }
+        // small m: cross-check with the pair enumeration
+        let mut out2: HashMap<u64, BTreeSet<Vec<u64>>> = HashMap::new();
+        for &t in targets {
+            out2.insert(t, BTreeSet::new());
+        }
+        for i in 0..wl.len() {
+            for j in i..wl.len() {
+                for r in f.s3_roots(wl[i], wl[j]) {
+                    if let Some(s) = out2.get_mut(&r) {
+                        s.insert(vec![wl[i], wl[j]]);
+                    }
+                }
+            }
+        }
+        assert_eq!(out, out2, "ground truth cross-check");
+        return out;
+    }
+    if k == 2 {
         for i in 0..wl.len() {
             for j in i..wl.len() {
                 for r in f.s3_roots(wl[i], wl[j]) {
@@ -858,6 +921,7 @@ fn selftest() {
         for _ in 0..200 {
             let (a, b, c) = (rng.next() & mask, rng.next() & mask, rng.next() & mask);
             assert_eq!(f.mul(a, b), f.mul(b, a));
+            assert_eq!(f.mul(a, b), f.mul_terms(a, b), "fast mul vs term formula m={m}");
             assert_eq!(f.mul(f.mul(a, b), c), f.mul(a, f.mul(b, c)));
             assert_eq!(f.mul(a, b ^ c), f.mul(a, b) ^ f.mul(a, c));
             assert_eq!(f.mul(a, f.one()), a);

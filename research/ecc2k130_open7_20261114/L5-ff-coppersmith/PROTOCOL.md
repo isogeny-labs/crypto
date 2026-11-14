@@ -133,3 +133,13 @@ Falsifier of the main verdict: one n >= 53 cell with >= 5/N recoveries at L/n > 
 Only the box (and one e-form) shift set; multiplicity <= 8; one modulus per n; planted roots
 uniformly random in the factor base. A measured ceiling for these lattices, not a theorem about
 all lattices. No e2e solve exists; the cost comparison with rho is derived (§5a band).
+
+## Amendment 1 (2026-11-14 08:35 UTC, instrument fix, no rule change)
+
+The first launch hung at `lat_n37` l = 2: with the sparse modulus there are fewer than two valid
+x-coordinates of degree < l, so the planted-instance sampler looped forever. Fix: a cell whose
+factor base has fewer than two valid x-coordinates is emitted as `arm = "skip_fb_lt2"` and has no
+planted instance (it cannot contain a 2-term decomposition). The summarizer drops these rows and
+reports their count. All runs are restarted from scratch with the fixed binary (the partial
+outputs of the first launch are discarded); grid, metrics, predictions and decision rule unchanged.
+The existence-count table of the first launch was viewed while writing the summarizer.

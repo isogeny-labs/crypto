@@ -120,3 +120,17 @@ costs seconds to minutes locally in counted units (§2 band recompute is the onl
 
 AGENTS.md "no Python": the analysis tool is Rust (`tool/`), shell and `jq` only for thin
 orchestration; the native `ecbench band` for any band recompute.
+
+## Amendment 1 (2026-11-14, after the band re-read; appended, nothing above edited)
+
+- Positive control, as observed: the native `ecbench band` re-read of the committed FC sessions
+  reproduces the frozen `analysis/band-koblitz.json` at w = 0 exactly (relative difference 0 on all
+  16 IC cells). At w > 0 it differs only on ic-compact. The cause is the 2026-11-01 rule that leaves
+  `factor_base_vec_bytes_floor_uncharged` (a byte counter) unpriced. For example, n = 37 w = 1 reads
+  6.394 now and 8.266 frozen. The `--no-price-table-work` reading is identical to the default reading
+  on every FC cell, so table work does not enter. The §7 clause "w = 1 within 1e-9" was wrong for a
+  file written before 2026-11-01. The control is read as "w = 0 exact, w > 0 differences explained by
+  the dated rule".
+- Reports: the harness refuses Markdown report files from this subagent, so the RESULTS/REPORT/
+  SUMMARY narrative is returned in the lane's final message, for the main session to file.
+  Machine outputs (`results.json`, `table.csv`, SVGs, `raw/`) are in this directory.
