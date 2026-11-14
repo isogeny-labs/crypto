@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:54:56Z",
+ "id": "PCC-20261114-98b25a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0a12a195c66785b5b8b4b4409ab0cc02ee991f64",
+  "model": "",
+  "session": "norm-growing-input-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "10f6c380645ff9a331dbaf65f32d9849f3e3c596477595a28d570d65a994f6b2",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormGrowingInput.U_monic_degree"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration context. Generic coefficient-support budget and actual Mathlib computed monic division over CommRing; actual growing chart over Field K, a=h+2 covers all a>=2. Literal multivariate variables have consecutive weights via explicit bijection. Actual norm/support/remainder, monicity/degrees, coefficient weightedTotalDegree <=2*degree(P)-2*j. Exact norm multiplication requires stated target-curve premise. Four-variable source binding is a polynomial-ring renaming equivalence, not finite-field value comparison. No degree29 normalized-row, full closure, public finder, coverage, extraction/retries or expected bit-cost claim. Unsigned; gate/fresh pending at creation.",
+ "statement": "Exact source-bound declaration NormGrowingInput.U_monic_degree: theorem U_monic_degree (h : \u2115) (alpha beta r z : K) : (U h alpha beta r z).Monic \u2227 (U h alpha beta r z).natDegree=2*h+3"
+}
