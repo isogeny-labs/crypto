@@ -106,3 +106,5 @@ Assumption2, FGHR generic/n≥3 scope, larger-system populations, internalF4
 degrees/C refinement and whole-curve order/scalar relations remain open.
 An exact Hilbert cutoff is not a bound on every polynomial processed by F4.
 The original fourteen-item request remains partial. [pcc:unverified]
+
+Public replay snapshot: commit`00806098f7f19a0651d39b9fcd422f9c5af6c996`, tree`26127d42672d2a652d40718f84f8a8f28e23a058`, identical to local receiptd19d5ee47b59406e57bd9e8371de059df74218a7. Completed anonymous fetch/tree comparison and fresh ready PR/body confirmation. See [publication metadata](publication.json). Signed standing remains unverified. [pcc:unverified]
