@@ -38,8 +38,12 @@ The [frozen protocol](PROTOCOL.md), [solver lock](LOCK.json),
 [known-model auditor](audit_known_model.py), [runner](run_locked.py),
 [raw auditor](audit_raw.py), and [versioned evidence](evidence/) make this
 gate reproducible. The raw audit is a producer-side checksum and terminal
-classification, not a third-party attestation. Original uncompressed XCNFs
-and transcripts remain at
+classification, not a third-party attestation. The artifact-store manifests
+in `evidence/export/` and `evidence/pinned-solver/` retain the three larger
+compressed files by SHA-256 and byte count. Hydrate those paths with
+`python3 tools/artifacts/artifacts.py pull` when store read access is
+available before rerunning the auditor. Original uncompressed XCNFs and
+transcripts remain at
 `/Volumes/SSD990-2/tmp/n83-a0-k2048-sorted-20261114/raw/`.
 
 The unpinned search is a censored solver-stage result: no relation or novel

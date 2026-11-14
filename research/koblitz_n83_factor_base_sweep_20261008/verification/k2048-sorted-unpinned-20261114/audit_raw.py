@@ -43,6 +43,18 @@ def main():
     export = EVIDENCE / "export"
     pinned = EVIDENCE / "pinned-solver"
     unpinned = EVIDENCE / "unpinned-solver"
+    for section, expected in (("export", {"pinned.xcnf.gz", "unpinned.xcnf.gz"}),
+                              ("pinned-solver", {"stdout.txt.gz"})):
+        pointer = EVIDENCE / section / ".artifacts.json"
+        if pointer.exists():
+            manifest = json.loads(pointer.read_text())
+            require(manifest["schema"] == "artifacts.manifest/v1" and
+                    set(manifest["files"]) == expected, "artifact pointer identity")
+            for name, entry in manifest["files"].items():
+                path = EVIDENCE / section / name
+                require(path.exists() and path.stat().st_size == entry["bytes"] and
+                        sha(path) == entry["sha256"],
+                        "artifact pointer or hydrated bytes")
     pinned_export = load("export", "pinned.json")
     unpinned_export = load("export", "unpinned.json")
     known = load("export", "known-model-audit.json")
@@ -110,7 +122,7 @@ def main():
             run["verified_relation"] is None and run["novel_rank"] is None,
             "unpinned terminal receipt")
     files = sorted(path for path in EVIDENCE.rglob("*") if path.is_file() and
-                   path.name != "audit.json")
+                   path.name not in {"audit.json", ".artifacts.json", ".gitignore"})
     hashes = {str(path.relative_to(EVIDENCE)): sha(path) for path in files}
     result = {
         "schema": "n83.k2048-sorted-unpinned-raw-audit/v1",
