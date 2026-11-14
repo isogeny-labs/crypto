@@ -1,7 +1,7 @@
 # Actual moment proof map
 
 43 authored declarations; pinned gate audits44 including generated
-momentRight.congr_simp,0 extra trusted axioms. Import-inclusive fresh active.
+momentRight.congr_simp,0 extra trusted axioms. Import-inclusive fresh exits0 with default imports.
 All records unsigned, gate data24441c [pcc:unverified].
 
 - `OrientationMoment.row_split` — PCC-20261114-9818c3 (unsigned). Source: `research/prime_orientation_layers_20261114/moments/lean/OrientationMoment.lean`.
@@ -51,3 +51,6 @@ All records unsigned, gate data24441c [pcc:unverified].
 Exact signatures/hypotheses and declaration hashes appear in
 evidence/declaration-bindings.json and claim-pins.json. No first-jet factor
 statement includes an all-chart or complete expected bit-cost conclusion.
+
+Current final replay/report links are in STATUS.md; pending checkpoint
+artifacts retain their exact bytes. Final dataa6ae4f, unsigned.

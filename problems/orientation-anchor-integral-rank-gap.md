@@ -168,3 +168,18 @@ public finder/extraction and complete expected cost remain open. A separate
 7-statement draft derives actual retained crossing whole-chart content w
 and normalized coefficient integrality, data310194 only, outside43/44;
 it does not provide the missing higher-chart factors [pcc:unverified].
+
+
+Moment source43 import-inclusive fresh OrientationMoment exits0, exact41-byte
+stdout. All pins unchanged; versioned final4page report/status added without
+rewriting pinned pending README/report/PDF. Final unsigned dataa6ae4f.
+The first-jet component replay is complete; higher-chart/mode/cost exit
+conditions remain open [pcc:unverified].
+
+Isolated chart005 expands the local bridge to17 statements: actual even
+slopes construct finite weighted rest/correction unit products and actual
+entry P=C(firstJet)*X*U with U_0=1 and degree-n coefficient valuation>=n.
+It is only an entrywise unit factor, not a compact matrix factor or efficient
+unit construction; outside moment43/44 gate/fresh, unsigned data514c4f.
+This identifies the next graded/higher-chart factor proof obligation,
+without resolving full recursion or expected ECDLP cost [pcc:unverified].
