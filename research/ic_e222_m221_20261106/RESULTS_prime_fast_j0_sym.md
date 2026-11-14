@@ -204,3 +204,15 @@ Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relativ
 | 30 | 3000 | 132.8 | 836.6 (6.3x) | 1675.8 (12.6x) |
 
 Reading: the folded multi-target BSGS is the strongest implemented multi-target arm in every cell: 3.4x-6.5x ahead of the symmetric multi-target IC, and ahead of the batched folded rho by 1.6x-15x. The IC's advantage over the rho at T=3000 does not survive the right comparator, and the IC/BSGS gap grows with T and with size (4.4x -> 6.5x at 26 bits, T=20 -> 1000; 3.4x -> 6.3x at 28-30 bits, T=200 -> 3000), as the exponents predict (BSGS total about sqrt(T n), IC setup about p^(2/3) plus a per-target cost). So there is **no regime in this campaign where an IC arm beats the strongest implemented comparator**; the verified gain remains the single-target 2.0x-2.4x over the 3-summand `ic_solve` baseline. One host, toy sizes, no isolation, no §5a band: not a claim in either direction beyond this ordering of implemented arms.
+
+## Experiment: the single-target gain at 32 and 34 bits, fresh curves (2026-11-14) — `[pcc:unverified]`
+Same code and frozen B rule as the holdout (B = round(100 (p/2^26)^(1/3)): 400 at 32 bits, 635 at 34 bits), fresh curves (idx 7 and 8: b65/b69 at 32 bits, b116/b128 at 34 bits), 4 targets per curve, extra 8, every solve verified (kG=Q) in both arms (n=4 per cell, 24 rows per bit size per arm). `ic_solve` 3-summand baseline at c in {0.5, 0.7, 1.0} x p^(1/3); medians:
+
+| bits | curve | sym3 ms | plain3 c=0.5 | c=0.7 | c=1.0 | ratio vs best of c=0.5/0.7 | rho (negation) ms | sym3 / rho |
+|---|---|---|---|---|---|---|---|---|
+| 32 | b65 | 230-240 | 492 | 454 | 660 | 1.96-2.14 | 5.2 | ~44x |
+| 32 | b69 | 224-246 | 519 | 500 | 578 | 2.03-2.22 | 5.4-6.7 | ~40x |
+| 34 | b116 | 684-825 | 1658 | 1782 | 2289 | 2.16-2.32 | 11.8 | ~60x |
+| 34 | b128 | 738-798 | 1533 | 1858 | 2407 | 2.08-2.40 | 9.3-10.3 | ~72x |
+
+Reading: the 2.0x-2.4x improvement over the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) holds at 32 and 34 bits on fresh curves, with B extrapolated by the frozen rule and not retuned (c=1.0 arms: 2.6x-3.4x, a worse baseline). The gap to the matched negation rho keeps growing with size (about 4x at 26 bits, 21x at 30, about 40x at 32, 60x-70x at 34), consistent with an engineering constant gain on a worse exponent. Same limits as before: one host, no isolation, wall clock, one twist group per size, no §5a band.
