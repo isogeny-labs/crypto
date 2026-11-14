@@ -65,6 +65,19 @@ cmp /tmp/ct112-py.json /tmp/ct112-jsopt.json
 printf '%s  %s\n' 28239819cd788d819e0fe0d8819dd850b520a2ea90acd9926f75d5fbff12c7ce /tmp/ct112-py.json | sha256sum -c
 ```
 
+### Independent modular discovery replay (not a substitute for integer proof)
+
+The additional `ct112_modular_interpolation.py` independently computes five rational x-coordinates in `F_p[X]/ψ₁₁`, builds symmetric coefficients there, then solves four 60×12 interpolation systems against the powers of S. It compares **all 48** coefficients with the independently frozen rational certificate at each admissible prime. The exact long-division verification remains separate.
+
+```sh
+python3 -B "$D/ct112_modular_interpolation.py" --full > /tmp/ct112-modular.json
+python3 -O -B "$D/ct112_modular_interpolation.py" --full > /tmp/ct112-modular-opt.json
+cmp /tmp/ct112-modular.json /tmp/ct112-modular-opt.json
+python3 -B "$D/ct112_modular_interpolation.py" 13 17 59 1151 1201 827
+```
+
+The `--full` panel contains the first 180 primes from 13 through 1103: **179 complete coefficient matches**, and the intentionally excluded prime **827** where L is nonunit (the exploratory S-basis interpolation also had deficient rank). The five-prime quick panel includes two held-out large primes. This is an independently reproducible residue regression, not a complexity measurement.
+
 ## Research consequence and next gates
 
 The full **degree-12 / degree-5 characteristic-zero tower** is now explicit; a computationally meaningful online transfer still needs a p-adic source-coordinate-to-global-root recognizer, the correct **degree-10 orientation torsor**, and evaluation at CT111's fixed 2-integral binary prime. The quintic contains all five x-roots but deliberately loses the scalar orientation; simply solving H_T in Q(S) does not produce an online ECDLP-preserving cross-characteristic map.
