@@ -1324,6 +1324,13 @@ fn main() -> Result<()> {
                 Path::new(&args[2]),fixture,Path::new(&args[4]))?;
             println!("{receipt}");
         },
+        Some("primary-k600-m6-xcnf")=>{
+            if args.len()!=5 { return Err("primary-k600-m6-xcnf positive-pinned|positive-unpinned|natural BASE_DIR NEW_OUTPUT_JSON (source-bound K600 full-base six-summand XCNF export only)".into()); }
+            let receipt=primary_adapter::k600_m6_xcnf_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-l0-xcnf-witness")=>{
             if args.len()!=5 { return Err("primary-full-d18-m4-l0-xcnf-witness BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (source-bound constructed XCNF and native assignment; 300-s internal cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_l0_xcnf_witness_cli(
