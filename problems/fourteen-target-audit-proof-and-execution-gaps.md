@@ -339,7 +339,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual length/support/native16/JV8; literal F2torus-helper disproof/point-chart repair (31); generic actual solution/quotient-map equivalence and finite scalar-length bound, unbounded actual bivariate nilpotent family with m0/m1/domain controls (44) | General n!dⁿ/decomposition node unrefuted; scheme-cycle/local multiplicity, isolated points in positive-dimensional components, projective geometry and Rojas/C runtime/refinement |
 | 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
-| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations Actual independent PMF cycle coupling51: everyZModn n>=2/t>0 everyevent distance<=n²/(4t), explicitcoalescence/potentialdrift/bothmarginalexpectations/uniformstationarity; allprime two distinct equalweights by time-dependentaffinepermutation. Deterministicalltime1/2/directnever-mixes and t0controls. Qualified k2/equalweight progress, not source refutation; unequalweights/k>=3/randomsupport/staticrho/collisionconstants open. [pcc:unverified] | Qualified random-table collision penalty and asymptotic mixing proofs |
+| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations Actual independent PMF cycle coupling51: everyZModn n>=2/t>0 everyevent distance<=n²/(4t), explicitcoalescence/potentialdrift/bothmarginalexpectations/uniformstationarity; allprime two distinct equalweights by time-dependentaffinepermutation. Deterministicalltime1/2/directnever-mixes and t0controls. Earlier k2/equalweight packet retains its sharperconstant; the general-weight uniformquadratic extension follows below. Stronger randomsupport/staticrho/collisionconstant gaps remain. [pcc:unverified] Generalweight packet59 proves qualifieduniformquadraticHildebrandTheorem2 foranyfixedfinitek>=2/allstrictpositiveweights/allprime/injectivesupports, actualPMF/productindependence/margins/drift/stationarity and explicitp²/(8w_aw_bt)/gamma independentofsupport/modulus. Actualpositive-halfweight distinctincrements0/2 onZMod4 givealltimegap1/2/directnoquadraticconstant afterprime-deletion. Full13pageprimaryread/inspection; sourceitselfwarnscomposites. StrongerrandomsupportTheorem1exponent/staticrho/collisionlaws remainopen. [pcc:unverified] | Stronger expected random-support Theorem1 exponent, random-table collision penalty and limiting constants |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Requested actual separate-host primeS3 replay completed in public run43501438026, both languages match all6fields/942models/4188162triples; canonical export2/2/0excluded passes | Compiler/runtime/physical-host proof and independence from the same author remain open. Native attestation PCC-20261113-9b23b3not_covered/unsigned; original manualHTTP404 unchanged. |
@@ -1404,3 +1404,32 @@ fivecustommodules/11formal-config+11artifactpins; all92build/processing/
 provenancefiles/33objects/18181Blosslessarchive/fivegatefiles/inspected
 onepagePDF46941B. Signedstandingunverified. No corpuspromotion/full14closure/
 nativeexperiment/paidcompute/upload. [pcc:unverified]
+
+### General positive-weight uniform quadratic theorem and actual prime-deletion control
+
+The [general-weight cycle-coupling packet](../research/weighted_cycle_coupling_audit_20261114/README.md)
+proves the qualified uniform-support quadratic Hildebrand1994Theorem2 for
+any fixed finite k>=2/strictlypositive normalized weightvector: gamma is
+positive and chosen before prime modulus/support; everyinjectivesupport,
+start/event and integer t>=gamma*p² has strict eventdistance<epsilon.
+Actualnormalizedweightvector→PMF/iidbind/process expectation, actualproduct
+labelPMF=independentbinds/equal-mass specialpair transposition/both alltime
+marginalexpectations/coalescence/normalizedmodulardifference/potentialdrift
+2w_aw_b/uniformstationarity areproved. Strongerquantitativebound
+p²/(8w_aw_bt)needs only two positiveweights at distinctincrements; gamma
+1/(4w_aw_bepsilon) works. Prior fairantitheticpacket retains sharperconstant
+p²/(4t) versus genericproduct p²/(2t) at halfweights; scopegainonly.
+ActualZMod4/injectiveincrements0/2/bothhalfweights confined to actual
+card2event{0,2}: distance1/2foralltime/directnoquadraticconstant after
+prime-deletion. Sourcep192alreadywarnscompositesubgroups; no noveltyclaim.
+FullHildebrand13pages191–203/proofs/discussion/referencesread/all13rendered
+pages inspected; LPWcouplingselectedscopecredited/notfullbookread. This
+preservesqualifiedTheorem2; strongerexpectedrandomsupportTheorem1exponent,
+staticrho/collisionlaws and other14gapsremainopen. ExactlocalPCC-20261114-c938e8
+PASSat2026-11-14T10:13:48Z, whole59/0failures/0trusted, full1948characterbinding
+6392c4699f5b7f881febf34a2c29b4bc3ec709fca57e48741aae00f803125fe9,
+ninecustommodules/18formal-config+11artifactpins; all102build/processing/
+provenancefiles/35objects/20486Blosslessarchive/fivegatefiles/inspected
+onepagePDF47254B. Signedstandingunverified. Historical44-unreadlabelsnapshot
+notpromoted; possibleLemma4k2boundarycandidate notprovedinthispacket.
+No nativeexperiment/paidcompute/upload/full14closure. [pcc:unverified]
