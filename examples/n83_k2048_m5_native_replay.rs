@@ -16,7 +16,8 @@ const N: usize = 83;
 const MOD: u128 = (1u128 << N) | (1u128 << 45) | 7;
 const ORDER: u128 = 2_417_851_639_230_796_216_685_689;
 const OBJECT_SHA256: &str = "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a";
-const POSITIVE_XCNF_SHA256: &str = "f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c";
+const POSITIVE_XCNF_SHA256: &str =
+    "f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c";
 
 fn sha_file(path: &Path) -> Result<String> {
     let mut file = File::open(path)?;
@@ -69,9 +70,7 @@ fn inverse(a: u128) -> Result<u128> {
 
 fn on_curve(p: Point) -> bool {
     let Some((x, y)) = p else { return true };
-    x < 1u128 << N
-        && y < 1u128 << N
-        && (mul(y, y) ^ mul(x, y) ^ mul(mul(x, x), x) ^ 1) == 0
+    x < 1u128 << N && y < 1u128 << N && (mul(y, y) ^ mul(x, y) ^ mul(mul(x, x), x) ^ 1) == 0
 }
 
 fn add(p: Point, q: Point) -> Result<Point> {
@@ -175,7 +174,9 @@ fn check_xcnf(path: &Path, assignment: &[u8]) -> Result<(usize, usize)> {
         } else {
             (false, line.as_str())
         };
-        let literals = body.split_whitespace().map(str::parse::<i32>)
+        let literals = body
+            .split_whitespace()
+            .map(str::parse::<i32>)
             .collect::<std::result::Result<Vec<_>, _>>()?;
         if literals.last() != Some(&0) || literals.len() < 2 {
             return Err("XCNF row lacks terminal zero or literals".into());
@@ -193,10 +194,14 @@ fn check_xcnf(path: &Path, assignment: &[u8]) -> Result<(usize, usize)> {
         }
         if is_xor {
             xor += 1;
-            if !parity { return Err("original XOR row fails".into()); }
+            if !parity {
+                return Err("original XOR row fails".into());
+            }
         } else {
             cnf += 1;
-            if !satisfied { return Err("original CNF clause fails".into()); }
+            if !satisfied {
+                return Err("original CNF clause fails".into());
+            }
         }
     }
     if (cnf, xor) != (1_141_221, 4_980) {
@@ -225,8 +230,13 @@ fn choose_lift(
     target: Point,
 ) -> Result<Vec<Entry>> {
     fn search(
-        groups: &[Vec<Entry>], reps: &[Point], intermediates: &[u128],
-        target: Point, depth: usize, sum: Point, chosen: &mut Vec<Entry>,
+        groups: &[Vec<Entry>],
+        reps: &[Point],
+        intermediates: &[u128],
+        target: Point,
+        depth: usize,
+        sum: Point,
+        chosen: &mut Vec<Entry>,
     ) -> Result<bool> {
         if depth == groups.len() {
             return Ok(sum == target);
@@ -239,9 +249,7 @@ fn choose_lift(
                 continue;
             }
             let next = add(sum, entry.point)?;
-            if (1..=3).contains(&depth)
-                && next.map(|(x, _)| x) != Some(intermediates[depth - 1])
-            {
+            if (1..=3).contains(&depth) && next.map(|(x, _)| x) != Some(intermediates[depth - 1]) {
                 continue;
             }
             chosen.push(entry.clone());
@@ -275,8 +283,12 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
     }
     let assignment = model(stdout, 111_478)?;
     let (cnf, xor) = check_xcnf(xcnf, &assignment)?;
-    let xs = (0..5).map(|block| x_block(&assignment, block)).collect::<Vec<_>>();
-    let intermediates = (5..8).map(|block| x_block(&assignment, block)).collect::<Vec<_>>();
+    let xs = (0..5)
+        .map(|block| x_block(&assignment, block))
+        .collect::<Vec<_>>();
+    let intermediates = (5..8)
+        .map(|block| x_block(&assignment, block))
+        .collect::<Vec<_>>();
     let target = point(&export_record["target"])?;
     if scalar(target, ORDER)? != None {
         return Err("native replay target outside subgroup".into());
@@ -293,13 +305,19 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
     {
         return Err("native replay archive curve or base differs".into());
     }
-    let reps = header["representatives"].as_array().ok_or("archive representatives absent")?
-        .iter().map(point).collect::<Result<Vec<_>>>()?;
+    let reps = header["representatives"]
+        .as_array()
+        .ok_or("archive representatives absent")?
+        .iter()
+        .map(point)
+        .collect::<Result<Vec<_>>>()?;
     if reps.len() != 2_048 {
         return Err("archive representative count differs".into());
     }
     let mut found = BTreeMap::<u128, Vec<Entry>>::new();
-    for &x in &xs { found.entry(x).or_default(); }
+    for &x in &xs {
+        found.entry(x).or_default();
+    }
     let mut rows = 0usize;
     for line in reader.lines() {
         let row: Value = serde_json::from_str(&line?)?;
@@ -310,11 +328,18 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
             group.push(Entry {
                 point: p,
                 column: row["column"].as_u64().ok_or("archive column absent")? as usize,
-                coefficient: row["coefficient"].as_str().ok_or("archive coefficient absent")?.parse()?,
+                coefficient: row["coefficient"]
+                    .as_str()
+                    .ok_or("archive coefficient absent")?
+                    .parse()?,
             });
         }
     }
-    if rows != 339_968 || found.values().any(|group| group.is_empty() || group.len() > 2) {
+    if rows != 339_968
+        || found
+            .values()
+            .any(|group| group.is_empty() || group.len() > 2)
+    {
         return Err("archive row count or SAT x lifts differ".into());
     }
     let groups = xs.iter().map(|x| found[x].clone()).collect::<Vec<_>>();
@@ -324,7 +349,9 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
     }
     let mut row = vec![0u128; 2_048];
     for entry in &chosen {
-        if scalar(entry.point, ORDER)? != None { return Err("relation point outside subgroup".into()); }
+        if scalar(entry.point, ORDER)? != None {
+            return Err("relation point outside subgroup".into());
+        }
         row[entry.column] = (row[entry.column] + entry.coefficient) % ORDER;
     }
     let mut row_sum = None;
@@ -333,9 +360,13 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
             row_sum = add(row_sum, scalar(reps[column], coefficient)?)?;
         }
     }
-    if row_sum != target { return Err("relation row sum differs from target".into()); }
+    if row_sum != target {
+        return Err("relation row sum differs from target".into());
+    }
     let decimals = row.iter().map(ToString::to_string).collect::<Vec<_>>();
-    let row_digest = blake3::hash(&serde_json::to_vec(&decimals)?).to_hex().to_string();
+    let row_digest = blake3::hash(&serde_json::to_vec(&decimals)?)
+        .to_hex()
+        .to_string();
     if export_record["positive"]["relation_row_decimal_blake3"] != row_digest {
         return Err("positive relation row digest differs".into());
     }
@@ -358,15 +389,23 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
     serde_json::to_writer_pretty(&mut file, &report)?;
     file.write_all(b"\n")?;
     file.sync_all()?;
-    println!("{}", json!({"status":report["status"],"cnf":cnf,"xor":xor,"columns":report["columns"]}));
+    println!(
+        "{}",
+        json!({"status":report["status"],"cnf":cnf,"xor":xor,"columns":report["columns"]})
+    );
     Ok(())
 }
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
     let result = if args.len() == 6 {
-        replay(Path::new(&args[1]), Path::new(&args[2]), Path::new(&args[3]),
-            Path::new(&args[4]), Path::new(&args[5]))
+        replay(
+            Path::new(&args[1]),
+            Path::new(&args[2]),
+            Path::new(&args[3]),
+            Path::new(&args[4]),
+            Path::new(&args[5]),
+        )
     } else {
         Err("usage: n83_k2048_m5_native_replay XCNF SOLVER_STDOUT EXPORT_JSON OBJECT_GZ NEW_RECEIPT".into())
     };

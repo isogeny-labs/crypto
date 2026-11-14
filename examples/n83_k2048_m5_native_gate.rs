@@ -81,7 +81,11 @@ fn get_u64(value: &Value, key: &str) -> Result<u64> {
         .ok_or_else(|| format!("lock {key} absent").into())
 }
 
-fn checked_lock(mode: &str, lock: &Value, out: &Path) -> Result<(PathBuf, PathBuf, PathBuf, Vec<String>)> {
+fn checked_lock(
+    mode: &str,
+    lock: &Value,
+    out: &Path,
+) -> Result<(PathBuf, PathBuf, PathBuf, Vec<String>)> {
     if lock["schema"] != "n83.k2048-m5-native-gate-lock/v1"
         || lock["mode"] != mode
         || !["positive", "natural"].contains(&mode)
@@ -155,14 +159,38 @@ fn checked_lock(mode: &str, lock: &Value, out: &Path) -> Result<(PathBuf, PathBu
         .as_array()
         .ok_or("native solver flags absent")?
         .iter()
-        .map(|v| v.as_str().map(str::to_owned).ok_or("native solver flag is not text".into()))
+        .map(|v| {
+            v.as_str()
+                .map(str::to_owned)
+                .ok_or("native solver flag is not text".into())
+        })
         .collect::<Result<Vec<String>>>()?;
-    if flags != [
-        "--threads", "1", "--random", "20261114", "--maxtime", "600",
-        "--maxconfl", "1000000", "--verb", "1", "--verbstat", "1",
-        "--printsol", "1", "--maxnummatrices", "32", "--autodisablegauss",
-        "0", "--gaussusefulcutoff", "0", "--branchstr", "vsids",
-    ] {
+    if flags
+        != [
+            "--threads",
+            "1",
+            "--random",
+            "20261114",
+            "--maxtime",
+            "600",
+            "--maxconfl",
+            "1000000",
+            "--verb",
+            "1",
+            "--verbstat",
+            "1",
+            "--printsol",
+            "1",
+            "--maxnummatrices",
+            "32",
+            "--autodisablegauss",
+            "0",
+            "--gaussusefulcutoff",
+            "0",
+            "--branchstr",
+            "vsids",
+        ]
+    {
         return Err("native solver flags differ from frozen arm".into());
     }
     Ok((solver, formula, export, flags))
@@ -190,10 +218,13 @@ fn run(mode: &str, lock_path: &Path, out: &Path) -> Result<()> {
     serde_json::to_writer_pretty(&mut host, &samples)?;
     host.write_all(b"\n")?;
     host.sync_all()?;
-    let swap = samples[0]["swapouts"].as_u64().ok_or("native preflight swapout missing")?;
-    if samples.iter().any(|sample| sample["load_1m"].as_f64().is_none_or(|load| load > 24.0)
-        || sample["swapouts"].as_u64() != Some(swap))
-        || load_1m()? > 24.0
+    let swap = samples[0]["swapouts"]
+        .as_u64()
+        .ok_or("native preflight swapout missing")?;
+    if samples.iter().any(|sample| {
+        sample["load_1m"].as_f64().is_none_or(|load| load > 24.0)
+            || sample["swapouts"].as_u64() != Some(swap)
+    }) || load_1m()? > 24.0
         || swapouts()? != swap
     {
         return Err("native host load or swapout gate failed; preflight retained".into());
@@ -258,13 +289,20 @@ fn run(mode: &str, lock_path: &Path, out: &Path) -> Result<()> {
             if waited != pid {
                 return Err(std::io::Error::last_os_error().into());
             }
-            let code = if libc::WIFEXITED(raw) { libc::WEXITSTATUS(raw) } else { -libc::WTERMSIG(raw) };
+            let code = if libc::WIFEXITED(raw) {
+                libc::WEXITSTATUS(raw)
+            } else {
+                -libc::WTERMSIG(raw)
+            };
             break (code, true);
         }
         thread::sleep(Duration::from_millis(100));
     };
     let transcript = fs::read_to_string(&stdout_path)?;
-    let statuses = transcript.lines().filter(|line| line.starts_with("s ")).collect::<Vec<_>>();
+    let statuses = transcript
+        .lines()
+        .filter(|line| line.starts_with("s "))
+        .collect::<Vec<_>>();
     let state = match (timed_out, code, statuses.as_slice()) {
         (true, _, _) => "WATCHDOG",
         (false, 10, ["s SATISFIABLE"]) => "SAT_PENDING_REPLAY",
@@ -272,8 +310,11 @@ fn run(mode: &str, lock_path: &Path, out: &Path) -> Result<()> {
         (false, 20, ["s UNSATISFIABLE"]) => "UNSAT_UNVERIFIED",
         _ => "PRODUCER_FAILURE",
     };
-    let conflicts = transcript.lines().filter_map(|line| line.strip_prefix("c conflicts                :"))
-        .map(str::trim).collect::<Vec<_>>();
+    let conflicts = transcript
+        .lines()
+        .filter_map(|line| line.strip_prefix("c conflicts                :"))
+        .map(str::trim)
+        .collect::<Vec<_>>();
     let record = json!({
         "schema":"n83.k2048-m5-native-solver-run/v1", "mode":mode,"status":state,
         "lock_sha256":file_sha(lock_path)?,"source_commit":lock["source_commit"],
@@ -293,7 +334,10 @@ fn run(mode: &str, lock_path: &Path, out: &Path) -> Result<()> {
     serde_json::to_writer_pretty(&mut receipt, &record)?;
     receipt.write_all(b"\n")?;
     receipt.sync_all()?;
-    println!("{}", json!({"status":state,"exit_code":code,"wall_seconds":record["wall_seconds"],"terminal_conflicts":record["terminal_conflicts"]}));
+    println!(
+        "{}",
+        json!({"status":state,"exit_code":code,"wall_seconds":record["wall_seconds"],"terminal_conflicts":record["terminal_conflicts"]})
+    );
     Ok(())
 }
 

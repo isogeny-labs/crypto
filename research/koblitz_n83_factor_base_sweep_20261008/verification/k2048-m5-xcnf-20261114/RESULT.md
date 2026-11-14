@@ -73,6 +73,10 @@ Both arms had preflight load below 24 and stable swapouts at 164,320. The exact
 native runner source commit was `d75033d50260210c8f094d00acfbccc1ad35d395`,
 runner binary SHA-256 `b0ab62790d2ef1a7e1ddfd2a654f666f138cecb355bfa4e9aece4c16ec166db8`,
 and replay binary SHA-256 `d0f90335c5674c8145aeac8686f0fbaddeb6fab4b51e007eeecbff08a20aacd5`.
+The gate and replay example files were formatted after these frozen calls for
+the changed-files CI gate. Formatting their exact committed pre-format source
+with the same Rust 1.99.1 formatter produces the current files byte for byte;
+the measurement receipts remain bound to the earlier source commit and binaries.
 The original full XCNFs and archive remain under
 `/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw`; the repository retains
 compressed copies of both XCNFs in [historical evidence](evidence/).
