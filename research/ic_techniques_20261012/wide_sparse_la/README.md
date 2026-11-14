@@ -1,9 +1,26 @@
 # Wide-modulus sparse linear algebra: benchmark pack
 
-**Status (2026-11-12): protocol frozen, harness ready, NOT RUN.** No
-measurement exists yet. The 10⁹-column cost in
-`docs/ic/IC_TECHNIQUE_INTEGRATION_20261012.md` §9 is still an extrapolation.
+**Status (2026-11-14): measured on RunPod (2026-11-12/13). The frozen
+verdict is "extrapolation unsupported".** The counted size law holds:
+β = 1.96–1.97 for every arm, curvature not significant, count independent of
+the width. The width-law test failed, because the time per operation depends
+on the modulus within one word, not only on the limb count. So the 10⁹-column
+cost in `docs/ic/IC_TECHNIQUE_INTEGRATION_20261012.md` §9 is still not
+supported by a fitted law. All figures are `[pcc:unverified]`. Full read-out:
+[`REPORT.md`](REPORT.md) ([PDF](REPORT.pdf)).
 
+- [`results.json`](results.json): the frozen analysis, produced by the native
+  crate [`analysis/`](analysis/) (`wide-sla-analysis --raw raw --out results.json`;
+  cross-check against the Python prototype in
+  [`analysis/CROSSCHECK.md`](analysis/CROSSCHECK.md)). Graphs:
+  [`figures/`](figures/), drawn by [`plot.py`](plot.py) from `results.json`
+  and `raw/`.
+- [`raw/`](raw/): 438 attempts from three RunPod pods, one per seed (414 valid,
+  24 timeouts at D = 2²⁰ in the wide arms). Launch:
+  [`launch.json`](launch.json), [`runpod/`](runpod/); the failed first launch:
+  [`launch.attempt1.json`](launch.attempt1.json).
+- [`PROTOCOL_AMENDMENT_1.md`](PROTOCOL_AMENDMENT_1.md): RunPod in place of
+  Iso Lab, committed before any data.
 - [`PROTOCOL.md`](PROTOCOL.md): the measurement §9 promised (counted work per
   column against modulus width 61→255 bits and size 2¹²→2²⁰ columns, for
   filter + block Wiedemann and filter + block Lanczos; the law to fit and how
@@ -23,5 +40,7 @@ measurement exists yet. The 10⁹-column cost in
   `ac9c937bbe` plus the uncommitted harness change; the `*_s` fields there
   are not measurements.
 
-Still to land after a run: `raw/`, `results.json`, report and graphs, the
-`benchmarks/` entry and the `bench.record/v1` record (see PROTOCOL.md).
+Bench record: `benchmarks/records/20261112T2153Z-wide-sparse-la.json`;
+copies in `benchmarks/20261112-wide-sparse-la/`. There is no admitted
+`benchmarks/README.md` row: a phase cost has no matched rho for the
+validation gate.
