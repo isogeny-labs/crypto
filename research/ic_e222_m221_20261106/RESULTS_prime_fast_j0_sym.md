@@ -237,3 +237,61 @@ Same code and frozen B rule as the holdout (B = round(100 (p/2^26)^(1/3)): 400 a
 | 34 | b128 | 738-798 | 1533 | 1858 | 2407 | 2.08-2.40 | 9.3-10.3 | ~72x |
 
 Reading: the 2.0x-2.4x improvement over the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) holds at 32 and 34 bits on fresh curves, with B extrapolated by the frozen rule and not retuned (c=1.0 arms: 2.6x-3.4x, a worse baseline). The gap to the matched negation rho keeps growing with size (about 4x at 26 bits, 21x at 30, about 40x at 32, 60x-70x at 34), consistent with an engineering constant gain on a worse exponent. Same limits as before: one host, no isolation, wall clock, one twist group per size, no §5a band.
+
+## Correction and improvement: the single-target scan now applies the entry's orbit shift (2026-11-14) — `[pcc:unverified]`
+**Defect found.** In `examples/prime_fast_j0_sym.rs` the 3-summand scan never used the stored orbit shift of a pair-table entry (`ent.5`): `SHIFTFIX=1` stored it but the scan ignored it, so only about one third of the table hits (those whose stored point already had shift 0) could yield a relation; the group re-addition rejected the rest. This is why the earlier "shift fix" A/B (section "pair-table shift fix") saw identical target counts (671 = 671, 273 = 273): that experiment did not exercise the fix, and its conclusion ("does not change relation yield; time within noise") is **withdrawn**. The multi-target example (`prime_fast_j0_multi.rs`) did apply the shift. All numbers before this section for the single-target arm (2.0x-2.4x at 26-34 bits) therefore describe the version that discards two thirds of the table hits, and are a lower bound.
+
+**Fix.** `sft = (sft_probe + 3 - ent.5) % 3` when `SHIFTFIX=1`. Relations are still group-verified; every solve verified kG = Q.
+
+A/B on the tuning curves (26 bits, B=100, 4 targets x 2 curves x 2 rounds, 16 rows per arm, all verified), same planted targets, baseline `ic_solve` c=0.7:
+
+| scan | targets needed (median) | sym3 ms | plain3 ms | ratio |
+|---|---|---|---|---|
+| shift ignored (old) | 274 | 8.3 | 20.1 | 2.42 |
+| shift applied (`SHIFTFIX=1`) | 192 (-30%) | 6.0 (-28%) | 18.1 | 3.01 |
+
+Fresh holdout (curves idx 9 and 10; frozen B rule B = round(100 (p/2^26)^(1/3)); `SHIFTFIX=1`; 4 targets per curve; baseline c in {0.5, 0.7}; 64 rows, all verified), medians:
+
+| bits | B | sym3 ms | plain3 ms | ratio (range over curves, c) | sym3 / negation rho |
+|---|---|---|---|---|---|
+| 28 | 159 | 17.8-25.5 | 52.5-65.4 | 2.57-2.95 | 6x-8x |
+| 30 | 252 | 51.2-58.2 | 143-162 | 2.59-2.86 | 12x-16x |
+| 32 | 400 | 156-175 | 447-522 | 2.61-3.19 | 24x-38x |
+| 34 | 635 | 469-605 | 1541-1695 | 2.80-3.30 | 50x-59x |
+
+Reading: with the shift applied the symmetric 3-summand IC is **2.6x-3.3x faster than the strongest implemented single-target IC** (3-summand `ic_solve`, best of the c grid) at 28-34 bits on fresh curves, up from 2.0x-2.4x. The gap to the matched negation rho keeps growing with size (about 7x at 28 bits to about 55x at 34), so this remains an engineering constant on a worse exponent. Same limits: one host, wall clock, one twist group per size, B extrapolated by the frozen rule and not retuned, not yet independently replayed (the validator report covers the pre-fix code), no §5a band.
+
+### Independent replay of the fixed code (2026-11-14) — see `results/pf_j0/VALIDATOR_REPORT_shiftfix.md`
+Validated: the shift logic (zero group-check rejections with the fix, 66.8% without), the 30% target reduction (probability 19/27 explained), timing scope, 32 solves / 6088 relations by an independent pure-python checker, and the withdrawal of the earlier null A/B; 64 of 64 committed `fix_hold_*` rows reproduce bit-for-bit with `SHIFTFIX=1`. **Corrected statement of the claim: about 2.8x-3.0x faster than the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) at 28-34 bits, individual cells 2.5x-3.6x** (the "2.6x-3.3x" above is the range of 4-row cell medians). Qualifiers carried: one twist group per size (a different prime agrees), no isolation or A/A interval, wall clock, gap to the negation rho about 5x-65x and to the x6-folded rho larger; not leaderboard-eligible. The fix is now the default (`NOSHIFTFIX=1` restores the old scan); rows record `shiftfix`.
+
+## Experiment: the matched rho for the shift-fixed single-target result, 28-34 bits (2026-11-14) — `[pcc:unverified]`
+Same fresh curves as the `fix_hold_*` rows (curve idx 9, 10), all targets verified. Median ms:
+
+| bits | curve | sym3 (shift fixed) | `rho_parallel` (negation, batched) | native x6-folded rho, unbatched (60 targets) | batched x6-folded rho, T=1, 128 lanes (12 targets) | sym3 / best rho |
+|---|---|---|---|---|---|---|
+| 28 | b38 / b50 | 21.7 / 19.4 | 3.1 / 3.1 | 3.4 / 3.1 | not run | 6x-7x |
+| 30 | b78 / b83 | 56.8 / 55.6 | 3.9 / 3.9 | 5.9 / 6.8 | not run | 14x-15x |
+| 32 | b72 / b74 | 157.9 / 171.5 | 6.0 / 6.4 | 12.2 / 10.2 | 4.3 / 3.0 | 37x / 57x |
+| 34 | b129 / b145 | 477.8 / 537.6 | 10.0 / 9.0 | 25.4 / 20.4 | 7.0 / 6.1 | 68x / 88x |
+
+(The batched folded rho at T=1 includes the multi-target code's anchor starts, so its step count (about 38k at 32 bits, about 82k-95k at 34) is above the single-target folded count (32k, 60k-71k); a single-target batched version would be a little faster, making the gap slightly larger.)
+
+Reading: the best implemented single-target rho is the batched, folded multi-target rho example at T=1 from 32 bits on, and `rho_parallel` below. Against it the shift-fixed symmetric IC is about 6x-7x behind at 28 bits, 14x-15x at 30, 37x-57x at 32 and 68x-88x at 34, so the earlier figures against the negation-only rho (up to 59x) understated the matched-rho gap. The 2.8x-3.0x gain over `ic_solve` is a constant factor; the gap to the matched rho still grows with size. Same limits: one host, wall clock, one twist group per size, no §5a band.
+
+## Experiment: B sweep for the shift-fixed single-target IC at 28 and 32 bits (2026-11-14) — `[pcc:unverified]`
+Fresh curves (idx 13, 14), 4 targets per curve (n=8 rows per B), baseline `ic_solve` c=0.7, shift applied (default), every solve verified. Medians:
+
+| bits | B | sym ms | targets needed | ratio vs plain3 |
+|---|---|---|---|---|
+| 28 | 50 / 64 / 80 | 31.5 / 23.4 / 21.0 | 3573 / 1928 / 1368 | 1.61 / 2.46 / 2.45 |
+| 28 | **100 / 159** | **19.7 / 19.8** | 806 / 318 | 2.87 / 2.80 |
+| 28 | 250 / 400 | 33.5 / 46.2 | 124 / 47 | 1.87 / 1.18 |
+| 32 | 130 / 160 | 257.8 / 234.3 | 7795 / 4882 | 2.08 / 2.25 |
+| 32 | **200 / 250** | **178.6 / 176.9** | 3094 / 1908 | 2.97 / 2.95 |
+| 32 | 400 (frozen rule) | 198.5 | 750 | 2.75 |
+| 32 | 630 / 1000 | 247.9 / 382.4 | 315 / 119 | 2.06 / 1.25 |
+
+Reading: the frozen B rule (B = round(100 (p/2^26)^(1/3))) is within about 11% of the best B (28 bits: flat optimum over B=100-159, frozen 159; 32 bits: optimum B=200-250, frozen 400 costs 199 vs 177 ms). The optimum grows more slowly than p^(1/3) (about 100 at 26 bits, 100-159 at 28, 200-250 at 32: exponent about 0.2), because the pair-table build (B^2) overtakes the collection saving. A retuned B would lift the 32-bit ratio from about 2.75 to about 2.95: a small constant, below the cell-to-cell spread, and not a new claim. The setup-cost levers on this line (B, layout, keys, batching) are now exhausted: what is left is the arithmetic per candidate and the relation yield per scan.
+
+## Obstruction: no prime-order j=1728 curves for the order-4 symmetric factor base (2026-11-14)
+The next symmetry in the list, j=1728 (y^2 = x^3 + a x, phi(x,y) = (-x, i y), orbits of size 2 in x, group of order 4 acting through lambda^2 = -1 mod n), was adapted from the j=0 code (orbit size 2, canonical key min(x, -x), y scaled by i on the rotated point, shift modulo 2). The first run found **no curve**: the search for a prime-order j=1728 curve over a prime field never terminates, and the reason is structural: x^3 + a x = x (x^2 + a) always has the root x = 0, so (0, 0) is a rational 2-torsion point and the group order is even (divisible by 4 when p = 1 mod 4 and the curve is not a twist with cofactor 2). Every j=1728 curve over F_p therefore has cofactor at least 2; the framework's prime-order assumption (relations in a prime-order subgroup, `scalar_field` mod n) does not hold for the full group. Using the prime-order subgroup requires projecting the factor base through the cofactor (the H1 cofactor projection of the earlier campaign), a different and larger construction with its own costs; it was not built. Expected gain if built, by the orbit size alone: about 1.5x over `ic_solve` against 2.8x-3.0x for j=0, i.e. another constant on the same exponent. Not pursued; no code kept (the adapted example was deleted).
