@@ -1128,7 +1128,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/fes_then_batched_20261112/validation/headline.json` — sha256 `468787a41a6aa47b…`
 - `research/fes_then_batched_20261112/README.md` — sha256 `6dc894448c5dcbff…`
 - `research/ic_gpu_e2e_20261113/results.json` — sha256 `9ec25e5885ed5cb5…`
-- `research/ic_gpu_e2e_20261113/REPORT.md` — sha256 `3bc11173520ab3e3…`
+- `research/ic_gpu_e2e_20261113/REPORT.md` — sha256 `6146ddab0f94a6d1…`
 - `research/ic_gpu_measure_20261112/results.json` — sha256 `23ddce3bb25d9594…`
 - `research/ic_gpu_measure_20261112/results2.json` — sha256 `e39fadca413cea84…`
 - `docs/perf/20261112-rust-deep-audit.md` — sha256 `e995c613c4a3e50c…`
