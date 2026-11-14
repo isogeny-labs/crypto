@@ -109,3 +109,21 @@ impl Fld {
         self.sqr(&a).add(&self.mul(&self.mul(x1, x2), x3)).add(&P::one())
     }
 }
+
+impl Fld {
+    pub fn sqrt(&self, a: &P) -> P { let mut x = a.clone(); for _ in 0..self.n - 1 { x = self.sqr(&x); } x }
+    /// all roots in F_{2^n} of u0 + u1 Z + u2 Z^2 (not all zero)
+    pub fn solve_quad(&self, u0: &P, u1: &P, u2: &P) -> Vec<P> {
+        if u2.is_zero() {
+            if u1.is_zero() { return vec![]; }
+            return vec![self.mul(u0, &self.inv(u1))];
+        }
+        if u1.is_zero() { return vec![self.sqrt(&self.mul(u0, &self.inv(u2)))]; }
+        let ba = self.mul(u1, &self.inv(u2));
+        let w0 = self.mul(&self.mul(u2, u0), &self.inv(&self.sqr(u1)));
+        if self.tr(&w0) != 0 { return vec![]; }
+        let w = self.htr(&w0);
+        let z1 = self.mul(&ba, &w);
+        vec![z1.clone(), z1.add(&ba)]
+    }
+}

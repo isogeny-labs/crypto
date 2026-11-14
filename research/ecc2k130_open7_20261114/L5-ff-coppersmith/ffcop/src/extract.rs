@@ -213,3 +213,34 @@ pub fn extract(k: &F64, h: &[Bi], b1: usize, b2: usize, rng: &mut Rng, max_rows:
     }
     out
 }
+
+fn swap_vars(h: &BiF) -> BiF {
+    let mut c = vec![vec![0u64; h.da + 1]; h.db + 1];
+    for a in 0..=h.da { for b in 0..=h.db { c[b][a] = h.c[a][b]; } }
+    BiF { c, da: h.db, db: h.da }
+}
+
+pub struct ExtractV2 { pub pairs_tried: u32, pub res_zero: u32, pub cand1: Vec<u64>, pub cand2: Vec<u64>, pub resolved: bool }
+
+/// v2: for pairs of rows, Res_{X2} gives first-coordinate candidates (deg <= b1) and
+/// Res_{X1} gives second-coordinate candidates (deg <= b2); stops at the first pair with a
+/// nonzero resultant. The partner coordinate is solved by the caller from the arm polynomial mod f.
+pub fn extract_v2(k: &F64, h: &[Bi], b1: usize, b2: usize, rng: &mut Rng, max_rows: usize) -> ExtractV2 {
+    let hs: Vec<BiF> = h.iter().take(max_rows).map(|b| to_bif(k, b)).collect();
+    let hsw: Vec<BiF> = hs.iter().map(swap_vars).collect();
+    let mut out = ExtractV2 { pairs_tried: 0, res_zero: 0, cand1: vec![], cand2: vec![], resolved: false };
+    let fits = |r: u64, b: usize| (64 - r.leading_zeros() as usize) <= b + 1;
+    for i in 0..hs.len() {
+        for j in i + 1..hs.len() {
+            out.pairs_tried += 1;
+            let r1 = resultant_x2(k, &hs[i], &hs[j]);
+            let r2 = resultant_x2(k, &hsw[i], &hsw[j]);
+            if r1.is_empty() && r2.is_empty() { out.res_zero += 1; continue; }
+            out.resolved = true;
+            if !r1.is_empty() { out.cand1 = roots(k, &r1, rng).into_iter().filter(|&r| fits(r, b1)).collect(); }
+            if !r2.is_empty() { out.cand2 = roots(k, &r2, rng).into_iter().filter(|&r| fits(r, b2)).collect(); }
+            return out;
+        }
+    }
+    out
+}

@@ -99,20 +99,47 @@ fn run_arm(fld: &Fld, arm: &str, form: Form, g: &Bi, wts: (usize, usize), k: usi
         match small_field_for(bounds.0.max(bounds.1)) {
             None => status = "skipped_D",
             Some(kf) => {
-                // extraction v2 (Amendment 2): strip exact factors of g from each short row
-                // (multiples of g carry no information beyond g), drop duplicates, use up to 24 rows
+                // extraction v2 (Amendment 2): strip exact factors of g and monomial factors from each
+                // short row (they carry no information about the root), drop duplicates, use up to 24
+                // rows; resultants in both variables; partner coordinate solved from g mod f.
                 let bmaj = matches!(form, Form::EForm);
                 let mut sh: Vec<Bi> = vec![];
                 for &i in &short {
                     let (q, _) = lattice::strip_g(&hs[i], g, bmaj);
+                    let ma = q.keys().map(|m| m.0).min().unwrap_or(0);
+                    let mb = q.keys().map(|m| m.1).min().unwrap_or(0);
+                    let q: Bi = q.into_iter().map(|(m, c)| ((m.0 - ma, m.1 - mb), c)).collect();
                     if q.keys().all(|m| *m == (0, 0)) { continue; }
                     if !sh.contains(&q) { sh.push(q); }
                 }
-                let ex = extract::extract(&kf, &sh, bounds.0, bounds.1, rng, 24);
-                pairs = ex.pairs_tried; rz = ex.res_zero; ncand = ex.candidates.len();
+                let ex = extract::extract_v2(&kf, &sh, bounds.0, bounds.1, rng, 24);
+                pairs = ex.pairs_tried; rz = ex.res_zero;
                 status = if ex.resolved { "resolved" } else { "all_res_zero" };
+                // candidate pairs: (a, solve g(a, Z)) and (solve g(Z, b), b)
+                let mut cands: Vec<(P, P)> = vec![];
+                let spec = |val: &P, first: bool| -> [P; 3] {
+                    let mut u = [P::zero(), P::zero(), P::zero()];
+                    for (m, c) in g {
+                        let (pv, pz) = if first { (m.0, m.1) } else { (m.1, m.0) };
+                        assert!(pz <= 2);
+                        u[pz] = u[pz].add(&fld.mul(c, &fld.red(&val.pow(pv))));
+                    }
+                    u
+                };
+                for &a in &ex.cand1 {
+                    let ap = P::from_u64(a);
+                    let u = spec(&ap, true);
+                    for z in fld.solve_quad(&u[0], &u[1], &u[2]) { if z.deg() <= bounds.1 as i64 { cands.push((ap.clone(), z)); } }
+                }
+                for &b in &ex.cand2 {
+                    let bp = P::from_u64(b);
+                    let u = spec(&bp, false);
+                    for z in fld.solve_quad(&u[0], &u[1], &u[2]) { if z.deg() <= bounds.0 as i64 { cands.push((z, bp.clone())); } }
+                }
+                cands.sort(); cands.dedup();
+                ncand = cands.len();
                 let mut gl = vec![];
-                for (a, b) in &ex.candidates {
+                for (a, b) in &cands {
                     if eval_mod(fld, g, a, b).is_zero() {
                         ngen += 1;
                         gl.push(format!("[\"{}\",\"{}\"]", a.hex(), b.hex()));
