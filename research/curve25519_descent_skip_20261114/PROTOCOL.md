@@ -85,3 +85,19 @@ construction (set-up group ops), reported separately.
   4 on `square-bits`) and raises hits per target, but by less than that factor, so hits per 10^9 mul-adds fall.
 - P5: of the three bases, `bits` lifts=1 has the highest hits per 10^9 mul-adds among the lifts=1 arms.
 No claim against rho: no rho arm is measured.
+
+## Amendment A3: Part C2, replication at 20,000 targets on a fresh seed (frozen before its data; Part C data seen)
+
+Part C (2,000 targets, seed 2026111402; `runs_c_summary.txt`) found 2 to 19 hits per arm, so its intervals overlap.
+Observed there, and what it did to the registered predictions: P4 held in point estimate on `bits` (yield per
+mul-add 0.329 → 0.124) and on `square-bits@414271` (0.253 → 0.127) but not on `square-bits@0` (0.203 → 0.241); P5
+(`bits` lifts=1 highest) was contradicted in point estimate (`square-bits@0` lifts=1 0.241 vs `bits` 0.124). No
+interval separated. Part C2 repeats the same six arms with 20,000 targets and a new seed, 2026111403, same binary,
+same G and t, no time cap that could truncate an arm.
+
+**Hypotheses, informed by Part C and so a replication, not a fresh prediction:**
+- H1: `square-bits@0` lifts=1 has higher hits per 10^9 mul-adds than `bits` lifts=1, with non-overlapping 95% intervals.
+- H2: on `bits`, lifts=1 has lower hits per 10^9 mul-adds than lifts=0.
+- H3: `lifts=1` multiplies cost per target by 8.0 on `bits` and 4.0 on `square-bits` (structural; Part A and C agree).
+Decision: a hypothesis is supported only if its interval statement holds; otherwise it is reported as unresolved,
+including when only the point estimate agrees.
