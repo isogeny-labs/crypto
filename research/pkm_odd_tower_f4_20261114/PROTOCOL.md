@@ -260,3 +260,10 @@ the `m = 3` cells. §6 forbids rerunning a frozen cell with a larger budget to c
 - *Order:* the extension starts after the Amendment 4 frozen-budget cells finish on the pod.
 - *Cost:* the ceiling for all pod time rises from $20 to $85, at the user's approval of about $50 more.
 
+*Note to Amendment 5 (before any extension row).* At the user's request the extension started before the
+Amendment 4 cells finished. The pod's supervisor runs one job and cannot stop it, so the pod was restarted after
+every row it had written was downloaded to `runs/highmem/`. The cells it had not reached stay censored as
+recorded on the 15 GiB host: `M3-A23-n4` (tower draws 1–2, null), `B-M3-A23-n4` and `B-M3-A2-t5`. Draw 0 of
+`M3-A23-n4-tower` is kept. The first start of `run_extension_remote.sh` ended at once with no rows: an extra
+`shift` inside `sh -c` dropped the binary path. The script was fixed (and now keeps each job's stderr) and restarted.
+

@@ -31,5 +31,5 @@ for j in "${jobs[@]}"; do
   name="${j%%|*}"; cmd="${j#*|}"
   # shellcheck disable=SC2086
   echo "$name $cmd --seed $SEED --budget $BUDGET --dmax $DMAX --cell $name --out runs/xb/$name.jsonl"
-done | xargs -P 3 -L 1 sh -c 'n="$0"; shift; python3 xb_wrap.py "$n" "$@" > /dev/null 2>&1; echo "xb done $n $(date -u +%FT%TZ)" >> runs/progress.txt'
+done | xargs -P 3 -L 1 sh -c 'n="$0"; python3 xb_wrap.py "$n" "$@" > "runs/xb/$n.stdout" 2> "runs/xb/$n.stderr"; echo "xb done $n $(date -u +%FT%TZ)" >> runs/progress.txt'
 echo "xb end $(date -u +%FT%TZ)" >> runs/progress.txt
