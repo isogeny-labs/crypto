@@ -1,0 +1,16 @@
+../evidence/moment-draft-007.lean.txt:291:88: error: unsolved goals
+u i x y : ℕ
+m : ℕ → ℕ
+hm : mask u x y = mask u (rowResidue u x) y
+⊢ (1 + C (slope u (x % 2 ^ u) y (poleQ i)) * X) * ∏ j ∈ mask u x y, (1 + C (slope u (x % 2 ^ u) y (2 ^ j)) * X) ^ m j =
+    (1 + C (slope u (x % 2 ^ u) y (poleQ i)) * X) *
+      ∏ j ∈ mask u (x % 2 ^ u) y, (1 + C (slope u (x % 2 ^ u) y (2 ^ j)) * X) ^ m j
+../evidence/moment-draft-007.lean.txt:293:35: warning: This simp argument is unused:
+  ← hm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [denominatorPolynomial, rowResidue, Nat.mod_mod]
+
+Note: Simp arguments with `←` have the additional effect of removing the other direction from the simp set, even if the simp argument itself is unused. If the hint above does not work, try replacing `←` with `-` to only get that effect and silence this warning.
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

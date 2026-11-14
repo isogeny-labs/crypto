@@ -1,0 +1,10 @@
+../evidence/moment-draft-010.lean.txt:353:4: error: Type mismatch: After simplification, term
+  VBound.mul hR hq
+ has type
+  VBound 0
+    (firstJet a u i (↑rb.1) (↑y) m / diagonalJet a u i m *
+      ((PowerSeries.coeff ↑rb.2) (inverseSeries (denominatorPolynomial u i (↑rb.1) (↑y) m)) / 2 ^ ↑rb.2))
+but is expected to have type
+  VBound 0
+    (firstJet a u i (↑(OrientationRank.classPort a u hu rb.1)) (↑y) m / diagonalJet a u i m *
+      ((PowerSeries.coeff ↑rb.2) (inverseSeries (denominatorPolynomial u i (↑rb.1) (↑y) m)) / 2 ^ ↑rb.2))

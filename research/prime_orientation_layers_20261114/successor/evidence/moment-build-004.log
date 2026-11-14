@@ -1,0 +1,47 @@
+../evidence/moment-draft-004.lean.txt:141:13: error: Type mismatch: After simplification, term
+  he
+ has type
+  VBound 1 e
+but is expected to have type
+  VBound 1 ((coeff 1) 1 + e)
+../evidence/moment-draft-004.lean.txt:142:53: warning: This simp argument is unused:
+  h1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [coeff_add, coeff_one, coeff_C_mul, coeff_X, h0, Ne.symm h1, VBound]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-004.lean.txt:167:8: error: typeclass instance problem is stuck
+  CommMagma ?m.8
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `CommMagma` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+../evidence/moment-draft-004.lean.txt:166:39: warning: This simp argument is unused:
+  Finset.prod_inv_distrib
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [denominatorPolynomial, reciprocalProduct, eval_mul, eval_prod, eval_pow, eval_add, eval_one,
+    eval_C, eval_X, mul_inv_rev, ← inv_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-004.lean.txt:166:63: warning: This simp argument is unused:
+  ← inv_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [denominatorPolynomial, reciprocalProduct, eval_mul, eval_prod, eval_pow, eval_add, eval_one,
+    eval_C, eval_X, mul_inv_rev, Finset.prod_inv_distrib]
+
+Note: Simp arguments with `←` have the additional effect of removing the other direction from the simp set, even if the simp argument itself is unused. If the hint above does not work, try replacing `←` with `-` to only get that effect and silence this warning.
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../evidence/moment-draft-004.lean.txt:180:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+../evidence/moment-draft-004.lean.txt:187:6: error: Type mismatch: After simplification, term
+  VBound.mul (hP ij.1) (ih ij.2 hj)
+ has type
+  VBound (↑n) (P.coeff ij.1 * (PowerSeries.coeff ij.2) (inverseSeries P))
+but is expected to have type
+  VBound (↑n) ((PowerSeries.coeff ij.1) ↑P * (PowerSeries.coeff ij.2) ((↑P).invOfUnit 1))

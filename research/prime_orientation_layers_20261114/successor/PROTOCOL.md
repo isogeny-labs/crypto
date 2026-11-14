@@ -13,6 +13,7 @@ positive retained multiplicities and i<u<=v<=a, construct explicit integral
 first-jet factors with2^v labels, normalized residual v-u+1 and absolute
 weighted residual w+v-u+1. Full row refinement v=a is exact. This supplies a
 charged control, not an improved density or an all-chart-jet result.
+[pcc:unverified]
 
 For i<u<=a, choose one literal port per retained residue class. Prove its
 actual normalized crossing-jet matrix equals identity modulo2 entrywise;
@@ -23,6 +24,7 @@ inner columns. Derive the same lower bound for the unnormalized matrix at
 absolute residual precision w+1. Do not assume factor integrality or any
 favorable scalar/rank. This is a necessary count for this particular kernel,
 jet, approximation and precision; it is not an ECDLP impossibility theorem.
+[pcc:unverified]
 
 Acceptance: build every owned source without holes or warnings, pinned shared
 axiom gate and import-inclusive fresh replay, actual-source-bound unsigned

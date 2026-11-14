@@ -121,3 +121,23 @@ remains separate and unreconciled. [pcc:unverified]
 Final source82 import-inclusive fresh OrientationLeading exits0; all pinned
 source/dependency hashes remain unchanged. This completes the component replay
 only and leaves the stated higher-jet/cost exit conditions open [pcc:unverified].
+
+
+## 2026-11-14 — actual first-jet precision and necessary count
+
+Successor source8455c485411b19c3b6a99cfc6c95f32276867b9b has40 authored
+statements; pinned gate audits44 including4 generated lemmas,0 extra trusted
+axioms, fresh running at this checkpoint. It constructs first-jet precision
+v-u+1 with2^v labels and proves ANY rational factor pair with normalized
+residual1 (absolute residual w+1) needs at least2^u inner columns, by an
+actual literal retained-class minor congruent to identity modulo2. It does
+not assert2^v minimal at higher precision. Central9fb7c1/127309/4d783b/
+1bce48/543d60, unsigned gate341743/checkpointe7cbe1 [pcc:unverified].
+
+A separately isolated43-statement draft constructs actual integral first-jet
+moment factors with2^u*k labels, additive row weights w+b and residual w+k.
+It locally elaborates without warnings but is OUTSIDE that40/44 audit/fresh,
+PCC-20261114-75aea8. This reuses standard inverse-series moments; no faster
+runtime or full source-interface result is inferred. All higher chart jets,
+weighted mode density, coefficient/entry/recovery/recursion and efficient
+public finder/extraction/expected bit cost remain open [pcc:unverified].
