@@ -1039,6 +1039,8 @@ pub fn cm_traces(d: i64, t: u64, v: u64) -> Vec<i64> {
 #[derive(Clone, Debug)]
 pub struct CmCurve {
     pub d: i64,
+    /// Class number `h(D)`.
+    pub h: usize,
     pub j: u64,
     pub curve: Curve,
     pub order: u64,
@@ -1069,6 +1071,70 @@ fn identify_order(e: &Curve, candidates: &[u64], rng: &mut Rng) -> Option<u64> {
     (left.len() == 1).then(|| left[0])
 }
 
+/// The CM curves with j-invariant `jm` over `F_p` whose order is one of
+/// `p + 1 − t'` for `t'` in `traces`: twists drawn until every trace is
+/// covered or the draws run out. A curve is kept only when its order is
+/// identified among the candidates on random points, so a wrong `j` (a
+/// mis-rounded class polynomial, say) yields nothing rather than a wrong
+/// curve.
+fn curves_with_j(
+    p: u64,
+    d: i64,
+    h: usize,
+    jm: u64,
+    traces: &[i64],
+    bound: u64,
+    rng: &mut Rng,
+) -> Vec<CmCurve> {
+    let cands: Vec<u64> = traces
+        .iter()
+        .map(|&tr| (p as i64 + 1 - tr) as u64)
+        .collect();
+    let mut seen: HashSet<u64> = HashSet::new();
+    let mut out = vec![];
+    let j1728 = 1728 % p;
+    for _ in 0..64 * cands.len() {
+        if seen.len() == cands.len() {
+            break;
+        }
+        let u = 1 + rng.below(p - 1);
+        let e = if jm == 0 {
+            Curve { p, a: 0, b: u }
+        } else if jm == j1728 {
+            Curve { p, a: u, b: 0 }
+        } else {
+            let k = mulm(jm, invm(subm(j1728, jm, p), p), p);
+            let (u2, u3) = (mulm(u, u, p), mulm(mulm(u, u, p), u, p));
+            Curve {
+                p,
+                a: mulm(mulm(3, k, p), u2, p),
+                b: mulm(mulm(2, k, p), u3, p),
+            }
+        };
+        if e.is_singular() {
+            continue;
+        }
+        let Some(n) = identify_order(&e, &cands, rng) else {
+            continue;
+        };
+        if !seen.insert(n) {
+            continue;
+        }
+        let (smooth, cofactor) = smooth_split(n, bound);
+        out.push(CmCurve {
+            d,
+            h,
+            j: jm,
+            curve: e,
+            order: n,
+            trace: p as i64 + 1 - n as i64,
+            smooth,
+            cofactor,
+        });
+    }
+    out
+}
+
 /// Method 2 for a **given** prime `p`: for each class-number-1
 /// discriminant in which `p` splits, every CM curve over `F_p` (one per
 /// trace), its order (checked on random points), and the `bound`-smooth
@@ -1086,69 +1152,215 @@ pub fn cm_curves(p: u64, bound: u64, seed: u64) -> Result<Vec<CmCurve>, String> 
         let Some((t, v)) = cornacchia_4p(p, d) else {
             continue;
         };
-        let traces = cm_traces(d, t, v);
-        let cands: Vec<u64> = traces
-            .iter()
-            .map(|&tr| (p as i64 + 1 - tr) as u64)
-            .collect();
         let jm = j_mod(j, p);
-        let mut seen: HashSet<u64> = HashSet::new();
-        // Draw curves with this j (all twists) until every trace is covered.
-        for _ in 0..64 * cands.len() {
-            if seen.len() == cands.len() {
-                break;
-            }
-            let u = 1 + rng.below(p - 1);
-            let e = if j == 0 {
-                Curve { p, a: 0, b: u }
-            } else if j == 1728 {
-                Curve { p, a: u, b: 0 }
-            } else {
-                // j ≡ 0 or 1728 (mod p) for another order: the curves are the
-                // j = 0 / 1728 ones, already handled by d = −3 / −4.
-                let den = subm(1728 % p, jm, p);
-                if den == 0 || jm == 0 {
-                    break;
-                }
-                let k = mulm(jm, invm(den, p), p);
-                let (u2, u3) = (mulm(u, u, p), mulm(mulm(u, u, p), u, p));
-                Curve {
-                    p,
-                    a: mulm(mulm(3, k, p), u2, p),
-                    b: mulm(mulm(2, k, p), u3, p),
-                }
-            };
-            if e.is_singular() {
-                continue;
-            }
-            let Some(n) = identify_order(&e, &cands, &mut rng) else {
-                continue;
-            };
-            if !seen.insert(n) {
-                continue;
-            }
-            let (smooth, cofactor) = smooth_split(n, bound);
-            out.push(CmCurve {
-                d,
-                j: jm,
-                curve: e,
-                order: n,
-                trace: p as i64 + 1 - n as i64,
-                smooth,
-                cofactor,
-            });
+        // j(d) ≡ 0 or 1728 (mod p) for another order: those curves are the
+        // j = 0 / 1728 ones, handled by d = −3 / −4.
+        if (jm == 0 && j != 0) || (jm == 1728 % p && j != 1728) {
+            continue;
         }
+        out.extend(curves_with_j(
+            p,
+            d,
+            1,
+            jm,
+            &cm_traces(d, t, v),
+            bound,
+            &mut rng,
+        ));
     }
     Ok(out)
 }
 
-/// The first CM curve (in `cm_curves` order) whose order has a cyclic
-/// `bound`-smooth part of at least `min_size`, as an [`AuxFound`].
-pub fn cm_aux(p: u64, bound: u64, min_size: u64, seed: u64) -> Result<(AuxFound, i64), String> {
+// ---------------------------------------- polynomials mod p: root finding
+
+fn poly_deg(a: &Poly) -> usize {
+    a.len() - 1
+}
+fn poly_is_zero(a: &Poly) -> bool {
+    a.len() == 1 && a[0] == 0
+}
+/// `(q, r)` with `a = q·b + r`, `deg r < deg b`; `b ≠ 0`.
+pub fn poly_divrem(a: &Poly, b: &Poly, p: u64) -> (Poly, Poly) {
+    let b = poly_trim(b.clone());
+    assert!(!poly_is_zero(&b), "division by zero polynomial");
+    let mut r = poly_trim(a.clone());
+    let db = poly_deg(&b);
+    if r.len() < b.len() {
+        return (vec![0], r);
+    }
+    let inv = invm(b[db], p);
+    let mut q = vec![0; r.len() - db];
+    for k in (0..q.len()).rev() {
+        let c = mulm(r[k + db], inv, p);
+        q[k] = c;
+        if c != 0 {
+            for (i, &bi) in b.iter().enumerate() {
+                r[i + k] = subm(r[i + k], mulm(c, bi, p), p);
+            }
+        }
+    }
+    r.truncate(db.max(1));
+    if db == 0 {
+        r = vec![0];
+    }
+    (poly_trim(q), poly_trim(r))
+}
+fn poly_monic(a: &Poly, p: u64) -> Poly {
+    let a = poly_trim(a.clone());
+    let c = invm(*a.last().unwrap(), p);
+    poly_scale(&a, c, p)
+}
+/// Monic gcd.
+pub fn poly_gcd(a: &Poly, b: &Poly, p: u64) -> Poly {
+    let (mut a, mut b) = (poly_trim(a.clone()), poly_trim(b.clone()));
+    while !poly_is_zero(&b) {
+        let r = poly_divrem(&a, &b, p).1;
+        a = b;
+        b = r;
+    }
+    if poly_is_zero(&a) {
+        a
+    } else {
+        poly_monic(&a, p)
+    }
+}
+fn poly_powmod(base: &Poly, mut e: u64, f: &Poly, p: u64) -> Poly {
+    let mut r: Poly = vec![1];
+    let mut b = poly_divrem(base, f, p).1;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = poly_divrem(&poly_mul(&r, &b, p), f, p).1;
+        }
+        b = poly_divrem(&poly_mul(&b, &b, p), f, p).1;
+        e >>= 1;
+    }
+    r
+}
+fn split_roots(g: &Poly, p: u64, rng: &mut Rng, out: &mut Vec<u64>) {
+    match poly_deg(g) {
+        0 => {}
+        1 => out.push(mulm(subm(0, g[0], p), invm(g[1], p), p)),
+        _ => loop {
+            // Cantor–Zassenhaus: gcd((x + a)^((p−1)/2) − 1, g).
+            let a = rng.below(p);
+            let w = poly_powmod(&vec![a, 1], (p - 1) / 2, g, p);
+            let w = poly_add(&w, &vec![p - 1], p);
+            let h = poly_gcd(&w, g, p);
+            let dh = if poly_is_zero(&h) { 0 } else { poly_deg(&h) };
+            if dh > 0 && dh < poly_deg(g) {
+                split_roots(&h, p, rng, out);
+                split_roots(&poly_divrem(g, &h, p).0, p, rng, out);
+                return;
+            }
+        },
+    }
+}
+/// The distinct roots of `f` in `F_p` (`p` odd), sorted.
+pub fn poly_roots(f: &Poly, p: u64, rng: &mut Rng) -> Vec<u64> {
+    let f = poly_trim(f.clone());
+    if poly_deg(&f) == 0 {
+        return vec![];
+    }
+    let f = poly_monic(&f, p);
+    // gcd(x^p − x, f): the product of the distinct linear factors.
+    let xp = poly_powmod(&vec![0, 1], p, &f, p);
+    let g = poly_gcd(&poly_add(&xp, &vec![0, p - 1], p), &f, p);
+    let mut out = vec![];
+    if !poly_is_zero(&g) {
+        split_roots(&g, p, rng, &mut out);
+    }
+    out.sort_unstable();
+    out.dedup();
+    out
+}
+
+// ------------------------------- Method 2 with class number > 1 (Hilbert)
+
+/// What a Hilbert-polynomial CM scan did, per stage.
+#[derive(Clone, Debug, Default)]
+pub struct CmScanStats {
+    /// Discriminants with `h(D) ≤ max_h` examined.
+    pub discriminants: u64,
+    /// Of which `4p = t² + |D|v²` has a solution (p splits in the order).
+    pub split: u64,
+    /// `H_D` computations that failed their rounding test.
+    pub poly_failed: u64,
+    /// Roots of `H_D mod p` found, and how many split discriminants had
+    /// fewer than `h(D)` roots in `F_p` (expected: none).
+    pub roots: u64,
+    pub incomplete_splits: u64,
+    /// Roots for which no curve's order matched a CM trace (expected:
+    /// none; a hit means the polynomial or the root is wrong).
+    pub roots_rejected: u64,
+}
+
+/// Method 2 for a **given** prime `p` with class number above 1: for every
+/// discriminant `D` with `|D| ≤ max_disc` and `h(D) ≤ max_h` in whose order
+/// `p` splits (Cornacchia), the roots of the class polynomial `H_D mod p`
+/// (`isogeny_algos::cm::hilbert_class_poly`, primitive forms, so ring class
+/// polynomials for non-maximal orders), and for every root every twist
+/// whose order is certified as `p + 1 ∓ t` on random points. Class number
+/// 1 is included (`H_D` then has degree 1). Nothing here chooses `p`.
+pub fn cm_curves_hilbert(
+    p: u64,
+    bound: u64,
+    max_disc: u64,
+    max_h: usize,
+    seed: u64,
+) -> Result<(Vec<CmCurve>, CmScanStats), String> {
+    use isogeny_algos::cm::{hilbert_class_poly, reduced_forms};
+    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+        return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
+    }
+    let mut rng = Rng(seed);
+    let mut st = CmScanStats::default();
+    let mut out = vec![];
+    for ad in 3..=max_disc {
+        if !(ad % 4 == 0 || ad % 4 == 3) || ad % p == 0 {
+            continue;
+        }
+        let d = -(ad as i64);
+        let h = reduced_forms(d).len();
+        if h > max_h {
+            continue;
+        }
+        st.discriminants += 1;
+        let Some((t, v)) = cornacchia_4p(p, d) else {
+            continue;
+        };
+        st.split += 1;
+        let Ok(hp) = hilbert_class_poly(d) else {
+            st.poly_failed += 1;
+            continue;
+        };
+        let f: Poly = poly_trim(hp.coeffs.iter().map(|c| c.mod_u64(p)).collect());
+        let roots = poly_roots(&f, p, &mut rng);
+        st.roots += roots.len() as u64;
+        if roots.len() < h {
+            st.incomplete_splits += 1;
+        }
+        let traces = cm_traces(d, t, v);
+        for jm in roots {
+            // j ≡ 0 or 1728 belongs to d = −3 / −4 (different twists).
+            if (jm == 0 && d != -3) || (jm == 1728 % p && d != -4) {
+                continue;
+            }
+            let cs = curves_with_j(p, d, h, jm, &traces, bound, &mut rng);
+            if cs.is_empty() {
+                st.roots_rejected += 1;
+            }
+            out.extend(cs);
+        }
+    }
+    Ok((out, st))
+}
+
+/// The first curve of `curves` whose order has a cyclic `bound`-smooth
+/// part of at least `min_size`, as an [`AuxFound`], with its `D`.
+pub fn cm_aux_from(curves: &[CmCurve], min_size: u64, seed: u64) -> Option<(AuxFound, i64)> {
     let mut rng = Rng(seed ^ 0xc0ffee);
-    for c in cm_curves(p, bound, seed)? {
-        let e = c.curve;
-        let n = c.order;
+    for c in curves {
+        let (e, n, p) = (c.curve, c.order, c.curve.p);
         let mut sel = vec![];
         let mut s = 1u64;
         for &q in &c.smooth {
@@ -1169,7 +1381,7 @@ pub fn cm_aux(p: u64, bound: u64, min_size: u64, seed: u64) -> Result<(AuxFound,
         for _ in 0..32 {
             let qpt = e.mul(n / s, e.random_point(&mut rng));
             if primes.iter().all(|&l| e.mul(s / l, qpt).is_some()) {
-                return Ok((
+                return Some((
                     AuxFound {
                         aux: e,
                         order: n,
@@ -1183,9 +1395,16 @@ pub fn cm_aux(p: u64, bound: u64, min_size: u64, seed: u64) -> Result<(AuxFound,
             }
         }
     }
-    Err(format!(
-        "no class-number-1 CM curve over p = {p} has a cyclic {bound}-smooth part ≥ {min_size}"
-    ))
+    None
+}
+
+/// [`cm_aux_from`] over the class-number-1 curves of [`cm_curves`].
+pub fn cm_aux(p: u64, bound: u64, min_size: u64, seed: u64) -> Result<(AuxFound, i64), String> {
+    cm_aux_from(&cm_curves(p, bound, seed)?, min_size, seed).ok_or_else(|| {
+        format!(
+            "no class-number-1 CM curve over p = {p} has a cyclic {bound}-smooth part ≥ {min_size}"
+        )
+    })
 }
 
 #[cfg(test)]
@@ -1331,5 +1550,52 @@ mod tests {
             }
         }
         assert!(done);
+    }
+
+    #[test]
+    fn poly_roots_finds_planted_roots() {
+        let p = 1_000_003;
+        let mut rng = Rng(5);
+        let planted = [3u64, 17, 999_999, 123_456, 77];
+        let mut f: Poly = vec![1];
+        for &r in &planted {
+            f = poly_mul(&f, &vec![p - r, 1], p);
+        }
+        // times an irreducible quadratic x^2 − n (n a non-residue)
+        let n = (2..p).find(|&n| !is_square(n, p)).unwrap();
+        f = poly_mul(&f, &vec![p - n, 0, 1], p);
+        let mut want = planted.to_vec();
+        want.sort_unstable();
+        assert_eq!(poly_roots(&f, p, &mut rng), want);
+        let (q, r) = poly_divrem(&f, &vec![p - 3, 1], p);
+        assert!(poly_is_zero(&r));
+        assert_eq!(poly_deg(&q), 6);
+    }
+
+    #[test]
+    fn hilbert_cm_curves_are_certified_and_extend_class_number_one() {
+        for p in [1_000_003u64, 998_244_353] {
+            let (cs, st) = cm_curves_hilbert(p, 50, 200, 8, 3).unwrap();
+            assert_eq!(st.poly_failed, 0);
+            assert_eq!(st.incomplete_splits, 0, "{st:?}");
+            assert_eq!(st.roots_rejected, 0, "{st:?}");
+            assert!(
+                cs.iter().any(|c| c.h > 1),
+                "no class number > 1 curve at p = {p}"
+            );
+            let mut rng = Rng(8);
+            for c in cs.iter().filter(|c| c.h > 1).take(12) {
+                assert_eq!(c.curve.order(&mut rng), Some(c.order), "p={p} d={}", c.d);
+            }
+            // every class-number-1 order from the dedicated path reappears
+            let one = cm_curves(p, 50, 3).unwrap();
+            for c in &one {
+                assert!(
+                    cs.iter().any(|x| x.d == c.d && x.order == c.order),
+                    "d={} missing",
+                    c.d
+                );
+            }
+        }
     }
 }
