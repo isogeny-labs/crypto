@@ -173,7 +173,10 @@ impl RootfindWorker {
         let h = self.read(24)?;
         let w = |i: usize| u32::from_le_bytes(h[4 * i..4 * i + 4].try_into().unwrap());
         if w(0) != MAGIC_BATCH {
-            return Err(format!("rootfind worker: bad batch reply magic {:#x}", w(0)));
+            return Err(format!(
+                "rootfind worker: bad batch reply magic {:#x}",
+                w(0)
+            ));
         }
         let (status, found, written) = (w(1) as i32, w(2), w(3));
         let kernel_seconds = f64::from_le_bytes(h[16..24].try_into().unwrap());
@@ -329,7 +332,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[("m", "summands; only 2 (the kernel looks candidates up in the base)")]
+        &[(
+            "m",
+            "summands; only 2 (the kernel looks candidates up in the base)",
+        )]
     }
 
     fn prepare(
@@ -343,7 +349,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             return Err(format!("rootfind-subtract-gpu takes m = 2, got {}", self.m));
         }
         self.cpu.prepare(ctx, fb, params, ops)?;
-        let (f, reps) = self.cpu.sweep().ok_or("rootfind-subtract did not prepare")?;
+        let (f, reps) = self
+            .cpu
+            .sweep()
+            .ok_or("rootfind-subtract did not prepare")?;
         // Both signs of every abscissa (or a 2-torsion point) are in the
         // base: what makes the kernel's `j ≥ i` hits contain the CPU's first.
         let mut xs = Vec::with_capacity(reps.len());
@@ -454,7 +463,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
                 let x3 = f.sub(f.sub(f.sqr(lam), xr), rep.x);
                 let y3 = f.sub(f.mul(lam, f.sub(xr, x3)), yr);
                 let summand = if pos % 2 == 0 { rep.plus } else { rep.minus };
-                (summand, PrimePoint::affine(f.from_mont(x3), f.from_mont(y3)))
+                (
+                    summand,
+                    PrimePoint::affine(f.from_mont(x3), f.from_mont(y3)),
+                )
             };
             RootfindSubtractOracle::charge_candidate(ops);
             self.bump("gpu_hits_confirmed_on_cpu", 1);
@@ -516,16 +528,29 @@ mod tests {
         assert_eq!(dc.targets_tried, dg.targets_tried, "{label}: targets");
         assert_eq!(dc.relations_found, dg.relations_found, "{label}: relations");
         assert_eq!(dc.setup.group_ops, dg.setup.group_ops, "{label}: setup ops");
-        assert_eq!(dc.setup.work_native, dg.setup.work_native, "{label}: setup work");
-        assert_eq!(dc.cost.group_ops, dg.cost.group_ops, "{label}: relation ops");
+        assert_eq!(
+            dc.setup.work_native, dg.setup.work_native,
+            "{label}: setup work"
+        );
+        assert_eq!(
+            dc.cost.group_ops, dg.cost.group_ops,
+            "{label}: relation ops"
+        );
         assert_eq!(
             without_gpu(&dc.cost.native),
             without_gpu(&dg.cost.native),
             "{label}: relation native"
         );
-        assert_eq!(dc.cost.work_native, dg.cost.work_native, "{label}: relation work");
+        assert_eq!(
+            dc.cost.work_native, dg.cost.work_native,
+            "{label}: relation work"
+        );
         let (lc, lg) = (&cpu.linear_algebra, &gpu.linear_algebra);
-        assert_eq!((lc.rows, lc.rank, lc.work), (lg.rows, lg.rank, lg.work), "{label}: LA");
+        assert_eq!(
+            (lc.rows, lc.rank, lc.work),
+            (lg.rows, lg.rank, lg.work),
+            "{label}: LA"
+        );
         assert_eq!(cpu.total_gae, gpu.total_gae, "{label}: total gae");
         assert_eq!(cpu.s, gpu.s, "{label}: S");
     }
@@ -576,11 +601,17 @@ mod tests {
                         let mut gpu_o = RootfindSubtractGpuOracle::new(2, &inst);
                         let gpu = run_pipeline(&c, &spec, &base, &mut gpu_o, planted, &calib, None)
                             .unwrap();
-                        let label =
-                            format!("{} {} seed {seed} planted {planted}", inst.name, targets.name());
+                        let label = format!(
+                            "{} {} seed {seed} planted {planted}",
+                            inst.name,
+                            targets.name()
+                        );
                         assert_same(&cpu, &gpu, &label);
                         let gn = &gpu.decomposition.cost.native;
-                        assert!(gn.get("gpu_targets_swept").copied().unwrap_or(0) > 0, "{label}");
+                        assert!(
+                            gn.get("gpu_targets_swept").copied().unwrap_or(0) > 0,
+                            "{label}"
+                        );
                         if targets != Targets::Walk {
                             assert!(
                                 gn["gpu_targets_swept"] > gn["gpu_batches"],
