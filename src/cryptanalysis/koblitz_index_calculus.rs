@@ -5067,6 +5067,31 @@ pub struct PairedScan<'a> {
 
 /// Whether aimed scans pair ± twins (`KIC_SCAN_PAIRED=0` turns it off,
 /// the control arm).  The same rests either way.
+/// The bits of a hash the partitioned fold build's single stream frees for
+/// the orbit: 34–37 and the partition's own top eight
+/// ([`PairSumTable::fold_partitioned`]).
+const PACK_KEEP: u64 = !((0xF << 34) | (0xFF << 56));
+
+/// An orbit below `2^12` in [`PACK_KEEP`]'s free bits.
+#[inline(always)]
+fn pack_orbit(orbit: u32) -> u64 {
+    let orbit = u64::from(orbit);
+    ((orbit & 0xF) << 34) | ((orbit >> 4) << 56)
+}
+
+/// [`pack_orbit`] undone.
+#[inline(always)]
+fn unpack_orbit(v: u64) -> u32 {
+    (((v >> 34) & 0xF) | ((v >> 56) << 4)) as u32
+}
+
+/// Whether the partitioned fold build packs a pair into one stream
+/// (`KIC_FOLD_PACK=0` keeps two, the control).
+fn fold_pack_enabled() -> bool {
+    static PACK: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PACK.get_or_init(|| std::env::var("KIC_FOLD_PACK").map_or(true, |v| v != "0"))
+}
+
 fn scan_paired_enabled() -> bool {
     static PAIRED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *PAIRED.get_or_init(|| std::env::var("KIC_SCAN_PAIRED").map_or(true, |v| v != "0"))
@@ -5942,6 +5967,7 @@ impl PairSumTable {
         tagged: bool,
         harvest: bool,
         layout: FilterLayout,
+        orbits: usize,
         each_row: &(dyn Fn(usize, &mut dyn FnMut(&[u64], u32, usize)) + Sync),
     ) -> (Vec<u32>, Vec<u32>, Vec<u64>, u64, Vec<(u32, u32)>) {
         let rows = row_lens.len();
@@ -5954,6 +5980,20 @@ impl PairSumTable {
         let runs = rayon::current_num_threads().clamp(1, rows.max(1));
         let per_run = rows.div_ceil(runs);
         let harvest = harvest && rows <= 1 << 12 && row_lens.iter().all(|&len| len < 1 << 20);
+        // **One stream a partition, not two.**  No step reads a hash's bits
+        // 34–37 — a bucket or a filter word is at most 26 top bits, a
+        // filter's bits within a word come from bits 0–33 or the top
+        // twelve, and a tagged word's rest is bits 0–15 — and a
+        // partition's own bits are its top eight.  Those twelve bits carry
+        // the pair's orbit, and its stored word is rebuilt from the hash
+        // as it is placed.  The harvest compares whole hashes, so it keeps
+        // two streams (`KIC_FOLD_PACK=0` keeps them too, the control).
+        let pack = tagged
+            && !harvest
+            && part_bits == 8
+            && bucket_bits <= 26
+            && orbits <= 1 << 12
+            && fold_pack_enabled();
         let streams: Vec<(Vec<Vec<u64>>, Vec<Vec<u32>>, Vec<Vec<u32>>)> = (0..runs)
             .into_par_iter()
             .map(|run| {
@@ -5963,13 +6003,24 @@ impl PairSumTable {
                 let mean = row_lens[here.clone()].iter().sum::<usize>() / parts;
                 let room = mean + 6 * (mean as f64).sqrt() as usize + 16;
                 let mut hs: Vec<Vec<u64>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
-                let mut ws: Vec<Vec<u32>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
+                let mut ws: Vec<Vec<u32>> = (0..parts)
+                    .map(|_| Vec::with_capacity(if pack { 0 } else { room }))
+                    .collect();
                 let mut ids: Vec<Vec<u32>> = (0..parts)
                     .map(|_| Vec::with_capacity(if harvest { room } else { 0 }))
                     .collect();
                 for r in here {
                     each_row(r, &mut |keys, orbit, start| {
                         let mut t = build_probe::now();
+                        if pack {
+                            let tag = pack_orbit(orbit);
+                            for &key in keys {
+                                let h = pair_filter_hash(key);
+                                hs[(h >> part_shift) as usize].push((h & PACK_KEEP) | tag);
+                            }
+                            build_probe::lap(build_probe::STREAM_PUSH, &mut t);
+                            return;
+                        }
                         for (at, &key) in keys.iter().enumerate() {
                             let h = pair_filter_hash(key);
                             let p = (h >> part_shift) as usize;
@@ -6056,8 +6107,10 @@ impl PairSumTable {
                     let p = run * parts_per_run + k;
                     let first = p * per_part;
                     let mut at = vec![0usize; per_part];
+                    let top = (p as u64) << part_shift;
                     for (hs, _, _) in &streams {
                         for &h in &hs[p] {
+                            let h = if pack { (h & PACK_KEEP) | top } else { h };
                             at[(h >> bucket_shift) as usize - first] += 1;
                         }
                     }
@@ -6067,6 +6120,25 @@ impl PairSumTable {
                         let n = *slot;
                         *slot = next;
                         next += n;
+                    }
+                    if pack {
+                        for (hs, _, _) in &streams {
+                            let vs = &hs[p];
+                            for (i, &v) in vs.iter().enumerate() {
+                                if let Some(&ahead) = vs.get(i + FILL_AHEAD) {
+                                    prefetch(&present[geom.word((ahead & PACK_KEEP) | top)]);
+                                }
+                                let h = (v & PACK_KEEP) | top;
+                                let w = Self::tagged_rest_from_hash(h, unpack_orbit(v));
+                                let b = (h >> bucket_shift) as usize - first;
+                                // SAFETY: as below.
+                                unsafe { *(rp as *mut u32).add(at[b]) = w };
+                                at[b] += 1;
+                                let (word, bits) = geom.slot(h);
+                                present[word] |= bits;
+                            }
+                        }
+                        continue;
                     }
                     for (hs, ws, ids) in &streams {
                         let (hs, ws, ids) = (&hs[p], &ws[p], &ids[p]);
@@ -6405,7 +6477,15 @@ impl PairSumTable {
                 .iter()
                 .map(|&(orbit, _)| n_points - suffix[orbit as usize] as usize)
                 .collect();
-            Self::fold_partitioned(&row_lens, bucket_bits, tagged, harvest, layout, &each_row)
+            Self::fold_partitioned(
+                &row_lens,
+                bucket_bits,
+                tagged,
+                harvest,
+                layout,
+                fb.signed_orbits.len(),
+                &each_row,
+            )
         } else {
             let counts: Vec<AtomicU32> = (0..buckets + 1).map(|_| AtomicU32::new(0)).collect();
             (0..reps.len()).into_par_iter().for_each(|r| {
