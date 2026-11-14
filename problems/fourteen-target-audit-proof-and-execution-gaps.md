@@ -1931,3 +1931,34 @@ independent native1complete/0prefix/0unresolved,6custom/15formal-config+
 14artifactpins,116files/52objects/16000-byte losslessXZ/fivegate/inspected
 onepagePDF47329bytes. Nine snapshots/fivefailedstates preserved.
 No nativecrypto/spend/upload. [pcc:unverified]
+
+
+### Square-root Vélu: actual irrational-point Frobenius qualification
+
+The [Vélu Frobenius qualification audit](../research/velu_frobenius_audit_20261114/README.md)
+binds original44-backlog node`ALG-RP-VELU-COST` to the actual primary
+Bernstein–DeFeo–Leroux–Smith2020/DOI10.2140/obs.2020.4.39.
+Full22page arXivv1 prose/math/appendix read; publishedselected
+Theorem4.11/Algorithm2/§4.14 printed47–49/PDF10–12 read,11–12visual,
+notfullpublisher20pages/originalVelu1971read. The irrational-generator
+paragraph says FrobP=[λ]P; arbitraryextensionpoints neednot satisfythis
+without cyclicFrobstability. Actual nonsingular E/F5:y²=x³+1,
+K=GaloisField5,2/card25/extensiondegree2 supplies a²2,
+actualfixedA(0,1),antifixedB(1,a) and P=A+B exactorder3,
+nonrational overF5, actualFrobP outsideitsowncyclicsubgroup/nointegerλ.
+Genericactualsubgrouppreservation iff existenceofintegerscalar onP is
+proved. The sameactualcurve has a stableirrationalprime3generatorB
+withFrobB=−B, so nonrationality alone doesnot invalidate the extension.
+The publishedparagraph may intend rationalcyclickernel fromisogenycontext;
+that qualifiedcontext/mainTheorem4.11rational-generator operationcount
+is notrefuted. Arbitraryrational-kernel inputencoding/cost/fullisogeny
+algorithm/canonicalGaloisdescent and ambiguousminimalxdegree/eigenvalue
+order are notverified. Historical44snapshot/canonicalstatuses unchanged,
+no noveltyclaim. Exact local **PCC-20261114-3cb039** PASS at 2026-11-14T22:14:11Z, signedstanding
+unverified; whole38/0/0, full1385-character binding
+`762ed418a4d3a6fe07f37b73f9066c427aa5cf722f3dcfd0c30666e955335fa7`,
+independent native1complete/0prefix/0unresolved,12custom/24formal-config+
+14artifactpins,89files/43objects/13396-byte losslessXZ/fivegate/inspected
+onepagePDF47684bytes. Nine snapshots/sixfailedstates retained, including
+defaultprettyprintertimeout handled by actualcurveAddEquiv/defaultlimits.
+No nativecrypto/spend/upload. [pcc:unverified]
