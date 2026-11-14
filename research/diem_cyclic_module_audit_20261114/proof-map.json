@@ -1,0 +1,127 @@
+{
+  "main": "DiemCyclicModuleAudit.diem_cyclic_module_certificate",
+  "binding": "54ccb5e70c8f6740f7224c4a6c3053312df871bfe63c4dca93c1869795b7029d",
+  "custom_imports": {
+    "CompositeControl": "research/diem_cyclic_module_audit_20261114/lean/CompositeControl.lean",
+    "PrimeControls": "research/diem_cyclic_module_audit_20261114/lean/PrimeControls.lean",
+    "CyclicQuotient": "research/diem_cyclic_module_audit_20261114/lean/CyclicQuotient.lean",
+    "DiemCertificate": "research/diem_cyclic_module_audit_20261114/lean/DiemCertificate.lean"
+  },
+  "claims": [
+    {
+      "declaration": "DiemCyclicModuleAudit.quotient_dimension",
+      "hypotheses": "Actualmonicpolynomialquotient",
+      "conclusion": "Actualfinrankequalsdegree."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.root_power_eq_one_iff",
+      "hypotheses": "ActualAdjoinRoot",
+      "conclusion": "Exactpolynomialdivisibility/rootorderbridge."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.cyclicRepresentation_faithful",
+      "hypotheses": "Actualunit/cyclicsubgroup",
+      "conclusion": "Actualrepresentationinjective."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.orbit_spans",
+      "hypotheses": "Actualunitisquotientroot",
+      "conclusion": "Actualorbit1spanswholequotient."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.group_algebra_cyclic",
+      "hypotheses": "Actualunitisquotientroot",
+      "conclusion": "ActualF2[C21]modulegeneratedby1."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.invariant_eq_bot_or_top",
+      "hypotheses": "Actualirreduciblequotient/actualrootstability",
+      "conclusion": "No properroot-invariantspace, derived."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.u21_order",
+      "hypotheses": "Explicitpolynomialdivision/degreecertificates",
+      "conclusion": "Actualunitexactorder21."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.dimension21",
+      "hypotheses": "Actualpowerbasis",
+      "conclusion": "Actualfinrank6."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.cardinality21_module",
+      "hypotheses": "Actualfinitefieldbase/cardinalitydimensionformula",
+      "conclusion": "Actualcard64."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.groupSubmodule21_proper",
+      "hypotheses": "Actualevaluationkernel/actualrepresentationlatticeisomorphism",
+      "conclusion": "Actualpropernonzerogroupalgebrasubmodule."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.composite_invariant_criterion_false",
+      "hypotheses": "ActualC21action",
+      "conclusion": "Directnegationofzeroorwholeinvariantcriterion."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.cyclotomic_annihilator_repair",
+      "hypotheses": "Oddn/f dividesPhi_n/degreeord_n2",
+      "conclusion": "Irreducibilityderived andallroot-invariantspaceszeroorwhole."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.prime5_no_proper_invariant",
+      "hypotheses": "Actualprime5polynomialquotient",
+      "conclusion": "No properroot-invariantspace."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.prime7_no_proper_invariant",
+      "hypotheses": "Actualprime7polynomialquotient",
+      "conclusion": "No properroot-invariantspace."
+    },
+    {
+      "declaration": "DiemCyclicModuleAudit.composite_excluded_by_repair",
+      "hypotheses": "Actualn21polynomial",
+      "conclusion": "Addedcyclotomicdivisorconditionfails."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 64,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_cyclic_faithful_group_algebra_module": true,
+    "actual_proper_nonzero_group_algebra_submodule": true,
+    "composite_algebraic_inference_refuted": true,
+    "universal_odd_cyclotomic_repair_proved": true,
+    "prime5_prime7_controls_proved": true,
+    "full_geometric_GHS_counterexample_claimed": false,
+    "source_norm_conorm_kernel_refuted": false,
+    "published_version_equivalence_asserted": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

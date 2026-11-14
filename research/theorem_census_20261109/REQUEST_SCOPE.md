@@ -40,6 +40,8 @@ The broader [HPS2014 primary-paper audit](../hps_first_fall_audit_20261114/READM
 
 The broader [Momose–Chao homography audit](../momose_cubic_homography_audit_20261114/README.md) proves the complete sourceLemma1/explicitmatrix with actual finite-field degree/intersection bridges, actualGL2/PGL/unit-scalar uniqueness, and actualF9 quadratic counter-control to deleting the degree hypothesis. The qualified source lemma survives; whole weak-cover classification/isogeny/kernel/density/runtime claims and original14 obligations remain separately open. [pcc:unverified]
 
+The broader [Diem2003 cyclic-module audit](../diem_cyclic_module_audit_20261114/README.md) refutes a composite-degree algebraic inference invoked in Lemma22 using an actual faithful cyclic C21 module of dimension ord_21(2)=6 with a proper nonzero invariant group-algebra submodule. Lean proves a sufficient cyclotomic-annihilator repair and prime5/7 controls. The full GHS geometric realization/Lemma22 and norm-conorm kernel theorem remain open; this is distinct from item5 Diem2011 factor-base bound. [pcc:unverified]
+
 The most substantial requested mathematical gaps are general-prime BK and
 supersingular geometry, canonical pairing/MOV–FR constructions, actual
 Jacobian/Picard counting and subgroup bridges, qualified intersection

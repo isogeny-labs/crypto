@@ -391,6 +391,36 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [Diem cyclic-module audit](../diem_cyclic_module_audit_20261114/README.md)
+recovers the archivedMarch24,2003 original odd-GHS draft,33pages.
+All33OCRpages inclappendix/references read; PDF8/10/13/18/23 visuallychecked.
+Brokenfont extraction/OCRformula limitations and journal32page-version gap
+retained. Section7 generaloddn/Lemma22 invokes prime-onlyLemma17.
+ActualF2[X]/(X6+X4+X+1) hasdimension6/card64, actualrootunitorder21,
+actualcyclicgroupcard21/faithfulrepresentation/orbitspan and actual
+F2[C21]modulecyclicity. Actualevaluation-at1kernel yieldspropernonzero
+invariantspace and actualgroupalgebrasubmodule/directcriterionnegation;
+ord_21(2)=6/odd21/coprime2/composite. Thisrefutes the composite-degree
+algebraicinference, not a constructedGHSfunctionfield/geometricLemma22
+or norm-conormkernelTheorem1. Universaloddnrepair addsactualannihilator
+f dividesPhi_n/degreeord_n2, derivesirreducibility/no properinvariants;
+actualn21failsguard, actualprime5/7quotientcontrols pass/dim4and3.
+No constantdescent/regularfunctionfields/Kummer/intermediatefield/source
+circulantcoordinate/genus/classgroup/Jacobian/runtime bridge, novelty,
+canonicalpromotion or sourceprimeapplicationrefutation. Copyrightprimary
+PDF/OCR/images localonly; separateCoverAttacks2003 remains1–10read.
+Exactlocal **PCC-20261114-cc4013** PASS at 2026-11-14T23:50:33Z, signedstandingunverified;
+whole64/0/0/full1037-character binding
+`54ccb5e70c8f6740f7224c4a6c3053312df871bfe63c4dca93c1869795b7029d`,
+independentnative1complete/0prefix/0unresolved;4custom/7formal-config+
+14artifactpins;81files/40objects/16588-byte losslessXZ/fivegate and
+visuallyinspectedone-page47603byte report. Nine snapshots/sixfailed
+buildstates/scratchfailedexploration/earlyupdate-hookoverlap retained.
+Final09advisoryfree, no limits/options/waivers/nativecrypto/spend/upload.
+Historical44snapshot unchanged; original14 remain separately tracked.
+[pcc:unverified]
+
+
 The [Momose cubic homography audit](../momose_cubic_homography_audit_20261114/README.md)
 recovers actual primary eprint2005/277 and checks complete sourceLemma1
 and its printed explicit matrix. Full21page extracted text reviewed;
