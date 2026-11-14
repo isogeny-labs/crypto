@@ -1,0 +1,146 @@
+LIB "linalg.lib";
+proc require66(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump66(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../65/runs/lattice65-01/first-lattice-polynomial65.sing"));
+require66(nrows(Gpoly65)==32 && ncols(Gpoly65)==32 && nrows(basisV165)==32 && ncols(basisV165)==32,"FROB66_SAVED_POLYNOMIAL_SHAPES");
+matrix inclusion66=lift(module(basisV165),module(Gpoly65));
+require66(basisV165*inclusion66==Gpoly65,"FROB66_COMPLETE_ORDER_INCLUSION");
+module quotientGB66=std(module(inclusion66));int quotientLength66=vdim(quotientGB66);
+require66(quotientLength66==80,"FROB66_COMPLETE_V1_ORDER_QUOTIENT");
+module quotientModule66=kbase(quotientGB66);matrix quotientQ66=matrix(quotientModule66);
+require66(nrows(quotientQ66)==32 && ncols(quotientQ66)==80,"FROB66_ALL_80_QUOTIENT_CLASSES");
+link quotientOut66="ASCII:w quotient-basis66.sing";open(quotientOut66);
+write(quotientOut66,"ring secondPolynomial66=2,(u),dp;short=0;");
+dump66(quotientOut66,"inclusion66",inclusion66);dump66(quotientOut66,"quotientQ66",quotientQ66);close(quotientOut66);
+execute(read("../../../65/runs/lattice65-01/first-lattice-field65.sing"));
+map polyToField66=firstLatticePolynomial65,u;
+matrix inclusionField66=polyToField66(inclusion66);
+matrix Qfield66=polyToField66(quotientQ66);
+require66(V1coordinates65*V1inverse65==unitmat(32) && V1inverse65*V1coordinates65==unitmat(32),"FROB66_SAVED_V1_TWO_SIDED_INVERSE");
+require66(V1inverse65==inclusionField66,"FROB66_SAVED_POLYNOMIAL_INCLUSION_MATCH");
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots66[32][1];int p66;int i66;int j66;int k66;
+for(p66=1;p66<=528;p66++){
+ if(parents50[p66,1]==parents50[p66,2]){j66=parents50[p66,1];require66(j66>=1 && j66<=32 && squareSlots66[j66,1]==0,"FROB66_UNIQUE_SQUARE_SLOTS");squareSlots66[j66,1]=p66;}
+}
+matrix squareSource66[32][32];
+for(j66=1;j66<=32;j66++){
+ require66(squareSlots66[j66,1]>0,"FROB66_ALL_SQUARE_SLOTS");
+ for(i66=1;i66<=32;i66++){squareSource66[i66,j66]=table50[i66,squareSlots66[j66,1]];}
+}
+setring firstLatticeField65;
+map tableToField66=tablePidCertificate50,u;
+matrix square66=tableToField66(squareSource66);
+matrix sourceColumns66=V1coordinates65*Qfield66;
+matrix sourceSquares66[32][80];
+for(i66=1;i66<=32;i66++){for(j66=1;j66<=80;j66++){sourceSquares66[i66,j66]=sourceColumns66[i66,j66]^2;}}
+matrix squareImage66=V1inverse65*square66*sourceSquares66;
+string rationalCode66="matrix numeratorRows66[32][80];matrix denominatorRows66[32][80];";
+number coefficient66;int nonzero66=0;
+for(i66=1;i66<=32;i66++){for(j66=1;j66<=80;j66++){
+ require66(diff(squareImage66[i66,j66],q)==0,"FROB66_SCALAR_RATIONAL_COORDINATE");
+ if(squareImage66[i66,j66]!=0){
+  coefficient66=leadcoef(squareImage66[i66,j66]);
+  require66(numerator(coefficient66)/denominator(coefficient66)==coefficient66,"FROB66_RATIONAL_NUMERATOR_DENOMINATOR");
+  rationalCode66=rationalCode66+"numeratorRows66["+string(i66)+","+string(j66)+"]="+string(numerator(coefficient66))+";denominatorRows66["+string(i66)+","+string(j66)+"]="+string(denominator(coefficient66))+";";
+  nonzero66++;
+ }
+}}
+ring binaryRing66=2,(u),dp;short=0;execute(rationalCode66);
+matrix remainderRows66[32][80];list denominators66;intvec offsets66;
+poly common66;poly den66;poly exactQuotient66;poly numerator66;poly remainder66;ideal principal66;
+int rows66=0;int degree66;
+for(i66=1;i66<=32;i66++){
+ common66=1;
+ for(j66=1;j66<=80;j66++){
+  if(numeratorRows66[i66,j66]!=0){den66=denominatorRows66[i66,j66];require66(den66!=0,"FROB66_NONZERO_DENOMINATOR");common66=(common66*den66)/gcd(common66,den66);}
+ }
+ require66(common66!=0,"FROB66_NONZERO_COMMON_DENOMINATOR");
+ denominators66[i66]=common66;offsets66[i66]=rows66;degree66=deg(common66);
+ if(common66!=1){principal66=std(ideal(common66));}
+ for(j66=1;j66<=80;j66++){
+  remainder66=0;
+  if(numeratorRows66[i66,j66]!=0){
+   den66=denominatorRows66[i66,j66];exactQuotient66=common66/den66;
+   require66(exactQuotient66*den66==common66,"FROB66_EXACT_ROW_CLEARING");
+   numerator66=numeratorRows66[i66,j66]*exactQuotient66;
+   if(common66!=1){remainder66=reduce(numerator66,principal66);}
+  }
+  require66(remainder66==0 || deg(remainder66)<degree66,"FROB66_COMPLETE_REMAINDER_BOUND");
+  remainderRows66[i66,j66]=remainder66;
+ }
+ rows66=rows66+degree66;
+}
+matrix binaryMap66[rows66+1][80];matrix terms66;poly rebuilt66;int exponent66;
+for(i66=1;i66<=32;i66++){for(j66=1;j66<=80;j66++){
+ remainder66=remainderRows66[i66,j66];rebuilt66=0;
+ if(remainder66!=0){terms66=coef(remainder66,u);for(k66=1;k66<=ncols(terms66);k66++){
+  exponent66=deg(terms66[1,k66]);
+  require66(terms66[1,k66]==u^exponent66 && terms66[2,k66]==1,"FROB66_BINARY_MONOMIAL_COEFFICIENTS");
+  binaryMap66[offsets66[i66]+exponent66+1,j66]=1;
+  rebuilt66=rebuilt66+terms66[1,k66]*terms66[2,k66];
+ }}
+ require66(rebuilt66==remainder66,"FROB66_EVERY_REMAINDER_RECONSTRUCTION");
+}}
+int rank66=mat_rk(binaryMap66);int kernelDimension66=80-rank66;
+require66(rank66>=0 && kernelDimension66>=0,"FROB66_BINARY_RANK_BOUND");
+link kernelOut66="ASCII:w square-kernel66.sing";open(kernelOut66);
+write(kernelOut66,"ring secondBinary66=2,(u),dp;short=0;");
+dump66(kernelOut66,"numeratorRows66",numeratorRows66);dump66(kernelOut66,"denominatorRows66",denominatorRows66);
+dump66(kernelOut66,"remainderRows66",remainderRows66);dump66(kernelOut66,"binaryMap66",binaryMap66);
+write(kernelOut66,"int rank66="+string(rank66)+";int kernelDimension66="+string(kernelDimension66)+";");
+matrix kernelBasis66=matrix(syz(module(binaryMap66)));
+require66(nrows(kernelBasis66)==80 && ncols(kernelBasis66)==kernelDimension66 && mat_rk(kernelBasis66)==kernelDimension66,"FROB66_COMPLETE_KERNEL_DIMENSION");
+require66(binaryMap66*kernelBasis66==matrix(0,rows66+1,kernelDimension66),"FROB66_ALL_KERNEL_PRODUCTS");
+for(i66=1;i66<=80;i66++){for(j66=1;j66<=kernelDimension66;j66++){require66(kernelBasis66[i66,j66]==0 || kernelBasis66[i66,j66]==1,"FROB66_KERNEL_OVER_F2");}}
+int changedKernel66=0;
+if(rank66>0 && kernelDimension66>0){
+ int changeColumn66=0;
+ for(i66=1;i66<=rows66+1;i66++){for(j66=1;j66<=80;j66++){if(changeColumn66==0 && binaryMap66[i66,j66]!=0){changeColumn66=j66;}}}
+ require66(changeColumn66>0,"FROB66_NONZERO_CHANGED_KERNEL_COLUMN");
+ matrix badKernel66=kernelBasis66;badKernel66[changeColumn66,1]=badKernel66[changeColumn66,1]+1;
+ require66(binaryMap66*badKernel66!=matrix(0,rows66+1,kernelDimension66),"FROB66_CHANGED_KERNEL_REJECTED");changedKernel66=1;
+}
+dump66(kernelOut66,"kernelBasis66",kernelBasis66);close(kernelOut66);
+map polyToBinary66=firstLatticePolynomial65,u;
+matrix Jbinary66=polyToBinary66(inclusion66);matrix Qbinary66=polyToBinary66(quotientQ66);
+matrix survivorPoly66=Qbinary66*kernelBasis66;
+matrix combined66[32][32+kernelDimension66];
+for(i66=1;i66<=32;i66++){
+ for(j66=1;j66<=32;j66++){combined66[i66,j66]=Jbinary66[i66,j66];}
+ for(j66=1;j66<=kernelDimension66;j66++){combined66[i66,32+j66]=survivorPoly66[i66,j66];}
+}
+module moduleV266=std(module(combined66));int quotientLength266=vdim(moduleV266);
+require66(quotientLength266==rank66,"FROB66_KERNEL_LATTICE_LENGTH_IDENTITY");
+matrix basisV266=matrix(moduleV266);
+require66(nrows(basisV266)==32 && ncols(basisV266)==32,"FROB66_FULL_SECOND_PID_BASIS");
+require66(mat_rk(matrix(reduce(module(combined66),moduleV266)))==0 && mat_rk(matrix(reduce(module(basisV266),std(module(combined66)))))==0,"FROB66_BOTH_SECOND_MODULE_INCLUSIONS");
+link polynomialOut66="ASCII:w second-lattice-polynomial66.sing";open(polynomialOut66);
+write(polynomialOut66,"ring secondLatticePolynomial66=2,(u),dp;short=0;");
+dump66(polynomialOut66,"inclusion66",Jbinary66);dump66(polynomialOut66,"quotientQ66",Qbinary66);
+dump66(polynomialOut66,"kernelBasis66",kernelBasis66);dump66(polynomialOut66,"basisV266",basisV266);close(polynomialOut66);
+setring firstLatticeField65;
+map binaryToField66=binaryRing66,u;
+matrix V2basisField66=binaryToField66(basisV266);
+matrix V2coordinates66=V1coordinates65*V2basisField66;
+matrix V2inverse66=lift(module(V2coordinates66),module(unitmat(32)));
+require66(V2coordinates66*V2inverse66==unitmat(32) && V2inverse66*V2coordinates66==unitmat(32),"FROB66_BOTH_SECOND_BASIS_INVERSES");
+for(i66=1;i66<=32;i66++){for(j66=1;j66<=32;j66++){
+ if(V2inverse66[i66,j66]!=0){coefficient66=leadcoef(V2inverse66[i66,j66]);require66(denominator(coefficient66)==1,"FROB66_ORDER_INSIDE_SECOND_LATTICE");}
+}}
+matrix V2squared66[32][32];for(i66=1;i66<=32;i66++){for(j66=1;j66<=32;j66++){V2squared66[i66,j66]=V2coordinates66[i66,j66]^2;}}
+matrix squareInV166=V1inverse65*square66*V2squared66;
+for(i66=1;i66<=32;i66++){for(j66=1;j66<=32;j66++){
+ if(squareInV166[i66,j66]!=0){coefficient66=leadcoef(squareInV166[i66,j66]);require66(denominator(coefficient66)==1,"FROB66_EVERY_V2_BASIS_SQUARE_IN_V1");}
+}}
+matrix changedInverse66=V2inverse66;changedInverse66[1,1]=changedInverse66[1,1]+1;
+require66(V2coordinates66*changedInverse66!=unitmat(32),"FROB66_CHANGED_INVERSE_REJECTED");
+link fieldOut66="ASCII:w second-lattice-field66.sing";open(fieldOut66);
+write(fieldOut66,"ring secondLatticeField66=(2,u),(q),dp;short=0;");
+dump66(fieldOut66,"V2coordinates66",V2coordinates66);dump66(fieldOut66,"V2inverse66",V2inverse66);
+dump66(fieldOut66,"squareInV166",squareInV166);close(fieldOut66);
+print("FROB66_RESULT order_rank=32 old_quotient=80 square_columns=80 binary_rows="+string(rows66)+" square_rank="+string(rank66)+" survivor_dimension="+string(kernelDimension66)+" new_quotient_length="+string(quotientLength266)+" rational_nonzero_entries="+string(nonzero66)+" second_basis_columns=32 changed_kernel_rejected="+string(changedKernel66)+" changed_inverse_rejected=1");
+print("SECOND_FROBENIUS66_ALL_CHECKS_PASS");quit;

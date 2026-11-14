@@ -1,0 +1,26 @@
+list allDenQuot33;int denRow33;int denCol33;int denOmit33;int denNext33;ideal denRemaining33;ideal denGenerators33;matrix denLift33;matrix denCheck33;
+proc collectQuotDen33(poly f,list ds){
+ int i;int j;int found;number d;
+ for(i=1;i<=size(f);i++){d=denominator(leadcoef(f[i]));if(d!=1){found=0;for(j=1;j<=size(ds);j++){if(ds[j]==d){found=1;}}if(found==0){ds[size(ds)+1]=d;}}}return(ds);
+}
+for(denRow33=1;denRow33<=4;denRow33++){allDenQuot33=collectQuotDen33(rationalSource33[denRow33],allDenQuot33);}
+for(denRow33=1;denRow33<=4;denRow33++){for(denCol33=1;denCol33<=3;denCol33++){allDenQuot33=collectQuotDen33(rationalJacobian33[denRow33,denCol33],allDenQuot33);}}
+allDenQuot33=collectQuotDen33(rationalH33,allDenQuot33);
+for(denOmit33=1;denOmit33<=3;denOmit33++){
+ execute("denGenerators33=quotientGenerators"+string(denOmit33)+"33;denLift33=quotientLift"+string(denOmit33)+"33;");
+ denRemaining33=0;denNext33=0;
+ for(denRow33=1;denRow33<=4;denRow33++){if(denRow33!=denOmit33){denNext33++;denRemaining33[denNext33]=rationalSource33[denRow33];}}
+ if(nrows(denLift33)!=3 || ncols(denLift33)!=ncols(matrix(denGenerators33))){ERROR("PREFIX34_LIFT_DIMENSIONS");}
+ matrix badLift34=denLift33;badLift34[1,1]=badLift34[1,1]+1;
+ matrix badCheck34=matrix(denRemaining33)*badLift34;
+ if(badCheck34==matrix(rationalSource33[denOmit33]*denGenerators33)){ERROR("PREFIX34_CORRUPTION_ACCEPTED");}
+ denCheck33=matrix(denRemaining33)*denLift33;
+ if(denCheck33!=matrix(rationalSource33[denOmit33]*denGenerators33)){ERROR("QUOTIENT33_RELOADED_LIFT_IDENTITY");}
+ for(denCol33=1;denCol33<=ncols(matrix(denGenerators33));denCol33++){
+  allDenQuot33=collectQuotDen33(denGenerators33[denCol33],allDenQuot33);
+  for(denRow33=1;denRow33<=3;denRow33++){allDenQuot33=collectQuotDen33(denLift33[denRow33,denCol33],allDenQuot33);}
+ }
+}
+short=0;link denOut33="ASCII:w quotient-denominators.sing";open(denOut33);write(denOut33,"list quotientDenominators33;");
+for(denRow33=1;denRow33<=size(allDenQuot33);denRow33++){write(denOut33,"quotientDenominators33["+string(denRow33)+"]="+string(allDenQuot33[denRow33])+";");}
+close(denOut33);print("PREFIX34_DENOMINATORS count="+string(size(allDenQuot33))+" lift_identities=all");print("PREFIX34_DENOMINATORS_ALL_CHECKS_PASS");quit;

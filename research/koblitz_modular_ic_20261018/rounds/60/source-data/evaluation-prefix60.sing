@@ -1,0 +1,54 @@
+LIB "linalg.lib";
+proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump58(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require58(A[i,j]==1,"SPACE58_EXPORTED_BINARY_MATRIX_ENTRY");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../57/source-data/rr-literals57.sing"));
+list terms58;list oneTerms58;poly remaining58;int ti58;intvec exp58;
+for(ti58=1;ti58<=68;ti58++){
+ remaining58=original57[ti58];oneTerms58=list();
+ while(remaining58!=0){exp58=leadexp(remaining58);oneTerms58=insert(oneTerms58,exp58,size(oneTerms58));remaining58=remaining58-lead(remaining58);}
+ terms58[ti58]=oneTerms58;
+}
+ring spaceJets58=(2,a),(w),dp;minpoly=a^2+a+1;short=0;
+execute(read("../../../58/source-data/laurent-helper58.sing"));
+short=1;execute(read("../../../57/source-data/r27-charts.sing"));execute(read("../../../57/source-data/r27-sigma.sing"));short=0;
+execute(read("../../../58/source-data/pairs58.sing"));
+proc cache58(list coordinates,list uu,list vv){
+ list np;list ll;list vp;list up;list ans;int i;int j;int k;int m;int ix;
+ np[1]=lc(1);ll[1]=lc(1);vp[1]=lc(1);vp[2]=vv;up[1]=lc(1);
+ for(i=1;i<=3;i++){np[i+1]=lm(np[i],coordinates[1]);ll[i+1]=lm(ll[i],coordinates[2]);}
+ for(i=1;i<=48;i++){up[i+1]=lm(up[i],uu);}
+ list cacheDen58=lm(lpw(uu,16),lpw(la(uu,lc(1)),16));list invden=li(cacheDen58);list common;
+ for(k=0;k<=1;k++){for(j=0;j<=3;j++){for(i=0;i<=3;i++){
+  common=lm(lm(lm(np[i+1],ll[j+1]),vp[k+1]),invden);
+  for(m=0;m<=48;m++){ix=1+m+49*(i+4*j+16*k);ans[ix]=lm(common,up[m+1]);}
+ }}}
+ return(ans);
+}
+proc eval58(list termList,list cache){
+ list ans=lc(0);int i;int ix;intvec ex;
+ for(i=1;i<=size(termList);i++){ex=termList[i];ix=1+ex[4]+49*(ex[1]+4*ex[2]+16*ex[3]);ans=la(ans,cache[ix]);}
+ return(ans);
+}
+proc scale58(list x,number q){return(lnrm(q*x[1],x[2],x[3]));}
+proc conjugate58(list x){
+ poly pp=x[1];poly ans=0;int i;
+ for(i=1;i<=size(pp);i++){ans=ans+leadcoef(pp[i])^2*w^deg(pp[i]);}
+ return(lnrm(ans,x[2],x[3]));
+}
+proc coefficient58(list x,int exponent){
+ if(x[3]<=exponent){ERROR("SPACE58_COEFFICIENT_PRECISION_INSUFFICIENT");return(number(0));}
+ if(x[1]==0 || exponent<x[2]){return(number(0));}
+ poly pp=x[1];int i;
+ for(i=1;i<=size(pp);i++){if(deg(pp[i])+x[2]==exponent){return(leadcoef(pp[i]));}}
+ return(number(0));
+}
+proc real58(number q){number im=q^2+q;number re=q+a*im;require58((re==0 || re==1) && (im==0 || im==1),"SPACE58_REAL_IMAG_BINARY");return(re);}
+proc imag58(number q){number im=q^2+q;require58(im==0 || im==1,"SPACE58_IMAG_BINARY");return(im);}
+list sigmaSupports58;list support58;poly column58;int i58;int j58;int k58;
+matrix sigmaOld58[68][68];
+for(j58=1;j58<=68;j58++){
+ column58=sigmaColumns[j58];support58=list();
+ for(k58=1;k58<=size(column58);k58++){i58=deg(column58[k58])+1;support58=insert(support58,i58,size(support58));sigmaOld58[i58,j58]=1;}
+ sigmaSupports58[j58]=support58;
+}
+require58(sigmaOld58*sigmaOld58==unitmat(68),"SPACE58_OLD_SIGMA_SQUARE");

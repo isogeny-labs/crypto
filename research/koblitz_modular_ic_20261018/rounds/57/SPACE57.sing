@@ -1,0 +1,118 @@
+LIB "linalg.lib";
+proc require57(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump57(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../source-data/rr-literals57.sing"));
+list terms57;list oneTerms57;poly remaining57;int ti57;int tj57;intvec exp57;
+for(ti57=1;ti57<=68;ti57++){
+ remaining57=original57[ti57];oneTerms57=list();
+ while(remaining57!=0){exp57=leadexp(remaining57);oneTerms57=insert(oneTerms57,exp57,size(oneTerms57));remaining57=remaining57-lead(remaining57);}
+ terms57[ti57]=oneTerms57;
+}
+ring spaceJets57=2,(w),dp;short=0;
+execute(read("../../source-data/laurent-helper57.sing"));
+short=1;execute(read("../../source-data/r27-charts.sing"));execute(read("../../source-data/r27-sigma.sing"));short=0;
+proc cache57(list coordinates,list uu,list vv){
+ list np;list ll;list vp;list up;list ans;int i;int j;int k;int m;int ix;
+ np[1]=lc(1);ll[1]=lc(1);vp[1]=lc(1);vp[2]=vv;up[1]=lc(1);
+ for(i=1;i<=3;i++){np[i+1]=lm(np[i],coordinates[1]);ll[i+1]=lm(ll[i],coordinates[2]);}
+ for(i=1;i<=48;i++){up[i+1]=lm(up[i],uu);}
+ list cacheDen57=lm(lpw(uu,16),lpw(la(uu,lc(1)),16));list invden=li(cacheDen57);list common;
+ for(k=0;k<=1;k++){for(j=0;j<=3;j++){for(i=0;i<=3;i++){
+  common=lm(lm(lm(np[i+1],ll[j+1]),vp[k+1]),invden);
+  for(m=0;m<=48;m++){ix=1+m+49*(i+4*j+16*k);ans[ix]=lm(common,up[m+1]);}
+ }}}
+ return(ans);
+}
+proc eval57(list termList,list cache){
+ list ans=lc(0);int i;int ix;intvec ex;
+ for(i=1;i<=size(termList);i++){ex=termList[i];ix=1+ex[4]+49*(ex[1]+4*ex[2]+16*ex[3]);ans=la(ans,cache[ix]);}
+ return(ans);
+}
+// Coefficients are extracted by explicit support, avoiding multivariate coef semantics.
+proc coeff57(list value,int exponent){
+ if(value[3]<=exponent){ERROR("SPACE57_COEFFICIENT_PRECISION_INSUFFICIENT");return(poly(0));}
+ if(value[1]==0 || exponent<value[2]){return(poly(0));}
+ poly pp=value[1];int i;
+ for(i=1;i<=size(pp);i++){if(deg(pp[i])+value[2]==exponent){return(poly(1));}}
+ return(poly(0));
+}
+matrix ordinary57[48][68];matrix jets57[129][68];matrix controlJets57[129][4];
+int ch57;int cusp57;int ram57;int j57;int k57;int row57;int offset57;int width57;int order57;int bound57;
+int selectedOne57=0;int selectedSeven57=0;int evaluations57=0;
+list chart57;list coordinates57;list uu57;list vv57;list cached57;list val57;list sigmaCoordinates57;list sigmaCache57;list sigmaVal57;list controls57;
+for(ch57=1;ch57<=20;ch57++){
+ chart57=charts[ch57];coordinates57=chart57[1];uu57=chart57[2];vv57=chart57[3];ram57=chart57[4];cusp57=chart57[5];
+ cached57=cache57(coordinates57,uu57,vv57);bound57=0;
+ if(cusp57==1){bound57=7*ram57;}if(cusp57==4){bound57=ram57;}
+ int selected57=0;
+ if(cusp57==1 && coordinates57[2][2]==-4*ram57){selected57=1;}
+ if(selected57){
+  require57(ram57==1 || ram57==7,"SPACE57_A_RAMIFICATION");
+  if(ram57==1){selectedOne57++;offset57=0;width57=3;}else{selectedSeven57++;offset57=6;width57=21;}
+  sigmaCoordinates57=coordinates57;
+  sigmaCoordinates57[1]=la(coordinates57[1],coordinates57[3]);
+  sigmaCoordinates57[2]=la(coordinates57[2],la(lc(1),coordinates57[4]));
+  sigmaCache57=cache57(sigmaCoordinates57,uu57,vv57);
+ }
+ for(j57=1;j57<=68;j57++){
+  val57=eval57(terms57[j57],cached57);evaluations57++;
+  require57(val57[3]>0 && (val57[1]==0 || val57[2]>=-bound57),"SPACE57_ALL_AMBIENT_POLE_BOUNDS");
+  if(ch57==1){
+   require57(val57[3]>=129 && (val57[1]==0 || val57[2]>=0),"SPACE57_INJECTIVE_JET_PRECISION");
+   for(k57=0;k57<=128;k57++){jets57[k57+1,j57]=coeff57(val57,k57);}
+  }
+  if(selected57){
+   sigmaVal57=eval57(terms57[j57],sigmaCache57);
+   require57(sigmaVal57[3]>0 && (sigmaVal57[1]==0 || sigmaVal57[2]>=-7*ram57),"SPACE57_SIGMA_AMBIENT_BOUND");
+   for(k57=0;k57<width57;k57++){
+    order57=-7*ram57+k57;ordinary57[offset57+k57+1,j57]=coeff57(val57,order57);
+    ordinary57[offset57+width57+k57+1,j57]=coeff57(sigmaVal57,order57);
+   }
+  }
+ }
+ if(ch57==1){
+  controls57=list(lc(1),la(lc(1),coordinates57[4]),coordinates57[2],coordinates57[3]);
+  for(j57=1;j57<=4;j57++){val57=controls57[j57];require57(val57[3]>=129,"SPACE57_CONTROLS_PRECISION");for(k57=0;k57<=128;k57++){controlJets57[k57+1,j57]=coeff57(val57,k57);}}
+ }
+ print("SPACE57_CHART "+string(ch57)+" cusp="+string(cusp57)+" e="+string(ram57)+" evaluated=68");
+}
+require57(selectedOne57==1 && selectedSeven57==1 && evaluations57==1360,"SPACE57_COMPLETE_CHART_AND_PAIR_COUNTS");
+matrix rowChange57[48][48];matrix rowInverse57[48][48];
+for(j57=1;j57<=2;j57++){
+ if(j57==1){offset57=0;width57=3;}else{offset57=6;width57=21;}
+ for(k57=1;k57<=width57;k57++){
+  rowChange57[offset57+k57,offset57+width57+k57]=1;
+  rowChange57[offset57+width57+k57,offset57+k57]=1;rowChange57[offset57+width57+k57,offset57+width57+k57]=1;
+  rowInverse57[offset57+k57,offset57+k57]=1;rowInverse57[offset57+k57,offset57+width57+k57]=1;
+  rowInverse57[offset57+width57+k57,offset57+k57]=1;
+ }
+}
+require57(rowChange57*rowInverse57==unitmat(48) && rowInverse57*rowChange57==unitmat(48),"SPACE57_EXACT_DESCENT_ROW_ISOMORPHISM");
+matrix constraints57=rowChange57*ordinary57;
+require57(mat_rk(jets57)==68,"SPACE57_AMBIENT_INDEPENDENCE");
+matrix controlColumns57=lift(module(jets57),module(controlJets57));
+require57(jets57*controlColumns57==controlJets57,"SPACE57_FOUR_CONTROL_RECONSTRUCTIONS");
+matrix controlImages57=constraints57*controlColumns57;
+for(j57=1;j57<=3;j57++){for(k57=1;k57<=48;k57++){require57(controlImages57[k57,j57]==0,"SPACE57_1_A_LAMBDA_POSITIVE_CONTROLS");}}
+int negativeCount57=0;for(k57=1;k57<=48;k57++){if(controlImages57[k57,4]!=0){negativeCount57++;}}
+require57(negativeCount57>0,"SPACE57_B_OUTSIDE_SMALLER_SPACE");
+matrix kernel57=matrix(syz(module(constraints57)));int dimension57=ncols(kernel57);int rank57=mat_rk(constraints57);
+require57(dimension57==68-rank57 && mat_rk(kernel57)==dimension57,"SPACE57_KERNEL_DIMENSION");
+for(j57=1;j57<=68;j57++){for(k57=1;k57<=dimension57;k57++){require57(deg(kernel57[j57,k57])<=0,"SPACE57_CONSTANT_BINARY_KERNEL");}}
+matrix zero57[48][dimension57];require57(constraints57*kernel57==zero57,"SPACE57_KERNEL_PRODUCT");
+matrix recovery57=transpose(lift(module(transpose(kernel57)),module(unitmat(dimension57))));
+require57(recovery57*kernel57==unitmat(dimension57),"SPACE57_KERNEL_LEFT_INVERSE");
+matrix residual57=unitmat(68)+kernel57*recovery57;
+matrix homotopy57=transpose(lift(module(transpose(constraints57)),module(transpose(residual57))));
+require57(kernel57*recovery57+homotopy57*constraints57==unitmat(68),"SPACE57_COMPLETE_KERNEL_SPLITTING");
+matrix sigma57[68][68];poly column57;
+for(j57=1;j57<=68;j57++){column57=sigmaColumns[j57];for(k57=1;k57<=size(column57);k57++){sigma57[deg(column57[k57])+1,j57]=1;}}
+require57(sigma57*sigma57==unitmat(68) && jets57*sigma57!=jets57,"SPACE57_ACTUAL_AMBIENT_INVOLUTION");
+matrix sigmaRestricted57=recovery57*sigma57*kernel57;
+require57(sigma57*kernel57==kernel57*sigmaRestricted57 && sigmaRestricted57*sigmaRestricted57==unitmat(dimension57),"SPACE57_SMALL_SPACE_SIGMA_STABILITY");
+matrix smallControls57=recovery57*controlColumns57;
+for(j57=1;j57<=3;j57++){for(k57=1;k57<=68;k57++){poly actual57=0;for(ti57=1;ti57<=dimension57;ti57++){actual57=actual57+kernel57[k57,ti57]*smallControls57[ti57,j57];}require57(actual57==controlColumns57[k57,j57],"SPACE57_POSITIVE_CONTROL_EXACT_KERNEL_MEMBERSHIP");}}
+link output57="ASCII:w complete-space57.sing";open(output57);write(output57,"ring completeSpace57=2,(w),dp;short=0;");
+dump57(output57,"ordinary57",ordinary57);dump57(output57,"rowChange57",rowChange57);dump57(output57,"rowInverse57",rowInverse57);dump57(output57,"constraints57",constraints57);dump57(output57,"kernel57",kernel57);dump57(output57,"recovery57",recovery57);dump57(output57,"homotopy57",homotopy57);dump57(output57,"jets57",jets57);dump57(output57,"controlJets57",controlJets57);dump57(output57,"controlColumns57",controlColumns57);dump57(output57,"sigma57",sigma57);dump57(output57,"sigmaRestricted57",sigmaRestricted57);dump57(output57,"smallControls57",smallControls57);close(output57);
+print("SPACE57_RESULT ambient=68 local_conditions=48 constraint_rank="+string(rank57)+" kernel_dimension="+string(dimension57)+" cusp_evaluations=1360 paired_charts=4 descent_row_isomorphism=1 complete_splitting=1 control_b_nonzero_rows="+string(negativeCount57)+" sigma_nilpotent_rank="+string(mat_rk(sigmaRestricted57+unitmat(dimension57))));
+print("SPACE57_ALL_CHECKS_PASS");quit;

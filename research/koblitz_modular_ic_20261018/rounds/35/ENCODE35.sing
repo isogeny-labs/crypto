@@ -1,0 +1,5 @@
+// Encode binary polynomials as ring-independent exponent metadata, retaining zero slots.
+proc encode35(poly f){list terms;int k;for(k=1;k<=size(f);k++){if(leadcoef(f[k])!=1){ERROR("ENC35_NONBINARY");}terms[k]=leadexp(f[k]);}return(terms);}
+list sourceEncoded35;int encIndex35;
+for(encIndex35=1;encIndex35<=5;encIndex35++){sourceEncoded35[encIndex35]=encode35(original[encIndex35]);sourceEncoded35[5+encIndex35]=encode35(diff(original[encIndex35],l));sourceEncoded35[10+encIndex35]=encode35(diff(original[encIndex35],n));}
+for(encIndex35=1;encIndex35<=8;encIndex35++){sourceEncoded35[15+encIndex35]=encode35(registered[encIndex35]);}

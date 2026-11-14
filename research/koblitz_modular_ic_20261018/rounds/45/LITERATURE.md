@@ -1,0 +1,4 @@
+# Prior evidence checked before implementation
+R13 REPORT/PROOF_MAP:500/580 ordinary supports already exhausted, zero by C5 fiber averaging under written moduli/pairing bridge. Do not repeat or call them unfinished. R39 COLLECT39: complete actual five-equation/eight-unit F128 collector,420 points/60 degree7 closed points/6 deck orbits. R41: independent orbit has both nonzero residual characters. R44 REPORT and Lean source: sign fixation kills mixed projection, orientation trace screen and limits.
+
+Primary sources rechecked2026-10-30: Stacks https://stacks.math.columbia.edu/tag/03PC finite separable field products and etale criteria; Sutherland/vanHoeij https://math.mit.edu/~drew/X1_optcurves.html independent modular models. Neither certifies this source's global proper model or its map to the selected Koblitz factor. Finite arithmetic and conditional deck cancellation only; no novelty or speed claim.

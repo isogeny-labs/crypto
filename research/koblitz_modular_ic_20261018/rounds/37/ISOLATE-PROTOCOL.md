@@ -1,0 +1,23 @@
+# ISOLATE37 prospective exact finite cofactor test
+
+Frozen afterCOFACTOR37,Nminus3721andmod11residue3;beforenewclassdata. Same
+nativeRust4GiBvirtual/1200s,manualauthorization,no cloud/agents/claim/capchange.
+ReadR15/16modularEuler/signobstruction,R27MixedPrymproperbridge andR37NEXT.
+Exactcomputation,no statistical/timing/ICclaim. Nativeverify3721=61² and
+121*3721=450241 with11unitcofactor. DoNOTprescribeclassannihilationoutcome.
+
+ComputeF1=[3721]E1 bybinaryscalar chain andF2=[61]([61]E2) onindependent
+SIGNED37representative. Requireexactclass equalityF1=F2. EvaluateF1,61E2,
+11F1,121F1 againstzero. Retainfullquotient/kernel/allgenerator membership
+certificates withtwoarithmeticpaths andeverymultiplespace. The121F1test
+checks thepredictedfullK(F2)order450241 underexistingpropermodular/diamond
+twistbridge,includingtheCMsumorder121 andcomplementorder3721. Ifitfails,
+recordfalse andleavecofactorinterpretationunverified;donotdiscardtheoutcome.
+
+IfFnonzeroand11Fzero,itisa sourceorder11class. If11Fnonzeroand121Fzero,
+Fhasorder121,indicating11-primarygluing/saturation behavior;11Fisthenorder11.
+IfFzero,testedorbitdoesnotgiveanonzero11-primaryCMsumclassunderthatbridge;
+othercollectorsremainopen. 61Ezerowouldgiveexactorder61forpriornonzeroE.
+AnyCMsumclassstillneeds theintendedCMsignmap/kerneltest. Nonzerotorsiondoes
+notproveanexplicitF2factortransfer,polarizedembedding,saturationorICrelations.
+Acceptexit0/exactmarker/allinternalchecks;retainfailure/capandallbooleanoutcomes.

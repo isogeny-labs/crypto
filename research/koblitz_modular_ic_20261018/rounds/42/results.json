@@ -1,0 +1,296 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 42,
+  "runs": [
+    {
+      "attempt": "residual42-01",
+      "kind": "native",
+      "status": "accepted",
+      "build_exit": 0,
+      "native_exit": 0,
+      "source_revision": "94e0fe828987b92fdbd301807e907bfaca2827bb",
+      "observations": [
+        "RESIDUAL42_RESULT fixed_cases=6 twist_modes=12 all_CM_and_primitive_character_embeddings=checked arbitrary_precision=true all_modular_products_independently_checked=true unit_certificates=22 actual_larger_n_geometric_transfer_evaluated=false IC_relation_rank=unknown"
+      ]
+    },
+    {
+      "attempt": "global42-01",
+      "kind": "native",
+      "status": "accepted",
+      "build_exit": 0,
+      "native_exit": 0,
+      "source_revision": "21495546aa9117cba9f5782dc71c2faa356e3ba5",
+      "observations": [
+        "GLOBAL42_RESULT fixed_cases=6 certified=3 obstruction_controls=3 twist_signs_each=2 exact_integer_lift_certificates=true normalized_global_CM_block_recovery=true actual_larger_n_geometric_transfer_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "integer42-01",
+      "kind": "native",
+      "status": "accepted",
+      "build_exit": 0,
+      "native_exit": 0,
+      "source_revision": "ad2c2f14ddbdf80813d6feb9a41f50aca5db3b4f",
+      "observations": [
+        "INTEGER42_LATTICE n=5 dimension=4 determinant_bits=11 least_scalar=22 predicted_formula_matches=true exact_divisions=20 primitive_witness=checked",
+        "INTEGER42_LATTICE n=11 dimension=10 determinant_bits=23 least_scalar=506 predicted_formula_matches=true exact_divisions=330 primitive_witness=checked",
+        "INTEGER42_LATTICE n=83 dimension=82 determinant_bits=167 least_scalar=12302938186694 predicted_formula_matches=true exact_divisions=183762 primitive_witness=checked",
+        "INTEGER42_LATTICE n=131 dimension=130 determinant_bits=268 least_scalar=10095126166020618049226 predicted_formula_matches=true exact_divisions=732290 primitive_witness=checked",
+        "INTEGER42_RESULT distinct_integer_lattices=4 fixed_target_cases=6 exact_least_scalar_certificates=true original_matrix_columns=all Bareiss_divisions=exact independent_norm_formula=checked target_unit_cases=3 full_modular_Hom_lattice_computed=false"
+      ]
+    },
+    {
+      "attempt": "lean42-base-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 31,
+      "source_revision": "b19ae585cf2a9590b614c874af83d969d72a09ce"
+    },
+    {
+      "attempt": "lean42-global-02",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 15,
+      "source_revision": "ad2c2f14ddbdf80813d6feb9a41f50aca5db3b4f"
+    },
+    {
+      "attempt": "least-scalar42-02",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 1,
+      "source_revision": "1ce08c51bcbff3d8a929c85353506c8b6a58b817"
+    },
+    {
+      "attempt": "integer-witness42-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 7,
+      "source_revision": "8b2ca04ebee33936eab706223ce11e91de6d3fd6"
+    },
+    {
+      "attempt": "least-scalar42-01",
+      "kind": "Lean",
+      "status": "rejected",
+      "compile_exit": 1,
+      "reason": "finite-sum notation import missing; repaired in fresh attempt least-scalar42-02"
+    },
+    {
+      "attempt": "lean42-global-01",
+      "kind": "Lean",
+      "status": "rejected",
+      "compile_exit": null,
+      "reason": "stopped before source copying/compilation because base audit.exit had not yet been written; no numerical or proof computation executed"
+    }
+  ],
+  "cases": [
+    {
+      "id": "n5-plus-control",
+      "n": 5,
+      "target_modulus": "11",
+      "target_modulus_bits": 4,
+      "conductor_prime": 11,
+      "genus_historical": 61,
+      "CM_exponents": [
+        4,
+        7
+      ],
+      "diamond_two_order": 10,
+      "diamond_two_n_matches_delta": true,
+      "global_denominator_norm_mod_target": "0",
+      "global_denominator_norm_unit": false,
+      "global_recovery_status": "obstructed",
+      "inverse_polynomial_degree": null,
+      "least_scalar": "22",
+      "least_scalar_target_gcd": "11",
+      "least_scalar_unit": false
+    },
+    {
+      "id": "n5-minus-control",
+      "n": 5,
+      "target_modulus": "11",
+      "target_modulus_bits": 4,
+      "conductor_prime": 11,
+      "genus_historical": 61,
+      "CM_exponents": [
+        4,
+        7
+      ],
+      "diamond_two_order": 10,
+      "diamond_two_n_matches_delta": true,
+      "global_denominator_norm_mod_target": "0",
+      "global_denominator_norm_unit": false,
+      "global_recovery_status": "obstructed",
+      "inverse_polynomial_degree": null,
+      "least_scalar": "22",
+      "least_scalar_target_gcd": "11",
+      "least_scalar_unit": false
+    },
+    {
+      "id": "n11-conductor-control",
+      "n": 11,
+      "target_modulus": "23",
+      "target_modulus_bits": 5,
+      "conductor_prime": 23,
+      "genus_historical": 309,
+      "CM_exponents": [
+        3,
+        21
+      ],
+      "diamond_two_order": 11,
+      "diamond_two_n_matches_delta": false,
+      "global_denominator_norm_mod_target": "0",
+      "global_denominator_norm_unit": false,
+      "global_recovery_status": "obstructed",
+      "inverse_polynomial_degree": null,
+      "least_scalar": "506",
+      "least_scalar_target_gcd": "23",
+      "least_scalar_unit": false
+    },
+    {
+      "id": "n11-twisted-target",
+      "n": 11,
+      "target_modulus": "991",
+      "target_modulus_bits": 10,
+      "conductor_prime": 23,
+      "genus_historical": 309,
+      "CM_exponents": [
+        3,
+        21
+      ],
+      "diamond_two_order": 11,
+      "diamond_two_n_matches_delta": false,
+      "global_denominator_norm_mod_target": "764",
+      "global_denominator_norm_unit": true,
+      "global_recovery_status": "certified",
+      "inverse_polynomial_degree": 9,
+      "least_scalar": "506",
+      "least_scalar_target_gcd": "1",
+      "least_scalar_unit": true
+    },
+    {
+      "id": "n83-target",
+      "n": 83,
+      "target_modulus": "2417851639230796216685689",
+      "target_modulus_bits": 82,
+      "conductor_prime": 499,
+      "genus_historical": 54781,
+      "CM_exponents": [
+        68,
+        35
+      ],
+      "diamond_two_order": 166,
+      "diamond_two_n_matches_delta": true,
+      "global_denominator_norm_mod_target": "1078354185484476628052286",
+      "global_denominator_norm_unit": true,
+      "global_recovery_status": "certified",
+      "inverse_polynomial_degree": 81,
+      "least_scalar": "12302938186694",
+      "least_scalar_target_gcd": "1",
+      "least_scalar_unit": true
+    },
+    {
+      "id": "n131-target",
+      "n": 131,
+      "target_modulus": "680564733841876926932320129493409985129",
+      "target_modulus_bits": 130,
+      "conductor_prime": 263,
+      "genus_historical": 45589,
+      "CM_exponents": [
+        254,
+        198
+      ],
+      "diamond_two_order": 131,
+      "diamond_two_n_matches_delta": false,
+      "global_denominator_norm_mod_target": "474449378653274604922996087227417989253",
+      "global_denominator_norm_unit": true,
+      "global_recovery_status": "certified",
+      "inverse_polynomial_degree": 129,
+      "least_scalar": "10095126166020618049226",
+      "least_scalar_target_gcd": "1",
+      "least_scalar_unit": true
+    }
+  ],
+  "integer_lattices": [
+    {
+      "n": 5,
+      "dimension": 4,
+      "determinant": "1936",
+      "least_scalar": "22",
+      "difference_gcd": 1,
+      "trace_sequence": "11",
+      "lucas_sequence": "-1",
+      "exact_divisions": 20,
+      "predicted_least_scalar": "22",
+      "predicted_formula_matches": true
+    },
+    {
+      "n": 11,
+      "dimension": 10,
+      "determinant": "5958656",
+      "least_scalar": "506",
+      "difference_gcd": 2,
+      "trace_sequence": "67",
+      "lucas_sequence": "23",
+      "exact_divisions": 330,
+      "predicted_least_scalar": "506",
+      "predicted_formula_matches": true
+    },
+    {
+      "n": 83,
+      "dimension": 82,
+      "determinant": "182985778110110309737143377282532804908915869351936",
+      "least_scalar": "12302938186694",
+      "difference_gcd": 1,
+      "trace_sequence": "6151469093347",
+      "lucas_sequence": "-347450761417",
+      "exact_divisions": 183762,
+      "predicted_least_scalar": "12302938186694",
+      "predicted_formula_matches": true
+    },
+    {
+      "n": 131,
+      "dimension": 130,
+      "determinant": "264722985050059394498473397279153151731221917109180131854467904112217234683723776",
+      "least_scalar": "10095126166020618049226",
+      "difference_gcd": 2,
+      "trace_sequence": "22283658519494248867",
+      "lucas_sequence": "38531015900842053623",
+      "exact_divisions": 732290,
+      "predicted_least_scalar": "10095126166020618049226",
+      "predicted_formula_matches": true
+    }
+  ],
+  "formal": {
+    "audited_declarations": 54,
+    "actual_integer_unit_and_primitive_witnesses": true,
+    "actual_large_polynomial_congruences": true,
+    "generic_primitive_divisibility_bridge": true,
+    "all_integer_matrix_columns_formalized": false,
+    "universal_Lucas_formula_formalized": false,
+    "independent_semantic_review": false
+  },
+  "scope": {
+    "full_modular_Hom_lattice": false,
+    "old_four_cover_map_recovery_solved_here": false,
+    "proper_level77_model_map": false,
+    "full_quotient_saturation": false,
+    "proper_polarized_embedding": false,
+    "larger_n_geometric_transfer_evaluated": false,
+    "node187_coupled_divisor_closed": false,
+    "precision615_source_jets_constructed": false,
+    "complete_degree460_or367_divisors_evaluated": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "global_metrics_integration": "pending exclusive T-901"
+}

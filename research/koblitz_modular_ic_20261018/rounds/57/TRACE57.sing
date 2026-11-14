@@ -1,0 +1,74 @@
+LIB "linalg.lib";
+proc require57(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump57(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../space57-02/complete-space57.sing"));
+matrix N57=sigmaRestricted57+unitmat(24);matrix zeroN57[24][24];
+require57(N57*N57==zeroN57 && mat_rk(N57)==10,"TRACE57_ACTUAL_SQUARE_ZERO_RANK");
+matrix fixed57=matrix(syz(module(N57)));module traceGB57=std(module(N57));matrix traceBasis57=matrix(traceGB57);
+require57(ncols(fixed57)==14 && ncols(traceBasis57)==10,"TRACE57_KERNEL_AND_IMAGE_DIMENSIONS");
+module span57=traceGB57;module enlarged57;vector candidate57;vector residual57;int chosen57=0;int i57;int j57;int k57;
+matrix exceptional57[24][4];
+for(j57=1;j57<=14;j57++){
+ candidate57=0;for(i57=1;i57<=24;i57++){candidate57=candidate57+fixed57[i57,j57]*gen(i57);}
+ residual57=reduce(candidate57,span57);
+ if(residual57!=0){
+  chosen57++;require57(chosen57<=4,"TRACE57_NO_EXTRA_QUOTIENT_DIRECTIONS");
+  for(i57=1;i57<=24;i57++){exceptional57[i57,chosen57]=candidate57[i57];}
+  enlarged57=span57,candidate57;span57=std(enlarged57);
+ }
+}
+require57(chosen57==4,"TRACE57_ALL_FOUR_QUOTIENT_REPRESENTATIVES");
+module joined57=module(traceBasis57),module(exceptional57);matrix splitting57=matrix(joined57);
+require57(ncols(splitting57)==14 && mat_rk(splitting57)==14,"TRACE57_DIRECT_SUM_INDEPENDENCE");
+matrix zeroFixed57[24][14];require57(N57*splitting57==zeroFixed57,"TRACE57_ALL_FIXED_DIRECTIONS");
+matrix fixedRecovery57=transpose(lift(module(transpose(splitting57)),module(unitmat(14))));
+require57(fixedRecovery57*splitting57==unitmat(14),"TRACE57_FIXED_DIRECT_SUM_RECOVERY");
+matrix fixedCoordinates57=lift(module(splitting57),module(fixed57));
+require57(splitting57*fixedCoordinates57==fixed57,"TRACE57_COMPLETE_FIXED_KERNEL_SPAN");
+matrix tracePreimages57=lift(module(N57),module(traceBasis57));
+require57(N57*tracePreimages57==traceBasis57,"TRACE57_ALL_TEN_TRACE_PREIMAGES");
+int oneTrace57=0;int ATrace57=0;matrix controlPreimages57[24][2];matrix fullControl57[24][1];
+for(j57=1;j57<=2;j57++){
+ candidate57=0;for(i57=1;i57<=24;i57++){candidate57=candidate57+smallControls57[i57,j57]*gen(i57);}
+ residual57=reduce(candidate57,traceGB57);
+ if(residual57==0){
+  for(i57=1;i57<=24;i57++){fullControl57[i57,1]=smallControls57[i57,j57];}
+  matrix liftControl57=lift(module(N57),module(fullControl57));
+  require57(N57*liftControl57==fullControl57,"TRACE57_ACTUAL_CONTROL_TRACE_PREIMAGE");
+  for(i57=1;i57<=24;i57++){controlPreimages57[i57,j57]=liftControl57[i57,1];}
+  if(j57==1){oneTrace57=1;}else{ATrace57=1;}
+ }
+}
+require57(ATrace57==1,"TRACE57_LAMBDA_TRACES_TO_A");
+matrix lambdaColumn57[24][1];matrix AColumn57[24][1];
+for(i57=1;i57<=24;i57++){lambdaColumn57[i57,1]=smallControls57[i57,3];AColumn57[i57,1]=smallControls57[i57,2];}
+require57(N57*lambdaColumn57==AColumn57,"TRACE57_EXACT_REGISTERED_LAMBDA_TRACE");
+link matrixOut57="ASCII:w trace-space57.sing";open(matrixOut57);write(matrixOut57,"ring traceSpace57=2,(w),dp;short=0;");
+dump57(matrixOut57,"N57",N57);dump57(matrixOut57,"fixed57",fixed57);dump57(matrixOut57,"traceBasis57",traceBasis57);dump57(matrixOut57,"exceptional57",exceptional57);dump57(matrixOut57,"splitting57",splitting57);dump57(matrixOut57,"fixedRecovery57",fixedRecovery57);dump57(matrixOut57,"fixedCoordinates57",fixedCoordinates57);dump57(matrixOut57,"tracePreimages57",tracePreimages57);dump57(matrixOut57,"controlPreimages57",controlPreimages57);close(matrixOut57);
+execute(read("../field57-01/field-space57.sing"));ideal GB57=std(sourceIdeal57);
+map matrixMap57=completeSpace57,0;matrix actualSigma57=matrixMap57(sigmaRestricted57);
+map traceMap57=completeSpace57,0;matrix actualExceptional57=traceMap57(exceptional57);matrix actualTraces57=traceMap57(traceBasis57);matrix actualPreimages57=traceMap57(tracePreimages57);
+poly value57;poly preimage57;poly image57;ideal exceptionalValues57;ideal traceValues57;ideal traceSourceValues57;
+require57(reduce(subst(actualA57,l,l+actualA57)+actualA57,GB57)==0,"TRACE57_A_FIXED");
+for(j57=1;j57<=24;j57++){
+ value57=subst(completeValues57[j57],l,l+actualA57);
+ for(i57=1;i57<=24;i57++){value57=value57+actualSigma57[i57,j57]*completeValues57[i57];}
+ require57(reduce(value57,GB57)==0,"TRACE57_ALL24_ACTUAL_SOURCE_INVOLUTION_IDENTITIES");
+}
+for(j57=1;j57<=4;j57++){
+ value57=0;for(i57=1;i57<=24;i57++){value57=value57+actualExceptional57[i57,j57]*completeValues57[i57];}
+ exceptionalValues57[j57]=reduce(value57,GB57);
+ require57(reduce(subst(value57,l,l+actualA57)+value57,GB57)==0,"TRACE57_FOUR_ACTUAL_FIXED_REPRESENTATIVES");
+}
+for(j57=1;j57<=10;j57++){
+ value57=0;preimage57=0;
+ for(i57=1;i57<=24;i57++){value57=value57+actualTraces57[i57,j57]*completeValues57[i57];preimage57=preimage57+actualPreimages57[i57,j57]*completeValues57[i57];}
+ traceValues57[j57]=reduce(value57,GB57);traceSourceValues57[j57]=reduce(preimage57,GB57);
+ require57(reduce(subst(preimage57,l,l+actualA57)+preimage57+value57,GB57)==0,"TRACE57_ALL_TEN_ACTUAL_TRACE_FUNCTIONS");
+}
+require57(reduce(subst(preimage57+l,l,l+actualA57)+preimage57+l+value57,GB57)!=0,"TRACE57_CHANGED_TRACE_PREIMAGE_REJECTED");
+link fieldOut57="ASCII:w trace-field57.sing";open(fieldOut57);write(fieldOut57,"ring traceField57=(2,u),(l,v),dp;short=0;ideal exceptionalValues57;ideal traceValues57;ideal traceSourceValues57;");
+for(j57=1;j57<=4;j57++){write(fieldOut57,"exceptionalValues57["+string(j57)+"]="+string(exceptionalValues57[j57])+";");}
+for(j57=1;j57<=10;j57++){write(fieldOut57,"traceValues57["+string(j57)+"]="+string(traceValues57[j57])+";traceSourceValues57["+string(j57)+"]="+string(traceSourceValues57[j57])+";");}close(fieldOut57);
+print("TRACE57_RESULT space_dimension=24 fixed_dimension=14 trace_dimension=10 fixed_mod_trace_dimension=4 actual_source_involution_checks=24 actual_fixed_functions=4 actual_trace_preimages=10 constant1_is_trace="+string(oneTrace57)+" A_is_trace="+string(ATrace57));
+print("TRACE57_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,96 @@
+LIB "linalg.lib";
+proc require62(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../61/runs/field61-01/field-space61.sing"));
+execute(read("../split62-02/split-functions62.sing"));
+require62(size(splitIdeal62)==size(sourceIdeal61),"DIRECT62_SOURCE_COUNT");
+int i62;int j62;
+for(i62=1;i62<=size(sourceIdeal61);i62++){require62(splitIdeal62[i62]==sourceIdeal61[i62],"DIRECT62_EVERY_SOURCE_EQUATION");}
+ideal GB62=std(sourceIdeal61);require62(dim(GB62)==0 && vdim(GB62)==32,"DIRECT62_SOURCE_DEGREE");
+def sourceRing62=basering;
+ring parityRing62=2,(u),dp;short=0;
+setring sourceRing62;
+proc splitCoefficient62(number c){
+ string ns=string(numerator(c));string ds=string(denominator(c));
+ setring parityRing62;
+ execute("poly numerator62="+ns+";poly denominator62="+ds+";");
+ require62(denominator62!=0,"SPLIT62_NONZERO_RATIONAL_DENOMINATOR");
+ poly p=numerator62*denominator62;poly even=0;poly odd=0;poly rebuilt=0;int j;int exponent;
+ if(p!=0){
+  matrix parts=coef(p,u);
+  for(j=1;j<=ncols(parts);j++){
+   exponent=deg(parts[1,j]);require62(parts[1,j]==u^exponent && parts[2,j]==1,"SPLIT62_BINARY_MONOMIAL_COEFFICIENT");
+   rebuilt=rebuilt+parts[1,j]*parts[2,j];
+   if(exponent%2==0){even=even+u^(exponent div 2);}else{odd=odd+u^((exponent-1) div 2);}
+  }
+ }
+ require62(rebuilt==p && even^2+u*odd^2==p,"SPLIT62_COMPLETE_POLYNOMIAL_PARITY_IDENTITY");
+ string es=string(even);string os=string(odd);ds=string(denominator62);
+ setring sourceRing62;
+ number e;number o;execute("e=("+es+")/("+ds+");o=("+os+")/("+ds+");");
+ require62(e^2+u*o^2==c,"SPLIT62_RATIONAL_COEFFICIENT_IDENTITY");
+ list ans=e,o;return(ans);
+}
+
+// A pair represents g^2+u*h^2, with all products in the actual source.
+proc pairMul62(list x,list y){
+ list z=reduce(x[1]*y[1]+u*x[2]*y[2],GB62),reduce(x[1]*y[2]+x[2]*y[1],GB62);return(z);
+}
+list vPair62=poly(v),poly(u+1);
+require62(reduce(vPair62[1]^2+u*vPair62[2]^2+v,GB62)==0,"DIRECT62_BASE_GENERATOR_PAIR");
+poly a62=0;poly b62=0;poly c62=0;poly d62=0;
+poly term62=sourceIdeal61[2];intvec ex62;int power62;list pair62;list scalar62;
+while(term62!=0){
+ ex62=leadexp(term62);require62(ex62[2]<2,"DIRECT62_LINEAR_BASE_COEFFICIENTS");
+ scalar62=splitCoefficient62(leadcoef(term62));pair62=poly(scalar62[1]),poly(scalar62[2]);
+ if(ex62[2]==1){pair62=pairMul62(pair62,vPair62);}
+ power62=ex62[1] div 2;
+ if(ex62[1]%2==0){a62=a62+pair62[1]*l^power62;b62=b62+pair62[2]*l^power62;}
+ else{c62=c62+pair62[1]*l^power62;d62=d62+pair62[2]*l^power62;}
+ term62=term62-lead(term62);
+}
+require62(reduce(a62^2+u*b62^2+l*c62^2+u*l*d62^2+sourceIdeal61[2],GB62)==0,"DIRECT62_FULL_POLYNOMIAL_GROUPING");
+poly q62=reduce(diff(sourceIdeal61[2],l),GB62);
+require62(q62!=0 && reduce(q62+c62^2+u*d62^2,GB62)==0,"DIRECT62_ACTUAL_DERIVATIVE_IDENTITY");
+ideal invertIdeal62=q62,sourceIdeal61[1],sourceIdeal61[2];
+matrix invert62=lift(invertIdeal62,ideal(1));poly qi62=reduce(invert62[1,1],GB62);
+require62(reduce(q62*qi62,GB62)==1,"DIRECT62_ACTUAL_DERIVATIVE_INVERSE");
+list lambdaPair62=reduce((a62*c62+u*b62*d62)*qi62,GB62),reduce((a62*d62+b62*c62)*qi62,GB62);
+require62(reduce(lambdaPair62[1]^2+u*lambdaPair62[2]^2+l,GB62)==0,"DIRECT62_PRIMITIVE_GENERATOR_FORMULA");
+list powers62;list temp62=poly(1),poly(0);powers62[1]=temp62;
+for(i62=2;i62<=16;i62++){temp62=pairMul62(temp62,lambdaPair62);powers62[i62]=temp62;}
+list basisPairs62;
+for(i62=1;i62<=16;i62++){basisPairs62[i62]=powers62[i62];basisPairs62[i62+16]=pairMul62(powers62[i62],vPair62);}
+for(i62=1;i62<=32;i62++){
+ temp62=basisPairs62[i62];require62(reduce(temp62[1]^2+u*temp62[2]^2+l^((i62-1)%16)*v^((i62-1) div 16),GB62)==0,"DIRECT62_ALL32_GENERATED_BASIS_PAIRS");
+}
+require62(size(inputs62)==435 && size(evenParts62)==435 && size(oddParts62)==435 && size(cubicValues61)==324 && size(completeValues61)==76,"DIRECT62_COMPLETE_COHORT");
+list expected62;
+for(i62=1;i62<=32;i62++){expected62[i62]=poly(l^((i62-1)%16)*v^((i62-1) div 16));}
+expected62[33]=poly(1);expected62[34]=poly(u);expected62[35]=poly(u^2);
+for(i62=1;i62<=324;i62++){expected62[35+i62]=cubicValues61[i62];}
+for(i62=1;i62<=76;i62++){expected62[359+i62]=completeValues61[i62];}
+int pos62;poly g62;poly h62;int coefficientCount62=0;
+for(i62=1;i62<=435;i62++){
+ require62(reduce(inputs62[i62]+expected62[i62],GB62)==0,"DIRECT62_EVERY_ACTUAL_INPUT_BINDING");
+ term62=reduce(expected62[i62],GB62);g62=0;h62=0;
+ while(term62!=0){
+  ex62=leadexp(term62);require62(ex62[1]<16 && ex62[2]<2,"DIRECT62_CANONICAL_INPUT");
+  pos62=1+ex62[1]+16*ex62[2];scalar62=splitCoefficient62(leadcoef(term62));coefficientCount62++;
+  pair62=poly(scalar62[1]),poly(scalar62[2]);pair62=pairMul62(pair62,basisPairs62[pos62]);
+  g62=g62+pair62[1];h62=h62+pair62[2];term62=term62-lead(term62);
+ }
+ g62=reduce(g62,GB62);h62=reduce(h62,GB62);
+ require62(reduce(g62^2+u*h62^2+expected62[i62],GB62)==0,"DIRECT62_WHOLE_SOURCE_IDENTITY");
+ require62(g62==evenParts62[i62] && h62==oddParts62[i62],"DIRECT62_BOTH_ROOTS_MATCH_MATRIX_METHOD");
+ if(i62==33){require62(g62==1 && h62==0,"DIRECT62_CONSTANT_CONTROL");}
+ if(i62==34){require62(g62==0 && h62==1,"DIRECT62_PARAMETER_CONTROL");require62(reduce((g62+1)^2+u*h62^2+expected62[i62],GB62)!=0,"DIRECT62_CHANGED_ROOT_REJECTED");}
+ if(i62==35){require62(g62==u && h62==0,"DIRECT62_SQUARE_CONTROL");}
+ print("DIRECT62_PROGRESS id="+string(i62));
+}
+link out62="ASCII:w generator-pairs62.sing";open(out62);
+write(out62,"// Actual source generator pairs, compare with FIELD61 before use.");
+write(out62,"list lambdaPair62="+string(lambdaPair62[1])+","+string(lambdaPair62[2])+";");
+write(out62,"list vPair62="+string(vPair62[1])+","+string(vPair62[2])+";");
+write(out62,"poly derivative62="+string(q62)+";poly derivativeInverse62="+string(qi62)+";");close(out62);
+print("DIRECT62_RESULT functions=435 whole_source_identities=435 roots_compared=870 generated_basis_pairs=32 derivative_inverse=1 generator_formula=1 coefficient_splits="+string(coefficientCount62)+" changed_root_rejected=1");
+print("DIRECT62_ALL_CHECKS_PASS");quit;

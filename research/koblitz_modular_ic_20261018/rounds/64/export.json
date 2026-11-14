@@ -1,0 +1,43 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R64-BRIDGE",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "bridge64-01",
+      "path": "runs/bridge64-01/protocol.json",
+      "sha256": "cd293b134f668b397785ecdcffb0c212093d7d7fe1371afc84ab5d2289d2ba32",
+      "frozen_revision": "e30b77574e0127f06584e46fae2ff542a07eb261"
+    },
+    {
+      "attempt": "bridge64-02",
+      "path": "runs/bridge64-02/protocol.json",
+      "sha256": "670b6af60c8f6f6639b83fdda9f6502b960cbd785032d58936dff602fd63c73b",
+      "frozen_revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8"
+    },
+    {
+      "attempt": "bridge64-03",
+      "path": "runs/bridge64-03/protocol.json",
+      "sha256": "9313d7b77bddc13a097de784c284b5d88a44485dfb1144eef1bd14942bcc1322",
+      "frozen_revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36"
+    },
+    {
+      "attempt": "bridge64-04",
+      "path": "runs/bridge64-04/protocol.json",
+      "sha256": "cf8cfe542f423a6cfbb334f6b8219bcb17083ce43a8e622be24f497c3645c0f6",
+      "frozen_revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "1ddf24fc6b5673ab3e7c41ef2f0168988fc67ecefc3eaa70173622f864a02609"
+  },
+  "flow": {
+    "accepted": 1,
+    "rejected": 3,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual byte and contract checks only",
+  "notes": "Actual degree32 source bridge and full32 basis isomorphism inputs checked. Integral closure, proper normalization and valuations are next experiments."
+}

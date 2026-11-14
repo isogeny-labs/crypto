@@ -1,0 +1,53 @@
+ring coefficientField35=(2,a),(t),dp;minpoly=a^5+a^2+1;
+list paddingRepresentatives33;
+paddingRepresentatives33[1]=list(number((a+1)),number((a2+a)),number((a3)),number((a4+a3+1)));
+paddingRepresentatives33[2]=list(number((a+1)),number((a2+a)),number((a3+a2+a+1)),number((a4+a3+a)));
+
+proc trace35(number x){number s=0;int i;for(i=0;i<5;i++){s=s+x;x=x^2;}if(s!=0 && s!=1){ERROR("ALG35_TRACE");}return(s);}
+list point35=paddingRepresentatives33[1];number u0Alg35=(number(point35[1])+number(point35[2]))/number(point35[2])^2;
+if(u0Alg35^5+u0Alg35^3+1!=0){ERROR("ALG35_BASE_MINIMAL_POLYNOMIAL");}
+list smallPiv35;list smallCo35;int iAlg35;int jAlg35;int pAlg35;int smallRank35;poly bitsAlg35;poly coAlg35;poly targetAlg35;poly solutionAlg35;
+for(iAlg35=1;iAlg35<=5;iAlg35++){smallPiv35[iAlg35]=poly(0);smallCo35[iAlg35]=poly(0);}
+for(iAlg35=0;iAlg35<5;iAlg35++){
+ bitsAlg35=0;coAlg35=t^iAlg35;
+ for(jAlg35=0;jAlg35<5;jAlg35++){if(trace35(u0Alg35^iAlg35*a^jAlg35)==1){bitsAlg35=bitsAlg35+t^jAlg35;}}
+ while(bitsAlg35!=0){pAlg35=deg(bitsAlg35)+1;if(smallPiv35[pAlg35]==0){smallPiv35[pAlg35]=bitsAlg35;smallCo35[pAlg35]=coAlg35;smallRank35++;break;}bitsAlg35=bitsAlg35+smallPiv35[pAlg35];coAlg35=coAlg35+smallCo35[pAlg35];}
+}
+if(smallRank35!=5){ERROR("ALG35_BASE_FIELD_BASIS");}
+targetAlg35=0;for(jAlg35=0;jAlg35<5;jAlg35++){if(trace35(a*a^jAlg35)==1){targetAlg35=targetAlg35+t^jAlg35;}}
+solutionAlg35=0;while(targetAlg35!=0){pAlg35=deg(targetAlg35)+1;targetAlg35=targetAlg35+smallPiv35[pAlg35];solutionAlg35=solutionAlg35+smallCo35[pAlg35];}
+number reconstructedA35=0;for(iAlg35=1;iAlg35<=size(solutionAlg35);iAlg35++){if(leadcoef(solutionAlg35[iAlg35])!=1){ERROR("ALG35_NONBINARY_ISOMORPHISM");}reconstructedA35=reconstructedA35+u0Alg35^deg(solutionAlg35[iAlg35]);}
+if(reconstructedA35!=a){ERROR("ALG35_ACTUAL_FIELD_EMBEDDING");}short=0;string isoText35=string(solutionAlg35);
+ring monogenic35=2,(t),dp;poly qAlg35=t^5+t^3+1;poly hAlg35=qAlg35^154;ideal hIdeal35=std(ideal(hAlg35));
+if(deg(hAlg35)!=770){ERROR("ALG35_DEGREE");}
+poly UAlg35=reduce(t^1024,hIdeal35);poly zAlg35=reduce(t+UAlg35,hIdeal35);
+if(reduce(UAlg35^5+UAlg35^3+1,hIdeal35)!=0 || reduce(UAlg35^32+UAlg35,hIdeal35)!=0 || reduce(zAlg35^154,hIdeal35)!=0){ERROR("ALG35_RING_IDENTITIES");}
+poly zQuotient35=zAlg35/qAlg35;if(qAlg35*zQuotient35!=zAlg35 || gcd(zQuotient35,qAlg35)!=1){ERROR("ALG35_UNIFORMIZER");}
+execute("poly aResidueAlg35="+isoText35+";");poly aConstAlg35=reduce(subst(aResidueAlg35,t,UAlg35),hIdeal35);
+if(reduce(aConstAlg35^5+aConstAlg35^2+1,hIdeal35)!=0 || reduce(aConstAlg35^32+aConstAlg35,hIdeal35)!=0){ERROR("ALG35_COEFFICIENT_FIELD");}
+if(reduce(aConstAlg35^5+aConstAlg35^2,hIdeal35)==0){ERROR("ALG35_CORRUPT_FIELD_CONTROL");}
+list basisPiv35;list basisCo35;ideal algebraColumns35;ideal inverseColumns35;int rankAlg35;int columnAlg35;int termAlg35;poly powerZ35=1;poly powerA35;poly valueAlg35;poly originalAlg35;poly coordinatesAlg35;poly rebuiltAlg35;
+for(iAlg35=1;iAlg35<=770;iAlg35++){basisPiv35[iAlg35]=poly(0);basisCo35[iAlg35]=poly(0);}
+for(jAlg35=0;jAlg35<154;jAlg35++){
+ powerA35=1;
+ for(iAlg35=0;iAlg35<5;iAlg35++){
+  columnAlg35++;valueAlg35=reduce(powerA35*powerZ35,hIdeal35);algebraColumns35[columnAlg35]=valueAlg35;coordinatesAlg35=t^(columnAlg35-1);
+  while(valueAlg35!=0){pAlg35=deg(valueAlg35)+1;if(basisPiv35[pAlg35]==0){basisPiv35[pAlg35]=valueAlg35;basisCo35[pAlg35]=coordinatesAlg35;rankAlg35++;break;}valueAlg35=valueAlg35+basisPiv35[pAlg35];coordinatesAlg35=coordinatesAlg35+basisCo35[pAlg35];}
+  if(valueAlg35==0){ERROR("ALG35_DEPENDENT_JET_BASIS");}powerA35=reduce(powerA35*aConstAlg35,hIdeal35);
+ }
+ powerZ35=reduce(powerZ35*zAlg35,hIdeal35);
+}
+if(columnAlg35!=770 || rankAlg35!=770){ERROR("ALG35_FULL_BASIS_RANK");}
+for(iAlg35=1;iAlg35<=770;iAlg35++){
+ valueAlg35=t^(iAlg35-1);coordinatesAlg35=0;
+ while(valueAlg35!=0){pAlg35=deg(valueAlg35)+1;valueAlg35=valueAlg35+basisPiv35[pAlg35];coordinatesAlg35=coordinatesAlg35+basisCo35[pAlg35];}
+ inverseColumns35[iAlg35]=coordinatesAlg35;rebuiltAlg35=0;
+ for(termAlg35=1;termAlg35<=size(coordinatesAlg35);termAlg35++){rebuiltAlg35=rebuiltAlg35+algebraColumns35[deg(coordinatesAlg35[termAlg35])+1];}
+ if(rebuiltAlg35!=t^(iAlg35-1)){ERROR("ALG35_INVERSE_RECOMBINATION");}
+ coordinatesAlg35=basisCo35[iAlg35];rebuiltAlg35=0;for(termAlg35=1;termAlg35<=size(coordinatesAlg35);termAlg35++){rebuiltAlg35=rebuiltAlg35+algebraColumns35[deg(coordinatesAlg35[termAlg35])+1];}
+ if(rebuiltAlg35!=basisPiv35[iAlg35]){ERROR("ALG35_PIVOT_RECOMBINATION");}
+}
+coordinatesAlg35=inverseColumns35[1]+1;rebuiltAlg35=0;for(termAlg35=1;termAlg35<=size(coordinatesAlg35);termAlg35++){rebuiltAlg35=rebuiltAlg35+algebraColumns35[deg(coordinatesAlg35[termAlg35])+1];}if(rebuiltAlg35==1){ERROR("ALG35_CORRUPTED_INVERSE_ACCEPTED");}
+short=0;link outAlg35="ASCII:w local-algebra.sing";open(outAlg35);write(outAlg35,"ring localAlgebra35=2,(t),dp;poly localModulus35="+string(hAlg35)+";poly constantRootU35="+string(UAlg35)+";poly localParameterZ35="+string(zAlg35)+";poly coefficientGeneratorA35="+string(aConstAlg35)+";poly residueAOfU35="+string(aResidueAlg35)+";ideal jetToMonogenic35;ideal monogenicToJet35;");
+for(iAlg35=1;iAlg35<=770;iAlg35++){write(outAlg35,"jetToMonogenic35["+string(iAlg35)+"]="+string(algebraColumns35[iAlg35])+";");write(outAlg35,"monogenicToJet35["+string(iAlg35)+"]="+string(inverseColumns35[iAlg35])+";");}close(outAlg35);
+print("ALG35_RESULT dimension=770 precision=154 basis_rank=770 inverse_recombination=all ring_identities=all actual_coefficient_embedding=checked");print("ALG35_ALL_CHECKS_PASS");quit;
