@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run.sh NAME STAGE  -- start ONE capped F4 run on a reserved RunPod Secure Cloud CPU pod (draft Amendment 17,
+# run.sh NAME STAGE  -- start ONE capped F4 run on a reserved RunPod Secure Cloud CPU pod (draft Amendment 18,
 # AMENDMENT_R2_H_runpod_capped.md). Shell only.
 #   NAME   pkm-x-t<T>-k<K>-c<C>[-suffix] for a study cell (STAGE must equal requests_r2i/pfd-x-t<T>-k<K>-c<C>.json's
 #          command[1]), or pkm-x-dev-<word> for a development check (t <= 10 only; not data).

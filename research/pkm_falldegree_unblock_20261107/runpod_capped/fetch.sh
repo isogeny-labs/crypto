@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # fetch.sh NAME [--abort]  -- collect one run started by run.sh, check the transfer by SHA-256, delete the pod
-# (draft Amendment 17, AMENDMENT_R2_H_runpod_capped.md). Shell only.
+# (draft Amendment 18, AMENDMENT_R2_H_runpod_capped.md). Shell only.
 # While the runner is still running and the pod deadline (run.sh start + 90,000 s) has not passed, it records one status
 # and exits 41 without touching the pod. Once the runner is done, or the deadline has passed, or --abort is given, it:
 #   fetches /results.tar.gz twice, extracts both, requires byte-identical per-file SHA-256 manifests, keeps one tree in

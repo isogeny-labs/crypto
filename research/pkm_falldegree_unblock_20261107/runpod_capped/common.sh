@@ -1,4 +1,4 @@
-# Shared settings for run.sh and fetch.sh (draft Amendment 17, AMENDMENT_R2_H_runpod_capped.md). Sourced, not run.
+# Shared settings for run.sh and fetch.sh (draft Amendment 18, AMENDMENT_R2_H_runpod_capped.md). Sourced, not run.
 # The pod-side runner is Amendment 16's runpod/server.py, unchanged; its client runpod/rp.sh is used unchanged for
 # upload, start, status and fetch (those calls talk only to the pod, with the pod's token). The RunPod API calls
 # (create, pod record, delete, list) are made here, because rp.sh hard-codes the proxy-injected placeholder key.
