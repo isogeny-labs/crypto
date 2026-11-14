@@ -29,6 +29,17 @@ case "$1" in
   start) shas=$(jq '.study_binary_sha256 | del(.["entry.sh"])' "$here/../image/image.json")
       jq -n --argjson s "$3" --argjson h "$shas" '{stages:$s,sha256:$h,rayon:12}' |
       curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
+  upload-iso) # rp.sh upload-iso ID BINDIR COMMIT : the R4 binaries from BINDIR, and repo.tar = git archive COMMIT of iso/BUNDLE_PATHS
+      repo=$(cd "$here/../../.." && pwd); tar=$(mktemp)
+      git -C "$repo" archive -o "$tar" "$4" $(cat "$here/../iso/BUNDLE_PATHS")
+      for f in pkm_tower_pilot_r4 prime_fall_degree_tools hky_fp_tower_check; do
+        curl -sS -f -X PUT -H "X-Token: $(tok $2)" --data-binary "@$3/$f" "$(url $2)/upload/$f"; echo; done
+      curl -sS -f -X PUT -H "X-Token: $(tok $2)" --data-binary "@$tar" "$(url $2)/upload/repo.tar"; echo
+      echo "repo.tar $(sha256sum "$tar" | cut -c1-64) commit $4" | tee "$TOKDIR/$2.repo.tar.sha256"; rm -f "$tar" ;;
+  start-iso) # rp.sh start-iso ID STAGES_JSON : pins from iso/PINS.json, repo.tar hash from upload-iso
+      shas=$(jq --arg t "$(cut -d' ' -f2 "$TOKDIR/$2.repo.tar.sha256")" '.sha256 + {"repo.tar":$t}' "$here/../iso/PINS.json")
+      jq -n --argjson s "$3" --argjson h "$shas" '{entry:"iso",stages:$s,sha256:$h,rayon:12}' |
+      curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
   status) curl -sS -H "X-Token: $(tok $2)" "$(url $2)/status" ;;
   fetch) curl -sS -f -H "X-Token: $(tok $2)" -o "$3" "$(url $2)/results.tar.gz" && sha256sum "$3" ;;
   delete) curl -sS -X DELETE "$API/pods/$2" "${H[@]}"; echo "deleted $2" ;;
