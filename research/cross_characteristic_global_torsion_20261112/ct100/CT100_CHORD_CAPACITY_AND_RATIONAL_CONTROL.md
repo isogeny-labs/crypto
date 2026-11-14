@@ -55,6 +55,10 @@ This is **not a scheme morphism between characteristic 7 and characteristic 2**.
 
 Two independent implementations check the five rational points, both finite curve orders, all **25 ordered group laws** over Q, F7 and F2, four public source and four target DLPs (Python BSGS, JS brute force), and all five source→binary lookup results. Four local modes produced byte-identical JSON SHA-256 8fd9c76473f73b96747a1419bde2474b12291b615796b0683ea374e92a23abc4.
 
+## The rational-torsion shortcut cannot scale to large primes over Q
+
+Mazur's rational torsion classification says that a prime-order torsion **point** on any elliptic curve over Q can only have order 2, 3, 5 or 7. See [University of Michigan course on Mazur's theorem](https://websites.umich.edu/~asnowden/teaching/2013/679/) and the [explicit torsion classification](https://planetmath.org/mazurstheoremontorsionofellipticcurves). Thus the order-five *rational-point* common lift above cannot be scaled to ell>=11 while keeping its global torsion point rational. The next non-rational ell=11 experiment necessarily requires a nontrivial extension for the point. This restriction is about **rational torsion points**; it does not exclude rational prime-degree isogenies, higher-degree number fields, or computationally useful implicit torsion representations. It is a classical theorem used as a gate, not a novel result. [pcc:unverified].
+
 ## Cold-cost boundaries
 
 | Route | Charged cold setup | Online work | Verified cost standing |
