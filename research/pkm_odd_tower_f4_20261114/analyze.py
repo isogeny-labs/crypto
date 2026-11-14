@@ -166,12 +166,12 @@ def main():
     # Order: A32 vs A23 at equal S (n = 4, 6), paired by draw.
     order = {}
     for n in (4, 6):
-        a = {r["draw"]: r for r in rows if r["cell"] == f"M2-A23-n{n}-tower"}
-        b = {r["draw"]: r for r in rows if r["cell"] == f"M2-A32-n{n}-tower"}
-        if a and b and not any(r["censored"] for r in list(a.values()) + list(b.values())):
-            rs = [b[d]["field_ops"] / a[d]["field_ops"] for d in sorted(a) if d in b]
-            order[f"n{n}"] = {"S": a[0]["S"], "r_A32_over_A23": rs, "bands": [band(x) for x in rs],
-                              "same_targets": all(a[d]["target_x"] == b[d]["target_x"] for d in a if d in b)}
+        ra = {r["draw"]: r for r in rows if r["cell"] == f"M2-A23-n{n}-tower"}
+        rb = {r["draw"]: r for r in rows if r["cell"] == f"M2-A32-n{n}-tower"}
+        if ra and rb and not any(r["censored"] for r in list(ra.values()) + list(rb.values())):
+            rs = [rb[d]["field_ops"] / ra[d]["field_ops"] for d in sorted(ra) if d in rb]
+            order[f"n{n}"] = {"S": ra[0]["S"], "r_A32_over_A23": rs, "bands": [band(x) for x in rs],
+                              "same_targets": all(ra[d]["target_x"] == rb[d]["target_x"] for d in ra if d in rb)}
     out["order"] = order
     # Positive control: one bit of |V| (A2 at t+1 read as if it were t).
     a2 = {x: statistics.median(w) for x, _, w, c, _ in cells(rows, "M2-", "tower").get("A2", []) if not c}
@@ -199,7 +199,7 @@ def main():
     for r in brows:
         key = (r["m"], r["form"], r["cell"].split("-")[2])  # B-M2-A3-k3 -> arm A3
         by.setdefault(key, {}).setdefault(r["cell"], []).append(r)
-    for (m, form, arm), cellmap in sorted(by.items()):
+    for (m, fm, arm), cellmap in sorted(by.items()):
         pts = []
         for cell, rs in sorted(cellmap.items(), key=lambda kv: kv[1][0]["S"]):
             cens = any(r["alg_undetermined"] for r in rs)
@@ -211,7 +211,7 @@ def main():
                         "relations": [r["enum_relations"] for r in rs]})
         done_pts = [p for p in pts if not p["censored"]]
         if not done_pts:
-            pb[f"m{m}_{form}_{arm}"] = {"verdict": "no_completed_cell", "points": pts}
+            pb[f"m{m}_{fm}_{arm}"] = {"verdict": "no_completed_cell", "points": pts}
             continue
         last = done_pts[-1]
         if all(x <= GAIN for x in last["ratios"]):
@@ -227,7 +227,7 @@ def main():
                 trend = "closing"
             elif all(b > a for a, b in zip(t, t[1:])):
                 trend = "widening"
-        pb[f"m{m}_{form}_{arm}"] = {"verdict": v, "trend": trend, "at_S": last["S"],
+        pb[f"m{m}_{fm}_{arm}"] = {"verdict": v, "trend": trend, "at_S": last["S"],
                                     "ratios_at_S": last["ratios"], "points": pts}
     out["part_b"] = pb
     out["part_b_valid"] = not out["C7_part_b_agree"]["disagree"]

@@ -209,3 +209,8 @@ interrupted cell had one row written (and swept into a progress commit) before i
 not read before this amendment was filed. Under §7 the partial file is moved to `runs/partial/` and the cell
 reruns from the start under the same name; both are reported.
 
+**Amendment 2 (2026-11-14, analysis bug fix; filed at the first run of `analyze.py`, before any output was
+produced).** The order comparison (C5) reused the name `a`, which shadowed the parsed command-line arguments, so
+the script crashed when writing `results.json`. The variables are renamed (`ra`, `rb`); no rule, band, cell or
+metric changes. The part B loop also reused `form`, shadowing the form-comparison table; it is renamed `fm` (found on the same first run, after `results.json` was written and before its summary printed). `analyze.py` SHA-256 changes from `29c9ac27339bd24b6c73080aabb095084fd7153a61546aaeb98682eb20db503b` (frozen) to `168edde01e92a3616e3a60b3457ffbc8f41502d76d73ab004df291d2cb5e89c5`.
+
