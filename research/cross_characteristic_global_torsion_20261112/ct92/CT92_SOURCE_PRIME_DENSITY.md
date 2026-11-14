@@ -27,6 +27,23 @@ The public source curve is E: y²+y=x³−x²−10x−20. Direct exact count giv
 
 Over F2 the same curve has five points (trace −2); CT91 handles the separate degree-24 binary residue obstruction. Source and target primes are *not interchangeable*. For ell=7, the conditional Chebotarev density of eligible source primes is 47/288, and among eligible Frobenius classes the identity is exceptional.
 
+## Exact splitting of both global point fields at the fixed two primes
+
+At source p=37, the characteristic polynomial is (X−1)(X−2) modulo 7 and the Frobenius matrix is conjugate to diag(1,2). Its action on the 48 nonzero oriented vectors has **six fixed vectors and fourteen 3-cycles**. As the 7-division field and its subfields are unramified at 37 (good reduction, p≠7), the exact splitting type of the oriented degree-48 point field K at 37 is
+
+    K at 37: residue degrees 1^6 3^14.
+
+On the 24 unordered pairs {±T}, the exact x-coordinate field L=Q(x(T)) at 37 has splitting **1^3 3^7**; this independently agrees with CT80's explicit psi_7 factorization modulo 37.
+
+At the target p=2, trace −2 and determinant 2 give Frob_2 polynomial X²+2X+2 modulo 7. A companion matrix [[0,5],[1,5]] has **two oriented 24-cycles** on the same 48 nonzero vectors and **two unoriented 12-cycles** on the 24 sign-classes. Because 2 is also good and prime to 7, the residue splitting types are
+
+    K at 2: residue degrees 24^2.
+    L at 2: residue degrees 12^2.
+
+This is a complementary, group-theoretic certificate of CT91's binary orbit lengths, without constructing F_(2^24), and precisely describes why 37 has six possible degree-one source places while 2 has no degree-one oriented target place. The nontrivial target residue field is essential: there is no valid shortcut using a degree-one binary specialization.
+
+These are **splitting types for the fixed CT80 fields**, not global computational maps of arbitrary Q. The Python verifier independently enumerates matrix orbits on all 48 nonzero vectors and on all 24 sign classes; the JS verifier uses a separately written cycle-traversal routine. Both test the four exact splitting multisets.
+
 ## Independently executable certificates
 
 Two standalone implementations **do not import CT81–91 code**. Python enumerates every matrix of GL2(F_ell) and brute-force checks every nonzero vector; JavaScript independently determines the 1-eigenspace rank algebraically. Both count the curve points at p=37 and p=2 without using a database. Tested ell=3,5,7,11.
@@ -49,7 +66,7 @@ node --no-opt "$D/ct92_prime_density_independent.js" >/tmp/ct92-jsopt.json
 cmp /tmp/ct92-py.json /tmp/ct92-opt.json
 cmp /tmp/ct92-py.json /tmp/ct92-js.json
 cmp /tmp/ct92-py.json /tmp/ct92-jsopt.json
-printf '%s  %s\n' f813e26c75d9a70835246b6cf1ba2d34a1bb9b2181d533c8b31453af88fc4506 /tmp/ct92-py.json | sha256sum -c
+printf '%s  %s\n' 4fbd54cd2e4ce9f3f0a850747cdb7465787e9baf158c35f81b408b979e7feb7a /tmp/ct92-py.json | sha256sum -c
 ```
 
 All four bounded local modes returned byte-identical JSON with the stated digest. No paid compute, no full Rust/Lean/Conductor run, and no independently signed scientific PCC verdict in this connector execution. GitHub exact-head CI must be inspected separately.
