@@ -1,7 +1,7 @@
 {
  "schema": "experiment.protocol/v1",
  "protocol_id": "PKM-M8-PANELA-20261114",
- "version": 1,
+ "version": 2,
  "created": "2026-11-14",
  "repository": "crypto",
  "study_dir": "research/pkm_m8_sparse_panel_20261114",
@@ -15,7 +15,8 @@
   "cost_model": "research/prime_norm_rank_20261112/cost-floor-report/README.md",
   "prior": "research/prime_leads_chase_20261113/L1-pkm/D83_VERDICT.md",
   "lead_state": "research/prime_ic_lead_heatmap_20261114/leads.json#CH-L1",
-  "pilot": "none; smoke runs under smoke/ are development checks of the instrument, not data"
+  "pilot": "PILOT.md (pilot seed 777, excluded from analysis)",
+  "redteam": "REDTEAM_PROTOCOL.md"
  },
  "question": "On the m=8 PKM Kummer-chain system over prime fields, how does the complete charged work c(B) of one positive sparse solver invocation scale with B=2^t, and is the measured exponent gamma below the gates 3.5 (all-output) and 3 (one-output)?",
  "claims": [
@@ -48,7 +49,7 @@
   {
    "id": "msolve",
    "role": "candidate",
-   "description": "msolve 0.6.5 F4 (-t 8 -v 2 -g 2 -P 1) on the raw chain presentation; native extraction and verification",
+   "description": "msolve 0.6.5 mode param (-t 8 -v 2 -P 1), all F4 passes and parametrization charged; mode gb (-g 2) only for the t=2 cross-check",
    "instrument": {
     "repo": "isogeny-labs/crypto",
     "commit": null,
@@ -67,7 +68,8 @@
      "sha256_local": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa"
     },
     "flags": {
-     "msolve": "-t 8 -v 2 -g 2 -P 1"
+     "param": "-t 8 -v 2 -P 1",
+     "gb": "-t 8 -v 2 -g 2"
     },
     "env": {},
     "threads": 8
@@ -76,7 +78,7 @@
   {
    "id": "native",
    "role": "second_instrument",
-   "description": "crypto_lib f4_fp grevlex single thread on byte-identical polynomial sets; t=2 cells decisive, t=3 censored",
+   "description": "crypto_lib f4_fp grevlex single thread; second instrument for the exporter (reduced-basis equality vs mode gb) at t=2 SAT1/UNSAT1; never carries gamma",
    "instrument": {
     "repo": "isogeny-labs/crypto",
     "commit": null,
@@ -120,27 +122,27 @@
  ],
  "cells": [
   {
-   "id": "t2r7",
-   "t": 2,
-   "B": 4,
-   "ratio": 7,
-   "p_rule": "least prime >= 2^14 with 4 | p-1 and prime-order curve",
-   "order": 1
-  },
-  {
    "id": "t2r8",
    "t": 2,
    "B": 4,
    "ratio": 8,
-   "p_rule": "least prime >= 2^16",
-   "order": 2
+   "p_rule": "least eligible prime >= 2^16 with 4 | p-1",
+   "order": 1
   },
   {
    "id": "t2r9",
    "t": 2,
    "B": 4,
    "ratio": 9,
-   "p_rule": "least prime >= 2^18",
+   "p_rule": "least eligible prime >= 2^18",
+   "order": 2
+  },
+  {
+   "id": "t2r10",
+   "t": 2,
+   "B": 4,
+   "ratio": 10,
+   "p_rule": "least eligible prime >= 2^20",
    "order": 3
   },
   {
@@ -148,7 +150,7 @@
    "t": 3,
    "B": 8,
    "ratio": 8,
-   "p_rule": "L1 decisive cell p=16801793 with its curve, g, zeta",
+   "p_rule": "L1 decisive cell p=16801793 with its curve, g, zeta if recoverable, else the rule",
    "order": 4
   },
   {
@@ -156,7 +158,7 @@
    "t": 3,
    "B": 8,
    "ratio": 7,
-   "p_rule": "least prime >= 2^21 with 8 | p-1",
+   "p_rule": "least eligible prime >= 2^21 with 8 | p-1",
    "order": 5
   },
   {
@@ -164,7 +166,7 @@
    "t": 3,
    "B": 8,
    "ratio": 9,
-   "p_rule": "least prime >= 2^27",
+   "p_rule": "least eligible prime >= 2^27",
    "order": 6
   },
   {
@@ -172,7 +174,7 @@
    "t": 4,
    "B": 16,
    "ratio": 7,
-   "p_rule": "least prime >= 2^28 with 16 | p-1; censor probe, lower bound only",
+   "p_rule": "least eligible prime >= 2^28 with 16 | p-1; censor probe; only if a t=3 natural row completed",
    "order": 7
   }
  ],
@@ -180,36 +182,47 @@
   "natural_sat": 4,
   "natural_unsat": 4,
   "planted": 1,
-  "classifier": "exhaustive signed multisets of 8 real base points; algebraic count over F_{p^2} recorded"
+  "classifier": "exhaustive signed multisets of 8 real base points; algebraic count over F_{p^2} recorded",
+  "draw_cap": 10000000,
+  "stratify_by": "algebraic_count (what the solver sees)"
  },
  "caps": {
-  "t2": {
+  "t2_param": {
    "threads": 8,
    "timeout_s": 3600,
-   "as_cap_gb": 60,
-   "native": {
-    "threads": 1,
-    "timeout_s": 3600,
-    "as_cap_gb": 30
-   }
+   "rss_cap_gb": 60
   },
-  "t3": {
+  "t2_gb": {
    "threads": 8,
-   "timeout_s": 21600,
-   "as_cap": "0.93 x pod RAM",
-   "native": {
-    "threads": 1,
-    "timeout_s": 7200,
-    "as_cap_gb": 60,
-    "read_as": "censored"
-   }
+   "timeout_s": 3600,
+   "rss_cap_gb": 60,
+   "targets": "SAT1, UNSAT1"
+  },
+  "t2_native": {
+   "threads": 1,
+   "timeout_s": 3600,
+   "as_cap_gb": 30,
+   "targets": "SAT1, UNSAT1"
+  },
+  "t3_natural": {
+   "threads": 8,
+   "timeout_s": 14400,
+   "rss_cap": "0.9 x cgroup memory.max"
+  },
+  "t3_planted": {
+   "threads": 8,
+   "timeout_s": 3600,
+   "rss_cap": "0.9 x cgroup memory.max",
+   "note": "last; completion not expected"
   },
   "t4_probe": {
    "threads": 8,
    "timeout_s": 7200,
-   "as_cap": "0.93 x pod RAM",
-   "targets": 1
-  }
+   "rss_cap": "0.9 x cgroup memory.max",
+   "targets": 1,
+   "condition": "a t=3 natural row completed"
+  },
+  "memory_enforcement": "RSS watchdog 2 s poll; prlimit --as at 1.25 x cap as backstop; VmHWM/VmPeak recorded at stop"
  },
  "controls": {
   "positive": {
@@ -231,13 +244,34 @@
   },
   "second_instrument": {
    "present": true,
-   "comparison": "native f4 vs msolve at t=2 on byte-identical inputs",
-   "expected": "same consistency verdict and solving degree"
+   "comparison": "reduced basis equality native f4 vs msolve -g 2 at t=2 SAT1/UNSAT1",
+   "fallback": "m=4,5,6 if native m=8 censors"
   },
   "replication": {
    "present": true,
    "comparison": "t3r8 on the L1 curve vs committed A3 log round structure",
    "gate": false
+  },
+  "exporter_planted_vanishing": {
+   "present": true,
+   "gate": true
+  },
+  "exporter_l1_replication": {
+   "present": true,
+   "gate": true,
+   "degraded_if": "L1 x_R not recoverable"
+  },
+  "exporter_variety_size": {
+   "present": true,
+   "gate": true,
+   "expected": "msolve count >= native ordered algebraic count; every native real decomposition recovered"
+  },
+  "canary": {
+   "present": true,
+   "what": "fixed-work mode-gb L1-curve run, timeout 120, before each t=3 call; drift > 1.5x flags the row"
+  },
+  "timer_floor": {
+   "present": true
   }
  },
  "variable_ledger": [
@@ -278,7 +312,7 @@
  "primary_metrics": [
   {
    "name": "cpu_s",
-   "unit": "CPU seconds (user+sys, msolve 8 threads + verify)",
+   "unit": "CPU seconds (user+sys of msolve mode param incl. all passes + verify); second reading adds base construction and target mask",
    "better": "lower"
   },
   {
@@ -288,12 +322,15 @@
   }
  ],
  "decision_rule": {
-  "gamma_lo": "log2(min_j c_lo(8,j) / max_j c(4,j)) over natural targets; censored rows enter as lower bounds",
-  "gamma_hi": "log2(max_j c(8,j) / min_j c(4,j)); +inf unless a t=3 natural row completed",
-  "KILL": "gamma_lo >= 3.5 on both observables with all controls passing (scope: msolve 0.6.5 F4 and native f4 on the raw chain presentation at measured scale)",
-  "NOT_KILLED_at_B_le_8": "gamma_hi < 3.5 on both observables and verified natural positives at t=3; reported as INCONCLUSIVE with direction; ADVANCE impossible (held-out t=4,5 unavailable)",
+  "gamma_lo": "log2(min_j c_lo(8,j) / max_j c(4,j)); min over all t=3 natural rows (censored = lower bound); max over ALL natural t=2 rows; undefined (KILL unavailable) if any natural t=2 row did not complete",
+  "gamma_hi": "log2(max_j c(8,j)/min_j c(4,j)); +inf unless a t=3 natural param row completed",
+  "gamma_lo_8_16": "log2(c_lo(16)/max_j c(8,j)) if the probe ran; undefined if any t=3 natural row is censored",
+  "reachability": "KILL needs min c_lo(8) >= 11.3 x max c(4); pilot seed 777 timings in PILOT.md; 256 GB pod required, no fallback",
+  "KILL_scoped": "gamma_lo(4->8) >= 3.5 on cpu_s and work_proxy, exporter gates + t=2 planted/negative + A/A + canaries passing; scope = msolve 0.6.5 -t 8 -P 1 pipeline on the raw Kummer-chain presentation, m=8, B in {4,8}; does not close the PKM lead, other presentations, solvers, arities or larger B",
+  "NOT_KILLED_at_B_le_8": "gamma_hi + log2(rho_AA) < 3.5 on cpu_s and gamma_hi < 3.5 on proxy, both cost readings, completed param runs and verified natural positives at t=3, every t=2 natural row completed; reported as INCONCLUSIVE with direction; ADVANCE impossible",
   "INCONCLUSIVE": "otherwise",
-  "censoring": "a cap-stopped call is a lower bound on c(B); may support KILL, never NOT_KILLED"
+  "censoring": "cap-stopped call = lower bound on c(B); may support KILL, never NOT_KILLED; a censored control is not evaluable",
+  "secant_note": "gamma(4->8) is a local secant over one doubling of B containing the degree step; never extrapolated"
  },
  "analysis_plan": {
   "tables": [
@@ -311,10 +348,12 @@
  "budget": {
   "route": "RunPod CPU pod (isolab monthly budget exhausted: 1808.95 of 1300 USD on 2026-11-14)",
   "pods": 1,
-  "flavor_rule": "largest cpu5m with <= 256 GB RAM available at creation; prefer 32 vCPU/256 GB; fallback 16 vCPU/128 GB",
-  "ceiling_usd": 60,
-  "deadline_h": 26,
-  "retries": 0
+  "replacement_pods": 1,
+  "flavor": "cpu5m 32 vCPU / 256 GB required; no smaller fallback",
+  "ceiling_usd": 90,
+  "deadline_h": 36,
+  "retries": 0,
+  "section_5a": "msolve cpu is unpriced; no cross-method ranking; rho rows only for the exponent comparison"
  },
  "export": {
   "export_schema": "experiment.export/v1",
@@ -333,5 +372,20 @@
   "commit": null,
   "protocol_md_sha256": null,
   "validator": "tools/experiment_protocol.py is vault-encrypted in the sibling checkout; schema conformance checked by hand against research/quadratic_twist_evidence_20261021/PAIR_RANK_20261029.protocol.json"
+ },
+ "eligibility": {
+  "prime": true,
+  "two_power_divides_p_minus_1": true,
+  "not_fermat": true,
+  "prime_order_curve": true,
+  "B_real_at_least": "B/2",
+  "g_rule": "least g>=2 outside mu_{2^t} with B_real >= B/2",
+  "all_p_at_least": 65536,
+  "crash_rule": "rc 139 with max RSS < 50% of cap or within 60 s = crash; cell replaced by next eligible prime before any natural row is analysed"
+ },
+ "plan_order": "t=2 block (planted first per cell; A/A t2r8 SAT1 first and last; gb+native for SAT1/UNSAT1 inside); t=3 natural interleaved t3r8-UNSAT1,t3r7-SAT1,t3r9-UNSAT1,t3r8-SAT1,t3r7-UNSAT1,t3r9-SAT1, then remaining natural round-robin, canary before each; t=3 planted last; t4r7 probe conditional",
+ "generation_accounting": {
+  "attack_setup": "base construction (field ops, square tests) and target mask",
+  "analysis_cost": "classifier enumeration and SAT-selection draws"
  }
 }
