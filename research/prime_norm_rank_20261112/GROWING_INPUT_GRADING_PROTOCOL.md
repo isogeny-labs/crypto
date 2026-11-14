@@ -21,7 +21,7 @@ be computed operations, not supplied witnesses. For a=3 this must bind to
 the unchanged actual four-variable source with weights (4,2,3,1).
 
 Assign w(A_j)=2(a-j), w(B_j)=2a-3-2j. Prove positivity and that this is
-exactly the consecutive multiset 1,...,2a-2. Define a polynomial coefficient
+exactly the consecutive multiset 1,...,2a-2 [pcc:unverified]. Define a polynomial coefficient
 budget by requiring weight(e)+2j<=d for every exponent e in coefficient j's
 actual multivariate support. This avoids treating a zero coefficient as a
 nonzero monomial of degree0. Target universal statements:
@@ -50,7 +50,7 @@ and actual Div.lean well-founded monic division recursion, and existing
 NormMembershipElimination/NormPoleTransport/NormSplitBaseDescent. Prior
 WEIGHTED_LEADING_PROTOCOL records the genericity and weight hypotheses of
 the weighted-GB literature. No claim that this new obligation is already
-proved or novel. Conductor executable absent. Scope new proof/control/report
+proved or novel [pcc:unverified]. Conductor executable absent. Scope new proof/control/report
 paths under the current study, its manifest, journal and append-only claims.
 
 A completed input budget does not imply that full iterated closure remains
