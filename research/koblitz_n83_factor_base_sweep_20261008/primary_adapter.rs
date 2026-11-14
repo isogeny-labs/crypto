@@ -1114,6 +1114,31 @@ pub(super) fn full_d18_m4_l0_ordered_xcnf_cli(
     )
 }
 
+/// Export the same ordered D18 construction for one sealed public fixture.
+pub(super) fn full_d18_m4_l0_ordered_xcnf_fixture_cli(
+    root: &Path,
+    fixture_root: &Path,
+    fixture: u64,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl_fixture(
+        "natural",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        false,
+        true,
+        32,
+        fixture,
+    )
+}
+
 /// Export the unchanged constructed full-D18 XCNF and save one native SAT
 /// assignment so an independent verifier can test every exported constraint.
 pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
@@ -1232,6 +1257,43 @@ fn full_d18_m4_impl(
     ordered_first_pair: bool,
     xor_decision_cadence: usize,
 ) -> Result<Value> {
+    full_d18_m4_impl_fixture(
+        mode,
+        root,
+        fixture_root,
+        output,
+        l0_diagnostic,
+        encoding,
+        choice_pins,
+        phase_zero_first,
+        budget_seconds,
+        export_xcnf,
+        native_xcnf_witness,
+        ordered_first_pair,
+        xor_decision_cadence,
+        0,
+    )
+}
+
+fn full_d18_m4_impl_fixture(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    l0_diagnostic: bool,
+    encoding: FrobeniusOrbitRootEncoding,
+    choice_pins: &'static str,
+    phase_zero_first: bool,
+    budget_seconds: u64,
+    export_xcnf: bool,
+    native_xcnf_witness: bool,
+    ordered_first_pair: bool,
+    xor_decision_cadence: usize,
+    public_fixture: u64,
+) -> Result<Value> {
+    if public_fixture != 0 && (mode != "natural" || !export_xcnf || !ordered_first_pair) {
+        return Err("nonzero public fixture requires ordered natural XCNF export".into());
+    }
     if !["positive", "natural"].contains(&mode)
         || output.exists()
         || ((native_xcnf_witness || (ordered_first_pair && xor_decision_cadence == 32))
@@ -1364,9 +1426,10 @@ fn full_d18_m4_impl(
     {
         return Err("full D18 public corpus differs from frozen fixture".into());
     }
-    let (public, corpus_hash) = public_target(fixture_root, &base.curve)?;
-    if point_json(words(&public))
-        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    let (public, corpus_hash) = public_target_fixture(fixture_root, &base.curve, public_fixture)?;
+    if public_fixture == 0
+        && point_json(words(&public))
+            != json!(["1834913121178197242856238", "8797964190732846213981377"])
     {
         return Err("full D18 public target point differs".into());
     }
@@ -1640,6 +1703,7 @@ fn full_d18_m4_impl(
             "summands":4, "identity_mask":0,
             "root_encoding":encoding_name, "choice_pin_policy":choice_pins,
             "search_policy":search_policy, "target":point_json(words(&target)),
+            "public_fixture":public_fixture,
             "object":row["object"], "point_set_blake3":FULL_D18_POINT_SET,
             "shape":shape, "xcnf_sha256":xcnf_sha256,
             "xcnf_bytes":xcnf.len(), "xcnf_path":xcnf_path.to_string_lossy(),
