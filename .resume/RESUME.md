@@ -1,42 +1,35 @@
-# Resume: crypto @ claude/f4-f5-algorithm-speed-bvp7qd
+# Resume: crypto @ claude/ecstatic-thompson-0jpmjv
 
 ## Goal
-Lower the cold one-target cost of the plane-quartic double-large-prime index calculus (arms D, DL1,
-DL of `research/quartic_n4v2_20261020`, the GHS-weak family, the only IC leaderboard section below
-its matched rho) by two changes, measured against the frozen grid on the same instances.
+Owner (2026-11-12): run the frozen wide-modulus sparse-LA pack on RunPod ("1 but on runpod").
+Protocol: research/ic_techniques_20261012/wide_sparse_la/PROTOCOL.md + PROTOCOL_AMENDMENT_1.md
+(RunPod cpu5g 4 vCPU/16 GiB, one pod per seed, A/A per pod, USD 25 ceiling, 40 h pod deadline).
 
 ## Lead / hypothesis
-`LEAD-J-dl1-percolation-fb-size` (`research/leads_20261112`, lane J): the frozen factor-base constant
-c_D = 2.0 sits far above the large-prime-graph percolation threshold (about 1.55); plus a new lever,
-a fixed-exponent chain for the per-pair square root. Confirmed if BOTH / BASE for DL is below 1 at
-every k = 18..22 (all seeds, w = 0, 0.1, 1); killed if not.
+Size law: row_ops/D grows as D^(beta-1), beta in [1.9, 2.1] (Krylov). Width law: ns per row_op
+t(L) = c0 + c2 L^2 over limbs L = 1..4. Extrapolate U192@129 (ECC2K-130 order) to D = 1e9 with
+interval; falsifiers in PROTOCOL.md "How the extrapolation model is falsified".
 
 ## Spec
-`research/quartic_dl1_cd_sqrt_20261113/PROTOCOL.md` (frozen in the commit that adds it); units
-`launch/units.tsv` (116 units: BASE, CHAIN, CRULE, BOTH; k = 12..22; frozen N4 v2 seeds); sources
-`src/` (v3 = frozen v2 + chain); pod runner `launch/job.sh`. Baseline instrument: frozen
-`research/quartic_n4v2_20261020/v2.rs`. Frozen grid units: `research/quartic_n4v2_20261020/results/grid-20261025/units.tar.gz`
-(artifact store, `ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts/store`).
+research/ic_techniques_20261012/wide_sparse_la/runpod/{launch.py, pod_run.sh, make_bundle.py}.
+launch.py bundles HEAD, uploads to s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/<stamp>-<sha>/,
+creates 3 RunPod CPU pods (REST v1) that build la_engine_bench and run the grid for their seed.
+Record: benchmarks/records/<id>-wide-sparse-la.json (benchrec).
 
 ## State
-Local pilots (not data, 2026-11-13, documented in PROTOCOL.md and docs/session-logs/2026-11-13.md):
-c = 1.55 succeeded on every unit at k = 18..22; combined estimate DL 0.68 / 0.61 / 0.56 of BASE at
-k = 18 / 20 / 22. A pilot BASE unit reproduced every counted field of the frozen grid unit.
-
-## Next steps
-1. Commit and push the study; `check-experiment-git` receipt into `launch/`.
-2. Build v2 (from `research/quartic_n4v2_20261020/v2.rs`) and v3 (from `src/v3.rs`) with
-   `rustc --edition 2021 -O`; image layer = binaries, job.sh, units.tsv, AWS CLI v2; publish with
-   `taskq/deploy/eks-karpenter/oci-layer-publish.py`; receipt `launch/image.json`.
-3. `launch/request.json` (isolab.eks.command-request/v1) and `remote/launch-remote-command`.
-4. Collect `s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod>/`, run the analysis (H0, H1,
-   H2, ratios), report + PDF + figure, bench record, VALIDATION.json, leaderboard, PR.
+2026-11-12: amendment + launcher committed; local smoke test of pod_run.sh (D=2^8..2^9) run.
+Launch manifest: research/ic_techniques_20261012/wide_sparse_la/launch.json (pod ids, S3 prefix).
 
 ## Runs in flight
-none (to be filled at submission).
+None. Attempt 2 completed 2026-11-13 ~16Z; raw data pulled into wide_sparse_la/raw/ (2026-11-14).
+Was: 3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
+Pods self-terminate via podTerminate; if not, terminate via REST DELETE /v1/pods/<id>.
 
 ## Stop and success conditions
-Budget ceiling USD 15 (charged incl. failures); one submission; success per PROTOCOL.md decision rule.
+Fixed grid; per-run 3600 s timeout and per-arm stop rule; pod deadline 40 h; A/A determinism failure voids.
+Success = complete raw data + frozen analysis (fits, intervals, falsification outcomes), whatever the outcome.
 
-## Open questions
-None blocking. Incremental factor-base growth (instead of the charged restart) is a later, smaller lever.
+## Next steps
+1. Monitor pods (~13-16 h). 2. Pull raw/*.jsonl into wide_sparse_la/raw/, sha256 + S3.
+3. analysis.py per frozen Analysis section -> results.json; research-visuals report/PDF/graphs.
+4. benchrec add-raw/metric/close; benchmarks/<date>-wide-sparse-la/ + README row; progress report; PR.

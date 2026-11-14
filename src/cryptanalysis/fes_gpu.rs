@@ -15,7 +15,7 @@
 //! reference is the algorithm in `fes.cuh` ported to Rust, so a worker's output
 //! must equal it exactly.
 
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
 use std::sync::Mutex;
@@ -303,7 +303,7 @@ pub fn sort_gray_order(points: &mut [u64]) {
     points.sort_unstable_by_key(|&x| gray_rank(x));
 }
 
-/// A worker kept running in `--serve` mode (`gpu/fes/fes_io.hpp`): one
+/// A worker kept running in `--serve-bin` mode (`gpu/fes/fes_io.hpp`): one
 /// process, one CUDA context and one set of device buffers for a whole run,
 /// so a solver call costs a pipe round trip and a kernel launch instead of a
 /// process start and a CUDA initialisation.  Like [`run_worker`], it only
@@ -325,15 +325,15 @@ pub struct ServeReply {
 }
 
 impl ServeWorker {
-    /// Start `worker --serve`.
+    /// Start `worker --serve-bin`.
     pub fn spawn(worker: &Path) -> Result<Self, String> {
         let mut child = Command::new(worker)
-            .arg("--serve")
+            .arg("--serve-bin")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
             .spawn()
-            .map_err(|e| format!("failed to start {} --serve: {e}", worker.display()))?;
+            .map_err(|e| format!("failed to start {} --serve-bin: {e}", worker.display()))?;
         let stdin = child.stdin.take().ok_or("no stdin on serve worker")?;
         let stdout = BufReader::new(child.stdout.take().ok_or("no stdout on serve worker")?);
         Ok(Self {
@@ -349,51 +349,43 @@ impl ServeWorker {
         &self.path
     }
 
-    /// Send one system and read its reply.
+    /// Send one system and read its reply (the binary protocol of
+    /// `gpu/fes/fes_io.hpp`: little-endian words, no text formatting).
     pub fn solve(&mut self, sys: &PackedSystem) -> Result<ServeReply, String> {
+        const MAGIC: u32 = 0x3153_4546;
+        let mut req = Vec::with_capacity(16 + 8 * (1 + sys.lin.len() + sys.quad_tri.len()));
+        for w in [MAGIC, sys.n as u32, sys.m as u32, 0] {
+            req.extend_from_slice(&w.to_le_bytes());
+        }
+        req.extend_from_slice(&sys.cst.to_le_bytes());
+        for v in sys.lin.iter().chain(sys.quad_tri.iter()) {
+            req.extend_from_slice(&v.to_le_bytes());
+        }
         self.stdin
-            .write_all(sys.to_contract().as_bytes())
+            .write_all(&req)
             .and_then(|_| self.stdin.flush())
             .map_err(|e| format!("serve worker write: {e}"))?;
-        let mut line = String::new();
-        let header = loop {
-            line.clear();
-            let k = self
-                .stdout
-                .read_line(&mut line)
-                .map_err(|e| format!("serve worker read: {e}"))?;
-            if k == 0 {
-                return Err("serve worker closed its output".into());
-            }
-            let t = line.trim();
-            if t.starts_with("ERROR") {
-                return Err(format!("serve worker: {t}"));
-            }
-            if t.starts_with("SOLUTIONS") {
-                break t.to_string();
-            }
-        };
-        let mut it = header.split_whitespace().skip(1);
-        let listed: usize = it
-            .next()
-            .and_then(|v| v.parse().ok())
-            .ok_or_else(|| format!("bad serve header: {header}"))?;
-        let total: u64 = it
-            .next()
-            .and_then(|v| v.parse().ok())
-            .ok_or_else(|| format!("bad serve header: {header}"))?;
-        let mut proposed = Vec::with_capacity(listed);
-        for _ in 0..listed {
-            line.clear();
-            self.stdout
-                .read_line(&mut line)
-                .map_err(|e| format!("serve worker read: {e}"))?;
-            proposed.push(
-                line.trim()
-                    .parse::<u64>()
-                    .map_err(|_| format!("bad solution line: {}", line.trim()))?,
-            );
+        let mut head = [0u8; 24];
+        self.stdout
+            .read_exact(&mut head)
+            .map_err(|e| format!("serve worker read: {e}"))?;
+        let word = |i: usize| u32::from_le_bytes(head[i..i + 4].try_into().unwrap());
+        let quad = |i: usize| u64::from_le_bytes(head[i..i + 8].try_into().unwrap());
+        if word(0) != MAGIC {
+            return Err(format!("serve worker: bad reply magic {:#x}", word(0)));
         }
+        if word(4) != 0 {
+            return Err(format!("serve worker: status {}", word(4)));
+        }
+        let (listed, total) = (quad(8), quad(16));
+        let mut body = vec![0u8; 8 * listed as usize];
+        self.stdout
+            .read_exact(&mut body)
+            .map_err(|e| format!("serve worker read: {e}"))?;
+        let proposed = body
+            .chunks_exact(8)
+            .map(|c| u64::from_le_bytes(c.try_into().unwrap()))
+            .collect();
         Ok(ServeReply { proposed, total })
     }
 }

@@ -142,6 +142,13 @@ template <class F, int CHUNK>
 __global__ void RF_BOUNDS k_decompose_shared_hash(DecompArgs<F> a, HashTable gtable) {
     extern __shared__ uint64_t s_dyn[];
     const uint32_t cap = gtable.mask + 1;
+    HashTable table = gtable;
+#if RF_HASH_PACKED
+    /* packed slots only: 8 bytes per slot instead of 12 */
+    for (uint32_t s = threadIdx.x; s < cap; s += blockDim.x) s_dyn[s] = gtable.slots[s];
+    __syncthreads();
+    table.slots = s_dyn;
+#else
     uint64_t *s_keys = s_dyn;
     uint32_t *s_vals = reinterpret_cast<uint32_t *>(s_dyn + cap);
     for (uint32_t s = threadIdx.x; s < cap; s += blockDim.x) {
@@ -149,10 +156,9 @@ __global__ void RF_BOUNDS k_decompose_shared_hash(DecompArgs<F> a, HashTable gta
         s_vals[s] = gtable.vals[s];
     }
     __syncthreads();
-    HashTable table;
     table.keys = s_keys;
     table.vals = s_vals;
-    table.mask = gtable.mask;
+#endif
     rf_decompose_thread<F, HashTable, CHUNK>(a, table, rf_global_tid());
 }
 
@@ -193,8 +199,8 @@ static int run_device(const typename F::ctx &f,
 
     int rc = RF_OK;
     elt *d_fbx = nullptr, *d_fby = nullptr, *d_tx = nullptr, *d_ty = nullptr;
-    uint64_t *d_keys = nullptr;
-    uint32_t *d_idx = nullptr, *d_cnt = nullptr;
+    uint64_t *d_keys = nullptr, *d_aux64 = nullptr;
+    uint32_t *d_idx = nullptr, *d_cnt = nullptr, *d_aux32 = nullptr;
     rf_relation *d_out = nullptr;
     cudaEvent_t e0 = nullptr, e1 = nullptr;
     SortedTable sview{};
@@ -224,6 +230,12 @@ static int run_device(const typename F::ctx &f,
         CU(cudaMemcpy(d_keys, sorted.keys.data(), n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
         CU(cudaMemcpy(d_idx, sorted.idx.data(), n_fb * sizeof(uint32_t), cudaMemcpyHostToDevice));
         sview.keys = d_keys; sview.idx = d_idx; sview.n = n_fb;
+        /* Eytzinger copy (RF_SORTED_EYT): n_fb + 1 entries, 1-indexed */
+        CU(rf_cu_alloc(&d_aux64, (n_fb + 1) * sizeof(uint64_t)));
+        CU(rf_cu_alloc(&d_aux32, (n_fb + 1) * sizeof(uint32_t)));
+        CU(cudaMemcpy(d_aux64, sorted.eyt.data(), (n_fb + 1) * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        CU(cudaMemcpy(d_aux32, sorted.eyt_rank.data(), (n_fb + 1) * sizeof(uint32_t), cudaMemcpyHostToDevice));
+        sview.eyt = d_aux64; sview.eyt_rank = d_aux32;
     } else {
         hcap = hash.capacity();
         CU(rf_cu_alloc(&d_keys, hcap * sizeof(uint64_t)));
@@ -231,6 +243,10 @@ static int run_device(const typename F::ctx &f,
         CU(cudaMemcpy(d_keys, hash.keys.data(), hcap * sizeof(uint64_t), cudaMemcpyHostToDevice));
         CU(cudaMemcpy(d_idx, hash.vals.data(), hcap * sizeof(uint32_t), cudaMemcpyHostToDevice));
         hview.keys = d_keys; hview.vals = d_idx; hview.mask = hash.mask;
+        /* packed slots (RF_HASH_PACKED) */
+        CU(rf_cu_alloc(&d_aux64, hcap * sizeof(uint64_t)));
+        CU(cudaMemcpy(d_aux64, hash.slots.data(), hcap * sizeof(uint64_t), cudaMemcpyHostToDevice));
+        hview.slots = d_aux64;
     }
 
     a.f = f;
@@ -238,7 +254,11 @@ static int run_device(const typename F::ctx &f,
     a.t_x = d_tx; a.t_y = d_ty; a.n_targets = n_targets;
     a.out = d_out; a.out_count = d_cnt; a.out_cap = cap;
 
+#if RF_HASH_PACKED
+    hash_smem = (size_t)hcap * sizeof(uint64_t);
+#else
     hash_smem = (size_t)hcap * (sizeof(uint64_t) + sizeof(uint32_t));
+#endif
     CU(rf_cu_event(&e0));
     CU(rf_cu_event(&e1));
     CU(cudaEventRecord(e0));
@@ -276,6 +296,7 @@ cleanup:
     cudaGetLastError();
     cudaFree(d_fbx); cudaFree(d_fby); cudaFree(d_tx); cudaFree(d_ty);
     cudaFree(d_keys); cudaFree(d_idx); cudaFree(d_cnt); cudaFree(d_out);
+    cudaFree(d_aux64); cudaFree(d_aux32);
     if (e0) cudaEventDestroy(e0);
     if (e1) cudaEventDestroy(e1);
     return rc;
@@ -298,6 +319,27 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
      * honour the request (the caller may be measuring exactly that) but
      * the default the API applies for P-256 is 16. */
     return run_device<FieldP256>(*f, fb_x, fb_y, n_fb, tx, ty, n_targets, lookup, chunk, out, cap, n_found, seconds);
+}
+
+/* RF_PROFILE builds: reset and read the sampled phase cycles of
+ * rf_decompose_thread (rootfind.cuh).  Return 0 on success, -1 when the
+ * build has no profile. */
+extern "C" int rf_profile_reset(void) {
+#if RF_PROFILE
+    unsigned long long z[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    return cudaMemcpyToSymbol(rf_prof_cycles, z, sizeof z) == cudaSuccess ? 0 : -1;
+#else
+    return -1;
+#endif
+}
+
+extern "C" int rf_profile_read(unsigned long long *out8) {
+#if RF_PROFILE
+    return cudaMemcpyFromSymbol(out8, rf_prof_cycles, 8 * sizeof(unsigned long long)) == cudaSuccess ? 0 : -1;
+#else
+    (void)out8;
+    return -1;
+#endif
 }
 
 extern "C" int rf_cuda_device_present(char *name, int name_len) {
