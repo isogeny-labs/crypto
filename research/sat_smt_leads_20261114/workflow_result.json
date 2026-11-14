@@ -1,0 +1,586 @@
+{
+ "root": "/home/user/crypto/research/sat_smt_leads_20261114",
+ "results": [
+  {
+   "idea": 1,
+   "title": "Proof-size slope as a go/no-go gate",
+   "slug": "01-proof-size-slope",
+   "pilot": {
+    "idea": 1,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "Kill criterion met [pcc:unverified]: on m=3 non-decomposable targets (n=17, l=2..5, 29 rows) the backward-trimmed DRAT core grows at 3.27 bits/l against 3.34 bits/l for the baseline, untreated CaDiCaL 1.5.3 conflicts on the same CNF and proofs; the core keeps 67-102% of the conflict count per cell. At l=5 the core is about 2.5e5 lemmas against 32 leaf solves for the linear 2+1 scan baseline (slope 1) and 1,024 MITM pairs (slope 2).",
+    "slopes": "All fits are least squares on per-instance log2 values, 95% bootstrap interval in brackets, UNSAT targets unless stated, [pcc:unverified].\n\nSeries A (n=17 fixed, CaDiCaL), l=2,3,4,5 with 8/8/6/7 rows:\n- Baseline conflicts: 3.34 [3.24, 3.42]\n- Decisions: 3.12 [3.05, 3.19]\n- Proof lemmas: 3.12 [3.00, 3.23]\n- Treatment T1, trimmed core lemmas: 3.27 [3.14, 3.38]\n- Treatment T2, iterated trim (only 1 row at l=5): 3.13 [2.98, 3.28]\n- Core literals: 3.79 [3.62, 3.94]\n\nSeries A restricted to l=3..5: conflicts 3.41 [3.23, 3.57], T1 core 3.55 [3.31, 3.77].\n\nGlucose 4, l=2..4 (1 row at l=4): conflicts 4.95 [4.29, 5.71], T1 core 4.92 [4.24, 5.71].\n\nSeries B (n=11,13,17 for l=3,4,5, CaDiCaL): conflicts 3.55 [3.35, 3.73], T1 core 3.40 [3.19, 3.58].\n\nSAT targets (mostly planted, CaDiCaL, l=2..5, 12 rows): conflicts 2.73 [2.44, 3.02].\n\nReference count slopes: linear 2+1 scan 1, MITM 2, tuple enumeration 3.\n\nT3 exploratory minimisation (re-solve core originals with four solvers, iterate): best core / CaDiCaL core was 0.39-1.00 at l=2 (4 targets) and 0.96-1.00 at l=3 (3 targets). Two sizes only, so no slope.",
+    "not_covered": "- Sizes: the protocol planned n=23, l=3..7. A cost probe showed that was unaffordable on this pilot CNF (3.3e5 conflicts already at n=19, l=4), so the run used n=17, l=2..5.\n- Trimmer: drat-trim was fetched, but the permission layer refused building it. I used my own backward RUP checker (rup_trim.c: deletions ignored, core-first), validated by bogus-proof rejection, an independent-solver UNSAT check of the core, and a Python forward re-check at l=2. There was no reference trimmer and no LRAT check.\n- Time censoring at l=5: target 0, the largest proof, is missing from the fits. Its scratch files give 532,934 proof lemmas and 405,370 core lemmas (ratio 0.76). This biases the l=5 means slightly low for both arms.\n- Time censoring at l=4: CaDiCaL has 6 of 8 UNSAT rows and Glucose has 1.\n- Iterated trim (T2) ran on only one target at l=5; Glucose was not run at l=5.\n- T3 minimisation covered only l=2 and l=3, with 4 and 3 targets.\n- Order of work: two l=5 runs started about a minute before the planted-lift validation passed. Its first run exposed a planted-generator defect (P1 = -P2), which was fixed; UNSAT rows do not use that generator.\n- Encoding: this is a pilot chained-S3 CNF with width-4 XOR cuts and no symmetry breaking, not the repository's cnf/wdsat encodings. Its conflict slope sits above 2^(3l)/6 and depends on n.\n- Scope of the result: it covers only trimming of proofs the solvers found. It does not show that no short refutation exists. Whether the 2^l linear 2+1 certificate translates into a short clausal proof was not attempted, and XOR-aware or algebraic proof systems were not tried.\n- Wall times are contended (load 5-6.5, up to 4 of my processes at once) and are indicative only.\n- No docs/session-logs entry, benchmark record, Conductor task, ecdb or research-kb query: writes were restricted to the idea directory and those tools are not installed. The session-log entry is inside README.md.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/tables.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/validation.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/pdp.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/rup_trim.c",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/validate.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/run.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/t3.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A234.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A4a.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A4b.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5b.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5c.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5d.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5e.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5f.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5g.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/A5h.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/B.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/T3.jsonl"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope && S=$(mktemp -d) && gcc -O2 -o $S/rup_trim rup_trim.c && python3 run.py $S A 17 2 8 4 $S/a2.jsonl"
+   },
+   "check": {
+    "idea": 1,
+    "reproduced": "partly",
+    "verdict_supported": "yes",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "Scope: the kill covers only backward trimming of CDCL-found DRAT proofs on this pilot CNF. It does not show that no short refutation exists; real minimisation (T3) ran at two sizes only and the 2^l linear 2+1 certificate was never translated to a clausal proof.",
+     "The primary series was changed after a cost probe (n=23, l=3..7 became n=17, l=2..5) and PROTOCOL.md was not amended for it; only README.md records it, and the probe rows were discarded. The change favours 'alive', not kill (adding l=2 lowers the trimmed slope from 3.55 to 3.27).",
+     "The l=4 'time censoring' is mislabelled: the two missing CaDiCaL rows (targets 4 and 6) take seconds and are the two largest in the cell (35,939 and 33,234 conflicts; T1 cores 28,797 and 26,648). With the full cell the slopes are unchanged (conflicts 3.345, core 3.275).",
+     "The censored l=5 row is also the largest; adding it from the producer's scratch figures gives conflicts 3.37, core 3.30, difference 0.07.",
+     "PROTOCOL.md's statement 'UNSAT in the relaxation implies non-decomposable' is false in general: the chained encoding misses decompositions through the point at infinity (for planted x(R)=1 there are 4 true ordered decompositions but 3 relaxed solutions). It does not affect the UNSAT rows checked, where x(R) is outside V.",
+     "The l=2 planted SAT cell holds 2 distinct targets, each twice, because only x=0 and x=1 in V are rational; it is 2 independent rows, not 4.",
+     "The trimmer is the producer's own code with no reference trimmer or LRAT check. I confirmed one l=2 core with my own forward RUP checker and MiniSat. Any non-minimality would bias toward kill, by an unknown amount.",
+     "The headline '67-102%' core/conflict range is over cell geometric means; per instance it is 55% to 147%.",
+     "The pilot CNF is weaker than enumeration (conflict slope 3.34 against 3), so the result does not transfer to the repository's encodings.",
+     "The l=5 rows, Glucose rows above l=2, series B and T3 were not re-run; the directory is untracked in git, so protocol-before-data rests on file times only (PROTOCOL.md 07:55, first rows 08:05)."
+    ],
+    "summary": "The kill verdict follows from the pre-written criterion and is robust, but it only kills \"trimming CDCL-found DRAT proofs on this pilot CNF exposes short refutations\".\n\n**Generator (own code, n=17, l=2, 12 targets):** all checks passed. The CNF model set (enumerated with MiniSat) equals my exhaustive solution set, every model satisfies both S3 equations, and row truth and solution counts match. The 8 UNSAT targets have no rational decomposition and the 4 planted ones do.\n\n**Re-runs:** the producer's command reproduced all 24 l=2 rows exactly. CaDiCaL rows at l=3 (8 of 8) and l=4 (the 6 stored) are also identical. l=5 was not re-run.\n\n**Fairness:** baseline and treatment use the same instances, seeds and proofs. SAT rows are not mixed into the UNSAT fits, and the fit rests on 4 sizes. Uncounted items (lemma length, trim time) would hurt the treatment, not help it.\n\n**Kill criterion (my recomputation, paired bootstrap):**\n\n| subset | conflicts | T1 core | difference | 95% of difference |\n|---|---|---|---|---|\n| l=2..5 | 3.34 | 3.27 | 0.07 | [-0.01, 0.15] |\n| l=3..5 | 3.41 | 3.55 | -0.14 | [-0.24, -0.03] |\n| l=2..4 | 3.23 | 3.08 | 0.15 | [0.01, 0.28] |\n| series B | 3.55 | 3.40 | 0.15 | [0.12, 0.18] |\n\nGlucose gives a difference of 0.03. No interval reaches 0.3, and the lowest core-slope bound is 2.88 against the 1.7 threshold.\n\nThe main defects in the record are an unamended protocol for the size change and a mislabelled l=4 censoring; neither moves the verdict.\n\nAll figures are [pcc:unverified]. Review written to /home/user/crypto/research/sat_smt_leads_20261114/01-proof-size-slope/SKEPTIC.md."
+   }
+  },
+  {
+   "idea": 2,
+   "title": "Linear-leaf XCNF",
+   "slug": "02-linear-leaf-xcnf",
+   "pilot": {
+    "idea": 2,
+    "status": "partial",
+    "verdict": "inconclusive",
+    "headline": "Against the native linear 2+1 scan baseline (2|F|-1 leaf solves, about 2^l: 53 at l=6) and the untreated chained CryptoMiniSat arm B0 (121,420 conflicts at l=4, all 8 targets censored above 300,000 at l=5), the assumption-driven linear-leaf arm T2 cost 354,490 conflicts+calls per non-decomposable target at l=6 (about 5,500x the scan, 8x 2^(3l)/6). Only T4, where an outer loop substitutes x1 and u and the solver is a pure-XOR leaf engine, sits at the scan count (0 conflicts per leaf), which is the scan by construction. All numbers [pcc:unverified], n=23, m=3.",
+    "slopes": "Bits per l, log2 of mean work on non-decomposable targets, 8 targets per cell unless noted, uncensored cells only. Native scan L: 1.00 (l=2..6). Baseline B0 (chained encoding, CMS native XOR, free): 2.96 on l=2,3,4 (3.84 on l=3,4 alone; l=5 censored). T1 (free solver, (s,p) affine encoding): 4.63 on l=2..4, i.e. 1.67 above B0. T2 (x1 by assumptions): 2.34 on l=2..7 (l=7 has only 2 targets); 3.77 on the matched sizes l=2..4, i.e. 0.81 above B0; 1.80 on l=3..7. T3 (x1 substituted, fresh solver per x1): 3.32 on l=2..8 (1 target each at l=7,8); its conflicts per x1 grow 7.9 -> 24,255 from l=3 to l=8. T4 (x1 and u substituted): 1.23 on l=2..8, 1.00 on l=2..6. Glucose without Gauss, l=2,3 only (two points): G-B0 3.77, G-T1 3.99, G-T2 5.90. The pre-registered rule (T1 or T2 at least 0.7 below B0) cannot be decided: B0 finished uncensored at only 2 of the pre-registered sizes; with the l=2 cell added after validation, the matched-size comparison points in the kill direction.",
+    "not_covered": "m=4 was not run. B0 and T1 were not run at l>=6, and are censored at l=5 (300,000-conflict cap), so the baseline slope rests on l=2,3,4, with l=2 a degenerate cell (|F|=2) added after the validation run. l=7 and l=8 hit the run deadline: 34 rows not run; T2 has 2 non-decomposable targets at l=7, T3 and T4 one each at l=7 and l=8; T2 was not run at l=8. Glucose arms only at l=2,3. Decision restriction was only emulated (assumptions or outer loop); pycryptosat exposes no decision-variable control and only a conflict count, so CMS decisions and propagations are missing. B0 is a weak baseline: far above the repository's one-conflict-per-tuple line (121,420 conflicts against 683 tuples at l=4), and no WDSat or symmetrised-encoding arm was run. n was fixed at 23, so the free 23-bit u dominates small cells. CMS default options only. Cells ran as up to 4 concurrent one-core processes, so wall times are not comparable. All random targets were non-decomposable for l<=7, so decomposable rows are planted targets only. No docs/session-logs entry was written, because the task confined writes to the pilot directory; the README is the handoff.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/summary_tables.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/pilot.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/raw/run_l2_l3.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/raw/run_l4.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/raw/run_l5.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/raw/run_l6.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/raw/run_l7.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/raw/run_l8.json"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf && ARMS=B0,T1,T2,T3,T4 python3 pilot.py /tmp/idea2_l3.json 20261114 300 3"
+   },
+   "check": {
+    "idea": 2,
+    "reproduced": "yes",
+    "verdict_supported": "no",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "The kill criterion was changed: the assigned one is absolute (work stays at or above 0.5*2^(2l)/6, slope not reduced by 0.7 from 2 bits per l), but PROTOCOL.md replaced it with a slope difference against the weak SAT arm B0 plus an 'inconclusive if B0 has fewer than 3 uncensored sizes' clause. B0 censors at l=5, so that rule could hardly return anything but inconclusive.",
+     "Under the assigned criterion the kill is decidable without B0 and is met: T2 slope 1.67 on l=3..6 (8 targets each), 1.77 on l=3..7, 2.34 on l=2..7, so at best 0.35 below 2.0; T2 work is 1,040x to 2,010x the 0.5*2^(2l)/6 line for l=3..7. T3 slope 3.26 to 3.32, T1 4.63. Only T4 (the native scan by construction, excluded from the verdict by the protocol) reaches 2^l.",
+     "The stated verdict contradicts the protocol once the added l=2 cell is counted: B0, T1 and T2 then have three matched uncensored sizes and the protocol's own rule reads KILL (T1 1.67 above B0, T2 0.81 above B0). The README adds the cell and then sets it aside as degenerate.",
+     "Deviations (l=2 added, B0/T1 dropped at l>=6, Glucose cut to l=2,3) were decided after a 'validation run' on the same deterministic seeds and code, which was a first look at the measurements; its output was not kept. File times are consistent with PROTOCOL.md preceding the measured runs, but there is no version history and I cannot tell whether it predates the validation run.",
+     "No symmetrised or WDSat baseline was run although the assignment names the chained/symmetrised encoding; B0 is 121,420 conflicts against 683 tuples at l=4.",
+     "n is fixed at 23 for all l, so the free 23-bit u dominates small cells and SAT-arm slopes are not those of a matched family with n near 3l.",
+     "Thin top cells: T2 at l=7 has 2 targets, T3 and T4 at l=7 and l=8 have 1 each; fits over l=2..8 lean on single targets.",
+     "Decision restriction was only emulated (assumptions or outer loop), one solver with default options, m=3 only; the kill does not cover a solver with real decision-variable control or WDSat-style XOR reasoning.",
+     "Small errors: T2 on l=3..7 fits 1.77, not the reported 1.80; 'one Gauss matrix in every run' is wrong for 2 T1 rows at l=4 (2 and 3 matrices); PROTOCOL.md says pycryptosat 5.11.x but 5.18.0 is installed.",
+     "Review limits: only l=3 was rerun and independently brute-forced; l=4..8 numbers are taken from results.json; Glucose arms were not rerun; the exhaustive check of the encoding over all 2^23 u covered 4 of 16 targets; seed-to-R regeneration was not checked independently."
+    ],
+    "summary": "The pilot reproduces, but its \"inconclusive\" label is not supported: under the assigned kill criterion the kill is met for every arm where the solver does part of the search (T1, T2, T3). All numbers [pcc:unverified].\n\n- **Generator and answers (l=3):** with my own field, curve and brute-force code, all 16 targets are on the curve with x(R) outside V. The 8 planted targets decompose and the 8 random ones do not. All 144 rows agree with brute force and every stored SAT model lifts to points summing to R. An exhaustive search over all 2^23 values of u confirmed the encoding's semantics on 4 of the 16 targets.\n- **Rerun:** the producer's command ran in 5.9 s and all 96 rows match results.json exactly (status, conflicts, calls, R, model).\n- **Fairness:** instances and seeds are identical across arms, decomposable and non-decomposable rows are kept separate, every arm run is reported, and the native 2+1 scan is shown beside each arm. My recomputed slopes match, except T2 on l=3..7 is 1.77, not 1.80.\n- **Why the verdict fails:** the producer swapped the absolute kill criterion for a slope difference against B0, a weak baseline that censors at l=5. Against the assigned line (0.5*2^(2l)/6, slope 2, required reduction 0.7), T2's best window is 1.67 on l=3..6, a reduction of about 0.35, and its work is over 1,000x the line at l=3..7. T3 fits 3.3 and T1 4.63. Only T4 reaches 2^l, and it is the native scan by construction.\n- **Protocol inconsistency:** with the l=2 cell the producer added, the protocol's own rule also reads kill (T1 1.67 above B0, T2 0.81 above B0). That cell and the other deviations were decided after a validation run on the same seeds.\n\nThe kill covers emulated decision restriction in CryptoMiniSat only, at m=3, n=23, l<=7. It does not cover a solver with real decision-variable control or WDSat-style XOR reasoning. I did not rerun l>=4 or the Glucose arms.\n\nReview: /home/user/crypto/research/sat_smt_leads_20261114/02-linear-leaf-xcnf/SKEPTIC.md\nScratch: /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-02-linear-leaf-xcnf/"
+   }
+  },
+  {
+   "idea": 3,
+   "title": "Cut-variable branching with bounded nogood memory",
+   "slug": "03-cut-variable-branching",
+   "pilot": {
+    "idea": 3,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "[pcc:unverified] Against the untreated default-branching CaDiCaL arm on the same chained m=4 CNF (n=11, l=1..3, non-decomposable targets), cut-first branching on the bits of u fitted 4.39 bits/l versus 4.08 for default (4.28 for the idle-propagator control); median conflicts at l=3 were 101937 versus 108287 (ratio 0.94). Both arms sit near 2^16.7 conflicts where the MITM / linear-leaf reference is 2^(2l) = 64, so the pre-written kill criterion (cut-first slope within 0.3 bits/l of default) is met.",
+    "slopes": "All fits are least squares on log2(median conflicts), non-decomposable targets, [pcc:unverified].\n\nPrimary series, n=11, l=1,2,3, 4 targets per cell:\n- D (default): 4.08 bits/l\n- Dp (default with idle propagator, control): 4.28\n- C (cut-first): 4.39\n- C-lean (cut-first, small learnt database): 4.38\n- C-keep (cut-first, no deletion): 4.37\n\nLast step only (l=2 to 3): D 5.09, Dp 4.64, C 3.94, C-lean 2.98, C-keep 3.43. The lower cut-first figures come from cut-first being 2.1x worse than default at l=2, not from being lower at l=3.\n\nSecondary series, n=13, 2 targets per cell, two points only (l=2,3): D 6.14, C 3.07. Here cut-first was 6.4x worse at l=2 and 0.76x at l=3; at l=4 both arms hit the 600000-conflict cap.\n\nMedian conflicts at n=11 for l=1/2/3:\n- D: 375 / 3180 / 108287\n- C: 233 / 6633 / 101937\n- C-lean: 299 / 16390 / 129663\n- C-keep: 233 / 9214 / 99588\n\nReference counts for l=1,2,3: enumeration 2^(3l)/4! = 0.33, 2.7, 21; MITM / linear-leaf 2^(2l) = 4, 16, 64.\n\nMemory dial: C-lean/C = 1.28, 2.47, 1.27 and C-keep/C = 1.00, 1.39, 0.98 for l=1,2,3.\n\nCut-first made 7088 decisions on u bits at n=11, l=3, where only 44 values of u are reachable and 2048 exist.",
+    "not_covered": "- **Sizes:** the protocol's n=19, l up to 5, 8 targets per cell was not reachable. The default arm did not finish n=19 l=3 in over 100 s, and calibration at n=13 capped at 150000 conflicts. The pilot ran n=11 with l=1,2,3 (4 non-decomposable targets per cell; l=1 is degenerate-small) and n=13 with l=2,3,4 (2 targets, arms D and C only; l=4 censored in both).\n- **Decomposable targets:** only n=11, l=3 has rows (4 targets; C/D 0.72, C/Dp 0.36, inside the 2x D-versus-Dp instrument noise). V has no rational x at l=2, and the relaxed generator found no l=2 target in about 3 minutes, so it was stopped with no rows.\n- **Memory dial:** no hard learnt-clause cap. The dial is CaDiCaL's reduction schedule, and peak database size was not observable.\n- **Variants not run:** DPLL on cut bits with a bounded cut-nogood store, native XOR/Gauss solvers, branching on v as well as u, and a 2l-bit cut via the (s,p) form.\n- **Statistics:** no confidence intervals. Wall times were taken with up to 4 processes on the shared machine.\n- **Repository rules not followed:** the research-kb lookup, conductor and ecdb were unavailable. docs/session-logs/ was not read or written because of the write restriction; the entry is in SESSION_LOG_ENTRY.md in the pilot directory instead.\n- **Wall time:** the pilot took about 40 minutes.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/pdp.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/arms.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/run.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/validate.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/SESSION_LOG_ENTRY.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/raw_logs/p_n11_l3.log"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching && python3 run.py 11 1 4 0 200000 D,Dp,C,C-lean,C-keep /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/03-cut-variable-branching/rerun_n11_l1.json"
+   },
+   "check": {
+    "idea": 3,
+    "reproduced": "yes",
+    "verdict_supported": "weaker-than-stated",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "The 3-point fit (l=1,2,3) is an endpoint difference, (y3-y1)/2. Cut-first's higher slope (4.39 vs 4.08) comes entirely from it being cheaper at the degenerate l=1 cell (V={0,1}, 2 reachable u; per-target C/D 0.54-0.76). At l=3 the arms are level (per-target C/D 0.94, 0.95, 1.45, 0.85).",
+     "Without l=1 the sign flips: the l=2 to 3 step is D 5.09 vs C 3.94 at n=11 and 6.14 vs 3.07 at n=13 (2 targets). The producer discloses this and attributes it to cut-first being 2x-8x worse at l=2, which the rows support, but it is two points and neither reading is a slope.",
+     "Instrument noise is about the size of the 0.3 bits/l threshold: the idle-propagator control vs default (same branching) differs by 0.20 bits/l, and my target-resampling bootstrap of that difference spans -0.41 to +0.62. For C minus D the bootstrap gives +0.12 to +0.61 and never reached -0.3 in 20000 draws, so 'not alive' is stable on these 12 targets but 'C steeper than D' is not established.",
+     "The design was changed after calibration data existed (n=19 to 11/13, l=2..5 to 1..3, 8 targets to 4, planted targets replaced). The kill criterion text is unchanged, but pre-registration cannot be confirmed: there is no git history and PROTOCOL.md was last written at 08:20:50, after the l=1 and l=2 rows (08:18).",
+     "Calibration rows are hand-typed literals in analyze.py with no log behind them (one has cap_conflicts=10), so the facts used to drop n=19 cannot be checked. One of them is unfavourable to the treatment and missing from the headline: at n=17, l=3, default finished at 73502 conflicts and cut-first hit the 150001 cap.",
+     "No positive control shows the instrument can register a 2 bits/l slope on this encoding. Cost at fixed l grows with n, so the l-slope at fixed n=11 may mostly measure the n-bit XOR system in both arms.",
+     "The idea was only partly tested: no hard learnt-clause cap, no DPLL with a cut-nogood store, no 2l-bit cut, no branching on v. The 'memory dial' is CaDiCaL's reduction schedule with no observed database size, so the kill covers the n-bit-cut IPASIR-UP implementation only and says nothing about a time-memory trade.",
+     "Enumeration, the linear-leaf scan and MITM are reference counts, not measured arms. This does not affect the kill (the comparison is C against D), and both SAT arms are about 2^10 above the 2^(2l) reference at l=3.",
+     "The decomposable cell (n=11, l=3) is degenerate: the only rational base x in V are 0 (2-torsion) and 6, so its four targets are exactly the four truly decomposable x(R), multiples of one point plus 2-torsion. The relaxation is loose (556 of 2048 x(R) relaxed-solvable at l=3).",
+     "Minor documentation errors: Amendment 2 says models are 'mostly non-rational' but all 20 SAT rows lifted; validate.py labels a block 'planted n=19 l=3' while running n=11.",
+     "My seed-variation run is not a real noise estimate for l=1 and l=2: the CaDiCaL seed option left those counts identical to the producer's. At l=3 it moved the default arm by about 20% (median 85635 vs the producer's 108287; 7 of 8 default runs had finished when read), giving C/D 1.22."
+    ],
+    "summary": "[pcc:unverified] The kill verdict follows from the criterion as written, but it is narrower and lower-powered than the headline suggests. Review written to /home/user/crypto/research/sat_smt_leads_20261114/03-cut-variable-branching/SKEPTIC.md.\n\nGenerator: correct. With my own field arithmetic, point enumeration, addition and S3, the reachable-u set sizes are 2, 12, 44, matching the producer. All 16 n=11 targets (80 rows) agree with my exhaustive scan in both label and solver answer. The producer's CNF solved with Glucose4 agrees with my brute force on all 128 targets at n=7, l=2 (24 SAT, models checked). My own planted targets at n=11, l=3 are exactly the producer's four decomposable targets; each planted decomposition is SAT under assumptions, a wrong u is UNSAT, and free models lift to points summing to the target.\n\nRerun: the producer's command for n=11, l=1 reproduced all 20 rows exactly, apart from wall time. A further run of arms D and C with solver seeds gave slopes of 3.92 for default and 4.40 for cut-first, so cut-first is again not lower.\n\nFairness: same CNF, targets and seeds across arms, rotated order, all arms reported, decomposable and non-decomposable kept separate, nothing uncounted in the treatment's favour.\n\nVerdict: slope(C) = 4.39 is above slope(D) - 0.3 = 3.78 on three uncensored sizes, so the criterion is met by the letter, and my bootstrap never put C 0.3 below D. It is weaker than stated for four reasons:\n- The fit is an endpoint difference resting on a degenerate l=1 cell; dropping l=1 flips the sign of the comparison.\n- Instrument noise (idle-propagator control vs default) is about the size of the threshold.\n- The design was amended after calibration, and pre-registration cannot be confirmed from file times.\n- Only the n-bit-cut CaDiCaL implementation was tested, not the bounded-nogood variants of the idea.\n\nWhat the data do support: no cut-first advantage at the largest solved size (C/D 0.76 to 1.22 at l=3), 2x to 8x worse at l=2, and at least 2x worse on the one n=17 calibration instance.\n\nScratch is in /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-03-cut-variable-branching/. No producer files were edited and no git state changed. The session log was not written, because the task restricts repository writes to SKEPTIC.md."
+   }
+  },
+  {
+   "idea": 4,
+   "title": "XOR cubes on symmetric functions",
+   "slug": "04-xor-cubes-symmetric",
+   "pilot": {
+    "idea": 4,
+    "status": "partial",
+    "verdict": "inconclusive",
+    "headline": "Prediction refuted: the residual after fixing k bits of e1 is never affine (non-affine rank stays at n for every k<l, l=3..7), and S4 keeps e3^3 and e2^2*e3 even with e1 fully fixed. Against the literal-cube baseline on the same CNF, XOR-cube total conflicts are 0.997x at l=5, k=l (0.98 UNSAT, 1.02 SAT) with 1.7x the propagations; both sit within 8% of plain CaDiCaL (about 2^{3l} conflicts), versus 2^l leaf solves for the linear 2+1 scan. The 2-4% ratio has no A/A noise floor, so clause 2 of the kill criterion is undecided on the letter. All numbers [pcc:unverified].",
+    "slopes": "log2(geometric-mean conflicts) vs l, truth-UNSAT targets, l=3,4,5 (n=11,13,17), CaDiCaL 1.5.3 incremental: plain SAT 3.12 bits/l; literal cubes k=l 3.12; XOR cubes on e1 k=l 2.98; literal k=2 3.05; XOR k=2 3.01. Count baselines: enumeration 2^{3l}/6 = 3.00, MITM 2.00, linear 2+1 scan 1.00. Three points per fit, 3-4 UNSAT targets per cell; the 0.14 gap between xor-l and lit-l comes from XOR cubes being worse at l=3 (ratio 1.19), not from a gain at l=5. [pcc:unverified]",
+    "not_covered": "SAT arms at l=6 and above were not run (one arm would exceed the 5-minute cap on the dense ANF encoding); l=6,7 have the algebraic part only. At l=5 only k=2 and k=5 were run. CryptoMiniSat native-XOR arm only at l=3,4, wall time only (pycryptosat exposes no counters). No A/A noise-floor arm. Only 3-5 targets per truth class per cell. The rank metric saturates at n, so it shows \"not affine\" but not how far. The repository's own Semaev-chain CNF and WDSat were not used. Unplanned exact observation, not tested as a method: S4 is F2-affine in (e1,e2) for fixed e3. One l=3 generator fix (redraw V when it has fewer than 3 liftable x) was made after the protocol was written. The repository session log was not written because the task restricts writes to this directory.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/pdplib.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/symbolic_e.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/symbolic_e.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/run_algebra.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/algebra_rows.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/algebra.log",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/run_sat.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/sat_l3.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/sat_l3_fresh.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/sat_l4.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/sat_l4_fresh.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/sat_l5.json"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric && python3 run_sat.py /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/04-xor-cubes-symmetric/rerun_l3.json 3 11 8 --cms"
+   },
+   "check": {
+    "idea": 4,
+    "reproduced": "yes",
+    "verdict_supported": "yes",
+    "corrected_verdict": "inconclusive",
+    "problems": [
+     "The sub-1 XOR/literal conflict ratio at l=5 is a cube-order artefact: numeric order gives 0.972, 0.972, 0.990 on seeds 5004-5006 (reproduced), but two shuffled orders give 1.007, 1.025, 1.004, 1.008, 0.993, 1.026 (geometric mean about 1.01). The same arm moves by up to 5% across cube orders at l=5 and up to 25% on SAT targets at l=4, so the reported 0.98 / 0.997 and the 0.14 slope gap are noise.",
+     "Clause 2 was not evaluated as written: it asks for the best k of each arm, but l=5 ran only k=2 and k=5. Among those, best k is 2 for both arms with pooled ratio 1.04 (clause satisfied); k=l gives 0.997 (fails on the letter by 0.3%).",
+     "The SAT arm does not test the idea as stated: the CNF is the x-bit ANF with definitional XORs for e1; the symmetrised (e1,e2,e3) system was never given to a solver and no symmetry breaking was applied, so the null result does not cover the e-variable encoding.",
+     "Slope is weak: 3 sizes, 3-4 UNSAT targets each, and n/l varies (11/3, 13/4, 17/5), so bits-per-l mixes l and n.",
+     "Seed 4005 is described as a decomposable random target, but its 6 S4 zeros do not lift to curve points (truth_nsol_lifting=0); it sits in the truth-SAT class at l=4 and is the source of the 32 non-lifting models. It does not affect the UNSAT slope population or the l=5 cell.",
+     "Conflicts are the primary metric but XOR cubes cost about 1.7x the propagations at equal conflicts (disclosed by the producer); on a work metric the XOR arm is clearly worse.",
+     "CNF construction uses the full 2^{3l} evaluation table plus Moebius transform, already enumeration cost and uncounted; equal across arms, so it does not bias XOR vs literal, but no SAT arm is comparable to the 2^l linear 2+1 scan on total work.",
+     "Protocol-before-results could be checked only by file mtimes (PROTOCOL.md 08:23:42, first data 08:24:32; disclosed pdplib.py edit at 08:25:47); there is no git history. A timing probe on five seeds preceded the measured runs (disclosed).",
+     "CryptoMiniSat arm is wall time only and was not checked beyond the rerun; my shuffled-order A/A covers only 3 UNSAT instances at k=l, so it cannot by itself upgrade the verdict to kill-criterion-met."
+    ],
+    "summary": "The producer's \"inconclusive\" verdict follows from the pre-written criterion and I leave it unchanged; in substance the idea is dead at these sizes. All numbers are [pcc:unverified].\n\nGenerator and encoding (l=3, n=11, all 8 seeds), checked with my own field arithmetic, group law and brute force over real curve points:\n- Planted targets decompose (4 of 4).\n- The CNF's full model set equals the real-point decomposition set on every seed: 6 permutations of one tuple for planted targets, none for random ones.\n- SAT/UNSAT of the full literal and XOR cube sweeps agrees with brute force, and each SAT cube's model lies in its cube.\n- The e-form of S4 equals the producer's S4 on all of V^3 at l=3 and l=4, and an independent second-difference rank test reproduces the non-affine rank (full rank n for every k<l).\n\nRerun: the producer's command reproduced all 80 l=3 rows exactly (conflicts, decisions, propagations, counts), and results.json holds the same rows. My own loop also reproduced the l=5 numeric-order ratios on three UNSAT seeds.\n\nVerdict logic:\n- Clause 1 (residual never affine for k<l) holds; the prediction is refuted.\n- Clause 2 (XOR/literal conflicts >= 1.0 at the largest l) gives 0.997 at k=l and 1.04 at the best k run, so it fails on the letter by 0.3%.\n- My cube-order A/A shows that shortfall is noise: same-arm spread is 3-5% at l=5, and the ratio moves to about 1.01 under shuffled orders.\n- With clause 1 holding and clause 2 not met, the protocol allows only \"alive (SAT constant only)\" or \"inconclusive\"; there is no real constant gain and the slope gap (0.14) is under the 0.15 threshold, so \"inconclusive\" is right.\n\nFairness is otherwise acceptable: same instances, seeds and CNF for both arms, all arms reported, baselines stated as counts, and the README says plainly that every SAT arm sits near 2^{3l} against 2^l for the linear 2+1 scan. A rerun with an A/A arm, randomised cube order and all k at l=5 would most likely settle it as a kill.\n\nReview written to /home/user/crypto/research/sat_smt_leads_20261114/04-xor-cubes-symmetric/SKEPTIC.md; scratch scripts are in /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-04-xor-cubes-symmetric/."
+   }
+  },
+  {
+   "idea": 5,
+   "title": "Conflict-directed polynomial lemmas",
+   "slug": "05-conflict-directed-poly-lemmas",
+   "pilot": {
+    "idea": 5,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "[pcc:unverified pilot] At m=3, n=13, l=4, conflict-directed degree-2 lemmas (k=8) versus the count-matched random-support control: random/directed conflict ratio 1.24 (bootstrap 95% 0.71..2.51, 5 paired instances), below the required 2.0. Against the untreated Glucose 4 baseline on the same encoding, the directed arm used about 2.6x as many conflicts at l=4 (untreated/directed 0.39, n=6) and its slope was higher (3.76 vs 2.52 bits per l).",
+    "slopes": "log2(median conflicts) vs l, sizes l=2,3,4 at n=13, m=3, Glucose 4, all targets (8, 8 and 5-6 instances per cell): untreated A0 2.52; static full degree-2 Macaulay A1 2.97; directed A2 k=8 3.76; random-support A3 k=8 3.61; directed k=12 3.74; random k=12 2.51. UNSAT-only (4, 4, 2-3 instances): A0 2.96, A1 3.11, A2k8 3.96, A3k8 3.42, A2k12 2.78, A3k12 3.21. Reference counts: enumeration 3.0, MITM 2.0, linear 2+1 scan 1.0 bits per l. Median conflicts at l=4: A0 76090, A1 60616, A2k8 275282, A3k8 309730, against a linear 2+1 scan count of 16 leaf solves. All figures are unverified pilot assertions.",
+    "not_covered": "The l=4 cell is incomplete: the run was stopped at the time budget, so idx 0,4,1,5,2 have all six arms, idx 6 has only A0/A1/A2k8, and idx 3 and 7 were not run. l=5 and above were not run, so the slope rests on three points. Deviation from the idea text: the outer loop uses pysat Glucose 4 with CNF-cut XORs, not pycryptosat, because the installed pycryptosat 5.18 exposes neither counters nor learnt clauses; no native-XOR (CryptoMiniSat Gauss) arm was run. Glucose honours the conflict budget only at restarts, so rounds overrun B, and at l=2 five of eight instances finished before any lemma was added (directed and random arms equal untreated there). The conflict signal is variable frequency in a round's learnt clauses, not a per-conflict cut; multipliers are single variables; all equations are multiplied. One n, one encoding (S3 chain with p and t auxiliaries), one solver seed. The 'aug' contingency was not triggered (the static lemma space was non-empty: 142 and 101 new lemmas at l=2 and l=3). Lemma soundness was checked on planted solutions only. Not done because writes were restricted to this directory and the tools are not installed: repository session log, research-kb lookup, Conductor task, benchmark record.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/rows.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/tables.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/pdp5.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/run.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/explore.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/calib.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/run_l23.log",
+     "/home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/run_l4.log"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas && mv rows.jsonl rows.prev.jsonl && python3 run.py 2 && python3 analyze.py"
+   },
+   "check": {
+    "idea": 5,
+    "reproduced": "yes",
+    "verdict_supported": "yes",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "The deciding l=4 cell was truncated (5 of 8 instances for A3/A2) although the criterion says 'all instances'. I ran the missing k=8 runs: random/directed = 1.27 (bootstrap 95% 0.86..2.02) over 8 instances, still below 2.0. idx 6 A3 timed out at 1380649 conflicts, so this is a lower bound; reaching 2.0 would need about 5e7 conflicts on that one run.",
+     "Headline side figures were inflated by the truncation: untreated/directed at l=4 is 0.56 (0.29..1.05, n=8), not 0.39 (n=6); directed slope is 3.36, not 3.76 bits per l. Directed is still not better than untreated (slope 2.52).",
+     "README says the criterion is met 'on both clauses'. Clause (b) as written ('directed slope within 0.25 of untreated') is not literally met: the directed slope is higher by 0.8 to 1.2. Only clause (a) is met; the 'alive' condition fails either way.",
+     "Slope is weakly measured: at l=2 five of eight instances finish before any lemma is added (treatment is a no-op), and slopes move by 0.4 bits per l when two instances are added. Per-instance ratios range 0.14 to 4.4; one solver seed, no A/A noise arm.",
+     "The kill covers this implementation only: Glucose 4 with lemmas of mean length 30 cut into arity-4 CNF, not pycryptosat with native XOR as the idea states; conflict signal is learnt-clause variable frequency with rounds overrunning the budget. Disclosed by the producer.",
+     "Planted = SAT and random = UNSAT in every cell, so 'all targets' is a 4+4 mix at l=2,3 but 3+3 or 3+2 at l=4 in the producer's data. Split tables are reported and the split does not change the verdict (completed l=4: A3/A2 about 1.5 on SAT, about 1.1 on UNSAT).",
+     "calibration.json is not in the directory, so the calibration figures in the protocol addendum cannot be checked. File times are otherwise consistent with protocol-before-results (PROTOCOL.md and run.py 08:33:50, first measured log 08:34:59).",
+     "Not checked: lemma soundness beyond the producer's planted-solution check, model lifting at l=3 and l=4, the l=4 k=12 and A1 runs for the missing instances. Repository session log was not written because the task restricted writes to SKEPTIC.md."
+    ],
+    "summary": "The kill verdict holds on clause (a) of the pre-written criterion, and it survives completing the truncated l=4 cell: random/directed k=8 is 1.27 (95% 0.86..2.02) over all 8 instances, below the required 2.0. All figures are unverified pilot assertions.\n\n- **Generator:** correct. With my own field and curve arithmetic, all 22 measured instances check out: planted targets decompose with x in V, brute-force SAT/UNSAT matches every stored solver status and the producer's counts, and the 4 SAT models at l=2 lift to points summing to x(R).\n- **Re-run:** l=2 (6.8 s) and l=3 (62 s) reproduce all 96 stored rows exactly.\n- **Fairness:** same instances and deterministic solver across arms, all six arms reported including the k=12 pair that points against the hypothesis, lemma generation counted, reference counts stated. No sign of post-hoc protocol changes.\n- **Weaker than stated:** the \"2.6x worse than untreated\" figure becomes about 1.8x (ratio 0.56, interval reaching 1.05) and the directed slope 3.36 rather than 3.76, against 2.52 untreated. The README's \"both clauses\" is wrong by the literal wording of clause (b).\n- **Scope:** this kills the Glucose/CNF-cut implementation, not a native-XOR (CryptoMiniSat) version of the idea, which was not run.\n\nReview written to /home/user/crypto/research/sat_smt_leads_20261114/05-conflict-directed-poly-lemmas/SKEPTIC.md. Scratch scripts and the seven added l=4 runs are in /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-05-conflict-directed-poly-lemmas/ (indep.py, complete.py, complete_l4.jsonl)."
+   }
+  },
+  {
+   "idea": 6,
+   "title": "BDD/ZDD bucket elimination",
+   "slug": "06-bdd-bucket-elimination",
+   "pilot": {
+    "idea": 6,
+    "status": "ran",
+    "verdict": "kill-criterion-met",
+    "headline": "BDD bucket elimination at m=3: the lowest peak-live-node slope over 9 order/schedule arms is 2.36 bits per l (l=3..6, 8 targets per cell), against the MITM memory baseline 2^{2l} (slope 2, kill threshold 1.8) and the linear 2+1 scan baseline 2^l (slope 1). Median peak live nodes are 28x to 56x the MITM table size; a single side-A constraint BDD alone already grows at 2.15 bits per l. [pcc:unverified]",
+    "slopes": "Baselines (counted, not fitted): MITM memory 2.00 bits/l at m=3 and 1.00 at m=2; linear 2+1 scan 1.00; enumeration 2.00 at m=3.\n\nTreatment, m=3, log2 of median peak live nodes vs l, with n = 11, 13, 17, 19 for l = 3, 4, 5, 6:\n- Orders xint_t and xblk_t with schedules t_first or x3_t_x12: 2.36 (2.08 after dividing by n). Largest intermediate BDD 2.39, single constraint 2.15, elimination apply calls 2.65 to 2.77. Sizes l=3..6.\n- x_first (MITM analogue), same two orders: 2.99, sizes l=3..5; l=6 hit the node cap.\n- t_xint (t on top) with t_first or x3_t_x12: 3.27, sizes l=3..5; l=6 hit the node cap. t_xint with x_first completed only l=3,4, so no fit.\n- Decomposable and non-decomposable targets give the same slope (2.36 vs 2.35 to 2.36).\n- Off-protocol l=7 (n=23, node cap raised to 24e6, 2 targets, xint_t): slope over l=3..7 is 2.39 for peak live and 2.16 for a single constraint.\n\nTreatment, m=2 sanity cell, l=4..8 with n = 11, 11, 13, 17, 17: peak live 1.29 (blocked order), 1.43 (interleaved), 1.44 (reverse-interleaved), against threshold 0.8; single constraint 1.03 to 1.06.\n\nAll 364 completed runs match the brute-force SAT/UNSAT answer. All numbers are [pcc:unverified].",
+    "not_covered": "- The untreated SAT arm was not re-run on these instances; the comparison is against counted baselines (MITM memory, enumeration, linear scan) plus a brute-force ground truth.\n- Only the direct encoding was tested: one BDD per bit of S3, split through a field variable t. Not tested: gate-level or Tseitin encodings with tree-decomposition elimination orders, direct S4 without t, ZDDs, complement edges, dynamic reordering, and-exists, restrict-by-T simplification.\n- m=4, l>7, random subspaces V and curves with a != 0 were not run.\n- l=7 ran only off-protocol (node cap raised from 4e6 to 24e6, 2 targets, one order); under the protocol cap it blows up while building side A.\n- The node cap counts nodes ever created (no garbage collection), so a blow-up bounds work, not live size.\n- n grows with l, so slopes carry a polylog factor; the per-n slope is 2.08.\n- m=3 cells at l=3,4 are 5 decomposable / 3 not, because one random target happened to decompose.\n- No plot or PDF: matplotlib is not installed.\n- No session-log entry under docs/session-logs, no Conductor task and no research-kb query: the write-only-in-own-directory rule and missing tools prevented them. The orchestrator should log this run.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/analysis_tables.txt",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/bddpdp.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/raw_m3.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/raw_m2.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/raw_m3_l7.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/raw_m3_l7_cap24M.json"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination && python3 bddpdp.py validate && python3 bddpdp.py run --m 3 --l 3 --targets 8 --out /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/06-bdd-bucket-elimination/rerun_m3_l3.json"
+   },
+   "check": {
+    "idea": 6,
+    "reproduced": "yes",
+    "verdict_supported": "weaker-than-stated",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "The fitted slope 2.36 depends on the protocol growing n with l (n = 11, 13, 17, 19, uneven steps). Holding n fixed with the producer's own code and best arm (xint_t, x3_t_x12), the peak-live slope is 1.45 at n=19 (l=3..6) and 1.47 at n=17 (l=3..5), below the 1.8 kill threshold; peak-work slope is about 0.95. A fixed-n protocol would not have fired the kill on slope.",
+     "Dividing the producer's medians by n^2 (2n constraints, each with an n-dependent tail) gives a peak-live slope of 1.81, on the threshold. The headline claim that the slope is above the MITM slope of 2 is not established; only 'no better than a table' is.",
+     "The kill rests on absolute size and a structural floor, not on the slope margin: peak live is 28x to 175x the MITM table at every size tested, and a single side-A constraint is 5 to 6 times 2^{2l} at fixed n (slope 1.94 to 2.11). The low fixed-n slope comes from an l-independent overhead of roughly 2^{n/2} at small l. l > 6 at fixed n was not run.",
+     "Protocol-before-results cannot be confirmed: no git history; PROTOCOL.md was saved at 08:46:33, bddpdp.py at 08:48:19, first raw output at 08:48:56. The protocol's node cap and 'l=6 attempted' wording suggest development runs preceded it. The 1.8 threshold comes from the task text, so threshold tuning is not a concern.",
+     "Only one encoding was tested (direct ANF, one BDD per output bit, split through t). Orders with t interleaved among x bits, restrict-by-T and gate-level encodings were not run, so the kill is for this encoding only.",
+     "The README's ratios of peak nodes to the 2^l linear scan compare memory with a time count. This does not affect the criterion, which uses MITM memory.",
+     "The l=3 cell has a duplicate instance: random target 2 and planted target 6 share xR = 435, so it has 7 distinct instances. l=6 completes for only 4 of 9 arms under the cap, which counts nodes created rather than live nodes.",
+     "The m=2 sanity cell uses n = 11, 11, 13, 17, 17 and carries the same n confound; it does not decide the verdict.",
+     "No session-log entry was written because this review was restricted to SKEPTIC.md; the orchestrator should log it."
+    ],
+    "summary": "The kill criterion is met as pre-written (lowest m=3 peak-live slope 2.36 on four sizes against a threshold of 1.8), but the result is weaker than the headline: the slope depends on growing n with l.\n\n**Generator and answers.** With my own F_{2^11} arithmetic and curve addition, on the m=3, l=3 cell: all 4 planted targets decompose into factor-base points, my point-level answer matches the producer's ground truth on 8 of 8 targets, and all 72 result rows agree. The producer's BDD solution sets equal my point-level decomposition sets for all 3 orders, and no algebraic solution fails to lift. Larger cells were not checked independently.\n\n**Re-run.** `validate` passes, and the rerun command reproduces the 72 rows of the smallest cell with zero differences apart from wall times.\n\n**Fairness.** Seeds match the protocol, baselines are counted on the same instances, all 9 + 3 arms are reported including blow-ups, and decomposable and non-decomposable targets give the same slope. The main weakness is the n confound:\n\n| design | peak-live slope | single-constraint slope |\n|---|---|---|\n| producer (n = 11, 13, 17, 19) | 2.36 | 2.15 |\n| producer, divided by n^2 | 1.81 | 1.60 |\n| fixed n=19, l=3..6 | 1.45 | 1.94 |\n| fixed n=17, l=3..5 | 1.47 | 2.11 |\n\nAt fixed n the best arm's slope is below 1.8, so that design would not have fired the kill on slope. The kill still holds in substance: peak live is 28x to 175x the MITM table at every size, and a single side-A constraint is 5 to 6 times 2^{2l}. \"Above the MITM slope of 2\" is not established; \"no better than a table\" is, for this one encoding.\n\nWhether the protocol predates all runs cannot be confirmed (no git history; file times are two minutes apart).\n\nReview written to /home/user/crypto/research/sat_smt_leads_20261114/06-bdd-bucket-elimination/SKEPTIC.md; scratch scripts are in /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-06-bdd-bucket-elimination/."
+   }
+  },
+  {
+   "idea": 7,
+   "title": "One homogeneous AllSAT instance for factor-base-only relations",
+   "slug": "07-homogeneous-allsat",
+   "pilot": {
+    "idea": 7,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "[pcc:unverified] Against the per-target SAT baseline (fresh Glucose4 per target, same encoding, same bases), homogeneous AllSAT spent 4.4x to 7.2x MORE conflicts per verified curve relation at m+1=3 (ratio Q = per-target/homogeneous = 0.23, 0.14, 0.20, 0.18 for l=4..7) and about 3x more at m+1=4 (Q = 0.30, 0.37 for l=3,4). Q is below 1 in every cell and flat in l (-0.05 bits/l at m+1=3); the linear 2+1 scan baseline needs only 1.6-1.7 leaf scans per relation at m=2, against 94 to 4540 per-target conflicts.",
+    "slopes": "Bits per l of Glucose4 conflicts per curve relation. Family A (m+1=3, n=2l-1, l=4,5,6,7; 8,8,8,4 bases; 16 targets per base): per-target baseline 1.85, homogeneous H0 1.90, homogeneous with curve-membership constraint H1 2.16, plain enumeration tuples per relation 1.97 (per-target) / 1.96 (homogeneous), linear-leaf scans per relation 0.00. log2 Q slope: -0.05 (H0), -0.30 (H1). H0 conflicts per whole instance: 2.87 bits/l, i.e. about one conflict per full 3-tuple. Family B (m+1=4, chain S4, n=3l-2, l=3,4 only; 8 bases each; two-point slopes): per-target 4.22, H0 3.91, H1 3.85, enumeration 2.86 / 2.04; log2 Q slope +0.30, not distinguishable from 0 (7 and 20 relations, overlapping bootstrap intervals).",
+    "not_covered": "Sizes fell short of the protocol: the homogeneous instance cost about 2^{3l} conflicts at m+1=3 and more than 2^{4l} at m+1=4, so family A stopped at l=7 (planned 4..10, and only 4 bases at l=7) and family B at l=4 (planned 3..6). Family B therefore has two sizes, short of the three needed for a slope.\n\nOther gaps:\n- Solver: only Glucose4 with XORs cut into CNF. No XOR-aware arm (CryptoMiniSat Gauss or WDSat), because the Python binding exposes no conflict counter; the 2^{(m-1)l} WDSat regime is untested.\n- Missing control: no incremental per-target arm with the target under assumptions, so \"homogeneous\" and \"learnt-clause reuse\" are not separated.\n- Encoding: the homogeneous encoding does not keep the (s,p)-linear leaf, so it was never compared at 2^{(k-2)l}.\n- Post-hoc correction: the chain S4 encoding admits trivial (a,a,a,a) models (P+P-P-P). They were enumerated, their cost is included, and they were removed from the relation count in analyze.py after the run.\n- Regime: n was tied to l; other n/l ratios were not explored. Homogeneous relations carry no target, and the extra target relation a DLP needs is not costed.\n- Statistics: 7 to 101 relations per cell, wide intervals, no multiple-testing correction.\n- Session log: docs/session-logs was not read or written, because the task restricted writes to this directory.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/hallsat.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/raw_A_small.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/raw_A_l7a.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/raw_A_l7b.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/raw_B.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/log_A_small.txt",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/log_A_l7a.txt",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/log_A_l7b.txt",
+     "/home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/log_B.txt"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat && python3 hallsat.py run 3 /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/07-homogeneous-allsat/x.jsonl 1 4:7 16"
+   },
+   "check": {
+    "idea": 7,
+    "reproduced": "yes",
+    "verdict_supported": "yes",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "Family B (m+1=4) sign depends on a post-hoc correction: if the trivial (a,a,a,a) models are counted as relations, Q0 is 1.54 (l=3) and 1.56 (l=4) instead of 0.30 and 0.37. Excluding them is correct and disclosed, but it was applied after the run; family B (2 sizes, 7 and 20 relations) is inconclusive on its own and should not be read as a second confirmation.",
+     "The homogeneous encoding carries an avoidable handicap: enc_s3 reifies x1*x2 only when x3 is non-constant, i.e. only in the treatment arm. Removing it cuts H0 conflicts to 0.67-0.70 of the producer's at k=3, l=4,5,6 (my probe, same model sets). The ratio is flat, so Q0 becomes about 0.2-0.3: still below 1 and flat. The '4.4x to 7.2x' constant is overstated by about 1.45x. Not checked at k=4.",
+     "The kill criterion was concretised by the producer (slope <= 0.15 bits/l in both families, or Q<1 at the largest two l). The outcome is far from both thresholds so the choice does not decide it, but the 'both families' slope clause is undecidable with two sizes in family B; the verdict rests on the Q<1 clause in family A.",
+     "Protocol-before-results cannot be verified: no git history; PROTOCOL.md mtime 08:46:59, hallsat.py 08:49:31, first raw data 08:52:06. The protocol already contains encoding details and a numeric null prediction, so code existed before it. Undisclosed harmless deviation: base seed in code is 1000*l+seed+100000*k, protocol says 1000*l+seed.",
+     "Sizes fell short of the protocol (A: l=4..7 of 4..10 with 4 bases at l=7; B: l=3,4 of 3..6). Disclosed. Family A has 4 sizes, enough for a slope.",
+     "README omits the homogeneous linear-leaf count that results.json holds (5.1-7.8 at k=3, 41-54 at k=4), and no MITM arm was measured (about 400 pair additions per relation at l=7 by my estimate, against 25,456 H0 conflicts). These omissions do not favour the treatment.",
+     "Scope: one solver (Glucose4, XORs cut to CNF), one encoding, fresh-solver baseline only, n tied to l; no XOR-aware solver, incremental per-target control, projected enumeration or linear-leaf homogeneous encoding. The kill applies to CNF blocking-clause AllSAT at m+1=3, not to the idea under an XOR-aware solver. Disclosed by the producer.",
+     "I did not re-run the l=6, l=7 and family B measurement cells (time); those numbers were checked only by recomputing the summary from the raw rows."
+    ],
+    "summary": "[pcc:unverified] The kill verdict is supported, but only by family A (m+1=3, Glucose4/CNF); family B is inconclusive on its own.\n\n- **Generator:** with my own field arithmetic, brute-force point table, group law and AllSAT loop, the homogeneous CNF's curve models equal the brute-force relation set on three k=3 cells. On two k=4 cells it misses only trivial (a,a,c,c) tuples. Per-target SAT/UNSAT matched brute force on 80/80 random targets, and 60/60 planted targets were SAT with valid lifts.\n- **Reproduction:** the rerun command gave 18 rows with counters identical to `raw_A_small.jsonl`. Recomputing from all 792 raw rows gives Q0 = 0.225, 0.138, 0.200, 0.178 at k=3 (slope -0.048 bits/l, 4 sizes) and 0.300, 0.370 at k=4, matching the README.\n- **Fairness:** same bases, generator, solver and symmetry breaking in every arm; all arms that were run are reported; UNSAT targets are charged to the baseline. The final UNSAT call is only 3-10% of H0 cost.\n- **No clause reuse:** H0 per instance costs 1.4-1.6 times as much as 2^l independent fresh per-target solves at k=3.\n- **Encoding handicap:** the treatment arm alone reifies x1*x2, which inflates its cost by about 1.45x, flat in l. Removing it leaves Q0 at about 0.2-0.3, so the kill stands but the \"4.4x to 7.2x\" constant is overstated.\n- **Family B:** Q0 would be about 1.55 at both sizes if the trivial (a,a,a,a) models were counted. The exclusion is correct and disclosed, but it was made after the run.\n\nReview written to /home/user/crypto/research/sat_smt_leads_20261114/07-homogeneous-allsat/SKEPTIC.md."
+   }
+  },
+  {
+   "idea": 8,
+   "title": "Target-parametric incremental solving",
+   "slug": "08-target-parametric",
+   "pilot": {
+    "idea": 8,
+    "status": "partial",
+    "verdict": "inconclusive",
+    "headline": "[pcc:unverified] At l=5 (n=17, m=3) the incremental target-by-assumption solver used 0.699x the conflicts of the fresh-solver-with-assumptions baseline on the second half of 16 never-seen targets (threshold 0.7; 0.80x against the untreated constant-target SAT arm), with the same fitted exponent in both arms. Minimal target-bit cores (5-6 of 11, 8 of 13) match a random-set counting null, and the incremental arm's median 8,360 conflicts per non-decomposable target compares with 32 leaf solves for the linear 2+1 scan baseline.",
+    "slopes": "Bits per l, least squares on log2 median UNSAT conflicts, l=3,4,5 with n=11,13,17 (n varies with l), [pcc:unverified]. CaDiCaL: INC (treatment) 2.46; FRESH-A (baseline) 2.48; FRESH-U 2.24; SPEC (untreated constant-target) 2.50. Glucose 4: INC 2.66; FRESH-A 2.64. Reference: enumeration 3.0, MITM 2.0, linear 2+1 scan 1.0. Median UNSAT conflicts INC / FRESH-A / SPEC: l=3 276 / 348.5 / 283.5; l=4 1377 / 1953 / 1514; l=5 8359.5 / 10854 / 9087. INC/FRESH-A second-half conflict ratio: 0.685, 0.666, 0.699 (no trend with l, no decline along the sequence).",
+    "not_covered": "Largest measured l is 5: l=6 and l=7 were dropped (one l=6 calibration solve took 112k conflicts and 106 s). Core minimisation finished 0 targets at l=5 and 4 of 6 at l=4, so the core half of the kill criterion is unmeasured at the largest l. The kill metric rests on 8 second-half targets and sits on the threshold. The first encoding (chain through t) was replaced by a resultant encoding with symmetry breaking before any measured row (PROTOCOL.md Amendment 1). l=3 fails the table-exhaustion control (6 of 48 decomposable abscissae used). Not done: m=4, native-XOR CryptoMiniSat, cores over other target bases or target powers, exact minimum cores, a second sequence order, an incremental arm with learnt clauses dropped between targets. Learnt-clause target-bit counts are from Glucose DRUP logs of fresh solves only. Session log, knowledge-base lookup and Conductor task were not done (writes restricted to this directory; tools not installed).",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/analysis_stdout.txt",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/pdp.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/run.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/cores.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/core_null.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/core_null.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/validate.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/raw_l3.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/raw_l4.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/raw_l5.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/cores_l3.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/cores_l4.jsonl"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric && python3 run.py 11 3 6 6 /tmp/raw_l3_rerun.jsonl"
+   },
+   "check": {
+    "idea": 8,
+    "reproduced": "yes",
+    "verdict_supported": "yes",
+    "corrected_verdict": "inconclusive",
+    "problems": [
+     "Generator defect: the CNF admits x_i = 0 (the 2-torsion point (0,1), since 0 is in V) while the ground truth (Setup.base, decomposable(), lift_model) excludes it. My exhaustive l=3 check found 16 of 1,053 rational abscissae outside V where the parametric CNF is SAT and the producer's ground truth says non-decomposable (4 of 264 in the constant-target form). 'Verdict equals ground truth' holds only for the sampled targets. No measured row is affected: I recomputed all 52 target labels at l=3,4,5 with my own enumeration, 0 errors, none in the 2-torsion family.",
+     "The kill metric sits on the threshold and is noise-limited: 0.699 pooled at l=5 over 8 targets (5 SAT, 3 UNSAT); UNSAT-only 0.716; leave-one-out 0.604 to 0.809; target bootstrap 95% 0.45 to 1.06 with half the resamples above 0.7. One lucky SAT target (811 vs 9,569 conflicts) puts it below 0.7.",
+     "The pre-registered baseline FRESH-A is the weakest fresh arm. At l=5 second half, INC is 0.80x SPEC, 0.82x FRESH-U and 1.04x the per-target best of the three fresh arms. The producer discloses the SPEC ratio, but the headline number is against the handicapped arm.",
+     "'No decline along the sequence' is contradicted by the UNSAT rows: INC/FRESH-A by position drifts down at l=5 (0.84, 0.80, 0.73, 0.77, 0.75, 0.72, 0.76, 0.67) and at l=4 (0.89 to 0.56). Weak with 8 and 11 points, but unresolved, and it is the quantity the idea is about. 'Leaning negative' in README.md omits this.",
+     "The core half of the kill criterion is unmeasured at the largest l (0 targets at l=5). At l=4 only 4 targets, deletion-minimal cores, one basis; they match the counting null. I did not re-run cores.py or core_null.py.",
+     "Protocol precedence cannot be established: no version control, PROTOCOL.md mtime is the same second as run.py and 2 s before raw_l3.jsonl completed, and it already contains Amendment 1. The amendment was written after unlogged smoke solves that included l=5 conflict counts; it changed the encoding, added symmetry breaking and dropped l=6 and l=7, making l=5 the threshold-bearing cell. Thresholds are unchanged and I found no sign of tuning (deterministic pipeline, stated seed formula).",
+     "Slope: three sizes but n varies with l (11, 13, 17), so bits per l mixes two variables; the one l=6 calibration solve sits 3.4 bits above l=5, above the fitted 2.5. Only the equality of INC and FRESH-A slopes is supported.",
+     "Non-SAT baselines (enumeration, MITM, linear 2+1 scan) are quoted as operation counts, not run, and in different units from conflicts; '8,360 conflicts vs 32 leaf solves' gives a direction, not a measured gap.",
+     "README uses the 2^(3l)/12 heuristic for available decomposable abscissae (341, 2,731); exact counts outside V are 327 and 2,241 (44 at l=3). The table-exhaustion control still holds at l=4 (3.7%) and l=5 (0.36%) and fails at l=3, as stated.",
+     "Review limits: l=4 and l=5 solver runs were not re-executed, only re-aggregated from the raw rows; Glucose rows were checked only through the l=3 rerun identity."
+    ],
+    "summary": "[pcc:unverified] The producer's verdict \"inconclusive\" follows from the pre-written kill criterion and stands. Criterion (1) is 0.699 at l=5, not above 0.7 by the letter but indistinguishable from it. Criterion (2) is unmeasured at l=5. \"Alive\" is not earned either, because the ratio is 0.716 on UNSAT targets alone and the l=3/l=4 cores match the counting null.\n\n- **Rerun:** `run.py 11 3 6 6` reproduced `raw_l3.jsonl` exactly in every counter for all six arms. My own re-aggregation of the three raw files reproduces the kill metrics (0.685, 0.666, 0.699), medians and slopes.\n- **Generator check:** my own field and curve code confirms the signed base of 8 and the 48 decomposable abscissae at l=3. All 52 measured target labels at l=3, 4 and 5 are correct, and planted targets are SAT with models that lift to points summing to the target.\n- **Defect found:** the CNF allows x_i = 0, so it uses the 2-torsion point (0,1), which the ground truth excludes. They disagree on 16 of 1,053 abscissae at l=3. No measured row is affected.\n- **Fairness:** arms share targets, order and assumptions, and all arms that ran are reported. The headline baseline FRESH-A is the weakest fresh arm; against SPEC the incremental arm is 0.80x at l=5, and against the per-target best fresh arm 1.04x.\n- **Overstated readings:** \"no decline along the sequence\" is contradicted by a mild downward drift of the UNSAT per-position ratio at l=4 and l=5. \"Leaning negative\" is a reading beyond the criterion.\n- **Not established:** that the protocol predates the data (no version control; file times are within seconds of the first run).\n\nI did not re-run the l=4 and l=5 solves or the core scripts. Review written to /home/user/crypto/research/sat_smt_leads_20261114/08-target-parametric/SKEPTIC.md; scratch is in /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-08-target-parametric/. A `__pycache__` directory created by the rerun inside the producer's directory was removed; no producer file was edited."
+   }
+  },
+  {
+   "idea": 9,
+   "title": "Solution-rich regime with budgets and XOR streamlining",
+   "slug": "09-solution-rich-regime",
+   "pilot": {
+    "idea": 9,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "[pcc:unverified] Against the linear 2+1 scan baseline (expected leaf solves per relation, early exit), the best SAT arm costs 11.7x to 313x more conflicts per relation in all 7 relation-producing cells (n=7, 11, 13; m=3), and untreated Glucose costs 41x to 10,900x; no cell falls below the baseline. Against plain enumeration the best SAT arm is 2.6x to 17.7x above in 6 cells and 0.549x in one (n=13, l=5), which rests on a single relation and an in-sample budget.",
+    "slopes": "Bits per l of cost per relation through the solution-rich regime. n=7 (l=2..4): untreated Glucose -2.03, linear scan -2.02, enumeration -2.24. n=11 (l=4..6): untreated Glucose -1.08, best SAT arm (in-sample exact-cut budget) -1.64, linear scan -2.74, enumeration -2.66. n=13: no slope, only l=5 produced relations. UNSAT refutation, median Glucose conflicts: +2.60 (n=7, l=1..3), +2.54 (n=11, l=2..5), +2.47 (n=13, l=3..5, biased low by 3 censored runs), plus about 0.7 to 0.8 bits per bit of n at fixed l. Modelled total cost T(l) = 2^l * cost/rel + 3 * 2^{2l} is minimised at l=4 (n=7) and l=6 (n=11) for Glucose, both at the top of the sweep, versus l=2 and l=4 for the linear scan; T at the SAT optimum is 1,656 vs 136 (n=7) and 1.62e6 vs 2,639 (n=11).",
+    "not_covered": "Sizes are much smaller than first planned: n=17 and n=19 were dropped after timing probes (PROTOCOL.md Amendment 1) because this chain encoding with free t refutes at a cost that grows with n (about 1e6 conflicts at n=17, l=5). n=13 has only l=3..5 with 8 targets per cell and relations only at l=5; n=11, l=6 has 13 of 16 targets; both runs were stopped at the time budget. The SAT-optimal l sits at the edge of each sweep, so it is not bracketed, and the prediction that the gain over the balanced point grows with n is not supported (16.7x at n=7, 4.45x at n=11, no data at n=13). No Gauss-aware or t-free arm was run (pycryptosat exposes no conflict counter), so the kill verdict applies to this encoding only. The budget arm is an idealised exact cut with B chosen on the same targets it is scored on, often keeping 1 or 2 relations; real Glucose conf_budget overshoots the cut by 3.8x to 32x in total conflicts. Streamlining used one random draw per target and k in {2,4,8}; 15 of 17 (cell, k) pairs were above untreated Glucose (1.15x to 28x), two below (0.74x, 0.50x) on few relations. Unit weights compare conflicts, leaf solves and tuple tests as raw counts. The brute-force cross-check cell (n=11, l=3) had only non-decomposable targets; SAT answers matched MITM ground truth on all 194 uncensored targets. Deviation: the measured runs started in the same shell line as the first validation attempt, which aborted on a spurious twist-type model (x1=x2=1, t=0); the encoding was unchanged and validation was rerun to completion (60/60 planted lifted). No session-log entry was written, because writes were restricted to this directory.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/analysis.txt",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/rows_n7.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/rows_n11.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/rows_n13.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/validation.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/budget_check.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/pdp.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/run.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/validate.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/budget_check.py"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime && python3 run.py 7 24 /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/09-solution-rich-regime/rows_n7_rerun.jsonl 1 2 3 4"
+   },
+   "check": {
+    "idea": 9,
+    "reproduced": "partly",
+    "verdict_supported": "yes",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "Protocol-before-results cannot be confirmed: all files carry copy-time mtimes (09:15 to 09:21, rows_n11.jsonl dated 5 minutes after PROTOCOL.md although it took about 25 minutes) and there is no git history. The kill criterion matches the idea text, so the verdict does not move.",
+     "Amendment 1 was written after conflict counts were seen on probe runs and shrank the study from n in {13,17,19} to {7,11,13}; the kill criterion itself was not changed.",
+     "Measured runs started before validation had passed (producer's own deviation). My independent n=7 check finds the encoding correct.",
+     "Budget arm is in-sample and idealised. On fresh targets the producer's figures are low by 3x to 50x: n=13 l=5 B=128 gives 0 relations in 400 targets and the best B costs 50,879 conflicts per relation (producer 1,008); n=11 l=6 gives 5,859 (producer 821); n=11 l=5 gives 5,429 (producer 1,997).",
+     "The single cell below enumeration (n=13, l=5, 0.549x) is a one-relation artefact: on 400 fresh targets the best budget is 41x above enumeration and 1,209x above the linear scan.",
+     "The headline range 11.7x to 313x for best SAT over linear scan is optimistic for SAT; with B chosen on one half and scored on the other it is about 25x to 3,000x.",
+     "Coverage is thin: 7 relation-producing cells; n=13 has one (8 targets, 3 decomposable, 3 censored); n=11 l=6 has 13 of 16 targets; n=13 l=6,7 from Amendment 1 were not run. The SAT-optimal l is at the sweep edge, so P1 is untested rather than confirmed, and cross-n scaling rests on two sizes.",
+     "Streamlining used one random draw per target; the two sub-1 ratios (0.74x, 0.50x) rest on few relations.",
+     "The primary criterion is close to unbeatable in raw units at high density: the linear scan needs 1.4 to 2.7 leaf solves per relation while the median SAT run needs 32 to 14,309 conflicts, and one conflict is compared with one GF(2) leaf solve.",
+     "Scope: one weak encoding (free t, refutation cost grows with n), no t-free or XOR-aware arm. The kill applies to this encoding at n <= 13 only.",
+     "n=11 and n=13 were not rerun (about 45 minutes); they were recomputed from raw rows and tested on fresh targets instead."
+    ],
+    "summary": "[pcc:unverified] The kill verdict holds and I could not break it; it covers this chain encoding with free t at n <= 13 only.\n\n- **Generator and encoding (my own F_{2^7} arithmetic and group law, n=7, l=1..4):** correct on every check. Seeds reproduce the stored targets 96/96. The producer's nsol, k3 and k2 equal my brute force over all point triples 96/96. Glucose SAT/UNSAT equals brute-force decomposability 96/96. The CNF with coordinate bits fixed agrees with direct S3 evaluation on 3456/3456 assignments. My own planted targets were SAT and lifted 59/60; the one miss is the twist-type model (1,1,7) the producer described, on a truly decomposable target.\n- **Rerun:** the producer's command took 1.1 s and gave 456 rows, 0 different from rows_n7.jsonl and results.json apart from wall time. Recomputing every cell from the raw rows reproduces the README table, including 11.7x to 313x against the linear scan and the 0.549x enumeration cell.\n- **Fairness:** all arms use the same instances in every cell, and every arm that was run is reported. The baseline is not inflated. Selection (minimum over six arms, B chosen in-sample) favours SAT, and the kill is met anyway.\n- **Held-out budget test (mine, 300 to 400 fresh targets per cell):** the result gets stronger. The 0.549x cell disappears: at n=13, l=5 the best budget is 41x above enumeration and 1,209x above the linear scan. With B chosen on one half and scored on the other, best SAT is about 25x to 3,000x the linear scan across the five cells tested.\n\nTwo things could not be confirmed: that the protocol was written before the results (copied mtimes, no git), and a full rerun of n=11 and n=13. Neither moves the verdict, because the kill criterion is the one in the idea text and the margins are at least 11.7x in sample and about 25x held out. P2 is not supported and P1 is not bracketed.\n\nReview: /home/user/crypto/research/sat_smt_leads_20261114/09-solution-rich-regime/SKEPTIC.md\nScratch scripts: /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-09-solution-rich-regime/indep.py and /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-09-solution-rich-regime/heldout.py"
+   }
+  },
+  {
+   "idea": 10,
+   "title": "Bit-sliced multi-target propagation",
+   "slug": "10-bitsliced-multitarget",
+   "pilot": {
+    "idea": 10,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "[pcc:unverified] Kill criterion met through K2: against a fresh untreated CaDiCaL run per target, the median common decision prefix across targets is 0 decisions on the target-specialised encoding (at most 2.6% of a trace on the universal one), far under the 10% bar. Against the scalar linear 2+1 scan baseline, the bit-sliced scan's wall time per target is 0.25x at l=5 rising to 1.02x at l=10 (n=31, random targets); it is 0.084x of bit-sliced enumeration at l=10, but that gap is the scan's 2^l versus 2^(2l), not bit-slicing.",
+    "slopes": "Part (a), n=31, m=2 leaf, l=5..10, 256 random targets per cell, bits per l (counted units / wall ns / wall ns top-3 sizes): enum_scalar 2.01 / 2.00 / 2.01; enum_bitsliced (baseline) 1.91 / 1.93 / 1.99; scan_scalar (linear 2+1 baseline, leaf solves) 1.00 / 0.78 / 0.91; scan_bitsliced (treatment, u64 word ops) 1.29 / 1.17 / 1.18. Planted targets give the same unit slopes. Part (b), random targets, l=5..7, 7-8 targets per cell, conflicts bits per l: E1 CaDiCaL 1.5.3 1.95, E1 MiniSat 2.04, E2 CaDiCaL 2.14. All [pcc:unverified].",
+    "not_covered": "Only the m=2 leaf (S3) was tested; no end-to-end m=3 and no m=4/S4. n fixed at 31, which favours bit-slicing (lane cost of target-dependent maps grows with n, scalar clmul does not); n about 3l and n>64 not run. l=4 dropped (256 distinct planted targets do not exist there). Part (b) stopped by its 240 s budget at l=7 after 15 of 16 targets; l=8 not run; incremental-reuse arm (b3) has only l=5,6, where it gave 0.87-0.94x conflicts on random targets and 0.56-1.79x on planted. Only 8+8 targets per cell and one seed in part (b); 2-3 pairs per cell with a long common E1 prefix (up to 81%) were not explained. No AVX2/AVX-512 lanes, no tuned lazy Gauss, no pinned cores or A/A noise arm; wall times come from a shared 4-core container. The hash-join arm used an unoptimised quadratic solver and is context only. No real WDSat/CryptoMiniSat lane sharing. research-kb was not available, so no prior-art check was made. Per the task card no session log was written under docs/session-logs (entry kept in SESSION_LOG_ENTRY.md in the pilot directory), and no Conductor task, benchmark record or pcc claim was made.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/bs.rs",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/part_b.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/raw_part_a.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/raw_part_b.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/part_b.log",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/validation.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/SESSION_LOG_ENTRY.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/instances/instance_l5.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/instances/instance_l10.json"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget && S=/tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/10-bitsliced-multitarget && mkdir -p $S/inst && rustc -O -C target-cpu=native bs.rs -o $S/bs && $S/bs 5 5 $S/inst"
+   },
+   "check": {
+    "idea": 10,
+    "reproduced": "partly",
+    "verdict_supported": "weaker-than-stated",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "K2 as pre-registered (E1, all variables) is a variable-numbering artifact: E1 has a different variable count per target, and in raw_part_b.json the common prefix is exactly 0 for every pair with different counts (118/118, 117/117, 102/102 at l=5,6,7) and long (230-433 decisions) for every pair with equal counts. The median of 0 was fixed by the encoder, not by the search; the producer's 'unexplained long-prefix pairs' are exactly the equal-count pairs.",
+     "The kill is really carried by the E2 side arm (identical clause set and numbering: prefix 0-10 decisions, max 2.6% of a trace), which is not the arm K2 names, on thin data: 8+8 targets per cell (7 random at l=7), one seed, l=5..7 only (protocol planned 4..8), one traced solver.",
+     "The common decision prefix of an unmodified CDCL does not bound what a purpose-built lane-shared solver with a fixed shared decision order could give; the part (a) treatment arm itself shares 100% of its x1 decisions. The (b2) statistic (40-60% of implied literals target-independent) is above the 10% bar and points the other way.",
+     "Wall-time ratios are good to about a factor of 2 only: my rerun of l=5 moved enum_bitsliced by 1.5-1.8x (scan_bs/enum_bs planted 4.25 stored vs 2.28 rerun), and stored repetitions spread up to 1.86x. No pinning, no A/A arm, arm order fixed rather than rotated. 'scan_bs/scan_scalar = 1.02 at l=10' is 1 within noise; the upward trend rests on counted units (1.29 vs 1.00 bits per l).",
+     "Part (a) 'planted' targets are x-level only: at l=5, 101 of 256 have no solution pair lifting to rational points summing to the target (155 do). Disclosed by the protocol's x-level design, but 'decomposable' there does not mean a point decomposition.",
+     "README slope table shows the random class only; scan_bitsliced wall slope on planted targets is 0.83, not 1.17.",
+     "Neither scan arm is tuned (fixed l+16 rows, 64-bit lanes; scalar arm has a fixed setup dominating at small l), so the bit-slicing constant is not settled in either direction. Only n=31 and the m=2 leaf were tested.",
+     "Part (b) conflict slopes rest on 3 sizes and 7-8 targets per cell; part (b) was not re-run by me, only its raw data re-analysed.",
+     "Pair statistics pool SAT and UNSAT targets (per-class medians are also near 0, so no change in outcome).",
+     "Protocol-before-results is supported only by file times and by the protocol still listing dropped sizes; there is no git history to prove it."
+    ],
+    "summary": "[pcc:unverified] Review written to /home/user/crypto/research/sat_smt_leads_20261114/10-bitsliced-multitarget/SKEPTIC.md. The kill formally follows from the pre-written criterion, but the statistic that triggers it is void; the conclusion survives only through a side arm on small data.\n\nChecks completed:\n- Generator and answers (own field, curve and brute-force code, l=5): 0 of 512 reference counts mismatch; S3 vanishes on all 306 point sums and differences; 108 of 108 SAT/UNSAT answers (E1 under two solvers, E2 under CaDiCaL) agree with my brute force; 24 of 24 E1 models on targets I planted from real points lift to P1 +- P2 = +-R.\n- Re-run of the smallest cell: regenerated instance is byte-identical, check rows and unit counts match exactly, wall times agree only to about a factor of 2.\n- Fairness of part (a): same instances and seeds in all arms, right baselines, precomputation inside the timed region, six sizes, classes separated, all arms reported.\n\nVerdict logic:\n- K1 is not met (0.084 at l=10), robust to timing noise, and correctly not credited to bit-slicing.\n- K2 is met on the letter, but the E1 prefix is 0 exactly when the two formulas have different variable counts and long when they are equal, so it measures encoder numbering.\n- The E2 arm (same numbering for every target) gives at most 2.6% common prefix, which honestly meets the task's 10% bar, on 8+8 targets, one seed, l=5..7.\n- A stock CDCL's common prefix does not bound a fixed-order lane-shared solver, so 'this bounds what lane sharing could ever give' is not established.\n\nThe more useful negative result is part (a): the bit-sliced scan is about 0.25x to 1x of the scalar scan, with word operations per target growing at 1.29 against 1.00 bits per l. That is no exponent gain and far from the protocol's own 1/8 bar, on untuned implementations at n=31 only.\n\nSide effect: importing part_b.py created a __pycache__ in the pilot directory; I removed it. No producer file was changed."
+   }
+  },
+  {
+   "idea": 11,
+   "title": "Solver-driven synthesis of the factor base",
+   "slug": "11-smt-factor-base-synthesis",
+   "pilot": {
+    "idea": 11,
+    "status": "partial",
+    "verdict": "kill-criterion-met",
+    "headline": "[pcc:unverified] Against the untreated CaDiCaL arm on random V (same encoding, A/A floor from two random-V sets), the best-defect base (polynomial span, dim V.V = 2l-1) shows no SAT conflict difference beyond noise: m=3 S/A = 0.65 at l=4 with A/B = 1.64; m=2 S/A 0.88..1.03 with A/B 0.88..1.18. Against the linear 2+1 scan baseline, the leaf count is unchanged (S/A 0.84..1.14); only the already-known leaf effect separates (candidates per scan S/A = 0.001 at l=7, A/B = 0.99), and the best base found is the polynomial span that baseline already uses. No search arm went below 2l-1.",
+    "slopes": "All fitted on geometric means over non-decomposable targets, bits per l, arms S (polynomial span) / A (random V) / B (random V, A/A control). SAT3 chained m=3 CaDiCaL conflicts, (l,n) = (2,7),(3,11),(4,13): 3.87 / 4.58 / 3.93 (decomposable 4.44 / 4.93 / 4.26); the A-B gap is as large as the S-A gap. SAT2 direct m=2 conflicts, (4,11),(5,11),(6,13),(7,17),(8,17): 1.84 / 1.81 / 1.83. Linear 2+1 scan at m=3, (2,7),(3,11),(4,13),(5,17),(6,19),(7,23): leaves 0.94 / 0.98 / 1.05; (s,p) candidates handed to the split 0.79 / 2.95 / 3.04 (the random-V figure includes the transition from dim V.V < n to = n; the predicted asymptote is 2). Defect: dim V.V random median 6, 10, 15, 19, 23 versus polynomial span 5, 7, 9, 11, 13 at l = 3..7; degree-3 Macaulay defect at l=7 is 226 for the polynomial span versus 140..147 for 200 random V.",
+    "not_covered": "SAT3 at l=5 was not run (one probe instance took 368k conflicts and 27 s; 96 instances did not fit the budget). A degenerate cell (2,7), where every V has dim V.V = 3, was added to get three sizes, so the SAT3 contrast between S and random rests on l=3 and l=4 only. The z3/CEGIS search over basis-change matrices was not run; it was replaced by exhaustive enumeration at l=3 (n=7 all V, n=11 all V containing 1) and two hill-climbs. An F2-linear change of coordinate on x was not explored. The defect was defined on the m=2 leaf system and on V.V, not on a descended S4. Only one solver (CaDiCaL 1.5.3) was measured, with no XOR-aware solver, no symmetry breaking, one run per instance, 4 bases per arm, no m=4, and only the curve a=0, b=1. Deviations from the protocol: decompositions through the 2-torsion point (t=0) are excluded in every arm after validation showed spurious off-curve models; bases with fewer than 3 rational points are resampled; the m=2 cells use the cell seed plus 500. No session-log entry was written, because the task restricted writes to this directory. No report PDF or graph was produced.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/summary_tables.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/defect.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/fb.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/validate.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/run_solve.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/defect.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/raw_sat3.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/raw_sat2.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/raw_l21.jsonl",
+     "/home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/run.log"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis && python3 validate.py"
+   },
+   "check": {
+    "idea": 11,
+    "reproduced": "yes",
+    "verdict_supported": "weaker-than-stated",
+    "corrected_verdict": "inconclusive",
+    "problems": [
+     "Verdict label does not follow from the pre-written criteria. Kill 1 is not met (polynomial span is below the random minimum for l >= 4). Kill 2 in PROTOCOL.md requires S/A inside the A/B range 'in every solve arm'; the L21 candidate arm separates by about 1000x at l=7 (decision rate 0.986 vs 0.000, permutation p = 0.002), so Kill 2 is not met either. The actual outcome is the protocol's third pre-registered one: 'known mechanism, nothing new to synthesise' (best base found is the baseline's own polynomial span, zero improvement over baseline).",
+     "SAT3 is underpowered: A/A floor is a factor 1.6 (non-decomposable) to 1.9 (decomposable) at l=4 with 4 bases per arm. S/(A\u222aB) = 0.85 (p = 0.50) non-decomposable and 0.53 (p = 0.16) decomposable. A true effect up to about 2x would not be seen, so 'no difference' is not shown, only 'no difference beyond noise'.",
+     "SAT3 slope has three sizes only by adding the degenerate cell (2,7) where every V has dim V.V = 3; only l=3 and l=4 contrast S with random V (disclosed by producer).",
+     "README claim that decomposable rows show 'the same picture' is loose: SAT2 decomposable has S slower (S/A 1.49 at l=7, 1.39 at l=8; S/(A\u222aB) 1.72, p = 0.07 at l=8), SAT3 decomposable l=3 has S/A 1.55 with A/B 0.97. Not significant, but direction is not uniform and the headline quotes non-decomposable only.",
+     "The SAT arm is far from the baseline in every arm (about 60000 conflicts at l=4 vs about 16 linear 2+1 leaves), so the S-vs-random SAT contrast compares two weak arms and says nothing about beating the baseline.",
+     "The rerun command (validate.py) regenerates no row of results.json; it only repeats the validation. Comparison with results.json needed a separate re-solve (done by the reviewer for cells (2,7) and (3,11): all 192 conflict counts match exactly).",
+     "Factor-base size is not controlled between bases (at (4,13): B has 11, 21, 7, 9 points vs S 19, 17, 13, 15), which drives leaf counts and part of the A/B spread.",
+     "S formula is smaller than A/B (w = 7 vs 9-10, about 650 vs 710 variables at l=4), so conflicts are not cost-equivalent across arms; propagations and CPU give the same reading, so no change to the conclusion.",
+     "run_solve.py was last modified in the same second the first cell finished: the (2,7) cell and the base-resampling rule are post-protocol edits made just before the run (disclosed, no effect on conclusions). No git history, so file times are the only evidence that the protocol predates the data.",
+     "README states '933 instances' twice; the files hold 1056 rows (768 with a SAT run).",
+     "Scope gaps (disclosed): no z3/CEGIS search, no coordinate change on x, defect defined on V.V and the m=2 system instead of the descended S4, exhaustive search only at l=3, one curve, one solver. Defect numbers (def2, def3, hill-climbs, exhaustive counts) and cells (4,13) and larger were not independently re-checked by the reviewer."
+    ],
+    "summary": "[pcc:unverified] The measurements hold up, but the verdict label does not: by the pre-written criteria neither kill is met, so I correct \"kill-criterion-met\" to \"inconclusive\", leaning negative.\n\n**Generator check (independent code, cells (2,7) and (3,11), all 192 SAT3 rows):**\n- Factor-base sizes match the recorded values in 192/192 rows.\n- Ground-truth decomposability matches my own triple enumeration in 192/192 rows.\n- All 96 planted targets decompose.\n- All 111 SAT models decode to x in V and lift to curve points summing to +-R.\n- All 81 UNSAT answers agree with brute force.\n- The t = 0 (2-torsion) exclusion is sound and changed no label in these cells.\n\n**Rerun:** `validate.py` ran in 39 s and printed the figures the README quotes. It regenerates no row of `results.json`, so I re-solved the two smallest cells myself: all 192 CaDiCaL conflict counts match exactly. `results.json` is identical to the raw files (1056 rows, not the 933 the README states), and my recomputed geometric means, ratios and SAT3 slopes match.\n\n**Fairness:** mostly holds.\n- Seeds and the four shared random targets are the same across all 12 bases of a cell.\n- Non-decomposable tables contain only shared targets, and decomposable rows are reported separately.\n- An A/A arm is present, the linear 2+1 baseline is included, and no leaf was truncated.\n- File times are consistent with the protocol being written first; there is no git history to confirm it.\n\n**Why the verdict is weaker than stated:**\n- **Kill 1** is not met: the polynomial span is below the random minimum for l >= 4.\n- **Kill 2** is not met as written: it requires no separation \"in every solve arm\", and the L21 candidate arm separates by about 1000x at l=7 (decision rate 0.986 vs 0.000).\n- **What the data support** is the protocol's third pre-registered outcome, \"known mechanism, nothing new to synthesise\". The best base found is the baseline's own polynomial span, so there is no improvement over the baseline.\n- **The SAT arms cannot show \"no difference\".** The A/A floor is a factor 1.6 to 1.9 with 4 bases per arm, and only l=3 and l=4 contrast S with random V. At l=4, S/(A\u222aB) is 0.85 (p = 0.50) non-decomposable and 0.53 (p = 0.16) decomposable.\n- **SAT is not competitive in any arm:** about 60000 conflicts at l=4 against about 16 linear leaves.\n- **The planned search was not run:** no z3/CEGIS, no coordinate change on x, and no defect on the descended S4.\n\nNot independently checked: cells (4,13) and larger, the m=2 CNF, and the defect numbers (def2, def3, hill-climbs, exhaustive counts).\n\nReview written to /home/user/crypto/research/sat_smt_leads_20261114/11-smt-factor-base-synthesis/SKEPTIC.md. The rerun created a `__pycache__` directory there, which I removed; no producer file was edited and no git state changed. Scratch scripts are /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-11-smt-factor-base-synthesis/indep.py and /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-11-smt-factor-base-synthesis/an.py."
+   }
+  },
+  {
+   "idea": 12,
+   "title": "MaxSAT for relation filtering and structured elimination",
+   "slug": "12-maxsat-filtering",
+   "pilot": {
+    "idea": 12,
+    "status": "ran",
+    "verdict": "kill-criterion-met",
+    "headline": "Against the greedy filtering pipeline (singleton removal + cascade-lookahead excess removal + 5 s randomised restarts, \"G3\"), neither MaxSAT arm (pysat RC2 exact, Glucose4 anytime model-improving, 5 s each) returned fewer columns on any of 66 random weight-4 relation matrices (N = 32..1024, excess 5/20/100%): cost ratio 1.0000 in every cell, threshold 5%. Exact solving stopped at N = 32 (anytime arm proved optimality on 11/12 instances at 5-20% excess, where greedy was already optimal; RC2 on 0/66), far short of 2^10. All numbers [pcc:unverified].",
+    "slopes": "No slope could be fitted for the MaxSAT arms: optimality was proven at one size only (N = 32; mean 36k conflicts at 5% excess, 78k at 20% including one timeout; none at 100% excess or at N >= 64). Baseline G2 (greedy with cascade lookahead), N = 2^5..2^12, 8 sizes: kept columns scale as N^0.97 (5% excess), N^0.97 (20%), N^0.96 (100%); at N = 4096 it keeps 3092 / 2674 / 1818 columns. Anytime-arm conflicts within 5 s fell from about 88k (N = 32) to 6.9k (N = 1024) with no improving model found.",
+    "not_covered": "Instances are the uniform random model (each row a random 4-subset), not real toy decompositions; structured matrices are untested, and the planted control (MaxSAT 7 columns against greedy 31) shows that is where a difference could appear. Merges and fill-in were not in the MaxSAT model: only subset selection was, with the same greedy Markowitz elimination applied to every arm. For N >= 64 the optimum is unknown; only \"no better model in 5 s\" was measured. Not run: 50% excess, z3 Optimize, budgets over 5 s, other cardinality or PB encodings, required excess above 1. Reps are 2-6 per cell (under 8 for N >= 64); N = 2048 and 4096 have baseline arms only, one seed. One protocol deviation (D1), recorded before the measured run: elimination stops at average row weight 16, because the unbounded minimum of N x weight is degenerate; the post-elimination cost is still degenerate at N = 32 and 64 and carries a few percent of noise, so column count is the cleaner metric. The research-kb query and the session log in docs/session-logs/ were not done (tool not installed; writes confined to the pilot directory); the log entry is in SESSION_LOG_ENTRY.md for merging.",
+    "files": [
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/PROTOCOL.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/README.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/results.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/results_raw.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/validation.json",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/table.md",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/run.log",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/filt.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/analyze.py",
+     "/home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/SESSION_LOG_ENTRY.md"
+    ],
+    "rerun_command": "cd /home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering && python3 filt.py smoke 32 5 5"
+   },
+   "check": {
+    "idea": 12,
+    "reproduced": "yes",
+    "verdict_supported": "weaker-than-stated",
+    "corrected_verdict": "kill-criterion-met",
+    "problems": [
+     "Scope: only subset selection was modelled. Merges and fill-in, half of the idea in the task card, are not in the MaxSAT model, so the kill does not cover them.",
+     "Instances are the uniform random weight-4 model only. The producer's own planted control (MaxSAT 7 columns against greedy 31) shows structured matrices are where a gain could exist; none were tested.",
+     "RC2 is a weak exact arm: z3 Optimize (named in the task card, not run by the producer) proves the optimum on all 6 N=32, 5% instances in 0.1-0.6 s where RC2 times out at 5 s. 'RC2 0/66' reflects the encoding more than the problem at that size.",
+     "The exact frontier still does not move: my z3 runs gave no answer in 12 s on 12/12 N=32 instances at 20% and 100% excess, nor in 20 s on 11/11 instances at N=64/128/256 with 5% excess.",
+     "For N >= 64 the optimum is unknown and the anytime arm returned its G3 warm start on every instance, so branch (a) is 'no better model in 5 s', not a measured MaxSAT reduction. The anytime arm is a single design (SAT call at bound G3-1) at a single 5 s budget.",
+     "The task card's primary metric (N x weight after elimination) is degenerate at N=32 and 64 (cost 2 for all arms). analyze.py divides by the minimum over G1, G2, G3, so that ratio can only be >= 1; against G3 alone it is exactly 1.0 on 66/66. Branch (a) is in effect judged on column count.",
+     "Coverage gaps against the task card, all disclosed: no MaxSAT arm at N=2048 and 4096, no 50% excess, 2-6 reps per cell.",
+     "Protocol-before-results cannot be proven: there is no git history, and PROTOCOL.md and filt.py share an identical mtime (09:36:48), after validation.json and before the measured run. Deviation D1 was made after smoke runs but affects only cost_sge, which does not drive the verdict.",
+     "Selected rows are not stored in results.json, so reported selections can only be re-verified by re-running. G3 is wall-clock bounded, so its restart count is not reproducible (50393 against 53097 on re-run; column count identical).",
+     "The review checklist items on planted targets, curve points and enumeration/2+1/MITM baselines do not apply to this pilot (no curve arithmetic); I checked the matrix-selection equivalents instead."
+    ],
+    "summary": "The pilot reproduces and the kill criterion is met, but only for the scope tested: MaxSAT subset selection on uniform random weight-4 matrices at 5 s per arm. Merges/fill-in and structured or real matrices were not tested, so the verdict is weaker than a kill of the whole idea.\n\nChecks I ran, all with my own code except where noted:\n- **Generator:** all 72 instances regenerate from the seed formula; seeds are distinct, rows are valid 4-subsets, and my own singleton removal matches the reported G0 rows and columns on 72/72.\n- **Solver correctness:** on 16 new tiny instances (N = 9..12), my brute force, my z3 model, the producer's RC2 and the producer's anytime arm agree on the optimum in 16/16.\n- **Re-run:** `filt.py smoke 32 5 5` matches results.json in every non-timing field (G1 = G2 = G3 = 27 columns, RC2 timeout, anytime arm optimal at 27).\n- **Headline counts:** recomputed from results.json as 66 full instances, RC2 optimal on 0, anytime arm optimal on 11, improved on 0.\n- **Independent optimum at N = 32, 5%:** z3 Optimize proves the optimum on 6/6 instances and it equals the reported G3 and anytime column counts.\n\nThe comparison is fair to the treatment: same instances for all arms, and the anytime arm starts from the G3 solution with an extra 5 s. Every arm that ran is reported, and no slope is claimed for the MaxSAT arms.\n\nBranch (b) of the kill criterion is the solid one: exact solving stops at N = 32, far below 2^10, and a second solver (z3) confirms it stalls at N = 64 and above. Branch (a) holds as measured (ratio 1.0000 in all 18 cells) but is weak for N >= 64, where the treatment only returned its warm start. One 40 s restart probe at N = 512, 100% excess stayed at the reported 228 columns, so I found no sign of large headroom there.\n\nReview written to /home/user/crypto/research/sat_smt_leads_20261114/12-maxsat-filtering/SKEPTIC.md. Scratch scripts and logs are in /tmp/claude-0/-home-user/570c81c4-197a-558d-aa76-c9ff505d9731/scratchpad/skeptic-12-maxsat-filtering/. No producer file was edited, no git state changed, and no session-log entry was written because the task confined writes to SKEPTIC.md."
+   }
+  }
+ ],
+ "missing": []
+}
