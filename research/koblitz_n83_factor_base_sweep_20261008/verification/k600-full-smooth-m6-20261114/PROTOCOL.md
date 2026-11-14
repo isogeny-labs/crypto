@@ -43,6 +43,8 @@ repository reports linked above are the primary execution receipts.
   `0eae40ffa0e938470671cf796633c1e47b61ff676df0807e7a7e8592e56bb828`,
   `760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd`,
   and `1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f`.
+  The [local staging receipt](staging.json) records byte counts and SHA-256
+  for the six copied inputs under source commit `0c38b582caa71aa9b94e0f0a5bb4e92ff72d19fd`.
 - Target: first sealed public corpus point, supplied as a point to the
   worker. The known-answer sidecar is read only after scalar production.
   Identity pattern 0 is the all-affine chained-S3 arm; other patterns
