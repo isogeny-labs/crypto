@@ -213,3 +213,19 @@ Normalrootpayloadcommit/push/actual8remote-byte replays/exactFF/all5030guards+BO
 
 ### Errors (what went wrong, how it was handled)
 AllsharedFB30failures/bindingcaller01/Typstinitialcompile/reportcustodycaller failuresretained. Originaltransportb08916passesexactclean39b/laterchangesstale. Root124/unknowntotals/twoexactclock101 errors633ab0 unchanged/capablehostrequired. Geometry/logextension/cost/mainledger/signing/reviews/conflict/vault/KB gapsremain. [pcc:unverified]
+
+## 2026-11-14T02:47:34.991082+00:00 — norm-assisted source published; independent replay active
+
+### What was done (commands, files, features)
+pcc/claims/PCC-20261114-515f4c.json:consumer21afb40f/tree d9422484/directb57/248paths/4f3a11 NORMALpublished0;native9bc5e6/writtene7a860/60partialunique/report510c8c andgenuine243bb9/9a7cf7 complete. Sourcegov01/02failedwhitespacecaptures085fede1e6b4andexactdataformatclassificationsf8e5c0d1fb8b preserved/all784and4082scientificbytesunchanged. Cleanphysical785/original3d/fouractualadmission2nooutputrestored;fullRUNNING/17automaticCIauditpending. Exactclean21af ORIGINALcheckpoint remote+localgate0/all28members/111985BZIP/SHA311c253a;neweditsstaleit. [pcc:unverified]
+
+### Decisions made (and why)
+Retainwhole normalpublication receipts/logs losslessly andsource/full/admission/checkpoint observations. 09historicalreleased/futureFFNEW10. Keepnativeordinarycorrectness andcompletecost/admission requirements separate. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Collect /workspace/scratch/ct71-norm-sampling-full-01 native/guard/phases andsource21af17CI327native60unique62actualchecks. Thencompletearithmetictaps/coldonlinecoverage/admittedmatchedrefs/completebeta coordinates. Continueafterrung. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+All15sharedFB30failures/caller01/Typst/reportcustody/sourcegov01and02 negativesretained. Root124/clock101/formal/cost/mainledger/signing/reviews/conflict/vaultKB remain. [pcc:unverified]
+
+2026-11-14:consumer21af sampling333af1/42073d/66da4b settled; latermetadata checkpointstale. Existingfixeddiagnosisworkflow onlytargets threehistoricaljobs, ordinaryisolabworkflow buildsunrelatedimages; neither suppliescurrentbudget/capacity noranimagebindingBOTHactualresearchrepos. No paidlaunch. Boundedlocalnative arithmeticdevelopment proceeds underc20aaf/2c+cda454/584. Mainledger/clock/signing/review/conflictrequirements unchanged. [pcc:unverified]

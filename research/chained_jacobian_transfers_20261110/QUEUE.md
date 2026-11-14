@@ -1,3 +1,32 @@
+# Sampling settled; arithmetic coverage in progress — 2026-11-14T04:01:01.399087+00:00
+
+Scientific consumer21afb40f has completed independent785-input replay333af1 and all17-source CI42073d:327 native records,60 unique canonical PCC digests,62 actual verdict records. Native9bc5e6 retains225 scalar pairs/1125triples/60ICpairs120reports/45 accepted correct perarm/all15publiccases and all15 shared FB30 failures. Writtene7a860/report510c8c are partial and unsigned. [pcc:unverified]
+
+Originalcheckpoint66da4b succeeded remotely and locally with the unchanged original gate for exactclean21af/all28members/111985BZIP; latermetadata stale. Actualwholepublication243bb9/9a7cf7 releasesguard09 after eightremote replays BEFORE18633f0ba/direct97b05738/exact10paths/all15objects8S3+7Git/all5030inputs+ownedbytes+3linktypes. Nextgenuinebatch forclosed785full/17CI/21aftransport needs freshguard10. [pcc:unverified]
+
+Currentconsumer584ba997 publishes c20aaf/2c prospectivearithmeticprotocol BEFOREtaps and cda454/584 inlinecounteraddendum BEFORE separatelycompiled classsolvercopies. Existingfrozenclasssolverfiles and all originalsource/verifier/workflow rules remain; require strip-only-declared-tap byte-roundtrip and all86wholeJSON. Implementation under way in isolatedmaterializedsources; no nativeoutcome claimed atthischeckpoint. [pcc:unverified]
+
+GitHub3877/1523/3904 bodies actuallyupdated; rootsettlement pcc/claims/PCC-20261114-e93114.json. Livebudget/capacity unknown; fixeddiagnosticworkflowonly historicaltargets andnormalisolabworkflow unrelatedimages; no paidlaunch. Continuearithmeticprimitivecontrols/nativepanel, explicitunpricedwork, fullcoldonlinecost andstrongestmatchedrefs; thencompleteglobalbeta/primefielddescent. Root124/clock101/mainledger/signing/reviews/conflict/actualgeometry/formalbridges/vault8edec422locked/KB127 remain. [pcc:unverified]
+
+---
+
+
+## 2026-11-14T02:47:34.991082+00:00 — norm-assisted source published; independent replay active
+
+### What was done (commands, files, features)
+pcc/claims/PCC-20261114-515f4c.json:consumer21afb40f/tree d9422484/directb57/248paths/4f3a11 NORMALpublished0;native9bc5e6/writtene7a860/60partialunique/report510c8c andgenuine243bb9/9a7cf7 complete. Sourcegov01/02failedwhitespacecaptures085fede1e6b4andexactdataformatclassificationsf8e5c0d1fb8b preserved/all784and4082scientificbytesunchanged. Cleanphysical785/original3d/fouractualadmission2nooutputrestored;fullRUNNING/17automaticCIauditpending. Exactclean21af ORIGINALcheckpoint remote+localgate0/all28members/111985BZIP/SHA311c253a;neweditsstaleit. [pcc:unverified]
+
+### Decisions made (and why)
+Retainwhole normalpublication receipts/logs losslessly andsource/full/admission/checkpoint observations. 09historicalreleased/futureFFNEW10. Keepnativeordinarycorrectness andcompletecost/admission requirements separate. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Collect /workspace/scratch/ct71-norm-sampling-full-01 native/guard/phases andsource21af17CI327native60unique62actualchecks. Thencompletearithmetictaps/coldonlinecoverage/admittedmatchedrefs/completebeta coordinates. Continueafterrung. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+All15sharedFB30failures/caller01/Typst/reportcustody/sourcegov01and02 negativesretained. Root124/clock101/formal/cost/mainledger/signing/reviews/conflict/vaultKB remain. [pcc:unverified]
+
+---
+
 
 ## 2026-11-14T02:17:18.564338+00:00 — norm-assisted whole-data handoff and fresh guard09
 
