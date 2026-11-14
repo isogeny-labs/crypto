@@ -7,11 +7,16 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: hec-native-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   native:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: crates/hec-native-ic
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo fmt --manifest-path crates/hec-native-ic/Cargo.toml -- --check
       - run: cargo test --manifest-path crates/hec-native-ic/Cargo.toml
