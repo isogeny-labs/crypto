@@ -26,16 +26,46 @@ namespace rf {
 struct SortedTableHost {
     std::vector<uint64_t> keys;
     std::vector<uint32_t> idx;
-    SortedTable view() const { SortedTable t; t.keys = keys.data(); t.idx = idx.data(); t.n = (uint32_t)keys.size(); return t; }
+    std::vector<uint64_t> eyt;       /* keys in Eytzinger (BFS) order, 1-indexed */
+    std::vector<uint32_t> eyt_rank;  /* sorted position of eyt[k] */
+    SortedTable view() const {
+        SortedTable t;
+        t.keys = keys.data(); t.idx = idx.data(); t.n = (uint32_t)keys.size();
+        t.eyt = eyt.data(); t.eyt_rank = eyt_rank.data();
+        return t;
+    }
 };
 
 struct HashTableHost {
     std::vector<uint64_t> keys;
     std::vector<uint32_t> vals;
+    std::vector<uint64_t> slots;     /* (tag << 32) | index; low word RF_NO_INDEX if empty */
     uint32_t mask = 0;
     uint32_t capacity() const { return mask + 1; }
-    HashTable view() const { HashTable t; t.keys = keys.data(); t.vals = vals.data(); t.mask = mask; return t; }
+    HashTable view() const {
+        HashTable t;
+        t.keys = keys.data(); t.vals = vals.data(); t.mask = mask; t.slots = slots.data();
+        return t;
+    }
 };
+
+/* In-order walk of the implicit tree k -> (2k, 2k+1) assigns the sorted
+ * keys to Eytzinger positions 1..n. */
+inline void eytzinger_fill(const std::vector<uint64_t> &sorted, std::vector<uint64_t> &eyt,
+                           std::vector<uint32_t> &rank) {
+    const uint32_t n = (uint32_t)sorted.size();
+    eyt.assign(n + 1, 0);
+    rank.assign(n + 1, 0);
+    uint32_t next = 0;
+    std::vector<uint32_t> stack;
+    uint32_t k = 1;
+    while (k <= n || !stack.empty()) {
+        while (k <= n) { stack.push_back(k); k = 2 * k; }
+        k = stack.back(); stack.pop_back();
+        eyt[k] = sorted[next]; rank[k] = next; next++;
+        k = 2 * k + 1;
+    }
+}
 
 template <class F>
 SortedTableHost build_sorted(const typename F::ctx &f, const typename F::elt *fb_x, uint32_t n) {
@@ -46,6 +76,7 @@ SortedTableHost build_sorted(const typename F::ctx &f, const typename F::elt *fb
     t.keys.resize(n);
     t.idx.resize(n);
     for (uint32_t i = 0; i < n; i++) { t.keys[i] = e[i].first; t.idx[i] = e[i].second; }
+    eytzinger_fill(t.keys, t.eyt, t.eyt_rank);
     return t;
 }
 
@@ -69,6 +100,9 @@ HashTableHost build_hash(const typename F::ctx &f, const typename F::elt *fb_x, 
         t.keys[slot] = key;
         t.vals[slot] = i;
     }
+    t.slots.resize(cap);
+    for (uint32_t k = 0; k < cap; k++)
+        t.slots[k] = ((uint64_t)HashTable::tag(t.keys[k]) << 32) | (uint64_t)t.vals[k];
     return t;
 }
 
