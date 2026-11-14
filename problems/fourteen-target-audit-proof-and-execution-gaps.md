@@ -332,7 +332,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
-| 8 Bézout/multiplicity | Partial: actual quotient length/support witness and16 native checks; JV dimension/F-length8/support1; literal F2two-torus source-helper disproof and exact rational-point chart qualification/repair/overhead (31) | General n!dⁿ bound/decomposition node remains unrefuted; scheme charts, isolated-point/multiplicity geometry and actual toric-resultant runtime |
+| 8 Bézout/multiplicity | Partial: actual length/support/native16/JV8; literal F2torus-helper disproof/point-chart repair (31); generic actual solution/quotient-map equivalence and finite scalar-length bound, unbounded actual bivariate nilpotent family with m0/m1/domain controls (44) | General n!dⁿ/decomposition node unrefuted; scheme-cycle/local multiplicity, isolated points in positive-dimensional components, projective geometry and Rojas/C runtime/refinement |
 | 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
@@ -849,3 +849,26 @@ main Bezout/decomposition theorem and exact corpus node remain unrefuted.
 Formal scheme charts, multihomogeneous substitution, isolated-point
 multiplicity geometry and the Rojas algorithm/runtime remain open. No
 novelty or new native experiment is claimed. [pcc:unverified]
+
+### Generic actual coordinate-length accounting and unbounded family
+
+The [coordinate-length packet](../research/coordinate_length_audit_20261114/README.md)
+constructs actual ideal solutions/coordinate-quotient algebra-map equivalence
+over every field extension, for every variable type. A finite quotient gives
+finite support bounded by dimension, which equals scalar-module length,
+with source nilpotents permitted. The actual two-variable ideal (x^m,y−x)
+has quotient isomorphic to K[t]/t^m, dimension/K-length m and exact
+nilpotent powers. For m>0 its support is one over every field extension;
+Lean proves arbitrary dimension gap and directly negates universal
+support=dimension. The m0 empty/zero-dimension and m1 reduced/isomorphic-K
+controls pass. Actual F3 dual numbers have dimension2 and at least three
+endomorphisms from coefficient scalings, directly disproving the bound
+after target-domain deletion. Whole gate44/0 failures/0 trusted and exact
+local PCC-20261114-c3ba4f replay pass at 2026-11-14T00:34:55Z; eight formal/config and ten artifact
+pins match, 62 attempt files/five gate files and inspected one-page PDF47161B
+retained. Signed standing unverified. Scalar-module length is not formally
+identified with scheme cycles/local intersection multiplicities. General
+projective isolated-point/positive-dimensional geometry, equal-multidegree
+n!dⁿ and Rojas/C refinement remain open; qualified source/node unrefuted.
+Existing16 msolve calls unchanged; no new native experiment or novelty.
+[pcc:unverified]
