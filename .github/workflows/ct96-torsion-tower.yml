@@ -1,0 +1,31 @@
+name: CT96 torsion field tower and Frobenius degrees
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct96/**'
+      - '.github/workflows/ct96-torsion-tower.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct96/**'
+      - '.github/workflows/ct96-torsion-tower.yml'
+  workflow_dispatch:
+jobs:
+  certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare separately coded exact integer and finite-field certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct96
+          python3 -B "$D/ct96_tower_certificate.py" > "$RUNNER_TEMP/ct96-python.json"
+          python3 -O -B "$D/ct96_tower_certificate.py" > "$RUNNER_TEMP/ct96-opt.json"
+          node "$D/ct96_tower_independent.js" > "$RUNNER_TEMP/ct96-node.json"
+          node --no-opt "$D/ct96_tower_independent.js" > "$RUNNER_TEMP/ct96-node-noopt.json"
+          cmp "$RUNNER_TEMP/ct96-python.json" "$RUNNER_TEMP/ct96-opt.json"
+          cmp "$RUNNER_TEMP/ct96-python.json" "$RUNNER_TEMP/ct96-node.json"
+          cmp "$RUNNER_TEMP/ct96-python.json" "$RUNNER_TEMP/ct96-node-noopt.json"
+          printf '%s  %s\n' 7dfe6c347eefb21353b71be3d2f325e18fb7c46909c8fb6f01a817190eb09c52 "$RUNNER_TEMP/ct96-python.json" | sha256sum -c
+          cat "$RUNNER_TEMP/ct96-python.json"
