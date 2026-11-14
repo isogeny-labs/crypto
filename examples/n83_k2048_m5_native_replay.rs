@@ -290,7 +290,7 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
         .map(|block| x_block(&assignment, block))
         .collect::<Vec<_>>();
     let target = point(&export_record["target"])?;
-    if scalar(target, ORDER)? != None {
+    if scalar(target, ORDER)?.is_some() {
         return Err("native replay target outside subgroup".into());
     }
     let mut reader = BufReader::new(GzDecoder::new(File::open(object)?));
@@ -349,7 +349,7 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
     }
     let mut row = vec![0u128; 2_048];
     for entry in &chosen {
-        if scalar(entry.point, ORDER)? != None {
+        if scalar(entry.point, ORDER)?.is_some() {
             return Err("relation point outside subgroup".into());
         }
         row[entry.column] = (row[entry.column] + entry.coefficient) % ORDER;
