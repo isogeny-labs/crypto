@@ -197,3 +197,19 @@ Normalrootpayloadcommit/push/originalpublisher8remote byte replays/exactFF/all42
 
 ### Errors (what went wrong, how it was handled)
 Originaltransportffe675 succeedsremote+localORIGINALgate forexactclean39e9;laterstatechangesstaleit. Rootfull124/unknowntotals/twoexact101clockinit failures633ab0 remain;CIhostmetadata0iscapabilityonly. Fullgeometry/logextension/fullcost/livebudgetcapacityrefs/mainledger/signing/reviews/conflict/vault/KB gapsremain. [pcc:unverified]
+
+## 2026-11-14T02:17:18.564338+00:00 — norm-assisted whole-data handoff and fresh guard09
+
+### What was done (commands, files, features)
+Native9bc5e6/all4082guards/225scalarpairs1125triples60ICpairs120reports/all15casesTHREEcommoncorrectsettings/45correcteach/all15FB30failures retained. Writtene7a860/faithful789d94a9a7afed533b/60partialunique/bothoriginal3gates0trusted/report510c8c TWO75055-bytefinalpagesALLviewed. StrictCIa2feab784+self785/tenphases/86JSON/17workflows327native60unique62actualchecks prepared/pendingnewsourcefullCI. [pcc:unverified]
+
+pcc/claims/PCC-20261114-d81ee9.json:SEVENwholecaptures+SEVENcompleteindices+wholePDF15objects/8genuineS3pending+7smallGit;ALL115ownedpendingfiles/baseb57/patch/784CI/PCCledger/resume/report+alias snapshot119members. Transport84filenonsecretclosureALL28ZIPmembers/ONEprivate temporarydownloadAPIexcludedwithhash/fulloriginalprivatecapturelocal. Freshguard09 HOLDS5030 actualinputs andallreportlinktypes/targets. Old08historicalreleased/ONLYpostpublicationcommoncanonicalREADMEdelta mapped. [pcc:unverified]
+
+### Decisions made (and why)
+Useunchangedgenuinepublisher/wholeexplicitPDF.bin canonicaldocs+relativelink/no splitprune thresholdpolicy orverifiertrust changes. WholecontrolplaneAPI/loglosslessXZ recordedDIRECTafterpublication. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Normalrootpayloadcommit/push/actual8remote-byte replays/exactFF/all5030guards+BOTHereposdirtybytes+linktypes/genuineconsumerprojections;thenconsumersourcecommit/785full/fouractualcontrols/17CI327native60unique62actualchecks. Continuecompletearithmetictaps/coldonlinecoverage/admittedmatchedrefs/odddegreecoordinates. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+AllsharedFB30failures/bindingcaller01/Typstinitialcompile/reportcustodycaller failuresretained. Originaltransportb08916passesexactclean39b/laterchangesstale. Root124/unknowntotals/twoexactclock101 errors633ab0 unchanged/capablehostrequired. Geometry/logextension/cost/mainledger/signing/reviews/conflict/vault/KB gapsremain. [pcc:unverified]
