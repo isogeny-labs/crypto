@@ -200,6 +200,7 @@ pub fn run(raw: &str, outdir: &str) {
     writeln!(md, "|--:|--:|--:|--:|--:|--:|--|--:|--:|--:|--|--:|").unwrap();
     let mut first = true;
     let mut linpts = vec![]; // (label, D, frac)
+    let mut shares: Vec<String> = vec![];
     for (n, m, d) in [(11, 2, 5), (11, 2, 6), (13, 2, 6), (13, 2, 7), (19, 2, 9), (19, 2, 10), (11, 3, 4), (13, 3, 4), (13, 3, 5), (19, 3, 6), (19, 3, 7)] {
         let p = format!("{}/linz_n{}_m{}_d{}.json", raw, n, m, d);
         let Ok(s) = std::fs::read_to_string(&p) else { continue };
@@ -220,6 +221,9 @@ pub fn run(raw: &str, outdir: &str) {
             let nets: Vec<String> = [0.0, 0.1, 1.0].iter().map(|pr| format!("{:+.3e}", saved - pr * wo)).collect();
             let be = saved / wo;
             let (lo, hi) = wilson(refd, unsat);
+            let wo_unsat: f64 = rows.iter().filter(|r| !r.get("sat").b()).map(|r| r.get(&key).get("word_ops").f()).sum();
+            let wo_all: f64 = rows.iter().map(|r| r.get(&key).get("word_ops").f()).sum();
+            shares.push(format!("| {} | {} | {} | {} | {:.3} | {:.3} |", n, m, d, dd, unsat / rows.len() as f64, wo_unsat / wo_all));
             writeln!(md, "| {} | {} | {} | {} | {} | {} | {}/{} = {:.3} [{:.3}, {:.3}] | {} | {:.3e} | {} | {} | {:.2e} |", n, m, d, nv, unsat, dd, refd, unsat, refd / unsat, lo, hi, fnn, wo, oracle, nets.join(" / "), be).unwrap();
             linpts.push((format!("n{} m{} d{}", n, m, d), dd, refd / unsat));
             if !first { js.push(',') }
@@ -230,6 +234,8 @@ pub fn run(raw: &str, outdir: &str) {
         }
     }
     js.push_str("]}\n");
+    writeln!(md, "\n### Table D: share of XL/linearisation word ops spent on UNSAT targets (same streams)\n\n| n | m | d | D | UNSAT share of targets | UNSAT share of word ops |\n|--:|--:|--:|--:|--:|--:|").unwrap();
+    for l in &shares { writeln!(md, "{}", l).unwrap(); }
     std::fs::write(format!("{}/results.json", outdir), js).unwrap();
     std::fs::write(format!("{}/tables.md", outdir), md).unwrap();
     std::fs::write(format!("{}/figure.svg", outdir), svg(&cellpts, &linpts)).unwrap();

@@ -4,6 +4,7 @@ mod field;
 mod gf2x;
 mod lattice;
 mod popov;
+mod report;
 
 use field::{Fld, Pt};
 use gf2x::{derive_seed, Rng, F64, P};
@@ -360,6 +361,7 @@ fn main() {
         Some("kobaug") => cmd_kobaug(&a),
         Some("exist") => cmd_exist(&a),
         Some("theory") => cmd_theory(&a),
+        Some("summarize") => report::summarize(&a[2], &a[3]),
         _ => eprintln!("usage: ffcop selftest|lattice|uni|kobaug|exist|theory ..."),
     }
 }
