@@ -222,3 +222,9 @@ cell's arguments, with no counts and nothing imputed. Censored rows are excluded
 already does for timeouts. A killed instrument is deterministic on this host, so the remaining draws of that
 cell are censored with it rather than rerun. `run_cells.sh` calls the helper when the instrument exits non-zero.
 
+*Note to Amendment 3 (after the run).* The runner read `$?` after `if !`, so the helper wrote "exit 0" into
+`censor_reason`. Every such row was rewritten afterwards to the cause shown in `run.log` (the kernel's "Killed",
+out of memory); only that text field changed. Censored cells: `M3-A2-t5` and `M3-A23-n4` (tower and null),
+`B-M3-A23-n4` and `B-M3-A2-t5`. `B-M3-A2-t5` first lost its runner to the session's 2-hour background limit, with no
+rows; it was rerun from the start (§7) and then killed for memory. The run ended 2026-11-14T11:46Z.
+

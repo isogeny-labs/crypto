@@ -289,7 +289,7 @@ pkm-smooth-tower cm --p 1000033 --bound 13 --min-size 300 --max-disc 1000
 ```
 Every tower is checked before it is printed: $|V| = S$ distinct values, and
 $L(v) = c$ on all of $V$. For $p < 2^22$ it also checks that $L(x) = c$ has no other root in $FF_p$.
-Code: `src/cryptanalysis/pkm_smooth_tower.rs` (library, 8 unit tests) and
+Code: `src/cryptanalysis/pkm_smooth_tower.rs` (library, 10 unit tests) and
 `src/bin/pkm_smooth_tower.rs`.
 
 = What is known, and what is not
@@ -327,15 +327,24 @@ quoted from their reports. They have no pcc claim id yet [pcc:unverified].
   The deciding cost, solving the systems at $m >= 3$, has not been measured
   at any size near that.
 
-*Not yet tried.* Every Gröbner measurement above used maps of degree 2 (or
-groupings of them). Towers with *odd* degrees $q_j = 3, 5, 7, dots$, or mixed
-ones, which is what this tool adds, have not been through F4. Neither has
-any comparison between towers of the same $|V|$ but different degree mixes.
-That is the cheapest open experiment this tutorial points to.
+*Now measured: odd degrees, the auxiliary curve, and the algebraic solver*
+(`research/pkm_odd_tower_f4_20261114/`, EXP-PKM-ODD-001, protocol frozen before data, [pcc:unverified]):
 
-*Bottom line.* At the sizes measured, this attack is slower than Pollard
-rho, by 18–141 times. Whether some tower shape changes how the cost *grows*
-is open. The tutorial makes no speed claim.
+- *Odd degrees help by a constant factor.* At equal $|V|$ and two points ($m = 2$), towers of degree 3 cost
+  0.24–0.30 times the degree-2 tower's F4 work, and degree 5 0.12–0.16 times. This replicates at a second prime,
+  and a random-coefficient control shows the same gain, so it comes from the shape of the equations. Every arm still
+  grows like $|V|^(3.1"–"3.6)$: the constant moves, the growth does not.
+- *The auxiliary curve does not help.* Isogeny (rational-map) towers cost 0.76–1.47 times the Kummer towers with
+  the same degrees, with the auxiliary-curve search not even charged.
+- *Solving the system loses to enumerating $V$.* The slides' relation search (F4 plus a linear stage that reads the
+  solutions off the basis) was implemented. It finds exactly the relations enumeration finds (80 of 80 decided
+  targets), but it costs between $2 dot 10^2$ and $1.2 dot 10^7$ times more $FF_p$ multiplications than simply
+  trying every factor-base point. The gap grows with $|V|$, at $m = 2$ and at $m = 3$. Larger $m = 3$ systems did
+  not fit in 15 GiB of memory.
+
+*Bottom line.* At the sizes measured, this attack is slower than Pollard rho by 18–141 times. Solving its
+polynomial systems is slower than enumerating the factor base by orders of magnitude. Odd degrees shave a
+constant, but no tower shape tried here changes how the cost grows. The tutorial makes no speed claim.
 
 = Exercises
 
