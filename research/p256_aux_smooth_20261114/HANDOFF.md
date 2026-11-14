@@ -60,3 +60,13 @@ Fp-rational solutions on complete checked instances. >=2x median complete
 stage improvement on identical instances with paid setup/conversion/replay
 and qualified measurement is the performance goal. New mathematical
 claims need independent proof/standing; input degree3 is not regularity3 [pcc:unverified].
+
+## Publication
+
+[PR4147](https://github.com/isogeny-labs/crypto/pull/4147) is regular/open,
+with auto-merge MERGE enabled under repository cadence, pending requirements.
+First code head:30ff45786a34e8f9525e5bc58e4e40e3bb52c0eb. Initial complete
+check-run API census returned23/23: native-checks succeeded, other jobs were
+pending, with no submitted reviews or inline comments. This snapshot is
+PCC-20261114-3db01e, unsigned; it does not establish later-head CI or merge
+success [pcc:unverified]. No experiment/check-in automation was created.
