@@ -133,3 +133,31 @@ disk once they exist.
 | `checks/sd_law_check.py`, `checks/sd_law_check.out.txt` | the SD-law check on committed cells |
 | `checks/sd_law_figure.py`, `sd_law.svg`, `sd_law.png` | the figure |
 | `REPORT.typ`, `REPORT.pdf` | this README as a report |
+
+## Errata (2026-11-14, from the wave-6 red team, `../curve25519_leads_wave6_20261114/lanes/redteam_wave5.md`)
+
+- **E1 (§1, "preregistered eight values it had not read").** The eight k = 22, m = 3 solving degrees are listed in
+  the parent exponent study's cell table, which the synthesis lane names among its sources. The 8-of-8 match is
+  in-sample. Next time a lane claims a prediction made before reading, it must commit a hash of the prediction
+  before the read [pcc:unverified].
+- **E2 (§1, "solving degree at least 65,148 on that route").** `solving_degree_max` is the highest productive F4
+  pair degree, which equals the largest generator degree plus 0 to 5 in every recorded cell. For the chain and flat
+  presentations of μ_d the bound holds by construction (a generator of degree ≥ 65,147 is in the input); for
+  other encodings of the same set (exponent bits, baby–giant splits, sumsets) it is false. What is true about
+  Curve25519 is the Petit–Kosters–Messeng smoothness condition: p − 1 has no divisor between 781,764 and the
+  236-bit prime C, so no μ_d base of useful size exists [pcc:unverified].
+- **E3 (§1 and §2 row 3, the law as a cost law).** Over the 60 complete sym cells, ln T against ln SD has R² = 0.09;
+  cells with equal SD differ in T by up to 8.0 × 10^4. The law says nothing about cost. Rank 3 is withdrawn
+  [pcc:unverified].
+- **E4 (§1 bullet 1 and §3, "e_max + 2 to 3 at m = 2").** The k = 18 cell d = 923 = 13 × 71 has SD 75 = e_max + 4, and
+  the wave-6 out-of-sample cell d = 825 has SD 15 = e_max + 4. The band is wrong; no exact rule is supported
+  [pcc:unverified].
+- **E5 (§2 row 7, W5-RP-4).** The proposed sparse/dense split of the F4 linear algebra is already implemented in
+  `f4_fp`. The lead is replaced by a memory-profile measurement (wave 6, W6-4) [pcc:unverified].
+- **E6 (§2 rows 1 and 2, W5-PL-1 and W5-PL-3).** No k = 20 `inc-lazy` arm exists, and the k = 20 incumbent already
+  stores its set-up, so the k = 20 strict-IC sub-claim of PL-1 has no denominator; the headline arm `tw2cj-lazy`
+  has no owner classification; the WalkTable walks a fixed prefix, so recycled points shorten only the tail
+  (about 0.73 of the set-up at k = 24). PL-3 undercounts: the tw-lazy arms run the [d]G = Q check twice, so the
+  saving is about −4 % at k = 20, not −2 % [pcc:unverified].
+- **E7 (§3, "the 3 % walk excess is fully explained").** The explanation is the published Brent–Pollard / Teske
+  factor √(1 − 1/r) (1.0352 at 16 jumps, Bernstein–Lange 2012/294 p. 7), not a new finding [pcc:unverified].
