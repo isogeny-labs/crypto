@@ -100,7 +100,7 @@ fn run_arm(fld: &Fld, arm: &str, form: Form, g: &Bi, wts: (usize, usize), k: usi
             None => status = "skipped_D",
             Some(kf) => {
                 // extraction v2 (Amendment 2): strip exact factors of g and monomial factors from each
-                // short row (they carry no information about the root), drop duplicates, use up to 12
+                // short row (they carry no information about the root), drop duplicates, scan all
                 // rows; resultants in both variables; partner coordinate solved from g mod f.
                 let bmaj = matches!(form, Form::EForm);
                 let mut sh: Vec<Bi> = vec![];
@@ -112,7 +112,7 @@ fn run_arm(fld: &Fld, arm: &str, form: Form, g: &Bi, wts: (usize, usize), k: usi
                     if q.keys().all(|m| *m == (0, 0)) { continue; }
                     if !sh.contains(&q) { sh.push(q); }
                 }
-                let ex = extract::extract_v2(&kf, &sh, bounds.0, bounds.1, rng, 12);
+                let ex = extract::extract_v2(&kf, &sh, bounds.0, bounds.1, rng, usize::MAX);
                 pairs = ex.pairs_tried; rz = ex.res_zero;
                 status = if ex.resolved { "resolved" } else { "all_res_zero" };
                 // candidate pairs: (a, solve g(a, Z)) and (solve g(Z, b), b)
