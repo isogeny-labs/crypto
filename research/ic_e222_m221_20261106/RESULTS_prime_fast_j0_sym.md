@@ -140,3 +140,50 @@ Hypothesis: the setup collection (about 70% of the symmetric setup) is memory-bo
 | linear probe + fingerprint | 6.3 | 14.0 | 20.8 | 0.74 |
 
 No difference: the probe is not the bottleneck (the table is about 1-2 MB and cache-resident); the per-candidate field arithmetic is. The symmetric setup stays at about 0.75x of the baseline's. Setup-cost levers tried and exhausted: B retune (flat 159-190), rotated keys (no gain), batched collector (cannot help), fingerprinted layout (no gain).
+
+## Experiment: native multi-target folded rho vs the symmetric multi-target IC (2026-11-13) — `[pcc:unverified]`
+`examples/prime_fast_j0_rho_multi.rs`: multi-target distinguished-point rho on j=0 curves, x6 folding with the short-cycle escape, G-only r-adding steps (32), walks restart at a random
+`aG + bQ_t` after each DP, affine union-find over the target logs (anchor Q=G, signed/affine relations b1 k_i - b2 k_j = c mod n). Unbatched (one inversion per step), one thread. Same curves and
+planted targets as the symmetric multi-target IC (`prime_fast_j0_multi`: B=100, extra 8, c=0.5 baseline), 26 bits, medians; every target of every row verified (rho 18/18 rows, IC 18/18 rows).
+
+| T | sym multi IC ms | folded multi rho ms (steps) | rho / IC |
+|---|---|---|---|
+| 20 | 8.7 | 9.2 (28k) | 1.06 |
+| 200 | 20.2 | 47.0 (166k) | 2.3 |
+| 1000 | 70.4 | 386 (1.24M) | 5.5 |
+
+(28 bits, rho only: T=20 22 ms, T=200 103 ms; the IC arm was not re-run at 28 bits against it.)
+
+Reading: at these toy sizes the symmetric multi-target IC is faster than an unbatched matched multi-target folded rho, with the advantage growing with T (rho steps grow about T^0.9, the IC total about T^0.4).
+**Not a claim:** the rho is unbatched (about 310 ns per step at T=1000); a lock-step batched rho would be several times faster, which would shrink the ratio and could reverse it at small T. A batched
+folded multi-target rho and the §5a pricing band are needed before ranking; the earlier tuned-BSGS comparison (a=-3 curves) is also not repeated on j=0. This is the first regime in the campaign where an IC arm is ahead of a rho-type arm on a measured total, and it is unverified and not yet fairly matched.
+
+## Correction: batched multi-target folded rho (2026-11-14) — `[pcc:unverified]`
+The previous section compared the symmetric multi-target IC with an **unbatched** folded rho and was flagged as not fairly matched. `examples/prime_fast_j0_rho_multi.rs` now runs the walks in lock-step (128 lanes, one batch inversion per round; the rare cycle-escape and
+degenerate steps fall back to unbatched adds). Same curves and planted targets, 26 bits, medians, every target of every row verified (18/18 rho rows, 18/18 IC rows):
+
+| T | sym multi IC ms | folded multi rho, batched ms (steps) | rho / IC | (unbatched rho, previous section) |
+|---|---|---|---|---|
+| 20 | 8.7 | 4.1 (35k) | 0.47 | 1.06 |
+| 200 | 20.2 | 14.1 (160k) | 0.70 | 2.3 |
+| 1000 | 70.4 | 80.0 (1.22M) | 1.14 | 5.5 |
+
+Reading: the earlier "IC ahead of rho" was an artifact of the unbatched rho. Against a batched, folded multi-target rho the symmetric multi-target IC is **behind** at T=20 and T=200 (2.1x and 1.4x) and about tied at T=1000
+(rho/IC 1.14, inside the host-noise scale seen in these runs). The trend is the one the exponent argument predicts (rho/IC grows with T: 0.47, 0.70, 1.14), which puts a crossover near T of a few hundred to a thousand at 26 bits;
+at larger sizes it moves with the setup cost p^(2/3) against the rho's sqrt(nT). Not a claim: one host, toy size, no §5a band, no tuned BSGS on j=0, one lane count (128), and the IC arm is not tuned per T.
+
+## Experiment: where the multi-target crossover sits at 28 and 30 bits (2026-11-14) — `[pcc:unverified]`
+Same planted targets for both arms, 2 curves x 2 instances (n=4 rows per cell), all targets verified in both arms. Symmetric multi-target IC (B=159 at 28 bits, 252 at 30 bits, extra 8, not retuned per T) against the batched folded multi-target rho (128 lanes, dp bits from the same formula, 32-step table), medians:
+
+| bits | T | IC ms | batched rho ms | rho / IC |
+|---|---|---|---|---|
+| 26 | 20 / 200 / 1000 | 8.7 / 20.2 / 70.4 | 4.1 / 14.1 / 80.0 | 0.47 / 0.70 / 1.14 |
+| 28 | 200 | 42.8 | 24.3 | 0.57 |
+| 28 | 1000 | 125.4 | 117.2 | 0.93 |
+| 28 | 3000 | 357.7 | 909.1 | 2.54 |
+| 30 | 200 | 95.2 | 42.9 | 0.45 |
+| 30 | 1000 | 303.2 | 191.4 | 0.63 |
+| 30 | 3000 | 836.6 | 1675.8 | 2.00 |
+
+Reading: the symmetric multi-target IC loses to the batched folded rho for T up to about 1000 and is 2.0x-2.5x faster at T=3000 (28 and 30 bits); the crossover moves up slowly with size (about T=800 at 26 bits, about T=1100 at 28 bits, between 1000 and 3000 at 30 bits), consistent with the IC total growing about T^0.4 against rho about T^0.9.
+Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relative setup, so the IC number is probably conservative), the rho is lightly tuned, one host, no isolation, no §5a band, and the comparison to a tuned, folded **BSGS** on j=0 curves is missing: on the a=-3 curves a tuned multi-target BSGS was 2x-4x ahead of the non-symmetric IC, and a x6-folded BSGS on j=0 would gain about sqrt(6), so the decisive comparator is still BSGS, not rho.

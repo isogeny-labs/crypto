@@ -1,0 +1,85 @@
+{
+  "schema": "unsigned-normalized-closure-validation/v1",
+  "created_utc": "2026-11-14T02:13:22.216570+00:00",
+  "source_freeze": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "new_authored_theorems": 15,
+  "additional_generated_audited_declaration": "NormRowClosure.InClosure.brecOn",
+  "whole_study_audited": 369,
+  "additional_trusted_native_decide": 0,
+  "gate_exit": 0,
+  "fresh": {
+    "command": "lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormRowClosure",
+    "imports_included": true,
+    "exit": 0
+  },
+  "source_unchanged": true,
+  "artifacts": [
+    {
+      "path": "research/prime_norm_rank_20261112/lean/NormTargetGrading.lean",
+      "sha256": "730edaacaf671d8beb1413289b6a6f4ea45898378b732da2cd58c74009b03664"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/NormRowClosure.lean",
+      "sha256": "e5ecedb4d6970c74a376282f63f22c7f8482366bf6780c4b439728cb6c29faae"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/lakefile.toml",
+      "sha256": "04ec4a29fc8fe6d856b0571bbf29ed0db0c0c6ece28185bfdf23c56c665e9926"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/lean-toolchain",
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/lean/lake-manifest.json",
+      "sha256": "15b44bf4a56f599422b0fa768fde334d39f44a2d1afddd60bb30e19277b6713c"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/target-grading-evidence/fresh-001.log",
+      "sha256": "b1239f1234cd3076daa325d069546c8526a4fca3291013aea44ef4a9faa62f56"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/target-grading-evidence/fresh-001.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/target-grading-evidence/proof-gate-001.log",
+      "sha256": "03fc5ef3481ea9a7701963354a8a73d2cdd8489a4e1cf8c8c30975dd9183ab4f"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/target-grading-evidence/proof-gate-001.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/target-grading-evidence/gate-build-001.json",
+      "sha256": "3180a08da29d5d3ac2926bf74075339b22a8d31d4881301c87f09296d5ecac93"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/target-grading-evidence/claim-pins.json",
+      "sha256": "dcbc1264ac7c61ae552215901c23c63adcb36f8b490b4e7b1e971772bf9ee9b0"
+    }
+  ],
+  "dependencies": {
+    "Lean": "4.35.0",
+    "CryptoLean": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+    "Mathlib": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2"
+  },
+  "native_changes": false,
+  "native_tests_repeated": false,
+  "native_fixture_experiment": {
+    "planned": 1,
+    "attempted": 0,
+    "completed": 0,
+    "excluded": 0,
+    "admission_blocked": 1,
+    "reason": "unchanged checkpoint upload profile/token transport blocker"
+  },
+  "limitations": [
+    "both old/new input families must be admitted at D",
+    "no numerical weighted-degree29 threshold binding",
+    "no claim below admission threshold",
+    "no general solver runtime lower bound",
+    "no growing-family low closure, efficient finder or expected sub-exponential bit cost"
+  ],
+  "standing": "unsigned producer receipt; no signed independent execution verdict"
+}
