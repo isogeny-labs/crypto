@@ -18,7 +18,7 @@ use super::registry::{
     binary_field, class_row, invariant_row, prime_field, FieldSpec, ALIAS_SQL, CLASS_SQL, CURVE_SQL, FIELD_SQL,
     INVARIANT_SQL, LINK_CLASS_SQL, POINT_SQL, SUBGROUP_SQL, ZETA_SQL,
 };
-use super::siblings::prime_icv1;
+use super::siblings::{binary_icv1, canon_hex, prime_icv1};
 use super::{bulk, bulk1, Ctx, Report};
 use crate::ec::{is_probable_prime, modpow, Curve};
 use crate::field::a_invariants;
@@ -197,21 +197,16 @@ fn genus1(rec: &Value, b: &mut Batch, report: &mut Report) -> Result<()> {
             "binary" => {
                 let m = field["m"].as_u64().ok_or_else(|| anyhow!("binary field without m"))?;
                 let modulus = field["modulus"].as_str().ok_or_else(|| anyhow!("binary field without modulus"))?;
-                let fid = icv1_binary_field(m, modulus);
-                let spec = binary_field(&fid, modulus)?;
-                let a = spec.fq.format(&spec.fq.parse(rec["a"].as_str().unwrap_or_default())?);
-                let bb = spec.fq.format(&spec.fq.parse(rec["b"].as_str().unwrap_or_default())?);
-                if spec.fq.is_zero(&spec.fq.parse(&bb)?) {
-                    bail!("b = 0: singular");
-                }
-                let mj = format!(
-                    "{{\"a\":\"{a}\",\"b\":\"{bb}\",\"field\":\"{fid}\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"{}\",\"v\":\"1\"}}",
-                    modulus.to_lowercase()
-                );
-                let sha = sha256_hex(&mj);
-                let t = &spec.q + BigInt::one() - &order;
-                let tr = if t.is_negative() { format!("m{}", t.abs()) } else { t.to_string() };
-                let slug = format!("icv1-f2m{m}-t{tr}-{}", &sha[..8]);
+                let (slug, mj, sha, _) = binary_icv1(
+                    m,
+                    modulus,
+                    rec["a"].as_str().unwrap_or_default(),
+                    rec["b"].as_str().unwrap_or_default(),
+                    &order,
+                )?;
+                let modulus = canon_hex(modulus)?.0;
+                let fid = icv1_binary_field(m, &modulus);
+                let spec = binary_field(&fid, &modulus)?;
                 (spec, fid, slug, mj, sha, "binary_weierstrass", "y^2+xy=x^3+a*x^2+b")
             }
             other => bail!("unsupported field kind {other:?}"),
@@ -809,5 +804,93 @@ mod tests {
         let p256: BigInt =
             "115792089210356248762697446949407573530086143415290314195533631308867097853951".parse().unwrap();
         assert_eq!(is_probable_prime(&p256), (true, false));
+    }
+
+    // ---- binary_icv1 extraction: genus1 keeps its slugs ----
+
+    /// The binary branch of `genus1` as it was before `binary_icv1` was extracted, verbatim
+    /// except that it returns (slug, model JSON) instead of building the whole tuple.
+    fn legacy_binary(m: u64, modulus: &str, ra: &str, rb: &str, order: &BigInt) -> Result<(String, String)> {
+        let fid = icv1_binary_field(m, modulus);
+        let spec = binary_field(&fid, modulus)?;
+        let a = spec.fq.format(&spec.fq.parse(ra)?);
+        let bb = spec.fq.format(&spec.fq.parse(rb)?);
+        if spec.fq.is_zero(&spec.fq.parse(&bb)?) {
+            bail!("b = 0: singular");
+        }
+        let mj = format!(
+            "{{\"a\":\"{a}\",\"b\":\"{bb}\",\"field\":\"{fid}\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"{}\",\"v\":\"1\"}}",
+            modulus.to_lowercase()
+        );
+        let sha = sha256_hex(&mj);
+        let t = &spec.q + BigInt::one() - order;
+        let tr = if t.is_negative() { format!("m{}", t.abs()) } else { t.to_string() };
+        Ok((format!("icv1-f2m{m}-t{tr}-{}", &sha[..8]), mj))
+    }
+
+    /// A `genus1` record for y^2 + xy = x^3 + a x^2 + b over GF(2^m), its order and a point found by brute force.
+    fn binary_record(m: u64, modulus: &str, a: &str, b: &str) -> Value {
+        let spec = binary_field(&icv1_binary_field(m, modulus), modulus).unwrap();
+        let k = &spec.fq;
+        let mut coeff = Map::new();
+        coeff.insert("a".into(), json!(a));
+        coeff.insert("b".into(), json!(b));
+        let (inv, _) = a_invariants(k, "binary_weierstrass", &coeff).unwrap();
+        let curve = Curve { k, a: inv };
+        let elt = |i: u64| k.parse(&format!("0x{i:x}")).unwrap();
+        let (mut n, mut pt) = (1u64, None);
+        for x in 0..1u64 << m {
+            for y in 0..1u64 << m {
+                let p = Some((elt(x), elt(y)));
+                if curve.on_curve(&p) {
+                    n += 1;
+                    pt.get_or_insert([k.format(&elt(x)), k.format(&elt(y))]);
+                }
+            }
+        }
+        json!({
+            "schema": SCHEMA, "genus": 1, "unit": "fixture", "set": "fixture", "family": "fixture", "order": n.to_string(),
+            "field": {"kind": "binary", "m": m, "modulus": modulus}, "a": a, "b": b, "point": pt.unwrap(),
+            "generator": null,
+        })
+    }
+
+    fn run_genus1(rec: &Value) -> Result<Batch> {
+        let mut batch = Batch::default();
+        genus1(rec, &mut batch, &mut Report::default())?;
+        Ok(batch)
+    }
+
+    #[test]
+    fn genus1_binary_slugs_match_the_pre_extraction_code() {
+        // every curve y^2 + xy = x^3 + a x^2 + b, a in {0, 1}, over GF(2^m), m = 3..6
+        let mut checked = 0;
+        for (m, modulus) in [(3u64, "0xb"), (4, "0x13"), (5, "0x25"), (6, "0x43")] {
+            for a in ["0x0", "0x1"] {
+                for b in 1..1u64 << m {
+                    let b = format!("0x{b:x}");
+                    let rec = binary_record(m, modulus, a, &b);
+                    let order: BigInt = rec["order"].as_str().unwrap().parse().unwrap();
+                    let (slug, mj) = legacy_binary(m, modulus, a, &b, &order).unwrap();
+                    let batch = run_genus1(&rec).unwrap();
+                    assert_eq!(batch.curves[0]["slug"], slug, "m={m} a={a} b={b}");
+                    assert_eq!(batch.curves[0]["model_json"], mj);
+                    assert_eq!(batch.curves[0]["model_sha256"], sha256_hex(&mj));
+                    checked += 1;
+                }
+            }
+        }
+        assert_eq!(checked, 2 * (7 + 15 + 31 + 63));
+        // literal slugs, so the check does not depend on the copy above: K_0 over GF(2^7) is in docs/curves/registry.json
+        let k0 = run_genus1(&binary_record(7, "0x83", "0x0", "0x1")).unwrap();
+        assert_eq!(k0.curves[0]["slug"], "icv1-f2m7-t13-616700dd");
+        // genus1 still refuses b = 0 (as a singular curve) and now also a reducible modulus
+        let singular = binary_record(4, "0x13", "0x0", "0x1");
+        let mut rec = singular.clone();
+        rec["b"] = json!("0x0");
+        assert!(run_genus1(&rec).err().unwrap().to_string().starts_with("singular"));
+        let mut rec = singular;
+        rec["field"]["modulus"] = json!("0x15"); // x^4 + x^2 + 1 = (x^2 + x + 1)^2
+        assert!(run_genus1(&rec).err().unwrap().to_string().contains("not irreducible"));
     }
 }

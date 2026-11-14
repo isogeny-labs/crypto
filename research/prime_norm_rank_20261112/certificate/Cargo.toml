@@ -1,0 +1,46 @@
+[package]
+name = "prime-norm-identity"
+version = "0.1.0"
+edition = "2021"
+default-run = "prime-norm-identity"
+[workspace]
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.145"
+hex = "=0.4.3"
+
+[[bin]]
+name = "norm-lift"
+path = "src/norm_lift.rs"
+
+[[bin]]
+name = "norm-wronskian"
+path = "src/norm_wronskian.rs"
+
+[[bin]]
+name = "norm-dual-pencil"
+path = "src/norm_dual_pencil.rs"
+
+[[bin]]
+name = "norm-quotient-moment"
+path = "src/norm_quotient_moment.rs"
+
+[[bin]]
+name = "norm-crt-reciprocity"
+path = "src/norm_crt_reciprocity.rs"
+
+[[bin]]
+name = "norm-pencil-functional"
+path = "src/norm_pencil_functional.rs"
+
+[[bin]]
+name = "norm-nonconstant-control"
+path = "src/norm_nonconstant_control.rs"
+
+[[bin]]
+name = "prime-ic-cost-floor"
+path = "src/prime_ic_cost_floor.rs"
+
+[[bin]]
+name = "norm-branch-radical"
+path = "src/norm_branch_radical.rs"

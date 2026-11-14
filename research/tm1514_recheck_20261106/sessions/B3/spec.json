@@ -1,0 +1,117 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "tm1514 recheck k = 24, replicate B3 (AMENDMENT-1, counted-only, local L0): ledger incumbent, rho-neg, A/A twins and rho-plain on 5 family curves",
+ "description": "research/tm1514_recheck_20261106 (protocol PROTOCOL.json, AMENDMENT-1): replicate B3, counted-only. Run as a local counted session on a development host (isolation L0, stated as such; owner's instruction 2026-11-10), audited with ecbench verify --replay-all; no wall time enters any claim and C3 is deferred. Re-measures the ledger incumbent (wwalk x=0.9,g=1,grow=2,seed=run; identical params to research/curve25519_autolab_20261104/multicurve/spec-k24.json) against rho.negation on the same five Curve25519-family k = 24 curves, with 96 fresh public targets per curve (new target_seed, suffix workloads.target_seed:3) and 6 measured rounds. Arms rho-neg-aa and inc-aa repeat rho-neg and inc exactly (determinism, C0 twin identity); rho-plain is the positive control (expected plain/neg near sqrt 2). Replicates A3 and B3 are identical except label, description and measurement.seed (suffixes measurement.seed:A3 / measurement.seed:B3), so A3-vs-B3 on the same workloads is the independent-randomness A/A. Replicate A (run 42269476702) is a dry run and A2 was withdrawn; neither is evidence. Public synthetic targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "a": 16743506,
+    "b": 2381926,
+    "gx": 109,
+    "gy": 3123379,
+    "group_order": 16778792,
+    "p": 16777213,
+    "r": 2097349,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 15946914,
+    "b": 5854629,
+    "gx": 531,
+    "gy": 8342630,
+    "group_order": 16780472,
+    "p": 16776941,
+    "r": 2097559,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 16595322,
+    "b": 12996757,
+    "gx": 274,
+    "gy": 3951937,
+    "group_order": 16779208,
+    "p": 16776869,
+    "r": 2097401,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 11690970,
+    "b": 2069111,
+    "gx": 1308,
+    "gy": 2356868,
+    "group_order": 16784408,
+    "p": 16776581,
+    "r": 2098051,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 16524018,
+    "b": 15225076,
+    "gx": 299,
+    "gy": 11588,
+    "group_order": 16777832,
+    "p": 16776317,
+    "r": 2097229,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 546787239895877,
+  "targets_per_curve": 96
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "inc-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "rho-plain",
+   "role": "candidate",
+   "method": {
+    "id": "rho.plain"
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate_measured",
+  "rounds": 6,
+  "seed": 6232168080843969,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ }
+}

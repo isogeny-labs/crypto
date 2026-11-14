@@ -45,8 +45,8 @@ exponent from $0.62$ to $0.52$; its limit is baby-step giant-step.
 
 \paragraph{Measurement.} At a matched reference, priced across a band and
 replayed, rho is cheaper on every prime-order curve measured: by
-$3.4$--$11.5\times$ on Koblitz curves of 37--47 bits (validated, rule v7;
-$4.7$--$18\times$ against rule v8's same-binary rho), $5.5$--$13.5\times$
+$4.08$--$11.13\times$ on Koblitz curves of 37--47 bits (validated, rule v9,
+11 November), $5.5$--$13.5\times$
 on prime curves of 10--24 bits (validated), $10.6$--$38\times$ on random
 binary curves (validated), $5.3$--$13.1\times$ for the $k$-sum table and
 $10.5$--$102\times$ for the campaign pair table at 20--40 bits, and
@@ -77,17 +77,20 @@ measurement.
 \paragraph{What would change the picture.} In order of what they would
 settle (Table~\ref{tab:fm-open}):
 \begin{enumerate}
-\item a proved lower bound on the last fall degree that grows with $n$,
-  for any presentation of the binary decomposition system (open
-  problem~12; best certified value now 5), the only result that bears on
-  the subexponential claims;
-\item certified instances at $n=33$--$51$, with public certificates, to
-  show whether the last fall degree reaches 6 (problem~13);
-\item the frozen $k=4$ replication at $m=14$--$17$, the cheapest experiment
-  that could record a measured size crossover, an \cls{advance} on a weak
-  family (problem~6; now $5.2\times$ rho at $m=15$);
-\item the Joux--Vitse sieve with its F4, descent and linear-algebra work
-  emitted and priced, which would turn the one validated below-rho
-  accounting result into a priced result (problem~11).
+\item a proved, growing lower bound on the last fall degree for any
+  presentation of the binary decomposition system (open problem~12; best
+  certified value now 5). This is the only result that bears on the
+  subexponential claims;
+\item more certified instances at $n=33$--$51$, with the certificates
+  published, to see whether the last fall degree reaches 6 (problem~13);
+\item the frozen $k=4$ replication at $m=14$--$17$: the cheapest
+  experiment that could put a measured size crossover on record, an
+  \cls{advance} in a weak family (problem~6; now $5.2\times$ rho at
+  $m=15$);
+\item owner rulings on whether the Curve25519 BSGS-boundary rounds count
+  as index calculus, and on admitting the Joux--Vitse cover result to the
+  leaderboard. That result is validated as accounting only; emitting and
+  pricing its F4, descent and linear-algebra work (problem~11) would turn
+  it into a priced result.
 \end{enumerate}
-Nothing here concerns a deployed curve.
+Nothing here concerns a deployed curve or key recovery.

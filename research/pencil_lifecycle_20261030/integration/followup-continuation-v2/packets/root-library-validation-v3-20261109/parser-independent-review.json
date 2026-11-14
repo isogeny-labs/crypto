@@ -1,0 +1,99 @@
+{
+  "schema": "research.software-qualification-review/v1",
+  "status": "passed_on_61_fixed_cases",
+  "cases": 61,
+  "passed": 61,
+  "failed": 0,
+  "groups": [
+    {
+      "name": "Fraction lengths",
+      "expected": 10,
+      "passed": 10
+    },
+    {
+      "name": "Timezone offsets",
+      "expected": 7,
+      "passed": 7
+    },
+    {
+      "name": "Invalid input rejection",
+      "expected": 20,
+      "passed": 20
+    },
+    {
+      "name": "Conservative precision floor",
+      "expected": 3,
+      "passed": 3
+    },
+    {
+      "name": "Heartbeat fractions",
+      "expected": 10,
+      "passed": 10
+    },
+    {
+      "name": "Heartbeat boundaries and observed case",
+      "expected": 7,
+      "passed": 7
+    },
+    {
+      "name": "Heartbeat identity rejection",
+      "expected": 4,
+      "passed": 4
+    }
+  ],
+  "runtime": "3.9.25 (main, Jul 15 2026, 00:00:00) \n[GCC 11.5.0 20240719 (Red Hat 11.5.0-5)]",
+  "source_sha256": "1be89bfce43a31d4cdfd2fb41400a7decbfadfec0b3bb11b887099c31d654fb6",
+  "harness_sha256": "74109a6499b6489a87a4b0b1b376543f32e1ea3cee8669064a855e916688e6dd",
+  "publication": "f4c7f6dcab880705c36c43c2a53cff9f6ea442af",
+  "recorded_harness_elapsed_seconds": 0.048199201992247254,
+  "recorded_outer_elapsed_seconds": 0.11483708396553993,
+  "charged_worker_seconds": 60,
+  "scope": "Actual source-pinned parser and heartbeat function with deterministic synthetic response/clock; Python 3.9.25. No live Conductor request, compiler, native unit, or scientific trial.",
+  "review_method": "Read native result/terminal; checked exact case count, all pass flags, exit and harness hash. No rerun.",
+  "preserved_failure": "V2 valid five-fraction expiry rejected by datetime.fromisoformat; original failed attempt remains recorded.",
+  "next_step": "Use corrected parser in admitted v3 validation after fresh cache binding. Existing full four-control and unfiltered suite sequence remains unchanged.",
+  "source_receipts": [
+    {
+      "path": "result.json",
+      "origin": "/var/tmp/pencil-lease-time-qualification-20261109/result.json",
+      "sha256": "82e7d88adf304b52a51046f5cf1ecd77c68c88d90971eb41184894072c2b6cd5",
+      "bytes": 4523
+    },
+    {
+      "path": "terminal.json",
+      "origin": "/var/tmp/pencil-lease-time-qualification-20261109-control/terminal.json",
+      "sha256": "829e73ed9cc147f5486468b0b0652b5969974657282fa71d2372765849fc4d9b",
+      "bytes": 237
+    },
+    {
+      "path": "stdout",
+      "origin": "/var/tmp/pencil-lease-time-qualification-20261109-control/stdout",
+      "sha256": "a47c0e1d31bc772c1959141e48af965b8dfeef1fb8a37dd2199674c2093aed9a",
+      "bytes": 3155
+    },
+    {
+      "path": "stderr",
+      "origin": "/var/tmp/pencil-lease-time-qualification-20261109-control/stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "qualify.py",
+      "origin": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/lease-time-qualification-20261109/qualify.py",
+      "sha256": "74109a6499b6489a87a4b0b1b376543f32e1ea3cee8669064a855e916688e6dd",
+      "bytes": 6002
+    },
+    {
+      "path": "PLAN.md",
+      "origin": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/lease-time-qualification-20261109/PLAN.md",
+      "sha256": "b2161db838ff6c1d990f3979e6b3f49867d7bc2ab613a7a078dab89f6cf88398",
+      "bytes": 2860
+    },
+    {
+      "path": "source-review.json",
+      "origin": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/lease-time-qualification-20261109/review.json",
+      "sha256": "870bb678e8214de892ca54967b19e2dd64ae4dcd9bc06c473b538d527ea344ce",
+      "bytes": 2263
+    }
+  ]
+}

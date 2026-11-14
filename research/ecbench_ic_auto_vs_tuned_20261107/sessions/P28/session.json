@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h3525e40319e5",
+  "label": "ic.pipeline size=auto against the tuned baseline N=407 at 28 bits (prime_base_oracle_tuning_20261029 holdout curve)",
+  "spec_id": "ECS1hbe2d29de93ad",
+  "spec_sha256": "be2d29de93ad9581fa939dd2b511d8aedf70c6594654953e16ea72a7869a2a88",
+  "env_class_id": "ECBENV3h8d80c7bc4dfc",
+  "host_sha256": "198b90bb5f3167c5a23f9aa5af045784865a028b375cd8b48bd7a29fb5844844",
+  "plan_sha256": "a9ad3076f3e6e31ef243dfb8ba3ce171904da972d72cced06afe4816321ab415",
+  "binary_sha256": "b89ef580909862a26f5d0b70e9114131d3f8c4adc83d446a20ac19301b4c6770",
+  "git_commit": "553a4c2aeb36442aa04a65a6519ef1f0e65f2b8a",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794037099872,
+  "finished_unix_ms": 1794037130353,
+  "status": "complete",
+  "executions_planned": 576,
+  "records_written": 576,
+  "records_sha256": "648c34972c3e295cdf588f74664ab58bbe6a8a15b1c6f859ba9f3ecaec12cd22",
+  "status_counts": {
+    "verified": 576
+  },
+  "last_seq": 575
+}

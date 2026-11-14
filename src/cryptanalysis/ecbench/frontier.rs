@@ -898,7 +898,7 @@ pub fn build(bounds: &[Bound], axes: &[String]) -> Result<Frontier, String> {
                                 plain.wins.join(", "),
                                 band_text(),
                                 match (p.holds_across_band, p.break_even_price) {
-                                    (None, _) => "; unpriced work is uncounted on one side, so it cannot be ranked above w = 0".to_string(),
+                                    (None, _) => "; a bound here records no price band, so the order cannot be checked above w = 0".to_string(),
                                     (_, Some(w)) => format!("; the order flips at about {w:.3} GAE per uncharged operation"),
                                     _ => String::new(),
                                 }
@@ -1590,6 +1590,7 @@ mod tests {
             levels: BTreeMap::new(),
             axes,
             band: vec![point(0.0), point(0.1), point(1.0)],
+            calibrated: None,
         }
     }
 

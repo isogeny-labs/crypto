@@ -1,31 +1,15 @@
-# Resume: crypto @ claude/fall-degree-e14-20261109
+# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-E14 of research/fall_degree_bounds_20261008 (Amendment 19): the E13 parts that ran out of 13 GiB locally,
-on one RunPod CPU pod (cpu3g, 64 vCPU, On-Demand), hard cap USD 100.
-
-## Lead / hypothesis
-E14b: 6:10:3 controls d1,d3,d4 refute at degree 4 under the pe engine (completes E13b's independent check).
-E14a: exact d_F at (3,21,7) via the degree-5 pe closure. E14c: (4,28,7) with hky_window w1x (H_ell at m=4).
+Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
 
 ## Spec
-PREREGISTRATION.md Amendment 19 (commit a430db11e3). Pod script research/fall_degree_bounds_20261008/e14/run_pod.sh.
-Source: frozen archive fd-src-a2be6609.tgz (sha256 18b14930...) in s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/.
-Outputs: s3://ephemeral-runs-104186811093-us-east-1/jobs/e13-runpod-20261107/out.tgz (presigned PUT, reused key; valid to 2026-11-14).
+Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
+Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
+Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
 
 ## State
-E14 ended "not completed": RunPod terminated pod oubpztzdbbbo4s about 10:20 UTC 2026-11-09 (account balance 0) during E14b d1.
-Write-up committed (e14/score.json, RESULTS.md E14, reports/run-20261109-e14). PR open from this branch.
+2026-11-14: patch written, release build running. No rows yet.
 
-## Next steps
-1. Drive the E14 write-up PR to merge.
-2. Any rerun needs a new amendment: first measure pe's degree-4 matrix size on 6:10:3 d1 locally; consider E14a first; needs RunPod funds.
-
-## Runs in flight
-None.
-
-## Stop and success conditions
-Nothing retried. Failed predictions stay failed.
-
-## Open questions
-Whether to fund and register a rerun (user decision).
+## Next
+Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.

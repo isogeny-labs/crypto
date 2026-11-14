@@ -1,0 +1,13 @@
+      p        r    rho_src  rho_isog(d)      rho_jac   ic_fb  ic_grpops    ic_trials   ic/rho_src  chain
+    211      109        428      530(2)          396     116       4184          244        9.8x  ok
+    419      113        357      562(2)          497     223       9366          532       26.2x  ok
+    821       71        370      274(3)          389     401      13313          869       36.0x  ok
+   1619      401        847      649(2)          560     772      36363         1588       42.9x  ok
+
+rho_src  = direct Pollard rho on E1 (group ops)
+rho_isog = rho after a verified isogeny hop E1→E1' (same order r)
+rho_jac  = rho on the order-r subgroup of J(C) after verified φ^*
+ic_jac   = genus-2 index calculus on J(C), counted group ops
+All figures [pcc:unverified]; isogeny/pull-back DLP-preservation is
+checked in-process before each measurement.
+wrote research/chained_prime_transfer_20261111/results.json

@@ -1,0 +1,50 @@
+{
+  "schema": "bounded-split-base-descent-prior/v1",
+  "created_utc": "2026-11-14T02:46:43.592723+00:00",
+  "kb": "Unavailable as previously documented; no loaded tools and missing wrapper executable; no unchanged retry.",
+  "queries": [
+    "norm rational factor base coefficient descent Frobenius",
+    "projective polar normalization target derivative"
+  ],
+  "repositories": [
+    "isogeny-labs/crypto",
+    "isogeny-labs/cryptanalysis",
+    "isogeny-labs/ml-cryptanalysis"
+  ],
+  "primary": [
+    {
+      "repo": "isogeny-labs/crypto",
+      "commit": "f87e25bb0b50a5ce137eaa33fc733d317a2f0981",
+      "path": "research/prime_one_shot_20261029/continuation/reviews/rationality.md",
+      "read_scope": "full original review and addenda shown in bounded source read"
+    },
+    {
+      "repo": "isogeny-labs/crypto",
+      "path": "research/prime_norm_rank_20261112/lean/NormBranchRepair.lean",
+      "declarations": [
+        "crossZero",
+        "normSquareRelation",
+        "squaresProportional"
+      ]
+    },
+    {
+      "repo": "mathlib",
+      "commit": "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2",
+      "paths": [
+        "Mathlib/Algebra/Polynomial/Splits.lean",
+        "Mathlib/FieldTheory/Separable.lean",
+        "Mathlib/LinearAlgebra/Lagrange.lean",
+        "Mathlib/FieldTheory/Finite/Basic.lean"
+      ],
+      "declarations": [
+        "Splits.of_dvd",
+        "Splits.eq_prod_roots_of_monic",
+        "nodup_roots",
+        "separable_prod_X_sub_C_iff'",
+        "Subfield.mem_bot_iff_pow_eq_self"
+      ]
+    }
+  ],
+  "interpretation": "Kummer rationality has explicit field/coset/short-relation assumptions and does not supply solver-cost or good-coset recognition. New component openly changes base to actually rational points and proves deterministic coefficient descent.",
+  "limitations": "Bounded source review; standard descent/uniqueness ingredients, no novelty or absence claim. No experiment or finder/closure-cost result."
+}

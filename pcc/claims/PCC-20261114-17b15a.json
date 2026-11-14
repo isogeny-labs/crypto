@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T02:07:20Z",
+ "id": "PCC-20261114-17b15a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "85c57a726a644a6d2138a5c97785ab1119a06aff",
+  "model": "",
+  "session": "norm-target-grading-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "91dc9a42dff415cd8a5a7de2c2217edc91030569ff76e80dafc541b35be94a59",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetGrading.actualTargetFactor"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact source declaration/context hypotheses. Field K, CommRing coefficient algebra A; Nontrivial A where monic degree guards need it. Curve equation, e!=0, d>=3 explicit for actual normalized binding. Full iterated closure with literal deg(a)+deg(f)<=D multiplier budget; requires both old/new input families admitted. No invariance below admission threshold, runtime impossibility, weighted-degree29, growing-family low closure or sub-exponential claim. Unsigned; fresh replay pending at claim creation.",
+ "statement": "Exact source-bound theorem NormTargetGrading.actualTargetFactor: theorem actualTargetFactor (e a b r z a1 a2 c0 c1 terminal : R) (hp : z^2=r^3+a*r+b) (n : \u2115) (hd : 3\u22642^(n+1)) : (NormTargetFiber.membership e a b r z a1 a2 c0 c1 terminal n).eval (e^2*r)= e^3*normalized e a b r z a1 a2 c0 c1 terminal n"
+}

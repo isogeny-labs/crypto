@@ -1,0 +1,39 @@
+F6 semaev_qubo_annealing  protocol_sha256 7c427397febd48f48ba9941152997628ab6f0ec308fcb0dc7d550c12222387eb
+tool_source_sha256 88d7dd340c8b48164696db4d0a670537e1e574c3d32938f3d0c8fbd540dad61f
+n=12 p=4091 a=-3 b=40 order=4027 G=(1,3287) B=64 rung_match=None
+n=16 p=65519 a=-3 b=76 order=65447 G=(2,40463) B=256 rung_match=Some(true)
+n=20 p=1048571 a=-3 b=44 order=1048189 G=(2,317355) B=1024 rung_match=Some(true)
+n=24 p=16777199 a=-3 b=31 order=16782299 G=(2,5412647) B=4096 rung_match=Some(true)
+n=28 p=268435399 a=-3 b=3 order=268407199 G=(1,1) B=16384 rung_match=Some(true)
+
+median cost evaluations to first c=0 (censored count in brackets; cap 50 B^2)
+  n       B         B^2    boxsol       uniform        greedy          sa_B         sa_4B        sa_16B            pt     root_enum
+ 12      64        4096      2.80        922[0]       2466[0]       3636[0]       2354[0]       5162[0]       4783[0]         25[0]
+ 16     256       65536      3.40      13792[0]      35242[0]      59672[0]      89760[0]      71861[0]      33464[0]         42[0]
+ 20    1024     1048576      2.75     191126[0]     394924[0]    2466308[0]    1722998[0]     893260[0]     939996[0]        290[0]
+ 24    4096    16777216      3.20    3898006[0]    4346316[0]   19692566[0]   13430037[0]   34937164[0]   30191004[0]        640[0]
+ 28   16384   268435456      3.30   40138032[0]   66891984[0]  820856178[2]  765670044[2]  367805855[0]  395638322[2]       3324[0]
+
+exponent e: median evals ~ B^e (ln-ln OLS), bootstrap 95% CI over instances
+  uniform    all    e =   1.948  CI [1.790, 2.115]
+  uniform    n>=20  e =   1.929  CI [1.572, 2.251]
+  greedy     all    e =   1.820  CI [1.668, 2.003]
+  greedy     n>=20  e =   1.851  CI [1.614, 2.105]
+  sa_B       all    e =   2.197  CI [2.050, 2.321]
+  sa_B       n>=20  e =   2.095  CI [1.761, 2.440]
+  sa_4B      all    e =   2.192  CI [1.993, 2.372]
+  sa_4B      n>=20  e =   2.199  CI [1.875, 2.486]
+  sa_16B     all    e =   2.058  CI [1.835, 2.304]
+  sa_16B     n>=20  e =   2.171  CI [1.593, 2.474]
+  pt         all    e =   2.124  CI [1.981, 2.325]
+  pt         n>=20  e =   2.179  CI [1.791, 2.506]
+  root_enum  all    e =   0.901  CI [0.797, 1.038]
+  root_enum  n>=20  e =   0.879  CI [0.626, 1.135]
+
+landscape lag-1 autocorrelation (bit-flip walks vs random landscape; band = random mean +- 3 sd)
+  n=12 walk -0.0006  rand +0.0003 (sd 0.0313)  in_band=true
+  n=16 walk +0.0003  rand +0.0012 (sd 0.0316)  in_band=true
+  n=20 walk -0.0012  rand -0.0004 (sd 0.0315)  in_band=true
+
+verification_failures=0 instrument_errors=0 P3_uniform_slope=1.948 verdict=closed
+wrote research/semaev_qubo_annealing_20261110/results/run.json
