@@ -263,3 +263,17 @@ Reading: with the shift applied the symmetric 3-summand IC is **2.6x-3.3x faster
 
 ### Independent replay of the fixed code (2026-11-14) — see `results/pf_j0/VALIDATOR_REPORT_shiftfix.md`
 Validated: the shift logic (zero group-check rejections with the fix, 66.8% without), the 30% target reduction (probability 19/27 explained), timing scope, 32 solves / 6088 relations by an independent pure-python checker, and the withdrawal of the earlier null A/B; 64 of 64 committed `fix_hold_*` rows reproduce bit-for-bit with `SHIFTFIX=1`. **Corrected statement of the claim: about 2.8x-3.0x faster than the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) at 28-34 bits, individual cells 2.5x-3.6x** (the "2.6x-3.3x" above is the range of 4-row cell medians). Qualifiers carried: one twist group per size (a different prime agrees), no isolation or A/A interval, wall clock, gap to the negation rho about 5x-65x and to the x6-folded rho larger; not leaderboard-eligible. The fix is now the default (`NOSHIFTFIX=1` restores the old scan); rows record `shiftfix`.
+
+## Experiment: the matched rho for the shift-fixed single-target result, 28-34 bits (2026-11-14) — `[pcc:unverified]`
+Same fresh curves as the `fix_hold_*` rows (curve idx 9, 10), all targets verified. Median ms:
+
+| bits | curve | sym3 (shift fixed) | `rho_parallel` (negation, batched) | native x6-folded rho, unbatched (60 targets) | batched x6-folded rho, T=1, 128 lanes (12 targets) | sym3 / best rho |
+|---|---|---|---|---|---|---|
+| 28 | b38 / b50 | 21.7 / 19.4 | 3.1 / 3.1 | 3.4 / 3.1 | not run | 6x-7x |
+| 30 | b78 / b83 | 56.8 / 55.6 | 3.9 / 3.9 | 5.9 / 6.8 | not run | 14x-15x |
+| 32 | b72 / b74 | 157.9 / 171.5 | 6.0 / 6.4 | 12.2 / 10.2 | 4.3 / 3.0 | 37x / 57x |
+| 34 | b129 / b145 | 477.8 / 537.6 | 10.0 / 9.0 | 25.4 / 20.4 | 7.0 / 6.1 | 68x / 88x |
+
+(The batched folded rho at T=1 includes the multi-target code's anchor starts, so its step count (about 38k at 32 bits, about 82k-95k at 34) is above the single-target folded count (32k, 60k-71k); a single-target batched version would be a little faster, making the gap slightly larger.)
+
+Reading: the best implemented single-target rho is the batched, folded multi-target rho example at T=1 from 32 bits on, and `rho_parallel` below. Against it the shift-fixed symmetric IC is about 6x-7x behind at 28 bits, 14x-15x at 30, 37x-57x at 32 and 68x-88x at 34, so the earlier figures against the negation-only rho (up to 59x) understated the matched-rho gap. The 2.8x-3.0x gain over `ic_solve` is a constant factor; the gap to the matched rho still grows with size. Same limits: one host, wall clock, one twist group per size, no §5a band.
