@@ -175,3 +175,21 @@ GAE band does not apply and no gap to rho is computed beyond quoting it.
   smoke's first target, while the native `ops` were equal). The frozen primary (native
   `ops`) and the decision rule are unchanged; the report states whether the complete
   count changes any order.
+
+## Amendment 2 (2026-11-14, after the data; records deviations, changes no number)
+
+* **Cell `K:37:19:2` not run**: `ic descent` refuses field degree 37 ("field degree 37
+  outside 5..=36", `raw/ic-K-37-19-2-s1.json`). The m = 2 regime family ends at n = 29.
+* **Positive control top-up**: cells `29:6`, `29:8`, `29:10`, `29:12` had no satisfiable
+  target at seed 1 or at the seed-2 top-up (expected solutions per target about
+  2^(2l-n), i.e. 2^-17 to 2^-5). Those cells have the exact-agreement gate on unsatisfiable
+  targets only; the gate's power to see solutions rests on the other nine cells (37
+  satisfiable targets, every set equal, every negative control differing).
+* **`K:19:6:3`**: `inherited-f4` hit the 120 s budget on all 8 targets (native count at the
+  stop 1.46e8 to 1.50e8 word XORs, a lower bound); G was checked against brute force
+  (all 8 equal) instead of against I.
+* **Decision rule inconsistency (found at assessment)**: section 7's IMPROVES bullet
+  counts "below I's at all three prices at some m = 3 cell", while its parenthesis says
+  beating I or F alone is not an improvement of a baseline row; `l4bench summarize`
+  implemented only the S clause and printed NEGATIVE. RESULTS.md reports both readings
+  and does not pick the favourable one.

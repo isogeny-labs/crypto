@@ -99,8 +99,16 @@ fn run_arm(fld: &Fld, arm: &str, form: Form, g: &Bi, wts: (usize, usize), k: usi
         match small_field_for(bounds.0.max(bounds.1)) {
             None => status = "skipped_D",
             Some(kf) => {
-                let sh: Vec<Bi> = short.iter().map(|&i| hs[i].clone()).collect();
-                let ex = extract::extract(&kf, &sh, bounds.0, bounds.1, rng, 8);
+                // extraction v2 (Amendment 2): strip exact factors of g from each short row
+                // (multiples of g carry no information beyond g), drop duplicates, use up to 24 rows
+                let bmaj = matches!(form, Form::EForm);
+                let mut sh: Vec<Bi> = vec![];
+                for &i in &short {
+                    let (q, _) = lattice::strip_g(&hs[i], g, bmaj);
+                    if q.keys().all(|m| *m == (0, 0)) { continue; }
+                    if !sh.contains(&q) { sh.push(q); }
+                }
+                let ex = extract::extract(&kf, &sh, bounds.0, bounds.1, rng, 24);
                 pairs = ex.pairs_tried; rz = ex.res_zero; ncand = ex.candidates.len();
                 status = if ex.resolved { "resolved" } else { "all_res_zero" };
                 let mut gl = vec![];
@@ -120,7 +128,7 @@ fn run_arm(fld: &Fld, arm: &str, form: Form, g: &Bi, wts: (usize, usize), k: usi
     }
     let degs: Vec<String> = red.degs.iter().map(|d| d.to_string()).collect();
     format!(
-        "{{\"n\":{},\"k\":{},\"l\":{},\"arm\":\"{}\",{}\"dim\":{},\"det_deg\":{},\"sum_row_deg\":{},\"det_identity\":{},\"weak_popov\":{},\"kn\":{},\"pred_ge1_short\":{},\"short_rows\":{},\"deg_min\":{},\"deg_2nd\":{},\"deg_max\":{},\"transforms\":{},\"word_xors\":{},\"rows_vanish\":{},\"short_rows_vanish_at_planted\":{},\"extract\":\"{}\",\"pairs_tried\":{},\"res_zero\":{},\"candidates\":{},\"genuine\":{},\"genuine_pairs\":[{}],\"recovered\":{},\"row_degs\":[{}]}}",
+        "{{\"n\":{},\"k\":{},\"l\":{},\"arm\":\"{}\",\"extract_version\":2,{}\"dim\":{},\"det_deg\":{},\"sum_row_deg\":{},\"det_identity\":{},\"weak_popov\":{},\"kn\":{},\"pred_ge1_short\":{},\"short_rows\":{},\"deg_min\":{},\"deg_2nd\":{},\"deg_max\":{},\"transforms\":{},\"word_xors\":{},\"rows_vanish\":{},\"short_rows_vanish_at_planted\":{},\"extract\":\"{}\",\"pairs_tried\":{},\"res_zero\":{},\"candidates\":{},\"genuine\":{},\"genuine_pairs\":[{}],\"recovered\":{},\"row_degs\":[{}]}}",
         n, k, l, arm, extra, dim, det, sumdeg, sumdeg == det, wp, kn, pred1, short.len(), red.degs[0], red.degs.get(1).copied().unwrap_or(-1), red.degs.last().unwrap(), red.st.transforms, red.st.word_xors, vanish, short_vanish_ok, status, pairs, rz, ncand, ngen, genuine_list, recovered, degs.join(",")
     )
 }

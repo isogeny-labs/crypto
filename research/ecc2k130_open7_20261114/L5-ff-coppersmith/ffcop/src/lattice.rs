@@ -106,3 +106,31 @@ pub fn reduce(rows: Vec<Vec<P>>) -> Reduced {
     let degs = red.iter().map(|r| popov::row_deg(r)).collect();
     Reduced { rows: red, degs, st }
 }
+
+/// Exact division by g (leading coefficient 1 in the chosen lex order). Returns Some(q) if h = q g.
+/// order_b_major = false: compare (a, b); true: compare (b, a).
+pub fn bi_div_exact(h: &Bi, g: &Bi, order_b_major: bool) -> Option<Bi> {
+    let key = |m: &(usize, usize)| if order_b_major { (m.1, m.0) } else { (m.0, m.1) };
+    let lm = *g.keys().max_by_key(|m| key(m)).unwrap();
+    if !g[&lm].is_one() { return None; }
+    let mut r = h.clone();
+    let mut q = Bi::new();
+    loop {
+        let lt = match r.keys().max_by_key(|m| key(m)) { None => break, Some(m) => *m };
+        if lt.0 < lm.0 || lt.1 < lm.1 { return None; }
+        let c = r[&lt].clone();
+        let sh = (lt.0 - lm.0, lt.1 - lm.1);
+        bi_add_term(&mut q, sh, &c);
+        for (m, gc) in g { bi_add_term(&mut r, (m.0 + sh.0, m.1 + sh.1), &gc.mul(&c)); }
+        debug_assert!(!r.contains_key(&lt));
+    }
+    Some(q)
+}
+
+/// strip all factors of g; returns (stripped poly, number of factors removed)
+pub fn strip_g(h: &Bi, g: &Bi, order_b_major: bool) -> (Bi, usize) {
+    let mut cur = h.clone();
+    let mut c = 0;
+    while let Some(q) = bi_div_exact(&cur, g, order_b_major) { if q.is_empty() { break; } cur = q; c += 1; }
+    (cur, c)
+}
