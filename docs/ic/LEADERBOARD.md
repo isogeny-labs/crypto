@@ -635,11 +635,13 @@ Many targets on one prime-order Weierstrass curve (group orders about 2^24 to 2^
 
 Study: [research/mt_fieldops_v5_20261112/](../../research/mt_fieldops_v5_20261112/); [report](../../research/mt_fieldops_v5_20261112/REPORT.pdf); source `research/mt_fieldops_v5_20261112/results/holdout/summary.json`. v4, without native work priced: [research/mt_fieldops_v4_20261112/](../../research/mt_fieldops_v4_20261112/). Earlier rows were measured against a rho without retention: IC5 (v3, [research/mt_fieldops_v3_20261111/](../../research/mt_fieldops_v3_20261111/); its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [research/mt_rho_start_fix_20261111/](../../research/mt_rho_start_fix_20261111/)).
 
-## 13 November live-source frontier reconciliation (diagnostic; no ranked-row change)
+## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)
 
-The live source tree now exposes **104 top-level ECBench methods** and **32 nested algorithms** (19 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled on 2026-11-13; none satisfies the conditions for changing Tables A–C.
+The live source tree now exposes **104 top-level ECBench methods** and **33 nested algorithms** (20 system-solver backends, 9 PDP3 engines and 4 PKM-tower engines). This is a live source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.
 
 ### Solver and GPU diagnostics
+
+The newly registered `primo-smt` backend is correctness-qualified for binary-field `descent-algebraic` systems and returns one independently checked Boolean model. It has no matched performance record and no prime-field route, so it changes the implementation census but not the measured frontier. [Integration boundary](../../integrations/primo/README.md).
 
 The validated `fes-then-batched` composition costs 0.739–0.889× inherited F4 at the calibration points, but remains 35.24–3012.56× matched rho. Across the §5a band its strict order against inherited F4 is unresolved, so this is a solver-local result, not a frontier promotion. [Study](../../research/fes_then_batched_20261112/README.md).
 
@@ -1111,7 +1113,8 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
 - `src/cryptanalysis/ecbench/methods.rs` — sha256 `1452c4c7672603e5…`
-- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `8bab5f869cfde3be…`
+- `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `b90a0f2a86b77951…`
+- `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
 - `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`

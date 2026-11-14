@@ -2,7 +2,7 @@
 title: "The ECBench ECDLP Performance Frontier"
 subtitle: "End-to-end boundary, implementation census, bottlenecks, and the next isolated campaign"
 author: "ECBench frontier audit"
-date: "13 November 2026"
+date: "14 November 2026"
 lang: en-US
 geometry: margin=0.72in
 fontsize: 10pt
@@ -23,7 +23,7 @@ header-includes:
     \pagestyle{fancy}
     \fancyhf{}
     \lhead{ECBench ECDLP frontier}
-    \rhead{2026-11-13}
+    \rhead{2026-11-14}
     \cfoot{\thepage}
     ```
 ---
@@ -94,9 +94,9 @@ clear:
    remains unpromoted because no L2 wall session completed. The new campaign
    therefore uses accounting-v2 rho, a same-target A/A rho control, and also
    measures BSGS and kangaroo where they can be finite-size leaders.
-6. **The 13 November live-source reconciliation changes implementation and
+6. **The 14 November live-source reconciliation changes implementation and
    bottleneck visibility, not the admitted ECDLP ranking.** The source tree now
-   has 104 top-level ECBench methods and 32 nested algorithms (19 system
+   has 104 top-level ECBench methods and 33 nested algorithms (20 system
    solvers, nine PDP3 engines, and four PKM-tower engines). Validated
    `fes-then-batched` work is 0.739--0.889 of inherited F4 at its calibration
    points but remains 35.24--3,012.56 times matched rho there. GPU FES and
@@ -106,6 +106,9 @@ clear:
    unresolved lower bounds). The validated multi-target study flips with the
    price assigned to hash/native work: IC/rho is 1.063--1.159 at $h=0$ and
    0.713--0.799 at $h=1$, so it is unranked across the required pricing band.
+   The newly registered `primo-smt` backend is correctness-qualified for
+   binary-field descent but has no matched performance record and no
+   prime-field route; it changes the census, not the measured frontier.
    None of these observations moves Tables A--C in the canonical leaderboard.
 
 ![Boundary markers. A ratio is meaningful only inside its row's exact domain and unit.](figures/boundary-map.png){width=100%}
@@ -128,7 +131,7 @@ retains a new F4/F5/F6 compatibility failure (72/144 rows reproduce). A pass
 means the versioned evidence statements agree; it does not turn the draft EKS
 campaign into data.
 
-This 13 November refresh also reconciles the later committed component and
+This 14 November refresh also reconciles the later committed component and
 end-to-end diagnostics into the canonical leaderboard and this report. It
 does not retroactively change the frozen 74/11, 78-method, or 79-method
 campaign censuses below; those remain dated descriptions of their exact
@@ -258,16 +261,18 @@ The machine-readable evidence is the
 and
 [j=1728 comparison](../ecbench_registry_optimization_20261101/execution/prime-orbit-j1728-crosscheck-l0-20261101/comparisons/rho-quartic-reference__orbit-affine-o8-r1_5.json).
 
-## 13 November live-source reconciliation
+## 14 November live-source reconciliation
 
 The live registry now contains **104 top-level method IDs**. The optimization
-surface separately contains **32 nested algorithms**: 19 system-solver
+surface separately contains **33 nested algorithms**: 20 system-solver
 backends, nine PDP3 engines, and four PKM-tower engines. The system solvers now
 include F4, Buchberger, M4GB client/server, matrix F4/F5, four inherited-F4
 variants, FES-then-inherited, FES-then-batched, Crossbred, XL, SAT-CDCL,
-scalar/GPU/wide FES, and exhaustive search. This is a source census at the
-report date, not an experimental claim and not a rewrite of the frozen binary
-censuses above.
+Primo SMT, scalar/GPU/wide FES, and exhaustive search. Primo is a first-solution
+Boolean backend for binary-field `descent-algebraic`: its returned model is
+checked, but it has no matched performance record and its pinned version has no
+prime-field theory route. This is a source census at the report date, not an
+experimental claim and not a rewrite of the frozen binary censuses above.
 
 The latest results separate into three evidence classes:
 
@@ -295,8 +300,8 @@ ns/pair (77.2%); at k0n61 it consumes 26.73 of 35.48 ns/pair (75.4%). A
 paired layout A/B found the current Top filter slower to build than the frozen
 Low filter: Top/Low is 1.104 [1.070, 1.143] at k0n53 and 1.142 [1.098,
 1.165] at k0n61, with zero identity mismatches. To preserve benchmark
-identity, the old `ic.koblitz_descent_v1` and `ic.koblitz_batched_v1` IDs stay
-on Low; explicit `_v2` IDs name Top. This prevents a default change from
+identity, the old `ic.koblitz_descent` and `ic.koblitz_batched` IDs stay on
+Low; explicit `_v2` IDs name Top. This prevents a default change from
 silently mutating historical measurements.
 
 The prime-leads chase remains prospective and inconclusive; it establishes no
@@ -415,7 +420,7 @@ primary campaign.
 The exact native registry is preserved in [method-registry.json](method-registry.json).
 This prevents “all implementations” from silently meaning only the arms that
 appeared in an older report. The current live-source count is 104 top-level
-methods and 32 nested algorithms; see the dated reconciliation above. Both
+methods and 33 nested algorithms; see the dated reconciliation above. Both
 counts are retained because they describe different exact source states.
 
 # Generic prime-field frontier

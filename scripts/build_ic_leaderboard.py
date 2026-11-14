@@ -168,6 +168,7 @@ SOURCES = {
     "prime_leads_chase": "research/prime_leads_chase_20261113/README.md",
     "ecbench_methods_source": "src/cryptanalysis/ecbench/methods.rs",
     "solver_registry_source": "src/cryptanalysis/ic_framework/solvers.rs",
+    "primo_readme": "integrations/primo/README.md",
     "optimization_source": "src/cryptanalysis/ecbench/optimization.rs",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
@@ -1900,6 +1901,8 @@ def nov13_frontier_diagnostics() -> dict:
         "pub fn solver_by_name", 1
     )[0]
     solver_count = len(re.findall(r"Box::new\(", solver_registry))
+    if '"primo-smt"' not in solvers:
+        raise SystemExit("live census: current Primo solver backend is absent")
 
     optimization = (REPO / SOURCES["optimization_source"]).read_text()
 
@@ -1982,12 +1985,19 @@ def nov13_frontier_diagnostics() -> dict:
                    for cell, rec in sorted(layout.items()) if cell != "keep_top_default"]
 
     return {
-        "as_of": "2026-11-13",
+        "as_of": "2026-11-14",
         "ranking_effect": "none: no row of tables A-C changes",
         "live_census": {"top_level_methods": top_level, "solver_backends": solver_count,
                         "pdp3_engines": len(pdp3), "pkm_tower_engines": len(pkm),
                         "nested_algorithms": solver_count + len(pdp3) + len(pkm),
-                        "pdp3_names": pdp3, "pkm_tower_names": pkm},
+                        "pdp3_names": pdp3, "pkm_tower_names": pkm,
+                        "new_unbenchmarked_backends": [{
+                            "id": "primo-smt",
+                            "scope": "binary-field descent through descent-algebraic",
+                            "status": "correctness-qualified; no matched performance record",
+                            "prime_field_route": False,
+                            "source": SOURCES["primo_readme"],
+                        }]},
         "fes_then_batched": {"ftb_over_inherited_f4_range": ftb_range,
                              "distance_to_rho": ftb_rho, "validation": "validated arithmetic; no ranked row"},
         "gpu_fes_e2e": {"rows": gpu_rows, "validation": "pcc:unverified; one pod; no independent replay"},
@@ -3947,13 +3957,17 @@ def markdown(doc: dict) -> str:
     fullj = d13["full_jacobian"]
     groebner = d13["groebner_free"]
     folded = d13["folded_pair_build"]
-    L += ["## 13 November live-source frontier reconciliation (diagnostic; no ranked-row change)", "",
+    L += ["## 14 November live-source frontier reconciliation (diagnostic; no ranked-row change)", "",
           f"The live source tree now exposes **{census['top_level_methods']} top-level ECBench methods** and "
           f"**{census['nested_algorithms']} nested algorithms** ({census['solver_backends']} system-solver backends, "
           f"{census['pdp3_engines']} PDP3 engines and {census['pkm_tower_engines']} PKM-tower engines). This is a live "
           "source census, not a rewrite of the historically frozen 74/11, 78-method or 79-method campaign snapshots. "
-          "The evidence below was reconciled on 2026-11-13; none satisfies the conditions for changing Tables A–C.", "",
+          "The evidence below was reconciled through 2026-11-14; none satisfies the conditions for changing Tables A–C.", "",
           "### Solver and GPU diagnostics", "",
+          "The newly registered `primo-smt` backend is correctness-qualified for binary-field `descent-algebraic` "
+          "systems and returns one independently checked Boolean model. It has no matched performance record and "
+          "no prime-field route, so it changes the implementation census but not the measured frontier. "
+          f"[Integration boundary](../../{SOURCES['primo_readme']}).", "",
           f"The validated `fes-then-batched` composition costs {ftb['ftb_over_inherited_f4_range'][0]:.3f}–"
           f"{ftb['ftb_over_inherited_f4_range'][1]:.3f}× inherited F4 at the calibration points, but remains "
           f"{min(x['ratio'] for x in ftb['distance_to_rho']):.2f}–"
@@ -5430,12 +5444,16 @@ def page(doc: dict, standalone: bool) -> str:
     gpu, gcomp = d13["gpu_fes_e2e"], d13["gpu_components"]
     rust, transfer = d13["rust_diagnostics"], d13["transfer_remeasure"]
     fullj, groebner, folded = d13["full_jacobian"], d13["groebner_free"], d13["folded_pair_build"]
-    P.append('<section class="card" id="nov13-frontier"><h2>13 November live-source frontier reconciliation</h2>'
+    P.append('<section class="card" id="nov13-frontier"><h2>14 November live-source frontier reconciliation</h2>'
              f'<p><strong>Diagnostic; no ranked-row change.</strong> The live source tree exposes '
              f'{census["top_level_methods"]} top-level ECBench methods and {census["nested_algorithms"]} nested '
              f'algorithms ({census["solver_backends"]} solver backends, {census["pdp3_engines"]} PDP3 engines and '
              f'{census["pkm_tower_engines"]} PKM-tower engines). This does not rewrite the frozen historical '
              'campaign censuses.</p>'
+             f'<p>The newly registered <code>primo-smt</code> backend is correctness-qualified for binary-field '
+             f'<code>descent-algebraic</code> systems, but has no matched performance record and no prime-field route. '
+             f'It changes the census, not the measured frontier. <a href="https://github.com/aburan28/crypto/blob/main/'
+             f'{esc(SOURCES["primo_readme"])}">Integration boundary</a>.</p>'
              f'<p>Validated <code>fes-then-batched</code> costs '
              f'{ftb["ftb_over_inherited_f4_range"][0]:.3f}–{ftb["ftb_over_inherited_f4_range"][1]:.3f}× inherited '
              f'F4 at the calibration points, but remains '

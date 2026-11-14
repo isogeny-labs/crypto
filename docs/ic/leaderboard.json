@@ -468,7 +468,11 @@
   },
   "solver_registry_source": {
    "path": "src/cryptanalysis/ic_framework/solvers.rs",
-   "sha256": "8bab5f869cfde3be2bd982136c5192609a434bcd6a2d78168f062f3ef381f93b"
+   "sha256": "b90a0f2a86b779511359ef456a282a7e59a95f3f8ecc0852bb2aec8f280df9f1"
+  },
+  "primo_readme": {
+   "path": "integrations/primo/README.md",
+   "sha256": "4ec69082225f9f8867f170bf054fae567a894329987c80a760997c0cf538c59f"
   },
   "optimization_source": {
    "path": "src/cryptanalysis/ecbench/optimization.rs",
@@ -339542,14 +339546,14 @@
   "validated": true
  },
  "nov13_frontier_diagnostics": {
-  "as_of": "2026-11-13",
+  "as_of": "2026-11-14",
   "ranking_effect": "none: no row of tables A-C changes",
   "live_census": {
    "top_level_methods": 104,
-   "solver_backends": 19,
+   "solver_backends": 20,
    "pdp3_engines": 9,
    "pkm_tower_engines": 4,
-   "nested_algorithms": 32,
+   "nested_algorithms": 33,
    "pdp3_names": [
     "inherited-f4",
     "f6-ic",
@@ -339566,6 +339570,15 @@
     "sig-f5",
     "f6",
     "enum"
+   ],
+   "new_unbenchmarked_backends": [
+    {
+     "id": "primo-smt",
+     "scope": "binary-field descent through descent-algebraic",
+     "status": "correctness-qualified; no matched performance record",
+     "prime_field_route": false,
+     "source": "integrations/primo/README.md"
+    }
    ]
   },
   "fes_then_batched": {
