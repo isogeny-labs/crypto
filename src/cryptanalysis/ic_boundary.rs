@@ -1073,7 +1073,10 @@ pub fn invmod(a: u64, m: u64) -> Option<u64> {
         // whose divisions are several times faster than 64-bit ones on
         // x86-64.  Remainders and coefficient magnitudes stay at most `m`,
         // so nothing overflows and every value is the 64-bit loop's.
-        return invmod_u32((a % m) as u32, m as u32).map(u64::from);
+        // A reduced operand (the group law's, always) skips the 64-bit
+        // remainder, a hardware division ahead of the whole Euclid.
+        let a = if a < m { a } else { a % m };
+        return invmod_u32(a as u32, m as u32).map(u64::from);
     }
     invmod_u64(a, m)
 }
@@ -1119,7 +1122,10 @@ fn invmod_u32(a: u32, m: u32) -> Option<u32> {
     if gcd != 1 {
         return None;
     }
-    Some(if neg { (m - t) % m } else { t % m })
+    // `t ≤ m`, and `t = m` only for `t = 0` negated (`m - t = m`) or
+    // `m = 1`, so the remainder is a division only for those.
+    let t = if neg { m - t } else { t };
+    Some(if t >= m { t % m } else { t })
 }
 
 /// The extended Euclid loop of [`invmod_u32`]: `(gcd, t, neg)` with
