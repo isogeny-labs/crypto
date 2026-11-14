@@ -1,0 +1,206 @@
+{
+  "schema": "walk-character-source-plan/v1",
+  "created": "2026-11-14T11:58:59.178186+00:00",
+  "formal": {
+    "project": "research/walk_character_audit_20261114/lean",
+    "theorem": "WalkCharacterAudit.walk_character_certificate",
+    "statement": "theorem walk_character_certificate : (∀ (I S : Type) [Fintype I] [Fintype S] (q : PMF I) (k : I → PMF S) (f : S → ℂ), complexExpectation (q.bind k) f=∑ i, (weight q i : ℂ)*complexExpectation (k i) f) ∧ (∀ (I G : Type) [Fintype I] [Fintype G] [AddCommGroup G] (q : PMF I) (a : I → G) (ψ : AddChar G ℂ) (t : ℕ) (x : G), complexExpectation (kernelLaw q (fun i y => y+a i) t x) ψ=(characterEigenvalue q a ψ)^t*ψ x ∧ Complex.normSq (complexExpectation (kernelLaw q (fun i y => y+a i) t x) ψ)= (Complex.normSq (characterEigenvalue q a ψ))^t) ∧ (∀ (I : Type) [Fintype I] (q : PMF I) (z : I → ℂ), (∀ i, Complex.normSq (z i)=1) → 1-Complex.normSq (complexExpectation q z)= (1/2 : ℝ)*(∑ i, ∑ j, weight q i*weight q j*Complex.normSq (z i-z j))) ∧ (∀ (I G : Type) [Fintype I] [AddCommGroup G] [Finite G] (q : PMF I) (a : I → G) (ψ : AddChar G ℂ) (i j : I), i ≠ j → Complex.normSq (characterEigenvalue q a ψ) ≤ 1-2*weight q i*weight q j*(1-(ψ (a i-a j)).re)) ∧ (∀ (I G : Type) [Fintype I] [AddCommGroup G] [Finite G] (q : PMF I) (a : I → G) (ψ : AddChar G ℂ) (i j : I), i ≠ j → 0<weight q i → 0<weight q j → ∀ δ : ℝ, 1-2*weight q i*weight q j*δ<Complex.normSq (characterEigenvalue q a ψ) → 1-δ<(ψ (a i-a j)).re) ∧ (∀ (p : ℕ) [NeZero p] (j x : ZMod p), (frequencyCharacter p j x).re=Real.cos (2*Real.pi*((x*j).val : ℝ)/(p : ℝ))) ∧ (∀ (I : Type) [Fintype I] (p : ℕ) [Fact p.Prime] (q : PMF I) (a : I → ZMod p), Function.Injective a → ∀ j : ZMod p, j ≠ 0 → ∀ (u v : I), u ≠ v → 0<weight q u → 0<weight q v → Complex.normSq (characterEigenvalue q a (frequencyCharacter p j))<1) ∧ (∀ (I : Type) [Fintype I] (p : ℕ) [NeZero p] (q : PMF I) (a : I → ZMod p), characterEigenvalue q a (frequencyCharacter p 0)=1 ∧ ∀ (t : ℕ) (x : ZMod p), Complex.normSq (complexExpectation (kernelLaw q (fun i y => y+a i) t x) (frequencyCharacter p 0))=1) ∧ (weight (PMF.pure false) false=1 ∧ weight (PMF.pure false) true=0) ∧ (∀ (p : ℕ) [Fact p.Prime], Function.Injective (twoSupports p) ∧ characterEigenvalue (PMF.pure false) (twoSupports p) (frequencyCharacter p 1)=1 ∧ ¬ Complex.normSq (characterEigenvalue (PMF.pure false) (twoSupports p) (frequencyCharacter p 1))<1) ∧ ((∀ b : Bool, 0<weight fairCoin b) ∧ Function.Injective evenSupports ∧ (2 : ZMod 4) ≠ 0 ∧ characterEigenvalue fairCoin evenSupports (frequencyCharacter 4 2)=1)",
+    "decl_sha256": "5aa92485a1a41a58f879a300b849daef3d3f6c899cecd962c688d629e0196b8c",
+    "scope": "Actual independent additive-walk Fourier law: finite normalized Mathlib PMF complex expectation/bind derived from actual real expectations; actual iterated kernel character expectation equals eigenvalue^t times character(start), and actual squared moment equals normSq(eigenvalue)^t. Normalized unit-phase variance identity and nonnegative pair-defect bound give quantitative character contraction and phase alignment. Actual standard ZMod frequency character cosine formula is proved. For every prime, any injective support with two positively weighted labels has every nonzero-frequency eigenvalue normSq<1. Actual j0 coefficient and all-time squared moment are1; actual pure-label weights1/0 with distinct two-support prime-field map give coefficient1 and direct strict-contraction negation; actual fair positive weights on ZMod4/injective0,2/nonzero frequency2 give coefficient1. These are deleted-hypothesis controls, not qualified-source refutations. Standard foundations/default limits, no holes/custom axioms/native evaluation/raised limits/global flags/waivers/native experiment/paid compute/upload. Full source minimum cutoff, Parseval/TV upper bound and stronger expected random-support mixing exponent remain open. No novelty claim.",
+    "sources": [
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+        "bytes": 4718,
+        "sha256": "b52bbe21e0157df1def29b77daa23dc6ba816ccd2abfe42ac29c9e885d0659bd"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/CharacterCertificate.lean",
+        "bytes": 3680,
+        "sha256": "0ac8e07da465600993e8411ba561a17b32642cd9ee8daae090b5068ab1f94a8e"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/CharacterWalk.lean",
+        "bytes": 2240,
+        "sha256": "abfae10d61d947e936a32c7eb28fe8e30ca359518e3e2f766b0ffdf073b43c3f"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/ComplexExpectation.lean",
+        "bytes": 1668,
+        "sha256": "8772dde72f7b241968e1acb299b45fc670a4bc5774789b7ccf5ab1d787cdec8a"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/PhaseVariance.lean",
+        "bytes": 4252,
+        "sha256": "b3722c8023becfd64bc8e95adb97080d9f0c4e99de41c275c6d0e4946b24ee93"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/SpectralContraction.lean",
+        "bytes": 5725,
+        "sha256": "2c6650135267f67f9152f40bea6c24ba7fe7b06538b6bf68ad753e532459a5da"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean",
+        "bytes": 5558,
+        "sha256": "22c81842c4402fc536128b11218617d9b63bf90bb648d65ee941e48f305c3fed"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lakefile.toml",
+        "bytes": 353,
+        "sha256": "d8997d8b100ce8e3da6f6bd04eb360f2ae4bae23a4e2273b7b59db16fa107222"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4042,
+        "sha256": "d169e80eecc0d6e301421d51547ec7bb13b50062e438c6d4ec14d2c00c1e5709"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 376,
+        "sha256": "e78ce13d461503c1e1cfcd78289586d99f17f00c1a757f4e0b2d61e0d430e129"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3690,
+        "sha256": "0bb802dd0905e950265a6f107ceff9f534c12d5036a89a552d643b0508f447f8"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 306,
+        "sha256": "5cf902fcb4908f6a1935ba0cd3735d4e91e2c4d2a1ba37617302439679d91af1"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3397,
+        "sha256": "c1f50dd86468022811659b7d11f1bc3e613ece5e63048a972635635f8bd5bb91"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CharacterCertificate",
+    "CharacterWalk",
+    "ComplexExpectation",
+    "FairKernel",
+    "PhaseVariance",
+    "SpectralContraction",
+    "WeightedKernel"
+  ],
+  "artifacts": [
+    {
+      "path": "research/walk_character_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 13961,
+      "sha256": "46e60a0c744a73259772ae7042c863e42f15206e167ae502b1ea9f6af9b274bd"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/evidence/attempts.json",
+      "bytes": 14599,
+      "sha256": "239523ed4d677f3673ceace84d2017ff08d800cb3d6f95cac0d47cd0e4050a12"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1066,
+      "sha256": "e69b0e7dd8bee728514e27597df4b832826b4c514a4b0215b3bf1ce983192a75"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/evidence/gate.json",
+      "bytes": 1209,
+      "sha256": "b466702ca5b7c20bec5c9e8a770a94836227eb5fb7c112aaa4406f2fe6d5c9d6"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/evidence/source-review.json",
+      "bytes": 6762,
+      "sha256": "0cf4e907b13b409d33db4e35b002cabe29b2a9efa34f1d5623da566775e8cff4"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/proof-map.json",
+      "bytes": 2145,
+      "sha256": "0b278f2c118659c358429a055d79e0197669487d892f45a0f0be7cd1b1fe318f"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/render_report.py",
+      "bytes": 6166,
+      "sha256": "b982d0e28e25394e8bc462cb0fe8bc7a46b0b832f32848af083a7c8bcc8da0aa"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/restore_attempts.py",
+      "bytes": 1016,
+      "sha256": "f7f877a20ba801a14592f27377e5ec1d142d77fd91e8346130995731b8adfbe4"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/reports/layout.json",
+      "bytes": 292,
+      "sha256": "ee40a434cb8bfa7f7d2aba01d407c507792c259269bff26d3206113bc941b073"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/reports/report.pdf",
+      "bytes": 47556,
+      "sha256": "27b77ecba647cd8d77914b534339e530d11fb7456c06bdddd7c88edb18f4fe9b"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/reports/walk-character-contraction.svg",
+      "bytes": 1422,
+      "sha256": "b260e80363818e8422c86dd47d3a217694711074933ea828fcbe67e313b7fec5"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 37,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_independent_character_power_law": true,
+    "actual_complex_expectation_bind_derived": true,
+    "actual_squared_moment_power_law": true,
+    "normalized_unit_phase_variance_derived": true,
+    "quantitative_character_pair_and_alignment_derived": true,
+    "actual_prime_nonzero_mode_strict_contraction": true,
+    "actual_zero_frequency_and_zero_weight_and_composite_controls": true,
+    "full_source_minimum_cutoff_closed": false,
+    "parseval_tv_upper_bound_closed": false,
+    "stronger_expected_random_support_mixing_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_later_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}
