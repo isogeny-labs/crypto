@@ -7,6 +7,7 @@ The previous component proves endpoints of an explicit norm/Dickson family
 and its special-fiber zero-set criterion. The next obligation is the exact
 map at every invertible parameter. No concrete weighted-initial-ideal,
 regularity, flatness, solving-degree or complexity conclusion is assumed.
+[pcc:unverified]
 
 Let e*l=1. Starting from the original actual curve f=X^3+aX+b and target
 (r,z), replace core coefficients by (a1*l^4,a2*l^2,c0*l^3,c1*l), and
