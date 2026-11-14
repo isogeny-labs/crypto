@@ -6,11 +6,13 @@ on:
     paths:
       - "research/cross_characteristic_global_torsion_20261112/ct86/**"
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct88/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   pull_request:
     paths:
       - "research/cross_characteristic_global_torsion_20261112/ct86/**"
       - "research/cross_characteristic_global_torsion_20261112/ct87/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct88/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   workflow_dispatch:
 
@@ -49,3 +51,18 @@ jobs:
           cmp /tmp/ct87-py.txt /tmp/ct87-js-noopt.txt
           printf '%s  %s\n' 9ae4951f266e6b9c2ef8e146ab9b82014e7753868f13c4324da368cd8bce371c /tmp/ct87-py.txt | sha256sum -c
           cat /tmp/ct87-py.txt
+
+      - name: Verify CT88 binary target order-index and nonmaximal polynomial independently
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct88
+          python3 -B "$D/ct88_index.py" > /tmp/ct88-py.json
+          python3 -O -B "$D/ct88_index.py" > /tmp/ct88-opt.json
+          node "$D/ct88_index_independent.js" > /tmp/ct88-js.json
+          node --no-opt "$D/ct88_index_independent.js" > /tmp/ct88-jsopt.json
+          cmp /tmp/ct88-py.json /tmp/ct88-opt.json
+          cmp /tmp/ct88-py.json /tmp/ct88-js.json
+          cmp /tmp/ct88-py.json /tmp/ct88-jsopt.json
+          printf '%s  %s\\n' 4953ec9689c3ce372eda1d53cc53eceb3340f7dc013270bcd3d0cf909956f096 /tmp/ct88-py.json | sha256sum -c
+          cat /tmp/ct88-py.json
