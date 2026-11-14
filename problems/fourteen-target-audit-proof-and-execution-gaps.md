@@ -899,3 +899,25 @@ open. Original publisher/author sources and exact corpus node were read
 at recorded scope; additive [coverage](../research/verheul_distortion_audit_20261114/coverage.json)
 does not promote the frozen unread labels or imply a full-paper read.
 No novelty or native experiment claimed. [pcc:unverified]
+
+
+### Original Thériault finite collision lower bound
+
+The [original Thériault collision audit](../research/theriault_collision_audit_20261114/README.md)
+refutes the finite lower bound in source Theorem1,p85 at n8,s3 within its
+actual sampling model: all512 uniform ordered draws from four free
+negation pairs give total352 and expectation11/16, below printed3/4.
+The domain3≤s<n/2 holds; source Definition7/Proposition2 count repeats
+after the first, and triple-repeat/distinct-orbit/upper controls pass.
+The source closedform at s3 equals6/n−4/n², below claimed6/n for alln>6.
+Explicitly conditional on the displayed recurrence, repaired bounds
+4s²/(9n)≤e(s)≤s²/n hold for3≤s≤n/2. The generic actual iid recurrence
+bridge remains open; the full algorithm/complexity Theorem3 is not
+refuted. Whole gate18/0failures/0trusted, exact local PCC-20261114-332aee replay
+PASS at2026-11-14T01:34:25Z, six formal/config and sixteen artifact pins match;
+59attemptfiles/fivegatefiles and inspected one-page PDF47646B retained.
+Scalar supplement IDC1h939108711fe75407 has an actual symbolic Lean
+proof and official checker32+32points. Signed standing unverified.
+Publisher primary/relevant sections and exact pp85–86 read/inspected;
+additive coverage preserves frozen unread labels, with no full-paper-read,
+novelty or native experiment claim. [pcc:unverified]
