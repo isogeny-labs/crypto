@@ -1,0 +1,28 @@
+# Protocol: interleaved multi-target rho vs folded multi-target BSGS on j=0 curves (2026-11-14)
+
+Frozen before any row of this study. Owner request: "run the interleaved rho vs BSGS comparison".
+
+## Question
+On the same j=0 curves and planted targets, which takes less wall time: the batched folded multi-target rho (Kuhn-Struik restarts, dp rule `DPRULE=ks DPDIV=1.5`, fixed in PR #4144 on held-out targets) or the folded multi-target BSGS (`MC=1`, tuned by its author)? The earlier comparison put them in separate, non-interleaved runs.
+
+## Arms
+- `rho`: `examples/prime_fast_j0_rho_multi.rs`, `DPRULE=ks DPDIV=1.5`, 128 lanes.
+- `bsgs`: `examples/prime_fast_j0_bsgs_multi.rs`, `MC=1`.
+- `rho_aa`: the `rho` arm run a second time on the same targets in the same round (A/A noise floor).
+No arm is retuned during the study.
+
+## Design
+- Cells: 26 bits T = 20, 200, 1000; 28 and 30 bits T = 200, 1000, 3000.
+- Rounds r = 0..5 per cell. Round r uses planted targets `INST0 = 100 + r`, 2 instances x 2 curves (4 problems), shared by all three arms. These targets were used by no earlier run.
+- Arm order within a round rotates through the six permutations of (rho, bsgs, rho_aa), one per round.
+- Cells run in the order above; one process per arm per round; single thread; local 4-core container, not isolated.
+- Every row must recover all T logs (checked against the planted values). A row that does not is reported and the round is excluded from the ratio, not rerun.
+
+## Metric and analysis
+- Per round and arm: the sum over its 4 problems of wall ms.
+- Per cell: ratio rho/bsgs per round; report the geometric mean over the 6 rounds with a 95% percentile bootstrap interval (10,000 resamples of rounds, seed 20261114), and the same for rho_aa/rho.
+- Reading: rho faster if the interval for rho/bsgs lies below 1, BSGS faster if above 1, otherwise unresolved. The A/A interval must contain 1; if it does not at a cell, that cell's verdict is reported as unreliable.
+- Also reported: rho steps / sqrt(2nT/6) and BSGS giant steps, medians.
+
+## Not in scope
+§5a band (both arms are counted in wall time only), isolated host, larger sizes.
