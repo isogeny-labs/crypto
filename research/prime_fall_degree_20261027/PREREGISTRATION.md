@@ -568,3 +568,41 @@ narrowed to stage B, with the two changes listed under "Differences from R3". Ev
    MB (measured in `research/runpod_kit_20261112/README.md`). The SHA-256 check before `/start` is unchanged.
 
 Registered per the owner's choice above.
+
+## Amendment 17 (2026-11-14; stage B's binaries: identity by reproduction, not by hash; before any stage B row exists)
+
+This amends Amendment 16's binary rule. Every number is `[pcc:unverified]`.
+
+**What happened (measured).**
+- A rebuild of `f13a690df0` in this container used the recipe of `image/build_layer_r2.sh`: rustc 1.97.0, musl,
+  `-C target-cpu=x86-64`, `--locked`. `pfd_grid_zeros` came out bit-identical. `pkm_tower_pilot`,
+  `prime_fall_degree_tools` and `hky_fp_tower_check` did not.
+- The three that differ link C code built with this container's `musl-gcc`/gcc 13.3.0 (`ring`, `libsqlite3-sys`,
+  `blake3`); `pfd_grid_zeros` does not. The rebuild embeds no build path.
+- The frozen image cannot be copied out of ECR here (no AWS credentials). Hashes and toolchain:
+  `research/pkm_falldegree_unblock_20261107/runpod/gate17/`.
+
+**The rule, replacing Amendment 16's hash rule for stage B.** A rebuilt binary may stand in for the frozen one only if it
+reproduces committed rows of the frozen image exactly. That means every deterministic field: `x_R`, curve, last fall
+degree, `ffd`, the fall degrees, closure multiply-adds and column counts, F4 `D` and F4 multiply-adds. Timing is excluded.
+The gate runs the registered flags of `run.sh` (rayon 12):
+
+- **Stage A, Kummer `P1`, Kummer and isogeny `P0`, closure and F4, `t ≤ 8`** against
+  `results/R9/analysis/pfdA_summary.json`: **48 draws, 432 checks, 0 differences** (measured,
+  `gate17/stageA_compare.txt`). The null and naive arms were not run.
+- **Stage C, `t = 2`, `m = 3, 4, 5`, both primes, closure** against `results/C9/analysis/pfdC_summary.json`:
+  **18 draws, 126 checks, 0 differences** (measured, `gate17/stageC_compare_m3to5.txt`). These are the same systems as
+  stage B's `t = 2` points.
+- **The `m = 6` cells** were still running on this 4-vCPU host at registration. Their comparison is reported with the
+  stage B rows whatever it reads. A wall-budget censoring on this host is a host effect, not a binary difference, and is
+  reported as such.
+- **G1** passes on the rebuild: `G1: 6 cases pass`.
+
+**Consequences.**
+- The runner's SHA-256 gate checks the uploaded files against the gated rebuild's hashes (`gate17/rebuild_binaries.sha256`)
+  instead of `image/image.json`.
+- `entry_r2.sh` and `run.sh` still match `image/image.json` byte for byte.
+- `host.txt` will carry the rebuild's hashes, and RESULTS names them.
+- Any stage B row whose deterministic fields later disagree with a frozen-image row of the same system is a reproducibility
+  failure (Amendment 2's stop rule).
+- No hypothesis, §6 rule, reading, cell, seed, budget or limit changes.
