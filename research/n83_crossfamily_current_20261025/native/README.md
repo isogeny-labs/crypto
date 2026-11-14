@@ -8,17 +8,19 @@ records all child outcomes and resource telemetry, replays arithmetic and
 calibration receipts, and uploads its raw archive. The local selector uses
 all 16 paired points, six exact sign-flip tests, and a 0.05/6 threshold.
 
-The approved allocation is two `g5g.4xlarge` Spot instances in
-`us-east-1a`, each with a $0.27/hour maximum bid, 50 GB encrypted gp3
+This branch proposes the single two-instance `g5g.4xlarge` Spot allocation in
+`us-east-1d` with the replacement security group. It requires separate owner
+approval before `aws-allocate` may run. Each instance retains the $0.27/hour
+maximum bid and a 50 GB encrypted gp3
 root disk, and a 21,600-second lifetime. The bid-based six-hour projection
 is $3.37 under the owner's $4.20 allocation cap. The host shutdown timer
 and an independently detached local termination guard retain their
 outcomes. The projection depends on both guards or provider access
 functioning through the deadline.
 
-This native allocation follows the east-region AWS protocol at commit
+This proposed native route follows the east-region AWS protocol at commit
 `c1b40731907eb7db238186e1b11f58d754572fd0` and the
-[2026-11-14 route amendment](AWS_EAST1A_AMENDMENT_20261114.md). The parent
+[2026-11-14 proposed route amendment](AWS_EAST1D_SG_PROPOSAL_20261114.md). The parent
 README's west-region alternative is a separate Python dispatch route. This
 native run binds its own region, zone, instance type, source hash, and budget
 in the controller receipt.
@@ -40,12 +42,12 @@ rustup run 1.99.1 cargo run --release --locked --manifest-path "$native_manifest
 ```
 
 `aws-plan` is read-only. `aws-allocate` mutates S3 and EC2 and requires
-the separate owner approval recorded for this allocation. It repeats the
+separate owner approval for this exact proposed route. It repeats the
 provider price and placement gate immediately before mutation. The
 controller receipt and source manifests retain exact SHA-256 values. Do
 not put presigned URLs, AWS credentials, or EC2 user data in a PR or log.
 The raw result archives and host status objects remain outside the tree
-until independently collected and verified.
+until independently collected and checked.
 
 After both uploads appear, collect exact S3 object versions and request
 early termination. Then replay each extracted result independently from
