@@ -92,3 +92,5 @@ unavailable, bounded primary/prior/official fallback before code recorded.
 Static rho, the stronger random-support exponent, collision constants and
 other fourteen-item gaps remain open. No full14 closure, native experiment,
 paid compute or agent upload. [pcc:unverified]
+
+Follow-up primary review found the author’s [corrections listing](https://www.albany.edu/~martinhi/pubsoops.html), whose attachment remains unread after the recorded access failures. The later [author preprint, arXiv:math/0401189v1](https://arxiv.org/abs/math/0401189), selected section4.2/pages13–16, explicitly treats k=2 separately, restricts its counting lemma to k≥3 and flags the older k=2 proof issue as an exercise. Pages15–16 were visually inspected. Any forthcoming check of the original printed counting lemma is a formal treatment of an acknowledged boundary issue, with no novelty claim or refutation of Theorem1/2. See [dated source follow-up](source-followup.json), outside the issued pinset; the proof and pinned report are unchanged. [pcc:unverified]
