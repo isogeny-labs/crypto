@@ -1,35 +1,36 @@
-# Resume: crypto @ claude/ecstatic-thompson-0jpmjv
+# Resume: crypto @ claude/f4-f5-algorithm-speed-bvp7qd
 
 ## Goal
-Owner (2026-11-12): run the frozen wide-modulus sparse-LA pack on RunPod ("1 but on runpod").
-Protocol: research/ic_techniques_20261012/wide_sparse_la/PROTOCOL.md + PROTOCOL_AMENDMENT_1.md
-(RunPod cpu5g 4 vCPU/16 GiB, one pod per seed, A/A per pod, USD 25 ceiling, 40 h pod deadline).
+Make the GHS-weak plane-quartic double-large-prime IC (research/quartic_dl1_cd_sqrt_20261113, c_D = 1.7 + sqrt chain)
+faster in measured CPU time at identical counted work, and record the factor-base-growth null result.
 
 ## Lead / hypothesis
-Size law: row_ops/D grows as D^(beta-1), beta in [1.9, 2.1] (Krylov). Width law: ns per row_op
-t(L) = c0 + c2 L^2 over limbs L = 1..4. Extrapolate U192@129 (ECC2K-130 order) to D = 1e9 with
-interval; falsifiers in PROTOCOL.md "How the extrapolation model is falsified".
+Pilot workflow wf_f57f915b-f9f (2026-11-14, L0, not a claim): (1) a compiled sqrt chain gave relations-stage CPU
+0.72-0.92x; (2) fast open-addressing hashing + allocation removal gave 0.56-0.72x; both have identical counted fields.
+(3) Incremental factor-base growth: no robust counted gain, CPU 1.16-1.52x (null). Confirm (1),(2) and a combined
+build under frozen protocols; write up (3) as a null result.
 
 ## Spec
-research/ic_techniques_20261012/wide_sparse_la/runpod/{launch.py, pod_run.sh, make_bundle.py}.
-launch.py bundles HEAD, uploads to s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/<stamp>-<sha>/,
-creates 3 RunPod CPU pods (REST v1) that build la_engine_bench and run the grid for their seed.
-Record: benchmarks/records/<id>-wide-sparse-la.json (benchrec).
+Three new study dirs, one per lane, each with PROTOCOL.md committed before data:
+research/ic_gw_sqrt_compiled_20261114, research/ic_gw_fasthash_20261114, research/ic_gw_fbgrow_20261114.
+Reference binary: v3 sha256 de500bc1... (/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/j2/layer/opt/study/bin/v3). Candidates built from /tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/wf/{chain,hash,grow}/src.
+Sizes q = 262111 524287 1048507 2097091 4194271 (k = 18..22), seeds 1-3, c_D 1.7, args "ic q seed D 3.0 c".
 
 ## State
-2026-11-12: amendment + launcher committed; local smoke test of pod_run.sh (D=2^8..2^9) run.
-Launch manifest: research/ic_techniques_20261012/wide_sparse_la/launch.json (pod ids, S3 prefix).
-
-## Runs in flight
-None. Attempt 2 completed 2026-11-13 ~16Z; raw data pulled into wide_sparse_la/raw/ (2026-11-14).
-Was: 3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
-Pods self-terminate via podTerminate; if not, terminate via REST DELETE /v1/pods/<id>.
-
-## Stop and success conditions
-Fixed grid; per-run 3600 s timeout and per-arm stop rule; pod deadline 40 h; A/A determinism failure voids.
-Success = complete raw data + frozen analysis (fits, intervals, falsification outcomes), whatever the outcome.
+Pilots done (raw under /tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/wf/). Measured runs are being launched by a three-lane workflow (Sonnet agents);
+timed units are serialised with flock on /tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/wf/timing.lock.
 
 ## Next steps
-1. Monitor pods (~13-16 h). 2. Pull raw/*.jsonl into wide_sparse_la/raw/, sha256 + S3.
-3. analysis.py per frozen Analysis section -> results.json; research-visuals report/PDF/graphs.
-4. benchrec add-raw/metric/close; benchmarks/<date>-wide-sparse-la/ + README row; progress report; PR.
+1. Lanes freeze protocol, run, analyze, report/graph/PDF, benchrec record (each in its own study dir).
+2. Main session: review, validation gate, leaderboard component section, session log, PR (ready, auto-merge).
+
+## Runs in flight
+Workflow lanes in this container (local L0, owner chose local because the EKS budget is exceeded, launch/BUDGET-HOLD.md
+in the quartic_dl1_cd_sqrt study). Outputs under each study dir's runs/.
+
+## Stop and success conditions
+Success: relations-stage CPU ratio < 1 at every (k, seed) with identical counted fields, outside the A/A floor.
+No cloud spend.
+
+## Open questions
+Whether to repeat on EKS (L2) once the budget allows.
