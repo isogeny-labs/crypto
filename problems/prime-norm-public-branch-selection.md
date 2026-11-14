@@ -229,3 +229,26 @@ would require a separately justified construction; the count does not
 supply it. Keep original W-jet map, coverage, field extraction, retries and
 complete expected bit-cost criteria open. No solver/native fixture or paid
 experiment was launched [pcc:unverified].
+
+
+2026-11-14 actual growing input grading: [report](../research/prime_norm_rank_20261112/growing-input-report/README.md),
+source0a12a195c66785b5b8b4b4409ab0cc02ee991f64. The literal multivariate
+coefficient support of the actual computed membership remainder has budget
+2*deg(P), with coefficient-j weightedTotalDegree<=2*deg(P)-2*j. Actual
+retained weights are exactly1,...,2a-2 via a proved bijection for all a>=2.
+The norm/support are monic of degrees2a/2a-1, actual target incidence gives
+exact norm multiplication, and an exact polynomial-ring renaming binds
+h=1 to the unchanged four-variable norm/support/full remainder. Central
+PCC-20261114-3a3e7b/cad062/253550/2c4a15/6c253b/3a3330/69b0f2, all
+unsigned. Forty authored new statements plus generated finSumFinEquiv.eq_1;
+whole-study435/0, fresh NormGrowingInput0, receiptsdc7d16/41a33c
+[pcc:unverified].
+
+This closes the actual growing input-budget obligation for the openly
+specified rational-point-base norm chart. It does not bind the original
+W-jet family or the separately unlaunched reduced.ms native fixture,
+prove the normalized-row degree29 claim, or establish a low full-closure
+cutoff. The next discriminating question is constructive bounded full
+closure on this actual family. Preserve public finder, coverage,
+field-extraction, retry and complete expected bit-cost exit criteria;
+no solver/native/paid experiment was launched [pcc:unverified].
