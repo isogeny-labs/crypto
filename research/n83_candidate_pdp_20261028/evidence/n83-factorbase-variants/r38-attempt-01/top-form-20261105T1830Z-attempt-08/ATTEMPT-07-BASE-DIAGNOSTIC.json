@@ -1,0 +1,25 @@
+{
+  "schema": "n83.attempt-base-diagnostic/v1",
+  "attempt07_failure": "pdp generate panicked with ENOTDIR at src/bin/pdp.rs:339:63 before candidate output root was observed on disk",
+  "observed_missing_input": "BASES/s3-file-index.json",
+  "source_file_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+  "copied_file_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+  "s3_file_index_shards": 384,
+  "family_manifests": {
+    "koblitz": {
+      "sha256": "f6573e4f71d511672a1da6bd4aa170e2e54acd9291423f014ce87f9ce8266caa",
+      "shards": 128
+    },
+    "binary": {
+      "sha256": "28816f378a8604ad0eab78c2b0418289e0d6a8650455564e5f2a03dea3726796",
+      "shards": 128
+    },
+    "prime": {
+      "sha256": "976a24675d8634b5b21246e99c42009bcc1b7a7dcc1c8df19b2db02b042bbc71",
+      "shards": 128
+    }
+  },
+  "base_index_sha256": "3fb72aa61147882832bbb17fc65a3ccfb8f5f179c047a43e4ccf65cecfa34623",
+  "generator_output_paths_absent": true,
+  "note": "The source helper returns an empty map when the sidecar is absent, so the ENOTDIR stack message is not fully explained by the observed missing file. Attempt08 will assert this sidecar before generation and capture openat trace."
+}
