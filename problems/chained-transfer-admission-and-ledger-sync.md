@@ -181,3 +181,19 @@ Rootfull03 remains124/unknowntotals;publicationinvariants notexecuted bytheseexa
 
 ### Errors (what went wrong, how it was handled)
 Exact101failures preserved;originalS3checkpointpush1/KBconductor127 unchanged. No globalpass/benchmarkadmission ormergewaiver. [pcc:unverified]
+
+## 2026-11-14T00:45:02.459782+00:00 — common-origin whole-data handoff and fresh guard08
+
+### What was done (commands, files, features)
+Native8a77f3/all3304guards/20pairs40reports51JSON/15correcteach/20outcomesmatch/sharedFB30failures;fouractualP0/fullFB/RNG/1004raw92triples/1004wrongorigincontrols. Written8ffc9c reusesEXISTINGfaithful01efbf671d42/57partialbindings. Report6271ce TWO79399-byte finalpagesALLinspected;new754CI/self755/ninephasepairs/16workflows241native57canonical prepared,ownsourcefullCIpending. [pcc:unverified]
+
+SEVENwholeclosedcaptures+SEVENcompleteindices+wholePDF15objects require8genuineS3migrations,7smallwholeGitobjects. Includeswhole94file unpublishedsource/report/754CI/PCCledger/resume/base0a+patch snapshot torestorebeforeconsumercommit. Freshguard08 holds4230 currentinputbytes andPDFsymlinktypes/targets untilactualgenuinebotFF/finalguards. Old07historical/released,ONLYpostpublicationcanonicalREADMEdelta mapped/alloldscienceunchanged. Originalroot2137/compiledbinary/fixture kept. [pcc:unverified]
+
+### Decisions made (and why)
+WholePDFcanonicaldocs+transparentrelativealias preservesunchangedPCCdocs hydration;explicitroot.pdf.bin carrier appliesstrictoriginaldatapolicy. No split/prune/policythreshold/verifier/trust changes orfakeavailability. WholecontrolplaneAPI/logs/losslessXZ retaineddirectafterpublication. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Normalrootpayloadcommit/push/originalpublisher8remote byte replays/exactFF/all4230guards+BOTHereposdirtybytes+linktypes/genuineconsumerprojections;thennormalconsumersource/755full/fouractualadmission/16CI241native57digests. Nextcompleteoperationcoverage/backendinventory/odddegreecoordinates/admittedrefs. Continueaftereachrung. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+Originaltransportffe675 succeedsremote+localORIGINALgate forexactclean39e9;laterstatechangesstaleit. Rootfull124/unknowntotals/twoexact101clockinit failures633ab0 remain;CIhostmetadata0iscapabilityonly. Fullgeometry/logextension/fullcost/livebudgetcapacityrefs/mainledger/signing/reviews/conflict/vault/KB gapsremain. [pcc:unverified]
