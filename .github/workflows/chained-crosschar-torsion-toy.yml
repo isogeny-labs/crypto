@@ -51,3 +51,85 @@ jobs:
           python3 -O -B research/cross_characteristic_global_torsion_20261112/ct53/ct53_orbits.py
           node research/cross_characteristic_global_torsion_20261112/ct53/ct53_independent.js
           node --no-opt research/cross_characteristic_global_torsion_20261112/ct53/ct53_independent.js
+
+      - name: CT81 fixed-source-prime compatibility, independent implementations
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct81
+          python3 -B "$D/ct81_source_prime_alignment.py" > /tmp/ct81-py.txt
+          python3 -O -B "$D/ct81_source_prime_alignment.py" > /tmp/ct81-pyopt.txt
+          node "$D/ct81_alignment_independent.js" > /tmp/ct81-js.txt
+          node --no-opt "$D/ct81_alignment_independent.js" > /tmp/ct81-jsopt.txt
+          cmp /tmp/ct81-py.txt /tmp/ct81-pyopt.txt
+          cmp /tmp/ct81-py.txt /tmp/ct81-js.txt
+          cmp /tmp/ct81-py.txt /tmp/ct81-jsopt.txt
+      - name: CT82 prime-to-37 global reduction and independent Hensel, pinned digest
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct82
+          python3 -B "$D/ct82_local_inverse.py" > /tmp/ct82-py.txt
+          python3 -O -B "$D/ct82_local_inverse.py" > /tmp/ct82-pyopt.txt
+          node "$D/ct82_local_inverse_independent.js" > /tmp/ct82-js.txt
+          node --no-opt "$D/ct82_local_inverse_independent.js" > /tmp/ct82-jsopt.txt
+          cmp /tmp/ct82-py.txt /tmp/ct82-pyopt.txt
+          cmp /tmp/ct82-py.txt /tmp/ct82-js.txt
+          cmp /tmp/ct82-py.txt /tmp/ct82-jsopt.txt
+          printf '%s  %s\n' a890c3fffb0f89eadc56688b7fa26a8ebb8538c61d528b8b2ea2ccafa6149d12 /tmp/ct82-py.txt | sha256sum -c
+
+      - name: CT83 fixed-place precision obstruction and binary-residue negative control
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct83
+          python3 -B "$D/ct83_precision_gate.py" > /tmp/ct83-py.json
+          python3 -O -B "$D/ct83_precision_gate.py" > /tmp/ct83-pyopt.json
+          node "$D/ct83_precision_independent.js" > /tmp/ct83-js.json
+          node --no-opt "$D/ct83_precision_independent.js" > /tmp/ct83-jsopt.json
+          cmp /tmp/ct83-py.json /tmp/ct83-pyopt.json
+          cmp /tmp/ct83-py.json /tmp/ct83-js.json
+          cmp /tmp/ct83-py.json /tmp/ct83-jsopt.json
+          printf '%s  %s\n' 7625287b302b557c7a444ca6a632f92800c17a2d5864b505100f21041cb9ffd5 /tmp/ct83-py.json | sha256sum -c
+
+      - name: CT84 selective p-adic-to-global Padé reconstruction and independent target law
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct84
+          python3 -B "$D/ct84_selective_pade.py" > /tmp/ct84-py.json
+          python3 -O -B "$D/ct84_selective_pade.py" > /tmp/ct84-pyopt.json
+          node "$D/ct84_independent.js" > /tmp/ct84-js.json
+          node --no-opt "$D/ct84_independent.js" > /tmp/ct84-jsopt.json
+          cmp /tmp/ct84-py.json /tmp/ct84-pyopt.json
+          cmp /tmp/ct84-py.json /tmp/ct84-js.json
+          cmp /tmp/ct84-py.json /tmp/ct84-jsopt.json
+          printf '%s  %s\n' ca0abbaf20ab4c70bfe99eb3a4867c0b3e3285f58daf79142f46df445fd15195 /tmp/ct84-py.json | sha256sum -c
+
+      - name: CT85 non-CM and endomorphism multiplication-coefficient controls
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct85
+          python3 -B "$D/ct85_rigidity.py" > /tmp/ct85-py.json
+          python3 -O -B "$D/ct85_rigidity.py" > /tmp/ct85-pyopt.json
+          node "$D/ct85_rigidity_independent.js" > /tmp/ct85-js.json
+          node --no-opt "$D/ct85_rigidity_independent.js" > /tmp/ct85-jsopt.json
+          cmp /tmp/ct85-py.json /tmp/ct85-pyopt.json
+          cmp /tmp/ct85-py.json /tmp/ct85-js.json
+          cmp /tmp/ct85-py.json /tmp/ct85-jsopt.json
+          printf '%s  %s\n' c0e58ecce5818071114aead61c71114a59619ed60dbd4881bb604fb2cc55a148 /tmp/ct85-py.json | sha256sum -c
+
+      - name: CT93 place/embedding fiber counts - two independent exact implementations
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct93
+          python3 -B "$D/ct93_place_transport.py" >/tmp/ct93-py.json
+          python3 -O -B "$D/ct93_place_transport.py" >/tmp/ct93-pyopt.json
+          node "$D/ct93_place_transport_independent.js" >/tmp/ct93-js.json
+          node --no-opt "$D/ct93_place_transport_independent.js" >/tmp/ct93-jsopt.json
+          cmp /tmp/ct93-py.json /tmp/ct93-pyopt.json
+          cmp /tmp/ct93-py.json /tmp/ct93-js.json
+          cmp /tmp/ct93-py.json /tmp/ct93-jsopt.json
+          printf '%s  %s\n' cf1fa25a5a26a19bdf1fa7d4c72e1e60c2dc9b04eb3e5c1b73b62740443f773d /tmp/ct93-py.json | sha256sum -c
+
+      - name: CT94 binary Frobenius equivariance and 24-extension obstruction
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct94
+          python3 -B "$D/ct94_frobenius_gate.py" >/tmp/ct94-py.json
+          python3 -O -B "$D/ct94_frobenius_gate.py" >/tmp/ct94-pyopt.json
+          node "$D/ct94_frobenius_gate_independent.js" >/tmp/ct94-js.json
+          node --no-opt "$D/ct94_frobenius_gate_independent.js" >/tmp/ct94-jsopt.json
+          cmp /tmp/ct94-py.json /tmp/ct94-pyopt.json
+          cmp /tmp/ct94-py.json /tmp/ct94-js.json
+          cmp /tmp/ct94-py.json /tmp/ct94-jsopt.json
+          printf '%s  %s\n' 63a7f301f19e28dd9e8257b2deae3340cc64f2da2ae935dd2eb945c7827fa495 /tmp/ct94-py.json | sha256sum -c
