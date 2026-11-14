@@ -28,7 +28,9 @@ NVCCFLAGS ?= -O3 -std=c++17 -lineinfo $(GENCODE) -Xcompiler -pthread
 # minimum resident blocks per SM ptxas must honour (0 = unconstrained).
 RF_BLOCK      ?= 128
 RF_MIN_BLOCKS ?= 0
-RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS)
+# 1: sampled clock64() phase profile in the kernels (`./bench profile`); 0 = off
+RF_PROFILE ?= 0
+RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=$(RF_PROFILE)
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 

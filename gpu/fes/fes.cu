@@ -276,10 +276,26 @@ static int serve_bin_main() {
             cudaMalloc(&d_res, (size_t)(1 + max_out) * 8) == cudaSuccess;
   if (!ok) { fes_serve_bin_reply(nullptr, 0, 0, 2); return 2; }
   FesSystem sys;
+  // Opt-in timing (FES_SERVE_TIMING=1): per call, the worker's busy time from
+  // the end of the request read to the flushed reply, and the kernel's own GPU
+  // time (CUDA events); printed to stderr at EOF.  The pipe wait and the read
+  // are not in the busy time.  Off by default: no events, no output.
+  const char *tv = getenv("FES_SERVE_TIMING");
+  const bool timing = tv && tv[0] && tv[0] != '0';
+  cudaEvent_t ev0 = nullptr, ev1 = nullptr;
+  if (timing) { cudaEventCreate(&ev0); cudaEventCreate(&ev1); }
+  unsigned long long calls = 0;
+  double busy_ns = 0, kernel_ns = 0;
   for (;;) {
     const int r = fes_serve_bin_read(sys, FES_MAX_VARS);
-    if (r == 0) return 0;
+    if (r == 0) {
+      if (timing && calls)
+        fprintf(stderr, "serve-bin-timing: calls=%llu busy_us_per_call=%.2f kernel_gpu_us_per_call=%.2f\n",
+                calls, busy_ns / calls / 1e3, kernel_ns / calls / 1e3);
+      return 0;
+    }
     if (r < 0) { fes_serve_bin_reply(nullptr, 0, 0, 1); return 2; }
+    const auto tb0 = std::chrono::steady_clock::now();
     const int n = sys.n, t = n * (n + 1) / 2;
     uint64_t *lin = h_in, *quad = h_in + n, *qsym = h_in + n + t;
     memcpy(lin, sys.lin.data(), n * 8);
@@ -294,8 +310,10 @@ static int serve_bin_main() {
     bool cu = cudaMemcpyAsync(d_in, h_in, words * 8, cudaMemcpyHostToDevice) == cudaSuccess &&
               cudaMemsetAsync(d_res, 0, 8) == cudaSuccess;
     if (cu) {
+      if (timing) cudaEventRecord(ev0);
       fes_kernel<<<blocks, threads, smem>>>(sys.cst, d_in, d_in + n, d_in + n + t, n, lb, d_res + 1,
                                             (unsigned int *)d_res, max_out);
+      if (timing) cudaEventRecord(ev1);
       cu = cudaGetLastError() == cudaSuccess &&
            cudaMemcpyAsync(h_res, d_res, (1 + FES_BIN_FIRST) * 8, cudaMemcpyDeviceToHost) == cudaSuccess &&
            cudaStreamSynchronize(0) == cudaSuccess;
@@ -310,6 +328,14 @@ static int serve_bin_main() {
       return 2;
     }
     fes_serve_bin_reply(h_res + 1, listed, total, 0);
+    if (timing) {
+      float ms = 0;
+      cudaEventElapsedTime(&ms, ev0, ev1);
+      kernel_ns += ms * 1e6;
+      busy_ns += (double)std::chrono::duration_cast<std::chrono::nanoseconds>(
+                     std::chrono::steady_clock::now() - tb0).count();
+      ++calls;
+    }
   }
 }
 
