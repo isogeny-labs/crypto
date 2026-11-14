@@ -126,7 +126,10 @@ struct FieldP256 {
  *     uint32_t pos = T.begin(key);
  *     while (T.valid(pos, key)) { uint32_t j = T.index(pos); ...; pos = T.next(pos, key); }
  * ------------------------------------------------------------------ */
-/* Lookup variants (compile-time, all off by default; every variant returns
+/* Lookup variants (compile-time, all ON by default since the A100
+ * measurement of research/ic_gpu_rootfind_lookup_20261114: together 1.12x at
+ * the best configuration of both workloads, faster than the old lookups at
+ * every configuration; set a flag to 0 for the old path).  Every variant returns
  * the same candidates in the same order, or extra ones the sweep's full-x
  * check discards, so the relation set and its order are unchanged):
  *   RF_SORTED_EYT=1   lower_bound over an Eytzinger (BFS) copy of the keys,
@@ -136,13 +139,13 @@ struct FieldP256 {
  *   RF_PROBE_PAIR=1   the two eps lookups of an entry start together
  *                     (begin2), so their dependent loads overlap. */
 #ifndef RF_SORTED_EYT
-#define RF_SORTED_EYT 0
+#define RF_SORTED_EYT 1
 #endif
 #ifndef RF_HASH_PACKED
-#define RF_HASH_PACKED 0
+#define RF_HASH_PACKED 1
 #endif
 #ifndef RF_PROBE_PAIR
-#define RF_PROBE_PAIR 0
+#define RF_PROBE_PAIR 1
 #endif
 
 RF_HD int rf_ffs32(uint32_t v) {   /* 1-based index of the lowest set bit, 0 for v == 0 */

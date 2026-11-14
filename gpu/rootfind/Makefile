@@ -31,10 +31,11 @@ RF_MIN_BLOCKS ?= 0
 # 1: sampled clock64() phase profile in the kernels (`./bench profile`); 0 = off
 RF_PROFILE ?= 0
 # lookup variants (rootfind.cuh): Eytzinger sorted search, packed hash slots,
-# paired eps lookups; 0 = off
-RF_SORTED_EYT ?= 0
-RF_HASH_PACKED ?= 0
-RF_PROBE_PAIR ?= 0
+# paired eps lookups; on by default (A100: 1.12x at the best configuration of
+# both workloads, research/ic_gpu_rootfind_lookup_20261114); 0 = old path
+RF_SORTED_EYT ?= 1
+RF_HASH_PACKED ?= 1
+RF_PROBE_PAIR ?= 1
 RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=$(RF_PROFILE) \
            -DRF_SORTED_EYT=$(RF_SORTED_EYT) -DRF_HASH_PACKED=$(RF_HASH_PACKED) -DRF_PROBE_PAIR=$(RF_PROBE_PAIR)
 

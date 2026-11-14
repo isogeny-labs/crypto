@@ -14,7 +14,7 @@ research/ic_gpu_rootfind_lookup_20261114/job.sh on one A100: eight arms (M, M2 A
 EHP), selftests first, 5 rotated rounds of ./bench throughput at |F|=65536 and |F|=1024.
 
 ## State
-2026-11-14: code and host tests done; pod not started.
+2026-11-14 19:45Z: done; pod deleted; all three flags default on (1.12x at best configurations); record closed; PR open.
 
 ## Runs in flight
 Pods icgpu-*; research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
@@ -24,4 +24,4 @@ Any selftest failure excludes the arm. A gain counts only outside the M/M2 sprea
 configuration per workload (not just at some configuration). Cap ~1 GPU-hour, $3. S3: same waiver.
 
 ## Next steps
-Launch, fetch, delete pod, analyze, report, record, PR.
+Track the PR.
