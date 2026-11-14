@@ -792,6 +792,53 @@ pub fn search_aux(
     Err(format!("no auxiliary curve in {max_curves} draws"))
 }
 
+/// Method 1 for a **chosen** `S`: random `E'/F_p` until one has a point of
+/// order exactly `S` (so a cyclic subgroup of that order). `degrees` is
+/// returned empty; the caller orders the chain. Curves whose order is not
+/// divisible by `S` are rejected after the order computation.
+pub fn search_aux_exact(p: u64, s: u64, seed: u64, max_curves: u64) -> Result<AuxFound, String> {
+    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+        return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
+    }
+    let (mut primes, _) = smooth_split(s, s);
+    primes.dedup();
+    let mut rng = Rng(seed);
+    let mut failed = 0;
+    for tried in 1..=max_curves {
+        let e = Curve {
+            p,
+            a: rng.below(p),
+            b: rng.below(p),
+        };
+        if e.is_singular() {
+            continue;
+        }
+        let Some(n) = e.order(&mut rng) else {
+            failed += 1;
+            continue;
+        };
+        if n % s != 0 {
+            continue;
+        }
+        for _ in 0..16 {
+            let q = e.mul(n / s, e.random_point(&mut rng));
+            if primes.iter().all(|&l| e.mul(s / l, q).is_some()) {
+                return Ok(AuxFound {
+                    aux: e,
+                    order: n,
+                    degrees: vec![],
+                    q: q.unwrap(),
+                    curves_tried: tried,
+                    orders_failed: failed,
+                });
+            }
+        }
+    }
+    Err(format!(
+        "no auxiliary curve with a point of order {s} in {max_curves} draws"
+    ))
+}
+
 // ------------------------------------------------- relation system (m=2..)
 
 /// Semaev's `S_3(x_1, x_2, x_3)` on `y² = x³ + ax + b`.
@@ -1596,6 +1643,17 @@ mod tests {
                     c.d
                 );
             }
+        }
+    }
+
+    #[test]
+    fn search_aux_exact_gives_a_tower_in_any_order() {
+        let p = 100_003;
+        let f = search_aux_exact(p, 36, 4, 20_000).unwrap();
+        assert_eq!(f.order % 36, 0);
+        for degs in [[2u64, 3, 2, 3], [3, 2, 3, 2], [3, 3, 2, 2]] {
+            let t = isogeny_tower_on(f.aux, f.order, f.q, &degs, 1, f.curves_tried).unwrap();
+            t.verify().unwrap();
         }
     }
 }

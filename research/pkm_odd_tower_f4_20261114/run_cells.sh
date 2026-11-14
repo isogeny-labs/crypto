@@ -64,6 +64,18 @@ for c in "${L2_CELLS[@]}"; do
   run "M2-$name-null" 3 --p $P1 --m 2 --degrees "$d" --control null --kind refute --draws 3
 done
 
+# Isogeny form (auxiliary curve, Vélu steps), m = 2: same degree sequences as A2/A3/A23 (lower end).
+# The auxiliary-curve search is not charged (owner, 2026-11-14); rows record its count only.
+for k in 3 4; do run "PL-I3-k$k" 1 --p $P1 --m 2 --form isogeny --degrees "$(deg 3 $k)" --kind planted --draws 1; done
+run "PL-I23-n4" 1 --p $P1 --m 2 --form isogeny --degrees "$(alt 2 3 4)" --kind planted --draws 1
+I2_CELLS=( "I2-t4:2:4" "I3-k3:3:3" "I23-n4:23:4" "I2-t5:2:5" "I2-t6:2:6" "I23-n5:23:5" "I3-k4:3:4" "I2-t7:2:7" "I23-n6:23:6" "I2-t8:2:8" "I3-k5:3:5" )
+for c in "${I2_CELLS[@]}"; do
+  IFS=: read -r name q n <<< "$c"
+  d="$(degs_of "$q" "$n")"
+  run "M2-$name-tower" 3 --p $P1 --m 2 --form isogeny --degrees "$d" --control tower --kind refute --draws 3
+  run "M2-$name-null" 3 --p $P1 --m 2 --form isogeny --degrees "$d" --control null --kind refute --draws 3
+done
+
 # Secondary ladder, m = 3 (small S).
 L3_CELLS=( "A2-t2:2:2" "A23-n2:23:2" "A2-t3:2:3" "A3-k2:3:2" "A23-n3:23:3" "A2-t4:2:4" "A5-k2:5:2" "A3-k3:3:3" "A2-t5:2:5" "A23-n4:23:4" )
 for c in "${L3_CELLS[@]}"; do

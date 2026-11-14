@@ -13,7 +13,7 @@ import math
 import os
 import statistics
 
-ARMS = ["A3", "A5", "A23", "A32"]
+ARMS = ["A3", "A5", "A23", "A32"]  # Kummer arms against the Kummer A2 reference
 GAIN, LOSS = 0.5, 2.0
 
 
@@ -139,6 +139,28 @@ def main():
             n = out[f"m{m}_null"].get("arms", {}).get(arm, {}).get("verdict")
             out["attribution"][f"m{m}_{arm}"] = {"tower": t, "null": n,
                                                  "reading": "shape" if t == n else "elliptic-specific"}
+    # Form: isogeny (I*) over Kummer (A*) for the same degree sequence, per draw (C6).
+    form = {}
+    for m in (2,):
+        for control in ("tower", "null"):
+            cs = cells(rows, f"M{m}-", control)
+            for iso, kum in (("I2", "A2"), ("I3", "A3"), ("I23", "A23")):
+                ka = {s: (w, c) for _, s, w, c, _ in cs.get(kum, [])}
+                pts = []
+                for x, s, w, c, cell in cs.get(iso, []):
+                    if s not in ka or c or ka[s][1]:
+                        pts.append({"S": s, "censored": True})
+                        continue
+                    rs = [a / b for a, b in zip(w, ka[s][0])]
+                    pts.append({"S": s, "r": rs, "r_median": statistics.median(rs), "bands": [band(v) for v in rs]})
+                done_pts = [p for p in pts if "r" in p]
+                if done_pts:
+                    bs = set(done_pts[-1]["bands"])
+                    v = bs.pop() if len(bs) == 1 else "mixed"
+                    form[f"m{m}_{control}_{iso}_over_{kum}"] = {"verdict": v, "at_S": done_pts[-1]["S"], "points": pts}
+                else:
+                    form[f"m{m}_{control}_{iso}_over_{kum}"] = {"verdict": "no_completed_cell", "points": pts}
+    out["form"] = form
     # Order: A32 vs A23 at equal S (n = 4, 6), paired by draw.
     order = {}
     for n in (4, 6):
@@ -175,6 +197,8 @@ def main():
             print(f"m={m} {arm}: tower {v.get('verdict')} growing={v.get('growing')} at S={v.get('at_S')} "
                   f"r={[round(x, 3) for x in v.get('r_at_S', [])]}; null {out['attribution'][f'm{m}_{arm}']['null']}")
     print("order", json.dumps(order))
+    for k, v in form.items():
+        print("form", k, v["verdict"], "at S", v.get("at_S"))
     print("positive control (one bit)", out["positive_control_one_bit"]["all_detected"])
     print("replication", json.dumps(out.get("replication_check")))
 

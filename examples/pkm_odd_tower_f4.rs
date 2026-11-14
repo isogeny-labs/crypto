@@ -34,7 +34,7 @@
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
 use crypto_lib::cryptanalysis::pkm_smooth_tower::{
-    addm, kummer_tower, mulm, powm, s3, sqrtm, subm, Curve, Rng,
+    addm, isogeny_tower_on, kummer_tower, mulm, powm, s3, search_aux_exact, sqrtm, subm, Curve, Rng,
 };
 use serde_json::json;
 use std::collections::HashMap;
@@ -188,6 +188,11 @@ fn main() {
         .collect();
     let m: usize = arg(&o, "m", "2").parse().expect("--m");
     let control = arg(&o, "control", "tower").to_string();
+    let form = arg(&o, "form", "kummer").to_string();
+    assert!(
+        form == "kummer" || form == "isogeny",
+        "--form kummer|isogeny"
+    );
     let kind = arg(&o, "kind", "refute").to_string();
     let draws: u64 = arg(&o, "draws", "3").parse().expect("--draws");
     let seed: u64 = arg(&o, "seed", "20261114").parse().expect("--seed");
@@ -200,7 +205,20 @@ fn main() {
     assert!(kind == "refute" || kind == "planted");
 
     // Same V for both controls and every kind: it depends on (p, degrees, seed) only.
-    let tower = kummer_tower(p, &degrees, None, seed).expect("kummer tower");
+    // Kummer: V = g·mu_S. Isogeny: V = x(R' + <Q>) on an auxiliary curve with a point of
+    // order exactly S (searched from the seed; the search is not part of any metric).
+    let (tower, aux_tried) = if form == "kummer" {
+        (
+            kummer_tower(p, &degrees, None, seed).expect("kummer tower"),
+            0,
+        )
+    } else {
+        let s_all: u64 = degrees.iter().product();
+        let f = search_aux_exact(p, s_all, seed ^ 0xa0c5, 1_000_000).expect("aux curve");
+        let t = isogeny_tower_on(f.aux, f.order, f.q, &degrees, seed, f.curves_tried)
+            .expect("isogeny tower");
+        (t, f.curves_tried)
+    };
     tower.verify().expect("tower verify");
     let s = tower.size();
     let n_tower = degrees.len();
@@ -299,15 +317,30 @@ fn main() {
         let mut raw: Vec<Vec<(Vec<u32>, u64)>> = vec![];
         for i in 0..m {
             for j in 0..n_tower {
-                let mut a = vec![0u32; n_vars];
-                a[xv(i, j)] = degrees[j] as u32;
-                if j + 1 < n_tower {
-                    let mut b = vec![0u32; n_vars];
-                    b[xv(i, j + 1)] = 1;
-                    raw.push(vec![(a, 1), (b, p - 1)]);
-                } else {
-                    raw.push(vec![(a, 1), (vec![0u32; n_vars], p - tower.c % p)]);
+                // Step j as  next·D_j(x) − N_j(x)  (next = x_{i,j+1}, or the constant c).
+                // Kummer: N = x^q, D = 1, so this is x^q − next as before.
+                let st = &tower.steps[j];
+                let mut eq: HashMap<Vec<u32>, u64> = HashMap::new();
+                let mut put = |mono: Vec<u32>, c: u64| {
+                    let e = eq.entry(mono).or_insert(0);
+                    *e = addm(*e, c, p);
+                };
+                for (k, &c) in st.num.iter().enumerate() {
+                    let mut mono = vec![0u32; n_vars];
+                    mono[xv(i, j)] = k as u32;
+                    put(mono, p - c % p);
                 }
+                for (k, &c) in st.den.iter().enumerate() {
+                    let mut mono = vec![0u32; n_vars];
+                    mono[xv(i, j)] = k as u32;
+                    if j + 1 < n_tower {
+                        mono[xv(i, j + 1)] += 1;
+                        put(mono, c % p);
+                    } else {
+                        put(mono, mulm(c, tower.c, p));
+                    }
+                }
+                raw.push(eq.into_iter().filter(|&(_, c)| c != 0).collect());
             }
         }
         if m == 2 {
@@ -340,7 +373,7 @@ fn main() {
                 let mut y = xs[i];
                 for j in 0..n_tower {
                     pt[xv(i, j)] = y;
-                    y = powm(y, degrees[j], p);
+                    y = tower.steps[j].eval(y, p).unwrap_or(0);
                 }
             }
             if m == 3 {
@@ -378,7 +411,7 @@ fn main() {
             "schema": "pkm-odd-tower-f4.row/v1", "cell": cell, "p": p, "m": m,
             "degrees": degrees, "arm": degrees.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(""),
             "S": s, "log2S": (s as f64).log2(), "n_tower_vars": m * n_tower, "n_vars": n_vars,
-            "control": control, "kind": kind, "draw": draw, "seed": seed, "target_x": xr,
+            "control": control, "form": form, "aux_curves_tried_uncharged": aux_tried, "kind": kind, "draw": draw, "seed": seed, "target_x": xr,
             "target_tries": tries, "curve": [e.a, e.b], "g": match tower.kind {
                 crypto_lib::cryptanalysis::pkm_smooth_tower::TowerKind::Kummer { g } => g, _ => 0 },
             "exhaustive_decomposable": decomp, "inconsistent": rep.inconsistent,
