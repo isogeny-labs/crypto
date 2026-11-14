@@ -201,6 +201,9 @@ fn sym_solve_ex(
     let mut heads: Vec<u32> = Vec::new();
     let mut next: Vec<u32> = Vec::new();
     let mut hmask = 0usize;
+    let prefilter = std::env::var_os("NOPREFILTER").is_none();
+    let mut bits: Vec<u64> = Vec::new();
+    let mut bmask = 0usize;
     if summands >= 3 {
         let mut dd = Vec::new();
         let mut sc = Vec::new();
@@ -261,6 +264,18 @@ fn sym_solve_ex(
             next[e] = heads[h];
             heads[h] = e as u32;
         }
+        if prefilter {
+            let nb = (ents.len() * 3 * 16).next_power_of_two().max(64);
+            bmask = nb - 1;
+            bits = vec![0u64; nb / 64];
+            for ent in ents.iter() {
+                let k0 = ent.0;
+                for kx in [k0, f.mul(beta, k0), f.mul(beta2, k0)] {
+                    let h = (kx.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & bmask;
+                    bits[h >> 6] |= 1u64 << (h & 63);
+                }
+            }
+        }
     }
     let ms_fb = t0.elapsed().as_secs_f64() * 1e3;
     let t1 = Instant::now();
@@ -304,7 +319,11 @@ fn sym_solve_ex(
             let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
             for (eps, l) in [(1i8, lam_minus), (-1i8, lam_plus)] {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
-                if summands >= 3 {
+                let pass = !prefilter || {
+                    let h = (x3.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & bmask;
+                    bits[h >> 6] >> (h & 63) & 1 == 1
+                };
+                if summands >= 3 && pass {
                     let (key, sft) = canon(x3);
                     let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & hmask;
                     let mut e = heads[h];
@@ -541,7 +560,7 @@ fn main() {
                 let row = json!({
                     "plain3_ok": p3.as_ref().map(|s| s.0 == k).unwrap_or(false), "plain3_ms": p3_ms, "plain3_fb": fbs3,
                     "curve": c.name, "rho_neg_median_ms": rho1, "p": c.f.p, "n": c.n, "B": bsz, "inst": ins,
-                    "summands": summ, "shiftfix": std::env::var_os("NOSHIFTFIX").is_none(), "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
+                    "summands": summ, "shiftfix": std::env::var_os("NOSHIFTFIX").is_none(), "prefilter": std::env::var_os("NOPREFILTER").is_none(), "sym_ok": sym.as_ref().map(|s| s.0 == k).unwrap_or(false),
                     "sym_ms": sym.as_ref().map(|s| s.1.ms_total),
                     "sym_fb_ms": sym.as_ref().map(|s| s.1.ms_fb),
                     "sym_collect_ms": sym.as_ref().map(|s| s.1.ms_collect),
