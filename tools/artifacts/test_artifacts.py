@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 TOOL = Path(__file__).resolve().parent / "artifacts.py"
@@ -330,6 +331,55 @@ class WorkflowWiringPaths(unittest.TestCase):
         )
 
 
+class SparsePattern(unittest.TestCase):
+    """The pull step runs tools/artifacts/artifacts.py with .artifacts/config.json, so a
+    sparse checkout must fetch both, whether its patterns are a block scalar or one inline path."""
+
+    def test_inline_cone_path_becomes_a_block(self):
+        block = ["      - uses: actions/checkout@v4", "        with:",
+                 "          sparse-checkout: taskq/deploy/eks-karpenter"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      ")[2:], [
+            "          sparse-checkout: |",
+            "            taskq/deploy/eks-karpenter",
+            "            tools/artifacts",
+            "            .artifacts",
+        ])
+
+    def test_inline_non_cone_path(self):
+        block = ["      - uses: actions/checkout@v4", "        with:",
+                 "          sparse-checkout-cone-mode: false", "          sparse-checkout: /Cargo.toml"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      ")[-3:],
+                         ["            /Cargo.toml", "            /tools/artifacts/", "            /.artifacts/"])
+
+    def test_expression_and_block_forms(self):
+        expr = ["      - uses: actions/checkout@v4", "        with:",
+                "          sparse-checkout: ${{ matrix.paths }}"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(expr, "      "), expr)
+        blk = ["      - uses: actions/checkout@v4", "        with:",
+               "          sparse-checkout: |", "            src"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(blk, "      ")[-2:],
+                         ["            tools/artifacts", "            .artifacts"])
+        done = wire_workflows.add_sparse_pattern(blk, "      ")
+        self.assertEqual(wire_workflows.add_sparse_pattern(done, "      "), done)
+
+
+class AwsBootstrap(unittest.TestCase):
+    """The pip fallback for a missing aws CLI runs only on CI (or when asked) and never
+    overrides a CLI named by ARTIFACTS_AWS."""
+
+    def cfg(self, aws="aws"):
+        return artifacts.Config(root=Path("."), remote="s3://b/p", endpoint=None, read_url=None,
+                                cache=Path(tempfile.gettempdir()) / "unused", aws=aws)
+
+    def test_off_outside_ci(self):
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("GITHUB_ACTIONS", "ARTIFACTS_BOOTSTRAP_AWS", "ARTIFACTS_AWS")}
+        with unittest.mock.patch.dict(os.environ, env, clear=True):
+            self.assertIsNone(artifacts.bootstrap_aws(self.cfg()))
+
+    def test_named_cli_is_respected(self):
+        with unittest.mock.patch.dict(os.environ, {"GITHUB_ACTIONS": "true", "ARTIFACTS_AWS": "/opt/aws"}):
+            self.assertIsNone(artifacts.bootstrap_aws(self.cfg("/opt/aws")))
 class WorkflowSparsePatterns(unittest.TestCase):
     """The pull step needs tools/artifacts and the .artifacts config in a sparse checkout."""
 

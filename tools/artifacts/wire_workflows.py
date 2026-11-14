@@ -12,9 +12,10 @@ that hold moved files, and inserts after each `actions/checkout` step:
         if ! command -v aws ...; then (install the AWS CLI into $RUNNER_TEMP); fi
         python3 tools/artifacts/artifacts.py pull research/x experiments/y/results
 
-A sparse checkout also gets `tools/artifacts` added to its patterns. The edit
-is textual (comments and layout survive) and idempotent; checkouts into a
-`path:` other than the workspace are reported, not edited.
+A sparse checkout also gets `tools/artifacts` and `.artifacts` (the store
+configuration) added to its patterns. The edit is textual (comments and
+layout survive) and idempotent; checkouts into a `path:` other than the
+workspace are reported, not edited.
 
     python3 tools/artifacts/wire_workflows.py [--check] [WORKFLOW ...]
 
@@ -173,6 +174,35 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
 
 
 def add_sparse_pattern(block: list[str], indent: str) -> list[str]:
+    """Make a sparse checkout also fetch what the pull step runs on: the tool
+    (tools/artifacts) and the store configuration (.artifacts/config.json)."""
+    for k, b in enumerate(block):
+        inline = re.match(rf"^({indent}    sparse-checkout: )(?!\|)(\S.*)$", b)
+        if inline and "${{" in inline.group(2):
+            return block
+        if not inline and not re.match(rf"^{indent}    sparse-checkout: \|", b):
+            continue
+        cone = not any("sparse-checkout-cone-mode: false" in x for x in block)
+        if inline:  # single-line form (`sparse-checkout: some/path`): rewrite as a block scalar
+            pad = indent + "      "
+            head, items, n = [inline.group(1) + "|"], [pad + inline.group(2).strip()], k + 1
+        else:
+            head, items, n = [b], [], k + 1
+            while n < len(block) and len(block[n]) - len(block[n].lstrip()) > len(indent) + 4:
+                items.append(block[n])
+                n += 1
+            pad = (items[0][: len(items[0]) - len(items[0].lstrip())]) if items else indent + "      "
+        have = [x.strip() for x in items]
+        if "/*" in have:
+            return block
+        add = []
+        if not any("tools/artifacts" in x or x in ("tools", "/tools/") for x in have):
+            add.append("tools/artifacts" if cone else "/tools/artifacts/")
+        if not any(x.strip("/") in (".artifacts", ".artifacts/config.json") for x in have):
+            add.append(".artifacts" if cone else "/.artifacts/")
+        if inline or add:
+            return block[:k] + head + items + [pad + x for x in add] + block[n:]
+        return block
     """Make a sparse checkout also fetch tools/artifacts and .artifacts (the
     store config the pull step reads; without it the remote is empty)."""
     cone = not any("sparse-checkout-cone-mode: false" in x for x in block)

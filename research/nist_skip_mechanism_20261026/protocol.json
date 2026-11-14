@@ -1,0 +1,535 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "nist-skip-mechanism-20261026",
+ "version": 1,
+ "created": "2026-10-26",
+ "repository": "crypto",
+ "study_dir": "research/nist_skip_mechanism_20261026",
+ "authors": [
+  "Claude Code session 016JRG2W5Bt5WuBs7JnEDfeP"
+ ],
+ "links": {
+  "narrative_protocol": "research/nist_skip_mechanism_20261026/PROTOCOL.md",
+  "addendum_B_freeze_commit": "6a14c3d8bd",
+  "note": "Machine-readable record written after the data, transcribing PROTOCOL.md (holdout section, addendum A, addendum B frozen in 6a14c3d before native computation) and amendments 1-2 (after the data). Not a preregistration in this form.",
+  "amendment_history": "PROTOCOL.md amendments 1-2, both filed after the data they affect: (1) B1 tail recalibrated by Monte Carlo, 0.8283 -> 0.8313; (2) controls PC1 and PC2 added. The cells they affect (B1 p-value, PC1, PC2) decide nothing under the experiment-protocol rules.",
+  "freeze_evidence": "The only pre-data freeze is git commit 6a14c3d8bd (PROTOCOL.md addendum B, pushed before any native computation). The holdout section and addendum A were frozen only in a scratchpad file (sha256 3181538d..., 19b23a6e...) before their computation; no commit records that. This JSON record was written after all data and is left as a draft, not frozen, because freezing would assert a pre-data analysis plan that did not exist."
+ },
+ "question": "Do the post-hoc NIST seed skip-rule separators hold out of sample, and does any mechanism (Schoof/SEA branch structure, Elkies coverage) make an independent prediction that the data supports?",
+ "claims": [
+  {
+   "id": "C1",
+   "text": "Within-stream permutation tail probabilities of L_E, sign(t), and the l<200 Elkies decompositions on the 21 prime candidates are as recorded in out/summary.txt (exact enumeration of 4,480 assignments).",
+   "class": "exact_computation",
+   "decided_by": []
+  },
+  {
+   "id": "C2",
+   "text": "B2: no set S of odd primes l <= 100 has all 10 published curves Atkin at every l in S while covering the 11 skipped curves.",
+   "class": "exact_computation",
+   "decided_by": []
+  },
+  {
+   "id": "C3",
+   "text": "B1: the NSA binary curves' mean L_E percentile is not above 50 under the Gekeler model.",
+   "class": "heuristic_estimate",
+   "decided_by": []
+  },
+  {
+   "id": "C4",
+   "text": "Any statement about the historical skip rule.",
+   "class": "out_of_scope",
+   "decided_by": []
+  }
+ ],
+ "hypotheses": [
+  {
+   "id": "H2",
+   "statement": "Skipped candidates have a larger Elkies bound L_E (expensive SEA abandoned).",
+   "mechanism": "An Elkies-only SEA needs Elkies primes up to L_E; costly counts were abandoned.",
+   "predictions": [
+    {
+     "id": "P-H2",
+     "metric": "p_value",
+     "direction": "lower",
+     "minimum_effect": "P(>=obs) small over 4,480 assignments",
+     "provenance": {
+      "written_at": "2026-10-26",
+      "data_seen": [
+       {
+        "path": "crypto:research/nist_seed_provenance_20261016/README.md",
+        "measured": "H1 Elkies coverage lean on the same 21 curves (p = 0.008), learned after Addendum A"
+       }
+      ],
+      "sample_status": "in_sample"
+     },
+     "role": "calibration"
+    }
+   ]
+  },
+  {
+   "id": "B1",
+   "statement": "An isogeny-structure filter also ran in the NSA binary pipeline.",
+   "mechanism": "The published prime curves sit high in L_E; the same filter would raise the binary curves.",
+   "predictions": [
+    {
+     "id": "P-B1",
+     "metric": "p_value",
+     "direction": "lower",
+     "minimum_effect": "mean percentile > 50 with small tail probability",
+     "provenance": {
+      "written_at": "2026-10-26",
+      "data_seen": [],
+      "sample_status": "out_of_sample"
+     },
+     "role": "decisive"
+    }
+   ]
+  },
+  {
+   "id": "B2",
+   "statement": "The historical SEA failed when some prime in a fixed set S was Elkies.",
+   "mechanism": "A buggy Elkies step skips curves with more Elkies primes, matching the observed direction.",
+   "predictions": [
+    {
+     "id": "P-B2",
+     "metric": "uncovered_skipped",
+     "direction": "equal_within",
+     "minimum_effect": "0 uncovered skipped curves",
+     "provenance": {
+      "written_at": "2026-10-26",
+      "data_seen": [
+       {
+        "path": "crypto:research/nist_seed_provenance_20261016/README.md",
+        "measured": "H1 Elkies coverage lean on the same 21 curves (p = 0.008), learned after Addendum A"
+       }
+      ],
+      "sample_status": "in_sample"
+     },
+     "role": "calibration"
+    }
+   ]
+  }
+ ],
+ "arms": [
+  {
+   "id": "prime-21",
+   "role": "reference",
+   "description": "the 21 valid 1997-98 prime candidates (10 published, 11 skipped), inputs/historical.tsv",
+   "instrument": {
+    "repo": "crypto",
+    "commit": null,
+    "build": [
+     [
+      "gp",
+      "-q",
+      "mechanism.gp"
+     ]
+    ],
+    "binary_sha256": "c9673623cad2eaa7cfe402e7b7d833f1f703689a09837026b6386aaafba6deec",
+    "flags": {
+     "parisizemax": "2^30"
+    },
+    "env": {},
+    "threads": 1
+   },
+   "parameters": {
+    "population": "historical.tsv sha256 f425dc7c"
+   }
+  },
+  {
+   "id": "nsa-binary",
+   "role": "candidate",
+   "description": "NSA binary curves B-233/283/409/571 (primary) and B-163 (secondary), inputs/binary.tsv",
+   "instrument": {
+    "repo": "crypto",
+    "commit": null,
+    "build": [
+     [
+      "gp",
+      "-q",
+      "mechanism.gp"
+     ]
+    ],
+    "binary_sha256": "c9673623cad2eaa7cfe402e7b7d833f1f703689a09837026b6386aaafba6deec",
+    "flags": {
+     "parisizemax": "2^30"
+    },
+    "env": {},
+    "threads": 1
+   },
+   "parameters": {
+    "population": "binary.tsv"
+   },
+   "same_instrument_as": "prime-21"
+  },
+  {
+   "id": "planted",
+   "role": "control_positive",
+   "description": "PC1: smallest-L_E labels planted in every stream (amendment 2)",
+   "instrument": {
+    "repo": "crypto",
+    "commit": null,
+    "build": [
+     [
+      "gp",
+      "-q",
+      "mechanism.gp"
+     ]
+    ],
+    "binary_sha256": "c9673623cad2eaa7cfe402e7b7d833f1f703689a09837026b6386aaafba6deec",
+    "flags": {
+     "parisizemax": "2^30"
+    },
+    "env": {},
+    "threads": 1
+   },
+   "parameters": {},
+   "same_instrument_as": "prime-21"
+  },
+  {
+   "id": "model-null",
+   "role": "control_negative",
+   "description": "Gekeler-model draws: the 4,480-assignment null for permutation tests and the 20,000-replicate calibration for B1; PC2 power",
+   "instrument": {
+    "repo": "crypto",
+    "commit": null,
+    "build": [
+     [
+      "gp",
+      "-q",
+      "mechanism.gp"
+     ]
+    ],
+    "binary_sha256": "c9673623cad2eaa7cfe402e7b7d833f1f703689a09837026b6386aaafba6deec",
+    "flags": {
+     "parisizemax": "2^30"
+    },
+    "env": {},
+    "threads": 1
+   },
+   "parameters": {
+    "seed": 20261026
+   },
+   "same_instrument_as": "prime-21"
+  },
+  {
+   "id": "null-validation",
+   "role": "control_negative",
+   "description": "control_null.gp: the Gekeler model against exact ellcard counts at 64 and 80 bits; not run (checkpoint gate, no S3 credential)",
+   "instrument": {
+    "repo": "crypto",
+    "commit": null,
+    "build": [
+     [
+      "gp",
+      "-q",
+      "control_null.gp"
+     ]
+    ],
+    "binary_sha256": "c9673623cad2eaa7cfe402e7b7d833f1f703689a09837026b6386aaafba6deec",
+    "flags": {
+     "parisizemax": "2^30"
+    },
+    "env": {},
+    "threads": 1
+   },
+   "parameters": {}
+  }
+ ],
+ "controls": {
+  "aa": {
+   "present": false,
+   "comparison": null,
+   "not_applicable_reason": "deterministic exact computation on fixed inputs with a fixed seed: reruns are byte-identical (verified), so there is no run-to-run noise floor"
+  },
+  "positive": {
+   "present": true,
+   "arm": "planted",
+   "expected_detection": "P(<=obs) equal to the smallest attainable value",
+   "not_applicable_reason": null
+  },
+  "negative": {
+   "present": true,
+   "arm": "model-null",
+   "null_population": {
+    "description": "count-preserving label assignments of the 21 prime candidates; Gekeler-model L_E draws per field",
+    "generator": "exact enumeration (assignments) and nullLE() in mechanism.gp with setrand(20261026)",
+    "n": 4480,
+    "why_n": "every assignment that keeps each seed run's published count is enumerated; Monte Carlo draws are 20,000 per field",
+    "matched_on": [
+     "seed run",
+     "per-run published count",
+     "field"
+    ]
+   },
+   "not_applicable_reason": null
+  }
+ },
+ "variable_ledger": {
+  "independent": [
+   {
+    "name": "population",
+    "levels": [
+     "prime-21",
+     "nsa-binary"
+    ]
+   }
+  ],
+  "factors": [
+   {
+    "name": "inputs",
+    "treatment": "fixed",
+    "value": "historical.tsv f425dc7c; binary.tsv (OpenSSL 3.0.13)",
+    "how": "committed before computation"
+   },
+   {
+    "name": "instrument",
+    "treatment": "fixed",
+    "value": "PARI/GP 2.15.4",
+    "how": "one gp binary, sha256 pinned"
+   },
+   {
+    "name": "rng_seed",
+    "treatment": "fixed",
+    "value": 20261026,
+    "how": "setrand at the top of mechanism.gp"
+   },
+   {
+    "name": "prime_bound",
+    "treatment": "fixed",
+    "value": "LMAX 3000 for L_E, l<200 decomposition, l<=100 for B2",
+    "how": "frozen in addendum A/B"
+   },
+   {
+    "name": "analyst",
+    "treatment": "measured",
+    "how": "unblinded single analyst who had seen the labels and the 2026-10-25 report; recorded in the README"
+   }
+  ],
+  "comparisons": [
+   {
+    "id": "C-pop",
+    "arms": [
+     "prime-21",
+     "nsa-binary"
+    ],
+    "differs_in": [
+     "population"
+    ],
+    "design": "one_factor"
+   }
+  ],
+  "aa_not_applicable": "deterministic computation; see controls.aa",
+  "crosses_map": false
+ },
+ "randomization": {
+  "arm_order": "fixed",
+  "arm_order_reason": "exact computation with no timing; order cannot affect any value",
+  "seed_derivation": {
+   "method": "explicit_list",
+   "seeds": [
+    20261026
+   ],
+   "nonce": null,
+   "note": "single fixed GP seed written in addendum B before computation"
+  },
+  "instance_sampling": {
+   "rule": "all curves in the two frozen input tables",
+   "independent_of_arm": true
+  },
+  "blinding": {
+   "analysis_labels_masked": false,
+   "how": "not masked: published/skipped labels are public and were seen",
+   "unmasked_at": null
+  }
+ },
+ "sample_size": {
+  "instances": 26,
+  "replicates": 1,
+  "warmups": 0,
+  "power": {
+   "method": "exact",
+   "alpha": 0.05,
+   "tests_in_family": 2,
+   "correction": "bonferroni",
+   "rank_test_n": null,
+   "min_attainable_two_sided_p": null,
+   "passes": true,
+   "note": "the permutation tests enumerate all 4,480 assignments (smallest attainable one-sided P 0.00022, from PC1); B1 has marginal power at the published-prime effect size (PC2: P = 0.045 at mean 74.6)"
+  },
+  "preflight_runtime": {
+   "fixed_seconds": 1,
+   "per_sample_seconds": 2,
+   "threads": 1,
+   "estimated_total_seconds": 50,
+   "measured_on": "local container, mechanism.gp 48 s"
+  }
+ },
+ "metrics": {
+  "primary": [
+   {
+    "id": "p_value",
+    "name": "tail probability",
+    "unit": "probability",
+    "kind": "exact",
+    "definition": "exact permutation tail over 4,480 count-preserving assignments, or the add-one Monte Carlo tail for B1/PC2",
+    "source": "out/rows.jsonl p_value",
+    "aggregation": "per_row",
+    "resolution": "1/4480 (exact) or 1/20001 (Monte Carlo)",
+    "uncertainty": "none_exact"
+   },
+   {
+    "id": "uncovered_skipped",
+    "name": "skipped curves not covered by S_max",
+    "unit": "curves",
+    "kind": "counted",
+    "definition": "B2 construction",
+    "source": "out/rows.jsonl uncovered_skipped",
+    "aggregation": "per_row",
+    "resolution": "1",
+    "uncertainty": "none_exact"
+   }
+  ],
+  "secondary": [
+   {
+    "id": "statistic",
+    "name": "test statistic",
+    "unit": "rank-sum or mean percentile",
+    "kind": "derived",
+    "definition": "skipped rank-sum within streams, or mean Gekeler-null percentile",
+    "source": "out/rows.jsonl statistic",
+    "aggregation": "per_row",
+    "resolution": "0.5 rank or 0.1 percentile",
+    "uncertainty": "none_exact",
+    "formula": "rank-sum: sum over skipped rows of the within-stream average rank of the feature; mean percentile: (1/k) sum_i pct(V_field(i), L_E(i))"
+   }
+  ]
+ },
+ "measurement": {
+  "isolation_required": "none",
+  "warmups": 0,
+  "order": "sequential",
+  "clock": "none",
+  "counters": [],
+  "record": [
+   "gp_version",
+   "script_sha256"
+  ],
+  "timed_primary_justification": null
+ },
+ "execution": {
+  "backend": "local",
+  "queue": null,
+  "placement": {
+   "instance_type": "Claude Code cloud container",
+   "cpus": 1,
+   "spot": false
+  },
+  "measurement_class": "search",
+  "timeout_seconds": 600,
+  "checkpoint": {
+   "policy": "none",
+   "interval_seconds": null,
+   "grace_seconds": null,
+   "restore_validation": "none",
+   "after_restore": {
+    "wall_time": "invalid",
+    "counted_units": "valid"
+   }
+  },
+  "retries": {
+   "infrastructure_only": true,
+   "max_attempts": 1
+  }
+ },
+ "stopping_rules": [
+  {
+   "rule": "fixed design: one pass of mechanism.gp over the frozen inputs",
+   "kind": "fixed_n",
+   "preregistered": true
+  }
+ ],
+ "invalidation_rules": [
+  "a B1 or figure percentile is model-dependent until control_null.gp passes",
+  "control_null.gp runs only after a resume checkpoint uploads (repository gate); until then the null model is unvalidated"
+ ],
+ "decision_rule": {
+  "text": "H2 and B1 are supported only if their one-sided tail is below 0.025 (Bonferroni over 2). B2 is supported only if 0 skipped curves are uncovered. Effects found in the reverse direction are reported as post hoc and decide nothing.",
+  "comparison_ids": [
+   "C-pop"
+  ],
+  "threshold": "one-sided P < 0.025",
+  "statistic": "within-stream rank-sum; mean null percentile",
+  "interval": "none (exact or Monte Carlo tail)",
+  "multiple_comparison_correction": "bonferroni",
+  "effect_size_measure": "mean null percentile difference",
+  "verdict_vocabulary": [
+   "supported",
+   "falsified",
+   "null",
+   "no_power",
+   "not_run"
+  ]
+ },
+ "analysis_plan": {
+  "script": {
+   "path": "research/nist_skip_mechanism_20261026/mechanism.gp",
+   "sha256": "530d7c923b302fc705aff2482ed845b3d5cb01b0f09d9d4e2c142a3cd80f4b6a"
+  },
+  "inputs": [
+   "inputs/historical.tsv",
+   "inputs/binary.tsv"
+  ],
+  "outputs": [
+   "out/summary.txt",
+   "out/curves.tsv",
+   "out/binary.tsv",
+   "out/b2_cover.tsv",
+   "out/rows.jsonl"
+  ],
+  "blinded": false,
+  "frozen_before_data": false
+ },
+ "reporting": {
+  "export_schema": "experiment.export/v1",
+  "review_schema": "experiment.review/v1",
+  "graphs": [
+   "mechanism.svg: L_E percentiles per stream and for the binary curves"
+  ],
+  "report_dir": "."
+ },
+ "inadmissible": [
+  "reading the reverse-direction L_E effect as confirmatory",
+  "counting the SEC 2 curves as a test of the NSA generator",
+  "quoting B1 percentiles as model-free before control_null.gp passes"
+ ],
+ "literature": [
+  {
+   "ref": "crypto:research/nist_seed_provenance_20261016/PREREGISTRATION.md",
+   "provenance": "internal",
+   "claim": "H1 Elkies coverage already preregistered L_E; lean p = 0.008",
+   "verified_by": "read 2026-10-26"
+  },
+  {
+   "ref": "crypto-autoresearcher:knowledge/leads/ecdlp/structure/LEAD-STR-curve-generation-provenance-seeds.yaml",
+   "provenance": "internal",
+   "claim": "skip rule exhausted_at_scale",
+   "verified_by": "read 2026-10-26"
+  },
+  {
+   "ref": "E.-U. Gekeler, Frobenius distributions of elliptic curves over finite prime fields, IMRN 2003",
+   "provenance": "recalled",
+   "claim": "Frobenius mod l is distributed like a random GL2(F_l) matrix with det q",
+   "verified_by": null
+  }
+ ],
+ "amendments": [],
+ "freeze": {
+  "status": "draft",
+  "protocol_sha256": null,
+  "commit": null,
+  "frozen_at": null,
+  "filed_before_affected_data": false
+ }
+}
