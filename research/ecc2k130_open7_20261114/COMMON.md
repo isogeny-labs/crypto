@@ -43,3 +43,11 @@ Lanes L1..L7, one directory each under this folder. These rules bind every lane.
 ## Return (in-message, also as `SUMMARY.md` if writing files works)
 Verdict under the frozen rule; key counted numbers with uncertainty; what prior work already
 settled (citations); what is genuinely new here; files written; open threads.
+
+## Amendment 1 (2026-11-14, main session, before any lane reported data)
+- AGENTS.md "Implementation language: no Python" binds every lane: new experiment code,
+  harnesses, solvers and result generators are Rust (or an existing native backend). The
+  earlier "Python or Rust" wording in lane briefs was wrong. A measurement produced only by a
+  Python harness is reported as a provisional prototype, not a verdict.
+- If the harness refuses writes into the repository, write under
+  $SP/lanes/<lane>/ and list the paths in the final message; the main session copies them in.
