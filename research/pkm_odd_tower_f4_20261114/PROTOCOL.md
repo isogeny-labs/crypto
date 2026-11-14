@@ -246,3 +246,17 @@ deviation from the lab's EKS default, recorded here.
 - *Cost:* ceiling $20 for all attempts; the pod is stopped and deleted when the cells end.
 - *Order:* as in `remote/run_tail_remote.sh`; order cannot change a counted metric (§3).
 
+**Amendment 5 (2026-11-14, a budget extension at the user's request; filed before any extension row).** On the
+128 GiB host the `m = 3` systems at `S = 32` hit the frozen 1,800 s budget. The user asked to raise the budget for
+the `m = 3` cells. §6 forbids rerunning a frozen cell with a larger budget to change its outcome, so this is an
+*extension*, kept apart:
+- *Cells:* six `XB-*` systems in `runs/xb/`. Part A tower, first refutation draw: `M3-A2-t5`, `M3-A23-n4`.
+  Part B, the first planted target and the first random target: the same two sizes. Each runs with
+  `--budget 86400` (24 h), three at a time, `RAYON_NUM_THREADS=4` each, with peak RSS recorded
+  (`remote/run_extension_remote.sh`). Same binaries, seeds, degree bound and host as Amendment 4.
+- *Reading:* the frozen verdicts (§5) are unchanged and stay computed on the frozen-budget rows. Extension
+  rows are reported separately, as completed counts or as lower bounds when they still time out. A system killed
+  for memory is censored.
+- *Order:* the extension starts after the Amendment 4 frozen-budget cells finish on the pod.
+- *Cost:* the ceiling for all pod time rises from $20 to $85, at the user's approval of about $50 more.
+
