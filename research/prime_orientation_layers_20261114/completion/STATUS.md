@@ -21,3 +21,12 @@ and public prime-field expected bit-cost obligations stay open.
 
 Add a dated final status and versioned report after actual replay exit.
 Keep original checkpoint files/pins exact.
+
+
+## Later component result
+
+Import-inclusive fresh replay now exits0; see [FINAL-STATUS.md](FINAL-STATUS.md)
+and its versioned final report. The earlier checkpoint status above remains
+historical. Source57/shared gate59/0 and all checkpoint pins are unchanged;
+separate cost5 remains outside that audit/replay. All records unsigned.
+[pcc:unverified]
