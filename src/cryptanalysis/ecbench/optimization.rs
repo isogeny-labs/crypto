@@ -518,12 +518,24 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.koblitz_descent",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_batched",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_descent_v2",
         NativeAdaptive,
         SpecializedDomain,
         StandardBand
     ),
     policy!(
-        "ic.koblitz_batched",
+        "ic.koblitz_batched_v2",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -1279,7 +1291,7 @@ mod tests {
         let profiles = profiles().unwrap();
         let profile = profiles
             .iter()
-            .find(|profile| profile.id == "ic.koblitz_batched")
+            .find(|profile| profile.id == "ic.koblitz_batched_v2")
             .unwrap();
         assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
         assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);

@@ -131,7 +131,9 @@ jobs:
   test:
     if: github.event_name == 'pull_request'
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 5
+    # Hosted checkout of the 312k-file tree can consume more than two minutes;
+    # keep enough of the job budget for the site and browser assertions.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
