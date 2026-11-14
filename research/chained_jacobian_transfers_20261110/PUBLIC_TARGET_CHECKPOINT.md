@@ -1,3 +1,15 @@
+# Arithmetic whole-data handoff and guard10 — 2026-11-14T05:11:56.257592+00:00
+
+Native8d0c27 oneunfilteredpass/all86exact/all225scalarpairs1125triples60ICpairs120reports/all15FB30failures/actualomittedhookpositive0negative101. Vectors8c2406 conserve7113rows:moreproducts/fewerinverses/unpriced, no computationaladvantage. Report03cfb7 THREEfinal92135BpagesALLviewed. Newread-only18thworkflow/new19source+self20/14positivephases/freshfull+ownCIawaitsourcepublication. Allunsigned. [pcc:unverified]
+
+pcc/claims/PCC-20261114-22f369.json:SIXwholecaptures+SIXcompleteindices+wholePDF+nativeXZ14objects/8genuineS3pending+6smallGit. 852file785full/862file17CI/84file21aftransport(all28members)/4016fileALLarithmeticattempts-layouts-binaries-failures/13filedrafts/225memberALL221pending sourcefiles+base584+patch/PCCledger/resume/report/nativewholebytes+aliases. ONLYprivate temporarydownloadreference excludedwithhash/fulloriginalprivatekept. No splitprune/policychange. Whole64744Bstagingreceipt/3948closedduplicatecopieshardlinked/allpathsbytesoriginals retained. [pcc:unverified]
+
+NEWguard10 HOLDS5263 CURRENTtransitiveinputs/FIVEPDF-native-linktypes andtargets untilactual8remote replays/genuinebotFF/finalguards+BOTHereposownedbytes. Historical09released5030allchecked/ONLYpostpublicationnormREADMEdelta mapped; old703/730/755physicaltreesretained butnotcurrentruntime. Normalrootpayloadpush/actualoriginalpublisher/exactFF/projections; thennormalconsumercommit/freshfull/own18CI andnextunblockedresearch. [pcc:unverified]
+
+Root124clock101/mainledger/signing/reviews/conflict/globalgeometry/beta/logextension/completecoldonlinecost/strongestrefs/livebudgetcapacity/vault8edec422locked/KB127 remain. No paidbenchmark ormergewaiver. [pcc:unverified]
+
+---
+
 # Sampling settled; arithmetic coverage in progress — 2026-11-14T04:01:01.399087+00:00
 
 Scientific consumer21afb40f has completed independent785-input replay333af1 and all17-source CI42073d:327 native records,60 unique canonical PCC digests,62 actual verdict records. Native9bc5e6 retains225 scalar pairs/1125triples/60ICpairs120reports/45 accepted correct perarm/all15publiccases and all15 shared FB30 failures. Writtene7a860/report510c8c are partial and unsigned. [pcc:unverified]
