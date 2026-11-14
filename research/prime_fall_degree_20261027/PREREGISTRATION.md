@@ -586,3 +586,51 @@ number is `[pcc:unverified]`.
   cannot do because it has no resume. These are stated in R2-G section 5 and get no special treatment in scoring.
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decisions 3, 4, 6, 8 and 9).
+
+## Amendment 16 (2026-11-14; stage B's execution route: one reserved RunPod CPU pod; before any stage B row exists)
+
+Route only. The text is the R3 draft (`research/pkm_falldegree_unblock_20261107/AMENDMENT_R3_RUNPOD.md`, commit 218b1226d1)
+narrowed to stage B, with the two changes listed under "Differences from R3". Every number is `[pcc:unverified]`.
+
+- **Numbering.** Amendment 15 is R2-G (stage B as resumable unit jobs), frozen in PR #4156, which was not merged when this
+  was written. This amendment is numbered 16 so that the two do not collide.
+- **Owner decision (2026-11-14, ~22:20Z, in session 01TCbLH6osebpnEbutNogBzD).** Asked which cells to run on reserved
+  RunPod pods, the owner chose "Stage B m=3–6", described in the question as replacing PR #4156's EKS unit-job route.
+  The EKS route had not started: card U1-1 stopped at its pool check (`AccountLimitExceededException`, commit 9ef0ddb37d
+  on PR #4156's branch).
+- **State before this run (measured).** No stage B row is admitted. The two `pfd-b` attempts were lost to Spot
+  interruptions, and their partial rows were never opened (`STAGE_B_LOST.md`). U1-1 never ran. The session that wrote
+  this has not seen any stage B row.
+- **What runs.** The registered stage B command as one job: `entry_r2.sh g1 hky-B d-B g3`. This is the same stages,
+  flags, budgets, limits, seeds and draws as `pfd-b` (Amendments 9–12), `RAYON_NUM_THREADS = 12`.
+  - Amendment 15's unit packing exists only to survive Spot interruptions, so it is not used on a reserved pod.
+  - The unit and single-job forms compute the same systems with the same budgets, with the ladder stop applied in-process
+    (R2-G §2).
+- **Host.** One reserved RunPod CPU pod (`interruptible: false`), base image `python:3.12-slim`, at least 56 GiB of memory
+  (the registered request). Its vCPU count, memory, `costPerHr` and id are recorded from the API's pod record and from
+  `host.txt`.
+- **Binaries.** The static musl builds of `f13a690df016d0a457bd40579fbb9d054f486adf`, rebuilt with the recipe of
+  `image/build_layer_r2.sh`.
+  - Every file must have the SHA-256 recorded in `image/image.json` (`study_binary_sha256`). The runner refuses to start
+    on any mismatch.
+  - `entry_r2.sh` runs byte-identical. Its `aws s3` calls go to the runner's shim, which copies into the pod's `/results`.
+- **Cost guard.** Owner decision 4 is unchanged: US$40 per job and US$400 for the study.
+  - A job whose `costPerHr × elapsed` reaches US$40 is stopped and recorded as censored-by-cost.
+  - The registered 172,800 s job limit also applies.
+- **Disclosure: wall-clock budgets depend on the host.**
+  - Every closure and F4 system carries a wall-clock `--budget` (1800 s). A host faster or slower than EKS's
+    `r6i.4xlarge` can therefore censor a different set of systems.
+  - Degrees and multiply-add counts do not depend on the host; whether a system finishes within its budget does.
+  - Each censored row is reported with its host, as §2 defines, and is never dropped.
+- **Disclosure: missing safeguards.** No S3 resume checkpoint could be pushed before launch: this container has no
+  checkpoint upload token and no AWS credentials. The `bench.record/v1` raw files are hashed into the record, and their
+  S3 upload is pending.
+- **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, draw, budget, `max_entries`, `max_cols`, binary or stage
+  changes. The t = 13/14 and `m = 4` cells are not part of this amendment.
+
+**Differences from R3.**
+1. Stage B only.
+2. The runner (`runpod/server.py`) gains a chunked upload endpoint. The RunPod HTTPS proxy rejects request bodies of a few
+   MB (measured in `research/runpod_kit_20261112/README.md`). The SHA-256 check before `/start` is unchanged.
+
+Registered per the owner's choice above.

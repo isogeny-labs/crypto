@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T1911Z-ic-key-chains-ab",
+  "latest_record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 163,
+    "measured": 167,
     "open": 0
   },
   "repo": "crypto",
@@ -880,6 +880,306 @@
           "spread": null,
           "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
           "value": 0.34
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.757,
+      "latest": 1.757,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_26b_t1000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.679,
+            1.813
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.757
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.43,
+      "latest": 1.43,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_28b_t3000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.349,
+            1.541
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.43
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.988,
+      "latest": 0.988,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_30b_t1000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.925,
+            1.044
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 0.988
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0,
+      "latest": 1.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_30b_t3000",
+      "points": [
+        {
+          "commit": "a95274095fec",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.931,
+            1.07
+          ],
+          "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
+          "value": 1.0
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.808,
+      "latest": 0.808,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.754,
+            0.845
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.808
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.989,
+      "latest": 0.989,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.911,
+            1.068
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.989
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.745,
+      "latest": 0.745,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.711,
+            0.785
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.745
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.606,
+      "latest": 0.606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.564,
+            0.642
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.606
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.809,
+      "latest": 0.809,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.759,
+            0.869
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.809
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.593,
+      "latest": 0.593,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.566,
+            0.624
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.593
         }
       ],
       "problem": "ecdlp-prime-multi-target",
@@ -2164,6 +2464,180 @@
     },
     {
       "better": "lower",
+      "first": 49.3937,
+      "latest": 49.3937,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 50.530639
+      },
+      "metric": "k1n23_pt_dim9_s_w01",
+      "points": [
+        {
+          "commit": "e4578bec2272",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 50.530639
+          },
+          "n": 40,
+          "record": "20261114T2126Z-k1-pair-table-dimension",
+          "reference": 0.9775,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+          "value": 49.3937
+        }
+      ],
+      "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 43.8958,
+      "latest": 43.8958,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 48.332746
+      },
+      "metric": "k1n23_pt_dim9_s_w0",
+      "points": [
+        {
+          "commit": "e4578bec2272",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 48.332746
+          },
+          "n": 40,
+          "record": "20261114T2126Z-k1-pair-table-dimension",
+          "reference": 0.9082,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+          "value": 43.8958
+        }
+      ],
+      "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 98.8753,
+      "latest": 98.8753,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 61.758463
+      },
+      "metric": "k1n23_pt_dim9_s_w1",
+      "points": [
+        {
+          "commit": "e4578bec2272",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 61.758463
+          },
+          "n": 40,
+          "record": "20261114T2126Z-k1-pair-table-dimension",
+          "reference": 1.601,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+          "value": 98.8753
+        }
+      ],
+      "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 3375.461,
+      "latest": 3375.461,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 735.010234
+      },
+      "metric": "k1n29_pt_dim10_s_w01",
+      "points": [
+        {
+          "commit": "e4578bec2272",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 735.010234
+          },
+          "n": 40,
+          "record": "20261114T2126Z-k1-pair-table-dimension",
+          "reference": 4.5924,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+          "value": 3375.461
+        }
+      ],
+      "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 3181.6462,
+      "latest": 3181.6462,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 708.54405
+      },
+      "metric": "k1n29_pt_dim10_s_w0",
+      "points": [
+        {
+          "commit": "e4578bec2272",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 708.54405
+          },
+          "n": 40,
+          "record": "20261114T2126Z-k1-pair-table-dimension",
+          "reference": 4.4904,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+          "value": 3181.6462
+        }
+      ],
+      "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 5119.7934,
+      "latest": 5119.7934,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 929.114656
+      },
+      "metric": "k1n29_pt_dim10_s_w1",
+      "points": [
+        {
+          "commit": "e4578bec2272",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 929.114656
+          },
+          "n": 40,
+          "record": "20261114T2126Z-k1-pair-table-dimension",
+          "reference": 5.5104,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+          "value": 5119.7934
+        }
+      ],
+      "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 0.459,
       "latest": 0.459,
       "latest_derived": {
@@ -2832,6 +3306,68 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.0638,
+      "latest": 0.0638,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.0638
+      },
+      "metric": "fpm_mid_ic_over_rho_g4_p4099_c_pre",
+      "points": [
+        {
+          "commit": "360fe03360a3",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.0638
+          },
+          "n": 12,
+          "record": "20261114T2047Z-genus-ladder",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.033,
+            0.135
+          ],
+          "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+          "value": 0.0638
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.64,
+      "latest": 0.64,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prefilter_rel_mul_ratio_g5",
+      "points": [
+        {
+          "commit": "360fe03360a3",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 60,
+          "record": "20261114T2047Z-genus-ladder",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.612,
+            0.673
+          ],
+          "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+          "value": 0.64
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
     },
     {
       "better": "lower",
