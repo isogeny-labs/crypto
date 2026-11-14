@@ -187,3 +187,20 @@ Same planted targets for both arms, 2 curves x 2 instances (n=4 rows per cell), 
 
 Reading: the symmetric multi-target IC loses to the batched folded rho for T up to about 1000 and is 2.0x-2.5x faster at T=3000 (28 and 30 bits); the crossover moves up slowly with size (about T=800 at 26 bits, about T=1100 at 28 bits, between 1000 and 3000 at 30 bits), consistent with the IC total growing about T^0.4 against rho about T^0.9.
 Not a claim: the IC arm is not retuned per T (a larger T wants a smaller relative setup, so the IC number is probably conservative), the rho is lightly tuned, one host, no isolation, no §5a band, and the comparison to a tuned, folded **BSGS** on j=0 curves is missing: on the a=-3 curves a tuned multi-target BSGS was 2x-4x ahead of the non-symmetric IC, and a x6-folded BSGS on j=0 would gain about sqrt(6), so the decisive comparator is still BSGS, not rho.
+
+## Experiment: folded multi-target BSGS on j=0 curves — the decisive comparator (2026-11-14) — `[pcc:unverified]`
+`examples/prime_fast_j0_bsgs_multi.rs`: multi-target BSGS folded by the order-6 automorphism group: baby table of the canonical orbit key of jG (j=1..m, open-addressing, 8-byte key + 5-byte value), giant steps P_i = Q_t - i*S (S = (2m+1) G) batched in lock-step across all unsolved targets (one inversion per round), a hit gives k = i*stride + (mu_j / mu') j with the stored/observed orbit multipliers, verified kG = Q for every target. m = MC * sqrt(T n / 6); MC tuned at 26 bits, T=1000 on the tuning curves (0.5 / 1.0 / 2.0: 15.8 / 14.2 / 15.0 ms, flat), MC=1 used throughout. Same curves and planted targets as the IC and rho arms; n=4 rows per cell, every target verified (36/36 rows).
+
+| bits | T | folded BSGS ms | sym multi IC ms (x BSGS) | batched folded rho ms (x BSGS) |
+|---|---|---|---|---|
+| 26 | 20 | 2.0 | 8.7 (4.4x) | 4.1 (2.1x) |
+| 26 | 200 | 5.0 | 20.2 (4.0x) | 14.1 (2.8x) |
+| 26 | 1000 | 10.9 | 70.4 (6.5x) | 80.0 (7.3x) |
+| 28 | 200 | 12.5 | 42.8 (3.4x) | 24.3 (1.9x) |
+| 28 | 1000 | 30.4 | 125.4 (4.1x) | 117.2 (3.8x) |
+| 28 | 3000 | 60.2 | 357.7 (5.9x) | 909.1 (15.1x) |
+| 30 | 200 | 27.3 | 95.2 (3.5x) | 42.9 (1.6x) |
+| 30 | 1000 | 58.7 | 303.2 (5.2x) | 191.4 (3.3x) |
+| 30 | 3000 | 132.8 | 836.6 (6.3x) | 1675.8 (12.6x) |
+
+Reading: the folded multi-target BSGS is the strongest implemented multi-target arm in every cell: 3.4x-6.5x ahead of the symmetric multi-target IC, and ahead of the batched folded rho by 1.6x-15x. The IC's advantage over the rho at T=3000 does not survive the right comparator, and the IC/BSGS gap grows with T and with size (4.4x -> 6.5x at 26 bits, T=20 -> 1000; 3.4x -> 6.3x at 28-30 bits, T=200 -> 3000), as the exponents predict (BSGS total about sqrt(T n), IC setup about p^(2/3) plus a per-target cost). So there is **no regime in this campaign where an IC arm beats the strongest implemented comparator**; the verified gain remains the single-target 2.0x-2.4x over the 3-summand `ic_solve` baseline. One host, toy sizes, no isolation, no §5a band: not a claim in either direction beyond this ordering of implemented arms.
