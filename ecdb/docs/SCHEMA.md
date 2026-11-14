@@ -290,7 +290,15 @@ After the Frobenius data, `import covers` computes the Richelot
     - `codomain_raw`: the splitting, Delta, the three brackets and f';
     - `external_id` = `richelot1_` and 16 hex digits of SHA-256(p, f, kernel);
     - status `proved` when p is proved prime.
-- **Idempotence.** The pass only inserts; a second import inserts 0 rows.
+- **Existing rows.** The pass only inserts (and fills a NULL Jacobian class
+  link). An image curve already stored must agree exactly with the computed
+  one (model f, `curve_zeta` counts, isogeny class); otherwise it is a problem
+  (`richelot_existing_conflicts`), the stored rows are left unchanged and no
+  isogeny is attached to it. After the insert, every isogeny sent must be
+  stored with exactly its source, target, kernel and formula; a stored row
+  with the same `external_id` and other content is a problem and is left
+  unchanged. A composite characteristic is skipped.
+- **Idempotence.** A second import inserts 0 rows (`tests/richelot_db.rs`).
 - **Pinned run** (throwaway cluster, registry + covers, pinned
   `covers.json`):
   - 126 sources with p < 2^14 (20,605 above, skipped as `field_too_large`);

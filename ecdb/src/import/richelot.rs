@@ -60,8 +60,14 @@
 //! [G1,G2] in `codomain_raw`. `external_id` is `richelot1_` and 16 hex digits
 //! of the SHA-256 of (p, f, kernel), so a re-import inserts nothing. Status
 //! `proved` when the characteristic is proved prime (always, for p < 2^14).
-//! Insert-only: nothing is updated or deleted; an existing curve with other
-//! counts is left alone and reported.
+//! Insert-only (plus filling a NULL Jacobian class link): nothing is
+//! overwritten or deleted. An image curve already stored must agree exactly
+//! (model f, `curve_zeta` counts, isogeny class); otherwise it is reported
+//! (`richelot_existing_conflicts`), left unchanged, and no isogeny is attached
+//! to it. After the insert every isogeny sent must be stored with exactly its
+//! source, target, kernel and formula; a row with the same `external_id` and
+//! other content is reported and left unchanged. A composite characteristic is
+//! skipped (`richelot_sources_skipped_composite_characteristic`).
 //!
 //! # Report
 //!
@@ -69,7 +75,8 @@
 //! `richelot_splittings`, `richelot_split_jacobians`, `richelot_images_verified`,
 //! `richelot_crosscheck_failures` (each also a problem), `richelot_curves`,
 //! `richelot_models`, `richelot_classes`, `richelot_jacobians_linked`,
-//! `richelot_zeta`, `richelot_isogenies`, `richelot_class_mismatches`.
+//! `richelot_zeta`, `richelot_isogenies`, `richelot_existing_conflicts`,
+//! `richelot_class_mismatches`.
 
 use super::cover_lpoly::{
     class_row, count_hyperelliptic_fp, count_hyperelliptic_fp2, Computed, Method, DIRECT_FP2_MAX,
@@ -456,6 +463,9 @@ pub fn richelot_images(p: u64, f: &[u64], stored: Option<(u64, u64)>) -> Result<
     if p >= MAX_P {
         return Err("field_too_large");
     }
+    if (3..).step_by(2).take_while(|d| d * d <= p).any(|d| p.is_multiple_of(d)) {
+        return Err("composite_characteristic");
+    }
     let f = trim(f.to_vec());
     if !(f.len() == 6 || f.len() == 7) {
         return Err("unsupported_degree");
@@ -632,6 +642,33 @@ JOIN ec.abelian_variety sa ON sa.curve_id = sc.id
 JOIN ec.abelian_variety ta ON ta.curve_id = tc.id
 ON CONFLICT DO NOTHING";
 
+/// Image curves whose stored row disagrees with the computed one: (k, what).
+const CURVE_CHECK_SQL: &str = "
+SELECT r.k::bigint, concat_ws(', ',
+         CASE WHEN c.id IS NULL THEN 'curve missing' END,
+         CASE WHEN c.id IS NOT NULL AND c.genus IS DISTINCT FROM 2 THEN 'genus' END,
+         CASE WHEN c.id IS NOT NULL AND hm.f IS DISTINCT FROM r.coefficients->'f' THEN 'hyperelliptic_model f' END,
+         CASE WHEN c.id IS NOT NULL AND z.point_counts::numeric[] IS DISTINCT FROM r.point_counts THEN 'curve_zeta point_counts' END,
+         CASE WHEN c.id IS NOT NULL AND av.isogeny_class_id IS DISTINCT FROM ic.id THEN 'isogeny class' END)
+FROM jsonb_to_recordset($1::jsonb) AS r(k int, field_id bigint, coefficients jsonb, label text, point_counts numeric[])
+LEFT JOIN ec.curve c ON c.field_id = r.field_id AND c.model = 'hyperelliptic' AND c.coefficients = r.coefficients
+LEFT JOIN ec.hyperelliptic_model hm ON hm.curve_id = c.id
+LEFT JOIN ec.curve_zeta z ON z.curve_id = c.id
+LEFT JOIN ec.abelian_variety av ON av.curve_id = c.id
+LEFT JOIN ec.isogeny_class_fq ic ON ic.label = r.label
+WHERE c.id IS NULL OR c.genus IS DISTINCT FROM 2 OR hm.f IS DISTINCT FROM r.coefficients->'f'
+   OR z.point_counts::numeric[] IS DISTINCT FROM r.point_counts OR av.isogeny_class_id IS DISTINCT FROM ic.id";
+
+/// Isogenies sent whose stored row is missing or has other content.
+const ISOGENY_CHECK_SQL: &str = "
+SELECT r.id
+FROM jsonb_to_recordset($1::jsonb) AS r(id text, source_id bigint, field_id bigint, coefficients jsonb, kernel jsonb)
+LEFT JOIN ec.isogeny i ON i.external_id = r.id
+LEFT JOIN ec.curve tc ON tc.id = i.target_curve_id
+WHERE i.id IS NULL OR i.source_curve_id IS DISTINCT FROM r.source_id OR tc.field_id IS DISTINCT FROM r.field_id
+   OR tc.coefficients IS DISTINCT FROM r.coefficients OR i.kernel_generators IS DISTINCT FROM r.kernel
+   OR i.formula IS DISTINCT FROM 'richelot' OR i.dimension IS DISTINCT FROM 2 OR i.degree IS DISTINCT FROM 4";
+
 const MISMATCH_SQL: &str = "
 SELECT i.external_id, sa.isogeny_class_id, ta.isogeny_class_id
 FROM ec.isogeny i
@@ -664,15 +701,12 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
         let f: Value = r.get(3);
         let f: Vec<String> =
             f.as_array().into_iter().flatten().filter_map(|x| x.as_str().map(str::to_string)).collect();
-        let pb = BigInt::from(p);
-        jobs.push(Job {
-            curve_id: r.get(0),
-            field_id: r.get(1),
-            p,
-            f,
-            stored_counts: r.get(4),
-            field_proved: is_probable_prime(&pb).1,
-        });
+        let (prime, certain) = is_probable_prime(&BigInt::from(p));
+        if !prime {
+            report.count("richelot_sources_skipped_composite_characteristic", 1);
+            continue;
+        }
+        jobs.push(Job { curve_id: r.get(0), field_id: r.get(1), p, f, stored_counts: r.get(4), field_proved: certain });
     }
     let outcomes = tokio::task::spawn_blocking(move || run_jobs(jobs)).await?;
 
@@ -718,8 +752,9 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
             let coefficients = json!({ "f": fs, "h": [] });
             let (inf_type, inf_pts) = infinity(p, &img.f);
             let id = external_id(p, &source_f, &img.kernel);
+            let k = curves.len();
             curves.push(json!({
-                "field_id": job.field_id, "coefficients": coefficients,
+                "k": k, "field_id": job.field_id, "coefficients": coefficients,
                 "equation": format!("y^2 = {}", poly_text(&fs, "x")),
                 "description": format!("Richelot (2,2)-isogenous to cover source curve id {} ({id})", job.curve_id),
                 "deg_f": img.f.len() - 1, "infinity_type": inf_type, "points_at_infinity": inf_pts,
@@ -736,7 +771,7 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
                 })
                 .collect();
             isogenies.push(json!({
-                "id": id, "source_id": job.curve_id, "field_id": job.field_id, "coefficients": coefficients,
+                "k": k, "id": id, "source_id": job.curve_id, "field_id": job.field_id, "coefficients": coefficients,
                 "kernel": kernel,
                 "codomain": {
                     "splitting": img.kernel.iter().map(quad_strs).collect::<Vec<_>>(),
@@ -776,7 +811,37 @@ pub async fn import(ctx: &Ctx<'_>, report: &mut Report) -> Result<()> {
     report.count("richelot_classes", bulk(client, super::cover_lpoly::CLASS_SQL, &class_rows, prov).await?);
     report.count("richelot_jacobians_linked", bulk1(client, LINK_SQL, &links).await?);
     report.count("richelot_zeta", bulk(client, ZETA_SQL, &curves, prov).await?);
+    // An image curve that was already stored (by this pass or any other) must agree exactly with what was
+    // computed: its model, its curve_zeta counts and its isogeny class. A disagreement is reported and no
+    // isogeny is attached to that curve; nothing stored is changed.
+    let mut refused = std::collections::BTreeSet::new();
+    for chunk in curves.chunks(super::BATCH) {
+        for r in client.query(CURVE_CHECK_SQL, &[&Value::Array(chunk.to_vec())]).await? {
+            let k: i64 = r.get(0);
+            let what: String = r.get(1);
+            refused.insert(k);
+            report.count("richelot_existing_conflicts", 1);
+            report.problem(format!(
+                "Richelot image {}: the stored curve disagrees with the computed one ({what}); no isogeny attached",
+                curves[k as usize]["description"].as_str().unwrap_or_default()
+            ));
+        }
+    }
+    let isogenies: Vec<Value> =
+        isogenies.into_iter().filter(|i| !i["k"].as_i64().is_some_and(|k| refused.contains(&k))).collect();
     report.count("richelot_isogenies", bulk(client, ISOGENY_SQL, &isogenies, prov).await?);
+    // Every isogeny sent is now stored with exactly this source, target, kernel and formula; a row with the
+    // same external_id and other content (left unchanged by ON CONFLICT DO NOTHING) is reported.
+    for chunk in isogenies.chunks(super::BATCH) {
+        for r in client.query(ISOGENY_CHECK_SQL, &[&Value::Array(chunk.to_vec())]).await? {
+            let id: String = r.get(0);
+            report.count("richelot_existing_conflicts", 1);
+            report.problem(format!(
+                "Richelot isogeny {id}: missing after insert, or a stored row with this external_id has another \
+                 source, target, kernel or formula; left unchanged"
+            ));
+        }
+    }
     let bad = client.query(MISMATCH_SQL, &[]).await?;
     report.count("richelot_class_mismatches", bad.len() as u64);
     for r in bad {
@@ -1003,6 +1068,17 @@ mod tests {
             }
         }
         assert!(above > 0, "no image above 2^12 in the sample");
+    }
+
+    /// A composite characteristic is refused before any arithmetic (inverses mod a composite are wrong).
+    #[test]
+    fn composite_characteristic_is_refused() {
+        let f = [4u64, 4, 3, 2, 0, 5, 1];
+        for n in [9u64, 15, 21, 25, 49, 91, 4095, 16383] {
+            assert_eq!(richelot_images(n, &f, None).unwrap_err(), "composite_characteristic", "n = {n}");
+        }
+        assert!(richelot_images(7, &f, None).is_ok());
+        assert!(richelot_images(16381, &f, Some((0, 0))).is_ok());
     }
 
     #[test]
