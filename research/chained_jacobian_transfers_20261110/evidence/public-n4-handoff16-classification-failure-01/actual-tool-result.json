@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "output": "Traceback (most recent call last):\n  File \"/workspace/scratch/ct74_prepare_norm_halving_handoff_16.py\", line 75, in <module>\n    assert all(row['original_policy_requires_store']for row in objects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "capture": "exact textual tool result retained; no separate shell caller logfile was created",
+  "cause": "unchanged root original policy keeps *.pdf; caller wrongly expected every object to require store",
+  "correction": "retain failed original report.pdf as ordinary Git evidence; publish exact unchanged PDF bytes as explicitly named opaque report-PDF.bin; no policy/tool change",
+  "scope": "preparation-only failure, not native or publisher negative"
+}
