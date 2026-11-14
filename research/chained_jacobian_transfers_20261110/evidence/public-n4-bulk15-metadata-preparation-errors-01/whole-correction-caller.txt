@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/ct74_correct_bulk_hold_15.py", line 48, in <module>
+    for row in objects:row['original_policy_requires_store']=mod.belongs_in_store(row['path'],row['bytes'],policy)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 157, in belongs_in_store
+    if size > policy["max_bytes"]:
+              ~~~~~~^^^^^^^^^^^^^
+KeyError: 'max_bytes'
