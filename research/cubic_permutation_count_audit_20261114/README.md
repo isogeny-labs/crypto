@@ -103,3 +103,5 @@ geometric supersingularity, p-rank/endomorphism/Hasse equivalences and full
 torsion-field identification remain open. A modular order statement is not
 an unproved full geometric torsion-inclusion statement. The original
 fourteen-item request remains partial. [pcc:unverified]
+
+Public replay snapshot: commit`1657db79a690ea94a2ae72868cb86b8b657b82ac` has tree`95da42198e748e655d6c275ce943ebc82d70260f`, identical to local receipt00e01a094c8c88386b860b9315b1f1ee187999f2. Completed anonymous fetch/tree comparison and fresh ready PR/body confirmation. See [publication metadata](publication.json). Signed standing remains unverified. [pcc:unverified]
