@@ -746,6 +746,7 @@ impl Arm {
         if let Some(a) = act {
             assumps.push(a);
         }
+        let is_owned = owned.is_some();
         let s: &mut CaDiCal = match owned.as_mut() {
             Some(s) => s,
             None => self.s.as_mut().unwrap(),
@@ -803,7 +804,7 @@ impl Arm {
         }
         let tot = [prev[0] - base[0], prev[1] - base[1], prev[2] - base[2]];
         let first = calls[0].1;
-        if let (Some(a), None) = (act, owned.as_ref()) {
+        if let (Some(a), false) = (act, is_owned) {
             s.clause1(-a);
         }
         drop(owned);
