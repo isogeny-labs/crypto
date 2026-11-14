@@ -25,8 +25,8 @@ pub struct SolveStats {
     pub max_row_len: usize,
 }
 
-/// Which elimination to run.  Both make identical pivot choices and do
-/// identical arithmetic; they differ only in bookkeeping (slice S2).
+/// Reference and Fast make identical pivots and perform identical arithmetic.
+/// Hybrid changes the elimination order and uses a dense residual block.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum Solver {
     /// The S1 solver, kept as the exactness reference.

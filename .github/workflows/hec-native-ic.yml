@@ -1,0 +1,19 @@
+name: Native hyperelliptic IC
+on:
+  pull_request:
+    paths:
+      - 'crates/hec-native-ic/**'
+      - '.github/workflows/hec-native-ic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --manifest-path crates/hec-native-ic/Cargo.toml -- --check
+      - run: cargo test --manifest-path crates/hec-native-ic/Cargo.toml
+      - run: cargo test --release --manifest-path crates/hec-native-ic/Cargo.toml
+      - run: cargo build --release --examples --manifest-path crates/hec-native-ic/Cargo.toml

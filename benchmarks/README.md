@@ -45,6 +45,13 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [14 November hyperelliptic IC follow-ups](20261114-hec-followups/)
+([PDF](20261114-hec-followups/REPORT.pdf)) record the hybrid residual solver, direct squarefree
+oracle and bounded genus-4 0/1/2-large-prime baseline. All 660 paired answers and 36 LP arms pass
+their checks. Median Hybrid/Fast solve ratio is 0.50–0.78 at genus2 p>=503; the direct oracle
+misses its threshold at genus4 p31, so the reference stays default. Unvalidated local L0 timing;
+external comparison not run. Record: `20261114T2210Z-hec-followups`.
+
 The [13 November native hyperelliptic IC engine and solver](20261113-hec-native-ic/)
 ([PDF](20261113-hec-native-ic/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of an engineering
 before/after on round eight's genus 2–4 rows, eleven rows at five seeds each. The rows are named by

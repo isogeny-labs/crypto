@@ -38,7 +38,7 @@ impl Default for IcParams {
             max_trials: 50_000_000,
             seed: 20260916,
             solver: Solver::default(),
-            reference_oracle: false,
+            reference_oracle: true,
         }
     }
 }
