@@ -2,9 +2,9 @@
 
 - **Status:** `investigating`
 - **Kind:** empirical bottleneck and implementation gap
-- **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [external XOR handoff](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/PROTOCOL.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md)
+- **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [K2048 native XCNF gate](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-xcnf-20261114/RESULT.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md), [separate a=1 cross-family panel](../research/n83_crossfamily_current_20261025/native/README.md)
 - **Next action owner:** N83 factor-base research task
-- **Last updated:** 2026-11-14 UTC; [native cadence-32 attempt 7](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-7/REPORT.md), [free-choice external CryptoMiniSat probe](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/external-cms-20261114/RESULT.md), [ordered XCNF replay](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-xcnf-20261114/RESULT.md), and [ordered external solver cap](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md)
+- **Last updated:** 2026-11-14 UTC; K2048 native evidence merged in [PR #4126](https://github.com/isogeny-labs/crypto/pull/4126), with a [separately frozen wide-XOR follow-up](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-wide-xcnf-20261114/RESULT.md); earlier [D18 ordered solver result](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md) remains a distinct cell
 
 ## Problem
 
@@ -27,6 +27,19 @@ requested selection criterion is minimum total index-calculus runtime,
 including setup and online phases, over the finite declared design grid.
 
 ## Evidence and uncertainty
+
+- **2026-11-14 K2048 m5 native gate [pcc:unverified]:** The retained
+  339,968-point, 2,048-column `a=0` base has a source-bound five-summand
+  positive XCNF that returned SAT in 839 conflicts and passed independent
+  original CNF/XOR, archive, subgroup, group-sum and relation-row replay.
+  One fixed public natural query on the same formula returned
+  `INDETERMINATE` at 1,000,001 conflicts after 137.753 seconds of local L0
+  process wall. The [merged report](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-xcnf-20261114/RESULT.md)
+  preserves the native receipts and earlier Python-orchestrated provenance.
+  The separately frozen `--maxmatrixcols 25000` [follow-up](../research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-wide-xcnf-20261114/RESULT.md)
+  stopped before its positive solver call: load samples 82.0376, 76.6616,
+  74.8535 exceeded the frozen maximum 24, with stable swapouts. Its public
+  natural arm remains withheld pending a fresh locked positive and replay.
 
 - **2026-11-14 D18 update:** A source-bound ordered-first-pair, cadence-32
   constructed control completed in 50.414 seconds with independent group,
@@ -83,10 +96,10 @@ criterion. A checked partial relation would resolve only the first gate.
 
 ## Next discriminating step
 
-- **Primary `a=0` action:** Freeze one new solver or encoding policy on the exact D18 input. Require a complete positive model and original-XCNF plus group replay before any public natural query. Keep all first-pattern and native cadence-32 caps as separate candidate cells.
+- **Primary `a=0` action:** When host load qualifies, commit a fresh output lock for the K2048 exact-formula wide-XOR positive and independently replay its original XCNF and group row before releasing one public natural query. Keep the K2048 and full-D18 encodings, arities, bases and capped outcomes as separate candidate cells. A later D18 solver-policy change requires its own positive gate.
 - **Inputs and controls:** Bind the exact compressed S3 object and provider checksums, pilot public corpus, target point, positive model, formula bytes, solver binary, source commit, and resource caps before timing.
 - **Execution limits:** Retain `INDETERMINATE`, timeout, OOM, and producer failure as terminal rows without assigning zero cost or natural yield. A checked natural relation advances to multi-query yield and rank measurement.
-- **Cross-curve action:** The separately identified `a=1` 53-bit-subgroup panel needs its own admissible route, same-point IC/rho replay, and total-cost selection. Do not pool its data with this primary `a=0` subgroup.
+- **Cross-curve action:** The distinct `a=1` 53-bit-subgroup [current-source panel](../research/n83_crossfamily_current_20261025/native/README.md) freezes K3300, K3450, K3500 and K3596 on 16 unseen public points with paired same-point IC/rho and separate online/cold selectors. Its owner-approved `us-east-1a` two-instance Spot route with security group `sg-030ffadf6a62d2ce2` remains price-gated: the latest 2026-11-14 read-only quote was $0.396900/hour against the $0.27 bid, though placement scored 7 for two units. No allocation has occurred. Do not pool its data with the primary `a=0` subgroup.
 - **Recheck trigger:** A changed solver or encoding with a positive pass, a checked natural relation, a completed matched panel, or a qualified cloud route for the `a=1` comparison.
 
 ## Resolution and history
