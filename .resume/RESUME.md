@@ -1,3 +1,17 @@
+# Whole report PNG and source checkpoint publication active — 2026-11-14T10:09:46.899356+00:00
+
+Native3f1ade/threeunfilteredpasses/all845guards0/all448exceptionals; conditionalgroup1e2420/original44declgates andIntd0400f/original1declgates/sevenbindings73partialunique; correctedreal-sitecounts[16,16]Phi/[1,1]origins/[8,8]isogenies withlegacy32actual101/fullthree-accounting-pathaudit/noothermathchanges. Reportf4a048 finalTWO48469BpagesALLviewed/frozen. [pcc:unverified]
+
+Sourcegov582599 passesallrecordedgates exceptartifact1 onwhole151899BPNG. NEWguard12: unchangedgenuinepublisher forwholePNG,completeALLpendingconsumer-source+StageC-runcheckpoint,andwholecurrentguardmap. Preserve PNG/PCCsubjects/nativegoldens/no policyexceptions. HOLD scientificcurrent881+self882/previous5268paths+latestphysicalreplay/stagedproofs andbothrepoownedbytes untilactualremotereplays/exactbotFF/terminalguards. No sourceedits duringhold. [pcc:unverified]
+
+Afterrelease projectgenuinePNGentryinto consumerreportmanifest/preservephysicalbytes; commitcompleteC20source; freshphysical882guardfull/freshoutsidecache andown20automaticCI/currentoriginalcheckpoint. UseCargo-reported executablepaths rather thanoldhardcodedunitname. ThenALLotherclosedcaptures ca9full/CInegative/helpercontrol/398CI/A-Bcomponents/C77fullcache+ownCI andnewcompletefull/CI underNEWguard13. CurrentStageC source/proof/native/reportattempts areincludedwholeinthischeckpoint. [pcc:unverified]
+
+Source consumerparent44df/rootparent556. No localscienceinflight. Root124clock101/mainledger/signing/reviews/conflict andlivebudgetcapacity/matchingimage/calibratedcost gates persist. Vault8edec422locked/KB127. Continueaftereachrung; no mergewaiver orpaidcompute. [pcc:unverified]
+
+Root handoff pcc/claims/PCC-20261114-34cea6.json / guard12 6210 / threewholeobjects; archive631members. Publisherpending, no scienceedits. [pcc:unverified]
+
+---
+
 # Arithmetic replay settled; matched beta descent next — 2026-11-14T06:20:42.843821+00:00
 
 pcc/claims/PCC-20261114-85dc6a.json: consumer ca9b0626 source normalpublished0; fresh386296 all14orderednative/tee0/0/oneunfilteredpass/all86frozenwalls/entire7113-rowcensus+allmetadata EXACT/NOMASKS/final21+self/original785/derivedguards0. Native8d0c27/vectors8c2406/report03cfb7 THREEinspected92135Bpages remain immutable. Allunsigned. [pcc:unverified]
