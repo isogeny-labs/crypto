@@ -520,3 +520,58 @@ text, with its evidence, its disclosure and the independent review, is
   (Amendments 8 and 13) are not touched. No hypothesis, §6 rule, cell, seed or cap changes.
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decisions 3, 4 and 6).
+
+## Amendment 15 (2026-11-14; execution route only; before any job runs on it): reserved RunPod CPU pods
+
+The owner's instructions of 2026-11-14 were "unblock the fall-degree study and root solver. Run this on runpod", then "do the
+isogeny arm at P1 first". The full text, its evidence and three rounds of independent review
+(`research/pkm_falldegree_unblock_20261107/REVIEW_R3_R4.md`, SHA-256 `59fd58bc7fb4…`) are in
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R3_RUNPOD.md`, revision 3, SHA-256
+`d04aec5fa9f4e6376b26c56b00ddefc0c0989c2672b0785054fd76a4c643bcc3`. That file is binding. The essentials are restated here:
+
+- **What runs.** Registered jobs may run on reserved (`interruptible false`) RunPod CPU pods: 12 vCPU, `cpu5m` or `cpu3m`, image
+  pinned by digest. Only Amendment 16's jobs are on this route. The Kummer retries (`pfd-x-t13-k0-c6`, stage B) and the
+  `t = 14` and `m = 4` cells need the owner's answer first.
+- **Runner** (`runpod/server.py`, SHA-256 `85e8784de26a…`; client `runpod/rp.sh`, SHA-256 `e4eee3a7b47d…`). It refuses a job
+  whose files do not match their pins, which has no time limit, whose cost at the limit plus 4 hours idle exceeds the per-job
+  ceiling at the pod's live price, whose memory is below the request, which has fewer than 12 CPUs, whose `oom_kill` counter
+  is unreadable, or whose results directory is not empty. It kills a job at its registered time limit, with exit `deadline`.
+- **Results** live on the pod volume, are fetched with a per-file SHA-256 manifest, and go to S3 by hash. No job starts while S3
+  upload is unavailable.
+- **Not changed:** hypotheses, §6 rules, cells, seeds, draws, caps, budgets, limits, binaries, stages.
+- **Ceilings.** Applying decision 4's ceilings (US$40 per job, US$400 for the study), written for Spot compute, to reserved pods
+  needs the owner's confirmation. No job starts on this route before that confirmation, and before the owner confirms the
+  account balance once.
+- **Losses** are recorded with their reason. Attempts are counted per cell across routes, and the next attempt needs owner
+  authority.
+
+## Amendment 16 (2026-11-14; before any isogeny row at `P1` exists): the 2-isogeny arm at `P1`
+
+The full text is `research/pkm_falldegree_unblock_20261107/AMENDMENT_R4_ISOGENY_P1.md`, revision 4, SHA-256
+`21f65d61bf1f4cca77772d921293fd3caee2c8e38c0d27463286c2ebe6cfacaa`. That file is binding, including its disclosure (§0)
+of everything seen before it was written. The essentials are restated here:
+
+- **Arm.** The 2-isogeny `m = 2` arm runs at `P1 = 2013265921`, `t = 1..13`. The pilot is frozen f13a690df0 plus
+  `gaux/aux_order_f13a690df0.patch` (`--aux-order mestre`: exact `#E'` by Mestre on `E'` and its twist, with a private stream,
+  so the same seed selects the same tower). Binary `pkm_tower_pilot_r4` has SHA-256 `705b151b6f35…`; `RAYON_NUM_THREADS=12`.
+- **Pinned job set.** `iso/PINS.json`, SHA-256 `f02c03dd95a861c51cd30d4dc0ff941590ee3880f18016092d3d33af1778a6da`, and
+  `iso/BUNDLE.sha256`, SHA-256 `557ceba4d3cf46b58c7af49477300600d214182eff47713b3cd2b8565eed24ff`. Every argv is in
+  `iso/entry_iso.sh`, and every job's bundle must match these pins on the pod.
+- **Gates.**
+  - G-AUX (16 `P0` draws, field-by-field equality) as the first stage of every job;
+  - G1;
+  - G2;
+  - G3 through `iso/pilot_mestre.sh`;
+  - stop on a Mestre panic;
+  - an independent naive recount of every selected auxiliary curve after the run.
+- **Decomposability.** Every draw is certified by `iso/certify_m2.py` (exact `V × V` count). Decomposable draws are excluded.
+- **Readings.** By `iso/score_iso.py` as committed in the bundle:
+  - P-ISO-1: transfer of the `P0` medians at `t = 1..8`;
+  - P-ISO-2: "flat at 5", "grows", "below 5" or "undecided" at `t = 9..13`, with range aggregation;
+  - lower median, certified admission, both draws per cell;
+  - any conflict stops R4.
+- **Not an improvement claim.** A "flat at 5" reading is a solving-degree description. It does not separate a Semaev-specific
+  effect from a tower-ring effect. It is not an improvement over the index-calculus baseline, which also needs the relation
+  cost, the auxiliary search and matched rho.
+- **Preconditions for the first job:** Amendment 15's (owner ceilings and balance); S3 working, with `705b151b…` in the
+  artifact store and a resume checkpoint and `bench.record/v1` written. No `P1` isogeny row existed when this was frozen.
