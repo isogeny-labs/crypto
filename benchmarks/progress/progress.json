@@ -5,7 +5,7 @@
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 156,
+    "measured": 158,
     "open": 0
   },
   "repo": "crypto",
@@ -2760,6 +2760,162 @@
     },
     {
       "better": "lower",
+      "first": 0.013434,
+      "latest": 0.013434,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "fes_f2_cpu_solver_s_per_call_koblitz_n23",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.013434
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000484,
+      "latest": 0.000367,
+      "latest_derived": {
+        "improvement_vs_first_percent": 24.1736,
+        "improvement_vs_previous_percent": 24.1736
+      },
+      "metric": "fes_f2_gpu_solver_s_per_call_char2_n25",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.000484
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 24.1736,
+            "improvement_vs_previous_percent": 24.1736
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 0.000367
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.001543,
+      "latest": 0.001443,
+      "latest_derived": {
+        "improvement_vs_first_percent": 6.4809,
+        "improvement_vs_previous_percent": 6.4809
+      },
+      "metric": "fes_f2_gpu_solver_s_per_call_char2_n29",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.001543
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 6.4809,
+            "improvement_vs_previous_percent": 6.4809
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 0.001443
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.000236,
+      "latest": 0.000129,
+      "latest_derived": {
+        "improvement_vs_first_percent": 45.339,
+        "improvement_vs_previous_percent": 45.339
+      },
+      "metric": "fes_f2_gpu_solver_s_per_call_koblitz_n23_t2",
+      "points": [
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 0.000236
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 45.339,
+            "improvement_vs_previous_percent": 45.339
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 0.000129
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
       "first": 0.0001635,
       "latest": 0.0001635,
       "latest_derived": {
@@ -3120,9 +3276,10 @@
     {
       "better": "lower",
       "first": 38.7,
-      "latest": 38.7,
+      "latest": 15.17,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 60.801,
+        "improvement_vs_previous_percent": 13.0659
       },
       "metric": "whole_solve_wall_s_char2_n29_fes_f2_gpu",
       "points": [
@@ -3139,6 +3296,36 @@
           "spread": null,
           "summary": "fes-f2-gpu (gpu/fes serve worker as the descent solver) end to end on an A100: identical calls, hit rate and counted S to fes-f2; whole solve 12.3x/44.1x faster than fes-f2 at 24/26 unknowns and 23.1x faster than inherited-f4 at 30; counted S unchanged (inherited-f4 stays cheapest). [pcc:unverified]",
           "value": 38.7
+        },
+        {
+          "commit": "6128d645d65d",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 54.9096,
+            "improvement_vs_previous_percent": 54.9096
+          },
+          "n": 2,
+          "record": "20261114T0436Z-ic-fes-gpu-overhead",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+          "value": 17.45
+        },
+        {
+          "commit": "40587624bb57",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 60.801,
+            "improvement_vs_previous_percent": 13.0659
+          },
+          "n": 2,
+          "record": "20261114T0528Z-ic-fes-gpu-binary-protocol",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Binary serve protocol and single-copy CUDA I/O on top of main's fes_pack_direct: fes-f2-gpu solver time per call 7% (30 unknowns) to 15% (26) lower, 37% on the second Koblitz-23 target; counted ops identical. [pcc:unverified]",
+          "value": 15.17
         }
       ],
       "problem": "ic-gpu-kernels",
