@@ -1,3 +1,11 @@
+# Whole model/third-edge publication18 settled
+
+Actual0e8aa2/consumer85aac5: original43627710330/job132547213547SUCCESS/EIGHTremote replays BEFORE3a689cf8b/directc350/EXACT10paths, ninth134690BmemberindexplainGitunchanged. All24853guards/all24445priorkeys/23links/ownedbytes retained; originalfetch-FF-artifact-wiring0/HOLD18RELEASED. All20closedroots/416wholemembers/actualbinaries/source/failures/nativefixtures/stdouts/pending4metadatafiles+immutableb77Gitbase genuinelypublished. SIXcanonicaldocsoriginalentrydicts/SIXtransparentconsumerlinks exactbytes; no newremote-read/scientificstandingclaim. [pcc:unverified]
+
+Negatives27fb3a and6d2c97 preserve smooth quartics but unsupported supplied-source identification atD12/D24; finiteproof68cd8c/ee88e7 scopedto223residues, inspectedreports14b605/a1ee6b. Next strict22ndpreflightreplay/physicalsource/ownCI, thennewprospective observer-bookkeeping remedy forincompletecoldcensus. Futurelarge data needsNEW19. Original343/929inputs/prior21workflows unchanged; global/main/root/benchmark/vault/KB constraints remain. No paidlaunch/waiver/advantage. [pcc:unverified]
+
+---
+
 
 
 # Whole model / fixed third-edge handoff18 ready
