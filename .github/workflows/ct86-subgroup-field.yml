@@ -1,4 +1,4 @@
-name: "CT86–91 subgroup tower, CRT and full binary torsion (bounded)"
+name: "CT86–92 subgroup tower, CRT, binary torsion and source-prime densities (bounded)"
 on:
   push:
     branches:
@@ -10,6 +10,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct89/**"
       - "research/cross_characteristic_global_torsion_20261112/ct90/**"
       - "research/cross_characteristic_global_torsion_20261112/ct91/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct92/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - "research/cross_characteristic_global_torsion_20261112/ct89/**"
       - "research/cross_characteristic_global_torsion_20261112/ct90/**"
       - "research/cross_characteristic_global_torsion_20261112/ct91/**"
+      - "research/cross_characteristic_global_torsion_20261112/ct92/**"
       - ".github/workflows/ct86-subgroup-field.yml"
   workflow_dispatch:
 
@@ -117,3 +119,18 @@ jobs:
           cmp /tmp/ct91-py.json /tmp/ct91-jsopt.json
           printf '%s  %s\n' 380218d31be6e794362d2f362725da5037d4e15264361ae2d61f082101aa3790 /tmp/ct91-py.json | sha256sum -c
           cat /tmp/ct91-py.json
+
+      - name: Verify CT92 exact Chebotarev source-place counts in two independent implementations
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct92
+          python3 -B "$D/ct92_prime_density.py" > /tmp/ct92-py.json
+          python3 -O -B "$D/ct92_prime_density.py" > /tmp/ct92-opt.json
+          node "$D/ct92_prime_density_independent.js" > /tmp/ct92-js.json
+          node --no-opt "$D/ct92_prime_density_independent.js" > /tmp/ct92-jsopt.json
+          cmp /tmp/ct92-py.json /tmp/ct92-opt.json
+          cmp /tmp/ct92-py.json /tmp/ct92-js.json
+          cmp /tmp/ct92-py.json /tmp/ct92-jsopt.json
+          printf '%s  %s\n' f813e26c75d9a70835246b6cf1ba2d34a1bb9b2181d533c8b31453af88fc4506 /tmp/ct92-py.json | sha256sum -c
+          cat /tmp/ct92-py.json
