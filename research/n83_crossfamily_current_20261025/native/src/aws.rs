@@ -23,7 +23,10 @@ pub const BUCKET_REGION: &str = "us-east-1";
 pub const PROJECT_TAG: &str = "N83HighKCurrent";
 pub const CAP_SECONDS: u64 = 21600;
 pub const BID_USD_HOURLY: &str = "0.31";
-pub const BID_PROJECTION_USD: &str = "3.85";
+pub const BID_PROJECTION_USD: &str = "4.15";
+const RESULT_ARCHIVE_MAX_BYTES: u64 = 3 * 1024 * 1024 * 1024;
+const STATUS_ARCHIVE_MAX_BYTES: u64 = 256 * 1024 * 1024;
+const SOURCE_ARCHIVE_MAX_BYTES: u64 = 64 * 1024 * 1024;
 const AMI_PARAMETER: &str =
     "/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id";
 
@@ -51,6 +54,9 @@ fn checked_source(root: &Path, directory: &Path) -> Result<Value> {
     fixture(root)?;
     arms(root)?;
     let bundle = bundle::verify(directory, None)?;
+    if fs::metadata(directory.join("source.tar.gz"))?.len() > SOURCE_ARCHIVE_MAX_BYTES {
+        return Err("source archive exceeds cross-region transfer budget".into());
+    }
     let head = Command::new("git")
         .args(["rev-parse", "HEAD"])
         .current_dir(root)
@@ -110,9 +116,14 @@ fn check_budget() -> Result<()> {
     if CAP_SECONDS != 21_600 {
         return Err("six-hour deletion guard differs".into());
     }
-    // Two hosts for six hours, plus the frozen $0.08 root-disk and
-    // $0.05 S3 allowances. Keep the projection below the $4.20 cap.
-    let projected_cents = 2 * 6 * cents + 8 + 5;
+    // Two hosts for six hours, $0.08 disks, $0.05 S3, and $0.30 for
+    // at most 6.625 GiB of cross-region source/results/status transfer.
+    let transfer_bytes =
+        2 * (RESULT_ARCHIVE_MAX_BYTES + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES);
+    if transfer_bytes > 7 * 1024 * 1024 * 1024 {
+        return Err("cross-region transfer envelope exceeds allowance".into());
+    }
+    let projected_cents = 2 * 6 * cents + 8 + 5 + 30;
     if projected_cents > 420
         || format!("{}.{:02}", projected_cents / 100, projected_cents % 100) != BID_PROJECTION_USD
     {
@@ -255,7 +266,13 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         "source_manifest_sha256":bundle["source_manifest_sha256"],
         "spot_quota_vcpus":quota_value,"cap_seconds":CAP_SECONDS,
         "root_disk_gb_per_host":50,"gp3_usd_per_gb_month":"0.08",
-        "s3_allowance_usd":"0.05","projected_at_bids_usd":BID_PROJECTION_USD,
+        "s3_allowance_usd":"0.05","cross_region_transfer_allowance_usd":"0.30",
+        "cross_region_transfer_max_bytes":2 * (RESULT_ARCHIVE_MAX_BYTES
+            + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES),
+        "result_archive_max_bytes_per_host":RESULT_ARCHIVE_MAX_BYTES,
+        "status_archive_max_bytes_per_host":STATUS_ARCHIVE_MAX_BYTES,
+        "source_archive_max_bytes_per_host":SOURCE_ARCHIVE_MAX_BYTES,
+        "projected_at_bids_usd":BID_PROJECTION_USD,
         "total_cap_usd":"4.20","zones":[zone(0),zone(1)]});
     let mut file = OpenOptions::new()
         .write(true)
@@ -286,6 +303,12 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
         || plan["source_manifest_sha256"] != bundle["source_manifest_sha256"]
         || plan["cap_seconds"] != CAP_SECONDS
         || plan["root_disk_gb_per_host"] != 50
+        || plan["cross_region_transfer_allowance_usd"] != "0.30"
+        || plan["cross_region_transfer_max_bytes"]
+            != 2 * (RESULT_ARCHIVE_MAX_BYTES + STATUS_ARCHIVE_MAX_BYTES + SOURCE_ARCHIVE_MAX_BYTES)
+        || plan["result_archive_max_bytes_per_host"] != RESULT_ARCHIVE_MAX_BYTES
+        || plan["status_archive_max_bytes_per_host"] != STATUS_ARCHIVE_MAX_BYTES
+        || plan["source_archive_max_bytes_per_host"] != SOURCE_ARCHIVE_MAX_BYTES
         || plan["projected_at_bids_usd"] != BID_PROJECTION_USD
         || plan["total_cap_usd"] != "4.20"
         || plan["zones"].as_array().is_none_or(|zones| {
@@ -442,6 +465,14 @@ fn user_data(
     let values = [
         ("N83_STRATUM", stratum.to_string()),
         ("N83_CAP_SECONDS", CAP_SECONDS.to_string()),
+        (
+            "N83_RESULT_ARCHIVE_MAX_BYTES",
+            RESULT_ARCHIVE_MAX_BYTES.to_string(),
+        ),
+        (
+            "N83_STATUS_ARCHIVE_MAX_BYTES",
+            STATUS_ARCHIVE_MAX_BYTES.to_string(),
+        ),
         ("N83_SOURCE_GET_URL", links.source_url.to_owned()),
         ("N83_MANIFEST_GET_URL", links.manifest_url.to_owned()),
         ("N83_RESULTS_PUT_URL", links.result_url.to_owned()),

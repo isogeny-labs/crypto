@@ -13,8 +13,9 @@ The owner-approved route remains `us-east-1a` under the
 a separate [west-2b proposal](AWS_WEST2B_PROPOSAL_20261114.md) for the same
 single allocation. Its controller binds two `g5g.4xlarge` Spot instances in
 `us-west-2b`, each with a proposed $0.31/hour maximum bid, 50 GB encrypted
-gp3 root disk, and a 21,600-second lifetime. The six-hour bid projection is
-$3.85 under the owner's $4.20 allocation cap. The host shutdown timer and an
+gp3 root disk, and a 21,600-second lifetime. The six-hour bid projection,
+including a bounded cross-region S3 transfer allowance, is $4.15 under the
+owner's $4.20 allocation cap. The host shutdown timer and an
 independently detached local termination guard retain their outcomes.
 
 This native proposal extends the east-region AWS protocol at commit
@@ -45,10 +46,13 @@ provider price and placement gate immediately before mutation. The
 controller receipt and source manifests retain exact SHA-256 values. Do
 not put presigned URLs, AWS credentials, or EC2 user data in a PR or log.
 The raw result archives and host status objects remain outside the tree
-until independently collected and verified.
+until independently collected and verified. Each host limits raw upload to
+3 GiB and final status upload to 256 MiB; a cap failure is retained in the
+versioned status archive.
 
-After both uploads appear, collect exact S3 object versions and request
-early termination. Then replay each extracted result independently from
+After both final status uploads appear, collect exact S3 object versions and
+request early termination. A missing raw archive remains an explicit failure
+in the collection receipt. Then replay each extracted result independently from
 the committed source and select from the local analyses:
 
 ```sh

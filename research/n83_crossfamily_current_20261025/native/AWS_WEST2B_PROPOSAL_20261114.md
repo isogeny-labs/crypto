@@ -14,8 +14,20 @@ Spot bid; it does not authorize another allocation.
 | Instance allocation | Two distinct `g5g.4xlarge` Spot instances, 50 GB encrypted gp3 root disk each |
 | Placement and price gate | Live score at least 3 for two units; latest `Linux/UNIX` quote at most $0.31 per instance-hour |
 | Runtime guards | 21,600-second host shutdown and an independent detached local EC2 termination guard |
-| Bid-based projection | `2 × 6 × $0.31 + $0.08` disks `+ $0.05` S3 = **$3.85**, below the frozen $4.20 cap |
+| Bid-based projection | `2 × 6 × $0.31 + $0.08` disks `+ $0.05` S3 `+ $0.30` cross-region transfer = **$4.15**, below the frozen $4.20 cap |
 | S3 bucket | Existing `aburan28-n83-tier1-20261016-590183823895` in `us-east-1`; S3 calls and presigned URLs bind that bucket region |
+
+The west-2 hosts transfer data to and from the east-1 bucket. The controller
+caps each source archive at 64 MiB; the host caps each raw result archive at
+3 GiB and each final status archive at 256 MiB before upload. The combined
+two-host ceiling is 6.625 GiB, or less than 7.12 decimal GB. The $0.30
+allowance covers that ceiling at a conservative $0.04 per decimal GB. The
+controller refuses a larger source archive. A host that exceeds either output
+cap uploads a bounded status archive recording `ARCHIVE_CAP`; collection
+retains a versioned status-only failure and requests early termination after
+both final statuses arrive. The $0.05 S3 allowance separately covers storage
+and API requests. This transfer allowance is a protocol budget bound, not an
+observed AWS invoice. Recheck live provider costs before allocation.
 
 At the 2026-11-14 UTC read-only observation, the two-unit placement score was
 7, the latest zone quote was $0.290500 per instance-hour, the subnet was
@@ -37,5 +49,5 @@ separate exact solver panel and cannot be inferred from this `a=1` panel.
 
 No S3 or EC2 mutation belongs to preparation of this proposal. Owner
 approval must explicitly replace the `us-east-1a` route with this `us-west-2b`
-route and allow the $0.31 per-instance-hour bid under the same one-pair,
+route and allow the $0.31 per-instance-hour bid and $0.30 transfer allowance under the same one-pair,
 $4.20 cap.
