@@ -18,6 +18,10 @@ vs new (this branch, binary serve) on koblitz-n23 (fes-f2, fes-f2-gpu), char2-n2
 ## State
 2026-11-14 05:00Z: done; pod deleted; record 20261114T0436Z-ic-fes-gpu-overhead closed; REPORT.md; PR open.
 
+## Second A/B (after merging main)
+main (3e432229fc: the other session's fes_pack_direct, text serve) vs merged (this branch: + --serve-bin,
+single-copy CUDA I/O), job2.sh, ABBA; isolates the binary protocol on top of main.
+
 ## Runs in flight
 Pods icgpu-*; research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
 
