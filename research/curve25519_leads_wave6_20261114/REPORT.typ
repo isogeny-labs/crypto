@@ -49,12 +49,13 @@ ran the out-of-sample test under a frozen micro-protocol (`sdrule/`).
   − c with Curve25519\'s shape (p ≡ 5 mod 8, p − 1 \= 4·3·q·C with q
   small and C prime, v₂(p + 1) \= 1) and a cyclic cofactor-8 Montgomery
   curve with a prime twist cofactor: k \= 20 gives p \= 2^20 − 315, A \=
-  383; k \= 24 gives p \= 2^24 − 75 (curve search running at the time of
-  writing, §4). No such prime exists at k \= 16, 18 (c \< 60,000) or k
-  \= 22 (c \< 4,000). On the k \= 20 member the only subgroup orders
-  below 17,471 are the divisors of 60, against the lab\'s family
-  member\'s rich set of divisors of 4·3³·7·19·73. Every verdict of the
-  exponent studies was measured on the smooth family \[pcc:unverified\].
+  383; k \= 24 gives p \= 2^24 − 75, A \= 667 (\#E \= 8 × 2,096,791,
+  twist 4 × 4,194,989). No such prime exists at k \= 16, 18 (c \<
+  60,000) or k \= 22 (c \< 4,000). On the k \= 20 member the only
+  subgroup orders below 17,471 are the divisors of 60, against the
+  lab\'s family member\'s rich set of divisors of 4·3³·7·19·73. Every
+  verdict of the exponent studies was measured on the smooth family
+  \[pcc:unverified\].
 + #strong[The torus census closes the \"other tori\" question for the
   real curve.] Across the tori of degree 1 to 12 the largest subgroup
   whose prime factors stay below 2^20 has about 1.3 × 10^10 elements
@@ -334,9 +335,6 @@ member has p + 1 \= 2 × 524,131 and subgroup orders 1, 2, 3, 4, 5, 6,
 - The `sdrule` cells are an engine measurement with a frozen protocol
   but no benchmark record, Conductor task, resume checkpoint or
   validator; the claimed quantity is the solving degree only.
-- The faithful family\'s k \= 24 curve search was still running when
-  this README was written; its result is appended to
-  `checks/faithful_family.out.txt` when it finishes.
 - No model identifiers appear in committed files; the lanes ran on a
   different tier from the agents\' defaults.
 
