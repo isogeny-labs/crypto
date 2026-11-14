@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T1854Z-j0-multirho-dp-tune",
+  "latest_record": "20261114T1855Z-ic-gpu-rootfind-lookup",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 160,
+    "measured": 162,
     "open": 0
   },
   "repo": "crypto",
@@ -3324,6 +3324,87 @@
       ],
       "problem": "ic-gpu-kernels",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.01773,
+      "latest": 0.01773,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_best_s_f1024",
+      "points": [
+        {
+          "commit": "1e757ab55112",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T1855Z-ic-gpu-rootfind-lookup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind lookup variants (Eytzinger search, packed hash slots, paired lookups), all on: 1.115x (|F|=65536) and 1.121x (|F|=1024) at each workload's best configuration on an A100, faster than main at all 12 configurations, identical relations (device selftests). Kernel component, [pcc:unverified].",
+          "value": 0.01773
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.36019,
+      "latest": 0.36019,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_best_s_f65536",
+      "points": [
+        {
+          "commit": "1e757ab55112",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T1855Z-ic-gpu-rootfind-lookup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind lookup variants (Eytzinger search, packed hash slots, paired lookups), all on: 1.115x (|F|=65536) and 1.121x (|F|=1024) at each workload's best configuration on an A100, faster than main at all 12 configurations, identical relations (device selftests). Kernel component, [pcc:unverified].",
+          "value": 0.36019
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.646,
+      "latest": 0.646,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rootfind_global_hash_c64_ratio",
+      "points": [
+        {
+          "commit": "1e757ab55112",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261114T1855Z-ic-gpu-rootfind-lookup",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rootfind lookup variants (Eytzinger search, packed hash slots, paired lookups), all on: 1.115x (|F|=65536) and 1.121x (|F|=1024) at each workload's best configuration on an A100, faster than main at all 12 configurations, identical relations (device selftests). Kernel component, [pcc:unverified].",
+          "value": 0.646
+        }
+      ],
+      "problem": "ic-gpu-kernels",
+      "unit": "ratio"
     },
     {
       "better": "lower",
@@ -13613,6 +13694,418 @@
       ],
       "problem": "kernel:fes_f2_gpu_call_prep",
       "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 1.962772675112476,
+      "latest": 1.962772675112476,
+      "latest_derived": {},
+      "metric": "beta_row_ops_u192_129_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {},
+          "n": 24,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.9603631971564432,
+            1.9655591953224478
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 1.962772675112476
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.9608991810901908,
+      "latest": 1.9608991810901908,
+      "latest_derived": {},
+      "metric": "beta_row_ops_u192_129_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {},
+          "n": 24,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.9584901132083512,
+            1.9636550157624442
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 1.9608991810901908
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 4.1793043094024585,
+      "latest": 4.1793043094024585,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u128_127_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.129775953352881,
+            5.19270482184397
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 4.1793043094024585
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 6.280680593517921,
+      "latest": 6.280680593517921,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u128_127_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            5.877259329898187,
+            6.378661456159762
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 6.280680593517921
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.889486869059283,
+      "latest": 2.889486869059283,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u128_61_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.6747778267955833,
+            3.252290941828533
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 2.889486869059283
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.5251258659305584,
+      "latest": 3.5251258659305584,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u128_61_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.088813966245767,
+            3.6558024344624895
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 3.5251258659305584
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.448919005061468,
+      "latest": 3.448919005061468,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u128_89_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.0615958024394456,
+            4.037120651234849
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 3.448919005061468
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 4.2899300628992725,
+      "latest": 4.2899300628992725,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u128_89_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.93543245530079,
+            4.365064334450554
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 4.2899300628992725
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 6.873229602433442,
+      "latest": 6.873229602433442,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u192_129_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            6.1728463749674,
+            7.560062272834707
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 6.873229602433442
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 10.511512430352784,
+      "latest": 10.511512430352784,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u192_129_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            9.708682497358632,
+            10.579491420380377
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 10.511512430352784
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 5.543651087458177,
+      "latest": 5.543651087458177,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u192_190_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            5.516509427874462,
+            6.613279284013998
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 5.543651087458177
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 9.097098967615967,
+      "latest": 9.097098967615967,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u192_190_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.060233786633725,
+            10.275052729947166
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 9.097098967615967
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 10.925356054698796,
+      "latest": 10.925356054698796,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u256_255_full_bl",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            9.290840025910672,
+            11.291488873174465
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 10.925356054698796
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 17.122644187448063,
+      "latest": 17.122644187448063,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "time_per_row_op_ratio_to_u64_61_d2e19_u256_255_full_bw",
+      "points": [
+        {
+          "commit": "248183b64a93",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261112T2153Z-wide-sparse-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            15.021892383434997,
+            17.581433351915297
+          ],
+          "summary": "Wide-modulus sparse LA on 3 RunPod pods: counted size law beta 1.96-1.97 holds; frozen width-law test FAILS (time per op depends on the modulus within a word), so the D=1e9 ECC2K-130 extrapolation is unsupported",
+          "value": 17.122644187448063
+        }
+      ],
+      "problem": "kernel:ic_sparse_la_wide",
+      "unit": "ratio"
     },
     {
       "better": "higher",

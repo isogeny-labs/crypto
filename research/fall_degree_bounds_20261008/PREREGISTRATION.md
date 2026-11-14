@@ -1324,3 +1324,59 @@ finished. Deleted at about 04:58 UTC (about USD 0.2); record `e14/pod-r2/launch-
 jobs and waits only on those. Tested on the authoring host with an unrelated long-lived background
 job present: the probe returned and read 4.0 of 8 on a 4-core machine. The only other `wait` in the
 script names a specific PID. Pod name prefix `fd-e14-r2j-`. Nothing else changes.
+
+## Amendment 31 (2026-11-14 UTC, before any draw below): E14 r3, draw 3 alone and the E14b controls, with output that survives the controller
+
+**Why.** E14 r2 measured E14a draws 0 and 1 (both "`d_F = 5`", valid) and its cell read "split"
+(RESULTS.md, E14 r2). Draw 3 was running at the last pull. The r2 pod deleted itself 6 h after
+its deadline (Amendment 21), before the controller's next check-in, so draw 3's record, if one was
+written, was lost. Draw 4 and E14b could not fit in the r2 deadline. This amendment measures the
+missing parts and changes only the order, the pod lifetime and how the four E14a draws are combined.
+
+**E14a r3: draw 3 alone.** The frozen `hky_par` (`a2be6609`) at `ladder` mode reruns a committed
+record: `hky_par ladder d3_input.jsonl --m 3 --cmax 5`, 32 threads. The input
+`d3_input.jsonl` is `jq -c 'select(.draw==3)'` of `e10/run-r3-B/out/E_3-21-7.jsonl` at the frozen
+commit, which the source tree hash already pins. It is one record, sha256 `0c6437f9…5b93c2` as
+extracted with jq 1.7. `ladder` builds the system from that record's `x_r` and `v_basis` with the
+same `system` and `refute` functions as `newcells`.
+- Gate **GL**: `ladder` at `--cmax 4` on the same input must equal the E10 draw-3 record on
+  `{draw, d_f, d_f_at_least, per_degree minus secs}`, or the run ends "GL_differs".
+- Reading as Amendment 20: degree-≤4 entries must equal E10 draw 3 or the draw is **void**; then
+  "`d_F = 5`" if `d_f = 5` and "`d_F ≥ 6`" if `d_f_at_least = 6`.
+- **Cell.** The Amendment 19 rule is applied to the four draws: 0 and 1 from r2, 3 from r3, and 4
+  "not completed". So the cell reads "`d_F = 5`" if draw 3 reads 5, and "split" otherwise. Draw 4
+  is not run.
+
+**E14b r3: the three 6:10:3 controls.** These are the same commands as Amendment 20, but draws 1, 3
+and 4 run concurrently at 8 threads each. That is G3's fastest `pe` setting in r2 (341 s at 140k
+columns). Each has a 6 h box. Gates G0 and G1 at 8 threads are as Amendment 17. Readings and the
+combined "independent agreement (E13b + E14b)" statement are exactly as Amendment 19.
+
+**Pods and lifetime.** Each part gets its own 32-vCPU RunPod CPU pod: part a uses the 503-GiB
+`cpu5m` flavor, and part b uses `cpu5m` or `cpu3m`. The script is `e14/run_pod_r3.sh` (sha256
+`d7144d9bcee5cd4f…`), launched by `e14/launch_r3.sh`.
+- **Volume.** `/workspace` is a 10 GB persistent pod volume holding `out/` and the served `out.tgz`.
+- **End of run.** The pod serves for 2 h after it finishes, then **stops** itself (REST `/stop`).
+  It never deletes itself, so the volume survives a late controller.
+- **Pulling.** `e14/pull_r3.sh` starts a stopped pod, pulls and checks the sha256. It deletes the
+  pod only after `final_status` is in the pulled output.
+- **Restarts.** A pod restarted after finishing only serves. A pod restarted mid-run records
+  "restarted_mid_run" and recomputes nothing.
+- **Deadline.** `min(MAX_HOURS, floor(CAP_USD / USD per h))` from boot: part a 12 h and USD 27,
+  part b 8 h and USD 17.
+
+**Admission.** A part launches only if the balance is at least `CAP_USD + MAX_HOURS ×` (USD/h of
+every running pod on the account), and no pod of the same part is running. At registration the
+balance was USD 42.35 and other pods cost USD 1.04/h. Part a (needs USD 39.48) and part b (needs
+USD 25.32) were each admissible alone but not together. Part a runs first. Part b runs when its
+admission passes: after part a ends or after a top-up. Nothing is retried. A part cut off by its
+deadline or by the provider reads "not completed".
+
+**Prediction (recorded before any draw).**
+- E14a r3 draw 3: "`d_F = 5`" 0.85, "`d_F ≥ 6`" 0.05, "void" 0.02, "not completed" 0.08.
+  Basis: draws 0 and 1 read 5, and E10's degree-≤4 dimensions are identical on all four draws.
+- E14a cell after r3: "`d_F = 5`" 0.85, "split" 0.15.
+- E14b r3: "controls confirmed" 0.55, "not completed" 0.35, "control differs" 0.10.
+- GL passes: 0.95.
+
+No E14 r3 draw has been generated, and nothing from any E14 r3 part has been computed.
