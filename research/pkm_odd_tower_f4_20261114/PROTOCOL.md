@@ -1,6 +1,6 @@
 # Odd and mixed-degree PKM towers under F4, and the algebraic relation oracle against enumeration
 
-**DRAFT, not yet frozen: the ladder top and budget await the pre-flight probe.** 2026-11-14. Study id `EXP-PKM-ODD-001`.
+**Protocol, frozen before any study row.** 2026-11-14. Study id `EXP-PKM-ODD-001`.
 Machine-readable form: [`protocol.json`](protocol.json) (`experiment.protocol/v1`). Runner:
 [`run_cells.sh`](run_cells.sh). Analysis: [`analyze.py`](analyze.py) (SHA-256 recorded in `protocol.json` at
 freeze). Instrument: [`examples/pkm_odd_tower_f4.rs`](../../examples/pkm_odd_tower_f4.rs).
@@ -113,8 +113,10 @@ is rerun with a larger budget to get a different outcome.
 
 - **Primary:** `field_ops`, the `F_p` multiplications of F4's row reductions (counted, exact, per system).
 - **Secondary:** `solving_degree_max`, `max_cols`, `steps`, per system.
-- **Part B:** `alg_field_ops` (F4 row-reduction multiplications over the substitution tree; the root
-  finding of univariates is *not* counted, which favours the algebraic oracle) and `enum_field_ops` (every
+- **Part B:** `alg_field_ops` = F4's row-reduction multiplications (full grevlex basis) plus the counted linear
+  stage that turns the basis into points (`points_from_grevlex_basis`: normal forms, multiplication matrix of a
+  random linear form, Krylov sequence, Berlekamp–Massey, one kernel per eigenvalue; the root finding of the
+  minimal polynomial is *not* counted, which favours the algebraic oracle) and `enum_field_ops` (every
   multiplication of the enumeration, square roots and inversions counted as their exponentiations, lifting `V`
   once included). Ratio `alg / enum` per target.
 - **Clock:** `ms` is recorded, not used. The host is unisolated.
@@ -189,7 +191,11 @@ amendment in §8 that states whether it preceded the data it affects.
 
 ## 8. Amendments
 
-None at freeze. Before freezing (disclosed): the pre-flight probe ran `A2 t = 8, 9, 10`, `A3 k = 5, 6`,
+Before freezing (disclosed): the pre-flight probe ran `A2 t = 8, 9, 10`, `A3 k = 5, 6`,
 `A5 k = 3, 4` and `A23/A32 n = 7` once each (`smoke/`). The isogeny arm, part B and the uncharged auxiliary
 search were added after the user asked whether the auxiliary-curve system is better and asked for the
-algebraic solver to be implemented; no study row existed then.
+algebraic solver to be implemented; no study row existed then. The repository's substitution solver
+(`f4_fp::solve`) stalled at `p ≈ 2^30` on the first smoke system (its fallback tries values of a variable one by
+one), so the oracle uses the linear stage above instead. Part B smoke at `P1` (`smoke/partB_smoke.jsonl`, 14
+targets, `m = 2` S ≤ 64 and `m = 3` S ≤ 8) was seen before freeze: every row `agree = true`, ratios
+`alg/enum` from 212 to 43,300. The part B prediction above was written after seeing it.
