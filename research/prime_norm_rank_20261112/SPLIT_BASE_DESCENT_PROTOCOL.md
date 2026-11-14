@@ -29,20 +29,21 @@ Acceptance obligations, in order:
    the pair and its mapped pair to vanish. From equal actual norms and
    monic upper normalization, prove both coefficient polynomials fixed.
    Handle B=0, and prove required monicity/nonzero/degree guards rather than
-   silently removing exceptional cases.
+   silently removing exceptional cases [pcc:unverified].
 4. Specialize phi to Frobenius in characteristic p and derive membership of
    every coefficient in the prime subfield using the existing exact
    fixed-point theorem. The public curve/base coordinates are explicit
    prime-subfield data, not arbitrary rational abscissas with twist branches.
 5. Bind the full norm divisor premise to the actual monic support division
-   and membership remainder, with the target distinct from the base.
+   and membership remainder, with the target distinct from the base [pcc:unverified].
 
 This would close the rationality implication for this selected base model.
 It does not prove coverage, finite expected retries, an efficient norm
 finder, a growing-family closure bound, a useful nonlinear rank map or
 complete expected bit cost. A separate coverage proof must retain actual
 sampling, collision/opposite/target exclusions and all attempted work.
-Do not infer any of these from a finite solution set or a good-base promise.
+Do not infer any of these from a finite solution set or a good-base promise
+[pcc:unverified].
 
 Sources checked (KB): unavailable as already documented, no loaded tools and
 missing wrapper executable; no unchanged retry. Bounded fallback queries

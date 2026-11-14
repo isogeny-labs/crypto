@@ -186,3 +186,25 @@ open. Next, obtain actual bounded derivations or test a mechanism beyond
 constant row recombination; preserve all original public finder, extraction
 and expected bit-cost criteria. No solver/native fixture experiment was
 launched, and no global non-generic impossibility is inferred [pcc:unverified].
+
+
+2026-11-14 rational-point base descent: [report](../research/prime_norm_rank_20261112/split-base-descent-report/README.md),
+source1e3f20752022a341a4612e6a72e8e5690f8c6baa. For a monic bounded norm
+pair, divisibility of the actual full norm by a public nodal polynomial on
+actual prime-field points forces all pair coefficients into the prime
+subfield. Selected support and either successful sign are derived; zero
+lower polynomial is handled. General arbitrary-arity rigidity and prime
+coefficient claimsPCC-20261114-8c21e7/255fa5; actual monic support/membership
+specializationPCC-20261114-0943a7/5d35b3. Validation7b5216 records14 authored
+theorems, whole-study gate383/0 and import-inclusive fresh0, all unsigned
+[pcc:unverified].
+
+This openly changes the base to actual rational points; it is not an
+extension of the Kummer good-coset theorem to Dickson/arbitrary primes.
+The new membership polynomial is an explicit point-list nodal product;
+no cheap tower or free known-log precomputation is assumed. Base generation,
+coverage, collisions/opposites/target exclusions, retry policy, actual
+public finder, growing-family normal forms and complete expected bit cost
+remain obligations. Field-of-definition correctness is distinct from the
+cost of extraction. Original W-jet mapping and all original exit criteria
+remain open; no native/solver/paid experiment was launched [pcc:unverified].
