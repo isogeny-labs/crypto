@@ -1,0 +1,64 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=.75in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}{\Large Actual mode support and a fixed-family width test}\\[4pt]
+14 November 2026; local12 statements; data PCC-20261114-4eb107
+\end{center}
+\textbf{Local result.} Accepted003/build003 elaborates12 statements,
+exit0/no warnings; four central printed dependencies contain only standard
+foundations. This draft is OUTSIDE Degree29's shared audit/replay. All
+records unsigned [pcc:unverified].
+
+\textbf{Actual support.} Labels are $(r,b)\in\mathrm{Fin}(2^u)\times
+\mathrm{Fin}(k)$, $i<u$, with weight $w+b$. Nonzero polynomial left entries
+force $x\bmod2^u=r$, hence row bit $i$ equals bit $i$ of $r$. Nonzero actual
+trimmed-right entries force the column bit to equal that same bit. With the
+original opposite column orientation, each label therefore has one fixed
+target side and one fixed source side. No arbitrary good-locality premise
+is supplied [pcc:unverified].
+
+\textbf{Declared capacity.} At a fixed integer weight, projection to $r$
+is injective, so at most $2^u$ labels have that weight. Across $P$ packets
+the bound is $P2^u$, even with different packet shifts $w$. For $i<u$,
+\[
+ P2^u=(P2^{i+1})2^{u-i-1}.
+\]
+The comparison retains the weight shift; it is a declared-capacity identity,
+not equality with actual nonzero support or a runtime gain. The primary
+construction uses column tiles $2^{i+1}$ [pcc:unverified].
+
+\textbf{Scoped polynomial width.} Take the actual normalized negative-pole
+chart matrix from the product family, $i<u\le a$, with all retained $m_j>0$.
+For arbitrary rational-polynomial factors $A,B$ of inner width $R$, suppose
+\[
+ \operatorname{Content}_1(P^{\rm neg}_{xy}-(AB)_{xy})\quad\text{for every }x,y.
+\]
+Then $R\ge2^u$. Evaluate at $Z=1$: the actual chart is congruent to its
+normalized first jet; the prior exact class-minor theorem gives the width
+bound. No integrality premise on proposed $A,B$ is needed [pcc:unverified].
+
+This concerns the fixed negative-pole product family at normalized residual1
+under positive multiplicities. It is not an arbitrary-node, full-$W$,
+origin or general-algorithm lower bound, and does not prove that every
+$2^u k$ moment is necessary.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=1.05in,keepaspectratio]{dependencies.pdf}
+\end{center}
+\textbf{Evidence and failures.} Exact source/log/exit pinned in
+local-validation-001.json. Three drafts/raw builds preserved. Failures
+included Boolean-not scope, Matroid operator tokenization, zero contradiction
+and a matrix-instance rewrite. The intended right-support equality was made
+explicit after the first failed parse; no accepted statement weakened.
+Accepted003 has no \texttt{sorryAx} or disabled linter [pcc:unverified].
+
+Read primary D.12--16 and exact Rank40/FullChart/Degree/Compact APIs first;
+KB unavailable as journaled. Standard support/cardinality/rank algebra reused
+without novelty or speed claim. Child coefficient extraction, integral-ring
+transport, immutable creation precision, coefficient/bit/entry/recovery/
+recursion/public expected cost remain separate. No attack, native solver,
+timing, paid or cloud campaign; all parent artifacts preserved.
+\end{document}
