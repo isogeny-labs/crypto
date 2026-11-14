@@ -1,0 +1,11 @@
+[package]
+name = "l3_incsat"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+batsat = "=0.6.0"
+cadical-sys = "=0.8.0"
+
+[profile.release]
+opt-level = 3
