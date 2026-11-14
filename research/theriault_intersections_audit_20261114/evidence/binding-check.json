@@ -1,0 +1,36 @@
+{
+  "schema": "native-theriault-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "theriault-intersections",
+      "expected_decl_sha256": "382c82b534b06bdbfdc28545d65acb0a2c1ea9e303eb73ca3f02ec130f2e9175",
+      "full_characters": 1265,
+      "full_decl_sha256": "382c82b534b06bdbfdc28545d65acb0a2c1ea9e303eb73ca3f02ec130f2e9175",
+      "full_normalized_signature": "theorem theriault_intersections_certificate : (∀ M : ℕ, Fintype.card (PairedPoint M) = 2 * M ∧ Function.Involutive (@negatePoint M) ∧ (∀ a : PairedPoint M, negatePoint a ≠ a) ∧ (∀ a b : PairedPoint M, a.1 = b.1 ↔ b = a ∨ b = negatePoint a)) ∧ (∀ (M s : ℕ) [NeZero M] (w : PairedWord M s), uniformPMF (PairedWord M s) w = ∏ i : Fin s, uniformPMF (PairedPoint M) (w i)) ∧ (∀ (M s : ℕ) [NeZero M], 0 < s → (∀ k : ℕ, 0 ≤ intersectionProbability M s k) ∧ (∑ k ∈ range s, intersectionProbability M s k) = 1 ∧ sourceMean M s = pairedMean M s ∧ sourceMean M s = (s : ℝ) - M + M * (1 - (M : ℝ)⁻¹) ^ s) ∧ (∀ (M s : ℕ) [NeZero M], pairedMean M (s + 1) = (1 - (M : ℝ)⁻¹) * pairedMean M s + (s : ℝ) / M) ∧ (∀ (M : ℕ) [NeZero M], 4 ≤ M → 3 ≤ (3 : ℕ) ∧ 3 < (2 * M) / 2 ∧ sourceMean M 3 = 3 / (M : ℝ) - 1 / (M : ℝ) ^ 2 ∧ sourceMean M 3 < 2 * (3 : ℝ) ^ 2 / (3 * (2 * M))) ∧ (¬∀ (M s : ℕ) [NeZero M], 3 ≤ s → s < (2 * M) / 2 → 2 * (s : ℝ) ^ 2 / (3 * (2 * M)) ≤ sourceMean M s) ∧ (Fintype.card (PairedPoint 4) = 8 ∧ Fintype.card (PairedWord 4 3) = 512 ∧ sourceMean 4 3 = 11 / 16 ∧ 2 * (3 : ℝ) ^ 2 / (3 * 8) = 3 / 4 ∧ sourceMean 4 3 < 3 / 4) ∧ (∀ (M s : ℕ) [NeZero M], 3 ≤ s → s < (2 * M) / 2 → 4 * (s : ℝ) ^ 2 / (9 * (2 * M)) ≤ sourceMean M s ∧ sourceMean M s ≤ (s : ℝ) ^ 2 / (2 * M))",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "theriault_intersections_certificate",
+        "end_byte": 1759,
+        "file": "/workspace/scratch/theriault-input01/TheriaultCertificate.lean",
+        "qualified_decl_id": "TheriaultIntersectionsAudit.theriault_intersections_certificate",
+        "signature": "theorem theriault_intersections_certificate :\n    (∀ M : ℕ, Fintype.card (PairedPoint M) = 2 * M ∧\n      Function.Involutive (@negatePoint M) ∧\n      (∀ a : PairedPoint M, negatePoint a ≠ a) ∧\n      (∀ a b : PairedPoint M, a.1 = b.1 ↔ b = a ∨ b = negatePoint a)) ∧\n    (∀ (M s : ℕ) [NeZero M] (w : PairedWord M s),\n      uniformPMF (PairedWord M s) w =\n        ∏ i : Fin s, uniformPMF (PairedPoint M) (w i)) ∧\n    (∀ (M s : ℕ) [NeZero M], 0 < s →\n      (∀ k : ℕ, 0 ≤ intersectionProbability M s k) ∧\n      (∑ k ∈ range s, intersectionProbability M s k) = 1 ∧\n      sourceMean M s = pairedMean M s ∧\n      sourceMean M s = (s : ℝ) - M + M * (1 - (M : ℝ)⁻¹) ^ s) ∧\n    (∀ (M s : ℕ) [NeZero M],\n      pairedMean M (s + 1) = (1 - (M : ℝ)⁻¹) * pairedMean M s + (s : ℝ) / M) ∧\n    (∀ (M : ℕ) [NeZero M], 4 ≤ M →\n      3 ≤ (3 : ℕ) ∧ 3 < (2 * M) / 2 ∧\n      sourceMean M 3 = 3 / (M : ℝ) - 1 / (M : ℝ) ^ 2 ∧\n      sourceMean M 3 < 2 * (3 : ℝ) ^ 2 / (3 * (2 * M))) ∧\n    (¬∀ (M s : ℕ) [NeZero M], 3 ≤ s → s < (2 * M) / 2 →\n      2 * (s : ℝ) ^ 2 / (3 * (2 * M)) ≤ sourceMean M s) ∧\n    (Fintype.card (PairedPoint 4) = 8 ∧ Fintype.card (PairedWord 4 3) = 512 ∧\n      sourceMean 4 3 = 11 / 16 ∧ 2 * (3 : ℝ) ^ 2 / (3 * 8) = 3 / 4 ∧\n      sourceMean 4 3 < 3 / 4) ∧\n    (∀ (M s : ℕ) [NeZero M], 3 ≤ s → s < (2 * M) / 2 →\n      4 * (s : ℝ) ^ 2 / (9 * (2 * M)) ≤ sourceMean M s ∧\n      sourceMean M s ≤ (s : ℝ) ^ 2 / (2 * M))",
+        "start_byte": 203
+      },
+      "recorded_statement": "theorem theriault_intersections_certificate : (∀ M : ℕ, Fintype.card (PairedPoint M) = 2 * M ∧ Function.Involutive (@negatePoint M) ∧ (∀ a : PairedPoint M, negatePoint a ≠ a) ∧ (∀ a b : PairedPoint M, a.1 = b.1 ↔ b = a ∨ b = negatePoint a)) ∧ (∀ (M s : ℕ) [NeZero M] (w : PairedWord M s), uniformPMF (PairedWord M s) w = ∏ i : Fin s, uniformPMF (PairedPoint M) (w i)) ∧ (∀ (M s : ℕ) [NeZero M], 0 < s → (∀ k : ℕ, 0 ≤ intersectionProbability M s k) ∧ (∑ k ∈ range s, intersectionProbability M s k) = 1 ∧ sourceMean M s = pairedMean M s ∧ sourceMean M s = (s : ℝ) - M + M * (1 - (M : ℝ)⁻¹) ^ s) ∧ (∀ (M s : ℕ) [NeZero M], pairedMean M (s + 1) = (1 - (M : ℝ)⁻¹) * pairedMean M s + (s : ℝ) / M) ∧ (∀ (M : ℕ) [NeZero M], 4 ≤ M → 3 ≤ (3 : ℕ) ∧ 3 < (2 * M) / 2 ∧ sourceMean M 3 = 3 / (M : ℝ) - 1 / (M : ℝ) ^ 2 ∧ sourceMean M 3 < 2 * (3 : ℝ) ^ 2 / (3 * (2 * M))) ∧ (¬∀ (M s : ℕ) [NeZero M], 3 ≤ s → s < (2 * M) / 2 → 2 * (s : ℝ) ^ 2 / (3 * (2 * M)) ≤ sourceMean M s) ∧ (Fintype.card (PairedPoint 4) = 8 ∧ Fintype.card (PairedWord 4 3) = 512 ∧ sourceMean 4 3 = 11 / 16 ∧ 2 * (3 : ℝ) ^ 2 / (3 * 8) = 3 / 4 ∧ sourceMean 4 3 < 3 / 4) ∧ (∀ (M s : ℕ) [NeZero M], 3 ≤ s → s < (2 * M) / 2 → 4 * (s : ℝ) ^ 2 / (9 * (2 * M)) ≤ sourceMean M s ∧ sourceMean M s ≤ (s : ℝ) ^ 2 / (2 * M))",
+      "recorded_text_sha256": "382c82b534b06bdbfdc28545d65acb0a2c1ea9e303eb73ca3f02ec130f2e9175",
+      "source_plan": "research/theriault_intersections_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "TheriaultIntersectionsAudit.theriault_intersections_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source processing, not kernel parser/hash/physicalhost/execution refinement."
+}

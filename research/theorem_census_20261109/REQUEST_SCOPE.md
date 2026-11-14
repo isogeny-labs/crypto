@@ -32,6 +32,8 @@ entire source theorem, native executable or physical execution was formally
 verified. The broader [gap register](../../problems/fourteen-target-audit-proof-and-execution-gaps.md)
 tracks the remaining work. [pcc:unverified]
 
+The broader [original Thériault2003 paper audit](../theriault_intersections_audit_20261114/README.md) now adds full18page primary reading and an actual Lean refutation of its qualified finite Theorem1 lower constant, together with a proved uniform repair. This does not refute its single-large-prime complexity exponent or close the original14method gaps. The historical44unread-label snapshot is retained; coverage is additive and theorem-specific. [pcc:unverified]
+
 The most substantial requested mathematical gaps are general-prime BK and
 supersingular geometry, canonical pairing/MOV–FR constructions, actual
 Jacobian/Picard counting and subgroup bridges, qualified intersection

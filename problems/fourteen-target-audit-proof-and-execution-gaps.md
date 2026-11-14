@@ -1901,3 +1901,33 @@ onepagePDF47431bytes. Nine snapshots retain four proof failures,
 one premature-setup harnessfailure and one unavailable processcompletion;
 only03/07/09pass, no invented05verdict. No nativecrypto/spend/upload.
 [pcc:unverified]
+
+
+### Original Thériault2003: qualified finite intersection lower bound refuted
+
+The [original Thériault2003 audit](../research/theriault_intersections_audit_20261114/README.md)
+adds full18page primary reading for original44-backlog node
+`ALG-WD-THERIAULT-2003`/source`S-WD-THERIAULT-2003`.
+Printed85–86/PDF11–12 Theorem1 and its proof were visually inspected.
+Its literal lower bound 2s²/(3n)≤E for3≤s<n/2 is directly refuted
+in the actual stated uniform paired-point model. Actual pointsFinM×Bool
+have n=2M/freeinvolution/orbits, and genuine uniform pointwordPMF has
+proved independentuniformwithreplacement productmasses. ActualQevent
+probabilities are nonnegative/normalized; the printed E=sumk*kQ is
+proved equal to the actualPMF expectation, with derived
+E=s−M+M(1−1/M)^s and source recurrence. AllM≥4/s3 retain allguards,
+yet E=3/M−1/M²<3/M=2s²/(3n). Actual n8/512triples gives11/16<3/4.
+The source correctly derives the closed expectation, then its last chain
+drops the finite s−1 correction too aggressively. Lean also proves
+4s²/(9n)≤E≤s²/n throughout the original window, retaining quadratic
+order. Theorem3singlelargeprime q-exponent is not refuted; wholeJacobian/
+Picard/smoothness/randomwalk/runtime bridges remain separate.
+Fullprimaryreading is distinct from fullpaperLeanverification; historical
+44unreadsnapshot/canonicalstatuses retained. No noveltyclaim.
+Exact local **PCC-20261114-9391e1** PASS at 2026-11-14T21:40:20Z, signedstanding unverified;
+whole37/0/0, full1265-character binding
+`382c82b534b06bdbfdc28545d65acb0a2c1ea9e303eb73ca3f02ec130f2e9175`,
+independent native1complete/0prefix/0unresolved,6custom/15formal-config+
+14artifactpins,116files/52objects/16000-byte losslessXZ/fivegate/inspected
+onepagePDF47329bytes. Nine snapshots/fivefailedstates preserved.
+No nativecrypto/spend/upload. [pcc:unverified]
