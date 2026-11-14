@@ -186,5 +186,15 @@ impl F64 {
         while e > 0 { if e & 1 == 1 { r = self.mul(r, b); } b = self.mul(b, b); e >>= 1; }
         r
     }
-    pub fn inv(&self, a: u64) -> u64 { assert!(a != 0); self.pow(a, (1u128 << self.d) - 2) }
+    pub fn inv(&self, a: u64) -> u64 {
+        assert!(a != 0);
+        let (mut u, mut v) = (a, self.q);
+        let (mut g1, mut g2) = (1u64, 0u64);
+        while u != 1 {
+            let mut j = (63 - u.leading_zeros() as i32) - (63 - v.leading_zeros() as i32);
+            if j < 0 { std::mem::swap(&mut u, &mut v); std::mem::swap(&mut g1, &mut g2); j = -j; }
+            u ^= v << j; g1 ^= g2 << j;
+        }
+        g1
+    }
 }

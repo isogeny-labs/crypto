@@ -233,8 +233,18 @@ pub fn extract_v2(k: &F64, h: &[Bi], b1: usize, b2: usize, rng: &mut Rng, max_ro
     for i in 0..hs.len() {
         for j in i + 1..hs.len() {
             out.pairs_tried += 1;
-            let r1 = resultant_x2(k, &hs[i], &hs[j]);
-            let r2 = resultant_x2(k, &hsw[i], &hsw[j]);
+            // cheap screen: a common factor in X2 (resp. X1) shows as a nontrivial gcd at random specializations
+            let mut cf1 = true; let mut cf2 = true;
+            for _ in 0..2 {
+                let v = rng.next() & ((1u64 << k.d) - 1);
+                let (mut a, mut b) = (eval_x1(k, &hs[i], v), eval_x1(k, &hs[j], v)); trim(&mut a); trim(&mut b);
+                if a.is_empty() || b.is_empty() || udeg(&ugcd(k, &a, &b)) == 0 { cf1 = false; }
+                let (mut a, mut b) = (eval_x1(k, &hsw[i], v), eval_x1(k, &hsw[j], v)); trim(&mut a); trim(&mut b);
+                if a.is_empty() || b.is_empty() || udeg(&ugcd(k, &a, &b)) == 0 { cf2 = false; }
+            }
+            if cf1 && cf2 { out.res_zero += 1; continue; }
+            let r1 = if cf1 { vec![] } else { resultant_x2(k, &hs[i], &hs[j]) };
+            let r2 = if cf2 { vec![] } else { resultant_x2(k, &hsw[i], &hsw[j]) };
             if r1.is_empty() && r2.is_empty() { out.res_zero += 1; continue; }
             out.resolved = true;
             if !r1.is_empty() { out.cand1 = roots(k, &r1, rng).into_iter().filter(|&r| fits(r, b1)).collect(); }
