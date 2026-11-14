@@ -126,12 +126,49 @@ struct FieldP256 {
  *     uint32_t pos = T.begin(key);
  *     while (T.valid(pos, key)) { uint32_t j = T.index(pos); ...; pos = T.next(pos, key); }
  * ------------------------------------------------------------------ */
+/* Lookup variants (compile-time, all off by default; every variant returns
+ * the same candidates in the same order, or extra ones the sweep's full-x
+ * check discards, so the relation set and its order are unchanged):
+ *   RF_SORTED_EYT=1   lower_bound over an Eytzinger (BFS) copy of the keys,
+ *                     mapped back to the sorted position by a rank array;
+ *   RF_HASH_PACKED=1  one u64 per hash slot (key tag << 32 | index), one load
+ *                     per probe step instead of keys[] + vals[];
+ *   RF_PROBE_PAIR=1   the two eps lookups of an entry start together
+ *                     (begin2), so their dependent loads overlap. */
+#ifndef RF_SORTED_EYT
+#define RF_SORTED_EYT 0
+#endif
+#ifndef RF_HASH_PACKED
+#define RF_HASH_PACKED 0
+#endif
+#ifndef RF_PROBE_PAIR
+#define RF_PROBE_PAIR 0
+#endif
+
+RF_HD int rf_ffs32(uint32_t v) {   /* 1-based index of the lowest set bit, 0 for v == 0 */
+#ifdef __CUDA_ARCH__
+    return __ffs((int)v);
+#else
+    return v ? __builtin_ctz(v) + 1 : 0;
+#endif
+}
+
 struct SortedTable {
     const uint64_t *keys;   /* ascending */
     const uint32_t *idx;    /* factor-base index of keys[pos] */
     uint32_t n;
+    const uint64_t *eyt;      /* RF_SORTED_EYT: keys in BFS order, 1-indexed (eyt[0] unused) */
+    const uint32_t *eyt_rank; /* RF_SORTED_EYT: sorted position of eyt[k] */
 
     RF_HD uint32_t begin(uint64_t key) const {
+#if RF_SORTED_EYT
+        /* Eytzinger lower_bound: descend, then strip the trailing ones of k
+         * (the right turns taken after the last left turn). */
+        uint32_t k = 1;
+        while (k <= n) k = 2 * k + (eyt[k] < key ? 1u : 0u);
+        k >>= rf_ffs32(~k);
+        return k ? eyt_rank[k] : n;
+#else
         /* lower_bound: first pos with keys[pos] >= key.  Branch-free body
          * (the loop count is log2(n), uniform across the warp). */
         uint32_t lo = 0, len = n;
@@ -142,6 +179,38 @@ struct SortedTable {
             else len = half;
         }
         return lo;
+#endif
+    }
+    /* Both lookups at once: one loop with two independent load chains. */
+    RF_HD void begin2(uint64_t k0, uint64_t k1, uint32_t &p0, uint32_t &p1) const {
+#if RF_SORTED_EYT
+        /* The bottom level is partial unless n = 2^h - 1, so the two
+         * descents can leave the tree one level apart: each advances only
+         * while it is inside. */
+        uint32_t a = 1, b = 1;
+        while (a <= n || b <= n) {
+            if (a <= n) a = 2 * a + (eyt[a] < k0 ? 1u : 0u);
+            if (b <= n) b = 2 * b + (eyt[b] < k1 ? 1u : 0u);
+        }
+        a >>= rf_ffs32(~a);
+        b >>= rf_ffs32(~b);
+        p0 = a ? eyt_rank[a] : n;
+        p1 = b ? eyt_rank[b] : n;
+#else
+        uint32_t lo0 = 0, lo1 = 0, len0 = n, len1 = n;
+        while (len0 > 0 || len1 > 0) {
+            if (len0 > 0) {
+                uint32_t h = len0 >> 1, m = lo0 + h;
+                if (keys[m] < k0) { lo0 = m + 1; len0 = len0 - h - 1; } else len0 = h;
+            }
+            if (len1 > 0) {
+                uint32_t h = len1 >> 1, m = lo1 + h;
+                if (keys[m] < k1) { lo1 = m + 1; len1 = len1 - h - 1; } else len1 = h;
+            }
+        }
+        p0 = lo0;
+        p1 = lo1;
+#endif
     }
     RF_HD int valid(uint32_t pos, uint64_t key) const { return pos < n && keys[pos] == key; }
     RF_HD uint32_t index(uint32_t pos) const { return idx[pos]; }
@@ -160,15 +229,46 @@ struct HashTable {
     const uint64_t *keys;
     const uint32_t *vals;   /* RF_NO_INDEX marks an empty slot */
     uint32_t mask;          /* capacity - 1, capacity a power of two */
+    const uint64_t *slots;  /* RF_HASH_PACKED: (uint32 tag << 32) | index, low word RF_NO_INDEX if empty */
 
+    static RF_HD uint32_t tag(uint64_t key) { return (uint32_t)key; }
+#if RF_HASH_PACKED
+    /* Same slots and probe order as the split arrays; a slot whose tag
+     * matches but whose key differs is returned as a candidate and dropped by
+     * the sweep's full-x comparison, so the emitted relations are unchanged. */
+    RF_HD uint32_t skip_mismatch(uint32_t slot, uint64_t key) const {
+        const uint32_t t = tag(key);
+        for (;;) {
+            const uint64_t v = slots[slot];
+            if ((uint32_t)v == RF_NO_INDEX || (uint32_t)(v >> 32) == t) return slot;
+            slot = (slot + 1) & mask;
+        }
+    }
+    RF_HD int valid(uint32_t pos, uint64_t) const { return (uint32_t)slots[pos] != RF_NO_INDEX; }
+    RF_HD uint32_t index(uint32_t pos) const { return (uint32_t)slots[pos]; }
+#else
     RF_HD uint32_t skip_mismatch(uint32_t slot, uint64_t key) const {
         /* advance over occupied slots whose key differs */
         while (vals[slot] != RF_NO_INDEX && keys[slot] != key) slot = (slot + 1) & mask;
         return slot;
     }
-    RF_HD uint32_t begin(uint64_t key) const { return skip_mismatch(rf_hash64(key, mask), key); }
-    RF_HD int valid(uint32_t pos, uint64_t) const { return vals[pos] != RF_NO_INDEX; }
+    RF_HD int valid(uint32_t pos, uint64_t key) const { return vals[pos] != RF_NO_INDEX; }
     RF_HD uint32_t index(uint32_t pos) const { return vals[pos]; }
+#endif
+    RF_HD uint32_t begin(uint64_t key) const { return skip_mismatch(rf_hash64(key, mask), key); }
+    RF_HD void begin2(uint64_t k0, uint64_t k1, uint32_t &p0, uint32_t &p1) const {
+#if RF_HASH_PACKED
+        /* issue both first-slot loads before either is examined */
+        const uint32_t s0 = rf_hash64(k0, mask), s1 = rf_hash64(k1, mask);
+        const uint64_t v0 = slots[s0], v1 = slots[s1];
+        const uint32_t t0 = tag(k0), t1 = tag(k1);
+        p0 = ((uint32_t)v0 == RF_NO_INDEX || (uint32_t)(v0 >> 32) == t0) ? s0 : skip_mismatch((s0 + 1) & mask, k0);
+        p1 = ((uint32_t)v1 == RF_NO_INDEX || (uint32_t)(v1 >> 32) == t1) ? s1 : skip_mismatch((s1 + 1) & mask, k1);
+#else
+        p0 = begin(k0);
+        p1 = begin(k1);
+#endif
+    }
     /* keep skipping mismatching occupied slots after a candidate */
     RF_HD uint32_t next(uint32_t pos, uint64_t key) const { return skip_mismatch((pos + 1) & mask, key); }
 };
@@ -317,14 +417,33 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         const elt inv = d[w];
         const elt lam_m = F::mul(f, F::add(f, yr, yi), inv);   /* eps = +1: R - F_i */
         const elt lam_p = F::mul(f, F::sub(f, yr, yi), inv);   /* eps = -1: R + F_i */
+#if RF_PROBE_PAIR
+        /* both lookups start before either is walked (begin2); the walks
+         * below then run eps = +1 first, as in the unpaired loop */
+        const elt x3_m = F::sub(f, F::sub(f, F::sqr(f, lam_m), xr), xi);
+        const elt x3_p = F::sub(f, F::sub(f, F::sqr(f, lam_p), xr), xi);
+        uint32_t pos_m, pos_p;
+        {
+            RF_PROF_PROBE_START();
+            table.begin2(F::key(f, x3_m), F::key(f, x3_p), pos_m, pos_p);
+            RF_PROF_PROBE_END();
+        }
+#endif
 #pragma unroll
         for (int s = 0; s < 2; s++) {
             const int8_t eps = s == 0 ? (int8_t)1 : (int8_t)-1;
             const elt lam = s == 0 ? lam_m : lam_p;
+#if RF_PROBE_PAIR
+            const elt x3 = s == 0 ? x3_m : x3_p;
+            const uint64_t key = F::key(f, x3);
+            RF_PROF_PROBE_START();
+            uint32_t pos = s == 0 ? pos_m : pos_p;
+#else
             const elt x3 = F::sub(f, F::sub(f, F::sqr(f, lam), xr), xi);
             const uint64_t key = F::key(f, x3);
             RF_PROF_PROBE_START();
             uint32_t pos = table.begin(key);
+#endif
             while (table.valid(pos, key)) {
                 const uint32_t j = table.index(pos);
                 pos = table.next(pos, key);

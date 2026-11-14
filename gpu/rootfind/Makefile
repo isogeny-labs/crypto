@@ -30,7 +30,13 @@ RF_BLOCK      ?= 128
 RF_MIN_BLOCKS ?= 0
 # 1: sampled clock64() phase profile in the kernels (`./bench profile`); 0 = off
 RF_PROFILE ?= 0
-RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=$(RF_PROFILE)
+# lookup variants (rootfind.cuh): Eytzinger sorted search, packed hash slots,
+# paired eps lookups; 0 = off
+RF_SORTED_EYT ?= 0
+RF_HASH_PACKED ?= 0
+RF_PROBE_PAIR ?= 0
+RF_DEFS := -DRF_BLOCK=$(RF_BLOCK) -DRF_MIN_BLOCKS=$(RF_MIN_BLOCKS) -DRF_PROFILE=$(RF_PROFILE) \
+           -DRF_SORTED_EYT=$(RF_SORTED_EYT) -DRF_HASH_PACKED=$(RF_HASH_PACKED) -DRF_PROBE_PAIR=$(RF_PROBE_PAIR)
 
 HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 
@@ -39,7 +45,7 @@ HDRS := fp64.cuh fp256x64.cuh rootfind.cuh rootfind_host.hpp rootfind_api.h
 all: test
 
 test_cpu: test_cpu.cpp rootfind_api.cpp $(HDRS)
-	$(CXX) $(CXXFLAGS) -DRF_HAVE_CUDA=0 -o $@ test_cpu.cpp rootfind_api.cpp
+	$(CXX) $(CXXFLAGS) $(RF_DEFS) -DRF_HAVE_CUDA=0 -o $@ test_cpu.cpp rootfind_api.cpp
 
 test: test_cpu
 	./test_cpu
