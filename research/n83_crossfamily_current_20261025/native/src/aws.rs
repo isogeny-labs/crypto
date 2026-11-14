@@ -11,17 +11,19 @@ use std::process::{Command, Stdio};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub const ACCOUNT: &str = "590183823895";
-pub const REGION: &str = "us-east-1";
-pub const ZONE: &str = "us-east-1a";
-pub const VPC: &str = "vpc-0da45a1bf46c94fa9";
-pub const SUBNET: &str = "subnet-04e6765fae0326ef3";
+pub const REGION: &str = "us-west-2";
+pub const ZONE: &str = "us-west-2b";
+pub const VPC: &str = "vpc-0394e002d95674fe6";
+pub const SUBNET: &str = "subnet-0ffc4f0562edc244f";
 pub const INSTANCE: &str = "g5g.4xlarge";
-pub const SECURITY_GROUP: &str = "sg-030ffadf6a62d2ce2";
+pub const SECURITY_GROUP: &str = "sg-031c140ef9d078b3d";
 pub const PROFILE: &str = "n83-online-screen-ssm-20261019";
 pub const BUCKET: &str = "aburan28-n83-tier1-20261016-590183823895";
+pub const BUCKET_REGION: &str = "us-east-1";
 pub const PROJECT_TAG: &str = "N83HighKCurrent";
 pub const CAP_SECONDS: u64 = 21600;
-pub const BID_USD_HOURLY: &str = "0.27";
+pub const BID_USD_HOURLY: &str = "0.31";
+pub const BID_PROJECTION_USD: &str = "3.85";
 const AMI_PARAMETER: &str =
     "/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id";
 
@@ -93,13 +95,34 @@ fn latest_quote(rows: &Value, now: DateTime<Utc>) -> Result<(String, String)> {
     }
     let price = field(row, "SpotPrice")?;
     let rate: f64 = price.parse()?;
-    if !(0.0..=0.27).contains(&rate) || rate == 0.0 {
-        return Err("Spot quote exceeds approved bid".into());
+    if rate <= 0.0 || rate > BID_USD_HOURLY.parse::<f64>()? {
+        return Err("Spot quote exceeds proposed bid".into());
     }
     Ok((price.to_owned(), field(row, "Timestamp")?.to_owned()))
 }
 
+fn check_budget() -> Result<()> {
+    let cents = BID_USD_HOURLY
+        .strip_prefix("0.")
+        .filter(|digits| digits.len() == 2)
+        .ok_or("Spot bid must have two decimal cents")?
+        .parse::<u64>()?;
+    if CAP_SECONDS != 21_600 {
+        return Err("six-hour deletion guard differs".into());
+    }
+    // Two hosts for six hours, plus the frozen $0.08 root-disk and
+    // $0.05 S3 allowances. Keep the projection below the $4.20 cap.
+    let projected_cents = 2 * 6 * cents + 8 + 5;
+    if projected_cents > 420
+        || format!("{}.{:02}", projected_cents / 100, projected_cents % 100) != BID_PROJECTION_USD
+    {
+        return Err("Spot bid projection exceeds or differs from frozen cap".into());
+    }
+    Ok(())
+}
+
 pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
+    check_budget()?;
     if output.exists() {
         return Err("AWS plan output already exists".into());
     }
@@ -153,7 +176,7 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         || subnet["MapPublicIpOnLaunch"] != true
         || subnet["AvailableIpAddressCount"].as_u64().unwrap_or(0) < 2
     {
-        return Err("approved east-region subnet differs".into());
+        return Err("proposed subnet differs".into());
     }
     let zones = cli(
         &["ec2", "describe-availability-zones", "--zone-names", ZONE],
@@ -182,9 +205,9 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         .iter()
         .find(|item| item["AvailabilityZoneId"] == zone_id)
         .and_then(|item| item["Score"].as_u64())
-        .ok_or("east-zone placement score absent")?;
+        .ok_or("proposed-zone placement score absent")?;
     if score < 3 {
-        return Err("east-zone placement score below approved gate".into());
+        return Err("proposed-zone placement score below gate".into());
     }
     let parameter = cli(&["ssm", "get-parameter", "--name", AMI_PARAMETER], REGION)?;
     let image_id = field(&parameter["Parameter"], "Value")?;
@@ -218,7 +241,7 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         "quote_time":quote_time,"max_hourly_usd":BID_USD_HOURLY})
     };
     let record = json!({"schema":"n83.crossfamily-aws-spot-plan/v1",
-        "status":"READY_FOR_APPROVED_ALLOCATION","tier":"cloud_instance_tier1",
+        "status":"PROPOSED_ROUTE_PROVIDER_READY","tier":"cloud_instance_tier1",
         "placement_model":"two_distinct_instances_same_availability_zone",
         "recorded_utc":now.to_rfc3339(),"account_id":ACCOUNT,"region":REGION,
         "instance_type":INSTANCE,"architecture":"arm64","image_id":image_id,
@@ -227,7 +250,7 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         "source_manifest_sha256":bundle["source_manifest_sha256"],
         "spot_quota_vcpus":quota_value,"cap_seconds":CAP_SECONDS,
         "root_disk_gb_per_host":50,"gp3_usd_per_gb_month":"0.08",
-        "s3_allowance_usd":"0.05","projected_at_bids_usd":"3.37",
+        "s3_allowance_usd":"0.05","projected_at_bids_usd":BID_PROJECTION_USD,
         "total_cap_usd":"4.20","zones":[zone(0),zone(1)]});
     let mut file = OpenOptions::new()
         .write(true)
@@ -240,10 +263,11 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
 }
 
 pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Result<Value> {
+    check_budget()?;
     let plan: Value = serde_json::from_slice(&fs::read(plan_path)?)?;
     let bundle = checked_source(root, source_bundle)?;
     if plan["schema"] != "n83.crossfamily-aws-spot-plan/v1"
-        || plan["status"] != "READY_FOR_APPROVED_ALLOCATION"
+        || plan["status"] != "PROPOSED_ROUTE_PROVIDER_READY"
         || plan["account_id"] != ACCOUNT
         || plan["region"] != REGION
         || plan["instance_type"] != INSTANCE
@@ -253,7 +277,7 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
         || plan["source_manifest_sha256"] != bundle["source_manifest_sha256"]
         || plan["cap_seconds"] != CAP_SECONDS
         || plan["root_disk_gb_per_host"] != 50
-        || plan["projected_at_bids_usd"] != "3.37"
+        || plan["projected_at_bids_usd"] != BID_PROJECTION_USD
         || plan["total_cap_usd"] != "4.20"
         || plan["zones"].as_array().is_none_or(|zones| {
             zones.len() != 2
@@ -265,7 +289,7 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
                 })
         })
     {
-        return Err("approved AWS plan differs from sealed inputs".into());
+        return Err("AWS plan differs from sealed inputs".into());
     }
     Ok(plan)
 }
@@ -329,7 +353,7 @@ fn upload(path: &Path, key: &str, digest: &str, head: &str) -> Result<Value> {
             "--metadata",
             &metadata,
         ],
-        REGION,
+        BUCKET_REGION,
     )?;
     let version = field(&response, "VersionId")?;
     Ok(json!({"key":key,"version_id":version,"sha256":digest}))
@@ -371,7 +395,7 @@ fn check_presigned_transfer(
             "--key",
             canary_key,
         ],
-        REGION,
+        BUCKET_REGION,
     )?;
     if head["ContentLength"] != fs::metadata(&canary)?.len()
         || head["VersionId"].as_str().is_none_or(str::is_empty)
@@ -664,8 +688,16 @@ fn preflight_provider() -> Result<()> {
         || group["IpPermissions"]
             .as_array()
             .is_none_or(|rules| !rules.is_empty())
+        || group["IpPermissionsEgress"].as_array().is_none_or(|rules| {
+            rules.len() != 1
+                || rules[0]["IpProtocol"] != "-1"
+                || rules[0]["IpRanges"] != json!([{"CidrIp":"0.0.0.0/0"}])
+                || rules[0]["Ipv6Ranges"] != json!([])
+                || rules[0]["UserIdGroupPairs"] != json!([])
+                || rules[0]["PrefixListIds"] != json!([])
+        })
     {
-        return Err("N83 security group differs or permits inbound traffic".into());
+        return Err("N83 security group differs from outbound-only rule".into());
     }
     let profile = cli(
         &[
@@ -679,17 +711,19 @@ fn preflight_provider() -> Result<()> {
     if !field(&profile["InstanceProfile"], "Arn")?.contains(&format!(":{ACCOUNT}:")) {
         return Err("EC2 instance profile belongs to another account".into());
     }
-    cli(&["s3api", "head-bucket", "--bucket", BUCKET], REGION)?;
+    cli(&["s3api", "head-bucket", "--bucket", BUCKET], BUCKET_REGION)?;
     let filter = format!("Name=tag:Project,Values={PROJECT_TAG}");
-    let existing = cli(&["ec2", "describe-instances", "--filters", &filter], REGION)?;
-    let instances = existing["Reservations"]
-        .as_array()
-        .ok_or("EC2 reservations absent")?
-        .iter()
-        .flat_map(|r| r["Instances"].as_array().into_iter().flatten().cloned())
-        .collect::<Vec<_>>();
-    if !active_ids(&instances).is_empty() {
-        return Err("another N83 allocation is active".into());
+    for region in [REGION, BUCKET_REGION] {
+        let existing = cli(&["ec2", "describe-instances", "--filters", &filter], region)?;
+        let instances = existing["Reservations"]
+            .as_array()
+            .ok_or("EC2 reservations absent")?
+            .iter()
+            .flat_map(|r| r["Instances"].as_array().into_iter().flatten().cloned())
+            .collect::<Vec<_>>();
+        if !active_ids(&instances).is_empty() {
+            return Err("another N83 allocation is active".into());
+        }
     }
     Ok(())
 }
@@ -728,7 +762,7 @@ pub fn allocate(
         "account_id":ACCOUNT,"region":REGION,"source_head_sha":plan["source_head_sha"],
         "run_id":run_id,"deadline_epoch":deadline,"instance_ids":[],"strata":[],
         "source_objects":{},"result_objects":{},"status_objects":{},
-        "allocation_cap_usd":"4.20","bid_projection_usd":"3.37"});
+        "allocation_cap_usd":"4.20","bid_projection_usd":BID_PROJECTION_USD});
     atomic_json(&receipt_path, &receipt)?;
     let prefix = format!(
         "n83-highk-current/{}/{run_id}",
@@ -754,7 +788,7 @@ pub fn allocate(
             method: "GET",
             bucket: BUCKET,
             key: field(&receipt["source_objects"]["source.tar.gz"], "key")?,
-            region: REGION,
+            region: BUCKET_REGION,
             timestamp: &date,
             expires: CAP_SECONDS as u32,
             version_id: Some(field(
@@ -769,7 +803,7 @@ pub fn allocate(
             method: "GET",
             bucket: BUCKET,
             key: field(&receipt["source_objects"]["manifest.json"], "key")?,
-            region: REGION,
+            region: BUCKET_REGION,
             timestamp: &date,
             expires: CAP_SECONDS as u32,
             version_id: Some(field(
@@ -785,7 +819,7 @@ pub fn allocate(
             method: "PUT",
             bucket: BUCKET,
             key: &canary_key,
-            region: REGION,
+            region: BUCKET_REGION,
             timestamp: &date,
             expires: 900,
             version_id: None,
@@ -811,7 +845,7 @@ pub fn allocate(
                     method: "PUT",
                     bucket: BUCKET,
                     key: &result_key,
-                    region: REGION,
+                    region: BUCKET_REGION,
                     timestamp: &date,
                     expires: (CAP_SECONDS + 900) as u32,
                     version_id: None,
@@ -823,7 +857,7 @@ pub fn allocate(
                     method: "PUT",
                     bucket: BUCKET,
                     key: &status_key,
-                    region: REGION,
+                    region: BUCKET_REGION,
                     timestamp: &date,
                     expires: (CAP_SECONDS + 900) as u32,
                     version_id: None,

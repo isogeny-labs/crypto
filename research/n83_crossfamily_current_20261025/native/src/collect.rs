@@ -17,7 +17,7 @@ fn version(key: &str) -> Result<Value> {
             "--prefix",
             key,
         ],
-        aws::REGION,
+        aws::BUCKET_REGION,
     )?;
     rows["Versions"]
         .as_array()
@@ -44,7 +44,7 @@ fn download(key: &str, path: &Path) -> Result<Value> {
             id,
             name,
         ],
-        aws::REGION,
+        aws::BUCKET_REGION,
     )?;
     let size = fs::metadata(path)?.len();
     if fetched["VersionId"] != id || fetched["ContentLength"] != size {

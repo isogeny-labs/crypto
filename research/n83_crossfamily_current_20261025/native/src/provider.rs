@@ -139,7 +139,7 @@ pub fn verify(root: &Path, stratum: usize, allocation_path: &Path, bundle: &Path
     if allocation["schema"] != "n83.crossfamily-current-aws-allocation/v1"
         || allocation["stratum"] != stratum
         || allocation["account_id"] != "590183823895"
-        || allocation["region"] != "us-east-1"
+        || allocation["region"] != aws::REGION
         || allocation["availability_zone"] != aws::ZONE
         || allocation["instance_type"] != "g5g.4xlarge"
         || allocation["market"] != "spot"
@@ -159,7 +159,7 @@ pub fn verify(root: &Path, stratum: usize, allocation_path: &Path, bundle: &Path
             .as_str()
             .is_none_or(|id| id.len() != 64)
     {
-        return Err("incomplete east-region AWS allocation".into());
+        return Err("incomplete AWS allocation".into());
     }
     let (archive_sha256, manifest_sha256) = source_bundle(root, bundle, &allocation)?;
     let identity = instance_identity()?;
@@ -194,7 +194,7 @@ pub fn verify(root: &Path, stratum: usize, allocation_path: &Path, bundle: &Path
 pub fn bind_allocation(template: &Path, output: &Path) -> Result<Value> {
     let mut allocation: Value = serde_json::from_slice(&fs::read(template)?)?;
     if allocation["schema"] != "n83.crossfamily-current-aws-allocation/v1"
-        || allocation["region"] != "us-east-1"
+        || allocation["region"] != aws::REGION
         || allocation["availability_zone"] != aws::ZONE
         || allocation["instance_type"] != "g5g.4xlarge"
         || allocation["market"] != "spot"
