@@ -1223,7 +1223,7 @@ WHERE h.genus IN (2, 3) AND h.family = 'cover' AND av.isogeny_class_id IS NOT NU
                WHERE m.source_curve_id = h.id AND m.kind = 'hyperelliptic_pullback'
                  AND m.construction IN ('prime_quadratic_pullback_v1', 'binary_cubic_pullback_v1'))";
 
-const CLASS_SQL: &str = "
+pub const CLASS_SQL: &str = "
 INSERT INTO ec.isogeny_class_fq (q, p, r, g, l_polynomial, label, order_value, order_bits, point_counts, curve_counts,
        is_ordinary, has_jacobian, status, provenance_id)
 SELECT r.q, r.p, r.r, r.g, r.l_polynomial, r.label, r.order_value, ec.bits(r.order_value), ARRAY[r.order_value],

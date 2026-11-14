@@ -248,6 +248,62 @@ algorithm; no value is guessed. In the pinned `covers.json` the skipped sources
 are 301 genus-2 sources over F_p (63 to 638 bits), 959 over GF(p^k) (49 to 253
 bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
 
+### Richelot (2,2)-isogenies of the cover sources
+
+After the Frobenius data, `import covers` computes the Richelot
+(2,2)-isogenous curves of the genus-2 cover sources over F_p, 3 <= p < 2^14
+(`src/import/richelot.rs`). No migration: it uses `curve`,
+`hyperelliptic_model`, `abelian_variety`, `curve_zeta` and `isogeny`.
+
+- **Splittings.** f of y^2 = f(x) is factored over F_p (Cantor–Zassenhaus).
+  Every factorisation f = G1 G2 G3 into factors of degree <= 2 over F_p is a
+  rational maximal isotropic subgroup K of Jac[2]: irreducible quadratic
+  factors are kept, rational roots are paired in every way. A factor of degree
+  >= 3 leaves none (`richelot_no_splitting`).
+- **Codomain.** With Delta = det of the rows (g_i0, g_i1, g_i2), Delta != 0
+  gives C': y^2 = Delta^-1 [G2,G3][G3,G1][G1,G2], [A,B] = A'B - AB'. Delta = 0
+  means Jac/K is a product of elliptic curves (a split Jacobian); it is counted
+  (`richelot_split_jacobians`) and nothing is stored. Each cover source
+  v^2 = G(u^2) with G split over F_p has the splitting u^2 - r_i, whose Delta
+  is 0: the known Jac(H) ~ E x E'.
+- **Cross-checks.** C' must be smooth of genus 2 (degree 5 or 6, squarefree),
+  and #C'(F_p), #C'(F_{p^2}), counted exhaustively, must equal the source's
+  (equal L-polynomials). The F_p count rejects the quadratic twist that the
+  other sign convention for Delta gives when p = 3 mod 4. The source's counts
+  are counted exhaustively for p < 2^12 and must equal its `cover_lpoly`
+  `curve_zeta` row. For 2^12 <= p < 2^14 that row is required, since there it
+  comes from the elliptic quotients by baby-step giant-step (an independent
+  method), and #C(F_p) is recounted against it. A failure is a problem
+  (`richelot_crosscheck_failures`) and nothing is stored for it.
+- **Rows.** Each verified image gets:
+  - an `ec.curve`: family `richelot`, model `hyperelliptic`, coefficients
+    `{"f": [...], "h": []}`, smoothness `proved`;
+  - its `hyperelliptic_model`: deg_f, and infinity type `ramified`, `split` or
+    `inert` from the leading coefficient;
+  - its Jacobian (the trigger), linked to the source's `isogeny_class_fq`.
+    The link is only set where it is NULL; a class mismatch is reported
+    (`richelot_class_mismatches`);
+  - a `curve_zeta` row: [#C'(F_p), #C'(F_{p^2})], `exhaustive count`;
+  - an `isogeny` row from Jac(C) to Jac(C'):
+    - dimension 2, degree 4, ell 2, kernel_structure {2,2}, formula `richelot`;
+    - `kernel_generators`: the three Mumford divisors (u = monic G_i, v = 0);
+    - `codomain_raw`: the splitting, Delta, the three brackets and f';
+    - `external_id` = `richelot1_` and 16 hex digits of SHA-256(p, f, kernel);
+    - status `proved` when p is proved prime.
+- **Idempotence.** The pass only inserts; a second import inserts 0 rows.
+- **Pinned run** (throwaway cluster, registry + covers, pinned
+  `covers.json`):
+  - 126 sources with p < 2^14 (20,605 above, skipped as `field_too_large`);
+  - 56 with no splitting, 258 splittings, of which 45 have Delta = 0;
+  - 213 images verified and stored as 213 curves and isogenies;
+  - 0 cross-check failures and 0 class mismatches.
+- **Not covered.**
+  - Above 2^14 the image would need a point count that is not exhaustive.
+  - Splittings whose G_i are only Galois-stable as a set, not each defined
+    over F_p, are left out.
+  - Split Jacobians store no elliptic factors.
+  - Dual isogenies are not stored.
+
 ### Global curves, security, evidence (`0007`)
 
 | Table | What it holds |
