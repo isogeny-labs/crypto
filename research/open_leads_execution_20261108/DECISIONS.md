@@ -38,3 +38,11 @@ executor.
 
 Fix it on `main` through this branch's next PR with the least invasive of the three proposed fixes
 that works with the artifact store. The study's evidence is not edited, and no session is relabelled.
+
+### Owner decisions of 2026-11-14 (PKM fall-degree study, Amendments 15 and 16)
+
+| # | date | question put to the owner | answer | what it authorizes |
+|---|---|---|---|---|
+| 9 | 2026-11-14 | "Confirm that the $40-per-job and $400-study ceilings also apply to reserved pods" | "Yes to all" | Decision 4's ceilings (US$40 per job including 4 h idle, US$400 for the study) apply to reserved RunPod pods (Amendment 15). |
+| 10 | 2026-11-14 | "Confirm once that the RunPod balance covers a few tens of dollars" | "Yes to all" | The one-time balance confirmation Amendment 15 §6 requires. |
+| 11 | 2026-11-14 | "S3 access: an AWS profile here or a presign-upload token" | "Yes to all" | Read as willingness to provide access. It is not access itself: on 2026-11-14 22:13Z `scripts/checkpoint.sh push` failed with `InvalidAccessKeyId`, so S3 stays blocked until a working credential exists. |
