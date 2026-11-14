@@ -18,6 +18,8 @@ const ORDER: u128 = 2_417_851_639_230_796_216_685_689;
 const OBJECT_SHA256: &str = "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a";
 const POSITIVE_XCNF_SHA256: &str =
     "f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c";
+const SORTED_PINNED_XCNF_SHA256: &str =
+    "579a3719fd54ae600632db3ef2a5e0bd458ff5f6c6b3d4524a2eed6d3e4e3d08";
 
 fn sha_file(path: &Path) -> Result<String> {
     let mut file = File::open(path)?;
@@ -155,11 +157,19 @@ fn model(stdout: &Path, variables: usize) -> Result<Vec<u8>> {
     Ok(assignment)
 }
 
-fn check_xcnf(path: &Path, assignment: &[u8]) -> Result<(usize, usize)> {
+fn check_xcnf(
+    path: &Path,
+    assignment: &[u8],
+    expected_variables: usize,
+    expected_cnf: usize,
+    expected_xor: usize,
+) -> Result<(usize, usize)> {
     let mut reader = BufReader::new(File::open(path)?);
     let mut header = String::new();
     reader.read_line(&mut header)?;
-    if header.trim_end() != "p cnf 111478 1146201" || assignment.len() != 111_479 {
+    if header.trim_end() != format!("p cnf {expected_variables} {}", expected_cnf + expected_xor)
+        || assignment.len() != expected_variables + 1
+    {
         return Err("positive XCNF header or model size differs".into());
     }
     let mut cnf = 0usize;
@@ -204,7 +214,7 @@ fn check_xcnf(path: &Path, assignment: &[u8]) -> Result<(usize, usize)> {
             }
         }
     }
-    if (cnf, xor) != (1_141_221, 4_980) {
+    if (cnf, xor) != (expected_cnf, expected_xor) {
         return Err("original XCNF row counts differ".into());
     }
     Ok((cnf, xor))
@@ -267,25 +277,52 @@ fn choose_lift(
     Ok(chosen)
 }
 
-fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Path) -> Result<()> {
-    if output.exists()
-        || sha_file(xcnf)? != POSITIVE_XCNF_SHA256
-        || sha_file(object)? != OBJECT_SHA256
-    {
+fn replay(
+    xcnf: &Path,
+    stdout: &Path,
+    export: &Path,
+    object: &Path,
+    output: &Path,
+    sorted: bool,
+) -> Result<()> {
+    let (mode, formula_sha, variables, clauses) = if sorted {
+        (
+            "positive-sorted-pinned",
+            SORTED_PINNED_XCNF_SHA256,
+            111_806,
+            1_142_209,
+        )
+    } else {
+        ("positive", POSITIVE_XCNF_SHA256, 111_478, 1_141_221)
+    };
+    if output.exists() || sha_file(xcnf)? != formula_sha || sha_file(object)? != OBJECT_SHA256 {
         return Err("native replay output or input hash differs".into());
     }
     let export_record: Value = serde_json::from_slice(&fs::read(export)?)?;
     if export_record["status"] != "PASS_XCNF_EXPORT_ONLY"
-        || export_record["mode"] != "positive"
-        || export_record["xcnf_sha256"] != POSITIVE_XCNF_SHA256
+        || export_record["mode"] != mode
+        || export_record["xcnf_sha256"] != formula_sha
+        || export_record["shape"]["variables"] != variables
+        || export_record["shape"]["clauses"] != clauses
+        || export_record["shape"]["xor_rows"] != 4_980
+        || export_record["shape"]["positive_x_pins"] != 747
     {
         return Err("native replay export identity differs".into());
     }
-    let assignment = model(stdout, 111_478)?;
-    let (cnf, xor) = check_xcnf(xcnf, &assignment)?;
+    if sorted
+        && (export_record["shape"]["summand_ordering"] != "all_nondecreasing_x"
+            || export_record["positive"]["indices"] != json!([166, 498, 664, 0, 332]))
+    {
+        return Err("sorted positive witness identity differs".into());
+    }
+    let assignment = model(stdout, variables)?;
+    let (cnf, xor) = check_xcnf(xcnf, &assignment, variables, clauses, 4_980)?;
     let xs = (0..5)
         .map(|block| x_block(&assignment, block))
         .collect::<Vec<_>>();
+    if sorted && xs.windows(2).any(|pair| pair[0] > pair[1]) {
+        return Err("sorted model x coordinates are out of order".into());
+    }
     let intermediates = (5..8)
         .map(|block| x_block(&assignment, block))
         .collect::<Vec<_>>();
@@ -371,9 +408,9 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
         return Err("positive relation row digest differs".into());
     }
     let report = json!({
-        "schema":"n83.k2048-m5-native-positive-replay/v1",
+        "schema":if sorted {"n83.k2048-m5-sorted-positive-replay/v1"} else {"n83.k2048-m5-native-positive-replay/v1"},
         "status":"PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY",
-        "xcnf_sha256":POSITIVE_XCNF_SHA256,"solver_stdout_sha256":sha_file(stdout)?,
+        "xcnf_sha256":formula_sha,"solver_stdout_sha256":sha_file(stdout)?,
         "object_sha256":OBJECT_SHA256,"export_receipt_sha256":sha_file(export)?,
         "replay_binary_sha256":sha_file(&std::env::current_exe()?)?,
         "checked_cnf_clauses":cnf,"checked_xor_rows":xor,
@@ -398,16 +435,18 @@ fn replay(xcnf: &Path, stdout: &Path, export: &Path, object: &Path, output: &Pat
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
-    let result = if args.len() == 6 {
+    let sorted = args.len() == 7 && args[6] == "positive-sorted-pinned";
+    let result = if args.len() == 6 || sorted {
         replay(
             Path::new(&args[1]),
             Path::new(&args[2]),
             Path::new(&args[3]),
             Path::new(&args[4]),
             Path::new(&args[5]),
+            sorted,
         )
     } else {
-        Err("usage: n83_k2048_m5_native_replay XCNF SOLVER_STDOUT EXPORT_JSON OBJECT_GZ NEW_RECEIPT".into())
+        Err("usage: n83_k2048_m5_native_replay XCNF SOLVER_STDOUT EXPORT_JSON OBJECT_GZ NEW_RECEIPT [positive-sorted-pinned]".into())
     };
     if let Err(error) = result {
         eprintln!("{error}");
