@@ -241,3 +241,38 @@ Seventeen Iwasawa-type ideas have now been examined (14 brainstormed, then R1–
 - The natural next test, if the line continues, is R1 with non-affine statistics: mutual
   information between bits of x and bits of ψ, and degree-bounded fits of ψ on the coordinates.
 - Nothing here bears on any leaderboard row; no index-calculus baseline was measured.
+
+## 10. R1b: non-affine leakage of ψ (measured, 2026-11-14)
+
+This closes the open thread from §6 and §9.
+
+**Protocol.** `r1_carry/PROTOCOL_R1B.md` (sha256 `d69cb9c1…a9c6`) was frozen before data. The tool
+is `r1_carry/src/bin/r1b.rs` (sha256 `5ed67677…e5fb`). It was run locally with seed 20261114 in
+about 6 s, exact, no timing. Output: `r1_carry/results_r1b_seed20261114.jsonl`
+(sha256 `88c2bf7c…bfda2`).
+
+| Statistic (measured) | Positive control | Test (12 curves) | Negative control | Null bound (frozen) |
+|---|---|---|---|---|
+| S4: max χ² over ~196 (bit of x, bit of ψ) pairs, p ∈ [2¹³, 2¹⁴] | 9520–15172 (anomalous, ψ/ψ(P) = x) | 7.53–17.59 | 6.48–15.44 | ≤ 20.8 on ≥ 11 of 12 |
+| S5: degree deficit of ψ/y as a polynomial in x, p ∈ [2¹¹, 2¹²] | known cubic: degree 3 on all 12 | 0 on all 12 (m = 1049–1883) | — | ≤ 2 on all 12 |
+
+**Verdict.** Null on both preregistered statistics. ψ/y has full degree m − 1 in x on every curve,
+which is what a function with no structure has. No (bit of x, bit of ψ) pair reaches the Bonferroni
+threshold.
+
+**Post-hoc observation, not preregistered.** On 11 of 12 curves the test max χ² exceeded its
+shuffled control. The identity ψ(−Q) = −ψ(Q), together with log(−Q) = n − log(Q), pairs x with n − x.
+That pairing halves the effective sample size and inflates χ², and the shuffle destroys it. A
+diagnostic restricted to x ≤ (n − 1)/2 (one point of each ± pair, same seed and curves) gives
+test 6.10–15.03 against shuffled 6.69–16.44, with the test arm higher on 6 of 12. So the excess is
+the trivial negation symmetry. Diagnostic output: `r1_carry/diag_halfrange_seed20261114.jsonl`.
+
+**Standing.** R1 is now null for:
+- affine leakage (S1, S2);
+- the carry cocycle (S3);
+- single-bit leakage (S4);
+- low-degree structure in the x-coordinate (S5).
+
+All at toy scale. Combinations of several bits and higher-dimensional fits remain untested. Their
+cost grows quickly, and nothing here suggests a direction. The Iwasawa line ends here with no
+surviving lead.
