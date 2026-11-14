@@ -1422,6 +1422,15 @@ pub trait CountedGroup {
     fn add(&self, ops: &mut GroupOps, p: Self::Elt, q: Self::Elt) -> Self::Elt;
     fn double(&self, ops: &mut GroupOps, p: Self::Elt) -> Self::Elt;
     fn neg(&self, p: Self::Elt) -> Self::Elt;
+    /// `a` when `first`, else `b`: `if first { a } else { b }`, for the
+    /// walk's canonicalisation, where `first` is a coin toss (a branch on
+    /// it is mispredicted half the time).  A group whose elements are a
+    /// few words overrides it with word-wise selects, which stay moves
+    /// (the default's select of a whole element can become a branch).
+    #[inline]
+    fn select_elt(&self, first: bool, a: Self::Elt, b: Self::Elt) -> Self::Elt {
+        std::hint::select_unpredictable(first, a, b)
+    }
     /// A key that identifies the element (both walks must agree on it).
     fn key(&self, p: &Self::Elt) -> u64;
     /// An opt-in addition path for the relation walk.  The closure lives for
@@ -1858,6 +1867,40 @@ fn joint_mul<G: CountedGroup>(
     acc
 }
 
+/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A
+/// select the compiler can see (`if first { a } else { b }`,
+/// `select_unpredictable`, mask arithmetic) it may turn into a branch
+/// around the code that computes its operands, and the walk's coin-toss
+/// conditions then cost a misprediction half the time; the instruction is
+/// opaque to it.
+#[inline(always)]
+fn pick_word(first: bool, a: u64, b: u64) -> u64 {
+    #[cfg(target_arch = "x86_64")]
+    {
+        let mut out = b;
+        // SAFETY: register-only; `out` takes `a` when `first` is non-zero.
+        unsafe {
+            std::arch::asm!(
+                "test {c:e}, {c:e}",
+                "cmovnz {out}, {a}",
+                c = in(reg) u32::from(first),
+                a = in(reg) a,
+                out = inout(reg) out,
+                options(pure, nomem, nostack),
+            );
+        }
+        out
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        if first {
+            a
+        } else {
+            b
+        }
+    }
+}
+
 #[inline]
 fn negmod(a: u64, m: u64) -> u64 {
     if a == 0 {
@@ -1865,6 +1908,44 @@ fn negmod(a: u64, m: u64) -> u64 {
     } else {
         m - a
     }
+}
+
+/// Whether `key` is one of `keys`: every entry compared, no branch per
+/// entry.  With AVX2 (found at run time) four keys are compared per
+/// instruction instead of two; the answer is the same.
+#[inline]
+fn any_key_equals(keys: &[u64], key: u64) -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        if keys.len() >= 8 && std::arch::is_x86_feature_detected!("avx2") {
+            // SAFETY: AVX2 is available, as just detected.
+            return unsafe { any_key_equals_avx2(keys, key) };
+        }
+    }
+    keys.iter().fold(false, |any, &k| any | (k == key))
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn any_key_equals_avx2(keys: &[u64], key: u64) -> bool {
+    use std::arch::x86_64::{
+        __m256i, _mm256_cmpeq_epi64, _mm256_loadu_si256, _mm256_or_si256, _mm256_set1_epi64x,
+        _mm256_setzero_si256, _mm256_testz_si256,
+    };
+    let needle = _mm256_set1_epi64x(key as i64);
+    let mut seen = _mm256_setzero_si256();
+    let chunks = keys.chunks_exact(4);
+    let tail = chunks.remainder();
+    for c in chunks {
+        // SAFETY: `c` is four `u64`s; the load is unaligned.
+        let v = unsafe { _mm256_loadu_si256(c.as_ptr().cast::<__m256i>()) };
+        seen = _mm256_or_si256(seen, _mm256_cmpeq_epi64(v, needle));
+    }
+    let mut hit = _mm256_testz_si256(seen, seen) == 0;
+    for &k in tail {
+        hit |= k == key;
+    }
+    hit
 }
 
 /// The classes a tuned walk moves between: one representative per orbit
@@ -1884,6 +1965,15 @@ pub trait RhoClasses<G: CountedGroup> {
     /// Points only: no canonicalisation is performed or counted.
     fn trivial(&self) -> bool {
         false
+    }
+    /// `Some(r)` for the classes `{P, -P}` of [`NegationClasses`]: `canon`
+    /// then is `-p` (multiplier `r - 1`) when its key is smaller than `p`'s
+    /// and `p` (multiplier 1) otherwise, with no field work.  The walk
+    /// reads it to take that choice as a select instead of a branch (the
+    /// two outcomes are equally likely, so the branch is mispredicted
+    /// half the time); every other class answers `None`.
+    fn negation_rule(&self) -> Option<u64> {
+        None
     }
     /// The walk's name in reports.
     fn method(&self) -> &'static str;
@@ -1923,6 +2013,9 @@ impl<G: CountedGroup> RhoClasses<G> for NegationClasses {
         } else {
             (p, 1)
         }
+    }
+    fn negation_rule(&self) -> Option<u64> {
+        Some(self.r)
     }
     fn method(&self) -> &'static str {
         "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"
@@ -2338,6 +2431,22 @@ fn rho_canon<G: CountedGroup, C: RhoClasses<G>>(
         return (p, a, b, false);
     }
     *canonicalisations += 1;
+    if r > 2 && classes.negation_rule() == Some(r) {
+        // `NegationClasses::canon` followed by the branches below, as
+        // selects: the representative is `-p` exactly when its key is
+        // smaller (multiplier `r - 1`, the coefficients negated, and
+        // `flipped`; `r > 2` keeps `r - 1` apart from the multiplier 1),
+        // else `p` with `a`, `b` as they are.  The same values; no field
+        // work is tallied either way.  The negations of the unselected
+        // arm are computed and dropped, so they wrap rather than trap.
+        let neg = |x: u64| if x == 0 { 0 } else { r.wrapping_sub(x) };
+        let n = g.neg(p);
+        let flip = g.key(&n) < g.key(&p);
+        let rep = g.select_elt(flip, n, p);
+        let a = pick_word(flip, neg(a), a);
+        let b = pick_word(flip, neg(b), b);
+        return (rep, a, b, flip);
+    }
     let (rep, mu) = classes.canon(g, ops, p);
     if mu == 1 {
         (rep, a, b, false)
@@ -2681,10 +2790,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
     /// and the ring is read in age order only on a hit.
     #[inline]
     fn recent_position(&self, key: u64) -> Option<usize> {
-        let hit = self
-            .recent_keys
-            .iter()
-            .fold(false, |any, &k| any | (k == key));
+        let hit = any_key_equals(&self.recent_keys, key);
         if !hit {
             return None;
         }
@@ -2757,11 +2863,15 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                 tried += 1;
                 let ky = g.key(&y);
                 let hy = mix(ky);
+                // One branch on the whole test (`flipped` alone is a coin
+                // toss, so a branch on it is mispredicted half the time);
+                // every operand is pure, so evaluating them all changes
+                // nothing.
                 if self.look_ahead
-                    && flipped
-                    && tried < jump_count
-                    && !g.is_identity(&y)
-                    && self.index_of(hy) == j
+                    & flipped
+                    & (tried < jump_count)
+                    & !g.is_identity(&y)
+                    & (self.index_of(hy) == j)
                 {
                     tally.look_ahead_adds += 1;
                     continue;
@@ -6155,6 +6265,14 @@ impl CountedGroup for PrimeCurve {
             p
         } else {
             PrimePoint::affine(p.x, if p.y == 0 { 0 } else { self.p - p.y })
+        }
+    }
+    #[inline]
+    fn select_elt(&self, first: bool, a: PrimePoint, b: PrimePoint) -> PrimePoint {
+        PrimePoint {
+            x: pick_word(first, a.x, b.x),
+            y: pick_word(first, a.y, b.y),
+            infinity: pick_word(first, u64::from(a.infinity), u64::from(b.infinity)) != 0,
         }
     }
     fn key(&self, p: &PrimePoint) -> u64 {
@@ -16319,6 +16437,106 @@ mod tests {
                 reference::invmod(a, m),
                 "invmod({a}, {m})"
             );
+        }
+    }
+
+    /// `NegationClasses` with the select fast path of [`rho_canon`]
+    /// switched off: the branchy form it must equal.
+    struct BranchyNegation(NegationClasses);
+    impl<G: CountedGroup> RhoClasses<G> for BranchyNegation {
+        fn automorphisms(&self) -> u32 {
+            2
+        }
+        fn canon(&self, g: &G, ops: &mut GroupOps, p: G::Elt) -> (G::Elt, u64) {
+            RhoClasses::<G>::canon(&self.0, g, ops, p)
+        }
+        fn method(&self) -> &'static str {
+            "branchy negation"
+        }
+    }
+
+    #[test]
+    fn negation_canonicalisation_by_selects_equals_the_branches() {
+        for (bits, seed) in [(14u32, 59297u64), (20, 3), (30, 11)] {
+            let inst = find_prime_order_curve(bits, seed);
+            let g = &inst.curve;
+            let r = inst.r;
+            let gen = inst.generator_point();
+            let fast = NegationClasses { r };
+            let slow = BranchyNegation(NegationClasses { r });
+            let mut ops = GroupOps::default();
+            let mut points = vec![PrimePoint::INFINITY, gen, g.neg(gen)];
+            // A point of order two has `y = 0`: `neg` is the identity map.
+            points.push(PrimePoint::affine(5 % g.p, 0));
+            let mut pt = gen;
+            for _ in 0..2000 {
+                pt = g.add(&mut ops, pt, gen);
+                points.push(pt);
+            }
+            for (i, &p) in points.iter().enumerate() {
+                let i = i as u64;
+                for (a, b) in [
+                    (0, 0),
+                    (1, r - 1),
+                    (r - 1, 0),
+                    (i * 7919 % r, i * 104729 % r),
+                ] {
+                    let (mut c1, mut c2) = (7u64, 7u64);
+                    let x = rho_canon(g, &fast, &mut ops, p, a, b, r, &mut c1);
+                    let y = rho_canon(g, &slow, &mut ops, p, a, b, r, &mut c2);
+                    assert_eq!(x, y, "p={p:?} a={a} b={b} r={r}");
+                    assert_eq!(c1, c2);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn any_key_equals_matches_a_scan() {
+        let mut x = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for len in 0..40usize {
+            for _ in 0..200 {
+                let keys: Vec<u64> = (0..len).map(|_| next() % 64).collect();
+                for key in [next() % 64, 0, 63, u64::MAX, 1 << 63] {
+                    assert_eq!(
+                        any_key_equals(&keys, key),
+                        keys.contains(&key),
+                        "len={len} key={key}"
+                    );
+                }
+            }
+        }
+        // Full-width keys, the hit in each lane and in the tail.
+        for len in [8usize, 9, 16, 17] {
+            for hit in 0..len {
+                let mut keys: Vec<u64> = (0..len as u64)
+                    .map(|i| i.wrapping_mul(0x1234_5678_9ABC_DEF1))
+                    .collect();
+                let key = 0xFEDC_BA98_7654_3210u64;
+                assert!(!any_key_equals(&keys, key));
+                keys[hit] = key;
+                assert!(any_key_equals(&keys, key), "len={len} hit={hit}");
+            }
+        }
+    }
+
+    #[test]
+    fn pick_word_is_the_select() {
+        for &(a, b) in &[
+            (0u64, 0u64),
+            (1, 2),
+            (u64::MAX, 0),
+            (0, u64::MAX),
+            (1 << 63, 5),
+        ] {
+            assert_eq!(pick_word(true, a, b), a);
+            assert_eq!(pick_word(false, a, b), b);
         }
     }
 
