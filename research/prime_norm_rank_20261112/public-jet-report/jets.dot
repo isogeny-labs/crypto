@@ -1,0 +1,14 @@
+digraph jets {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.2",ranksep="0.3"];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=11,margin="0.14,0.10"];
+  edge [fontname="Helvetica",fontsize=10,color="#526273"];
+  public [label="Public support G and curve f\nN(A,B) = A² - fB²"];
+  local [label="Componentwise jets: (A+GJ, B+GK)\nExplicit Bezout inverse reaches any first jet"];
+  remainder [label="Modulo G² can pass\nFull higher-order residual can remain",fillcolor="#fff2da"];
+  rigid [label="Old and new pole budgets\nforce J=K=0",fillcolor="#ffe8e5"];
+  coupled [label="Coupled chart: G divides A-sB\ns²=f modulo G; coordinates may move",fillcolor="#e9f5ee"];
+  reconstruct [label="Supplied public branches → linear reconstruction\nF17 control: kernel dimensions 1 and 0"];
+  missing [label="Open: choose branches jointly and efficiently\nComplete bit-cost bound still required",style="rounded,dashed",fillcolor="white"];
+  public -> local; local -> remainder; local -> rigid;
+  public -> coupled; coupled -> reconstruct; reconstruct -> missing;
+}

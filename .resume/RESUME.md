@@ -1,31 +1,15 @@
-# Resume: ECC2K-130 open-items sweep (2026-11-14)
+# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-Chase the owner's seven open items for binary/Koblitz (ECC2K-130-type) index calculus in parallel:
-L1 Frobenius/negation-closed non-linear factor base; L2 UNSAT refutation cost and pre-solve
-filters; L3 cross-instance SAT amortisation; L4 missing baselines (gcd with subspace polynomial,
-FES, polynomial method); L5 function-field Coppersmith on S3; L6 Gröbner-free dissection
-splitting; L7 end-to-end normalisation against matched rho.
-
-## Lead / hypothesis
-Each lane states the residual question left by prior repository work (or CLOSED-BY-PRIOR) and
-a pre-registered prediction in its frozen PROTOCOL.md.
+Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
 
 ## Spec
-research/ecc2k130_open7_20261114/COMMON.md (sha256 479269fe…) and each lane's PROTOCOL.md.
-Toy scale, local, counted units decide.
+Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
+Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
+Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
 
 ## State
-Seven subagent lanes dispatched 2026-11-14. Branch claude/ecc-discrete-log-open-3n28i1.
+2026-11-14: patch written, release build running. No rows yet.
 
-## Next steps
-Collect lane SUMMARY.md/RESULTS.md; consolidate README.md, overview SVG and REPORT.pdf in
-research/ecc2k130_open7_20261114/; session log; commit, PR with auto-merge.
-
-## Runs in flight
-Local processes started by lanes L1..L7 (1 core, <2 GB each); no remote jobs.
-
-## Stop and success conditions
-Stop when every lane has a verdict under its frozen rule (or CLOSED-BY-PRIOR) and the
-consolidated report is in a PR. Success = any verified, measured improvement over the current
-binary IC baseline in counted units; no lane claims an end-to-end speedup from a stage ratio.
+## Next
+Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.
