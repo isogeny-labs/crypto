@@ -74,7 +74,9 @@ def preflight(args, lock):
     require(sha256(xcnf) == entry["xcnf_sha256"], "XCNF differs")
     require(xcnf.stat().st_size == entry["xcnf_bytes"], "XCNF byte count differs")
     require(xcnf.open("rb").readline().decode().strip() == f'p cnf {entry["variables"]} {entry["dimacs_header_clauses"]}', "XCNF header differs")
-    samples = (root / "host-preflight-natural-solver.txt").read_text().splitlines()
+    require(Path(args.host_preflight_file).name == args.host_preflight_file, "host sample name must be a basename")
+    sample_path = root / args.host_preflight_file
+    samples = sample_path.read_text().splitlines()
     require(len(samples) == 12, "three host samples required")
     loads = [float(samples[index].split()[1]) for index in (1, 5, 9)]
     swaps = [int(samples[index].split()[1].rstrip(".")) for index in (2, 6, 10)]
@@ -83,7 +85,7 @@ def preflight(args, lock):
     require(os.getloadavg()[0] <= 24, "launch load gate failed")
     require(swapouts() == swaps[-1], "launch swapouts changed")
     require(shutil.disk_usage(root).free >= 2 * 1024**3, "scratch gate failed")
-    return xcnf, loads, swaps[-1]
+    return xcnf, loads, swaps[-1], sample_path
 
 
 def solver_status(exit_code, timed_out, stdout):
@@ -106,12 +108,13 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("worker", type=Path)
     parser.add_argument("solver", type=Path)
+    parser.add_argument("--host-preflight-file", default="host-preflight-natural-solver.txt")
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
     lock_path = Path(__file__).with_name("NATURAL_SOLVER_LOCK.json")
     lock = json.loads(lock_path.read_text())
     require(lock["schema"] == "n83.d18-ordered-cms-fullgauss-natural-solver-lock/v1", "lock schema differs")
-    xcnf, loads, baseline_swaps = preflight(args, lock)
+    xcnf, loads, baseline_swaps, sample_path = preflight(args, lock)
     if args.preflight_only:
         print(json.dumps({"status": "PREFLIGHT_PASS", "load_1m": loads, "swapouts": baseline_swaps}, sort_keys=True))
         return
@@ -167,6 +170,8 @@ def main():
         "cpu_system_seconds": usage.ru_stime,
         "sampled_peak_rss_kb": peak_rss_kb,
         "host_load_1m_preflight": loads,
+        "host_preflight_file": sample_path.name,
+        "host_preflight_sha256": sha256(sample_path),
         "swapouts_preflight": baseline_swaps,
         "swapouts_after": swapouts(),
         "stdout_sha256": sha256(out / "stdout.txt"),

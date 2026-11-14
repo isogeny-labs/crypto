@@ -26,3 +26,8 @@ independent field/curve, subgroup and relation-row replay before it counts
 as one natural relation. One relation does not establish natural yield,
 rank, subgroup logs, unseen-target descent, or an end-to-end factor-base
 choice on either N83 curve.
+
+The first natural-solver host sample failed the load gate before launch.
+Retain that file unchanged and pass a fresh, uniquely named sample file with
+`--host-preflight-file` on a later retry. The runner records its name and hash
+in the solver receipt; the load, swapout, scratch and solver caps are unchanged.
