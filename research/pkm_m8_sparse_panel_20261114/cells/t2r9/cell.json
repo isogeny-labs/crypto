@@ -1,0 +1,64 @@
+{
+  "B": 4,
+  "B_real": 2,
+  "R": 9,
+  "T": 2,
+  "V": [
+    2,
+    87043,
+    262151,
+    175110
+  ],
+  "V_real": [
+    87043,
+    262151
+  ],
+  "a": 258956,
+  "b": 212245,
+  "curve_search_attempts": 69,
+  "derivation_rule": "p runs over the primes >= 2^(T*R) (T*R >= 16) with 2^T | p-1, in increasing order; a prime is ELIGIBLE iff it is not a Fermat prime (p-1 not a power of two), a prime-order curve y^2=x^3+ax+b is found within 400 attempts, and a base with B_real >= ceil(B/2) exists under the g rule; the first eligible prime is used and every rejected prime is recorded. Curve search: StdRng (rand 0.8, ChaCha12) seeded by SHA-256('pkm.m8-panel/v1|curve|<slug>|<seed>|<p>'), a, b uniform in [1,p), skip singular, #E counted natively (exhaustive Legendre sum for p < 2^20, else Hasse-interval baby-step giant-step of a random point whose unique candidate is #E), first prime #E; r*Pv = O is checked for a random point. zeta = h^((p-1)>>T) for the least h >= 2 with zeta^(2^(T-1)) != 1. g rule: the least integer g in [2, 20000) outside mu_(2^T) (g^(2^T) != 1) with B_real >= ceil(2^T/2). V = { g*zeta^k }. Real base = { x in V : x^3+ax+b is a non-zero square }, positive sign = the point with y <= (p-1)/2. Generator P = point with the least x >= 1, y <= (p-1)/2. Exception: T=3, R=8 reuses the L1 decisive cell (p=16801793; a, b, g reconstructed by a native port of CPython random.Random(str) following gen.py, no eligibility rule applied; see l1_reuse).",
+  "eligibility": {
+    "b_real_min": 2,
+    "curve_attempt_bound": 400,
+    "g_bound": 20000
+  },
+  "g": 2,
+  "generator": {
+    "x": 1,
+    "y": 56134
+  },
+  "group_order": 262511,
+  "l1_reuse": {
+    "requested": false
+  },
+  "master_seed": 20261114,
+  "min_prime_override": null,
+  "p": 262153,
+  "point_count_method": "legendre_sum",
+  "r": 262511,
+  "real_base": [
+    {
+      "v_index": 1,
+      "x": 87043,
+      "y": 6312
+    },
+    {
+      "v_index": 2,
+      "x": 262151,
+      "y": 70214
+    }
+  ],
+  "rejected_primes": [],
+  "schema": "pkm.m8-panel.cell/v1",
+  "seed": 20261114,
+  "sha256": "ac6bcc194bb2ad2e8a3b2bfbf0d68b2f4911c10d2cf1e4d05ec78b1ce5de253e",
+  "signed_points": 4,
+  "slug": "t2-r9-s20261114",
+  "tool": {
+    "git_commit": "2f965fef941db43ea284ef058b017711a0409e74",
+    "git_note": "null when run outside a git checkout and PKM_M8_GIT_COMMIT was not set at build",
+    "name": "pkm_m8_panel",
+    "source_sha256": "ba0a04209dd97914307fdb1e2a4c0d3ef15884da77348c91a32e51f125120ac7"
+  },
+  "zeta": 174598
+}

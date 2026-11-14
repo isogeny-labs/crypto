@@ -1,7 +1,8 @@
 # Protocol: panel A, positive sparse PKM relation finding at m = 8 (frozen before data)
 
 **Study:** `research/pkm_m8_sparse_panel_20261114/`. **Date written:** 2026-11-14; revised the same day after the
-pre-freeze red-team review (`REDTEAM_PROTOCOL.md`, findings B1–B6 and S1–S9 all adopted). **Status:** draft until
+pre-freeze red-team review (`REDTEAM_PROTOCOL.md`, findings B1–B6 and S1–S9 all adopted), and again (v2.2, §9a)
+after the pilot on seed 777 (`PILOT.md`). **Status:** draft until
 the freeze line at the end carries a commit hash; no data is taken before that.
 **Standing:** every number produced under this protocol is `[pcc:unverified]` until a pcc claim is filed;
 nothing here reaches a leaderboard or `benchmarks/README.md` without the validation gate.
@@ -85,17 +86,17 @@ The owner is told this before launch.
   the Ubuntu archive pinned to `0.6.5-1build2` (GNU `time` installed too), the panel binary shipped from this
   container (same glibc 2.39). Isolation is shared-host (RunPod): timing rows are L0-class; CPU seconds are
   the primary timing observable, wall time secondary; the matrix-work proxy is host-independent. A no-op
-  msolve baseline (empty-ish system) is timed once for the timer floor. Every prime is ≥ 2^17 and < 2^31 so
+  msolve baseline (empty-ish system) is timed once for the timer floor. Every prime is ≥ 2^18 and < 2^31 so
   msolve selects the same coefficient kernel in every cell (its kernel choice by characteristic size was
   not verified in source; the uniform band removes the question).
 
 ## 3. Cells (deterministic; derived by `pkm_m8_panel cell`, master seed 20261114)
 
-| cell | t | B | ratio ρ = log_B p | p rule (all primes ≥ 2^17, one msolve kernel band) | order |
+| cell | t | B | ratio ρ = log_B p | p rule (all primes ≥ 2^18, one msolve kernel band) | order |
 |---|---|---|---|---|---|
-| t2r8 | 2 | 4 | 8.5 | least eligible prime ≥ 2^17 with 4 \| p−1 (the band 2^16–2^17 is excluded: msolve 0.6.5 segfaults on inputs at p = 65537 and 131101) | 1 |
-| t2r9 | 2 | 4 | 9 | least eligible prime ≥ 2^18 | 2 |
-| t2r10 | 2 | 4 | 10 | least eligible prime ≥ 2^20 | 3 |
+| t2r9 | 2 | 4 | 9 | least eligible prime ≥ 2^18 with 4 \| p−1 (the band below 2^18 is excluded: msolve 0.6.5 segfaults at once on every input tried there, p = 65537, 65557, 131101, `PILOT.md`) | 1 |
+| t2r10 | 2 | 4 | 10 | least eligible prime ≥ 2^20 | 2 |
+| t2r11 | 2 | 4 | 11 | least eligible prime ≥ 2^22 (replaces the v2.1 cell t2r8, whose rule collapsed onto the t2r9 prime; §9a) | 3 |
 | t3r8 | 3 | 8 | 8 | the L1 decisive cell p = 16801793 with the L1 curve, g, ζ if recoverable from committed files, else the rule | 4 |
 | t3r7 | 3 | 8 | 7 | least eligible prime ≥ 2^21 with 8 \| p−1 | 5 |
 | t3r9 | 3 | 8 | 9 | least eligible prime ≥ 2^27 | 6 |
@@ -103,12 +104,13 @@ The owner is told this before launch.
 
 **Eligible** means: prime, `2^t | p−1`, not a Fermat prime, a prime-order curve found by the seeded search,
 and a base with `B_real ≥ B/2` under the `g` rule (`g` = least integer ≥ 2 outside `μ_{2^t}` giving
-`B_real ≥ B/2`; if none below a frozen bound, the next prime). The t = 2 ratios are 8.5, 9, 10 (not 7, 8, 9)
-so that every prime is ≥ 2^17; the ratio only sets the natural-SAT rate, the degree is p-independent
+`B_real ≥ B/2`; if none below a frozen bound, the next prime; the instrument's bound is g < 20000). The t = 2 ratios are 9, 10, 11
+so that every prime is ≥ 2^18; the ratio only sets the natural-SAT rate, the degree is p-independent
 (L1 replication at p = 12289 and 40961).
 
 **msolve crash rule (frozen):** rc 139 with max RSS < 50 % of the cap, or within 60 s, is `crash`, not a
-cap stop (msolve 0.6.5 segfaults on some small inputs at p = 65537 and 131101). The first call of every
+cap stop (msolve 0.6.5 segfaults at once on every input tried below 2^18: p = 65537, 65557, 131101; it runs at
+262153, 524309, 1048589 and the L1 prime). The first call of every
 cell is its planted row at t = 2 (cheap) or its first natural row at t = 3; if that call crashes, the cell
 is replaced by the next eligible prime before any natural row is analysed, and the crash and replacement
 are recorded. A crashed t = 3 natural row elsewhere keeps its CPU time as a (weak) lower bound.
@@ -129,9 +131,9 @@ is recorded per target and every row is stratified by it in the results); plus 1
 
 | cells | msolve threads | wall timeout | memory cap | native arm |
 |---|---|---|---|---|
-| t2r8, t2r9, t2r10 (mode param) | 8 | 3,600 s | 60 GB RSS (every cap is at least 2 GB above the need: msolve reserves ~1.2 GB of address space at start) | SAT 1, UNSAT 1 per cell: 1 thread, 3,600 s, 30 GB |
-| t2 mode gb (cross-check) | 8 | 3,600 s | 60 GB RSS | — |
-| t3r8, t3r7, t3r9 natural rows | 8 | 14,400 s | 0.9 × cgroup `memory.max` RSS | none at t = 3 |
+| t2r9, t2r10, t2r11 (mode param) | 8 | 7,200 s | 60 GB RSS (every cap is at least 2 GB above the need: msolve reserves ~1.2 GB of address space at start) | SAT 1, UNSAT 1 per cell: 1 thread, 600 s, 30 GB |
+| t2 mode gb (cross-check) | 8 | 7,200 s | 60 GB RSS | — |
+| t3r8, t3r7, t3r9 natural rows | 8 | 21,600 s | 0.9 × cgroup `memory.max` RSS | none at t = 3 |
 | t3 planted rows (last, "interface only") | 8 | 3,600 s | same | — |
 | t4r7 probe | 8 | 7,200 s | same | — |
 
@@ -141,14 +143,15 @@ backstop (msolve reserves about 1.2 GB of address space at start). The cap is re
 cgroup limit, not from `/proc/meminfo`, so the kernel OOM killer never reaches the orchestrator.
 
 **Plan order (frozen):** t = 2 block: each cell's planted row first, then SAT/UNSAT rows as drawn, with the
-A/A repeat of t2r8 SAT 1 as the first and the last call of the block; mode-gb and native calls for SAT 1 and
+A/A repeat of t2r9 SAT 1 as the first and the last call of the block; mode-gb and native calls for SAT 1 and
 UNSAT 1 of each cell inside the block. t = 3: natural rows first, interleaved across ratios:
 t3r8-UNSAT1, t3r7-SAT1, t3r9-UNSAT1, t3r8-SAT1, t3r7-UNSAT1, t3r9-SAT1, then the remaining natural rows
 round-robin; a fixed-work canary (§6) before every t = 3 call. Then the t = 3 planted rows (1 h each, completion
 not expected). Then the t4r7 probe, only if at least one t = 3 natural row completed. One solve at a time;
-no retry; failed and censored rows stay in the record. Expected schedule: t = 2 block 3–9 h (29 param +
-6 gb + 6 native calls; worst case bounded by the caps), six t = 3 natural rows 24 h at the cap; the whole
-panel fits the 36 h deadline only in the expected case, and the order puts the analysed rows first.
+no retry; failed and censored rows stay in the record. Expected schedule (from the pilot, `PILOT.md`): t = 2 block 15–30 h (29 param + 6 gb + 6 native calls; a
+SAT call is expected at 1–2 h wall at 8 threads, worst case bounded by the 7,200 s cap), six t = 3 natural
+rows 36 h at the cap; the whole panel fits the 72 h deadline only in the expected case, and the order puts
+the analysed rows first.
 
 ## 4. Observables (per call, all recorded in `runs.jsonl`)
 
@@ -162,6 +165,8 @@ panel fits the 36 h deadline only in the expected case, and the order puts the a
 - Per cell: generation cost (curve search, base, classifier enumeration, target masks) in CPU s and
   counted ops; `B_real`; natural-SAT draw statistics.
 - Native arm: `solving_degree`, `field_multiplications`, `cpu_s`, consistency verdict.
+- `verify` runs with `--deadline 3600`; its per-root reconstruction is quadratic in the eliminating degree.
+  A verify that hits its deadline makes the row's `c` a lower bound and the row **incomplete** for §5.
 - Rho reference: group additions and CPU s per seed.
 
 **Complete per-call work** `c(B, j)` for target `j`: `cpu_s(msolve param) + cpu_s(verify)`. A second
@@ -185,7 +190,7 @@ Natural targets only (planted rows are controls). For each observable `X ∈ {cp
   completed in mode param; otherwise `+∞`.
 - `γ_lo(8→16) = log2( c_lo(16) / max_j c(8, j) )` if the probe ran, over all t = 3 natural rows (undefined
   if any of them is censored).
-- A/A: the two t2r8 repeats give `ρ_AA = max/min cpu_s`; their `work_proxy` must be identical.
+- A/A: the two t2r9 repeats give `ρ_AA = max/min cpu_s`; their `work_proxy` must be identical.
 - γ(4→8) is a **local secant over one doubling of B** that contains the degree step (D_F4 8 → ≥ 10) and the
   variable step (22 → 30); it is reported as such and never extrapolated as an asymptotic exponent.
 
@@ -193,8 +198,13 @@ Natural targets only (planted rows are controls). For each observable `X ∈ {cp
 From the committed L1 logs, a t = 2 call costs about 10^3–10^4 CPU-s and the t = 3 D83 run reached 40k CPU-s
 before dying at about 132 GB in degree 10. A pilot (pilot seed 777, not 20261114, excluded from analysis) times
 one t = 2 SAT and one t = 2 UNSAT call locally under the frozen flags before the freeze; the implied minimum
-t = 3 stop `11.3 × pilot max` is written into `PILOT.md`. The pod must give a cap that the D83 trajectory
-reaches (≥ 256 GB RAM, so the 14,400 s wall cap, not memory, is the expected stop). **No 128 GB fallback:**
+t = 3 stop `11.3 × pilot max` is written into `PILOT.md`. **Pilot result (seed 777, 4 threads):** UNSAT
+completed at 1,988 CPU-s; SAT was stopped by a 14 GB memory cap at 5,756 CPU-s in its first degree-7 round,
+so the t = 3 stop needed for KILL is at least 65,000 CPU-s and grows with the completed SAT t = 2 cost. At
+8 threads the 21,600 s t = 3 wall cap gives at most 172,800 CPU-s, so KILL stays reachable while
+`max c(4) ≤ 15,300 CPU-s`; if the t = 2 block shows a larger maximum, the panel can only reach INCONCLUSIVE
+and this is reported, not repaired. The pod must give a cap that the D83 trajectory
+reaches (≥ 256 GB RAM, so the 21,600 s wall cap, not memory, is the expected stop). **No 128 GB fallback:**
 if the 256 GB flavor is unavailable, nothing is launched and the owner is told.
 
 **Rule (one verdict per observable; the panel verdict is KILL only if both observables say KILL):**
@@ -227,10 +237,10 @@ that cannot complete is recorded **not evaluable**, never as passed or failed.
 | second instrument | native f4 vs mode gb at t = 2 (SAT 1, UNSAT 1 per cell), reduced bases in the same order | equal bases | exporter or solver fault; fallback m = 4, 5, 6 if native m = 8 censors |
 | positive (detector sees solutions) | planted target per cell, mode param | planted decomposition among the extracted real decompositions when the call completes | instrument fault: the cell's SAT rows are invalid; not evaluable when censored |
 | negative (no false relations) | natural real-UNSAT targets | zero real decompositions extracted (algebraic solutions may exist and are counted) | classifier/solver disagreement: invalid run |
-| A/A (noise floor) | t2r8 SAT 1 first and last of the t = 2 block (and once more on a replacement host) | `work_proxy` identical; `ρ_AA` recorded | proxy mismatch invalidates the proxy; `ρ_AA` widens the CPU interval |
+| A/A (noise floor) | t2r9 SAT 1 first and last of the t = 2 block (and once more on a replacement host) | `work_proxy` identical; `ρ_AA` recorded | proxy mismatch invalidates the proxy; `ρ_AA` widens the CPU interval |
 | canary (drift) | a fixed-work mode-gb run of the L1-curve system with `timeout 120`, before every t = 3 call; metric = CPU time of the rounds up to degree 8 | within 1.5× of the first canary | the following row is flagged `drift` |
 | timer floor | one near-empty msolve run | recorded | — |
-| blinding | `hidden.json` sealed and never shipped; pod-side verify uses public data; labels used for stratification only; analyst reads `runs.jsonl` after `done.json` | | |
+| blinding | `hidden.json` (k, the decompositions) sealed by SHA-256 and never shipped; `targets.json` (public: a_j, b_j, x_R, SAT/UNSAT label, real and algebraic counts) ships, so the pod-side `verify` can form relation rows; msolve never reads either file; labels used for stratification only; analyst reads `runs.jsonl` after `done.json` | | |
 
 Variable ledger: instrument fixed (commit, binary SHA-256, msolve package and hash, flags, threads, one
 kernel band); host measured once (lscpu, model, cgroup limit) and shared by every row (one pod; one
@@ -247,8 +257,8 @@ in flight when a pod is lost is a **lost row**, not a censored one: it is re-pla
   authorization is honored on the route the lab used for the L1 lab and the 2026-11-12 wide-modulus pack.
   Switching to isolab-eks when the budget resets needs no protocol change beyond the host row.
 - **Pod:** one pod, `cpu5m` 32 vCPU / 256 GB (required; price recorded at creation; no smaller fallback).
-- **Ceiling:** USD 90 all-in (pod hours, the one replacement pod if the host is lost, transfer).
-  **Deadline:** 36 h wall from first pod creation. At either limit the orchestrator fetches whatever exists,
+- **Ceiling:** USD 175 all-in (pod hours at about 2.08 USD/h, the one replacement pod if the host is lost,
+  transfer). **Deadline:** 72 h wall from first pod creation. At either limit the orchestrator fetches whatever exists,
   records the loss, deletes the pod.
 - No quota change, no retry of a censored call, no cap raised after seeing results; a follow-up needs a
   new protocol version. §5a: msolve CPU seconds are not a counted native operation and cannot be priced at
@@ -264,8 +274,43 @@ in flight when a pod is lost is a **lost row**, not a censored one: it is re-pla
 graph `figures/work_vs_B.svg` (per-call work against B with censoring marks, both observables),
 `REPORT.pdf`; session-log entry; PR with auto-merge. `.resume/RESUME.md` is filled before launch.
 
+## 9a. Pre-freeze amendments (v2.2, 2026-11-14, before any data-seed row)
+
+What had been seen: the pilot on seed 777 only (`PILOT.md`), the committed L1 logs, and the instrument's
+tests. No cell of seed 20261114 had been derived. Changes against v2.1, all made before the freeze:
+
+1. Prime floor 2^18 for every cell (msolve 0.6.5 crashes at once on every input tried below it); the v2.1
+   cell t2r8 (least prime ≥ 2^17) collapsed onto the t2r9 prime and is replaced by **t2r11** (≥ 2^22), so
+   the t = 2 block keeps three p-points at one B. The A/A repeat moves to t2r9 SAT 1.
+2. t = 2 param and gb wall cap 3,600 s → 7,200 s (the pilot SAT call was still in its first degree-7
+   round at 2,025 s wall on 4 threads); a t = 2 row that times out makes `γ_lo` undefined, so the cap
+   protects the decision, not the budget.
+3. Native-arm cap 3,600 s → 600 s per call (the native m = 8 run reaches degree 8 within 30 s and cannot
+   finish the degree-9/10 step single-threaded in the hour; the equality gate is carried by m = 4, 5, 6).
+4. t = 3 natural wall cap 14,400 s → 21,600 s, so that KILL is reachable for `max c(4)` up to 15,300 CPU-s
+   (§5 reachability).
+5. Deadline 36 h → 72 h, ceiling USD 90 → USD 175, following 2–4.
+6. `verify --deadline 3600` and its incompleteness rule (§4).
+7. Disclosure: `targets.json` carries a_j, b_j and the labels (needed pod-side to form relation rows);
+   only k and the decompositions are sealed.
+8. Second-instrument rows: the m = 8 mode-gb and native pair runs for t2r9 only (SAT 1, UNSAT 1); every
+   t = 2 cell additionally gets the equality gate at m = 4, 5, 6 (one SAT, one UNSAT target each, drawn
+   from the same cell with `targets --m`, same exporter path; gb 600 s, native 600 s). Reason: the native
+   m = 8 run cannot finish in its cap, so the m = 8 gb rows of t2r10/t2r11 (up to 4 h) would feed nothing.
+9. The t4r7 probe row is last in the plan and runs regardless (the runner never skips a row); it is
+   **analysed** only if a t = 3 natural row completed, as before.
+10. Plan: `pod/plan.json` (126 rows: 1 timer floor, 2 A/A, 6 planted, 48 natural, 20 gb, 20 native, 28
+    canaries, 1 probe), built by `pod/build_plan.py` from `cells/`; canary system
+    `smoke/l1-export/l1/l1_t3r8.ms`; launcher deadline default 72 h.
+11. Incident, disclosed: the launcher's `--dry-run` mode executes the plan locally with the installed
+    msolve (it only skips `apt-get`). A structural check of the full bundle therefore started row 2
+    (t2r9 SAT 1, `-P 1`, 4 local vCPUs) and ran it for about 90 s before it was killed; its output was
+    deleted unread and nothing from it enters the record. The structural check was redone on a 5-row
+    mini plan (timer floor, m = 4 gb and native pairs), which completed and whose reduced bases agree.
+
 ## 9. Freeze
 
-Frozen by commit (filled at freeze): `FREEZE_COMMIT_PLACEHOLDER`. SHA-256 of this file at freeze:
-`FREEZE_SHA_PLACEHOLDER`. Changes after the freeze go to `AMENDMENTS.md` with a timestamp and a
-disclosure of what had been seen.
+Frozen by the commit recorded in `FREEZE.json` (written in the following commit, with the SHA-256 of this
+file, `protocol.json`, `pod/plan.json`, `pod/job.sh`, `cells/MANIFEST.json` and the instrument binary at
+that commit). Changes after the freeze go to `AMENDMENTS.md` with a timestamp and a disclosure of what
+had been seen.

@@ -1,7 +1,7 @@
 {
  "schema": "experiment.protocol/v1",
  "protocol_id": "PKM-M8-PANELA-20261114",
- "version": 2,
+ "version": 3,
  "created": "2026-11-14",
  "repository": "crypto",
  "study_dir": "research/pkm_m8_sparse_panel_20261114",
@@ -122,20 +122,12 @@
  ],
  "cells": [
   {
-   "id": "t2r8",
-   "t": 2,
-   "B": 4,
-   "ratio": 8.5,
-   "p_rule": "least eligible prime >= 2^17 with 4 | p-1 (2^16..2^17 excluded: msolve 0.6.5 segfault band)",
-   "order": 1
-  },
-  {
    "id": "t2r9",
    "t": 2,
    "B": 4,
    "ratio": 9,
-   "p_rule": "least eligible prime >= 2^18",
-   "order": 2
+   "p_rule": "least eligible prime >= 2^18 with 4 | p-1 (below 2^18 excluded: msolve 0.6.5 segfaults at p=65537,65557,131101)",
+   "order": 1
   },
   {
    "id": "t2r10",
@@ -143,6 +135,14 @@
    "B": 4,
    "ratio": 10,
    "p_rule": "least eligible prime >= 2^20",
+   "order": 2
+  },
+  {
+   "id": "t2r11",
+   "t": 2,
+   "B": 4,
+   "ratio": 11,
+   "p_rule": "least eligible prime >= 2^22 (replaces v2.1 t2r8)",
    "order": 3
   },
   {
@@ -189,24 +189,24 @@
  "caps": {
   "t2_param": {
    "threads": 8,
-   "timeout_s": 3600,
+   "timeout_s": 7200,
    "rss_cap_gb": 60
   },
   "t2_gb": {
    "threads": 8,
-   "timeout_s": 3600,
+   "timeout_s": 7200,
    "rss_cap_gb": 60,
    "targets": "SAT1, UNSAT1"
   },
   "t2_native": {
    "threads": 1,
-   "timeout_s": 3600,
+   "timeout_s": 600,
    "as_cap_gb": 30,
    "targets": "SAT1, UNSAT1"
   },
   "t3_natural": {
    "threads": 8,
-   "timeout_s": 14400,
+   "timeout_s": 21600,
    "rss_cap": "0.9 x cgroup memory.max"
   },
   "t3_planted": {
@@ -239,7 +239,7 @@
   },
   "aa": {
    "present": true,
-   "comparison": "t2r7 SAT target 1 run first and last of the t=2 block",
+   "comparison": "t2r9 SAT target 1 run first and last of the t=2 block",
    "expected": "work_proxy identical; rho_AA = max/min cpu_s recorded"
   },
   "second_instrument": {
@@ -307,7 +307,7 @@
  "blinding": {
   "analysis_labels_masked": false,
   "hidden_instance_sealed": true,
-  "note": "SAT/UNSAT labels are public for stratification only; the solver pipeline never reads hidden.json; the analyst reads runs.jsonl only after done.json"
+  "note": "SAT/UNSAT labels, a_j, b_j and x_R are public (targets.json) for stratification and pod-side relation rows; k and decompositions sealed in hidden.json; msolve never reads either; the analyst reads runs.jsonl only after done.json"
  },
  "primary_metrics": [
   {
@@ -350,10 +350,11 @@
   "pods": 1,
   "replacement_pods": 1,
   "flavor": "cpu5m 32 vCPU / 256 GB required; no smaller fallback",
-  "ceiling_usd": 90,
-  "deadline_h": 36,
+  "ceiling_usd": 175,
+  "deadline_h": 72,
   "retries": 0,
-  "section_5a": "msolve cpu is unpriced; no cross-method ranking; rho rows only for the exponent comparison"
+  "section_5a": "msolve cpu is unpriced; no cross-method ranking; rho rows only for the exponent comparison",
+  "pod_usd_per_h_estimate": 2.08
  },
  "export": {
   "export_schema": "experiment.export/v1",
@@ -380,12 +381,30 @@
   "prime_order_curve": true,
   "B_real_at_least": "B/2",
   "g_rule": "least g>=2 outside mu_{2^t} with B_real >= B/2",
-  "all_p_at_least": 131072,
+  "all_p_at_least": 262144,
   "crash_rule": "rc 139 with max RSS < 50% of cap or within 60 s = crash; cell replaced by next eligible prime before any natural row is analysed"
  },
- "plan_order": "t=2 block (planted first per cell; A/A t2r8 SAT1 first and last; gb+native for SAT1/UNSAT1 inside); t=3 natural interleaved t3r8-UNSAT1,t3r7-SAT1,t3r9-UNSAT1,t3r8-SAT1,t3r7-UNSAT1,t3r9-SAT1, then remaining natural round-robin, canary before each; t=3 planted last; t4r7 probe conditional",
+ "plan_order": "t=2 block (planted first per cell; A/A t2r9 SAT1 first and last; gb+native for SAT1/UNSAT1 inside); t=3 natural interleaved t3r8-UNSAT1,t3r7-SAT1,t3r9-UNSAT1,t3r8-SAT1,t3r7-UNSAT1,t3r9-SAT1, then remaining natural round-robin, canary before each; t=3 planted last; t4r7 probe conditional",
  "generation_accounting": {
   "attack_setup": "base construction (field ops, square tests) and target mask",
   "analysis_cost": "classifier enumeration and SAT-selection draws"
+ },
+ "version_label": "v2.2",
+ "verify": {
+  "deadline_s": 3600,
+  "incomplete_if_deadline_hit": true
+ },
+ "amendments_pre_freeze": {
+  "version": "v2.2",
+  "seen": "pilot seed 777 only (PILOT.md); no data-seed cell derived",
+  "items": [
+   "prime floor 2^18; t2r8 -> t2r11 (>=2^22); A/A on t2r9",
+   "t2 caps 7200 s",
+   "native cap 600 s",
+   "t3 natural cap 21600 s",
+   "deadline 72 h, ceiling USD 175",
+   "verify deadline 3600 s",
+   "targets.json public fields disclosed"
+  ]
  }
 }

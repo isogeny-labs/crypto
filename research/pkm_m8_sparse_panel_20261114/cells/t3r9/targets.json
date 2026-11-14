@@ -1,0 +1,170 @@
+{
+  "Q": {
+    "x": 120589731,
+    "y": 44438402
+  },
+  "cell_sha256": "7883c8a7dea06a7a21aa90b1399f216ab709b2d83c2774f34aba9f1a96e0a1f2",
+  "draws": {
+    "draws_total": 44780,
+    "empirical_natural_sat_rate": 0.00008932559178204556,
+    "identity_draws": 0,
+    "real_sat_draw_indices": [
+      7500,
+      12801,
+      28786,
+      44779
+    ],
+    "real_sat_draws": 4,
+    "selected_draw_indices": [
+      0,
+      1,
+      2,
+      3,
+      7500,
+      12801,
+      28786,
+      44779
+    ],
+    "stopping_rule": "draw in order until 4 real-SAT and 4 real-UNSAT are kept; SAT = at least one real signed multiset of size 8 sums to R"
+  },
+  "enumeration": {
+    "alg_entries": 24906,
+    "alg_leaves": 490314,
+    "definition": "real decomposition = signed multiset of m real base points with sum exactly R; algebraic = signed multisets over the 2B lifts of V to E(F_{p^2}) whose sum has abscissa x_R; algebraic_count = distinct unsigned multisets of V among them (gen.py decomposable); ordered_algebraic_solutions = sequences with no identity prefix (formula: targets.rs enumerate_alg)",
+    "real_entries": 12120,
+    "real_leaves": 24310,
+    "seconds": 0.265326553,
+    "total_seconds": 0.60576308
+  },
+  "hidden_sha256": "06a8835984fff469aa56cb548f6c06a7f79a77039e5d6a91cf255ece17fce104",
+  "label_leak_note": "label (sat/unsat/planted) and the real/algebraic counts are classifier metadata needed for the panel's stratification; they are NOT inputs to a solver. a, b are the attacker's own multipliers of R = aP + bQ (needed to form relation rows), k is hidden.",
+  "m": 8,
+  "schema": "pkm.m8-panel.targets/v1",
+  "seed": 20261114,
+  "sha256": "30474d4656255fb41a99902f74e810103d33697f9e418ce0a537749eb11116a8",
+  "targets": [
+    {
+      "a": 71778505,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 111341188,
+      "draw_index": 0,
+      "label": "unsat",
+      "name": "d000000",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "x_r": 4093390
+    },
+    {
+      "a": 82654656,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 32533558,
+      "draw_index": 1,
+      "label": "unsat",
+      "name": "d000001",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "x_r": 79769670
+    },
+    {
+      "a": 38898085,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 95420932,
+      "draw_index": 2,
+      "label": "unsat",
+      "name": "d000002",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "x_r": 67407993
+    },
+    {
+      "a": 102449125,
+      "algebraic_count": 0,
+      "algebraic_signed_classes": 0,
+      "b": 21843245,
+      "draw_index": 3,
+      "label": "unsat",
+      "name": "d000003",
+      "ordered_algebraic_solutions": 0,
+      "planted": false,
+      "real_count": 0,
+      "x_r": 70276718
+    },
+    {
+      "a": 78204872,
+      "algebraic_count": 36,
+      "algebraic_signed_classes": 36,
+      "b": 64972942,
+      "draw_index": 7500,
+      "label": "sat",
+      "name": "d007500",
+      "ordered_algebraic_solutions": 335112,
+      "planted": false,
+      "real_count": 15,
+      "x_r": 7539368
+    },
+    {
+      "a": 70757488,
+      "algebraic_count": 8,
+      "algebraic_signed_classes": 8,
+      "b": 8971511,
+      "draw_index": 12801,
+      "label": "sat",
+      "name": "d012801",
+      "ordered_algebraic_solutions": 2144,
+      "planted": false,
+      "real_count": 5,
+      "x_r": 23306469
+    },
+    {
+      "a": 103802206,
+      "algebraic_count": 1,
+      "algebraic_signed_classes": 1,
+      "b": 32268372,
+      "draw_index": 28786,
+      "label": "sat",
+      "name": "d028786",
+      "ordered_algebraic_solutions": 1680,
+      "planted": false,
+      "real_count": 1,
+      "x_r": 14913630
+    },
+    {
+      "a": 82829348,
+      "algebraic_count": 1,
+      "algebraic_signed_classes": 1,
+      "b": 89445501,
+      "draw_index": 44779,
+      "label": "sat",
+      "name": "d044779",
+      "ordered_algebraic_solutions": 336,
+      "planted": false,
+      "real_count": 1,
+      "x_r": 73787823
+    },
+    {
+      "a": null,
+      "algebraic_count": 8,
+      "algebraic_signed_classes": 8,
+      "b": null,
+      "draw_index": null,
+      "label": "planted",
+      "name": "planted0",
+      "ordered_algebraic_solutions": 54240,
+      "planted": true,
+      "real_count": 5,
+      "x_r": 93608402
+    }
+  ],
+  "tool": {
+    "git_commit": "2f965fef941db43ea284ef058b017711a0409e74",
+    "git_note": "null when run outside a git checkout and PKM_M8_GIT_COMMIT was not set at build",
+    "name": "pkm_m8_panel",
+    "source_sha256": "ba0a04209dd97914307fdb1e2a4c0d3ef15884da77348c91a32e51f125120ac7"
+  }
+}

@@ -261,7 +261,7 @@ for ((i=0; i<N; i++)); do
     case "$R_mode" in param) MF=(-P 1);; gb) MF=(-g 2);; esac                           # -g 2 and -P 1 are NOT combinable
     ARGV=("${WRAP[@]}" /usr/bin/msolve -t "$R_threads" -v 2 "${MF[@]}" $(eval echo $R_flags) -f "$SYS" -o "$OUTF")
   else
-    ARGV=("${WRAP[@]}" "$IN/$R_instrument" native-solve --system "$SYS" --max-degree "$R_native_max_degree" --deadline "$R_native_deadline_s" --out "$OUTF")
+    ARGV=("${WRAP[@]}" "$IN/$R_instrument" native-solve --system "$SYS" --max-degree "$R_native_max_degree" --deadline "$R_native_deadline_s" --out "$OUTF" --gb-out "$RD/native.gb.txt")
   fi
   ARGV_JSON=$(printf '%s\0' "${ARGV[@]}" | $PY -I -c "import json,sys;print(json.dumps(sys.stdin.read().split('\0')[:-1]))")
   # exactly one solver process at a time: nothing of ours may still be running; wait up to 60 s, then record it
@@ -281,7 +281,7 @@ for ((i=0; i<N; i++)); do
   if [ "$R_verify" = 1 ] && [ "$RC" = 0 ] && [ -s "$OUTF" ]; then
     VJ=$RD/verify.json; V0=$(date +%s.%N)
     if [ -x "$IN/$R_instrument" ]; then
-      taskset -c "$CPUS" timeout 900 "$IN/$R_instrument" verify --cell "$IN/$R_cell_dir" --targets "$IN/$R_targets_dir" --msolve-out "$OUTF" --target "$R_target" --out "$VJ" > "$RD/verify.stdout" 2> "$RD/verify.stderr"; VRC=$?
+      taskset -c "$CPUS" timeout -k 30 3700 "$IN/$R_instrument" verify --cell "$IN/$R_cell_dir" --targets "$IN/$R_targets_dir" --msolve-out "$OUTF" --target "$R_target" --deadline 3600 --out "$VJ" > "$RD/verify.stdout" 2> "$RD/verify.stderr"; VRC=$?
     else echo "instrument missing: $IN/$R_instrument" > "$RD/verify.stderr"; VRC=127; fi
     VW=$($PY -I -c "print($(date +%s.%N)-$V0)")
   fi

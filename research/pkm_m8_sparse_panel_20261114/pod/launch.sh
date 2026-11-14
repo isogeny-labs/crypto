@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Main-session orchestration for ONE RunPod CPU pod running job.sh on a bundle (protocol v2).   [pcc:unverified]
-#   launch.sh --bundle BUNDLE.tgz --out DIR [--deadline-h 36] [--poll-s 600] [--stamp STAMP] [--dry-run]
+#   launch.sh --bundle BUNDLE.tgz --out DIR [--deadline-h 72] [--poll-s 600] [--stamp STAMP] [--dry-run]
 #   launch.sh --replace --bundle BUNDLE.tgz --out DIR_OF_FIRST_RUN [--deadline-h H]      (one replacement pod, same flavor)
 # Flavor is fixed: cpu5m, 32 vCPU / 256 GB. If `rp.sh flavors` does not show it available, this script exits (rc 3)
 # BEFORE creating anything. Prints pod id and $/h at creation. Refuses a bundle that contains hidden.json.
@@ -15,7 +15,7 @@
 # --dry-run: no RunPod call and no RUNPOD_API_KEY use; a local directory is the "pod"; job.sh runs locally with --dry-run.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-POLL=600; DEADLINE_H=36; BUNDLE=; OUT=; DRY=0; REPLACE=0; STAMP=$(date -u +%Y%m%dT%H%M%SZ)
+POLL=600; DEADLINE_H=72; BUNDLE=; OUT=; DRY=0; REPLACE=0; STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 VCPU=32; FLAVOR=cpu5m; DISK=60
 while [ $# -gt 0 ]; do case "$1" in
   --bundle) BUNDLE=$2; shift 2;; --out) OUT=$2; shift 2;; --deadline-h) DEADLINE_H=$2; shift 2;; --poll-s) POLL=$2; shift 2;;
@@ -26,7 +26,7 @@ say() { echo "$(date -u +%FT%TZ) $*" | tee -a "$OUT/launch.log"; }
 
 # ---- bundle checks (before anything is created) -----------------------------------------
 tar tzf "$BUNDLE" | awk -F/ 'tolower($NF)=="hidden.json"{f=1} END{exit f}' || { echo "refusing: bundle contains hidden.json" >&2; exit 4; }
-tar tzf "$BUNDLE" | grep -qE '^(\./)?plan\.json$' || { echo "refusing: bundle has no plan.json" >&2; exit 4; }
+tar tzf "$BUNDLE" | grep -E '^(\./)?plan\.json$' > /dev/null || { echo "refusing: bundle has no plan.json" >&2; exit 4; }
 
 # ---- replacement plan ------------------------------------------------------------------------
 REPL=0; SUFFIX=

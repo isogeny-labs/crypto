@@ -1,0 +1,118 @@
+{
+  "B": 16,
+  "B_real": 9,
+  "R": 7,
+  "T": 4,
+  "V": [
+    2,
+    264051191,
+    178957110,
+    170848620,
+    119308324,
+    41781621,
+    79691800,
+    172069274,
+    268435535,
+    4384346,
+    89478427,
+    97586917,
+    149127213,
+    226653916,
+    188743737,
+    96366263
+  ],
+  "V_real": [
+    178957110,
+    119308324,
+    41781621,
+    172069274,
+    268435535,
+    4384346,
+    89478427,
+    188743737,
+    96366263
+  ],
+  "a": 134145810,
+  "b": 153759789,
+  "curve_search_attempts": 33,
+  "derivation_rule": "p runs over the primes >= 2^(T*R) (T*R >= 16) with 2^T | p-1, in increasing order; a prime is ELIGIBLE iff it is not a Fermat prime (p-1 not a power of two), a prime-order curve y^2=x^3+ax+b is found within 400 attempts, and a base with B_real >= ceil(B/2) exists under the g rule; the first eligible prime is used and every rejected prime is recorded. Curve search: StdRng (rand 0.8, ChaCha12) seeded by SHA-256('pkm.m8-panel/v1|curve|<slug>|<seed>|<p>'), a, b uniform in [1,p), skip singular, #E counted natively (exhaustive Legendre sum for p < 2^20, else Hasse-interval baby-step giant-step of a random point whose unique candidate is #E), first prime #E; r*Pv = O is checked for a random point. zeta = h^((p-1)>>T) for the least h >= 2 with zeta^(2^(T-1)) != 1. g rule: the least integer g in [2, 20000) outside mu_(2^T) (g^(2^T) != 1) with B_real >= ceil(2^T/2). V = { g*zeta^k }. Real base = { x in V : x^3+ax+b is a non-zero square }, positive sign = the point with y <= (p-1)/2. Generator P = point with the least x >= 1, y <= (p-1)/2. Exception: T=3, R=8 reuses the L1 decisive cell (p=16801793; a, b, g reconstructed by a native port of CPython random.Random(str) following gen.py, no eligibility rule applied; see l1_reuse).",
+  "eligibility": {
+    "b_real_min": 8,
+    "curve_attempt_bound": 400,
+    "g_bound": 20000
+  },
+  "g": 2,
+  "generator": {
+    "x": 1,
+    "y": 63032324
+  },
+  "group_order": 268457867,
+  "l1_reuse": {
+    "requested": false
+  },
+  "master_seed": 20261114,
+  "min_prime_override": null,
+  "p": 268435537,
+  "point_count_method": "hasse_bsgs",
+  "r": 268457867,
+  "real_base": [
+    {
+      "v_index": 2,
+      "x": 178957110,
+      "y": 52701220
+    },
+    {
+      "v_index": 4,
+      "x": 119308324,
+      "y": 87253239
+    },
+    {
+      "v_index": 5,
+      "x": 41781621,
+      "y": 45368132
+    },
+    {
+      "v_index": 7,
+      "x": 172069274,
+      "y": 14625246
+    },
+    {
+      "v_index": 8,
+      "x": 268435535,
+      "y": 56264257
+    },
+    {
+      "v_index": 9,
+      "x": 4384346,
+      "y": 105301211
+    },
+    {
+      "v_index": 10,
+      "x": 89478427,
+      "y": 76413401
+    },
+    {
+      "v_index": 14,
+      "x": 188743737,
+      "y": 32942976
+    },
+    {
+      "v_index": 15,
+      "x": 96366263,
+      "y": 115077199
+    }
+  ],
+  "rejected_primes": [],
+  "schema": "pkm.m8-panel.cell/v1",
+  "seed": 20261114,
+  "sha256": "bfb8fcead2df745b3848f4cdc425edae511924262c247fd9ed57a60398c6443b",
+  "signed_points": 18,
+  "slug": "t4-r7-s20261114",
+  "tool": {
+    "git_commit": "2f965fef941db43ea284ef058b017711a0409e74",
+    "git_note": "null when run outside a git checkout and PKM_M8_GIT_COMMIT was not set at build",
+    "name": "pkm_m8_panel",
+    "source_sha256": "ba0a04209dd97914307fdb1e2a4c0d3ef15884da77348c91a32e51f125120ac7"
+  },
+  "zeta": 266243364
+}
