@@ -34,12 +34,15 @@ check(fpow(t,2**20)===t,'degree20 closure');for(const d of [4,10])check(gcd(fpow
 let tr=0,v=r;for(let k=0;k<20;k++){tr^=v;v=fmul(v,v);}check(tr===1&&v===r,'quadratic trace');
 const P=[[2,0],[0,1]];check(valid(P),'point on curve');check(times(11,P)===null,'exact order');
 let pts=Array.from({length:10},(_,i)=>times(i+1,P));check(new Set(pts.map(JSON.stringify)).size===10,'subgroup distinct');
+check(new Set(pts.map(v=>JSON.stringify(v[0]))).size===5,'five Kummer x classes');
 for(let k=0;k<10;k++){
  const v=pts[k];check(valid(v),'valid multiple');
  check(eq(frob(v,4),times(7,v)),'fourth Frobenius');
  check(eq(frob(v,20),negative(v)),'twentieth Frobenius');
  check(eq(frob(v,40),v),'fortieth Frobenius');
  check(eq(frob(v,20)[0],v[0])&&!eq(frob(v,20)[1],v[1]),'x field and y obstruction');
+ for(let d=1;d<20;d++)check(!eq(frob(v,d)[0],v[0]),'x exact degree20');
+ check(new Set(Array.from({length:5},(_,j)=>JSON.stringify(frob(v,4*j)[0]))).size===5,'five-step Frobenius orbit');
  for(let d=1;d<40;d++)check(!eq(frob(v,d),v),'no proper subfield orientation');
 }
 for(let i=1;i<=10;i++)for(let j=1;j<=10;j++)check(eq(lineadd(pts[i-1],pts[j-1]),times((i+j)%11,P)),'all addition pairs');
@@ -55,5 +58,5 @@ for(let d=1;d<=40;d++){
 }
 check(counts.every((c,k)=>c===(k===39?121:1)),'torsion fixed-vector counts');
 let a4=mm(mm(mm(A,A),A),A);check(eq(a4,[[7,0],[0,7]]),'scalar fourth Frobenius');
-const o={base_curve_f2_points:baseCount,binary_oriented_field_degree:40,binary_x_field_degree:20,case:'ct115-frobenius-descent-obstruction',complete_dlp_cost_compared:false,fixed_vector_count_at_40:121,fixed_vector_counts_first_39:Array(39).fill(1),frobenius_20_scalar_mod_11:10,frobenius_4_scalar_mod_11:7,global_point_lift_computed:false,group_law_pairs_checked:100,hom_constant_z11_into_11_torsion_over_f2_20:1,hom_constant_z11_into_11_torsion_over_f2_40:121,hom_constant_z11_into_fixed_cyclic_target_over_f2_40:11,nonzero_hom_into_11_torsion_over_f2_40:120,nonzero_target_subgroup_checked:10};
+const o={base_curve_f2_points:baseCount,binary_oriented_field_degree:40,binary_x_field_degree:20,case:'ct115-frobenius-descent-obstruction',complete_dlp_cost_compared:false,fixed_vector_count_at_40:121,fixed_vector_counts_first_39:Array(39).fill(1),frobenius_20_scalar_mod_11:10,frobenius_4_scalar_mod_11:7,global_point_lift_computed:false,group_law_pairs_checked:100,hom_constant_z11_into_11_torsion_over_f2_20:1,hom_constant_z11_into_11_torsion_over_f2_40:121,hom_constant_z11_into_fixed_cyclic_target_over_f2_40:11,nonzero_hom_into_11_torsion_over_f2_40:120,nonzero_target_subgroup_checked:10,kummer_x_classes:5,kummer_x_orbit_length_under_frob4:5,kummer_x_residue_degree:20};
 process.stdout.write(JSON.stringify(Object.fromEntries(Object.entries(o).sort(([a],[b])=>a.localeCompare(b))))+'\n');
