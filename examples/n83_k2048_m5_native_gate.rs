@@ -86,7 +86,8 @@ fn checked_lock(
     lock: &Value,
     out: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf, Vec<String>)> {
-    if lock["schema"] != "n83.k2048-m5-native-gate-lock/v1"
+    let fixture_lock = lock["schema"] == "n83.k2048-m5-native-gate-lock/v2";
+    if !fixture_lock && lock["schema"] != "n83.k2048-m5-native-gate-lock/v1"
         || lock["mode"] != mode
         || !["positive", "natural"].contains(&mode)
         || lock["out_path"].as_str() != out.to_str()
@@ -102,6 +103,15 @@ fn checked_lock(
         .output()?;
     if !source_type.status.success() || source_type.stdout != b"commit\n" {
         return Err("native gate source commit unavailable".into());
+    }
+    if fixture_lock {
+        let head = Command::new("git")
+            .current_dir(root)
+            .args(["rev-parse", "HEAD"])
+            .output()?;
+        if !head.status.success() || String::from_utf8_lossy(&head.stdout).trim() != source_commit {
+            return Err("native gate public fixture source commit differs from HEAD".into());
+        }
     }
     let clean = Command::new("git")
         .current_dir(root)
@@ -144,6 +154,18 @@ fn checked_lock(
         || export_record["xcnf_sha256"] != lock["formula_sha256"]
     {
         return Err("native gate export identity differs".into());
+    }
+    if fixture_lock
+        && (mode != "natural"
+            || export_record["public_fixture"] != lock["public_fixture"]
+            || lock["public_fixture"].as_u64().is_none()
+            || !lock["target"].is_array()
+            || export_record["target"] != lock["target"]
+            || export_record["public_corpus_blake3"] != lock["public_corpus_blake3"]
+            || export_record["source_commit"] != source_commit
+            || export_record["curve_a"] != 0)
+    {
+        return Err("native gate public fixture binding differs".into());
     }
     if mode == "natural" {
         let replay = Path::new(get_str(lock, "positive_native_replay")?);
