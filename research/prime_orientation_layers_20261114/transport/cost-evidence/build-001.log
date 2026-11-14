@@ -1,0 +1,19 @@
+../cost-evidence/draft-001.lean.txt:68:22: error: not a positivity goal
+../cost-evidence/draft-001.lean.txt:90:77: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../cost-evidence/draft-001.lean.txt:90:77: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+../cost-evidence/draft-001.lean.txt:98:2: error: mod_cast has type
+  |t| ≤ ↑(2 ^ a)
+but is expected to have type
+  t.natAbs ≤ 2 ^ a
+../cost-evidence/draft-001.lean.txt:108:4: error: mod_cast has type
+  |Int.subNatNat y r| ≤ ↑(2 ^ a)
+but is expected to have type
+  (Int.subNatNat y r).natAbs ≤ 2 ^ a
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

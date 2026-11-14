@@ -1,0 +1,16 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+../cost-evidence/draft-005.lean.txt:168:2: error: Type mismatch: After simplification, term
+  Bits.mono H (Nat.mul_le_mul_right (a + a + 1) hb)
+ has type
+  Bits (2 * 2 ^ a * (a + a + 1)) (∏ i ∈ (grid a).erase q, (q - i))
+but is expected to have type
+  Bits (derivativeSize a) (∏ x ∈ (grid a).erase q, (q - x))
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
