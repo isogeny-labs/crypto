@@ -1123,6 +1123,8 @@ fn summarize(args: &[String]) {
         t: usize,
         g: [Vec<f64>; 3],
         i_ops: Vec<f64>,
+        ic: [Vec<f64>; 3],
+        fc: Vec<f64>,
         f_ops: Vec<f64>,
         i_budget: usize,
         gate_fail: usize,
@@ -1170,6 +1172,17 @@ fn summarize(args: &[String]) {
                         a.gate_fail += 1;
                     }
                     let decided = verdict == "solved" || verdict == "unsatisfiable";
+                    let bits: Vec<Vec<u64>> = e.get("bitop").map(|b| b.arr().iter().map(|r| r.arr().iter().map(|x| x.u64()).collect()).collect()).unwrap_or_default();
+                    let nn = key.0;
+                    let pc = |b: &Vec<u64>, p: &str| -> f64 { let (im, is) = inv_cost(nn); let mul = (b[3] + b[5] * im) as f64; let sqr = (b[4] + b[5] * is) as f64; let base = (b[0] + b[1] + b[2]) as f64; match p { "P1" => base + mul + sqr, "P4" => base + 4.0 * mul + 3.0 * sqr, _ => base + 2.0 * nn as f64 * mul + nn as f64 * sqr } };
+                    if name == "inherited-f4" && decided && !bits.is_empty() {
+                        for (k, p) in ["P1", "P4", "P2n"].iter().enumerate() {
+                            a.ic[k].push(bits.iter().map(|b| pc(b, p)).fold(f64::INFINITY, f64::min));
+                        }
+                    }
+                    if name == "fes-f2" && decided && !bits.is_empty() {
+                        a.fc.push(bits.iter().map(|b| pc(b, "P1")).fold(f64::INFINITY, f64::min));
+                    }
                     if name == "inherited-f4" {
                         if decided {
                             a.i_ops.push(ops[0] as f64);
