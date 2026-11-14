@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T0620Z-ic-gpu-replay",
+  "latest_record": "20261114T1854Z-j0-multirho-dp-tune",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 159,
+    "measured": 160,
     "open": 0
   },
   "repo": "crypto",
@@ -880,6 +880,141 @@
           "spread": null,
           "summary": "Multi-target rho with Kuhn-Struik restarts beats symmetric multi-target IC at every cell (rho/IC 0.28-0.83); earlier IC lead was a restart bug",
           "value": 0.34
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.32,
+      "latest": 0.32,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_tuned_over_ic_26b_t1000",
+      "points": [
+        {
+          "commit": "66afc8c88526",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T1854Z-j0-multirho-dp-tune",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "dp rule fixed on held-out targets; tuned multi-target rho is 0.38-0.97x of the old-dp rho and 2.5-7.6x faster than symmetric multi-target IC",
+          "value": 0.32
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.22,
+      "latest": 0.22,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_tuned_over_ic_28b_t3000",
+      "points": [
+        {
+          "commit": "66afc8c88526",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T1854Z-j0-multirho-dp-tune",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "dp rule fixed on held-out targets; tuned multi-target rho is 0.38-0.97x of the old-dp rho and 2.5-7.6x faster than symmetric multi-target IC",
+          "value": 0.22
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.18,
+      "latest": 0.18,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_tuned_over_ic_30b_t1000",
+      "points": [
+        {
+          "commit": "66afc8c88526",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T1854Z-j0-multirho-dp-tune",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "dp rule fixed on held-out targets; tuned multi-target rho is 0.38-0.97x of the old-dp rho and 2.5-7.6x faster than symmetric multi-target IC",
+          "value": 0.18
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.13,
+      "latest": 0.13,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_tuned_over_ic_30b_t3000",
+      "points": [
+        {
+          "commit": "66afc8c88526",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T1854Z-j0-multirho-dp-tune",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "dp rule fixed on held-out targets; tuned multi-target rho is 0.38-0.97x of the old-dp rho and 2.5-7.6x faster than symmetric multi-target IC",
+          "value": 0.13
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.38,
+      "latest": 0.38,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_tuned_over_old_dp_30b_t3000",
+      "points": [
+        {
+          "commit": "66afc8c88526",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261114T1854Z-j0-multirho-dp-tune",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "dp rule fixed on held-out targets; tuned multi-target rho is 0.38-0.97x of the old-dp rho and 2.5-7.6x faster than symmetric multi-target IC",
+          "value": 0.38
         }
       ],
       "problem": "ecdlp-prime-multi-target",
