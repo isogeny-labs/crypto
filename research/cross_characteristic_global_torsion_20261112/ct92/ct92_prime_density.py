@@ -49,6 +49,34 @@ def count_curve(p):
                    if (y*y + y - x*x*x + x*x + 10*x + 20) % p == 0)
 
 
+
+def residue_orbits(matrix, projective_sign=False):
+    """Frobenius cycle lengths on oriented or ±-unoriented F7² torsion."""
+    ell = 7
+    def normal(v):
+        opposite = tuple((-z) % ell for z in v)
+        return min(v, opposite) if projective_sign else v
+    def apply(v):
+        return ((matrix[0][0]*v[0] + matrix[0][1]*v[1]) % ell,
+                (matrix[1][0]*v[0] + matrix[1][1]*v[1]) % ell)
+    remaining = {normal((a, b)) for a in range(ell) for b in range(ell) if (a, b) != (0, 0)}
+    degrees = {}
+    while remaining:
+        first = next(iter(remaining))
+        v = first
+        length = 0
+        while True:
+            if v not in remaining:
+                raise ValueError('non-permutation')
+            remaining.remove(v)
+            length += 1
+            v = normal(apply(v))
+            if v == first:
+                break
+        degrees[length] = degrees.get(length, 0) + 1
+    return [[k, degrees[k]] for k in sorted(degrees)]
+
+
 def main():
     source = count_curve(37)
     target = count_curve(2)
@@ -56,7 +84,17 @@ def main():
     assert (37 + 1 - source) % 7 == 3
     assert (37 % 7) == 2
     assert {1, 2} == {z for z in range(7) if (z*z - 3*z + 2) % 7 == 0}
-    result = {'experiment': 'ct92-degree-one-place-density',
+    source_oriented = residue_orbits(((1, 0), (0, 2)))
+    source_x = residue_orbits(((1, 0), (0, 2)), True)
+    binary_oriented = residue_orbits(((0, 5), (1, 5)))
+    binary_x = residue_orbits(((0, 5), (1, 5)), True)
+    assert source_oriented == [[1, 6], [3, 14]] and source_x == [[1, 3], [3, 7]]
+    assert binary_oriented == [[24, 2]] and binary_x == [[12, 2]]
+    result = {'source_oriented_residue_degrees': source_oriented,
+              'source_x_residue_degrees': source_x,
+              'binary_oriented_residue_degrees': binary_oriented,
+              'binary_x_residue_degrees': binary_x,
+              'experiment': 'ct92-degree-one-place-density',
               'galois_image_hypothesis': 'full_GL2_mod_ell',
               'source_prime': 37, 'source_curve_order': source,
               'source_trace': 3, 'source_eigenvalues_mod_7': [1, 2],
