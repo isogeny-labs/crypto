@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261114T2202Z-j0-multirho-vs-bsgs-interleaved",
+  "latest_record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 3,
-    "measured": 165,
+    "measured": 166,
     "open": 0
   },
   "repo": "crypto",
@@ -1000,6 +1000,186 @@
           ],
           "summary": "Interleaved: folded BSGS faster than tuned multi-target rho at 26-28 bits (rho/BSGS 1.27-1.98), tied at 30 bits",
           "value": 1.0
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.808,
+      "latest": 0.808,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.754,
+            0.845
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.808
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.989,
+      "latest": 0.989,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.911,
+            1.068
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.989
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.745,
+      "latest": 0.745,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_32b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.711,
+            0.785
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.745
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.606,
+      "latest": 0.606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t1000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.564,
+            0.642
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.606
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.809,
+      "latest": 0.809,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t200",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.759,
+            0.869
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.809
+        }
+      ],
+      "problem": "ecdlp-prime-multi-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.593,
+      "latest": 0.593,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_over_bsgs_34b_t3000",
+      "points": [
+        {
+          "commit": "f010f1966fdf",
+          "date": "2026-11-14",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261114T2217Z-j0-multirho-vs-bsgs-interleaved-32-34",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.566,
+            0.624
+          ],
+          "summary": "Interleaved at 32/34 bits: tuned multi-target rho faster than folded BSGS at 32/T=3000 (0.75) and 34/T=1000,3000 (0.61, 0.59); three cells fail A/A",
+          "value": 0.593
         }
       ],
       "problem": "ecdlp-prime-multi-target",
