@@ -332,7 +332,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency; fixed-genus2/unbounded-field actual Cantor image-group/order2cyclic counterfamily, all ambient pairs and even-extension control (60) | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
-| 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks; literal JV actual quotient dimension/F-length8 versus geometric support1 | General n!dⁿ bound and decomposition-system hypotheses |
+| 8 Bézout/multiplicity | Partial: actual quotient length/support witness and16 native checks; JV dimension/F-length8/support1; literal F2two-torus source-helper disproof and exact rational-point chart qualification/repair/overhead (31) | General n!dⁿ bound/decomposition node remains unrefuted; scheme charts, isolated-point/multiplicity geometry and actual toric-resultant runtime |
 | 9 Gröbner heuristics | Partial: actual Edwards universal n=2 counterexample; 18 native source-system calls; literal JV ideal/source-field/group proofs; actual eight-element quotient basis and sharp monomial cutoff4 | Generic/n>=3 and larger m,n sweeps, full internal F4 refinement and canonical graded Hilbert-function identification |
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate; finite repository rho run 768/768, measured replays 576/576, exact A/A controls and Lean report-arithmetic gate 11/0/0 | Generic p-adic/complexity/native refinement and qualified asymptotic collision law |
@@ -827,3 +827,25 @@ Signed standing unverified. Generic odd-prime geometry/Frobenius
 determinant/representation/descent and full supersingular Hasse/geometric
 classification remain open. No native experiment, novelty or group-scheme
 formalization claim. [pcc:unverified]
+
+### Diem two-torus helper: actual F2 obstruction and rational-point repair
+
+The [Diem chart packet](../research/diem_chart_audit_20261114/README.md)
+disproves a literal helper in Proposition2.5(b)'s proof, printedp81:
+two copies of the multiplicative group cannot cover the actual projective
+line over F2 (three rational points versus one per torus), even allowing
+arbitrary maps. Every positive product has the same obstruction. The
+proposition explicitly accepts every primepower; later Condition2.7 is
+not its hypothesis. Lean proves the exact finite-field rational-point
+qualification: two maps cover iff cardK≥3, with explicit injective formulas.
+Three explicit injective charts cover every field and product; any F2
+n-torus cover needs at least3^n charts. Actual index cardinality and
+3^n≤5n!/3^nB≤5B² for B=n!d^n,d>0 give the repaired chart-overhead
+allowance. Whole gate31/0 failures/0 trusted and exact local PCC-20261114-66624a
+replay pass at 2026-11-14T00:17:51Z; all7 formal/config and10 artifact pins match,
+53 attempt files/five gate files and inspected one-page PDF47209B retained.
+Signed standing unverified. This refutes the source helper only; the
+main Bezout/decomposition theorem and exact corpus node remain unrefuted.
+Formal scheme charts, multihomogeneous substitution, isolated-point
+multiplicity geometry and the Rojas algorithm/runtime remain open. No
+novelty or new native experiment is claimed. [pcc:unverified]
