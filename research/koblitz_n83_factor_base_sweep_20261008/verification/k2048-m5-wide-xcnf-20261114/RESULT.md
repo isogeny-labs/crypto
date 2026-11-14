@@ -43,8 +43,10 @@ respectively. The [natural lock](NATIVE_NATURAL_LOCK.json) binds the replay
 hash, exact public-natural XCNF, and unused raw output path before dispatch.
 The [natural receipt](native-evidence/natural-01/receipt.json) has SHA-256
 `092e28f738549abf4eea12dc5cf3ef6baefe5b34db45c91207b99d17f389f71a`,
-and the complete [solver transcript](native-evidence/natural-01/stdout.txt)
-has SHA-256 `d210ed7bc4c6166e7f1f05c3249ead98d65f245159381608210bd8396dfa174b`.
+and the complete [solver transcript](native-evidence/natural-01/stdout.txt.gz)
+decompresses to SHA-256 `d210ed7bc4c6166e7f1f05c3249ead98d65f245159381608210bd8396dfa174b`.
+The [positive transcript](native-evidence/positive-02/stdout.txt.gz)
+decompresses to SHA-256 `bf7caafb268d9986b8840481d4917aea5ab4db771dfb165937e9f5e760c203cc`.
 The solver used 32 Gaussian matrices, including three width-20,916 matrices;
 the original 1,000-column limit declined those matrices. This single
 natural-query result isolates matrix admission but does not settle the
