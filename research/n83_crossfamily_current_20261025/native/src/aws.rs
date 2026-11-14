@@ -244,6 +244,8 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         "status":"PROPOSED_ROUTE_PROVIDER_READY","tier":"cloud_instance_tier1",
         "placement_model":"two_distinct_instances_same_availability_zone",
         "recorded_utc":now.to_rfc3339(),"account_id":ACCOUNT,"region":REGION,
+        "vpc_id":VPC,"security_group_id":SECURITY_GROUP,
+        "s3_bucket":BUCKET,"s3_bucket_region":BUCKET_REGION,
         "instance_type":INSTANCE,"architecture":"arm64","image_id":image_id,
         "source_head_sha":bundle["source_head_sha"],
         "source_archive_sha256":bundle["source_archive_sha256"],
@@ -270,6 +272,10 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
         || plan["status"] != "PROPOSED_ROUTE_PROVIDER_READY"
         || plan["account_id"] != ACCOUNT
         || plan["region"] != REGION
+        || plan["vpc_id"] != VPC
+        || plan["security_group_id"] != SECURITY_GROUP
+        || plan["s3_bucket"] != BUCKET
+        || plan["s3_bucket_region"] != BUCKET_REGION
         || plan["instance_type"] != INSTANCE
         || plan["architecture"] != "arm64"
         || plan["source_head_sha"] != bundle["source_head_sha"]
