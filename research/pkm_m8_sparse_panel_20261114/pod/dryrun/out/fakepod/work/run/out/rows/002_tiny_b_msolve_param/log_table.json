@@ -1,0 +1,228 @@
+{
+ "schema": "pkm.msolve-log-table/v1",
+ "log": "/home/user/crypto/research/pkm_m8_sparse_panel_20261114/pod/dryrun/out/fakepod/work/run/out/rows/002_tiny_b_msolve_param/stdout.log",
+ "meta": {
+  "overall_elapsed_s": [
+   "0.00",
+   "0.00",
+   "0.00"
+  ],
+  "overall_cpu_s": [
+   "0.00",
+   "0.00",
+   "0.00"
+  ]
+ },
+ "totals": {
+  "passes": 3,
+  "rounds": 11,
+  "max_round_degree": 5,
+  "sum_rows_x_cols_x_density": 180.9951,
+  "sum_rows_x_cols_x_density_with_final": 228.9959,
+  "max_matrix_entries": 29.997000000000003,
+  "max_matrix_rows": 7,
+  "max_matrix_cols": 11,
+  "sum_new": 9,
+  "sum_zero": 2,
+  "sum_round_real_s": 0.0,
+  "sum_round_cpu_s": 0.0,
+  "completed": true,
+  "incomplete_last_row": null,
+  "largest_matrix_round": {
+   "deg": 5,
+   "rows": 6,
+   "cols": 11,
+   "density_pct": 45.45
+  }
+ },
+ "passes": [
+  {
+   "rows": [
+    {
+     "deg": 2,
+     "sel": 1,
+     "pairs": 2,
+     "rows": 4,
+     "cols": 7,
+     "density_pct": 46.43,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 13.000399999999999
+    },
+    {
+     "deg": 3,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 3,
+     "cols": 6,
+     "density_pct": 50.0,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 9.0
+    }
+   ],
+   "final": {
+    "rows": 3,
+    "cols": 8,
+    "density_pct": 41.67,
+    "new": 3,
+    "zero": 0,
+    "real_s": 0.0,
+    "cpu_s": 0.0,
+    "entries": 10.0008
+   },
+   "banner": "first pass (input variable order)"
+  },
+  {
+   "rows": [
+    {
+     "deg": 2,
+     "sel": 1,
+     "pairs": 2,
+     "rows": 4,
+     "cols": 7,
+     "density_pct": 46.43,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 13.000399999999999
+    },
+    {
+     "deg": 3,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 3,
+     "cols": 6,
+     "density_pct": 50.0,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 9.0
+    },
+    {
+     "deg": 4,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 3,
+     "cols": 7,
+     "density_pct": 57.14,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 11.999400000000001
+    },
+    {
+     "deg": 5,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 6,
+     "cols": 10,
+     "density_pct": 43.33,
+     "new": 0,
+     "zero": 1,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 25.997999999999998
+    }
+   ],
+   "final": {
+    "rows": 4,
+    "cols": 10,
+    "density_pct": 40.0,
+    "new": 4,
+    "zero": 0,
+    "real_s": 0.0,
+    "cpu_s": 0.0,
+    "entries": 16.0
+   },
+   "banner": "Changing variable order for possibly more generic staircase:"
+  },
+  {
+   "rows": [
+    {
+     "deg": 1,
+     "sel": 1,
+     "pairs": 3,
+     "rows": 2,
+     "cols": 4,
+     "density_pct": 87.5,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 7.0
+    },
+    {
+     "deg": 2,
+     "sel": 1,
+     "pairs": 2,
+     "rows": 7,
+     "cols": 10,
+     "density_pct": 31.43,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 22.000999999999998
+    },
+    {
+     "deg": 3,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 7,
+     "cols": 11,
+     "density_pct": 28.57,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 21.9989
+    },
+    {
+     "deg": 4,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 4,
+     "cols": 9,
+     "density_pct": 50.0,
+     "new": 1,
+     "zero": 0,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 18.0
+    },
+    {
+     "deg": 5,
+     "sel": 1,
+     "pairs": 1,
+     "rows": 6,
+     "cols": 11,
+     "density_pct": 45.45,
+     "new": 0,
+     "zero": 1,
+     "real_s": 0.0,
+     "cpu_s": 0.0,
+     "entries": 29.997000000000003
+    }
+   ],
+   "final": {
+    "rows": 5,
+    "cols": 11,
+    "density_pct": 40.0,
+    "new": 5,
+    "zero": 0,
+    "real_s": 0.0,
+    "cpu_s": 0.0,
+    "entries": 22.0
+   },
+   "banner": "Adding a linear form with an extra variable (lowest w.r.t. monomial order)"
+  }
+ ]
+}

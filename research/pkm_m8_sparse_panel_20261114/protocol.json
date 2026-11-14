@@ -125,8 +125,8 @@
    "id": "t2r8",
    "t": 2,
    "B": 4,
-   "ratio": 8,
-   "p_rule": "least eligible prime >= 2^16 with 4 | p-1",
+   "ratio": 8.5,
+   "p_rule": "least eligible prime >= 2^17 with 4 | p-1 (2^16..2^17 excluded: msolve 0.6.5 segfault band)",
    "order": 1
   },
   {
@@ -380,7 +380,7 @@
   "prime_order_curve": true,
   "B_real_at_least": "B/2",
   "g_rule": "least g>=2 outside mu_{2^t} with B_real >= B/2",
-  "all_p_at_least": 65536,
+  "all_p_at_least": 131072,
   "crash_rule": "rc 139 with max RSS < 50% of cap or within 60 s = crash; cell replaced by next eligible prime before any natural row is analysed"
  },
  "plan_order": "t=2 block (planted first per cell; A/A t2r8 SAT1 first and last; gb+native for SAT1/UNSAT1 inside); t=3 natural interleaved t3r8-UNSAT1,t3r7-SAT1,t3r9-UNSAT1,t3r8-SAT1,t3r7-UNSAT1,t3r9-SAT1, then remaining natural round-robin, canary before each; t=3 planted last; t4r7 probe conditional",

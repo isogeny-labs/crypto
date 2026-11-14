@@ -85,15 +85,15 @@ The owner is told this before launch.
   the Ubuntu archive pinned to `0.6.5-1build2` (GNU `time` installed too), the panel binary shipped from this
   container (same glibc 2.39). Isolation is shared-host (RunPod): timing rows are L0-class; CPU seconds are
   the primary timing observable, wall time secondary; the matrix-work proxy is host-independent. A no-op
-  msolve baseline (empty-ish system) is timed once for the timer floor. Every prime is ≥ 2^16 and < 2^31 so
+  msolve baseline (empty-ish system) is timed once for the timer floor. Every prime is ≥ 2^17 and < 2^31 so
   msolve selects the same coefficient kernel in every cell (its kernel choice by characteristic size was
   not verified in source; the uniform band removes the question).
 
 ## 3. Cells (deterministic; derived by `pkm_m8_panel cell`, master seed 20261114)
 
-| cell | t | B | ratio ρ = log_B p | p rule (all primes ≥ 2^16, one msolve kernel band) | order |
+| cell | t | B | ratio ρ = log_B p | p rule (all primes ≥ 2^17, one msolve kernel band) | order |
 |---|---|---|---|---|---|
-| t2r8 | 2 | 4 | 8 | least eligible prime ≥ 2^16 with 4 \| p−1 | 1 |
+| t2r8 | 2 | 4 | 8.5 | least eligible prime ≥ 2^17 with 4 \| p−1 (the band 2^16–2^17 is excluded: msolve 0.6.5 segfaults on inputs at p = 65537 and 131101) | 1 |
 | t2r9 | 2 | 4 | 9 | least eligible prime ≥ 2^18 | 2 |
 | t2r10 | 2 | 4 | 10 | least eligible prime ≥ 2^20 | 3 |
 | t3r8 | 3 | 8 | 8 | the L1 decisive cell p = 16801793 with the L1 curve, g, ζ if recoverable from committed files, else the rule | 4 |
@@ -103,8 +103,8 @@ The owner is told this before launch.
 
 **Eligible** means: prime, `2^t | p−1`, not a Fermat prime, a prime-order curve found by the seeded search,
 and a base with `B_real ≥ B/2` under the `g` rule (`g` = least integer ≥ 2 outside `μ_{2^t}` giving
-`B_real ≥ B/2`; if none below a frozen bound, the next prime). The t = 2 ratios are 8, 9, 10 (not 7, 8, 9)
-so that every prime is ≥ 2^16; the ratio only sets the natural-SAT rate, the degree is p-independent
+`B_real ≥ B/2`; if none below a frozen bound, the next prime). The t = 2 ratios are 8.5, 9, 10 (not 7, 8, 9)
+so that every prime is ≥ 2^17; the ratio only sets the natural-SAT rate, the degree is p-independent
 (L1 replication at p = 12289 and 40961).
 
 **msolve crash rule (frozen):** rc 139 with max RSS < 50 % of the cap, or within 60 s, is `crash`, not a
@@ -129,7 +129,7 @@ is recorded per target and every row is stratified by it in the results); plus 1
 
 | cells | msolve threads | wall timeout | memory cap | native arm |
 |---|---|---|---|---|
-| t2r8, t2r9, t2r10 (mode param) | 8 | 3,600 s | 60 GB RSS | SAT 1, UNSAT 1 per cell: 1 thread, 3,600 s, 30 GB |
+| t2r8, t2r9, t2r10 (mode param) | 8 | 3,600 s | 60 GB RSS (every cap is at least 2 GB above the need: msolve reserves ~1.2 GB of address space at start) | SAT 1, UNSAT 1 per cell: 1 thread, 3,600 s, 30 GB |
 | t2 mode gb (cross-check) | 8 | 3,600 s | 60 GB RSS | — |
 | t3r8, t3r7, t3r9 natural rows | 8 | 14,400 s | 0.9 × cgroup `memory.max` RSS | none at t = 3 |
 | t3 planted rows (last, "interface only") | 8 | 3,600 s | same | — |

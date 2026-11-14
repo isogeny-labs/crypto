@@ -1,0 +1,83 @@
+{
+ "schema": "pkm.m8-panel.plan/v1",
+ "plan_id": "dryrun-tiny-20261114",
+ "instrument": "bin/pkm_m8_panel",
+ "msolve": {
+  "version": "0.6.5-1build2",
+  "sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa"
+ },
+ "defaults": {
+  "threads": 2,
+  "timeout_s": 120,
+  "mem_cap_kb": 2097152
+ },
+ "rows": [
+  {
+   "cell": "tiny",
+   "target": "a",
+   "solver": "msolve",
+   "mode": "param",
+   "order": 1
+  },
+  {
+   "cell": "tiny",
+   "target": "b",
+   "solver": "msolve",
+   "mode": "param",
+   "order": 2
+  },
+  {
+   "cell": "tiny",
+   "target": "c",
+   "solver": "msolve",
+   "mode": "gb",
+   "order": 3
+  },
+  {
+   "cell": "tiny",
+   "target": "nosol",
+   "solver": "msolve",
+   "mode": "param",
+   "order": 4
+  },
+  {
+   "cell": "tiny",
+   "target": "posdim",
+   "solver": "msolve",
+   "mode": "param",
+   "order": 5
+  },
+  {
+   "cell": "tiny",
+   "target": "cyc10",
+   "solver": "msolve",
+   "mode": "param",
+   "timeout_s": 5,
+   "order": 6
+  },
+  {
+   "cell": "tiny",
+   "target": "cyc8",
+   "solver": "msolve",
+   "mode": "param",
+   "mem_cap_kb": 1048576,
+   "order": 7
+  },
+  {
+   "cell": "tiny",
+   "target": "cyc8",
+   "solver": "msolve",
+   "mode": "gb",
+   "threads": 2,
+   "order": 8
+  },
+  {
+   "cell": "tiny",
+   "target": "a",
+   "solver": "native",
+   "system_native": "systems/tiny/a.ms",
+   "threads": 1,
+   "order": 9
+  }
+ ]
+}
