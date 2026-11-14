@@ -38,7 +38,7 @@ Exact interpolation yields
 -368168372X^3+3131989X^4}{1162512}.}
 \]
 
-The common denominator satisfies v₂=4. Python constructs rational Lagrange products. Independent JavaScript uses BigInt Newton divided differences and Newton-to-monomial basis conversion. Four normal/optimized runs matched byte-for-byte, SHA-256 \`46b50bc0c22d432987572a848dbe056f8095120b571eb07c5b93e3e82b54e21b\` (local development runs; independent signed PCC not established). [pcc:unverified]
+The common denominator satisfies v₂=4. Python constructs rational Lagrange products. Independent JavaScript uses BigInt Newton divided differences and Newton-to-monomial basis conversion. Four normal/optimized runs matched byte-for-byte, SHA-256 `46b50bc0c22d432987572a848dbe056f8095120b571eb07c5b93e3e82b54e21b` (local development runs; independent signed PCC not established). [pcc:unverified]
 
 The offline construction explicitly enumerates the five projective source scalar classes (four source additions), associates them with the Frobenius orbit (16 binary field squarings), then compiles that source DLP table into five rational coefficients. The **online evaluator** accepts only Q coordinates, checks curve and [11]Q=O, performs exact rational Horner polynomial evaluation, matches the result to the target orbit and checks the source sign. It contains no online source-x→scalar dictionary. Nevertheless, the coefficients embody all five projective log classes. All ten nonzero public toy points recover the source log; four invalid controls reject and a one-coefficient mutation is detected. [pcc:unverified]
 
@@ -52,7 +52,7 @@ The source-only BSGS control, rebuilt for every public input, counts [4,4,4,5,5,
 
 ## Reproduction
 
-\`\`\`bash
+```bash
 D=research/cross_characteristic_global_torsion_20261112/ct117
 python3 -B "$D/ct117_interpolation_control.py" > /tmp/ct117-py.json
 python3 -O -B "$D/ct117_interpolation_control.py" > /tmp/ct117-pyo.json
@@ -62,7 +62,7 @@ cmp /tmp/ct117-py.json /tmp/ct117-pyo.json
 cmp /tmp/ct117-py.json /tmp/ct117-js.json
 cmp /tmp/ct117-py.json /tmp/ct117-jso.json
 printf '%s  %s\n' 46b50bc0c22d432987572a848dbe056f8095120b571eb07c5b93e3e82b54e21b /tmp/ct117-py.json | sha256sum -c
-\`\`\`
+```
 
 A scoped exact-head GitHub Actions workflow runs all four tests. Passing scoped CI checks this finite-set construction only; the independent scientific PCC verdict, full project tests, default-branch merge gates and hardware-budget approvals remain distinct.
 
