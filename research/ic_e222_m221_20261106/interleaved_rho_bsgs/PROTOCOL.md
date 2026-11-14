@@ -26,3 +26,7 @@ No arm is retuned during the study.
 
 ## Not in scope
 §5a band (both arms are counted in wall time only), isolated host, larger sizes.
+
+## Addendum A (2026-11-14, frozen before any 32/34-bit row): 32 and 34 bits
+Owner request: "run it at 32 and 34 bits". Same arms, settings (rho `DPRULE=ks DPDIV=1.5`, BSGS `MC=1`), rounds (r = 0..5, `INST0 = 100 + r`, 2 curves x 2 instances), order rotation, metric, bootstrap and decision rule as above, on cells 32 and 34 bits x T = 200, 1000, 3000 (`run.sh "32 200" "32 1000" "32 3000" "34 200" "34 1000" "34 3000"`). No retuning. Reported alongside the first nine cells, not pooled with them.
+Also recorded per row: BSGS table size `m` (its memory grows as sqrt(Tn)), to read any change in the ratio against it.

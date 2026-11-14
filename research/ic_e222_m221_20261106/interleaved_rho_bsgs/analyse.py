@@ -3,7 +3,9 @@
 import json, math, random, statistics as st, pathlib, sys
 here = pathlib.Path(__file__).resolve().parent
 rows = here / "rows"
-CELLS = [(26, 20), (26, 200), (26, 1000), (28, 200), (28, 1000), (28, 3000), (30, 200), (30, 1000), (30, 3000)]
+CELLS = [(26, 20), (26, 200), (26, 1000), (28, 200), (28, 1000), (28, 3000), (30, 200), (30, 1000), (30, 3000),
+         (32, 200), (32, 1000), (32, 3000), (34, 200), (34, 1000), (34, 3000)]
+CELLS = [c for c in CELLS if (rows / f"rho_b{c[0]}_T{c[1]}_r0.jsonl").exists()]
 def load(arm, b, T, r):
     return [json.loads(l) for l in open(rows / f"{arm}_b{b}_T{T}_r{r}.jsonl")]
 def boot(xs, seed=20261114, n=10000):
@@ -29,7 +31,7 @@ for b, T in CELLS:
                     rho_ms=st.median(sums["rho"]) / 4, bsgs_ms=st.median(sums["bsgs"]) / 4,
                     rho_over_bsgs=g, lo=lo, hi=hi, aa=ga, aa_lo=alo, aa_hi=ahi, aa_ok=alo <= 1 <= ahi,
                     verdict=verdict if alo <= 1 <= ahi else verdict + " (A/A failed: unreliable)",
-                    rho_steps_over_W=st.median(steps), bsgs_giant_steps=st.median(giants)))
+                    rho_steps_over_W=st.median(steps), bsgs_giant_steps=st.median(giants), bsgs_m=d["bsgs"][0]["m"]))
 (here / "summary.json").write_text(json.dumps(out, indent=1))
 print("| bits | T | rounds | rho ms/problem | BSGS ms/problem | rho/BSGS [95%] | A/A [95%] | verdict | rho steps/W |")
 print("|---|---|---|---|---|---|---|---|---|")
