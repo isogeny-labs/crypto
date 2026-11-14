@@ -201,7 +201,7 @@ fn sym_solve_ex(
     let mut heads: Vec<u32> = Vec::new();
     let mut next: Vec<u32> = Vec::new();
     let mut hmask = 0usize;
-    let prefilter = std::env::var_os("NOPREFILTER").is_none();
+    let prefilter = summands >= 3 && std::env::var_os("NOPREFILTER").is_none();
     let mut bits: Vec<u64> = Vec::new();
     let mut bmask = 0usize;
     if summands >= 3 {
