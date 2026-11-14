@@ -1,0 +1,18 @@
+Polynomial.natDegree_prod.{u, w} {R : Type u} {ι : Type w} (s : Finset ι) [CommSemiring R] [NoZeroDivisors R]
+  (f : ι → Polynomial R) (h : ∀ i ∈ s, f i ≠ 0) : (∏ i ∈ s, f i).natDegree = ∑ i ∈ s, (f i).natDegree
+Polynomial.natDegree_pow.{u} {R : Type u} [Semiring R] [NoZeroDivisors R] (p : Polynomial R) (n : ℕ) :
+  (p ^ n).natDegree = n * p.natDegree
+../evidence/budget-api-001.lean.txt:5:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.natDegree_C_sub_X`
+Polynomial.natDegree_X_sub_C.{u} {R : Type u} [Ring R] [Nontrivial R] (x : R) :
+  (Polynomial.X - Polynomial.C x).natDegree = 1
+Polynomial.natDegree_mul.{u} {R : Type u} [Semiring R] [NoZeroDivisors R] {p q : Polynomial R} (hp : p ≠ 0)
+  (hq : q ≠ 0) : (p * q).natDegree = p.natDegree + q.natDegree
+Polynomial.natDegree_mul_C.{u} {R : Type u} [Semiring R] {p : Polynomial R} {a : R} [NoZeroDivisors R] (a0 : a ≠ 0) :
+  (p * Polynomial.C a).natDegree = p.natDegree
+Polynomial.natDegree_C_mul.{u} {R : Type u} [Semiring R] {p : Polynomial R} {a : R} [NoZeroDivisors R] (a0 : a ≠ 0) :
+  (Polynomial.C a * p).natDegree = p.natDegree
+../evidence/budget-api-001.lean.txt:10:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.C_sub_X_ne_zero`
+Polynomial.X_sub_C_ne_zero.{u} {R : Type u} [Ring R] [Nontrivial R] (r : R) : Polynomial.X - Polynomial.C r ≠ 0
+Polynomial.C_ne_zero.{u} {R : Type u} {a : R} [Semiring R] : Polynomial.C a ≠ 0 ↔ a ≠ 0
+Polynomial.natDegree_eq_zero_of_isUnit.{u} {R : Type u} [Semiring R] [NoZeroDivisors R] {p : Polynomial R}
+  (h : IsUnit p) : p.natDegree = 0

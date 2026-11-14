@@ -1,0 +1,251 @@
+module
+public import OrientationMoment
+import all OrientationAnchor
+public import Mathlib.Algebra.BigOperators.Group.List.Basic
+public import Mathlib.Data.Nat.Fib.Basic
+public import Mathlib.Tactic.Linarith
+public section
+namespace AnchorBudget
+
+/-- Weighted suffix penalty, with coefficients 1,2,... . -/
+def penalty : List ℕ → ℕ
+  | [] => 0
+  | m :: ms => m + penalty ms + ms.sum
+
+/-- Lower levels are at the head. These are the explicit anchor inequalities,
+not assumptions that a faster ECDLP algorithm exists. -/
+inductive Feasible (g : ℕ) : List ℕ → Prop
+  | nil : Feasible g []
+  | cons {ms : List ℕ} (m : ℕ) : Feasible g ms →
+      g + penalty ms ≤ m → Feasible g (m :: ms)
+
+theorem penalty_ge_sum (ms : List ℕ) : ms.sum ≤ penalty ms := by
+  induction ms with
+  | nil => simp [penalty]
+  | cons m ms ih => simp only [List.sum_cons, penalty]; omega
+
+/-- General degree-budget lower bound; the analytic valuation-to-inequality
+bridge is a written proof, not formalized by this declaration. -/
+theorem mass_bound {g : ℕ} {ms : List ℕ} (h : Feasible g ms) :
+    2 ^ ms.length * g ≤ ms.sum + g := by
+  induction h with
+  | nil => simp
+  | @cons ms m h hm ih =>
+    have hp := penalty_ge_sum ms
+    simp only [List.length_cons, List.sum_cons, pow_succ]
+    nlinarith
+
+/-- The sharper necessary mass for these inequalities is Fibonacci-sized. -/
+theorem fibonacci_bound {g : ℕ} {ms : List ℕ} (h : Feasible g ms) :
+    Nat.fib (2 * ms.length) * g ≤ ms.sum ∧
+    Nat.fib (2 * ms.length + 1) * g ≤ penalty ms + g := by
+  induction h with
+  | nil => simp [penalty]
+  | @cons ms m h hm ih =>
+    rcases ih with ⟨hs, hp⟩
+    have h2 : Nat.fib (2 * (ms.length + 1)) =
+        Nat.fib (2 * ms.length) + Nat.fib (2 * ms.length + 1) := by
+      rw [show 2 * (ms.length + 1) = 2 * ms.length + 2 by omega,
+        Nat.fib_add_two]
+    have h3 : Nat.fib (2 * (ms.length + 1) + 1) =
+        Nat.fib (2 * ms.length + 1) + Nat.fib (2 * (ms.length + 1)) := by
+      rw [show 2 * (ms.length + 1) + 1 = (2 * ms.length + 1) + 2 by omega,
+        Nat.fib_add_two]
+      congr 1
+    simp only [List.length_cons, List.sum_cons, penalty, h2, h3]
+    constructor <;> nlinarith
+
+end AnchorBudget
+#print axioms AnchorBudget.penalty_ge_sum
+#print axioms AnchorBudget.mass_bound
+#print axioms AnchorBudget.fibonacci_bound
+
+namespace AnchorBudget
+
+/-- Necessary mass and suffix penalty for a specified highest retained
+anchor multiplicity. Only the explicit Feasible recurrence is assumed. -/
+theorem terminal_fibonacci_bound (ms : List ℕ) (r : ℕ)
+    (h : Feasible 0 (ms ++ [r])) :
+    Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum ∧
+    Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r]) := by
+  induction ms with
+  | nil => simp [penalty]
+  | cons m ms ih =>
+    cases h with
+    | cons _ ht hm =>
+      rcases ih ht with ⟨hs, hp⟩
+      have h2 : Nat.fib (2 * (ms.length + 1) + 1) =
+          Nat.fib (2 * ms.length + 1) + Nat.fib (2 * ms.length + 2) := by
+        rw [show 2 * (ms.length + 1) + 1 = (2 * ms.length + 1) + 2 by omega,
+          Nat.fib_add_two]
+      have h3 : Nat.fib (2 * (ms.length + 1) + 2) =
+          Nat.fib (2 * ms.length + 2) + Nat.fib (2 * (ms.length + 1) + 1) := by
+        rw [show 2 * (ms.length + 1) + 2 = (2 * ms.length + 2) + 2 by omega,
+          Nat.fib_add_two]
+        congr 2
+      simp only [List.length_cons, List.cons_append, List.sum_cons, penalty, h2, h3]
+      simp only [zero_add] at hm
+      change penalty (ms ++ [r]) ≤ m at hm
+      constructor <;> nlinarith
+
+end AnchorBudget
+#print axioms AnchorBudget.terminal_fibonacci_bound
+
+namespace OrientationActualBudget
+open Finset OrientationAnchor AnchorBudget
+
+def anchors (m : ℕ → ℕ) (u : ℕ) : List ℕ := (List.range u).map m
+
+theorem anchors_length (m : ℕ → ℕ) (u : ℕ) : (anchors m u).length = u := by
+  simp [anchors]
+
+theorem anchors_append (m : ℕ → ℕ) (u : ℕ) :
+    anchors m (u+1) = anchors m u ++ [m u] := by
+  simp [anchors, List.range_succ]
+
+theorem anchors_cons (m : ℕ → ℕ) (u : ℕ) :
+    anchors m (u+1) = m 0 :: anchors (fun j => m (j+1)) u := by
+  simp [anchors, List.range_succ_eq_map, List.map_map, Function.comp_def]
+
+theorem anchors_mass (m : ℕ → ℕ) (u : ℕ) :
+    (anchors m u).sum = ∑ j ∈ range u, m j := by
+  induction u with
+  | zero => simp [anchors]
+  | succ u ih => rw [anchors_append, List.sum_append, List.sum_singleton,
+      ih, Finset.sum_range_succ]
+
+theorem penalty_append_single (ms : List ℕ) (r : ℕ) :
+    penalty (ms ++ [r]) = penalty ms + (ms.length+1)*r := by
+  induction ms with
+  | nil => simp [penalty]
+  | cons m ms ih =>
+    simp only [List.cons_append, penalty, List.sum_append, List.sum_singleton,
+      List.length_cons, ih]
+    ring
+
+theorem anchors_penalty (m : ℕ → ℕ) (u : ℕ) :
+    penalty (anchors m u) = ∑ j ∈ range u, (j+1)*m j := by
+  induction u with
+  | zero => simp [anchors, penalty]
+  | succ u ih =>
+    rw [anchors_append, penalty_append_single, anchors_length, ih, Finset.sum_range_succ]
+
+theorem head_penalty (m : ℕ → ℕ) (u : ℕ) :
+    penalty (anchors (fun j => m (j+1)) u) = ∑ j ∈ range (u+1), j*m j := by
+  rw [anchors_penalty, Finset.sum_range_succ']
+  simp
+
+theorem schedule_shift (m : ℕ → ℕ) (u i : ℕ) :
+    schedule (u+1) (i+1) m = schedule u i (fun j => m (j+1)) := by
+  simp [schedule, Finset.sum_range_succ']
+
+/-- The explicit actual retained-level inequalities imply the abstract
+recurrence; the recurrence is not a hypothesis supplied by the caller. -/
+theorem actual_schedule_feasible (m : ℕ → ℕ) (u : ℕ)
+    (hm : ∀ i < u, 0 ≤ schedule u i m) : Feasible 0 (anchors m u) := by
+  induction u generalizing m with
+  | zero => simp [anchors]; exact Feasible.nil
+  | succ u ih =>
+    rw [anchors_cons]
+    apply Feasible.cons
+    · apply ih
+      intro i hi
+      rw [← schedule_shift]
+      exact hm (i+1) (by omega)
+    · simp only [zero_add]
+      rw [head_penalty]
+      have h0 := hm 0 (by omega)
+      simp only [schedule, Nat.sub_zero] at h0
+      have hb := sub_nonneg.mp h0
+      exact_mod_cast hb
+
+/-- Terminal multiplicity paid by the actual finite schedule's total degree. -/
+theorem actual_terminal_mass_bound (m : ℕ → ℕ) (u : ℕ)
+    (hm : ∀ i < u+1, 0 ≤ schedule (u+1) i m) :
+    Nat.fib (2*u+1)*m u ≤ ∑ j ∈ range (u+1), m j := by
+  have hf := actual_schedule_feasible m (u+1) hm
+  rw [anchors_append] at hf
+  have hb := (terminal_fibonacci_bound (anchors m u) (m u) hf).1
+  rw [anchors_length, ← anchors_append, anchors_mass] at hb
+  exact hb
+
+theorem actual_terminal_degree_cap (m : ℕ → ℕ) (u K L : ℕ)
+    (hm : ∀ i < u+1, 0 ≤ schedule (u+1) i m)
+    (hdegree : ∑ j ∈ range (u+1), m j ≤ K*L) :
+    Nat.fib (2*u+1)*m u ≤ K*L :=
+  (actual_terminal_mass_bound m u hm).trans hdegree
+
+end OrientationActualBudget
+#print axioms OrientationActualBudget.actual_schedule_feasible
+#print axioms OrientationActualBudget.actual_terminal_mass_bound
+#print axioms OrientationActualBudget.actual_terminal_degree_cap
+
+namespace OrientationActualBudget
+open Polynomial Finset OrientationAnchor AnchorBudget
+
+theorem selected_factor_degree (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    (factor (delta x y) j).natDegree = 1 := by
+  have he : (C ((2:ℚ)^j)-X:ℚ[X]) = -(X-C ((2:ℚ)^j)) := by ring
+  unfold OrientationAnchor.factor
+  rw [natDegree_mul_C (inv_ne_zero (denominator_ne_zero u x y j hj)),
+    he, natDegree_neg, natDegree_X_sub_C]
+
+theorem selected_factor_ne_zero (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    factor (delta x y) j ≠ 0 := by
+  intro hz
+  have hd := selected_factor_degree u x y j hj
+  rw [hz, natDegree_zero] at hd
+  exact Nat.zero_ne_one hd
+
+theorem correction_ne_zero (u x y : ℕ) (m : ℕ → ℕ) :
+    correction u x y m ≠ 0 := by
+  unfold correction
+  apply prod_ne_zero_iff.mpr
+  intro j hj
+  exact pow_ne_zero _ (selected_factor_ne_zero u x y j hj)
+
+theorem correction_degree_exact (u x y : ℕ) (m : ℕ → ℕ) :
+    (correction u x y m).natDegree = ∑ j ∈ mask u x y, m j := by
+  unfold correction
+  rw [natDegree_prod _ _ (fun j hj => pow_ne_zero _ (selected_factor_ne_zero u x y j hj))]
+  apply sum_congr rfl
+  intro j hj
+  rw [natDegree_pow, selected_factor_degree u x y j hj, mul_one]
+
+theorem diagonal_correction_degree (u x : ℕ) (m : ℕ → ℕ) :
+    (correction u x x m).natDegree = mass u m := by
+  simpa [mask, mass] using correction_degree_exact u x x m
+
+theorem base_degree_exact (S : Finset ℚ) (d : ℚ) (h0 : 0 ∈ S) (hd : d ∈ S) :
+    (base S d).natDegree = S.card-1 := by
+  rw [base, natDegree_C_mul (inv_ne_zero (normalizer_ne_zero S h0))]
+  simp [puncture, natDegree_finsetProd_X_sub_C_eq_card, card_erase_of_mem hd]
+
+theorem base_ne_zero (S : Finset ℚ) (d : ℚ) (h0 : 0 ∈ S) : base S d ≠ 0 := by
+  unfold base puncture
+  apply mul_ne_zero
+  · exact C_ne_zero.mpr (inv_ne_zero (normalizer_ne_zero S h0))
+  · exact prod_ne_zero_iff.mpr (fun j _ => X_sub_C_ne_zero j)
+
+theorem completed_diagonal_degree (S : Finset ℚ) (u x : ℕ) (m : ℕ → ℕ) (h0 : 0 ∈ S) :
+    (completed S u x x m).natDegree = S.card-1+mass u m := by
+  rw [completed, natDegree_mul (base_ne_zero S (delta x x) h0)
+    (correction_ne_zero u x x m), base_degree_exact S (delta x x) h0 (by simpa [delta] using h0),
+    diagonal_correction_degree]
+
+/-- An actual polynomial degree cap now implies the necessary terminal
+bound; this uses equality of degrees, not reversal of an upper bound. -/
+theorem actual_terminal_polynomial_budget (a u x K : ℕ) (m : ℕ → ℕ)
+    (hm : ∀ i < u+1, 0 ≤ schedule (u+1) i m)
+    (hdegree : (completed (grid a) (u+1) x x m).natDegree ≤
+      (2*2^a-1)+K*2^a) :
+    Nat.fib (2*u+1)*m u ≤ K*2^a := by
+  apply actual_terminal_degree_cap m u K (2^a) hm
+  have he := completed_diagonal_degree (grid a) (u+1) x m (zero_in_grid a)
+  rw [grid_card] at he
+  rw [he] at hdegree
+  simpa [mass] using (Nat.le_of_add_le_add_left hdegree)
+
+end OrientationActualBudget
+#print axioms OrientationActualBudget.completed_diagonal_degree
+#print axioms OrientationActualBudget.actual_terminal_polynomial_budget
