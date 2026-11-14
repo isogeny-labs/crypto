@@ -121,3 +121,15 @@ jobs:
           cmp /tmp/ct93-py.json /tmp/ct93-js.json
           cmp /tmp/ct93-py.json /tmp/ct93-jsopt.json
           printf '%s  %s\n' cf1fa25a5a26a19bdf1fa7d4c72e1e60c2dc9b04eb3e5c1b73b62740443f773d /tmp/ct93-py.json | sha256sum -c
+
+      - name: CT94 binary Frobenius equivariance and 24-extension obstruction
+        run: |
+          D=research/cross_characteristic_global_torsion_20261112/ct94
+          python3 -B "$D/ct94_frobenius_gate.py" >/tmp/ct94-py.json
+          python3 -O -B "$D/ct94_frobenius_gate.py" >/tmp/ct94-pyopt.json
+          node "$D/ct94_frobenius_gate_independent.js" >/tmp/ct94-js.json
+          node --no-opt "$D/ct94_frobenius_gate_independent.js" >/tmp/ct94-jsopt.json
+          cmp /tmp/ct94-py.json /tmp/ct94-pyopt.json
+          cmp /tmp/ct94-py.json /tmp/ct94-js.json
+          cmp /tmp/ct94-py.json /tmp/ct94-jsopt.json
+          printf '%s  %s\n' 63a7f301f19e28dd9e8257b2deae3340cc64f2da2ae935dd2eb945c7827fa495 /tmp/ct94-py.json | sha256sum -c
