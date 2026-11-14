@@ -64,5 +64,5 @@ jobs:
           cmp /tmp/ct88-py.json /tmp/ct88-opt.json
           cmp /tmp/ct88-py.json /tmp/ct88-js.json
           cmp /tmp/ct88-py.json /tmp/ct88-jsopt.json
-          printf '%s  %s\\n' 4953ec9689c3ce372eda1d53cc53eceb3340f7dc013270bcd3d0cf909956f096 /tmp/ct88-py.json | sha256sum -c
+          printf '%s  %s\n' 4953ec9689c3ce372eda1d53cc53eceb3340f7dc013270bcd3d0cf909956f096 /tmp/ct88-py.json | sha256sum -c
           cat /tmp/ct88-py.json
