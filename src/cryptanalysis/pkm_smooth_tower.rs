@@ -198,11 +198,19 @@ pub type Pt = Option<(u64, u64)>;
 impl Curve {
     pub fn rhs(&self, x: u64) -> u64 {
         let p = self.p;
-        addm(addm(mulm(mulm(x, x, p), x, p), mulm(self.a, x, p), p), self.b, p)
+        addm(
+            addm(mulm(mulm(x, x, p), x, p), mulm(self.a, x, p), p),
+            self.b,
+            p,
+        )
     }
     pub fn is_singular(&self) -> bool {
         let p = self.p;
-        let d = addm(mulm(4, powm(self.a, 3, p), p), mulm(27, mulm(self.b, self.b, p), p), p);
+        let d = addm(
+            mulm(4, powm(self.a, 3, p), p),
+            mulm(27, mulm(self.b, self.b, p), p),
+            p,
+        );
         d == 0
     }
     pub fn on_curve(&self, pt: Pt) -> bool {
@@ -225,7 +233,11 @@ impl Curve {
             if addm(y1, y2, p) == 0 {
                 return None;
             }
-            mulm(addm(mulm(3, mulm(x1, x1, p), p), self.a, p), invm(mulm(2, y1, p), p), p)
+            mulm(
+                addm(mulm(3, mulm(x1, x1, p), p), self.a, p),
+                invm(mulm(2, y1, p), p),
+                p,
+            )
         } else {
             mulm(subm(y2, y1, p), invm(subm(x2, x1, p), p), p)
         };
@@ -248,7 +260,11 @@ impl Curve {
         loop {
             let x = rng.below(self.p);
             if let Some(y) = sqrtm(self.rhs(x), self.p) {
-                let y = if rng.next() & 1 == 1 { subm(0, y, self.p) } else { y };
+                let y = if rng.next() & 1 == 1 {
+                    subm(0, y, self.p)
+                } else {
+                    y
+                };
                 return Some((x, y));
             }
         }
@@ -292,7 +308,13 @@ impl Curve {
             let mut n = 1;
             for x in 0..p {
                 let r = self.rhs(x);
-                n += if r == 0 { 1 } else if is_square(r, p) { 2 } else { 0 };
+                n += if r == 0 {
+                    1
+                } else if is_square(r, p) {
+                    2
+                } else {
+                    0
+                };
             }
             return Some(n);
         }
@@ -303,7 +325,11 @@ impl Curve {
             let pt = self.random_point(rng);
             let hits = match &cand {
                 None => self.annihilators_in(pt, lo, hi),
-                Some(c) => c.iter().copied().filter(|&k| self.mul(k, pt).is_none()).collect(),
+                Some(c) => c
+                    .iter()
+                    .copied()
+                    .filter(|&k| self.mul(k, pt).is_none())
+                    .collect(),
             };
             if hits.len() == 1 {
                 return Some(hits[0]);
@@ -348,7 +374,9 @@ pub fn poly_scale(a: &Poly, c: u64, p: u64) -> Poly {
     poly_trim(a.iter().map(|&x| mulm(x, c, p)).collect())
 }
 pub fn poly_eval(a: &Poly, x: u64, p: u64) -> u64 {
-    a.iter().rev().fold(0, |acc, &c| addm(mulm(acc, x, p), c, p))
+    a.iter()
+        .rev()
+        .fold(0, |acc, &c| addm(mulm(acc, x, p), c, p))
 }
 
 // ---------------------------------------------------------------- maps
@@ -411,12 +439,19 @@ impl SmoothTower {
         let s = self.size();
         let set: HashSet<u64> = self.v.iter().copied().collect();
         if self.v.len() as u64 != s || set.len() as u64 != s {
-            return Err(format!("|V| = {} distinct of {}, expected S = {s}", set.len(), self.v.len()));
+            return Err(format!(
+                "|V| = {} distinct of {}, expected S = {s}",
+                set.len(),
+                self.v.len()
+            ));
         }
         for (k, s) in self.steps.iter().enumerate() {
             let deg = (s.num.len().max(s.den.len()) - 1) as u64;
             if deg != s.degree {
-                return Err(format!("step {k}: rational degree {deg}, expected {}", s.degree));
+                return Err(format!(
+                    "step {k}: rational degree {deg}, expected {}",
+                    s.degree
+                ));
             }
         }
         for &x in &self.v {
@@ -425,7 +460,9 @@ impl SmoothTower {
             }
         }
         if self.p < 1 << 22 {
-            let n = (0..self.p).filter(|&x| self.eval(x) == Some(self.c)).count() as u64;
+            let n = (0..self.p)
+                .filter(|&x| self.eval(x) == Some(self.c))
+                .count() as u64;
             if n != s {
                 return Err(format!("L(x) = c has {n} roots in F_p, expected {s}"));
             }
@@ -436,7 +473,12 @@ impl SmoothTower {
 
 /// Kummer form: `L_j(x) = x^{q_j}`, `c = g^S`. Needs `S | p − 1`; `g`
 /// is drawn from the seed when not given.
-pub fn kummer_tower(p: u64, degrees: &[u64], g: Option<u64>, seed: u64) -> Result<SmoothTower, String> {
+pub fn kummer_tower(
+    p: u64,
+    degrees: &[u64],
+    g: Option<u64>,
+    seed: u64,
+) -> Result<SmoothTower, String> {
     check_degrees(p, degrees)?;
     let s: u64 = degrees.iter().product();
     if (p - 1) % s != 0 {
@@ -469,10 +511,21 @@ pub fn kummer_tower(p: u64, degrees: &[u64], g: Option<u64>, seed: u64) -> Resul
         .map(|&q| {
             let mut num = vec![0; q as usize + 1];
             num[q as usize] = 1;
-            MapStep { degree: q, num, den: vec![1] }
+            MapStep {
+                degree: q,
+                num,
+                den: vec![1],
+            }
         })
         .collect();
-    Ok(SmoothTower { p, degrees: degrees.to_vec(), steps, c: powm(g, s, p), v, kind: TowerKind::Kummer { g } })
+    Ok(SmoothTower {
+        p,
+        degrees: degrees.to_vec(),
+        steps,
+        c: powm(g, s, p),
+        v,
+        kind: TowerKind::Kummer { g },
+    })
 }
 
 fn check_degrees(p: u64, degrees: &[u64]) -> Result<(), String> {
@@ -518,7 +571,11 @@ impl Velu {
         let mut den: Poly = vec![1];
         for &(xt, yt) in &reps {
             let gx = addm(mulm(3, mulm(xt, xt, p), p), e.a, p);
-            let (vt, ut) = if yt == 0 { (gx, 0) } else { (mulm(2, gx, p), mulm(4, mulm(yt, yt, p), p)) };
+            let (vt, ut) = if yt == 0 {
+                (gx, 0)
+            } else {
+                (mulm(2, gx, p), mulm(4, mulm(yt, yt, p), p))
+            };
             vsum = addm(vsum, vt, p);
             wsum = addm(wsum, addm(ut, mulm(xt, vt, p), p), p);
             let lin: Poly = vec![subm(0, xt, p), 1];
@@ -533,9 +590,18 @@ impl Velu {
                 den = poly_mul(&den, &sq, p);
             }
         }
-        let codomain = Curve { p, a: subm(e.a, mulm(5, vsum, p), p), b: subm(e.b, mulm(7, wsum, p), p) };
+        let codomain = Curve {
+            p,
+            a: subm(e.a, mulm(5, vsum, p), p),
+            b: subm(e.b, mulm(7, wsum, p), p),
+        };
         let degree = kernel.len() as u64 + 1;
-        Velu { step: MapStep { degree, num, den }, codomain, kernel: kernel.to_vec(), dom: *e }
+        Velu {
+            step: MapStep { degree, num, den },
+            codomain,
+            kernel: kernel.to_vec(),
+            dom: *e,
+        }
     }
     pub fn map(&self, pt: Pt) -> Pt {
         let (x, y) = pt?;
@@ -589,7 +655,10 @@ pub fn isogeny_tower_on(
         .map(|_| aux.random_point(&mut rng))
         .find(|&r| !gset.contains(&aux.add(r, r)))
         .ok_or("no R' with 2R' ∉ G")?;
-    let v: Vec<u64> = g.iter().map(|&t| aux.add(r, t).expect("R' ∈ G").0).collect();
+    let v: Vec<u64> = g
+        .iter()
+        .map(|&t| aux.add(r, t).expect("R' ∈ G").0)
+        .collect();
     // The chain.
     let (mut e, mut qj, mut rj, mut rest) = (aux, Some(q), r, s);
     let (mut steps, mut codomains) = (vec![], vec![]);
@@ -602,7 +671,9 @@ pub fn isogeny_tower_on(
             k = e.add(k, gen);
         }
         if k.is_some() {
-            return Err(format!("kernel generator of step of degree {l} has wrong order"));
+            return Err(format!(
+                "kernel generator of step of degree {l} has wrong order"
+            ));
         }
         let iso = Velu::new(&e, &kernel);
         qj = iso.map(qj);
@@ -622,7 +693,14 @@ pub fn isogeny_tower_on(
         steps,
         c,
         v,
-        kind: TowerKind::Isogeny { aux, aux_order, q, r: r.unwrap(), codomains, curves_tried },
+        kind: TowerKind::Isogeny {
+            aux,
+            aux_order,
+            q,
+            r: r.unwrap(),
+            codomains,
+            curves_tried,
+        },
     };
     Ok(t)
 }
@@ -643,14 +721,24 @@ pub struct AuxFound {
 /// part of size at least `min_size`. The smallest prefix (ascending
 /// primes, largest first dropped) reaching `min_size` is used, so `S` is
 /// as close to the target as the order allows.
-pub fn search_aux(p: u64, bound: u64, min_size: u64, seed: u64, max_curves: u64) -> Result<AuxFound, String> {
+pub fn search_aux(
+    p: u64,
+    bound: u64,
+    min_size: u64,
+    seed: u64,
+    max_curves: u64,
+) -> Result<AuxFound, String> {
     if !is_prime(p) || p < 5 || p >= 1 << 62 {
         return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
     }
     let mut rng = Rng(seed);
     let mut failed = 0;
     for tried in 1..=max_curves {
-        let e = Curve { p, a: rng.below(p), b: rng.below(p) };
+        let e = Curve {
+            p,
+            a: rng.below(p),
+            b: rng.below(p),
+        };
         if e.is_singular() {
             continue;
         }
@@ -683,7 +771,14 @@ pub fn search_aux(p: u64, bound: u64, min_size: u64, seed: u64, max_curves: u64)
             let pt = e.random_point(&mut rng);
             let qpt = e.mul(n / s, pt);
             if primes.iter().all(|&l| e.mul(s / l, qpt).is_some()) {
-                return Ok(AuxFound { aux: e, order: n, degrees: sel, q: qpt.unwrap(), curves_tried: tried, orders_failed: failed });
+                return Ok(AuxFound {
+                    aux: e,
+                    order: n,
+                    degrees: sel,
+                    q: qpt.unwrap(),
+                    curves_tried: tried,
+                    orders_failed: failed,
+                });
             }
         }
     }
@@ -699,7 +794,15 @@ pub fn s3(e: &Curve, x1: u64, x2: u64, x3: u64) -> u64 {
     let s = addm(x1, x2, p);
     let pr = mulm(x1, x2, p);
     let t0 = mulm(mulm(d, d, p), mulm(x3, x3, p), p);
-    let t1 = mulm(2, mulm(addm(mulm(s, addm(pr, e.a, p), p), mulm(2, e.b, p), p), x3, p), p);
+    let t1 = mulm(
+        2,
+        mulm(
+            addm(mulm(s, addm(pr, e.a, p), p), mulm(2, e.b, p), p),
+            x3,
+            p,
+        ),
+        p,
+    );
     let pa = subm(pr, e.a, p);
     let t2 = subm(mulm(pa, pa, p), mulm(4, mulm(e.b, s, p), p), p);
     addm(subm(t0, t1, p), t2, p)
@@ -731,14 +834,21 @@ pub fn decompose_m2(e: &Curve, v: &[u64], r: (u64, u64)) -> Vec<Relation> {
         let a2 = mulm(subm(addm(f1, fm, p), mulm(2, f0, p), p), inv2, p);
         let a1 = mulm(subm(f1, fm, p), inv2, p);
         let roots: Vec<u64> = if a2 == 0 {
-            if a1 == 0 { vec![] } else { vec![mulm(subm(0, f0, p), invm(a1, p), p)] }
+            if a1 == 0 {
+                vec![]
+            } else {
+                vec![mulm(subm(0, f0, p), invm(a1, p), p)]
+            }
         } else {
             let disc = subm(mulm(a1, a1, p), mulm(4, mulm(a2, f0, p), p), p);
             match sqrtm(disc, p) {
                 None => vec![],
                 Some(sd) => {
                     let i = invm(mulm(2, a2, p), p);
-                    vec![mulm(subm(sd, a1, p), i, p), mulm(subm(subm(0, sd, p), a1, p), i, p)]
+                    vec![
+                        mulm(subm(sd, a1, p), i, p),
+                        mulm(subm(subm(0, sd, p), a1, p), i, p),
+                    ]
                 }
             }
         };
@@ -746,11 +856,16 @@ pub fn decompose_m2(e: &Curve, v: &[u64], r: (u64, u64)) -> Vec<Relation> {
             if x2 < x1 || !set.contains(&x2) {
                 continue;
             }
-            let (Some(a), Some(b)) = (lift(x1), lift(x2)) else { continue };
+            let (Some(a), Some(b)) = (lift(x1), lift(x2)) else {
+                continue;
+            };
             for pa in [Some(a), e.neg(Some(a))] {
                 for pb in [Some(b), e.neg(Some(b))] {
                     if e.add(pa, pb) == Some(r) {
-                        let rel = Relation { p1: pa.unwrap(), p2: pb.unwrap() };
+                        let rel = Relation {
+                            p1: pa.unwrap(),
+                            p2: pb.unwrap(),
+                        };
                         if !out.contains(&rel) {
                             out.push(rel);
                         }
@@ -774,7 +889,11 @@ fn poly_str(c: &Poly, var: &str) -> String {
             _ => format!("{k}*{var}^{i}"),
         });
     }
-    if terms.is_empty() { "0".into() } else { terms.join("+") }
+    if terms.is_empty() {
+        "0".into()
+    } else {
+        terms.join("+")
+    }
 }
 
 fn s3_str(e: &Curve, x1: &str, x2: &str, x3: &str) -> String {
@@ -810,7 +929,11 @@ pub fn relation_system_msolve(e: &Curve, tower: &SmoothTower, m: usize, xr: u64)
     let xrs = xr.to_string();
     let mut left = x(1, 1);
     for k in 2..=m {
-        let right = if k == m { xrs.clone() } else { format!("u{}", k - 1) };
+        let right = if k == m {
+            xrs.clone()
+        } else {
+            format!("u{}", k - 1)
+        };
         eqs.push(s3_str(e, &left, &x(k, 1), &right));
         left = right;
     }
@@ -820,9 +943,19 @@ pub fn relation_system_msolve(e: &Curve, tower: &SmoothTower, m: usize, xr: u64)
             let st = &tower.steps[j - 1];
             let xv = x(i, j);
             if j < n {
-                eqs.push(format!("{}*({})-({})", x(i, j + 1), poly_str(&st.den, &xv), poly_str(&st.num, &xv)));
+                eqs.push(format!(
+                    "{}*({})-({})",
+                    x(i, j + 1),
+                    poly_str(&st.den, &xv),
+                    poly_str(&st.num, &xv)
+                ));
             } else {
-                eqs.push(format!("({})-{}*({})", poly_str(&st.num, &xv), tower.c, poly_str(&st.den, &xv)));
+                eqs.push(format!(
+                    "({})-{}*({})",
+                    poly_str(&st.num, &xv),
+                    tower.c,
+                    poly_str(&st.den, &xv)
+                ));
             }
         }
     }
@@ -838,7 +971,11 @@ mod tests {
         let p = 10007;
         let mut rng = Rng(1);
         for _ in 0..40 {
-            let e = Curve { p, a: rng.below(p), b: rng.below(p) };
+            let e = Curve {
+                p,
+                a: rng.below(p),
+                b: rng.below(p),
+            };
             if e.is_singular() {
                 continue;
             }
@@ -847,7 +984,9 @@ mod tests {
                 if n % l != 0 {
                     continue;
                 }
-                let gen = (0..20).map(|_| e.mul(n / l, e.random_point(&mut rng))).find(|g| g.is_some());
+                let gen = (0..20)
+                    .map(|_| e.mul(n / l, e.random_point(&mut rng)))
+                    .find(|g| g.is_some());
                 let Some(gen) = gen else { continue };
                 let mut ker = vec![];
                 let mut k = gen;
@@ -873,7 +1012,10 @@ mod tests {
     #[test]
     fn kummer_mixed_tower_verifies() {
         // p − 1 = 2·3·5·7·... pick p with 2·3·3·5 | p − 1
-        let p = (1..).map(|k| 90 * k + 1).find(|&q| q > 20000 && is_prime(q)).unwrap();
+        let p = (1..)
+            .map(|k| 90 * k + 1)
+            .find(|&q| q > 20000 && is_prime(q))
+            .unwrap();
         let t = kummer_tower(p, &[3, 2, 5, 3], None, 7).unwrap();
         t.verify().unwrap();
         assert_eq!(t.v.len(), 90);
@@ -887,7 +1029,15 @@ mod tests {
         assert!(s >= 60);
         let mut degs = found.degrees.clone();
         degs.reverse(); // any order of the chain works
-        let t = isogeny_tower_on(found.aux, found.order, found.q, &degs, 9, found.curves_tried).unwrap();
+        let t = isogeny_tower_on(
+            found.aux,
+            found.order,
+            found.q,
+            &degs,
+            9,
+            found.curves_tried,
+        )
+        .unwrap();
         t.verify().unwrap();
     }
 
@@ -899,7 +1049,10 @@ mod tests {
         t.verify().unwrap();
         let e = Curve { p, a: 5, b: 7 };
         let mut rng = Rng(4);
-        let base: Vec<(u64, u64)> = t.v.iter().filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y))).collect();
+        let base: Vec<(u64, u64)> =
+            t.v.iter()
+                .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                .collect();
         assert!(base.len() > 4);
         // a target that is a known sum
         let r = e.add(Some(base[0]), Some(base[1])).unwrap();
