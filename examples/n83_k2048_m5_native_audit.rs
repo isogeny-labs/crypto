@@ -69,6 +69,35 @@ fn collect_files(
     Ok(())
 }
 
+fn check_artifact_pointer(path: &Path) -> Result<bool> {
+    let directory = path.parent().ok_or("artifact has no parent")?;
+    let manifest_path = directory.join(".artifacts.json");
+    if !manifest_path.exists() {
+        return Ok(false);
+    }
+    let name = path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or("artifact name is not UTF-8")?;
+    let manifest = json_file(&manifest_path)?;
+    let files = manifest["files"]
+        .as_object()
+        .ok_or("artifact manifest files missing")?;
+    let entry = files.get(name).ok_or("artifact pointer missing raw file")?;
+    if manifest["schema"] != "artifacts.manifest/v1"
+        || files.len() != 1
+        || entry["sha256"] != file_sha(path)?
+        || entry["bytes"] != fs::metadata(path)?.len()
+    {
+        return Err(format!("artifact pointer differs from {}", path.display()).into());
+    }
+    let ignore = fs::read_to_string(directory.join(".gitignore"))?;
+    if !ignore.lines().any(|line| line == format!("/{name}")) {
+        return Err(format!("artifact ignore rule missing for {}", path.display()).into());
+    }
+    Ok(true)
+}
+
 fn check_host(host: &Value, receipt: &Value) -> Result<Vec<f64>> {
     let samples = host.as_array().ok_or("host preflight is not an array")?;
     if samples.len() != 3 || &receipt["host_preflight"] != host {
@@ -127,7 +156,9 @@ fn check_arm(base: &Path, mode: &str, hashes: &mut Map<String, Value>) -> Result
         return Err(format!("{mode} native receipt or command binding differs").into());
     }
     let loads = check_host(&host, &receipt)?;
-    let stdout = decompress(&arm.join("stdout.txt.zst"))?;
+    let stdout_path = arm.join("stdout.txt.zst");
+    check_artifact_pointer(&stdout_path)?;
+    let stdout = decompress(&stdout_path)?;
     let stdout_sha = hex::encode(sha256(&stdout));
     let stderr_sha = file_sha(&arm.join("stderr.txt"))?;
     if receipt["stdout_sha256"] != stdout_sha || receipt["stderr_sha256"] != stderr_sha {
@@ -165,7 +196,9 @@ fn check_arm(base: &Path, mode: &str, hashes: &mut Map<String, Value>) -> Result
     {
         return Err(format!("{mode} terminal solver classification differs").into());
     }
-    let formula = decompress(&study.join(format!("evidence/export-{mode}/result.xcnf.zst")))?;
+    let formula_path = study.join(format!("evidence/export-{mode}/result.xcnf.zst"));
+    check_artifact_pointer(&formula_path)?;
+    let formula = decompress(&formula_path)?;
     if hex::encode(sha256(&formula)) != lock["formula_sha256"]
         || formula.len() as u64 != lock["formula_bytes"]
         || formula
@@ -239,6 +272,10 @@ fn audit(base: &Path, output: &Path) -> Result<()> {
         .collect::<std::collections::BTreeSet<_>>();
     let mut actual = std::collections::BTreeSet::new();
     collect_files(base, base, &mut actual)?;
+    if base.join("positive/.artifacts.json").exists() {
+        actual.remove("positive/.artifacts.json");
+        actual.remove("positive/.gitignore");
+    }
     if let Ok(relative) = output.strip_prefix(base) {
         actual.remove(relative.to_str().ok_or("audit path is not UTF-8")?);
     }
