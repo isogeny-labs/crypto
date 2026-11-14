@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck and implementation gap
 - **Affected work:** [N83 factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/), [external XOR handoff](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/PROTOCOL.md), [full-D18 native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md)
 - **Next action owner:** N83 factor-base research task
-- **Last updated:** 2026-11-14 UTC; [native cadence-32 attempt 7](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-7/REPORT.md) and [external CryptoMiniSat probe](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/external-cms-20261114/RESULT.md)
+- **Last updated:** 2026-11-14 UTC; [native cadence-32 attempt 7](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-7/REPORT.md), [free-choice external CryptoMiniSat probe](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/external-cms-20261114/RESULT.md), [ordered XCNF replay](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-xcnf-20261114/RESULT.md), and [ordered external solver cap](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-20261114/RESULT.md)
 
 ## Problem
 
@@ -16,9 +16,10 @@ end-to-end protocol. The current 5+1 and 4+2 mixed-orbit searches expose
 bounded, first-identity-pattern SAT instances; a capped search leaves the
 relation-yield question open.
 
-There is no verified complete cold IC baseline on this primary `a=0` 81-bit
-subgroup. The verified K1107/root11 cold comparison is on the separate
-diagnostic `a=1` 53-bit subgroup and cannot supply this arm's baseline.
+There is no complete cold IC baseline with signed PCC standing on this primary
+`a=0` 81-bit subgroup [pcc:unverified]. The recorded K1107/root11 cold
+comparison is on the separate diagnostic `a=1` 53-bit subgroup and cannot
+supply this arm's baseline.
 
 The affected curve is `icv1-f2m83-tm6151469093347-debefd74`, with the
 primary-arm K=600 base and cross-stream Gray/hash residual pools. The
@@ -43,7 +44,19 @@ including setup and online phases, over the finite declared design grid.
   than a memory-admission failure. No D18 natural relation or useful-rank
   observation was promoted.
 
-- **Observed:** The [independently replayed hosted 5+1 split panel](../research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-split-panel-20261025/attempt-1/replay-receipt.json) reached 20,000 native conflicts and zero models in each Gray/hash arm. Worker walls were 1,470,249 and 1,223,792 ms respectively on that Linux host; both statuses are `UNKNOWN_search_cap`. The prior 4+2 panel is likewise capped. The [local external-XOR receipt](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/receipt.json) records four first-pattern 5+1/4+2 Gray/hash arms, each ending `INDETERMINATE` at 2,000,001–2,000,002 conflicts with zero models after 119.2–192.5 seconds of L0 process wall. Its [replay](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/replay.json) rebuilds all four formulas from exact archive bytes and checks the raw-output hashes and counters.
+- **2026-11-14 ordered external-control update:** The archived native
+  cadence-32 positive assignment satisfies every original clause and XOR
+  row of the fresh ordered-first-pair XCNF (2,807,999 CNF clauses, 3,901 XOR
+  rows). CryptoMiniSat 5.14.7 then returned `INDETERMINATE` on that exact
+  satisfiable constructed formula at 1,000,002 reported conflicts after
+  431.660 seconds; the natural arm remained withheld. Host load stayed below
+  the frozen admission threshold and swapouts were unchanged. This is a
+  bounded local execution observation with unverified PCC standing
+  [pcc:unverified]; it does not show a natural relation or an end-to-end
+  factor-base ranking. The linked ordered reports retain raw hashes, source,
+  solver, model replay and process receipts.
+
+- **Observed [pcc:unverified]:** The [independently replayed hosted 5+1 split panel](../research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-split-panel-20261025/attempt-1/replay-receipt.json) reached 20,000 native conflicts and zero models in each Gray/hash arm. Worker walls were 1,470,249 and 1,223,792 ms respectively on that Linux host; both statuses are `UNKNOWN_search_cap`. The prior 4+2 panel is likewise capped. The [local external-XOR receipt](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/receipt.json) records four first-pattern 5+1/4+2 Gray/hash arms, each ending `INDETERMINATE` at 2,000,001–2,000,002 conflicts with zero models after 119.2–192.5 seconds of L0 process wall. Its [replay](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/replay.json) rebuilds all four formulas from exact archive bytes and checks the raw-output hashes and counters.
 - **Observed capacity and access gates:** The [full-D18 native preflight](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PREFLIGHT.md) checked the exact 5,418,738-row S3 object, distinct producer and custody manifests, full-object provider checksums, clean source and release binaries. Its local one-minute load remained 55.95–74.19 against the frozen maximum of 24 while cumulative swapouts increased, so the cadence-32 worker was not launched. A [second source-bound preflight](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-2/REPORT.md) at `45ce91d5` again matched both S3 object hashes but sampled load 26.44–66.14 and 390,448 new swapouts; neither worker arm launched. Configured AWS spot and RunPod SSH endpoints were unavailable at bounded checks. The exact two-object read grant is now applied and read back, while PR #2649 GitHub Actions still stop before runner assignment at the account billing gate. These are resource/access conditions, not evidence about solver yield.
 - **Third preflight and runner access:** A [third fresh-GET report](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-3/REPORT.md) again matched the three exact producer/wrapper/object hashes. Its recorded one-minute local load was 114.84, so the worker was not launched. A configured profile reached the deployed `ephemeral` runner in account `104186811093`, but direct HEAD of the original D18 manifest returned `403`. The [exact two-sided access proposal](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-3/ACCESS_PROPOSAL.md) is unapplied pending explicit authorization; it is separate from the already active `rho-gh-snapshot-readonly-20261024` user grant. A no-source On-Demand market smoke then failed at `RunInstances` because the account's `SpotOnlyEC2Launch` v2 identity policy explicitly denies this direct non-Spot launch. The tagged instance readback was empty. No D18 solver job was submitted from this proposal.
 - **Fourth source-bound launch:** The [attempt-4 report](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-4/REPORT.md) matched a fresh S3 GET and passed the load/swap/scratch gate, but its worker exited at startup because its compile-time source path pointed to the now-dirty original checkout. The 1.05-second exit yielded no result JSON. Rebuilding from a clean frozen checkout is the exact correction; this is producer provenance failure, not relation-search evidence.
@@ -66,16 +79,15 @@ including setup and online phases, over the finite declared design grid.
 - [ ] Apply the frozen finite-grid coverage and unsupported-combination dispositions, and compare total cost with uncertainty before filling `selected_best_total_runtime`.
 
 These checks are jointly needed to select a factor base on the requested
-criterion. A verified partial relation would resolve only the first gate.
+criterion. A checked partial relation would resolve only the first gate.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** Run the [first-pattern external XOR protocol](../research/koblitz_n83_factor_base_sweep_20261008/verification/external-xor-20261025/PROTOCOL.md) on both retained pools and both 5+1/4+2 shapes, with identical backend settings, independent process budgets, and complete model replay when SAT.
-- **Parallel full-D18 action:** On a resource-qualified host, run the [native cadence-32 protocol](../research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/PROTOCOL.md) against the separately hash-checked complete S3 generation. First require the constructed control and independent native group/row replay; only then launch one public natural query under its frozen cap. Preserve internal cap classification, phase records and host charge.
-- **Inputs and controls:** Exact S3 compressed-object hashes and pilot manifest, trial-zero public corpus, known-answer group-lift tests, and matched Gray/hash process limits.
-- **Execution limits and stop condition:** Record finite time, conflict, and memory caps per arm; preserve `INDETERMINATE`, timeout, or OOM without converting them to UNSAT.
-- **Outcomes and next actions:** Verified partials advance to graph/rank measurement. A SAT model rejected by the group check calls for model blocking and a different pattern. Two censored arms call for a backend/encoding bottleneck study. Infrastructure failures require a fresh replay before interpretation.
-- **Recheck trigger:** A checked natural partial, a changed solver backend or encoding, a completed matched panel, or a qualified host that permits the frozen full-D18 pair to run.
+- **Primary `a=0` action:** Freeze one new solver or encoding policy on the exact D18 input. Require a complete positive model and original-XCNF plus group replay before any public natural query. Keep all first-pattern and native cadence-32 caps as separate candidate cells.
+- **Inputs and controls:** Bind the exact compressed S3 object and provider checksums, pilot public corpus, target point, positive model, formula bytes, solver binary, source commit, and resource caps before timing.
+- **Execution limits:** Retain `INDETERMINATE`, timeout, OOM, and producer failure as terminal rows without assigning zero cost or natural yield. A checked natural relation advances to multi-query yield and rank measurement.
+- **Cross-curve action:** The separately identified `a=1` 53-bit-subgroup panel needs its own admissible route, same-point IC/rho replay, and total-cost selection. Do not pool its data with this primary `a=0` subgroup.
+- **Recheck trigger:** A changed solver or encoding with a positive pass, a checked natural relation, a completed matched panel, or a qualified cloud route for the `a=1` comparison.
 
 ## Resolution and history
 
@@ -99,13 +111,13 @@ access condition, not a mathematical or solver result.
 
 ### 2026-10-26 exact-read authorization and capacity continuation
 
-After the rejection above, the user explicitly approved the prepared temporary
+After the rejection above, the user explicitly authorized the prepared temporary
 inline policy `N83D18ExactInputRead20261025` for IAM user
 `rho-gh-snapshot-readonly-20261024`. A live `aws iam get-user-policy` readback
 confirmed that its sole statement allows `s3:GetObject` for exactly the D18
 `manifest.json` and `objects/c295da88…jsonl.gz` keys under the frozen
 `d18-full-direct-subgroup-v1/a0` prefix. It does not alter the factor-base
-object or prove that a worker ran. The current [PR handoff](https://github.com/isogeny-labs/crypto/pull/2649)
+object or establish that a worker ran. The current [PR handoff](https://github.com/isogeny-labs/crypto/pull/2649)
 and [timestamped IAM readback](evidence/n83-d18-exact-read-20261026.json)
 record the applied state and cleanup obligation. The readback policy document
 matches the reviewed proposal after canonical JSON sorting. The latest applicable
@@ -160,14 +172,12 @@ read policy and verify `NoSuchEntity`; then continue the remaining yield,
 rank/log, unseen-target, matched-rho and finite-grid gates before selection.
 
 **Next discriminating step:** preserve the completed D18 runs as separate
-candidate cells and prepare one versioned, source-bound external XCNF export
-for the ordered-first-pair positive that native cadence-32 already solved.
-Freeze the exact formula, native witness, solver version and resource caps
-before a new external solver call. First independently replay the planted
-assignment against every original CNF and XOR row. Then test whether that
-ordered encoding lets the external solver pass the positive gate under its
-declared cap. Launch a public natural arm only after a complete positive
-model and group replay. Retain every censored or failed arm. Any checked
-natural relation advances only the first gate: independent multi-equation
-yield, closure, rank/logs, unseen-target descent, matched rho and finite-grid
-coverage remain required for total-runtime selection.
+candidate cells. The ordered XCNF assignment replay is complete, while both
+free-choice and ordered CryptoMiniSat positive controls are capped under the
+declared one-million-conflict budget. Freeze one changed solver or encoding
+policy with its exact formula, source and resources, and require a complete
+positive model plus original-XCNF and group replay before a public natural
+arm. Retain every censored or failed arm. A checked natural relation advances
+only the first gate: independent multi-equation yield, closure, rank/logs,
+unseen-target descent, matched rho and finite-grid coverage remain required
+for total-runtime selection on both N83 curves.
