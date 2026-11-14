@@ -31,6 +31,14 @@
 //! "derived"). The trace of the target recorded in ecdb is the cross-check:
 //! T^2 - tT + q must divide T^4 + a1 T^3 + a2 T^2 + q a1 T + q^2.
 //!
+//! **Larger fields** (F_p with 2^62 <= p < 2^128, GF(p^k) with 2^48 <= q <
+//! 2^128): the same decomposition, with t and t' from Schoof's algorithm
+//! ([`super::schoof`], t mod l for l <= 61, finished by baby-step giant-step on
+//! the residue class with a unique surviving order; method "derived ... by
+//! Schoof's algorithm"). The 128-bit limit keeps a source near 10 s at import;
+//! a larger field is skipped (`field_too_large`), never guessed. The target's
+//! recorded trace must again give a divisor of the Frobenius polynomial.
+//!
 //! **`binary_cubic_pullback_v1`, genus 3, q = 2^m.** H: y^2 + u^2 y = u^7 +
 //! a u^4 + d u (one point at infinity: deg f = 2g + 1, deg h <= g). With
 //! s = y / u^2 it is s^2 + s = u^3 + a + d u^-3 for u != 0, so
@@ -52,6 +60,7 @@
 //! `cover_lpoly_zeta`.
 
 use super::covers::fq_from_parts;
+use super::schoof;
 use super::{bulk, bulk1, Ctx, Report};
 use crate::ec::is_probable_prime;
 use crate::field::{Elt, Encoding, Fq};
@@ -74,6 +83,10 @@ pub const DIRECT_FP_MAX: u64 = 1 << 22;
 pub const DIRECT_FP2_MAX: u64 = 1 << 12;
 /// Largest binary field extension (bits of Q) counted exhaustively.
 pub const MAX_BINARY_COUNT_BITS: u32 = 24;
+/// Largest prime field (bits of p) counted by Schoof's algorithm at import.
+pub const SCHOOF_MAX_FP_BITS: u64 = 128;
+/// Largest extension field (bits of q) counted by Schoof's algorithm at import.
+pub const SCHOOF_MAX_EXT_BITS: u64 = 128;
 /// Random points tried before baby-step giant-step gives up.
 const MAX_POINTS: usize = 48;
 
@@ -857,6 +870,7 @@ pub fn curve_counts(l: &[BigInt], q: &BigInt) -> Vec<BigInt> {
 pub enum Method {
     G2Count,
     G2Derived,
+    G2Schoof,
     G3Count,
     G3Derived,
 }
@@ -874,6 +888,12 @@ impl Method {
                  a1 = -(t + t'), a2 = 2q + t t', t and t' from group orders found by baby-step giant-step in the Hasse interval \
                  (unique candidate); #H(F_p) counted exhaustively and equal when p < 2^22; T^2 - tT + q of the target divides the \
                  reversed polynomial"
+            }
+            Method::G2Schoof => {
+                "derived: Jac(H) ~ E x E' with E: v^2 = G(x) (the target) and E': Y^2 = x G(x), L(T) = (1 - tT + qT^2)(1 - t'T + qT^2), \
+                 a1 = -(t + t'), a2 = 2q + t t'; t and t' by Schoof's algorithm (t mod 2 from gcd(x^q - x, G), t mod l for odd primes \
+                 l <= 61 from the l-division polynomials), the residue class of #E in the Hasse interval finished by baby-step giant-step \
+                 with a unique surviving order; T^2 - tT + q of the target's recorded trace divides the reversed polynomial"
             }
             Method::G3Count => {
                 "exhaustive count of #H over F_q, F_q^2 and F_q^3 (s^2 + s = u^3 + a + d u^-3), L(T) from Newton's identities; \
@@ -1017,6 +1037,89 @@ pub fn genus2_extension(fq: &Fq, f: &[Elt], targets: &[BigInt]) -> Outcome {
     }
 }
 
+/// Traces (t, t') of E: v^2 = G(x) and E': V^2 = Z^3 + g1 Z^2 + g0 g2 Z + g0^2
+/// (the smooth model of Y^2 = x G(x)) by Schoof's algorithm, for the even
+/// sextic G(u^2) given as g0, g1, g2.
+pub fn quotient_traces_schoof<F: schoof::Field>(
+    f: &F,
+    g0: &F::E,
+    g1: &F::E,
+    g2: &F::E,
+    cfg: &schoof::Config,
+) -> Result<(BigInt, BigInt), schoof::SchoofError> {
+    let (a, b) = schoof::short_weierstrass(f, g2, g1, g0);
+    let t = schoof::frobenius_trace(f, &a, &b, cfg)?;
+    let (a, b) = schoof::short_weierstrass(f, g1, &f.mul(g0, g2), &f.mul(g0, g0));
+    let tp = schoof::frobenius_trace(f, &a, &b, cfg)?;
+    Ok((t, tp))
+}
+
+fn schoof_outcome<F: schoof::Field>(
+    f: &F,
+    c: &[F::E],
+    p: BigInt,
+    r: usize,
+    targets: &[BigInt],
+    cfg: &schoof::Config,
+) -> Outcome {
+    use schoof::SchoofError as E;
+    let q = BigInt::from(f.q().clone());
+    match quotient_traces_schoof(f, &c[0], &c[2], &c[4], cfg) {
+        Ok((t, tp)) => finish(Computed { g: 2, l: genus2_l(&q, &t, &tp), q, p, r, method: Method::G2Schoof }, targets),
+        Err(E::TooLarge) => Outcome::Skip("field_too_large"),
+        Err(E::Ambiguous(_)) => Outcome::Skip("bsgs_inconclusive"),
+        Err(E::Unsupported(m)) => Outcome::Fail(format!("quotient curve unsupported by Schoof: {m}")),
+        Err(E::Inconsistent(m)) => Outcome::Fail(format!("Schoof point count inconsistent: {m}")),
+    }
+}
+
+fn is_even_monic_sextic_s<F: schoof::Field>(f: &F, c: &[F::E]) -> bool {
+    c.len() == 7 && [1, 3, 5].iter().all(|&i| f.is_zero(&c[i])) && c[6] == f.one() && !f.is_zero(&c[0])
+}
+
+/// Genus 2 over F_p for p beyond baby-step giant-step (Schoof), bits(p) <=
+/// [`SCHOOF_MAX_FP_BITS`].
+pub fn genus2_prime_large(fq: &Fq, f: &[Elt], targets: &[BigInt], cfg: &schoof::Config) -> Outcome {
+    let Some(p) = fq.p.to_biguint() else { return Outcome::Skip("unsupported_field") };
+    if p.bits() > SCHOOF_MAX_FP_BITS {
+        return Outcome::Skip("field_too_large");
+    }
+    let field = schoof::PrimeField::new(p);
+    let Some(c) = f.iter().map(|e| e.first().and_then(|x| x.to_biguint())).collect::<Option<Vec<_>>>() else {
+        return Outcome::Skip("unparsed_model");
+    };
+    if !is_even_monic_sextic_s(&field, &c) {
+        return Outcome::Skip("unsupported_shape");
+    }
+    schoof_outcome(&field, &c, fq.p.clone(), 1, targets, cfg)
+}
+
+/// Genus 2 over GF(p^k) for q beyond baby-step giant-step (Schoof), bits(q) <=
+/// [`SCHOOF_MAX_EXT_BITS`], p < 2^60, k <= 16.
+pub fn genus2_extension_large(fq: &Fq, f: &[Elt], targets: &[BigInt], cfg: &schoof::Config) -> Outcome {
+    let k = fq.degree();
+    let q = num_traits::pow(fq.p.clone(), k);
+    if q.bits() > SCHOOF_MAX_EXT_BITS {
+        return Outcome::Skip("field_too_large");
+    }
+    let (Some(p), Some(low)) = (fq.p.to_u64(), fq.f[..k].iter().map(|c| c.to_i128()).collect::<Option<Vec<i128>>>())
+    else {
+        return Outcome::Skip("unsupported_field");
+    };
+    let Some(field) = schoof::ExtField::new(p, &low) else { return Outcome::Skip("unsupported_field") };
+    let Some(c) = f
+        .iter()
+        .map(|e| e.iter().map(|x| x.to_u64()).collect::<Option<Vec<u64>>>().map(|v| field.elt(&v)))
+        .collect::<Option<Vec<_>>>()
+    else {
+        return Outcome::Skip("unparsed_model");
+    };
+    if !is_even_monic_sextic_s(&field, &c) {
+        return Outcome::Skip("unsupported_shape");
+    }
+    schoof_outcome(&field, &c, fq.p.clone(), k, targets, cfg)
+}
+
 /// Genus 3 over GF(2^m) for H: y^2 + u^2 y = u^7 + a u^4 + d u, with `base`
 /// the field (modulus bits) and a, d its elements as bit masks.
 pub fn genus3_binary(base: Gf2n, a: u64, d: u64, targets: &[BigInt]) -> Outcome {
@@ -1111,7 +1214,7 @@ fn run_job(job: &Job) -> Outcome {
     match fq.encoding {
         Encoding::Decimal if has(PRIME_CONSTRUCTION) && job.genus == 2 && h.iter().all(|c| fq.is_zero(c)) => {
             if fq.p.bits() > MAX_FP_BITS {
-                return Outcome::Skip("field_too_large");
+                return genus2_prime_large(fq, &f, &job.targets, &schoof::IMPORT);
             }
             let Some(p) = fq.p.to_u64() else { return Outcome::Skip("field_too_large") };
             if p < 5 {
@@ -1123,6 +1226,9 @@ fn run_job(job: &Job) -> Outcome {
             genus2_prime(p, &fu, &job.targets)
         }
         Encoding::DecimalVector if has(PRIME_CONSTRUCTION) && job.genus == 2 && h.iter().all(|c| fq.is_zero(c)) => {
+            if ExtField::new(fq).is_none() {
+                return genus2_extension_large(fq, &f, &job.targets, &schoof::IMPORT);
+            }
             genus2_extension(fq, &f, &job.targets)
         }
         Encoding::HexBitset if has(BINARY_CONSTRUCTION) && job.genus == 3 => {
@@ -1498,6 +1604,73 @@ mod tests {
         assert_eq!(c.q, BigInt::from(169));
         assert_eq!(c.l, genus2_l(&BigInt::from(169), &BigInt::from(te), &BigInt::from(tpe)));
         assert_eq!(c.r, 2);
+    }
+
+    fn prime_elts(f: &[u64]) -> Vec<Elt> {
+        f.iter().map(|&c| vec![BigInt::from(c)]).collect()
+    }
+
+    /// Schoof's path pinned against the live row icv1-fp24-t553-4d349218 (the
+    /// registry's trace 553 and the L-polynomial of the BSGS + exhaustive path
+    /// above), and agreeing with that path on further curves.
+    #[test]
+    fn schoof_path_matches_the_live_row_and_the_small_field_path() {
+        let p = 8416129u64;
+        let f = vec![1713668, 0, 1040051, 0, 0, 0, 1];
+        let fq = Fq::prime(BigInt::from(p));
+        let c = done(genus2_prime_large(&fq, &prime_elts(&f), &ints(&[553]), &schoof::IMPORT));
+        assert_eq!(c.method, Method::G2Schoof);
+        let q = p as i128;
+        assert_eq!(c.l, ints(&[1, -2156, 17718717, q * -2156, q * q]));
+        // A wrong target trace, or a corrupted model, is a cross-check failure.
+        assert!(matches!(genus2_prime_large(&fq, &prime_elts(&f), &ints(&[554]), &schoof::IMPORT), Outcome::Fail(_)));
+        let mut bad = f.clone();
+        bad[0] += 1;
+        assert!(matches!(genus2_prime_large(&fq, &prime_elts(&bad), &ints(&[553]), &schoof::IMPORT), Outcome::Fail(_)));
+        // Against the BSGS + exhaustive path on more primes (Schoof alone, no search).
+        let only_schoof = schoof::Config { bsgs_bits: 0, max_l: 200 };
+        for (p, a, b) in [(1009u64, 3u64, 7u64), (65_537, 11, 2), (1_000_003, 5, 123_456)] {
+            let f = cover_sextic(p, a, b);
+            let (t, _) = quotient_traces(&Fp64 { p }, &f).unwrap();
+            let t = BigInt::from(t);
+            let small = done(genus2_prime(p, &f, std::slice::from_ref(&t)));
+            let fq = Fq::prime(BigInt::from(p));
+            let big = done(genus2_prime_large(&fq, &prime_elts(&f), std::slice::from_ref(&t), &only_schoof));
+            assert_eq!(big.l, small.l, "p = {p}");
+        }
+    }
+
+    /// Schoof's path over GF(p^k) agrees with the BSGS path (q < 2^48) and with
+    /// the subfield relation t_{q^2} = t^2 - 2q.
+    #[test]
+    fn schoof_path_over_extensions_matches_bsgs() {
+        let only_schoof = schoof::Config { bsgs_bits: 0, max_l: 200 };
+        // GF(169) = F_13[t]/(t^2 - 2), as in the test above.
+        let p = 13u64;
+        let f = cover_sextic(p, 2, 3);
+        let (t, _) = quotient_traces(&Fp64 { p }, &f).unwrap();
+        let fq = Fq::extension(BigInt::from(p), &[BigInt::from(11), BigInt::from(0)]);
+        let lift: Vec<Elt> = f.iter().map(|&c| vec![BigInt::from(c), BigInt::zero()]).collect();
+        let target = BigInt::from(t * t - 26);
+        let small = done(genus2_extension(&fq, &lift, std::slice::from_ref(&target)));
+        let big = done(genus2_extension_large(&fq, &lift, std::slice::from_ref(&target), &only_schoof));
+        assert_eq!(big.l, small.l);
+        assert_eq!(big.r, 2);
+        // GF(1009^3) = F_1009[t]/(t^3 - 11) (11 is not a cube mod 1009: 1009 = 1 mod 3
+        // and 11^336 != 1), a curve with coefficients outside the prime field.
+        let p = 1009u64;
+        let fq = Fq::extension(BigInt::from(p), &[BigInt::from(-11), BigInt::zero(), BigInt::zero()]);
+        let e = |a: u64, b: u64, c: u64| vec![BigInt::from(a), BigInt::from(b), BigInt::from(c)];
+        let z = e(0, 0, 0);
+        let sextic = vec![e(5, 7, 1), z.clone(), e(3, 0, 2), z.clone(), e(1, 1, 0), z.clone(), e(1, 0, 0)];
+        let ext = ExtField::new(&fq).unwrap();
+        let ext_f: Vec<Elt> = sextic.clone();
+        let (te, _) = quotient_traces(&ext, &ext_f).unwrap();
+        let tb = BigInt::from(te);
+        let small = done(genus2_extension(&fq, &sextic, std::slice::from_ref(&tb)));
+        let big = done(genus2_extension_large(&fq, &sextic, std::slice::from_ref(&tb), &schoof::IMPORT));
+        assert_eq!(big.l, small.l);
+        assert!(matches!(genus2_extension_large(&fq, &sextic, &[tb + 1], &schoof::IMPORT), Outcome::Fail(_)));
     }
 
     #[test]

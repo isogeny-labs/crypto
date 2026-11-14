@@ -234,6 +234,7 @@ both is left alone; nothing is deleted).
 | `prime_quadratic_pullback_v1`, genus 2 | F_p, 5 <= p < 2^62; GF(p^k), q < 2^48 | H: v^2 = G(u^2) is a double cover of E: v^2 = G(x) (the target) and of E': Y^2 = x G(x), and Jac(H) ~ E x E' over F_q. L = (1 - tT + qT^2)(1 - t'T + qT^2), so a1 = -(t + t') and a2 = 2q + t t'. Both traces come from group orders found by baby-step giant-step in the Hasse interval, intersecting the candidates of random points until one is left (the true order is always a candidate, so a single survivor is the order). Method "derived" |
 | the same, p < 2^22 | F_p | also #H(F_p) = p + 2 + sum chi(f(u)) counted exhaustively, which must give the same a1 |
 | the same, p < 2^12 | F_p | also #H(F_{p^2}) counted exhaustively (the character of F_{p^2} is that of the norm to F_p); a2 = (#H(F_{p^2}) - p^2 - 1 + a1^2)/2 must agree. The exhaustive counts are the stored result; method "exhaustive count" |
+| the same, beyond those ranges | F_p, 2^62 <= p < 2^128; GF(p^k), 2^48 <= q < 2^128, p < 2^60, k <= 16 | The same decomposition, with t and t' by Schoof's algorithm (`src/import/schoof.rs`): t mod 2 from gcd(x^q - x, cubic); t mod l for odd primes l <= 61, l != p, in F_q[x]/(h) with h a factor of the l-division polynomial (x^{q^2}, y^{q^2} by Brent-Kung composition, [q mod l]P by division polynomials, the tau loop in projective coordinates; a zero divisor met by an inversion restarts modulo the factor it exposes, and an unmatched tau or y-sign is an error); the residue class of #E modulo the product of the primes (at most 2^36 terms of the Hasse interval) finished by baby-step giant-step on random points, intersected until one order is left. Method "derived ... by Schoof's algorithm". The limit keeps each source near 10 s at import (two traces; measured on a loaded 4-core host: about 3.7 s per trace at 128-bit p, 3.6 to 4.8 s at 126 to 128-bit q = p^k); NIST P-192 takes about a minute per trace |
 | `binary_cubic_pullback_v1`, genus 3 | GF(2^m), m <= 12 | H: y^2 + u^2 y = u^7 + a u^4 + d u has one point at infinity; s = y/u^2 gives #H(F_Q) = Q + 1 + sum_{u != 0} (-1)^Tr(u^3 + a + d u^-3), counted exhaustively over F_{2^m}, F_{2^{2m}} and, when 3m <= 24 (m <= 8), F_{2^{3m}}, with a and d embedded through a root of the modulus. Three counts: L by Newton's identities (method "exhaustive count"). Two counts: L = L_E L_B, where E (y^2 + xy = x^3 + a x^2 + d^2) is counted exhaustively and the Prym surface B is fixed by the two counts (method "derived") |
 
 Cross-checks, applied to every result: L(T) has the functional-equation shape,
@@ -241,12 +242,17 @@ Cross-checks, applied to every result: L(T) has the functional-equation shape,
 ecdb), T^2 - tau T + q divides the reversed polynomial T^{2g} L(1/T). A failure
 is reported (`cover_lpoly_crosscheck_failures` and a problem line) and nothing
 is stored for that source. Cases outside the ranges above are skipped and
-counted under `cover_lpoly_skipped_*`: a prime above 62 bits, an extension field
-of 2^48 elements or more, and a binary field with m > 12 (the counts over
-F_{2^{2m}} need 2^24 elements or fewer). They need SEA or a Kloosterman-sum
-algorithm; no value is guessed. In the pinned `covers.json` the skipped sources
-are 301 genus-2 sources over F_p (63 to 638 bits), 959 over GF(p^k) (49 to 253
-bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
+counted under `cover_lpoly_skipped_*`: a field of 2^128 elements or more for
+genus 2 (`field_too_large`: Schoof's algorithm would need primes above 61, which
+costs minutes per curve without Elkies' and Atkin's improvements), and a binary
+field with m > 12 for genus 3 (the counts over F_{2^{2m}} need 2^24 elements or
+fewer; a sound method for larger m, such as a Kloosterman-sum or p-adic
+algorithm, is not implemented). No value is guessed. Of the 1,423 sources of the
+pinned `covers.json` that the baby-step giant-step pass skips (301 genus-2 over
+F_p, 63 to 638 bits; 959 over GF(p^k), 49 to 253 bits; 163 genus-3 over GF(2^m),
+m = 13 to 577), the fields in `registry.json` put 43 within Schoof's range (17
+over F_p, 26 over GF(p^k)); the remaining 286 + 933 genus-2 sources and the 163
+genus-3 sources stay skipped.
 
 ### Global curves, security, evidence (`0007`)
 
@@ -359,7 +365,7 @@ the import's own checks.
 | `docs/curves/registry.json` | 20,817 curves over 891 fields. Each has a computed `genus1_invariants` row whose j equals the registry's j: 0 mismatches, Montgomery and Edwards models included through their birational maps. Also 1,808 isogeny classes, 1,023 EC1 representations (every digest reproduced from its preimage), 258 standards publications and 43,915 aliases |
 | six `isogeny_routes.json` walk outputs | 263 more curves (rebuilt model JSON reproduces each slug), 478 kernel-certified Vélu isogenies with kernel polynomials, codomains and u^2, 687 IW1 routes, and the walks' proved volcano levels. The walk curves land in their source curve's isogeny class, as Tate's theorem requires |
 | `docs/curves/traits.json` | Frobenius data for 1,808 classes (Delta = v^2 d_K re-checked by CHECK), per-prime class rows and per-curve l-torsion rows, 20,991 endomorphism rings, 26.6k volcano levels, 1,273 CM fields, subgroups, embedding degrees, twists, and 20,992 verbatim trait records |
-| `docs/curves/covers.json` | 20,815 genus-2 and genus-3 hyperelliptic curves and their Jacobians, and 20,817 explicit covers H -> E. For the 30 Montgomery and Edwards targets the polynomial map lands on an intermediate short Weierstrass model; the certificate's `target_model_map` is kept in the map with the composition stated. Two genus-2 curves each cover two models: the Montgomery and twisted Edwards models of one curve share a Weierstrass model, so they share the cover. Every source also gets an `isogeny_class_fq` row, the link `abelian_variety.isogeny_class_id` and a `curve_zeta` row from `import covers` (`src/import/cover_lpoly.rs`): 20,853 of the 22,276 sources of the pinned file (20,842 of genus 2, 11 of genus 3); the other 1,423 are skipped, not guessed (below) |
+| `docs/curves/covers.json` | 20,815 genus-2 and genus-3 hyperelliptic curves and their Jacobians, and 20,817 explicit covers H -> E. For the 30 Montgomery and Edwards targets the polynomial map lands on an intermediate short Weierstrass model; the certificate's `target_model_map` is kept in the map with the composition stated. Two genus-2 curves each cover two models: the Montgomery and twisted Edwards models of one curve share a Weierstrass model, so they share the cover. Every source also gets an `isogeny_class_fq` row, the link `abelian_variety.isogeny_class_id` and a `curve_zeta` row from `import covers` (`src/import/cover_lpoly.rs`): 20,853 of the 22,276 sources of the pinned file (20,842 of genus 2, 11 of genus 3) by baby-step giant-step and exhaustive counts, and by the fields of `registry.json` 43 more by Schoof's algorithm (q < 2^128; not yet counted by a re-import); the other 1,380 are skipped, not guessed (below) |
 | `docs/curves/jacobian-transfers.json` | 61,305 priced DLP transfer routes; the cost model is in the provenance parameters |
 | level and Jacobian certificates | 19 + 1 certificates |
 | derived in SQL | 21,080 automorphism groups (79 C6, 14 C4), 21,082 attack-surface rows, 21,080 Frobenius endomorphisms, 73 subfield-tau records with their endomorphisms |
