@@ -21,7 +21,8 @@ Record: benchmarks/records/<id>-wide-sparse-la.json (benchrec).
 Launch manifest: research/ic_techniques_20261012/wide_sparse_la/launch.json (pod ids, S3 prefix).
 
 ## Runs in flight
-3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
+None. Attempt 2 completed 2026-11-13 ~16Z; raw data pulled into wide_sparse_la/raw/ (2026-11-14).
+Was: 3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
 Pods self-terminate via podTerminate; if not, terminate via REST DELETE /v1/pods/<id>.
 
 ## Stop and success conditions
