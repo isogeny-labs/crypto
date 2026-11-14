@@ -9,9 +9,9 @@ decisions. Every number here is `[pcc:unverified]`. Nothing in this directory is
 
 | track | lead | what was done | state | next |
 |:--|:--|:--|:--|:--|
-| A | class-representative IC selection (`../ic-representative-selection_20261105/`, frozen 2026-11-05, never run) | drift check since the freeze (`A_repsel/DRIFT.md`); Stage 0 ran locally (24 classes, 205 job specs, 16 native tests pass); amendment A1 filed in the study's `INPUTS.md`; protocol hash re-checked with the lab's tool (equal to the recorded value) | ready except the image | image publish (`isolab-experiment.yml`, `publish_only`), mask nonce, cards; about 247 jobs, 75 to 155 job-hours on the L2 pool, about USD 7 to 25 (estimate, `A_repsel/READINESS.md`) |
-| B | the Nov 10 sweep's unfinished leads (`../lead_sweep_20261110/`) | 107 prime-field leads decided at the desk (`B_sweep_followups/EXPERIMENTS.md`, `decisions.json`): 30 already tested for real by a native study, 47 closed at the desk, 27 need new native code, 3 runnable now | B1 and B2 being made freeze-ready | B1: factor-base size above 45 at 20 bits (under 0.1 CPU-hour); B2: kangaroo against rho on the six medium-tier curves (about 0.5 CPU-hour); B3 (first counted algebraic row) is blocked on a route and an image |
-| C | global-lift height family (`LEAD-EXO-global-lift-height` and three related ids) | desk analysis (`C_global_lift/DESK.md`): closed in the exponent for every family with fresh random points per trial, by two kernel-checked Lean results plus a published height bound; asymptotic only, nothing quantitative at deployed sizes; open residue: section-finding cost on surfaces of rank 9 or more, for which the repository has no instrument | under independent review | the closure is recorded only if the review holds |
+| A | class-representative IC selection (`../ic-representative-selection_20261105/`, frozen 2026-11-05, never run) | drift check since the freeze (`A_repsel/DRIFT.md`); Stage 0 ran locally (24 classes, 205 job specs, 16 native tests pass); amendment A1 filed in the study's `INPUTS.md`; protocol hash re-checked with the lab's tool (equal to the recorded value) | ready except the image; not launchable while the launcher quota is 0 | image publish (`isolab-experiment.yml`, `publish_only`), mask nonce, cards; about 247 jobs, 75 to 155 job-hours on the L2 pool, about USD 7 to 25 (estimate, `A_repsel/READINESS.md`) |
+| B | the Nov 10 sweep's unfinished leads (`../lead_sweep_20261110/`) | 107 prime-field leads decided at the desk (`B_sweep_followups/EXPERIMENTS.md`, `decisions.json`): 30 already tested for real by a native study, 47 closed at the desk, 27 need new native code, 3 runnable now | B1 and B2 frozen 2026-11-14T20:00:39Z (protocol tool, 0 findings); records opened; not launched (launcher quota is 0) | B1: factor-base size above 45 at 20 bits (under 0.1 CPU-hour); B2: kangaroo against rho on the six medium-tier curves (about 0.5 CPU-hour); B3 (first counted algebraic row) is blocked on a route and an image |
+| C | global-lift height family (`LEAD-EXO-global-lift-height` and three related ids) | desk analysis (`C_global_lift/DESK.md`) and an independent review (`C_global_lift/REVIEW.md`): "holds with corrections". The exponent closure holds only in a narrow setting and duplicates the closure committed and checker-reviewed on 2026-11-12 (`../prime_field_ic_closure_20261112/`); its one addition is that Masser 1989 needs no prime of bad reduction. The leads stay open on section-finding cost (R2) and adaptive trials (R3) | done; no lead disposition changes | R2 needs an instrument the repository lacks (a general F_p F4 and a builder for surfaces with planted sections) |
 
 ## Owner decisions taken today (`../open_leads_execution_20261108/DECISIONS.md`)
 
@@ -29,3 +29,11 @@ decisions. Every number here is `[pcc:unverified]`. Nothing in this directory is
 The knowledge base (`research-kb`) is unavailable in this session (`scripts/research-kb status`: no executable). The
 lead atlas in `crypto-autoresearcher` is now vault-encrypted and this session has no key. Fallback: the repository paths
 named in each track's files, and the two inventories of 2026-11-12 (sweep follow-ups and leads outside the atlas).
+
+## Launch path blocked (2026-11-14)
+
+Every AWS CodeBuild "Concurrently running builds" quota in us-east-2 reads 0 (Service Quotas; first recorded by
+another session at about 00:27Z on 2026-11-11). All Iso Lab cluster launches and status reads go through the CodeBuild
+project `isolab-experiment-launcher`, so no job can be submitted from any session. Stage B unit job 1 stopped at its
+pool check with `AccountLimitExceededException`; nothing ran. Raising the quota is an owner action. The image builds run
+on GitHub Actions and are not affected.

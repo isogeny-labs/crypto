@@ -1,5 +1,19 @@
 # Track C: global-lift-height leads over prime fields. Desk analysis (2026-11-14)
 
+> **Review status (main session, 2026-11-14).** An independent red-team review (`REVIEW.md`, pinned to this file's
+> sha256 `c52892a0…`; this status block is prepended without changing the text below) reads **"holds with corrections"**:
+> - The exponent closure holds only in a narrow setting: fixed relation dimension k, fresh uniform masks per trial, lifts
+>   of polynomial size over Q or a number field of bounded degree, relations only among the sampled lifted points, and
+>   function fields of bounded Euler characteristic.
+> - **It is not new.** The same closure was committed on 2026-11-12 and checker-reviewed
+>   (`research/prime_field_ic_closure_20261112/finish/lifting/PROOF.md`; `research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md` §5),
+>   using Petsche 2006. The one addition here: Masser 1989 Corollary 1 needs no prime of bad reduction.
+> - Unsupported and withdrawn: the extension to number fields of polylogarithmic degree; the 160–700-bit thresholds as
+>   stated (they assume a height ratio K); "closed" for p-dependent curves in R2; and the claim that the five leads are
+>   closed. The leads stay open on branch (ii) (R2, section-finding cost) and residue R3 (adaptive trials); see `REVIEW.md` M1, M3, M4.
+> - Disposition: no atlas lead changes on the strength of this note. Every statement is `[pcc:unverified]`.
+
+
 **Class.** Desk derivation. No run, no curve, no cost row. This note does not
 change any lead disposition or the leaderboard. Every number in it is
 `[pcc:unverified]`. No pcc claim covers xedni, lifts or heights
