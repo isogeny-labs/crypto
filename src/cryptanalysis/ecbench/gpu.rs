@@ -1216,7 +1216,7 @@ mod lock_and_capsule_tests {
 
     fn options(d: &Path, lock: &str) -> GpuOptions {
         GpuOptions {
-            binary: PathBuf::from("/bin/true"),
+            binary: PathBuf::from(if cfg!(target_os = "macos") { "/usr/bin/true" } else { "/bin/true" }),
             out: d.join("out"),
             mode: "rho".into(),
             args: vec![],

@@ -314,6 +314,7 @@ impl Store {
         if sparse_dense_finish() {
             return Err(invalid("native matrix checkpoints require KIC_SPARSE_DENSE_FINISH unset; dense finish is not checkpointed"));
         }
+        let root = fs::canonicalize(root)?;
         let mut store = Self {
             root,
             job,
