@@ -1,0 +1,35 @@
+name: CT113 integral binary relative quintic
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct113/**'
+      - '.github/workflows/ct113-integral-binary-quintic.yml'
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct113/**'
+      - '.github/workflows/ct113-integral-binary-quintic.yml'
+  workflow_dispatch:
+jobs:
+  ct113:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct112
+            research/cross_characteristic_global_torsion_20261112/ct113
+      - name: Independently verify 2-integrality and fixed binary specializations
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct113
+          python3 -B "$D/ct113_integral_binary_quintic.py" >/tmp/ct113-py.json
+          python3 -O -B "$D/ct113_integral_binary_quintic.py" >/tmp/ct113-pyopt.json
+          node "$D/ct113_integral_binary_quintic_independent.js" >/tmp/ct113-js.json
+          node --no-opt "$D/ct113_integral_binary_quintic_independent.js" >/tmp/ct113-jsopt.json
+          cmp /tmp/ct113-py.json /tmp/ct113-pyopt.json
+          cmp /tmp/ct113-py.json /tmp/ct113-js.json
+          cmp /tmp/ct113-py.json /tmp/ct113-jsopt.json
+          cat /tmp/ct113-py.json
