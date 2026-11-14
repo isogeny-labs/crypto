@@ -518,12 +518,24 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.koblitz_descent",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_batched",
+        ReplayControl,
+        FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "ic.koblitz_descent_v2",
         NativeAdaptive,
         SpecializedDomain,
         StandardBand
     ),
     policy!(
-        "ic.koblitz_batched",
+        "ic.koblitz_batched_v2",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -538,6 +550,15 @@ const POLICIES: &[PolicyDecl] = &[
     // 2.74x rho.negation's cost): a diagnostic, never a frontier reference.
     policy!(
         "rho.negation_chained",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    // rho.negation's walk in lock-step lanes with a batched inversion
+    // (docs/perf/20261112-rust-deep-audit.md): a diagnostic until a reviewed
+    // paired session admits it.
+    policy!(
+        "rho.negation_lanes_v1",
         ImplementationAb,
         DiagnosticOnly,
         StandardBand
@@ -1270,7 +1291,7 @@ mod tests {
         let profiles = profiles().unwrap();
         let profile = profiles
             .iter()
-            .find(|profile| profile.id == "ic.koblitz_batched")
+            .find(|profile| profile.id == "ic.koblitz_batched_v2")
             .unwrap();
         assert_eq!(profile.strategy, SearchStrategy::NativeGrid);
         assert_eq!(profile.claim_scope, ClaimScope::SpecializedDomain);

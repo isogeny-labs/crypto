@@ -255,6 +255,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.plain", Fx::Prime18, &[]),
     ("rho.negation", Fx::Prime18, &[]),
     ("rho.negation_chained", Fx::Prime18, &[]),
+    ("rho.negation_lanes_v1", Fx::Prime18, &[("lanes", "8")]),
     ("rho.negation_v2", Fx::Prime18, &[]),
     ("rho.negation_v3", Fx::Prime18, &[]),
     ("rho.plain_v3", Fx::Prime18, &[]),
@@ -352,7 +353,25 @@ const CASES: &[(&str, Fx, P)] = &[
         ],
     ),
     (
+        "ic.koblitz_descent_v2",
+        Fx::K1n17,
+        &[
+            ("descent_summands", "2"),
+            ("collection_window", "64"),
+            ("factor_base_points", "256"),
+            ("unit_trials", "64"),
+            ("units", "1"),
+            ("max_trials", "100000"),
+            ("seed", "7"),
+        ],
+    ),
+    (
         "ic.koblitz_batched",
+        Fx::K1n17,
+        &[("factor_base_points", "102")],
+    ),
+    (
+        "ic.koblitz_batched_v2",
         Fx::K1n17,
         &[("factor_base_points", "102")],
     ),
@@ -492,6 +511,7 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("rho.preprocessing", "internal_verification"),
     ("rho.negation_strong", "check"),
     ("ic.koblitz_batched", "verify"),
+    ("ic.koblitz_batched_v2", "verify"),
 ];
 
 fn phase_gap(rep: &SolveReport) -> f64 {

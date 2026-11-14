@@ -1,0 +1,41 @@
+crosscheck p=53: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=79: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=101: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=131: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=151: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=181: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=211: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+crosscheck p=251: ok  built=true fields=3772 divisors=1200 ic=16 rho=24
+cross-check hyper64 vs HCurve on p in 53..251: PASS
+p=503 instance 0: built (r=269, #E=538) in 0.1s
+p=503 instance 1: built (r=241, #E=482) in 0.1s
+p=503 instance 2: built (r=269, #E=538) in 0.1s
+p=503 instance 0: done in 0.3s: rho=530.0 ic2=525.4 ic3=1612.6 ok=true
+p=503 instance 2: done in 0.3s: rho=539.0 ic2=526.1 ic3=1563.5 ok=true
+p=503 instance 1: done in 0.3s: rho=499.0 ic2=543.1 ic3=1768.1 ok=true
+p=251 instance 0: built (r=127, #E=254) in 0.1s
+p=251 instance 1: built (r=127, #E=254) in 0.1s
+p=251 instance 0: done in 0.1s: rho=450.4 ic2=275.4 ic3=886.2 ok=true
+p=251 instance 1: done in 0.1s: rho=452.3 ic2=278.0 ic3=714.8 ok=true
+p=251 instance 2: built (r=67, #E=268) in 0.1s
+p=251 instance 2: done in 0.2s: rho=344.3 ic2=282.5 ic3=699.0 ok=true
+     p inst   r_mean     rho_E        IC2        IC3 IC3/IC2         LA2         LA3 tr/rel2 tr/rel3  IC2/ρ  IC3/ρ  ok
+   251    3      107     415.7      278.6      766.7    2.75       33678       87075   1.93   5.32   0.67   1.84  true
+   503    3      260     522.7      531.5     1648.1    3.10      101671      167804   1.97   6.41   1.02   3.15  true
+slope rho on E (group ops)         all  0.329  p>=1000 n/a
+slope rho on E walk steps only     all  1.393  p>=1000 n/a
+slope mean r                       all  1.275  p>=1000 n/a
+slope IC2 group ops                all  0.929  p>=1000 n/a
+slope IC3 group ops                all  1.101  p>=1000 n/a
+slope IC3 / IC2                    all  0.172  p>=1000 n/a
+slope IC2 linalg mulmods           all  1.589  p>=1000 n/a
+slope IC3 linalg mulmods           all  0.944  p>=1000 n/a
+slope IC2 ops + 0.1 x linalg       all  1.548  p>=1000 n/a
+slope IC3 ops + 0.1 x linalg       all  0.957  p>=1000 n/a
+slope IC2 ops + 1.0 x linalg       all  1.585  p>=1000 n/a
+slope IC3 ops + 1.0 x linalg       all  0.945  p>=1000 n/a
+slope IC2 trials per relation      all  0.024  p>=1000 n/a
+slope IC3 trials per relation      all  0.268  p>=1000 n/a
+slope IC2 oracle fp muls           all  1.125  p>=1000 n/a
+slope IC3 oracle fp muls           all  1.285  p>=1000 n/a
+slope factor-base columns, genus 2 all  0.966  p>=1000 n/a

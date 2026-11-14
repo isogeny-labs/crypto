@@ -15,12 +15,15 @@
 
 use crate::cryptanalysis::ic_framework::stages::BooleanSystem;
 use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono, F2BoolPoly, Mask, MASK_BITS};
+use std::collections::HashMap;
 use std::fmt::Write as _;
 use std::fs;
-use std::io::Read;
+use std::io::{BufRead, BufReader, Read, Write as _};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{Child, ChildStdin, Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::mpsc;
+use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 /// Write `system` in M4GB's text input format over GF(2).
@@ -409,6 +412,219 @@ pub fn run_m4gb(
     })
 }
 
+/// A long-lived `solver --serve` process.
+struct Server {
+    child: Child,
+    stdin: ChildStdin,
+    lines: mpsc::Receiver<String>,
+}
+
+static SERVERS: OnceLock<Mutex<HashMap<PathBuf, Server>>> = OnceLock::new();
+
+fn servers() -> std::sync::MutexGuard<'static, HashMap<PathBuf, Server>> {
+    SERVERS
+        .get_or_init(|| Mutex::new(HashMap::new()))
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+}
+
+fn spawn_server(binary: &Path, threads: usize, limit: Duration) -> Result<Server, M4gbError> {
+    let mut child = Command::new(binary)
+        .arg("--serve")
+        .arg("--loglevel")
+        .arg("1")
+        .arg("--nrthreads")
+        .arg(threads.max(1).to_string())
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| M4gbError::Spawn(format!("{}: {e}", binary.display())))?;
+    let (Some(stdin), Some(stdout), Some(stderr)) =
+        (child.stdin.take(), child.stdout.take(), child.stderr.take())
+    else {
+        let _ = child.kill();
+        let _ = child.wait();
+        return Err(M4gbError::Spawn("server pipes unavailable".into()));
+    };
+    // Drain stderr so the server can never block on it.
+    std::thread::spawn(move || {
+        let mut r = stderr;
+        let mut buf = [0u8; 4096];
+        while matches!(r.read(&mut buf), Ok(n) if n > 0) {}
+    });
+    let (tx, lines) = mpsc::channel::<String>();
+    std::thread::spawn(move || {
+        for line in BufReader::new(stdout).lines() {
+            let Ok(line) = line else { break };
+            if tx.send(line).is_err() {
+                break;
+            }
+        }
+    });
+    let deadline = Instant::now() + limit;
+    loop {
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        match lines.recv_timeout(remaining) {
+            Ok(l) if l.trim() == "READY" => break,
+            Ok(_) => {}
+            Err(_) => {
+                let _ = child.kill();
+                let _ = child.wait();
+                return Err(M4gbError::Spawn(format!(
+                    "{}: no READY from --serve within {} ms",
+                    binary.display(),
+                    limit.as_millis()
+                )));
+            }
+        }
+    }
+    Ok(Server {
+        child,
+        stdin,
+        lines,
+    })
+}
+
+/// Like [`run_m4gb`], but the request goes to a long-lived `--serve` process
+/// (one per selected binary, shared by the whole process), so process start,
+/// field tables and the thread pool are paid once.  Requests to one server
+/// are serialised.  `cpu_seconds`, `peak_mib` and `max_lcm_degree` are `None`.
+pub fn run_m4gb_persistent(
+    system: &BooleanSystem,
+    options: &M4gbOptions,
+    budget: Option<Duration>,
+) -> Result<M4gbRun, M4gbError> {
+    let limit = budget.map_or(options.timeout, |b| b.min(options.timeout));
+    let dir = options.work_dir.clone().unwrap_or_else(std::env::temp_dir);
+    fs::create_dir_all(&dir).map_err(|e| M4gbError::Spawn(format!("create work dir: {e}")))?;
+    let id = format!(
+        "m4gb-ic-{}-{}",
+        std::process::id(),
+        COUNTER.fetch_add(1, Ordering::Relaxed)
+    );
+    let input = dir.join(format!("{id}.in"));
+    let output = dir.join(format!("{id}.out"));
+    fs::write(&input, write_m4gb_input(system))
+        .map_err(|e| M4gbError::Spawn(format!("write {}: {e}", input.display())))?;
+    let cleanup = |keep: bool| {
+        if !keep {
+            let _ = fs::remove_file(&input);
+            let _ = fs::remove_file(&output);
+        }
+    };
+    let Some(binary) = select_binary(&options.binary, system.n_vars) else {
+        cleanup(options.keep_files);
+        return Err(M4gbError::Spawn(format!(
+            "no M4GB binary under {} takes {} variables",
+            options.binary.display(),
+            system.n_vars
+        )));
+    };
+
+    let mut pool = servers();
+    if !pool.contains_key(&binary) {
+        match spawn_server(&binary, options.threads, limit) {
+            Ok(server) => {
+                pool.insert(binary.clone(), server);
+            }
+            Err(e) => {
+                cleanup(options.keep_files);
+                return Err(e);
+            }
+        }
+    }
+    let server = pool.get_mut(&binary).expect("server just inserted");
+
+    let started = Instant::now();
+    let request = format!("SOLVE {} {}\n", input.display(), output.display());
+    if let Err(e) = server
+        .stdin
+        .write_all(request.as_bytes())
+        .and_then(|_| server.stdin.flush())
+    {
+        if let Some(mut dead) = pool.remove(&binary) {
+            let _ = dead.child.kill();
+            let _ = dead.child.wait();
+        }
+        cleanup(options.keep_files);
+        return Err(M4gbError::Exit(format!("m4gb server write failed: {e}")));
+    }
+    let deadline = started + limit;
+    let reply = loop {
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        match server.lines.recv_timeout(remaining) {
+            Ok(line) => {
+                let line = line.trim_end();
+                if line == "OK" || line == "UNSAT" || line.starts_with("ERR ") || line == "ERR" {
+                    break line.to_string();
+                }
+            }
+            Err(mpsc::RecvTimeoutError::Timeout) => {
+                if let Some(mut dead) = pool.remove(&binary) {
+                    let _ = dead.child.kill();
+                    let _ = dead.child.wait();
+                }
+                cleanup(options.keep_files);
+                return Err(M4gbError::Timeout(limit));
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                if let Some(mut dead) = pool.remove(&binary) {
+                    let _ = dead.child.kill();
+                    let _ = dead.child.wait();
+                }
+                cleanup(options.keep_files);
+                return Err(M4gbError::Exit("m4gb server exited".into()));
+            }
+        }
+    };
+    let wall = started.elapsed();
+    drop(pool);
+    let run = |basis| M4gbRun {
+        basis,
+        wall,
+        cpu_seconds: None,
+        peak_mib: None,
+        max_lcm_degree: None,
+        stdout: String::new(),
+        stderr: String::new(),
+    };
+    if reply == "UNSAT" {
+        cleanup(options.keep_files);
+        return Ok(run(vec![F2BoolPoly::one(system.n_vars)]));
+    }
+    if reply.starts_with("ERR") {
+        cleanup(options.keep_files);
+        return Err(M4gbError::Exit(
+            reply.strip_prefix("ERR").unwrap_or("").trim().to_string(),
+        ));
+    }
+    let text = fs::read_to_string(&output)
+        .map_err(|e| M4gbError::Exit(format!("no output file {}: {e}", output.display())));
+    cleanup(options.keep_files);
+    let basis = parse_m4gb_basis(&text?, system.n_vars).map_err(M4gbError::Parse)?;
+    Ok(run(basis))
+}
+
+/// Ask every pooled server to `QUIT`, wait for it, and clear the pool.
+pub fn shutdown_m4gb_servers() {
+    shutdown_where(|_| true);
+}
+
+fn shutdown_where(pick: impl Fn(&Path) -> bool) {
+    let drained: Vec<Server> = {
+        let mut pool = servers();
+        let keys: Vec<PathBuf> = pool.keys().filter(|k| pick(k)).cloned().collect();
+        keys.into_iter().filter_map(|k| pool.remove(&k)).collect()
+    };
+    for mut s in drained {
+        let _ = s.stdin.write_all(b"QUIT\n");
+        let _ = s.stdin.flush();
+        drop(s.stdin);
+        let _ = s.child.wait();
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -524,5 +740,86 @@ mod tests {
         assert_eq!(cpu, Some(0.98));
         assert_eq!(peak, Some(188));
         assert_eq!(deg, Some(5));
+    }
+
+    #[cfg(unix)]
+    mod persistent {
+        use super::*;
+        use std::os::unix::fs::PermissionsExt;
+
+        fn stub(tag: &str, body: impl Fn(&Path) -> String) -> (PathBuf, M4gbOptions) {
+            let dir = std::env::temp_dir().join(format!("m4gb-stub-{}-{tag}", std::process::id()));
+            let _ = fs::remove_dir_all(&dir);
+            fs::create_dir_all(&dir).unwrap();
+            let bin = dir.join("solver_m4gb_n16_gf2");
+            fs::write(dir.join("sample.txt"), SAMPLE).unwrap();
+            fs::write(&bin, format!("#!/bin/sh\n{}", body(&dir))).unwrap();
+            fs::set_permissions(&bin, fs::Permissions::from_mode(0o755)).unwrap();
+            let options = M4gbOptions {
+                binary: bin.clone(),
+                threads: 1,
+                timeout: Duration::from_secs(20),
+                work_dir: Some(dir.clone()),
+                keep_files: false,
+            };
+            (dir, options)
+        }
+
+        fn tiny() -> BooleanSystem {
+            BooleanSystem {
+                equations: vec![F2BoolPoly::from_monos(vec![m(0b1), m(0)], 3)],
+                n_vars: 3,
+            }
+        }
+
+        fn sample_stub(dir: &Path) -> String {
+            format!(
+                "echo READY\nwhile read cmd in out; do\n  case \"$cmd\" in\n    SOLVE) echo $$ >> {d}/count\n      case \"$in\" in\n        *unsat*) echo UNSAT ;;\n        *) cp {d}/sample.txt \"$out\"; echo noise; echo OK ;;\n      esac ;;\n    QUIT) exit 0 ;;\n  esac\ndone\n",
+                d = dir.display()
+            )
+        }
+
+        #[test]
+        fn persistent_reuses_one_server() {
+            let (dir, options) = stub("reuse", sample_stub);
+            let expected = parse_m4gb_basis(SAMPLE, 16).unwrap();
+            let mut sys = tiny();
+            sys.n_vars = 16;
+            for _ in 0..2 {
+                let run = run_m4gb_persistent(&sys, &options, None).unwrap();
+                assert_eq!(run.basis, expected);
+                assert!(run.cpu_seconds.is_none() && run.peak_mib.is_none());
+            }
+            assert!(servers().contains_key(&options.binary));
+            let count = fs::read_to_string(dir.join("count")).unwrap();
+            let pids: Vec<&str> = count.lines().collect();
+            assert_eq!(pids.len(), 2);
+            assert_eq!(pids[0], pids[1], "one server process served both requests");
+            shutdown_where(|k| k == options.binary);
+            assert!(!servers().contains_key(&options.binary));
+            let _ = fs::remove_dir_all(&dir);
+        }
+
+        #[test]
+        fn persistent_unsat_is_the_unit_ideal() {
+            let (dir, options) = stub("unsat", sample_stub);
+            let run = run_m4gb_persistent(&tiny(), &options, None).unwrap();
+            assert_eq!(run.basis, vec![F2BoolPoly::one(3)]);
+            shutdown_where(|k| k == options.binary);
+            let _ = fs::remove_dir_all(&dir);
+        }
+
+        #[test]
+        fn persistent_timeout_removes_the_server() {
+            let (dir, options) = stub("timeout", |_| {
+                "echo READY\nread cmd in out\nexec sleep 30\n".to_string()
+            });
+            let err = run_m4gb_persistent(&tiny(), &options, Some(Duration::from_millis(200)))
+                .unwrap_err();
+            assert!(matches!(err, M4gbError::Timeout(_)), "{err:?}");
+            assert!(!servers().contains_key(&options.binary));
+            shutdown_where(|k| k == options.binary);
+            let _ = fs::remove_dir_all(&dir);
+        }
     }
 }

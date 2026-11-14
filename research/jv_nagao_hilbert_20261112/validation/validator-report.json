@@ -1,0 +1,3517 @@
+{
+ "schema": "validator-report/validator-v1",
+ "id": "VAL-20261112-nagao-hilbert",
+ "study": "research/jv_nagao_hilbert_20261112",
+ "evidence_dir": "research/jv_nagao_hilbert_20261112/validation",
+ "status": "insufficient_evidence",
+ "disposition": "insufficient_evidence",
+ "independent": true,
+ "independence": "Validator subagent dispatched by the coordinating session; it did not write or run any of the producer's scripts (band.py, replay_compare.py, rho_compare.py, make_evidence.py) or the Rust negrho_rescore tool. Every number below was recomputed from the raw JSON records by the validator's own Python (source embedded under checker.source_embedded). The local replay ran on a third host with a third build of jv_cover. This is not a keyring-signed pcc validation (docs/SABOTAGE_RESISTANCE.md); no pcc claim exists.",
+ "date_utc": "2026-11-12",
+ "validated_from": {
+  "head_commit": "2003c4bc85a6db91e74bfe19522a517b44995ff4",
+  "branch": "claude/binary-decomposition-research-6cez5r",
+  "study_commit": "c820a8c29db20e63d092a3fd68d500e408ebd131 (study results, rescore, run.sh); a99e6c95b6 moved the PNG to the artifact store",
+  "study_source_commit": "dd00d429d6bc060085948ded46c3cbabcc60a882 (results/SOURCE_COMMIT)",
+  "preregistration_commit": "61a0b6e8e623398fc4f8ebfb9f75ac5539c771e6 (research/leads_20261111/lane_C_prime_ext_cover.md, 2026-11-11T19:52Z, before the source commit 2026-11-11T22:53Z and the study commit 2026-11-12T02:16Z)",
+  "evidence_tracked_in_git": false,
+  "freeze": "validation/ is untracked (git status '??'), so it is not a committed artifact set. The validator froze it by a sha256 manifest of all 599 files under research/jv_nagao_hilbert_20261112 at 2026-11-12T21:44Z (manifest sha256 cd94645a5bb549d19162950b80d5c8c9b63b22b9e7dc8ddd6fd3c6ad22ec7c0b) and re-hashed it at the end: unchanged. raw_data below pins every input by sha256, so the gate fails if any of them changes before or after the commit."
+ },
+ "checker": {
+  "path": "embedded (checker.source_embedded): recompute.py, certcheck.py, build_report.py; the validator may write only this file",
+  "language": "Python 3 + numpy 2.5.3",
+  "shares_code_with_producer": false,
+  "rng": "numpy PCG64, seeds 20261112 (bootstrap) and 777 (permutations); the tool uses splitmix64, so intervals and permutation p-values agree within Monte Carlo error only",
+  "source_embedded": {
+   "recompute.py": {
+    "sha256": "7c133c888705236719b87709566552f82c4f91dc0ef603eea618b2c57b5c0a00",
+    "text": "#!/usr/bin/env python3\n\"\"\"Validator recompute for research/jv_nagao_hilbert_20261112 (independent of the producer's\nband.py / replay_compare.py / rho_compare.py and of the Rust negrho_rescore tool).\nReads raw JSON records only. Writes a JSON summary to argv[1].\"\"\"\nimport json, glob, math, os, sys, hashlib\nimport numpy as np\n\nROOT = '/home/user/crypto'\nST = ROOT + '/research/jv_nagao_hilbert_20261112'\nVA = ST + '/validation'\nRS = ROOT + '/research/jv_cover_negrho_rescore_20261101/results'\nFB = ROOT + '/research/jv_cover_fbline_20261102/results'\nPRIMES = [1301, 1451, 1601]\nSEEDS = [1, 2, 3]\nout = {}\n\ndef load(p):\n    with open(p) as f:\n        return json.load(f)\n\ndef flat(x, pre=''):\n    r = {}\n    if isinstance(x, dict):\n        for k, v in x.items():\n            r.update(flat(v, pre + '.' + k))\n    elif isinstance(x, list):\n        for i, v in enumerate(x):\n            r.update(flat(v, pre + '[%d]' % i))\n    else:\n        r[pre] = x\n    return r\n\ndef diff(a, b, ignore_ms=True):\n    fa, fb = flat(a), flat(b)\n    keys = set(fa) | set(fb)\n    d = []\n    for k in sorted(keys):\n        if ignore_ms and k.endswith('_ms'):\n            continue\n        if fa.get(k, '<missing>') != fb.get(k, '<missing>') or (type(fa.get(k)) != type(fb.get(k))):\n            d.append(k)\n    return len([k for k in keys if not (ignore_ms and k.endswith('_ms'))]), d\n\n# ---------- A. cover replay ----------\nlabels = ['aa_line_p1301_s1'] + ['hilbert_p%d_s%d' % (p, s) for p in PRIMES for s in SEEDS]\nrep = {}\nfor L in labels:\n    a = load(ST + '/results/%s.json' % L); b = load(VA + '/replay/%s.json' % L)\n    n, d = diff(a, b)\n    r0, r1 = a[0], b[0]\n    rep[L] = dict(fields=n, differing=d, total_muls=r0['total_muls'], equal_total=r0['total_muls'] == r1['total_muls'],\n                  correct=(r0['correct'], r1['correct']), solved=(r0['solved'], r1['solved']),\n                  mismatches=(r0['mismatches'], r1['mismatches']), digest=r0['relation_digest'],\n                  s_committed=r0['s'], s_recomputed=r0['total_muls'] / (r0['c_add_e'] * math.sqrt(r0['l'])),\n                  hcheck=(r0.get('hilbert_check_muls'), r1.get('hilbert_check_muls')),\n                  pts=(r0.get('f4_muls_per_test_sum'), r1.get('f4_muls_per_test_sum')), f4=r0['f4_muls'])\n    # internal arithmetic: total_muls = sum of phase muls\n    parts = ['setup_muls', 'base_muls', 'stream_muls', 'weil_muls', 'f4_muls', 'lin_muls', 'post_muls', 'verify_muls', 'la_muls']\n    rep[L]['phase_sum_equals_total'] = sum(r0[k] for k in parts) == r0['total_muls']\nout['cover_replay'] = rep\n# single thread\na = load(ST + '/results/hilbert_p1301_s1.json'); b = load(VA + '/replay_1thread/hilbert_p1301_s1.json')\nn, d = diff(a, b)\nout['cover_replay_1thread'] = dict(fields=n, differing=d, f4=b[0]['f4_muls'], per_test_sum=b[0]['f4_muls_per_test_sum'],\n    rel=(b[0]['f4_muls_per_test_sum'] - b[0]['f4_muls']) / b[0]['f4_muls'], hcheck_1t=b[0]['hilbert_check_muls'],\n    hcheck_committed=a[0]['hilbert_check_muls'], hcheck_1t_over_f4=b[0]['hilbert_check_muls'] / b[0]['f4_muls'],\n    hcheck_committed_over_f4=a[0]['hilbert_check_muls'] / a[0]['f4_muls'])\n\n# ---------- B. stage 1 vs frozen line records ----------\nst1 = {}\nfor p in PRIMES:\n    for s in SEEDS:\n        A = load(FB + '/line_p%d_s%d.json' % (p, s))[0]; Bv = load(ST + '/results/hilbert_p%d_s%d.json' % (p, s))[0]\n        st1['p%d_s%d' % (p, s)] = dict(SB_SA=Bv['s'] / A['s'], f4_ratio=Bv['f4_muls'] / A['f4_muls'],\n            native_ratio=Bv['f4_native_ops'] / A['f4_native_ops'],\n            same_digest=A['relation_digest'] == Bv['relation_digest'], same_rel=A['relations'] == Bv['relations'],\n            same_res=A['residuals'] == Bv['residuals'], same_dec=A['decompositions'] == Bv['decompositions'],\n            same_l=A['l'] == Bv['l'], correct=(A['correct'], Bv['correct']), fallbacks=Bv['hilbert_fallbacks'],\n            applied=Bv['hilbert_applied'], fallback_frac=Bv['hilbert_fallbacks'] / (Bv['hilbert_applied'] + Bv['hilbert_fallbacks']))\naa = load(ST + '/results/aa_line_p1301_s1.json'); fr = load(FB + '/line_p1301_s1.json')\nn, d = diff(fr, aa)\nst1['aa_vs_frozen'] = dict(fields=n, differing=d)\nout['stage1'] = st1\n\n# ---------- C. rho records ----------\nNATK = ['canon_cmp', 'hash', 'dp_check', 'scalar_ops', 'table_ops', 'cycle_cmp']\ncover = {(p, s): load(ST + '/results/hilbert_p%d_s%d.json' % (p, s))[0] for p in PRIMES for s in SEEDS}\n\ndef rho_rec(path):\n    return load(path)[0]\n\ndef ref_old(p, s, r):\n    if r <= 1:\n        for x in load(RS + '/inputs/old_rhostrong/rhostrong_p%d_run%d.json' % (p, r)):\n            if x['seed'] == s:\n                return x\n        raise KeyError\n    return rho_rec(RS + '/new/rhostrong_p%d_s%d_run%d.json' % (p, s, r))\n\nchecks = dict(n=0, bad=[])\nfresh = {}\nfor d_, rr in [('rho_fresh_run0-13', range(0, 14)), ('rho_fresh_run14-27', range(14, 28))]:\n    for p in PRIMES:\n        for s in SEEDS:\n            for r in rr:\n                x = rho_rec(VA + '/%s/rhostrong_p%d_s%d_run%d.json' % (d_, p, s, r))\n                checks['n'] += 1\n                ok = (x['correct'] is True and x['capped'] is False and x['negation'] is True and x['batch'] == 16 and x['r'] == 256\n                      and x['dp_bits'] == 16 and x['p'] == p and x['seed'] == s and x['run'] == r and x['l'] == cover[(p, s)]['l']\n                      and x['c_add_e'] == cover[(p, s)]['c_add_e'])\n                # internal: muls_tuned / harness from ops, s from muls\n                o = x['ops']\n                mt = 24 * o['mul'] + 18 * o['sq'] + 62 * o['inv']; mh = 55 * o['mul'] + 55 * o['sq'] + 166 * o['inv']\n                ok = ok and mt == x['muls_tuned'] and mh == x['muls_harness']\n                ok = ok and abs(x['s_tuned'] - mt / (331.0 * math.sqrt(x['l']))) < 1e-12 and abs(x['s_harness'] - mh / (331.0 * math.sqrt(x['l']))) < 1e-12\n                ok = ok and o['walk_adds'] == x['steps']\n                if not ok:\n                    checks['bad'].append((d_, p, s, r))\n                fresh[(p, s, r)] = x\nout['rho_record_checks'] = checks\n# runs 0-13 vs reference of the 20261101 study\nsame, dif = 0, []\nfor p in PRIMES:\n    for s in SEEDS:\n        for r in range(14):\n            n, d = diff(ref_old(p, s, r), fresh[(p, s, r)])\n            d = [k for k in d if not k.endswith('wall_ms')]\n            if d:\n                dif.append(((p, s, r), d))\n            else:\n                same += 1\nout['rho_0_13_vs_reference'] = dict(identical=same, differing=dif)\n\n# ---------- D. ratios ----------\ndef nat(x):\n    return sum(x['ops'][k] for k in NATK) / math.sqrt(x['l'])\n\ndef refset(rr):\n    return [fresh[(p, s, r)] for p in PRIMES for s in SEEDS for r in rr]\n\ncov_S = {p: np.array([cover[(p, s)]['s'] for s in SEEDS]) for p in PRIMES}\ncov_N = {p: np.array([cover[(p, s)]['f4_native_ops'] / math.sqrt(cover[(p, s)]['l']) for s in SEEDS]) for p in PRIMES}\n# recompute s from total_muls\nfor p in PRIMES:\n    for s in SEEDS:\n        c = cover[(p, s)]\n        assert abs(c['s'] - c['total_muls'] / (c['c_add_e'] * math.sqrt(c['l']))) < 1e-14 * c['s'] + 1e-15\n\ndef gm(v):\n    return float(np.exp(np.mean(np.log(v))))\n\ndef point(rs, unit, w, p):\n    key = 's_harness' if unit == 'U1' else 's_tuned'\n    ref = np.mean([x[key] + w * nat(x) for x in rs])\n    ic = gm(cov_S[p] + w * cov_N[p])\n    return ic / ref, ic, ref\n\nsets = {'pooled_0-13': range(0, 14), 'fresh_14-27': range(14, 28), 'combined_0-27': range(0, 28)}\nres = {}\nfor nm, rr in sets.items():\n    rs = refset(rr)\n    st = np.array([x['steps'] / math.sqrt(x['l']) for x in rs])\n    theory = math.sqrt(math.pi / 4) / math.sqrt(1 - 1 / 256)\n    se = st.std(ddof=1) / math.sqrt(len(st))\n    cell = {'n': len(rs), 'mean_s_harness': float(np.mean([x['s_harness'] for x in rs])),\n            'mean_s_tuned': float(np.mean([x['s_tuned'] for x in rs])),\n            'mean_nat_rho': float(np.mean([nat(x) for x in rs])),\n            'steps_over_sqrtl': float(st.mean()), 'se': float(se), 'z': float((st.mean() - theory) / se), 'theory': theory}\n    for unit in ['U1', 'U2']:\n        for w in [0, 0.1, 1]:\n            for p in PRIMES:\n                r_, ic, ref = point(rs, unit, w, p)\n                cell['%s_w%s_p%d' % (unit, w, p)] = dict(ratio=r_, ic=ic, rho=ref)\n    # crossover model p*\n    for unit in ['U1', 'U2']:\n        G = np.mean([math.log(cell['%s_w0_p%d' % (unit, p)]['ratio']) + 2.10 * math.log(p) for p in PRIMES])\n        cell['pstar_' + unit] = math.exp(G / 2.10)\n    res[nm] = cell\nout['ratios'] = res\n\n# ---------- E. bootstrap (own RNG, same frozen design) ----------\ndef boot(rr, B=20000, seed=20261112):\n    rng = np.random.default_rng(seed)\n    # per instance group arrays\n    groups = {}\n    for p in PRIMES:\n        for s in SEEDS:\n            xs = [fresh[(p, s, r)] for r in rr]\n            groups[(p, s)] = dict(h=np.array([x['s_harness'] for x in xs]), t=np.array([x['s_tuned'] for x in xs]),\n                                  n=np.array([nat(x) for x in xs]))\n    keys = list(groups)\n    res = {}\n    acc = {(u, w, p): np.empty(B) for u in ['U1', 'U2'] for w in [0, 0.1, 1] for p in PRIMES}\n    for b in range(B):\n        H, T, N = [], [], []\n        for k in keys:\n            g = groups[k]; m = len(g['h'])\n            idx = rng.integers(0, m, m)\n            H.append(g['h'][idx]); T.append(g['t'][idx]); N.append(g['n'][idx])\n        H = np.concatenate(H); T = np.concatenate(T); N = np.concatenate(N)\n        for p in PRIMES:\n            si = rng.integers(0, 3, 3)\n            cs = cov_S[p][si]; cn = cov_N[p][si]\n            for w in [0, 0.1, 1]:\n                icw = math.exp(np.mean(np.log(cs + w * cn)))\n                acc[('U1', w, p)][b] = icw / np.mean(H + w * N)\n                acc[('U2', w, p)][b] = icw / np.mean(T + w * N)\n    for k, v in acc.items():\n        lo, hi = np.percentile(v, [2.5, 97.5])\n        res['%s_w%s_p%d' % k] = [float(lo), float(hi), 'below' if hi < 1 else ('above' if lo > 1 else 'not resolved')]\n    return res\n\nif len(sys.argv) > 2 and sys.argv[2] == 'boot':\n    out['boot'] = {nm: boot(rr, B=int(sys.argv[3]) if len(sys.argv) > 3 else 20000) for nm, rr in sets.items()}\n\n# ---------- F. homogeneity (permutation ANOVA F and KW H) ----------\ndef anova_F(groups):\n    allv = np.concatenate(groups); gmn = allv.mean(); k = len(groups); n = len(allv)\n    ssb = sum(len(g) * (g.mean() - gmn) ** 2 for g in groups); ssw = sum(((g - g.mean()) ** 2).sum() for g in groups)\n    return (ssb / (k - 1)) / (ssw / (n - k))\n\ndef kw_H(groups):\n    allv = np.concatenate(groups); n = len(allv)\n    ranks = np.empty(n); order = np.argsort(allv, kind='mergesort'); ranks[order] = np.arange(1, n + 1)\n    # ties: average ranks\n    vals, inv, cnt = np.unique(allv, return_inverse=True, return_counts=True)\n    if (cnt > 1).any():\n        sums = np.zeros(len(vals)); np.add.at(sums, inv, ranks); ranks = (sums / cnt)[inv]\n    H = 0; i = 0\n    for g in groups:\n        rg = ranks[i:i + len(g)]; i += len(g); H += len(g) * (rg.mean() - (n + 1) / 2) ** 2\n    return 12 / (n * (n + 1)) * H\n\nif len(sys.argv) > 2 and sys.argv[2] == 'boot':\n    hom = {}\n    for nm, rr in sets.items():\n        gs = [np.array([fresh[(p, s, r)]['steps'] / math.sqrt(fresh[(p, s, r)]['l']) for s in SEEDS for r in rr]) for p in PRIMES]\n        F0, H0 = anova_F(gs), kw_H(gs)\n        allv = np.concatenate(gs); sz = [len(g) for g in gs]\n        rng = np.random.default_rng(777); cf = ch = 0; P = 20000\n        for _ in range(P):\n            perm = rng.permutation(allv); parts = np.split(perm, np.cumsum(sz)[:-1])\n            cf += anova_F(parts) >= F0; ch += kw_H(parts) >= H0\n        hom[nm] = dict(F=F0, H=H0, perm_p_F=(cf + 1) / (P + 1), perm_p_H=(ch + 1) / (P + 1))\n    out['homogeneity'] = hom\n\njson.dump(out, open(sys.argv[1], 'w'), indent=1, default=str)\nprint('written', sys.argv[1])\n"
+   },
+   "certcheck.py": {
+    "sha256": "2b21ae4c3a4557ff1665fbb06c2c78740ccb26c7581aecbde3b4680336d24237",
+    "text": "#!/usr/bin/env python3\n\"\"\"Independent certificate check for a jv_cover JV_DUMP_INSTANCE line (validator code, no solver code).\nTower: F_p2 = F_p[i]/(i^2 - w), F_p6 = F_p2[t]/(t^3 - s); curve y^2 = x^3 + a2 x^2 + a4 x.\nChecks: tower irreducible, G and Q on the curve, G != O, l prime, [l]G = O, [dd]G = Q, dd == d.\"\"\"\nimport json, sys, random\n\ndef run(line):\n    J = json.loads(line)\n    p, w = J['p'], J['w']\n    s = tuple(J['s'])\n    # --- F_p2 ---\n    def m2(a, b):\n        return ((a[0]*b[0] + w*a[1]*b[1]) % p, (a[0]*b[1] + a[1]*b[0]) % p)\n    def ad2(a, b): return ((a[0]+b[0]) % p, (a[1]+b[1]) % p)\n    def sb2(a, b): return ((a[0]-b[0]) % p, (a[1]-b[1]) % p)\n    def pw2(a, e):\n        r = (1, 0)\n        while e:\n            if e & 1: r = m2(r, a)\n            a = m2(a, a); e >>= 1\n        return r\n    Z2, O2 = (0, 0), (1, 0)\n    # --- F_p6 ---\n    def m6(a, b):\n        c = [Z2]*5\n        for i in range(3):\n            for j in range(3):\n                c[i+j] = ad2(c[i+j], m2(a[i], b[j]))\n        # t^3 = s\n        return (ad2(c[0], m2(s, c[3])), ad2(c[1], m2(s, c[4])), c[2])\n    def ad6(a, b): return tuple(ad2(x, y) for x, y in zip(a, b))\n    def sb6(a, b): return tuple(sb2(x, y) for x, y in zip(a, b))\n    def sc6(k, a): return tuple(((x[0]*k) % p, (x[1]*k) % p) for x in a)\n    Z6 = (Z2, Z2, Z2); O6 = (O2, Z2, Z2)\n    def pw6(a, e):\n        r = O6\n        while e:\n            if e & 1: r = m6(r, a)\n            a = m6(a, a); e >>= 1\n        return r\n    Q6 = p**6\n    def inv6(a):\n        assert a != Z6\n        return pw6(a, Q6 - 2)\n    def e6(v): return tuple(tuple(x) for x in v)\n    a2, a4 = e6(J['a2']), e6(J['a4'])\n    def pt(d): return None if d['inf'] else (e6(d['x']), e6(d['y']))\n    G, Q = pt(J['g']), pt(J['q'])\n    l, d, dd = J['l'], J['d'], J['dd']\n    res = {}\n    # tower irreducibility\n    res['w_nonresidue'] = pow(w % p, (p-1)//2, p) == p-1\n    res['s_noncube_in_Fp2'] = (p*p - 1) % 3 == 0 and pw2(s, (p*p-1)//3) != O2\n    def on(P):\n        if P is None: return True\n        x, y = P\n        x2 = m6(x, x)\n        rhs = ad6(ad6(m6(x2, x), m6(a2, x2)), m6(a4, x))\n        return m6(y, y) == rhs\n    def add(P, R):\n        if P is None: return R\n        if R is None: return P\n        (x1, y1), (x2, y2) = P, R\n        if x1 == x2:\n            if ad6(y1, y2) == Z6: return None\n            num = ad6(ad6(sc6(3, m6(x1, x1)), sc6(2, m6(a2, x1))), a4)\n            lam = m6(num, inv6(sc6(2, y1)))\n        else:\n            lam = m6(sb6(y2, y1), inv6(sb6(x2, x1)))\n        x3 = sb6(sb6(sb6(m6(lam, lam), a2), x1), x2)\n        y3 = sb6(m6(lam, sb6(x1, x3)), y1)\n        return (x3, y3)\n    def mul(P, k):\n        R = None\n        for b in bin(k)[2:]:\n            R = add(R, R)\n            if b == '1': R = add(R, P)\n        return R\n    def isprime(n):\n        if n < 2: return False\n        for q in [2,3,5,7,11,13,17,19,23,29,31,37]:\n            if n % q == 0: return n == q\n        dd_, r = n-1, 0\n        while dd_ % 2 == 0: dd_ //= 2; r += 1\n        for a in [2,3,5,7,11,13,17,19,23,29,31,37]:\n            x = pow(a, dd_, n)\n            if x in (1, n-1): continue\n            for _ in range(r-1):\n                x = x*x % n\n                if x == n-1: break\n            else: return False\n        return True\n    res['G_on_curve'] = on(G); res['Q_on_curve'] = on(Q)\n    res['G_not_inf'] = G is not None\n    res['l_prime'] = isprime(l)\n    res['lG_is_O'] = mul(G, l) is None\n    res['ddG_eq_Q'] = mul(G, dd) == Q\n    res['dd_eq_d'] = dd == d\n    res['dd_lt_l'] = 0 <= dd < l\n    # negative control: a wrong scalar must fail\n    res['neg_control_dd_plus_1_fails'] = mul(G, (dd + 1) % l) != Q\n    res['ok'] = all(v for k, v in res.items())\n    res.update(p=p, seed=J['seed'], l=l, d=d, dd=dd)\n    return res\n\nif __name__ == '__main__':\n    out = [run(L) for L in open(sys.argv[1]) if L.strip()]\n    print(json.dumps(out, indent=1))\n"
+   },
+   "build_report.py": {
+    "sha256": "75101156bcdcdd3a7c3c73f5a041a2289cf7ef66725c4328090cad94990dd4e1",
+    "text": "#!/usr/bin/env python3\n\"\"\"Builds research/jv_nagao_hilbert_20261112/validation/validator-report.json from the validator's own\nrecompute (recompute.py -> full.json), certificate check (certcheck.py) and local replay (vrun/).\"\"\"\nimport json, hashlib, os, glob, math, sys\n\nSP = '/tmp/claude-0/-home-user/5d26ea47-4c79-5b59-bd9c-e47e6411a571/scratchpad'\nROOT = '/home/user/crypto'\nST = ROOT + '/research/jv_nagao_hilbert_20261112'\nVA = ST + '/validation'\nOUT = VA + '/validator-report.json'\n\ndef sha(p):\n    h = hashlib.sha256()\n    with open(p, 'rb') as f:\n        h.update(f.read())\n    return h.hexdigest()\n\ndef rel(p):\n    return os.path.relpath(p, VA)\n\ndef load(p):\n    with open(p) as f:\n        return json.load(f)\n\nfull = load(SP + '/vcheck/full.json')\ncert = load(SP + '/vcheck/cert_out.json')\nlocal = load(SP + '/vcheck/local_replay.json')\nextra = load(SP + '/vcheck/extra.json')\n\n# ---------------- raw data ----------------\nraw = []\nfiles = sorted(glob.glob(ST + '/results/*.json')) + sorted(glob.glob(VA + '/replay/*.json')) \\\n    + sorted(glob.glob(VA + '/replay_1thread/*.json')) + sorted(glob.glob(VA + '/rho_fresh_run0-13/rhostrong_*.json')) \\\n    + sorted(glob.glob(VA + '/rho_fresh_run14-27/rhostrong_*.json')) \\\n    + sorted(glob.glob(ROOT + '/research/jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1[346]*.json')) \\\n    + sorted(glob.glob(ROOT + '/research/jv_cover_negrho_rescore_20261101/results/new/rhostrong_p*.json')) \\\n    + sorted(glob.glob(ROOT + '/research/jv_cover_fbline_20261102/results/line_p*.json')) \\\n    + [ST + '/rescore/fit.json', VA + '/rescore_fresh_run0-13/fit.json', VA + '/rescore_fresh_run14-27/fit.json',\n       VA + '/rescore_combined_run0-27/fit.json', VA + '/VALIDATION.json', VA + '/replay-certificate.json',\n       ST + '/run.sh', VA + '/pod_run.sh', VA + '/pod_run2.sh', ST + '/results/SOURCE_COMMIT', ST + '/results/BINARY.sha256']\nseen = set()\nfor f in files:\n    if f in seen:\n        continue\n    seen.add(f)\n    raw.append({'path': rel(f), 'sha256': sha(f)})\n\n# ---------------- headline ----------------\nH = []\ndef add(name, claimed, recomputed, tol=1e-9, src=None):\n    d = {'name': name, 'claimed': claimed, 'recomputed': recomputed, 'rel_tol': tol}\n    if src:\n        d['claimed_from'] = src\n    H.append(d)\n\nsets = [('pooled_0-13', ST + '/rescore/fit.json', '../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)'),\n        ('fresh_14-27', VA + '/rescore_fresh_run14-27/fit.json', 'rescore_fresh_run14-27/fit.json'),\n        ('combined_0-27', VA + '/rescore_combined_run0-27/fit.json', 'rescore_combined_run0-27/fit.json')]\nW = ['0', '0.1', '1']\nfor nm, fp, src in sets:\n    f = load(fp)\n    for c in f['band_5a']:\n        u = 'U1' if c['unit'].startswith('U1') else 'U2'\n        for i, w in enumerate(W):\n            add('%s|%s|p%d|w=%s|S/rho' % (nm, u, c['p'], w), c['ratio'][i], full['ratios'][nm]['%s_w%s_p%d' % (u, w, c['p'])]['ratio'], src=src)\n    for u, key in [('U1', 'U1 group additions|(b) pooled new primes'), ('U2', 'U2 textbook F_p mults|(b) pooled new primes')]:\n        add('%s|%s|p* model (b)' % (nm, u), f['p_star'][key]['p_star'], full['ratios'][nm]['pstar_' + u], src=src)\n    pc = f['positive_control']['b']\n    add('%s|rho steps/sqrt(l) mean (b)' % nm, pc['mean'], full['ratios'][nm]['steps_over_sqrtl'], src=src)\n    add('%s|rho positive-control z (b)' % nm, pc['z'], full['ratios'][nm]['z'], tol=1e-6, src=src)\nV = load(VA + '/VALIDATION.json')\nfor w in W:\n    for side in ['ic', 'rho']:\n        add('VALIDATION.json gae_band U2 p1601 w=%s %s' % (w, side), V['rho_reference']['gae_band'][w][side],\n            full['ratios']['pooled_0-13']['U2_w%s_p1601' % w][side], src='VALIDATION.json')\nP = load(ST + '/results/paired.json')\nfor r in P:\n    add('stage1 S_B/S_A p%d s%d' % (r['p'], r['seed']), r['S_ratio'], full['stage1']['p%d_s%d' % (r['p'], r['seed'])]['SB_SA'], src='../results/paired.json')\nRC = load(VA + '/replay-certificate.json')\nfor r in RC['runs']:\n    L = r['run']\n    add('replay total_muls %s' % L, r['total_muls'], full['cover_replay'][L]['total_muls'], src='replay-certificate.json')\n    add('replay S %s (= total_muls/(c_add_e sqrt l))' % L, r['s'], full['cover_replay'][L]['s_recomputed'], src='replay-certificate.json')\nadd('single-thread hilbert_check_muls p1301 s1', 8875006425, full['cover_replay_1thread']['hcheck_1t'], src='RESULT.md / replay-certificate.json (8.875e9)')\n\n# ---------------- intervals (Monte Carlo, own stream) ----------------\niv = []\nfor nm, fp, src in sets:\n    f = load(fp)\n    for c in f['band_5a']:\n        u = 'U1' if c['unit'].startswith('U1') else 'U2'\n        for i, w in enumerate(W):\n            mine = full['boot'][nm]['%s_w%s_p%d' % (u, w, c['p'])]\n            iv.append({'cell': '%s|%s|p%d|w=%s' % (nm, u, c['p'], w), 'tool_ci95': c['ci'][i], 'tool_verdict': c['verdicts'][i],\n                       'validator_ci95': [round(mine[0], 6), round(mine[1], 6)], 'validator_verdict': mine[2],\n                       'max_abs_end_diff': round(max(abs(c['ci'][i][0] - mine[0]), abs(c['ci'][i][1] - mine[1])), 6),\n                       'same_verdict': c['verdicts'][i] == mine[2]})\n\nrep = json.load(open(SP + '/vcheck/report_body.json'))\nrep['raw_data'] = raw\nrep['headline'] = H\nrep['intervals'] = {'note': 'validator bootstrap: 20000 resamples, frozen design of research/jv_cover_negrho_rescore_20261101/PROTOCOL.md (seeds with replacement per prime; reference runs with replacement within each of the 9 instances; one reference resample shared by the three primes and all w), numpy PCG64 seed 20261112, not the tool\\'s splitmix64 stream: agreement is within Monte Carlo error only',\n                    'cells': iv, 'all_verdicts_agree': all(x['same_verdict'] for x in iv),\n                    'max_abs_end_diff': max(x['max_abs_end_diff'] for x in iv)}\nrep['homogeneity'] = full['homogeneity']\nrep['certificate_check'] = cert\nrep['local_replay'] = local\nrep['extra'] = extra\nsrc = {}\nfor nmf in ['recompute.py', 'certcheck.py', 'build_report.py']:\n    p = SP + '/vcheck/' + nmf\n    src[nmf] = {'sha256': sha(p), 'text': open(p).read()}\nrep['checker']['source_embedded'] = src\nbad = [h for h in H if abs(h['claimed'] - h['recomputed']) > h['rel_tol'] * max(abs(h['claimed']), abs(h['recomputed']), 1e-300)]\nrep['headline_summary'] = {'n': len(H), 'n_disagree': len(bad), 'disagree': [b['name'] for b in bad]}\nwith open(OUT, 'w') as f:\n    json.dump(rep, f, indent=1)\n    f.write('\\n')\nprint('wrote', OUT, 'headline', len(H), 'disagree', len(bad), 'raw', len(raw), 'sha256', sha(OUT))\n"
+   }
+  }
+ },
+ "checks": [
+  {
+   "id": "V1",
+   "requirement": "Headline numbers recompute from raw records (S per record; U1/U2 S/rho at w = 0, 0.1, 1 for p = 1301/1451/1601 under the pooled, fresh 14-27 and combined references; VALIDATION.json gae_band; p* model; positive control; stage-1 S_B/S_A)",
+   "verdict": "pass",
+   "evidence": "headline (all within rel_tol; see headline_summary)",
+   "detail": "Every deterministic number agrees to <= 1e-15 relative (the positive-control z to 1e-6). S = total_muls/(c_add_e sqrt l) for all 10 cover records; total_muls equals the sum of the nine phase counters in every record. U2 w=0 pooled 1.0028/0.8366/0.6953, fresh 1.0495/0.8756/0.7277, combined 1.0256/0.8557/0.7112; U1 w=0 pooled 0.4173/0.3481/0.2893. [pcc:unverified]"
+  },
+  {
+   "id": "V2",
+   "requirement": "Bootstrap intervals and verdicts (frozen design, 20000 resamples)",
+   "verdict": "pass",
+   "evidence": "intervals",
+   "detail": "54 of 54 cells give the same verdict; the largest difference of an interval end against the tool is listed in intervals.max_abs_end_diff (Monte Carlo). The p* intervals were not re-bootstrapped (points only)."
+  },
+  {
+   "id": "V3",
+   "requirement": "Reference homogeneity (frozen rule: permutation ANOVA and Kruskal-Wallis p >= 0.05) and positive control (|z| <= 3)",
+   "verdict": "pass",
+   "evidence": "homogeneity; headline '* rho positive-control z (b)'",
+   "detail": "fresh 14-27: ANOVA perm p 0.533, KW perm p 0.657 (tool 0.537 / 0.663); pooled 0.313 / 0.351; combined 0.906 / 0.915. steps/sqrt(l) fresh 0.8909, se 0.0375, z +0.079 against theory 0.88796."
+  },
+  {
+   "id": "V4",
+   "requirement": "Replay certificate: every counted field of the 10 committed records reproduced on another host",
+   "verdict": "pass",
+   "evidence": "replay/*.json vs ../results/*.json (validator flatten-and-compare); local_replay.runs[1]",
+   "detail": "73 non-timing fields per record; only f4_muls_per_test_sum (10/10) and hilbert_check_muls (9/9 Hilbert) differ, by 5.74-8.77x on 32 threads. Source read at dd00d429: both are per-test differences of the process-wide FIELD_OPS counter (f4_fp.rs field_ops_now), while f4_muls is the batch's global difference and hilbert_check_ops sits inside it, so neither enters total_muls. Validator's own third-host, third-build, single-thread replay of the nonce-drawn hilbert_p1301_s3: all 71 counted fields identical; per_test_sum/f4_muls - 1 = -5.3e-5; hilbert_check_muls 8.563e9 = 11.09% of f4_muls against 6.21e10 committed. Confirms the producer's finding that the committed hilbert_check_muls are concurrency-inflated and must not be quoted."
+  },
+  {
+   "id": "V5",
+   "requirement": "Same-binary rho reference: runs 0-13 reproduce the protocol's pooled 126-run reference; runs 14-27 valid",
+   "verdict": "pass",
+   "evidence": "rho_fresh_run0-13 vs ../../jv_cover_negrho_rescore_20261101/results/{inputs/old_rhostrong,new}; local_replay.runs[0]",
+   "detail": "126/126 identical except wall_ms. All 252 records: correct, not capped, negation, batch 16, r 256, dp 16, l and c_add_e equal to the cover record of the same (p, seed), muls_tuned = 24 mul + 18 sq + 62 inv, muls_harness = 55 mul + 55 sq + 166 inv, s_* recomputed, walk_adds = steps. Validator's local replay of the drawn fresh run p1451 s1 run21 (binary a98c009d, Intel host): identical except wall_ms."
+  },
+  {
+   "id": "V6",
+   "requirement": "Certificate discipline: every claimed discrete-log solve carries a certificate the validator re-verifies with code independent of the solver",
+   "verdict": "fail (partial)",
+   "evidence": "certificate_check; local_replay.runs[1]",
+   "detail": "No committed record carries G, Q, the planted d or the recovered log; 'correct: true' is the solver's own comparison found == Some(spec.d) (jv_cover.rs:3930) or found == Some(inst.d) (jv_rho_strong.rs:802). The replay certificate's 'scalars_verified: true' therefore rests on the solver's self-report. The validator re-ran the nonce-drawn hilbert_p1301_s3 with JV_DUMP_INSTANCE (existing value-only dump) and verified with its own F_{p^6} arithmetic: tower irreducible, G and Q on y^2 = x^3 + a2 x^2 + a4 x, l prime, [l]G = O, [dd]G = Q, dd = d, and the negative control [dd+1]G != Q. Certified: 1 of 9 cover solves. Not certified: the other 8 cover solves and all 252 rho solves (jv_rho_strong has no dump). This makes the evidence insufficient, not the measurement invalid: no certificate failed."
+  },
+  {
+   "id": "V7",
+   "requirement": "Section 5a: every unpriced counter listed for every arm; rank only where the order holds across w in {0, 0.1, 1}; an arm that names an unemitted counter cannot be ranked",
+   "verdict": "fail",
+   "evidence": "extra.cells; ../rescore/table.md band note; research/jv_cover_fbline_20261102/review/red_team/REPORT.md row 5",
+   "detail": "The band is recomputed exactly and the order holds on the emitted counters (U2 below at p = 1451, 1601; not resolved at 1301). But the cover arm names work it does not emit (F_p additions, F4 pair selection, matrix assembly, memory traffic; f4_native_ops is a lower bound), so under 5a it is a lower bound that cannot be ranked; the fbline red team recorded the same failure for this arm. VALIDATION.json sets order_holds_across_band: true without that qualification. Robustness (derived): the U2 'below' at w = 0.1 and 1 survives only while unemitted cover native work is below 0.46-0.51x of f4_native_ops at p = 1451 and 0.76-0.88x at p = 1601 (extra.cells.cover_native_factor_to_reach_1). If F_p additions were priced as native operations on both arms (MODEL: cover additions approximated by f4_muls), U2 at w = 0.1 and 1 becomes 1.22-1.24 at p = 1451 and 1.02-1.03 at p = 1601 (above). Not listed in the band either: the line search's fb_line.lookups and fb_line.adds (pricing the lookups moves U2 by < 0.005). The U2 ratio at w = 0 (counted F_p multiplications only, additions excluded on both arms) does not depend on this."
+  },
+  {
+   "id": "V8",
+   "requirement": "Preregistered thresholds kept (F1-F4, C5, the U2 miss rule) and every preregistered prediction reported",
+   "verdict": "fail",
+   "evidence": "extra.prereg_band_prediction_hilbert_over_plain; ../results/paired.json; lane_C_prime_ext_cover.md Lead 1",
+   "detail": "Kept: F1 (digest, relations, residuals, decompositions identical 9/9; logarithms self-reported correct), F2 (S_B/S_A 0.52764-0.52801), F3 and C5 (fallbacks 0.062-0.091% of systems), F4 (f4_native_ops ratio 0.98294-0.98302), U2 miss rule (p = 1601 w = 0 upper bound 0.756 < 1), U2 point predictions 1.03/0.86/0.71 (measured 1.003/0.837/0.695, inside the predicted intervals). Missed and not reported anywhere (study README, leads README, producer RESULT.md): the preregistered claim 'lowers counted S by a factor in [0.50, 0.60] ... at w = 0, 0.1 and 1' and band prediction 'Hilbert/plain ratio stays in [0.50, 0.62] at w = 0.1 and w = 1'. Measured Hilbert/plain: 0.528 at w = 0, 0.821 at w = 0.1, 0.959 at w = 1 at every prime. The engineering gain is 1.895x at w = 0, 1.219x at w = 0.1, 1.043x at w = 1; the order (Hilbert cheaper) holds at every weight."
+  },
+  {
+   "id": "V9",
+   "requirement": "Preregistered controls run (C1 plain reproduction, C2 A/A, C3 equality, C4 positive control, C5 fallbacks)",
+   "verdict": "partial",
+   "evidence": "local_replay.runs[2]; ../results/aa_line_p1301_s1.json",
+   "detail": "C2/C3/C5 ran. C1 (JV_FB_LINE unset, no --stop, p1301 s3) was not run by the study; its drift control re-ran the frozen line command instead (aa_line_p1301_s1: every counted field equal to research/jv_cover_fbline_20261102/results/line_p1301_s1.json; the newer binary only adds fb_line diagnostic keys and changes f4_muls_per_test_sum). The validator did not run C1 (a plain p = 1301 run exceeds the 20-minute local limit). C4 was not run by the study; the validator ran it: 20/20 planted, 0 mismatches, 118 applied, 2 fallbacks: pass."
+  },
+  {
+   "id": "V10",
+   "requirement": "Reproducibility bindings (commit, binary, commands, environment)",
+   "verdict": "pass with caveat",
+   "evidence": "replay-certificate.json binary; ../run.sh; pod_run.sh; pod_run2.sh; local_replay.binary",
+   "detail": "The study binary f35af5d3 did not rebuild byte-for-byte (pod binary 9ccf9217, built from a git archive of dd00d429; the validator confirmed 9ccf9217 is the copy left in the session scratch). Counted fields are identical under three builds (f35af5d3, 9ccf9217, a98c009d), so the counts do not depend on the build. pod_run.sh part 1 is the frozen run.sh command with unchanged flags; part 2 and pod_run2.sh are the frozen rhostrong command."
+  },
+  {
+   "id": "V11",
+   "requirement": "Gate wiring: VALIDATION.json pins this report",
+   "verdict": "fail",
+   "evidence": "VALIDATION.json",
+   "detail": "VALIDATION.json names validator_report review/validator/validator-report.json with sha256 'TO-BE-FILLED-BY-VALIDATOR'; this report was dispatched to validation/validator-report.json. The validator was told to edit nothing else, so the coordinator must repoint the path and pin this file's sha256. With status insufficient_evidence the gate will (correctly) still refuse the directory."
+  },
+  {
+   "id": "V12",
+   "requirement": "No source change; default behaviour unchanged",
+   "verdict": "pass",
+   "evidence": "git status; producer code_changed []",
+   "detail": "No tracked file differs in research/jv_nagao_hilbert_20261112 or the two input studies; the producer changed no source. The validator changed no source (JV_DUMP_INSTANCE is an existing opt-in dump that moves no counter: the record with it set is identical)."
+  },
+  {
+   "id": "V13",
+   "requirement": "RunPod hygiene: no bdr-* pod of this task remains",
+   "verdict": "pass",
+   "evidence": "GET https://rest.runpod.io/v1/pods at 2026-11-12T21:49:10Z",
+   "detail": "26 pods listed; none named bdr-nagao-hilbert-validation and no pod jwdf4pnk0velez. The producer's state file names that id. The 1.56 h / $1.75 figure (1.56 h x $1.12/h) is the producer's; a deleted pod's lifetime is not visible in the listing, so it was not independently confirmed. The validator created no pod."
+  },
+  {
+   "id": "V14",
+   "requirement": "Reporting contract (one table, one unit, ratio, all arms priced, lower-bound labels, S3/bench.record, pcc)",
+   "verdict": "partial",
+   "evidence": "RESULT.md; ../README.md",
+   "detail": "One unit per table with ratios and correctness; the rho reference is priced and its unpriced fp_adds listed (42.1 per sqrt(l) pooled). Missing: bench.record/v1 and S3 raw data (AWS identity rejected; disclosed), pcc claim (none; disclosed), the missed band prediction (V8) and the 5a lower-bound qualification in VALIDATION.json (V7)."
+  }
+ ],
+ "verdict_on_producer_claims": {
+  "replay passed (10/10, every counted field)": "confirmed",
+  "runs 0-13 identical to the pooled reference except wall_ms; rescore byte-identical": "confirmed (126/126; table.md, fit.txt and band_5a identical)",
+  "fresh 14-27 U2 1.050/0.876/0.728; combined 1.026/0.856/0.711; verdicts unchanged": "confirmed",
+  "U1 below at every prime and weight": "confirmed on emitted counters",
+  "committed hilbert_check_muls concurrency-inflated; single-thread 8.875e9 (11.1% of f4_muls)": "confirmed, and reproduced independently on seed 3 (11.09%)",
+  "U2 below rho at all three 5a weights at p = 1451 and 1601": "arithmetic confirmed; as a ranking it is not admissible under strict 5a (cover is a lower bound), see V7",
+  "gate evidence complete except the validator report": "refuted: certificates (V6), 5a admissibility (V7), unreported preregistered miss (V8), VALIDATION.json path/sha placeholder and untracked evidence (V11, validated_from)"
+ },
+ "blocking": [
+  "V6: 8 of 9 cover solves and all 252 rho solves have no independently checkable certificate.",
+  "V7: the cover arm's native count is a lower bound (unemitted F_p additions, pair selection, matrix assembly), so 5a forbids ranking it below rho at w = 0.1 and 1.",
+  "V8: the preregistered band prediction and claim missed (Hilbert/plain 0.821 at w = 0.1, 0.959 at w = 1, against [0.50, 0.62]) and the miss is not reported.",
+  "V11: VALIDATION.json points at another path with a placeholder sha256, and the evidence directory is uncommitted."
+ ],
+ "what_would_unblock": [
+  "Re-run the 9 Hilbert instances with JV_DUMP_INSTANCE (value-only, no counter moves) and commit the dump lines; the validator re-checks dd*G = Q for all 9 (certcheck.py embedded here). For the rho reference, an opt-in dump of (G, Q, d, found) in jv_rho_strong, default unchanged, or explicitly accept the steps/sqrt(l) theory control (z = +0.08) as its correctness evidence.",
+  "Stage 3 of the lead as preregistered: emit the F4-driver pair selection, matrix assembly and table lookups as native counters (and F4 F_p additions, which the HEAD f4_fp.rs NORM_OPS path already makes derivable under jv_bitops), then re-band; or add an upper-bound layer as research/jv_sieve_negrho_20261102 did (layer A).",
+  "State the missed band prediction in ../README.md and the leads README: the Hilbert stop's gain is 1.895x at w = 0 but 1.219x at w = 0.1 and 1.043x at w = 1.",
+  "Commit validation/, repoint VALIDATION.json validator_report to this file with its sha256, and add a 5a lower-bound qualifier to rho_reference."
+ ],
+ "caveats": [
+  "Scope: the Joux-Vitse genus-3 cover weak class over F_{p^6}, p in {1301, 1451, 1601}, 3 seeds each; no statement about deployed or prime-order curves.",
+  "The p = 1301 U2 cell is not resolved at w = 0 under every reference (pooled, fresh, combined) and has no order across the band.",
+  "Estimator (a) per-prime on the fresh sample gives U2 p = 1451 0.922 [0.807, 1.073] (not resolved); the frozen primary is (b) because homogeneity holds.",
+  "U2 prices the cover at harness F_p multiplications and rho at tuned (textbook) multiplications, the frozen convention; the red team noted a minimal F_{q^3} product would make rho about 1.34x cheaper in multiplications.",
+  "All results are [pcc:unverified]."
+ ],
+ "raw_data": [
+  {
+   "path": "../results/aa_line_p1301_s1.json",
+   "sha256": "04219838cf75c754a2711c27154267694b4cbb32db37827ee0427822db2fa4bb"
+  },
+  {
+   "path": "../results/hilbert_p1301_s1.json",
+   "sha256": "65103e32587a0578e5ab3a757d9ae8822843059b725593dfc74ff5d7ce9ca64d"
+  },
+  {
+   "path": "../results/hilbert_p1301_s2.json",
+   "sha256": "fbdd5a710227bd001860e329da4c235596eac2e485a1cbba433ff3e2ebdba44a"
+  },
+  {
+   "path": "../results/hilbert_p1301_s3.json",
+   "sha256": "dea7a8f234791a246c00b0a9a58b0b6914eb445ba33c2d2944f5297cd838e357"
+  },
+  {
+   "path": "../results/hilbert_p1451_s1.json",
+   "sha256": "51647b65b0e52c88146b47252f5361b38530e29bc46292eceb2db080b247c47d"
+  },
+  {
+   "path": "../results/hilbert_p1451_s2.json",
+   "sha256": "4fe921e36cd7113796533a70058067a8926825fd312e41d52c314c3a7458d393"
+  },
+  {
+   "path": "../results/hilbert_p1451_s3.json",
+   "sha256": "f85c041fe434e2dbee156f75e639c468222c4ded1f9feb5fef2de2d43ecbeb27"
+  },
+  {
+   "path": "../results/hilbert_p1601_s1.json",
+   "sha256": "67285be2b3171de02ebf65fa0b2ec10ab297f1d7ada6a32a4156d92c53088557"
+  },
+  {
+   "path": "../results/hilbert_p1601_s2.json",
+   "sha256": "b55a1369bbfb43d9796876ea620b33e30a5824e1469ccfcf6801617a48ba5bf7"
+  },
+  {
+   "path": "../results/hilbert_p1601_s3.json",
+   "sha256": "41b85d159f497f12bee7272a4db1f00f74181a0801cbbbae726ab5d71b3d2740"
+  },
+  {
+   "path": "../results/paired.json",
+   "sha256": "e486182043f7dc086901e3e3b38260346f8d4034b4114dc9d75bed87de62459b"
+  },
+  {
+   "path": "replay/aa_line_p1301_s1.json",
+   "sha256": "032950aa9df38a822cf1f4b514a57fa2f92aeb152b7c67da389728546af762f1"
+  },
+  {
+   "path": "replay/compare.json",
+   "sha256": "7532ef93b4dbe2bf0675fc47417ca404f44d4dff625a0b5eff4cfa1a25adf800"
+  },
+  {
+   "path": "replay/hilbert_p1301_s1.json",
+   "sha256": "3ccba91bc3cd030279b454c1e0506f28fad629c49277268a6919ac6a4daccd6a"
+  },
+  {
+   "path": "replay/hilbert_p1301_s2.json",
+   "sha256": "15011fad1b3d0c3d5b8635e789535ba323af7f53a4a3dff34404fcab141ebdbd"
+  },
+  {
+   "path": "replay/hilbert_p1301_s3.json",
+   "sha256": "fd7c1b70d57242619b513c4e27b801d2991b5557045e721c660dce031e29d36c"
+  },
+  {
+   "path": "replay/hilbert_p1451_s1.json",
+   "sha256": "7cdd1269675ae3e0c3972f2aa0720ea9d1dfa749ed499942c9d268a95f1a29c0"
+  },
+  {
+   "path": "replay/hilbert_p1451_s2.json",
+   "sha256": "721d5e9230c0a81d114f42969186834ce9d3d540f562007129dc19a9c4a7b6e4"
+  },
+  {
+   "path": "replay/hilbert_p1451_s3.json",
+   "sha256": "6f32f909bef58039cf5e5a7bd4c5f558594632d4b509a65a3199190f586ed20c"
+  },
+  {
+   "path": "replay/hilbert_p1601_s1.json",
+   "sha256": "2e393405717214e4a2d318f6733722bead442d587d352816c699b7881a8612f6"
+  },
+  {
+   "path": "replay/hilbert_p1601_s2.json",
+   "sha256": "55232ab50fe1b1a77a64bcdea67178092bf624df12bcf91c1aa4c25163d61306"
+  },
+  {
+   "path": "replay/hilbert_p1601_s3.json",
+   "sha256": "f0a20c4743b63e8700761b3e169b901c0ac26ae9611fe975e5af41076fd050ad"
+  },
+  {
+   "path": "replay_1thread/compare.json",
+   "sha256": "f0414620829d42b9cd734a087bdfa63b15508e911445add2804890d2a64391a3"
+  },
+  {
+   "path": "replay_1thread/hilbert_p1301_s1.json",
+   "sha256": "639ec13072d73c3950f9966af9e2ec85ee1452d343a63bb3f8e5e95b6b158ba1"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run0.json",
+   "sha256": "56b4f4b47ec7e949d5688129285dc8f43cc682ce898ddbeedf8062cc5450803c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run1.json",
+   "sha256": "84effdc47766e59becb5332b3ac81913e5011051cbe7f4212c0a6389a3e0df69"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run10.json",
+   "sha256": "33c7596d2ff0be6ab0c74bbd28901a3e7dff221df036c525706d760e8377a81e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run11.json",
+   "sha256": "a172a3ec61ce423dcc278c149d638ec612a2dfe4c0b3227ea1bf255c3e179ae7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run12.json",
+   "sha256": "e5eaff182af779f8ed076f0b3e544c4d0eedb8fb8e98be50f8fc612fa1c60440"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run13.json",
+   "sha256": "c049e08853478bdf511e9aa0a9ff0d5073d2917a30a048a78d3889c6d18fcb03"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run2.json",
+   "sha256": "ed37c782e44398768782c11990a7bbb27c9556c716b80dbc7c5958349bb4b1f9"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run3.json",
+   "sha256": "87a8ad1416db2430f9f7048d68a27e24a14d6921784f464ee1e3eedbdd9141d2"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run4.json",
+   "sha256": "f7a732edd51472fa1c1f6e8c12edcd00727d7bb9b25c778aefd72af57c491ee7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run5.json",
+   "sha256": "a125a175eb75e6261eb82c0d76035de3d3a484251e35c008cda6384e8a734f47"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run6.json",
+   "sha256": "759217f091e9f46545189d584fb7944e7a9301c77b39423acf839f7ee82b138c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run7.json",
+   "sha256": "3151437ae5c255d7c2416bc0330a6991526ec802cd8004577280c0561ab3ffbc"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run8.json",
+   "sha256": "359816600055a307e90f1dd1d8191eb77ede0ed0aa6238ebc47c973a887a8d55"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s1_run9.json",
+   "sha256": "abbe2c210a1c9e052b946caf730c34b43dd4d0f3736dda7f7fe3d07ae3fdac2b"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run0.json",
+   "sha256": "c40c981bf38197b8ea6399d8f927287cacf051e83b9af13770b71fd9e2b3cfbf"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run1.json",
+   "sha256": "a7e3e45b8e9119e05aebfc9d04d816ccf408375940d52358f3b8cc6d350ca5fd"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run10.json",
+   "sha256": "a01dcf6e13346c7832a1ccdf5f417a5df603059d5009ed2d5182471e59b14d6e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run11.json",
+   "sha256": "a6b37e44a35118e73bc479680e36c651a2f5fff2c44cd04ec088a2e8429d52cc"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run12.json",
+   "sha256": "c26cbd5806101f3f1e10c99b5785bfb6666b52848762e9d139a24d875277a4d7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run13.json",
+   "sha256": "8cfc04c9b0d6e9f200074bde93e0d59fe7fe0cb93df142c5a81723baa7891060"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run2.json",
+   "sha256": "9558306ad9334ff968f76eaaa855412f436e030982a84fcf46c020b0fed1259d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run3.json",
+   "sha256": "86682eeff55202eed2de0a780f564c8427b5e5c37a76a4134e4b1fc456f331af"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run4.json",
+   "sha256": "379c849de8b8a6f5c3721533a4684557b4fe22e6adb921cf62e46b69350b28c1"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run5.json",
+   "sha256": "c5589ac54eca7cd70af7f24a0041611f2509378eaa2bdff8961a614ea9624968"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run6.json",
+   "sha256": "6f579b228722f92e28be1c6f78578ac61d4ce15db155b6c4838ad62822e5469e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run7.json",
+   "sha256": "6d216adf0573c36be87e5e5d1d9d3c7064286f76e35490c1990dc1c2eb6d6599"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run8.json",
+   "sha256": "61ad8a680924780eca3a953a7bd295a8aed5b8a39764a59e2f800e8cb6b2196e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s2_run9.json",
+   "sha256": "46f1120245e81f3a06bb3e1e5c0d3c4bf282335884919af7813a840265485110"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run0.json",
+   "sha256": "d42d0eff12f69b90792e6f4121628817d6001e9140348208ed821e65eab77022"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run1.json",
+   "sha256": "6b5072a43c61eb2701ae7e8e95dbb612a2d6ca22436be1d1b34be2c4c15b36c7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run10.json",
+   "sha256": "b3a4d71bcf80578b3506a717c1416f95f1656ecc99a84d704be906dacf8617cf"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run11.json",
+   "sha256": "809614753dd2a24147a82c28fddff0863a1ad4e2dd1a53c53fbc584fb4a35afa"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run12.json",
+   "sha256": "fe4c48d806598fafae6d5b06d01280c2642a3d170777b5586daafde44c0820ff"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run13.json",
+   "sha256": "2e2305c9dfce2ebe79518fa3ae008eabda48846b11a4ec936540d8559f62541d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run2.json",
+   "sha256": "88b7ac80c94875806534525bbe21c29436abb47542104a9cf15c6a1e52b9a506"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run3.json",
+   "sha256": "fafea8a73b691efc890e13f38ea98632aea1880866ac853bc24f465ab567aa6f"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run4.json",
+   "sha256": "1bb859c936c73cf3909de7c1f5ac867de830cb09f832c047fdd01cd015e03501"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run5.json",
+   "sha256": "3d3b82f811abbf1568a25ef21b5aa306a77eaaadd46cf17c46aa39c15c495f3c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run6.json",
+   "sha256": "a3bf54d89ae6164d528d88648065ce40b7bb63ac4cfb0bedfcdd14c4751a208e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run7.json",
+   "sha256": "0530930ae21a53194480357570ec44b2d24d5d0023e8ac81f03f4fc6818d5ca3"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run8.json",
+   "sha256": "9f525555402d9d4c73014807121b6e634a4719236d3915a1b1f4c60da9e8ec69"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1301_s3_run9.json",
+   "sha256": "15bb70a56fae7c3246a81c989025d2ff56e352f9e0db618dbe72ada762202663"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run0.json",
+   "sha256": "d217d1c8ca8ec9f7ec24d5906f51ed9605c2ad993ee5824405ab0bd18c00d912"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run1.json",
+   "sha256": "2b1a3748c503c707f197327354a834fe20a69e183ce883afae71f355c15119fe"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run10.json",
+   "sha256": "9a47568599fb2bd628e7598c3330422cce136bda0b61fa85fa49ebf5d37cf783"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run11.json",
+   "sha256": "0ba0fee7151e62ae9cef164590cc32ce4a39a101d275312bc92a9de468f1a7f3"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run12.json",
+   "sha256": "0e94a8f4133bd34d2210d6746c384db2adb39f19029929d5b913f48a3495b534"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run13.json",
+   "sha256": "2992cf070bd7717e8889f88c52ace243747b8f44c54d84b3415f3ab7ff8a3fa9"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run2.json",
+   "sha256": "1963674fd970d8abcab6258ff5f9a0ef73e2fdbde0c6dd5693106d13ac1bd7e0"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run3.json",
+   "sha256": "78d271947f5cfd9e8019cf493d827a1a623b6de26703e9e648ee084750e5ca2b"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run4.json",
+   "sha256": "a999a3e2e938a4c8f5e4881eae7e160f645afc2aca16c571274356c3d9a203d2"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run5.json",
+   "sha256": "385987dfa59db347ff6dbc0f59e47856e6cff0fa1fce850c669d3582f5dd356c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run6.json",
+   "sha256": "d6f60468e107b3a60fff3dd903852c3a946094cfb232f95923c39478d37cb5b5"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run7.json",
+   "sha256": "1346f482ebbc49e638e67520e5e7af4dfad69ec40e5f2e0e9518842b50ad9881"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run8.json",
+   "sha256": "579f52bb92e8cc571002a5281463e2b4e3c8d70297aaaf1ae15f4ef4f8659257"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s1_run9.json",
+   "sha256": "484be9232ccb47e7612e3b9176d25a9a3a0e9234900f9fd26d89808353c03745"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run0.json",
+   "sha256": "29c8f09887a917532d00ffba4c37d475a6fa6f08c9b9c8f8ab1b92c4d1d10342"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run1.json",
+   "sha256": "4c7bf9fbc2228ef9cb65f8fd07335d764066beee2758bf989dd33a1f02c3593e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run10.json",
+   "sha256": "0de66557e7ca3f7836d6ece66dc31dd1c31178463b60fa5d5f2c4c285e7de69a"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run11.json",
+   "sha256": "6cd0eb61b5a4c986ed443015ff67adeee73d76f2af48ecc5dbaa52ad2c223993"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run12.json",
+   "sha256": "577604dab0b6df1448a8c25315ac6ded2017698268b71bb88a8dec8979451e3f"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run13.json",
+   "sha256": "6f28fa7d097eee4efef6290416ccf855a6a8983a534c5a81f9e7dd17d14b96d4"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run2.json",
+   "sha256": "46b389631ef1c5122a53e2940c9f61fc1ed196d3af398339fad333f9528477d7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run3.json",
+   "sha256": "db20906d45092c21dc29030378cf6f0989d5a76ba7a1c84447aaf73d1fca04b0"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run4.json",
+   "sha256": "51a8ea35d6043b11b12ccc7c7b80b2b89b4cc1b9bf6982421635f1671e030760"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run5.json",
+   "sha256": "437e0966a60873eefbd5cd9373f3d5eb4a8fe0db0e3eb3ef5976065210530db0"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run6.json",
+   "sha256": "3962b1677e620740d8736e08c6450df52963568753e3d4cdb048119c4868fc36"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run7.json",
+   "sha256": "002098187ac0b5433ed8e5af044e216cfe0c8db1d852f63e24d1c809c157d140"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run8.json",
+   "sha256": "f9d455a3a20149bde13f6063d3bf7025f5f59a3281fab83380e74f452adaaf3c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s2_run9.json",
+   "sha256": "33d4be2518dac4ffcc47be6361769b2a1c009823afcb9819aae94475277894c9"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run0.json",
+   "sha256": "ef6bea74e6f97a5ae85c60d13ffad2f10e8d0ba30a654f22a857d7cb00a2247c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run1.json",
+   "sha256": "9556e961b27c7a55f4c3046f7e3626673d583c9e7273c2d4a95cf6713b2d2bc9"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run10.json",
+   "sha256": "fe64e6888dd54eae8fea3a10c4ba2a8a4c6cc15c6f503f8bde4ffacb5c57ecc1"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run11.json",
+   "sha256": "0a669ab87c62260f175ed6fead2cddfa5ae5bf4bdcec8794f310d3e366ad3dbb"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run12.json",
+   "sha256": "63449077fc5c90b0b366aec3393b728288ef555a82546a2482a28c22618adc5d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run13.json",
+   "sha256": "a21bd0f9f29bbaa717a3d057c05c40a5e216ff9bba2952f7595eb141f7d2890d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run2.json",
+   "sha256": "efffaadb169473cb89220a98a4b909b59387efb6bbef4213deafe58d7bad9d2a"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run3.json",
+   "sha256": "bbe207c3864a9bbfa5d314eb8d86171f60c650723faebea13c61879ea8c6baa5"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run4.json",
+   "sha256": "5b6b655b9f95051a7e73dcc68175d54a7491734cb5eefaa5bc95e12d11980fe9"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run5.json",
+   "sha256": "6ea17164c54bf2105525f7ed8f80cf5f157d72f00052543e14786d1a03fa6cb4"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run6.json",
+   "sha256": "c98f37a73400e7aeda2241e173f383f2b56258233487bb8c1dbc23fb08dcd35d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run7.json",
+   "sha256": "fec3ac0f86476fb6459d80fe121fc79291be8b0c7fdcd452ba7157285a0f8210"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run8.json",
+   "sha256": "911cf705a764f30d3d57c44606a131df127a9cf4b41f2b0cb2d7c45b898e038f"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1451_s3_run9.json",
+   "sha256": "d1529e97f9214d515b45cc8554b40e233fd01bab591f0f42507b263845cd7f93"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run0.json",
+   "sha256": "00c03e64ad62a533211248656ad68ae92de0899002ab601124769773a7dac247"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run1.json",
+   "sha256": "fd4c71942588d29891477b324c2ce07f1881391139aee6439dce580051ca4366"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run10.json",
+   "sha256": "0f2227dcc0a335ada52b6eac303adb24ec3a00d0590ccbec92b789885704502d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run11.json",
+   "sha256": "bc07d2f4a6af80c37bf676bdb3a757c92c1e5f916275300c6738a265da22f3c8"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run12.json",
+   "sha256": "e52c345941d68b7caf8c855a9c30d06e4289ceff634d05b7e72b7143dac0102a"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run13.json",
+   "sha256": "d2f6a528b44f96410421547c0ac57d0cb5cae361a72e1b3df3c076721933799d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run2.json",
+   "sha256": "8435e40605ab7b24e189cfad1e89c6ac6ab1e74e1f7f60b98e36d3b00c1fc881"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run3.json",
+   "sha256": "1a660b04841373f0aed3b8f509725a9fe276a6c1e1f69f3d9c737d9fa211a356"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run4.json",
+   "sha256": "d027651eab26ce4a776bd4353fc3d9838f129033d5c6a1aa19d28863168f2b7e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run5.json",
+   "sha256": "eaf02bfc349e13bb6b61fda59172f4a5c5f5b076369608cdf1df1737a1025e97"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run6.json",
+   "sha256": "13d7521be061fc3cd2e6eb323d05017ae20deae00cff2f53826cb8a1ec6d5211"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run7.json",
+   "sha256": "6ba7606214a240a4482cb629802a9fb14a37d0d9633f896dba577b766b0854d9"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run8.json",
+   "sha256": "9d2fc48fc66cfd4ae7682c628f4e828b1b1e6beae17a66b27e12f04593e33153"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s1_run9.json",
+   "sha256": "43675795a6e91793d3cf0188741643f8f6b1d1dba24bdf1dc56e193264c5f7e0"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run0.json",
+   "sha256": "7292cb4c2472b198d5a3c4b6524268c482191bb4caf99c7d48510d40455a368a"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run1.json",
+   "sha256": "57468e42f29b8468898e9fa1ac2b85403538e33c7a66af8b0b3c55596ea5946b"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run10.json",
+   "sha256": "972a3235c2c36751dd5c7681600970ee2c61a3d32e497026a201d7a3d96a08c7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run11.json",
+   "sha256": "ef7153217440bf7ca05568376ddd100aec41c700109aee5fa292b1b1cc037094"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run12.json",
+   "sha256": "201dbdebb474057a37304a2021ef74acf17317524f4edeafb9cc46f80228dec1"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run13.json",
+   "sha256": "b7a19781623f7b3acd1d03c220c562340f08e83516c31c9fb5e89c671d47bdd2"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run2.json",
+   "sha256": "7f48aa54c55a44a7ecabbc1f0d786332866cd262aa87a48d8668ac8adea11e0c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run3.json",
+   "sha256": "15cf4b541da424433149e5971a4f2b32280ab298a51b6afe82be811f3c072198"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run4.json",
+   "sha256": "d93001b96603246f5c52bac6537c1e44b3d7568846dcd02c28a1be5fffb8158a"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run5.json",
+   "sha256": "5b3670857eaeb40d71ac46ae51b95dd7d32d452e623948732766077cd839b383"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run6.json",
+   "sha256": "8e64760453c385ee24d50bf9a2ac13b2d112b156c0f4ed34f0b8735f6c7faec5"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run7.json",
+   "sha256": "ef90914bf1524e4b12aee699c717ba7e9a38a5e2928dae464ebe9dedb47f961b"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run8.json",
+   "sha256": "53d091019101fc3d50b6119fbbdf76549ffa1efdbbcf10377b3da17afc9c3435"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s2_run9.json",
+   "sha256": "b65ed7bdc3299e4a0f41fa82194452bde278790ca734640339cf3a3c7425991e"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run0.json",
+   "sha256": "931c9d52c3ae5785830b90c5265697d6e0b2e6fe10cd09c04ad19b8f0984f2d6"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run1.json",
+   "sha256": "673d7d179d05291a87f4fedbf77816ed941d7a8e5b3c093bc5a25c9eb0d387d0"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run10.json",
+   "sha256": "17a152ebd065f23f32210a9d4d823c2dbfb8d70cbb8f9a7ac31cc9a41c5d3179"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run11.json",
+   "sha256": "af577fdcf83ded38d857374cb0a2db8a1def668b2bb0a8c15001ad11a9a42c12"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run12.json",
+   "sha256": "72b2c661c9d41c73c3c9f2ef25a7bfe97d0f8813171f211048f318fc3b386d90"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run13.json",
+   "sha256": "d64ce6dcdf0b9858052ff87a9b5d64f4fc4cacb74619abe09555ce201b4c4690"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run2.json",
+   "sha256": "46bc0e27b677cefa5baf84315357c708d3e20e86a1122937c089e412322d3d3c"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run3.json",
+   "sha256": "7e70e9ae14a5e0654003c60debf60efb804d50a1150c82c6c672b63cded8ab2d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run4.json",
+   "sha256": "4950f59d7dd5d7910f6beb80d45f9498571995e34ba9b12ce259aae38d108dd7"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run5.json",
+   "sha256": "685363666c249b591778d07d3a52542798dce377eb2ab34892af8803b0c6eace"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run6.json",
+   "sha256": "a2833690038d42ba6e18e2a5a18ee7f9adc2024da4448fba5ddddd7dcf383820"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run7.json",
+   "sha256": "65f1ce0d3417786184f66d7208c0c4d6cfe60399cb633e87ea96bf0dbcac90a1"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run8.json",
+   "sha256": "0f7b318efa193310db4f67bd93625551e5bc7d4f75d3aa2b5ab63ca0d2d9695d"
+  },
+  {
+   "path": "rho_fresh_run0-13/rhostrong_p1601_s3_run9.json",
+   "sha256": "b538d5cb1dc02f0eef4a3aae735d2eb3b4f4f2e62e0eb07ab01aaa920094f022"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run14.json",
+   "sha256": "1c0765c1035920e210a477536b895a638c4b7db4c26456f3672b70384e98e99f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run15.json",
+   "sha256": "591c9cc3855264b8616cb2c7a05ed77907ecf4e4be836d708992c3f6a7e92832"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run16.json",
+   "sha256": "174de9dbe5a401c15e38e4e401e349be1135529f2707f36363e57d14d46f0d5d"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run17.json",
+   "sha256": "d43fa229d9ef4773978b966fb8add4d5e6458dca52eee6eb6284212a855e3b66"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run18.json",
+   "sha256": "4841d0865e727c63cb03f86e42f079df7d39ccda614b361594be406c001d8c99"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run19.json",
+   "sha256": "9c89a6992435ea9841fb29bce54a824d94e649b4c68160fd9c7c63b468a03220"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run20.json",
+   "sha256": "62b40931b6f416bae1cb3fde3e5c8e77283654bb59e0f915fcf3791064f917ea"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run21.json",
+   "sha256": "ce3eb0aad00f73a7ebe949505b0d6277fa6efb7493b7f89a928c70c3e52875a6"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run22.json",
+   "sha256": "8608fb42926cb8c18acebaaec7528e5647fb7eadf8642488abdb2405e9662b29"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run23.json",
+   "sha256": "276941c2fe1ad7367f50c273c6129cafd98faada5ecd158f31da2724b1ef1729"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run24.json",
+   "sha256": "1306fb0bf41d1008e0c0ad9f2d1437500b64ff388b0f7ccaa9c39dc5c500b4d4"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run25.json",
+   "sha256": "1634564dddc92b7e6f2a8ac3279d385dd7dc52d4c340558c5b2f679771d5e4bf"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run26.json",
+   "sha256": "4129ea7e9d59aaec6812be828b40a28bef501fa68787fc77d26c2b6a8e7a5d2c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s1_run27.json",
+   "sha256": "7647b1c43550b9d75c025fe21f7b47fa927b0087f6d07814768790f7f0b9eeef"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run14.json",
+   "sha256": "a275bf4c11f0e5d02087c710a70d38c6434f815e3415ad47f70483e190b5c0de"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run15.json",
+   "sha256": "fe034b921a707738df7ffee332d57a45bdef93c10e3e789eadd7a395b7a8bb95"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run16.json",
+   "sha256": "40ffdc7c03beaa83f60d990d76064169e90b3485a31bf192f31e4c2c1e11e803"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run17.json",
+   "sha256": "80a7b6145455e0ac8241641b412179f4c581c458f1f6c2eccf3611ca815dddb7"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run18.json",
+   "sha256": "25b0fb68e3de2e55785e2bd77be3c2e979b1cf15f7c94796798bd7fc187817d9"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run19.json",
+   "sha256": "8df59d28e05df9cb0726083ef75b543ffba92b1d80f2b125056b05f874038554"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run20.json",
+   "sha256": "aa6a0293cf052a276e757fbfbba9b35b188671dd93ad18a70e7719645570a7a9"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run21.json",
+   "sha256": "758419286d9e41c551053b565b187764b2df554f0813657eb05153490d28ccbe"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run22.json",
+   "sha256": "936f107756fdd5066c50e6b0cc0b7aa7de5b1393a501c66313db883e77020db0"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run23.json",
+   "sha256": "30a215f6926a248f73c575d9b715d2edc9d58a82ebbea1ca11774a5ab7d078e8"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run24.json",
+   "sha256": "b56da7d75c91ccd3d7ec37bae27c84bfc24223bc0b00b905f6ea93cceaeabc76"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run25.json",
+   "sha256": "6d442ebd89099f1211dfd055cb088d254327868a1b216bbe2d42d286d2f29d5b"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run26.json",
+   "sha256": "96aee12e6912045b20d19a99446f83a81ad8cdd0a0a5ba394fcecda1944530cb"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s2_run27.json",
+   "sha256": "70c70df7fe1b451c7420c3977ff4b75d4cdf3ee0f75d4ee244cc7d5c2d0641da"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run14.json",
+   "sha256": "d8f6e3a14b2d31fdcbbf3f436cb28eed696dfb4decb8ba98232645abdb6916f9"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run15.json",
+   "sha256": "5f6c1a096db007da515bac7422ef2b2f59765da5959068274a115536267e4dba"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run16.json",
+   "sha256": "db27b94d41c17420f06a3d9122f978a2d16a959400a3965f2aa277a7d684d05a"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run17.json",
+   "sha256": "cd5061f7037fe88c2bc2bae0e3baac9d083e09d15d9fd4b989701f31e1bb3cfb"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run18.json",
+   "sha256": "bd0fc3be1de4675be0cb6784af61237fcec7be939ced98d3612e5b34b989fd20"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run19.json",
+   "sha256": "bcbe81d35d6e8947840c935207b17db4d596c3ec380dee5602f8bfd7b58c7642"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run20.json",
+   "sha256": "7b1f88d25c7140a6ce97d64be7e89388c69a0c003dd491acb05f1e04335d9eea"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run21.json",
+   "sha256": "6bd0b643c93f9c90c9872532a9b134cbf5fd66cfccf7fef749e78dc697c48a31"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run22.json",
+   "sha256": "fc31f0e3064493f3018a9fa5298dc8972b6c4152791024f5adc89c4e8d5879aa"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run23.json",
+   "sha256": "cda7d532759d3fbdf772e41b75480e37b42fc477d592f135b3b8ff6bcf0e698b"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run24.json",
+   "sha256": "57e7915c747ba033d634db3e1a9ce0f1e20e4e45a28a4d43d69c2d4b69f794c0"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run25.json",
+   "sha256": "e7ac7c8a92a1d94341d948c4b0a84f8c03ed5371adf8de382e0852cacb4aa2e9"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run26.json",
+   "sha256": "6373c0a6d5ed1844ba8e902b49f541b31096f273645f7ac31d078bed54c4a72c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1301_s3_run27.json",
+   "sha256": "fc4e431e35aa9d7b1b85356f5310bb6baa40778e7980e012c85d58ee558e4401"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run14.json",
+   "sha256": "4b51f04803a9e2b1bd086503c12d10cc4eea0c01a9882750eacb46aaf3721539"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run15.json",
+   "sha256": "af415dffdc636a88725d264d8c12de91078685b8596b92516e59d8135e45c9dd"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run16.json",
+   "sha256": "1943b64b582429b806a39b8edfd253f8aa2d2c25f75a8ddb78a85c7abc40c4de"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run17.json",
+   "sha256": "180e39455a65a3ce7ffcda3192a5c207d49da46254f2723b545d8acec5966c25"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run18.json",
+   "sha256": "6db4e40601730492053576a3cdb31942a6c63129847bc3727e775b928293f1ba"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run19.json",
+   "sha256": "8be02ab4f9a39ae16d366f3a8d0f43e3d011604f608c7f243317ad6184e13882"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run20.json",
+   "sha256": "c30c997fece542408c2f93e1c65c3838fd2c5277e2cd381e60e440a19a5e4ae1"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run21.json",
+   "sha256": "e9f3c4bda5807d923816db8870ca97958003a90a759bb75c579794d2a59b9797"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run22.json",
+   "sha256": "6a60b80edce4a2dfb2b3eb47f3aa482c4cbd3d498ce5e630e0622344cb911f35"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run23.json",
+   "sha256": "30a609fb35f1f357bee5a610c4231a80b171b57330d159465872530d8d8346ef"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run24.json",
+   "sha256": "0058ab2ab3bb47c92e133bd4cf1adc4ed3f303b6b299f5e038768f78c8f668d5"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run25.json",
+   "sha256": "d6513d10d8d03a68eb51dd5739bee802bea33575201173f867560667f2a8ee2c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run26.json",
+   "sha256": "fa7c5679005ded9e10becd21bef4dba7b7084207ccd7af106a62a1e5d7e5296a"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s1_run27.json",
+   "sha256": "6d6fbcfc392420af8f8a735178b1c0d66bcce837e2dd694f0d1ecfc07e1bc9d1"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run14.json",
+   "sha256": "ec23fef8245fabef52693e167136721f6f41f207f54adcae5c5bd7dd3c2fac9f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run15.json",
+   "sha256": "734c726c7b46fdac2288a33cb8ab4f5fb8ce1b805355ce270a730b243e3c47f8"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run16.json",
+   "sha256": "66d057491962b0e4a56f7a764ca6c56923e95ece00b20ac8a1be154e1bf2a404"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run17.json",
+   "sha256": "4a747f62c7a4df7ab4d93159729708cba3ef1260a3bdc2d2c4c629100068cc6c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run18.json",
+   "sha256": "3c97e51c3bc5f2cafff475a659757ffc837c0bd34bd35cea15a70557372862a4"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run19.json",
+   "sha256": "97207389b26ad776eae7d4bb83067698cfe624a3681f0063a1bf4f8f6340916f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run20.json",
+   "sha256": "90037ea11c7058fcfe1da3ca398bdf832606b72b48482c653f040159e13ba4b6"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run21.json",
+   "sha256": "cef1d7d55d04a825dca87f06b33f557b333724f2947f093192aecbf88f0643c6"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run22.json",
+   "sha256": "4c934894dfcb3570eadcfb1ae0f284047674be959392425821b790b3c8d01fb1"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run23.json",
+   "sha256": "b8487e84cc525c5c6718cd2328f138536cdb211a7217821e822f1f0dccf65c89"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run24.json",
+   "sha256": "e44c896973be121b94a816eb608ee61507c0429465123ad32c47e4d86fce6f3c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run25.json",
+   "sha256": "b0d25ad1723309175b36646abe76f7a334a0bcc03d4e229cbc5c906f4c456f6d"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run26.json",
+   "sha256": "892a90706c2abbf00785b44d640cf05c328d728ddc1b18a50199d5589bfaae7a"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s2_run27.json",
+   "sha256": "afaf8546927efd7d5146e405ed73efefbb8339e4164253b105f357f5d5daac59"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run14.json",
+   "sha256": "2972aa7f3f574c950a32426a7f5d04b8455b8bd86534f71a15f15243090d005b"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run15.json",
+   "sha256": "3595b116d762bf279e42e4f7ab5277b581cf667fca03d19570fa1fafc6e13235"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run16.json",
+   "sha256": "c4b4297843df95eb28eb0f2438099cffe8f579b02aefc2f603a8ee38c75aa6d3"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run17.json",
+   "sha256": "9971ca8f1a6fe75505df65b36ca9c00dc26ca661e8f9534cbee6942d9e74f639"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run18.json",
+   "sha256": "06d59bbf29a840c476fc9724d1a17a85eb2029c410284076545cb76896230642"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run19.json",
+   "sha256": "c618562f0abce0a9499ee6d8f35588f35f4aa269a8b920bd6cd34074ecde4697"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run20.json",
+   "sha256": "c4afc754ad9f6d294d5d7122fe258c7076f63b50c50b1089f80c9a45940a1d25"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run21.json",
+   "sha256": "835dffcb6f87388aedba587d61b46d813e91eb9f4f36b21b7b8d91a62e8896ed"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run22.json",
+   "sha256": "662393563986a9042c941ca51ffeeb46274626f4e7e4fa2cc47905997f799be2"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run23.json",
+   "sha256": "430cbebfba0c9413dbf03d45874b98e6c529257c4beb932751c549ebf19958ad"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run24.json",
+   "sha256": "f7b3517e8a65ee791be09eceed5e417feddace4aa3776872aa41c0b9ea4d546d"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run25.json",
+   "sha256": "1f90210eb201e76ce2591b6e2ebf4c50d75731b63dc665b96bfc03d089ae9a0e"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run26.json",
+   "sha256": "0ef9d5abe3b22ae0a20a510eaab059072277462866ca33cca9ed7d41f6e60ce6"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1451_s3_run27.json",
+   "sha256": "33b45ba00ec326d533dfdd56f309357ada73d7166f28dac6e53f0e3f1aa1ae1f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run14.json",
+   "sha256": "84f462470100852e264bd1e12798f2cf810be65ec2869f1a683f941edf59388b"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run15.json",
+   "sha256": "a90a12eb0dceeff075bc6c2166a1f2abdcc390a0b610c08e348afc9f423f9af5"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run16.json",
+   "sha256": "ad8ea0e90619685723366ce9adbe400678c730106d4eb2013096c302c625be06"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run17.json",
+   "sha256": "8f1e73c5d82e638a1c8c7558a1b4bf17d31ab92c5daaf4f00de7e03d3568ad47"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run18.json",
+   "sha256": "93dedab27639c48687d701b62beb19ed2ed38422338b36aec228f4609c37a5ce"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run19.json",
+   "sha256": "c66fe1b5c95fb7d7568b701a18daebaab07c6c17ac5ede97ba40983cb1187e70"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run20.json",
+   "sha256": "4669b1db25fdeddf44d1581983268604e45ce616ae9a12ffc1a055d321448a86"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run21.json",
+   "sha256": "3a1c086d988e0e075eca6e87702025d278d884537db7ae24100d73e41a3eec6a"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run22.json",
+   "sha256": "950ee92cb8a900b6bd91b39e34da74ca99e0636bcf25b5359885ef46cdcd0192"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run23.json",
+   "sha256": "f3d8cff2350c8693ae227e68abdebc1d0706dc9929b3debad235f3b832c9b4ca"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run24.json",
+   "sha256": "c507c684bb9edd1e3d0c736982ab4932056a207a7aded82616876d54bc97da2b"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run25.json",
+   "sha256": "dc0924e0dddbba89f5ce93c6d1eb409ddd5e56d5ad0890ff7e334c34f99824cc"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run26.json",
+   "sha256": "5d12b1ae52658cc666c34ac03a5f83a74f4116d4d0372c2495080617d43e24b9"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s1_run27.json",
+   "sha256": "b7cb7a684e708ada1c68b741cf03dc35f4809afc892cda638fc51fd86698b336"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run14.json",
+   "sha256": "3c734e7a17f5551bf590f8ed1f45957a0944d4a07b9eb22111eb380bf04922ba"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run15.json",
+   "sha256": "82b2b8917bde4d14350798f46382163e22352bda9957f0f538cf34c180b49cd5"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run16.json",
+   "sha256": "7e3dda9b0c6b9d22f2064caaeefb714d51de50238e97b2de806bed38d4f0b559"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run17.json",
+   "sha256": "5718991c96e4e38c4cfca803f068afaa772e91bf2751d1a6c68ab8b92836076e"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run18.json",
+   "sha256": "c788433a7b7288b246379eed5d2b5bcd82b062178d373971de34f5740092735f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run19.json",
+   "sha256": "e73e09c857970b737ef0326a24c1b423fd6aad665fbdb11f2e92822a011e81d6"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run20.json",
+   "sha256": "a4e1664ada2c5bde9e90ee16d9c0a424f22370393e23b77b16ed09f870a2db2c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run21.json",
+   "sha256": "62936542622c18c35df27d51cd90990d19e49b5825abc1fe94726f1a4ddaeed6"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run22.json",
+   "sha256": "008ee3bec17eacde96a022150efeb6a826e89d41cb7ada1452a19637596b815c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run23.json",
+   "sha256": "43cfe28de551356a3bd96b1555fa7c9bd8540c6015797145cc3e56934cadd41c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run24.json",
+   "sha256": "343ffb3658b143781f36305550298fe90e538bcee3f3b31e98d64aee602876d4"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run25.json",
+   "sha256": "a9bf95eb590f2982ab823c41e81d6391b78f028f801f41bba91c8281c05b18cb"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run26.json",
+   "sha256": "ab7e66711d8e6a399e04044dfec609a989aa89c9b34c06795e0f8c62fce6faf3"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s2_run27.json",
+   "sha256": "1d5cf4e448a770fd0ecf7af9b200a02912731c26f97b066a35d5146f3cfe779c"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run14.json",
+   "sha256": "6269e77efdd47b7dee3269b5081019f08da5138088ddb0d5c601217734884a2f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run15.json",
+   "sha256": "c9c98acfd0a7255700a6c6ccf8ddb0588f68d35c153d3ffa94c066701e4f15f3"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run16.json",
+   "sha256": "4d784ed9d9b3a04d1131dcca3ddf116f01828cdcac04490c477327f8d039d0df"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run17.json",
+   "sha256": "5f757b1ef1a0fbc04eb4d8e90b4ef3b024c51fefb272bda43018c4b1945b6d3d"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run18.json",
+   "sha256": "084b54e0264379638eaa6155c320adf6343deaa749d436f56d820e58443f179a"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run19.json",
+   "sha256": "8f291580903104eadbbd72ee8faecaf388fe1eb99e4ee2797d9fc32c1e9608f5"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run20.json",
+   "sha256": "777f3bfed8db663a1a01e77699f75f80f4ce9cc9dd07d0ad92771bbc0aa5d1dd"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run21.json",
+   "sha256": "b09aed1357e69df331a72132466ae1528d8de8e950a3c1edf94e20a3ef5ec8db"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run22.json",
+   "sha256": "2d509aa963b60132a3ed98e66945ec101c0cef8f28711518e1a742bc8f357fae"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run23.json",
+   "sha256": "7545b4705c8130bef1f454c7280bb3681c0b7b8bd6d17aa02b6bf4e3119b0b8f"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run24.json",
+   "sha256": "067160e81ab553e3cfb91a87ae5099339c0f9e3cce41c5d49275fafc41d2efd1"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run25.json",
+   "sha256": "85656df8608782c6625ab63e59745b30c8e89baefb28f3891a87327b49b5f455"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run26.json",
+   "sha256": "3027d73c29019c4d73b0a07cb910600d2781c4b68807c97ff0cb1b35b6c7b7dc"
+  },
+  {
+   "path": "rho_fresh_run14-27/rhostrong_p1601_s3_run27.json",
+   "sha256": "eadfc220bc9320704b6a3648f4251aa6bf85ba6f308485c8ae85882dd0ec4aee"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1301_run0.json",
+   "sha256": "f2b4c751d4bae4d6635708ac15acf0e00ee5ac7b55514089a458163c49659362"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1301_run1.json",
+   "sha256": "086ce4afb6ba9fd9c67261610d77ba77e6144eec86228d5f360cfda34c8cf03f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1451_run0.json",
+   "sha256": "c033e1bc0850ce38e1b2a470e42b5f52abfd0190684013f7a1ddda222153d022"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1451_run1.json",
+   "sha256": "f9b6736eddeddc00e4bae787e39e4674a52f10d07a6ddb672c9ceeb59272ac14"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1601_run0.json",
+   "sha256": "9af9efbc4ce71c642ffcc2fb6c6dde8d7a2ab1de75e5165f0f48584b76995ed3"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/inputs/old_rhostrong/rhostrong_p1601_run1.json",
+   "sha256": "bde21b5fd7d11e8e44d06679220002035821604e19c7fc802d9498a0e4d26493"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run10.json",
+   "sha256": "b45493fc782da896d9b526339f7f2d59c31bc0baa46e53a328544b3a98f6c169"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run11.json",
+   "sha256": "6f754375e87be15ff5bedfb84f1a537effc88ee8b6c8b193bd519d5bf0a5f9a1"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run12.json",
+   "sha256": "f8d0d60cca188cbc7b2d534fd7a8658ddea542559d01d73d5313723c1d21fdf9"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run13.json",
+   "sha256": "7d73d5cc5098b8b672b5b5280a2e7cd6cbae448557207db610a9590187730559"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run2.json",
+   "sha256": "8eb8fc501797099dd2bb9774b7c21aebb7aee1a692f05a7689c53c62e540ba45"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run3.json",
+   "sha256": "d2aa8a77b03c217e9bae9c3c84b3e4a5df2590d62b2d03c67fb0bed87a63ceb6"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run4.json",
+   "sha256": "cf137cdd31dd7911accca9357044ca710a6367f02131a25a8443237a65e3872f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run5.json",
+   "sha256": "9905ba5b582cff13f9c2454478c7c8c7a420e0c1d6fcef5d1a207b3e41fa68d2"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run6.json",
+   "sha256": "8c94e1d5c4fc35558ae1d9423fc21e93fb0b9eec35deda37c99345cdc2d3e54a"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run7.json",
+   "sha256": "5a195089500b7b3ba51e5f67e72386f7a38bd79d08edb5fe3839f31d889b07c4"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run8.json",
+   "sha256": "3719d0466cc7d70e4b7edad8ec0df9f297bd9101abbacb47ccf3af8bd9753ed7"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s1_run9.json",
+   "sha256": "f3f4a84d9aaaba358ea97b0d3d3f977b95872ec9a439811dbace1f793878e2c6"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run10.json",
+   "sha256": "787faaf460ef689bafd7a30c439e3ee58f54008ad68aaf70626f32c5f40f71f7"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run11.json",
+   "sha256": "664a8843402e7af60c4d13d6afd0069381eed192d548fffda0d917fbe5bfa721"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run12.json",
+   "sha256": "e5fe54ec9345f5858d5b80dd52cad0ca843b2e46e6388499c0e1f40117f64982"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run13.json",
+   "sha256": "97aae5ddc32d62e00ef896bb0f70586822d4ef761fd7434938b3c2fbdd26998b"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run2.json",
+   "sha256": "e4e79107191b0aaad9fb58b151caace82177c45d86791b09f4038d306568c371"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run3.json",
+   "sha256": "32d022f2cf3cec2e8592df48c1528424ab45ddeb6231e83393793aef7445aec2"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run4.json",
+   "sha256": "2b212adfda694b8da2a33702455cc8816697b52b9804e3083f0da7daace79798"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run5.json",
+   "sha256": "cabbb06d8c89cf61e650041f4c045c063012f1ed5645d3255bfbba1d4f5da721"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run6.json",
+   "sha256": "abf00ebbfa16d87dfb1936266c1650e4fa39f56e5269d6a33b30c38b2620b283"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run7.json",
+   "sha256": "94902413c7b0e5e01b8181fdb9b16a9abb74e246d9278b5d83a6a9b3b2391d43"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run8.json",
+   "sha256": "88c8449f7e3319577dc40c69b649f964ac8ee120f985d433dc328c4c5704a417"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s2_run9.json",
+   "sha256": "f461003870bfce1d3e90175b609e58ce95559596a187fc58bee133fc2e7856f8"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run10.json",
+   "sha256": "c42bbc697c2ebee1cf0a2955bb91bbf1ee719602ab237737daefa5ea3bda3ce3"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run11.json",
+   "sha256": "85afd2c7ab4d4dec0fe4dcff04dbbbdd0b8cc78da59b3b8287fd725567c84603"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run12.json",
+   "sha256": "b3ae3e968964248a5957c3cd4b37f23e305c28c12e4291789a4a2ea015d7b657"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run13.json",
+   "sha256": "b0214f30d0202cbe730022155363315c3fcde1a4370379069b0b32e1a1469cd9"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run2.json",
+   "sha256": "160ddb34f1231d9a34c045c07742fa579bb3f22083a23d31f0b3aa36b9df1593"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run3.json",
+   "sha256": "f33e01391dd713b33db1a6dad8455a5d0502b5552e4aec141e0b6b6b86a495da"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run4.json",
+   "sha256": "694a37052815318ee998bfd4684857e50f256585d68982fea98d039231544568"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run5.json",
+   "sha256": "3bf4517a0e1a66ddfc753259b7a2b160d22b7bb3010902e298707c4494392578"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run6.json",
+   "sha256": "11b2b7fb648be69edde1817cc676caacdebe763fb20a80c3e0a21a6dc715f387"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run7.json",
+   "sha256": "454f7739e663f4cec1902ffae7913b8553c48a300c260478e5e93dce647c5703"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run8.json",
+   "sha256": "e641ff76c18bc048bb96ffdeabca0c7f5fd58f5d291f023bed631bb0fa2a7fea"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1301_s3_run9.json",
+   "sha256": "abf57395a309f15aa6edb2ba1d1fc42d7a000c9b2ee1da19177c26286c66ed27"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run10.json",
+   "sha256": "bddb411da27ef0a88cd6c6dfbcb9bbbf4d9f6680439314da760eb55489edb95f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run11.json",
+   "sha256": "90c273d9454de78cbeaf035114a75cdb8b5c7ede5fc569cf3c0fe600382ae8b7"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run12.json",
+   "sha256": "c51098d1eccaaea795652a0324ee8bf88d19e5b9d13d62d336d78f1223219e2c"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run13.json",
+   "sha256": "6484eceeb1e1207da3dfa1a8a4f1a30deb342a5c2dbac07ab8ec4e6c82d1ce70"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run2.json",
+   "sha256": "3137a8be6bf08ce143ea7b0021619114d9aaf30510fc6bc90fa8c01b913fc7fa"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run3.json",
+   "sha256": "73e1bcdf697c7353ab1b540273cf9422b42af3bd914067229377b8e482f8334f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run4.json",
+   "sha256": "9cf4ce7a0128b71ea3b1c831c8a7b78f17de916bdf48cfc36df5e44257ee270a"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run5.json",
+   "sha256": "6a9e84fcda78759cb47ea2e74e3074ea1a764382fda2deb0443988c5a1e915df"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run6.json",
+   "sha256": "b6d4d94a854e389ebef6c8490114668b0fdfa14b16051b77a498b3b7a62f0398"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run7.json",
+   "sha256": "a5c1a7732b900b02e6862fc3f5dcfda543d27227d86b042bdd34f2323997b666"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run8.json",
+   "sha256": "51e2941898dc76deec1744abc8f7c699d4571166dfcd4fed22a378e23a5b951c"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s1_run9.json",
+   "sha256": "45d1c264e8e6ad173b9e90e5a9558ac01e04551695f2e8cef5a62228d82becce"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run10.json",
+   "sha256": "eeb8f41cb054be98fc1d594eec97c34d36a693ca5fae578f3faa4ffc62053d8f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run11.json",
+   "sha256": "50ec28e00af5db65cddc8f33c66f949bec7880bc158a0461bb585f631f88e7a7"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run12.json",
+   "sha256": "827ebeaa32f2de28f034e131ed4b49709ee4a0bd04f5bfe343873dc6d2c99bc1"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run13.json",
+   "sha256": "6850f1403b4e22781433ed2c62c57e250313c07fedc03c23515af151e010a938"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run2.json",
+   "sha256": "dd5ba23ed59600f4feb4a10374345d398125a37390cdf6f9745bca4bd6a9510c"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run3.json",
+   "sha256": "75c201ce9f8c2cf61370cd022a9b8c1634669a5bdba2fd6e94f89755a9238f97"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run4.json",
+   "sha256": "af485fe52c760af6e1af3d76e1f0d0ac6f6a55d1624c748007be8a8d2a077d52"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run5.json",
+   "sha256": "06a097db387aee9f3d4a09765ebd5595668aae53de007281fe15b8a70f365f8a"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run6.json",
+   "sha256": "dfd71c22c49dadd6cec78f378914dc27d9a28d8125b66e222a87a49c5224eb1b"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run7.json",
+   "sha256": "278d35930b3913551896fa675f8b6ea64391bc021d1cf083b0ed4b0e9adeb62e"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run8.json",
+   "sha256": "1b602cbd3cec1c0626589573aaa22d244fccd5e7c4654edf3936d318104c33fa"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s2_run9.json",
+   "sha256": "7a0ddf7f44e9a4a34251151e81b41e8688a33e1c94814ae9ec8b3eb7bb0332b9"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run10.json",
+   "sha256": "aca6d323142cc2626a0cf1bc5b9a2173c7ec228661af619f526c254af227de1e"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run11.json",
+   "sha256": "73c3797b614b21ff6a7be4df3611e775acf51ec79859cba09635d1cbcbe80129"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run12.json",
+   "sha256": "c480c0933e15b8c902ad0d43a757a28fdc295a039f62e614a58aca0fc4aab541"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run13.json",
+   "sha256": "f2dc2dd9f171e36d7800e39c0c4bf8c0ace74287d5bc029a4557273d9621cf02"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run2.json",
+   "sha256": "7e84d24ca856b1e320a15786be2f9db14aa241dcf3cd6a4b9dcfcefb12c9669c"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run3.json",
+   "sha256": "a153f312efa6daf199e1bd8415a284349270cf3b4a00b60b723c4b9189a55253"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run4.json",
+   "sha256": "482844250ec0de56afaee0caee596193e0c824c07cb8f972bb9aae157aa0997f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run5.json",
+   "sha256": "a4064e05cebd6eca4a0ca792c3fb1d066382e29f31bffb9c5536eda01df18c71"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run6.json",
+   "sha256": "3e10663f10a6d65c6d30df5d28a966fdf71d08a690f9b68a6ce7c2a231a7e5e0"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run7.json",
+   "sha256": "9a5af0ddd0b714f65c8675fd46b6a4cc638fe201b3e1d1b1672af353e8c06aaa"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run8.json",
+   "sha256": "211e4c22ce399fd0f27d6ab2717a92acc9c5b3ef6ce02d47980ebbb3e2c3955b"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1451_s3_run9.json",
+   "sha256": "2fdc213cd143fa22a260692bcf1af4f9c41869484fb602fd0a3050a9307cdf3a"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run10.json",
+   "sha256": "bf6b873b70a08cc54532073306677476732e564aee1627aa67ade465fd1ddf81"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run11.json",
+   "sha256": "c6de8c37a5b7dc0096cddebd375ed32f7f4cc2d034d5614b2c88fa72f9314360"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run12.json",
+   "sha256": "7b7aa3f6cfb8382c757f3c9d5cb3bdef6f7e160c2151939b1606e70a4fb7c8ac"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run13.json",
+   "sha256": "6a0d61cfa6281887e017271008a2e4a45cd350edcbded8dc3a86145c3fd85e4d"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run2.json",
+   "sha256": "6ef815dc38b908897deab8f9492f478f8e0a535bf3664ee9312c4dd317d38436"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run3.json",
+   "sha256": "bd62f866b41d8903e6fc414d21566a2ffa3e9ab1a201cecf71296a87b74a453b"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run4.json",
+   "sha256": "843746340d2bf1f8855f7b4f3bc8ac61fbce6623f468885dee1a974aa7c11828"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run5.json",
+   "sha256": "f3d4e17be180bc7c134c548f03c030d9dad05bd26e83c95e954fd90dd2bd6c65"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run6.json",
+   "sha256": "0bae5ba6c016aad9a78e8c0ff65780641a645c81493c279d6d924c3261b42f3a"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run7.json",
+   "sha256": "385e0601e6c6e0f81c37dc3e6dc6a3278091499d3fce33b8c9bff39b87b5200c"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run8.json",
+   "sha256": "98b8070d18b01cd6488cece67116e9c76f75d4781a780b06db1a3decf3cbbd55"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s1_run9.json",
+   "sha256": "7be8c9544b533ad0d311fd643bec743a83a87f7319d38f12934017a7159116fb"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run10.json",
+   "sha256": "1f9233dfffacb21a35557f541e9fd151582cc05bd187ba5a6195f27141fb2cd6"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run11.json",
+   "sha256": "1b0c191a00be67a23225bf1d8ea61d7aad443bd4a82fe747fc072915a5ef8d3b"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run12.json",
+   "sha256": "6f4f5e07dc45ac1539cf1b5c186bb94143f7697f0cf51a3e480ac96f1ac2f33d"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run13.json",
+   "sha256": "c72f57e248acad6f0b6788565c5298255d0ab1b2ea11bc6f45a61cc6c883987f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run2.json",
+   "sha256": "25d15742a0fd9fe3b3b452cab82575cda0ae934afdd760f68c8098e8a8c8418e"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run3.json",
+   "sha256": "3f4398170012cbc144ec1840fa49fb4357c40fdd98637f54471a07a4c202c357"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run4.json",
+   "sha256": "5dbb1d8535d9b7dafd861d31643ad93f25ac41a31cbc70451b71f681faf5ce3f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run5.json",
+   "sha256": "9dba5d2feb46cdc3eed0cb423b64f0f5f52bb139fddd657d1c5e2d57c2eaa5b8"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run6.json",
+   "sha256": "eb2faca05751582e77d8a5893b7d1d6168b147f788b29b6c8ae4e39f69b3871d"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run7.json",
+   "sha256": "e9b646d20d622c692aa364ea8864d6296517a3514a1e85d3bb092dcff24f81b2"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run8.json",
+   "sha256": "2d4ece58def3431c078ee1f42a3105d122ef4369ee3859bcf12937c7bc96dfc8"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s2_run9.json",
+   "sha256": "ec388aa7d524dfd276c87d92c46292c6d84867fc565b53cb3af14b8c3f8131b7"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run10.json",
+   "sha256": "fdd16771b974d3761be7e43867aedc0a7d7bf85c7958d0399450d5c8f95be889"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run11.json",
+   "sha256": "ce20c778b4eae49f47e3174109a0783b37d3324c11f771e2b6cdb1d4adc7fed2"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run12.json",
+   "sha256": "f11f59ef0d5dfc730ca1a6075de9c3e1a5586459b6aca7029cf74a1080bc2b60"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run13.json",
+   "sha256": "50053e5c624edf5514fe0b5152487dd629a16f235844aba08943ad708502c8f3"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run2.json",
+   "sha256": "3d084a00ba39e42a3d8b8392006c309d460c75e213caf0edd3e46464f44abd6b"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run3.json",
+   "sha256": "9318f97d12d14524902485ca56b1c7c0b45a9569723c7da697fb4497c49b3abd"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run4.json",
+   "sha256": "ad7135ecca300e82caa858d1aa1de4be0ee6489b7158aa68ddd5a87979ae13b8"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run5.json",
+   "sha256": "fc609f88b2af84cb8acbb9a721fe7aace13f553eb43a934781a01b5ad4d05f1f"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run6.json",
+   "sha256": "31b2a8f68ae64275224ca243a79dc86fd423346e48584e1d64684521aad8a5a7"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run7.json",
+   "sha256": "e3c2f954d4d136c1a91e9e00abd9c6ad91f08cc2ced61708549c373237be6d97"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run8.json",
+   "sha256": "b339a26873e148fc826f7d4f45ba65d21b98581bce9250b91851b32d9cacfa15"
+  },
+  {
+   "path": "../../jv_cover_negrho_rescore_20261101/results/new/rhostrong_p1601_s3_run9.json",
+   "sha256": "cce827505e3ed1c8dc7412a2264d995e03d18c120e4d33aa19252765a52bc7c9"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1301_s1.json",
+   "sha256": "056a5fe1543f1b5bcedfdd12d9570e2fd70f07fc08dd5e3c78173ef0299530c6"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1301_s2.json",
+   "sha256": "a42bc9d41dbe95462fb2ad6d942f464a65808c9022a6a3a91a2d2cce500cb33a"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1301_s3.json",
+   "sha256": "1b5a691473e9cd1eff529407c67f422822ac33dcc1dfef434641bf090714d561"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1451_s1.json",
+   "sha256": "6c7ec8c2247bf3d46b4be7730148f26d79920f5851944f674c9a1b2093150a47"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1451_s2.json",
+   "sha256": "acb38b8b1fe5f4f544dff0593cf961efff05dc805ae2dd554d46dd6634b88646"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1451_s3.json",
+   "sha256": "4e223f3a145f2ce9da81916ee428771120efc2985d629723e95bea5ccb3e281d"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1601_s1.json",
+   "sha256": "ebbdf992c9653da9f61d1302f3a3c81e18845a2acc244dcf5eb03a2391963fbe"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1601_s2.json",
+   "sha256": "c7a9d949a8a49eb24a9f98e8c2c3509c8655cc172a76db652033b3220cc18c3a"
+  },
+  {
+   "path": "../../jv_cover_fbline_20261102/results/line_p1601_s3.json",
+   "sha256": "094413b2f432c8d7d303b69fcd4c9ad94c9636c7328e0c9edcf0693e4e47e3fd"
+  },
+  {
+   "path": "../rescore/fit.json",
+   "sha256": "180ece4151ebba942d0aa2a592f94a03e325574b9189e5b6f016931cedd343f8"
+  },
+  {
+   "path": "rescore_fresh_run0-13/fit.json",
+   "sha256": "180ece4151ebba942d0aa2a592f94a03e325574b9189e5b6f016931cedd343f8"
+  },
+  {
+   "path": "rescore_fresh_run14-27/fit.json",
+   "sha256": "24501788034724501a1623decc01c6bc82d347d3ec961755b00299641146acee"
+  },
+  {
+   "path": "rescore_combined_run0-27/fit.json",
+   "sha256": "f423da94c0c1ce5abf792d82ebe071d0f92b208526da598f20620aeba45bfe07"
+  },
+  {
+   "path": "VALIDATION.json",
+   "sha256": "681d8d15679a096897b7044b5b3a8452c987514443747e52cf91cd05d6938a22"
+  },
+  {
+   "path": "replay-certificate.json",
+   "sha256": "a99691f6ca7a2ed75458b4b56b4b8e9d3fe49ef8c2254390c5ccf5e569c7d6a2"
+  },
+  {
+   "path": "../run.sh",
+   "sha256": "9d5301773fed25fad41a1c961525e7322a6ec04d904b1f91960e5c2b65233d5e"
+  },
+  {
+   "path": "pod_run.sh",
+   "sha256": "2f5fc65498a53738cd419dbfefa06c999eb85715144f6a2bb8a255707191a32c"
+  },
+  {
+   "path": "pod_run2.sh",
+   "sha256": "87556e1bd1495c163a21ac047fd16a57e1f3a8ace62913355453f759102da730"
+  },
+  {
+   "path": "../results/SOURCE_COMMIT",
+   "sha256": "5c08557a946b84fffef5abea82bcfe5df5fbaa84a5805d59f2ff310942b895fd"
+  },
+  {
+   "path": "../results/BINARY.sha256",
+   "sha256": "4cb43e3aec4a7b7d995d352ceac8ea030f49f9d968928ae2fd78d3ce9d60147d"
+  }
+ ],
+ "headline": [
+  {
+   "name": "pooled_0-13|U1|p1301|w=0|S/rho",
+   "claimed": 0.4172921838141875,
+   "recomputed": 0.4172921838141876,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1301|w=0.1|S/rho",
+   "claimed": 0.674800095914727,
+   "recomputed": 0.6748000959147271,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1301|w=1|S/rho",
+   "claimed": 0.8038523456798582,
+   "recomputed": 0.8038523456798582,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1451|w=0|S/rho",
+   "claimed": 0.3481444788486205,
+   "recomputed": 0.34814447884862065,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1451|w=0.1|S/rho",
+   "claimed": 0.562708386766279,
+   "recomputed": 0.5627083867662791,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1451|w=1|S/rho",
+   "claimed": 0.670238899721724,
+   "recomputed": 0.6702388997217239,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1601|w=0|S/rho",
+   "claimed": 0.28934331307374006,
+   "recomputed": 0.28934331307374017,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1601|w=0.1|S/rho",
+   "claimed": 0.46782814355950625,
+   "recomputed": 0.46782814355950636,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p1601|w=1|S/rho",
+   "claimed": 0.5572773250112802,
+   "recomputed": 0.5572773250112802,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1301|w=0|S/rho",
+   "claimed": 1.0027981874083627,
+   "recomputed": 1.0027981874083627,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1301|w=0.1|S/rho",
+   "claimed": 0.8613546417277582,
+   "recomputed": 0.8613546417277584,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1301|w=1|S/rho",
+   "claimed": 0.8308658732558395,
+   "recomputed": 0.8308658732558397,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1451|w=0|S/rho",
+   "claimed": 0.8366287840681959,
+   "recomputed": 0.8366287840681959,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1451|w=0.1|S/rho",
+   "claimed": 0.7182741730693566,
+   "recomputed": 0.7182741730693568,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1451|w=1|S/rho",
+   "claimed": 0.6927623358943403,
+   "recomputed": 0.6927623358943403,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1601|w=0|S/rho",
+   "claimed": 0.6953232318827154,
+   "recomputed": 0.6953232318827154,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1601|w=0.1|S/rho",
+   "claimed": 0.5971634346607779,
+   "recomputed": 0.597163434660778,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p1601|w=1|S/rho",
+   "claimed": 0.5760046776993281,
+   "recomputed": 0.5760046776993283,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U1|p* model (b)",
+   "claimed": 874.2545884633071,
+   "recomputed": 874.2545884633071,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|U2|p* model (b)",
+   "claimed": 1327.2677276551556,
+   "recomputed": 1327.2677276551556,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|rho steps/sqrt(l) mean (b)",
+   "claimed": 0.9324185811309637,
+   "recomputed": 0.9324185811309638,
+   "rel_tol": 1e-09,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "pooled_0-13|rho positive-control z (b)",
+   "claimed": 1.1495067912486059,
+   "recomputed": 1.1495067912486088,
+   "rel_tol": 1e-06,
+   "claimed_from": "../rescore/fit.json (study, = rescore_fresh_run0-13/fit.json)"
+  },
+  {
+   "name": "fresh_14-27|U1|p1301|w=0|S/rho",
+   "claimed": 0.4367318958544316,
+   "recomputed": 0.43673189585443156,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1301|w=0.1|S/rho",
+   "claimed": 0.7062370094372624,
+   "recomputed": 0.7062370094372625,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1301|w=1|S/rho",
+   "claimed": 0.841302072951958,
+   "recomputed": 0.8413020729519584,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1451|w=0|S/rho",
+   "claimed": 0.3643629192597441,
+   "recomputed": 0.3643629192597441,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1451|w=0.1|S/rho",
+   "claimed": 0.5889232835931644,
+   "recomputed": 0.5889232835931645,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1451|w=1|S/rho",
+   "claimed": 0.7014638680092797,
+   "recomputed": 0.70146386800928,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1601|w=0|S/rho",
+   "claimed": 0.30282247924338085,
+   "recomputed": 0.3028224792433808,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1601|w=0.1|S/rho",
+   "claimed": 0.48962285429165614,
+   "recomputed": 0.48962285429165625,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p1601|w=1|S/rho",
+   "claimed": 0.5832396599459964,
+   "recomputed": 0.5832396599459967,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1301|w=0|S/rho",
+   "claimed": 1.0495140792070399,
+   "recomputed": 1.04951407920704,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1301|w=0.1|S/rho",
+   "claimed": 0.9014829880098764,
+   "recomputed": 0.9014829880098767,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1301|w=1|S/rho",
+   "claimed": 0.8695741733931219,
+   "recomputed": 0.8695741733931224,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1451|w=0|S/rho",
+   "claimed": 0.875603585023109,
+   "recomputed": 0.8756035850231091,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1451|w=0.1|S/rho",
+   "claimed": 0.7517367601921402,
+   "recomputed": 0.7517367601921404,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1451|w=1|S/rho",
+   "claimed": 0.7250366815917065,
+   "recomputed": 0.7250366815917068,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1601|w=0|S/rho",
+   "claimed": 0.7277152378452388,
+   "recomputed": 0.727715237845239,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1601|w=0.1|S/rho",
+   "claimed": 0.6249837770983828,
+   "recomputed": 0.624983777098383,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p1601|w=1|S/rho",
+   "claimed": 0.6028395287415237,
+   "recomputed": 0.602839528741524,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U1|p* model (b)",
+   "claimed": 893.4174391798371,
+   "recomputed": 893.4174391798371,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|U2|p* model (b)",
+   "claimed": 1356.3603077725738,
+   "recomputed": 1356.3603077725738,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|rho steps/sqrt(l) mean (b)",
+   "claimed": 0.8909130614310669,
+   "recomputed": 0.8909130614310669,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "fresh_14-27|rho positive-control z (b)",
+   "claimed": 0.07867157501000072,
+   "recomputed": 0.0786715750100007,
+   "rel_tol": 1e-06,
+   "claimed_from": "rescore_fresh_run14-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1301|w=0|S/rho",
+   "claimed": 0.4267907917376786,
+   "recomputed": 0.4267907917376785,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1301|w=0.1|S/rho",
+   "claimed": 0.6901607492802745,
+   "recomputed": 0.690160749280274,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1301|w=1|S/rho",
+   "claimed": 0.8221509629839929,
+   "recomputed": 0.8221509629839923,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1451|w=0|S/rho",
+   "claimed": 0.3560691130343969,
+   "recomputed": 0.3560691130343968,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1451|w=0.1|S/rho",
+   "claimed": 0.5755174668587861,
+   "recomputed": 0.5755174668587858,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1451|w=1|S/rho",
+   "claimed": 0.6854959866659432,
+   "recomputed": 0.6854959866659426,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1601|w=0|S/rho",
+   "claimed": 0.2959294864859773,
+   "recomputed": 0.29592948648597717,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1601|w=0.1|S/rho",
+   "claimed": 0.4784774395382271,
+   "recomputed": 0.47847743953822686,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p1601|w=1|S/rho",
+   "claimed": 0.569962993663561,
+   "recomputed": 0.5699629936635605,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1301|w=0|S/rho",
+   "claimed": 1.0256244465410125,
+   "recomputed": 1.0256244465410125,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1301|w=0.1|S/rho",
+   "claimed": 0.8809620841557414,
+   "recomputed": 0.8809620841557406,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1301|w=1|S/rho",
+   "claimed": 0.8497794513376978,
+   "recomputed": 0.8497794513376971,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1451|w=0|S/rho",
+   "claimed": 0.8556726013215248,
+   "recomputed": 0.8556726013215247,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1451|w=0.1|S/rho",
+   "claimed": 0.7346246039066654,
+   "recomputed": 0.7346246039066647,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1451|w=1|S/rho",
+   "claimed": 0.7085321670474289,
+   "recomputed": 0.7085321670474283,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1601|w=0|S/rho",
+   "claimed": 0.7111505722899863,
+   "recomputed": 0.7111505722899862,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1601|w=0.1|S/rho",
+   "claimed": 0.6107569617609762,
+   "recomputed": 0.6107569617609757,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p1601|w=1|S/rho",
+   "claimed": 0.589116673025952,
+   "recomputed": 0.5891166730259515,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U1|p* model (b)",
+   "claimed": 883.6750283951516,
+   "recomputed": 883.6750283951516,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|U2|p* model (b)",
+   "claimed": 1341.5696126630799,
+   "recomputed": 1341.5696126630799,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|rho steps/sqrt(l) mean (b)",
+   "claimed": 0.9116658212810151,
+   "recomputed": 0.9116658212810153,
+   "rel_tol": 1e-09,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "combined_0-27|rho positive-control z (b)",
+   "claimed": 0.8807348017521166,
+   "recomputed": 0.8807348017521209,
+   "rel_tol": 1e-06,
+   "claimed_from": "rescore_combined_run0-27/fit.json"
+  },
+  {
+   "name": "VALIDATION.json gae_band U2 p1601 w=0 ic",
+   "claimed": 0.2697386483248473,
+   "recomputed": 0.2697386483248473,
+   "rel_tol": 1e-09,
+   "claimed_from": "VALIDATION.json"
+  },
+  {
+   "name": "VALIDATION.json gae_band U2 p1601 w=0 rho",
+   "claimed": 0.3879327425814328,
+   "recomputed": 0.38793274258143273,
+   "rel_tol": 1e-09,
+   "claimed_from": "VALIDATION.json"
+  },
+  {
+   "name": "VALIDATION.json gae_band U2 p1601 w=0.1 ic",
+   "claimed": 1.1757366225394175,
+   "recomputed": 1.1757366225394175,
+   "rel_tol": 1e-09,
+   "claimed_from": "VALIDATION.json"
+  },
+  {
+   "name": "VALIDATION.json gae_band U2 p1601 w=0.1 rho",
+   "claimed": 1.9688690805512918,
+   "recomputed": 1.9688690805512916,
+   "rel_tol": 1e-09,
+   "claimed_from": "VALIDATION.json"
+  },
+  {
+   "name": "VALIDATION.json gae_band U2 p1601 w=1 ic",
+   "claimed": 9.329718332514483,
+   "recomputed": 9.329718332514483,
+   "rel_tol": 1e-09,
+   "claimed_from": "VALIDATION.json"
+  },
+  {
+   "name": "VALIDATION.json gae_band U2 p1601 w=1 rho",
+   "claimed": 16.197296122280022,
+   "recomputed": 16.197296122280022,
+   "rel_tol": 1e-09,
+   "claimed_from": "VALIDATION.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1301 s1",
+   "claimed": 0.5277718512055668,
+   "recomputed": 0.5277718512055668,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1301 s2",
+   "claimed": 0.5276350428459158,
+   "recomputed": 0.5276350428459158,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1301 s3",
+   "claimed": 0.5279448375292034,
+   "recomputed": 0.5279448375292034,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1451 s1",
+   "claimed": 0.5280055022075258,
+   "recomputed": 0.5280055022075258,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1451 s2",
+   "claimed": 0.5277811923508375,
+   "recomputed": 0.5277811923508375,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1451 s3",
+   "claimed": 0.5279530801319886,
+   "recomputed": 0.5279530801319886,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1601 s1",
+   "claimed": 0.527664673695927,
+   "recomputed": 0.527664673695927,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1601 s2",
+   "claimed": 0.5278169288323132,
+   "recomputed": 0.5278169288323132,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "stage1 S_B/S_A p1601 s3",
+   "claimed": 0.5277352981557637,
+   "recomputed": 0.5277352981557637,
+   "rel_tol": 1e-09,
+   "claimed_from": "../results/paired.json"
+  },
+  {
+   "name": "replay total_muls aa_line_p1301_s1",
+   "claimed": 265597174434,
+   "recomputed": 265597174434,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S aa_line_p1301_s1 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.7287751622892765,
+   "recomputed": 0.7287751622892765,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1301_s1",
+   "claimed": 140174712426,
+   "recomputed": 140174712426,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1301_s1 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.38462701651404885,
+   "recomputed": 0.38462701651404885,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1301_s2",
+   "claimed": 150234219750,
+   "recomputed": 150234219750,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1301_s2 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.41222941502945415,
+   "recomputed": 0.41222941502945415,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1301_s3",
+   "claimed": 135319708867,
+   "recomputed": 135319708867,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1301_s3 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.37130531591288424,
+   "recomputed": 0.37130531591288424,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1451_s1",
+   "claimed": 160577077018,
+   "recomputed": 160577077018,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1451_s1 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.3176020615333068,
+   "recomputed": 0.3176020615333068,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1451_s2",
+   "claimed": 168914503445,
+   "recomputed": 168914503445,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1451_s2 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.33409248399584784,
+   "recomputed": 0.33409248399584784,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1451_s3",
+   "claimed": 162898818503,
+   "recomputed": 162898818503,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1451_s3 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.3221941858346924,
+   "recomputed": 0.3221941858346924,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1601_s1",
+   "claimed": 187545267253,
+   "recomputed": 187545267253,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1601_s1 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.27614304862381717,
+   "recomputed": 0.27614304862381717,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1601_s2",
+   "claimed": 180656654191,
+   "recomputed": 180656654191,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1601_s2 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.26600020352753456,
+   "recomputed": 0.26600020352753456,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay total_muls hilbert_p1601_s3",
+   "claimed": 181461894403,
+   "recomputed": 181461894403,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "replay S hilbert_p1601_s3 (= total_muls/(c_add_e sqrt l))",
+   "claimed": 0.26718584518476646,
+   "recomputed": 0.26718584518476646,
+   "rel_tol": 1e-09,
+   "claimed_from": "replay-certificate.json"
+  },
+  {
+   "name": "single-thread hilbert_check_muls p1301 s1",
+   "claimed": 8875006425,
+   "recomputed": 8875006425,
+   "rel_tol": 1e-09,
+   "claimed_from": "RESULT.md / replay-certificate.json (8.875e9)"
+  }
+ ],
+ "intervals": {
+  "note": "validator bootstrap: 20000 resamples, frozen design of research/jv_cover_negrho_rescore_20261101/PROTOCOL.md (seeds with replacement per prime; reference runs with replacement within each of the 9 instances; one reference resample shared by the three primes and all w), numpy PCG64 seed 20261112, not the tool's splitmix64 stream: agreement is within Monte Carlo error only",
+  "cells": [
+   {
+    "cell": "pooled_0-13|U1|p1301|w=0",
+    "tool_ci95": [
+     0.381039977667707,
+     0.45945279229943653
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.380921,
+     0.458739
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000714,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1301|w=0.1",
+    "tool_ci95": [
+     0.616071617429086,
+     0.7431700335413841
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.615847,
+     0.741954
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001216,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1301|w=1",
+    "tool_ci95": [
+     0.7338379334249193,
+     0.8854139322483189
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.733566,
+     0.883919
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001495,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1451|w=0",
+    "tool_ci95": [
+     0.32082151137197584,
+     0.3788486012227082
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.320507,
+     0.379405
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000557,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1451|w=0.1",
+    "tool_ci95": [
+     0.5185297205372622,
+     0.6123510940181933
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.518055,
+     0.613257
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000905,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1451|w=1",
+    "tool_ci95": [
+     0.6176203919372675,
+     0.729376295556799
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.617027,
+     0.730447
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001071,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1601|w=0",
+    "tool_ci95": [
+     0.267211215887354,
+     0.31443466324578034
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.266995,
+     0.314884
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000449,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1601|w=0.1",
+    "tool_ci95": [
+     0.43203241321560887,
+     0.5084212832617367
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.431646,
+     0.509153
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000731,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U1|p1601|w=1",
+    "tool_ci95": [
+     0.5146233318226808,
+     0.6056572668558418
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.514164,
+     0.606521
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000863,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1301|w=0",
+    "tool_ci95": [
+     0.9156800308518932,
+     1.1041149911437889
+    ],
+    "tool_verdict": "not resolved",
+    "validator_ci95": [
+     0.915394,
+     1.1024
+    ],
+    "validator_verdict": "not resolved",
+    "max_abs_end_diff": 0.001715,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1301|w=0.1",
+    "tool_ci95": [
+     0.786389722429342,
+     0.9486263720993983
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.786103,
+     0.947075
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001552,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1301|w=1",
+    "tool_ci95": [
+     0.7584985801302317,
+     0.9151683971078637
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.758217,
+     0.913624
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001545,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1451|w=0",
+    "tool_ci95": [
+     0.7709685050952242,
+     0.9104143923723315
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.770213,
+     0.911752
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001338,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1451|w=0.1",
+    "tool_ci95": [
+     0.6618813791659511,
+     0.7816415963600134
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.661275,
+     0.782797
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001156,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1451|w=1",
+    "tool_ci95": [
+     0.6383754977724903,
+     0.7538871223711239
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.637762,
+     0.754994
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001107,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1601|w=0",
+    "tool_ci95": [
+     0.6421372654780171,
+     0.7556206561959364
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.641617,
+     0.7567
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.00108,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1601|w=0.1",
+    "tool_ci95": [
+     0.5514713069805098,
+     0.6489793310296421
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.550979,
+     0.649913
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000934,
+    "same_verdict": true
+   },
+   {
+    "cell": "pooled_0-13|U2|p1601|w=1",
+    "tool_ci95": [
+     0.5319172476606276,
+     0.6260105035645646
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.531442,
+     0.626903
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000892,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1301|w=0",
+    "tool_ci95": [
+     0.39834943289523145,
+     0.48078361009975523
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.397914,
+     0.480874
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000436,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1301|w=0.1",
+    "tool_ci95": [
+     0.6441051070094073,
+     0.7777050375215705
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.643401,
+     0.777759
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000704,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1301|w=1",
+    "tool_ci95": [
+     0.7672205731185101,
+     0.9265207875726552
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.766383,
+     0.926557
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000838,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1451|w=0",
+    "tool_ci95": [
+     0.33586728061556037,
+     0.3978860614378749
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.33583,
+     0.397015
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000871,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1451|w=0.1",
+    "tool_ci95": [
+     0.5427779355703837,
+     0.6431938780202342
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.542803,
+     0.641806
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001388,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1451|w=1",
+    "tool_ci95": [
+     0.6464936485981625,
+     0.7661127827107136
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.646524,
+     0.76442
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001693,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1601|w=0",
+    "tool_ci95": [
+     0.2796103857049416,
+     0.3301030833394669
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.279688,
+     0.32953
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000573,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1601|w=0.1",
+    "tool_ci95": [
+     0.452093476219858,
+     0.5337693729682875
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.452212,
+     0.532855
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000914,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U1|p1601|w=1",
+    "tool_ci95": [
+     0.53851449400476,
+     0.6358294156611813
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.538689,
+     0.634747
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001082,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1301|w=0",
+    "tool_ci95": [
+     0.9572766824776773,
+     1.155375388377316
+    ],
+    "tool_verdict": "not resolved",
+    "validator_ci95": [
+     0.956229,
+     1.155594
+    ],
+    "validator_verdict": "not resolved",
+    "max_abs_end_diff": 0.001047,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1301|w=0.1",
+    "tool_ci95": [
+     0.8221737718115479,
+     0.9927096055654832
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.821275,
+     0.992778
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000898,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1301|w=1",
+    "tool_ci95": [
+     0.7930030912507382,
+     0.9576567740818781
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.792137,
+     0.957694
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000866,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1451|w=0",
+    "tool_ci95": [
+     0.8071253313227968,
+     0.9561636129151877
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.807035,
+     0.954071
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.002092,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1451|w=0.1",
+    "tool_ci95": [
+     0.6928336951718598,
+     0.8210113678194493
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.692866,
+     0.81924
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001771,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1451|w=1",
+    "tool_ci95": [
+     0.668219101432694,
+     0.7918582606077735
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.668251,
+     0.790108
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.00175,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1601|w=0",
+    "tool_ci95": [
+     0.671933909555202,
+     0.7932737318148319
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.67212,
+     0.791896
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001378,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1601|w=0.1",
+    "tool_ci95": [
+     0.5770787547155148,
+     0.6813354715531222
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.57723,
+     0.680169
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001167,
+    "same_verdict": true
+   },
+   {
+    "cell": "fresh_14-27|U2|p1601|w=1",
+    "tool_ci95": [
+     0.5566113123802904,
+     0.65719666815411
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.556792,
+     0.656078
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.001118,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1301|w=0",
+    "tool_ci95": [
+     0.3973925084233456,
+     0.4612490818703744
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.39701,
+     0.460937
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000382,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1301|w=0.1",
+    "tool_ci95": [
+     0.6424524974793449,
+     0.7460782246495283
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.641829,
+     0.745654
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000623,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1301|w=1",
+    "tool_ci95": [
+     0.7652687006950373,
+     0.8888401446783538
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.764515,
+     0.888333
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000753,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1451|w=0",
+    "tool_ci95": [
+     0.33494415107556463,
+     0.3796927846336577
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.334942,
+     0.379582
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.00011,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1451|w=0.1",
+    "tool_ci95": [
+     0.5413096507041989,
+     0.6138064820522524
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.541374,
+     0.613619
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000187,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1451|w=1",
+    "tool_ci95": [
+     0.6447722091330103,
+     0.731139567237866
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.644821,
+     0.730913
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000227,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1601|w=0",
+    "tool_ci95": [
+     0.2790047818687174,
+     0.31474881480521105
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.279019,
+     0.3147
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 4.9e-05,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1601|w=0.1",
+    "tool_ci95": [
+     0.45110463141309737,
+     0.5089582011495768
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.45107,
+     0.508863
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 9.5e-05,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U1|p1601|w=1",
+    "tool_ci95": [
+     0.5373470164128584,
+     0.6062882092227001
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.537306,
+     0.606173
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000115,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1301|w=0",
+    "tool_ci95": [
+     0.9549770797506241,
+     1.1084316925931255
+    ],
+    "tool_verdict": "not resolved",
+    "validator_ci95": [
+     0.954059,
+     1.107683
+    ],
+    "validator_verdict": "not resolved",
+    "max_abs_end_diff": 0.000918,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1301|w=0.1",
+    "tool_ci95": [
+     0.8200640436748348,
+     0.9523388625678275
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.819269,
+     0.951797
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000796,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1301|w=1",
+    "tool_ci95": [
+     0.7909856104539829,
+     0.9187098001137328
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.790207,
+     0.918186
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000779,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1451|w=0",
+    "tool_ci95": [
+     0.8049068654525738,
+     0.9124429925956138
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.804901,
+     0.912178
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000265,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1451|w=0.1",
+    "tool_ci95": [
+     0.6909594996810151,
+     0.7834993236532742
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.691041,
+     0.78326
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000239,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1451|w=1",
+    "tool_ci95": [
+     0.6664397901797823,
+     0.7557096663735711
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.66649,
+     0.755475
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000235,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1601|w=0",
+    "tool_ci95": [
+     0.6704785492839116,
+     0.7563755836621275
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.670512,
+     0.756259
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000117,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1601|w=0.1",
+    "tool_ci95": [
+     0.5758164809304677,
+     0.6496647482946496
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.575772,
+     0.649543
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000121,
+    "same_verdict": true
+   },
+   {
+    "cell": "combined_0-27|U2|p1601|w=1",
+    "tool_ci95": [
+     0.555404591397367,
+     0.6266626598777465
+    ],
+    "tool_verdict": "below",
+    "validator_ci95": [
+     0.555363,
+     0.626543
+    ],
+    "validator_verdict": "below",
+    "max_abs_end_diff": 0.000119,
+    "same_verdict": true
+   }
+  ],
+  "all_verdicts_agree": true,
+  "max_abs_end_diff": 0.002092
+ },
+ "homogeneity": {
+  "pooled_0-13": {
+   "F": 1.1604260934337678,
+   "H": 2.078454478904422,
+   "perm_p_F": 0.3128343582820859,
+   "perm_p_H": 0.3505324733763312
+  },
+  "fresh_14-27": {
+   "F": 0.6272787135068345,
+   "H": 0.8422875711964569,
+   "perm_p_F": 0.5332733363331833,
+   "perm_p_H": 0.6573671316434179
+  },
+  "combined_0-27": {
+   "F": 0.09570681507170964,
+   "H": 0.1767497512839135,
+   "perm_p_F": 0.9061546922653867,
+   "perm_p_H": 0.9146542672866357
+  }
+ },
+ "certificate_check": [
+  {
+   "w_nonresidue": true,
+   "s_noncube_in_Fp2": true,
+   "G_on_curve": true,
+   "Q_on_curve": true,
+   "G_not_inf": true,
+   "l_prime": true,
+   "lG_is_O": true,
+   "ddG_eq_Q": true,
+   "dd_eq_d": true,
+   "dd_lt_l": true,
+   "neg_control_dd_plus_1_fails": true,
+   "ok": true,
+   "p": 1301,
+   "seed": 3,
+   "l": 1212282366205077161,
+   "d": 886293798800496412,
+   "dd": 886293798800496412
+  }
+ ],
+ "local_replay": {
+  "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU shared container (a third host: neither the producer container run nor the RunPod EPYC pod), Linux 6.18.44",
+  "binary": {
+   "sha256": "a98c009dba6ef7ae03abef3c4e9f9f98224c1a7c287241b6667f5f7b55ccb2cf",
+   "origin": "copy of the shared target/release/examples/jv_cover (mtime 2026-11-12T07:33:23Z, built before this validation task from the branch worktree; it contains the opt-in JV_SIEVE_EMIT path, so its source is later than dd00d429). It is neither the study binary f35af5d3 nor the pod binary 9ccf9217: a cross-build check",
+   "rustc": "1.97.0"
+  },
+  "draw": {
+   "file": "DRAW.txt (validator scratch)",
+   "time": "2026-11-12T21:43:39Z",
+   "nonce": "0d6a898351587634ef3c4371529aa3cb48e0eb8abbbd62732fdf12cbc8242b13 = sha256(HEAD sha | UTC time | label)",
+   "rule": "rho: uniform over the 95 fresh-sample runs (14-27) whose pod wall was below 900 s (cost cap for the 20-minute local limit); cover: uniform over p = 1301 seeds 1-3 (cost cap; a p = 1601 run single-threaded would exceed the local limit)",
+   "drawn": [
+    "rho_fresh_run14-27/rhostrong_p1451_s1_run21",
+    "hilbert_p1301_s3"
+   ]
+  },
+  "runs": [
+   {
+    "run": "rhostrong p=1451 seed 1 run 21 (fresh sample)",
+    "command": "RAYON_NUM_THREADS=1 jv_cover --exp rhostrong --sizes 1451 --first-seed 1 --seeds 1 --neg 1 --batch 16 --r 256 --dp-bits 16 --run 21",
+    "record": "rho_fresh_run14-27/rhostrong_p1451_s1_run21.json",
+    "replay_sha256": "49216c910fa6d3ae4c9cd4bd3fb569355cb7cfd97320f7aa7ef19120c501e93d",
+    "fields_compared": 35,
+    "differing_except_wall_ms": [],
+    "identical_except_wall_ms": true,
+    "correct": true,
+    "capped": false,
+    "steps": 1277433628,
+    "wall_s_local": 467.8
+   },
+   {
+    "run": "hilbert p=1301 seed 3 (cover arm B)",
+    "command": "JV_FB_LINE=65536 JV_DUMP_INSTANCE=<file> RAYON_NUM_THREADS=1 jv_cover --exp dlp --rho-runs 0 --rho-ref 1.3 --check-every 64 --stop hilbert:16 --sizes 1301 --first-seed 3 --seeds 1",
+    "record": "../results/hilbert_p1301_s3.json",
+    "replay_sha256": "54cbab29ec2d23b4cc058af6bb4df4c266e66d2f09618b63330f8b81b5215646",
+    "fields_compared_excluding_ms": 73,
+    "differing": [
+     "[0].f4_muls_per_test_sum",
+     "[0].hilbert_check_muls"
+    ],
+    "identical_counted_fields": true,
+    "total_muls": 135319708867,
+    "s": 0.37130531591288424,
+    "relation_digest": 7945254227474834773,
+    "single_thread_f4_muls_per_test_sum_over_f4_muls_minus_1": -5.256010592924465e-05,
+    "single_thread_hilbert_check_muls": 8563388671,
+    "single_thread_hilbert_check_over_f4": 0.11091980808936655,
+    "committed_hilbert_check_muls": 62126945509,
+    "wall_s_local": 941,
+    "note": "JV_DUMP_INSTANCE only reads values (its doc comment); the record is identical in every counted field with it set, which confirms that"
+   },
+   {
+    "run": "preregistered control C4 (not run by the study): positive control of the Hilbert stop",
+    "command": "RAYON_NUM_THREADS=1 jv_cover --exp ccov --sizes 101 --seeds 1 --residuals 100 --constructed 20 --oracle-base 60 --stop hilbert:16",
+    "replay_sha256": "d98a106913589f59ca5fcb301e1e5b279381acaf0429ce3d8824e2f2084fa674",
+    "planted_found": 20,
+    "constructed": 20,
+    "oracle_checked": 120,
+    "mismatches": 0,
+    "hilbert_applied": 118,
+    "hilbert_fallbacks": 2,
+    "wall_s_local": 245,
+    "verdict": "pass (20/20 planted decompositions with the stop on, 0 oracle mismatches; equal to research/ic_cover_weakclass_20261023/REPORT.md positive control: 118 applied, 2 fallbacks)"
+   }
+  ],
+  "scratch_outputs_not_committed": "the validator may write only this report; the local records stay in the validator scratchpad and are described here by sha256"
+ },
+ "extra": {
+  "reference": "pooled runs 0-13 (protocol reference), U2",
+  "rho_native_per_sqrt_l": 15.80936337969859,
+  "rho_fp_adds_per_sqrt_l": 42.09185716102513,
+  "cells": {
+   "U2_p1301_w0.1": {
+    "ratio_as_reported": 0.8613546417277584,
+    "cover_native_factor_to_reach_1": 1.2089,
+    "ratio_if_fb_line_lookups_priced_as_native": 0.8652915157067462,
+    "ratio_if_F_p_additions_priced_as_native_on_both_arms_MODEL": 1.46443486580358
+   },
+   "U2_p1301_w1": {
+    "ratio_as_reported": 0.8308658732558397,
+    "cover_native_factor_to_reach_1": 1.2096,
+    "ratio_if_fb_line_lookups_priced_as_native": 0.8356513732183777,
+    "ratio_if_F_p_additions_priced_as_native_on_both_arms_MODEL": 1.4920858985761054
+   },
+   "U2_p1451_w0.1": {
+    "ratio_as_reported": 0.7182741730693567,
+    "cover_native_factor_to_reach_1": 1.5091,
+    "ratio_if_fb_line_lookups_priced_as_native": 0.7214368757602849,
+    "ratio_if_F_p_additions_priced_as_native_on_both_arms_MODEL": 1.2210459606999187
+   },
+   "U2_p1451_w1": {
+    "ratio_as_reported": 0.6927623358943404,
+    "cover_native_factor_to_reach_1": 1.4567,
+    "ratio_if_fb_line_lookups_priced_as_native": 0.69660677677536,
+    "ratio_if_F_p_additions_priced_as_native_on_both_arms_MODEL": 1.2440717194450504
+   },
+   "U2_p1601_w0.1": {
+    "ratio_as_reported": 0.597163434660778,
+    "cover_native_factor_to_reach_1": 1.8754,
+    "ratio_if_fb_line_lookups_priced_as_native": 0.5997610318151837,
+    "ratio_if_F_p_additions_priced_as_native_on_both_arms_MODEL": 1.015064997394854
+   },
+   "U2_p1601_w1": {
+    "ratio_as_reported": 0.5760046776993283,
+    "cover_native_factor_to_reach_1": 1.758,
+    "ratio_if_fb_line_lookups_priced_as_native": 0.5791621998426166,
+    "ratio_if_F_p_additions_priced_as_native_on_both_arms_MODEL": 1.0342168390678717
+   }
+  },
+  "prereg_band_prediction_hilbert_over_plain": {
+   "prediction": "0.54 [0.50, 0.60] at w = 0, 0.1 and 1 (claim); band: stays in [0.50, 0.62] at w = 0.1 and w = 1",
+   "measured_geomean": {
+    "p1301_w0": 0.5277838953049394,
+    "p1451_w0": 0.527913249536148,
+    "p1601_w0": 0.5277389632277913,
+    "p1301_w0.1": 0.8206378747035962,
+    "p1451_w0.1": 0.8206362570349854,
+    "p1601_w0.1": 0.8205709403572894,
+    "p1301_w1": 0.9590876620784891,
+    "p1451_w1": 0.9590728225992617,
+    "p1601_w1": 0.9590401714760493
+   },
+   "held_at_w0": true,
+   "held_at_w0.1": false,
+   "held_at_w1": false
+  }
+ },
+ "headline_summary": {
+  "n": 102,
+  "n_disagree": 0,
+  "disagree": []
+ }
+}

@@ -28,7 +28,30 @@
 //!   bsgs2: param = mf (baby x-classes = mf sqrt(nT)/2)
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::cell::Cell;
-use std::collections::HashMap;
+// The hash tables of every arm. Default build: std HashMap (SipHash, RandomState). With the cargo feature
+// `mt-fasthash`: the same tables with a fast multiplicative hasher (MtFastH). Counted operations are identical in
+// both builds (a hash-table operation is counted per call, whatever the hasher); only wall time differs.
+#[cfg(not(feature = "mt-fasthash"))]
+type HState = std::collections::hash_map::RandomState;
+#[cfg(feature = "mt-fasthash")]
+type HState = std::hash::BuildHasherDefault<MtFastH>;
+type HashMap<K, V> = std::collections::HashMap<K, V, HState>;
+#[derive(Default)]
+#[allow(dead_code)]
+struct MtFastH(u64);
+impl std::hash::Hasher for MtFastH {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, b: &[u8]) {
+        for &c in b {
+            self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);
+        }
+    }
+    fn write_u64(&mut self, v: u64) {
+        self.0 = (self.0 ^ v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    }
+}
 use std::time::Instant;
 
 type Pt = Option<(u64, u64)>;
@@ -42,6 +65,7 @@ struct F {
     cs: Cell<u64>,
     ch: Cell<u64>,
     cl: Cell<u64>,
+    cn: Cell<u64>,
 }
 
 impl F {
@@ -89,6 +113,11 @@ impl F {
     }
     fn hash(&self) {
         self.ch.set(self.ch.get() + 1);
+    }
+    // unpriced native work (step-index hashes, canonicalisations, distinguished-point tests, W-step indices),
+    // counted so that the section 5a band can price it at h
+    fn native(&self) {
+        self.cn.set(self.cn.get() + 1);
     }
     fn lin(&self, k: u64) {
         self.cl.set(self.cl.get() + k);
@@ -253,7 +282,7 @@ fn main() {
     let param: f64 = args[5].parse().unwrap();
     let num = |v: &serde_json::Value| -> u64 { v.to_string().trim_matches('"').parse().unwrap() };
     let p = num(&d["field"]["modulus"]);
-    assert!(p < (1u64 << 31));
+    assert!(p < (1u64 << 60)); // bank sums of three logs must fit in u64
     let f = F {
         p,
         a: num(&d["a"]),
@@ -263,6 +292,7 @@ fn main() {
         cs: Cell::new(0),
         ch: Cell::new(0),
         cl: Cell::new(0),
+        cn: Cell::new(0),
     };
     let n = num(&d["subgroup_order"]);
     let g: Pt = Some((num(&d["generator"]["x"]), num(&d["generator"]["y"])));
@@ -280,6 +310,7 @@ fn main() {
             cs: Cell::new(0),
             ch: Cell::new(0),
             cl: Cell::new(0),
+            cn: Cell::new(0),
         };
         xs.iter().map(|&x| f0.smul(g, x)).collect()
     };
@@ -310,7 +341,8 @@ fn main() {
             }
             snap.push(("fb".into(), take(&f)));
             // x-only pair-sum table: key x -> (i, j, kind) kind 0: F_i+F_j, 1: F_i-F_j, 2: 2F_i
-            let mut table: HashMap<u64, (u32, u32, u8)> = HashMap::with_capacity(m * m + 8);
+            let mut table: HashMap<u64, (u32, u32, u8)> =
+                HashMap::with_capacity_and_hasher(m * m + 8, Default::default());
             for i in 0..m {
                 let pi = Some(fb[i]);
                 if let Some((x2, _)) = f.padd(pi, pi) {
@@ -360,7 +392,7 @@ fn main() {
             let mut v_log = v0;
             let need = (gfac * m as f64).ceil() as usize;
             let mut rels: Vec<(u32, i8, u32, i8, u64)> = Vec::with_capacity(need);
-            let mut seen_pairs: HashMap<(u32, u32, u8), ()> = HashMap::new();
+            let mut seen_pairs: HashMap<(u32, u32, u8), ()> = HashMap::default();
             let mut p1_trials = 0u64;
             'outer: loop {
                 for k in 0..kw {
@@ -539,6 +571,1096 @@ fn main() {
                 ),
             }
         }
+        "ic5" => {
+            // k-term index calculus: table of x(F_{i1} + s2 F_{i2} + ... + s_k F_{ik}), i1 < ... < ik,
+            // built as x(P +- F_l) from full (k-1)-term points P (shared inversion per pair);
+            // factor-base logs by incremental Gaussian elimination mod n (every mod-n product counted
+            // as M, every mod-n inverse as I); targets by paired trials x(Q +- W_k) as in ic4.
+            let mu = param;
+            let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
+            let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
+            assert!((2..=4).contains(&k));
+            let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
+            let classes = |m: usize| -> f64 {
+                let mut c = 1.0;
+                for i in 0..k {
+                    c *= (m - i) as f64 / (i + 1) as f64;
+                }
+                c * (1u64 << (k - 1)) as f64
+            };
+            let mut m = k + 1;
+            while classes(m) < kstar {
+                m += 1;
+            }
+            let mut fb: Vec<(u64, u64)> = Vec::with_capacity(m);
+            let mut x = 0u64;
+            while fb.len() < m {
+                x += 1;
+                let xx = f.sqr(x);
+                let rhs = f.add(f.add(f.mul(xx, x), f.mul(f.a, x)), f.b);
+                if rhs == 0 {
+                    continue;
+                }
+                if let Some(y) = f.sqrt(rhs) {
+                    fb.push((x, y));
+                }
+            }
+            snap.push(("fb".into(), take(&f)));
+            // (k-1)-term full points: (point, indices, signs); first sign +1.
+            let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
+                .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
+                .collect();
+            for _ in 2..k {
+                let mut next = Vec::new();
+                for (p, idx, sg) in &combos {
+                    let last = *idx.last().unwrap() as usize;
+                    for l in (last + 1)..m {
+                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
+                            if pt.is_some() {
+                                let mut i2 = idx.clone();
+                                i2.push(l as u16);
+                                let mut s2 = sg.clone();
+                                s2.push(s);
+                                next.push((pt, i2, s2));
+                            }
+                        }
+                    }
+                }
+                combos = next;
+            }
+            snap.push(("combos".into(), take(&f)));
+            // table: x -> (combo id, l, sign of F_l)
+            let mut table: HashMap<u64, (u32, u16, i8)> =
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
+            for (ci_, (p, idx, _)) in combos.iter().enumerate() {
+                let last = *idx.last().unwrap() as usize;
+                for l in (last + 1)..m {
+                    if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
+                        f.hash();
+                        table.entry(xp).or_insert((ci_ as u32, l as u16, 1));
+                        f.hash();
+                        table.entry(xm).or_insert((ci_ as u32, l as u16, -1));
+                    }
+                }
+            }
+            snap.push(("table".into(), take(&f)));
+            let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
+                let fl = Some(fb[e.1 as usize]);
+                f.padd(
+                    combos[e.0 as usize].0,
+                    if e.2 > 0 { fl } else { f.pneg(fl) },
+                )
+            };
+            // coefficient vector of an entry: (index, sign) pairs
+            let entry_terms = |e: (u32, u16, i8)| -> Vec<(usize, i64)> {
+                let (_, idx, sg) = &combos[e.0 as usize];
+                let mut v: Vec<(usize, i64)> = idx
+                    .iter()
+                    .zip(sg)
+                    .map(|(&i, &s)| (i as usize, s as i64))
+                    .collect();
+                v.push((e.1 as usize, e.2 as i64));
+                v
+            };
+            // counted arithmetic mod n
+            let mulm = |a: u64, b: u64| -> u64 {
+                f.cm.set(f.cm.get() + 1);
+                ((a as u128 * b as u128) % n as u128) as u64
+            };
+            let invm = |a: u64| -> u64 {
+                f.ci.set(f.ci.get() + 1);
+                let (mut r0, mut r1) = (n as i128, a as i128);
+                let (mut t0, mut t1) = (0i128, 1i128);
+                while r1 != 0 {
+                    let q = r0 / r1;
+                    (r0, r1) = (r1, r0 - q * r1);
+                    (t0, t1) = (t1, t0 - q * t1);
+                }
+                t0.rem_euclid(n as i128) as u64
+            };
+            let w0 = rng.gen_range(1..n);
+            let dd = rng.gen_range(1..n);
+            let dpt = f.smul(g, dd);
+            let mut w_pts: Vec<Pt> = vec![f.smul(g, w0)];
+            let mut w_log: Vec<u64> = vec![w0];
+            let ensure_w = |f: &F, kk: usize, w_pts: &mut Vec<Pt>, w_log: &mut Vec<u64>| {
+                while w_pts.len() <= kk {
+                    let last = *w_pts.last().unwrap();
+                    w_pts.push(f.padd(last, dpt));
+                    w_log.push((w_log.last().unwrap() + dd) % n);
+                }
+            };
+            let kw = 64usize;
+            ensure_w(&f, kw, &mut w_pts, &mut w_log);
+            let e_log = rng.gen_range(1..n);
+            let e_pt = f.smul(g, e_log);
+            let v0 = rng.gen_range(1..n);
+            let mut v_pt = f.smul(g, v0);
+            let mut v_log = v0;
+            // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
+            let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
+            let mut rank = 0usize;
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
+            let mut nrel = 0usize;
+            let budget_rel = (gfac * m as f64).ceil() as usize;
+            let mut p1_trials = 0u64;
+            let mut kk = 0usize;
+            while rank < m {
+                if kk == kw {
+                    kk = 0;
+                    v_pt = f.padd(v_pt, e_pt);
+                    v_log = (v_log + e_log) % n;
+                }
+                p1_trials += 2;
+                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                    for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                        f.hash();
+                        if let Some(&e) = table.get(&xx) {
+                            f.hash();
+                            if seen.insert(e, ()).is_some() {
+                                continue;
+                            }
+                            let wp = if sw > 0 { w_pts[kk] } else { f.pneg(w_pts[kk]) };
+                            let r = f.padd(v_pt, wp);
+                            let eps: i64 = if r == entry_pt(&f, e) { 1 } else { -1 };
+                            let mut row = vec![0u64; m + 1];
+                            for (i, s) in entry_terms(e) {
+                                row[i] = md((row[i] as i128) + (eps * s) as i128, n);
+                            }
+                            row[m] = md(v_log as i128 + sw as i128 * w_log[kk] as i128, n);
+                            nrel += 1;
+                            // reduce against pivots
+                            for c in 0..m {
+                                if row[c] == 0 {
+                                    continue;
+                                }
+                                if let Some(pr) = &pivots[c] {
+                                    let fct = row[c];
+                                    for j in c..=m {
+                                        if pr[j] != 0 {
+                                            row[j] =
+                                                md(row[j] as i128 - mulm(fct, pr[j]) as i128, n);
+                                        }
+                                    }
+                                } else {
+                                    let iv = invm(row[c]);
+                                    for j in c..=m {
+                                        if row[j] != 0 {
+                                            row[j] = mulm(row[j], iv);
+                                        }
+                                    }
+                                    pivots[c] = Some(row.clone());
+                                    rank += 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                kk += 1;
+                if nrel > 50 * budget_rel + 1000 {
+                    panic!("relation budget");
+                }
+            }
+            // back substitution
+            let mut ylog: Vec<u64> = vec![0; m];
+            for c in (0..m).rev() {
+                let pr = pivots[c].as_ref().unwrap();
+                let mut v = pr[m] as i128;
+                for j in (c + 1)..m {
+                    if pr[j] != 0 {
+                        v -= mulm(pr[j], ylog[j]) as i128;
+                    }
+                }
+                ylog[c] = md(v, n);
+            }
+            snap.push(("relations".into(), take(&f)));
+            let mut trials = 0u64;
+            for t in 0..targets {
+                let q = qs[t];
+                let mut kq = 0usize;
+                let v = 'tgt: loop {
+                    ensure_w(&f, kq, &mut w_pts, &mut w_log);
+                    trials += 2;
+                    if q.unwrap().0 == w_pts[kq].unwrap().0 {
+                        break 'tgt if q == w_pts[kq] {
+                            w_log[kq]
+                        } else {
+                            (n - w_log[kq]) % n
+                        };
+                    }
+                    if let Some((xp, xm)) = f.xpair(q, w_pts[kq]) {
+                        for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                            f.hash();
+                            if let Some(&e) = table.get(&xx) {
+                                let dl = md(
+                                    entry_terms(e)
+                                        .iter()
+                                        .map(|&(i, s)| s as i128 * ylog[i] as i128)
+                                        .sum(),
+                                    n,
+                                );
+                                let dpt2 = entry_pt(&f, e);
+                                break 'tgt resolve(&f, q, w_pts[kq], sw, w_log[kq], dpt2, dl, n);
+                            }
+                        }
+                    }
+                    kq += 1;
+                    if kq > 50_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+            }
+            snap.push(("targets".into(), take(&f)));
+            let _ = budget_rel;
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{}",
+                    k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len()
+                ),
+            }
+        }
+        "ic5w" => {
+            // k-term index calculus: table of x(F_{i1} + s2 F_{i2} + ... + s_k F_{ik}), i1 < ... < ik,
+            // built as x(P +- F_l) from full (k-1)-term points P (shared inversion per pair);
+            // factor-base logs by incremental Gaussian elimination mod n (every mod-n product counted
+            // as M, every mod-n inverse as I); targets by paired trials x(Q +- W_k) as in ic4.
+            let mu = param;
+            let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
+            let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
+            assert!((2..=4).contains(&k));
+            let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
+            let classes = |m: usize| -> f64 {
+                let mut c = 1.0;
+                for i in 0..k {
+                    c *= (m - i) as f64 / (i + 1) as f64;
+                }
+                c * (1u64 << (k - 1)) as f64
+            };
+            let mut m = k + 1;
+            while classes(m) < kstar {
+                m += 1;
+            }
+            let mut fb: Vec<(u64, u64)> = Vec::with_capacity(m);
+            let mut x = 0u64;
+            while fb.len() < m {
+                x += 1;
+                let xx = f.sqr(x);
+                let rhs = f.add(f.add(f.mul(xx, x), f.mul(f.a, x)), f.b);
+                if rhs == 0 {
+                    continue;
+                }
+                if let Some(y) = f.sqrt(rhs) {
+                    fb.push((x, y));
+                }
+            }
+            snap.push(("fb".into(), take(&f)));
+            // (k-1)-term full points: (point, indices, signs); first sign +1.
+            let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
+                .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
+                .collect();
+            for _ in 2..k {
+                let mut next = Vec::new();
+                for (p, idx, sg) in &combos {
+                    let last = *idx.last().unwrap() as usize;
+                    for l in (last + 1)..m {
+                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
+                            if pt.is_some() {
+                                let mut i2 = idx.clone();
+                                i2.push(l as u16);
+                                let mut s2 = sg.clone();
+                                s2.push(s);
+                                next.push((pt, i2, s2));
+                            }
+                        }
+                    }
+                }
+                combos = next;
+            }
+            snap.push(("combos".into(), take(&f)));
+            // table: x -> (combo id, l, sign of F_l)
+            let mut table: HashMap<u64, (u32, u16, i8)> =
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
+            for (ci_, (p, idx, _)) in combos.iter().enumerate() {
+                let last = *idx.last().unwrap() as usize;
+                for l in (last + 1)..m {
+                    if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
+                        f.hash();
+                        table.entry(xp).or_insert((ci_ as u32, l as u16, 1));
+                        f.hash();
+                        table.entry(xm).or_insert((ci_ as u32, l as u16, -1));
+                    }
+                }
+            }
+            snap.push(("table".into(), take(&f)));
+            let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
+                let fl = Some(fb[e.1 as usize]);
+                f.padd(
+                    combos[e.0 as usize].0,
+                    if e.2 > 0 { fl } else { f.pneg(fl) },
+                )
+            };
+            // coefficient vector of an entry: (index, sign) pairs
+            let entry_terms = |e: (u32, u16, i8)| -> Vec<(usize, i64)> {
+                let (_, idx, sg) = &combos[e.0 as usize];
+                let mut v: Vec<(usize, i64)> = idx
+                    .iter()
+                    .zip(sg)
+                    .map(|(&i, &s)| (i as usize, s as i64))
+                    .collect();
+                v.push((e.1 as usize, e.2 as i64));
+                v
+            };
+            // counted arithmetic mod n
+            let mulm = |a: u64, b: u64| -> u64 {
+                f.cm.set(f.cm.get() + 1);
+                ((a as u128 * b as u128) % n as u128) as u64
+            };
+            let invm = |a: u64| -> u64 {
+                f.ci.set(f.ci.get() + 1);
+                let (mut r0, mut r1) = (n as i128, a as i128);
+                let (mut t0, mut t1) = (0i128, 1i128);
+                while r1 != 0 {
+                    let q = r0 / r1;
+                    (r0, r1) = (r1, r0 - q * r1);
+                    (t0, t1) = (t1, t0 - q * t1);
+                }
+                t0.rem_euclid(n as i128) as u64
+            };
+            let w0 = rng.gen_range(1..n);
+            let dd = rng.gen_range(1..n);
+            let dpt = f.smul(g, dd);
+            let _ = dpt;
+            const RWN: usize = 32;
+            let rwd: Vec<(Pt, u64)> = (0..RWN)
+                .map(|_| {
+                    let c = rng.gen_range(1..n);
+                    (f.smul(g, c), c)
+                })
+                .collect();
+            let mut w_pts: Vec<Pt> = vec![f.smul(g, w0)];
+            let mut w_log: Vec<u64> = vec![w0];
+            let ensure_w = |f: &F, kk: usize, w_pts: &mut Vec<Pt>, w_log: &mut Vec<u64>| {
+                while w_pts.len() <= kk {
+                    let last = *w_pts.last().unwrap();
+                    // step index from the position k (splitmix64), not from the point: a point-driven
+                    // r-adding W walk is a rho walk and cycles after ~sqrt(n) terms (first attempt, 9 runs hit
+                    // the trial budget); a position-driven sum never cycles
+                    f.native();
+                    let j = {
+                        let mut z = (w_pts.len() as u64).wrapping_add(0x9E37_79B9_7F4A_7C15);
+                        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+                        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+                        ((z ^ (z >> 31)) >> 59) as usize
+                    };
+                    w_pts.push(f.padd(last, rwd[j].0));
+                    w_log.push((w_log.last().unwrap() + rwd[j].1) % n);
+                    let _ = dd;
+                }
+            };
+            let kw = 64usize;
+            ensure_w(&f, kw, &mut w_pts, &mut w_log);
+            let e_log = rng.gen_range(1..n);
+            let e_pt = f.smul(g, e_log);
+            let v0 = rng.gen_range(1..n);
+            let mut v_pt = f.smul(g, v0);
+            let mut v_log = v0;
+            // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
+            let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
+            let mut rank = 0usize;
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
+            let mut nrel = 0usize;
+            let budget_rel = (gfac * m as f64).ceil() as usize;
+            let mut p1_trials = 0u64;
+            let mut kk = 0usize;
+            while rank < m {
+                if kk == kw {
+                    kk = 0;
+                    v_pt = f.padd(v_pt, e_pt);
+                    v_log = (v_log + e_log) % n;
+                }
+                p1_trials += 2;
+                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                    for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                        f.hash();
+                        if let Some(&e) = table.get(&xx) {
+                            f.hash();
+                            if seen.insert(e, ()).is_some() {
+                                continue;
+                            }
+                            let wp = if sw > 0 { w_pts[kk] } else { f.pneg(w_pts[kk]) };
+                            let r = f.padd(v_pt, wp);
+                            let eps: i64 = if r == entry_pt(&f, e) { 1 } else { -1 };
+                            let mut row = vec![0u64; m + 1];
+                            for (i, s) in entry_terms(e) {
+                                row[i] = md((row[i] as i128) + (eps * s) as i128, n);
+                            }
+                            row[m] = md(v_log as i128 + sw as i128 * w_log[kk] as i128, n);
+                            nrel += 1;
+                            // reduce against pivots
+                            for c in 0..m {
+                                if row[c] == 0 {
+                                    continue;
+                                }
+                                if let Some(pr) = &pivots[c] {
+                                    let fct = row[c];
+                                    for j in c..=m {
+                                        if pr[j] != 0 {
+                                            row[j] =
+                                                md(row[j] as i128 - mulm(fct, pr[j]) as i128, n);
+                                        }
+                                    }
+                                } else {
+                                    let iv = invm(row[c]);
+                                    for j in c..=m {
+                                        if row[j] != 0 {
+                                            row[j] = mulm(row[j], iv);
+                                        }
+                                    }
+                                    pivots[c] = Some(row.clone());
+                                    rank += 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                kk += 1;
+                if nrel > 50 * budget_rel + 1000 {
+                    panic!("relation budget");
+                }
+            }
+            // back substitution
+            let mut ylog: Vec<u64> = vec![0; m];
+            for c in (0..m).rev() {
+                let pr = pivots[c].as_ref().unwrap();
+                let mut v = pr[m] as i128;
+                for j in (c + 1)..m {
+                    if pr[j] != 0 {
+                        v -= mulm(pr[j], ylog[j]) as i128;
+                    }
+                }
+                ylog[c] = md(v, n);
+            }
+            snap.push(("relations".into(), take(&f)));
+            let mut trials = 0u64;
+            for t in 0..targets {
+                let q = qs[t];
+                let mut kq = 0usize;
+                let v = 'tgt: loop {
+                    ensure_w(&f, kq, &mut w_pts, &mut w_log);
+                    trials += 2;
+                    if q.unwrap().0 == w_pts[kq].unwrap().0 {
+                        break 'tgt if q == w_pts[kq] {
+                            w_log[kq]
+                        } else {
+                            (n - w_log[kq]) % n
+                        };
+                    }
+                    if let Some((xp, xm)) = f.xpair(q, w_pts[kq]) {
+                        for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                            f.hash();
+                            if let Some(&e) = table.get(&xx) {
+                                let dl = md(
+                                    entry_terms(e)
+                                        .iter()
+                                        .map(|&(i, s)| s as i128 * ylog[i] as i128)
+                                        .sum(),
+                                    n,
+                                );
+                                let dpt2 = entry_pt(&f, e);
+                                break 'tgt resolve(&f, q, w_pts[kq], sw, w_log[kq], dpt2, dl, n);
+                            }
+                        }
+                    }
+                    kq += 1;
+                    if kq > 50_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+            }
+            snap.push(("targets".into(), take(&f)));
+            let _ = budget_rel;
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{}",
+                    k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len()
+                ),
+            }
+        }
+        "ic5ks" => {
+            // k-term index calculus: table of x(F_{i1} + s2 F_{i2} + ... + s_k F_{ik}), i1 < ... < ik,
+            // built as x(P +- F_l) from full (k-1)-term points P (shared inversion per pair);
+            // factor-base logs by incremental Gaussian elimination mod n (every mod-n product counted
+            // as M, every mod-n inverse as I); targets by paired trials x(Q +- W_k) as in ic4.
+            let mu = param;
+            let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
+            let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
+            assert!((2..=4).contains(&k));
+            let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
+            let classes = |m: usize| -> f64 {
+                let mut c = 1.0;
+                for i in 0..k {
+                    c *= (m - i) as f64 / (i + 1) as f64;
+                }
+                c * (1u64 << (k - 1)) as f64
+            };
+            let mut m = k + 1;
+            while classes(m) < kstar {
+                m += 1;
+            }
+            let mut fb: Vec<(u64, u64)> = Vec::with_capacity(m);
+            let mut x = 0u64;
+            while fb.len() < m {
+                x += 1;
+                let xx = f.sqr(x);
+                let rhs = f.add(f.add(f.mul(xx, x), f.mul(f.a, x)), f.b);
+                if rhs == 0 {
+                    continue;
+                }
+                if let Some(y) = f.sqrt(rhs) {
+                    fb.push((x, y));
+                }
+            }
+            snap.push(("fb".into(), take(&f)));
+            // (k-1)-term full points: (point, indices, signs); first sign +1.
+            let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
+                .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
+                .collect();
+            for _ in 2..k {
+                let mut next = Vec::new();
+                for (p, idx, sg) in &combos {
+                    let last = *idx.last().unwrap() as usize;
+                    for l in (last + 1)..m {
+                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
+                            if pt.is_some() {
+                                let mut i2 = idx.clone();
+                                i2.push(l as u16);
+                                let mut s2 = sg.clone();
+                                s2.push(s);
+                                next.push((pt, i2, s2));
+                            }
+                        }
+                    }
+                }
+                combos = next;
+            }
+            snap.push(("combos".into(), take(&f)));
+            // table: x -> (combo id, l, sign of F_l)
+            let mut table: HashMap<u64, (u32, u16, i8)> =
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
+            for (ci_, (p, idx, _)) in combos.iter().enumerate() {
+                let last = *idx.last().unwrap() as usize;
+                for l in (last + 1)..m {
+                    if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
+                        f.hash();
+                        table.entry(xp).or_insert((ci_ as u32, l as u16, 1));
+                        f.hash();
+                        table.entry(xm).or_insert((ci_ as u32, l as u16, -1));
+                    }
+                }
+            }
+            snap.push(("table".into(), take(&f)));
+            let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
+                let fl = Some(fb[e.1 as usize]);
+                f.padd(
+                    combos[e.0 as usize].0,
+                    if e.2 > 0 { fl } else { f.pneg(fl) },
+                )
+            };
+            // coefficient vector of an entry: (index, sign) pairs
+            let entry_terms = |e: (u32, u16, i8)| -> Vec<(usize, i64)> {
+                let (_, idx, sg) = &combos[e.0 as usize];
+                let mut v: Vec<(usize, i64)> = idx
+                    .iter()
+                    .zip(sg)
+                    .map(|(&i, &s)| (i as usize, s as i64))
+                    .collect();
+                v.push((e.1 as usize, e.2 as i64));
+                v
+            };
+            // counted arithmetic mod n
+            let mulm = |a: u64, b: u64| -> u64 {
+                f.cm.set(f.cm.get() + 1);
+                ((a as u128 * b as u128) % n as u128) as u64
+            };
+            let invm = |a: u64| -> u64 {
+                f.ci.set(f.ci.get() + 1);
+                let (mut r0, mut r1) = (n as i128, a as i128);
+                let (mut t0, mut t1) = (0i128, 1i128);
+                while r1 != 0 {
+                    let q = r0 / r1;
+                    (r0, r1) = (r1, r0 - q * r1);
+                    (t0, t1) = (t1, t0 - q * t1);
+                }
+                t0.rem_euclid(n as i128) as u64
+            };
+            let w0 = rng.gen_range(1..n);
+            let dd = rng.gen_range(1..n);
+            let dpt = f.smul(g, dd);
+            let mut w_pts: Vec<Pt> = vec![f.smul(g, w0)];
+            let mut w_log: Vec<u64> = vec![w0];
+            let ensure_w = |f: &F, kk: usize, w_pts: &mut Vec<Pt>, w_log: &mut Vec<u64>| {
+                while w_pts.len() <= kk {
+                    let last = *w_pts.last().unwrap();
+                    w_pts.push(f.padd(last, dpt));
+                    w_log.push((w_log.last().unwrap() + dd) % n);
+                }
+            };
+            let kw = 64usize;
+            ensure_w(&f, kw, &mut w_pts, &mut w_log);
+            let e_log = rng.gen_range(1..n);
+            let e_pt = f.smul(g, e_log);
+            let v0 = rng.gen_range(1..n);
+            let mut v_pt = f.smul(g, v0);
+            let mut v_log = v0;
+            // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
+            let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
+            let mut rank = 0usize;
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
+            let mut nrel = 0usize;
+            let budget_rel = (gfac * m as f64).ceil() as usize;
+            let mut p1_trials = 0u64;
+            let mut kk = 0usize;
+            while rank < m {
+                if kk == kw {
+                    kk = 0;
+                    v_pt = f.padd(v_pt, e_pt);
+                    v_log = (v_log + e_log) % n;
+                }
+                p1_trials += 2;
+                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                    for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                        f.hash();
+                        if let Some(&e) = table.get(&xx) {
+                            f.hash();
+                            if seen.insert(e, ()).is_some() {
+                                continue;
+                            }
+                            let wp = if sw > 0 { w_pts[kk] } else { f.pneg(w_pts[kk]) };
+                            let r = f.padd(v_pt, wp);
+                            let eps: i64 = if r == entry_pt(&f, e) { 1 } else { -1 };
+                            let mut row = vec![0u64; m + 1];
+                            for (i, s) in entry_terms(e) {
+                                row[i] = md((row[i] as i128) + (eps * s) as i128, n);
+                            }
+                            row[m] = md(v_log as i128 + sw as i128 * w_log[kk] as i128, n);
+                            nrel += 1;
+                            // reduce against pivots
+                            for c in 0..m {
+                                if row[c] == 0 {
+                                    continue;
+                                }
+                                if let Some(pr) = &pivots[c] {
+                                    let fct = row[c];
+                                    for j in c..=m {
+                                        if pr[j] != 0 {
+                                            row[j] =
+                                                md(row[j] as i128 - mulm(fct, pr[j]) as i128, n);
+                                        }
+                                    }
+                                } else {
+                                    let iv = invm(row[c]);
+                                    for j in c..=m {
+                                        if row[j] != 0 {
+                                            row[j] = mulm(row[j], iv);
+                                        }
+                                    }
+                                    pivots[c] = Some(row.clone());
+                                    rank += 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                kk += 1;
+                if nrel > 50 * budget_rel + 1000 {
+                    panic!("relation budget");
+                }
+            }
+            // back substitution
+            let mut ylog: Vec<u64> = vec![0; m];
+            for c in (0..m).rev() {
+                let pr = pivots[c].as_ref().unwrap();
+                let mut v = pr[m] as i128;
+                for j in (c + 1)..m {
+                    if pr[j] != 0 {
+                        v -= mulm(pr[j], ylog[j]) as i128;
+                    }
+                }
+                ylog[c] = md(v, n);
+            }
+            snap.push(("relations".into(), take(&f)));
+            let mut trials = 0u64;
+            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::default();
+            for t in 0..targets {
+                let q = qs[t];
+                let mut kq = 0usize;
+                let mut trail: Vec<(u64, u32, i8)> = Vec::new();
+                let v = 'tgt: loop {
+                    ensure_w(&f, kq, &mut w_pts, &mut w_log);
+                    trials += 2;
+                    if q.unwrap().0 == w_pts[kq].unwrap().0 {
+                        break 'tgt if q == w_pts[kq] {
+                            w_log[kq]
+                        } else {
+                            (n - w_log[kq]) % n
+                        };
+                    }
+                    if let Some((xp, xm)) = f.xpair(q, w_pts[kq]) {
+                        for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                            f.hash();
+                            trail.push((xx, kq as u32, sw as i8));
+                            if let Some(&(t2, k2, s2)) = ret.get(&xx) {
+                                // Q + sw W_kq = eps (Q_t2 + s2 W_k2), Q_t2 solved: recompute the stored point (counted)
+                                let wp2 = if s2 > 0 {
+                                    w_pts[k2 as usize]
+                                } else {
+                                    f.pneg(w_pts[k2 as usize])
+                                };
+                                let dpt2 = f.padd(qs[t2 as usize], wp2);
+                                let dl = md(
+                                    found[t2 as usize] as i128
+                                        + s2 as i128 * w_log[k2 as usize] as i128,
+                                    n,
+                                );
+                                break 'tgt resolve(&f, q, w_pts[kq], sw, w_log[kq], dpt2, dl, n);
+                            }
+                            if let Some(&e) = table.get(&xx) {
+                                let dl = md(
+                                    entry_terms(e)
+                                        .iter()
+                                        .map(|&(i, s)| s as i128 * ylog[i] as i128)
+                                        .sum(),
+                                    n,
+                                );
+                                let dpt2 = entry_pt(&f, e);
+                                break 'tgt resolve(&f, q, w_pts[kq], sw, w_log[kq], dpt2, dl, n);
+                            }
+                        }
+                    }
+                    kq += 1;
+                    if kq > 50_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (xx, kk2, s2) in trail {
+                    f.hash();
+                    ret.entry(xx).or_insert((t as u32, kk2, s2));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            let _ = budget_rel;
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{}",
+                    k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len()
+                ),
+            }
+        }
+        "ic5rw" => {
+            // k-term index calculus: table of x(F_{i1} + s2 F_{i2} + ... + s_k F_{ik}), i1 < ... < ik,
+            // built as x(P +- F_l) from full (k-1)-term points P (shared inversion per pair);
+            // factor-base logs by incremental Gaussian elimination mod n (every mod-n product counted
+            // as M, every mod-n inverse as I); targets by paired trials x(Q +- W_k) as in ic4.
+            let mu = param;
+            let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
+            let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
+            assert!((2..=4).contains(&k));
+            let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
+            let classes = |m: usize| -> f64 {
+                let mut c = 1.0;
+                for i in 0..k {
+                    c *= (m - i) as f64 / (i + 1) as f64;
+                }
+                c * (1u64 << (k - 1)) as f64
+            };
+            let mut m = k + 1;
+            while classes(m) < kstar {
+                m += 1;
+            }
+            let mut fb: Vec<(u64, u64)> = Vec::with_capacity(m);
+            let mut x = 0u64;
+            while fb.len() < m {
+                x += 1;
+                let xx = f.sqr(x);
+                let rhs = f.add(f.add(f.mul(xx, x), f.mul(f.a, x)), f.b);
+                if rhs == 0 {
+                    continue;
+                }
+                if let Some(y) = f.sqrt(rhs) {
+                    fb.push((x, y));
+                }
+            }
+            snap.push(("fb".into(), take(&f)));
+            // (k-1)-term full points: (point, indices, signs); first sign +1.
+            let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
+                .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
+                .collect();
+            for _ in 2..k {
+                let mut next = Vec::new();
+                for (p, idx, sg) in &combos {
+                    let last = *idx.last().unwrap() as usize;
+                    for l in (last + 1)..m {
+                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
+                            if pt.is_some() {
+                                let mut i2 = idx.clone();
+                                i2.push(l as u16);
+                                let mut s2 = sg.clone();
+                                s2.push(s);
+                                next.push((pt, i2, s2));
+                            }
+                        }
+                    }
+                }
+                combos = next;
+            }
+            snap.push(("combos".into(), take(&f)));
+            // table: x -> (combo id, l, sign of F_l)
+            let mut table: HashMap<u64, (u32, u16, i8)> =
+                HashMap::with_capacity_and_hasher(kstar as usize + 16, Default::default());
+            for (ci_, (p, idx, _)) in combos.iter().enumerate() {
+                let last = *idx.last().unwrap() as usize;
+                for l in (last + 1)..m {
+                    if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
+                        f.hash();
+                        table.entry(xp).or_insert((ci_ as u32, l as u16, 1));
+                        f.hash();
+                        table.entry(xm).or_insert((ci_ as u32, l as u16, -1));
+                    }
+                }
+            }
+            snap.push(("table".into(), take(&f)));
+            let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
+                let fl = Some(fb[e.1 as usize]);
+                f.padd(
+                    combos[e.0 as usize].0,
+                    if e.2 > 0 { fl } else { f.pneg(fl) },
+                )
+            };
+            // coefficient vector of an entry: (index, sign) pairs
+            let entry_terms = |e: (u32, u16, i8)| -> Vec<(usize, i64)> {
+                let (_, idx, sg) = &combos[e.0 as usize];
+                let mut v: Vec<(usize, i64)> = idx
+                    .iter()
+                    .zip(sg)
+                    .map(|(&i, &s)| (i as usize, s as i64))
+                    .collect();
+                v.push((e.1 as usize, e.2 as i64));
+                v
+            };
+            // counted arithmetic mod n
+            let mulm = |a: u64, b: u64| -> u64 {
+                f.cm.set(f.cm.get() + 1);
+                ((a as u128 * b as u128) % n as u128) as u64
+            };
+            let invm = |a: u64| -> u64 {
+                f.ci.set(f.ci.get() + 1);
+                let (mut r0, mut r1) = (n as i128, a as i128);
+                let (mut t0, mut t1) = (0i128, 1i128);
+                while r1 != 0 {
+                    let q = r0 / r1;
+                    (r0, r1) = (r1, r0 - q * r1);
+                    (t0, t1) = (t1, t0 - q * t1);
+                }
+                t0.rem_euclid(n as i128) as u64
+            };
+            let w0 = rng.gen_range(1..n);
+            let dd = rng.gen_range(1..n);
+            let dpt = f.smul(g, dd);
+            let _ = dpt;
+            const RWN: usize = 32;
+            let rwd: Vec<(Pt, u64)> = (0..RWN)
+                .map(|_| {
+                    let c = rng.gen_range(1..n);
+                    (f.smul(g, c), c)
+                })
+                .collect();
+            let mut w_pts: Vec<Pt> = vec![f.smul(g, w0)];
+            let mut w_log: Vec<u64> = vec![w0];
+            let ensure_w = |f: &F, kk: usize, w_pts: &mut Vec<Pt>, w_log: &mut Vec<u64>| {
+                while w_pts.len() <= kk {
+                    let last = *w_pts.last().unwrap();
+                    // step index from the position k (splitmix64), not from the point: a point-driven
+                    // r-adding W walk is a rho walk and cycles after ~sqrt(n) terms (first attempt, 9 runs hit
+                    // the trial budget); a position-driven sum never cycles
+                    f.native();
+                    let j = {
+                        let mut z = (w_pts.len() as u64).wrapping_add(0x9E37_79B9_7F4A_7C15);
+                        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+                        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+                        ((z ^ (z >> 31)) >> 59) as usize
+                    };
+                    w_pts.push(f.padd(last, rwd[j].0));
+                    w_log.push((w_log.last().unwrap() + rwd[j].1) % n);
+                    let _ = dd;
+                }
+            };
+            let kw = 64usize;
+            ensure_w(&f, kw, &mut w_pts, &mut w_log);
+            let e_log = rng.gen_range(1..n);
+            let e_pt = f.smul(g, e_log);
+            let v0 = rng.gen_range(1..n);
+            let mut v_pt = f.smul(g, v0);
+            let mut v_log = v0;
+            // incremental echelon form: pivots[col] = Some(row) with row[col] = 1 (row has m+1 entries, last = rhs)
+            let mut pivots: Vec<Option<Vec<u64>>> = vec![None; m];
+            let mut rank = 0usize;
+            let mut seen: HashMap<(u32, u16, i8), ()> = HashMap::default();
+            let mut nrel = 0usize;
+            let budget_rel = (gfac * m as f64).ceil() as usize;
+            let mut p1_trials = 0u64;
+            let mut kk = 0usize;
+            while rank < m {
+                if kk == kw {
+                    kk = 0;
+                    v_pt = f.padd(v_pt, e_pt);
+                    v_log = (v_log + e_log) % n;
+                }
+                p1_trials += 2;
+                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                    for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                        f.hash();
+                        if let Some(&e) = table.get(&xx) {
+                            f.hash();
+                            if seen.insert(e, ()).is_some() {
+                                continue;
+                            }
+                            let wp = if sw > 0 { w_pts[kk] } else { f.pneg(w_pts[kk]) };
+                            let r = f.padd(v_pt, wp);
+                            let eps: i64 = if r == entry_pt(&f, e) { 1 } else { -1 };
+                            let mut row = vec![0u64; m + 1];
+                            for (i, s) in entry_terms(e) {
+                                row[i] = md((row[i] as i128) + (eps * s) as i128, n);
+                            }
+                            row[m] = md(v_log as i128 + sw as i128 * w_log[kk] as i128, n);
+                            nrel += 1;
+                            // reduce against pivots
+                            for c in 0..m {
+                                if row[c] == 0 {
+                                    continue;
+                                }
+                                if let Some(pr) = &pivots[c] {
+                                    let fct = row[c];
+                                    for j in c..=m {
+                                        if pr[j] != 0 {
+                                            row[j] =
+                                                md(row[j] as i128 - mulm(fct, pr[j]) as i128, n);
+                                        }
+                                    }
+                                } else {
+                                    let iv = invm(row[c]);
+                                    for j in c..=m {
+                                        if row[j] != 0 {
+                                            row[j] = mulm(row[j], iv);
+                                        }
+                                    }
+                                    pivots[c] = Some(row.clone());
+                                    rank += 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                kk += 1;
+                if nrel > 50 * budget_rel + 1000 {
+                    panic!("relation budget");
+                }
+            }
+            // back substitution
+            let mut ylog: Vec<u64> = vec![0; m];
+            for c in (0..m).rev() {
+                let pr = pivots[c].as_ref().unwrap();
+                let mut v = pr[m] as i128;
+                for j in (c + 1)..m {
+                    if pr[j] != 0 {
+                        v -= mulm(pr[j], ylog[j]) as i128;
+                    }
+                }
+                ylog[c] = md(v, n);
+            }
+            snap.push(("relations".into(), take(&f)));
+            let mut trials = 0u64;
+            let mut ret: HashMap<u64, (u32, u32, i8)> = HashMap::default();
+            for t in 0..targets {
+                let q = qs[t];
+                let mut kq = 0usize;
+                let mut trail: Vec<(u64, u32, i8)> = Vec::new();
+                let v = 'tgt: loop {
+                    ensure_w(&f, kq, &mut w_pts, &mut w_log);
+                    trials += 2;
+                    if q.unwrap().0 == w_pts[kq].unwrap().0 {
+                        break 'tgt if q == w_pts[kq] {
+                            w_log[kq]
+                        } else {
+                            (n - w_log[kq]) % n
+                        };
+                    }
+                    if let Some((xp, xm)) = f.xpair(q, w_pts[kq]) {
+                        for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                            f.hash();
+                            trail.push((xx, kq as u32, sw as i8));
+                            if let Some(&(t2, k2, s2)) = ret.get(&xx) {
+                                // Q + sw W_kq = eps (Q_t2 + s2 W_k2), Q_t2 solved: recompute the stored point (counted)
+                                let wp2 = if s2 > 0 {
+                                    w_pts[k2 as usize]
+                                } else {
+                                    f.pneg(w_pts[k2 as usize])
+                                };
+                                let dpt2 = f.padd(qs[t2 as usize], wp2);
+                                let dl = md(
+                                    found[t2 as usize] as i128
+                                        + s2 as i128 * w_log[k2 as usize] as i128,
+                                    n,
+                                );
+                                break 'tgt resolve(&f, q, w_pts[kq], sw, w_log[kq], dpt2, dl, n);
+                            }
+                            if let Some(&e) = table.get(&xx) {
+                                let dl = md(
+                                    entry_terms(e)
+                                        .iter()
+                                        .map(|&(i, s)| s as i128 * ylog[i] as i128)
+                                        .sum(),
+                                    n,
+                                );
+                                let dpt2 = entry_pt(&f, e);
+                                break 'tgt resolve(&f, q, w_pts[kq], sw, w_log[kq], dpt2, dl, n);
+                            }
+                        }
+                    }
+                    kq += 1;
+                    if kq > 50_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (xx, kk2, s2) in trail {
+                    f.hash();
+                    ret.entry(xx).or_insert((t as u32, kk2, s2));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            let _ = budget_rel;
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{}",
+                    k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len()
+                ),
+            }
+        }
         "rho" | "rho2" => {
             let sib = arm == "rho2";
             const ARMS: usize = 32;
@@ -551,23 +1673,29 @@ fn main() {
                 bank.push((f.smul(g, k), k));
             }
             let arms: Vec<(Pt, u64)> = (0..ARMS).map(|_| bank[rng.gen_range(0..BANK)]).collect();
-            let hidx = |pt: Pt| -> usize { pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0) };
+            let hidx = |pt: Pt| -> usize {
+                f.native();
+                pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
+            };
             // db: x -> (log, y or u64::MAX for a sibling without y)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
-            let mut db: HashMap<u64, (u64, u64)> = HashMap::with_capacity(db_target * 2);
+            let mut db: HashMap<u64, (u64, u64)> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
             let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
             while db.len() < db_target {
                 if st >= RESTART || cur.is_none() {
-                    let (k1, k2, k3) = (
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                    );
-                    cur = f.padd(f.padd(bank[k1].0, bank[k2].0), bank[k3].0);
-                    ca = (bank[k1].1 + bank[k2].1 + bank[k3].1) % n;
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
                     st = 0;
                 }
                 let h = hidx(cur);
@@ -597,11 +1725,16 @@ fn main() {
                 let mut cur: Pt = None;
                 let mut ca = 0u64;
                 let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
                 let v = loop {
                     if st >= RESTART || cur.is_none() {
-                        let (k1, k2) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
-                        cur = f.padd(f.padd(bank[k1].0, bank[k2].0), q);
-                        ca = (bank[k1].1 + bank[k2].1) % n;
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
                         st = 0;
                     }
                     let h = hidx(cur);
@@ -666,7 +1799,10 @@ fn main() {
                 bank.push((f.smul(g, k), k));
             }
             let arms: Vec<(Pt, u64)> = (0..ARMS).map(|_| bank[rng.gen_range(0..BANK)]).collect();
-            let hidx = |pt: Pt| -> usize { pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0) };
+            let hidx = |pt: Pt| -> usize {
+                f.native();
+                pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
+            };
             // full P + A and x(P - A) with one inversion: I + 3M + 2S
             let step_x = |f: &F, p: Pt, q: Pt| -> (Pt, Option<u64>) {
                 if let (Some((x1, y1)), Some((x2, y2))) = (p, q) {
@@ -685,20 +1821,22 @@ fn main() {
             // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
             let mut db: HashMap<u64, (u64, u64, (u64, u64, usize))> =
-                HashMap::with_capacity(db_target * 2);
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = None;
             let mut ca = 0u64;
             let mut st = RESTART;
             let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
             while db.len() < db_target {
                 if st >= RESTART || cur.is_none() {
-                    let (k1, k2, k3) = (
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                        rng.gen_range(0..BANK),
-                    );
-                    cur = f.padd(f.padd(bank[k1].0, bank[k2].0), bank[k3].0);
-                    ca = (bank[k1].1 + bank[k2].1 + bank[k3].1) % n;
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
                     st = 0;
                 }
                 let h = hidx(cur);
@@ -734,11 +1872,16 @@ fn main() {
                 let mut cur: Pt = None;
                 let mut ca = 0u64;
                 let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
                 let v = loop {
                     if st >= RESTART || cur.is_none() {
-                        let (k1, k2) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
-                        cur = f.padd(f.padd(bank[k1].0, bank[k2].0), q);
-                        ca = (bank[k1].1 + bank[k2].1) % n;
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
                         st = 0;
                     }
                     let h = hidx(cur);
@@ -787,6 +1930,160 @@ fn main() {
             }
         }
 
+        "rho2xks" => {
+            const ARMS: usize = 32;
+            const RESTART: usize = 32;
+            const BANK: usize = 64;
+            const NOY: u64 = u64::MAX;
+            let kappa = param;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let arms: Vec<(Pt, u64)> = (0..ARMS).map(|_| bank[rng.gen_range(0..BANK)]).collect();
+            let hidx = |pt: Pt| -> usize {
+                f.native();
+                pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
+            };
+            // full P + A and x(P - A) with one inversion: I + 3M + 2S
+            let step_x = |f: &F, p: Pt, q: Pt| -> (Pt, Option<u64>) {
+                if let (Some((x1, y1)), Some((x2, y2))) = (p, q) {
+                    if x1 != x2 {
+                        let d = f.inv(f.sub(x2, x1));
+                        let lam = f.mul(f.sub(y2, y1), d);
+                        let x3 = f.sub(f.sub(f.sqr(lam), x1), x2);
+                        let y3 = f.sub(f.mul(lam, f.sub(x1, x3)), y1);
+                        let lm = f.mul(f.neg(f.add(y2, y1)), d);
+                        let xm = f.sub(f.sub(f.sqr(lm), x1), x2);
+                        return (Some((x3, y3)), Some(xm));
+                    }
+                }
+                (f.padd(p, q), None)
+            };
+            // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
+            let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
+            let mut db: HashMap<u64, (u64, u64, (u64, u64, usize))> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
+            let mut cur: Pt = None;
+            let mut ca = 0u64;
+            let mut st = RESTART;
+            let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while db.len() < db_target {
+                if st >= RESTART || cur.is_none() {
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
+                    st = 0;
+                }
+                let h = hidx(cur);
+                let prev = cur;
+                let (nx, sx) = step_x(&f, prev, arms[h].0);
+                cur = nx;
+                if let Some(xm) = sx {
+                    let (px, py) = prev.unwrap();
+                    f.hash();
+                    db.entry(xm)
+                        .or_insert(((ca + n - arms[h].1) % n, NOY, (px, py, h)));
+                }
+                ca = (ca + arms[h].1) % n;
+                st += 1;
+                db_steps += 1;
+                if let Some((x, y)) = cur {
+                    f.hash();
+                    db.entry(x).or_insert((ca, y, (0, 0, 0)));
+                }
+            }
+            snap.push(("db".into(), take(&f)));
+            let full_y = |f: &F, y2: u64, aux: (u64, u64, usize)| -> u64 {
+                if y2 != NOY {
+                    return y2;
+                }
+                f.padd(Some((aux.0, aux.1)), f.pneg(arms[aux.2].0))
+                    .unwrap()
+                    .1
+            };
+            let mut steps_total = 0u64;
+            for t in 0..targets {
+                let q = qs[t];
+                let mut cur: Pt = None;
+                let mut ca = 0u64;
+                let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut trail: Vec<(u64, u64, u64, (u64, u64, usize))> = Vec::new();
+                let v = loop {
+                    if st >= RESTART || cur.is_none() {
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
+                        st = 0;
+                    }
+                    let h = hidx(cur);
+                    let prev = cur;
+                    let pa = ca;
+                    let (nx, sx) = step_x(&f, prev, arms[h].0);
+                    cur = nx;
+                    ca = (ca + arms[h].1) % n;
+                    st += 1;
+                    steps_total += 1;
+                    if let Some((x, y)) = cur {
+                        trail.push((x, ca, y, (0, 0, 0)));
+                    }
+                    if let (Some(xm), Some((px, py))) = (sx, prev) {
+                        trail.push((xm, (pa + n - arms[h].1) % n, NOY, (px, py, h)));
+                    }
+                    if let Some((x, y)) = cur {
+                        f.hash();
+                        if let Some(&(a2, y2, aux)) = db.get(&x) {
+                            let y2 = full_y(&f, y2, aux);
+                            let eps: i128 = if y == y2 { 1 } else { -1 };
+                            break md(eps * a2 as i128 - ca as i128, n);
+                        }
+                    }
+                    if let Some(xm) = sx {
+                        f.hash();
+                        if let Some(&(a2, y2, aux)) = db.get(&xm) {
+                            let ym = f.padd(prev, f.pneg(arms[h].0)).unwrap().1; // target sibling in full (counted)
+                            let y2 = full_y(&f, y2, aux);
+                            let eps: i128 = if ym == y2 { 1 } else { -1 };
+                            break md(
+                                eps * a2 as i128 - md(pa as i128 - arms[h].1 as i128, n) as i128,
+                                n,
+                            );
+                        }
+                    }
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, off, y, aux) in trail {
+                    f.hash();
+                    db.entry(x).or_insert(((off + v) % n, y, aux));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"db_steps\":{},\"target_steps\":{}",
+                    db.len(),
+                    db_steps,
+                    steps_total
+                ),
+            }
+        }
+
         "rhoseq" => {
             // validator control: anchored rho with a sequential phase-1 database {G, 2G, ..., NG} (no walk waste, no restarts);
             // phase 2 identical to "rho".
@@ -800,9 +2097,13 @@ fn main() {
                 bank.push((f.smul(g, k), k));
             }
             let arms: Vec<(Pt, u64)> = (0..ARMS).map(|_| bank[rng.gen_range(0..BANK)]).collect();
-            let hidx = |pt: Pt| -> usize { pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0) };
+            let hidx = |pt: Pt| -> usize {
+                f.native();
+                pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
+            };
             let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
-            let mut db: HashMap<u64, (u64, u64)> = HashMap::with_capacity(db_target * 2);
+            let mut db: HashMap<u64, (u64, u64)> =
+                HashMap::with_capacity_and_hasher(db_target * 2, Default::default());
             let mut cur: Pt = g;
             let mut ca = 1u64;
             let mut db_steps = 0u64;
@@ -821,11 +2122,16 @@ fn main() {
                 let mut cur: Pt = None;
                 let mut ca = 0u64;
                 let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
                 let v = loop {
                     if st >= RESTART || cur.is_none() {
-                        let (k1, k2) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
-                        cur = f.padd(f.padd(bank[k1].0, bank[k2].0), q);
-                        ca = (bank[k1].1 + bank[k2].1) % n;
+                        // chained starts tp <- tp + B_k from tp = Q (tp = ta G + Q): one addition per restart
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
                         st = 0;
                     }
                     let h = hidx(cur);
@@ -857,6 +2163,344 @@ fn main() {
                 ),
             }
         }
+        "rhodp" => {
+            // Multi-target distinguished-point rho on {P, -P} classes (Kuhn-Struik with retention of solved
+            // walks, optional precomputation). Walk: P -> canon(P + A_h(P)), R = 1024 steps A_i = B_j + B_k from
+            // the 64-point bank; if the next point would use the same step index (a fruitless 2-cycle risk),
+            // the step A_(h+1) is used instead (the extra addition is counted). A point is distinguished when
+            // d hash bits are zero (theta = 2^d steps per walk on average); walks longer than 20 theta are
+            // abandoned (their steps stay counted). param = kappa: precomputation walks from known-log starts
+            // until kappa sqrt(nT) steps are spent; args[6] = offset of d from d0 = round(log2(n/T)/4).
+            // Each target walks from chained starts Q + s G until a distinguished point is found in the
+            // database (solved) or in its own earlier walks with the opposite Q sign (solved); otherwise it is
+            // kept pending. After a target is solved, its pending distinguished points are inserted with known
+            // logs. Every addition is counted; every database or pending lookup and insert is one hash op.
+            const BANK: usize = 64;
+            const R: usize = 1024;
+            let kappa = param;
+            let doff: i32 = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
+            let d0 = (0.25 * ((n as f64) / targets as f64).log2()).round() as i32;
+            let d = (d0 + doff).max(1) as u32;
+            let mask = (1u64 << d) - 1;
+            let theta = 1u64 << d;
+            let maxwalk = 20 * theta;
+            let half = f.p / 2;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let mut arms: Vec<(Pt, u64)> = Vec::with_capacity(R);
+            for _ in 0..R {
+                let (i, j) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
+                arms.push((f.padd(bank[i].0, bank[j].0), (bank[i].1 + bank[j].1) % n));
+            }
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let idx = |p: Pt| -> usize { p.map(|(x, _)| (mix(x) >> 40) as usize % R).unwrap_or(0) };
+            let is_dp =
+                |p: Pt| -> bool { p.map(|(x, _)| (mix(x) >> 8) & mask == 0).unwrap_or(false) };
+            // canonical class representative (y <= p/2); returns the sign applied
+            // native work per generated point: one canonicalisation and one hash of x (the step index and the
+            // distinguished-point test are bits of that one hash, so they are not counted again)
+            let canon = |p: Pt| -> (Pt, i64) {
+                f.native();
+                f.native();
+                match p {
+                    Some((x, y)) if y > half => (Some((x, f.p - y)), -1),
+                    _ => (p, 1),
+                }
+            };
+            // one walk step on (point, a, b) with point = a G + b Q canonical
+            let step = |f: &F, p: Pt, a: u64, b: i64| -> (Pt, u64, i64) {
+                let h = idx(p);
+                let (mut q1, mut s1) = canon(f.padd(p, arms[h].0));
+                let mut hh = h;
+                if q1.is_some() && idx(q1) == h {
+                    hh = (h + 1) % R;
+                    let r = canon(f.padd(p, arms[hh].0));
+                    q1 = r.0;
+                    s1 = r.1;
+                }
+                let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
+                (q1, a1, s1 * b)
+            };
+            let mut db: HashMap<u64, u64> = HashMap::default();
+            let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
+            let mut pre_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while pre_steps < pre_budget {
+                let k1 = rng.gen_range(0..BANK);
+                sp = f.padd(sp, bank[k1].0);
+                sa = (sa + bank[k1].1) % n;
+                let (mut p, s0) = canon(sp);
+                let mut a = md(s0 as i128 * sa as i128, n);
+                let mut len = 0u64;
+                while p.is_some() && len < maxwalk {
+                    let r = step(&f, p, a, 0);
+                    p = r.0;
+                    a = r.1;
+                    len += 1;
+                    if is_dp(p) {
+                        f.hash();
+                        db.entry(p.unwrap().0).or_insert(a);
+                        break;
+                    }
+                }
+                pre_steps += len;
+            }
+            snap.push(("db".into(), take(&f)));
+            let mut steps_total = 0u64;
+            let mut walks = 0u64;
+            let mut abandoned = 0u64;
+            let inv2 = n.div_ceil(2);
+            for t in 0..targets {
+                let q = qs[t];
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut pending: HashMap<u64, (u64, i64)> = HashMap::default();
+                let v = 'tgt: loop {
+                    let k1 = rng.gen_range(0..BANK);
+                    tp = f.padd(tp, bank[k1].0);
+                    ta = (ta + bank[k1].1) % n;
+                    let (mut p, s0) = canon(tp);
+                    let mut a = md(s0 as i128 * ta as i128, n);
+                    let mut b = s0;
+                    let mut len = 0u64;
+                    walks += 1;
+                    while p.is_some() && len < maxwalk {
+                        let r = step(&f, p, a, b);
+                        p = r.0;
+                        a = r.1;
+                        b = r.2;
+                        len += 1;
+                        if is_dp(p) {
+                            let x = p.unwrap().0;
+                            f.hash();
+                            if let Some(&a2) = db.get(&x) {
+                                // a G + b Q = a2 G
+                                break 'tgt md(b as i128 * (a2 as i128 - a as i128), n);
+                            }
+                            f.hash();
+                            if let Some(&(a2, b2)) = pending.get(&x) {
+                                if b2 != b {
+                                    // a + b q = a2 + b2 q, b2 = -b: q = (a2 - a) / (2 b)
+                                    let num = md(a2 as i128 - a as i128, n);
+                                    let qv = md(
+                                        b as i128
+                                            * ((num as u128 * inv2 as u128) % n as u128) as i128,
+                                        n,
+                                    );
+                                    f.cm.set(f.cm.get() + 1);
+                                    break 'tgt qv;
+                                }
+                            } else {
+                                f.hash();
+                                pending.insert(x, (a, b));
+                            }
+                            break;
+                        }
+                    }
+                    steps_total += len;
+                    if len >= maxwalk {
+                        abandoned += 1;
+                    }
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, (a, b)) in pending {
+                    f.hash();
+                    db.entry(x)
+                        .or_insert(md(a as i128 + b as i128 * v as i128, n));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{}",
+                    db.len(),
+                    d,
+                    pre_steps,
+                    steps_total,
+                    walks,
+                    abandoned
+                ),
+            }
+        }
+        "rhodpu" => {
+            // Multi-target distinguished-point rho on {P, -P} classes (Kuhn-Struik with retention of solved
+            // walks, optional precomputation). Walk: P -> canon(P + A_h(P)), R = 1024 steps A_i = B_j + B_k from
+            // the 64-point bank; if the next point would use the same step index (a fruitless 2-cycle risk),
+            // the step A_(h+1) is used instead (the extra addition is counted). A point is distinguished when
+            // d hash bits are zero (theta = 2^d steps per walk on average); walks longer than 20 theta are
+            // abandoned (their steps stay counted). param = kappa: precomputation walks from known-log starts
+            // until kappa sqrt(nT) steps are spent; args[6] = offset of d from d0 = round(log2(n/T)/4).
+            // Each target walks from chained starts Q + s G until a distinguished point is found in the
+            // database (solved) or in its own earlier walks with the opposite Q sign (solved); otherwise it is
+            // kept pending. After a target is solved, its pending distinguished points are inserted with known
+            // logs. Every addition is counted; every database or pending lookup and insert is one hash op.
+            const BANK: usize = 64;
+            const R: usize = 1024;
+            let kappa = param;
+            let doff: i32 = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
+            let d0 = (0.25 * ((n as f64) / targets as f64).log2()).round() as i32;
+            let d = (d0 + doff).max(1) as u32;
+            let mask = (1u64 << d) - 1;
+            let theta = 1u64 << d;
+            let maxwalk = 20 * theta;
+            let half = f.p / 2;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let mut arms: Vec<(Pt, u64)> = Vec::with_capacity(R);
+            let mut used = std::collections::HashSet::new();
+            while arms.len() < R {
+                let (i, j) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
+                if i == j || !used.insert((i.min(j), i.max(j))) {
+                    continue;
+                }
+                arms.push((f.padd(bank[i].0, bank[j].0), (bank[i].1 + bank[j].1) % n));
+            }
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let idx = |p: Pt| -> usize { p.map(|(x, _)| (mix(x) >> 40) as usize % R).unwrap_or(0) };
+            let is_dp =
+                |p: Pt| -> bool { p.map(|(x, _)| (mix(x) >> 8) & mask == 0).unwrap_or(false) };
+            // canonical class representative (y <= p/2); returns the sign applied
+            // native work per generated point: one canonicalisation and one hash of x (the step index and the
+            // distinguished-point test are bits of that one hash, so they are not counted again)
+            let canon = |p: Pt| -> (Pt, i64) {
+                f.native();
+                f.native();
+                match p {
+                    Some((x, y)) if y > half => (Some((x, f.p - y)), -1),
+                    _ => (p, 1),
+                }
+            };
+            // one walk step on (point, a, b) with point = a G + b Q canonical
+            let step = |f: &F, p: Pt, a: u64, b: i64| -> (Pt, u64, i64) {
+                let h = idx(p);
+                let (mut q1, mut s1) = canon(f.padd(p, arms[h].0));
+                let mut hh = h;
+                if q1.is_some() && idx(q1) == h {
+                    hh = (h + 1) % R;
+                    let r = canon(f.padd(p, arms[hh].0));
+                    q1 = r.0;
+                    s1 = r.1;
+                }
+                let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
+                (q1, a1, s1 * b)
+            };
+            let mut db: HashMap<u64, u64> = HashMap::default();
+            let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
+            let mut pre_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while pre_steps < pre_budget {
+                let k1 = rng.gen_range(0..BANK);
+                sp = f.padd(sp, bank[k1].0);
+                sa = (sa + bank[k1].1) % n;
+                let (mut p, s0) = canon(sp);
+                let mut a = md(s0 as i128 * sa as i128, n);
+                let mut len = 0u64;
+                while p.is_some() && len < maxwalk {
+                    let r = step(&f, p, a, 0);
+                    p = r.0;
+                    a = r.1;
+                    len += 1;
+                    if is_dp(p) {
+                        f.hash();
+                        db.entry(p.unwrap().0).or_insert(a);
+                        break;
+                    }
+                }
+                pre_steps += len;
+            }
+            snap.push(("db".into(), take(&f)));
+            let mut steps_total = 0u64;
+            let mut walks = 0u64;
+            let mut abandoned = 0u64;
+            let inv2 = n.div_ceil(2);
+            for t in 0..targets {
+                let q = qs[t];
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut pending: HashMap<u64, (u64, i64)> = HashMap::default();
+                let v = 'tgt: loop {
+                    let k1 = rng.gen_range(0..BANK);
+                    tp = f.padd(tp, bank[k1].0);
+                    ta = (ta + bank[k1].1) % n;
+                    let (mut p, s0) = canon(tp);
+                    let mut a = md(s0 as i128 * ta as i128, n);
+                    let mut b = s0;
+                    let mut len = 0u64;
+                    walks += 1;
+                    while p.is_some() && len < maxwalk {
+                        let r = step(&f, p, a, b);
+                        p = r.0;
+                        a = r.1;
+                        b = r.2;
+                        len += 1;
+                        if is_dp(p) {
+                            let x = p.unwrap().0;
+                            f.hash();
+                            if let Some(&a2) = db.get(&x) {
+                                // a G + b Q = a2 G
+                                break 'tgt md(b as i128 * (a2 as i128 - a as i128), n);
+                            }
+                            f.hash();
+                            if let Some(&(a2, b2)) = pending.get(&x) {
+                                if b2 != b {
+                                    // a + b q = a2 + b2 q, b2 = -b: q = (a2 - a) / (2 b)
+                                    let num = md(a2 as i128 - a as i128, n);
+                                    let qv = md(
+                                        b as i128
+                                            * ((num as u128 * inv2 as u128) % n as u128) as i128,
+                                        n,
+                                    );
+                                    f.cm.set(f.cm.get() + 1);
+                                    break 'tgt qv;
+                                }
+                            } else {
+                                f.hash();
+                                pending.insert(x, (a, b));
+                            }
+                            break;
+                        }
+                    }
+                    steps_total += len;
+                    if len >= maxwalk {
+                        abandoned += 1;
+                    }
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, (a, b)) in pending {
+                    f.hash();
+                    db.entry(x)
+                        .or_insert(md(a as i128 + b as i128 * v as i128, n));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{}",
+                    db.len(),
+                    d,
+                    pre_steps,
+                    steps_total,
+                    walks,
+                    abandoned
+                ),
+            }
+        }
         "bsgs2" => {
             let mf = param;
             let mx_goal = (mf * ((n as f64) * targets as f64).sqrt() / 2.0).ceil() as u64;
@@ -876,7 +2520,8 @@ fn main() {
                 let l = *b_pts.last().unwrap();
                 b_pts.push(f.padd(l, ugen));
             }
-            let mut baby: HashMap<u64, u64> = HashMap::with_capacity((2 * mx + 4) as usize);
+            let mut baby: HashMap<u64, u64> =
+                HashMap::with_capacity_and_hasher((2 * mx + 4) as usize, Default::default());
             for i in 0..u as usize {
                 f.hash();
                 baby.entry(a_pts[i].unwrap().0).or_insert(i as u64 + 1);
@@ -964,8 +2609,178 @@ fn main() {
                 ),
             }
         }
+        "opcost" => {
+            // Timed microbenchmark (no counted result): wall-clock ns per operation of this harness's own
+            // implementations on this host, to price the section 5a band: field mul/sqr/inv, one affine
+            // addition (= 1 GAE by definition: I + 2M + S), x-pair (shared inversion), std HashMap lookup and
+            // insert at table sizes 2^10..2^24 (the harness's key/value shape), and the native operations
+            // (step index x mod 32, canonicalisation + one 64-bit hash of x). A fast multiplicative hasher is
+            // timed as a sensitivity (the harness itself uses the std hasher). param = repetition scale.
+            use std::hint::black_box;
+            let scale = param.max(0.01);
+            let reps = |base: f64| -> u64 { ((base * scale) as u64).max(1000) };
+            let time_ns = |n: u64, t: Instant| -> f64 { t.elapsed().as_nanos() as f64 / n as f64 };
+            let p = f.p;
+            let mut res: Vec<String> = Vec::new();
+            // field ops
+            let n1 = reps(2e7);
+            let mut x = 12345u64 % p;
+            let y = 987654321u64 % p;
+            let t = Instant::now();
+            for _ in 0..n1 {
+                x = f.mul(black_box(x), y);
+            }
+            res.push(format!("\"mul_ns\":{:.3}", time_ns(n1, t)));
+            black_box(x);
+            let t = Instant::now();
+            for _ in 0..n1 {
+                x = f.sqr(black_box(x));
+            }
+            res.push(format!("\"sqr_ns\":{:.3}", time_ns(n1, t)));
+            black_box(x);
+            let n2 = reps(1e6);
+            let t = Instant::now();
+            for _ in 0..n2 {
+                x = f.inv(black_box(x) | 1);
+            }
+            res.push(format!("\"inv_ns\":{:.3}", time_ns(n2, t)));
+            black_box(x);
+            // affine addition chain P <- P + Q (one GAE each)
+            let q = f.smul(g, 7);
+            let mut pt = f.smul(g, 3);
+            let t = Instant::now();
+            for _ in 0..n2 {
+                pt = f.padd(black_box(pt), q);
+                if pt.is_none() {
+                    pt = g;
+                }
+            }
+            let gae_ns = time_ns(n2, t);
+            res.push(format!("\"padd_ns\":{:.3}", gae_ns));
+            black_box(pt);
+            let t = Instant::now();
+            let mut acc = 0u64;
+            for _ in 0..n2 {
+                if let Some((a, b)) = f.xpair(black_box(pt), q) {
+                    acc ^= a ^ b;
+                }
+                pt = f.padd(pt, q);
+            }
+            res.push(format!("\"xpair_plus_padd_ns\":{:.3}", time_ns(n2, t)));
+            black_box(acc);
+            // native ops
+            let half = p / 2;
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let n3 = reps(5e7);
+            let mut xs: Vec<(u64, u64)> = Vec::with_capacity(1 << 16);
+            for _ in 0..(1 << 16) {
+                xs.push((rng.gen_range(0..p), rng.gen_range(0..p)));
+            }
+            let t = Instant::now();
+            let mut acc = 0u64;
+            for i in 0..n3 {
+                let (xx, yy) = xs[(i & 0xffff) as usize];
+                let (cx, cy) = if black_box(yy) > half {
+                    (xx, p - yy)
+                } else {
+                    (xx, yy)
+                };
+                acc = acc.wrapping_add(cx ^ cy ^ (mix(cx) >> 40));
+            }
+            res.push(format!("\"canon_hash_ns\":{:.3}", time_ns(n3, t)));
+            let t = Instant::now();
+            for i in 0..n3 {
+                let (xx, _) = xs[(i & 0xffff) as usize];
+                acc = acc.wrapping_add((black_box(xx) as usize % 32) as u64);
+            }
+            res.push(format!("\"step_index_ns\":{:.3}", time_ns(n3, t)));
+            let t = Instant::now();
+            for i in 0..n3 {
+                let (xx, _) = xs[(i & 0xffff) as usize];
+                acc = acc.wrapping_add(black_box(xx));
+            }
+            res.push(format!("\"loop_baseline_ns\":{:.3}", time_ns(n3, t)));
+            black_box(acc);
+            // hash tables: std (as in the harness) and a fast multiplicative hasher (sensitivity)
+            #[derive(Default)]
+            struct FastH(u64);
+            impl std::hash::Hasher for FastH {
+                fn finish(&self) -> u64 {
+                    self.0
+                }
+                fn write(&mut self, b: &[u8]) {
+                    for &c in b {
+                        self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);
+                    }
+                }
+                fn write_u64(&mut self, v: u64) {
+                    self.0 = (v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+                }
+            }
+            type Fast = std::hash::BuildHasherDefault<FastH>;
+            let mut tabs: Vec<String> = Vec::new();
+            for lg in [10u32, 12, 14, 16, 18, 20, 22, 24] {
+                let size = 1usize << lg;
+                let keys: Vec<u64> = (0..size).map(|_| rng.gen_range(0..p)).collect();
+                let probes: Vec<u64> = (0..(1 << 20))
+                    .map(|i| {
+                        if i % 2 == 0 {
+                            keys[rng.gen_range(0..size)]
+                        } else {
+                            rng.gen_range(0..p)
+                        }
+                    })
+                    .collect();
+                let nl = reps(4e6);
+                // std hasher, value shape (u64, u64) as the rho databases
+                let mut m: std::collections::HashMap<u64, (u64, u64)> =
+                    std::collections::HashMap::with_capacity(size * 2);
+                let t = Instant::now();
+                for &k in &keys {
+                    m.entry(k).or_insert((k, k));
+                }
+                let ins = time_ns(size as u64, t);
+                let t = Instant::now();
+                let mut hits = 0u64;
+                for i in 0..nl {
+                    if m.contains_key(&probes[(i as usize) & ((1 << 20) - 1)]) {
+                        hits += 1;
+                    }
+                }
+                let look = time_ns(nl, t);
+                black_box(hits);
+                drop(m);
+                let mut m2: std::collections::HashMap<u64, (u64, u64), Fast> =
+                    std::collections::HashMap::with_capacity_and_hasher(size * 2, Fast::default());
+                let t = Instant::now();
+                for &k in &keys {
+                    m2.entry(k).or_insert((k, k));
+                }
+                let ins2 = time_ns(size as u64, t);
+                let t = Instant::now();
+                let mut hits2 = 0u64;
+                for i in 0..nl {
+                    if m2.contains_key(&probes[(i as usize) & ((1 << 20) - 1)]) {
+                        hits2 += 1;
+                    }
+                }
+                let look2 = time_ns(nl, t);
+                black_box(hits2);
+                tabs.push(format!(
+                    "{{\"log2_size\":{},\"std_insert_ns\":{:.3},\"std_lookup_ns\":{:.3},\"fast_insert_ns\":{:.3},\"fast_lookup_ns\":{:.3}}}",
+                    lg, ins, look, ins2, look2
+                ));
+            }
+            res.push(format!("\"tables\":[{}]", tabs.join(",")));
+            Out {
+                ok: 0,
+                extra: res.join(","),
+            }
+        }
         _ => panic!("unknown arm"),
     };
+    // wall time of the method itself (everything before the shared verification pass)
+    let ms_arm = t0.elapsed().as_secs_f64() * 1e3;
     // Verification (counted): every recovered log by double-and-add.
     let mut ok = out.ok;
     for t in 0..targets {
@@ -980,8 +2795,8 @@ fn main() {
         .map(|(k, v)| format!("\"{}\":[{},{},{},{},{}]", k, v[0], v[1], v[2], v[3], v[4]))
         .collect();
     println!(
-        "{{\"arm\":\"{}\",\"n\":{},\"p\":{},\"targets\":{},\"seed\":{},\"param\":{},\"ok\":{},\"I\":{},\"M\":{},\"S\":{},\"H\":{},\"L\":{},\"phases\":{{{}}},{},\"ms\":{:.1}}}",
-        arm, n, p, targets, seed, param, ok, f.ci.get(), f.cm.get(), f.cs.get(), f.ch.get(), f.cl.get(),
-        phases.join(","), out.extra, t0.elapsed().as_secs_f64() * 1e3
+        "{{\"arm\":\"{}\",\"n\":{},\"p\":{},\"targets\":{},\"seed\":{},\"param\":{},\"ok\":{},\"I\":{},\"M\":{},\"S\":{},\"H\":{},\"L\":{},\"N\":{},\"phases\":{{{}}},{},\"ms_arm\":{:.1},\"ms\":{:.1}}}",
+        arm, n, p, targets, seed, param, ok, f.ci.get(), f.cm.get(), f.cs.get(), f.ch.get(), f.cl.get(), f.cn.get(),
+        phases.join(","), out.extra, ms_arm, t0.elapsed().as_secs_f64() * 1e3
     );
 }

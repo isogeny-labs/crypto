@@ -1,0 +1,69 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-fp31-phase4-rhostep-20261112-1
+experiment_id: fp31_whole_field_census_20261111
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 433929023888966a6ff4c87520f98c4b2c929055
+receipt: research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.receipt.json
+binds:
+  - {path: research/fp31_whole_field_census_20261111/phase4/PROTOCOL.md, sha256: cd2984ea9ed7b71eac87f020262cb5552b26620e67762ce31404c4ae49b072b1}
+  - {path: research/fp31_whole_field_census_20261111/phase4/run_phase4.sh, sha256: 6b35b4c9be47191a0558e1d4c815b2088245a541b9aee84b721b050470b5a591}
+  - {path: research/fp31_whole_field_census_20261111/phase3/classes.json, sha256: f5e04adc98f8eb3d7b6f2c84849640f63acd3fcf7cb1a69ab107e8cc087a5d10}
+  - {path: research/fp31_whole_field_census_20261111/tool/src/phase4.rs, sha256: 340e7fb924ff64539dd9b8bbf99967830f95824b1f15dc49843bbc0dd0e7fde1}
+  - {path: research/fp31_whole_field_census_20261111/tool/src/stats.rs, sha256: df661a281eda8d7a1e5458e5c4dc9ea68152504e3bfcc3c1aa9684c5ccf0c468}
+  - {path: target/release/ecbench, sha256: 86a9421ddd9881665af24006d9505497fc2fab58e99890aa8af2a7972425254a}
+  - {path: research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census, sha256: 632d1b77d0d7106ab3a0e3ad3afc0706b17ee30bdc6449be13b34a8b009e89db}
+must_not_exist:
+  - research/fp31_whole_field_census_20261111/phase4/runs
+  - research/fp31_whole_field_census_20261111/phase4/analysis.json
+commands:
+  - id: run-phase4
+    argv:
+      - research/fp31_whole_field_census_20261111/phase4/run_phase4.sh
+      - target/release/ecbench
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - research/fp31_whole_field_census_20261111/phase4/runs
+    env:
+      BENCHREC: benchmarks/records/20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves.json
+      BENCHREC_ISOLATION: L2
+      CHECKPOINT_SKIP: no-aws-identity-local-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 10800
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.run-phase4.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.run-phase4.stderr
+  - id: rho-timing
+    argv:
+      - research/fp31_whole_field_census_20261111/tool/target/release/fp31-class-census
+      - rho-timing
+      - --classes
+      - research/fp31_whole_field_census_20261111/phase3/classes.json
+      - --runs
+      - research/fp31_whole_field_census_20261111/phase4/runs
+      - --out
+      - research/fp31_whole_field_census_20261111/phase4/analysis.json
+    env:
+      BENCHREC: benchmarks/records/20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves.json
+      BENCHREC_ISOLATION: L2
+      CHECKPOINT_SKIP: no-aws-identity-local-run-recorded-in-PROTOCOL-section-7
+    timeout_seconds: 540
+    success_exit_codes: [0]
+    stdout: research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.rho-timing.stdout
+    stderr: research/fp31_whole_field_census_20261111/phase4/cards/CARD-fp31-phase4-rhostep-20261112-1.rho-timing.stderr
+    outputs: [research/fp31_whole_field_census_20261111/phase4/analysis.json]
+bus_address: executor-mechanical-fp31-phase4
+background: true
+write_scope: [research/fp31_whole_field_census_20261111/phase4/]
+stop_when:
+  - Any command exits nonzero or reaches its timeout; retain the receipt and the run directory as they are.
+  - The tool reports that a bound digest does not match; run nothing further.
+notes: >-
+  Local route (PROTOCOL.md section 7: no AWS identity), isolation L2; ecbench refuses L2 runs on a busy host and grades
+  each row. CHECKPOINT_SKIP is set because the checkpoint hook would otherwise refuse ecbench launchers until a resume
+  checkpoint is pushed to S3, which needs AWS. The benchmark record is
+  benchmarks/records/20261112T0301Z-fp31-rho-step-cost-across-isogenous-curves.json. The first command (48 classes,
+  estimated under 1 h) runs detached and the tool exits 4; run `python3 tools/task_card.py wait` on this card and
+  repeat it for as long as it exits 4. run_phase4.sh exits 0 even when a class prints FAILED; the script prints one
+  line per class, beginning with ok, skip or FAILED, and a FAILED class is recorded as missing and not retried or
+  replaced (PROTOCOL.md section 4). The two binaries are untracked build outputs bound by sha256 only.
