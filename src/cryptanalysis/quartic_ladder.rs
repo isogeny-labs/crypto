@@ -423,7 +423,11 @@ impl Ctx {
     fn new(q: u32, f: &[u32; 15], nat: &mut Nat) -> Ctx {
         let qq = q as u64;
         let pts = rational_points(q, f, nat);
-        let idx: HashMap<Pt, u32> = pts.iter().enumerate().map(|(i, &p)| (p, i as u32)).collect();
+        let idx: HashMap<Pt, u32> = pts
+            .iter()
+            .enumerate()
+            .map(|(i, &p)| (p, i as u32))
+            .collect();
         let val2: Vec<[u64; 6]> = pts
             .iter()
             .map(|p| {
@@ -773,7 +777,11 @@ pub fn jacobian_order(pq: &PlaneQuartic, pts: &[Pt], seed: u64) -> Result<u64, S
     let tests: Vec<PicClass> = (0..32).map(|_| random_class(pq, pts, &mut rng)).collect();
     let surv: Vec<u64> = cands
         .into_iter()
-        .filter(|&n| tests.iter().all(|t| pq.is_zero(&pq.mul_scalar(t, n as u128))))
+        .filter(|&n| {
+            tests
+                .iter()
+                .all(|t| pq.is_zero(&pq.mul_scalar(t, n as u128)))
+        })
         .collect();
     match surv.as_slice() {
         [one] => Ok(*one),
@@ -1161,7 +1169,8 @@ pub fn run_diem(inst: &QInstance, prm: QIcParams) -> QIcResult {
                         let tcoef = subm(0, mulmod(h, b, r), r);
                         let rhs = mulmod(h, a, r);
                         if let Some((rel, lps)) = make_rel(&qs, tcoef, rhs, &col) {
-                            let good = !prm.verify_relations || ver.check(&pq, &mut ctx, &qs, true, &x);
+                            let good =
+                                !prm.verify_relations || ver.check(&pq, &mut ctx, &qs, true, &x);
                             if good {
                                 push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
                                 res.decomp_relations += 1;
@@ -1518,7 +1527,11 @@ mod tests {
         let rho = run_rho(&inst, 11);
         eprintln!(
             "q={q} rho: rec={:?} cert={} ops={} pic_mul={} steps={} wall={:.3}s",
-            rho.recovered, rho.certified, rho.group_ops, rho.pic_mul, rho.steps,
+            rho.recovered,
+            rho.certified,
+            rho.group_ops,
+            rho.pic_mul,
+            rho.steps,
             rho.wall_ns as f64 * 1e-9
         );
         assert!(rho.certified);
@@ -1541,15 +1554,38 @@ mod tests {
     fn timing_q1031() {
         let t0 = Instant::now();
         let inst = instance(1031);
-        eprintln!("q=1031 instance: order={} h={} r={} N={} setup={:.2}s", inst.order, inst.h, inst.r, inst.n_points, t0.elapsed().as_secs_f64());
+        eprintln!(
+            "q=1031 instance: order={} h={} r={} N={} setup={:.2}s",
+            inst.order,
+            inst.h,
+            inst.r,
+            inst.n_points,
+            t0.elapsed().as_secs_f64()
+        );
         for (arm, nb) in [(QArm::Full, 0usize), (QArm::DoubleLp, 96)] {
-            let res = run_diem(&inst, QIcParams { arm, nb, seed: 3, max_lines: 1 << 24, verify_relations: false });
+            let res = run_diem(
+                &inst,
+                QIcParams {
+                    arm,
+                    nb,
+                    seed: 3,
+                    max_lines: 1 << 24,
+                    verify_relations: false,
+                },
+            );
             eprintln!("q=1031 {arm:?}: cert={} ops={} pic_mul={} rel.mul={} (enum {}, decomp {}) la.mul={} rels={} lines={} att={} wall={:.3}s",
                 res.certified, res.group_ops, res.pic_mul, res.rel.mul, res.rel_enum.mul, res.rel_decomp.mul, res.la.mul, res.relations, res.lines_tried, res.attempts, res.wall_ns as f64 * 1e-9);
             assert_eq!(res.recovered, Some(inst.t_secret));
         }
         let rho = run_rho(&inst, 5);
-        eprintln!("q=1031 rho: cert={} ops={} pic_mul={} steps={} wall={:.3}s", rho.certified, rho.group_ops, rho.pic_mul, rho.steps, rho.wall_ns as f64 * 1e-9);
+        eprintln!(
+            "q=1031 rho: cert={} ops={} pic_mul={} steps={} wall={:.3}s",
+            rho.certified,
+            rho.group_ops,
+            rho.pic_mul,
+            rho.steps,
+            rho.wall_ns as f64 * 1e-9
+        );
         assert_eq!(rho.recovered, Some(inst.t_secret));
     }
 }

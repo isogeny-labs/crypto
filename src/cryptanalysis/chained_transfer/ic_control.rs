@@ -723,7 +723,13 @@ impl Dsu {
 
 /// The cycle rows of the relation graph: large-prime columns eliminated
 /// along a breadth-first spanning tree of the component of the vertex "1".
-pub(crate) fn build_rows(rels: &[Rel], nverts: usize, tcol: u32, r: u64, nat: &mut Nat) -> Vec<Row> {
+pub(crate) fn build_rows(
+    rels: &[Rel],
+    nverts: usize,
+    tcol: u32,
+    r: u64,
+    nat: &mut Nat,
+) -> Vec<Row> {
     let neg = |e: i8| if e > 0 { 1u64 } else { r - 1 }; // coefficient as residue
     let frow = |rel: &Rel| -> Vec<(u32, u64)> {
         let mut v: Vec<(u32, u64)> = rel.fb[..rel.nfb as usize]
