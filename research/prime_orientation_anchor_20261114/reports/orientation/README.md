@@ -94,8 +94,9 @@ Pinned Lean4.35/CryptoLean/Mathlib revisions are in the exact manifest.
 Sixty-six authored declarations, failed sources and raw logs are retained.
 Pinned gate:66/0 extra trusted axioms. Native literal checks:25 tests pass,
 format passes. Strict Clippy:4 inherited shared SHA256 library style errors,
-plus1 test-only style error; shared sources are unchanged. Fresh replay was
-still running at this report checkpoint [pcc:unverified].
+plus1 test-only style error; shared sources are unchanged. Fresh replay of OrientationProduct, with default imports, exits0.
+The [final receipt](../../evidence/validation-001.json) pins actual logs and
+checker bytes [pcc:unverified].
 [Proof map](../../PROOF_MAP.md), [protocol](../../PROTOCOL.md),
 [bindings](../../evidence/claim-pins.json),
 [source pins](../../evidence/source-freeze.json).
@@ -156,3 +157,7 @@ first-difference content margin) are retained separately from the66 audited
 project statements. Their local elaboration is data claim
 PCC-20261114-6f9128; it does not promote new rank or base-content results
 [pcc:unverified].
+
+Gate data PCC-20261114-50876e; final replay/validation data
+PCC-20261114-6b0d58. All69 new records (66 theorem bindings and3 data
+records) remain unsigned/default not_covered [pcc:unverified].
