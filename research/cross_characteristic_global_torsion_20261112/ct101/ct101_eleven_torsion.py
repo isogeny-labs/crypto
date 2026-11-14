@@ -180,6 +180,9 @@ for j in range(11):
 assert A is None and len(set(points))==11
 assert sorted({P[0] for P in points[1:]})==source_roots
 assert all((P is None or (P[1]**2+P[1]-rhs(P[0]))%p==0) for P in points)
+for i in range(11):
+    for j in range(11):
+        assert add59(points[i],points[j])==points[(i+j)%11]
 
 print(json.dumps({'case':'ct101-eleven-field-gate','ell':11,'source_p':59,
     'source_order':55,'source_11_generator':[19,22],
