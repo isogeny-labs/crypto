@@ -4,6 +4,11 @@ Only Python stdlib, fixed public 11a1 fixture; no source-to-target transfer.
 """
 import json
 
+def check(condition):
+    if not condition:
+        raise ArithmeticError('CT101 arithmetic invariant failed')
+
+
 def trim(a):
     a=list(a)
     while len(a)>1 and a[-1]==0:a.pop()
@@ -33,7 +38,7 @@ f5=sub(mul(power(D,2),f4),power(f3,3))
 f6=mul(f3,sub(f5,power(f4,2)))
 f7=sub(mul(f5,power(f3,3)),mul(power(D,2),power(f4,3)))
 f11=sub(mul(f7,power(f5,3)),mul(mul(power(D,2),f4),power(f6,3)))
-assert len(f11)==61 and f11[-1]==11
+check(len(f11)==61 and f11[-1]==11)
 
 def rem(a,b,p):
     a=trim([z%p for z in a]);b=trim([z%p for z in b]);iv=pow(b[-1],-1,p)
@@ -56,12 +61,12 @@ def modpow(a,e,m,p):
 
 q59=[z%59 for z in f11]
 source_roots=[i for i in range(59) if rem(q59,[-i,1],59)==[0]]
-assert source_roots==[19,20,22,43,46]
+check(source_roots==[19,20,22,43,46])
 x=[0,1]
 g1=gcdpoly(q59,sub(modpow(x,59,q59,59),x),59)
 g5=gcdpoly(q59,sub(modpow(x,59**5,q59,59),x),59)
-assert len(g1)-1==5 and len(g5)-1==60
-assert gcdpoly(q59,[(i*q59[i])%59 for i in range(1,len(q59))],59)==[1]
+check(len(g1)-1==5 and len(g5)-1==60)
+check(gcdpoly(q59,[(i*q59[i])%59 for i in range(1,len(q59))],59)==[1])
 
 def bits(a):return sum((z&1)<<i for i,z in enumerate(a))
 def p2mul(a,b):
@@ -83,15 +88,15 @@ f2=bits(f11)
 factors=[0x130027,0x131203,0x131211]
 prod=1
 for f in factors:prod=p2mul(prod,f)
-assert f2==prod
+check(f2==prod)
 for f in factors:
-    assert f.bit_length()==21 and f&1
+    check(f.bit_length()==21 and f&1)
     z=2
     for k in range(1,21):
         z=p2square(z,f)
-        if k in (4,10):assert p2gcd(z^2,f)==1
-    assert z==2
-assert p2gcd(f2, p2rem(sum(((i&1)&(f2>>i)) << (i-1) for i in range(1,61)),f2))==1
+        if k in (4,10):check(p2gcd(z^2,f)==1)
+    check(z==2)
+check(p2gcd(f2, p2rem(sum(((i&1)&(f2>>i)) << (i-1) for i in range(1,61)),f2))==1)
 
 mask=(1<<20)-1
 def kmul(a,b,f):
@@ -100,7 +105,7 @@ def kmul(a,b,f):
         if b&1:r^=a
         b>>=1;a<<=1
         if a&(1<<20):a^=f
-    assert b==0
+    check(b==0)
     return r&mask
 def kpow(a,n,f):
     r=1
@@ -110,9 +115,9 @@ def kpow(a,n,f):
     return r
 def ksq(a,f):return kmul(a,a,f)
 def kinv(a,f):
-    assert a
+    check(a)
     r=kpow(a,(1<<20)-2,f)
-    assert kmul(a,r,f)==1
+    check(kmul(a,r,f)==1)
     return r
 def curve_rhs(x,f):return kmul(ksq(x,f),x,f)^ksq(x,f)
 def on_curve(P,f,rad):
@@ -125,13 +130,13 @@ def point_add(P,Q,f,rad):
     x1,y1=P;x2,y2=Q
     if x1==x2:
         if y1^y2==1:return None
-        assert y1==y2
+        check(y1==y2)
         slope=ksq(x1,f)
     else:slope=kmul(y1^y2,kinv(x1^x2,f),f)
     x3=ksq(slope,f)^1^x1^x2
     y3=y1^kmul(slope,x1^x3,f)^1
     R=(x3,y3)
-    assert on_curve(R,f,rad)
+    check(on_curve(R,f,rad))
     return R
 
 summaries=[]
@@ -140,27 +145,27 @@ for f in factors:
     rad=curve_rhs(t,f)
     tr=0;cur=rad
     for _ in range(20):tr^=cur;cur=ksq(cur,f)
-    assert tr==1 and cur==rad
-    P=(t,0);assert on_curve(P,f,rad)
+    check(tr==1 and cur==rad)
+    P=(t,0);check(on_curve(P,f,rad))
     multiples=[None]
     for j in range(1,12):multiples.append(point_add(multiples[-1],P,f,rad))
-    assert multiples[11] is None and len(set(multiples[:11]))==11
+    check(multiples[11] is None and len(set(multiples[:11]))==11)
     for i in range(11):
         for j in range(11):
-            assert point_add(multiples[i],multiples[j],f,rad)==multiples[(i+j)%11]
+            check(point_add(multiples[i],multiples[j],f,rad)==multiples[(i+j)%11])
     conjugates=[];u=t;y0=0
     for k in range(40):
         conjugates.append((u,y0))
         u=ksq(u,f);y0=ksq(y0,f)^rad
-    assert len(set(conjugates))==40 and u==t and y0==0
-    assert conjugates[20]==(t,1)
-    for xx,yy in conjugates:assert on_curve((xx,yy),f,rad)
+    check(len(set(conjugates))==40 and u==t and y0==0)
+    check(conjugates[20]==(t,1))
+    for xx,yy in conjugates:check(on_curve((xx,yy),f,rad))
     summaries.append({'factor':hex(f),'trace_rhs':tr,'x_orbit':20,'oriented_orbit':40,'order11_verified':True,'group_pairs':121})
 
 p=59
 rhs=lambda x:(x**3-x*x-10*x-20)%p
 source_count=1+sum(1 for a in range(p) for b in range(p) if (b*b+b-rhs(a))%p==0)
-assert source_count==55
+check(source_count==55)
 def add59(P,Q):
     if P is None:return Q
     if Q is None:return P
@@ -177,12 +182,12 @@ Q=(19,22);A=None;points=[]
 for j in range(11):
     points.append(A)
     A=add59(A,Q)
-assert A is None and len(set(points))==11
-assert sorted({P[0] for P in points[1:]})==source_roots
-assert all((P is None or (P[1]**2+P[1]-rhs(P[0]))%p==0) for P in points)
+check(A is None and len(set(points))==11)
+check(sorted({P[0] for P in points[1:]})==source_roots)
+check(all((P is None or (P[1]**2+P[1]-rhs(P[0]))%p==0) for P in points))
 for i in range(11):
     for j in range(11):
-        assert add59(points[i],points[j])==points[(i+j)%11]
+        check(add59(points[i],points[j])==points[(i+j)%11])
 
 print(json.dumps({'case':'ct101-eleven-field-gate','ell':11,'source_p':59,
     'source_order':55,'source_11_generator':[19,22],
