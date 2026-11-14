@@ -467,9 +467,24 @@ fn full_d18_load(root: &Path) -> Result<(PrimaryBase, Value)> {
 /// solver. The constructed control pins x coordinates but leaves every
 /// representative and Frobenius-phase selector free.
 pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result<Value> {
-    const OBJECT: &str = "objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz";
+    k2048_m5_xcnf_export(mode, root, output, 0)
+}
+
+/// Export a frozen public corpus fixture with the same retained K2048 base.
+/// The constructed fixture-zero control remains the separate legacy command.
+pub(super) fn k2048_m5_xcnf_fixture_cli(root: &Path, fixture: u64, output: &Path) -> Result<Value> {
+    if fixture >= 32 {
+        return Err("K2048 m5 public fixture outside sealed corpus".into());
+    }
+    k2048_m5_xcnf_export("natural", root, output, fixture)
+}
+
+fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) -> Result<Value> {
+    const OBJECT: &str =
+        "objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz";
     const OBJECT_SHA256: &str = "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a";
-    const MANIFEST_SHA256: &str = "68b43524198394a2f0d112f86df0d1c1f69ea1ff817695cf21efe2767b7d17b8";
+    const MANIFEST_SHA256: &str =
+        "68b43524198394a2f0d112f86df0d1c1f69ea1ff817695cf21efe2767b7d17b8";
     const REPLAY_SHA256: &str = "5ad374ef0042b2ebd6562746b7ca67e46c6b0f4d46c4ba25abae83fd2dd411e2";
     const STORAGE_SHA256: &str = "f1139c1dd61beac0e1d9e80a1d02e983f98c7b1abc6887f1816f013d4693bf4c";
     const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
@@ -493,8 +508,7 @@ pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Resul
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
     let started = Instant::now();
-    let (base, row, manifest_blake3) =
-        load_panel_selected(root, 2_048, "public_x_hash", SEEDS[0])?;
+    let (base, row, manifest_blake3) = load_panel_selected(root, 2_048, "public_x_hash", SEEDS[0])?;
     let fb = &base.factor_base;
     if fb.points.len() != 339_968 || fb.signed_orbits.len() != 2_048 {
         return Err("K2048 m5 imported base size differs".into());
@@ -507,9 +521,10 @@ pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Resul
             BinaryPoint::Infinity => Err("K2048 representative is infinity".into()),
         })
         .collect::<Result<_>>()?;
-    let (public, corpus_blake3) = public_target(root, &base.curve)?;
-    if point_json(words(&public))
-        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    let (public, corpus_blake3) = public_target_fixture(root, &base.curve, fixture)?;
+    if fixture == 0
+        && point_json(words(&public))
+            != json!(["1834913121178197242856238", "8797964190732846213981377"])
     {
         return Err("K2048 m5 public target differs from frozen fixture".into());
     }
@@ -522,7 +537,10 @@ pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Resul
             sum = base.curve.add(&sum, &fb.points[index]);
             partial.push(sum.clone());
         }
-        if partial.iter().any(|point| !matches!(point, BinaryPoint::Affine { .. })) {
+        if partial
+            .iter()
+            .any(|point| !matches!(point, BinaryPoint::Affine { .. }))
+        {
             return Err("K2048 m5 positive has an identity intermediate".into());
         }
         let relation = checked_primary_relation_row(&base.curve, fb, &indices, &sum)?;
@@ -568,7 +586,10 @@ pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Resul
             let x = x.to_biguint();
             for bit in 0..83usize {
                 let wire = (block * 83 + bit + 1) as i32;
-                if !enc.solver.add_clause(vec![if x.bit(bit as u64) { wire } else { -wire }]) {
+                if !enc
+                    .solver
+                    .add_clause(vec![if x.bit(bit as u64) { wire } else { -wire }])
+                {
                     return Err("K2048 m5 positive pin contradicted circuit".into());
                 }
             }
@@ -588,14 +609,16 @@ pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Resul
         return Err("K2048 m5 XCNF exceeds frozen output cap".into());
     }
     let xcnf_path = output.with_extension("xcnf");
-    let mut file = OpenOptions::new().write(true).create_new(true).open(&xcnf_path)?;
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&xcnf_path)?;
     file.write_all(xcnf.as_bytes())?;
     file.sync_all()?;
     let xcnf_sha256 = sha256_hex(xcnf.as_bytes());
     let positive_receipt = if let Some((indices, _, row)) = positive {
-        let row_bytes = serde_json::to_vec(
-            &row.iter().map(ToString::to_string).collect::<Vec<_>>(),
-        )?;
+        let row_bytes =
+            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
         Some(json!({
             "indices":indices,
             "relation_row_decimal_blake3":blake3::hash(&row_bytes).to_hex().to_string(),
@@ -611,6 +634,7 @@ pub(super) fn k2048_m5_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Resul
         "binary_sha256":binary_sha256,"object":row["object"],
         "object_sha256":OBJECT_SHA256,"point_set_blake3":row["point_set_blake3"],
         "panel_manifest_blake3":manifest_blake3,"public_corpus_blake3":corpus_blake3,
+        "public_fixture":if mode == "natural" { Some(fixture) } else { None },
         "target":point_json(words(&target)),"shape":shape,
         "positive":positive_receipt,
         "xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
@@ -1090,6 +1114,31 @@ pub(super) fn full_d18_m4_l0_ordered_xcnf_cli(
     )
 }
 
+/// Export the same ordered D18 construction for one sealed public fixture.
+pub(super) fn full_d18_m4_l0_ordered_xcnf_fixture_cli(
+    root: &Path,
+    fixture_root: &Path,
+    fixture: u64,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl_fixture(
+        "natural",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        300,
+        true,
+        false,
+        true,
+        32,
+        fixture,
+    )
+}
+
 /// Export the unchanged constructed full-D18 XCNF and save one native SAT
 /// assignment so an independent verifier can test every exported constraint.
 pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
@@ -1208,6 +1257,43 @@ fn full_d18_m4_impl(
     ordered_first_pair: bool,
     xor_decision_cadence: usize,
 ) -> Result<Value> {
+    full_d18_m4_impl_fixture(
+        mode,
+        root,
+        fixture_root,
+        output,
+        l0_diagnostic,
+        encoding,
+        choice_pins,
+        phase_zero_first,
+        budget_seconds,
+        export_xcnf,
+        native_xcnf_witness,
+        ordered_first_pair,
+        xor_decision_cadence,
+        0,
+    )
+}
+
+fn full_d18_m4_impl_fixture(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    l0_diagnostic: bool,
+    encoding: FrobeniusOrbitRootEncoding,
+    choice_pins: &'static str,
+    phase_zero_first: bool,
+    budget_seconds: u64,
+    export_xcnf: bool,
+    native_xcnf_witness: bool,
+    ordered_first_pair: bool,
+    xor_decision_cadence: usize,
+    public_fixture: u64,
+) -> Result<Value> {
+    if public_fixture != 0 && (mode != "natural" || !export_xcnf || !ordered_first_pair) {
+        return Err("nonzero public fixture requires ordered natural XCNF export".into());
+    }
     if !["positive", "natural"].contains(&mode)
         || output.exists()
         || ((native_xcnf_witness || (ordered_first_pair && xor_decision_cadence == 32))
@@ -1340,9 +1426,10 @@ fn full_d18_m4_impl(
     {
         return Err("full D18 public corpus differs from frozen fixture".into());
     }
-    let (public, corpus_hash) = public_target(fixture_root, &base.curve)?;
-    if point_json(words(&public))
-        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    let (public, corpus_hash) = public_target_fixture(fixture_root, &base.curve, public_fixture)?;
+    if public_fixture == 0
+        && point_json(words(&public))
+            != json!(["1834913121178197242856238", "8797964190732846213981377"])
     {
         return Err("full D18 public target point differs".into());
     }
@@ -1616,6 +1703,7 @@ fn full_d18_m4_impl(
             "summands":4, "identity_mask":0,
             "root_encoding":encoding_name, "choice_pin_policy":choice_pins,
             "search_policy":search_policy, "target":point_json(words(&target)),
+            "public_fixture":public_fixture,
             "object":row["object"], "point_set_blake3":FULL_D18_POINT_SET,
             "shape":shape, "xcnf_sha256":xcnf_sha256,
             "xcnf_bytes":xcnf.len(), "xcnf_path":xcnf_path.to_string_lossy(),
@@ -3336,6 +3424,14 @@ pub(super) fn build_capacity_cli(
 }
 
 fn public_target(root: &Path, kc: &KoblitzCurve) -> Result<(BinaryPoint, String)> {
+    public_target_fixture(root, kc, 0)
+}
+
+fn public_target_fixture(
+    root: &Path,
+    kc: &KoblitzCurve,
+    fixture: u64,
+) -> Result<(BinaryPoint, String)> {
     let corpus: Value = serde_json::from_slice(&fs::read(root.join("probe-corpus.json"))?)?;
     if corpus["schema"] != "n83.public-probe-corpus/v1" || corpus["study"] != STUDY {
         return Err("public target corpus mismatch".into());
@@ -3343,10 +3439,8 @@ fn public_target(root: &Path, kc: &KoblitzCurve) -> Result<(BinaryPoint, String)
     let targets = corpus["targets"].as_array().ok_or("public targets")?;
     let mut selected = targets
         .iter()
-        .filter(|row| row["a"] == 0 && row["fixture"] == 0);
-    let row = selected
-        .next()
-        .ok_or("primary public fixture zero absent")?;
+        .filter(|row| row["a"] == 0 && row["fixture"] == fixture);
+    let row = selected.next().ok_or("primary public fixture absent")?;
     if selected.next().is_some() {
         return Err("ambiguous primary public fixture".into());
     }
@@ -4164,13 +4258,21 @@ mod tests {
         ));
         fs::create_dir(&root).unwrap();
         let target = base.curve.generator().clone();
+        let second = base.curve.mul(&target, &BigUint::from(2u8));
         let corpus = json!({
             "schema":"n83.public-probe-corpus/v1", "study":STUDY,
-            "targets":[{"a":0,"fixture":0,"point":point_json(words(&target))}]
+            "targets":[
+                {"a":0,"fixture":0,"point":point_json(words(&target))},
+                {"a":0,"fixture":1,"point":point_json(words(&second))}
+            ]
         });
         write_new_json(&root.join("probe-corpus.json"), &corpus).unwrap();
         let (selected, hash) = public_target(&root, &base.curve).unwrap();
         assert_eq!(selected, target);
+        let (selected_second, second_hash) = public_target_fixture(&root, &base.curve, 1).unwrap();
+        assert_eq!(selected_second, second);
+        assert_eq!(second_hash, hash);
+        assert!(public_target_fixture(&root, &base.curve, 2).is_err());
         let validation = json!({
             "schema":"n83.public-probe-validation/v1",
             "corpus_canonical_json_blake3":hash,

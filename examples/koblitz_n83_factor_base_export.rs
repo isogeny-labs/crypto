@@ -1304,10 +1304,24 @@ fn main() -> Result<()> {
                 &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]))?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-m4-l0-ordered-xcnf-fixture")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4-l0-ordered-xcnf-fixture BASE_DIR FIXTURE_DIR FIXTURE NEW_OUTPUT_JSON (source-bound D18 public-fixture XCNF export only; 300-s internal cap)".into()); }
+            let fixture: u64=args[4].parse()?;
+            let receipt=primary_adapter::full_d18_m4_l0_ordered_xcnf_fixture_cli(
+                Path::new(&args[2]),Path::new(&args[3]),fixture,Path::new(&args[5]))?;
+            println!("{receipt}");
+        },
         Some("primary-k2048-m5-xcnf")=>{
             if args.len()!=5 { return Err("primary-k2048-m5-xcnf positive|natural BASE_DIR NEW_OUTPUT_JSON (source-bound K2048 five-summand XCNF export only)".into()); }
             let receipt=primary_adapter::k2048_m5_xcnf_cli(
                 &args[2],Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-k2048-m5-xcnf-fixture")=>{
+            if args.len()!=5 { return Err("primary-k2048-m5-xcnf-fixture BASE_DIR FIXTURE NEW_OUTPUT_JSON (source-bound K2048 public-fixture XCNF export only)".into()); }
+            let fixture: u64=args[3].parse()?;
+            let receipt=primary_adapter::k2048_m5_xcnf_fixture_cli(
+                Path::new(&args[2]),fixture,Path::new(&args[4]))?;
             println!("{receipt}");
         },
         Some("primary-full-d18-m4-l0-xcnf-witness")=>{
