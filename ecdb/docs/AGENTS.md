@@ -8,6 +8,10 @@ It holds:
   isogeny-walk outputs and the trait catalogue;
 - 20,815 genus-2 and genus-3 cover curves, their Jacobians and explicit
   covers;
+- 128 Ciani plane quartics (genus 3, non-hyperelliptic, family
+  `ciani-quartic`) over F_p, p < 64, with their three elliptic quotients
+  (`curve_morphism` kind `quotient`) and L(Jac C) = L(E_x) L(E_y) L(E_z)
+  verified by exhaustive counts (`ecdb import ciani-quartics`);
 - 478 kernel-certified isogenies;
 - 61,305 priced DLP transfer routes;
 - Frobenius data, End(E), volcano levels, embedding degrees, twists and

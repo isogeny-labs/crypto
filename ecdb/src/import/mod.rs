@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use tokio_postgres::Client;
 
 pub mod certs;
+pub mod ciani;
 pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
@@ -214,6 +215,8 @@ pub enum Selection {
     EndRings,
     /// Factor bases of the IC work (FB1, FBM1, archive, spec ids), their points and results.
     FactorBases,
+    /// Ciani plane quartics (genus 3, non-hyperelliptic) and their three elliptic quotients (src/import/ciani.rs).
+    CianiQuartics,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -247,6 +250,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Enrich {
         reports.push(enrich::import(ctx).await?);
+    }
+    if all || what == Selection::CianiQuartics {
+        reports.push(ciani::import(ctx).await?);
     }
     if all || what == Selection::Results {
         reports.push(results::leaderboard(ctx).await?);

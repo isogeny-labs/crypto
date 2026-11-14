@@ -185,6 +185,9 @@ enum ImportWhat {
     /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
     /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
     FactorBases,
+    /// Ciani plane quartics over F_p, 5 <= p < 64 (seeded sample), verified L(Jac C) = L(E_x) L(E_y) L(E_z),
+    /// with their quotient maps (src/import/ciani.rs).
+    CianiQuartics,
     /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
     Generated { paths: Vec<String> },
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
@@ -285,6 +288,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
                 ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
+                ImportWhat::CianiQuartics => import::run(&ctx, Selection::CianiQuartics, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };
