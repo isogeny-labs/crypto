@@ -135,6 +135,12 @@ fn cmd_lattice(a: &[String]) {
         let r4 = eval_mod(&fld, &gp, &x1, &x2);
         if !r4.is_zero() { gp.insert((0, 0), r4); }
         let gu = generic_poly(&[r[0].clone(), r[1].clone(), r[2].clone(), fld.rand(&mut rng)]);
+        // symmetric generic null: r1 = r2 (X1<->X2 symmetry of S3), r3 random, r4 planted / random
+        let rs = fld.rand(&mut rng);
+        let mut gs = generic_poly(&[rs.clone(), rs.clone(), r[2].clone(), P::zero()]);
+        let rs4 = eval_mod(&fld, &gs, &x1, &x2);
+        if !rs4.is_zero() { gs.insert((0, 0), rs4); }
+        let gsu = generic_poly(&[rs.clone(), rs.clone(), r[2].clone(), fld.rand(&mut rng)]);
         // K2: P2' = phi(Q2), deg x(Q2) < l
         let q2 = loop { let q = fld.rand_point(&mut rng, l); if q.x != x1 { break q; } };
         let p2f = fld.frob(&q2);
@@ -148,6 +154,8 @@ fn cmd_lattice(a: &[String]) {
                 "s3u" => run_arm(&fld, arm, Form::XBox, &s3_poly(&fld, &cu), (1, 1), k, l, None, (lb, lb), &mut arng, &extra),
                 "genp" => run_arm(&fld, arm, Form::XBox, &gp, (1, 1), k, l, Some((x1.clone(), x2.clone())), (lb, lb), &mut arng, &extra),
                 "genu" => run_arm(&fld, arm, Form::XBox, &gu, (1, 1), k, l, None, (lb, lb), &mut arng, &extra),
+                "gsp" => run_arm(&fld, arm, Form::XBox, &gs, (1, 1), k, l, Some((x1.clone(), x2.clone())), (lb, lb), &mut arng, &extra),
+                "gsu" => run_arm(&fld, arm, Form::XBox, &gsu, (1, 1), k, l, None, (lb, lb), &mut arng, &extra),
                 "e3p" => run_arm(&fld, arm, Form::EForm, &e3_poly(&fld, &c), (1, 2), k, l, Some((x1.add(&x2), x1.mul(&x2))), (lb, 2 * lb), &mut arng, &extra),
                 "e3u" => run_arm(&fld, arm, Form::EForm, &e3_poly(&fld, &cu), (1, 2), k, l, None, (lb, 2 * lb), &mut arng, &extra),
                 "k2p" => {
