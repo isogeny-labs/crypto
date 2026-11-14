@@ -67,6 +67,7 @@ body=$(jq -n --arg n "$NAME" --argjson v $VCPU --arg t "$tok" --arg b "$boot" --
   cloudType:"SECURE",cpuFlavorIds:$fl,cpuFlavorPriority:"custom",vcpuCount:$v,interruptible:false,
   imageName:"python:3.12-slim",containerDiskInGb:20,ports:["8000/http"],env:{RUNNER_TOKEN:$t},
   dockerEntrypoint:["python3","-u","-c"],dockerStartCmd:[$b]}')
+jq 'del(.env, .dockerStartCmd) + {env:{RUNNER_TOKEN:"<withheld>"}, dockerStartCmd:["<server.py, base64; sha256 below>"]}' <<<"$body" > "$REC/pod-request.json"
 log "server.py sha256 $(sha256sum "$study/runpod/server.py" | cut -d' ' -f1); rp.sh sha256 $(sha256sum "$RP" | cut -d' ' -f1)"
 out=$(api -X POST "$API/pods" -d "$body"); id=$(jq -r '.id // empty' <<<"$out" 2>/dev/null || true)
 [ -n "$id" ] || { log "create failed: $(jq -c 'del(.env?)' <<<"$out" 2>/dev/null || echo "$out" | head -c 500)"; exit 4; }
