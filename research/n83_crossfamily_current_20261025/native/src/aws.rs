@@ -12,16 +12,16 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub const ACCOUNT: &str = "590183823895";
 pub const REGION: &str = "us-east-1";
-pub const ZONE: &str = "us-east-1a";
+pub const ZONE: &str = "us-east-1d";
 pub const VPC: &str = "vpc-0da45a1bf46c94fa9";
-pub const SUBNET: &str = "subnet-04e6765fae0326ef3";
+pub const SUBNET: &str = "subnet-0561480728d2b1ffd";
 pub const INSTANCE: &str = "g5g.4xlarge";
 pub const SECURITY_GROUP: &str = "sg-030ffadf6a62d2ce2";
 pub const PROFILE: &str = "n83-online-screen-ssm-20261019";
 pub const BUCKET: &str = "aburan28-n83-tier1-20261016-590183823895";
 pub const PROJECT_TAG: &str = "N83HighKCurrent";
 pub const CAP_SECONDS: u64 = 21600;
-pub const BID_USD_HOURLY: &str = "0.27";
+pub const BID_USD_HOURLY: &str = "0.28";
 const AMI_PARAMETER: &str =
     "/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id";
 
@@ -93,7 +93,7 @@ fn latest_quote(rows: &Value, now: DateTime<Utc>) -> Result<(String, String)> {
     }
     let price = field(row, "SpotPrice")?;
     let rate: f64 = price.parse()?;
-    if !(0.0..=0.27).contains(&rate) || rate == 0.0 {
+    if !(0.0..=0.28).contains(&rate) || rate == 0.0 {
         return Err("Spot quote exceeds approved bid".into());
     }
     Ok((price.to_owned(), field(row, "Timestamp")?.to_owned()))
@@ -227,7 +227,7 @@ pub fn plan(root: &Path, source_bundle: &Path, output: &Path) -> Result<Value> {
         "source_manifest_sha256":bundle["source_manifest_sha256"],
         "spot_quota_vcpus":quota_value,"cap_seconds":CAP_SECONDS,
         "root_disk_gb_per_host":50,"gp3_usd_per_gb_month":"0.08",
-        "s3_allowance_usd":"0.05","projected_at_bids_usd":"3.37",
+        "s3_allowance_usd":"0.05","projected_at_bids_usd":"3.49",
         "total_cap_usd":"4.20","zones":[zone(0),zone(1)]});
     let mut file = OpenOptions::new()
         .write(true)
@@ -253,7 +253,7 @@ pub fn verify_plan(root: &Path, source_bundle: &Path, plan_path: &Path) -> Resul
         || plan["source_manifest_sha256"] != bundle["source_manifest_sha256"]
         || plan["cap_seconds"] != CAP_SECONDS
         || plan["root_disk_gb_per_host"] != 50
-        || plan["projected_at_bids_usd"] != "3.37"
+        || plan["projected_at_bids_usd"] != "3.49"
         || plan["total_cap_usd"] != "4.20"
         || plan["zones"].as_array().is_none_or(|zones| {
             zones.len() != 2
@@ -728,7 +728,7 @@ pub fn allocate(
         "account_id":ACCOUNT,"region":REGION,"source_head_sha":plan["source_head_sha"],
         "run_id":run_id,"deadline_epoch":deadline,"instance_ids":[],"strata":[],
         "source_objects":{},"result_objects":{},"status_objects":{},
-        "allocation_cap_usd":"4.20","bid_projection_usd":"3.37"});
+        "allocation_cap_usd":"4.20","bid_projection_usd":"3.49"});
     atomic_json(&receipt_path, &receipt)?;
     let prefix = format!(
         "n83-highk-current/{}/{run_id}",
