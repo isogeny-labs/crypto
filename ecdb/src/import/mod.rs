@@ -11,6 +11,7 @@ use tokio_postgres::Client;
 
 pub mod certs;
 pub mod cover_lpoly;
+pub mod cover_prym;
 pub mod covers;
 pub mod derive;
 pub mod ecbench;

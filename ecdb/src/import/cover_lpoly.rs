@@ -220,7 +220,7 @@ impl Gf for ExtField<'_> {
     }
 }
 
-fn gpow<F: Gf>(f: &F, a: &F::E, mut e: u128) -> F::E {
+pub(crate) fn gpow<F: Gf>(f: &F, a: &F::E, mut e: u128) -> F::E {
     let mut r = f.one();
     let mut b = a.clone();
     while e > 0 {
@@ -433,7 +433,7 @@ fn candidates<F: Gf>(c: &Cubic<'_, F>, p: &Pt<F::E>, lo: u128, hi: u128, m: u128
 }
 
 /// #E(F_q) of y^2 = x^3 + a2 x^2 + a4 x + a6 (smooth), q odd.
-fn group_order<F: Gf>(f: &F, a2: F::E, a4: F::E, a6: F::E) -> Result<u128, Bsgs> {
+pub(crate) fn group_order<F: Gf>(f: &F, a2: F::E, a4: F::E, a6: F::E) -> Result<u128, Bsgs> {
     let c = Cubic::new(f, a2, a4, a6);
     if !c.is_smooth() {
         return Err(Bsgs::Inconsistent("singular cubic".into()));

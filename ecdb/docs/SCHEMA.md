@@ -179,7 +179,7 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | `isogeny` | source and target varieties, dimension, degree with factorization, l, kernel invariant factors (cyclic or (l, l)), separability and inseparable degree, field of definition. Also the formula (Vélu, Kohel, Elkies, sqrt-Vélu, radical, modular polynomial, Richelot, Lubicz–Robert, Cosset–Robert, Kani, Frobenius, dual, composition, CM action), and the kernel as a polynomial, generators or ideal. Also the raw codomain and the post-isomorphism onto the stored model, the rational map (inline or artifact), volcano direction, the dual, the certificate and the status |
 | `isogeny_route`, `isogeny_route_step` | ordered chains (IW1 routes) with total degree |
 | `isogeny_volcano`, `volcano_vertex` | components of the l-isogeny graph: depth, crater size and shape, completeness, vertex levels |
-| `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism |
+| `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism, and (`0013`) `prym_complement`: E -> E', the other elliptic factor of a genus-2 cover's Jacobian |
 | `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing, Frey–Kani, Satoh, quotient. Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
 | `dlp_transfer` | routes that move a DLP to another group: Jacobian, Weil restriction, F_{q^k}^* (MOV / Frey–Rück), additive group (anomalous), isogenous curve, extension-field curve, Pohlig–Hellman factor. Each carries invariants, the full cost record, log2 transfer / target / total / matched-reference costs, the ratio, the verdict and notes; the cost model is stored once in the provenance |
 | `certificate` | volcano-level, order, kernel, Jacobian-gluing, cover, primality and irreducibility certificates with their hypotheses |
@@ -247,6 +247,71 @@ F_{2^{2m}} need 2^24 elements or fewer). They need SEA or a Kloosterman-sum
 algorithm; no value is guessed. In the pinned `covers.json` the skipped sources
 are 301 genus-2 sources over F_p (63 to 638 bits), 959 over GF(p^k) (49 to 253
 bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
+
+### Prym complements of the genus-2 cover sources (`0013`)
+
+After the L-polynomials, `import covers` materialises the second elliptic
+factor of every genus-2 source (`src/import/cover_prym.rs`). For
+`prime_quadratic_pullback_v1`, H: v^2 = G(u^2) with G(x) = x^3 + g2 x^2 +
+g1 x + g0, the quotients of H by (u, v) -> (-u, v) and (-u, -v) are the
+target E: v^2 = G(x) and E': w^2 = x G(x), and Jac(H) ~ E x E' over F_q (E' is
+the Prym variety of H -> E).
+
+- **The model.** Z = g0/x, V = g0 w/x^2 gives V^2 = Z^3 + g1 Z^2 + g0 g2 Z +
+  g0^2, and X = Z + g1/3 gives E': Y^2 = X^3 + A X + B with A = g0 g2 - g1^2/3
+  and B = g0^2 - g0 g1 g2/3 + 2 g1^3/27. So H -> E' is (u, v) -> (g0/u^2 +
+  g1/3, g0 v/u^3). E' is a `curve` row under its ICV1 slug: the model JSON
+  of (A, B) over the field of H (prime, or GF(p^k) with the extension model
+  JSON of `docs/curves/ICV1.md`), its hash, and the trace t'. The family is
+  `prym-complement`, unless the curve already exists. It also gets
+  `genus1_invariants`, the genus-1 `isogeny_class_fq` row of t', the link
+  `abelian_variety.isogeny_class_id`, `curve_zeta` (with `order_check` and
+  `order_method`) and the `icv1_slug` alias.
+- **The relations.**
+  - `curve_relation` E -> E' has kind `prym_complement`, the enum value
+    migration 0013 adds. Its `map` holds the source H
+    (`via_cover_source_curve_id`), g0, g1 and g2, both maps from H, and the
+    change of variables. There is one row per target of H. No row is written
+    when E' is E itself (the table's CHECK).
+  - `av_component` rows give Jac(H) ~ Jac(E) x Jac(E'), with relation
+    `isogeny_factor`. When E' = E, the one row has multiplicity 2. When H
+    covers two models of one curve, the short Weierstrass target is the
+    factor.
+  - Neither kind of row transports a discrete logarithm.
+- **Cross-checks.** A failure is reported (`prym_crosscheck_failures` and a
+  problem line), and nothing is stored for that source.
+  - t' = -a1 - t, from the stored L-polynomial and the target's stored trace
+    t. It must satisfy a2 = 2q + t t' and the Hasse bound.
+  - #E' = q + 1 - t' must equal the group order of the short model (A, B),
+    found independently. The search is baby-step giant-step with a unique
+    candidate in the Hasse interval, or an exhaustive count for q < 2^20 when
+    the search is inconclusive. An inconclusive order above that is skipped.
+  - j(E') is computed twice: as 1728 * 4A^3 / (4A^3 + 27B^2) from the short
+    model, and as 6912 I^3 / (4I^3 - J^2) from the invariants of the quartic
+    x G(x) itself, I = g1^2 - 3 g0 g2 and J = 9 g0 g1 g2 - 27 g0^2 - 2 g1^3.
+    The two must agree.
+  - The field's ICV1 name, recomputed from its modulus, must equal the
+    stored one.
+  - A curve that already has the same model must carry the same slug, and an
+    existing class must have the same trace.
+- **Status.** The status is that of the L-polynomial (`proved`, or
+  `probable` when the field is not proved). The invariants are `proved`.
+- **Idempotence.** A source whose Jacobian already has `isogeny_factor` rows
+  is left alone (`prym_already_complete`). Every insert is
+  insert-or-nothing. Nothing is deleted.
+- **The pinned load.** A throwaway database loaded with `import registry`
+  and then `import covers` holds the following.
+  - All 20,842 genus-2 sources with an L-polynomial get E': 20,428 over F_p
+    and 412 over GF(p^k), with no failure and no skip.
+  - That is 20,842 distinct E', of which 20,840 are new curves. The other 2
+    are their own targets (E' = E).
+  - 5,818 new genus-1 classes, 20,840 `prym_complement` relations (all
+    `proved`) and 41,682 `av_component` rows.
+  - For every relation, #Jac(H) = #E · #E'.
+  - A second import inserts nothing.
+  - The deployed ecdb also holds the census and dataset curves. Against it,
+    the split between new and existing E' can differ: a census curve with
+    exactly the same (A, B) is reused under its slug.
 
 ### Global curves, security, evidence (`0007`)
 
