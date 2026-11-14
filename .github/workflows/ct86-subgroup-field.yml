@@ -120,7 +120,7 @@ jobs:
           printf '%s  %s\n' 380218d31be6e794362d2f362725da5037d4e15264361ae2d61f082101aa3790 /tmp/ct91-py.json | sha256sum -c
           cat /tmp/ct91-py.json
 
-      - name: Verify CT92 exact Chebotarev source-place counts in two independent implementations
+      - name: Verify CT92 source/target Frobenius splitting and Chebotarev counts independently
         shell: bash
         run: |
           set -euo pipefail
@@ -132,5 +132,5 @@ jobs:
           cmp /tmp/ct92-py.json /tmp/ct92-opt.json
           cmp /tmp/ct92-py.json /tmp/ct92-js.json
           cmp /tmp/ct92-py.json /tmp/ct92-jsopt.json
-          printf '%s  %s\n' f813e26c75d9a70835246b6cf1ba2d34a1bb9b2181d533c8b31453af88fc4506 /tmp/ct92-py.json | sha256sum -c
+          printf '%s  %s\n' 4fbd54cd2e4ce9f3f0a850747cdb7465787e9baf158c35f81b408b979e7feb7a /tmp/ct92-py.json | sha256sum -c
           cat /tmp/ct92-py.json
