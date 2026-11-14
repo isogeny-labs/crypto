@@ -162,3 +162,49 @@ own faithful map. The fixed native fixture experiment remains unlaunched
 due checkpoint upload admission; no solver, paid or attack campaign was run.
 Original public finder, field extraction and expected bit-cost exit criteria
 remain open [pcc:unverified].
+
+
+2026-11-14 normalized scaling/full-closure test: [report](../research/prime_norm_rank_20261112/target-grading-report/README.md),
+source85c57a726a644a6d2138a5c97785ab1119a06aff. The normalized actual target
+row has exact inverse-pair weight-(d-3) transport, retaining d>=3, e*l=1
+and the curve premise. Separately, its row change is a public constant
+field-linear recombination in the coefficient algebra. The old/new input
+spans, and their full iterated degree-budgeted closures, coincide whenever
+both input families fit the budget. Multiplication of newly derived rows
+is included; the degree function is explicit. Actual symbolic remainder
+binding is not a finite-field pointwise surrogate. Central unsigned
+PCC-20261114-46dee9/5f67e7/044d98/d07690; validation6643d4 records15 authored
+theorems plus one generated recursor, whole-study gate369/0 and fresh0
+[pcc:unverified].
+
+This excludes attributing a closure reduction above input admission to
+constant row recombination alone. It does not prove the original closure
+large or exclude short derivations exposed by a different row basis,
+lower-budget effects, implementation gains or nonlinear mechanisms.
+Exact multivariate degree29 binding and full growing-family closure remain
+open. Next, obtain actual bounded derivations or test a mechanism beyond
+constant row recombination; preserve all original public finder, extraction
+and expected bit-cost criteria. No solver/native fixture experiment was
+launched, and no global non-generic impossibility is inferred [pcc:unverified].
+
+
+2026-11-14 rational-point base descent: [report](../research/prime_norm_rank_20261112/split-base-descent-report/README.md),
+source1e3f20752022a341a4612e6a72e8e5690f8c6baa. For a monic bounded norm
+pair, divisibility of the actual full norm by a public nodal polynomial on
+actual prime-field points forces all pair coefficients into the prime
+subfield. Selected support and either successful sign are derived; zero
+lower polynomial is handled. General arbitrary-arity rigidity and prime
+coefficient claimsPCC-20261114-8c21e7/255fa5; actual monic support/membership
+specializationPCC-20261114-0943a7/5d35b3. Validation7b5216 records14 authored
+theorems, whole-study gate383/0 and import-inclusive fresh0, all unsigned
+[pcc:unverified].
+
+This openly changes the base to actual rational points; it is not an
+extension of the Kummer good-coset theorem to Dickson/arbitrary primes.
+The new membership polynomial is an explicit point-list nodal product;
+no cheap tower or free known-log precomputation is assumed. Base generation,
+coverage, collisions/opposites/target exclusions, retry policy, actual
+public finder, growing-family normal forms and complete expected bit cost
+remain obligations. Field-of-definition correctness is distinct from the
+cost of extraction. Original W-jet mapping and all original exit criteria
+remain open; no native/solver/paid experiment was launched [pcc:unverified].
