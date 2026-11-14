@@ -85,6 +85,8 @@ The binary square check (1906^2=1544=s+1) is independent. The six oriented sourc
 
 All are the same compatible-point outputs independently obtained through CT98's *different*, scalar-reading construction. The new algorithm **never computes a candidate scalar** during orientation; its own source and binary group operations are only validation controls.
 
+**CI replay certificate:** scoped PR workflow #43573329423 ran normal/optimized SymPy 1.14 and independently written Node normal/--no-opt, byte-identical JSON; SHA-256 `85366d4ac0b01b03898d2d69a8a3e04d5045805040c652eaf1f3f6ed6a69c124`. This is a specific previous exact-source run (code commit `f4699754d`), **not** an assertion of success on later commits or signed scientific verification. The newer CLI revision includes `--point 27,9` and rejects `--point 27,10` / `--point 10,4`; its exact-head CI must be checked separately.
+
 ## Independent regression and strict scope
 
 - `ct99_cubic_chord_orientation.py` imports CT97's actual algebraic cubic roots and increasing-degree QQ nullspace reconstruction, verifies both **global** polynomial identities, checks that (H+(1+2H)Y) obeys the full global curve equation for every root in (mathbb Q[X]/(psi_7)), checks the selected source and binary specializations, and orients all six public points. No multiplication map leading coefficients are examined or scalar index is provided.
@@ -105,6 +107,9 @@ cmp /tmp/ct99-py.json /tmp/ct99-pyopt.json
 cmp /tmp/ct99-py.json /tmp/ct99-js.json
 cmp /tmp/ct99-py.json /tmp/ct99-jsopt.json
 sha256sum /tmp/ct99-py.json
+python3 -B "$D/ct99_cubic_chord_orientation.py" --point 27,9
+# An invalid ordinate must exit nonzero:
+! python3 -B "$D/ct99_cubic_chord_orientation.py" --point 27,10
 ```
 
 ## Important cryptanalytic boundary and cost obligations
