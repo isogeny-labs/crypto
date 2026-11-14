@@ -56,10 +56,13 @@ class H(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data)
     def do_PUT(self):
         if not self.ok(): return
-        name = self.path.removeprefix("/upload/")
+        # /upload/<name> writes the file; /append/<name> appends one chunk (Amendment 16: the RunPod proxy rejects
+        # request bodies of a few MB, so the client sends 2 MB chunks). The /start SHA-256 check is unchanged.
+        mode = "ab" if self.path.startswith("/append/") else "wb"
+        name = self.path.removeprefix("/append/" if mode == "ab" else "/upload/")
         if name not in ALLOWED or state["state"] != "idle": return self.reply(400, {"error": "name or state"})
         n = int(self.headers["Content-Length"])
-        with open(f"{IN}/{name}", "wb") as f:
+        with open(f"{IN}/{name}", mode) as f:
             while n > 0:
                 b = self.rfile.read(min(n, 1 << 20)); f.write(b); n -= len(b)
         self.reply(200, {"name": name, "sha256": sha(f"{IN}/{name}")})
