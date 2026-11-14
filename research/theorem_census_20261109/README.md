@@ -391,6 +391,32 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [HPS first-fall primary-paper audit](../hps_first_fall_audit_20261114/README.md)
+reads all24PDFpages of the institutional version of Hodges–Petit–Schlather2014,
+DOI10.1016/j.ffa.2014.07.001, and formally refutes the printed general-field
+Theorem4.9 rank bound and upstream4.7/AppA.2 strict positivity.
+Actual B=Fp[X]/(X^p), for every primep≥5, has actual λ=x² of exact
+degree2/minimal linear-generatorrank1/firstfallp, strictly above(p+3)/2.
+ActualF5 gives5>4. Quotient power basis/independent spanning homogeneous
+pieces/graded multiplication/positive-part qnilpotence and actual
+annihilator quotient/minimum/rank are derived. Exact source qnomial
+coefficients and actual bi-infinite Γ satisfy Γ₅(1,2,4,2)=0; no cutoff
+approximation. The sharp one-variable monomial repair gives firstfallq
+andrank1 for q≥3,2≤d<q; q3 attains the printedbound3, while q2 x²/degree2
+piecezero is an invalid-domain control. Original corpusnode
+`THM-GB-HPS-FIRST-FALL-WEIL` is binaryq2: its specialization and m²+1
+bound are not refuted or fully proved. FullWeil/filteredgraded/allVtensor/
+solvingdegree/runtime bridges remain open. No novelty/canonical-status
+promotion; historical44snapshot unchanged. Exact local **PCC-20261114-0c9bcf** PASS at
+2026-11-14T22:48:00Z, signedstanding unverified; whole45/0/0/full1506-character
+binding`e1eb8e2ab8f67dad4a4467cb03e2437b6ff46b888c2c36fc6c36c6373abfea9e`,
+independent native1complete/0prefix/0unresolved,7custom/10formal-config+
+14artifactpins,136files/61objects/64160-byte losslessXZ/fivegate and
+visually inspected one-page48268byte report. Eleven build snapshots/nine
+failed states/defaulttimeout plus corrected report-count draft retained.
+No nativecrypto/spend/upload. [pcc:unverified]
+
+
 The [Vélu Frobenius qualification audit](../velu_frobenius_audit_20261114/README.md)
 binds original44-backlog node`ALG-RP-VELU-COST` to the actual primary
 Bernstein–DeFeo–Leroux–Smith2020/DOI10.2140/obs.2020.4.39.
