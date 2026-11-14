@@ -33,4 +33,8 @@ jobs:
           cmp /tmp/ct112-py.json /tmp/ct112-js.json
           cmp /tmp/ct112-py.json /tmp/ct112-jsopt.json
           printf '%s  %s\n' 28239819cd788d819e0fe0d8819dd850b520a2ea90acd9926f75d5fbff12c7ce /tmp/ct112-py.json | sha256sum -c
+          python3 -B "$D/ct112_modular_interpolation.py" --full > /tmp/ct112-modular.json
+          python3 -O -B "$D/ct112_modular_interpolation.py" --full > /tmp/ct112-modular-opt.json
+          cmp /tmp/ct112-modular.json /tmp/ct112-modular-opt.json
+          python3 -c 'import json; r=json.load(open("/tmp/ct112-modular.json")); assert len(r["validated_primes"])==179 and r["excluded_bad_prime"]==[827]'
           cat /tmp/ct112-py.json
