@@ -36,10 +36,13 @@ remained out of the solver command.
 The [frozen protocol](PROTOCOL.md), [lock](LOCK.json),
 [known-model auditor](audit_known_model.py), [runner](run_locked.py), and
 [raw auditor](audit_raw.py) define the reproducible boundary. The
-[`evidence/`](evidence/) directory retains the original formula and solver
-transcript as deterministic gzip archives, exact JSON receipts, host samples,
-command, and the first stale-binary export failure. The full original XCNF
-also remains at the absolute local path in the export receipt. The
+[`evidence/`](evidence/) directory retains an artifact-store pointer for the
+deterministic gzip original formula and a Git copy of the compressed solver
+transcript, exact JSON receipts, host samples, command, and the first
+stale-binary export failure. The full original XCNF also remains at the
+absolute local path in the export receipt. Hydrate the formula with
+`python3 tools/artifacts/artifacts.py pull` using store read access before
+rerunning the auditor. The
 [audit receipt](evidence/audit.json) binds the versioned copies to their
 frozen hashes; it is an unsigned producer-side audit. [pcc:unverified]
 

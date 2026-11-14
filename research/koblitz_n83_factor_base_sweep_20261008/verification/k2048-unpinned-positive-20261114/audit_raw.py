@@ -29,6 +29,12 @@ def sha(path, compressed=False):
 def main():
     export = EVIDENCE / "export"
     solver = EVIDENCE / "solver"
+    manifest = json.loads((export / ".artifacts.json").read_text())
+    entry = manifest["files"]["result.xcnf.gz"]
+    require(manifest["schema"] == "artifacts.manifest/v1" and
+            entry["sha256"] == sha(export / "result.xcnf.gz") and
+            entry["bytes"] == (export / "result.xcnf.gz").stat().st_size,
+            "artifact-store pointer or hydrated bytes")
     require(sha(export / "result.json") == LOCK["export_receipt_sha256"], "export copy")
     require(sha(export / "known-model-audit.json") == LOCK["known_model_audit_sha256"],
             "independent model audit copy")
