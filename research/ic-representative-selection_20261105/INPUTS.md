@@ -66,7 +66,7 @@ pushed, by the analysis owner, with `od -An -N8 -tx8 /dev/urandom`, and recorded
 below as the line `mask nonce: <16 hex>` (that exact form; `run/06-analyse.sh`
 reads it with `grep -oE 'mask nonce: [0-9a-f]{16}'`):
 
-mask nonce: (pending)
+mask nonce: f0115f0e0192bd9a
 
 ## 6. Decisions of the main session, 2026-11-14
 
@@ -143,9 +143,12 @@ adds its own statement when it files this amendment.
 
 ## 8. Still open
 
-- Iso Lab image receipt `inputs/image.json` (publish_only dispatch; requirements in
-  the hand-off message and in A_repsel/READINESS.md section 5).
-- Mask nonce (section 5), after this file is committed and pushed.
+- Image receipt: filed 2026-11-14 in `inputs/image.json` from the `isolab-publication` artifact of
+  `isolab-experiment.yml` run 43633983571 (publish_only, source revision c6cd50bcc8, the frozen commit):
+  image `isolab/tasks@sha256:5f1febae…bf02`, ecbench sha256 `ee08c78e…d87c`. Mask nonce drawn the same day
+  (section 5).
+- Launch: blocked while every AWS CodeBuild concurrency quota in us-east-2 reads 0 (the cluster launcher is a
+  CodeBuild project); raising it is an owner action.
 - `protocol.json` is not edited for A1: the protocol tool treats any change to it as a
   new version (`validate`: "file an amendment under a new version"). A1 is this file,
   the one the protocol designates for the inputs freeze; its first commit, before any
