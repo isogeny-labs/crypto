@@ -332,7 +332,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 |:--|:--|:--|
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees, literal binary S4 display disproof, and actual S3 symmetry/absolute irreducibility after every field scalar extension with2≠0, and actual source-ordered k2/S4-block polynomial normalization at every arity≥5; full all-arity input symmetry with actual coordinate/scalar semantics (90); actual ordinary characteristic2S3absolute irreducibility/allscalar maps/group semantics/model control (43); literal all-source-split recursion with actual natural degrees/source-last variable order and all domain specializations (82) | Higher-arity absolute irreducibility |
 | 2 BK | Complete p<500k1; actualF5/F7allk; generalr2geometry; generalr3rank2/actualFrobenius/descent, cubic-character normalformdetq; **qualifiedprime3 all-model/allfinitefield/allchosenextension inclusion and originalnine-point iff** with actual normalization/AddEquiv/scalar/tower/Frobenius/alln torsion bridges, explicitF7q1/r² and ordinarychar3controls (50); originalnine-pointprime3formwithoutaddedcoprime/generalchar3actualcard1or3/rank0or1 (22); directoriginalr2/r3finite-fieldcountformswithonlyAlgebraFK/cardq^k/noauxiliaryclosure-tower/noaddedcoprime (7) | Otherprime≥5 geometry/criterion, canonicalWeil necessity, generaldetq without rational3point, fullallkp500census |
-| 3 Supersingular | Partial: actual r2 exact-degree-two counterexamples; complete F2/F3/F4/F9/p<500 checks; generic char2/3 geometric j/torsion/module criteria(30); all-model F2/F3 source/geometry/Hasse/order4/6(44); all-model F5/F7 actual Hasse/source-trace0/count6/8/compositeorder2/namedcyclic6/8controls(29). **Unbounded every finite char2 field source-trace iff j0 iff odd point count iff rational/geometric2tor1, actual rank0/1, scalar invariance, imperfect/wrong-characteristic direct universal negations(26).**; genericodd-fieldactualtwistcount/tracenegation/sourceinvariance/literalF7special-jcoordinateandactualAddEquivcounter/hypothesiscontrols(42) | General char3/other-prime trace-geometric and Endrank identifications; Hasse beyond checked cohorts; embedding/full-torsion-field bridges |
+| 3 Supersingular | Partial: actual r=2 exact-degree-two counterexamples; complete F2/F3/F4/F9 and p<500 basefield checks. Generic char2/3 actual geometric j/torsion/module criteria; all-model F2/F3 kernel source/geometry/Hasse/count/order4/6(44) and F5/F7 Hasse/source-trace0/count6/8/composite-order/named cyclic6/8(29). **Every finite field of characteristic2 or3, every actual nonsingular general model: exact source-trace iff j0 iff actual geometric p-torsion card1/rank0, with finite-extension source invariance.** Char2 also rational-geometric equality/rank; imperfect-field control rejects deleting finiteness(26). Char3 uses actual complete-square, finite cube roots, paired twist three-point construction and actual counts(55); rational replacement and trace-zero strengthening are directly refuted. Generic odd-field actual twist count/trace/source invariance and literal Galbraith9.5.3 special-j F7 counter(42) retained. [pcc:unverified] | General p>=5 trace-geometric and Endrank identifications; Hasse beyond checked cohorts; embedding/full-torsion-field bridges; further explicit extension censuses |
 | 4 Pairings/MOV/FR | Partial: actual composite/F25controls; actual k1cyclic9group, true quotient/target and all-valid-auxiliary proper Miller-domain ND with rationalrestriction disproofs (116); original Verheul printed-formula disproof and actual point-group/cyclic repair with order3control (49); genericodd-fieldactualtwistcount/tracenegation/sourceinvariance/literalF7special-jcoordinateandactualAddEquivcounter/hypothesiscontrols(42) | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread; general Verheul End/Tate-module theorem5 |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
@@ -1257,3 +1257,37 @@ authorlanding/erratareadincludingadjacent9.5.8correction, no fullbookread/
 corpuspromotion. MilneIV7char≠2,3restrictionretained. Generalchar3trace-
 geometricbridge/Hasse/Endrank/embedding/fulltorsionfield/other14gapsopen.
 No nativeexperiment/paidcompute/agentupload. [pcc:unverified]
+
+### Every finite characteristic-three field: actual source trace and geometric torsion
+
+The [every-finite-characteristic-three packet](../research/finite_char_three_trace_audit_20261114/README.md)
+proves the exact source gcd(actual trace,q) predicate iff three divides actual
+trace iff actual point count is one modulo three iff b2=0 iff j=0 iff actual
+geometric three-torsion has cardinality one iff actual ZMod3 rank is zero.
+This holds for every finite characteristic-three field and every nonsingular
+general Weierstrass model, with no field-size or extension-degree bound.
+Actual complete-square group/Delta/card/b2 transport reduces to cubic models.
+Finite cube-root surjectivity supplies an actual division-polynomial abscissa;
+complementary twist fibers construct a nonzero three-point on one ordinary
+partner. Actual Cauchy/Lagrange, twist-source invariance, and the actual
+count sum prove both branches without rational-point/count/basis/rank/Hasse/
+trace-classification/End-rank premises. The source predicate is invariant
+under every finite field extension. Prior actual geometric j/module/group/
+count proofs are credited. Together with the preceding char2 packet, this
+closes the source-to-geometric p-torsion bridge in both characteristics2/3.
+The ordinary F3 pair has actual counts5/3 and rational3torsion1/3; twist
+P(1,1) has exact order3, and both source predicates are false. Lean rejects
+replacing geometric by rational torsion. The source-SS F3 pair has counts7/1
+and traces-3/+3, directly negating universal trace-zero strengthening.
+Qualified source p>=5 is retained. Exactlocal PCC-20261114-3a8304 PASS at2026-11-14T08:01:36Z,
+55declarations/0failures/0trusted, complete2121-character binding,
+102formal/config+11artifactpins, all51attemptfiles/20objects
+retained losslessly in27072Barchive,
+fivegatefiles and inspectedone-pagePDF48037B.
+Signedstandingunverified. FSTselectedpp230/237, Galbraithselected9.5.4
+context and Milne selected geometricp-rank/Endrank distinction reviewed,
+with prior primary-page inspections credited; no fullpaper/bookread or
+canonicalcorpuspromotion. Generalp>=5trace-geometric, Endrank, general
+Hasse/embedding/fulltorsionfield and other14gaps remain open. Further
+explicit native extension censuses are not automatically discharged.
+No newnativeexperiment/paidcompute/agentupload. [pcc:unverified]
