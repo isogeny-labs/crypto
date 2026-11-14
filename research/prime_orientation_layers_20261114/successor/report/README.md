@@ -3,7 +3,7 @@
 Frozen source `8455c485411b19c3b6a99cfc6c95f32276867b9b` contains40 authored
 statements. The pinned shared gate audits44 declarations, including4 generated
 congruence lemmas, with0 extra trusted axioms, exit0. Import-inclusive fresh
-OrientationRank is running. These are unsigned producer checks, gate data
+OrientationRank exits0 with default imports. These are unsigned producer checks, gate data
 PCC-20261114-341743; no signed standing is asserted [pcc:unverified].
 
 ## Actual objects and scope
@@ -83,7 +83,7 @@ completions, non-generic algorithms, or ECDLP complexity [pcc:unverified].
 | Actual first-layer necessary count |2^u for any rational approximation factors |
 | Absolute weighted normalization | actual c,w used, no supplied favorable scalar |
 | Source axiom audit |44 declarations/0 extra trusted axioms, gate exit0 |
-| Fresh replay | running; no final exit claimed yet |
+| Fresh replay | exit0/default imports; final data429114 |
 | Literal native artifact | IDC1hbc3887c49b3c9ce8, ring telescope only,32+16points |
 | New literal adapter checks |3tests/format/strictClippy exit0 |
 | All chart jets and complete weighted mode profile | open |
@@ -98,7 +98,11 @@ drafts and exact logs are retained. All new records remain unsigned.
 [Protocol](../PROTOCOL.md), [source/parent pins](../evidence/source-freeze.json),
 [gate receipt](../evidence/gate-validation-001.json),
 [all40 declaration/claim bindings](../evidence/claim-pins.json),
-[editable report](report.tex), [PDF](report.pdf).
+[versioned final report](report-final.tex), [final PDF](report-final.pdf).
+The earlier pending [checkpoint report](report.tex)/[PDF](report.pdf) retain
+their exact pinned bytes. Final replay receipt
+[validation-001.json](../evidence/validation-001.json), unsigned data
+PCC-20261114-429114 [pcc:unverified].
 
 Next: bind the existing reciprocal/geometric-series moment method to this
 exact masked family with constructed coefficients and charged costs. A

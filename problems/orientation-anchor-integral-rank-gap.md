@@ -141,3 +141,30 @@ PCC-20261114-75aea8. This reuses standard inverse-series moments; no faster
 runtime or full source-interface result is inferred. All higher chart jets,
 weighted mode density, coefficient/entry/recovery/recursion and efficient
 public finder/extraction/expected bit cost remain open [pcc:unverified].
+
+Successor40-source fresh replay now exits0 with default imports; exact39-byte
+stdout and versioned inspected final report retained in unsigned final data
+PCC-20261114-429114. Earlier pending report/receipt bytes remain unchanged.
+This finishes that component replay, not the higher-chart/cost exit criteria
+[pcc:unverified].
+
+
+## 2026-11-14 — constructed actual first-jet additive moment profile
+
+Source6e97fcc1fffc1dcbdc25770aac701c2e252905c5 promotes43 authored moment
+statements. Pinned gate44/0 (momentRight.congr_simp generated), fresh active
+at this checkpoint. Actual reciprocal denominator/even slopes, constructed
+weighted inverse/truncation and finite evaluation error give explicit
+integral2^u*k factors, row weight b, actual weighted row w+b and residual
+w+k. No good truncation/factor supplied. Central84a6cb/a88b83/3be17e/
+15d101/f6a09d/e3550d/f04bf6; gate24441c/checkpoint7ee1a1 unsigned
+[pcc:unverified].
+
+This advances the first-jet arbitrary-precision part of the factor interface.
+It reuses standard inverse-series moments; its symbolic label comparison
+with row refinement is not a runtime gain against prior linear moments.
+All required higher chart factors, coefficient/entry/bit/recovery/recursion,
+public finder/extraction and complete expected cost remain open. A separate
+7-statement draft derives actual retained crossing whole-chart content w
+and normalized coefficient integrality, data310194 only, outside43/44;
+it does not provide the missing higher-chart factors [pcc:unverified].

@@ -1,7 +1,7 @@
 # Successor proof map
 
 40 authored declarations; pinned gate audits44 including4 generated congruence
-lemmas,0 extra trusted axioms. Fresh replay active; records unsigned, gate data
+lemmas,0 extra trusted axioms. Import-inclusive fresh replay exit0; records unsigned, gate data
 PCC-20261114-341743 [pcc:unverified].
 
 - `OrientationRank.integral_prod` — PCC-20261114-0d2501 (unsigned). Source: `research/prime_orientation_layers_20261114/successor/lean/OrientationRank.lean`.
