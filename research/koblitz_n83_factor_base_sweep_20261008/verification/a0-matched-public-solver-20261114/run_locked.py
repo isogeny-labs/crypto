@@ -40,6 +40,12 @@ def check_lock(lock, arm, repo):
     require(lock["schema"] == "n83.a0-matched-public-solver-lock/v1", "lock schema")
     require(lock["fixture"] == 1 and arm in ("d18", "k2048"), "fixture or arm")
     require(lock["run_order"] == ["d18", "k2048"], "run order")
+    corpus = Path(lock["corpus"])
+    require(digest(corpus) == lock["corpus_sha256"], "corpus hash")
+    rows = json.loads(corpus.read_text())["targets"]
+    matching = [row for row in rows if row["a"] == 0 and row["fixture"] == 1]
+    require(len(matching) == 1 and matching[0]["point"] == lock["target"],
+            "sealed public point")
     require(digest(Path(__file__)) == lock["runner_sha256"], "runner source hash")
     commit = lock["runner_source_commit"]
     shown = subprocess.check_output(
