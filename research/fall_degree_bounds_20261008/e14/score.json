@@ -115,7 +115,7 @@
    },
    "last_pull": "2026-11-13T02:50:48Z",
    "last_out_tgz_sha256": "fe164085cfba43dbf9fba643c584f9aa759a9773c0a047d81476e980ed031e60",
-   "end": "not observed: REST 404 'pod not found' at 2026-11-14T19:09Z; who or what deleted it was not determined (the in-pod script exits after a 6 h grace; pull_r2.sh, which deletes after final_status, was not running)"
+   "end": "self-deleted by design: run_pod_r2.sh finish() keeps serving for 21,600 s (Amendment 21) and then calls delete_self (REST DELETE with POD_CTL_KEY); the deadline fired 2026-11-13T16:57Z, so deletion was due about 22:57Z. REST 404 when checked at 2026-11-14T19:09Z."
   },
   "gates": {
    "G0": "7 passed, 0 failed",
