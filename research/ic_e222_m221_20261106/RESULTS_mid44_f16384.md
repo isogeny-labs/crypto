@@ -22,4 +22,4 @@ Extends `RESULTS_mid44_f8192.md`. All figures [pcc:unverified], one run, produce
 - The matched rho is still cheaper at every weight (IC rises 8.8% at w = 1, the elimination and table terms growing with F); the distance is 5.4e3 to 1.1e4 times. The F = 4096 row is another instance, so its trial count and rho are not the same cell.
 - Elimination now takes 12.8 s (about 5x for each doubling of F), still 0.4% of the run; memory in the run was 5.1 GB resident when sampled mid-run, not a recorded peak.
 
-Limits: one instance, one run at this F; two rho runs; largest measured subgroup 44 bits against 218 to 220 native; F = 32768 would need the table's index width raised again (15 bits fit in 32 with the empty marker only if capped at 32767) and about 22 GB for the table plus the elimination at the current layout.
+Limits: one instance, one run at this F; two rho runs; largest measured subgroup 44 bits against 218 to 220 native; F = 32768 would need the table's index width raised again (15-bit indices leave no spare value for the empty marker in 32 bits) and about 22 GB for the table alone at this layout, which does not fit this machine.
