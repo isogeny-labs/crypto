@@ -165,32 +165,41 @@ fn checked_lock(
                 .ok_or("native solver flag is not text".into())
         })
         .collect::<Result<Vec<String>>>()?;
-    if flags
-        != [
-            "--threads",
-            "1",
-            "--random",
-            "20261114",
-            "--maxtime",
-            "600",
-            "--maxconfl",
-            "1000000",
-            "--verb",
-            "1",
-            "--verbstat",
-            "1",
-            "--printsol",
-            "1",
-            "--maxnummatrices",
-            "32",
-            "--autodisablegauss",
-            "0",
-            "--gaussusefulcutoff",
-            "0",
-            "--branchstr",
-            "vsids",
-        ]
-    {
+    let base_flags = [
+        "--threads",
+        "1",
+        "--random",
+        "20261114",
+        "--maxtime",
+        "600",
+        "--maxconfl",
+        "1000000",
+        "--verb",
+        "1",
+        "--verbstat",
+        "1",
+        "--printsol",
+        "1",
+        "--maxnummatrices",
+        "32",
+        "--autodisablegauss",
+        "0",
+        "--gaussusefulcutoff",
+        "0",
+        "--branchstr",
+        "vsids",
+    ];
+    let mut wide_flags = base_flags.to_vec();
+    wide_flags.splice(
+        wide_flags.len() - 2..wide_flags.len() - 2,
+        ["--maxmatrixcols", "25000"],
+    );
+    let expected = match lock["arm"].as_str() {
+        None | Some("baseline") => base_flags.to_vec(),
+        Some("wide_25000") => wide_flags,
+        _ => return Err("native solver arm differs from frozen variants".into()),
+    };
+    if flags != expected {
         return Err("native solver flags differ from frozen arm".into());
     }
     Ok((solver, formula, export, flags))
@@ -316,7 +325,7 @@ fn run(mode: &str, lock_path: &Path, out: &Path) -> Result<()> {
         .map(str::trim)
         .collect::<Vec<_>>();
     let record = json!({
-        "schema":"n83.k2048-m5-native-solver-run/v1", "mode":mode,"status":state,
+        "schema":"n83.k2048-m5-native-solver-run/v1", "mode":mode,"arm":lock["arm"],"status":state,
         "lock_sha256":file_sha(lock_path)?,"source_commit":lock["source_commit"],
         "runner_binary_sha256":lock["runner_binary_sha256"],"solver_sha256":lock["solver_sha256"],
         "formula_sha256":lock["formula_sha256"],"export_receipt_sha256":file_sha(&export)?,
