@@ -1,0 +1,303 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-compiled-advice-robdd-20261110-F5-RUN-01",
+  "experiment_id": "compiled_advice_robdd_20261110",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "da7ac2dbb8dc920652be41efb0be3ee14eaa17a7",
+  "receipt": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.receipt.json",
+  "binds": [
+    {
+      "path": "/home/user/crypto/research/compiled_advice_robdd_20261110/PROTOCOL.md",
+      "sha256": "e57b8ef0449a0353244770e439fc1c1ee7798f9a915e0d8d3cf49513fe4f76d1"
+    },
+    {
+      "path": "/home/user/crypto/research/compiled_advice_robdd_20261110/FREEZE.sha256",
+      "sha256": "9f4ef68829c495bbd917397e8e698c225dd3289778a4ad43eea089e6bce0970a"
+    },
+    {
+      "path": "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/Cargo.toml",
+      "sha256": "01cec37983a65158e913ab81b4bc6d8ede694b1fb4050e526f6723d243155278"
+    },
+    {
+      "path": "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/Cargo.lock",
+      "sha256": "2912a6c720234c63c2c8ed0622fc99d8ff566ee0b80f873b8df3e8aea0c08c29"
+    },
+    {
+      "path": "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/src/main.rs",
+      "sha256": "c0f41c930679fc016f29864e541bac351272dd49976dd8a23fd2a579e015d019"
+    },
+    {
+      "path": "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/target/release/compiled_advice_robdd",
+      "sha256": "7bb1a710a6ae3d3df15a78cde927275195f5cf3c521337d058c6bcbf339f8bb2"
+    }
+  ],
+  "must_not_exist": [
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.receipt.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run",
+    "research/compiled_advice_robdd_20261110/results/run.json",
+    "research/compiled_advice_robdd_20261110/results/run.stdout.txt",
+    "research/compiled_advice_robdd_20261110/results/run.stderr.txt",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-sha256.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-table.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-sha256.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-table.stderr"
+  ],
+  "commands": [
+    {
+      "id": "verify-freeze",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "cwd": "research/compiled_advice_robdd_20261110",
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stdout"
+      ]
+    },
+    {
+      "id": "git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stdout"
+      ]
+    },
+    {
+      "id": "rustc-version",
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stdout"
+      ]
+    },
+    {
+      "id": "cargo-version",
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stdout"
+      ]
+    },
+    {
+      "id": "nproc",
+      "argv": [
+        "nproc"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stdout"
+      ]
+    },
+    {
+      "id": "uname",
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stdout"
+      ]
+    },
+    {
+      "id": "cpu-model",
+      "argv": [
+        "lscpu"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stdout"
+      ]
+    },
+    {
+      "id": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stdout"
+      ]
+    },
+    {
+      "id": "test",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stdout"
+      ]
+    },
+    {
+      "id": "binary-sha256",
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/target/release/compiled_advice_robdd"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stdout"
+      ]
+    },
+    {
+      "id": "run-full",
+      "argv": [
+        "/home/user/crypto/research/compiled_advice_robdd_20261110/tool/target/release/compiled_advice_robdd",
+        "--protocol",
+        "/home/user/crypto/research/compiled_advice_robdd_20261110/PROTOCOL.md",
+        "--rand",
+        "10",
+        "--threads",
+        "2",
+        "--out",
+        "research/compiled_advice_robdd_20261110/results/run.json"
+      ],
+      "timeout_seconds": 14400,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/results/run.stdout.txt",
+      "stderr": "research/compiled_advice_robdd_20261110/results/run.stderr.txt",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/results/run.json",
+        "research/compiled_advice_robdd_20261110/results/run.stdout.txt"
+      ]
+    },
+    {
+      "id": "result-sha256",
+      "argv": [
+        "sha256sum",
+        "research/compiled_advice_robdd_20261110/results/run.json"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-sha256.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-sha256.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-sha256.stdout"
+      ]
+    },
+    {
+      "id": "result-table",
+      "argv": [
+        "cat",
+        "research/compiled_advice_robdd_20261110/results/run.stdout.txt"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-table.stdout",
+      "stderr": "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-table.stderr",
+      "outputs": [
+        "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.result-table.stdout"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-compiled-advice-robdd",
+  "background": true,
+  "write_scope": [
+    "research/compiled_advice_robdd_20261110/"
+  ],
+  "stop_when": [
+    "Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing.",
+    "The verify-freeze command prints any line not ending in OK, or the test command prints no line reading test result: ok. 4 passed; 0 failed; report the printed text verbatim.",
+    "The run-full command exits with a nonzero status; report the printed text verbatim, the tool exits nonzero on an ROBDD verification failure."
+  ],
+  "notes": "Frozen full run of study compiled_advice_robdd_20261110 (PROTOCOL.md sections 2, 5, 6; FREEZE.sha256). Exact node, unique-table-operation and sifting-swap counts; no timing is a result. Execution route: local host. The isolab-eks route is unavailable from this session (no aws CLI) and the GitHub route takes only ecbench specs, so this is local evidence; the section 9a confirmatory EKS run is open. The host is shared with other studies; --threads 2 is the frozen setting. The run-full command has a 4-hour limit, so it runs detached: run the card, then run wait until the receipt status is no longer detached. The cpu-model step runs lscpu in place of reading /proc/cpuinfo, because the card runner takes no shell pipe. The binary bound in binds is the build already on disk before this card; the binary-sha256 step records the digest of the binary this card builds."
+}

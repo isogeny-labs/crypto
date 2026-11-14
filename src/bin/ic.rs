@@ -11,12 +11,20 @@ mod cubic_external;
 mod cubic_route;
 #[path = "ic/descent.rs"]
 mod descent;
+#[path = "ic/ecc2k130.rs"]
+mod ecc2k130;
 #[path = "ic/experiment.rs"]
 mod experiment;
 #[path = "ic/fixed.rs"]
 mod fixed;
+#[path = "ic/install.rs"]
+mod install;
 #[path = "ic/large_prime.rs"]
 mod large_prime;
+#[path = "ic/log_store.rs"]
+mod log_store;
+#[path = "ic/oversample.rs"]
+mod oversample;
 #[path = "ic/params.rs"]
 mod params;
 #[path = "ic/plan.rs"]
@@ -37,8 +45,17 @@ mod rho;
 mod sweep;
 #[path = "ic/tensor.rs"]
 mod tensor;
+#[path = "ic/update.rs"]
+mod update;
 #[path = "ic/workflow.rs"]
 mod workflow;
+
+/// Release version embedded at build time. The release job sets
+/// `CRYPTO_CLI_VERSION`; a developer build falls back to the crate version.
+pub const VERSION: &str = match option_env!("CRYPTO_CLI_VERSION") {
+    Some(version) => version,
+    None => env!("CARGO_PKG_VERSION"),
+};
 
 use clap::{Args, Parser, Subcommand};
 use serde_json::{json, Value};
@@ -53,7 +70,7 @@ use std::{
 #[derive(Parser)]
 #[command(
     name = "ic",
-    version,
+    version = VERSION,
     about = "Curve inspection and index-calculus research, including explicit public EC targets"
 )]
 #[command(
@@ -90,6 +107,7 @@ struct Cli {
     gpu: String,
 }
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum Action {
     /// List built-in inspection profiles.
     List,
@@ -111,6 +129,10 @@ enum Action {
     Workflow(workflow::WorkflowArgs),
     /// Persist and resume index calculus on fixed K_0 parameters through degree 131.
     Fixed(fixed::FixedArgs),
+    /// Watch ECC2K-130 relation collection with live progress and a JSONL export.
+    Ecc2k130(ecc2k130::Ecc2k130Args),
+    /// Check for or install a newer macOS `ic` + `crax` release bundle.
+    Update(update::UpdateArgs),
     /// Price every index-calculus variant of the prime, generic-binary and Koblitz regimes in one unit against the generic floor and a counted Pollard rho, with fitted exponents.
     Boundary(boundary::BoundaryArgs),
     /// Write a benchmark corpus of Weil-descended Semaev S4 instances (Magma, DIMACS+XOR, CNF, ANF) with certified labels and planted witnesses.
@@ -127,6 +149,8 @@ enum Action {
     Rho(rho::RhoArgs),
     /// Price the workflow's pipeline phase by phase: the same calls in memory on one thread, each phase on its own clock, converted at one batched addition measured in the same process, beside batch rho on the same targets with its step priced.
     Price(price::PriceArgs),
+    /// Measure relation oversampling in the logarithm precompute: one pool per seed past full rank, prefixes solved at each surplus fraction, paired rows.
+    Oversample(oversample::OversampleArgs),
     /// Import the ECBench binary-curve battery and run bounded exact
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
@@ -206,6 +230,16 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Solve(args)) => experiment::solve(args.clone(), cli.json),
         Some(Action::Workflow(args)) => workflow::run(args.clone(), cli.json),
         Some(Action::Fixed(args)) => fixed::run(args.clone()),
+        Some(Action::Ecc2k130(args)) => {
+            let mut args = args.clone();
+            // `ecc2k130` turns live progress on by default; the global JSON
+            // contract wins unless the user asks for a human report.
+            if cli.json {
+                args.quiet = true;
+            }
+            ecc2k130::run(args)
+        }
+        Some(Action::Update(args)) => update::run(args.clone()),
         Some(Action::Boundary(args)) => boundary::run(args.clone(), cli.json),
         Some(Action::Corpus(args)) => corpus::run(args.clone()),
         Some(Action::Descent(args)) => descent::run(args.clone(), cli.json),
@@ -214,6 +248,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
+        Some(Action::Oversample(args)) => oversample::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
@@ -485,6 +520,70 @@ fn display(report: &Value) {
                 println!("Failure: {f}");
             }
         }
+        Some("fixed") => {
+            if report["status"] == "error" {
+                println!("Fixed campaign: error");
+                if let Some(stage) = report["stage"].as_str() {
+                    println!("  stage: {stage}");
+                }
+                if let Some(message) = report["message"].as_str() {
+                    println!("  message: {message}");
+                }
+                if let Some(hint) = report["hint"].as_str() {
+                    println!("  hint: {hint}");
+                }
+                return;
+            }
+            println!(
+                "Fixed campaign: {} (stage {})",
+                report["status"].as_str().unwrap_or("?"),
+                report["stage"].as_str().unwrap_or("?")
+            );
+            println!(
+                "  degree {}; {} orbit columns; {} signed base points; {} solver",
+                report["degree"],
+                report["orbit_columns"],
+                report["signed_base_points"],
+                report["solver"].as_str().unwrap_or("?")
+            );
+            println!(
+                "  relations saved: {}; attempts saved: {}; factor-base logs: {}",
+                report["relations_saved"],
+                report["attempts_saved"],
+                if report["logs_available"].as_bool().unwrap_or(false) {
+                    "available"
+                } else {
+                    "incomplete"
+                }
+            );
+            if let Some(path) = report["relations_out"].as_str() {
+                println!("  relation export: {path}");
+            }
+            for (name, target) in report["targets"].as_object().into_iter().flatten() {
+                println!(
+                    "  target {name}: {} (verified {})",
+                    target["status"].as_str().unwrap_or("?"),
+                    target["verified"]
+                );
+            }
+        }
+        Some("update") => {
+            println!(
+                "Update: {} (current {}, latest {})",
+                report["status"].as_str().unwrap_or("?"),
+                report["current"].as_str().unwrap_or("?"),
+                report["latest"].as_str().unwrap_or("?")
+            );
+            if let Some(asset) = report["asset"].as_str() {
+                println!("  asset: {asset}");
+            }
+            if let Some(dir) = report["install_dir"].as_str() {
+                println!("  install directory: {dir}");
+            }
+            if let Some(message) = report["message"].as_str() {
+                println!("  {message}");
+            }
+        }
         Some("boundary") => {
             println!(
                 "Boundary ledger: {}; {} instances, all verified: {}; {:.1} s",
@@ -711,7 +810,7 @@ fn main() -> ExitCode {
     };
     // Generated parameter documents remain directly importable under their strict schema.
     if report.get("operation").is_some() {
-        report["software"] = json!({"version":env!("CARGO_PKG_VERSION"),"os":std::env::consts::OS,
+        report["software"] = json!({"version":VERSION,"os":std::env::consts::OS,
             "arch":std::env::consts::ARCH,"binary_blake3":binary_hash(),"git_commit":git_commit(),
             "git_dirty":crypto_lib::build_provenance::git_dirty(),
             "git_commit_source":crypto_lib::build_provenance::source()});
@@ -721,7 +820,16 @@ fn main() -> ExitCode {
     }
     let success = matches!(
         report["status"].as_str(),
-        Some("complete" | "checks_passed" | "stopped")
+        Some(
+            "complete"
+                | "checks_passed"
+                | "stopped"
+                | "up_to_date"
+                | "update_available"
+                | "installed"
+                | "dry_run"
+                | "cancelled"
+        )
     ) || report.get("operation").is_none();
     let text = serde_json::to_string_pretty(&report).expect("JSON serializable");
     if let Some(path) = &cli.out {

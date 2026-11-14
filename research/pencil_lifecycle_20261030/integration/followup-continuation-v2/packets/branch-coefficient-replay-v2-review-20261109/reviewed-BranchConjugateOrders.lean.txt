@@ -1,0 +1,110 @@
+-- Prospective source only; no compiler or axiom audit. [pcc:unverified]
+import WeightedProjNormBranchZeroOrder
+import WeightedProjQuinticHead
+import Mathlib.Data.ENat.Basic
+import Mathlib.Tactic.NormNum
+
+set_option autoImplicit false
+noncomputable section
+namespace BranchConjugateOrders
+open Polynomial Common22BranchStalk Common22BranchParameter
+  WeightedProjFiniteBranchDVR WeightedProjBranchPolynomialEval
+variable {K : Type*} [Field K]
+
+-- Reuses actual branch stalk and existing order-one theorem; no valuation
+-- identity is supplied as a premise. The simple-root hypothesis is geometric.
+theorem actual_branch_conjugate_orders (a3 a2 a1 a0 a b : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hsimple : derivativeAt a3 a2 a1 a0 a ≠ 0)
+    (hb : b ≠ 0) (n : K[X]) (hn : n.eval a = 0) :
+    let R := ProjBranchRing a3 a2 a1 a0 a hroot
+    letI := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+    letI := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+    let v := IsDiscreteValuationRing.addVal R
+    let N := n.eval₂ (projectiveCoeffHom a3 a2 a1 a0 a hroot)
+      (projectiveX a3 a2 a1 a0 a hroot)
+    let B := projectiveCoeffHom a3 a2 a1 a0 a hroot b
+    let Y := projectiveY a3 a2 a1 a0 a hroot
+    v (N-B*Y) = 1 ∧ v (N+B*Y) = 1 ∧
+    v ((N-B*Y)*(N+B*Y)) = 2 ∧
+    v (N-B*Y) ≠ ⊤ ∧ v (N+B*Y) ≠ ⊤ ∧
+    (v (N-B*Y)).toNat = 1 ∧ (v ((N-B*Y)*(N+B*Y))).toNat = 2 := by
+  dsimp only
+  let R := ProjBranchRing a3 a2 a1 a0 a hroot
+  letI : IsDomain R := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+  letI : IsDiscreteValuationRing R := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+  let N := n.eval₂ (projectiveCoeffHom a3 a2 a1 a0 a hroot)
+    (projectiveX a3 a2 a1 a0 a hroot)
+  let B := projectiveCoeffHom a3 a2 a1 a0 a hroot b
+  let Y := projectiveY a3 a2 a1 a0 a hroot
+  let v := IsDiscreteValuationRing.addVal R
+  obtain ⟨t, ht⟩ := projective_eval_factor a3 a2 a1 a0 a hroot n
+    (dvd_iff_isRoot.mpr hn)
+  have hB : IsUnit B :=
+    WeightedProjNormBranchZeroOrder.projective_coeff_unit a3 a2 a1 a0 a hroot b hb
+  have hm : v (N-B*Y) = 1 :=
+    WeightedProjBranchZeroOrder.projective_branch_x_factor_zero_order
+      a3 a2 a1 a0 a hroot hsimple N B t ht hB
+  have hp : v (N+B*Y) = 1 := by
+    have h := WeightedProjBranchZeroOrder.projective_branch_x_factor_zero_order
+      a3 a2 a1 a0 a hroot hsimple N (-B) t ht hB.neg
+    simpa only [neg_mul, sub_neg_eq_add] using h
+  have hprod : v ((N-B*Y)*(N+B*Y)) = 2 := by
+    rw [AddValuation.map_mul, hm, hp]
+    norm_num
+  refine ⟨hm,hp,hprod,?_,?_,?_,?_⟩
+  · change v (N-B*Y) ≠ ⊤
+    rw [hm]
+    norm_num
+  · change v (N+B*Y) ≠ ⊤
+    rw [hp]
+    norm_num
+  · change (v (N-B*Y)).toNat = 1
+    rw [hm]
+    norm_num
+  · change (v ((N-B*Y)*(N+B*Y))).toNat = 2
+    rw [hprod]
+    norm_num
+
+-- A separable actual quintic supplies hsimple. A root of the norm support
+-- supplies the numerator root using the existing polynomial factor theorem.
+-- Its polynomial norm premise is not a desired local valuation identity.
+theorem numerator_root_from_norm (a3 a2 a1 a0 a b : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (n u1 u2 U : K[X])
+    (hnorm : n^2-u1*u2*U=C (b^2)*WeightedProjSmoothPoints.quintic a3 a2 a1 a0)
+    (hsupport : u1.eval a*u2.eval a*U.eval a = 0) : n.eval a = 0 := by
+  have hf : (WeightedProjSmoothPoints.quintic a3 a2 a1 a0).eval a = 0 := by
+    rw [WeightedProjQuinticHead.quintic_eval_eq_fAt]
+    exact hroot
+  have hd := Common22BranchFactorization.branch_norm_forces_numerator_factor
+    (WeightedProjSmoothPoints.quintic a3 a2 a1 a0) u1 u2 n U b a hf hnorm hsupport
+  exact dvd_iff_isRoot.mp hd
+
+-- Two overlapping input support roots at a simple branch force the source
+-- determinant coefficient to vanish. The polynomial norm identity is input,
+-- while n(a)=0 and the derivative obstruction are derived here.
+theorem two_support_roots_force_b_zero (f n u1 u2 U : K[X]) (a b : K)
+    (hf : f.eval a = 0) (hdf : f.derivative.eval a ≠ 0)
+    (hu : u1.eval a = 0) (hv : u2.eval a = 0)
+    (hnorm : n^2-u1*u2*U=C (b^2)*f) : b = 0 := by
+  have hs : u1.eval a*u2.eval a*U.eval a = 0 := by simp [hu]
+  have hn : n.eval a = 0 := dvd_iff_isRoot.mp
+    (Common22BranchFactorization.branch_norm_forces_numerator_factor
+      f u1 u2 n U b a hf hnorm hs)
+  have hd := congrArg (fun p : K[X] => p.derivative.eval a) hnorm
+  simp only [Polynomial.derivative_sub, Polynomial.derivative_mul,
+    Polynomial.derivative_pow, Polynomial.derivative_C,
+    Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_add,
+    Polynomial.eval_pow, Polynomial.eval_C] at hd
+  have hp : b^2*f.derivative.eval a = 0 := by
+    simpa [hn,hu,hv] using hd.symm
+  have hsq : b^2 = 0 := (mul_eq_zero.mp hp).resolve_right hdf
+  rcases mul_eq_zero.mp (show b*b=0 by simpa [pow_two] using hsq) with h | h
+  · exact h
+  · exact h
+
+#print axioms two_support_roots_force_b_zero
+#print axioms actual_branch_conjugate_orders
+#print axioms numerator_root_from_norm
+end BranchConjugateOrders

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:18:06Z",
+ "id": "PCC-20261114-4428cc",
+ "kind": "theorem",
+ "producer": {
+  "commit": "740732e95389e5185ed9a6547c18d8d889a6c580",
+  "model": "",
+  "session": "norm-weighted-count-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "48c5d50b63ebae15af65de51bb5a49b156deb8c9d49fbdbcd997db5269ee999b",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormWeightedCount.radix_injective"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Positive natural weights for completeness and radix bounds; all exponent vectors counted via explicit finite box and degree filter; exact slack multiset injection and mixed-radix encoding. Consecutive weights include zero variables and zero budget. No actual growing norm input grading, closure cutoff, finder, asymptotic specialization or total expected bit-cost theorem. Unsigned; independent gate and fresh replay pending at creation.",
+ "statement": "Exact finite combinatorial declaration NormWeightedCount.radix_injective: theorem radix_injective {v : \u2115} (w : Fin v \u2192 \u2115) (hw : \u2200 i, 0 < w i) (e e' t t' : Fin v \u2192 \u2115) (ht : t \u2208 digits w) (ht' : t' \u2208 digits w) (h : radix w e t = radix w e' t') : e = e' \u2227 t = t'"
+}

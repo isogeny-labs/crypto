@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-11T09:46:18Z",
+ "id": "PCC-20261111-9a26ac",
+ "kind": "measurement",
+ "producer": {
+  "commit": "eaa8dd9d92bc22b83021e7ea6f1e27b880d6eee5",
+  "model": "",
+  "session": "https://claude.ai/code/session_01TCbLH9FoRiHTPWAKdyQi2r"
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/mt_rho_start_fix_20261111/validation/replay-certificate.json",
+   "sha256": "62eb73f0dd6ec4d9fbefdc8f890cf2f77731d3d4a5b98613dd47ad00957135bf"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/mt_rho_start_fix_20261111/validation/claim-report.json",
+   "sha256": "bad50365c0d1aadc3690c30cd898eadc69e5219097eb5a7c39c368b3c9e173f1"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/mt_rho_start_fix_20261111",
+ "statement": "With the rho-family restart defect of examples/mt_fieldops.rs fixed (all 1584 v2 rho jobs rerun, every target verified), the cheapest of four rho arms is 1.4-4.8% cheaper and multi-target IC4 costs 0.951-0.991x it per target at T = 16384 on the v2 curves (cheaper at every I/M and h against this harness's rho family); against the same family with Kuhn-Struik retention IC4 is 1.12-1.17x at h = 0 at T = 16384 (1.12-1.48x over all six v2 cells) and the v2 decisions are 0 cheaper, 6 unranked, 12 dearer. IC4 vs paired BSGS is unchanged (1.18-1.80x)."
+}

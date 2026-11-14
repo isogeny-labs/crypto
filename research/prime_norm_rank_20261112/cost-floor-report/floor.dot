@@ -1,0 +1,11 @@
+digraph floor {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,margin="0.13",fillcolor="#fff1d5"];
+ edge [fontname="Helvetica",fontsize=10];
+ old [label="Declared m8 entropy charge\ntheta8=8H2(1/8), with 4<theta8<5\nUnclamped exponent between0.4 and0.5"];
+ calls [label="At its balanced base size:\nwhole-attack call exponent is negative\nFewer than one solve is being charged",fillcolor="#ffe5df"];
+ floor [label="Single-target optimistic all-output model\nW=max(1,p/b^7)*c+b^2; c>=b^4",fillcolor="#e8f5ed"];
+ proof [label="Exact model charges: W>=b^4, W*b^3>=p\nFor p>1,b>=1: W^2>p\nNo square-root gain in this declared model",fillcolor="#e8f5ed"];
+ scope [label="Not an actual sparse-solver lower bound\nNext test: actual positive-solver work,\nuseful independent relations and full charged cost"];
+ old -> calls -> floor -> proof -> scope;
+}

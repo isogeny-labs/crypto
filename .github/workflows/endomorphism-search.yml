@@ -41,12 +41,16 @@ jobs:
         run: cargo test --manifest-path tools/endomorphism-search/Cargo.toml --locked --release
       - name: Build the standalone binary
         run: cargo build --manifest-path tools/endomorphism-search/Cargo.toml --locked --release
+      - name: Check the frozen native manifest in its pinned-workflow view
+        env:
+          FROZEN_VIEW_STEP: |
+            sha256sum --check research/endomorphism_search_20261005/native-manifest.sha256
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only endomorphism_search_20261005 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Replay frozen evidence and reject tampering
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/endomorphism-replay
-          sha256sum --check research/endomorphism_search_20261005/native-manifest.sha256
           bash tools/endomorphism-search/check.sh | tee /tmp/endomorphism-replay/verification.txt
       - uses: actions/upload-artifact@v4
         if: always()

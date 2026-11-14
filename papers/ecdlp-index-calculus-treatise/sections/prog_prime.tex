@@ -179,7 +179,12 @@ curve, so no factor-base test was ever selected
 Lemma~\ref{lem:conservation} a homomorphic transfer could change only
 bounded constants in any case. The class of a 61-bit curve has a
 certified order of $358{,}094{,}304$ with adjacency still open
-(\art{research/p61_terminal_closure_20261023/}).
+(\art{research/p61_terminal_closure_20261023/}). Over $\FF_{2^{31}-1}$ the
+relation yield of a prime-abscissa base at $m=2$ and 3, measured on 332
+curves of 48 prime-order classes (526{,}111 relations), does not depend on
+the class or on the curve within it, and neither does the time per
+decomposition attempt (\S\ref{sec:rv-isogeny}, Table~\ref{tab:rv-fp31};
+\texttt{[pcc:unverified]}).
 
 \section{Lattices}
 
@@ -297,9 +302,24 @@ multi-curve re-baseline per curve: the ledger curve and four siblings by
 the same selection rule at each $k$, 12 targets $\times$ 2 rounds per
 curve, 720 of 720 records audited per size. At $w=0$ every per-curve
 ratio lies between $1.44$ and $2.13$. At $w=1$, where rho's
-canonicalisations are priced, the ratios fall to $0.95$--$1.64$. Rho is
-cheaper across the band on 19 of 20 curves; on one $k=24$ curve the order
-is unresolved inside the band ($1.52$ at $w=0$, $0.95$ at $w=1$).
+canonicalisations are priced, the ratios fall to $0.95$--$1.64$. In that
+design rho is cheaper across the band on 19 of 20 curves; on one $k=24$
+curve, \texttt{icv1-fp24-tm1514-dce9313c}, the order was unresolved inside
+the band ($1.52$ at $w=0$, $0.95$ at $w=1$, 24 solves per arm).
+
+A frozen re-measurement settles that curve
+(\art{research/tm1514_recheck_20261106/REPORT.md}). Two fresh replicates
+on all five $k=24$ curves give 1{,}152 paired solves per arm per curve,
+with 96 new targets per curve and every replay reproduced. On tm1514 the
+inc/rho-neg ratio is $1.806$ $[1.754,1.860]$, $1.689$ $[1.640,1.740]$ and
+$1.136$ $[1.100,1.174]$ at $w=0$, $0.1$ and $1$ (95\,\%): \texttt{rho-neg} is
+ahead at every weight. tm1514 lies within the ratio of its four siblings
+($D=\ln R_{\rm tm1514}-\ln R_{\rm sib}=0.002$ $[-0.038,0.042]$ at $w=0$,
+98.33\,\%; pooled siblings $1.803$), so the earlier $1.52$ was a
+small-sample draw. Rho is therefore ahead across the band on all 20 curves.
+Standing: operation counts only, from two local sessions on an L0
+development host, no wall time and no independent replay certificate or
+validator report; unverified (statement claim \texttt{PCC-20261110-97c3b6}).
 
 \begin{table}[t]
 \centering\small
@@ -323,7 +343,10 @@ repeats the computation for Figure~\ref{fig:pf-c25519}.
 All arms are $F=2$ collision designs (\texttt{wsum2}, \texttt{wwalk}).
 Standing: unverified (statement claim \texttt{PCC-20261105-37a78d}).
 Source: \art{research/curve25519_autolab_20261104/multicurve/band-k*.json};
-extracted in \art{figures/data-pf-c25519.json}.}
+extracted in \art{figures/data-pf-c25519.json}. The $k=24$ row is the
+original 24-solve design; its first curve (tm1514, $1.52$ at $w=0$, the
+$0.95$ low end at $w=1$) was re-measured with 1{,}152 solves per arm at
+$1.806$, $1.689$ and $1.136$ (\art{research/tm1514_recheck_20261106/REPORT.md}).}
 \label{tab:pf-c25519-multi}
 \end{table}
 
@@ -410,9 +433,12 @@ Sources: \art{research/curve25519_scale_guess_trace_20261105/},
 
 \paragraph{What this settles.} On every Curve25519 miniature, track and
 size measured, rho with negation is ahead of every index-calculus arm at
-$w=0$. Across the band the order holds everywhere except one $k=24$
-sibling curve of the multi-curve re-baseline, where it is unresolved
-(Table~\ref{tab:pf-c25519-multi}). The generic gap grows with $k$. Collision-based variants sit at a
+$w=0$. Across the band the order holds everywhere. The one $k=24$ curve
+the multi-curve re-baseline left unresolved (tm1514,
+Table~\ref{tab:pf-c25519-multi}) has \texttt{rho-neg} ahead at every
+weight in a 1{,}152-solve re-measurement; its earlier $1.52$ was a draw
+(operation counts on a local L0 host, unverified;
+\art{research/tm1514_recheck_20261106/REPORT.md}). The generic gap grows with $k$. Collision-based variants sit at a
 derived floor near $1.9\times$, and the algebraic gap grows as about
 $r^{1/2}$. No study makes or implies a statement about the 255-bit curve,
 and none weakens its security. No Curve25519 row is on the leaderboard or
@@ -449,10 +475,12 @@ invalid-curve attack on an unvalidated ECDH oracle
 constructive: GLV-2 scalar multiplication $1.25$--$1.50\times$ faster via
 isogeny-chain endomorphisms (\art{research/cryptopro_b_chain_sweep_20261006/},
 \art{research/endo_native_bench_20261016/}). Cheon's attack with auxiliary
-inputs is cheaper than matched negation rho at most sizes from 36 bits in
-ecbench's counted unit (dearer at 32 and 40 bits; no exponent separation;
-not validated;
-\S\ref{sec:gf-cheon}), and only for the DLP with auxiliary inputs; an
+inputs is cheaper than matched negation rho in ecbench's counted unit: a
+validated study on eleven sizes of 36--56 bits gives pooled comb/rho
+$0.525$ ($r-1$) and $0.367$ ($r+1$) at $w=0$ and separates the fitted
+exponents over that range, for $r-1$ by $0.002$ (\S\ref{sec:gf-cheon}); the
+earlier six-size study had overlapping intervals and was dearer at 32 and 40
+bits. This holds only for the DLP with auxiliary inputs; an
 earlier study's ``beats rho from 24 bits up''
 (\art{research/torsion_auxiliary_inputs_20260918/}) was not priced across
 the band, and the P-224-shape Cheon/rho ratios of a different study were

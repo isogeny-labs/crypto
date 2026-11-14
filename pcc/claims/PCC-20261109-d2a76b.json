@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T07:58:13Z",
+ "id": "PCC-20261109-d2a76b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "15ab03e54a929ce076fd6b58edc6bb646a110cb8",
+  "model": "",
+  "session": "stream-precision-20261109"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "55b667bf55544a608b3202974b4f280868930c23351eb37a36ecc3c1d5166f4b",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "StreamPrecision.actualScaledCoefficientIntegral"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "rational scaled-accumulator algebra only; no native unscaling, construction cost, measured memory gain or full recursive bound",
+ "statement": "Every actual Hermite coefficient E_t(0)*(-t/alpha)^j for j<q_t becomes integral after multiplication by2^K for K=8h*2^a+8M(a+1), with u<=M and actual source parameters."
+}

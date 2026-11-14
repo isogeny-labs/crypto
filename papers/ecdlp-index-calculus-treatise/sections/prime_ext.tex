@@ -28,15 +28,22 @@ $1.3$--$1.7\times$ on 36--42-bit curves as the producer reports them, with no
 growth of that distance over the measured sizes. The Curve25519 walk tables
 of \S\ref{sec:c25519} are at about the same distance ($1.6$--$1.9\times$,
 unverified). They are generic collision searches with rho's
-exponent, not index calculus with a better one. Their large gains at
+exponent, not index calculus with a better one. In the many-target regime the
+multi-target index calculus of \S\ref{sec:pg-multitarget} is unranked
+against multi-target rho across the band, cheaper when a hash operation
+costs a group addition and dearer when it is free, and slower in wall time
+at $2^{32}$. Their large gains at
 $w>0$ were a pricing artefact, withdrawn when the owner chose option~B on
 1 November (\S\ref{sec:pg-bytes}).
 
 \paragraph{Standing of the numbers.} Under the rule of 4 November every
 producer is assumed to be possibly sabotaging the work, and a result is
 cited by its proof-carrying claim and standing or labelled an unverified
-assertion. None of the generic-track studies in this chapter has a
-\texttt{pcc} claim record. Four evidence directories have a
+assertion. Until 11 November none of the generic-track studies in this
+chapter had a \texttt{pcc} claim record. Since then the pooled $k$-sum
+study (\S\ref{sec:pg-ksum}) and the six multi-target studies of
+\S\ref{sec:pg-multitarget} have claims, all of unverified standing, and a
+\texttt{VALIDATION.json} each. Four earlier evidence directories have a
 \texttt{VALIDATION.json} with a replay certificate and a validator
 report: Table~B (Chapter~\ref{sec:prime}), the 20-bit $N=45$ baseline
 (Chapter~\ref{ch:distance}), the first $m=4$ cells of
@@ -99,7 +106,7 @@ Residual collector \texttt{res1eq} (\S\ref{sec:pg-residual}) & 36--42 & $1.32$--
 Residual collector \texttt{res1dp} & 36--42 & $1.92$--$2.27$ & as above \\
 Residual collector \texttt{res2} & 36 & $2.6$ & improvement-log row, no validator \\
 Residual collector \texttt{res4} & 20.6--32 & $3.78$--$4.94$ & producer \\
-$k=5$ sum table (\S\ref{sec:pg-ksum}) & 20--48 & $5.4$--$11.0$ & unqualified \\
+$k=5$ sum table (\S\ref{sec:pg-ksum}) & 20--48 & $5.4$--$11.0$ & validated (20--32 bits); unqualified (40--48) \\
 Table~B pair table (Chapter~\ref{sec:prime}) & 10--24 & $5.47$--$13.5$ & validated \\
 20-bit pair table, $N=45$ (Chapter~\ref{ch:distance}) & 20 & $7.75$ & validated \\
 Cofactor-cleared base, $h=32$ (\S\ref{sec:pg-cofactor}) & census & $9.80$ & \texttt{invalid\_controls} \\
@@ -214,12 +221,13 @@ negation-folded table of every signed 4-sum of a smaller base, $S$ $83.7\to
 $2^{k-1}\binom{A}{k}+c_k A p/(2^k\binom Ak)$, with optimum exponent
 $k/(2k-1)$, falling toward $1/2$ (baby-step giant-step) as $k$ grows and
 never below it. Three studies followed (Table~\ref{tab:pg-ksum}). All three
-are registered before data, every run verified and replay-audited,
-and none has a second-host replay, a \texttt{VALIDATION.json} or a
-\texttt{claims/*.json} record; the two later studies call themselves
-\emph{unqualified}. The benchmark index lists them
-only as ``not admitted to the results table until it has an
-independent-host replay and its own \texttt{VALIDATION.json}''.
+are registered before data, every run verified and replay-audited. The
+first two have no second-host replay and no \texttt{VALIDATION.json}, and
+the benchmark index lists them only as ``not admitted to the results table
+until it has an independent-host replay and its own
+\texttt{VALIDATION.json}''. The pooled study was gate-validated on 12
+November (below) and is admitted with claim \texttt{PCC-20261112-31adb2}
+of unverified standing.
 
 \begin{table}[t]
 \centering\small
@@ -241,8 +249,9 @@ $k=5$ vs re-tuned incumbent & 20 & $0.700$ $[0.682,0.718]$ & $6.0\times$ & $0.49
  & 32 & $0.217$ $[0.212,0.222]$ & $7.3\times$ & \\
 \bottomrule
 \end{tabular}
-\caption[]{Prime-field $k$-sum tables after 28 October (generic track;
-all unqualified, producer-reported). Ratio: paired ratio of total cost,
+\caption[]{Prime-field $k$-sum tables after 28 October (generic track). The
+first two studies are unqualified and producer-reported; the pooled study
+(last block) is gate-validated, claim \texttt{PCC-20261112-31adb2}. Ratio: paired ratio of total cost,
 cluster-bootstrap 95\% intervals. ``To rho'': mean $S$ over matched
 negation rho at $w=0$. Exponent: fitted cost exponent in $r$ at $w=0$;
 the pooled study's rho-neg fits $0.457$ and \texttt{bsgs-neg} $0.501$ on
@@ -286,6 +295,26 @@ allow a limit below $1/2$. Tuned for $w=0$, the incumbent
 is 8--13\% cheaper, and $k=5$ is still $2.2$--$4.6\times$ cheaper than it. A train-frozen
 rule chose $k=5$ at every size; at 20 bits $k=4$ is cheaper at $w=0$ and
 $0.1$ and the two are unresolved at $w=1$.
+
+\paragraph{Validation of the pooled study.} On 12 November the pooled
+study received its gate evidence
+(\art{research/prime_ksum_pooled_20261029/VALIDATION.json},
+\art{research/prime_ksum_pooled_20261029/VALIDATOR.md}). The eight
+sessions' records, recovered from Git, replayed count-identically on x86
+Linux from a clean build (9{,}216 of 9{,}216; the measurement ran on macOS
+arm64). An independent recompute checked $[d]G=Q$ on 5{,}952 of 5{,}952
+measured holdout records, matched all 24 curves to the registry, and
+reproduced every headline ratio and band cell to within $2\cdot10^{-15}$.
+The order \texttt{rho-neg} $<$ \texttt{ksum5-sel} $<$ \texttt{inc-sel}
+holds on 16 of 16 holdout curves at $w=0,0.1,1$. The study's numbers use the
+pricing reading before 8 November, which leaves counted table work
+unpriced; under the current default the order is unchanged, every $w>0$
+figure moves, and the $w=1$ distance of \texttt{ksum5-sel} to rho grows
+from $5.26$--$6.70$ to $6.30$--$8.52$ over 20--32 bits. Pooled over the 16
+curves the validated row is $S=6.94$ against rho's $1.06$ at $w=0$. The
+validator corrected one derived figure, \texttt{inc-w0}/\texttt{inc-rec}
+at 32 bits, from $0.88$ to $0.874$. The study remains one host at L0 with
+no external ECDLP tool, so its unit is the counted one only.
 
 \paragraph{The precomputation regime.} The $k=4$ table is built before any
 target arrives, which invites two accounting questions
@@ -357,6 +386,144 @@ Producer-reported, same-host replays, no validation. Source:
 \art{research/ecbench_known_log_targets_20261021/}.}
 \label{tab:pg-knownlog}
 \end{table}
+
+\section{Many targets in counted field operations}\label{sec:pg-multitarget}
+
+Six studies of 11 and 12 November measured a multi-target index calculus
+against multi-target rho and baby-step giant-step on $T$ targets of one
+curve. They use a separate counted field layer
+(\texttt{examples/mt\_fieldops.rs}), not ecbench, so their rows are outside
+Tables~A--C. Inversions, multiplications and squarings are counted, and
+the cost per target is
+\[
+  \Bigl[\frac{c_I I+M+S}{c_I+3}+h\,(H+L+N)\Bigr]\Big/T,
+\]
+with $c_I\in\{3,10,30\}$ the price of an inversion in multiplications, $H$
+and $L$ hash-table inserts and lookups, $N$ counted native work (rho step
+indices, distinguished-point canonicalisations and point hashes, IC offset
+indices; counted from v5 on) and $h\in\{0,0.1,1\}$ the band weight. Every
+study used fresh prime-order curves, verified every recovered logarithm, ran
+on one local host without an AWS identity (not \texttt{isolab-eks}) and was
+replayed by an independent validator. Each has a \texttt{VALIDATION.json}
+in \art{benchmarks/} and a \texttt{pcc} claim of unverified standing.
+Table~\ref{tab:pg-mt} gives the sequence; each row corrects or extends the
+one above it.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}p{2.3cm}>{\raggedright}Xll@{}}
+\toprule
+Study & population & IC / multi-target rho & IC / BSGS & claim \\
+\midrule
+v2, \texttt{ic4} & 33 curves, 22--25 bits; 2{,}112 runs & $0.91$--$0.95$ at $T=16384$, cheaper; $1.05$--$1.19$ at $T=1024$, dearer; reference: four harness rho arms without retention & $1.18$--$1.80$ & \texttt{fa13c8}, superseded \\
+start fix & v2 holdout, 1{,}584 rho reruns & fixed harness rho: $0.951$--$0.991$ at $T=16384$; with Kuhn--Struik retention $1.12$--$1.17$ at $h=0$; v2 decisions become 0 cheaper, 6 unranked, 12 dearer & unchanged & \texttt{9a26ac} \\
+v3, \texttt{ic5} & 44 curves, 22--32 bits; 4{,}488 runs & against retention rho (validator arm): $1.07$--$1.34$ ($h=0$), $1.05$--$1.18$ ($h=0.1$), $0.91$--$0.98$ ($h=1$); unranked in all 36 & $1.11$--$1.49$ & \texttt{dda51e} \\
+v4 & 33 curves, 24--32 bits; 3{,}960 runs & frozen rule (rho's per-step work unpriced): dearer in all 27, $1.003$--$1.810$; with rho's canonicalisations priced: unranked in all 27 & $1.14$--$1.49$ & \texttt{830272} \\
+v5 & 33 curves, 24--32 bits; 3{,}366 runs & native work counted: $1.06$--$1.16$ ($h=0$), $1.00$--$1.05$ ($h=0.1$), $0.71$--$0.80$ ($h=1$); unranked in all 27 & $1.11$--$1.47$ & \texttt{22e5d2} \\
+timed & the 12 v5 curves, new seed; 1{,}836 executions & wall time: $0.78$--$0.83$ at $2^{24}$, $0.93$ or unranked at $2^{28}$, $1.11$--$1.29$ at $2^{32}$ & $1.33$--$1.59$ & \texttt{ec2f3f} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Multi-target index calculus against the best multi-target rho
+of the same harness, per target, ranges over cells, $c_I$ and $h$ as each
+source states them. Claim ids are \texttt{PCC-2026111x-}\emph{id}, all of
+unverified standing; the v2 and start-fix rows' \texttt{VALIDATION.json}
+records \texttt{strongest\_available: false}. Sources:
+\art{research/mt_fieldops_v2_20261111/RESULTS.md},
+\art{research/mt_rho_start_fix_20261111/RESULTS.md},
+\art{research/mt_fieldops_v3_20261111/RESULTS.md},
+\art{research/mt_fieldops_v4_20261112/RESULTS.md},
+\art{research/mt_fieldops_v5_20261112/RESULTS.md},
+\art{research/mt_timed_20261112/RESULTS.md}.}
+\label{tab:pg-mt}
+\end{table}
+
+\paragraph{From \texttt{ic4} to \texttt{ic5}.} \texttt{ic4} pairs a
+factor base with an x-only pair-sum table that shares one inversion per two
+x-classes, and walks every target along one trial progression. Its v2 row
+read cheaper than rho at $T=16384$. Two defects of the reference undid that.
+The harness rho paid a restart cost that a fix removed (1.4--4.8\% of the
+cheapest arm's cost), and it kept no walk points of finished targets. With
+the fix the margin halved, and with retention added by the validator
+\texttt{ic4} is dearer; the v2 claim is withdrawn as a statement about rho.
+The v3 arm \texttt{ic5} replaces the pair table by a $k=4$ sum table of a
+factor base of about $(\text{table})^{1/4}$ elements (48 to 67 at 32 bits).
+Its relation search, factor base and linear algebra fall to 0.08--2.5\% of
+its cost, and it costs $0.47$--$0.99$ of \texttt{ic4} in all 36 (cell, $c_I$)
+decisions. That is a validated improvement of the multi-target IC over its
+own baseline \texttt{[pcc:PCC-20261111-dda51e]}, largest at 32 bits and
+$T=1024$. What remains in \texttt{ic5} is a table and paired target trials,
+the same objects a $k$-sum table with known logarithms would use.
+
+\paragraph{Against a standard multi-target rho.} v4 measured the two
+standard multi-target rhos in the harness: a Kuhn--Struik retention rho
+(\texttt{rho2xks}) and a distinguished-point rho (\texttt{rhodp}). Under its
+frozen rule the IC was dearer in all 27 decisions, but that rule left
+\texttt{rhodp}'s per-step canonicalisation, step hash and distinguished-point
+test unpriced ($7.27\cdot10^9$ canonicalisations against $7.66\cdot10^8$
+priced hash operations). v5 counted that work and priced it in the band.
+The order then flips with $h$ in every cell (Figure~\ref{fig:u12-mt}): the
+IC is dearer by 6--16\% when hash and native operations are free and
+cheaper by 20--29\% when each costs one group addition. All 27 decisions
+are unranked. The $h=1$ advantage rests on charging two native operations
+per distinguished-point step; at one per step the IC is $0.83$--$1.06\times$
+at 28--32 bits with $T=1024$--$4096$, and 3 of 27 decisions become dearer.
+
+\paragraph{Wall time.} The timed study ran the v5 arms on one pinned CPU of a
+4-vCPU cloud VM (Intel Xeon at 2.10\,GHz, no PMU, isolation below L2), 36
+configurations $\times$ 17 run keys $\times$ 3 interleaved repeats. It
+measured the prices the band leaves open. One affine addition costs
+214--294\,ns, $I/M$ is 23--31, a canonicalisation plus one hash costs
+0.005--0.009\,GAE and a step index 0.002--0.006\,GAE, so native work is
+nearly free. A \texttt{std} HashMap lookup costs 0.04--0.15\,GAE at
+$2^{10}$--$2^{16}$ entries and 0.27--0.85\,GAE at $2^{22}$--$2^{24}$. In
+solve-phase wall time the IC is faster at $2^{24}$ (12 of 12 configurations
+below 1), and slower at $2^{32}$ (12 of 12 above 1), where the
+fastest rho is the distinguished-point rho in 30 of 36 configurations. Each cell
+decision is a 4-of-4 sign rule. The 28-bit, $T=1024$ cell ($0.93$) is
+unranked under the preregistered fixed-key control and reads $0.98$ in the
+validator's pooled rerun; the rerun reproduced all 9 decisions pooled. The
+trend with group size runs against the IC.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-u12prime-mt.pdf}
+\caption[]{Multi-target IC (cheapest of four variants) over the best
+multi-target rho of the same harness, per target. Filled: counted cost of
+v5 at $c_I=10$, with hash-table and native operations at $h=0,0.1,1$\,GAE;
+median of 22 configurations with bootstrap 95\% interval. Open diamonds:
+solve-phase wall time on one CPU of a cloud VM; median of 4 configurations,
+whose interval is their range. Dashed: parity. Data
+\art{figures/data-u12prime-mt.json} from
+\art{research/mt_fieldops_v5_20261112/RESULTS.md} and
+\art{research/mt_timed_20261112/RESULTS.md}.}
+\label{fig:u12-mt}
+\end{figure}
+
+\paragraph{Why BSGS stays ahead.} In every study the IC is 1.11--1.80$\times$
+a paired BSGS. A note on the v2 rows (\art{research/mt_bsgs_gap_20261111/};
+no new run, \texttt{[pcc:unverified]}) gives the mechanism. Both methods
+store $K$ x-classes at the same price per class. The IC table's logarithms
+are effectively random, so a trial hits with probability $2K/n$ and needs
+$n/(2K)$ trials in expectation; BSGS tiles the group with disjoint windows
+and needs $1+n/(4M_x)$, half as many. The two trial models match the
+measured v2 counts to within about 2\% in all six cells ($1.009$--$1.022$
+for \texttt{ic4}, $0.996$--$1.006$ for BSGS). At the optimum a factor~2 in
+trials is a factor $\sqrt2$ in cost. A combinatorial simulation on random
+$K$-subsets of $\ZZ_{2^{18}}$ chose trial offsets greedily by new coverage.
+At $K=4096$ (64 random trials) the best of $R=16$ or 256 candidates needs
+$0.963$ and $0.943$ of the random-offset trials, against $0.500$ for tiling,
+and each greedy step costs about $RK$ lookups.
+Closing the gap needs a table whose logarithms form an interval, a factor
+base with known logarithms, which is BSGS itself. The note closes the
+family as a negative result.
+
+\paragraph{Reading.} Per field operation the retention rho covers more of
+the group than the IC's fixed table; per hash operation the IC is cheaper;
+on the measured host native work is nearly free and lookups are not, and
+the IC loses at $2^{32}$. None of the six studies uses a property of the
+curve, the comparison is per target in a batch on one curve, and none says
+anything about single-target ECDLP. The distance remaining to BSGS is
+11--47\% in v5 and 33--59\% in wall time.
 
 \section{Residual collectors}\label{sec:pg-residual}
 
@@ -1097,6 +1264,69 @@ job on 1 November, and the cells are owed. The owner approved a command
 route for non-ecbench jobs (\texttt{D-ROUTE}) that an administrator has to
 implement.
 
+\paragraph{The slope that parity needs.} A desk study of 10--12 November
+(\art{research/prime_ic_leads_20261110/README.md}; derivations plus
+development checks on a shared host, every measured value
+\texttt{[pcc:unverified]}, no admitted run) turned the tower's degree growth
+into a distance to parity. A dense closure at degree $\alpha N$ in $N$
+one-bit unknowns has about $2^{N H(\alpha)}$ columns, $H$ the binary entropy;
+with elimination exponent $\omega'$ and the gate $s<m-3$ of
+\S\ref{sec:pg-gate}, the tower can reach parity only if
+$H(\alpha)<(1-3/m)/\omega'$. At $\omega'=2$ that allows a fall-degree slope
+of at most $0.017$ per unknown bit at $m=4$, $0.042$ at $m=6$ and $0.066$
+at $m=10$ (derived). The measured slopes are $0.125$ in $t$ (C-step) and
+$0.5$ in $m$ (stage~C). The bound is for dense degree-$d$ elimination; an
+engine that never forms that matrix escapes it only by a column ratio that
+shrinks exponentially in $N$.
+
+\paragraph{The equation budget.} The same note names the mechanism. Weil
+descent over $\FF_{2^n}$ turns one relation into $n$ equations in about $n$
+bit unknowns. Over $\FF_p$ one relation gives one equation, and every
+further cross-summand equation of bounded degree, from a fixed rational
+map, a translate or a larger coefficient ring, costs about $\log_2p$ unknown
+bits. Five candidate equation sources failed that count on paper (a
+2-torsion symmetrised tower, which is a plain tower on the 2-isogenous
+curve; translate-pair bases; Wagner $k$-tree filtering; the $p$-adic second
+digit; two towers through an endomorphism). The one free source is the
+multiples $[k]R=\sum[k]P_i$; the $[2]$-consequence enters the Kummer
+quotient at multilinear degree~6. Appended as a presentation control, they gave identical $d_F$ at $m=2$
+on every completed cell, as predicted, lowered $d_F$ by exactly one on six of
+ten completed cells at $m\ge3$ and by zero on the other four, and left both
+slopes unchanged; the $m=5$, $t=3$ cell is censored on both arms. Dual
+numbers add only free $\FF_p$ unknowns (derived), and the $p$-adic digits
+of the torsion lift read the generic degree on 42 cells over 17 curves.
+
+\paragraph{The curve does not set the degree.} Replacing every summation
+equation by a random polynomial on $\Sem3$'s monomial support, or on the
+exponent box of width $W=2$, gives the tower's $d_F$ on all 40 completed
+cells, draw by draw. The degree is a function of the support and $N$ under
+the carry grading, computable without a curve, and it is monotone in $W$ and
+$t$ on every completed cell (Table~\ref{tab:pa-width}). The study's
+prediction for $W=3$ (a step at $t=10$ or 11) was refuted: the step is at
+$t=9$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Support & $t=2,\dots,8$ & $t=9$ & $t=10$ & $t=11$ \\
+\midrule
+box $W=1$ & 3, 3, 4, 4, 4, 4, 5 & 5 & 5 & 5 \\
+box $W=2$ (= tower) & 4, 4, 4, 4, 5, 5, 5 & 5 & 6 & 6 \\
+box $W=3$ & 5, 5, 5, 5, 5, 5, 5 & 6 & $\ge6$ & --- \\
+box $W=4$ & 5, 5, 5, 5, 5, 5, 5 & 6 / $\ge6$ & $\ge6$ & --- \\
+\bottomrule
+\end{tabular}
+\caption[]{Last fall degree $d_F$ of the Kummer closure at $m=2$ when every
+summation equation is replaced by a random polynomial on the full exponent
+box of width $W$, both draws equal unless split. Censored cells are lower
+bounds (900\,s budget). Fits to the recorded steps, not a law:
+$d_F(1,t)=3+\lfloor t/4\rfloor$ and $d_F(2,t)=4+\lfloor(t-2)/4\rfloor$ on
+$t=2$--11. Development check, \texttt{[pcc:unverified]}. Source:
+\art{research/prime_ic_leads_20261110/devcheck/README.md}.}
+\label{tab:pa-width}
+\end{table}
+
 \paragraph{Open.} Lead~1 of the tower, whether $D$ stays bounded as $N$
 grows, is open in every presentation tried: plain, torus, Dickson,
 symmetric, radix-graded and P-224-shaped. In each family $D$ either grows
@@ -1319,6 +1549,33 @@ continuation found the external tensor-contraction preprint of
 translates to $O(mb^2)$ Boolean edges, too many for the contraction bound
 to give $\exp(o(b))$.
 
+\paragraph{The rank-one condition.} An audit of 12 November
+(\art{research/prime_norm_rank_20261112/REPORT.md}) wrote the signed-sum
+version of the reduction with every cost charged online. After $Q$
+arrives, $k=\lceil\log_2r\rceil+\kappa$ points $R_i=[u_i]P$ with known
+random labels are drawn, and a signed sum $\sum\epsilon_iR_i=Q$ is
+equivalent to a norm equation $A^2-fB^2=c\prod_i(X-x_i)(X-x_Q)$ with
+$A(x_Q)=y_QB(x_Q)$ and bounded degrees of $A$ and $B$. A written
+second-moment argument bounds the probability that no signed relation
+exists by $(r-2)/2^k+(k^2+2k)/r$. The coefficient system lifts to linear
+equations in a symmetric matrix, but a solution must have rank one. For
+$k=2$, with $B=1$ and $A=v(X-q)+y$, the linear matching leaves the defect
+$(v^2-U)(X-q)^2$ with $U=q+x_1+x_2$, so the missing condition is exactly
+$v^2=U$. Lean~4 proves that equivalence over any commutative coefficient
+ring, and on $y^2=x^3+2x+2$ over $\FF_{17}$ (the fixture of the arity-three
+solver above) it checks that the linear relaxation has a solution, with
+Gram matrix entries $11,9,1$ and determinant 15, so not of rank one, while
+the normalised norm equation has none. These are
+claims \texttt{PCC-20261112-ee178f} (the defect identity),
+\texttt{-ef0ca9} (the equivalence), \texttt{-e1609f} (no norm on the
+fixture), \texttt{-1b689b}, \texttt{-3325a1} and \texttt{-aa5a10} (the
+fixture's nonsingularity, 19 points and point equations), all theorems of
+unverified standing, and \texttt{-070fa2}, the written reduction, which is
+not formalised. The audit refutes the linear relaxation as a norm solver
+and nothing more. No $2^{o(n)}$ constructive rank-one witness solver is
+known, so no algorithm and no cost are claimed; direct sign enumeration is
+$2^k$ times a polynomial.
+
 \section{SAT, SMT and CDCL(T)}\label{sec:pa-sat}
 
 Chapter~\ref{sec:prime} reports three frozen SMT formulations of a 20-bit
@@ -1449,12 +1706,14 @@ the preprint of Akshima and coauthors, \emph{A Subexponential Time Algorithm
 for Elliptic Curve Discrete Logarithm}, which claims sub-exponential
 prime-field ECDLP conditional on a Boolean tensor-contraction theorem in a
 second external manuscript. The programme read both, ported the prototype
-and built instruments. \emph{Nothing was measured}: there is no ecbench
+and built instruments. \emph{No cost was measured}: there is no ecbench
 count, no wall time and no cost against rho for this route, and the
-programme did not verify the theorem it rests on. The second part collects
+programme did not verify the theorem it rests on. The graph widths of its
+encodings were measured on 11--12 November (\S\ref{sec:pt-tensor}, the
+treewidth census). The second part collects
 the named targets not already in Chapter~\ref{sec:prime}: EcGFp5 and
-EcMasFp5 over $\FF_{p^5}$, a short remainder on $\FF_{p^4}$, ECCp-131, and
-the audits of standard prime curves. Xedni calculus and the JKSST audit
+EcMasFp5 over $\FF_{p^5}$, a short remainder on $\FF_{p^4}$, ECCp-131,
+E-222 and M-221, and the audits of standard prime curves. Xedni calculus and the JKSST audit
 are in Chapter~\ref{ch:obstructions}.
 
 \section{Boolean tensor contraction: an external claim}\label{sec:pt-tensor}
@@ -1554,6 +1813,73 @@ entries (\art{research/hashed_ecdl_entry_cost_20261104/}) is claim
 \texttt{PCC-20261104-1df881}, and the structured-predicate integration
 report is \texttt{PCC-20261104-458dda}; both are of unverified standing.
 
+\paragraph{A treewidth census.} A Boolean tensor network whose primal graph
+has treewidth $w$ is contracted exactly in $O(V\cdot2^{w+1})$ table
+operations, whatever its edge count $s$, so width, not $s$, is what a
+structure-exploiting contraction pays. A census of 11--12 November
+(\art{research/semaev_tensor_treewidth_20261111/}; one curve per size, every
+number \texttt{[pcc:unverified]}, no independent validation) built four
+relation languages in the audited tensor crate on prime-order toy curves of
+$b=8$--40 bits: the hashed group law of the preprint, the group law on a
+small-abscissa base, Semaev's $\Sem3$ on that base ($m=2$) and chained
+$\Sem3$ ($m=3$). It measured lower bounds (MMD+ after safe reductions) and
+greedy upper bounds on the width, with each multiplier gadget.
+Table~\ref{tab:pt-tw} gives the schoolbook rows at the ends of the range.
+\begin{itemize}
+\item The width lower bound exceeds the enumeration and rho exponent $b/2$
+  by $4$--$5\times$ at every size and grows by about 2 per bit (least-squares
+  slopes $1.83$ for $\Sem3$, $2.42$ for the hashed group law), against $0.5$
+  per bit for enumeration. An optimal exact contraction of these graphs costs
+  at least about $2^{2b}$.
+\item The D.1 exponent $s/\sqrt{\log_2s}$ is $30$--$150\times$ the best
+  measured upper bound, so the generic bound ignores real structure; what
+  remains is still about $2^{1.5b}$ above enumeration.
+\item $\Sem3$ against the hashed group law at equal $b$ has $3.7$--$5.3\times$
+  fewer edges, a 15--25\% lower width lower bound and a 20--30\% lower best
+  upper bound: constants, not a regime.
+\item The preprint's Fourier multiplier makes its transform vertex a clique
+  of 132, 260 or 520 variables, so it minimises $s$ while maximising width:
+  for $\Sem3$ at $b=36$ the lower bound is 788 and the best upper bound
+  $1{,}477$.
+\item On every row $\log_2$ of the exact table work along the best order is
+  the best width plus about~2.
+\end{itemize}
+A follow-up measured the field-level object the lab's F4 harness solves, the
+Weil-descended binary $\Sem3$ system with a subspace base, at $n=8$--30.
+Every equation touches all $2n'$ unknowns, so its primal treewidth is
+exactly $2n'-1$, and contracting it is enumeration of both slots, while the
+refutation harness refutes the same instances at Macaulay degree 2--4 with
+37--1{,}471 columns. The structure these systems offer is algebraic degree,
+not graph width. The census therefore does not reopen the hashed-relation
+lead through Semaev's polynomials: any bit-level encoding of a $b$-bit
+modular product has width $\Omega(b)$, and a relation needs several.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Relation (schoolbook) & $b$ & edges $s$ & width lower & width upper & $s/\sqrt{\log_2s}$ \\
+\midrule
+$\Sem3$, small $x$ & 8 & 7{,}104 & 22 & 71 & 1{,}986 \\
+ & 36 & 97{,}408 & 74 & 616 & 23{,}928 \\
+ & 40 & 121{,}216 & 81 & 879 & 29{,}497 \\
+chained $\Sem3$ ($m=3$) & 36 & 212{,}240 & 84 & 670 & 50{,}454 \\
+group law, small $x$ & 36 & 260{,}236 & 86 & 752 & 61{,}356 \\
+group law, hashed & 8 & 37{,}619 & 27 & 92 & 9{,}649 \\
+ & 36 & 521{,}803 & 95 & 900 & 119{,}731 \\
+ & 40 & 624{,}865 & 104 & 1{,}157 & 142{,}408 \\
+\bottomrule
+\end{tabular}
+\caption[]{Treewidth of bit-level relation networks on prime-order toy
+curves. Enumeration of one slot costs $b/2$ bits ($2b/3$ for chained
+$\Sem3$); rho costs $b/2$. Lower bounds are valid; upper bounds are greedy
+(the 40-bit rows with one restart). Exact Boolean contraction, which does
+not credit algebraic structure inside a tensor. Source:
+\art{research/semaev_tensor_treewidth_20261111/TABLE.md}; field-level rows
+in \art{research/semaev_tensor_treewidth_20261111/FIELD_LEVEL.md}.}
+\label{tab:pt-tw}
+\end{table}
+
 \paragraph{What would test it.} The rank-census design of 31 October
 stages the test as six gated experiments plus one SAT/BDD triangulation,
 none authorised to spend benchmark budget until its predecessor's gate
@@ -1587,7 +1913,9 @@ result.
 \emph{claimed} sub-exponential algorithm for prime-field ECDLP, and it is
 external prior art. Its correctness rests on an external result that the
 programme read but did not verify, its constants make it infeasible at
-finite size as written, and it has no measurement. It does not move a row
+finite size as written, and it has no cost measurement; the treewidth
+census bounds exact Boolean contraction of its encodings at about $2^{2b}$.
+It does not move a row
 of any table in this treatise, and the iterative success criterion does not
 apply to it until a counted cost exists. The norm and divisor candidate of
 \S\ref{sec:pa-divisor} does not inherit its compactness: its literal
@@ -1758,6 +2086,134 @@ probe and the rho rates. Four further studies are nulls or constructions.
 The full-parameter index calculus remains the open problem
 \art{problems/eccp131-full-parameter-index-calculus.md}.
 
+\section{E-222 and M-221}\label{sec:pt-e222}
+
+A campaign of 6--12 November (\art{research/ic_e222_m221_20261106/},
+\art{research/ic_e222_m221_20261106/CAMPAIGN_SUMMARY.md}) took the
+Edwards curve E-222 ($p=2^{222}-117$, cofactor 4) and the Montgomery curve
+M-221 ($p=2^{221}-3$, cofactor 8) as targets for prime-field factor-base
+index calculus. It worked on toy analogues of both families (Edwards with
+cofactor 4, Montgomery with cofactor 8, a cofactor-1 control) and timed
+single operations on the real curves. Every result is local, on an
+unisolated host, \texttt{[pcc:unverified]} and pre-gate: an evidence bundle
+with a draft \texttt{VALIDATION.json} exists, but its replay and recompute
+are producer-run (\texttt{independent: false}), and no claim is registered
+(\art{research/ic_e222_m221_20261106/evidence/README.md}).
+
+\paragraph{Gains over index-calculus baselines.} On the CLI solver
+(\texttt{ic solve-prime-file}) the campaign cut the relation surplus from 64
+to 2, replaced the per-trial square-root sweep by a pair-sum table lookup,
+added a restarted walk and a cofactor projection (H1), and moved the new
+arms to the fast point path. With every arm on fresh instances and frozen
+settings, the table costs $0.066$ $[0.058,0.072]$ and the walk $0.026$
+$[0.022,0.029]$ of the best hoisted sweep in solver time, $0.546$ and $0.534$
+end to end (validated as a measurement by the campaign's validator, on the same host, with qualifiers). The validator then
+found that the repository holds a stronger solver unreachable from that
+CLI, \texttt{prime\_fast::ic\_solve} (Montgomery arithmetic, batched
+inversion, 3-summand pair table), $12.6\times$ below the word-sized sweep in
+an exploratory probe. Against it the table-lookup single-target mode is
+$1.25$--$1.46\times$ slower on all five fresh instances. The CLI-stack gains
+are therefore not improvements over the strongest implemented baseline.
+H1 projects the factor base into the prime-order subgroup and cuts trials to
+$0.277$ (cofactor 4), $0.153$ (cofactor 8) and exactly $1.000$ (cofactor 1)
+of the unprojected count.
+
+\paragraph{The \texttt{prime\_fast} line.} On \texttt{prime\_fast} a
+multi-target arm shares the factor-base logarithms and needs one relation
+per target. It is $78$--$122\times$ faster than repeated \texttt{ic\_solve}
+at $T=200$, and a table collector, a lock-step batched per-target phase and a
+bucketed pair table each lowered it further (validator reports for each
+step). Against generic multi-target attacks it does not win. The best
+variant is $1.9$--$2.4\times$ behind a tuned multi-target BSGS over 25--31
+bits ($2.4$--$2.5\times$ behind a compacted one). Against a lightly tuned
+multi-target distinguished-point rho (validator arm) it is $0.85$ at 25 bits,
+$1.13$--$1.21$ at 29 bits, tied at 31 bits and $2.3$--$2.9\times$ slower at 33
+and 35 bits; the earlier reading that the IC wins at small size, against an
+untuned rho, was withdrawn. Single-target IC is $15$--$19\times$ rho at 24
+bits, $62$--$78\times$ at 28 and $443$--$528\times$ at 32. The campaign's
+counted reasoning (not a measurement) puts the setup at about $p^{2/3}$ and
+the per-target relation search at about $p^{1/3}/c^2$ additions, a floor in
+$T$, so the IC stays a constant factor from BSGS at best. These are wall
+times on one host, outside ecbench.
+
+\paragraph{$j=0$ curves.} On $y^2=x^3+b$ with $p\equiv1\pmod3$ an orbit factor
+base under the order-6 automorphism group, with an orbit-reduced pair table,
+gives a symmetric 3-summand solver. On holdout curves of 26--30 bits it is about
+$2.0$--$2.4\times$ faster than the best 3-summand \texttt{ic\_solve} arm, all
+costs counted (validator correction of a first $1.87$--$2.93$; 490 of 490
+independent certificates pass; fresh primes give $2.1$--$2.6$). That is a
+measured single-target improvement over the strongest implemented
+prime-field IC on this curve family, unregistered and pre-gate. Its distance
+to negation-only rho grows from $3\times$ at 26 bits to $23\times$ at 30. A
+native rho folded by the same automorphism, with a short-cycle escape,
+reaches the expected $\sqrt{\pi n/12}$ steps and ties \texttt{rho\_parallel}
+in time, so the matched reference is the cheaper of the two: $3.5$--$5\times$
+at 26 bits and about $21\times$ at 30. The multi-target symmetric arm cut the
+setup to about $0.73$--$0.75$ of the batched baseline's, and its total
+advantage vanishes with $T$ ($1.63$ at $T=20$, $1.03$ at $T=1000$); four
+setup levers tried afterwards gave nothing.
+
+\paragraph{The distance to matched rho, by size.} A band panel added
+counted group operations and named uncharged counters to the default
+path, and ran the repository's negation rho $K=16$ times on each instance in
+the same process. Table~\ref{tab:pt-e222} gives the distance at the largest
+sizes of each panel. Rho is cheaper on every instance at every band weight.
+A counter model of the default path (a table of $F$ points holds $2F^2$
+entries; $(F+2)n/(2F^2)$ trials of about $1.75\log_2 n$ group operations each)
+reproduces the deterministic counters exactly and the trial counts within a
+7\% median bias on the 120 band runs, $1.001$ (default) and $0.962$ (H1) of
+the predicted trials on 40 runs at 26--31 bits, and $0.84$--$1.10$ on four
+single runs at 34--35 bits, where the field exceeds one machine word. The
+distance falls as $1/F$ and rises as $\sqrt n$, as the model says.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+Panel & family, configuration & bits & IC / rho ($w=0$) & runs \\
+\midrule
+band & Edwards, default / H1 & 21 & $1{,}687.8$ / $469.4$ & 5 inst. \\
+ & Montgomery, default / H1 & 21 & $3{,}593.4$ / $471.5$ & 4 \\
+ & cofactor 1 & 21 & $419.5$ & 5 \\
+mid & cofactor 1 & 30--31 & $6{,}500$ / $1{,}727$ & 1--2 per cell \\
+ & Edwards, H1 & 30--31 & $7{,}488$ / $1{,}658$ & \\
+ & Montgomery, H1 & 30--31 & $6{,}756$ / $1{,}738$ & \\
+ & Edw.\ / Mont., default, $F=128$ & 30--31 & $28{,}817$ / $54{,}894$ & \\
+mid34, $F=128$ & Edwards, default / H1 & 34 & $1.2\cdot10^5$ / $3.8\cdot10^4$ & 1 \\
+ & Montgomery, default / H1 & 35 & $2.5\cdot10^5$ / $2.8\cdot10^4$ & 1 \\
+ & cofactor 1 & 34 & $3.3\cdot10^4$ & 1 \\
+\addlinespace
+projection, $F=2^{20}$, H1 & E-222 & 220 & $2^{96.7}$--$2^{97.8}$ & model \\
+ & M-221 & 219 & $2^{95.7}$--$2^{96.7}$ & model \\
+\bottomrule
+\end{tabular}
+\caption[]{E-222 and M-221 analogues: index calculus (pair-sum table,
+joint relation point) over the matched negation rho on the same instance,
+GAE at $w=0$, medians over the instances of a cell; bits are subgroup
+bits; the mid rows give $F=128$ / $F=512$ unless marked. At $w=1$ the band ratios
+fall (Edwards default at 21 bits: $1{,}012.7$) because rho's uncharged
+canonicalisations are weighted too; the order never changes. The
+projection is a counter model evaluated at the real curves, not a
+measurement; its range is over rho's constant $S\in[0.886,1.8]$, and a
+table of $2^{41}$ entries is beyond ordinary memory. All producer-run,
+pre-gate. Sources: \art{research/ic_e222_m221_20261106/RESULTS_band.md},
+\art{research/ic_e222_m221_20261106/RESULTS_native_band.md},
+\art{research/ic_e222_m221_20261106/RESULTS_mid34.md}.}
+\label{tab:pt-e222}
+\end{table}
+
+\paragraph{Native size.} On the real curves a joint double-scalar pass
+($aG+bQ$ in one interleaved Jacobian pass) costs $0.529$ (E-222) and $0.581$
+(M-221) of the former relation point, about 2.8\,ms per relation point
+(\art{research/ic_e222_m221_20261106/RESULTS_native.md}; one host, no
+interval). A table lookup is about $0.1\,\mu$s, so a trial costs its relation
+point, and the fixed cost of an H1 solve at $F=32$ is about 66\,ms (E-222) and
+62\,ms (M-221). At $F=2^{20}$ with H1 the model projects the IC at $2^{207.6}$
+(E-222) and $2^{205.6}$ (M-221) GAE against rho's $2^{110}$--$2^{111}$. A
+cross-check that scales the measured mid-size ratios by $\sqrt{n}$, $1/F$
+and the bit length agrees with the model to about one bit. The extrapolation
+spans about 190 bits of subgroup order beyond the largest measured one.
+
 \section{Audits of standard prime curves}\label{sec:pt-standard}
 
 Chapter~\ref{sec:prime} lists the audits of the NIST, SECG and CryptoPro
@@ -1810,14 +2266,22 @@ index-calculus arm, generic or algebraic. The generic track's best arms are
 the residual collectors at $1.3$--$1.7\times$ rho ($w=0$; $1.54$--$1.64$ in
 the cells with a validator report), a constant at rho's exponent with no
 growth over 36--42 bits; the $k$-sum tables are
-$5.4$--$11.0\times$ rho and above baby-step giant-step. The algebraic track's
+$5.4$--$11.0\times$ rho and above baby-step giant-step, gate-validated at
+20--32 bits since 12 November. In the many-target regime the multi-target
+index calculus is unranked against multi-target rho across the band and
+1.11--1.47$\times$ BSGS (\S\ref{sec:pg-multitarget}). On the E-222 and
+M-221 analogues the distance to matched rho grows from $15.9$--$76.1$ at
+12 bits to $3.3\cdot10^4$--$2.5\cdot10^5$ at 34--35 bits in the default
+configuration, and a counter model projects $2^{95.7}$--$2^{97.8}$ at the
+real curves with $F=2^{20}$ and H1 (\S\ref{sec:pt-e222}). The algebraic track's
 priced prime rows are the Kummer-tower rows and the Curve25519 F4 arms; the
 best of the latter, with a validator report, is still $1.83\cdot10^4\times$
 rho at $w=0.1$, and the cost scales as $r^{1.03}$ (\S\ref{sec:c25519}). Its degree
 studies show growth or input-pinned degrees in every presentation, with
 matrices that grow when degrees do not. The one claimed sub-exponential
 route is external, conditional on an unverified theorem, infeasible at
-finite size as written and unmeasured. On EcGFp5 the measured per-system
+finite size as written and without a cost measurement; the widths of its
+bit-level encodings grow about 2 per bit (\S\ref{sec:pt-tensor}). On EcGFp5 the measured per-system
 cost moved by $1.72$--$1.97\times$ and remains about 7.4--7.8 bits from the
 promote line.
 
@@ -1841,7 +2305,15 @@ The chapters state these corrections and withdrawals:
 \item the symmetric-tower rows are instrument diagnostics, not natural
   prime-order benchmarks (\S\ref{sec:pa-pkm});
 \item the Cheon/rho ratios on P-224's shape are withdrawn
-  (\S\ref{sec:pt-standard}).
+  (\S\ref{sec:pt-standard});
+\item the 11 November reading that the multi-target \texttt{ic4} is
+  cheaper than rho at $T=16384$ is withdrawn as a statement about rho: it
+  held only against a harness rho without retention, and with retention the
+  decisions are 0 cheaper, 6 unranked, 12 dearer (\S\ref{sec:pg-multitarget});
+\item on the E-222 analogues the CLI-stack table and walk gains are not
+  improvements over the strongest implemented baseline,
+  \texttt{prime\_fast::ic\_solve}, and the multi-target IC's win over an
+  untuned rho at small size is withdrawn (\S\ref{sec:pt-e222}).
 \end{itemize}
 The open items are the discriminating Kummer cells ($m=3$, $N=21$
 symmetric; $t=14$ at cap 6), the algebraic reference arm, a counted cost

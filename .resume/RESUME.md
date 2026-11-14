@@ -1,37 +1,15 @@
-# Resume: crypto @ claude/gpu-ic-baseline-modal-20261107
+# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
 
 ## Goal
-User request (2026-11-07): draft the EKS GPU pool for review and also use Modal, for the first hardware
-baseline of gpu/semaev and gpu/rootfind (no kernel in either has ever run on a GPU).
-
-## Lead / hypothesis
-Engineering stage diagnostic, not a lead. Does the device agree with the verified host path, and how fast
-does it run (clmad vs software product, per-row vs per-pair, sorted vs hash lookup)? Predictions P1-P4 are
-in the spec.
+Owner (2026-11-14) asked to implement the PKM auxiliary-curve IC and show the prime-field speedup, then: "the results we saw before were pretty good so something must be off" — audit all favourable earlier results.
 
 ## Spec
-research/gpu_ic_baseline_20261027/PROTOCOL.md including Amendment 1 (frozen at the commit that adds
-gpu/modal/). Container job: gpu/modal/ic_baseline_job.sh. Launcher: gpu/modal/modal_ic_job.py.
+Audit finding: the batched multi-target folded rho in examples/prime_fast_j0_rho_multi.rs restarts walks from a target drawn uniformly over all T targets (solved or not), so its step counts are 8-35x above Kuhn-Struik sqrt(2 n T / 6). Fix: restart only from unsolved targets (default); RESTART=all reproduces the old policy.
+Rerun: target/release/examples/prime_fast_j0_rho_multi <out.jsonl> <bits> <T> 2 for bits 26,28,30 and T 200,1000,3000 (plus 20 at 26), both policies; compare with research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl (IC rows unchanged, same planted targets).
+Outputs: research/ic_e222_m221_20261106/results/pf_j0/rhoks_*.jsonl and rhoall_*.jsonl.
 
 ## State
-Protocol, Modal launcher/job and the EKS GPU pool draft (taskq/deploy/eks-karpenter/gpu-draft/, NOT applied)
-are committed on this branch. No Modal run yet. Modal credentials are in the session environment
-(MODAL_TOKEN_ID, MODAL_TOKEN_SECRET); the `modal` client is pip-installed (1.6.3).
+2026-11-14: patch written, release build running. No rows yet.
 
-## Next steps
-1. Checkpoint push must succeed (needs CHECKPOINT_UPLOAD_TOKEN or AWS creds; neither was present).
-2. `modal run --detach gpu/modal/modal_ic_job.py --out /tmp/gpu-ic-baseline/run-01`; if the client dies,
-   `--fetch-token <token>`.
-3. If the selftest gate fails, that is the result: report it, no throughput.
-4. Otherwise score P1-P4, write RESULTS, graph, PDF, benchmarks/ row only if the validation gate allows
-   (it does not for a Modal-only run), session log, PR.
-
-## Runs in flight
-None.
-
-## Stop and success conditions
-One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
-
-## Open questions
-Whether sm_120 is available on Modal as "RTX-PRO-6000" for this workspace; whether the g7e sizes and
-G-family Spot quota exist for the EKS pool.
+## Next
+Run both policies, tabulate rho/IC, append correction section to RESULTS_prime_fast_j0_sym.md, session log, bench record, PR.

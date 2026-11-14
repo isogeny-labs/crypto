@@ -1,0 +1,38 @@
+{
+  "card_id": "CARD-fp31-phase3-icyield-20261112-1",
+  "card_path": "research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.yaml",
+  "card_sha256": "03b5adaf1fde62c54e7d5fb31e47528251e3d9f3ba37c40a72d0f0875b70601a",
+  "commands": [
+    {
+      "argv": [
+        "research/fp31_whole_field_census_20261111/phase3/run_phase3.sh",
+        "target/release/ecbench",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool",
+        "research/fp31_whole_field_census_20261111/phase3/classes.json",
+        "research/fp31_whole_field_census_20261111/phase3/runs"
+      ],
+      "child_alive": false,
+      "child_pid": 3129,
+      "cwd": ".",
+      "id": "run-phase3",
+      "index": 1,
+      "lost_detected_at": "2026-11-12T01:43:18Z",
+      "pid": 3127,
+      "pid_file": "research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.run/01-run-phase3.pid.json",
+      "started_at": "2026-11-12T01:04:39Z",
+      "status": "lost",
+      "stderr": "research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.run-phase3.stderr",
+      "stdout": "research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.run-phase3.stdout"
+    }
+  ],
+  "commands_total": 3,
+  "commit": "58e501e346844ce62850c578e3b4ad0258e1dcb1",
+  "dirty_after": [],
+  "dirty_before": [
+    "benchmarks/records/20261112T0103Z-fp31-ic-yield-across-classes.json",
+    "research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.yaml"
+  ],
+  "loss_ledger_suggestion": "python3 tools/loss_ledger.py add --slug card-fp31-phase3-icyield-20261112-1-01-run-phase3 --route local --cause container_restart --what 'task card CARD-fp31-phase3-icyield-20261112-1 step 01-run-phase3 lost: pid 3127 gone without an exit record, started 2026-11-12T01:04:39Z' --source research/fp31_whole_field_census_20261111/phase3/cards/CARD-fp31-phase3-icyield-20261112-1.receipt.json",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "lost at command 1"
+}

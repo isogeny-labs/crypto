@@ -1,0 +1,121 @@
+{
+  "branch": "claude/zealous-meitner-85ipb5",
+  "closed_utc": "2026-11-12T20:14:45+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/fes_then_batched_20261112/run_e2e.sh",
+        "research/fes_then_batched_20261112/results"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-12T20:09:38+00:00",
+      "wall_s": 259.849
+    }
+  ],
+  "commit": "4900647bcd3f03eac82803fea83c0615d1db10db",
+  "commit_dirty": false,
+  "created_utc": "2026-11-12T20:09:33+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261112-fes-then-batched"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T2009Z-fes-then-batched-e2e",
+  "metrics": [
+    {
+      "baseline": 2051.2,
+      "better": "lower",
+      "n": 3,
+      "name": "s_fes_then_batched_koblitz23",
+      "note": "degree-23 Koblitz, binary-subspace dimension 12, descent-algebraic m=2 with fes-then-batched (ran inherited-f4-batched, pinned word XORs); baseline inherited-f4",
+      "reference": 0.88,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1223.1,
+        1999.0
+      ],
+      "unit": "S",
+      "value": 1674.3
+    },
+    {
+      "baseline": 137.9,
+      "better": "lower",
+      "n": 3,
+      "name": "s_fes_then_batched_koblitz13",
+      "note": "degree-13 Koblitz, fes-then-batched ran fes-f2; equal to fes-then-inherited",
+      "reference": 2.89,
+      "reference_kind": "matched_rho",
+      "spread": [
+        83.7,
+        116.3
+      ],
+      "unit": "S",
+      "value": 101.9
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "ftb_over_inherited_s_ratio_max",
+      "note": "fes-then-batched S / inherited-f4 S in the same run, over the six instances: 0.739-0.889",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.739,
+        0.889
+      ],
+      "unit": "ratio",
+      "value": 0.889
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "verified_configurations",
+      "note": "6 instances x (pair table, inherited-f4, fes-then-inherited, fes-then-batched), every repeat",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 24.0
+    }
+  ],
+  "problem": "study:fes_then_batched_20261112:e2e-ladder",
+  "raw": [
+    {
+      "bytes": 91439,
+      "path": "research/fes_then_batched_20261112/results.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/15/15dbded3cf4b02e24d389f8cee623733dadb726ac96f9633f6f6b7a0718241fe",
+      "sha256": "15dbded3cf4b02e24d389f8cee623733dadb726ac96f9633f6f6b7a0718241fe",
+      "uploaded": false
+    },
+    {
+      "bytes": 19311,
+      "path": "research/fes_then_batched_20261112/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fa/fa200ed14d3bc1f6e34e6961f4da5aec3a5a4d037c02b664da5715f2f8713418",
+      "sha256": "fa200ed14d3bc1f6e34e6961f4da5aec3a5a4d037c02b664da5715f2f8713418",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/fes_then_batched_20261112/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/fes_then_batched_20261112/results.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fes-then-batched-e2e",
+  "status": "measured",
+  "summary": "ic bench --sweep on the six e2e-ladder instances with inherited-f4, fes-then-inherited and fes-then-batched, 3 repeats: all configurations verified; fes-then-batched lowest algebraic row everywhere, 0.74-0.89 of inherited-f4 (Koblitz 13: 101.9 vs 137.9; Koblitz 23: 1674.3 vs 2051.2), lowest IC row on five of six (pair table lower on random 21); Koblitz rows equal the earlier runs exactly. Local container; unverified.",
+  "validation": null
+}

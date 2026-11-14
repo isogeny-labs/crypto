@@ -222,6 +222,37 @@ RF_HD uint64_t rf_thread_count(uint32_t n_targets, uint32_t n_fb, int chunk) {
 /* ------------------------------------------------------------------ *
  * The per-thread oracle.  CHUNK must be a multiple of 8 and <= 64.
  * ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ *
+ * Opt-in phase profile (RF_PROFILE=1, device only).  clock64() at the
+ * phase boundaries of rf_decompose_thread; one thread in 1024 (tid % 1024
+ * == 0) adds its cycles to rf_prof_cycles[] with one atomic per phase, so
+ * the totals are a sample of where a thread's cycles go, not a timing.
+ * Slots: 0 load d[], 1 prefix products, 2 inversion, 3 unwind, 4 sweep
+ * (all of it), 5 table probes inside the sweep, 6 sampled threads.
+ * RF_PROFILE=0 (default) compiles every macro to nothing.
+ * ------------------------------------------------------------------ */
+#ifndef RF_PROFILE
+#define RF_PROFILE 0
+#endif
+#if RF_PROFILE && defined(__CUDACC__)
+static __device__ unsigned long long rf_prof_cycles[8];
+#endif
+#if RF_PROFILE && defined(__CUDA_ARCH__)
+#define RF_PROF_BEGIN(tid) long long rf_pa[6] = {0, 0, 0, 0, 0, 0}; long long rf_pt = clock64(); \
+    const bool rf_ps = ((tid) & 1023u) == 0
+#define RF_PROF_STEP(slot) do { long long rf_now = clock64(); rf_pa[slot] += rf_now - rf_pt; rf_pt = rf_now; } while (0)
+#define RF_PROF_PROBE_START() long long rf_pp = clock64()
+#define RF_PROF_PROBE_END() (rf_pa[5] += clock64() - rf_pp)
+#define RF_PROF_FLUSH() do { if (rf_ps) { for (int rf_s = 0; rf_s < 6; rf_s++) \
+    atomicAdd(&rf_prof_cycles[rf_s], (unsigned long long)rf_pa[rf_s]); atomicAdd(&rf_prof_cycles[6], 1ull); } } while (0)
+#else
+#define RF_PROF_BEGIN(tid) do { } while (0)
+#define RF_PROF_STEP(slot) do { } while (0)
+#define RF_PROF_PROBE_START() do { } while (0)
+#define RF_PROF_PROBE_END() do { } while (0)
+#define RF_PROF_FLUSH() do { } while (0)
+#endif
+
 template <class F, class T, int CHUNK>
 RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t tid) {
     typedef typename F::elt elt;
@@ -231,6 +262,7 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
     const uint32_t i0 = (uint32_t)(tid / (uint64_t)a.n_targets) * (uint32_t)CHUNK;
     const uint32_t cnt = (a.n_fb - i0 < (uint32_t)CHUNK) ? (a.n_fb - i0) : (uint32_t)CHUNK;
 
+    RF_PROF_BEGIN(tid);
     const elt xr = a.t_x[k];
     const elt yr = a.t_y[k];
     const elt one = F::one(f);
@@ -252,6 +284,7 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             d[w] = one;
         }
     }
+    RF_PROF_STEP(0);
     /* Montgomery's trick: prefix products, one inversion, unwind. */
     elt acc = one;
 #pragma unroll
@@ -259,13 +292,16 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
         pre[w] = acc;
         acc = F::mul(f, acc, d[w]);
     }
+    RF_PROF_STEP(1);
     elt inv_acc = F::inv(f, acc);
+    RF_PROF_STEP(2);
 #pragma unroll
     for (int w = CHUNK - 1; w >= 0; w--) {
         elt dw = d[w];
         d[w] = F::mul(f, inv_acc, pre[w]);
         inv_acc = F::mul(f, inv_acc, dw);
     }
+    RF_PROF_STEP(3);
 
     /* The sweep.  Factor-base loads are warp-uniform (every lane holds
      * the same slice), target values live in registers. */
@@ -287,6 +323,7 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
             const elt lam = s == 0 ? lam_m : lam_p;
             const elt x3 = F::sub(f, F::sub(f, F::sqr(f, lam), xr), xi);
             const uint64_t key = F::key(f, x3);
+            RF_PROF_PROBE_START();
             uint32_t pos = table.begin(key);
             while (table.valid(pos, key)) {
                 const uint32_t j = table.index(pos);
@@ -297,8 +334,11 @@ RF_HD void rf_decompose_thread(const DecompArgs<F> &a, const T &table, uint64_t 
                 const int8_t tau = F::eq(f, y3, a.fb_y[j]) ? (int8_t)1 : (int8_t)-1;
                 rf_emit(a.out, a.out_count, a.out_cap, k, i, j, eps, tau);
             }
+            RF_PROF_PROBE_END();
         }
     }
+    RF_PROF_STEP(4);
+    RF_PROF_FLUSH();
 }
 
 #endif /* GPU_ROOTFIND_ROOTFIND_CUH */

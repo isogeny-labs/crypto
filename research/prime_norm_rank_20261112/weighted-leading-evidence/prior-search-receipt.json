@@ -1,0 +1,102 @@
+{
+  "schema": "bounded-prior-search/v1",
+  "standing": "unsigned producer source review, not absence proof",
+  "kb": "unavailable as already recorded; no loaded KB MCP",
+  "repositories": [
+    "isogeny-labs/crypto",
+    "isogeny-labs/cryptanalysis",
+    "isogeny-labs/ml-cryptanalysis",
+    "isogeny-labs/cryptanalysis-rl",
+    "isogeny-labs/ecbench"
+  ],
+  "queries": [
+    {
+      "query": "weighted degree Riemann Roch Macaulay",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/n83_ic_degree_sweep_20261027/validation/ecbench-rechecks.log",
+          "path": "research/n83_ic_degree_sweep_20261027/validation/ecbench-rechecks.log"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/README.md",
+          "path": "README.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/pdp_literature_leads_20261022/leads/LEAD-16.md",
+          "path": "research/pdp_literature_leads_20261022/leads/LEAD-16.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/pdp_literature_leads_20261022/README.md",
+          "path": "research/pdp_literature_leads_20261022/README.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/docs/session-logs/2026-11-04.md",
+          "path": "docs/session-logs/2026-11-04.md"
+        }
+      ]
+    },
+    {
+      "query": "pole weights norm divisibility",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/prime_norm_rank_20261112/README.md",
+          "path": "research/prime_norm_rank_20261112/README.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/prime_pole_anchor_20261030/README.md",
+          "path": "research/prime_pole_anchor_20261030/README.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/nagao_relations/README.md",
+          "path": "research/nagao_relations/README.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/koblitz_modular_ic_20261018/rounds/19/SOURCES.md",
+          "path": "research/koblitz_modular_ic_20261018/rounds/19/SOURCES.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/koblitz_modular_ic_20261018/rounds/22/PROTOCOL.md",
+          "path": "research/koblitz_modular_ic_20261018/rounds/22/PROTOCOL.md"
+        }
+      ]
+    },
+    {
+      "query": "weighted closure certificate",
+      "results": [
+        {
+          "url": "https://github.com/isogeny-labs/crypto/blob/c9e6d8ee47dc3b9fdf258386f84c90dd9e7169c0/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/state-and-repair-closure/PLAN.md",
+          "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/state-and-repair-closure/PLAN.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/docs/IC_CURVE_SWEEP.md",
+          "path": "docs/IC_CURVE_SWEEP.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/docs/IC_PAPER_DRAFT.md",
+          "path": "docs/IC_PAPER_DRAFT.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/README.md",
+          "path": "README.md"
+        },
+        {
+          "url": "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/experiments/ic-bounds-locus/README.md",
+          "path": "experiments/ic-bounds-locus/README.md"
+        }
+      ]
+    }
+  ],
+  "primary": "https://arxiv.org/pdf/1412.7547",
+  "primary_sections": "3.2 equation11, Theorem12, section4",
+  "read_files": [
+    "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/formal/README.md",
+    "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/formal/ICFallDegrees/Closure.lean",
+    "https://github.com/isogeny-labs/ml-cryptanalysis/blob/8020e131a1a3806531d695b6bc7586473802dada/formal/ICFallDegrees/VariableClosure.lean"
+  ],
+  "changed_plan": [
+    "Use full iterated closure rather than static monomial multiples in any later closure experiment.",
+    "Do not apply weighted regularity bounds without the exact hypotheses.",
+    "Prove the explicit special-fiber zero-set criterion first."
+  ],
+  "limitations": "Multiword GitHub token matching is not semantic absence; this is bounded fallback, not an exhaustive literature review or novelty claim."
+}

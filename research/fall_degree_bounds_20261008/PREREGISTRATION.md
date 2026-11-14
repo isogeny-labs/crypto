@@ -832,3 +832,495 @@ and all original gates can support a later scientific reading. Preserve the
 initial snapshots, installation receipts, readback hashes, and uploader source
 under `e12/continuation-20261028/`. The observed bucket lifecycle expires `cache/`
 objects only; it defines no expiration for these `jobs/` keys.
+
+## Amendment 17 (2026-11-07 UTC, before any draw below): E13, the exact `d_F` at (3, 21, 7), an independent-engine check of every E10 `d_F ≥ 5` draw, and (4, 28, 7)
+
+**Why.**
+- E12a (the degree-5 closure at (3, 21, 7)) and E12c ((4, 28, 7), `N = 84`) were
+  Spot-reclaimed three times each and have no reading.
+- The E10 `d_F ≥ 5` draws have been confirmed only by runs of the same closure code
+  (`hky_par`). Both `hky_crosscheck` attempts were lost to container restarts.
+- The user approved all three follow-ups on 2026-11-07, with a hard cap of **USD 100**.
+
+**Route.**
+- One RunPod CPU pod: `cpu3g`, 64 vCPU, about 256 GB, `interruptible: false` (On-Demand,
+  so not reclaimable). This is the route the owner approved on 2026-11-06 for
+  `dreg_guess_scaling_20261106`. The lab AWS account's `SpotOnlyEC2Launch` policy forbids
+  On-Demand EC2.
+- **Budget:**
+  - The pod gets a hard wall-clock limit of `floor(100 / costPerHr)` hours, at most
+    36 h, counted from pod creation.
+  - It is deleted when the job ends or the limit passes, whichever comes first.
+  - Nothing runs after the limit, and no second pod is created without a new amendment.
+- **Source and outputs:**
+  - The source is a `git archive` of main `a2be660914e8e485eefd45f2958eb6d18344dadf` over
+    `e13/source_paths.txt`. The pod fetches it by a presigned S3 URL and checks its
+    SHA-256 before building.
+  - Outputs are tarred to S3 by presigned PUT every 10 minutes, and once at the end.
+  - Counts only: wall time is recorded, not scored.
+
+**Gates (on the pod's exact build; if one fails, the parts that depend on it do not run).**
+- **G0:** `cargo test --release --lib -- fast_chained_count_matches_the_reference
+  chained_count partial_enlargement` passes.
+- **G1 (for E13a and E13b):** `dreg_linear_guess --engine pe --to 4 --max-cols 140000
+  --draw 0 --sum 15=7+0 --fix 23=0,24=1` on
+  `research/dreg_invariant_guess_20261029/draws/m3-22-8.jsonl` reproduces
+  `research/dreg_invariant_guess_20261029/runs/S3.d0.b4.jsonl`: degree 4 saturated,
+  not refuted, `closure_rank` 131,588. This is Gate A2 of `dreg_guess_scaling_20261106`.
+- **G2 (for E13c):** the gates of `e12/run_window.sh`, unchanged.
+
+**E13b: independent-engine check (runs first).**
+- **Engine:** `dreg_linear_guess --engine pe --batch 64 --to 4 --max-cols 400000`, no
+  guesses. This is the partial-enlargement closure of `src/cryptanalysis/partial_enlargement.rs`,
+  a different implementation from `hky_par`. It shares only the system construction
+  (`build_decomposition_system`).
+- **Censored draws:** all 12 `d_F ≥ 5` draws of E10, from the committed records
+  `e10/run-r3-B/out/E_3-21-7.jsonl`, `E_3-24-8.jsonl` and `E_3-27-9.jsonl`.
+- **Controls with a known refutation:** the four E10 draws of (4, 12, 3) (`d_F = 4`) and
+  the four E9 draws of (6, 10, 3) (`d_F` 4 3 4 4).
+- **Reading:**
+
+| reading | condition |
+|:--|:--|
+| **"independent agreement"** | every censored draw saturates unrefuted at degree 4 with `closure_rank` equal to `hky_par`'s degree-4 `dim`, AND every control refutes at its recorded `d_F` |
+| **"disagreement"** | otherwise. The draws that differ are listed; the E10 `≥ 5` reading for those cells is then suspended until resolved |
+
+**E13a: the exact `d_F` at (3, 21, 7).**
+- **Engine:** the same `pe` engine, `--to 5 --max-cols 1000000` (degree ≤ 5 has 974,982
+  columns at `N = 42`).
+- **Draws:** the four E10 draws of (3, 21, 7) (draws 0, 1, 3 and 4), one at a time, in that
+  order.
+- **Per draw:**
+  - "`d_F = 5`" if the degree-5 closure contains 1.
+  - "`d_F ≥ 6`" if it saturates without 1.
+  - "unmeasured" if it is capped or the time limit passes.
+  - The draw's degree-4 entry must equal E13b's for the same draw. If not, the draw is void.
+- **Cell reading:**
+
+| reading | condition |
+|:--|:--|
+| **"`d_F = 5` at (3, 21, 7)"** | at least 3 of 4 draws read 5 |
+| **"`d_F ≥ 6` at (3, 21, 7)"** | at least 3 of 4 draws read `≥ 6` |
+| **"split"** | otherwise, with at least 2 draws measured |
+| **"not completed"** | fewer than 2 draws measured |
+
+**E13c: (4, 28, 7) with the E11 engine.** `e12/run_window.sh "$OUT" 4:28:7`, exactly as
+E12c: `hky_window`, `w1x`, `--features wide-vars`, `keep = 4`.
+- **Reading:** Amendment 11's E12c rule. "H_ℓ refuted at `m = 4`" if at least 2 completed
+  draws are "`d_F = 4` certified"; otherwise "no reading".
+- **Consistency check:** draw 0 was already computed by E12c r3 (`e12/interrupted-c-20261028/W_4-28-7.jsonl`).
+  The new draw 0 must equal it on every non-timing field. A difference is reported as
+  engine nondeterminism.
+
+**Scheduling.**
+- E13b runs first, with all threads.
+- Then E13a (40 threads) and E13c (24 threads) run concurrently.
+- A part cut off by the time limit is "not completed", with whatever finished.
+- Nothing is retried or relaunched under this amendment.
+
+**Prediction (recorded before any draw).**
+- E13b: "independent agreement", probability 0.85.
+- E13a: "`d_F = 5`", 0.6; "`d_F ≥ 6`", 0.3; "not completed", 0.1.
+- E13c: "no reading", 0.8. The E12c r3 draw 0 was inconclusive, and E12b's
+  "mixed" reading weakens H_ℓ.
+
+Nothing from any E13 part has been computed, and no E13 draw has been generated.
+
+## Amendment 18 (2026-11-07 UTC, before any E13 draw): E13 runs locally instead of on RunPod
+
+**Why.** The RunPod pod of Amendment 17 was refused for low account balance, so no pod
+existed and nothing was run. The user then asked for E13 to run locally. Nothing from any
+E13 part has been computed.
+
+**Route.**
+- The authoring container: 4 vCPU and 15 GB RAM.
+- The source is the same frozen archive (`e13/source_archive.sha256`, main `a2be6609`),
+  extracted and built here.
+- Every computation runs under an address-space cap of 13 GiB (`ulimit -v`). A run that
+  exceeds it fails cleanly and is recorded as **"not completed (memory)"**.
+- No cloud cost.
+
+**Changes from Amendment 17 (everything else unchanged):**
+- **Threads:** 4 for every part.
+- **Order:** sequential: gates, then E13b (the censored draws first, then the controls,
+  smallest `N` first), then E13a, then E13c. The engines, flags, gates and reading rules
+  are as in Amendment 17.
+- **Draw granularity:** every draw is a separate process (`--draw D`) with its own output
+  file. A finished draw is never recomputed.
+- **Container restarts:** after a restart, the runner resumes at the first draw without
+  an output file. That draw is recomputed from scratch, which is allowed because the
+  computation is deterministic. The killed attempt's partial `.err` file is kept with an
+  `.attemptN` suffix.
+- **Time limit:** none per draw. A part still unfinished when the user stops the run is
+  "not completed", with whatever finished.
+
+**Expected (recorded before any draw).**
+- E13b's censored draws fit (degree 4, at most 342,541 columns).
+- The `N = 58` controls, E13a (974,982 columns at degree 5) and E13c (`N = 84`) are
+  likely to exceed 13 GiB. Probability "not completed (memory)":
+  - `N = 58` controls: 0.5;
+  - E13a: 0.85;
+  - E13c: 0.95.
+
+Nothing from any E13 part has been computed, and no E13 draw has been generated.
+
+## Amendment 19 (2026-11-09 UTC, before any draw below): E14, the parts of E13 that need more than 13 GiB, on RunPod
+
+**Why.**
+- E13 ran locally under a 13 GiB cap (Amendment 18). Three parts ran out of memory:
+  - the three `N = 58` controls 6:10:3 d1, d3 and d4;
+  - all four E13a draws (degree 5 at (3, 21, 7));
+  - the E13c gate build. The local runner put the cap on the build too.
+- The owner topped up RunPod on 2026-11-09 and asked for the pod route.
+- E13's recorded readings are unchanged. E14 is a new run with its own readings.
+
+**Route.** As in Amendment 17:
+- **Pod:** one RunPod CPU pod, `cpu3g`, 64 vCPU, `interruptible: false`.
+- **Source:** the same frozen archive (main `a2be6609`, SHA-256 `18b14930…`), fetched by
+  presigned URL and hash-checked.
+- **Outputs:** tarred to S3 by presigned PUT every 10 minutes and after every draw.
+- **Hard cap of USD 100:** the pod reads its own `costPerHr` from the RunPod API and sets
+  its deadline to `min(36 h, floor(100 / costPerHr) h)` from start. It deletes itself at
+  the end or at the deadline. No second pod is created without a new amendment.
+- **Memory:** no `ulimit`.
+- **Gates:** G0 and G1 of Amendment 17, unchanged. E14c also runs the gates of
+  `e12/run_window.sh`.
+
+**E14b: the three unmeasured E13b controls.**
+- **Run:** 6:10:3 draws 1, 3 and 4 (recorded `d_F` = 4 each), from
+  `e9/run-r3/out/E_6-10-3.jsonl`, with
+  `dreg_linear_guess --engine pe --batch 64 --to 4 --max-cols 600000 --draw D`, 64 threads.
+- **Reading:**
+  - **"controls confirmed"** if all three refute at degree 4.
+  - **"control differs"** if any of them saturates unrefuted at degree 4 or refutes at
+    degree 3. The draw is listed.
+  - **"not completed"** if any draw does not finish.
+- **Combined with E13b:** if E14b reads "controls confirmed", E13b's condition holds over
+  E13 and E14 together. All 12 censored draws agree, and all 8 controls refute at their
+  recorded `d_F`. That combined statement is reported as **"independent agreement (E13b +
+  E14b)"**. E13b's own recorded reading stays "disagreement".
+
+**E14a: the exact `d_F` at (3, 21, 7).** Rules as E13a (Amendment 17):
+- **Run:** `--to 5 --max-cols 1000000`, draws 0, 1, 3 and 4 in that order, 40 threads.
+- **Per draw:** "`d_F = 5`", "`d_F ≥ 6`" or "unmeasured". The degree-4 entry must equal
+  E13b's committed record for the same draw, or the draw is void.
+- **Cell:** "`d_F = 5`" if ≥ 3 of 4 draws read 5; "`d_F ≥ 6`" if ≥ 3 of 4 read ≥ 6;
+  "split" if ≥ 2 are measured; "not completed" otherwise.
+
+**E14c: (4, 28, 7).** `e12/run_window.sh "$OUT/C" 4:28:7`, 24 threads, concurrent with E14a.
+- **Reading:** Amendment 11's E12c rule. "H_ℓ refuted at `m = 4`" if at least 2 completed
+  draws are "`d_F = 4` certified"; otherwise "no reading".
+- **Consistency check:** draw 0 must equal `e12/interrupted-c-20261028/W_4-28-7.jsonl` on
+  every non-timing field.
+
+**Scheduling.** Gates first, then E14b, then E14a and E14c concurrently. A part cut off by
+the deadline is "not completed". Nothing is retried.
+
+**Prediction (recorded before any draw).**
+- E14b "controls confirmed": 0.85.
+- E14a: "`d_F = 5`" 0.55, "`d_F ≥ 6`" 0.3, "not completed" 0.15.
+- E14c: "no reading" 0.75.
+
+Nothing from any E14 part has been computed, and no E14 draw has been generated.
+
+## Amendment 20 (2026-11-11 UTC, before any draw below): E14 relaunch (r2) after the zero-balance termination
+
+**Why.**
+- The Amendment 19 pod (`oubpztzdbbbo4s`) was terminated by the provider at zero account balance
+  about 5 h after start (`e14/score.json`). It passed G0 and G1 and produced no draw. E14b's first
+  control, 6:10:3 draw 1, had run for more than 16,400 s at 64 threads without output, against 190 s
+  for the `hky_par` reference, and its `.err` stream was empty. E13's local timings put the `pe`
+  engine at roughly 20× the `hky_par` time at matched column counts (E_3-24-8: 1,830 s for 186k
+  columns at 4 threads against 90–124 s for `hky_par` at 213k columns). Dense elimination scales
+  about cubically in the column count, so the registered E14a design (`pe`, 975k columns at degree
+  5) had no realistic chance inside the USD 100 cap. This amendment keeps every reading rule and
+  changes the engine for E14a, the transport, the order, and adds a scaling gate.
+- AWS identity is unavailable in the authoring session (`aws` is not installed; the last check on
+  2026-11-11 returned `InvalidClientTokenId`), so the S3 presigned transport of Amendments 17–19
+  cannot be minted. The repository `isogeny-labs/crypto` is public, so the pod fetches the frozen
+  commit directly from GitHub.
+- The owner authorised the spend on 2026-11-11 ("a few hundred dollars of large-memory compute to
+  finish E14 and the three missing controls, once credentials are restored").
+
+**Admission (checked by `e14/launch_r2.sh`, recorded in `e14/pod-r2/launch.json`).**
+- RunPod account balance ≥ USD 100 + 24 h × (sum of `costPerHr` of every other running pod). At
+  authoring time the balance was USD 15.74 with another pod (`icb-k14d`, not this study's) running
+  at USD 5.29/h, so the launch is **not admitted** until the account is topped up.
+- No other pod whose name starts with `fd-e14` exists.
+- `.resume/RESUME.md` filled by the launching session (repository rule). The S3 push needs a
+  checkpoint token or AWS identity; absent both, the owner's waiver is recorded in the session log.
+- The in-pod script `e14/run_pod_r2.sh` is passed as `SCRIPT_B64`; its sha256 at launch is recorded
+  in `launch.json` and must equal the committed file's.
+
+**Route.** One RunPod CPU pod, Secure Cloud, flavor `cpu3g` (fallback `cpu5g`), 64 vCPU,
+`interruptible: false`, 150 GB container disk, `runpod/base:1.0.2-ubuntu2404`. Hard cap USD 100:
+deadline `min(36 h, floor(100 / costPerHr) h)` from start, read from the pod's own record with the
+key passed as `POD_CTL_KEY`; fallback 18 h if the cost cannot be read. The pod deletes itself at the
+end or at the deadline. No second pod without a new amendment.
+
+**Source.** Frozen commit `a2be660914e8e485eefd45f2958eb6d18344dadf` (main, 2026-11-07), as in
+Amendments 17–19, fetched by sparse partial clone from `https://github.com/isogeny-labs/crypto` over
+the E13 path list. Gates:
+- `G-src-a`: `git rev-parse HEAD` equals the commit.
+- `G-src-b`: sha256 of the path list fetched from the commit equals
+  `97b6bbde009ee1e04884041280b1c5dcd9030024d95b940f7e4a12bd9bd28ecd`.
+- `G-src-c`: `git ls-tree -r HEAD -- <paths> | sha256sum` equals
+  `da6ee5f3f65fa864d7eddb1da48a6bb7d5d286e7072f8607cc1356e480c466ff` (4,501 entries). This is the
+  tree identity; it does not depend on gzip. For the record, `git archive --format=tar <commit>
+  <paths> | gzip -n` hashed `e9d4924a4cde92cc469a3f663eae25d29d12c0bb56a0cf68dc97482f7d8dd170` on the
+  authoring host (32,129,557 bytes); Amendment 17's archive hash `18b14930…` was made with other gzip
+  settings and is not re-checked.
+
+**Outputs.** No S3. The pod serves `/workspace/out` over HTTP on port 8080 under a random path token
+(`OUT_TOKEN`, 32 hex chars, generated at launch) through RunPod's proxy; `e14/pull_r2.sh` pulls
+`out.tgz` every 10 minutes into `e14/pod-r2/pulls/` with its sha256, and the final pull into
+`e14/pod-r2/out/`. The pod refreshes `out.tgz` every 10 minutes and after every draw, keeps serving
+for 30 minutes after `final_status` is written, then deletes itself; the controller deletes it as
+soon as the final pull is verified.
+
+**Gates on the pod (all before any draw; any failure ends the run with that status).**
+- `G0`, `G1`: as Amendment 17 (unit tests; `pe` reproduces `S3.d0.b4.jsonl` on the 3-22-8 draw).
+- `G2` (new, `hky_par` identity): `hky_par newcells --cells 3:21:7 --seed 20261012 --keep 4 --cmax 4`
+  at 64 threads must reproduce `e10/run-r3-B/out/E_3-21-7.jsonl` on every non-timing field (`draw`,
+  `x_r`, `v_basis`, `solutions`, `d_f`, `d_f_at_least`, `per_degree`) for draws 0, 1, 3, 4.
+- `G3` (new, `pe` scaling pilot): the G1 command at 8, 16 and 64 threads, wall time recorded in
+  `g3.json`. `T_pe` = the fastest; `TH_pe` = its thread count, used for every `pe` run below.
+  If `T_pe > 1,800 s`, E14b is skipped with reading "not completed (G3: pe too slow)", because the
+  cubic extrapolation from 140k to 457k columns (×34) would exceed the cap per draw.
+
+**E14a: the exact `d_F` at (3, 21, 7), engine `hky_par`.** `hky_par newcells --cells 3:21:7 --seed
+20261012 --keep 4 --cmax 5`, 64 threads, default `HKY_CHUNK`. Per draw, in the engine's order
+(expected 0, 1, 3, 4): the degree-≤4 `per_degree` entries must equal the E10 record for that draw or
+the draw is **void**; then "`d_F = 5`" if `d_f = 5`, "`d_F ≥ 6`" if `d_f_at_least = 6`. Cell rule as
+Amendment 19: "`d_F = 5`" if ≥ 3 of 4 read 5; "`d_F ≥ 6`" if ≥ 3 read ≥ 6; "split" if ≥ 2 are
+measured; "not completed" otherwise. The engine processes all four draws in one invocation; its
+per-draw records are read as they appear. Time box: if no draw has finished 12 h after E14a starts,
+E14a is killed and reads "not completed".
+
+**E14b: the three unmeasured E13b controls, engine `pe`.** 6:10:3 draws 1, 3, 4 from
+`e9/run-r3/out/E_6-10-3.jsonl`, `dreg_linear_guess --engine pe --batch 64 --to 4 --max-cols 600000
+--draw D`, `TH_pe` threads, sequential, 6 h per draw (a draw past 6 h is killed and reads "not
+completed"). Readings exactly as Amendment 19, including the combined "independent agreement (E13b +
+E14b)" statement.
+
+**E14c: (4, 28, 7).** `e12/run_window.sh "$OUT/C" 4:28:7`, 24 threads, only after E14a and E14b, until
+the deadline. Reading as Amendment 19.
+
+**Order.** Gates; E14a; E14b; E14c. Nothing runs concurrently with E14a or E14b. A part cut off by
+the deadline is "not completed". Nothing is retried.
+
+**Prediction (recorded before any draw).**
+- E14a: "`d_F = 5`" 0.50, "`d_F ≥ 6`" 0.25, "split" 0.05, "not completed" 0.20.
+- E14b: "controls confirmed" 0.55, "not completed" 0.35, "control differs" 0.10.
+- E14c: "no reading" 0.80.
+- G2 passes (hky_par at `a2be6609` reproduces E10): 0.90.
+
+Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.
+
+## Amendment 21 (2026-11-12 UTC, before any draw below): owner override of the Amendment 20 admission rule; longer post-finish grace
+
+**Owner decision (2026-11-12, about 02:05 UTC).** The RunPod balance was USD 99.23 with a sibling
+pod (`icb-bin-deep2`, not this study's, USD 5.29/h, started 01:48 UTC) running, so Amendment 20's
+admission condition (balance ≥ USD 100 + 24 h × other pods) was not met: USD 227 would have been
+needed. The main session put three options to the owner (a capped 9 h run; wait for a top-up; the
+full run now with the zero-balance risk). The owner chose **"Full run now anyway"**. The consequence
+was stated before the choice and is recorded here: at the combined burn of about USD 7.9/h the
+account reaches zero after about 12 h unless topped up, which would terminate both pods as it did
+E14 r1. Nothing else in Amendment 20 changes: engine order, gates, readings, predictions and the
+USD 100 cap stand.
+
+**Changes.**
+- `e14/launch_r2.sh` accepts `OWNER_OVERRIDE=1`, which bypasses only the balance condition (the
+  "no other `fd-e14` pod" condition stays) and records `owner_override: true`, the balance and the
+  other pods' rate in `launch.json`.
+- Post-finish grace on the pod rises from 30 minutes to 6 hours (`e14/run_pod_r2.sh`), because the
+  controller in a cloud session runs in windows of at most 2 hours and is re-armed by scheduled
+  check-ins; the controller still deletes the pod as soon as the final pull verifies, so the grace
+  costs nothing when the controller is up. Worst case USD 15.
+- Controller cadence: `e14/pull_r2.sh` pulls every 10 minutes while it runs; the main session
+  re-arms it with scheduled check-ins about every 100 minutes and records each pull's sha256 in
+  `e14/pod-r2/pull.log`. Snapshots are kept in `e14/pod-r2/pulls/` so a termination between pulls
+  loses at most 10 minutes of output.
+- Resume checkpoint: `.resume/RESUME.md` is filled on the branch; the S3 push is unavailable in this
+  session (no checkpoint token, no AWS identity), so the Git copy is the checkpoint, as the owner
+  allowed for the 2026-11-11 oversampling run.
+
+Nothing from any E14 r2 part has been computed, and no E14 r2 draw has been generated.
+
+## Amendment 22 (2026-11-12 UTC, before any draw below): pod r2a failed to bootstrap; relaunch r2b with observability
+
+**What happened.** Pod `vvek50lemifzcw` (`fd-e14-r2-20261112T0205Z`, created 02:05:40 UTC) ran for
+13 minutes with the container reporting 0 % CPU and nothing listening on port 8080 (proxy 502, then
+timeouts), so its in-pod script either stopped early (most likely in `finish`, idle in the
+post-finish grace) or never started its HTTP server (if `python3` is absent from
+`runpod/base:1.0.2-ubuntu2404`; the sibling pod on the same image installs Python packages through
+`apt` as a fallback, which suggests exactly that). Its log could not be read, so the cause is **not
+established**. It computed no gate and no draw. It was deleted at 02:21:09 UTC (about USD 0.66).
+Its launch record is kept as `e14/pod-r2/launch-r2a.json`.
+
+**Changes for r2b (`e14/run_pod_r2.sh`, sha256 recorded in `launch.json`).**
+- `apt-get install python3 openssh-server …` runs **before** the HTTP server starts; the first
+  `run.log` lines ("boot: script started", "boot: apt exit=…", "boot: sshd started") are written
+  before any network-dependent step, and `pack` runs after the Rust toolchain and after the source
+  check, so a failure in any later step leaves a readable log.
+- `sshd` is started with RunPod's account `PUBLIC_KEY` (and `EXTRA_PUBKEY` if given; none given,
+  the authoring session has no SSH client) and port `22/tcp` is exposed, so the owner can inspect
+  the pod from the RunPod console if needed. Root login is key-only.
+- Pod name prefix `fd-e14-r2b-`. Nothing else changes: engines, gates, readings, predictions, the
+  USD 100 cap and Amendment 21's owner override all stand. No draw of r2a exists, so no draw is
+  retried.
+
+## Amendment 23 (2026-11-12 UTC, before any draw below): r2b also failed to bootstrap; cause established; relaunch r2c
+
+**What happened.** Pod r2b (`vlydemuitde7d7`, created 02:21:55 UTC) behaved exactly like r2a: container
+up, 0 % CPU, nothing on port 8080 after 11 minutes, no readable log. A diagnostic pod
+(`fd-e14-diag-python-proxy`, `ar0ext66azn7u1`, 2 vCPU, USD 0.06/h, created 02:30 UTC) running the
+same image with a start command that writes under `/srv` after `mkdir -p` served its status file
+through the proxy **17 s after boot** and reported `python3=/usr/bin/python3`. So the image has
+Python, the proxy path works, and r2a/r2b's script never ran: their start command was
+`echo "$SCRIPT_B64" | base64 -d >/workspace/run.sh && bash /workspace/run.sh`, which fails at the
+redirect because these CPU pods mount no volume and `/workspace` does not exist before the script's
+own `mkdir -p`. The E14 r1 pod (Amendment 19) had created `/workspace` another way. r2b computed no
+gate and no draw; it and the diagnostic pod were deleted at 02:33 UTC (r2b about USD 0.5, the
+diagnostic pod under USD 0.01). Records: `e14/pod-r2/launch-r2b.json`.
+
+**Change for r2c (`e14/launch_r2.sh`).** Start command
+`mkdir -p /workspace /root && echo "$SCRIPT_B64" | base64 -d >/root/run.sh && exec bash /root/run.sh`;
+pod name prefix `fd-e14-r2c-`. The in-pod script (`run_pod_r2.sh`, sha256 `5f49b8ac…`, Amendment 22)
+is unchanged. Nothing else changes: engines, gates, readings, predictions, the USD 100 cap and the
+Amendment 21 owner override stand. No draw exists, so no draw is retried.
+
+## Amendment 24 (2026-11-12 UTC, before any draw below): r2c failed the same way; early-serving start command and a full trace; relaunch r2d
+
+**What happened.** Pod r2c (`qoulmu5122514o`, created 02:33:06 UTC) showed the r2a/r2b signature
+again (container up, 0 % CPU, nothing on 8080 after 5 minutes). The stored `SCRIPT_B64` decodes to
+the committed script (sha256 `5f49b8ac…`, 7,981 bytes) and the sibling pod carries a 20 KB variable
+the same way, so delivery is not the cause; the `/workspace` theory of Amendment 23 is therefore
+**not confirmed** either. The cause is still not established. r2c was deleted at about 02:41 UTC
+(about USD 0.35, no gate, no draw). Record: `e14/pod-r2/launch-r2c.json`.
+
+**Changes for r2d.**
+- Start command (`e14/launch_r2.sh`): creates the output and serve directories, writes "start command
+  running" to `run.log`, starts `python3 -m http.server 8080` itself (Python is in the image, as the
+  diagnostic pod showed), decodes the script, logs its sha256, then runs it. The log is therefore
+  readable from the first second, whatever the script does.
+- In-pod script (`e14/run_pod_r2.sh`): `set -x` with timestamps into `out/trace.log`; `apt` split into
+  update, base tools and build tools, each with its exit code logged; `openssh-server` and `sshd`
+  dropped (no SSH client in the authoring session; port 22 no longer exposed). Everything after the
+  boot block is unchanged. The new script's sha256 is recorded in `launch.json`.
+- Pod name prefix `fd-e14-r2d-`. Engines, gates, readings, predictions, the USD 100 cap and the
+  Amendment 21 owner override stand. No draw exists, so no draw is retried. If r2d also fails to
+  bootstrap, no further pod is launched without the owner's reading of `trace.log`.
+
+## Amendment 25 (2026-11-12 UTC, before any draw below): cause of the r2a–r2d failures established (64 vCPU exceeds the provider maximum); relaunch r2e at 32 vCPU on a memory-optimized flavor
+
+**What happened.** r2d (`9cfghisyn5cliy`) showed the same signature and was deleted at 02:55 UTC
+(14 min, about USD 0.6; record `e14/pod-r2/launch-r2d.json`). Diagnostic pods settled the cause:
+- D2 (`7u7h5lowmoe4f7`): the known-good simple start command with r2d's **full env block** served
+  after 11 s with every variable present, so the env block (including the 10 KB `SCRIPT_B64`) is
+  not the cause.
+- D5 (`e1j3jly1yk1hf6`): a 2-vCPU pod on `cpu5c` served after about 15 s (EUR-IS-1).
+- RunPod's flavor catalogue (GraphQL `cpuFlavors`, read 03:03 UTC): every CPU flavor has
+  `maxVcpu = 32` (cpu3c/cpu5c 2 GB per vCPU, cpu3g/cpu5g 4 GB, cpu3m/cpu5m 8 GB; disk 10–15 GB per
+  vCPU). r2a–r2d all requested **64 vCPU**; the API accepted the request and echoed
+  `vcpuCount: 64`, but their containers never started (uptime counting, 0 % CPU, no listener).
+  The E14 r1 pod of Amendment 19 ran with 64 vCPU and 528 GB on 2026-11-09, so the limit is new or
+  was not enforced then; it is enforced now.
+- D3 and D4 (2-vCPU probes created 02:53–02:55 on cpu3c/cpu3g) had not started after 10 min
+  (one container with uptime 0, one with no container), so container start on some hosts is also
+  slow; that is a second, independent effect and does not change the conclusion above.
+  All probes were deleted at 03:05 UTC (total under USD 0.05).
+
+**Changes for r2e.**
+- `e14/launch_r2.sh`: `vcpuCount: 32`, flavors `["cpu5m","cpu3m"]` (8 GB per vCPU, so 256 GB RAM,
+  which the E14a degree-5 closure needs: Amendment 13 sized it at 256 GiB), pod name prefix
+  `fd-e14-r2e-`. Price about USD 4.16/h (cpu5m) or 3.52/h (cpu3m); the USD 100 cap therefore gives a
+  deadline of about 24 h or 28 h instead of 36 h. The cap is unchanged.
+- `e14/run_pod_r2.sh` (sha256 `6003ecbdbb92c6ef…`): every 64-thread setting becomes 32 (G1, G2, E14a, and the
+  G3 pilot now times 8, 16 and 32 threads; `g3.json` records `t32`). Nothing else changes.
+- Engines, gates, readings, predictions and the Amendment 21 owner override stand. No draw exists,
+  so no draw is retried. If r2e has not written "start command running" to its served `run.log`
+  within 20 minutes of creation, it is left running for a further 20 minutes before any action,
+  because slow container starts were also observed.
+
+*Note at launch (03:05:14 UTC):* the provider priced the 32-vCPU memory-optimized pod at USD 2.08/h
+(below the catalogue estimate above), so the USD 100 cap gives the full 36 h deadline. Pod
+`xkgx6mw9roo3zl`, `fd-e14-r2e-20261112T0305Z`, 32 vCPU, 256 GB; balance at launch USD 91.37; the
+sibling pod was at USD 5.35/h.
+
+## Amendment 26 (2026-11-12 UTC, before any draw below): r2e booted correctly and stopped at G-src-b; path list fetched from a commit that contains it; relaunch r2f
+
+**What happened.** r2e (`xkgx6mw9roo3zl`, cpu5m/cpu3m 32 vCPU, 528 GB host, AMD EPYC 9575F) ran the
+start command 2 s after creation, finished `apt` and the Rust toolchain by 03:05:33 UTC, and then
+stopped at gate `G-src-b`: the path list was fetched from
+`raw.githubusercontent.com/.../a2be6609.../e13/source_paths.txt`, but `e13/source_paths.txt` was
+added to the repository after the frozen commit `a2be6609` (it is absent there; the raw URL returns
+404), so the hash check refused the 404 page, as it should. The controller pulled the final output
+(`e14/pod-r2/out-r2e/`: `run.log`, `trace.log`, `apt.log`, `host.txt`) and deleted the pod at
+03:05:49 UTC (under USD 0.05). This confirms Amendment 25's cause: with 32 vCPU the pod starts at once.
+No gate beyond G-src-a was reached; no draw exists.
+
+**Change for r2f.** The path list is fetched from commit
+`43438f5ab6eb6d1844b8d0465c933ad079099326` (main at the start of this session, where it exists with
+sha256 `97b6bbde…`); `G-src-b` still pins its content by that hash, and `G-src-a`/`G-src-c` still
+pin the source tree at `a2be6609`. Env `PATHS_COMMIT` carries the commit; the in-pod script
+(sha256 `a6c9d90cec93b62f…`) defaults to the same value. Pod name prefix `fd-e14-r2f-`. Nothing else changes.
+
+## Amendment 27 (2026-11-12 UTC, before any draw below): G2's comparison key excluded timings as Amendment 20 states; relaunch r2g
+
+**What happened.** r2f (`vx5qv5kjfk21k0`) passed G-src-a/b/c (03:08:04 UTC), G0 and G1 (G1: 597 s at
+32 threads for the 140k-column cell, against 511–586 s at 4 threads in E13, so `pe` gains nothing
+from threads) and ran G2 at 03:26:33 UTC. G2 reported "differs" because the in-pod `jq` key compared
+`per_degree` whole, and each degree entry carries a `secs` wall-time field (E10: 136.7, 140.5,
+134.2, 139.0 s; r2f: 94.2, 90.0, 84.0, 88.0 s). Every non-timing field is identical on all four draws:
+`draw`, `x_r`, `v_basis`, `solutions`, `d_f`, `d_f_at_least`, and `dim`, `of`, `rounds` at
+degrees 2, 3 and 4 (`e14/pod-r2/out-r2f/g2.diff`, `g2.jsonl`). Amendment 20 defines G2 on
+"every non-timing field"; the script's key was wrong, not the engine. The output was pulled, the pod
+deleted at about 03:36 UTC (about USD 1), and the records archived under `e14/pod-r2/out-r2f/`.
+No draw of E14a, E14b or E14c exists.
+
+**Change for r2g.** The G2 key becomes
+`{draw,x_r,v_basis,solutions,d_f,d_f_at_least,per_degree:(.per_degree|map_values(del(.secs)))}`
+(script sha256 `e6e6d62754a76a66…`). Applied to E10's committed records and to r2f's `g2.jsonl` on the
+authoring host, both sides hash identically. Pod name prefix `fd-e14-r2g-`. Nothing else changes.
+
+## Amendment 28 (2026-11-12 UTC, before any draw below): r2g stalled in the build on a slow host; CPU probe and build time limit; relaunch r2h
+
+**What happened.** r2g (`q0pylpkso8ofd1`, cpu5m, 32 vCPU, EPYC 9575F, 528 GB) verified its source
+at 03:41:13 UTC and then spent more than 55 minutes on the final crate of the build
+(`Compiling crypto v0.1.0`), with the container reporting about 200 % CPU, against 3.5 minutes for
+the whole build on r2f (same host model, same 231 crates). It shared no machine with the sibling pods.
+The container was effectively getting about two of its 32 cores; whether by a quota or by host
+contention is not established. At that rate E14a would also run about 15 times slower than planned,
+so the pod was pulled (`e14/pod-r2/out-r2g/`, key redacted) and deleted at 04:39:46 UTC
+(about USD 2.2). No gate beyond the source checks ran; no draw exists.
+
+**Change for r2h (`e14/run_pod_r2.sh`, sha256 `690f657cf36fe54b…`).** Before the build the script records
+`/sys/fs/cgroup/cpu.max` and `/proc/pressure/cpu` in `host.txt`, runs a 32-way busy-loop probe and
+logs the effective parallelism; below 12 of 32 the run ends with `cpu_probe_low_<value>` before any
+build, so a bad host costs minutes, not an hour. The build is bounded at 25 minutes
+(`build_failed_or_timeout`). Pod name prefix `fd-e14-r2h-`. Nothing else changes.
+
+## Amendment 29 (2026-11-12 UTC, before any draw below): the CPU probe ran under the command trace; relaunch r2i
+
+r2h (`7zs8zqc7idamg6`) verified its source at 04:41:18 UTC and started the Amendment 28 probe with
+`set -x` still active, so every iteration of the 32 busy loops was written to `trace.log`. Ten
+minutes later the loops were at about 82 % with the container at 2,672 % CPU (about 27 cores busy)
+and `cpu.max: max 100000` (no quota), so the host was healthy and the probe itself was the stall;
+its result would also have been distorted by 32 writers contending on one file. The pod was deleted at
+about 04:52 UTC (about USD 0.4); no build or gate ran; record `e14/pod-r2/launch-r2h.json`.
+
+**Change for r2i (`e14/run_pod_r2.sh`, sha256 `cd2c4679dbc5c775…`):** tracing is switched off for the probe
+and back on after it. Pod name prefix `fd-e14-r2i-`. Nothing else changes.
+
+## Amendment 30 (2026-11-12 UTC, before any draw below): the CPU probe's bare `wait` blocked on the snapshot and watchdog loops; relaunch r2j
+
+r2i (`jrizifz5p2wv18`) verified its source at 04:53:09 UTC and then sat at 0 % CPU: the probe ended
+with a bare `wait`, which waits for every background child of the script, including the 10-minute
+snapshot loop and the deadline watchdog, neither of which exits. The probe loops themselves had
+finished. Deleted at about 04:58 UTC (about USD 0.2); record `e14/pod-r2/launch-r2i.json`.
+
+**Change for r2j (`e14/run_pod_r2.sh`, sha256 `40bd8720b8bb79d2…`):** the probe records the PIDs of its 32
+jobs and waits only on those. Tested on the authoring host with an unrelated long-lived background
+job present: the probe returned and read 4.0 of 8 on a 4-core machine. The only other `wait` in the
+script names a specific PID. Pod name prefix `fd-e14-r2j-`. Nothing else changes.

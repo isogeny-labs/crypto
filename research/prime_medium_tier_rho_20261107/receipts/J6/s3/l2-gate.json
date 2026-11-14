@@ -1,0 +1,3652 @@
+{
+  "required": "L2",
+  "executions": 140,
+  "invalid_outcomes": [],
+  "below_l2": [
+    {
+      "seq": 2,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 5 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091242372,
+          "loadavg": [
+            0.1962890625,
+            0.6650390625,
+            0.61376953125
+          ],
+          "psi_cpu_some_avg10": 0.64,
+          "psi_cpu_some_total_us": 26246400,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 43505,
+              "idle": 59798,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091247383,
+          "loadavg": [
+            0.2607421875,
+            0.6708984375,
+            0.6162109375
+          ],
+          "psi_cpu_some_avg10": 0.35,
+          "psi_cpu_some_total_us": 26247825,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 44006,
+              "idle": 59798,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 6,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091254012,
+          "loadavg": [
+            0.3203125,
+            0.6767578125,
+            0.61865234375
+          ],
+          "psi_cpu_some_avg10": 0.19,
+          "psi_cpu_some_total_us": 26249910,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 44666,
+              "idle": 59800,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091257015,
+          "loadavg": [
+            0.375,
+            0.68212890625,
+            0.62109375
+          ],
+          "psi_cpu_some_avg10": 0.15,
+          "psi_cpu_some_total_us": 26250974,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 44966,
+              "idle": 59800,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 7,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 6 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091257021,
+          "loadavg": [
+            0.375,
+            0.68212890625,
+            0.62109375
+          ],
+          "psi_cpu_some_avg10": 0.15,
+          "psi_cpu_some_total_us": 26250974,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 44966,
+              "idle": 59801,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091264551,
+          "loadavg": [
+            0.42529296875,
+            0.6875,
+            0.62353515625
+          ],
+          "psi_cpu_some_avg10": 0.07,
+          "psi_cpu_some_total_us": 26251808,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 45719,
+              "idle": 59801,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 8,
+      "arm": "bsgs-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 118
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091264555,
+          "loadavg": [
+            0.42529296875,
+            0.6875,
+            0.62353515625
+          ],
+          "psi_cpu_some_avg10": 0.07,
+          "psi_cpu_some_total_us": 26251808,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 45719,
+              "idle": 59801,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091267468,
+          "loadavg": [
+            0.4716796875,
+            0.69287109375,
+            0.6259765625
+          ],
+          "psi_cpu_some_avg10": 0.04,
+          "psi_cpu_some_total_us": 26255210,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 46011,
+              "idle": 59801,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 10,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091269363,
+          "loadavg": [
+            0.4716796875,
+            0.69287109375,
+            0.6259765625
+          ],
+          "psi_cpu_some_avg10": 0.03,
+          "psi_cpu_some_total_us": 26255995,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 46200,
+              "idle": 59802,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091274005,
+          "loadavg": [
+            0.51416015625,
+            0.6982421875,
+            0.62841796875
+          ],
+          "psi_cpu_some_avg10": 0.02,
+          "psi_cpu_some_total_us": 26256112,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 46664,
+              "idle": 59802,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 11,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091274011,
+          "loadavg": [
+            0.51416015625,
+            0.6982421875,
+            0.62841796875
+          ],
+          "psi_cpu_some_avg10": 0.02,
+          "psi_cpu_some_total_us": 26256112,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 46664,
+              "idle": 59803,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091278682,
+          "loadavg": [
+            0.55322265625,
+            0.70361328125,
+            0.630859375
+          ],
+          "psi_cpu_some_avg10": 0.01,
+          "psi_cpu_some_total_us": 26256836,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 47131,
+              "idle": 59803,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 12,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091278687,
+          "loadavg": [
+            0.55322265625,
+            0.70361328125,
+            0.630859375
+          ],
+          "psi_cpu_some_avg10": 0.01,
+          "psi_cpu_some_total_us": 26256836,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 47131,
+              "idle": 59804,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091284891,
+          "loadavg": [
+            0.58935546875,
+            0.708984375,
+            0.63330078125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26259839,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 47751,
+              "idle": 59804,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 15,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091290150,
+          "loadavg": [
+            0.62255859375,
+            0.7138671875,
+            0.6357421875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26261126,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 48274,
+              "idle": 59805,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091295187,
+          "loadavg": [
+            0.65283203125,
+            0.71875,
+            0.63818359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26261477,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 48778,
+              "idle": 59805,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 16,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091295192,
+          "loadavg": [
+            0.65283203125,
+            0.71875,
+            0.63818359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26261477,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 48778,
+              "idle": 59806,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091300266,
+          "loadavg": [
+            0.6806640625,
+            0.7236328125,
+            0.64013671875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26266289,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 49285,
+              "idle": 59806,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 17,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091300271,
+          "loadavg": [
+            0.6806640625,
+            0.7236328125,
+            0.64013671875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26266289,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 49285,
+              "idle": 59806,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091301941,
+          "loadavg": [
+            0.70654296875,
+            0.728515625,
+            0.64208984375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26266307,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 49452,
+              "idle": 59806,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 20,
+      "arm": "rho-neg-v2",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091307513,
+          "loadavg": [
+            0.73046875,
+            0.7333984375,
+            0.64404296875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26267257,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 50008,
+              "idle": 59808,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091311022,
+          "loadavg": [
+            0.73046875,
+            0.7333984375,
+            0.64404296875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26274522,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 50359,
+              "idle": 59808,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 45,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091366819,
+          "loadavg": [
+            0.90283203125,
+            0.78466796875,
+            0.66748046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26292824,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 55926,
+              "idle": 59822,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091371491,
+          "loadavg": [
+            0.90283203125,
+            0.78466796875,
+            0.66748046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26295359,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 56393,
+              "idle": 59822,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 47,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091376172,
+          "loadavg": [
+            0.91064453125,
+            0.78857421875,
+            0.66943359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26295517,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 56860,
+              "idle": 59823,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091381392,
+          "loadavg": [
+            0.91796875,
+            0.79248046875,
+            0.67138671875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26298156,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 57382,
+              "idle": 59823,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 48,
+      "arm": "bsgs-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 118
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091381396,
+          "loadavg": [
+            0.91796875,
+            0.79248046875,
+            0.67138671875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26298156,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 57382,
+              "idle": 59823,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091384281,
+          "loadavg": [
+            0.9248046875,
+            0.79638671875,
+            0.67333984375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26298617,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 57670,
+              "idle": 59823,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 52,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091387058,
+          "loadavg": [
+            0.93115234375,
+            0.7998046875,
+            0.67529296875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26299620,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 57945,
+              "idle": 59825,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091392829,
+          "loadavg": [
+            0.93701171875,
+            0.80322265625,
+            0.67724609375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26300164,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 58522,
+              "idle": 59825,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 67,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091420913,
+          "loadavg": [
+            0.95947265625,
+            0.8203125,
+            0.68701171875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26308749,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 61320,
+              "idle": 59834,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091423933,
+          "loadavg": [
+            0.962890625,
+            0.82373046875,
+            0.68896484375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26308810,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 61622,
+              "idle": 59834,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 68,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": -1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091423938,
+          "loadavg": [
+            0.962890625,
+            0.82373046875,
+            0.68896484375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26308810,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 61622,
+              "idle": 59834,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091429254,
+          "loadavg": [
+            0.96630859375,
+            0.82666015625,
+            0.69091796875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26310387,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 62153,
+              "idle": 59834,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 69,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 5 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091429260,
+          "loadavg": [
+            0.96630859375,
+            0.82666015625,
+            0.69091796875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26310387,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 62153,
+              "idle": 59835,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091434580,
+          "loadavg": [
+            0.96923828125,
+            0.82958984375,
+            0.69287109375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26311505,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 62685,
+              "idle": 59835,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 73,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091442395,
+          "loadavg": [
+            0.974609375,
+            0.83544921875,
+            0.69677734375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26312487,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 63466,
+              "idle": 59837,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091446649,
+          "loadavg": [
+            0.974609375,
+            0.83544921875,
+            0.69677734375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26313051,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 63892,
+              "idle": 59837,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 74,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091446654,
+          "loadavg": [
+            0.974609375,
+            0.83544921875,
+            0.69677734375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26313051,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 63892,
+              "idle": 59837,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091450928,
+          "loadavg": [
+            0.97705078125,
+            0.83837890625,
+            0.69873046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26314887,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 64320,
+              "idle": 59837,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 77,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091456380,
+          "loadavg": [
+            0.97900390625,
+            0.84130859375,
+            0.70068359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26314963,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 64864,
+              "idle": 59839,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091460154,
+          "loadavg": [
+            0.98095703125,
+            0.84423828125,
+            0.70263671875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26318297,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 65241,
+              "idle": 59839,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 82,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 8 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091473281,
+          "loadavg": [
+            0.98583984375,
+            0.85302734375,
+            0.70849609375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26319360,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 66552,
+              "idle": 59842,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091479071,
+          "loadavg": [
+            0.9873046875,
+            0.85546875,
+            0.71044921875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26325986,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 67131,
+              "idle": 59842,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 85,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091483251,
+          "loadavg": [
+            0.98876953125,
+            0.85791015625,
+            0.71240234375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26326837,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 67548,
+              "idle": 59843,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091487544,
+          "loadavg": [
+            1.06982421875,
+            0.876953125,
+            0.7197265625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26326937,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 67977,
+              "idle": 59843,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 86,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091487549,
+          "loadavg": [
+            1.06982421875,
+            0.876953125,
+            0.7197265625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26326937,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 67977,
+              "idle": 59844,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091491842,
+          "loadavg": [
+            1.06396484375,
+            0.87939453125,
+            0.7216796875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26329886,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 68406,
+              "idle": 59844,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 87,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091491847,
+          "loadavg": [
+            1.06396484375,
+            0.87939453125,
+            0.7216796875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26329886,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 68406,
+              "idle": 59845,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091496432,
+          "loadavg": [
+            1.06396484375,
+            0.87939453125,
+            0.7216796875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26331060,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 68864,
+              "idle": 59845,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 92,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091502952,
+          "loadavg": [
+            1.0537109375,
+            0.88427734375,
+            0.7255859375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26333213,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 69513,
+              "idle": 59847,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091504397,
+          "loadavg": [
+            1.0537109375,
+            0.88427734375,
+            0.7255859375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26333501,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 69658,
+              "idle": 59847,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 96,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091512202,
+          "loadavg": [
+            1.044921875,
+            0.88818359375,
+            0.72900390625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26341801,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 70437,
+              "idle": 59849,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091515018,
+          "loadavg": [
+            1.044921875,
+            0.88818359375,
+            0.72900390625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26341814,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 70719,
+              "idle": 59849,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 98,
+      "arm": "bsgs-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091516531,
+          "loadavg": [
+            1.044921875,
+            0.88818359375,
+            0.72900390625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26342057,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 70869,
+              "idle": 59851,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091520514,
+          "loadavg": [
+            1.041015625,
+            0.89013671875,
+            0.73046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26343631,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 71267,
+              "idle": 59851,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 99,
+      "arm": "rho-neg-v2",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091520519,
+          "loadavg": [
+            1.041015625,
+            0.89013671875,
+            0.73046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26343631,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 71267,
+              "idle": 59851,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091524324,
+          "loadavg": [
+            1.03759765625,
+            0.89208984375,
+            0.73193359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26344259,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 71647,
+              "idle": 59851,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 102,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091528252,
+          "loadavg": [
+            1.0341796875,
+            0.89404296875,
+            0.7333984375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26346299,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 72039,
+              "idle": 59853,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091530755,
+          "loadavg": [
+            1.0341796875,
+            0.89404296875,
+            0.7333984375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26346505,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 72289,
+              "idle": 59853,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 103,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 5 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091530760,
+          "loadavg": [
+            1.0341796875,
+            0.89404296875,
+            0.7333984375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26346505,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 72289,
+              "idle": 59853,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091535814,
+          "loadavg": [
+            1.03125,
+            0.89599609375,
+            0.73486328125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26346805,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 72794,
+              "idle": 59853,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 104,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091535819,
+          "loadavg": [
+            1.03125,
+            0.89599609375,
+            0.73486328125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26346805,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 72794,
+              "idle": 59854,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091540857,
+          "loadavg": [
+            1.0283203125,
+            0.89794921875,
+            0.736328125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26353333,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 73298,
+              "idle": 59854,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 108,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091549193,
+          "loadavg": [
+            1.0234375,
+            0.90185546875,
+            0.7392578125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26355962,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 74130,
+              "idle": 59856,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091551710,
+          "loadavg": [
+            1.0234375,
+            0.90185546875,
+            0.7392578125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26356305,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 74382,
+              "idle": 59856,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 112,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 4 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091558191,
+          "loadavg": [
+            1.01953125,
+            0.90576171875,
+            0.7421875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26358166,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 75027,
+              "idle": 59858,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091563041,
+          "loadavg": [
+            1.017578125,
+            0.90771484375,
+            0.74365234375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26359358,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 75512,
+              "idle": 59858,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 113,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": -1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091563046,
+          "loadavg": [
+            1.017578125,
+            0.90771484375,
+            0.74365234375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26359358,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 75512,
+              "idle": 59859,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091564774,
+          "loadavg": [
+            1.017578125,
+            0.90771484375,
+            0.74365234375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26360366,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 75684,
+              "idle": 59859,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 115,
+      "arm": "rho-neg-v2",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091566510,
+          "loadavg": [
+            1.017578125,
+            0.90771484375,
+            0.74365234375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26360367,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 75856,
+              "idle": 59860,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091569931,
+          "loadavg": [
+            1.01611328125,
+            0.90966796875,
+            0.7451171875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26362029,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 76198,
+              "idle": 59860,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 119,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091577763,
+          "loadavg": [
+            1.01318359375,
+            0.91357421875,
+            0.748046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26362888,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 76980,
+              "idle": 59862,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091581186,
+          "loadavg": [
+            1.01318359375,
+            0.91357421875,
+            0.748046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26363859,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 77323,
+              "idle": 59862,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 122,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091583211,
+          "loadavg": [
+            1.01171875,
+            0.9150390625,
+            0.74951171875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26363861,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 77524,
+              "idle": 59864,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091588549,
+          "loadavg": [
+            1.0107421875,
+            0.91650390625,
+            0.7509765625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26364275,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 78058,
+              "idle": 59864,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 125,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091594309,
+          "loadavg": [
+            1.009765625,
+            0.91796875,
+            0.75244140625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26367044,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 78632,
+              "idle": 59865,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091597164,
+          "loadavg": [
+            1.0087890625,
+            0.91943359375,
+            0.75390625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26370773,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 78917,
+              "idle": 59865,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 127,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091600023,
+          "loadavg": [
+            1.0087890625,
+            0.91943359375,
+            0.75390625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26372057,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 79202,
+              "idle": 59866,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091603024,
+          "loadavg": [
+            1.0078125,
+            0.9208984375,
+            0.75537109375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26374129,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 79502,
+              "idle": 59866,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 128,
+      "arm": "bsgs-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091603029,
+          "loadavg": [
+            1.0078125,
+            0.9208984375,
+            0.75537109375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26374129,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 79502,
+              "idle": 59867,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091605892,
+          "loadavg": [
+            1.0078125,
+            0.9208984375,
+            0.75537109375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26374146,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 79788,
+              "idle": 59867,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 130,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091605975,
+          "loadavg": [
+            1.0078125,
+            0.9208984375,
+            0.75537109375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26374148,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 79795,
+              "idle": 59868,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091609659,
+          "loadavg": [
+            1.0068359375,
+            0.92236328125,
+            0.7568359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26376777,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 80164,
+              "idle": 59868,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 131,
+      "arm": "rho-neg-aa",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 3 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 121
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091609664,
+          "loadavg": [
+            1.0068359375,
+            0.92236328125,
+            0.7568359375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26376777,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 80164,
+              "idle": 59868,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091613354,
+          "loadavg": [
+            1.005859375,
+            0.923828125,
+            0.75830078125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26376879,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 80533,
+              "idle": 59869,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 132,
+      "arm": "rho-plain",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 5 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 120
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091613359,
+          "loadavg": [
+            1.005859375,
+            0.923828125,
+            0.75830078125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26376879,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 80533,
+              "idle": 59869,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091618971,
+          "loadavg": [
+            1.00537109375,
+            0.92529296875,
+            0.759765625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26378209,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 81094,
+              "idle": 59869,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 135,
+      "arm": "rho-neg",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 6 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 1,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091624504,
+          "loadavg": [
+            1.0048828125,
+            0.9267578125,
+            0.76123046875
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26378411,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 81645,
+              "idle": 59871,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091629819,
+          "loadavg": [
+            1.00439453125,
+            0.92822265625,
+            0.7626953125
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26382266,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 82177,
+              "idle": 59871,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 139,
+      "arm": "rho-neg-v2",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: 2 foreign task slices on the run CPU during the solve (0 µs)",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 119
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1794091640109,
+          "loadavg": [
+            1.00341796875,
+            0.93115234375,
+            0.765625
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26386441,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 83204,
+              "idle": 59873,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1794091643628,
+          "loadavg": [
+            1.0029296875,
+            0.9326171875,
+            0.76708984375
+          ],
+          "psi_cpu_some_avg10": 0.0,
+          "psi_cpu_some_total_us": 26387290,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 83556,
+              "idle": 59873,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    }
+  ],
+  "grades": [
+    {
+      "level": "L1",
+      "count": 46
+    },
+    {
+      "level": "L2",
+      "count": 94
+    }
+  ],
+  "accepted": false
+}

@@ -1,0 +1,222 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h4b52a3733d292783",
+  "statement": {
+    "name": "Universal CRT reconstruction residual",
+    "source": "NormCRTReciprocity.reconstructionResidual; universal CommRing identity, without assuming Bezout or quotient equations",
+    "variables": [
+      "F",
+      "H",
+      "P",
+      "U",
+      "V",
+      "Q",
+      "T"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "P"
+                        },
+                        {
+                          "op": "var",
+                          "args": "V"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "F"
+                          },
+                          {
+                            "op": "var",
+                            "args": "Q"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "H"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "P"
+                        },
+                        {
+                          "op": "var",
+                          "args": "U"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "H"
+                          },
+                          {
+                            "op": "var",
+                            "args": "T"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "F"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "var",
+            "args": "P"
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "P"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "U"
+                        },
+                        {
+                          "op": "var",
+                          "args": "F"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "V"
+                        },
+                        {
+                          "op": "var",
+                          "args": "H"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 1
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "F"
+                  },
+                  {
+                    "op": "var",
+                    "args": "H"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "Q"
+                  },
+                  {
+                    "op": "var",
+                    "args": "T"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111303,
+  "value_digest": "51ba8ff207e71ee6d4d2cdbc1b460d55e4f5532b843c806aa18c0e684cae3bca",
+  "independence": "Unsigned expression checks; conditional degree/CRT claims require separate Lean proof",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormCRTReciprocity.lean",
+    "sha256": "8cd3177c55abe9845ab158f34d635a4f5e5c0a4d0f40979ad08688382a81be95"
+  }
+}
