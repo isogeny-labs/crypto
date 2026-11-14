@@ -94,6 +94,18 @@ solver run. The native repeat remains an L0 diagnostic; any wall-time factor-
 base ranking requires a separate calibrated Tier 1 or Tier 0 comparison and
 complete end-to-end IC/rho evidence.
 
+### 11:38 UTC native positive lock
+
+The new Rust verifier checked the historical positive model against all
+1,141,221 CNF clauses, 4,980 XOR rows, 339,968 archived rows, subgroup and
+relation row; its independent receipt SHA-256 is
+`6f5defdfb297e6d069e893869f49c9058b8343d1f669c559c76d32b1a0be1a3b`.
+The one native positive repeat is bound by `NATIVE_POSITIVE_LOCK.json` to
+source commit `d75033d50260210c8f094d00acfbccc1ad35d395`, runner source
+and binary hashes, the exact previously exported positive XCNF, the same
+CryptoMiniSat binary and frozen flags, and one new raw output path. This lock
+precedes the native positive solver call.
+
 ## Bounded search and interpretation
 
 The first public natural query uses the same solver flags, at most 1,000,000
