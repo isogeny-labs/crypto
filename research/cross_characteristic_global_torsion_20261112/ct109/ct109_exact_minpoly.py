@@ -17,7 +17,7 @@ def crt():
     residues=panel(P);coeff=[];modulus=1
     for p in P:modulus*=p
     for j in range(13):
-        r=0,m=1
+        r,m=0,1
         for p in P:
             val=residues[str(p)]['coefficients_low_to_high'][j]
             r+=m*((val-r)*pow(m,-1,p)%p);m*=p
