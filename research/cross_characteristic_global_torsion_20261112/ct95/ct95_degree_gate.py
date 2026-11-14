@@ -13,12 +13,13 @@ with redirect_stdout(io.StringIO()):
     data = runpy.run_path(str(source))
 ctx = data["lift"].__globals__
 p = 37
+check = data["check"]  # always executes, even under python -O
 D,P3,F4 = data["D"],data["P3"],data["F4"]
 mul,sub,ev,lll = (data[n] for n in ("mul","sub","ev","lll"))
 phi3 = sub([0]+mul(P3,P3),mul(D,F4))
 psi3sq = mul(P3,P3)
-assert (len(phi3)-1,len(psi3sq)-1)==(9,8)
-assert ev(phi3,9,p)*pow(ev(psi3sq,9,p),-1,p)%p==28
+check((len(phi3)-1,len(psi3sq)-1)==(9,8), "tripling degree")
+check(ev(phi3,9,p)*pow(ev(psi3sq,9,p),-1,p)%p==28, "source tripling x")
 
 def divrem(a,b):
     a=list(map(Fraction,a)); b=list(map(Fraction,b))
@@ -33,7 +34,7 @@ def divrem(a,b):
 def coprime(a,b):
     while any(b): a,b=b,divrem(a,b)
     return len(a)==1 and a[0]!=0
-assert coprime(phi3,psi3sq), "tripling map must be reduced"
+check(coprime(phi3,psi3sq), "tripling map must be reduced")
 
 def short_pade(source_root,target_root,digits=18):
     ctx["N"]=digits
@@ -58,11 +59,11 @@ for root in (27,28):
         A,B,height=short_pade(9,root,digits)
         cases.append((root,digits,height))
         print("target",root,"digits",digits,"candidate_max_coefficient",height)
-assert cases==[(27,18,158),(27,24,158),(27,36,158),
-               (28,18,905),(28,24,8539),(28,36,802789)]
+check(cases==[(27,18,158),(27,24,158),(27,36,158),
+               (28,18,905),(28,24,8539),(28,36,802789)], "LLL candidate regression")
 # If degree-24 alpha satisfied a (4,3) candidate for the tripling
 # rational function with reduced degrees (9,8), then a nonzero
 # polynomial of degree <= max(4+8,3+9) = 12 < 24 would vanish at alpha.
 # Hence no globally equal (4,3) rational function can exist.
-assert max(4+8,3+9)<24
+check(max(4+8,3+9)<24, "degree gate")
 print("PASS: short (4,3) template cannot globally represent tripling on degree-24 point field")
