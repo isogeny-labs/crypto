@@ -23,6 +23,8 @@ fn main() {
         r,
         cofactor: 1,
         generator: (gx, gy),
+
+        representation: None,
     };
     let g = inst.generator_point();
     let ctx = InstanceCtx {

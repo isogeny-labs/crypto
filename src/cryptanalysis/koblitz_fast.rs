@@ -386,6 +386,40 @@ impl FastCurve {
         false
     }
 
+    /// [`Self::add_many_lazy_soa`] on summands paired by abscissa: pair
+    /// `j` is `(px[j], pya[j])` then `(px[j], pyb[j])`, one shared inverse
+    /// for both.  Appends `2·px.len()` abscissae and slopes in that order,
+    /// the same field elements the unpaired kernel gives for the
+    /// interleaved list, and counts `counted` additions, the summands the
+    /// caller's scan names (a scan whose window starts or ends inside a
+    /// pair hands the whole pair and drops the extra sum).  Returns
+    /// `false`, having appended and counted nothing, wherever the folding
+    /// kernel does not run or a pair is degenerate; the caller then takes
+    /// the unpaired path, which handles and counts every case as before.
+    #[allow(clippy::too_many_arguments)]
+    pub fn add_many_lazy_soa_paired(
+        &self,
+        p: FastPoint,
+        px: &[u64],
+        pya: &[u64],
+        pyb: &[u64],
+        x3: &mut Vec<u64>,
+        lambdas: &mut Vec<u64>,
+        scratch: &mut BatchScratch,
+        counted: u64,
+    ) -> bool {
+        #[cfg(target_arch = "x86_64")]
+        if let Some(simd) = &self.simd {
+            let done = simd.fold_into_paired(self, p, px, pya, pyb, x3, lambdas, scratch);
+            if done {
+                group_op_count::count_adds(counted);
+            }
+            return done;
+        }
+        let _ = (p, px, pya, pyb, x3, lambdas, scratch, counted);
+        false
+    }
+
     /// The portable body of [`Self::add_many_lazy`]; also what the SIMD
     /// kernel falls back to on a block with a degenerate sum.
     fn add_many_lazy_scalar(
@@ -1860,6 +1894,196 @@ mod simd512 {
             self.fold_into(curve, p, qx, qy, x3, lambdas, pre, lanes)
         }
 
+        /// [`Self::fold_into`] for summands that come in pairs sharing an
+        /// abscissa (a base point's ± twins): pair `j` is `(px[j], pya[j])`
+        /// then `(px[j], pyb[j])`, and both sums of a pair share one
+        /// denominator `x_R + x_j`, so one prefix product and one inverse
+        /// serve two summands.  Appends `2·px.len()` abscissae and slopes in
+        /// pair order — the same field elements [`Self::fold_into`] gives
+        /// for the interleaved list — or appends nothing and returns `false`
+        /// on `R = O`, an empty slice or a degenerate pair.  Counts nothing:
+        /// a caller whose pairs decline runs [`Self::fold_into`] instead.
+        #[allow(clippy::too_many_arguments)]
+        pub(super) fn fold_into_paired(
+            &self,
+            curve: &FastCurve,
+            p: FastPoint,
+            px: &[u64],
+            pya: &[u64],
+            pyb: &[u64],
+            x3: &mut Vec<u64>,
+            lambdas: &mut Vec<u64>,
+            scratch: &mut BatchScratch,
+        ) -> bool {
+            assert!(
+                px.len() == pya.len() && px.len() == pyb.len(),
+                "two ordinates per abscissa"
+            );
+            if self.fold == 0 || p.infinity || px.is_empty() {
+                return false;
+            }
+            let BatchScratch { pre, lanes, .. } = scratch;
+            let pairs = px.len();
+            let padded = pairs.div_ceil(8) * 8;
+            let (x0, l0) = (x3.len(), lambdas.len());
+            pre.clear();
+            pre.resize(padded, 0);
+            x3.resize(x0 + 2 * padded, 0);
+            lambdas.resize(l0 + 2 * padded, 0);
+            // SAFETY: a folding `Simd512` is only built after detecting
+            // avx512f and vpclmulqdq, on a field that folds; `pre` holds
+            // `padded` words and both outputs `2·padded`, and the kernel
+            // reads the inputs only below `pairs`.
+            let ok = unsafe {
+                self.kernel_fold_paired(
+                    curve,
+                    p,
+                    px,
+                    pya,
+                    pyb,
+                    pre,
+                    lanes,
+                    &mut x3[x0..],
+                    &mut lambdas[l0..],
+                )
+            };
+            let keep = if ok { 2 * pairs } else { 0 };
+            x3.truncate(x0 + keep);
+            lambdas.truncate(l0 + keep);
+            ok
+        }
+
+        /// [`Self::kernel_fold`] on pairs: the forward and backward passes
+        /// run over the pairs' shared denominators, and each pair's two
+        /// slopes and sums are formed from its one inverse, then
+        /// interleaved so the outputs read `a₀ b₀ a₁ b₁ …`.
+        ///
+        /// # Safety
+        ///
+        /// As [`Self::kernel_fold`], with `pya` and `pyb` as long as `px`,
+        /// `pre` holding `px.len()` rounded up to a multiple of eight
+        /// words, and `x3` and `lambdas` twice that.
+        #[allow(clippy::too_many_arguments)]
+        #[target_feature(enable = "avx512f,vpclmulqdq")]
+        unsafe fn kernel_fold_paired(
+            &self,
+            curve: &FastCurve,
+            p: FastPoint,
+            px: &[u64],
+            pya: &[u64],
+            pyb: &[u64],
+            pre: &mut [u64],
+            lanes: &mut Vec<u64>,
+            x3: &mut [u64],
+            lambdas: &mut [u64],
+        ) -> bool {
+            let len = px.len();
+            let groups = len.div_ceil(8);
+            let last = groups - 1;
+            let last_mask: __mmask8 = 0xff >> (groups * 8 - len);
+            let mask_of = |g: usize| if g == last { last_mask } else { 0xff };
+            let s = _mm512_set1_epi64(i64::from(64 - self.n));
+            let tail = _mm512_set1_epi64(self.fold as i64);
+            let one = _mm512_set1_epi64(1);
+            let rx = _mm512_set1_epi64(p.x as i64);
+            let load = |src: &[u64], g: usize| {
+                _mm512_maskz_loadu_epi64(mask_of(g), src.as_ptr().add(8 * g) as *const i64)
+            };
+            let den = |x: __m512i, g: usize| {
+                _mm512_mask_blend_epi64(mask_of(g), one, _mm512_xor_si512(rx, x))
+            };
+            let half = groups.div_ceil(2);
+            let z_s = _mm512_set1_epi64((1u64 << (64 - self.n)) as i64);
+            let (mut acc_a, mut acc_b) = (z_s, z_s);
+            let mut degenerate: __mmask8 = 0;
+            for i in 0..half {
+                let x = load(px, i);
+                degenerate |= _mm512_mask_cmpeq_epi64_mask(mask_of(i), x, rx);
+                _mm512_storeu_si512(
+                    pre.as_mut_ptr().add(8 * i) as *mut _,
+                    _mm512_srlv_epi64(acc_a, s),
+                );
+                acc_a = mul_fold(den(x, i), acc_a, tail);
+                let g = half + i;
+                if g < groups {
+                    let x = load(px, g);
+                    degenerate |= _mm512_mask_cmpeq_epi64_mask(mask_of(g), x, rx);
+                    _mm512_storeu_si512(
+                        pre.as_mut_ptr().add(8 * g) as *mut _,
+                        _mm512_srlv_epi64(acc_b, s),
+                    );
+                    acc_b = mul_fold(den(x, g), acc_b, tail);
+                }
+            }
+            if degenerate != 0 {
+                return false;
+            }
+            let mut products = [0u64; 16];
+            _mm512_storeu_si512(products.as_mut_ptr() as *mut _, _mm512_srlv_epi64(acc_a, s));
+            _mm512_storeu_si512(
+                products.as_mut_ptr().add(8) as *mut _,
+                _mm512_srlv_epi64(acc_b, s),
+            );
+            curve.field.batch_inv(&mut products, lanes);
+            let mut inv_a = _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr() as *const _), s);
+            let mut inv_b =
+                _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr().add(8) as *const _), s);
+            let py = _mm512_set1_epi64(p.y as i64);
+            let px_a = _mm512_set1_epi64((p.x ^ curve.a) as i64);
+            // `a₀ b₀ a₁ b₁ a₂ b₂ a₃ b₃` and `a₄ b₄ … a₇ b₇`.
+            let lo_idx = _mm512_set_epi64(11, 3, 10, 2, 9, 1, 8, 0);
+            let hi_idx = _mm512_set_epi64(15, 7, 14, 6, 13, 5, 12, 4);
+            let x3 = x3.as_mut_ptr();
+            let lambdas = lambdas.as_mut_ptr();
+            let step = |g: usize, inv_acc: __m512i| {
+                let x = load(px, g);
+                let inv = mul_fold(
+                    _mm512_loadu_si512(pre.as_ptr().add(8 * g) as *const _),
+                    inv_acc,
+                    tail,
+                );
+                let next = mul_fold(den(x, g), inv_acc, tail);
+                let x_part = _mm512_xor_si512(px_a, x);
+                let sum = |y: __m512i| {
+                    let lambda_s = mul_fold(_mm512_xor_si512(py, y), inv, tail);
+                    let lambda = _mm512_srlv_epi64(lambda_s, s);
+                    let square = _mm512_srlv_epi64(mul_fold(lambda, lambda_s, tail), s);
+                    (
+                        _mm512_ternarylogic_epi64::<0x96>(square, lambda, x_part),
+                        lambda,
+                    )
+                };
+                let (xa, la) = sum(load(pya, g));
+                let (xb, lb) = sum(load(pyb, g));
+                let out = 16 * g;
+                _mm512_storeu_si512(
+                    x3.add(out) as *mut _,
+                    _mm512_permutex2var_epi64(xa, lo_idx, xb),
+                );
+                _mm512_storeu_si512(
+                    x3.add(out + 8) as *mut _,
+                    _mm512_permutex2var_epi64(xa, hi_idx, xb),
+                );
+                _mm512_storeu_si512(
+                    lambdas.add(out) as *mut _,
+                    _mm512_permutex2var_epi64(la, lo_idx, lb),
+                );
+                _mm512_storeu_si512(
+                    lambdas.add(out + 8) as *mut _,
+                    _mm512_permutex2var_epi64(la, hi_idx, lb),
+                );
+                next
+            };
+            for i in (0..half).rev() {
+                let g = half + i;
+                if g < groups {
+                    inv_b = step(g, inv_b);
+                }
+                inv_a = step(i, inv_a);
+            }
+            true
+        }
+
         /// The folding kernel on coordinate slices, appending to `x3` and
         /// `lambdas`; `false`, with nothing appended, on `R = O`, an
         /// empty slice or a degenerate sum (some `x_k = x_R`).
@@ -2198,6 +2422,115 @@ mod simd512 {
             acc
         }
 
+        /// Micro-benchmark variant of [`Self::kernel_fold`] (test only):
+        /// `square = false` drops `λ²` (lever 1's upper bound: what slope
+        /// keys could save); `qy2 = Some(..)` gives each denominator a
+        /// second numerator, the ± twin's (lever 2's paired form), and
+        /// writes its `x₃`/`λ` to `x3b`/`lambdasb`.  Same arithmetic
+        /// otherwise; the outputs are for timing, not for keys.
+        #[cfg(test)]
+        #[allow(clippy::too_many_arguments)]
+        #[target_feature(enable = "avx512f,vpclmulqdq")]
+        pub(super) unsafe fn kernel_fold_variant(
+            &self,
+            curve: &FastCurve,
+            p: FastPoint,
+            qx: &[u64],
+            qy: &[u64],
+            qy2: Option<&[u64]>,
+            square: bool,
+            pre: &mut [u64],
+            lanes: &mut Vec<u64>,
+            x3: &mut [u64],
+            lambdas: &mut [u64],
+            x3b: &mut [u64],
+            lambdasb: &mut [u64],
+        ) {
+            let len = qx.len();
+            let groups = len.div_ceil(8);
+            let last = groups - 1;
+            let last_mask: __mmask8 = 0xff >> (groups * 8 - len);
+            let mask_of = |g: usize| if g == last { last_mask } else { 0xff };
+            let s = _mm512_set1_epi64(i64::from(64 - self.n));
+            let tail = _mm512_set1_epi64(self.fold as i64);
+            let one = _mm512_set1_epi64(1);
+            let px = _mm512_set1_epi64(p.x as i64);
+            let load = |src: &[u64], g: usize| {
+                _mm512_maskz_loadu_epi64(mask_of(g), src.as_ptr().add(8 * g) as *const i64)
+            };
+            let den = |x: __m512i, g: usize| {
+                _mm512_mask_blend_epi64(mask_of(g), one, _mm512_xor_si512(px, x))
+            };
+            let half = groups.div_ceil(2);
+            let z_s = _mm512_set1_epi64((1u64 << (64 - self.n)) as i64);
+            let (mut acc_a, mut acc_b) = (z_s, z_s);
+            for i in 0..half {
+                let x = load(qx, i);
+                _mm512_storeu_si512(
+                    pre.as_mut_ptr().add(8 * i) as *mut _,
+                    _mm512_srlv_epi64(acc_a, s),
+                );
+                acc_a = mul_fold(den(x, i), acc_a, tail);
+                let g = half + i;
+                if g < groups {
+                    let x = load(qx, g);
+                    _mm512_storeu_si512(
+                        pre.as_mut_ptr().add(8 * g) as *mut _,
+                        _mm512_srlv_epi64(acc_b, s),
+                    );
+                    acc_b = mul_fold(den(x, g), acc_b, tail);
+                }
+            }
+            let mut products = [0u64; 16];
+            _mm512_storeu_si512(products.as_mut_ptr() as *mut _, _mm512_srlv_epi64(acc_a, s));
+            _mm512_storeu_si512(
+                products.as_mut_ptr().add(8) as *mut _,
+                _mm512_srlv_epi64(acc_b, s),
+            );
+            curve.field.batch_inv(&mut products, lanes);
+            let mut inv_a = _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr() as *const _), s);
+            let mut inv_b =
+                _mm512_sllv_epi64(_mm512_loadu_si512(products.as_ptr().add(8) as *const _), s);
+            let py = _mm512_set1_epi64(p.y as i64);
+            let px_a = _mm512_set1_epi64((p.x ^ curve.a) as i64);
+            let (x3, lambdas) = (x3.as_mut_ptr(), lambdas.as_mut_ptr());
+            let (x3b, lambdasb) = (x3b.as_mut_ptr(), lambdasb.as_mut_ptr());
+            let finish =
+                |num: __m512i, inv: __m512i, x: __m512i, xo: *mut u64, lo: *mut u64, g: usize| {
+                    let lambda_s = mul_fold(num, inv, tail);
+                    let lambda = _mm512_srlv_epi64(lambda_s, s);
+                    let x3v = if square {
+                        let sq = _mm512_srlv_epi64(mul_fold(lambda, lambda_s, tail), s);
+                        _mm512_ternarylogic_epi64::<0x96>(sq, lambda, _mm512_xor_si512(px_a, x))
+                    } else {
+                        _mm512_xor_si512(lambda, _mm512_xor_si512(px_a, x))
+                    };
+                    _mm512_storeu_si512(xo.add(8 * g) as *mut _, x3v);
+                    _mm512_storeu_si512(lo.add(8 * g) as *mut _, lambda);
+                };
+            let step = |g: usize, inv_acc: __m512i| {
+                let x = load(qx, g);
+                let inv = mul_fold(
+                    _mm512_loadu_si512(pre.as_ptr().add(8 * g) as *const _),
+                    inv_acc,
+                    tail,
+                );
+                let next = mul_fold(den(x, g), inv_acc, tail);
+                finish(_mm512_xor_si512(py, load(qy, g)), inv, x, x3, lambdas, g);
+                if let Some(qy2) = qy2 {
+                    finish(_mm512_xor_si512(py, load(qy2, g)), inv, x, x3b, lambdasb, g);
+                }
+                next
+            };
+            for i in (0..half).rev() {
+                let g = half + i;
+                if g < groups {
+                    inv_b = step(g, inv_b);
+                }
+                inv_a = step(i, inv_a);
+            }
+        }
+
         /// Test hook: multiply eight pairs through the kernel's multiply,
         /// the folding one when the field folds.
         #[cfg(test)]
@@ -2265,6 +2598,186 @@ mod tests {
     /// exhaustive scan, on random words and on the patterns where it could
     /// go wrong: all zeros and ones, single bits, periodic words where
     /// several rotations tie, and runs that wrap around bit `n − 1`.
+    /// The paired kernel gives, word for word, the abscissae and slopes the
+    /// unpaired kernel gives for the interleaved list of ± twins, at every
+    /// pair count around the eight-lane boundaries, and counts the additions
+    /// it is told to.
+    #[test]
+    fn the_paired_kernel_forms_the_interleaved_list_s_sums() {
+        use crate::cryptanalysis::koblitz_index_calculus::{
+            build_subgroup_orbit_factor_base, KoblitzCurve,
+        };
+        for (a, n) in [(0u8, 53u32), (0, 61), (1, 59)] {
+            let Some(kc) = KoblitzCurve::new(a, n) else {
+                continue;
+            };
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            if !fc.simd.as_ref().is_some_and(|s| s.folds()) {
+                continue;
+            }
+            let fb = build_subgroup_orbit_factor_base(&kc, 7, 600).unwrap();
+            let pts: Vec<FastPoint> = fb.points.iter().map(|p| fc.lift(p)).collect();
+            let qx: Vec<u64> = pts.iter().map(|p| p.x).collect();
+            let qy: Vec<u64> = pts.iter().map(|p| p.x ^ p.y).collect();
+            let target = fc.add(fc.add(pts[3], pts[40]), pts[77]);
+            let mut scratch = BatchScratch::default();
+            for pairs in [1usize, 2, 7, 8, 9, 15, 16, 17, 33, 100] {
+                let (ux, uya, uyb): (Vec<u64>, Vec<u64>, Vec<u64>) = (
+                    (0..pairs).map(|j| qx[2 * j]).collect(),
+                    (0..pairs).map(|j| qy[2 * j]).collect(),
+                    (0..pairs).map(|j| qy[2 * j + 1]).collect(),
+                );
+                assert!((0..pairs).all(|j| qx[2 * j] == qx[2 * j + 1]));
+                let (mut x3, mut l3) = (vec![17u64], vec![19u64]);
+                let before = crate::cryptanalysis::group_op_count::ops_snapshot();
+                assert!(fc.add_many_lazy_soa_paired(
+                    target,
+                    &ux,
+                    &uya,
+                    &uyb,
+                    &mut x3,
+                    &mut l3,
+                    &mut scratch,
+                    5
+                ));
+                let added = crate::cryptanalysis::group_op_count::ops_snapshot().adds - before.adds;
+                assert_eq!(added, 5, "n={n}, pairs={pairs}: counts what it is told");
+                let (mut x3u, mut l3u) = (vec![17u64], vec![19u64]);
+                assert!(fc.add_many_lazy_soa(
+                    target,
+                    &qx[..2 * pairs],
+                    &qy[..2 * pairs],
+                    &mut x3u,
+                    &mut l3u,
+                    &mut scratch
+                ));
+                assert_eq!(x3, x3u, "n={n}, pairs={pairs}: abscissae");
+                assert_eq!(l3, l3u, "n={n}, pairs={pairs}: slopes");
+            }
+            // A degenerate pair declines without appending or counting.
+            let degenerate = FastPoint {
+                x: qx[0],
+                y: qy[0] ^ 1,
+                infinity: false,
+            };
+            let (mut x3, mut l3) = (Vec::new(), Vec::new());
+            assert!(!fc.add_many_lazy_soa_paired(
+                degenerate,
+                &qx[..1],
+                &qy[..1],
+                &qy[1..2],
+                &mut x3,
+                &mut l3,
+                &mut scratch,
+                2
+            ));
+            assert!(x3.is_empty() && l3.is_empty());
+        }
+    }
+
+    /// Levers 1 and 2 (untimed elsewhere; a micro-benchmark here, run with
+    /// `--ignored`): ns a summand for the fused kernel as it is, without
+    /// `λ²`, and with one inverse shared by each ± twin pair.
+    #[test]
+    #[ignore]
+    fn lever_kernel_microbench() {
+        use crate::cryptanalysis::koblitz_index_calculus::{
+            build_subgroup_orbit_factor_base, KoblitzCurve,
+        };
+        for (a, n) in [(0u8, 53u32), (0, 61)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let Some(simd) = fc.simd.as_ref().filter(|s| s.folds()) else {
+                eprintln!("n={n}: folding kernel unavailable here");
+                continue;
+            };
+            let fb = build_subgroup_orbit_factor_base(&kc, 201, 4096).unwrap();
+            let pts: Vec<FastPoint> = fb.points.iter().map(|p| fc.lift(p)).collect();
+            // the scan's summands: the base negated, twins adjacent as the base holds them
+            let qx: Vec<u64> = pts.iter().map(|p| p.x).collect();
+            let qy: Vec<u64> = pts.iter().map(|p| p.x ^ p.y).collect();
+            assert!(qx.chunks(2).all(|c| c[0] == c[1]), "twins adjacent");
+            let w = 2048usize;
+            let (ux, uy, uy2): (Vec<u64>, Vec<u64>, Vec<u64>) = (
+                qx[..w].iter().step_by(2).copied().collect(),
+                qy[..w].iter().step_by(2).copied().collect(),
+                qy[1..w].iter().step_by(2).copied().collect(),
+            );
+            let target = fc.add(fc.add(pts[1], pts[7]), pts[13]);
+            let mut pre = vec![0u64; w + 8];
+            let mut lanes = Vec::new();
+            let (mut x3, mut l3, mut x3b, mut l3b) = (
+                vec![0u64; w + 8],
+                vec![0u64; w + 8],
+                vec![0u64; w + 8],
+                vec![0u64; w + 8],
+            );
+            let reps = 3000;
+            let mut best = [f64::MAX; 3];
+            for _round in 0..7 {
+                for (v, b) in best.iter_mut().enumerate() {
+                    let t0 = std::time::Instant::now();
+                    for _ in 0..reps {
+                        // SAFETY: folds() and the CPU check above; buffers sized for w.
+                        unsafe {
+                            match v {
+                                0 => simd.kernel_fold_variant(
+                                    &fc,
+                                    target,
+                                    &qx[..w],
+                                    &qy[..w],
+                                    None,
+                                    true,
+                                    &mut pre,
+                                    &mut lanes,
+                                    &mut x3,
+                                    &mut l3,
+                                    &mut x3b,
+                                    &mut l3b,
+                                ),
+                                1 => simd.kernel_fold_variant(
+                                    &fc,
+                                    target,
+                                    &qx[..w],
+                                    &qy[..w],
+                                    None,
+                                    false,
+                                    &mut pre,
+                                    &mut lanes,
+                                    &mut x3,
+                                    &mut l3,
+                                    &mut x3b,
+                                    &mut l3b,
+                                ),
+                                _ => simd.kernel_fold_variant(
+                                    &fc,
+                                    target,
+                                    &ux,
+                                    &uy,
+                                    Some(&uy2),
+                                    true,
+                                    &mut pre,
+                                    &mut lanes,
+                                    &mut x3,
+                                    &mut l3,
+                                    &mut x3b,
+                                    &mut l3b,
+                                ),
+                            }
+                        }
+                        std::hint::black_box((&x3, &x3b));
+                    }
+                    let ns = t0.elapsed().as_nanos() as f64 / (reps * w) as f64;
+                    *b = b.min(ns);
+                }
+            }
+            eprintln!(
+                "n={n}: ns a summand (best of 7): kernel {:.3}, without square {:.3} (saves {:.3}), paired ± {:.3} (saves {:.3})",
+                best[0], best[1], best[0] - best[1], best[2], best[0] - best[2]
+            );
+        }
+    }
+
     #[test]
     fn least_rotation_matches_exhaustive_scan() {
         fn brute(c: u64, n: u32, mask: u64) -> (u64, u32) {

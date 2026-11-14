@@ -1,6 +1,6 @@
 {
   "branch": "claude/serene-davinci-ujoi58",
-  "closed_utc": null,
+  "closed_utc": "2026-11-09T20:34:56+00:00",
   "commands": [
     {
       "argv": [
@@ -41,19 +41,672 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261108T2223Z-pkm-fd-pfd-c",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagec/kummer-p1-t2-median-df-m2-to-m5",
+      "note": "rise of median d_F over completed m, P1 Kummer t=2: 4,5,6,6 at m=2..5; m=6 >=7 (budget), m=7..9 >7, m=10 >=7 (max_cols). runs/C-t2-m*.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagec/kummer-p1-t3-median-df-m2-to-m4",
+      "note": "rise of median d_F over completed m, P1 Kummer t=3: 4,6,7 at m=2..4; m=5..7 >7, m=8 >=7, m=9,10 >=6 (max_cols). runs/C-t3-m*.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagec/isogeny-p0-t2-median-df-m2-to-m5",
+      "note": "rise of median d_F over completed m, P0 2-isogeny t=2: 5,6,6,7 at m=2..5 (m=5 small base). runs/C-t2-m*-p0.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 88,
+      "name": "stagec/draws-exact-df",
+      "note": "censoring per \u00a72 over 88 draws: 42 exact; 28 cmax 7 without 1 (d_F>7); 4 budget, 2 max_entries, 12 max_cols (d_F>=c). Every m>=7 draw (28) censored, labelled 'G3 not applicable (F4 engine capacity)' (Amendment 11). [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 42.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 32,
+      "name": "stagec/g4-planted-rows-with-1",
+      "note": "G4 pass: 32 planted draws (16 cells x 2; Kummer P1 m=2 t=1..6, m=3 t=2,3; isogeny P0 same), closure to cmax 5; 1 in 0 closures; planted_ok true on 32/32; runs/g4-*.jsonl. U4 of stage A met. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "stagec/g1-cases-pass",
+      "note": "G1 pass: hky_fp_tower_check 'G1: 6 cases pass' (gates/g1.log). [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 12,
+      "name": "stagec/repeat-check-m2-vs-stagea",
+      "note": "12 of 12 stage C m=2 draws (t=2,3; P1 and P0) identical to stage A rows on x_r, curve, tower, d_F, ffd, falls, muladds. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": 12.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "count",
+      "value": 12.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 6,
+      "name": "stagec/h-m-ladders-grows",
+      "note": "H-m reads 'grows in m' on 6 of 6 ladders (P1 Kummer t=2,3; P0 Kummer t=2,3; P0 2-isogeny t=2,3), completed lower medians, small-base cells entering; independent of m>=7 rows; P0 isogeny t=2 would read 'mixed' without small-base cells. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 98,
+      "name": "stagec/g3-disagreements-m-le-6",
+      "note": "stage C G3 in job pfd-g3c-20261109 (results/G1/7c2b54f1-.../gates/g3.log, g3.jsonl): 98 capped runs over 56 draws in 28 cells (m<=6), 0 disagreements, 0 timeouts; equals the Amendment 11 within-capacity set; m>=7 G3 not applicable. pfd-c's own g3: not run (tool defect). Study continues (A11 stop rule). [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
   "problem": "study:pkm_falldegree_unblock_20261107:pfd-c",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 398,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/binary.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bec86166d04ae72fd6dd15e7a814b0bacb1ba865e0b4dfd054f8306bca118cec",
+      "sha256": "bec86166d04ae72fd6dd15e7a814b0bacb1ba865e0b4dfd054f8306bca118cec",
+      "uploaded": true
+    },
+    {
+      "bytes": 820,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/gates/g3.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f3be68b5c8ef478ef130d0978f8d189569f6d08453201fce996deedca2dcf85",
+      "sha256": "1f3be68b5c8ef478ef130d0978f8d189569f6d08453201fce996deedca2dcf85",
+      "uploaded": true
+    },
+    {
+      "bytes": 220,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/gates/g1.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/49/49161382135664fa85deb20419c278357165ed25e293e23a371361b257fad94b",
+      "sha256": "49161382135664fa85deb20419c278357165ed25e293e23a371361b257fad94b",
+      "uploaded": true
+    },
+    {
+      "bytes": 0,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/gates/g3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": true
+    },
+    {
+      "bytes": 1098,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38ac692ae317ff7b1d381736b31f29440e8f9798cd934b400b9ff1484c75af55",
+      "sha256": "38ac692ae317ff7b1d381736b31f29440e8f9798cd934b400b9ff1484c75af55",
+      "uploaded": true
+    },
+    {
+      "bytes": 10938,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/progress.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9c7e0d7099cfa51deb9396bc38e18117ab607b58626a782690ce07aad133b3a8",
+      "sha256": "9c7e0d7099cfa51deb9396bc38e18117ab607b58626a782690ce07aad133b3a8",
+      "uploaded": true
+    },
+    {
+      "bytes": 2020,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/50/5082782f0276e92b502622922d7437a3ad957dabf08d58971a3d43a89735ea10",
+      "sha256": "5082782f0276e92b502622922d7437a3ad957dabf08d58971a3d43a89735ea10",
+      "uploaded": true
+    },
+    {
+      "bytes": 12874,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-isogeny-m2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5b/5b20135c25730f205188846d97cb59856ea671a67719d92772c2f1d1c45fce7c",
+      "sha256": "5b20135c25730f205188846d97cb59856ea671a67719d92772c2f1d1c45fce7c",
+      "uploaded": true
+    },
+    {
+      "bytes": 944,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m3-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5b/5bb6f1465269df7eebacec57fa7477cf33f9d28ee69ca1eebff2e9f6f19f1ee5",
+      "sha256": "5bb6f1465269df7eebacec57fa7477cf33f9d28ee69ca1eebff2e9f6f19f1ee5",
+      "uploaded": true
+    },
+    {
+      "bytes": 2493,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/57/574de95a86ccddd61c77e255cf27748dc9bba58b8e4eda7bf12a1c1856e9cf82",
+      "sha256": "574de95a86ccddd61c77e255cf27748dc9bba58b8e4eda7bf12a1c1856e9cf82",
+      "uploaded": true
+    },
+    {
+      "bytes": 2851,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2b/2ba353cacafbed9bebcadbe28f4a340ce84820cb4645eb6c1b25dae87852874e",
+      "sha256": "2ba353cacafbed9bebcadbe28f4a340ce84820cb4645eb6c1b25dae87852874e",
+      "uploaded": true
+    },
+    {
+      "bytes": 5303,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m10-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fa/fa8a545312aa85681838e38ec9d79e0498c9502d68073919c1bbbc945d739e9b",
+      "sha256": "fa8a545312aa85681838e38ec9d79e0498c9502d68073919c1bbbc945d739e9b",
+      "uploaded": true
+    },
+    {
+      "bytes": 2464,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-kummer-m2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a5/a5a3fb4879c3b6cf37b27e8a8c4382258fa95a3672148200125c895e451a779f",
+      "sha256": "a5a3fb4879c3b6cf37b27e8a8c4382258fa95a3672148200125c895e451a779f",
+      "uploaded": true
+    },
+    {
+      "bytes": 963,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m9-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c8/c8f982d3d27cb01a96f2c05b3dc85ca0db7fe7336aaf843b4a4d8a3a4029e088",
+      "sha256": "c8f982d3d27cb01a96f2c05b3dc85ca0db7fe7336aaf843b4a4d8a3a4029e088",
+      "uploaded": true
+    },
+    {
+      "bytes": 641,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m8.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/243f0293dbade5740937bd98c05b44bda381e718d98ab6fe11d9565cbc76f2b5",
+      "sha256": "243f0293dbade5740937bd98c05b44bda381e718d98ab6fe11d9565cbc76f2b5",
+      "uploaded": true
+    },
+    {
+      "bytes": 2545,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m10.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/39/3905d6bcc1fb6d3c2dc2c6d1a999d4f7e2ab23be1ea77f21c3639840ffb8a9fe",
+      "sha256": "3905d6bcc1fb6d3c2dc2c6d1a999d4f7e2ab23be1ea77f21c3639840ffb8a9fe",
+      "uploaded": true
+    },
+    {
+      "bytes": 5011,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m5-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dc/dc77ea3f27bdac42c63c905a7c9332d97b50cb9ffb768b78dd992b0c5e06ea62",
+      "sha256": "dc77ea3f27bdac42c63c905a7c9332d97b50cb9ffb768b78dd992b0c5e06ea62",
+      "uploaded": true
+    },
+    {
+      "bytes": 646,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m10.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9c102c984aba06c89c389c244dbaa60655f2d670e72a596c258b924a58250705",
+      "sha256": "9c102c984aba06c89c389c244dbaa60655f2d670e72a596c258b924a58250705",
+      "uploaded": true
+    },
+    {
+      "bytes": 929,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m2-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5b/5b5f5dc6b3d3512cb4b35e39ee58e8847ea00b356501886713af5deb7aceb271",
+      "sha256": "5b5f5dc6b3d3512cb4b35e39ee58e8847ea00b356501886713af5deb7aceb271",
+      "uploaded": true
+    },
+    {
+      "bytes": 633,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m9.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ee/eee6a45e8d92b63efb23cb29e19c4b20f414d31ff71f1cb3adb685d9f41900b4",
+      "sha256": "eee6a45e8d92b63efb23cb29e19c4b20f414d31ff71f1cb3adb685d9f41900b4",
+      "uploaded": true
+    },
+    {
+      "bytes": 545,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6c/6cd64b6a508a5f84bdc2f2442cdae3c6db7960e873822e8566f1c001b566d461",
+      "sha256": "6cd64b6a508a5f84bdc2f2442cdae3c6db7960e873822e8566f1c001b566d461",
+      "uploaded": true
+    },
+    {
+      "bytes": 563,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m5.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd460c5c50038e4d8612cd896ad7f5b933325b967093632b9d1a0e104824b8a0",
+      "sha256": "dd460c5c50038e4d8612cd896ad7f5b933325b967093632b9d1a0e104824b8a0",
+      "uploaded": true
+    },
+    {
+      "bytes": 2938,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m7.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6f/6f3e5674cb3009234802b64d1ce9b36f8a1137012071c135a3aa6fdb43ed5c53",
+      "sha256": "6f3e5674cb3009234802b64d1ce9b36f8a1137012071c135a3aa6fdb43ed5c53",
+      "uploaded": true
+    },
+    {
+      "bytes": 564,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m6.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/2060334ac84b84173f1e2cd2842c824352769bf08d5ebed08e0be60145b96fe1",
+      "sha256": "2060334ac84b84173f1e2cd2842c824352769bf08d5ebed08e0be60145b96fe1",
+      "uploaded": true
+    },
+    {
+      "bytes": 982,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m4-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/45815c3705bd2a5ef38d4e4b0d3b98047b0c9725d77189199d13293cb3572a81",
+      "sha256": "45815c3705bd2a5ef38d4e4b0d3b98047b0c9725d77189199d13293cb3572a81",
+      "uploaded": true
+    },
+    {
+      "bytes": 4591,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m3-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0ca768cfd9b009be37ee18d2aa7e255745104585845cb37fa0f693adc3248787",
+      "sha256": "0ca768cfd9b009be37ee18d2aa7e255745104585845cb37fa0f693adc3248787",
+      "uploaded": true
+    },
+    {
+      "bytes": 5485,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m9-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a7/a7986e0044db8e208b61ece4940394affa3e1b64148ded2b8ca6c4d06ad38339",
+      "sha256": "a7986e0044db8e208b61ece4940394affa3e1b64148ded2b8ca6c4d06ad38339",
+      "uploaded": true
+    },
+    {
+      "bytes": 3824,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-isogeny-m3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6ae666129a93837d9c8bd5795c96d3696eea49e362125d90b7cb1453c08e6791",
+      "sha256": "6ae666129a93837d9c8bd5795c96d3696eea49e362125d90b7cb1453c08e6791",
+      "uploaded": true
+    },
+    {
+      "bytes": 2919,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m8.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1e97778c5876e77053dda22a1d741ce7501e3be72c8f28b3a0c3199f34813267",
+      "sha256": "1e97778c5876e77053dda22a1d741ce7501e3be72c8f28b3a0c3199f34813267",
+      "uploaded": true
+    },
+    {
+      "bytes": 5386,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m7-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/472b1c63da083611564b805a133b13cdeea548283ee71e61c4e2906399ce59f9",
+      "sha256": "472b1c63da083611564b805a133b13cdeea548283ee71e61c4e2906399ce59f9",
+      "uploaded": true
+    },
+    {
+      "bytes": 2050,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d4/d4b9141178d356996b4a39ed10569a8926396d9c5cd44cb8a4ec70fcebb09ab5",
+      "sha256": "d4b9141178d356996b4a39ed10569a8926396d9c5cd44cb8a4ec70fcebb09ab5",
+      "uploaded": true
+    },
+    {
+      "bytes": 568,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m4.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/50/5055abbf05b4fe04988bfdfac38112b2099d3b47cf675c8b1d3abdfd68be96e4",
+      "sha256": "5055abbf05b4fe04988bfdfac38112b2099d3b47cf675c8b1d3abdfd68be96e4",
+      "uploaded": true
+    },
+    {
+      "bytes": 566,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m9.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/df/dfaef44999addbabb00179250e52f73dc8e66b8d3e69cdcc16cd567123335ce6",
+      "sha256": "dfaef44999addbabb00179250e52f73dc8e66b8d3e69cdcc16cd567123335ce6",
+      "uploaded": true
+    },
+    {
+      "bytes": 564,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m7.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/18/1835b9787e630429a7d5e3a1aa666d5019c6850b524ba2acb73c3f265dfee23c",
+      "sha256": "1835b9787e630429a7d5e3a1aa666d5019c6850b524ba2acb73c3f265dfee23c",
+      "uploaded": true
+    },
+    {
+      "bytes": 566,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m7.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/466a186cef85edeb4f26ce08b38263ed97bf59e4b1a46b7f97ff69d503d579ba",
+      "sha256": "466a186cef85edeb4f26ce08b38263ed97bf59e4b1a46b7f97ff69d503d579ba",
+      "uploaded": true
+    },
+    {
+      "bytes": 5450,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m8-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/ed641ad7c8fe53ea44fdbe75633ef62ee4b318a9c8c5380c179d9d33490e40f3",
+      "sha256": "ed641ad7c8fe53ea44fdbe75633ef62ee4b318a9c8c5380c179d9d33490e40f3",
+      "uploaded": true
+    },
+    {
+      "bytes": 5348,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m5-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/3723e249fe8d94421b0fe15b3dfaf0eacf4283ae2d71c0288631231ac64d3423",
+      "sha256": "3723e249fe8d94421b0fe15b3dfaf0eacf4283ae2d71c0288631231ac64d3423",
+      "uploaded": true
+    },
+    {
+      "bytes": 4157,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m3-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5a/5a67e1c8c11d69a4e674e31a846d613e0bb63b31ffbd4eb4515be66c8ad72b6a",
+      "sha256": "5a67e1c8c11d69a4e674e31a846d613e0bb63b31ffbd4eb4515be66c8ad72b6a",
+      "uploaded": true
+    },
+    {
+      "bytes": 2840,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m10.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/46e7ea4e4c8e526539f59940848f95e15b7af6a149fcee2e533aef7eb024a6e4",
+      "sha256": "46e7ea4e4c8e526539f59940848f95e15b7af6a149fcee2e533aef7eb024a6e4",
+      "uploaded": true
+    },
+    {
+      "bytes": 2501,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e7224b5814bf5f3f9c0d8504c0701666b9de499919a057971937fbadd9a45c7a",
+      "sha256": "e7224b5814bf5f3f9c0d8504c0701666b9de499919a057971937fbadd9a45c7a",
+      "uploaded": true
+    },
+    {
+      "bytes": 2881,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m7.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/92/92af92ba5126f22bc676add10a0cdd3343ba3a2539d90ea119306e54460dd1b2",
+      "sha256": "92af92ba5126f22bc676add10a0cdd3343ba3a2539d90ea119306e54460dd1b2",
+      "uploaded": true
+    },
+    {
+      "bytes": 545,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/52/52308f7cef9557a0e9a3b90571b21c116b36ae948d04c4f812d0afb73d8a34d4",
+      "sha256": "52308f7cef9557a0e9a3b90571b21c116b36ae948d04c4f812d0afb73d8a34d4",
+      "uploaded": true
+    },
+    {
+      "bytes": 561,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m3.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/319fdecc5d1c73706326f4936b015c0f1884baee9a82b695b01394b3194e9a2e",
+      "sha256": "319fdecc5d1c73706326f4936b015c0f1884baee9a82b695b01394b3194e9a2e",
+      "uploaded": true
+    },
+    {
+      "bytes": 5382,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m4-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/21/21af65c7054af9d0d2f8fa6c1fb368f40c56c2b88b7c49cffc71f30f79d7e7b6",
+      "sha256": "21af65c7054af9d0d2f8fa6c1fb368f40c56c2b88b7c49cffc71f30f79d7e7b6",
+      "uploaded": true
+    },
+    {
+      "bytes": 960,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m7-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/059e548eb2a5c36571306e42ca7b44c55b59ab82e9014075a7571a35c0265455",
+      "sha256": "059e548eb2a5c36571306e42ca7b44c55b59ab82e9014075a7571a35c0265455",
+      "uploaded": true
+    },
+    {
+      "bytes": 2820,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m6.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a189a6d65ec629be6848d78d6c4cc864de7478aad4b59f728ce547b6490ed02e",
+      "sha256": "a189a6d65ec629be6848d78d6c4cc864de7478aad4b59f728ce547b6490ed02e",
+      "uploaded": true
+    },
+    {
+      "bytes": 1126,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m10-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/50/5087dc32954d341179ecaf05bfd08d3ec14dc361251cbbc1ba42f834b9c2472b",
+      "sha256": "5087dc32954d341179ecaf05bfd08d3ec14dc361251cbbc1ba42f834b9c2472b",
+      "uploaded": true
+    },
+    {
+      "bytes": 4090,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-kummer-m3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5f/5f0c769fe12583496ac9ecc4dc558142e8b59c6da6bd0df0ea76895c9ad2b326",
+      "sha256": "5f0c769fe12583496ac9ecc4dc558142e8b59c6da6bd0df0ea76895c9ad2b326",
+      "uploaded": true
+    },
+    {
+      "bytes": 929,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m2-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/382b013900b8b42d3c77c9039238b1da05ec2cc6e814a814b7f522d22d2de911",
+      "sha256": "382b013900b8b42d3c77c9039238b1da05ec2cc6e814a814b7f522d22d2de911",
+      "uploaded": true
+    },
+    {
+      "bytes": 553,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m3.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8e/8e83387873400076def9c464df7ee4e9e685e5f958bcd4a674b72666de71b59d",
+      "sha256": "8e83387873400076def9c464df7ee4e9e685e5f958bcd4a674b72666de71b59d",
+      "uploaded": true
+    },
+    {
+      "bytes": 2453,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-isogeny-m2.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3a/3a377e6cd918f0e4529db04aa66eaee0899e588a4a1cc2ce2fe6a30a8b8a2e5b",
+      "sha256": "3a377e6cd918f0e4529db04aa66eaee0899e588a4a1cc2ce2fe6a30a8b8a2e5b",
+      "uploaded": true
+    },
+    {
+      "bytes": 964,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m8-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/30/30762f1b69b0ec72a52258fa2c88ed2e6587a4fcf4294b65b6b5084941472661",
+      "sha256": "30762f1b69b0ec72a52258fa2c88ed2e6587a4fcf4294b65b6b5084941472661",
+      "uploaded": true
+    },
+    {
+      "bytes": 2791,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m8.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b62404ca45e8bd2f58dd1df74cfad23c99f43ec59234a5f5877933b1e109edeb",
+      "sha256": "b62404ca45e8bd2f58dd1df74cfad23c99f43ec59234a5f5877933b1e109edeb",
+      "uploaded": true
+    },
+    {
+      "bytes": 652,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m6.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/eb/eb91a44d83c5d390cdfa858308b73509aa784c67475a042b8324a9c22018775f",
+      "sha256": "eb91a44d83c5d390cdfa858308b73509aa784c67475a042b8324a9c22018775f",
+      "uploaded": true
+    },
+    {
+      "bytes": 954,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m4-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5a/5a26028299cc5c4542bea1cabf3cd8ef338829597bebd9a79182bdc49cd19f5c",
+      "sha256": "5a26028299cc5c4542bea1cabf3cd8ef338829597bebd9a79182bdc49cd19f5c",
+      "uploaded": true
+    },
+    {
+      "bytes": 955,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m3-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f0c1ee2d22873de3a0ca5294dd0d4956b6551afb504b7c04a5e67231594253b",
+      "sha256": "3f0c1ee2d22873de3a0ca5294dd0d4956b6551afb504b7c04a5e67231594253b",
+      "uploaded": true
+    },
+    {
+      "bytes": 13318,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-kummer-m2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d70bd5616e4aa704476935f916709fd318d8bdc86581f6b4eee3ab5cfe0d0227",
+      "sha256": "d70bd5616e4aa704476935f916709fd318d8bdc86581f6b4eee3ab5cfe0d0227",
+      "uploaded": true
+    },
+    {
+      "bytes": 2917,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e6/e635d245d829ccb9b56947cb93d0a89bdc4ddd063089b5e47829cf36fc25d80f",
+      "sha256": "e635d245d829ccb9b56947cb93d0a89bdc4ddd063089b5e47829cf36fc25d80f",
+      "uploaded": true
+    },
+    {
+      "bytes": 2456,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/582d7a1862ad3846f065e1aad29696ad0186fe458dad437f92a7355fe258ef62",
+      "sha256": "582d7a1862ad3846f065e1aad29696ad0186fe458dad437f92a7355fe258ef62",
+      "uploaded": true
+    },
+    {
+      "bytes": 1135,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m6-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b8/b8a7b42ac60c78bfdc191605521715d53c1d656205ab12cdbdeeebd63d71fea7",
+      "sha256": "b8a7b42ac60c78bfdc191605521715d53c1d656205ab12cdbdeeebd63d71fea7",
+      "uploaded": true
+    },
+    {
+      "bytes": 935,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-kummer-m3.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e5/e5ef5ee6a6137864fc11845b70d8e63ed0b6ed6088923bae208a590bc510ac7c",
+      "sha256": "e5ef5ee6a6137864fc11845b70d8e63ed0b6ed6088923bae208a590bc510ac7c",
+      "uploaded": true
+    },
+    {
+      "bytes": 3756,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m2-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9fb0fb4a6769ea53cb352d133c46afceb88d1d800a7aefec0d9dd5699386c9c9",
+      "sha256": "9fb0fb4a6769ea53cb352d133c46afceb88d1d800a7aefec0d9dd5699386c9c9",
+      "uploaded": true
+    },
+    {
+      "bytes": 575,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m4.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/13/13c0b4185875eddd3ee41d670c154e8c2108069a32d8c5c2c6dd6cceb8ce9161",
+      "sha256": "13c0b4185875eddd3ee41d670c154e8c2108069a32d8c5c2c6dd6cceb8ce9161",
+      "uploaded": true
+    },
+    {
+      "bytes": 5295,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m6-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/59/59fc565b276ac9e689460f4effb76d8c7468a4a821797eb8fac49496f4946517",
+      "sha256": "59fc565b276ac9e689460f4effb76d8c7468a4a821797eb8fac49496f4946517",
+      "uploaded": true
+    },
+    {
+      "bytes": 2134,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/62/62067dad8bf18c22886886420c125c39a40cf74ef277c3b35315b71191dfd276",
+      "sha256": "62067dad8bf18c22886886420c125c39a40cf74ef277c3b35315b71191dfd276",
+      "uploaded": true
+    },
+    {
+      "bytes": 917,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/g4-isogeny-m3.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1a/1a3c79e3b28da57d357c7196ec8048a163bb9016564d0368d18d5fe288e5fee1",
+      "sha256": "1a3c79e3b28da57d357c7196ec8048a163bb9016564d0368d18d5fe288e5fee1",
+      "uploaded": true
+    },
+    {
+      "bytes": 638,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m10.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/75/75a5ea9a890ea2e9a6655acd06b03e5c0f75a6688e3c72ff074e6c8e132728ae",
+      "sha256": "75a5ea9a890ea2e9a6655acd06b03e5c0f75a6688e3c72ff074e6c8e132728ae",
+      "uploaded": true
+    },
+    {
+      "bytes": 572,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m8.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/51/51216999fc93b6775e14e18d153acd5c4d30998a4470cdc87e3b4b6d430df44b",
+      "sha256": "51216999fc93b6775e14e18d153acd5c4d30998a4470cdc87e3b4b6d430df44b",
+      "uploaded": true
+    },
+    {
+      "bytes": 971,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m5-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a110e353134b054163c373b09d1dbea83ca105bc51a993aa592235e588726573",
+      "sha256": "a110e353134b054163c373b09d1dbea83ca105bc51a993aa592235e588726573",
+      "uploaded": true
+    },
+    {
+      "bytes": 2893,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m6.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/45cf1f59bc00c6b60c3f32a80a2169c2c7a041af5cd3086158bbfd058aba404d",
+      "sha256": "45cf1f59bc00c6b60c3f32a80a2169c2c7a041af5cd3086158bbfd058aba404d",
+      "uploaded": true
+    },
+    {
+      "bytes": 2503,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m5.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b3/b32d1ef86956325b8d5024f83d31c7b1a3bee564c473f8b867492039f8e194fa",
+      "sha256": "b32d1ef86956325b8d5024f83d31c7b1a3bee564c473f8b867492039f8e194fa",
+      "uploaded": true
+    },
+    {
+      "bytes": 566,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m5.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/91/91038399967d90a584eaf36a662c7d4710707f612feaea25efb4ca812d5a3f43",
+      "sha256": "91038399967d90a584eaf36a662c7d4710707f612feaea25efb4ca812d5a3f43",
+      "uploaded": true
+    },
+    {
+      "bytes": 2843,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/bedce9d01a1e96df42b927d51f8f33deaf1e692ee90bc150b49bd4999310f05a",
+      "sha256": "bedce9d01a1e96df42b927d51f8f33deaf1e692ee90bc150b49bd4999310f05a",
+      "uploaded": true
+    },
+    {
+      "bytes": 4567,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t2-m4-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1c/1cc2c66f3311b25ff63c523238d9eb6281fff15026b167e05d4084001c9ad39c",
+      "sha256": "1cc2c66f3311b25ff63c523238d9eb6281fff15026b167e05d4084001c9ad39c",
+      "uploaded": true
+    },
+    {
+      "bytes": 960,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m5-p0.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/61/61918e4ff9304568399b1d2b96748ff81622e30059db6095d7621181d51d8fea",
+      "sha256": "61918e4ff9304568399b1d2b96748ff81622e30059db6095d7621181d51d8fea",
+      "uploaded": true
+    },
+    {
+      "bytes": 3832,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/3eeef6a6-9565-415c-918c-b3f92801aafc/runs/C-t3-m2-p0.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/12c15341f725e61de6bb7209aac1da06bd5de0e978c1c1e360b1e76e908df55c",
+      "sha256": "12c15341f725e61de6bb7209aac1da06bd5de0e978c1c1e360b1e76e908df55c",
+      "uploaded": true
+    },
+    {
+      "bytes": 22391,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d681da5c5b5657cf797180abc6fba6ad4ea6cf43fa34fbedc20e349248621b8",
+      "sha256": "4d681da5c5b5657cf797180abc6fba6ad4ea6cf43fa34fbedc20e349248621b8",
+      "uploaded": true
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_report.pdf",
+    "png": [
+      "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_fig1.png"
+    ],
+    "svg": [
+      "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_fig1.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "pkm-fd-pfd-c",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "PKM stage C + G4 (pfd-c, Amendments 1-11): H-m reads 'grows in m' on all six ladders (independent of the m >= 7 rows); G1 and G4 pass (stage A's G4 condition met); the job's own g3 stage did not run (tool defect, F4 capacity m <= 6); m >= 7 rows labelled 'G3 not applicable', all censored",
   "validation": null
 }

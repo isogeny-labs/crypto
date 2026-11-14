@@ -21,6 +21,10 @@ mod fixed;
 mod install;
 #[path = "ic/large_prime.rs"]
 mod large_prime;
+#[path = "ic/log_store.rs"]
+mod log_store;
+#[path = "ic/oversample.rs"]
+mod oversample;
 #[path = "ic/params.rs"]
 mod params;
 #[path = "ic/plan.rs"]
@@ -92,8 +96,18 @@ struct Cli {
     /// Publish --out through the configured artifact store under a new logical name.
     #[arg(long, global = true, requires = "out")]
     store_name: Option<String>,
+    /// GPU offload: off (default), auto (discover workers) or a worker executable. Every offloaded
+    /// result is re-verified on the CPU and a worker failure falls back to the CPU path.
+    #[arg(
+        long,
+        global = true,
+        value_name = "off|auto|WORKER",
+        default_value = "off"
+    )]
+    gpu: String,
 }
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum Action {
     /// List built-in inspection profiles.
     List,
@@ -135,6 +149,8 @@ enum Action {
     Rho(rho::RhoArgs),
     /// Price the workflow's pipeline phase by phase: the same calls in memory on one thread, each phase on its own clock, converted at one batched addition measured in the same process, beside batch rho on the same targets with its step priced.
     Price(price::PriceArgs),
+    /// Measure relation oversampling in the logarithm precompute: one pool per seed past full rank, prefixes solved at each surplus fraction, paired rows.
+    Oversample(oversample::OversampleArgs),
     /// Import the ECBench binary-curve battery and run bounded exact
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
@@ -232,6 +248,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
+        Some(Action::Oversample(args)) => oversample::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
@@ -738,6 +755,13 @@ fn display(report: &Value) {
 }
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    match crypto_lib::cryptanalysis::gpu_offload::GpuMode::parse(&cli.gpu) {
+        Ok(mode) => crypto_lib::cryptanalysis::gpu_offload::set_mode(mode),
+        Err(message) => {
+            eprintln!("ic: {message}");
+            return ExitCode::FAILURE;
+        }
+    }
     // Generated parameters stay directly importable even with a global -v.
     progress::init(cli.verbose && !cli.json && !matches!(cli.command, Some(Action::Generate(_))));
     progress::line(format_args!(
@@ -790,6 +814,9 @@ fn main() -> ExitCode {
             "arch":std::env::consts::ARCH,"binary_blake3":binary_hash(),"git_commit":git_commit(),
             "git_dirty":crypto_lib::build_provenance::git_dirty(),
             "git_commit_source":crypto_lib::build_provenance::source()});
+        if let Some(gpu) = crypto_lib::cryptanalysis::gpu_offload::report() {
+            report["gpu"] = gpu;
+        }
     }
     let success = matches!(
         report["status"].as_str(),

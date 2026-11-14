@@ -26,3 +26,16 @@ Findings:
 Limits: the idealised-rho arm is an assumption, not a run of a multi-target rho; no 5-parameter tuning per size; T = 1000 only in the frozen evaluation; 33 bits has 2 rows; 1 thread everywhere; no §5a pricing band; not independently replayed.
 
 Next: an independent validator replay, then lower the per-target cost (the O(fb) sweep per walk step) with the table-lookup collector for the Q_t phase only, which the single-target evaluation could not exploit.
+
+## Independent validation and required corrections (`results/pf_multi/VALIDATOR_REPORT.md`)
+
+Validated: the measurement and finding 1. The validator replayed all 22 rows with the producer's seeds and verified 22 000 of 22 000 logs `k G = Q_t` in independent big-integer code; 16 rows re-run on a clean rebuild reproduced (identical `determined` counts, timing ratios 0.55 to 1.44, median 1.00; executable code identical, 37 bytes of build-id differ); mutation tests show `ic_multi_solve` cannot return an unverified log; the evaluation curves share no p, (p, a, b) or n with the 24/28/32-bit curves. Same machine, not an independent-host audit. Not eligible for the leaderboard (no `VALIDATION.json`, no §5a band, wall clock only).
+
+Corrections that supersede the text above:
+- Finding 1: per-size medians are 134x to 570x (rows 105x to 580x), not 130x to 550x; the `ic_solve` arm is an extrapolation.
+- The rho arm is mis-sized: `rho_parallel` builds a 1024-entry table per solve (1.3 to 2.9 ms, about 80% of the 23-bit solve). With a right-sized table (32 entries, mean of 100 solves) the advantage over rho x T is **9.5x, 4.4x, 1.14x and 1.44x at 23, 26, 30 and 31 bits and IC is 1.4x slower at 33 bits**, not the figures in the table above (48x/13x/2.5x/2.1x/none).
+- The idealised multi-target arm `rho_single x sqrt(T)` repeats that fixed cost 31.6 times, so it was not "favourable to rho" at small sizes. With the fixed cost paid once IC loses by **3.8x, 7.7x, 28.6x, 22.6x and 44.3x at 23, 26, 30, 31 and 33 bits**; "IC wins at 23 bits" is an artifact. No real multi-target rho was run; the validator's judgment (not a measurement) is that a real one would not be 3.8x or more worse than the corrected idealised arm.
+- Remove "best known rho strategy" and the unsupported "0.46 at T = 10 000". Row medians are pseudo-replicated (10 independent rho reference measurements across 22 rows). `rho_parallel` thread sizing used the host core count (4 vCPU) before `threads = 1` was set; the count is not in `provenance.txt`. No (Q_t, k) certificate file, null control or bench record; the run was on the local sandbox, not isolab-eks.
+- `RESULTS_prime_fast_vs_rho.md` probably carries the same rho-table inflation (not checked): its IC/rho ratios (5x to 257x) are therefore overstated for small sizes.
+
+Net: multi-target amortization is a verified improvement over repeated single-target `ic_solve` (finding 1) and a marginal one over repeated single-target rho at 30 to 31 bits only; it does not approach a multi-target rho. Distance remaining against the corrected idealised multi-target rho: 3.8x to 44x, growing with size.

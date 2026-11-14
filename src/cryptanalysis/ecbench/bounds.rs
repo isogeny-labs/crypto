@@ -279,6 +279,26 @@ pub struct SizeRow {
     /// priced.  Empty for a bound fitted at a weight.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub band: Vec<BandPoint>,
+    /// Fit version 2 on sessions that carry a `w_cal`
+    /// ([`super::runner::read_wcal`]) and a fit not at a weight; absent
+    /// otherwise, so every earlier bound re-derives with the same id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedPoint>,
+}
+
+/// The calibrated reading of AGENTS.md §5a (2026-11-12) on one size: mean `S`
+/// over the verified runs with the field-multiplication counters at
+/// `field_weights` and every other native counter at `other_weights`
+/// (`mean_s[i][j]`; `None` where a run's counter has no count).  A point
+/// reading beside [`BandPoint`]; it replaces nothing.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CalibratedPoint {
+    pub w_cal: f64,
+    pub method: String,
+    pub host: String,
+    pub field_weights: Vec<f64>,
+    pub other_weights: Vec<f64>,
+    pub mean_s: Vec<Vec<Option<f64>>>,
 }
 
 /// One axis on one size.
@@ -1253,6 +1273,11 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             .push(r);
     }
     let mut sizes: Vec<SizeRow> = Vec::new();
+    let wcal = if v2 && opts.weight.is_none() {
+        super::runner::shared_wcal(inputs.dirs)?
+    } else {
+        None
+    };
     // Intervals fit version 2 refused for excluding their estimate.
     let mut refused: Vec<String> = Vec::new();
     for (slug, rs) in &by_slug {
@@ -1336,6 +1361,10 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             }),
             axes: size_axes,
             band: size_band,
+            calibrated: match (&wcal, v2 && opts.weight.is_none()) {
+                (Some(w), true) => Some(calibrated_point(&ok, w)?),
+                _ => None,
+            },
         });
     }
     sizes.sort_by_key(|a| a.r);
@@ -1979,7 +2008,10 @@ fn size_axes_and_band(
         put(axis, &|r| field_axis(r, axis), 0x111 + 2 * i as u64);
     }
     let mut band = Vec::new();
-    if opts.weight.is_none() {
+    // Fit version 2 records the price band on a weighted fit too, so the
+    // frontier can test a dominance across the band in that fit's own
+    // domain; version 1 left it out there.
+    if opts.weight.is_none() || opts.fit_version >= 2 {
         for (i, w) in BAND_WEIGHTS.iter().enumerate() {
             let point =
                 strata_of(&|r| super::band::priced_s(r, *w).ok().flatten()).and_then(|st| {
@@ -2001,6 +2033,35 @@ fn size_axes_and_band(
         }
     }
     (axes, band)
+}
+
+fn calibrated_point(ok: &[&&Record], w: &super::band::WCal) -> Result<CalibratedPoint, String> {
+    w.validate()?;
+    let fw = [0.0, w.w_cal, 10.0 * w.w_cal];
+    let mut mean_s = Vec::new();
+    for wf in fw {
+        let mut row = Vec::new();
+        for wo in BAND_WEIGHTS {
+            let mut vals = Vec::new();
+            let mut all = !ok.is_empty();
+            for r in ok {
+                match super::band::priced_s_split(r, wf, wo, super::band::Pricing::default())? {
+                    Some(v) => vals.push(v),
+                    None => all = false,
+                }
+            }
+            row.push(all.then(|| vals.iter().sum::<f64>() / vals.len() as f64));
+        }
+        mean_s.push(row);
+    }
+    Ok(CalibratedPoint {
+        w_cal: w.w_cal,
+        method: w.method.clone(),
+        host: w.host.clone(),
+        field_weights: fw.to_vec(),
+        other_weights: BAND_WEIGHTS.to_vec(),
+        mean_s,
+    })
 }
 
 /// Re-derive a committed bound from the sessions it names and require the
@@ -2589,6 +2650,36 @@ mod tests {
             let v: Vec<f64> = s.band.iter().filter_map(|p| p.s).collect();
             assert!(v.windows(2).all(|w| w[0] <= w[1] + 1e-12), "{v:?}");
         }
+    }
+
+    #[test]
+    fn a_weighted_version_2_fit_carries_the_same_pricing_band() {
+        // The band prices each size at the fixed band weights, whatever
+        // weight the fit itself charges, so a weighted fit records the
+        // same band as the unweighted one; version 1 left it out.
+        let src = repo().join(CANDIDATES).join("sessions/prime");
+        let audit = repo().join(CANDIDATES).join("audit-prime.json");
+        let run = |weight, fit_version| {
+            fit(
+                std::slice::from_ref(&src),
+                "bsgs-neg",
+                std::slice::from_ref(&audit),
+                FitOptions {
+                    weight,
+                    fit_version,
+                    ..Default::default()
+                },
+            )
+            .unwrap()
+        };
+        let plain = run(None, 2);
+        let weighted = run(Some(1.0), 2);
+        assert_eq!(plain.sizes.len(), weighted.sizes.len());
+        for (p, w) in plain.sizes.iter().zip(&weighted.sizes) {
+            assert_eq!(w.band.len(), BAND_WEIGHTS.len());
+            assert_eq!(p.band, w.band);
+        }
+        assert!(run(Some(1.0), 1).sizes.iter().all(|s| s.band.is_empty()));
     }
 
     #[test]

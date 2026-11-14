@@ -38,8 +38,8 @@ use serde::Serialize;
 use super::f4_fp;
 use super::gaudry_cubic::{am, mm, sm, wiedemann_u64, SparseRel};
 use super::jv_cover::{
-    factor_base, generate_spec, nagao_decompose, opts_for, peval, pmul, rho_e, unit_costs,
-    verify_dec, BaseEl, Ctx, Div, Fld, Fq, RhoRunE, Spec, E2,
+    factor_base, generate_spec, nagao_decompose, opts_for, opts_for_mode, peval, pmul, rho_e,
+    unit_costs, verify_dec, BaseEl, Ctx, Div, Fld, Fq, RhoRunE, Spec, StopMode, E2,
 };
 use super::residual_walk::inv_mod;
 
@@ -1637,6 +1637,12 @@ pub struct SieveDlpReport {
     pub descent_muls: u64,
     pub descent_c_cov: f64,
     pub descent_stopped: u64,
+    /// `JV_SIEVE_HILBERT=N`: descent F4 uses the Hilbert early stop with N pairs per step (0 = off).
+    pub descent_hilbert: usize,
+    pub descent_hilbert_applied: u64,
+    pub descent_hilbert_fallbacks: u64,
+    /// Native F4 operations (divisibility tests, table probes, staircase/Hilbert checks) in the descent.
+    pub descent_f4_native_ops: u64,
     pub descent_incomplete: u64,
     pub descent_timed_out: u64,
     pub trace: bool,
@@ -1863,6 +1869,10 @@ pub fn run_cover_sieve_dlp_on(
     // reported and predicts, it no longer sets where the run starts
     let mut m = m_override.unwrap_or(9);
     let fact = |m: usize| (1..=m).map(|k| k as f64).product::<f64>();
+    let descent_hilbert: usize = std::env::var("JV_SIEVE_HILBERT")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
     let mut rep = SieveDlpReport {
         fb_line,
         p,
@@ -1880,6 +1890,7 @@ pub fn run_cover_sieve_dlp_on(
         estimate_by_m: (9..=13).map(|mm| (mm, relations_estimate(p, mm))).collect(),
         base_muls,
         lin_mode: super::jv_cover::lin_mode_name().to_string(),
+        descent_hilbert,
         ..Default::default()
     };
     // ── the residual stream for the descent: R = aG′ + bQ′, R₀ + i·M
@@ -2078,12 +2089,16 @@ pub fn run_cover_sieve_dlp_on(
         rep.descent_stream_muls += ctx.f.muls();
         ctx.f.reset_muls();
         let f4_before = f4_fp::field_ops_total();
+        let native_before = f4_fp::native_ops_total();
         let found: Vec<_> = batch
             .par_iter()
             .map_init(
                 || Ctx::with_trace(&spec, trace),
                 |c, (a, b, r, idx)| {
-                    let opts = opts_for(24, 600.0, stop);
+                    let opts = match descent_hilbert {
+                        0 => opts_for(24, 600.0, stop),
+                        c => opts_for_mode(24, 600.0, StopMode::Hilbert(c)),
+                    };
                     let mut lrng =
                         StdRng::seed_from_u64(seed ^ idx.wrapping_mul(0x9E37_79B9_7F4A_7C15));
                     let (decs, cost) = nagao_decompose(c, &base, &by_x, r, &opts, &mut lrng);
@@ -2099,6 +2114,7 @@ pub fn run_cover_sieve_dlp_on(
             )
             .collect();
         rep.descent_f4_muls += f4_fp::field_ops_total() - f4_before;
+        rep.descent_f4_native_ops += f4_fp::native_ops_total() - native_before;
         if std::env::var_os("JV_SIEVE_PROGRESS").is_some() {
             eprintln!(
                 "  [descent p={p}] residuals {} successes {}",
@@ -2121,6 +2137,12 @@ pub fn run_cover_sieve_dlp_on(
             }
             if cost.stopped_at.is_some() {
                 rep.descent_stopped += 1;
+            }
+            if cost.hilbert_applied {
+                rep.descent_hilbert_applied += 1;
+            }
+            if cost.hilbert_fallback {
+                rep.descent_hilbert_fallbacks += 1;
             }
             if cost.replayed {
                 rep.descent_replayed += 1;

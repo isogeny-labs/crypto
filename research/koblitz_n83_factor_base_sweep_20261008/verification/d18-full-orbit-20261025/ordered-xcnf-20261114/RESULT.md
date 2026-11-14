@@ -5,7 +5,7 @@ export, and its archived native assignment satisfies every exported row:
 2,807,999 CNF clauses and 3,901 XOR constraints over 329,808 variables.
 This supplies a checked positive formula for a bounded external solver probe
 on the primary N83 `a=0` curve. [pcc:unverified] PCC claim
-`PCC-20261114-80f095` has `unverified` standing; the replay is a local
+`PCC-20261114-e4c5de` has `unverified` standing; the replay is a local
 independent check of the retained bytes, not a signed PCC verdict.
 
 | Item | Recorded result |

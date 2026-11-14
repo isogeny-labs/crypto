@@ -279,6 +279,53 @@ in it. Two `pinned` rows compare operation counts; a `pinned` row
 against a `measured` row compares an operation count against a
 stopwatch, and the table should say which is which.
 
+#### Solver and oracle work units: calibration keys (2026-11-12)
+
+Since PR #1774 the whole `word XORs (…)` family is priced by count where the
+curve pins `ns_per_word_xor`. Every other solver or oracle unit has no ratio in
+[`calibration.json`](calibration.json), so it is still a lower bound everywhere.
+`ic bench` prices it at this host's wall time (`measured`). `ecbench` takes that
+term back out and lists `solver_<unit>_uncharged` (`lower_bound: true`). The
+§5a band then charges it at `w`. Each such unit now has a calibration key, read
+by `Calibration::pin` like the older keys. A key charges the count
+(`priced_by: pinned`, named in `calibration_pins` / `calibration_pinned_units`)
+only once the table pins it for the curve. A value that is merely present
+prices nothing. **No row pins any of these keys yet**, so every run, record and
+qualification string is byte-identical to the ones written before the keys
+existed (tests `solver_pricing_is_unchanged_with_no_solver_unit_key_pinned`,
+`sat_cdcl_record_is_unchanged_with_no_solver_unit_key_pinned`). A key's ratio is
+the solver call's whole wall time per counted unit, so a count that stands in
+for the whole run may be charged at it. A count that by its own `op_unit` is
+partial or modelled is refused even when pinned. The run is then priced as if
+no key were pinned, and the solver block's `pricing_qualification` says why.
+How to pin each key: [`calibration-solver-units.md`](calibration-solver-units.md).
+
+| unit (`op_unit` or counter) | emitted by | `bitop_complete` | pricing today | key | charged once pinned |
+|:--|:--|:--|:--|:--|:--|
+| `word XORs (elimination only)` | `f4-f2`, `matrix-f4`, `matrix-f5` (`solvers.rs`) | 1 | pinned `ns_per_word_xor` where the row has it (all 25 rows do); else measured / `solver_…_uncharged` | `ns_per_word_xor` (existing) | yes, since #1774 |
+| `word XORs (elimination, specialisation and linear elimination only)` | `inherited-f4` (`solvers.rs`); pdp3 / symmetrised oracles (`plugins.rs`) | 1 | as above | `ns_per_word_xor` (existing) | yes, since #1774 |
+| `word XORs (Gray-code steps)` | `fes-f2` | 1 | as above (prefix match) | `ns_per_word_xor` (existing) | yes |
+| `vector XORs (Gray-code steps, 8 \| 16 lanes of 32 bits)` | `fes-f2-wide` | 1 | measured; ecbench `solver_vector_XORs_…_uncharged`; band weight only | `ns_per_vector_xor_8x32`, `ns_per_vector_xor_16x32` | yes |
+| `conflicts` | `sat-cdcl` | 1 | measured; `solver_conflicts_uncharged`; band weight only | `ns_per_conflict` | yes |
+| `monomial operations` | `buchberger-f2` | 1 | measured; `solver_monomial_operations_uncharged`; band weight only | `ns_per_monomial_op` | yes |
+| `monomial operations (modelled)` | `xl-f2` | 1 | measured; `solver_…_uncharged`; band weight only | `ns_per_monomial_op` | **refused**: modelled count (terms × n²), not the work done |
+| `monomial tests` | `exhaustive` | 1 | measured; `solver_monomial_tests_uncharged`; band weight only | `ns_per_monomial_test` | yes |
+| `word operations (partial: …)` | `crossbred-f2` | 1 | measured; `solver_…_uncharged`; band weight only | `ns_per_word_op` | **refused**: per-point solves counted apart (`solve_row_ops`) |
+| `F_p multiply-adds (elimination only)` | `pkm-semaev` tower F4 (`pkm_semaev.rs`) | no | measured; `solver_F_p_multiply-adds_(elimination_only)_uncharged`; band weight only | `ns_per_f4_muladd` | yes |
+| `F_p multiplications (grid)` | `pkm-semaev`, `engine=exhaustive` (block carries `ops = 0`; the work is on `pkm_grid_fp_mults_uncharged`) | no | measured (wall) | `ns_per_fp_mul` | yes |
+| `F_p multiplications`, no `fp_muls_per_add` | `line-resultant`, `line-s4-macaulay`, `fghr-d3`, `y-line-s3-macaulay` | no | measured; `solver_F_p_multiplications_uncharged`; band weight only | `ns_per_fp_mul` | yes |
+| `F_p` / `F_q multiplications` with `fp_muls_per_add` | the Gaudry and x-line oracles | no | `counted` at the curve's own multiplications per addition | none needed | already charged |
+| `none (external process; wall time only)` | `m4gb-f2` | no | measured | none (a reference arm, AGENTS.md §6) | no |
+| `pkm_system_fp_mults_uncharged`, `pkm_grid_…`, `pkm_shared_poly_…`, `pkm_trace_learn_spec_…`, `pkm_t0_base_map_…`, `pkm_base_check_…`, `pkm_t0_target_fp_mults_uncharged` | `pkm-semaev` native counters | — | listed unpriced; band weight only; `*_full` rule to optional unit `fp_mul` (no row has it) | `ns_per_fp_mul` (`ic_boundary::PINNABLE_NATIVE`) | yes, under the frozen name, dropped from `unpriced` |
+| `hashed_tensor_steps` | `hashed-affine` base, `hashed-tensor` set-up and relations (`hashed.rs`) | — | uncharged, `cost_qualification` names it; not an ecbench id | `ns_per_hashed_tensor_step` | yes; the run stays qualified for the omitted tensor-curve certification |
+| `pkm_trace_learn_muladds`, `pkm_t0_base_inversions`, `pkm_t0_target_inversions`, `pkm_crosscheck_fp_mults` | `pkm-semaev` | — | counted, not `*_uncharged`: neither priced nor listed unpriced | none (not changed here: renaming would change frozen records) | — |
+
+Every shipped engine except `m4gb-f2` and the `pkm-semaev` F4 also reports
+`bitop_complete = 1`. `ecbench::work` prices those engines' whole run in
+`bitop/v1` primitives from the `bitop_*` keys. That accounting is separate, and
+these keys do not change it. The `*_full` and `*_wordram` repricings keep
+every `solver_*` unpriced entry as it was.
+
 ### Linear algebra, verification, total
 
 | field | meaning |
@@ -289,6 +336,30 @@ stopwatch, and the table should say which is which.
 | `recovered`, `verified` | the logarithm found, and whether it is the planted one |
 | `total_gae`, `s` | the whole pipeline, and it over `√r` |
 | `s_over_rho` | against the matched counted Pollard rho on the same instance, when supplied |
+
+#### Stored factor-base log tables (individual logarithm only)
+
+A factor-base logarithm table depends only on the curve, its generator
+`G` and the materialised base, so it can be paid for once and reused.
+`ic logs --log-store <dir>` (or `$IC_LOG_STORE`) writes the table to
+`<dir>/<key>.json`, where the key is SHA-256 over a canonical text of
+the curve (degree, subfield, `a`, `b`, field modulus, subgroup order,
+cofactor), `G`'s coordinates and the SHA-256 of the *sorted point list*
+of the base (`src/bin/ic/log_store.rs`). Files are schema-2 documents
+(schema 1 still loads), written to a temporary name and hard-linked
+into place; an existing file is never replaced. `ic solve --log-store`
+(with `--factor-base` or `--factor-index`) and `ic price --log-store`
+look the table up by recomputing the key, check the generator and base
+hash, and re-verify every column as `[log]G == point` before use: a
+mismatch or failed check is an error, never a silent fallback. A run
+that used the store skips collection and linear algebra, and its report
+says so: `log_table.log_table_source` is `"store"` (or `"file"` for
+`--logs`, `"computed"` otherwise), with the key and
+`precomputation_paid_in_this_run: false`. That run's cost is
+**amortized, not cold**: `ic price` moves its cold figures to `*_store`
+fields (`s_cold` → `s_store`, `s_ic_cold` → `s_ic_store`) and nulls the
+cold ones. Report the cold cost first; a store-backed figure is
+secondary and never stands in for `S` (§7).
 
 ### The rho reference
 
@@ -456,6 +527,7 @@ What ships behind it (`ic bench --list` prints each one's parameters):
 | name | engine | native unit | limits |
 |:--|:--|:--|:--|
 | `f4-f2` | Faugère's F4 over `F_2[v]/(v² − v)`: normal strategy, Gebauer–Möller criteria, the field products `v·g` as pairs, symbolic preprocessing, bit-packed elimination; a full reduced basis, solutions read off its linear elements ([`pq_f4_f2.rs`](../../src/cryptanalysis/pq_f4_f2.rs)) | word XORs (elimination only) | matrix size; the budget |
+| `m4gb-f2` | M4GB (Makarim–Stevens, ISSAC 2017) run as an external process ([`m4gb_oracle.rs`](../../src/cryptanalysis/m4gb_oracle.rs)): reduced degrevlex basis over GF(2) with field equations, solutions read off it | none (wall time only) | `M4GB_BINARY` must be set; unknowns ≤ the binary's `MAXVARS`; the budget |
 | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree (`max_degree`, default 3), propagation, splitting (`split`) | word XORs (elimination only) | `node_budget` |
 | `matrix-f5` | the same, leaving out the rows the Boolean F5 criterion predicts to reduce to zero | word XORs (elimination only) | `node_budget` |
 | `inherited-f4` | the same, children specialising their parent's reduced basis | word XORs (elimination, specialisation and linear elimination only) | `node_budget` |
@@ -466,6 +538,20 @@ What ships behind it (`ic bench --list` prints each one's parameters):
 | `fes-f2` | fast exhaustive search, libfes-lite's Gray code: two word XORs per point | word XORs (Gray-code steps) | quadratic systems, ≤ 32 unknowns, ≤ 64 equations |
 | `fes-f2-wide` | the same over 16 (AVX-512) or 8 (AVX2) sub-cubes per Gray-code step, the last four or three unknowns fixed per 32-bit lane; the first 32 equations in the lanes, the rest filtering the candidates; the scalar walk where the lanes do not fit ([`mq_fes.rs`](../../src/cryptanalysis/mq_fes.rs)) | vector XORs (Gray-code steps, *k* lanes) | quadratic systems, ≤ 36 unknowns; 3–4× `fes-f2` here |
 | `exhaustive` | every equation at every point, stopping at the first that fails | monomial tests (performed) | 26 unknowns |
+
+`m4gb-f2` is an external process, not linked code: M4GB is GPL-3, so the
+adapter writes its text input, runs the binary named by `M4GB_BINARY`
+(`M4GB_THREADS` sets `--nrthreads`) and parses the reduced basis back. It is
+GF(2) only and priced by wall time, so it is a reference arm and never a
+leaderboard row (`AGENTS.md` §6). Build the binary in a checkout of
+[cr-marcstevens/m4gb](https://github.com/cr-marcstevens/m4gb) with
+`autoreconf --install && ./configure`, then
+`make MAXVARS=128 FIELDSIZE=2 m4gb`; the `solver_m4gb_n<MAXVARS>_gf2` it
+produces bounds the unknowns the adapter accepts. `M4GB_BINARY` may also
+name a directory of such binaries (several `MAXVARS`): the adapter then runs
+the one with the smallest `MAXVARS` at least the system's unknowns, because a
+wide binary is memory-hungry (about 7 GB resident for `n128` on a 35-unknown
+system against about 150 MB for `n35`).
 
 The exhaustive searches are the **reference**, not a strawman:
 `fes-f2-wide` (or `fes-f2` on a host without the vector instructions)
@@ -695,7 +781,10 @@ configurations or a **matrix** whose product is taken.
   refused with an error that names the `;`, not read as `divisor=1`.
 - The keys are the stages: `factor_base`, `oracle`, `targets`,
   `solver` (for `descent-algebraic`) and `linalg`. A key left out takes
-  the command line's value.
+  the command line's value. When neither names a solver,
+  `descent-algebraic` runs `fes-then-batched` (`fes-f2` up to 14 unknowns,
+  `inherited-f4-batched` above; `solvers::DEFAULT_DESCENT_SOLVER`, since
+  2026-11-13); before, it refused to run.
 - `configurations` takes an explicit list instead of, or as well as, a
   matrix — the way to put a reference row (the pair-table oracle on the
   same base) beside a matrix of candidates.
@@ -835,8 +924,8 @@ worse than none:
 | factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `hashed-affine`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
 | point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`, `chained-x`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
-| polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
-| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+| polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `m4gb-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
+| relation matrix | `RelationSolver` | `incremental-gauss`, `incremental-gauss-full-rank`, `incremental-gauss-full-rank-checked`, `incremental-gauss-echelon`, `structured-gauss`, `sparse-cado` (= `filter+wiedemann`), `filter+lanczos`, `wiedemann`, `lanczos` (the deferred sparse names force the full-rank completion rule and accept an answer only when two independently seeded solves agree; `linalg.rs` `MATRIX_NAMES`) |
 
 ### Hashed-affine / hashed-tensor
 
@@ -852,7 +941,12 @@ the summation-polynomial pipeline.
 The contraction's work is reported as `hashed_tensor_steps`, an
 **uncalibrated** charged-primitive count, so the `S` column does not yet
 price it. Treat a `hashed-affine + hashed-tensor` row as a stage diagnostic,
-not as a comparable end-to-end `S`, until that step has a calibration.
+not as a comparable end-to-end `S`, until that step has a calibration. The
+key `ns_per_hashed_tensor_step` exists (§3, "Solver and oracle work units")
+but no curve pins it. Pinning it charges the steps and removes the step
+clauses from `cost_qualification`. The row stays qualified until the tensor
+curve's certification is charged too
+([`calibration-solver-units.md`](calibration-solver-units.md)).
 
 `ic bench --list` prints this with every parameter each plug-in reads.
 A parameter that takes several values (`divisor` on `koblitz-orbit`,

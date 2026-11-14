@@ -1,5 +1,19 @@
 {
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "github-checkpoint-substitution",
+      "filed": "2026-11-09",
+      "filed_before_affected_data": true,
+      "reason": "Explicit owner authorization replaces missing S3 transport; no census data exists.",
+      "changes": [
+        "Use committed/pushed source, run-start markers and completed/partial raw evidence in git origin as checkpoints.",
+        "Keep exact checker/analyzer binaries, all180 positive cases and3 controls, two invocations and all acceptance/stopping/resource limits unchanged."
+      ],
+      "supersedes_fields": [
+        "execution.placement.backend_authorization"
+      ]
+    }
+  ],
   "analysis_plan": {
     "blinded": false,
     "frozen_before_data": true,
@@ -230,7 +244,7 @@
     },
     "measurement_class": "throughput",
     "placement": {
-      "backend_authorization": "Standing approved local override;1CPU,2GiB,600s x2, no retries/cloud spend. Separate S3 gate must pass; no upload success assumed.",
+      "backend_authorization": "Owner approved local1CPU/2GiB/600s x2 and committed/pushed GitHub checkpoints instead of unavailable S3 in the resumed session2026-11-09. No retries or cloud spend.",
       "cpus": 1,
       "memory_limit_bytes": 2147483648
     },
@@ -242,11 +256,11 @@
     "timeout_seconds": 600
   },
   "freeze": {
-    "commit": "77aed44a5a68e7ba4e794bed742b04b30994da23",
-    "filed_before_affected_data": true,
-    "frozen_at": "2026-11-09T07:41:34Z",
-    "protocol_sha256": "d509c8b852fc7d561380f89b5e66c02165a9b23e9ffee960996cf3117c9f4f1a",
-    "status": "frozen"
+    "status": "frozen",
+    "protocol_sha256": "7d5b77252d2930a0e8da185f08e0454809af934270dfa94c1a1a44bd50d57635",
+    "commit": "a26eb8fd31d2a102c9f12dbe98178e4cbfd57610",
+    "frozen_at": "2026-11-09T20:07:22Z",
+    "filed_before_affected_data": true
   },
   "inadmissible": [
     "Timing or extrapolating census to asymptotic cost",
@@ -455,5 +469,5 @@
       }
     ]
   },
-  "version": 1
+  "version": 2
 }

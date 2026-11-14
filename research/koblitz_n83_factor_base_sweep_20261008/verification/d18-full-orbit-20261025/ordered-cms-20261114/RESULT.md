@@ -4,7 +4,7 @@ The ordered-first-pair D18 positive XCNF has a complete original-constraint
 model replay, but CryptoMiniSat 5.14.7 reached the frozen one-million-conflict
 cap on that same satisfiable constructed control. It returned
 `INDETERMINATE`, so the natural solver arm was withheld. [pcc:unverified]
-Claim `PCC-20261114-907555` has `unverified` standing; this is a retained
+Claim `PCC-20261114-39d251` has `unverified` standing; this is a retained
 local execution observation and raw-transcript audit.
 
 | Item | Recorded result |
