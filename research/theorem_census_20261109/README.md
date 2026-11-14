@@ -391,6 +391,25 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Original fourteen requirements
 
+The [generic actual iid bridge](../theriault_iid_audit_20261114/README.md)
+now derives the source collision closedform and recurrence from actual
+uniform finite samples, with no recurrence hypothesis. Missing-color
+function subtype count(m−1)^s and finite support-indicator sum interchange
+give exact expectation s−m+m(1−1/m)^s. Product-function projection transfers
+the average to free paired poolsα×Bool; involution/orbit semantics are bound.
+Direct corrected4s²/(9n)≤E≤s²/n holds for3≤s≤n/2. Actual pools
+Fin(t+4)×Bool give an unbounded even-pool counterfamily to the original
+finite lower bound at s3 within the strict source domain. Paired8mean11/16
+and unpaired8mean23/64 are checked controls. Whole gate32/0failures/0trusted,
+exact local PCC-20261114-0a4692 replay PASS at2026-11-14T01:46:59Z, seven formal/config and eleven
+artifact pins match;59attemptfiles/fivegatefiles and inspected one-page
+PDF47284B retained. Signed standing unverified. Earlier frozen conditional
+repair and source-review packet remain unchanged; this closes their generic
+paired iid recurrence gap. Actual algorithm walks and Jacobian/subgroup
+distribution, linear-algebra rank/invertibility and full runtime stay open.
+No full-paper-read/corpus promotion/novelty/native experiment. [pcc:unverified]
+
+
 The [original Thériault collision audit](../theriault_collision_audit_20261114/README.md)
 refutes the finite lower bound in source Theorem1,p85 at n8,s3 within its
 actual sampling model: all512 uniform ordered draws from four free
@@ -399,9 +418,9 @@ The domain3≤s<n/2 holds; source Definition7/Proposition2 count repeats
 after the first, and triple-repeat/distinct-orbit/upper controls pass.
 The source closedform at s3 equals6/n−4/n², below claimed6/n for alln>6.
 Explicitly conditional on the displayed recurrence, repaired bounds
-4s²/(9n)≤e(s)≤s²/n hold for3≤s≤n/2. The generic actual iid recurrence
-bridge remains open; the full algorithm/complexity Theorem3 is not
-refuted. Whole gate18/0failures/0trusted, exact local PCC-20261114-332aee replay
+4s²/(9n)≤e(s)≤s²/n hold for3≤s≤n/2. The original packet left the generic paired iid recurrence
+bridge open; the later generic iid packet below closes it. The full
+algorithm/complexity Theorem3 is not refuted. Whole gate18/0failures/0trusted, exact local PCC-20261114-332aee replay
 PASS at2026-11-14T01:34:25Z, six formal/config and sixteen artifact pins match;
 59attemptfiles/fivegatefiles and inspected one-page PDF47646B retained.
 Scalar supplement IDC1h939108711fe75407 has an actual symbolic Lean
