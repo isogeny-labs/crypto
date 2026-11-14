@@ -8,7 +8,7 @@ repository) can show the two rows it supports.
 |:--|:--|
 | Source repository | `github.com/aburan28/ml-cryptanalysis` |
 | Source path | `experiments/fb-pt-lgrow-k1` (plus the four sibling files its validator report reads) |
-| Source commit | `7d4e8e0fccb43148c80fd2004821fd7e48f9df76` (main; merge of ml-cryptanalysis PR #310) |
+| Source commit | `7d4e8e0fccb43148c80fd2004821fd7e48f9df76` (main; merge of ml-cryptanalysis PR #310), with the validator files replaced by their redacted versions from `b504b611` (ml-cryptanalysis PR #314) |
 | Validation | `VAL-20261114-d9190c`, `fb-pt-lgrow-k1/VALIDATION.json` |
 | ecbench binary | sha256 `a0be1b2a3a02f5385c9b9654622b01923f3f54a52904bd157861e0cbe8796d29` |
 | Isolation | L0, counted cost only |
@@ -58,3 +58,7 @@ Caveats carried from the validator report:
 - The slope statistic D in the source report is `(R_n23 + 7 R_n29) / 84` by construction, an offset rather than a bent slope. It is not a row.
 - The leaderboard's existing K1 n = 23 figure (table C) is a 32-target batch, pre-gate figure in another unit; these rows are not ranked against it.
 - K1 n = 29 has r = 42457 = 2^15.37, smaller than K1 n = 17's subgroup, so n is the field degree here, not a problem size.
+
+## Redaction
+
+`fb-pt-lgrow-k1/VALIDATION.json`, `validation/VALIDATOR.md` and `validation/validator-report.json` come from ml-cryptanalysis `b504b611` (PR #314). That commit replaced the validator's model id with a redaction note and re-pinned the sha256 values; `validation/REDACTION.md` lists the old and new hashes. No number, check or verdict changed.

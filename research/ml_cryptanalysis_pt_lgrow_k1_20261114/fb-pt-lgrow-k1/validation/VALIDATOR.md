@@ -3,7 +3,7 @@
 - Report: `VAL-20261114-d9190c`.
 - Verdict: **passed.** All 8 RunPod session receipts and the 4 committed sizing sessions are admissible evidence. Every number in `results.json` (177 of 177) recomputes from the raw records, and all three frozen verdicts (D, R_n23, R_n29: POSITIVE) reproduce.
 - Findings: two that affect how the result should be read (F3, F4), two minor disclosure errors in the protocol's sizing summary (F1, F2) and one cosmetic change-log timing note (F5). None affects admissibility or any number.
-- Validator: a Validator subagent (claude-opus-5-5), 2026-11-14.
+- Validator: a Validator subagent (model id redacted per repository policy), 2026-11-14.
 - Snapshot: `ml-cryptanalysis` at `a1c27e9` on branch `claude/relation-yield-index-calculus-97c347`. `git ls-remote` shows that branch and `refs/pull/310/head` both at `a1c27e9`.
   - The validated inputs (sessions, `results.json`) are unchanged since `203d8e3`.
   - `score.py`, `make_specs.py`, the specs, `sizing/` and `data/PROTOCOL.frozen.sha256` are unchanged since the freeze, `609d945`.
@@ -224,7 +224,7 @@ I recomputed the best l by total S on the committed sizing sessions (2 targets p
 - **Memory.** Max RSS is 27,656 to 27,664 KiB for every arm except pt-l10 at n = 29 (31,460 / 32,476 KiB). The pair table holds 61,297 entries for l9 and 258,442 for l10, against about 2,900 to 3,800 for l7.
 - **Success probability.** All 240 IC solves verified, with at most 37,232 trials against a cap of 1e7, so expected cost = measured cost.
 - **Unverifiable remarks.** The pod id, price, HTTP checks, DELETE and runtime in the change log, and the n = 43 timeout remark, cannot be checked from committed artifacts. None is load-bearing.
-- **Validator independence.** Same model family as the producer (claude-opus-5-5), separate context. The scorer, bootstrap, EC arithmetic and robustness code were written before reading `score.py`. Then `score.py` was run read-only.
+- **Validator independence.** Same model family as the producer (model id redacted per repository policy), separate context. The scorer, bootstrap, EC arithmetic and robustness code were written before reading `score.py`. Then `score.py` was run read-only.
 
 ## Attestation
 
