@@ -1,0 +1,337 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "PKM-M8-PANELA-20261114",
+ "version": 1,
+ "created": "2026-11-14",
+ "repository": "crypto",
+ "study_dir": "research/pkm_m8_sparse_panel_20261114",
+ "authors": [
+  "Claude main session (frontier tier), owner-authorized 2026-11-14"
+ ],
+ "links": {
+  "spec": "PROTOCOL.md",
+  "design_source": "research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md#A",
+  "prerequisites": "research/prime_norm_rank_20261112/cost-floor-report/NEXT_TEST.md",
+  "cost_model": "research/prime_norm_rank_20261112/cost-floor-report/README.md",
+  "prior": "research/prime_leads_chase_20261113/L1-pkm/D83_VERDICT.md",
+  "lead_state": "research/prime_ic_lead_heatmap_20261114/leads.json#CH-L1",
+  "pilot": "none; smoke runs under smoke/ are development checks of the instrument, not data"
+ },
+ "question": "On the m=8 PKM Kummer-chain system over prime fields, how does the complete charged work c(B) of one positive sparse solver invocation scale with B=2^t, and is the measured exponent gamma below the gates 3.5 (all-output) and 3 (one-output)?",
+ "claims": [
+  {
+   "id": "C1",
+   "text": "Cell derivation, target classification (real and algebraic decompositions), solver-output verification and useful-relation rank are exact computations.",
+   "class": "exact_computation",
+   "decided_by": [
+    "planted control",
+    "negative control",
+    "native-vs-msolve cross-check"
+   ]
+  },
+  {
+   "id": "C2",
+   "text": "The per-call work exponent gamma between B=4 and B=8 (lower bound from B=16) lies above or below 3.5.",
+   "class": "comparative",
+   "decided_by": [
+    "decision_rule"
+   ]
+  },
+  {
+   "id": "C3",
+   "text": "The projected whole-attack exponent E_all(gamma) of the Lean cost-floor model and its distance to 1/2.",
+   "class": "heuristic_estimate",
+   "decided_by": []
+  }
+ ],
+ "arms": [
+  {
+   "id": "msolve",
+   "role": "candidate",
+   "description": "msolve 0.6.5 F4 (-t 8 -v 2 -g 2 -P 1) on the raw chain presentation; native extraction and verification",
+   "instrument": {
+    "repo": "isogeny-labs/crypto",
+    "commit": null,
+    "build": [
+     [
+      "cargo",
+      "build",
+      "--release",
+      "--example",
+      "pkm_m8_panel"
+     ]
+    ],
+    "binary_sha256": null,
+    "external": {
+     "msolve": "0.6.5-1build2",
+     "sha256_local": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa"
+    },
+    "flags": {
+     "msolve": "-t 8 -v 2 -g 2 -P 1"
+    },
+    "env": {},
+    "threads": 8
+   }
+  },
+  {
+   "id": "native",
+   "role": "second_instrument",
+   "description": "crypto_lib f4_fp grevlex single thread on byte-identical polynomial sets; t=2 cells decisive, t=3 censored",
+   "instrument": {
+    "repo": "isogeny-labs/crypto",
+    "commit": null,
+    "build": [
+     [
+      "cargo",
+      "build",
+      "--release",
+      "--example",
+      "pkm_m8_panel"
+     ]
+    ],
+    "binary_sha256": null,
+    "flags": {},
+    "env": {},
+    "threads": 1
+   }
+  },
+  {
+   "id": "rho",
+   "role": "reference",
+   "description": "native negation-map rho on each cell's hidden instance, 3 seeds; reference row only",
+   "instrument": {
+    "repo": "isogeny-labs/crypto",
+    "commit": null,
+    "build": [
+     [
+      "cargo",
+      "build",
+      "--release",
+      "--example",
+      "pkm_m8_panel"
+     ]
+    ],
+    "binary_sha256": null,
+    "flags": {},
+    "env": {},
+    "threads": 1
+   }
+  }
+ ],
+ "cells": [
+  {
+   "id": "t2r7",
+   "t": 2,
+   "B": 4,
+   "ratio": 7,
+   "p_rule": "least prime >= 2^14 with 4 | p-1 and prime-order curve",
+   "order": 1
+  },
+  {
+   "id": "t2r8",
+   "t": 2,
+   "B": 4,
+   "ratio": 8,
+   "p_rule": "least prime >= 2^16",
+   "order": 2
+  },
+  {
+   "id": "t2r9",
+   "t": 2,
+   "B": 4,
+   "ratio": 9,
+   "p_rule": "least prime >= 2^18",
+   "order": 3
+  },
+  {
+   "id": "t3r8",
+   "t": 3,
+   "B": 8,
+   "ratio": 8,
+   "p_rule": "L1 decisive cell p=16801793 with its curve, g, zeta",
+   "order": 4
+  },
+  {
+   "id": "t3r7",
+   "t": 3,
+   "B": 8,
+   "ratio": 7,
+   "p_rule": "least prime >= 2^21 with 8 | p-1",
+   "order": 5
+  },
+  {
+   "id": "t3r9",
+   "t": 3,
+   "B": 8,
+   "ratio": 9,
+   "p_rule": "least prime >= 2^27",
+   "order": 6
+  },
+  {
+   "id": "t4r7",
+   "t": 4,
+   "B": 16,
+   "ratio": 7,
+   "p_rule": "least prime >= 2^28 with 16 | p-1; censor probe, lower bound only",
+   "order": 7
+  }
+ ],
+ "targets_per_cell": {
+  "natural_sat": 4,
+  "natural_unsat": 4,
+  "planted": 1,
+  "classifier": "exhaustive signed multisets of 8 real base points; algebraic count over F_{p^2} recorded"
+ },
+ "caps": {
+  "t2": {
+   "threads": 8,
+   "timeout_s": 3600,
+   "as_cap_gb": 60,
+   "native": {
+    "threads": 1,
+    "timeout_s": 3600,
+    "as_cap_gb": 30
+   }
+  },
+  "t3": {
+   "threads": 8,
+   "timeout_s": 21600,
+   "as_cap": "0.93 x pod RAM",
+   "native": {
+    "threads": 1,
+    "timeout_s": 7200,
+    "as_cap_gb": 60,
+    "read_as": "censored"
+   }
+  },
+  "t4_probe": {
+   "threads": 8,
+   "timeout_s": 7200,
+   "as_cap": "0.93 x pod RAM",
+   "targets": 1
+  }
+ },
+ "controls": {
+  "positive": {
+   "present": true,
+   "arm": "planted target per cell",
+   "expected": "planted decomposition among extracted real decompositions when the call completes",
+   "failure_means": "instrument fault; the cell's SAT rows are invalid"
+  },
+  "negative": {
+   "present": true,
+   "arm": "natural UNSAT targets",
+   "expected": "zero real decompositions extracted",
+   "failure_means": "classifier/solver disagreement; invalid run"
+  },
+  "aa": {
+   "present": true,
+   "comparison": "t2r7 SAT target 1 run first and last of the t=2 block",
+   "expected": "work_proxy identical; rho_AA = max/min cpu_s recorded"
+  },
+  "second_instrument": {
+   "present": true,
+   "comparison": "native f4 vs msolve at t=2 on byte-identical inputs",
+   "expected": "same consistency verdict and solving degree"
+  },
+  "replication": {
+   "present": true,
+   "comparison": "t3r8 on the L1 curve vs committed A3 log round structure",
+   "gate": false
+  }
+ },
+ "variable_ledger": [
+  {
+   "factor": "instrument (commit, binary sha256, msolve package+hash, flags, threads)",
+   "treatment": "fixed"
+  },
+  {
+   "factor": "host (one RunPod pod; lscpu, RAM recorded)",
+   "treatment": "measured; shared by all rows; co-tenancy uncontrolled (L0)"
+  },
+  {
+   "factor": "memory cap and timeout",
+   "treatment": "fixed per cell class"
+  },
+  {
+   "factor": "plan order",
+   "treatment": "fixed; A/A first and last of the t=2 block"
+  },
+  {
+   "factor": "targets",
+   "treatment": "randomized, seeded (20261114 + cell slug)"
+  },
+  {
+   "factor": "B (the variable)",
+   "treatment": "crossed with ratio 7/8/9"
+  }
+ ],
+ "seeds": {
+  "master": 20261114,
+  "derivation": "StdRng seeded by master xor sha256(cell slug); hidden k and (a_j,b_j) from a separate seeded stream sealed in hidden.json"
+ },
+ "blinding": {
+  "analysis_labels_masked": false,
+  "hidden_instance_sealed": true,
+  "note": "SAT/UNSAT labels are public for stratification only; the solver pipeline never reads hidden.json; the analyst reads runs.jsonl only after done.json"
+ },
+ "primary_metrics": [
+  {
+   "name": "cpu_s",
+   "unit": "CPU seconds (user+sys, msolve 8 threads + verify)",
+   "better": "lower"
+  },
+  {
+   "name": "work_proxy",
+   "unit": "sum over F4 rounds of rows x cols x density",
+   "better": "lower"
+  }
+ ],
+ "decision_rule": {
+  "gamma_lo": "log2(min_j c_lo(8,j) / max_j c(4,j)) over natural targets; censored rows enter as lower bounds",
+  "gamma_hi": "log2(max_j c(8,j) / min_j c(4,j)); +inf unless a t=3 natural row completed",
+  "KILL": "gamma_lo >= 3.5 on both observables with all controls passing (scope: msolve 0.6.5 F4 and native f4 on the raw chain presentation at measured scale)",
+  "NOT_KILLED_at_B_le_8": "gamma_hi < 3.5 on both observables and verified natural positives at t=3; reported as INCONCLUSIVE with direction; ADVANCE impossible (held-out t=4,5 unavailable)",
+  "INCONCLUSIVE": "otherwise",
+  "censoring": "a cap-stopped call is a lower bound on c(B); may support KILL, never NOT_KILLED"
+ },
+ "analysis_plan": {
+  "tables": [
+   "per-call rows (cell, target, label, solver, cpu_s, wall_s, max_rss, censored, work_proxy, max_round_degree, useful_relations, rank_increment)",
+   "per-cell summary (median, min, max, censored count) per observable",
+   "gamma table (4->8, 8->16 lower bound) per observable",
+   "E_all projection and distance to 1/2",
+   "rho reference per cell"
+  ],
+  "figures": [
+   "figures/work_vs_B.svg"
+  ],
+  "frozen_before_data": true
+ },
+ "budget": {
+  "route": "RunPod CPU pod (isolab monthly budget exhausted: 1808.95 of 1300 USD on 2026-11-14)",
+  "pods": 1,
+  "flavor_rule": "largest cpu5m with <= 256 GB RAM available at creation; prefer 32 vCPU/256 GB; fallback 16 vCPU/128 GB",
+  "ceiling_usd": 60,
+  "deadline_h": 26,
+  "retries": 0
+ },
+ "export": {
+  "export_schema": "experiment.export/v1",
+  "review_schema": "experiment.review/v1"
+ },
+ "forbidden": [
+  "discarding censored or failed rows",
+  "raising caps after seeing results",
+  "a second pod or retry under this version",
+  "reading hidden.json in the solver pipeline",
+  "promoting any row to a leaderboard without the validation gate"
+ ],
+ "freeze": {
+  "status": "draft",
+  "frozen_at": null,
+  "commit": null,
+  "protocol_md_sha256": null,
+  "validator": "tools/experiment_protocol.py is vault-encrypted in the sibling checkout; schema conformance checked by hand against research/quadratic_twist_evidence_20261021/PAIR_RANK_20261029.protocol.json"
+ }
+}

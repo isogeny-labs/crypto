@@ -1,35 +1,32 @@
-# Resume: crypto @ claude/ecstatic-thompson-0jpmjv
+# Resume: crypto @ claude/loving-hawking-w2wv5p
 
 ## Goal
-Owner (2026-11-12): run the frozen wide-modulus sparse-LA pack on RunPod ("1 but on runpod").
-Protocol: research/ic_techniques_20261012/wide_sparse_la/PROTOCOL.md + PROTOCOL_AMENDMENT_1.md
-(RunPod cpu5g 4 vCPU/16 GiB, one pod per seed, A/A per pod, USD 25 ceiling, 40 h pod deadline).
+Owner (2026-11-14, "Yes to 1"): run panel A, the positive sparse PKM relation-finder panel at m = 8
+(research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md §A), on a large host. Protocol:
+research/pkm_m8_sparse_panel_20261114/PROTOCOL.md (+ protocol.json). Outcome space: KILL this sparse
+mechanism at measured scale, or INCONCLUSIVE; ADVANCE is impossible by construction (held-out t=4,5 out of reach).
 
 ## Lead / hypothesis
-Size law: row_ops/D grows as D^(beta-1), beta in [1.9, 2.1] (Krylov). Width law: ns per row_op
-t(L) = c0 + c2 L^2 over limbs L = 1..4. Extrapolate U192@129 (ECC2K-130 order) to D = 1e9 with
-interval; falsifiers in PROTOCOL.md "How the extrapolation model is falsified".
+c(B) = B^gamma per solver call; gate gamma < 3.5 (all-output) / 3 (one-output). Expectation from D(8,2)=8,
+D(8,3)>=9..10: gamma_lo well above 3.5 (KILL), with t=3 cells likely censored at the memory cap.
 
 ## Spec
-research/ic_techniques_20261012/wide_sparse_la/runpod/{launch.py, pod_run.sh, make_bundle.py}.
-launch.py bundles HEAD, uploads to s3://setec-astronomy-artifacts/lab-results/wide-sparse-la/<stamp>-<sha>/,
-creates 3 RunPod CPU pods (REST v1) that build la_engine_bench and run the grid for their seed.
-Record: benchmarks/records/<id>-wide-sparse-la.json (benchrec).
+Instrument: examples/pkm_m8_panel.rs (cell/targets/export/verify/native-solve/rho). Pod runner:
+research/pkm_m8_sparse_panel_20261114/pod/{rp.sh,podserver.py,job.sh,launch.sh,parse_msolve_log.py,plan.json}.
+msolve 0.6.5-1build2 from the Ubuntu 24.04 archive on the pod. Cells and caps: PROTOCOL.md §3.
+Route: RunPod CPU pod (isolab monthly budget exhausted 1808.95/1300 USD); ceiling USD 60; deadline 26 h.
 
 ## State
-2026-11-12: amendment + launcher committed; local smoke test of pod_run.sh (D=2^8..2^9) run.
-Launch manifest: research/ic_techniques_20261012/wide_sparse_la/launch.json (pod ids, S3 prefix).
+2026-11-14 ~21:30Z: protocol drafted; instrument and pod runner being built (Sonnet workers); Opus red-team
+of the protocol in flight. Nothing launched. Lead heat map landed in PR #4161 (merged).
 
 ## Runs in flight
-None. Attempt 2 completed 2026-11-13 ~16Z; raw data pulled into wide_sparse_la/raw/ (2026-11-14).
-Was: 3 RunPod pods (see launch.json). Progress: aws s3 cp <prefix>/seed<s>/runs.jsonl -; done.json appears at end.
-Pods self-terminate via podTerminate; if not, terminate via REST DELETE /v1/pods/<id>.
+None yet. When launched: pod name pkm-m8-panelA-<stamp>; state in research/pkm_m8_sparse_panel_20261114/pod/state/
+(git-ignored); results pulled to research/pkm_m8_sparse_panel_20261114/results/<stamp>/; raw tarball to S3 via
+tools/benchrec.py (record benchmarks/records/*-pkm-m8-panela.json). To check: pod/rp.sh ls <name>; done.json ends the plan.
+Delete the pod with pod/rp.sh delete <name> after fetching results.
 
 ## Stop and success conditions
-Fixed grid; per-run 3600 s timeout and per-arm stop rule; pod deadline 40 h; A/A determinism failure voids.
-Success = complete raw data + frozen analysis (fits, intervals, falsification outcomes), whatever the outcome.
-
-## Next steps
-1. Monitor pods (~13-16 h). 2. Pull raw/*.jsonl into wide_sparse_la/raw/, sha256 + S3.
-3. analysis.py per frozen Analysis section -> results.json; research-visuals report/PDF/graphs.
-4. benchrec add-raw/metric/close; benchmarks/<date>-wide-sparse-la/ + README row; progress report; PR.
+Deadline 26 h from pod creation or USD 60: fetch partials, delete pod, record the loss. Success = complete raw
+records for every planned row that ran (censored rows included), the frozen analysis (gamma_lo/gamma_hi per
+observable, controls), RESULTS.md + figure + PDF, benchrec record, session log, PR. No retry under this protocol.

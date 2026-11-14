@@ -1,0 +1,8 @@
+x0,x1,x2,x3,x4,x5
+65521
+x0+x1+x2+x3+x4+x5,
+x0*x1+x1*x2+x2*x3+x3*x4+x4*x5+x5*x0,
+x0*x1*x2+x1*x2*x3+x2*x3*x4+x3*x4*x5+x4*x5*x0+x5*x0*x1,
+x0*x1*x2*x3+x1*x2*x3*x4+x2*x3*x4*x5+x3*x4*x5*x0+x4*x5*x0*x1+x5*x0*x1*x2,
+x0*x1*x2*x3*x4+x1*x2*x3*x4*x5+x2*x3*x4*x5*x0+x3*x4*x5*x0*x1+x4*x5*x0*x1*x2+x5*x0*x1*x2*x3,
+x0*x1*x2*x3*x4*x5-1
