@@ -87,11 +87,11 @@ def certified(A,B,source_y):
                 multiplier_magnitude=mag,differential_certificate=True,
                 two_integral_numerator=True)
 
+precomputed=[recon(beta) for beta in roots]
 rows=[]
 for qx,qy in public:
     matches=[]
-    for beta in roots:
-        A,B=recon(beta)
+    for A,B in precomputed:
         b0=ev37(sp.Poly(B,x,domain=sp.ZZ))
         if b0 and ev37(sp.Poly(A,x,domain=sp.ZZ))*pow(b0,-1,37)%37==qx:
             matches.append((A,B))
