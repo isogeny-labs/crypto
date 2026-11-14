@@ -236,7 +236,9 @@ Variable ledger: instrument fixed (commit, binary SHA-256, msolve package and ha
 kernel band); host measured once (lscpu, model, cgroup limit) and shared by every row (one pod; one
 replacement of the same flavor allowed after a host loss, rows tagged by host, A/A repeated there, CPU
 compared across hosts only through the proxy); memory caps and timeouts fixed per cell class; order
-fixed; seeds derived from 20261114 and the cell slug; results synced off the pod after every call.
+fixed; seeds derived from 20261114 and the cell slug; results synced off the pod after every call. A row
+in flight when a pod is lost is a **lost row**, not a censored one: it is re-planned on the replacement pod
+(tagged `replacement: true`) and this is not counted as a retry; its partial log, if fetched, is kept as evidence only.
 
 ## 7. Budget, route and stop rules
 
