@@ -56,3 +56,32 @@ No Conductor task (not installed), no isolab-eks or S3 resume checkpoint (the AW
 this container); counted F4 mul-adds are deterministic and were run locally, as in the earlier
 torsion studies. research-kb unavailable; the prior-work check is the repository reading recorded in
 the miniature README. No figure or PDF if matplotlib is missing.
+
+## Amendment A1 (2026-11-14, after Part A data, before any write-up)
+
+- Part A result: `descent_skip` never fired (`pkm_descent_skipped` absent in all three cells) and A2 equals A1 count for
+  count. Cause, from reading `cofactor_fiber` (`ic_framework/fiber.rs`): the torsion group is generated from `[r]P`
+  over the *base points*; on a `square-bits` base every `[r]P` lies in 2E[8], so the fiber has 4 elements and the oracle
+  only tries the 4 live lifts. P2 is falsified by this (A2/A1 = 1.000, not 0.45 to 0.62).
+- Post hoc control (not registered), added to check that reading: `bits` lo = 0, t = 5, G = 3, same seed and targets,
+  `lifts` = 0 and 1. If the reading is right the `bits` base (both classes) should try 8 lifts per target.
+- The opt-in flag is a no-op, so its code is not kept in `src/`: the change is saved as `descent_skip.patch` (base
+  `1edbb0262c~1`) and the measured binary's identity is in the README. `src/` is unchanged by this study.
+
+## Amendment A2: Part C, yield per F4 mul-add at 2,000 targets (frozen before its data; Part A data seen)
+
+Part A's 100-target cells return 0 to 2 hits, too few to compare yield. Part C repeats the arms that matter with
+2,000 targets, same binary (flag off), seed 2026111402, m = 2, mode full, G = 3, t = 5:
+
+- bases: `bits` (lo = 0), `square-bits@0`, `square-bits@414271`;
+- arms per base: `lifts=0` (blind) and `lifts=1`.
+
+**Metric:** hits_verified per 10^9 counted F4 mul-adds, per arm, with exact Poisson 95% intervals on the hit
+counts (the mul-adds are deterministic counts). Unpriced native work is the lift additions and the fiber
+construction (set-up group ops), reported separately.
+
+**Predictions (direction fixed now):**
+- P4: on every base, `lifts=1` multiplies the F4 cost per target by about the number of lifts tried (8 on `bits`,
+  4 on `square-bits`) and raises hits per target, but by less than that factor, so hits per 10^9 mul-adds fall.
+- P5: of the three bases, `bits` lifts=1 has the highest hits per 10^9 mul-adds among the lifts=1 arms.
+No claim against rho: no rho arm is measured.

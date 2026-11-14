@@ -1480,7 +1480,7 @@ fn support(k: u32, form: &str, t: u32) -> Value {
 #[allow(dead_code)]
 fn f4cost(k: u32, form: &str, t: u32, guess: u32, targets: u64, seed: u64, cap_s: u64) -> Value {
     f4cost_m(
-        k, form, t, guess, targets, seed, cap_s, 2, "full", 0, None, false, false,
+        k, form, t, guess, targets, seed, cap_s, 2, "full", 0, None, false,
     )
 }
 
@@ -1776,7 +1776,6 @@ fn f4cost_m(
     lifts: u8,
     max_nnz: Option<u64>,
     trace: bool,
-    descent_skip: bool,
 ) -> Value {
     use crypto_lib::cryptanalysis::ic_boundary::{
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
@@ -1930,9 +1929,6 @@ fn f4cost_m(
     };
     if lifts > 0 {
         spec.push_str(&format!(",lifts={lifts}"));
-    }
-    if descent_skip {
-        spec.push_str(",descent_skip=1");
     }
     if let Some(n) = max_nnz {
         spec.push_str(&format!(",max_nnz={n}"));
@@ -2100,7 +2096,7 @@ fn f4cost_m(
         "wall_s": started.elapsed().as_secs_f64(),
         "f4_calls": tot.calls, "f4_muladds": tot.ops, "muladds_per_target": per_target,
         "solving_degree_max": tot.solving_degree_max, "undecided": tot.budget_exceeded,
-        "lifts": lifts > 0, "lifts_mode": lifts, "descent_skip": descent_skip, "trace": trace, "hits_exact": exact,
+        "lifts": lifts > 0, "lifts_mode": lifts, "trace": trace, "hits_exact": exact,
         "trace_learn_muladds": learn_muladds,
         "amortised_muladds_per_target": (learn_muladds + tot.ops) as f64 / done.max(1) as f64,
         "calls_per_target": tot.calls as f64 / done.max(1) as f64,
@@ -2396,13 +2392,10 @@ fn main() {
                 .filter(|v| v.as_str() != "-")
                 .map(|v| v.parse().unwrap());
             let trace = args.get(13).is_some_and(|v| v == "1");
-            // Position 14: descent_skip (0|1, with lifts 1 on square-bits).
-            let descent_skip = args.get(14).is_some_and(|v| v == "1");
             println!(
                 "{}",
                 serde_json::to_string(&f4cost_m(
-                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts, max_nnz, trace,
-                    descent_skip
+                    k, &args[3], t, g, n, seed, cap, nsum, mode, lifts, max_nnz, trace
                 ))
                 .unwrap()
             );

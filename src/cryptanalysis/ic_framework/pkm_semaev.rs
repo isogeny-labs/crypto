@@ -809,11 +809,6 @@ pub struct PkmSemaevOracle {
     /// Cofactor-fiber lifts (`lifts=1`): the rational `h`-torsion `E(F_q)[h]`,
     /// computed once in `prepare`; `decompose` tries the targets `R + K`.
     lifts: bool,
-    /// `descent_skip=1` (with `lifts=1` on a `square-bits` base): skip a lift
-    /// R + K whose 2-descent class chi(x_W - A/3) is -1. Every base point of
-    /// that base lies in 2E(F_p), so no sum of base points equals such a lift.
-    /// One Legendre symbol per lift, counted as `pkm_descent_legendre`.
-    descent_skip: bool,
     /// `lifts=2`: ONE F4 system per target (per guess branch) for all the
     /// lifts. The third abscissa is a free ring variable `X`, constrained by
     /// `P_R(X) = Π (X − x(R+K))` over the distinct lift abscissae, built
@@ -861,7 +856,6 @@ impl PkmSemaevOracle {
             traces: Vec::new(),
             trace_setup: BTreeMap::new(),
             lifts: false,
-            descent_skip: false,
             shared_req: false,
             shared: false,
             shared_pts: Vec::new(),
@@ -1110,11 +1104,6 @@ impl PkmSemaevOracle {
         }
         self.lifts = lifts >= 1;
         self.shared_req = lifts == 2;
-        let descent_skip = params.u64_or("descent_skip", 0)?;
-        if descent_skip > 1 || (descent_skip == 1 && lifts != 1) {
-            return Err("pkm-semaev: descent_skip is 0, or 1 together with lifts=1".into());
-        }
-        self.descent_skip = descent_skip == 1;
         if self.shared_req
             && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some() || self.m != 2)
         {
@@ -1931,10 +1920,6 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "lifts",
                 "1: cofactor-fiber lifts; try R + K for each x-distinct K in E(F_q)[h], first liftable relation wins; relations are over the projection [h]P (see fiber.rs). 2: the same verdicts from ONE F4 system per target: the third abscissa is a free variable X with P_R(X) = prod (X - x(R+K)) (m = 2, engine f4)",
             ),
-            (
-                "descent_skip",
-                "1 (with lifts=1, square-bits base): skip lifts whose 2-descent class is -1; they cannot decompose; one Legendre symbol per lift, counted",
-            ),
         ]
     }
 
@@ -2184,17 +2169,6 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                             continue;
                         }
                         tried_x.push(t.x);
-                        if self.descent_skip {
-                            if let Membership::SquareBits { shift: Some(sh), .. } = self.membership
-                            {
-                                // x_M = x_W - A/3; class -1 means R + K is not in 2E(F_p).
-                                self.bump("pkm_descent_legendre", 1);
-                                if ctx.group.legendre(subm(t.x, sh, ctx.group.p)) < 0 {
-                                    self.bump("pkm_descent_skipped", 1);
-                                    continue;
-                                }
-                            }
-                        }
                         self.bump("pkm_lift_targets_tried", 1);
                         if let Some(idx) = self.decompose(ctx, fb, ops, counters, t) {
                             if i != 0 {
