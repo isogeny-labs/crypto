@@ -173,6 +173,7 @@ SOURCES = {
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
+    "ghs_weak_cd_chain": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -512,7 +513,8 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 # These engineering components also carry validation gates outside tables A-C.
 COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
                            "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
-                           "benchmarks/20261112-mt-fieldops-v5")
+                           "benchmarks/20261112-mt-fieldops-v5",
+                           "research/quartic_dl1_cd_sqrt_20261113/combo/validation")
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -2086,6 +2088,69 @@ def ghs_weak_n4v2() -> dict:
             "report": "research/quartic_n4v2_20261020/README.md"}
 
 
+GHS_CD_CHAIN_EVIDENCE = "research/quartic_dl1_cd_sqrt_20261113/combo/validation"
+
+
+def ghs_weak_cd_chain() -> dict:
+    """c_D = 1.7 with the fixed-exponent square-root chain against the frozen N4 v2 DL (c_D = 2.0), same instances,
+    k = 18..22 (research/quartic_dl1_cd_sqrt_20261113/combo). Ratios copied from analysis.json (geometric means over
+    seeds 1..3 of the per-seed cold M-eq ratio, frozen grid constants; additions priced at 0, 0.5 and 1 M-eq). Its
+    standing comes from combo/validation/VALIDATION.json."""
+    a = load(SOURCES["ghs_weak_cd_chain"])
+    errs = gate.check_evidence_dir(REPO / GHS_CD_CHAIN_EVIDENCE, REPO)
+    qs = (262111, 524287, 1048507, 2097091, 4194271)
+    rows = []
+    for y in ("DL", "DL1", "D"):
+        for q in qs:
+            r = {"arm": y, "q": q, "k": q.bit_length()}
+            for w in ("0.0", "0.5", "1.0"):
+                x = a["ratios"][f"B170/BASE/{y}/{q}/{w}"]
+                r[w] = {"geomean": x["geomean"], "max": x["max"], "all_below_1": x["all_below_1"]}
+            rows.append(r)
+    manifest = json.loads((REPO / GHS_CD_CHAIN_EVIDENCE / gate.MANIFEST).read_text()) if not errs else {}
+    band = manifest.get("rho_reference", {}).get("gae_band", {})
+    return {"rows": rows, "headline": a["headline_DL_robust_all_k"], "rho_band_k22": band,
+            "study": "research/quartic_dl1_cd_sqrt_20261113/",
+            "report": "research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf", "source": SOURCES["ghs_weak_cd_chain"],
+            "class": "component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family)",
+            "validation": (f"validated: replay certificate, validator report and the negation-map rho reference with the "
+                           f"§5a band ({GHS_CD_CHAIN_EVIDENCE}/VALIDATION.json)") if not errs else (
+                "not validated: " + "; ".join(errs)),
+            "validated": not errs}
+
+
+def ghs_cd_chain_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3}: c_D = 1.7 with a fixed-exponent square root against the frozen DL, outside tables A–C", "",
+         "Same instances as the N4 v2 section (k = 18..22, seeds 1–3): the double-large-prime factor base shrunk from "
+         "c_D = 2.0 to 1.7 and the per-pair square root computed by a fixed addition chain (same values). Cold M-eq of the "
+         "new configuration divided by the frozen DL on the same instance; geometric mean over seeds, with mod-ell and "
+         "F_q additions priced at 0 (the frozen model), 0.5 and 1 M-eq each. ✓ = below 1 at every seed. "
+         f"Class: {g['class']}. {g['validation']}.", "",
+         "| IC arm | k | additions 0 | 0.5 | 1 |", "|:--|--:|--:|--:|--:|"]
+    f = lambda x: f"{x['geomean']:.3f}" + (" ✓" if x["all_below_1"] else "")
+    for r in g["rows"]:
+        L.append(f"| {r['arm']} | {r['k']} | {f(r['0.0'])} | {f(r['0.5'])} | {f(r['1.0'])} |")
+    b = g["rho_band_k22"]
+    if b:
+        L += ["", "DL with both changes against the frozen negation-map rho at k = 22 (mean cold M-eq, §5a band): "
+              + ", ".join(f"w = {w}: {b[w]['ic'] / b[w]['rho']:.4f}" for w in ("0", "0.1", "1")) + "."]
+    L += ["", f"Study: [{g['study']}](../../{g['study']}); [report](../../{g['report']}); source `{g['source']}`. "
+          "Wall time is not claimed (local L0 runs; CPU diagnostic in the study).", ""]
+    return L
+
+
+def ghs_cd_chain_html(g: dict) -> str:
+    md = ghs_cd_chain_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| IC arm")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-cd-chain-20261114"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>: c<sub>D</sub> = 1.7 with a '
+            'fixed-exponent square root against the frozen DL</h2>' + body +
+            '<div class="scroll"><table><thead><tr><th>IC arm</th><th>k</th><th>additions 0</th><th>0.5</th>'
+            '<th>1</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_cd_chain"], "Analysis") + '</section>')
+
+
 def _ci(v, lo, hi, i):
     return f"{v[i]:.3g} [{lo[i]:.3g}, {hi[i]:.3g}]"
 
@@ -2907,6 +2972,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "pkm_symmetric_component": pkm_symmetric_component(),
         "ghs_weak_n4_component": ghs_weak_n4(),
         "ghs_weak_n4v2_component": ghs_weak_n4v2(),
+        "ghs_weak_cd_chain_component": ghs_weak_cd_chain(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -4128,6 +4194,7 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['a']} | {r['n']} | {r['d']} | {r['cofactor']} | {r['targets']} | {r['mean_ic_trials']:,.0f} | "
                  f"{r['mean_ic_s']:.4g} | {r['mean_rho_s']:.3g} | {r['ic_over_rho_wall']:,.0f} |")
     L += ghs2_md(doc["ghs_weak_n4v2_component"])
+    L += ghs_cd_chain_md(doc["ghs_weak_cd_chain_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -5932,6 +5999,7 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["ic_over_rho_wall"]:,.0f}</td></tr>')
     P.append('</tbody></table>' + gh(al["study"], 'Study, report, raw records and validation') + '</section>')
     P.append(ghs2_html(doc["ghs_weak_n4v2_component"]))
+    P.append(ghs_cd_chain_html(doc["ghs_weak_cd_chain_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

@@ -140,3 +140,10 @@ B mod squares, which is +1 here; `descent_class.py` used chi(A²−4) at x = 0, 
 contains, so no result changes.
 
 No cost claim, no matched rho, no figure or PDF (matplotlib missing). All of it [pcc:unverified].
+
+**Update 2026-11-14:** the open points above were measured in
+[`research/curve25519_descent_skip_20261114`](../curve25519_descent_skip_20261114/README.md). For `square-bits` the lift
+oracle already tries only the 4 class +1 lifts, because `cofactor_fiber` builds the torsion group from the base points'
+`[r]P` and every base point is in 2E(F_p); an explicit skip fired 0 times. On the `bits` base the oracle tries all 8
+lifts. A one-bit class label reaches 91.9% of the full coset label for frame selection. Lifts cost 8× (`bits`) and 4×
+(`square-bits`) per target and lowered hits per counted mul-add on `square-bits` (rate ratio 0.69, post hoc p = 0.0045).

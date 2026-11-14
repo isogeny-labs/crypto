@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T06:54:56Z",
+ "id": "PCC-20261114-69b0f2",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0a12a195c66785b5b8b4b4409ab0cc02ee991f64",
+  "model": "",
+  "session": "norm-growing-input-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "34c7e243880484fa81a2a9af54c0e582296049468ac95e150bce3dc783f1111d",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormGrowingInput.four_membership"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact declaration context. Generic coefficient-support budget and actual Mathlib computed monic division over CommRing; actual growing chart over Field K, a=h+2 covers all a>=2. Literal multivariate variables have consecutive weights via explicit bijection. Actual norm/support/remainder, monicity/degrees, coefficient weightedTotalDegree <=2*degree(P)-2*j. Exact norm multiplication requires stated target-curve premise. Four-variable source binding is a polynomial-ring renaming equivalence, not finite-field value comparison. No degree29 normalized-row, full closure, public finder, coverage, extraction/retries or expected bit-cost claim. Unsigned; gate/fresh pending at creation.",
+ "statement": "Exact source-bound declaration NormGrowingInput.four_membership: theorem four_membership (alpha beta r z : K) (P : K[X]) : (membership 1 alpha beta r z P).map (fourRename (K"
+}

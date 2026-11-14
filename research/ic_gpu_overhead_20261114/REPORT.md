@@ -52,7 +52,11 @@ Both on A100 80GB PCIe pods, CUDA 12.8, ABBA per sweep, same instances and seeds
 `research/ic_gpu_e2e_20261113` (no mitm row). Counted ops, calls and hit rate are identical per
 repeat in every run of every arm; every row recovered the planted logarithm. S is the counted ops
 priced at the curve's calibration: pinned for the Koblitz curve (identical everywhere), measured once
-per `ic bench` run for the char-2 curves (about ±0.5% between runs of the same arm, any engine).
+per `ic bench` run for the char-2 curves, so their S moves between runs of the same arm with the
+re-measured word-XOR price, not with the engine: same-arm max/min up to 1.013 in A/B 1 and up to 1.358
+(A/B 2, n=29, main) and 1.165 (A/B 2, n=25, merged) in A/B 2 (corrected 2026-11-14 after the
+validator's review, `research/ic_gpu_replay_20261114/VALIDATION_REVIEW.md`; the first version said
+about ±0.5%, true of A/B 1 only).
 
 ### A/B 1: `abecd26901` (text serve, `AnfRow` route) against this branch before merging main
 
@@ -66,7 +70,7 @@ Pod `gvor4yci0yby96` (host `ruvct7owvq4l`), 04:37Z–04:57Z, about $0.70; `raw/o
 | char-2 n=29 (30) | 1 | 2.619 → 1.543 (1.70×) | 1.04 → 0.18 | 27.35 → 17.45 (1.57×) |
 
 Largest max/min between two runs of the same arm and target: 1.20 (n=25), 1.15 (n=23), 1.004
-(n=29) [pcc:unverified]. CPU `fes-f2` at n=23: 13.65 → 13.44 ms per call (1.5%, same-arm spread 0.5%).
+(n=29) [pcc:unverified]. CPU `fes-f2` at n=23: 13.65 → 13.43 ms per call (1.6%, same-arm spread 0.5%).
 
 ### A/B 2: main `3e432229fc` (with `fes_pack_direct`, text serve) against the merged branch
 

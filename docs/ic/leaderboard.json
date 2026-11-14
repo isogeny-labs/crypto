@@ -420,7 +420,7 @@
   },
   "gpu_fes_e2e_report": {
    "path": "research/ic_gpu_e2e_20261113/REPORT.md",
-   "sha256": "3bc11173520ab3e3cdc6a4968a98556686a420bd01e7c961efabb87e6af16b66"
+   "sha256": "6146ddab0f94a6d1a763e1d6ad7fcf760bf391f725b1c25865bb29e06de12b62"
   },
   "gpu_kernel_round1": {
    "path": "research/ic_gpu_measure_20261112/results.json",
@@ -468,7 +468,7 @@
   },
   "solver_registry_source": {
    "path": "src/cryptanalysis/ic_framework/solvers.rs",
-   "sha256": "b90a0f2a86b779511359ef456a282a7e59a95f3f8ecc0852bb2aec8f280df9f1"
+   "sha256": "f8f9a75589e9690274d655b5996301729be1cd58bbcd048e7d7a169298eb31a8"
   },
   "primo_readme": {
    "path": "integrations/primo/README.md",
@@ -489,6 +489,10 @@
   "ghs_weak_n4v2": {
    "path": "research/quartic_n4v2_20261020/results/summary.json",
    "sha256": "a8d6c823f4b90829f409ef20e51df7de70fae6789a6458e272a730e71483ad7c"
+  },
+  "ghs_weak_cd_chain": {
+   "path": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
+   "sha256": "d363ee50d3da05c23085ae383ffadc61bcfe77e77711e756559ae79ed3656c79"
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -336462,8 +336466,8 @@
   },
   "host": "c8a.2xlarge (AMD EPYC 9R45) on EKS, L2",
   "other_sizes": "At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); 28 bits is undecidable (infrastructure); see the README.",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_packed_filter_20261029/VALIDATION.json); single session, not replicated. Caveats: the validator re-priced the bitops with its own code rather than re-running `ecbench work`; the image digest is bound through the binary hashes, not pod status",
+  "validated": true
  },
  "lazy_members_component": {
   "rows": [
@@ -337194,8 +337198,8 @@
   "study": "research/ecbench_generator_orbit_20261022/",
   "report": "research/ecbench_generator_orbit_20261022/REPORT.pdf",
   "source": "research/ecbench_generator_orbit_20261022/figures/summary.json",
-  "validated": false,
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: validator report raw_data sessions/a1-n29/records.jsonl: sessions/a1-n29/records.jsonl is not a file; validator report raw_data sessions/a0-n13/records.jsonl: sessions/a0-n13/records.jsonl is not a file; validator report raw_data sessions/a1-n17/records.jsonl: sessions/a1-n17/records.jsonl is not a file; validator report raw_data sessions/a0-n19/records.jsonl: sessions/a0-n19/records.jsonl is not a file; validator report raw_data sessions/a0-n23/records.jsonl: sessions/a0-n23/records.jsonl is not a file; validator report raw_data sessions/a0-n31/records.jsonl: sessions/a0-n31/records.jsonl is not a file; validator report raw_data sessions/a0-n37/records.jsonl: sessions/a0-n37/records.jsonl is not a file."
+  "validated": true,
+  "validation": "Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study directory: replay certificate, validator report, §5a-banded rho-frob reference)."
  },
  "lazy_columns2_component": {
   "rows": [
@@ -338550,8 +338554,8 @@
   "study": "research/ic_d4_char2_lever_20261023/",
   "report": "research/ic_d4_char2_lever_20261023/REPORT.pdf",
   "source": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "validated with caveats: replay certificate, validator report and the matched rho reference with the §5a band (research/ic_d4_char2_lever_20261023/VALIDATION.json)",
+  "validated": true
  },
  "algebraic_ladder": {
   "source": "research/ic_m2_linear_ladder_20261024/fit.json",
@@ -339088,8 +339092,8 @@
   "study": "research/ic_aimed_gather_20261023/",
   "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
   "source": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
-  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.",
-  "validated": false
+  "validation": "validated: replay certificate, validator report and the matched rho reference with the §5a band (benchmarks/20261029-ic-aimed-gather/VALIDATION.json)",
+  "validated": true
  },
  "mt_fieldops_component": {
   "rows": [
@@ -346257,6 +346261,331 @@
   "headline_arm": "DL",
   "study": "research/quartic_n4v2_20261020/",
   "report": "research/quartic_n4v2_20261020/README.md"
+ },
+ "ghs_weak_cd_chain_component": {
+  "rows": [
+   {
+    "arm": "DL",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.726364292069,
+     "max": 0.729344705894,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.814061093689,
+     "max": 0.821587911593,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.859603846917,
+     "max": 0.871991812188,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.737400181003,
+     "max": 0.739506827839,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.830815463661,
+     "max": 0.832386397864,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.876852551566,
+     "max": 0.879178209152,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.693963433674,
+     "max": 0.696094243199,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.796492952379,
+     "max": 0.797853860013,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.848309698216,
+     "max": 0.849253441859,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.71046267916,
+     "max": 0.711600017823,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.81189375135,
+     "max": 0.816038566031,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.862209497737,
+     "max": 0.867695541896,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.680518098261,
+     "max": 0.68089709246,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.79448235449,
+     "max": 0.799194888629,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.850718193914,
+     "max": 0.857406969368,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 0.728590269242,
+     "max": 0.734736210517,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.877547217673,
+     "max": 0.888656617679,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.94240952795,
+     "max": 0.960844455693,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 0.75387213011,
+     "max": 0.758186533597,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.912602834409,
+     "max": 0.915623900256,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.975237671644,
+     "max": 0.9783113274,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 0.668277459138,
+     "max": 0.672679118211,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.845846563704,
+     "max": 0.848265541811,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.921387907077,
+     "max": 0.922897280807,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 0.699967686795,
+     "max": 0.702108135873,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.870648236775,
+     "max": 0.877327666678,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.941373854155,
+     "max": 0.949600831136,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "DL1",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 0.643925508633,
+     "max": 0.64464741842,
+     "all_below_1": true
+    },
+    "0.5": {
+     "geomean": 0.840683429437,
+     "max": 0.848287281497,
+     "all_below_1": true
+    },
+    "1.0": {
+     "geomean": 0.921908272717,
+     "max": 0.931990278542,
+     "all_below_1": true
+    }
+   },
+   {
+    "arm": "D",
+    "q": 262111,
+    "k": 18,
+    "0.0": {
+     "geomean": 1.09179603745,
+     "max": 1.133822797,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.10009345388,
+     "max": 1.14179691808,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.1058858913,
+     "max": 1.1473595738,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 524287,
+    "k": 19,
+    "0.0": {
+     "geomean": 1.12244882796,
+     "max": 1.13213121385,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.12683843757,
+     "max": 1.1369143937,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.12984511774,
+     "max": 1.14019109841,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 1048507,
+    "k": 20,
+    "0.0": {
+     "geomean": 1.07239004845,
+     "max": 1.07663037029,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.0828500205,
+     "max": 1.08708711273,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.09009394098,
+     "max": 1.09433046372,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 2097091,
+    "k": 21,
+    "0.0": {
+     "geomean": 1.08869994492,
+     "max": 1.09933785313,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.0975345145,
+     "max": 1.10831824336,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.10362451982,
+     "max": 1.11450723579,
+     "all_below_1": false
+    }
+   },
+   {
+    "arm": "D",
+    "q": 4194271,
+    "k": 22,
+    "0.0": {
+     "geomean": 1.07752736947,
+     "max": 1.0909653251,
+     "all_below_1": false
+    },
+    "0.5": {
+     "geomean": 1.08936182752,
+     "max": 1.10303063001,
+     "all_below_1": false
+    },
+    "1.0": {
+     "geomean": 1.09751798271,
+     "max": 1.11134419636,
+     "all_below_1": false
+    }
+   }
+  ],
+  "headline": true,
+  "rho_band_k22": {
+   "0": {
+    "ic": 1038514332.42,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 1208511467.82,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2738485686.42,
+    "rho": 1492814000000.0
+   }
+  },
+  "study": "research/quartic_dl1_cd_sqrt_20261113/",
+  "report": "research/quartic_dl1_cd_sqrt_20261113/REPORT.pdf",
+  "source": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
+  "class": "component improvement over the frozen N4 v2 DL (restricted to the GHS-weak family)",
+  "validation": "validated: replay certificate, validator report and the negation-map rho reference with the §5a band (research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json)",
+  "validated": true
  },
  "phases": [
   {

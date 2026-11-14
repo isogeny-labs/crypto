@@ -9,7 +9,7 @@ calibration receipts, and uploads its raw archive. The local selector uses
 all 16 paired points, six exact sign-flip tests, and a 0.05/6 threshold.
 
 The approved allocation is two `g5g.4xlarge` Spot instances in
-`us-east-1d`, each with a $0.27/hour maximum bid, 50 GB encrypted gp3
+`us-east-1a`, each with a $0.27/hour maximum bid, 50 GB encrypted gp3
 root disk, and a 21,600-second lifetime. The bid-based six-hour projection
 is $3.37 under the owner's $4.20 allocation cap. The host shutdown timer
 and an independently detached local termination guard retain their
@@ -17,10 +17,11 @@ outcomes. The projection depends on both guards or provider access
 functioning through the deadline.
 
 This native allocation follows the east-region AWS protocol at commit
-`c1b40731907eb7db238186e1b11f58d754572fd0`, which the owner linked in
-the spend approval. The parent README's later west-region alternative is a
-separate Python dispatch route; this native run binds its own region, zone,
-instance type, source hash, and budget in the controller receipt.
+`c1b40731907eb7db238186e1b11f58d754572fd0` and the
+[2026-11-14 route amendment](AWS_EAST1A_AMENDMENT_20261114.md). The parent
+README's west-region alternative is a separate Python dispatch route. This
+native run binds its own region, zone, instance type, source hash, and budget
+in the controller receipt.
 
 Use Rust 1.99.1 for this isolated crate and a full, clean checkout of the
 exact source commit. All output directories belong outside the repository.

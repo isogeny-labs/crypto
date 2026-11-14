@@ -300,6 +300,27 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
     return run_device<FieldP256>(*f, fb_x, fb_y, n_fb, tx, ty, n_targets, lookup, chunk, out, cap, n_found, seconds);
 }
 
+/* RF_PROFILE builds: reset and read the sampled phase cycles of
+ * rf_decompose_thread (rootfind.cuh).  Return 0 on success, -1 when the
+ * build has no profile. */
+extern "C" int rf_profile_reset(void) {
+#if RF_PROFILE
+    unsigned long long z[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    return cudaMemcpyToSymbol(rf_prof_cycles, z, sizeof z) == cudaSuccess ? 0 : -1;
+#else
+    return -1;
+#endif
+}
+
+extern "C" int rf_profile_read(unsigned long long *out8) {
+#if RF_PROFILE
+    return cudaMemcpyFromSymbol(out8, rf_prof_cycles, 8 * sizeof(unsigned long long)) == cudaSuccess ? 0 : -1;
+#else
+    (void)out8;
+    return -1;
+#endif
+}
+
 extern "C" int rf_cuda_device_present(char *name, int name_len) {
     int n = 0;
     if (cudaGetDeviceCount(&n) != cudaSuccess || n <= 0) return 0;

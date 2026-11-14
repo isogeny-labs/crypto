@@ -68,7 +68,8 @@ Derived wall ratios (practicality note):
 - `fes-f2` → `fes-f2-gpu`, same trajectory and S: whole solve **12.3×** faster at 24 unknowns,
   **44.1×** at 26 [pcc:unverified].
 - `inherited-f4` → `fes-f2-gpu`: whole solve **17.7×**, **10.4×** and **23.1×** faster at 24, 26
-  and 30 unknowns, while `inherited-f4`'s counted S stays 9×, 53× and 106× lower [pcc:unverified].
+  and 30 unknowns, while `inherited-f4`'s counted S stays 10×, 53× and 106× lower [pcc:unverified] (9.96× at 24 unknowns;
+  the first version rounded it to 9×, corrected after `research/ic_gpu_replay_20261114/VALIDATION_REVIEW.md`).
 - `fes-f2` at n=29 was not run: about 0.7 s per call at 30 unknowns
   (`research/inherited_f4_next_20261112`) over 8977 calls is roughly 1.7 hours, and its S equals
   `fes-f2-gpu`'s by construction.
