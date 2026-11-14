@@ -22,7 +22,9 @@ use std::process::ExitCode;
 
 use serde_json::{json, Value};
 
-const READINGS: [&str; 7] = ["gae_w0", "gae_w01", "gae_w1", "fpm_low", "fpm_mid", "fpm_high", "trials"];
+const READINGS: [&str; 7] = [
+    "gae_w0", "gae_w01", "gae_w1", "fpm_low", "fpm_mid", "fpm_high", "trials",
+];
 /// Readings that are costs (the last, relation trials, is a count).
 const COSTS: usize = 6;
 const BOOT: usize = 2000;
@@ -107,7 +109,11 @@ fn mean_resampled(bc: &ByCurve, picks: &[(u64, Vec<usize>)], k: usize, rng: &mut
         // The arm may hold a different number of runs on this curve than
         // the arm that fixed the picks: draw inside this arm's runs.
         for &i in idx {
-            let j = if v.len() == idx.len() { i } else { rng.below(v.len()) };
+            let j = if v.len() == idx.len() {
+                i
+            } else {
+                rng.below(v.len())
+            };
             s += v[j][k];
             n += 1;
         }
@@ -162,7 +168,8 @@ fn main() -> ExitCode {
             "skip" => skips.push(v),
             "run" => {
                 n_run += 1;
-                let good = v["certified"].as_bool() == Some(true) && v["ok"].as_bool() == Some(true);
+                let good =
+                    v["certified"].as_bool() == Some(true) && v["ok"].as_bool() == Some(true);
                 if !good {
                     n_bad += 1;
                     bad.push(json!({"family": v["family"], "p": v["p"], "g": v["g"], "arm": v["arm"],
@@ -204,7 +211,11 @@ fn main() -> ExitCode {
     type Series = Vec<(f64, f64, Vec<f64>)>;
     let mut series: BTreeMap<(String, u64, String), Vec<Series>> = BTreeMap::new();
     for ((family, g, p), arms) in &cells {
-        let rho_name = if family == "quartic" { "Q_rho_neg" } else { "R_rho_neg" };
+        let rho_name = if family == "quartic" {
+            "Q_rho_neg"
+        } else {
+            "R_rho_neg"
+        };
         let rho = arms.get(rho_name);
         for (arm, bc) in arms {
             let curves: Vec<u64> = bc.keys().copied().collect();
@@ -212,8 +223,8 @@ fn main() -> ExitCode {
             let n: usize = sizes.values().sum();
             let mut rec = json!({"family": family, "g": g, "p": p, "arm": arm,
                 "curves": curves.len(), "runs": n});
-            let mut boots_mean = vec![Vec::with_capacity(BOOT); 7];
-            let mut boots_ratio = vec![Vec::with_capacity(BOOT); 7];
+            let mut boots_mean: Vec<Vec<f64>> = (0..7).map(|_| Vec::with_capacity(BOOT)).collect();
+            let mut boots_ratio: Vec<Vec<f64>> = (0..7).map(|_| Vec::with_capacity(BOOT)).collect();
             for _ in 0..BOOT {
                 let picks = resample(&curves, &sizes, &mut rng);
                 for k in 0..7 {
@@ -224,19 +235,27 @@ fn main() -> ExitCode {
                     }
                 }
             }
-            let ser = series.entry((family.clone(), *g, arm.clone())).or_insert_with(|| vec![Vec::new(); 7]);
+            let ser = series
+                .entry((family.clone(), *g, arm.clone()))
+                .or_insert_with(|| vec![Vec::new(); 7]);
             let mut verdicts = Vec::new();
             for k in 0..7 {
                 let m = mean_of(bc, k);
                 let mut b = boots_mean[k].clone();
-                rec[READINGS[k]] = json!({"mean": m, "lo": pct(&mut b, 0.025), "hi": pct(&mut b, 0.975)});
-                ser[k].push(((*p as f64).ln(), m.ln(), boots_mean[k].iter().map(|x| x.ln()).collect()));
+                rec[READINGS[k]] =
+                    json!({"mean": m, "lo": pct(&mut b, 0.025), "hi": pct(&mut b, 0.975)});
+                ser[k].push((
+                    (*p as f64).ln(),
+                    m.ln(),
+                    boots_mean[k].iter().map(|x| x.ln()).collect(),
+                ));
                 if let Some(rb) = rho {
                     if arm != rho_name && k < COSTS {
                         let ratio = m / mean_of(rb, k);
                         let mut br = boots_ratio[k].clone();
                         let (lo, hi) = (pct(&mut br, 0.025), pct(&mut br, 0.975));
-                        rec[format!("{}_over_rho", READINGS[k])] = json!({"ratio": ratio, "lo": lo, "hi": hi});
+                        rec[format!("{}_over_rho", READINGS[k])] =
+                            json!({"ratio": ratio, "lo": lo, "hi": hi});
                         verdicts.push(if hi < 1.0 {
                             "below"
                         } else if lo > 1.0 {
@@ -267,8 +286,21 @@ fn main() -> ExitCode {
                 .collect();
             let avg = |k: &str| mine.iter().map(|r| f(&r.raw, k)).sum::<f64>() / mine.len() as f64;
             for k in [
-                "group_ops", "cantor_mul", "cantor_inv", "rel_mul", "la_mul", "la_add", "trials", "candidates",
-                "splits", "relations", "fb_cols", "core_cols", "prefilter_rejects", "steps", "wall_ns",
+                "group_ops",
+                "cantor_mul",
+                "cantor_inv",
+                "rel_mul",
+                "la_mul",
+                "la_add",
+                "trials",
+                "candidates",
+                "splits",
+                "relations",
+                "fb_cols",
+                "core_cols",
+                "prefilter_rejects",
+                "steps",
+                "wall_ns",
             ] {
                 rec[format!("mean_{k}")] = json!(avg(k));
             }
@@ -276,9 +308,11 @@ fn main() -> ExitCode {
             if cand > 0.0 {
                 let sp: f64 = mine.iter().map(|r| f(&r.raw, "splits")).sum();
                 rec["split_fraction"] = json!(sp / cand);
-                rec["split_fraction_times_g_factorial"] = json!(sp / cand * (1..=*g).product::<u64>() as f64);
+                rec["split_fraction_times_g_factorial"] =
+                    json!(sp / cand * (1..=*g).product::<u64>() as f64);
             }
-            let ln_r: f64 = mine.iter().map(|r| f(&r.raw, "r").ln()).sum::<f64>() / mine.len() as f64;
+            let ln_r: f64 =
+                mine.iter().map(|r| f(&r.raw, "r").ln()).sum::<f64>() / mine.len() as f64;
             rec["mean_ln_r"] = json!(ln_r);
             cell_out.push(rec);
         }
@@ -312,17 +346,31 @@ fn main() -> ExitCode {
     // prefilter pairs: same instance, same seed, arm vs arm+pre
     let mut by_id: BTreeMap<(String, u64, u64, u64, u64, String), &Run> = BTreeMap::new();
     for r in &runs {
-        by_id.insert((r.family.clone(), r.g, r.p, r.curve, r.seed, r.arm.clone()), r);
+        by_id.insert(
+            (r.family.clone(), r.g, r.p, r.curve, r.seed, r.arm.clone()),
+            r,
+        );
     }
     let mut pre: BTreeMap<(u64, u64, String), Vec<(f64, f64, f64, bool)>> = BTreeMap::new();
     for ((family, g, p, curve, seed, arm), on) in &by_id {
-        let Some(base) = arm.strip_suffix("+pre") else { continue };
-        let Some(off) = by_id.get(&(family.clone(), *g, *p, *curve, *seed, base.to_string())) else {
+        let Some(base) = arm.strip_suffix("+pre") else {
             continue;
         };
-        let same = ["trials", "relations", "splits", "group_ops", "cantor_mul", "la_mul", "candidates"]
-            .iter()
-            .all(|k| f(&on.raw, k) == f(&off.raw, k));
+        let Some(off) = by_id.get(&(family.clone(), *g, *p, *curve, *seed, base.to_string()))
+        else {
+            continue;
+        };
+        let same = [
+            "trials",
+            "relations",
+            "splits",
+            "group_ops",
+            "cantor_mul",
+            "la_mul",
+            "candidates",
+        ]
+        .iter()
+        .all(|k| f(&on.raw, k) == f(&off.raw, k));
         pre.entry((*g, *p, base.to_string())).or_default().push((
             f(&on.raw, "rel_mul") / f(&off.raw, "rel_mul"),
             on.cost[4] / off.cost[4],
@@ -355,7 +403,14 @@ fn main() -> ExitCode {
     let mut order: BTreeMap<(u64, u64, u64), f64> = BTreeMap::new();
     for i in &instances {
         if i["family"] == "hyperelliptic" {
-            order.insert((i["g"].as_u64().unwrap(), i["p"].as_u64().unwrap(), i["curve_seed"].as_u64().unwrap()), f(i, "order"));
+            order.insert(
+                (
+                    i["g"].as_u64().unwrap(),
+                    i["p"].as_u64().unwrap(),
+                    i["curve_seed"].as_u64().unwrap(),
+                ),
+                f(i, "order"),
+            );
         }
     }
     let mut sm: BTreeMap<(u64, u64, u64), (f64, f64, f64)> = BTreeMap::new();
@@ -367,7 +422,9 @@ fn main() -> ExitCode {
     }
     let mut smooth_out = Vec::new();
     for ((g, p, curve), (cand, splits, fb)) in &sm {
-        let Some(n) = order.get(&(*g, *p, *curve)) else { continue };
+        let Some(n) = order.get(&(*g, *p, *curve)) else {
+            continue;
+        };
         let mut comb = 1.0f64;
         let mut gfact = 1.0f64;
         for i in 0..*g {
@@ -375,10 +432,12 @@ fn main() -> ExitCode {
             gfact *= i as f64 + 1.0;
         }
         let predicted = comb * 2f64.powi(*g as i32) / n;
-        smooth_out.push(json!({"g": g, "p": p, "curve_seed": curve, "fb": fb, "order": n,
+        smooth_out.push(
+            json!({"g": g, "p": p, "curve_seed": curve, "fb": fb, "order": n,
             "candidates": cand, "splits": splits, "observed": splits / cand, "predicted": predicted,
             "observed_over_predicted": splits / cand / predicted,
-            "predicted_times_g_factorial": predicted * gfact}));
+            "predicted_times_g_factorial": predicted * gfact}),
+        );
     }
 
     // Smith on the admitted genus-3 curves

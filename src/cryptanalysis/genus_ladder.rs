@@ -266,7 +266,11 @@ impl Fk {
             return (r0, s0, t0);
         }
         let li = self.inv(r0.lead());
-        (self.scale(&r0, li), self.scale(&s0, li), self.scale(&t0, li))
+        (
+            self.scale(&r0, li),
+            self.scale(&s0, li),
+            self.scale(&t0, li),
+        )
     }
     fn eval(&self, a: &Poly, x: u64) -> u64 {
         let mut acc = 0;
@@ -311,7 +315,12 @@ fn sqrt_mod(a: u64, p: u64) -> Option<u64> {
     while pow_mod(z, (p - 1) / 2, p) != p - 1 {
         z += 1;
     }
-    let (mut m, mut c, mut t, mut r) = (s, pow_mod(z, q, p), pow_mod(a, q, p), pow_mod(a, q.div_ceil(2), p));
+    let (mut m, mut c, mut t, mut r) = (
+        s,
+        pow_mod(z, q, p),
+        pow_mod(a, q, p),
+        pow_mod(a, q.div_ceil(2), p),
+    );
     while t != 1 {
         let mut i = 0;
         let mut tt = t;
@@ -361,7 +370,7 @@ pub struct JCurve {
 
 impl JCurve {
     pub fn new(p: u64, genus: u32, f: &[u64]) -> Result<JCurve, String> {
-        if p < 3 || p >= (1 << 31) || !is_prime_u64(p) {
+        if !(3..(1 << 31)).contains(&p) || !is_prime_u64(p) {
             return Err(format!("p must be an odd prime below 2^31, not {p}"));
         }
         if !(1..=MAX_GENUS as u32).contains(&genus) {
@@ -451,13 +460,19 @@ impl JCurve {
 
     /// `u`, lowest degree first, with its leading 1.
     pub fn u_coeffs(&self, d: &JDiv) -> Vec<u64> {
-        let mut out: Vec<u64> = d.u[..d.deg as usize].iter().map(|&c| u64::from(c)).collect();
+        let mut out: Vec<u64> = d.u[..d.deg as usize]
+            .iter()
+            .map(|&c| u64::from(c))
+            .collect();
         out.push(1);
         out
     }
     /// `v`, lowest degree first, `deg` entries.
     pub fn v_coeffs(&self, d: &JDiv) -> Vec<u64> {
-        d.v[..d.deg as usize].iter().map(|&c| u64::from(c)).collect()
+        d.v[..d.deg as usize]
+            .iter()
+            .map(|&c| u64::from(c))
+            .collect()
     }
 
     /// `D` is a reduced divisor on this curve.
@@ -696,7 +711,9 @@ impl JCurve {
             bound += w * coef(i);
         }
         let sp = (p as f64).sqrt();
-        let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9)).floor().max(1.0) as i128;
+        let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
+            .floor()
+            .max(1.0) as i128;
         let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
         let from = (base - bound).max(lo).max(1);
         let to = (base + bound).min(hi);
@@ -706,7 +723,9 @@ impl JCurve {
         let width = (to - from) as u64;
         let m = (((width + 1) as f64).sqrt().ceil() as u64).max(1);
         if m > (1 << 26) {
-            return Err(format!("order window too wide for baby-step giant-step (m = {m})"));
+            return Err(format!(
+                "order window too wide for baby-step giant-step (m = {m})"
+            ));
         }
         let mut st = seed ^ 0xA5A5_5A5A;
         let mut cands = Vec::new();
@@ -1086,7 +1105,11 @@ pub fn disc_character(p: u64, u: &[u64], chi: &[i8], n: &mut Nat) -> i8 {
     n.mul += d as u64;
     vtrim(&mut b);
     // disc(u) = (−1)^{d(d−1)/2} Res(u, u′)
-    let mut sign: i8 = if (d * (d - 1) / 2) % 2 == 1 { chi[(p - 1) as usize] } else { 1 };
+    let mut sign: i8 = if (d * (d - 1) / 2) % 2 == 1 {
+        chi[(p - 1) as usize]
+    } else {
+        1
+    };
     loop {
         if b.is_empty() {
             return 0;
@@ -1094,7 +1117,11 @@ pub fn disc_character(p: u64, u: &[u64], chi: &[i8], n: &mut Nat) -> i8 {
         let m = a.len() - 1;
         let nn = b.len() - 1;
         if nn == 0 {
-            return if m % 2 == 1 { sign * chi[b[0] as usize] } else { sign };
+            return if m % 2 == 1 {
+                sign * chi[b[0] as usize]
+            } else {
+                sign
+            };
         }
         // pseudo-remainder: lc(b)^δ a = q b + r, δ = m − n + 1 steps.
         let lb = b[nn];
@@ -1162,6 +1189,10 @@ pub struct IcParams {
     pub nb: usize,
     pub seed: u64,
     pub max_trials: u64,
+    /// Walk steps between fresh random starts ([`RESTART`] in the frozen
+    /// grid).  A walk in a group of order `r` meets itself after about
+    /// `sqrt(pi r / 2)` steps and then repeats; [`restart_sqrt`] stays below.
+    pub restart: u64,
     /// The discriminant-parity prefilter (module notes).
     pub prefilter: bool,
     /// Check every accepted relation by group arithmetic (tests only).
@@ -1225,6 +1256,11 @@ impl IcResult {
 /// Walk length between fresh random starts.
 pub const RESTART: u64 = 4096;
 
+/// The amendment rule: `min(4096, max(16, floor(sqrt(r) / 2)))`.
+pub fn restart_sqrt(r: u64) -> u64 {
+    (((r as f64).sqrt() / 2.0) as u64).clamp(16, RESTART)
+}
+
 /// Run one index-calculus arm on an instance.  The structure is
 /// `ic_control::run_ic_with`, with the genus a variable.
 pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
@@ -1253,7 +1289,11 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
         chi[(y * y % p) as usize] = 1;
     }
     res.rel.mul += (p - 1) / 2;
-    let want = if prm.arm == Arm::Full { usize::MAX } else { prm.nb };
+    let want = if prm.arm == Arm::Full {
+        usize::MAX
+    } else {
+        prm.nb
+    };
     let mut col = vec![u32::MAX; p as usize];
     let mut ncols = 0usize;
     for x in 0..p {
@@ -1303,7 +1343,7 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= RESTART {
+            if since_restart >= prm.restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1557,17 +1597,25 @@ mod tests {
     #[test]
     fn cantor_matches_hyper64() {
         for (p, g) in [(131u64, 2u32), (131, 3), (1031, 3)] {
-            let f = (1..50).map(|s| random_f(p, g, s)).find(|f| JCurve::new(p, g, f).is_ok()).unwrap();
+            let f = (1..50)
+                .map(|s| random_f(p, g, s))
+                .find(|f| JCurve::new(p, g, f).is_ok())
+                .unwrap();
             let c = JCurve::new(p, g, &f).unwrap();
             let h = H64Curve::new(p, g, &f).unwrap();
             let mut st = 11u64;
             let mut pair = || {
-                let (mut a, mut ha) = (JDiv::IDENTITY, h.cantor(Default::default(), Default::default()));
+                let (mut a, mut ha) = (
+                    JDiv::IDENTITY,
+                    h.cantor(Default::default(), Default::default()),
+                );
                 let mut placed = 0;
                 while placed < g {
                     st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
                     let x = mix64(st) % p;
-                    let Some(y) = sqrt_mod(c.k.eval(&c.f, x), p) else { continue };
+                    let Some(y) = sqrt_mod(c.k.eval(&c.f, x), p) else {
+                        continue;
+                    };
                     a = c.cantor(a, c.point(x, y).unwrap());
                     ha = h.cantor(ha, h.point(x, y).unwrap());
                     placed += 1;
@@ -1582,8 +1630,16 @@ mod tests {
                 assert_eq!(c.v_coeffs(&a), hv, "v at step {i}");
                 assert!(c.is_valid(&a));
                 let (b, hb) = pair();
-                a = if i % 3 == 0 { c.cantor(a, a) } else { c.cantor(a, b) };
-                ha = if i % 3 == 0 { h.cantor(ha, ha) } else { h.cantor(ha, hb) };
+                a = if i % 3 == 0 {
+                    c.cantor(a, a)
+                } else {
+                    c.cantor(a, b)
+                };
+                ha = if i % 3 == 0 {
+                    h.cantor(ha, ha)
+                } else {
+                    h.cantor(ha, hb)
+                };
             }
         }
     }
@@ -1593,7 +1649,10 @@ mod tests {
     fn group_axioms_all_genera() {
         for g in 2..=5u32 {
             let p = 67;
-            let f = (1..50).map(|s| random_f(p, g, s)).find(|f| JCurve::new(p, g, f).is_ok()).unwrap();
+            let f = (1..50)
+                .map(|s| random_f(p, g, s))
+                .find(|f| JCurve::new(p, g, f).is_ok())
+                .unwrap();
             let c = JCurve::new(p, g, &f).unwrap();
             let mut st = 5u64;
             for _ in 0..60 {
@@ -1712,7 +1771,9 @@ mod tests {
             assert_eq!(num % k as i128, 0);
             c[k] = num / k as i128;
         }
-        (0..=g).map(|i| c[i] * if i < g { 1 + pp.pow((g - i) as u32) } else { 1 }).sum()
+        (0..=g)
+            .map(|i| c[i] * if i < g { 1 + pp.pow((g - i) as u32) } else { 1 })
+            .sum()
     }
 
     /// `jacobian_order` against the brute-force zeta function (genus 2, 3,
@@ -1726,9 +1787,17 @@ mod tests {
             let mut done = 0;
             for cs in 1..400u64 {
                 let f = random_f(p, g as u32, cs);
-                let Ok(c) = JCurve::new(p, g as u32, &f) else { continue };
-                let Ok(n) = c.jacobian_order(cs) else { continue };
-                assert_eq!(i128::from(n), brute_order(p, g, &f), "p = {p}, g = {g}, seed {cs}");
+                let Ok(c) = JCurve::new(p, g as u32, &f) else {
+                    continue;
+                };
+                let Ok(n) = c.jacobian_order(cs) else {
+                    continue;
+                };
+                assert_eq!(
+                    i128::from(n),
+                    brute_order(p, g, &f),
+                    "p = {p}, g = {g}, seed {cs}"
+                );
                 done += 1;
                 if done == want {
                     break;
@@ -1737,14 +1806,20 @@ mod tests {
             assert_eq!(done, want, "too few determined orders at p = {p}, g = {g}");
         }
         for (p, g) in [(5u64, 4usize), (7, 4), (5, 5), (7, 5)] {
-            let f = (1..200).map(|s| random_f(p, g as u32, s)).find(|f| JCurve::new(p, g as u32, f).is_ok()).unwrap();
+            let f = (1..200)
+                .map(|s| random_f(p, g as u32, s))
+                .find(|f| JCurve::new(p, g as u32, f).is_ok())
+                .unwrap();
             let c = JCurve::new(p, g as u32, &f).unwrap();
             let n = brute_order(p, g, &f);
             assert!(n > 0);
             let mut st = 3u64;
             for _ in 0..40 {
                 let d = c.random_divisor(&mut st);
-                assert!(c.mul_ltr(d, n as u64).is_identity(), "p = {p}, g = {g}: #J = {n} does not kill a divisor");
+                assert!(
+                    c.mul_ltr(d, n as u64).is_identity(),
+                    "p = {p}, g = {g}: #J = {n} does not kill a divisor"
+                );
             }
         }
     }
@@ -1791,7 +1866,9 @@ mod tests {
                 let mixed = roots[2..].iter().fold(quad, |acc, &x| mulp(&acc, &lin(x)));
                 assert_eq!(disc_character(p, &mixed, &chi, &mut nat), -1);
                 // a repeated root
-                let rep = roots[1..].iter().fold(lin(roots[1]), |acc, &x| mulp(&acc, &lin(x)));
+                let rep = roots[1..]
+                    .iter()
+                    .fold(lin(roots[1]), |acc, &x| mulp(&acc, &lin(x)));
                 assert_eq!(disc_character(p, &rep, &chi, &mut nat), 0);
             }
         }
@@ -1810,6 +1887,7 @@ mod tests {
                     nb: fb_size_2lp(p, g, 2.0),
                     seed: 5,
                     max_trials: 5_000_000,
+                    restart: RESTART,
                     prefilter,
                     verify_relations: verify,
                 };
@@ -1827,7 +1905,10 @@ mod tests {
                 assert_eq!(off.group_ops(), on.group_ops());
                 assert_eq!(off.cantor_mul, on.cantor_mul);
                 assert_eq!(off.la.mul, on.la.mul);
-                assert!(on.rel.mul < off.rel.mul, "prefilter saved nothing at g = {g}");
+                assert!(
+                    on.rel.mul < off.rel.mul,
+                    "prefilter saved nothing at g = {g}"
+                );
             }
             let rho = run_rho(&inst, 3);
             assert!(rho.certified);

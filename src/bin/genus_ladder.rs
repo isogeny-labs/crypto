@@ -8,7 +8,7 @@
 //! genus_ladder run --primes 131,257 --genera 2,3,4,5 --curves 4 --seeds 3
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
 //!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
-//!     [--quartic] [--qc 3.0] --out FILE.jsonl
+//!     [--quartic] [--qc 3.0] [--restart-sqrt] --out FILE.jsonl
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
@@ -42,6 +42,7 @@ struct Cfg {
     rho_cap: f64,
     seed_search: u64,
     max_trials: u64,
+    restart_sqrt: bool,
     smith: bool,
     smith_census: u64,
     quartic: bool,
@@ -51,7 +52,9 @@ struct Cfg {
 fn parse() -> Result<Cfg, String> {
     let a: Vec<String> = std::env::args().skip(1).collect();
     if a.first().map(String::as_str) != Some("run") {
-        return Err("usage: genus_ladder run --primes P,... --genera 2,3,4,5 --out F [options]".into());
+        return Err(
+            "usage: genus_ladder run --primes P,... --genera 2,3,4,5 --out F [options]".into(),
+        );
     }
     let mut c = Cfg {
         primes: vec![],
@@ -66,6 +69,7 @@ fn parse() -> Result<Cfg, String> {
         rho_cap: 3.0e7,
         seed_search: 600,
         max_trials: 50_000_000,
+        restart_sqrt: false,
         smith: false,
         smith_census: 0,
         quartic: false,
@@ -79,19 +83,33 @@ fn parse() -> Result<Cfg, String> {
             i += 1;
             continue;
         }
+        if flag == "--restart-sqrt" {
+            c.restart_sqrt = true;
+            i += 1;
+            continue;
+        }
         if flag == "--quartic" {
             c.quartic = true;
             i += 1;
             continue;
         }
-        let v = a.get(i + 1).cloned().ok_or(format!("missing value for {flag}"))?;
+        let v = a
+            .get(i + 1)
+            .cloned()
+            .ok_or(format!("missing value for {flag}"))?;
         let num = |v: &str| v.parse::<f64>().map_err(|e| format!("{flag}: {e}"));
         match flag {
             "--primes" => {
-                c.primes = v.split(',').map(|s| s.parse().map_err(|e| format!("{e}"))).collect::<Result<_, _>>()?
+                c.primes = v
+                    .split(',')
+                    .map(|s| s.parse().map_err(|e| format!("{e}")))
+                    .collect::<Result<_, _>>()?
             }
             "--genera" => {
-                c.genera = v.split(',').map(|s| s.parse().map_err(|e| format!("{e}"))).collect::<Result<_, _>>()?
+                c.genera = v
+                    .split(',')
+                    .map(|s| s.parse().map_err(|e| format!("{e}")))
+                    .collect::<Result<_, _>>()?
             }
             "--curves" => c.curves = num(&v)? as usize,
             "--seeds" => c.seeds = num(&v)? as u64,
@@ -163,11 +181,14 @@ fn main() -> ExitCode {
         w.flush().unwrap();
     };
     let t0 = Instant::now();
-    emit(json!({"kind": "config", "primes": cfg.primes, "genera": cfg.genera, "curves": cfg.curves,
+    emit(
+        json!({"kind": "config", "primes": cfg.primes, "genera": cfg.genera, "curves": cfg.curves,
         "seeds": cfg.seeds, "arms": cfg.arms, "cc": cfg.cc, "qc": cfg.qc, "max_h": cfg.max_h,
         "rho_cap": cfg.rho_cap, "seed_search": cfg.seed_search, "max_trials": cfg.max_trials,
         "smith": cfg.smith, "smith_census": cfg.smith_census, "quartic": cfg.quartic,
-        "threads": cfg.threads, "restart": gl::RESTART}));
+        "threads": cfg.threads,
+        "restart": if cfg.restart_sqrt { json!("min(4096, max(16, sqrt(r)/2))") } else { json!(gl::RESTART) }}),
+    );
 
     // ── instance search, one cell per (p, g) and one per quartic prime ──
     let mut cells: Vec<(u64, u32)> = Vec::new();
@@ -194,10 +215,15 @@ fn main() -> ExitCode {
                 match ql::make_instance(p as u32, cs, cs, cfg.max_h) {
                     Ok(inst) => {
                         admitted += 1;
-                        emit(json!({"kind": "instance", "family": "quartic", "p": p, "g": 3,
+                        emit(
+                            json!({"kind": "instance", "family": "quartic", "p": p, "g": 3,
                             "curve_seed": cs, "f": inst.f.to_vec(), "order": inst.order,
-                            "h": inst.h, "r": inst.r, "n_points": inst.n_points}));
-                        specs.lock().unwrap().push(Spec::Quartic { q: p as u32, curve_seed: cs });
+                            "h": inst.h, "r": inst.r, "n_points": inst.n_points}),
+                        );
+                        specs.lock().unwrap().push(Spec::Quartic {
+                            q: p as u32,
+                            curve_seed: cs,
+                        });
                     }
                     Err(e) => *reasons.entry(reason_class(&e)).or_default() += 1,
                 }
@@ -225,9 +251,11 @@ fn main() -> ExitCode {
                 Err(e) => *reasons.entry(reason_class(&e)).or_default() += 1,
             }
         }
-        emit(json!({"kind": "cell", "family": if g == 0 { "quartic" } else { "hyperelliptic" },
+        emit(
+            json!({"kind": "cell", "family": if g == 0 { "quartic" } else { "hyperelliptic" },
             "p": p, "g": if g == 0 { 3 } else { g }, "tried": tried, "admitted": admitted,
-            "rejects": reasons, "search_wall_s": ts.elapsed().as_secs_f64()}));
+            "rejects": reasons, "search_wall_s": ts.elapsed().as_secs_f64()}),
+        );
     });
 
     // ── Smith census: random genus-3 curves with no admission filter ──
@@ -246,8 +274,10 @@ fn main() -> ExitCode {
                 ok += u64::from(rec["full_success"].as_bool().unwrap_or(false));
                 tract += u64::from(rec["n_tractable"].as_u64().unwrap_or(0) > 0);
             }
-            emit(json!({"kind": "smith_census", "p": p, "curves": n, "with_tractable_subgroup": tract,
-                "full_success": ok}));
+            emit(
+                json!({"kind": "smith_census", "p": p, "curves": n, "with_tractable_subgroup": tract,
+                "full_success": ok}),
+            );
         }
     }
 
@@ -262,9 +292,18 @@ fn main() -> ExitCode {
         }
     }
     pool(&tasks, cfg.threads, |(spec, seed)| match spec {
-        Spec::Hyper { p, g, curve_seed, order, h, r } => {
-            let curve = gl::JCurve::new(*p, *g, &gl::random_f(*p, *g, *curve_seed)).expect("admitted curve");
-            let inst = gl::instance_from(curve, *order, *h, *r, *curve_seed).expect("admitted instance");
+        Spec::Hyper {
+            p,
+            g,
+            curve_seed,
+            order,
+            h,
+            r,
+        } => {
+            let curve = gl::JCurve::new(*p, *g, &gl::random_f(*p, *g, *curve_seed))
+                .expect("admitted curve");
+            let inst =
+                gl::instance_from(curve, *order, *h, *r, *curve_seed).expect("admitted instance");
             let head = json!({"family": "hyperelliptic", "p": p, "g": g, "curve_seed": curve_seed,
                 "seed": seed, "r": r, "h": h});
             for ch in cfg.arms.chars() {
@@ -306,6 +345,11 @@ fn main() -> ExitCode {
                         nb: gl::fb_size_2lp(*p, *g, cfg.cc),
                         seed: *seed,
                         max_trials: cfg.max_trials,
+                        restart: if cfg.restart_sqrt {
+                            gl::restart_sqrt(*r)
+                        } else {
+                            gl::RESTART
+                        },
                         prefilter: pre,
                         verify_relations: false,
                     },
@@ -342,16 +386,26 @@ fn main() -> ExitCode {
             }
         }
         Spec::Quartic { q, curve_seed } => {
-            let inst = ql::make_instance(*q, *curve_seed, *curve_seed, cfg.max_h).expect("admitted quartic");
+            let inst = ql::make_instance(*q, *curve_seed, *curve_seed, cfg.max_h)
+                .expect("admitted quartic");
             let head = json!({"family": "quartic", "p": q, "g": 3, "curve_seed": curve_seed,
                 "seed": seed, "r": inst.r, "h": inst.h});
             for (arm, nb) in [
                 (ql::QArm::Full, 0usize),
-                (ql::QArm::DoubleLp, (cfg.qc * f64::from(*q).sqrt()).ceil() as usize),
+                (
+                    ql::QArm::DoubleLp,
+                    (cfg.qc * f64::from(*q).sqrt()).ceil() as usize,
+                ),
             ] {
                 let o = ql::run_diem(
                     &inst,
-                    ql::QIcParams { arm, nb, seed: *seed, max_lines: cfg.max_trials, verify_relations: false },
+                    ql::QIcParams {
+                        arm,
+                        nb,
+                        seed: *seed,
+                        max_lines: cfg.max_trials,
+                        verify_relations: false,
+                    },
                 );
                 let mut rec = head.clone();
                 rec["kind"] = json!("run");
