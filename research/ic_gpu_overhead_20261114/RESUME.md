@@ -16,7 +16,7 @@ vs new (this branch, binary serve) on koblitz-n23 (fes-f2, fes-f2-gpu), char2-n2
 (fes-f2-gpu). Record benchmarks/records/<stamp>-ic-fes-gpu-overhead.json.
 
 ## State
-2026-11-14: code, tests and local probe done; pod not started.
+2026-11-14 05:00Z: done; pod deleted; record 20261114T0436Z-ic-fes-gpu-overhead closed; REPORT.md; PR open.
 
 ## Runs in flight
 Pods icgpu-*; research/ic_gpu_measure_20261112/rp_gpu.sh delete NAME.
@@ -26,4 +26,4 @@ Identity: every row verified and S/calls equal across arms. Speed: per-call solv
 old-vs-old / new-vs-new spread. Cap: ~1 GPU-hour, $3. S3: same waiver as before.
 
 ## Next steps
-Launch, fetch out_ab.tgz, delete pod, analyze, report, record, merge main, PR.
+Track the PR.
