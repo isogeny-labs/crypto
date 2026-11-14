@@ -140,6 +140,9 @@ struct Ctx<'a> {
     next: Vec<u32>,
     slots: Vec<(u32, u32)>,
     lp: bool,
+    pf: bool,
+    bits: Vec<u64>,
+    bmask: usize,
     hmask: usize,
     beta: u64,
     beta2: u64,
@@ -201,6 +204,9 @@ impl<'a> Ctx<'a> {
             next: vec![],
             slots: vec![],
             lp: std::env::var_os("LINPROBE").is_some(),
+            pf: !rot && std::env::var_os("NOPREFILTER").is_none(),
+            bits: vec![],
+            bmask: 0,
             hmask: 0,
             beta,
             beta2,
@@ -275,6 +281,18 @@ impl<'a> Ctx<'a> {
                 me.heads[h] = e as u32;
             }
         }
+        if me.pf {
+            let nb = (ents.len() * 3 * 16).next_power_of_two().max(64);
+            me.bmask = nb - 1;
+            me.bits = vec![0u64; nb / 64];
+            for ent in ents.iter() {
+                let k0 = ent.0;
+                for kx in [k0, f.mul(beta, k0), f.mul(beta2, k0)] {
+                    let h = (kx.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & me.bmask;
+                    me.bits[h >> 6] |= 1u64 << (h & 63);
+                }
+            }
+        }
         me.ents = ents;
         me
     }
@@ -299,11 +317,22 @@ impl<'a> Ctx<'a> {
             let lp = f.mul(f.sub(r.y, fi.y), inv);
             for (eps, l) in [(1i8, lm), (-1i8, lp)] {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
-                let (key, sft0) = if self.rot { (x3, 0) } else { self.canon(x3) };
+                let pass = !self.pf || {
+                    let hb = (x3.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & self.bmask;
+                    self.bits[hb >> 6] >> (hb & 63) & 1 == 1
+                };
+                let (key, sft0) = if !pass {
+                    (0, 0)
+                } else if self.rot {
+                    (x3, 0)
+                } else {
+                    self.canon(x3)
+                };
                 let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.hmask;
                 let mut hits = [0u32; 16];
                 let mut nh = 0usize;
-                if self.lp {
+                if !pass {
+                } else if self.lp {
                     let fp = (key >> 17) as u32;
                     let mut i = h;
                     loop {
