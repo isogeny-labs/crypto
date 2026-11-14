@@ -194,6 +194,63 @@ static int serve_main() {
   return 0;
 }
 
+// Binary serve mode (`fes_cuda --serve-bin`, protocol in fes_io.hpp).  Per
+// request: one pinned host buffer [lin | quad_tri | qsym] goes up in one
+// async copy; the device result buffer is [count, x_0, x_1, ...] (count in the
+// first word), so the count and the first FES_BIN_FIRST solutions come back
+// in one copy and one synchronisation; a second copy only when there are
+// more.  Same kernel, same split, same solutions as --serve.
+#ifndef FES_BIN_FIRST
+#define FES_BIN_FIRST 64
+#endif
+static int serve_bin_main() {
+  const int nmax = FES_MAX_VARS, tmax = nmax * (nmax + 1) / 2;
+  const int max_out = 1 << 20;
+  const size_t in_words = (size_t)nmax + tmax + (size_t)nmax * nmax;
+  uint64_t *h_in = nullptr, *h_res = nullptr, *d_in = nullptr, *d_res = nullptr;
+  bool ok = cudaHostAlloc(&h_in, in_words * 8, cudaHostAllocDefault) == cudaSuccess &&
+            cudaHostAlloc(&h_res, (size_t)(1 + max_out) * 8, cudaHostAllocDefault) == cudaSuccess &&
+            cudaMalloc(&d_in, in_words * 8) == cudaSuccess &&
+            cudaMalloc(&d_res, (size_t)(1 + max_out) * 8) == cudaSuccess;
+  if (!ok) { fes_serve_bin_reply(nullptr, 0, 0, 2); return 2; }
+  FesSystem sys;
+  for (;;) {
+    const int r = fes_serve_bin_read(sys, FES_MAX_VARS);
+    if (r == 0) return 0;
+    if (r < 0) { fes_serve_bin_reply(nullptr, 0, 0, 1); return 2; }
+    const int n = sys.n, t = n * (n + 1) / 2;
+    uint64_t *lin = h_in, *quad = h_in + n, *qsym = h_in + n + t;
+    memcpy(lin, sys.lin.data(), n * 8);
+    memcpy(quad, sys.quad_tri.data(), (size_t)t * 8);
+    fes_build_qsym(sys.quad_tri.data(), n, qsym);
+    const size_t words = (size_t)n + t + (size_t)n * n;
+    const int lb = fes_default_low_bits(n);
+    const uint64_t nprefix = 1ULL << (n - lb);
+    const int threads = 256;
+    const int blocks = (int)((nprefix + threads - 1) / threads);
+    const size_t smem = (size_t)n * n * sizeof(uint64_t);
+    bool cu = cudaMemcpyAsync(d_in, h_in, words * 8, cudaMemcpyHostToDevice) == cudaSuccess &&
+              cudaMemsetAsync(d_res, 0, 8) == cudaSuccess;
+    if (cu) {
+      fes_kernel<<<blocks, threads, smem>>>(sys.cst, d_in, d_in + n, d_in + n + t, n, lb, d_res + 1,
+                                            (unsigned int *)d_res, max_out);
+      cu = cudaGetLastError() == cudaSuccess &&
+           cudaMemcpyAsync(h_res, d_res, (1 + FES_BIN_FIRST) * 8, cudaMemcpyDeviceToHost) == cudaSuccess &&
+           cudaStreamSynchronize(0) == cudaSuccess;
+    }
+    if (!cu) { fes_serve_bin_reply(nullptr, 0, 0, 2); return 2; }
+    const uint64_t total = (uint64_t)(unsigned int)h_res[0];
+    const uint64_t listed = total < (uint64_t)max_out ? total : (uint64_t)max_out;
+    if (listed > FES_BIN_FIRST &&
+        cudaMemcpy(h_res + 1 + FES_BIN_FIRST, d_res + 1 + FES_BIN_FIRST, (listed - FES_BIN_FIRST) * 8,
+                   cudaMemcpyDeviceToHost) != cudaSuccess) {
+      fes_serve_bin_reply(nullptr, 0, 0, 2);
+      return 2;
+    }
+    fes_serve_bin_reply(h_res + 1, listed, total, 0);
+  }
+}
+
 int main(int argc, char **argv) {
   // Worker mode: `fes_cuda --in <system-file>` reads a system in the shared
   // contract, runs the kernel, and prints SOLUTIONS — this is what the Rust
@@ -202,6 +259,7 @@ int main(int argc, char **argv) {
   int low_bits = -1;
   for (int i = 1; i < argc; ++i) {
     if (!strcmp(argv[i], "--serve")) return serve_main();
+    if (!strcmp(argv[i], "--serve-bin")) return serve_bin_main();
     if (!strcmp(argv[i], "--in") && i + 1 < argc) in_path = argv[++i];
     else if (!strcmp(argv[i], "--low-bits") && i + 1 < argc) low_bits = atoi(argv[++i]);
   }
