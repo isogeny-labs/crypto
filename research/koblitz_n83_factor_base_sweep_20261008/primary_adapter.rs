@@ -689,6 +689,185 @@ fn k2048_m5_xcnf_export(mode: &str, root: &Path, output: &Path, fixture: u64) ->
     Ok(result)
 }
 
+/// Export the retained full-base K600 six-summand orbit circuit. Constructed
+/// controls and the public point use the same archive and identity pattern.
+pub(super) fn k600_m6_xcnf_cli(mode: &str, root: &Path, output: &Path) -> Result<Value> {
+    const OBJECT: &str =
+        "objects/b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e.jsonl.gz";
+    const OBJECT_SHA256: &str = "3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf";
+    const MANIFEST_SHA256: &str =
+        "5bd862987844f709e03beeab9fd265e3d2024011bcadcb82f5af9c72018df6a6";
+    const REPLAY_SHA256: &str = "fa5e545c27dd64c32a47ddae05a2a0b3a031545d700897f3e0e34f59abc0d72e";
+    const STORAGE_SHA256: &str = "0eae40ffa0e938470671cf796633c1e47b61ff676df0807e7a7e8592e56bb828";
+    const CORPUS_SHA256: &str = "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
+    const VALIDATION_SHA256: &str =
+        "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f";
+    if !["positive-pinned", "positive-unpinned", "natural"].contains(&mode)
+        || output.exists()
+        || output.with_extension("xcnf").exists()
+    {
+        return Err("K600 m6 mode or fresh output differs from protocol".into());
+    }
+    for (name, expected) in [
+        (OBJECT, OBJECT_SHA256),
+        ("manifest.json", MANIFEST_SHA256),
+        ("replay.json", REPLAY_SHA256),
+        ("upload-receipt.json", STORAGE_SHA256),
+        ("probe-corpus.json", CORPUS_SHA256),
+        ("probe-validation.json", VALIDATION_SHA256),
+    ] {
+        if sha256_hex(&fs::read(root.join(name))?) != expected {
+            return Err(format!("K600 m6 input {name} differs from frozen SHA-256").into());
+        }
+    }
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
+    let started = Instant::now();
+    let (base, row, manifest_blake3) = load_panel_selected(root, 600, "public_x_hash", SEEDS[0])?;
+    let fb = &base.factor_base;
+    if fb.points.len() != 99_600
+        || fb.signed_orbits.len() != 600
+        || row["point_set_blake3"]
+            != "ac664f5f0c7122c52a08c0a288b543efb709111a99dc2a5cb2bef025ffffee21"
+    {
+        return Err("K600 m6 imported base identity differs".into());
+    }
+    let representatives: Vec<BigUint> = fb
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &fb.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("K600 representative is infinity".into()),
+        })
+        .collect::<Result<_>>()?;
+    let (public, corpus_blake3) = public_target_fixture(root, &base.curve, 1)?;
+    let pinned = mode == "positive-pinned";
+    let constructed = mode != "natural";
+    let mut positive = None;
+    let target = if constructed {
+        let indices: [usize; 6] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+        let mut partial = Vec::with_capacity(6);
+        let mut sum = BinaryPoint::Infinity;
+        for &index in &indices {
+            sum = base.curve.add(&sum, &fb.points[index]);
+            partial.push(sum.clone());
+        }
+        if partial
+            .iter()
+            .any(|point| !matches!(point, BinaryPoint::Affine { .. }))
+        {
+            return Err("K600 m6 constructed chain has an identity point".into());
+        }
+        let relation = checked_primary_relation_row(&base.curve, fb, &indices, &sum)?;
+        positive = Some((indices, partial, relation));
+        sum
+    } else {
+        public
+    };
+    let BinaryPoint::Affine { x: target_x, .. } = &target else {
+        return Err("K600 m6 target is identity".into());
+    };
+    let model_started = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        6,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        125_000,
+    )
+    .map_err(|_| "K600 m6 chained-S3 circuit construction failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        125_000,
+        350_000,
+    )
+    .map_err(|_| "K600 m6 shared-root orbit domain failed")?;
+    if pinned {
+        let (indices, partial, _) = positive.as_ref().ok_or("K600 positive witness missing")?;
+        let points: Vec<&BinaryPoint> = indices
+            .iter()
+            .map(|&index| &fb.points[index])
+            .chain(partial[1..5].iter())
+            .chain(std::iter::once(&target))
+            .collect();
+        if points.len() != 11 {
+            return Err("K600 m6 positive block count differs".into());
+        }
+        for (block, point) in points.iter().enumerate() {
+            let BinaryPoint::Affine { x, .. } = point else {
+                return Err("K600 m6 positive pin is identity".into());
+            };
+            let x = x.to_biguint();
+            for bit in 0..83usize {
+                let wire = (block * 83 + bit + 1) as i32;
+                if !enc
+                    .solver
+                    .add_clause(vec![if x.bit(bit as u64) { wire } else { -wire }])
+                {
+                    return Err("K600 m6 positive pin contradicted circuit".into());
+                }
+            }
+        }
+    }
+    let model_ms = model_started.elapsed().as_secs_f64() * 1000.0;
+    let shape = json!({
+        "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
+        "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
+        "summands":6,"identity_mask":0,"root_encoding":"shared_root_bits",
+        "domain_representatives":representatives.len(),
+        "positive_x_pins":if pinned { 11*83 } else { 0 },
+        "summand_ordering":"none",
+    });
+    let export_started = Instant::now();
+    let xcnf = to_dimacs_xor(&enc.solver);
+    if xcnf.len() > 200_000_000 {
+        return Err("K600 m6 XCNF exceeds frozen output cap".into());
+    }
+    let xcnf_path = output.with_extension("xcnf");
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&xcnf_path)?;
+    file.write_all(xcnf.as_bytes())?;
+    file.sync_all()?;
+    let xcnf_sha256 = sha256_hex(xcnf.as_bytes());
+    let positive_receipt = if let Some((indices, partial, row)) = positive {
+        let row_bytes =
+            serde_json::to_vec(&row.iter().map(ToString::to_string).collect::<Vec<_>>())?;
+        Some(json!({
+            "indices":indices,
+            "points":indices.map(|index| planted_point_json(&fb.points[index])),
+            "partial_sums":partial.iter().map(planted_point_json).collect::<Vec<_>>(),
+            "relation_row_decimal_blake3":blake3::hash(&row_bytes).to_hex().to_string(),
+        }))
+    } else {
+        None
+    };
+    let result = json!({
+        "schema":"n83.k600-m6-xcnf-export/v1",
+        "status":"PASS_XCNF_EXPORT_ONLY", "mode":mode,
+        "curve_id":base.curve.label(),"curve_a":0,
+        "source_commit":source_commit,"source_attestation_mode":source_attestation_mode,
+        "binary_sha256":binary_sha256,"object":row["object"],
+        "object_sha256":OBJECT_SHA256,"point_set_blake3":row["point_set_blake3"],
+        "panel_manifest_blake3":manifest_blake3,"public_corpus_blake3":corpus_blake3,
+        "public_fixture":if mode == "natural" { Some(1) } else { None },
+        "target":point_json(words(&target)),"shape":shape,
+        "positive":positive_receipt,
+        "xcnf_sha256":xcnf_sha256,"xcnf_bytes":xcnf.len(),
+        "xcnf_path":xcnf_path.to_string_lossy(),
+        "export_ms":export_started.elapsed().as_secs_f64()*1000.0,
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "process_usage":process_usage(),"solver_search_executed":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &result)?;
+    Ok(result)
+}
+
 pub(super) fn check_full_d18_export(root: &Path) -> Result<Value> {
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
