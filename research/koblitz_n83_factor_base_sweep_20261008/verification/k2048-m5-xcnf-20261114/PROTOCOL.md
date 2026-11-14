@@ -106,6 +106,16 @@ and binary hashes, the exact previously exported positive XCNF, the same
 CryptoMiniSat binary and frozen flags, and one new raw output path. This lock
 precedes the native positive solver call.
 
+### 11:40 UTC native natural lock
+
+The native positive repeat returned SAT in 839 conflicts and its Rust replay
+passed every original XCNF row, archived K2048 group lift and relation row.
+The native replay SHA-256 is
+`03432e7b5e1d9af74cd7d7111ee2289506b50434bdf9dc58919438a7c0f2737d`.
+`NATIVE_NATURAL_LOCK.json` binds that positive gate, the same native runner
+source/binary and solver, the exact previously exported public-natural XCNF,
+frozen flags and one new raw output path before the native natural call.
+
 ## Bounded search and interpretation
 
 The first public natural query uses the same solver flags, at most 1,000,000
