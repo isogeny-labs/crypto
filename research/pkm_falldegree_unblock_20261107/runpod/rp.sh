@@ -17,7 +17,7 @@ case "$1" in
     name=$2 vcpu=$3; t=$(python3 -c 'import secrets;print(secrets.token_hex(24))')
     boot="import base64;exec(base64.b64decode('$(base64 -w0 "$here/server.py")'))"
     body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" '{name:$n,computeType:"CPU",
-      cpuFlavorIds:["cpu5m","cpu3m","cpu5g","cpu3g"],cpuFlavorPriority:"custom",vcpuCount:$v,interruptible:false,
+      cpuFlavorIds:["cpu5m","cpu3m"],cpuFlavorPriority:"custom",vcpuCount:$v,interruptible:false,
       imageName:"python:3.12-slim",containerDiskInGb:20,ports:["8000/http"],env:{RUNNER_TOKEN:$t},
       dockerEntrypoint:["python3","-u","-c"],dockerStartCmd:[$b]}')
     out=$(curl -sS -X POST "$API/pods" "${H[@]}" -d "$body"); id=$(jq -r '.id // empty' <<<"$out")
@@ -38,7 +38,11 @@ case "$1" in
       echo "repo.tar $(sha256sum "$tar" | cut -c1-64) commit $4" | tee "$TOKDIR/$2.repo.tar.sha256"; rm -f "$tar" ;;
   start-iso) # rp.sh start-iso ID STAGES_JSON : pins from iso/PINS.json, repo.tar hash from upload-iso
       shas=$(jq --arg t "$(cut -d' ' -f2 "$TOKDIR/$2.repo.tar.sha256")" '.sha256 + {"repo.tar":$t}' "$here/../iso/PINS.json")
-      jq -n --argjson s "$3" --argjson h "$shas" '{entry:"iso",stages:$s,sha256:$h,rayon:12}' |
+      commit=$(cut -d' ' -f4 "$TOKDIR/$2.repo.tar.sha256"); repo=$(cd "$here/../../.." && pwd)
+      pins=$(git -C "$repo" show "$commit:research/pkm_falldegree_unblock_20261107/iso/BUNDLE.sha256" |
+        jq -R 'split("  ") | {(.[1]): .[0]}' | jq -s add)
+      jq -n --argjson s "$3" --argjson h "$shas" --argjson b "$pins" --arg c "$commit" \
+        '{entry:"iso",stages:$s,sha256:$h,bundle_sha256:$b,commit:$c,rayon:12}' |
       curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
   status) curl -sS -H "X-Token: $(tok $2)" "$(url $2)/status" ;;
   fetch) curl -sS -f -H "X-Token: $(tok $2)" -o "$3" "$(url $2)/results.tar.gz" && sha256sum "$3" ;;

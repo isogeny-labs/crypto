@@ -30,7 +30,7 @@ up() {
   aws s3 sync "$S/gates" "$ISOLAB_RESULTS_URI/gates" --only-show-errors
   aws s3 cp "$S/progress.txt" "$ISOLAB_RESULTS_URI/progress.txt" --only-show-errors 2>/dev/null
 }
-panicked() { grep -l 'Mestre: #E ambiguous' "$S"/runs/*.log "$S"/gates/*.log 2>/dev/null | head -1; }
+panicked() { grep -l 'Mestre: #E ambiguous' "$S"/runs/*.log "$S"/gates/*.log "$S"/gates/gaux/*.log 2>/dev/null | head -1; }
 run() {  # run NAME ARGS... : one pilot invocation, rows to runs/NAME.jsonl
   name=$1; shift
   log "start $name: $*"

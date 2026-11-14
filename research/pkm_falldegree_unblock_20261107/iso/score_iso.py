@@ -50,26 +50,39 @@ def f4_done(r):
 
 
 def score(runs):
+    """Per-draw bounds, with conflicts flagged (re-review edits R2-E1, R2-E2, R2-E4).
+
+    Closure (A-m2-iso-p1*) gives an exact value or a lower bound Lc. F4 gives an interval [Lf, Uf]: a refuting uncapped
+    run at D -> Uf = D; a completed capped run at C -> Uf = C if it refutes, Lf = C + 1 if not; a stopped run gives nothing.
+    Conflicts (any one stops R4): L > U; a closure-exact value outside [Lf, Uf]; a closure lower bound above a refuting D
+    (G2 in bound form); sources of one draw disagreeing on x_R or on the auxiliary curve.
+    Admission: a draw enters a median only if it is refuted (closure exact, or some F4 refutation) or certified
+    (CERT solutions == 0); a decomposable draw (solutions > 0) is excluded.
+    """
     draws = {}
     def d(t, k):
-        return draws.setdefault((t, k), {"t": t, "k": k, "L": None, "U": None, "exact": None, "src": [], "D": None,
-                                         "closure": None, "decomposable": None})
+        return draws.setdefault((t, k), {"t": t, "k": k, "closure": None, "Lf": None, "Uf": None, "D": None,
+                                         "refuted": False, "solutions": None, "sources": [], "conflicts": []})
+    def src(x, path, r, what):
+        x["sources"].append({"file": os.path.basename(path), "what": what, "x_r": r.get("x_r"),
+                             "aux": [r.get("tower", {}).get("aux_a"), r.get("tower", {}).get("aux_b")]})
     for p in sorted(glob.glob(os.path.join(runs, "A-m2-iso-p1*.jsonl"))):
         for r in rows_of(p):
             x = d(r["t"], r["target_index"])
-            v, c = d_f(r)
-            x["closure"] = (v, c)
-            if c == "":
-                x["exact"] = v
-            else:
-                x["L"] = max(x["L"] or 0, v)  # (c+1, '>') and (c, '>=') are both lower bounds d_F >= v
-            x["src"].append(os.path.basename(p))
+            x["closure"] = d_f(r)
+            if x["closure"][1] == "":
+                x["refuted"] = True
+            src(x, p, r, "closure " + "".join(map(str, x["closure"][::-1])))
     for p in sorted(glob.glob(os.path.join(runs, "DA-m2-iso-p1.jsonl"))):
         for r in rows_of(p):
             x = d(r["t"], r["target_index"])
             if f4_done(r) and r.get("inconsistent"):
                 x["D"] = r["solving_degree_max"]
-                x["U"] = r["solving_degree_max"] if x["U"] is None else min(x["U"], r["solving_degree_max"])
+                x["Uf"] = x["D"] if x["Uf"] is None else min(x["Uf"], x["D"])
+                x["refuted"] = True
+                src(x, p, r, f"F4 refutes at D={x['D']}")
+            else:
+                src(x, p, r, "F4 stopped or not refuted: no bound")
     for pat in ("CAP-iso-m2-t*-k*-c*.jsonl", "X-iso-m2-t*-k*-c*.jsonl"):
         for p in sorted(glob.glob(os.path.join(runs, pat))):
             m = re.match(r"(CAP|X)-iso-m2-t(\d+)-k(\d+)-c(\d+)\.jsonl$", os.path.basename(p))
@@ -79,55 +92,78 @@ def score(runs):
             for r in rows_of(p):
                 x = d(r["t"], r["target_index"])
                 if not f4_done(r):
+                    src(x, p, r, f"cap {cap} stopped: no bound")
                     continue
                 if r.get("inconsistent"):
-                    x["U"] = cap if x["U"] is None else min(x["U"], cap)
+                    x["Uf"] = cap if x["Uf"] is None else min(x["Uf"], cap)
+                    x["refuted"] = True
+                    src(x, p, r, f"cap {cap} refutes: <= {cap}")
                 else:
-                    x["L"] = max(x["L"] or 0, cap + 1)
-                x["src"].append(os.path.basename(p))
+                    x["Lf"] = max(x["Lf"] or 0, cap + 1)
+                    src(x, p, r, f"cap {cap} does not refute: >= {cap + 1}")
     for p in sorted(glob.glob(os.path.join(runs, "CERT-m2-iso-p1.jsonl")) + glob.glob(os.path.join(runs, "*.cert.jsonl"))):
         for line in open(p):
             c = json.loads(line)
             x = d(c["t"], c["target_index"])
-            x["decomposable"] = bool(x["decomposable"]) or c["solutions"] > 0
+            x["solutions"] = c["solutions"] if x["solutions"] is None else max(x["solutions"], c["solutions"])
+            x["sources"].append({"file": os.path.basename(p), "what": f"certificate solutions={c['solutions']}",
+                                 "x_r": c.get("x_r"), "aux": None})
     out = []
     for (t, k), x in sorted(draws.items()):
-        if x["exact"] is None and x["L"] is not None and x["U"] is not None and x["L"] == x["U"]:
-            x["exact"] = x["L"]
-        x["dF"] = (x["exact"], "") if x["exact"] is not None else ((x["L"], ">=") if x["L"] is not None else None)
+        xs = {s["x_r"] for s in x["sources"] if s["x_r"] is not None}
+        auxs = {tuple(s["aux"]) for s in x["sources"] if s["aux"] and s["aux"][0] is not None}
+        if len(xs) > 1:
+            x["conflicts"].append(f"sources disagree on x_R: {sorted(xs)}")
+        if len(auxs) > 1:
+            x["conflicts"].append(f"sources disagree on the auxiliary curve: {sorted(auxs)}")
+        cv, cc = x["closure"] if x["closure"] else (None, None)
+        L = max(v for v in (cv, x["Lf"]) if v is not None) if (cv is not None or x["Lf"] is not None) else None
+        U = x["Uf"]
+        if cc == "":
+            if (x["Lf"] is not None and cv < x["Lf"]) or (U is not None and cv > U):
+                x["conflicts"].append(f"closure exact {cv} outside F4 interval [{x['Lf']}, {U}]")
+            L = U = cv
+        elif cc and x["D"] is not None and cv > x["D"]:
+            x["conflicts"].append(f"G2 (bound form): closure >= {cv} above refuting D = {x['D']}")
+        if L is not None and U is not None and L > U:
+            x["conflicts"].append(f"empty interval [{L}, {U}]")
+        x["dF"] = None if L is None else ((L, "") if U is not None and L == U else (L, ">="))
+        x["decomposable"] = x["solutions"] is not None and x["solutions"] > 0
+        x["admitted"] = not x["decomposable"] and x["dF"] is not None and (x["refuted"] or x["solutions"] == 0)
         # G2 (registered for m = 2, t <= 10): exact closure d_F <= D.
-        x["g2"] = None if (x["closure"] is None or x["closure"][1] or x["D"] is None or t > 10) else x["closure"][0] <= x["D"]
+        x["g2"] = None if (cc != "" or x["D"] is None or t > 10) else cv <= x["D"]
         out.append(x)
     return out
 
 
 def readings(draws):
-    med, n_ge6, n_dec = {}, {}, {}
+    conflicts = [(x["t"], x["k"], c) for x in draws for c in x["conflicts"]]
+    med, n_ge6, n_dec, complete = {}, {}, {}, {}
     for t in T_ALL:
-        ds = [x for x in draws if x["t"] == t]
-        n_dec[t] = sum(1 for x in ds if x["decomposable"])
-        keep = [x["dF"] for x in ds if not x["decomposable"] and x["dF"] is not None]
+        ds = {x["k"]: x for x in draws if x["t"] == t}
+        n_dec[t] = sum(1 for x in ds.values() if x["decomposable"])
+        keep = [x["dF"] for x in ds.values() if x["admitted"]]
+        # R2-E3: both draws are needed, unless a draw is certified decomposable.
+        complete[t] = all((k in ds) and (ds[k]["admitted"] or ds[k]["decomposable"]) for k in (0, 1)) and keep != []
         med[t] = lower_median(keep)
         n_ge6[t] = sum(1 for v, c in keep if v >= 6)
-    ex = lambda m: m is not None and m[1] == ""
-    # P-ISO-1
-    if any(ex(med[t]) and med[t][0] != P0_MEDIANS[t] for t in T_P1):
+    ex = lambda t: complete[t] and med[t] is not None and med[t][1] == ""
+    if any(ex(t) and med[t][0] != P0_MEDIANS[t] for t in T_P1):
         p1 = "refuted"
-    elif all(ex(med[t]) and med[t][0] == P0_MEDIANS[t] for t in T_P1):
+    elif all(ex(t) and med[t][0] == P0_MEDIANS[t] for t in T_P1):
         p1 = "holds"
     else:
         p1 = "undecided"
-    # P-ISO-2 per t
     per = {}
     for t in T_P2:
         m = med[t]
-        if m is None:
+        if not complete[t] or m is None:
             per[t] = "undecided"
-        elif (ex(m) and m[0] > 5) or (m[1] == ">=" and m[0] >= 6):
+        elif (m[1] == "" and m[0] > 5) or (m[1] == ">=" and m[0] >= 6):
             per[t] = "grows"
-        elif ex(m) and m[0] < 5:
+        elif m[1] == "" and m[0] < 5:
             per[t] = "below 5"
-        elif ex(m) and m[0] == 5:
+        elif m[1] == "" and m[0] == 5:
             per[t] = "flat at 5"
         else:
             per[t] = "undecided"
@@ -135,10 +171,13 @@ def readings(draws):
     p2 = ("grows" if "grows" in vals else "below 5" if "below 5" in vals
           else "flat at 5" if vals == {"flat at 5"} else "undecided")
     g2 = [x for x in draws if x["g2"] is not None]
-    return {"medians": {t: (None if med[t] is None else f"{med[t][1]}{med[t][0]}") for t in T_ALL},
-            "draws_dF_ge_6": n_ge6, "decomposable_draws": n_dec,
-            "P_ISO_1": p1, "P_ISO_2_per_t": per, "P_ISO_2": p2,
-            "G2": {"checked": len(g2), "violations": sum(1 for x in g2 if not x["g2"])}}
+    g2v = sum(1 for x in g2 if not x["g2"])
+    stop = bool(conflicts) or g2v > 0
+    return {"STOP": stop, "conflicts": conflicts,
+            "medians": {t: (None if med[t] is None else f"{med[t][1]}{med[t][0]}") for t in T_ALL},
+            "cell_complete": complete, "draws_dF_ge_6": n_ge6, "decomposable_draws": n_dec,
+            "P_ISO_1": "STOPPED" if stop else p1, "P_ISO_2_per_t": per, "P_ISO_2": "STOPPED" if stop else p2,
+            "G2": {"checked": len(g2), "violations": g2v}}
 
 
 def _selftest():
@@ -182,9 +221,49 @@ def _selftest():
     print("selftest: pass")
 
 
+def _selftest_review_cases():
+    """The re-review's cases A-E (REVIEW_R3_R4.md, re-review of R4 revision 2), each with the required outcome."""
+    import tempfile
+    def base(t=13, k=0, **kw):
+        r = {"x_r": 777, "kind": "isogeny", "m": 2, "control": "tower", "t": t, "target_index": k,
+             "tower": {"aux_a": 1, "aux_b": 2}}
+        r.update(kw)
+        return r
+    def run(files):
+        tmp = tempfile.mkdtemp()
+        for name, rs in files.items():
+            open(os.path.join(tmp, name), "w").write("".join(json.dumps(r) + "\n" for r in rs))
+        return readings(score(tmp))
+    cert = lambda sols, x_r=777: [{"t": 13, "target_index": k, "x_r": x_r, "solutions": sols} for k in (0, 1)]
+    # A: closure >= 8 but uncapped F4 refutes at D = 6 -> conflict, STOP.
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=None, closures=[{"c": 8, "censored": "budget"}]) for k in (0, 1)],
+              "DA-m2-iso-p1.jsonl": [base(k=k, inconsistent=True, solving_degree_max=6, timed_out=False) for k in (0, 1)]})
+    assert rd["STOP"] and rd["P_ISO_2"] == "STOPPED", ("A", rd["conflicts"])
+    # B: censored >= 6, no refutation and no certificate -> not admitted -> undecided (not 'grows').
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=None, closures=[{"c": 5, "censored": None}]) for k in (0, 1)]})
+    assert not rd["STOP"] and rd["P_ISO_2_per_t"][13] == "undecided", ("B", rd)
+    #    ... and with a solutions == 0 certificate it is admitted and reads 'grows'.
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=None, closures=[{"c": 5, "censored": None}]) for k in (0, 1)],
+              "CERT-m2-iso-p1.jsonl": cert(0)})
+    assert rd["P_ISO_2_per_t"][13] == "grows", ("B2", rd)
+    # C: one draw missing -> the cell is incomplete -> undecided, not 'flat at 5'.
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=0, last_fall_degree=5, closures=[])]})
+    assert rd["P_ISO_2_per_t"][13] == "undecided" and not rd["cell_complete"][13], ("C", rd)
+    # D: closure exact 5 but a completed cap-5 run does not refute (>= 6) -> conflict, STOP.
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=5, closures=[]) for k in (0, 1)],
+              "CAP-iso-m2-t13-k0-c5.jsonl": [base(k=0, inconsistent=False, timed_out=False)]})
+    assert rd["STOP"], ("D", rd["conflicts"])
+    # E: sources of one draw with different x_R -> conflict, STOP.
+    rd = run({"A-m2-iso-p1-big.jsonl": [base(k=k, last_fall_degree=None, closures=[{"c": 5, "censored": None}]) for k in (0, 1)],
+              "DA-m2-iso-p1.jsonl": [base(k=k, x_r=999, inconsistent=True, solving_degree_max=6, timed_out=False) for k in (0, 1)]})
+    assert rd["STOP"] and any("x_R" in c[2] for c in rd["conflicts"]), ("E", rd["conflicts"])
+    print("selftest (review cases A-E): pass")
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["--selftest"]:
         _selftest()
+        _selftest_review_cases()
     else:
         ds = score(sys.argv[1])
         rd = readings(ds)

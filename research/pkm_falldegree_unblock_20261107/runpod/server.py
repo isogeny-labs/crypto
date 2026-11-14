@@ -81,6 +81,14 @@ class H(BaseHTTPRequestHandler):
             for n in ISO_BIN: subprocess.check_call(["install", "-m755", f"{IN}/{n}", f"/usr/local/bin/{n}"])
             os.makedirs("/opt/repo", exist_ok=True)
             subprocess.check_call(["tar", "-xf", f"{IN}/repo.tar", "-C", "/opt/repo"])
+            # R2-E5: every bundled file must match the committed pins sent with the request (iso/BUNDLE.sha256 at `commit`).
+            pins = req.get("bundle_sha256") or {}
+            if not pins or not req.get("commit"):
+                return self.reply(409, {"error": "iso mode needs commit and bundle_sha256"})
+            badb = {n: [h, sha(f"/opt/repo/{n}") if os.path.exists(f"/opt/repo/{n}") else None]
+                    for n, h in pins.items() if not os.path.exists(f"/opt/repo/{n}") or sha(f"/opt/repo/{n}") != h}
+            if badb:
+                return self.reply(409, {"error": "bundle sha256 mismatch", "detail": badb})
         else:
             for n in BIN: subprocess.check_call(["install", "-m755", f"{IN}/{n}", f"/usr/local/bin/{n}"])
             for n in STUDY:
