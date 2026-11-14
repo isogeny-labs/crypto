@@ -79,19 +79,19 @@ Data: `leads.json` (one record per lead with `sources_checked`, `why_this_verdic
 | | count |
 |---|--:|
 | records | 304 |
-| in scope (prime-field E(F_p) ECDLP) | 237 |
-| out of scope | 67 |
-| open | 23 |
-| blocked | 17 |
-| unexamined | 20 |
-| engineering / constant factor | 11 |
-| refuted | 166 |
-| evidence proof / measured / toy / desk / none (in scope) | 26 / 20 / 101 / 64 / 26 |
+| in scope (prime-field E(F_p) ECDLP) | 235 |
+| out of scope | 69 |
+| open | 13 |
+| blocked | 10 |
+| unexamined | 21 |
+| engineering / constant factor | 13 |
+| refuted | 178 |
+| evidence proof / measured / toy / desk / none (in scope) | 27 / 20 / 94 / 72 / 22 |
 | sources atlas / idea records / crypto studies | 93 / 143 / 68 |
-| flagships (live exponent-level questions) | 9 |
+| flagships (live exponent-level questions) | 2 |
 | desk and toy checks run today | 71 |
 
-The Haiku validator found 0 schema problems, 0 duplicate ids and 1,298 cited paths that all resolve (`checks/validation.md`); its 19 evidence-strength flags were reviewed by hand and one grade lowered (`LEAD-ICE-generic-oracle-arity-cost-floor`, proof to measured).
+The Haiku validator found 0 schema problems, 0 duplicate ids and 1,298 cited paths that all resolve (`checks/validation.md`); its 19 evidence-strength flags were reviewed by hand and one grade lowered (`LEAD-ICE-generic-oracle-arity-cost-floor`, proof to measured). The Opus red team reviewed 52 records (every open, blocked and flagship one plus 12 sampled desk-only refutations) and proposed 25 changes, applied as listed in `TABLES.md` and `checks/redteam.md`.
 
 - **No lead in the corpus is a sub-√p prime-field ECDLP method, and none moved an exponent today.**
   The idea-campaign records are honest about this: all but one self-declare exponent delta 0 (the
@@ -99,23 +99,29 @@ The Haiku validator found 0 schema problems, 0 duplicate ids and 1,298 cited pat
   stated predictions, run as toys, mostly hold, several falsifiers were mis-set, and one merged
   "verified construction" is empty (§4).
 - **The live exponent-level questions reduce to two**, as the closure ledger of 2026-11-12 already
-  said, and both narrowed again today:
-  1. **The PKM / Kummer tower fall-degree growth** (cells 0.1, 0.2; `CH-L1`;
-     `LEAD-ICP-pkm-tower-algebraic-oracle`). m ≤ 7 is closed; m = 8 hinges on D(8,3) = 9 against ≥ 10
-     (certified ≥ 9, uncertified msolve evidence ≥ 10; a ≥ 140 GB host is needed). The 2026-11-13
-     continuation protocol demotes even that cell to a diagnostic: with the whole solve charged, m = 8
-     loses its gain at D = 9. The surviving test is a positive sparse relation-finder panel with the
-     whole-call floor charged. Today's growth-law cell (PR #4151, `d_F ≥ 6` at t = 12) is one more
-     point on the C-step law, not a reprieve.
-  2. **Lifting with growing rank** (`CL-A8`, `CH-L4`, `LEAD-TRF-global-lift-small-height`,
-     `LEAD-EXO-global-lift-height`). Open only because unmeasured: Theorem X (paper only, checker
-     "sound with gaps") bounds per-trial success by |M|/q for every lift construction, the Q-only case
-     closes under Lang's conjecture (Iwasawa R2), and the practical blocker is an unproved step (no
-     fast small-height preimage of reduction). Cheapest next step: a public small-height lift
-     selector, then one scaling panel at r = 7..9 on a 24–28-bit curve.
-  One idea-campaign record is flagged beside them: `IDEA-20261109-2debfa` (S_{m+1} on the subgroup
-  grid μ_B^k), whose Claim 1 factorisation held 13/13 today and whose exponent lemma e_2 < 1 is
-  undecided; prior is low because hashing already costs about B.
+  said, and both narrowed again today. The workers had flagged nine cells; the Opus red team cut the
+  flags to the two distinct questions (the other seven were restatements of them, or, for
+  `IDEA-20261109-2debfa`, a route whose best reachable exponent is 2/(3 − e_2) ≥ 2/3 even if its open
+  lemma holds; `checks/rt/exponent_check.py`, `checks/redteam.md`):
+  1. **The PKM / Kummer tower fall-degree growth at m ≥ 8** (`CH-L1`; cells 0.1, 0.2 and
+     `LEAD-ICP-pkm-tower-algebraic-oracle` are the same question). m ≤ 7 is closed. The D(8,3) cell
+     (`CH-D83`) is no longer decisive: the Lean-checked cost floor of
+     `research/prime_norm_rank_20261112/cost-floor-report/` (p < W² with c ≥ B⁴) removes the m = 8
+     gain even at D(8,3) = 9, and the dense-floor exponent at m = 8 is at least 4/7 whatever D(8,3)
+     is; the red team therefore marks the cell refuted (proof) and the 2026-11-13 continuation protocol
+     already calls it a diagnostic. The surviving test is the positive sparse relation-finder panel A
+     with the whole-call floor charged, at log_B p in {7, 8, 9}: kill if the lower confidence bound on
+     the per-call exponent is ≥ 3.5. It needs the L1 closure source recovered or replaced. Today's
+     growth-law cell (PR #4151, `d_F ≥ 6` at t = 12) is one more point on the C-step law, not a
+     reprieve. Cell 0.2 (Vélu tower) stays open only as an unmeasured exact-LFD question; as a gain it
+     is already "falsified" (`research/non_semaev_decomposition_20261113/README.md`, 1.00–1.33× a
+     plain base).
+  2. **Lifting with growing rank** (`CH-L4`; `CL-A8` and the two global-lift atlas rows are the same
+     question). Open only because unmeasured: Theorem X (paper only, checker "sound with gaps") bounds
+     per-trial success by |M|/q for every lift construction, the Q-only case closes under Lang's
+     conjecture (Iwasawa R2), and the practical blocker is an unproved step (no fast small-height
+     preimage of reduction). Cheapest falsification: write an executable public small-height lift
+     selector, then at 8–12 bits compare the heights of successful lifts with all lifts (L4-check F1).
 - **The distance to rho did not move.** Table B of `docs/ic/LEADERBOARD.md` still reads 5.47× to
   13.5× matched rho and widens with size; the chase toys that quote a distance all sit above rho
   (closure ledger B1–B3: 4.5× to 33×; S5 oracle slope 0.663 against 0.5; MITM m = 3/4 exponents
@@ -123,7 +129,7 @@ The Haiku validator found 0 schema problems, 0 duplicate ids and 1,298 cited pat
 
 ## 4. What the chase changed relative to the records
 
-- **Recorded open or proposed, read as refuted today: 103 leads (29 atlas, 69 idea records, 5 crypto studies)** (`TABLES.md` lists every
+- **Recorded open or proposed, read as refuted today: 112 leads (33 atlas, 74 idea records, 5 crypto studies)** (`TABLES.md` lists every
   one with its reason). For the atlas this is mostly the newest evidence overtaking an
   `open_next_step` written on 2026-10-30/11-01: Coppersmith small roots (proof of reach ≤ 0.49),
   algebraic-membership bases (closure ledger A4/A5), digit presentations (chase L3, Theorem F),
@@ -161,6 +167,10 @@ The Haiku validator found 0 schema problems, 0 duplicate ids and 1,298 cited pat
 
 - It does not change any atlas disposition (the atlas is unreadable here); the proposed deltas are
   in `ATLAS_DELTA.md` for a session with `KEY`.
+- The red team's 25 changes (`checks/redteam.json`) were all applied; each record keeps its prior
+  verdict under a `redteam` key, and the worker files are archived unchanged in the scratchpad's
+  `verdicts/` (not committed). Reviewers who disagree with a change can restore the prior value from
+  the record itself.
 - It does not price anything across the §5a band, add a leaderboard or benchmark row, or claim an
   improvement. "Engineering" cells are constant-factor levers already measured elsewhere
   (CM-orbit fold 1.25–1.62 net, paired translate unresolved across the band, root-find/pair-table
@@ -172,20 +182,20 @@ The Haiku validator found 0 schema problems, 0 duplicate ids and 1,298 cited pat
 
 1. **Desk, hours:** fix the mis-set falsifiers of §4 in the idea records; record the empty
    construction `1130d0`; apply `ATLAS_DELTA.md` in a session that holds `KEY`.
-2. **Local CPU, a day:** the selected-lift height panel at r = 7..9 (lifting flagship); the e_2 < 1
-   timing fit on μ_B^2 for `2debfa` (native Rust box); the Vélu-tower exact LFD at k = 4..10 (`S2`,
-   cell 0.2).
-3. **Large host, owner's call:** D(8,3) certification (≥ 140 GB) is now diagnostic only; the lead-
-   changing cell is the positive sparse PKM relation-finder panel at m = 8 with the whole-call floor
-   charged (`research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md`), through isolab-eks with
-   a task card.
+2. **Local CPU, a day:** an executable small-height lift selector and the L4-check F1 height
+   comparison at 8–12 bits (lifting flagship); the Vélu-tower exact LFD at k = 4..10 (`S2`, cell 0.2,
+   exactness only, no gain expected).
+3. **Large host, owner's call:** not D(8,3) (refuted as decisive by the Lean cost floor); the
+   lead-changing cell is the positive sparse PKM relation-finder panel A at m = 8 with the whole-call
+   floor charged (`research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md`), through isolab-eks
+   with a task card, once the L1 closure source is recovered or replaced.
 
 ## 7. Files
 
 - `leads.json`: the 304 records (schema in `BRIEF.md`).
 - `figures/plot.py`, `figures/lead_cells.svg|png`, `figures/verdict_matrix.svg|png`.
 - `TABLES.md` (generated), `build_tables.py`.
-- `checks/validation.md`, `checks/validate.py` (Haiku pass); `checks/redteam.md`, `checks/redteam.json` (Opus pass).
+- `checks/validation.md`, `checks/validate.py` (Haiku pass); `checks/redteam.md`, `checks/redteam.json`, `checks/rt/exponent_check.py` (Opus pass).
 - `ATLAS_DELTA.md`: dispositions to apply in `crypto-autoresearcher` once unlocked.
 - `REPORT.typ`, `REPORT.pdf`.
 - Idea-corpus index (PR number, state, class, lead link per record): `corpus/idea_index.json`,

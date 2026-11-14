@@ -44,8 +44,8 @@
    "column": "ORACLE",
    "recorded_disposition": "open_blocked",
    "verdict": "blocked",
-   "evidence_strength": "toy",
-   "flagship": true,
+   "evidence_strength": "measured",
+   "flagship": false,
    "exponent_delta": "needs D(8,3)=9 exactly (E~0.43); D(8,3)>=10 gives E>=0.65 (worse than rho)",
    "distance_to_rho": "m=8 E~0.43 if D(8,3)=9, else E>=0.65 vs rho 0.5 (research/prime_leads_chase_20261113/README.md); earlier algebraic-oracle smoke S=1027 vs 9.05 for generic at w=0 (research/prime_ic_leads_20261110/README.md s1)",
    "mechanism": "Solve Petit-Kosters-Messeng tower / partitioned-base Semaev systems algebraically over F_p; if solving degree stayed flat in tower depth the decomposition would be cheap per attempt.",
@@ -73,15 +73,24 @@
    "pr": null,
    "pr_state": null,
    "pcc": "unverified",
-   "worker": "W1"
+   "worker": "W1",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": true,
+    "prior_column": "ORACLE",
+    "reason": "Verdict 'blocked' stands, but the blocker and next test are stale: /home/user/crypto/research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md 'Decision' item 1 demotes D(8,3) to a degree diagnostic because the Lean cost-floor (/home/user/crypto/research/prime_norm_rank_20261112/cost-floor-report/README.md) removes the m=8 gain even if D(8,3)=9; the decisive test is the sparse relation-finder panel A, blocked on recovering the missing L1 closure source (A2 prerequisites). Strength should match CH-L1 (same certified D(m,t) table, cross-implementation checked). Flagship should be carried once, by CH-L1; this atlas row is the same question and double-counts it in the heat map."
+   }
   },
   {
    "id": "LEAD-ICP-split-graph-secant-presentation",
    "label": "split-graph / secant presentation",
    "column": "ORACLE",
    "recorded_disposition": "open_next_step",
-   "verdict": "open",
-   "evidence_strength": "toy",
+   "verdict": "engineering",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "unknown (degree d+1 vs 2d+1 is a presentation constant; no complete-cost gain shown)",
    "distance_to_rho": "not quantified",
@@ -107,7 +116,16 @@
    "pr": null,
    "pr_state": null,
    "pcc": "unverified",
-   "worker": "W1"
+   "worker": "W1",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The lever is a first-vanishing degree d+1 vs 2d+1 at fixed low graph degree d (3-5), which is p-independent, so at most a constant, the same argument that closes CL-A9/BKK (/home/user/crypto/research/prime_field_ic_closure_20261112/closure-ledger.md row A9). The atlas itself says 'lower degree alone is not enough' and the complete toy used more rows than its own dense presentation (/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md line 18); base yield is conserved for every base (atlas line 139, KN-FIND-007). The prospective panel can only move a constant."
+   }
   },
   {
    "id": "LEAD-ICP-shared-coefficient-membership",
@@ -451,7 +469,16 @@
    ],
    "notes": "Disagreement: docs/ic/factor-base-encyclopedia/README.md line ~851 says global lifting is 'closed on paper'; closure ledger and chase L4 say still open/unmeasured. Newer (11-12, 11-13) wins: open. Sweep toy tests only the smoothness leg (no replay).",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "LIFT",
+    "reason": "Open (non-flagship) is defensible: the smoothness sub-mechanism is null at toy (R=1.00213, lead_sweep RESULT.md) and the dependent-lift part is the CH-L4 question, still open per CONTINUATION_PROTOCOL. Next test should follow CH-L4 (public selector first) rather than a new census."
+   }
   },
   {
    "id": "LEAD-ICP-elliptic-code-list-decoding",
@@ -508,12 +535,21 @@
    ],
    "notes": "Atlas label open_next_step vs its own obstruction block: kept both. Toy result is mostly built into the pricing formula.",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "Refuted/desk holds on the atlas cost_model obstruction and the encyclopedia closure; the sweep toy is correctly discounted (positive control failed at 4/7 sizes, IC cost is a formula)."
+   }
   },
   {
    "id": "LEAD-ICP-full-width-arity-grid",
    "label": "50-63 bit arity grid m=2..8",
-   "column": "FB",
+   "column": "BARRIER",
    "source_kind": "atlas",
    "pr": null,
    "pr_state": null,
@@ -536,7 +572,16 @@
    ],
    "notes": "Toy shows a mild same-sign positive z (1.9-2.7) at p=65521, the only hint of non-genericity; n=3 curves cannot decide.",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "FB",
+    "reason": "Blocked on launcher admission is accurate, but column FB is wrong: the panel measures the generic arity ladder and the atlas says 'measures rather than beats; generic model predicts the gap widens' (atlas_survey.md line 96). It is a control/measurement (BARRIER), not a factor-base family with an exponent upside."
+   }
   },
   {
    "id": "LEAD-ICP-gfp5-oa-sdhp-jv",
@@ -744,7 +789,7 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_blocked",
-   "verdict": "blocked",
+   "verdict": "refuted",
    "evidence_strength": "measured",
    "flagship": false,
    "exponent_delta": "0 so far (mean yield class-invariant, KN-FIND-007)",
@@ -762,7 +807,16 @@
    ],
    "notes": "Sweep toy verdict 'falsified' (variance clause) vs atlas open_blocked: variance excess is flat and unattributed, so I kept blocked.",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "measured",
+    "prior_flagship": false,
+    "prior_column": "FB",
+    "reason": "Mean yield C(B+m-1,m)/N is the same for every base (KN-FIND-007, 288/288 cells, atlas_survey.md line 139) and the isogeny class is closed_obstructed by theorem plus a 403,168-run census (LEAD-STR-isogeny-class-generic-invariance, atlas_survey.md line 54); transport is a relabel (closure-ledger.md A11) and isogenous curves share #E so rho gains equally (B4, counted gain exactly 0). The 17 missing arms can only probe a cross-curve variance excess, which the sweep found flat in p and which cannot lower the cost on a fixed target curve. 'Blocked' hides a lead that is closed at the exponent level; /home/user/crypto/research/non_semaev_decomposition_20261113/README.md table also lists isogeny-class yield as null (ratios 1 +/- 3.85e-5)."
+   }
   },
   {
    "id": "LEAD-ICP-lattice-ic-relation-construction",
@@ -772,8 +826,8 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_blocked",
-   "verdict": "blocked",
-   "evidence_strength": "toy",
+   "verdict": "refuted",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "unknown (no theory); generic constructor gap grows ~n^(1/6)",
    "distance_to_rho": "sweep toy: generic relation collection costs 13.8x to 40.9x of rho at 2^12..2^22 (lead_sweep_20261110/LEAD-ICP-lattice-ic-relation-construction/RESULT.md)",
@@ -790,7 +844,16 @@
    ],
    "notes": "Toy tests no lattice object.",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Lattice/quaternion short vectors and isogeny-adjoint witnesses produce relations among base points only; Lemma T (/home/user/crypto/research/non_semaev_decomposition_20261113/README.md section 4) bounds any such source at total >= sqrt(2cn), exponent 1/2 whatever the relations cost, and generic B^2 linear algebra pushes it to >= n^(2/3). A positive constructor therefore cannot change the exponent; 'blocked on constructors' presents a closed-at-exponent lead as open. Lemma T is a proof sketch (Shoup collision argument), not formalised, so strength is desk."
+   }
   },
   {
    "id": "LEAD-ICP-prym-witness-relation-diversity",
@@ -800,8 +863,8 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_blocked",
-   "verdict": "blocked",
-   "evidence_strength": "none",
+   "verdict": "refuted",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "unknown",
    "distance_to_rho": "not quantified",
@@ -817,7 +880,16 @@
    ],
    "notes": "Toy 'falsified' is a protocol mis-specification, not a result.",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The atlas records that no mechanism for attaching a prescribed target Q exists (atlas_survey.md line 27); without target attachment the witnesses are relations among base points and Lemma T (/home/user/crypto/research/non_semaev_decomposition_20261113/README.md section 4) caps the route at exponent 1/2. Locating the owner's records would only measure relation diversity (rank 13/15, 9/15), which cannot move the exponent. Keep the missing-records note, but the verdict is refuted at the exponent level (desk)."
+   }
   },
   {
    "id": "LEAD-ICP-representation-subset-sum",
@@ -934,7 +1006,16 @@
    ],
    "notes": "No newer study than the 11-07 survey and chase L4 (shared lifting bound); evidence strength desk because the exact count is arithmetic only.",
    "pcc": "unverified",
-   "worker": "W2"
+   "worker": "W2",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "LIFT",
+    "reason": "Open/desk is defensible: alpha=3 exact for the examined family (atlas_survey.md line 25) and reopening needs a dimension-surplus family; the target is attached by lifting, so Lemma T does not apply and Theorem X's scope does not cover function fields."
+   }
   },
   {
    "id": "LEAD-ICE-prime-field-semaev-solving-degree",
@@ -1005,8 +1086,8 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_next_step",
-   "verdict": "open",
-   "evidence_strength": "toy",
+   "verdict": "engineering",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "0 expected (contraction order changes constants; semaev-chain cost model is topology-blind)",
    "distance_to_rho": "not quantified",
@@ -1023,7 +1104,16 @@
    ],
    "notes": "Recorded title empty. The F4 matrix ratio was over F_{p^3}, not E(F_p). Likely constant-factor if it ever works. research-kb MCP and ecdb not available in this container (grep only); atlas YAML vault-encrypted, so atlas text read only through the 2026-11-07 survey. Sweep RESULT.md files are single stdlib toy runs by subagents (research/lead_sweep_20261110/SWEEP_REPORT.md says weak evidence, triage only).",
    "pcc": "unverified",
-   "worker": "W3"
+   "worker": "W3",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Chain vs tree vs monolithic contraction changes F4 matrix size by constant factors at fixed m (0.110x, 1.095x; atlas_survey.md line 43, explicitly 'not an ECDLP cost claim'), and the sibling LEAD-ICE-semaev-chain-cost-model is topology-blind (t*=m*, atlas_survey.md line 150). The proposed prime-field m=3/4 msolve panel can only rank presentations by a constant; no outcome moves the exponent."
+   }
   },
   {
    "id": "LEAD-ICE-charged-toy-ic-exponent-vs-rho",
@@ -1638,7 +1728,7 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_next_step",
-   "verdict": "open",
+   "verdict": "refuted",
    "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "0 expected (closure at exponent 1/2)",
@@ -1657,7 +1747,16 @@
    ],
    "notes": "Open only because the lemma is unwritten; every priced route read points to closure. research-kb MCP and ecdb not available in this container (grep only); atlas YAML vault-encrypted, so atlas text read only through the 2026-11-07 survey. Sweep RESULT.md files are single stdlib toy runs by subagents (research/lead_sweep_20261110/SWEEP_REPORT.md says weak evidence, triage only).",
    "pcc": "unverified",
-   "worker": "W3"
+   "worker": "W3",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "The record itself notes a principal ideal acts on E(F_p) as the integer a+b and h ~ p^(1/2) lives in a group unrelated to Z/N (/home/user/crypto/research/ecdlp_subexp_ideas_20261110/README.md line 150). The pending simulation lemma is covered by two closed_obstructed atlas theorems: End(G)=Z/N on prime-order G is GGM-simulable, and ECDLP cost is an isogeny-class invariant (atlas_survey.md lines 54 and 147). Its positive outcome would be a barrier, not an attack, so 'open' overstates; refuted at desk."
+   }
   },
   {
    "id": "LEAD-STR-level-structure-torsor",
@@ -1692,7 +1791,16 @@
    ],
    "notes": "Disagreement: recorded open_next_step vs notes saying 'dead by size'. The title in leads.json is empty. Genus formula typed from memory, matches known g=1 (N=11), g=2 (N=13). research-kb MCP and ecdb not available in this container (grep only); atlas YAML vault-encrypted, so atlas text read only through the 2026-11-07 survey. Sweep RESULT.md files are single stdlib toy runs by subagents (research/lead_sweep_20261110/SWEEP_REPORT.md says weak evidence, triage only).",
    "pcc": "unverified",
-   "worker": "W3"
+   "worker": "W3",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "Refuted/desk holds for its stated scope: g(X_1(N))=(N-5)(N-7)/24 for prime N, and with N ~ p any computation on X_1(N) is at least cost p; the record's own caveat ('only Hasse-Weil routes are excluded') should stay in notes."
+   }
   },
   {
    "id": "LEAD-STR-jmv-random-self-reduction",
@@ -1746,7 +1854,16 @@
    ],
    "notes": "A clean screen bounds only visible weaknesses. Scale numbers second-hand via survey. research-kb MCP and ecdb not available in this container (grep only); atlas YAML vault-encrypted, so atlas text read only through the 2026-11-07 survey. Sweep RESULT.md files are single stdlib toy runs by subagents (research/lead_sweep_20261110/SWEEP_REPORT.md says weak evidence, triage only).",
    "pcc": "unverified",
-   "worker": "W3"
+   "worker": "W3",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "measured",
+    "prior_flagship": false,
+    "prior_column": "BARRIER",
+    "reason": "Blocked on unrecoverable historical generator records is accurate (atlas_survey.md line 152, exhausted_at_scale); BARRIER column right. Not an IC mechanism; no change."
+   }
   },
   {
    "id": "LEAD-TRF-prime-field-isogeny-to-weak",
@@ -1998,7 +2115,16 @@
    ],
    "notes": "Result near-tautological per PROTOCOL.md s6; A/A arm cannot detect noise because counts are exact.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "LIFT",
+    "reason": "Open/toy is right: exact p^-3 for the linear section shape and PROOF.md covers Q and number fields, not function fields; the exact-count test at p<=13 for degree-2 shapes is cheap and decisive for the shape class."
+   }
   },
   {
    "id": "LEAD-TRF-global-lift-small-height",
@@ -2010,7 +2136,7 @@
    "recorded_disposition": "open_next_step",
    "verdict": "open",
    "evidence_strength": "toy",
-   "flagship": true,
+   "flagship": false,
    "exponent_delta": "unknown (classic xedni asymptotically >= 1/2 by Theorem 2, paper proof)",
    "distance_to_rho": "not quantified; Theorem 2 vacuous at 256 bits for r>=2, excludes only from b>=265,842,1773,3134,5015 bits for r=2..6 (crypto:research/prime_field_ic_closure_20261112/finish/lifting-check/copy/out/bounds.md)",
    "mechanism": "Global lifts to E(Q) or E(K) with small canonical height (xedni, SNFS/cyclotomic/Solinas fields, rational 2-torsion lifts).",
@@ -2028,7 +2154,16 @@
    ],
    "notes": "Flagship (shared with LEAD-EXO-global-lift-height) because the 2026-11-12 closure ledger names lifting as one of two remaining gaps; the other is auxiliary-variable PKM presentations at m>=6 (not in this assignment). Disagreement: the survey/atlas label is open_next_step, the PROOF.md note makes classic xedni asymptotically closed but only on paper.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": true,
+    "prior_column": "LIFT",
+    "reason": "Open is defensible, but two things are wrong. Its cheapest_next_test (another r=7..9 height census) is exactly what CONTINUATION_PROTOCOL forbids: 'do not launch another height census until an executable public-input selector returns small-height preimages; measurements on unsuccessful lifts do not bound successful lifts' (also L4-check/CHECK.md F1). And the flagship duplicates CH-L4's lifting question; keep one flag."
+   }
   },
   {
    "id": "LEAD-TRF-one-point-self-pairing",
@@ -2200,7 +2335,16 @@
    ],
    "notes": "Related lead LEAD-EXO-low-degree-algebraic-query-bound (not assigned here) carries the conjecture.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "BARRIER",
+    "reason": "Open is acceptable for a BARRIER lead: the single-test lemma is unproved; note that its positive outcome is a barrier and cannot advance an attack."
+   }
   },
   {
    "id": "LEAD-EXO-holant-decomposition-count-network",
@@ -2260,13 +2404,13 @@
   {
    "id": "LEAD-EXO-lange-winterhof-interpolation",
    "label": "Lange-Winterhof: paper unread",
-   "column": "ORACLE",
+   "column": "BARRIER",
    "source_kind": "atlas",
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_next_step (no next_step text)",
    "verdict": "blocked",
-   "evidence_strength": "none",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "unknown",
    "distance_to_rho": "not quantified",
@@ -2282,7 +2426,16 @@
    ],
    "notes": "Blocked on a missing paper, not on compute.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Verdict 'blocked on the paper' is fair, but column ORACLE is wrong: Lange-Winterhof (COCOON 2002) is, as recalled (paper not re-read here), a set of LOWER bounds on the degree/sparsity of polynomials interpolating the EC discrete log, i.e. a barrier. Column should be BARRIER and the expected outcome of reading it is a closure, not an oracle. Strength desk (recalled literature), not none."
+   }
   },
   {
    "id": "LEAD-EXO-global-lift-height",
@@ -2294,7 +2447,7 @@
    "recorded_disposition": "open_next_step",
    "verdict": "open",
    "evidence_strength": "toy",
-   "flagship": true,
+   "flagship": false,
    "exponent_delta": "unknown (same question as LEAD-TRF-global-lift-small-height)",
    "distance_to_rho": "not quantified; naive Q-lifts need B50 ~ p^1.7 (toy, research/lead_sweep_20261110/LEAD-EXO-global-lift-height/RESULT.md)",
    "mechanism": "Height-compressing global lifts over Q, number fields, function fields and elliptic surfaces.",
@@ -2311,7 +2464,16 @@
    ],
    "notes": "Twin of LEAD-TRF-global-lift-small-height; flagship flag shared. Toy slopes have wide uncertainty (6 tiny primes, no CI).",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": true,
+    "prior_column": "LIFT",
+    "reason": "Same question and same stale next test as LEAD-TRF-global-lift-small-height: the CONTINUATION_PROTOCOL bars another height census without a public selector, and L4-check F1 shows unsuccessful-lift heights cannot bound successful ones. The toy (box-height counts ~p^1.7) is about naive lifts and agrees with the expected closure. Flagship belongs to CH-L4 only."
+   }
   },
   {
    "id": "LEAD-EXO-torsor-deck-period",
@@ -2321,8 +2483,8 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_next_step",
-   "verdict": "open",
-   "evidence_strength": "toy",
+   "verdict": "unexamined",
+   "evidence_strength": "none",
    "flagship": false,
    "exponent_delta": "unknown",
    "distance_to_rho": "not quantified",
@@ -2338,7 +2500,16 @@
    ],
    "notes": "Atlas condition: a rational, target-compatible selector or section of a nontrivial cover.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "The record itself says the toy 'does not touch the real object' and that 'no cheap compute test exists' (lead_sweep_20261110/LEAD-EXO-torsor-deck-period/RESULT.md); the only homomorphic selector found is the known DL parity bit. 'Open' requires a decisive test that exists; here the object (a rational target-compatible section of a nontrivial cover) has not been constructed, so the honest state is unexamined with strength none."
+   }
   },
   {
    "id": "LEAD-EXO-ksum-conjecture-s5-oracle",
@@ -2403,8 +2574,8 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "open_blocked",
-   "verdict": "blocked",
-   "evidence_strength": "toy",
+   "verdict": "out-of-scope",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "0.25 vs 0.5 only with the leaked advice",
    "distance_to_rho": "toy Cheon slope 0.2516 vs BSGS null 0.5039 (research/lead_sweep_20261110/LEAD-EXO-hnp-advice-leakage/RESULT.md); rho slope in that toy 1.006 so the rho ratio is unreliable",
@@ -2420,7 +2591,16 @@
    ],
    "notes": "The toy rho baseline is mis-specified (slope 1.006 vs 0.5, ~200x too many steps at 22 bits); do not quote Cheon/rho ratios as matched-rho gaps.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "BARRIER",
+    "reason": "The 0.25 exponent needs leaked auxiliary points [a^i]G with d | n-1 (Cheon), confirmed only for that setting (lead_sweep_20261110/LEAD-EXO-hnp-advice-leakage/RESULT.md); standard single-target prime-field ECDLP has no leakage or auxiliary input. This is ECDLP-with-auxiliary-input / side-channel, not an E(F_p) index-calculus lead, so it should not sit in the blocked column."
+   }
   },
   {
    "id": "LEAD-EXO-elliptic-code-list-decoding",
@@ -2502,7 +2682,16 @@
    ],
    "notes": "Bucket-averaged barrier for sum-compatible and character filters is recorded in the atlas; unverified here.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Blocked on the vaulted O2 kernel definition with evidence none is accurate; the x mod B stand-in does not test the lead (RESULT.md)."
+   }
   },
   {
    "id": "LEAD-EXO-gag-holant-semaev-chain",
@@ -2556,7 +2745,16 @@
    ],
    "notes": "Blocked on a missing paper; RESULT.json 'arms' is empty so per-arm data is not dumped.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Blocked pending the Lange-Winterhof statements is accurate; the RANSAC null at p~10^3 says nothing asymptotic. Expect closure (L-W are lower bounds, recalled)."
+   }
   },
   {
    "id": "LEAD-EXO-miller-pairing-cocycle",
@@ -2665,7 +2863,16 @@
    ],
    "notes": "No constructor has been tested; the toy restates the recorded obstruction.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "Blocked on per-row constructors is accurate; the toy is near-tautological, so strength toy is generous but harmless."
+   }
   },
   {
    "id": "LEAD-EXO-lossy-object-propagation",
@@ -2692,7 +2899,16 @@
    ],
    "notes": "run.py verdict 'falsified' applies the preregistered rule literally; the decay with size suggests a small-p artifact (hypothesis, untested). Blocked on the panel definition.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Blocked on the vaulted IDEA-20260817-84755b panel is accurate; the toy dependence vanishes by 20 bits (RESULT.md), which already leans closed."
+   }
   },
   {
    "id": "LEAD-EXO-weak-class-instrument-calibration",
@@ -2719,7 +2935,16 @@
    ],
    "notes": "Methodological caveat for all null verdicts at toy size.",
    "pcc": "unverified",
-   "worker": "W4"
+   "worker": "W4",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "BARRIER",
+    "reason": "Open BARRIER control is right; it bounds the power of every null in the corpus rather than testing a mechanism."
+   }
   },
   {
    "id": "IDEA-20261109-5dd4ab",
@@ -3087,7 +3312,16 @@
    ],
    "notes": "Evidence is desk plus one trivial arithmetic check; the degree bound and local-image claims are unverified assertions. Verified on Tate-type invariance only through the linked lead's toy.",
    "pcc": "unverified",
-   "worker": "W5"
+   "worker": "W5",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "Refuted/desk holds as a barrier for degree-N descents; the N=1 mod 6 input is forced for j=0 prime order (N is the norm of a non-unit of Z[omega] prime to 3). Linked lead closed_obstructed."
+   }
   },
   {
    "id": "IDEA-20261109-f861c2",
@@ -3834,7 +4068,16 @@
    ],
    "notes": "Representational identification, no exponent change claimed; verdict 'refuted' refers to its use as a solver lever. Desk only. All content [pcc:unverified].",
    "pcc": "unverified",
-   "worker": "W6"
+   "worker": "W6",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Refuted/desk holds: the record proves its duality route reduces to enumerating (m-1)-subsets, the generic oracle closed at R=7.09 above rho (lead_sweep LEAD-ICE-generic-oracle-arity-cost-floor)."
+   }
   },
   {
    "id": "IDEA-20261109-2debfa",
@@ -3844,9 +4087,9 @@
    "pr": 3238,
    "pr_state": "OPEN",
    "recorded_disposition": "status: proposed; class: solver; lead LEAD-ICB-cofactor-projected-ladder-base; lead_delta.kind: advances_next_action; PR OPEN",
-   "verdict": "open",
-   "evidence_strength": "toy",
-   "flagship": true,
+   "verdict": "refuted",
+   "evidence_strength": "desk",
+   "flagship": false,
    "exponent_delta": "0 (self-declared); e_2<1 would change the exponent",
    "distance_to_rho": "not quantified",
    "mechanism": "S_{m+1}(X,Y;x3..xm,xR) factors into 2^(m-2) bidegree-(2,2) copies of S_3 at x(R+sum eps_i P_i), so the k=2 joint solve on mu_B^2 costs ~B by factor-and-hash, and e_2<1 would need sub-linear point finding of a (2,2)-curve on a subgroup grid.",
@@ -3868,7 +4111,16 @@
    ],
    "notes": "Verdict 'open' rests on the lemma being undecided, not on evidence of promise; prior is low (hash needs ~B anyway). Flagship = exponent-level only if e_2<1. Exponent delta: needs e_2<1 (unknown). All content [pcc:unverified].",
    "pcc": "unverified",
-   "worker": "W6"
+   "worker": "W6",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": true,
+    "prior_column": "ORACLE",
+    "reason": "The record's own composition (e_k <= k-2+e_2 by enumerating k-2 variables, interpretation_limits 'e_2=1 moves no exponent') bounds the whole mu_B IC route: under the CONTINUATION_PROTOCOL all-output model the best exponent is 2/(3-e_2) >= 2/3 even at e_2=0, and at m=8 the per-call gamma=6+e_2 is far above the 3.5 gate (check below; /home/user/crypto/research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md A1). So the 'e_2<1 lemma' is a real open mathematical question but its positive outcome cannot reach rho; it is not an exponent-level flagship. The m=2 mu_B zero question is also exactly the Kummer m=2 closure measured in growth_law (d_F grows with t), and closure-ledger A4 (algebraic mu_{2^k}: Macaulay space at D* is all of |V|^m)."
+   }
   },
   {
    "id": "IDEA-20261109-3a4152",
@@ -3878,8 +4130,8 @@
    "pr": 3238,
    "pr_state": "OPEN",
    "recorded_disposition": "status: proposed; class: representation; lead LEAD-ICE-quadratised-chain-representation; lead_delta.kind: advances_next_action; PR OPEN",
-   "verdict": "open",
-   "evidence_strength": "toy",
+   "verdict": "refuted",
+   "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "0 (self-declared)",
    "distance_to_rho": "not quantified",
@@ -3903,7 +4155,16 @@
    ],
    "notes": "Atlas row LEAD-ICE-quadratised-chain-representation is a binary-field lead (representation_leads_20261109/README.md); this record is its prime-field analogue and shares only the name. 3a4152 restricts to a=0, 0cbdd4 claims j=0 for all (a,b); my count supports the all-(a,b) statement. All content [pcc:unverified].",
    "pcc": "unverified",
-   "worker": "W6"
+   "worker": "W6",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The only exponent lever the record names is a B^(2-delta) 3SUM into the trace-zero locus, but arity-2 decomposition is already O(B) by hashing the base and testing R-P (the worker's own note; record target_complexity 'arity-2 search stays B^2' is itself pessimistic). A sub-B^2 3SUM is dominated by the trivial O(B) lookup, and the record declares 'no ECDLP exponent changes' and needs an F_{p^3} DLP for its log coordinates (interpretation_limits). Refuted as a lead; the Sage pipeline would only verify a representation identity."
+   }
   },
   {
    "id": "IDEA-20261109-d0ce11",
@@ -3913,7 +4174,7 @@
    "pr": 3238,
    "pr_state": "OPEN",
    "recorded_disposition": "status: proposed; class: solver; lead LEAD-ICE-sat-xor-pdp-oracle; lead_delta.kind: advances_next_action; PR OPEN",
-   "verdict": "blocked",
+   "verdict": "refuted",
    "evidence_strength": "desk",
    "flagship": false,
    "exponent_delta": "0 (self-declared)",
@@ -3934,7 +4195,16 @@
    ],
    "notes": "Blocked here only on solver binaries; the static XOR-hypergraph statistic needs no solver and could be computed first. Exponent claim: none. All content [pcc:unverified].",
    "pcc": "unverified",
-   "worker": "W6"
+   "worker": "W6",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The record predicts a negative (XOR/Gauss-Jordan should not help, ratio <= 1.5x), and its positive outcome would be a constant factor on a SAT oracle already measured far above rho: CaDiCaL on the bit-level ladder alpha_FRESH=1.877 [1.675,2.188] (/home/user/crypto/research/sat_ladder_scaling_20261110/README.md), cvc5 unknown at 20 bits (/home/user/crypto/research/prime_field_smt_20261005/RESULT.md), and CONTINUATION_PROTOCOL Decision 4 demotes CDCL/SMT to controls. 'Blocked' on a missing solver binary overstates a route whose every outcome is closed at the exponent level."
+   }
   },
   {
    "id": "IDEA-20261109-506334",
@@ -5225,8 +5495,8 @@
    "recorded_disposition": "YAML status: proposed, approved_by: null; wave tag [adaptation] (wave lead 5); PR #3183 OPEN",
    "flagship": false,
    "pcc": "unverified",
-   "verdict": "blocked",
-   "evidence_strength": "none",
+   "verdict": "refuted",
+   "evidence_strength": "toy",
    "exponent_delta": "0 (self-declared; no exponent below 1/2 claimed)",
    "distance_to_rho": "not quantified (record predicts scaling exponent c_w >= 0.85 vs interval method 1/2)",
    "mechanism": "Encode Q=kP with k<2^w as a Tseitin-encoded double-and-add circuit over F_p and fit the CaDiCaL median solve time T(w)=A 2^{c w}, with a matched null circuit.",
@@ -5239,7 +5509,16 @@
     "crypto:research/prime_field_lead_assessment_20261107/atlas_survey.md"
    ],
    "notes": "Blocked on a solver binary and wall-clock, not on an idea. Kill-test class: a null result is expected. | research-kb MCP and ecdb not available in this container (grep only); crypto-autoresearcher atlas is vault-encrypted and unread",
-   "worker": "W7"
+   "worker": "W7",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The proposed experiment (CaDiCaL on a Tseitin-encoded double-and-add circuit with k's bits free, fit T(w)=A 2^(cw)) was effectively run as F4-RUN-02 on the x-only Montgomery ladder: alpha_FRESH=1.877 [1.675,2.188] over n=4..7, P1 false upward, every model decoded (/home/user/crypto/research/sat_ladder_scaling_20261110/README.md). The record's 'nothing for this id exists in /home/user/crypto' missed this; double-and-add vs Montgomery ladder is an encoding variant, not a new mechanism. Refuted at toy scale (not replayed), not blocked/none."
+   }
   },
   {
    "id": "IDEA-20261109-37348e",
@@ -5376,7 +5655,16 @@
     "crypto:research/iwasawa_leads_20261113/REPORT.md"
    ],
    "notes": "Lemma T is a proof sketch marked [pcc:unverified]; the log entry is the closest independent statement. | research-kb MCP and ecdb not available in this container (grep only); crypto-autoresearcher atlas is vault-encrypted and unread",
-   "worker": "W7"
+   "worker": "W7",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "BARRIER",
+    "reason": "Refuted/desk holds: Heegner/Kolyvagin relations are among base points only, closed at exponent 1/2 by Lemma T (non_semaev_decomposition_20261113/README.md section 4; session log 2026-11-13)."
+   }
   },
   {
    "id": "IDEA-20261109-fcf651",
@@ -5415,8 +5703,8 @@
    "recorded_disposition": "YAML status: proposed, approved_by: null; wave tag [speculative] (wave lead 3); PR #3192 MERGED",
    "flagship": false,
    "pcc": "unverified",
-   "verdict": "open",
-   "evidence_strength": "none",
+   "verdict": "out-of-scope",
+   "evidence_strength": "desk",
    "exponent_delta": "0 (self-declared; 'in every outcome no exponent moves')",
    "distance_to_rho": "not quantified",
    "mechanism": "The second Witt digit x_1(P)=(x(Phat)-x(P)^p)/p of the torsion-section lift is claimed to equal alpha y(P) c(P) + h(P) with h in L(nO), c the finite-field zeta, which would place the crystalline coordinate in the de Rham one.",
@@ -5431,7 +5719,16 @@
     "crypto:research/prime_field_lead_assessment_20261107/atlas_survey.md"
    ],
    "notes": "The cocycle c used in this record is the one run in IDEA-20261109-410419 today. Flagged open rather than refuted because the sibling sweep shows a non-null digit signal with an unexplained effect size. | research-kb MCP and ecdb not available in this container (grep only); crypto-autoresearcher atlas is vault-encrypted and unread",
-   "worker": "W7"
+   "worker": "W7",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "LIFT",
+    "reason": "The record states 'A confirmed fit identifies two coordinates; it does not make either informative about k' and exponent delta 0 (interpretation_limits, target_complexity in ideas-corpus/files/ledger/proposals/IDEA-20261109-16e2d3.yaml). That is pure formula verification (Witt vs E^nat coordinate), which the brief puts out of scope; independently, the sibling c0eacd argument (Hom(Z/N, Z_p-module)=0, unique order-N lift) and LEAD-TRF-padic-canonical-section already close any DL use of the digit."
+   }
   },
   {
    "id": "IDEA-20261109-410419",
@@ -5492,7 +5789,16 @@
     "crypto:research/ecdlp_subexp_ideas_20261110/README.md"
    ],
    "notes": "Non-additive invariants are explicitly not excluded by the record. | research-kb MCP and ecdb not available in this container (grep only); crypto-autoresearcher atlas is vault-encrypted and unread",
-   "worker": "W7"
+   "worker": "W7",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "LIFT",
+    "reason": "Refuted/desk holds: coprime orders give a unique order-N lift and Hom(Z/N, Z_p-module)=0 for N != p; matches LEAD-TRF-padic-canonical-section (atlas_survey.md). The lift-count toy would only confirm."
+   }
   },
   {
    "id": "IDEA-20261109-e2592b",
@@ -5624,15 +5930,15 @@
   {
    "id": "IDEA-20261109-f7c381",
    "label": "f7c381 Function-field xedni null",
-   "column": "LIFT",
+   "column": "BARRIER",
    "source_kind": "idea-pr",
    "pr": 3196,
    "pr_state": "MERGED",
    "recorded_disposition": "YAML status: proposed, approved_by: null; wave tag [adaptation] -> RECORD D (wave lead 7); PR #3196 MERGED",
    "flagship": false,
    "pcc": "unverified",
-   "verdict": "open",
-   "evidence_strength": "none",
+   "verdict": "refuted",
+   "evidence_strength": "desk",
    "exponent_delta": "0 (self-declared)",
    "distance_to_rho": "not quantified",
    "mechanism": "On a rational elliptic surface over F_p(T) the specialisation of r>=3 Mordell-Weil sections at a fibre with prime N has relation lattice of index exactly N, predicted to look like the random lattice of r random points (lambda_1 about sqrt(r/2 pi e) N^{1/r}).",
@@ -5647,7 +5953,16 @@
     "crypto:research/prime_leads_chase_20261113/README.md"
    ],
    "notes": "Open because a decisive cheap test exists and was not run; no ECDLP exponent is at stake. | research-kb MCP and ecdb not available in this container (grep only); crypto-autoresearcher atlas is vault-encrypted and unread",
-   "worker": "W7"
+   "worker": "W7",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "LIFT",
+    "reason": "The record declares 'Nothing here proposes an algorithm; exponent delta is 0' (YAML interpretation_limits). The specialised sections give relations among base points only, so Lemma T (/home/user/crypto/research/non_semaev_decomposition_20261113/README.md section 4) caps any use at exponent 1/2, and the lattice Lambda cannot even be formed without the logs it encodes. It is a null-test/control with no exponent-level outcome; 'open' should be refuted (or BARRIER control)."
+   }
   },
   {
    "id": "IDEA-20261109-4a3247",
@@ -7405,7 +7720,7 @@
    "recorded_disposition": "Inconclusive",
    "verdict": "open",
    "evidence_strength": "desk",
-   "flagship": true,
+   "flagship": false,
    "exponent_delta": "unknown (JKSST predicts about 1 or worse, conditional)",
    "distance_to_rho": "not quantified",
    "mechanism": "Lift (P,Q) to a number field / Q so that dependent lifts give a relation with growing rank, then reduce.",
@@ -7421,7 +7736,16 @@
    ],
    "notes": " research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only. Evidence directories cited by the ledger live under another session's /tmp scratchpad (ad79db08-...), not in this container, so the numbers are quoted from the ledger and not re-read.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "desk",
+    "prior_flagship": true,
+    "prior_column": "LIFT",
+    "reason": "Open is right, but this ledger row is superseded by CH-L4 (Theorem X and its check, /home/user/crypto/research/prime_leads_chase_20261113/L4-check/CHECK.md) and by CONTINUATION_PROTOCOL's 'blocked: growing-rank lifting requires an explicit public small-height lift selector'. Flagging it as a separate flagship double-counts the lifting question; keep the flag on CH-L4 only."
+   }
   },
   {
    "id": "CL-A9",
@@ -7447,7 +7771,16 @@
    ],
    "notes": " research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only. Evidence directories cited by the ledger live under another session's /tmp scratchpad (ad79db08-...), not in this container, so the numbers are quoted from the ledger and not re-read.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Refuted holds: a presentation choice changes a p-independent constant bounded by D(m)/Bezout (closure-ledger.md A9)."
+   }
   },
   {
    "id": "CL-A10",
@@ -7473,7 +7806,16 @@
    ],
    "notes": "9.8x-42.9x rho (crypto:research/chained_prime_transfer_20261111/README.md:35) research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only. Evidence directories cited by the ledger live under another session's /tmp scratchpad (ad79db08-...), not in this container, so the numbers are quoted from the ledger and not re-read.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "TRANSFER",
+    "reason": "Refuted holds: genus-2 IC on a p^2-order Jacobian is exponent >= 1 in p (Gaudry p^(2-2/g)), and the repo measures 9.8-42.9x rho (chained_prime_transfer_20261111/README.md line 35)."
+   }
   },
   {
    "id": "CL-A11",
@@ -7749,7 +8091,16 @@
    ],
    "notes": "Whole explicit-table family B1-B13: ledger section 2 says every measured or projected arm stays 4.5x-33x above matched rho, gap growing with size where measured (strong at 16-32 bits, not a proof). research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only. Evidence directories cited by the ledger live under another session's /tmp scratchpad (ad79db08-...), not in this container, so the numbers are quoted from the ledger and not re-read.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Refuted holds: x([2]P) is a rational function of x(P) and costs more to evaluate than the membership test it would prefilter (closure-ledger.md B9)."
+   }
   },
   {
    "id": "CL-B10",
@@ -7803,7 +8154,16 @@
    ],
    "notes": "Whole explicit-table family B1-B13: ledger section 2 says every measured or projected arm stays 4.5x-33x above matched rho, gap growing with size where measured (strong at 16-32 bits, not a proof). research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only. Evidence directories cited by the ledger live under another session's /tmp scratchpad (ad79db08-...), not in this container, so the numbers are quoted from the ledger and not re-read.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "ENG",
+    "reason": "Refuted holds: for superlinear M, M(kd) >= k M(d), so a product-tree batch of x^p is not cheaper (closure-ledger.md B11). ENG column right."
+   }
   },
   {
    "id": "CL-B12",
@@ -7892,7 +8252,16 @@
    ],
    "notes": "Disagreement across sources: the closure ledger (2026-11-12) still lists PKM chain m>=6 as the one live exponent question; the chase (11-13) closes m<=7 and leaves m=8 inconclusive; the continuation (11-13) then says even D=9 would not support the gain after whole-solve charging. Newest wins: open only through the sparse relation-finder panel. All [pcc:unverified]. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "measured",
+    "prior_flagship": true,
+    "prior_column": "ORACLE",
+    "reason": "Keep open/measured/flagship: the one surviving exponent-level PKM question. The test is CONTINUATION_PROTOCOL panel A (gamma<3.5 all-output gate, gamma<3 one-output), prerequisite: recover the missing L1 closure source; the D(8,3) cell is a diagnostic only. A positive gamma<3.5 would change the exponent."
+   }
   },
   {
    "id": "CH-D83",
@@ -7902,8 +8271,8 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "INCONCLUSIVE, leaning KILL; certified D(8,3)>=9, msolve evidence >=10",
-   "verdict": "blocked",
-   "evidence_strength": "measured",
+   "verdict": "refuted",
+   "evidence_strength": "proof",
    "flagship": false,
    "exponent_delta": "D(8,3)=9 -> E about 0.43; D>=10 -> E>=0.65 (A3 model); not end-to-end after cost-floor audit",
    "distance_to_rho": "not quantified as a priced ratio",
@@ -7926,7 +8295,16 @@
    ],
    "notes": "Recorded as inconclusive-leaning-KILL, not KILL (session log 2026-11-13 05:55Z). Blocked on host class (>=140 GB, EKS) and isolab budget. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "blocked",
+    "prior_strength": "measured",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The mechanism as recorded ('the one numeric cell deciding whether PKM m=8 beats rho under the A3 cost model') is withdrawn: the Lean-checked cost-floor statement p < W^2 with c >= B^4 (/home/user/crypto/research/prime_norm_rank_20261112/cost-floor-report/README.md, lean/PrimeICCostFloor.lean) removes the m=8 gain even if D(8,3)=9, and CONTINUATION_PROTOCOL Decision 1 demotes the cell to a diagnostic. The degree value itself remains uncertified (blocked on a ~140 GB host), but that no longer decides any attack; record it as refuted (model-level proof, pcc unverified) with the degree diagnostic noted."
+   }
   },
   {
    "id": "CH-L2",
@@ -8005,7 +8383,16 @@
    ],
    "notes": "Iwasawa R2 (IW-R2) closes the Q case conditional on Lang's height conjecture; the chase says the route is not closed. Both recorded. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "desk",
+    "prior_flagship": true,
+    "prior_column": "LIFT",
+    "reason": "Keep open/desk/flagship: Theorem X is sound with gaps (L4-check/CHECK.md); growing-rank lifting stays open, blocked in practice on an explicit public small-height lift selector (CONTINUATION_PROTOCOL table). This is the second live exponent-level question named by the closure ledger (row A8)."
+   }
   },
   {
    "id": "CH-L5",
@@ -8057,7 +8444,16 @@
    ],
    "notes": "Instance-independence confirmed, mechanism not tested. Study PR #3967 as named in session log 2026-11-12 06:20 UTC; merge state not verified. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "FB",
+    "reason": "Blocked on the owner's GPU-route authorisation is accurate; stage 1 matched 72/72 cells (RESULTS.md). Note it is a closure-type lower-bound heuristic (BARRIER-like): its positive outcome closes, not advances."
+   }
   },
   {
    "id": "LEAD-P-P2",
@@ -8083,7 +8479,16 @@
    ],
    "notes": "Related growth evidence: the ml-cryptanalysis growth-law proof (LFD unbounded, slope >=1/14) is cited in leads_20261112 section 0, not re-read here. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "blocked",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "FB",
+    "reason": "Blocked on GPU route with evidence none is accurate; no record found."
+   }
   },
   {
    "id": "LEAD-P-P3",
@@ -8212,7 +8617,16 @@
    ],
    "notes": "research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "open",
+    "prior_strength": "none",
+    "prior_flagship": false,
+    "prior_column": "FB",
+    "reason": "Open/none is fair, though prior evidence (first fall degree 5 vs 4, falsified-as-gain in non_semaev_decomposition_20261113/README.md) predicts S2 at best matches Kummer."
+   }
   },
   {
    "id": "LEAD-SYN-S3",
@@ -8397,7 +8811,7 @@
    "pr": null,
    "pr_state": null,
    "recorded_disposition": "measured 2026-11-11; 'shape-driven'; derivation of d_F(W,N) is the remaining theory lead",
-   "verdict": "open",
+   "verdict": "refuted",
    "evidence_strength": "toy",
    "flagship": false,
    "exponent_delta": "needs fall-degree slope below 0.017 per unknown bit at m=4 (omega'=2); measured 0.125 per bit in t and 0.5 per bit in m",
@@ -8413,7 +8827,16 @@
    ],
    "notes": "Brief mentions a PR #4151 whose title says a t=12 falsifying cell happened; I could not find that PR or a readable result in this container, so that is unverified here. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "BARRIER",
+    "reason": "The mechanism is 'a law that stays bounded for some presentable support'. Every width measured grows: W=3/4 stepped at t=9 (/home/user/crypto/research/prime_ic_leads_20261110/devcheck/README.md), W=2 is the tower, and the remaining W=1 falsifier of Conjecture G (step to 6 at t=12, growth_law/README.md section 5) is reported satisfied by PR #4151 (d_F>=6). The derivation still missing (a t-growing lower bound) can only close PKM, so it belongs under CH-L1; the bounded-degree hope is refuted at toy scale. Caveat: #4151's data are not in this checkout (growth_law/falsify/nullw1_m2_t12_k0.jsonl is 0 bytes), so this rests on the reported value [pcc:unverified]."
+   }
   },
   {
    "id": "SUBEXP-L",
@@ -8566,7 +8989,16 @@
    ],
    "notes": "Ulmer papers known only through web-search summaries. All derivations by the producing session, [pcc:unverified]; standard facts cited not re-proved in Lean. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "FB",
+    "reason": "Refuted holds: specialisation hands over no logs (Lemma B), the Legendre family has full 2-torsion so no prime-order fibre, and specialised points lie in E(F_{p^2f}) (iwasawa_leads_20261113/REPORT.md)."
+   }
   },
   {
    "id": "IW-I14",
@@ -8672,7 +9104,7 @@
    "pr": 3943,
    "pr_state": "MERGED",
    "recorded_disposition": "prior 0.001 (alpha<0.5), 0.02 (reuse>=2x); kill: alpha lower CI >=0.6 and reuse >=0.5",
-   "verdict": "open",
+   "verdict": "refuted",
    "evidence_strength": "toy",
    "flagship": false,
    "exponent_delta": "alpha_FRESH 1.88 vs 0.5: loss of about +1.4 on the fresh axis; reuse axis undecided",
@@ -8689,7 +9121,16 @@
    ],
    "notes": "Card-run with receipts and frozen tool, not independently replayed. The verdict is open only because decision rule 2 fired and its replication is unrecorded; the exponent of fresh solves is clearly exhaustive-like. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "toy",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "The exponent axis is refuted upward (alpha_FRESH=1.877 [1.675,2.188] vs rho 0.5, /home/user/crypto/research/sat_ladder_scaling_20261110/README.md). The surviving 'lead alive' clause is clause reuse across targets on one curve; the README notes the first REUSE solve costs 1.0-2.5x a FRESH solve, so the single-target exponent is unchanged and reuse is multi-target amortisation (n<=7 means r~2^7 where 10 targets cover a sizeable share of the group). F4-REP-01's positive outcome cannot change the single-target exponent the success criterion measures; record refuted (toy) with the pending replication noted."
+   }
   },
   {
    "id": "MOON-2",
@@ -8817,7 +9258,16 @@
    ],
    "notes": "research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": false,
+    "prior_verdict": "refuted",
+    "prior_strength": "desk",
+    "prior_flagship": false,
+    "prior_column": "ORACLE",
+    "reason": "Refuted/desk is acceptable but weak: it rests only on the generator's own kill statement (session log 2026-11-10 20:05Z). Independent reason: a decomposability decision oracle does not find decompositions, and per-target decision is already O(1) in the explicit-table family (closure-ledger.md B12). Keep refuted; the exact identity check is a correctness guard only."
+   }
   },
   {
    "id": "MOON-7",
@@ -8930,7 +9380,7 @@
    "recorded_disposition": "Open (encyclopedia 0.1 status: solver axis open, F4 only at NIST size)",
    "verdict": "open",
    "evidence_strength": "measured",
-   "flagship": true,
+   "flagship": false,
    "exponent_delta": "needs fall-degree slope below 0.017/bit at m=4 (omega'=2) for parity; measured 0.125/bit in t and 0.5/bit in m",
    "distance_to_rho": "slope 0.125 (t) vs 0.017-0.066 thresholds at omega'=2, factor about 7x in t and 10-30x in m (prime_ic_leads README section 3); no priced S ratio at NIST size",
    "mechanism": "Coset of the 2^t-th roots of unity as factor base; membership via t quadratic tower equations with auxiliary unknowns; the P-224 shape (v2(p-1)=96).",
@@ -8956,7 +9406,16 @@
    ],
    "notes": "Evidence is all [pcc:unverified], toy-to-NIST-prime F4 stage diagnostics, not a priced row. Verdict stays open because the lane has a decisive cell that was not completed, but every completed cell is on the 'grows' side. The brief's 'PR #4151: t=12 falsifying cell happened' could not be verified in this container: the committed falsify/ run is empty, and the committed t=12 result (RESULTS_T12_BRACKET.md, d_F=6) agrees with the C-step law. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only. | Main-session addendum 2026-11-14: crypto PR #4151 (merged 19:47Z, 'Growth law: W = 1, t = 12 falsifying cell') reports d_F >= 6 at t = 12 on both draws from a completed degree-5 closure (55,455 columns, about 500 s each, 4-core host, [pcc:unverified]); the predicted C-step happened and Conjecture G survives; exact value 6 untested (degree-6 closure needs > 15 GB). Source: PR #4151 body; research/prime_ic_leads_20261110/growth_law/README.md §5 after merge.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "measured",
+    "prior_flagship": true,
+    "prior_column": "FB",
+    "reason": "Open on the solver axis is fair (no relation phase at NIST size), but this factor base's live question is exactly CH-L1 (PKM fall-degree growth at m>=8, sparse panel A); flagging both double-counts. Its d_F ladder is consistent with the C-step law, and PR #4151 (reported today, not in this checkout: growth_law/falsify/*.jsonl are zero bytes) adds d_F>=6 at W=1,t=12, i.e. the predicted growth happened."
+   }
   },
   {
    "id": "ENC-0.2",
@@ -8968,7 +9427,7 @@
    "recorded_disposition": "Open on the solver axis (encyclopedia 0.2 status); V built at P-192, no F4 run",
    "verdict": "open",
    "evidence_strength": "measured",
-   "flagship": true,
+   "flagship": false,
    "exponent_delta": "unknown; same slope question as ENC-0.1 (d_F grows in m)",
    "distance_to_rho": "29-94x rho at w=0 for priced IC arms at 20-24 bits (encyclopedia 0.2, PR #1947); lower-bound comparison",
    "mechanism": "Auxiliary curve E' with a rational 2^t-torsion point; V = x(R'+<Q>) via a Velu 2-isogeny chain; the only non-degenerate-at-infinity tower, defined for every prime (P-192 shape).",
@@ -8983,7 +9442,16 @@
    ],
    "notes": "No fresh evidence after the 2026-11-12 encyclopedia section; the leads_20261112 P4 reading of 0.2 was withdrawn. research-kb MCP, ecdb and the lead atlas were not available in this container; grep over crypto repo only.",
    "pcc": "unverified",
-   "worker": "W9"
+   "worker": "W9",
+   "redteam": {
+    "reviewed": true,
+    "change": true,
+    "prior_verdict": "open",
+    "prior_strength": "measured",
+    "prior_flagship": true,
+    "prior_column": "FB",
+    "reason": "Not an independent exponent-level question: the isogeny tower's first fall degree is 5 vs 4 for Kummer and d_F grows in m on both P0 ladders (/home/user/crypto/research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_C.md as quoted), and /home/user/crypto/research/non_semaev_decomposition_20261113/README.md lists the PKM Velu tower base as 'falsified as a gain: 1.00-1.33x a plain base of equal size, 18-136x rho; same F4 degree D as Kummer'. S2 stays a legitimate open check, but a positive outcome would at best match Kummer; flagship should be false."
+   }
   },
   {
    "id": "ENC-A12",
@@ -9011,5 +9479,6 @@
    "pcc": "unverified",
    "worker": "W9"
   }
- ]
+ ],
+ "redteam_applied": "2026-11-14: 25 Opus red-team changes applied; prior values kept under each record's \"redteam\" key"
 }
