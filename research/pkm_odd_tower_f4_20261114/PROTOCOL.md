@@ -204,6 +204,8 @@ targets, `m = 2` S ≤ 64 and `m = 3` S ≤ 8) was seen before freeze: every row
 written).** The first `m = 3` cell at `S = 27` ran 840 s on its first system at 5 GB. At the frozen 1,800 s per
 system, the three `m = 3` cells with `S ≥ 27` (parts A and B) could take most of a day, ahead of the replication,
 A/A and part B cells. Those cells now run last (`L3_TAIL` in `run_cells.sh`). No cell, budget, bound or rule
-changes, and §3 says order cannot change a counted metric. The interrupted cell had no rows; it reruns from the
-start under the same name (§7).
+changes, and §3 says order cannot change a counted metric. Correction to the first version of this amendment: the
+interrupted cell had one row written (and swept into a progress commit) before it was stopped; its values were
+not read before this amendment was filed. Under §7 the partial file is moved to `runs/partial/` and the cell
+reruns from the start under the same name; both are reported.
 
