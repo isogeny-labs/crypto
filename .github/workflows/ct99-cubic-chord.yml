@@ -34,3 +34,15 @@ jobs:
           cmp /tmp/ct99-py.json /tmp/ct99-jsopt.json
           cat /tmp/ct99-py.json
           sha256sum /tmp/ct99-py.json
+          # Actual arbitrary encoded public-input interface, not six scalar labels.
+          python -B "$D/ct99_cubic_chord_orientation.py" --point 27,9 | grep -F '"target_y":[77,1]'
+          python -B "$D/ct99_cubic_chord_orientation.py" --point 28,0 | grep -F '"target_y":[2879,1]'
+          if python -B "$D/ct99_cubic_chord_orientation.py" --point 27,10 2>/dev/null; then
+            echo 'invalid oriented point was accepted' >&2
+            exit 1
+          fi
+          if python -B "$D/ct99_cubic_chord_orientation.py" --point 10,4 2>/dev/null; then
+            echo 'nonmember point was accepted' >&2
+            exit 1
+          fi
+
