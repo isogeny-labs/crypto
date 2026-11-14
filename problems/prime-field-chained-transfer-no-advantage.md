@@ -222,6 +222,23 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - **Not admitted:** v3, tower_large and cover_pushforward. Their measurements reproduce in independent code, but their matched rho is plain (negation-free) and its native work is not emitted, so the gate fails on the reference.
 - **Next step for those three:** re-measuring them with the negation-map reference from `instrument_rerun` would make them admissible.
 
+## Negation re-measurement (2026-11-13 addendum)
+
+`research/negation_remeasure_20261113/RESULTS.md`; validation evidence in `research/validation_20261113/REPORT.md` [pcc:unverified].
+- **Setup.** v3, tower_large and cover_pushforward were re-measured against the negation-map rho in the same process, with rho's native counters emitted.
+- **Result.** 0 of 162 arm-rows are below rho. The plain rho total was 4.35–9.22× the negation total, so the recorded gaps were understated at 0 GAE. At priced weights this is not uniform: at the tower g3 headline cell the w = 1 distance shrinks.
+- **Verdict changes.** Fifteen cover first-collision rows had been recorded below plain rho; that came from plain rho's set-up and does not hold against the negation rho. The tower g2 p = 251 row moves from unresolved to above.
+- **Validation.** Admitted 2026-11-13: `research/negation_remeasure_20261113/VALIDATION.json`, with the commit binding confirmed against `8bf77ba333`.
+- **Verdict-change count.** Of the 16 verdict changes, 10 go to "above" and 6 to "unresolved (lower bound)".
+
+## Whole-Jacobian IC, open case O3 (2026-11-13 addendum)
+
+`research/full_jacobian_ic_20261113/RESULTS.md` [pcc:unverified]; not validated.
+- **Setup.** Gaudry-style IC on the whole `J_C(F_p)` with full relations (A) and with double large primes (B), plus the subgroup-restricted controls, at p = 211 to 51,203. Protocol frozen before data.
+- **Result.** All 36 IC cells (four arms, nine primes) are above the negation rho on `E1` at the band and at the calibrated reading. At w = 0.1, A and B cost 406 to 7.5e6 times rho.
+- **Verdict.** Unresolved under the frozen rule, because the slope-CI condition fails (lower bounds −0.07 for A and −0.65 for B). Rho costs about √r, and the selection let r vary from 71 to 3191 independently of p.
+- **Next step.** A decisive rerun freezes r ≈ p.
+
 ## Resolution and history
 
 - 2026-11-11: opened from `research/chained_prime_transfer_20261111`
@@ -241,3 +258,4 @@ See `research/chained_prime_transfer_20261111/LEADS_20261112.md` [pcc:unverified
 - 2026-11-12: proof note added; ATLAS iff narrowed to only-if.
 - 2026-11-13: instrument-fix addendum; the recorded gaps were understated.
 - 2026-11-13: validation addendum; small_de admitted, three targets not (rho reference).
+- 2026-11-13: negation re-measurement addendum.

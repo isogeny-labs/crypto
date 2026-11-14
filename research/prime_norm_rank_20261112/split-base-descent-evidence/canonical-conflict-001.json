@@ -1,0 +1,27 @@
+{
+  "schema": "canonical-merge-conflict-inspection/v1",
+  "created_utc": "2026-11-14T03:01:48.481564+00:00",
+  "feature_head": "364d5a1bd21800d3dcb54206e248db0c0ffcd1db",
+  "canonical_head": "20bab3756a38841f85230398f475ab95e5a5f308",
+  "conflicted_paths": [
+    "docs/session-logs/2026-11-14.md"
+  ],
+  "protected_source_evidence_claim_ledger_conflicts": false,
+  "journal_stages": {
+    "1": {
+      "sha256": "d778861d35b9cff2161847f7df4e0a8d96c12f80b8dafd7e5ccadc187f18acac",
+      "bytes": 17667
+    },
+    "2": {
+      "sha256": "dda9bbf90910d01d283c410e1c2f43e755dad3b6dac638f485995ddca2c5bc14",
+      "bytes": 43566,
+      "extends_stage1_exact_bytes": true
+    },
+    "3": {
+      "sha256": "59d437aa0c6594962dc2b8e3c2ab0f3d1fca042051d0f3c5f70ea9343d8abbd8",
+      "bytes": 26632,
+      "extends_stage1_exact_bytes": false
+    }
+  },
+  "action": "Abort local trial and delegate journal conflict to Copilot before any resolution. Preserve all parent entries; no protected-data picking/rechaining."
+}

@@ -274,6 +274,24 @@ pub mod scan_probes {
         COLLECTING.store(on, Relaxed);
     }
 
+    /// The folded build's steps ([`super::build_probe`]), in counter ticks.
+    static BUILD: [AtomicU64; super::build_probe::STEPS.len()] =
+        [const { AtomicU64::new(0) }; super::build_probe::STEPS.len()];
+    static BUILDS: AtomicU64 = AtomicU64::new(0);
+    static BUILD_PAIRS: AtomicU64 = AtomicU64::new(0);
+
+    #[inline(always)]
+    pub fn build_lap(step: usize, since: &mut u64) {
+        let t = now();
+        BUILD[step].fetch_add(t.wrapping_sub(*since), Relaxed);
+        *since = t;
+    }
+
+    pub fn build_done(pairs: u64) {
+        BUILDS.fetch_add(1, Relaxed);
+        BUILD_PAIRS.fetch_add(pairs, Relaxed);
+    }
+
     /// Counter ticks a second, against the monotonic clock over 50 ms.
     pub fn rate_hz() -> f64 {
         let (t0, i0) = (now(), std::time::Instant::now());
@@ -300,11 +318,81 @@ pub mod scan_probes {
         };
         let mut out = side(0);
         out["other"] = side(1);
+        let steps: serde_json::Map<String, serde_json::Value> = super::build_probe::STEPS
+            .iter()
+            .zip(&BUILD)
+            .map(|(k, v)| (k.to_string(), v.load(Relaxed).into()))
+            .collect();
+        out["build"] = serde_json::json!({
+            "steps": steps,
+            "builds": BUILDS.load(Relaxed),
+            "stored_pairs": BUILD_PAIRS.load(Relaxed),
+            "what": "ticks per step of the folded pair-table build, summed over builds",
+        });
         out["tsc_hz"] = serde_json::json!(rate_hz());
         out["what"] = serde_json::json!(
             "cycles per stage of the collection scan (R04); `other` holds scans outside collection"
         );
         out
+    }
+}
+
+/// Timing points in the folded pair-table build, charged to
+/// [`scan_probes`] under `--features scan-probes` and nothing otherwise.
+/// With one thread the steps sum to the build; with more, the row and
+/// fill steps are summed over threads.
+pub mod build_probe {
+    /// Rows' base and slices; rows' additions; rows' keys; pushing keys
+    /// into the partition streams; the counting sort and filter fill; the
+    /// filters' merge; the duplicate harvest; assembly; and the wall time
+    /// of the whole build, the check on the others.
+    pub const STEPS: [&str; 9] = [
+        "setup",
+        "row_add",
+        "row_key",
+        "stream_push",
+        "sort_fill",
+        "filter_merge",
+        "dups",
+        "assemble",
+        "whole",
+    ];
+    pub const SETUP: usize = 0;
+    pub const ROW_ADD: usize = 1;
+    pub const ROW_KEY: usize = 2;
+    pub const STREAM_PUSH: usize = 3;
+    pub const SORT_FILL: usize = 4;
+    pub const FILTER_MERGE: usize = 5;
+    pub const DUPS: usize = 6;
+    pub const ASSEMBLE: usize = 7;
+    pub const WHOLE: usize = 8;
+
+    #[inline(always)]
+    pub fn now() -> u64 {
+        #[cfg(feature = "scan-probes")]
+        {
+            super::scan_probes::now()
+        }
+        #[cfg(not(feature = "scan-probes"))]
+        {
+            0
+        }
+    }
+
+    #[inline(always)]
+    pub fn lap(step: usize, since: &mut u64) {
+        #[cfg(feature = "scan-probes")]
+        super::scan_probes::build_lap(step, since);
+        #[cfg(not(feature = "scan-probes"))]
+        let _ = (step, since);
+    }
+
+    #[inline(always)]
+    pub fn done(pairs: u64) {
+        #[cfg(feature = "scan-probes")]
+        super::scan_probes::build_done(pairs);
+        #[cfg(not(feature = "scan-probes"))]
+        let _ = pairs;
     }
 }
 
@@ -4241,6 +4329,86 @@ pub(crate) fn filter_slot(h: u64, mask: u64, extra: u64) -> (usize, u64) {
 /// [`filter_extra`] for this module's own builds.
 const FILTER_EXTRA: u64 = filter_extra(FILTER_PROBES);
 
+/// **Which bits of a key's hash pick its presence-filter word.**
+///
+/// `Low` is [`filter_slot`]'s: the word from the hash's low bits, as
+/// `gpu/ecc2k/pairtable.cuh` and every table built before it read.
+/// `Top` takes the word from the hash's top bits, the bits that also pick
+/// the build's partition ([`PairSumTable::fold_partitioned`]), so a
+/// partition fills only its own run of the filter, a few kilobytes,
+/// rather than words anywhere in megabytes.  Its bits within the word come
+/// from hash bits 16–33, which no word index reaches (a filter has at
+/// most 2^26 words) and a tagged word's rest (bits 0–15) does not use.
+/// Both are Bloom filters of the same size and bits a key; a table
+/// records its layout and every probe follows it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum FilterLayout {
+    #[default]
+    Low,
+    Top,
+}
+
+impl FilterLayout {
+    /// The layout this module's folded builds use: `Top`, unless
+    /// `KIC_FILTER_LAYOUT=low` (the same-binary control).
+    fn for_folded_builds() -> Self {
+        static LAYOUT: std::sync::OnceLock<FilterLayout> = std::sync::OnceLock::new();
+        *LAYOUT.get_or_init(|| match std::env::var("KIC_FILTER_LAYOUT").as_deref() {
+            Ok("low") => FilterLayout::Low,
+            _ => FilterLayout::Top,
+        })
+    }
+}
+
+/// A filter's layout reduced to shifts and masks, so a probe of either
+/// layout is the same branch-free arithmetic: word `(h >> shift) & words`,
+/// bits `1 << ((h >> s) & 63)` for each of its shifts (the last two only
+/// where three probes were set).
+#[derive(Clone, Copy, Debug)]
+struct FilterGeom {
+    layout: FilterLayout,
+    shift: u32,
+    words: u64,
+    bit_shifts: [u32; 3],
+    extra: u64,
+}
+
+impl FilterGeom {
+    fn new(layout: FilterLayout, present_mask: u64, extra: u64) -> Self {
+        let words = present_mask >> 6;
+        let word_bits = 64 - words.leading_zeros();
+        let (shift, bit_shifts) = match layout {
+            // `(h & mask) >> 6`, bits `h`, `h >> 52`, `h >> 58`: exactly
+            // [`filter_slot`].
+            FilterLayout::Low => (6, [0, 52, 58]),
+            // A one-word filter has no index bits: any shift, masked to 0.
+            FilterLayout::Top => ((64 - word_bits).min(63), [16, 22, 28]),
+        };
+        Self {
+            layout,
+            shift,
+            words,
+            bit_shifts,
+            extra,
+        }
+    }
+
+    #[inline(always)]
+    fn word(&self, h: u64) -> usize {
+        ((h >> self.shift) & self.words) as usize
+    }
+
+    #[inline(always)]
+    fn slot(&self, h: u64) -> (usize, u64) {
+        let [a, b, c] = self.bit_shifts;
+        let more = (1u64 << ((h >> b) & 63)) | (1u64 << ((h >> c) & 63));
+        (
+            self.word(h),
+            (1u64 << ((h >> a) & 63)) | (more & self.extra),
+        )
+    }
+}
+
 /// **Every pair sum of a factor base**, `P_i + P_j` for `i ≤ j`, sorted
 /// by packed point identity so a sum can be looked up by binary search.
 ///
@@ -4378,6 +4546,8 @@ pub struct FoldedStorage<'a> {
     pub present_mask: u64,
     /// Bits each key set in its filter word: 1 or [`FILTER_PROBES`].
     pub filter_probes: u8,
+    /// Which hash bits pick a key's filter word.
+    pub filter_layout: FilterLayout,
     pub tagged: bool,
     /// The normal basis the keys were named in; empty if the build fell
     /// back to the squaring chain.
@@ -4395,6 +4565,7 @@ impl FoldedStorage<'_> {
             present: self.present.to_vec(),
             present_mask: self.present_mask,
             filter_probes: self.filter_probes,
+            filter_layout: self.filter_layout,
             canon_tables: self.canon_tables.to_vec(),
         }
     }
@@ -4422,6 +4593,9 @@ pub struct FoldedParts {
     /// built with one bit a key, as both built them before (a `PTFOLD1`
     /// file).  The probe reads as many as were set.
     pub filter_probes: u8,
+    /// Which hash bits pick a key's filter word: [`FilterLayout::Low`]
+    /// for `gpu/ecc2k/pairtable.cuh`'s tables and every table file.
+    pub filter_layout: FilterLayout,
     /// The normal basis the keys were named in, as
     /// [`FrobeniusCanon::tables`] gives it.
     pub canon_tables: Vec<[u64; 256]>,
@@ -4491,8 +4665,8 @@ pub struct PairSumTable {
     /// few.  No false negatives, so the answer is unchanged.
     present: Vec<u64>,
     present_mask: u64,
-    /// [`filter_extra`] of the probes the filter was built with.
-    filter_extra: u64,
+    /// The filter's layout and the probes it was built with.
+    filter: FilterGeom,
     /// Whether the stored keys are folded by the signed Frobenius group
     /// `G = ⟨π, −1⟩`.
     ///
@@ -5336,9 +5510,31 @@ impl PairSumTable {
         byte_budget: u128,
         probes: ProbeBudget,
     ) -> Option<Self> {
+        Self::build_within_for_layout(
+            kc,
+            fb,
+            byte_budget,
+            probes,
+            FilterLayout::for_folded_builds(),
+        )
+    }
+
+    /// [`Self::build_within_for`] with a folded table's filter layout
+    /// named.  The layout changes no answer, but it changes which absent
+    /// keys the filter lets through, and so the bucket reads a run
+    /// counts: a harness that replays records counted under one layout
+    /// must build with that layout ([`FilterLayout::Low`] for every
+    /// record made before the layouts existed).
+    pub fn build_within_for_layout(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        probes: ProbeBudget,
+        layout: FilterLayout,
+    ) -> Option<Self> {
         let (points, orbits) = (fb.points.len(), fb.signed_orbits.len());
         if Self::fold_is_cheaper(points, kc.n, orbits, probes) {
-            if let Some(folded) = Self::build_folded_within(kc, fb, byte_budget) {
+            if let Some(folded) = Self::build_folded_within_layout(kc, fb, byte_budget, layout) {
                 return Some(folded);
             }
         }
@@ -5347,7 +5543,7 @@ impl PairSumTable {
         }
         // Below the crossover but too wide to hold compactly: the fold
         // is dearer per probe and still the only tier that fits.
-        if let Some(folded) = Self::build_folded_within(kc, fb, byte_budget) {
+        if let Some(folded) = Self::build_folded_within_layout(kc, fb, byte_budget, layout) {
             return Some(folded);
         }
         Self::build_full_within(kc, fb, byte_budget)
@@ -5428,7 +5624,7 @@ impl PairSumTable {
             bucket_shift,
             present,
             present_mask,
-            filter_extra: FILTER_EXTRA,
+            filter: FilterGeom::new(FilterLayout::Low, present_mask, FILTER_EXTRA),
             fold: false,
             canon: None,
             orbit_start: Vec::new(),
@@ -5548,7 +5744,7 @@ impl PairSumTable {
             bucket_shift,
             present,
             present_mask,
-            filter_extra: FILTER_EXTRA,
+            filter: FilterGeom::new(FilterLayout::Low, present_mask, FILTER_EXTRA),
             fold: false,
             canon: None,
             orbit_start: Vec::new(),
@@ -5671,7 +5867,7 @@ impl PairSumTable {
             bucket_shift,
             present,
             present_mask,
-            filter_extra: FILTER_EXTRA,
+            filter: FilterGeom::new(FilterLayout::Low, present_mask, FILTER_EXTRA),
             fold: false,
             canon: None,
             orbit_start: Vec::new(),
@@ -5745,6 +5941,7 @@ impl PairSumTable {
         bucket_bits: u32,
         tagged: bool,
         harvest: bool,
+        layout: FilterLayout,
         each_row: &(dyn Fn(usize, &mut dyn FnMut(&[u64], u32, usize)) + Sync),
     ) -> (Vec<u32>, Vec<u32>, Vec<u64>, u64, Vec<(u32, u32)>) {
         let rows = row_lens.len();
@@ -5772,6 +5969,7 @@ impl PairSumTable {
                     .collect();
                 for r in here {
                     each_row(r, &mut |keys, orbit, start| {
+                        let mut t = build_probe::now();
                         for (at, &key) in keys.iter().enumerate() {
                             let h = pair_filter_hash(key);
                             let p = (h >> part_shift) as usize;
@@ -5785,11 +5983,13 @@ impl PairSumTable {
                                 ids[p].push((r as u32) << 20 | (start + at) as u32);
                             }
                         }
+                        build_probe::lap(build_probe::STREAM_PUSH, &mut t);
                     });
                 }
                 (hs, ws, ids)
             })
             .collect();
+        let mut probe = build_probe::now();
         let mut part_start = vec![0usize; parts + 1];
         for p in 0..parts {
             let len: usize = streams.iter().map(|(hs, _, _)| hs[p].len()).sum();
@@ -5812,6 +6012,7 @@ impl PairSumTable {
         const FILL_AHEAD: usize = 16;
         let filter_bits = filter_bits_for(total);
         let present_mask = (1u64 << filter_bits) - 1;
+        let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
         let filter_words = (1usize << filter_bits) / 64;
         let per_part = buckets / parts;
         // Capacity, not length: skewed partitions can grow their streams.
@@ -5871,7 +6072,7 @@ impl PairSumTable {
                         let (hs, ws, ids) = (&hs[p], &ws[p], &ids[p]);
                         for (i, (&h, &w)) in hs.iter().zip(ws).enumerate() {
                             if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
-                                prefetch(&present[filter_slot(ahead, present_mask, 0).0]);
+                                prefetch(&present[geom.word(ahead)]);
                             }
                             let b = (h >> bucket_shift) as usize - first;
                             // SAFETY: partition `p` owns
@@ -5887,7 +6088,7 @@ impl PairSumTable {
                                 }
                             }
                             at[b] += 1;
-                            let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
+                            let (word, bits) = geom.slot(h);
                             present[word] |= bits;
                         }
                     }
@@ -5896,6 +6097,7 @@ impl PairSumTable {
             })
             .collect();
         bucket_start[buckets] = total as u32;
+        build_probe::lap(build_probe::SORT_FILL, &mut probe);
         let present = filters
             .into_iter()
             .reduce(|mut all, run| {
@@ -5905,6 +6107,7 @@ impl PairSumTable {
                 all
             })
             .unwrap_or_else(|| vec![0u64; filter_words]);
+        build_probe::lap(build_probe::FILTER_MERGE, &mut probe);
         // Two pairs of one bucket with one hash: one canonical key twice.
         // The hash of key 0 (the point at infinity) is not a sum of two
         // base points in any useful sense, and every row has one.
@@ -5933,6 +6136,7 @@ impl PairSumTable {
         } else {
             Vec::new()
         };
+        build_probe::lap(build_probe::DUPS, &mut probe);
         (bucket_start, rests, present, present_mask, dups)
     }
 
@@ -5955,7 +6159,29 @@ impl PairSumTable {
         byte_budget: u128,
         bulk: bool,
     ) -> Option<Self> {
-        Self::build_folded_core(kc, fb, byte_budget, bulk, false).map(|(table, _)| table)
+        Self::build_folded_core(
+            kc,
+            fb,
+            byte_budget,
+            bulk,
+            false,
+            FilterLayout::for_folded_builds(),
+        )
+        .map(|(table, _)| table)
+    }
+
+    /// [`Self::build_folded_within`] with its filter layout named rather
+    /// than chosen: [`FilterLayout::Low`] builds the table
+    /// `gpu/ecc2k/pairtable.cuh` builds, word for word, for the tools that
+    /// compare the two.
+    pub fn build_folded_within_layout(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        layout: FilterLayout,
+    ) -> Option<Self> {
+        let bulk = std::env::var("KIC_FOLD_BUILD").as_deref() != Ok("scalar");
+        Self::build_folded_core(kc, fb, byte_budget, bulk, false, layout).map(|(table, _)| table)
     }
 
     /// [`Self::build_folded_within`], and with it the pairs of base points
@@ -5970,7 +6196,14 @@ impl PairSumTable {
         byte_budget: u128,
     ) -> Option<(Self, Option<FoldedDuplicates>)> {
         let bulk = std::env::var("KIC_FOLD_BUILD").as_deref() != Ok("scalar");
-        Self::build_folded_core(kc, fb, byte_budget, bulk, true)
+        Self::build_folded_core(
+            kc,
+            fb,
+            byte_budget,
+            bulk,
+            true,
+            FilterLayout::for_folded_builds(),
+        )
     }
 
     /// [`Self::build_within_for`] with the harvest of
@@ -5998,10 +6231,13 @@ impl PairSumTable {
         byte_budget: u128,
         bulk: bool,
         harvest: bool,
+        layout: FilterLayout,
     ) -> Option<(Self, Option<FoldedDuplicates>)> {
         if !kc.frobenius_is_endomorphism {
             return None;
         }
+        let whole_began = build_probe::now();
+        let mut probe = whole_began;
         if matches!(
             fb.domain,
             FactorBaseDomain::StandardSubspace | FactorBaseDomain::CofactorProjection
@@ -6079,9 +6315,11 @@ impl PairSumTable {
         } else {
             (Vec::new(), Vec::new())
         };
+        build_probe::lap(build_probe::SETUP, &mut probe);
         // A row hands its keys over in order, a slice at a time, with
         // its orbit.
         let each_row = |r: usize, f: &mut dyn FnMut(&[u64], u32, usize)| {
+            let mut t = build_probe::now();
             let mut sums = Vec::with_capacity(n_points);
             let mut scratch = BatchScratch::default();
             let (orbit, rep) = reps[r];
@@ -6106,12 +6344,15 @@ impl PairSumTable {
                     &mut lambdas,
                     &mut scratch,
                 );
+                build_probe::lap(build_probe::ROW_ADD, &mut t);
                 let mut keys: Vec<u64> = sums.iter().map(|p| p.x).collect();
                 canon.canon_in_place(&mut keys);
                 for (key, p) in keys.iter_mut().zip(&sums) {
                     *key = if p.infinity { 0 } else { *key + 1 };
                 }
+                build_probe::lap(build_probe::ROW_KEY, &mut t);
                 f(&keys, orbit, 0);
+                t = build_probe::now();
                 if own_end == n_points {
                     return;
                 }
@@ -6125,7 +6366,9 @@ impl PairSumTable {
                     &mut lambdas,
                     &mut scratch,
                 ) {
+                    build_probe::lap(build_probe::ROW_ADD, &mut t);
                     canon.x_keys(&x3s, &mut keys);
+                    build_probe::lap(build_probe::ROW_KEY, &mut t);
                     f(&keys, orbit, own_end - from);
                     return;
                 }
@@ -6162,7 +6405,7 @@ impl PairSumTable {
                 .iter()
                 .map(|&(orbit, _)| n_points - suffix[orbit as usize] as usize)
                 .collect();
-            Self::fold_partitioned(&row_lens, bucket_bits, tagged, harvest, &each_row)
+            Self::fold_partitioned(&row_lens, bucket_bits, tagged, harvest, layout, &each_row)
         } else {
             let counts: Vec<AtomicU32> = (0..buckets + 1).map(|_| AtomicU32::new(0)).collect();
             (0..reps.len()).into_par_iter().for_each(|r| {
@@ -6183,6 +6426,7 @@ impl PairSumTable {
             let mut rests = vec![0u32; total];
             let filter_bits = filter_bits_for(total);
             let present_mask = (1u64 << filter_bits) - 1;
+            let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
             let words = (1usize << filter_bits) / 64;
             let present_atomic: Vec<AtomicU64> = (0..words).map(|_| AtomicU64::new(0)).collect();
             let slots = rests.as_mut_ptr() as usize;
@@ -6201,8 +6445,7 @@ impl PairSumTable {
                                 Self::compact_rest(key)
                             };
                         }
-                        let (word, bits) =
-                            filter_slot(pair_filter_hash(key), present_mask, FILTER_EXTRA);
+                        let (word, bits) = geom.slot(pair_filter_hash(key));
                         present_atomic[word].fetch_or(bits, Ordering::Relaxed);
                     }
                 });
@@ -6213,6 +6456,8 @@ impl PairSumTable {
                 .collect();
             (bucket_start, rests, present, present_mask, Vec::new())
         };
+        let stored = rests.len() as u64;
+        let mut probe = build_probe::now();
         let table = Self::assemble_folded(
             curve,
             points,
@@ -6225,6 +6470,7 @@ impl PairSumTable {
                 present,
                 present_mask,
                 filter_probes: FILTER_PROBES,
+                filter_layout: layout,
                 canon_tables: Vec::new(),
             },
             tagged,
@@ -6237,6 +6483,10 @@ impl PairSumTable {
                 suffix: suffix.clone(),
             },
         });
+        build_probe::lap(build_probe::ASSEMBLE, &mut probe);
+        let mut whole = whole_began;
+        build_probe::lap(build_probe::WHOLE, &mut whole);
+        build_probe::done(stored);
         Some((table, harvested))
     }
 }
@@ -6280,7 +6530,11 @@ impl PairSumTable {
             bucket_shift: parts.bucket_shift,
             present: parts.present,
             present_mask: parts.present_mask,
-            filter_extra: filter_extra(parts.filter_probes),
+            filter: FilterGeom::new(
+                parts.filter_layout,
+                parts.present_mask,
+                filter_extra(parts.filter_probes),
+            ),
             fold: true,
             canon,
             orbit_start,
@@ -6536,7 +6790,8 @@ impl PairSumTable {
             words: &self.rests,
             present: &self.present,
             present_mask: self.present_mask,
-            filter_probes: if self.filter_extra != 0 {
+            filter_layout: self.filter.layout,
+            filter_probes: if self.filter.extra != 0 {
                 FILTER_PROBES
             } else {
                 1
@@ -6799,7 +7054,7 @@ impl PairSumTable {
     /// [`Self::filter_word`] for a precomputed `pair_filter_hash(key)`.
     #[inline]
     fn filter_word_hash(&self, h: u64) -> usize {
-        ((h & self.present_mask) as usize) >> 6
+        self.filter.word(h)
     }
 
     /// Whether the filter admits this key: every bit it would have set is
@@ -6814,7 +7069,7 @@ impl PairSumTable {
     #[inline]
     fn admitted_hash(&self, h: u64) -> bool {
         group_op_count::count_filter_probes(1);
-        let (word, bits) = filter_slot(h, self.present_mask, self.filter_extra);
+        let (word, bits) = self.filter.slot(h);
         self.present[word] & bits == bits
     }
 
@@ -20437,6 +20692,72 @@ mod tests {
         assert!(loaded.is_folded());
         assert_eq!(loaded.len(), built.len());
         assert_same_answers(&kc, &fb, &built, &loaded);
+    }
+
+    #[test]
+    fn the_low_filter_layout_is_filter_slot() {
+        // `FilterGeom` for the low layout must name the word and bits
+        // `filter_slot` does, so every table built or loaded before the
+        // layouts existed reads exactly as it did.
+        let mut x = 0x9e37_79b9_7f4a_7c15u64;
+        for filter_bits in 6..=32u32 {
+            let mask = (1u64 << filter_bits) - 1;
+            for probes in [1u8, FILTER_PROBES] {
+                let geom = FilterGeom::new(FilterLayout::Low, mask, filter_extra(probes));
+                for _ in 0..2000 {
+                    x ^= x << 13;
+                    x ^= x >> 7;
+                    x ^= x << 17;
+                    assert_eq!(geom.slot(x), filter_slot(x, mask, filter_extra(probes)));
+                    assert_eq!(geom.word(x), filter_slot(x, mask, 0).0);
+                }
+            }
+        }
+        // The top layout's word stays inside the filter at every width,
+        // including a filter of one word.
+        for filter_bits in 6..=32u32 {
+            let mask = (1u64 << filter_bits) - 1;
+            let geom = FilterGeom::new(FilterLayout::Top, mask, FILTER_EXTRA);
+            for h in [0u64, u64::MAX, x, x.rotate_left(17)] {
+                assert!(geom.word(h) as u64 <= mask >> 6);
+            }
+        }
+    }
+
+    #[test]
+    fn both_filter_layouts_give_the_same_answers() {
+        for (a, n, seed, points) in [
+            (0u8, 31u32, 5u64, 400usize),
+            (1, 47, 3, 1500),
+            (0, 53, 1, 3000),
+        ] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, seed, points).unwrap();
+            let low =
+                PairSumTable::build_folded_within_layout(&kc, &fb, u128::MAX, FilterLayout::Low)
+                    .unwrap();
+            let top =
+                PairSumTable::build_folded_within_layout(&kc, &fb, u128::MAX, FilterLayout::Top)
+                    .unwrap();
+            let (ls, ts) = (low.folded_storage().unwrap(), top.folded_storage().unwrap());
+            assert_eq!(ls.filter_layout, FilterLayout::Low);
+            assert_eq!(ts.filter_layout, FilterLayout::Top);
+            // The same stored pairs, a different filter.
+            assert_eq!(ls.bucket_start, ts.bucket_start);
+            assert_eq!(ls.present_mask, ts.present_mask);
+            assert_ne!(
+                ls.present, ts.present,
+                "K_{a}/2^{n}: the layout changed nothing"
+            );
+            assert_same_answers(&kc, &fb, &low, &top);
+            // The layout survives a round trip through the parts.
+            let loaded = PairSumTable::from_folded_parts(&kc, &fb, ts.to_parts()).unwrap();
+            assert_eq!(
+                loaded.folded_storage().unwrap().filter_layout,
+                FilterLayout::Top
+            );
+            assert_same_answers(&kc, &fb, &top, &loaded);
+        }
     }
 
     #[test]
