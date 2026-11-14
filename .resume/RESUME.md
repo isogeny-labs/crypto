@@ -1,14 +1,14 @@
-# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
+# Resume: crypto @ claude/ecstatic-edison-cgo57l
 
 ## Goal
-Owner (2026-11-14): "run the interleaved rho vs BSGS comparison" — tuned multi-target rho (PR #4144) vs folded multi-target BSGS on j=0 curves, same targets, interleaved.
+Owner (2026-11-14): work on hyperelliptic index calculus and make cross-genus statistical experiments possible: HCDLP at genus 2, 3, 4, 5 on one field, difficulty differences, Smith's isogeny, non-hyperelliptic curves.
 
 ## Spec
-research/ic_e222_m221_20261106/interleaved_rho_bsgs/PROTOCOL.md (frozen before data); runner run.sh; rows in rows/.
-examples/prime_fast_j0_bsgs_multi.rs gained INST0.
+Frozen protocol: research/genus_ladder_20261114/PROTOCOL.md (frozen.sha256 beside it). Code: src/cryptanalysis/genus_ladder.rs, src/cryptanalysis/quartic_ladder.rs, src/bin/genus_ladder.rs, src/bin/genus_ladder_analyze.rs.
+Run (section 6 of the protocol): two `genus_ladder run` invocations -> part_a.jsonl, part_b.jsonl -> ladder.jsonl; then `genus_ladder_analyze ladder.jsonl analysis.json`; then `python3 render.py analysis.json` in the study directory.
 
 ## State
-26-30 complete (PR #4169). Addendum A (32/34 bits) frozen in e8c0fd72da; 32/34 complete: rho faster at 32/3000, 34/1000, 34/3000; record closed; pushed to PR #4169.
+2026-11-14: code and unit tests done (5 ladder tests pass), protocol frozen, grid launched locally (4 vCPU container, no AWS identity, so no isolab-eks and no S3 push).
 
 ## Next
-Run under benchrec run, analyse (geomean ratio + bootstrap, A/A), README + graph, close record, PR.
+Collect part_a/part_b, analyze, RESULTS.md with the H1..H9 scorecard, figures, PDF, bench record, session log, PR.
