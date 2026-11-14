@@ -1,0 +1,67 @@
+{
+  "command": [
+    "/opt/homebrew/bin/cryptominisat5",
+    "--threads",
+    "1",
+    "--random",
+    "20261114",
+    "--maxtime",
+    "600",
+    "--maxconfl",
+    "1000000",
+    "--verb",
+    "1",
+    "--verbstat",
+    "1",
+    "--printsol",
+    "1",
+    "--maxnummatrices",
+    "32",
+    "--autodisablegauss",
+    "0",
+    "--gaussusefulcutoff",
+    "0",
+    "--branchstr",
+    "vsids",
+    "/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw/export-positive/result.xcnf"
+  ],
+  "cpu_system_seconds": 0.033797,
+  "cpu_user_seconds": 0.263083,
+  "ended_unix_ms": 1794656391456,
+  "exit_code": 10,
+  "export_receipt_sha256": "6120d5ef8d65739dc4b85e8995bea95cfe5416f90fa0e400b6cec84edfe20007",
+  "formula_sha256": "f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c",
+  "host_preflight": [
+    {
+      "load_1m": 7.2919921875,
+      "swapouts": 164320,
+      "unix_ms": 1794656360988
+    },
+    {
+      "load_1m": 6.5625,
+      "swapouts": 164320,
+      "unix_ms": 1794656376000
+    },
+    {
+      "load_1m": 6.35791015625,
+      "swapouts": 164320,
+      "unix_ms": 1794656391009
+    }
+  ],
+  "lock_sha256": "95895829b842db68e84aed525112e7997e44e9263ff96faf31349a22f842709f",
+  "mode": "positive",
+  "runner_binary_sha256": "b0ab62790d2ef1a7e1ddfd2a654f666f138cecb355bfa4e9aece4c16ec166db8",
+  "schema": "n83.k2048-m5-native-solver-run/v1",
+  "selected_best_total_runtime": null,
+  "solver_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "source_commit": "d75033d50260210c8f094d00acfbccc1ad35d395",
+  "started_unix_ms": 1794656391032,
+  "status": "SAT_PENDING_REPLAY",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "e9c61aa7c7fe4c3f31849428c8ec4e892295c40ec39408b1537c12fd2d88f938",
+  "swapouts_after": 164320,
+  "terminal_conflicts": 839,
+  "timed_out": false,
+  "wait4_peak_rss_bytes": 83705856,
+  "wall_seconds": 0.423803125
+}

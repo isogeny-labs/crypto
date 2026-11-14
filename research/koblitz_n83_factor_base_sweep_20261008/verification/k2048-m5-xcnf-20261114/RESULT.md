@@ -2,14 +2,17 @@
 
 The retained 339,968-point K2048 signed-Frobenius base supports a checked
 five-summand constructed relation in the shared-root chained-S3 encoding.
-CryptoMiniSat 5.14.7 returned SAT in 839 conflicts; independent replay checked
-all 1,141,221 original CNF clauses, 4,980 XOR rows, the curve group sum,
+The native Rust gate ran CryptoMiniSat 5.14.7 against the frozen original
+XCNFs. Its constructed control returned SAT in 839 conflicts and 0.423803125
+seconds of process wall; separate Rust replay checked all 1,141,221 original
+CNF clauses, 4,980 XOR rows, all 339,968 archive rows, curve group sum,
 subgroup membership and the 2,048-column relation row. The first same-public-
-point natural query reached the frozen one-million-conflict cap and returned
-`INDETERMINATE` after 137.253 seconds. These are historical Python-orchestrated
-local diagnostics; the repository's native-implementation rule requires a
-native runner and replay before further research comparisons. The one censored
-query supplies no relation-yield estimate or end-to-end factor-base ranking.
+point natural query returned `INDETERMINATE` at 1,000,001 conflicts after
+137.753047167 process-wall seconds. This one capped query supplies no
+relation-yield estimate or end-to-end factor-base ranking. [pcc:unverified]
+The native measurement claim `PCC-20261114-27045d` has `not_covered`
+standing: the retained audit is unsigned and the measurement claim lacks
+keyring-signed recompute and replay proofs.
 
 | Cell | Positive control | Public natural query |
 | --- | ---: | ---: |
@@ -19,8 +22,9 @@ query supplies no relation-yield estimate or end-to-end factor-base ranking.
 | Formula variables / CNF clauses / XOR rows | 111,478 / 1,141,221 / 4,980 | 111,478 / 1,140,557 / 4,980 |
 | Solver exit / terminal status | 10 / `SATISFIABLE` | 15 / `INDETERMINATE` |
 | Conflicts | 839 | 1,000,001 |
-| Solver process wall / CPU seconds | 1.024 / 0.279 | 137.253 / 136.857 |
-| Peak RSS | sampled peak is incomplete for the brief control | 1,413,316,608 bytes from `wait4` |
+| Native solver process wall seconds | 0.423803125 | 137.753047167 |
+| Native solver user / system CPU seconds | 0.263083 / 0.033797 | 136.349600 / 1.044079 |
+| Native wait4 peak RSS bytes | 83,705,856 | 1,422,950,400 |
 | Original XCNF and group replay | PASS | no model |
 | Checked relations at this cap | 1 constructed control | 0 |
 | Final rank / target descent / same-point rho | unmeasured | unmeasured |
@@ -57,18 +61,29 @@ showed `--maxmatrixcols 25000` can admit 20,916-column matrices on a different
 N83 formula, with no established runtime improvement. A new locked arm on
 this exact formula is the concrete next solver diagnostic.
 
-The [raw manifest](evidence/RAW_MANIFEST.json) retains compressed original
-XCNFs and solver transcripts, export receipts, commands, host samples,
-positive independent replay and both terminal receipts. The
-[byte-level audit](audit_raw.py) recomputes each retained file hash, expands
-both XCNFs/transcripts, checks source and command bindings, host gates,
-positive replay and terminal conflict counts; its [result](evidence/audit.json)
-is `PASS_RAW_CUSTODY_AND_TERMINAL_CLASSIFICATION`. The full uncompressed files
-remain under `/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw`.
-The host's three 15-second preflight samples stayed below load 24 in each
-arm, and swapouts stayed 164,320. This is a local L0 diagnostic, so its wall
-times are not a Tier 0 or Tier 1 speedup comparison and are not promoted as
-native performance measurements. [pcc:unverified]
+The [native evidence](native-evidence/) retains source-bound commands, three
+15-second host samples, wait4 receipts, compressed complete solver transcripts,
+the independent [positive replay](native-evidence/positive/replay.json), and
+the [native audit](native-evidence/audit.json). The Rust
+[auditor](../../../../examples/n83_k2048_m5_native_audit.rs) recomputes
+retained file hashes, expands the original XCNFs and solver transcripts,
+checks source and command bindings, host gates, replay counts and terminal
+classifications. It reports `PASS_NATIVE_RAW_CUSTODY_AND_TERMINAL_CLASSIFICATION`.
+Both arms had preflight load below 24 and stable swapouts at 164,320. The exact
+native runner source commit was `d75033d50260210c8f094d00acfbccc1ad35d395`,
+runner binary SHA-256 `b0ab62790d2ef1a7e1ddfd2a654f666f138cecb355bfa4e9aece4c16ec166db8`,
+and replay binary SHA-256 `d0f90335c5674c8145aeac8686f0fbaddeb6fab4b51e007eeecbff08a20aacd5`.
+The original full XCNFs and archive remain under
+`/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw`; the repository retains
+compressed copies of both XCNFs in [historical evidence](evidence/).
+
+The earlier Python-orchestrated local run remains retained in the historical
+[raw manifest](evidence/RAW_MANIFEST.json) with its own
+[audit](evidence/audit.json). It returned the same SAT/`INDETERMINATE` terminal
+classes and conflict counts, with process walls 1.024 and 137.253 seconds.
+Those historical timings are separate from the native measurements above.
+This is a local L0 solver diagnostic; no Tier 0 or Tier 1 speedup comparison
+is inferred from the wall times. [pcc:unverified]
 
 The next selection gate on `a=0` needs a common-query yield and novel-rank
 panel, full-width logarithm solve, unseen-target descent, charged cold and
