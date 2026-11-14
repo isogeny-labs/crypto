@@ -178,4 +178,4 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
-| [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection, bounded norm reconstruction and uniform full sub-exponential bit cost | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |
+| [Prime-field norm public branch selection](prime-norm-public-branch-selection.md) | investigating | public root-branch selection, bounded norm reconstruction and uniform full sub-exponential bit cost; finite weighted-count component added | explicit public finder without successful witness/sign inputs, actual scalar bridge and complete charged proof/replay |

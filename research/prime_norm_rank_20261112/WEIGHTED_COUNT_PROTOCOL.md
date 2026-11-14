@@ -33,6 +33,6 @@ for this elementary counting argument. Conductor executable unavailable.
 Open obligations: bind growing norm input weights; construct actual full
 closure/normal forms at a sufficiently small cutoff; prove public known-label
 base coverage and capped-attempt success; charge signed output, extraction,
-setup and all bit costs. Any eventual asymptotic specialization requires a
+setup and all bit costs [pcc:unverified]. Any eventual asymptotic specialization requires a
 separate Lean argument; this protocol claims only exact finite inequalities.
 The original Wnew=Wbase+C*H jet proposal has no established map here.

@@ -208,3 +208,24 @@ public finder, growing-family normal forms and complete expected bit cost
 remain obligations. Field-of-definition correctness is distinct from the
 cost of extraction. Original W-jet mapping and all original exit criteria
 remain open; no native/solver/paid experiment was launched [pcc:unverified].
+
+
+2026-11-14 finite weighted counting: [report](../research/prime_norm_rank_20261112/weighted-count-report/README.md),
+source740732e95389e5185ed9a6547c18d8d889a6c580. For positive weights,
+all weighted exponent vectors under budgetD satisfy
+M*product(weights)<=choose(D+sum(weights),v), and
+M*product(weights)*v!<=(D+sum(weights))^v. Consecutive weights1,...,v give
+M(v,D)*(v!)^2<=(D+v^2)^v, including zero variables and zero budget.
+Exact finite count/completeness and mixed-radix injection are source-bound
+in unsignedPCC-20261114-cc1d70/621b19/9932d5. This is an elementary
+combinatorial component, with no novelty claim for the counting argument
+[pcc:unverified].
+
+The full study gate reports394 theorem declarations/0 extra trusted axioms;
+final import-inclusive replay status and hashed receipts are in the linked
+report. This does not bind actual growing norm input weights, construct a
+small full closure, or supply a public finder. A quadratic weighted budget
+would require a separately justified construction; the count does not
+supply it. Keep original W-jet map, coverage, field extraction, retries and
+complete expected bit-cost criteria open. No solver/native fixture or paid
+experiment was launched [pcc:unverified].
