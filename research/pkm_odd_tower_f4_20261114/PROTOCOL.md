@@ -53,11 +53,11 @@ exponent at cryptographic size, and no outcome is a claim about Pollard rho.
 
 | arm | sequence | `S` on the `m = 2` ladder | `log₂ S` |
 |:--|:--|:--|:--|
-| A2 (reference) | `2^t`, `t = 4…10` | 16 … 1024 | 4 … 10 |
-| A3 | `3^k`, `k = 3…6` | 27, 81, 243, 729 | 4.75 … 9.51 |
-| A5 | `5^k`, `k = 2…4` | 25, 125, 625 | 4.64 … 9.29 |
+| A2 (reference) | `2^t`, `t = 4…9` | 16 … 512 | 4 … 9 |
+| A3 | `3^k`, `k = 3…5` | 27, 81, 243 | 4.75 … 7.92 |
+| A5 | `5^k`, `k = 2, 3` | 25, 125 | 4.64, 6.97 |
 | A23 | `2,3,2,3,…`, length `n = 4…7` | 36, 72, 216, 432 | 5.17 … 8.75 |
-| A32 | `3,2,3,2,…`, length `n = 4…7` | 36, 108, 216, 648 | 5.17 … 9.34 |
+| A32 | `3,2,3,2,…`, length `n = 4…6` | 36, 108, 216 | 5.17 … 7.75 |
 | I2 (isogeny) | `2^t`, `t = 4…8`, Vélu steps | 16 … 256 | 4 … 8 |
 | I3 (isogeny) | `3^k`, `k = 3…5`, Vélu steps | 27, 81, 243 | 4.75 … 7.92 |
 | I23 (isogeny) | `2,3,…`, `n = 4…6`, Vélu steps | 36, 72, 216 | 5.17 … 7.75 |
@@ -100,6 +100,10 @@ and A/A as above. Full list and order: `run_cells.sh`.
 **Order.** Fixed in `run_cells.sh`: planted first, then the main ladder interleaved by `log₂ S` with the arms
 rotating, tower before null; then `m = 3`, replication, A/A. Counts do not depend on order. The order only
 guards the clock, which is not a study metric.
+
+**Ladder cap.** `log₂ S ≤ 9`. The probe (`smoke/probe2.txt`) put A2 `t = 10` at 1,065 s and 10.8 GB for one
+system (six per cell), which would occupy this host alone for about two hours; A3 `k = 6`, A5 `k = 4` and
+A32 `n = 7` lie above the capped reference and are dropped with it. Fixed before freeze.
 
 **Budgets.** `--budget 1800` seconds per system, `--dmax 64`. A system that times out or drops a pair above
 the bound is *censored*. It is reported with its partial counts as a lower bound and never imputed. No cell
