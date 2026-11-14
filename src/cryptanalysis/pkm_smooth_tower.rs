@@ -1546,6 +1546,282 @@ pub fn relation_system_polys(
     (out, n_vars)
 }
 
+/// Grevlex key: a larger key is a larger monomial.
+fn grevlex_key(e: &[u32]) -> Vec<i64> {
+    let mut k = Vec::with_capacity(e.len() + 1);
+    k.push(e.iter().map(|&x| x as i64).sum());
+    k.extend(e.iter().rev().map(|&x| -(x as i64)));
+    k
+}
+
+/// Full normal form of `f` (exponent map) by a monic grevlex Gröbner basis,
+/// with its `F_p` multiplications counted into `ops`.
+fn nf_counted(
+    f: &HashMap<Vec<u32>, u64>,
+    basis: &[crate::cryptanalysis::f4_fp::Poly],
+    p: u64,
+    ops: &mut u64,
+) -> HashMap<Vec<u32>, u64> {
+    use std::collections::BTreeMap;
+    let mut work: BTreeMap<Vec<i64>, (Vec<u32>, u64)> = BTreeMap::new();
+    for (e, &c) in f {
+        if c != 0 {
+            work.insert(grevlex_key(e), (e.clone(), c));
+        }
+    }
+    let mut rem: HashMap<Vec<u32>, u64> = HashMap::new();
+    while let Some((_, (e, c))) = work.pop_last() {
+        let g = basis
+            .iter()
+            .find(|g| g[0].0.iter().zip(&e).all(|(a, b)| a <= b));
+        match g {
+            None => {
+                rem.insert(e, c);
+            }
+            Some(g) => {
+                let shift: Vec<u32> = e.iter().zip(&g[0].0).map(|(a, b)| a - b).collect();
+                for (ge, gc) in g.iter().skip(1) {
+                    let me: Vec<u32> = ge.iter().zip(&shift).map(|(a, b)| a + b).collect();
+                    let k = grevlex_key(&me);
+                    *ops += 1;
+                    let sub = mulm(c, *gc, p);
+                    let zero = {
+                        let slot = work.entry(k.clone()).or_insert((me, 0));
+                        slot.1 = subm(slot.1, sub, p);
+                        slot.1 == 0
+                    };
+                    if zero {
+                        work.remove(&k);
+                    }
+                }
+            }
+        }
+    }
+    rem
+}
+
+/// Berlekamp–Massey over `F_p`: the connection polynomial `C` (low first,
+/// `C[0] = 1`) of the shortest LFSR generating `s`.
+fn berlekamp_massey(s: &[u64], p: u64, ops: &mut u64) -> Vec<u64> {
+    let (mut c, mut b) = (vec![1u64], vec![1u64]);
+    let (mut l, mut m, mut bb) = (0usize, 1usize, 1u64);
+    for n in 0..s.len() {
+        let mut d = s[n];
+        for i in 1..=l.min(c.len() - 1) {
+            d = addm(d, mulm(c[i], s[n - i], p), p);
+            *ops += 1;
+        }
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = mulm(d, invm(bb, p), p);
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        for (i, &bi) in b.iter().enumerate() {
+            c[i + m] = subm(c[i + m], mulm(coef, bi, p), p);
+            *ops += 1;
+        }
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            bb = d;
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.truncate(l + 1);
+    c
+}
+
+/// Kernel of a square matrix over `F_p` (row-major), by Gaussian
+/// elimination, counted.
+fn kernel(mut a: Vec<Vec<u64>>, p: u64, ops: &mut u64) -> Vec<Vec<u64>> {
+    let n = a.len();
+    let mut piv_col = vec![usize::MAX; n];
+    let mut row = 0;
+    let mut pivots = vec![];
+    for col in 0..n {
+        let Some(r) = (row..n).find(|&r| a[r][col] != 0) else {
+            continue;
+        };
+        a.swap(row, r);
+        let inv = invm(a[row][col], p);
+        for x in a[row].iter_mut() {
+            *x = mulm(*x, inv, p);
+        }
+        *ops += n as u64;
+        for r2 in 0..n {
+            if r2 != row && a[r2][col] != 0 {
+                let f = a[r2][col];
+                for c2 in 0..n {
+                    let v = mulm(f, a[row][c2], p);
+                    a[r2][c2] = subm(a[r2][c2], v, p);
+                }
+                *ops += n as u64;
+            }
+        }
+        piv_col[row] = col;
+        pivots.push(col);
+        row += 1;
+    }
+    let free: Vec<usize> = (0..n).filter(|c| !pivots.contains(c)).collect();
+    free.iter()
+        .map(|&fc| {
+            let mut v = vec![0u64; n];
+            v[fc] = 1;
+            for r in 0..row {
+                v[piv_col[r]] = subm(0, a[r][fc], p);
+            }
+            v
+        })
+        .collect()
+}
+
+/// The linear stage after F4: every `F_p`-point of the zero-dimensional
+/// ideal with grevlex Gröbner basis `basis`. Standard monomials `B`
+/// (`δ = |B|`), the multiplication matrix `M` of a random linear form `ℓ`
+/// (by counted normal forms), the minimal polynomial of a Krylov sequence
+/// of `Mᵀ` (Berlekamp–Massey), its roots in `F_p`, and for each root the
+/// kernel of `Mᵀ − λ`, which is the evaluation functional at the point:
+/// coordinates are read off it. Every point is checked against `input`.
+/// `Err` when it cannot decide (staircase above `max_delta`, or an
+/// eigenvalue with a kernel of dimension other than 1).
+pub fn points_from_grevlex_basis(
+    basis: &[crate::cryptanalysis::f4_fp::Poly],
+    input: &[crate::cryptanalysis::f4_fp::Poly],
+    n: usize,
+    p: u64,
+    seed: u64,
+    max_delta: usize,
+) -> Result<(Vec<Vec<u64>>, u64, usize), String> {
+    use crate::cryptanalysis::f4_fp;
+    let mut ops = 0u64;
+    if basis
+        .iter()
+        .any(|g| g.len() == 1 && g[0].0.iter().all(|&e| e == 0))
+    {
+        return Ok((vec![], 0, 0));
+    }
+    let divisible = |e: &[u32]| {
+        basis
+            .iter()
+            .any(|g| g[0].0.iter().zip(e).all(|(a, b)| a <= b))
+    };
+    // Staircase.
+    let mut stair: Vec<Vec<u32>> = vec![vec![0; n]];
+    let mut idx: HashMap<Vec<u32>, usize> = HashMap::new();
+    idx.insert(vec![0; n], 0);
+    let mut head = 0;
+    while head < stair.len() {
+        let s = stair[head].clone();
+        head += 1;
+        for i in 0..n {
+            let mut t = s.clone();
+            t[i] += 1;
+            if !idx.contains_key(&t) && !divisible(&t) {
+                if stair.len() >= max_delta {
+                    return Err(format!("staircase above {max_delta}"));
+                }
+                idx.insert(t.clone(), stair.len());
+                stair.push(t);
+            }
+        }
+    }
+    let delta = stair.len();
+    let mut rng = Rng(seed ^ 0xf61a);
+    let ell: Vec<u64> = (0..n).map(|_| 1 + rng.below(p - 1)).collect();
+    // M[t][s] = coefficient of t in NF(ℓ·s).
+    let mut m = vec![vec![0u64; delta]; delta];
+    for (si, s) in stair.iter().enumerate() {
+        let mut f: HashMap<Vec<u32>, u64> = HashMap::new();
+        for i in 0..n {
+            let mut e = s.clone();
+            e[i] += 1;
+            let c = f.entry(e).or_insert(0);
+            *c = addm(*c, ell[i], p);
+        }
+        let r = nf_counted(&f, basis, p, &mut ops);
+        for (e, c) in r {
+            let ti = *idx
+                .get(&e)
+                .ok_or("normal form left a non-standard monomial")?;
+            m[ti][si] = c;
+        }
+    }
+    // Krylov sequence a_j = u · (Mᵀ)^j v.
+    let u: Vec<u64> = (0..delta).map(|_| rng.below(p)).collect();
+    let mut w: Vec<u64> = (0..delta).map(|_| rng.below(p)).collect();
+    let mut seq = Vec::with_capacity(2 * delta);
+    for _ in 0..2 * delta {
+        seq.push(
+            u.iter()
+                .zip(&w)
+                .fold(0, |a, (&x, &y)| addm(a, mulm(x, y, p), p)),
+        );
+        ops += delta as u64;
+        // w ← Mᵀ w
+        w = (0..delta)
+            .map(|s| (0..delta).fold(0, |a, t| addm(a, mulm(m[t][s], w[t], p), p)))
+            .collect();
+        ops += (delta * delta) as u64;
+    }
+    let conn = berlekamp_massey(&seq, p, &mut ops);
+    // minimal polynomial = reverse of the connection polynomial
+    let mut minpoly: Poly = conn.iter().rev().copied().collect();
+    minpoly = poly_trim(minpoly);
+    let roots = poly_roots(&minpoly, p, &mut rng);
+    let mut points = vec![];
+    for lam in roots {
+        let a: Vec<Vec<u64>> = (0..delta)
+            .map(|s| {
+                (0..delta)
+                    .map(|t| {
+                        if s == t {
+                            subm(m[t][s], lam, p)
+                        } else {
+                            m[t][s]
+                        }
+                    })
+                    .collect()
+            })
+            .collect();
+        let ker = kernel(a, p, &mut ops);
+        if ker.len() != 1 {
+            return Err(format!(
+                "eigenvalue with a kernel of dimension {}",
+                ker.len()
+            ));
+        }
+        let ev = &ker[0];
+        if ev[0] == 0 {
+            return Err("evaluation functional vanishes at 1".into());
+        }
+        let inv0 = invm(ev[0], p);
+        let mut pt = vec![0u64; n];
+        for i in 0..n {
+            let mut e = vec![0u32; n];
+            e[i] = 1;
+            let mut f = HashMap::new();
+            f.insert(e, 1u64);
+            let r = nf_counted(&f, basis, p, &mut ops);
+            let mut val = 0;
+            for (e, c) in r {
+                let ti = *idx.get(&e).ok_or("non-standard monomial in NF(x_i)")?;
+                val = addm(val, mulm(c, ev[ti], p), p);
+            }
+            pt[i] = mulm(val, inv0, p);
+        }
+        if input.iter().all(|g| f4_fp::eval(g, &pt, p) == 0) {
+            points.push(pt);
+        }
+    }
+    Ok((points, ops, delta))
+}
+
 /// What the algebraic oracle did on one target.
 #[derive(Clone, Debug)]
 pub struct AlgebraicDecomposition {
@@ -1557,9 +1833,16 @@ pub struct AlgebraicDecomposition {
     /// Solutions whose abscissae do not all lift to `E(F_p)` (points over
     /// `F_{p²}`): not relations, dropped.
     pub unlifted: usize,
-    /// `F_p` multiplications of F4's row reductions over the substitution
-    /// tree (root finding of univariates is not included).
+    /// `F_p` multiplications: F4's row reductions plus the linear stage
+    /// (normal forms, Krylov, Berlekamp–Massey, kernels). Root finding of
+    /// the univariate minimal polynomial is not included.
     pub field_ops: u64,
+    pub f4_field_ops: u64,
+    pub linear_stage_ops: u64,
+    /// Number of standard monomials (solutions with multiplicity).
+    pub staircase: usize,
+    /// Why the linear stage gave up, when it did.
+    pub stage_error: Option<String>,
     pub solving_degree: u32,
     pub f4_runs: usize,
     pub max_cols: usize,
@@ -1597,8 +1880,8 @@ fn signed_relations(e: &Curve, pts: &[(u64, u64)], r: (u64, u64)) -> Vec<Vec<(u6
 }
 
 /// The slides' relation search: solve the low-degree system of
-/// [`relation_system_polys`] by F4 and substitution
-/// ([`crate::cryptanalysis::f4_fp::solve`], grevlex, degree bound `dmax`),
+/// [`relation_system_polys`] algebraically, by F4 (grevlex, degree bound
+/// `dmax`, full basis) and the linear stage [`points_from_grevlex_basis`],
 /// then lift every solution's `x_{i,1}` to points and keep the sign choices
 /// whose sum is `r`. Nothing is enumerated over `V`.
 pub fn algebraic_decompose(
@@ -1609,7 +1892,7 @@ pub fn algebraic_decompose(
     dmax: u32,
     budget: std::time::Duration,
 ) -> AlgebraicDecomposition {
-    use crate::cryptanalysis::f4_fp::{self, F4Options, Ordering, Verdict};
+    use crate::cryptanalysis::f4_fp::{self, F4Options, Ordering};
     let p = e.p;
     assert!(p < 1 << 32, "f4_fp needs p < 2^32");
     let (terms, n_vars) = relation_system_polys(e, tower, m, r.0);
@@ -1619,25 +1902,36 @@ pub fn algebraic_decompose(
         .collect();
     let mut opts = F4Options::new(Ordering::Grevlex, dmax);
     opts.deadline = Some(std::time::Instant::now() + budget);
-    let rep = f4_fp::solve(&input, n_vars, p, &opts);
+    let rep = f4_fp::f4(&input, n_vars, p, &opts);
     let n = tower.steps.len();
     let mut relations: Vec<Vec<(u64, u64)>> = vec![];
-    let (mut solutions, mut unlifted) = (0, 0);
-    let undetermined = matches!(rep.verdict, Verdict::Undetermined) || rep.timed_out;
-    if let Verdict::Solutions(sols) = &rep.verdict {
-        solutions = sols.len();
-        for sol in sols {
-            let xs: Vec<u64> = (0..m).map(|i| sol[i * n]).collect();
-            let lifted: Option<Vec<(u64, u64)>> = xs
-                .iter()
-                .map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
-                .collect();
-            match lifted {
-                None => unlifted += 1,
-                Some(pts) => {
-                    for rel in signed_relations(e, &pts, r) {
-                        if !relations.contains(&rel) {
-                            relations.push(rel);
+    let (mut solutions, mut unlifted, mut lin_ops, mut delta) = (0, 0, 0u64, 0usize);
+    let mut undetermined = rep.timed_out || rep.pairs_above_bound > 0;
+    let mut stage_error = None;
+    if !undetermined && !rep.inconsistent {
+        match points_from_grevlex_basis(&rep.basis, &input, n_vars, p, r.0 ^ r.1, 200_000) {
+            Err(msg) => {
+                undetermined = true;
+                stage_error = Some(msg);
+            }
+            Ok((pts, ops, d)) => {
+                lin_ops = ops;
+                delta = d;
+                solutions = pts.len();
+                for sol in pts {
+                    let xs: Vec<u64> = (0..m).map(|i| sol[i * n]).collect();
+                    let lifted: Option<Vec<(u64, u64)>> = xs
+                        .iter()
+                        .map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                        .collect();
+                    match lifted {
+                        None => unlifted += 1,
+                        Some(pts) => {
+                            for rel in signed_relations(e, &pts, r) {
+                                if !relations.contains(&rel) {
+                                    relations.push(rel);
+                                }
+                            }
                         }
                     }
                 }
@@ -1649,12 +1943,16 @@ pub fn algebraic_decompose(
         relations,
         solutions,
         unlifted,
-        field_ops: rep.field_ops,
-        solving_degree: rep.solving_degree,
-        f4_runs: rep.f4_runs,
+        field_ops: rep.field_ops + lin_ops,
+        f4_field_ops: rep.field_ops,
+        linear_stage_ops: lin_ops,
+        staircase: delta,
+        solving_degree: rep.solving_degree_max,
+        f4_runs: 1,
         max_cols: rep.max_cols,
         ms: rep.ms,
         undetermined,
+        stage_error,
     }
 }
 
