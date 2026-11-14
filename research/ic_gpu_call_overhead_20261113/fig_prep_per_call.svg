@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" width="720" height="330" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Rust-side preparation cost of a fes-f2-gpu call, before and after the direct pack</title>
+<desc id="d">Milliseconds per call spent building the packed system, mean of three runs with min to max whiskers, at 20 and 24 unknowns. Before: QuadraticForm conversion plus packing. After: direct pack from the monomials.</desc>
+<style>.bg{fill:#fcfcfb}.b{fill:#eb6834}.a{fill:#1baf7a}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}.w{stroke:#0b0b0b}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.b{fill:#d95926}.a{fill:#199e70}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}.w{stroke:#f0efec}}</style>
+<rect class="bg" width="720" height="330"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">fes-f2-gpu: Rust-side preparation cost per call</text>
+<text class="q" x="16" y="42" font-size="12">ms per call, mean of 3 runs per arm, whiskers min to max; host serve worker, no GPU; identical answers in all 12 runs</text>
+<rect class="b" x="16" y="54" width="12" height="12" rx="2"/><text class="p" x="34" y="64" font-size="12">before: QuadraticForm conversion + packing</text>
+<rect class="a" x="330" y="54" width="12" height="12" rx="2"/><text class="p" x="348" y="64" font-size="12">after: direct pack from the monomials</text>
+<line class="g" x1="64" x2="696" y1="274.0" y2="274.0" stroke-width="1"/><text class="q" x="56" y="278.0" font-size="11" text-anchor="end">0.0</text>
+<line class="g" x1="64" x2="696" y1="212.1" y2="212.1" stroke-width="1"/><text class="q" x="56" y="216.1" font-size="11" text-anchor="end">0.1</text>
+<line class="g" x1="64" x2="696" y1="150.2" y2="150.2" stroke-width="1"/><text class="q" x="56" y="154.2" font-size="11" text-anchor="end">0.2</text>
+<line class="g" x1="64" x2="696" y1="88.4" y2="88.4" stroke-width="1"/><text class="q" x="56" y="92.4" font-size="11" text-anchor="end">0.3</text>
+<rect class="b" x="140.0" y="169.1" width="70" height="104.9" rx="2"/>
+<line class="w" x1="175.0" x2="175.0" y1="173.1" y2="165.6" stroke-width="1.5"/>
+<text class="p" x="175.0" y="159.6" font-size="12" text-anchor="middle">0.1695</text>
+<rect class="a" x="234.0" y="271.0" width="70" height="3.0" rx="2"/>
+<line class="w" x1="269.0" x2="269.0" y1="271.2" y2="270.7" stroke-width="1.5"/>
+<text class="p" x="269.0" y="264.7" font-size="12" text-anchor="middle">0.0048</text>
+<text class="p" x="222.0" y="294" font-size="12" text-anchor="middle">Koblitz n=19 · 20 unknowns</text>
+<text class="q" x="222.0" y="311" font-size="11" text-anchor="middle">saved 0.165 ms/call (97.1%)</text>
+<rect class="b" x="456.0" y="101.7" width="70" height="172.3" rx="2"/>
+<line class="w" x1="491.0" x2="491.0" y1="105.9" y2="96.4" stroke-width="1.5"/>
+<text class="p" x="491.0" y="90.4" font-size="12" text-anchor="middle">0.2784</text>
+<rect class="a" x="550.0" y="269.4" width="70" height="4.6" rx="2"/>
+<line class="w" x1="585.0" x2="585.0" y1="269.5" y2="269.4" stroke-width="1.5"/>
+<text class="p" x="585.0" y="263.4" font-size="12" text-anchor="middle">0.0074</text>
+<text class="p" x="538.0" y="294" font-size="12" text-anchor="middle">Koblitz n=23 · 24 unknowns</text>
+<text class="q" x="538.0" y="311" font-size="11" text-anchor="middle">saved 0.271 ms/call (97.3%)</text>
+</svg>
