@@ -316,6 +316,7 @@ fn sym_solve_ex(
                         }
                         let (ei, ej, em, sg) =
                             (ent.1 as usize, ent.2 as usize, ent.3 as usize, ent.4);
+                        let sft = if fix { (sft + 3 - ent.5 as usize) % 3 } else { sft };
                         // P = F_ei + s*phi^em F_ej ; T = +-phi^sft P
                         let fa = reps[ei];
                         let fb_ = cand[3 * ej + em];

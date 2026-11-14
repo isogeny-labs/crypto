@@ -216,3 +216,26 @@ Same code and frozen B rule as the holdout (B = round(100 (p/2^26)^(1/3)): 400 a
 | 34 | b128 | 738-798 | 1533 | 1858 | 2407 | 2.08-2.40 | 9.3-10.3 | ~72x |
 
 Reading: the 2.0x-2.4x improvement over the strongest implemented single-target IC (3-summand `ic_solve`, best of the c grid) holds at 32 and 34 bits on fresh curves, with B extrapolated by the frozen rule and not retuned (c=1.0 arms: 2.6x-3.4x, a worse baseline). The gap to the matched negation rho keeps growing with size (about 4x at 26 bits, 21x at 30, about 40x at 32, 60x-70x at 34), consistent with an engineering constant gain on a worse exponent. Same limits as before: one host, no isolation, wall clock, one twist group per size, no §5a band.
+
+## Correction and improvement: the single-target scan now applies the entry's orbit shift (2026-11-14) — `[pcc:unverified]`
+**Defect found.** In `examples/prime_fast_j0_sym.rs` the 3-summand scan never used the stored orbit shift of a pair-table entry (`ent.5`): `SHIFTFIX=1` stored it but the scan ignored it, so only about one third of the table hits (those whose stored point already had shift 0) could yield a relation; the group re-addition rejected the rest. This is why the earlier "shift fix" A/B (section "pair-table shift fix") saw identical target counts (671 = 671, 273 = 273): that experiment did not exercise the fix, and its conclusion ("does not change relation yield; time within noise") is **withdrawn**. The multi-target example (`prime_fast_j0_multi.rs`) did apply the shift. All numbers before this section for the single-target arm (2.0x-2.4x at 26-34 bits) therefore describe the version that discards two thirds of the table hits, and are a lower bound.
+
+**Fix.** `sft = (sft_probe + 3 - ent.5) % 3` when `SHIFTFIX=1`. Relations are still group-verified; every solve verified kG = Q.
+
+A/B on the tuning curves (26 bits, B=100, 4 targets x 2 curves x 2 rounds, 16 rows per arm, all verified), same planted targets, baseline `ic_solve` c=0.7:
+
+| scan | targets needed (median) | sym3 ms | plain3 ms | ratio |
+|---|---|---|---|---|
+| shift ignored (old) | 274 | 8.3 | 20.1 | 2.42 |
+| shift applied (`SHIFTFIX=1`) | 192 (-30%) | 6.0 (-28%) | 18.1 | 3.01 |
+
+Fresh holdout (curves idx 9 and 10; frozen B rule B = round(100 (p/2^26)^(1/3)); `SHIFTFIX=1`; 4 targets per curve; baseline c in {0.5, 0.7}; 64 rows, all verified), medians:
+
+| bits | B | sym3 ms | plain3 ms | ratio (range over curves, c) | sym3 / negation rho |
+|---|---|---|---|---|---|
+| 28 | 159 | 17.8-25.5 | 52.5-65.4 | 2.57-2.95 | 6x-8x |
+| 30 | 252 | 51.2-58.2 | 143-162 | 2.59-2.86 | 12x-16x |
+| 32 | 400 | 156-175 | 447-522 | 2.61-3.19 | 24x-38x |
+| 34 | 635 | 469-605 | 1541-1695 | 2.80-3.30 | 50x-59x |
+
+Reading: with the shift applied the symmetric 3-summand IC is **2.6x-3.3x faster than the strongest implemented single-target IC** (3-summand `ic_solve`, best of the c grid) at 28-34 bits on fresh curves, up from 2.0x-2.4x. The gap to the matched negation rho keeps growing with size (about 7x at 28 bits to about 55x at 34), so this remains an engineering constant on a worse exponent. Same limits: one host, wall clock, one twist group per size, B extrapolated by the frozen rule and not retuned, not yet independently replayed (the validator report covers the pre-fix code), no §5a band.
