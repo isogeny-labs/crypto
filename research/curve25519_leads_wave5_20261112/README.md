@@ -141,7 +141,7 @@ disk once they exist.
   in-sample. Next time a lane claims a prediction made before reading, it must commit a hash of the prediction
   before the read [pcc:unverified].
 - **E2 (§1, "solving degree at least 65,148 on that route").** `solving_degree_max` is the highest productive F4
-  pair degree, which equals the largest generator degree plus 0 to 5 in every recorded cell. For the chain and flat
+  pair degree, which equals the largest generator degree plus 0 to 6 in every recorded cell. For the chain and flat
   presentations of μ_d the bound holds by construction (a generator of degree ≥ 65,147 is in the input); for
   other encodings of the same set (exponent bits, baby–giant splits, sumsets) it is false. What is true about
   Curve25519 is the Petit–Kosters–Messeng smoothness condition: p − 1 has no divisor between 781,764 and the
@@ -150,7 +150,7 @@ disk once they exist.
   cells with equal SD differ in T by up to 8.0 × 10^4. The law says nothing about cost. Rank 3 is withdrawn
   [pcc:unverified].
 - **E4 (§1 bullet 1 and §3, "e_max + 2 to 3 at m = 2").** The k = 18 cell d = 923 = 13 × 71 has SD 75 = e_max + 4, and
-  the wave-6 out-of-sample cell d = 825 has SD 15 = e_max + 4. The band is wrong; no exact rule is supported
+  the wave-6 out-of-sample cells d = 825 and d = 1271 have SD 15 = e_max + 4 and SD 47 = e_max + 6. The band is wrong; no exact rule is supported
   [pcc:unverified].
 - **E5 (§2 row 7, W5-RP-4).** The proposed sparse/dense split of the F4 linear algebra is already implemented in
   `f4_fp`. The lead is replaced by a memory-profile measurement (wave 6, W6-4) [pcc:unverified].

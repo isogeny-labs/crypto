@@ -31,7 +31,7 @@ ran the out-of-sample test under a frozen micro-protocol (`sdrule/`).
   README in this PR.] The \"eight preregistered values the lane had not
   read\" were in a table the lane had read, so the 8-of-8 match is
   in-sample. The \"solving degree\" is the highest productive F4 pair
-  degree, which tracks the largest generator degree plus 0 to 5; it does
+  degree, which tracks the largest generator degree plus 0 to 6; it does
   not predict cost (R² \= 0.09 of ln T on ln SD over 60 cells, with an
   8.0e4× cost spread at equal SD). The security statement \"SD ≥ 65,148
   for Curve25519\'s subgroup bases\" holds by construction for chain and
@@ -41,10 +41,10 @@ ran the out-of-sample test under a frozen micro-protocol (`sdrule/`).
   \[pcc:unverified\].
 + #strong[Neither solving-degree rule survives out of sample.] The red
   team\'s reading (SD \= largest generator degree plus a small,
-  form-dependent constant) is the one that stands. Wave 5\'s band missed
-  d \= 825 and the k \= 18 cell d \= 923; the theory lane\'s fitted
-  chain rule missed d \= 341 by one (§3). Failed predictions stay
-  failed.
+  form-dependent offset) is the one that stands, with the offset now
+  seen up to 6. Wave 5\'s band missed d \= 825, d \= 1271 and the k \=
+  18 cell d \= 923; the theory lane\'s fitted chain rule missed d \= 341
+  by one and d \= 1271 by three (§3). Failed predictions stay failed.
 + #strong[A faithful miniature family exists but is sparse.] Primes 2^k
   − c with Curve25519\'s shape (p ≡ 5 mod 8, p − 1 \= 4·3·q·C with q
   small and C prime, v₂(p + 1) \= 1) and a cyclic cofactor-8 Montgomery
@@ -78,7 +78,7 @@ ran the out-of-sample test under a frozen micro-protocol (`sdrule/`).
   ≥ 28 for the walk arms and far larger for every algebraic arm
   \[pcc:unverified\].
 
-=#figure(image("wave6.png", width: 100%), caption: [Left: cyclotomic-torus census of Curve25519, the largest subgroup inside the degree-k torus whose prime factors stay below B. Right: the out-of-sample solving-degree cells against the two candidate rules. Unverified.])
+=#figure(image("wave6.png", width: 100%), caption: [Left: cyclotomic-torus census of Curve25519, the largest subgroup inside the degree-k torus whose prime factors stay below B. Right: the three out-of-sample solving-degree cells against the two candidate rules. Unverified.])
 
 = 2. Ranked leads
 <2-ranked-leads>
@@ -192,7 +192,7 @@ items, mine \[pcc:unverified\].
   [0.6],
   [12],
   [W6-TH-2 chain-offset rule as a bounded statement: SD − e\_max ∈ \[1,
-  5\] with the offset rising with the smaller factors],
+  6\] so far, rising with the smaller factors],
   [descriptive],
   [superseded as an exact rule by §3; keep only as a band],
   [done],
@@ -239,21 +239,22 @@ factors) had matched 66 of 66 recorded cells
   [153 s],
   [1271],
   [31 × 41],
-  [running at the time of writing],
-  [50],
-  [43 to 44],
-  [],
-  [],
+  [47],
+  [50 (miss)],
+  [43 to 44 (miss)],
+  [4.8e10],
+  [483 s],
 )
 ]
 
 P1 (every cell equals the rule) failed at the first cell; P2 (some cell
-outside the band) held at the second. Each rule misses one cell by one.
-Together with the k \= 18 cell d \= 923 (SD 75 \= e\_max + 4) the honest
-statement is the red team\'s: SD equals the largest generator degree
-plus a form-dependent constant between 0 and 5, with the constant
-growing with the smaller factors; no exact formula is supported
-\[pcc:unverified\].
+outside the band) held at the second; P3 (all cells complete) held. The
+third cell misses both rules by three: SD − e\_max \= 6, one more than
+the largest offset in the 66 recorded cells. Together with the k \= 18
+cell d \= 923 (SD 75 \= e\_max + 4) the honest statement is the red
+team\'s, widened by one: SD equals the largest generator degree plus a
+form-dependent offset, 0 to 6 so far, that grows with the smaller prime
+factors; no exact formula is supported \[pcc:unverified\].
 
 == 4. Censuses computed here
 <4-censuses-computed-here>
@@ -333,9 +334,9 @@ member has p + 1 \= 2 × 524,131 and subgroup orders 1, 2, 3, 4, 5, 6,
 - The `sdrule` cells are an engine measurement with a frozen protocol
   but no benchmark record, Conductor task, resume checkpoint or
   validator; the claimed quantity is the solving degree only.
-- The faithful family\'s k \= 24 curve search and the d \= 1271 cell
-  were still running when this README was written; their outputs are
-  appended to the `.out.txt` and `cells/` files when they finish.
+- The faithful family\'s k \= 24 curve search was still running when
+  this README was written; its result is appended to
+  `checks/faithful_family.out.txt` when it finishes.
 - No model identifiers appear in committed files; the lanes ran on a
   different tier from the agents\' defaults.
 

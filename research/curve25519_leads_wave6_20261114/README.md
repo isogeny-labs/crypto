@@ -19,13 +19,14 @@ recorded subgroup cells, and ran the out-of-sample test under a frozen micro-pro
 1. **Wave 5 overstated three things; the errata are applied to its README in this PR.** The "eight preregistered
    values the lane had not read" were in a table the lane had read, so the 8-of-8 match is in-sample. The
    "solving degree" is the highest productive F4 pair degree, which tracks the largest generator degree plus 0 to
-   5; it does not predict cost (R² = 0.09 of ln T on ln SD over 60 cells, with an 8.0e4× cost spread at equal SD).
+   6; it does not predict cost (R² = 0.09 of ln T on ln SD over 60 cells, with an 8.0e4× cost spread at equal SD).
    The security statement "SD ≥ 65,148 for Curve25519's subgroup bases" holds by construction for chain and flat
    presentations and is false for other encodings; the real statement about Curve25519 is the known
    Petit–Kosters–Messeng smoothness condition, confirmed by the census below [pcc:unverified].
 2. **Neither solving-degree rule survives out of sample.** The red team's reading (SD = largest generator degree
-   plus a small, form-dependent constant) is the one that stands. Wave 5's band missed d = 825 and the k = 18
-   cell d = 923; the theory lane's fitted chain rule missed d = 341 by one (§3). Failed predictions stay failed.
+   plus a small, form-dependent offset) is the one that stands, with the offset now seen up to 6. Wave 5's band
+   missed d = 825, d = 1271 and the k = 18 cell d = 923; the theory lane's fitted chain rule missed d = 341 by one
+   and d = 1271 by three (§3). Failed predictions stay failed.
 3. **A faithful miniature family exists but is sparse.** Primes 2^k − c with Curve25519's shape (p ≡ 5 mod 8,
    p − 1 = 4·3·q·C with q small and C prime, v₂(p + 1) = 1) and a cyclic cofactor-8 Montgomery curve with a prime
    twist cofactor: k = 20 gives p = 2^20 − 315, A = 383; k = 24 gives p = 2^24 − 75 (curve search running at the
@@ -66,7 +67,7 @@ are the lanes' or, for the main session's items, mine [pcc:unverified].
 | 9 | W6-7 encodings of μ_d with low generator degree (exponent-bit map, baby–giant split, sumset): measure SD and T at k = 20, m = 3, d = 19 against the recorded 20 and 2.2e8 | security | the exponent-bit encoding is the digit presentation in multiplicative form; the lab's digit study found the last fall degree rising one per two digits and a cost exponent ≥ 0.70, so no encoding is expected to be cheaper than the flat one | minutes per cell | 0.7 |
 | 10 | W6-SC-8 late-target stored walk (table target-free to rank 2, then chained [β]Q jumps) | improvement, classification pending | 0.92 of inc-lazy at k ≥ 24; 1.00 [0.97, 1.03] of tw2cj-lazy | owner's ruling on tw2 first | 0.6 |
 | 11 | W6-TH-4 preregistered prime cells at m = 3: k = 24, d = 23 (SD 24, T 5.1e8); k = 20, d = 73 (SD 74, T 1.15e11 [6e10, 2e11]); k = 24, d = 89 (SD 90, T 3.1e11) | theory check | as stated; d = 73 and 89 need 2 to 50 GB and 700 to 8,000 s | d = 23 in seconds; the others on a 64 GB node | 0.6 |
-| 12 | W6-TH-2 chain-offset rule as a bounded statement: SD − e_max ∈ [1, 5] with the offset rising with the smaller factors | descriptive | superseded as an exact rule by §3; keep only as a band | done | — |
+| 12 | W6-TH-2 chain-offset rule as a bounded statement: SD − e_max ∈ [1, 6] so far, rising with the smaller factors | descriptive | superseded as an exact rule by §3; keep only as a band | done | — |
 
 Closed by this wave (no further work recommended): interleaved grumpy giants, multi-walk shared tables, adaptive
 table size, kangaroo and Gaudry–Schost variants, tag tracing (all `lanes/schedules.md`); the exact solving-degree
@@ -85,12 +86,13 @@ SD = e_max + 1 + ⌈s/4⌉ (s the sum of e_j − 1 over the smaller prime factor
 |--:|:--|--:|--:|:--|--:|--:|
 | 341 | 11 × 31 | 34 | 35 (miss) | 33 to 34 (hit) | 4.2e8 | 8 s |
 | 825 | 3 × 5 × 5 × 11 | 15 | 15 (hit) | 13 to 14 (miss) | 2.5e10 | 153 s |
-| 1271 | 31 × 41 | running at the time of writing | 50 | 43 to 44 | | |
+| 1271 | 31 × 41 | 47 | 50 (miss) | 43 to 44 (miss) | 4.8e10 | 483 s |
 
-P1 (every cell equals the rule) failed at the first cell; P2 (some cell outside the band) held at the second.
-Each rule misses one cell by one. Together with the k = 18 cell d = 923 (SD 75 = e_max + 4) the honest statement is
-the red team's: SD equals the largest generator degree plus a form-dependent constant between 0 and 5, with the
-constant growing with the smaller factors; no exact formula is supported [pcc:unverified].
+P1 (every cell equals the rule) failed at the first cell; P2 (some cell outside the band) held at the second; P3
+(all cells complete) held. The third cell misses both rules by three: SD − e_max = 6, one more than the largest
+offset in the 66 recorded cells. Together with the k = 18 cell d = 923 (SD 75 = e_max + 4) the honest statement is
+the red team's, widened by one: SD equals the largest generator degree plus a form-dependent offset, 0 to 6 so far,
+that grows with the smaller prime factors; no exact formula is supported [pcc:unverified].
 
 ## 4. Censuses computed here
 
@@ -137,8 +139,8 @@ faithful member has p + 1 = 2 × 524,131 and subgroup orders 1, 2, 3, 4, 5, 6, 1
   simulation (it specifies cells for `src/bin/nc2_stage0.rs` instead), so its predicted S values are analytic.
 - The `sdrule` cells are an engine measurement with a frozen protocol but no benchmark record, Conductor task,
   resume checkpoint or validator; the claimed quantity is the solving degree only.
-- The faithful family's k = 24 curve search and the d = 1271 cell were still running when this README was
-  written; their outputs are appended to the `.out.txt` and `cells/` files when they finish.
+- The faithful family's k = 24 curve search was still running when this README was written; its result is
+  appended to `checks/faithful_family.out.txt` when it finishes.
 - No model identifiers appear in committed files; the lanes ran on a different tier from the agents' defaults.
 
 ## 7. Next steps
