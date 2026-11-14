@@ -214,3 +214,11 @@ produced).** The order comparison (C5) reused the name `a`, which shadowed the p
 the script crashed when writing `results.json`. The variables are renamed (`ra`, `rb`); no rule, band, cell or
 metric changes. The part B loop also reused `form`, shadowing the form-comparison table; it is renamed `fm` (found on the same first run, after `results.json` was written and before its summary printed). `analyze.py` SHA-256 changes from `29c9ac27339bd24b6c73080aabb095084fd7153a61546aaeb98682eb20db503b` (frozen) to `168edde01e92a3616e3a60b3457ffbc8f41502d76d73ab004df291d2cb5e89c5`.
 
+**Amendment 3 (2026-11-14, censoring by memory; filed after the kernel killed the first `M3-A2-t5-tower`
+system, before any row of `M3-A2-t5` or any later tail cell existed).** §3 censors timeouts and pairs above the
+degree bound but did not name the host's memory limit. A system whose instrument is killed (here: exit 137, the
+15 GiB host) is now recorded as a *censored* row with `censor_reason`, written by `censor_rows.py` from the
+cell's arguments, with no counts and nothing imputed. Censored rows are excluded from every verdict, as §3
+already does for timeouts. A killed instrument is deterministic on this host, so the remaining draws of that
+cell are censored with it rather than rerun. `run_cells.sh` calls the helper when the instrument exits non-zero.
+

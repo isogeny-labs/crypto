@@ -30,7 +30,11 @@ run() {
   if [ -f "$f" ] && [ "$(wc -l < "$f")" -ge "$rows" ]; then return 0; fi
   if [ -f "$f" ]; then mv "$f" "runs/partial/$name.$(date -u +%s).jsonl"; echo "rerun $name (partial)" >> progress.txt; fi
   local t0=$(date +%s)
-  "$BIN" --seed "$SEED" --budget "$BUDGET" --dmax "$DMAX" --cell "$name" --out "$f" "$@" > /dev/null
+  if ! "$BIN" --seed "$SEED" --budget "$BUDGET" --dmax "$DMAX" --cell "$name" --out "$f" "$@" > /dev/null; then
+    # Amendment 3: a killed instrument (host memory) leaves censored rows, never a gap.
+    python3 censor_rows.py A "$f" "$name" "$rows" "instrument killed (exit $?, host 15 GiB)" -- "$@"
+    echo "censored $name (instrument killed)" >> progress.txt
+  fi
   echo "done $name rows=$(wc -l < "$f") secs=$(( $(date +%s) - t0 ))" >> progress.txt
 }
 
@@ -103,7 +107,10 @@ runb() {
   if [ -f "$f" ] && [ "$(wc -l < "$f")" -ge 4 ]; then return 0; fi
   if [ -f "$f" ]; then mv "$f" "runs/partial/B-$name.$(date -u +%s).jsonl"; echo "rerun B-$name (partial)" >> progress.txt; fi
   local t0=$(date +%s)
-  "$ORACLE" --seed "$SEED" --budget "$BUDGET" --dmax "$DMAX" --cell "B-$name" --out "$f" --planted 2 --random 2 "$@" > /dev/null
+  if ! "$ORACLE" --seed "$SEED" --budget "$BUDGET" --dmax "$DMAX" --cell "B-$name" --out "$f" --planted 2 --random 2 "$@" > /dev/null; then
+    python3 censor_rows.py B "$f" "B-$name" 4 "instrument killed (exit $?, host 15 GiB)" -- "$@"
+    echo "censored B-$name (instrument killed)" >> progress.txt
+  fi
   echo "done B-$name rows=$(wc -l < "$f") secs=$(( $(date +%s) - t0 ))" >> progress.txt
 }
 for c in "A2-t4:2:4" "A3-k3:3:3" "A23-n4:23:4" "A2-t6:2:6" "A23-n6:23:6" "A3-k5:3:5" "A2-t8:2:8"; do
