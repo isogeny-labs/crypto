@@ -11,11 +11,19 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Native Koblitz measurement checkpoint access](native-koblitz-measurement-access.md) | open | requested isolated Rust baseline/candidate measurement | existing authorized S3 uploader, checkpoint gate, source-pinned EKS execution and verified receipts |
+
+---
+
 | [Historical benchmark registry path](benchmark-record-mutable-registry-path.md) | resolved | offline archived-input availability for a reused registry path | existing guarded archive verification, matched readback and substitution controls; both records preserved |
 | [Primo has no prime-field or bit-vector route for index calculus](primo-prime-field-theory-gap.md) | open | using `primo-smt` on prime-field IC or claiming a prime-field performance advantage from the binary adapter | exact native frontend or qualified Primo theory support, SAT/UNSAT controls with independent model checks, and a matched stage benchmark |
 | [Lift to characteristic zero, reduce at a second prime p′](lift-reduce-second-prime-transfer.md) | open (proposed lead; untracked route) | deciding whether lifting to an abelian variety over a number field and reducing at a second prime can weaken a prime-field ECDLP | atlas/KB lookup for a duplicate; review of the derived g = 1 and non-torsion reductions; a bound on the field of definition of an N-torsion lift for g ≥ 2 |
 | [P3 census rho walk: bimodal, curve-reproducible cost above √n](p3census-rho-walk-bimodal.md) | resolved (walk v2, 2026-11-08) | reading P3's rho outcome as a statement about Pollard rho | identify the binary property on 50 small curves; a corrected walk with flat, unimodal per-curve cost; re-run Y1 |
 | [Split-prime pattern reaches the prime-order group only through scalars](split-prime-pattern-scalar-only.md) | open (derived obstruction for the ℓ-adic / class-group route) | a novel ECDLP algorithm built on the split-prime deficit of the published prime curves | a computable non-scalar entry point verified on a toy class, or a Lean proof that closes the route formally |
+| [RR Dickson matrix-reduction qualification](rr-dickson-matrix-reduction-qualification.md) | open (output qualification and measurement admission) | retain RR degree while lowering matrix growth and complete equal-output cost | complete normalization checks; S3 checkpoint and budget admission; matched RR/F panel |
+
+---
+
 | [Chained same-characteristic transfers do not cheapen a prime-field ECDLP](prime-field-chained-transfer-no-advantage.md) | open (derived + measured boundary for isogeny→bielliptic cover→genus-2 Jacobian) | a cryptanalytic speedup from chaining covers/isogenies/Jacobian maps over F_p | a same-characteristic destination with DLP exponent below √p, or a computable cross-characteristic subgroup map, each with full cost accounting |
 | [P-256 mixed eigenline: folded-rho cost](p256-eigenline-folded-rho-cost.md) | open | net runtime advantage from the checked six-image subgroup | cycle-safe independent-increment solver and matched complete costs below the stated threshold; no active benchmark |
 | [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only | current-main PCC prefix/integration | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
