@@ -1,0 +1,278 @@
+module
+public import NormInputBudget
+public import NormMembershipElimination
+public import NormPoleTransport
+public import NormTargetFiber
+public import Mathlib.Algebra.MvPolynomial.Rename
+public import Mathlib.Algebra.Polynomial.BigOperators
+import all NormInputBudget
+import all NormMembershipElimination
+import all NormPoleTransport
+import all NormTargetFiber
+public section
+
+namespace NormGrowingInput
+open Polynomial Finset
+variable {K : Type*} [Field K]
+
+abbrev Variables (h : ℕ) := Fin (h+1) ⊕ Fin (h+1)
+abbrev Coefficients (K : Type*) [CommRing K] (h : ℕ) := MvPolynomial (Variables h) K
+
+def weights (h : ℕ) : Variables h → ℕ
+  | .inl i => 2*(h+1-i.val)
+  | .inr i => 2*h+1-2*i.val
+
+theorem weights_positive (h : ℕ) (i : Variables h) : 0<weights h i := by
+  cases i with
+  | inl i => simp only [weights]; omega
+  | inr i => simp only [weights]; omega
+
+/-- A literal permutation of weights 1,...,2h+2. -/
+def weightIndex (h : ℕ) (i : Variables h) : Fin (2*h+2) :=
+  ⟨weights h i-1, by cases i <;> simp only [weights] <;> omega⟩
+
+theorem weightIndex_value (h : ℕ) (i : Variables h) : weights h i=(weightIndex h i).val+1 := by
+  have hi := weights_positive h i
+  simp only [weightIndex]
+  omega
+
+theorem weightIndex_bijective (h : ℕ) : Function.Bijective (weightIndex h) := by
+  constructor
+  · intro i j hij
+    have hv := congrArg Fin.val hij
+    cases i with
+    | inl i => cases j with
+      | inl j => have hv' : i.val=j.val := by simp only [weightIndex,weights] at hv; omega
+                 exact congrArg Sum.inl (Fin.ext hv')
+      | inr j => simp only [weightIndex,weights] at hv; omega
+    | inr i => cases j with
+      | inl j => simp only [weightIndex,weights] at hv; omega
+      | inr j => have hv' : i.val=j.val := by simp only [weightIndex,weights] at hv; omega
+                 exact congrArg Sum.inr (Fin.ext hv')
+  · intro j
+    by_cases hj : j.val%2=0
+    · refine ⟨.inr ⟨h-j.val/2, by omega⟩,?_⟩
+      apply Fin.ext
+      simp only [weightIndex,weights]
+      omega
+    · refine ⟨.inl ⟨h-j.val/2, by omega⟩,?_⟩
+      apply Fin.ext
+      simp only [weightIndex,weights]
+      omega
+
+noncomputable def weightEquiv (h : ℕ) : Variables h ≃ Fin (2*h+2) :=
+  Equiv.ofBijective (weightIndex h) (weightIndex_bijective h)
+
+noncomputable def tail (h : ℕ) : (Coefficients K h)[X] :=
+  ∑ i : Fin (h+1), Polynomial.monomial (i.val+1) (MvPolynomial.X (.inl i))
+noncomputable def D (h : ℕ) : (Coefficients K h)[X] := X^(h+2)+tail h
+noncomputable def B (h : ℕ) : (Coefficients K h)[X] :=
+  ∑ i : Fin (h+1), Polynomial.monomial i.val (MvPolynomial.X (.inr i))
+noncomputable def A (h : ℕ) (r z : K) : (Coefficients K h)[X] :=
+  NormMembershipElimination.completeTarget (D h) (B h) (MvPolynomial.C r) (MvPolynomial.C z)
+noncomputable def curve (h : ℕ) (alpha beta : K) : (Coefficients K h)[X] :=
+  (X^3+Polynomial.C alpha*X+Polynomial.C beta).map MvPolynomial.C
+noncomputable def N (h : ℕ) (alpha beta r z : K) : (Coefficients K h)[X] :=
+  A h r z^2-curve h alpha beta*B h^2
+noncomputable def U (h : ℕ) (alpha beta r z : K) : (Coefficients K h)[X] :=
+  N h alpha beta r z /ₘ (X-Polynomial.C (MvPolynomial.C r))
+noncomputable def membership (h : ℕ) (alpha beta r z : K) (P : K[X]) : (Coefficients K h)[X] :=
+  P.map MvPolynomial.C %ₘ U h alpha beta r z
+
+theorem D_budget (h : ℕ) : NormInputBudget.Budget (weights h) 2 (D (K:=K) h) (2*h+4) := by
+  unfold D tail
+  apply NormInputBudget.add
+  · simpa [Nat.mul_add] using NormInputBudget.publicPolynomial (weights h) 2 (X^(h+2) : K[X])
+  · apply NormInputBudget.sum
+    intro i _
+    apply NormInputBudget.indeterminate
+    simp only [weights]
+    omega
+
+theorem B_budget (h : ℕ) : NormInputBudget.Budget (weights h) 2 (B (K:=K) h) (2*h+1) := by
+  unfold B
+  apply NormInputBudget.sum
+  intro i _
+  apply NormInputBudget.indeterminate
+  simp only [weights]
+  omega
+
+theorem A_budget (h : ℕ) (r z : K) :
+    NormInputBudget.Budget (weights h) 2 (A h r z) (2*h+4) := by
+  unfold A NormMembershipElimination.completeTarget
+  apply NormInputBudget.add (D_budget h)
+  rw [map_sub,map_mul]
+  apply NormInputBudget.sub
+  · have hb := NormInputBudget.mul (NormInputBudget.scalar (weights h) 2 z)
+      (NormInputBudget.evalScalar (B_budget (K:=K) h) r)
+    apply NormInputBudget.mono hb
+    omega
+  · exact NormInputBudget.evalScalar (D_budget h) r
+
+theorem curve_budget (h : ℕ) (alpha beta : K) :
+    NormInputBudget.Budget (weights h) 2 (curve h alpha beta) 6 := by
+  have hp : (X^3+Polynomial.C alpha*X+Polynomial.C beta : K[X]).natDegree≤3 := by compute_degree!
+  exact NormInputBudget.mono (NormInputBudget.publicPolynomial (weights h) 2 _) (by omega)
+
+theorem N_budget (h : ℕ) (alpha beta r z : K) :
+    NormInputBudget.Budget (weights h) 2 (N h alpha beta r z) (4*h+8) := by
+  unfold N
+  apply NormInputBudget.sub
+  · convert NormInputBudget.pow (A_budget h r z) 2 using 1; ring
+  · have hb := NormInputBudget.mul (curve_budget h alpha beta)
+      (NormInputBudget.pow (B_budget (K:=K) h) 2)
+    apply NormInputBudget.mono hb
+    omega
+
+theorem U_budget (h : ℕ) (alpha beta r z : K) :
+    NormInputBudget.Budget (weights h) 2 (U h alpha beta r z) (4*h+6) := by
+  have hx : NormInputBudget.Budget (weights h) 2
+      (X-Polynomial.C (MvPolynomial.C r)) 2 := by
+    have hb := NormInputBudget.publicPolynomial (weights h) 2 (X-Polynomial.C r : K[X])
+    have hm : (X-Polynomial.C r : K[X]).map (MvPolynomial.C : K→+*Coefficients K h)=
+        X-Polynomial.C (MvPolynomial.C r) := by simp
+    rw [hm,natDegree_X_sub_C,mul_one] at hb
+    exact hb
+  have hd := NormInputBudget.division (N h alpha beta r z)
+    (monic_X_sub_C (MvPolynomial.C r)) (by simpa using hx) (4*h+8) (N_budget h alpha beta r z)
+  simpa [U] using hd.2
+
+theorem tail_degree (h : ℕ) : (tail (K:=K) h).degree<((h+2 : ℕ) : WithBot ℕ) := by
+  unfold tail
+  apply (degree_sum_le _ _).trans_lt
+  apply (Finset.sup_lt_iff (WithBot.bot_lt_coe (h+2))).mpr
+  intro i _
+  have hi : i.val+1<h+2 := by have := i.is_lt; omega
+  have hc : ((i.val+1 : ℕ) : WithBot ℕ)<((h+2 : ℕ) : WithBot ℕ) :=
+    WithBot.coe_lt_coe.mpr hi
+  exact (degree_monomial_le (i.val+1) _).trans_lt hc
+
+theorem A_monic_degree (h : ℕ) (r z : K) : (A h r z).Monic ∧ (A h r z).natDegree=h+2 := by
+  let c : Coefficients K h := MvPolynomial.C z*(B (K:=K) h).eval (MvPolynomial.C r)-(D h).eval (MvPolynomial.C r)
+  have he : A h r z=X^(h+2)+(tail h+Polynomial.C c) := by
+    simp only [A,NormMembershipElimination.completeTarget,D,c,add_assoc]
+  have ht : (tail h+Polynomial.C c).degree<((h+2 : ℕ) : WithBot ℕ) :=
+    (degree_add_le _ _).trans_lt (max_lt (tail_degree h)
+      (degree_C_le.trans_lt (by exact_mod_cast (by omega : 0<h+2))))
+  rw [he]
+  refine ⟨monic_X_pow_add ht,?_⟩
+  rw [natDegree_add_eq_left_of_degree_lt (by simpa using ht),natDegree_X_pow]
+
+theorem B_degree (h : ℕ) : (B (K:=K) h).natDegree≤h := by
+  unfold B
+  apply natDegree_sum_le_of_forall_le
+  intro i _
+  exact (natDegree_monomial_le _).trans (by omega)
+
+theorem N_monic_degree (h : ℕ) (alpha beta r z : K) :
+    (N h alpha beta r z).Monic ∧ (N h alpha beta r z).natDegree=2*(h+2) := by
+  have ha := A_monic_degree h r z
+  have hf : (curve h alpha beta).natDegree≤3 := by
+    unfold curve
+    simp only [Polynomial.map_add,Polynomial.map_mul,Polynomial.map_pow,map_X,map_C]
+    compute_degree!
+  have hb := B_degree (K:=K) h
+  have hlow : (curve h alpha beta*B h^2).natDegree<(A h r z^2).natDegree := by
+    have ht := natDegree_mul_le (p:=curve h alpha beta) (q:=B h^2)
+    rw [natDegree_pow] at ht
+    rw [natDegree_pow,ha.2]
+    omega
+  unfold N
+  refine ⟨(ha.1.pow 2).sub_of_left ?_,?_⟩
+  · rw [degree_eq_natDegree (pow_ne_zero 2 ha.1.ne_zero)]
+    exact degree_le_natDegree.trans_lt (by exact_mod_cast hlow)
+  · rw [natDegree_sub_eq_left_of_natDegree_lt hlow,natDegree_pow,ha.2]
+
+theorem U_monic_degree (h : ℕ) (alpha beta r z : K) :
+    (U h alpha beta r z).Monic ∧ (U h alpha beta r z).natDegree=2*h+3 := by
+  have hn := N_monic_degree h alpha beta r z
+  have hdeg : (X-Polynomial.C (MvPolynomial.C r) : (Coefficients K h)[X]).degree≤(N h alpha beta r z).degree := by
+    rw [degree_X_sub_C,degree_eq_natDegree hn.1.ne_zero,hn.2]
+    exact_mod_cast (by omega : 1≤2*(h+2))
+  constructor
+  · unfold U Monic
+    rw [leadingCoeff_divByMonic_of_monic (monic_X_sub_C _) hdeg,hn.1.leadingCoeff]
+  · unfold U
+    rw [natDegree_divByMonic _ (monic_X_sub_C _),natDegree_X_sub_C,hn.2]
+    omega
+
+/-- The full actual membership remainder has the literal weighted input budget. -/
+theorem membership_budget (h : ℕ) (alpha beta r z : K) (P : K[X]) :
+    NormInputBudget.Budget (weights h) 2 (membership h alpha beta r z P) (2*P.natDegree) := by
+  have hu := U_monic_degree h alpha beta r z
+  exact (NormInputBudget.division (P.map MvPolynomial.C) hu.1
+    (by rw [hu.2]; convert U_budget h alpha beta r z using 1; omega)
+    (2*P.natDegree) (NormInputBudget.publicPolynomial (weights h) 2 P)).1
+
+/-- This is the actual multivariate weighted degree, not a pointwise law. -/
+theorem input_weighted_degree (h : ℕ) (alpha beta r z : K) (P : K[X]) (j : ℕ) :
+    MvPolynomial.weightedTotalDegree (weights h) ((membership h alpha beta r z P).coeff j)
+      ≤2*P.natDegree-2*j := by
+  unfold MvPolynomial.weightedTotalDegree
+  apply Finset.sup_le
+  intro e he
+  exact Nat.le_sub_of_add_le (membership_budget h alpha beta r z P j e he)
+
+/-- Actual curve incidence binds the computed quotient to exact norm division. -/
+theorem exact_norm (h : ℕ) (alpha beta r z : K) (hp : z^2=r^3+alpha*r+beta) :
+    (X-Polynomial.C (MvPolynomial.C r))*U h alpha beta r z=N h alpha beta r z := by
+  apply NormMembershipElimination.canonicalNormQuotient (curve h alpha beta) (A h r z) (B h)
+    (MvPolynomial.C r) (MvPolynomial.C z)
+  · simpa [curve,eval_map_apply,eval_add,eval_pow,eval_X,eval_mul,eval_C,map_add,map_mul,map_pow]
+      using congrArg (MvPolynomial.C : K→Coefficients K h) hp
+  · exact NormMembershipElimination.completionRow _ _ _ _
+
+/-- Exact polynomial-ring renaming; the original four retained coefficients
+are kept as indeterminates, not compared only at finite-field values. -/
+noncomputable def fourRename : Coefficients K 1 ≃ₐ[K] MvPolynomial (Fin 4) K :=
+  MvPolynomial.renameEquiv K (finSumFinEquiv : Variables 1 ≃ Fin 4)
+
+theorem four_A (r z : K) :
+    (A 1 r z).map (fourRename (K:=K)).toRingHom=
+      NormPoleTransport.actualA (MvPolynomial.X 0) (MvPolynomial.X 1)
+        (MvPolynomial.X 2) (MvPolynomial.X 3) (MvPolynomial.C r) (MvPolynomial.C z) := by
+  simp [A,D,tail,B,NormPoleTransport.actualA,NormMembershipElimination.completeTarget,
+    Fin.sum_univ_two,fourRename,MvPolynomial.renameEquiv,
+    ← C_mul_X_pow_eq_monomial,Polynomial.eval_monomial,finSumFinEquiv]
+  ring
+
+theorem four_B :
+    (B (K:=K) 1).map (fourRename (K:=K)).toRingHom=
+      Polynomial.C (MvPolynomial.X 2)+Polynomial.C (MvPolynomial.X 3)*X := by
+  simp [B,Fin.sum_univ_two,fourRename,MvPolynomial.renameEquiv,
+    ← C_mul_X_pow_eq_monomial,finSumFinEquiv]
+
+theorem four_N (alpha beta r z : K) :
+    (N 1 alpha beta r z).map (fourRename (K:=K)).toRingHom=
+      NormPoleTransport.actualNorm (MvPolynomial.C alpha) (MvPolynomial.C beta)
+        (MvPolynomial.X 0) (MvPolynomial.X 1) (MvPolynomial.X 2) (MvPolynomial.X 3)
+        (MvPolynomial.C r) (MvPolynomial.C z) := by
+  unfold N NormPoleTransport.actualNorm
+  rw [Polynomial.map_sub,Polynomial.map_pow,Polynomial.map_mul,Polynomial.map_pow,four_A,four_B]
+  simp [curve,fourRename,MvPolynomial.renameEquiv]
+
+theorem four_U (alpha beta r z : K) :
+    (U 1 alpha beta r z).map (fourRename (K:=K)).toRingHom=
+      NormTargetFiber.support (MvPolynomial.C alpha) (MvPolynomial.C beta)
+        (MvPolynomial.X 0) (MvPolynomial.X 1) (MvPolynomial.X 2) (MvPolynomial.X 3)
+        (MvPolynomial.C r) (MvPolynomial.C z) := by
+  unfold U NormTargetFiber.support
+  rw [Polynomial.map_divByMonic _ (monic_X_sub_C _),four_N]
+  simp [fourRename,MvPolynomial.renameEquiv]
+
+theorem four_membership (alpha beta r z : K) (P : K[X]) :
+    (membership 1 alpha beta r z P).map (fourRename (K:=K)).toRingHom=
+      P.map MvPolynomial.C %ₘ
+      NormTargetFiber.support (MvPolynomial.C alpha) (MvPolynomial.C beta)
+        (MvPolynomial.X 0) (MvPolynomial.X 1) (MvPolynomial.X 2) (MvPolynomial.X 3)
+        (MvPolynomial.C r) (MvPolynomial.C z) := by
+  unfold membership
+  rw [Polynomial.map_modByMonic _ (U_monic_degree 1 alpha beta r z).1,four_U]
+  congr 1
+  ext j
+  simp [fourRename,MvPolynomial.renameEquiv]
+
+theorem four_weights : weights 1 (.inl 0)=4 ∧ weights 1 (.inl 1)=2 ∧
+    weights 1 (.inr 0)=3 ∧ weights 1 (.inr 1)=1 := by decide
+
+end NormGrowingInput

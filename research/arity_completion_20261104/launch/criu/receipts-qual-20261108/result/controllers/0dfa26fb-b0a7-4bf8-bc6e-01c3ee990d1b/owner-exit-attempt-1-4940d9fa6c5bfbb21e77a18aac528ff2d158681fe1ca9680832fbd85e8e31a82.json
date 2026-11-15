@@ -1,0 +1,37 @@
+{
+  "accepted_external_closure": null,
+  "attempt": 1,
+  "boundary": "observed direct-child reap upper boundary; exact kernel exit instant unknown",
+  "cpu": {
+    "scope": "wait4 direct-child OS accounting; not allocated worker CPU",
+    "system_microseconds": 719159,
+    "user_microseconds": 978096194
+  },
+  "exit_code": 0,
+  "findings": [
+    "restored attempt clock alignment unsupported",
+    "post-exec runner identity not observed"
+  ],
+  "journal_durability_boundary": "post-reap evidence sync when session_binding exists; no pre-exit durability or ExternalExit fabricated",
+  "owner_begin_clock": {
+    "boot_id": "b2159c29-cc34-458d-b465-366c66dfd52d",
+    "raw_ns": 44565435076,
+    "time_namespace": "time:[4026531834]",
+    "time_namespace_offsets": "monotonic           0         0\nboottime            0         0\n"
+  },
+  "payload_pid": 531,
+  "payload_starttime": "6821",
+  "postexec_runner_observation": null,
+  "reap_observed": true,
+  "reap_observed_clock": {
+    "boot_id": "b2159c29-cc34-458d-b465-366c66dfd52d",
+    "raw_ns": 1149006275631,
+    "time_namespace": "time:[4026531834]",
+    "time_namespace_offsets": "monotonic           0         0\nboottime            0         0\n"
+  },
+  "request_sha256": "e45cf2fde5d217750faec543a7fb72c34aef1f369a8ec553c71ba154e07de7b8",
+  "schema": "isolab.recovery.owner-exit/v1",
+  "session_binding": null,
+  "terminal_reason": "observed terminal reap",
+  "total_active_worker_ns": null
+}

@@ -101,8 +101,11 @@ def padd(F, a, P, Q):
     return (x3, y3)
 
 
+SALT = os.environ.get("TZ_SALT", "")  # A5: independent seeds for the replication
+
+
 def seed(*parts):
-    h = hashlib.sha256("|".join(map(str, parts)).encode()).digest()
+    h = hashlib.sha256("|".join(map(str, (SALT,) + parts if SALT else parts)).encode()).digest()
     return int.from_bytes(h[:8], "big")
 
 
@@ -212,10 +215,13 @@ def random_subspace(F, d, rnd):
                     m = F.add(m, g)
             span = new
         if len(span) == p ** d:
+            if EXCL and any(g and F.frob(g) in (g, F.neg(g)) for g in span):
+                continue  # A6: drop degenerate V (contains g with g^p = +-g)
             return sorted(span)
 
 
 SYM = bool(int(os.environ.get("TZ_SYM", "0")))
+EXCL = bool(int(os.environ.get("TZ_EXCL", "0")))
 SUB = 3  # A2: small factor-base size for the unsaturated arm
 _F = {}
 

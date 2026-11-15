@@ -20,12 +20,16 @@ jobs:
         with:
           python-version: '3.12'
       - name: Check frozen source and input bytes
-        run: |
-          python3 -m py_compile research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/{export,verify,run,ci_replay}.py
-          python3 research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 -m py_compile research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/{export,verify,run,ci_replay}.py
+            python3 research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_s3_sparse_cnf_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Audit committed evidence when present
-        run: |
-          receipt=research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/evidence/final/receipt.json
-          if test -f "$receipt"; then
-            python3 research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/ci_replay.py --evidence "$receipt"
-          fi
+        env:
+          FROZEN_VIEW_STEP: |
+            receipt=research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/evidence/final/receipt.json
+            if test -f "$receipt"; then
+              python3 research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/ci_replay.py --evidence "$receipt"
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_s3_sparse_cnf_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

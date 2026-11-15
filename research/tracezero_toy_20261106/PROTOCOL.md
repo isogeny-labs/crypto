@@ -118,3 +118,43 @@ d = 1 cells show a small significant shortfall of the trace arm (Δ|S| ≈ −0.
 are sign-symmetric, while the random null draws independent points. A symmetric-pair null
 (draw n/2 points and their negatives) is run as a **post hoc secondary** (`TZ_SYM=1`,
 `summary_symnull.json`). It does not replace the registered verdict.
+
+## Amendment A5 (2026-11-06): pre-registered replication of the k = 2, d = 1 residual
+
+Frozen before the replication data. The post hoc A4 run left one residual: k = 2, d = 1,
+Δcov_2 = −0.0086 [−0.0125, −0.0050] under the sign-symmetric null.
+
+- **Run**: `TZ_SALT=rep1 TZ_SYM=1`, k ∈ {2, 3}, d = 1, p ∈ {37, 41, 43, 47, 53, 59, 61},
+  200 curves × 20 V-pairs per (p, k), all independent seeds (salt changes every derived
+  seed). k = 3 is the reference arm where A4 showed no effect.
+- **Statistic**: small-base cov_2 (primary), cov_3 and |S| (secondary), Δ = trace − random
+  with the symmetric null, curve-level means, pooled over the seven primes, 95% bootstrap.
+- **Prediction (from A4)**: if the residual is real, k = 2 pooled Δcov_2 < 0 with an interval
+  excluding 0, and k = 3 contains 0. If it is a fluke or small-p, k = 2 contains 0.
+- **Validity**: positive control excludes 0 and A/A half-width ≤ 0.05, as before.
+- **Reading**: replicated only if the k = 2 interval excludes 0 on the negative side. This
+  tests one cell, so it says nothing about other (k, d) and no cost claim follows.
+
+## Amendment A6 (2026-11-06): pre-registered rerun without degenerate V
+
+Frozen before the data. A4/A5 and `explore_line_classes.py` explain the k = 2, d = 1 residual
+by degenerate V (V contains a nonzero g with g^p = g or g^p = −g). This run excludes them:
+`TZ_EXCL=1 TZ_SYM=1 TZ_SALT=rep2`, both V draws (trace and A/A) resampled until non-degenerate.
+For k = 3 only g ∈ F_p can occur; for d = 2 the whole span is checked.
+
+- **Runs**: (a) d = 1, k ∈ {2, 3}, p ∈ {17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61};
+  (b) d = 2, k ∈ {2, 3}, p ∈ {17, 19, 23, 29, 31}. 200 curves × 20 V-pairs; independent seeds.
+- **Statistics and rule**: as A1/A2, pooled over p ≥ 17 per (k, d) cell, symmetric null.
+- **Prediction**: if the explanation is complete, every (k, d) cell's Δcov_2 and Δcov_3 interval
+  contains 0 and the registered verdict is "no structure detected". If any interval excludes 0
+  the residual is not fully explained by degenerate V.
+- **Validity**: positive control excludes 0; A/A half-width ≤ 0.05.
+
+## Amendment A7 (2026-11-06, before the A6 part (b) data; part (a) results seen)
+
+A6 part (b) hung with no rows: for k = 2, d = 2 the subspace V is the whole field F_{p²},
+which always contains F_p, so excluding degenerate V rejects every draw. That cell cannot be
+run under A6 and is dropped (this also means the earlier registered k = 2, d = 2 cell was
+V = F_{p²} on every draw, not a random subspace). Part (b) becomes k = 3, d = 2, p ∈
+{17, 19, 23, 29, 31}, otherwise as A6. Part (a) is unchanged and its results are reported
+as they came out (see README).

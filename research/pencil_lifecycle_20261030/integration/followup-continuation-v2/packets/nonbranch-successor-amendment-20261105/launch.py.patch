@@ -1,0 +1,68 @@
+--- original-v3/launch.py
++++ successor/launch.py
+@@ -3,25 +3,40 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105')
++W=Path('/home/ec2-user/pencil-native-nonbranch-successor-t1717-20261105')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1793937600
+ BOOT='7643b0496f9d444aa34577d07d463277'
+ ap=argparse.ArgumentParser();ap.add_argument('--execute',action='store_true');ap.add_argument('--freeze-sha256',required=True)
++ap.add_argument('--release-record',required=True);ap.add_argument('--release-sha256',required=True)
+ a=ap.parse_args()
+ assert a.execute,'Preparation only; explicit execution required after independent review and publication'
+ assert hashlib.sha256((P/'freeze.json').read_bytes()).hexdigest()==a.freeze_sha256,'freeze mismatch'
+ F=json.loads((P/'freeze.json').read_text())
+ for name,digest in F['files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,('frozen input',name)
+ assert Path('/proc/sys/kernel/random/boot_id').read_text().strip().replace('-','')==BOOT,'boot changed'
+-prior=json.loads((P/'prior-attempts.json').read_text())
+-assert prior['conservative_debit_seconds']==1200 and prior['attempt_number']==3 and prior['total_attempt_ceiling']==3
+-assert prior['remaining_before_attempt_seconds']==45600
+-for file,digest in prior['bindings'].items():assert hashlib.sha256(Path(file).read_bytes()).hexdigest()==digest,('prior attempt drift',file)
+-previous=Path('/home/ec2-user/pencil-native-nonbranch-t1637-v2-20261105')
+-assert not (previous/'compiler.started').exists() and not (previous/'post.started').exists(),'previous phases need reconciliation'
+-assert not Path('/sys/fs/cgroup/system.slice/pencil-nonbranch-t1637-v2-pre.service').exists(),'previous group remains'
+-assert not Path('/proc/882274').exists(),'previous PID remains'
++# Existing coordinator release binds this exact successor after serial reconciliation.
++release_path=Path(a.release_record).resolve()
++assert hashlib.sha256(release_path.read_bytes()).hexdigest()==a.release_sha256,'release pin'
++release=json.loads(release_path.read_text())
++assert release['schema']=='norm-successor-coordinator-release/v1' and release['released'] is True
++assert release['freeze_sha256']==a.freeze_sha256
++assert release['attempt_limit']==1 and release['automatic_retry'] is False
++assert release['campaign_total_seconds']==46800 and release['deadline']=='2026-11-06T04:00:00Z'
++assert release['prior_debit_seconds']==5400 and release['remaining_before_attempt_seconds']==41400
++assert release['materializer_conservative_debit_seconds']==900
++assert release['serial_materializer_terminal_confirmed'] is True
++assert release['coordinator_live_lease_confirmed'] is True
++assert set(release['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
++assert type(release['lease']['fencing_epoch']) is int and release['lease']['fencing_epoch']>0
++for key in ('task_id','attempt_id','lease_id'):assert isinstance(release['lease'][key],str) and release['lease'][key]
++assert release['published_github_commit'] and release['independent_review_commit']
++assert set(release['receipts'])=={'publication','independent_review','ledger','materializer_terminal','lease_readback'}
++for name,binding in release['receipts'].items():
++ path=Path(binding['path']);assert path.is_absolute() and path.is_file()
++ assert hashlib.sha256(path.read_bytes()).hexdigest()==binding['sha256'],('release receipt',name)
++# Coordinator authenticates these receipts and maintains the live lease throughout.
++# Phase ownership/cgroup checks below remain the original runtime authority.
+ assert time.time()+2400<DEADLINE,'insufficient absolute deadline allowance'
+ assert not W.exists(),'existing native workspace; no retries'
+ O.mkdir(mode=0o700)  # exclusive admission: existing outer directory also rejects repeats
+@@ -122,12 +137,13 @@
+  return {'phase':phase,'argv':cmd,'returncode':rc,'elapsed_seconds':elapsed,'invocation_id':invocation,'terminal_owner_confirmed':terminal,'wait_timeout':timed_out,'errors':errors,'native_receipt_present':native is not None,'receipt_error':receipt_error,'passed':passed,'systemd_stdout':str(log_out),'systemd_stderr':str(log_err)}
+ results=[]
+ try:
+- durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':46800,'prior_debit_seconds':1200,'remaining_before_attempt_seconds':45600,'attempt_number':3,'total_attempt_ceiling':3,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
++ durable('coordinator-release.json',release)
++ durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':46800,'prior_debit_seconds':5400,'remaining_before_attempt_seconds':41400,'historical_norm_attempts_consumed':3,'historical_norm_attempt_ceiling':3,'successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
+  for phase,limit in [('pre',900),('compiler',600),('post',900)]:
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-nonbranch-t1651-v3-'+phase
++  unit='pencil-nonbranch-successor-t1717-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',

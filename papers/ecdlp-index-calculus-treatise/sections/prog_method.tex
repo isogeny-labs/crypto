@@ -1,10 +1,10 @@
 \chapter{Measuring index calculus against rho}\label{sec:method}
 
-The programme's first lesson was that index-calculus numbers from
-different studies did not compose: one study timed a decomposition, another
-a relation, a third a whole multi-target batch with shared tables, each on
-a different host and in a different unit. Four mechanisms, built in this
-order, fixed that.
+Index-calculus numbers from different studies did not compose at first:
+one study timed a decomposition, another a relation, a third a whole
+multi-target batch with shared tables, each on a different host and in a
+different unit. Four mechanisms, built in this order, fixed that.
+Table~\ref{tab:fm-standing} counts what they admitted by 6 November.
 
 \section{The boundary ledger (10 September)}
 
@@ -14,7 +14,7 @@ prime) and each pipeline stage (\texttt{factor\_base},
 \texttt{decomposition}, \texttt{relation\_yield}, \texttt{rank},
 \texttt{end\_to\_end\_dlp}, \texttt{vs\_rho}) a current record, a next
 target and acceptance gates. A row promotes only when its evidence JSON
-carries every field the measurement schema requires for that stage---for
+carries every field the measurement schema requires for that stage. For
 example, a \texttt{decomposition} claim that beats an algebraic frontier
 must report the first-fall degree, and a \texttt{vs\_rho} claim needs one
 target, the identical public point for both methods, verified scalars,
@@ -51,8 +51,8 @@ every record carries the one-target \emph{online window}, split for index
 calculus into the five exclusive phases \texttt{target\_query},
 \texttt{target\_PDP}, \texttt{target\_relation\_check},
 \texttt{target\_descent}, \texttt{target\_recovery\_check}. Targets are
-either planted or \emph{public}---hashed to the subgroup so that nobody
-knows the logarithm---and the runner verifies $[k]G=Q$ in its own process;
+either planted or \emph{public} (hashed to the subgroup so that nobody
+knows the logarithm), and the runner verifies $[k]G=Q$ in its own process;
 \texttt{ecbench verify} checks it again from the files. Failed, exhausted
 and timed-out runs are rows, never dropped.
 
@@ -85,7 +85,7 @@ checks determinism. A claim about scaling fits exponents over at least
 four sizes.
 
 \paragraph{Bounds and the frontier.} \texttt{ecbench} also records sealed
-\emph{bounds}---constant and exponent with intervals, per phase---and a
+\emph{bounds} (constant and exponent with intervals, per phase) and a
 challenge protocol whose verdict says whether a candidate advances,
 trades, matches or regresses an incumbent and at which level (exponent,
 constant, primitive). The incumbent for cold one-target Koblitz operations
@@ -150,12 +150,29 @@ arm before any comparative statement. Blockers are recorded as named
 problems (\art{problems/}) with exit criteria rather than silently dropped.
 Measurement code is native (Rust); Python only lays out recorded values.
 
+\begin{table}[tbp]
+\centering\footnotesize
+\input{figures/tab-fm-standing.tex}
+\caption[]{Standing of the programme's records at \texttt{origin/main}
+\texttt{05f73826}, 6 November 2026. ``Running'' sessions were never
+finalised (a runner killed outright); \texttt{ecbench verify} audits them
+as interrupted. The \texttt{pcc} ledger began on 4 November and holds no
+verdict entry, so no claim record has a standing beyond ``unverified''.
+Counts by \art{figures/data-fm-glance.json}; table by
+\art{figures/make_tab_fm.py}.}
+\label{tab:fm-standing}
+\end{table}
+
 \paragraph{Generic baselines.} The rho, BSGS and Pohlig--Hellman
 references were engineered alongside index calculus, which is why each
 round's distance is quoted against the strongest reference at the time. On
 Koblitz curves the strong signed-Frobenius rho fell from 1{,}196 to 679.7
 instructions per step over four rounds with no established native-time gain
-(\S\ref{sec:ladder2}). On hyperelliptic Jacobians a negation fold and hash mixing each fell short
+(\S\ref{sec:ladder2}); on an L0 Apple host the tuned ecbench walk ran at
+$95.0$, $92.2$ and $102.5$\,ns per step at $n=41$, $53$ and $61$ against
+$519.9$, $861.5$ and $979.7$ for that strong reference, descriptive wall
+time (\art{benchmarks/20261026-r12-rho-ns-per-step/README.md}). On
+hyperelliptic Jacobians a negation fold and hash mixing each fell short
 of their registered gains, and full-width branch coefficients showed that
 the earlier 8-bit reference walk had been slow at large $N$
 (\art{benchmarks/20261018-hec-rho-negation/},
@@ -216,7 +233,7 @@ Appendix~\ref{ch:corrections}.
   two ``solutions''). Fixed by evaluating every candidate on the input.
 \item \emph{F6-IC charged cost} (\S\ref{sec:groebner}): a stage win in
   word XORs became a $64.6$--$1{,}353\times$ loss in charged $S$ once its
-  batched geometry was counted---recorded as an accounting result, not an
+  batched geometry was counted, recorded as an accounting result, not an
   advance. With inherited F4's own word XORs priced the $m=13$ loss is about
   $2.5\times$ (\S\ref{sec:groebner}).
 \item \emph{Lopsided pricing} (\S\ref{sec:band}): comparisons of a

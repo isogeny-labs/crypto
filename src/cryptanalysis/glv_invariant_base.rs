@@ -1057,6 +1057,8 @@ pub fn generate_cm_instance(
             r,
             cofactor: h,
             generator: (g.x, g.y),
+
+            representation: None,
         });
     }
     Err(format!(

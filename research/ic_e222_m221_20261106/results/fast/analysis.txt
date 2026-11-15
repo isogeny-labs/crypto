@@ -1,0 +1,17 @@
+frozen {'A': 8, 'Eh': 256, 'Ef': 96, 'D': 32, 'Dw': 16} | rows 600 recovered 600 | missing timings 0
+binary 78d4fb69dc5a commit 2fb74a63dc | IC_ env seen: {'{"IC_FAST_SWEEP": "1"}', '{}', '{"IC_HOIST_SWEEP": "1"}', '{"IC_SUM_TABLE": "1", "IC_WALK": "1"}', '{"IC_SUM_TABLE": "1"}'}
+pairs 120 instances 60
+A shipped default (sweep, extra 64)  fb 8 | solver ms median 300.49 | process ms median 324.3 | trials 18760
+Eh hoisted BigUint sweep, extra 2     fb 256 | solver ms median 21.79 | process ms median 46.0 | trials 262
+Ef word-sized sweep, extra 2          fb 96 | solver ms median 9.76 | process ms median 33.8 | trials 226
+D pair-sum table, extra 2            fb 32 | solver ms median 1.48 | process ms median 25.2 | trials 554
+Dw table + restarted walk, extra 2    fb 16 | solver ms median 0.50 | process ms median 23.9 | trials 1177
+paired ratios, median [bootstrap 95% by instance]  solver | process | wins(solver)
+  Ef/Eh: 0.425 [0.411,0.455] | 0.716 [0.670,0.758] | 120/120
+  D/Ef: 0.162 [0.133,0.179] | 0.747 [0.694,0.777] | 120/120
+  Dw/Ef: 0.055 [0.047,0.062] | 0.703 [0.635,0.757] | 120/120
+  Dw/D: 0.367 [0.345,0.382] | 0.961 [0.941,0.981] | 118/120
+  Ef/A: 0.034 [0.032,0.036] | 0.110 [0.097,0.119] | 120/120
+  D/A: 0.005 [0.005,0.006] | 0.081 [0.071,0.095] | 120/120
+  Dw/A: 0.002 [0.002,0.002] | 0.077 [0.066,0.087] | 120/120
+by size (Dw/Ef, D/Ef solver): {14: (0.072, 0.199), 15: (0.071, 0.175), 16: (0.049, 0.128), 17: (0.036, 0.107)}
