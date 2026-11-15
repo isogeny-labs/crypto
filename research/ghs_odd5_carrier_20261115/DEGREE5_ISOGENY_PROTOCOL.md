@@ -9,9 +9,14 @@ coefficients of b in powers of a, least significant first. Every target has
 order 218 and one K-rational nonzero 2-torsion point.
 
 The source is `degree5_isogeny_screen.sage`. Invoke once per mask as
-`sage degree5_isogeny_screen.sage MASK`, capture stdout JSON and stderr without
-truncation, and require exit zero and a source SHA-256 bound to the committed
-`.sage` file. Reject masks outside the nine frozen values. Keep the exact
+`sage degree5_isogeny_screen.sage MASK`, or use the deterministic Sage-preparsed
+`degree5_isogeny_screen.sage.py` via `sage -python` to run independent masks
+concurrently. Record the generated Python SHA-256 and require that it is
+regenerated from the committed `.sage` file. The frozen generated Python
+SHA-256 is `d37fd0e29ba035edcef07a61aab07bc4aa86ba441715008a9544ba18ce2f36f6`.
+Capture stdout JSON and stderr
+without truncation, and require exit zero and a source SHA-256 bound to the
+committed `.sage` file. Reject masks outside the nine frozen values. Keep the exact
 denominator shapes and 14,446,377 logical assignments from `DEGREE5_PROTOCOL.md`.
 For each target recompute the finite 2-torsion roots, the CRT residue, and the
 identity `f*C^2=B*(A^3+2*A^2*B+b*B^3)` for every degree-five numerator survivor.
