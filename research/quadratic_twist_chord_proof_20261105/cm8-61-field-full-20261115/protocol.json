@@ -1038,11 +1038,12 @@
     "backend": "local",
     "queue": null,
     "measurement_class": "search",
-    "timeout_seconds": 600,
+    "timeout_seconds": 1800,
     "placement": {
       "outer_seconds": 3600,
       "max_local_workers": 2,
-      "paid_resources": false
+      "paid_resources": false,
+      "per_stage_seconds": 600
     },
     "checkpoint": {
       "policy": "none",
@@ -1154,11 +1155,11 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": false
+    "status": "frozen",
+    "protocol_sha256": "f7e2d1fa0faecd2c8437dbd2ba4d2953c2b28739ad3f0b47ab23d847d244a95a",
+    "commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
+    "frozen_at": "2026-11-15T23:46:13Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
     "source_commit": "cc763aa15ccf232d524c4aac4f995a14f81f8b64",
