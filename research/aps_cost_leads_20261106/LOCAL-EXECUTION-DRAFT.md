@@ -1,6 +1,7 @@
 # APS local measurement preparation
 
-Status: proposed execution design, not a frozen protocol or performance result.
+Status: bounded structural implementation and proposed performance design;
+not a frozen performance protocol or speed result.
 
 The requested execution backend is the current local machine. This changes
 the default EKS destination; the prospective checkpoint, accounting, replay,
@@ -95,11 +96,13 @@ later admitted cost comparison.
 
 ### Implementation and execution boundary
 
-The current Conductor exception covers this documentation-only PR. Native
-partition-lab edits and correctness tests need a task/scope or an explicit
-owner extension of that exception. No native implementation or experiment
-result is asserted here. Performance trials additionally need the frozen
-design, prospective checkpoint and accounting/replay/admission below.
+The owner extended the Conductor exception to native partition-lab edits and
+bounded local correctness experiments. The standalone
+[partition lab](../../tools/aps-partition-lab/README.md) now supplies coloring
+coverage and specialization-feature experiments. Its scope stops before real
+labeled-pool integration and certified F4 trace reuse. Those obligations are
+not replaced with synthetic trace checks. Performance trials still need the
+frozen design, prospective checkpoint and accounting/replay/admission below.
 Register native claims before public citation of resulting observations;
 registration does not authorize publishing the withheld native ledger.
 
