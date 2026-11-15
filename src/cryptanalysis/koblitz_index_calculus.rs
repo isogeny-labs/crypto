@@ -15567,6 +15567,18 @@ struct LogSystem<'a> {
     /// In the word width `r` needs; empty (and over a placeholder
     /// width) on the dense path.
     sparse_rows: SparseRows,
+    /// `λ^k mod r` for `k` in `0..=n`: the Frobenius column
+    /// coefficients, so a row needs no `modpow` per summand.
+    lambda_powers: Vec<BigUint>,
+}
+
+/// Whether the sparse relation system builds each row straight from
+/// its summands (`KIC_DIRECT_ROWS`, default on) instead of through a
+/// dense big-integer row.  Both give the same row; `0` restores the
+/// dense route for A/B timing.
+fn direct_rows_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_DIRECT_ROWS").map_or(true, |v| v != "0"))
 }
 
 impl<'a> LogSystem<'a> {
@@ -15600,6 +15612,13 @@ impl<'a> LogSystem<'a> {
                 SparseRows::for_modulus(&BigUint::from(2u32)).expect("2 is supported"),
             ),
         };
+        let mut lambda_powers = Vec::with_capacity(kc.n as usize + 1);
+        let mut power = BigUint::one() % r;
+        for _ in 0..=kc.n {
+            let next = (&power * &kc.lambda) % r;
+            lambda_powers.push(power);
+            power = next;
+        }
         Some(Self {
             kc,
             fb,
@@ -15611,6 +15630,7 @@ impl<'a> LogSystem<'a> {
             dense_matrix: Vec::new(),
             dense_rhs: Vec::new(),
             sparse_rows,
+            lambda_powers,
         })
     }
 
@@ -15669,6 +15689,29 @@ impl<'a> LogSystem<'a> {
         let _matrix = measurement::scope(Phase::MatrixBuild);
         let r = &self.kc.subgroup_order;
         let a = BigUint::from(rel.a);
+        if self.sparse_opts.is_some() && direct_rows_enabled() {
+            let entries = self.direct_entries(&rel.points);
+            let rhs = (&self.h * &a) % r;
+            self.sparse_rows.push_entries(&entries, &rhs);
+            #[cfg(debug_assertions)]
+            {
+                let dense = relation_from_decomposition_with_mode(
+                    self.kc,
+                    self.fb,
+                    &rel.points,
+                    &a,
+                    &BigUint::zero(),
+                    self.opts.collapse_negation,
+                    Some(self.projected.as_ref()),
+                );
+                debug_assert_eq!(
+                    self.sparse_rows.last_dense(self.n_cols),
+                    Some(dense.row),
+                    "direct row differs from the dense route"
+                );
+            }
+            return;
+        }
         let relation = relation_from_decomposition_with_mode(
             self.kc,
             self.fb,
@@ -15680,6 +15723,30 @@ impl<'a> LogSystem<'a> {
         );
         let rhs = (&self.h * &a) % r;
         self.push_row(relation.row, rhs);
+    }
+
+    /// A relation's `(column, ±λ^k mod r)` pairs, one a summand, unsorted
+    /// and unmerged.  Through `SparseRows::push_entries` (which sorts,
+    /// adds per column mod `r` and drops zeros) they give the row of the
+    /// dense route, `relation_from_decomposition_with_mode`.
+    fn direct_entries(&self, points: &[usize]) -> Vec<(u32, BigUint)> {
+        let r = &self.kc.subgroup_order;
+        let mut entries = Vec::with_capacity(points.len());
+        for &i in points {
+            // `None`: [h]P = O, no column (as in the dense route).
+            let Some((o, k, negated)) = self.projected.orbit_of[i] else {
+                continue;
+            };
+            let mut coeff = match self.lambda_powers.get(k as usize) {
+                Some(c) => c.clone(),
+                None => self.kc.lambda.modpow(&BigUint::from(k), r),
+            };
+            if negated && !coeff.is_zero() {
+                coeff = r - coeff;
+            }
+            entries.push((o as u32, coeff));
+        }
+        entries
     }
 
     /// Store a row `Σ c_o x_o ≡ rhs` in the configured form (sparse in
@@ -20324,6 +20391,66 @@ mod tests {
         let system = LogSystem::new(&kc, &fb, &dense).unwrap();
         assert!(system.sparse_opts.is_none());
         assert_eq!(system.attempt_interval(), 1);
+    }
+
+    #[test]
+    fn direct_sparse_rows_equal_the_dense_route() {
+        // Rows pushed straight from their summands must equal the rows
+        // the dense route builds, for repeated summands, a point with
+        // its negation, and on the 82-bit N83 order as well.
+        let n83 = KoblitzCurve::known_n83_k0().expect("public N83 curve fixture");
+        let BinaryPoint::Affine { x, .. } = n83.generator() else {
+            panic!("N83 generator must be affine");
+        };
+        let n83_fb = build_explicit_frobenius_orbit_factor_base(&n83, std::slice::from_ref(x))
+            .expect("complete signed orbit");
+        let small = KoblitzCurve::new(0, 13).unwrap();
+        let small_fb = build_frobenius_factor_base(&small, 0).unwrap();
+        for (kc, fb) in [(&small, &small_fb), (&n83, &n83_fb)] {
+            for collapse_negation in [true, false] {
+                let opts = KoblitzIcOptions {
+                    linear_algebra: LinearAlgebra::Sparse(SparseSolveOptions::default()),
+                    collapse_negation,
+                    ..KoblitzIcOptions::default()
+                };
+                let system = LogSystem::new(kc, fb, &opts).unwrap();
+                let r = &kc.subgroup_order;
+                let n = fb.points.len();
+                let mut state = 0x9e37_79b9_7f4a_7c15u64;
+                let mut rows = SparseRows::for_modulus(r).unwrap();
+                let mut cases: Vec<Vec<usize>> = vec![vec![0, 0], vec![0, n - 1], vec![]];
+                for _ in 0..200 {
+                    let len = 1 + (state % 6) as usize;
+                    let mut points = Vec::with_capacity(len);
+                    for _ in 0..len {
+                        state = state
+                            .wrapping_mul(6_364_136_223_846_793_005)
+                            .wrapping_add(1_442_695_040_888_963_407);
+                        points.push((state >> 33) as usize % n);
+                    }
+                    cases.push(points);
+                }
+                for (i, points) in cases.iter().enumerate() {
+                    let rhs = BigUint::from(i as u32);
+                    let dense = relation_from_decomposition_with_mode(
+                        kc,
+                        fb,
+                        points,
+                        &BigUint::zero(),
+                        &BigUint::zero(),
+                        collapse_negation,
+                        Some(system.projected.as_ref()),
+                    );
+                    rows.push_dense(&dense.row, &rhs);
+                    rows.push_entries(&system.direct_entries(points), &rhs);
+                    assert_eq!(
+                        rows.row_biguint(2 * i),
+                        rows.row_biguint(2 * i + 1),
+                        "summands {points:?}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]
