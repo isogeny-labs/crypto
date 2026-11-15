@@ -3,6 +3,10 @@
 //! y = y_v(u) v + y_0(u). Each certificate becomes a genus-2 or genus-3
 //! curve row (with its Jacobian) and a curve_morphism to E. Existence over the
 //! declared field only: no descent, subgroup-map or DLP-cost claim.
+//! The exact L-polynomial of each cover source's Jacobian is computed at the
+//! end of the import ([`super::cover_lpoly`]), the Prym complement E' of
+//! each genus-2 source after it ([`super::cover_prym`]), then the Richelot
+//! (2,2)-isogenous curves over small prime fields ([`super::richelot`]).
 
 use super::{bulk, bulk1, Ctx, Report};
 use crate::field::Fq;
@@ -55,6 +59,29 @@ FROM jsonb_to_recordset($1::jsonb) AS r(target text, irreducible boolean, probab
 JOIN ec.curve e ON e.icv1_slug = r.target
 WHERE f.id = e.field_id";
 
+/// The field arithmetic of a stored field row (`kind`, characteristic text,
+/// defining polynomial, binary modulus); `None` for kinds without finite-field
+/// arithmetic here.
+pub fn fq_from_parts(kind: &str, p: &str, poly: Option<Vec<String>>, modulus: Option<String>) -> Result<Option<Fq>> {
+    let pb: BigInt = p.parse()?;
+    Ok(Some(match kind {
+        "prime" => Fq::prime(pb),
+        "binary" => {
+            let m = modulus.ok_or_else(|| anyhow!("binary field without modulus"))?;
+            Fq::binary(
+                &BigUint::parse_bytes(m.trim_start_matches("0x").as_bytes(), 16)
+                    .ok_or_else(|| anyhow!("bad modulus"))?,
+            )
+        }
+        "prime_power" => {
+            let poly = poly.ok_or_else(|| anyhow!("extension field without defining polynomial"))?;
+            let low: Vec<BigInt> = poly[..poly.len() - 1].iter().map(|c| c.parse()).collect::<Result<_, _>>()?;
+            Fq::extension(pb, &low)
+        }
+        _ => return Ok(None),
+    }))
+}
+
 /// Field arithmetic for every registered curve, keyed by slug.
 pub async fn fields_by_slug(ctx: &Ctx<'_>) -> Result<BTreeMap<String, Fq>> {
     let rows = ctx
@@ -78,23 +105,7 @@ pub async fn fields_by_slug(ctx: &Ctx<'_>) -> Result<BTreeMap<String, Fq>> {
             out.insert(slug, k.clone());
             continue;
         }
-        let pb: BigInt = p.parse()?;
-        let k = match kind.as_str() {
-            "prime" => Fq::prime(pb),
-            "binary" => {
-                let m = modulus.ok_or_else(|| anyhow!("binary field without modulus"))?;
-                Fq::binary(
-                    &BigUint::parse_bytes(m.trim_start_matches("0x").as_bytes(), 16)
-                        .ok_or_else(|| anyhow!("bad modulus"))?,
-                )
-            }
-            "prime_power" => {
-                let poly = poly.ok_or_else(|| anyhow!("extension field without defining polynomial"))?;
-                let low: Vec<BigInt> = poly[..poly.len() - 1].iter().map(|c| c.parse()).collect::<Result<_, _>>()?;
-                Fq::extension(pb, &low)
-            }
-            _ => continue,
-        };
+        let Some(k) = fq_from_parts(&kind, &p, poly, modulus)? else { continue };
         cache.insert(key, k.clone());
         out.insert(slug, k);
     }
@@ -131,7 +142,7 @@ fn cover_map(k: &Fq, cert: &Value) -> Result<Value> {
     Ok(map)
 }
 
-fn poly_text(c: &[String], var: &str) -> String {
+pub fn poly_text(c: &[String], var: &str) -> String {
     let terms: Vec<String> = c
         .iter()
         .enumerate()
@@ -209,5 +220,11 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     report.count("hyperelliptic_models", bulk(client, H_MODEL_SQL, &rows, prov).await?);
     report.count("morphisms", bulk(client, MORPHISM_SQL, &rows, prov).await?);
     report.count("field_status_updates", bulk1(client, FIELD_STATUS_SQL, &rows).await?);
+    // The Frobenius data of every cover source, new or imported earlier.
+    super::cover_lpoly::import(ctx, &mut report).await?;
+    // Then the Prym complement E' of every genus-2 source with an L-polynomial.
+    super::cover_prym::import(ctx, &mut report).await?;
+    // Richelot (2,2)-isogenous curves of the small-p sources, checked against those counts.
+    super::richelot::import(ctx, &mut report).await?;
     Ok(report)
 }

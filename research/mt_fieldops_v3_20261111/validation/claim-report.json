@@ -1,0 +1,131 @@
+{
+ "schema": "validator.report/v1",
+ "independent": true,
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-11; scripts/claim_check.py",
+ "validated_commit": "a094afb97435c0e62bb4ffd055556752297581bf",
+ "scope": "this one statement exactly as worded; nothing else in the study",
+ "raw_data": [
+  {
+   "path": "../results/holdout/runs.json",
+   "sha256": "77deaeb7512ec48f4539aecba9fe6f1b2b2ea29f7f371665564e9e4e2ed5611a"
+  },
+  {
+   "path": "ks_runs.json",
+   "sha256": "6f53239fbf65e488ad1266473c504bd932290a287f23fc08d016c2025608e18f",
+   "note": "validator retention arm rho2xks (sensitivity runs, every target verified by the counted check)"
+  }
+ ],
+ "clause_checks": [
+  {
+   "clause": "44 fresh prime-order Weierstrass curves",
+   "ok": true,
+   "recomputed": "44 curves (idx 1..11 x 4 sizes); validity and freshness: validator-report.json A-F checks"
+  },
+  {
+   "clause": "(group orders about 2^22 to 2^32)",
+   "ok": true,
+   "recomputed": "group orders n from 4193971 (2^21.99989) to 4295088293 (2^32.00004)"
+  },
+  {
+   "clause": "T = 1024/4096/16384, 22 paired configurations per cell",
+   "ok": true,
+   "recomputed": "yes"
+  },
+  {
+   "clause": "counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE",
+   "ok": true,
+   "recomputed": "yes; ic5's mod-n elimination is counted in the same I/M units (0.08%-2.5% of its cost); 'F_p and mod-n operations' would be more exact (optional)"
+  },
+  {
+   "clause": "ic5 0.47-0.99x of ic4, cheaper in all 36",
+   "ok": true,
+   "recomputed": "0.4727-0.9919; {'cheaper': 36}"
+  },
+  {
+   "clause": "1.11-1.49x a paired BSGS, dearer in all 36",
+   "ok": true,
+   "recomputed": "1.1120-1.4908; {'dearer': 36}"
+  },
+  {
+   "clause": "0.85-0.98x the cheapest of 12 harness rho runs",
+   "ok": true,
+   "recomputed": "0.8480-0.9824; decisions {'cheaper': 36}"
+  },
+  {
+   "clause": "with Kuhn-Struik retention (rho2xks): 1.07-1.34x at h = 0, 1.05-1.18x at h = 0.1",
+   "ok": true,
+   "recomputed": "h = 0: 1.0688-1.3370; h = 0.1: 1.0464-1.1806; (h = 1: 0.9076-0.9754)"
+  },
+  {
+   "clause": "so no ranking against rho is established",
+   "ok": true,
+   "recomputed": "section-5a decisions against rhobest + rho2xks: {'unranked': 36}"
+  }
+ ],
+ "headline": [
+  {
+   "name": "ic5/ic4 min",
+   "claimed": 0.47,
+   "recomputed": 0.47274177584874,
+   "rel_tol": 0.010576598591262556
+  },
+  {
+   "name": "ic5/ic4 max",
+   "claimed": 0.99,
+   "recomputed": 0.9918944544093207,
+   "rel_tol": 0.005040858912725171
+  },
+  {
+   "name": "ic5/bsgs2 min",
+   "claimed": 1.11,
+   "recomputed": 1.1119528464883262,
+   "rel_tol": 0.004496593553317052
+  },
+  {
+   "name": "ic5/bsgs2 max",
+   "claimed": 1.49,
+   "recomputed": 1.4907628317019208,
+   "rel_tol": 0.0033539875660721576
+  },
+  {
+   "name": "ic5/rhobest min",
+   "claimed": 0.85,
+   "recomputed": 0.8480231042213189,
+   "rel_tol": 0.005896065774574831
+  },
+  {
+   "name": "ic5/rhobest max",
+   "claimed": 0.98,
+   "recomputed": 0.9823656912775366,
+   "rel_tol": 0.005089754299623411
+  },
+  {
+   "name": "ic5/rhoKS h0 min",
+   "claimed": 1.07,
+   "recomputed": 1.068795998199908,
+   "rel_tol": 0.004678161229542324
+  },
+  {
+   "name": "ic5/rhoKS h0 max",
+   "claimed": 1.34,
+   "recomputed": 1.3369868692534208,
+   "rel_tol": 0.0037397525109046197
+  },
+  {
+   "name": "ic5/rhoKS h0.1 min",
+   "claimed": 1.05,
+   "recomputed": 1.0463724988397158,
+   "rel_tol": 0.00477841304754348
+  },
+  {
+   "name": "ic5/rhoKS h0.1 max",
+   "claimed": 1.18,
+   "recomputed": 1.1805813070539193,
+   "rel_tol": 0.004235201736048005
+  }
+ ],
+ "statement_judged": "On 44 fresh prime-order Weierstrass curves (group orders about 2^22 to 2^32), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established.",
+ "statement_previous_submission": "On 44 fresh prime-order Weierstrass curves (2^22-2^33), T = 1024/4096/16384, 22 paired configurations per cell, counted F_p operations (I = 3/10/30 M, S = M) with hash/solver ops at 0/0.1/1 GAE: the k = 4 term multi-target index calculus ic5 costs 0.47-0.99x per target of ic4 (cheaper in all 36 cell x I/M section-5a decisions) and 1.11-1.49x a paired BSGS (dearer in all 36); against the cheapest of 12 runs of this harness's anchored fixed-database rho family it is 0.85-0.98x, but against the same family with Kuhn-Struik retention (validator arm rho2xks) it is 1.07-1.34x at h = 0 and 1.05-1.18x at h = 0.1, so no ranking against rho is established.",
+ "status": "pass",
+ "verdict": "endorsed exactly as worded (statement_judged)"
+}

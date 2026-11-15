@@ -1,0 +1,303 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hd9711b7c88619f6b",
+  "statement": {
+    "name": "Sparse differential norm residual expansion",
+    "source": "NormWronskian.normDerivative and definition of filter; expression expansion only, not a solver or characteristic-17 certificate",
+    "variables": [
+      "A",
+      "Ap",
+      "B",
+      "Bp",
+      "f",
+      "fp",
+      "G",
+      "Gp"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "G"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 2
+                    },
+                    {
+                      "op": "var",
+                      "args": "A"
+                    },
+                    {
+                      "op": "var",
+                      "args": "Ap"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "fp"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "B"
+                          },
+                          {
+                            "op": "var",
+                            "args": "B"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "const",
+                        "args": 2
+                      },
+                      {
+                        "op": "var",
+                        "args": "f"
+                      },
+                      {
+                        "op": "var",
+                        "args": "B"
+                      },
+                      {
+                        "op": "var",
+                        "args": "Bp"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "Gp"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "A"
+                      },
+                      {
+                        "op": "var",
+                        "args": "A"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "f"
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "B"
+                            },
+                            {
+                              "op": "var",
+                              "args": "B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 2
+            },
+            {
+              "op": "var",
+              "args": "G"
+            },
+            {
+              "op": "var",
+              "args": "A"
+            },
+            {
+              "op": "var",
+              "args": "Ap"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "G"
+              },
+              {
+                "op": "var",
+                "args": "fp"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "B"
+                  },
+                  {
+                    "op": "var",
+                    "args": "B"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "var",
+                "args": "G"
+              },
+              {
+                "op": "var",
+                "args": "f"
+              },
+              {
+                "op": "var",
+                "args": "B"
+              },
+              {
+                "op": "var",
+                "args": "Bp"
+              }
+            ]
+          }
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "Gp"
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "A"
+                  },
+                  {
+                    "op": "var",
+                    "args": "A"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "Gp"
+            },
+            {
+              "op": "var",
+              "args": "f"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "B"
+                },
+                {
+                  "op": "var",
+                  "args": "B"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261113,
+  "value_digest": "ade6cf89b52eb567e2de4203dd559219513bdb33bec8677fc2770c5838dc7eec",
+  "independence": "Unsigned producer certificate; derivatives and kernel implications checked separately in Lean",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/NormWronskian.lean",
+    "sha256": "27e6523f63657bfe248a605749825019390372846f0f9ed1b727996230fdef85"
+  }
+}
