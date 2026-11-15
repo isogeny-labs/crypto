@@ -1076,11 +1076,11 @@ pub(super) fn k600_m6_replay_cli(
     {
         return Err("K600 XCNF search policy differs".into());
     }
-    let variables = shape["variables"].as_u64().ok_or("variable count")? as usize;
-    let clauses = shape["clauses"].as_u64().ok_or("clause count")? as usize;
-    let xors = shape["xor_rows"].as_u64().ok_or("XOR count")? as usize;
-    if variables < 913 || variables > 125_000 || clauses > 2_000_000 || xors > 2_000_000 {
-        return Err("K600 XCNF shape exceeds frozen bounds".into());
+    let variables = usize::try_from(shape["variables"].as_u64().ok_or("variable count")?)?;
+    let clauses = usize::try_from(shape["clauses"].as_u64().ok_or("clause count")?)?;
+    let xors = usize::try_from(shape["xor_rows"].as_u64().ok_or("XOR count")?)?;
+    if variables < 913 || variables > 125_000 {
+        return Err("K600 XCNF variable count exceeds frozen bound".into());
     }
     let xcnf = fs::read(xcnf_path)?;
     if xcnf.len() > 200_000_000
