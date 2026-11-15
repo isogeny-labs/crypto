@@ -272,8 +272,9 @@ fn main()->Result<(),String>{
         let aux_w=summands(&mut ar,&ps,6,8).ok_or("known pair sum is identity")?;
         let aux_u=summands(&mut ar,&ps,0,3).ok_or("known left sum is identity")?;
         let aux_v=summands(&mut ar,&ps,3,6).ok_or("known right sum is identity")?;
-        let r=ar.add(e,ar.scalar(e,first[0],Some(e.g)),
-            ar.scalar(e,first[1],Q)).ok_or("known R is identity")?;
+        let first_ag=ar.scalar(e,first[0],Some(e.g));
+        let first_bq=ar.scalar(e,first[1],Q);
+        let r=ar.add(e,first_ag,first_bq).ok_or("known R is identity")?;
         if (aux_u.0,aux_v.0,aux_w.0,r.0)
             != (803_189_040,898_740_481,729_813_404,903_384_438) {
             return Err("known positive auxiliary witness changed".into());
