@@ -1,3 +1,35 @@
+# Preserve version02 false rejection; original complete rank file has62records
+
+## What was done
+pcc/claims/PCC-20261115-f19383.json / pcc/claims/PCC-20261115-814040.json: exact38d/a6e5ea/checkpoint26, allsource/runtime/materialization0, positive comparison1 at wrongrank-count61guard; driver1/noacceptedoutput/no negatives. Originalproducer239/replay314-316 and completefile show header+60calls+mandatorycompletefooter=62records, character65. Fullsecondpositivearchive/CRC/everyoriginalbytecompare0 and postfailure source/runtime0 preserved under scratch/ct114-comparator-schema-failure-custody-02. [pcc:unverified]
+
+## Decisions made
+Correct the implementation and receipt count in NEWaudit-03/driver03/guard03, preserving old174696/a6e5ea sources and bothactualfailures. The originalprospective9aad0c entirefixture criterion alreadyrequires the completion record; no new equivalence, field omission or cap change. Explicitly correct previous61assertions rather than treating native02 as accepted. [pcc:unverified]
+
+## Open threads
+Build/sourcepublish03/exactoriginalcheckpoint27, then wholepositive/eightnegative/elapsed-only controls, full diagnosticCI, futureNEW28 and reviewed unassisted successor. All original mathematical/calibrated/reference/admission/merge obligations remain. PR1564open; previous1523merged5f23. [pcc:unverified]
+
+## Errors
+The verifier's count omitted the original mandatory completion record. Sourceproof/rank/character data were intact; this was a false rejection by newcode. No positive result or memory-envelope closure is claimed from the second failed comparison. [pcc:unverified]
+
+---
+
+# Exact checkpoint26 imported; version02 controls ready and follow-up PR open
+
+## What was done
+pcc/claims/PCC-20261115-46f5c5.json: original43755426948/job132938372722/artifact14178181542/full447020BZIP/SHAd6597c953aef67d7bdb292af39d12a2c455577b8ba1b7c11287b15b0fd8424e9/all28members, remote/readback/localstatus-gate0 and exactcleanconsumer38d8971e. Compiledversion02a6e5ea/governance2f84e3; firstmemoryfailure769560/2b4297 retained. PR1523merged5f23 at19:06:52; newreadyPR1564 correctlyreviews later source, formerclosedbody/Root3877/queue3904 corrected. [pcc:unverified]
+
+## Decisions made
+Run pinned run-comparator-controls-02.sh with exact38d8971e/build scratch/ct112-whole-relation-comparator-build-01/new scratch/ct112-whole-relation-comparator-native-02 and RAM/dev-shm/ct112-whole-relation-comparator-controls-02. Keep same2GiBVM120s/fullcriteria. Consumer remains unchanged through receipt and run; fullnew raw/source/runtime/control/failedroots go in futureNEW28. [pcc:unverified]
+
+## Open threads
+Version02 wholecontrols, then finish/validate/project fullCI draft ct111 with completephaseplan/workflow and exactoriginalcheckpoint before math. Original global/model/numericLean/calibration/reference/admission/ledger/review/merge requirements persist. PR1564stackedfeaturebase cannotauto-merge yet. [pcc:unverified]
+
+## Errors
+FormerPR1523 merged while workcontinued; earlierbodyupdates werepostmerge scope and are nowexplicitly corrected andlinkedto1564. No frozen source, ledger history, failedrun or protocol criterion changed. [pcc:unverified]
+
+---
+
 # Whole comparator01 allocation failure retained; versioned streaming repair next
 
 ## What was done
