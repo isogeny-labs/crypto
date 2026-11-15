@@ -669,3 +669,15 @@ Route only, plus a study-level spend guard. Every number is `[pcc:unverified]`.
 - **Unchanged.** No hypothesis, §6 rule, reading, cell, seed, cap, budget, `max_entries` or `max_cols` changes. Amendment
   8's readings and Amendment 13's H-null rule apply as registered. The `t = 5, c = 7` and `t = 6` cells stay out (a limit
   change, R3 §3).
+
+## Amendment 20 (2026-11-15; resources only; the study's dollar ceiling)
+
+- **Owner instruction (2026-11-15, ~04:23Z, session 01TCbLH6osebpnEbutNogBzD):** "raise the ceiling to $500".
+- **Change.**
+  - The study ceiling of owner decision 4 rises from US$400 to US$500. The per-job ceiling stays at US$40.
+  - Amendment 19's spend-guard threshold rises from US$370 to US$470, keeping the same US$30 reserve for the earlier
+    EKS jobs.
+- **Effect (derived).** Every job launched under Amendments 16, 18 and 19 together costs at most US$435 at its per-job
+  stop, plus less than US$30 already spent on EKS. That is below US$470, so the guard cannot stop a running job.
+- **Recorded.** No row of any of these jobs existed when this was written.
+- No hypothesis, rule, cell, limit or budget changes.
