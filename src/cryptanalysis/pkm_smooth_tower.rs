@@ -177,7 +177,7 @@ pub fn smooth_split(mut n: u64, bound: u64) -> (Vec<u64>, u64) {
 #[derive(Clone, Debug)]
 pub struct Rng(pub u64);
 impl Rng {
-    pub fn next(&mut self) -> u64 {
+    pub fn next_u64(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
         let mut z = self.0;
         z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
@@ -185,7 +185,7 @@ impl Rng {
         z ^ (z >> 31)
     }
     pub fn below(&mut self, n: u64) -> u64 {
-        self.next() % n
+        self.next_u64() % n
     }
 }
 
@@ -267,7 +267,7 @@ impl Curve {
         loop {
             let x = rng.below(self.p);
             if let Some(y) = sqrtm(self.rhs(x), self.p) {
-                let y = if rng.next() & 1 == 1 {
+                let y = if rng.next_u64() & 1 == 1 {
                     subm(0, y, self.p)
                 } else {
                     y
@@ -488,12 +488,12 @@ pub fn kummer_tower(
 ) -> Result<SmoothTower, String> {
     check_degrees(p, degrees)?;
     let s: u64 = degrees.iter().product();
-    if (p - 1) % s != 0 {
+    if !(p - 1).is_multiple_of(s) {
         return Err(format!("S = {s} does not divide p − 1"));
     }
     let mut rng = Rng(seed);
     let g = g.unwrap_or_else(|| 1 + rng.below(p - 1));
-    if g % p == 0 {
+    if g.is_multiple_of(p) {
         return Err("g = 0".into());
     }
     // primitive S-th root of unity
@@ -536,7 +536,7 @@ pub fn kummer_tower(
 }
 
 fn check_degrees(p: u64, degrees: &[u64]) -> Result<(), String> {
-    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+    if !is_prime(p) || !(5..1 << 62).contains(&p) {
         return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
     }
     if degrees.is_empty() {
@@ -735,7 +735,7 @@ pub fn search_aux(
     seed: u64,
     max_curves: u64,
 ) -> Result<AuxFound, String> {
-    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+    if !is_prime(p) || !(5..1 << 62).contains(&p) {
         return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
     }
     let mut rng = Rng(seed);
@@ -797,7 +797,7 @@ pub fn search_aux(
 /// returned empty; the caller orders the chain. Curves whose order is not
 /// divisible by `S` are rejected after the order computation.
 pub fn search_aux_exact(p: u64, s: u64, seed: u64, max_curves: u64) -> Result<AuxFound, String> {
-    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+    if !is_prime(p) || !(5..1 << 62).contains(&p) {
         return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
     }
     let (mut primes, _) = smooth_split(s, s);
@@ -1052,7 +1052,7 @@ pub fn cornacchia_4p(p: u64, d: i64) -> Option<(u64, u64)> {
         b = r;
     }
     let rem = 4 * p as u128 - b * b;
-    if rem % ad as u128 != 0 {
+    if !rem.is_multiple_of(ad as u128) {
         return None;
     }
     let c = rem / ad as u128;
@@ -1187,13 +1187,13 @@ fn curves_with_j(
 /// trace), its order (checked on random points), and the `bound`-smooth
 /// part of that order. Nothing here chooses or changes `p`.
 pub fn cm_curves(p: u64, bound: u64, seed: u64) -> Result<Vec<CmCurve>, String> {
-    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+    if !is_prime(p) || !(5..1 << 62).contains(&p) {
         return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
     }
     let mut rng = Rng(seed);
     let mut out = vec![];
     for &(d, j) in CLASS_NUMBER_ONE.iter() {
-        if (d.unsigned_abs() as u64) % p == 0 {
+        if d.unsigned_abs().is_multiple_of(p) {
             continue;
         }
         let Some((t, v)) = cornacchia_4p(p, d) else {
@@ -1356,7 +1356,7 @@ pub fn cm_curves_hilbert(
     seed: u64,
 ) -> Result<(Vec<CmCurve>, CmScanStats), String> {
     use isogeny_algos::cm::{hilbert_class_poly, reduced_forms};
-    if !is_prime(p) || p < 5 || p >= 1 << 62 {
+    if !is_prime(p) || !(5..1 << 62).contains(&p) {
         return Err(format!("p = {p}: need a prime 5 ≤ p < 2^62"));
     }
     let mut rng = Rng(seed);
@@ -2077,7 +2077,7 @@ mod tests {
             }
             let n = e.order(&mut rng).unwrap();
             for l in [2u64, 3, 5, 7] {
-                if n % l != 0 {
+                if !n.is_multiple_of(l) {
                     continue;
                 }
                 let gen = (0..20)
@@ -2157,7 +2157,7 @@ mod tests {
         for rel in &rels {
             assert_eq!(e.add(Some(rel.p1), Some(rel.p2)), Some(r));
         }
-        let _ = rng.next();
+        let _ = rng.next_u64();
         let sys = relation_system_msolve(&e, &t, 3, r.0);
         assert!(sys.lines().next().unwrap().contains("u1"));
     }
