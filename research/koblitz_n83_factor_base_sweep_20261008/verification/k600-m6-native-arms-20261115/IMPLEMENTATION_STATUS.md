@@ -10,6 +10,12 @@ records a source-identity admission conflict found in the unexecuted native
 path. A versioned two-revision or detached-ref lock contract and negative
 controls are required before the Linux zero-trial and arm gates can run.
 
+The [two-revision source amendment](TWO_REVISION_SOURCE_AMENDMENT.md) now
+implements the strict `C -> H` one-lock tree-diff contract with native
+negative controls. This resolves the static commit cycle in the unit-tested
+admission predicate; a qualified Linux preflight and arm freeze have not
+yet tested the complete execution path.
+
 **Status: implemented and locally tested, not run against S3 for this arm pair.**
 The Rust `examples/n83_k600_m6_native_arms.rs` `stage` command bridges the
 already verified read-only astronomy-store K600 object to the original
@@ -24,8 +30,10 @@ source commit are rechecked after staging. The output is write-once and sits
 outside the source checkout. An error after output creation writes a terminal
 `failure.json`. The command makes no S3 PUT and does not execute a solver.
 
-The same example now also exposes `freeze STAGED_DIR EXPORTER_REPLAYER_BINARY
-SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON`. It writes a new external lock only
+The initial example exposed `freeze STAGED_DIR EXPORTER_REPLAYER_BINARY
+SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON`; the current command adds
+`COMMITTED_PREFLIGHT_LOCK` before `NEW_LOCK_JSON` as specified in the
+[two-revision amendment](TWO_REVISION_SOURCE_AMENDMENT.md). It writes a new external lock only
 after binding a successful staging receipt to the current clean commit,
 the exact committed `pilot-01` metadata root, the unchanged astronomy-store
 index, all five panel metadata hashes, and the full 3,025,798-byte object
@@ -36,7 +44,9 @@ clause, conflict, model, CPU, memory, swap, PID and network caps; it explicitly
 marks solver launch and both arms unexecuted. The executable has not yet run
 `freeze` on a real staged panel. The current `freeze` source requires Linux
 arm64 ELF exporter and solver bytes plus an image ID whose inspected OS,
-architecture, and source-revision label match the clean commit. A build
+architecture, and source-revision label match the clean commit in that
+initial version; the amendment binds the label to its direct-parent build
+commit. A build
 receipt that ties those bytes to that source, actual cgroup isolation, solver
 behavior, output receipt, and model replay remain to be checked. A lock alone
 does not admit the positive or natural arm.

@@ -86,3 +86,10 @@ rank, target descent or a minimum cold IC runtime.
 
 2026-11-15: Static source audit identified the commit-identity cycle. No
 execution attempted under this record. Unresolved.
+
+2026-11-15: The [two-revision source amendment](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-m6-native-arms-20261115/TWO_REVISION_SOURCE_AMENDMENT.md)
+adds a strict one-lock `C..H` tree-diff and direct-parent predicate, binds the image to `C`
+and arm execution to `H`, and passes a temporary-repository acceptance and
+tamper test. The dependent preflight gate test also passes. The complete
+Linux image/preflight/freeze chain remains unexecuted, so the problem stays
+open for host verification and full budget custody.

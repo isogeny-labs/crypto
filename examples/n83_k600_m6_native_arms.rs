@@ -141,6 +141,78 @@ fn git_common_dir(repo: &Path) -> Result<PathBuf> {
     Ok(fs::canonicalize(String::from_utf8(output.stdout)?.trim())?)
 }
 
+fn committed_preflight_revision(
+    repo: &Path,
+    lock_path: &Path,
+    head: &str,
+    image: &str,
+) -> Result<(String, String)> {
+    let lock_path = fs::canonicalize(lock_path)?;
+    let relative = lock_path
+        .strip_prefix(repo)?
+        .to_str()
+        .ok_or("preflight lock path encoding invalid")?;
+    let bytes = fs::read(&lock_path)?;
+    let lock: Value = serde_json::from_slice(&bytes)?;
+    let source = lock["source_commit"]
+        .as_str()
+        .ok_or("preflight source commit missing")?;
+    if lock["schema"] != "n83.k600-m6-native-preflight-lock/v1"
+        || lock["status"] != "PREPARED_ONLY"
+        || lock["source_root"] != repo.to_string_lossy().as_ref()
+        || lock["image_id"] != image
+        || source.len() != 40
+        || !source.bytes().all(|b| b.is_ascii_hexdigit())
+        || source == head
+    {
+        return Err("preflight lock identity differs from two-revision contract".into());
+    }
+    let tracked = Command::new("git")
+        .args(["show", &format!("HEAD:{relative}")])
+        .current_dir(repo)
+        .output()?;
+    let ancestor = Command::new("git")
+        .args(["merge-base", "--is-ancestor", source, head])
+        .current_dir(repo)
+        .status()?;
+    let parents = Command::new("git")
+        .args(["rev-list", "--parents", "-n", "1", head])
+        .current_dir(repo)
+        .output()?;
+    let changed = Command::new("git")
+        .args(["diff", "--name-status", "--no-renames", source, head])
+        .current_dir(repo)
+        .output()?;
+    if !tracked.status.success()
+        || tracked.stdout != bytes
+        || !ancestor.success()
+        || !parents.status.success()
+        || parents.stdout != format!("{head} {source}\n").as_bytes()
+        || !changed.status.success()
+        || changed.stdout != format!("A\t{relative}\n").as_bytes()
+    {
+        return Err("preflight lock must be the only tree change after build source".into());
+    }
+    let hashes = lock["source_sha256"]
+        .as_object()
+        .ok_or("preflight source hashes missing")?;
+    if hashes.is_empty() {
+        return Err("preflight source hashes empty".into());
+    }
+    for (name, expected) in hashes {
+        let path = Path::new(name);
+        if path.is_absolute()
+            || path
+                .components()
+                .any(|c| !matches!(c, std::path::Component::Normal(_)))
+            || expected.as_str() != Some(sha256_file(&repo.join(path))?.as_str())
+        {
+            return Err("preflight source hash differs at execution revision".into());
+        }
+    }
+    Ok((source.to_owned(), sha256_file(&lock_path)?))
+}
+
 fn write_new_json(path: &Path, value: &Value) -> Result<()> {
     let mut file = File::options().write(true).create_new(true).open(path)?;
     serde_json::to_writer_pretty(&mut file, value)?;
@@ -262,6 +334,7 @@ fn freeze(
     exporter: &Path,
     solver: &Path,
     image: &str,
+    preflight_lock: &Path,
     output: &Path,
 ) -> Result<Value> {
     if !output.is_absolute() || output.exists() {
@@ -273,6 +346,8 @@ fn freeze(
         return Err("lock must be outside source checkout".into());
     }
     let commit = clean_source_commit(&repo)?;
+    let (build_source, preflight_lock_sha) =
+        committed_preflight_revision(&repo, preflight_lock, &commit, image)?;
     let (panel, receipt) = staged_panel(stage_root, &commit)?;
     if parent.starts_with(fs::canonicalize(stage_root)?) {
         return Err("lock must be outside staged input".into());
@@ -290,7 +365,7 @@ fn freeze(
     {
         return Err("full Docker image ID required".into());
     }
-    let expected = format!("{image} linux/arm64 {commit}");
+    let expected = format!("{image} linux/arm64 {build_source}");
     let inspected = docker_short(&["image", "inspect", "--format", "{{.Id}} {{.Os}}/{{.Architecture}} {{index .Config.Labels \"org.opencontainers.image.revision\"}}", image])?;
     if inspected != expected {
         return Err("Docker image ID, Linux arm64 architecture, or source revision differs".into());
@@ -315,6 +390,7 @@ fn freeze(
     let lock = json!({
         "schema":"n83.k600-m6-native-arms-lock/v1", "status":"PREPARED_ONLY",
         "source_commit":commit, "source_root":repo, "staging_receipt_sha256":receipt_sha,
+        "build_source_commit":build_source,"preflight_lock_sha256":preflight_lock_sha,
         "panel_root":panel, "store_index_sha256":receipt["store_index_sha256"],
         "remote":REMOTE, "store_name":STORE_NAME, "object_sha256":OBJECT_SHA,
         "object_bytes":3_025_798, "point_set_blake3":POINT_SET,
@@ -529,7 +605,8 @@ fn preflight_gate(
     let limits = json!({"max_variables":125_000,"max_domain_clauses":350_000,
         "max_models":1,"conflict_budget":10_000});
     if preflight["schema"] != "n83.k600-m6-native-preflight-lock/v1"
-        || preflight["source_commit"] != arm_lock["source_commit"]
+        || preflight["source_commit"] != arm_lock["build_source_commit"]
+        || arm_lock["preflight_lock_sha256"] != hashes[0]
         || preflight["image_id"] != arm_lock["image_id"]
         || preflight["object_sha256"] != OBJECT_SHA
         || preflight["point_set_blake3"] != POINT_SET
@@ -555,7 +632,7 @@ fn preflight_gate(
         || outer["worker_config_sha256"] != hashes[2]
         || outer["worker_summary_sha256"] != hashes[3]
         || config["schema"] != "n83.primary-store-chain-config/v1"
-        || config["source_commit"] != arm_lock["source_commit"]
+        || config["source_commit"] != arm_lock["build_source_commit"]
         || config["study"] != "koblitz_n83_factor_base_sweep_20261008"
         || config["input_kind"] != "artifact_store_v3"
         || config["curve_a"] != 0
@@ -581,7 +658,7 @@ fn preflight_gate(
         || summary["summands"] != 6
         || summary["policy"] != "public_x_hash"
         || summary["seed"] != 2_026_100_801u64
-        || summary["source_commit"] != arm_lock["source_commit"]
+        || summary["source_commit"] != arm_lock["build_source_commit"]
         || summary["source_attestation_mode"] != "supervised_snapshot"
         || summary["store_name"] != STORE_NAME
         || summary["object"] != STORE_NAME
@@ -2026,11 +2103,11 @@ fn main() -> Result<()> {
             let result = stage(Path::new(&args[2]), &output);
             (output, result, stage_created_output)
         }
-        Some("freeze") if args.len() == 7 => {
-            let output = PathBuf::from(&args[6]);
+        Some("freeze") if args.len() == 8 => {
+            let output = PathBuf::from(&args[7]);
             let result = freeze(
                 Path::new(&args[2]), Path::new(&args[3]), Path::new(&args[4]),
-                &args[5], &output,
+                &args[5], Path::new(&args[6]), &output,
             );
             (output, result, false)
         }
@@ -2113,7 +2190,7 @@ fn main() -> Result<()> {
             })();
             (output,result,false)
         }
-        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID NEW_LOCK_JSON | export ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned|positive-unpinned NEW_OUTPUT OUTER_SECONDS | solve ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned EXPORT_DIR NEW_OUTPUT OUTER_SECONDS | replay-pinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN EXPORT_DIR SOLVER_DIR NEW_OUTPUT OUTER_SECONDS | solve-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT UNPINNED_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | export-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | solve-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN NATURAL_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN NATURAL_EXPORT NATURAL_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS".into()),
+        _ => return Err("usage: stage FROZEN_METADATA_DIR NEW_OUTPUT_DIR | freeze STAGED_DIR EXPORTER_REPLAYER_BINARY SOLVER_BINARY IMAGE_ID COMMITTED_PREFLIGHT_LOCK NEW_LOCK_JSON | export ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned|positive-unpinned NEW_OUTPUT OUTER_SECONDS | solve ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN positive-pinned EXPORT_DIR NEW_OUTPUT OUTER_SECONDS | replay-pinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN EXPORT_DIR SOLVER_DIR NEW_OUTPUT OUTER_SECONDS | solve-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-unpinned ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN UNPINNED_EXPORT UNPINNED_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | export-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | solve-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN NATURAL_EXPORT PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS | replay-natural ARM_LOCK PREFLIGHT_LOCK PREFLIGHT_RUN NATURAL_EXPORT NATURAL_SOLVER PINNED_EXPORT PINNED_SOLVER PINNED_REPLAY UNPINNED_EXPORT UNPINNED_SOLVER UNPINNED_REPLAY NEW_OUTPUT OUTER_SECONDS".into()),
     };
     if let Err(error) = &result {
         if stage_created_output && output.is_dir() && !output.join("staging.json").exists() {
@@ -2277,7 +2354,6 @@ mod tests {
         fs::create_dir_all(&worker).unwrap();
         let commit = "a".repeat(40);
         let image = format!("sha256:{}", "b".repeat(64));
-        let arm = json!({"source_commit":commit,"image_id":image});
         let limits = json!({"max_variables":125_000,"max_domain_clauses":350_000,
             "max_models":1,"conflict_budget":10_000});
         let preflight = json!({
@@ -2321,6 +2397,8 @@ mod tests {
         let config_path = worker.join("config.json");
         let summary_path = worker.join("summary.json");
         write_new_json(&lock_path, &preflight).unwrap();
+        let arm = json!({"source_commit":"c".repeat(40),"build_source_commit":commit,
+            "image_id":image,"preflight_lock_sha256":sha256_file(&lock_path).unwrap()});
         write_new_json(&config_path, &config).unwrap();
         write_new_json(&summary_path, &summary).unwrap();
         let outer = json!({
@@ -2690,5 +2768,75 @@ mod tests {
         )
         .is_err());
         fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn committed_preflight_lock_allows_only_one_evidence_commit() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let repo = std::env::temp_dir().join(format!(
+            "n83-k600-two-revision-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::create_dir(&repo).unwrap();
+        let git = |args: &[&str]| -> String {
+            let out = Command::new("git")
+                .args(args)
+                .current_dir(&repo)
+                .output()
+                .unwrap();
+            assert!(
+                out.status.success(),
+                "git {:?}: {}",
+                args,
+                String::from_utf8_lossy(&out.stderr)
+            );
+            String::from_utf8(out.stdout).unwrap().trim().to_owned()
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.name", "N83 Test"]);
+        git(&["config", "user.email", "n83@example.invalid"]);
+        fs::write(repo.join("source.txt"), b"frozen source").unwrap();
+        git(&["add", "source.txt"]);
+        git(&["commit", "-qm", "source"]);
+        let source = git(&["rev-parse", "HEAD"]);
+        let image = format!("sha256:{}", "b".repeat(64));
+        let lock_path = repo.join("preflight-lock.json");
+        write_new_json(
+            &lock_path,
+            &json!({
+                "schema":"n83.k600-m6-native-preflight-lock/v1","status":"PREPARED_ONLY",
+                "source_root":repo,"source_commit":source,"image_id":image,
+                "source_sha256":{"source.txt":sha256_file(&repo.join("source.txt")).unwrap()}
+            }),
+        )
+        .unwrap();
+        git(&["add", "preflight-lock.json"]);
+        git(&["commit", "-qm", "evidence lock"]);
+        let head = git(&["rev-parse", "HEAD"]);
+        assert_ne!(source, head);
+        assert_eq!(
+            committed_preflight_revision(&repo, &lock_path, &head, &image)
+                .unwrap()
+                .0,
+            source
+        );
+        assert!(committed_preflight_revision(&repo, &lock_path, &head, "sha256:wrong").is_err());
+        fs::write(&lock_path, b"substituted lock").unwrap();
+        assert!(committed_preflight_revision(&repo, &lock_path, &head, &image).is_err());
+        git(&["checkout", "--", "preflight-lock.json"]);
+        fs::write(repo.join("source.txt"), b"changed source").unwrap();
+        assert!(committed_preflight_revision(&repo, &lock_path, &head, &image).is_err());
+        git(&["checkout", "--", "source.txt"]);
+        fs::write(repo.join("extra.txt"), b"unrelated commit").unwrap();
+        git(&["add", "extra.txt"]);
+        git(&["commit", "-qm", "unrelated"]);
+        let later = git(&["rev-parse", "HEAD"]);
+        assert!(committed_preflight_revision(&repo, &lock_path, &later, &image).is_err());
+        git(&["checkout", "-qb", "unrelated", &source]);
+        assert!(committed_preflight_revision(&repo, &lock_path, &source, &image).is_err());
+        fs::remove_dir_all(repo).unwrap();
     }
 }
