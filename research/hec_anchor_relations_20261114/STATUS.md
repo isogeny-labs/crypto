@@ -18,7 +18,7 @@ Jacobian and emitted modular rows under a catalogue-certified ell projection. Co
 best native and best cold table controls from the previous pilot, including branch count1.
 
 ## Open threads
-Run recorded55-case gate and55-case cold timing. Retain rank/cap failures. Package prior3 open
+The first55-case gate and55-case cold timing are complete; results below. Retain rank/cap failures. Package prior3 open
 benchmark records and the new one with source-linked reports, plots and formal receipts.
 
 ## Errors
@@ -32,3 +32,19 @@ ratios versus prior cold table controls are<=1.2x, with large L0 timing outliers
 The next variant shares work across all sign choices via the exact Gray-code norm identity,
 uses cached anchor inverses and dense reusable forest potentials, and removes repeated small
 matrix rebuilding. This remains a falsification attempt toward the original10x goal.
+
+## Signed-orbit integration gate
+Implemented orbit.rs: barycentric basis, cached cross terms and reflected Gray-code updates.
+The local release test compares5600(h,Q) pairs with independent fresh Newton interpolation
+and norm division across six genus2/3/4 instances. All comparisons passed.
+Implemented dense.rs incremental echelon elimination;60 planted systems compare target
+determination against solve_fast at every inserted prefix, including guaranteed rank completion.
+Integrated both into solve_orbit with the reference sparse forest and raw-row dedup retained.
+Twelve fully group-gated target solves passed. All seven example tests passed locally
+(release,9.23seconds test execution). These are producer self-checks, not signed independent
+verification or performance evidence. No new timing arm was run.
+
+Next: implement dense affine forest, batch anchor inverses and bounded tuple schedule, then
+run full group gates before measuring the frozen variant. Retain the old solve path unchanged
+as an explicit reference. Current integration intentionally does not represent the entire
+signed-orbit protocol amendment.

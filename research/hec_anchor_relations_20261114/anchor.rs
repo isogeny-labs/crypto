@@ -1,4 +1,8 @@
 //! Target-seeded anchor relations with coefficient-aware off-base elimination.
+#[path = "dense.rs"]
+mod dense;
+#[path = "orbit.rs"]
+mod orbit;
 use crate::table_factor::Tables;
 use hec_native_ic::{
     fp::Fp,
@@ -276,6 +280,24 @@ pub struct Report {
     pub solve: SolveStats,
 }
 pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
+    solve_variant(c, d1, d2, ell, seed, gate, false)
+}
+
+/// Integration gate for orbit reuse and incremental elimination. The sparse
+/// forest and raw-row dedup remain the reference versions; not a timing arm.
+pub fn solve_orbit(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
+    solve_variant(c, d1, d2, ell, seed, gate, true)
+}
+
+fn solve_variant(
+    c: &Curve,
+    d1: &Div,
+    d2: &Div,
+    ell: u64,
+    seed: u64,
+    gate: bool,
+    use_orbit: bool,
+) -> Report {
     let all = Instant::now();
     let mut r = Report::default();
     let fp = &c.fp;
@@ -338,6 +360,12 @@ pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> 
     let mut target = map(&b);
     target.push((h as u32, ell - 1));
     let mut rows = vec![(map(&a), 1), (target, 0)];
+    let mut echelon = dense::Echelon::new(h, ell);
+    if use_orbit {
+        for (row, rhs) in &rows {
+            echelon.insert(row, *rhs);
+        }
+    }
     let mut wanted = h + 8;
     let projected = if gate {
         let ps = projection(c, ell, &fb);
@@ -351,37 +379,71 @@ pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> 
     let mut pure: HashSet<Row> = HashSet::new();
     r.memory_bytes = tab.bytes() + inv.len() * 8;
     r.setup_ns = all.elapsed().as_nanos();
-    while r.draws < 1_000_000 && r.solves < 16 {
+    let mut pending = Vec::new();
+    while r.draws < 1_000_000 && (use_orbit || r.solves < 16) {
         r.draws += 1;
         let clock = Instant::now();
-        let mut chosen: Vec<(u32, bool)> = Vec::with_capacity(c.g + 1);
-        while chosen.len() < c.g + 1 {
-            let j = anchor[rng.below(h as u64) as usize] as u32;
-            if chosen.iter().any(|e| e.0 == j) {
+        let (chosen, hp, q) = if use_orbit {
+            if pending.is_empty() {
+                let mut chosen: Vec<(u32, bool)> = Vec::with_capacity(c.g + 1);
+                while chosen.len() < c.g + 1 {
+                    let j = anchor[rng.below(h as u64) as usize] as u32;
+                    if !chosen.iter().any(|e| e.0 == j) {
+                        chosen.push((j, false));
+                    }
+                }
+                chosen.sort_unstable_by_key(|e| e.0);
+                if !tuples.insert(chosen.clone()) {
+                    r.relation_ns += clock.elapsed().as_nanos();
+                    continue;
+                }
+                let points: Vec<_> = chosen.iter().map(|&(j, _)| fb[j as usize]).collect();
+                for (step, (hp, q)) in orbit::signed_orbit(c, &points)
+                    .into_iter()
+                    .enumerate()
+                    .rev()
+                {
+                    let gray = step ^ (step >> 1);
+                    let signed = chosen
+                        .iter()
+                        .enumerate()
+                        .map(|(j, &(id, _))| (id, j > 0 && gray & (1 << (j - 1)) != 0))
+                        .collect::<Vec<_>>();
+                    pending.push((signed, hp, q));
+                }
+            }
+            pending.pop().unwrap()
+        } else {
+            let mut chosen: Vec<(u32, bool)> = Vec::with_capacity(c.g + 1);
+            while chosen.len() < c.g + 1 {
+                let j = anchor[rng.below(h as u64) as usize] as u32;
+                if chosen.iter().any(|e| e.0 == j) {
+                    continue;
+                }
+                chosen.push((j, false));
+            }
+            chosen.sort_unstable_by_key(|e| e.0);
+            for p in &mut chosen[1..] {
+                p.1 = rng.below(2) == 1;
+            }
+            if !tuples.insert(chosen.clone()) {
+                r.relation_ns += clock.elapsed().as_nanos();
                 continue;
             }
-            chosen.push((j, false));
-        }
-        chosen.sort_unstable_by_key(|e| e.0);
-        for p in &mut chosen[1..] {
-            p.1 = rng.below(2) == 1;
-        }
-        if !tuples.insert(chosen.clone()) {
-            r.relation_ns += clock.elapsed().as_nanos();
-            continue;
-        }
-        let (mut hp, mut ap) = (Poly::zero(), Poly::one());
-        for &(j, neg) in &chosen {
-            let (x, y) = fb[j as usize];
-            let y = if neg { fp.neg(y) } else { y };
-            let den = ap.eval(x, fp);
-            assert_ne!(den, 0);
-            let k = fp.mul(fp.sub(y, hp.eval(x, fp)), inv[den as usize]);
-            hp = hp.add(&ap.scale(k, fp), fp);
-            ap = ap.mul(&Poly::x_minus(x, fp), fp);
-        }
-        let (q, rem) = c.f.sub(&hp.mul(&hp, fp), fp).divrem(&ap, fp);
-        assert!(rem.is_zero());
+            let (mut hp, mut ap) = (Poly::zero(), Poly::one());
+            for &(j, neg) in &chosen {
+                let (x, y) = fb[j as usize];
+                let y = if neg { fp.neg(y) } else { y };
+                let den = ap.eval(x, fp);
+                assert_ne!(den, 0);
+                let k = fp.mul(fp.sub(y, hp.eval(x, fp)), inv[den as usize]);
+                hp = hp.add(&ap.scale(k, fp), fp);
+                ap = ap.mul(&Poly::x_minus(x, fp), fp);
+            }
+            let (q, rem) = c.f.sub(&hp.mul(&hp, fp), fp).divrem(&ap, fp);
+            assert!(rem.is_zero());
+            (chosen, hp, q)
+        };
         let Some(roots) = tab.split(&q) else {
             r.relation_ns += clock.elapsed().as_nanos();
             continue;
@@ -466,6 +528,18 @@ pub fn solve(c: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> 
         }
         rows.push((row, 0));
         r.pure_rows = rows.len() - 2;
+        if use_orbit {
+            let t = Instant::now();
+            r.solves += 1;
+            let k = echelon.insert(&rows.last().unwrap().0, 0);
+            r.solve_ns += t.elapsed().as_nanos();
+            if let Some(k) = k {
+                assert_eq!(c.mul(d1, k), *d2, "orbit target verification");
+                r.k = Some(k);
+                break;
+            }
+            continue;
+        }
         if rows.len() >= wanted {
             let t = Instant::now();
             r.solves += 1;
@@ -525,6 +599,21 @@ mod tests {
                 let k = 113 + seed * 23;
                 let target = i.curve.mul(&i.d1, k);
                 let r = solve(&i.curve, &i.d1, &target, i.ell, 20260916 + seed, true);
+                assert_eq!(r.k, Some(k), "g={g} p={p} seed={seed} {r:?}");
+                assert_eq!(r.raw_checks, r.admitted);
+                assert_eq!(r.pure_checks, r.pure_rows as u64);
+            }
+        }
+    }
+
+    #[test]
+    fn checked_orbit_anchor_solves() {
+        for (g, p) in [(2, 101), (2, 251), (3, 61), (3, 211), (4, 31), (4, 61)] {
+            let i = hec_native_ic::instance::pick_instance(p, g).unwrap();
+            for seed in 0..2 {
+                let k = 113 + seed * 23;
+                let target = i.curve.mul(&i.d1, k);
+                let r = solve_orbit(&i.curve, &i.d1, &target, i.ell, 20260916 + seed, true);
                 assert_eq!(r.k, Some(k), "g={g} p={p} seed={seed} {r:?}");
                 assert_eq!(r.raw_checks, r.admitted);
                 assert_eq!(r.pure_checks, r.pure_rows as u64);
