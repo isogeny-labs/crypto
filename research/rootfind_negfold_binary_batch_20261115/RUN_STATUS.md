@@ -18,6 +18,14 @@ and spec paths against pushed commit `2f242cf2728f6091461441d2687688158778f98f`.
 The launch request and exact image/binary hashes remain to be bound at
 admission. No session directory or outcome row exists here.
 
+**Before-data source amendment:** [`AMENDMENT-1.md`](AMENDMENT-1.md)
+selects the lazy-sum scan at source revision
+`c30a899bce6e74fe4574f042016ed7b6ddd1e1ac` and clarifies that the
+ordinate is completed only after a table-key hit. The original protocol,
+spec and receipt remain intact. Run only after the separate amended
+publication receipt is committed and checked; do not pool eager-sum and
+lazy-sum revisions.
+
 ## Admission obstruction
 
 The read-only [AWS monthly budget response](budget-monthly-readback.json)
