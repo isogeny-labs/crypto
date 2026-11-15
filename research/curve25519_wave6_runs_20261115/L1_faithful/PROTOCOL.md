@@ -23,3 +23,15 @@ m = 3, field_ops lie within a factor 2 of 7.75e8.
 Decision. P1 or P4 failing means the family rule is a confounder for the exponent studies' cell costs, and every
 cross-family comparison must be redone on a matched family. SD and mean field_ops are the recorded quantities;
 wall time is not claimed.
+
+## Pre-data amendment (2026-11-15, before any L1 cell ran)
+
+The member named above (p = 1,048,261, A = 383) is invalid under the lab's family rule, which the wave-6 search had
+not applied in full: the rule requires A ≡ 2 (mod 4) and r > 2^(k−3) besides the cofactor conditions, and the
+engine's explicit-curve path enforces it. Under the full rule no k = 20 prime of Curve25519's shape
+(p ≡ 5 mod 8, p − 1 = 4·3·q·C with q < 2^(k/8), so q = 5, and C prime; v₂(p + 1) = 1) admits a curve with
+A < 40,000 among the seven such primes below 2^20 − 17,115 that were searched (`checks/faithful_full.py` output in
+`L1_faithful/faithful_search.txt`). The k = 24 prime p = 16,777,141 = 2^24 − 75 (p − 1 = 4·3·5·279,619) admits
+A = 7,842 with #E = 8·2,098,009 and twist 4·4,192,553. L1 therefore runs on `p=16777141,A=7842`; the cell list,
+seeds, limits, predictions and comparators are unchanged (the comparators are per (m, D) and the theory lane's
+claim under test is that T does not depend on k or p). P4's comparator stays the k = 20 value 7.75e8 at D = 12.
