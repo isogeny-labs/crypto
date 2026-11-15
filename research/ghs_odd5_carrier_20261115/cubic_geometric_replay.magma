@@ -1,0 +1,52 @@
+SetSeed(20261115);
+L := GF(3^10);
+R0<X> := PolynomialRing(L);
+V<v> := PolynomialRing(L);
+R<x> := PolynomialRing(V);
+rows := [<-26,28967>, <26,35518>];
+for row in rows do
+    trace := row[1];
+    mask := row[2];
+    f := X^11;
+    for i in [0..10] do
+        f +:= (mask mod 3)*X^i;
+        mask := mask div 3;
+    end for;
+    assert mask eq 0 and GCD(f,Derivative(f)) eq 1;
+    roots := Roots(f,L);
+    assert #roots eq 11;
+    pairs := 0;
+    nonconstant := 0;
+    for i in [1..10] do
+        for j in [i+1..11] do
+            B := (X-roots[i][1])*(X-roots[j][1]);
+            C := f div B;
+            assert B*C eq f;
+            A0 := Modexp(C,3^9,B);
+            assert (A0^3-C) mod B eq 0;
+            bb := R!B;
+            cc := R!C;
+            aa := R!A0;
+            A := aa+bb*(x+v);
+            Q := (cc-A^3) div bb;
+            assert (cc-A^3) mod bb eq 0;
+            c2 := Coefficient(Q,6);
+            Q -:= c2*A^2;
+            c1 := Coefficient(Q,5);
+            Q -:= c1*A*bb;
+            c0 := Coefficient(Q,4);
+            Q -:= c0*bb^2;
+            G := V!0;
+            for k in [0..3] do
+                G := GCD(G,Coefficient(Q,k));
+            end for;
+            pairs +:= 1;
+            if G eq 0 or Degree(G) gt 0 then
+                nonconstant +:= 1;
+                print "candidate",trace,i,j,G;
+            end if;
+        end for;
+    end for;
+    assert pairs eq 55;
+    print "trace",trace,"pole_pairs",pairs,"nonconstant_gcd_pairs",nonconstant;
+end for;
