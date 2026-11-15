@@ -59,6 +59,9 @@ host, with no comparative ratio. The [study result and raw receipts](../research
 are the source of truth. No relation search, matched rho or cold IC total
 runtime was measured, so this documentary record remains outside the admitted
 table; the temporary file store was not an S3 publication.
+The repository bot subsequently archived the object and PNG to its configured
+S3 artifact store; the [fresh GET and hash addendum](../research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-local-custody-20261115/S3_CUSTODY_ADDENDUM_20261115.md)
+records that later custody event without changing the run's scope.
 
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
