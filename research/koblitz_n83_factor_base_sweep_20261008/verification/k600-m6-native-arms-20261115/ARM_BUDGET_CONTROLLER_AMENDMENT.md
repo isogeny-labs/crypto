@@ -29,8 +29,9 @@ identities, but it does not exercise Docker or a real K600 input. The root
 release library gate was rerun at commit `9428ed7e275b` with
 `RUSTC="$(rustup which rustc --toolchain 1.99.1)" cargo test --release --lib`.
 It exited 101 after 609.57 seconds: 6,306 passed, 59 failed, 138 ignored.
-The [full compressed log](budget-controller-lib-gate-9428ed7e.log.gz)
-has SHA-256
+The full compressed log was moved by the repository artifact automation at
+`2fd1d4886a6c`; its [tracked artifact manifest](.artifacts.json) records
+120,556 bytes and SHA-256
 `9afa9ded60430c739369aba3b379b44c064b5ba0bfbdfcdba2fbca131dea25aa`.
 Failures include `certicom_dlp`, `ecbench::band`, and `ml_dataset` tests.
 The `cargo test --lib` target does not compile this new example, and this
