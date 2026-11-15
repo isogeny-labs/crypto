@@ -60,7 +60,9 @@
 //! on that half table.
 //! `rootfind-negfold-batch` keeps the same ordered half table and probe,
 //! but shares an inversion over each binary table row's ordinary additions.
-//! Its abstract addition ledger is unchanged; any wall benefit needs a
+//! For `m = 3`, consecutive scan additions share an inversion in blocks of
+//! eight. Completed blocks charge every addition, including any candidates
+//! after the first hit. Any wall benefit needs a
 //! separate controlled measurement. It has a separate method identity so
 //! the scalar arm remains reproducible.
 //!
@@ -135,7 +137,7 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost, SolverTotals,
     SystemShape,
 };
-use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
+use crypto_lib::cryptanalysis::koblitz_fast::{BatchScratch, FastPoint};
 use crypto_lib::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, parse_linear_harvest, set_linear_harvest, FieldStructure, LinearHarvest,
     SolveStats, SolverEngine,
@@ -538,6 +540,10 @@ pub struct Pdp3KoblitzOracle<'i> {
     pair: Option<PairSumTable>,
     /// Negation-folded [`PairTable`] under `*-negfold` engines.
     pair_neg: Option<PairTable>,
+    /// Reused by the batched `m = 3` scan; all completed additions are charged.
+    scan_scratch: BatchScratch,
+    scan_addends: Vec<FastPoint>,
+    scan_sums: Vec<FastPoint>,
     /// Base size the table was built on; `0` under a Groebner engine.
     pair_table_points: usize,
     /// Third-summand window for windowed engines; `0` otherwise.
@@ -571,6 +577,9 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             totals: SolverTotals::default(),
             pair: None,
             pair_neg: None,
+            scan_scratch: BatchScratch::default(),
+            scan_addends: Vec::new(),
+            scan_sums: Vec::new(),
             pair_table_points: 0,
             scan_window_len: 0,
             window_div: 0,
@@ -667,6 +676,34 @@ impl<'i> Pdp3KoblitzOracle<'i> {
     ) -> Option<Vec<usize>> {
         let table = self.pair_neg.as_ref()?;
         let g = ctx.group;
+        if self.engine == Pdp3Engine::RootfindNegfoldBatch && self.summands == 3 {
+            const SCAN_BLOCK: usize = 8;
+            for from in (0..fb.points.len()).step_by(SCAN_BLOCK) {
+                let to = (from + SCAN_BLOCK).min(fb.points.len());
+                self.scan_addends.clear();
+                self.scan_addends
+                    .extend(fb.points[from..to].iter().map(|&p| g.neg(p)));
+                self.scan_sums.clear();
+                g.0.add_many(
+                    point,
+                    &self.scan_addends,
+                    &mut self.scan_sums,
+                    &mut self.scan_scratch,
+                );
+                // The batch has already formed all sums, even if an early
+                // probe hits. The ledger therefore charges the entire block.
+                ops.adds += self.scan_addends.len() as u64;
+                for (offset, &rest) in self.scan_sums.iter().enumerate() {
+                    if g.is_identity(&rest) {
+                        continue;
+                    }
+                    if let Some((i, j)) = table.probe(g, fb, ops, &mut counters.lookups, rest) {
+                        return Some(vec![from + offset, i, j]);
+                    }
+                }
+            }
+            return None;
+        }
         if !self.engine.is_window() {
             return decompose_mitm(g, fb, table, self.summands, ops, counters, point);
         }
@@ -1230,7 +1267,7 @@ pub fn plugins() -> BinaryPlugins {
 /// it.  The oracle lives in this binary, so the replays do too.
 #[cfg(test)]
 mod engine_names {
-    use super::Pdp3Engine;
+    use super::{Pdp3Engine, Pdp3KoblitzOracle};
 
     #[test]
     fn f6_ic_pair_parses_and_shares_the_f6_solver() {
@@ -1249,6 +1286,75 @@ mod engine_names {
         assert!(engine.is_negfold());
         assert!(!engine.is_window());
         assert_eq!(engine.solver(3), None);
+    }
+
+    #[test]
+    fn binary_batch_scan_keeps_scalar_first_witness_and_lookup_order() {
+        use super::{decompose_mitm, BinaryGroup, ColumnFold, GroupOps};
+        use super::{OracleCounters, PairTable};
+        use crypto_lib::cryptanalysis::ic_boundary::{koblitz_factor_base, koblitz_instance};
+        use crypto_lib::cryptanalysis::ic_framework::stages::InstanceCtx;
+        use crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+        use num_bigint::BigUint;
+
+        let inst = koblitz_instance(0, 13).expect("Koblitz E0 n13");
+        let frob = build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), 5)
+            .expect("standard subspace");
+        let fb = koblitz_factor_base(&inst, &frob, ColumnFold::Abscissa, "d5".into())
+            .expect("signed base");
+        let group = BinaryGroup(&inst.fast);
+        let table = PairTable::build_negation_folded_binary_batch(&group, &fb);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut batch = Pdp3KoblitzOracle::new("pdp3-binary", 3, &inst);
+        batch.engine = Pdp3Engine::RootfindNegfoldBatch;
+        batch.pair_neg = Some(table);
+        let mut points = Vec::new();
+        for k in 1..=256u64 {
+            points.push(
+                group
+                    .0
+                    .mul(inst.generator, &BigUint::from((53 * k % (inst.r - 1)) + 1)),
+            );
+        }
+        for k in [0, 1, fb.points.len() / 2, fb.points.len() - 1] {
+            points.push(
+                group
+                    .0
+                    .add(fb.points[k], group.0.add(fb.points[3], fb.points[7])),
+            );
+        }
+        for point in points {
+            let mut scalar_ops = GroupOps::default();
+            let mut scalar_ctr = OracleCounters::default();
+            let expected = decompose_mitm(
+                &group,
+                &fb,
+                batch.pair_neg.as_ref().unwrap(),
+                3,
+                &mut scalar_ops,
+                &mut scalar_ctr,
+                point,
+            );
+            let mut batch_ops = GroupOps::default();
+            let mut batch_ctr = OracleCounters::default();
+            let got =
+                batch.decompose_rootfind_negfold(&ctx, &fb, &mut batch_ops, &mut batch_ctr, point);
+            assert_eq!(got, expected, "first witness at {point:?}");
+            assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+            // A completed eight-point block may do up to seven additions
+            // beyond the scalar first-hit point; misses do identical work.
+            assert!(batch_ops.adds >= scalar_ops.adds);
+            assert!(batch_ops.adds <= scalar_ops.adds + 7);
+        }
     }
 }
 
