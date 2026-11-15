@@ -132,12 +132,12 @@
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
     }
   ],
-  "latest_record": "20261115T2010Z-ic-native-ifma",
+  "latest_record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 26 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 8,
     "invalid": 4,
-    "measured": 199,
+    "measured": 200,
     "open": 1
   },
   "repo": "crypto",
@@ -15064,6 +15064,318 @@
         }
       ],
       "problem": "mt:batched-inversion",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9507,
+      "latest": 0.9507,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_best_rho_2p32_t1024",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9164,
+            0.9907
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.9507
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9394,
+      "latest": 0.9394,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_best_rho_2p32_t16384",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8694,
+            1.0256
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.9394
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9346,
+      "latest": 0.9346,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_best_rho_2p32_t4096",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8971,
+            0.972
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.9346
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2896,
+      "latest": 1.2896,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_best_rho_2p36_t1024",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1618,
+            1.3207
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 1.2896
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2047,
+      "latest": 1.2047,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_best_rho_2p36_t16384",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1576,
+            1.2133
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 1.2047
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1651,
+      "latest": 1.1651,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_best_rho_2p36_t4096",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.114,
+            1.2419
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 1.1651
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7448,
+      "latest": 0.7448,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_ic_bi_2p32_t1024",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6931,
+            0.8364
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.7448
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7616,
+      "latest": 0.7616,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_ic_bi_2p32_t16384",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7188,
+            0.8063
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.7616
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7521,
+      "latest": 0.7521,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_ic_bi_2p32_t4096",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6988,
+            0.8076
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.7521
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6881,
+      "latest": 0.6881,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_ic_bi_2p36_t1024",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6646,
+            0.764
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.6881
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.6879,
+      "latest": 0.6879,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_ic_bi_2p36_t16384",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6466,
+            0.8341
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.6879
+        }
+      ],
+      "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7488,
+      "latest": 0.7488,
+      "latest_derived": {},
+      "metric": "ic_pffp_over_ic_bi_2p36_t4096",
+      "points": [
+        {
+          "commit": "0bc69900d41c",
+          "date": "2026-11-15",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2231Z-mt-ic-mem-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6571,
+            0.7828
+          ],
+          "summary": "Prefetched table inserts + 8-byte fingerprint slots: IC 0.69-0.76x of batched-inversion IC (same table, trials, counts); IC / best batched rho 0.94-0.95x at 2^32 (ahead 4/4 at T=1024, 4096), 1.17-1.29x at 2^36; 720 executions, 0 errors [pcc:unverified]",
+          "value": 0.7488
+        }
+      ],
+      "problem": "mt:ic-memory",
       "unit": "ratio"
     },
     {
