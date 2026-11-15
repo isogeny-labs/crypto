@@ -180,3 +180,5 @@ raw files; copyrighted primaries and regenerable PNGs are excluded.
 [pcc:unverified]
 
 The [one-page report](reports/report.pdf) and [diagram](reports/weil-auxiliary.svg) retain the exact source formula, proof mechanism, controls and scope. First render47591B/all5324 text characters read/entire individual page visually inspected/inbounds. Exact source/artifact plan is sealed. Once-only local **PCC-20261115-004f3b** replay PASS at 2026-11-15T23:22:08Z; signed standing remains unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: ready [PR #4355](https://github.com/isogeny-labs/crypto/pull/4355), stacked on #3739. Remote proof `319262a0ce6b54f48d4e62abb7c335114f86c277` and local receipt `6dd584e14aef3e5e45d14902442c17858bec7b52` share tree `5f5772173c7a974b6e4ad9a38845cde04a7dfe64`. Anonymous fetch completed; fresh head/body/title/open/ready matched. Body2 has4417characters. All34 pinsets/2397entries and73 scope links match; the nonempty627-row ledger prefix is preserved through628. Publication metadata is outside frozen pinsets; current-head CI/review/signing pending. [pcc:unverified]
