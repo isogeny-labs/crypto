@@ -30,6 +30,15 @@ construction and matched checks; retain original equations and basis equality.
 Existing QUOTIENT_SPEED_PROTOCOL.md concerns the older standalone comparison;
 do not relabel its denominator or reuse its timing as root-API evidence.
 
+The actual-root worker is now prepared at source
+6ff21fd8711d33d84fa8c3eb2856e2d71899ac07. Three separate immutable CLI tests
+pass: same complete 31-bit basis across actual F4/certified arms, capped F4
+incomplete/null status, and unsupported wide F4 control. Both executable hashes
+match after calls; read ROOT_WORKER_CONTRACT.md and root-worker-development/
+before rerunning. This is not a new runtime ratio or a combined rerun of the
+old API suite. Producer claim PCC-20261115-461551 remains unverified
+`[pcc:unverified]`.
+
 Publication uses codex/native-certified-relation-integration-20261115, stacked
 in [PR #4349](https://github.com/isogeny-labs/crypto/pull/4349) on the existing
 relation-degree-trace PR #4228. The parent advanced while the

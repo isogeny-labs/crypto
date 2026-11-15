@@ -23,3 +23,11 @@ The 53-bit case tests exact coefficients, certificates and native normal-form
 checks, without claiming general wide-field F4 support. A six-variable case
 reports its checked success or explicit proof-budget limit, without replacing
 inputs. No performance conclusion is drawn here `[pcc:unverified]`.
+
+## Actual-root comparison worker
+
+`src/bin/native-root-worker.rs` calls the actual F4/certified APIs on the same
+bounded System JSON. Three separate CLI tests and immutable worker/test copies
+are recorded in ../root-worker-development/. Read ../ROOT_WORKER_CONTRACT.md
+for paid scope, incomplete/unsupported handling and the still-pending runtime
+gate. Worker clocks are diagnostics, not speed ratios.

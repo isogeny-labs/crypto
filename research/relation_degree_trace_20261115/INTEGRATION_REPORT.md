@@ -100,3 +100,26 @@ The same-day root session log and append-only PCC ledger also changed in the
 parent branch. The focused follow-on PR preserves its qualified source
 commits; it does not reconcile competing frozen ledger histories. That merge
 dependency is separate from the recorded local correctness checks.
+
+## Actual-root worker follow-up
+
+Source 6ff21fd8711d33d84fa8c3eb2856e2d71899ac07 adds native-root-worker in
+the focused qualifier crate. It reads the same admitted System JSON and calls
+the actual optimized F4 or certified API. Common admission/conversion and
+canonical output stay charged, along with the certified API's internal
+provenance/native checks. This supplies the root-codebase worker needed for a
+future comparison; it does not replace the missing runtime protocol/gates.
+
+Three separately frozen CLI tests pass: identical complete 31-bit fixed-case
+bases; capped F4 remains incomplete with null basis/observed solving degree;
+and the 53-bit F4 control is explicitly unsupported. The worker and test
+executable both retain their pre-call hashes afterward. The original five
+API checks are the separate earlier qualification, not a new combined-suite
+run. See root-worker-development/ and producer record PCC-20261115-461551;
+standing remains unverified `[pcc:unverified]`.
+
+F4's highest productive degree is a run observation and is exposed only after
+complete termination. Certified construction still reports no Macaulay/F4
+solving degree. The worker's single-call clocks exclude launch/printing and
+cannot provide a speed ratio; a matched driver must pay output consumption
+and identical external basis checks as well.
