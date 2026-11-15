@@ -192,6 +192,28 @@ fn main()->Result<(),String>{
         if ring.eval(&final_poly,&xs)!=0 {return Err("S4 target polynomial residual !=0".into());}
         let corrupted=s4(&u,&v,&w,&Polynomial::constant(add(r.0,1)));
         if ring.eval(&ring.from_raw(&corrupted.raw_tower()),&xs)!=0 {mutated+=1;}
+        // The polynomial system uses x only. After a candidate x-tuple is
+        // extracted, enumerate all 2^8 choices of y-sign and admit only the
+        // one(s) whose signed EC sum equals the *full* public R, not just x(R).
+        // This is bounded witness verification, never the relation oracle.
+        let mut exact_lifts=0;
+        let mut x_only_lifts=0;
+        let mut distinct=HashSet::new();
+        for mask in 0..256_u16 {
+            let mut candidate=None;
+            for (j,&pt) in ps.iter().enumerate() {
+                let q=if ((mask>>j)&1)==1 {
+                    ar.neg(e,Some(pt))
+                } else {Some(pt)};
+                candidate=ar.add(e,candidate,q);
+            }
+            if candidate==Some(r) {exact_lifts+=1;}
+            if candidate.is_some_and(|q|q.0==r.0) {x_only_lifts+=1;}
+            distinct.insert(candidate);
+        }
+        if exact_lifts!=1 || x_only_lifts!=2 || distinct.len()!=256 {
+            return Err("signed lift / x-only ambiguity gate changed".into());
+        }
         if first_aux.is_none(){first_aux=Some([u_pt.0,v_pt.0,w_pt.0,r.0]);}
         checked+=1;
     }
@@ -205,6 +227,9 @@ fn main()->Result<(),String>{
       "tower_vars":TOWER,"free_vars":3,"normal_form_terms_fixed":nf_terms,
       "balanced_m8_natural_witnesses_checked":checked,
       "mutated_target_x_rejected":mutated,
+      "sign_orientations_per_x_tuple":256,
+      "unique_full_target_y_signs_per_tuple":1,
+      "abscissa_only_sign_solutions_per_tuple":2,
       "first_auxiliary_x":first_aux,
       "rust_compilation_status":"must be confirmed on exact GitHub head"}));
     Ok(())
