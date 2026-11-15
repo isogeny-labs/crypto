@@ -217,3 +217,12 @@ README, `ideas/SYNTHESIS.md`, `ideas/OBSTRUCTION.md`, `c1/`, `rebaseline-seedrun
 sub-rho from larger k; not violated: constants only), LEAD-ICP-full-width-arity-grid (open, blocked; the lead asked
 that its grid not already contain ksum k = 6 be checked before adoption: not checked here). The director must run
 the atlas `--match` and the research-kb queries before registering.
+
+## Amendment A1 (2026-11-15, before any data)
+
+The first RunPod attempt (pod `bzxcwivc23x3hv`) collected no data. Every session exited with rc = 1 after 0 s, because
+`taskset -c i` failed with EINVAL. The container's usable CPU ids do not start at 0. `pod/run.sh` now pins lane i to the
+i-th CPU listed in `Cpus_allowed_list`, and runs unpinned if that is impossible. Pinning affects wall time only, not
+counted cost. No claim, arm, seed, spec, prediction or kill criterion changes. The toy smoke run passes with the
+patched script on a host whose allowed CPUs are 1–3. REGISTRATION.sha256 was regenerated after this amendment
+[pcc:unverified].

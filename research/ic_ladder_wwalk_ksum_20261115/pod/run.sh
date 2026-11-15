@@ -17,7 +17,10 @@ LOG=$OUT/runlog.tsv
 { echo "start $(date -u +%FT%TZ) load $(cut -d' ' -f1-3 /proc/loadavg) nproc $(nproc) mem_kib $(awk '/MemTotal/{print $2}' /proc/meminfo)"; sha256sum "$BIN"; lscpu | head -20; } >> "$OUT/host.txt" 2>&1
 cp "$WORK/bin/rustc.txt" "$WORK/bin/BINARY.sha256" "$OUT/" 2>/dev/null || true
 
-pin() { local cpu=$1; shift; if command -v taskset >/dev/null; then taskset -c "$cpu" "$@"; else "$@"; fi; }
+# Amendment A1 (2026-11-15, before any data): lane i is pinned to the i-th CPU this process may use (Cpus_allowed_list),
+# not to CPU id i; container CPU ids need not start at 0 (RunPod attempt 1 failed every session with taskset EINVAL).
+ALLOWED=($(awk '/Cpus_allowed_list/{print $2}' /proc/self/status | tr ',' '\n' | while IFS=- read -r a b; do seq "$a" "${b:-$a}"; done))
+pin() { local i=$1; shift; local c=${ALLOWED[$i]:-}; if [ -n "$c" ] && command -v taskset >/dev/null; then taskset -c "$c" "$@"; else "$@"; fi; }
 ecrun() { # ecrun CPU SPEC OUTDIR   (skips finished sessions)
   local cpu=$1 spec=$2 dir=$3 s e rc
   [ -f "$dir/session.json" ] && return 0; rm -rf "$dir"
