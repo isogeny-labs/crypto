@@ -14,4 +14,4 @@ Accept only paired results on the same point, complete IC online phases, separat
 
 Sources checked: autolab README/protocol and `single_target_panel.py`; `tools/isolated_bench.py`; Iso Lab skill, HARNESS, ACCESS, COST_CONTROLS and submit-job. This reproduces registered beats and makes no new mechanism or novelty claim.
 
-Status: authorized preparation; no measurements reported in this document. Raw prelaunch evidence is under `research/sat_factor_base_review_20260908/autolab/runs/tournament-20261115-single-target/`. Terminal reports and durable raw-result references will be added after execution.
+Status: one Job submitted at 19:24:05 UTC and queued by AWS MaxFleetCountExceeded; no measurement has started. See the [dated provisioning report](reports/run-20261115T1924Z/report.md), [PDF](reports/run-20261115T1924Z/report.pdf) and [open provisioning problem](../../problems/isolab-ec2-fleet-request-quota-20261115.md). Raw prelaunch evidence is under `research/sat_factor_base_review_20260908/autolab/runs/tournament-20261115-single-target/`. Terminal reports and durable raw-result references will be added after execution.
