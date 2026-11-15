@@ -1,5 +1,7 @@
 //! Frozen held-out screen. See HELDOUT-PROTOCOL.md for cohort, caps and scope.
 mod anchor;
+#[cfg(test)]
+mod rational;
 #[path = "../hec_table_oracle_20261114/pipeline.rs"]
 mod pipeline;
 #[path = "../../crates/hec-native-ic/src/table_factor.rs"]

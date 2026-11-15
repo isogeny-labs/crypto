@@ -52,3 +52,36 @@ The full cold pipeline and >=10x objective remain open.
 No algebra mismatch occurred. Duplicate-abscissa panic in raw stdout is the
 expected passing rejection control. Standalone rustc --test -O used the pinned
 existing native library; this does not independently verify that library.
+
+## Rank/yield screen completed
+
+### What was done (commands, files, features)
+Protocol c6903c64ea preceded rational_rank.rs and its run. All36attempted arms
+completed, visiting145268functions and verifying5360distinct admitted principal
+identities. Twenty-three arms attained rank H-1;12exhausted their tuple family
+and one reached its1024tuple cap. No identity or rank assertion failed. Full
+per-arm counts, including2532nonprimitive rejections, are in RATIONAL-RANK.jsonl.
+The5algebra unit tests are now included in the heldout example's CI test target.
+
+### Decisions made (and why)
+At g2p1009, d2 attains rank7 with H8 after705visited/736constructed outputs;
+the original d0 exhausts H8 at rank0, and reaches rank11 at H12 after714visits.
+This supports the smaller-anchor premise on this instance, not a speed claim.
+At g3p503, H14 works for d1..3 but every H9arm exhausts at rank0; d0 works
+at H24 with6049visits versus10611for d2 at H14. At g4p127, H16d2 reaches
+rank15 after6924visits, while H28d0 reaches rank27 after2372visits. Smaller
+anchors increase the work needed to generate useful relations in these cases.
+The finite sign capacity is not a sufficient relation-yield/rank prediction.
+
+### Open threads (unfinished, pick up next time)
+Independently recompute the anchor-intersection rank from the full admitted
+relation matrix before treating the forest's rank as established. Then assess
+cold construction/normalization costs: field-operation reductions must offset
+the observed rise in trial count. No end-to-end timing run is authorized by
+these count protocols, and no10x performance inference follows from this screen.
+
+### Errors (what went wrong, how it was handled)
+No mathematical assertion failed. Twelve exhausted families and one tuple cap
+are retained rather than retried/replaced. Compile warnings are unused helper
+methods in the shared modules, not failed gates. Shared log and resume remain
+untouched because another task holds them.
