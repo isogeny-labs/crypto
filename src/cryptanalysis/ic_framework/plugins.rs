@@ -3155,6 +3155,10 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     fn line_guard(&self) -> bool {
         self.lines
     }
+
+    fn recovery_ladder(&self) -> Option<Vec<G::Elt>> {
+        WWalkOracle::recovery_ladder(self)
+    }
 }
 
 /// One abscissa of the base as the root-finding sweep sees it: both
