@@ -62,3 +62,10 @@ A2 is frozen before implementing source-certified early completion: constant1
 or a source-consistent full linear point ideal can stop the queue, followed by
 all unchanged external checks. No degree or resource cap increase is planned.
 [pcc:unverified]
+
+Shared crypto-lean PR8 merged, source3fc498f77743426e1dc0a3c855d7794b3f20af20.
+Hosted CI executes zero steps: its annotation states the account is locked due
+to billing. The local102-theorem full gate and actual2-theorem instance gate
+pass; no hosted-CI success is claimed. Task-wide autonomy accounting follows
+D3 (one task, several PRs, ended at its last merge); this research task and its
+parent PC PR remain open, so no completed-task autonomy success is recorded.

@@ -7,6 +7,26 @@ class Producer {
     std::vector<Node> nodes;
     std::map<Monomial,std::size_t> pivots;
     std::vector<std::size_t> queue,originals;
+    std::vector<std::size_t> completion_basis;
+    bool linear_checked=false;
+    void check_completion(){
+        const auto unit=pivots.find(Monomial(s.names.size(),0));
+        if(unit!=pivots.end()){completion_basis={unit->second};return;}
+        if(linear_checked)return;
+        std::vector<std::size_t> ids;std::vector<Polynomial> linear;
+        for(std::size_t var=0;var<s.names.size();++var){
+            Monomial mon(s.names.size(),0);mon[var]=1;const auto found=pivots.find(mon);
+            if(found==pivots.end())return;
+            ids.push_back(found->second);linear.push_back(nodes.at(found->second).poly);
+        }
+        linear_checked=true;
+        std::size_t monomials=1,linear_entries=0;
+        for(unsigned k=1;k<=degree;++k)monomials=monomials*(s.names.size()+k)/k;
+        for(const auto&f:linear)linear_entries+=f.terms.size();
+        require(stats.entries+3*monomials+linear_entries<=entry_cap,"completion scratch-entry cap");
+        for(const auto&f:s.equations)if(!normal_form(f,linear,stats.steps).terms.empty())return;
+        completion_basis=std::move(ids);
+    }
     std::size_t append(Node node){
         require(nodes.size()<node_cap,"proof node cap");check_degree(node.poly,degree);
         const auto entries=node.poly.terms.size()+node.links.size();
@@ -27,6 +47,7 @@ class Producer {
                 const auto id=append({'L',0,0,std::move(links),std::move(row)});
                 pivots.emplace(lm,id);++stats.pivots;
                 if(nodes[id].poly.largest_degree()<degree)queue.push_back(id);
+                check_completion();
                 return;
             }
             require(++stats.steps<=step_cap,"row-reduction step cap");
@@ -39,16 +60,17 @@ public:
     Producer(const System&input,unsigned d,Stats&counts):s(input),degree(d),stats(counts){}
     void run(const std::filesystem::path&basis,const std::filesystem::path&certificate){
         for(std::size_t eq=0;eq<s.equations.size();++eq){
-            const auto id=append({'I',eq,0,{},s.equations[eq]});originals.push_back(id);absorb(id);
+            const auto id=append({'I',eq,0,{},s.equations[eq]});originals.push_back(id);
+            if(completion_basis.empty())absorb(id);
         }
-        for(std::size_t at=0;at<queue.size();++at){const auto source=queue[at];
-            for(std::size_t var=0;var<s.names.size();++var){
+        for(std::size_t at=0;at<queue.size()&&completion_basis.empty();++at){const auto source=queue[at];
+            for(std::size_t var=0;var<s.names.size()&&completion_basis.empty();++var){
                 const auto product=variable_multiple(nodes.at(source).poly,var);
                 const auto id=append({'M',source,var,{},product});absorb(id);
             }
         }
-        std::vector<std::size_t> selected;
-        for(const auto&entry:pivots){bool minimal=true;
+        std::vector<std::size_t> selected=completion_basis;
+        if(selected.empty())for(const auto&entry:pivots){bool minimal=true;
             for(const auto&other:pivots)if(entry.first!=other.first&&quotient::divides(other.first,entry.first)){minimal=false;break;}
             if(minimal)selected.push_back(entry.second);
         }
