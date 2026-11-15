@@ -14,6 +14,7 @@ pub mod fp;
 pub mod ic;
 pub mod instance;
 pub mod jac;
+pub mod lp_sieve;
 pub mod oracle;
 pub mod poly;
 pub mod rng;
