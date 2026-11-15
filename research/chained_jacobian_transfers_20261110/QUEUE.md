@@ -2009,3 +2009,39 @@ Actual newCI completion/failures, complete scientificNEW28, reviewed prospective
 
 ## Errors
 The previous ready/open1564 descriptions became stale because it merged before resultpublication. Corrected using exact originalAPI/source/merge/time, no scientific history rewritten. Earlier769560/f19383 negative runs and all oldsources remain frozen. [pcc:unverified]
+
+2026-11-15T21:11:24.656386+00:00
+
+# External main merge rewrites shared ledger prefix; preserve local history on new branch
+
+## What was done
+pcc/claims/PCC-20261115-99baab.json: remoteRoot223e8696 merges2d46258a with main30e066b0 and changes35739paths. Originalnormalpublisher refused1487e3a before push because expectedremote2d hadmoved. Entireoriginal old/new/local ledgers and unchangedPCC check show old2d is not a prefix of223; canonical ledger[569] differs. Fullfetch/RAMcache/commands/oldactualfailure preserved with lossless archive/everyoriginalbyte roundtrip. Local1487e3a now genuinelynormallypublished on new research/chained-transfer-preserved-20261115-ct120 ref, actualpush0/exactreadback, originalsharedrefuntouched. [pcc:unverified]
+
+## Decisions made
+Keep both immutable histories and all frozen science. Do not merge, rechain, reset, forcepush or pick a ledger side. ContinueRootcheckpoint work on the preserved branch; report preciseoriginalPR3877 frozen-ledger blocker and review metadata via a regular continuationPR. Independentlycontinue Consumer1573 freshCI and reviewed unassisted relation completion. [pcc:unverified]
+
+## Open threads
+Root ledger-prefix conflict requires an authorized append-only history resolution, beyond routine filemerge; no repair proposed. Consumer1573/sourcef136 and fullfresh diagnosticCI (first8a3 run43761331865queued) remain active. FullscientificNEW28 must use a coherent preserved source lineage with originalpolicy and complete terminal holds; all existing mathematical/cost/reference/admission gates remain. [pcc:unverified]
+
+## Errors
+Rootnormalpub1 is a real expected-head refusal, not a failednetworkpush; no retry was attempted on movedsharedbranch. Previousdescription of1487 publication must reference the newpreservedbranch only. OriginalRoot3877nowpoints223; its auto-reconciledledger fails the original2d-prefix check. Allcomplete evidence and localclaims remain intact. [pcc:unverified]
+
+---
+
+2026-11-15T21:16:34.349950+00:00
+
+# Preserve original artifact-policy failure; route complete metadata archive through original store
+
+## What was done
+pcc/claims/PCC-20261115-b50a7e.json: Rootdivergence metadata governance passed ledger/prose/workingcachedwhitespace/wiring/all343science, then originalartifact1 selected the full726536-byte34member archive pinned99baab. Full failure and stagedfilename record remain. No commit/push occurred in that failed governor; local1487 stays normallypublished on preservedbranch. [pcc:unverified]
+
+## Decisions made
+Use the original trusted artifact migration with this one entire archive, no trim/rename/split/exception. Freeze METADATA_TRANSPORT_01.md before sourcepublication: stablebase snapshot2d46258a, preservedbranch source, all343 science and originaltools/workflow/policy/archive/newsubject/sourceledger holds through actual replays-before-bot/exact3pathnormalFF/terminalguards. This metadata sidecar has no Consumer projection and is separate from NEW28. [pcc:unverified]
+
+## Open threads
+Source transportgovernance/publication/readycontinuationPR, actual artifactmigration/terminalclosure; original3877 frozenledger conflict; Consumer1573freshCI and primary-reviewed unassisted completion/fullscientificNEW28. [pcc:unverified]
+
+## Errors
+Original artifact1 is retained and handled by the original store, not relabeled as0. Remote223 fails original2d-prefix check; no historyrepair or forcepush. All prior failures remain. [pcc:unverified]
+
+---
