@@ -61,6 +61,9 @@ use serde::Serialize;
 
 use super::residual_walk::{inv_mod, is_prime_u64, mix64, pow_mod, sqrt_mod, RelationSystem};
 
+#[path = "gaudry_cubic_graph.rs"]
+mod graph;
+
 /// `F_p` multiplications per affine addition in `E(F_{p³})`: measured by
 /// [`Fp3::adds_to_muls_ratio`] on construction and folded into the
 /// reports; this constant is only the fallback.
@@ -3119,6 +3122,30 @@ pub struct GaudryReport {
     pub max_large_primes: u8,
     pub lp_histogram: [u64; 5],
     pub lp_full_relations: u64,
+    /// Present only for the explicit protected-target comparison entry point.
+    /// Legacy serialization and counters are left unchanged for replay.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_backend: Option<LargePrimeBackend>,
+    /// Graph constructor (including primality) and feed events. These semantic
+    /// counts are not an instruction count or a fully priced native budget.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_graph_work: Option<pencil_symbolic_graph::meter::Snapshot>,
+    /// BLAKE3 of the factor base and every admitted projected relation, in
+    /// input order. Protected backends hash the same bytes; legacy runs do
+    /// not perform this additional diagnostic work.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_input_digest: Option<String>,
+    /// Hash input bytes (not a count of native hash instructions).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_input_hash_bytes: Option<u64>,
+}
+
+/// Auxiliary-column elimination for the protected-target comparison path.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LargePrimeBackend {
+    Pivot,
+    SymbolicGraph,
 }
 
 /// Options of a Gaudry-style run; see [`run_gaudry_opts`].
@@ -3691,6 +3718,41 @@ pub fn run_gaudry_opts(
     seed: u64,
     opts: &GaudryOptions,
 ) -> GaudryReport {
+    run_gaudry_impl(inst, base, seed, opts, None)
+}
+
+/// Compare pivot chaining and symbolic forests with the same algebraic oracle.
+/// Both backends protect the target column `small`, unlike the legacy pivot
+/// boundary retained by [`run_gaudry_opts`] for frozen evidence replay.
+/// The graph supports at most two surviving auxiliary variables and no merge
+/// cap. Unsupported configurations fail before sampling any residuals.
+pub fn run_gaudry_with_eliminator(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    seed: u64,
+    opts: &GaudryOptions,
+    backend: LargePrimeBackend,
+) -> GaudryReport {
+    if backend == LargePrimeBackend::SymbolicGraph {
+        assert!(
+            opts.max_large_primes <= 2,
+            "symbolic graph accepts at most two large variables"
+        );
+        assert_eq!(
+            opts.max_merge_level, 0,
+            "symbolic graph has no pivot merge-level cap"
+        );
+    }
+    run_gaudry_impl(inst, base, seed, opts, Some(backend))
+}
+
+fn run_gaudry_impl(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    seed: u64,
+    opts: &GaudryOptions,
+    backend: Option<LargePrimeBackend>,
+) -> GaudryReport {
     let max_residuals = opts.max_residuals;
     let solver = opts.solver;
     let cross_check = opts.cross_check;
@@ -3741,12 +3803,47 @@ pub fn run_gaudry_opts(
     curve.reset();
     let mut stats = SolveStats::default();
     let mut system = RelationSystem::new(n, unknowns);
-    let mut eliminator = LargePrimeEliminator::with_cap(small, n, opts.max_merge_level);
+    let mut eliminator = LargePrimeEliminator::with_cap(
+        small + usize::from(backend.is_some()),
+        n,
+        opts.max_merge_level,
+    );
+    let mut graph_eliminator = (backend == Some(LargePrimeBackend::SymbolicGraph)).then(|| {
+        graph::GraphEliminator::new(small, base.len() - small, n)
+            .expect("prime subgroup order required by symbolic graph")
+    });
+    let mut input_hasher = backend.map(|_| blake3::Hasher::new());
+    let mut input_hash_bytes = 0u64;
+    if let Some(hasher) = &mut input_hasher {
+        let domain = b"gaudry-cubic-projected-relations/v1\0";
+        hasher.update(domain);
+        input_hash_bytes += domain.len() as u64;
+        for value in [n, h, small as u64, base.len() as u64] {
+            hasher.update(&value.to_le_bytes());
+            input_hash_bytes += 8;
+        }
+        for point in &base.points {
+            hasher.update(&[u8::from(point.inf)]);
+            input_hash_bytes += 1;
+            for value in point.x.0.into_iter().chain(point.y.0) {
+                hasher.update(&value.to_le_bytes());
+                input_hash_bytes += 8;
+            }
+        }
+    }
     let mut full_rels: Vec<SparseRel> = Vec::new();
     let mut la_ops = 0u64;
     // The eliminator's share of `la_ops`, tracked alongside it so the solve's
     // share is the difference.
     let mut merge_ops = 0u64;
+    // The graph's constructor performs a deterministic primality check.
+    // Charge those multiplications rather than resetting its meter away.
+    if let Some(graph) = &graph_eliminator {
+        let constructor_muls = u64::try_from(graph.work.scalar_muls)
+            .expect("graph constructor multiplication count exceeds u64");
+        la_ops += constructor_muls;
+        merge_ops += constructor_muls;
+    }
     let mut la_attempts = 0u64;
     let mut next_attempt = unknowns;
     let mut la_rows_used = 0usize;
@@ -3799,6 +3896,10 @@ pub fn run_gaudry_opts(
         max_large_primes: max_lp,
         lp_histogram: [0; 5],
         lp_full_relations: 0,
+        lp_backend: backend,
+        lp_graph_work: None,
+        lp_input_digest: None,
+        lp_input_hash_bytes: None,
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
@@ -3932,11 +4033,28 @@ pub fn run_gaudry_opts(
                 cols,
                 rhs: mm(h % n, a, n),
             };
+            if let Some(hasher) = &mut input_hasher {
+                for value in [rep.residuals, rel.cols.len() as u64, rel.rhs] {
+                    hasher.update(&value.to_le_bytes());
+                    input_hash_bytes += 8;
+                }
+                for &(column, coefficient) in &rel.cols {
+                    hasher.update(&(column as u64).to_le_bytes());
+                    hasher.update(&coefficient.to_le_bytes());
+                    input_hash_bytes += 16;
+                }
+            }
             let full = if lp_count == 0 {
                 Some(rel)
             } else {
                 let before = la_ops;
-                let f = eliminator.feed(rel, &mut la_ops);
+                let f = if let Some(graph) = &mut graph_eliminator {
+                    graph
+                        .feed(rel, &mut la_ops)
+                        .expect("admitted Gaudry relation must fit graph")
+                } else {
+                    eliminator.feed(rel, &mut la_ops)
+                };
                 merge_ops += la_ops - before;
                 if f.is_some() {
                     rep.lp_full_relations += 1;
@@ -4032,6 +4150,9 @@ pub fn run_gaudry_opts(
     rep.lp_merge_ops = merge_ops;
     rep.lp_abandoned = eliminator.abandoned;
     rep.lp_mean_merge_depth = eliminator.mean_merge_depth();
+    rep.lp_graph_work = graph_eliminator.map(|graph| graph.work);
+    rep.lp_input_digest = input_hasher.map(|hasher| hasher.finalize().to_hex().to_string());
+    rep.lp_input_hash_bytes = backend.map(|_| input_hash_bytes);
     rep.la_rows = la_rows_used;
     rep.la_attempts = la_attempts;
     if opts.sparse_la {

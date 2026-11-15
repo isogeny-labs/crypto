@@ -170,3 +170,31 @@ kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
   `retries.max_attempts` = 2. Running it again needs an owner decision. The
   cpu-spot limit raise (`launch/criu/nodepool-change-20261107/patch-cpu-spot.sh`)
   still needs an operator.
+
+## 2026-11-15: cubic-extension symbolic graph comparison
+
+The same checkpoint/command-image access dependency also affects the native
+Rust integration at `research/extension_ic_graph_20261115/` on branch
+`feat/extension-ic-graph-elimination`. Its frozen cohort and holdouts are in
+`protocol.json`; the requested baseline/candidate measurements remain pending.
+[pcc:unverified]
+
+Observed in this Codex workspace: no `aws` executable, no checkpoint upload
+environment token or token file, and the checkpoint gate reports
+`no way to upload` / `cannot upload, so nothing was checkpointed` (raw output:
+`research/extension_ic_graph_20261115/validation/checkpoint-gate.log`). GitHub
+workflow metadata is readable; Actions permissions/variables endpoints returned
+HTTP 403. No workload was dispatched. [pcc:unverified]
+
+The next action is to use an existing authenticated lab runner/profile, pass
+checkpoint/publication/pool gates, and build a digest-pinned command image
+carrying `gaudry_cubic_graph_compare`. The maintained GitHub fixture image's
+`ecbench` executable does not itself expose this new comparison example.
+The frozen limit is USD 5, four CPUs, 8 GiB, 900 seconds and zero automatic
+retries. Local unit checks are not the requested EKS comparison. The user has
+been asked for an existing runner/profile location, not credential text.
+[pcc:unverified]
+
+This addition does not change the older arity/dreg findings or assert anything
+about their current credentials. Recheck when this session receives a configured
+runner/profile or checkpoint transport. The shared obstruction remains open.
