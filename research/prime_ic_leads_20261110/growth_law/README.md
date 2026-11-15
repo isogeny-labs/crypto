@@ -163,6 +163,16 @@ monotonicity and the intercepts, and the fit uses the observed step positions (`
 - `W = 3` reads 6 at `t = 10, 11, 12` and 7 at `t = 13`.
 - `W = 2` reads 7 at `t = 14` (the C-step prediction of Amendment 6, already registered).
 
+**Falsifying cell `W = 1`, `t = 12` (run 2026-11-14; development check, this host; `[pcc:unverified]`).**
+Rows `falsify/nullw1_m2_t12_k{0,1}.jsonl` (null arm, Kummer `P1`, seed `0x504B4D54`, binary sha256
+prefix `922f4082`, source commit in `falsify/source_commit.txt`). Two attempts to run the closure to
+degree 6 were killed by the 15 GB memory limit (`falsify/run_*_attempt{1,2}_oom.log`); the closure was
+then run to degree 5 (`--hky-cmax 5`), which decides the half of the prediction that tests the step.
+On both draws the degree-5 closure completes (55,455 columns, 6.8·10⁷ entries, about 500 s) without
+`1` and without censoring, so `d_F ≥ 6` at `t = 12`, against 5 at `t = 11`. **The predicted step at
+`t = 12` happened; Conjecture G survives this test.** That the value is exactly 6 (not 7) is not
+tested: the degree-6 closure needs a host with more than 15 GB.
+
 ## 6. What remains open, stated exactly
 
 **Update 2026-11-13** (`lower_bound/README.md`, written by a delegated agent and checked by the main

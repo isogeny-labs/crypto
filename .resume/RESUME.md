@@ -1,16 +1,14 @@
-# Resume: crypto @ aburan28/inspiring-dijkstra-ay05qi
+# Resume: crypto @ claude/ecstatic-edison-cgo57l
 
 ## Goal
-Owner (2026-11-14): "tune the rho dp bits and rerun" — after PR #4107 (Kuhn-Struik restarts), the multi-target rho was still 1.4-4.8x above sqrt(2Tn/6) steps, partly because dp bits grow with T.
+Owner (2026-11-14): work on hyperelliptic index calculus and make cross-genus statistical experiments possible: HCDLP at genus 2, 3, 4, 5 on one field, difficulty differences, Smith's isogeny, non-hyperelliptic curves.
 
 ## Spec
-examples/prime_fast_j0_rho_multi.rs: DP=<k> override, DPRULE=ks (2^dp ~ W/(T*2^DPDIV)), INST0 offset.
-Tune: DP sweep 2..12 on held-out instances INST0=10 (2 curves x 2 inst), cells 26/{20,200,1000}, 28/{200,1000,3000}, 30/{200,1000,3000}; pick a rule.
-Confirm: chosen rule on INST0=0 (the IC's planted targets) vs research/ic_e222_m221_20261106/results/pf_j0/symmulti_*.jsonl.
-Outputs: results/pf_j0/dpsweep/*.jsonl, results/pf_j0/rhotuned_*.jsonl.
+Frozen protocol: research/genus_ladder_20261114/PROTOCOL.md (frozen.sha256 beside it). Code: src/cryptanalysis/genus_ladder.rs, src/cryptanalysis/quartic_ladder.rs, src/bin/genus_ladder.rs, src/bin/genus_ladder_analyze.rs.
+Run (section 6 of the protocol): two `genus_ladder run` invocations -> part_a.jsonl, part_b.jsonl -> ladder.jsonl; then `genus_ladder_analyze ladder.jsonl analysis.json`; then `python3 render.py analysis.json` in the study directory.
 
 ## State
-2026-11-14 ~19:00Z: complete. DPDIV=1.5 fixed on held-out sweep; confirmed on INST0=0: rho/IC 0.13-0.40. Record 20261114T1854Z-j0-multirho-dp-tune closed; PR #4144 open with auto-merge.
+2026-11-14: code and unit tests done (5 ladder tests pass), protocol frozen, grid launched locally (4 vCPU container, no AWS identity, so no isolab-eks and no S3 push).
 
 ## Next
-Track PR #4144 to merge. Open threads: 26-bit T=20 lane overhead; interleaved rho vs folded BSGS; isolated host and §5a band.
+Collect part_a/part_b, analyze, RESULTS.md with the H1..H9 scorecard, figures, PDF, bench record, session log, PR.

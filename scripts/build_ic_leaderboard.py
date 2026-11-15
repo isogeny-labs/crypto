@@ -109,6 +109,7 @@ SOURCES = {
     "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
     "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
+    "k1_pt_lgrow": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -514,7 +515,69 @@ def attach_display_operation_costs(board: list[dict], names: Names) -> None:
 COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20261111-mt-fieldops-ic4",
                            "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
                            "benchmarks/20261112-mt-fieldops-v5",
-                           "research/quartic_dl1_cd_sqrt_20261113/combo/validation")
+                           "research/quartic_dl1_cd_sqrt_20261113/combo/validation",
+                           "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1")
+
+
+def gate_inputs(evidence: Path) -> set[str]:
+    """Repository paths the validation gate reads for `evidence`: its manifest,
+    certificate, validator report and the report's raw data."""
+    manifest = evidence / gate.MANIFEST
+    needed = {str(manifest.relative_to(REPO))}
+    if not manifest.is_file():
+        return needed
+    document = json.loads(manifest.read_text())
+    for key in ("replay_certificate", "validator_report"):
+        spec = document.get(key)
+        if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
+            continue
+        path = (evidence / spec["path"]).resolve()
+        if not path.is_relative_to(REPO):
+            continue  # validation_gate reports the invalid path
+        needed.add(str(path.relative_to(REPO)))
+        if key == "validator_report" and path.is_file():
+            report = json.loads(path.read_text())
+            for item in report.get("raw_data", []):
+                name = item.get("path") if isinstance(item, dict) else item
+                if isinstance(name, str):
+                    raw_path = (evidence / name).resolve()
+                    if raw_path.is_relative_to(REPO):
+                        needed.add(str(raw_path.relative_to(REPO)))
+    return needed
+
+
+def refuse_unpulled_store_inputs(needed: set[str]) -> None:
+    """Do not demote validated rows because their inputs are still in the artifact store.
+
+    tools/artifacts moves data files out of Git and leaves a `.artifacts.json`
+    pointer beside them.  A checkout that has not pulled them would otherwise
+    see "not a file" gate errors and demote a validated row (or abort on a
+    component that refuses to render unvalidated), so the generated page would
+    disagree with CI, which pulls first.
+    """
+    stored = []
+    for path in sorted(needed):
+        local = REPO / path
+        pointer = local.parent / ".artifacts.json"
+        if local.is_file() or not pointer.is_file():
+            continue
+        try:
+            files = json.loads(pointer.read_text()).get("files", {})
+        except (OSError, ValueError, AttributeError):
+            continue
+        if isinstance(files, dict) and local.name in files:
+            stored.append(path)
+    if stored:
+        raise SystemExit("leaderboard validation inputs live in the artifact store and are not "
+                         "pulled here; run `python3 tools/artifacts/artifacts.py pull` on these "
+                         "paths (as .github/workflows/ic-leaderboard.yml does) before generating:\n"
+                         + "\n".join(stored))
+
+
+def checked_evidence_dir(evidence: Path, repo: Path | None = None, *args) -> list[str]:
+    """gate.check_evidence_dir, after refusing unpulled artifact-store inputs."""
+    refuse_unpulled_store_inputs(gate_inputs(evidence))
+    return gate.check_evidence_dir(evidence, REPO if repo is None else repo, *args)
 
 
 def require_materialized_gate_inputs(board: list[dict]) -> None:
@@ -530,32 +593,12 @@ def require_materialized_gate_inputs(board: list[dict]) -> None:
     needed = {gate.PRE_GATE_LEADERBOARD, gate.SWEEPS["leaderboard"]}
     evidence_dirs = {gate.board_evidence_dir(row) for row in board} | set(COMPONENT_EVIDENCE_DIRS)
     for directory in sorted(evidence_dirs):
-        evidence = REPO / directory
-        manifest = evidence / gate.MANIFEST
-        needed.add(str(manifest.relative_to(REPO)))
-        if not manifest.is_file():
-            continue
-        document = json.loads(manifest.read_text())
-        for key in ("replay_certificate", "validator_report"):
-            spec = document.get(key)
-            if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
-                continue
-            path = (evidence / spec["path"]).resolve()
-            if not path.is_relative_to(REPO):
-                continue  # validation_gate reports the invalid path
-            needed.add(str(path.relative_to(REPO)))
-            if key == "validator_report" and path.is_file():
-                report = json.loads(path.read_text())
-                for item in report.get("raw_data", []):
-                    name = item.get("path") if isinstance(item, dict) else item
-                    if isinstance(name, str):
-                        raw_path = (evidence / name).resolve()
-                        if raw_path.is_relative_to(REPO):
-                            needed.add(str(raw_path.relative_to(REPO)))
+        needed |= gate_inputs(REPO / directory)
     missing = sorted(path for path in needed & sparse if not (REPO / path).is_file())
     if missing:
         raise SystemExit("leaderboard validation inputs are sparse-excluded; hydrate these "
                          "committed paths before generating:\n" + "\n".join(missing))
+    refuse_unpulled_store_inputs(needed)
 
 
 # ---------------------------------------------------------------------------
@@ -902,7 +945,7 @@ def prime_base_size_component() -> dict:
                    "identical in every counted and band-priced field. Over its 5 rounds, selected ÷ incumbent "
                    + " / ".join(f"{sh[w]['ratio_b_over_a']:.3f}" for w in ("0", "0.1", "1"))
                    + f" at w = 0 / 0.1 / 1 ({sh['0']['pairs']} pairs); report {study}/second-host/README.pdf.")
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/README.pdf",
             "second_host": second_host,
             "unit": "S = counted cost in GAE per sqrt(r), ecbench, native work priced at w GAE per operation",
@@ -946,7 +989,7 @@ def prime_ksum_component() -> dict:
                 acc.append({"ratio": o["ratio_b_over_a"], "ci95": o["ci95_bootstrap"], "pairs": o["pairs"]})
             cmps[name] = acc
         rows.append({"bits": bits, "mean_s": means, **cmps})
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "class": "engineering", "study": study + "/", "report": study + "/report.pdf",
             "readme": study + "/README.md",
             "track": "generic decomposition, bounded by sqrt(r), cannot beat rho",
@@ -985,7 +1028,7 @@ def packed_filter_component() -> dict:
     if not (j4["dgb/rho-neg"]["strict_same_order_across_band_every_curve"]
             and j4["dgbf/rho-neg"]["strict_same_order_across_band_every_curve"]):
         raise SystemExit(f"{study}: rho-neg order does not hold across the band")
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"study": study + "/", "readme": study + "/README.md", "report": study + "/REPORT.pdf",
             "class": "engineering", "track": "generic (prime-table; docs/ic/SWEEPER.md, Tracks)",
             "label": "whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table",
@@ -1046,7 +1089,7 @@ def generator_orbit_component() -> dict:
                      "lazy_over_layout": cmp(c, layout, lazy), "layout_over_gen": cmp(c, gen, layout),
                      "lazy_over_gen": cmp(c, gen, lazy), "gen_over_rho_frob": cmp(c, "rho-frob", gen),
                      "band_gen": band(c, gen), "band_lazy": band(c, lazy), "band_rho_frob": band(c, "rho-frob")})
-    errors = gate.check_evidence_dir(REPO / study)
+    errors = checked_evidence_dir(REPO / study)
     validation = ("Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study "
                   "directory: replay certificate, validator report, §5a-banded rho-frob reference)."
                   if not errors else NOT_VALIDATED + " Gate: " + "; ".join(errors) + ".")
@@ -1100,25 +1143,25 @@ def k4_v4_component() -> dict:
     e27_study = "research/e27_walk_20261030"
     if (e27.get("experiment") != "e27" or e27.get("all_walks_identical") is not True
             or not all(z["other_fields_equal"] for z in e27["rows"])
-            or gate.check_evidence_dir(REPO / e27_study, REPO)):
+            or checked_evidence_dir(REPO / e27_study, REPO)):
         raise SystemExit("review the E27 walk summary and its VALIDATION.json before updating the leaderboard")
     span = lambda key, i: [min(z[key][i] for z in e27["rows"]), max(z[key][i] for z in e27["rows"])]
     e30 = load(SOURCES["glv_e30"])
     e30_study = "research/e30_invariants_lite_20261030"
     if (e30.get("experiment") != "e30" or not all(z["other_fields_equal"] for z in e30["rows"])
-            or gate.check_evidence_dir(REPO / e30_study, REPO)):
+            or checked_evidence_dir(REPO / e30_study, REPO)):
         raise SystemExit("review the E30 audit summary and its VALIDATION.json before updating the leaderboard")
     span30 = lambda f: [min(f(z) for z in e30["rows"]), max(f(z) for z in e30["rows"])]
     e32 = load(SOURCES["glv_e32"])
     e32_study = "research/e32_handover_ladder_20261031"
     if (e32.get("experiment") != "e32" or e32.get("rows_at_or_below_rho_any_weight") != 0
             or not all(c["ic_correct"] and c["walks_correct"] for c in e32["curves"])
-            or gate.check_evidence_dir(REPO / e32_study, REPO)):
+            or checked_evidence_dir(REPO / e32_study, REPO)):
         raise SystemExit("review the E32 ladder summary and its VALIDATION.json before updating the leaderboard")
     e33 = load(SOURCES["glv_e33"])
     e33_study = "research/e33_solver_b_pivot_count_20261031"
     if (e33.get("experiment") != "e33" or e33.get("e2e_identity_ok") is not True
-            or gate.check_evidence_dir(REPO / e33_study, REPO)):
+            or checked_evidence_dir(REPO / e33_study, REPO)):
         raise SystemExit("review the E33 pivot-count summary and its VALIDATION.json before updating the leaderboard")
     e34 = load(SOURCES["glv_e34"])
     e34_study = "research/e34_twist24_cheap_rep_20261031"
@@ -1130,7 +1173,7 @@ def k4_v4_component() -> dict:
     v40 = e40.get("verdict", {})
     if (not v40.get("V_ranked_vs_A_registered_rule") or not v40.get("e2e_identity")
             or v40.get("G2.208_kill_fired") is not False
-            or gate.check_evidence_dir(REPO / e40_study, REPO)):
+            or checked_evidence_dir(REPO / e40_study, REPO)):
         raise SystemExit("review the E40 Macaulay-entries summary and its VALIDATION.json before updating the leaderboard")
     e41 = load(SOURCES["glv_e41"])
     e41_study = "research/e41_twist24_shortfall_20261102"
@@ -1142,7 +1185,7 @@ def k4_v4_component() -> dict:
     e39_study = "research/e39_pivot_rules_confirm3_20261102"
     if (e39.get("experiment") != "e39" or e39.get("e2e_identity_ok") is not True
             or not all(ok for _, ok in e39["verdict_checks"]["G2.201_rank_with_gates"])
-            or gate.check_evidence_dir(REPO / e39_study, REPO)):
+            or checked_evidence_dir(REPO / e39_study, REPO)):
         raise SystemExit("review the E39 pivot-rule summary and its VALIDATION.json before updating the leaderboard")
     rho39 = {}
     for r in e39["rho_ranges"]:
@@ -1247,7 +1290,7 @@ def postgb_linear_stage_component() -> dict:
     if d.get("schema") != "postgb_linear_stage.summary/v1" or not d["gates"]["pass"]:
         raise SystemExit(f"{SOURCES['postgb_linear_stage']}: unexpected schema or a failed correctness gate")
     study = "research/postgb_linear_stage_20261026"
-    errs = gate.check_evidence_dir(REPO / study / "validation", REPO)
+    errs = checked_evidence_dir(REPO / study / "validation", REPO)
     fams = []
     for f, v in d["sparse_over_fast"].items():
         dn = d["dense_over_fast"].get(f)
@@ -1308,7 +1351,7 @@ def ic_cover_weakclass_component() -> dict:
                      "ratio_min": per_p[p]["ratio_S_A_over_S_B"]["min"],
                      "ratio_max": per_p[p]["ratio_S_A_over_S_B"]["max"],
                      "before": band(base), "after": band(lever)})
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "slope": d["slope_A"][0], "slope_engineer": d["slope_B"][0],
             "class": "engineering",
             "unit": "S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread",
@@ -1342,7 +1385,7 @@ def jv_sieve_line_vs_rho_component() -> dict:
                          "s": cell("S/rho U2")["point"], "lo": cell("S/rho U2")["lo"], "hi": cell("S/rho U2")["hi"],
                          "band": [b["point"] for b in band], "band_hi": max(b["hi"] for b in band),
                          "below": all(b["verdict"] == "below" for b in band)})
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     walk = load("research/jv_walk_charge_20261111/analysis.json")
     w512 = walk["by_M"]["512"]["pooled"]
     walk_note = (f"The isogeny walk into the class from a non-weak start (M = 512 random moves) is charged separately in "
@@ -1360,6 +1403,109 @@ def jv_sieve_line_vs_rho_component() -> dict:
                            "replay certificate, validator report and the matched negation-map rho reference "
                            f"with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
             "validated": not errs}
+
+
+K1_PT_LGROW_EVIDENCE = "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1"
+
+
+def k1_pt_lgrow_component(names: Names) -> dict:
+    """Two K1 Koblitz one-target cold rows in ecbench's counted GAE: the ic.pipeline pair-table
+    factor base sized for n (dimension 9 at n = 23, 10 at n = 29) against the fixed dimension 7
+    (the before mark) and strong signed-Frobenius rho, all three arms on the same 8 targets x 5
+    rounds in the same ecbench session (ml-cryptanalysis experiments/fb-pt-lgrow-k1, copied with
+    its validation into research/ml_cryptanalysis_pt_lgrow_k1_20261114).  The numbers are copied
+    from the directory's summary.json (recomputed there from the session records with the
+    section 5a band) and cross-checked here against the validated VALIDATION.json.  The unit is
+    not table A's (a clock reading in batched additions), table B's (GAE from the ic boundary
+    calibration, prime and random-binary curves, negation rho) or table C's (32-target batch), so
+    the rows sit in their own section outside tables A-C and are never ranked against them."""
+    summ = load(SOURCES["k1_pt_lgrow"])
+    errs = checked_evidence_dir(REPO / K1_PT_LGROW_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{K1_PT_LGROW_EVIDENCE}: not validated; the K1 pair-table rows cannot be shown: "
+                         + "; ".join(errs))
+    man = json.loads((REPO / K1_PT_LGROW_EVIDENCE / gate.MANIFEST).read_text())
+    ref = man["rho_reference"]
+    if (summ.get("schema") != "crypto.ic_k1_pt_lgrow_summary/v1" or ref.get("kind") != "negation_frobenius"
+            or ref.get("order_holds_across_band") is not True or len(summ["rows"]) != 2):
+        raise SystemExit(f"{SOURCES['k1_pt_lgrow']}: review the summary and its VALIDATION.json")
+    rows = []
+    for r in summ["rows"]:
+        n = str(r["n"])
+        c = names(r["slug"])
+        if c["slug"] != r["slug"] or int(c["order"]) != r["group_order"] or r["r"] * r["cofactor"] != r["group_order"]:
+            raise SystemExit(f"{r['slug']}: curve identity disagrees with docs/curves/registry.json")
+        if abs(r["log2_r"] - ref["log2_r_by_n"][n]) > 5e-5:
+            raise SystemExit(f"{r['slug']}: log2 r disagrees with VALIDATION.json")
+        for w, b in r["band"].items():
+            checks = ((b["gap_after_bits"], ref["gap_to_rho_bits"]["ic_lstar"][n][w]),
+                      (b["gap_before_bits"], ref["gap_to_rho_bits"]["ic_pt_l7"][n][w]),
+                      (b["delta_bits"], ref["R_lstar_vs_l7_bits"][f"n{n}"][w]["R"]),
+                      (b["s_after"], ref["gae_band_by_n"][n][w]["ic_lstar"]),
+                      (b["s_before"], ref["gae_band_by_n"][n][w]["ic_pt_l7"]),
+                      (b["s_rho"], ref["gae_band_by_n"][n][w]["rho"]))
+            if any(not math.isclose(x, y, rel_tol=5e-5, abs_tol=5e-5) for x, y in checks):
+                raise SystemExit(f"{r['slug']} w = {w}: summary.json disagrees with VALIDATION.json")
+            if not (b["gap_after_ci95"][0] > 0 and b["delta_ci95"][0] > 0):
+                raise SystemExit(f"{r['slug']} w = {w}: the row's order no longer holds")
+        rows.append({**r, "ec1": c.get("ec1"), "first_ic_on_curve": r["n"] == 29})
+    return {"rows": rows, "source": SOURCES["k1_pt_lgrow"], "unit": summ["unit"], "isolation": summ["isolation"],
+            "provenance": summ["source"], "class": "engineering (parameter re-selection at fixed n)",
+            "study": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/",
+            "report": K1_PT_LGROW_EVIDENCE + "/report.md",
+            "figure": K1_PT_LGROW_EVIDENCE + "/figures/fig_lgrow_gap.png",
+            "not_a_row": summ["not_a_row"],
+            "validation": ("validated: replay certificate, validator report (VAL-20261114-d9190c) and the matched "
+                           "strong signed-Frobenius rho reference with the §5a band "
+                           f"({K1_PT_LGROW_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def k1_pt_lgrow_text(k: dict) -> dict:
+    """The K1 pair-table section's prose and cells, shared by the Markdown and the HTML."""
+    W = ("0", "0.1", "1")
+    cells = []
+    for r in k["rows"]:
+        b = r["band"]
+        cells.append({
+            "slug": r["slug"], "n": r["n"],
+            "r": f"2^{r['log2_r']:.2f} ({r['r']}, cofactor {r['cofactor']})",
+            "recipe": f"{r['recipe']['method']}: {r['recipe']['factor_base']}, {r['recipe']['oracle']}",
+            "gap": " / ".join(f"{b[w]['gap_after_bits']:.2f}" for w in W),
+            "gap_ci": " / ".join(f"[{b[w]['gap_after_ci95'][0]:.2f}, {b[w]['gap_after_ci95'][1]:.2f}]" for w in W),
+            "before": " / ".join(f"{b[w]['gap_before_bits']:.2f}" for w in W),
+            "delta": " / ".join(f"{b[w]['delta_bits']:.2f}" for w in W),
+            "delta_ci": " / ".join(f"[{b[w]['delta_ci95'][0]:.2f}, {b[w]['delta_ci95'][1]:.2f}]" for w in W),
+            "s": " / ".join(f"{b[w]['s_after']:.2f}" for w in W),
+            "s_rho": " / ".join(f"{b[w]['s_rho']:.3f}" for w in W),
+            "bitop": f"{r['bitop']['gap_after_bits']:.2f} (before {r['bitop']['gap_before_bits']:.2f})",
+            "targets": f"{r['targets']} × {r['rounds']}",
+        })
+    pv = k["provenance"]
+    intro = ("One target per process, cold (every phase, the pair table included, priced for the one target), on two "
+             "K1 Koblitz curves. Unit: " + k["unit"] + ". Reference: strong signed-Frobenius rho (all 2n automorphisms, "
+             "negation × Frobenius) on the same targets in the same ecbench session and binary; every solve of every "
+             "arm verified. The before mark is the same pipeline with the fixed pair-table dimension 7 on the same "
+             "targets, the figure this row supersedes. Gap = log2(S_IC / S_rho) at w = 0 / 0.1 / 1 GAE per native "
+             "operation: the distance remaining to rho, not a pass/fail gate. " + k["isolation"] + ". Class: "
+             + k["class"] + ".")
+    caveats = [
+        "Rho is cheaper than both rows at every weight and in bitop/v1: these gaps are the distance remaining.",
+        "The improvement over dimension 7 is an engineering improvement at fixed n. " + k["not_a_row"]
+        + "; it is not shown as a row.",
+        "These rows rank only against their own before mark, never against tables A–C or other sections: table C's "
+        "K1 n = 23 figure is a 32-target batch, pre-gate figure in another unit (a batched-addition clock against batch "
+        "rho), table A is a clock reading too, and the Frobenius-orbit component sections above measure other methods "
+        "on K1 n = 29 under other protocols.",
+        "K1 n = 29 has r = 2^15.37 (cofactor 12646), a smaller prime subgroup than K1 n = 17's 2^16.0, so n here is "
+        "the field degree, not a problem size; at n = 29 rho is set-up dominated.",
+        "Dimensions 9 and 10 were chosen on two disclosed sizing targets per n, separate from the measured targets. "
+        "Records are L0 (counted cost; wall time not certified); the replays used the producer's binary.",
+    ]
+    prov = (f"Evidence copied from {pv['repository']} {pv['path']} at {pv['branch']} {pv['commit'][:8]} "
+            f"({pv['validation_id']})"
+            + (f"; validator files from {pv['validator_files_redacted_at']}" if pv.get("validator_files_redacted_at") else "") + ".")
+    return {"cells": cells, "intro": intro, "caveats": caveats, "provenance": prov}
 
 
 def d4_char2_frob_roots_component() -> dict:
@@ -1393,7 +1539,7 @@ def d4_char2_frob_roots_component() -> dict:
         if o.get("status") != "ok" or not o.get("same_seeds"):
             raise SystemExit(f"{SOURCES[key]}: comparison not ok or seeds differ")
         paired[m] = {"ratio": o["ratio_b_over_a"], "ci95": o["ci95"], "pairs": o["pairs"]}
-    errs = gate.check_evidence_dir(REPO / study, REPO)
+    errs = checked_evidence_dir(REPO / study, REPO)
     return {"rows": rows, "paired": paired, "class": "engineering",
             "unit": "S = counted cost in GAE per sqrt(r), ecbench",
             "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["d4_char2_m12"],
@@ -1441,7 +1587,7 @@ def aimed_gather_component() -> dict:
         raise SystemExit(f"{SOURCES['aimed_gather_corrected']}: unexpected schema")
     if not d.get("identity_ok") or d.get("rounds_kept") != 42:
         raise SystemExit(f"{SOURCES['aimed_gather']}: an identity failure or an incomplete session")
-    errs = gate.check_evidence_dir(REPO / AIMED_GATHER_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / AIMED_GATHER_EVIDENCE, REPO)
 
     def pick(s, metric):
         def one(q):
@@ -1859,7 +2005,7 @@ def mt_fieldops_component() -> dict:
     (analyze.py); I/M = 10, h in {0, 0.1, 1}. A multi-target regime outside tables A-C; its standing comes from the
     benchmarks directory's VALIDATION.json."""
     summary = load(SOURCES["mt_fieldops_component"])
-    errs = gate.check_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / MT_FIELDOPS_EVIDENCE, REPO)
     cells = sorted({(x["bits"], x["T"]) for x in summary})
     rows = []
     for bits, t in cells:
@@ -2097,7 +2243,7 @@ def ghs_weak_cd_chain() -> dict:
     seeds 1..3 of the per-seed cold M-eq ratio, frozen grid constants; additions priced at 0, 0.5 and 1 M-eq). Its
     standing comes from combo/validation/VALIDATION.json."""
     a = load(SOURCES["ghs_weak_cd_chain"])
-    errs = gate.check_evidence_dir(REPO / GHS_CD_CHAIN_EVIDENCE, REPO)
+    errs = checked_evidence_dir(REPO / GHS_CD_CHAIN_EVIDENCE, REPO)
     qs = (262111, 524287, 1048507, 2097091, 4194271)
     rows = []
     for y in ("DL", "DL1", "D"):
@@ -2955,6 +3101,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "postgb_linear_stage_component": postgb_linear_stage_component(),
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
         "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
+        "k1_pt_lgrow_component": k1_pt_lgrow_component(names),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -3372,6 +3519,20 @@ def markdown(doc: dict) -> str:
                  + " / ".join(f"{x:.3f}" for x in r["band"]) + f" | {'yes' if r['below'] else 'no'} |")
     L += ["", f"[Report]({'../../' + js['report']}) · [study](../../{js['study']}) · "
               f"[data](../../{js['source']}).", "", js["validation"], ""]
+    kp = doc["k1_pt_lgrow_component"]
+    kt = k1_pt_lgrow_text(kp)
+    L += ["## K1 Koblitz, one target, ecbench counted GAE: pair-table factor base sized for n (outside tables A–C)", "",
+          kt["intro"], "",
+          "| curve | n | r | recipe | gap to rho, bits (w = 0 / 0.1 / 1) [95%] | before: dimension 7 | "
+          "improvement, bits [95%] | S, IC (w = 0 / 0.1 / 1) | S, rho (w = 0 / 0.1 / 1) | bitop/v1 gap | targets × rounds |",
+          "|:--|--:|:--|:--|:--|:--|:--|:--|:--|:--|:--|"]
+    for c in kt["cells"]:
+        L.append(f"| `{c['slug']}` | {c['n']} | {c['r']} | `{c['recipe']}` | **{c['gap']}** {c['gap_ci']} | "
+                 f"{c['before']} | {c['delta']} {c['delta_ci']} | {c['s']} | {c['s_rho']} | {c['bitop']} | "
+                 f"{c['targets']} |")
+    L += [""] + [f"- {x}" for x in kt["caveats"]]
+    L += ["", f"[Report](../../{kp['report']}) · [study](../../{kp['study']}) · [data](../../{kp['source']}). "
+              + kt["provenance"], "", kp["validation"], ""]
     d4 = doc["d4_char2_frob_roots_component"]
     L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
           "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
@@ -4926,6 +5087,25 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table></div>'
              f'<p>{gh(js["report"], "Report")} · {gh(js["study"], "study")} · {gh(js["source"], "data")}.</p>'
              f'<p class="muted">{esc(js["validation"])}</p></section>')
+    kp = doc["k1_pt_lgrow_component"]
+    kt = k1_pt_lgrow_text(kp)
+    P.append('<section class="panel" id="k1-pair-table-lgrow"><h2>K1 Koblitz, one target, ecbench counted GAE: '
+             'pair-table factor base sized for n <span class="chip">outside tables A–C</span> '
+             '<span class="chip">engineering</span></h2>'
+             f'<p>{esc(kt["intro"])}</p><div class="scroll"><table><thead><tr><th>Curve</th><th>n</th><th>r</th>'
+             '<th>Recipe</th><th>Gap to rho, bits (w = 0 / 0.1 / 1) [95%]</th><th>Before: dimension 7</th>'
+             '<th>Improvement, bits [95%]</th><th>S, IC (w = 0 / 0.1 / 1)</th><th>S, rho (w = 0 / 0.1 / 1)</th>'
+             '<th>bitop/v1 gap</th>'
+             '<th>Targets × rounds</th></tr></thead><tbody>')
+    for c in kt["cells"]:
+        P.append(f'<tr><td><code>{esc(c["slug"])}</code></td><td>{c["n"]}</td><td>{esc(c["r"])}</td>'
+                 f'<td><code>{esc(c["recipe"])}</code></td><td><b>{c["gap"]}</b> {c["gap_ci"]}</td>'
+                 f'<td>{c["before"]}</td><td>{c["delta"]} {c["delta_ci"]}</td><td>{c["s"]}</td><td>{c["s_rho"]}</td>'
+                 f'<td>{esc(c["bitop"])}</td><td>{c["targets"]}</td></tr>')
+    P.append('</tbody></table></div><ul>' + "".join(f"<li>{esc(x)}</li>" for x in kt["caveats"]) + '</ul>'
+             f'<p>{gh(kp["report"], "Report")} · {gh(kp["study"], "study")} · {gh(kp["source"], "data")}. '
+             f'{esc(kt["provenance"])}</p>'
+             f'<p class="muted">{esc(kp["validation"])}</p></section>')
     d4 = doc["d4_char2_frob_roots_component"]
     P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
              'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
