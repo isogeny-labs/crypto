@@ -30,6 +30,79 @@ contents, artifact transfer, schema-valid build identity and independent
 verification together. Extend negative identity tests; do not weaken
 existing checks or silently add unsupported schema fields.
 
+## Partition leads and first experiments
+
+The following are candidate mechanisms, not new literature claims or measured
+improvements. Cosets and low-degree maps already appear in the
+[source review](../aps_leads_20261105/SOURCES.md). Start with structural
+correctness experiments; performance collection remains subject to the
+admission steps below.
+
+| Lead | Proposed partition rule | Falsification target |
+| --- | --- | --- |
+| Solver signatures | Bucket coordinates by cheap specialization features: degree/support and leading-coefficient zero patterns under fixed other domains | Reject a speed interpretation if signature construction plus solving costs more than the matched ordinary partition, or yields fewer useful relations without compensation |
+| Coloring families | Try a bounded, deterministic family of point-to-slot colorings; assign each represented tuple to its first qualifying coloring | Reject any completeness assertion if exact enumeration finds an uncovered tuple; retain and report partial coverage |
+| Rational-map fibers | Bucket known labeled coordinates through a fixed low-degree rational map | Reject if denominator handling, label acquisition or elimination of the graph relation erases the saving |
+| Coefficient cancellation | Search a labeled pool for subsets whose vanishing polynomials have prescribed missing coefficients | Charge the search and reject if the reduced relation system is no easier at matched coverage |
+| Pair-sum compatibility | Form compatible pair blocks using their actual group sums before algebraic solving | Charge construction, memory and joins; compare with an ordinary group join as well as the polynomial baseline |
+
+### First experiment: coloring coverage, without timing
+
+Question: can a bounded family recover tuples excluded by a single partition
+without duplicating tuples in the represented union?
+
+Proposed native scope: a small partition-lab module plus focused tests, with
+no change to existing solver identities or frozen receipts. Begin with
+synthetic distinct point IDs, arities three and four, population at most
+twelve IDs and a family cap of thirty-two colorings. This is a combinatorial
+correctness experiment, not a solver or timing experiment. Stop at the cap;
+do not silently add colorings until a desired outcome appears.
+
+Controls: one fixed coloring, repeated identical colorings, renamed colors,
+an intentionally uncovered tuple and an exhaustive small-domain reference.
+Compute the qualifying-coloring predicate separately in the reference.
+Require exact equality between the represented union and reference union,
+and exactly one first-owner assignment for each represented tuple. An
+incomplete family must return its explicit uncovered population. Distinct
+point IDs, original slot labels, group signs and coordinate canonicalization
+are separate concepts; do not infer one from another.
+
+Only after those checks should real labeled APS pools be integrated. Freeze
+the color family before held-out relation outcomes are observed. Retain
+original point representations and informative-relation checks. Build and
+validate an independent full-domain relation set, then compare the union of
+family cells with that reference. A tuple excluded by the family is a missing
+decomposition, not evidence that the method cannot solve the target.
+
+### Second experiment: specialization buckets, without timing
+
+Question: can cheap signatures predict compatible certified trace reuse
+without using relation outcomes as features?
+
+Use fixed labeled pools and public input polynomials. Begin with degree,
+support and leading-coefficient zero patterns only. Do not solve the
+specialization to assign its bucket. Freeze the feature definition and
+assignment before held-out targets. Compare random partitions, signature
+buckets with trace disabled, and the same buckets with certified trace reuse;
+this separates partitioning from the existing reuse mechanism.
+
+Require literal-equation and complete-root agreement with the ordinary
+reference. Include a poisoned trace, incompatible signature and degenerate
+leading coefficient; each must retain the existing certification/fallback
+behavior. Acceptance/refusal and coverage are diagnostic observations, not a
+speed conclusion. Record all feature construction and fallback work for the
+later admitted cost comparison.
+
+### Implementation and execution boundary
+
+The current Conductor exception covers this documentation-only PR. Native
+partition-lab edits and correctness tests need a task/scope or an explicit
+owner extension of that exception. No native implementation or experiment
+result is asserted here. Performance trials additionally need the frozen
+design, prospective checkpoint and accounting/replay/admission below.
+Register native claims before public citation of resulting observations;
+registration does not authorize publishing the withheld native ledger.
+
 ## Before any measurement
 
 1. Obtain the existing project's native Conductor task and current scope.
