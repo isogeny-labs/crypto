@@ -38,3 +38,5 @@ See [preflight](preflight.json), [proof map](proof-map.json), [source plan](sour
 Full scheme/divisor API comparison, general divisor basechange/Galois descent, translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonical Weil–Tate/MOV–FR and the remaining fourteen-item obligations stay open. No canonical corpus promotion or new backend/runtime/physical-host assurance is claimed. The parent immutable-ledger issue remains unresolved in this session; no rechain/force/rebase/retarget/merge is performed. [pcc:unverified]
 
 Exact local **PCC-20261115-29cf72** replay PASS at 2026-11-15T13:08:48Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `f766849b954a005b82a53493e8f5076ebcf6227f` and local receipt `73430998d79089a994ae2c8a7dd26e5a63ab432a` share tree `4ce7d8317919a79cc2589c4bb21b669d84dfb20c`. Anonymous fetch completed; fresh PR head/body/open/ready matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
