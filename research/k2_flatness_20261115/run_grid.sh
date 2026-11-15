@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Frozen grid of PROTOCOL.md. Usage: run_grid.sh <k2close binary> <cpu lock> <out.jsonl>
+# Frozen grid of PROTOCOL.md. Usage: flock <cpu lock> run_grid.sh <k2close binary> <cpu lock> <out.jsonl>
 set -euo pipefail
 B=$1; L=$2; OUT=$3
-run() { flock "$L" "$B" "$@" >> "$OUT"; }
+run() { "$B" "$@" >> "$OUT"; }  # the caller holds the CPU lock for the whole grid
 for s in 1 2; do run --cell P --m 2 --n 16 --k 8 --targets 2 --dmin 2 --dmax 5 --seed $s; done
 for s in 1 2; do run --cell P --m 2 --n 20 --k 10 --targets 2 --dmin 2 --dmax 5 --seed $s; done
 run --cell N --m 3 --n 12 --k 4 --targets 1 --dmin 3 --dmax 4 --pres random --seed 1
