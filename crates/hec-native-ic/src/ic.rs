@@ -184,7 +184,7 @@ pub fn solve_dlp(curve: &Curve, d1: &Div, d2: &Div, ell: u64, params: &IcParams)
         if rows.len() >= wanted {
             let t = Instant::now();
             rep.solve_rounds += 1;
-            let k = solve_for_last(&rows, m, ell, params.solver, &mut rep.solve);
+            let k = solve_for_last(&rows, m, ell, params.solver, &steps, &mut rep.solve);
             rep.solve_ns += t.elapsed().as_nanos();
             if let Some(k) = k {
                 if curve.mul(d1, k) == *d2 {
@@ -269,6 +269,41 @@ mod tests {
                         f.solve.row_ops,
                         f.solve.mulmods
                     ),
+                    "g={g} p={p} seed={seed}"
+                );
+            }
+        }
+    }
+    /// G6 on small rows (PLAN.md §8): the dense-block solver gives the same
+    /// run as the S2a solver — same `k`, trials, relations, solve rounds.
+    #[test]
+    fn dense_solver_agrees() {
+        use crate::solve::Solver;
+        for &(g, p) in &[
+            (2usize, 251u64),
+            (2, 503),
+            (3, 61),
+            (3, 211),
+            (4, 31),
+            (4, 61),
+        ] {
+            let inst = pick_instance(p, g).unwrap();
+            let k_true = inst.ell / 3 + 7;
+            let d2 = inst.curve.mul(&inst.d1, k_true);
+            for seed in 0..3u64 {
+                let run = |solver| {
+                    let params = IcParams {
+                        seed: 20260916 + seed,
+                        solver,
+                        ..IcParams::default()
+                    };
+                    solve_dlp(&inst.curve, &inst.d1, &d2, inst.ell, &params)
+                };
+                let (fa, de) = (run(Solver::Fast), run(Solver::Dense));
+                assert_eq!(de.k, Some(k_true));
+                assert_eq!(
+                    (fa.k, fa.trials, fa.relations, fa.solve_rounds),
+                    (de.k, de.trials, de.relations, de.solve_rounds),
                     "g={g} p={p} seed={seed}"
                 );
             }

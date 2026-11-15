@@ -61,6 +61,38 @@ equation, since ICV1 covers elliptic curves only. Record: `20261114T0356Z-hec-na
 Source of truth:
 [`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261114T0356Z/).
 
+The [14 November S2b dense step-column block](20261114-hec-s2b-dense-solve/)
+([PDF](20261114-hec-s2b-dense-solve/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a second
+solver change on the same eleven rows, five repeats of five seeds each. Record:
+`20261114T2233Z-hec-s2b-dense-solve`.
+
+- **Exactness.** `Solver::Dense` gives the same `k`, trials, relations and solve rounds as S2a on all
+  275 runs; all 550 solves check `k·D₁ = D₂`.
+- **Solve.** At genus 2, p ≥ 503, the median paired S2a/Dense solve ratio is 4.04–5.75×, and the solve
+  falls to 18–26% of native wall time. Dense does 2.5–52% more multiplications mod ℓ there; the gain
+  is memory layout.
+- **External comparison: not run.**
+- **Unvalidated.** The host was shared (load average 81–95), not L0, and only wall clock was measured.
+  There is no `VALIDATION.json` and no matched rho, so it remains outside the admitted table.
+  [pcc:unverified]
+
+Source of truth:
+[`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261114T2233Z/).
+
+The [14 November S3 inversion hygiene](20261114-hec-s3-inversion-hygiene/)
+([PDF](20261114-hec-s3-inversion-hygiene/REPORT.pdf)) keeps documentary copies of the first T2
+slice. Record: `20261115T0426Z-hec-s3-inversion-hygiene`.
+
+- **Exactness.** The old and new builds give identical stream hashes and identical runs.
+- **Counts.** Field inversions per walk step fall from 6.5–9.0 to 3.0–4.5. Per genus-3/4 oracle call
+  they fall from 9.4–16.2 to 3.6–5.2. The ≤ 5 bar fails on two genus-4 rows.
+- **Timing: not determined.** The A/A floor failed in both sets, at load average 50–401.
+- **Unvalidated.** This was a shared host. There is no `VALIDATION.json`, so the slice stays outside
+  the admitted table. [pcc:unverified]
+
+Source of truth:
+[`research/hec_ic_speedup_20261113/`](../research/hec_ic_speedup_20261113/reports/run-20261115T0426Z/).
+
 The [10 November tm1514 recheck at k = 24](20261110-tm1514-recheck/)
 ([PDF](20261110-tm1514-recheck/REPORT.pdf)) keeps documentary PDF/SVG/PNG copies of a
 frozen re-measurement of the ledger incumbent (`wwalkGg-x09-sr-n2`) against matched
