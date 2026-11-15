@@ -110,6 +110,7 @@ SOURCES = {
     "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
     "jv_sieve_line_vs_rho": "research/jv_sieve_line_vs_rho_20261103/fit.json",
     "k1_pt_lgrow": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summary.json",
+    "tableb_ksum": "research/ic_tableb_ksum_20261115/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -175,6 +176,7 @@ SOURCES = {
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "ghs_weak_n4v2": "research/quartic_n4v2_20261020/results/summary.json",
     "ghs_weak_cd_chain": "research/quartic_dl1_cd_sqrt_20261113/combo/analysis.json",
+    "ghs_weak_relstage": "research/ic_gw_fasthash_20261114/analysis.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -516,7 +518,9 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "benchmarks/20261111-mt-fieldops-v3", "benchmarks/20261112-mt-fieldops-v4",
                            "benchmarks/20261112-mt-fieldops-v5",
                            "research/quartic_dl1_cd_sqrt_20261113/combo/validation",
-                           "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1")
+                           "research/ic_gw_fasthash_20261114/validation",
+                           "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
+                           "benchmarks/20261115-tableb-ksum")
 
 
 def gate_inputs(evidence: Path) -> set[str]:
@@ -1508,6 +1512,126 @@ def k1_pt_lgrow_text(k: dict) -> dict:
     return {"cells": cells, "intro": intro, "caveats": caveats, "provenance": prov}
 
 
+TABLEB_KSUM_EVIDENCE = "benchmarks/20261115-tableb-ksum"
+TABLEB_KSUM_STUDY = "research/ic_tableb_ksum_20261115"
+TABLEB_KSUM_TITLE = ("Table B prime rows re-measured with the k = 5 sum table (2026-11-15, counted component "
+                     "improvement, outside tables A-C)")
+
+
+def tableb_ksum_component() -> dict:
+    """Three Table B prime rows re-measured with the k = 5 sum table (frozen study
+    research/ic_tableb_ksum_20261115), in ecbench's counted GAE with native work priced at
+    w = 0, 0.1 and 1.  Everything is copied from the study's summary.json; nothing is recomputed
+    here.  Table B's recorded figures are another harness's before marks and are shown, never
+    divided into the new S.  Requires the validation gate's VALIDATION.json."""
+    summ = load(SOURCES["tableb_ksum"])
+    errs = checked_evidence_dir(REPO / TABLEB_KSUM_EVIDENCE, REPO)
+    if errs:
+        raise SystemExit(f"{TABLEB_KSUM_EVIDENCE}: not validated (VALIDATION.json missing or failing); "
+                         "the Table B k = 5 rows cannot be shown: " + "; ".join(errs))
+    man = json.loads((REPO / TABLEB_KSUM_EVIDENCE / gate.MANIFEST).read_text())
+    ref = man.get("rho_reference")
+    if not isinstance(ref, dict) or not all(isinstance(ref.get(k), str) and ref[k].strip()
+                                            for k in ("kind", "protocol", "unit", "binary_or_process")):
+        raise SystemExit(f"{TABLEB_KSUM_EVIDENCE}/VALIDATION.json: rho_reference descriptors are missing")
+    check_tableb_ksum_summary(summ)
+    return {"rows": summ["rows"], "source": SOURCES["tableb_ksum"], "study": TABLEB_KSUM_STUDY + "/",
+            "report": TABLEB_KSUM_STUDY + "/report.pdf", "protocol": summ["protocol"],
+            "unit": summ["unit"], "isolation": summ["isolation"], "track": summ["track"],
+            "binary_sha256": summ["binary_sha256"], "commit": summ["commit"],
+            "registered_at": summ["registered_at"], "replay": summ["replay"],
+            "sessions": summ["sessions"], "targets_per_curve": summ["targets_per_curve"],
+            "rounds": summ["rounds"], "replicates": summ["replicates"],
+            "l1_holds_on_a_primary_row": summ["l1_holds_on_a_primary_row"],
+            "l1_falsified": summ["l1_falsified"], "class": "counted component improvement",
+            "title": TABLEB_KSUM_TITLE,
+            "validation": ("validated: replay certificate, validator report and the matched rho reference with "
+                           f"the section 5a band ({TABLEB_KSUM_EVIDENCE}/VALIDATION.json)"),
+            "validated": True}
+
+
+def check_tableb_ksum_summary(summ: dict) -> None:
+    """Sanity checks on the frozen summary (schema, registered verdict, shape)."""
+    if (summ.get("schema") != "crypto.ic_tableb_ksum_summary/v1"
+            or summ.get("l1_holds_on_a_primary_row") is not True or summ.get("l1_falsified") is not False
+            or len(summ.get("rows", [])) != 3
+            or [r["role"] for r in summ["rows"]].count("primary") != 2):
+        raise SystemExit(f"{SOURCES['tableb_ksum']}: review the summary (schema, L1 verdict, rows)")
+    for r in summ["rows"]:
+        if set(r["weights"]) != {"0", "0.1", "1"}:
+            raise SystemExit(f"{r['slug']}: weights must be exactly 0, 0.1 and 1")
+        for w, b in r["weights"].items():
+            if (len(b["per_replicate"]) != summ["replicates"] or "ksum5" not in b["s"]
+                    or "rho-neg" not in b["s"] or b["strictest_incumbent"] not in b["s"]):
+                raise SystemExit(f"{r['slug']} w = {w}: summary.json is incomplete")
+
+
+def tableb_ksum_text(k: dict) -> dict:
+    """The Table B k = 5 section's prose and cells, shared by the Markdown and the HTML."""
+    W = ("0", "0.1", "1")
+    cells = []
+    for r in k["rows"]:
+        tb = r["table_b"]
+        for w in W:
+            b = r["weights"][w]
+            s = b["s"]
+            cells.append({
+                "slug": r["slug"], "role": r["role"], "w": w,
+                "before": f"S_IC {tb['s_ic']:.3f}, S_rho {tb['s_rho']:.3f}",
+                "incumbent": f"{b['strictest_incumbent']}: {s[b['strictest_incumbent']]:.3f}",
+                "ksum5": f"{s['ksum5']:.3f}",
+                "ratio": f"{b['ksum5_over_incumbent']:.4f}",
+                "ci": f"[{b['ci95'][0]:.4f}, {b['ci95'][1]:.4f}]",
+                "reps": " / ".join(f"{x:.4f}" for x in b["per_replicate"]),
+                "gap_rho": f"{b['gap_to_rho']:.3f}",
+                "rho_s": f"{s['rho-neg']:.3f}",
+                "over_bsgs": f"{b['ksum5_over_bsgs']:.3f}",
+            })
+    rule = ("Registered rule L1 (PROTOCOL.md): L1 holds on a row if the upper end of the 95% interval of "
+            "R_w = cost(ksum5) / cost(strictest incumbent) is below 1 at all three weights, pooled and in each "
+            "replicate session alone, and the improvement exceeds the replicate noise delta (1 - max_w R_w(upper) "
+            "> delta - 1); L1 is falsified if on both primary rows the pooled upper bound is at or above 1 at any "
+            "weight. Result: "
+            f"l1_holds_on_a_primary_row = {str(k['l1_holds_on_a_primary_row']).lower()}, "
+            f"l1_falsified = {str(k['l1_falsified']).lower()}; replicate noise delta per row: "
+            + "; ".join(f"{r['slug']} ({r['role']}) {r['delta']:.4f}" for r in k["rows"]) + ".")
+    intro = ("Three Table B prime rows re-measured with the k = 5 sum table (ksum5) against the strictest "
+             "in-session incumbent, matched negation-map rho (rho-neg) and BSGS (bsgs-neg), same ecbench session "
+             "and binary. Unit: " + k["unit"] + ". Table B's recorded before-mark is another harness's figure: "
+             "it is shown for reference and never divided into the new S. S, ratios and the distance remaining "
+             "to rho (ksum5 S / rho-neg S) are in the new unit only; the distance remaining is not a pass/fail gate. "
+             "It is read under the section 5a band: the independent validator found it depends on how uncharged "
+             "native work is priced (bitop/v1: 5.6-5.8x; all work_native priced at w: 3.0-3.2x at w = 0.1 and "
+             "1.4x at w = 1); rho stays ahead in every reading.")
+    rp = k["replay"]
+    scope = [
+        "Unit: " + k["unit"] + ".",
+        "Isolation: " + k["isolation"] + "; wall time is not claimed.",
+        "Track: " + k["track"] + "; it cannot beat rho or BSGS.",
+        f"Binary sha256 `{k['binary_sha256']}`, commit `{k['commit']}`, registered at {k['registered_at']}.",
+        f"{k['sessions']} sessions, {k['targets_per_curve']} targets per curve, {k['rounds']} rounds, "
+        f"{k['replicates']} replicates; replay: {rp['records']} records, {rp['replays']} replays ({rp['host']}).",
+    ]
+    return {"cells": cells, "intro": intro, "rule": rule, "scope": scope}
+
+
+def tableb_ksum_markdown(doc: dict) -> list[str]:
+    tk = doc["tableb_ksum_component"]
+    tt = tableb_ksum_text(tk)
+    L = [f"## {tk['title']}", "", tt["intro"], "",
+         "| curve | role | w | Table B before-mark (another harness) | strictest incumbent: S | S, ksum5 | "
+         "ksum5 / incumbent [95%] | per-replicate ratios | S, rho-neg | distance remaining: ksum5 / rho-neg | "
+         "ksum5 / bsgs-neg |",
+         "|:--|:--|:--|:--|:--|--:|:--|:--|--:|--:|--:|"]
+    for c in tt["cells"]:
+        L.append(f"| `{c['slug']}` | {c['role']} | {c['w']} | {c['before']} | {c['incumbent']} | {c['ksum5']} | "
+                 f"**{c['ratio']}** {c['ci']} | {c['reps']} | {c['rho_s']} | {c['gap_rho']} | {c['over_bsgs']} |")
+    L += ["", tt["rule"], ""] + [f"- {x}" for x in tt["scope"]]
+    L += ["", f"[Report](../../{tk['report']}) · [protocol](../../{tk['protocol']}) · "
+              f"[data](../../{tk['source']}).", "", tk["validation"], ""]
+    return L
+
+
 def d4_char2_frob_roots_component() -> dict:
     """Frobenius-semilinear squaring in the F_q root finding of the char-2 D4
     index calculus (`frob_roots=1`), from research/ic_d4_char2_lever_20261023:
@@ -2295,6 +2419,63 @@ def ghs_cd_chain_html(g: dict) -> str:
             '<div class="scroll"><table><thead><tr><th>IC arm</th><th>k</th><th>additions 0</th><th>0.5</th>'
             '<th>1</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
             gh(SOURCES["ghs_weak_cd_chain"], "Analysis") + '</section>')
+
+
+GHS_RELSTAGE_EVIDENCE = "research/ic_gw_fasthash_20261114/validation"
+
+
+def ghs_weak_relstage() -> dict:
+    """Relation-stage CPU speed-up at identical counted work: COMBO (open-addressing hashing, no per-candidate
+    allocation, prefetch, compiled square-root chain) against v3 at c_D = 1.7 on the GHS-weak instances, k = 18..22
+    (research/ic_gw_fasthash_20261114). Ratios copied from analysis.json (relations.cpu, geometric mean over seeds 1..3
+    of the two-pass mean; total CPU geometric mean). Standing from validation/VALIDATION.json."""
+    a = load(SOURCES["ghs_weak_relstage"])
+    errs = checked_evidence_dir(REPO / GHS_RELSTAGE_EVIDENCE, REPO)
+    qs = (262111, 524287, 1048507, 2097091, 4194271)
+    rows = []
+    for q in qs:
+        cells = [a["primary_relations_cpu_ratio"][f"COMBO/{q}/{s}"]["mean"] for s in (1, 2, 3)]
+        rows.append({"q": q, "k": q.bit_length(), "relations_geomean": a["relations_ratio_geomean_over_seeds"][f"COMBO/{q}"],
+                     "relations_max": max(cells), "total_cpu_geomean": a["total_cpu_ratio"][f"COMBO/{q}"]["geomean"]})
+    v = a["verdict"]["COMBO"]
+    return {"rows": rows, "decision": v["decision"], "aa_floor": a["aa_floor"],
+            "study": "research/ic_gw_fasthash_20261114/", "report": "research/ic_gw_fasthash_20261114/REPORT.pdf",
+            "source": SOURCES["ghs_weak_relstage"],
+            "class": "phase speed-up (relation stage, CPU time) at identical counted work; GHS-weak family only",
+            "validation": (f"validated: replay certificate (counted replay and an independent timing replay), validator "
+                           f"report and the negation-map rho reference ({GHS_RELSTAGE_EVIDENCE}/VALIDATION.json)")
+            if not errs else ("not validated: " + "; ".join(errs)),
+            "validated": not errs}
+
+
+def ghs_relstage_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3}: relation-stage speed-up at identical counted work, outside tables A–C", "",
+         "Same instances and configuration as the section above (c_D = 1.7, square-root chain): the relation stage "
+         "rewritten with open-addressing hash tables, no per-candidate allocation, prefetch of large-prime vertex slots "
+         "and a compiled square-root chain. Every counted field is identical to v3, so cold M-eq and the distance to rho "
+         "do not move; the gain is CPU time. Ratio of relations-stage CPU (and DL phase-sum CPU) to v3 on the same unit, one "
+         f"unit at a time on a shared 4-vCPU container (L0), two passes in reversed order; A/A floor {g['aa_floor']:.3f}. "
+         f"Pre-registered decision: {g['decision']}. Class: {g['class']}. {g['validation']}.", "",
+         "| k | relations CPU (geomean over seeds) | worst seed | DL phase-sum CPU |", "|--:|--:|--:|--:|"]
+    for r in g["rows"]:
+        L.append(f"| {r['k']} | {r['relations_geomean']:.3f} | {r['relations_max']:.3f} | {r['total_cpu_geomean']:.3f} |")
+    L += ["", f"Study: [{g['study']}](../../{g['study']}); [report](../../{g['report']}); source `{g['source']}`. "
+          "Times are L0 (local container, not an isolated host). The DL phase sum leaves out the instance search and the "
+          "D and DL1 linear algebra; whole-process CPU fell only to 0.90–0.96 of v3 in the validator's timing replay "
+          "(relation stage 0.43–0.50 there).", ""]
+    return L
+
+
+def ghs_relstage_html(g: dict) -> str:
+    md = ghs_relstage_md(g)
+    body = "".join(f"<p>{rich(x)}</p>" if x and not x.startswith("|") and not x.startswith("##") else "" for x in md)
+    tr = [x for x in md if x.startswith("| ") and not x.startswith("| k ")]
+    rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tr)
+    return ('<section id="ghs-weak-relstage-20261115"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>: relation-stage speed-up '
+            'at identical counted work</h2>' + body +
+            '<div class="scroll"><table><thead><tr><th>k</th><th>relations CPU</th><th>worst seed</th><th>total CPU</th>'
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+            gh(SOURCES["ghs_weak_relstage"], "Analysis") + '</section>')
 
 
 def _ci(v, lo, hi, i):
@@ -3102,6 +3283,8 @@ def build(allow_unvalidated: bool = False) -> dict:
         "ic_cover_weakclass_component": ic_cover_weakclass_component(),
         "jv_sieve_line_vs_rho_component": jv_sieve_line_vs_rho_component(),
         "k1_pt_lgrow_component": k1_pt_lgrow_component(names),
+        # Table B prime rows re-measured with the k = 5 sum table, copied from the study's frozen summary.
+        "tableb_ksum_component": tableb_ksum_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -3120,6 +3303,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "ghs_weak_n4_component": ghs_weak_n4(),
         "ghs_weak_n4v2_component": ghs_weak_n4v2(),
         "ghs_weak_cd_chain_component": ghs_weak_cd_chain(),
+        "ghs_weak_relstage_component": ghs_weak_relstage(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -3552,6 +3736,8 @@ def markdown(doc: dict) -> str:
           f"[Report]({'../../' + d4['report']}) · [study](../../{d4['study']}) · [data](../../{d4['source']}).", "",
           d4["validation"], ""]
     for code in ("A", "B", "C"):
+        if code == "C":
+            L += tableb_ksum_markdown(doc)
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
         multi = len(f["regimes"]) > 1
@@ -4356,6 +4542,7 @@ def markdown(doc: dict) -> str:
                  f"{r['mean_ic_s']:.4g} | {r['mean_rho_s']:.3g} | {r['ic_over_rho_wall']:,.0f} |")
     L += ghs2_md(doc["ghs_weak_n4v2_component"])
     L += ghs_cd_chain_md(doc["ghs_weak_cd_chain_component"])
+    L += ghs_relstage_md(doc["ghs_weak_relstage_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -5882,6 +6069,26 @@ def page(doc: dict, standalone: bool) -> str:
         family_table(code)
         P.append('</section>')
 
+    # Table B prime rows re-measured with the k = 5 sum table (outside tables A-C).
+    tk = doc["tableb_ksum_component"]
+    tt = tableb_ksum_text(tk)
+    P.append(f'<section class="panel" id="tableb-ksum"><h2>{esc(tk["title"])} '
+             '<span class="chip">outside tables A–C</span> <span class="chip">counted component</span></h2>'
+             f'<p>{esc(tt["intro"])}</p><div class="scroll"><table><thead><tr><th>Curve</th><th>Role</th><th>w</th>'
+             '<th>Table B before-mark (another harness)</th><th>Strictest incumbent: S</th><th>S, ksum5</th>'
+             '<th>ksum5 / incumbent [95%]</th><th>Per-replicate ratios</th><th>S, rho-neg</th>'
+             '<th>Distance remaining: ksum5 / rho-neg</th><th>ksum5 / bsgs-neg</th></tr></thead><tbody>')
+    for c in tt["cells"]:
+        P.append(f'<tr><td><code>{esc(c["slug"])}</code></td><td>{esc(c["role"])}</td><td>{c["w"]}</td>'
+                 f'<td>{esc(c["before"])}</td><td>{esc(c["incumbent"])}</td><td>{c["ksum5"]}</td>'
+                 f'<td><b>{c["ratio"]}</b> {c["ci"]}</td><td>{c["reps"]}</td><td>{c["rho_s"]}</td>'
+                 f'<td>{c["gap_rho"]}</td><td>{c["over_bsgs"]}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{esc(tt["rule"])}</p><ul>' + "".join(f"<li>{esc(x)}</li>" for x in tt["scope"]) + '</ul>'
+             f'<p>{gh(tk["report"], "Report")} · {gh(tk["protocol"], "PROTOCOL.md")} · '
+             f'{gh(tk["source"], "summary.json")}.</p>'
+             f'<p class="muted">{esc(tk["validation"])}</p></section>')
+
     # Table C: the Koblitz batch, a historical diagnostic.
     fc = doc["families"]["C"]
     P.append(f'<section class="panel" id="batch"><h2>Table C · Koblitz, 32 targets in a batch '
@@ -6180,6 +6387,7 @@ def page(doc: dict, standalone: bool) -> str:
     P.append('</tbody></table>' + gh(al["study"], 'Study, report, raw records and validation') + '</section>')
     P.append(ghs2_html(doc["ghs_weak_n4v2_component"]))
     P.append(ghs_cd_chain_html(doc["ghs_weak_cd_chain_component"]))
+    P.append(ghs_relstage_html(doc["ghs_weak_relstage_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

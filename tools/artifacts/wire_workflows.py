@@ -18,8 +18,14 @@ is textual (comments and layout survive) and idempotent; checkouts into a
 
     python3 tools/artifacts/wire_workflows.py [--check] [WORKFLOW ...]
 
-`--check` edits nothing and exits 1 if any workflow lacks the step it needs,
-which is how CI keeps new workflows honest.
+`--check` edits nothing and exits 1 if any workflow lacks the step it needs
+or carries a stale one, which is how CI keeps new workflows honest.
+
+The pull list is derived from the workflow text outside the generated step:
+the step's own `pull` line is output, never a reference, so a directory the
+workflow stops naming is dropped on regeneration. Inputs a workflow's scripts
+discover at run time are declared with `# tools/artifacts pull: PATH ...`
+comment lines; hand edits to the generated line do not survive.
 """
 
 from __future__ import annotations
@@ -34,6 +40,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import artifacts  # noqa: E402
 
 STEP_NAME = "Pull store data this workflow reads (tools/artifacts)"
+# A workflow whose scripts find their inputs at run time (a gate that follows
+# VALIDATION.json to the session records it names) declares them, one or more
+# paths per comment line, since its text never names them:
+#     # tools/artifacts pull: research/x/sessions research/y/results
+DECLARE_RE = re.compile(r"^\s*#\s*tools/artifacts pull:(.*)$")
 PATH_RE = re.compile(r"(?<![A-Za-z0-9_./*-])((?:[A-Za-z0-9_+*-][A-Za-z0-9_.+*-]*/)+[A-Za-z0-9_.+*-]*)")
 
 
@@ -55,9 +66,39 @@ def moved_dirs(moved: set[str]) -> set[str]:
     }
 
 
+def strip_generated(text: str) -> str:
+    """The workflow without the pull steps this tool generated.
+
+    The generated `artifacts.py pull ...` line names every directory it pulls,
+    so scanning it would make each pulled directory a reference to itself and
+    keep it after the workflow stopped naming it.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^(\s*)- name: (.*)$", lines[i])
+        if not (m and m.group(2).strip() == STEP_NAME):
+            out.append(lines[i])
+            i += 1
+            continue
+        indent = len(m.group(1))
+        i += 1
+        while i < len(lines) and (not lines[i].strip() or len(lines[i]) - len(lines[i].lstrip()) > indent):
+            i += 1
+    return "\n".join(out)
+
+
 def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
     """Paths the workflow names that are, or contain, moved files; minimal cover."""
     found = set()
+    text = strip_generated(text)
+    for line in text.split("\n"):
+        if m := DECLARE_RE.match(line):
+            # Declared, so kept while it still names moved data, and dropped
+            # (like any stale entry) once it does not.
+            found.update(p for p in (x.rstrip("/") for x in m.group(1).split())
+                         if p in moved or any(x.startswith(p + "/") for x in moved))
     # A sibling script may read data in the same artifact directory. Do not
     # infer that it reads every artifact in a broad ancestor such as
     # research/notes: many independent studies share that namespace.
@@ -120,7 +161,10 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
 
 
 def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
-    """Insert the pull step after each workspace checkout; returns (text, notes)."""
+    """Insert the pull step after each workspace checkout; returns (text, notes).
+
+    With no paths, an earlier generated step is removed and nothing is added.
+    """
     lines = text.split("\n")
     notes: list[str] = []
     out: list[str] = []
@@ -150,7 +194,8 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             out.extend(block)
             i = j
             continue
-        block = add_sparse_pattern(block, indent)
+        if paths:
+            block = add_sparse_pattern(block, indent)
         out.extend(block)
         k = next((k for k in range(j, len(lines)) if lines[k].strip()), len(lines))
         if k < len(lines) and STEP_NAME in lines[k]:
@@ -162,6 +207,9 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
                 j += 1
             while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
+        if not paths:
+            i = j
+            continue
         step = step_lines(indent, paths)
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
                      if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
@@ -219,7 +267,7 @@ def main() -> int:
     for f in files:
         text = f.read_text()
         paths = needed(text, moved, dirs)
-        if not paths:
+        if not paths and STEP_NAME not in text:
             continue
         new, notes = wire(text, paths)
         for n in notes:
@@ -227,12 +275,15 @@ def main() -> int:
         if new != text:
             missing += 1
             if args.check:
-                print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
+                if paths:
+                    print(f"{f.name}: needs `{STEP_NAME}` for {' '.join(paths)}")
+                else:
+                    print(f"{f.name}: stale `{STEP_NAME}`: the workflow names no moved data")
             else:
                 f.write_text(new)
-                print(f"{f.name}: pull {' '.join(paths)}")
+                print(f"{f.name}: pull {' '.join(paths)}" if paths else f"{f.name}: pull step removed")
     if args.check and missing:
-        print(f"\n{missing} workflow(s) read store data without pulling it; run "
+        print(f"\n{missing} workflow(s) lack the pull step they need or carry a stale one; run "
               f"python3 tools/artifacts/wire_workflows.py", file=sys.stderr)
         return 1
     return 0
