@@ -31,11 +31,23 @@ it is **not** a measured attack cost. The scaling step is checked in
 must be discharged for the concrete field. Kernel dimension, projective
 line count, trace prefilter, and GHS geometry remain outside that Lean file.
 
-The proposed relative-trace prefilter rejects a candidate when
-`Tr_(K/k)(sqrt(b)) != 0`. It passed every direct finite member below. An
-algebraic proof requires the Frobenius-eigenspace product argument; it has
-not yet been independently checked or given an identity certificate, so the
-general statement remains a **[pcc:unverified] conjectured invariant**.
+The relative-trace prefilter rejects a candidate when
+`Tr_(K/k)(sqrt(b)) != 0`. It passed every direct finite member below. There
+is also a short algebraic derivation. Write `p*=T^3+T^2+1` when
+`p=T^3+T+1`, and reverse the roles for the other cubic. For the first
+cubic, `(T+1)p*+T p=1` in `F2[T]`. Hence any `y` in `V=ker p(sigma)` is
+`p*(sigma)(sigma+1)y`. The trace pairing
+`B(x,y)=Tr_(K/k)(xy)` satisfies
+`B(x,p*(sigma)u)=B(p*(sigma^-1)x,u)`; because
+`p*(sigma^-1)=sigma^-3 p(sigma)`, this is zero for `x in V`.
+For the other cubic, the same identity is `T p*+(T+1)p=1`, so the
+argument again puts `y` in the image of `p*(sigma)`.
+Also `Tr_(K/k)(x)=0` for `x in V`, since `p(1)=1`. Thus if
+`gamma2=w+c` with `w in V` and `c in k*`, both
+`Tr(gamma1*w)` and `Tr(c*gamma1)` vanish. Squaring preserves zero trace.
+This establishes the prefilter under the stated finite-field identities;
+the derivation has not yet received an independent proof check or an
+identity certificate and remains **[pcc:unverified]** for repository claims.
 
 ## Native finite evidence
 
@@ -105,7 +117,7 @@ dimension, line count, and exact membership equality at q=2,4; at q=8 it
 checks the direct count and the trace-zero containment. The only general
 count bounds presently justified from the construction are the coarse
 `(q^3-1)(q-1) <= #W1 <= q^6-1` for each cubic, and the upper bound
-`#(W1 union) <= q^6-1`, conditional on the trace-zero lemma. The lower
+`#(W1 union) <= q^6-1`, using the trace-zero derivation above. The lower
 bound uses a fixed nonzero gamma1: all `(q^3-1)(q-1)` choices of gamma2
 are distinct. The q=8 counterexample forbids promoting a sharper count
 from q=2,4 interpolation.
