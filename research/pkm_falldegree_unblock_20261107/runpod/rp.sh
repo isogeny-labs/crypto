@@ -25,7 +25,7 @@ case "$1" in
     umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,costPerHr,vcpuCount,memoryInGb,interruptible,machine,imageName}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
   pod) curl -sS "$API/pods/$2" "${H[@]}" | jq '{id,name,desiredStatus,costPerHr,vcpuCount,memoryInGb,interruptible,lastStartedAt,machine}' ;;
   upload) # 2 MB chunks (Amendment 16): first chunk via /upload (truncates), the rest via /append
-    for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json; do
+    for f in pkm_tower_pilot prime_fall_degree_tools hky_fp_tower_check pfd_grid_zeros entry_r2.sh run.sh build-info.json entry_m2c.sh; do
       [ -f "$3/$f" ] || continue; tmp=$(mktemp -d); split -b 2M -d -a 4 "$3/$f" "$tmp/part."; ep=upload
       for c in "$tmp"/part.*; do curl -sS -f -m 300 -X PUT -H "X-Token: $(tok $2)" --data-binary "@$c" "$(url $2)/$ep/$f" > "$tmp/last"; ep=append; done
       cat "$tmp/last"; echo; rm -rf "$tmp"; done ;;
@@ -35,7 +35,7 @@ case "$1" in
       cph=$(curl -sS "$API/pods/$2" "${H[@]}" | jq -r .costPerHr)
       jq -n --argjson s "$3" --argjson h "$shas" --argjson sec "${SECONDS_LIMIT:?}" --argjson cph "$cph" \
         --argjson mx "${MAX_USD:-40}" --argjson mf "${MEMORY_FLOOR_GIB:-56}" \
-        '{stages:$s,sha256:$h,rayon:12,seconds:$sec,cost_per_hr:$cph,max_usd:$mx,memory_floor_gib:$mf}' |
+        --arg en "${ENTRY:-}" '{stages:$s,sha256:$h,rayon:12,seconds:$sec,cost_per_hr:$cph,max_usd:$mx,memory_floor_gib:$mf} + (if $en == "" then {} else {entry:$en} end)' |
       curl -sS -X POST -H "X-Token: $(tok $2)" -H "Content-Type: application/json" --data-binary @- "$(url $2)/start"; echo ;;
   upload-iso) # rp.sh upload-iso ID BINDIR COMMIT : the R4 binaries from BINDIR, and repo.tar = git archive COMMIT of iso/BUNDLE_PATHS
       repo=$(cd "$here/../../.." && pwd); tar=$(mktemp)
