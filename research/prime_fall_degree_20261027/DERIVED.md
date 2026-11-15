@@ -345,3 +345,10 @@ where `⟨u⟩` takes the `u`-coefficient of the residue, which has degree `≤ 
 - **D10 is attained at `t = 2`**: `10 = 2t + 6`.
 - **D9 is not tight for `d_NS`.** Its value 3t+5 is exact only within the `u`-degree `≤ 1` class.
 - **Control:** m = 2 reproduces `2t + 2` on 24/24 instances.
+
+*Measured, wave 2* (`research/kummer_wave2_20261115/`; pointer only, nothing above changed). `[pcc:unverified]`
+- **KM3-LQR-CLOSURE.** D10's functional also vanishes on the **true closure** `V_{F,c}` for every `c < d_F`, so it is a closure pseudo-solution.
+  - Cells: 12/12 at m = 3 (t = 2, 3) and 28/28 at m = 2, plus `c ≤ 5` at t = 4 on one draw.
+  - A growing lower bound on `d_F` would follow from showing that λ kills `V_{F,c}` up to a growing `c`. That is open; the data reach only `d_F = 5, 6`.
+- **KM-ART-DEGEN.** Replacing `y_{t−1}² = 1` by `0` or `5` leaves `d_F` and `ffd` unchanged (65/65 m = 2 cells, t ≤ 8). So a lower-bound argument has to come from carry transport, not the wrap.
+- **KM3-SPEC-LADDER.** The specialisation inequality `d_F(m) ≥ d_F(m−1, ρ)` holds on 50/50 pairs, but it gives only `d_F ≥ 4`.
