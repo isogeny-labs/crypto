@@ -4879,6 +4879,23 @@ mod tests {
         assert_eq!(trial["store_manifest_sha256"], manifest_sha256);
         assert!(trial["panel_manifest_blake3"].is_null());
         assert!(trial["total_index_calculus_runtime_ms"].is_null());
+        let one_query = run_with_config(
+            &bundle,
+            2,
+            2,
+            "enumerate",
+            1,
+            60,
+            &root.join("one-query"),
+            None,
+            Some(&config),
+        )
+        .unwrap();
+        assert_eq!(one_query["schema"], "n83.primary-store-trial/v1");
+        assert_eq!(one_query["store_name"], name);
+        assert_eq!(one_query["report"]["trials"], 1);
+        assert_eq!(one_query["solver_stage_executed"], true);
+        assert!(one_query["total_index_calculus_runtime_ms"].is_null());
         assert!(run_with_config(
             &bundle,
             3,
