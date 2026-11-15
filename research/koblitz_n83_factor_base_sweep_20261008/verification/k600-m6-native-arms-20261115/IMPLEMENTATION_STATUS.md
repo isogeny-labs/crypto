@@ -23,11 +23,13 @@ hash. It hashes the compiled supervisor, exporter/replayer, and solver bytes, ch
 exact Docker image ID, then rechecks the source, staging receipt, panel and
 binary bytes before writing the lock. The lock records the frozen variable,
 clause, conflict, model, CPU, memory, swap, PID and network caps; it explicitly
-marks worker launch and both arms unexecuted. The executable has not yet run
-`freeze` on a real staged panel. The image's architecture, compiled source
-provenance, actual cgroup isolation, solver behavior, output receipt, and
-model replay remain checks for the outer runner. A lock alone does not admit
-the positive or natural arm.
+marks solver launch and both arms unexecuted. The executable has not yet run
+`freeze` on a real staged panel. The current `freeze` source requires Linux
+arm64 ELF exporter and solver bytes plus an image ID whose inspected OS,
+architecture, and source-revision label match the clean commit. A build
+receipt that ties those bytes to that source, actual cgroup isolation, solver
+behavior, output receipt, and model replay remain to be checked. A lock alone
+does not admit the positive or natural arm.
 
 The release example tests passed **2/2** on local macOS arm64 Rust 1.99.1,
 and the production release example build exited 0. The same invocation also
@@ -64,6 +66,43 @@ it; its [stderr](arm-existing-stage.log.gz) is retained. The default Homebrew
 selected installed `rustc 1.99.1` explicitly through `RUSTC`. The final
 release tests and build then exited 0. No canonical runtime or factor-base
 graph changed because this step produced no relation or timing observation.
+
+The added `export LOCK_JSON positive-pinned|positive-unpinned
+NEW_OUTPUT_DIR OUTER_SECONDS` command now prepares a source-bound XCNF *export stage* in a
+Linux arm64 Docker image. It mounts the clean checkout, exact staged panel,
+and exporter binary read-only at `/src`, `/base`, and `/exporter`, and mounts
+the worktree's Git common directory read-only at its original absolute path
+so the `.git` worktree pointer can resolve. `GIT_OPTIONAL_LOCKS=0` avoids
+index writes; only a new output directory is writable. The Docker invocation specifies a 4 GiB hard
+memory limit, no additional swap, one CPU and pinned CPU 0, 64 PIDs, no
+network, no added capabilities, no new privileges, read-only root, and a
+64 MiB scratch tmpfs. The explicit outer cap must be positive and at most
+3,600 seconds; it bounds the Docker child, and the receipt separately records
+the entire export-stage wall interval. The later cumulative controller must
+pass only the remaining approved allowance. The guard kills a timed-out
+container, waits for it, and checks removal; terminal wall-cap, resource-exit,
+cleanup-failure, and producer-failure receipts remain distinct. Successful
+exports must match the frozen K600 source/base/mode, all output bytes and
+hashes, a clean-checkout attestation, per-representative circuit shape, and
+the 125,000-variable and 200 MB output caps. It rechecks the source, lock,
+panel, binaries, and image after the process before writing a success receipt.
+The image must be built with its clean source at `/src` for the exporter’s
+compiled source attestation to pass; this has not yet been demonstrated.
+
+The Docker export source passed release example tests **5/5** and the
+production release build on local macOS arm64 Rust 1.99.1; the new tests check
+the hard resource and read-only Docker arguments and reject natural export
+before a constructed solver control. The [test log](docker-export-test.log.gz)
+and [build log](docker-export-build.log.gz) retain compiler output. No Docker
+image or real staged panel was available for an export, so the launch,
+timeout cleanup, in-container source attestation, and XCNF receipt checks are
+implemented but unverified. The 3,600-second proposed charged envelope is
+still unapproved and unused. This export step alone does not enforce the
+cumulative build/staging/preflight/arm budget. A source-matched image/build receipt, zero-trial
+preflight, constructed solver control, natural solver arm, and native model
+replay remain open. This command does not run a solver or change the
+total-runtime selection. Natural export remains unavailable through this
+command until a completed constructed solver control can gate it.
 
 Validation commands from the repository root (stdout and stderr preserved
 in the linked logs):
