@@ -16,6 +16,7 @@ import datetime as dt
 import hashlib
 import json
 import platform
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -333,6 +334,41 @@ for n in (25, 26, 27):
                  f"{MS} --dump-dir validation/fresh_n{n}_dump/inst --run-json validation/fresh_n{n}_dump/pq2_rank.json "
                  f"--producer '' --raw-dir validation/msolve_replay/raw_fresh_n{n} --out validation/msolve_replay/msolve_fresh_n{n}.json",
                  "no producer msolve rows exist for the fresh instances; checks quotient dimension = |Z|, linear = k, degree >= 4")
+
+# ---- step test n = 36 / 37 (f4/step_n36_37) ------------------------------------------------
+if (HERE / "step_n36_37/pq2_rank.json").exists():
+    json_vs_json("step_n36_37_dump", HERE / "step_n36_37/pq2_rank.json", "f4/step_n36_37/pq2_rank.json", NONTIME,
+                 f"PQ2_DUMP=validation/step_n36_37/inst {BIN} 36,37 2 0 validation/step_n36_37/pq2_rank   "
+                 "(the producer's arguments from f4/step_n36_37/dump_run.log, out prefix moved)")
+    names = [f"n{n}_i{i}.json" for n in (36, 37) for i in (0, 1)]
+    same = sum(rc.read_text(PKG / f"f4/step_n36_37/dumps/{nm}") == (HERE / f"step_n36_37/inst/{nm}").read_text() for nm in names)
+    same_part = sum(rc.read_text(PKG / f"f4/step_n36_37/part_{nm[:-5]}/{nm}") == (HERE / f"step_n36_37/inst/{nm}").read_text()
+                    for nm in names)
+    runs.append({"id": "step_n36_37_dumps", "command": "validator regeneration vs f4/step_n36_37/dumps and part_*/",
+                 "reference": "f4/step_n36_37/dumps/*.json, f4/step_n36_37/part_*/*.json", "dumps": len(names),
+                 "dumps_byte_identical": same, "part_copies_byte_identical": same_part,
+                 "mismatches": 2 * len(names) - same - same_part})
+    if same + same_part != 2 * len(names):
+        problems.append(f"step dumps: {same}+{same_part} of {2 * len(names)} identical")
+    closure_entry("closure_step_n36_37.json",
+                  f"{CC} --run-json validation/step_n36_37/pq2_rank.json --dump-dir validation/step_n36_37/inst "
+                  "--out validation/closure_step_n36_37.json --iter3-max-n 0 --iter4-max-n 0 --low4-max-n 0 --interp-above-N 24",
+                  "Rust values of the regenerated n = 36/37 instances; descent by exact weight-<=2 interpolation plus 500 random points")
+    oom = (HERE / "step_n36_37/kernel_oom.txt").read_text()
+    runs.append({"id": "step_n37_kernel_oom_records", "command": "dmesg | grep -E 'invoked oom-killer|Memory cgroup out of memory'",
+                 "reference": "f4/step_n36_37/msolve_n37_i0.killed_t3.json and msolve_n37_i0.json (exit -9)",
+                 "msolve_oom_kills": len(re.findall(r"Killed process \d+ \(msolve\)", oom)),
+                 "mismatches": 0 if len(re.findall(r"Killed process \d+ \(msolve\)", oom)) == 2 else 1,
+                 "output_sha256": sha(HERE / "step_n36_37/kernel_oom.txt"),
+                 "note": "captured by the validator in the same boot as the producer's n = 37 runs; uptime 12907 s and 16563 s"})
+    if (HERE / "msolve_replay/msolve_step_n36.json").exists():
+        msolve_entry("msolve_step_n36.json",
+                     f"{MS} --dump-dir validation/step_n36_37/inst --run-json validation/step_n36_37/pq2_rank.json "
+                     "--producer f4/step_n36_37/msolve_n36_i0.json --raw-dir validation/msolve_replay/raw_step "
+                     "--out validation/msolve_replay/msolve_step_n36.json --only 36:0 --timeout 10800",
+                     "producer f4/step_n36_37/msolve_n36_i0.json; quotient dimension = |Z|, linear = k")
+    else:
+        problems.append("msolve_step_n36.json missing")
 
 # ---- independent |F'| recount for n <= 32 ------------------------------------
 def fsize_independent(row) -> int:

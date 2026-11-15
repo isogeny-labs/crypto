@@ -1,0 +1,315 @@
+{
+  "branch": "claude/nice-babbage-bn0fn0",
+  "closed_utc": "2026-11-15T04:43:27+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/runpod_kit_20261112/rp.sh",
+        "exec",
+        "bdr-tbk",
+        "cd /work && (bash /work/build.sh > /work/build.out 2>&1 && bash /work/run.sh > /work/run.out 2>&1)"
+      ],
+      "cwd": "research/ic_tableb_ksum_20261115",
+      "exit": 0,
+      "note": "9 registered sessions on RunPod pod bdr-tbk (build of origin/main 7b3c057e1c before; verify --replay-all after); launched through rp.sh exec, not benchrec run; start/end from data/runlog-pod.tsv (sessions only)",
+      "started_utc": "2026-11-15T04:05:02+00:00",
+      "wall_s": 326.0
+    },
+    {
+      "argv": [
+        "bash",
+        "research/ic_tableb_ksum_20261115/replay-local.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "second-host replay: ecbench verify --replay-all of every session with the producing binary on this container; receipts in verify-local/, replay-certificate.json",
+      "started_utc": "2026-11-15T04:20:00+00:00",
+      "wall_s": 16.0
+    }
+  ],
+  "commit": "8143aef076bcf7903477dde8852194cb9c927949",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T03:49:09+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-tableb-ksum"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0349Z-tableb-ksum-l1",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp20.ksum5_over_strictest_incumbent.w0",
+      "note": "primary row icv1-fp20-t1293-3c2999ba; incumbent inc-tb; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.676849629335083,
+        0.7049580376970707
+      ],
+      "unit": "ratio",
+      "value": 0.6907608750588367
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp20.ksum5_over_strictest_incumbent.w1",
+      "note": "primary row icv1-fp20-t1293-3c2999ba; incumbent inc-sel; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5836234323126437,
+        0.6081384915143417
+      ],
+      "unit": "ratio",
+      "value": 0.5957548772263922
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp20.ksum5_over_strictest_incumbent.w0.1",
+      "note": "primary row icv1-fp20-t1293-3c2999ba; incumbent inc-sel; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.6563666166577568,
+        0.6793589587206363
+      ],
+      "unit": "ratio",
+      "value": 0.6677638364209324
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp22.ksum5_over_strictest_incumbent.w0",
+      "note": "secondary row icv1-fp22-tm1267-a5acaf6d; incumbent inc-tb; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5825048139389976,
+        0.6108075455440152
+      ],
+      "unit": "ratio",
+      "value": 0.5964883365746998
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp22.ksum5_over_strictest_incumbent.w1",
+      "note": "secondary row icv1-fp22-tm1267-a5acaf6d; incumbent inc-hi; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4913683767473674,
+        0.5121015461075353
+      ],
+      "unit": "ratio",
+      "value": 0.5016278555270598
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp22.ksum5_over_strictest_incumbent.w0.1",
+      "note": "secondary row icv1-fp22-tm1267-a5acaf6d; incumbent inc-tb; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5593052061836886,
+        0.5875998713889119
+      ],
+      "unit": "ratio",
+      "value": 0.5732780016891322
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp24.ksum5_over_strictest_incumbent.w0",
+      "note": "primary row icv1-fp24-t1577-77336155; incumbent inc-w0; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4909425327970129,
+        0.5114388627663705
+      ],
+      "unit": "ratio",
+      "value": 0.5010859114536607
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp24.ksum5_over_strictest_incumbent.w1",
+      "note": "primary row icv1-fp24-t1577-77336155; incumbent inc-w0; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.415640784782985,
+        0.4368347254050702
+      ],
+      "unit": "ratio",
+      "value": 0.42610600569321144
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 432,
+      "name": "fp24.ksum5_over_strictest_incumbent.w0.1",
+      "note": "primary row icv1-fp24-t1577-77336155; incumbent inc-w0; pooled over 3 replicate sessions (432 pairs); RunPod record, second-host replay; counted cost L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.47402810976282467,
+        0.4947178631494867
+      ],
+      "unit": "ratio",
+      "value": 0.4842625047788181
+    },
+    {
+      "baseline": 10.294957795764272,
+      "better": "lower",
+      "n": 432,
+      "name": "fp20_s_ksum5_w0",
+      "note": "S of ksum5 (value), strictest incumbent inc-tb (baseline), matched negation rho (reference); icv1-fp20-t1293-3c2999ba",
+      "reference": 1.2691499828475836,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.111354055695914
+    },
+    {
+      "baseline": 24.485878847752467,
+      "better": "lower",
+      "n": 432,
+      "name": "fp20_s_ksum5_w1",
+      "note": "S of ksum5 (value), strictest incumbent inc-sel (baseline), matched negation rho (reference); icv1-fp20-t1293-3c2999ba",
+      "reference": 2.3746252273950295,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 14.58758174672307
+    },
+    {
+      "baseline": 11.769096192631578,
+      "better": "lower",
+      "n": 432,
+      "name": "fp20_s_ksum5_w0p1",
+      "note": "S of ksum5 (value), strictest incumbent inc-sel (baseline), matched negation rho (reference); icv1-fp20-t1293-3c2999ba",
+      "reference": 1.3796975073023274,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.8589768247986305
+    },
+    {
+      "baseline": 11.14737558972188,
+      "better": "lower",
+      "n": 432,
+      "name": "fp22_s_ksum5_w0",
+      "note": "S of ksum5 (value), strictest incumbent inc-tb (baseline), matched negation rho (reference); icv1-fp22-tm1267-a5acaf6d",
+      "reference": 1.1718550848270417,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.64927952268661
+    },
+    {
+      "baseline": 28.03956674301153,
+      "better": "lower",
+      "n": 432,
+      "name": "fp22_s_ksum5_w1",
+      "note": "S of ksum5 (value), strictest incumbent inc-hi (baseline), matched negation rho (reference); icv1-fp22-tm1267-a5acaf6d",
+      "reference": 2.2491003443187934,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 14.065427735204743
+    },
+    {
+      "baseline": 12.892339008581473,
+      "better": "lower",
+      "n": 432,
+      "name": "fp22_s_ksum5_w0p1",
+      "note": "S of ksum5 (value), strictest incumbent inc-tb (baseline), matched negation rho (reference); icv1-fp22-tm1267-a5acaf6d",
+      "reference": 1.2795796107762163,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.390894343938431
+    },
+    {
+      "baseline": 12.73834951352579,
+      "better": "lower",
+      "n": 432,
+      "name": "fp24_s_ksum5_w0",
+      "note": "S of ksum5 (value), strictest incumbent inc-w0 (baseline), matched negation rho (reference); icv1-fp24-t1577-77336155",
+      "reference": 1.0872239713560443,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.383007476400372
+    },
+    {
+      "baseline": 33.1643399863509,
+      "better": "lower",
+      "n": 432,
+      "name": "fp24_s_ksum5_w1",
+      "note": "S of ksum5 (value), strictest incumbent inc-w0 (baseline), matched negation rho (reference); icv1-fp24-t1577-77336155",
+      "reference": 2.0626338965097077,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 14.13152444303565
+    },
+    {
+      "baseline": 14.780948560808305,
+      "better": "lower",
+      "n": 432,
+      "name": "fp24_s_ksum5_w0p1",
+      "note": "S of ksum5 (value), strictest incumbent inc-w0 (baseline), matched negation rho (reference); icv1-fp24-t1577-77336155",
+      "reference": 1.1847649638714108,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.157859173063904
+    }
+  ],
+  "problem": "ecdlp:ic_prime_tableb_ksum",
+  "raw": [
+    {
+      "bytes": 12584896,
+      "path": "/tmp/claude-0/-home-user/6c4d3551-cc8a-5111-aeb2-cdafa56866cd/scratchpad/tbk/tableb-ksum-l1-sessions.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/75/753f3400a1546deb3940fab90b86ed87a36e4d0560191696bd0280755b3368fa",
+      "sha256": "753f3400a1546deb3940fab90b86ed87a36e4d0560191696bd0280755b3368fa",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-tableb-ksum/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261115-tableb-ksum/l1-ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "tableb-ksum-l1",
+  "status": "measured",
+  "summary": "k = 5 sum table vs strictest pair-table incumbent on Table B fp20/fp22/fp24 (counted GAE, RunPod L0, second-host replay, independent validator): ratio 0.691/0.668/0.596 (20 bits), 0.596/0.573/0.502 (22), 0.501/0.484/0.426 (24) at w=0/0.1/1; rho still ahead",
+  "validation": "benchmarks/20261115-tableb-ksum/VALIDATION.json"
+}

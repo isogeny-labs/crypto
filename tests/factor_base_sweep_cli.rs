@@ -289,7 +289,12 @@ fn interrupted_attempt_is_retained_and_resume_obeys_the_hard_deadline() {
     let t = Temp::new();
     let p = plan(&t, true);
     let mut v = value(&p);
-    v["candidates"][0]["curve"] = json!({"kind":"prime_search","bits":32,"seed":19});
+    // The worker must outlive the 1 s hard deadline on any machine. The default
+    // 16-bit roster prime with the maximum trial counts does (about 8 s on a slow
+    // runner). A 32-bit `prime_search` did not: its search ends near 1 s and the
+    // p <= 1000000 refusal then made the attempt `failed` before the deadline fired.
+    v["train"] = json!(4096);
+    v["holdout"] = json!(4096);
     v["candidate_seconds"] = json!(1);
     fs::write(&p, serde_json::to_vec(&v).unwrap()).unwrap();
     let dir = t.0.join("run");
@@ -429,7 +434,9 @@ fn a_second_supervisor_cannot_write_into_an_active_run() {
     let t = Temp::new();
     let p = plan(&t, true);
     let mut v = value(&p);
-    v["candidates"][0]["curve"] = json!({"kind":"prime_search","bits":32,"seed":19});
+    v["candidates"][0]["curve"] = json!({"kind":"prime_search","bits":19,"seed":19});
+    v["train"] = json!(4096);
+    v["holdout"] = json!(4096);
     v["candidate_seconds"] = json!(30);
     fs::write(&p, serde_json::to_vec(&v).unwrap()).unwrap();
     let dir = t.0.join("active");

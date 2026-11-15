@@ -99,6 +99,24 @@ One row first recorded 0 linear polynomials because its output was truncated whi
 disk was full. The rerun gives k, and the part file `f4/msolve_n26_i0.json` takes
 precedence. Three instances were rerun after a machine restart.
 
+**Testing the published step to 5 (`f4/step_n36_37/`).** Kousidis and Wiemers report Magma
+degree 4 for n ≤ 36 and 5 from n = 37. To test that with a second implementation, msolve
+ran on fresh instances at n = 36 and 37.
+
+| instance | outcome |
+|---|---|
+| n = 36, instance 0 (control) | maximal step degree 4, linear polynomials = k = 35, 47 minutes |
+| n = 37, instance 0 (test) | locally killed twice for memory; on isolab-eks (128 GB node, 4 threads) msolve ran 2, 2, 4 steps at degrees 2, 3, 4 and then started a degree-5 step (1,016,044 × 610,665 matrix) about 60 minutes in, at 53 GB; run still in progress (`f4/eks_n37/interim-0742/`) |
+| n = 36 and 37, instance 1 | stopped early to save memory, no result |
+
+On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute over the last
+five minutes (0.22 GiB per minute averaged over the hour) and passed 13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
+`*.timeout_3600s.log` and `*.killed_t3.*`. On the isolab-eks rerun msolve does reach a degree-5 step at n = 37, so its maximal step
+degree there is at least 5, matching the Magma value Kousidis–Wiemers report [pcc:unverified].
+The run did not finish: Kubernetes stopped it at its deadline after about 4 hours of compute (the
+6-hour deadline also counted 2 hours of queueing), about 3 hours into the degree-5 step, so the final
+basis check (linear = k = 33) is not available (`f4/eks_n37/final/OUTCOME.md`).
+
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
 on five dumped instances at n = 14 to 18 at degree 3. At degree 4 the Python closure reaches k on

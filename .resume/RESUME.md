@@ -1,45 +1,28 @@
-# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
-merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
-selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
-prime fields, plus a Lean statement of the obstruction.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
-stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
-E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
-moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
-p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
-Instrument commands pinned in each protocol's Addendum A before any claim cell.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
-followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
-(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
-/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
-Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
-standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
-resolve "latest" through the proxy).
-
-## Next steps
-1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
-2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
-3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
-   director assess mode.
-4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
-   session log; PR; track to merge.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
 ## Runs in flight
-None. No claim cell has run.
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
 ## Stop and success conditions
-Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
-P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
-## Open questions
-Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.

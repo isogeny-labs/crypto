@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><title>E14 r2 report</title>
+<style>body{font-family:Helvetica,Arial,sans-serif;max-width:1000px;margin:auto;color:#1a202c;font-size:13px}table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #cbd5e0;padding:4px 8px;text-align:left}th{background:#edf2f7}img{width:100%}code{font-size:12px}</style></head><body>
+<h1>E14 r2: exact last fall degree at (m, n, ℓ) = (3, 21, 7)</h1>
+<p>Fall-degree study, preregistration Amendments 20, 21, 25, 27–30. Pod <code>gjr9mpprgga8eb</code> on RunPod: 32 vCPU AMD EPYC 9575F, 503 GiB, USD 2.08/h, launched 2026-11-12 04:57 UTC, deadline 2026-11-13 16:57 UTC. Source <code>a2be6609</code> (tree hash checked). Records: <code>e14/score.json</code> (section <code>r2</code>), <code>e14/pod-r2/out-r2j/</code>.</p>
+<img src="e14r2.png" alt="E14 r2 timeline">
+<h2>Readings</h2>
+<table><tr><th>Unit</th><th>What happened</th><th>Registered reading</th><th>Prediction outcome</th></tr>
+<tr><td>Gates G0–G3</td><td>G0 7/7 tests; G1 and G2 diffs empty; G3: <code>pe</code> fastest at 8 threads (341 s)</td><td>passed</td><td>G2 passes (0.90): occurred</td></tr>
+<tr><td>E14a draw 0</td><td><code>d_f = 5</code> in 37,890 s; degree ≤ 4 equal to E10</td><td>d_F = 5 [pcc:unverified]</td><td rowspan="4">"split" (0.05) occurred</td></tr>
+<tr><td>E14a draw 1</td><td><code>d_f = 5</code> in 38,240 s; degree ≤ 4 equal to E10</td><td>d_F = 5 [pcc:unverified]</td></tr>
+<tr><td>E14a draw 3</td><td>running at the last pull (2026-11-13 02:50 UTC); record lost with the pod</td><td>not completed</td></tr>
+<tr><td>E14a draw 4</td><td>cut off by the deadline</td><td>not completed</td></tr>
+<tr><td><b>E14a cell</b></td><td>2 measured, both read 5; the rule needs ≥ 3 of 4 for "d_F = 5"</td><td><b>split</b></td><td></td></tr>
+<tr><td>E14b (6:10:3 controls)</td><td>not started: E14a held the pod until the deadline</td><td>not completed</td><td>"not completed" (0.35) occurred</td></tr>
+<tr><td>E14c (4:28:7)</td><td>not started</td><td>no reading</td><td>"no reading" (0.80) occurred</td></tr></table>
+<p>The combined statement "independent agreement (E13b + E14b)" is not made, and E13b's reading stays "disagreement".</p>
+<h2>Degree-5 closure cost</h2>
+<p>Both measured draws closed degree 5 at full rank: 974,982 of 974,982 columns in 4 rounds. Degree 5 took 37,799 s and 38,151 s of the totals on 32 threads, against 91 s for degree 4. The cell is called "split" only because two draws were measured. It is not a disagreement: no measured draw reads anything other than 5.</p>
+<h2>What went wrong</h2>
+<ul><li>The check-ins scheduled for 13:35 and 17:10 UTC on 2026-11-13 reached the session only at 19:08 UTC on 2026-11-14. No pull was taken after 02:50 UTC, and by then the pod was gone (REST 404). Draw 3's record, if it was written, was lost. Whether draw 3 finished is unknown.</li>
+<li>Detached pullers died when the session container restarted. The in-pod script never uploaded to S3, so the pod's local disk was the only copy.</li>
+<li>The registered order ran E14a's four draws in one invocation. At about 10.6 h per draw, all four could not finish inside the 36 h deadline, so E14b and E14c never ran.</li></ul>
+<h2>Next step (needs a new amendment)</h2>
+<p>A rerun of draws 3 and 4 alone, at about 11 h each on the same pod class (about USD 46 at USD 2.08/h), with pulls or an S3 upload after every draw, would decide the cell. Nothing is retried without an amendment.</p>
+</body></html>

@@ -192,3 +192,7 @@ following, and this README applies its errata [pcc:unverified].
 `figures/ratio_to_rho.{svg,png}`, `REPORT.pdf`. Benchmark records:
 `benchmarks/records/20261107T1945Z-curve25519-f1-walk-k20.json` and
 `benchmarks/records/20261107T1947Z-curve25519-f1-walk-k24.json`.
+
+## Correction (2026-11-08): weight-1 distances to rho
+
+The ecbench w band charges rho-neg's per-step negation work but not the walk-table arms' per-step hash inserts (`work_native.table_insert_attempts`), so this study's distances to rho at w = 0.1 and w = 1 flatter the F = 1 arm [pcc:unverified]. Charging the inserts the same way (the post-hoc script `research/curve25519_f1_targetwalk_20261108/scripts/sensitivity_inserts.py`, applied to these sessions) gives F = 1 (x = 0.7) ÷ rho-neg = 1.492 [1.449, 1.536] at w = 0.1 and 1.471 [1.423, 1.521] at w = 1 for k = 20, and 1.567 and 1.551 for k = 24, not the 1.43x / 1.08x and 1.49x / 1.10x quoted above [pcc:unverified]. The w = 0 figures are unaffected [pcc:unverified]. How the band should price table inserts is an open ruling.
