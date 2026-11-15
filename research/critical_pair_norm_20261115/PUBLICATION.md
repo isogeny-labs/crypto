@@ -42,3 +42,11 @@ change; no old producer is rerun. The failed status read first used stdout.log
 instead of the backend's actual backend.stdout name; no computation was
 repeated, and the actual four stderr files report the reduction cap.
 [pcc:unverified]
+
+A1 is implemented after its preregistration: represented-pair statuses charge
+seven slots each; chain tests require both earlier statuses and divisibility
+by the current LCM. A processed nonzero remainder is installed before its
+pair receives a status. Reducers prefer lower leading degree, then column
+and creation id. The same build/qualifier and unchanged checker are reused;
+fresh strict build003 passes all five executables. No002 call has occurred.
+The next source commit freezes this version before its own immutable wrapper.

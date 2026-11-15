@@ -5,7 +5,7 @@ namespace critical {
 using namespace mca;
 using Sparse=std::vector<std::pair<std::size_t,U>>;
 struct Stats {
-    std::size_t rows=0,steps=0,entries=0,nodes=0,basis=0,pairs=0,skipped=0,deferred=0;
+    std::size_t rows=0,steps=0,entries=0,nodes=0,basis=0,pairs=0,skipped=0,chains=0,deferred=0;
     U products=0,updates=0;
 };
 struct Field {
@@ -55,11 +55,24 @@ struct Node {char kind;std::size_t first,second;Sparse links,value;};
 using Pair=std::tuple<unsigned,std::size_t,std::size_t,std::size_t>;
 class Engine {
     const System&s;Stats&stats;Index index;Field field;
-    std::vector<Node> nodes;std::vector<std::size_t> basis,originals;
+    std::vector<Node> nodes;std::vector<std::size_t> basis,reducers,originals;
     std::vector<U> dense;
     std::set<Pair> pairs;
+    std::set<std::pair<std::size_t,std::size_t>> represented;
     std::map<std::pair<std::size_t,std::size_t>,std::size_t> cache;
     void reserve_slots(std::size_t count){require(stats.entries+count<=entry_cap,"entry cap");stats.entries+=count;}
+    static std::pair<std::size_t,std::size_t> key(std::size_t a,std::size_t b){return std::minmax(a,b);}
+    void mark_represented(std::size_t a,std::size_t b){
+        const auto pair=key(a,b);if(represented.count(pair))return;
+        reserve_slots(7);represented.insert(pair);
+    }
+    bool chain_represented(std::size_t a,std::size_t b,std::size_t lcm)const{
+        for(const auto h:basis){
+            if(h==a||h==b||!quotient::divides(index.monomials[nodes[h].value.front().first],index.monomials[lcm]))continue;
+            if(represented.count(key(a,h))&&represented.count(key(b,h)))return true;
+        }
+        return false;
+    }
     std::size_t append(char kind,std::size_t first,std::size_t second,Sparse links,Sparse value){
         require(nodes.size()<pc::node_cap,"proof node cap");reserve_slots(6+2*links.size()+2*value.size());
         nodes.push_back({kind,first,second,std::move(links),std::move(value)});stats.nodes=nodes.size();return nodes.size()-1;
@@ -83,7 +96,7 @@ class Engine {
         for(std::size_t at=0;at<index.columns;){
             if(dense[at]==0){++at;continue;}
             require(++stats.steps<=step_cap,"reduction step cap");bool changed=false;
-            for(const auto reducer:basis){
+            for(const auto reducer:reducers){
                 const auto lead=nodes[reducer].value.front().first;
                 if(!quotient::divides(index.monomials[lead],index.monomials[at]))continue;
                 Monomial multiplier(index.n);for(std::size_t j=0;j<index.n;++j)multiplier[j]=index.monomials[at][j]-index.monomials[lead][j];
@@ -104,16 +117,20 @@ class Engine {
         require(!proof.empty(),"nonzero remainder has empty provenance");return append('L',0,0,std::move(proof),std::move(row));
     }
     void install(std::size_t node){
-        require(basis.size()<row_cap,"working basis count cap");reserve_slots(1);
+        require(basis.size()<row_cap,"working basis count cap");reserve_slots(2);
         const auto&lm=index.monomials[nodes[node].value.front().first];
         for(const auto other:basis){
             const auto&om=index.monomials[nodes[other].value.front().first];bool coprime=true;Monomial lcm(index.n);
             for(std::size_t j=0;j<index.n;++j){if(lm[j]&&om[j])coprime=false;lcm[j]=std::max(lm[j],om[j]);}
-            if(coprime){++stats.skipped;continue;}
+            if(coprime){++stats.skipped;mark_represented(other,node);continue;}
             const auto degree=canonical::degree(lcm);if(degree>index.degree){++stats.deferred;continue;}
             reserve_slots(9);pairs.emplace(degree,index.lookup.at(lcm),other,node);
         }
-        basis.push_back(node);stats.basis=basis.size();
+        basis.push_back(node);reducers.push_back(node);
+        std::sort(reducers.begin(),reducers.end(),[&](auto a,auto b){
+            const auto ca=nodes[a].value.front().first,cb=nodes[b].value.front().first;
+            return std::make_tuple(index.degrees[ca],ca,a)<std::make_tuple(index.degrees[cb],cb,b);
+        });stats.basis=basis.size();
         std::cout<<"PROGRESS basis="<<basis.size()<<" pairs_pending="<<pairs.size()<<" reductions="<<stats.steps
                  <<" entries="<<stats.entries<<" nodes="<<nodes.size()<<std::endl;
     }
@@ -147,7 +164,7 @@ class Engine {
         std::cout<<"CANDIDATE CRITICAL degree="<<index.degree<<" columns="<<index.columns<<" rows="<<stats.rows
                  <<" basis="<<stats.basis<<" exported="<<gb.size()<<" reductions="<<stats.steps<<" entries="<<stats.entries
                  <<" nodes="<<stats.nodes<<" proof_nodes="<<count<<" proof_bytes="<<proof.str().size()<<" pairs="<<stats.pairs
-                 <<" skipped="<<stats.skipped<<" deferred="<<stats.deferred<<" products="<<stats.products<<" updates="<<stats.updates<<std::endl;
+                 <<" skipped="<<stats.skipped<<" chains="<<stats.chains<<" deferred="<<stats.deferred<<" products="<<stats.products<<" updates="<<stats.updates<<std::endl;
     }
 public:
     Engine(const System&input,unsigned degree,Stats&counts):s(input),stats(counts),index(input,degree),field(input.p,counts),dense(index.columns,0){stats.entries=index.fixed;}
@@ -155,17 +172,20 @@ public:
         for(std::size_t i=0;i<s.equations.size();++i)originals.push_back(append('I',i,0,{},index.encode(s.equations[i])));
         for(const auto id:originals){if(unit())break;require(++stats.rows<=row_cap,"row cap");const auto result=reduction(id);if(result<nodes.size())install(result);}
         while(!pairs.empty()&&!unit()){
-            const auto pair=*pairs.begin();pairs.erase(pairs.begin());stats.entries-=9;++stats.pairs;require(++stats.rows<=row_cap,"row cap");
-            const auto lcm=std::get<1>(pair),a=std::get<2>(pair),b=std::get<3>(pair);Monomial ma(index.n),mb(index.n);
+            const auto pair=*pairs.begin();pairs.erase(pairs.begin());stats.entries-=9;++stats.pairs;
+            const auto lcm=std::get<1>(pair),a=std::get<2>(pair),b=std::get<3>(pair);
+            if(chain_represented(a,b,lcm)){++stats.chains;mark_represented(a,b);continue;}
+            require(++stats.rows<=row_cap,"row cap");Monomial ma(index.n),mb(index.n);
             for(std::size_t j=0;j<index.n;++j){ma[j]=index.monomials[lcm][j]-index.monomials[nodes[a].value.front().first][j];mb[j]=index.monomials[lcm][j]-index.monomials[nodes[b].value.front().first][j];}
             const auto left=multiply(a,ma),right=multiply(b,mb);std::map<std::size_t,U> difference;
             for(const auto&term:nodes[left].value)difference[term.first]=term.second;
             for(const auto&term:nodes[right].value){auto&value=difference[term.first];value=field.sub(value,term.second);}
             Sparse value;for(const auto&term:difference)if(term.second)value.push_back(term);
-            if(value.empty())continue;
+            if(value.empty()){mark_represented(a,b);continue;}
             require(stats.entries+4*difference.size()<=entry_cap,"active S-row cap");
             const auto source=append('L',0,0,{{left,1},{right,s.p-1}},std::move(value));
             const auto result=reduction(source);if(result<nodes.size())install(result);
+            mark_represented(a,b);
         }
         export_candidate(output);
     }
@@ -190,5 +210,5 @@ int main(int argc,char**argv){
         execl(verifier,verifier,input.c_str(),output.c_str(),(output.string()+".cert").c_str(),nullptr);throw std::runtime_error("verifier exec failed");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<" rows="<<stats.rows<<" basis="<<stats.basis
         <<" reductions="<<stats.steps<<" entries="<<stats.entries<<" nodes="<<stats.nodes<<" pairs="<<stats.pairs
-        <<" skipped="<<stats.skipped<<" deferred="<<stats.deferred<<'\n';return 2;}
+        <<" skipped="<<stats.skipped<<" chains="<<stats.chains<<" deferred="<<stats.deferred<<'\n';return 2;}
 }
