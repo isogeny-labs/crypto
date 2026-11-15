@@ -153,3 +153,58 @@ This is a **complete toy ECDLP solver with reusable generic preprocessing**, not
 First prove or refute the general square-cubic determinant identity (including exceptional characteristic and collision strata). Then carry a preregistered held-out growing-`k` rank census into the norm-branch B1 gate, and allow SAT B2 only after a substantial rank compression survives controls. Independently execute the already specified sparse PKM `m=8` positive full-solver-call panel with extracted relations and its `gamma<3.5` whole-call gate; this remains the stronger direct cost-changing ECDLP lead. All claims here are [pcc:unverified].
 
 **Literature and prior-work check:** This extends the current PR #4188 counterexample and protocol, not a claim of novelty in polynomial factorization. Root splitting uses the standard Cantor–Zassenhaus idea, and the toy preprocessing belongs to ordinary generic-group time/memory tradeoffs, as in the repository's `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`. Review also considered Shoup 1997 (generic model) and Yokoyama–Yasuda–Takahashi–Kogure 2020 (naive Semaev IC limits, DOI 10.1515/jmc-2019-0029). Research-KB MCP/catalog remained unavailable in this execution context; the repository lead heat map and primary sources served as fallback. No signed PCC standing, EKS benchmark, conductor scope lock, full Rust suite or independent host replay is claimed.
+
+## 2026-11-15: exact integer one-parameter locus and a second cold-solver control [pcc:unverified]
+
+This follow-up is deliberately **not** a proof of the conjectured square-cubic factorization for arbitrary seven fixed abscissae. It supplies a stronger, exact **infinite one-parameter specialization**, valid as an identity in `Z[z]`, plus an independent prime-order elliptic-curve fixture that quantifies the cold-cost penalty. No PCC-signed independent verification, EKS run, or cryptographic-size benchmark was obtained.
+
+### Exact polynomial identity for a fixed seven-tuple
+
+Let `K(z)` be the 6-by-6 matrix from `locus_selector.matrix([0,1,2,3,4,5,6,z],p)`, but formed first over the integers (before reduction modulo any prime). The script `exact_integer_locus.py` gives a deterministic coefficient-free proof certificate for
+
+```text
+det K(z) = -[41472 (z-4)^2 (z-5)^2 (z-6)^2
+               (11879 z^3 - 58033 z^2 + 78934 z - 25880)]^2 .
+```
+
+**Why 19 evaluations suffice:** only the three columns indexed by right-hand pairs containing the eighth point depend on `z`. Each such column has polynomial degree at most six, so the determinant has degree at most 18. The displayed right-hand side has degree 18. Exact integer equality at the 19 distinct values `z=0,...,18` therefore proves the identity in `Q[z]`, and both expressions lie in `Z[z]`. Consequently the same **specialized** identity holds after reduction modulo *every* prime. This argument does not extrapolate to variable first seven abscissae. The script evaluates determinants by fraction-free Bareiss and separately cross-checks Leibniz expansions at two values.
+
+Modulo the prime `1031`, the noncollision cubic root `z=338` gives rank **4**. All 36 minors of size 5 vanish; the leading 4-by-4 minor is `188 mod 1031`. The comparison at `z=7` has rank 6. These are exact local arithmetic checks [pcc:unverified]. They falsify a universal guarded full-rank assertion but do **not** satisfy the prospective B1 threshold `rank <= (null rank)/2` (4/6 > 1/2).
+
+### Actual prime-order EC fixture and matched cold-cost accounting
+
+The separate `prime_curve_fixture_1031.py` constructs
+
+```text
+p = 1031; E: y^2 = x^3 + 447 x + 997; #E(F_p) = 991 (prime).
+P_1,...,P_8 =
+ [(0,911),(1,528),(2,620),(3,731),
+  (4,555),(5,518),(6,687),(338,592)].
+```
+
+The script checks the discriminant guard, each nonzero ordinate and curve equation, curve cardinality by direct point counting, primality of the cardinality by trial division, and the coefficient-matrix rank. With `P_1` as generator, it independently recovers and checks all 991 public toy target logarithms by ordinary BSGS and by the sign-table-and-shift algorithm. The eight-point signed support contains **252 distinct elements** out of 991, below the combinatorial ceiling 256.
+
+The script counts calls to the same elliptic-curve addition routine, with a **fresh cold setup per target**, and averages the target-dependent query cost over all 991 known-answer points. It treats the generator's own logarithm as free to the signed solver; it omits curve/locus discovery, field-inversion weights, full verification expenses and memory costs. These omissions favor the signed alternative.
+
+| Stage, group-addition calls | Ordinary BSGS | Signed table / shift |
+| --- | ---: | ---: |
+| Shared BSGS baby/giant-stride setup | 39 | 39 |
+| Additional seven base-point logarithms | 0 | 90 |
+| Build 256 sign assignments (252 unique entries) | 0 | 271 |
+| Mean online target calls | 14.984864 | 4.896065 |
+| **Mean one-target cold total** | **53.984864** | **404.896065** |
+
+The 991-target census is a correctness sweep, **not** a justification for amortizing its setup. At this exact toy protocol the signed approach reduces online calls but **increases cold calls about 7.5-fold**, prior to charging locus selection. [pcc:unverified] This controls the interpretation of the previous 977-target demonstration; it is not a universal performance claim.
+
+For fixed signed support `S` of size `s` in a prime-order group of size `r`, and a fixed target-independent set of `T` shifts `D`, the union `S-D` has size at most `sT`. Hence a uniformly sampled target has success probability **at most** `min(1,sT/r)`. Guaranteed coverage by such a fixed-shift strategy requires `T >= ceil(r/s)`. This elementary bound does not cover a target-adaptive algebraic relation algorithm and is not a lower bound on arbitrary prime-field ECDLP.
+
+Reproduce from the repository root (Python 3.11+, standard library only):
+
+```sh
+python3 research/norm_branch_rank_pilot_20261115/exact_integer_locus.py
+python3 research/norm_branch_rank_pilot_20261115/prime_curve_fixture_1031.py
+```
+
+**Next gated experiments:** (a) seek an arbitrary-seven symbolic determinant formula or a counterexample to the universal square-cubic conjecture; (b) compare genuine conditioned rank defects on preregistered growing-`k` holdouts with independent nonzero-coefficient nulls, both adjacent middle layers and exact positive-relation extraction; (c) put the native sparse PKM `m=8` natural-positive whole-call relation/rank panel on authorized EKS Spot and report full cold setup + relation finding + linear algebra + verified scalar recovery against matched rho. Do not promote a model from stage-only online costs.
+
+Literature scope: the prime-field algebraic context was cross-checked against Petit–Kosters–Messeng, *Algebraic Approaches for the Elliptic Curve Discrete Logarithm Problem over Prime Fields* (PKC 2016, DOI 10.1007/978-3-662-49387-8_1), and Amadori–Pintore–Sala, *On the discrete logarithm problem for prime-field elliptic curves* (Finite Fields Appl. 51, 2018, DOI 10.1016/j.ffa.2018.01.009). No priority or novel general theorem is claimed. Research-KB MCP, repo wrapper, Conductor and EKS are not available in this execution environment; code and sources were reviewed via the GitHub connector and public primary records. All numerical claims are producer-local [pcc:unverified].
