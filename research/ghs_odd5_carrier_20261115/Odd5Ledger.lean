@@ -48,6 +48,12 @@ theorem howe_degree_ceilings :
 theorem selected_cover_primes_exceed_ceilings :
     (43 : Nat) > 33 ∧ 127 > 35 ∧ 37 > 26 ∧ 109 > 20 := by decide
 
+theorem degree_four_denominator_count :
+    (5 : Nat) + 242 + 1 + 1 = 249 := by decide
+
+theorem degree_four_assignment_count :
+    (5 : Nat) * 3^4 + 244 * 3^5 = 59697 := by decide
+
 #print axioms ordinary_class_count
 #print axioms selected_class_count
 #print axioms all_eight_orders_two_mod_four
@@ -59,4 +65,6 @@ theorem selected_cover_primes_exceed_ceilings :
 #print axioms selected_prime_subgroups
 #print axioms howe_degree_ceilings
 #print axioms selected_cover_primes_exceed_ceilings
+#print axioms degree_four_denominator_count
+#print axioms degree_four_assignment_count
 end GHSOdd5Ledger
