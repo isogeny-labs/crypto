@@ -2734,4 +2734,71 @@ mod tests {
         assert!(bad(r, 1));
         assert!(!bad(PowRule::kummer(3, None), 1));
     }
+
+    /// Reviewer's adversarial test: mixed 2,3,2 and 3,2,3,2 towers over
+    /// primes where 12 (resp. 36) divides p - 1, planted and unplanted,
+    /// against exhaustive search, the staircase and the generic F4.
+    #[test]
+    fn review_mixed_2_3_2_towers_over_primes_with_12_dividing_p_minus_1() {
+        let mut rng = rand::rngs::StdRng::seed_from_u64(20261115);
+        let cases: [(u64, &[u8]); 7] = [
+            (61, &[2, 3, 2]),
+            (97, &[2, 3, 2]),
+            (109, &[2, 3, 2]),
+            (157, &[2, 3, 2]),
+            (37, &[3, 2, 3, 2]),
+            (73, &[3, 2, 3, 2]),
+            (109, &[2, 3, 2, 3]),
+        ];
+        for (p, radices) in cases {
+            assert_eq!((p - 1) % radices.iter().map(|&r| u64::from(r)).product::<u64>(), 0);
+            for (m, n_eq, d, trial) in [(2usize, 1usize, 3u32, 0usize), (2, 2, 2, 1), (3, 2, 2, 2), (3, 3, 2, 3)] {
+                let tag = format!("review p {p} {radices:?} m {m} eq {n_eq} trial {trial}");
+                let dd = Decomp::new(&mut rng, p, radices, m, n_eq, d, 4, trial != 1);
+                check_decomposition(&dd, m * radices.len() <= 7, &tag);
+            }
+        }
+    }
+
+    /// Reviewer's adversarial test: multiplication in a random mixed ring
+    /// with every b coefficient non-zero is commutative, associative and
+    /// equals the independent dense reduction (sum of term-by-term products
+    /// against the dense product reduced by the generic rewriting).
+    #[test]
+    fn review_products_are_associative_and_match_dense_reduction() {
+        let mut rng = rand::rngs::StdRng::seed_from_u64(424242);
+        let ring = random_ring(&mut rng, 101, &[2, 3, 3, 2, 3], 1, 0);
+        let n = ring.n_vars();
+        let rnd_raw = |rng: &mut rand::rngs::StdRng| -> Vec<(Vec<u32>, u64)> {
+            (0..4)
+                .map(|_| ((0..n).map(|_| rng.gen_range(0..2u32)).collect(), rng.gen_range(1..101u64)))
+                .collect()
+        };
+        for _ in 0..200 {
+            let (a, b) = (rnd_raw(&mut rng), rnd_raw(&mut rng));
+            let pa = ring.from_raw(&a);
+            // a * c as a sum over the terms of b of (term * a) then times c monomials
+            let mut ab: BTreeMap<Vec<u32>, u64> = BTreeMap::new();
+            let f = fp(101);
+            for (e, cf) in &b {
+                let m = ring.from_raw(&[(e.clone(), 1)]);
+                let t = ring.mul_mono(&pa, m.monos[0]);
+                for (&mm, &cc) in t.monos.iter().zip(&t.coefs) {
+                    let k = x_exponents(mm, ring.n_tower(), 0);
+                    let v = ab.entry(k).or_insert(0);
+                    *v = f.add(*v, f.mul(*cf, u64::from(cc)));
+                }
+            }
+            ab.retain(|_, v| *v != 0);
+            // dense reference: multiply the raw polynomials, reduce
+            let mut dense = Vec::new();
+            for (ea, ca) in &a {
+                for (eb, cb) in &b {
+                    let e: Vec<u32> = ea.iter().zip(eb).map(|(x, y)| x + y).collect();
+                    dense.push((e, f.mul(*ca, *cb)));
+                }
+            }
+            assert_eq!(ab, reference_nf(&ring, &dense));
+        }
+    }
 }
