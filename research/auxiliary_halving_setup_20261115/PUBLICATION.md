@@ -117,3 +117,19 @@ bytes to the temporary /workspace/scratch/aux-halving-pr.md referenced by
 lesson test T-40fa2db68053). Its prose lint reports zero findings. The restored
 tracked .artifacts/config.json supplies the actual keep rules; the policy
 check selects exactly the two whole archives, retaining PDF and PCC ledger.
+
+PR4302 opens at79045b80da with auto-merge. Artifact bot ba62e3ae93 moves only
+the two whole archives to pointers/ignore rules. Run43717663512 reports two
+uploaded objects and two complete remote-byte replays. Restored exact ignored
+local copies pass both hydrated verifications with zero problems. The report
+and README now record this actual custody, without promoting PCC standing.
+[pcc:unverified]
+
+At the first review of this new head, required gate/size/artifacts and PCC
+checks pass; records fails on the unrelated existing open benchmark record.
+Main40eb9a1607 introduces a shared-journal conflict. The one authorized
+Copilot request is comment6895067091 at2026-11-15T13:31:44Z, asking a normal
+base merge preserving every complete entry. This worktree's journal stays
+untouched while the request is pending. This custody-only source commit must
+receive its own current-head gates; prior-head passes are not carried forward.
+[pcc:unverified]

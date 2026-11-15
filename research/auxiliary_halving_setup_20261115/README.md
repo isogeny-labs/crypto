@@ -77,8 +77,12 @@ It retains all 25 arms, the full census, setup histories, certificate,
 legacy comparison and cold trace. Both build failures remain under checks.
 Current source/binary/script bytes match their distinct pre-call manifests.
 This whole archive and the parent's 97,024-byte final Rust gate archive use
-the documented artifact-autofix upload/full-byte replay. Their remote custody
-awaits its receipt. No archive is split. [pcc:unverified]
+the documented artifact-autofix upload/full-byte replay. Run43717663512
+uploads both objects and replays both complete remote bytes; manifest commit
+ba62e3ae93 retains the two SHA256/length pointers and ignore rules. Local
+hydrated verification passes for both objects with zero problems. Use
+tools/artifacts/artifacts.py pull on either evidence directory to hydrate it.
+No archive is split. [pcc:unverified]
 
 The parent's full Rust suite at source 2fd16de7ca finishes nonpassing:
 6,406 passed, 48 failed, 139 ignored. Output reports omitted sparse data/device
