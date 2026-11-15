@@ -22615,9 +22615,8 @@ mod tests {
         let (found, _) = collector.collect_aimed(unit, None);
         assert!(!found.is_empty(), "no relations to check");
         let fast = FastCurve::new(&kc.curve).expect("single-word field");
-        let negation = (0..fb.points.len()).find_map(|j| {
-            (fb.points[j] == crate::binary_ecc::curve::point_neg(&fb.points[0])).then_some(j)
-        });
+        let negation = (0..fb.points.len())
+            .find(|&j| fb.points[j] == crate::binary_ecc::curve::point_neg(&fb.points[0]));
         let mut cases = Vec::new();
         for rel in found.iter().take(40) {
             cases.push(rel.clone());
