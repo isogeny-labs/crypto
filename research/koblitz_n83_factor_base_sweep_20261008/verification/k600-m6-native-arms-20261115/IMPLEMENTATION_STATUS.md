@@ -1,5 +1,12 @@
 # Native K600 m6 arm-input staging component
 
+The [Linux build producer amendment](LINUX_BUILD_PRODUCER_AMENDMENT.md)
+adds a source-bound native build receipt for the existing `charge build`
+precharge phase. Its two focused release tests pass. A frozen host-specific
+plan, actual Linux arm64 build, image inspection, full-invocation wall receipt,
+and subsequent K600 controls remain unexecuted. It reports no new performance
+value.
+
 The [runtime image-label correction](RUNTIME_IMAGE_LABEL_CORRECTION.md)
 aligns export, solver and replay inspection with the two-revision build
 commit. Its release tests pass; a real Linux K600 path remains unrun.
