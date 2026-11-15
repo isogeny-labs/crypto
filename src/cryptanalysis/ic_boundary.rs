@@ -9050,6 +9050,33 @@ impl PairTable {
         }
     }
 
+    /// Probe a binary sum returned by [`FastCurve::add_many_lazy`]. Its
+    /// abscissa is final; its ordinate is completed only after the key hits.
+    /// The lookup, re-addition and sign resolution are those of [`Self::probe`].
+    pub fn probe_binary_lazy(
+        &self,
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        minuend: FastPoint,
+        rest: FastPoint,
+        lambda: u64,
+    ) -> Option<(usize, usize)> {
+        *lookups += 1;
+        let (i, j) = self.get(rest.pack() >> 1)?;
+        let target = g.0.finish_lazy(minuend, rest, lambda);
+        let (i, j) = (i as usize, j as usize);
+        let s = g.add(ops, fb.points[i], fb.points[j]);
+        if s == target {
+            Some((i, j))
+        } else if s == g.neg(target) {
+            Some((fb.neg_index[i], fb.neg_index[j]))
+        } else {
+            None
+        }
+    }
+
     pub fn calibrate_lookup(&self, samples: u64) -> f64 {
         let mut rng = StdRng::seed_from_u64(7);
         let keys: Vec<u64> = (0..1024).map(|_| rng.gen::<u64>() >> 1).collect();

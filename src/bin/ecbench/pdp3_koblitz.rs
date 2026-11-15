@@ -61,8 +61,9 @@
 //! `rootfind-negfold-batch` keeps the same ordered half table and probe,
 //! but shares an inversion over each binary table row's ordinary additions.
 //! For `m = 3`, consecutive scan additions share an inversion in blocks of
-//! eight. Completed blocks charge every addition, including any candidates
-//! after the first hit. Any wall benefit needs a
+//! eight. The scan computes an ordinate only when a table key is present.
+//! Completed blocks charge every addition, including any candidates after
+//! the first hit. Any wall benefit needs a
 //! separate controlled measurement. It has a separate method identity so
 //! the scalar arm remains reproducible.
 //!
@@ -544,6 +545,7 @@ pub struct Pdp3KoblitzOracle<'i> {
     scan_scratch: BatchScratch,
     scan_addends: Vec<FastPoint>,
     scan_sums: Vec<FastPoint>,
+    scan_lambdas: Vec<u64>,
     /// Base size the table was built on; `0` under a Groebner engine.
     pair_table_points: usize,
     /// Third-summand window for windowed engines; `0` otherwise.
@@ -580,6 +582,7 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             scan_scratch: BatchScratch::default(),
             scan_addends: Vec::new(),
             scan_sums: Vec::new(),
+            scan_lambdas: Vec::new(),
             pair_table_points: 0,
             scan_window_len: 0,
             window_div: 0,
@@ -684,20 +687,34 @@ impl<'i> Pdp3KoblitzOracle<'i> {
                 self.scan_addends
                     .extend(fb.points[from..to].iter().map(|&p| g.neg(p)));
                 self.scan_sums.clear();
-                g.0.add_many(
+                self.scan_lambdas.clear();
+                g.0.add_many_lazy(
                     point,
                     &self.scan_addends,
                     &mut self.scan_sums,
+                    &mut self.scan_lambdas,
                     &mut self.scan_scratch,
                 );
+                assert_eq!(self.scan_sums.len(), self.scan_addends.len());
+                assert_eq!(self.scan_lambdas.len(), self.scan_addends.len());
                 // The batch has already formed all sums, even if an early
                 // probe hits. The ledger therefore charges the entire block.
                 ops.adds += self.scan_addends.len() as u64;
-                for (offset, &rest) in self.scan_sums.iter().enumerate() {
+                for (offset, (&rest, &lambda)) in
+                    self.scan_sums.iter().zip(&self.scan_lambdas).enumerate()
+                {
                     if g.is_identity(&rest) {
                         continue;
                     }
-                    if let Some((i, j)) = table.probe(g, fb, ops, &mut counters.lookups, rest) {
+                    if let Some((i, j)) = table.probe_binary_lazy(
+                        g,
+                        fb,
+                        ops,
+                        &mut counters.lookups,
+                        point,
+                        rest,
+                        lambda,
+                    ) {
                         return Some(vec![from + offset, i, j]);
                     }
                 }
@@ -1290,7 +1307,7 @@ mod engine_names {
 
     #[test]
     fn binary_batch_scan_keeps_scalar_first_witness_and_lookup_order() {
-        use super::{decompose_mitm, BinaryGroup, ColumnFold, GroupOps};
+        use super::{decompose_mitm, BinaryGroup, ColumnFold, FastPoint, GroupOps};
         use super::{OracleCounters, PairTable};
         use crypto_lib::cryptanalysis::ic_boundary::{koblitz_factor_base, koblitz_instance};
         use crypto_lib::cryptanalysis::ic_framework::stages::InstanceCtx;
@@ -1332,6 +1349,9 @@ mod engine_names {
                     .add(fb.points[k], group.0.add(fb.points[3], fb.points[7])),
             );
         }
+        points.push(fb.points[0]);
+        points.push(group.0.neg(fb.points[0]));
+        points.push(FastPoint::INFINITY);
         for point in points {
             let mut scalar_ops = GroupOps::default();
             let mut scalar_ctr = OracleCounters::default();
