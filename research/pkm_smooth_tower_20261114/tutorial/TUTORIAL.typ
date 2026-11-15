@@ -341,6 +341,13 @@ quoted from their reports. They have no pcc claim id yet [pcc:unverified].
   targets), but it costs between $2 dot 10^2$ and $1.2 dot 10^7$ times more $FF_p$ multiplications than simply
   trying every factor-base point. The gap grows with $|V|$, at $m = 2$ and at $m = 3$, where it reaches
   $5 dot 10^7$ at $|V| = 32$. Those systems needed about 18 GiB and ran on a 128 GiB host.
+- *The cost depends on the shape, not the instance.* Rerunning the same system with a different curve, coset
+  $g$, target or prime gives the same F4 count to 8–9 significant figures. So the work is fixed by $m$ and the
+  degree sequence $(q_1, dots, q_(n'))$. One consequence surprised us: at $m = 3$, the degree-2 tower with
+  $|V| = 32$ and the mixed tower $(2, 3, 2, 3)$ with $|V| = 36$ cost the same to within 0.023%
+  ($approx 5.10 dot 10^12$ multiplications each). Step-by-step logs show two different computations: 16 against
+  13 unknowns, top degree 7 against 8, and the work spread over different steps. Only the totals agree, so we
+  read it as a coincidence between two fixed shape constants, not a hidden equivalence.
 
 *Bottom line.* At the sizes measured, this attack is slower than Pollard rho by 18–141 times. Solving its
 polynomial systems is slower than enumerating the factor base by orders of magnitude. Odd degrees shave a
