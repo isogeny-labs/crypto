@@ -362,3 +362,54 @@ divisible by 4, so bit₀(x) ⊕ bit₁(x) = 0 on every one of them.
 - By the decision rule, the lead stays closed at this scope. The P2 caveat above applies.
 - This is consistent with `LEAD-TRF-padic-canonical-section`.
 - Untested: masks of weight ≥ 3, and sizes at cryptographic scale.
+
+## 13. R1d: weight-3 masks and larger p (measured, 2026-11-15)
+
+All results are unverified assertions by the producing session [pcc:unverified].
+
+**Run.**
+- Protocol `r1_carry/PROTOCOL_R1D.md`, frozen at commit `9cd8ff82` before data, with the R1c
+  instrument defects fixed.
+- Tool `src/bin/r1d.rs`; static binary sha256 `c56b9f4e…9399`, checked inside the pod.
+- Host: RunPod pod `urjw36z7y65jo0` (cpu5c, 32 vCPU, AMD EPYC 9575F), 06:10:58–06:16:39Z, about
+  $0.11. The pod was deleted afterwards (HTTP 204).
+- Raw outputs: `r1_carry/results_r1d/`.
+
+**Part 1: weight ≤ 3 masks.** Six curves, p ∈ [2²¹, 2²²], |H| = 1.37–1.99 × 10⁶.
+
+T = 2,798,873 mask pairs. That is fewer than the protocol's estimate of about 6.8×10⁶, because the
+x-masks now range only over the 21 bits that vary on H. The frozen bound of 42.0 was set for
+T ≤ 7×10⁶ and is therefore conservative here.
+
+| Statistic | Test | Shuffled | P1 affine | P2 weight-2 at (3,1) | P3 weight-3 at (7,2) | Bound |
+|---|---|---|---|---|---|---|
+| S6 max χ² | 24.85–33.41 | 23.95–27.96 | 34,211–161,452 | 124.13–213.61 | 139.06–200.64 | ≤ 42.0 |
+| S7 max bin | 8–9 | 8 | = \|H\| − 1 | 8–9 | 8–9 | ≤ 30 |
+| S3 zeros / 10⁶ | 0–2 | — | — | — | — | ≤ 10 |
+
+Both planted controls are found at exactly their planted mask pair.
+
+**Part 2: larger p, weight ≤ 2.** Two curves, p = 18,807,461 and 26,672,851, |H| = 0.94–1.33 × 10⁷,
+T = 97,500.
+- S6: 21.00 and 22.81, against shuffled 20.17 and 20.26 (bound ≤ 33.0).
+- S7: 9; S3: 0.
+- P1: S7 = |H| − 1.
+- P2 at (3,1): χ² = 975.82–1,244.19.
+- P3 at (7,2) is computed for reference: χ² = 811.43–1,358.58. Weight-3 masks are not in this part's
+  S6, as the protocol specifies.
+
+**Observation.** In Part 1 the test maximum exceeds its shuffled control on 4 of 6 curves (sign test
+p ≈ 0.34). The largest value, 33.41 at T = 2.8×10⁶, has a family-wise p of about 0.07 on its own curve.
+Neither is significant, and every value is inside the frozen bound.
+
+**Verdict.**
+- All frozen null bounds are met, and P1, P2 and P3 pass. By the decision rule, the lead stays
+  closed at this scope.
+- Together with R1, R1b and R1c, ψ shows no leakage in:
+  - affine fits;
+  - carry cocycles;
+  - linear masks up to weight 3;
+  - lag differences;
+  - degree in x.
+
+  The tested range runs from p = 2¹¹ to 2²⁵.
