@@ -12,15 +12,20 @@ The user selected **local or Runpod** after the lab-access question. The
 continuation now uses the local backend, a local checkpoint and published
 source/spec; [Amendment 2](AMENDMENT_2_LOCAL.md) supersedes the earlier blocked
 EKS route for this work. The first frozen pilot is `p=67`, seed `3`, all five
-oracles, one warmup and five measured rounds under a 900-second bound. It has
-not run yet. Standard lab admission and S3 custody are not asserted.
+oracles, one warmup and five measured rounds under a 900-second bound. It
+completed on source `3188372cc`: all 150 executions recovered correctly and
+the local controls passed. The best graph arm, symmetric hybrid S3, took
+25.61 times the existing local rho reference's cold wall time (paired-round
+95% interval 24.16–27.62). See the [pilot report](local-p67-all5-20261115-02/report.pdf)
+and [evidence](local-p67-all5-20261115-02/README.md). Standard lab admission
+and S3 custody are not asserted.
 [pcc:unverified]
 
 The [native Rust analysis](native_analysis/README.md) checks the full planned
 schedule, provenance/instance identity, graph/pivot fingerprints, scalar
 replays and A/A controls. It retains failed/incomplete cases, produces paired
 bootstrap intervals and a Plotters SVG, and prevents the small pilot from
-triggering the large-subgroup reference-parity field. Five analysis tests and
+triggering the large-subgroup reference-parity field. Six analysis tests and
 its warnings-denied Clippy check pass locally. [pcc:unverified]
 
 ## Rust continuation toward the rho comparison
@@ -46,8 +51,15 @@ graph/pivot prefixes match within each oracle block. [pcc:unverified]
 
 The reference is the repository's existing cubic r-adding rho. The fastest
 external reference and full native pricing remain required for a broader
-parity claim. Ratios in the driver are unadmitted diagnostics; no performance
-run or parity result has been produced. [pcc:unverified]
+parity claim. The local pilot is exploratory and does not meet that claim.
+[pcc:unverified]
+
+[Amendment 3](AMENDMENT_3_SAMPLING.md) freezes the next matched fresh/r-adding
+sampler comparison. The native incremental sampler charges construction,
+cycle detection and uniform restarts; it recovers through IC relations.
+The corrected implementation passes all 33 filtered cubic tests, including
+the exact pilot fresh-stream regression. The failed unbounded-walk prototype
+is retained in validation. Successor timing has not started. [pcc:unverified]
 
 ## Scope and status
 
@@ -55,9 +67,9 @@ run or parity result has been produced. [pcc:unverified]
 | --- | --- | --- |
 | Native Rust integration with other IC code | Final targeted tests pass locally | `src/cryptanalysis/gaudry_cubic_graph.rs`; `run_gaudry_with_eliminator` |
 | Extension-field algebraic relation finding | Existing native engines reused | Weil-restricted S3 pair test, symmetrised S4, and hybrid scan/S3 |
-| Named baseline/candidate comparison | Driver implemented, run pending | `examples/gaudry_cubic_graph_compare.rs`, `protocol.json` |
+| Named baseline/candidate comparison | First local pilot complete | Driver, pilot report, frozen protocol/amendments |
 | Preserve historical default behavior | Targeted regression passes locally | Legacy entry point and optional report-key regression |
-| Numerical performance result | Not measured | S3 checkpoint/EKS submission access and admission required |
+| Numerical performance result | Local pilot, best graph/rho 25.61 | Source/raw hashes and local custody; standard lab admission unavailable |
 | Complete native-cost ranking | Not implemented | Legacy pivot/dense counters omit additions, inversions and native collection work |
 | Full parent-library validation | Incomplete, interrupted | Reported failures outside the touched module and long inherited PKM cases; see validation record |
 

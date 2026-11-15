@@ -2,17 +2,19 @@
 # Thin local build-independent capture/run wrapper; all research computation is Rust.
 set -u -o pipefail
 umask 077
-[[ $# == 1 ]] || { echo 'usage: run-local.sh NEW-RUN-DIR' >&2; exit 2; }
+[[ $# == 1 || $# == 2 ]] || { echo 'usage: run-local.sh NEW-RUN-DIR [FROZEN-PLAN.json]' >&2; exit 2; }
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo=$(/usr/bin/git -C "$here" rev-parse --show-toplevel)
 cd "$repo" || exit 2
+plan=${2:-$here/local-pilot-plan.json}
 for program in jq taskset timeout sha256sum; do command -v "$program" >/dev/null || exit 2; done
 if pgrep -x rustc >/dev/null || pgrep -x cargo >/dev/null || pgrep -x clippy-driver >/dev/null; then
   echo 'Compiler/build activity exists; do not time this run yet.' >&2; exit 2
 fi
 [[ -z $(/usr/bin/git status --porcelain --untracked-files=normal) ]] || { echo 'Publish the clean source/spec first.' >&2; exit 2; }
 source_revision=$(/usr/bin/git rev-parse HEAD)
-sha256sum -c "$here/validation/local-pilot-component-source.sha256" || exit 2
+component_hashes=$(jq -er '.component_hashes // "validation/local-pilot-component-source.sha256"' "$plan") || exit 2
+sha256sum -c "$here/$component_hashes" || exit 2
 mkdir "$1" || exit 2
 run_dir=$(cd "$1" && pwd)
 cp target/release/examples/gaudry_cubic_graph_compare "$run_dir/driver" || exit 2
@@ -21,10 +23,11 @@ binary_sha=$(sha256sum "$run_dir/driver" | cut -d ' ' -f1)
 cpu=$(awk '/^Cpus_allowed_list:/{split($2,a,/[,-]/); print a[1]}' /proc/self/status)
 jq --arg source "$source_revision" --arg binary "$binary_sha" --arg cpu "$cpu" \
   '. + {source_revision:$source,binary_sha256:$binary,pinned_cpu:$cpu}' \
-  "$here/local-pilot-plan.json" > "$run_dir/runtime-plan.json" || exit 2
+  "$plan" > "$run_dir/runtime-plan.json" || exit 2
 cp .resume/RESUME.md "$run_dir/RESUME-before.md" || exit 2
 /usr/bin/git ls-files -z -- Cargo.toml Cargo.lock src/cryptanalysis/gaudry_cubic.rs \
   src/cryptanalysis/gaudry_cubic_graph.rs src/cryptanalysis/gaudry_cubic_symmetric.rs \
+  src/cryptanalysis/gaudry_cubic_sampling.rs \
   src/cryptanalysis/residual_walk.rs src/cryptanalysis/jv_bitops.rs \
   examples/gaudry_cubic_graph_compare.rs research/pencil_large_prime_20261029/Cargo.toml \
   research/pencil_large_prime_20261029/src/lib.rs research/pencil_large_prime_20261029/src/meter.rs \
@@ -37,12 +40,13 @@ lscpu -J > "$run_dir/cpu.json"
 primes=$(jq -er '.primes|map(tostring)|join(",")' "$run_dir/runtime-plan.json")
 seeds=$(jq -er '.seeds|map(tostring)|join(",")' "$run_dir/runtime-plan.json")
 oracles=$(jq -er .oracle_cli "$run_dir/runtime-plan.json")
+sampler=$(jq -r '.sampler // "fresh"' "$run_dir/runtime-plan.json")
 rounds=$(jq -er .rounds "$run_dir/runtime-plan.json")
 warmups=$(jq -er .warmup_rounds "$run_dir/runtime-plan.json")
 cap=$(jq -er .max_residuals "$run_dir/runtime-plan.json")
 seconds=$(jq -er .timeout_seconds "$run_dir/runtime-plan.json")
 memory_kib=$(( $(jq -er .memory_gib "$run_dir/runtime-plan.json") * 1024 * 1024 ))
-argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" --oracles "$oracles" \
+argv=("$run_dir/driver" --primes "$primes" --seeds "$seeds" --oracles "$oracles" --sampler "$sampler" \
   --warmup-rounds "$warmups" --rounds "$rounds" --max-residuals "$cap" \
   --source-revision "$source_revision" --out "$run_dir/raw.jsonl")
 jq -n --args '$ARGS.positional' -- "${argv[@]}" > "$run_dir/argv.json" || exit 2

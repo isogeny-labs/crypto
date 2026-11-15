@@ -66,6 +66,8 @@ mod graph;
 #[path = "gaudry_cubic_symmetric.rs"]
 mod symmetric;
 pub use symmetric::{weil_s3_pair_test_symmetric, SymmetricPairStats};
+#[path = "gaudry_cubic_sampling.rs"]
+mod sampling;
 
 /// `F_p` multiplications per affine addition in `E(F_{p³})`: measured by
 /// [`Fp3::adds_to_muls_ratio`] on construction and folded into the
@@ -3157,6 +3159,16 @@ pub struct GaudryReport {
     /// additions remain included in `group_ops`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub symmetric_pair_stats: Option<SymmetricPairStats>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub residual_sampler: Option<ResidualSampler3>,
+    /// Jump table and start-point construction, also retained in group_ops.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sampler_setup_group_ops: Option<u64>,
+    /// Group operations constructing sampled residuals, excluding setup.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sampling_group_ops: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sampler_restarts: Option<u64>,
 }
 
 /// Auxiliary-column elimination for the protected-target comparison path.
@@ -3165,6 +3177,15 @@ pub struct GaudryReport {
 pub enum LargePrimeBackend {
     Pivot,
     SymbolicGraph,
+}
+
+/// Residual construction for the explicit protected comparison API.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum ResidualSampler3 {
+    #[serde(rename = "fresh")]
+    FreshScalar,
+    #[serde(rename = "r-adding")]
+    RAdding32,
 }
 
 /// Options of a Gaudry-style run; see [`run_gaudry_opts`].
@@ -3742,7 +3763,7 @@ pub fn run_gaudry_opts(
     seed: u64,
     opts: &GaudryOptions,
 ) -> GaudryReport {
-    run_gaudry_impl(inst, base, seed, opts, None)
+    run_gaudry_impl(inst, base, seed, opts, None, ResidualSampler3::FreshScalar)
 }
 
 /// Compare pivot chaining and symbolic forests with the same algebraic oracle.
@@ -3757,6 +3778,27 @@ pub fn run_gaudry_with_eliminator(
     opts: &GaudryOptions,
     backend: LargePrimeBackend,
 ) -> GaudryReport {
+    run_gaudry_with_sampler(
+        inst,
+        base,
+        seed,
+        opts,
+        backend,
+        ResidualSampler3::FreshScalar,
+    )
+}
+
+/// Select residual construction without changing the algebraic oracle or
+/// eliminator. The r-adding sampler has no rho collision table; recovery still
+/// comes from admitted IC relations. All setup and walk additions are charged.
+pub fn run_gaudry_with_sampler(
+    inst: &Instance3,
+    base: &SubspaceBase,
+    seed: u64,
+    opts: &GaudryOptions,
+    backend: LargePrimeBackend,
+    sampler: ResidualSampler3,
+) -> GaudryReport {
     if backend == LargePrimeBackend::SymbolicGraph {
         assert!(
             opts.max_large_primes <= 2,
@@ -3767,7 +3809,7 @@ pub fn run_gaudry_with_eliminator(
             "symbolic graph has no pivot merge-level cap"
         );
     }
-    run_gaudry_impl(inst, base, seed, opts, Some(backend))
+    run_gaudry_impl(inst, base, seed, opts, Some(backend), sampler)
 }
 
 fn run_gaudry_impl(
@@ -3776,6 +3818,7 @@ fn run_gaudry_impl(
     seed: u64,
     opts: &GaudryOptions,
     backend: Option<LargePrimeBackend>,
+    sampler: ResidualSampler3,
 ) -> GaudryReport {
     let max_residuals = opts.max_residuals;
     let solver = opts.solver;
@@ -3825,6 +3868,9 @@ fn run_gaudry_impl(
     };
     let precompute_muls = curve.field.muls();
     curve.reset();
+    let mut walk_sampler =
+        (sampler == ResidualSampler3::RAdding32).then(|| sampling::RAddingSampler::new(inst, seed));
+    let sampler_setup_group_ops = curve.ops();
     let mut stats = SolveStats::default();
     let mut system = RelationSystem::new(n, unknowns);
     let mut eliminator = LargePrimeEliminator::with_cap(
@@ -3925,13 +3971,29 @@ fn run_gaudry_impl(
         lp_input_digest: None,
         lp_input_hash_bytes: None,
         symmetric_pair_stats: None,
+        residual_sampler: backend.map(|_| sampler),
+        sampler_setup_group_ops: backend.map(|_| sampler_setup_group_ops),
+        sampling_group_ops: backend.map(|_| 0),
+        sampler_restarts: backend.map(|_| 0),
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
         rep.residuals += 1;
-        let a = rng.gen_range(0..n);
-        let b = rng.gen_range(1..n);
-        let subgroup_residual = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+        let sampling_before = if backend.is_some() { curve.ops() } else { 0 };
+        let (a, b, subgroup_residual) = if let Some(walk) = &mut walk_sampler {
+            walk.next(curve, &inst.q)
+        } else {
+            let a = rng.gen_range(0..n);
+            let b = rng.gen_range(1..n);
+            (
+                a,
+                b,
+                curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b)),
+            )
+        };
+        if let Some(ops) = &mut rep.sampling_group_ops {
+            *ops += curve.ops() - sampling_before;
+        }
         // A raw subspace decomposition can have any cofactor component.
         // Sample one component in ker([h]) using [n] of a curve point;
         // [h][n]P = O because #E = hn. Every accepted relation is then
@@ -4192,6 +4254,7 @@ fn run_gaudry_impl(
         system.rank()
     };
     rep.group_ops = curve.ops();
+    rep.sampler_restarts = backend.map(|_| walk_sampler.as_ref().map_or(0, |w| w.restarts));
     rep.solver = solver;
     rep.precompute_fp_muls = precompute_muls;
     rep.solve_stats = stats;

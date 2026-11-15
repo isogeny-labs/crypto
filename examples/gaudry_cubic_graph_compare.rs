@@ -10,8 +10,8 @@ use std::time::Instant;
 
 use clap::{Parser, ValueEnum};
 use crypto_lib::cryptanalysis::gaudry_cubic::{
-    generate_instance3, run_gaudry_with_eliminator, run_rho3, GaudryOptions, LargePrimeBackend,
-    Solver, SubspaceBase,
+    generate_instance3, run_gaudry_with_sampler, run_rho3, GaudryOptions, LargePrimeBackend,
+    ResidualSampler3, Solver, SubspaceBase,
 };
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
 use rand::{rngs::StdRng, SeedableRng};
@@ -34,6 +34,8 @@ struct Args {
         default_value = "mitm,groebner,pair,symmetric-pair,symmetric-mitm"
     )]
     oracles: Vec<Oracle>,
+    #[arg(long, value_enum, default_value = "fresh")]
+    sampler: Sampler,
     #[arg(long, default_value_t = 10_000)]
     max_residuals: u64,
     /// Frozen source commit, externally checked against binary/build receipt.
@@ -52,6 +54,21 @@ enum Oracle {
     SymmetricMitm,
 }
 
+#[derive(Clone, Copy, ValueEnum)]
+enum Sampler {
+    Fresh,
+    RAdding,
+}
+
+impl Sampler {
+    fn mode(self) -> ResidualSampler3 {
+        match self {
+            Self::Fresh => ResidualSampler3::FreshScalar,
+            Self::RAdding => ResidualSampler3::RAdding32,
+        }
+    }
+}
+
 impl Oracle {
     fn solver(self) -> Solver {
         match self {
@@ -66,6 +83,7 @@ impl Oracle {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
+    let sampler = args.sampler.mode();
     if args.rounds < 5
         || args.warmup_rounds == 0
         || args.primes.is_empty()
@@ -140,7 +158,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             diagnostics.push((arm, cost as f64, elapsed, valid));
                             let record = json!({
                                 "schema":"gaudry.cubic.graph-comparison/v2", "record_type":"execution",
-                                "source_revision":args.source_revision, "phase":phase,
+                                "source_revision":args.source_revision, "phase":phase,"sampler":sampler,
                                 "p":p, "seed":seed, "round":round, "arm":arm, "oracle_block":solver,
                                 "field":inst.curve.field,"a":inst.curve.a,"b":inst.curve.b,
                                 "generator":inst.curve.g,"target":inst.q,"subgroup_order":inst.curve.n,
@@ -171,7 +189,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         } else {
                             LargePrimeBackend::Pivot
                         };
-                        let report = run_gaudry_with_eliminator(&inst, &base, seed, &opts, backend);
+                        let report =
+                            run_gaudry_with_sampler(&inst, &base, seed, &opts, backend, sampler);
                         let replay_before = inst.curve.ops();
                         let replay = report
                             .recovered_scalar
@@ -200,7 +219,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         diagnostics.push((arm, cost, elapsed, valid));
                         let record = json!({
                             "schema":"gaudry.cubic.graph-comparison/v2","record_type":"execution",
-                            "source_revision":args.source_revision,
+                            "source_revision":args.source_revision,"sampler":sampler,
                             "phase":phase,"p":p,"seed":seed,"round":round,"arm":arm,"oracle_block":solver,"options":opts,
                             "field":inst.curve.field,"a":inst.curve.a,"b":inst.curve.b,
                             "generator":inst.curve.g,"target":inst.q,"subgroup_order":inst.curve.n,
@@ -242,7 +261,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         &mut output,
                         &json!({
                             "schema":"gaudry.cubic.graph-comparison/v2","record_type":"block_diagnostic",
-                            "source_revision":args.source_revision,"phase":phase,
+                        "source_revision":args.source_revision,"phase":phase,"sampler":sampler,
                             "p":p,"seed":seed,"round":round,"oracle_block":solver,
                             "block_valid":block_valid,"ratios":ratios,
                             "parity_status":"unadmitted_diagnostic_only_incomplete_pricing_and_reference_scope"

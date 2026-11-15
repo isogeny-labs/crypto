@@ -1,6 +1,7 @@
 //! Native analysis of retained matched IC/rho executions. Failures, incomplete
 //! plans and warmups remain visible; none can generate a parity acceptance.
 use plotters::prelude::*;
+use plotters::style::text_anchor::{HPos, Pos, VPos};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
@@ -143,6 +144,11 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
         if row["schema"] != "gaudry.cubic.graph-comparison/v2" || row["source_revision"] != source {
             problems.push(format!(
                 "source/schema mismatch p={p} seed={fixture_seed} {oracle} {arm}"
+            ));
+        }
+        if plan.get("sampler").is_some() && row["sampler"] != plan["sampler"] {
+            problems.push(format!(
+                "sampler treatment mismatch p={p} seed={fixture_seed}"
             ));
         }
         if !primes.contains(&json!(p))
@@ -334,7 +340,7 @@ fn analyze(plan: &Value, rows: Vec<Value>, parse_failures: usize) -> Result<Valu
     }
     Ok(
         json!({"schema":"gaudry.cubic.local-analysis/v1","source_revision":source,"backend":"local_user_authorized",
-        "standard_lab_admission":false,"reference_scope":plan["reference_scope"],"raw_execution_count":actual_order.len(),
+        "standard_lab_admission":false,"reference_scope":plan["reference_scope"],"sampler":plan["sampler"],"raw_execution_count":actual_order.len(),
         "unique_execution_count":executions.len(),"planned_execution_count":expected_order.len(),
         "phase_counts":phase_counts,"global_problems":problems,"strata":strata,
         "interval_scope":"deterministic round bootstrap; timing repeat variation, not independent curve samples",
@@ -380,13 +386,7 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
         .build_cartesian_2d(0f64..strata.len().max(1) as f64, (min..max).log_scale())?;
     chart
         .configure_mesh()
-        .x_labels(strata.len())
-        .x_label_formatter(&|x| {
-            strata
-                .get(x.floor() as usize)
-                .map(|s| format!("p{} {}", s["p"], s["oracle"].as_str().unwrap_or("?")))
-                .unwrap_or_default()
-        })
+        .x_labels(0)
         .x_label_style(("sans-serif", 11))
         .y_desc("ratio, log scale (lower costs less)")
         .draw()?;
@@ -395,6 +395,24 @@ fn plot(result: &Value, path: &Path) -> Result<(), Box<dyn Error>> {
         &BLACK,
     ))?;
     for (i, s) in strata.iter().enumerate() {
+        let (x, y) = chart.plotting_area().map_coordinate(&(i as f64 + 0.5, min));
+        let name = match s["oracle"].as_str().unwrap_or("?") {
+            "MeetInTheMiddle" => "Hybrid triple",
+            "Groebner" => "S4",
+            "PairOnly" => "Pair",
+            "SymmetricPairOnly" => "Symmetric pair",
+            "SymmetricMeetInTheMiddle" => "Symmetric triple",
+            other => other,
+        };
+        let label_style = ("sans-serif", 16)
+            .into_text_style(&root)
+            .pos(Pos::new(HPos::Center, VPos::Top));
+        root.draw(&Text::new(
+            format!("p{} / seed{}", s["p"], s["seed"]),
+            (x, y + 10),
+            label_style.clone(),
+        ))?;
+        root.draw(&Text::new(name, (x, y + 31), label_style))?;
         for (j, key, color) in [
             (0, "diagnostic_pivot_wall_over_rho", BLUE),
             (1, "diagnostic_graph_wall_over_rho", RED),
@@ -551,6 +569,22 @@ mod tests {
             false
         );
     }
+    #[test]
+    fn sampler_metadata_cannot_mix_treatments() {
+        let (mut p, mut r) = fixture();
+        p["sampler"] = json!("fresh");
+        for row in &mut r {
+            row["sampler"] = json!("fresh");
+        }
+        r[6]["sampler"] = json!("r-adding");
+        let s = analyze(&p, r, 0).unwrap();
+        assert!(!s["global_problems"].as_array().unwrap().is_empty());
+        assert_eq!(
+            s["strata"][0]["eligible_local_controlled_comparison"],
+            false
+        );
+    }
+
     #[test]
     fn input_mismatch_and_aa_timing_failure_are_rejected() {
         let (p, mut r) = fixture();
