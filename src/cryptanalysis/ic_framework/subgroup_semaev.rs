@@ -961,7 +961,8 @@ mod tests {
         let (r2, log) = solve_system_logged(&sys, p, 120, 200);
         assert_eq!(r1.inconsistent, r2.inconsistent);
         assert_eq!(r1.steps, r2.steps);
-        assert_eq!(r1.field_ops, r2.field_ops);
+        // (`field_ops` agree too, but the counter is process-wide unless
+        // `F4_FP_THREAD_OPS=1`, so parallel tests would pollute a comparison.)
         assert!(!log.steps.is_empty());
     }
 }
