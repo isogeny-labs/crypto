@@ -1380,3 +1380,21 @@ deadline or by the provider reads "not completed".
 - GL passes: 0.95.
 
 No E14 r3 draw has been generated, and nothing from any E14 r3 part has been computed.
+
+## Amendment 32 (2026-11-15 UTC, before any draw below): no persistent volume on RunPod CPU pods; serve 18 h after finishing
+
+The first part-a pod, `am1yly53s0dkmg`, was launched at 00:31:31 UTC on 2026-11-15. RunPod created
+it with `volumeInGb: 0` although `10` was requested, so CPU pods get no persistent volume, and the
+Amendment 31 self-stop would have wiped `out/`. The pod was deleted at about 00:33 UTC, during source
+verification, before any build, gate or draw. Its launch record is
+`e14/pod-r3a/launch-r3a-1.json`.
+
+**Change.**
+- `e14/run_pod_r3.sh` (sha256 `08efc2b96e4e1a7c…`) no longer stops itself. After `finish` it keeps serving for
+  `POST_HOURS` = 18 h and then deletes itself.
+- The controller deletes the pod earlier, after its pull (`e14/pull_r3.sh`).
+- `e14/launch_r3.sh` no longer requests a volume.
+
+Everything else in Amendment 31 stands: parts, gates, readings, cell rule, admission and predictions.
+The post-finish wait costs at most 18 h × USD 2.08/h ≈ USD 37 per part. It is spent only if the
+controller does not pull sooner. No E14 r3 draw has been generated.

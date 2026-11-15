@@ -1,0 +1,117 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-t1355-39d9b7fa",
+      "log2_r": 23.11107309082852,
+      "arm": "rho-neg",
+      "runs": 2,
+      "verified": 2,
+      "mean_s": [
+        1.196520938516613,
+        1.3041131378609432,
+        2.2724429319599144
+      ],
+      "charged_sum": 7203.0,
+      "native_sum": 6477,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-t1355-39d9b7fa",
+      "log2_r": 23.11107309082852,
+      "arm": "sem-chain-t2",
+      "runs": 2,
+      "verified": 2,
+      "mean_s": [
+        214.2729298021352,
+        8049499.5178481415,
+        80493066.72211319
+      ],
+      "charged_sum": 1289913.0,
+      "native_sum": 484563201134,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-t1355-39d9b7fa",
+      "a": "rho-neg",
+      "b": "sem-chain-t2",
+      "verdict": "rho-neg < sem-chain-t2"
+    }
+  ],
+  "calibrated": {
+    "w_cal": 0.0285,
+    "method": "best-of-N timing",
+    "host": "validator-scratch: hand-check value, not a measurement",
+    "field_weights": [
+      0.0,
+      0.0285,
+      0.28500000000000003
+    ],
+    "field_counters": [
+      "factor_base_fp_muls_uncharged",
+      "root_search_field_muls_uncharged",
+      "oracle_fp_muls_uncharged",
+      "native_field_muls_uncharged",
+      "native_field_sqrs_uncharged",
+      "linalg_mulmods_uncharged",
+      "linalg_mulmod_uncharged",
+      "smoothness_field_muls_uncharged",
+      "endomorphism_field_muls_uncharged",
+      "transfer_field_muls_uncharged",
+      "scalar_mulmod_uncharged",
+      "lift_field_multiplies_uncharged",
+      "lift_field_squares_uncharged",
+      "min_key_field_squares_uncharged",
+      "base_point_sqrt_field_multiplications_uncharged",
+      "aps_f4_multiplications_uncharged",
+      "aps_root_multiplications_uncharged",
+      "aps_core_expression_multiplications_uncharged",
+      "pkm_grid_fp_mults_uncharged",
+      "pkm_system_fp_mults_uncharged",
+      "pkm_shared_poly_fp_mults_uncharged",
+      "pkm_trace_learn_spec_fp_mults_uncharged",
+      "pkm_t0_target_fp_mults_uncharged",
+      "pkm_t0_base_map_fp_mults_uncharged",
+      "pkm_base_check_fp_mults_uncharged",
+      "cm_formula_muls_uncharged",
+      "cm_formula_sqrs_uncharged",
+      "elimination_modular_multiplications_uncharged",
+      "large_prime_mulmods_uncharged",
+      "explicit_x_zero_lift_squarings_uncharged",
+      "scalar_muls_uncharged",
+      "scalar_multiplications_uncharged",
+      "solver_F_p_multiplications_(grid)_uncharged",
+      "solver_F_p_multiply-adds_(elimination_only)_uncharged",
+      "solver_F_p_multiply-adds_(tower_F4_elimination)_uncharged"
+    ],
+    "pairs": [
+      {
+        "curve": "icv1-fp24-t1355-39d9b7fa",
+        "a": "rho-neg",
+        "b": "sem-chain-t2",
+        "order_at": {
+          "0": "rho-neg < sem-chain-t2",
+          "10*w_cal": "rho-neg < sem-chain-t2",
+          "w_cal": "rho-neg < sem-chain-t2"
+        },
+        "ranked_at_calibrated_price": true,
+        "band_verdict": "rho-neg < sem-chain-t2"
+      }
+    ]
+  }
+}

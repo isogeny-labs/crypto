@@ -12,7 +12,7 @@ median or reading.
 | stage | `cap:8:0:5:12800000000` (Kummer m = 2, P1, t = 8, draw 0, cap 5): **development check, not data**; t = 8 is not an Amendment 7 B cell |
 | pod name | `pkm-x-dev-smoke1` |
 | pod id | `gwfmrulvmua8ye` |
-| flavor and size (API pod record) | `cpu5m` (Memory-Optimized), 16 vCPU, `memoryInGb` 128, `costPerHr` 1.04, `machine.secureCloud` true, data center `EU-RO-1` |
+| flavor and size (create response, `pod-create.json`; the later GET record `pod-record.json` has `machine: {}`) | `cpu5m` (Memory-Optimized), 16 vCPU, `memoryInGb` 128, `costPerHr` 1.04, `machine.secureCloud` true, data center `EU-RO-1` |
 | reserved | request body had `interruptible: false`; the pod record returns `interruptible: null` (the API does not echo the field) |
 | image | `python:3.12-slim`, running Amendment 16's `runpod/server.py` (SHA-256 `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550`) unchanged |
 | client | Amendment 16's `runpod/rp.sh` (SHA-256 `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d`) unchanged, for upload, start, status and fetch |
@@ -79,7 +79,24 @@ API call that creates anything.
 
 ## Changed after the smoke
 
-- `run.sh` now also writes `pod-request.json` (the create body with the runner token and the base64 runner withheld),
-  so that `interruptible: false` and `cloudType: SECURE` are on record even though the pod record returns
-  `interruptible: null`. The change is one `jq` line. It was checked offline on a sample body, and `bash -n` passes.
-  It was **not** exercised on a pod: a second smoke pod was not started, because the task allowed one.
+Revision 1 (before the review):
+- `run.sh` also writes `pod-request.json` (the create body with the runner token and the base64 runner withheld), so that
+  `interruptible: false` and the reserved-tier `cloudType` are on record even though the pod record returns
+  `interruptible: null`. The change is one `jq` line, checked offline on a sample body; not exercised on a pod.
+
+Revision 2 (after the independent review of `59e487150f`; draft Amendment 18 sections 2-6). None of this was exercised
+on a pod; it is covered by the offline tests in `tests/README.md` and needs one more development smoke before the
+freeze (amendment section 9, point 5):
+- the pod's start command is now `bash -c` with a cgroup copy loop before the unchanged runner. **Which cgroup files a
+  RunPod CPU pod exposes is not known**: this smoke did not read `/sys/fs/cgroup`. The loop copies the v2 files or the
+  v1 files, whichever exist, and records which;
+- one pinned flavor (`cpu5m`, 16 vCPU, 128 GB) with no fallback, checked on the create response (reserved tier, flavor,
+  size, `costPerHr` equal to the price read before create);
+- the client is a pinned copy (`rp_pinned.sh`, unchanged, SHA-256 `b4b60199…`), and `run.sh` checks both pins;
+- the allow-list, the registered order, the receipts and results directories that are never reused, the study ledger,
+  the protocol check, the layer check, the cleanup trap set before create, the deadlines written before start, the
+  outcome classifier in `fetch.sh`, the raw-upload gate before delete, and the backstop `reap.sh`;
+- receipts and results now live at fixed paths (`receipts/`, `receipts_dev/`, `results/`): the `RPC_RECEIPTS` and
+  `RPC_RESULTS` overrides used in the command above were removed, so they cannot bypass the reuse checks;
+- new API records drop `consumerUserId`. The smoke receipts above are left as committed (the field is an account
+  identifier, not a credential, and it is already in the history).

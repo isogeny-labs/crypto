@@ -964,6 +964,11 @@ pub struct VerdictInputs<'a> {
     /// derives from; `epoch` must be what they give.
     pub commitment: Option<&'a Commitment>,
     pub beacon: Option<&'a str>,
+    /// A `w_cal` override (`challenge verdict --w-cal`): takes precedence
+    /// over the session's own reading for the calibrated block, which then
+    /// records `source: "override"`, and for the bounds fitted from the
+    /// session.  Procedure 2 only; validated.
+    pub w_cal: Option<&'a crate::cryptanalysis::ecbench::band::WCal>,
 }
 
 pub struct VerdictOutput {
@@ -1005,6 +1010,15 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         ));
     }
     let v2 = inputs.procedure >= 2;
+    if let Some(w) = inputs.w_cal {
+        if !v2 {
+            return Err(
+                "a w_cal override needs verdict procedure 2: a procedure-1 verdict has no calibrated block"
+                    .into(),
+            );
+        }
+        w.validate()?;
+    }
     let dir = inputs.dir;
     let session = read_session(dir)?;
     let plan_doc: PlanDoc = serde_json::from_str(
@@ -1176,6 +1190,7 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         } else {
             1
         },
+        w_cal: inputs.w_cal.cloned(),
         ..Default::default()
     };
     let dirs = [dir.to_path_buf()];
@@ -1657,8 +1672,15 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
             control.as_ref().and_then(|c| c.ratio.map(|r| format!("; A/A {} {r:.4}{}", if v2 { "determinism check" } else { "control" }, fmt_ci(c.ci95)))).unwrap_or_default(),
         ),
     };
-    let calibrated = match (v2, crate::cryptanalysis::ecbench::runner::read_wcal(dir)?) {
-        (true, Some(w)) => {
+    let wcal = match inputs.w_cal {
+        Some(w) => Some((
+            w.clone(),
+            Some(crate::cryptanalysis::ecbench::band::WCAL_SOURCE_OVERRIDE.to_string()),
+        )),
+        None => crate::cryptanalysis::ecbench::runner::read_wcal(dir)?.map(|w| (w, None)),
+    };
+    let calibrated = match (v2, wcal) {
+        (true, Some((w, source))) => {
             use crate::cryptanalysis::ecbench::band as bd;
             let pick = |arm: &str| {
                 recs.iter()
@@ -1667,14 +1689,16 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
             };
             let (inc, cand) = (pick(inputs.incumbent_arm), pick(inputs.candidate_arm));
             let pairs = bd::matched_verified(inc.iter().copied(), cand.iter().copied());
-            Some(bd::calibrated_ratio_grid(
+            let mut g = bd::calibrated_ratio_grid(
                 &pairs,
                 &BAND_WEIGHTS,
                 bd::Pricing::default(),
                 &w,
                 inputs.incumbent_arm,
                 inputs.candidate_arm,
-            )?)
+            )?;
+            g.source = source;
+            Some(g)
         }
         _ => None,
     };
@@ -2164,6 +2188,48 @@ mod tests {
         let a = plan(spec_for(&c, &cand, 1)).unwrap();
         let b = plan(spec_for(&c, &cand, 1)).unwrap();
         assert_eq!(a.spec_id, b.spec_id);
+    }
+
+    /// A `w_cal` override is refused on a procedure-1 verdict (no
+    /// calibrated block) and when not positive and finite, before the
+    /// session is read.
+    #[test]
+    fn a_w_cal_override_needs_procedure_2_and_a_positive_finite_value() {
+        let ch = challenge();
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let missing = root.join("no-such-session-dir");
+        let run = |procedure: u32, w: f64| {
+            let w = crate::cryptanalysis::ecbench::band::WCal {
+                w_cal: w,
+                method: "best-of-N timing".into(),
+                host: "h".into(),
+            };
+            verdict(&VerdictInputs {
+                challenge: &ch,
+                dir: &missing,
+                epoch: 1,
+                candidate_arm: CANDIDATE_ARM,
+                incumbent_arm: INCUMBENT_ARM,
+                control_arm: None,
+                replay: 0,
+                bounds: None,
+                root: &root,
+                resamples: 100,
+                seed: 1,
+                procedure,
+                commitment: None,
+                beacon: None,
+                w_cal: Some(&w),
+            })
+            .err()
+            .unwrap()
+        };
+        assert!(run(1, 0.02).contains("procedure 2"));
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            assert!(run(2, bad).contains("finite and > 0"), "{bad}");
+        }
+        // A good value passes the check and fails only on the session.
+        assert!(!run(2, 0.02).contains("w_cal"));
     }
 
     #[test]

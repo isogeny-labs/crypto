@@ -577,30 +577,140 @@ pub fn certify_both(ci: &CoverCurve, x_inst: u64, k: u64) -> (bool, bool) {
 /// Why each candidate before the selected one of [`cover_select`] was
 /// skipped, by reason (the same checks, in the same order, as the selection).
 pub fn selection_skips(p: u64, i: usize, selected: u64) -> std::collections::BTreeMap<String, u32> {
-    use super::bielliptic::Bielliptic;
-    use super::negation_remeasure::{candidate_coeffs, largest_cyclic_prime};
+    selection_skips_min_r(p, i, selected, 0)
+}
+
+/// [`selection_skips`] for [`cover_select_min_r`]: a candidate whose `r` is
+/// below `min_r` is counted as `r_below_min_r`.  With `min_r = 0` this is
+/// exactly [`selection_skips`].
+pub fn selection_skips_min_r(
+    p: u64,
+    i: usize,
+    selected: u64,
+    min_r: u64,
+) -> std::collections::BTreeMap<String, u32> {
     let mut m = std::collections::BTreeMap::new();
-    let _ = i;
     for s in 0..selected {
-        let reason = match Bielliptic::new(p, candidate_coeffs(p, s)) {
-            Err(_) => "bielliptic_rejected",
-            Ok(b) => {
-                let (n1, n2) = (b.e1.order(), b.e2.order());
-                let r = largest_cyclic_prime(n1);
-                if r < 50 {
-                    "r_below_50"
-                } else if n2.is_multiple_of(r) {
-                    "r_divides_e2_order"
-                } else if (n1 * n2).is_multiple_of(r * r) {
-                    "r_squared_divides_jac_order"
-                } else {
-                    "other_hop_or_point_failure"
-                }
-            }
+        let reason = match admissible_min_r(p, s, seed0_of(i, s), min_r) {
+            Ok(_) => "admissible_but_not_selected",
+            Err("bielliptic_rejected") => "bielliptic_rejected",
+            Err("r_below_50") => "r_below_50",
+            Err("r_below_min_r") => "r_below_min_r",
+            Err("r_divides_e2_order") => "r_divides_e2_order",
+            Err("r_squared_divides_jac_order") => "r_squared_divides_jac_order",
+            Err(_) => "other_hop_or_point_failure",
         };
         *m.entry(reason.to_string()).or_insert(0) += 1;
     }
     m
+}
+
+/// The cover seed of candidate `s` of prime number `i`, as [`cover_select`].
+pub fn seed0_of(i: usize, s: u64) -> u64 {
+    0xC0FFEE + i as u64 * 101 + s
+}
+
+/// The admissibility checks of `negation_remeasure::cover_select`, in the
+/// same order, with one extra exclusion after `r < 50`: `r < min_r`, where
+/// `r` is the largest prime with `r || #E1(F_p)`.  `min_r = 0` adds nothing.
+pub fn admissible_min_r(
+    p: u64,
+    s: u64,
+    seed: u64,
+    min_r: u64,
+) -> Result<(super::bielliptic::Bielliptic, u64, super::ec::Pt), &'static str> {
+    use super::bielliptic::Bielliptic;
+    use super::chain::{Chain, Elt, Hop};
+    use super::negation_remeasure::{candidate_coeffs, ec_gen, find_isogeny, largest_cyclic_prime};
+    let b = Bielliptic::new(p, candidate_coeffs(p, s)).map_err(|_| "bielliptic_rejected")?;
+    let (n1, n2) = (b.e1.order(), b.e2.order());
+    let r = largest_cyclic_prime(n1);
+    if r < 50 {
+        return Err("r_below_50");
+    }
+    if r < min_r {
+        return Err("r_below_min_r");
+    }
+    if n2.is_multiple_of(r) {
+        return Err("r_divides_e2_order");
+    }
+    if (n1 * n2).is_multiple_of(r * r) {
+        return Err("r_squared_divides_jac_order");
+    }
+    let x = (seed.wrapping_mul(2_246_822_519).wrapping_add(7)) % r;
+    let gen = ec_gen(&b.e1, r).ok_or("no_order_r_point_on_E1")?;
+    let target = b.e1.mul(&gen, x as u128);
+    let (iso, _k) = find_isogeny(&b.e1, r).ok_or("no_rational_small_isogeny")?;
+    let hop = Hop::isogeny(iso, &gen, &target, r).map_err(|_| "isogeny_hop_failed")?;
+    if !Chain::new(vec![hop]).verify(&Elt::E(gen), r, x as u128) {
+        return Err("isogeny_chain_unverified");
+    }
+    let hop = Hop::pullback(&b, Quotient::E1, &gen, r).map_err(|_| "pullback_hop_failed")?;
+    if !Chain::new(vec![hop]).verify(&Elt::E(gen), r, x as u128) {
+        return Err("pullback_chain_unverified");
+    }
+    Ok((b, r, gen))
+}
+
+/// Number of candidates scanned per prime (as `cover_select`).
+pub const COVER_CANDIDATES: u64 = 4000;
+
+/// `cover_select` with `r >= min_r` (2026-11-14 rerun of O3: binds the
+/// transferred order `r` to `p`, so `#E1 / r` is small).  The first of the
+/// same 4000 candidates, in the same order, that passes every check of
+/// `cover_select` and `r >= min_r`.  With `min_r = 0` it selects the same
+/// cover as `cover_select` (unit-tested).
+pub fn cover_select_min_r(p: u64, i: usize, min_r: u64) -> Option<CoverCurve> {
+    (0..COVER_CANDIDATES).find_map(|s| {
+        let seed0 = seed0_of(i, s);
+        admissible_min_r(p, s, seed0, min_r)
+            .ok()
+            .map(|(b, r, gen)| CoverCurve {
+                b,
+                candidate: s,
+                seed0,
+                r,
+                gen,
+            })
+    })
+}
+
+/// `min_r = ceil(frac * p)` (0 when `frac <= 0`).
+pub fn min_r_for(p: u64, frac: f64) -> u64 {
+    if frac > 0.0 {
+        (frac * p as f64).ceil() as u64
+    } else {
+        0
+    }
+}
+
+/// The frozen fallback of the 2026-11-14 protocol: when prime `p` has no
+/// candidate with `r >= ceil(frac p)`, the next prime above it is tried, in
+/// increasing order, with the same prime number `i`, at most `max_hops`
+/// times.  Returns the prime actually used, the primes passed over, and the
+/// cover.  With `frac <= 0` and a candidate at `p`, this is `cover_select(p, i)`.
+pub fn cover_select_rp(
+    p: u64,
+    i: usize,
+    frac: f64,
+    max_hops: u32,
+) -> Option<(u64, Vec<u64>, CoverCurve)> {
+    use crate::cryptanalysis::residual_walk::is_prime_u64;
+    let mut q = p;
+    let mut passed = vec![];
+    for hop in 0..=max_hops {
+        if hop > 0 {
+            q += 1;
+            while !is_prime_u64(q) {
+                q += 1;
+            }
+        }
+        if let Some(c) = cover_select_min_r(q, i, min_r_for(q, frac)) {
+            return Some((q, passed, c));
+        }
+        passed.push(q);
+    }
+    None
 }
 
 // ── statistics ──────────────────────────────────────────────────────────
@@ -803,6 +913,49 @@ mod tests {
         assert!(n.is_multiple_of(c.z_order));
         assert!(c.inst.curve.mul_uncounted(c.z, c.z_order).is_identity());
         assert_eq!(point_order(&c.inst.curve, c.inst.g, n), c.inst.r);
+    }
+
+    #[test]
+    fn min_r_zero_selects_the_cover_select_cover_and_skips() {
+        for (i, p) in [211u64, 419, 821, 1619, 3203].into_iter().enumerate() {
+            let a = cover_select(p, i).expect("cover");
+            let b = cover_select_min_r(p, i, 0).expect("cover");
+            assert_eq!((a.candidate, a.seed0, a.r), (b.candidate, b.seed0, b.r));
+            assert_eq!(a.gen, b.gen);
+            let sk = selection_skips(p, i, a.candidate);
+            assert_eq!(sk, selection_skips_min_r(p, i, a.candidate, 0));
+            assert_eq!(sk.values().sum::<u32>() as u64, a.candidate);
+            assert!(!sk.contains_key("r_below_min_r"));
+            let (q, passed, c) = cover_select_rp(p, i, 0.0, 3).expect("rp");
+            assert!(q == p && passed.is_empty() && c.candidate == a.candidate);
+        }
+    }
+
+    #[test]
+    fn min_r_binds_r_to_p_and_keeps_every_exclusion() {
+        use super::super::negation_remeasure::largest_cyclic_prime;
+        for (i, p) in [211u64, 419, 821, 1619, 3203, 6421].into_iter().enumerate() {
+            let min_r = min_r_for(p, 0.125);
+            assert_eq!(min_r, (p as f64 / 8.0).ceil() as u64);
+            let (q, _passed, c) = cover_select_rp(p, i, 0.125, 20).expect("rp cover");
+            assert!(q >= p);
+            let (n1, n2) = (c.b.e1.order(), c.b.e2.order());
+            assert_eq!(c.r, largest_cyclic_prime(n1));
+            assert!(c.r >= min_r_for(q, 0.125) && c.r >= 50, "p={q} r={}", c.r);
+            assert!(!n2.is_multiple_of(c.r) && !(n1 * n2).is_multiple_of(c.r * c.r));
+            // #E1 / r is small: at most about 8 (p + 1 + 2 sqrt p) / p
+            assert!(n1 / c.r <= 9, "cofactor {}", n1 / c.r);
+            // every candidate before it was skipped for a recorded reason
+            let sk = selection_skips_min_r(q, i, c.candidate, min_r_for(q, 0.125));
+            assert_eq!(sk.values().sum::<u32>() as u64, c.candidate);
+            assert!(!sk.contains_key("admissible_but_not_selected"));
+            // the selected cover still gives a certified whole-J instance
+            let inst = cover_instance(&c, 0).expect("instance");
+            assert_eq!(inst.inst.r, c.r);
+        }
+        // a bound no curve meets: no candidate and the fallback is bounded
+        assert!(cover_select_min_r(211, 0, 10_000).is_none());
+        assert!(cover_select_rp(211, 0, 50.0, 2).is_none());
     }
 
     #[test]
