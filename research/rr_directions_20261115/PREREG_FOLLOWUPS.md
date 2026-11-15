@@ -96,3 +96,14 @@ counting a timeout as a refutation; reporting any of this as an ECDLP speedup.
   (cold_sym/warm conflicts 1.023 and 1.394; cold/cold_sym 0.019 and 0.021). Those two
   values were seen before this amendment, which is stated here; the threshold of P4 is
   unchanged.
+
+## Amendment 4 (2026-11-15T11:05Z, before the affected cells resumed)
+
+- **F1, `rr4` under F4 at ℓ ≥ 6.** The memory cgroup killed the `norm,rr4` process at
+  m = 13, ℓ = 6 on `rr4`/F4 draw 5 (draws 0–4 of that cell had completed as "undecided,
+  degree 7 reached, matrix refused") and at m = 17, ℓ = 7 on `rr4`/F4 draw 0. Recorded as
+  those cells' outcome ("F4 on rr4 at ℓ ≥ 6: killed above the container's memory on some
+  draws"). The remaining draws of both cells run `norm` under SAT and F4 and `rr4` under SAT
+  only; `s4` under SAT as before.
+- **Container restart at ≈ 10:56Z** killed every queue; all resumed from the next
+  unrecorded draw on the identical RNG stream (`--first-draw`), no row repeated.
