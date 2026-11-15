@@ -45,3 +45,5 @@ Official norm-degree, valuation/localization, residue, discrete valuation and un
 Still open: identification with the canonical projective local ring at infinity; the full canonical principal divisor; translation pullback, Weil reciprocity, isogeny/Lang/Cartier/Jacobian and canonical Weil/Tate/MOV/Frey–Rück constructions; and the remaining original fourteen-item work. The same host, prover and Mathlib are used. This is not independent implementation or physical-host/compiler/parser assurance. No canonical corpus promotion or signed-standing claim is made. [pcc:unverified]
 
 Exact local **PCC-20261115-c0e6db** replay PASS at 2026-11-15T04:43:54Z; signed standing unverified. See [verification receipt](verification.json). [pcc:unverified]
+
+Publication: existing ready [PR3743](https://github.com/isogeny-labs/crypto/pull/3743), remote proof `b4419905dbe503ce1860a328ff105c2b2f00d7a1` and local receipt `ae35bf7f1cded6ce57eb9570777e3378d13d647d` share tree `8eb8550a62b514064ff763faec5f7f4145da1f2c`. Anonymous fetch completed; fresh PR head/body/open/ready check matched. Publication metadata is outside the frozen pinset. [pcc:unverified]
