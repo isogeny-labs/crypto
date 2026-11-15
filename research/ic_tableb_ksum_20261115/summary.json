@@ -1,0 +1,383 @@
+{
+ "schema": "crypto.ic_tableb_ksum_summary/v1",
+ "unit": "ecbench counted GAE per sqrt(r), native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a)",
+ "isolation": "L0 (counted cost; wall time not claimed)",
+ "track": "generic decomposition (bounded by sqrt(r); cannot beat rho or BSGS)",
+ "protocol": "research/ic_tableb_ksum_20261115/PROTOCOL.md",
+ "registered_at": "2026-11-15T03:46:33Z",
+ "binary_sha256": "7d46e5ee0778a741193c4af08274fa4861406182e479b06770f5dd8303c5c9cb",
+ "commit": "7b3c057e1cef83ccf5712950473ef91e10153499",
+ "sessions": 9,
+ "targets_per_curve": 48,
+ "rounds": 3,
+ "replicates": 3,
+ "replay": {
+  "records": 13824,
+  "replays": 10368,
+  "host": "second host class (Intel Xeon 2.10 GHz container); recorded on a RunPod pod (AMD EPYC)"
+ },
+ "l1_holds_on_a_primary_row": true,
+ "l1_falsified": false,
+ "rows": [
+  {
+   "slug": "icv1-fp20-t1293-3c2999ba",
+   "role": "primary",
+   "incumbents": [
+    "inc-rec",
+    "inc-sel",
+    "inc-tb"
+   ],
+   "table_b": {
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "recipe": "folded, walked, base at the family optimum, m = 2",
+    "columns": 51,
+    "signed_points": 102,
+    "s_ic": 10.7228719576,
+    "s_rho": 1.29190608779,
+    "ic_over_rho": 8.30003980861,
+    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json"
+   },
+   "weights": {
+    "0": {
+     "strictest_incumbent": "inc-tb",
+     "s": {
+      "rho-neg": 1.2691499828475836,
+      "bsgs-neg": 1.0571238944204389,
+      "inc-rec": 10.853544499390786,
+      "inc-sel": 10.356120342062574,
+      "inc-tb": 10.294957795764272,
+      "ksum4": 6.635249466214852,
+      "ksum5": 7.111354055695914
+     },
+     "ksum5_over_incumbent": 0.6907608750588367,
+     "ci95": [
+      0.676849629335083,
+      0.7049580376970707
+     ],
+     "ci95_bootstrap": [
+      0.6731830570882392,
+      0.7096135291460679
+     ],
+     "upper": 0.7096135291460679,
+     "per_replicate": [
+      0.6835470061754789,
+      0.7014693505921573,
+      0.6876379985089498
+     ],
+     "ksum4_over_incumbent": 0.6445144893109551,
+     "ksum5_over_bsgs": 6.727077207534572,
+     "gap_to_rho": 5.603241659224715
+    },
+    "1": {
+     "strictest_incumbent": "inc-sel",
+     "s": {
+      "rho-neg": 2.3746252273950295,
+      "bsgs-neg": 2.10545210974605,
+      "inc-rec": 27.450488728917275,
+      "inc-sel": 24.485878847752467,
+      "inc-tb": 25.39133609662874,
+      "ksum4": 14.96372145249983,
+      "ksum5": 14.58758174672307
+     },
+     "ksum5_over_incumbent": 0.5957548772263922,
+     "ci95": [
+      0.5836234323126437,
+      0.6081384915143417
+     ],
+     "ci95_bootstrap": [
+      0.5797275254183678,
+      0.6116041673965894
+     ],
+     "upper": 0.6116041673965894,
+     "per_replicate": [
+      0.6006015410119613,
+      0.589240280799249,
+      0.597446309466754
+     ],
+     "ksum4_over_incumbent": 0.6111163722380892,
+     "ksum5_over_bsgs": 6.92847948390646,
+     "gap_to_rho": 6.143109059245398
+    },
+    "0.1": {
+     "strictest_incumbent": "inc-sel",
+     "s": {
+      "rho-neg": 1.3796975073023274,
+      "bsgs-neg": 1.161956715953001,
+      "inc-rec": 12.51323892234344,
+      "inc-sel": 11.769096192631578,
+      "inc-tb": 11.80459562585071,
+      "ksum4": 7.4680966648433476,
+      "ksum5": 7.8589768247986305
+     },
+     "ksum5_over_incumbent": 0.6677638364209324,
+     "ci95": [
+      0.6563666166577568,
+      0.6793589587206363
+     ],
+     "ci95_bootstrap": [
+      0.6528003725660421,
+      0.6829458914750071
+     ],
+     "upper": 0.6829458914750071,
+     "per_replicate": [
+      0.6717408407570891,
+      0.6622524668953775,
+      0.6693067726256782
+     ],
+     "ksum4_over_incumbent": 0.6345514169150049,
+     "ksum5_over_bsgs": 6.763571066718222,
+     "gap_to_rho": 5.696159327101347
+    }
+   },
+   "replicate_spread": {
+    "inc-tb": 1.0391721005756096,
+    "rho-neg": 1.027200694670574,
+    "ksum5": 1.0186820318563212
+   },
+   "delta": 1.0391721005756096,
+   "max_upper_pooled": 0.7096135291460679,
+   "max_upper_replicate": 0.7332954457271873,
+   "holds": true
+  },
+  {
+   "slug": "icv1-fp22-tm1267-a5acaf6d",
+   "role": "secondary",
+   "incumbents": [
+    "inc-hi",
+    "inc-lo",
+    "inc-tb"
+   ],
+   "table_b": {
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "recipe": "folded, walked, base at the family optimum, m = 2",
+    "columns": 74,
+    "signed_points": 148,
+    "s_ic": 12.7702224719,
+    "s_rho": 1.21605771181,
+    "ic_over_rho": 10.5013292937,
+    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json"
+   },
+   "weights": {
+    "0": {
+     "strictest_incumbent": "inc-tb",
+     "s": {
+      "rho-neg": 1.1718550848270417,
+      "bsgs-neg": 0.9858455311254807,
+      "inc-hi": 11.83039006528679,
+      "inc-lo": 12.920062329738094,
+      "inc-tb": 11.14737558972188,
+      "ksum4": 6.283897507665376,
+      "ksum5": 6.64927952268661
+     },
+     "ksum5_over_incumbent": 0.5964883365746998,
+     "ci95": [
+      0.5825048139389976,
+      0.6108075455440152
+     ],
+     "ci95_bootstrap": [
+      0.5790059342154398,
+      0.6152966645697158
+     ],
+     "upper": 0.6152966645697158,
+     "per_replicate": [
+      0.5950798980158913,
+      0.5831416503214093,
+      0.6119657638974323
+     ],
+     "ksum4_over_incumbent": 0.5637109342094179,
+     "ksum5_over_bsgs": 6.744747846141302,
+     "gap_to_rho": 5.674148287429245
+    },
+    "1": {
+     "strictest_incumbent": "inc-hi",
+     "s": {
+      "rho-neg": 2.2491003443187934,
+      "bsgs-neg": 1.96452575836463,
+      "inc-hi": 28.03956674301153,
+      "inc-lo": 35.21586100107833,
+      "inc-tb": 28.59700977831787,
+      "ksum4": 14.340800723646781,
+      "ksum5": 14.065427735204743
+     },
+     "ksum5_over_incumbent": 0.5016278555270598,
+     "ci95": [
+      0.4913683767473674,
+      0.5121015461075353
+     ],
+     "ci95_bootstrap": [
+      0.4884157938691042,
+      0.5153489937845425
+     ],
+     "upper": 0.5153489937845425,
+     "per_replicate": [
+      0.49172385988915474,
+      0.5005124982818543,
+      0.5129747330265779
+     ],
+     "ksum4_over_incumbent": 0.5114487272604168,
+     "ksum5_over_bsgs": 7.159706445851599,
+     "gap_to_rho": 6.253801779335405
+    },
+    "0.1": {
+     "strictest_incumbent": "inc-tb",
+     "s": {
+      "rho-neg": 1.2795796107762163,
+      "bsgs-neg": 1.0837135538493956,
+      "inc-hi": 13.451307733059277,
+      "inc-lo": 15.149642196872119,
+      "inc-tb": 12.892339008581473,
+      "ksum4": 7.08958782926352,
+      "ksum5": 7.390894343938431
+     },
+     "ksum5_over_incumbent": 0.5732780016891322,
+     "ci95": [
+      0.5593052061836886,
+      0.5875998713889119
+     ],
+     "ci95_bootstrap": [
+      0.5557233332769408,
+      0.5920673240017785
+     ],
+     "upper": 0.5920673240017785,
+     "per_replicate": [
+      0.5718754350682314,
+      0.5600872379879571,
+      0.5886046703272478
+     ],
+     "ksum4_over_incumbent": 0.5499070280842371,
+     "ksum5_over_bsgs": 6.819970385795825,
+     "gap_to_rho": 5.776033223485782
+    }
+   },
+   "replicate_spread": {
+    "inc-tb": 1.0521179634088482,
+    "rho-neg": 1.0185257737728777,
+    "ksum5": 1.011829105768066
+   },
+   "delta": 1.0521179634088482,
+   "max_upper_pooled": 0.6152966645697158,
+   "max_upper_replicate": 0.6494329841734845,
+   "holds": true
+  },
+  {
+   "slug": "icv1-fp24-t1577-77336155",
+   "role": "primary",
+   "incumbents": [
+    "inc-rec",
+    "inc-tb",
+    "inc-w0"
+   ],
+   "table_b": {
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "recipe": "folded, walked, base at the family optimum, m = 2",
+    "columns": 111,
+    "signed_points": 222,
+    "s_ic": 13.9656576304,
+    "s_rho": 1.03794226057,
+    "ic_over_rho": 13.4551392317,
+    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json"
+   },
+   "weights": {
+    "0": {
+     "strictest_incumbent": "inc-w0",
+     "s": {
+      "rho-neg": 1.0872239713560443,
+      "bsgs-neg": 1.0463471104865127,
+      "inc-rec": 14.069389738368896,
+      "inc-tb": 12.824351163742822,
+      "inc-w0": 12.73834951352579,
+      "ksum4": 6.365076989896435,
+      "ksum5": 6.383007476400372
+     },
+     "ksum5_over_incumbent": 0.5010859114536607,
+     "ci95": [
+      0.4909425327970129,
+      0.5114388627663705
+     ],
+     "ci95_bootstrap": [
+      0.48833792534219506,
+      0.5155794454478319
+     ],
+     "upper": 0.5155794454478319,
+     "per_replicate": [
+      0.5072434534518164,
+      0.5009223391271526,
+      0.4950608186742051
+     ],
+     "ksum4_over_incumbent": 0.49967831257400225,
+     "ksum5_over_bsgs": 6.10027725257683,
+     "gap_to_rho": 5.870922316437836
+    },
+    "1": {
+     "strictest_incumbent": "inc-w0",
+     "s": {
+      "rho-neg": 2.0626338965097077,
+      "bsgs-neg": 2.087855446806971,
+      "inc-rec": 33.41000788301925,
+      "inc-tb": 33.68004886437592,
+      "inc-w0": 33.1643399863509,
+      "ksum4": 14.95498131817341,
+      "ksum5": 14.13152444303565
+     },
+     "ksum5_over_incumbent": 0.42610600569321144,
+     "ci95": [
+      0.415640784782985,
+      0.4368347254050702
+     ],
+     "ci95_bootstrap": [
+      0.41295106314632996,
+      0.4409920926772851
+     ],
+     "upper": 0.4409920926772851,
+     "per_replicate": [
+      0.43271759887239347,
+      0.4264757127547057,
+      0.41907606466136926
+     ],
+     "ksum4_over_incumbent": 0.4509355929992349,
+     "ksum5_over_bsgs": 6.7684400587442415,
+     "gap_to_rho": 6.851203437967519
+    },
+    "0.1": {
+     "strictest_incumbent": "inc-w0",
+     "s": {
+      "rho-neg": 1.1847649638714108,
+      "bsgs-neg": 1.1504979441185579,
+      "inc-rec": 16.003451552833944,
+      "inc-tb": 14.909920933806122,
+      "inc-w0": 14.780948560808305,
+      "ksum4": 7.224067422724142,
+      "ksum5": 7.157859173063904
+     },
+     "ksum5_over_incumbent": 0.4842625047788181,
+     "ci95": [
+      0.47402810976282467,
+      0.4947178631494867
+     ],
+     "ci95_bootstrap": [
+      0.47141522765294497,
+      0.498927321791925
+     ],
+     "upper": 0.498927321791925,
+     "per_replicate": [
+      0.49052785216285316,
+      0.48419765615486415,
+      0.4780276136110639
+     ],
+     "ksum4_over_incumbent": 0.48874180117768246,
+     "ksum5_over_bsgs": 6.221531476571056,
+     "gap_to_rho": 6.0415857924042955
+    }
+   },
+   "replicate_spread": {
+    "inc-tb": 1.0067824156917857,
+    "rho-neg": 1.062261598863655,
+    "ksum5": 1.030252872298197
+   },
+   "delta": 1.062261598863655,
+   "max_upper_pooled": 0.5155794454478319,
+   "max_upper_replicate": 0.5340328127540577,
+   "holds": true
+  }
+ ]
+}
