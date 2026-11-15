@@ -44,3 +44,25 @@ old ARMS15/cohort/receipts, then measure all cold controls and candidate phases.
 
 ### Errors (what went wrong, how it was handled)
 No mismatch occurred. These gate clocks are diagnostic, not performance evidence.
+
+## Cold-worker preparation
+
+### What was done (commands, files, features)
+Implemented separate --linear-cold stage and rational worker arms while keeping
+old ARMS15and its cohort unchanged. All25tests in the heldout example pass,
+including exact generic/linear full-solver counts. New native collector pins
+source, args and fixture SHA for the six-curve/18target/288cell protocol.
+
+### Decisions made (and why)
+Commit scientific source before building the timed binary. Keep collection/
+reduction/plot generation native. Shared bench registry/custody tools handle
+only generic metadata; they will not launch scientific workers or compute the
+study's statistics. Existing progress metadata is separate from the study's
+native numerical result path. Scoped metadata taskT-6049was checked/claimed.
+
+### Open threads (unfinished, pick up next time)
+Pin source/library/binary, open record, checkpoint, execute capped child stage,
+collect/reduce all outputs and evaluate E6/E7. No result is known yet.
+
+### Errors (what went wrong, how it was handled)
+No new error. Old frozen raw data and closed records remain unchanged.

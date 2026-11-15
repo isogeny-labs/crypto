@@ -1,12 +1,9 @@
 //! Frozen held-out screen. See HELDOUT-PROTOCOL.md for cohort, caps and scope.
 mod anchor;
-#[cfg(test)]
 mod linear;
 #[path = "../hec_table_oracle_20261114/pipeline.rs"]
 mod pipeline;
-#[cfg(test)]
 mod rational;
-#[cfg(test)]
 mod rational_solve;
 #[path = "../../crates/hec-native-ic/src/table_factor.rs"]
 mod table_factor;
@@ -176,6 +173,52 @@ fn worker(path: &str, s: u64, arm: &str) {
     let f = Fixture::parse(&fs::read_to_string(path).unwrap());
     let (expected, target) = f.target(s);
     let (g, p) = (f.c.g, f.c.fp.p);
+    if arm.starts_with("rational-") {
+        let requested = if g == 2 {
+            let mut h = 6;
+            loop {
+                let mut v = 1u64;
+                for j in 0..6 {
+                    v = v * (h - j) / (j + 1);
+                }
+                if 32 * v >= 4 * p {
+                    break h as usize;
+                }
+                h += 1;
+            }
+        } else {
+            (p as f64).powf(1.0 - 1.0 / g as f64).ceil() as usize
+        };
+        let gate = arm == "rational-linear-gate";
+        let report = if arm == "rational-generic" {
+            rational_solve::solve(
+                &f.c,
+                &f.d1,
+                &target,
+                f.ell,
+                20260916 + s,
+                requested,
+                2,
+                gate,
+            )
+        } else {
+            assert!(matches!(
+                arm,
+                "rational-linear" | "rational-linear-aa" | "rational-linear-gate"
+            ));
+            rational_solve::solve_linear(&f.c, &f.d1, &target, f.ell, 20260916 + s, requested, gate)
+        };
+        let r = &report.base;
+        let check = Instant::now();
+        let correct = r.k == Some(expected) && r.k.is_some_and(|k| f.c.mul(&f.d1, k) == target);
+        let extra = check.elapsed().as_nanos();
+        let got = r.k.map_or("null".to_string(), |k| k.to_string());
+        println!("CELL {{\"g\":{g},\"p\":{p},\"family\":{},\"attempt\":{},\"ell\":{},\"seed\":{s},\"arm\":\"{arm}\",\"gate\":{gate},\"expected_k\":{expected},\"k\":{got},\"target_u\":{:?},\"target_v\":{:?},\"correct\":{correct},\"total_ns\":{},\"setup_ns\":{},\"relation_ns\":{},\"forest_ns\":{},\"solve_ns\":{},\"extra_check_ns\":{extra},\"anchors\":{},\"requested_h\":{},\"m\":{},\"trials\":{},\"constructed\":{},\"tuples\":{},\"splits\":{},\"admitted\":{},\"duplicates\":{},\"pure_rows\":{},\"unions\":{},\"pins\":{},\"descent_steps\":{},\"common\":{},\"normalized_admitted\":{},\"raw_checks\":{},\"pure_checks\":{},\"status\":\"{}\"}}",f.family,f.attempt,f.ell,&target.u.c[..target.u.n],&target.v.c[..target.v.n],r.total_ns,r.setup_ns,r.relation_ns,r.forest_ns,r.solve_ns,r.anchors,requested,r.m,r.draws,report.constructed,r.unique_tuples,r.splits,r.admitted,r.duplicate_relations,r.pure_rows,r.unions,r.pins,r.descent_steps,report.common,report.normalized_admitted,r.raw_checks,r.pure_checks,report.status);
+        if !correct {
+            std::process::exit(3);
+        }
+        return;
+    }
     let gate = arm == "compact-gate";
     if matches!(arm, "compact" | "compact-gate" | "orbit") {
         let r = if arm == "orbit" {
@@ -418,6 +461,7 @@ fn stage(mode: &str, root: &Path) {
 fn main() {
     let a: Vec<_> = std::env::args().collect();
     match a[1].as_str() {
+        "--linear-cold" => linear_stage(Path::new(&a[2]), Path::new(&a[3])),
         "--sleep-ms" => thread::sleep(Duration::from_millis(a[2].parse().unwrap())),
         "--runner-self-test" => {
             let dir = Path::new(&a[2]);
@@ -459,6 +503,103 @@ fn main() {
         "--worker" => worker(&a[2], a[3].parse().unwrap(), &a[4]),
         mode => stage(mode, &PathBuf::from(&a[2])),
     }
+}
+
+const LINEAR_ARMS: [&str; 16] = [
+    "n1fr",
+    "n1fd",
+    "n1hr",
+    "n1hd",
+    "n64fr",
+    "n64fd",
+    "n64hr",
+    "n64hd",
+    "t1f",
+    "t1h",
+    "t64f",
+    "t64h",
+    "compact",
+    "rational-generic",
+    "rational-linear",
+    "rational-linear-aa",
+];
+fn linear_stage(root: &Path, origin: &Path) {
+    assert_ne!(BUILD, "UNFROZEN");
+    fs::create_dir_all(root).unwrap();
+    let mut used: u128 = fs::read_dir(root)
+        .unwrap()
+        .map(|p| p.unwrap().path())
+        .filter(|p| p.extension().is_some_and(|e| e == "receipt"))
+        .map(|p| receipt(&p, None).wall)
+        .sum();
+    for (index, (g, p)) in [
+        (2, 1009),
+        (2, 16381),
+        (3, 127),
+        (3, 1009),
+        (4, 31),
+        (4, 127),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let name = format!("select-g{g}-p{p}-f0.out");
+        let fixture = root.join(&name);
+        let source = origin.join(&name);
+        if fixture.exists() {
+            assert_eq!(sha(&fixture), sha(&source));
+        } else {
+            fs::copy(&source, &fixture).unwrap();
+        }
+        let input = sha(&fixture);
+        for s in 5..8u64 {
+            let gate_key = format!("gate-g{g}-p{p}-f0-s{s}-rational-linear-gate");
+            let args = vec![
+                "--worker".into(),
+                fixture.to_str().unwrap().into(),
+                s.to_string(),
+                "rational-linear-gate".into(),
+            ];
+            if !root.join(format!("{gate_key}.receipt")).exists()
+                && used + 60_000_000_000 > 1_800_000_000_000
+            {
+                println!("BUDGET {used}");
+                std::process::exit(5);
+            }
+            let gate = cell(root, &gate_key, &args, &input, 60, false);
+            if !gate.cached {
+                used += gate.wall;
+            }
+            println!("STATUS {gate_key} {} {}", gate.status, gate.wall);
+            let mut arms = LINEAR_ARMS.to_vec();
+            arms.rotate_left((index * 3 + (s - 5) as usize) % 16);
+            if s % 2 == 1 {
+                arms.reverse();
+            }
+            for arm in arms {
+                let key = format!("measure-g{g}-p{p}-f0-s{s}-{arm}");
+                if !root.join(format!("{key}.receipt")).exists()
+                    && used + 30_000_000_000 > 1_800_000_000_000
+                {
+                    println!("BUDGET {used}");
+                    std::process::exit(5);
+                }
+                let skip = gate.status != "exit_0" && arm.starts_with("rational-");
+                let args = vec![
+                    "--worker".into(),
+                    fixture.to_str().unwrap().into(),
+                    s.to_string(),
+                    arm.into(),
+                ];
+                let result = cell(root, &key, &args, &input, 30, skip);
+                if !result.cached {
+                    used += result.wall;
+                }
+                println!("STATUS {key} {} {}", result.status, result.wall);
+            }
+        }
+    }
+    println!("TERMINAL linear-cold child_wall_ns={used}");
 }
 #[cfg(test)]
 mod tests {
