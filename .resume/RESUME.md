@@ -1,14 +1,13 @@
-# Resume: crypto @ claude/ecstatic-edison-cgo57l
+# Resume: crypto @ claude/cool-davinci-szm3om
 
 ## Goal
-Owner (2026-11-14): work on hyperelliptic index calculus and make cross-genus statistical experiments possible: HCDLP at genus 2, 3, 4, 5 on one field, difficulty differences, Smith's isogeny, non-hyperelliptic curves.
+Owner (2026-11-15): establish a rigorous solving degree and growth formula alongside d_ff and d_lf for the ECDLP index-calculus systems, prime (two- and three-summand chains) and binary.
 
 ## Spec
-Frozen protocol: research/genus_ladder_20261114/PROTOCOL.md (frozen.sha256 beside it). Code: src/cryptanalysis/genus_ladder.rs, src/cryptanalysis/quartic_ladder.rs, src/bin/genus_ladder.rs, src/bin/genus_ladder_analyze.rs.
-Run (section 6 of the protocol): two `genus_ladder run` invocations -> part_a.jsonl, part_b.jsonl -> ladder.jsonl; then `genus_ladder_analyze ladder.jsonl analysis.json`; then `python3 render.py analysis.json` in the study directory.
+Frozen protocol: research/solving_degree_20261115/PROTOCOL.md (predictions P1–P6). Claim: for a unit prime chain instance the static Macaulay solving degree is sd = δ + maxwt(supp g^{-1}), g^{-1} the inverse in F_p[(Z/2^k)^m]; hence d_lf ≤ sd ≤ δ + mk with generic equality.
 
 ## State
-2026-11-14: code and unit tests done (5 ladder tests pass), protocol frozen, grid launched locally (4 vCPU container, no AWS identity, so no isolab-eks and no S3 push).
+2026-11-15 02:10Z: four lanes running locally (4 vCPU, no AWS identity): A prime m=2 (brute force k=3,4; inverse scan k=3..12), B prime m=3, C binary static degrees from the ic-bounds-binary records, D proof note SD1 plus red-team. Outputs under research/solving_degree_20261115/lane*/.
 
 ## Next
-Collect part_a/part_b, analyze, RESULTS.md with the H1..H9 scorecard, figures, PDF, bench record, session log, PR.
+Collect lane RESULTS.md, assemble RESULTS.md and REPORT (research-visuals), copy SD1-solving-degree.md to ml-cryptanalysis docs/proofs on claude/lfd-proofs-20261108, session log, PR with auto-merge.
