@@ -193,11 +193,13 @@ jobs:
             --max-processes 1800 --timeout 60
       - name: Run the native tournament once
         run: |
+          set -o pipefail
           "$RUNNER_TEMP/runs/round-0026/evaluator/icprog" tournament run \
             --round "$RUNNER_TEMP/runs/round-0026" \
             | tee "$RUNNER_TEMP/ic-native-round-run.log"
       - name: Independently audit the frozen round
         run: |
+          set -o pipefail
           "$RUNNER_TEMP/runs/round-0026/evaluator/icprog" tournament verify \
             --round "$RUNNER_TEMP/runs/round-0026" \
             | tee "$RUNNER_TEMP/ic-native-round-audit.log"

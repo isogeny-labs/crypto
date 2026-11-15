@@ -1,0 +1,18 @@
+== A/A base vs base, bsgs32 x20 | load before 3.74 5.08 5.30 | after 3.74 5.08 5.30
+A: min 360 ms, median 367 ms (n=5) [] all: 394 398 360 364 367
+B: min 339 ms, median 367 ms (n=5) [] all: 410 407 367 356 339
+== B1 R13: base vs b1, bsgs32 x20 | load before 3.74 5.08 5.30 | after 3.68 5.05 5.28
+A: min 358 ms, median 375 ms (n=5) [] all: 358 375 377 384 362
+B: min 340 ms, median 362 ms (n=5) [] all: 380 362 340 375 348
+== B2 kangaroo: b1 vs b2, kangaroo32 x20 | load before 3.68 5.05 5.28 | after 3.62 5.02 5.27
+A: min 402 ms, median 422 ms (n=5) [] all: 402 429 412 425 422
+B: min 397 ms, median 424 ms (n=5) [] all: 422 438 424 430 397
+== C1: rho.negation (base) vs rho.negation_lanes_v1 lanes=32 (c), 32-bit x20 | load before 3.62 5.02 5.27 | after 3.62 5.02 5.27
+A: min 299 ms, median 315 ms (n=5) [] all: 315 348 299 318 312
+B: min 182 ms, median 191 ms (n=5) [] all: 233 186 182 203 191
+== C2: rootfind-mitm (base) vs rootfind-mitm-prime-batch (c), 24-bit size 32, x1 | load before 3.62 5.02 5.27 | after 3.57 4.98 5.26
+A: min 76 ms, median 84 ms (n=5) [] all: 83 86 76 84 84
+B: min 39 ms, median 50 ms (n=5) [] all: 55 43 39 50 50
+== gate-prime whole session: base vs c (existing ids only) | load before 2.97 4.58 5.10 | after 3.02 4.31 4.98
+A: min 6033 ms, median 6304 ms (n=5) [] all: 6324 6304 6198 6345 6033
+B: min 5916 ms, median 5992 ms (n=5) [] all: 5992 6199 6217 5916 5945

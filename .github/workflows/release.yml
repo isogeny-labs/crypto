@@ -773,6 +773,7 @@ jobs:
         # 0 (curve 83 at --launches 1 does exactly that), so assert on the
         # verification line instead.
         run: |
+          set -o pipefail
           ./ecc2k130/ecc2k130-cpu --curve 23 --launches 1 | tee /tmp/smoke.log
           grep -q 'verified \[k\]P == Q' /tmp/smoke.log \
             || { echo "::error::client ran but did not solve the planted instance"; exit 1; }

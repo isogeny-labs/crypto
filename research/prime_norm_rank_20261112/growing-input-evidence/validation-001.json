@@ -1,0 +1,65 @@
+{
+  "schema": "norm-growing-input-validation/v1",
+  "source_commit": "0a12a195c66785b5b8b4b4409ab0cc02ee991f64",
+  "created_at": "2026-11-14T07:03:28.812551+00:00",
+  "gate": {
+    "exit": 0,
+    "whole_study_theorems": 435,
+    "extra_trusted_axioms": 0,
+    "receipt": "gate-validation-001.json",
+    "data_claim": "PCC-20261114-dc7d16"
+  },
+  "fresh": {
+    "command": "PATH=/workspace/audit/toolchains/lean-4.35.0-linux/bin:$PATH lake -d research/prime_norm_rank_20261112/lean env leanchecker --fresh --verbose NormGrowingInput",
+    "exit": 0,
+    "includes_imports": true
+  },
+  "standing": "Unsigned producer data, no signed execution verdict",
+  "artifacts": [
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/source-freeze.json",
+      "bytes": 1189,
+      "sha256": "05f9ab142999f194b6ecb00cee53b28e2d372fc156b771c07c3c9a925b88fc21"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/claim-pins.json",
+      "bytes": 9521,
+      "sha256": "301f593acfe69b4f88d85cd7e3fe707661f580e5c46ab0234084085a59fb90c5"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/gate-validation-001.json",
+      "bytes": 2028,
+      "sha256": "6f328150a6a7edb59c3c326db56e2b265ebbc194987e566c37bf512f9bdb9d73"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/gate-validation-claim.json",
+      "bytes": 83,
+      "sha256": "5ddb482e57ddcab58f4bc28653cda1cac827d487869051349713a0e11a5ebd1b"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/fresh-001.log",
+      "bytes": 40,
+      "sha256": "8c306816596920b2d49f6cfe65dd5ab5edab2aafc11405805adf1cc1a617e4dc"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/fresh-001.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/default-verification-001.json",
+      "bytes": 31403,
+      "sha256": "791f43fff8983bbbbdc93e6779f291f4d2d273c853f4c156308099ec9111d0c9"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/growing-build-006.log",
+      "bytes": 16142,
+      "sha256": "ea66847c4c07e886158b81369a16bb2974768eb71b823b5a526a100ee9807cc5"
+    },
+    {
+      "path": "research/prime_norm_rank_20261112/growing-input-evidence/report-build-002.log",
+      "bytes": 5089,
+      "sha256": "5bd258cd418f3378eaed878e61a161308c6c785d6b1c59aec049eefdea7349e4"
+    }
+  ]
+}
