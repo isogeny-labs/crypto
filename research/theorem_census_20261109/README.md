@@ -391,6 +391,32 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual infinity chart localization audit](../miller_infinity_chart_audit_20261115/README.md)
+now identifies the actual origin-localized chart-function image algebra in
+X/Y and1/Y with the norm-degree DVR by an explicit RingEquiv preserving actual
+function-field inclusion. Unique/surjective origin evaluation/ker(t,z), actual
+Noetherian local DVR/maximal ideal(t), full actual FunctionField fraction-ring
+identifications and the explicit inverse are derived, not assumed. The official
+normalized maximal-ideal adic valuation equals norm degree everywhere, giving
+source-sign line/vertical pole orders−3/−2, correct normalization and the
+reciprocal-X substitution countercontrol. The actual local residue field is
+explicitly K, with exact evaluation formula. This closes the specified actual
+chart-function/localization/adic-order comparison left by the preceding packet;
+a separate Mathlib projective Scheme.localRing comparison is not asserted.
+**Full finite-point principal divisor, translation/reciprocity/isogeny/Lang/
+Cartier/Jacobian/canonical pairing/MOV-FR and all14 completion remain open.**
+Exact local **PCC-20261115-6a306d** PASS at2026-11-15T05:37:49Z, signed unverified. Whole129/0fail/0trusted/
+standardfoundations;16modules=7byte-identicalcreditednormcores+9new; full1033-char
+binding0bae769dea940a972891b819c4a49162b9aa2189ca7156fc5fa387f267ec81f5/native1complete/0prefix/0unresolved;
+19formal-config+14artifactpins. Fifteen snapshots/eight failures/APIprobe/two
+protocols,290files/69objects/25340-byte losslessXZ/fivegate/one-page46953-bytePDF
+fullread/visual/inbounds; final15/projectlogs clean, auditoroneinheriteddeprecation.
+Galbraithchapter7 PDF1–2,7–10,14–15 fulltext/PDF2,8,9,15 visual, not all21pages;
+infinity subsection of Example7.3.4 verified, not fullTheorem7.7.11. Existing
+chapter26/reusedofficialMathlib arguments credited. No frozenedits/novelty/
+canonicalpromotion/independenthostvalidation/spend/upload. [pcc:unverified]
+
+
 The [actual Miller norm valuation/DVR bridge](../miller_norm_valuation_audit_20261115/README.md)
 constructs a valuation on the actual curve function field from the actual rank-two
 algebra norm degree, deriving multiplicativity, ultrametricity and zero support.

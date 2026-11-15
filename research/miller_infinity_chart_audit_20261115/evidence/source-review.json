@@ -1,0 +1,125 @@
+{
+  "schema": "miller-infinity-chart-source-review/v1",
+  "primary_chapter7": {
+    "author": "Steven D. Galbraith",
+    "title": "Mathematics of Public Key Cryptography, chapter7, extended corrected version2.0",
+    "URL": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch7.pdf",
+    "bytes": 281643,
+    "PDF_pages": 21,
+    "sha256": "c5b9a25eeb00c280f9e723b7290533d3f62ecfcc0995731e9e30e29503a6b942",
+    "full_text_PDF_pages": [
+      1,
+      2,
+      7,
+      8,
+      9,
+      10,
+      14,
+      15
+    ],
+    "full_visual_PDF_pages": [
+      2,
+      8,
+      9,
+      15
+    ],
+    "printed_pages": "123-124,129-132,136-137",
+    "exact_targets": "Definition7.1.1/Lemma7.1.2/Example7.1.4 local fraction model; infinity subsection of Example7.3.4/exactYchart7.6; uniformizer7.3.2 and valuation7.4.1/7.4.5/7.4.11. Definition7.7.2/Lemma7.7.10 read as context for remaining finite-point divisor work.",
+    "limits": "Not all21pages read. Theorem7.7.11 proof starts in readpages but is not fully read/proved. Qualified infinity chart/uniformizer/pole-order assertions survive; no source refutation/novelty claimed."
+  },
+  "primary_chapter26": {
+    "URL": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+    "bytes": 222784,
+    "PDF_pages": 16,
+    "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+    "read_scope": "Prior printed574-577/PDF2-5 fulltext/visual and recent577/PDF5, notall16pages; Definition26.3.4/Exercise26.3.5."
+  },
+  "interpretation": "Actual image algebra of polynomial functions in t=X/Y,z=1/Y inside actual curve FunctionField, its unique origin evaluation and origin localization. Derived finite-type/Noetherian/domain/DVR, full fraction field, actual injective/surjective localization map and explicit RingEquiv preserving function-field inclusion. Official normalized maximal-ideal adic valuation equals norm-degree everywhere, deriving negative-log pole orders -3/-2, actual normalization and actual residue-field/evaluation comparison. No missing inverse, DVR, fraction-field or valuation equality supplied as premise. This proves the specified chart-function localization bridge; separate Mathlib projective Scheme.localRing comparison is not asserted.",
+  "official_APIs_read": [
+    "Algebra.adjoin induction, internal generation, FG/FiniteType/Noetherian, actual Subalgebra coefficient/residue images.",
+    "Localization.AtPrime unit criterion, local/domain/Noetherian, maximal ideal map, lift/injectivity and explicit fraction-ring universal properties.",
+    "DVR TFAE, unit-times-uniformizer factorization, integer-zpow fraction representation, official height-one maximal ideal, normalized adic valuation/value of its generator/units.",
+    "Actual residue quotients, quotient-by-kernel and explicit equivalent-ideal quotient maps."
+  ],
+  "prior_reused_claim": "PCC-20261115-c0e6db",
+  "prior_source_plan": {
+    "path": "research/miller_norm_valuation_audit_20261115/sources.json",
+    "sha256": "131c419975b5f5f317ef8ff7dff60d55c0e4ae6b85c99feace8b3f23630d9b88"
+  },
+  "exact_reused_modules": [
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/DiscreteValuation.lean",
+      "byte_identical": true
+    },
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/FieldValuation.lean",
+      "byte_identical": true
+    },
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/MillerFunctions.lean",
+      "byte_identical": true
+    },
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/NormDegree.lean",
+      "byte_identical": true
+    },
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/Normalization.lean",
+      "byte_identical": true
+    },
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/ResidueNormalization.lean",
+      "byte_identical": true
+    },
+    {
+      "original": {
+        "path": "research/miller_norm_valuation_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      "new": "research/miller_infinity_chart_audit_20261115/lean/ValuationCertificate.lean",
+      "byte_identical": true
+    }
+  ],
+  "new_modules": 9,
+  "source_fidelity": "Explicit localization and inverse proof used; no shortcut from a merely one-way-defined birational map. Actual source chart relation proved. Negative reciprocal-X substitution control retained; source uses the correct X/Y parameter.",
+  "KB": "MCPabsent; fresh status/mechanism/negative/theorem/Conductor127, inspected. Broad prior map/source search and primary/official fallback; no absence or novelty claim.",
+  "execution": "Fifteen snapshots/eight failed states/seven successes/APIprobe retained. Typeclass/whnf timeouts repaired using explicit proved instance arguments; monoid data aligned locally with actual CommRing, not a new elaboration flag or linter waiver. Default limits throughout.",
+  "boundaries": [
+    "Specified actual chart-function image localization, not a silently assumed Mathlib projective Scheme.localRing equivalence.",
+    "Full finite-point principal divisor, translation pullback, Weil reciprocity, isogeny/Lang/Cartier/Jacobian/canonical Weil-Tate/MOV-FR/all14 remainopen.",
+    "Same host/prover/Mathlib, not independent physical-host/compiler/parser assurance or signed standing."
+  ],
+  "copyright": "Copyrighted primary PDF/text/images localonly; committed bibliography/hash/read scope/retrieval metadata only.",
+  "signed_standing": "unverified"
+}
