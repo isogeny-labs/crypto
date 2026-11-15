@@ -1,0 +1,52 @@
+SetSeed(20261115);
+R<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^42+x^7+1>;
+k := GF(64);
+Embed(k,K);
+
+function FromMask(n, z)
+    v := Parent(z)!0;
+    for i in [0..41] do
+        if (n div 2^i) mod 2 eq 1 then
+            v +:= z^i;
+        end if;
+    end for;
+    return v;
+end function;
+
+b := FromMask(4169,z);
+a := FromMask(34359738368,z);
+assert a^64 eq a;
+found := false;
+for j in [0..62] do
+    if K!(k.1^j) eq a then
+        a0 := k.1^j;
+        found := true;
+        break;
+    end if;
+end for;
+assert found;
+E := EllipticCurve([K | 1,a,0,0,b]);
+assert #E eq 4398047737114;
+C,h := WeilDescent(E,k,K!1);
+assert Genus(C) eq 8;
+J := Jacobian(C);
+E0 := EllipticCurve([k | 1,a0,0,0,1]);
+assert #E0 eq 74;
+t := 2^42+1-#E;
+u := 65-#E0;
+ZZT<T> := PolynomialRing(Integers());
+expected := (1-u*T+64*T^2)*(1-t*T^7+64^7*T^14);
+cpu := Cputime();
+actual := EulerFactor(J);
+print "euler_cpu_sec", Cputime(cpu);
+print "source_trace", t;
+print "base_trace", u;
+print "expected", expected;
+print "actual", actual;
+print "factorization_matches", actual eq expected;
+print "order_product", Evaluate(expected,1);
+print "jacobian_order", #J;
+assert actual eq expected;
+assert Evaluate(actual,1) eq #J;
+assert #J eq #E*#E0;
