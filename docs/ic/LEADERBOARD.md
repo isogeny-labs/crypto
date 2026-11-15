@@ -1286,7 +1286,7 @@ Eight exact packed-root configurations ran on sixteen sealed public points acros
 - `research/ic_tool_program/explorations/build-steps-20261113/summary.json` — sha256 `34edc872ae14d24b…`
 - `research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json` — sha256 `3ace18c28337e08b…`
 - `research/prime_leads_chase_20261113/README.md` — sha256 `1c894b6f2b41a373…`
-- `src/cryptanalysis/ecbench/methods.rs` — sha256 `2b5bd6e586ec0a3a…`
+- `src/cryptanalysis/ecbench/methods.rs` — sha256 `ad7d431652524737…`
 - `src/cryptanalysis/ic_framework/solvers.rs` — sha256 `f8f9a75589e96902…`
 - `integrations/primo/README.md` — sha256 `4ec69082225f9f88…`
 - `src/cryptanalysis/ecbench/optimization.rs` — sha256 `6d71ad769ca27a3e…`
