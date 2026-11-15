@@ -8,6 +8,8 @@ on:
       - research/prime31_ic_20261115/native/M4_FACTORIZED_S4_RESULTANT_PROTOCOL_20261115.md
       - .github/workflows/prime31-factorized-s4-rust.yml
       - research/prime31_ic_20261115/native/M4_FACTORIZED_NATURAL_4096_PROTOCOL_20261115.md
+      - research/prime31_ic_20261115/native/examples/prime31_s3_root_index.rs
+      - research/prime31_ic_20261115/native/S3_ROOT_INDEX_CONTROL_AND_NATURAL_16384_20261115.md
   workflow_dispatch:
 
 permissions:
@@ -36,3 +38,7 @@ jobs:
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --m4-factorized
       - name: Rust natural 4096 public-target S4 witness/rank calibration
         run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --m4-natural-4096
+      - name: Rust S3 pair-root index correctness and B4 exhaustive signed support
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index
+      - name: Rust-only 16384 public natural-target coordinate control
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --natural-16384
