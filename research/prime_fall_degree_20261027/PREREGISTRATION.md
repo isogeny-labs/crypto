@@ -681,3 +681,28 @@ Route only, plus a study-level spend guard. Every number is `[pcc:unverified]`.
   stop, plus less than US$30 already spent on EKS. That is below US$470, so the guard cannot stop a running job.
 - **Recorded.** No row of any of these jobs existed when this was written.
 - No hypothesis, rule, cell, limit or budget changes.
+
+## Amendment 21 (2026-11-15; stage B's gate G3: a tool race, recorded and re-run with one worker; before any stage B rule is read)
+
+Procedure only. Every number is `[pcc:unverified]`.
+
+- **What happened (measured).**
+  - Stage B's job (`pfd-b-rp`, Amendment 16) ran `g1 hky-B d-B g3`. Every `hky-B` and `d-B` stage ended `exit 0`.
+  - `g3` (`prime_fall_degree_tools gate3 ... --max-n 20 --jobs 2 --budget 900`) panicked after 17 min, with exit 101 and
+    "capped rows: No such file or directory" at `examples/prime_fall_degree_tools.rs:524`.
+  - Before the panic it had written 122 capped comparisons to `gates/g3.jsonl`, all `agree`: 0 disagreements and no
+    `G3 DISAGREE` line.
+- **Cause (read from the frozen source, f13a690df0, lines 507–525).**
+  - `gate3` names each capped run's temporary file by `(p, kind, m, x_r, cap)` only.
+  - The `B-m3-null` systems share `p`, `kind`, `m` and `x_r` with their Kummer counterparts. With two workers, one worker
+    can delete the file the other is about to read.
+  - This is a defect in the tool, not a disagreement.
+- **Reading, following Amendment 11's precedent.** Stage B's `g3` stage is recorded as "not completed (tool race)", not as
+  a §4 gate failure. Its 122 rows are kept as evidence and are not used as the gate.
+- **Re-run.** `prime_fall_degree_tools gate3 <stage B directory> <pilot> --max-n 20 --jobs 1 --budget 900`.
+  - It uses the same binaries (Amendment 17), the stage B rows as fetched, and a fresh `gates/` directory.
+  - One worker removes the race. The capped runs are independent, so the worker count changes no computation.
+  - It runs on this session's host (4 vCPU), which is a host disclosure as in Amendment 16. A budget timeout still counts
+    as a disagreement, as `gate3` defines it.
+  - If any item disagrees, it goes to the owner with the rows, following Amendment 11's stop rule.
+- No hypothesis, §6 rule, cell, seed, budget or limit changes.
