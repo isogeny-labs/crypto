@@ -29,3 +29,22 @@ Written while `analysis/build_results.py` was built, before launch. They resolve
    listed as references only.
 9. "Verified natural positive at t = 3" = complete, label `sat`, consistent with the classifier, every real
    decomposition recovered, at least one real decomposition.
+
+## A2 — 2026-11-15T00:00Z, orchestration hardening (seen: smoke pods on 2-row/61-row m = 4 mini plans only; no data row)
+
+Measurement commands, caps, plan and cells are unchanged (`pod/plan.json`, `pod/bundle.tgz` and `cells/` keep their
+freeze hashes). Orchestration files changed so a 72 h run survives the loss of the controlling session and cannot
+bill past its deadline (`pod/HARDENING.md` has the smoke-pod evidence):
+
+- `pod/job.sh` (+17): (i) msolve identity gate before row 1: a missing or wrong `/usr/bin/msolve` writes
+  `done.json` with `"aborted":"msolve_identity"` and exits 5 (before: an install failure was only recorded and the
+  plan ran on whatever msolve was present); (ii) a `STOP` file created by the pod-side guard at the deadline makes
+  the remaining rows `not_run` (reason `deadline`) in `runs.jsonl`. New sha256: dd243da0abb0723e964b94d5d7329c570412002bb9b9e9f77a2ec100719b7bd4.
+- `pod/guard.sh` (new, pod side): at the deadline creates `STOP`; after `done.json` + `fetched.flag`, or at the
+  deadline + 6 h grace, stops the pod's compute with `runpodctl stop pod` (a bare `kill 1` only restarts the
+  container and keeps billing, measured). sha256: 667ea094e069bb1ecc392a05a9477c7c83c197d718c4aded1db64dcf965809e1.
+- `pod/launch.sh` (+123/−22): starts the guard; writes `launch.json` (pod id, $/h, created and deadline epochs);
+  sets `fetched.flag` after a sha-verified or partial fetch; `--attach NAME` mode for a resumed session; copies the
+  pod state to `.resume/pod_state/` and a `## Pod in flight` line into `.resume/RESUME.md`; 3× retry on `put`;
+  pod-status check in the poll loop. sha256: 88de4f76925c7df5a012a413c30f10843aeea677a1983b9ba42eb4b6e9a5afd5.
+- `pod/podserver.py` (+8/−1): SIGTERM handler; re-stop if the container restarts after a guard stop.

@@ -5,7 +5,7 @@
   POST /<TOKEN>/exec            body = shell command; runs detached in /work; returns {"id": n}; log /work/exec_<n>.log, exit code /work/exec_<n>.rc
   GET  /<TOKEN>/ls              JSON listing of /work (relative paths, sizes)
 Token from env POD_TOKEN. Anything else: 404."""
-import http.server, json, os, subprocess, threading
+import http.server, json, os, signal, subprocess, threading, time
 TOKEN = os.environ['POD_TOKEN']; ROOT = '/work'; os.makedirs(ROOT, exist_ok=True); lock = threading.Lock(); n = [0]
 def safe(p):
     full = os.path.realpath(os.path.join(ROOT, p))
@@ -49,4 +49,11 @@ class H(http.server.BaseHTTPRequestHandler):
         subprocess.Popen(['bash', '-c', f'({cmd}) > {ROOT}/exec_{i}.log 2>&1; echo $? > {ROOT}/exec_{i}.rc'], cwd=ROOT, start_new_session=True)
         self._send(200, json.dumps({'id': i}).encode(), 'application/json')
     def log_message(self, *a): pass
+# hardening [pcc:unverified]: when this is PID 1, a signal from inside the container is dropped unless a handler exists,
+# so guard.sh's `kill -TERM 1` would be a no-op without this. Exit at once (the container then stops).
+signal.signal(signal.SIGTERM, lambda *a: os._exit(0))
+def _restop():   # RunPod restarts a container whose PID 1 died; if guard.sh had already decided to stop, ask RunPod to stop the pod again
+    while os.path.exists(ROOT + '/guard.stopped'):
+        subprocess.run(['runpodctl', 'stop', 'pod', os.environ.get('RUNPOD_POD_ID', '')], capture_output=True); time.sleep(60)
+threading.Thread(target=_restop, daemon=True).start()
 http.server.ThreadingHTTPServer(('0.0.0.0', 8000), H).serve_forever()

@@ -8,6 +8,7 @@
 # One solve at a time, in plan `order`. Never retries, never skips a planned row; a failed row is a row.
 # Memory: resident-size watchdog (2 s poll of /proc/<pid>/status over the process tree) + prlimit --as at 1.25 x cap.
 # No `set -e`: a failing row must not stop the plan.
+# Exit 5 = msolve identity gate (done.json has "aborted":"msolve_identity"). WORKDIR/STOP (made by guard.sh at the deadline) stops new rows.
 set -uo pipefail
 BUNDLE=$(readlink -f "${1:?bundle.tgz}"); mkdir -p "${2:?workdir}"; W=$(cd "$2" && pwd); DRY=0; [ "${3:-}" = "--dry-run" ] && DRY=1
 MSOLVE_PIN=0.6.5-1build2; MSOLVE_SHA=c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa
@@ -54,6 +55,15 @@ fi
   echo "== pod"; echo "POD_ID=$POD_ID REPLACEMENT=$REPLACEMENT"
 } > "$OUT/env/env.txt" 2>&1
 MSOLVE_ACTUAL=$(sha /usr/bin/msolve)
+# ---- 1b. msolve identity gate (hardening [pcc:unverified]): wrong or missing msolve => no row runs --------------
+# Before this gate an install failure only set INSTALL_RC (recorded in done.json); the plan then ran with whatever
+# msolve was present. Now a real run (not --dry-run, which uses the local msolve) aborts before row 1, rc 5.
+if [ $DRY = 0 ] && [ "$MSOLVE_ACTUAL" != "$MSOLVE_SHA" ]; then
+  say "FATAL: msolve identity gate: sha256 '${MSOLVE_ACTUAL:-missing}' != expected $MSOLVE_SHA (install_rc=$INSTALL_RC); no row will run"
+  printf '{"schema":"pkm.m8-panel.done/v2","aborted":"msolve_identity","rows_planned":0,"rows_recorded":0,"msolve_sha256":"%s","msolve_sha_expected":"%s","msolve_install_rc":%s,"pod_id":"%s","utc":"%s"}\n' \
+    "${MSOLVE_ACTUAL:-}" "$MSOLVE_SHA" "$INSTALL_RC" "$POD_ID" "$(ts)" > "$OUT/done.json.tmp" && mv "$OUT/done.json.tmp" "$OUT/done.json"
+  exit 5
+fi
 cp "$PLAN" "$OUT/env/plan.json"
 
 # ---- 2. helper (JSON, watchdog; no analysis) ---------------------------------------------
@@ -250,6 +260,13 @@ say "plan rows: $N"
 
 # ---- 3. plan loop --------------------------------------------------------------------
 for ((i=0; i<N; i++)); do
+  # deadline hook (hardening [pcc:unverified]): guard.sh creates $W/STOP at the deadline; remaining rows are recorded as not_run
+  if [ -e "$W/STOP" ]; then
+    say "STOP file present: rows $((i+1))..$N not started (reason deadline)"
+    for ((j=i; j<N; j++)); do ( eval "$(H plan "$PLAN" $j)"; printf '{"order":%s,"kind":"%s","cell":"%s","target":"%s","solver":"%s","msolve_mode":"%s","pod_id":"%s","censored":"not_run","reason":"deadline","wall_s":0,"user_s":0,"sys_s":0}\n' \
+      "$R_order" "$R_kind" "$R_cell" "$R_target" "$R_solver" "$R_mode" "$POD_ID" ) >> "$RUNS"; done
+    break
+  fi
   set -a; eval "$(H plan "$PLAN" $i)"; set +a
   ID=$(printf '%03d_%s_%s_%s_%s' "$R_order" "$R_cell" "$R_target" "$R_solver" "$R_mode"); RD=$OUT/rows/$ID; mkdir -p "$RD"
   read -r CPUS CPUS_N CPUS_ALL < <(H cpus "$R_threads")
