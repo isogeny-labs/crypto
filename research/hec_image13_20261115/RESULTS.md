@@ -1,5 +1,7 @@
 # Quotient image relations and singular-quartic candidates
 
+**Current status:** the post-run [global certificate](GLOBAL-CERTIFICATE.md) now proves all eight cubics and the unique globally singular quartic for each image. The original empirical-only record below is preserved; see the explicit proof supplement at the end.
+
 Both descended genus3quotient maps produce the same exact fitted pattern:
 no quadrics, eight cubics and a unique quartic whose eight partial derivatives
 span the fitted cubic space. All unused holdout evaluations pass.
@@ -97,3 +99,16 @@ validation. AdditionalLefschetzsearches did not yet verify the exact algebraic
 hypotheses. Established interpolation/gradientlinearalgebra; no noveltyclaim.
 Nextglobalequationcertificate and geometry/curve/descent/divisortransport,
 then complete costs. Full mathematical10xgenus2/3/4objective stays active.
+
+## Post-run global certificate, 2026-11-15
+The finite-field hypotheses have now been checked using Donovan's primary
+Lefschetz-Riemann-Roch theorem and its Brauer trace. GLOBAL-CERTIFICATE.md
+proves h0(A,6M)^+=112 for these symmetric ppavs without assuming a curve.
+The global cubic kernel has dimensionatleast8 and is contained in the
+sampled kernel of dimension8, hence they coincide. All eight fittedcubics
+are global identities. Exact gradient membership and Euler then prove the
+recorded quartic is globally singular along the coordinate image, uniquely
+up to scalar. This does not prove scheme equality with its gradient locus.
+The prior rawfalse flag and candidate report preserve the empirical-only
+status at execution; this explicit mathematical supplement supplies the
+additional proof, without scientific rerun or independent signature.

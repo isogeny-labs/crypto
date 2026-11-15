@@ -28,3 +28,19 @@ Sharedresumeuntouched. No sciencePython/oldrecordchange.
 ## Publication checks
 One-page PDF and embedded SVG rendered and visually inspected. rustfmt/diff
 checks pass; source/run remain unchanged. Nextpublication/checkpoint/currentCI.
+
+## Post-run proof completed
+PrimaryDonovanCor5.5/setup/Section3Brauertrace read from validatedwwwPDF;
+order2prime127,64fixedpoints,conormaldenominator8,fibersixthpower1.
+Amplecohomologyvanishing viaétaletracesplitting/Serre,RR216,exacttrace8
+=>even112. Rank sandwich now proves all8globalcubics; exactgradientspan/
+Euler gives unique globallysingularquartic perimage. GLOBAL-CERTIFICATE.md
+records fullproof and boundary(notfullgradient-scheme/curve/transport).
+Rawfalse flag/initialcandidatePDF unchanged; no science rerun. Webrefetch
+failedtimeouts; archiveTLSmismatchnotbypassed; validatedwwwPDFsucceeded.
+Expiredownclaim cleanup thennewscopeclaim epoch3 before proofedits.
+
+## Global-proof report inspected
+GLOBAL-REPORT.pdf is onepage, rendered and visually inspected with embedded
+GLOBAL.svg. Original candidatePDF/rawretained. Resultsnowleadsexplicitproof
+status and NEXT-CERTIFICATElinkscompletedproof. No scientificrerun required.

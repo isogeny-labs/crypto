@@ -1,4 +1,6 @@
-# Post-run route to a dimension certificate (not yet admitted)
+# Post-run route to a dimension certificate (original proposal)
+
+Status update: the source checks and proof are now completed in GLOBAL-CERTIFICATE.md. The proposal and its original pending conditions below are retained for provenance.
 
 The frozen interpolation gate is terminal. Its output remains explicitly
 uncertified as global identities. A subsequent literature pass found a
