@@ -77,6 +77,25 @@ above the first host's 15 GiB:
 Each random part B target is the same system as the part A refutation draw at its size, and their F4 counts are
 identical (`5,097,695,134,360` and `5,096,514,454,550`). The pod ran about 6.9 h (about \$7) and was deleted.
 
+=== Why `S = 32` and `S = 36` cost the same (diagnostic, not study data)
+
+The two `m = 3` refutation counts, `5,097,695,134,360` (degree 2, `S = 32`) and `5,096,514,454,550` (mixed
+2,3,2,3, `S = 36`), differ by 0.023%. Two diagnostics (`runs/trace/`, `runs/coinc/`):
+
+- *It is a property of the shapes, not of the instance.* Rerunning both shapes with a different curve, coset `g`
+  and target (seed 77), and at the second prime, gives the same counts to 8–9 significant figures. The remaining
+  differences of about 10⁻⁹ come from the parallel schedule, and the ratio is 0.999768 every time. F4's work on
+  these systems depends on the degree sequence and `m` alone, which fits the null controls matching the tower
+  throughout.
+- *It is not the same computation.* Per-step logs (`--trace 1`, which reproduces the totals exactly) show
+  different runs: 24 against 34 steps, a top degree of 7 against 8, largest matrices of about 117k against 105k
+  rows. By degree, the work is 3.76·10¹² at degree 7 plus 1.24·10¹² at degree 6 for the degree-2 tower, and
+  3.10·10¹² at degree 8 plus 1.65·10¹² at degree 7 for the mixed one. The totals agree although the parts do not.
+- *Reading.* The match is reproducible because each count is a fixed number for its shape. Nothing found here
+  forces the two fixed numbers to be equal. They differ in every component, and the match is best read as a
+  coincidence between two shape constants. With about 40 shape counts in this study, a pair this close was
+  spotted after the fact; it is surprising but not extraordinary.
+
 == Scope and deviations
 
 Kummer and isogeny towers over two primes near `2^30` and `2^31.6`; `m = 2` to `log₂ S = 9`, `m = 3` small.
