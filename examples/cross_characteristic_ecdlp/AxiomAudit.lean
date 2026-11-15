@@ -1,5 +1,6 @@
 import CrossCharacteristicExample
 import CrossCharacteristicTwo
+import CrossCharacteristicLarger
 
 #print axioms CrossCharacteristicExample.P_order
 #print axioms CrossCharacteristicExample.R_order
@@ -18,3 +19,16 @@ import CrossCharacteristicTwo
 #print axioms CrossCharacteristicTwo.no_field_map
 #print axioms CrossCharacteristicTwo.F4_card
 #print axioms CrossCharacteristicTwo.F5_to_F4_dlog
+
+#print axioms CrossCharacteristicLarger.source_card
+#print axioms CrossCharacteristicLarger.target_card
+#print axioms CrossCharacteristicLarger.exists_omega
+#print axioms CrossCharacteristicLarger.omega_not_from_F2
+#print axioms CrossCharacteristicLarger.omega_relation
+#print axioms CrossCharacteristicLarger.P_order
+#print axioms CrossCharacteristicLarger.R_order
+#print axioms CrossCharacteristicLarger.phi_challenge
+#print axioms CrossCharacteristicLarger.transfer_dlog
+#print axioms CrossCharacteristicLarger.example_dlog
+#print axioms CrossCharacteristicLarger.source_scalar_mod
+#print axioms CrossCharacteristicLarger.target_scalar_mod
