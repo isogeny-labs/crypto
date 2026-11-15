@@ -150,7 +150,8 @@ fn main()->Result<(),String> {
             let branch=if x==y {None} else {Some(first_collision(x,y)?)};
             if let Some(j)=branch {filtered[j]+=1;}
             let solutions=s3_roots(x,y)?;
-            if solutions.len()!=if branch.is_none(){1}else{2} {
+            let expected_roots=if branch.is_none(){1}else{2};
+            if solutions.len()!=expected_roots {
                 return Err("signed-pair S3 root multiplicity drift".into());
             }
             for &w in &solutions {
