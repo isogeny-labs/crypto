@@ -1,5 +1,12 @@
 # Benchmarks
 
+The [15 November complete point-sieve cold pilot](20261115-hec-point-cold/)
+([PDF](20261115-hec-point-cold/REPORT.pdf)) remains outside the admitted table.
+All18targets recover and18gates/306cold cells pass checks; E8passes and E9fails.
+Fastest-existing/point-lazy fixture medians0.066–0.430favor existing controls.
+Local ARM L0, A/Amax2.923; producer observations pending independent validation
+[pcc:unverified].
+
 The [15 November linear-denominator hyperelliptic cold screen](20261115-hec-linear-cold/)
 ([PDF](20261115-hec-linear-cold/REPORT.pdf)) is retained outside the admitted table.
 All18target gates and288cold cells pass; exact-work specialization/generic median
