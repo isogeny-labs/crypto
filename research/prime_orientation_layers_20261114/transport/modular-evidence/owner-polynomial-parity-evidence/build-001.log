@@ -1,0 +1,24 @@
+✖ [3138/3138] Building CryptoLean.PolynomialParity (4.7s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/crypto-lean-first-moment-worktree/CryptoLean/PolynomialParity.lean -o /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean/CryptoLean/PolynomialParity.olean -i /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean/CryptoLean/PolynomialParity.ilean -c /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/ir/CryptoLean/PolynomialParity.c --setup /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/ir/CryptoLean/PolynomialParity.setup.json --json
+error: CryptoLean/PolynomialParity.lean:43:22: Application type mismatch: The argument
+  hodd
+has type
+  ¬2 ∣ 2 * b + 1
+but is expected to have type
+  ?m.165 < 0
+in the application
+  ite_neg hodd
+error: CryptoLean/PolynomialParity.lean:43:2: Type mismatch: After simplification, term
+  H
+ has type
+  (Ideal.Quotient.mk (Ideal.span {d})) (P.coeff (2 * b + 1)) = if 2 ∣ 2 * b + 1 then Q.coeff ((2 * b + 1) / 2) else 0
+but is expected to have type
+  (Ideal.Quotient.mk (Ideal.span {d})) (P.coeff (2 * b + 1)) = 0
+info: CryptoLean/PolynomialParity.lean:47:0: 'CryptoLean.PolynomialParity.fourth_linear_expand_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CryptoLean/PolynomialParity.lean:48:0: 'CryptoLean.PolynomialParity.dvd_odd_coeff_of_quotient_expand' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+Some required targets logged failures:
+- CryptoLean.PolynomialParity
+error: build failed
