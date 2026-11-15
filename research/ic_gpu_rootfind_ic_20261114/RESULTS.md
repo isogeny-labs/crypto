@@ -34,12 +34,12 @@ Selftests passed (of 3): D 3, D2 3, P3 3, P4 3, P5 3, P4L2 3
 
 Best configuration per arm:
 
-- default (no prefetch): sorted/C16 360.27 ms (1.000× the default's best)
-- default (A/A): sorted/C16 360.54 ms (0.999× the default's best)
-- prefetch 3 levels: hash/C16 407.93 ms (0.883× the default's best)
-- prefetch 4 levels: hash/C16 407.54 ms (0.884× the default's best)
-- prefetch 5 levels: hash/C16 407.40 ms (0.884× the default's best)
-- prefetch 4 levels, L2: hash/C16 407.05 ms (0.885× the default's best)
+- default (no prefetch): sorted/C16 360.27 ms (1.000× the default's best time)
+- default (A/A): sorted/C16 360.54 ms (1.001× the default's best time)
+- prefetch 3 levels: hash/C16 407.93 ms (1.132× the default's best time)
+- prefetch 4 levels: hash/C16 407.54 ms (1.131× the default's best time)
+- prefetch 5 levels: hash/C16 407.40 ms (1.131× the default's best time)
+- prefetch 4 levels, L2: hash/C16 407.05 ms (1.130× the default's best time)
 
 A/A: largest |D2/D − 1| 0.0012; largest max/min of one arm's rounds 1.2626.
 
@@ -56,11 +56,11 @@ A/A: largest |D2/D − 1| 0.0012; largest max/min of one arm's rounds 1.2626.
 
 Best configuration per arm:
 
-- default (no prefetch): hash/C16 17.71 ms (1.000× the default's best)
-- default (A/A): hash/C16 17.71 ms (1.000× the default's best)
-- prefetch 3 levels: hash/C16 17.71 ms (1.000× the default's best)
-- prefetch 4 levels: hash/C16 17.71 ms (1.000× the default's best)
-- prefetch 5 levels: hash/C16 17.71 ms (1.000× the default's best)
-- prefetch 4 levels, L2: hash/C16 17.71 ms (1.000× the default's best)
+- default (no prefetch): hash/C16 17.71 ms (1.000× the default's best time)
+- default (A/A): hash/C16 17.71 ms (1.000× the default's best time)
+- prefetch 3 levels: hash/C16 17.71 ms (1.000× the default's best time)
+- prefetch 4 levels: hash/C16 17.71 ms (1.000× the default's best time)
+- prefetch 5 levels: hash/C16 17.71 ms (1.000× the default's best time)
+- prefetch 4 levels, L2: hash/C16 17.71 ms (1.000× the default's best time)
 
 A/A: largest |D2/D − 1| 0.0016; largest max/min of one arm's rounds 1.0713.

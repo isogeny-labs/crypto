@@ -167,3 +167,130 @@ skipped at stage 1 (P = 0.9).
 
 G9. Stage 2 completes 25601 (P = 0.85), 51203 (P = 0.7) and 102407 (P = 0.3)
 within the budget rule.
+
+## Amendment 1 (2026-11-15, before any data)
+
+Frozen by the new `frozen.sha256` before the first measured run. No data has
+been taken under this protocol: `full_jacobian.json` and `run.log` do not exist
+in this directory (checked 2026-11-15), and the 2026-11-13 run is a different
+protocol. Between the first freeze and this amendment only the unit tests,
+`--select-only`, `--field-microbench` (timing of single field operations, no
+cover, no arm) and two tiny smokes, at `p = 211` and at `p = 211, 419, 821`,
+with output outside this directory, were run. Every number here is `[pcc:unverified]`.
+
+### Why
+
+Validator finding 7 (`research/validation_20261114/REPORT.md`; erratum 7 in
+`research/full_jacobian_ic_20261113/ERRATA.md`): the unit "one group operation
+of the arm's own group" counted one Cantor step on `J_C` as one `E1` addition,
+although a Cantor step costs about 4.3-5.7 `E1` additions in time, so every
+IC / rho ratio was understated. The IC arms also left work uncounted (the
+partition hash, the large-prime map, the RNG draws, the one-time `[h]Z`) while
+carrying `lower_bound: false`.
+
+### Changes
+
+1. **Primary unit: one `F_p` multiplication or squaring.** Both sides are
+   priced in it. A Cantor step is tallied by `full_jacobian_ic::CantorTally`
+   (`H64Curve::cantor` step for step: same extended gcds, products, divisions
+   and reduction loop; same reduced divisor, unit-tested), an `E1` addition by
+   `full_jacobian_ic::ec_add_tally` (affine formula on `F_p`-rational points:
+   addition 2M + 1S + 1I, doubling 4M + 2S + 1I, identity operand or `P + (-P)`
+   nothing). Additions, subtractions and negations are not counted. The
+   `F_{p^2}` container of `ec.rs` costs extra products in time that are not
+   charged (this favours the rho side being cheaper, i.e. it is conservative
+   for "IC above rho"). The Cantor count is the generic algorithm, not
+   explicit genus-2 formulae.
+2. **Per-arm base, in this unit.** IC arms A, B: Cantor `mul + sqr` +
+   `w_inv` x Cantor `inv` + `rel_mul` + `la_mul`. Rho on `E1`: `E1` `mul + sqr`
+   + `w_inv` x `inv`. Rho on `J_C`: its Cantor tally. Every native counter of
+   the arm (IC: none further, since `rel_mul` and `la_mul` are already in the
+   base; rho: `canonicalisations + partition_hashes + dp_lookups + dp_inserts
+   + word_ops`) is priced at 0, 0.1 and 1 unit per operation (AGENTS.md 5a)
+   and, calibrated, at `w_cal = time(class) / time(one F_p multiplication)`
+   at 0, 1 and 10 `w_cal`; classification by `negation_remeasure::classify`
+   as before. The report is the arm's `field_unit` object.
+3. **Frozen inversion weight `w_inv = 10`** multiplications (`--inv-weight`
+   default). Justification, from `full_jacobian_ic --field-microbench` on this
+   machine (Intel Xeon @ 2.30 GHz, 4 vCPU, shared VM, best of 25 batches of
+   20,000, throughput timing, operands through `black_box`):
+
+   | p | ns mul | ns inv (ext. gcd, the Cantor code) | inv / mul | ns inv (Fermat, `ec.rs`) | inv / mul |
+   |---|---|---|---|---|---|
+   | 211 | 1.54 | 10.83 | 7.0 | 21.84 | 14.2 |
+   | 1619 | 1.54 | 15.10 | 9.8 | 31.92 | 20.7 |
+   | 12841 | 1.54 | 19.36 | 12.6 | 43.31 | 28.1 |
+   | 51203 | 1.54 | 22.48 | 14.6 | 46.87 | 30.5 |
+   | 102407 | 1.87 | 22.82 | 12.2 | 54.02 | 28.9 |
+
+   The ratio grows with `log p` and differs by code path. One weight is frozen
+   for both sides so the unit is the same; `w_inv = 10` is the middle of the
+   extended-gcd range 7.0-14.6 (the code the Cantor tally mirrors). The
+   rho side's `ec.rs` uses Fermat inversion (14-30), so `w_inv = 10` is
+   favourable to the rho side's cost being *under*-stated, i.e. it is
+   conservative for "IC above rho" there. The sensitivity `w_inv = 0` and
+   `w_inv = 30` is read from the stored `field_mul_sqr` and `field_inv` of each
+   row by `render.py` (base only, native work at 0); it does not enter the
+   verdict. A throughput microbench on a shared VM is a rough weight, not a
+   calibration of the whole code.
+4. **Decision rule, slopes and verdict in the field unit.** The rule of the
+   section "Decision rule" is applied unchanged but to the `field_unit`
+   reports: cells are classified `above` / `below` / `unresolved` from the
+   `field_unit` band and calibrated ratios, and the slope is the OLS slope of
+   `ln(arm field total / negation-rho field total at w = 0.1)` on `ln p`
+   (`A_field_ratio_to_rho_E_w0.1`, `B_field_ratio_to_rho_E_w0.1` in
+   `fits_stage1`). The binary's `verdict` field is this reading. The old
+   group-operation reading is kept as `verdict_group_ops` (secondary, as the
+   2026-11-13 rule) and every group-operation field of the output is
+   unchanged. RESULTS.md quotes both, labelled.
+5. **IC arms are lower bounds.** Every IC arm row carries `lower_bound: true`
+   and `lower_bound_note` naming the uncounted work: the partition (jump) hash
+   of every walk step (`key_of` + `mix64`), the large-prime map (`HashMap`) and
+   union-find, the RNG draws (`StdRng`), the one-time `[h]Z` and `ord(Z)` of
+   the instance (uncounted Cantor), polynomial additions and subtractions in
+   Cantor and the relation phase, and linear-algebra additions. The subgroup
+   controls A_S and B_S additionally run through `ic_on_rung`, whose Cantor
+   steps are not field-tallied (`instrument.rs` is outside the tallied code):
+   their `field_mul_sqr` and `field_inv` are null and their `field_unit` base
+   holds only `rel_mul + la_mul`; they are a lower bound of a lower bound, and
+   no comparison of A_S or B_S against A or B in the field unit is claimed.
+6. **New row fields.** Per arm row: `field_mul_sqr`, `field_mul`, `field_sqr`,
+   `field_inv`, `lower_bound_note`, `field_unit`; per prime: `rho_E.field`
+   (negation, plain, bands), `inv_weight`; top level: `verdict_group_ops`,
+   `inv_weight`, `field_unit` (definitions). The 2026-11-13 counters replay
+   unchanged: `old_counters_replay_the_2026_11_13_p211_row` (p = 211, old
+   selection) checks the `group_ops`, `setup_ops`, `walk_ops`, `rel`, `la` and
+   `trials` sums of arms Full and DoubleLp and the negation-rho operation total
+   against the 2026-11-13 row.
+
+### Predictions G1-G9 under the amendment
+
+G1-G4 and G6 are about the ratio slopes and the arm group operations. The
+verdict and slopes in G1-G4 now refer to the **field unit** (primary); the
+numbers P are unchanged, because the unit change raises the Cantor side by
+the factor of field work per step (about 5 on this machine), which moves the
+ratios up but the slopes only through the inversion share (a cost that grows
+slowly with `log p`). So G2 and G3 hold as stated for `A_field_ratio_to_rho_E_w0.1`
+and `B_field_ratio_to_rho_E_w0.1`, and G1 holds for the `field_unit` classes.
+G4 is for `verdict`; the secondary `verdict_group_ops` is not predicted
+separately. G5 and G6 are about group-operation counts and are unchanged (the
+group-operation slopes stay in `fits_stage1`). G7-G9 do not refer to the unit.
+
+New, frozen with the amendment:
+
+G10. The mean Cantor step costs between 6 and 16 times the mean `E1` addition
+in field-multiplication units (`w_inv = 10`; `field_mul_sqr + 10 field_inv` per
+group operation, `J_C` over `E1`) at every stage-1 prime. P = 0.75. The band
+is wider than the validator's 4.3-5.7 *time* ratio because the generic Cantor
+code does about 110 products and 4 inversions per step at `p = 211`, while the
+`E1` addition does 3 products and 1 inversion in this count; the `E1` time is
+inflated by the `F_{p^2}` container that the count does not charge, so the two
+ratios need not agree and the field-unit ratio is the primary one. Disclosure:
+the band was set after the `p = 211` smoke run (arm A: 109 products and 4.3
+inversions per step, `E1` negation rho 4.3 and 0.97, ratio 10.8), so G10 is not
+an independent prediction at `p = 211`; it is for the other primes.
+
+The smoke run (3 primes, outside this directory) also showed the unit's
+sensitivity to `w_inv`: the Cantor-over-`E1` ratio per group operation was
+about 25 at `w_inv = 0`, 10.5 at 10 and 6.9 at 30. The frozen weight is 10;
+the other two are reported as sensitivity only.

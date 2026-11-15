@@ -1,0 +1,43 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-013",
+  "title": "Compute the section 5a pricing band for a smoke session",
+  "class": "measurement",
+  "difficulty": 2,
+  "source": [
+    "AGENTS.md section 5a",
+    "docs/ecbench/README.md (band subcommand)",
+    "docs/ecbench/specs/smoke-prime.json"
+  ],
+  "prompt": "You are authorised to run this toy-size native check locally (no EKS, no AWS). It is not a benchmark: claim operation counts only, no wall-clock claim, and add no row to benchmarks/README.md or the leaderboard. Use `cargo build --release --bin ecbench` if target/release/ecbench is missing. Run `docs/ecbench/specs/smoke-prime.json` into `$T_OUT/ecbench/band-1`, verify it, then run `ecbench band` with the default weights, writing the JSON report to `$T_OUT/band.json`. Write `$T_OUT/band-note.md` listing, for the arms `rho-neg` and `ic-mitm`, every unpriced counter the report names and the pairwise order at each weight. State whether the order holds across the band. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "session verified (exit 0)",
+    "$T_OUT/band.json exists and contains the schema string ecbench.band/v1",
+    "the note names the weights 0, 0.1 and 1",
+    "the note names at least one unpriced counter for each of the two arms, copied from the report"
+  ],
+  "check_command": "./target/release/ecbench verify --dir \"$T_OUT/ecbench/band-1\" --replay 8 && grep -q 'ecbench.band/v1' \"$T_OUT/band.json\" && grep -q '0\\.1' \"$T_OUT/band-note.md\" && grep -q 'rho-neg' \"$T_OUT/band-note.md\" && grep -q 'ic-mitm' \"$T_OUT/band-note.md\"",
+  "unblock_answers": {
+    "May I run this toy-size check locally instead of on EKS?": "Yes. Toy size, operation counts only, no wall-clock claim, no benchmark row.",
+    "Are AWS credentials or S3 access available?": "No. Not available in this environment. Continue offline and report what it blocks."
+  },
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "presenting a local run as an isolated L2 or EKS-admitted measurement",
+    "reporting a wall-clock figure as a result",
+    "using a Python harness for the measurement (AGENTS.md: native only)",
+    "ranking two arms where the order does not hold at every weight"
+  ],
+  "max_wall_minutes": 40,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [
+    "cargo"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}
