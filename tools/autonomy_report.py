@@ -16,7 +16,7 @@ id. Entries are never edited or deleted; a later fact is a new entry.
     autonomy_report.py set-check --episode E-... --check reverted|validator_blocking
                        --value true|false --evidence E
     autonomy_report.py verify [--base REF]
-    autonomy_report.py report [--since YYYY-MM-DD] [--out DIR]
+    autonomy_report.py report [--since YYYY-MM-DD] [--until YYYY-MM-DD] [--out DIR]
     autonomy_report.py classify-prompt
     autonomy_report.py audit-sample --rate 0.1 --seed N
 
@@ -208,9 +208,11 @@ def rate_row(states: list[str]) -> dict:
             "rate": (k / (k + f)) if k + f else None, "ci": (lo, hi)}
 
 
-def summarize(entries: dict[str, dict], since: str | None = None, at: dt.datetime | None = None) -> dict:
+def summarize(entries: dict[str, dict], since: str | None = None, at: dt.datetime | None = None,
+              until: str | None = None) -> dict:
     eps = {eid: e for eid, e in entries.items() if e.get("kind") == "episode"
-           and (since is None or e["ended"][:10] >= since)}
+           and (since is None or e["ended"][:10] >= since)
+           and (until is None or e["ended"][:10] <= until)}
     st = {eid: episode_state(eid, entries, at) for eid in eps}
     overall = rate_row([s["state"] for s in st.values()])
     by_class: dict[str, dict] = {}
@@ -280,10 +282,10 @@ def mean_median(xs: list[int]) -> str:
     return f"mean {statistics.mean(xs):.2f}, median {statistics.median(xs):g}"
 
 
-def render_markdown(s: dict, since: str | None) -> str:
+def render_markdown(s: dict, since: str | None, until: str | None = None) -> str:
     o = s["overall"]
     lines = [f"# Agent autonomy report ({SCHEMA})", "",
-             f"Episodes: {s['episodes']}" + (f" ended since {since}" if since else "") +
+             f"Episodes: {s['episodes']}" + (f" ended since {since}" if since else "") + (f" until {until}" if until else "") +
              f". Generated {now()}. All figures are [pcc:unverified] until a pcc claim cites them.", "",
              "## Unsupervised success", "",
              "Rate = unsupervised successes / (successes + failures). Pending episodes are counted "
@@ -403,8 +405,8 @@ def render_svg(series: list[dict]) -> str:
 
 
 def cmd_report(a, d: Path) -> int:
-    s = summarize(load(d), a.since)
-    md = render_markdown(s, a.since)
+    s = summarize(load(d), a.since, until=a.until)
+    md = render_markdown(s, a.since, a.until)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "AUTONOMY.md").write_text(md)
@@ -608,7 +610,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--evidence", action="append", default=[])
 
     s = sub.add_parser("verify"); s.add_argument("--base")
-    s = sub.add_parser("report"); s.add_argument("--since")
+    s = sub.add_parser("report"); s.add_argument("--since"); s.add_argument("--until")
     s.add_argument("--out", type=Path, default=DEFAULT_OUT)
     sub.add_parser("classify-prompt")
     s = sub.add_parser("audit-sample"); s.add_argument("--rate", type=float, default=0.1)

@@ -9,7 +9,7 @@
     "docs/DEFERRED.md"
   ],
   "prompt": "Seven relative links near the end of `README.md` point at files that are not in the repository root (`./RESEARCH.md`, `./RESEARCH_P256.md`, `./RESEARCH_RESIDUAL_WALKS.md`, `./RESEARCH_TII_MCELIECE.md`, `./RESEARCH_EXOTIC_COORDINATES.md`, `./DEFERRED.md`, `./docs/RESEARCH_BENCH_LOG.md`). Find where each document went, using git history, and repair each link. If a document is gone for good, say so and keep the entry as plain text with a note instead of a link. Leave every other link in README.md alone.",
-  "setup": "No fixture; the links are dead in the tree.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
   "acceptance": [
     "none of the seven targets remains a dead relative link",
     "README.md still lists all seven entries (as a link or as annotated plain text)",

@@ -9,7 +9,7 @@
     "src/bin/ecbench.rs (module header)"
   ],
   "prompt": "The module header of `src/bin/ecbench.rs` lists every `ecbench` subcommand, and `docs/ecbench/README.md` has a table of every subcommand. One subcommand is in the header but not in the table. Find it, read what it does in the source, and add an accurate row in the table's style. Do not describe behaviour you did not read.",
-  "setup": "No fixture; the gap is in the tree (`optimize inventory` and `optimize audit`).",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- docs/ecbench/README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
   "acceptance": [
     "every `//! ecbench <word>` in src/bin/ecbench.rs appears as a table row in docs/ecbench/README.md",
     "the new row describes both optimize inventory and optimize audit, and cites a section or file",

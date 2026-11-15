@@ -9,7 +9,7 @@
     "docs/ECDLP_CALIBRATION_PRIMES.md line 300 (../src/cryptanalysis/summation_poly/)"
   ],
   "prompt": "`docs/ecbench/README.md` links to `../../research/ecbench_accounting_v2_20261023/REPORT.pdf` and `docs/ECDLP_CALIBRATION_PRIMES.md` links to `../src/cryptanalysis/summation_poly/`. Neither target exists in the checkout. Find out why for each (moved, renamed, never committed, or kept in the artifact store) and repair the link or annotate it honestly. Do not create the missing files.",
-  "setup": "No fixture; both links are dead in the tree.",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- docs/ecbench/README.md docs/ECDLP_CALIBRATION_PRIMES.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
   "acceptance": [
     "neither link target is a dead relative path",
     "only the two documents changed",

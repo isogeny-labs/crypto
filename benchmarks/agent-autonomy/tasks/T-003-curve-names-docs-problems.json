@@ -11,7 +11,7 @@
     "research/arity_completion_20261104/README.md"
   ],
   "prompt": "`python3 scripts/check_curve_names.py` reports retired curve names in `docs/ic/calibration-solver-units.md`, `problems/arity-completion-launch-gates.md` and `research/arity_completion_20261104/README.md`. Fix those three files with the repository's own tooling and check that nothing else changes. Do not edit session logs or any file under a `results/`, `runs/`, `raw/`, `evidence/` or `archives/` directory.",
-  "setup": "No fixture; findings are in the tree (3, 5 and 2 lines).",
+  "setup": "Restore the pre-fix files: `git checkout 0b9d7b861ed51b73c83187b5c03e17de73ea117a -- docs/ic/calibration-solver-units.md problems/arity-completion-launch-gates.md research/arity_completion_20261104/README.md` (that commit holds the broken starting state).  Not a harness-written fixture.",
   "acceptance": [
     "none of the three files appears in the output of scripts/check_curve_names.py",
     "only these three files changed",
