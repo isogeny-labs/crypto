@@ -1,0 +1,162 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref}
+\usepackage[margin=.74in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{7pt}
+\begin{document}
+\begin{center}{\Large Actual Boolean-word coefficient evaluation}\\[4pt]
+Local successor --- 15 November 2026\end{center}
+\textbf{Working result.} An explicit word interpreter replaces scalar ring
+operations in the actual Packed approximation coefficient pass. Its canonical
+value agrees with the previous stored evaluator. Boolean primitive events are
+emitted by the actual routines, and their composed bound follows from the
+constructed syntax size. The absolute-right-entry wrapper uses this word
+numerator and retains the existing final extraction routine. This component
+prices Boolean circuit calls, not total bit runtime [pcc:unverified].
+
+\textbf{Evidence scope.} Six accepted local stages compile with exit0 and no
+warnings. Each statement count includes all prior local work:
+\begin{center}
+\begin{tabular}{lll}
+Source / count & Main result & PCC data suffix\\
+051 / 268 & Constructed shift and word product & baf945\\
+052 / 274 & Actual word dot and convolution & d98959\\
+054 / 283 & Materialized word-array operations & b7e3c3\\
+056 / 290 & Full expression and coefficient values & 14513f\\
+057 / 302 & Actual syntax-based Boolean gate cap & 25a7fc\\
+058 / 306 & Actual right numerator and entry wrapper & 6dbc5c
+\end{tabular}
+\end{center}
+All suffixes use PCC-20261115-. Receipts026--031 bind exact sources, raw logs
+and exits. Central printed dependencies use standard axioms. These local
+compilations are outside shared Transport53/57/fresh coverage; all records are
+unsigned and defaultnot\_covered [pcc:unverified].
+
+\textbf{Constructed word multiplication.} A Word contains an actual list of
+$q$ bits and a length proof. Its canonical value $V$ is the decoded integer in
+$\mathbb Z/2^q\mathbb Z$. A truncating shift constructs a word with value $2V(x)$.
+The multiplier recursively shifts the operand and invokes the actual ripple
+adder for every input bit, including zero bits. It proves
+\[
+ V(\mathrm{multiplyBits}(x,t))=V(x)D(t),\qquad
+ \#\mathrm{gates}=5q|t|.
+\]
+For a width-$q$ second operand, multiplication has the canonical product and
+exactly $5q^2$ emitted Boolean gates. Width zero is retained. No sparsity or
+skipped-zero premise is used. Shift copying, zero-word construction, selection,
+control and trace work remain outside this gate count [pcc:unverified].
+
+\textbf{Actual convolution.} Word zero extension, dot recursion and the same
+flattened antidiagonal traversal use explicit addWord and multiplyWord.
+No CommRing instance for Word hides a canonical ring operation. For coefficient
+$(b,n)$, the actual pair count is $(b+1)(n+1)$, and the returned canonical value
+is the ordinary box convolution. Its trace has exactly
+\[
+ (5q^2+5q)(b+1)(n+1)
+\]
+Boolean gate events. Pair enumeration, bounds tests, array access, representation
+preparation and trace concatenation are additional work [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Materialized arrays and actual syntax budget}\end{center}
+\textbf{Arrays.} Gated word cells are materialized into core Vector arrays.
+Their events are flattened in the actual finite traversal. The source proves
+that canonical array values commute with addition, negation and multiplication.
+Addition emits $5qhz$ gates, negation $6qhz$, and multiplication
+\[
+ (5q^2+5q)P(h,z),\qquad
+ P(h,z)=\sum_{b<h}\sum_{n<z}(b+1)(n+1)\le(hz)^2.
+\]
+Empty dimensions and $q=0$ remain admitted. These identities do not make the
+arrays, indices, memory or event logs free [pcc:unverified].
+
+\textbf{Full expression value.} Literal and variable basis arrays are constructed
+from signed integer words and explicit zero/one words. Recursive expression
+nodes use the proved word-array operations. For every expression $e$,
+\[
+ V_{\rm array}(\mathrm{evaluateWord}(q,h,z,e))
+ =\mathrm{sample}_{h,z}(\mathrm{fullEval}(e)).
+\]
+The actual Packed approximation coefficient therefore equals the previous
+stored canonical coefficient. There is no polynomial sampling or polynomial
+arithmetic in the runtime word constructors; these appear only in the
+correctness statements. Signed literals, all widths and all dimensions are
+retained [pcc:unverified].
+
+\textbf{Derived gate bound.} The explicit constant
+\[
+ C(q,h,z)=10(q+1)^2(hz+1)^2
+\]
+dominates the actual scalar and array node traces. Induction over the actual
+interpreter gives at most $C(q,h,z)\,\mathrm{nodes}(e)$ Boolean gates.
+For the actual approximation, reuse the proved syntax bound with
+\[
+ \begin{aligned}
+ M&=\sum_{j<u}m_j,\\
+ R_*&=17+20\cdot2^a+13M+2u,\\
+ N_*&=1+R_*+(29+10M+2u)(k+1)^2.
+ \end{aligned}
+\]
+The whole coefficient pass, using $h=b+1$ and $z=n+1$, emits at most
+$C(q,h,z)N_*$. This is an explicit consequence of actual constructors and
+primitive events, not a supplied cost oracle. Grid size, multiplicities and
+unary powers remain charged. Every $2^u k$ label remains charged separately;
+no mode-density improvement is inferred [pcc:unverified].
+
+\textbf{Primary sources and failures.} Standard shift/add arithmetic reuses
+pinned Lean BitVec Bitblast, Nat division, List take/drop and Mathlib ZMod
+facts. Generic polynomial coefficient identities in this pinned Mathlib use
+an aesop simp interface and were invoked explicitly. Failed049, 053 and055,
+warning-bearing050, and the honest administrative assembly diagnostic remain
+preserved with raw outputs. No novelty claim is made for standard arithmetic
+[pcc:unverified].
+
+\newpage
+\begin{center}{\Large Actual right-entry prefix and remaining costs}\end{center}
+\textbf{Actual numerator.} Under the existing degree and crossing branches, the
+word routine constructs the signed outer scalar factor, evaluates the actual
+word coefficient, and multiplies the resulting words. It proves canonical
+agreement with the previous right numerator. Its Boolean prefix cap is
+\[
+ C(q,b+1,n+1)N_*+6q+5q^2.
+\]
+The additional terms cover the signed-factor circuit and outer word product.
+A zero branch emits no Boolean circuit events but still constructs its
+representation; zero events is not zero preparation time [pcc:unverified].
+
+\textbf{Working precision and wrapper.} The entry driver constructs
+$k$ and positive denominator $d$ by the existing actual routines, then uses
+\[
+ E=v_2(d),\qquad q=p+E.
+\]
+Existing actual denominator bounds control this precision under their recorded
+premises. Here $p$ is auxiliary binary precision, not the elliptic-curve field
+prime. Only after the word numerator is produced does the wrapper invoke the
+existing finiteExtract. Its value equals the previous entry and the canonical
+actual absoluteRight coefficient under exactly the previous node, valuation,
+label and port premises [pcc:unverified].
+
+\begin{center}\includegraphics[width=\linewidth]{circuit-prefix-dependencies-001.pdf}\end{center}
+
+\textbf{Unpriced final step.} finiteExtract still performs unsigned division
+before the final reduction and multiplies by the odd-part inverse. It is
+existing opaque code and is outside the Boolean prefix trace. The numerator
+bound must not be reported as a total entry bound. A prospective explicit
+implementation must derive the unit premise from the actual positive
+denominator and prove agreement, including precision zero and signed inputs
+[pcc:unverified].
+
+\textbf{Other remaining costs.} Integer and rational scalars, actual expression
+and denominator preparation, bit extraction and halving, selection and control,
+array construction, bounds and indexing, trace concatenation, retained memory
+and final inversion require their own accounting. Trace append can be
+nonlinear. No free instrumentation erasure, extracted-program performance or
+full bit-runtime theorem is asserted [pcc:unverified].
+
+\textbf{Research boundary.} The result concerns the same auxiliary matrix
+family and coefficient representation. Original extension-data creation,
+weighted modes and children, recovery and recursion, actual elliptic relation,
+public finder, field/scalar extraction, retries and complete expected cost
+remain open. The identity origin and all protected source/evidence histories
+remain unchanged [pcc:unverified].
+\end{document}

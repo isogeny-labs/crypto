@@ -1,0 +1,22 @@
+{
+  "schema": "orientation-primary-inversion-literature-review/v1",
+  "created_at": "2026-11-15T07:39:54.467086+00:00",
+  "authors": [
+    "Richard P. Brent",
+    "Paul Zimmermann"
+  ],
+  "title": "Modern Computer Arithmetic",
+  "edition": "Cambridge University Press 2010; author PDF version0.5.9",
+  "index_url": "https://members.loria.fr/PZimmermann/mca/pub226.html",
+  "pdf_url": "https://members.loria.fr/PZimmermann/mca/mca-cup-0.5.9.pdf",
+  "bytes": 1987150,
+  "sha256": "0a7b9eff1f7c02faa7f3f350545282f1e5a5e34b055f8eb366f656c2ac3bc213",
+  "source_read_complete": true,
+  "inspected_sections": [
+    "Section2.5 printed pages65-67; equation2.3 and odd modulus2^32 example",
+    "Section1.4.8 LSB division odd-divisor requirement"
+  ],
+  "finding": "Standard prime-power Newton/Hensel inverse x_next=x*(2-b*x),odd b for powers2; error squares,precision doubles. Unit premise must derive from actual oddPart denominator. Not a novel method.",
+  "complexity_scope": "Book fast O(M(n)) claim is NOT inherited by proposed fixed-width schoolbook/linear-iteration implementation; its own actual gate counts and all preparation/control/tracing costs required.",
+  "download_provenance": "Initial25s partial download retained as metadata in literature-download001; changed range-resume completed remaining bytes. Public PDF temporary cache,metadata only committed; no copyrighted book content copied into repo."
+}
