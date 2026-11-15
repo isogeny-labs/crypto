@@ -181,6 +181,8 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | `isogeny_volcano`, `volcano_vertex` | components of the l-isogeny graph: depth, crater size and shape, completeness, vertex levels |
 | `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism, and (`0013`) `prym_complement`: E -> E', the other elliptic factor of a genus-2 cover's Jacobian |
 | `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing, Frey–Kani, Satoh, quotient. Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
+| `curve_relation` | typed non-isogeny links: isomorphism (u, r, s, t), quadratic, cubic, quartic and sextic twists, base change (with embedding), Frobenius conjugate, birational model change, reduction mod p, CM lift, quotient by an automorphism |
+| `curve_morphism` | covers C -> E. Kinds: GHS Weil descent, generalized GHS, Diem, isogeny-then-GHS, explicit hyperelliptic pullback, Scholten, (2, 2)-gluing, Frey–Kani, Satoh, quotient (the Ciani quartic quotients, below). Also the descent degree, the GHS magic number m, cover genus, the explicit map, existence over the base field, minimal degree and genus, whether the DLP subgroup is carried, and a per-claim contract |
 | `dlp_transfer` | routes that move a DLP to another group: Jacobian, Weil restriction, F_{q^k}^* (MOV / Frey–Rück), additive group (anomalous), isogenous curve, extension-field curve, Pohlig–Hellman factor. Each carries invariants, the full cost record, log2 transfer / target / total / matched-reference costs, the ratio, the verdict and notes; the cost model is stored once in the provenance |
 | `certificate` | volcano-level, order, kernel, Jacobian-gluing, cover, primality and irreducibility certificates with their hypotheses |
 
@@ -317,6 +319,71 @@ the Prym variety of H -> E).
   - The deployed ecdb also holds the census and dataset curves. Against it,
     the split between new and existing E' can differ: a census curve with
     exactly the same (A, B) is reused under its slug.
+### Ciani plane quartics: genus-3 non-hyperelliptic covers
+
+`ecdb import ciani-quartics` (`src/import/ciani.rs`; also part of
+`ecdb import all`, after `enrich`) generates, verifies and stores Ciani plane
+quartics C: a x^4 + b y^4 + c z^4 + d y^2 z^2 + e x^2 z^2 + f x^2 y^2 = 0 over
+F_p with their three elliptic quotients by x -> -x, y -> -y and z -> -z. No
+migration: every row fits an existing table and enum value.
+
+- **Generator** `ciani_quartic_seeded_v1`: for every prime 5 <= p < 64,
+  SplitMix64 seeded with `0x4349414e49510001` xor (p * 0x9E3779B97F4A7C15)
+  draws a, b, c, d, e, f in turn as next() mod p; singular draws are rejected
+  and repeats skipped until 8 quartics per prime are accepted (128 quartics;
+  84 singular draws rejected on the way). `ciani::sample(p, n)` reproduces the
+  set.
+- **Smoothness** (proved criterion, characteristic != 2): C is smooth iff
+  a b c (f^2 - 4ab)(e^2 - 4ac)(d^2 - 4bc) det M != 0 with
+  det M = 8abc + 2def - 2(a d^2 + b e^2 + c f^2). Tested against an
+  exhaustive singular-point search over F_{p^2}, where every singular point
+  lies.
+- **Quotients**: C / <x -> -x> is D_x: w^2 = (f^2 - 4ab) y^4 + (2ef - 4ad)
+  y^2 z^2 + (e^2 - 4ac) z^4 with w = 2a x^2 + f y^2 + e z^2, and likewise
+  for y and z. A deterministic F_p-point of D_i and Washington's Thm 2.17
+  give a birational map to long Weierstrass form, then to y^2 = x^3 + Ax + B.
+- **Checks** (all must pass; a failure is `ciani_crosscheck_failures`, a
+  problem line, and nothing of that quartic is stored): #C(F_{p^k}), k = 1,
+  2, 3, counted exhaustively (the quadratic in x^2 is solved over every
+  (y : z)), and #C(F_p) equal to a direct point enumeration; L(T) of Jac(C)
+  from Newton's identities; #E_i(F_p) counted exhaustively and equal to
+  #D_i(F_p) counted on the quartic model; every F_p-point of C off the
+  chart's exceptional points maps onto E_i; L(T) = (1 - t_x T + pT^2)
+  (1 - t_y T + pT^2)(1 - t_z T + pT^2).
+
+| Rows | What |
+|:--|:--|
+| `curve` | the quartic: genus 3, model `plane_curve`, family `ciani-quartic`, form `a*x^4+b*y^4+c*z^4+d*y^2*z^2+e*x^2*z^2+f*x^2*y^2=0`, coefficients {a..f} decimal, `is_smooth` true, `smoothness_status` proved, geometrically irreducible; key (field, model, coefficients). Each E_i: short Weierstrass ICV1 curve, family `ciani-quotient` (an existing curve with the same model is reused) |
+| `curve_equation_model` | P^2, variables x, y, z, the sparse quartic, degree 4, no singular points, proved |
+| `generation_provenance` | method `seeded_generator`, the seed, `ecdb/src/import/ciani.rs (ciani_quartic_seeded_v1)`, `ciani::sample(p, 8)` |
+| `isogeny_class_fq` | Jac(C): g = 3, `3.p.a1_a2_a3`, L(1), `curve_counts` [#C(F_p), #C(F_p^2), #C(F_p^3)], ordinary flag, `has_jacobian`, proved. E_i: g = 1 from the counted trace, proved (an existing class is left as it is) |
+| `abelian_variety`, `curve_zeta` | the Jacobians linked to their classes; zeta rows with the counts, `order_check` proved and the method |
+| `genus1_invariants` | of each E_i, computed from the model |
+| `curve_morphism` | kind `quotient`, constructions `ciani_quotient_x_v1`, `ciani_quotient_y_v1`, `ciani_quotient_z_v1`, degree 2, cover genus 3, `C -> E`, same field, proved; `map` holds the involution, the quotient model (s, t, w and alpha, beta, gamma), the chart (u, v, u0, q and the translated quartic), the long Weierstrass coefficients A1..A6 and the change to short form |
+| `av_component` | Jac(C) to each E_i, relation `isogeny_factor` (multiplicity = how many of the three quotients are that curve), proved by the equal L-polynomials (Tate) |
+
+**Existing rows.** Every statement inserts or fills NULL only (a Jacobian's
+class link is set only where none is stored). Before writing, the importer
+compares the stored rows each quartic would meet with the computed values:
+the quartic curve (genus, smoothness), its Jacobian's class link, zeta counts
+(common prefix) and class, equation model, generation row and the class's
+L-polynomial; each quotient curve's slug (model hash), a same-model curve
+stored under another slug, class link, zeta counts and invariants; the three
+maps (map, degree, status, method) and the `av_component` multiplicities. A
+quartic meeting any disagreement is refused whole (`ciani_refused_conflict`,
+one problem line per conflict) and nothing of it is written; after the
+inserts every kept quartic's three maps must be stored exactly
+(`ciani_morphisms_missing`, a problem).
+
+**Limit.** The Weierstrass chart needs an F_p-point of D_i with w != 0. For
+some smooth quartics over tiny fields every F_p-point of a D_i is a branch
+point (e.g. 3x^4 + y^4 + z^4 + 3x^2y^2 over F_5); such a quartic is reported
+as a cross-check failure and not stored. No quartic of the generator's sample
+meets this.
+
+Counts of the first import into an empty database: 16 fields, 128 quartics,
+120 genus-3 classes, 384 morphisms, 346 distinct quotient curves in 133
+genus-1 classes, 381 `av_component` rows; a second import inserts 0.
 
 ### Global curves, security, evidence (`0007`)
 

@@ -11,6 +11,7 @@ use tokio_postgres::Client;
 
 pub mod certs;
 pub mod class_group;
+pub mod ciani;
 pub mod cover_lpoly;
 pub mod cover_prym;
 pub mod covers;
@@ -224,6 +225,8 @@ pub enum Selection {
     EllTorsion,
     /// Cl(End(E)) of the census-fp curves and the orders of the l-classes, l = 2, 3, 5, 7.
     ClassGroups,
+    /// Ciani plane quartics (genus 3, non-hyperelliptic) and their three elliptic quotients (src/import/ciani.rs).
+    CianiQuartics,
 }
 
 /// Run the selected importers; `walk_files` overrides the default walk outputs.
@@ -257,6 +260,9 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Enrich {
         reports.push(enrich::import(ctx).await?);
+    }
+    if all || what == Selection::CianiQuartics {
+        reports.push(ciani::import(ctx).await?);
     }
     if all || what == Selection::Results {
         reports.push(results::leaderboard(ctx).await?);

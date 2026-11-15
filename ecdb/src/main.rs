@@ -194,6 +194,9 @@ enum ImportWhat {
     /// Cl(End(E)) of every census-fp curve with End(E) known and the order of the class above l = 2, 3, 5, 7
     /// (src/import/class_group.rs).
     ClassGroups,
+    /// Ciani plane quartics over F_p, 5 <= p < 64 (seeded sample), verified L(Jac C) = L(E_x) L(E_y) L(E_z),
+    /// with their quotient maps (src/import/ciani.rs).
+    CianiQuartics,
     /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
     Generated { paths: Vec<String> },
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
@@ -297,6 +300,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Levels57 => import::run(&ctx, Selection::Levels57, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
                 ImportWhat::ClassGroups => import::run(&ctx, Selection::ClassGroups, None).await?,
+                ImportWhat::CianiQuartics => import::run(&ctx, Selection::CianiQuartics, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };
