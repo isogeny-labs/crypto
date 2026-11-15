@@ -1,5 +1,10 @@
 # Native K600 m6 arm-input staging component
 
+The [larger-memory AWS Spot host proposal](AWS_ARM64_SPOT_BUILD_SMOKE_PROTOCOL.md)
+was [rejected before allocation](AWS_ARM64_SPOT_LAUNCH_REJECTION.md):
+AWS reports that the selected account is blocked. Exact-tag
+instance and Spot-request readbacks were empty. No cloud build ran.
+
 The [frozen Linux ARM64 build smoke](LINUX_ARM64_BUILD_SMOKE_PROTOCOL.md)
 was executed once at source `3ff510d8a280`. Its
 [attempt-1 report and visual](LINUX_ARM64_BUILD_SMOKE_ATTEMPT1.md)
