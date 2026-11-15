@@ -8,6 +8,8 @@ The geometric argument in [THEOREM.md](THEOREM.md) gives a **necessary bound**: 
 
 The same argument extends to any odd extension degree `n` and irreducible factor `p` of degree `s>=2` in `T^n+1`: the corresponding Hess cover has genus `2^(s+1)-2`, its natural quotient has genus `2^s-1`, and at most `q^s-1` nonzero coefficients can give that quotient a hyperelliptic presentation. A symmetric presentation attains the coefficient-locus bound. See [GENERAL_BOUND.md](GENERAL_BOUND.md) for the proof and its assumptions. This generalization is a structural screen, not a new vulnerability family.
 
+The full n=7 genus-14 cover has 15 geometric degree-two deck quotients: seven of genus six and eight of genus seven. Only the natural genus-seven quotient is defined over `k`; [DECK_QUOTIENTS.md](DECK_QUOTIENTS.md) gives the conductor count. Hess Section 8.3 proves that the norm composition into this intermediate quotient is zero. The classical genus-seven GHS presentation uses a separate transfer map.
+
 The q=2 and q=4 native census tested the algebraic pole-swap condition on every exact W1 presentation. It matched the prior independent W1 counts and found the swap only on classical coefficients:
 
 | q | W1 coefficients per arm | Classical/swap coefficients per arm | W1 union | Classical union |
