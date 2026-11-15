@@ -315,6 +315,13 @@ pub(crate) struct Program {
     /// holds by construction there and is skipped; every accepted assignment
     /// is still verified against the whole graph. Empty means none.
     pub implied: Vec<bool>,
+    /// Set only when the encoder proved, once, that every graph vertex is
+    /// either the vertex of a Check step read through exactly its edges'
+    /// signals, or a copy/endpoint vertex whose edges all carry one signal and
+    /// whose predicate accepts both constant inputs. Then, for an assignment the
+    /// program accepted, the whole graph holds iff the vertices of the implied
+    /// (skipped) checks hold, and only those, listed here, are re-evaluated.
+    pub implied_vertices: Option<Vec<usize>>,
 }
 
 /// Conservative dependence on enumeration digits (digit zero changes fastest).
@@ -629,7 +636,25 @@ impl Program {
             .iter()
             .map(|&signal| values[signal])
             .collect();
-        if !network.evaluate(&assignment, meter)? {
+        let holds = match &self.implied_vertices {
+            Some(vertices) if !self.implied.is_empty() => {
+                let mut ports: Vec<bool> = Vec::new();
+                let mut holds = true;
+                for &vertex in vertices {
+                    meter.charge(1, "Boolean vertex evaluation")?;
+                    let vertex = &network.vertices[vertex];
+                    ports.clear();
+                    ports.extend(vertex.edges.iter().map(|&e| assignment[e]));
+                    if !vertex.predicate.evaluate(&ports, meter)? {
+                        holds = false;
+                        break;
+                    }
+                }
+                holds
+            }
+            _ => network.evaluate(&assignment, meter)?,
+        };
+        if !holds {
             return Err(integrity("program witness disagrees with graph"));
         }
         Ok(Evaluation::Accepted(assignment))

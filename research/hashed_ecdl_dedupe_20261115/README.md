@@ -42,8 +42,24 @@ record byte for byte, and built against the merged branch reproduces every
    recorded widths; Fourier still wins at d = 131, so ECCp-131 keeps it.
    `decomposition_network_with_multiplier(.., Fourier, ..)` gives the
    Theorem 3 gadget throughout.
-7. **final** (`encoding.rs`). A ripple-adder bit with two constant-zero inputs
-   passes the third through instead of emitting a full adder.
+7. **zeroadd** (`encoding.rs`). A ripple-adder bit with two constant-zero
+   inputs passes the third through instead of emitting a full adder.
+8. **compressed** (`encoding.rs`, `reduction.rs`). Free points of
+   `decomposition_network` are enumerated as (x, parity of y): w + 1 free bits
+   instead of 2w. The rest of y is a defined witness (the root of x^3+ax+b with
+   that parity) pinned by the unchanged validity constraints; for odd q, y and
+   q - y differ in parity, so accepted points and counts are unchanged and
+   visited assignments drop. `decomposition_network_with_multiplier` keeps the
+   (x, y) layout.
+9. **verify** (`encoding.rs`, `network.rs`). The encoder proves once that every
+   vertex is a Check step's vertex read through exactly its edges' signals, or
+   a copy/endpoint vertex on one signal; an accepted assignment then
+   re-evaluates only the implied checks' vertices, not the whole graph.
+10. **hashfirst** (`reduction.rs`). The hash reads only x and the parity bit, so
+    it runs before the curve equation.
+11. **final** (`encoding.rs`). `point_add` with a constant first point pins the
+    tangent slope to the constant (3x^2+a)/(2y) instead of multiplying, and
+    the same-x test reuses x2 - x1.
 
 New unit tests: memo emits nothing twice; `point_add`'s graph accepts exactly
 one of all 2^(1+2w) output values, a + b, for every input pair on two tiny
@@ -61,15 +77,19 @@ every constant c < 13 matches x*c mod 13 for every 4-bit x.
 | step 4 + chains | 3.01–5.65 (median 4.03) | 5.06–5.69 (median 5.39) |
 | step 5 + implied | 3.79–6.78 (median 5.03) | 6.85–7.75 (median 7.27) |
 | step 6 + auto | 8.08–13.78 (median 9.96) | 11.19–15.07 (median 13.1) |
-| **step 7 final** | **12.32–19.10 (median 14.21)** | **15.08–20.95 (median 18.62)** |
-| edges, final / before | 0.04 | 0.06 |
+| step 7 + zeroadd | 12.32–19.10 (median 14.21) | 15.08–20.95 (median 18.62) |
+| step 8 + compressed | 19.05–30.11 (median 23.74) | 20.57–34.07 (median 31.56) |
+| step 9 + verify | 23.05–31.52 (median 27.37) | 29.55–35.96 (median 33.68) |
+| step 10 + hashfirst | 24.77–41.68 (median 28.78) | 29.27–38.09 (median 36.72) |
+| **step 11 final** | **26.24–44.81 (median 30.97)** | **30.66–39.49 (median 37.47)** |
+| edges, before / final | 23.6–29.8x | 16.6–17.8x |
 
 * Five seeded `reduction::solve` runs (p = 5, 7, 11, 13) recover the same scalar
   with the same relation count and pass `reduction::verify` at every recorded
-  step; final uses 12.29–16.73x fewer charged steps than before. [pcc:unverified]
+  step; final uses 20.08–29.06x fewer charged steps than before. [pcc:unverified]
 * The ECCp-131 decomposition network (bundled certified input) drops from
-  1,531,849 to 252,526 edges and from 225,617 to 43,144 vertices with two
-  slots; from 2,380,538 to 517,003 edges with three. Maximum degree there is
+  1,531,849 to 226,444 edges and from 225,617 to 39,307 vertices with two
+  slots; from 2,380,538 to 489,492 edges with three. Maximum degree there is
   unchanged (1032).
 
 These are constant factors in what every backend contracts. The exponent is
@@ -79,6 +99,17 @@ against 2^18.0 for the two-slot ECCp-131 network now. Most of the 10x on the
 recorded toy curves (steps 6 and 7) comes from the multiplier choice at small
 widths, so it does not carry over to d = 131, where Fourier stays smaller. No ECCp-131 scalar is
 computed.
+
+## 100x was not reached
+
+Final against main on the recorded curves: 26–45x fewer charged steps per
+count (m = 2), 31–39x (m = 3), 9–30x fewer edges, 3–10x fewer vertices. At
+p = 13 the two-slot network has 1,215 vertices: 541 definition checks, 441
+copy-equality vertices (the degree-3 fan-out trees of the construction) and
+215 other constraints, built from bit-level ripple adders and AND arrays.
+Further large factors would need wider fused predicates or wide equality stars:
+fewer, bigger steps and vertices for the same work, which under the
+bounded-degree model is relabelling, not an improvement, so they were not made.
 
 ## Units and gates
 
@@ -109,6 +140,7 @@ typst compile runs/report.typ runs/report.pdf
 `network.rs`, from step 1. `dedupe`: the first commit of this change. `fold`
 and `valid`: the working tree after steps 2 and 3 (step 4's
 `multiply_by_small_constant`, and for `fold` also `proven_valid` /
-`negate_point`, absent). `chains`: commit e852145431. `implied`, `auto`: the
-working tree after steps 5 and 6 (counts only). `mult` and `modops` modes print the multiplier and
+`negate_point`, absent). `chains`: commit e852145431. `zeroadd`: commit f2adf2d616.
+`implied`, `auto`, `compressed`, `verify`, `hashfirst`: the working tree after
+steps 5, 6, 8, 9 and 10 (counts only). `mult` and `modops` modes print the multiplier and
 modular-operation sizes used to choose the step-4 threshold.

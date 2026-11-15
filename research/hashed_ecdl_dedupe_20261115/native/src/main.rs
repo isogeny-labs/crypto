@@ -420,6 +420,10 @@ fn report(dir: &str) -> Res<Value> {
         "chains",
         "implied",
         "auto",
+        "zeroadd",
+        "compressed",
+        "verify",
+        "hashfirst",
         "final",
     ];
     let mut counts = serde_json::Map::new();
@@ -458,7 +462,7 @@ fn report(dir: &str) -> Res<Value> {
         }
         counts.insert(format!("slots_{slots}"), Value::Object(per));
     }
-    let stages = ["dedupe", "chains", "final"];
+    let stages = ["dedupe", "chains", "zeroadd", "final"];
     let sb = read_jsonl(&format!("{dir}/solves_before.jsonl"))?;
     let mut solves = serde_json::Map::new();
     for stage in stages {

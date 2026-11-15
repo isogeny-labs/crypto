@@ -1,6 +1,6 @@
 //! Linear-edge arithmetic and curve encodings from Bochum §2–3.
 
-use crate::arithmetic::inverse;
+use crate::arithmetic::{inverse, Seeded, SquareRootContext};
 use crate::canonical::{fourier_sum, PowerTable, PredicateProgram, TwistTable, ValueOperation};
 use crate::curve::{Curve, Point};
 use crate::finite::{Domain, PrimeDomain};
@@ -1350,6 +1350,81 @@ impl Encoder {
         self.assert_equal(&left, &right, meter)
     }
 
+    /// A free affine point given by its abscissa and the parity of its
+    /// ordinate: `w + 1` free bits instead of `2w`. The other ordinate bits are
+    /// a defined witness, the square root of `x^3 + ax + b` with that parity,
+    /// and the usual validity constraints (canonical `x` and `y`, curve
+    /// equation) follow. For odd `q`, `y` and `q - y` differ in parity, so each
+    /// valid point has exactly one `(x, parity)` and its witness is unique:
+    /// the accepted points, their interface words and every count are those
+    /// of `input_point(curve, false, ..)`. Free words: `x`, then the parity.
+    pub fn input_point_compressed(&mut self, curve: &Curve, meter: &Meter) -> Result<PointWords> {
+        let point = self.input_point_compressed_unchecked(curve, meter)?;
+        self.valid_point(curve, &point, meter)?;
+        Ok(point)
+    }
+
+    /// `input_point_compressed` without its validity constraints, for a caller
+    /// that adds them itself with `assert_valid_point` (for example after a
+    /// cheaper filter on `x` and the parity bit, which are the free bits).
+    pub fn input_point_compressed_unchecked(
+        &mut self,
+        curve: &Curve,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let p = curve.modulus().clone();
+        let width = p.bits() as usize;
+        if width < 2 || !p.bit(0) {
+            return Err(invalid("compressed point modulus"));
+        }
+        let x = self.input_word(width, meter)?;
+        let parity = self.input_word(1, meter)?;
+        let c = curve.clone();
+        let upper = self
+            .define(
+                &[x.clone(), parity.clone()],
+                &[width - 1],
+                Arc::new(move |v, work| {
+                    let p = c.modulus();
+                    let x = &v[0] % p;
+                    let rhs = (&x * &x % p * &x + c.a() * &x + c.b()) % p;
+                    // Only the root's sign depends on the randomness, and the
+                    // parity below fixes the sign, so a fixed seed is exact.
+                    let root = SquareRootContext::new(p)?.root(&rhs, &mut Seeded(1), work)?;
+                    let want = !v[1].is_zero();
+                    let y = root.map(|r| if r.bit(0) == want { r } else { (p - r) % p });
+                    // No root of this parity: any output fails the checks below.
+                    Ok(vec![match y {
+                        Some(y) if y.bit(0) == want => y >> 1,
+                        _ => BigUint::zero(),
+                    }])
+                }),
+                None,
+                false,
+                meter,
+            )?
+            .remove(0);
+        let mut y = parity.0.clone();
+        y.extend(upper.0.iter().copied());
+        Ok(PointWords {
+            infinity: Self::constant(1, &BigUint::zero())?,
+            x,
+            y: Word(y),
+        })
+    }
+
+    /// Constrain `point` to be a valid curve point (canonical coordinates, the
+    /// identity encoded as zeros, the curve equation otherwise). Emitted once
+    /// per point and region.
+    pub fn assert_valid_point(
+        &mut self,
+        curve: &Curve,
+        point: &PointWords,
+        meter: &Meter,
+    ) -> Result<()> {
+        self.valid_point(curve, point, meter)
+    }
+
     /// Hardcode a canonical curve point.
     pub fn constant_point(curve: &Curve, point: &Point) -> Result<PointWords> {
         if !curve.contains(point) {
@@ -1558,9 +1633,10 @@ impl Encoder {
             .remove(0);
         let p = curve.modulus();
         self.canonical(&slope, p, meter)?;
-        let dx = self.modular_subtract(&a.x, &b.x, p, meter)?;
+        // x2 - x1 is needed for the chord below; it is zero iff x1 - x2 is.
+        let x2_x1 = self.modular_subtract(&b.x, &a.x, p, meter)?;
         let sy = self.modular_add(&a.y, &b.y, p, meter)?;
-        let same_x = self.zero_test(&dx, meter)?;
+        let same_x = self.zero_test(&x2_x1, meter)?;
         let inverse_y = self.zero_test(&sy, meter)?;
         let finite_a = self.not(&a.infinity, meter)?;
         let finite_b = self.not(&b.infinity, meter)?;
@@ -1581,22 +1657,52 @@ impl Encoder {
             &Self::constant_point(curve, &Point::Infinity)?,
             meter,
         )?;
-        let x2_x1 = self.modular_subtract(&b.x, &a.x, p, meter)?;
         let y2_y1 = self.modular_subtract(&b.y, &a.y, p, meter)?;
         let generic_slope = self.modular_multiply(&slope, &x2_x1, p, meter)?;
         self.gated_equal(&sigma4, &generic_slope, &y2_y1, meter)?;
-        let two_y = self.modular_add(&a.y, &a.y, p, meter)?;
-        let square = self.modular_multiply(&a.x, &a.x, p, meter)?;
-        let three_square = self.modular_multiply(
-            &square,
-            &Self::constant(width, &(BigUint::from(3u8) % p))?,
-            p,
-            meter,
-        )?;
-        let tangent =
-            self.modular_add(&three_square, &Self::constant(width, curve.a())?, p, meter)?;
-        let doubling_slope = self.modular_multiply(&slope, &two_y, p, meter)?;
-        self.gated_equal(&sigma5, &doubling_slope, &tangent, meter)?;
+        let constant_tangent = match &a.y.0[..] {
+            bits if a
+                .x
+                .0
+                .iter()
+                .chain(bits)
+                .all(|b| matches!(b, Bit::Constant(_))) =>
+            {
+                // A constant first point: the tangent slope is the constant
+                // (3x^2 + a) / (2y), so slope * 2y = 3x^2 + a with 2y != 0 is
+                // the same constraint as slope = that constant.
+                let (x, y) = (Self::constant_value(&a.x), Self::constant_value(&a.y));
+                let two_y = (&y << 1u8) % p;
+                if two_y.is_zero() {
+                    None
+                } else {
+                    let tangent = (BigUint::from(3u8) * &x * &x + curve.a()) % p;
+                    Some(tangent * inverse(&two_y, p)? % p)
+                }
+            }
+            _ => None,
+        };
+        if let Some(slope_value) = constant_tangent {
+            self.gated_equal(
+                &sigma5,
+                &slope,
+                &Self::constant(width, &slope_value)?,
+                meter,
+            )?;
+        } else {
+            let two_y = self.modular_add(&a.y, &a.y, p, meter)?;
+            let square = self.modular_multiply(&a.x, &a.x, p, meter)?;
+            let three_square = self.modular_multiply(
+                &square,
+                &Self::constant(width, &(BigUint::from(3u8) % p))?,
+                p,
+                meter,
+            )?;
+            let tangent =
+                self.modular_add(&three_square, &Self::constant(width, curve.a())?, p, meter)?;
+            let doubling_slope = self.modular_multiply(&slope, &two_y, p, meter)?;
+            self.gated_equal(&sigma5, &doubling_slope, &tangent, meter)?;
+        }
         self.gated_equal(
             &active,
             &result.infinity,
@@ -1681,6 +1787,63 @@ impl Encoder {
         let hashed = self.modular_add(&multiplied, &Self::constant(width, beta)?, s, meter)?;
         let accepted = self.less_than(&hashed, &Self::constant(width, tau)?, meter)?;
         self.assert_equal(&accepted, &Self::constant(1, &BigUint::one())?, meter)
+    }
+
+    /// The structural proof behind `Program::implied_vertices`: None unless
+    /// every vertex is a Check step's vertex read through exactly its edges'
+    /// signals (each vertex at most once), or a vertex whose edges all carry one
+    /// signal and whose predicate accepts all-false and all-true.
+    fn implied_vertices(
+        vertices: &[Vertex],
+        steps: &[Step],
+        implied: &[bool],
+        edge_signals: &[usize],
+        meter: &Meter,
+    ) -> Result<Option<Vec<usize>>> {
+        let mut work = Meter::new(meter.limits.clone());
+        let mut covered = vec![false; vertices.len()];
+        let mut list = Vec::new();
+        for (index, step) in steps.iter().enumerate() {
+            let Step::Check { vertex, ports } = step else {
+                continue;
+            };
+            let Some(v) = vertices.get(*vertex) else {
+                return Ok(None);
+            };
+            if covered[*vertex]
+                || v.edges.len() != ports.len()
+                || v.edges.iter().zip(ports).any(|(&edge, port)| {
+                    edge_signals.get(edge).map(|&s| Bit::Signal(s)) != Some(*port)
+                })
+            {
+                return Ok(None);
+            }
+            covered[*vertex] = true;
+            if implied.get(index).copied().unwrap_or(false) {
+                list.push(*vertex);
+            }
+        }
+        for (id, v) in vertices.iter().enumerate() {
+            if covered[id] {
+                continue;
+            }
+            let Some(&first) = v.edges.first() else {
+                return Ok(None);
+            };
+            let signal = edge_signals.get(first);
+            if signal.is_none() || v.edges.iter().any(|&e| edge_signals.get(e) != signal) {
+                return Ok(None);
+            }
+            for value in [false, true] {
+                if !v
+                    .predicate
+                    .evaluate(&vec![value; v.edges.len()], &mut work)?
+                {
+                    return Ok(None);
+                }
+            }
+        }
+        Ok(Some(list))
     }
 
     /// Freeze shared signals into ordinary edges and constant-degree equality
@@ -1883,8 +2046,11 @@ impl Encoder {
                 implied[step] = true;
             }
         }
+        let implied_vertices =
+            Self::implied_vertices(&self.vertices, &self.steps, &implied, &edge_signals, meter)?;
         let program = Program {
             implied,
+            implied_vertices,
             free: self.free,
             signals: self.uses.len(),
             steps: self.steps,
@@ -2203,6 +2369,151 @@ mod tests {
                         .map(|(i, &bit)| u32::from(bit) << i)
                         .sum();
                     assert_eq!(accepted, vec![expected], "{a:?} + {b:?}");
+                }
+            }
+        }
+    }
+    #[test]
+    fn compressed_point_accepts_exactly_one_input_per_affine_point() {
+        let mut meter = Meter::new(Limits {
+            steps: 500_000_000,
+            ..Limits::default()
+        });
+        let curves = [
+            crate::curve::tiny(&mut meter),
+            Curve::with_cofactor(
+                5u8.into(),
+                0u8.into(),
+                1u8.into(),
+                3u8.into(),
+                2u8.into(),
+                Point::Affine {
+                    x: 0u8.into(),
+                    y: 1u8.into(),
+                },
+                &mut meter,
+            )
+            .unwrap(),
+        ];
+        for curve in curves {
+            let p = curve.modulus().to_u64().unwrap();
+            let width = curve.modulus().bits() as usize;
+            let mut builder = Encoder::new();
+            let point = builder.input_point_compressed(&curve, &meter).unwrap();
+            builder.mark_point_interface(&point, &meter).unwrap();
+            let graph = builder.finish(&meter).unwrap();
+            assert_eq!(graph.input_bit_count(), Some(width + 1));
+            let mut accepted = Vec::new();
+            for x in 0..1u64 << width {
+                for parity in [false, true] {
+                    let mut bits = bits(&x.into(), width);
+                    bits.push(parity);
+                    if let Some(witness) = graph.witness_from_input_bits(&bits, &mut meter).unwrap()
+                    {
+                        let read_back = read_point(&graph, &witness, width);
+                        let Point::Affine { x: rx, y: ry } = &read_back else {
+                            panic!("identity accepted")
+                        };
+                        assert_eq!(rx, &BigUint::from(x));
+                        assert_eq!(ry.bit(0), parity);
+                        assert!(curve.contains(&read_back));
+                        accepted.push(read_back);
+                    }
+                }
+            }
+            let mut expected = Vec::new();
+            for x in 0..p {
+                for y in 0..p {
+                    let point = Point::Affine {
+                        x: x.into(),
+                        y: y.into(),
+                    };
+                    if curve.contains(&point) {
+                        expected.push(point);
+                    }
+                }
+            }
+            let key = |point: &Point| format!("{point:?}");
+            accepted.sort_by_key(key);
+            expected.sort_by_key(key);
+            assert_eq!(accepted, expected);
+        }
+    }
+    #[test]
+    fn point_add_with_constant_first_point_accepts_only_the_sum() {
+        // Constant first points take the constant-tangent path. For every
+        // constant T and free b, overwrite the output's edges with each of the
+        // 2^(1+2w) values: the graph must accept exactly T + b.
+        let mut meter = Meter::new(Limits {
+            steps: 2_000_000_000,
+            ..Limits::default()
+        });
+        let curves = [
+            crate::curve::tiny(&mut meter),
+            Curve::with_cofactor(
+                5u8.into(),
+                0u8.into(),
+                1u8.into(),
+                3u8.into(),
+                2u8.into(),
+                Point::Affine {
+                    x: 0u8.into(),
+                    y: 1u8.into(),
+                },
+                &mut meter,
+            )
+            .unwrap(),
+        ];
+        for curve in curves {
+            let width = curve.modulus().bits() as usize;
+            let mut points = vec![Point::Infinity];
+            for x in 0..5u8 {
+                for y in 0..5u8 {
+                    let point = Point::Affine {
+                        x: x.into(),
+                        y: y.into(),
+                    };
+                    if curve.contains(&point) {
+                        points.push(point);
+                    }
+                }
+            }
+            for constant in &points {
+                let mut builder = Encoder::new();
+                let a = Encoder::constant_point(&curve, constant).unwrap();
+                let b = builder.input_point(&curve, true, &meter).unwrap();
+                let output = builder.point_add(&curve, &a, &b, &meter).unwrap();
+                builder.mark_point_interface(&output, &meter).unwrap();
+                let graph = builder.finish(&meter).unwrap();
+                let edge_signals = &graph.model.as_ref().unwrap().edge_signals;
+                let output_signals: Vec<Option<usize>> = (0..1 + 2 * width)
+                    .map(|k| graph.interface().get(k).map(|&edge| edge_signals[edge]))
+                    .collect();
+                for b in &points {
+                    let witness = graph
+                        .witness_from_input_bits(&point_bits(b, width), &mut meter)
+                        .unwrap()
+                        .unwrap();
+                    let mut accepted = Vec::new();
+                    for candidate in 0u32..1 << (1 + 2 * width) {
+                        let mut assignment = witness.clone();
+                        for (edge, signal) in edge_signals.iter().enumerate() {
+                            if let Some(k) = output_signals.iter().position(|s| *s == Some(*signal))
+                            {
+                                assignment[edge] = candidate >> k & 1 == 1;
+                            }
+                        }
+                        if graph.evaluate(&assignment, &mut meter).unwrap() {
+                            accepted.push(candidate);
+                        }
+                    }
+                    let sum = curve.add(constant, b, &mut meter).unwrap();
+                    let expected: u32 = point_bits(&sum, width)
+                        .iter()
+                        .enumerate()
+                        .map(|(i, &bit)| u32::from(bit) << i)
+                        .sum();
+                    assert_eq!(accepted, vec![expected], "{constant:?} + {b:?}");
                 }
             }
         }

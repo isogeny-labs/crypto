@@ -9,25 +9,29 @@ import matplotlib.pyplot as plt
 H = os.path.dirname(os.path.abspath(__file__))
 R = json.load(open(os.path.join(H, "report.json")))
 fig, ax = plt.subplots(1, 3, figsize=(16, 4.4))
-order = ("dedupe", "fold", "valid", "chains", "implied", "auto", "final")
-names = {"dedupe": "1: dedupe", "fold": "2: + constant folding", "valid": "3: + implied validity",
-         "chains": "4: + small-constant chains", "implied": "5: + skip implied checks",
-         "auto": "6: + smaller multiplier per width", "final": "7: + zero-addend adders (final)"}
+order = ("dedupe", "fold", "valid", "chains", "implied", "auto", "zeroadd", "compressed", "verify", "hashfirst", "final")
+names = {"dedupe": "1 dedupe", "fold": "2 + folding", "valid": "3 + implied validity",
+         "chains": "4 + constant chains", "implied": "5 + skip implied checks",
+         "auto": "6 + per-shape multiplier", "zeroadd": "7 + zero-addend adders",
+         "compressed": "8 + (x, parity) inputs", "verify": "9 + structural verify",
+         "hashfirst": "10 + hash before curve eq.", "final": "11 + constant-T point_add (final)"}
 colors = {"dedupe": "#009e73", "fold": "#cc79a7", "valid": "#d55e00", "chains": "#e69f00",
-          "implied": "#56b4e9", "auto": "#999933", "final": "#2a6fdb"}
+          "implied": "#56b4e9", "auto": "#999933", "zeroadd": "#882255", "compressed": "#44aa99",
+          "verify": "#ddcc77", "hashfirst": "#aa4499", "final": "#2a6fdb"}
 
 for k, slots in enumerate((2, 3)):
     per = R["counts"][f"slots_{slots}"]
     for j, v in enumerate(order):
         ratios = [row["ratio"] for row in per[v]["table"]]
         xs = [j + (i - len(ratios) / 2) * 0.02 for i in range(len(ratios))]
-        ax[0].scatter([x + 8 * k for x in xs], ratios, s=10, color=colors[v],
+        ax[0].scatter([x + 12 * k for x in xs], ratios, s=10, color=colors[v],
                       label=names[v] if k == 0 else None)
 ax[0].axhline(1, color="#888", lw=1, ls=":")
 ax[0].axhline(10, color="#c0392b", lw=1, ls="--")
-ax[0].set_xticks([3, 11]); ax[0].set_xticklabels(["m = 2 (24 counts)", "m = 3 (12 counts)"])
+ax[0].set_yscale("symlog", linthresh=10)
+ax[0].set_xticks([5, 17]); ax[0].set_xticklabels(["m = 2 (24 counts)", "m = 3 (12 counts)"])
 ax[0].set_ylabel("charged steps: before / variant")
-ax[0].set_title("Exact count vs main, every row = brute force"); ax[0].legend(fontsize=7, loc="upper left", ncol=2); ax[0].set_ylim(0, 30)
+ax[0].set_title("Exact count vs main, every row = brute force"); ax[0].legend(fontsize=6, loc="upper left", ncol=3); ax[0].set_ylim(0, 400)
 
 s = R["sizes"]
 for slots, mk in ((2, "o"), (3, "s")):
