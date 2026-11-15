@@ -40,3 +40,8 @@ Source942ab8f2385c/checkpoint215301 stopped exit101 BEFORE spawningmsolve: the
 manifestpaths are repository-relative while collectorcwd is study. No solver
 outputfiles created; retain POSITIVE-COLLECT and EXIT-POSITIVE. V2uses reporoot
 forhashcheck only; solverinput/limits/verifier unchanged. Freeze next.
+
+## V2producer failure and V3preflight
+V2stopped before solver: manifestfilename also relative aftercwd change. Retain
+allreceipts. V3canonicalizes manifest before switchingcwd, thenmetadata-only
+preflight passes3fingerprints without solver. No inverse cell has run.
