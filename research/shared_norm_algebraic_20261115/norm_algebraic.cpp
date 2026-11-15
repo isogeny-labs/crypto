@@ -64,17 +64,21 @@ struct Generator {
     }
     void equations(const P&f) {for(const auto&v:f)if(!v.terms.empty())system.equations.push_back(v);}
 
-    Generator(coeff::Config input,unsigned arity):cfg(input),m(arity),h((arity+1)/2) {
+    Generator(coeff::Config input,unsigned arity,bool pruned=false):cfg(input),m(arity),h((arity+1)/2) {
         if(m<3||m>7||m%2==0||cfg.t<1||cfg.t>8||cfg.field.p<5||cfg.field.p>257)
             throw std::invalid_argument("bounded shared-norm shape");
+        if(pruned&&cfg.field.mod(cfg.c)==0)
+            throw std::invalid_argument("witness-pruned membership requires nonzero c");
         system.p=cfg.field.p;
         a=names("a",h);c=names("c",h-1);u=names("u0_",m);
         for(int j=1;j<=cfg.t;++j) {
             q.push_back(names("q"+std::to_string(j)+"_",m-1));
             r.push_back(j<cfg.t?names("r"+std::to_string(j)+"_",m):std::vector<std::size_t>{});
         }
-        cs=names("bc_s",h-1);ct=names("bc_t",m);
-        ds=names("bd_s",m-1);dt=names("bd_t",m);
+        if(!pruned) {
+            cs=names("bc_s",h-1);ct=names("bc_t",m);
+            ds=names("bd_s",m-1);dt=names("bd_t",m);
+        }
         target_inverse=name("target_inverse");
         const auto A=polynomial(a,true),C=polynomial(c),U0=polynomial(u,true);
         const P curve{constant(cfg.b),constant(cfg.a),constant(0),constant(1)};
@@ -87,10 +91,12 @@ struct Generator {
             equations(subtract(subtract(multiply(previous,previous),multiply(polynomial(q[j]),U0)),next));
             previous=next;
         }
-        equations(subtract(plus(multiply(U0,polynomial(cs)),multiply(C,polynomial(ct))),P{constant(1)}));
-        P derivative;
-        for(unsigned i=1;i<=m;++i)derivative.push_back(U0[i].times(constant(i)));
-        equations(subtract(plus(multiply(U0,polynomial(ds)),multiply(derivative,polynomial(dt))),P{constant(1)}));
+        if(!pruned) {
+            equations(subtract(plus(multiply(U0,polynomial(cs)),multiply(C,polynomial(ct))),P{constant(1)}));
+            P derivative;
+            for(unsigned i=1;i<=m;++i)derivative.push_back(U0[i].times(constant(i)));
+            equations(subtract(plus(multiply(U0,polynomial(ds)),multiply(derivative,polynomial(dt))),P{constant(1)}));
+        }
         equations(P{evaluate(U0,cfg.rx).times(variable(target_inverse)).plus(constant(1),true)});
     }
 };
@@ -169,15 +175,16 @@ struct OracleResult {std::set<std::string> models;quotient::Result extraction;};
 struct Oracle {
     std::filesystem::path exe,root;
     std::size_t calls=0;
-    Oracle(std::filesystem::path binary,std::filesystem::path directory)
-        :exe(std::filesystem::absolute(binary)),root(std::filesystem::absolute(directory)) {
+    bool pruned=false;
+    Oracle(std::filesystem::path binary,std::filesystem::path directory,bool prune_witnesses=false)
+        :exe(std::filesystem::absolute(binary)),root(std::filesystem::absolute(directory)),pruned(prune_witnesses) {
         if(!std::filesystem::is_regular_file(exe))throw std::invalid_argument("missing backend binary");
         if(!std::filesystem::create_directory(root))throw std::invalid_argument("refusing reused output directory");
     }
     OracleResult solve(coeff::Config cfg,unsigned m=3) {
         const auto directory=root/("call-"+std::to_string(++calls));
         if(!std::filesystem::create_directory(directory))throw std::runtime_error("reused backend call path");
-        Generator gen(cfg,m);
+        Generator gen(cfg,m,pruned);
         const auto in=directory/"input.ms",gb=directory/"basis.gb";
         canonical::write_system(in,gen.system,false);
         const int exit=backend(exe,in,gb,directory);
@@ -322,6 +329,16 @@ int main(int argc,char**argv) {
         using namespace algebraic;
         if(argc==2&&std::string(argv[1])=="--selftest") {
             quotient::selftest();direct::unit_linear_checks();
+            for(unsigned m:{3U,5U,7U}) {
+                const coeff::Config cfg{{17},2,2,4,1,0,6};
+                const Generator original(cfg,m),pruned(cfg,m,true);
+                if(original.system.names.size()-pruned.system.names.size()!=(7*m-3)/2)
+                    throw std::runtime_error("witness-pruned variable count");
+            }
+            bool rejected=false;
+            try{Generator bad({{17},2,2,4,0,0,6},3,true);}
+            catch(const std::invalid_argument&){rejected=true;}
+            if(!rejected)throw std::runtime_error("zero-c pruned input accepted");
             std::cout<<"PASS quotient and rank-free linear controls\n";return 0;
         }
         if(argc==3&&std::string(argv[1])=="--retained") {
@@ -339,8 +356,8 @@ int main(int argc,char**argv) {
             std::cout<<"PASS retained models="<<models.size()<<" dimension="<<points.dimension<<" generator_identical=true\n";
             return 0;
         }
-        if(argc==5&&std::string(argv[1])=="--qualify-models") {
-            Oracle oracle(argv[2],argv[3]);
+        if(argc==5&&(std::string(argv[1])=="--qualify-models"||std::string(argv[1])=="--qualify-pruned-models")) {
+            Oracle oracle(argv[2],argv[3],std::string(argv[1])=="--qualify-pruned-models");
             std::ofstream log(argv[4]);
             log<<"t\tc\trx\try\tmodels\tquotient_dimension\tstatus\n";
             reference::Curve E{17,2,2};std::size_t cases=0,models=0;
@@ -354,7 +371,7 @@ int main(int argc,char**argv) {
                 }
             std::cout<<"PASS complete model controls="<<cases<<" models="<<models<<" backend_calls="<<oracle.calls<<'\n';return 0;
         }
-        if(argc==5&&std::string(argv[1])=="--qualify-cold") {
+        if(argc==5&&(std::string(argv[1])=="--qualify-cold"||std::string(argv[1])=="--qualify-pruned-cold")) {
             const auto root=std::filesystem::absolute(argv[3]);
             if(!std::filesystem::create_directory(root))throw std::runtime_error("reused cold qualification path");
             std::ofstream log(argv[4]);log<<"target_x\ttarget_y\trecovered_scalar\tattempts\tbackend_calls\tmisses\trank\n";
@@ -362,15 +379,15 @@ int main(int argc,char**argv) {
             for(int k=1;k<19;++k) {
                 // Known scalar is only in this harness, outside cold_solve.
                 const auto Q=multiply(E,P,k);
-                Oracle oracle(argv[2],root/("target-x"+std::to_string(Q.x)+"-y"+std::to_string(Q.y)));
+                Oracle oracle(argv[2],root/("target-x"+std::to_string(Q.x)+"-y"+std::to_string(Q.y)),std::string(argv[1])=="--qualify-pruned-cold");
                 const auto out=cold_solve(Q,1234,oracle);
                 if(out.scalar!=k)throw std::runtime_error("cold scalar mismatch");
                 log<<Q.x<<'\t'<<Q.y<<'\t'<<out.scalar<<'\t'<<out.attempts<<'\t'<<out.calls<<'\t'<<out.misses<<'\t'<<out.rank<<'\n';log.flush();
             }
             std::cout<<"PASS cold point-only IC targets=18\n";return 0;
         }
-        if(argc==5&&std::string(argv[1])=="--qualify-arity") {
-            Oracle oracle(argv[2],argv[3]);std::ofstream log(argv[4]);
+        if(argc==5&&(std::string(argv[1])=="--qualify-arity"||std::string(argv[1])=="--qualify-pruned-arity")) {
+            Oracle oracle(argv[2],argv[3],std::string(argv[1])=="--qualify-pruned-arity");std::ofstream log(argv[4]);
             log<<"m\tt\tc\treference_models\tcandidate_models\tquotient_dimension\tstatus\n";
             const std::vector<std::array<int,3>> cells{{5,3,16},{5,4,1},{7,4,1}};
             for(const auto&cell:cells) {
@@ -390,11 +407,11 @@ int main(int argc,char**argv) {
             }
             std::cout<<"Completed three capped arity controls; see TSV for match/unknown\n";return 0;
         }
-        if(argc==7&&std::string(argv[1])=="--solve") {
-            Oracle oracle(argv[2],argv[3]);
+        if(argc==7&&(std::string(argv[1])=="--solve"||std::string(argv[1])=="--solve-pruned")) {
+            Oracle oracle(argv[2],argv[3],std::string(argv[1])=="--solve-pruned");
             const auto out=cold_solve({reference::read_int(argv[4]),reference::read_int(argv[5]),false},std::stoull(argv[6]),oracle);
             std::cout<<"{\"scalar\":"<<out.scalar<<",\"attempts\":"<<out.attempts<<",\"backend_calls\":"<<out.calls<<",\"misses\":"<<out.misses<<",\"rank\":"<<out.rank<<"}\n";return 0;
         }
-        throw std::invalid_argument("usage: norm_algebraic --selftest | --retained BASIS | --qualify-models MSOLVE OUTDIR TSV | --qualify-cold MSOLVE OUTDIR TSV | --qualify-arity MSOLVE OUTDIR TSV | --solve MSOLVE OUTDIR Qx Qy SEED");
+        throw std::invalid_argument("usage: norm_algebraic --selftest | --retained BASIS | --qualify-models MSOLVE OUTDIR TSV | --qualify-cold MSOLVE OUTDIR TSV | --qualify-arity MSOLVE OUTDIR TSV | --qualify-pruned-{models,cold,arity} MSOLVE OUTDIR TSV | --solve[-pruned] MSOLVE OUTDIR Qx Qy SEED");
     }catch(const std::exception&e){std::cerr<<"UNKNOWN: "<<e.what()<<'\n';return 2;}
 }

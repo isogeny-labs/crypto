@@ -34,7 +34,7 @@ removal of the target-separation inverse. [pcc:unverified]
 The retained chain implies divisibility by induction: V_0=X and
 V_(j-1)^2=Q_j U+V_j imply V_j = X^(2^j) modulo U; V_t=c closes it.
 Quotients and remainders stay bounded and uniquely determined by monic
-Euclidean division. Eliminating the Bezout blocks removes 7m-5 over2
+Euclidean division. Eliminating the Bezout blocks removes (7m-3)/2
 variables: h-1+m from (U,C) and 2m-1 from (U,U'), with h=(m+1)/2.
 Concretely these are9,16,23 variables for m=3,5,7. The count itself says
 nothing about the cost of constructing a basis. [pcc:unverified]

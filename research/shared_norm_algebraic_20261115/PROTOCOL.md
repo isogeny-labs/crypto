@@ -123,3 +123,10 @@ completed arity models must match the bounded reference. Stop on disagreement,
 keep caps as unknown, and do not adaptively expand the panel. Also require an
 input rejection check for c=0. These are encoding/correctness controls; no
 scientific timing, speedup, fitted exponent or general degree claim is admitted.
+
+A4 timestamp correction (04:07 UTC, before its backend calls): the preceding
+04:10 header was entered ahead of the clock in error. The protocol freeze is
+commit ee82e32f1525472579489d19b14a435ce03f0e1d at 04:05:13 UTC. This exact
+commit, rather than that mistaken header, determines prospective ordering.
+No calls have run yet. The implementation variable-count expression is
+(7m-3)/2; the earlier prose numerator typo does not affect its9/16/23 counts.
