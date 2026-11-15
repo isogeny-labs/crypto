@@ -67,6 +67,7 @@
  *   a contention point.
  */
 #include <cuda_runtime.h>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
@@ -363,7 +364,7 @@ struct RfCudaSession64 {
     rf_relation *d_out;
     SortedTable sview;
     HashTable hview;
-    cudaEvent_t e0, e1;
+    cudaEvent_t e0 = nullptr, e1 = nullptr;
 };
 
 extern "C" void rf_cuda_session64_destroy(void *h) {
@@ -535,6 +536,20 @@ static const unsigned long long RF_KEY_EMPTY = ~0ull;   /* abscissae are < p < 2
 /* one thread per (ai, bi) cell, bi >= ai: both signs of P_ai +/- P_bi */
 __global__ void k_pair_keys(Fp64Ctx f, uint64_t a_m, const uint64_t *x, const uint64_t *y, uint32_t n,
                             uint64_t *keys) {
+    /* one thread per run of RF_PAIR_CHUNK partners of a row (rf_pair_run) */
+    const uint64_t runs = (n + RF_PAIR_CHUNK - 1) / RF_PAIR_CHUNK;
+    const uint64_t t = rf_global_tid();
+    if (t >= (uint64_t)n * runs) return;
+    const uint32_t ai = (uint32_t)(t / runs);
+    const uint64_t r = t % runs;
+    const uint64_t b0 = (uint64_t)ai + r * RF_PAIR_CHUNK;
+    if (b0 >= n) return;
+    rf_pair_run(f, a_m, x, y, n, ai, (uint32_t)b0, keys);
+}
+
+/* The per-cell build (two field inversions per cell), kept for rf_cuda_pairs_bench. */
+__global__ void k_pair_keys_cell(Fp64Ctx f, uint64_t a_m, const uint64_t *x, const uint64_t *y, uint32_t n,
+                                 uint64_t *keys) {
     const uint64_t t = rf_global_tid();
     if (t >= (uint64_t)n * n) return;
     const uint32_t ai = (uint32_t)(t / n), bi = (uint32_t)(t % n);
@@ -589,6 +604,18 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     const uint64_t nb = (uint64_t)n_fb * (n_fb + 1);
     const uint32_t hcap = rf::hash_capacity_for((uint32_t)nb);
     uint32_t entries = 0;
+    /* RF_SERVE_TIMING: per-stage wall of the build (each stage synchronised; off otherwise) */
+    const bool timing = std::getenv("RF_SERVE_TIMING") != nullptr;
+    double stage_s[5] = {0, 0, 0, 0, 0};
+    int ti = 0;
+    auto t_last = std::chrono::steady_clock::now();
+    auto mark = [&]() {
+        if (!timing) return;
+        cudaDeviceSynchronize();
+        const auto now = std::chrono::steady_clock::now();
+        if (ti < 5) stage_s[ti++] = std::chrono::duration<double>(now - t_last).count();
+        t_last = now;
+    };
     s->f = *f; s->lookup = RF_LOOKUP_HASH_DEVICE; s->chunk = chunk; s->n_fb = n_fb;
     s->max_targets = max_targets; s->cap = cap ? cap : 1;
     CUS(rf_cu_alloc(&s->d_fbx, n_fb * sizeof(uint64_t)));
@@ -602,9 +629,10 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     /* every pair's abscissa, in build order */
     CUS(rf_cu_alloc(&d_keys, nb * sizeof(uint64_t)));
     {
-        const uint64_t cells = (uint64_t)n_fb * n_fb;
-        k_pair_keys<<<(unsigned)((cells + 255) / 256), 256>>>(*f, a_m, s->d_fbx, s->d_fby, n_fb, d_keys);
+        const uint64_t threads = (uint64_t)n_fb * ((n_fb + RF_PAIR_CHUNK - 1) / RF_PAIR_CHUNK);
+        k_pair_keys<<<(unsigned)((threads + 255) / 256), 256>>>(*f, a_m, s->d_fbx, s->d_fby, n_fb, d_keys);
         CUS(cudaGetLastError());
+        mark();
     }
     /* first pair per abscissa */
     CUS(rf_cu_alloc(&d_hkey, (size_t)hcap * sizeof(unsigned long long)));
@@ -613,6 +641,7 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     CUS(cudaMemset(d_hval, 0xFF, (size_t)hcap * sizeof(uint32_t)));
     k_pair_dedupe<<<(unsigned)((nb + 255) / 256), 256>>>(d_keys, nb, d_hkey, d_hval, hcap - 1);
     CUS(cudaGetLastError());
+    mark();
     cudaFree(d_keys); d_keys = nullptr;
     /* compact into the probe set and its build-index map */
     CUS(rf_cu_alloc(&s->d_px, nb * sizeof(uint64_t)));
@@ -622,6 +651,7 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     k_pair_compact<<<(hcap + 255) / 256, 256>>>(d_hkey, d_hval, hcap, s->d_px, d_pairb, d_count);
     CUS(cudaGetLastError());
     CUS(cudaMemcpy(&entries, d_count, sizeof(uint32_t), cudaMemcpyDeviceToHost));
+    mark();
     cudaFree(d_hkey); d_hkey = nullptr;
     cudaFree(d_hval); d_hval = nullptr;
     s->n_probe = entries;
@@ -632,6 +662,7 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     k_slots_fill<<<(s->hcap + 255) / 256, 256>>>(s->d_aux64, s->hcap);
     k_slots_insert<<<(entries + 255) / 256, 256>>>(*f, s->d_aux64, s->hcap - 1, s->d_px, entries);
     CUS(cudaGetLastError());
+    mark();
     s->hview.keys = nullptr; s->hview.vals = nullptr; s->hview.mask = s->hcap - 1;
     s->hview.slots = s->d_aux64;
 #else
@@ -641,6 +672,10 @@ extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, co
     *pairb_host = static_cast<uint32_t *>(std::malloc((size_t)entries * sizeof(uint32_t) + 1));
     if (!*pairb_host) { rc = RF_ERR_NOMEM; goto fail; }
     CUS(cudaMemcpy(*pairb_host, d_pairb, (size_t)entries * sizeof(uint32_t), cudaMemcpyDeviceToHost));
+    mark();
+    if (timing)
+        std::fprintf(stderr, "rootfind_serve: timing pairs n_fb=%u keys %.4f dedupe %.4f compact %.4f probe %.4f copy %.4f s\n",
+                     n_fb, stage_s[0], stage_s[1], stage_s[2], stage_s[3], stage_s[4]);
     cudaFree(d_pairb); cudaFree(d_count);
     CUS(rf_cu_event(&s->e0));
     CUS(rf_cu_event(&s->e1));
@@ -694,4 +729,52 @@ extern "C" int rf_cuda_device_present(char *name, int name_len) {
         }
     }
     return 1;
+}
+
+/* Bench and check of the pair-table key kernels on one device: a random base of n
+ * abscissae over p (Montgomery), the per-cell kernel and the batched-run kernel each run
+ * twice, the second timed with events; *mismatch counts cells whose keys differ. */
+extern "C" int rf_cuda_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run,
+                                   uint64_t *mismatch) {
+    Fp64Ctx f = fp64_ctx_new(p);
+    const uint64_t nb = (uint64_t)n * (n + 1);
+    std::vector<uint64_t> hx(n), hy(n), k1(nb), k2(nb);
+    uint64_t st = seed | 1;
+    auto rnd = [&]() { st ^= st << 13; st ^= st >> 7; st ^= st << 17; return st; };
+    for (uint32_t i = 0; i < n; i++) {
+        hx[i] = fp64_to_mont(f, rnd() % p);
+        uint64_t yc; do { yc = rnd() % p; } while (yc == 0);
+        hy[i] = fp64_to_mont(f, yc);
+    }
+    const uint64_t a_m = fp64_to_mont(f, rnd() % p);
+    uint64_t *dx = nullptr, *dy = nullptr, *d1 = nullptr, *d2 = nullptr;
+    cudaEvent_t e0 = nullptr, e1 = nullptr;
+    float ms = 0;
+    int rc = -1;
+    if (cudaMalloc(&dx, n * 8) || cudaMalloc(&dy, n * 8) || cudaMalloc(&d1, nb * 8) || cudaMalloc(&d2, nb * 8)) goto out;
+    cudaMemcpy(dx, hx.data(), n * 8, cudaMemcpyHostToDevice);
+    cudaMemcpy(dy, hy.data(), n * 8, cudaMemcpyHostToDevice);
+    cudaEventCreate(&e0); cudaEventCreate(&e1);
+    for (int rep = 0; rep < 2; rep++) {
+        cudaEventRecord(e0);
+        k_pair_keys_cell<<<(unsigned)(((uint64_t)n * n + 255) / 256), 256>>>(f, a_m, dx, dy, n, d1);
+        cudaEventRecord(e1); cudaEventSynchronize(e1); cudaEventElapsedTime(&ms, e0, e1);
+        *t_cell = ms / 1e3;
+        const uint64_t threads = (uint64_t)n * ((n + RF_PAIR_CHUNK - 1) / RF_PAIR_CHUNK);
+        cudaEventRecord(e0);
+        k_pair_keys<<<(unsigned)((threads + 255) / 256), 256>>>(f, a_m, dx, dy, n, d2);
+        cudaEventRecord(e1); cudaEventSynchronize(e1); cudaEventElapsedTime(&ms, e0, e1);
+        *t_run = ms / 1e3;
+    }
+    if (cudaGetLastError() != cudaSuccess) goto out;
+    cudaMemcpy(k1.data(), d1, nb * 8, cudaMemcpyDeviceToHost);
+    cudaMemcpy(k2.data(), d2, nb * 8, cudaMemcpyDeviceToHost);
+    *mismatch = 0;
+    for (uint64_t b = 0; b < nb; b++) *mismatch += k1[b] != k2[b];
+    rc = 0;
+out:
+    if (e0) cudaEventDestroy(e0);
+    if (e1) cudaEventDestroy(e1);
+    cudaFree(dx); cudaFree(dy); cudaFree(d1); cudaFree(d2);
+    return rc;
 }
