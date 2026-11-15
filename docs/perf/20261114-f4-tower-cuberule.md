@@ -304,7 +304,7 @@ degree-cut run.)
 
 ## 6. Smoke outputs (engineering only, not results)
 
-Printed by the tests with `--nocapture`. `D` is `solving_degree_max`, in the
+Printed by the tests with `--nocapture`. `D` is `solving_degree_max`, in the [pcc:unverified]
 unit of the presentation: the exponent sum, so a radix-4 digit counts up to 3.
 Seeded toy instances: 1 to 3 random raw equations of degree <= 2 in each `x_i`
 (<= 3 in the control), planted or not, `m` blocks as listed. They show the engine solves

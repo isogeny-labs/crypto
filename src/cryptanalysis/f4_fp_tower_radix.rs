@@ -58,9 +58,9 @@ use std::time::Instant;
 use rayon::prelude::*;
 
 use super::f4_fp_tower::{
-    ElimStats, Elem, Fp, MonoHasher, MonoMap, ProductCache, RPoly, Row, RowDesc, SquareRule,
-    Stop, StepTrace, TowerF4Options, TowerRing, echelon, eliminate, number_of, order_columns,
-    Echelon, NONE, PRODUCT_CACHE_TERMS,
+    echelon, eliminate, number_of, order_columns, Echelon, Elem, ElimStats, Fp, MonoHasher,
+    MonoMap, ProductCache, RPoly, Row, RowDesc, SquareRule, StepTrace, Stop, TowerF4Options,
+    TowerRing, NONE, PRODUCT_CACHE_TERMS,
 };
 
 /// A monomial key; see the module notes for the layout.
@@ -119,7 +119,10 @@ fn lane_sum(tw: u128) -> u32 {
 #[inline]
 pub fn x_mono(tw: u128, free: [u8; MAX_XFREE]) -> XMono {
     let deg = lane_sum(tw) + free.iter().map(|&e| u32::from(e)).sum::<u32>();
-    assert!(deg <= MAX_DEGREE, "f4_fp_tower_radix: degree above 2^16 − 1");
+    assert!(
+        deg <= MAX_DEGREE,
+        "f4_fp_tower_radix: degree above 2^16 − 1"
+    );
     x_mono_with_degree(deg, tw, free)
 }
 
@@ -453,7 +456,10 @@ impl RadixRing {
             );
             for k in 0..4 {
                 for &x in &[r.c[k], r.b[k]] {
-                    assert!(x < self.p, "f4_fp_tower_radix: rule {j} has a coefficient ≥ p");
+                    assert!(
+                        x < self.p,
+                        "f4_fp_tower_radix: rule {j} has a coefficient ≥ p"
+                    );
                     assert!(
                         k < r.radix as usize || x == 0,
                         "f4_fp_tower_radix: rule {j} has a term above y^(radix−1)"
@@ -475,10 +481,9 @@ impl RadixRing {
 
     /// The lanes' limits: lane `j` holds `r_j − 1`.
     fn cap(&self) -> u128 {
-        self.rules
-            .iter()
-            .enumerate()
-            .fold(0u128, |acc, (j, r)| acc | (u128::from(r.radix - 1) << (2 * j)))
+        self.rules.iter().enumerate().fold(0u128, |acc, (j, r)| {
+            acc | (u128::from(r.radix - 1) << (2 * j))
+        })
     }
 
     /// `y_j · (e, coef)` in normal form, pushed onto `out` as tower
@@ -1689,7 +1694,13 @@ mod tests {
         let n_f = 2usize;
         let rnd = |rng: &mut rand::rngs::StdRng| -> Vec<u32> {
             let mut e: Vec<u32> = (0..n_t)
-                .map(|_| if rng.gen_bool(0.5) { 0 } else { rng.gen_range(0..4) })
+                .map(|_| {
+                    if rng.gen_bool(0.5) {
+                        0
+                    } else {
+                        rng.gen_range(0..4)
+                    }
+                })
                 .collect();
             e.extend((0..n_f).map(|_| rng.gen_range(0..5)));
             e
@@ -1723,7 +1734,13 @@ mod tests {
         let n_t = 6usize;
         for _ in 0..200 {
             let e: Vec<u32> = (0..n_t)
-                .map(|_| if rng.gen_bool(0.4) { 0 } else { rng.gen_range(0..4) })
+                .map(|_| {
+                    if rng.gen_bool(0.4) {
+                        0
+                    } else {
+                        rng.gen_range(0..4)
+                    }
+                })
                 .collect();
             let tw = x_tw(x_from_exponents(&e, n_t));
             // `lanes_down` walks all vectors ≤ e, descending as a
@@ -1762,7 +1779,14 @@ mod tests {
     fn products_match_a_generic_reduction() {
         let mut rng = rand::rngs::StdRng::seed_from_u64(2027);
         let p = 10007u64;
-        let towers: [&[u8]; 6] = [&[3], &[3, 3], &[2, 3, 2], &[4, 3, 2, 2], &[3, 4, 3], &[4, 4]];
+        let towers: [&[u8]; 6] = [
+            &[3],
+            &[3, 3],
+            &[2, 3, 2],
+            &[4, 3, 2, 2],
+            &[3, 4, 3],
+            &[4, 4],
+        ];
         for radices in towers {
             for n_free in [0usize, 1] {
                 let blocks = if radices.len() <= 2 { 2 } else { 1 };
@@ -1834,8 +1858,15 @@ mod tests {
 
     fn narrow_exps(ring: &TowerRing, m: narrow::Mono) -> Vec<u32> {
         let mask = narrow::mask_of(m);
-        let mut e: Vec<u32> = (0..ring.n_tower()).map(|j| ((mask >> j) & 1) as u32).collect();
-        e.extend(narrow::free_of(m).iter().take(ring.n_free).map(|&x| u32::from(x)));
+        let mut e: Vec<u32> = (0..ring.n_tower())
+            .map(|j| ((mask >> j) & 1) as u32)
+            .collect();
+        e.extend(
+            narrow::free_of(m)
+                .iter()
+                .take(ring.n_free)
+                .map(|&x| u32::from(x)),
+        );
         e
     }
 
@@ -1890,10 +1921,16 @@ mod tests {
         assert_eq!(nrep.degree_reached, xrep.degree_reached, "{tag}");
         assert_eq!(nrep.pairs_above_bound, xrep.pairs_above_bound, "{tag}");
         assert_eq!(nrep.muladds, xrep.muladds, "{tag}");
-        assert_eq!(nrep.critical_pairs_reduced, xrep.critical_pairs_reduced, "{tag}");
+        assert_eq!(
+            nrep.critical_pairs_reduced, xrep.critical_pairs_reduced,
+            "{tag}"
+        );
         assert_eq!(nrep.tower_pairs_reduced, xrep.tower_pairs_reduced, "{tag}");
         assert_eq!(nrep.pairs_chain_skipped, xrep.pairs_chain_skipped, "{tag}");
-        assert_eq!(nrep.pairs_product_skipped, xrep.pairs_product_skipped, "{tag}");
+        assert_eq!(
+            nrep.pairs_product_skipped, xrep.pairs_product_skipped,
+            "{tag}"
+        );
         assert_eq!(nrep.reducer_rows, xrep.reducer_rows, "{tag}");
         assert_eq!(nrep.max_cols, xrep.max_cols, "{tag}");
         assert_eq!(nrep.max_rows, xrep.max_rows, "{tag}");
@@ -2465,14 +2502,10 @@ mod tests {
                 // block exponents (ζ₄-power for ζ₂-power: the same x), and
                 // both engines' staircases count it.
                 let x_of = |d: &Decomp, k: &[usize]| -> Vec<u64> {
-                    k.iter()
-                        .map(|&ki| fp(p).mul(d.g, d.pts[ki][0]))
-                        .collect()
+                    k.iter().map(|&ki| fp(p).mul(d.g, d.pts[ki][0])).collect()
                 };
-                let s4: BTreeSet<Vec<u64>> =
-                    d4.exhaustive().iter().map(|k| x_of(&d4, k)).collect();
-                let s2: BTreeSet<Vec<u64>> =
-                    d2.exhaustive().iter().map(|k| x_of(&d2, k)).collect();
+                let s4: BTreeSet<Vec<u64>> = d4.exhaustive().iter().map(|k| x_of(&d4, k)).collect();
+                let s2: BTreeSet<Vec<u64>> = d2.exhaustive().iter().map(|k| x_of(&d2, k)).collect();
                 assert_eq!(s4, s2, "{tag}");
                 assert_eq!(n4, n2, "{tag}");
                 // The radix-2 solution lifts to the radix-4 ring's by keeping
@@ -2569,7 +2602,10 @@ mod tests {
                 let mut raw = raw;
                 if trial % 2 == 0 {
                     // plant a root
-                    let (a, b) = (vs[rng.gen_range(0..vs.len())], vs[rng.gen_range(0..vs.len())]);
+                    let (a, b) = (
+                        vs[rng.gen_range(0..vs.len())],
+                        vs[rng.gen_range(0..vs.len())],
+                    );
                     let pt = [chain(a), chain(b)].concat();
                     let g = ring.from_raw(&raw);
                     let v = ring.eval(&g, &pt);
@@ -2602,8 +2638,10 @@ mod tests {
                 assert_eq!(gl.is_none(), rep.inconsistent);
                 if let Some(gl) = gl {
                     let lms: Vec<XMono> = rep.basis.iter().map(|b| b.lm().unwrap()).collect();
-                    let mut mine: Vec<Vec<u32>> =
-                        lms.iter().map(|&m| x_exponents(m, ring.n_tower(), 0)).collect();
+                    let mut mine: Vec<Vec<u32>> = lms
+                        .iter()
+                        .map(|&m| x_exponents(m, ring.n_tower(), 0))
+                        .collect();
                     for (j, r) in ring.rules.iter().enumerate() {
                         let mut e = vec![0u32; ring.n_tower()];
                         e[j] = u32::from(r.radix);
@@ -2663,7 +2701,11 @@ mod tests {
             let lms: Vec<XMono> = rep.basis.iter().map(|b| b.lm().unwrap()).collect();
             assert_eq!(x_staircase_at_most(&lms, &ring, 1 << 12), Some(zeros.len()));
         }
-        println!("smoke free-variable radix-3: solutions {}, D {}", zeros.len(), rep.solving_degree_max);
+        println!(
+            "smoke free-variable radix-3: solutions {}, D {}",
+            zeros.len(),
+            rep.solving_degree_max
+        );
     }
 
     #[test]
@@ -2751,8 +2793,16 @@ mod tests {
             (109, &[2, 3, 2, 3]),
         ];
         for (p, radices) in cases {
-            assert_eq!((p - 1) % radices.iter().map(|&r| u64::from(r)).product::<u64>(), 0);
-            for (m, n_eq, d, trial) in [(2usize, 1usize, 3u32, 0usize), (2, 2, 2, 1), (3, 2, 2, 2), (3, 3, 2, 3)] {
+            assert_eq!(
+                (p - 1) % radices.iter().map(|&r| u64::from(r)).product::<u64>(),
+                0
+            );
+            for (m, n_eq, d, trial) in [
+                (2usize, 1usize, 3u32, 0usize),
+                (2, 2, 2, 1),
+                (3, 2, 2, 2),
+                (3, 3, 2, 3),
+            ] {
                 let tag = format!("review p {p} {radices:?} m {m} eq {n_eq} trial {trial}");
                 let dd = Decomp::new(&mut rng, p, radices, m, n_eq, d, 4, trial != 1);
                 check_decomposition(&dd, m * radices.len() <= 7, &tag);
@@ -2771,7 +2821,12 @@ mod tests {
         let n = ring.n_vars();
         let rnd_raw = |rng: &mut rand::rngs::StdRng| -> Vec<(Vec<u32>, u64)> {
             (0..4)
-                .map(|_| ((0..n).map(|_| rng.gen_range(0..2u32)).collect(), rng.gen_range(1..101u64)))
+                .map(|_| {
+                    (
+                        (0..n).map(|_| rng.gen_range(0..2u32)).collect(),
+                        rng.gen_range(1..101u64),
+                    )
+                })
                 .collect()
         };
         for _ in 0..200 {
