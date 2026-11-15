@@ -2041,9 +2041,9 @@ mod tests {
         let mut f = Vec::new();
         let mut q = 2;
         while q * q <= n {
-            if n % q == 0 {
+            if n.is_multiple_of(q) {
                 f.push(q);
-                while n % q == 0 {
+                while n.is_multiple_of(q) {
                     n /= q;
                 }
             }
@@ -2550,7 +2550,7 @@ mod tests {
                             )
                         })
                         .collect();
-                    (pts.len() as u64 == n).then(|| (u, pts))
+                    (pts.len() as u64 == n).then_some((u, pts))
                 })
                 .unwrap();
             let c_top = f.add(f.pow(u, n), f.inv(f.pow(u, n)));
@@ -2612,7 +2612,7 @@ mod tests {
                     raw.push((vec![0; ring.n_vars()], f.neg(v)));
                 }
                 let g = ring.from_raw(&raw);
-                let rep = f4_radix(&[g.clone()], &ring, &TowerF4Options::new(100));
+                let rep = f4_radix(std::slice::from_ref(&g), &ring, &TowerF4Options::new(100));
                 let mut zeros = Vec::new();
                 for a in &vs {
                     for b in &vs {
@@ -2667,7 +2667,7 @@ mod tests {
             n_free: 1,
         };
         let n = ring.n_vars(); // 5: y00 y01 y10 y11 u
-        let sys = vec![
+        let sys = [
             // u − x1 x2
             vec![(vec![0, 0, 0, 0, 1], 1), (vec![1, 0, 1, 0, 0], p - 1)],
             // u² − 5
