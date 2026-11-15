@@ -1,3 +1,21 @@
+# Original-prime native result mirrored; full-group kernel census next
+
+pcc/claims/PCC-20261115-ea9174.json: exact published consumer7a600a2 exports retain native976f50 and inspected two-page report1f3c4c. One unfiltered test0/worker0/supervisor0/all13phases; whole1077orderedrecords/fouractualwhole-class omissions101-nooutput/all1131guards/actualbinarycustody pass. Seven conditional proofroots remain6d8c42, original failed101e62fb2 andformatter-onlycorrectiona3c6eb preserved. [pcc:unverified]
+
+## What was done
+Original ell2773073/order11092292 uses the three frozen supported alternative HLP models and actual prime-subgroup norm/inverse-two reprojection. All18oldrows/672explicitly4projectedexceptionals/384publicpoints/cofactors/additions/originalpublictransfers/12five-routevectors pass native assertions. A known initial elliptic point avoids norm/inverse-two; source-call counts are unpriced. [pcc:unverified]
+
+## Decisions made
+Keep all343 producer scientific inputs and original tools/workflows/policies unchanged. Publish root metadata and next separate prospective full-group finitekernelcompatibility census before any new mask calculation. Fixed D12/D24/D67 negatives and the current prime-only cases remain frozen. [pcc:unverified]
+
+## Open threads
+Finite18vertices/72adjacentpairs/216triples, exhaustive all reasons andwhole-record controls; completeprimitive setup/reuse/knownpoint andprime-fielddescent leads. FuturelargecustodyNEW24 retains fullnative/proof/source/executables/preparedcopies/checkpoint15/reportdrafts, including failed Typst source. [pcc:unverified]
+
+## Errors
+Originalnative01 diagnostic101 andall older mathematical/infrastructure/root-main negatives retained. KB unavailable; autoresearcher vaultlocked andunchanged. Actualgeometry/program bridges, signing/review/conflict/main-ledger/calibratedreference obligations remainopen. [pcc:unverified]
+
+---
+
 # Norm-point reuse result mirrored; next original-prime and cost tasks
 
 pcc/claims/PCC-20261115-21c9c3.json: exact published consumer69ce10b evidence exports mirror unsigned native46008b at51dff2bb. Full695 mathematical records match under the prospective48 counter transformations; one unfiltered test0/all14 phases expected/four whole omissions101/no output/all1099 guards/three actual binaries exact. Same entire finite population and independent elliptic/full-cofactor checks. Three conditional Lean roots pass both original gates and all3 exact bindings36f906; the inspected two-page reportf8d381 is59,050B. [pcc:unverified]
