@@ -31,11 +31,13 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
                                     rf_relation *out, uint32_t cap, uint32_t *n_found, double *seconds);
 extern "C" int rf_cuda_device_present(char *name, int name_len);
 extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, const uint64_t *fb_y,
-                                        uint32_t n_fb, int lookup, uint32_t chunk,
+                                        uint32_t n_fb, const uint64_t *probe_x, uint32_t n_probe,
+                                        int lookup, uint32_t chunk,
                                         uint32_t max_targets, uint32_t cap, void **out);
 extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t *ty, uint32_t n_targets,
                                      rf_relation *out, uint32_t *n_found, double *seconds);
 extern "C" void rf_cuda_session64_destroy(void *h);
+extern "C" int rf_cuda_warmup(void);
 #endif
 
 namespace {
@@ -48,6 +50,7 @@ int run_emulated(const typename F::ctx &f,
     DecompArgs<F> a;
     a.f = f;
     a.fb_x = fbx.data(); a.fb_y = fby.data(); a.n_fb = (uint32_t)fbx.size();
+    a.probe_x = fbx.data(); a.probe_mode = 0;
     a.t_x = tx.data(); a.t_y = ty.data(); a.n_targets = (uint32_t)tx.size();
     a.out = out; a.out_cap = cap;
     uint32_t count = 0;
@@ -189,6 +192,7 @@ struct rf64_session {
     int backend, lookup;
     uint32_t chunk, max_targets, cap;
     std::vector<uint64_t> fbx, fby;           /* Montgomery form */
+    std::vector<uint64_t> px;                 /* probe set, Montgomery form; empty = factor base */
     rf::SortedTableHost sorted;               /* emulation backend's table */
     rf::HashTableHost hash;
     std::vector<uint64_t> mx, my;             /* per-batch scratch */
@@ -196,6 +200,7 @@ struct rf64_session {
 };
 
 extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
+                                   const uint64_t *probe_x, uint32_t n_probe,
                                    uint32_t max_targets, uint32_t cap, const rf_options *opt_in,
                                    rf64_session **out, rf_result *info) {
     rf_options opt = opt_in ? *opt_in : rf_options{RF_BACKEND_AUTO, RF_LOOKUP_AUTO, 0};
@@ -206,28 +211,34 @@ extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint6
     if (opt.lookup != RF_LOOKUP_AUTO && opt.lookup != RF_LOOKUP_SORTED && opt.lookup != RF_LOOKUP_HASH) return RF_ERR_BAD_ARG;
     if (opt.backend != RF_BACKEND_AUTO && opt.backend != RF_BACKEND_EMULATE && opt.backend != RF_BACKEND_CUDA) return RF_ERR_BAD_ARG;
     for (uint32_t i = 0; i < n_fb; i++) if (fb_x[i] >= p || fb_y[i] >= p) return RF_ERR_BAD_ARG;
+    if (probe_x && n_probe == 0) return RF_ERR_BAD_ARG;
+    if (probe_x) for (uint32_t i = 0; i < n_probe; i++) if (probe_x[i] >= p) return RF_ERR_BAD_ARG;
     rf64_session *s = new rf64_session();
     s->f = fp64_ctx_new(p);
     s->backend = resolve_backend(opt.backend);
-    s->lookup = rf::resolve_lookup(opt.lookup, n_fb);
+    s->fbx = rf::to_mont64(s->f, fb_x, n_fb);
+    s->fby = rf::to_mont64(s->f, fb_y, n_fb);
+    if (probe_x) s->px = rf::to_mont64(s->f, probe_x, n_probe);
+    const uint32_t n_keys = probe_x ? n_probe : n_fb;
+    const uint64_t *keys = probe_x ? s->px.data() : s->fbx.data();
+    s->lookup = rf::resolve_lookup(opt.lookup, n_keys);
     s->chunk = opt.chunk;
     s->max_targets = max_targets;
     s->cap = cap ? cap : 1;
-    s->fbx = rf::to_mont64(s->f, fb_x, n_fb);
-    s->fby = rf::to_mont64(s->f, fb_y, n_fb);
     s->cuda = nullptr;
     int rc = RF_OK;
     if (s->backend == RF_BACKEND_CUDA) {
 #if RF_HAVE_CUDA
-        rc = rf_cuda_session64_create(&s->f, s->fbx.data(), s->fby.data(), n_fb, s->lookup, s->chunk,
-                                      max_targets, s->cap, &s->cuda);
+        rc = rf_cuda_session64_create(&s->f, s->fbx.data(), s->fby.data(), n_fb,
+                                      probe_x ? s->px.data() : nullptr, probe_x ? n_probe : 0,
+                                      s->lookup, s->chunk, max_targets, s->cap, &s->cuda);
 #else
         rc = RF_ERR_NO_CUDA;
 #endif
     } else if (s->lookup == RF_LOOKUP_HASH) {
-        s->hash = rf::build_hash<FieldFp64>(s->f, s->fbx.data(), n_fb);
+        s->hash = rf::build_hash<FieldFp64>(s->f, keys, n_keys);
     } else {
-        s->sorted = rf::build_sorted<FieldFp64>(s->f, s->fbx.data(), n_fb);
+        s->sorted = rf::build_sorted<FieldFp64>(s->f, keys, n_keys);
     }
     if (rc != RF_OK) {
         delete s;
@@ -281,6 +292,7 @@ extern "C" int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const
     DecompArgs<FieldFp64> a;
     a.f = s->f;
     a.fb_x = s->fbx.data(); a.fb_y = s->fby.data(); a.n_fb = (uint32_t)s->fbx.size();
+    a.probe_x = s->px.empty() ? s->fbx.data() : s->px.data(); a.probe_mode = s->px.empty() ? 0u : 1u;
     a.t_x = s->mx.data(); a.t_y = s->my.data(); a.n_targets = n_targets;
     a.out = out; a.out_cap = cap;
     a.out_count = &found;
@@ -299,6 +311,13 @@ extern "C" void rf64_session_destroy(rf64_session *s) {
     if (s->cuda) rf_cuda_session64_destroy(s->cuda);
 #endif
     delete s;
+}
+
+extern "C" int rf_warmup(void) {
+#if RF_HAVE_CUDA
+    if (rf_cuda_available()) return rf_cuda_warmup();
+#endif
+    return 0;
 }
 
 extern "C" int rf_cuda_available(void) {

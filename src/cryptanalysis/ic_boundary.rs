@@ -8833,6 +8833,19 @@ impl PairTable {
 
     /// Indices `(i, j)` with `P_i + P_j = target`, if the table holds a
     /// pair summing to `±target`; one probe, at most one addition.
+    /// The abscissae of the stored sums, ascending (`key >> 1 = x + 1` on a
+    /// prime curve), for a table held in its plain map (`build`,
+    /// `build_negation_folded`); `None` for the blocked, packed and line
+    /// layouts.  `rootfind-subtract-gpu` (`m = 3`) probes this set on the device.
+    pub(crate) fn map_abscissae(&self) -> Option<Vec<u64>> {
+        if !self.parts.is_empty() || self.packed.is_some() || self.lines.is_some() {
+            return None;
+        }
+        let mut xs: Vec<u64> = self.map.keys().map(|k| k - 1).collect();
+        xs.sort_unstable();
+        Some(xs)
+    }
+
     pub fn probe<G: CountedGroup>(
         &self,
         g: &G,

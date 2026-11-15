@@ -3385,6 +3385,11 @@ impl RootfindSubtractOracle<'_> {
         Some((self.field?, &self.reps))
     }
 
+    /// The pair table's abscissae (`m = 3`), for the device probe set.
+    pub(crate) fn pair_abscissae(&self) -> Option<Vec<u64>> {
+        self.table.as_ref()?.map_abscissae()
+    }
+
     /// What `decompose` charges for a target before its first candidate:
     /// the two conversions into Montgomery form and the batched inversion
     /// over the `k` abscissae.
