@@ -142,7 +142,10 @@ names below can be launched (decision D2), each at most once, in this order: cel
      before the API call, and appends one JSON line per `pkm-x-` pod to `reaper/reap-YYYYMMDD.jsonl`. The main session
      schedules it as a scheduled check-in at intervals of at most 4 h while any study pod exists. It takes the same
      per-name lock as `run.sh` and `fetch.sh`; a pod whose lock is held is skipped for that pass, and the skip is
-     recorded (review round 3, S1).
+     recorded (review round 3, S1). A pass that skipped a due pod for a held lock still exits 0 (the pod is not
+     counted as left over); the skip is visible only on stderr and as a "skipped: lock held" line in the reaper's JSONL.
+     The session therefore reads that JSONL after every reaper pass and runs the pass again once the lock is free; a due
+     pod skipped this way is never left until the next scheduled pass (validator observation, revision 4).
    - **One worst-case pod life, used everywhere (S7).** A pod lives at most until its hard deadline (26 h) plus one
      reaper interval (4 h): **30 h, US$31.20 at US$1.04/h.** The per-run guard (price × 30 h ≤ US$40), the open ledger
      rows and the US$400 check all use these 30 h.
