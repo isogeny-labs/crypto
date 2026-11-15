@@ -1,0 +1,1016 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PRIME-MEDIUM-RHO-P4-CONFIRM-20261108",
+  "version": 1,
+  "created": "2026-11-08",
+  "repository": "crypto",
+  "study_dir": "research/prime_medium_rho_p4_confirm_20261108",
+  "authors": [
+    "Claude Code subagent (slug r2p4), 2026-11-08"
+  ],
+  "links": {
+    "narrative": "PROTOCOL.md",
+    "curves": "curves.json",
+    "seeds": "seeds.json",
+    "specs": "specs/",
+    "spec_ids": "specs/spec-ids.json",
+    "requests": "requests/",
+    "builder": "build_study.py",
+    "analysis": "analysis/p4_confirm.py",
+    "power": "analysis/power_from_old_variance.py",
+    "cost": "analysis/cost_model.py",
+    "predecessor": "research/prime_medium_tier_rho_20261107 (PROTOCOL.md section 7 P4, RESULTS.md verdict inconclusive)",
+    "owner_decision": "research/open_leads_execution_20261108/DECISIONS.md",
+    "analysis_command": "python3 -I -B analysis/p4_confirm.py analyze --session sessions/M1 --audit sessions/M1.audit.json ... --session sessions/PC --audit sessions/PC.audit.json --seeds seeds.json --spec-ids specs/spec-ids.json --planned-pairs 2160 --out analysis/result.json",
+    "analysis_tested_on": "synthetic data only (tests/selftest-output.json, p4_confirm.py selftest)",
+    "script_sha256": [
+      "01e6270937bbf3919bb8c37d94919a51c112d19ba4fa8335bc8f36a1e439e194  analysis/p4_confirm.py",
+      "04c0dddbe21b6d7c6754fc4e13b5162d8faa6e59ae1a4cfc186326d70a703fc0  analysis/power_from_old_variance.py",
+      "149645339803f261c13d10d0ce574b0111fcf51240034ef8293461461d10ddb2  analysis/cost_model.py",
+      "1322b90568ea5ae2d66da131aa6f0854c4fb51c929f5e73cde37ff086a8a6b2a  build_study.py"
+    ],
+    "input_sha256": [
+      "7b36f7c8047ec47e63a83c7796fa7532a8b5ca5e5223a6c6ae2c25f477991322  curves.json",
+      "02e854e8cb819768ceb9d2b7d5ca8d98f2bcf283ea55272d7fd34c2238926b8d  seeds.json",
+      "30854efed4314040e649386aa8d928919b6608a20a7ef07fe0e674ab55535bdc  specs/spec-ids.json",
+      "203243059203295bee3398fc3e9baa64d6b763626c2962f497f2161d9abd0520  specs/M1.json",
+      "1905803c909933da8f9c2f387107bb99a74c70bd9700699df329a8c8e9742a8c  specs/M2.json",
+      "f7758a5a3488605eb6e3ac1b2b7a6ec09a059ce155832f84e63d3304794c72d1  specs/M3.json",
+      "7505d9e7b33983df7604590cf1f0ef44b1239d5e50f7aac789f70e0a66452fd6  specs/M4.json",
+      "a2a74f58faf29b7e6e6a0c13c716a2a71b473213611274ab807d920a8eba84e8  specs/M5.json",
+      "59cabee6ffc20e3887e799c62ca9c044c2902c2e4158f9d03edea2337ebc02ba  specs/M6.json",
+      "0d08631d28e7b485dfaf899cb841b16f8b283f780eb455329531af4394103cd5  specs/M7.json",
+      "dceb3a228259b0af1a4e6b94ec31e461952aa4f80241a6328944626fae3e4889  specs/M8.json",
+      "8dfa79c3918de980f925dec9b860147b4627974ba17a7fb2f3585e6289df612c  specs/M9.json",
+      "1ac9d9a185a229524de15eec7951f2361a49b1b1f1626205c7c492b253c32b97  specs/PC.json"
+    ]
+  },
+  "question": "On the medium prime tier (the ten generic prime-order curves at log2 r 32-49 of research/prime_medium_tier_rho_20261107), what is the pooled paired rho.plain / rho.negation operation-count ratio at w = 0, does its 95% interval exclude 1.2 from below, and is it consistent with sqrt 2 = 1.414 or with the 2026-11-07 point value of about 1.285?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every admitted run recovers the planted logarithm and every measured run replays exactly (pod verify --replay-all and a local re-audit).",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "The pooled curve-equal ratio theta = mean S(rho.plain) / mean S(rho.negation) at w = 0 is classified by the PROTOCOL.md section 9 table as confirm_sqrt2, exceeds_1.2_below_sqrt2, exceeds_sqrt2, below_1.2 or inconclusive.",
+      "class": "comparative",
+      "decided_by": [
+        "C-primary",
+        "C-null-split",
+        "C-positive"
+      ],
+      "if_supported": "report the verdict and theta with its interval; the 2026-11-07 P4 stays inconclusive (this study does not re-decide it)",
+      "if_not_supported": "inconclusive: report which gate failed"
+    },
+    {
+      "id": "C3",
+      "text": "The estimator and harness resolve a known ratio: bsgs.textbook / bsgs.negation, expected 1.5 (methods::expected_s), on the same curves, with its 95% interval excluding 1.2 from below and 1.5 inside its 99% interval.",
+      "class": "comparative",
+      "decided_by": [
+        "C-positive"
+      ],
+      "if_supported": "C2 is decidable",
+      "if_not_supported": "C2 is inconclusive"
+    },
+    {
+      "id": "C4",
+      "text": "Where theta falls short of sqrt 2, the shortfall is attributed (secondary, predeclared) to charged negation-map overhead (look-ahead additions, escape doublings, set-up, starts, verification) or to the walk itself (theta_steps below sqrt 2), with a size trend and the look-ahead heuristic sqrt2/(1+1/32) reported beside it.",
+      "class": "heuristic_estimate",
+      "decided_by": []
+    },
+    {
+      "id": "C5",
+      "text": "Nothing here is a statement about cryptographic sizes, wall-clock speed-up of the negation map, or a lower bound on ECDLP; it is not a new IC result and changes no leaderboard row.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "At these sizes ecbench's rho.negation saves less than sqrt 2 in charged operations over rho.plain: theta is about 1.30, its interval excludes 1.2 from below and lies below sqrt 2.",
+      "mechanism": "rho.plain sits near its floor (R about 1.01) while rho.negation pays the Wiener-Zuccherato look-ahead (about 1/32 extra additions per step, charged), cycle escapes and possibly a larger walk-randomness penalty of a 16-jump r-adding walk on classes",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "theta_w0",
+          "direction": "equal_within",
+          "minimum_effect": "point about 1.30; 95% interval inside [1.20, 1.414): verdict exceeds_1.2_below_sqrt2",
+          "provenance": {
+            "written_at": "2026-11-08",
+            "data_seen": [
+              {
+                "path": "research/prime_medium_tier_rho_20261107/RESULTS.md",
+                "measured": "P4 per job: J1 1.285 [1.177, 1.404] (48 workloads), J2 1.286 [1.094, 1.512], J3-J6 1.352/1.414/1.663/1.217 (4 workloads each); bound constants S rho.plain 1.270, rho.negation 0.969"
+              },
+              {
+                "path": "research/prime_medium_tier_rho_20261107/sessions/J1..J6/comparisons/rho-neg__rho-plain.json",
+                "measured": "per-workload means used for the variance in analysis/power.json"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "new seeds and new workloads only (seeds.json disjoint, workload ids and algorithm seeds checked disjoint against the old plans)"
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P2",
+          "metric": "theta_steps",
+          "direction": "lower",
+          "minimum_effect": "point about 1.35, 95% interval below sqrt 2 (attribution walk_level_shortfall)",
+          "provenance": {
+            "written_at": "2026-11-08",
+            "data_seen": [
+              {
+                "path": "research/prime_medium_tier_rho_20261107/RESULTS.md",
+                "measured": "rho.negation 1.093 x floor and rho.plain R 1.014 at w = 0; the decomposition was not computed there"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P3",
+          "metric": "pc_ratio",
+          "direction": "equal_within",
+          "minimum_effect": "1.50 within +-0.05; 95% interval lower end above 1.2",
+          "provenance": {
+            "written_at": "2026-11-08",
+            "data_seen": [
+              {
+                "path": "src/cryptanalysis/ecbench/methods.rs@dbd587a01a expected_s",
+                "measured": "derived constants bsgs.textbook 1.5, bsgs.negation 1.0"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P4",
+          "metric": "aa_split",
+          "direction": "equal_within",
+          "minimum_effect": "even/odd-round ratios of rho-neg and of rho-plain each inside their 97.5% interval around 1; rho-neg-aa counts identical to rho-neg in every pair",
+          "provenance": {
+            "written_at": "2026-11-08",
+            "data_seen": [
+              {
+                "path": "research/prime_medium_tier_rho_20261107/RESULTS.md",
+                "measured": "A/A paired counts exactly 1.0000 in every job"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P5",
+          "metric": "theta_band",
+          "direction": "different",
+          "minimum_effect": "theta about 1.18 at w = 0.1 and about 0.65 at w = 1 (canonicalisations priced); band order unresolved",
+          "provenance": {
+            "written_at": "2026-11-08",
+            "data_seen": [
+              {
+                "path": "research/prime_medium_tier_rho_20261107/sessions/J1/comparisons/rho-neg__rho-plain.json",
+                "measured": "J1 band ratios 1.285 / 1.169 / 0.643 at w = 0 / 0.1 / 1"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "literature": [
+    {
+      "ref": "Wiener and Zuccherato, Faster attacks on elliptic curve cryptosystems, SAC 1998",
+      "provenance": "recalled",
+      "claim": "the negation map halves the classes, an ideal sqrt 2 saving in expected steps, and fruitless cycles appear; the look-ahead against 2-cycles",
+      "verified_by": null
+    },
+    {
+      "ref": "Bos, Kleinjung and Lenstra, On the use of the negation map in the Pollard rho method, ANTS IX 2010",
+      "provenance": "recalled",
+      "claim": "with r-adding walks, fruitless cycles and their handling make the practical negation-map gain smaller than sqrt 2",
+      "verified_by": null
+    },
+    {
+      "ref": "Bernstein, Lange and Schwabe, On the correct use of the negation map in the Pollard rho method, PKC 2011",
+      "provenance": "recalled",
+      "claim": "fruitless-cycle frequency for additive walks with r jumps (2-cycles about 1/(2r) per step without look-ahead, 4-cycles about (r-1)/(4 r^3)); with enough jumps and cheap cycle handling the gain approaches sqrt 2",
+      "verified_by": null
+    },
+    {
+      "ref": "Teske, On random walks for Pollard's rho method, Math. Comp. 2001",
+      "provenance": "recalled",
+      "claim": "r-adding walks with r of about 16-20 perform close to a random walk; the heuristic expected-length penalty is about 1/sqrt(1 - 1/r)",
+      "verified_by": null
+    },
+    {
+      "ref": "src/cryptanalysis/ic_boundary.rs@dbd587a01a (RhoWalk::negation, TunedWalker::walk, rho_jumps_for, WalkShape::of)",
+      "provenance": "internal",
+      "claim": "rho.negation: 16 jumps for r above 2^22, distinguished-point bits floor(bits(r)/4), look-ahead on, a 16-point cycle window with escape by doubling the least-key point, abandon on re-entry, no Brent detection, walk cap 20*2^dp+64 steps; every addition and doubling charged, canonicalisations uncharged",
+      "verified_by": "read at the instrument revision for this protocol"
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation, the denominator of theta",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "ecbench_arm": "rho-neg",
+        "jobs": "M1-M9",
+        "image": "isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation again with the same algorithm seeds: determinism of counts (exact) and the wall-time noise floor the EKS gate needs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation",
+        "ecbench_arm": "rho-neg-aa",
+        "jobs": "M1-M9"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-plain",
+      "role": "baseline",
+      "description": "rho.plain, the numerator of theta",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.plain",
+        "ecbench_arm": "rho-plain",
+        "jobs": "M1-M9"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-v2",
+      "role": "candidate",
+      "description": "rho.negation_v2 (Brent detection of cycles longer than the window, lost-walk counters): secondary only, for the fruitless-cycle analysis",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation_v2",
+        "ecbench_arm": "rho-neg-v2",
+        "jobs": "M1-M9"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "bsgs-neg",
+      "role": "control_positive",
+      "description": "bsgs.negation (declared S 1.0): denominator of the positive control",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.negation",
+        "ecbench_arm": "bsgs-neg",
+        "jobs": "PC"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "bsgs-neg-aa",
+      "role": "control_aa",
+      "description": "bsgs.negation again (A/A of the positive-control job; the EKS gate needs a control arm)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.negation",
+        "ecbench_arm": "bsgs-neg-aa",
+        "jobs": "PC"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "bsgs-tb",
+      "role": "control_positive",
+      "description": "bsgs.textbook (declared S 1.5): numerator of the positive control, known ratio 1.5",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "bsgs.textbook",
+        "ecbench_arm": "bsgs-tb",
+        "jobs": "PC"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-split-half",
+      "role": "control_negative",
+      "description": "analysis-defined arm, no extra execution: the rho-neg and rho-plain rows of even measured rounds read against those of odd measured rounds (same method, independent algorithm seeds); a known-null input (ratio 1) through the same estimator",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "flags": {
+          "target": "x86_64-unknown-linux-musl",
+          "rustflags": "-C target-cpu=x86-64",
+          "default_features": "false"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "method": "rho.negation and rho.plain",
+        "ecbench_arm": "rho-neg, rho-plain (rounds split by parity)",
+        "jobs": "M1-M9"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa-det",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "bsgs-tb",
+      "expected_detection": "PC job: curve-equal ratio of mean S bsgs-tb / bsgs-neg through the same estimator; 95% interval lower end above 1.2 and 1.5 inside the 99% interval; a miss makes C2 inconclusive",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "rho-split-half",
+      "null_population": {
+        "description": "known-null input: the split-half arm rho-split-half (even against odd measured rounds of one method, independent algorithm seeds, expected ratio 1) through the same estimator; and the ten exchangeable random generic prime-order curves (two per size) as the null population for a curve effect on theta (Cochran Q on ln theta_c, reported, not a gate)",
+        "generator": "prime_orbit_index_calculus::generate_instance(generic, bits, seed), resolved and frozen in research/prime_medium_tier_rho_20261107/curves.json",
+        "n": 10,
+        "why_n": "the same curves as the study being confirmed (no superset), so the two studies differ only in seeds; 10 curves give 9 dof for the heterogeneity test",
+        "matched_on": [
+          "prime field",
+          "prime group order (cofactor 1)",
+          "automorphisms available 2 (negation only)",
+          "medium tier (field bits 33-49)",
+          "same instrument, arms and seeds policy"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho.plain",
+          "rho.negation",
+          "rho.negation_v2",
+          "bsgs.textbook",
+          "bsgs.negation"
+        ]
+      },
+      {
+        "name": "pricing_weight",
+        "levels": [
+          "0",
+          "0.1",
+          "1"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "ecbench sha256 a18af09f..., image isolab/tasks@sha256:292bdc3d..., source dbd587a01a, for every arm and job (the instrument of the 2026-11-07 study)",
+        "how": "job.build in every request; session.json binary_sha256 checked by the analysis script"
+      },
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "the ten curves of curves.json",
+        "how": "curve-equal weights in theta; Cochran Q diagnostic"
+      },
+      {
+        "name": "size",
+        "treatment": "fixed",
+        "value": "field bits 33, 37, 41, 45, 49 (two curves each)",
+        "how": "size trend slope reported, secondary"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "how": "planted uniform_scalar_sha256_v1 from ten new target-seed blocks K01-K10; 36 per curve (16 per curve in PC)"
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "ecbench derives one seed per (workload, round) from the job's measurement seed, shared by every arm (paired); checked disjoint from the 560 old ones"
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "order alternate over 6 measured rounds after 1 warm-up (balanced)"
+      },
+      {
+        "name": "job",
+        "treatment": "measured",
+        "how": "sizes are nested in jobs (M1: 33-41 bits; M2-M3: 45; M4-M6: 49 curve 1; M7-M9: 49 curve 2); counts are job-independent; job is a cluster only through its target block, which the workload bootstrap resamples"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "EKS cpu-l2-spot c8a.2xlarge, isolation recorded per row; counts are host-independent; wall time is not a metric of this study beyond the pod gate"
+      },
+      {
+        "name": "spot_preemption",
+        "treatment": "measured",
+        "how": "an interrupted session is incomplete, kept, excluded, and rerun once under a new job name (PROTOCOL.md section 10)"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "every figure comes from analysis/p4_confirm.py (sha256 pinned below) on the downloaded sessions; no analyst choice remains after freeze"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-primary",
+        "arms": [
+          "rho-neg",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "threshold": "1.2 (lower end) and sqrt 2 (PROTOCOL.md section 9)"
+      },
+      {
+        "id": "C-aa-det",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "threshold": "every pair's counts identical"
+      },
+      {
+        "id": "C-null-split",
+        "arms": [
+          "rho-split-half"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "even/odd-round ratio of rho-neg and of rho-plain: 1 inside each 97.5% interval (Bonferroni over two); a miss makes C2 inconclusive"
+      },
+      {
+        "id": "C-positive",
+        "arms": [
+          "bsgs-neg",
+          "bsgs-tb"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "threshold": "95% lower end above 1.2; 1.5 inside the 99% interval"
+      },
+      {
+        "id": "C-v2",
+        "arms": [
+          "rho-neg-v2",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor",
+        "threshold": "none (secondary)"
+      },
+      {
+        "id": "C-band",
+        "arms": [
+          "rho-neg",
+          "rho-plain"
+        ],
+        "differs_in": [
+          "method",
+          "pricing_weight"
+        ],
+        "design": "factorial",
+        "threshold": "order reported only where it holds at w = 0, 0.1 and 1"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        259261276268747,
+        58898508776987,
+        131557798055508,
+        230559409661136,
+        112559572458697,
+        134742999582066,
+        50033655736337,
+        239703336658961,
+        98200427807618,
+        225203915520274,
+        249115091267486,
+        68345070444546,
+        48503903392925,
+        38659607828687,
+        124745887533118,
+        121887317757250,
+        86164594671542,
+        31435994005288,
+        69004135767548,
+        47075202384453,
+        47393111417401,
+        52762206010099,
+        263411560565113
+      ],
+      "nonce": null,
+      "note": "seeds.json: seed(tag) = int(SHA-256('prime_medium_rho_p4_confirm_20261108/v1/' + tag)[0:12 hex], 16) for ten target blocks, ten measurement seeds and three analysis bootstrap seeds, written before any data; build_study.py asserts none equals a value of research/prime_medium_tier_rho_20261107/seeds.json; ecbench derives the per-run algorithm seeds from them"
+    },
+    "instance_sampling": {
+      "rule": "curves fixed (curves.json); targets uniform planted scalars from the block's target seed; algorithm seeds derived by ecbench",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "no analyst step remains: the frozen script computes every figure and the verdict from the sessions; the method identity is part of the accounting (unpriced counters, A) and cannot be masked from the script",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 456,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "analysis/power.json, from the OLD run's variance only: curve-centred per-run CV 0.41 (rho-neg) and 0.56 (rho-plain), pair correlation -0.22 [-0.43, 0.02] over 80 workloads; the delta method reproduces the old J1 half-width (0.113 vs 0.1135 observed). Target: 95% half-width <= 0.05, because sqrt 2 - 1.285 = 0.129 > 2 x 0.05 (one interval cannot contain both references) and 1.285 - 0.05 > 1.2. 10 curves x 36 targets x 6 rounds = 2160 pairs: delta-method half-width 0.041 at theta 1.285 and 0.046 at sqrt 2 at rho -0.22 (0.045 / 0.049 at rho -0.43). Simulation (200 designs x 2000 resamples per truth, lognormal pairs): median half-width 0.041-0.048, P(half-width <= 0.05) 0.75-1.00, coverage 0.93-0.955; truth 1.285 gives exceeds_1.2_below_sqrt2 with probability 0.965-0.98 (else inconclusive), truth sqrt 2 gives confirm_sqrt2 with probability 0.935. With rho at its lower end 2094 pairs reach 0.05 at sqrt 2, hence 36 targets per curve (2160 pairs). The 1.2 decision is a single interval (no correction); the split-half A/A uses Bonferroni over two (97.5% intervals)."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 3600,
+      "per_sample_seconds": 0,
+      "threads": 1,
+      "estimated_total_seconds": 17383,
+      "measured_on": "analysis/cost.json: model = settle 60 s + (rounds+warmup) x targets x sum sqrt(r) x sum_arms S x ns/GAE + replay of measured runs + 2 x 5 ms per execution, with S and the largest ns/GAE per arm of the 2026-11-07 c8a.2xlarge L2 jobs (rho-neg 122.8, rho-plain 116.6, rho-neg-v2 123.3, bsgs 155.8 ns/GAE); the model reproduces the six old session walls within 0.83-1.06; pod walls 459-1921 s per job (47-87% under the 3600 s cap), 14383 s of pod time, plus an assumed 300 s provisioning per job"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "theta_w0",
+        "name": "pooled paired rho.plain / rho.negation operation-count ratio",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "over every complete pair (workload, measured round) of jobs M1-M9: theta = mean over the 10 curves of (mean S rho-plain over the curve's pairs) / mean over the 10 curves of (mean S rho-neg over the curve's pairs), S = total_gae / sqrt(r), every phase charged, w = 0",
+        "source": "analysis/p4_confirm.py analyze",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "pc_ratio",
+        "name": "positive control bsgs.textbook / bsgs.negation",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "the primary estimator on job PC (bsgs-tb over bsgs-neg)",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "aa_split",
+        "name": "split-half A/A ratios",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "curve-equal mean S over even measured rounds / over odd measured rounds, for rho-neg and for rho-plain",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "theta_band",
+        "name": "theta at w = 0.1 and w = 1",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "theta with S_w = (total_gae + w x sum of the record's cost.unpriced counters) / sqrt(r)",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "paired_bootstrap_ci95",
+        "formula": "S_w = (total_gae + w * sum(counters[k] for k in cost.unpriced)) / sqrt(r)"
+      },
+      {
+        "id": "theta_steps",
+        "name": "walk-step ratio",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "theta with counters.steps / sqrt(r) in place of S (look-ahead additions, escape doublings, set-up, starts and verification removed)",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "paired_ratio",
+        "resolution": "1 step",
+        "uncertainty": "paired_bootstrap_ci95",
+        "formula": "theta_steps = curve-equal mean(steps_plain/sqrt r) / curve-equal mean(steps_neg/sqrt r)"
+      },
+      {
+        "id": "neg_overhead",
+        "name": "rho.negation charged overhead per step",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "curve-equal ratios of look_ahead_additions, cycle_escape_doublings, setup_additions, setup_doublings, start_additions, verification_operations to steps",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95",
+        "formula": "sum counter / sum steps per curve, curve-equal"
+      },
+      {
+        "id": "theta_v2",
+        "name": "rho.plain / rho.negation_v2",
+        "unit": "dimensionless",
+        "kind": "counted",
+        "definition": "the primary estimator with rho-neg-v2 as denominator; and v2 lost_walk_steps over its total",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "paired_ratio",
+        "resolution": "1 GAE",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "size_trend",
+        "name": "slope of ln theta_c on log2 r",
+        "unit": "per bit",
+        "kind": "derived",
+        "definition": "OLS over the 10 curves, interval from the same bootstrap",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "per_row",
+        "resolution": "n/a",
+        "uncertainty": "bootstrap_ci95",
+        "formula": "slope of ln(theta_c) = a + b log2(r_c)"
+      },
+      {
+        "id": "R_vs_floor",
+        "name": "R of each rho arm",
+        "unit": "dimensionless",
+        "kind": "derived",
+        "definition": "curve-equal mean S over sqrt(pi/2) (rho.plain) or sqrt(pi/4) (rho.negation, _v2)",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "mean",
+        "resolution": "1 GAE",
+        "uncertainty": "bootstrap_ci95",
+        "formula": "R = mean S / declared S"
+      },
+      {
+        "id": "fruitless_cycles",
+        "name": "fruitless cycles, capped and abandoned walks per walk",
+        "unit": "per walk",
+        "kind": "counted",
+        "definition": "rho.negation counters cycles_length_2, cycles_length_4, cycles_other_length, walks_capped, walks_abandoned_in_a_cycle over walks, per curve",
+        "source": "analysis/p4_confirm.py",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "total_gae",
+      "phases",
+      "steps",
+      "look_ahead_additions",
+      "cycle_escape_doublings",
+      "setup_additions",
+      "setup_doublings",
+      "start_additions",
+      "verification_operations",
+      "cycles_length_2",
+      "cycles_length_4",
+      "cycles_other_length",
+      "walks",
+      "walks_capped",
+      "walks_abandoned_in_a_cycle",
+      "lost_walk_steps (v2)",
+      "every *_uncharged counter"
+    ],
+    "record": [
+      "binary_sha256",
+      "spec_id",
+      "env_class_id",
+      "isolation",
+      "run_cpu",
+      "threads",
+      "algorithm_seed"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "ten jobs (M1-M9, PC), each once; fixed N; PC first",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "a per-execution timeout (300 s) or exhaustion is a censored row kept in the session; more than 1% censored in any arm makes the verdict inconclusive",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "an incomplete session (Spot loss, launcher failure, job timeout) is kept and rerun once under a new job name with the identical spec; a second failure leaves that job out; the analysis runs on the completed sessions and is inconclusive if fewer than 90% of the planned 2160 pairs are complete",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "a complete session with a passing audit is admitted for counts even if the pod's L2 wall gate failed (exit 42/43); no wall time is reported",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "PROTOCOL.md section 9. Gates G1 (every session complete, its audit ok with replay-all, frozen binary and spec ids), G2 (rho-neg-aa counts identical to rho-neg in every pair), G3 (positive control: bsgs-tb/bsgs-neg 95% lower end above 1.2 and 1.5 inside its 99% interval, its A/A identical), G4 (split-half A/A: even/odd ratios of rho-neg and rho-plain each with 1 inside the 97.5% interval), G5 (censoring at most 1% per arm), G6 (at least 90% of planned pairs). If any gate fails: inconclusive. Otherwise, with [L, U] the 95% interval of theta: L > 1.2 and L <= sqrt 2 <= U: confirm_sqrt2; L > 1.2 and U < sqrt 2: exceeds_1.2_below_sqrt2; L > sqrt 2: exceeds_sqrt2; U < 1.2: below_1.2; otherwise (1.2 inside [L, U]): inconclusive. Reported beside it, never changing it: whether 1.285 lies inside [L, U], whether the half-width is at most 0.05, and the section 9a secondaries. Tie-break: an endpoint within 0.002 of 1.2 or sqrt 2 is recomputed with 200000 resamples (seed tag analysis/bootstrap-large) and that interval decides.",
+    "comparison_ids": [
+      "C-primary",
+      "C-null-split",
+      "C-positive"
+    ],
+    "threshold": "1.2 (lower end of the 95% interval) and sqrt 2",
+    "statistic": "curve-equal ratio of mean S, w = 0",
+    "interval": "stratified (by curve) workload-cluster bootstrap, 20000 resamples, seed from seeds.json tag analysis/bootstrap, percentile type 7",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "theta and its distance to sqrt 2 and to 1.285",
+    "verdict_vocabulary": [
+      "confirm_sqrt2",
+      "exceeds_1.2_below_sqrt2",
+      "exceeds_sqrt2",
+      "below_1.2",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/prime_medium_rho_p4_confirm_20261108/analysis/p4_confirm.py",
+      "sha256": "01e6270937bbf3919bb8c37d94919a51c112d19ba4fa8335bc8f36a1e439e194"
+    },
+    "inputs": [
+      "sessions/M1..M9, sessions/PC (records.jsonl, session.json) downloaded from the pods",
+      "sessions/<job>.audit.json (local ecbench verify --replay-all with the frozen binary)",
+      "seeds.json",
+      "specs/spec-ids.json"
+    ],
+    "outputs": [
+      "analysis/result.json",
+      "reports/ (research-visuals)"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "theta with interval against sqrt 2, 1.285 and 1.2",
+      "per-curve theta_c against log2 r",
+      "band theta at w = 0, 0.1, 1",
+      "rho.negation overhead decomposition"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "pooling any session, record or ratio of research/prime_medium_tier_rho_20261107 into theta or its interval",
+    "changing curves, seeds, targets, rounds, arms, unit, accounting, weights, estimator, resample count or seed, or thresholds after any data",
+    "dropping or rerunning individual executions; rerunning a complete session because of its numbers",
+    "reading a secondary (attribution, size trend, band, v2) as the verdict",
+    "quoting local or non-L2 wall time; reading wall time as a negation-map speed-up",
+    "using the --dev mode of the analysis script for the reported result"
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "26fd5c574d585f57d39cf298dbfb48b3569d952c1693526e253853bfca02ae0c",
+    "commit": "de0e7026b0f1718c8ed15118c61c280fc4eaffb9",
+    "frozen_at": "2026-11-08T05:12:02Z",
+    "filed_before_affected_data": true
+  }
+}

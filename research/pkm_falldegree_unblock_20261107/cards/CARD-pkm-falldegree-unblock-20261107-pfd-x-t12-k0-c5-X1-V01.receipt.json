@@ -1,0 +1,377 @@
+{
+  "card_id": "CARD-pkm-falldegree-unblock-20261107-pfd-x-t12-k0-c5-X1-V01",
+  "card_path": "research/pkm_falldegree_unblock_20261107/cards/CARD-pkm-falldegree-unblock-20261107-pfd-x-t12-k0-c5-X1-V01.yaml",
+  "card_sha256": "262cf7725800bd3e6a48afe1cf071aba2559f2d958d716f7fc57f2bdcaf9da97",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "68dc62e40a15a05472083d2208e27a373f0a04ea",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "68dc62e40a15a05472083d2208e27a373f0a04ea",
+        "HEAD",
+        "--",
+        "research/pkm_falldegree_unblock_20261107",
+        ":(exclude)research/pkm_falldegree_unblock_20261107/cards",
+        ":(exclude)research/pkm_falldegree_unblock_20261107/receipts",
+        ":(exclude)research/pkm_falldegree_unblock_20261107/results",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "cc6573af0782aa2ed6bdb47059613fe9e1b75713cef9ac30784e8be2404e73ab",
+        ".provenance.protocol_sha256 == $h",
+        "research/pkm_falldegree_unblock_20261107/requests_r2f/pfd-x-t12-k0-c5.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "pfd-x-t12-k0-c5-20261108",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/wait_command_status.sh",
+        "research/pkm_falldegree_unblock_20261107/cards/status_request_pfd-x-t12-k0-c5.json",
+        "pfd-x-t12-k0-c5-20261108",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/collect-v01",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 54.168,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "status-once",
+      "index": 5,
+      "outputs": {
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/collect-v01/final-status.json": "2b87c2662f9539c5c419404907309dfaa23a7e8689832757bf7fd4b5920f73b9"
+      },
+      "seconds": 54.168,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "901419c1cb6b4b24eaa829fb5534913f998765975fd7dd153c50db923224e428",
+      "stdout_tail": [
+        "2026-11-10T01:17:41Z poll 1 launcher_exit 0 state succeeded",
+        "{\"state\":\"succeeded\",\"job_name\":\"pfd-x-t12-k0-c5-20261108\",\"job_uid\":\"ab749aec-0a16-4e40-bd48-74aedde7c414\",\"pods\":[],\"launcher\":\"isolab-experiment-launcher:31b85532-b08c-41db-8e62-ecde67a93f65\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/pfd-x-t12-k0-c5-20261108/launcher/31b85532-b08c-41db-8e62-ecde67a93f65/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/status_with_audit_pod.sh",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/collect-v01/final-status.json",
+        "2026-11-08T00:00:00Z",
+        "2026-11-10T01:15:10Z",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/collect-v01/status-with-audit-pod.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 130.561,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pod-from-audit",
+      "index": 6,
+      "outputs": {
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/collect-v01/status-with-audit-pod.json": "9f612aed1f61ba66d9d8a98ed3a3f685004e12c12ea5a2797396be12155f01dd"
+      },
+      "seconds": 130.561,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e2f0b81d8cd3bc08b11dcbfae3815cffee1a14affb49b5f26dd4478d0316b661",
+      "stdout_tail": [
+        "pod pfd-x-t12-k0-c5-20261108-ct6pm uid 9f2460de-3e12-455b-b34b-f1bfd5c4f9c4 exit 0 (from 1 node report(s)); job pfd-x-t12-k0-c5-20261108 uid ab749aec-0a16-4e40-bd48-74aedde7c414"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/pfd-x-t12-k0-c5-20261108/",
+        "research/pkm_falldegree_unblock_20261107/results/X1",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.614,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 7,
+      "outputs": {},
+      "seconds": 1.614,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/verify_results_nosums.sh",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/collect-v01/status-with-audit-pod.json",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/launch/result.json",
+        "research/pkm_falldegree_unblock_20261107/results/X1",
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/local-sha256-01.txt",
+        "binary.sha256",
+        "f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot",
+        "binary.sha256",
+        "7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools",
+        "binary.sha256",
+        "c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e  /usr/local/bin/hky_fp_tower_check",
+        "binary.sha256",
+        "962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354  /usr/local/bin/pfd_grid_zeros",
+        "host.txt",
+        "argv: cap:12:0:5:12800000000",
+        "host.txt",
+        "rayon: 12",
+        "progress.txt",
+        "end X-m2-t12-k0-c5 exit 0",
+        "progress.txt",
+        "end X-m2-t12-k0-c5.gridzeros exit 0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.038,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 8,
+      "outputs": {
+        "research/pkm_falldegree_unblock_20261107/receipts/X1/local-sha256-01.txt": "a6c5eda77fdeabc51ae7ee328e8eebb4764338718e8858d4c986fe71e1752a1e"
+      },
+      "seconds": 0.038,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4ffe7478b9d9b041565cf95df4717339fec3148c2740a0886874991081450a2b",
+      "stdout_tail": [
+        "found in binary.sha256: f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot",
+        "found in binary.sha256: 7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools",
+        "found in binary.sha256: c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e  /usr/local/bin/hky_fp_tower_check",
+        "found in binary.sha256: 962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354  /usr/local/bin/pfd_grid_zeros",
+        "found in host.txt: argv: cap:12:0:5:12800000000",
+        "found in host.txt: rayon: 12",
+        "found in progress.txt: end X-m2-t12-k0-c5 exit 0",
+        "found in progress.txt: end X-m2-t12-k0-c5.gridzeros exit 0",
+        "local sha256 lines: 8 written to research/pkm_falldegree_unblock_20261107/receipts/X1/local-sha256-01.txt",
+        "verified: job pfd-x-t12-k0-c5-20261108 job_uid ab749aec-0a16-4e40-bd48-74aedde7c414 pod_uid 9f2460de-3e12-455b-b34b-f1bfd5c4f9c4"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/pkm_falldegree_unblock_20261107/results/X1",
+        "-type",
+        "f",
+        "-exec",
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261109T2346Z-pkm-fd-pfd-x-t12.json",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.061,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.061,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0df25f2680fbe823d45c2014ba8138be9de26320a0fb18e08474b55a4bbf6ad4",
+      "stdout_tail": [
+        "8 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261109T2346Z-pkm-fd-pfd-x-t12.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 12.572,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload-raw",
+      "index": 10,
+      "outputs": {},
+      "seconds": 12.572,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 10,
+  "commit": "5a3aef9ed432baa28803f3e11550471448ff584b",
+  "dirty_after": [
+    "enchmarks/records/20261109T2346Z-pkm-fd-pfd-x-t12.json",
+    "research/pkm_falldegree_unblock_20261107/results/X1/9f2460de-3e12-455b-b34b-f1bfd5c4f9c4/binary.sha256",
+    "research/pkm_falldegree_unblock_20261107/results/X1/9f2460de-3e12-455b-b34b-f1bfd5c4f9c4/host.txt",
+    "research/pkm_falldegree_unblock_20261107/results/X1/9f2460de-3e12-455b-b34b-f1bfd5c4f9c4/progress.txt",
+    "research/pkm_falldegree_unblock_20261107/results/X1/9f2460de-3e12-455b-b34b-f1bfd5c4f9c4/runs/X-m2-t12-k0-c5.gridzeros.jsonl",
+    "research/pkm_falldegree_unblock_20261107/results/X1/9f2460de-3e12-455b-b34b-f1bfd5c4f9c4/runs/X-m2-t12-k0-c5.jsonl",
+    "research/pkm_falldegree_unblock_20261107/results/X1/9f2460de-3e12-455b-b34b-f1bfd5c4f9c4/runs/X-m2-t12-k0-c5.out"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

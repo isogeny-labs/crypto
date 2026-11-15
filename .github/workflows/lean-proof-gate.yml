@@ -60,10 +60,15 @@ jobs:
         run: |
           toolchain='${{ matrix.toolchain }}'
           if [ "$toolchain" = pinned ]; then toolchain=$(cat tools/lean/lean-toolchain); fi
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$toolchain"
+          curl --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 15 --max-time 120 -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
+          for attempt in 1 2 3; do
+            if sh "$RUNNER_TEMP/elan-init.sh" -y --default-toolchain "$toolchain"; then break; fi
+            if [ "$attempt" -eq 3 ]; then echo '::error::elan installation failed after three attempts'; exit 3; fi
+            sleep 5
+          done
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
           echo "ELAN_TOOLCHAIN=$toolchain" >> "$GITHUB_ENV"
-      - run: tools/lean/selftest/run.sh
+      - run: bash tools/lean/selftest/run.sh
 
   discover:
     runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
@@ -87,12 +92,14 @@ jobs:
     needs: discover
     if: ${{ needs.discover.outputs.indexes != '[]' }}
     runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted' && 'ubuntu-latest') || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 60
     strategy:
       fail-fast: false
+      # Avoid a simultaneous toolchain download from every target runner.
+      max-parallel: 8
       matrix:
         index: ${{ fromJson(needs.discover.outputs.indexes) }}
-    name: Lean target ${{ matrix.index }}
+    name: Lean target batch ${{ matrix.index }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -100,23 +107,42 @@ jobs:
           sparse-checkout: ${{ env.LEAN_CHECKOUT }}
       - name: Install elan
         run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          curl --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 15 --max-time 120 -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o "$RUNNER_TEMP/elan-init.sh"
+          for attempt in 1 2 3; do
+            if sh "$RUNNER_TEMP/elan-init.sh" -y --default-toolchain none; then break; fi
+            if [ "$attempt" -eq 3 ]; then echo '::error::elan installation failed after three attempts'; exit 3; fi
+            sleep 5
+          done
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Build and audit
         env:
           TARGET_INDEX: ${{ matrix.index }}
         run: |
-          target=$(python3 tools/lean/ci-targets.py select "$TARGET_INDEX")
-          printf 'Lean target %s: %s\n' "$TARGET_INDEX" "$target"
-          if [[ "$target" == *.lean ]]; then
-            pin="$(dirname "$target")/lean-toolchain"
-            if [ -f "$pin" ]; then elan default "$(cat "$pin")"; else elan default "$(cat tools/lean/lean-toolchain)"; fi
-          fi
-          set +e
-          tools/lean/proof-gate.sh --out receipts "$target"
-          rc=$?
-          [ $rc -eq 3 ] && echo "::error::infrastructure failure (not evidence about the proof)"
-          exit $rc
+          python3 tools/lean/ci-targets.py batch "$TARGET_INDEX" > "$RUNNER_TEMP/batch-targets.txt"
+          rc_any=0
+          while IFS= read -r target; do
+            printf 'Lean target in batch %s: %s\n' "$TARGET_INDEX" "$target"
+            pin="$target/lean-toolchain"
+            if [[ "$target" == *.lean ]]; then pin="$(dirname "$target")/lean-toolchain"; fi
+            if [ -f "$pin" ]; then toolchain="$(cat "$pin")"; else toolchain="$(cat tools/lean/lean-toolchain)"; fi
+            installed=0
+            for attempt in 1 2 3; do
+              if elan default "$toolchain"; then installed=1; break; fi
+              sleep 5
+            done
+            if [ "$installed" -eq 0 ]; then
+              echo "::error::Lean toolchain download failed after three attempts: $target"
+              rc_any=3
+              continue
+            fi
+            set +e
+            tools/lean/proof-gate.sh --out receipts "$target"
+            rc=$?
+            set -e
+            if [ "$rc" -eq 3 ]; then echo "::error::infrastructure failure: $target"; rc_any=3; fi
+            if [ "$rc" -ne 0 ] && [ "$rc_any" -eq 0 ]; then rc_any=1; fi
+          done < "$RUNNER_TEMP/batch-targets.txt"
+          exit "$rc_any"
       - name: Keep receipts
         if: always()
         uses: actions/upload-artifact@v4

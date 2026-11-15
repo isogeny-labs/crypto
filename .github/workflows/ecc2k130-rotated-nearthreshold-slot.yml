@@ -19,10 +19,15 @@ jobs:
         with:
           python-version: '3.13'
       - name: Frozen source and independent factor-only preflight
-        run: python3 research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_nearthreshold_slot_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Replay complete evidence only when later committed
         shell: bash
-        run: |
-          if test -f research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/evidence/receipt.json; then
-            python3 research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/ci_replay.py --evidence research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/evidence
-          fi
+        env:
+          FROZEN_VIEW_STEP: |
+            if test -f research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/evidence/receipt.json; then
+              python3 research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/ci_replay.py --evidence research/notes/ecc2k130/rotated_nearthreshold_slot_20260925/evidence
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_nearthreshold_slot_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

@@ -1,0 +1,127 @@
+{
+  "branch": "claude/serene-davinci-ujoi58",
+  "closed_utc": "2026-11-09T20:35:12+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/pkm_falldegree_unblock_20261107/requests_r2e/pfd-g3c.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-09T20:19:40+00:00",
+      "wall_s": 163.785
+    },
+    {
+      "argv": [
+        "research/pkm_falldegree_unblock_20261107/cards/wait_command_status.sh",
+        "research/pkm_falldegree_unblock_20261107/cards/status_request_g3c.json",
+        "pfd-g3c-20261109",
+        "research/pkm_falldegree_unblock_20261107/receipts/G1/status",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-09T20:22:23+00:00",
+      "wall_s": 54.086
+    }
+  ],
+  "commit": "b59991cf91e1cfd4c02f548e7efced2344496203",
+  "commit_dirty": false,
+  "created_utc": "2026-11-09T20:16:50+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261109T2016Z-pkm-fd-pfd-g3c",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 98,
+      "name": "stagec-g3/disagreements",
+      "note": "G3 on stage C within-capacity cells (m <= 6): 98 capped runs, 0 disagreements, 0 timeouts, 0 seed mismatches. results/G1/<pod>/gates/g3.log and g3.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 98,
+      "name": "stagec-g3/capped-runs",
+      "note": "capped F4 runs made by the frozen gate3 over 19 stage C files (56 draws in 28 cells; largest m 6, largest N 18). [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 98.0
+    }
+  ],
+  "problem": "study:pkm_falldegree_unblock_20261107:pfd-g3c",
+  "raw": [
+    {
+      "bytes": 202,
+      "path": "research/pkm_falldegree_unblock_20261107/results/G1/7c2b54f1-afcd-474f-a9b8-c7b58ee44c04/binary.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/cee2057e52ea58e4232f46e0aeeab34bcff6e5ab1b6ddedaadaba7fc65b167d7",
+      "sha256": "cee2057e52ea58e4232f46e0aeeab34bcff6e5ab1b6ddedaadaba7fc65b167d7",
+      "uploaded": true
+    },
+    {
+      "bytes": 36,
+      "path": "research/pkm_falldegree_unblock_20261107/results/G1/7c2b54f1-afcd-474f-a9b8-c7b58ee44c04/gates/g3.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0b/0b76344bf59e75719c4a30a8238fbaf30e932eab9dad606033025b4569d26291",
+      "sha256": "0b76344bf59e75719c4a30a8238fbaf30e932eab9dad606033025b4569d26291",
+      "uploaded": true
+    },
+    {
+      "bytes": 1547,
+      "path": "research/pkm_falldegree_unblock_20261107/results/G1/7c2b54f1-afcd-474f-a9b8-c7b58ee44c04/gates/g3-inputs.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a4/a452705775b89d0fe34896fb40062c8d9f0dbedb0729d238488cb1f23a84eb29",
+      "sha256": "a452705775b89d0fe34896fb40062c8d9f0dbedb0729d238488cb1f23a84eb29",
+      "uploaded": true
+    },
+    {
+      "bytes": 22053,
+      "path": "research/pkm_falldegree_unblock_20261107/results/G1/7c2b54f1-afcd-474f-a9b8-c7b58ee44c04/gates/g3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/7171183624c18fc3a75743fa8194183363599267ae98e0cb28b0d3040974f5b2",
+      "sha256": "7171183624c18fc3a75743fa8194183363599267ae98e0cb28b0d3040974f5b2",
+      "uploaded": true
+    },
+    {
+      "bytes": 10,
+      "path": "research/pkm_falldegree_unblock_20261107/results/G1/7c2b54f1-afcd-474f-a9b8-c7b58ee44c04/gates/g3.exit",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/39/394230a87906fdcec8e5062349b7a5978326238c43fb57e01dd262e950e4dcfb",
+      "sha256": "394230a87906fdcec8e5062349b7a5978326238c43fb57e01dd262e950e4dcfb",
+      "uploaded": true
+    },
+    {
+      "bytes": 58,
+      "path": "research/pkm_falldegree_unblock_20261107/results/G1/7c2b54f1-afcd-474f-a9b8-c7b58ee44c04/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/87/870321966957d15f9010111b13bdcd4966ab2c005639a8ac87755c1c5b0a933c",
+      "sha256": "870321966957d15f9010111b13bdcd4966ab2c005639a8ac87755c1c5b0a933c",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_report.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "pkm-fd-pfd-g3c",
+  "status": "measured",
+  "summary": "PKM stage C G3-only job (Amendment 11): 98 capped runs, 0 disagreements, no timeouts, on exactly the within-capacity (m <= 6) stage C cells; inputs match pfd-c's rows (19 OK); the stop rule does not fire",
+  "validation": null
+}

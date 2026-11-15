@@ -96,3 +96,13 @@ their mathematical hypotheses. [pcc:unverified]
 The original frozen experiment protocol, instrument and binary are unchanged.
 Backend approval remains pending. This proof work is independent of that
 approval and uses only local formal correctness checks.
+
+## 2026-11-08 additive product API
+
+The subsequent local-series formalization exposes the existing baseKernel body
+and adds baseKernel_formula, its exact finite-product equation. No mathematical
+body or frozen native instrument changes. The24-theorem/26-declaration receipts
+above remain snapshots of their recorded source commit; the expanded project
+is checked in prime_common_scalar_20261108/lean/local-series-gate/. The new
+actual chart theorem uses this API instead of assuming a polynomial model.
+Producer evidence is unsigned pending trusted PCC standing. [pcc:unverified]
