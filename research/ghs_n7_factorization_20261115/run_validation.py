@@ -16,8 +16,8 @@ URL = "https://calculator.magma-maths.org/execute"
 
 
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] not in {"q16", "q4"}:
-        raise SystemExit("usage: run_validation.py q16|q4")
+    if len(sys.argv) != 2 or sys.argv[1] not in {"q16", "q4", "attack_optimized"}:
+        raise SystemExit("usage: run_validation.py q16|q4|attack_optimized")
     case = sys.argv[1]
     source = (ROOT / f"{case}.magma").read_bytes()
     output = ROOT / "receipts" / f"{case}.json"
