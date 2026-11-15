@@ -152,6 +152,40 @@ fn six_input(poly:&Polynomial,ring:&TowerRing)->Result<RPoly,String> {
     Ok(ring.from_raw(&raw))
 }
 
+// Same exact S4 resultant, but only its three active depth-six fibre blocks
+// plus one free group-sum abscissa. Used solely for minimal-ideal ablation.
+fn minimal_s4_ring(terminal:u64)->TowerRing {
+    let mut rules=Vec::with_capacity(3*DEPTH);
+    for block in 0..3 {
+        for level in 0..DEPTH {
+            let last=level+1==DEPTH;
+            rules.push(SquareRule{
+                next:(!last).then_some((block*DEPTH+level+1) as u8),
+                a:0,b:u64::from(!last),c:0,
+                d:if last {(terminal+2)%P} else {2},
+            });
+        }
+    }
+    TowerRing{p:P,rules,n_free:1}
+}
+fn minimal_s4_input(poly:&Polynomial,start:usize,free:usize,
+    ring:&TowerRing)->Result<RPoly,String> {
+    if start!=0 && start!=3 {return Err("invalid minimal S4 block".into());}
+    if free!=8 && free!=9 {return Err("invalid minimal S4 free variable".into());}
+    let mut raw=Vec::new();
+    for (monomial,&coeff) in &poly.0 {
+        if monomial.iter().enumerate().any(|(i,&pow)| pow!=0 &&
+            !(i>=start && i<start+3) && i!=free) {
+            return Err("minimal S4 still depends on eliminated coordinates".into());
+        }
+        let mut exps=vec![0u32;3*DEPTH+1];
+        for j in 0..3 { exps[j*DEPTH]=u32::from(monomial[start+j]); }
+        exps[3*DEPTH]=u32::from(monomial[free]);
+        raw.push((exps,coeff));
+    }
+    Ok(ring.from_raw(&raw))
+}
+
 fn four(code:u64)->[(usize,i8);4] {
     std::array::from_fn(|j| (
         ((code>>(6*j))&63) as usize,
@@ -341,6 +375,33 @@ fn main()->Result<(),String>{
             ablations.push(json!({"arm":label,"polynomials":inputs.len(),
                 "strict_subset_not_an_oracle":true,"f4":f4}));
         }
+        // Minimal-arm F4: remove three unused six-level towers and the
+        // unused auxiliary variable. This is a bounded diagnostic, never a
+        // substitute for the full target-dependent S4 system.
+        let r3=minimal_s4_ring(fb.terminal);
+        r3.check();
+        let mut minimal_arms=Vec::new();
+        for (label,part,start,free) in [
+            ("minimal_left_s4", &fixed[0], 0usize, 8usize),
+            ("minimal_right_s4", &fixed[1], 3usize, 9usize)
+        ] {
+            let eq=minimal_s4_input(part,start,free,&r3)?;
+            let mut short=vec![0u64;3*DEPTH+1];
+            for j in 0..3 {
+                for k in 0..DEPTH {
+                    short[j*DEPTH+k]=known[(start+j)*DEPTH+k];
+                }
+            }
+            short[3*DEPTH]=known[6*DEPTH+(free-8)];
+            if r3.eval(&eq,&short)!=0 {
+                return Err(format!("minimal S4 lost natural positive: {label}"));
+            }
+            let f4=capped_f4(&[eq],&r3,Some(&short))?;
+            minimal_arms.push(json!({
+                "arm":label, "reduced_ideal_only":true,
+                "tower_blocks":3,"free_variables":1,"f4":f4
+            }));
+        }
         println!("{}",json!({
             "standing":"[pcc:unverified]",
             "scope":"eight finite fixed-w S4 F4 development calls; no full 961-way search, no root extraction or ECDLP",
@@ -353,7 +414,8 @@ fn main()->Result<(),String>{
             "original_fixed_s3_bottleneck_dense_entries":26_618,
             "comparability":"only full 961-root/all-branch runs could be a complete oracle",
             "outcomes":outcomes,
-            "positive_ideal_ablation_controls":ablations
+            "positive_ideal_ablation_controls":ablations,
+            "minimal_three_block_s4_controls":minimal_arms
         }));
         return Ok(());
     }
