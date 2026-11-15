@@ -1,3 +1,21 @@
+# Genuine22 settled; strict replay and published norm-point reuse next
+
+pcc/claims/PCC-20261115-b9e9d7.json/pcc/claims/PCC-20261115-de10d7.json: original43670176697/job132678268921SUCCESS/SEVENremote replays BEFOREaec16d11/direct2e572cfb/exact9paths. ALL44386guards/165links/ownedbytes/whole55440900Barchive/all564members/14wholeclosedscientificroots preserved; normalfetch-FF-artifact-wiring0/HOLD22RELEASED. All42866prior keys/162oldlinks/c031ledgerprefix retained withdeclaredmetadataupdates, prior21genuinepayloadexactwithoutrecursivecapture. FOURexactcanonicalmanifestentries/FOURtransparentrelativealiases. [pcc:unverified]
+
+## What was done
+Genuinelypublished ALL closedct82science/ct82-83controls/publicationmetadata/source-exes-fullpreparedcopies/failures/proofs/checkpoints/whole24CI/reports-drafts, fullnativeed33ef695fixture-stdout/geometryf81cbf13fixture-stdout/current67abase+fourpendingmetadatafiles. No scientific source or oldrecordoccurrence discarded. Native/proof/report/negativecomparison andpublished25d29e scopesunchanged. [pcc:unverified]
+
+## Decisions made
+Nextadditive25fullstrictgeometry+completechain replay with old24unchanged; then additive norm-point reuse under25d29e published67aBEFOREcode, retaining entire695record/fullpopulation parity exceptexact48countertransforms. Completeprimitive setup/reusecensus/strongmatchedreferences andseparateendpoint/factorbase/originalprime leads remainqueued. No optimizedcodewrittenyet orpricedadvantage. [pcc:unverified]
+
+## Open threads
+Normalpublish settlement andexactcanonicalprojection (originalverifyAFTERSTAGING); implementadditive25driver/workflow/fullguardreference/both33rootgates+33bindings/whole13and695auditors. Thennorm-pointreuse materialization/compiledsource/exactcheckpoint/boundednative/fullparity/actualprimitivecounts. FuturelargecustodyNEW23. [pcc:unverified]
+
+## Errors
+All originalscientific/19GH001/source/proofpath/EOF-PDFwhitespace/logdownload/cold/root-main negatives retained. Exactclosedhardlinks preservebytes-path-mode afteroriginalchecks; onlyunheldoldmetadata removed underreceipts, allraw/exes/fullcopies/currentct57/ct80 kept. Signing/mainledger/review/conflicts/KB-vault/calibratedadmission gaps remainopen. No paidlaunch/waiver/novelty/signedpromotion. [pcc:unverified]
+
+---
+
 # Whole scientific handoff22 ready; inputs HELD
 
 pcc/claims/PCC-20261115-6a361a.json: all42866prior keys/162links/c031ledgerprefix/ownedscience retained; all14wholeclosedct82scientificroots/closedct82-83controls/source-exes-librarycopies/failures/proofs/checkpoints/wholeCI/reportroots/drafts and67abase+fourpendingmetadatafiles. Exact32MiBarchiveparts/allmembersroundtripped, originalpolicyselects7objects. HOLD allscience/raw/source/aliases/ownedbytes/consumerledger until ORIGINALremote replays BEFOREactualbot/exactFF/wholeordered reassembly/terminal22checks. Nativeed33ef/full695records/13rootconditionalproofs/24CIab17f7/reports/negativecomparison andprospective25d29e scopesunchanged. No optimizedcode orpricedoutcome. [pcc:unverified]
