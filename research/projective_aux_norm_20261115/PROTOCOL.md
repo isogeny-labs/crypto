@@ -134,3 +134,35 @@ remain mandatory, with all unknowns retained. No target/cap/degree adapts
 after this panel starts. Use new binaries and a fresh frozen runner copy;
 capture source, all binary/script hashes and loader evidence before calls.
 [pcc:unverified]
+
+## Amendment A4 — indexed prime-field row representation
+
+A3 verifies8 variables/degree4/six cancelled graph equations. All12 msolve
+sets again match4 models, including lifts to the original14-variable system.
+All12 PC D6 calls remain capped unknown. Preserve all results. A code review
+identifies repeated symbolic leading-term scans and map reconstruction inside
+each Gaussian cancellation. This is a candidate implementation bottleneck,
+not a measured cause, degree lower bound or mathematical barrier.
+
+Implement a separately named indexed producer: enumerate the same monomials
+in the same grevlex order, use integer leading-column lookup, a dense temporary
+row, and sparse stored pivot vectors. Multiply low-degree pivots using public
+monomial-index products. Preserve the same FIFO closure/early-completion rules,
+source/DAG format and unchanged separate verifier. Store only proof descriptors
+for temporary product nodes, retaining pivot polynomials needed by the queue.
+A tiny-prime multiplication table is allowed only for p<=257, so setup is
+uniformly bounded by257²; larger admitted word primes use ordinary field
+arithmetic. Charge table/index/work slots against the same2M entry budget,
+along with stored coefficients and proof links. No field-size table for large p.
+
+Freeze exactly one indexed-005 qualification: same six small controls and
+Kummer D4, then all12 projected auxiliary targets at D6. Native complete-set
+comparisons and OpenSSL replay as before; no msolve or old producer rerun.
+Keep20s total producer+verifier CPU/wall,2GiB,1M elimination steps,2M entries,
+20k rows,40k nodes,128 quotient/basis and1MiB proof. Record deterministic row,
+pivot and field-update counters and limited progress messages; clocks are not
+measurements. Preserve every unknown and any failed candidate/proof. All
+source/binary/script hashes precede calls; use fresh build and frozen runner
+paths. No cap, degree, target, order or verifier criterion adapts after start.
+This is standard indexed elimination, not a novelty or speedup claim.
+[pcc:unverified]
