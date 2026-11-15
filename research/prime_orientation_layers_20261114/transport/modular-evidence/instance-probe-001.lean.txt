@@ -1,0 +1,23 @@
+import Mathlib.Algebra.Polynomial.Eval.Degree
+import Mathlib.Algebra.Polynomial.Coeff
+import Mathlib.Tactic
+
+open Polynomial
+
+example {R : Type*} [CommSemiring R] (s : R) (n b : ℕ) :
+    ((1 + C s * X)^n : R[X]).coeff b = (n.choose b : R) * s^b := by
+  have he : (1 + C s * X)^n = ((1 + X)^n : R[X]).comp (C s * X) := by
+    simp only [pow_comp,add_comp,one_comp,X_comp]
+  rw [he,comp_C_mul_X_coeff,coeff_one_add_X_pow]
+
+example {R : Type*} [CommSemiring R] (s : R) (b : ℕ) (hb : b % 2 = 1) :
+    ∃ q : R, ((1 + C s * X)^4 : R[X]).coeff b = 4 * q := by
+  have he : (1 + C s * X)^4 = ((1 + X)^4 : R[X]).comp (C s * X) := by
+    simp only [pow_comp,add_comp,one_comp,X_comp]
+  rw [he,comp_C_mul_X_coeff,coeff_one_add_X_pow]
+  by_cases h : b ≤ 4
+  · interval_cases b <;> norm_num at hb ⊢
+    · exact ⟨s,rfl⟩
+    · exact ⟨s^3,rfl⟩
+  · rw [Nat.choose_eq_zero_of_lt (by omega : 4 < b)]
+    exact ⟨0,by simp⟩

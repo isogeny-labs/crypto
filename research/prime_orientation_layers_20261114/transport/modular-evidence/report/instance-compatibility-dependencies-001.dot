@@ -1,0 +1,14 @@
+digraph G {
+rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=15];
+a[label="Existing binomial + substitution laws"];
+b[label="Generic fourth-power probe
+standard arithmetic, not actual profile"];
+c[label="Proposed mod4 conditions
+require selected1, others0"];
+d[label="Same profile at two nodes
+requires m0 mod4 both1 and0",fillcolor="#fff1dc"];
+e[label="Different sufficient conditions or charged gluing
+actual denominator + global cost still required",fillcolor="#fff1dc"];
+{rank=same;a;b;} {rank=same;c;d;}
+a->b;c->d;b->c[style=dashed,label="application pending"];d->e[style=dashed];
+}
