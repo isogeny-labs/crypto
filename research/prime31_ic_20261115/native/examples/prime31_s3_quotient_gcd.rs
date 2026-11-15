@@ -414,6 +414,185 @@ fn m4_scale(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
     Ok(())
 }
 
+// Deterministic, naturally sampled public targets. No known scalar is passed
+// into the algebraic discovery stage. Every attempted query, even a miss,
+// contributes to the charged target-dependent time. Production usage must
+// validate recovered signed relations independently.
+fn splitmix64_next(state: &mut u64) -> u64 {
+    *state = state.wrapping_add(0x9e3779b97f4a7c15);
+    let mut z = *state;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+    z ^ (z >> 31)
+}
+
+fn modmul_n(a: u64, b: u64, n: u64) -> u64 {
+    ((a as u128 * b as u128) % n as u128) as u64
+}
+fn modpow_n(mut a: u64, mut e: u64, n: u64) -> u64 {
+    let mut r = 1u64;
+    while e != 0 {
+        if e & 1 != 0 { r = modmul_n(r, a, n); }
+        a = modmul_n(a, a, n);
+        e >>= 1;
+    }
+    r
+}
+// A matrix rank of signed coefficient rows, not a certified rank of a
+// complete logarithm linear system. n is prime on the frozen curve.
+fn signed_coefficient_rank(rows: &[Vec<(usize,i32)>], width: usize, n: u64)
+    -> Result<usize, String>
+{
+    let mut pivots: Vec<Option<Vec<u64>>> = vec![None; width];
+    let mut rank = 0;
+    for row in rows {
+        let mut v = vec![0u64; width];
+        for &(i, sign) in row {
+            if i >= width || (sign != 1 && sign != -1) {
+                return Err("invalid signed coefficient".into());
+            }
+            let c = if sign == 1 { 1 } else { n-1 };
+            v[i] = (v[i] + c) % n;
+        }
+        for col in 0..width {
+            if v[col] == 0 { continue; }
+            if let Some(pivot) = &pivots[col] {
+                let c = v[col];
+                for j in col..width {
+                    v[j] = (v[j] + n - modmul_n(c, pivot[j], n)) % n;
+                }
+            } else {
+                let inv = modpow_n(v[col], n-2, n);
+                for j in col..width { v[j] = modmul_n(v[j], inv, n); }
+                pivots[col] = Some(v);
+                rank += 1;
+                break;
+            }
+        }
+    }
+    Ok(rank)
+}
+
+// Experimental 4096-query Rust-only natural-public panel. The target is
+// generated from a known scalar fixture, but that scalar never enters the
+// oracle and is reported only to enable independent ex-post replay.
+// This is not a complete index-calculus ECDLP, nor a cold rho comparison.
+fn m4_factorized_natural_4096(base: &Base, ar: &mut Arithmetic)
+    -> Result<(), String>
+{
+    use std::collections::BTreeSet;
+    use std::time::Instant;
+    const TRIALS: usize = 4096;
+    const SEED: u64 = 0x525553545f4d3401;
+    let xs: Vec<u64> = base.points.iter().map(|q| q.0).collect();
+    if xs.len() != 31 { return Err("natural gate requires canonical B31 base".into()); }
+    let start = Instant::now();
+    let k = m4_pair_support(&xs)?;
+    let support_build_ns = start.elapsed().as_nanos();
+    if k.len() != 31*31+1 { return Err("natural gate K degree changed".into()); }
+    let mut state = SEED;
+    let mut seen = BTreeSet::new();
+    let mut fingerprint = 0xcbf29ce484222325u64;
+    let mut query_ns = Vec::with_capacity(TRIALS);
+    let mut target_generation_ns = 0u128;
+    let mut target_generation_additions = 0u64;
+    let mut extraction_ns = 0u128;
+    let mut validation_ns = 0u128;
+    let mut verification_additions = 0u64;
+    let mut nonconstant_gcds = 0usize;
+    let mut certified_positive_targets = 0usize;
+    let mut undetermined = 0usize;
+    let mut exceptional_targets = 0usize;
+    let mut signed_rows = Vec::new();
+    let mut positives = Vec::new();
+    let mut failures = Vec::new();
+    for sample in 0..TRIALS {
+        let scalar = loop {
+            let next = (splitmix64_next(&mut state) % (PRIME31.n-1)) + 1;
+            if seen.insert(next) { break next; }
+        };
+        fingerprint = (fingerprint ^ scalar).wrapping_mul(0x100000001b3);
+        let before = ar.counts.group_additions;
+        let started = Instant::now();
+        let target = ar.scalar(PRIME31, scalar, Some(PRIME31.g))
+            .ok_or("nonzero natural scalar unexpectedly mapped to identity")?;
+        target_generation_ns += started.elapsed().as_nanos();
+        target_generation_additions += ar.counts.group_additions - before;
+
+        let started = Instant::now();
+        let (d, exceptional, _, _) =
+            m4_first_eliminant_factorized(&xs, &k, target.0)?;
+        query_ns.push(started.elapsed().as_nanos());
+        if exceptional { exceptional_targets += 1; }
+        if d.len() <= 1 { continue; }
+        nonconstant_gcds += 1;
+        let started = Instant::now();
+        let extraction = m4_extract_from_eliminant(&xs, &k, target.0, &d);
+        extraction_ns += started.elapsed().as_nanos();
+        let (_uv, tuples) = match extraction {
+            Ok(ok) => ok,
+            Err(error) => {
+                undetermined += 1;
+                failures.push(json!({
+                    "sample":sample, "target":target,
+                    "reason":error, "status":"undetermined"
+                }));
+                continue;
+            }
+        };
+        let before = ar.counts.group_additions;
+        let started = Instant::now();
+        let rows = m4_signed_lifts(base, Some(target), &tuples, ar);
+        validation_ns += started.elapsed().as_nanos();
+        verification_additions += ar.counts.group_additions - before;
+        if !rows.is_empty() {
+            certified_positive_targets += 1;
+            for row in &rows { signed_rows.push(row.clone()); }
+        }
+        positives.push(json!({
+            "sample":sample, "target":target,
+            "fixture_scalar_after_discovery":scalar,
+            "gcd_degree":d.len()-1,
+            "raw_pair_tuples":tuples.len(),
+            "verified_signed_rows":rows
+        }));
+    }
+    query_ns.sort_unstable();
+    let total_query_ns: u128 = query_ns.iter().sum();
+    let sampled_rank = signed_coefficient_rank(&signed_rows, xs.len(), PRIME31.n)?;
+    let p50 = query_ns[(TRIALS-1)/2];
+    let p95 = query_ns[(TRIALS-1)*95/100];
+    println!("{}", json!({
+        "standing":"[pcc:unverified]",
+        "study":"factorized S4 Rust-only naturally sampled prime31 B31 query gate",
+        "sample_method":"splitmix64 distinct nonzero fixture scalars, generator multiplication excluded from oracle",
+        "seed_hex":"525553545f4d3401",
+        "sample_count":TRIALS, "distinct_public_targets":seen.len(),
+        "fixture_scalar_fingerprint_fnv64":format!("{fingerprint:016x}"),
+        "curve_p":PRIME31.p,"curve_n":PRIME31.n,
+        "factor_base_size":xs.len(),"pair_support_degree":k.len()-1,
+        "pair_support_build_ns":support_build_ns,
+        "target_generation_ns":target_generation_ns,
+        "target_generation_group_additions":target_generation_additions,
+        "total_algebraic_query_ns":total_query_ns,
+        "algebraic_query_median_ns":p50,"algebraic_query_p95_ns":p95,
+        "nonconstant_gcd_targets":nonconstant_gcds,
+        "verified_positive_targets":certified_positive_targets,
+        "exceptional_target_x":exceptional_targets,
+        "undetermined_extraction_targets":undetermined,
+        "completed_negative_targets":TRIALS-nonconstant_gcds,
+        "additional_algebraic_extraction_ns":extraction_ns,
+        "post_extraction_signed_validation_ns":validation_ns,
+        "post_extraction_validation_group_additions":verification_additions,
+        "verified_signed_coefficient_rows":signed_rows.len(),
+        "signed_coefficient_rank_mod_n":sampled_rank,
+        "caveat":"coefficient rank, not a completed factor-base logarithm system",
+        "natural_nonconstant_cases":positives,"censored_cases":failures,
+        "cold_ECDLP_solved":false,"rho_matched":false
+    }));
+    Ok(())
+}
+
 // Paired Rust-only A/B on the SAME K(U) and SAME public target, with
 // algebraic discovery separated from any signed EC witness verification.
 // B31 original Horner is omitted because it scales prohibitively.
@@ -709,6 +888,9 @@ fn main() -> Result<(),String> {
     }
     if std::env::args().any(|arg| arg == "--m4-factorized") {
         m4_factorized_scale(&base, &mut ar)?;
+    }
+    if std::env::args().any(|arg| arg == "--m4-natural-4096") {
+        m4_factorized_natural_4096(&base, &mut ar)?;
     }
     if std::env::args().any(|arg| arg == "--compare") {
         // Diagnostic A/B only: same Rust host/inputs, fixed base constructed
