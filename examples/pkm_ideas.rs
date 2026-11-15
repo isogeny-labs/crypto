@@ -219,11 +219,11 @@ fn main() {
                     let mut q = 2u64;
                     let mut ss = s as u64;
                     while q <= ss {
-                        if ss % q == 0 {
+                        if ss.is_multiple_of(q) {
                             if powm(z, s as u64 / q, p) == 1 {
                                 ok = false;
                             }
-                            while ss % q == 0 {
+                            while ss.is_multiple_of(q) {
                                 ss /= q;
                             }
                         }
@@ -377,7 +377,7 @@ fn main() {
         // ---------------- idea 5b: exact coverage of m = 2 sums
         "coverage" => {
             let s: u64 = arg(&o, "S", "16").parse().unwrap();
-            assert!(is_prime(p) && (p - 1) % s == 0);
+            assert!(is_prime(p) && (p - 1).is_multiple_of(s));
             let mut r = Rng(seed ^ 0xc0e);
             // prime-order curve (exhaustive order, small p)
             let (e, n) = loop {
@@ -401,11 +401,11 @@ fn main() {
                 let mut ss = s;
                 let mut q = 2;
                 while q <= ss {
-                    if ss % q == 0 {
+                    if ss.is_multiple_of(q) {
                         if powm(z, s / q, p) == 1 {
                             ok = false;
                         }
-                        while ss % q == 0 {
+                        while ss.is_multiple_of(q) {
                             ss /= q;
                         }
                     }
@@ -466,7 +466,7 @@ fn main() {
         "aut" => {
             let s: u64 = arg(&o, "S", "36").parse().unwrap();
             let tk: u64 = arg(&o, "targets", "2000").parse().unwrap();
-            assert!(is_prime(p) && p % 3 == 1 && (p - 1) % s == 0 && s % 3 == 0);
+            assert!(is_prime(p) && p % 3 == 1 && (p - 1).is_multiple_of(s) && s.is_multiple_of(3));
             let mut r = Rng(seed ^ 0xa07);
             let (e, n) = loop {
                 let c = Curve {
@@ -513,11 +513,11 @@ fn main() {
                 let mut ss = s;
                 let mut q = 2;
                 while q <= ss {
-                    if ss % q == 0 {
+                    if ss.is_multiple_of(q) {
                         if powm(z, s / q, p) == 1 {
                             ok = false;
                         }
-                        while ss % q == 0 {
+                        while ss.is_multiple_of(q) {
                             ss /= q;
                         }
                     }

@@ -113,7 +113,7 @@ impl Sum3 {
             self.eval(x, p)
         };
         let (f0, f1, fm) = (at(0), at(1), at(p - 1));
-        let inv2 = (p + 1) / 2;
+        let inv2 = p.div_ceil(2);
         let c2 = mulm(subm(addm(f1, fm, p), mulm(2, f0, p), p), inv2, p);
         let c1 = mulm(subm(f1, fm, p), inv2, p);
         [f0, c1, c2]
