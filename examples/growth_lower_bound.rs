@@ -1101,7 +1101,7 @@ impl Ctx {
             let mut proper = false;
             let mut bs = x;
             while bs != 0 {
-                let lb = bs & bs.wrapping_neg();
+                let lb = 1 << bs.trailing_zeros();
                 if has[x ^ lb] {
                     proper = true;
                     break;

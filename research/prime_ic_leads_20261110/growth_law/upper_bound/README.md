@@ -413,3 +413,132 @@ previous upper bound `2t + 2` and the one-variable chain restated as Lemma O);
 subagent, so no `kb_status`/`search_knowledge` receipt exists, and the novelty of U1, Theorem E and
 Lemma B is unchecked against the corpus. Fibre gluing via idempotents and the defect-absorption form of
 a lifting lemma are standard proof patterns, presented as tools, not as new.
+
+## Red-team review (2026-11-15)
+
+Independent adversarial review (Red Team, core tier). It challenges; it does not change a status or
+declare a result supported or refuted. The Coordinator and Validator decide and record.
+
+**What was reviewed, and its standing.** The review was dispatched on working-tree files: `upper_bound/`
+was untracked at HEAD `c696cd874a`, and `README.md` hashed (SHA-256) to
+`bfccbf5b03454ac50ce7d33dea363d6272698cbd484651f20f088684470afd32`. During the review another actor (not
+this reviewer) did two things:
+- appended ` [pcc:unverified]` to the ends of lines 10, 17, 19 and 176;
+- committed the note as `741217c652` on branch `claude/prime-field-index-calculus-atxvot`
+  ("red-team review pending").
+
+At that commit `README.md` is `ca76d5f5e0b6ca641eb0dadd18fa0c29794834856e6826e530ab4e2b3a531120`.
+Removing the four tags gives back `bfccbf5b…` exactly. `lean/UpperBound.lean` is
+`a759fa648a4ff6bce2e3893f0ed7b9780d2ac2dc367f6b608ff84a8a38e24819`, identical to the reviewed file and to
+the receipt's `SOURCE.sha256`. **So this review applies to the committed text of `741217c652`.** This
+section is an uncommitted working-tree addition on top of that commit. No pcc claim references
+`upper_bound/`; every result here remains `[pcc:unverified]`.
+
+**Checks run by the reviewer.**
+- `tools/lean/proof-gate.sh` on `lean/UpperBound.lean` (core Lean 4.35.0 from `~/.elan`, receipt
+  written to a scratch directory, not here). Result: PASS, 22 theorems, 0 trusted, rc 0. `#print axioms`:
+  `orbit_all_ones`, `wrap_pop`, `closure_mulv_list`, `closure_glue`, `closure_lift_defect` use
+  `[propext, Quot.sound]`; `closure_trans` uses none. This reproduces the producer's receipt.
+- Every recorded `m = 2` cell in `../../devcheck/*.jsonl` and `../falsify/*.jsonl` in scope for U1 (tower
+  arm and null arm with `W ∈ {1, 2}`; multiples arm and planted targets excluded). That is 160 completed
+  rows (tower 104, null `W = 2` 30, null `W = 1` 26). None exceeds `t + 2`. 16 rows are tight
+  (`d_F = 4` at `t = 2`). The 6 one-sided rows (`≥ 6` at `t ≥ 10`, `> 5` at `t = 12`) sit below the bound.
+  The external tower ladder `research/pkm_falldegree_unblock_20261107/RESULTS.md` Table 1 also obeys
+  `t + 2`, and is tight at `t = 1` (3) and `t = 2` (4). Every measured value is `[pcc:unverified]`.
+- A reviewer scratch closure in Python (not admitted, not committed). It implements §0 directly over
+  `F_12289`, with 2 random units per cell. It reproduced the recorded ladders: `W = 1`: 3, 3, 4, 4 and
+  `W = 2`: 4, 4, 4, 4 at `t = 2..5`, plus `W = 1`, `t = 1`: 3. Theorem E held on all 20 tested
+  `(W, t, k)` instances (`t + k ≤ 5`), and so did Proposition S and Theorem U2 on all 12 `k = 1`
+  instances. Both ends of S's sandwich occur: `κ = 1 + max d^{(i,−)}` at `W = 1`, `t = 3`, and
+  `κ = max d^{(i,−)}` elsewhere. The constant generator gives `d_F = 0` but `κ_{2,1} = 1` (finding 2).
+
+### Per-claim verdicts
+
+| claim | verdict | reason |
+|:--|:--|:--|
+| Lemmas A, M, T, F, BC, G | established | Each checked. G's closure step needs `deg(eu) ≤ δ + c − 1 < c + δ`, which follows from subadditivity of popcount degree (D2). BC: intersection with `R_{<c}` commutes with `⊗ F'`. The abstract cores of A, T and G are kernel-checked. |
+| Lemma O | established | Checked the recurrence `a_{j+1} = a_j² + b_j² a_1`, `b_{j+1} = 2a_j b_j + b_j² b_1`, the case split, and the determinant `m_1² q(ρ)`. Needs no roots of unity in `F`. |
+| Theorem U1 | **established** (prose) | Needs only `p` odd. `p ≡ 1 (mod 2^t)` is **not** needed: `e_x ∈ F(μ_K)[z_1]`, not `F_p[z]` in general, and Lemma BC descends `1 ∈ V_{c+t}` to `F`. (For the pilot prime `2013265921 = 15·2^27 + 1`, `e_x` is `F_p`-rational for `t ≤ 27` anyway.) `deg e_x = t` exactly: the coefficient of `z_1^{K−1}` is `K^{-1}x ≠ 0`. The unit hypothesis is used only to make each fibre `f_x` a unit of `R¹`. No genericity is used. Data consistent (above). |
+| U1′(a) | established | Upper bound: U1 at `t = 1` gives 3. Lower bound: the §4 Lemma at `t = 1` (`y_{1,0}² = 1` has degree 0 < 2). Wording issue: finding 8. |
+| U1′(b) | established, conditional on Theorem 4 (`W = 2`) / D3 | D3 was re-derived at `t = 2`: `gr R` has `y² = 0` because `y_{i,1}² = 1`. It needs `det M ≠ 0` and `y_{11} f_2 ≠ 0` (explicit conditions, not vague genericity). D3 is prose `[pcc:unverified]`. |
+| Theorem U2 | established (prose) | Checked: the wrap identity, `e_ω(y_{i,t} − ω_i) = 0`, the set-`T` closure, and that twisted units follow from a level-`(t+1)` unit by CRT. Implicit hypothesis: `f` is a unit at level `t + 1` (otherwise the max is infinite and the bound is vacuous). |
+| U2′ | established up to wording; the numeric use is **unsupported** | Findings 5 and 6. |
+| Theorem E | **false as stated** (constant `f`); established for `deg f ≥ 1` | Finding 2. The `≤` proof checked; `wrap_pop` matches the defect bound. |
+| Corollary E1 | the equivalence is established; the induction scheme has a **gap** | Finding 3. |
+| Proposition S | established | Both bounds checked. The lower bound needs `−2` invertible (`p` odd). |
+| Lemma B | established as stated; its consequences are a **gap** | Finding 4. |
+| Lemma S4 | established | |
+| Proposition N | established as stated (`W = 1` Möbius form, `β ≠ 0`, `γ ≠ αβ`, `p` odd); its use is overstated | Finding 4. |
+| Lean file | gate PASS reproduced; coverage is narrower than one prose sentence says | Finding 7. |
+
+**Status against the task's question.** The upper half of Conjecture G is not proved, and the note says [pcc:unverified]
+so. The task's fallback "weaker explicit bound, linear in `t`" is delivered (U1, slope 1). The
+four-level lift is reformulated exactly (Theorem E / E1, subject to findings 2 and 3). "Where the
+natural liftings fail" is shown only relative to the method used (finding 4).
+
+### Findings, by severity
+
+1. **No pcc claim (process).** The note is now committed (`741217c652`), but nothing is registered in [pcc:unverified]
+   the ledger. The gate receipt was written before the commit ("uncommitted working tree"). Its source
+   hash does match the committed Lean file, and the reviewer re-ran the gate. *Cheapest fix:* register a
+   pcc claim for U1 (and for E with the hypothesis `deg f ≥ 1`) citing `741217c652`.
+2. **Theorem E is wrong as stated, for a degenerate case** (§5, "`≥`" bullet). "`V_d = R_{≤d}`, which
+   contains the degree-1 elements `y_{i,t} − 1`" needs `d ≥ 1`. For constant `f` (exponents `< 2^t`, as
+   the statement allows): `d_F(f, t+k) = 0` but `κ_{t,k}(f) = 1`, so the identity reads `0 = 1`. The
+   scratch check confirms it. *Fix:* add the hypothesis `deg f ≥ 1`, which every unit of the boxes with a
+   non-constant term satisfies. The proof is otherwise sound.
+3. **Off-by-one in Corollary E1's base cells for `W = 1`** (gap). Theorem E needs all exponents
+   `< 2^t`. For `W = 1` with `s_1 = 0`, the base range `[s_W, s_W + 3] = [0, 3]` would need the step
+   `0 → 4`, which Theorem E does not provide, because exponent 1 is not `< 2^0`. The base cells for
+   `W = 1` must be `t ∈ {1, 2, 3, 4}`. (`W = 2`, `[2, 5]`, is fine.) E1 also says "(i) is proved only at
+   `(2, 2)`", while U1′(a) proves `(1, 1)`. *Fix:* use the range
+   `[max(s_W, ⌈log₂(W+1)⌉), that + 3]` and list `(1, 1)` as proved.
+4. **The barrier statements claim more than is proved** (unsupported). Answer item 5, the §6
+   "Consequence", and §7 "Lemma B shows that it needs falls inside the fibres" go beyond what is proved.
+   - Lemma B bounds the degree of one annihilator from below. It therefore limits only the Lemma-G
+     mechanism, with its additive bookkeeping `δ = deg e`. It is not a statement about every gluing
+     proof, so "a period-4 bound cannot come from it" holds only for that mechanism.
+   - Proposition N rules out only the polynomial identity `f | f(z^16)` in `F[z_1, z_2]`, for the
+     `W = 1` form. At every finite level `f` is a unit, so it divides `f(z^16)` there. N says nothing
+     about whether `f(z^16) ∈ V_{c'}(f)` at level `t + 4` for `c' = d_F(t) + 1`, nothing about `W = 2` or
+     `S₃` ("for generic `f`" in item 5 drops the `W = 1` restriction), and nothing about `g ≠ f`. So
+     "S4 fails because…" is not established.
+
+   *Cheapest test:* compute the least `c'` with `f(z^16) ∈ V_{c'}(f)` at level `t + 4` for `W = 1`,
+   `t = 2..4` (pilot engine, `t + 4 ≤ 8`), and compare it with `d_F(t) + 1`. Also restate the barrier as
+   "for Lemma-G gluing with annihilator multipliers".
+5. **The U2′ number is conditional** (unsupported as stated, §4). "Used with the measured
+   `d_F(1, 11) = 5`, U2′ gives `d_F^gen(1, 12) ≤ 7`" assumes three things:
+   - that the two `F_p` draws at `t = 11` lie in the generic stratum (Theorem 3 of `../README.md` gives
+     no probability bound);
+   - that the measurement is correct (it is `[pcc:unverified]`);
+   - for the drawn `f` itself, that `d_F` of its four twists `f_λ` at `t = 11` is known (U2 needs it,
+     and it was not measured).
+
+   *Fix:* state it as a conditional.
+6. **U2′ wording and an unlisted dependency** (gap). The proof says `f ↦ f_λ` "preserves units". As
+   written that is wrong: it maps units at level `t + 1` to units at level `t`, which is the fact
+   actually used, and the parenthetical states it correctly. Separately, "Counterexample risks" 1 says
+   "U2′ needs only genericity", but U2′ also rests on Theorem 3 of `../README.md` (prose,
+   `[pcc:unverified]`). Theorem E and U2 also leave implicit the hypothesis that `f` is a unit at the
+   higher level.
+7. **The Lean file covers less than one sentence claims** (gap). The §8 table is accurate: U1, U2 and S
+   are listed as prose. But the header sentence "Their abstract closure steps … are kernel-checked"
+   overstates:
+   - `closure_glue` uses one `FilteredData` for both closures (same ring, same variable set), while U1
+     step 5 uses a subring closure with fewer variables.
+   - U2 and S compose a lift between different rings with a multiplier that raises degree by `δ = 2` or
+     1. `closure_glue` cannot express that (it needs the same `D`), and neither can
+     `closure_lift_defect` (its `hdeg` forbids raising degree).
+   - All statements are over an axiom-free `FilteredData`. `Closure = V_c` is not formalized (an open
+     item inherited from `../README.md`).
+
+   *Fix:* add a lemma `closure_lift_glue` (lift, degree shift `δ`, defect killed by the multiplier),
+   plus monotonicity in the variable set.
+8. **Minor wording in U1′.** "So does part (a), where no `t = 1` entry was measured": a `t = 1` tower
+   cell exists (`research/pkm_falldegree_unblock_20261107/RESULTS.md` Table 1, `d_F = 3 / 3`,
+   `[pcc:unverified]`). The `t = 1` reduction of `S₃` is a width-1-box unit, so that cell corroborates
+   (a) and should be cited. Conjecture G was fitted on `t = 2..11`, so `t = 1` is an extrapolated cell.
+9. **Sourcing (process, minor).** The knowledge base was not consulted (the note says so). "The only
+   previous upper bound, D4's `2t + 2`" is scoped to this repository; DERIVED.md D7 also records
+   `d_F ≤ D` (solving degree), which is not explicit in `t`. No novelty is claimed.
