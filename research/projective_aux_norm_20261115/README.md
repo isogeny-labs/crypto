@@ -84,9 +84,10 @@ indexed005,cold006}/runs.tar.xz, each with a directly checkable SHA256 file.
 Check with `sha256sum -c runs.tar.xz.sha256`, then extract using
 `tar -xJf runs.tar.xz` in that directory. Archives use normalized tar/xz
 metadata and retain every input, candidate, certificate, exit and failure.
-The 688992-byte indexed round uses the documented artifact-autofix CI upload,
-full remote-byte replay and manifest path; remote custody is pending that
-receipt. Hydrate it with `python3 tools/artifacts/artifacts.py pull
+Artifact-autofix run 43704942686 reports one uploaded and completely replayed
+688992-byte indexed archive. Commit 379576ac63 installs its manifest/ignore
+and removes the tracked raw file; SHA256 is
+8b8cb99d428ef8825d4522d2ed3583673605bfb5c8948b83b417e5ac6b6b5f38. Hydrate it with `python3 tools/artifacts/artifacts.py pull
 research/projective_aux_norm_20261115/evidence/indexed005` after migration.
 All other whole rounds are naturally below 64 KiB. No archive is split.
 [pcc:unverified]
@@ -129,3 +130,9 @@ prime arithmetic and an explicit degree/yield argument on an admissible family.
 The tiny presets do not meet the parent theorem's large-size parameter bounds,
 and there is no T1/T2/T3, fitted exponent or matched-rho claim here.
 [pcc:unverified]
+
+The full root Rust suite at source 2fd16de7ca finishes nonpassing: 6406 passed,
+48 failed,139 ignored. Failure output reports omitted sparse data/device
+sources in untouched tests. The earlier partial snapshot remains immutable;
+the complete final log is retained by the generated-setup continuation.
+No full root-suite pass is claimed. [pcc:unverified]

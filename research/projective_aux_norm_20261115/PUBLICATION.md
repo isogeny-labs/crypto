@@ -159,3 +159,17 @@ PCC sabotage classes pass locally; native/Lean evidence remains separately
 scoped. Merge 0dc7866eb1 preserves all178 main journal entries plus both unique
 09:09/10:12 sections; PCC ledger remains1077 with an exact main1076 prefix.
 [pcc:unverified]
+
+
+Manual parent fallback at da0dea6666 follows one unanswered Copilot request
+from10:53:56, after its head stayed379576ac63 beyond an hour. Merge main
+preserves all191 complete main journal sections and all3 complete own
+sections at chronological anchors; no event is rewritten. The qualified
+C++ source bodies are byte-identical to379576ac63 after the base merge.
+New continuation journal details will land with that separate result.
+Artifact-autofix run43704942686 reports one uploaded/full-byte-replayed
+object, SHA2568b8cb99d428ef8825d4522d2ed3583673605bfb5c8948b83b417e5ac6b6b5f38,
+688992 bytes; local manifest verification agrees. README/PDF now record
+that receipt. Full Rust outcome is6406/48/139 at source2fd16de7ca, not a
+pass; its complete log is retained in the generated-setup continuation.
+[pcc:unverified]

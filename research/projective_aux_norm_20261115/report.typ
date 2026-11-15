@@ -79,9 +79,9 @@ under the same protocol or relabelled as a mathematical result.
 )
 
 Each deterministic archive retains all native inputs, bases, proofs, errors,
-exits and manifests, with a SHA256 file. The indexed archive belongs in the
-standard artifact store; remote custody remains pending its CI upload/download
-receipt. No evidence is split. The other whole rounds fit the existing policy.
+exits and manifests, with a SHA256 file. CI run43704942686 reports the indexed archive uploaded and its entire remote
+bytes replayed; commit379576ac63 installs the manifest and removes tracked
+raw data. No evidence is split. The other whole rounds fit the existing policy.
 README.md gives build, hydration, extraction and hash-check commands.
 
 Initial failures are retained: missing libneogb at process startup; a final
@@ -106,3 +106,8 @@ sampling-law/accounting obligations; no implementation or run has begun.
 Sources: prior auxiliary-curve/PKM and selective-oracle notes, native Vélu
 implementations, the preceding PC component, and actual Mathlib coprimality,
 AdjoinRoot and ZMod laws. KB unavailable; no novelty or exhaustive survey claim.
+
+The root Rust run at source2fd16de7ca finishes6406 passed,48 failed,139 ignored.
+Its failures report omitted sparse data/device sources in untouched tests.
+The immutable partial snapshot remains; the complete final log is retained
+by the generated-setup continuation. No full root-suite pass is claimed.
