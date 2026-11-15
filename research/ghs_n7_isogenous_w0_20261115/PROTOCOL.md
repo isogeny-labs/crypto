@@ -23,3 +23,7 @@ The prediction that the genus-seven output would be hyperelliptic was false. Mag
 ## Amendment C: stronger published isogeny barrier
 
 A subsequent primary-source check of [Hess, *Generalising the GHS Attack*, Section 6](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/315278965D8D277A85812D9498236A88/S146115700000108Xa.pdf/generalising-the-ghs-attack-on-the-elliptic-curve-discrete-logarithm-problem.pdf) found the general congruence: absolute trace-zero binary elliptic curves have order 0 modulo four; trace-one curves have order 2 modulo four. Thus W1-to-W0 isogenies over the same field are impossible. The finite q2 product screen remains a reproducible positive control and exact coefficient census, but its missing trace −9 is already explained by this published obstruction. Do not describe that absence as a newly discovered exclusion theorem.
+
+## Amendment D: correct the Hess kernel exponent
+
+The first report gave `2^m−1=7` for m=3. Hess's Theorems 7 and 14 give `2^(m−1)=4` torsion under the non-subfield and rational-base hypotheses. Here `j=z^124∉F2`, so the degree-seven source is not a subfield curve, and gcd(5,4)=1. The subgroup preservation conclusion remains valid. The corrected report and kernel receipt replace the bound, while the original prediction remains in Amendment B.

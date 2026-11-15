@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Independent F128 sigma-annihilator check for the selected Hess parameter."""
 
+from math import gcd
+
 def mul(a: int, b: int) -> int:
     out = 0
     while b:
@@ -88,6 +90,6 @@ for degree in range(1, 8):
     if found:
         mf = min(found)
         break
-print(f"m_f=0b{mf:b} degree={mf.bit_length()-1} kernel_exponent_bound={(1 << (mf.bit_length()-1))-1}")
+print(f"m_f=0b{mf:b} degree={mf.bit_length()-1} kernel_exponent_bound={1 << (mf.bit_length()-2)}")
 assert mf.bit_length() - 1 == 4
-assert 23 % ((1 << 4) - 1) != 0
+assert gcd(23, 1 << (4 - 1)) == 1

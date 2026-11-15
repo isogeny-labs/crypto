@@ -18,8 +18,8 @@ SHA-256 digests:
 - `pilot_receipt.json`: `e5ff057030bb7018c8b5ece82e69836ac38fb24e537229c84feb045e9364d0b2`
 - `scan_receipt.json`: `7530fa3e15cd4f5d78388e1baf89391e60380efe1fa891bc8dc95aec21ba079e`
 - `map14_receipt.json`: `237f5a55ee4f04d46d9ebcd8cf851b3ead040d36ee94a6526e62365d9f56e11b`
-- `kernel_bound.py`: `d955444943709675bd2aebcaca19112ca8930324fd38c2841387975f0b5c40e8`
-- `kernel_bound.txt`: `32a51234f244dd7629ba0fd7d36c0bf7072419cdad2a6a884983870e84bdfdb5`
+- `kernel_bound.py`: `f552908d92d259919a2e933e2bfa013e1bad1d6c7402d4c980f14943fb2fce02`
+- `kernel_bound.txt`: `eb2ba31578b17a76bfb61a302e91d4066eebeb63dc5e8c192d3f333e5f37dc3e`
 - `scan_summary.json`: `217f3aa3c66c2971a54168bc1c699c8f59af4cd0eee97ca4b11c297af37701e6`
 
 The reported 0.13/0.20/0.75 seconds are Magma service timings for the construction and scan, **not** an index-calculus or rho benchmark. [pcc:unverified]

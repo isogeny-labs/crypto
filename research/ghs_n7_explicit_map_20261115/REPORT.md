@@ -1,4 +1,4 @@
-# Complete Hess-parameter scan and evaluated genus-14 transfer on the ±9 source
+# Complete Hess-parameter scan and evaluated genus-14 transfer on the −9 W1 source
 
 15 November 2026. [Frozen protocol and amendments](PROTOCOL.md), [full Magma scan response](scan_receipt.json), [validated summary](scan_summary.json), [map response](map14_receipt.json), and [independent kernel input check](kernel_bound.txt). [pcc:unverified]
 
@@ -20,7 +20,7 @@ The minimum is genus **14**, at `c=z^94` and `c=z^98`; no documented `WeilDescen
 
 At `c=z^94`, Magma returned a genus-14 plane curve (`CrvPln`) and evaluated its divisor map on the first exact order-23 point, `P=(1:z^105:1)`, and on the identity. The response contains both divisors. Since this is a plane curve, Magma returns divisors (`DivCrvElt`), not reduced Jacobian classes; the printed divisors alone do not establish their class orders.
 
-An independent bit-field computation found `j(E)=z^124∉F2`, `r=sqrt(1/j)=z^65`, `c=z^94`, and `r/c=z^98`. Their Frobenius annihilators are `m_c(T)=T⁴+T²+T+1=(T+1)(T³+T²+1)` and `m_(r/c)(T)=T³+T²+1`; `Tr(c)=1` satisfies Hess's Frobenius-extension condition. The a₂=1 term adds `T+1`, already present, so `deg m_f=4`. As the source is not defined over the proper subfield F2, Hess Theorem 7 confines the kernel of this conorm/norm class map to 15-torsion. Therefore its restriction to the order-23 subgroup is injective. This is a **theorem-based subgroup preservation check** for an evaluated, published genus-14 map. It is not a direct Jacobian-class order computation or target-log recovery. [pcc:unverified]
+An independent bit-field computation found `j(E)=z^124∉F2`, `r=sqrt(1/j)=z^65`, `c=z^94`, and `r/c=z^98`. Their Frobenius annihilators are `m_c(T)=T⁴+T²+T+1=(T+1)(T³+T²+1)` and `m_(r/c)(T)=T³+T²+1`; `Tr(c)=1` satisfies Hess's Frobenius-extension condition. The a₂=1 term adds `T+1`, already present, so `deg m_f=4`. As the source is not defined over the proper subfield F2, Hess Theorem 14 (from Theorem 7) confines the kernel of this conorm/norm class map to `2^(m−1)=8` torsion. Therefore its restriction to the order-23 subgroup is injective. This is a **theorem-based subgroup preservation check** for an evaluated, published genus-14 map. It is not a direct Jacobian-class order computation or target-log recovery. [pcc:unverified]
 
 ## Validation and limits
 
