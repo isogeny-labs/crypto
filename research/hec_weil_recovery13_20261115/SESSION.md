@@ -22,3 +22,9 @@ Source9e75b695db30/checkpoint193556 preceded one exit0execution.
 108polynomial comparisons plus fixture matched; W/residues inRUN.txt.
 No scientific rerun. git diffcheck noticed blank EOF in Weil note; trimmed only
 prose afterward. Next V2 adds exact integer lifting as a separate frozen gate.
+
+## Completed exact lift
+V2sourceb4c2df9008ee/checkpoint193803 preceded one exit0execution.
+30residue lifts,3coarse survivors,1endpoint survivor; brackets and recovered
+coefficients inRUN-V2.txt. Implied counts129/16043; no extension count.
+Both gate executions retained; no timing or speedup measurement.

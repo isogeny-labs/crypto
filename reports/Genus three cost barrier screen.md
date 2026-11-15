@@ -41,3 +41,16 @@ Genus 2 cannot access non-hyperelliptic genus-2 geometry; genus 4 additionally n
 The productive next step is **certified source recovery followed by a complete mathematical cost certificate for transfer plus scalable quartic IC**. Passing the residue gate would remove a concrete prerequisite; experiment admission still depends on the joint inequality and coverage bounds. The screen preserves a known genus-3 exponent mechanism while declining to promote it into a 10× result or a genus-2+ solution. [pcc:unverified]
 
 Source scope: all three supplied notes and the earlier RESULTS at commit `07d5141c2c7c`; primary Diem, Smith and Shi pages were also opened. KB revision `9141e386254340a9bdba3036f2bb706a`, refreshed 2026-11-14T21:44:48Z, predates these local records; lexical searches for the quartic exponent and cold-cost barrier supplied pointers, not replacement evidence. No implementation, timing, residue computation or independent replay was performed for this report. [pcc:unverified]
+
+## Executed follow-up, 15 November 2026
+
+After this desk study, a separately frozen correctness worker independently
+computed the expected Hasse-Witt matrix/residues, matching108polynomial oracle
+cases. A separately committed exact-lift amendment recovered the unique
+fixture polynomial and order2057786 without extension enumeration, conditional
+on the reused public subgroup check. Both first executions exited0, retained
+raw output and had pre-run S3 checkpoints. General ambiguous lifting remains
+unsupported; no timing or10xgain measured. The earlier uncomputed-residue
+statements describe this report's original screening stage, now superseded
+by the [executed results](../research/hec_weil_recovery13_20261115/RESULTS.md).
+[pcc:unverified]
