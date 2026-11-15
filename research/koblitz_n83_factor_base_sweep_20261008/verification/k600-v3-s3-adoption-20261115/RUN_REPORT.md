@@ -23,7 +23,7 @@ The native release example suite passed 27/27, including positive transfer and c
 
 ![Two fresh-pull and replay diagnostics](timings.png)
 
-![Read-only custody and replay path](custody.png)
+![Read-only custody and replay path](custody.svg)
 
 The diagram source is [custody.dot](custody.dot); the [vector diagram](custody.svg), [vector timing graph](timings.svg), and PNG renders are generated from the retained sources/data. The rendered report is [RUN_REPORT.pdf](RUN_REPORT.pdf).
 
