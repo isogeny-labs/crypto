@@ -715,3 +715,13 @@ Kummer `t = 13` "holds", and stage B. No row of the cells below exists.
 
 The study total at the limits is checked before each pod is created, against US$400 plus the `m = 4` jobs' ceilings
 (owner decision 16).
+
+## Amendment 22 (2026-11-15; route procedure; before the relaunch): balance per batch, frequent fetches
+
+After all 11 Amendment 21 pods were lost (most likely a RunPod balance stop; `results/RUNPOD_LOSSES_20261115.md`):
+- **Balance.** No batch of pods starts unless the owner has confirmed the balance covers the batch's spend at its limits (owner
+  decision 18 for this batch: US$99.15). This replaces the one-time confirmation of decision 10.
+- **Fetches.** While a batch runs, every pod's results are fetched every 15 minutes, checked against the pod's manifest, and
+  kept. A loss then costs at most 15 minutes of rows. Fetched rows are committed at each check-in (Amendment 17).
+- **Relaunch** (decision 18; Amendment 15 §7): attempt 2 of `iso-null`, `pfd-x-t14-k0-c6` and `pfd-x-t14-k1-c6`, with exactly
+  the Amendment 21 stages, limits and pins.
