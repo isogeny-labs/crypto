@@ -1,5 +1,20 @@
 # Trace-homomorphism matched experiment checkpoint access
 
+## 2026-11-15 scoped execution resolution
+
+The user explicitly accepted the capped local EKS/S3 exception for the three
+described steps. All three source-pinned panels completed:264 original,
+330 encoding and264 tau-presentation primary executions, with no invalid
+Found/Refuted decisions. The [dated report](../research/trace_zero_comparisons_20261115/README.md)
+links exports, raw outcomes and controls [pcc:unverified].
+
+The checkpoint transport and general EKS/full-DLP evaluation remain open.
+They no longer block these authorized local comparisons. The preparation
+and pending-exception text below is the historical access record before the
+2026-11-15 authorization, not the current status of those completed runs.
+
+## Historical access record
+
 - **Status:** open
 - **Kind:** access/tool limit; separate wide-encoder implementation dependency
 - **Affected work:** [trace integration](../research/ecc2k_trace_homomorphism_20261109/README.md), [pending comparison protocol](../research/ecc2k_trace_homomorphism_20261109/PROTOCOL.md)

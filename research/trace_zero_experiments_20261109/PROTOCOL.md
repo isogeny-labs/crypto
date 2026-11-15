@@ -1,8 +1,9 @@
 # Matched finite-domain trace-zero experiment
 
-The executable, exact input manifest and canonical protocol are prepared.
-Execution is pending access or a specific user exception; no solver panel has
-run. The mandatory checkpoint gate currently fails on missing upload access.
+Execution update2026-11-15: the user authorized the capped local EKS/S3
+exception. The pilot passed and all264 primary queries completed. The
+canonical accepted export is export-final.json; the dated run report is in
+reports/run-20261115T0450Z/. The original executable and workload were unchanged.
 
 Compare three real production encodings: explicit full-point witnesses,
 certified finite domains, and certified domains with necessary trace bits on
@@ -55,10 +56,11 @@ but does not grant upload or cloud budget access. The workflow builds ecbench,
 not this standalone new instrument, so submitting its fixture would not run
 this workload.
 
-The reviewable alternative is this exact local run, within the limits above,
-with durable Git input custody and flushed local rows, explicitly waiving the
-EKS/S3 rule for this run. It needs the user's explicit exception. No gate is
-silently changed and no experiment is relabeled as a unit test.
+The authorized alternative is this exact local run, within the limits above,
+with durable Git/artifact input custody and flushed local rows. The user's
+2026-11-15 instruction explicitly accepts the previously described EKS/S3
+exception. No gate configuration changed and no experiment was relabeled as
+a unit test. The original checkpoint transport remains unavailable.
 
 ## Reproduction
 
