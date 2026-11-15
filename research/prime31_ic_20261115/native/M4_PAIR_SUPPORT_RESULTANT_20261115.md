@@ -107,3 +107,18 @@ The preregistered `--m4-scale` experiment [GitHub Actions 43747237466](https://g
 **Material negative scaling:** doubling B8→B16 makes the quotient norm/GCD about 54× slower despite its still sparse positive output. The naive high-degree polynomial representation is a substantial cost blocker; do not project small-slice success to B31 or claim cold-rho advantage. Not shown: a natural-positive random-target success rate, independent relation-rank growth, ordinary B31 target-dependent quotient, complete scalar recovery, or any paired external CAS/rho benchmark.
 
 **Source-head accounting correction:** in the `ebb2c345` probe, `m4_extract_pairs` called `m4_first_eliminant` a *second* time, so the reported `algebraic_root_extraction_ns` also includes a redundant full quotient norm/GCD. Those two ns fields were not disjoint phases and **must not be added** to quote a baseline one-pass pipeline. Source commit `f1944c706e27d4662047f7e8deab17f1831e976d` replaces that duplicate call with `m4_extract_from_eliminant` and adds a wrapper/parity test; the corrected executable needs its own successful CI and frozen output before a revised performance conclusion. This eliminates redundant computational work, not the `B²` degree and steep observed one-pass norm scaling. Keep the original measurements rather than overwriting them.
+
+
+## Successful no-duplicate-norm Rust execution
+
+At `f1944c706e27d4662047f7e8deab17f1831e976d`, [development CI #43747735303](https://github.com/isogeny-labs/crypto/actions/runs/43747735303) **passed** the same focused suite, including the Rust wrapper-vs-reused-eliminant test and frozen B4/B8/B16 executable. See [`M4_NO_DUPLICATE_NORM_CI_20261115.json`](M4_NO_DUPLICATE_NORM_CI_20261115.json).
+
+| B | degree K | target norm/GCD positive | algebraic root/pair extraction positive | signed verification positive | target norm/GCD [17]G | signed rows positive / [17]G |
+|---:|---:|---:|---:|---:|---:|---:|
+| 4 | 16 | 0.057 ms | 0.251 ms | 0.051 ms | 0.055 ms | 1 / 0 |
+| 8 | 64 | 1.783 ms | 0.300 ms | 0.050 ms | 1.785 ms | 1 / 0 |
+| 16 | 256 | 106.916 ms | 0.572 ms | 0.052 ms | 106.555 ms | 1 / 0 |
+
+The extraction phase now **does not repeat** the already charged norm/GCD. Those three reported phases are disjoint inside one target invocation, but exclude cold base construction and charge pair-support K construction separately (B16 0.136ms); candidate validation includes 384 EC additions in the planted-positive case. These are single-run GitHub Actions timings, not a paired statistical benchmark, independent PCC replay, cold whole-ECDLP solve, or comparison with rho. B8→B16 still makes the expensive norm about 60× slower, so removing the duplicate norm is a useful exact source-level reduction but does not remove the central asymptotic bottleneck. A small-B positive fixture still supplies only one canonical signed row, not an independent-rank recovery.
+
+**Next blocker to attack:** replace degree-`B²` naive quotient Horner/remainders with fast polynomial arithmetic or the #4228 certified quotient route. Preregister correct outputs, natural-positive query yields and complete cost on B4/B8/B16/B31 before changing the algorithm; stop if the faster implementation is not cheaper than dense F4 and optimized matched rho at the relevant useful-rank yield. Handle intermediate identities and repeated indices before calling any m4 oracle complete.
