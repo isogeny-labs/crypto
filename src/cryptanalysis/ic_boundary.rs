@@ -1105,7 +1105,7 @@ fn invmod_u64(a: u64, m: u64) -> Option<u64> {
 /// [`invmod`] for a modulus and a reduced operand that fit 32 bits: the
 /// same extended Euclid, step for step.
 #[inline]
-fn invmod_u32(a: u32, m: u32) -> Option<u32> {
+pub(crate) fn invmod_u32(a: u32, m: u32) -> Option<u32> {
     // The loop of `invmod_u64` unrolled by two: instead of swapping the
     // remainder and coefficient pairs every step (and flipping the sign
     // flag), the two halves update one pair each and trade roles, and the
@@ -6251,6 +6251,11 @@ impl CountedGroup for PrimeCurve {
             left.reserve(requests.len());
             right.reserve(requests.len());
             outputs.reserve(requests.len());
+            // The field-operation tallies are summed in locals and added
+            // to `ops` once per round: the same totals, without a store
+            // through `ops` per lane.
+            let (mut adds, mut muls, mut sqrs, mut invs, mut reductions) =
+                (0u64, 0u64, 0u64, 0u64, 0u64);
             for &(lane, p, q, slot) in requests {
                 assert!(slot < addends.len());
                 if previous.len() <= lane {
@@ -6261,7 +6266,7 @@ impl CountedGroup for PrimeCurve {
                 } else if p.infinity {
                     None
                 } else {
-                    ops.field_ops.muls += 2;
+                    muls += 2;
                     Some(fast.point(p.x, p.y))
                 };
                 let fq = if let Some((_, native)) = addends[slot].filter(|(old, _)| *old == q) {
@@ -6270,7 +6275,7 @@ impl CountedGroup for PrimeCurve {
                     let native = if q.infinity {
                         None
                     } else {
-                        ops.field_ops.muls += 2;
+                        muls += 2;
                         Some(fast.point(q.x, q.y))
                     };
                     addends[slot] = Some((q, native));
@@ -6278,21 +6283,21 @@ impl CountedGroup for PrimeCurve {
                 };
                 left.push(fp);
                 right.push(fq);
-                ops.adds += 1;
+                adds += 1;
                 match (fp, fq) {
                     (Some(a), Some(b)) if a.x != b.x => {
-                        ops.field_ops.muls += 2;
-                        ops.field_ops.sqrs += 1;
+                        muls += 2;
+                        sqrs += 1;
                         if !batched {
-                            ops.field_ops.invs += 1;
-                            ops.field_ops.muls += 1; // Fp64::inv Montgomery correction.
+                            invs += 1;
+                            muls += 1; // Fp64::inv Montgomery correction.
                         }
                     }
                     (Some(a), Some(b)) if a.y == b.y && a.y != 0 => {
-                        ops.field_ops.muls += 2;
-                        ops.field_ops.sqrs += 2;
-                        ops.field_ops.invs += 1;
-                        ops.field_ops.muls += 1; // Fp64::inv Montgomery correction.
+                        muls += 2;
+                        sqrs += 2;
+                        invs += 1;
+                        muls += 1; // Fp64::inv Montgomery correction.
                     }
                     _ => {}
                 }
@@ -6300,9 +6305,9 @@ impl CountedGroup for PrimeCurve {
             if batched {
                 let stats = fast.add_many_batched(&mut left, &right, &mut scratch);
                 if stats.ordinary > 0 {
-                    ops.field_ops.invs += 1;
+                    invs += 1;
                     // batch_inv performs k prefix and 2k suffix multiplies.
-                    ops.field_ops.muls += 3 * stats.ordinary as u64 + 1;
+                    muls += 3 * stats.ordinary as u64 + 1;
                 }
             } else {
                 for (p, q) in left.iter_mut().zip(right.iter().copied()) {
@@ -6312,7 +6317,7 @@ impl CountedGroup for PrimeCurve {
             for (&native, &(lane, _, _, _)) in left.iter().zip(requests) {
                 let out = match native {
                     Some(pt) => {
-                        ops.montgomery_reductions += 2; // Montgomery -> canonical.
+                        reductions += 2; // Montgomery -> canonical.
                         let (x, y) = fast.canonical(pt);
                         PrimePoint::affine(x, y)
                     }
@@ -6321,6 +6326,11 @@ impl CountedGroup for PrimeCurve {
                 previous[lane] = Some((out, native));
                 outputs.push(out);
             }
+            ops.adds += adds;
+            ops.field_ops.muls += muls;
+            ops.field_ops.sqrs += sqrs;
+            ops.field_ops.invs += invs;
+            ops.montgomery_reductions += reductions;
         }))
     }
     fn supports_native_lane_walk(&self) -> bool {
@@ -8829,6 +8839,13 @@ impl PairTable {
             wall_ns: self.build_wall_ns,
             native: Vec::new(),
         }
+    }
+
+    /// Whether [`Self::probe`] on `target` finds no key: then it returns
+    /// `None` after its one lookup and no addition.
+    #[inline]
+    pub fn misses<G: CountedGroup>(&self, g: &G, target: &G::Elt) -> bool {
+        self.get(g.key(target) >> 1).is_none()
     }
 
     /// Indices `(i, j)` with `P_i + P_j = target`, if the table holds a
@@ -13207,6 +13224,37 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
     touch: impl Fn(&G::Elt),
     line_guard: bool,
 ) -> PipelineOutcome {
+    collect_and_solve_relations_touching_miss(
+        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+        oracle, touch, |_| false, line_guard,
+    )
+}
+
+/// [`collect_and_solve_relations_touching`] with a miss predicate:
+/// `certain_miss(point)` may return `true` only when `oracle` on `point`
+/// would return no relation and do nothing but add one to
+/// `OracleCounters::lookups` (see `DecompositionOracle::certain_miss`).
+/// The loop then adds that lookup and skips the call, so every counter
+/// and decision is unchanged.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_miss<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    certain_miss: impl Fn(&G::Elt) -> bool,
+    line_guard: bool,
+) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
@@ -13225,6 +13273,7 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
             None,
             oracle,
             touch,
+            certain_miss,
             GuardLineSet::with_capacity(capacity),
         )
     } else {
@@ -13244,6 +13293,7 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
             None,
             oracle,
             touch,
+            certain_miss,
             fast_map(capacity),
         )
     }
@@ -13286,6 +13336,7 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         scale,
         oracle,
         |_| {},
+        |_| false,
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
     )
 }
@@ -13311,6 +13362,7 @@ fn collect_and_solve_relations_scaled_touching<
     mut scale: Option<&mut CoeffScale>,
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
     touch: impl Fn(&G::Elt),
+    certain_miss: impl Fn(&G::Elt) -> bool,
     mut seen: R,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
@@ -13419,8 +13471,12 @@ fn collect_and_solve_relations_scaled_touching<
             permutation: (0..jump_count).collect(),
         })
         .collect();
-    let mut lane_queue: std::collections::VecDeque<(usize, G::Elt, u64, u64)> =
-        std::collections::VecDeque::new();
+    // The prepared targets of the current lane round, consumed from
+    // `lane_head`: a plain vector refilled only once it is drained, in
+    // the order a FIFO would hand them out.
+    let mut lane_queue: Vec<(usize, G::Elt, u64, u64)> =
+        Vec::with_capacity(lane_config.map_or(0, |x| x.0));
+    let mut lane_head = 0usize;
     let mut lane_adder = lane_config.map(|(_, batched)| {
         g.native_lane_walk_adder(batched)
             .expect("prime lanes required")
@@ -13505,7 +13561,16 @@ fn collect_and_solve_relations_scaled_touching<
     }
 
     while trials < max_trials {
-        if lane_config.is_some() && lane_queue.is_empty() {
+        // Exclusive phase marks (no-ops without an `ic_measurement`
+        // session): drawing the target-dependent query point.  The mark
+        // comes before the batched lane round, which draws the next
+        // sixteen query points; after it, the round's wall was charged to
+        // whichever phase the previous trial ended in (`target_pdp`
+        // after a miss).  Only wall fields move.
+        measurement::mark(measurement::Phase::TargetQuery);
+        if lane_config.is_some() && lane_head == lane_queue.len() {
+            lane_queue.clear();
+            lane_head = 0;
             lane_requests.clear();
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if lane.fresh || lane.segment_steps >= segment_cap {
@@ -13570,26 +13635,24 @@ fn collect_and_solve_relations_scaled_touching<
                     lanes[*index].point = *point;
                 }
             }
+            // Queue the round's targets and, in the same pass, request the
+            // lines their guard and oracle probes will read (advisory: the
+            // order of the requests decides nothing).
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if g.is_identity(&lane.point) {
                     lane.fresh = true;
                     direct_skipped += 1;
                 } else {
-                    lane_queue.push_back((index, lane.point, lane.a, lane.b));
+                    lane_queue.push((index, lane.point, lane.a, lane.b));
                     lane_prepared += 1;
-                }
-            }
-            if R::PREFETCH {
-                for &(_, point, _, _) in &lane_queue {
-                    seen.prefetch(g.key(&point));
-                    touch(&point);
+                    if R::PREFETCH {
+                        seen.prefetch(g.key(&lane.point));
+                        touch(&lane.point);
+                    }
                 }
             }
             lane_rounds += 1;
         }
-        // Exclusive phase marks (no-ops without an `ic_measurement`
-        // session): drawing the target-dependent query point.
-        measurement::mark(measurement::Phase::TargetQuery);
         let (point, a, b, lane_id) = match targets {
             TargetSource::Random | TargetSource::RandomUnguarded => {
                 rng_draws += 2;
@@ -13731,7 +13794,8 @@ fn collect_and_solve_relations_scaled_touching<
                 (walk_point, wa, wb, None)
             }
             TargetSource::WalkPrimeLanes { .. } => {
-                let (lane, point, a, b) = lane_queue.pop_front().expect("nonempty lane round");
+                let (lane, point, a, b) = *lane_queue.get(lane_head).expect("nonempty lane round");
+                lane_head += 1;
                 (point, a, b, Some(lane))
             }
         };
@@ -13754,6 +13818,11 @@ fn collect_and_solve_relations_scaled_touching<
             }
         }
         measurement::mark(measurement::Phase::TargetPdp);
+        if certain_miss(&point) {
+            // Exactly the oracle call's effect on a miss.
+            ctr.lookups += 1;
+            continue;
+        }
         let relations = oracle(&mut rel.group_ops, &mut ctr, point, a, b);
         if relations.is_empty() {
             continue;
@@ -13920,7 +13989,7 @@ fn collect_and_solve_relations_scaled_touching<
             rel.count("lane_batch_inversion", u64::from(batched));
             rel.count("lane_rounds", lane_rounds);
             rel.count("lane_prepared", lane_prepared);
-            rel.count("lane_unused_prepared", lane_queue.len() as u64);
+            rel.count("lane_unused_prepared", (lane_queue.len() - lane_head) as u64);
             let reductions = rel.group_ops.montgomery_reductions;
             rel.count("montgomery_reductions", reductions);
             rel.count(

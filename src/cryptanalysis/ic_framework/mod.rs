@@ -90,7 +90,7 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations_touching, price_phase, Calibration, CompletionRule, CountedGroup,
+    collect_and_solve_relations_touching_miss, price_phase, Calibration, CompletionRule, CountedGroup,
     FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
     TargetSource,
 };
@@ -638,7 +638,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // rows through the same call.
         let line_guard = oracle.line_guard();
         let oracle_cell = std::cell::RefCell::new(&mut *oracle);
-        collect_and_solve_relations_touching(
+        collect_and_solve_relations_touching_miss(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -657,6 +657,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
                     .decompose_relations(ctx, &fb, ops, counters, point, a, b)
             },
             |point| oracle_cell.borrow().touch(ctx, point),
+            |point| oracle_cell.borrow().certain_miss(ctx, point),
             line_guard,
         )
     };

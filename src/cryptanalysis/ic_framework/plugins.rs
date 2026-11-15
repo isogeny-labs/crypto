@@ -2298,6 +2298,18 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         }
     }
 
+    /// With `m = 2` a decomposition is one [`PairTable::probe`]: one
+    /// lookup, and the addition only when the key is present.  An absent
+    /// key is therefore exactly "no relation, one lookup".  `decompose`
+    /// and the default `decompose_relations` add nothing else.
+    fn certain_miss(&self, ctx: &InstanceCtx<G>, point: &G::Elt) -> bool {
+        self.m == 2
+            && self
+                .table
+                .as_ref()
+                .is_some_and(|table| table.misses(ctx.group, point))
+    }
+
     fn line_guard(&self) -> bool {
         self.lines
     }

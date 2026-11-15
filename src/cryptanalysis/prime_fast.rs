@@ -170,7 +170,21 @@ impl Fp64 {
     pub fn inv(&self, a: u64) -> u64 {
         // inv_mod gives (a·R)⁻¹ = a⁻¹·R⁻¹; times R³ through one
         // Montgomery multiplication (which divides by R) is a⁻¹·R.
-        let c = inv_mod_u64(a, self.p);
+        //
+        // Below 2³² the stored value `a < p` and `p` fit 32 bits, and the
+        // division-based extended Euclid on 32-bit words
+        // (`ic_boundary::invmod_u32`, the inversion every affine
+        // `PrimeCurve` operation already uses) replaces the 64-bit binary
+        // one.  The inverse mod a prime is unique, so `c` is the same
+        // value either way.
+        let c = if self.p <= u64::from(u32::MAX) {
+            u64::from(
+                crate::cryptanalysis::ic_boundary::invmod_u32(a as u32, self.p as u32)
+                    .expect("Fp64::inv of a non-zero element mod a prime"),
+            )
+        } else {
+            inv_mod_u64(a, self.p)
+        };
         self.mul(c, self.r3)
     }
 
@@ -424,12 +438,12 @@ pub struct FastCurve {
 
 /// Reused storage for simultaneous additions from independent walk lanes.
 /// Each active ordinary lane contributes one denominator; exceptional lanes
-/// use the ordinary group law after the shared inversion.
+/// use the ordinary group law (no lane reads another, so order is free).
 #[derive(Default)]
 pub struct BatchAddScratch {
-    denominators: Vec<u64>,
-    prefix: Vec<u64>,
-    ordinary: Vec<Option<usize>>,
+    /// Per ordinary lane, in lane order: the running product before its
+    /// denominator, the denominator `x₂ − x₁`, and the lane index.
+    ordinary: Vec<(u64, u64, usize)>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -585,40 +599,43 @@ impl FastCurve {
         scratch: &mut BatchAddScratch,
     ) -> BatchAddStats {
         assert_eq!(left.len(), right.len());
-        let n = left.len();
-        scratch.denominators.clear();
+        let f = &self.f;
         scratch.ordinary.clear();
-        scratch.denominators.reserve(n);
-        scratch.ordinary.reserve(n);
+        scratch.ordinary.reserve(left.len());
         let mut stats = BatchAddStats::default();
-        for (&a, &b) in left.iter().zip(right) {
-            if let (Some(p), Some(q)) = (a, b) {
+        // Forward pass: Montgomery's trick fused with the lane scan.  Each
+        // ordinary lane's denominator `x₂ − x₁` and the running product
+        // before it (the `prefix` of [`Fp64::batch_inv`], in the same
+        // order); an exceptional lane takes the ordinary group law at once,
+        // since no lane reads another.
+        let mut acc = f.one;
+        for (i, (l, &r)) in left.iter_mut().zip(right).enumerate() {
+            if let (Some(p), Some(q)) = (*l, r) {
                 if p.x != q.x {
-                    let index = scratch.denominators.len();
-                    scratch.denominators.push(self.f.sub(q.x, p.x));
-                    scratch.ordinary.push(Some(index));
-                    stats.ordinary += 1;
+                    let d = f.sub(q.x, p.x);
+                    scratch.ordinary.push((acc, d, i));
+                    acc = f.mul(acc, d);
                     continue;
                 }
             }
-            scratch.ordinary.push(None);
             stats.exceptional += 1;
+            *l = self.add(*l, r);
         }
+        stats.ordinary = scratch.ordinary.len();
         if stats.ordinary > 0 {
-            self.f
-                .batch_inv(&mut scratch.denominators, &mut scratch.prefix);
             stats.inversions = 1;
-        }
-        for i in 0..n {
-            left[i] = if let Some(index) = scratch.ordinary[i] {
-                Some(self.add_with_inv(
-                    left[i].expect("ordinary lane"),
-                    right[i].expect("ordinary lane"),
-                    scratch.denominators[index],
-                ))
-            } else {
-                self.add(left[i], right[i])
-            };
+            // Backward pass: the same products as `batch_inv`'s, each
+            // inverse used as soon as it is formed.  Inverses are exact
+            // field elements, so every output is `add`'s.
+            let mut inv_acc = f.inv(acc);
+            for &(before, d, i) in scratch.ordinary.iter().rev() {
+                let inv_d = f.mul(inv_acc, before);
+                inv_acc = f.mul(inv_acc, d);
+                let (Some(p), Some(q)) = (left[i], right[i]) else {
+                    unreachable!("ordinary lanes hold two points")
+                };
+                left[i] = Some(self.add_with_inv(p, q, inv_d));
+            }
         }
         stats
     }

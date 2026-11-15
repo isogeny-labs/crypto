@@ -265,6 +265,19 @@ pub trait DecompositionOracle<G: CountedGroup> {
     /// The default is a no-op and the hook may not decide or count.
     fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
 
+    /// A decision-free shortcut for the relation loop's common case:
+    /// `true` only when [`decompose_relations`] on `point` would return no
+    /// relation and its **only** effect would be `counters.lookups += 1`
+    /// (no group operation, no other counter, no state change).  The loop
+    /// then adds that one lookup itself and skips the call, so every
+    /// counter and decision is the call's.  The default never claims a
+    /// miss, which keeps every other oracle on the full call.
+    ///
+    /// [`decompose_relations`]: DecompositionOracle::decompose_relations
+    fn certain_miss(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) -> bool {
+        false
+    }
+
     /// Select the cache-line relation guard.  Both representations return
     /// identical membership answers; the default preserves every recorded
     /// run's hash-map path.

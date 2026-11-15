@@ -56,6 +56,156 @@ fn now_ns() -> u64 {
     }
 }
 
+/// The hot-path clock: raw ticks of the x86-64 time-stamp counter when the
+/// CPU advertises an invariant TSC, otherwise [`now_ns`] itself.
+///
+/// A boundary runs twice per relation trial (millions of times in a 32-bit
+/// child), and even the vDSO `clock_gettime` path (call, seqlock, TSC read,
+/// scale and shift) cost more than the rest of a boundary; an ordered TSC
+/// read (`rdtscp`, or `lfence; rdtsc`, as the vDSO reads it) is one or two
+/// instructions.  Ticks are converted to nanoseconds once, when the session
+/// finishes, at the session's own average TSC rate measured against
+/// `CLOCK_MONOTONIC` between [`Session::begin`] and [`Session::finish`]
+/// ([`TickScale`]).
+///
+/// **Precision.**  Each phase total is its tick count times that average
+/// rate, so it inherits the rate's relative error: the two calibration
+/// reads (TSC and `CLOCK_MONOTONIC` side by side) are each a few tens of
+/// nanoseconds apart, which over a session of milliseconds or more is a
+/// part-per-million-scale error, well under scheduling noise.  The phase
+/// totals still sum exactly to `observed_wall_ns` (and the online ones to
+/// `online_wall_ns`): the conversion is applied to running sums, so each
+/// phase may move by at most one nanosecond against a direct conversion.
+/// Without an invariant TSC, or off x86-64, ticks are nanoseconds and
+/// nothing changes from the `clock_gettime` path.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Clock {
+    Monotonic,
+    /// `lfence; rdtsc`.
+    #[cfg(target_arch = "x86_64")]
+    Tsc,
+    /// `rdtscp`, when the CPU has it.
+    #[cfg(target_arch = "x86_64")]
+    Tscp,
+}
+
+impl Clock {
+    /// Chosen once per session.
+    fn detect() -> Self {
+        #[cfg(target_arch = "x86_64")]
+        {
+            // CPUID 0x8000_0007 EDX bit 8: invariant TSC (constant rate
+            // across P-, C- and T-states, the `nonstop_tsc` flag on Linux).
+            // `cpuid` exists on every x86-64 CPU (a safe intrinsic).
+            let max_ext = std::arch::x86_64::__cpuid(0x8000_0000).eax;
+            if max_ext >= 0x8000_0007
+                && std::arch::x86_64::__cpuid(0x8000_0007).edx & (1 << 8) != 0
+            {
+                // CPUID 0x8000_0001 EDX bit 27: `rdtscp`.
+                return if std::arch::x86_64::__cpuid(0x8000_0001).edx & (1 << 27) != 0 {
+                    Self::Tscp
+                } else {
+                    Self::Tsc
+                };
+            }
+        }
+        Self::Monotonic
+    }
+
+    #[inline(always)]
+    fn ticks(self) -> u64 {
+        match self {
+            Self::Monotonic => now_ns(),
+            // An *ordered* TSC read, as the kernel's `rdtsc_ordered` (what
+            // the vDSO `clock_gettime` reads too): a bare `rdtsc` may execute
+            // before earlier instructions finish, which charges work still
+            // in flight at a boundary (a division chain, a cache miss) to
+            // the next phase.  Measured on the 32-bit `walk` child, a bare
+            // `rdtsc` moved about a sixth of the online wall from
+            // `target_query` to `target_pdp`; `rdtscp` (which waits for
+            // every earlier instruction) and `lfence; rdtsc` keep the split
+            // that `clock_gettime` gave.
+            // SAFETY: `lfence`, `rdtsc` and (when CPUID reports it)
+            // `rdtscp` are unprivileged on Linux x86-64; SSE2 is part of
+            // the x86-64 baseline.
+            #[cfg(target_arch = "x86_64")]
+            Self::Tsc => unsafe {
+                core::arch::x86_64::_mm_lfence();
+                core::arch::x86_64::_rdtsc()
+            },
+            #[cfg(target_arch = "x86_64")]
+            Self::Tscp => unsafe {
+                let mut aux = 0u32;
+                core::arch::x86_64::__rdtscp(&mut aux)
+            },
+        }
+    }
+}
+
+/// The tick → nanosecond map of one session: `ns = ticks · ns_span /
+/// tick_span`, both spans measured between the session's first and last
+/// clock reads.  The identity for [`Clock::Monotonic`].
+#[derive(Clone, Copy)]
+struct TickScale {
+    ns_span: u64,
+    tick_span: u64,
+}
+
+impl TickScale {
+    #[inline]
+    fn ns(self, ticks: u64) -> u64 {
+        if self.tick_span == 0 || self.tick_span == self.ns_span {
+            return ticks;
+        }
+        (u128::from(ticks) * u128::from(self.ns_span) / u128::from(self.tick_span)) as u64
+    }
+
+    /// Per-entry nanoseconds of `ticks`, converted through running sums so
+    /// they add up to `self.ns(ticks.sum())` exactly.
+    fn split(self, ticks: impl Iterator<Item = u64>) -> Vec<u64> {
+        let (mut cum_ticks, mut cum_ns) = (0u64, 0u64);
+        ticks
+            .map(|t| {
+                cum_ticks += t;
+                let next = self.ns(cum_ticks);
+                let out = next - cum_ns;
+                cum_ns = next;
+                out
+            })
+            .collect()
+    }
+}
+
+/// Whether phase boundaries issue Callgrind `DUMP_STATS_AT` requests:
+/// only under Valgrind (the `RUNNING_ON_VALGRIND` client request, which
+/// natively returns 0), and not when `IC_MEASUREMENT_PHASE_DUMPS=0`.
+/// Decided once per session.  Natively a boundary therefore issues no
+/// client request; under Callgrind the per-phase parts that
+/// `icprog callgrind` sums are still written, and setting the variable to
+/// `0` profiles a whole solve as one part without patching the binary.
+fn phase_dumps_enabled() -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        let args = [0x1001usize, 0, 0, 0, 0, 0];
+        let running: usize;
+        // SAFETY: the Valgrind client-request preamble; natively the
+        // rotations cancel and `xchg rbx, rbx` is a no-op, so `rdx` keeps
+        // its default 0.
+        unsafe {
+            std::arch::asm!(
+                "rol rdi, 3", "rol rdi, 13", "rol rdi, 61", "rol rdi, 51",
+                "xchg rbx, rbx", in("rax") args.as_ptr(), inout("rdx") 0usize => running,
+                out("rdi") _, options(nostack)
+            );
+        }
+        running != 0 && std::env::var_os("IC_MEASUREMENT_PHASE_DUMPS").is_none_or(|v| v != "0")
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        false
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(usize)]
 pub enum Phase {
@@ -133,7 +283,13 @@ impl Phase {
 struct Trace {
     generation: u64,
     phase: Phase,
-    /// [`now_ns`] at the session's start and at the last boundary.
+    clock: Clock,
+    /// Issue a Callgrind dump at each boundary ([`phase_dumps_enabled`]).
+    dumps: bool,
+    /// [`now_ns`] when the session began, the calibration anchor.
+    started_ns: u64,
+    /// Clock ticks ([`Clock::ticks`]) at the session's start and at the
+    /// last boundary; every interval below is in ticks until `finish`.
     started: u64,
     last: u64,
     elapsed: [u64; 14],
@@ -147,9 +303,13 @@ struct Trace {
 
 impl Trace {
     fn boundary(&mut self, next: Phase) {
-        dump(self.phase.label());
-        let now = now_ns();
-        // The clock is monotonic, so the difference never wraps.
+        if self.dumps {
+            dump(self.phase.label());
+        }
+        // Monotonic clocks; the TSC is invariant and synchronised across
+        // cores, and the clamp only guards a migrating read, keeping `last`
+        // non-decreasing so the intervals still sum to `last − started`.
+        let now = self.clock.ticks().max(self.last);
         let ns = now - self.last;
         self.elapsed[self.phase as usize] += ns;
         if self.online_start.is_some() {
@@ -170,7 +330,14 @@ struct State {
     trace: Option<Trace>,
 }
 
-thread_local! { static CURRENT: RefCell<State> = RefCell::new(State::default()); }
+thread_local! {
+    static CURRENT: RefCell<State> = const {
+        RefCell::new(State {
+            generation: 0,
+            trace: None,
+        })
+    };
+}
 
 // A worker's strict session must notice an accidentally uninstrumented Rayon
 // callback. Ordinary library tests can still use isolated thread-local clocks.
@@ -220,12 +387,18 @@ impl Session {
                 .checked_add(1)
                 .expect("bounded session count");
             let generation = state.generation;
-            let now = now_ns();
+            let clock = Clock::detect();
+            let dumps = phase_dumps_enabled();
+            let started_ns = now_ns();
+            let now = clock.ticks();
             let mut entered = [false; 14];
             entered[Phase::Setup as usize] = true;
             state.trace = Some(Trace {
                 generation,
                 phase: Phase::Setup,
+                clock,
+                dumps,
+                started_ns,
                 started: now,
                 last: now,
                 elapsed: [0; 14],
@@ -272,30 +445,35 @@ impl Session {
                 return Err(error);
             }
             trace.boundary(Phase::Setup);
+            let scale = TickScale {
+                ns_span: now_ns().saturating_sub(trace.started_ns),
+                tick_span: trace.last - trace.started,
+            };
+            let scale = if trace.clock == Clock::Monotonic {
+                TickScale {
+                    ns_span: 1,
+                    tick_span: 1,
+                }
+            } else {
+                scale
+            };
+            let phases_ns = scale.split(PHASES.iter().map(|&p| trace.elapsed[p as usize]));
+            let online: Vec<Phase> = PHASES.iter().copied().filter(|p| p.online()).collect();
+            let online_ns = scale.split(online.iter().map(|&p| trace.online_elapsed[p as usize]));
             let snapshot = Snapshot {
                 schema_version: 1,
                 phases_ns: PHASES
                     .iter()
-                    .map(|&p| {
-                        (
-                            p.name(),
-                            trace.entered[p as usize].then_some(trace.elapsed[p as usize]),
-                        )
-                    })
+                    .zip(&phases_ns)
+                    .map(|(&p, &ns)| (p.name(), trace.entered[p as usize].then_some(ns)))
                     .collect(),
-                observed_wall_ns: trace.last - trace.started,
-                online_phases_ns: PHASES
+                observed_wall_ns: scale.ns(trace.last - trace.started),
+                online_phases_ns: online
                     .iter()
-                    .filter(|p| p.online())
-                    .map(|&p| {
-                        (
-                            p.name(),
-                            trace.online_entered[p as usize]
-                                .then_some(trace.online_elapsed[p as usize]),
-                        )
-                    })
+                    .zip(&online_ns)
+                    .map(|(&p, &ns)| (p.name(), trace.online_entered[p as usize].then_some(ns)))
                     .collect(),
-                online_wall_ns: trace.online_ns,
+                online_wall_ns: trace.online_ns.map(|ticks| scale.ns(ticks)),
             };
             state.trace = None;
             Ok(snapshot)
