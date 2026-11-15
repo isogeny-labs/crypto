@@ -50,6 +50,9 @@ breakthrough. Report each row's gap to the matched rho as the distance
 remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
+Claim tiers T0–T3 (faster than rho, smaller exponent, subexponential;
+transfers to hyperelliptic or other groups count when fully charged):
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md).
 
 Look up curve facts in the curve database before computing them or
 scanning `docs/curves/*.json`: MCP server `ecdb` (export `ECDB_TOKEN` from

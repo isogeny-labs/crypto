@@ -300,6 +300,21 @@ descriptive investigations report their own technical outcomes and next steps.
 - **Keep going.** After each result, name the next improvement to try, and
   move on to it.
 
+**Claim tiers** (owner, 2026-11-15): "faster than rho", "smaller exponent" and
+"subexponential" are defined in
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md) (checklist
+`docs/ic/success_criteria.json`): T0 improvement over the IC baseline; T1
+faster than matched rho at a stated size (paired interval below 1 across the
+§5a band and at `w_cal`, 32+ verified targets); T2 a smaller exponent along a
+declared family path (six or more sizes over 24+ bits, a frozen held-out
+prediction); T3 subexponential (a proof or named, per-size-tested heuristics,
+model selection on eight or more sizes, held-out test). A transfer to another
+group (a hyperelliptic or other Jacobian, a finite field, an isogenous curve)
+counts at every tier when the map's construction and evaluation are charged,
+its correctness is certified independently, the answer is verified on `E`,
+and its applicability is checked on the exact instance. Each tier is
+reported as the distance remaining, never as a gate on the work.
+
 ## Tracks of index calculus
 
 Owner's rule, 2026-10-29 (`research/prime_ic_program_20261029/DECISIONS.md`
