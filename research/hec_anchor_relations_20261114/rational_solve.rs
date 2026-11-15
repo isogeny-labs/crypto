@@ -45,6 +45,32 @@ pub fn solve(
     d: usize,
     gate: bool,
 ) -> Report {
+    solve_variant(c, d1, d2, ell, seed, requested_h, d, gate, false)
+}
+
+pub fn solve_linear(
+    c: &Curve,
+    d1: &Div,
+    d2: &Div,
+    ell: u64,
+    seed: u64,
+    requested_h: usize,
+    gate: bool,
+) -> Report {
+    solve_variant(c, d1, d2, ell, seed, requested_h, 2, gate, true)
+}
+
+fn solve_variant(
+    c: &Curve,
+    d1: &Div,
+    d2: &Div,
+    ell: u64,
+    seed: u64,
+    requested_h: usize,
+    d: usize,
+    gate: bool,
+    linear: bool,
+) -> Report {
     let all = Instant::now();
     let fp = &c.fp;
     let f = Fp::new(ell);
@@ -165,17 +191,33 @@ pub fn solve(
             }
         };
         let points: Vec<_> = chosen.iter().map(|&j| fb[j]).collect();
-        let batch = rational::SignedFamily::new(c.g, d, &points, fp).walsh(fp);
-        out.constructed += batch.len() as u64;
+        let kernel = if linear {
+            Some(crate::linear::Kernel::new(c.g, &points, fp))
+        } else {
+            None
+        };
+        let batch = if linear {
+            Vec::new()
+        } else {
+            rational::SignedFamily::new(c.g, d, &points, fp).walsh(fp)
+        };
+        let len = kernel.as_ref().map_or(batch.len(), |k| k.pairs.len());
+        out.constructed += len as u64;
         r.relation_ns += clock.elapsed().as_nanos();
-        for (signs, (a, b)) in batch.into_iter().enumerate() {
+        for signs in 0..len {
             if r.draws >= 1_000_000 {
                 out.status = "draw_cap";
                 break 'outer;
             }
             r.draws += 1;
             let clock = Instant::now();
-            let Some(p) = rational::primitive(c, &points, a, b) else {
+            let normalized = if let Some(k) = &kernel {
+                k.primitive(c, signs)
+            } else {
+                let (a, b) = batch[signs];
+                rational::primitive(c, &points, a, b)
+            };
+            let Some(p) = normalized else {
                 r.relation_ns += clock.elapsed().as_nanos();
                 continue;
             };
@@ -333,6 +375,49 @@ mod tests {
                     assert_eq!(r.base.raw_checks, r.base.admitted);
                     assert_eq!(r.base.pure_checks, r.base.pure_rows as u64);
                     assert!(r.constructed >= r.base.draws);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn linear_and_generic_complete_solvers_are_exact() {
+        fn counts(r: &Report) -> Vec<u64> {
+            let b = &r.base;
+            vec![
+                b.k.unwrap(),
+                r.requested_h as u64,
+                b.m as u64,
+                b.anchors as u64,
+                r.constructed,
+                b.draws,
+                b.unique_tuples as u64,
+                b.splits,
+                b.admitted,
+                b.duplicate_relations,
+                b.pure_rows as u64,
+                b.unions,
+                b.pins,
+                b.solves as u64,
+                b.descent_steps,
+                b.raw_checks,
+                b.pure_checks,
+                r.common,
+                r.normalized_admitted,
+            ]
+        }
+        for (g, p) in [(2, 101), (3, 61), (4, 31)] {
+            let i = hec_native_ic::instance::pick_instance(p, g).unwrap();
+            for h in [g + 6, 4 * g + 12] {
+                for seed in 0..2 {
+                    let k = 113 + 23 * seed;
+                    let target = i.curve.mul(&i.d1, k);
+                    let a = solve(&i.curve, &i.d1, &target, i.ell, 20260916 + seed, h, 2, true);
+                    let b = solve_linear(&i.curve, &i.d1, &target, i.ell, 20260916 + seed, h, true);
+                    assert_eq!(a.status, "solved");
+                    assert_eq!(b.status, a.status);
+                    assert_eq!(counts(&a), counts(&b));
+                    println!("linear_solve g={g} p={p} seed={seed} requested={h} effective={} constructed={} consumed={} exact_counts=true k={k}",b.base.anchors,b.constructed,b.base.draws);
                 }
             }
         }
