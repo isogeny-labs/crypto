@@ -285,6 +285,190 @@ fn natural(base:&Base,index:&CoordinateIndex,ar:&mut Arithmetic)->Result<(),Stri
     }));
     Ok(())
 }
+
+const UNKNOWNS: usize = 32;
+#[derive(Default)]
+struct System32 {
+    pivots: Vec<Option<(Vec<u64>, u64)>>,
+    rank: usize,
+    dependent: usize,
+    equations: usize,
+}
+// Matrix over the actual prime subgroup order n. The final unknown is log_G(Q).
+impl System32 {
+    fn new() -> Self {
+        Self { pivots:vec![None;UNKNOWNS], rank:0, dependent:0, equations:0 }
+    }
+    fn include(&mut self,row:&[(usize,i8)],a:u64,b:u64)->Result<bool,String>{
+        let mut v=vec![0u64;UNKNOWNS];
+        for &(i,s) in row {
+            if i>=UNKNOWNS-1 || (s != 1 && s != -1) {
+                return Err("invalid factor-base coefficient".into());
+            }
+            v[i]=(v[i]+if s==1{1}else{N-1})%N;
+        }
+        v[UNKNOWNS-1]=if b==0{0}else{N-b};
+        let mut rhs=a;
+        self.equations+=1;
+        for col in 0..UNKNOWNS {
+            if v[col]==0{continue;}
+            if let Some((pivot, pivot_rhs))=&self.pivots[col] {
+                let factor=v[col];
+                for j in col..UNKNOWNS {
+                    v[j]=(v[j]+N-nmul(factor,pivot[j]))%N;
+                }
+                rhs=(rhs+N-nmul(factor,*pivot_rhs))%N;
+            } else {
+                let inv=ninv(v[col]);
+                for vj in &mut v[col..] {*vj=nmul(*vj,inv);}
+                rhs=nmul(rhs,inv);
+                self.pivots[col]=Some((v,rhs));
+                self.rank+=1;
+                return Ok(true);
+            }
+        }
+        if rhs != 0 {
+            return Err("verified elliptic-curve relation inconsistent in mod-n linear algebra".into());
+        }
+        self.dependent+=1;
+        Ok(false)
+    }
+    fn solve(&self)->Result<[u64;UNKNOWNS],String>{
+        if self.rank != UNKNOWNS {return Err("incomplete coefficient rank".into());}
+        let mut sol=[0u64;UNKNOWNS];
+        for col in (0..UNKNOWNS).rev() {
+            let (pivot,rhs)=self.pivots[col].as_ref()
+                .ok_or("missing pivot column in full-rank matrix")?;
+            let mut value=*rhs;
+            for j in col+1..UNKNOWNS {
+                value=(value+N-nmul(pivot[j],sol[j]))%N;
+            }
+            sol[col]=value;
+        }
+        Ok(sol)
+    }
+}
+// Bounded, full relation-collection + modular solve test. This is bona-fide
+// factor-base linear algebra, but the coordinate-root oracle is mathematically
+// generic MITM-equivalent: not a new non-generic index calculus complexity.
+fn cold_full_log(q:(u64,u64), cap:usize)->Result<Option<u64>,String>{
+    let started=Instant::now();
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar)?;
+    if !ar.on_curve(PRIME31,Some(q)){return Err("invalid external Q".into());}
+    let base=Base::build(PRIME31,6,&mut ar)?;
+    if base.points.len()!=31{return Err("wrong B31 base".into());}
+    let index=CoordinateIndex::new(&base.points.iter().map(|p|p.0).collect::<Vec<_>>())?;
+    if index.support.len()!=961 {return Err("root index support changed".into());}
+    let cold_setup_ns=started.elapsed().as_nanos();
+    let mut walk_seed=0x5354525543545f38u64;
+    let mut steps=Vec::with_capacity(64);
+    let step_started=Instant::now();
+    for _ in 0..64 {
+        let da=1+splitmix64_next(&mut walk_seed)%(N-1);
+        let db=1+splitmix64_next(&mut walk_seed)%(N-1);
+        let p=ar.scalar(PRIME31,da,Some(PRIME31.g));
+        let r=ar.scalar(PRIME31,db,Some(q));
+        let step=ar.add(PRIME31,p,r).ok_or("degenerate public-step point")?;
+        steps.push((step,da,db));
+    }
+    let step_setup_ns=step_started.elapsed().as_nanos();
+    let mut position:Point=Some(PRIME31.g);
+    let mut alpha=1u64;
+    let mut beta=0u64;
+    let mut system=System32::new();
+    let mut query_ns=0u128;
+    let mut validation_ns=0u128;
+    let mut LA_ns=0u128;
+    let mut target_generation_ns=0u128;
+    let mut nonempty=0usize;
+    let mut verified_rows=0usize;
+    let mut independent=0usize;
+    let mut calls=0usize;
+    let mut first_hit=None;
+    let mut final_log=None;
+    let mut replay_additions=0u64;
+    let mut seen=BTreeSet::new();
+    let mut duplicate_targets=0usize;
+    for turn in 0..cap {
+        let choice=(splitmix64_next(&mut walk_seed) as usize)&63;
+        let (step,da,db)=steps[choice];
+        let timer=Instant::now();
+        position=ar.add(PRIME31,position,Some(step));
+        alpha=(alpha+da)%N;
+        beta=(beta+db)%N;
+        target_generation_ns+=timer.elapsed().as_nanos();
+        let Some(r)=position else {continue;};
+        // Source-only x projection; can be equal for R and -R. Track point
+        // encodings to exclude any repeated whole public target.
+        if !seen.insert(r) {
+            duplicate_targets+=1;
+            continue;
+        }
+        calls+=1;
+        let timer=Instant::now();
+        let tuples=index.tuples(r.0)?;
+        query_ns+=timer.elapsed().as_nanos();
+        if tuples.is_empty(){continue;}
+        nonempty+=1;
+        if first_hit.is_none(){first_hit=Some(turn);}
+        let before=ar.counts.group_additions;
+        let timer=Instant::now();
+        let rows=validate(&base,r,&tuples,&mut ar);
+        validation_ns+=timer.elapsed().as_nanos();
+        replay_additions+=ar.counts.group_additions-before;
+        if rows.is_empty(){return Err("S3 coordinate support gave a false positive on prime-order curve".into());}
+        for row in rows {
+            verified_rows+=1;
+            let timer=Instant::now();
+            if system.include(&row,alpha,beta)?{independent+=1;}
+            LA_ns+=timer.elapsed().as_nanos();
+            if system.rank == UNKNOWNS {
+                let sol=system.solve()?;
+                // Verify every factor-base log and external target log
+                // independently with reused Rust group arithmetic.
+                for (i,&p) in base.points.iter().enumerate() {
+                    if ar.scalar(PRIME31,sol[i],Some(PRIME31.g))!=Some(p){
+                        return Err(format!("factor-base discrete log verification failed at {i}"));
+                    }
+                }
+                if ar.scalar(PRIME31,sol[31],Some(PRIME31.g))!=Some(q){
+                    return Err("external Q discrete log verification failed".into());
+                }
+                final_log=Some(sol[31]);
+                break;
+            }
+        }
+    }
+    println!("{}",json!({
+        "standing":"[pcc:unverified]",
+        "method":"Rust factor-base relations plus prime-modulus Gaussian elimination; S3 coordinate root-index discovery (generic-equivalent)",
+        "new_non_generic_attack":false,
+        "curve_p":P,"curve_n":N,"factor_base_size":31,
+        "public_target":q,"target_fixture_scalar_never_passed_to_solver":true,
+        "max_public_walk_targets":cap,"visited_distinct_targets":calls,
+        "duplicate_public_targets":duplicate_targets,
+        "first_nonempty_turn":first_hit,
+        "algebraic_nonempty_targets":nonempty,
+        "verified_relation_rows":verified_rows,
+        "independent_equation_rows":independent,
+        "coefficient_rank":system.rank,
+        "linear_equations_processed":system.equations,
+        "dependent_rows":system.dependent,
+        "cold_setup_ns":cold_setup_ns,"step_setup_ns":step_setup_ns,
+        "public_target_walk_ns":target_generation_ns,
+        "algebraic_discovery_ns":query_ns,
+        "post_discovery_verification_ns":validation_ns,
+        "linear_algebra_ns":LA_ns,
+        "relation_replay_additions":replay_additions,
+        "full_cold_wall_ns":started.elapsed().as_nanos(),
+        "verified_complete_log":final_log,
+        "complete_ECDLP_recovery":final_log.is_some(),
+        "matched_optimized_rho":false
+    }));
+    Ok(final_log)
+}
+
 fn main()->Result<(),String>{
     let mut ar=Arithmetic::default();
     check_curve(PRIME31,&mut ar)?;
@@ -312,6 +496,19 @@ fn main()->Result<(),String>{
         "no_ordinates_or_group_additions_in_discovery":true,
         "generic_equivalent_not_novel":true}));
     if std::env::args().any(|x|x=="--natural-16384"){natural(&base,&index,&mut ar)?;}
+    if std::env::args().any(|x|x=="--solve-one"){
+        // Public synthetic fixture only. The solver receives q, never k.
+        const FIXTURE_K:u64=1_038_579_171;
+        let public_q=ar.scalar(PRIME31,FIXTURE_K,Some(PRIME31.g))
+            .ok_or("known-answer fixture unexpectedly infinity")?;
+        let recovered=cold_full_log(public_q,250_000)?;
+        if recovered.is_some() && recovered!=Some(FIXTURE_K){
+            return Err("held-out known-answer fixture mismatch".into());
+        }
+        println!("{}",json!({"posthoc_fixture_matches":recovered==Some(FIXTURE_K),
+                              "fixture_used_for_relation_oracle":false,
+                              "solver_target":"public point only"}));
+    }
     Ok(())
 }
 #[cfg(test)]
