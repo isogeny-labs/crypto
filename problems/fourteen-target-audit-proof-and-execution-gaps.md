@@ -2717,3 +2717,43 @@ positive-dimensional isolated components/projective cycles, Rojas C refinement
 and the remaining fourteen-item obligations stay open. No new host/compiler
 independence, canonical promotion, cryptoPython, limits/flags/waivers/frozen edits,
 paid compute or agent uploads. [pcc:unverified]
+
+
+### Actual JV affine-scheme origin stalk and germ map
+
+The [actual JV scheme-stalk proof](../research/jv_scheme_stalk_audit_20261115/README.md)
+identifies the actual origin structure-sheaf stalk of Spec(A), for the literal
+first homogeneous F101 quotient, with its canonical prime localization. The
+actual stalk has its own self-module length8 and canonical residue field F101.
+The official categorical comparison is retained, and the actual coefficient map
+is proved equal to the actual global-section germ map. Actual scheme
+nonreducedness follows from the credited nilpotent witness and official affine
+reducedness equivalence. Unique point/isolation/cardinality1 are credited
+scheme corollaries rather than a new population. Stalk length8 differs from1.
+Actual first quotient/localization schemes and principal basic open are empty;
+actual second source-root-induced quotient/open/cone points and second basic-open
+membership prove the nonempty controls. No comparison, length, locality, residue,
+reducedness or germ correctness conclusion is supplied as a premise. Official
+comparison/scalar-restriction methods and predecessor73-theorem gate are credited.
+Exact local **PCC-20261115-2f14e0** replay PASS at 2026-11-15T14:41:02Z; signed standing unverified.
+Fresh21theorems/4newmodules(3concrete+1import-only)/0failures/0trusted-native
+exemptions/full transitive standard foundations;24frozen local modules/0copies.
+49formal+18artifact=67pins; all59predecessor pins unchanged before/after each
+numbered state. Four states/three failures01–03/final04success retained.
+Full709-character binding/native1complete/0prefix/0unresolved/empty suffix.
+92files/42objects/18148byte losslessXZ/five gate files.
+Reportdraft01spill129characters to page2 retained8files49128byteXZ; finalonepage
+47974bytePDF/all5464textcharacters read/visual/inbounds. Zero new-source warnings;
+12inherited module advisories and1frozen auditor deprecation retained.
+Current-session primary JV7/21 and Diem6–8/printed79–81/31 reads credited; Diem
+text reread and official scheme/stalk/reducedness APIs checked. Four correct KB
+calls/initial Conductor127 before processing/code; publication-scope Conductor127
+before living-map edits recorded outside frozen pins. Bounded local/official
+fallback/no absence/novelty claim. The actual scheme-stalk comparison gap for
+this concrete quotient is closed. General cycles/multihomogeneous intersections,
+positive-dimensional isolated components/projective bounds/RojasC and the other
+fourteen-item obligations remain open. Explicit localized-Spec/basic-open scheme
+isomorphism is not constructed. Qualified Diem bound unrefuted; ordinary cone
+not its product-projective instance. No second root uniqueness/whole-curve order/
+scalar/decomposition/newsolver/host/compiler/canonical-promotion/full14 claim,
+cryptoPython/limits/flags/waivers/frozen edits/spend/upload. [pcc:unverified]
