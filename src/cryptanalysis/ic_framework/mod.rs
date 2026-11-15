@@ -90,9 +90,9 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations_touching, price_phase, Calibration, CompletionRule, CountedGroup,
-    FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
-    TargetSource,
+    collect_and_solve_relations_touching_ladder, price_phase, Calibration, CompletionRule,
+    CountedGroup, FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver,
+    RestartPool, TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
@@ -637,8 +637,9 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         // recorded run took; the large-prime collector returns merged
         // rows through the same call.
         let line_guard = oracle.line_guard();
+        let recovery_ladder = oracle.recovery_ladder();
         let oracle_cell = std::cell::RefCell::new(&mut *oracle);
-        collect_and_solve_relations_touching(
+        collect_and_solve_relations_touching_ladder(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -658,6 +659,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
             },
             |point| oracle_cell.borrow().touch(ctx, point),
             line_guard,
+            recovery_ladder.as_deref(),
         )
     };
     for (name, value) in oracle.relation_counters() {
