@@ -53,6 +53,10 @@ fn sha256_file(path: &Path) -> Result<String> {
     Ok(hex::encode(hash.finalize()))
 }
 
+fn matches_sha256(path: &Path, expected: &str) -> bool {
+    sha256_file(path).ok().as_deref() == Some(expected)
+}
+
 fn read_json(path: &Path) -> Result<Value> {
     Ok(serde_json::from_slice(&fs::read(path)?)?)
 }
@@ -188,6 +192,7 @@ fn prepare(args: &[String]) -> Result<()> {
     if worker_seconds == 0
         || worker_seconds > 300
         || lock_path.exists()
+        || !lock_path.is_absolute()
         || !image.starts_with("sha256:")
         || image.len() != 71
         || !image[7..].bytes().all(|b| b.is_ascii_hexdigit())
@@ -196,6 +201,10 @@ fn prepare(args: &[String]) -> Result<()> {
         return Err("K600 preflight binary, image, cap or lock path invalid".into());
     }
     let commit = clean_commit(&repo)?;
+    let lock_parent = fs::canonicalize(lock_path.parent().ok_or("lock parent missing")?)?;
+    if !lock_parent.starts_with(&repo) {
+        return Err("execution lock must be written in the clean source checkout".into());
+    }
     for path in SOURCE_FILES {
         if !repo.join(path).is_file() {
             return Err(format!("missing source {path}").into());
@@ -230,6 +239,7 @@ fn prepare(args: &[String]) -> Result<()> {
         "schema":"n83.k600-m6-native-preflight-lock/v1", "status":"PREPARED_ONLY",
         "source_commit":commit, "source_root":repo, "source_sha256":exact_hashes(&repo,SOURCE_FILES)?,
         "base_dir":base, "base_sha256":exact_hashes(&base,BASE_FILES)?,
+        "point_set_blake3":manifest["base"]["point_set_blake3"],
         "fixture_dir":fixtures, "fixture_sha256":exact_hashes(&fixtures,FIXTURE_FILES)?,
         "store_index":config.index_path, "store_index_sha256":sha256_file(&config.index_path)?,
         "store_remote":REMOTE, "store_name":STORE_NAME, "object_sha256":OBJECT_SHA,
@@ -268,6 +278,8 @@ fn docker_args(lock: &Value, out: &Path, source: &Path) -> Vec<String> {
         "4096m".into(),
         "--cpus".into(),
         "1".into(),
+        "--cpuset-cpus".into(),
+        "0".into(),
         "--pids-limit".into(),
         "64".into(),
         "--cap-drop".into(),
@@ -336,7 +348,7 @@ fn run(args: &[String]) -> Result<Value> {
         || outer_seconds == 0
         || outer_seconds > 300
         || outer_seconds
-            < lock["worker_seconds"]
+            <= lock["worker_seconds"]
                 .as_u64()
                 .ok_or("worker cap missing")?
     {
@@ -423,6 +435,7 @@ fn run(args: &[String]) -> Result<Value> {
         &source.join("attestation.json"),
         &json!({"schema":"n83.chain-s3-source-attestation/v1","source_commit":lock["source_commit"],"status_clean":true}),
     )?;
+    let attestation_sha256 = sha256_file(&source.join("attestation.json"))?;
     fs::copy(&index, out.join("store-index.json"))?;
     let mut cfg = crypto_lib::store::Config::discover()?;
     if cfg.remote.as_ref() != Some(&RemoteSpec::parse(REMOTE)?) {
@@ -489,18 +502,33 @@ fn run(args: &[String]) -> Result<Value> {
             "name=^n83-k600-m6-native-preflight$",
         ],
         &repo,
-    )?;
+    )
+    .ok();
     let mut failure = Vec::new();
-    if !remaining.is_empty() {
+    if remaining.as_deref().is_none_or(|value| !value.is_empty()) {
         failure.push("container cleanup unverified");
     }
     if check_hashes(&repo, SOURCE_FILES, &lock["source_sha256"]).is_err()
+        || check_hashes(&source, SOURCE_FILES, &lock["source_sha256"]).is_err()
+        || !matches_sha256(&source.join("attestation.json"), &attestation_sha256)
         || check_hashes(&base, BASE_FILES, &lock["base_sha256"]).is_err()
         || check_hashes(&fixtures, FIXTURE_FILES, &lock["fixture_sha256"]).is_err()
-        || sha256_file(&binary)? != lock["worker_sha256"]
-        || sha256_file(&std::env::current_exe()?)? != lock["supervisor_sha256"]
-        || sha256_file(&index)? != lock["store_index_sha256"]
-        || sha256_file(&fetched.path)? != OBJECT_SHA
+        || !matches_sha256(&binary, lock["worker_sha256"].as_str().unwrap_or_default())
+        || std::env::current_exe().ok().is_none_or(|path| {
+            !matches_sha256(
+                &path,
+                lock["supervisor_sha256"].as_str().unwrap_or_default(),
+            )
+        })
+        || !matches_sha256(
+            &index,
+            lock["store_index_sha256"].as_str().unwrap_or_default(),
+        )
+        || !matches_sha256(
+            &out.join("store-index.json"),
+            lock["store_index_sha256"].as_str().unwrap_or_default(),
+        )
+        || !matches_sha256(&fetched.path, OBJECT_SHA)
         || command_output(
             "docker",
             &[
@@ -520,10 +548,15 @@ fn run(args: &[String]) -> Result<Value> {
     }
     let summary_path = out.join("run/summary.json");
     let config_path = out.join("run/config.json");
+    let worker_cap_path = out.join("run/cap.json");
+    let worker_capped = worker_cap_path.exists();
     let summary = read_json(&summary_path).ok();
     let config = read_json(&config_path).ok();
     if timed_out {
         failure.push("outer wall cap");
+    }
+    if worker_capped {
+        failure.push("worker cap receipt present");
     }
     if exit != Some(0) {
         failure.push("worker exit was not zero");
@@ -543,6 +576,18 @@ fn run(args: &[String]) -> Result<Value> {
         "PRODUCER_FAILURE_frozen_input_changed"
     } else if timed_out {
         "UNKNOWN_wall_cap"
+    } else if worker_capped
+        && read_json(&worker_cap_path).ok().is_some_and(|cap| {
+            cap["schema"] == "n83.primary-cold-cap/v1"
+                && cap["status"] == "UNKNOWN_budget"
+                && cap["orbit_columns"] == 600
+                && cap["summands"] == 6
+                && cap["strategy"] == "orbit-chain-s3"
+                && cap["max_trials"] == 0
+                && cap["budget_seconds"] == lock["worker_seconds"]
+        })
+    {
+        "UNKNOWN_worker_cap"
     } else if matches!(exit, Some(134 | 137)) {
         "UNKNOWN_resource_or_worker_exit"
     } else if exit != Some(0) {
@@ -558,6 +603,7 @@ fn run(args: &[String]) -> Result<Value> {
         "stderr_sha256":sha256_file(&out.join("stderr.log"))?,
         "worker_config_sha256":if config.is_some(){Some(sha256_file(&config_path)?)}else{None},
         "worker_summary_sha256":if summary.is_some(){Some(sha256_file(&summary_path)?)}else{None},
+        "worker_cap_sha256":if worker_capped{Some(sha256_file(&worker_cap_path)?)}else{None},
         "elapsed_wall_ms":started.elapsed().as_secs_f64()*1000.0,
         "selected_best_total_runtime":Value::Null});
     write_new_json(&out.join("outer.json"), &outer)?;
@@ -569,9 +615,20 @@ fn valid_preflight(summary: Option<&Value>, config: Option<&Value>, lock: &Value
         return false;
     };
     config["schema"] == "n83.primary-store-chain-config/v1"
+        && config["study"] == "koblitz_n83_factor_base_sweep_20261008"
+        && config["input_kind"] == "artifact_store_v3"
+        && config["curve_a"] == 0
+        && config["fixture"] == 0
+        && config["base_dir"] == "/base"
+        && config["fixture_dir"] == "/fixtures"
         && config["orbit_columns"] == 600
         && config["summands"] == 6
+        && config["strategy"] == "orbit-chain-s3"
         && config["max_trials"] == 0
+        && config["budget_seconds"] == lock["worker_seconds"]
+        && config["allow_direct_relation"] == false
+        && config["chain_s3_limits"]
+            == json!({"max_variables":125000,"max_domain_clauses":350000,"max_models":1,"conflict_budget":10000})
         && config["policy"] == "public_x_hash"
         && config["seed"] == 2_026_100_801u64
         && config["source_commit"] == lock["source_commit"]
@@ -580,17 +637,42 @@ fn valid_preflight(summary: Option<&Value>, config: Option<&Value>, lock: &Value
         && config["memory_cgroup_swap_limit_bytes"] == 0
         && summary["schema"] == "n83.primary-store-chain/v1"
         && summary["status"] == "PREFLIGHT_ONLY"
+        && summary["study"] == "koblitz_n83_factor_base_sweep_20261008"
+        && summary["input_kind"] == "artifact_store_v3"
+        && summary["curve_a"] == 0
+        && summary["fixture"] == 0
+        && summary["strategy"] == "orbit-chain-s3"
         && summary["orbit_columns"] == 600
         && summary["summands"] == 6
         && summary["max_trials"] == 0
+        && summary["budget_seconds"] == lock["worker_seconds"]
+        && summary["policy"] == "public_x_hash"
+        && summary["seed"] == 2_026_100_801u64
+        && summary["fixture_dir"] == "/fixtures"
+        && summary["point_set_blake3"] == lock["point_set_blake3"]
+        && summary["store_manifest_sha256"] == lock["base_sha256"]["manifest.json"]
+        && summary["chain_s3_limits"] == config["chain_s3_limits"]
+        && summary["solver_stage_executed"] == false
         && summary["report"]["trials"] == 0
+        && summary["report"]["relations"] == 0
+        && summary["report"]["sat_calls"] == 0
+        && summary["report"]["matrix_rows"] == 0
+        && summary["attempt_records"]
+            .as_array()
+            .is_some_and(Vec::is_empty)
+        && summary["relation_matrix"]
+            .as_array()
+            .is_some_and(Vec::is_empty)
+        && summary["verified_log"].is_null()
         && summary["store_name"] == STORE_NAME
         && summary["source_commit"] == lock["source_commit"]
+        && summary["source_attestation_mode"] == "supervised_snapshot"
+        && summary["object"] == STORE_NAME
         && summary["memory_cgroup_limit_bytes"] == 4_294_967_296u64
         && summary["memory_cgroup_swap_limit_bytes"] == 0
         && summary["memory_cgroup_peak_bytes"]
             .as_u64()
-            .is_some_and(|peak| peak <= 4_294_967_296)
+            .is_some_and(|peak| peak > 0 && peak <= 4_294_967_296)
         && summary["total_index_calculus_runtime_ms"].is_null()
         && summary["selected_best_total_runtime"].is_null()
 }
@@ -622,6 +704,19 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn preflight_receipt_requires_peak_and_zero_solver_work() {
+        let limits = json!({"max_variables":125000,"max_domain_clauses":350000,"max_models":1,"conflict_budget":10000});
+        let lock = json!({"worker_seconds":20,"source_commit":"a".repeat(40),"point_set_blake3":"point-set","base_sha256":{"manifest.json":"manifest"}});
+        let config = json!({"schema":"n83.primary-store-chain-config/v1","study":"koblitz_n83_factor_base_sweep_20261008","input_kind":"artifact_store_v3","curve_a":0,"fixture":0,"base_dir":"/base","fixture_dir":"/fixtures","orbit_columns":600,"summands":6,"strategy":"orbit-chain-s3","max_trials":0,"budget_seconds":20,"allow_direct_relation":false,"chain_s3_limits":limits,"policy":"public_x_hash","seed":2026100801u64,"source_commit":"a".repeat(40),"source_attestation_mode":"supervised_snapshot","memory_cgroup_limit_bytes":4294967296u64,"memory_cgroup_swap_limit_bytes":0});
+        let mut summary = json!({"schema":"n83.primary-store-chain/v1","status":"PREFLIGHT_ONLY","study":"koblitz_n83_factor_base_sweep_20261008","input_kind":"artifact_store_v3","curve_a":0,"fixture":0,"strategy":"orbit-chain-s3","orbit_columns":600,"summands":6,"max_trials":0,"budget_seconds":20,"policy":"public_x_hash","seed":2026100801u64,"fixture_dir":"/fixtures","point_set_blake3":"point-set","store_manifest_sha256":"manifest","chain_s3_limits":limits,"solver_stage_executed":false,"report":{"trials":0,"relations":0,"sat_calls":0,"matrix_rows":0},"attempt_records":[],"relation_matrix":[],"verified_log":null,"store_name":STORE_NAME,"object":STORE_NAME,"source_commit":"a".repeat(40),"source_attestation_mode":"supervised_snapshot","memory_cgroup_limit_bytes":4294967296u64,"memory_cgroup_swap_limit_bytes":0,"memory_cgroup_peak_bytes":1024,"total_index_calculus_runtime_ms":null,"selected_best_total_runtime":null});
+        assert!(valid_preflight(Some(&summary), Some(&config), &lock));
+        summary["memory_cgroup_peak_bytes"] = Value::Null;
+        assert!(!valid_preflight(Some(&summary), Some(&config), &lock));
+        summary["memory_cgroup_peak_bytes"] = json!(1024);
+        summary["report"]["sat_calls"] = json!(1);
+        assert!(!valid_preflight(Some(&summary), Some(&config), &lock));
+    }
     #[test]
     fn committed_k600_s3_adoption_bundle_matches_preflight_contract() {
         let root=Path::new(env!("CARGO_MANIFEST_DIR")).join("research/koblitz_n83_factor_base_sweep_20261008/verification/k600-v3-s3-adoption-20261115/attempt-1");
@@ -657,6 +752,7 @@ mod tests {
             "ALL",
             "no-new-privileges",
             "--read-only",
+            "--cpuset-cpus",
             "primary-store-v3-orbit-chain-cold",
             "125000",
             "350000",

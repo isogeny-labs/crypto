@@ -4660,7 +4660,13 @@ fn run_with_config(
         None => false,
     };
     let post_solver_validation_ms = verification_start.elapsed().as_secs_f64() * 1000.0;
-    let memory_cgroup_peak_bytes = if chain.is_some() && (store.is_none() || max_trials != 0) {
+    // A source-bound zero-trial store preflight must report its real cgroup peak.
+    // The in-process test fixture has no Linux cgroup and remains explicitly
+    // marked `test_fixture`, so it cannot be confused with an admitted run.
+    let fixture_only = store.is_some()
+        && max_trials == 0
+        && chain.is_some_and(|config| config.source_attestation_mode == "test_fixture");
+    let memory_cgroup_peak_bytes = if chain.is_some() && !fixture_only {
         Some(
             fs::read_to_string(cgroup_v2_file("memory.peak")?)?
                 .trim()
