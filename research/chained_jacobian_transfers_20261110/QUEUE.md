@@ -1,3 +1,35 @@
+# Complete historical comparator03 and all whole controls finish
+
+## What was done
+pcc/claims/PCC-20261115-1b1ee6.json: exact1e426e19/dd4ee9/checkpoint27, all26actualexpectedphases/original.exit0, wholepositive0/timing-only0/eightfullmodifiedcontrols1/noacceptednegative. Complete62rank/65character/allfullinputs-field-order-hashbindings, fullarchiveCRC/everyoriginalbytecompare0 and before-afterruntime/sourceguards0. Raw scratch/ct114-whole-relation-comparator-native-03, RAMct114controls03 remain complete; nofreshsolvernative orfullCI yet. [pcc:unverified]
+
+## Decisions made
+Before reporting the kernel-coordinate control as constrained, run the unchanged original passive mathematical auditor on its entire modified trace/journal, requiring actual nonzero selected-row residual rejection. SamecleanConsumer/source/checkpoint27, originalruntimebytecopy/sourceguards and cap. Then checkpoint result inConsumer and finalize fullCI. [pcc:unverified]
+
+## Open threads
+Independent controlsemantics, fullfresh diagnosticCI99newphases+inherited102, fullsource/runtime/prepared/CI/controls/failedroots NEW28, reviewedunassisted relationcompletion andalloriginal proof/global/cost/admission/reference/merge gaps. Overlay119MiB/RAM3.9GiB free after44MiBarchive; newwholepayload mayneed RAMcloneRootstaging with normalremoteFF, neverdeleteoldscience/localobjects. [pcc:unverified]
+
+## Errors
+Both firstmemoryfailure andsecondwrongcountfalse rejectionremain complete; correctsource03includesmandatoryfooter. No criteria/capschanged andnooverallperformance/globalresultinferred. [pcc:unverified]
+
+---
+
+# Exact original checkpoint27 imported for version03
+
+## What was done
+pcc/claims/PCC-20261115-7c0614.json: exactcleansource1e426e19/dd4ee9/f2d05b, original43757919471/job132945988634/artifact14179640235/full450406BZIP/SHA63da3439185360825e59d4b0311d0a09542c16d9978f2c357c4adb0d00801f4d/all28members; remote-readback/source/Resume/localstatus-gate0/Gitstatusunchanged. Fullraw retainedscratch/ct115-current-original-checkpoint-27, privatesigneddownloadAPI outsidepublishedroots. [pcc:unverified]
+
+## Decisions made
+Runpinned native03 with scratch/ct114-whole-relation-comparator-build-01, new scratch/ct114-whole-relation-comparator-native-03 and RAM/dev-shm/ct114-whole-relation-comparator-controls-03. Original62record rankfooter and65character/allvalues/order/hashbindings/fullcontrols/2GiB120s unchanged; keepConsumerstatecleanuntilrunends. [pcc:unverified]
+
+## Open threads
+Fullactualcontrols andfull diagnosticCI draft99plannedphases plusentireinherited102phaseCI, exactpre-nativecheckpoint, two27declarationgates/all9bindings/source-runtime-fullprepared/wholeartifact. FutureNEW28 and reviewedunassisted successor/calibration/reference/global/merge gaps remain. [pcc:unverified]
+
+## Errors
+Originalmemoryabort134 andversion02falsecount1 retained769560/f19383. No positivecomparison or controls accepted in either. Version03source corrects mandatoryfooter62withoutchangingthepublishedcriterion. [pcc:unverified]
+
+---
+
 # Preserve version02 false rejection; original complete rank file has62records
 
 ## What was done
@@ -1947,3 +1979,19 @@ closurestudy. Alloldfrozenbytes/ledger/C/budget/S3/vault/KB limits persist.
 
 All rows unsigned;globalclassificationbridges written,notfullLeanAVtheory.
 [pcc:unverified]
+
+2026-11-15T20:53:55.561587+00:00
+
+# Complete historical comparator03 controls and original constrained-coordinate audit
+
+## What was done
+Consumer pcc/claims/PCC-20261115-241ee2.json, Root pcc/claims/PCC-20261115-1b1ee6.json and pcc/claims/PCC-20261115-650409.json: exact source1e426e19/dd4ee9/checkpoint27; all26 actual/expected phases match, original.exit0, whole historical positive0, elapsed-only0, eight complete negative bundles1 without accepted outputs. Complete62-record rank file includes mandatory footer, character65 and all entire inputs/order/scientific fields/hash bindings. Full45,834,976-byte positive-and-controls archive, CRC/every-original-byte comparison0 and all source/runtime guards0 remain in scratch/ct114-whole-relation-comparator-native-03 and RAMct114controls03. Separately the unchanged original passive mathematical auditor rejects the entire changed-kernel bundle at its selected-row modular residual assertion, actual101/noacceptedoutput, immediate original gate0. [pcc:unverified]
+
+## Decisions made
+Resolve the memory/schema/control obstruction for this fixed historical fixture in comparator03. Preserve old source01/02, original pinned problem and failures769560/f19383; keep live problem update unpinned. Next integrate complete fresh diagnosticCI under the existing prospective9aad0c contract and its exact-source original pre-native checkpoint, all inherited checks, proof gates, full raw/runtime/prepared/source retention. [pcc:unverified]
+
+## Open threads
+Full fresh diagnosticCI, full scientific custodyNEW28 using resource-aware regular-file staging, reviewed unassisted relation completion, concrete numerical Lean/global-character bridges, complete primitive/setup/reference/calibrated admission and existing merge gates. PR1564 carries post1523-merge work; RootPR3877 and queue3904 need this checkpoint. Overlay118MiB/RAM3.9GiB free; preserve all science and local objects. [pcc:unverified]
+
+## Errors
+Prior allocation134/driver1 and wrong61-count false rejection1/driver1 remain complete frozen attempts. This success uses the original62-record schema and unchanged2GiBVM120s criterion. The original audit101 is the expected control rejection. No new fresh solver CI has run. Conductor command/tool unavailable in this runtime; existing reserved project/evidence/log/problem scopes retained. [pcc:unverified]
