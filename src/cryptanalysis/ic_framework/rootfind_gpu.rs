@@ -1,6 +1,21 @@
-//! `rootfind-subtract-gpu`: the `rootfind-subtract` oracle (`m = 2`) with its
-//! sweep run in batches on the `gpu/rootfind` kernel, through the persistent
-//! worker `rootfind_serve` (`gpu/rootfind/rootfind_serve.cpp`).
+//! `rootfind-subtract-gpu`: the `rootfind-subtract` oracle (`m = 2` or `3`)
+//! with its sweep run in batches on the `gpu/rootfind` kernel, through the
+//! persistent worker `rootfind_serve` (`gpu/rootfind/rootfind_serve.cpp`).
+//!
+//! **`m = 3`.**  The CPU oracle probes every candidate `R ∓ F_i` against the
+//! negation-folded pair table, keyed by the abscissa of the sum.  Here the
+//! device looks every candidate up in the set of those abscissae (probe mode
+//! of the kernel, no `j ≥ i` filter); a position it does not report is one
+//! where the CPU probe misses its key, so the reported positions, confirmed
+//! in order through the CPU probe, give the CPU's first hit, charge for
+//! charge.
+//!
+//! **`worker=daemon`.**  A spawned worker creates its CUDA context in every
+//! process (about 0.3 s on an A100, and ecbench runs each record in its own
+//! process).  With `worker=daemon` the run connects to a running
+//! `rootfind_serve --daemon SOCKET` whose context already exists; the
+//! daemon's start is a one-time cost on the host, outside every record, and
+//! is reported beside them.
 //!
 //! **Same search, same answer, same charge.**  For every target the CPU
 //! oracle walks the abscissae of the base in order and, at each, the two
@@ -38,7 +53,7 @@ use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
 use std::io::{BufReader, Read, Write};
 use std::path::{Path, PathBuf};
-use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 
 use super::plugins::RootfindSubtractOracle;
@@ -47,7 +62,7 @@ use crate::cryptanalysis::ic_boundary::{
     FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
 };
 
-const MAGIC_INIT: u32 = 0x3153_4652; // "RFS1"
+const MAGIC_INIT: u32 = 0x3253_4652; // "RFS2"
 const MAGIC_BATCH: u32 = 0x3142_4652; // "RFB1"
 /// Largest batch sent to the worker (and its device buffers' size).
 pub const MAX_BATCH: usize = 4096;
@@ -85,11 +100,46 @@ pub fn discover_worker() -> Option<PathBuf> {
         .find(|c| c.is_file())
 }
 
-/// A running `rootfind_serve --serve-bin`.
+/// Find the daemon's socket: `ICX_ROOTFIND_SOCKET`, else `rootfind_serve.sock`
+/// beside the current executable (ecbench children get a fixed environment).
+pub fn discover_socket() -> Option<PathBuf> {
+    if let Ok(p) = std::env::var("ICX_ROOTFIND_SOCKET") {
+        let path = PathBuf::from(p);
+        return path.exists().then_some(path);
+    }
+    let exe = std::env::current_exe().ok()?;
+    let cand = exe.parent()?.join("rootfind_serve.sock");
+    cand.exists().then_some(cand)
+}
+
+/// How a run reaches the worker: its own `rootfind_serve --serve-bin` child
+/// (`worker=spawn`, the default: every process creates its CUDA context), or a
+/// connection to a running `rootfind_serve --daemon SOCKET` (`worker=daemon`:
+/// the context exists before the run; the daemon's start is a one-time host
+/// cost outside every record and must be reported beside them).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WorkerMode {
+    Spawn,
+    Daemon,
+}
+
+impl WorkerMode {
+    fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "spawn" => Ok(Self::Spawn),
+            "daemon" => Ok(Self::Daemon),
+            other => Err(format!(
+                "rootfind-subtract-gpu: worker must be spawn or daemon, got `{other}`"
+            )),
+        }
+    }
+}
+
+/// A connection to the worker: a child on pipes, or the daemon on a socket.
 pub struct RootfindWorker {
-    child: Child,
-    stdin: ChildStdin,
-    stdout: BufReader<ChildStdout>,
+    child: Option<Child>,
+    writer: Box<dyn Write + Send>,
+    reader: BufReader<Box<dyn Read + Send>>,
     path: PathBuf,
     /// Backend the last `init` resolved to (1 emulation, 2 CUDA).
     pub backend: u32,
@@ -105,12 +155,27 @@ impl RootfindWorker {
             .spawn()
             .map_err(|e| format!("failed to start {} --serve-bin: {e}", worker.display()))?;
         let stdin = child.stdin.take().ok_or("no stdin on rootfind worker")?;
-        let stdout = BufReader::new(child.stdout.take().ok_or("no stdout on rootfind worker")?);
+        let stdout = child.stdout.take().ok_or("no stdout on rootfind worker")?;
         Ok(Self {
-            child,
-            stdin,
-            stdout,
+            child: Some(child),
+            writer: Box::new(stdin),
+            reader: BufReader::new(Box::new(stdout)),
             path: worker.to_path_buf(),
+            backend: 0,
+        })
+    }
+
+    pub fn connect(socket: &Path) -> Result<Self, String> {
+        let stream = std::os::unix::net::UnixStream::connect(socket)
+            .map_err(|e| format!("rootfind daemon {}: {e}", socket.display()))?;
+        let read_half = stream
+            .try_clone()
+            .map_err(|e| format!("rootfind daemon socket: {e}"))?;
+        Ok(Self {
+            child: None,
+            writer: Box::new(stream),
+            reader: BufReader::new(Box::new(read_half)),
+            path: socket.to_path_buf(),
             backend: 0,
         })
     }
@@ -120,24 +185,25 @@ impl RootfindWorker {
     }
 
     fn send(&mut self, buf: &[u8]) -> Result<(), String> {
-        self.stdin
+        self.writer
             .write_all(buf)
-            .and_then(|_| self.stdin.flush())
+            .and_then(|_| self.writer.flush())
             .map_err(|e| format!("rootfind worker write: {e}"))
     }
 
     fn read(&mut self, n: usize) -> Result<Vec<u8>, String> {
         let mut b = vec![0u8; n];
-        self.stdout
+        self.reader
             .read_exact(&mut b)
             .map_err(|e| format!("rootfind worker read: {e}"))?;
         Ok(b)
     }
 
-    /// Load a factor base (canonical coordinates).  Lookup and chunk 0 let
-    /// the library choose, as `rf64_decompose` does.
-    pub fn init(&mut self, p: u64, xs: &[u64], ys: &[u64]) -> Result<(), String> {
-        let mut req = Vec::with_capacity(32 + 16 * xs.len());
+    /// Load a factor base (canonical coordinates) and, for probe mode, the
+    /// abscissae candidates are looked up in instead (`probe` non-empty: a
+    /// pair table's sums).  Lookup and chunk 0 let the library choose.
+    pub fn init(&mut self, p: u64, xs: &[u64], ys: &[u64], probe: &[u64]) -> Result<(), String> {
+        let mut req = Vec::with_capacity(40 + 16 * xs.len() + 8 * probe.len());
         req.extend_from_slice(&MAGIC_INIT.to_le_bytes());
         req.extend_from_slice(&(xs.len() as u32).to_le_bytes());
         req.extend_from_slice(&p.to_le_bytes());
@@ -145,6 +211,10 @@ impl RootfindWorker {
             req.extend_from_slice(&w.to_le_bytes());
         }
         for v in xs.iter().chain(ys) {
+            req.extend_from_slice(&v.to_le_bytes());
+        }
+        req.extend_from_slice(&(probe.len() as u32).to_le_bytes());
+        for v in probe {
             req.extend_from_slice(&v.to_le_bytes());
         }
         self.send(&req)?;
@@ -161,8 +231,9 @@ impl RootfindWorker {
     }
 
     /// Decompose one batch (canonical coordinates, at most [`MAX_BATCH`]).
-    /// An overflowing batch is an error: its list is incomplete.
-    pub fn batch(&mut self, xs: &[u64], ys: &[u64]) -> Result<BatchReply, String> {
+    /// `Ok(None)`: the batch's relations overflowed the worker's buffer, so
+    /// its list is incomplete; the caller splits the batch.
+    pub fn batch(&mut self, xs: &[u64], ys: &[u64]) -> Result<Option<BatchReply>, String> {
         let mut req = Vec::with_capacity(8 + 16 * xs.len());
         req.extend_from_slice(&MAGIC_BATCH.to_le_bytes());
         req.extend_from_slice(&(xs.len() as u32).to_le_bytes());
@@ -181,6 +252,9 @@ impl RootfindWorker {
         let (status, found, written) = (w(1) as i32, w(2), w(3));
         let kernel_seconds = f64::from_le_bytes(h[16..24].try_into().unwrap());
         let body = self.read(16 * written as usize)?;
+        if status == 1 {
+            return Ok(None); // RF_ERR_OVERFLOW
+        }
         if status != 0 || found != written {
             return Err(format!(
                 "rootfind worker: batch status {status}, {written} of {found} relations"
@@ -196,38 +270,64 @@ impl RootfindWorker {
                 tau: c[13] as i8,
             })
             .collect();
-        Ok(BatchReply {
+        Ok(Some(BatchReply {
             relations,
             kernel_seconds,
-        })
+        }))
     }
 }
 
 impl Drop for RootfindWorker {
     fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
+        if let Some(child) = self.child.as_mut() {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
     }
 }
 
-/// One worker per process, kept across runs so the CUDA context is created
-/// once; each run re-`init`s it with its base.
-static SHARED: Mutex<Option<RootfindWorker>> = Mutex::new(None);
+thread_local! {
+    /// One worker connection per thread, kept across runs (a spawned
+    /// worker's CUDA context is created once per process); each run
+    /// re-`init`s it.  Per thread, so concurrent pipelines in one process
+    /// never re-initialise each other's worker between calls.
+    static SHARED: RefCell<Option<(WorkerMode, RootfindWorker)>> = const { RefCell::new(None) };
+}
 
-fn with_worker<T>(f: impl FnOnce(&mut RootfindWorker) -> Result<T, String>) -> Result<T, String> {
-    let mut guard = SHARED.lock().unwrap_or_else(|p| p.into_inner());
-    if guard.is_none() {
-        let path = discover_worker().ok_or(
-            "rootfind-subtract-gpu: no worker (set ICX_ROOTFIND_WORKER or build \
-             gpu/rootfind `make serve` / `make serve-cuda`)",
-        )?;
-        *guard = Some(RootfindWorker::spawn(&path)?);
-    }
-    let out = f(guard.as_mut().expect("worker present"));
-    if out.is_err() {
-        *guard = None;
-    }
-    out
+fn with_worker<T>(
+    mode: WorkerMode,
+    f: impl FnOnce(&mut RootfindWorker) -> Result<T, String>,
+) -> Result<T, String> {
+    SHARED.with(|cell| {
+        let mut guard = cell.borrow_mut();
+        if guard.as_ref().is_some_and(|(m, _)| *m != mode) {
+            *guard = None;
+        }
+        if guard.is_none() {
+            let worker = match mode {
+                WorkerMode::Spawn => {
+                    let path = discover_worker().ok_or(
+                        "rootfind-subtract-gpu: no worker (set ICX_ROOTFIND_WORKER or build \
+                         gpu/rootfind `make serve` / `make serve-cuda`)",
+                    )?;
+                    RootfindWorker::spawn(&path)?
+                }
+                WorkerMode::Daemon => {
+                    let sock = discover_socket().ok_or(
+                        "rootfind-subtract-gpu: worker=daemon but no socket (ICX_ROOTFIND_SOCKET, \
+                         or rootfind_serve.sock beside the executable)",
+                    )?;
+                    RootfindWorker::connect(&sock)?
+                }
+            };
+            *guard = Some((mode, worker));
+        }
+        let out = f(&mut guard.as_mut().expect("worker present").1);
+        if out.is_err() {
+            *guard = None;
+        }
+        out
+    })
 }
 
 /// Sum of the worker's kernel seconds in this process (diagnostic only; not
@@ -256,6 +356,7 @@ type Hits = Vec<(usize, u32, i8)>;
 pub struct RootfindSubtractGpuOracle<'i> {
     cpu: RootfindSubtractOracle<'i>,
     m: u32,
+    mode: WorkerMode,
     pending: RefCell<Vec<PrimePoint>>,
     swept: HashMap<(u64, u64), Hits>,
     counters: BTreeMap<String, u64>,
@@ -266,6 +367,7 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
         Self {
             cpu: RootfindSubtractOracle::new(m, instance),
             m,
+            mode: WorkerMode::Spawn,
             pending: RefCell::new(Vec::new()),
             swept: HashMap::new(),
             counters: BTreeMap::new(),
@@ -286,10 +388,23 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
                 batch.push(p);
             }
         }
-        for chunk in batch.chunks(MAX_BATCH) {
+        // A batch whose relations overflow the worker's buffer is split in
+        // halves until each fits (only dense m = 3 tables on tiny curves).
+        let mut work: Vec<&[PrimePoint]> = batch.chunks(MAX_BATCH).rev().collect();
+        let mode = self.mode;
+        while let Some(chunk) = work.pop() {
             let xs: Vec<u64> = chunk.iter().map(|p| p.x).collect();
             let ys: Vec<u64> = chunk.iter().map(|p| p.y).collect();
-            let reply = with_worker(|w| w.batch(&xs, &ys))?;
+            let Some(reply) = with_worker(mode, |w| w.batch(&xs, &ys))? else {
+                if chunk.len() == 1 {
+                    return Err("rootfind worker: one target overflows the relation buffer".into());
+                }
+                self.bump("gpu_batch_splits", 1);
+                let (lo, hi) = chunk.split_at(chunk.len() / 2);
+                work.push(hi);
+                work.push(lo);
+                continue;
+            };
             *KERNEL_SECONDS.lock().unwrap_or_else(|p| p.into_inner()) += reply.kernel_seconds;
             let mut hits: Vec<Hits> = vec![Vec::new(); chunk.len()];
             for r in &reply.relations {
@@ -326,16 +441,25 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
     fn describe(&self, params: &Params) -> String {
         format!(
             "{}; the sweep runs in batches on the gpu/rootfind kernel (rootfind_serve worker), \
-             every hit confirmed on the CPU in rootfind-subtract's order and charge",
+             every hit confirmed on the CPU in rootfind-subtract's order and charge \
+             (m = 3: candidates probed against the pair table's abscissae on the device)",
             self.cpu.describe(params)
         )
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "m",
-            "summands; only 2 (the kernel looks candidates up in the base)",
-        )]
+        &[
+            (
+                "m",
+                "summands, 2 (candidates looked up in the base) or 3 (in the pair table's \
+                 abscissae on the device, then probed on the CPU)",
+            ),
+            (
+                "worker",
+                "spawn (default: a worker process per run, which creates its CUDA context) or \
+                 daemon (connect to rootfind_serve --daemon; its start is a one-time host cost)",
+            ),
+        ]
     }
 
     fn prepare(
@@ -345,10 +469,25 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
-        if self.m != 2 {
-            return Err(format!("rootfind-subtract-gpu takes m = 2, got {}", self.m));
+        if !(2..=3).contains(&self.m) {
+            return Err(format!(
+                "rootfind-subtract-gpu takes m = 2 or 3, got {}",
+                self.m
+            ));
         }
-        self.cpu.prepare(ctx, fb, params, ops)?;
+        for key in params.0.keys() {
+            if key != "m" && key != "worker" {
+                return Err(format!(
+                    "rootfind-subtract-gpu reads only `m` and `worker`; `{key}` is unknown"
+                ));
+            }
+        }
+        self.mode = WorkerMode::parse(params.0.get("worker").map_or("spawn", |s| s.as_str()))?;
+        // The CPU oracle sees only `m`: the worker changes where the sweep
+        // runs, not the search.
+        let mut cpu_params = params.clone();
+        cpu_params.0.remove("worker");
+        self.cpu.prepare(ctx, fb, &cpu_params, ops)?;
         let (f, reps) = self
             .cpu
             .sweep()
@@ -359,7 +498,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         let mut ys = Vec::with_capacity(reps.len());
         for rep in reps {
             let (x, y) = (f.from_mont(rep.x), f.from_mont(rep.y));
-            if rep.plus == rep.minus && y != 0 {
+            if self.m == 2 && rep.plus == rep.minus && y != 0 {
                 return Err(
                     "rootfind-subtract-gpu needs a negation-closed base (both signs of every \
                      abscissa)"
@@ -376,7 +515,23 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         // The backend (emulation or CUDA) is not a counter: a replay on a
         // host without a GPU must read the same record.  The worker names it
         // on stderr.
-        with_worker(|w| w.init(p, &xs, &ys))?;
+        // m = 3: the device looks candidates up in the abscissae of the pair
+        // table the CPU oracle built (and charged); a hit there is a position
+        // where the CPU probe finds a key, so every position the CPU sweep
+        // could stop at is reported, with no `j ≥ i` filter.
+        let probe = if self.m == 3 {
+            let px = self
+                .cpu
+                .pair_abscissae()
+                .ok_or("rootfind-subtract-gpu: the pair table has no plain map")?;
+            if px.is_empty() {
+                return Err("rootfind-subtract-gpu: empty pair table".into());
+            }
+            px
+        } else {
+            Vec::new()
+        };
+        with_worker(self.mode, |w| w.init(p, &xs, &ys, &probe))?;
         self.swept.clear();
         self.pending.borrow_mut().clear();
         self.counters.clear();
@@ -564,6 +719,62 @@ mod tests {
         if !worker_present() {
             return;
         }
+        run_equality(
+            2,
+            "spawn",
+            &[
+                Targets::WalkPrimeBatch16,
+                Targets::WalkPrimeBatch256,
+                Targets::Walk,
+            ],
+        );
+    }
+
+    /// `m = 3`: candidates probed against the pair table's abscissae on the
+    /// device give the CPU probe's first hit and charge.
+    #[test]
+    fn gpu_oracle_m3_matches_rootfind_subtract_end_to_end() {
+        if !worker_present() {
+            return;
+        }
+        run_equality(3, "spawn", &[Targets::WalkPrimeBatch256, Targets::Walk]);
+    }
+
+    /// `worker=daemon`: the same runs through a daemon on a socket.
+    #[test]
+    fn gpu_oracle_daemon_matches_rootfind_subtract() {
+        if !worker_present() {
+            return;
+        }
+        let worker = discover_worker().expect("worker");
+        let dir = std::env::temp_dir().join(format!("rf-daemon-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let sock = dir.join("rootfind_serve.sock");
+        let mut daemon = Command::new(&worker)
+            .arg("--daemon")
+            .arg(&sock)
+            .spawn()
+            .expect("daemon");
+        for _ in 0..200 {
+            if sock.exists() {
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+        std::env::set_var("ICX_ROOTFIND_SOCKET", &sock);
+        let out = std::panic::catch_unwind(|| {
+            run_equality(2, "daemon", &[Targets::WalkPrimeBatch256]);
+            run_equality(3, "daemon", &[Targets::WalkPrimeBatch256]);
+        });
+        let _ = daemon.kill();
+        let _ = daemon.wait();
+        let _ = std::fs::remove_dir_all(&dir);
+        if let Err(e) = out {
+            std::panic::resume_unwind(e);
+        }
+    }
+
+    fn run_equality(m: u32, worker: &str, sources: &[Targets]) {
         let calib = Calibration::default();
         let mut solved = 0;
         for (inst, size) in [
@@ -577,11 +788,7 @@ mod tests {
                 let planted = planted_seed % inst.r;
                 let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
                 let c = ctx(&inst, q);
-                for targets in [
-                    Targets::WalkPrimeBatch16,
-                    Targets::WalkPrimeBatch256,
-                    Targets::Walk,
-                ] {
+                for &targets in sources {
                     for seed in [7u64, 3116] {
                         let mut spec = PipelineSpec {
                             factor_base: "prime-abscissa".into(),
@@ -592,17 +799,18 @@ mod tests {
                             ..Default::default()
                         };
                         spec.factor_base_params.set("size", size.to_string());
-                        spec.oracle_params.set("m", "2");
+                        spec.oracle_params.set("m", m.to_string());
                         let base = PrimeAbscissaBase { instance: &inst };
-                        let mut cpu_o = RootfindSubtractOracle::new(2, &inst);
+                        let mut cpu_o = RootfindSubtractOracle::new(m, &inst);
                         let cpu = run_pipeline(&c, &spec, &base, &mut cpu_o, planted, &calib, None)
                             .unwrap();
                         spec.oracle = "rootfind-subtract-gpu".into();
-                        let mut gpu_o = RootfindSubtractGpuOracle::new(2, &inst);
+                        spec.oracle_params.set("worker", worker);
+                        let mut gpu_o = RootfindSubtractGpuOracle::new(m, &inst);
                         let gpu = run_pipeline(&c, &spec, &base, &mut gpu_o, planted, &calib, None)
                             .unwrap();
                         let label = format!(
-                            "{} {} seed {seed} planted {planted}",
+                            "m={m} worker={worker} {} {} seed {seed} planted {planted}",
                             inst.name,
                             targets.name()
                         );
@@ -629,9 +837,9 @@ mod tests {
         assert!(solved > 0, "no run solved");
     }
 
-    /// The fail-closed checks: m = 3 is refused.
+    /// The fail-closed checks: m = 4 and unknown parameters are refused.
     #[test]
-    fn gpu_oracle_refuses_m3() {
+    fn gpu_oracle_refuses_bad_parameters() {
         let inst = prime_instance_for(14, 1);
         let q = inst.generator_point();
         let c = ctx(&inst, q);
@@ -641,8 +849,12 @@ mod tests {
             ..Default::default()
         };
         spec.factor_base_params.set("size", "16");
-        let mut o = RootfindSubtractGpuOracle::new(3, &inst);
         let base = PrimeAbscissaBase { instance: &inst };
+        let mut o = RootfindSubtractGpuOracle::new(4, &inst);
+        let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
+        assert!(r.is_err());
+        spec.oracle_params.set("worker", "elsewhere");
+        let mut o = RootfindSubtractGpuOracle::new(2, &inst);
         let r = run_pipeline(&c, &spec, &base, &mut o, 1, &Calibration::default(), None);
         assert!(r.is_err());
     }
