@@ -13,7 +13,7 @@ Neither has an independently signed verification verdict.
 
 `REPORT.md` is the immutable first draft pinned by the initial study claim.
 The active `REPORT-v2.md` clarifies the final integration paragraph after the
-prose linter flagged the draft's negative mention of a verified catalog edge.
+prose linter flagged the draft's negative mention of a catalog capability claim.
 The mathematical content is unchanged; REPORT.pdf renders the active version.
 The [active study record](../../pcc/claims/PCC-20261115-7c905f.json) pins that
 version; its standing is also unverified.
@@ -67,3 +67,19 @@ been computed. [pcc:unverified]
 The source and historical artifacts were imported from the earlier standalone
 project. The Rust implementation is the active replacement required by this
 repository's language policy; none of the archived Python is invoked by it.
+
+## Diagram and managed rendering
+
+![Derived quotient structure over the P-256 field; unsigned producer assertions.](factors.svg)
+
+The repository artifact bot moved `factors.png` into its managed store and
+recorded its hash in `.artifacts.json`. The SVG remains directly viewable
+on GitHub and REPORT.pdf embeds the inspected diagram. To rebuild the report's
+PNG locally from its committed source, use Graphviz:
+
+```sh
+dot -Tpng -Gdpi=150 research/p256_genus_dlp_20261115/factors.dot -o research/p256_genus_dlp_20261115/factors.png
+```
+
+Keep the artifact manifest and managed ignore rules. The bot's storage change
+does not alter the source equations or native correctness outputs.
