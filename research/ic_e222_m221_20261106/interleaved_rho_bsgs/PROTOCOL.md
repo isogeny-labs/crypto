@@ -30,3 +30,6 @@ No arm is retuned during the study.
 ## Addendum A (2026-11-14, frozen before any 32/34-bit row): 32 and 34 bits
 Owner request: "run it at 32 and 34 bits". Same arms, settings (rho `DPRULE=ks DPDIV=1.5`, BSGS `MC=1`), rounds (r = 0..5, `INST0 = 100 + r`, 2 curves x 2 instances), order rotation, metric, bootstrap and decision rule as above, on cells 32 and 34 bits x T = 200, 1000, 3000 (`run.sh "32 200" "32 1000" "32 3000" "34 200" "34 1000" "34 3000"`). No retuning. Reported alongside the first nine cells, not pooled with them.
 Also recorded per row: BSGS table size `m` (its memory grows as sqrt(Tn)), to read any change in the ratio against it.
+
+## Addendum B (2026-11-15, frozen before any 36-bit row): 36 bits
+Owner request: "run it at 36 bits". Same arms, settings (rho `DPRULE=ks DPDIV=1.5`, BSGS `MC=1`), rounds (r = 0..5, `INST0 = 100 + r`, 2 curves x 2 instances), order rotation, metric, bootstrap and decision rule as above, on cells 36 bits x T = 200, 1000, 3000 (`run.sh "36 200" "36 1000" "36 3000"`), same binaries as addendum A (source unchanged since `a8cc24a6fe`). No retuning. Reported alongside the earlier cells, not pooled. BSGS table size `m` recorded as in addendum A.
