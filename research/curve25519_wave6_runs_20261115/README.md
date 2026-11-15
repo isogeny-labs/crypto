@@ -22,7 +22,7 @@ Four cores, one lead each; the F4 leads under `ulimit -v 6000000`.
 | lead | question | answer | predictions |
 |:--|:--|:--|:--|
 | L3 flat vs chain | Is one variable y^D = 1 per summand cheaper than the chain of power maps on the same base? | **Yes, by 10 to 363x at m = 3 and 2.7 to 17x at m = 2** at every D measured; flat D = 36 completes in 202 s under 6 GB where the chain ran out of 12 GB; flat SD = D + 1 everywhere | P1, P3, P4, P5 hold; P2 holds except that D = 27 (363x) lies above the predicted band [70, 260] |
-| L1 faithful family | Do the exponent studies' costs depend on the family rule? | **No: T is identical to four digits at every shared (m, D)** between the faithful member (p = 2^24 − 75, A = 7842) and the k = 20, 22, 24 smooth-family records; the m = 3 estimator stays inapplicable on the faithful member because its divisor set is sparse | P1, P2, P4 hold; P3: pending the last m = 3 cells |
+| L1 faithful family | Do the exponent studies' costs depend on the family rule? | **No: T is identical to four digits at every shared (m, D)** between the faithful member (p = 2^24 − 75, A = 7842) and the k = 20, 22, 24 smooth-family records; the m = 3 estimator stays inapplicable on the faithful member because its divisor set is sparse | P1 to P4 hold |
 | L2 ladder checks | What does routing both [d]G = Q checks through the stored [2^i]G ladder save? | **3.3 % at k = 20 and 1.4 % at k = 24** of the tw2cj-lazy arm's counted cost at w = 0, the order holding at w = 0.1 and 1; walks identical, only check doublings change; distance to rho-neg 1.56 (k = 20) and 1.61 (k = 24) against 1.61 and 1.63 before | P1, P2, P3 hold; the prediction's basis was wrong in detail (validator E1) |
 | L4 F4 step trace | Is the recorded solving degree bookkeeping of the generator degree? | **The top degree is reached at steps 3 to 4 of 22**, from pairs of the binomial, and 78 % of the field operations are spent afterwards on the way down; changing the variable order leaves SD unchanged and moves T by 1.24x and 0.91x | P1 fails as written (the last productive step is at degree 3), P2 vacuous, P3 holds |
 
@@ -33,7 +33,7 @@ Four cores, one lead each; the F4 leads under `ulimit -v 6000000`.
   m = 2, s = 2.26 [2.21, 2.31] over D = 9 to 219 (9 cells, span 24x). These fits were not preregistered in L3 (reported as readings);
   under the parent's lever rule they would read "no lever at m = 3" instead of "undetermined".
 - Cost is a function of (m, D) alone: the same chain cells on three different primes and two family rules give the
-  same field_ops to four digits. The family-rule confounder the wave-6 README feared does not exist for this
+  same field_ops to four digits (10 shared cells). The family-rule confounder the wave-6 README feared does not exist for this
   instrument. What the faithful family changes is which D exist.
 - L2 is the first measured improvement over the C = 2 arms since the snc-panel: small, constant-factor,
   shrinking with k, and not an accounting change (fewer doublings are performed; nothing moved to an unpriced
@@ -82,8 +82,9 @@ warned; wall time is recorded, not claimed. Full table: `L3_flat/analysis.json` 
 At every (m, D) that also exists in the smooth-family records the mean field_ops agree to four significant digits
 (ratio 1.000): m = 2 at D = 3 (three records, k = 20, 22, 24), 5, 15; m = 3 at D = 3 (two records), 5, 12, 15. The
 solving degrees agree too. P1, P2 and P4 hold. P3 (the m = 3 chain censors at or before D = 60, so the estimator
-stays inapplicable): the m = 3 cells D = 20, 30, 60 were still running at the time of writing; with D ≤ 15 complete
-the span is 1.5x. Table: `L1_faithful/analysis.json` (`analyse_l1.py`).
+stays inapplicable) holds: D = 20 (2·2·5) completed at 2.70e10 in 426 s and D = 30 (2·3·5) at 2.99e11 in 6,089 s,
+and D = 60 (2·2·3·5, four chain variables per summand) exhausted 6 GB after 1,524 s before its first target
+finished; the complete m = 3 cells with D ≥ 9 are 10, 12, 15, 20, 30 (span 3.0x). Table: `L1_faithful/analysis.json` (`analyse_l1.py`).
 
 The amendment (§5) is itself a result: under the full family rule (A ≡ 2 mod 4, cofactor 8 with prime r > 2^(k−3),
 prime twist cofactor 4) no prime of Curve25519's shape below 2^20 among the seven searched admits a curve with
