@@ -1,0 +1,305 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "PKM-PRESENT-PANELP-20261115",
+ "version": 1,
+ "created": "2026-11-15",
+ "repository": "isogeny-labs/crypto",
+ "study_dir": "research/pkm_present_panel_20261115",
+ "authors": [
+  "main session (frontier tier)",
+  "pre-freeze red-team: REDTEAM_PROTOCOL.md"
+ ],
+ "links": {
+  "protocol_md": "PROTOCOL.md",
+  "protocol_md_sha256": "205ec62b8f578f4cefa45e128cc2de3a236ce3da61ed2db3f1f95951d5d3f395",
+  "predecessors": [
+   "crypto:research/pkm_symmetric_tower_20261026/README.md",
+   "crypto-autoresearcher:research/gag_presentation_matched_20261031/protocol.json",
+   "crypto:research/pkm_m8_sparse_panel_20261114/PROTOCOL.md"
+  ]
+ },
+ "question": "Does the per-call counted work of the PKM Kummer relation finder depend on the algebraic presentation of the same instance at m = 3, 4, and how does each presentation's work grow with the base size B = 2^t?",
+ "claims": {
+  "C1": "identical verified decompositions across arms (semantics-adjusted), classifier agreement, planted found",
+  "C2": "per cell and label stratum, median paired log2(w_A/w_chain-tower) differs from 0, same sign on every curve, on w, w^+ and w^solve, msolve proxy co-gate",
+  "C3": "per-arm secant gamma_A(t->t+1) on nested bases, reported with spread, no gate"
+ },
+ "arms": [
+  {
+   "id": "chain-tower",
+   "role": "baseline",
+   "semantics": "ordered leaves, repeats allowed",
+   "membership": "y-tower",
+   "cells": "all"
+  },
+  {
+   "id": "tree-tower",
+   "role": "candidate",
+   "semantics": "as chain",
+   "membership": "y-tower",
+   "cells": "m = 4 only"
+  },
+  {
+   "id": "chain-direct",
+   "role": "candidate",
+   "semantics": "as chain",
+   "membership": "x_i^(2^t) = g^(2^t)",
+   "cells": "all"
+  },
+  {
+   "id": "mono-direct",
+   "role": "positive_control_for_statistic",
+   "semantics": "may admit unlifted tuples",
+   "membership": "direct",
+   "cells": "m = 3 only"
+  },
+  {
+   "id": "sym-tower",
+   "role": "candidate",
+   "semantics": "unordered, distinct abscissae",
+   "membership": "remainder tower R_j = X^(2^j) mod Q",
+   "cells": "B_real >= m+1"
+  },
+  {
+   "id": "sym-direct",
+   "role": "candidate",
+   "semantics": "unordered, distinct abscissae",
+   "membership": "X^(2^t)-g^(2^t) = 0 mod P_e",
+   "cells": "B_real >= m+1"
+  },
+  {
+   "id": "aa",
+   "role": "control",
+   "what": "literal rerun of chain-tower"
+  }
+ ],
+ "not_run": [
+  "mono-tower",
+  "monolithic at m >= 4 (S_5 degree 8; S_6 not expandable)",
+  "m = 5",
+  "random-base null",
+  "Magma",
+  "enumeration reference"
+ ],
+ "instruments": {
+  "native": {
+   "example": "examples/pkm_present_panel.rs",
+   "engine": "crypto_lib::cryptanalysis::f4_fp grevlex",
+   "unit": "field multiplications (field_ops_total)",
+   "threads": "RAYON_NUM_THREADS=1, taskset -c 0",
+   "max_degree": 64,
+   "progress_streamed": true
+  },
+  "msolve": {
+   "package": "0.6.5-1build2",
+   "sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "flags": "-t 1 -v 2 -c 0 -g 2",
+   "proxy": "sum rows*cols*density, single F4 pass"
+  },
+  "classifier": "pkm_m8_panel targets (exhaustive signed multisets; real_count, real_count_distinct, algebraic_count)",
+  "host": "this container, 4 vCPU, 15 GB, one call at a time"
+ },
+ "curves": {
+  "rule": "16 | p-1, not Fermat, prime-order curve, B_real(t=4) >= 5, least such prime >= 2^18 (c1), >= 2^20 (c2), >= 2^22 (c3, m = 3 only); nested bases g*mu_4 ⊂ g*mu_8 ⊂ g*mu_16 on one curve",
+  "commands_in": "PROTOCOL.md §3"
+ },
+ "cells": [
+  {
+   "id": "m3t2",
+   "m": 3,
+   "t": 2,
+   "curves": [
+    "c1",
+    "c2",
+    "c3"
+   ]
+  },
+  {
+   "id": "m3t3",
+   "m": 3,
+   "t": 3,
+   "curves": [
+    "c1",
+    "c2",
+    "c3"
+   ]
+  },
+  {
+   "id": "m3t4",
+   "m": 3,
+   "t": 4,
+   "curves": [
+    "c1",
+    "c2",
+    "c3"
+   ]
+  },
+  {
+   "id": "m4t2",
+   "m": 4,
+   "t": 2,
+   "curves": [
+    "c1",
+    "c2"
+   ]
+  },
+  {
+   "id": "m4t3",
+   "m": 4,
+   "t": 3,
+   "curves": [
+    "c1",
+    "c2"
+   ]
+  },
+  {
+   "id": "m4t4",
+   "m": 4,
+   "t": 4,
+   "curves": [
+    "c1",
+    "c2"
+   ],
+   "exploratory": true,
+   "runs_last": true
+  }
+ ],
+ "targets_per_cell_curve": {
+  "natural_sat": 5,
+  "natural_unsat": 5,
+  "planted": 1,
+  "planted_distinct": true,
+  "draw_cap": 1000000,
+  "labels_public": true,
+  "hidden": "k and decompositions in hidden.json"
+ },
+ "caps": {
+  "native": {
+   "wall_s": 600,
+   "as_gb": 10
+  },
+  "msolve": {
+   "wall_s": 600,
+   "as_gb": 10
+  },
+  "retries": 0
+ },
+ "order": "cells in table order; curves c1,c2,(c3); instances in draw order; arms in table order then A/A; native then msolve; resumable runner; lost row rerun once tagged rerun",
+ "stop_rules": [
+  "chain-tower censored on > half of a cell's instances on a curve: remaining cells of that m not run",
+  "m4t4 last"
+ ],
+ "work_definition": {
+  "w": "solve_field_multiplications + extract_field_multiplications",
+  "w_plus": "w + per-target construction_field_multiplications",
+  "w_solve": "solve only",
+  "per_cell_construction": "reported separately",
+  "censored": "w_lo from progress file; +inf on the candidate side, -inf on the baseline side; both censored dropped and counted"
+ },
+ "primary_metrics": [
+  "median paired log2(w_A/w_chain) per cell per label stratum",
+  "gamma_A(t->t+1)"
+ ],
+ "decision_rule": {
+  "statistic": "median of paired log2 ratios, per cell, per label stratum, pooled over the cell's curves",
+  "test": "exact paired sign-flip, p <= 0.05/k (k = candidate arms in the cell)",
+  "interval": "percentile bootstrap of the median, 20000 resamples, level 1-0.05/k",
+  "supported_within_scope": "p <= 0.05/k AND interval excludes 0 AND same sign of per-curve medians on every curve AND |median| > D_AA AND same sign on w_plus and w_solve AND msolve proxy median same sign",
+  "within_control_distribution": "|median| <= D_AA on every curve",
+  "invalid_measurement": "C1 fails on a completed instance",
+  "inconclusive": "otherwise; fewer than 8 valid pairs; positive control not detected in the cell; co-gate disagrees",
+  "family_wise": "not controlled across cells and strata; number of tests reported"
+ },
+ "controls": {
+  "c1_identity": true,
+  "classifier_gate": true,
+  "per_arm_variety_gate": true,
+  "positive_planted": true,
+  "negative_unsat": true,
+  "positive_control_for_statistic": "mono-direct at m = 3",
+  "aa_literal": true,
+  "engine_cross_check": "msolve -g 2 proxy sign",
+  "construction_charged": true,
+  "pre_run_identities": "cargo test",
+  "blinding": "hidden.json never read; analysis after plan end",
+  "not_run_stated": [
+   "random-base null",
+   "Magma",
+   "enumeration reference"
+  ]
+ },
+ "variable_ledger": [
+  "instrument commit+sha256",
+  "msolve sha256+flags",
+  "RAYON_NUM_THREADS=1, taskset",
+  "F4_* env cleared and recorded",
+  "one host",
+  "fixed order",
+  "seeds from 20261115 and explicit slugs",
+  "caps fixed",
+  "no retry",
+  "no cap raised"
+ ],
+ "seeds": {
+  "master": 20261115,
+  "slugs": "c1,c2,c3 x t2,t3,t4"
+ },
+ "budget": {
+  "route": "local container (isolab budget exhausted; owner declined a paid host)",
+  "usd": 0,
+  "expected_wall_h": "8-16",
+  "worst_case": "caps bound each call at 600 s"
+ },
+ "expectations_preregistered": {
+  "sym-tower": "below chain-tower",
+  "sym-direct": "below chain-tower",
+  "mono-direct": "above chain-tower (worst)",
+  "chain-direct": "undecided",
+  "tree-tower": "undecided"
+ },
+ "non_improvement_sentence": "no presentation effect at m <= 4 is a measured improvement of the index-calculus baseline; no leaderboard row changes; no claim about m = 8",
+ "section_5a": "all arms priced in one native unit; no cross-method ranking; no rho comparison",
+ "export": {
+  "rows": "results/<stamp>/rows.jsonl",
+  "analysis": "analysis/build_results.py (frozen by hash in FREEZE.json)"
+ },
+ "freeze": {
+  "status": "draft",
+  "commit": null,
+  "frozen_at": null,
+  "seen_before_freeze": "seed-777 probe and smoke only"
+ },
+ "redteam": {
+  "file": "REDTEAM_PROTOCOL.md",
+  "adopted": [
+   "B1",
+   "B2",
+   "B3",
+   "B4",
+   "B5",
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S5",
+   "S6",
+   "S7",
+   "S8",
+   "S9",
+   "S10",
+   "S11",
+   "S12",
+   "S13 (partly: literal A/A and positive control; random-base null, Magma, enumeration reference listed as not run)",
+   "M1",
+   "M2",
+   "M3",
+   "M4",
+   "M5",
+   "M6",
+   "M7",
+   "M8",
+   "M9",
+   "M10"
+  ]
+ }
+}

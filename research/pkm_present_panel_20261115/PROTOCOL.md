@@ -1,203 +1,258 @@
-# Protocol: panel P, presentation dependence of the PKM Kummer relation finder (frozen before data)
+# Protocol v1: panel P, presentation dependence of the PKM Kummer relation finder (frozen before data)
 
-**Study:** `research/pkm_present_panel_20261115/`. **Date written:** 2026-11-15. **Status:** draft until §9
-carries a freeze commit; no data-seed row is run before that. **Standing:** every number produced under this
-protocol is `[pcc:unverified]` until a pcc claim is filed; nothing reaches a leaderboard or
+**Study:** `research/pkm_present_panel_20261115/`. **Written:** 2026-11-15 (draft v0.1), revised to v1 the same day after
+the pre-freeze red-team (`REDTEAM_PROTOCOL.md`, B1–B5 adopted, S1–S13 and M1–M10 adopted or answered below).
+**Status:** draft until §9 names a freeze commit; no data-seed row is run before that. **Standing:** every number
+produced here is `[pcc:unverified]` until a pcc claim is filed; nothing reaches a leaderboard or
 `benchmarks/README.md` without the validation gate.
 
-**Why this experiment.** The owner did not approve the 72 h panel A run (`research/pkm_m8_sparse_panel_20261114/AMENDMENTS.md`
-A3) and asked for a different experiment. Panel A measured one presentation of the m = 8 relation finder, the raw
-chained S_3 system with the y-tower membership. Two records say presentation matters by large factors and that the
-prime-field case is unmeasured: the lead atlas `LEAD-ICE-gag-contraction-planner` (run-001, n = m = 3 over F_{p^3}:
-the monolithic S_4 used 0.110× the chained system's F4 matrix cells at every prime, `supported_within_scope`; its
-recorded next step is "first prime-field m = 3 (all three) and m = 4 (chain vs tree)"), and
-`LEAD-ICP-pkm-tower-algebraic-oracle` (EXP-ECDLP-f49f75/502ae2: the P-256 2-isogeny chain encoding was 2×–654× slower
-than the dense encoding of the same set). Panel A's own KILL scope excluded "other presentations (symmetrized or
-elementary-symmetric variables, fewer auxiliaries)". This panel measures exactly that, on identical instances, at
-arities and base sizes a 4-vCPU host solves in seconds to minutes, at zero spend.
+**Why this experiment.** The owner did not approve the 72 h panel A run
+(`research/pkm_m8_sparse_panel_20261114/AMENDMENTS.md` A3) and asked for a different experiment. Panel A measured
+one presentation of the m = 8 relation finder (the raw chained S_3 system with the y-tower membership), and its
+KILL scope excluded "other presentations (symmetrized or elementary-symmetric variables, fewer auxiliaries)".
+What the lab knows about that axis:
+
+- `research/pkm_symmetric_tower_20261026/` (stage diagnostic, native `f4_fp`, two random targets per cell,
+  m = 2, 3): the **symmetric tower** presentation (elementary symmetric unknowns with a remainder tower) has F4
+  solving degree one lower than the plain Kummer chain and matrices about 10× narrower at m = 3; a **single
+  S_4** without symmetrisation is the worst arm (D = 12 = its own degree). Not measured there: counted work,
+  extraction, real SAT/UNSAT targets, m = 4, a second engine, direct (tower-free) membership, merge trees.
+- Lead atlas (crypto-autoresearcher) `LEAD-ICE-gag-contraction-planner`: over F_{p^3}, n = m = 3, the monolithic
+  S_4 used 0.110× the chained system's F4 matrix cells (run-001, `supported_within_scope`); its recorded next step
+  is the prime-field m = 3 (chain, tree, monolithic) and m = 4 (chain, tree) measurement. `LEAD-ICE-semaev-chain-cost-model`
+  reopens on "a solver whose degree depends on topology on measured cells". `LEAD-ICP-pkm-tower-algebraic-oracle`
+  records the P-256 isogeny-chain encoding as 2×–654× slower than the dense encoding of the same set.
+
+Panel P is the **measured follow-up of the 2026-10-26 diagnostic**, on identical real instances, with counted work,
+on this container, at zero spend. It asks whether and by how much the presentation changes the per-call cost of
+the relation finder at m = 3 and m = 4, which presentation is cheapest, and how each presentation's cost grows
+with the base size. It decides nothing about m = 8 (§5, S8).
 
 ## 0. Sources checked (knowledge base first)
 
-- `research-kb` MCP and `scripts/research-kb`: unavailable in this container (no executable; recorded, not waived).
-- Lead atlas (crypto-autoresearcher, unlocked 2026-11-15): `tools/lead_atlas.py --match` on the presentation idea
-  returns `LEAD-ICE-gag-contraction-planner` (open_next_step, prime-field arms not run), `LEAD-ICE-semaev-chain-cost-model`
-  (cost_model obstruction: variable count is topology-invariant; `revisit_when` = a solver whose degree depends on
-  topology on measured cells, which is precisely what this panel measures), `LEAD-ICE-prime-field-semaev-solving-degree`
-  (closed_known for naive bases; `revisit_when` names a bounded-degree membership base, i.e. the PKM tower),
-  `LEAD-ICP-pkm-tower-algebraic-oracle` (open_blocked; chain vs dense encoding factors above), `KR-IC-955fd6`
-  (symmetrised summation polynomials, literature over extension fields, heuristic; not measured here over F_p for a
-  Kummer base), `LEAD-ICB-decomposition-encoding-and-sat` (binary field only).
-- crypto-autoresearcher `research/gag_presentation_matched_20261031/` (protocol 609c701c, run-001, review REV-…c184b3):
-  the statistic, interval and verdict vocabulary below are taken from it so that the prime-field rows are comparable.
-- crypto: `research/pkm_m8_sparse_panel_20261114/` (instrument `pkm_m8_panel`, pilot, protocol v2.2 §2 msolve facts),
-  `src/cryptanalysis/semaev_higher.rs` (prime-field S_4..S_6 extractions, test oracle), `src/cryptanalysis/koblitz_sym_s4.rs`
-  (symmetrised S_4, binary field only), `examples/pkm_oracle_program/algebra.rs`.
-- Not found anywhere in the four repositories: a prime-field measurement of monolithic, tree, direct-membership or
-  symmetrised presentations of the PKM Kummer system. This is a "not tried" claim under the rule; it rests on the
-  atlas and grep, not on the knowledge base.
+- `research-kb` MCP and `scripts/research-kb`: unavailable in this container (no executable); recorded, not waived.
+- Lead atlas `--match` (unlocked checkout, 2026-11-15): `LEAD-ICE-gag-contraction-planner` (open_next_step),
+  `LEAD-ICE-semaev-chain-cost-model` (cost_model obstruction, revisit on topology-dependent degree),
+  `LEAD-ICE-prime-field-semaev-solving-degree` (closed_known; revisit on a bounded-degree membership base),
+  `LEAD-ICP-pkm-tower-algebraic-oracle` (open_blocked), `KR-IC-955fd6` (symmetrised summation polynomials,
+  extension fields, heuristic), `LEAD-ICB-decomposition-encoding-and-sat` (binary field).
+- crypto: `research/pkm_symmetric_tower_20261026/{README.md,rows*.jsonl}` and `examples/pkm_symmetric_tower.rs`
+  (the symmetric tower construction reused as arm `sym-tower`); `docs/ic/factor-base-encyclopedia/README.md` §0.1,
+  §8 (PKM_GOALS G3 names this comparison); `research/pkm_m8_sparse_panel_20261114/` (instrument `pkm_m8_panel`,
+  pilot facts on msolve); `src/cryptanalysis/semaev_higher.rs` (S_4..S_6 extractions; S_6 cannot be expanded);
+  `examples/pkm_oracle_program/algebra.rs`.
+- crypto-autoresearcher: `research/gag_presentation_matched_20261031/` (statistic, interval and verdict vocabulary
+  reused; its review REV-…c184b3 flagged the single max-row A/A floor, repeated here as S3 and fixed).
+- **Corrected claim (S6):** the draft said no prime-field presentation measurement existed. False: the 2026-10-26
+  diagnostic measured chain vs single-S_4 vs symmetric tower at m ≤ 3 on D and matrix width. What is untried, by
+  grep over the four repositories and the atlas: counted paired work with extraction and construction charged,
+  tower-free (direct) membership, merge trees, m = 4, msolve as a second engine, the per-presentation B-secant.
 
 ## 1. Question and claims
 
-One instance = (cell, target): a curve `E/F_p` of prime order `r`, the Kummer base `V = g·μ_{2^t}` (B = 2^t
-abscissae), the real base `V ∩ x(E(F_p))` (`B_real`), a target abscissa `x_R` with `R = aP + bQ`, and the arity `m`.
-A **presentation** is a polynomial system over F_p whose F_p-rational solutions are (in the stated semantics) the
-decompositions of R into m signed real base points. Six presentations of the same instance:
+Instance = (curve `E/F_p` of prime order r, Kummer base `V = g·μ_{2^t}` with `B = 2^t` abscissae, real base
+`V ∩ x(E(F_p))` of size `B_real`, arity m, target abscissa `x_R` with `R = aP + bQ`). A presentation is a
+polynomial system over F_p whose F_p-rational solutions are (in its stated semantics) the decompositions of R into
+m signed real base points.
 
-| id | Semaev part | membership part | variables |
-|---|---|---|---|
-| `chain-tower` | chained S_3, m−2 auxiliaries (panel A's raw system) | y-tower, t levels per leaf | m·t + (m−2) |
-| `tree-tower` | balanced merge tree of S_3 (m ≥ 4; = chain at m = 3) | y-tower | m·t + (m−2) |
-| `mono-tower` | S_{m+1} (all internal wires contracted by resultants) | y-tower | m·t |
-| `chain-direct` | chained S_3 | `x_i^{2^t} = g^{2^t}` | m + (m−2) |
-| `mono-direct` | S_{m+1} | `x_i^{2^t} = g^{2^t}` | m |
-| `sym-direct` | S_{m+1} in elementary symmetric variables e_1..e_m | `X^{2^t} − g^{2^t} ≡ 0 mod P_e(X)` (m equations) | m |
+| id | Semaev part | membership part | variables | semantics |
+|---|---|---|---|---|
+| `chain-tower` (baseline) | chained S_3, m−2 auxiliaries (panel A's raw system) | y-tower, t levels per leaf | m·t + (m−2) | ordered leaves, repeats allowed |
+| `tree-tower` (m = 4 only) | balanced merge tree of S_3 | y-tower | m·t + (m−2) | as chain |
+| `chain-direct` | chained S_3 | `x_i^{2^t} = g^{2^t}` | m + (m−2) | as chain |
+| `mono-direct` (m = 3 only; **positive control**, §6) | S_4 by resultant | direct | m | may admit unlifted tuples (non-rational partial sums) |
+| `sym-tower` | S_{m+1} in e_1..e_m (2026-10-26 construction) | remainder tower `R_j = X^{2^j} mod Q`, `R_{t−1}^2 ≡ 1` | m·t | **unordered, distinct abscissae only** |
+| `sym-direct` | S_{m+1} in e_1..e_m | `X^{2^t} − g^{2^t} ≡ 0 mod P_e(X)` (m equations) | m | unordered, distinct abscissae only |
 
-Solution semantics (stated before data): chain/tree presentations have exactly the F_p-rational decompositions
-(with ordered leaves); monolithic presentations may admit extra tuples whose internal partial sums are not
-F_p-rational (counted as `unlifted`, never as relations); `sym-direct` identifies permutations (unordered
-solutions). Every arm's solutions are lifted and verified by point addition; only verified decompositions count.
+`mono-tower` (S_{m+1} with the y-tower) and any monolithic arm at m = 4 (S_5, degree 8) or m = 5 (S_6 is not
+expandable) are **not run**: the 2026-10-26 diagnostic already places the unsymmetrised monolithic arm last, and
+S12's runtime budget goes to the untried arms. Symmetric arms run only in cells with `B_real ≥ m + 1`
+(`sym_applicable`, recorded per cell); where they do not run, the cell reports them as not applicable, not as
+censored (B2).
 
-Claims (descriptive; they decide no hypothesis about ECDLP cost):
+**Work** `w_A(i)` of arm A on instance i = native counted field multiplications of (solve to a reduced basis)
++ (extraction: lifting and verifying every F_p-rational solution, same `--extract-max-q` on every arm). Two
+co-readings: `w^solve` (solve only; S1) and `w^+` = `w` + the per-target **construction** work (resultants,
+symmetric rewrite, remainder polynomial, tower; B5), all in the same unit. Per-cell construction (independent of
+the target) is reported separately and charged once per cell, never hidden.
 
-- **C1 (correctness gate):** on every instance, every arm's verified decompositions are the same set (modulo the
-  stated semantics) and equal the exhaustive classifier's count; the planted decomposition is found by every arm.
-- **C2 (presentation effect, per cell):** for each candidate arm A and each cell (m, t), the median over
-  instances of `log2(work_A / work_chain-tower)` differs from 0 beyond the permutation control, in the same
-  direction on every prime of the cell. Work is the native engine's counted field multiplications to a reduced
-  Groebner basis plus extraction (primary) and msolve's F4 matrix-cell proxy (secondary).
-- **C3 (secant per presentation):** the local secant `γ_A(B→2B) = log2(work_A(2B) / work_A(B))` over
-  t = 2→3 and 3→4 at fixed m, per arm, with its spread over instances; reported against the panel A gate value
-  3.5 as a distance, never as a verdict about m = 8.
+Claims (descriptive; they decide no hypothesis about ECDLP cost and make no ranking against rho):
 
-**No ADVANCE is possible:** the panel contains no held-out size and no priced comparison with rho; §5a is
-satisfied by making no cross-method ranking at all.
+- **C1 (correctness gate):** on every instance, every arm's verified decompositions equal the baseline's
+  (distinct-abscissa subset for the symmetric arms) and the exhaustive classifier's count; the planted
+  decomposition is found by every arm that completes. A censored arm makes C1 **not evaluable** on that instance
+  (B3), never a failure.
+- **C2 (presentation effect, per cell and label):** for each candidate arm A, cell (m, t) and label stratum
+  (real-SAT; real-UNSAT), the median paired `log2(w_A / w_chain-tower)` differs from 0 with the same sign on both
+  primes and on `w^+`, by the rule of §5.
+- **C3 (secant per presentation):** `γ_A(B→2B) = median_i log2(w_A(i at t+1) / w_A(i at t))` over instances
+  paired by (prime, label, draw rank) on the **same curve** (nested bases, S11), reported with spread; no gate value
+  is applied (S7).
+
+**No ADVANCE is possible:** no held-out size, no priced comparison with rho. §5a: C2 is a ranking of arms by
+counted native work; every arm is priced in the same unit (field multiplications), so the 0 / 0.1 / 1 GAE band
+collapses to one number and is stated as such (S2). The m ≤ 4 cells **do not decide** anything about m = 8; they
+inform which presentation any future m = 8 plan should use, and nothing more (S8).
 
 ## 2. Instruments
 
-- **Native arm (primary):** `examples/pkm_present_panel.rs` (new; reuses `examples/pkm_m8_panel/*` and
-  `examples/pkm_oracle_program/algebra.rs`), engine `crypto_lib::cryptanalysis::f4_fp` (grevlex; the probe showed the engine uses several threads: user 266 s against 77 s wall on the m = 4, t = 3 UNSAT call, so every native call runs with `RAYON_NUM_THREADS=1` and `taskset -c 0`, and the thread count actually used is recorded), counted
-  field multiplications as the engine names them (`field_ops_total`), solving degree, degree reached, basis size,
-  extraction counted separately, CPU seconds secondary. Deterministic: the same input gives the same count.
-- **msolve arm (secondary):** `/usr/bin/msolve` 0.6.5-1build2 (sha256 `c2722288…59fa`), `msolve -t 1 -v 2 -P 1`, one
-  process per call; `work_proxy` = Σ rows×cols×density over all F4 passes from the `-v 2` log (parser
-  `research/pkm_m8_sparse_panel_20261114/pod/parse_msolve_log.py`), max round degree, CPU seconds. Every prime is
-  ≥ 2^18 (msolve 0.6.5 segfaults at once below it on this host, panel A `PILOT.md`).
-- **Classifier and targets:** `pkm_m8_panel cell|targets` (exhaustive signed-multiset classifier; `--m`).
-- **Host:** this container (4 vCPU Intel Xeon 2.30 GHz, 15 GB; `lscpu` recorded), one call at a time, `nice 0`;
-  CPU seconds are L0-class and secondary; counted operations and the matrix proxy are host-independent.
+- **Native (primary):** `examples/pkm_present_panel.rs` (new; reuses `examples/pkm_m8_panel/*`,
+  `examples/pkm_oracle_program/algebra.rs`, `examples/pkm_symmetric_tower.rs`), engine `crypto_lib::cryptanalysis::f4_fp`
+  (grevlex), counted field multiplications (`field_ops_total`), solving degree, degree reached, basis size,
+  `solve_field_multiplications`, `extract_field_multiplications`, `construction_field_multiplications` (per cell
+  and per target), progress streamed every F4 step to `<out>.progress.json` so an external stop leaves a lower
+  bound (B4, S12). `RAYON_NUM_THREADS=1`, `taskset -c 0`, thread count actually used recorded (probe: user 266 s vs
+  77 s wall at m = 4, t = 3 without the pin). Degree bound `--max-degree 64`, non-binding by design (B4); the only
+  stop is the external wall cap.
+- **msolve (co-observable, F4 work only; S4):** `/usr/bin/msolve` 0.6.5-1build2 (sha256 `c2722288…59fa`),
+  `msolve -t 1 -v 2 -c 0 -g 2 -f X.ms -o X.out` (Gröbner basis only, no parametrisation, genericity reruns off),
+  `work_proxy` = Σ rows×cols×density of the single F4 pass (`research/pkm_m8_sparse_panel_20261114/pod/parse_msolve_log.py`),
+  max round degree, CPU s. Every prime is ≥ 2^18: msolve 0.6.5 segfaulted at once on p = 65537, 65557 and 131101
+  and ran at 262153 and above (M1: the observed crash band is [2^16, 2^18); smaller primes were not tried).
+- **Classifier and targets:** `pkm_m8_panel targets` (exhaustive signed-multiset classifier, `--m`; records
+  `real_count`, `real_count_distinct`, `algebraic_count`); planted targets drawn with distinct abscissae (B2).
+- **Host:** this container (4 vCPU Intel Xeon 2.30 GHz, 15 GB, `lscpu` recorded), one call at a time. CPU seconds
+  are L0-class and secondary; counted operations and the matrix proxy are host-independent.
+- **Frozen environment:** no `F4_*` environment variable set (the runner clears them and records `env`); msolve
+  flags as above; analysis script `analysis/build_results.py` frozen by hash in `FREEZE.json` (S10).
 
 ## 3. Cells, instances, order
 
-| cell | m | t | B | p rule | arms |
+**Curves (nested bases, S11):** one curve per prime serves every t: p is prime with `16 | p − 1`, not Fermat,
+prime-order curve from the seeded search, and `B_real(t = 4) ≥ 5` (so that the symmetric arms apply at m = 4,
+t = 4). Two primes: `p1` = least such prime ≥ 2^18, `p2` = least such prime ≥ 2^20 (a third, ≥ 2^22, for m = 3
+only). Bases `g·μ_4 ⊂ g·μ_8 ⊂ g·μ_16` on the same curve with the same g. Exact commands (every flag explicit,
+`--no-l1-reuse` always; the instrument records the rule it applied and refuses an L1 reuse):
+
+```
+pkm_present_panel cell --t 4 --min-prime 262144  --require-breal 5 --master-seed 20261115 --slug c1 --out cells/c1
+pkm_present_panel cell --t 4 --min-prime 1048576 --require-breal 5 --master-seed 20261115 --slug c2 --out cells/c2
+pkm_present_panel cell --t 4 --min-prime 4194304 --require-breal 5 --master-seed 20261115 --slug c3 --out cells/c3
+pkm_present_panel cell --prime <p_k> --t 2 ... --slug c<k>t2   and   --t 3 ... --slug c<k>t3   (same curve, same g)
+```
+
+| cell | m | t | B | curves | arms |
 |---|---|---|---|---|---|
-| m3t2 | 3 | 2 | 4 | least eligible prime ≥ 2^18 | chain-tower, mono-tower, chain-direct, mono-direct, sym-direct |
-| m3t3 | 3 | 3 | 8 | least eligible prime ≥ 2^18 with 8 \| p−1 | same |
-| m3t4 | 3 | 4 | 16 | least eligible prime ≥ 2^18 with 16 \| p−1 | same |
-| m4t2 | 4 | 2 | 4 | as m3t2 | all six (tree-tower added) |
-| m4t3 | 4 | 3 | 8 | as m3t3 | all six |
-| m4t4 | 4 | 4 | 16 | as m3t4 | all six |
-| m5t2 | 5 | 2 | 4 | as m3t2 | all six; **exploratory**: any arm may censor at the cap |
-| m5t3 | 5 | 3 | 8 | as m3t3 | all six; exploratory |
+| m3t2 | 3 | 2 | 4 | c1, c2, c3 | chain-tower, chain-direct, mono-direct (+ sym-* iff B_real(t=2) ≥ 4) |
+| m3t3 | 3 | 3 | 8 | c1, c2, c3 | chain-tower, chain-direct, mono-direct, sym-tower, sym-direct (iff B_real ≥ 4) |
+| m3t4 | 3 | 4 | 16 | c1, c2, c3 | same as m3t3 |
+| m4t2 | 4 | 2 | 4 | c1, c2 | chain-tower, tree-tower, chain-direct |
+| m4t3 | 4 | 3 | 8 | c1, c2 | chain-tower, tree-tower, chain-direct, sym-tower, sym-direct (iff B_real ≥ 5) |
+| m4t4 | 4 | 4 | 16 | c1, c2 | same as m4t3; **exploratory** (probe: chain-tower at m = 4, t = 3 already costs 77 s wall) |
 
-Each cell runs on **two primes**: the least eligible prime ≥ 2^18 and the least eligible prime ≥ 2^20 (same t
-rule), so that C2's "same direction on every prime" has two primes; a third prime (≥ 2^22) is added for m = 3
-only (cheap). Eligible = prime, `2^t | p−1`, not Fermat, prime-order curve from the seeded search, `B_real ≥ B/2`
-under `pkm_m8_panel`'s g rule. Cells are derived by `pkm_m8_panel cell --t T --ratio R --master-seed 20261115`
-(ratio chosen so that `2^(t·ratio)` is the prime floor: t = 2 → ratios 9, 10, 11; t = 3 → 6, 7, 8 (8 | p−1 is the
-instrument's rule for t = 3); t = 4 → ratios 5, 5 with `--min-prime` 2^18 / 2^20 since 2^(4·5) = 2^20 already; the
-instrument records every rule it applied).
+**Instances per (cell, curve):** 5 natural real-SAT, 5 natural real-UNSAT (seeded draw order, classifier, draw cap
+10^6; a cell whose draws exhaust the cap on a curve records it and the curve is dropped from that cell, M8), 1
+planted with distinct abscissae (B1, B2). Hidden `k` and decompositions in `hidden.json`, never read by a solver
+step. Labels and `algebraic_count` are public for stratification (S9).
 
-**Instances per (cell, prime):** 3 natural real-SAT, 3 natural real-UNSAT (drawn in seeded order with the
-classifier, draw cap 10^6) and 1 planted; `targets --m M --n-sat 3 --n-unsat 3 --planted 1`. The hidden `k` and
-the decompositions stay in `hidden.json`, never read by any solver step; labels are public for stratification.
+**Order (frozen):** cells in table order (m = 3 block then m = 4 block); within a cell, curves c1, c2, (c3);
+within a curve, instances in draw order; within an instance, arms in the table order, then the literal A/A
+(chain-tower rerun; S3, S13); for each arm the native call then the msolve call. The arm order is fixed and
+disclosed (M4); the native engine is deterministic, so order cannot leak between arms. One process at a time, no
+retry. The runner is resumable (rows already in `rows.jsonl` are skipped by `(cell, curve, instance, arm, engine)`);
+a call interrupted by a container loss is a **lost row**, re-run once on resume and tagged `rerun: true` (S12).
 
-**Order (frozen):** cells in the table order; within a cell, prime ascending; within a prime, instances in draw
-order; within an instance, arms in the table order, then the permutation control; native call then msolve call.
-One process at a time. No retry. A censored call stays censored.
+**Per-call caps (frozen):** native 600 s wall (external `timeout -k 10 600`) and 10 GB address space; msolve 600 s
+and 10 GB. **Stop rules:** if `chain-tower` censors on more than half of a cell's instances on a curve, the remaining
+cells of that m are not run (reported); the m4t4 block runs only after every other cell has finished.
 
-**Per-call caps (frozen):** native 600 s wall and 10 GB address space (`prlimit --as`); msolve 600 s wall and 10 GB;
-`max-degree` 16 for the native engine (a run that needs more is censored `degree_cap`). The exploratory m = 5 cells
-use the same caps; they are reported but excluded from C2's cell-level verdicts if any arm censors on more than
-half of the instances.
+**Runtime (S12):** calls = Σ_cells Σ_curves 11 instances × (arms + A/A) × 2 engines ≈ 3 × 11 × (4..6) × 2 × 3
+(m = 3 block) + 2 × 11 × (4..6) × 2 × 3 (m = 4 block) ≈ 1,000–1,300 calls. From the seed-777 probe, m = 3 cells and
+m4t2 take seconds per call; m4t3 about 1–3 min per call (≈ 3–7 h for the cell); m4t4 unknown, capped. Expected
+8–16 h wall in total; the external caps bound the worst case at about 1,300 × 600 s = 9 days, which is why the
+m4t4 block is last and the stop rules exist.
 
 ## 4. Observables (per call)
 
-`arm, cell, prime, instance, label, algebraic_count, nvars, nequations, max_input_degree, solving_degree,
-degree_reached, basis_size, field_multiplications (solve), field_multiplications (extraction), cpu_s, wall_s,
-max_rss_kb, censored ∈ {no, timeout, as_rlimit, degree_cap, crash}`, `verified_real_decompositions`,
-`unlifted_solutions`, `consistent_with_classifier`; msolve: `work_proxy, max_round_degree, rounds, passes, cpu_s,
-distinct_solutions (from -P 1), censored`. Per instance: the set of verified decompositions per arm (sorted,
-hashed) for C1. Per cell: classifier enumeration cost (analysis cost, listed separately).
+`arm, cell, curve, instance, label, algebraic_count, real_count, real_count_distinct, nvars, nequations,
+max_total_degree, nterms_total, construction_field_multiplications (per target), solve_field_multiplications,
+extract_field_multiplications, solving_degree, degree_reached, basis_size, threads_used, cpu_s, wall_s, max_rss_kb,
+censored ∈ {no, timeout, as_rlimit, crash, not_applicable}, progress_last (ops, degree at the stop for censored
+calls), verified_real_decompositions, unlifted_solutions, consistent_with_classifier`; msolve: `work_proxy,
+max_round_degree, rounds, cpu_s, censored`. Per instance: the sorted, hashed decomposition set per arm (C1). Per
+cell: per-cell construction work, classifier enumeration cost (analysis cost).
 
-**Work** `w_A(instance)` = native `field_multiplications(solve) + field_multiplications(extraction)`. The msolve
-proxy `π_A` is the co-observable. Censored calls carry lower bounds and are excluded from medians (and the
-exclusion is counted and reported; a cell with any censored chain-tower call has no C2 verdict).
+Censored calls carry `w_lo` = ops at the stop (from the progress file) and enter the paired statistics as
+**+∞ on the candidate side** and as `−∞` when the baseline is censored (i.e. the pair's sign is known whenever one
+side completed and the other's lower bound already exceeds it; a pair with both sides censored is dropped and
+counted) (B3).
 
 ## 5. Analysis and decision rule (frozen)
 
-For each cell (m, t), each prime, each candidate arm A ≠ chain-tower, over the natural instances (SAT and UNSAT
-pooled, and also reported split by label):
+For each cell (m, t), each candidate arm A, each label stratum L ∈ {SAT, UNSAT} (S9), pooled over the cell's curves
+(B1):
 
-- statistic `d_A = median_i log2( w_A(i) / w_chain(i) )`; interval: percentile bootstrap of the median, 20,000
-  resamples, level `1 − 0.05/k` with k = number of candidate arms in the cell (Bonferroni); exact sign-flip test
-  on the paired log-ratios.
-- **permutation control** `d_perm`: chain-tower on the same instance with the leaves in a seeded random order
-  (the system is identical up to variable relabelling; a counting engine should give the same work up to tie
-  breaking). `D_perm = max_i |log2(w_perm(i)/w_chain(i))|` per prime.
-- **supported_within_scope** for arm A in cell (m, t): at every prime of the cell, the interval excludes 0, the
-  sign-flip p ≤ 0.05/k, `|d_A| > D_perm`, and the sign agrees across the cell's primes; also the msolve proxy's
-  `d` has the same sign at every prime (co-gate). The scope is the measured (m, t, p) cells and these two engines.
-- **within_control_distribution:** `|d_A| ≤ D_perm` at every prime.
-- **invalid_measurement:** C1 fails on any instance of the cell (any arm misses a verified decomposition that
-  another arm finds, or finds one the classifier does not have), or a prime has fewer than 4 valid instances.
-- **inconclusive:** otherwise.
-- C3: `γ_A(B→2B)` = median over matched instances (same prime rule, same draw index) of
-  `log2(w_A(t+1) / w_A(t))`, with the instance spread; reported per arm with the distance to 3.5 as a number.
-  A censored call at the larger t makes that γ a lower bound.
+- pairs `d_i = log2(w_A(i) / w_chain(i))` over the stratum's instances on all curves (n = 10 for two curves, 15 for
+  three); statistic = median of `d_i` (ties at exactly 0 count as 0 and are reported); exact paired sign-flip test
+  on the `d_i` (p_min = 2/2^10 ≈ 0.002); percentile bootstrap of the median (20,000 resamples, level `1 − 0.05/k`,
+  k = number of candidate arms in the cell); degenerate intervals (all signs equal) are reported as such (M3).
+- **floor:** literal A/A `D_AA` = max_i |log2(w_AA(i)/w_chain(i))| per curve (expected 0 for a deterministic
+  engine; a nonzero value is itself a finding), and the **positive control** (mono-direct at m = 3; §6).
+- **supported_within_scope** for (A, cell, L): sign-flip p ≤ 0.05/k, interval excludes 0, the per-curve medians have
+  the same sign on every curve of the cell, `|median| > D_AA`, the same sign holds on `w^+` (B5) and on
+  `w^solve` (S1), and the msolve `work_proxy` median has the same sign (S4 co-gate). Scope: the measured (m, t,
+  curves), both strata as stated, these two engines.
+- **within_control_distribution:** `|median| ≤ D_AA` on every curve.
+- **invalid_measurement:** C1 fails on any completed instance of the cell.
+- **inconclusive:** otherwise, including fewer than 8 valid pairs in the stratum (B1), the positive control not
+  detected in that cell (§6), or the co-gate disagreeing.
+- Family-wise error across cells and strata is **not** controlled beyond the per-cell Bonferroni; the number of
+  tests is reported with the results (M2).
+- C3 per arm: `γ_A(t→t+1)` = median over pairs (same curve, same label, same draw rank) of
+  `log2(w_A(t+1)/w_A(t))`, with the interquartile range; a censored numerator makes the pair a lower bound. No
+  gate value is applied; the arity-matched heuristic gates the red-team derived (0, 1, 2 at m = 3, 4, 5) are
+  quoted as desk, unverified, for orientation only (S7).
 
-The pre-registered expectations (from the F_{p^3} run-001 and the P-256 isogeny-chain record), which the data may
-contradict: `mono-*` below `chain-*`; `*-direct` below `*-tower`; `sym-direct` lowest when `2^t` is small relative
-to the degree budget; `tree-tower` indistinguishable from `chain-tower` at m = 4. The m = 8 question is not decided
-by any outcome here; a strong presentation effect at m ≤ 5 is the reason to re-plan panel A's presentation before
-any large host is bought, and no effect is the reason not to.
+**Pre-registered expectations, which the data may contradict:** from the 2026-10-26 diagnostic, `sym-tower` and
+`sym-direct` below `chain-tower` and `mono-direct` above it (worst); `chain-direct` and `tree-tower` undecided.
+**Non-improvement sentence (S8):** whatever C2 finds, no presentation effect at m ≤ 4 is a measured improvement
+of the index-calculus baseline; the panel changes no leaderboard row and makes no claim about m = 8.
 
 ## 6. Controls and variable ledger
 
 | control | arm | expected | failure means |
 |---|---|---|---|
-| C1 identical verified relations | all arms, every instance | same decomposition set (semantics-adjusted); planted found | exporter/extractor fault; instance invalid |
-| classifier gate | `pkm_m8_panel targets` exhaustive count vs verified decompositions of chain-tower | equal | classifier or solver fault; cell invalid |
-| positive | planted instance per (cell, prime) | planted decomposition recovered by every arm | arm invalid in that cell |
-| negative | real-UNSAT instances | zero verified decompositions on every arm (algebraic/unlifted solutions may exist and are counted) | false relation: invalid run |
-| permutation (noise floor of a counting engine) | chain-tower with seeded leaf permutation | `D_perm` small; recorded | sets the floor for C2 |
-| engine cross-check | msolve proxy sign agreement | same sign as native | engine-specific effect, not a presentation effect: C2 inconclusive |
-| resultant / rewrite identities | `cargo test` of the instrument (S_{m+1} vs `semaev_higher`, symmetric rewrite, remainder criterion) | pass before any data | exporter fault: nothing runs |
-| blinding | `hidden.json` never read by the pipeline; analyst reads the results table only after the whole plan finished | | |
+| C1 identical verified relations | all completed arms, every instance | same decomposition set (semantics-adjusted); planted found | exporter/extractor fault; instance invalid |
+| classifier gate | exhaustive `real_count` / `real_count_distinct` vs chain-tower's verified set | equal | classifier or solver fault; cell invalid |
+| per-arm variety gate (S5) | F_p-rational solution count of each arm vs the count its semantics predicts from the classifier (ordered with repeats / distinct unordered) | equal; monolithic arms ≥ with `unlifted` explaining the excess | exporter fault: arm invalid in that cell |
+| positive (detector sees solutions) | planted instance per (cell, curve), every arm | planted decomposition recovered | arm invalid in that cell |
+| negative (no false relations) | real-UNSAT instances | zero verified decompositions; algebraic solutions counted | false relation: invalid run |
+| **positive control for the C2 statistic (S13)** | `mono-direct` at m = 3 (the known worst arm of 2026-10-26) | `supported_within_scope` with positive sign in every m = 3 cell where it completes | the statistic cannot detect a known effect: the cell's other C2 verdicts are inconclusive |
+| literal A/A (S3, S13) | chain-tower rerun on every instance | identical counts (D_AA = 0) | engine nondeterminism; D_AA becomes the floor |
+| engine cross-check (S4) | msolve `-g 2` proxy sign | same sign as native | engine-specific effect: inconclusive |
+| construction charged (B5) | `w^+` sign agreement | same sign | "presentation" was precomputation moved offline: inconclusive |
+| identities (pre-run) | `cargo test`: resultant vs `semaev_higher`, symmetric rewrite, remainder criterion both directions, sym-tower vs the 2026-10-26 builder, chain-tower byte-identical to panel A's exporter | pass before any data | exporter fault: nothing runs |
+| blinding | `hidden.json` never read by the pipeline; the analyst runs `analysis/build_results.py` only after the plan finished | | |
+| not run, stated | random-base null (presentation vs Kummer structure), Magma arm, enumeration reference row (S13) | — | listed as limits of scope, not controls |
 
-Variable ledger: instrument commit and binary sha256, msolve package sha256, flags, one thread, one host (lscpu
-recorded), fixed order, seeds derived from 20261115 and the cell slug, caps fixed, no retry, no cap raised after
-seeing results. Confounders isolated: same instance across arms (paired), same engine settings, same prime band,
-interleaving of arms within an instance, permutation control for ordering effects.
+Variable ledger: instrument commit and binary sha256; msolve sha256 and flags; `RAYON_NUM_THREADS=1`, `taskset`;
+cleared `F4_*` environment; one host; fixed order; seeds derived from 20261115 and the explicit cell slugs (S10:
+each (curve, t) has its own slug, so no two cells share an RNG stream); caps fixed; no retry; no cap raised after
+seeing results. Confounders isolated: same instance across arms (paired), same engine settings, same prime band and
+the same curve across t (nested bases), label strata separated, construction charged, extraction uniform.
 
 ## 7. Budget, route and stop rules
 
-Local container, 1 thread, one call at a time; expected total 2–8 h (probe on seed 777, chain-tower: m = 3 at t ≤ 3 and m = 4 at t = 2 take 0.1–3.2 s on
-both engines; the m = 4, t = 3 UNSAT call took 77 s wall / 266 CPU-s native (1.9 GB) and 75 s msolve; m = 4 at
-t = 4 and m = 5 are unknown and capped at 600 s). Zero spend. Stop rules: a cell whose chain-tower
-censors on more than half of its instances stops the remaining cells of that m (reported). No isolab, no pod.
-A follow-up at larger m or on a bigger host is a new protocol version.
+Local container, zero spend, one call at a time. Route reason (M9): the isolab monthly budget is exhausted
+(1,808.95 of 1,300 USD on 2026-11-14) and the owner declined a paid host; counted operations do not need an
+isolated host, and CPU seconds are secondary. Resume checkpoint (`.resume/RESUME.md`) filled and pushed before the
+run (M6; no waiver needed: the S3 token works in this container). Stop rules in §3. A follow-up at m ≥ 5 or on a
+bigger host is a new protocol version.
 
 ## 8. Records and deliverables
 
-`cells/<cell>-p<k>/{cell.json,targets.json,hidden.json}`, `systems/<cell>-p<k>/<instance>/<arm>.{ms,system.json}`,
-`plan.json` (frozen order), `results/<stamp>/{rows.jsonl,calls/*,analysis/}`, `RESULTS.md` (tables per §4–§5,
-C1/C2/C3), `figures/presentation_work.svg|png` (per-arm work vs B, log y, per m), `REPORT.typ`
-(`REPORT.pdf` if Typst is permitted), bench record (`tools/benchrec.py`), raw tarball to S3 by SHA-256, pcc claims
-for the cell derivation, C1 and each C2 verdict, session-log entries, PR with auto-merge. `.resume/RESUME.md` filled
-before the run.
+`cells/<curve>/{cell.json}` and `cells/<curve>t<t>/{targets.json,hidden.json}` with `cells/MANIFEST.json` (ICV1
+curve slugs recorded, M7); `systems/<cell>/<curve>/<instance>/<arm>.{ms,system.json}`; `plan.json` (frozen order);
+`results/<stamp>/{rows.jsonl,calls/*,analysis/}`; `RESULTS.md` (tables of §4–§5, C1/C2/C3, the number of tests,
+the seed-777 smoke disclosed as development data, M10); `figures/presentation_work.svg|png` (per-arm work vs B,
+log y, per m and label, censoring marks); `REPORT.typ` (`REPORT.pdf` if Typst is permitted); bench record
+`benchmarks/records/20261115T0345Z-pkm-present-panel.json`; raw tarball to S3 by SHA-256; pcc claims for the cell
+derivation, C1 and each C2 verdict; session-log entries; PR with auto-merge. The metric is not comparable with the
+F_{p^3} predecessor's matrix cells and the report says so (M5).
 
 ## 9. Freeze
 
-Frozen by the commit recorded in `FREEZE.json` (written in the following commit with the SHA-256 of this file,
-`protocol.json`, `plan.json`, the instrument binary and `cells/MANIFEST.json`). Changes after the freeze go to
+Frozen by the commit recorded in `FREEZE.json` (written in the following commit, with the SHA-256 of this file,
+`protocol.json`, `plan.json`, `analysis/build_results.py`, the instrument binary and `cells/MANIFEST.json`, and the
+disclosure of what had been seen: the seed-777 probe and smoke only). Changes after the freeze go to
 `AMENDMENTS.md` with a timestamp and a disclosure of what had been seen.
