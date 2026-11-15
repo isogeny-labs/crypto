@@ -1,5 +1,26 @@
 # Vieta Rust port: continuation receipt
 
+## Current state — 22:15 UTC
+
+PR 4340 merged (merge 5181b305c62eb8032b7f0ea5e0b81a6d6a14eb31).
+User authorized local isolated execution and Git-only checkpoints. The full
+matrix plus a separate fixture repair is now complete; see RESULTS.md, ERRATA.md
+and reports/local-scale/report.pdf. The older receipt below is historical.
+No benchmark is active and no further run is needed to reproduce the report.
+Both bench records are closed censored; no admitted canonical row or clock
+speedup is asserted. New results branch is codex/vieta-local-run-20261115.
+Native formatting, clippy and 5 unit/3 CLI checks pass [pcc:unverified].
+All 2,184 successful rows replayed without mismatch [pcc:unverified]. Twelve
+Vieta deadlines and twelve original missing three-term calls remain recorded.
+The proposed last-fall-degree bound is a hand argument awaiting independent
+or formal validation, not a running-time claim.
+
+Remaining publication work: reconcile main/shared metadata, register pending
+claims, push and open regular results PR with auto-merge subject to gates.
+Old follow-up automation was paused when this active work resumed.
+
+## Historical receipt
+
 2026-11-15 20:49 UTC. PR https://github.com/isogeny-labs/crypto/pull/4340
 is open, ready for review. Source commit `5306b099f`; pending statement
 `PCC-20261115-0b04ff` in `47b244609`. No performance run has launched.

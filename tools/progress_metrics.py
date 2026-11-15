@@ -824,6 +824,21 @@ def n83_d18_vsids_gate(ref, since):
              source=source)
 
 
+def vieta_component(ref, since):
+    """Export stored native observations; censored records do not imply admission."""
+    for slug in ("20261115T2104Z-vieta-coset-local-scale",
+                 "20261115T2147Z-vieta-three-fixture-repair"):
+        path = f"benchmarks/records/{slug}.json"
+        for date, commit, text in file_history(ref, path, since):
+            record = json.loads(text)
+            for metric in record.get("metrics", []):
+                emit(f"vieta.component.{metric['name']}", metric.get("value"),
+                     date=date, problem="vieta-coset-component",
+                     unit=metric.get("unit", ""), better="neutral",
+                     label="Generic-reference operation counts; censored epoch, PCC unverified",
+                     source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     jacobian_catalog(a.ref, a.since)
@@ -861,6 +876,7 @@ def main():
     explicit_gpu_profile(a.ref, a.since)
     explicit_gpu_fullcache(a.ref, a.since)
     n83_d18_vsids_gate(a.ref, a.since)
+    vieta_component(a.ref, a.since)
 
 if __name__ == "__main__":
     main()
