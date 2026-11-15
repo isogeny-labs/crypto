@@ -20,14 +20,16 @@ rf3-gpuh (host-built table, F2048), rf3-cpuaa A/A; rho, rho A/A), specs/rf2mt.js
 |F_x| 4096; rf2-cpu, rf2-mt, rf2-gpud; rho). job.sh on one A100 (daemon with RF_SERVE_TIMING=1).
 
 ## State
-2026-11-15: code + local tests in progress.
+2026-11-15 06:15Z: done; pod deleted. 240/240 verified+replayed, 136 pairs equal S. m=3 at 39.3 bits,
+|F_x|=2048: GPU 11.1x one CPU thread, 2.6x multi-thread; device-built table -0.46..0.77 s set-up;
+at 4096 the CPU pair table and LA bound the solve. m=2: GPU 4-24x multi-thread (weak baseline). REPORT.md.
 
 ## Runs in flight
-None yet (pod icgpu-rbig when launched; research/ic_gpu_measure_20261112/rp_gpu.sh delete icgpu-rbig).
+None (icgpu-rbig deleted 06:12Z).
 
 ## Stop and success conditions
 Any S/relation/logarithm mismatch or failed replay voids that comparison. Wall results are L0 and
 descriptive; A/A arms give the noise floor. Cap ~2 GPU-hours, $5. S3: same waiver as earlier rounds.
 
 ## Next steps
-Tests -> commit+push specs -> record init -> ecbench build -> local smoke -> pod -> analyze -> report.
+Track the PR. Next: pair table on the device; a tuned multi-threaded CPU sweep; validator check.
