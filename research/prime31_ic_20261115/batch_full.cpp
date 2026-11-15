@@ -44,13 +44,21 @@ uint64_t bsgs(Point q){
 int main(int argc,char **argv){
  try{
  size_t B=argc>1?stoul(argv[1]):384;uint64_t seed=argc>2?stoull(argv[2]):20261114,cap=argc>3?stoull(argv[3]):1000000;
+ bool walk=(argc>4 && string(argv[4])=="walk");
  if(B<8||B>1500)throw runtime_error("bad B");
  if(!(scalar(G,NORD).o))throw runtime_error("generator invalid");
  mt19937_64 gen(seed);uint64_t secret=1+gen()%(NORD-1);Point q=scalar(G,secret);
  ct={};nalgebra=0;auto start=chrono::steady_clock::now();
  vector<Point> f=base(B);Table h=batched(f);SparseRank linear(B);
- uint64_t trials=0;
- while(linear.rank<B&&trials<cap){uint64_t known=1+gen()%(NORD-1);Point target=scalar(G,known);Hit rel=batched_query(target,f,h);++trials;if(rel.ok){if(!witness(target,f,rel))throw runtime_error("relation not a real group sum");linear.submit(known,rel);}}
+ uint64_t trials=0,walk_known=0,walk_step=0;Point walk_target,walk_delta;
+ if(walk){walk_known=1+gen()%(NORD-1);walk_step=1+gen()%(NORD-1);
+  walk_target=scalar(G,walk_known);walk_delta=scalar(G,walk_step);}
+ while(linear.rank<B&&trials<cap){
+  uint64_t known=walk?walk_known:1+gen()%(NORD-1);
+  Point target=walk?walk_target:scalar(G,known);Hit rel=batched_query(target,f,h);++trials;
+  if(rel.ok){if(!witness(target,f,rel))throw runtime_error("relation not a real group sum");linear.submit(known,rel);}
+  if(walk){walk_known=nadd(walk_known,walk_step);walk_target=add(walk_target,walk_delta);}
+ }
  if(linear.rank<B){cout<<"{\"status\":\"censored\",\"b\":"<<B<<",\"seed\":"<<seed<<",\"rank\":"<<linear.rank<<",\"trials\":"<<trials<<"}\n";return 2;}
  auto logs=linear.solve();for(size_t i=0;i<B;++i)if(!(scalar(G,logs[i])==f[i]))throw runtime_error("factor base scalar mismatch");
  Point r=q;uint64_t shifts=0,answer=0;Hit rel;
@@ -61,7 +69,7 @@ int main(int argc,char **argv){
  if(baseline!=secret||answer!=secret)throw runtime_error("wrong answer");
  cout<<"{\"status\":\"complete\",\"p\":"<<P<<",\"order\":"<<NORD<<",\"b\":"<<B<<",\"seed\":"<<seed
    <<",\"target\":["<<q.x<<","<<q.y<<"],\"verified_log\":"<<answer
-   <<",\"trials\":"<<trials<<",\"positive\":"<<linear.pos<<",\"rank\":"<<linear.rank
+   <<",\"mode\":\""<<(walk?"walk":"scalar")<<"\",\"trials\":"<<trials<<",\"positive\":"<<linear.pos<<",\"rank\":"<<linear.rank
    <<",\"dependent\":"<<linear.dependent<<",\"target_shifts\":"<<shifts
    <<",\"ic_ms\":"<<chrono::duration<double,milli>(stop-start).count()
    <<",\"ic_adds\":"<<ic.add<<",\"ic_inversions\":"<<ic.inv<<",\"ic_fpmuls\":"<<ic.mul
