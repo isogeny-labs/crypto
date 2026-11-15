@@ -1,28 +1,28 @@
-# Resume: crypto @ claude/best-leads-experiments-jikl0j
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
-Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
-0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
-(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
-sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
-p256 below 1 at k = 32; cv0 vs lazy two-sided.
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
-x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
-Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
-on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
-(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
-push of this branch is the checkpoint.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
-## State (23:20Z: EKS failed; local L0 panel done, results committed)
-Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
-push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
+## State
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
+
+## Runs in flight
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
+
+## Stop and success conditions
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
 ## Next steps
-1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
-2. Report + figure + PDF (research-visuals), benchrec record close, PR.
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.

@@ -1,0 +1,2573 @@
+{
+ "schema": "validator-assessment/v1",
+ "finding": "F5",
+ "finding_source": {
+  "path": "research/fes_k13_validated_20261112/runpod-a1/validation/findings.json",
+  "sha256": "9143a770a6fd02a7af93abb045ace286692862df7f6640fc5564c7e7062b686b",
+  "status_in_file": "open (not edited by this validator)"
+ },
+ "verdict": "closed",
+ "disposition": "validated",
+ "verdict_basis": "Closed by the validator's own rebuild, not by the producer's pod alone. A validator-made git archive of e9d5dbdccd (on origin/main), built with the official Rust 1.97.0 toolchain (rustc, rust-std, cargo and rustup verified file-by-file against static.rust-lang.org) and crates.io crates under Cargo.lock checksums, replays the committed session 288/288 identical; and the measured binary 8f9576b5 is instruction- and data-equivalent to that build (and to the producer pod build d012489f) apart from link layout and the CARGO_HOME prefix in panic paths. The producer pod evidence checks out in every respect tested and is consistent corroboration; on its own it would only narrow F5 (C5).",
+ "validated_utc": "2026-11-15T03:55:51+00:00",
+ "validator": {
+  "model": "claude-opus-5-5",
+  "role": "validator (independent)"
+ },
+ "frozen_inputs": {
+  "repo_head_at_dispatch": "0cad701aebb4665b52e97d641a5e89086e1e557f",
+  "repo_head_at_end": "a9c14e21280384af4374557631f993bdad4985af",
+  "f5_rebuild_commit": "a9c14e2128 (19 files; every blob equals the validator start snapshot)",
+  "source_commit": "e9d5dbdccdeb55b6d8527ebae1113135b42b26bf",
+  "original_binary_sha256": "8f9576b5bf81819274cc6049eb671c6d97f0bc6660f99d0445448edb4e5130f4",
+  "pod_rebuilt_binary_sha256": "d012489f3857d766f656e944223e785056801a50730fc2d2da6ba7f2d78bc8b6",
+  "validator_built_binary_sha256": "fbb83c40210f31b13a239d14dff8d2cd4f09f6f7bfb673033ef1fd2d49852813",
+  "original_session": {
+   "session.json": "5a2e5bbbcabfd19abfde26798f6e34096d2d3cca35fa19c48d78b56d960dfe76",
+   "plan.json": "4ed34a74e05c735287f4ae9fd8131dc4c4e6926579c465fac4e91c5b333bfafe",
+   "host.json": "aff7577b33544099ae3d293e41cb36d7cb822cd8dd9253690b1a95d4461eb25d",
+   "spec.json": "327e0bb42228fcfd79121b59d35b5f57f7e68826b221dc4aeb6832da46a9d76c",
+   "records.jsonl": "965d95f5ab02e85ba7bbc33024f306243c0e7fecf88b04196a98dde0bf9962c8"
+  },
+  "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runpod/fes-k13-f5-rebuild/",
+  "s3_object_versions": [
+   {
+    "key": "inputs/src.tgz",
+    "version_id": "_CjwJe_dLC7gmAlkX8Hu3vg26jBxTdEQ",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:23:16.000Z",
+    "size": 69429631
+   },
+   {
+    "key": "inputs/session.tgz",
+    "version_id": "nM1ivfBwGl4mZwOuGhuiKdwNURKjA_G8",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:23:18.000Z",
+    "size": 395206
+   },
+   {
+    "key": "inputs/pod-f5.sh",
+    "version_id": "U1WiI9sJPV0zOTAJwD3pjiwfZQp2B84i",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:23:19.000Z",
+    "size": 2224
+   },
+   {
+    "key": "pod-log-1.txt",
+    "version_id": "xa3FSXv_bx66oKc78kclevkZ1IU4eTIR",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:23:27.000Z",
+    "size": 95
+   },
+   {
+    "key": "pod-log-2.txt",
+    "version_id": "P_EBQAvTC0jTZoZqF.KAf_eZyC9h0dwY",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:23:44.000Z",
+    "size": 798
+   },
+   {
+    "key": "pod-log-3.txt",
+    "version_id": "zsNZ5WR0LqCga654TzLVvBXf0a9AImoP",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:23:53.000Z",
+    "size": 836
+   },
+   {
+    "key": "pod-log-4.txt",
+    "version_id": "JR_dFQe7xYV_MmERtX3pBnGvrBnz1fkH",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:23:54.000Z",
+    "size": 1229
+   },
+   {
+    "key": "results.tgz",
+    "version_id": "nr4COTVJr2eIQ7a0uoHESYjIMLrbMO9f",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:23:54.000Z",
+    "size": 5563
+   },
+   {
+    "key": "pod-log-1.txt",
+    "version_id": "506NXqvBvhqLXeH__h6EeO0oI_2xC2CA",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:24:46.000Z",
+    "delete_marker": true
+   },
+   {
+    "key": "pod-log-2.txt",
+    "version_id": "PDR3BxY2jDYzzKQVn6962nV0o6zHl0J2",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:24:46.000Z",
+    "delete_marker": true
+   },
+   {
+    "key": "pod-log-3.txt",
+    "version_id": "oXMav87le36Qq6QrLcyitOv5f76o4mY4",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:24:46.000Z",
+    "delete_marker": true
+   },
+   {
+    "key": "pod-log-4.txt",
+    "version_id": "2kyyBVDa9UDiGGF0LavAJZoq6IbY6Cz9",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:24:46.000Z",
+    "delete_marker": true
+   },
+   {
+    "key": "results.tgz",
+    "version_id": "0xp6E5w2XGaEYMKbz3sjyfn687HWe4Q2",
+    "is_latest": false,
+    "last_modified": "2026-11-15T03:24:46.000Z",
+    "delete_marker": true
+   },
+   {
+    "key": "inputs/pod-f5.sh",
+    "version_id": "1MYboDUZX5rfnz8e651ZWRfTCLhNCvpF",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:24:47.000Z",
+    "size": 2382
+   },
+   {
+    "key": "pod-log-1.txt",
+    "version_id": "aSXsC83XHkWejFYGGRgsJZNFSKNJJ1QR",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:25:03.000Z",
+    "size": 95
+   },
+   {
+    "key": "pod-log-2.txt",
+    "version_id": "jA6SiTDKlwhRzTt3BCav1If2J1_tqQd4",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:25:25.000Z",
+    "size": 825
+   },
+   {
+    "key": "pod-log-3.txt",
+    "version_id": "Dgwqg7dDuShjPo47wx.Xqsid.XC4.ixL",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:28:26.000Z",
+    "size": 955
+   },
+   {
+    "key": "results.tgz",
+    "version_id": "4TR6Js8WNNvuTmJDchcGHWT2F7P2r09L",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:28:45.000Z",
+    "size": 16202946
+   },
+   {
+    "key": "pod-log-4.txt",
+    "version_id": "Va3rTeKrb6t_hAWlTUk7BRRP561OKy__",
+    "is_latest": true,
+    "last_modified": "2026-11-15T03:28:47.000Z",
+    "size": 1348
+   }
+  ]
+ },
+ "checks": [
+  {
+   "id": "C1a",
+   "requirement": "Every file in the producer source tree manifest equals its blob at e9d5dbdccd (all paths, not a sample; all Rust/Cargo files in full)",
+   "result": "pass",
+   "method": "validator script tree_vs_git.py: git ls-tree + git cat-file --batch, sha256 of each blob vs source-tree.sha256",
+   "evidence": "f5-rebuild/source-tree.sha256; git object e9d5dbdccdeb55b6d8527ebae1113135b42b26bf",
+   "numbers": {
+    "manifest_entries": 9372,
+    "matched_git_blob_sha256": 9372,
+    "mismatched": 0,
+    "not_in_commit": 0,
+    "rust_cargo_files_checked_in_full": 2833,
+    "recipe_paths_absent_from_manifest": 24,
+    "absent_are": "23 git symlinks (mode 120000: .claude/skills/* and .agents/skills/controlled-experiment, taskq/.../container-bin/aws) + 1 submodule (verification/pqc-assay/upstream); none is a build input"
+   }
+  },
+  {
+   "id": "C1b",
+   "requirement": "Nothing outside the commit got into the tree; staged tarball matches its recorded hash and the manifest",
+   "result": "pass",
+   "method": "aws s3 cp (versioned bucket), sha256; validator script tgz_vs_git.py streams every tar member and compares content/symlink target/exec bit with git directly",
+   "evidence": "s3://isolab-results-104186811093-us-east-2/runpod/fes-k13-f5-rebuild/inputs/src.tgz (version _CjwJe_dLC7gmAlkX8Hu3vg26jBxTdEQ); f5-rebuild/staged-inputs.sha256",
+   "numbers": {
+    "src_tgz_sha256": "12a2db9f2ca4fbc7fe381396dff780f4c7fadd0c7f1e1dccc5a83fc9a4fe0d26",
+    "matches_staged_inputs_sha256": true,
+    "regular": 9372,
+    "regular_eq_manifest": 9372,
+    "regular_eq_git": 9372,
+    "symlinks": 23,
+    "symlink_target_eq_git": 23,
+    "dirs": 1051,
+    "other": 0,
+    "unsafe_paths": 0,
+    "not_in_commit": 0,
+    "content_mismatch_git": 0,
+    "manifest_mismatch": 0,
+    "mode_mismatch": 0,
+    "in_manifest_not_in_tgz": 0,
+    "symlink_mismatch": 0
+   }
+  },
+  {
+   "id": "C1c",
+   "requirement": "Rebuild tree covers the original build export (smoke/export-paths.txt, frozen in 03ac49860a before the run)",
+   "result": "pass",
+   "method": "path coverage check",
+   "evidence": "git show 03ac49860a:research/fes_k13_validated_20261112/smoke/export-paths.txt",
+   "numbers": {
+    "original_export_paths": 87,
+    "not_covered": 0
+   }
+  },
+  {
+   "id": "C2a",
+   "requirement": "Rebuild record shows rustc 1.97.0 and the declared toolchain",
+   "result": "pass",
+   "evidence": "f5-rebuild/rustc.txt, f5-rebuild/pod.log; results.tgz out/ecbench-rebuilt",
+   "numbers": {
+    "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+    "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+    "rustc_commit_string_occurrences_in_rebuilt_binary": 50
+   }
+  },
+  {
+   "id": "C2b",
+   "requirement": "--locked, clean build, nothing fetched outside crates.io, nothing patched",
+   "result": "pass (with note)",
+   "method": "validator script build_vs_lock.py against Cargo.lock/Cargo.toml read from git at e9d5dbdccd",
+   "evidence": "f5-rebuild/build.log, f5-rebuild/pod-f5.sh",
+   "note": "cargo does not echo flags, so --locked is shown by pod-f5.sh and is consistent with build.log (every compiled crate version is the lock version; no Locking/Updating-git lines). The validator's own build (C6) used --locked --offline and compiled the identical crate set.",
+   "numbers": {
+    "downloaded": 226,
+    "downloaded_not_in_lock_registry": 0,
+    "compiled_registry": 224,
+    "compiled_registry_not_in_lock": 0,
+    "compiled_path": 7,
+    "compiled_path_outside_/work/src": 0,
+    "lock_non_crates_io_sources": 0,
+    "lock_registry_packages_without_checksum": 0,
+    "root_patch_or_replace_sections": {},
+    "unexpected_build_log_lines": 0,
+    "root_.cargo/config_or_rust-toolchain_at_commit": "none"
+   }
+  },
+  {
+   "id": "C2c",
+   "requirement": "Producer local evidence equals the pod output tarball; S3 hashes and history",
+   "result": "pass (with finding N1)",
+   "evidence": "s3://.../runpod/fes-k13-f5-rebuild/ (versioned); f5-rebuild/outputs.sha256",
+   "numbers": {
+    "results_tgz_sha256": "48acd0236efa80fc160f7300620c6d3b91bbaa0b3d9ce94887bab1869f5f074f",
+    "matches_outputs_sha256": true,
+    "local_files_byte_identical_to_results_tgz": 13,
+    "results_tgz_files_not_copied_locally": [
+     "apt.log",
+     "rustup.log",
+     "ecbench-rebuilt"
+    ],
+    "session_tgz_equals_committed_session": true,
+    "pod_f5_sh_in_s3_equals_local": true,
+    "ecbench_rebuilt_sha256": "d012489f3857d766f656e944223e785056801a50730fc2d2da6ba7f2d78bc8b6"
+   }
+  },
+  {
+   "id": "C3",
+   "requirement": "Replay receipt replay-rebuilt.stdout shows all 288 measured runs reproduced (recomputed from JSON)",
+   "result": "pass",
+   "method": "validator script compare_sessions.py (receipt_check)",
+   "evidence": "f5-rebuild/replay-rebuilt.stdout",
+   "numbers": {
+    "schema": "ecbench.audit/v1",
+    "session_id": "ECBS1h695ef8e76c34",
+    "ok": true,
+    "problems": [],
+    "checks_false": [],
+    "records_field": 336,
+    "verified_records_field": 336,
+    "records_in_session_file": 336,
+    "replays_listed": 288,
+    "replays_reproduced_true": 288,
+    "replays_detail_identical": 288,
+    "unique_record_ids": 288,
+    "unique_seqs": 288,
+    "replay_seq_record_id_consistent": true,
+    "replay_set_equals_nonwarmup_records": true,
+    "nonwarmup_records": 288,
+    "replay_candidates_field": 288,
+    "replay_selection": "all",
+    "file_hashes_match_session_dir": {
+     "host.json": true,
+     "plan.json": true,
+     "records.jsonl": true,
+     "session.json": true,
+     "spec.json": true
+    },
+    "auditor_binary_sha256": "d012489f3857d766f656e944223e785056801a50730fc2d2da6ba7f2d78bc8b6",
+    "auditor_binary_is_expected": true,
+    "auditor_env_class_id": "ECBENV3h3ea0ce3c3fe0",
+    "auditor_hardware_class_id": "ECBHW1h792c454b90fe"
+   }
+  },
+  {
+   "id": "C3b",
+   "requirement": "Rerun-session audit (producer pod) recomputed from JSON",
+   "result": "pass",
+   "evidence": "f5-rebuild/rerun-audit.stdout",
+   "numbers": {
+    "schema": "ecbench.audit/v1",
+    "session_id": "ECBS1h3956e67b9206",
+    "ok": true,
+    "problems": [],
+    "checks_false": [],
+    "records_field": 336,
+    "verified_records_field": 336,
+    "records_in_session_file": 336,
+    "replays_listed": 288,
+    "replays_reproduced_true": 288,
+    "replays_detail_identical": 288,
+    "unique_record_ids": 288,
+    "unique_seqs": 288,
+    "replay_seq_record_id_consistent": true,
+    "replay_set_equals_nonwarmup_records": true,
+    "nonwarmup_records": 288,
+    "replay_candidates_field": 288,
+    "replay_selection": "all",
+    "file_hashes_match_session_dir": {
+     "host.json": true,
+     "plan.json": true,
+     "records.jsonl": true,
+     "session.json": true,
+     "spec.json": true
+    },
+    "auditor_binary_sha256": "d012489f3857d766f656e944223e785056801a50730fc2d2da6ba7f2d78bc8b6",
+    "auditor_binary_is_expected": true,
+    "auditor_env_class_id": "ECBENV3h3ea0ce3c3fe0",
+    "auditor_hardware_class_id": "ECBHW1h792c454b90fe"
+   }
+  },
+  {
+   "id": "C4",
+   "requirement": "Independent field-by-field comparison of rerun-session/records.jsonl with the original records.jsonl; is any counted or cost field among the differences?",
+   "result": "pass: no counted, cost, answer, workload, method or seed field differs in any of 336 records",
+   "method": "validator script compare_sessions.py: flatten every record, key by seq, compare every leaf",
+   "evidence": "f5-rebuild/rerun-session/records.jsonl vs session/records.jsonl",
+   "numbers": {
+    "record_counts": {
+     "orig": 336,
+     "rerun": 336,
+     "orig_unique_seq": 336,
+     "rerun_unique_seq": 336,
+     "seq_sets_equal": true
+    },
+    "identity_mismatches": 0,
+    "differing_top_level_groups": {
+     "record_id": 1,
+     "isolation": 44,
+     "online": 6,
+     "time": 27,
+     "session_id": 1,
+     "binary_sha256": 1,
+     "phases": 1,
+     "detail": 1,
+     "solver": 1
+    },
+    "differing_paths": [
+     "binary_sha256",
+     "detail.decomposition.solver.wall_ns",
+     "isolation.after.loadavg[]",
+     "isolation.after.psi_cpu_some_avg10",
+     "isolation.after.psi_cpu_some_total_us",
+     "isolation.after.psi_memory_some_total_us",
+     "isolation.after.reserved_ticks.106.busy",
+     "isolation.after.reserved_ticks.106.idle",
+     "isolation.after.reserved_ticks.106.steal",
+     "isolation.after.reserved_ticks.125.busy",
+     "isolation.after.reserved_ticks.125.idle",
+     "isolation.after.reserved_ticks.125.steal",
+     "isolation.after.reserved_ticks.42.busy",
+     "isolation.after.reserved_ticks.42.idle",
+     "isolation.after.reserved_ticks.42.steal",
+     "isolation.after.reserved_ticks.61.busy",
+     "isolation.after.reserved_ticks.61.idle",
+     "isolation.after.reserved_ticks.61.steal",
+     "isolation.after.unix_ms",
+     "isolation.before.loadavg[]",
+     "isolation.before.psi_cpu_some_avg10",
+     "isolation.before.psi_cpu_some_total_us",
+     "isolation.before.psi_memory_some_total_us",
+     "isolation.before.reserved_ticks.106.busy",
+     "isolation.before.reserved_ticks.106.idle",
+     "isolation.before.reserved_ticks.106.steal",
+     "isolation.before.reserved_ticks.125.busy",
+     "isolation.before.reserved_ticks.125.idle",
+     "isolation.before.reserved_ticks.125.steal",
+     "isolation.before.reserved_ticks.42.busy",
+     "isolation.before.reserved_ticks.42.idle",
+     "isolation.before.reserved_ticks.42.steal",
+     "isolation.before.reserved_ticks.61.busy",
+     "isolation.before.reserved_ticks.61.idle",
+     "isolation.before.reserved_ticks.61.steal",
+     "isolation.before.unix_ms",
+     "isolation.blockers[]",
+     "isolation.foreign_busy_ticks",
+     "isolation.idle_sibling_busy_ticks",
+     "isolation.level",
+     "isolation.placement.affinity[]",
+     "isolation.placement.anon_pages_by_node.0",
+     "isolation.placement.cpu_at_end",
+     "isolation.placement.cpu_at_start",
+     "isolation.reserved[]",
+     "isolation.run_cpu",
+     "online.phases_ns.rho_solve",
+     "online.phases_ns.target_PDP",
+     "online.phases_ns.target_descent",
+     "online.phases_ns.target_query",
+     "online.phases_ns.target_recovery_check",
+     "online.wall_ns",
+     "phases[].wall_ns",
+     "record_id",
+     "session_id",
+     "solver.wall_ns",
+     "time.involuntary_switches",
+     "time.max_rss_kib",
+     "time.method_call_wall_ns",
+     "time.minor_faults",
+     "time.parent_audit_verification_ns",
+     "time.process_wall_ns",
+     "time.schedstat_solve.cpu_ns",
+     "time.schedstat_solve.run_delay_ns",
+     "time.schedstat_solve.timeslices",
+     "time.solve.cpu",
+     "time.solve.cpu_sched.pcount",
+     "time.solve.cpu_sched.rq_cpu_ns",
+     "time.solve.cpu_sched.run_delay_ns",
+     "time.solve.involuntary_switches",
+     "time.solve.irq.device",
+     "time.solve.irq.ipi_other",
+     "time.solve.irq.local_timer",
+     "time.solve.irq.softirq_tick",
+     "time.solve.irq.softirq_work",
+     "time.solve.minor_faults",
+     "time.solve.schedstat_all.cpu_ns",
+     "time.solve.schedstat_all.run_delay_ns",
+     "time.solve.schedstat_all.timeslices",
+     "time.solve_wall_ns",
+     "time.sys_ns",
+     "time.user_ns",
+     "time.voluntary_switches"
+    ],
+    "differing_counted_or_cost_paths": [
+     "detail.decomposition.solver.wall_ns"
+    ],
+    "note_on_the_one_hit": "detail.decomposition.solver.wall_ns is a wall-clock copy of solver.wall_ns (equal in all 112 records that carry it, on both sides); it is not a count",
+    "mean_s_per_arm_orig": {
+     "ic-descent-fes-f2": "86.066899",
+     "ic-descent-inherited-f4": "121.544209",
+     "ic-pairtable-mitm2": "197.488758",
+     "rho-negation": "2.787871",
+     "rho-sfstrong-v2": "2.584483",
+     "rho-sfstrong-v2-aa": "2.584483"
+    },
+    "mean_s_per_arm_rerun": {
+     "ic-descent-fes-f2": "86.066899",
+     "ic-descent-inherited-f4": "121.544209",
+     "ic-pairtable-mitm2": "197.488758",
+     "rho-negation": "2.787871",
+     "rho-sfstrong-v2": "2.584483",
+     "rho-sfstrong-v2-aa": "2.584483"
+    },
+    "per_record_s_identical_all_arms": true,
+    "verified_per_arm": {
+     "ic-descent-fes-f2": 48,
+     "ic-descent-inherited-f4": 48,
+     "ic-pairtable-mitm2": 48,
+     "rho-negation": 48,
+     "rho-sfstrong-v2": 48,
+     "rho-sfstrong-v2-aa": 48
+    }
+   },
+   "producer_statement_accuracy": {
+    "means_claimed": {
+     "fes-f2 (arm ic-descent-fes-f2)": "86.066899",
+     "inherited-f4 (arm ic-descent-inherited-f4)": "121.544209",
+     "rho-sfstrong-v2": "2.584483"
+    },
+    "means_correct": true,
+    "difference_list": "materially correct but imprecise: allocator was listed as differing and does not differ (glibc 2.39 / pre_solve_trim true / trim_result 1 on both); detail.decomposition.solver.wall_ns differs and was not named (it is a wall field); env_class_id does not differ; host is not a record field"
+   }
+  },
+  {
+   "id": "C5",
+   "requirement": "How much the producer-orchestrated rebuild closes on its own",
+   "result": "narrows only, on its own; closure comes from C6-C8",
+   "reason": "The producer chose the pod, launched it, held the presigned URLs and the bucket credentials. The S3 history (server timestamps, versioning) is consistent with the logs, but nothing in the pod evidence alone excludes a producer who runs a different script or uploads fabricated outputs. The validator therefore rebuilt and replayed independently (C6) and compared binaries (C7)."
+  },
+  {
+   "id": "C6",
+   "requirement": "Validator-independent rebuild of ecbench at e9d5dbdccd and replay of the original session, 288/288 identical required",
+   "result": "pass",
+   "method": "validator git archive of e9d5dbdccd over the 87 frozen export paths; fresh CARGO_HOME, cargo fetch --locked from crates.io; nice cargo build --release --locked --offline --bin ecbench (600 s, exit 0); replay on a fresh copy of the committed session",
+   "evidence": "scratch (ephemeral): val-f5-build/build.log, val-f5-build/ecbench-validator, val-replay/replay-validator.stdout; the receipt is embedded below",
+   "numbers": {
+    "validator_binary_sha256": "fbb83c40210f31b13a239d14dff8d2cd4f09f6f7bfb673033ef1fd2d49852813",
+    "compiled_registry": 224,
+    "compiled_registry_not_in_lock": 0,
+    "compiled_path": 7,
+    "unexpected_build_log_lines": 0,
+    "replay": {
+     "binary_sha256": "fbb83c40210f31b13a239d14dff8d2cd4f09f6f7bfb673033ef1fd2d49852813",
+     "auditor_env_class_id": "ECBENV3hb516f42f4ab3",
+     "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+     "command": "ecbench-validator verify --dir <fresh copy of runpod-a1/session from the repo> --replay-all --exit-code",
+     "exit_code": 0,
+     "ok": true,
+     "problems": [],
+     "checks_not_true": [],
+     "replays_listed": 288,
+     "reproduced_true": 288,
+     "detail_identical": 288,
+     "replayed_set_equals_the_288_non_warmup_records": true,
+     "session_file_hashes_in_receipt_match_committed_session": true,
+     "receipt_sha256": "46c422131dde64378d457c1c7bd0603be5abf0f4be3100d0e8ddb5eb49715b0d"
+    },
+    "replayed_list_equals_producer_pod_receipt_and_original_validation_receipt": true
+   }
+  },
+  {
+   "id": "C6b",
+   "requirement": "Toolchain used by the validator build is the official Rust 1.97.0, not a producer-modifiable local copy",
+   "result": "pass",
+   "method": "stream official tarballs from static.rust-lang.org, check xz sha256 against channel-rust-1.97.0.toml, compare every file with the installed toolchain; rustup proxies vs official rustup-init 1.28.2 sha256; e9d5dbdccd on origin/main",
+   "numbers": {
+    "rustc": {
+     "files_in_tarball": 41,
+     "equal_to_local": 41,
+     "missing_locally": 0,
+     "different": 0,
+     "skipped_meta": 12,
+     "xz_sha256": "0a8787303c88b018af61b5c53a0c7024d516d175e623eeab35a35eab11dbcad0",
+     "xz_bytes": 81045896,
+     "xz_sha256_matches_manifest": true
+    },
+    "rust-std": {
+     "files_in_tarball": 62,
+     "equal_to_local": 62,
+     "missing_locally": 0,
+     "different": 0,
+     "skipped_meta": 12,
+     "xz_sha256": "0c43618128a7a6b96b0b04c04cf7b28dd52fb0991a74c9615fbd1a684ff88712",
+     "xz_bytes": 30076456,
+     "xz_sha256_matches_manifest": true
+    },
+    "cargo": {
+     "files_in_tarball": 44,
+     "equal_to_local": 44,
+     "missing_locally": 0,
+     "different": 0,
+     "skipped_meta": 12,
+     "xz_sha256": "5c5bc94af02797b699bb7d4e85b356192eab9fb50376053a1e6edf509fcf7129",
+     "xz_bytes": 11147356,
+     "xz_sha256_matches_manifest": true
+    },
+    "rustup_proxies_sha256": "20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c == official rustup-init 1.28.2",
+    "source_commit_on_origin_main": true
+   }
+  },
+  {
+   "id": "C7",
+   "requirement": "Is the measured binary 8f9576b5 the program e9d5dbdccd compiles to (not merely output-equivalent on these workloads)?",
+   "result": "pass: code- and data-equivalent modulo link layout and the CARGO_HOME prefix in embedded panic-location paths",
+   "method": "validator scripts sym_compare.py, disasm_equiv.py (objdump -d of all .text in lockstep; every differing operand must be an address field resolving to the same section offset, equal .rodata content, a relative jump table with matching entries, or an explained short string), data_equiv.py (all named .rodata symbols byte-compared; all .rela.dyn relocations matched by slot and target), drr_check.py",
+   "evidence": "scratch: isolab-k13/ecbench-e9d5dbdccd (sha256 8f9576b5..., the hash in every record), results.tgz out/ecbench-rebuilt, val-f5-build/ecbench-validator",
+   "numbers": {
+    "section_sizes": ".text 0x140bba0, .data.rel.ro, .eh_frame, .gcc_except_table, .data, .got, .symtab identical in all three; .rodata/.strtab/.relro_padding differ",
+    "symbols": "28650 names after stripping .llvm.<hash>, all common; 23110 code symbols all size-identical; 60 differing are .rodata anon data symbols, byte-identical after CARGO_HOME normalisation (orig vs pod: each exactly 2 bytes longer, /root/.cargo/ vs /opt/cargo/)",
+    "orig_vs_pod_rebuild_text": {
+     "instructions": 4674413,
+     "textually_identical": 3736223,
+     "same_offset_.text": 670152,
+     "layout_only_difference": 938163,
+     "same_offset_.dynamic": 1,
+     "same_offset_.tm_clone_table": 6,
+     "same_offset_.got": 174853,
+     "same_offset_.data": 879,
+     "same_offset_.plt": 12886,
+     "same_offset_.data.rel.ro": 28137,
+     "rodata_ref_jump_table": 309,
+     "same_offset_.tbss": 659,
+     "rodata_ref_content_equal_ge16": 49351,
+     "rodata_ref_content_equal_4_15": 66,
+     "violation": 27,
+     "same_offset_.bss": 864
+    },
+    "orig_vs_validator_text": {
+     "instructions": 4674413,
+     "textually_identical": 3736223,
+     "same_offset_.text": 670152,
+     "layout_only_difference": 938161,
+     "same_offset_.dynamic": 1,
+     "same_offset_.tm_clone_table": 6,
+     "same_offset_.got": 174853,
+     "same_offset_.data": 879,
+     "same_offset_.plt": 12886,
+     "same_offset_.data.rel.ro": 28137,
+     "rodata_ref_jump_table": 309,
+     "same_offset_.tbss": 659,
+     "rodata_ref_content_equal_ge16": 49354,
+     "rodata_ref_content_equal_4_15": 61,
+     "violation": 29,
+     "same_offset_.bss": 864
+    },
+    "residual_text_violations_explained": {
+     "orig_vs_pod": "27 = 12 refs to \"}\" + 10 refs to empty C string \"\" + 2 refs to the 3-byte symbol \"Err\" + 3 relative tables whose entries resolve to equal code offsets/equal rodata",
+     "orig_vs_validator": "29 = 12 \"}\" + 10 \"\" + 2 \"Err\" + 5 relative tables (entries resolve equal)"
+    },
+    "orig_vs_pod_rebuild_data": {
+     "rodata_named_symbols": {
+      "identical": 3714,
+      "identical_after_path_normalisation": 60
+     },
+     "rodata_named_symbol_mismatches": [],
+     "rela_counts": [
+      18529,
+      18529
+     ],
+     "relocations": {
+      "same_offset_target_.text": 5899,
+      "rodata_content_equal_ge16": 4205,
+      "rodata_same_symbol_same_offset": 7917,
+      "same_offset_target_.tbss": 15,
+      "same_offset_target_.data.rel.ro": 301,
+      "same_offset_target_.bss": 20,
+      "same_offset_target_.data": 8,
+      "same_offset_target_.tm_clone_table": 2,
+      "nonrelative_same": 162
+     },
+     "raw_.data": {
+      "size_a": 4688,
+      "size_b": 4688,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.tdata": {
+      "size_a": 1080,
+      "size_b": 1080,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.data.rel.ro": {
+      "size_a": 308776,
+      "size_b": 308776,
+      "differing_bytes_after_masking_relocs": 441
+     },
+     "raw_.init_array": {
+      "size_a": 16,
+      "size_b": 16,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.fini_array": {
+      "size_a": 8,
+      "size_b": 8,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.gcc_except_table": {
+      "size_a": 2692596,
+      "size_b": 2692596,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.eh_frame": {
+      "size_a": 1495016,
+      "size_b": 1495016,
+      "differing_bytes_after_masking_relocs": 0
+     }
+    },
+    "orig_vs_validator_data": {
+     "rodata_named_symbols": {
+      "identical": 3714,
+      "identical_after_path_normalisation": 60
+     },
+     "rodata_named_symbol_mismatches": [],
+     "rela_counts": [
+      18529,
+      18529
+     ],
+     "relocations": {
+      "same_offset_target_.text": 5899,
+      "rodata_content_equal_ge16": 4205,
+      "rodata_same_symbol_same_offset": 7917,
+      "same_offset_target_.tbss": 15,
+      "same_offset_target_.data.rel.ro": 301,
+      "same_offset_target_.bss": 20,
+      "same_offset_target_.data": 8,
+      "same_offset_target_.tm_clone_table": 2,
+      "nonrelative_same": 162
+     },
+     "raw_.data": {
+      "size_a": 4688,
+      "size_b": 4688,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.tdata": {
+      "size_a": 1080,
+      "size_b": 1080,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.data.rel.ro": {
+      "size_a": 308776,
+      "size_b": 308776,
+      "differing_bytes_after_masking_relocs": 441
+     },
+     "raw_.init_array": {
+      "size_a": 16,
+      "size_b": 16,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.fini_array": {
+      "size_a": 8,
+      "size_b": 8,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.gcc_except_table": {
+      "size_a": 2692596,
+      "size_b": 2692596,
+      "differing_bytes_after_masking_relocs": 0
+     },
+     "raw_.eh_frame": {
+      "size_a": 1495016,
+      "size_b": 1495016,
+      "differing_bytes_after_masking_relocs": 0
+     }
+    },
+    "data_rel_ro_441_bytes": "all 441 are u64 length fields after a relocated pointer to a CARGO_HOME/registry/... path, differing by exactly the path-length difference (both comparisons)"
+   }
+  },
+  {
+   "id": "C8",
+   "requirement": "Replay compares counts, not only answers",
+   "result": "pass",
+   "evidence": "git show e9d5dbdccd:src/cryptanalysis/ecbench/audit.rs compare_replay()",
+   "numbers": {
+    "compared": "recovered, exhaustion, total_gae (bit-exact), phase gae, phase adds/doubles/scalar_mults/native, bitop work counters, counters, factor_base, field_ops, unpriced/deterministic/automorphisms_used",
+    "legacy_fallbacks_used": "none: all 288 details are exactly \"identical\" (fallbacks report different strings)"
+   }
+  },
+  {
+   "id": "C9",
+   "requirement": "Frozen inputs; no moving tree",
+   "result": "pass (with note)",
+   "note": "At dispatch f5-rebuild/ was untracked; the validator snapshot its 19 file hashes at start. The producer committed it as a9c14e2128 (03:30:48Z) moments after; every committed blob equals the start snapshot, and the working copy was unchanged at the end. Original session files unchanged (records.jsonl 965d95f5... equals the artifact manifest and the blob committed in 4812e1b245)."
+  }
+ ],
+ "new_findings": [
+  {
+   "id": "F5-N1",
+   "severity": "minor",
+   "kind": "disclosure",
+   "text": "An earlier pod attempt is not disclosed in f5-rebuild/. S3 versions show pod-f5.sh v1 (2224 bytes, 03:23:19Z), pod a28832d870cc with the same src.tgz/session.tgz/ecbench-orig/spec hashes, build=101 after 9 s (openssl-sys: pkg-config not found), results.tgz v1 (5563 bytes), then delete markers on pod-log-1..4 and results.tgz at 03:24:46Z and pod-f5.sh v2 (adds only the apt-get install line) at 03:24:47Z. The failure is infrastructural and does not affect the result, but AGENTS.md requires failed runs to be preserved and disclosed; the objects remain recoverable by version id.",
+   "evidence": [
+    "s3 versions: inputs/pod-f5.sh U1WiI9sJPV0zOTAJwD3pjiwfZQp2B84i; pod-log-4.txt JR_dFQe7xYV_MmERtX3pBnGvrBnz1fkH; results.tgz nr4COTVJr2eIQ7a0uoHESYjIMLrbMO9f"
+   ]
+  },
+  {
+   "id": "F5-N2",
+   "severity": "minor",
+   "kind": "reporting accuracy",
+   "text": "The producer list of differing record fields names allocator (it does not differ) and does not name detail.decomposition.solver.wall_ns (it differs; wall-clock copy of solver.wall_ns). Arm labels fes-f2 / inherited-f4 are short for ic-descent-fes-f2 / ic-descent-inherited-f4. No effect on any number."
+  }
+ ],
+ "residuals": [
+  "The fresh re-run (rerun-session/) exists only from the producer-orchestrated pod; it is consistent (all counted fields equal the original on 336/336 records) but the validator did not re-run the spec, so it is corroboration, not load-bearing. F5 closure rests on the validator replay (C6) and binary equivalence (C7).",
+  "C-compiled parts (bundled sqlite, blake3 C/asm) were compiled by each host's system cc, which was not verified; their machine code is identical across the original, the pod and the validator builds, and they are not in the counting path.",
+  "The validator build and replay ran on this container (env class ECBENV3hb516f42f4ab3, the original validation replay host class), not on the run host class (ECBENV3h3ea0ce3c3fe0). Counts are host-independent and replayed identically on both classes.",
+  "session.json and records still carry git_commit null / git_dirty null; the binding is now the validator rebuild equivalence recorded here, which the validation gate documents must cite (status changes are not made by this validator).",
+  "Scope: closing F5 does not change F2 (H1 unresolved inside the band), F3/F4 (no admissible wall figure) or any other open finding."
+ ],
+ "validator_replay_receipt": {
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1h695ef8e76c34",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+   "arms": true,
+   "env_class": true,
+   "executions": true,
+   "executions_planned": true,
+   "host_hash": true,
+   "last_seq": true,
+   "plan_hash": true,
+   "record_count": true,
+   "records": true,
+   "records_hash": true,
+   "regraded": true,
+   "replays": true,
+   "session_build": true,
+   "session_complete": true,
+   "session_id": true,
+   "spec_id": true,
+   "status_counts": true,
+   "workloads": true
+  },
+  "records": 336,
+  "verified_records": 336,
+  "planned_executions": 336,
+  "regraded": true,
+  "replays": [
+   {
+    "seq": 48,
+    "record_id": "ECR1h6661ff0e9afc",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 49,
+    "record_id": "ECR1hfbd48d4e0ee6",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 50,
+    "record_id": "ECR1hc51440b0c46f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 51,
+    "record_id": "ECR1h9624f439cfdb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 52,
+    "record_id": "ECR1h9b6cf501692f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 53,
+    "record_id": "ECR1haa818427d88a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 54,
+    "record_id": "ECR1hae4ce9f053df",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 55,
+    "record_id": "ECR1hc571694c4af1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 56,
+    "record_id": "ECR1h40eee2c307a9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 57,
+    "record_id": "ECR1he831bf4b82b0",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 58,
+    "record_id": "ECR1ha18fadabb540",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 59,
+    "record_id": "ECR1h89177505ff77",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 60,
+    "record_id": "ECR1h33abca8846a0",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 61,
+    "record_id": "ECR1h79e689495cde",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 62,
+    "record_id": "ECR1hb7bd9301724d",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 63,
+    "record_id": "ECR1h68747832b244",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 64,
+    "record_id": "ECR1h40e36c3855ab",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 65,
+    "record_id": "ECR1h40fafa757614",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 66,
+    "record_id": "ECR1h1b194ba98600",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 67,
+    "record_id": "ECR1hdbf4beaca56d",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 68,
+    "record_id": "ECR1hf301f05f689b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 69,
+    "record_id": "ECR1hc7ce8d3270ee",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 70,
+    "record_id": "ECR1hc31df6938d54",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 71,
+    "record_id": "ECR1h127fe10d8c4b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 72,
+    "record_id": "ECR1h46bbb55ce09b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 73,
+    "record_id": "ECR1h8b7d4de69fe7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 74,
+    "record_id": "ECR1h3077f6d3c4fd",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 75,
+    "record_id": "ECR1he4da8557e2ca",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 76,
+    "record_id": "ECR1h5971ebe1ee7a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 77,
+    "record_id": "ECR1h8bd2e5784f4b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 78,
+    "record_id": "ECR1h8827ae1a7a84",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 79,
+    "record_id": "ECR1h79444a213e79",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 80,
+    "record_id": "ECR1h580343eac623",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 81,
+    "record_id": "ECR1h4448025b1c80",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 82,
+    "record_id": "ECR1heca0c47b343e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 83,
+    "record_id": "ECR1h25612e9d626e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 84,
+    "record_id": "ECR1hc86f5198a71a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 85,
+    "record_id": "ECR1hdd62f257e008",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 86,
+    "record_id": "ECR1h0a2b386adab1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 87,
+    "record_id": "ECR1h1a80f38b39b9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 88,
+    "record_id": "ECR1hc94b20dbfd60",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 89,
+    "record_id": "ECR1h37b4eb73bc6b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 90,
+    "record_id": "ECR1h2dcbb8f3d893",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 91,
+    "record_id": "ECR1h03e9e0631f80",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 92,
+    "record_id": "ECR1hb4fe27e6c470",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 93,
+    "record_id": "ECR1he9908a4deb80",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 94,
+    "record_id": "ECR1h68ae87160f01",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 95,
+    "record_id": "ECR1h513dc67d63c6",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 96,
+    "record_id": "ECR1hdf5aba6671df",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 97,
+    "record_id": "ECR1h16efae6da819",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 98,
+    "record_id": "ECR1h7da3bfe98073",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 99,
+    "record_id": "ECR1ha73d62d08984",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 100,
+    "record_id": "ECR1h45aae4f0efd0",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 101,
+    "record_id": "ECR1h55cd19c07220",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 102,
+    "record_id": "ECR1h045e713eadbf",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 103,
+    "record_id": "ECR1h40bc5af82337",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 104,
+    "record_id": "ECR1h39996190da73",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 105,
+    "record_id": "ECR1h30a6438c84c9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 106,
+    "record_id": "ECR1h640f0fe6dc1c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 107,
+    "record_id": "ECR1hd67e1ec5ba9d",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 108,
+    "record_id": "ECR1h615b3e38c83b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 109,
+    "record_id": "ECR1h2a69989d7003",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 110,
+    "record_id": "ECR1hf8a46c73767b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 111,
+    "record_id": "ECR1hab33e168e951",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 112,
+    "record_id": "ECR1h2544a57ce477",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 113,
+    "record_id": "ECR1h4c43a7bde01a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 114,
+    "record_id": "ECR1h7f218f5916a2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 115,
+    "record_id": "ECR1hd3ab6372f05e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 116,
+    "record_id": "ECR1hcc682da8cdb2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 117,
+    "record_id": "ECR1h569855913c77",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 118,
+    "record_id": "ECR1h6b650fee2298",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 119,
+    "record_id": "ECR1h1e1c5283bcdb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 120,
+    "record_id": "ECR1hcb9a13ab087a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 121,
+    "record_id": "ECR1haa2156dc283f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 122,
+    "record_id": "ECR1h4335e546b749",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 123,
+    "record_id": "ECR1h3dffde925230",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 124,
+    "record_id": "ECR1heba01f252078",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 125,
+    "record_id": "ECR1h67fce927f4c2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 126,
+    "record_id": "ECR1h7d8604a3967a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 127,
+    "record_id": "ECR1h52924bd90dfb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 128,
+    "record_id": "ECR1hd772a8bb693b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 129,
+    "record_id": "ECR1h730e70ba2f1e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 130,
+    "record_id": "ECR1he8f9a2a6e5b3",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 131,
+    "record_id": "ECR1h5d0caff8bf43",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 132,
+    "record_id": "ECR1hb464a7872646",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 133,
+    "record_id": "ECR1h4220cf5fe4c9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 134,
+    "record_id": "ECR1h262298d46bd1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 135,
+    "record_id": "ECR1hf391f436f674",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 136,
+    "record_id": "ECR1h8b80ac9d349a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 137,
+    "record_id": "ECR1hf1b74050c82b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 138,
+    "record_id": "ECR1hc8e9e74e4d88",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 139,
+    "record_id": "ECR1he99961fb4d8c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 140,
+    "record_id": "ECR1hd5149a05928f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 141,
+    "record_id": "ECR1h4c09573b1dd5",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 142,
+    "record_id": "ECR1h73fdff8d533f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 143,
+    "record_id": "ECR1hf03cdc222510",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 144,
+    "record_id": "ECR1h40b3dfe86032",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 145,
+    "record_id": "ECR1h802a0b6cd099",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 146,
+    "record_id": "ECR1h06ac229be9a7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 147,
+    "record_id": "ECR1h6ce191fac74c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 148,
+    "record_id": "ECR1h67fdae97fd10",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 149,
+    "record_id": "ECR1h1df14ed2b06e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 150,
+    "record_id": "ECR1h46c6a94163eb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 151,
+    "record_id": "ECR1h52f1289473ca",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 152,
+    "record_id": "ECR1h70f8d92885a7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 153,
+    "record_id": "ECR1h03cff6348c3f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 154,
+    "record_id": "ECR1hcafcdbdec23f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 155,
+    "record_id": "ECR1he7d0bc53e9b6",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 156,
+    "record_id": "ECR1h154460ab386f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 157,
+    "record_id": "ECR1h399482d1384f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 158,
+    "record_id": "ECR1h0ffa0bd0e992",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 159,
+    "record_id": "ECR1h0fc883459d48",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 160,
+    "record_id": "ECR1h0725a0d74e07",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 161,
+    "record_id": "ECR1h01b48c15b61f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 162,
+    "record_id": "ECR1hfa66bdb22be6",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 163,
+    "record_id": "ECR1h2fe19fe748a4",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 164,
+    "record_id": "ECR1h1c163026d5a1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 165,
+    "record_id": "ECR1h077cd7dc2333",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 166,
+    "record_id": "ECR1he6cf27b356ab",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 167,
+    "record_id": "ECR1h1816253c9481",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 168,
+    "record_id": "ECR1h0342db78c7f2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 169,
+    "record_id": "ECR1h3d88cbade762",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 170,
+    "record_id": "ECR1he35eb8444af9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 171,
+    "record_id": "ECR1h7881715388e9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 172,
+    "record_id": "ECR1h763839c61a6f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 173,
+    "record_id": "ECR1haa2c02859ba9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 174,
+    "record_id": "ECR1h76fb452e1494",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 175,
+    "record_id": "ECR1hf6585bc6e875",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 176,
+    "record_id": "ECR1ha0877e97e966",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 177,
+    "record_id": "ECR1hbc7bc5be372f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 178,
+    "record_id": "ECR1he1677fdff680",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 179,
+    "record_id": "ECR1h0ec0bc808c9e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 180,
+    "record_id": "ECR1hd735b82239ae",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 181,
+    "record_id": "ECR1hce469375820e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 182,
+    "record_id": "ECR1h9f9b58c443a8",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 183,
+    "record_id": "ECR1hd36899e66229",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 184,
+    "record_id": "ECR1h8fb072b6b519",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 185,
+    "record_id": "ECR1h1da465ba22ae",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 186,
+    "record_id": "ECR1h28a690e59cba",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 187,
+    "record_id": "ECR1h26ac31d6f189",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 188,
+    "record_id": "ECR1h2f6216feadde",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 189,
+    "record_id": "ECR1hbf1ba2121f96",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 190,
+    "record_id": "ECR1he4507f9408b7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 191,
+    "record_id": "ECR1h2ff65f33f642",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 192,
+    "record_id": "ECR1h2ee3ca32d0b7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 193,
+    "record_id": "ECR1ha8d2751fda61",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 194,
+    "record_id": "ECR1hdadeab54fe50",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 195,
+    "record_id": "ECR1haf99e8185271",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 196,
+    "record_id": "ECR1habbcb7fafa2c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 197,
+    "record_id": "ECR1h464e2a4964bb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 198,
+    "record_id": "ECR1hac1354526e31",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 199,
+    "record_id": "ECR1hb02844d8f93c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 200,
+    "record_id": "ECR1h31e17e0de231",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 201,
+    "record_id": "ECR1h78a5c174f123",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 202,
+    "record_id": "ECR1h69db26f5eb63",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 203,
+    "record_id": "ECR1h4b5f8ce26593",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 204,
+    "record_id": "ECR1h5a824fb180ba",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 205,
+    "record_id": "ECR1h23f4ea3a214b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 206,
+    "record_id": "ECR1h6db0f9689100",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 207,
+    "record_id": "ECR1h8bd010fd2e9b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 208,
+    "record_id": "ECR1ha9b367422a5f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 209,
+    "record_id": "ECR1h44939691c1a1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 210,
+    "record_id": "ECR1hcde087f3a3fc",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 211,
+    "record_id": "ECR1h06d9877bb6bd",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 212,
+    "record_id": "ECR1haebb6737b039",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 213,
+    "record_id": "ECR1ha740da166299",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 214,
+    "record_id": "ECR1h1a0aac9371e2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 215,
+    "record_id": "ECR1hfe166a212668",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 216,
+    "record_id": "ECR1ha46eb8530a49",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 217,
+    "record_id": "ECR1hf4856a4537db",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 218,
+    "record_id": "ECR1h2c1763a96fe5",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 219,
+    "record_id": "ECR1h15ce7ca2e0da",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 220,
+    "record_id": "ECR1hdd96645e2ddb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 221,
+    "record_id": "ECR1h64e9af1914f0",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 222,
+    "record_id": "ECR1he9757cc0c6b4",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 223,
+    "record_id": "ECR1h324d3ca5a191",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 224,
+    "record_id": "ECR1hee2ba0242349",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 225,
+    "record_id": "ECR1hd6f7a6447208",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 226,
+    "record_id": "ECR1h65d47883814c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 227,
+    "record_id": "ECR1h0bcd2168b1c5",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 228,
+    "record_id": "ECR1hfaa48e646a8e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 229,
+    "record_id": "ECR1h4099f3ba331d",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 230,
+    "record_id": "ECR1h57f36746c3e2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 231,
+    "record_id": "ECR1had8b283aa7c1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 232,
+    "record_id": "ECR1h3e61abb78a65",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 233,
+    "record_id": "ECR1h1f25bdda00c4",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 234,
+    "record_id": "ECR1h998e6ca16e8b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 235,
+    "record_id": "ECR1h991c0abfe412",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 236,
+    "record_id": "ECR1h551ad690f53e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 237,
+    "record_id": "ECR1h6ab9a2e5d54a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 238,
+    "record_id": "ECR1h518c0d4ca5e0",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 239,
+    "record_id": "ECR1h3a1f08434680",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 240,
+    "record_id": "ECR1h386b2d07bbda",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 241,
+    "record_id": "ECR1h277621fe0752",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 242,
+    "record_id": "ECR1h72b537433f43",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 243,
+    "record_id": "ECR1h0713eaee3861",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 244,
+    "record_id": "ECR1h2da02f9c517c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 245,
+    "record_id": "ECR1h1062a853e53b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 246,
+    "record_id": "ECR1hc08ac715a246",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 247,
+    "record_id": "ECR1hf9f6e084f7fb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 248,
+    "record_id": "ECR1h5a57998a638c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 249,
+    "record_id": "ECR1h54d949e86d0a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 250,
+    "record_id": "ECR1h4ef3d2da1b84",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 251,
+    "record_id": "ECR1h96e325b72fb3",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 252,
+    "record_id": "ECR1h7b0c6125993f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 253,
+    "record_id": "ECR1h4cfbe91b5196",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 254,
+    "record_id": "ECR1hdb86fb39b3ba",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 255,
+    "record_id": "ECR1h9c1beeed0fa2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 256,
+    "record_id": "ECR1hd71af4aeb963",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 257,
+    "record_id": "ECR1h1877959642a0",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 258,
+    "record_id": "ECR1h5d839ad6028e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 259,
+    "record_id": "ECR1hf41905b170ca",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 260,
+    "record_id": "ECR1h11bc94875b8a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 261,
+    "record_id": "ECR1h23805336bb37",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 262,
+    "record_id": "ECR1h197016be0065",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 263,
+    "record_id": "ECR1h7633886b466f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 264,
+    "record_id": "ECR1h51385259191a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 265,
+    "record_id": "ECR1hb199be32e40c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 266,
+    "record_id": "ECR1h524d4c746ccb",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 267,
+    "record_id": "ECR1h888adb1c3f6a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 268,
+    "record_id": "ECR1h775c30cb7077",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 269,
+    "record_id": "ECR1hecb51f941c16",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 270,
+    "record_id": "ECR1hb902986e7bf3",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 271,
+    "record_id": "ECR1hd72ad8ed3bda",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 272,
+    "record_id": "ECR1h6d1d582783d4",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 273,
+    "record_id": "ECR1h03388d592ecd",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 274,
+    "record_id": "ECR1hc59c66b60e5e",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 275,
+    "record_id": "ECR1h714112cea551",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 276,
+    "record_id": "ECR1hbe51d35d56ca",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 277,
+    "record_id": "ECR1h5cab3696ee51",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 278,
+    "record_id": "ECR1hd3e0f2a5f281",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 279,
+    "record_id": "ECR1h6112ae0fee33",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 280,
+    "record_id": "ECR1h2ebb72f2b903",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 281,
+    "record_id": "ECR1ha4af407a3ab1",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 282,
+    "record_id": "ECR1h273aab270a95",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 283,
+    "record_id": "ECR1h41da48bad555",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 284,
+    "record_id": "ECR1h2a0fab683dd7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 285,
+    "record_id": "ECR1h358023475908",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 286,
+    "record_id": "ECR1h78e0db1da791",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 287,
+    "record_id": "ECR1h4af29513940b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 288,
+    "record_id": "ECR1he4b744614df2",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 289,
+    "record_id": "ECR1hea00a012ddde",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 290,
+    "record_id": "ECR1h91a1b4c415e7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 291,
+    "record_id": "ECR1h33d46f7b7c25",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 292,
+    "record_id": "ECR1h0a02d35ad95b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 293,
+    "record_id": "ECR1h36a13f34a613",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 294,
+    "record_id": "ECR1h8f0d7e92ccc9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 295,
+    "record_id": "ECR1ha5a6f9664130",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 296,
+    "record_id": "ECR1h3cb42e607f18",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 297,
+    "record_id": "ECR1h4f22b353baa8",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 298,
+    "record_id": "ECR1haa5074039cb9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 299,
+    "record_id": "ECR1h133f8b3bfc45",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 300,
+    "record_id": "ECR1h12fa779c582a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 301,
+    "record_id": "ECR1hb761b14db5c7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 302,
+    "record_id": "ECR1h59e732c00292",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 303,
+    "record_id": "ECR1h3f26e5db79ad",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 304,
+    "record_id": "ECR1h597280b22e32",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 305,
+    "record_id": "ECR1h31259fa3464f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 306,
+    "record_id": "ECR1hd0a55747a05c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 307,
+    "record_id": "ECR1hf11498142cc9",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 308,
+    "record_id": "ECR1h58a2fee54bdc",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 309,
+    "record_id": "ECR1h6f885608d394",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 310,
+    "record_id": "ECR1h2dfba29e68bc",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 311,
+    "record_id": "ECR1h1dae89208fff",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 312,
+    "record_id": "ECR1h9114f91a6238",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 313,
+    "record_id": "ECR1h825aa50666ae",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 314,
+    "record_id": "ECR1h673623e2e873",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 315,
+    "record_id": "ECR1h65f1848f245f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 316,
+    "record_id": "ECR1ha2f148c27028",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 317,
+    "record_id": "ECR1hd7997aeff51a",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 318,
+    "record_id": "ECR1h302821a83438",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 319,
+    "record_id": "ECR1hf2b5a6ee6ab5",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 320,
+    "record_id": "ECR1h1d4becc1a696",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 321,
+    "record_id": "ECR1h9ba51df9a091",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 322,
+    "record_id": "ECR1hef5cc02041ba",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 323,
+    "record_id": "ECR1h37bb6fb005c4",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 324,
+    "record_id": "ECR1h4ce243dfaa5c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 325,
+    "record_id": "ECR1h6b08db531e7f",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 326,
+    "record_id": "ECR1h8aae02dac8ac",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 327,
+    "record_id": "ECR1h616bfe7013c7",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 328,
+    "record_id": "ECR1ha013fa57125b",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 329,
+    "record_id": "ECR1h05111ccfcad8",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 330,
+    "record_id": "ECR1hbdc0f2209b33",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 331,
+    "record_id": "ECR1h495036c7d678",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 332,
+    "record_id": "ECR1hd48a22c24f7c",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 333,
+    "record_id": "ECR1h2d1483d28cb5",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 334,
+    "record_id": "ECR1h767d0ff73f39",
+    "reproduced": true,
+    "detail": "identical"
+   },
+   {
+    "seq": 335,
+    "record_id": "ECR1h8797a57bde9a",
+    "reproduced": true,
+    "detail": "identical"
+   }
+  ],
+  "replay_selection": "all",
+  "replay_candidates": 288,
+  "files": {
+   "host.json": "aff7577b33544099ae3d293e41cb36d7cb822cd8dd9253690b1a95d4461eb25d",
+   "plan.json": "4ed34a74e05c735287f4ae9fd8131dc4c4e6926579c465fac4e91c5b333bfafe",
+   "records.jsonl": "965d95f5ab02e85ba7bbc33024f306243c0e7fecf88b04196a98dde0bf9962c8",
+   "session.json": "5a2e5bbbcabfd19abfde26798f6e34096d2d3cca35fa19c48d78b56d960dfe76",
+   "spec.json": "327e0bb42228fcfd79121b59d35b5f57f7e68826b221dc4aeb6832da46a9d76c"
+  },
+  "auditor_binary_sha256": "fbb83c40210f31b13a239d14dff8d2cd4f09f6f7bfb673033ef1fd2d49852813",
+  "auditor_env_class_id": "ECBENV3hb516f42f4ab3",
+  "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+  "audited_unix_ms": 1794714554570
+ },
+ "validator_scripts_scratch_ephemeral": {
+  "build_vs_lock.py": "95b376761c6fe4154900f5b9af01ec3426bc29de1f74212fd55c750677ed7ec2",
+  "compare_sessions.py": "d7605378b2ba147ddd61b2792508ebfa06439d9b78e798e98402b928edad8363",
+  "data_equiv.py": "6145606304c7d6909c683685a99121457aa5207996a6a730661e5560ec3eff96",
+  "disasm_equiv.py": "1543c14427913ae37966fc2ff8713a51e65765f31eaa224f837a1c50d55c6fa6",
+  "drr_check.py": "f35b6a222eff91a252c17e003ee72759e1ac1d656210e14ce45bb42b375f8bbc",
+  "explain_violations.py": "ac5cb17a955d9d15b206cef1027522fa1162650ad316512ec0f8d4047c94e278",
+  "make_assessment.py": "78e4bc24cee5ccae3b26441198dae84455990e4c26d6bc799c601d24f3d4a287",
+  "sym_compare.py": "d63442b4a13feab93f5d60524eef3088a4573823b3f941b8a9deb903b24e1887",
+  "tc_verify.py": "afab1b91b4cf37386ba3b2a5a0f14597e1c7567c11beeca6da9e2a602ce057a7",
+  "text_diff.py": "8e95ea9f2cf6e4f90a417348eb8d981970f6266b239d3c1356b797b455c09db6",
+  "tgz_vs_git.py": "3e20b07eaf03ec4eb4c4c9ea16c06dd62dcacaee53957418802eb3e74a61b045",
+  "tree_vs_git.py": "0bb327ed54399b321dd44bf0440fab379387153355f8df46a745f7d51604c492",
+  "val_build.sh": "2ac34fe3ea0b7e3bb909246c6262b5354c40d2a4d06865009881c9a21ab4296b"
+ }
+}

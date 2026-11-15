@@ -1,0 +1,23 @@
+[package]
+name = "g5-propt-census"
+version = "0.1.0"
+edition = "2021"
+description = "Cell G5: Proposition T / Sigma census and the A2-prime sporadic-overlap census at m = 2..8 on toy Koblitz curves (exact enumeration)"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "g5census"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[profile.test]
+opt-level = 2
+
+[workspace]
