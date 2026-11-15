@@ -314,7 +314,7 @@ fn m4_scale(base: &Base, ar: &mut Arithmetic) -> Result<(),String> {
                 "post_extraction_signed_validation_ns":validation_ns,
                 "post_extraction_validation_group_additions":validation_group_additions,
                 "projectively_normalized_signed_rows":rows.len(),
-                "complete_ecdpl_recovery":false
+                "complete_ecdlp_recovery":false
             }));
         }
     }
