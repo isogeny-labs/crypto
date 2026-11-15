@@ -62,6 +62,12 @@ calls are within the600second combined pilot/freeze/primary cap. If the
 engineering estimate is infeasible, preserve the attempt and amend before
 primary data rather than downscale silently.
 
+Planning map, fixed before pilot: n5/7/9 use their sole field representative;
+n83/131 use the smallest pilot dimension at least as large as the primary
+dimension (d4->5,d6->8,d10->12). Sum the per-arm mapped costs for all650 rows
+and add total pilot/setup elapsed. Do not multiply every row by the largest
+base's cost or use the estimate as timing evidence.
+
 Primary: exact valid decision counts for the complete panel, new scale cases,
 and field/dimension/kind strata. Secondary: SAT conflicts, SAT allocations,
 linear coefficient columns and actual group additions/doublings across
