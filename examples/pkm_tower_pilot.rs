@@ -804,7 +804,13 @@ fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
 }
 
 /// Some `k ∈ [lo, hi]` with `[k]P = O`, by baby-step giant-step, or `None`.
-fn bsgs_multiple_in(e: &PrimeCurve, ops: &mut GroupOps, pt: PrimePoint, lo: u64, hi: u64) -> Option<u64> {
+fn bsgs_multiple_in(
+    e: &PrimeCurve,
+    ops: &mut GroupOps,
+    pt: PrimePoint,
+    lo: u64,
+    hi: u64,
+) -> Option<u64> {
     let len = hi - lo + 1;
     let w = isqrt_u64(len) + 1;
     let key = |q: &PrimePoint| (q.infinity, q.x, q.y);
@@ -851,15 +857,23 @@ fn mestre_exact_order(e: &PrimeCurve, ops: &mut GroupOps) -> u64 {
     assert!(p > 229, "Mestre's method needs p > 229");
     let r = isqrt_u64(4 * p); // ⌊2√p⌋
     let (lo, hi) = (p + 1 - r, p + 1 + r);
-    let d = (2..p).find(|&d| e.legendre(d) == -1).expect("a non-residue");
-    let tw = PrimeCurve { p, a: mulm(e.a, mulm(d, d, p), p), b: mulm(e.b, mulm(d, mulm(d, d, p), p), p) };
-    let mut rng = StdRng::seed_from_u64(p ^ e.a.rotate_left(21) ^ e.b.rotate_left(42) ^ 0x4D45_5354_5245_u64);
+    let d = (2..p)
+        .find(|&d| e.legendre(d) == -1)
+        .expect("a non-residue");
+    let tw = PrimeCurve {
+        p,
+        a: mulm(e.a, mulm(d, d, p), p),
+        b: mulm(e.b, mulm(d, mulm(d, d, p), p), p),
+    };
+    let mut rng =
+        StdRng::seed_from_u64(p ^ e.a.rotate_left(21) ^ e.b.rotate_left(42) ^ 0x4D45_5354_5245_u64);
     let (mut l_e, mut l_t) = (1u64, 1u64);
     for i in 0..64 {
         let twist = i % 2 == 1;
         let c = if twist { &tw } else { e };
         let pt = random_point(c, &mut rng);
-        let k = bsgs_multiple_in(c, ops, pt, lo, hi).expect("#E is a multiple in the Hasse interval");
+        let k =
+            bsgs_multiple_in(c, ops, pt, lo, hi).expect("#E is a multiple in the Hasse interval");
         let o = exact_point_order(c, ops, pt, k);
         if twist {
             l_t = l_t / gcd_u64(l_t, o) * o;
@@ -883,7 +897,10 @@ fn mestre_exact_order(e: &PrimeCurve, ops: &mut GroupOps) -> u64 {
             return found.unwrap();
         }
     }
-    panic!("Mestre: #E ambiguous after 64 points (p = {p}, a = {}, b = {})", e.a, e.b);
+    panic!(
+        "Mestre: #E ambiguous after 64 points (p = {p}, a = {}, b = {})",
+        e.a, e.b
+    );
 }
 
 /// A tower of 2-isogenies on an auxiliary curve `E'` with a rational
@@ -3554,7 +3571,13 @@ mod tests {
     fn mestre_exact_order_equals_point_count() {
         let mut rng = StdRng::seed_from_u64(0x4D45_5354);
         let mut ops = GroupOps::default();
-        for &(p, curves) in &[(233u64, 300), (1009, 300), (40961, 100), (65519, 60), (786433, 12)] {
+        for &(p, curves) in &[
+            (233u64, 300),
+            (1009, 300),
+            (40961, 100),
+            (65519, 60),
+            (786433, 12),
+        ] {
             let mut done = 0;
             while done < curves {
                 let (a, b) = (rng.gen_range(0..p), rng.gen_range(1..p));
@@ -3562,7 +3585,11 @@ mod tests {
                     continue;
                 }
                 let e = PrimeCurve { p, a, b };
-                assert_eq!(mestre_exact_order(&e, &mut ops), e.point_count(), "p = {p}, a = {a}, b = {b}");
+                assert_eq!(
+                    mestre_exact_order(&e, &mut ops),
+                    e.point_count(),
+                    "p = {p}, a = {a}, b = {b}"
+                );
                 done += 1;
             }
         }
