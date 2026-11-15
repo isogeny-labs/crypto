@@ -1,3 +1,19 @@
+# Whole relation-character custody27: inputs HELD
+
+## What was done
+Source consumerfe914417/producer69abf112: passive d118b9 full100native/60calls660events/strict report-counter parity; rankc0479c all360certificates1440470operations/FB30nullities6-10-13/largerFBnullity1; proof19c467 both27declarationgates/allninebindings; character3a7d56 full60calls13200actualnorm-cofactor4-BSGSwitnesses15125rows/all180canonical-characterdecompositions/all60postsolver targetchecks. Final2fd6b0report53962B/twoactuallyopenedpages and allfailed metadata/source/report/CI/transport specimens retained. Prior58919keys/177links and exact genuine26/current ledger prefixes checked. [pcc:unverified]
+
+## Decisions made
+HOLD all science/source/raw/aliases/consumer owned bytes and consumer ledger until actual original remote replays BEFORE the actual publisher/bot, exact normalFF, whole reassembly and terminal27 file/link-state checks. Include every declared complete nonsecret post26root and both repository deltas; keep alreadygenuine archivepayloads referenced without recursive copies. Preserve dangling failed-layout symlinks exactly, with complete literal-target/target-state guards; never hydrate or omit them. Archive/parts initially inRAM; allregularpayloadbytes and anynewGitblobcache require full custody/recovery receipts. No force/rechain/policy exemption/synthetic manifest. [pcc:unverified]
+
+## Open threads
+Complete genuine27 and exact wholefixture projection, then prospectively publish whole diagnosticCI comparison contract and review/freeze an unassisted relation-completion successor before code. All numericLean/globalmodel-program-character/causal/calibratedliveadmission/primitive/strongest-reference/merge requirements remain explicit. Vault8edec422/VLT1 only, KB127. [pcc:unverified]
+
+## Errors
+All original failures remain complete. Historicalct95staginglist bytes were restored exactly from genuine26; its later overwritten transient list is preserved and newRoot governors use unique staginglist filenames. Consumerproblem-index updates are declared released metadata. No scientificresult or pinned render/source byte changed. [pcc:unverified]
+
+---
+
 # The finite FB30 mismatch is present before descent
 
 pcc/claims/PCC-20261115-3555e4.json: exact published consumerfe914417 character3a7d56/full60calls/13200direct-source norm-cofactor4-BSGSwitnesses/15125relation occurrences. Everyrelation and all180canonical-character decompositions hold; all60postsolver ratios pass actualtarget checks. FB30all15functional tables differon29columns/179-171-174knownlogs/all45Yvalues;45largerFBcalls agree. Full53962B/twoopenedpage report2fd6b0 and currentproblem02 mirrored. All343producer science/transfergraph unchanged. [pcc:unverified]
