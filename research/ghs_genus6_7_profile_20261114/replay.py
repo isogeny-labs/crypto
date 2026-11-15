@@ -159,6 +159,8 @@ def run() -> dict:
     witnesses: dict[str, dict] = {}
     for c in range(1, FIELD_SIZE):
         item = profile(c)
+        if item["genus"] == "5" and (item["f1"], item["f2"]) != ("0x7", "0x7"):
+            raise AssertionError(f"unexpected genus-five order polynomials at c={c}")
         key = (item["genus"], item["descends"], item["hyperelliptic_sufficient"])
         counts[key] += 1
         witnesses.setdefault(f"{item['genus']}:{str(item['descends']).lower()}", item)
@@ -174,6 +176,7 @@ def run() -> dict:
                 counts.items(), key=lambda x: (int(x[0][0]), x[0][1], x[0][2])
             )
         ],
+        "genus_five_order_seven_all": True,
         "first_witnesses": witnesses,
     }
 
@@ -207,7 +210,7 @@ def main() -> None:
         result["native_output_sha256"] = hashlib.sha256(args.native_json.read_bytes()).hexdigest()
     if args.check:
         expected = json.loads(SUMMARY.read_text())
-        for key in ("schema", "input", "counts", "first_witnesses"):
+        for key in ("schema", "input", "counts", "genus_five_order_seven_all", "first_witnesses"):
             if result[key] != expected[key]:
                 raise SystemExit(f"frozen summary differs: {key}")
         if args.native_json and result["native_output_sha256"] != expected["native_output_sha256"]:

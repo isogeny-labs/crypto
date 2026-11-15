@@ -27,6 +27,15 @@ curve is nonhyperelliptic. The genus-5 count describes arithmetic profiles;
 the missing descent condition prevents these parameters from entering the
 descendable candidate set.
 
+There is a structural reason for that genus-5 exclusion in the degree-3
+tower. Within `1 <= s1,s2 <= t <= 3`, the genus formula equals 5 only for
+`(t,s1,s2)=(3,2,2)`. Every one of the 62 genus-5 profiles has
+`f1=f2=T²+T+1` (`0x7`), so the order-polynomial relation is the
+degree-3 relative-trace sum. Both traces vanish, which makes the descent
+predicate false. The replay asserts the `0x7` condition for all 62 rows;
+the Lean module proves the degree pattern and the order-polynomial-to-trace
+implication.
+
 ## Criterion and exact replay
 
 For each nonzero `c` in the declared field, put `beta = sqrt(b)` and
@@ -81,12 +90,16 @@ independent Python replay matched all native candidate fields. The exact
 
 The pinned Lean 4 module [GenusArithmetic.lean](GenusArithmetic.lean) proves
 the four specific genus-formula evaluations, including the genus-6 and
-genus-7 witness degree triples. `lean GenusArithmetic.lean` succeeded under
-Lean 4.34.1, and `#print axioms` reported no axioms for all four theorems.
-This formalizes the arithmetic substitution only. The field operations,
-Frobenius-order and trace assertions, finite enumeration, smooth-cover
-construction, and subgroup transport are not Lean theorems in this module.
-The full geometric theorem remains open.
+genus-7 witness degree triples. It also proves that genus five forces the
+degree pattern above in a relative-degree-three tower, and that two
+`1+T+T²` order relations make the descent predicate false for the two
+elements. `lean GenusArithmetic.lean` succeeded under Lean 4.34.1.
+`#print axioms` reported no axioms for the arithmetic theorems and only
+Lean's `propext` and `Quot.sound` for the trace theorems. Field operations,
+the assertion that the enumerated elements satisfy their reported
+Frobenius-order relations, finite enumeration, smooth-cover construction,
+and subgroup transport remain outside this Lean module. The full geometric
+theorem remains open.
 
 The next experiment should construct and independently check the smooth
 genus-6 cover for `c=0x2` and the genus-7 cover for `c=0x3`, then exhibit
