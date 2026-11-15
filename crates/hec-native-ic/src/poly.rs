@@ -143,6 +143,7 @@ impl Poly {
         // Accumulate in u128 and reduce every 4 terms: 4 products are
         // < 4p² < p·2^64 (p < 2^62), the bound `reduce128` needs.
         let mut r = Poly::zero();
+        crate::fp::count_products((self.n * o.n) as u64);
         for k in 0..n {
             let lo = k.saturating_sub(o.n - 1);
             let hi = k.min(self.n - 1);

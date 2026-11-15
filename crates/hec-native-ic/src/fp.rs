@@ -14,6 +14,61 @@ pub fn inv_calls() -> u64 {
     0
 }
 
+// Field products and Montgomery reductions on this thread (feature
+// `count-ops` only; S4, PLAN.md §10).
+#[cfg(feature = "count-ops")]
+thread_local! {
+    pub static PRODUCTS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+    pub static REDCS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// Count `n` field products (feature `count-ops`; a no-op otherwise).
+#[inline(always)]
+pub fn count_products(_n: u64) {
+    #[cfg(feature = "count-ops")]
+    PRODUCTS.with(|c| c.set(c.get() + _n));
+}
+
+/// Operation counts on this thread so far (all zero without the features).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct OpCounts {
+    /// 64×64-bit products of field elements (any modulus).
+    pub products: u64,
+    /// Montgomery reductions.
+    pub redc: u64,
+    /// `Fp::inv` calls.
+    pub inv: u64,
+}
+
+impl OpCounts {
+    pub fn since(&self, earlier: &OpCounts) -> OpCounts {
+        OpCounts {
+            products: self.products - earlier.products,
+            redc: self.redc - earlier.redc,
+            inv: self.inv - earlier.inv,
+        }
+    }
+    pub fn add(&mut self, o: &OpCounts) {
+        self.products += o.products;
+        self.redc += o.redc;
+        self.inv += o.inv;
+    }
+}
+
+pub fn op_counts() -> OpCounts {
+    #[cfg(feature = "count-ops")]
+    return OpCounts {
+        products: PRODUCTS.with(|c| c.get()),
+        redc: REDCS.with(|c| c.get()),
+        inv: inv_calls(),
+    };
+    #[cfg(not(feature = "count-ops"))]
+    OpCounts {
+        inv: inv_calls(),
+        ..OpCounts::default()
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Fp {
     pub p: u64,
@@ -47,6 +102,8 @@ impl Fp {
     /// Montgomery reduction: `t·2^{-64} mod p` for `t < p·2^64`.
     #[inline(always)]
     fn redc(&self, t: u128) -> u64 {
+        #[cfg(feature = "count-ops")]
+        REDCS.with(|c| c.set(c.get() + 1));
         let m = (t as u64).wrapping_mul(self.pinv);
         let s = (t + m as u128 * self.p as u128) >> 64;
         let s = s as u64;
@@ -94,17 +151,20 @@ impl Fp {
 
     #[inline(always)]
     pub fn mul(&self, a: u64, b: u64) -> u64 {
+        count_products(1);
         self.reduce128(a as u128 * b as u128)
     }
     /// `b·R mod p`, for [`Fp::mul_pre`]: a factor used many times costs one
     /// REDC per product instead of two.
     #[inline]
     pub fn pre(&self, b: u64) -> u64 {
+        count_products(1);
         self.redc(b as u128 * self.r2 as u128)
     }
     /// `a·b mod p` given `bm = pre(b)`; `a, b < p`.
     #[inline]
     pub fn mul_pre(&self, a: u64, bm: u64) -> u64 {
+        count_products(1);
         self.redc(a as u128 * bm as u128)
     }
 
