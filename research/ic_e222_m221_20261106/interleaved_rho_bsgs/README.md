@@ -1,4 +1,4 @@
-# Interleaved multi-target rho vs folded multi-target BSGS on j=0 curves, 26-38 bits (2026-11-14/15) — `[pcc:unverified]`
+# Interleaved multi-target rho vs folded multi-target BSGS on j=0 curves, 26-40 bits (2026-11-14/15) — `[pcc:unverified]`
 
 Protocol: [`PROTOCOL.md`](PROTOCOL.md), committed in `a8cc24a6fe` before any row. Runner `run.sh`, analysis `analyse.py` (as the protocol fixes it), graph `plot.py` → `rho_vs_bsgs.{svg,png,pdf}`, raw rows `rows/`, summary `summary.json`. Bench record `benchmarks/records/20261114T2202Z-j0-multirho-vs-bsgs-interleaved.json`.
 
@@ -81,6 +81,22 @@ BSGS table entries `m`: 3.03M / 6.77M / 11.7M at T = 200 / 1000 / 3000.
 - T = 3000 reads 0.47 [0.45, 0.49], but its A/A interval [1.02, 1.08] excludes 1, so by the rule it carries no verdict.
 - **The 36-bit plateau reading is withdrawn.** From 36 to 38 bits the ratio moved again in rho's favour in every cell (0.85 → 0.72, 0.66 → 0.62, 0.58 → 0.47), so addendum B's "the gap stops widening" was a two-point reading that a third point does not support. The trend over 30-38 bits is a slow, uneven widening, which fits BSGS's per-probe cost rising as its table (now 11.7M entries) moves further down the memory hierarchy. Not profiled. [pcc:unverified]
 
+## Addendum D: 40 bits [pcc:unverified]
+
+Frozen in `3f2b071724` before any 40-bit row (PROTOCOL.md, addendum D); same arms, settings, rounds, rule and binaries. Record `benchmarks/records/20261115T0532Z-j0-multirho-vs-bsgs-interleaved-40.json`. Every row recovered all T logs; no round excluded; every A/A interval contains 1.
+
+| bits | T | rounds | rho ms/problem | BSGS ms/problem | rho/BSGS [95%] | A/A [95%] | verdict | rho steps/W |
+|---|---|---|---|---|---|---|---|---|
+| 40 | 200 | 6 | 900.5 | 1288.6 | 0.71 [0.68, 0.74] | 0.99 [0.91, 1.06] | rho faster | 1.96 |
+| 40 | 1000 | 6 | 1660.9 | 3066.7 | 0.55 [0.53, 0.57] | 0.99 [0.96, 1.03] | rho faster | 1.66 |
+| 40 | 3000 | 6 | 2621.3 | 5896.9 | 0.45 [0.44, 0.46] | 1.01 [0.98, 1.04] | rho faster | 1.48 |
+
+BSGS table entries `m`: 6.05M / 13.5M / 23.4M at T = 200 / 1000 / 3000.
+
+- **Rho is faster in all three 40-bit cells**: 0.71 [0.68, 0.74], 0.55 [0.53, 0.57] and 0.45 [0.44, 0.46] at T = 200, 1000, 3000; at T = 3000 rho takes less than half of BSGS's time. [pcc:unverified]
+- Against 38 bits the ratio held at T = 200 (0.72 → 0.71) and moved further in rho's favour at T = 1000 (0.62 → 0.55) and T = 3000 (0.47 → 0.45, where the 38-bit cell had failed A/A and this one passes).
+- Over 30-40 bits the trend is consistent: the larger the BSGS table, the larger rho's lead. Still not profiled.
+
 ## Not done
 
-No §5a band (wall time only), no isolated host, no sizes above 38 bits, no cache/memory profile, the S3 checkpoint and raw upload skipped (no AWS credentials in this container).
+No §5a band (wall time only), no isolated host, no sizes above 40 bits, no cache/memory profile, the S3 checkpoint and raw upload skipped (no AWS credentials in this container).
