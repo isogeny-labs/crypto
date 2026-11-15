@@ -1,0 +1,10 @@
+import CrossCharacteristicExample
+
+#print axioms CrossCharacteristicExample.P_order
+#print axioms CrossCharacteristicExample.R_order
+#print axioms CrossCharacteristicExample.phi_challenge
+#print axioms CrossCharacteristicExample.subgroup_cases
+#print axioms CrossCharacteristicExample.transfer_dlog
+#print axioms CrossCharacteristicExample.example_dlog
+#print axioms CrossCharacteristicExample.target_scalar_mod
+#print axioms CrossCharacteristicExample.no_field_map
