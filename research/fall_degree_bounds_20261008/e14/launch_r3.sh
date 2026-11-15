@@ -38,11 +38,11 @@ OUT_TOKEN=$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
 SCRIPT_B64=$(base64 -w0 "$S/e14/run_pod_r3.sh")
 payload=$(jq -n --arg name "fd-e14-r3$MODE-$(date -u +%Y%m%dT%H%MZ)" --arg b64 "$SCRIPT_B64" --arg key "$RUNPOD_API_KEY" \
   --arg c "$SRC_COMMIT" --arg p "$PATHS_SHA256" --arg t "$TREE_SHA256" --arg tok "$OUT_TOKEN" --arg mode "$MODE" \
-  --arg cap "$CAP_USD" --arg mh "$MAX_HOURS" --argjson fl "$FLAVORS" '{
+  --arg cap "$CAP_USD" --arg mh "$MAX_HOURS" --arg ph "${POST_HOURS:-18}" --argjson fl "$FLAVORS" '{
   name: $name, imageName: "runpod/base:1.0.2-ubuntu2404", cloudType: "SECURE", computeType: "CPU",
   cpuFlavorIds: $fl, cpuFlavorPriority: "custom", vcpuCount: 32, containerDiskInGb: 60,
-  volumeInGb: 10, volumeMountPath: "/workspace", interruptible: false, ports: ["8080/http"],
-  env: { MODE: $mode, CAP_USD: $cap, MAX_HOURS: $mh, SCRIPT_B64: $b64, POD_CTL_KEY: $key, SRC_COMMIT: $c, PATHS_SHA256: $p,
+  interruptible: false, ports: ["8080/http"],
+  env: { MODE: $mode, POST_HOURS: $ph, CAP_USD: $cap, MAX_HOURS: $mh, SCRIPT_B64: $b64, POD_CTL_KEY: $key, SRC_COMMIT: $c, PATHS_SHA256: $p,
          TREE_SHA256: $t, OUT_TOKEN: $tok, MAX_HOURS_FALLBACK: $mh, PATHS_COMMIT: "43438f5ab6eb6d1844b8d0465c933ad079099326" },
   dockerEntrypoint: ["bash","-c"],
   dockerStartCmd: ["mkdir -p /workspace/out /workspace/serve/$OUT_TOKEN /root && ln -sfn /workspace/out /workspace/serve/$OUT_TOKEN/out && echo \"$(date -u +%FT%TZ) start command running\" >>/workspace/out/run.log && (cd /workspace/serve && nohup python3 -m http.server 8080 --bind 0.0.0.0 >>/workspace/out/http0.log 2>&1 &) && echo \"$SCRIPT_B64\" | base64 -d >/root/run.sh && echo \"$(date -u +%FT%TZ) script decoded $(sha256sum /root/run.sh | cut -c1-16)\" >>/workspace/out/run.log && exec bash /root/run.sh"]
@@ -53,5 +53,5 @@ pod_id=$(echo "$resp" | jq -r '.id // empty')
 jq -n --arg m "$MODE" --arg id "$pod_id" --arg tok "$OUT_TOKEN" --arg sha "$script_sha" --arg bal "$bal" --arg other "$other_rate" \
   --arg when "$(date -u +%FT%TZ)" --argjson resp "$resp" \
   '{mode:$m, admitted:true, pod_id:$id, out_token:$tok, run_pod_r3_sha256:$sha, balance_usd:$bal, running_pods_usd_per_h:$other,
-    launched_at:$when, amendment:31, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,volumeInGb,imageName,ports})}' | tee "$R/launch.json"
+    launched_at:$when, amendment:32, pod:($resp|{id,name,costPerHr,vcpuCount,memoryInGb,volumeInGb,imageName,ports})}' | tee "$R/launch.json"
 echo "pull with: MODE=$MODE $S/e14/pull_r3.sh"

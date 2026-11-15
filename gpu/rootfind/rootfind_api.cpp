@@ -30,6 +30,12 @@ extern "C" int rf_cuda_decompose256(const Fp256Ctx *f,
                                     int lookup, uint32_t chunk,
                                     rf_relation *out, uint32_t cap, uint32_t *n_found, double *seconds);
 extern "C" int rf_cuda_device_present(char *name, int name_len);
+extern "C" int rf_cuda_session64_create(const Fp64Ctx *f, const uint64_t *fb_x, const uint64_t *fb_y,
+                                        uint32_t n_fb, int lookup, uint32_t chunk,
+                                        uint32_t max_targets, uint32_t cap, void **out);
+extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t *ty, uint32_t n_targets,
+                                     rf_relation *out, uint32_t *n_found, double *seconds);
+extern "C" void rf_cuda_session64_destroy(void *h);
 #endif
 
 namespace {
@@ -174,6 +180,125 @@ extern "C" int rf256_decompose(const uint64_t *fb_x, const uint64_t *fb_y, uint3
 #endif
     }
     return run_emulated<FieldP256>(f, fbx, fby, mx, my, lookup, opt.chunk, out, cap, res);
+}
+
+/* ---- persistent Fp64 session ---------------------------------------- */
+
+struct rf64_session {
+    Fp64Ctx f;
+    int backend, lookup;
+    uint32_t chunk, max_targets, cap;
+    std::vector<uint64_t> fbx, fby;           /* Montgomery form */
+    rf::SortedTableHost sorted;               /* emulation backend's table */
+    rf::HashTableHost hash;
+    std::vector<uint64_t> mx, my;             /* per-batch scratch */
+    void *cuda;                               /* RfCudaSession64 */
+};
+
+extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
+                                   uint32_t max_targets, uint32_t cap, const rf_options *opt_in,
+                                   rf64_session **out, rf_result *info) {
+    rf_options opt = opt_in ? *opt_in : rf_options{RF_BACKEND_AUTO, RF_LOOKUP_AUTO, 0};
+    if (!fb_x || !fb_y || !out || n_fb == 0 || max_targets == 0) return RF_ERR_BAD_ARG;
+    if ((p & 1) == 0 || p <= 3 || p >= (1ull << 62)) return RF_ERR_BAD_ARG;
+    if (opt.chunk == 0) opt.chunk = RF_DEFAULT_CHUNK_64;
+    if (!rf::chunk_ok(opt.chunk)) return RF_ERR_BAD_CHUNK;
+    if (opt.lookup != RF_LOOKUP_AUTO && opt.lookup != RF_LOOKUP_SORTED && opt.lookup != RF_LOOKUP_HASH) return RF_ERR_BAD_ARG;
+    if (opt.backend != RF_BACKEND_AUTO && opt.backend != RF_BACKEND_EMULATE && opt.backend != RF_BACKEND_CUDA) return RF_ERR_BAD_ARG;
+    for (uint32_t i = 0; i < n_fb; i++) if (fb_x[i] >= p || fb_y[i] >= p) return RF_ERR_BAD_ARG;
+    rf64_session *s = new rf64_session();
+    s->f = fp64_ctx_new(p);
+    s->backend = resolve_backend(opt.backend);
+    s->lookup = rf::resolve_lookup(opt.lookup, n_fb);
+    s->chunk = opt.chunk;
+    s->max_targets = max_targets;
+    s->cap = cap ? cap : 1;
+    s->fbx = rf::to_mont64(s->f, fb_x, n_fb);
+    s->fby = rf::to_mont64(s->f, fb_y, n_fb);
+    s->cuda = nullptr;
+    int rc = RF_OK;
+    if (s->backend == RF_BACKEND_CUDA) {
+#if RF_HAVE_CUDA
+        rc = rf_cuda_session64_create(&s->f, s->fbx.data(), s->fby.data(), n_fb, s->lookup, s->chunk,
+                                      max_targets, s->cap, &s->cuda);
+#else
+        rc = RF_ERR_NO_CUDA;
+#endif
+    } else if (s->lookup == RF_LOOKUP_HASH) {
+        s->hash = rf::build_hash<FieldFp64>(s->f, s->fbx.data(), n_fb);
+    } else {
+        s->sorted = rf::build_sorted<FieldFp64>(s->f, s->fbx.data(), n_fb);
+    }
+    if (rc != RF_OK) {
+        delete s;
+        return rc;
+    }
+    if (info) {
+        std::memset(info, 0, sizeof(*info));
+        info->backend_used = s->backend;
+        info->lookup_used = s->lookup;
+        info->chunk_used = s->chunk;
+    }
+    *out = s;
+    return RF_OK;
+}
+
+extern "C" int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const uint64_t *ty,
+                                      uint32_t n_targets, rf_relation *out, uint32_t cap, rf_result *res) {
+    if (!s || !tx || !ty || !res || n_targets == 0 || n_targets > s->max_targets) return RF_ERR_BAD_ARG;
+    if (cap > 0 && !out) return RF_ERR_BAD_ARG;
+    std::memset(res, 0, sizeof(*res));
+    const uint64_t p = s->f.p;
+    for (uint32_t k = 0; k < n_targets; k++) if (tx[k] >= p || ty[k] >= p) return RF_ERR_BAD_ARG;
+    s->mx.resize(n_targets);
+    s->my.resize(n_targets);
+    for (uint32_t k = 0; k < n_targets; k++) {
+        s->mx[k] = fp64_to_mont(s->f, tx[k]);
+        s->my[k] = fp64_to_mont(s->f, ty[k]);
+    }
+    res->backend_used = s->backend;
+    res->lookup_used = s->lookup;
+    res->chunk_used = s->chunk;
+    uint32_t found = 0;
+    if (s->backend == RF_BACKEND_CUDA) {
+#if RF_HAVE_CUDA
+        /* the device buffer holds the session's cap; copy what fits the caller's */
+        std::vector<rf_relation> tmp(s->cap);
+        double secs = 0;
+        int rc = rf_cuda_session64_run(s->cuda, s->mx.data(), s->my.data(), n_targets, tmp.data(), &found, &secs);
+        if (rc != RF_OK) return rc;
+        res->seconds = secs;
+        uint32_t have = found < s->cap ? found : s->cap;
+        uint32_t nw = have < cap ? have : cap;
+        if (nw) std::memcpy(out, tmp.data(), nw * sizeof(rf_relation));
+        res->n_found = found;
+        res->n_written = nw;
+        return found > nw ? RF_ERR_OVERFLOW : RF_OK;
+#else
+        return RF_ERR_NO_CUDA;
+#endif
+    }
+    DecompArgs<FieldFp64> a;
+    a.f = s->f;
+    a.fb_x = s->fbx.data(); a.fb_y = s->fby.data(); a.n_fb = (uint32_t)s->fbx.size();
+    a.t_x = s->mx.data(); a.t_y = s->my.data(); a.n_targets = n_targets;
+    a.out = out; a.out_cap = cap;
+    a.out_count = &found;
+    double t0 = rf::now_seconds();
+    if (s->lookup == RF_LOOKUP_HASH) rf::emulate_chunk<FieldFp64, HashTable>(a, s->hash.view(), s->chunk);
+    else rf::emulate_chunk<FieldFp64, SortedTable>(a, s->sorted.view(), s->chunk);
+    res->seconds = rf::now_seconds() - t0;
+    res->n_found = found;
+    res->n_written = found < cap ? found : cap;
+    return found > cap ? RF_ERR_OVERFLOW : RF_OK;
+}
+
+extern "C" void rf64_session_destroy(rf64_session *s) {
+    if (!s) return;
+#if RF_HAVE_CUDA
+    if (s->cuda) rf_cuda_session64_destroy(s->cuda);
+#endif
+    delete s;
 }
 
 extern "C" int rf_cuda_available(void) {

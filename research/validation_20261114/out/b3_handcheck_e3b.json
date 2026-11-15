@@ -1,0 +1,337 @@
+{
+ "mine": {
+  "pairs": 2,
+  "field_weights": [
+   0.0,
+   0.0285,
+   0.28500000000000003
+  ],
+  "other_weights": [
+   0.0,
+   0.1,
+   1.0
+  ],
+  "ratio_b_over_a": [
+   [
+    179.07996668054977,
+    180.68173538665343,
+    188.27222222222224
+   ],
+   [
+    1917437.8042850897,
+    1759261.3485887246,
+    1009692.2628118056
+   ],
+   [
+    19172766.323150776,
+    17590987.350268766,
+    10095228.178118058
+   ]
+  ],
+  "order_at": {
+   "0": "rho-neg < sem-chain-t2",
+   "w_cal": "rho-neg < sem-chain-t2",
+   "10*w_cal": "rho-neg < sem-chain-t2"
+  },
+  "ranked_at_calibrated_price": true,
+  "per_run": [
+   {
+    "arm": "rho-neg",
+    "key": [
+     "W6755265b1e04",
+     0
+    ],
+    "G": 6151.0,
+    "U_other": 5773,
+    "U_field": 0,
+    "sqrt_r": 3009.976577981962,
+    "counts": {
+     "canonicalisations_uncharged": 5773
+    }
+   },
+   {
+    "arm": "sem-chain-t2",
+    "key": [
+     "W6755265b1e04",
+     0
+    ],
+    "G": 843442.0,
+    "U_other": 841281,
+    "U_field": 314852479303,
+    "sqrt_r": 3009.976577981962,
+    "counts": {
+     "solver_F_p_multiply-adds_(elimination_only)_uncharged": 314844422015,
+     "sqrt_solves_uncharged": 2,
+     "row_ops_uncharged": 18,
+     "legendre_symbols_uncharged": 4,
+     "target_guard_probes_uncharged": 841257,
+     "pkm_base_check_fp_mults_uncharged": 6,
+     "pkm_grid_fp_mults_uncharged": 732,
+     "pkm_system_fp_mults_uncharged": 8056550
+    }
+   },
+   {
+    "arm": "rho-neg",
+    "key": [
+     "Wa46506aae62c",
+     0
+    ],
+    "G": 1052.0,
+    "U_other": 704,
+    "U_field": 0,
+    "sqrt_r": 3009.976577981962,
+    "counts": {
+     "canonicalisations_uncharged": 704
+    }
+   },
+   {
+    "arm": "sem-chain-t2",
+    "key": [
+     "Wa46506aae62c",
+     0
+    ],
+    "G": 446471.0,
+    "U_other": 444370,
+    "U_field": 169709436180,
+    "sqrt_r": 3009.976577981962,
+    "counts": {
+     "solver_F_p_multiply-adds_(elimination_only)_uncharged": 169705092862,
+     "sqrt_solves_uncharged": 2,
+     "row_ops_uncharged": 23,
+     "legendre_symbols_uncharged": 4,
+     "target_guard_probes_uncharged": 444341,
+     "pkm_base_check_fp_mults_uncharged": 6,
+     "pkm_grid_fp_mults_uncharged": 732,
+     "pkm_system_fp_mults_uncharged": 4342580
+    }
+   }
+  ]
+ },
+ "binary_compare": {
+  "w_cal": 0.0285,
+  "method": "best-of-N timing",
+  "host": "validator-scratch: hand-check value, not a measurement",
+  "field_weights": [
+   0.0,
+   0.0285,
+   0.28500000000000003
+  ],
+  "other_weights": [
+   0.0,
+   0.1,
+   1.0
+  ],
+  "ratio_b_over_a": [
+   [
+    179.07996668054977,
+    180.68173538665343,
+    188.27222222222224
+   ],
+   [
+    1917437.8042850897,
+    1759261.3485887246,
+    1009692.2628118056
+   ],
+   [
+    19172766.323150776,
+    17590987.350268766,
+    10095228.178118058
+   ]
+  ],
+  "order_at": {
+   "0": "rho-neg < sem-chain-t2",
+   "10*w_cal": "rho-neg < sem-chain-t2",
+   "w_cal": "rho-neg < sem-chain-t2"
+  },
+  "ranked_at_calibrated_price": true
+ },
+ "checks": [
+  {
+   "cell": [
+    0.0,
+    0.0
+   ],
+   "binary": 179.07996668054977,
+   "mine": 179.07996668054977,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.0,
+    0.1
+   ],
+   "binary": 180.68173538665343,
+   "mine": 180.68173538665343,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.0,
+    1.0
+   ],
+   "binary": 188.27222222222224,
+   "mine": 188.27222222222224,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.0285,
+    0.0
+   ],
+   "binary": 1917437.8042850897,
+   "mine": 1917437.8042850897,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.0285,
+    0.1
+   ],
+   "binary": 1759261.3485887246,
+   "mine": 1759261.3485887246,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.0285,
+    1.0
+   ],
+   "binary": 1009692.2628118056,
+   "mine": 1009692.2628118056,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.28500000000000003,
+    0.0
+   ],
+   "binary": 19172766.323150776,
+   "mine": 19172766.323150776,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.28500000000000003,
+    0.1
+   ],
+   "binary": 17590987.350268766,
+   "mine": 17590987.350268766,
+   "ok": true
+  },
+  {
+   "cell": [
+    0.28500000000000003,
+    1.0
+   ],
+   "binary": 10095228.178118058,
+   "mine": 10095228.178118058,
+   "ok": true
+  }
+ ],
+ "band_order_binary": "sem-chain-t2 > rho-neg at every weight",
+ "binary_band_calibrated": {
+  "w_cal": 0.0285,
+  "method": "best-of-N timing",
+  "host": "validator-scratch: hand-check value, not a measurement",
+  "field_weights": [
+   0.0,
+   0.0285,
+   0.28500000000000003
+  ],
+  "field_counters": [
+   "factor_base_fp_muls_uncharged",
+   "root_search_field_muls_uncharged",
+   "oracle_fp_muls_uncharged",
+   "native_field_muls_uncharged",
+   "native_field_sqrs_uncharged",
+   "linalg_mulmods_uncharged",
+   "linalg_mulmod_uncharged",
+   "smoothness_field_muls_uncharged",
+   "endomorphism_field_muls_uncharged",
+   "transfer_field_muls_uncharged",
+   "scalar_mulmod_uncharged",
+   "lift_field_multiplies_uncharged",
+   "lift_field_squares_uncharged",
+   "min_key_field_squares_uncharged",
+   "base_point_sqrt_field_multiplications_uncharged",
+   "aps_f4_multiplications_uncharged",
+   "aps_root_multiplications_uncharged",
+   "aps_core_expression_multiplications_uncharged",
+   "pkm_grid_fp_mults_uncharged",
+   "pkm_system_fp_mults_uncharged",
+   "pkm_shared_poly_fp_mults_uncharged",
+   "pkm_trace_learn_spec_fp_mults_uncharged",
+   "pkm_t0_target_fp_mults_uncharged",
+   "pkm_t0_base_map_fp_mults_uncharged",
+   "pkm_base_check_fp_mults_uncharged",
+   "cm_formula_muls_uncharged",
+   "cm_formula_sqrs_uncharged",
+   "elimination_modular_multiplications_uncharged",
+   "large_prime_mulmods_uncharged",
+   "explicit_x_zero_lift_squarings_uncharged",
+   "scalar_muls_uncharged",
+   "scalar_multiplications_uncharged",
+   "solver_F_p_multiplications_(grid)_uncharged",
+   "solver_F_p_multiply-adds_(elimination_only)_uncharged",
+   "solver_F_p_multiply-adds_(tower_F4_elimination)_uncharged"
+  ],
+  "pairs": [
+   {
+    "curve": "icv1-fp24-t1355-39d9b7fa",
+    "a": "rho-neg",
+    "b": "sem-chain-t2",
+    "order_at": {
+     "0": "rho-neg < sem-chain-t2",
+     "10*w_cal": "rho-neg < sem-chain-t2",
+     "w_cal": "rho-neg < sem-chain-t2"
+    },
+    "ranked_at_calibrated_price": true,
+    "band_verdict": "rho-neg < sem-chain-t2"
+   }
+  ]
+ },
+ "band_mean_s": {
+  "0": {
+   "rho-neg": [
+    1.196520938516613,
+    1.3041131378609432,
+    2.2724429319599144
+   ],
+   "sem-chain-t2": [
+    214.2729298021352,
+    235.6294248892492,
+    427.83788067327527
+   ]
+  },
+  "w_cal": {
+   "rho-neg": [
+    1.196520938516613,
+    1.3041131378609432,
+    2.2724429319599144
+   ],
+   "sem-chain-t2": [
+    2294254.481130429,
+    2294275.837625516,
+    2294468.0460813
+   ]
+  },
+  "10*w_cal": {
+   "rho-neg": [
+    1.196520938516613,
+    1.3041131378609432,
+    2.2724429319599144
+   ],
+   "sem-chain-t2": [
+    22940616.354936074,
+    22940637.71143116,
+    22940829.919886943
+   ]
+  }
+ },
+ "band_order_mine": {
+  "0": "rho-neg < sem-chain-t2",
+  "w_cal": "rho-neg < sem-chain-t2",
+  "10*w_cal": "rho-neg < sem-chain-t2"
+ },
+ "ok": true
+}

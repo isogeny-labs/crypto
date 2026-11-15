@@ -156,6 +156,37 @@ RF_HD int rf_ffs32(uint32_t v) {   /* 1-based index of the lowest set bit, 0 for
 #endif
 }
 
+/* RF_EYT_PREFETCH = d > 0: while the Eytzinger descent is at node k, prefetch
+ * eyt[k << d], the first of the 2^d nodes d levels down.  d = 4 is one 128-byte
+ * line of 16 keys (eyt[16k .. 16k+15]; the device copy is 256-byte aligned).
+ * RF_EYT_PREFETCH_L2 = 1 prefetches into L2 only.  0 = off (default). */
+#ifndef RF_EYT_PREFETCH
+#define RF_EYT_PREFETCH 0
+#endif
+#ifndef RF_EYT_PREFETCH_L2
+#define RF_EYT_PREFETCH_L2 0
+#endif
+RF_HD void rf_prefetch(const void *p) {
+#if defined(__CUDA_ARCH__)
+#if RF_EYT_PREFETCH_L2
+    asm volatile("prefetch.global.L2 [%0];" ::"l"(p));
+#else
+    asm volatile("prefetch.global.L1 [%0];" ::"l"(p));
+#endif
+#else
+    __builtin_prefetch(p);
+#endif
+}
+#if RF_EYT_PREFETCH
+#define RF_EYT_PF(k)                                                             \
+    do {                                                                         \
+        uint32_t q_ = (k) << RF_EYT_PREFETCH;                                    \
+        if (q_ <= n && q_ > (k)) rf_prefetch(eyt + q_);                          \
+    } while (0)
+#else
+#define RF_EYT_PF(k) do { } while (0)
+#endif
+
 struct SortedTable {
     const uint64_t *keys;   /* ascending */
     const uint32_t *idx;    /* factor-base index of keys[pos] */
@@ -168,7 +199,10 @@ struct SortedTable {
         /* Eytzinger lower_bound: descend, then strip the trailing ones of k
          * (the right turns taken after the last left turn). */
         uint32_t k = 1;
-        while (k <= n) k = 2 * k + (eyt[k] < key ? 1u : 0u);
+        while (k <= n) {
+            RF_EYT_PF(k);
+            k = 2 * k + (eyt[k] < key ? 1u : 0u);
+        }
         k >>= rf_ffs32(~k);
         return k ? eyt_rank[k] : n;
 #else
@@ -192,8 +226,8 @@ struct SortedTable {
          * while it is inside. */
         uint32_t a = 1, b = 1;
         while (a <= n || b <= n) {
-            if (a <= n) a = 2 * a + (eyt[a] < k0 ? 1u : 0u);
-            if (b <= n) b = 2 * b + (eyt[b] < k1 ? 1u : 0u);
+            if (a <= n) { RF_EYT_PF(a); a = 2 * a + (eyt[a] < k0 ? 1u : 0u); }
+            if (b <= n) { RF_EYT_PF(b); b = 2 * b + (eyt[b] < k1 ? 1u : 0u); }
         }
         a >>= rf_ffs32(~a);
         b >>= rf_ffs32(~b);

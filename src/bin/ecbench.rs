@@ -432,6 +432,8 @@ enum Cmd {
         /// `--weight` or several `--dir`; the §5a band is not computed.
         #[arg(long)]
         unit: Option<String>,
+        #[command(flatten)]
+        w_cal: WCalOverride,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -617,6 +619,31 @@ enum Cmd {
     },
 }
 
+/// A `w_cal` override (AGENTS.md §5a, 2026-11-12) for `compare`,
+/// `challenge verdict` and `bound fit`: takes precedence over the sessions'
+/// own reading (`options.w_cal` or the `w_cal.json` sidecar), is recorded as
+/// `source: "override"`, and is refused unless positive and finite.
+#[derive(clap::Args, Clone, Debug, Default)]
+struct WCalOverride {
+    /// Calibrated weight overriding the sessions' own: time of one native
+    /// mulmod over time of one group addition on the same curve and host.
+    /// Needs --w-cal-method and --w-cal-host.
+    #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+    w_cal: Option<f64>,
+    /// `perf-ipc` or `best-of-N timing`.
+    #[arg(long)]
+    w_cal_method: Option<String>,
+    /// The host `w_cal` was measured on.
+    #[arg(long)]
+    w_cal_host: Option<String>,
+}
+
+impl WCalOverride {
+    fn get(self) -> Result<Option<crypto_lib::cryptanalysis::ecbench::band::WCal>, String> {
+        wcal_from_flags(self.w_cal, self.w_cal_method, self.w_cal_host)
+    }
+}
+
 #[derive(clap::Args)]
 struct OptimizeArgs {
     #[command(subcommand)]
@@ -700,6 +727,8 @@ enum BoundCmd {
         /// bounds are version 2.
         #[arg(long, default_value_t = bounds::FIT_VERSION)]
         fit_version: u32,
+        #[command(flatten)]
+        w_cal: WCalOverride,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -740,6 +769,7 @@ enum FrontierCmd {
 }
 
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum ChallengeCmd {
     /// Validate a drafted challenge (its curves build, lie in its domain,
     /// and number enough sizes) and seal it.
@@ -845,6 +875,8 @@ enum ChallengeCmd {
         /// Exit 1 when the verdict is inadmissible.
         #[arg(long)]
         exit_code: bool,
+        #[command(flatten)]
+        w_cal: WCalOverride,
     },
 }
 
@@ -1123,6 +1155,23 @@ fn compare_pooled_cmd(
             r.join(", "),
             band.order
         );
+    }
+    if let Some(cal) = &c.calibrated {
+        match &cal.declined {
+            Some(why) => println!("calibrated (pooled): declined: {why}"),
+            None => println!(
+                "calibrated (pooled, {}, w_cal {}..{}): {}; ranked at calibrated price: {}",
+                cal.rule,
+                cal.w_cal_min.unwrap_or(f64::NAN),
+                cal.w_cal_max.unwrap_or(f64::NAN),
+                cal.order_at
+                    .iter()
+                    .map(|(k, v)| format!("{k}: {v}"))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                cal.ranked_at_calibrated_price
+            ),
+        }
     }
     for s in &c.sessions {
         println!(
@@ -1909,7 +1958,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             price_table_work: _,
             no_price_table_work,
             unit,
+            w_cal,
         } => {
+            let w_cal = w_cal.get()?;
             let bitop = match unit.as_deref() {
                 None => false,
                 Some("bitop/v1") => true,
@@ -1926,7 +1977,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     table_work: !no_price_table_work,
                 },
                 bitop,
-                w_cal: None,
+                w_cal,
             };
             if dir.len() > 1 {
                 return compare_pooled_cmd(
@@ -2365,8 +2416,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 param_rule,
                 oracle,
                 fit_version,
+                w_cal,
                 out,
             } => {
+                let w_cal = w_cal.get()?;
                 let b = bounds::bound_from_sessions(&bounds::FitInputs {
                     dirs: &dir,
                     arm: &arm,
@@ -2384,6 +2437,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         param_rule,
                         oracle,
                         fit_version,
+                        w_cal,
                     },
                     audit_refs: &[],
                 })?;
@@ -2660,7 +2714,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 bound_out,
                 audit_out,
                 exit_code,
+                w_cal,
             } => {
+                let w_cal = w_cal.get()?;
                 let c = challenge::Challenge::read(&path)?;
                 let cm = commitment
                     .as_deref()
@@ -2695,6 +2751,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     root: &root,
                     resamples,
                     seed,
+                    w_cal: w_cal.as_ref(),
                 })?;
                 if let Some(a) = &audit_out {
                     std::fs::write(a, &o.audit_text)
