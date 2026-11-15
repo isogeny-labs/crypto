@@ -1,6 +1,6 @@
 # Five follow-up ideas on PKM smooth-map factor bases
 
-**DRAFT (not yet frozen; awaiting smoke tests).** 2026-11-15. Study id `EXP-PKM-IDEAS-001`. Instrument
+**Protocol, frozen before any study row.** 2026-11-15. Study id `EXP-PKM-IDEAS-001`. Instrument
 [`examples/pkm_ideas.rs`](../../examples/pkm_ideas.rs); runner [`run.sh`](run.sh); rows `runs/`. Counted metrics and
 exact counts only; no clock is read. Context: EXP-PKM-ODD-001 (`research/pkm_odd_tower_f4_20261114/`).
 
@@ -16,13 +16,13 @@ ideas. Five ideas, each with its cheapest decisive test:
 | 5 | A separate coset per point changes coverage, not F4 work | (a) F4 counts, shared vs per-point coset, same targets policy; (b) exact `m = 2` coverage `|{P₁ + P₂}|` at small `p`, shared vs per-point vs random sets | (a) per-point ÷ shared in `(0.5, 2)`; (b) per-point covers about twice the shared count, like random pairs | (a) outside the band; (b) per-point ÷ shared `< 1.5` |
 
 **Fixed.** `P1 = 1399680001`, `P2 = 3265920001` (as EXP-PKM-ODD-001); small primes `1001089` (coverage, `192 \| p − 1`)
-and `1000081` (`aut`, `p ≡ 1 mod 3`, `36 \| p − 1`); grevlex, degree bound 64, budget 1,800 s per system,
+and `1000621` (`aut`, `p ≡ 1 mod 3`, `36 \| p − 1`, with a prime-order `j = 0` curve); grevlex, degree bound 64, budget 1,800 s per system,
 `RAYON_NUM_THREADS=4`, one binary (SHA-256 in `binary.sha256`), seed `20261115` unless a cell says otherwise.
 
 **Ladders** (all in `run.sh`). Idea 1: `m = 2`, `S = 16, 32, 64, 128, 256`, random and coset, 3 draws; `m = 3`,
 `S = 4, 8, 16`, 3 draws. Idea 3: `m = 2` degrees `2^4 … 2^8` and `3^3 … 3^5`; `m = 3` degrees `2^2 … 2^4`; 3 replays
 each. Idea 4: `m = 2` `2^6`, `3^4`; `m = 3` `2^3`; cross-curve (seed 77) and cross-prime (`P2`). Idea 5a: `m = 2`,
-`2^4 … 2^8`, 3 draws per layout. Idea 5b: `S = 16, 32, 64`. Idea 2: `S = 18, 36`, 2,000 targets.
+`2^4 … 2^8`, 3 draws per layout. Idea 5b: `S = 16, 32, 64`. Idea 2: `S = 18, 36`, 2,000 targets, half planted (a sum of two factor-base points), half random.
 
 **Rules.** A row that times out is censored and reported as a lower bound, never imputed. Verdicts come from the
 prediction column above; every one is reported. No ladder, budget or band changes after a row is seen without a dated
@@ -34,4 +34,9 @@ different `V`), stated as such. Nothing here concerns cryptographic sizes or Pol
 
 ## Amendments
 
-None at freeze.
+None at freeze. Smoke runs before freezing (disclosed): at `p = 1000081` no `j = 0` curve has prime order, so the
+`aut` prime became `1000621`. At random targets alone no decomposition occurred, so half the targets are now
+planted. Smoke rows seen before the freeze, all small: `m = 2`, `S = 16` dense random 34,150 and dense coset 32,976
+`field_ops`, against the committed tower's 662,046; replay ÷ fresh 0.38; per-point and shared cosets identical; coverage
+at `S = 16` shared 99, per-point 308, random 201/400. The predictions above were written before these were seen and
+are left unchanged.

@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 ROOT="$(git rev-parse --show-toplevel)"
 BIN="${PKM_IDEAS_BIN:-$ROOT/target/release/examples/pkm_ideas}"
 export RAYON_NUM_THREADS="${RAYON_NUM_THREADS:-4}"
-P1=1399680001; P2=3265920001; PC=1001089; PA=1000081
+P1=1399680001; P2=3265920001; PC=1001089; PA=1000621
 sha256sum "$BIN" > binary.sha256; git -C "$ROOT" rev-parse HEAD > commit.txt
 mkdir -p runs
 cell() {  # name expected-rows args...

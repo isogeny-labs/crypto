@@ -560,8 +560,18 @@ fn main() {
             // decomposition counts are omega-invariant: d(R) == d(omega(R))
             let mut inv_ok = 0;
             let mut nonzero = 0;
-            for _ in 0..tk {
-                let rpt = e.random_point(&mut r).unwrap();
+            for k in 0..tk {
+                // half planted (a sum of two factor-base points), half random
+                let rpt = if k % 2 == 0 && f.len() >= 2 {
+                    let a = f[r.below(f.len() as u64) as usize];
+                    let b = f[r.below(f.len() as u64) as usize];
+                    match e.add(Some(a), Some(b)) {
+                        Some(q) => q,
+                        None => e.random_point(&mut r).unwrap(),
+                    }
+                } else {
+                    e.random_point(&mut r).unwrap()
+                };
                 let (a, _) = enumerate_decompositions(&e, &v, 2, rpt);
                 let (b, _) = enumerate_decompositions(&e, &v, 2, omega(rpt));
                 if a.len() == b.len() {
