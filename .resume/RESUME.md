@@ -1,3 +1,21 @@
+# Whole original full-group custody25 prepared; scientific inputs HELD
+
+pcc/claims/PCC-20261115-6963ce.json: all49753prior keys/172links/exactledgerprefixes andALL675pendingconsumerbytes retained; everydeclaredclosedct90science-control-publicationroot/completeinspectedreport/source-executable-fullpreparedcopy/proof/checkpoint/failure roundtripped. Nativee245d0/full701, conditional7b5f49-da2fe7/all21bindings/report761003 andfailed99d448/all693 retainunsignedscopes. Originalpolicy selects3objects; HOLDuntiloriginalremote replays BEFOREactualbot/exactFF/reassembly/terminal25guards-links-ownedbytes. [pcc:unverified]
+
+## What was done
+Prior24archive24881096B/parts remainheld-exact/alreadygenuine, wholemanifest/guard/publicationmetadata retainedwithoutrecursivepayloadcopy. Onlytwo privatecheckpoint signed-downloadmetadata files excluded andretainedlocally; canonicalwhole701losslessfixture awaitsactualpublication. [pcc:unverified]
+
+## Decisions made
+Normalpublishoriginalpolicypayload; exactoriginalpublisher/FF/replay/guardrelease beforeanyscientific/consumerledger/ownedbyte mutation. Thenexactcanonicalprojection, freshadditiveCI preservingoldworkflows/references andallnewpopulations/proofs. [pcc:unverified]
+
+## Open threads
+Genuine25publication/release/canonical701; thencompleteprimitive/setup/reference andprime-fieldICdescentstudy usingexistingIC/norm-assistedsampler. Actualfield/HLP/geometry/Frobenius/Picard/order/program andcostadmission bridges explicit. [pcc:unverified]
+
+## Errors
+Allnativefailed693/source/proof/format/importer/launch/reportdraft/cold/root-main/negative results preserved. No calibrated/signing/globalCI/mergepromotion. [pcc:unverified]
+
+---
+
 # Full original-source Jacobian chain result mirrored; custody25 and additive CI next
 
 pcc/claims/PCC-20261115-c66350.json: exactpublished consumer675cbc9 retainsnativee245d0/sourcec8490c7/build03/checkpoint19/all28/immediategate0. Oneunfilteredtest0/worker0/all14phases/all701whole/fiveactualwholeclassomissions101-nooutput/1270hashes/actualbinaries pass. Fullconditionalproofsources7b5f49-da2fe7/all21bindings andinspected58175Btwo-page report761003 exportedexactly. [pcc:unverified]
