@@ -82,3 +82,20 @@ The focused [development workflow](../../../.github/workflows/prime31-algebraic-
 **I3:** Only after real natural m8 positive extraction, collect projectively unique useful independent rows, solve 12 unseen public prime31 logs (four holdouts) and compare complete cold cost `S(w=0,0.1,1)` with optimized same-host Rust rho/BSGS plus fastest external method. Include *every* failed/censored query, base production, amortization policy, matrix, root extraction, final scalar verification. A full end-to-end advantage requires independently replayed consistent numbers.
 
 The result implemented here is a **measurable algebraic subproblem** on a non-weak prime31 curve, not yet a complete or cheaper ECDLP solver.
+
+## Source-bound Rust execution and stage measurements (2026-11-15)
+
+The full narrow development suite passed at source/workflow commit `afdc9e50699f2dad882dbe354238741528103910`: [Actions run 43741710811](https://github.com/isogeny-labs/crypto/actions/runs/43741710811), job `132896091678`. The new exact algebraic-versus-generic Rust parity test passed `1/1`, the executable completed, and the development job's narrow Clippy and existing modules passed. The full repository root release-lib suite was not run for this commit. The exact output and scope are frozen in [`S3_QUOTIENT_GCD_CI_EVIDENCE_20261115.json`](S3_QUOTIENT_GCD_CI_EVIDENCE_20261115.json). **All measurements are producer-only and [pcc:unverified].**
+
+| Fixed factor base on same prime31 curve | Public target type | Exact GCD stage | Algebraically extracted signed relations | Old packed Rust F4 control |
+|---|---|---:|---:|---|
+| B=31, Dickson depth 6 | planted positive `P3+P9` | 0.485900 ms | 1 | 3.079562 ms, **undetermined**, degree 4, 252732 partial muladds |
+| B=31 | public `[17]G`, no decomposition | 0.446576 ms | 0 | 2.425976 ms, **undetermined**, 252732 partial muladds |
+| B=135, Dickson depth 8 | planted positive `P0+P14` | 29.476025 ms | 1 | **not run** |
+| B=135 | public `[17]G`, no decomposition | 28.549258 ms | 0 | **not run** |
+
+These are **one sample per cell**, not statistically calibrated benchmarks. B=31 fixed-base construction was excluded from both stage intervals, and B=135 base construction was also excluded; the GCD interval includes subsequent signed EC candidate validation. The old F4 has a lower stopping resource cap and did **not** finish, so dividing times or calling it an end-to-end speedup would be invalid. B135 scaling from roughly 0.5 to 29 ms also warns against treating this exact two-summand algebraic method as the final cheap solver. None of these rows is a complete scalar recovery, cold cost, useful-rank rate or rho comparison.
+
+The newly checked [Amadori–Pintore–Sala, *On the discrete logarithm problem for prime-field elliptic curves* (2018)](https://doi.org/10.1016/j.ffa.2018.01.009), alongside Petit–Kosters–Messeng (2016) and the repository's #4275/#4228 results, further limits the novelty of applying small-degree Semaev elimination. Its published approach reduces the number of factor-base relations required in a prime-field IC algorithm. We have **not** shown that our special resultant/GCD implementation improves or subsumes their method. A direct reproduction of their complete-cost model and a paired end-to-end comparison is added as a literature-control requirement in I3.
+
+**Immediate execution gate:** use this working S3 quotient as an exact reusable building block in a target-dependent, genuinely algebraic **m≥4/m8 S4 system**, obtain fresh natural-positive relations not constructed from the base points, deduplicate actual signed linear rows, finish held-out prime31 scalar recovery, and only then charge cold setup plus every miss and compare with optimized rho and strongest external F4. Do not substitute the old known-point triple-root tables or regard the capped F4 loss as an overall performance ranking.
