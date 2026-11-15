@@ -2045,3 +2045,39 @@ Source transportgovernance/publication/readycontinuationPR, actual artifactmigra
 Original artifact1 is retained and handled by the original store, not relabeled as0. Remote223 fails original2d-prefix check; no historyrepair or forcepush. All prior failures remain. [pcc:unverified]
 
 ---
+
+2026-11-15T22:19:50.352665+00:00
+
+# Original metadata transport replays full object, then loses mutable branch publication race
+
+## What was done
+pcc/claims/PCC-20261115-e3c377.json: original43763536307/job132963431408 uploads/replays1entireobject, createsrunner-local50d79441e5, then normalpush1/non-fast-forward. Completejob/API/sourcehold retained. Observedbotprefixnotpublished(422). All406heldfiles/fullsourceledger/HEAD/status/wholearchive/externalcopy unchanged at failureterminalguard; attemptclosedfailed withno canonicalpublication/FF/acceptance claim. [pcc:unverified]
+
+## Decisions made
+Preserve sourcec019 andallrawbytes; release failedmetadatahold onlyfornewbookkeeping. Authorseparatelyprospective transport02 usingoriginalimmutabletool/policy, exactwholearchive/replay/directparent/3pathguards, fullbotbundle/manifest/log exports onfailure, andnewuniqueimmutabletagpublication. Thisaddresses observedexternalbranchmovement withoutforcedupdates/ledgerrechain orfakecanonicalentries. [pcc:unverified]
+
+## Open threads
+Concrete02workflow/staticchecks/sourcepublication/actualoriginaltooltransport; scientificNEW28; Consumer1578freshCI02atsource826 queuedlastobserved, cheapercompleteLPpresentationreview/protocolbeforecode andoriginalledgermergegates. [pcc:unverified]
+
+## Errors
+Originalmigrationjoboverall1 despiteS3whole-replay success; do nottreatpartialinfrastructuresuccess asterminalcustody. Bothpreservedheadandstablebasebranchesmovedexternallywhilejobran. No unchangedretryagainstthe sameadvancedbranch andno forcepush. [pcc:unverified]
+
+---
+
+2026-11-15T23:16:07.116640+00:00
+
+# Freeze original artifact transport02 and immutable source clone
+
+## What was done
+pcc/claims/PCC-20261115-553a04.json: new thin workflow/protocol positive static gates0; historical broadbenchrec1 unchanged; exact original c019 clone holds952 files, full source ledger, all343 science inputs and whole payload/external copy. e3c377 retains attempt01 full failed publication and closed hold. [pcc:unverified]
+
+## Decisions made
+Publish concrete02 source on new codex feature/checkpoint base and genuinely new source tag. Actual original migration must replay whole bytes before its real direct-parent three-path bot, publish a new run tag, and complete normal FF plus terminal guards in the isolated source clone. Never force moved shared branches, rechain frozen ledgers or manufacture canonical metadata. [pcc:unverified]
+
+## Open threads
+Ready PR and actual transport02; full scientific NEW28; Consumer LP proof/native development and fresh CI03 materialization; original shared-ledger prefix conflicts. [pcc:unverified]
+
+## Errors
+Prior normal branch publication was rejected after successful whole-object replay. It remains failed;02 addresses publication with a new tag and exports the real bot bundle on every outcome. No02 success yet. [pcc:unverified]
+
+---
