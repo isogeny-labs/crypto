@@ -4,7 +4,7 @@
 //! Pure correctness/coverage diagnostic. It is NOT an index-calculus cost
 //! benchmark, a solver replacement, or independently signed verification.
 //! Reproduce:
-//! cargo run --locked --release --manifest-path //!   research/prime31_ic_20261115/native/Cargo.toml --example prime31_two_sum_gate
+//! cargo run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_two_sum_gate
 use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use serde_json::json;
 use std::collections::HashSet;
