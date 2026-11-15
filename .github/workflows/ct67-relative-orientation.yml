@@ -1,0 +1,41 @@
+name: CT67 two-prime torsion orientation audit
+on:
+  pull_request:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct67/**'
+      - '.github/workflows/ct67-relative-orientation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct67-orientation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent Frobenius centralizer and two-prime controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct67
+          python3 -B "$D/ct67_relative_embedding.py" > ct67-py.json
+          python3 -O -B "$D/ct67_relative_embedding.py" > ct67-py-opt.json
+          node "$D/ct67_relative_embedding_independent.js" > ct67-js.json
+          node --no-opt "$D/ct67_relative_embedding_independent.js" > ct67-js-noopt.json
+          cmp ct67-py.json ct67-py-opt.json
+          cmp ct67-py.json ct67-js.json
+          cmp ct67-py.json ct67-js-noopt.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.loads(Path('ct67-py.json').read_text())
+          assert t['F_centralizer_orbit']==8
+          assert t['F_centralizer_size']==8
+          assert t['conjugate_frobenius_matrices']==6
+          assert t['source_curve_order']==30
+          assert t['binary_curve_order']==5
+          assert t['same_F_different_image'] is True
+          assert t['scalar_compatibility'] is True
+          print('CT67 two-prime orientation arithmetic passed; no global ECDLP lift')
+          PY
+          sha256sum ct67-py.json ct67-js.json
