@@ -1,0 +1,55 @@
+SetSeed(20261115);
+R<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^35+x^2+1>;
+k := GF(32);
+Embed(k,K);
+
+function FromMask(n, z)
+    v := Parent(z)!0;
+    for i in [0..34] do
+        if (n div 2^i) mod 2 eq 1 then
+            v +:= z^i;
+        end if;
+    end for;
+    return v;
+end function;
+
+a := K!1;
+b := FromMask(9698245,z);
+assert b^(2^35) eq b;
+for d in [1,5,7] do
+    assert b^(2^d) ne b;
+end for;
+beta := Sqrt(b);
+assert beta+beta^32+beta^(32^2)+beta^(32^3)+beta^(32^4)+beta^(32^5)+beta^(32^6) eq 1;
+v := beta+1;
+assert v^(32^3)+v^32+v eq 0 and v ne 0;
+E := EllipticCurve([K | 1,a,0,0,b]);
+r := 5726649013;
+assert IsPrime(r) and #E eq 34359894078;
+P := E![FromMask(25722924589,z),FromMask(16457048142,z),1];
+Q := E![FromMask(31908057006,z),FromMask(10517578624,z),1];
+assert P ne E!0 and r*P eq E!0;
+assert Q ne E!0 and Q eq 1234567*P;
+assert WeilDescentGenus(E,k,K!1) eq 8;
+cpu := Cputime();
+wall := Realtime();
+C,h := WeilDescent(E,k,K!1);
+assert Type(C) eq CrvHyp and Genus(C) eq 8;
+J := Jacobian(C);
+G := h(P);
+T := h(Q);
+assert G ne J!0 and r*G eq J!0;
+assert T eq 1234567*G and h(2*P) eq 2*G and h(3*P) eq 3*G;
+print "source_order", #E;
+print "source_prime", r;
+print "source_point", P;
+print "source_target", Q;
+print "subfield_generator_in_K", K!k.1;
+print "target_curve", C;
+print "target_generator", G;
+print "target_point", T;
+print "target_genus", Genus(C);
+print "image_order_r", G ne J!0 and r*G eq J!0;
+print "map_cpu_sec", Cputime(cpu);
+print "map_wall_sec", Realtime(wall);
