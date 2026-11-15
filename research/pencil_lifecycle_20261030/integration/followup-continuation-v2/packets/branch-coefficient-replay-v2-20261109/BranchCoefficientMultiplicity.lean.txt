@@ -1,0 +1,47 @@
+-- Prospective source only; no compiler or named axiom audit. [pcc:unverified]
+import BranchRootMultiplicity
+
+set_option autoImplicit false
+noncomputable section
+namespace BranchCoefficientMultiplicity
+open Polynomial Common22BranchStalk WeightedProjSmoothPoints
+variable {K : Type*} [Field K]
+
+-- The norm identity is derived from the actual coefficientData formulas and
+-- the two divisor congruences. Support nonzero conclusions are inherited from
+-- the finite stalk sum; none is silently added as an input assumption.
+theorem source_support_base_multiplicity_sum
+    (a3 a2 a1 a0 a q1 r1 s1 t1 q2 r2 s2 t2 : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hs : (quintic a3 a2 a1 a0).Separable)
+    (hb : (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1 ≠ 0)
+    (valid1 : Common22Coprime.firstSupport q1 r1 ∣
+      quintic a3 a2 a1 a0 - (C s1 * X + C t1)^2)
+    (valid2 : Common22Coprime.secondSupport q2 r2 ∣
+      quintic a3 a2 a1 a0 - (C s2 * X + C t2)^2)
+    (hsupport : (Common22Coprime.firstSupport q1 r1).eval a *
+      (Common22Coprime.secondSupport q2 r2).eval a *
+      (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2).eval a = 0) :
+    Common22Coprime.firstSupport q1 r1 ≠ 0 ∧
+      Common22Coprime.secondSupport q2 r2 ≠ 0 ∧
+      ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2 ≠ 0 ∧
+      (Common22Coprime.firstSupport q1 r1).rootMultiplicity a +
+        (Common22Coprime.secondSupport q2 r2).rootMultiplicity a +
+        (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2).rootMultiplicity a = 1 := by
+  exact BranchRootMultiplicity.support_base_multiplicity_sum
+    a3 a2 a1 a0 a
+    (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1
+    hroot
+    (WeightedProjQuinticHead.derivativeAt_ne_zero_of_separable
+      a3 a2 a1 a0 a hs hroot)
+    hb
+    (ActualNonbranchNorm.numerator q1 r1 s1 t1 q2 r2 s2 t2)
+    (Common22Coprime.firstSupport q1 r1)
+    (Common22Coprime.secondSupport q2 r2)
+    (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2)
+    (ActualNonbranchNorm.source_norm_identity
+      a3 a2 a1 a0 q1 r1 s1 t1 q2 r2 s2 t2 hb valid1 valid2)
+    hsupport
+
+#print axioms source_support_base_multiplicity_sum
+end BranchCoefficientMultiplicity

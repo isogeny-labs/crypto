@@ -38,6 +38,9 @@ pub struct FixedArgs {
     /// Print live stage, pair-table, attempt and relation progress to stderr.
     #[arg(long)]
     pub progress: bool,
+    /// Processes used to compute pair sums; 1 disables the pool.
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u32).range(1..=64))]
+    pub pair_workers: u32,
     /// Attempts between progress heartbeats; 0 prints only relations and stage changes.
     #[arg(long, default_value_t = 100)]
     pub progress_every: u32,
@@ -82,7 +85,9 @@ pub fn run(args: FixedArgs) -> Result<Value, String> {
         .arg("--pair-budget")
         .arg(args.pair_budget.to_string())
         .arg("--query-seconds")
-        .arg(args.query_seconds.to_string());
+        .arg(args.query_seconds.to_string())
+        .arg("--pair-workers")
+        .arg(args.pair_workers.to_string());
     if args.progress {
         command
             .arg("--progress")

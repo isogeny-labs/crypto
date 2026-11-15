@@ -60,6 +60,27 @@ theorem required_mono_bytes {planned bytesPerPair₁ bytesPerPair₂ : Nat}
     Nat.div_le_div_right hmul
   omega
 
+/-- Reserve for the final `pair_lookup` index when a bulk build keeps it off. -/
+def indexAllowance (totalPairs : Nat) : Nat := totalPairs * 192
+
+def pairTableRequired (planned bytesPerPair totalPairs : Nat) (indexPresent : Bool) : Nat :=
+  required planned bytesPerPair +
+    (if indexPresent then 0 else indexAllowance totalPairs)
+
+theorem pair_table_required_ge (planned bytesPerPair totalPairs : Nat) (indexPresent : Bool) :
+    required planned bytesPerPair ≤ pairTableRequired planned bytesPerPair totalPairs indexPresent := by
+  unfold pairTableRequired
+  split <;> omega
+
+theorem pair_table_required_mono_total {total₁ total₂ planned bytesPerPair : Nat}
+    (h : total₁ ≤ total₂) :
+    pairTableRequired planned bytesPerPair total₁ false ≤
+      pairTableRequired planned bytesPerPair total₂ false := by
+  unfold pairTableRequired indexAllowance
+  simp
+  have hmul : total₁ * 192 ≤ total₂ * 192 := Nat.mul_le_mul_right 192 h
+  omega
+
 end DiskBudget
 
 #print axioms DiskBudget.required_overhead
@@ -67,3 +88,5 @@ end DiskBudget
 #print axioms DiskBudget.required_at_least_raw
 #print axioms DiskBudget.required_mono_planned
 #print axioms DiskBudget.required_mono_bytes
+#print axioms DiskBudget.pair_table_required_ge
+#print axioms DiskBudget.pair_table_required_mono_total

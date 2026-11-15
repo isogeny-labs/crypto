@@ -8,6 +8,7 @@ from collections import Counter
 import hashlib
 import json
 import math
+import multiprocessing
 from pathlib import Path
 import shutil
 import sqlite3
@@ -25,6 +26,31 @@ FORMAT = 'fixed-koblitz-ic-v1'
 # enough to amortise SQLite's commit cost. The cursor and rolling checksum
 # are committed with the rows, so a crash loses at most one chunk.
 PAIR_CHUNK = 4096
+# Above this many planned candidates, maintaining pair_lookup during inserts
+# costs more than dropping it and rebuilding once at the end.
+PAIR_INDEX_THRESHOLD = 100000
+# Below this budget, worker start-up costs more than the saved field time.
+PAIR_PARALLEL_MIN = 16384
+
+_PAIR_WORKER = None
+
+
+def _initPairWorker(m, points):
+    """Reconstruct the field/curve once per spawned worker."""
+    global _PAIR_WORKER
+    ledger = engine.Ledger()
+    onb = engine.AuditField(m, ledger)
+    curve = engine.AuditCurve(onb, ledger)
+    _PAIR_WORKER = (curve, points)
+
+
+def _pairKeys(indices):
+    """Return point keys (and operation counts) for `(i, j)` indices."""
+    global _PAIR_WORKER
+    curve, points = _PAIR_WORKER
+    pairs = [(points[i], points[j]) for i, j in indices]
+    keys = [None if point is None else pointKey(point) for point in curve.addBatch(pairs)]
+    return keys, dict(curve.ledger.counts)
 
 
 def require(condition, message):
@@ -184,6 +210,19 @@ def requiredBytes(planned, bytesPerPair):
     return (planned * bytesPerPair * 5) // 4 + 32 * 1024 * 1024
 
 
+# Index entries are roughly this large on the degree-131 text keys. When the
+# pair index is absent during a bulk build, reserve room to create it once.
+PAIR_INDEX_BYTES_PER_PAIR = 192
+
+
+def pairTableRequiredBytes(planned, bytesPerPair, totalPairs, indexPresent):
+    """Disk required for this chunk, including the final index when absent."""
+    required = requiredBytes(planned, bytesPerPair)
+    if not indexPresent:
+        required += totalPairs * PAIR_INDEX_BYTES_PER_PAIR
+    return required
+
+
 class Progress:
     """Live human-readable progress on stderr.
 
@@ -253,11 +292,14 @@ class Progress:
 
 class Campaign:
     def __init__(self, document, directory, solver='pairs', memory=False, selectorModel=None,
-                 progress=None, relationsOut=None):
+                 progress=None, relationsOut=None, pairWorkers=1):
         require(__debug__, 'run without Python -O; the shared arithmetic engine uses assertions')
+        require(type(pairWorkers) is int and 1 <= pairWorkers <= 64,
+                'pair workers must be between 1 and 64')
         self.ledger = engine.Ledger()
         self.uses = Counter()
         self.started = time.perf_counter_ns()
+        self.pairWorkers = pairWorkers
         self.db = None
         self.lock = None
         self.relationsOut = None
@@ -429,6 +471,22 @@ class Campaign:
             with self.db:
                 self.put('base_order', self.baseHash)
 
+    def pairIndexExists(self):
+        return self.db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='index' AND name='pair_lookup'"
+        ).fetchone() is not None
+
+    def ensurePairIndex(self):
+        if self.memory or self.pairIndexExists():
+            return
+        with self.db:
+            self.db.execute('CREATE INDEX IF NOT EXISTS pair_lookup ON pairs(point)')
+
+    def dropPairIndex(self):
+        if not self.memory and self.pairIndexExists():
+            with self.db:
+                self.db.execute('DROP INDEX IF EXISTS pair_lookup')
+
     def buildPairs(self, budget):
         """Build at most budget candidate pairs; each chunk and cursor commit together."""
         require(type(budget) is int and budget >= 0, 'pair budget must be nonnegative')
@@ -440,19 +498,21 @@ class Campaign:
             self.progress.pairStart()
             if state['i'] == size:
                 self.uses['pair_table_loads'] += 1
+                self.ensurePairIndex()
                 self.progress.pairTable(total, total, state['serial'], True, 0, budget)
                 return True
             considered = consideredCount(size, state['i'], state['j'])
+            remaining = max(0, total - considered)
+            planned = min(budget, remaining)
             if not self.memory:
-                remaining = max(0, total - considered)
-                planned = min(budget, remaining)
                 pages = self.db.execute('PRAGMA page_count').fetchone()[0]
                 page_size = self.db.execute('PRAGMA page_size').fetchone()[0]
                 if state['serial'] > 0:
                     bytes_per_pair = max(128, (pages * page_size + state['serial'] - 1) // state['serial'])
                 else:
                     bytes_per_pair = 256
-                required = requiredBytes(planned, bytes_per_pair)
+                required = pairTableRequiredBytes(planned, bytes_per_pair, total,
+                                                  self.pairIndexExists())
                 free = shutil.disk_usage(self.directory).free
                 if free < required:
                     raise ValueError(
@@ -460,6 +520,8 @@ class Campaign:
                         'choose --dir on a volume with more space or stop earlier with --pair-budget'
                         % (required // (1024 * 1024), self.directory.resolve(),
                            free // (1024 * 1024)))
+            if planned >= PAIR_INDEX_THRESHOLD:
+                self.dropPairIndex()
             done = 0
             reportEvery = max(PAIR_CHUNK, budget // 100)
             nextReport = reportEvery
@@ -470,6 +532,15 @@ class Campaign:
             self.db.execute('PRAGMA synchronous=NORMAL')
             self.db.execute('PRAGMA cache_size=-65536')
             self.db.execute('PRAGMA temp_store=MEMORY')
+            pool = None
+            if self.pairWorkers > 1 and budget >= PAIR_PARALLEL_MIN:
+                try:
+                    context = multiprocessing.get_context('spawn')
+                    pool = context.Pool(self.pairWorkers, initializer=_initPairWorker,
+                                        initargs=(self.params.onb.m, self.points))
+                except (OSError, ValueError) as error:
+                    self.progress.message('pair workers unavailable (%s); using one process' % error)
+                    pool = None
             try:
                 while done < budget and state['i'] < size:
                     with self.db:
@@ -488,13 +559,24 @@ class Campaign:
                             done += 1
                             self.uses['pair_candidates_built'] += 1
                         if entries:
-                            points = self.params.curve.addBatch(
-                                [(left, right) for _, _, left, right in entries])
+                            if pool is not None and len(entries) >= self.pairWorkers * 64:
+                                width = (len(entries) + self.pairWorkers - 1) // self.pairWorkers
+                                chunks = [[(i, j) for i, j, _, _ in entries[start:start + width]]
+                                          for start in range(0, len(entries), width)]
+                                keys = []
+                                worker_counts = Counter()
+                                for chunk_keys, counts in pool.map(_pairKeys, chunks):
+                                    keys.extend(chunk_keys)
+                                    worker_counts.update(counts)
+                                self.ledger.counts.update(worker_counts)
+                            else:
+                                points = self.params.curve.addBatch(
+                                    [(left, right) for _, _, left, right in entries])
+                                keys = [None if point is None else pointKey(point) for point in points]
                             rows = []
-                            for (i, j, _, _), point in zip(entries, points):
-                                if point is None:
+                            for (i, j, _, _), key in zip(entries, keys):
+                                if key is None:
                                     continue
-                                key = pointKey(point)
                                 serial = state['serial']
                                 rows.append((serial, key, i, j))
                                 state['hash'] = digest([state['hash'], serial, key, i, j])
@@ -508,7 +590,12 @@ class Campaign:
                         nextReport += reportEvery
             finally:
                 self.db.execute('PRAGMA synchronous=%d' % previous_sync)
+                if pool is not None:
+                    pool.close()
+                    pool.join()
             complete = state['i'] == size
+            if complete:
+                self.ensurePairIndex()
             considered = consideredCount(size, state['i'], state['j'])
             self.progress.pairTable(considered, total, state['serial'], complete, done, budget)
             return complete
@@ -616,6 +703,7 @@ class Campaign:
             return witness, details
         state = self.meta('pair_state')
         require(state is not None and state['i'] == len(self.points), 'pair table is incomplete')
+        self.ensurePairIndex()
         deadline = time.monotonic() + seconds
         with self.ledger.phase('decomposition'):
             prefixes = [(None, None)] if self.params.summands == 2 else enumerate(self.points)
@@ -872,11 +960,13 @@ def main():
                         help='attempts between progress heartbeats; 0 prints only relations and stage changes')
     parser.add_argument('--relations-out',
                         help='rewrite saved relations as JSON Lines, then append each new verified relation')
+    parser.add_argument('--pair-workers', type=int, default=1,
+                        help='processes used to compute pair sums (1 disables the pool)')
     args = parser.parse_args()
     try:
         with Campaign(readJson(args.params), args.dir, args.solver, selectorModel=args.selector_model,
                       progress=Progress(args.progress, args.progress_every),
-                      relationsOut=args.relations_out) as campaign:
+                      relationsOut=args.relations_out, pairWorkers=args.pair_workers) as campaign:
             report = campaign.run(args.stage, args.attempts, args.pair_budget, args.query_seconds)
     except (ValueError, OSError, sqlite3.Error, RuntimeError) as error:
         message = str(error)

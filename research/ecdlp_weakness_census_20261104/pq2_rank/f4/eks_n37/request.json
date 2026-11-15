@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "pq2-msolve-n37-e63bf8e5",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:21d4b8333a0a23395c4b9af9df6696a513948186332c4c71e82d59db4815b49c",
+    "command": [
+      "/opt/msolve/run.sh",
+      "4"
+    ],
+    "cpu": 8,
+    "memory": "100Gi",
+    "seconds": 21600,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 600
+  },
+  "provenance": {
+    "harness": "claude-code main session",
+    "source_revision": "e63bf8e55d587c82155ec2c537cfced20cd6cb52",
+    "study": "pq2_rank msolve n = 37 step test",
+    "protocol_sha256": "fdcd0fa3203aa3bf8df05bcaac9d82e17b33173133c2a91d5b32c6bb07564e53",
+    "note": "one attempt, no retries, USD 5 ceiling; see eks_n37/protocol.json"
+  }
+}
