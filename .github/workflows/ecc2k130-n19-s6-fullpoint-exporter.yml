@@ -20,8 +20,13 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify frozen hashes and syntax without n19 outcomes
-        run: python3 research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n19_s6_fullpoint_exporter_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Replay only the n2 toy full-point CNF control
-        run: |
-          python3 research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/selftest.py > /tmp/s6-toy-selftest.json
-          cmp /tmp/s6-toy-selftest.json research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/evidence/toy_selftest.json
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/selftest.py > /tmp/s6-toy-selftest.json
+            cmp /tmp/s6-toy-selftest.json research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/evidence/toy_selftest.json
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n19_s6_fullpoint_exporter_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

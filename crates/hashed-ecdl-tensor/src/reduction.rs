@@ -8,7 +8,7 @@
 use crate::arithmetic::{floor_root, hash_prime_by, inverse, random_below, RandomSource};
 use crate::contraction::Counter;
 use crate::curve::{Curve, Point};
-use crate::encoding::{Encoder, PointWords};
+use crate::encoding::{Encoder, Multiplier, PointWords};
 use crate::network::Network;
 use crate::{integrity, invalid, overflow, BigUint, Error, Meter, Result};
 use num_integer::Integer;
@@ -125,7 +125,20 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
-    Ok(decomposition_network_impl(curve, bases, target, false, meter)?.0)
+    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Fourier, meter)?.0)
+}
+
+/// The same language with the integer multiplication gadget chosen explicitly
+/// (`Multiplier::Fourier` reproduces `decomposition_network`). Only the Boolean
+/// graph changes: the accepted assignments, counts and witnesses do not.
+pub fn decomposition_network_with_multiplier(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    multiplier: Multiplier,
+    meter: &mut Meter,
+) -> Result<Network> {
+    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, meter)?.0)
 }
 
 /// Build the same decomposition language with semantic slot regions and return
@@ -141,7 +154,7 @@ pub fn decomposition_network_with_semantic_cut(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<(Network, Vec<usize>)> {
-    decomposition_network_impl(curve, bases, target, true, meter)
+    decomposition_network_impl(curve, bases, target, true, Multiplier::Fourier, meter)
 }
 
 /// The same language as the general construction, with the last slot computed
@@ -156,12 +169,14 @@ fn derived_last_slot_network(
     curve: &Curve,
     bases: &[FactorBase],
     target: &Point,
+    multiplier: Multiplier,
     meter: &mut Meter,
 ) -> Result<Network> {
     let (last, free) = bases
         .split_last()
         .ok_or_else(|| invalid("decomposition target or arity"))?;
     let mut encoder = Encoder::new();
+    encoder.set_multiplier(multiplier);
     let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
     for base in free {
         let point = encoder.input_point(curve, false, meter)?;
@@ -212,6 +227,7 @@ fn decomposition_network_impl(
     bases: &[FactorBase],
     target: &Point,
     semantic_cut: bool,
+    multiplier: Multiplier,
     meter: &mut Meter,
 ) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
@@ -219,11 +235,12 @@ fn decomposition_network_impl(
     }
     if !semantic_cut && curve.cofactor().is_one() {
         return Ok((
-            derived_last_slot_network(curve, bases, target, meter)?,
+            derived_last_slot_network(curve, bases, target, multiplier, meter)?,
             Vec::new(),
         ));
     }
     let mut encoder = Encoder::new();
+    encoder.set_multiplier(multiplier);
     if semantic_cut {
         encoder.set_semantic_region("setup")?;
     }

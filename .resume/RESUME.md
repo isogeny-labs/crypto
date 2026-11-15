@@ -1,32 +1,28 @@
-# Resume: crypto @ claude/happy-johnson-9edk2r
+# Resume: crypto @ claude/hky-progress-growth-law-20261115 (growth-law cells rerun)
 
 ## Goal
-Run the prepared trace-line reference panel (research/trace_c1_2lp_20261027/reference-d{2,3,4,5}.json)
-on Iso Lab EKS Spot via the GitHub route (isolab-experiment.yml on main), as a measured stage
-diagnostic of the Tr_{N/d} trace-selected factor-base line against the standard subfield line and matched rho.
+Owner (2026-11-15): "Yes go ahead with the engine fix and rerun"; budget "All three cells, 24h each, $80".
+Decide d_F at the three open Conjecture G cells of the PKM/Kummer tower (prime_ic_leads_20261110/growth_law).
 
 ## Lead / hypothesis
-Trace line lifts every nonzero x (exact, research/trace_homomorphism_tests_20261109 T4), so the
-four-summand MITM reference should need fewer trials than the standard line. This is the exact
-MITM reference only, NOT the algebraic C1 experiment of PROTOCOL.md (still blocked on the C1 oracle).
+Conjecture G: d_F(W,t) = ffd(W) + max(0, floor((t - s_W)/4)). Registered predictions:
+(a) W=1,t=12: d_F=6; (b) W=3,t=13: d_F=7; (c) W=2,t=14: d_F=7.
 
 ## Spec
-Specs frozen on main; source_revision = main HEAD at dispatch (recorded in the session log and
-research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md). c8a.2xlarge, seconds=1800, one dispatch per size.
-Dollar ceiling: USD 10 for all four dispatches including failures.
+research/prime_ic_leads_20261110/growth_law/rerun_20261115/PLAN.md (frozen before data) and cells_job.sh.
+Binary pkm_tower_pilot from commit in source_commit.txt, sha256 in binary.sha256 (checked on pod).
 
 ## State
-d5 run 42639382601 failed (launcher exit 23, Job failed, no pod UID in result). Gate unknown without S3. d2-d4 not dispatched.
-
-## Next steps
-1. Await each run; read step summary; download receipts only via the lab's verified route.
-2. Report per-size outcome, L2/A/A admission, and the IC/rho gap; no claim beyond the MITM reference.
+Engine fix committed (fall_degrees_with + --hky-progress). Pod about to launch.
 
 ## Runs in flight
-None.
+RunPod pod bdr-growthlaw (cpu5m, 16 vCPU), job /work/in/cells_job.sh, outputs /work/out.
+Kit: research/runpod_kit_20261112/rp.sh (get/exec/delete). Cleanup: rp.sh delete bdr-growthlaw.
 
 ## Stop and success conditions
-No automatic resubmission. A failed or ambiguous run is reconciled against its original run ID first.
+Pod deleted at ALL_DONE, on BINARY HASH MISMATCH, or before spend exceeds USD 80 (~72 h at USD 1.06/h).
+Reading rules in PLAN.md (holds / fails / censored). Partial: decided degrees from out/prog_*.jsonl.
 
-## Open questions
-Whether the S3 receipts are readable from this session (no valid AWS identity here).
+## Next steps
+Poll at most every 4 h: rp.sh get out/ into rerun_20261115/out/. At ALL_DONE: copy back, delete pod,
+close benchrec record, write REPORT + figure + PDF, update PR.

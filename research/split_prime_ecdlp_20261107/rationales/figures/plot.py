@@ -90,11 +90,11 @@ if os.path.exists(fp):
         if line.startswith("{"):
             FACTS.append(json.loads(line))
 EXACT = {}
-for f in glob.glob(os.path.join(HERE, "..", "data", "cl", "cl_*.jsonl")):
-    for line in open(f):
-        if line.startswith("{"):
-            r = json.loads(line)
-            EXACT[r["label"]] = r
+# exact class numbers from the library's relation method (classgroup binary)
+for f in glob.glob(os.path.join(HERE, "..", "data", "cl", "rust_p*.json")):
+    r = json.load(open(f))
+    if r.get("accepted"):
+        EXACT[r["label"]] = {"h_K_bits": r["h_bits"], "h": r["h"], "ratio": r["ratio_to_analytic"]}
 roles = {c["label"]: (c["role"], c["bits"]) for c in W["curves"]}
 if FACTS:
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.6))
@@ -122,7 +122,7 @@ if FACTS:
         ax.plot([b], [r["h_estimate_log2"]], "o" if role == "published" else "x", color=col, ms=6, alpha=0.8)
     for lab, e in EXACT.items():
         role, b = roles[lab]
-        ax.plot([b], [e["h_K_bits"]], "s", mfc="none", color="k", ms=9, label="exact h (quadclassunit, GRH)" if lab == sorted(EXACT)[0] else None)
+        ax.plot([b], [e["h_K_bits"]], "s", mfc="none", color="k", ms=9, label="exact h (relation method, GRH)" if lab == sorted(EXACT)[0] else None)
     ax.plot(fields, [b / 2 for b in fields], "--", color="gray", lw=0.8, label="log₂ √p")
     ax.set_xlabel("field size (bits)")
     ax.set_ylabel("log₂ h(O_K) (analytic estimate; squares exact)")

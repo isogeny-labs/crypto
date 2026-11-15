@@ -50,6 +50,10 @@ breakthrough. Report each row's gap to the matched rho as the distance
 remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
+Claim tiers T0–T3 (below rho, smaller exponent, subexponential; transfers
+to hyperelliptic or other groups count when fully charged; cold, public
+targets, preregistered):
+[`docs/ic/SUCCESS_CRITERIA.md`](docs/ic/SUCCESS_CRITERIA.md).
 
 Look up curve facts in the curve database before computing them or
 scanning `docs/curves/*.json`: MCP server `ecdb` (export `ECDB_TOKEN` from
@@ -149,6 +153,12 @@ report in `benchmarks/progress/`, in the same PR. The hooks refuse unrecorded
 benchmark launchers and unrecorded pushes; the `bench-records` check fails
 the PR. AGENTS.md, "Benchmark records: data in S3, metadata in Git, one
 progress report"; [docs/benchmark-records.md](docs/benchmark-records.md).
+
+**Continuous learning** (owner, 2026-11-15): every skill and agent reads
+`python3 tools/lessons.py brief --scope <name>` before acting, records an
+evidenced outcome and lesson tests after, and folds adopted lessons back into
+its own instructions by PR. Ledger: `docs/lessons/`. Rule: AGENTS.md
+"Continuous learning loop".
 
 ## Persistent scientific research loop
 

@@ -1,0 +1,12 @@
+digraph equivalence {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.3",ranksep="0.35"];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,fillcolor="#eef5fc",margin="0.15"];
+  edge [fontname="Helvetica",fontsize=10];
+  norm [label="Polynomial witness in supplied finite families\nc != 0; A_w^2 - f B_w^2 = cG\nA_w(q) - y B_w(q) = 0"];
+  matrix [label="Exact constrained matrix witness\nM != 0; symmetric; every 2x2 minor vanishes\nM ell = 0; actual polynomial lift L(M) = cG"];
+  norm -> matrix [dir=both,label="Exact equivalence\nouter product / pivot column"];
+  identity [label="Checked bridge: L(ww^T) = A_w^2 - f B_w^2\nbranchEval matches actual target evaluation",fillcolor="#eaf7eb"];
+  identity -> matrix [style=dashed,arrowhead=none];
+  search [label="Finding M with all constraints remains open\nNo search algorithm or time bound supplied",fillcolor="#fff1d5"];
+  matrix -> search [style=dashed];
+}

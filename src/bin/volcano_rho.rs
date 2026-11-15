@@ -29,8 +29,10 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::Instant;
 
+use crypto_lib::cryptanalysis::ic_boundary::invmod;
 use crypto_lib::cryptanalysis::isogeny_walk::field::Field;
 use crypto_lib::cryptanalysis::isogeny_walk::poly;
+use crypto_lib::cryptanalysis::prime_fast::MulModN;
 use num_bigint::BigUint;
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
@@ -40,12 +42,27 @@ use serde_json::json;
 
 // ---------------------------------------------------------------- F_p, p < 2^62
 
+/// `F_p` for a prime `5 ≤ p < 2^62`.  Products go through
+/// [`MulModN`] (Montgomery, no `__umodti3` library call) and inverses
+/// through `ic_boundary::invmod` (word-division Euclid).  Both return the
+/// value the earlier `u128 %` and `i128` Euclid returned for every input
+/// (the remainder and the inverse are unique; out-of-range operands take
+/// the old code), so every walk, `iters`, `k` and log line is unchanged;
+/// only wall time (`ns`) differs, so rows from before and after this
+/// change must not be pooled on time (assessment 2026-11-10, R1).
 #[derive(Clone, Copy)]
 struct Fp {
     p: u64,
+    mm: MulModN,
 }
 
 impl Fp {
+    fn new(p: u64) -> Self {
+        Fp {
+            p,
+            mm: MulModN::new(p),
+        }
+    }
     fn add(&self, a: u64, b: u64) -> u64 {
         let s = a + b;
         if s >= self.p {
@@ -69,7 +86,7 @@ impl Fp {
         }
     }
     fn mul(&self, a: u64, b: u64) -> u64 {
-        ((a as u128 * b as u128) % self.p as u128) as u64
+        self.mm.mul(a, b)
     }
     fn sm(&self, k: u64, a: u64) -> u64 {
         self.mul(k % self.p, a)
@@ -124,7 +141,18 @@ impl Fp {
     }
 }
 
+/// `a⁻¹ mod m` by `ic_boundary::invmod` (word-division Euclid; 32-bit
+/// steps for a modulus below 2^32), falling back to the `i128` Euclid
+/// below only for a non-invertible `a`, to keep its panic.  The inverse
+/// is unique, so both give the same value.
 fn inv_mod(a: u64, m: u64) -> u64 {
+    if let Some(x) = invmod(a, m) {
+        return x;
+    }
+    inv_mod_i128(a, m)
+}
+
+fn inv_mod_i128(a: u64, m: u64) -> u64 {
     let (mut r0, mut r1) = (m as i128, a as i128);
     let (mut s0, mut s1) = (0i128, 1i128);
     while r1 != 0 {
@@ -138,6 +166,36 @@ fn inv_mod(a: u64, m: u64) -> u64 {
 
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
+}
+
+/// `(a + b) % n`, by one compare-and-subtract when both are reduced (the
+/// walk coefficients always are); the same value for every input.
+#[inline(always)]
+fn add_n(a: u64, b: u64, n: u64) -> u64 {
+    if a < n && b < n {
+        let s = a + b;
+        if s >= n {
+            s - n
+        } else {
+            s
+        }
+    } else {
+        (a + b) % n
+    }
+}
+
+/// `(n - a) % n` without the division when `a` is reduced.
+#[inline(always)]
+fn neg_n(a: u64, n: u64) -> u64 {
+    if a < n {
+        if a == 0 {
+            0
+        } else {
+            n - a
+        }
+    } else {
+        (n - a) % n
+    }
 }
 
 fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
@@ -565,8 +623,8 @@ fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens
             (
                 (x.0, f.neg(x.1)),
                 (c.0, f.neg(c.1)),
-                (n - a) % n,
-                (n - b) % n,
+                neg_n(a, n),
+                neg_n(b, n),
                 true,
             )
         } else {
@@ -603,7 +661,7 @@ fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens
                 iters += 1;
                 run += 1;
                 tried += 1;
-                let (na, nb) = ((a + s.0) % n, (b + s.1) % n);
+                let (na, nb) = (add_n(a, s.0, n), add_n(b, s.1, n));
                 let Some(nx) = e.add(f, Some(x), Some(s.2)) else {
                     // naP + nbQ = O.
                     if nb != 0 {
@@ -640,7 +698,7 @@ fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens
                     restarts += 1;
                     continue 'restart;
                 };
-                (x, c, a, b, _) = canon(d, (ma + ma) % n, (mb + mb) % n);
+                (x, c, a, b, _) = canon(d, add_n(ma, ma, n), add_n(mb, mb, n));
                 recent.clear();
             }
             recent.push_back((c.0, x, a, b));
@@ -702,8 +760,8 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
             let s = &steps[(c.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize];
             iters += 1;
             run += 1;
-            a = (a + s.0) % n;
-            b = (b + s.1) % n;
+            a = add_n(a, s.0, n);
+            b = add_n(b, s.1, n);
             match e.add(f, Some(x), Some(s.2)) {
                 Some(nx) => {
                     x = nx;
@@ -1487,7 +1545,7 @@ fn search(args: &Args, rng: &mut SmallRng) -> Found {
                 break c;
             }
         };
-        let f = Fp { p };
+        let f = Fp::new(p);
         for _ in 0..200 {
             tried += 1;
             let e = Curve {
@@ -1542,7 +1600,7 @@ fn from_curve(args: &Args, (p, a, b): (u64, u64, u64), rng: &mut SmallRng) -> Fo
     if !(5..1 << 62).contains(&p) || !is_prime(p) {
         die("--curve needs a prime 5 <= p < 2^62");
     }
-    let f = Fp { p };
+    let f = Fp::new(p);
     let e = Curve { a: a % p, b: b % p };
     if e.j(&f).is_none() {
         die("singular curve: 4a^3 + 27b^2 = 0 mod p");
@@ -2225,7 +2283,7 @@ mod tests {
 
     /// The registered prime-order curve `find_prime_order_curve(16, 59297)`.
     fn instance(k: u64) -> (Fp, Instance, u64) {
-        let f = Fp { p: 53411 };
+        let f = Fp::new(53411);
         let curve = Curve { a: 4589, b: 186 };
         let p = (43982, 22687);
         let q = curve.mul(&f, Some(p), k).expect("1 <= k < n");
@@ -2257,7 +2315,7 @@ mod tests {
         // A 28-bit prime-order curve (research/rho_negation_audit_20261020,
         // #E counted by this binary): the 32-jump negation walk needs a group
         // well above 2^16 before its look-ahead and escapes stop showing.
-        let f = Fp { p: 259_182_139 };
+        let f = Fp::new(259_182_139);
         let curve = Curve {
             a: 256_310_742,
             b: 86_097_094,
