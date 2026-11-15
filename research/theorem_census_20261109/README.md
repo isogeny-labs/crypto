@@ -391,6 +391,49 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [general actual torsion Frobenius bridge](../bk_general_frobenius_audit_20261115/README.md)
+constructs the actual r-killed point subgroup and canonical ZModr module for every
+naturalr, genuine coefficient pointmaps, and actual q-Frobenius linear maps.
+Frobenius is injective over any ambient field extension and an actual linear
+automorphism over algebraic extensions of a finite base. Its actual k-power
+fixedkernel is linearly equivalent to actual torsion over each compatible
+chosen finite field of sizeq^k; finiteness/cardinality follow from actual finite
+point encoding. A prime dividing actual base point count supplies a nonzero
+actual rational fixedpoint. r1trivial/r0allpoints guards are proved. No geometric
+rank2/determinantq/basis/globaltorsion-finiteness premise is smuggled into these
+claims. The original BK1998 Remarks1 F19 curve y²=x³+x+6 is checked: actual
+count18, generator(0,5) exactorder18/cyclic wholegroup, rational3kernel3,
+geometric3kernel9/fixedkernel3, actual Frobenius nonidentity and exactorder3.
+The actual division polynomial factors3(X−12)(X³+12X²+13X+9); cubic monic,
+degree3 and all19nonroots give irreducibility. Its actual AdjoinRoot field has
+dimension3/card6859 and an algebraic embedding/tower into the closure; actual
+finitefield power law and point geometry/sign rigidity prove full geometric
+3torsion over compatible19^k fields iff3|k. The constructed cubic field has all
+nine killedby3 points (including infinity), and positive extensiondegree is at
+least3. Source-only determinant19mod3 is derived. This verifies the source's
+known exception, not a new refutation/novelty/independent population. Original
+qualified BK theorem retained; arbitrary-prime geometric rank2/general detq,
+canonical Weil necessity/full all-k p<500 census and remaining14 stayopen.
+Fresh primary fulltext and individual visual review: BK1998PDF2–3/5, printed
+142–143, DOI10.1007/s001459900040, SHAac837b8edc47b346dbb341f787c41de0402c95371a159f9786b747bb2c987499.
+Earlier allr point descent, actual3basis/matrix and Cauchy credited; official
+module/Frobenius/fixedfield/AdjoinRoot methods credited. Five fresh correct KB
+calls and initial Conductor127 before processing/code; publication Conductor127
+before maps/outside pins; bounded fallback/no absenceclaim. Exact local
+**PCC-20261115-bec94e PASS at 2026-11-15T17:19:12Z**, signed standing unverified. Fresh59theorems/
+10newmodules(9concrete1adapter)/0fail0trusted/fulltransitive foundations;
+24frozen localmodules0copies/39oldformalconfigs/55oldpins checked before/after
+15states/gate,10failed5success retained. 52formal17artifact69pins. Full2588
+header SHA1496e8cfdebbf83c0db95c47a6fd234bcd8e9f29294f9a4ae96b80b88e4be677;
+native1complete0prefix0unresolved/empty suffix after completed gate. 300files/
+99objects/32344byte losslessXZ/roundtrip equal/fivegatefiles. Onepage47798PDF/
+all5064charsread/fullvisual/inbounds, first render valid/no reportdraft. New
+sourcewarnings0/38inherited exactbaseline+1auditor advisory retained. No holes/
+customaxioms/nativeproofeval/raisedlimits/newglobalflags/waivers/frozenedits/
+cryptoPython/nativecryptoexperiment/spend/upload/newphysicalhost/compiler/
+canonicalpairing or full14 claim. [pcc:unverified]
+
+
 The [both-nonzero two-choice refinement](../rho_nonzero_support_audit_20261115/README.md)
 derives an actual uniform ordered-distinct support PMF with both increments
 nonzero and the actual fair static-vertex-label first-repeat mean from0. Actual
