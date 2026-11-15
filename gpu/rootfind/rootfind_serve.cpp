@@ -15,11 +15,13 @@
  * Protocol (little-endian; the worker only proposes relations, the caller
  * re-checks every one it uses in the group):
  *
- *   INIT  u32 'RFS2', u32 n_fb, u64 p, u32 backend, u32 lookup, u32 chunk,
- *         u32 max_targets, u64 x[n_fb], u64 y[n_fb], u32 n_probe, u64 px[n_probe]
- *         (canonical; n_probe = 0: look candidates up in the base; else probe mode
- *         against px, rootfind_api.h)
- *   ->    u32 'RFS2', i32 status, u32 backend, u32 lookup, u32 chunk, u32 0
+ *   INIT  u32 'RFS3', u32 n_fb, u64 p, u32 backend, u32 lookup, u32 chunk,
+ *         u32 max_targets, u64 x[n_fb], u64 y[n_fb], u32 n_probe, u64 px[n_probe],
+ *         u64 curve_a   (canonical; n_probe = 0: look candidates up in the base; else
+ *         probe mode against px; lookup = 4 (RF_LOOKUP_PAIRS_DEVICE): probe mode
+ *         against the base's own negation-folded pair table, built by the library,
+ *         hits carrying the first pair's build index -- rootfind_api.h)
+ *   ->    u32 'RFS3', i32 status, u32 backend, u32 lookup, u32 chunk, u32 entries
  *   BATCH u32 'RFB1', u32 n, u64 x[n], u64 y[n]
  *   ->    u32 'RFB1', i32 status, u32 n_found, u32 n_written, f64 kernel_s,
  *         rf_relation[n_written]  (16 bytes: target, i, j, eps, tau, pad)
@@ -32,6 +34,7 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <vector>
@@ -42,8 +45,13 @@
 
 #include "rootfind_api.h"
 
-static const uint32_t MAGIC_INIT = 0x32534652u;  /* "RFS2" */
+static const uint32_t MAGIC_INIT = 0x33534652u;  /* "RFS3" */
 static const uint32_t MAGIC_BATCH = 0x31424652u; /* "RFB1" */
+
+static double now_s();
+/* RF_SERVE_TIMING=1: print each INIT's receive and session-create times to stderr.
+ * Off by default, so a worker's stderr stays deterministic. */
+static const bool g_timing = std::getenv("RF_SERVE_TIMING") != nullptr;
 
 static bool read_all(FILE *in, void *buf, size_t n) { return n == 0 || std::fread(buf, 1, n, in) == n; }
 static void write_all(FILE *out, const void *buf, size_t n) { if (n) std::fwrite(buf, 1, n, out); }
@@ -58,6 +66,7 @@ static void serve(FILE *in, FILE *out) {
         uint32_t magic = 0;
         if (!read_all(in, &magic, 4)) break;
         if (magic == MAGIC_INIT) {
+            const double ti0 = now_s();
             uint32_t n_fb = 0, w[4], n_probe = 0;
             uint64_t p = 0;
             if (!read_all(in, &n_fb, 4) || !read_all(in, &p, 8) || !read_all(in, w, 16)) break;
@@ -66,19 +75,30 @@ static void serve(FILE *in, FILE *out) {
             if (!read_all(in, &n_probe, 4)) break;
             px.resize(n_probe);
             if (!read_all(in, px.data(), 8ull * n_probe)) break;
+            uint64_t curve_a = 0;
+            if (!read_all(in, &curve_a, 8)) break;
             if (s) { rf64_session_destroy(s); s = nullptr; }
             rf_options opt{(int)w[0], (int)w[1], w[2]};
             const uint32_t max_targets = w[3];
             cap = 4u * max_targets + 4096u;
             rf_result info{};
-            int rc = rf64_session_create(p, x.data(), y.data(), n_fb, n_probe ? px.data() : nullptr, n_probe,
-                                         max_targets, cap, &opt, &s, &info);
+            const double ti1 = now_s();
+            uint32_t entries = 0;
+            int rc = w[1] == RF_LOOKUP_PAIRS_DEVICE
+                         ? rf64_session_create_pairs(p, curve_a, x.data(), y.data(), n_fb, max_targets, cap, &opt, &s,
+                                                     &info, &entries)
+                         : rf64_session_create(p, x.data(), y.data(), n_fb, n_probe ? px.data() : nullptr, n_probe,
+                                               max_targets, cap, &opt, &s, &info);
+            if (w[1] == RF_LOOKUP_PAIRS_DEVICE) n_probe = entries;
+            if (g_timing)
+                std::fprintf(stderr, "rootfind_serve: timing init n_probe=%u lookup=%d receive %.4f s create %.4f s\n",
+                             n_probe, info.lookup_used, ti1 - ti0, now_s() - ti1);
             if (rc == RF_OK) {
                 std::fprintf(stderr, "rootfind_serve: %s; n_fb=%u n_probe=%u lookup=%d chunk=%u max_targets=%u\n",
                              rf_backend_info(), n_fb, n_probe, info.lookup_used, info.chunk_used, max_targets);
             }
             uint32_t reply[6] = {MAGIC_INIT, (uint32_t)rc, (uint32_t)info.backend_used,
-                                 (uint32_t)info.lookup_used, info.chunk_used, 0};
+                                 (uint32_t)info.lookup_used, info.chunk_used, entries};
             write_all(out, reply, sizeof reply);
             std::fflush(out);
         } else if (magic == MAGIC_BATCH) {
@@ -113,6 +133,7 @@ static int daemon_main(const char *path) {
     const double t0 = now_s();
     /* Create the CUDA context now, so no client pays for it. */
     const int wrc = rf_warmup();
+    std::fprintf(stderr, "rootfind_serve: emulation threads %u\n", rf_emu_threads());
     std::fprintf(stderr, "rootfind_serve: daemon backend: %s (context %s, %.3f s)\n", rf_backend_info(),
                  wrc == 0 ? "ready" : "FAILED", now_s() - t0);
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);

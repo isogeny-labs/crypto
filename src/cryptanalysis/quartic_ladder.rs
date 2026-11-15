@@ -840,6 +840,59 @@ pub fn make_instance(
     })
 }
 
+/// An instance on a GIVEN smooth quartic with GIVEN generator and target
+/// classes (for example classes transferred from another Jacobian), in the
+/// representation of the curve `(q, f, p0)`.  `order = h r` is `#Pic^0`,
+/// `r` prime.  Checked here, uncharged: the curve builds with base point
+/// `p0`, `g != 0`, `[r] g = 0`, `[r] target = 0`, and `target = [t] g` when
+/// the logarithm is supplied.  `t_secret` is stored as given, or 0 when
+/// unknown (a planted logarithm is never 0).
+#[allow(clippy::too_many_arguments)]
+pub fn make_instance_from_classes(
+    q: u32,
+    f: [u32; 15],
+    p0: Pt,
+    g: &PicClass,
+    target: &PicClass,
+    order: u64,
+    h: u64,
+    r: u64,
+    n_points: u64,
+    t_secret: Option<u64>,
+) -> Result<QInstance, String> {
+    let pq = PlaneQuartic::new(q, f, p0).map_err(|e| format!("curve: {e:?}"))?;
+    if pq.base_point() != pq.normalize_point(p0) {
+        return Err("base point changed".into());
+    }
+    if h.checked_mul(r) != Some(order) {
+        return Err(format!("order {order} != h r = {h} * {r}"));
+    }
+    if pq.is_zero(g) || !pq.is_zero(&pq.mul_scalar(g, r as u128)) {
+        return Err("generator does not have order r".into());
+    }
+    if !pq.is_zero(&pq.mul_scalar(target, r as u128)) {
+        return Err("target is not in the subgroup of order r".into());
+    }
+    if let Some(t) = t_secret {
+        if pq.mul_scalar(g, t as u128) != *target {
+            return Err("target != [t] g".into());
+        }
+    }
+    Ok(QInstance {
+        q,
+        f,
+        p0: pq.base_point(),
+        order,
+        h,
+        r,
+        n_points,
+        t_secret: t_secret.unwrap_or(0),
+        g: QClass::from(g),
+        target: QClass::from(target),
+        curve_seed: 0,
+    })
+}
+
 // ── Diem index calculus ─────────────────────────────────────────────────
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1381,6 +1434,80 @@ mod tests {
         let mut nat = Nat::default();
         let pts = rational_points(q, &f, &mut nat);
         (pq, pts)
+    }
+
+    /// An instance rebuilt from its own classes is the same instance, and a
+    /// solve on it returns the planted logarithm.
+    #[test]
+    fn instance_from_given_classes() {
+        let inst = (1..200)
+            .find_map(|cs| make_instance(131, cs, cs, 64).ok())
+            .expect("an admitted quartic");
+        let g: PicClass = inst.g.into();
+        let t: PicClass = inst.target.into();
+        let again = make_instance_from_classes(
+            inst.q,
+            inst.f,
+            inst.p0,
+            &g,
+            &t,
+            inst.order,
+            inst.h,
+            inst.r,
+            inst.n_points,
+            Some(inst.t_secret),
+        )
+        .unwrap();
+        assert_eq!(
+            (again.q, again.f, again.p0, again.order, again.h, again.r),
+            (inst.q, inst.f, inst.p0, inst.order, inst.h, inst.r)
+        );
+        assert_eq!(
+            (again.g, again.target, again.t_secret),
+            (inst.g, inst.target, inst.t_secret)
+        );
+        let res = run_diem(
+            &again,
+            QIcParams {
+                arm: QArm::DoubleLp,
+                nb: (3.0 * f64::from(inst.q).sqrt()).ceil() as usize,
+                seed: 1,
+                max_lines: 50_000_000,
+                verify_relations: false,
+            },
+        );
+        assert!(res.certified);
+        assert_eq!(res.recovered, Some(inst.t_secret));
+        let rho = run_rho(&again, 1);
+        assert_eq!(rho.recovered, Some(inst.t_secret));
+        // Wrong data is refused.
+        let wrong = make_instance_from_classes(
+            inst.q,
+            inst.f,
+            inst.p0,
+            &g,
+            &t,
+            inst.order,
+            inst.h,
+            inst.r,
+            inst.n_points,
+            Some(inst.t_secret % (inst.r - 1) + 1),
+        );
+        assert!(wrong.is_err());
+        let zero = inst.curve().zero();
+        assert!(make_instance_from_classes(
+            inst.q,
+            inst.f,
+            inst.p0,
+            &zero,
+            &t,
+            inst.order,
+            inst.h,
+            inst.r,
+            inst.n_points,
+            None,
+        )
+        .is_err());
     }
 
     #[test]

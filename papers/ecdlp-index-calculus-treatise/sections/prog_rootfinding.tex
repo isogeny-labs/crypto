@@ -125,7 +125,8 @@ PDP oracle family &
 CUDA kernel &
   one thread per (target, slice); per-thread Montgomery inversion; SoA
   base; shared-memory hash for $\abs\Fb\le2048$; 64-bit and P-256 fields.
-  Checked in host emulation only (no GPU available); no validation file.
+  Checked in host emulation only until 12 November, then measured on an
+  A100 (\S\ref{sec:rf-gpu}).
   \art{RESEARCH_GPU_ROOTFIND_DECOMPOSITION.md} \\
 ecbench engines &
   \texttt{pdp3-koblitz:m=2|3,engine=rootfind}, \texttt{rootfind-subtract},
@@ -336,3 +337,110 @@ $\Theta(\abs\Fb^{m-1})$, every measurement is at $m\le4$, and it leaves
 relation yield, factor-base size and linear algebra untouched. Its effect
 on the cold frontier is to move the decomposition stage from dominant to
 minor, which exposes the stages that now are.
+
+\section{Root finding on a GPU, 12--14 November}\label{sec:rf-gpu}
+
+The CUDA kernel (one thread per target and slice) first ran on hardware on
+12 November, on an A100 80\,GB PCIe, CUDA 12.8 (\S\ref{sec:in-gpuic}). The
+audit's commits moved its time at $\abs\Fb=1{,}024$ from $23.53$ to
+$19.91$\,ms and left $\abs\Fb=65{,}536$ unchanged ($0.995$--$1.000$); a fused
+unwind and sweep was rejected, and the launch knobs stayed at their
+defaults (\art{research/ic_gpu_measure_20261112/REPORT.md}). Every number
+in this section is \texttt{[pcc:unverified]}.
+
+\paragraph{Where the cycles go.} RunPod blocks the profiler counters, so
+an instrumented build sampled \texttt{clock64()} at the phase boundaries of
+one thread in 1{,}024 (\art{research/ic_gpu_replay_20261114/REPORT.md}).
+Table probes took 62--85\% of the sampled cycles at $\abs\Fb=65{,}536$ and
+41--60\% at $\abs\Fb=1{,}024$; the sweep's field arithmetic took 7.7--24.7\%. The
+instrumented kernel runs $0.72$--$1.21\times$ the plain one's time, so the
+split describes the instrumented kernel; that the lookups are bound by
+memory latency is the source's interpretation.
+
+\paragraph{Cheaper lookups.} Three changes keep the relation set and its
+emission order: one 64-bit slot per hash entry (key tag and index, one load
+per probe step), the two $\varepsilon$ lookups of a base entry issued
+together, and an Eytzinger-ordered copy of the sorted keys. The host tests
+found a bug in the first paired Eytzinger search (it read past the array
+when the two descents left the tree at different levels); the new
+primitive test fails with $3{,}610$ mismatches on the buggy version. Eight
+builds, main twice as A/A, five rotated rounds at two workloads
+(Table~\ref{tab:rf-gpu-lookup};
+\art{research/ic_gpu_rootfind_lookup_20261114/REPORT.md}). An independent
+validator recomputed every headline number from the raw tarball and
+returned ``validated, scoped'': a kernel-time speed-up on one A100 at the
+two workloads, with relation identity resting on device selftests, and four
+wording corrections, applied in the source
+(\art{research/ic_gpu_rootfind_lookup_20261114/VALIDATION_REVIEW.md}). The
+three flags are on by default since 14 November.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+arm & $\abs\Fb=65{,}536$, $65{,}536$ targets & $\abs\Fb=1{,}024$, $262{,}144$ targets \\
+\midrule
+main (best configuration) & sorted/C16 $401.70$\,ms & hash/C16 $19.87$\,ms \\
+Eytzinger & $1.050\times$ & $1.000\times$ \\
+packed hash & $1.000\times$ & $1.112\times$ \\
+paired & $0.999\times$ & $1.019\times$ \\
+Eytzinger + paired & $1.116\times$ & $1.019\times$ \\
+packed + paired & $1.000\times$ & $1.120\times$ \\
+all three & $\mathbf{1.115\times}$ ($360.19$\,ms) & $\mathbf{1.121\times}$ ($17.73$\,ms) \\
+\bottomrule
+\end{tabular}
+\caption[]{Root-finding lookup variants on one A100: main's best kernel
+time over each arm's best, per workload, median of five rounds (61-bit
+prime field). The A/A builds differ by at most $0.06\%$. Per
+configuration, all three is faster than main at 12 of 12 configurations
+($0.646$--$0.914$ of main's kernel time). A kernel-component result, no
+counted-cost or rho claim. Validated (scoped) by an independent review;
+\texttt{[pcc:unverified]}. Source:
+\art{research/ic_gpu_rootfind_lookup_20261114/REPORT.md}.}
+\label{tab:rf-gpu-lookup}
+\end{table}
+
+\paragraph{In a complete solve.} \texttt{rootfind-subtract-gpu} ($m=2$)
+runs \texttt{rootfind-subtract}'s sweep on a persistent device session
+and confirms each target's first hit through the CPU oracle; it is charged
+exactly as the CPU oracle, and the extra device work is reported as
+uncharged \texttt{gpu\_*} counters (\art{research/ic_gpu_rootfind_ic_20261114/REPORT.md}).
+One frozen ecbench spec ran on 14 November on one A100 (AMD EPYC 9454
+host): three prime-order curves of 28, 30 and 32 bits, two targets, two
+rounds, prime-abscissa bases of $4{,}096$ and $16{,}384$, negation rho and an
+A/A copy. All 72 records verified and replayed; all 24 CPU/GPU pairs have
+equal $S$, logarithm, relations and relation-phase additions.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$\log_2r$ & $\abs{\Fb_x}$ & mean $S$ & $S$/rho & CPU solve (s) & GPU solve (s) & relations, CPU/GPU \\
+\midrule
+27.5 & 4{,}096 & 6{,}259 & 6{,}403 & 1.88 & 0.489 & $25.8\times$ \\
+27.5 & 16{,}384 & 3{,}639 & 3{,}723 & 2.72 & 1.07 & $21.4\times$ \\
+30.0 & 4{,}096 & 18{,}007 & 13{,}154 & 12.4 & 0.507 & $84.4\times$ \\
+30.0 & 16{,}384 & 14{,}371 & 10{,}498 & 12.1 & 1.39 & $77.8\times$ \\
+31.3 & 4{,}096 & 26{,}010 & 22{,}986 & 28.0 & 0.643 & $113.2\times$ \\
+31.3 & 16{,}384 & 23{,}265 & 20{,}560 & 28.6 & 1.51 & $121.2\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{\texttt{rootfind-subtract} against \texttt{rootfind-subtract-gpu}
+in complete prime-field index-calculus solves: $S$ is the same for both
+arms; wall columns are medians of 4 paired runs (CPU arm one thread, GPU
+arm one thread plus the device). $S$/rho is the distance remaining, and
+it grows with $r$. No validator yet; \texttt{[pcc:unverified]}. Source:
+\art{research/ic_gpu_rootfind_ic_20261114/REPORT.md}.}
+\label{tab:rf-gpu-ic}
+\end{table}
+
+\noindent Table~\ref{tab:rf-gpu-ic} is a wall-time change on one host and
+no counted-cost improvement. The GPU solve is now dominated by the worker
+start and CUDA context ($0.25$--$0.35$\,s per solve, since ecbench runs each
+record in a fresh process) and, at $\abs{\Fb_x}=16{,}384$, by the linear
+algebra ($0.69$--$0.94$\,s on both arms). A two-summand subtraction search
+does relation work that grows like $r$ against rho's $\sqrt r$, so its gap
+of $3{,}700$--$23{,}000\times$ grows with the curve. Prefetching the next
+Eytzinger level made the sorted path slower in every variant
+($1.31$--$1.92\times$ at $\abs\Fb=65{,}536$, $1.21$--$1.81\times$ at $1{,}024$),
+against A/A arms within $0.16\%$; the flag stays in the tree, off.
