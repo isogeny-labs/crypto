@@ -391,6 +391,40 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual Miller basechange audit](../miller_basechange_audit_20261115/README.md)
+constructs an injective actual function-field embedding under field extensions,
+proves actual norm/infinity valuation and leading-residue-one compatibility,
+and actual point/step/every-n chosen-function compatibility. Proper
+GeometricMiller includes actual discriminant nonzero and actual function/point
+images in actual AlgebraicClosureK with the full geometric divisor. Actual
+constructed functions satisfy it; any proper function equals the chosen base
+function. Exact chosen i+j addition descends to every base field, including
+characteristics2/3 and zero/vertical branches. The credited prior normalized
+nonconstant F3 ratio times every chosen function satisfies our old rational-only
+predicate, differs from the chosen function, fails the proper predicate and has
+the wrong actual embedded geometric divisor for every actual P,n. n0/n1 equal
+the ratio; its actual embedded geometric divisor is nonzero. Our weak definition
+is false; qualified source Definition26.3.4/Exercise26.3.5 survive. Full finite-point/
+local-divisor/scheme/tensor basechange, Galois descent, evaluation/translation/
+reciprocity/isogeny/Lang/Cartier/Jacobian/canonical pairing/MOV-FR/binary runtime
+remain separate. Exact local **PCC-20261115-b11451** PASS at2026-11-15T10:06:31Z; signedunverified.
+Whole471/0fail/0trusted/standardfoundations;67modules58exactcredited+9new/
+70formal-config+17artifactpins;full2145-character complete native binding.
+Initial gate471accepted the full valid theorem but exporter recorded161of2253
+characters; native parser exit0 reported0complete/1prefix. Transparent positional
+aliases retained every hypothesis/conclusion; final native1complete/0prefix/
+0unresolved, both source/export/gate/native states retained. Frozen verifier/
+keyring unchanged; existing prefix study credited. Tenstates/fourfailures/
+sixsuccesses;153files/73objects/23492byte losslessXZ/
+fivefinalgate/PDF47596fulltextread/visual/inbounds. Final10projectlogs clean;
+04two unused-simp advisories and inherited auditor String.mk deprecation retained.
+Ch26 exact partial reading and ch7 additional partial text scope recorded;
+not whole chapters. Official coordinate/point/fraction/norm maps and prior
+geometric uniqueness credited. Four correct KB calls127 before queryprocessing,
+Conductor127 fallback. No novelty/canonicalpromotion/newphysicalhost/frozenedits/
+cryptoPython/spend/upload. [pcc:unverified]
+
+
 The [actual geometric principal-divisor audit](../geometric_principal_divisor_audit_20261115/README.md)
 proves degreezero for every actual nonzero elliptic rational function under
 actual IsAlgClosed K and nonzero-discriminant guards, including characteristics2/3.
