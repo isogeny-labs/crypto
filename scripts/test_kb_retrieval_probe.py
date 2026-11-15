@@ -49,6 +49,20 @@ class ProbeTest(unittest.TestCase):
         self.assertIsNone(probe.rank_of(RESULTS, "crypto-autoresearcher", "knowledge/missing.md"))
         self.assertEqual(probe.rank_of([], "x", "y"), None)
 
+    def test_rank_of_any_accepts_alternate_copy(self):
+        copies = [
+            {"origins": [{"repo": "crypto", "path": "docs/curve-identities.md"}]},
+            {"origins": [{"repo": "cryptanalysis", "path": "docs/curve-identities.md"}]},
+        ]
+        accepted = [
+            ("crypto-autoresearcher", "docs/curve-identities.md"),
+            ("cryptanalysis", "docs/curve-identities.md"),
+        ]
+        self.assertEqual(probe.rank_of_any(copies, accepted), 2)
+        self.assertIsNone(probe.rank_of_any(copies, [("crypto-autoresearcher", "docs/other.md")]))
+        self.assertEqual(probe.candidates({"accept_any": ["a:x.md", "b:y.md"]}), [("a", "x.md"), ("b", "y.md")])
+        self.assertEqual(probe.candidates({"repo": "a", "path": "x.md"}), [("a", "x.md")])
+
     def test_summarize_counts(self):
         stats = probe.summarize([1, 4, None], top_k=5)
         self.assertEqual(stats["queries"], 3)

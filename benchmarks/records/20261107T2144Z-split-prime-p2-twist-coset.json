@@ -1,0 +1,136 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-07T22:27:42+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "launched by executor-mechanical with BENCHREC=<this record> in its environment (the hook-accepted form), not via benchrec run; started_utc = first m1 call start minus the build step's receipt seconds; wall_s = sum of the receipt's per-command seconds; exit from the receipt (status completed)",
+      "started_utc": "2026-11-07T21:44:39.728000+00:00",
+      "wall_s": 885.508
+    }
+  ],
+  "commit": "72004b435c02aae8bd7e5aff9fb31429e146cec8",
+  "commit_dirty": false,
+  "created_utc": "2026-11-07T21:44:09+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T2144Z-split-prime-p2-twist-coset",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "f4_work_rel_diff_selected_vs_random_max",
+      "note": "derived by p2analyze; A/A 0.45 %; kill line 10 %",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.39
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 36,
+      "name": "coverage_law_max_deviation",
+      "note": "derived; kill line 20 %",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 0.93
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 24,
+      "name": "purity_nontrivial_violations",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 8,
+      "name": "gain_min_t4",
+      "note": "(c_sel/c_rand)^m at t=4, curve 0; frozen rule 4 threshold 1.2",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 2.25
+    }
+  ],
+  "problem": "ic:split-prime-p2-twist-coset-toy",
+  "raw": [
+    {
+      "bytes": 51346,
+      "path": "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/23/2339b349af40589bb3cc879f26bc8559ceed58891bc0ddd8624b51fd37ae0484",
+      "sha256": "2339b349af40589bb3cc879f26bc8559ceed58891bc0ddd8624b51fd37ae0484",
+      "uploaded": true
+    },
+    {
+      "bytes": 61912,
+      "path": "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m2.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/87/87c6c6111a7ea9aaed8254f3d7751cbd7b24021c1e074b4465db6cc277588b4a",
+      "sha256": "87c6c6111a7ea9aaed8254f3d7751cbd7b24021c1e074b4465db6cc277588b4a",
+      "uploaded": true
+    },
+    {
+      "bytes": 258186,
+      "path": "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m3.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f37f55adce17921144043b586304def1efd7c965a5285dbc53f33ea36df067f9",
+      "sha256": "f37f55adce17921144043b586304def1efd7c965a5285dbc53f33ea36df067f9",
+      "uploaded": true
+    },
+    {
+      "bytes": 17650,
+      "path": "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/580fa2c5ad26ebf5c4955d5df4380f8b36718a6d1ef608d9376aa9152a950d27",
+      "sha256": "580fa2c5ad26ebf5c4955d5df4380f8b36718a6d1ef608d9376aa9152a950d27",
+      "uploaded": true
+    },
+    {
+      "bytes": 608,
+      "path": "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/analysis/derived/decision.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c1/c1d7b85e0d3395abf953fc51bf82e32f1f5230d6da24d4a3e7586a634efac051",
+      "sha256": "c1d7b85e0d3395abf953fc51bf82e32f1f5230d6da24d4a3e7586a634efac051",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/report/REPORT.pdf",
+    "png": [
+      "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/figures/p2_summary.png"
+    ],
+    "svg": [
+      "research/split_prime_ecdlp_20261107/followups/p2_twist_coset/figures/p2_summary.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p2-twist-coset",
+  "status": "measured",
+  "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+  "validation": null
+}

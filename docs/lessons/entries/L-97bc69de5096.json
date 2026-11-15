@@ -1,0 +1,15 @@
+{
+  "action": "expect later steps to have been masked: after the fix lands, read the next run's log to the end before calling the job fixed",
+  "created": "2026-11-15T06:19:58Z",
+  "evidence": [
+    "research/lab_checks_fix_20261114/NOTE.md",
+    "docs/session-logs/2026-11-15.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "fixing the first failing step of a CI job that has been red for a while",
+  "why": "ic-leaderboard: removing the artifact 404 (#4207) exposed check_ic_leaderboard_paths.py missing 161 inputs, fixed in #4219"
+}

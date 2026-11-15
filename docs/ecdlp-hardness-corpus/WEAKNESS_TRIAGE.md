@@ -350,10 +350,14 @@ report) [pcc:unverified]; the Lean results have pcc claim records pending CI sig
 - **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** 119 instances, n = 8 to 47 [pcc:unverified].
   The iterated degree-3 closure reaches all k linear consequences for n ≤ 14 and n = 16,
   and only 1 of them at n = 15 and on all 84 instances from n = 17 to 44. Degree 4 reaches
-  k on 24 of 24 fresh instances at n = 17 to 24. The literal reading (degree 2) fails
-  everywhere, and the Kousidis–Wiemers value 3 is not reached from n = 17 to 44
-  (`MEAS-PQ2-DLIN-CENSUS` obstructs `HEUR-GB-PQ-ASSUMPTION-2`). This cuts against the
-  subexponential binary-curve heuristics.
+  k on 33 of 33 fresh instances at n = 17 to 27, and msolve's F4 reaches maximal step
+  degree exactly 4 on all 54 main-sweep instances at n = 17 to 34. The literal reading (degree 2) fails
+  on the 111 instances with n ≤ 44, and the Kousidis–Wiemers value 3 is not reached from n = 17 to 44
+  (`MEAS-PQ2-DLIN-CENSUS` obstructs `HEUR-GB-PQ-ASSUMPTION-2`). msolve's degree 4
+  over n = 17 to 34 matches Kousidis–Wiemers' Magma value for n ≤ 36; they report 5 from
+  n = 37 (`MEAS-GB-KW-TABLE1`), so this window does not decide boundedness
+  (`MEAS-PQ2-MSOLVE-F4`).
+  `THM-F4-CONTAINMENT` (Lean) makes the census values lower bounds for F4.
   The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis
   inside the degree-d Macaulay row space supplies at most dim(rowspace ∩ P₁) linear
   leading monomials, so `d_lin ≤ sd`. The `|Z| = 1` case of the bridge `k = N` is
@@ -403,3 +407,29 @@ validation gate) before any number enters the corpus.
 node docs/ecdlp-hardness-corpus/weakness.mjs          # writes WEAKNESSES.md, weakness.json, weakness-queue.svg
 node docs/ecdlp-hardness-corpus/weakness.mjs --check  # fails if they are stale
 ```
+
+## Round 6 (2026-11-08): a formal counterexample family for the extension-field decomposition heuristics
+
+Owner request: go after weak links in the ECDLP graph formally. The queue's precisely stated
+heuristics were screened for claims false as literally recorded and settleable by a Lean
+theorem. `HEUR-SP-JV-ASSUMPTION1` qualified: its only recorded hypothesis is `#F ∈ Ω(q)`, with
+no condition on the curve.
+
+- **`CEX-SUBFIELD-FACTOR-BASE` (Lean, `SubfieldFactorBase`).** For a curve over `F_q` and odd
+  `n`, every point of `E(F_{q^n})` with `x ∈ F_q` already lies in `E(F_q)` (a root of a monic
+  quadratic over `F_q` cannot have degree 2 over `F_q` inside an odd-degree extension). Every
+  sum of factor-base points therefore stays in `E(F_q)`: at most `2q + 1` points, proved
+  [pcc:unverified]. Claims PCC-20261108-8e873f and PCC-20261108-1ff9e1 await CI signing.
+- **Refuted reading.** `CLAIM-JV-ASSUMPTION1-ALL-CURVES`: subfield curves with `n ≥ 3` odd
+  satisfy `#F ∈ Ω(q)` (Hasse, cited) yet have at most `2q + 1` decomposable points, not
+  `Ω(q^{n-1}/(n-1)!)`. The same family breaks the `1/n!` proportion of
+  `HEUR-BK-GG-DECOMP-PROPORTION`, whose "no unexpected collisions" assumption fails wholesale.
+  The `ext_decomp` census control at `n = 3` measured 0.0003 to 0.002 against `1/6`
+  [pcc:unverified].
+- **What survives.** Both heuristics remain open for curves whose coefficients generate
+  `F_{q^n}`; the repair is an explicit non-subfield condition.
+- **Screened and not pursued.** The "r does not divide q" cluster (impact 17) states its
+  assumptions explicitly, so there is nothing false to refute. `HEUR-GG-DGM-CYCLE-RATES` is
+  exact (`1/(2r)`) under its random-branch model. `HEUR-SP-SEMAEV15-ASSUMPTION1` (`d_F4 ≤ 4`)
+  awaits the n = 37 msolve run on isolab-eks; the closure route would take about 58 hours at
+  n = 37.
