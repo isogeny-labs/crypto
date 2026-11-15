@@ -2678,3 +2678,42 @@ promotion/newhost/backend/runtime/frozenedits/cryptoPython/raisedlimits/global
 flags/waivers/spend/upload. General scheme/divisor basechange/descent,
 translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonical Weil–Tate/MOV–FR
 and the remaining fourteen-item obligations stay open. [pcc:unverified]
+
+
+### Actual JV origin localization length and chart controls
+
+The [actual JV local-multiplicity proof](../research/jv_local_multiplicity_audit_20261115/README.md)
+derives self-module length8 and locality for the literal first homogeneous F101
+quotient, unique isolated origin prime, canonical origin localization with its
+own self-module length8, and actual origin/localized residue fields F101.
+No locality, length, isolation, residue or evaluation-correctness conclusion is
+supplied as a premise. Actual basis tails form a strict eight-step ideal flag;
+scalar restriction supplies the upper bound. Actual h³≠0/h⁴=0 proves nonreducedness.
+The first actual h=1 quotient and principal-open localization are zero rings,
+self-length0 and not nontrivial local. The second literal source triple has the
+actual F101 root(69,75,1); actual descended quotient/open evaluation maps prove
+both charts nontrivial, without uniqueness, whole-curve/order/scalar/decomposition
+claims. The cone pointcard1 over every characteristic101 field is explicitly a
+corollary of the credited all-field zero characterization. The actual ring length
+is8 despite one distinct point. The ordinary cone is not Diem's product-projective
+multihomogeneous setup; qualified n!dⁿ with multiplicities remains unrefuted.
+Exact local **PCC-20261115-2e7ce0** replay PASS at 2026-11-15T14:21:50Z; signed standing unverified.
+Fresh73theorems/6new modules/0failures/0trusted-native exemptions/full transitive
+standard foundations;18frozen dependency modules/0copies/prior gates26 and28
+credited separately.42formal+17artifact=59pins. All61predecessor pins unchanged
+before/after eleven numbered states; six failures/five successes retained.
+Full935-character binding/native1complete/0prefix/0unresolved/empty omitted suffix.
+206files/86objects/32736byte losslessXZ/five gate files;
+one-page48087byte PDF fully read, visually inspected and inbounds.
+Zero new-source warnings;12inherited module advisories and1frozen auditor
+deprecation preserved. Fresh fulltext+visual JV PDF7/21 and DiemPDF6–8/printed79–81
+of31; no whole-paper claim. Eight exact historical native files retained; raw
+GB sizes6/1/2 are not a direct multiplicity8 certificate. No solver rerun.
+Five correct KB calls/initial Conductor call127 before processing/code; second
+publication-scope Conductor127 before living-map edits is outside the frozen
+packet. Bounded primary/official/local fallback; no absence or novelty claim.
+Actual Scheme localRing/cycle comparison, general multihomogeneous intersection,
+positive-dimensional isolated components/projective cycles, Rojas C refinement
+and the remaining fourteen-item obligations stay open. No new host/compiler
+independence, canonical promotion, cryptoPython, limits/flags/waivers/frozen edits,
+paid compute or agent uploads. [pcc:unverified]
