@@ -575,3 +575,21 @@ of everything seen before it was written. The essentials are restated here:
   cost, the auxiliary search and matched rho.
 - **Preconditions for the first job:** Amendment 15's (owner ceilings and balance); S3 working, with `705b151b…` in the
   artifact store and a resume checkpoint and `bench.record/v1` written. No `P1` isogeny row existed when this was frozen.
+
+## Amendment 17 (2026-11-15; storage only; before any job of Amendment 16 runs): git in place of S3
+
+Owner decision 12 (`research/open_leads_execution_20261108/DECISIONS.md`), "store in git. do 1-5", given after S3 failed for
+this session with `InvalidAccessKeyId`. For the jobs of Amendment 16 it replaces every S3 requirement of Amendments 15 and 16.
+Nothing else changes.
+
+- **Results.** Each job's results are fetched from the pod with the pod's own per-file SHA-256 manifest (`/manifest`), checked
+  file by file, and committed under `research/pkm_falldegree_unblock_20261107/results/ISO/<job>/`, with the manifest and the
+  tarball's SHA-256. Fetches happen at every check-in, so a lost pod loses at most the work since the last fetch.
+- **Binary.** `pkm_tower_pilot_r4` (`705b151b…`) is not committed. It is rebuilt bit-for-bit from the committed source and patch
+  (Amendment 16; `runpod/REBUILD.md` shows the recipe reproduces the frozen binaries exactly). Its SHA-256 is checked on the pod
+  by the runner.
+- **Resume note.** `research/pkm_falldegree_unblock_20261107/iso/RESUME_ISO.md`, committed and updated at each check-in.
+- **Checkpoint hook.** The hook's S3 push cannot succeed in this session, so launch commands use its recorded opt-out (a pcc
+  ledger entry naming decision 12).
+- **Amendment 15 §3** ("no job starts while S3 upload is unavailable") reads, for these jobs: no job starts unless the session
+  can commit and push to the study branch.
