@@ -1,6 +1,6 @@
 # Workspace unavailable at the elliptic7 to Jacobian7 handoff
 
-- **Status:** open
+- **Status:** resolved (execution/custody restored;research objective remains open)
 - **Kind:** access/tool limit; execution environment failure, cause unknown
 - **Affected work:** [CT19 recovery](../research/chained_jacobian_transfers_20261110/EMERGENCY_RESUME_20261111.md),
   [CT20 plan](../research/chained_jacobian_transfers_20261110/CT20_PLAN.md),
@@ -37,12 +37,12 @@ full109 preservation,not a prospective plan. [pcc:unverified]
 
 ## What would unblock it
 
-- [ ] Restore a working execution workspace and inspect original
+- [x] Restore a working execution workspace and inspect original
   HEAD/index/uncommitted/untracked files before modifying them.
-- [ ] Preserve original PCC records/receipts if present;otherwise retain
+- [x] Preserve original PCC records/receipts if present;otherwise retain
   fresh recovered-root-example and four-helper-gate receipts and register
   new records through the existing CLI without fabricating lost IDs.
-- [ ] Resume the first CT20 image2-torsion gluing inventory under unchanged
+- [x] Resume the first CT20 image2-torsion gluing inventory under unchanged
   correctness/admission requirements.
 
 Execution availability is necessary for construction/testing;it does not
@@ -73,3 +73,13 @@ and published producer data without rewriting the ledger. The connector
 cannot run local Rust/Lean or dispatch the manual proof workflow with the
 currently exposed actions;no substitute proof run is claimed. Completing
 this record does not complete the research objective. [pcc:unverified]
+
+## 2026-11-11 restoration resolution
+
+Usable execution restored;original records/receipts and unchanged two ledger
+rows recovered in dcd324f35. Actual native gluing inventory,complete rational
+Phi/PhiHat and full geometric kernel checks pass;see
+[SEVEN_JACOBIAN_CHECKPOINT.md](../research/chained_jacobian_transfers_20261110/SEVEN_JACOBIAN_CHECKPOINT.md).
+These satisfy this access/custody record exit conditions. S3/budget,ledger/
+archive,formal geometry and next-chain obligations remain separate/open.
+[pcc:unverified]
