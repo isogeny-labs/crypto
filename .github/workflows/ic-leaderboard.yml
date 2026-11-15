@@ -23,6 +23,7 @@ name: ic-leaderboard
 # tools/artifacts pull: research/pencil_sparse_20261022 research/projective_law_followup_20261022
 # tools/artifacts pull: research/three_leads_e2e_20261018/results
 # tools/artifacts pull: research/ic_tableb_binary_ksum_20261115
+# tools/artifacts pull: research/ic_ksum_prune_20261115
 
 on:
   push:
@@ -71,6 +72,8 @@ on:
       - 'research/ic_gw_nrm_lz_20261115/**'
       - 'research/ic_tableb_binary_ksum_20261115/**'
       - 'benchmarks/20261115-tableb-binary-ksum/**'
+      - 'research/ic_ksum_prune_20261115/**'
+      - 'benchmarks/20261115-ksum-prune-tableb/**'
       - 'research/ic_tool_program/explorations/build-steps-20261113/summary.json'
       - 'research/ic_tool_program/explorations/filter-layout-20261113/ab/summary.json'
       - 'research/ic_tool_program/rule/v3/runs/**'
