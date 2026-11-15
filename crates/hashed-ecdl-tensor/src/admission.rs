@@ -14,6 +14,8 @@
 use crate::{invalid, BigUint, Result};
 use num_traits::{One, ToPrimitive};
 
+pub mod dimensions;
+
 const EPSILON_DENOMINATOR: u64 = 128 * 1024;
 
 /// Exact numeric parameters and guard decisions for one recursion node.
