@@ -19,9 +19,9 @@ int main(int argc,char**argv){
             mca::require(reconstructed.terms==basis[i].terms,"input-row identity mismatch");}
         std::string extra;mca::require(!(cert>>extra),"trailing certificate content");
         std::size_t steps=0;
-        for(const auto&f:s.equations)mca::require(mca::normal_form(f,basis,steps).terms.empty(),"original generator not included");
         for(std::size_t i=0;i<basis.size();++i)for(std::size_t j=i+1;j<basis.size();++j)
             mca::require(mca::normal_form(mca::s_polynomial(basis[i],basis[j]),basis,steps).terms.empty(),"Buchberger completion failed");
+        for(const auto&f:s.equations)mca::require(mca::normal_form(f,basis,steps).terms.empty(),"original generator does not reduce to zero");
         std::cout<<"PASS source identities, original inclusion and Buchberger completion; basis="<<basis.size()<<" normal_form_steps="<<steps<<'\n';return 0;
     }catch(const std::exception&e){std::cerr<<"REJECT/UNKNOWN: "<<e.what()<<'\n';return 2;}
 }

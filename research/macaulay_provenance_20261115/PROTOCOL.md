@@ -109,3 +109,28 @@ old binaries/source commit38c0d23859 and raw panel. No degree, support, time,
 memory or verifier criterion is loosened, and no further retry is authorized
 by A1. The repeat is justified by this actual candidate-construction change;
 completion may still remain unknown. No timing comparison is admitted.
+
+## Amendment A2 — diagnostic logic and saved-certificate replay
+
+A1 still returns unknown on all3 norm caps. The candidate now literally
+contains every original generator, so the old message `original generator
+not included` is too strong: nonzero division remainder under an incomplete
+basis does not prove ideal non-membership. The initial checker criterion was
+sufficient for acceptance, but its failure label/interpretation was inaccurate.
+Preserve both panels and correct that interpretation explicitly.
+
+Change only verifier check order/diagnostics: source identities, then all
+S-polynomial reductions (completion), then original-generator reductions.
+The acceptance conjunction stays identical; use the message `original
+generator does not reduce to zero`. Freeze exactly one checker-only replay
+of the saved002 six positive/four negative/three norm candidates, with fresh
+hashes/logs and unchanged20s/2GiB bounds. Do not regenerate source rows or
+rerun the producer. Expected positives pass; the deliberately missing original
+is rejected after its candidate GB check; incomplete norm candidates remain
+unknown/rejected at completion. No new degree or resource experiment.
+
+A1's phrase about a possible proper subideal was a general possibility, not
+an established property of these norm candidates. Source membership cannot be
+inferred negatively from a nonzero normal form before GB completion is known.
+The first panels' raw error messages are historical diagnostics, not proofs
+of that stronger statement or a certificate-degree lower bound.
