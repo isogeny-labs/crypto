@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Genus ladder scaling</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+<style>body{font-family:system-ui,sans-serif;font-size:10.5pt;line-height:1.4;max-width:1000px;margin:auto;color:#0b0b0b}table{border-collapse:collapse;margin:8px 0;font-size:9pt}th,td{border:1px solid #d8d7d2;padding:3px 6px}th{background:#f1f0ec}img{max-width:100%}code{font-size:9pt;background:#f4f3ef;padding:0 2px}h1{font-size:17pt}h2{font-size:13.5pt;margin-top:18px}header{display:none}</style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Genus ladder scaling</h1>
+</header>
+<h1
+id="genus-ladder-follow-up-2-genus-2-to-p-224-and-genus-3-to-p-215-results-2026-11-15">Genus
+ladder, follow-up 2: genus 2 to p = 2^24 and genus 3 to p = 2^15 —
+results (2026-11-15)</h1>
+<p>Status: <code>[pcc:unverified]</code> (shared 4-vCPU host, no
+independent replay). Protocol <a
+href="PROTOCOL.md"><code>PROTOCOL.md</code></a>, frozen
+<code>30e46a98d6</code>; Amendment 1 (full-base arm dropped above 2^18,
+before any datum of those cells) in the same file. Binary sha
+<code>61ccabd2…</code>. Data <code>scale_g2.jsonl</code>,
+<code>scale_g2b.jsonl</code>, <code>scale_g3.jsonl</code>;
+<code>g2_analysis.json</code>, <code>g3_analysis.json</code>;
+<code>tables_g2.md</code>, <code>tables_g3.md</code>;
+<code>data.sha256</code>. Bench record
+<code>benchmarks/records/20261115T0317Z-genus-ladder-scale.json</code>.</p>
+<h2 id="run">Run</h2>
+<p>234 runs, all certified, 0 skipped. Genus 2: 12 primes 8209 …
+16,777,259 (arms a to 262,147; c and R throughout), 3 curves × 2 seeds,
+<code>h &lt;= 8</code>. Genus 3: 8209, 16411, 32771, arms a, c, R. Wall:
+1h50 + 1h for genus 2 (the full-base solve alone was 54 min at 262,147),
+about 1h for genus 3 (dominated by the O(p²) point count of the order
+search).</p>
+<figure>
+<img src="fig_ratio_g2.png" alt="genus 2" />
+<figcaption aria-hidden="true">genus 2</figcaption>
+</figure>
+<figure>
+<img src="fig_cost_g3.png" alt="genus 3" />
+<figcaption aria-hidden="true">genus 3</figcaption>
+</figure>
+<h2 id="genus-2-parallel-lines-constant-35-no-crossing">Genus 2:
+parallel lines, constant 3–5×, no crossing</h2>
+<p>Exponents in <code>p</code> (FPM primary), 8209 … 2^24: rho
+<strong>0.975 [0.908, 1.037]</strong>, double large prime + prefilter
+<strong>1.004 [0.991, 1.020]</strong> (trials 0.980); full base 1.97
+(8209 … 2^18). Ratio 2LP/rho (FPM mid): 3.3, 2.0, 2.2, 4.6, 3.9, 5.7,
+3.0, 3.7, 3.6, 4.6, 1.7, 5.1 from 8209 to 2^24, intervals always above
+1, no trend. The linear-algebra share of the 2LP arm is 0.08–0.20
+throughout. Reading: at genus 2 both methods are <code>p^1</code> and
+the method is a constant factor behind in this instrument; the cost is
+the relation walk (one Cantor step per trial, half the trials split,
+each split a single edge of a large-prime graph with about
+<code>p/2</code> vertices), not the algebra. Nothing here suggests a
+crossing at any size.</p>
+<h2
+id="genus-3-the-gap-opens-as-p112-measured-as-p0.07-and-the-arm-is-below-rho">Genus
+3: the gap opens as <code>p^{1/12}</code>… measured as
+<code>p^{0.07}</code> and the arm is below rho</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">2LP+pre FPM</th>
+<th style="text-align: right;">rho FPM</th>
+<th style="text-align: right;">2LP / rho [95%]</th>
+<th>FPM band</th>
+<th style="text-align: right;">LA share of 2LP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">8209</td>
+<td style="text-align: right;">8.42e7</td>
+<td style="text-align: right;">1.43e8</td>
+<td style="text-align: right;">0.591 [0.437, 0.870]</td>
+<td>below</td>
+<td style="text-align: right;">0.75</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">16411</td>
+<td style="text-align: right;">2.14e8</td>
+<td style="text-align: right;">2.89e8</td>
+<td style="text-align: right;">0.741 [0.492, 1.42]</td>
+<td>unresolved</td>
+<td style="text-align: right;">0.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">32771</td>
+<td style="text-align: right;">5.42e8</td>
+<td style="text-align: right;">1.01e9</td>
+<td style="text-align: right;"><strong>0.537 [0.407,
+0.686]</strong></td>
+<td>below</td>
+<td style="text-align: right;">0.77</td>
+</tr>
+</tbody>
+</table>
+<p>Exponents: 2LP+pre <strong>1.344 [1.334, 1.358]</strong> (theory
+4/3), rho <strong>1.413 [1.145, 1.751]</strong> (theory 3/2; three
+primes, six runs each), full base 1.98. GAE band: unresolved at every
+prime (above at <code>w = 1</code>). Three quarters of the 2LP arm’s
+primary cost at genus 3 is the linear algebra, which the SGE study
+(<code>research/genus_ladder_sge_20261115/</code>) cuts to about a
+quarter: the two results compose, and the composition is the next
+measurement.</p>
+<h2 id="scorecard">Scorecard</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>id</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X1</td>
+<td>held: 234/234 certified, no exhaustion</td>
+</tr>
+<tr class="even">
+<td>X2</td>
+<td>held: rho 0.975, arm c 1.004 (arm a’s clause on 8209 … 2^18 only, by
+Amendment 1: 1.97, not a <code>p^1</code> quantity, and not what X2 was
+about)</td>
+</tr>
+<tr class="odd">
+<td>X3</td>
+<td><strong>failed</strong>: ratio at 2^24 (5.1) is not 2× smaller than
+at 8209 (3.3)</td>
+</tr>
+<tr class="even">
+<td>X4</td>
+<td><strong>failed</strong>: no prime with arm c below rho across the
+FPM band at genus 2; distance remaining 3–5×, flat in
+<code>p</code></td>
+</tr>
+<tr class="odd">
+<td>X5</td>
+<td>held: c exponent 1.344 in [1.20, 1.45]; rho 1.41 in [1.35, 1.65];
+below across the FPM band at 32771 with ratio 0.537 ≤ 0.6</td>
+</tr>
+<tr class="even">
+<td>X6</td>
+<td><strong>failed</strong>: the genus-2 LA share stays below 0.2 (a
+2-LP relation at genus 2 carries no base column, so cycle rows are
+short)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deviations">Deviations</h2>
+<ul>
+<li>131071 (= 2^17 − 1, prime) was run where “first prime at or above
+2^17” is 131101.</li>
+<li>Amendment 1 as stated in the protocol; the first launch’s stopped
+process had no partial rows of the dropped cells.</li>
+</ul>
+<h2 id="limits">Limits</h2>
+<p>Three curves × two seeds per cell; <code>h &lt;= 8</code>; rho’s
+genus-3 exponent interval is wide on three primes; shared host; the FPM
+prices are stated conventions.</p>
+</body>
+</html>
