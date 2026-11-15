@@ -25,3 +25,8 @@ Source2bafe6f049a9/checkpoint162927 preceded one release run, exit0/stderr empty
 endpoint scales±10, negations and target annihilations pass. Rawfull jets retained.
 Decision: next map arbitrary ell-subgroup D by finding zero[n]D, doubling its
 mapped difference to cancelT, then dividing by known2n moduloell. No DLP input.
+
+## Reporting
+CASES.svg and onepageREPORT.pdf created from raw counts, rendered and visually
+inspected. Reports retain five of minimumthree/maximumsix selected, all exclusions,
+actualsource versus target-derived jets, fixedglobal sign and psi(T) origin shift.

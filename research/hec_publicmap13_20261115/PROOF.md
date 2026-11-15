@@ -42,7 +42,7 @@ fits an output to a known scalar, label or expected group identity.
 
 ## Scope of the verification
 
-The independent public divisor B=[2](0,44) is constructed geometrically, without
+The independent public divisor B=[2](3,21) is constructed geometrically, without
 computing its scalar relative to D1. Map D1,B,D1+B,2B,-B and [1729]D1 in separate
 scans. The last control's scalar is available only to the outer checker, not
 the mapping routine; no label-dependent branch exists. Compare addition,
