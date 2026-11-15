@@ -178,6 +178,8 @@ enum ImportWhat {
     Ecbench,
     /// Curve records, dataset curves and measurements of the sibling checkouts (src/import/siblings.rs).
     Siblings,
+    /// Complete rational ℓ-isogeny graphs for ℓ = 7, 11, 13 over F_p, p < 2^10 (src/import/ell_isogenies.rs).
+    EllIsogenies,
     /// ℓ-volcano levels, isogeny directions and End(E) derived from the stored census isogeny graphs.
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10 (Kohel's l^k-torsion criterion, src/import/end_ring.rs).
@@ -297,6 +299,7 @@ async fn main() -> Result<()> {
                 ImportWhat::Results => import::run(&ctx, Selection::Results, None).await?,
                 ImportWhat::Ecbench => import::run(&ctx, Selection::Ecbench, None).await?,
                 ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
+                ImportWhat::EllIsogenies => import::run(&ctx, Selection::EllIsogenies, None).await?,
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
                 ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
                 ImportWhat::EllTorsion => import::run(&ctx, Selection::EllTorsion, None).await?,

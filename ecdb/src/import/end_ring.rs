@@ -129,6 +129,8 @@ ON CONFLICT (curve_id, ell) DO NOTHING";
 type Poly = Vec<u64>; // ascending coefficients in [0, p)
 
 pub(super) fn trim(mut a: Poly) -> Poly {
+}
+pub(crate) fn trim(mut a: Poly) -> Poly {
     while a.last() == Some(&0) {
         a.pop();
     }
@@ -136,6 +138,8 @@ pub(super) fn trim(mut a: Poly) -> Poly {
 }
 
 pub(super) fn pmul(a: &[u64], b: &[u64], p: u64) -> Poly {
+}
+pub(crate) fn pmul(a: &[u64], b: &[u64], p: u64) -> Poly {
     if a.is_empty() || b.is_empty() {
         return Vec::new();
     }
@@ -155,16 +159,18 @@ pub(super) fn pmul(a: &[u64], b: &[u64], p: u64) -> Poly {
     trim(out.into_iter().map(|c| c % p).collect())
 }
 
-fn psub(a: &[u64], b: &[u64], p: u64) -> Poly {
+pub(crate) fn psub(a: &[u64], b: &[u64], p: u64) -> Poly {
     let n = a.len().max(b.len());
     trim((0..n).map(|i| (a.get(i).copied().unwrap_or(0) + p - b.get(i).copied().unwrap_or(0)) % p).collect())
 }
 
-fn pscale(a: &[u64], c: u64, p: u64) -> Poly {
+pub(crate) fn pscale(a: &[u64], c: u64, p: u64) -> Poly {
     trim(a.iter().map(|x| x * (c % p) % p).collect())
 }
 
 pub(super) fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
+}
+pub(crate) fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1 % p;
     b %= p;
     while e > 0 {
@@ -177,12 +183,12 @@ pub(super) fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 
-fn inv(a: u64, p: u64) -> u64 {
+pub(crate) fn inv(a: u64, p: u64) -> u64 {
     powmod(a, p - 2, p)
 }
 
 /// a mod g, g monic.
-fn prem(a: &[u64], g: &[u64], p: u64) -> Poly {
+pub(crate) fn prem(a: &[u64], g: &[u64], p: u64) -> Poly {
     let dg = g.len() - 1;
     let mut r: Poly = a.to_vec();
     while r.len() > dg {
@@ -199,12 +205,14 @@ fn prem(a: &[u64], g: &[u64], p: u64) -> Poly {
 }
 
 pub(super) fn monic(g: &[u64], p: u64) -> Poly {
+}
+pub(crate) fn monic(g: &[u64], p: u64) -> Poly {
     let li = inv(*g.last().unwrap(), p);
     pscale(g, li, p)
 }
 
 /// x^e mod g.
-fn xpow(e: u64, g: &[u64], p: u64) -> Poly {
+pub(crate) fn xpow(e: u64, g: &[u64], p: u64) -> Poly {
     let mut r: Poly = prem(&[1], g, p);
     let mut b: Poly = prem(&[0, 1], g, p);
     let mut e = e;
@@ -221,6 +229,8 @@ fn xpow(e: u64, g: &[u64], p: u64) -> Poly {
 /// The x-only division polynomials f_0..=f_n of y^2 = x^3 + A x + B:
 /// psi_n = f_n for n odd and psi_n = 2y f_n for n even.
 pub(super) fn division_polys(n: usize, a: u64, b: u64, p: u64) -> Vec<Poly> {
+}
+pub(crate) fn division_polys(n: usize, a: u64, b: u64, p: u64) -> Vec<Poly> {
     let m = |v: i64| v.rem_euclid(p as i64) as u64;
     let (ai, bi) = (a as i64, b as i64);
     let big_f = trim(vec![b % p, a % p, 0, 1]);
@@ -289,6 +299,8 @@ pub(super) fn scalar_on(
 // ------------------------------------------------------------- integers
 
 pub(super) fn is_prime(n: u64) -> bool {
+}
+pub(crate) fn is_prime(n: u64) -> bool {
     n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| !n.is_multiple_of(d))
 }
 

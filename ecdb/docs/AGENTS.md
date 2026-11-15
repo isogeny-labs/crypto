@@ -48,6 +48,11 @@ It holds:
   graphs over every F_p with p < 2^10, and the ℓ-neighbours of the crypto
   and pairing curves. Walk them with `ecdb_curve_detail part=graph` or
   `GET /v1/curves/{ref}/graph?ell=&depth=`.
+- the rational ℓ-isogenies for ℓ = 7, 11, 13 of every curve over F_p, p < 2^10,
+  computed by ecdb (`ecdb import ell-isogenies`) and cross-checked against
+  Φ_ℓ. A curve's ℓ-neighbourhood is complete exactly when it has a
+  `curve_ell_torsion` row for that ℓ with a non-null `rational_isogenies`;
+  F_7, F_11 and F_13 are skipped at ℓ = p.
 - the ℓ-volcanoes of those graphs: each curve's level (`endomorphism_level`),
   the components (`isogeny_volcano`, `volcano_vertex`) and each edge's
   direction (horizontal, ascending, descending). End(E) is stored for 149,593

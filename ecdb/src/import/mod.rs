@@ -18,6 +18,7 @@ pub mod covers;
 pub mod derive;
 pub mod ecbench;
 pub mod ell_torsion;
+pub mod ell_isogenies;
 pub mod end_ring;
 pub mod enrich;
 pub mod factor_bases;
@@ -216,6 +217,8 @@ pub enum Selection {
     Ecbench,
     /// The sibling repositories' curve records, dataset curves and measurements.
     Siblings,
+    /// Complete rational ℓ-isogeny graphs for ℓ = 7, 11, 13 over F_p, p < 2^10 (computed, cross-checked by Φ_ℓ).
+    EllIsogenies,
     /// ℓ-volcano levels, directions and End(E) from the stored census isogeny graphs.
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10, by Kohel's l^k-torsion criterion.
@@ -277,6 +280,10 @@ pub async fn run(ctx: &Ctx<'_>, what: Selection, walk_files: Option<Vec<String>>
     }
     if all || what == Selection::Ecbench {
         reports.push(ecbench::import(ctx).await?);
+    }
+    // Before volcanoes: they derive the ℓ = 7, 11, 13 levels and directions from these edges.
+    if all || what == Selection::EllIsogenies {
+        reports.push(ell_isogenies::import(ctx).await?);
     }
     if all || what == Selection::Volcanoes {
         reports.push(volcano::import(ctx).await?);
