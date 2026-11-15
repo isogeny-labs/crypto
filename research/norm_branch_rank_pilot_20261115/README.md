@@ -65,3 +65,55 @@ Repository evidence: [five-lead report](../prime_leads_chase_20261113/README.md)
 Primary literature checked: [Shoup 1997](https://doi.org/10.1007/3-540-69053-0_18) (generic group, not a universal lower bound); [Petit–Kosters–Messeng 2016](https://doi.org/10.1007/978-3-662-49387-8_1) and [Amadori–Pintore–Sala 2018](https://ora.ox.ac.uk/objects/uuid:c99fdb39-f5b1-428d-999c-770b63363e25) (prime-field algebraic approaches); and [Corrigan-Gibbs–Henzinger–Wu, EUROCRYPT 2026](https://people.eecs.berkeley.edu/~henrycg/pubs/structured-generic-groups/) (bounded structural generic model, not a blanket algebraic obstruction).
 
 Research-KB MCP tools are not exposed in this runtime; the newest session log also reports the wrapper catalog and encrypted atlas unavailable. GitHub repository search and primary papers were the fallback; **no novelty or exhaustive-prior-art assertion**. Conductor, EKS Spot, an independent host, and a PCC signing verifier were unavailable here. No execution, speed, complexity or security standing is claimed beyond [pcc:unverified].
+
+
+## Follow-up: exact guarded rank-deficiency certificates and a cubic selector
+
+The initial single-seed random census above remains intact, but **it does not support a universal full-rank conjecture**. A targeted counterexample was subsequently found on the same day. The following exact checked examples refute full rank under *only* the distinct-abscissa/nonzero-ordinate/odd-characteristic guards, although they do **not** satisfy the proposed B1 advancement criterion of rank <= half the support-matched null on held-out growing sizes. All results below remain [pcc:unverified].
+
+### First finite counterexample (F_19)
+
+The script `counterexample.py` uses E: y²=x³+5 (mod 19) and the nine valid distinct-x points
+
+    [(0,9),(1,5),(5,4),(7,5),(10,6),(12,2),(15,6),(17,4),(18,2)].
+
+For the eight variable signs, take the layer t=4 and balanced 4+4 split with row subsets of size 2 and column subsets of size 2. The resulting 6×6 coefficient flattening has rank **4**, not 6. All 36 possible 5×5 minors vanish, and an exact nonzero 4×4 minor witnesses rank at least 4. A support-matched seeded independent nonzero-coefficient null is rank 6. The exhaustive 256-sign equivalence test finds nine signed elliptic identities, and *each* one has a validated A/B norm-polynomial certificate. This is a small-characteristic structural exception, not a cryptographic-size attack.
+
+### Stronger counterexample (F_1019; single positive target)
+
+The script `counterexample_1019.py` gives E: y²=x³+46x+158 (mod 1019) and the nine distinct, nonzero-y points
+
+    [(944,936),(243,525),(432,632),(225,527),(627,518),
+     (387,878),(914,704),(764,816),(429,379)].
+
+The last point is the fixed signed target. The first eight yield the same layer t=4, split 4+4, (a,b)=(2,2) 6×6 coefficient matrix. Its exact rank is **4**. All 36 5×5 determinants vanish; the leading 4×4 minor equals **126 mod 1019**. An independent seeded nonzero-coefficient 6×6 null has determinant **602 mod 1019**. Exhaustive 256-sign comparison of EC group addition, interpolation singularity, and sign polynomial has precisely **one** positive sign model, `(+,+,+,+,+,+,+,-)`; its full A/B norm certificate verifies. This refutes the naive claim that distinct x and characteristic exceeding k suffice for full block rank.
+
+### Why this is algorithmically testable: a one-variable determinant locus
+
+After removing invertible row/column scales, each balanced 2+2 entry equals
+
+    K_(A,B)=Delta(x_(A union B))².
+
+Fix seven abscissae `[944,243,432,225,627,387,914]`, and let the eighth `z` vary. Over F_1019, **the exact determinant polynomial for this 6×6 squared-Vandermonde matrix** interpolates to
+
+    det K(z) =
+      163 * (z-627)^4 * (z-387)^4 * (z-914)^4
+          * (z³ - 2*z² + 79*z + 609)^2   (mod 1019).
+
+The noncollision root `z=764` produces the rank-four counterexample, with y=816 on the specified curve. It is selected by a cubic equation rather than by scanning random factor bases. The target x=429 is **not** one of the eight variables used in this layer; this specific flattening deficiency is target-independent. This structural fact does not by itself accelerate sign search, relation finding, or scalar recovery.
+
+The self-contained `locus_selector.py` interpolates det K(z) from 19 evaluations, verifies the predicted degree-18 polynomial on 32 untouched z values, divides the three collision factors to fourth power, and reconstructs the **square of a monic cubic** from the quotient. It reproduces the F_1019 example and five independently seeded seven-tuples over F_1019 and F_10007. All six trials match the factorization form; noncollision cubic roots in the six cases number **1, 1, 1, 0, 0, 3**, and all selected roots yield rank 4. The general square-cubic factorization is **an experimental conjecture**, not a theorem; its proof and characteristic restrictions remain open. The root enumeration in the toy script is O(p), not a claimed cryptographic-size selector. A future implementation could instead factor the resulting cubic over F_p.
+
+Reproduction:
+
+    python3 research/norm_branch_rank_pilot_20261115/counterexample.py
+    python3 research/norm_branch_rank_pilot_20261115/counterexample_1019.py
+    python3 research/norm_branch_rank_pilot_20261115/locus_selector.py
+
+### Updated experiment decision
+
+1. **Prove or refute the cubic-square identity** for arbitrary distinct abscissae and p>2. Check the determinant interpolation against a separately derived symbolic or exact fraction-free elimination identity, including characteristic 3 and collisions. A six-fixture finite-field success is not a proof.
+2. **Targeted factor-base B1 campaign:** construct liftable eight-abscissa bases by cubic root selection, match random eight-abscissa controls and random-coefficient nulls, and measure ranks in *both* adjacent target-sign layers. Extend to growing k and multiple held-out primes; quantify rank/nulllity, target-model counts, witnesses, preprocessing cost and rank slope. A fixed 6×6 rank-4 block does not meet the preregistered rank-at-most-half gate.
+3. **Only if compression scales, measure whole-query complexity:** exact model extraction and verified positive/negative certificates, amortized vs cold setup, elimination proof width and final public DLP solve. Compare to the strongest batched rho and sparse PKM under identical conditions. No proposed algorithm has yet shown a cheaper complete single-target solve.
+
+The new scripts are **small deterministic exact-arithmetic test artifacts**, not an independently certified research claim. No pcc record/signature or external CI rerun is implied by checking these files into GitHub.
