@@ -37,7 +37,13 @@ Two variants of inherited F4 were added on 12 November: \texttt{inherited-f4-nex
 (the same eliminations with SIMD row XOR, Four-Russians table reuse and
 the existing exact matrix builders) and \texttt{inherited-f4-batched}
 (kept rows rewritten only when read or at a split). Both leave every
-decision and tree statistic unchanged (\S\ref{sec:bo-ladder}).
+decision and tree statistic unchanged (\S\ref{sec:bo-ladder}). Two size
+rules route by unknowns: \texttt{fes-then-inherited} and
+\texttt{fes-then-batched} run \texttt{fes-f2} on quadratic systems of at
+most 14 unknowns and inherited F4, or its batched variant, otherwise. From
+13 November \texttt{fes-f2-gpu} runs \texttt{fes-f2}'s search on a
+persistent CUDA worker, charged as \texttt{fes-f2} and returning its
+solutions in the same Gray order (\S\ref{sec:in-gpuic}).
 
 \paragraph{Correctness.} The audit pinned every engine against every
 other and against brute force (88+15+9+14+13+12+21+6 passing library
@@ -50,7 +56,7 @@ headline ratios and Table~\ref{tab:prog_groebner-engineering} lists them
 all; all are \cls{engineering} with identical outputs.
 
 \begin{table}[p]
-\centering\footnotesize
+\centering\scriptsize
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedleft\arraybackslash}p{0.2\linewidth}@{}}
 \toprule
 Change & Case & Measure & Ratio or value \\
@@ -104,6 +110,11 @@ M4GB server / one-shot & $m=2$, 12--24 unknowns & wall per call & $0.36$--$1.00$
  & $m=3$, 12 unknowns & & $1.03$--$1.05$ \\
 M4GB with / without patch 0004 & $m=2$, 14--24 unknowns & wall per call & $0.57$--$0.75$ \\
  & $m=3$, 12 unknowns & & $0.88$--$0.89$ \\
+\texttt{inherited-f4-batched} / inherited F4 & $m=2$, 14--32 unknowns & word XORs per target & $0.70$--$0.91$ \\
+ & 14--16 unknowns & wall per call & $1.08$--$1.14$ \\
+ & 24--32 unknowns & & $0.85$--$0.95$ \\
+\texttt{fes-f2-gpu} / \texttt{fes-f2} & complete solve, 24, 26 unknowns & whole-solve wall & $1/12.3$, $1/44.1$; $S$ equal \\
+FES GPU kernel, block walk / O($n$) walk & $n=30$, A100 & kernel time & $1/102$ \\
 Boolean decomposition systems, $n=17$, 8 targets & our oracle (decides) & time per target & 7--24\,ms \\
  & msolve, PolyBoRi (full basis) & & 40--52\,s \\
  & Singular & & exceeds 120\,s \\
@@ -139,7 +150,11 @@ variants and M4GB, measured on a shared 4-vCPU container, one thread,
 unverified (\art{research/inherited_f4_next_20261112/RESULTS_AB.md},
 \art{research/m4gb_persistent_server_20261111/RESULTS.md},
 \art{research/m4gb_update_signatures_20261112/RESULTS.md};
-\S\ref{sec:bo-ladder}).
+\S\ref{sec:bo-ladder}); the batched engine's runs 1 and 3
+(\art{research/inherited_f4_batched_20261112/README.md}); the GPU rows on
+one A100 (\art{research/ic_gpu_e2e_20261113/REPORT.md},
+\art{research/ic_gpu_measure_20261112/REPORT.md};
+\S\ref{sec:in-gpuic}).
 
 Matrix and inherited F4 can return different decompositions, so their
 splitting trees may differ; only matrix F4 and F5 share a tree by
