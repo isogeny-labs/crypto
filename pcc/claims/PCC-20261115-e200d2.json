@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T04:25:39Z",
+ "id": "PCC-20261115-e200d2",
+ "kind": "execution",
+ "producer": {
+  "commit": "2ef47dc5b46a5a9a58389a12d132165a4d1bb95e",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/classification/results/local-checks.txt",
+    "sha256": "29749440cb4b175b3b854d0e8e8229bc8cd3aff120c91445d9ba133e16621b4c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/classification/VALIDATION.md",
+    "sha256": "1eeebd3770e0d05dae0909bc3bb8561155d2e3718241b684f101a0ca09167510"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/classification/sources.sha256",
+    "sha256": "6ac512c5d3a9f5e59b9e62834fa4e091fefb35d5c1184a2d519d71aa2d48a3f0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/classification",
+ "statement": "Producer standalone correctness check completed with four release tests, formatting, strict new-package Clippy without dependency linting, and three deterministic output comparisons. The report and diagram were rendered and inspected. No whole-workspace, compiled Lean or complete Smith-codomain execution is asserted."
+}
