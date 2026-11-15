@@ -44,3 +44,13 @@ its independent OpenSSL census validates12 reference counts and reports zero
 completed candidate sets. The PC arm continues the fixed panel at unchanged
 caps. A1 is frozen before its msolve-only loader repair; no PC retry is allowed.
 [pcc:unverified]
+
+First panel finishes all24 cases: msolve12 startup127 unknowns, PC12 outer-cap
+124 unknowns; both independent OpenSSL censuses pass12 reference counts with
+zero completed candidate sets. The final wrapper alone exits2 because its
+on-disk file was edited for the future loader fix while bash was paused in a
+native child, shifting its resume offset. Both arm exit/status files and both
+replay receipts remain intact. This error changes no native outcome and is
+not a reason to repeat PC. A1 uses a separate frozen execution copy, with its
+exact script hash captured before the still-single amended msolve arm.
+[pcc:unverified]
