@@ -22,3 +22,19 @@ Genus2and4still require their own constructive complete-cost mechanisms.
 ## Errors
 None in native compile/execution; missing sparse isogeny/notes paths were
 handled through existing protocol and KB/primary source, without broad scan.
+
+## Full archived cohort terminal
+### What was done
+Amendment91471e18d3preceded source9ccc6658d3/checkpoint. Exact archived20inputs
+restored with matching manifest hash; no selector rerun. Full/pair eligible
+curves:g2three/three of8,g3two/two of6,g4two/one of6. All controls pass.
+Genus3p127f1andp1009f1each have one tractable kernel; all exclusions retained.
+### Decisions made
+Proceed to rational-trigonal/explicit-map gates on those two existing inputs;
+no destination or speed inferred. This is cohort admission, not a population.
+### Open threads
+Render/inspect census report and publish. Then test whether each tractable
+kernel actually permits a rational degree-three map, preserving both outcomes.
+### Errors
+First patch failed on rustfmt-expanded text; corrected before source freeze.
+No scientific mismatch or retry. Original six-fixture outputs unchanged.
