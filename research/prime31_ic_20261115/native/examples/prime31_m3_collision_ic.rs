@@ -9,7 +9,7 @@
 //!   --example prime31_m3_collision_ic
 use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use serde_json::json;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 const Q: Point = Some((1_547_953_785, 1_667_575_595));
 const VERIFIER_SCALAR_ONLY: u64 = 661_068_045;
@@ -80,6 +80,24 @@ fn collision_row(previous: u32, current: u32, b: usize, n: u64) -> Vec<u64> {
     }
     row
 }
+/// Canonicalize a nonzero homogeneous relation modulo the prime group order.
+/// Scalar multiples span the same row space and must not be counted as
+/// independent oracle outputs. Sparse (index, coefficient) pairs save memory.
+fn projective_relation(row: &[u64], n: u64) -> Option<Vec<(u16, u64)>> {
+    let first = row.iter().copied().find(|&coefficient| coefficient != 0)?;
+    let scale = inverse(first, n);
+    Some(
+        row.iter()
+            .enumerate()
+            .filter(|(_, &coefficient)| coefficient != 0)
+            .map(|(index, &coefficient)| {
+                assert!(index <= u16::MAX as usize);
+                (index as u16, times(coefficient, scale, n))
+            })
+            .collect(),
+    )
+}
+
 fn weighted_sum(code: u32, weights: &[u64], n: u64) -> u64 {
     let mut out = 0_u64;
     for (i, sign) in decode(code) {
@@ -156,6 +174,10 @@ struct TripleBank {
     hom: HomogeneousRank,
     templates: u64,
     collisions: u64,
+    /// Number of same-sum collision rows rejected as projectively duplicate.
+    duplicate_projective_rows: u64,
+    /// Actual nonzero relation classes modulo F_n^*; NOT the independent rank.
+    projective_rows: HashSet<Vec<(u16, u64)>>,
     first_full_rank: Option<(u64, u64)>,
 }
 impl TripleBank {
@@ -169,6 +191,8 @@ impl TripleBank {
             hom: HomogeneousRank::new(b),
             templates: 0,
             collisions: 0,
+            duplicate_projective_rows: 0,
+            projective_rows: HashSet::new(),
             first_full_rank: None,
         }
     }
@@ -178,7 +202,14 @@ impl TripleBank {
         if let Some(&previous) = self.first.get(&key) {
             self.collisions += 1;
             if self.hom.rank < self.hom.pivots.len() - 1 {
-                self.hom.insert(collision_row(previous, code, self.hom.pivots.len(), n), n);
+                let row = collision_row(previous, code, self.hom.pivots.len(), n);
+                let normalized = projective_relation(&row, n)
+                    .expect("distinct triple codes produced a zero formal row");
+                if self.projective_rows.insert(normalized) {
+                    self.hom.insert(row, n);
+                } else {
+                    self.duplicate_projective_rows += 1;
+                }
             }
             if self.hom.rank == self.hom.pivots.len() - 1
                 && self.first_full_rank.is_none()
@@ -264,6 +295,8 @@ fn main() -> Result<(), String> {
         || bank.first.len() != 4_047_598
         || bank.collisions != 3_765
         || bank.hom.rank != 255
+        || bank.projective_rows.len() != 305
+        || bank.duplicate_projective_rows != 3_460
         || bank.first_full_rank != Some((3_765, 4_051_363))
     {
         return Err("native m3 census/rank differs from independent producer fixture".into());
@@ -331,6 +364,8 @@ fn main() -> Result<(), String> {
         "generator":e.g, "public_target":Q, "factor_base_size":base.points.len(),
         "templates":bank.templates,"unique_sums":bank.first.len(),
         "homogeneous_collision_rows":bank.collisions,
+        "unique_projective_collision_rows":bank.projective_rows.len(),
+        "duplicate_projective_rows":bank.duplicate_projective_rows,
         "homogeneous_rank":bank.hom.rank,"full_rank_at":bank.first_full_rank,
         "anchor_trials":anchor_trials,"anchor_scalar":anchor_a,
         "target_trials":target_trials,"target_mix_a":a,"target_mix_b":b,
@@ -358,6 +393,19 @@ mod tests {
         assert_eq!(row[129], 975); // -2 modulo 977
         assert_eq!(weighted_sum(a, &[1; 130], 977), 3);
         assert_eq!(weighted_sum(b, &[1; 130], 977), 1);
+    }
+
+    #[test]
+    fn projective_normalization_removes_scaling_not_distinct_rows() {
+        let n = 977;
+        let a = vec![0, n - 2, 0, 4];
+        let scaled = vec![0, n - 1, 0, 2];
+        let opposite = vec![0, 2, 0, n - 4];
+        let independent = vec![0, n - 1, 0, 3];
+        assert_eq!(projective_relation(&a, n), projective_relation(&scaled, n));
+        assert_eq!(projective_relation(&a, n), projective_relation(&opposite, n));
+        assert_ne!(projective_relation(&a, n), projective_relation(&independent, n));
+        assert_eq!(projective_relation(&[0, 0, 0], n), None);
     }
 
     #[test]
