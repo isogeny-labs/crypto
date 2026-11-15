@@ -48,7 +48,8 @@ enum rf_backend { RF_BACKEND_AUTO = 0, RF_BACKEND_EMULATE = 1, RF_BACKEND_CUDA =
  * device (CUDA backend; packed slots, one atomicCAS insert per key) instead of on the host.
  * The table answers the same lookups; only slot order may differ.  Emulation builds it on
  * the host. */
-enum rf_lookup  { RF_LOOKUP_AUTO = 0, RF_LOOKUP_SORTED = 1, RF_LOOKUP_HASH = 2, RF_LOOKUP_HASH_DEVICE = 3 };
+enum rf_lookup  { RF_LOOKUP_AUTO = 0, RF_LOOKUP_SORTED = 1, RF_LOOKUP_HASH = 2, RF_LOOKUP_HASH_DEVICE = 3,
+                  RF_LOOKUP_PAIRS_DEVICE = 4 /* rf64_session_create_pairs only */ };
 
 /* Library default for chunk == 0, per field.  The slice length sets the
  * per-thread register footprint (2 * chunk field elements live during
@@ -121,6 +122,15 @@ int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint64_t *fb_y, 
 int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const uint64_t *ty,
                            uint32_t n_targets, rf_relation *out, uint32_t cap, rf_result *res);
 void rf64_session_destroy(rf64_session *s);
+/* Probe mode against the negation-folded pair table of the base itself, built by
+ * the library (on the device for the CUDA backend): the abscissae of P_ai +/- P_bi,
+ * bi >= ai, first pair per abscissa in build order (rootfind.cuh rf_pair_x).  Each
+ * reported hit (tau != 0) carries j = that first pair's build index
+ * b = rf_pair_offset(ai, n) + 2 (bi - ai) + s.  curve_a: the curve's a (canonical);
+ * every base y must be non-zero.  *n_entries: distinct abscissae in the table. */
+int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uint64_t *fb_x, const uint64_t *fb_y,
+                              uint32_t n_fb, uint32_t max_targets, uint32_t cap, const rf_options *opt,
+                              rf64_session **out, rf_result *info, uint32_t *n_entries);
 
 /* Create the CUDA context now when the CUDA backend is available (0 on success
  * or when there is nothing to do). */

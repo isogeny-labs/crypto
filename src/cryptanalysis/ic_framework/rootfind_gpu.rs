@@ -59,10 +59,10 @@ use std::sync::Mutex;
 use super::plugins::RootfindSubtractOracle;
 use super::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
-    FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
+    CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
 };
 
-const MAGIC_INIT: u32 = 0x3253_4652; // "RFS2"
+const MAGIC_INIT: u32 = 0x3353_4652; // "RFS3"
 const MAGIC_BATCH: u32 = 0x3142_4652; // "RFB1"
 /// Largest batch sent to the worker (and its device buffers' size).
 pub const MAX_BATCH: usize = 4096;
@@ -212,7 +212,8 @@ impl RootfindWorker {
         probe: &[u64],
         backend: u32,
         lookup: u32,
-    ) -> Result<(), String> {
+        curve_a: u64,
+    ) -> Result<u32, String> {
         let mut req = Vec::with_capacity(40 + 16 * xs.len() + 8 * probe.len());
         req.extend_from_slice(&MAGIC_INIT.to_le_bytes());
         req.extend_from_slice(&(xs.len() as u32).to_le_bytes());
@@ -227,6 +228,7 @@ impl RootfindWorker {
         for v in probe {
             req.extend_from_slice(&v.to_le_bytes());
         }
+        req.extend_from_slice(&curve_a.to_le_bytes());
         self.send(&req)?;
         let r = self.read(24)?;
         let w = |i: usize| u32::from_le_bytes(r[4 * i..4 * i + 4].try_into().unwrap());
@@ -237,7 +239,7 @@ impl RootfindWorker {
             return Err(format!("rootfind worker: init status {}", w(1) as i32));
         }
         self.backend = w(2);
-        Ok(())
+        Ok(w(5))
     }
 
     /// Decompose one batch (canonical coordinates, at most [`MAX_BATCH`]).
@@ -369,6 +371,9 @@ pub struct RootfindSubtractGpuOracle<'i> {
     mode: WorkerMode,
     backend: u32,
     lookup: u32,
+    /// `probe_build=pairs`: the abscissa of each base representative, by
+    /// position in the sweep (for the degenerate rows' pair search).
+    abscissa_pos: HashMap<u64, usize>,
     pending: RefCell<Vec<PrimePoint>>,
     swept: HashMap<(u64, u64), Hits>,
     counters: BTreeMap<String, u64>,
@@ -382,6 +387,7 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
             mode: WorkerMode::Spawn,
             backend: 0,
             lookup: 0,
+            abscissa_pos: HashMap::new(),
             pending: RefCell::new(Vec::new()),
             swept: HashMap::new(),
             counters: BTreeMap::new(),
@@ -390,6 +396,175 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
 
     fn bump(&mut self, name: &str, by: u64) {
         *self.counters.entry(name.to_string()).or_insert(0) += by;
+    }
+
+    /// `probe_build=pairs`: charge the negation-folded pair table the worker
+    /// builds exactly as `PairTable::build_negation_folded` would: every visit
+    /// is one group addition (`a(a + 1)` of them over `a` abscissae, each with
+    /// both signs), whose field work depends only on its case: `a(a − 1)`
+    /// general additions, `a` doublings (`P + P`) and `a` identities (`P − P`).
+    /// One addition of each case, made here on the real ledger type, gives
+    /// the per-case charge.  Work counters: `a²` insert attempts (the
+    /// non-identity sums) and `a` index reads.
+    fn charge_pair_table_build(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        let g = ctx.group;
+        let (_, reps) = self
+            .cpu
+            .sweep()
+            .ok_or("rootfind-subtract did not prepare")?;
+        let a = reps.len() as u64;
+        for rep in reps {
+            let p = fb.points[rep.plus];
+            if rep.plus == rep.minus || p.y == 0 || fb.points[rep.minus] != g.neg(p) {
+                return Err(
+                    "rootfind-subtract-gpu: probe_build=pairs needs both signs of every abscissa \
+                     and no point of order two"
+                        .into(),
+                );
+            }
+        }
+        let p0 = fb.points[reps[0].plus];
+        let one = |q: PrimePoint| {
+            let mut o = GroupOps::default();
+            g.add(&mut o, p0, q);
+            o
+        };
+        let dbl = one(p0);
+        let ident = one(fb.points[reps[0].minus]);
+        let gen = if a >= 2 {
+            one(fb.points[reps[1].plus])
+        } else {
+            GroupOps::default()
+        };
+        for (case, n) in [(gen, a * a.saturating_sub(1)), (dbl, a), (ident, a)] {
+            ops.adds += case.adds * n;
+            ops.doubles += case.doubles * n;
+            ops.scalar_mults += case.scalar_mults * n;
+            ops.field_ops.muls += case.field_ops.muls * n;
+            ops.field_ops.sqrs += case.field_ops.sqrs * n;
+            ops.field_ops.invs += case.field_ops.invs * n;
+            ops.montgomery_reductions += case.montgomery_reductions * n;
+        }
+        let mut work = BTreeMap::new();
+        if a * a > 0 {
+            work.insert("table_insert_attempts".to_string(), a * a);
+            work.insert("lookups".to_string(), a);
+        }
+        self.cpu.set_deferred_table_work(work);
+        self.abscissa_pos = reps
+            .iter()
+            .enumerate()
+            .map(|(i, r)| (fb.points[r.plus].x, i))
+            .collect();
+        Ok(())
+    }
+
+    /// The pair `(i, j)` of fb indices at build index `b` (`rf_pair_offset`).
+    fn pair_at(&self, b: u64) -> Option<(usize, usize)> {
+        let (_, reps) = self.cpu.sweep()?;
+        let n = reps.len() as u64;
+        let off = |ai: u64| 2 * (ai * n - ai * ai.saturating_sub(1) / 2);
+        let (mut lo, mut hi) = (0u64, n); // the largest ai with off(ai) <= b
+        while hi - lo > 1 {
+            let mid = (lo + hi) / 2;
+            if off(mid) <= b {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+        let rem = b - off(lo);
+        let bi = (lo + rem / 2) as usize;
+        let rb = reps.get(bi)?;
+        let j = if rem % 2 == 0 { rb.plus } else { rb.minus };
+        Some((reps[lo as usize].plus, j))
+    }
+
+    /// The least build index whose sum has the abscissa of `t` (the pair the
+    /// CPU table keeps for that key), by enumeration: `P_ai + Q = ±t` with `Q`
+    /// a base point above an abscissa `bi ≥ ai`.  Only the degenerate rows
+    /// need this; their extra arithmetic is lookup work, not charged.
+    fn first_pair_for(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        t: PrimePoint,
+    ) -> Option<u64> {
+        let g = ctx.group;
+        let (_, reps) = self.cpu.sweep()?;
+        let n = reps.len() as u64;
+        let mut scratch = GroupOps::default();
+        let mut best: Option<u64> = None;
+        for (ai, rep) in reps.iter().enumerate() {
+            let p = fb.points[rep.plus];
+            for target in [t, g.neg(t)] {
+                let q = g.add(&mut scratch, target, g.neg(p));
+                if q.infinity {
+                    continue;
+                }
+                let Some(&bi) = self.abscissa_pos.get(&q.x) else {
+                    continue;
+                };
+                if bi < ai {
+                    continue;
+                }
+                let s = if q == fb.points[reps[bi].plus] {
+                    0
+                } else if q == fb.points[reps[bi].minus] {
+                    1
+                } else {
+                    continue;
+                };
+                if bi == ai && s == 1 {
+                    continue; // P − P
+                }
+                let ai = ai as u64;
+                let b = 2 * (ai * n - ai * ai.saturating_sub(1) / 2) + 2 * (bi as u64 - ai) + s;
+                best = Some(best.map_or(b, |x: u64| x.min(b)));
+            }
+        }
+        best
+    }
+
+    /// `rootfind-subtract`'s `m = 3` lookup of `t = R − F_summand`, with the
+    /// pair table's answer for `t`'s abscissa given as a build index (from the
+    /// device, or searched for a degenerate row): one lookup, then the
+    /// probe's confirming addition on the ledger, exactly as
+    /// `PairTable::probe`.
+    #[allow(clippy::too_many_arguments)]
+    fn lookup_pairs(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        summand: usize,
+        t: PrimePoint,
+        b: Option<u64>,
+    ) -> Option<Vec<usize>> {
+        let g = ctx.group;
+        counters.lookups += 1;
+        if g.is_identity(&t) {
+            return None;
+        }
+        let b = match b {
+            Some(b) => b,
+            None => self.first_pair_for(ctx, fb, t)?,
+        };
+        let (i, j) = self.pair_at(b)?;
+        let s = g.add(ops, fb.points[i], fb.points[j]);
+        if s == t {
+            Some(vec![summand, i, j])
+        } else if s == g.neg(t) {
+            Some(vec![summand, fb.neg_index[i], fb.neg_index[j]])
+        } else {
+            None
+        }
     }
 
     /// Sweep `point` and every touched point not yet swept, in batches.
@@ -522,7 +697,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         };
         // `probe_build=device` (the default for m = 3): the probe set's hash
         // table is built on the device; `host`: the library's host-built table
-        // (sorted for large sets), the first m = 3 measurement's path.
+        // (sorted for large sets), the first m = 3 measurement's path;
+        // `pairs` (m = 3): the pair table itself is built by the worker (on the
+        // device under CUDA) from the base, and charged here as the CPU build.
         let default_build = if self.m == 3 { "device" } else { "host" };
         self.lookup = match params
             .0
@@ -531,12 +708,17 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         {
             "host" => 0,
             "device" => 3,
+            "pairs" if self.m == 3 => 4,
             other => {
                 return Err(format!(
-                    "rootfind-subtract-gpu: probe_build must be host or device, got `{other}`"
-                ))
+                "rootfind-subtract-gpu: probe_build must be host or device (or pairs at m = 3), \
+                     got `{other}`"
+            ))
             }
         };
+        if self.lookup == 4 {
+            self.cpu.defer_pair_table();
+        }
         // The CPU oracle sees only `m`: the worker changes where the sweep
         // runs, not the search.
         let mut cpu_params = params.clone();
@@ -575,7 +757,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
         // table the CPU oracle built (and charged); a hit there is a position
         // where the CPU probe finds a key, so every position the CPU sweep
         // could stop at is reported, with no `j ≥ i` filter.
-        let probe = if self.m == 3 {
+        let probe = if self.m == 3 && self.lookup != 4 {
             let px = self
                 .cpu
                 .pair_abscissae()
@@ -588,7 +770,16 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             Vec::new()
         };
         let (backend, lookup) = (self.backend, self.lookup);
-        with_worker(self.mode, |w| w.init(p, &xs, &ys, &probe, backend, lookup))?;
+        let curve_a = ctx.group.a;
+        if lookup == 4 {
+            self.charge_pair_table_build(ctx, fb, ops)?;
+        }
+        let entries = with_worker(self.mode, |w| {
+            w.init(p, &xs, &ys, &probe, backend, lookup, curve_a)
+        })?;
+        if lookup == 4 && entries == 0 {
+            return Err("rootfind-subtract-gpu: the worker built an empty pair table".into());
+        }
         self.swept.clear();
         self.pending.borrow_mut().clear();
         self.counters.clear();
@@ -648,6 +839,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             }
         }
         let hits = self.swept.remove(&key).unwrap_or_default();
+        if self.lookup == 4 {
+            return self.decompose_pairs(ctx, fb, ops, counters, point, hits);
+        }
         if fb.x_index.contains_key(&point.x) {
             // R = ±F_i: the CPU oracle takes the degenerate rows its own way.
             self.bump("gpu_cpu_fallback_targets", 1);
@@ -691,6 +885,93 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
     }
 }
 
+impl RootfindSubtractGpuOracle<'_> {
+    /// `probe_build=pairs`: `rootfind-subtract:m=3`'s sweep, candidate for
+    /// candidate.  Positions the device reported are confirmed through
+    /// [`Self::lookup_pairs`] with the device's build index; the two rows of an
+    /// abscissa equal to `x_R` (if any) are taken as the CPU takes them (one
+    /// charged addition each, no candidate charge) with the pair searched for.
+    fn decompose_pairs(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+        hits: Hits,
+    ) -> Option<Vec<usize>> {
+        let g = ctx.group;
+        let (f, k) = {
+            let (f, reps) = self.cpu.sweep()?;
+            (f, reps.len())
+        };
+        let degenerate = self.abscissa_pos.get(&point.x).copied();
+        if degenerate.is_some() {
+            self.bump("gpu_degenerate_rows", 1);
+        }
+        self.cpu.charge_sweep_setup(ops, counters);
+        let xr = f.to_mont(point.x);
+        let yr = f.to_mont(point.y);
+        // Misses in [from, to), skipping the degenerate row's two positions.
+        let misses = |from: usize, to: usize| -> usize {
+            let n = to.saturating_sub(from);
+            match degenerate {
+                Some(d) => n - (from..to).filter(|&q| q / 2 == d).count(),
+                None => n,
+            }
+        };
+        let mut events: Vec<(usize, Option<u64>)> = hits
+            .iter()
+            .filter(|(pos, _, _)| Some(pos / 2) != degenerate)
+            .map(|&(pos, j, _)| (pos, Some(j as u64)))
+            .collect();
+        if let Some(d) = degenerate {
+            events.push((2 * d, None));
+            events.push((2 * d + 1, None));
+        }
+        events.sort_unstable();
+        events.dedup_by_key(|e| e.0);
+        let mut next = 0usize;
+        for (pos, b) in events {
+            charge_misses(ops, counters, misses(next, pos));
+            next = pos + 1;
+            let found = if Some(pos / 2) == degenerate {
+                let (_, reps) = self.cpu.sweep()?;
+                let rep = reps[pos / 2];
+                let summand = if pos % 2 == 0 { rep.plus } else { rep.minus };
+                let t = g.add(ops, point, g.neg(fb.points[summand]));
+                self.lookup_pairs(ctx, fb, ops, counters, summand, t, None)
+            } else {
+                let (summand, t) = {
+                    let (_, reps) = self.cpu.sweep()?;
+                    let rep = reps[pos / 2];
+                    let inv = f.inv(f.sub(xr, rep.x));
+                    let lam = if pos % 2 == 0 {
+                        f.mul(f.add(yr, rep.y), inv)
+                    } else {
+                        f.mul(f.sub(yr, rep.y), inv)
+                    };
+                    let x3 = f.sub(f.sub(f.sqr(lam), xr), rep.x);
+                    let y3 = f.sub(f.mul(lam, f.sub(xr, x3)), yr);
+                    let summand = if pos % 2 == 0 { rep.plus } else { rep.minus };
+                    (
+                        summand,
+                        PrimePoint::affine(f.from_mont(x3), f.from_mont(y3)),
+                    )
+                };
+                RootfindSubtractOracle::charge_candidate(ops);
+                self.bump("gpu_hits_confirmed_on_cpu", 1);
+                self.lookup_pairs(ctx, fb, ops, counters, summand, t, b)
+            };
+            if found.is_some() {
+                return found;
+            }
+        }
+        charge_misses(ops, counters, misses(next, 2 * k));
+        None
+    }
+}
+
 #[cfg(test)]
 mod tests {
     //! Needs a worker: `make -C gpu/rootfind serve` and
@@ -698,7 +979,7 @@ mod tests {
     //! the tests print why and pass, as the root crate builds no native code.
     use super::*;
     use crate::cryptanalysis::ic_boundary::{
-        find_prime_order_curve, prime_instance_for, Calibration, CountedGroup,
+        find_prime_order_curve, prime_instance_for, Calibration,
     };
     use crate::cryptanalysis::ic_framework::plugins::PrimeAbscissaBase;
     use crate::cryptanalysis::ic_framework::stages::Targets;
@@ -828,6 +1109,12 @@ mod tests {
                 &[Targets::WalkPrimeBatch256],
                 &[("probe_build", "host")],
             );
+            run_equality_with(
+                3,
+                "daemon",
+                &[Targets::WalkPrimeBatch256],
+                &[("probe_build", "pairs")],
+            );
         });
         let _ = daemon.kill();
         let _ = daemon.wait();
@@ -855,6 +1142,90 @@ mod tests {
                 "spawn",
                 &[Targets::WalkPrimeBatch256],
                 &[("backend", "emulate"), ("probe_build", build)],
+            );
+        }
+    }
+
+    /// `probe_build=pairs`: the worker builds the pair table; relations, every
+    /// phase's ledger (the table build's charge included) and S equal
+    /// `rootfind-subtract:m=3`'s.
+    #[test]
+    fn gpu_oracle_pairs_build_matches() {
+        if !worker_present() {
+            return;
+        }
+        run_equality_with(
+            3,
+            "spawn",
+            &[Targets::WalkPrimeBatch256, Targets::Walk],
+            &[("probe_build", "pairs")],
+        );
+    }
+
+    /// The degenerate rows (`x_R` a base abscissa) under `probe_build=pairs`:
+    /// every base point and its double as targets, decomposed by both oracles
+    /// with fresh ledgers; same answer, same ledger, same counters.
+    #[test]
+    fn gpu_oracle_pairs_degenerate_rows_match() {
+        use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
+        if !worker_present() {
+            return;
+        }
+        for (inst, size) in [
+            (prime_instance_for(14, 1), 16usize),
+            (find_prime_order_curve(17, 3116), 28),
+        ] {
+            let g = inst.generator_point();
+            let c = ctx(&inst, g);
+            let mut fparams = Params::default();
+            fparams.set("size", size.to_string());
+            let base = PrimeAbscissaBase { instance: &inst };
+            let fb = base.build(&c, &fparams, &mut GroupOps::default()).unwrap();
+            let mut cpu_params = Params::default();
+            cpu_params.set("m", "3");
+            let mut gpu_params = cpu_params.clone();
+            gpu_params.set("probe_build", "pairs");
+            let mut cpu_o = RootfindSubtractOracle::new(3, &inst);
+            let mut gpu_o = RootfindSubtractGpuOracle::new(3, &inst);
+            let (mut po, mut pg) = (GroupOps::default(), GroupOps::default());
+            cpu_o.prepare(&c, &fb, &cpu_params, &mut po).unwrap();
+            gpu_o.prepare(&c, &fb, &gpu_params, &mut pg).unwrap();
+            assert_eq!(po, pg, "{}: table build charge", inst.name);
+            assert_eq!(
+                cpu_o.setup_work_native(),
+                gpu_o.setup_work_native(),
+                "{}",
+                inst.name
+            );
+            let mut found = 0;
+            for &p in &fb.points {
+                let doubled = inst.curve.add(&mut GroupOps::default(), p, p);
+                for point in [p, doubled] {
+                    let (mut oc, mut og) = (GroupOps::default(), GroupOps::default());
+                    let (mut cc, mut cg) = (OracleCounters::default(), OracleCounters::default());
+                    let a = cpu_o.decompose(&c, &fb, &mut oc, &mut cc, point);
+                    let b = gpu_o.decompose(&c, &fb, &mut og, &mut cg, point);
+                    assert_eq!(a, b, "{}: relation", inst.name);
+                    assert_eq!(oc, og, "{}: ledger", inst.name);
+                    assert_eq!(
+                        format!("{cc:?}"),
+                        format!("{cg:?}"),
+                        "{}: counters",
+                        inst.name
+                    );
+                    found += usize::from(a.is_some());
+                }
+            }
+            assert!(found > 0, "{}: no target decomposed", inst.name);
+            assert!(
+                gpu_o
+                    .relation_counters()
+                    .get("gpu_degenerate_rows")
+                    .copied()
+                    .unwrap_or(0)
+                    > 0,
+                "{}: no degenerate row exercised",
+                inst.name
             );
         }
     }

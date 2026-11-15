@@ -15,11 +15,13 @@
  * Protocol (little-endian; the worker only proposes relations, the caller
  * re-checks every one it uses in the group):
  *
- *   INIT  u32 'RFS2', u32 n_fb, u64 p, u32 backend, u32 lookup, u32 chunk,
- *         u32 max_targets, u64 x[n_fb], u64 y[n_fb], u32 n_probe, u64 px[n_probe]
- *         (canonical; n_probe = 0: look candidates up in the base; else probe mode
- *         against px, rootfind_api.h)
- *   ->    u32 'RFS2', i32 status, u32 backend, u32 lookup, u32 chunk, u32 0
+ *   INIT  u32 'RFS3', u32 n_fb, u64 p, u32 backend, u32 lookup, u32 chunk,
+ *         u32 max_targets, u64 x[n_fb], u64 y[n_fb], u32 n_probe, u64 px[n_probe],
+ *         u64 curve_a   (canonical; n_probe = 0: look candidates up in the base; else
+ *         probe mode against px; lookup = 4 (RF_LOOKUP_PAIRS_DEVICE): probe mode
+ *         against the base's own negation-folded pair table, built by the library,
+ *         hits carrying the first pair's build index -- rootfind_api.h)
+ *   ->    u32 'RFS3', i32 status, u32 backend, u32 lookup, u32 chunk, u32 entries
  *   BATCH u32 'RFB1', u32 n, u64 x[n], u64 y[n]
  *   ->    u32 'RFB1', i32 status, u32 n_found, u32 n_written, f64 kernel_s,
  *         rf_relation[n_written]  (16 bytes: target, i, j, eps, tau, pad)
@@ -43,7 +45,7 @@
 
 #include "rootfind_api.h"
 
-static const uint32_t MAGIC_INIT = 0x32534652u;  /* "RFS2" */
+static const uint32_t MAGIC_INIT = 0x33534652u;  /* "RFS3" */
 static const uint32_t MAGIC_BATCH = 0x31424652u; /* "RFB1" */
 
 static double now_s();
@@ -73,14 +75,21 @@ static void serve(FILE *in, FILE *out) {
             if (!read_all(in, &n_probe, 4)) break;
             px.resize(n_probe);
             if (!read_all(in, px.data(), 8ull * n_probe)) break;
+            uint64_t curve_a = 0;
+            if (!read_all(in, &curve_a, 8)) break;
             if (s) { rf64_session_destroy(s); s = nullptr; }
             rf_options opt{(int)w[0], (int)w[1], w[2]};
             const uint32_t max_targets = w[3];
             cap = 4u * max_targets + 4096u;
             rf_result info{};
             const double ti1 = now_s();
-            int rc = rf64_session_create(p, x.data(), y.data(), n_fb, n_probe ? px.data() : nullptr, n_probe,
-                                         max_targets, cap, &opt, &s, &info);
+            uint32_t entries = 0;
+            int rc = w[1] == RF_LOOKUP_PAIRS_DEVICE
+                         ? rf64_session_create_pairs(p, curve_a, x.data(), y.data(), n_fb, max_targets, cap, &opt, &s,
+                                                     &info, &entries)
+                         : rf64_session_create(p, x.data(), y.data(), n_fb, n_probe ? px.data() : nullptr, n_probe,
+                                               max_targets, cap, &opt, &s, &info);
+            if (w[1] == RF_LOOKUP_PAIRS_DEVICE) n_probe = entries;
             if (g_timing)
                 std::fprintf(stderr, "rootfind_serve: timing init n_probe=%u lookup=%d receive %.4f s create %.4f s\n",
                              n_probe, info.lookup_used, ti1 - ti0, now_s() - ti1);
@@ -89,7 +98,7 @@ static void serve(FILE *in, FILE *out) {
                              rf_backend_info(), n_fb, n_probe, info.lookup_used, info.chunk_used, max_targets);
             }
             uint32_t reply[6] = {MAGIC_INIT, (uint32_t)rc, (uint32_t)info.backend_used,
-                                 (uint32_t)info.lookup_used, info.chunk_used, 0};
+                                 (uint32_t)info.lookup_used, info.chunk_used, entries};
             write_all(out, reply, sizeof reply);
             std::fflush(out);
         } else if (magic == MAGIC_BATCH) {

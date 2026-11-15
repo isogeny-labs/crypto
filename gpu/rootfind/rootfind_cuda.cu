@@ -68,6 +68,7 @@
  */
 #include <cuda_runtime.h>
 #include <cstdio>
+#include <cstdlib>
 #include <vector>
 
 #include "rootfind_host.hpp"
@@ -526,6 +527,134 @@ fail:
     cudaGetLastError();
     return rc;
 }
+
+/* ---- RF_LOOKUP_PAIRS_DEVICE: the negation-folded pair table built on the device ---- */
+
+static const unsigned long long RF_KEY_EMPTY = ~0ull;   /* abscissae are < p < 2^62 */
+
+/* one thread per (ai, bi) cell, bi >= ai: both signs of P_ai +/- P_bi */
+__global__ void k_pair_keys(Fp64Ctx f, uint64_t a_m, const uint64_t *x, const uint64_t *y, uint32_t n,
+                            uint64_t *keys) {
+    const uint64_t t = rf_global_tid();
+    if (t >= (uint64_t)n * n) return;
+    const uint32_t ai = (uint32_t)(t / n), bi = (uint32_t)(t % n);
+    if (bi < ai) return;
+    const uint64_t b = rf_pair_offset(ai, n) + 2ull * (bi - ai);
+    for (int sg = 0; sg < 2; sg++) {
+        uint64_t xk;
+        keys[b + sg] = rf_pair_x(f, a_m, x, y, ai, bi, sg, &xk) ? xk : RF_KEY_EMPTY;
+    }
+}
+
+/* first pair per abscissa: hash on the key, keep the least build index */
+__global__ void k_pair_dedupe(const uint64_t *keys, uint64_t nb, unsigned long long *hkey, uint32_t *hval,
+                              uint32_t mask) {
+    const uint64_t b = rf_global_tid();
+    if (b >= nb) return;
+    const unsigned long long key = keys[b];
+    if (key == RF_KEY_EMPTY) return;
+    uint32_t slot = rf_hash64(key, mask);
+    for (;;) {
+        const unsigned long long prev = atomicCAS(hkey + slot, RF_KEY_EMPTY, key);
+        if (prev == RF_KEY_EMPTY || prev == key) {
+            atomicMin(hval + slot, (uint32_t)b);
+            return;
+        }
+        slot = (slot + 1) & mask;
+    }
+}
+
+__global__ void k_pair_compact(const unsigned long long *hkey, const uint32_t *hval, uint32_t cap, uint64_t *px,
+                               uint32_t *pairb, uint32_t *count) {
+    const uint64_t i = rf_global_tid();
+    if (i >= cap || hkey[i] == RF_KEY_EMPTY) return;
+    const uint32_t e = atomicAdd(count, 1u);
+    px[e] = hkey[i];
+    pairb[e] = hval[i];
+}
+
+/* fb_x, fb_y: Montgomery form, every y non-zero.  On success *n_entries is the table's size
+ * and *pairb_host (malloc'ed; the caller frees) maps probe index -> build index. */
+extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, const uint64_t *fb_x,
+                                              const uint64_t *fb_y, uint32_t n_fb, uint32_t chunk,
+                                              uint32_t max_targets, uint32_t cap, void **out,
+                                              uint32_t *n_entries, uint32_t **pairb_host) {
+    int rc = RF_OK;
+    if (!rf::chunk_ok(chunk)) return RF_ERR_BAD_CHUNK;
+    if (n_fb == 0 || max_targets == 0) return RF_ERR_BAD_ARG;
+    RfCudaSession64 *s = new RfCudaSession64();
+    uint64_t *d_keys = nullptr;
+    unsigned long long *d_hkey = nullptr;
+    uint32_t *d_hval = nullptr, *d_pairb = nullptr, *d_count = nullptr;
+    const uint64_t nb = (uint64_t)n_fb * (n_fb + 1);
+    const uint32_t hcap = rf::hash_capacity_for((uint32_t)nb);
+    uint32_t entries = 0;
+    s->f = *f; s->lookup = RF_LOOKUP_HASH_DEVICE; s->chunk = chunk; s->n_fb = n_fb;
+    s->max_targets = max_targets; s->cap = cap ? cap : 1;
+    CUS(rf_cu_alloc(&s->d_fbx, n_fb * sizeof(uint64_t)));
+    CUS(rf_cu_alloc(&s->d_fby, n_fb * sizeof(uint64_t)));
+    CUS(rf_cu_alloc(&s->d_tx, max_targets * sizeof(uint64_t)));
+    CUS(rf_cu_alloc(&s->d_ty, max_targets * sizeof(uint64_t)));
+    CUS(rf_cu_alloc(&s->d_cnt, sizeof(uint32_t)));
+    CUS(rf_cu_alloc(&s->d_out, s->cap * sizeof(rf_relation)));
+    CUS(cudaMemcpy(s->d_fbx, fb_x, n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
+    CUS(cudaMemcpy(s->d_fby, fb_y, n_fb * sizeof(uint64_t), cudaMemcpyHostToDevice));
+    /* every pair's abscissa, in build order */
+    CUS(rf_cu_alloc(&d_keys, nb * sizeof(uint64_t)));
+    {
+        const uint64_t cells = (uint64_t)n_fb * n_fb;
+        k_pair_keys<<<(unsigned)((cells + 255) / 256), 256>>>(*f, a_m, s->d_fbx, s->d_fby, n_fb, d_keys);
+        CUS(cudaGetLastError());
+    }
+    /* first pair per abscissa */
+    CUS(rf_cu_alloc(&d_hkey, (size_t)hcap * sizeof(unsigned long long)));
+    CUS(rf_cu_alloc(&d_hval, (size_t)hcap * sizeof(uint32_t)));
+    CUS(cudaMemset(d_hkey, 0xFF, (size_t)hcap * sizeof(unsigned long long)));
+    CUS(cudaMemset(d_hval, 0xFF, (size_t)hcap * sizeof(uint32_t)));
+    k_pair_dedupe<<<(unsigned)((nb + 255) / 256), 256>>>(d_keys, nb, d_hkey, d_hval, hcap - 1);
+    CUS(cudaGetLastError());
+    cudaFree(d_keys); d_keys = nullptr;
+    /* compact into the probe set and its build-index map */
+    CUS(rf_cu_alloc(&s->d_px, nb * sizeof(uint64_t)));
+    CUS(rf_cu_alloc(&d_pairb, nb * sizeof(uint32_t)));
+    CUS(rf_cu_alloc(&d_count, sizeof(uint32_t)));
+    CUS(cudaMemset(d_count, 0, sizeof(uint32_t)));
+    k_pair_compact<<<(hcap + 255) / 256, 256>>>(d_hkey, d_hval, hcap, s->d_px, d_pairb, d_count);
+    CUS(cudaGetLastError());
+    CUS(cudaMemcpy(&entries, d_count, sizeof(uint32_t), cudaMemcpyDeviceToHost));
+    cudaFree(d_hkey); d_hkey = nullptr;
+    cudaFree(d_hval); d_hval = nullptr;
+    s->n_probe = entries;
+    /* the probe table over the entries (packed slots, as RF_LOOKUP_HASH_DEVICE) */
+#if RF_HASH_PACKED
+    s->hcap = rf::hash_capacity_for(entries);
+    CUS(rf_cu_alloc(&s->d_aux64, s->hcap * sizeof(uint64_t)));
+    k_slots_fill<<<(s->hcap + 255) / 256, 256>>>(s->d_aux64, s->hcap);
+    k_slots_insert<<<(entries + 255) / 256, 256>>>(*f, s->d_aux64, s->hcap - 1, s->d_px, entries);
+    CUS(cudaGetLastError());
+    s->hview.keys = nullptr; s->hview.vals = nullptr; s->hview.mask = s->hcap - 1;
+    s->hview.slots = s->d_aux64;
+#else
+    rc = RF_ERR_BAD_ARG;
+    goto fail;
+#endif
+    *pairb_host = static_cast<uint32_t *>(std::malloc((size_t)entries * sizeof(uint32_t) + 1));
+    if (!*pairb_host) { rc = RF_ERR_NOMEM; goto fail; }
+    CUS(cudaMemcpy(*pairb_host, d_pairb, (size_t)entries * sizeof(uint32_t), cudaMemcpyDeviceToHost));
+    cudaFree(d_pairb); cudaFree(d_count);
+    CUS(rf_cu_event(&s->e0));
+    CUS(rf_cu_event(&s->e1));
+    *n_entries = entries;
+    *out = s;
+    return RF_OK;
+fail:
+    cudaGetLastError();
+    cudaFree(d_keys); cudaFree(d_hkey); cudaFree(d_hval); cudaFree(d_pairb); cudaFree(d_count);
+    if (pairb_host && *pairb_host) { std::free(*pairb_host); *pairb_host = nullptr; }
+    rf_cuda_session64_destroy(s);
+    return rc;
+}
+
 #undef CUS
 
 /* Create this process's CUDA context now (the daemon does, before it listens). */
