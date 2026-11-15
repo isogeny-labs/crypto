@@ -391,6 +391,42 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Further load-bearing primary-paper audits
 
+The [actual negation pullback audit](../negation_pullback_audit_20261115/README.md)
+constructs the actual coordinate involution, full FunctionField automorphism and
+actual point-localization isomorphism. Actual evaluation identifies allowed
+denominators; actual maximal ideals and uniformizer generators transport.
+The earlier actual nonsingularity-derived DVR/full fraction field and actual
+unit-times-integer-power theorem derive the official normalized finite-adic
+formula v_P(iota*f)=v_(-P)(f) for every actual function, without a valuation-
+invariance premise. Actual norm preservation handles infinity; every actual
+point order and finite-support principal divisor consequently transports by
+actual point negation. The actual algebra norm equals the product with actual
+conjugation, including the full-field fraction identity. On the actual
+nonsingular F5 curve y²=x³+1, the actual nonzero tangent at actual3torsion
+P=(0,1) has order3atP and0at−P. This disproves deleting function pullback;
+the correct pulled-back function has order0atP. Qualified Galbraith
+Lemma7.7.12 survives. Involutive means squareidentity, not exactorder2 for
+every general model/characteristic. Actual nonsingularKpoints include all
+geometric points for an elliptic model over algebraically closedK.
+Geometric degreezero/constantkernel/uniqueness, algebraicclosurebasechange,
+separate Scheme.localRing/Divisor APIcomparison, translation/reciprocity/
+isogeny/Lang/Cartier/Jacobian/canonical pairings/MOV-FR/full14 remain open.
+Exact local **PCC-20261115-421c18** PASS at2026-11-15T08:05:52Z; signedunverified. Whole381/0fail/0trusted/
+standardfoundations;47modules39exactcredited+8new/50formal-config+15artifactpins;
+full1280-character bindingaeb39697095990a68ba9433163f8b7fa516850bef89f64e69f2b1a4ecac6ed1e/native1complete/0prefix/0unresolved.
+Eleven retainedstates/sixfailures/fivesuccesses;97files/42objects/
+15592byte losslessXZ/fivegate/onepagePDF47090fullread/visual/inbounds.
+Final11/projectlogs clean; inheritedauditordeprecation retained. Raw01source/log/
+exit retained; initial01config explicitlyreconstructed from02/single-targetedit,
+not falsely presented as raw. Setupreceipt summaryrecordedafterobservedexit0.
+Full sourceLemma7.7.12 proof/PDF16/printed138 freshlytext-read; exact priorvisual
+and cumulativepartialchaptercoverage credited, notall21pages. Official
+AdjoinRoot/localization/DVR/norm APIs and establishedQuadraticAlgebra
+conjugation credited; KB/Conductor127 explicitfallback. No novelty/canonical
+promotion/independentphysicalhost/frozenedits/cryptoPython/spend/upload.
+[pcc:unverified]
+
+
 The [actual general-function divisor audit](../function_divisor_finiteness_audit_20261115/README.md)
 now derives finite nonzero actual local orders for every nonzero actual
 Weierstrass rational function, not only constructed Miller functions. Actual
