@@ -73,7 +73,7 @@ fn sqrt_mod(n: u64, p: u64) -> Option<u64> {
     while powm(z, (p - 1) / 2, p) != p - 1 {
         z += 1;
     }
-    let (mut m, mut c, mut t, mut r) = (s, powm(z, q, p), powm(n, q, p), powm(n, (q + 1) / 2, p));
+    let (mut m, mut c, mut t, mut r) = (s, powm(z, q, p), powm(n, q, p), powm(n, q.div_ceil(2), p));
     while t != 1 {
         let mut i = 0;
         let mut tt = t;
@@ -111,7 +111,6 @@ struct Instance {
     g: u64,
     zeta: u64,
     x_r: u64,
-    planted: bool,
     grid_zeros: u64,
     tries: u64,
 }
@@ -123,7 +122,7 @@ fn draw_instance(p: u64, t: usize, idx: u64, planted: bool) -> Instance {
         ^ idx.wrapping_mul(0x1000_0000_01b3)
         ^ if planted { 0xABCD_0000 } else { 0 };
     let mut rng = StdRng::seed_from_u64(seed);
-    assert!((p - 1) % (1u64 << t) == 0, "2^t must divide p-1");
+    assert!((p - 1).is_multiple_of(1u64 << t), "2^t must divide p-1");
     let zeta = loop {
         let h = rng.gen_range(2..p);
         if powm(h, (p - 1) / 2, p) == p - 1 {
@@ -185,7 +184,6 @@ fn draw_instance(p: u64, t: usize, idx: u64, planted: bool) -> Instance {
                 g,
                 zeta,
                 x_r,
-                planted,
                 grid_zeros: 1,
                 tries,
             };
@@ -227,7 +225,6 @@ fn draw_instance(p: u64, t: usize, idx: u64, planted: bool) -> Instance {
                 g,
                 zeta,
                 x_r,
-                planted,
                 grid_zeros: 0,
                 tries,
             };
@@ -332,7 +329,6 @@ const NONE: u32 = u32::MAX;
 
 struct Cols {
     mask: Vec<u32>,
-    deg: Vec<u8>,
     idx: Vec<u32>,
     mulmap: Vec<u32>,
     first_low: u32,
@@ -370,7 +366,6 @@ fn build_cols(nv: usize, t: usize, c: u32) -> Cols {
     }
     Cols {
         mask: masks,
-        deg,
         idx,
         mulmap,
         first_low,
