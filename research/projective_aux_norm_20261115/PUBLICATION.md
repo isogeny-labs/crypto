@@ -86,3 +86,14 @@ Strict native build004 passes; no original build directory is overwritten.
 The prospective graph-004 panel runs only after its source commit and hashes
 are captured, using a separate frozen runner file. Runtime shape and all
 model/certificate checks remain acceptance conditions, not assumed results.
+
+A3 completes:8 variables/degree4/six zero graph equations, all12 msolve
+sets match4 models with original lifts, all12 source-certified PC calls are
+still124 unknown. Preserve graph004. A4 is now implemented as a separately
+named indexed producer: same grevlex/FIFO semantics and external DAG verifier,
+with sparse pivots and a dense temporary row. Source-consistent full linear
+completion is checked by triangular back-substitution and original evaluation,
+equivalent to zero remainders in the resulting point ideal. Index/table/work,
+stored coefficient and proof-remap entries share the2M admission budget.
+Strict native compilation passes; no qualification result is asserted yet.
+[pcc:unverified]
