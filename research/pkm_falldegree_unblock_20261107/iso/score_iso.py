@@ -38,11 +38,14 @@ def lower_median(v):
     return (med, ">=" if cens else "")
 
 
+CONTROL = "tower"   # "null" for Amendment 21's isogeny null (set by --null)
+
+
 def rows_of(path):
     for line in open(path):
         if line.startswith("{"):
             r = json.loads(line)
-            if "x_r" in r and r.get("kind") == "isogeny" and r.get("m") == 2 and r.get("control") == "tower":
+            if "x_r" in r and r.get("kind") == "isogeny" and r.get("m") == 2 and r.get("control") == CONTROL:
                 yield r
 
 
@@ -87,9 +90,9 @@ def score(runs):
                 src(x, p, r, f"F4 refutes at D={x['D']}")
             else:
                 src(x, p, r, "F4 stopped or not refuted: no bound")
-    for pat in ("CAP-iso-m2-t*-k*-c*.jsonl", "X-iso-m2-t*-k*-c*.jsonl"):
+    for pat in ("CAP-iso-m2-t*-k*-c*.jsonl", "CAPN-iso-m2-t*-k*-c*.jsonl", "X-iso-m2-t*-k*-c*.jsonl"):
         for p in sorted(glob.glob(os.path.join(runs, pat))):
-            m = re.match(r"(CAP|X)-iso-m2-t(\d+)-k(\d+)-c(\d+)\.jsonl$", os.path.basename(p))
+            m = re.match(r"(CAP|CAPN|X)-iso-m2-t(\d+)-k(\d+)-c(\d+)\.jsonl$", os.path.basename(p))
             if not m:
                 continue
             cap = int(m.group(4))
@@ -293,7 +296,43 @@ def _selftest_review_cases():
     print("selftest (review cases A-F, H): pass")
 
 
+def null_reading(tower_json, null_runs):
+    """Amendment 21, P-ISO-N: per t = 1..13, the isogeny tower median (from a committed score_iso.json) against the
+    isogeny null median (lower median, both draws, the same bound rules; null draws are not certified: a null system
+    is not a summation system). 'shape-driven' if every t with both medians exact has them equal and at least 8 such t
+    exist; 'Semaev-specific' if some t has both exact and different, or one exact and the other a bound above it;
+    'undecided' otherwise."""
+    global CONTROL
+    tw = json.load(open(tower_json))["readings"]["medians"]
+    CONTROL = "null"
+    ds = score(null_runs)
+    out, eq, diff = {}, 0, 0
+    for t in range(1, 14):
+        keep = [x["dF"] for x in ds if x["t"] == t and x["dF"] is not None and not x["conflicts"]]
+        both = len([x for x in ds if x["t"] == t]) == 2 and len(keep) == 2
+        m = lower_median(keep) if both else None
+        nm = None if m is None else f"{m[1]}{m[0]}"
+        tm = tw.get(str(t), tw.get(t))
+        out[t] = {"tower": tm, "null": nm}
+        if nm and tm:
+            ex_t, ex_n = not tm.startswith(">"), not nm.startswith(">")
+            vt, vn = int(tm.lstrip(">=")), int(nm.lstrip(">="))
+            if ex_t and ex_n:
+                eq += vt == vn
+                diff += vt != vn
+            elif (ex_t and not ex_n and vn > vt) or (ex_n and not ex_t and vt > vn):
+                diff += 1
+    conflicts = [(x["t"], x["k"], c) for x in ds for c in x["conflicts"]]
+    reading = ("STOPPED" if conflicts else "Semaev-specific" if diff else "shape-driven" if eq >= 8 else "undecided")
+    return {"per_t": out, "exact_equal": eq, "differ": diff, "conflicts": conflicts, "P_ISO_N": reading}
+
+
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["--null"]:
+        r = null_reading(sys.argv[2], sys.argv[3])
+        json.dump(r, open(sys.argv[4], "w"), indent=1)
+        print(json.dumps(r, indent=1))
+        sys.exit(2 if r["P_ISO_N"] == "STOPPED" else 0)
     if sys.argv[1:] == ["--selftest"]:
         _selftest()
         _selftest_review_cases()

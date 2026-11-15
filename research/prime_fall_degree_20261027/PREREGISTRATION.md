@@ -672,3 +672,46 @@ The study's running total is checked against US$400 before each pod is created.
 - **Unchanged:** the systems, caps, `--max-n`, budget, the agree rule, and Amendment 11's stop rule. A disagreement or timeout
   in the rerun stops stage B as Amendment 11 says.
 - **Consistency check.** The 22 runs already written must come out the same in the rerun (same system, cap, refutation).
+
+## Amendment 21 (2026-11-15; before any row of the jobs it adds): Kummer `t = 14`, the `m = 4` cells, and the isogeny null
+
+The owner's instruction of 2026-11-15 was "Chase down all leads above": Kummer `t = 14` cap 6, the `m = 4` jobs, and an
+isogeny null arm. Route, storage and resources follow Amendments 15, 17 and 18 (reserved 16-vCPU RunPod pods; git; refusal
+above the per-job ceiling including 4 h idle). Every Kummer job starts with the E3.7 positive control
+(`cap:12:0:5`, `cap:12:0:6`), and its rows are admitted only if X1/X3 are reproduced exactly.
+
+**Disclosure.** Everything in `REPORT_RUNPOD_20261115.md` had been seen when this was written: the isogeny `P1` medians,
+Kummer `t = 13` "holds", and stage B. No row of the cells below exists.
+
+1. **Kummer `t = 14`, cap 6** (Amendment 7 B; Amendment 14 at 56Gi; `c*(14) = 7`, the decisive C-step cell of Amendment 7 E).
+   - Jobs `pfd-x-t14-k{0,1}-c6-rp`: stages `cap:12:0:5:12800000000 cap:12:0:6:12800000000 cap:14:K:6:12800000000`.
+   - Limit 90,000 s, ceiling US$40.
+   - If cap 6 does not refute on a draw, that draw's cap 7 (`cap:14:K:7:12800000000`) runs as a new job, with the same rules.
+   - Readings: Amendment 7 D.5 as registered.
+   - Amendment 14's `-m112` rule applies to these single-heavy-stage jobs (Amendment 15 F-R3-3).
+2. **`m = 4`.** Amendment 8's four Kummer cells and Amendment 13's four null cells:
+   - `m4:4:K:7:13958643712:4000000` and `m4n:4:K:7:13958643712:4000000`;
+   - `m4:5:K:6:13958643712:4000000` and `m4n:5:K:6:13958643712:4000000`;
+   - `K = 0, 1`; frozen binaries and `entry_r2.sh`; memory floor 112 GiB (pod 128 GB); limit 176,400 s;
+     ceiling US$60 (owner decision 16; US$55.12 at the limit).
+   - On RunPod there is no pool limit, so Amendment 13's "serially" becomes "each null is submitted after its Kummer
+     counterpart". The order is kept; the jobs may run at the same time.
+   - Readings: Amendments 8 and 13 as registered.
+   - The 256 GB cells (`t = 5, c = 7` and `t = 6, c = 6`) wait for the `t = 5, c = 6` rows' measured entry counts
+     (`CAPACITY_R2.md` §1) and a further amendment.
+3. **Isogeny null at `P1`** (`--kinds isogeny --controls null`, `m = 2`).
+   - Job `iso-null` (stages `g1 gaux A-null A-null-big DA-null cap-A-null` of `iso/entry_iso.sh`): the stage A isogeny
+     cell set at `t = 1..13` with the null control.
+   - The null keeps the Vélu tower equations and replaces the `S3` coefficients with random ones (the pilot's `system`;
+     kind-independent). The rows are not certified: a null system is not a summation system.
+   - Limit 120,000 s, ceiling US$40. Bundle pins: `iso/BUNDLE.sha256` SHA-256 `69611876052a4805b17ed5266a97f06bb2c656fe80236d2129f676161f4fca50`.
+   - **Reading P-ISO-N** (`score_iso.py --null`), per `t`, the isogeny tower median (committed `results/ISO/SCORE/score_iso.json`)
+     against the null median (lower median, both draws):
+     - **"Semaev-specific"** if some `t` has both exact and different, or one exact and the other a bound above it;
+     - **"shape-driven"** if no `t` differs and at least 8 `t` have both exact and equal;
+     - **"undecided"** otherwise;
+     - a conflict stops it.
+   - It answers whether P-ISO-2's "grows" belongs to the Semaev system or to the tower ring.
+
+The study total at the limits is checked before each pod is created, against US$400 plus the `m = 4` jobs' ceilings
+(owner decision 16).

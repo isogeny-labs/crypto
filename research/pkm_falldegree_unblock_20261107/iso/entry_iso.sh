@@ -10,6 +10,7 @@
 #   cert              decomposability certificate of every m = 2 isogeny row in runs/ (certify_m2.py)
 #   cap-A             capped F4 at D - 1 for t = 11..13, both draws, D from DA-m2-iso-p1 (run.sh cap-A rule)
 #   A-14, DA-14, cap-14   the t = 14 cell of Amendment 19 (closure cmax 5, F4, capped F4 at D - 1)
+#   A-null, A-null-big, DA-null, cap-A-null   Amendment 21: the shape-matched isogeny null at P1, t = 1..13
 #   g3-b              Amendment 20: stage B gate G3 rerun with --jobs 1 on the frozen Kummer pilot over /work/rows_in/B-*.jsonl
 #   x:T:K:C:DENSE     ONE Amendment 7 B bracket run (budget 86400, --max-dense DENSE, --trace), then cert of its row
 # Results: $ISOLAB_RESULTS_URI (runs/, gates/, progress.txt, binary.sha256, host.txt), synced every 300 s and at exit.
@@ -24,6 +25,7 @@ export RAYON_NUM_THREADS=12          # pinned (G-AUX: F4 muladds depend on the r
 P0=786433
 P1=2013265921
 c1=(--p $P1 --ladder-t none --planted 0 --random 2 --kinds isogeny --m 2 --controls tower)
+n1=(--p $P1 --ladder-t none --planted 0 --random 2 --kinds isogeny --m 2 --controls null)   # Amendment 21: isogeny null
 hky=(--engine hky --hky-cmax 7 --budget 1800 --hky-max-cols 2000000 --hky-max-entries 300000000)
 f4=(--engine tower --budget 1800 --max-nnz 2000000000)
 log() { echo "$(date -u +%FT%TZ) $*" >> "$S/progress.txt"; }
@@ -64,6 +66,14 @@ for s in "$@"; do
     A) run A-m2-iso-p1 "${c1[@]}" "${hky[@]}" --t-min 1 --max-t 10 ;;
     A-big) run A-m2-iso-p1-big "${c1[@]}" "${hky[@]}" --hky-cmax 5 --t-min 11 --max-t 13 ;;
     DA) run DA-m2-iso-p1 "${c1[@]}" "${f4[@]}" --t-min 1 --max-t 13 ;;
+    A-null) run A-m2-iso-p1-null "${n1[@]}" "${hky[@]}" --t-min 1 --max-t 10 ;;                   # Amendment 21
+    A-null-big) run A-m2-iso-p1-null-big "${n1[@]}" "${hky[@]}" --hky-cmax 5 --t-min 11 --max-t 13 ;; # Amendment 21
+    DA-null) run DA-m2-iso-p1-null "${n1[@]}" "${f4[@]}" --t-min 1 --max-t 13 ;;                  # Amendment 21
+    cap-A-null) for t in 11 12 13; do for k in 0 1; do                                             # Amendment 21
+          D=$(grep -h "\"t\":$t," runs/DA-m2-iso-p1-null.jsonl | grep "\"target_index\":$k," | sed 's/.*"solving_degree_max":\([0-9]*\).*/\1/' | head -1)
+          [ -n "$D" ] || continue
+          run CAPN-iso-m2-t$t-k$k-c$((D-1)) "${n1[@]}" "${f4[@]}" --t-min $t --max-t $t --targets $k --cap $((D-1))
+        done; done ;;
     A-14) run A-m2-iso-p1-t14 "${c1[@]}" "${hky[@]}" --hky-cmax 5 --t-min 14 --max-t 14 ;;     # Amendment 19
     DA-14) run DA-m2-iso-p1-t14 "${c1[@]}" "${f4[@]}" --t-min 14 --max-t 14 ;;               # Amendment 19
     cap-14) for k in 0 1; do                                                                  # Amendment 19
