@@ -141,9 +141,14 @@ impl MatchGate {
                 return true;
             }
         }
-        self.epoch = self.epoch.wrapping_add(1);
+        // Columns stamped with the current epoch are either visited by this
+        // search or proven dead by an earlier failed one: from a dead column
+        // no alternating path reaches a free column, and that stays true
+        // until the matching changes, because a new (unmatched) row adds
+        // edges only at a vertex no alternating path enters.  So the epoch
+        // moves only after an augmentation, and the failed searches between
+        // two augmentations cost O(edges) together, not each.
         if self.epoch == 0 {
-            self.stamp.iter_mut().for_each(|s| *s = 0);
             self.epoch = 1;
         }
         let mut stack: Vec<(u32, usize)> = vec![(r0, 0)];
@@ -177,6 +182,11 @@ impl MatchGate {
                     cur = prev as usize;
                 }
                 self.size += 1;
+                self.epoch = self.epoch.wrapping_add(1);
+                if self.epoch == 0 {
+                    self.stamp.iter_mut().for_each(|s| *s = 0);
+                    self.epoch = 1;
+                }
                 return true;
             }
             stack.push((owner, 0));
@@ -391,12 +401,17 @@ fn solve_square(
     let mut frozen: Vec<Option<(BTreeMap<u32, u64>, u64)>> = vec![None; n];
 
     // Live rows of a column (lazy: incidence lists keep stale entries).
+    // Lists can hold a row twice (a cancelled entry refilled later), so
+    // the live set is de-duplicated.
     let live_rows = |c: usize, col_rows: &Vec<Vec<u32>>, w: &Vec<BTreeMap<u32, u64>>, row_alive: &Vec<bool>| -> Vec<u32> {
-        col_rows[c]
+        let mut v: Vec<u32> = col_rows[c]
             .iter()
             .copied()
             .filter(|&i| row_alive[i as usize] && w[i as usize].contains_key(&(c as u32)))
-            .collect()
+            .collect();
+        v.sort_unstable();
+        v.dedup();
+        v
     };
 
     // ── Peeling ──
