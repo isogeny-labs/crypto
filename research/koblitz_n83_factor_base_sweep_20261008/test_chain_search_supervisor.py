@@ -196,6 +196,27 @@ class ChainSearchGuardTests(unittest.TestCase):
         self.assertIsNone(guard.receipt_error(worker, worker_config, ordered_config))
         worker_config["strategy"] = "orbit-chain-s3"
         self.assertIn("strategy", guard.receipt_error(worker, worker_config, ordered_config))
+        karatsuba_config = dict(config, product_kernel="karatsuba")
+        worker_config, worker = receipts(karatsuba_config, "UNKNOWN_solver_cap")
+        self.assertEqual(worker_config["strategy"], "chain-s3-karatsuba")
+        self.assertIsNone(guard.receipt_error(worker, worker_config, karatsuba_config))
+        worker_config["strategy"] = "chain-s3"
+        self.assertIn("strategy", guard.receipt_error(worker, worker_config, karatsuba_config))
+        with self.assertRaises(ValueError):
+            guard.strategy_name(dict(karatsuba_config, domain_encoding="frobenius_orbit_phase"))
+        shallow_config = dict(config, product_kernel="shallow_karatsuba")
+        worker_config, worker = receipts(shallow_config, "UNKNOWN_solver_cap")
+        self.assertEqual(worker_config["strategy"], "chain-s3-shallow-karatsuba")
+        self.assertIsNone(guard.receipt_error(worker, worker_config, shallow_config))
+        shallow_orbit = dict(shallow_config, domain_encoding="frobenius_orbit_phase")
+        worker_config, worker = receipts(shallow_orbit, "UNKNOWN_solver_cap")
+        self.assertEqual(worker_config["strategy"], "orbit-chain-s3-shallow-karatsuba")
+        self.assertIsNone(guard.receipt_error(worker, worker_config, shallow_orbit))
+        shallow_ordered = dict(
+            shallow_config, domain_encoding="frobenius_orbit_phase_ordered_first_pair")
+        worker_config, worker = receipts(shallow_ordered, "UNKNOWN_solver_cap")
+        self.assertEqual(worker_config["strategy"], "ordered-orbit-chain-s3-shallow-karatsuba")
+        self.assertIsNone(guard.receipt_error(worker, worker_config, shallow_ordered))
 
     def test_relation_replay_checks_phase_sign_and_canonical_residue(self):
         self.assertEqual((guard.PRIMARY_FROBENIUS_LAMBDA**2 +
@@ -333,6 +354,8 @@ class ChainSearchGuardTests(unittest.TestCase):
                 "orbit_bad_strategy": "PRODUCER_FAILURE_worker_receipt",
                 "ordered_preflight": "PREFLIGHT_ONLY",
                 "ordered_bad_strategy": "PRODUCER_FAILURE_worker_receipt",
+                "karatsuba_preflight": "PREFLIGHT_ONLY",
+                "karatsuba_bad_strategy": "PRODUCER_FAILURE_worker_receipt",
                 "input_changed": "PRODUCER_FAILURE_frozen_input_changed",
                 "object_changed": "PRODUCER_FAILURE_frozen_input_changed",
             }
@@ -341,6 +364,7 @@ class ChainSearchGuardTests(unittest.TestCase):
                     output = root / mode
                     orbit_mode = mode.startswith(("orbit_", "ordered_"))
                     ordered_mode = mode.startswith("ordered_")
+                    karatsuba_mode = mode.startswith("karatsuba_")
                     columns = 2048 if orbit_mode else 64
                     max_variables = 150000 if orbit_mode else 100000
                     max_domain_clauses = 1000000 if orbit_mode else 300000
@@ -372,13 +396,16 @@ class ChainSearchGuardTests(unittest.TestCase):
                         self.assertEqual(command[command.index("--network") + 1], "none")
                         self.assertEqual(command[command.index("--memory-swap") + 1], f"{memory_mib}m")
                         selected = ("primary-ordered-orbit-chain-cold" if ordered_mode else
-                                    "primary-orbit-chain-cold" if orbit else "primary-chain-cold")
+                                    "primary-orbit-chain-cold" if orbit else
+                                    "primary-chain-cold-karatsuba" if karatsuba_mode else
+                                    "primary-chain-cold")
                         self.assertEqual(command[-16:-14], ["/worker", selected])
                         if mode not in ("timeout", "resource"):
                             worker_config, worker = receipts(config)
                             if mode == "malformed":
                                 worker["report"]["sat_invalid_models"] = 1
-                            if mode in ("orbit_bad_strategy", "ordered_bad_strategy"):
+                            if mode in ("orbit_bad_strategy", "ordered_bad_strategy",
+                                        "karatsuba_bad_strategy"):
                                 worker_config["strategy"] = "chain-s3"
                             run_dir = output / "run"
                             run_dir.mkdir()
@@ -409,6 +436,7 @@ class ChainSearchGuardTests(unittest.TestCase):
                             0, max_variables, max_domain_clauses, 1, 1000, 1.0, memory_mib,
                             binary, output, checkout=checkout,
                             orbit_domain=orbit_mode, ordered_first_pair=ordered_mode,
+                            karatsuba=karatsuba_mode,
                         )
                     self.assertEqual(outer["status"], status)
                     self.assertEqual(json.loads((output / "outer.json").read_text())["status"], status)
