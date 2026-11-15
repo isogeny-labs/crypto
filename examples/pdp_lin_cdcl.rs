@@ -911,8 +911,3 @@ impl ChainInstance {
         }
     }
 }
-
-/// This file is a module that `b0_pdp_sat_baseline.rs` loads with `#[path]`; Cargo also
-/// discovers it as an example target, which needs an entry point. It does nothing.
-#[allow(dead_code)]
-fn main() {}
