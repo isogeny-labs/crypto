@@ -23,8 +23,9 @@ pub struct Info {
     pub basis_polynomial_degree: usize,
 }
 fn bounded(row: &Row) -> Result<(), String> {
-    if row.poly.len() > POLY_CAP || row.proof.len() > PROOF_CAP || degree(&row.poly) > 64 {
-        Err("quotient_budget: polynomial/proof expansion".into())
+    let polynomial_degree = degree(&row.poly);
+    if row.poly.len() > POLY_CAP || row.proof.len() > PROOF_CAP || polynomial_degree > 64 {
+        Err(format!("quotient_budget: polynomial/proof expansion; polynomial_terms={}; proof_terms={}; polynomial_degree={polynomial_degree}; caps={POLY_CAP}/{PROOF_CAP}/64",row.poly.len(),row.proof.len()))
     } else {
         Ok(())
     }
@@ -356,7 +357,13 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
                 t,
                 y,
                 p,
-            )? {
+            )
+            .map_err(|e| {
+                format!(
+                    "{e}; phase=coordinate; variable={y}; projected_root_degree={}",
+                    root.degree
+                )
+            })? {
                 if !verify(&row, inputs, p) {
                     return Err("quotient: invalid coordinate certificate".into());
                 }
@@ -372,12 +379,16 @@ pub fn solve(inputs: &[Poly], n: usize, p: u64) -> Result<(Vec<Row>, Info), Stri
             return Err("quotient: disconnected graph or nonunit subresultant".into());
         }
     }
-    for row in originals {
-        if !rewrite(row, &h, &rules, t, p)?.poly.is_empty() {
+    for (i, row) in originals.into_iter().enumerate() {
+        if !rewrite(row, &h, &rules, t, p)
+            .map_err(|e| format!("{e}; phase=input-rewrite; input={i}"))?
+            .poly
+            .is_empty()
+        {
             return Err("quotient: original input not in representation".into());
         }
     }
-    let basis = change_order(&h, &rules, t, p)?;
+    let basis = change_order(&h, &rules, t, p).map_err(|e| format!("{e}; phase=change-order"))?;
     let reduced = basis.iter().enumerate().all(|(i, r)| {
         r.poly[lead(&r.poly)] == 1
             && r.poly.keys().all(|m| {
