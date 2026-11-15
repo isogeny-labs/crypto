@@ -43,3 +43,14 @@ present), `render.py` of the first study.
 ## Limits
 Shared 4-vCPU host (counted units only); 3 curves × 2 seeds per cell; `h ≤ 8`; genus 2
 only above 2^15. Not an isolated-host measurement.
+
+## Amendment 1 (2026-11-15 05:10Z, before any datum of the cells it changes)
+
+The full-base arm a at genus 2 spends its time in a dense linear algebra of about
+`p/2` columns (`la_mul` 5.8e10 at p = 262147, 54 minutes for one run) and would take
+days at p ≥ 2^20; it answers none of X1–X6, which are about arm c and rho. The run was
+stopped after the p = 262147 cell (108 runs, all certified; no run of a larger cell had
+started) and relaunched for `524309,1048583,2097169,4194319,8388617,16777259` with
+`--arms cR` only, everything else unchanged; then the genus-3 command as written. The
+arm-a exponent (X2's second clause) is therefore fitted on 8209…262147 only, and
+that restriction is reported with it.
