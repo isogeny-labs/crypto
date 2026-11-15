@@ -57,3 +57,8 @@ and uncommitted diffs first. Reuse immutable passing receipts when inputs have
 not changed; do not repeat the completed two-hour root library run. Rerun
 affected checks after new arithmetic changes. Never rerun historical Python
 research for extension work. Recheck access before any new experiment.
+
+
+## CT20b (2026-11-11) — conditional global degree-seven factor lemma
+
+**State: written geometric argument plus 15-class symbolic negative-control test, unsigned; actual Jacobian map unimplemented.** See `CT20B_GLOBAL_FACTOR_CERTIFICATE.md`, `ct20_two_torsion_graph.py`, and `ct20b_torsion_graph.svg` in stacked CT20b review PR (on CT20 #3920). Assuming the *actual* source and target HLP product pull/norm maps have the matching kernel graphs, branch-pair norms yield N0(J0[2]) subset G0; A=P1 alpha N0 factors through geometric [2] to degree49 Phi, with dual[7] identities. Producer script enumerates all15 nonzero branch pairs (3 zero,4 each graph element); incorrect rotated matching fails12/15. This is **not** an independently certified correspondence or cost result. Next independently establish the target quotient correspondences and run full12,317-class balanced divisor maps/dual checks and64 elliptic4-torsion lifts. Preserve root PCC ledger/archive gates. [pcc:unverified]
