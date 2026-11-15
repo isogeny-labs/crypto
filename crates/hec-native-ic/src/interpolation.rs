@@ -181,6 +181,19 @@ fn descend(
 /// Cold, target-connected IC. Both descents and every rank retry are charged.
 pub fn solve(curve: &Curve, d1: &Div, d2: &Div, ell: u64, seed: u64, gate: bool) -> Report {
     let all = Instant::now();
+    // A unique rational ell-primary component makes factor-base log
+    // normalization valid. Use a conservative integral Hasse bound.
+    let mut root = (curve.fp.p as f64).sqrt() as u64;
+    while (root as u128) * (root as u128) < curve.fp.p as u128 {
+        root += 1;
+    }
+    let upper = (root as u128 + 1)
+        .checked_pow((2 * curve.g) as u32)
+        .expect("bounded Hasse certificate");
+    assert!(
+        (ell as u128) * (ell as u128) > upper,
+        "unique ell-primary component not certified"
+    );
     let mut rep = Report::default();
     let mut rng = Rng::new(seed);
     let fl = Fp::new(ell);

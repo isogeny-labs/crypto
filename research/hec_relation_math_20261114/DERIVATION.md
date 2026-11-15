@@ -67,3 +67,15 @@ Success target remains >=10x at every genus 2,3,4 row in a held-out growing-size
 independent replay and a novelty review. Pilot gains, rank behavior and component ratios do
 not establish that conclusion. Freeze hold-out curves/statistics before measuring that ladder.
 Record failed or capped attempts and preserve the active goal if this mechanism misses 10x.
+
+### Normalization certificate (before pilot)
+
+The logarithm map on all base places must land in the target's unique ell-primary component.
+We certify ell^2 > #J using the conservative integer Hasse upper bound
+(ceil(sqrt(p))+1)^(2g) < ell^2. Since D1 has prime order ell, this makes the rational ell-primary
+component cyclic of order ell. Projection by the prime-to-ell cofactor then defines the map
+L with aL=1. The implementation rejects inputs without this certificate. This condition is
+separate from the principal-divisor identity, which is unconditional under the curve hypotheses.
+
+The q exponent in genus2's published double-large-prime family is not a universal lower bound
+for all non-generic algorithms; no such impossibility statement is assumed in this search.
