@@ -56,7 +56,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 
-use super::plugins::RootfindSubtractOracle;
+use super::plugins::{RootfindSubtractOracle, SweepRep};
 use super::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
     CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimeInstance, PrimePoint,
@@ -413,12 +413,14 @@ impl<'i> RootfindSubtractGpuOracle<'i> {
         ops: &mut GroupOps,
     ) -> Result<(), String> {
         let g = ctx.group;
-        let (_, reps) = self
+        let reps: Vec<SweepRep> = self
             .cpu
             .sweep()
-            .ok_or("rootfind-subtract did not prepare")?;
+            .ok_or("rootfind-subtract did not prepare")?
+            .1
+            .to_vec();
         let a = reps.len() as u64;
-        for rep in reps {
+        for rep in &reps {
             let p = fb.points[rep.plus];
             if rep.plus == rep.minus || p.y == 0 || fb.points[rep.minus] != g.neg(p) {
                 return Err(
@@ -750,9 +752,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractGpuOracle<'_> {
             return Err("rootfind-subtract-gpu: empty base".into());
         }
         let p = ctx.group.p;
-        // The backend (emulation or CUDA) is not a counter: a replay on a
-        // host without a GPU must read the same record.  The worker names it
-        // on stderr.
+        // The backend the worker resolved is not a counter: with `backend=any`
+        // or `emulate` a replay on a host without a GPU reads the same record.
+        // A `backend=cuda` record names its backend in the method parameters
+        // and replays only where a device answers (it fails closed elsewhere).
         // m = 3: the device looks candidates up in the abscissae of the pair
         // table the CPU oracle built (and charged); a hit there is a position
         // where the CPU probe finds a key, so every position the CPU sweep

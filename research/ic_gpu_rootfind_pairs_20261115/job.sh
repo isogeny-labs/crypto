@@ -8,7 +8,7 @@ set -uo pipefail
 W=/work/rpair; OUT=/work/out_rpair; mkdir -p $OUT
 log() { echo "[$(date -u +%H:%M:%S)] $*" | tee -a $OUT/progress.log; }
 pack() { (cd /work && tar czf out_rpair.tgz out_rpair && sha256sum out_rpair.tgz > out_rpair.tgz.sha256); }
-nvidia-smi -q > $OUT/nvidia-smi-q.txt 2>&1; nvcc --version > $OUT/nvcc.txt; lscpu > $OUT/lscpu.txt; nproc > $OUT/nproc.txt
+(cat /sys/fs/cgroup/cpu.max; cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us /sys/fs/cgroup/cpu/cpu.cfs_period_us) > $OUT/cgroup-cpu.txt 2>&1; nvidia-smi -q > $OUT/nvidia-smi-q.txt 2>&1; nvcc --version > $OUT/nvcc.txt; lscpu > $OUT/lscpu.txt; nproc > $OUT/nproc.txt
 CC=$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -1 | tr -d .); ARCH=sm_$CC
 cp $W/REV $OUT/
 FL="-O3 -std=c++17 -lineinfo -gencode arch=compute_$CC,code=$ARCH -Xcompiler -pthread"

@@ -136,6 +136,10 @@ int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uint64_t *fb_x
  * or when there is nothing to do). */
 int rf_warmup(void);
 
+/* Threads the emulation backend runs on (RF_EMU_THREADS, else the CPU count capped by a
+ * cgroup quota). */
+unsigned rf_emu_threads(void);
+
 /* 1 if the CUDA backend is compiled in and at least one device answers. */
 int rf_cuda_available(void);
 

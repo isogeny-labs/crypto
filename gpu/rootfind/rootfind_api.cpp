@@ -395,6 +395,8 @@ extern "C" void rf64_session_destroy(rf64_session *s) {
     delete s;
 }
 
+extern "C" unsigned rf_emu_threads(void) { return rf::EmuPool::get().size(); }
+
 extern "C" int rf_warmup(void) {
 #if RF_HAVE_CUDA
     if (rf_cuda_available()) return rf_cuda_warmup();

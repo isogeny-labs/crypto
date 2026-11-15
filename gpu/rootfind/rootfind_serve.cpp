@@ -133,6 +133,7 @@ static int daemon_main(const char *path) {
     const double t0 = now_s();
     /* Create the CUDA context now, so no client pays for it. */
     const int wrc = rf_warmup();
+    std::fprintf(stderr, "rootfind_serve: emulation threads %u\n", rf_emu_threads());
     std::fprintf(stderr, "rootfind_serve: daemon backend: %s (context %s, %.3f s)\n", rf_backend_info(),
                  wrc == 0 ? "ready" : "FAILED", now_s() - t0);
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);

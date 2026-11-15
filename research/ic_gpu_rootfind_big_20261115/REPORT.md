@@ -9,8 +9,12 @@ User request (2026-11-15), "do these", on the open items of PR #4217: build the 
 the device; run `m = 3` above 32 bits; a validator check of `research/ic_gpu_rootfind_m3_20261115`;
 a multi-threaded CPU comparison.
 
-**Standing.** `[pcc:unverified]`: one A100 pod, measured by the session that wrote the code; no
-validator yet for this report. Counted S is unchanged by design and measured unchanged in every pair;
+**Standing.** `[pcc:unverified]`: one A100 pod, measured by the session that wrote the code. An
+independent validator (`VALIDATION_REVIEW.md`) re-verified all 240 certificates with its own code,
+proved the four curves' group orders, replayed the 51 records that need no GPU on another hardware
+class (all identical; the 72 `backend=cuda` records refuse without a device, so they replay only on a
+GPU host), and recomputed every number: **validated, scoped**; its corrections are applied below
+(*corrected*). ecbench rates the wall comparisons "measurement quality 0/100, admitted 0" (L0). Counted S is unchanged by design and measured unchanged in every pair;
 the differences are wall time. Every record is L0 (`--cpus none --allow-busy`) on a shared pod, and
 the CPU arm's A/A copy differs from it by up to 16% in solve wall, so differences inside that band are
 noise. No scoreboard or leaderboard row is added.
@@ -46,8 +50,9 @@ orphaned daemon left by the aborted first `job_rf3.sh`, and the amendment's head
 ## Run
 
 One A100 80GB PCIe pod (`t0bqkj2h4g2dgo`, Intel Xeon Gold 6240R host, 96 threads), CUDA 12.8,
-04:43Z–06:12Z 2026-11-15, about $3.10, deleted. `ecbench` built locally from `7417c99292` on a clean
-tree (the benchmark record was initialised on that commit), `rootfind_serve_cuda` built on the pod
+04:43Z–06:12Z 2026-11-15, about $3.10, deleted. `ecbench` built locally from `7417c99292` (the benchmark
+record was initialised on that commit with a clean tree; the sessions record no git commit and the
+pod-built worker's sources are not hashed, so the build provenance is not verifiable from the artifacts), `rootfind_serve_cuda` built on the pod
 from the same tree; one daemon started once (context 0.382 s) with `RF_SERVE_TIMING=1`; the job
 required the CUDA backend in the daemon and the worker. Sessions as frozen: `specs/smoke.json`,
 `specs/rf3big.json` (34–40 bits; \|F_x\| 2048 and 4096; arms CPU 1 thread, multi-threaded CPU
@@ -67,9 +72,9 @@ multi-threaded CPU, GPU daemon; rho). Raw `raw/out_rbig.tgz` (sha256 `4144d049�
 
 | log2 r | \|F_x\| | S / rho | CPU solve | multi-thread solve | GPU solve | GPU vs CPU | GPU vs multi-thread | relation phase CPU → GPU |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| 33.4 | 2048 | 133 | 2.75 s | 2.75 s | 2.56 s | 1.07× | 1.08× | 0.586 → 0.044 s |
-| 35.2 | 2048 | 152 | 4.22 s | 3.42 s | 2.81 s | 1.50× | 1.21× | 1.77 → 0.054 s |
-| 37.4 | 2048 | 188 | 10.5 s | 4.49 s | 2.92 s | 3.59× | 1.54× | 7.83 → 0.113 s |
+| 33.4 | 2048 | 133 | 2.74 s | 2.75 s | 2.56 s | 1.07× | 1.08× | 0.586 → 0.044 s |
+| 35.2 | 2048 | 152 | 4.22 s | 3.41 s | 2.81 s | 1.50× | 1.21× | 1.77 → 0.054 s |
+| 37.4 | 2048 | 188 | 10.5 s | 4.49 s | 2.91 s | 3.59× | 1.54× | 7.83 → 0.113 s |
 | 39.3 | 2048 | 521 | 32.6 s | 7.74 s | 2.93 s | 11.1× | 2.64× | 30.2 → 0.245 s |
 | 33.4 | 4096 | 230 | 8.66 s | 11.6 s | 8.56 s | 1.01× | 1.35× | 0.398 → 0.070 s |
 | 35.2 | 4096 | 129 | 15.5 s | 17.6 s | 16.0 s | 0.97× | 1.10× | 1.26 → 0.077 s |
@@ -77,18 +82,21 @@ multi-threaded CPU, GPU daemon; rho). Raw `raw/out_rbig.tgz` (sha256 `4144d049�
 | 39.3 | 4096 | 274 | 48.0 s | 21.3 s | 17.6 s | 2.72× | 1.20× | 31.5 → 0.152 s |
 
 - Above 32 bits the `m = 3` relation phase grows (8–32 s on the CPU at 37–39 bits) and the device takes
-  it to 0.09–0.25 s there (69–208×; 13–33× at 33–35 bits). At \|F_x\| = 2048 the solve is then 3.6× (37.4 bits) and 11.1× (39.3
+  it to 0.09–0.25 s there (69–208×; 5.7–33× at 33–35 bits, *corrected*; at 33.4 bits, 4096, every run splits its batches four times and the multi-threaded arm is slower than one thread). At \|F_x\| = 2048 the solve is then 3.6× (37.4 bits) and 11.1× (39.3
   bits) faster than one CPU thread, and 1.5× and 2.6× faster than the multi-threaded arm. [pcc:unverified]
-- At \|F_x\| = 4096 what remains is the pair table (≈ 16.8M sums built on the CPU, 5.1–5.8 s, the same
-  on every arm) and linear algebra (2.8–11 s, the same code on every arm), so the solve gains only
+- At \|F_x\| = 4096 what remains is the pair table (≈ 16.8M sums built on the CPU: oracle set-up 5.1–5.8 s
+  on the CPU arm, 5.8–6.4 s on the GPU arm and 7.2–7.5 s on the multi-threaded arm, *corrected*) and linear algebra (2.8–11 s, the same code on every arm), so the solve gains only
   0.97–2.72×.
 - **Device-built against host-built table** (\|F_x\| = 2048, same session): the GPU arm's oracle set-up
   falls by 0.46–0.77 s (1.92–2.06 s → 1.28–1.46 s). On the worker, creating the session takes a median
-  0.185 s with the device build against 0.780 s with the host build (daemon timing lines). The GPU
-  set-up is now 0.10–0.80 s above the CPU arm's (which builds the same pair table), against 0.12–0.57 s
+  0.044 s (0.028–0.066) with the device-built hash against 0.780 s with the host build (daemon timing
+  lines, CUDA, \|F_x\| = 2048; *corrected*: 0.185 s pooled emulation arms, both sizes and replays). The
+  host arm's table is a sorted Eytzinger table, so the comparison also changes the table type. The GPU
+  set-up is now 0.09–0.80 s above the CPU arm's (which builds the same pair table), against 0.12–0.57 s
   on the smaller curves of the previous round with sets four times smaller.
 - **Distance to rho** (at w = 0): S is 107–521× the matched rho's mean S; in wall time the best GPU
-  arm is 7–254× slower than rho's median solve (36–417 ms).
+  arm is 7–254× slower than rho's median solve (37–417 ms). The validator's §5a band: rho is ahead at
+  w = 0, 0.1 and 1 (`m = 3` 107–946×, `m = 2` 8 468–22 867×).
 
 ### `m = 2`: multi-threaded CPU against the GPU (\|F_x\| = 4096, median of 4)
 
@@ -99,13 +107,19 @@ multi-threaded CPU, GPU daemon; rho). Raw `raw/out_rbig.tgz` (sha256 `4144d049�
 | 31.3 | 22 784 | 39.9 s | 7.81 s | 0.323 s | 5.1× | 24.2× |
 
 **The multi-threaded arm is a weak baseline.** It is the worker's host emulation: the kernel's
-per-thread function on 96 host threads, with a thread pool created for every batch, and it reaches
-only about 5× one thread. A tuned parallel CPU sweep would close part of the 4–24× gap; how much is
-not measured here.
+per-thread function on 96 host threads, and it reaches only about 5× one thread at `m = 2` (where
+"one thread" is the separate Rust implementation). *Corrected:* creating a thread pool per batch costs
+only 3.4–4.4 ms of a 36–47 ms batch (≤ 10%); the main cause is that the emulation code sweeps about
+1/7–1/9 as many candidates per core as the single-thread Rust arm. A tuned parallel CPU sweep would
+close part of the 4–24× gap; how much is not measured here.
+
+**Device work not charged** (*corrected*, previously unnamed): 18–986 swept targets per `m = 3` run that
+the run never asked for, plus the split batches, as `gpu_*` counters.
 
 ## Not done / next
 
 - The `m = 3` pair table is still built on the CPU (5–6 s at \|F_x\| = 4096, charged on every arm); at
   that size it and linear algebra now bound the solve.
 - A tuned multi-threaded CPU sweep (persistent thread pool) for a fair parallel baseline.
-- A validator check of this report.
+- Process (validator): raw data in Git, not S3 (`uploaded: false`); a code comment saying CPU hosts
+  can replay every record is wrong for `backend=cuda` records.

@@ -12,6 +12,10 @@
 #define GPU_ROOTFIND_HOST_HPP
 
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -129,6 +133,36 @@ inline std::vector<U256x64> to_mont256(const Fp256Ctx &f, const uint64_t *limbs,
 
 /* --- emulation driver ----------------------------------------------- */
 
+/* CPUs this process may use: RF_EMU_THREADS if set; else hardware_concurrency,
+ * capped by a cgroup CPU quota (cgroup v2 cpu.max, or v1 cfs quota/period).  A
+ * container commonly sees every host thread in nproc but is allowed far fewer;
+ * running a thread per host thread then oversubscribes the quota. */
+inline unsigned rf_cpu_budget() {
+    if (const char *e = std::getenv("RF_EMU_THREADS")) {
+        long v = std::strtol(e, nullptr, 10);
+        if (v > 0) return (unsigned)v;
+    }
+    unsigned n = std::max(1u, std::thread::hardware_concurrency());
+    double quota = -1, period = -1;
+    if (FILE *f = std::fopen("/sys/fs/cgroup/cpu.max", "r")) {
+        char q[64] = {0};
+        if (std::fscanf(f, "%63s %lf", q, &period) == 2 && std::strcmp(q, "max") != 0) quota = std::atof(q);
+        std::fclose(f);
+    } else if (FILE *fq = std::fopen("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "r")) {
+        if (std::fscanf(fq, "%lf", &quota) != 1) quota = -1;
+        std::fclose(fq);
+        if (FILE *fp = std::fopen("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "r")) {
+            if (std::fscanf(fp, "%lf", &period) != 1) period = -1;
+            std::fclose(fp);
+        }
+    }
+    if (quota > 0 && period > 0) {
+        unsigned cap = (unsigned)std::max(1.0, std::ceil(quota / period));
+        n = std::min(n, cap);
+    }
+    return n;
+}
+
 /* A persistent worker pool for the emulation backend (the multi-threaded CPU
  * sweep, `backend=emulate`).  The threads are created once per process and wait
  * between batches; a batch hands out grains of thread indices through an atomic
@@ -136,7 +170,7 @@ inline std::vector<U256x64> to_mont256(const Fp256Ctx &f, const uint64_t *limbs,
 class EmuPool {
 public:
     static EmuPool &get() {
-        static EmuPool pool(std::max(1u, std::thread::hardware_concurrency()));
+        static EmuPool pool(rf_cpu_budget());
         return pool;
     }
     unsigned size() const { return (unsigned)workers_.size() + 1; }
