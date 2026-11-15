@@ -1,0 +1,38 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "d42debc19e0c816b64e0e36735f9c374bd76af5c71fbba04ecb2ed04c5db4201"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "35b00cb75dccb3288aae8ce585778108939921169cdac8d509c5e1c2527b004b"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "frozen N4 v2 grid negation-map rho (rho2::rho_neg) on the same GHS-weak E0 instances; k = 22 from the frozen supplement (research/quartic_n4v2_20261020/results/summary_supp.json), as that study does",
+  "unit": "cold F_q-multiplication equivalents (M-eq) with the frozen grid's per-size r_inv, r_lmul; hash/cmp at w*gae (section 5a)",
+  "binary_or_process": "N4 v2 driver. The IC arm is CAND (research/ic_gw_nrm_lz_20261115/src, sha256 a7e4ad7a41e5..., run with NRM=1 LZ_REUSE=1); without the variables it equals BLR1 (e236855d7fef...) in every counted field, and with them it differs only in relations.mul/add (and D/DL1 linear_algebra.lmul/ladd); its REF arm reproduces the BLR1 band values exactly (validator VAL-20261115-5c7af8, rel. error 0). The rho reference is v3's rho2::rho_neg, which replays the frozen k = 22 negation-map run field for field (research/quartic_dl1_cd_sqrt_20261113/combo/validation/rho-replay-v3-k22-neg-seed2-run1.jsonl, 0 differences)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "strongest_available_note": "E0 has coefficients generic in K = F_{q^3} (built from u, u^q, u^{q^2}), so no Frobenius endomorphism; the negation map is the available symmetry. Plain rho at k = 22 for comparison: IC/rho 0.0024, 0.0026, 0.0032 at w = 0, 0.1, 1.",
+  "gae_band": {
+   "0": {
+    "ic": 807657140.7227665,
+    "rho": 379591500000.0
+   },
+   "0.1": {
+    "ic": 977654276.1227666,
+    "rho": 490913800000.0
+   },
+   "1": {
+    "ic": 2507628494.7227664,
+    "rho": 1492814000000.0
+   }
+  },
+  "order_holds_across_band": true,
+  "scope": "DL arm, previous configuration (c_D = 1.7, square-root chain, fast relation stage, block Lanczos reuse) plus the normalised-coordinate relation stage; q = 4194271 (k = 22), mean cold M-eq over seeds 1-3, hash/cmp at w*gae. Paired ratios at k = 18..22, seeds 1-6, for DL, DL1 and D are in the validator report"
+ }
+}
