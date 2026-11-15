@@ -349,6 +349,18 @@ quoted from their reports. They have no pcc claim id yet [pcc:unverified].
   13 unknowns, top degree 7 against 8, and the work spread over different steps. Only the totals agree, so we
   read it as a coincidence between two fixed shape constants, not a hidden equivalence.
 
+*Is a smooth factor base cheaper than a random one?* (`research/pkm_ideas_20261115/`, EXP-PKM-IDEAS-001,
+[pcc:unverified]). We predicted yes and were wrong. Write membership in a *random* $V$ of the same size as one
+polynomial $product_(v in V) (x - v)$ of degree $|V|$. F4 then refutes the same systems with 0.05 down to 0.001
+times the tower's work at $m = 2$ ($|V| = 16 dots 256$), and 0.54 down to 0.04 times at $m = 3$
+($|V| = 4 dots 16$). The smooth coset $g mu_S$ costs the same as a random set in this form. The tower makes $V$
+easy to *describe*; it does not make the system easier to *solve*. The study also found that:
+
+- On $j = 0$ curves, $omega: (x, y) |-> (zeta_3 x, y)$ maps a coset with $3 | S$ to itself, so the linear algebra
+  needs $|F|/6$ columns instead of $|F|/2$.
+- A recorded F4 trace replays on new targets, curves and primes without a mismatch, at 0.38–0.91 of the fresh cost.
+- Giving each point its own coset leaves the F4 work unchanged and covers 2.4–3.1 times as many sums.
+
 *Bottom line.* At the sizes measured, this attack is slower than Pollard rho by 18–141 times. Solving its
 polynomial systems is slower than enumerating the factor base by orders of magnitude. Odd degrees shave a
 constant, but no tower shape tried here changes how the cost grows. The tutorial makes no speed claim.
