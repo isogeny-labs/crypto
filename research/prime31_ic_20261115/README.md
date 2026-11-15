@@ -2,6 +2,15 @@
 
 **Standing [pcc:unverified]: producer-local**, not PCC signed or independently rerun on CI. This is an index-calculus **negative speed** result, not a faster-than-rho attack.
 
+## Saved-data audit
+
+The [native C++ audit](audit_recorded.cpp) checks the recorded public answers,
+curve-order certificate and summary arithmetic. See the [scope report](AUDIT.md),
+[PDF](AUDIT.pdf) and [raw audit output](audit_recorded.results.json).
+Public-answer claim `PCC-20261115-63ae2a` pins the three distinct target
+certificates; it remains [pcc:unverified]. This does not replay the solver,
+reconstruct its relation matrices or validate its performance counters.
+
 ## Non-weak curve
 
 The earlier smooth-order Mersenne-field curve is excluded. Here the ordinary curve is
