@@ -4235,14 +4235,24 @@ pub enum DecompositionStrategy {
     /// is lifted and checked in the original curve group. Resource caps
     /// are supplied separately through `KoblitzIcOptions::chain_s3_limits`.
     ChainedS3,
+    /// Chained S3 with an opt-in Karatsuba field-product SAT circuit.
+    /// The finite coordinate domain and original-curve witness checks are
+    /// identical to `ChainedS3`.
+    ChainedS3Karatsuba,
+    /// Chained S3 with one-level split Karatsuba and direct field reduction.
+    ChainedS3ShallowKaratsuba,
     /// The same chained-S3 solver with an exact representative-and-Frobenius-
     /// phase domain for an ambient-basis signed-orbit base. This can avoid a
     /// large explicit-coordinate trie, but still requires the same complete
     /// curve-group witness and relation checks.
     ChainedS3FrobeniusOrbit,
+    /// Signed-Frobenius domain with the shallow split field-product circuit.
+    ChainedS3FrobeniusOrbitShallowKaratsuba,
     /// The Frobenius-orbit chained solver with `x_0 <= x_1` on the first
     /// S3 node. This preserves solutions under swapping its first pair.
     ChainedS3FrobeniusOrbitOrdered,
+    /// Signed-Frobenius domain, shallow products, and first-pair order.
+    ChainedS3FrobeniusOrbitOrderedShallowKaratsuba,
     /// **Meet in the middle** over a precomputed table of all pair sums
     /// `P_i + P_j` ([`PairSumTable`]).  `m = 2` is one lookup, `m = 3`
     /// is `|F|` lookups, `m = 4` is `|F|²` lookups — against
@@ -4391,6 +4401,20 @@ pub enum FilterLayout {
 }
 
 impl FilterLayout {
+    /// Filter bits a folded build adds to [`filter_bits_for`]'s width:
+    /// one for a [`FilterLayout::Top`] table (`KIC_FILTER_DOUBLE`, default
+    /// on), doubling its filter, and none for `Low`.  A `Low` table is the
+    /// format the table files, the GPU builder and `ecbench`'s methods
+    /// share, so their widths and counted bucket reads stay as they were;
+    /// a `Top` table lives only in this process.  The doubled filter
+    /// admits about a fifth as many absent keys; `0` keeps the old width.
+    fn extra_filter_bits(self) -> u32 {
+        static DOUBLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+        let double =
+            *DOUBLE.get_or_init(|| std::env::var("KIC_FILTER_DOUBLE").map_or(true, |v| v != "0"));
+        u32::from(self == FilterLayout::Top && double)
+    }
+
     /// The layout this module's folded builds use: `Top`, unless
     /// `KIC_FILTER_LAYOUT=low` (the same-binary control).
     fn for_folded_builds() -> Self {
@@ -6197,7 +6221,7 @@ impl PairSumTable {
         // At one thread there is one run, and its filter is the filter.
         // Every bit is set either way, so the filter is the same.
         const FILL_AHEAD: usize = 16;
-        let filter_bits = filter_bits_for(total);
+        let filter_bits = (filter_bits_for(total) + layout.extra_filter_bits()).min(32);
         let present_mask = (1u64 << filter_bits) - 1;
         let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
         let filter_words = (1usize << filter_bits) / 64;
@@ -6643,7 +6667,7 @@ impl PairSumTable {
             let total = bucket_start[buckets] as usize;
             let cursor: Vec<AtomicU32> = bucket_start.iter().map(|&c| AtomicU32::new(c)).collect();
             let mut rests = vec![0u32; total];
-            let filter_bits = filter_bits_for(total);
+            let filter_bits = (filter_bits_for(total) + layout.extra_filter_bits()).min(32);
             let present_mask = (1u64 << filter_bits) - 1;
             let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
             let words = (1usize << filter_bits) / 64;
@@ -10236,6 +10260,8 @@ fn sat_decompose_union_s4(
     }
 }
 
+/// Hard limits for an experimental five- or six-summand chained-S3 SAT
+/// decomposition. The variable cap is checked before a SAT solver is built;
 /// Hard limits for an experimental four- to six-summand chained-S3 SAT
 /// decomposition. The variable cap is checked before any SAT model is built;
 /// the conflict and model caps cover all intermediate-identity patterns.
@@ -10292,7 +10318,54 @@ pub fn sat_decompose_chained_s3(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, false, false)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+pub fn sat_decompose_chained_s3_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Karatsuba,
+    )
+}
+
+pub fn sat_decompose_chained_s3_shallow_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        false,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::ShallowKaratsuba,
+    )
 }
 
 /// Use one signed-Frobenius representative per column to constrain the same
@@ -10306,7 +10379,16 @@ pub fn sat_decompose_chained_s3_frobenius_orbit(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, false)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        false,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
 }
 
 /// An opt-in symmetry arm for the same exact signed-Frobenius domain.
@@ -10319,7 +10401,36 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, true)
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        true,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+pub fn sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    order_first_pair: bool,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_with_domain(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        true,
+        order_first_pair,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::ShallowKaratsuba,
+    )
 }
 
 /// The chained-S3 solver of [`sat_decompose_chained_s3`] and its
@@ -10373,6 +10484,7 @@ fn sat_decompose_chained_s3_with_domain(
     limits: ChainS3Limits,
     frobenius_orbits: bool,
     order_first_pair: bool,
+    kernel: crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
     if !(4..=6).contains(&m) {
         return (
@@ -10383,7 +10495,7 @@ fn sat_decompose_chained_s3_with_domain(
             },
         );
     }
-    sat_decompose_chained_s3_checked(
+    sat_decompose_chained_s3_checked_with_kernel(
         kc,
         fb,
         target,
@@ -10400,6 +10512,7 @@ fn sat_decompose_chained_s3_with_domain(
             tables: ChainS3Tables::default(),
             wall_budget: None,
         },
+        kernel,
     )
 }
 
@@ -11242,6 +11355,26 @@ fn sat_decompose_chained_s3_checked(
     limits: ChainS3Limits,
     options: ChainS3Options,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
+    sat_decompose_chained_s3_checked_with_kernel(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        options,
+        crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel::Schoolbook,
+    )
+}
+
+fn sat_decompose_chained_s3_checked_with_kernel(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: ChainS3Limits,
+    options: ChainS3Options,
+    kernel: crate::cryptanalysis::binary_semaev_chain_sat::ChainProductKernel,
+) -> (Option<Vec<usize>>, ChainS3Stats) {
     let ChainS3Options {
         frobenius_orbits,
         order,
@@ -11442,13 +11575,14 @@ fn sat_decompose_chained_s3_checked(
                 continue;
             }
         }
-        let mut enc = match ChainedS3Encoding::build(
+        let mut enc = match ChainedS3Encoding::build_with_kernel(
             m,
             &kc.curve.irreducible,
             &kc.curve.b,
             target_x,
             identity_mask,
             limits.max_variables,
+            kernel,
         ) {
             Ok(enc) => enc,
             Err(
@@ -12677,15 +12811,20 @@ fn koblitz_index_calculus_dlp_observed(
     if matches!(
         opts.strategy,
         DecompositionStrategy::ChainedS3
+            | DecompositionStrategy::ChainedS3Karatsuba
+            | DecompositionStrategy::ChainedS3ShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbit
+            | DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba
             | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
-    ) && (!(4..=6).contains(&opts.m)
-        || !fb.uses_ambient_basis()
-        || opts.chain_s3_limits.max_variables == 0
-        || opts.chain_s3_limits.max_domain_clauses == 0
-        || opts.chain_s3_limits.max_models == 0
-        || opts.chain_s3_limits.conflict_budget == 0
-        || opts.relation_batch_size != 1)
+            | DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba
+    ) && (!(5..=6).contains(&opts.m))
+        && (!(4..=6).contains(&opts.m)
+            || !fb.uses_ambient_basis()
+            || opts.chain_s3_limits.max_variables == 0
+            || opts.chain_s3_limits.max_domain_clauses == 0
+            || opts.chain_s3_limits.max_models == 0
+            || opts.chain_s3_limits.conflict_budget == 0
+            || opts.relation_batch_size != 1)
     {
         report.sat_unknowns = 1;
         return Some(report);
@@ -12966,6 +13105,26 @@ fn koblitz_index_calculus_dlp_observed(
                         sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
+                DecompositionStrategy::ChainedS3Karatsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3ShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_shallow_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
                 DecompositionStrategy::ChainedS3FrobeniusOrbit => {
                     let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit(
                         kc,
@@ -12976,6 +13135,17 @@ fn koblitz_index_calculus_dlp_observed(
                     );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
+                DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                        false,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
                 DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered => {
                     let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_ordered(
                         kc,
@@ -12983,6 +13153,17 @@ fn koblitz_index_calculus_dlp_observed(
                         target,
                         opts.m,
                         opts.chain_s3_limits,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba => {
+                    let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                        true,
                     );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
@@ -14737,6 +14918,21 @@ fn decompose_once(
                 sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
             PdpAttempt::chained(points, stats)
         }
+        DecompositionStrategy::ChainedS3Karatsuba => {
+            let (points, stats) =
+                sat_decompose_chained_s3_karatsuba(kc, fb, target, opts.m, opts.chain_s3_limits);
+            PdpAttempt::chained(points, stats)
+        }
+        DecompositionStrategy::ChainedS3ShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+            );
+            PdpAttempt::chained(points, stats)
+        }
         DecompositionStrategy::ChainedS3FrobeniusOrbit => {
             let (points, stats) = sat_decompose_chained_s3_frobenius_orbit(
                 kc,
@@ -14747,6 +14943,17 @@ fn decompose_once(
             );
             PdpAttempt::chained(points, stats)
         }
+        DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+                false,
+            );
+            PdpAttempt::chained(points, stats)
+        }
         DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered => {
             let (points, stats) = sat_decompose_chained_s3_frobenius_orbit_ordered(
                 kc,
@@ -14754,6 +14961,17 @@ fn decompose_once(
                 target,
                 opts.m,
                 opts.chain_s3_limits,
+            );
+            PdpAttempt::chained(points, stats)
+        }
+        DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba => {
+            let (points, stats) = sat_decompose_chained_s3_frobenius_orbit_shallow_karatsuba(
+                kc,
+                fb,
+                target,
+                opts.m,
+                opts.chain_s3_limits,
+                true,
             );
             PdpAttempt::chained(points, stats)
         }
@@ -19480,28 +19698,18 @@ mod tests {
     }
 
     #[test]
-    fn chained_s3_frobenius_strategy_feeds_rank_and_target_solve() {
+    fn chained_s3_karatsuba_strategy_feeds_verified_relation_rank_and_target_solve() {
         let kc = KoblitzCurve::new(0, 7).unwrap();
         let BinaryPoint::Affine { x, .. } = kc.generator() else {
             panic!("generator is affine");
         };
-        let fb = (2u32..32)
-            .filter_map(
-                |scalar| match kc.mul(kc.generator(), &BigUint::from(scalar)) {
-                    BinaryPoint::Affine { x: other_x, .. } => {
-                        build_explicit_frobenius_orbit_factor_base(&kc, &[x.clone(), other_x])
-                    }
-                    BinaryPoint::Infinity => None,
-                },
-            )
-            .find(|base| base.signed_orbits.len() >= 2)
-            .expect("two distinct signed Frobenius orbits");
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
         let known = BigUint::from(3u32) % &kc.subgroup_order;
         let target = kc.mul(kc.generator(), &known);
         let opts = KoblitzIcOptions {
             m: 5,
-            strategy: DecompositionStrategy::ChainedS3FrobeniusOrbit,
-            max_trials: 64,
+            strategy: DecompositionStrategy::ChainedS3Karatsuba,
+            max_trials: 16,
             extra_relations: 1,
             allow_direct_relation: false,
             chain_s3_limits: ChainS3Limits {
@@ -19520,6 +19728,89 @@ mod tests {
         assert_eq!(report.sat_invalid_models, 0);
         assert_eq!(report.verification_failures, 0);
         assert!(!report.direct_relation);
+    }
+
+    #[test]
+    fn chained_s3_shallow_karatsuba_strategy_feeds_verified_relation_rank_and_target_solve() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = build_explicit_frobenius_orbit_factor_base(&kc, std::slice::from_ref(x)).unwrap();
+        let known = BigUint::from(3u32) % &kc.subgroup_order;
+        let target = kc.mul(kc.generator(), &known);
+        let opts = KoblitzIcOptions {
+            m: 5,
+            strategy: DecompositionStrategy::ChainedS3ShallowKaratsuba,
+            max_trials: 16,
+            extra_relations: 1,
+            allow_direct_relation: false,
+            chain_s3_limits: ChainS3Limits {
+                max_variables: 2_000,
+                max_domain_clauses: 10_000,
+                max_models: 128,
+                conflict_budget: 500_000,
+            },
+            ..KoblitzIcOptions::default()
+        };
+        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(report.sat_calls > 0);
+        assert!(report.independent_relations > 0);
+        assert!(report.linear_solve_attempts > 0);
+        assert_eq!(report.sat_invalid_models, 0);
+        assert_eq!(report.verification_failures, 0);
+        assert!(!report.direct_relation);
+    }
+
+    #[test]
+    fn chained_s3_frobenius_strategy_feeds_rank_and_target_solve() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let BinaryPoint::Affine { x, .. } = kc.generator() else {
+            panic!("generator is affine");
+        };
+        let fb = (2u32..32)
+            .filter_map(
+                |scalar| match kc.mul(kc.generator(), &BigUint::from(scalar)) {
+                    BinaryPoint::Affine { x: other_x, .. } => {
+                        build_explicit_frobenius_orbit_factor_base(&kc, &[x.clone(), other_x])
+                    }
+                    BinaryPoint::Infinity => None,
+                },
+            )
+            .find(|base| base.signed_orbits.len() >= 2)
+            .expect("two distinct signed Frobenius orbits");
+        let known = BigUint::from(3u32) % &kc.subgroup_order;
+        let target = kc.mul(kc.generator(), &known);
+        for strategy in [
+            DecompositionStrategy::ChainedS3FrobeniusOrbit,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitShallowKaratsuba,
+            DecompositionStrategy::ChainedS3FrobeniusOrbitOrderedShallowKaratsuba,
+        ] {
+            let opts = KoblitzIcOptions {
+                m: 5,
+                strategy,
+                max_trials: 64,
+                extra_relations: 1,
+                allow_direct_relation: false,
+                chain_s3_limits: ChainS3Limits {
+                    max_variables: 2_000,
+                    max_domain_clauses: 10_000,
+                    max_models: 128,
+                    conflict_budget: 500_000,
+                },
+                ..KoblitzIcOptions::default()
+            };
+            let report =
+                koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+            assert_eq!(report.log, Some(known.clone()), "{strategy:?}: {report:?}");
+            assert!(report.sat_calls > 0);
+            assert!(report.independent_relations > 0);
+            assert!(report.linear_solve_attempts > 0);
+            assert_eq!(report.sat_invalid_models, 0);
+            assert_eq!(report.verification_failures, 0);
+            assert!(!report.direct_relation);
+        }
     }
 
     #[test]
@@ -21268,7 +21559,11 @@ mod tests {
             assert_eq!(ts.filter_layout, FilterLayout::Top);
             // The same stored pairs, a different filter.
             assert_eq!(ls.bucket_start, ts.bucket_start);
-            assert_eq!(ls.present_mask, ts.present_mask);
+            // A `Top` table's filter is wider by its extra bits.
+            assert_eq!(
+                ts.present_mask.count_ones(),
+                (ls.present_mask.count_ones() + FilterLayout::Top.extra_filter_bits()).min(32)
+            );
             assert_ne!(
                 ls.present, ts.present,
                 "K_{a}/2^{n}: the layout changed nothing"
