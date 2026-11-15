@@ -293,7 +293,30 @@ def main():
         assert row["full_transfer_over_mean_rho_wall_ratio"] > 1
         assert row["verified_on_source_and_jacobian"]
         audit_attack(row)
-    print("PASS: old 15 maps and attacks; 10,664-model degree-three scan; 60 prior gates; two nonzero-trace maps and full attacks; hashes")
+    degree4_path = HERE/"degree4_all_q16_scan_receipt.json"
+    degree4 = json.loads(degree4_path.read_text())
+    assert degree4["catalog_sha256"] == sha(all_catalog_path)
+    assert degree4["script_sha256"] == sha(HERE/"degree4_all_q16_scan.py")
+    assert degree4["catalog_classes"] == 126 and degree4["models_scanned"] == 10664
+    assert degree4["branch_polynomials"] == 7 and degree4["patterns_per_model"] == 6
+    assert degree4["counts"] == {"models":10664,"exact_hits":1020}
+    assert len(degree4["hits"]) == 1020
+    assert len({h["class"] for h in degree4["hits"]}) == 36
+    assert len({(h["u_mask"],h["b_mask"]) for h in degree4["hits"]}) == 510
+    assert sum(h["u_mask"] == 0 for h in degree4["hits"]) == 90
+    for hit in degree4["hits"]:
+        assert labels[hit["class"]]["curves"][hit["model_index"]] == hit["equation"]
+        assert sum(labels[hit["class"]]["poly"]) == hit["expected_order"]
+        assert sorted(hit["exponents"]) == [-2,-2,2,2]
+        assert relative_trace(hit["b_mask"]) == hit["trace_b_mask"] == 0
+    prior4 = json.loads((HERE/"prior_work_degree4_receipt.json").read_text())
+    assert prior4["scan_sha256"] == sha(degree4_path)
+    assert prior4["script_sha256"] == sha(HERE/"prior_work_degree4.py")
+    assert len(prior4["rows"]) == 1020
+    assert all(r["relative_trace_b_mask"] == 0 and
+               r["same_cover_formula_as_publication"] == "unverified"
+               for r in prior4["rows"])
+    print("PASS: 15 old maps and attacks; 10,664-model degree-three/four scans; 1080 prior gates; two nonzero-trace maps and full attacks; hashes")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,9 @@ theorem degree_three_pattern_accounting :
 theorem degree_three_full_catalog_accounting :
     10664 * 24 = 255936 ∧ 60 ≤ 255936 ∧ 36 + 24 = 60 := by decide
 
+theorem degree_four_full_catalog_accounting :
+    10664 * 6 = 63984 ∧ 1020 ≤ 63984 ∧ 510 * 2 = 1020 := by decide
+
 theorem nonzero_trace_source_subgroup_order :
     4090 = 10 * 409 ∧ 409 > 1 := by decide
 

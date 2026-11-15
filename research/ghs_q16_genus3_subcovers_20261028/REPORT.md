@@ -112,6 +112,31 @@ coefficient `b` has nonzero relative trace. The two trace-zero classes
 This is an isogeny-class statement; it does not construct a short
 isogeny between each displayed source equation and its base witness.
 
+### Degree-four bound across the same catalog slice
+
+For a branch-supported degree-four rational `X`, the order-three-pole
+lemma below eliminates 24 of the 30 possible exponent patterns. The
+remaining six are permutations of `(2,2,-2,-2)`. The
+[degree-four scan](degree4_all_q16_scan_receipt.json) tests all
+`10,664*6=63,984` model-pattern pairs. Every residue matrix has full
+column rank 24. Exactly 1,020 complete Artin–Schreier identities
+survive, representing 510 distinct `(u,b)` source equations across 36
+cataloged classes. Ninety have `u=0`; these are counted as exact
+constant-zero identities. Independent GF(4096) trace arithmetic in the
+[per-hit prior gate](prior_work_degree4_receipt.json) confirms
+`Tr_(K/k)(b)=0` for **all 1,020 descriptions**. Each therefore meets
+the published Joux–Vitse trace-zero coefficient criterion; equivalence
+of each exact cover formula to a published one remains unverified.
+
+Combining the degree-three and degree-four screens gives a bounded
+exclusion: among these 10,664 cataloged models and branch-supported
+ordinary elliptic covers of degree at most four, every nonzero-trace
+source found is in a base-defined isogeny class, and every degree-four
+source has trace-zero `b`. This does not exclude degree-five or higher
+covers, zeros or poles away from the four branch points, other curve
+models, or isogeny correspondences. It narrows the next search without
+asserting a global vulnerability classification.
+
 ### Two 409-order nonzero-trace representatives
 
 The table gives exact source curves using polynomial-basis masks for `u,b`
