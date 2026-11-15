@@ -1787,9 +1787,9 @@ mod tests {
         }
     }
 
-    /// **`ic.koblitz_descent` is this pipeline.**  On the committed rule v8
+    /// **`ic.koblitz_descent_v2` is this current pipeline.** On the committed rule v8
     /// `k0n41` recipe with three seeds, ecbench's library pipeline
-    /// (`ecbench::koblitz_descent::run`, the method's code) and this
+    /// (`ecbench::koblitz_descent::run_top`, the method's code) and this
     /// file's single-target pass give the same logarithm, the same
     /// collection trials, relations, summands scanned and units, the same
     /// table and the same descent trials — and both give the numbers this
@@ -1845,7 +1845,7 @@ mod tests {
                 max_units: p.collection.max_units,
                 max_trials: p.max_trials,
             };
-            let out = koblitz_descent::run(&c, &q, &dp).expect("ecbench pipeline");
+            let out = koblitz_descent::run_top(&c, &q, &dp).expect("ecbench pipeline");
             let k = &pass.counts;
             let got = [
                 out.counts.trials,

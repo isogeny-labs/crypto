@@ -2252,6 +2252,41 @@ impl FrobeniusFactorBase {
     }
 }
 
+/// The base's point-to-index map ([`FrobeniusFactorBase::shared_index_map`]),
+/// built on first use.  The collector and the individual-log solver keep
+/// one for the decomposition paths without a pair table; with one, neither
+/// ever reads it, and building it (a hash map over every point's two
+/// `BigUint` coordinates) was most of their construction.
+#[derive(Clone, Debug)]
+struct LazyIndexMap<'a> {
+    fb: &'a FrobeniusFactorBase,
+    map: std::sync::OnceLock<Arc<HashMap<(BigUint, BigUint), usize>>>,
+}
+
+impl<'a> LazyIndexMap<'a> {
+    fn new(fb: &'a FrobeniusFactorBase) -> Self {
+        let lazy = Self {
+            fb,
+            map: std::sync::OnceLock::new(),
+        };
+        if !lazy_index_enabled() {
+            lazy.get();
+        }
+        lazy
+    }
+
+    fn get(&self) -> &HashMap<(BigUint, BigUint), usize> {
+        self.map.get_or_init(|| self.fb.shared_index_map())
+    }
+}
+
+/// Whether [`LazyIndexMap`] waits for first use; `KIC_LAZY_INDEX=0`
+/// builds it at construction, as before, the control.
+fn lazy_index_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_LAZY_INDEX").map_or(true, |v| v != "0"))
+}
+
 /// One representative per orbit of a point set under Frobenius and
 /// negation (the set is assumed closed under both). Exact multi-limb keys
 /// keep distinct wide-field orbits separate.
@@ -4329,6 +4364,180 @@ pub(crate) fn filter_slot(h: u64, mask: u64, extra: u64) -> (usize, u64) {
 /// [`filter_extra`] for this module's own builds.
 const FILTER_EXTRA: u64 = filter_extra(FILTER_PROBES);
 
+/// **Which bits of a key's hash pick its presence-filter word.**
+///
+/// `Low` is [`filter_slot`]'s: the word from the hash's low bits, as
+/// `gpu/ecc2k/pairtable.cuh` and every table built before it read.
+/// `Top` takes the word from the hash's top bits, the bits that also pick
+/// the build's partition ([`PairSumTable::fold_partitioned`]), so a
+/// partition fills only its own run of the filter, a few kilobytes,
+/// rather than words anywhere in megabytes.  Its bits within the word come
+/// from hash bits 16–33, which no word index reaches (a filter has at
+/// most 2^26 words) and a tagged word's rest (bits 0–15) does not use.
+/// Both are Bloom filters of the same size and bits a key; a table
+/// records its layout and every probe follows it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum FilterLayout {
+    #[default]
+    Low,
+    Top,
+}
+
+impl FilterLayout {
+    /// The layout this module's folded builds use: `Top`, unless
+    /// `KIC_FILTER_LAYOUT=low` (the same-binary control).
+    fn for_folded_builds() -> Self {
+        static LAYOUT: std::sync::OnceLock<FilterLayout> = std::sync::OnceLock::new();
+        *LAYOUT.get_or_init(|| match std::env::var("KIC_FILTER_LAYOUT").as_deref() {
+            Ok("low") => FilterLayout::Low,
+            _ => FilterLayout::Top,
+        })
+    }
+}
+
+/// A filter's layout reduced to shifts and masks, so a probe of either
+/// layout is the same branch-free arithmetic: word `(h >> shift) & words`,
+/// bits `1 << ((h >> s) & 63)` for each of its shifts (the last two only
+/// where three probes were set).
+#[derive(Clone, Copy, Debug)]
+struct FilterGeom {
+    layout: FilterLayout,
+    shift: u32,
+    words: u64,
+    bit_shifts: [u32; 3],
+    extra: u64,
+}
+
+impl FilterGeom {
+    fn new(layout: FilterLayout, present_mask: u64, extra: u64) -> Self {
+        let words = present_mask >> 6;
+        let word_bits = 64 - words.leading_zeros();
+        let (shift, bit_shifts) = match layout {
+            // `(h & mask) >> 6`, bits `h`, `h >> 52`, `h >> 58`: exactly
+            // [`filter_slot`].
+            FilterLayout::Low => (6, [0, 52, 58]),
+            // A one-word filter has no index bits: any shift, masked to 0.
+            FilterLayout::Top => ((64 - word_bits).min(63), [16, 22, 28]),
+        };
+        Self {
+            layout,
+            shift,
+            words,
+            bit_shifts,
+            extra,
+        }
+    }
+
+    #[inline(always)]
+    fn word(&self, h: u64) -> usize {
+        ((h >> self.shift) & self.words) as usize
+    }
+
+    #[inline(always)]
+    fn slot(&self, h: u64) -> (usize, u64) {
+        let [a, b, c] = self.bit_shifts;
+        let more = (1u64 << ((h >> b) & 63)) | (1u64 << ((h >> c) & 63));
+        (
+            self.word(h),
+            (1u64 << ((h >> a) & 63)) | (more & self.extra),
+        )
+    }
+
+    /// Each key's hash, filter word and filter bits, a block at a time:
+    /// `hashes[i] = pair_filter_hash(keys[i])` and `(words[i], bits[i]) =
+    /// self.slot(hashes[i])`, eight lanes at once where AVX-512DQ runs.
+    /// The aimed scan then tests the filter from these arrays instead of
+    /// hashing and slotting each key between its loads
+    /// ([`scan_vfilter_enabled`]).
+    fn fill_block(
+        &self,
+        keys: &[u64],
+        hashes: &mut Vec<u64>,
+        words: &mut Vec<u64>,
+        bits: &mut Vec<u64>,
+    ) {
+        let n = keys.len();
+        hashes.resize(n, 0);
+        words.resize(n, 0);
+        bits.resize(n, 0);
+        #[allow(unused_mut)]
+        let mut done = 0;
+        #[cfg(target_arch = "x86_64")]
+        if filter_simd() {
+            // SAFETY: AVX-512F and DQ were detected at run time, and the
+            // outputs were just sized to the keys.
+            done = unsafe { self.fill_block_avx512(keys, hashes, words, bits) };
+        }
+        for i in done..n {
+            let h = pair_filter_hash(keys[i]);
+            let (w, b) = self.slot(h);
+            hashes[i] = h;
+            words[i] = w as u64;
+            bits[i] = b;
+        }
+    }
+
+    /// [`Self::fill_block`]'s whole groups of eight; returns how many keys
+    /// it filled.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support AVX-512F and AVX-512DQ, and the three output
+    /// slices must be at least `keys.len()` long.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "avx512f,avx512dq")]
+    unsafe fn fill_block_avx512(
+        &self,
+        keys: &[u64],
+        hashes: &mut [u64],
+        words: &mut [u64],
+        bits: &mut [u64],
+    ) -> usize {
+        use std::arch::x86_64::*;
+        let set = |v: u64| _mm512_set1_epi64(v as i64);
+        let (c1, c2) = (set(0xff51_afd7_ed55_8ccd), set(0xc4ce_b9fe_1a85_ec53));
+        let (shift, mask) = (set(u64::from(self.shift)), set(self.words));
+        let [a, b, c] = self.bit_shifts;
+        let (sa, sb, sc) = (set(u64::from(a)), set(u64::from(b)), set(u64::from(c)));
+        let (m63, one, extra) = (set(63), set(1), set(self.extra));
+        let bit = |h: __m512i, s: __m512i| {
+            _mm512_sllv_epi64(one, _mm512_and_si512(_mm512_srlv_epi64(h, s), m63))
+        };
+        let whole = keys.len() / 8 * 8;
+        for i in (0..whole).step_by(8) {
+            let k = _mm512_loadu_si512(keys.as_ptr().add(i).cast());
+            // `pair_filter_hash`, lane by lane.
+            let mut h = _mm512_mullo_epi64(k, c1);
+            h = _mm512_xor_si512(h, _mm512_srli_epi64::<33>(h));
+            h = _mm512_mullo_epi64(h, c2);
+            let w = _mm512_and_si512(_mm512_srlv_epi64(h, shift), mask);
+            let more = _mm512_and_si512(_mm512_or_si512(bit(h, sb), bit(h, sc)), extra);
+            let bb = _mm512_or_si512(bit(h, sa), more);
+            _mm512_storeu_si512(hashes.as_mut_ptr().add(i).cast(), h);
+            _mm512_storeu_si512(words.as_mut_ptr().add(i).cast(), w);
+            _mm512_storeu_si512(bits.as_mut_ptr().add(i).cast(), bb);
+        }
+        whole
+    }
+}
+
+/// Whether AVX-512F and DQ run here, for [`FilterGeom::fill_block`].
+#[cfg(target_arch = "x86_64")]
+fn filter_simd() -> bool {
+    static SIMD: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *SIMD.get_or_init(|| {
+        std::is_x86_feature_detected!("avx512f") && std::is_x86_feature_detected!("avx512dq")
+    })
+}
+
+/// Whether the aimed scan fills its filter tests a block at a time
+/// ([`FilterGeom::fill_block`]); `KIC_SCAN_VFILTER=0` hashes and slots
+/// each key in the test loop as before, the control.
+fn scan_vfilter_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_SCAN_VFILTER").map_or(true, |v| v != "0"))
+}
+
 /// **Every pair sum of a factor base**, `P_i + P_j` for `i ≤ j`, sorted
 /// by packed point identity so a sum can be looked up by binary search.
 ///
@@ -4466,6 +4675,8 @@ pub struct FoldedStorage<'a> {
     pub present_mask: u64,
     /// Bits each key set in its filter word: 1 or [`FILTER_PROBES`].
     pub filter_probes: u8,
+    /// Which hash bits pick a key's filter word.
+    pub filter_layout: FilterLayout,
     pub tagged: bool,
     /// The normal basis the keys were named in; empty if the build fell
     /// back to the squaring chain.
@@ -4483,6 +4694,7 @@ impl FoldedStorage<'_> {
             present: self.present.to_vec(),
             present_mask: self.present_mask,
             filter_probes: self.filter_probes,
+            filter_layout: self.filter_layout,
             canon_tables: self.canon_tables.to_vec(),
         }
     }
@@ -4510,6 +4722,9 @@ pub struct FoldedParts {
     /// built with one bit a key, as both built them before (a `PTFOLD1`
     /// file).  The probe reads as many as were set.
     pub filter_probes: u8,
+    /// Which hash bits pick a key's filter word: [`FilterLayout::Low`]
+    /// for `gpu/ecc2k/pairtable.cuh`'s tables and every table file.
+    pub filter_layout: FilterLayout,
     /// The normal basis the keys were named in, as
     /// [`FrobeniusCanon::tables`] gives it.
     pub canon_tables: Vec<[u64; 256]>,
@@ -4579,8 +4794,8 @@ pub struct PairSumTable {
     /// few.  No false negatives, so the answer is unchanged.
     present: Vec<u64>,
     present_mask: u64,
-    /// [`filter_extra`] of the probes the filter was built with.
-    filter_extra: u64,
+    /// The filter's layout and the probes it was built with.
+    filter: FilterGeom,
     /// Whether the stored keys are folded by the signed Frobenius group
     /// `G = ⟨π, −1⟩`.
     ///
@@ -4981,6 +5196,31 @@ pub struct PairedScan<'a> {
 
 /// Whether aimed scans pair ± twins (`KIC_SCAN_PAIRED=0` turns it off,
 /// the control arm).  The same rests either way.
+/// The bits of a hash the partitioned fold build's single stream frees for
+/// the orbit: 34–37 and the partition's own top eight
+/// ([`PairSumTable::fold_partitioned`]).
+const PACK_KEEP: u64 = !((0xF << 34) | (0xFF << 56));
+
+/// An orbit below `2^12` in [`PACK_KEEP`]'s free bits.
+#[inline(always)]
+fn pack_orbit(orbit: u32) -> u64 {
+    let orbit = u64::from(orbit);
+    ((orbit & 0xF) << 34) | ((orbit >> 4) << 56)
+}
+
+/// [`pack_orbit`] undone.
+#[inline(always)]
+fn unpack_orbit(v: u64) -> u32 {
+    (((v >> 34) & 0xF) | ((v >> 56) << 4)) as u32
+}
+
+/// Whether the partitioned fold build packs a pair into one stream
+/// (`KIC_FOLD_PACK=0` keeps two, the control).
+fn fold_pack_enabled() -> bool {
+    static PACK: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *PACK.get_or_init(|| std::env::var("KIC_FOLD_PACK").map_or(true, |v| v != "0"))
+}
+
 fn scan_paired_enabled() -> bool {
     static PAIRED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *PAIRED.get_or_init(|| std::env::var("KIC_SCAN_PAIRED").map_or(true, |v| v != "0"))
@@ -5424,9 +5664,31 @@ impl PairSumTable {
         byte_budget: u128,
         probes: ProbeBudget,
     ) -> Option<Self> {
+        Self::build_within_for_layout(
+            kc,
+            fb,
+            byte_budget,
+            probes,
+            FilterLayout::for_folded_builds(),
+        )
+    }
+
+    /// [`Self::build_within_for`] with a folded table's filter layout
+    /// named.  The layout changes no answer, but it changes which absent
+    /// keys the filter lets through, and so the bucket reads a run
+    /// counts: a harness that replays records counted under one layout
+    /// must build with that layout ([`FilterLayout::Low`] for every
+    /// record made before the layouts existed).
+    pub fn build_within_for_layout(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        probes: ProbeBudget,
+        layout: FilterLayout,
+    ) -> Option<Self> {
         let (points, orbits) = (fb.points.len(), fb.signed_orbits.len());
         if Self::fold_is_cheaper(points, kc.n, orbits, probes) {
-            if let Some(folded) = Self::build_folded_within(kc, fb, byte_budget) {
+            if let Some(folded) = Self::build_folded_within_layout(kc, fb, byte_budget, layout) {
                 return Some(folded);
             }
         }
@@ -5435,7 +5697,7 @@ impl PairSumTable {
         }
         // Below the crossover but too wide to hold compactly: the fold
         // is dearer per probe and still the only tier that fits.
-        if let Some(folded) = Self::build_folded_within(kc, fb, byte_budget) {
+        if let Some(folded) = Self::build_folded_within_layout(kc, fb, byte_budget, layout) {
             return Some(folded);
         }
         Self::build_full_within(kc, fb, byte_budget)
@@ -5516,7 +5778,7 @@ impl PairSumTable {
             bucket_shift,
             present,
             present_mask,
-            filter_extra: FILTER_EXTRA,
+            filter: FilterGeom::new(FilterLayout::Low, present_mask, FILTER_EXTRA),
             fold: false,
             canon: None,
             orbit_start: Vec::new(),
@@ -5636,7 +5898,7 @@ impl PairSumTable {
             bucket_shift,
             present,
             present_mask,
-            filter_extra: FILTER_EXTRA,
+            filter: FilterGeom::new(FilterLayout::Low, present_mask, FILTER_EXTRA),
             fold: false,
             canon: None,
             orbit_start: Vec::new(),
@@ -5759,7 +6021,7 @@ impl PairSumTable {
             bucket_shift,
             present,
             present_mask,
-            filter_extra: FILTER_EXTRA,
+            filter: FilterGeom::new(FilterLayout::Low, present_mask, FILTER_EXTRA),
             fold: false,
             canon: None,
             orbit_start: Vec::new(),
@@ -5833,6 +6095,8 @@ impl PairSumTable {
         bucket_bits: u32,
         tagged: bool,
         harvest: bool,
+        layout: FilterLayout,
+        orbits: usize,
         each_row: &(dyn Fn(usize, &mut dyn FnMut(&[u64], u32, usize)) + Sync),
     ) -> (Vec<u32>, Vec<u32>, Vec<u64>, u64, Vec<(u32, u32)>) {
         let rows = row_lens.len();
@@ -5845,6 +6109,20 @@ impl PairSumTable {
         let runs = rayon::current_num_threads().clamp(1, rows.max(1));
         let per_run = rows.div_ceil(runs);
         let harvest = harvest && rows <= 1 << 12 && row_lens.iter().all(|&len| len < 1 << 20);
+        // **One stream a partition, not two.**  No step reads a hash's bits
+        // 34–37 — a bucket or a filter word is at most 26 top bits, a
+        // filter's bits within a word come from bits 0–33 or the top
+        // twelve, and a tagged word's rest is bits 0–15 — and a
+        // partition's own bits are its top eight.  Those twelve bits carry
+        // the pair's orbit, and its stored word is rebuilt from the hash
+        // as it is placed.  The harvest compares whole hashes, so it keeps
+        // two streams (`KIC_FOLD_PACK=0` keeps them too, the control).
+        let pack = tagged
+            && !harvest
+            && part_bits == 8
+            && bucket_bits <= 26
+            && orbits <= 1 << 12
+            && fold_pack_enabled();
         let streams: Vec<(Vec<Vec<u64>>, Vec<Vec<u32>>, Vec<Vec<u32>>)> = (0..runs)
             .into_par_iter()
             .map(|run| {
@@ -5854,13 +6132,24 @@ impl PairSumTable {
                 let mean = row_lens[here.clone()].iter().sum::<usize>() / parts;
                 let room = mean + 6 * (mean as f64).sqrt() as usize + 16;
                 let mut hs: Vec<Vec<u64>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
-                let mut ws: Vec<Vec<u32>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
+                let mut ws: Vec<Vec<u32>> = (0..parts)
+                    .map(|_| Vec::with_capacity(if pack { 0 } else { room }))
+                    .collect();
                 let mut ids: Vec<Vec<u32>> = (0..parts)
                     .map(|_| Vec::with_capacity(if harvest { room } else { 0 }))
                     .collect();
                 for r in here {
                     each_row(r, &mut |keys, orbit, start| {
                         let mut t = build_probe::now();
+                        if pack {
+                            let tag = pack_orbit(orbit);
+                            for &key in keys {
+                                let h = pair_filter_hash(key);
+                                hs[(h >> part_shift) as usize].push((h & PACK_KEEP) | tag);
+                            }
+                            build_probe::lap(build_probe::STREAM_PUSH, &mut t);
+                            return;
+                        }
                         for (at, &key) in keys.iter().enumerate() {
                             let h = pair_filter_hash(key);
                             let p = (h >> part_shift) as usize;
@@ -5903,6 +6192,7 @@ impl PairSumTable {
         const FILL_AHEAD: usize = 16;
         let filter_bits = filter_bits_for(total);
         let present_mask = (1u64 << filter_bits) - 1;
+        let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
         let filter_words = (1usize << filter_bits) / 64;
         let per_part = buckets / parts;
         // Capacity, not length: skewed partitions can grow their streams.
@@ -5929,6 +6219,8 @@ impl PairSumTable {
         let parts_per_run = parts.div_ceil(fill_runs);
         let mut bucket_start = vec![0u32; buckets + 1];
         let mut rests = vec![0u32; total];
+        advise_huge_pages(&bucket_start);
+        advise_huge_pages(&rests);
         let rp = rests.as_mut_ptr() as usize;
         // The harvest's side arrays, in the order of `rests`.
         let mut sorted_hash = vec![0u64; if harvest { total } else { 0 }];
@@ -5942,12 +6234,15 @@ impl PairSumTable {
             .enumerate()
             .map(|(run, run_starts)| {
                 let mut present = vec![0u64; filter_words];
+                advise_huge_pages(&present);
                 for (k, starts) in run_starts.chunks_mut(per_part).enumerate() {
                     let p = run * parts_per_run + k;
                     let first = p * per_part;
                     let mut at = vec![0usize; per_part];
+                    let top = (p as u64) << part_shift;
                     for (hs, _, _) in &streams {
                         for &h in &hs[p] {
+                            let h = if pack { (h & PACK_KEEP) | top } else { h };
                             at[(h >> bucket_shift) as usize - first] += 1;
                         }
                     }
@@ -5958,11 +6253,30 @@ impl PairSumTable {
                         *slot = next;
                         next += n;
                     }
+                    if pack {
+                        for (hs, _, _) in &streams {
+                            let vs = &hs[p];
+                            for (i, &v) in vs.iter().enumerate() {
+                                if let Some(&ahead) = vs.get(i + FILL_AHEAD) {
+                                    prefetch(&present[geom.word((ahead & PACK_KEEP) | top)]);
+                                }
+                                let h = (v & PACK_KEEP) | top;
+                                let w = Self::tagged_rest_from_hash(h, unpack_orbit(v));
+                                let b = (h >> bucket_shift) as usize - first;
+                                // SAFETY: as below.
+                                unsafe { *(rp as *mut u32).add(at[b]) = w };
+                                at[b] += 1;
+                                let (word, bits) = geom.slot(h);
+                                present[word] |= bits;
+                            }
+                        }
+                        continue;
+                    }
                     for (hs, ws, ids) in &streams {
                         let (hs, ws, ids) = (&hs[p], &ws[p], &ids[p]);
                         for (i, (&h, &w)) in hs.iter().zip(ws).enumerate() {
                             if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
-                                prefetch(&present[filter_slot(ahead, present_mask, 0).0]);
+                                prefetch(&present[geom.word(ahead)]);
                             }
                             let b = (h >> bucket_shift) as usize - first;
                             // SAFETY: partition `p` owns
@@ -5978,7 +6292,7 @@ impl PairSumTable {
                                 }
                             }
                             at[b] += 1;
-                            let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
+                            let (word, bits) = geom.slot(h);
                             present[word] |= bits;
                         }
                     }
@@ -6049,7 +6363,29 @@ impl PairSumTable {
         byte_budget: u128,
         bulk: bool,
     ) -> Option<Self> {
-        Self::build_folded_core(kc, fb, byte_budget, bulk, false).map(|(table, _)| table)
+        Self::build_folded_core(
+            kc,
+            fb,
+            byte_budget,
+            bulk,
+            false,
+            FilterLayout::for_folded_builds(),
+        )
+        .map(|(table, _)| table)
+    }
+
+    /// [`Self::build_folded_within`] with its filter layout named rather
+    /// than chosen: [`FilterLayout::Low`] builds the table
+    /// `gpu/ecc2k/pairtable.cuh` builds, word for word, for the tools that
+    /// compare the two.
+    pub fn build_folded_within_layout(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        layout: FilterLayout,
+    ) -> Option<Self> {
+        let bulk = std::env::var("KIC_FOLD_BUILD").as_deref() != Ok("scalar");
+        Self::build_folded_core(kc, fb, byte_budget, bulk, false, layout).map(|(table, _)| table)
     }
 
     /// [`Self::build_folded_within`], and with it the pairs of base points
@@ -6064,7 +6400,14 @@ impl PairSumTable {
         byte_budget: u128,
     ) -> Option<(Self, Option<FoldedDuplicates>)> {
         let bulk = std::env::var("KIC_FOLD_BUILD").as_deref() != Ok("scalar");
-        Self::build_folded_core(kc, fb, byte_budget, bulk, true)
+        Self::build_folded_core(
+            kc,
+            fb,
+            byte_budget,
+            bulk,
+            true,
+            FilterLayout::for_folded_builds(),
+        )
     }
 
     /// [`Self::build_within_for`] with the harvest of
@@ -6092,6 +6435,7 @@ impl PairSumTable {
         byte_budget: u128,
         bulk: bool,
         harvest: bool,
+        layout: FilterLayout,
     ) -> Option<(Self, Option<FoldedDuplicates>)> {
         if !kc.frobenius_is_endomorphism {
             return None;
@@ -6265,7 +6609,15 @@ impl PairSumTable {
                 .iter()
                 .map(|&(orbit, _)| n_points - suffix[orbit as usize] as usize)
                 .collect();
-            Self::fold_partitioned(&row_lens, bucket_bits, tagged, harvest, &each_row)
+            Self::fold_partitioned(
+                &row_lens,
+                bucket_bits,
+                tagged,
+                harvest,
+                layout,
+                fb.signed_orbits.len(),
+                &each_row,
+            )
         } else {
             let counts: Vec<AtomicU32> = (0..buckets + 1).map(|_| AtomicU32::new(0)).collect();
             (0..reps.len()).into_par_iter().for_each(|r| {
@@ -6286,6 +6638,7 @@ impl PairSumTable {
             let mut rests = vec![0u32; total];
             let filter_bits = filter_bits_for(total);
             let present_mask = (1u64 << filter_bits) - 1;
+            let geom = FilterGeom::new(layout, present_mask, FILTER_EXTRA);
             let words = (1usize << filter_bits) / 64;
             let present_atomic: Vec<AtomicU64> = (0..words).map(|_| AtomicU64::new(0)).collect();
             let slots = rests.as_mut_ptr() as usize;
@@ -6304,8 +6657,7 @@ impl PairSumTable {
                                 Self::compact_rest(key)
                             };
                         }
-                        let (word, bits) =
-                            filter_slot(pair_filter_hash(key), present_mask, FILTER_EXTRA);
+                        let (word, bits) = geom.slot(pair_filter_hash(key));
                         present_atomic[word].fetch_or(bits, Ordering::Relaxed);
                     }
                 });
@@ -6330,6 +6682,7 @@ impl PairSumTable {
                 present,
                 present_mask,
                 filter_probes: FILTER_PROBES,
+                filter_layout: layout,
                 canon_tables: Vec::new(),
             },
             tagged,
@@ -6389,7 +6742,11 @@ impl PairSumTable {
             bucket_shift: parts.bucket_shift,
             present: parts.present,
             present_mask: parts.present_mask,
-            filter_extra: filter_extra(parts.filter_probes),
+            filter: FilterGeom::new(
+                parts.filter_layout,
+                parts.present_mask,
+                filter_extra(parts.filter_probes),
+            ),
             fold: true,
             canon,
             orbit_start,
@@ -6645,7 +7002,8 @@ impl PairSumTable {
             words: &self.rests,
             present: &self.present,
             present_mask: self.present_mask,
-            filter_probes: if self.filter_extra != 0 {
+            filter_layout: self.filter.layout,
+            filter_probes: if self.filter.extra != 0 {
                 FILTER_PROBES
             } else {
                 1
@@ -6908,7 +7266,7 @@ impl PairSumTable {
     /// [`Self::filter_word`] for a precomputed `pair_filter_hash(key)`.
     #[inline]
     fn filter_word_hash(&self, h: u64) -> usize {
-        ((h & self.present_mask) as usize) >> 6
+        self.filter.word(h)
     }
 
     /// Whether the filter admits this key: every bit it would have set is
@@ -6923,7 +7281,7 @@ impl PairSumTable {
     #[inline]
     fn admitted_hash(&self, h: u64) -> bool {
         group_op_count::count_filter_probes(1);
-        let (word, bits) = filter_slot(h, self.present_mask, self.filter_extra);
+        let (word, bits) = self.filter.slot(h);
         self.present[word] & bits == bits
     }
 
@@ -7588,6 +7946,8 @@ impl PairSumTable {
         const LOOKAHEAD: usize = 32;
         let mut admitted_offsets = Vec::with_capacity(BLOCK / 8);
         let mut hashes = Vec::with_capacity(BLOCK);
+        let vfilter = scan_vfilter_enabled();
+        let (mut fwords, mut fbits) = (Vec::new(), Vec::new());
         #[cfg(feature = "scan-probes")]
         scan_probes::lap(scan_probes::SUBTRACT, &mut probe);
         let count = if fused { len } else { rests.len() };
@@ -7599,22 +7959,46 @@ impl PairSumTable {
             }
             #[cfg(feature = "scan-probes")]
             scan_probes::lap(scan_probes::KEY, &mut probe);
-            hashes.clear();
-            hashes.extend(keys.iter().copied().map(pair_filter_hash));
             admitted_offsets.clear();
-            for &h in hashes.iter().take(LOOKAHEAD) {
-                prefetch(&self.present[self.filter_word_hash(h)]);
-            }
-            for within in 0..hi - lo {
-                if let Some(&ahead) = hashes.get(within + LOOKAHEAD) {
-                    prefetch(&self.present[self.filter_word_hash(ahead)]);
+            if vfilter {
+                // The tests `admitted_hash` makes below, their hashes,
+                // words and bits filled a block at a time, and the same
+                // count of probes.
+                let n = hi - lo;
+                self.filter
+                    .fill_block(&keys[..n], &mut hashes, &mut fwords, &mut fbits);
+                group_op_count::count_filter_probes(n as u64);
+                for &w in fwords.iter().take(LOOKAHEAD) {
+                    prefetch(&self.present[w as usize]);
                 }
-                let h = hashes[within];
-                if !self.admitted_hash(h) {
-                    continue;
+                for within in 0..n {
+                    if let Some(&ahead) = fwords.get(within + LOOKAHEAD) {
+                        prefetch(&self.present[ahead as usize]);
+                    }
+                    let b = fbits[within];
+                    if self.present[fwords[within] as usize] & b != b {
+                        continue;
+                    }
+                    self.prefetch_bucket_hash(keys[within], hashes[within]);
+                    admitted_offsets.push(within);
                 }
-                self.prefetch_bucket_hash(keys[within], h);
-                admitted_offsets.push(within);
+            } else {
+                hashes.clear();
+                hashes.extend(keys.iter().copied().map(pair_filter_hash));
+                for &h in hashes.iter().take(LOOKAHEAD) {
+                    prefetch(&self.present[self.filter_word_hash(h)]);
+                }
+                for within in 0..hi - lo {
+                    if let Some(&ahead) = hashes.get(within + LOOKAHEAD) {
+                        prefetch(&self.present[self.filter_word_hash(ahead)]);
+                    }
+                    let h = hashes[within];
+                    if !self.admitted_hash(h) {
+                        continue;
+                    }
+                    self.prefetch_bucket_hash(keys[within], h);
+                    admitted_offsets.push(within);
+                }
             }
             #[cfg(feature = "scan-probes")]
             {
@@ -14544,7 +14928,7 @@ pub struct RelationCollector<'a> {
     kc: &'a KoblitzCurve,
     fb: &'a FrobeniusFactorBase,
     opts: &'a KoblitzIcOptions,
-    index_of: Arc<HashMap<(BigUint, BigUint), usize>>,
+    index_of: LazyIndexMap<'a>,
     field: FieldStructure,
     pair: PairSource<'a>,
     /// Single-word curve and lifted generator when the field fits.
@@ -14629,7 +15013,7 @@ impl<'a> RelationCollector<'a> {
             kc,
             fb,
             opts,
-            index_of: fb.shared_index_map(),
+            index_of: LazyIndexMap::new(fb),
             field: FieldStructure::new(kc.n, &kc.curve.irreducible),
             pair,
             fast,
@@ -14899,7 +15283,7 @@ impl<'a> RelationCollector<'a> {
                         decompose_once(
                             self.kc,
                             self.fb,
-                            &self.index_of,
+                            self.index_of.get(),
                             &self.field,
                             self.pair_table(),
                             self.opts,
@@ -15152,6 +15536,13 @@ pub fn verify_collected_relation(
         {
             return false;
         }
+        if fast_verify_enabled() {
+            if let Some(sum) = FastCurve::new(&kc.curve)
+                .and_then(|fast| fast_relation_sum(&fast, fb, &rel.points).map(|s| s.infinity))
+            {
+                return sum;
+            }
+        }
         let mut sum = BinaryPoint::Infinity;
         for &i in &rel.points {
             sum = kc.add(&sum, &fb.points[i]);
@@ -15164,11 +15555,78 @@ pub fn verify_collected_relation(
     if rel.points.iter().any(|&i| i >= fb.points.len()) {
         return false;
     }
+    if fast_verify_enabled() {
+        if let Some(verdict) = FastCurve::new(&kc.curve)
+            .and_then(|fast| verify_probe_relation_fast(kc, fb, &fast, rel))
+        {
+            return verdict;
+        }
+    }
+    verify_probe_relation_generic(kc, fb, rel)
+}
+
+/// `[a]G == Σ P_i` (and the sum is not `O`) in the generic arithmetic.
+fn verify_probe_relation_generic(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    rel: &CollectedRelation,
+) -> bool {
     let mut sum = BinaryPoint::Infinity;
     for &i in &rel.points {
         sum = kc.add(&sum, &fb.points[i]);
     }
     sum != BinaryPoint::Infinity && sum == kc.mul(kc.generator(), &BigUint::from(rel.a))
+}
+
+/// Whether [`verify_collected_relation`] sums a probe relation in
+/// single-word arithmetic (`KIC_FAST_VERIFY`, default on).  The verdict
+/// and the counted additions and doublings are those of the generic
+/// route; `0` restores it for A/B timing.
+fn fast_verify_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_FAST_VERIFY").map_or(true, |v| v != "0"))
+}
+
+/// `[a]G == Σ P_i` (and the sum is not `O`) in [`FastCurve`] arithmetic,
+/// or `None` when a point does not round-trip through the single-word
+/// field, so the caller keeps the generic route.  `FastCurve::add` and
+/// `double` count exactly where `point_add` and `point_double` do, and
+/// the scalar multiple is the one [`KoblitzCurve::mul`] takes.
+fn verify_probe_relation_fast(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    fast: &FastCurve,
+    rel: &CollectedRelation,
+) -> Option<bool> {
+    let generator = fast_lift_exact(fast, kc.generator())?;
+    let sum = fast_relation_sum(fast, fb, &rel.points)?;
+    Some(!sum.infinity && sum == fast.mul(generator, &BigUint::from(rel.a)))
+}
+
+/// `p` in single-word coordinates, or `None` if it does not round-trip.
+fn fast_lift_exact(fast: &FastCurve, p: &BinaryPoint) -> Option<FastPoint> {
+    let lifted = fast.lift(p);
+    (fast.lower(lifted) == *p).then_some(lifted)
+}
+
+/// `Σ P_i` over `points`, added left to right from `O` as the generic
+/// route adds them (so the same additions and doublings are counted),
+/// or `None` if a summand does not round-trip.  No addition is counted
+/// before every summand has lifted.
+fn fast_relation_sum(
+    fast: &FastCurve,
+    fb: &FrobeniusFactorBase,
+    points: &[usize],
+) -> Option<FastPoint> {
+    let summands = points
+        .iter()
+        .map(|&i| fast_lift_exact(fast, &fb.points[i]))
+        .collect::<Option<Vec<_>>>()?;
+    let mut sum = FastPoint::INFINITY;
+    for p in summands {
+        sum = fast.add(sum, p);
+    }
+    Some(sum)
 }
 
 /// The relation rows of a logarithm precompute, dense or sparse per the
@@ -15186,6 +15644,54 @@ struct LogSystem<'a> {
     /// In the word width `r` needs; empty (and over a placeholder
     /// width) on the dense path.
     sparse_rows: SparseRows,
+    /// `λ^k mod r` for `k` in `0..=n`: the Frobenius column
+    /// coefficients, so a row needs no `modpow` per summand.
+    lambda_powers: Vec<BigUint>,
+}
+
+/// Whether the pair table asks the kernel for transparent huge pages on
+/// its large, randomly read arrays (`KIC_HUGE_PAGES`, default on).  The
+/// arrays and every answer and count are the same either way; only the
+/// page size behind them changes, and so the TLB misses of the scan's
+/// filter probes and run lookups and of the build's scatter.  `0` turns
+/// the advice off for A/B timing.
+fn huge_pages_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_HUGE_PAGES").map_or(true, |v| v != "0"))
+}
+
+/// Advise transparent huge pages for the 2 MiB-aligned span of `v`,
+/// before its pages are first written: a freshly zeroed large `Vec`
+/// comes from `mmap` untouched, so the advice decides how its pages are
+/// faulted in.  Small slices, other systems and a refused advice are
+/// left as they are; the advice never changes the contents.
+fn advise_huge_pages<T>(v: &[T]) {
+    const HUGE: usize = 2 << 20;
+    let bytes = std::mem::size_of_val(v);
+    if bytes < 2 * HUGE || !huge_pages_enabled() {
+        return;
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let start = v.as_ptr() as usize;
+        let (lo, hi) = (start.next_multiple_of(HUGE), (start + bytes) / HUGE * HUGE);
+        if hi > lo {
+            // SAFETY: `[lo, hi)` lies inside `v`'s allocation, and
+            // `MADV_HUGEPAGE` changes only how its pages are backed.
+            unsafe {
+                libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_HUGEPAGE);
+            }
+        }
+    }
+}
+
+/// Whether the sparse relation system builds each row straight from
+/// its summands (`KIC_DIRECT_ROWS`, default on) instead of through a
+/// dense big-integer row.  Both give the same row; `0` restores the
+/// dense route for A/B timing.
+fn direct_rows_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_DIRECT_ROWS").map_or(true, |v| v != "0"))
 }
 
 impl<'a> LogSystem<'a> {
@@ -15219,6 +15725,13 @@ impl<'a> LogSystem<'a> {
                 SparseRows::for_modulus(&BigUint::from(2u32)).expect("2 is supported"),
             ),
         };
+        let mut lambda_powers = Vec::with_capacity(kc.n as usize + 1);
+        let mut power = BigUint::one() % r;
+        for _ in 0..=kc.n {
+            let next = (&power * &kc.lambda) % r;
+            lambda_powers.push(power);
+            power = next;
+        }
         Some(Self {
             kc,
             fb,
@@ -15230,6 +15743,7 @@ impl<'a> LogSystem<'a> {
             dense_matrix: Vec::new(),
             dense_rhs: Vec::new(),
             sparse_rows,
+            lambda_powers,
         })
     }
 
@@ -15288,6 +15802,29 @@ impl<'a> LogSystem<'a> {
         let _matrix = measurement::scope(Phase::MatrixBuild);
         let r = &self.kc.subgroup_order;
         let a = BigUint::from(rel.a);
+        if self.sparse_opts.is_some() && direct_rows_enabled() {
+            let entries = self.direct_entries(&rel.points);
+            let rhs = (&self.h * &a) % r;
+            self.sparse_rows.push_entries(&entries, &rhs);
+            #[cfg(debug_assertions)]
+            {
+                let dense = relation_from_decomposition_with_mode(
+                    self.kc,
+                    self.fb,
+                    &rel.points,
+                    &a,
+                    &BigUint::zero(),
+                    self.opts.collapse_negation,
+                    Some(self.projected.as_ref()),
+                );
+                debug_assert_eq!(
+                    self.sparse_rows.last_dense(self.n_cols),
+                    Some(dense.row),
+                    "direct row differs from the dense route"
+                );
+            }
+            return;
+        }
         let relation = relation_from_decomposition_with_mode(
             self.kc,
             self.fb,
@@ -15299,6 +15836,30 @@ impl<'a> LogSystem<'a> {
         );
         let rhs = (&self.h * &a) % r;
         self.push_row(relation.row, rhs);
+    }
+
+    /// A relation's `(column, ±λ^k mod r)` pairs, one a summand, unsorted
+    /// and unmerged.  Through `SparseRows::push_entries` (which sorts,
+    /// adds per column mod `r` and drops zeros) they give the row of the
+    /// dense route, `relation_from_decomposition_with_mode`.
+    fn direct_entries(&self, points: &[usize]) -> Vec<(u32, BigUint)> {
+        let r = &self.kc.subgroup_order;
+        let mut entries = Vec::with_capacity(points.len());
+        for &i in points {
+            // `None`: [h]P = O, no column (as in the dense route).
+            let Some((o, k, negated)) = self.projected.orbit_of[i] else {
+                continue;
+            };
+            let mut coeff = match self.lambda_powers.get(k as usize) {
+                Some(c) => c.clone(),
+                None => self.kc.lambda.modpow(&BigUint::from(k), r),
+            };
+            if negated && !coeff.is_zero() {
+                coeff = r - coeff;
+            }
+            entries.push((o as u32, coeff));
+        }
+        entries
     }
 
     /// Store a row `Σ c_o x_o ≡ rhs` in the configured form (sparse in
@@ -16181,7 +16742,7 @@ pub struct IndividualLogSolver<'a> {
     pair: Option<&'a PairSumTable>,
     projected: Arc<ProjectedSignedOrbitMap>,
     column_log: Vec<BigUint>,
-    index_of: Arc<HashMap<(BigUint, BigUint), usize>>,
+    index_of: LazyIndexMap<'a>,
     field: FieldStructure,
     /// Single-word curve and lifted generator when the field fits.
     fast: Option<(FastCurve, FastPoint)>,
@@ -16386,7 +16947,7 @@ impl<'a> IndividualLogSolver<'a> {
             pair,
             projected: projected.clone(),
             column_log,
-            index_of: fb.shared_index_map(),
+            index_of: LazyIndexMap::new(fb),
             field: FieldStructure::new(kc.n, &kc.curve.irreducible),
             fast,
             h: &kc.cofactor % r,
@@ -16475,7 +17036,7 @@ impl<'a> IndividualLogSolver<'a> {
                 _ => decompose_once(
                     self.kc,
                     self.fb,
-                    &self.index_of,
+                    self.index_of.get(),
                     &self.field,
                     self.pair,
                     self.opts,
@@ -16494,7 +17055,7 @@ impl<'a> IndividualLogSolver<'a> {
         decompose_once(
             self.kc,
             self.fb,
-            &self.index_of,
+            self.index_of.get(),
             &self.field,
             self.pair,
             self.opts,
@@ -19946,6 +20507,66 @@ mod tests {
     }
 
     #[test]
+    fn direct_sparse_rows_equal_the_dense_route() {
+        // Rows pushed straight from their summands must equal the rows
+        // the dense route builds, for repeated summands, a point with
+        // its negation, and on the 82-bit N83 order as well.
+        let n83 = KoblitzCurve::known_n83_k0().expect("public N83 curve fixture");
+        let BinaryPoint::Affine { x, .. } = n83.generator() else {
+            panic!("N83 generator must be affine");
+        };
+        let n83_fb = build_explicit_frobenius_orbit_factor_base(&n83, std::slice::from_ref(x))
+            .expect("complete signed orbit");
+        let small = KoblitzCurve::new(0, 13).unwrap();
+        let small_fb = build_frobenius_factor_base(&small, 0).unwrap();
+        for (kc, fb) in [(&small, &small_fb), (&n83, &n83_fb)] {
+            for collapse_negation in [true, false] {
+                let opts = KoblitzIcOptions {
+                    linear_algebra: LinearAlgebra::Sparse(SparseSolveOptions::default()),
+                    collapse_negation,
+                    ..KoblitzIcOptions::default()
+                };
+                let system = LogSystem::new(kc, fb, &opts).unwrap();
+                let r = &kc.subgroup_order;
+                let n = fb.points.len();
+                let mut state = 0x9e37_79b9_7f4a_7c15u64;
+                let mut rows = SparseRows::for_modulus(r).unwrap();
+                let mut cases: Vec<Vec<usize>> = vec![vec![0, 0], vec![0, n - 1], vec![]];
+                for _ in 0..200 {
+                    let len = 1 + (state % 6) as usize;
+                    let mut points = Vec::with_capacity(len);
+                    for _ in 0..len {
+                        state = state
+                            .wrapping_mul(6_364_136_223_846_793_005)
+                            .wrapping_add(1_442_695_040_888_963_407);
+                        points.push((state >> 33) as usize % n);
+                    }
+                    cases.push(points);
+                }
+                for (i, points) in cases.iter().enumerate() {
+                    let rhs = BigUint::from(i as u32);
+                    let dense = relation_from_decomposition_with_mode(
+                        kc,
+                        fb,
+                        points,
+                        &BigUint::zero(),
+                        &BigUint::zero(),
+                        collapse_negation,
+                        Some(system.projected.as_ref()),
+                    );
+                    rows.push_dense(&dense.row, &rhs);
+                    rows.push_entries(&system.direct_entries(points), &rhs);
+                    assert_eq!(
+                        rows.row_biguint(2 * i),
+                        rows.row_biguint(2 * i + 1),
+                        "summands {points:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
     fn an_underdetermined_sparse_attempt_keeps_its_report() {
         let kc = KoblitzCurve::new(0, 9).unwrap();
         let fb = build_frobenius_factor_base(&kc, 0).unwrap();
@@ -20546,6 +21167,107 @@ mod tests {
         assert!(loaded.is_folded());
         assert_eq!(loaded.len(), built.len());
         assert_same_answers(&kc, &fb, &built, &loaded);
+    }
+
+    #[test]
+    fn the_low_filter_layout_is_filter_slot() {
+        // `FilterGeom` for the low layout must name the word and bits
+        // `filter_slot` does, so every table built or loaded before the
+        // layouts existed reads exactly as it did.
+        let mut x = 0x9e37_79b9_7f4a_7c15u64;
+        for filter_bits in 6..=32u32 {
+            let mask = (1u64 << filter_bits) - 1;
+            for probes in [1u8, FILTER_PROBES] {
+                let geom = FilterGeom::new(FilterLayout::Low, mask, filter_extra(probes));
+                for _ in 0..2000 {
+                    x ^= x << 13;
+                    x ^= x >> 7;
+                    x ^= x << 17;
+                    assert_eq!(geom.slot(x), filter_slot(x, mask, filter_extra(probes)));
+                    assert_eq!(geom.word(x), filter_slot(x, mask, 0).0);
+                }
+            }
+        }
+        // The top layout's word stays inside the filter at every width,
+        // including a filter of one word.
+        for filter_bits in 6..=32u32 {
+            let mask = (1u64 << filter_bits) - 1;
+            let geom = FilterGeom::new(FilterLayout::Top, mask, FILTER_EXTRA);
+            for h in [0u64, u64::MAX, x, x.rotate_left(17)] {
+                assert!(geom.word(h) as u64 <= mask >> 6);
+            }
+        }
+    }
+
+    #[test]
+    fn a_filled_block_is_the_per_key_hash_and_slot() {
+        // `fill_block` (AVX-512 where it runs, scalar for the tail) must
+        // give each key exactly the hash, word and bits the scan's per-key
+        // test computes, under both layouts, both probe counts and every
+        // filter width, at block lengths that leave tails of every size.
+        let mut x = 0x2545_f491_4f6c_dd1du64;
+        for layout in [FilterLayout::Low, FilterLayout::Top] {
+            for probes in [1u8, FILTER_PROBES] {
+                for filter_bits in 6..=32u32 {
+                    let geom =
+                        FilterGeom::new(layout, (1u64 << filter_bits) - 1, filter_extra(probes));
+                    for len in [0usize, 1, 7, 8, 9, 63, 1024] {
+                        let keys: Vec<u64> = (0..len)
+                            .map(|_| {
+                                x ^= x << 13;
+                                x ^= x >> 7;
+                                x ^= x << 17;
+                                x
+                            })
+                            .collect();
+                        let (mut h, mut w, mut b) = (Vec::new(), Vec::new(), Vec::new());
+                        geom.fill_block(&keys, &mut h, &mut w, &mut b);
+                        assert_eq!(h.len(), len);
+                        for (i, &k) in keys.iter().enumerate() {
+                            let hk = pair_filter_hash(k);
+                            let (wk, bk) = geom.slot(hk);
+                            assert_eq!((h[i], w[i], b[i]), (hk, wk as u64, bk));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn both_filter_layouts_give_the_same_answers() {
+        for (a, n, seed, points) in [
+            (0u8, 31u32, 5u64, 400usize),
+            (1, 47, 3, 1500),
+            (0, 53, 1, 3000),
+        ] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, seed, points).unwrap();
+            let low =
+                PairSumTable::build_folded_within_layout(&kc, &fb, u128::MAX, FilterLayout::Low)
+                    .unwrap();
+            let top =
+                PairSumTable::build_folded_within_layout(&kc, &fb, u128::MAX, FilterLayout::Top)
+                    .unwrap();
+            let (ls, ts) = (low.folded_storage().unwrap(), top.folded_storage().unwrap());
+            assert_eq!(ls.filter_layout, FilterLayout::Low);
+            assert_eq!(ts.filter_layout, FilterLayout::Top);
+            // The same stored pairs, a different filter.
+            assert_eq!(ls.bucket_start, ts.bucket_start);
+            assert_eq!(ls.present_mask, ts.present_mask);
+            assert_ne!(
+                ls.present, ts.present,
+                "K_{a}/2^{n}: the layout changed nothing"
+            );
+            assert_same_answers(&kc, &fb, &low, &top);
+            // The layout survives a round trip through the parts.
+            let loaded = PairSumTable::from_folded_parts(&kc, &fb, ts.to_parts()).unwrap();
+            assert_eq!(
+                loaded.folded_storage().unwrap().filter_layout,
+                FilterLayout::Top
+            );
+            assert_same_answers(&kc, &fb, &top, &loaded);
+        }
     }
 
     #[test]
@@ -21873,6 +22595,78 @@ mod tests {
     /// relation for relation.  Without this, turning aiming on would
     /// change a run's first unit and the comparison with a swept run
     /// would not be controlled.
+    #[test]
+    fn fast_relation_checks_match_the_generic_verdicts_and_counts() {
+        // Valid relations, corrupted ones, a doubled summand and a point
+        // with its negation: the single-word check must give the generic
+        // verdict and count the same additions, doublings and scalar
+        // multiplications.
+        use crate::cryptanalysis::group_op_count::counted;
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 3, 400).unwrap();
+        let pair = PairSumTable::build(&kc, &fb).unwrap();
+        let opts = windowed_options(fb.points.len() / 8);
+        let collector = RelationCollector::with_pair_table(&kc, &fb, &opts, Some(&pair)).unwrap();
+        let unit = RelationWorkUnit {
+            seed: 11,
+            start: 0,
+            count: 4096,
+        };
+        let (found, _) = collector.collect_aimed(unit, None);
+        assert!(!found.is_empty(), "no relations to check");
+        let fast = FastCurve::new(&kc.curve).expect("single-word field");
+        let negation = (0..fb.points.len())
+            .find(|&j| fb.points[j] == crate::binary_ecc::curve::point_neg(&fb.points[0]));
+        let mut cases = Vec::new();
+        for rel in found.iter().take(40) {
+            cases.push(rel.clone());
+            let mut wrong_a = rel.clone();
+            wrong_a.a = rel.a % 1000 + 1;
+            cases.push(wrong_a);
+            let mut doubled = rel.clone();
+            doubled.points[1] = doubled.points[0];
+            cases.push(doubled);
+            if let Some(j) = negation {
+                let mut cancelled = rel.clone();
+                cancelled.points[0] = 0;
+                cancelled.points[1] = j;
+                cases.push(cancelled);
+            }
+        }
+        // Free relations (`a = 0`): a point with its negation and a
+        // point with itself, through the public check.
+        if let Some(j) = negation {
+            let free = [vec![0, j], vec![0, 0], vec![0, j, 1, 1]];
+            for points in free {
+                let rel = CollectedRelation {
+                    trial: 0,
+                    a: 0,
+                    points,
+                };
+                let mut sum = BinaryPoint::Infinity;
+                let (generic, generic_ops) = counted(|| {
+                    for &i in &rel.points {
+                        sum = kc.add(&sum, &fb.points[i]);
+                    }
+                    sum == BinaryPoint::Infinity
+                });
+                let (quick, quick_ops) = counted(|| verify_collected_relation(&kc, &fb, 3, &rel));
+                assert_eq!(generic, quick, "free verdict differs for {rel:?}");
+                assert_eq!(generic_ops, quick_ops, "free counts differ for {rel:?}");
+            }
+        }
+        let mut accepted = 0;
+        for rel in &cases {
+            let (generic, generic_ops) = counted(|| verify_probe_relation_generic(&kc, &fb, rel));
+            let (quick, quick_ops) =
+                counted(|| verify_probe_relation_fast(&kc, &fb, &fast, rel).expect("round trip"));
+            assert_eq!(generic, quick, "verdict differs for {rel:?}");
+            assert_eq!(generic_ops, quick_ops, "counts differ for {rel:?}");
+            accepted += usize::from(quick);
+        }
+        assert!(accepted >= found.len().min(40), "valid relations rejected");
+    }
+
     #[test]
     fn aiming_at_every_column_is_the_sweep() {
         let kc = KoblitzCurve::new(0, 19).unwrap();

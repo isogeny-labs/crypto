@@ -279,6 +279,30 @@ pub struct SizeRow {
     /// priced.  Empty for a bound fitted at a weight.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub band: Vec<BandPoint>,
+    /// Fit version 2 on sessions that carry a `w_cal`
+    /// ([`super::runner::read_wcal`]) and a fit not at a weight; absent
+    /// otherwise, so every earlier bound re-derives with the same id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calibrated: Option<CalibratedPoint>,
+}
+
+/// The calibrated reading of AGENTS.md §5a (2026-11-12) on one size: mean `S`
+/// over the verified runs with the field-multiplication counters at
+/// `field_weights` and every other native counter at `other_weights`
+/// (`mean_s[i][j]`; `None` where a run's counter has no count).  A point
+/// reading beside [`BandPoint`]; it replaces nothing.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CalibratedPoint {
+    pub w_cal: f64,
+    pub method: String,
+    pub host: String,
+    pub field_weights: Vec<f64>,
+    pub other_weights: Vec<f64>,
+    pub mean_s: Vec<Vec<Option<f64>>>,
+    /// `override` when the reading came from [`FitOptions::w_cal`]; absent
+    /// when it is the sessions' own.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 /// One axis on one size.
@@ -467,6 +491,13 @@ pub struct FitOptions {
     /// field is version 1 and is not written with it, so its seal stands.
     #[serde(default = "legacy_fit_version", skip_serializing_if = "is_legacy_fit")]
     pub fit_version: u32,
+    /// A `w_cal` override (`bound fit --w-cal`): the calibrated reading
+    /// (`sizes[].calibrated`) uses it instead of the sessions' own and
+    /// records `source: "override"`.  Kept here so `bound check` fits it
+    /// again.  Fit version 2, no `weight`, no `unit` only.  Omitted when
+    /// unset, so every earlier bound keeps its id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub w_cal: Option<super::band::WCal>,
 }
 
 fn legacy_fit_version() -> u32 {
@@ -489,6 +520,7 @@ impl Default for FitOptions {
             param_rule: None,
             oracle: None,
             fit_version: FIT_VERSION,
+            w_cal: None,
         }
     }
 }
@@ -1117,6 +1149,15 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let unverified_before_filter = recs.iter().filter(|r| !r.counts()).count();
     let runs_before_filter = recs.len();
 
+    if let Some(w) = &opts.w_cal {
+        w.validate()?;
+        if !v2 || opts.weight.is_some() || opts.unit.is_some() {
+            return Err(
+                "a w_cal override needs fit version 2 without --weight or --unit: the calibrated reading is in GAE beside the band, and bitop units price field multiplications at their frozen primitive weights"
+                    .into(),
+            );
+        }
+    }
     if opts.unit.is_some() && opts.weight.is_some() {
         return Err(
             "--unit and --weight exclude each other: bitop/v1 prices every operation, \
@@ -1253,6 +1294,19 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             .push(r);
     }
     let mut sizes: Vec<SizeRow> = Vec::new();
+    // The calibrated reading is in GAE: not at a weight, and not in a bitop
+    // unit (whose records are re-priced in gates by `bitop_view`).
+    let wcal = if v2 && opts.weight.is_none() && opts.unit.is_none() {
+        match &opts.w_cal {
+            Some(w) => Some((
+                w.clone(),
+                Some(super::band::WCAL_SOURCE_OVERRIDE.to_string()),
+            )),
+            None => super::runner::shared_wcal(inputs.dirs)?.map(|w| (w, None)),
+        }
+    } else {
+        None
+    };
     // Intervals fit version 2 refused for excluding their estimate.
     let mut refused: Vec<String> = Vec::new();
     for (slug, rs) in &by_slug {
@@ -1336,6 +1390,13 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             }),
             axes: size_axes,
             band: size_band,
+            calibrated: match &wcal {
+                Some((w, source)) => Some(CalibratedPoint {
+                    source: source.clone(),
+                    ..calibrated_point(&ok, w)?
+                }),
+                None => None,
+            },
         });
     }
     sizes.sort_by_key(|a| a.r);
@@ -2006,6 +2067,36 @@ fn size_axes_and_band(
     (axes, band)
 }
 
+fn calibrated_point(ok: &[&&Record], w: &super::band::WCal) -> Result<CalibratedPoint, String> {
+    w.validate()?;
+    let fw = [0.0, w.w_cal, 10.0 * w.w_cal];
+    let mut mean_s = Vec::new();
+    for wf in fw {
+        let mut row = Vec::new();
+        for wo in BAND_WEIGHTS {
+            let mut vals = Vec::new();
+            let mut all = !ok.is_empty();
+            for r in ok {
+                match super::band::priced_s_split(r, wf, wo, super::band::Pricing::default())? {
+                    Some(v) => vals.push(v),
+                    None => all = false,
+                }
+            }
+            row.push(all.then(|| vals.iter().sum::<f64>() / vals.len() as f64));
+        }
+        mean_s.push(row);
+    }
+    Ok(CalibratedPoint {
+        w_cal: w.w_cal,
+        method: w.method.clone(),
+        host: w.host.clone(),
+        field_weights: fw.to_vec(),
+        other_weights: BAND_WEIGHTS.to_vec(),
+        mean_s,
+        source: None,
+    })
+}
+
 /// Re-derive a committed bound from the sessions it names and require the
 /// same id: the bound's analogue of a replay.  Returns the re-derived
 /// bound.
@@ -2408,6 +2499,103 @@ mod tests {
         assert!(e.contains("same records"), "{e}");
         let _ = std::fs::remove_dir_all(copy);
         let _ = std::fs::remove_dir_all(same_bytes);
+    }
+
+    /// `bound fit --w-cal`: the override fills `sizes[].calibrated` with
+    /// `source: "override"`, is kept in `fit_options` so `bound check`
+    /// re-derives the same id, and is refused where there is no GAE
+    /// calibrated reading.  Without it nothing changes.
+    #[test]
+    fn a_w_cal_override_is_recorded_re_derives_and_is_refused_where_meaningless() {
+        use super::super::band::WCal;
+        let src = repo().join(CANDIDATES).join("sessions/prime");
+        let w = |v: f64| WCal {
+            w_cal: v,
+            method: "best-of-N timing".into(),
+            host: "h".into(),
+        };
+        let mut plain = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            &[],
+            FitOptions::default(),
+        )
+        .unwrap();
+        assert!(plain.sizes.iter().all(|s| s.calibrated.is_none()));
+        let plain_text = plain.seal().unwrap();
+        assert!(!plain_text.contains("w_cal"));
+        let mut over = fit(
+            std::slice::from_ref(&src),
+            "rho-neg",
+            &[],
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(!over.sizes.is_empty());
+        for s in &over.sizes {
+            let c = s.calibrated.as_ref().unwrap();
+            assert_eq!((c.w_cal, c.source.as_deref()), (0.02, Some("override")));
+        }
+        assert_eq!(over.fit_options.w_cal, Some(w(0.02)));
+        let text = over.seal().unwrap();
+        assert_ne!(over.bound_id, plain.bound_id);
+        // Everything but the calibrated points and the option is unchanged.
+        let strip = |t: &str| {
+            let mut v: serde_json::Value = serde_json::from_str(t).unwrap();
+            for k in ["bound_id", "fit_options"] {
+                v.as_object_mut().unwrap().remove(k);
+            }
+            for s in v["sizes"].as_array_mut().unwrap() {
+                s.as_object_mut().unwrap().remove("calibrated");
+            }
+            v
+        };
+        assert_eq!(strip(&text), strip(&plain_text));
+        // `bound check` fits it again from the recorded option.
+        let f = std::env::temp_dir().join(format!("wcal-bound-{}.json", std::process::id()));
+        std::fs::write(&f, &text).unwrap();
+        assert_eq!(check(&f, &repo()).unwrap().bound_id, over.bound_id);
+        let _ = std::fs::remove_file(&f);
+        // Refused: a bad value, a bitop unit, a weight, fit version 1.
+        let refuse = |o: FitOptions, want: &str| {
+            let e = fit(std::slice::from_ref(&src), "rho-neg", &[], o).unwrap_err();
+            assert!(e.contains(want), "{e}");
+        };
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            refuse(
+                FitOptions {
+                    w_cal: Some(w(bad)),
+                    ..Default::default()
+                },
+                "finite and > 0",
+            );
+        }
+        refuse(
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                unit: Some(crate::cryptanalysis::bitops::UNIT.into()),
+                ..Default::default()
+            },
+            "w_cal override",
+        );
+        refuse(
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                weight: Some(0.1),
+                ..Default::default()
+            },
+            "w_cal override",
+        );
+        refuse(
+            FitOptions {
+                w_cal: Some(w(0.02)),
+                ..v1()
+            },
+            "w_cal override",
+        );
     }
 
     #[test]

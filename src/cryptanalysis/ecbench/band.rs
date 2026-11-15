@@ -210,6 +210,7 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "native_field_muls_uncharged",
     "native_field_sqrs_uncharged",
     "linalg_mulmods_uncharged",
+    "linalg_mulmod_uncharged",
     "smoothness_field_muls_uncharged",
     "endomorphism_field_muls_uncharged",
     "transfer_field_muls_uncharged",
@@ -228,12 +229,64 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "pkm_t0_target_fp_mults_uncharged",
     "pkm_t0_base_map_fp_mults_uncharged",
     "pkm_base_check_fp_mults_uncharged",
+    // Added 2026-11-13 by the class-membership test
+    // (`field_multiplication_lookalikes_are_classed_or_excluded`).
+    "cm_formula_muls_uncharged",
+    "cm_formula_sqrs_uncharged",
+    "elimination_modular_multiplications_uncharged",
+    "large_prime_mulmods_uncharged",
+    "explicit_x_zero_lift_squarings_uncharged",
+    // Mod-r ring multiplications (`Ring` tallies, known-log answer product).
+    "scalar_muls_uncharged",
+    "scalar_multiplications_uncharged",
+    // Solver-block counters named for the solver's op unit: F_p
+    // multiplications, and multiply-adds counted as one multiplication each.
+    "solver_F_p_multiplications_(grid)_uncharged",
+    "solver_F_p_multiply-adds_(elimination_only)_uncharged",
+    "solver_F_p_multiply-adds_(tower_F4_elimination)_uncharged",
 ];
+
+/// Counters whose name looks like a multiplication or squaring but that are
+/// deliberately not in [`FIELD_ARITHMETIC_COUNTERS`], each with the reason.
+/// The test `field_multiplication_lookalikes_are_classed_or_excluded` fails
+/// for a name that looks like one and is in neither list.
+pub const FIELD_ARITHMETIC_EXCLUSIONS: &[(&str, &str)] = &[
+    ("aps_core_scalar_mults_uncharged", "scalar multiplication of a curve point: a group operation"),
+    ("aps_core_square_roots_uncharged", "a square root, not a multiplication: left to the band"),
+    ("sqrt_mod_p_calls_uncharged", "a square root, not a multiplication: left to the band"),
+    ("sqrt_solves_uncharged", "a square root, not a multiplication: left to the band"),
+    ("fp2_mul_uncharged", "a multiplication in F_{p^2}, an extension field, not the base field"),
+    ("line_field_multiplications_uncharged", "arithmetic in the trace-line extension field (its XORs are counted separately); no w_cal reading covers it"),
+    ("line_field_squarings_uncharged", "arithmetic in the trace-line extension field (its XORs are counted separately); no w_cal reading covers it"),
+];
+
+/// The counters `complete_route_f2m<n>_{mul,square}_uncharged`, whose name
+/// carries the field degree of the instance and so cannot be listed once.
+fn is_complete_route_field_counter(name: &str) -> bool {
+    let Some(rest) = name.strip_prefix("complete_route_f2m") else {
+        return false;
+    };
+    let digits = rest.chars().take_while(char::is_ascii_digit).count();
+    digits > 0 && matches!(&rest[digits..], "_mul_uncharged" | "_square_uncharged")
+}
+
+/// Whether `name` looks like a base-field multiplication or squaring: some
+/// `_`/punctuation-separated word of it begins `mul`, `sqr` or `squar`
+/// (`muls`, `mulmods`, `multiplications`, `sqrs`, `squarings`, `square_roots`
+/// and `sqrt` alike; the exclusions list the ones that are not).
+pub fn looks_like_field_multiplication(name: &str) -> bool {
+    name.split(|c: char| !c.is_ascii_alphanumeric())
+        .any(|w| ["mul", "sqr", "squar"].iter().any(|p| w.starts_with(p)))
+}
 
 /// Whether `name` is a field-multiplication counter ([`FIELD_ARITHMETIC_COUNTERS`]).
 /// Memory-size counters are not: the two classes are disjoint.
 pub fn is_field_arithmetic(name: &str) -> bool {
-    FIELD_ARITHMETIC_COUNTERS.contains(&name) && !is_non_operation(name)
+    // A phase-qualified label (`linear_algebra.linalg_mulmod_uncharged`) is
+    // classed by the counter after the last dot.
+    let name = name.rsplit('.').next().unwrap_or(name);
+    (FIELD_ARITHMETIC_COUNTERS.contains(&name) || is_complete_route_field_counter(name))
+        && !is_non_operation(name)
 }
 
 /// The unpriced counters of `r` that the band charges per operation: every
@@ -515,6 +568,148 @@ pub struct CalibratedReport {
     pub field_weights: Vec<f64>,
     pub field_counters: Vec<String>,
     pub pairs: Vec<CalibratedPair>,
+}
+
+/// `S` of one run with the field-arithmetic class ([`FIELD_ARITHMETIC_COUNTERS`])
+/// priced at `wf` GAE per operation and every other native counter at `wo`;
+/// `None` for a run with no recorded cost or an uncounted class priced above
+/// zero.  With `wf == wo` it equals [`priced_s_with`].
+pub fn priced_s_split(
+    r: &Record,
+    wf: f64,
+    wo: f64,
+    pricing: Pricing,
+) -> Result<Option<f64>, String> {
+    if r.cost.total_gae.is_none() {
+        return Ok(None);
+    }
+    let rr = &r;
+    let t = split_sums(&[rr], pricing)?;
+    Ok(split_mean_s(&t, (r.workload.curve.r as f64).sqrt(), wf, wo))
+}
+
+/// The calibrated reading of one pair of arms pooled over matched runs
+/// (AGENTS.md §5a, 2026-11-12), the form `compare` and `challenge` surface
+/// beside their band: `ratio_b_over_a[i][j]` is `Σ S_B / Σ S_A` with the
+/// field class at `field_weights[i]` and every other native counter at
+/// `other_weights[j]`.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CalibratedGrid {
+    pub w_cal: f64,
+    pub method: String,
+    pub host: String,
+    /// `[0, w_cal, 10·w_cal]`.
+    pub field_weights: Vec<f64>,
+    /// The band weights the other native counters take.
+    pub other_weights: Vec<f64>,
+    pub ratio_b_over_a: Vec<Vec<Option<f64>>>,
+    /// Per field weight (`0`, `w_cal`, `10*w_cal`): `B < A`, `A < B`,
+    /// `flips` (the order changes across `other_weights`) or `unrankable`.
+    pub order_at: BTreeMap<String, String>,
+    /// The same strict order at all three field weights.
+    pub ranked_at_calibrated_price: bool,
+    /// Where `w_cal` came from when it is not the sessions' own reading:
+    /// `override` for a `--w-cal` flag (or an explicit option).  Absent when
+    /// the sessions carry it (`options.w_cal` or the `w_cal.json` sidecar),
+    /// so a grid written before the field existed reads and serialises the
+    /// same.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+}
+
+/// The [`CalibratedGrid::source`] of a `w_cal` given by a flag.
+pub const WCAL_SOURCE_OVERRIDE: &str = "override";
+
+/// [`CalibratedGrid`] over matched `(A run, B run)` pairs, all verified.
+pub fn calibrated_ratio_grid(
+    pairs: &[(&Record, &Record)],
+    weights: &[f64],
+    pricing: Pricing,
+    wcal: &WCal,
+    a_arm: &str,
+    b_arm: &str,
+) -> Result<CalibratedGrid, String> {
+    calibrated_ratio_grid_scaled(pairs, weights, pricing, wcal, a_arm, b_arm, |_| 1.0)
+}
+
+/// [`calibrated_ratio_grid`] in total cost: each pair's `S` (both runs)
+/// times `scale` of the A run, `√r` for the ratio of `Σ S·√r` a pooled
+/// multi-session comparison reports.
+pub fn calibrated_ratio_grid_scaled(
+    pairs: &[(&Record, &Record)],
+    weights: &[f64],
+    pricing: Pricing,
+    wcal: &WCal,
+    a_arm: &str,
+    b_arm: &str,
+    scale: impl Fn(&Record) -> f64,
+) -> Result<CalibratedGrid, String> {
+    wcal.validate()?;
+    let fw = [0.0, wcal.w_cal, 10.0 * wcal.w_cal];
+    let mut grid = Vec::new();
+    let mut order_at = BTreeMap::new();
+    let mut dirs = Vec::new();
+    for (label, wf) in ["0", "w_cal", "10*w_cal"].into_iter().zip(fw) {
+        let mut row = Vec::new();
+        for &wo in weights {
+            let (mut sa, mut sb, mut known) = (0.0, 0.0, !pairs.is_empty());
+            for (ra, rb) in pairs {
+                match (
+                    priced_s_split(ra, wf, wo, pricing)?,
+                    priced_s_split(rb, wf, wo, pricing)?,
+                ) {
+                    (Some(x), Some(y)) => {
+                        let k = scale(ra);
+                        sa += x * k;
+                        sb += y * k;
+                    }
+                    _ => known = false,
+                }
+            }
+            row.push((known && sa > 0.0).then(|| sb / sa));
+        }
+        let (text, dir) = if row.iter().any(Option::is_none) {
+            ("unrankable".to_string(), 0i8)
+        } else if row.iter().flatten().all(|r| *r < 1.0) {
+            (format!("{b_arm} < {a_arm}"), -1)
+        } else if row.iter().flatten().all(|r| *r > 1.0) {
+            (format!("{a_arm} < {b_arm}"), 1)
+        } else {
+            ("flips".to_string(), 0)
+        };
+        order_at.insert(label.to_string(), text);
+        dirs.push(dir);
+        grid.push(row);
+    }
+    Ok(CalibratedGrid {
+        w_cal: wcal.w_cal,
+        method: wcal.method.clone(),
+        host: wcal.host.clone(),
+        field_weights: fw.to_vec(),
+        other_weights: weights.to_vec(),
+        ratio_b_over_a: grid,
+        order_at,
+        ranked_at_calibrated_price: dirs[0] != 0 && dirs.iter().all(|d| *d == dirs[0]),
+        source: None,
+    })
+}
+
+/// Pair the verified, measured runs of two arms (each given as its runs) by
+/// `(workload_id, round)`.
+pub fn matched_verified<'a>(
+    a_runs: impl IntoIterator<Item = &'a Record>,
+    b_runs: impl IntoIterator<Item = &'a Record>,
+) -> Vec<(&'a Record, &'a Record)> {
+    let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
+    let side = |runs: &mut dyn Iterator<Item = &'a Record>| -> BTreeMap<_, &'a Record> {
+        runs.filter(|r| !r.warmup && r.counts())
+            .map(|r| (key(r), r))
+            .collect()
+    };
+    let (a, b) = (side(&mut a_runs.into_iter()), side(&mut b_runs.into_iter()));
+    a.iter()
+        .filter_map(|(k, ra)| b.get(k).map(|rb| (*ra, *rb)))
+        .collect()
 }
 
 /// The band report over `records` (warm-ups ignored), default pricing.
@@ -1327,6 +1522,319 @@ mod tests {
                 );
             }
         }
+    }
+
+    fn lookalike_is_settled(name: &str) -> bool {
+        is_field_arithmetic(name) || FIELD_ARITHMETIC_EXCLUSIONS.iter().any(|(n, _)| *n == name)
+    }
+
+    /// Every unpriced counter name in a committed ecbench record (the
+    /// `cost.unpriced` lists, read as text so no record is parsed) and every
+    /// `"..._uncharged"` literal in `src/` that looks like a base-field
+    /// multiplication or squaring is in [`FIELD_ARITHMETIC_COUNTERS`] or has
+    /// a reasoned entry in [`FIELD_ARITHMETIC_EXCLUSIONS`].
+    #[test]
+    fn field_multiplication_lookalikes_are_classed_or_excluded() {
+        use std::io::BufRead;
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let mut names: std::collections::BTreeMap<String, String> = Default::default();
+        let mut stack = vec![root.join("research")];
+        while let Some(d) = stack.pop() {
+            let Ok(rd) = std::fs::read_dir(&d) else {
+                continue;
+            };
+            for e in rd.flatten() {
+                let p = e.path();
+                if p.is_dir() {
+                    stack.push(p);
+                } else if p.file_name().is_some_and(|f| f == "records.jsonl") {
+                    let Ok(f) = std::fs::File::open(&p) else {
+                        continue;
+                    };
+                    for line in std::io::BufReader::new(f).lines().map_while(Result::ok) {
+                        let Some(i) = line.find("\"unpriced\":[") else {
+                            continue;
+                        };
+                        let rest = &line[i + 12..];
+                        let list = &rest[..rest.find(']').unwrap_or(rest.len())];
+                        for n in list.split('"').skip(1).step_by(2) {
+                            names
+                                .entry(n.to_string())
+                                .or_insert_with(|| p.display().to_string());
+                        }
+                    }
+                }
+            }
+        }
+        let mut stack = vec![root.join("src")];
+        while let Some(d) = stack.pop() {
+            let Ok(rd) = std::fs::read_dir(&d) else {
+                continue;
+            };
+            for e in rd.flatten() {
+                let p = e.path();
+                if p.is_dir() {
+                    stack.push(p);
+                } else if p.extension().is_some_and(|x| x == "rs") {
+                    let Ok(text) = std::fs::read_to_string(&p) else {
+                        continue;
+                    };
+                    for lit in text.split('"').skip(1).step_by(2) {
+                        if lit.ends_with("_uncharged")
+                            && !lit.starts_with('_')
+                            && !lit.contains(char::is_whitespace)
+                            && !lit.contains("{}")
+                        {
+                            names
+                                .entry(lit.to_string())
+                                .or_insert_with(|| p.display().to_string());
+                        }
+                    }
+                }
+            }
+        }
+        assert!(names.len() > 50, "scanned too little: {}", names.len());
+        let unsettled: Vec<String> = names
+            .iter()
+            .filter(|(n, _)| {
+                looks_like_field_multiplication(n.rsplit('.').next().unwrap_or(n))
+                    && !lookalike_is_settled(n)
+            })
+            .map(|(n, from)| format!("{n} (first seen in {from})"))
+            .collect();
+        assert!(
+            unsettled.is_empty(),
+            "counter names that look like field multiplications or squarings are in neither FIELD_ARITHMETIC_COUNTERS nor FIELD_ARITHMETIC_EXCLUSIONS: {unsettled:#?}"
+        );
+        // The lists themselves: no name in both, no stale exclusion.
+        for (n, why) in FIELD_ARITHMETIC_EXCLUSIONS {
+            assert!(
+                !FIELD_ARITHMETIC_COUNTERS.contains(n),
+                "{n} is in both lists"
+            );
+            assert!(!why.is_empty());
+            assert!(looks_like_field_multiplication(n), "{n} is not a lookalike");
+        }
+        assert!(!is_field_arithmetic("fp2_mul_uncharged"));
+        assert!(is_field_arithmetic("complete_route_f2m7_mul_uncharged"));
+        assert!(!is_field_arithmetic(
+            "complete_route_f2m7_inverse_uncharged"
+        ));
+        assert!(!looks_like_field_multiplication(
+            "cm_formula_invs_uncharged"
+        ));
+    }
+
+    /// Sessions, comparisons and verdict inputs written without a `w_cal`
+    /// read and serialise as before: no `w_cal` key anywhere, and `compare`
+    /// with a `w_cal` differs from `compare` without one only by the added
+    /// `calibrated` block.  Three committed sessions.
+    #[test]
+    fn records_without_w_cal_replay_unchanged_and_compare_is_additive() {
+        use crate::cryptanalysis::ecbench::compare::{compare_loaded_weighted, CompareOptions};
+        use crate::cryptanalysis::ecbench::runner::{read_session, read_wcal, shared_wcal};
+        use crate::cryptanalysis::ecbench::spec::Level;
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let rels = [
+            "research/ic_planner_validation_20261020/sessions/r24",
+            "research/ic_planner_validation_20261020/sessions/c24",
+            "research/ic_planner_validation_20261020/sessions/r26",
+        ];
+        let dirs: Vec<_> = rels.iter().map(|r| root.join(r)).collect();
+        assert_eq!(shared_wcal(&dirs).unwrap(), None);
+        for (rel, dir) in rels.iter().zip(&dirs) {
+            assert_eq!(read_wcal(dir).unwrap(), None, "{rel}");
+            let sess = read_session(dir).unwrap();
+            let text = serde_json::to_string(&sess).unwrap();
+            assert!(!text.contains("w_cal"), "{rel}");
+            let recs = crate::cryptanalysis::ecbench::runner::read_records(dir).unwrap();
+            let mk = |w: Option<WCal>| CompareOptions {
+                resamples: 200,
+                seed: 7,
+                allow_interrupted: false,
+                pricing: Pricing::default(),
+                bitop: false,
+                w_cal: w,
+            };
+            // `own`: the reading the session carries (`options.w_cal`);
+            // `w`: an override in the options.
+            let run_on = |s: &crate::cryptanalysis::ecbench::runner::Session, w| {
+                serde_json::to_value(
+                    compare_loaded_weighted(
+                        s,
+                        &recs,
+                        s,
+                        &recs,
+                        "rho-neg",
+                        "plan",
+                        Level::L0,
+                        &mk(w),
+                        None,
+                    )
+                    .unwrap(),
+                )
+                .unwrap()
+            };
+            let run = |w| run_on(&sess, w);
+            let mut carrying = sess.clone();
+            carrying.options.w_cal = Some(wcal(0.01));
+            let (plain, own, over) = (run(None), run_on(&carrying, None), run(Some(wcal(0.01))));
+            assert!(plain["ops"]["band"].get("calibrated").is_none(), "{rel}");
+            let strip = |v: &serde_json::Value| {
+                let mut v = v.clone();
+                if let Some(b) = v["ops"]["band"].as_object_mut() {
+                    assert!(b.remove("calibrated").is_some(), "{rel}");
+                }
+                v
+            };
+            // The session's own reading: additive only, the id included.
+            assert!(own["ops"]["band"]["calibrated"].get("source").is_none());
+            assert_eq!(strip(&own), plain, "{rel}: additive only");
+            // An override: the same grid, marked, and its own id (the
+            // legacy id is unchanged).
+            assert_eq!(over["ops"]["band"]["calibrated"]["source"], "override");
+            let mut g = over["ops"]["band"]["calibrated"].clone();
+            g.as_object_mut().unwrap().remove("source");
+            assert_eq!(g, own["ops"]["band"]["calibrated"], "{rel}");
+            assert_ne!(over["comparison_id"], plain["comparison_id"], "{rel}");
+            assert_eq!(over["legacy_comparison_id"], plain["legacy_comparison_id"]);
+            let mut over = strip(&over);
+            over["comparison_id"] = plain["comparison_id"].clone();
+            assert_eq!(over, plain, "{rel}: additive apart from the id");
+        }
+    }
+
+    /// From session directories: the `w_cal.json` sidecar reaches the
+    /// single and the pooled comparison, an override beats it and is
+    /// recorded, and sessions without one compare exactly as before.
+    #[test]
+    fn sidecar_and_override_reach_single_and_pooled_compare_from_directories() {
+        use crate::cryptanalysis::ecbench::compare::{
+            compare_pooled, compare_weighted_with, CompareOptions,
+        };
+        use crate::cryptanalysis::ecbench::runner::WCAL_SIDECAR;
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let src = root.join("research/ic_planner_validation_20261020/sessions/r24");
+        let copy = |name: &str, rename: bool| {
+            let d = std::env::temp_dir().join(format!("wcal-dirs-{name}-{}", std::process::id()));
+            let _ = std::fs::remove_dir_all(&d);
+            std::fs::create_dir_all(&d).unwrap();
+            for f in ["plan.json", "spec.json", "host.json", "records.jsonl"] {
+                std::fs::copy(src.join(f), d.join(f)).unwrap();
+            }
+            let mut v: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(src.join("session.json")).unwrap())
+                    .unwrap();
+            if rename {
+                v["session_id"] = serde_json::json!("ECBS1hcopy0000wcal");
+            }
+            std::fs::write(d.join("session.json"), serde_json::to_string(&v).unwrap()).unwrap();
+            d
+        };
+        let dirs = vec![copy("a", false), copy("b", true)];
+        let opts = |w: Option<WCal>| CompareOptions {
+            resamples: 200,
+            seed: 7,
+            allow_interrupted: false,
+            pricing: Pricing::default(),
+            bitop: false,
+            w_cal: w,
+        };
+        let pooled = |o: &CompareOptions| {
+            serde_json::to_value(compare_pooled(&dirs, "rho-neg", "plan", o, None).unwrap())
+                .unwrap()
+        };
+        let single = |o: &CompareOptions| {
+            serde_json::to_value(
+                compare_weighted_with(&dirs[0], "rho-neg", None, "plan", o, None).unwrap(),
+            )
+            .unwrap()
+        };
+        let (p0, s0) = (pooled(&opts(None)), single(&opts(None)));
+        assert!(p0.get("calibrated").is_none());
+        assert!(s0["ops"]["band"].get("calibrated").is_none());
+        let side = |d: &std::path::Path, w: f64| {
+            std::fs::write(
+                d.join(WCAL_SIDECAR),
+                format!(r#"{{"schema":"ecbench.wcal/v1","w_cal":{w},"method":"best-of-N timing","host":"h"}}"#),
+            )
+            .unwrap()
+        };
+        // One sidecar: the single comparison reads it; the pool declines.
+        side(&dirs[0], 0.03);
+        let s1 = single(&opts(None));
+        let g = &s1["ops"]["band"]["calibrated"];
+        assert_eq!(g["w_cal"], 0.03);
+        assert!(g.get("source").is_none());
+        let p1 = pooled(&opts(None));
+        assert_eq!(p1["calibrated"]["rule"], "declined");
+        assert_eq!(p1["sessions"][0]["calibrated"]["w_cal"], 0.03);
+        assert!(p1["sessions"][1].get("calibrated").is_none());
+        assert_eq!(p1["comparison_id"], p0["comparison_id"]);
+        // Both: pooled.
+        side(&dirs[1], 0.03);
+        let p2 = pooled(&opts(None));
+        assert_eq!(p2["calibrated"]["rule"], "identical");
+        // An override beats the sidecars and says so.
+        let o = opts(Some(wcal(0.05)));
+        let s3 = single(&o);
+        let g = &s3["ops"]["band"]["calibrated"];
+        assert_eq!(
+            (g["w_cal"].as_f64(), g["source"].as_str()),
+            (Some(0.05), Some("override"))
+        );
+        let p3 = pooled(&o);
+        assert_eq!(p3["calibrated"]["rule"], "override");
+        assert_eq!(p3["calibrated"]["grids"][0]["source"], "override");
+        for d in &dirs {
+            let _ = std::fs::remove_dir_all(d);
+        }
+    }
+
+    /// A session run with a `w_cal` carries it in `options`, a sidecar reads
+    /// back, and a bad one is refused.
+    #[test]
+    fn w_cal_round_trips_through_the_session_options_and_the_sidecar() {
+        use crate::cryptanalysis::ecbench::runner::{read_wcal, WCAL_SIDECAR};
+        let d = std::env::temp_dir().join(format!("wcal-sidecar-{}", std::process::id()));
+        std::fs::create_dir_all(&d).unwrap();
+        assert_eq!(read_wcal(&d).unwrap(), None);
+        std::fs::write(
+            d.join(WCAL_SIDECAR),
+            r#"{"schema":"ecbench.wcal/v1","w_cal":0.03,"method":"best-of-N timing","host":"h","mul_ns":1}"#,
+        )
+        .unwrap();
+        let w = read_wcal(&d).unwrap().unwrap();
+        assert_eq!(
+            (w.w_cal, w.method.as_str(), w.host.as_str()),
+            (0.03, "best-of-N timing", "h")
+        );
+        std::fs::write(
+            d.join(WCAL_SIDECAR),
+            r#"{"w_cal":0.03,"method":"guess","host":"h"}"#,
+        )
+        .unwrap();
+        assert!(read_wcal(&d).is_err());
+        std::fs::remove_dir_all(&d).ok();
+    }
+
+    /// `priced_s_split` with one weight for both classes is `priced_s`.
+    #[test]
+    fn the_split_price_at_equal_weights_is_the_band_price() {
+        let recs = session("research/ic_planner_validation_20261020/sessions/r24");
+        let mut n = 0;
+        for r in recs.iter().filter(|r| r.counts() && !r.warmup) {
+            for w in DEFAULT_WEIGHTS {
+                let a = priced_s(r, w).unwrap();
+                let b = priced_s_split(r, w, w, Pricing::default()).unwrap();
+                match (a, b) {
+                    (Some(x), Some(y)) => assert!((x - y).abs() <= 1e-9 * x.abs().max(1.0)),
+                    (x, y) => assert_eq!(x, y),
+                }
+                n += 1;
+            }
+        }
+        assert!(n > 0);
     }
 
     /// Two arms on one curve from a committed record: `ic` has `g_ic` GAE
