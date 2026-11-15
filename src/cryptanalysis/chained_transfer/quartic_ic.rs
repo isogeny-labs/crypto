@@ -2878,7 +2878,7 @@ mod tests {
         );
         // x = 0 becomes 1: find a seed with (s · 2246822519 + 7) = 0 (mod 223)
         let s0 = (0..223u64)
-            .find(|&s| (s as u128 * 2_246_822_519 + 7) % 223 == 0)
+            .find(|&s| (s as u128 * 2_246_822_519 + 7).is_multiple_of(223))
             .unwrap();
         assert_eq!(x_k(s0, 223), (1, true));
         assert_eq!(ic_seed(ArmKind::Q, 0, 0), 700);
