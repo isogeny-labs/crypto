@@ -21,6 +21,16 @@ theorem degree_three_full_catalog_accounting :
 theorem nonzero_trace_source_subgroup_order :
     4090 = 10 * 409 ∧ 409 > 1 := by decide
 
+theorem base_isogeny_cubic_trace_gate :
+    (7 : Int)^3 - 48 * 7 = 7 ∧
+    (-7 : Int)^3 - 48 * (-7) = -7 ∧
+    (1 : Int)^3 - 48 * 1 = -47 ∧
+    (-1 : Int)^3 - 48 * (-1) = 47 := by decide
+
+theorem trace_zero_factor_orders :
+    10 * 409 = 4090 ∧ 24 * 171 = 4104 ∧
+    18 * 225 = 4050 ∧ 16 * 259 = 4144 := by decide
+
 theorem branch_symmetry_accounting :
     4 * 3 = 12 ∧ 3 * 12 = 36 := by decide
 

@@ -261,7 +261,17 @@ def main():
     prior3 = json.loads((HERE/"prior_work_degree3_receipt.json").read_text())
     assert prior3["scan_sha256"] == sha(full_scan_path)
     assert prior3["script_sha256"] == sha(HERE/"prior_work_degree3.py")
+    base_path = HERE/"base_isogeny_degree3_gate_receipt.json"
+    base = json.loads(base_path.read_text())
+    assert base["scan_sha256"] == sha(full_scan_path)
+    assert base["script_sha256"] == sha(HERE/"base_isogeny_degree3_gate.py")
+    assert len(base["rows"]) == 6
+    assert sum(r["cover_descriptions"] for r in base["rows"] if r["is_k_defined_isogeny_class"]) == 36
+    assert prior3["base_isogeny_receipt_sha256"] == sha(base_path)
     assert len(prior3["rows"]) == 60
+    base_by_class = {r["class"]:r for r in base["rows"]}
+    assert all(r["base_field_isogeny_class"] == base_by_class[r["class"]]["is_k_defined_isogeny_class"]
+               for r in prior3["rows"])
     assert sum(hit["trace_b_mask"] != 0 for hit in full_scan["hits"]) == 36
     assert len({(hit["u_mask"],hit["b_mask"]) for hit in full_scan["hits"]}) == 30
     for index in (5,12):
