@@ -25,3 +25,10 @@ benchmark records and the new one with source-linked reports, plots and formal r
 Coordination service restarted and changed local transport. The new task was successfully
 claimed before editing these files; repeated coordination work stopped at the user's request.
 No correctness failure has occurred in the anchor unit gates.
+
+## First anchor pilot result and next decision
+55 gated and55 timed solves pass;15890 raw and1638 projected identities checked. Most total
+ratios versus prior cold table controls are<=1.2x, with large L0 timing outliers retained.
+The next variant shares work across all sign choices via the exact Gray-code norm identity,
+uses cached anchor inverses and dense reusable forest potentials, and removes repeated small
+matrix rebuilding. This remains a falsification attempt toward the original10x goal.

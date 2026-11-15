@@ -59,3 +59,44 @@ The pilot is exploratory; >=10x still requires frozen arms, held-out curves, sca
 Relevant sources already checked: GTTD three-author primary draft (2005), section3.1, signed
 cycles; Magma handbook on principal-divisor/geometric IC; existing table-oracle Cardano/Ferrari
 proof and gates. No new family or special-subfield assumption is used.
+
+## Signed-orbit amendment (after first pilot, before new implementation/timing)
+
+First anchor pilot:55 gate and55 timed answers all check, no caps,15890 principal identities and
+1638 projected anchor identities. Total gain against prior table baseline mostly<=1.2x. Therefore
+retain that failure; optimize the measured interpolation and forest costs, not just the oracle.
+
+For a fixed anchor tuple let A=product(x-x_i), w_i=y_i/A'(x_i), h_i=w_i A/(x-x_i).
+For i!=j, h_i h_j/A=w_i w_j product_{k!=i,j}(x-x_k), a polynomial of degree<=g-1.
+If h_sigma=sum sigma_i h_i, Q_sigma=(f-h_sigma^2)/A, changing only sign j gives
+
+    Q_new = Q_old +4 sum_{i!=j} sigma_i sigma_j (h_i h_j/A),
+    h_new = h_old -2 sigma_j h_j.
+
+Proof: expand the difference of squares; the h_j^2 terms cancel because sigma_j^2=1.
+Thus all2^g sign classes (first sign fixed, global negation identified) share interpolation and
+one norm division. Gray-code order changes one sign per step. This is an exact algebraic reuse
+identity, not a claim of new mathematics or of tenfold complete speedup.
+
+Precompute inverse anchor differences with one batch inversion, O(H^2) field operations/words.
+For g2 enumerate/shuffle unordered triples without replacement (O(H^3)=O(p) at the frozen H);
+for g3/4 sample distinct tuples, consuming all sign classes in each. Do not normalize/deduplicate
+raw rows: repeated group relations yield zero/duplicate anchor equations and do not create rank.
+Deduplicate emitted anchor rows. Record this change in metadata. Finite family limits remain.
+
+Use a flat dense potential array for the signed forest, with reusable buffers and path
+compression. Its O(mH) storage is explicit, capped at16million u64 words. Coefficients remain
+mod ell, including non-unit cycle gains; +/-1 uses addition/subtraction. The small anchor solve
+uses incremental dense echelon rows, checking target determination as rows arrive; no matrix
+rebuild or arbitrary oversampling is charged away. This replaces the16-rebuild cap; the1million
+candidate cap and10000-step descent cap remain.
+
+Catalogue evaluation uses finite differences (2g+1 additions per x) and the square-root table;
+polynomial evaluations for the initial difference table are charged. A new interleaved baseline
+must receive the same catalogue option in a subsequent confirmation, so catalogue-only savings
+cannot be attributed uniquely to the signed-orbit mechanism.
+
+Gates: every Gray-code residual/h must equal full signed interpolation and norm division on
+random tuples. Same principal/projected checks as before, arbitrary-coefficient forest fixture,
+full target verification. Timing remains exploratory against all strongest existing native and
+table controls, with all cold setup and memory reported. >=10x and novelty remain unestablished.
