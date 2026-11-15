@@ -1,0 +1,24 @@
+digraph covers {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", fontsize=16,
+    label="All finite covers of the fixed P-256 curve\nComplete representation framework; worked traits and Smith checks have declared scope", labelloc=t, nodesep=0.35, ranksep=0.45];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f8", color="#53708e", fontname="Helvetica", fontsize=12];
+  edge [color="#688096", fontname="Helvetica", fontsize=10];
+  A [label="Every finite cover C -> E\nup to source isomorphism over fixed E"];
+  S [label="Finite separable extension S / Fp(E)\nfull constant field Fp"];
+  F [label="Append relative Frobenius^e\ne >= 0; total degree = d_sep p^e"];
+  G [label="Normalize; compute genus and canonical model"];
+  E [label="Genus 1\nelliptic isogeny + translation"];
+  H [label="Hyperelliptic, genus >= 2\nall represented by v^2 = f(R(t))\nplus target translation"];
+  N [label="Nonhyperelliptic, genus >= 3\ngeneral extensions with canonical-model test"];
+  Q [label="All separable degree-2 covers\nreduced branch divisor B + unique square-root line bundle\n+ one of two twists (P-256 has odd order)"];
+  M [label="Smith input gate\nonly genus-3 hyperelliptic sources"];
+  K [label="Stable pair kernel -> genuine cubic map\n-> rational correspondence -> smooth plane quartic\n-> divisor arithmetic and subgroup validation"];
+  C3 [label="Fixed C3 model over Fp\n3 stable pair kernels; all rank-degenerate", fillcolor="#f8eee3"];
+  H5 [label="Fixed H5 companion over Fp\n1 pair kernel; candidates drop to degree 2", fillcolor="#f8eee3"];
+  A -> S -> F -> G;
+  G -> E; G -> H; G -> N;
+  S -> Q [style=dashed,label="overlapping subclass"];
+  H -> M -> K;
+  K -> C3 [style=dashed,label="producer prerequisite check"];
+  K -> H5 [style=dashed,label="producer prerequisite check"];
+}

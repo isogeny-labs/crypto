@@ -13,6 +13,16 @@ name: ic-leaderboard
 # either list misses one; the builder is on both lists, so the change that
 # adds an input runs it.
 
+# Store data the builder and the gate it runs reach through VALIDATION.json
+# files and committed sessions, not through this file: tools/artifacts/
+# wire_workflows.py pulls these declared paths with the ones it finds.
+# tools/artifacts pull: research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst
+# tools/artifacts pull: research/four_followups_20261021/results/pencil-pilot
+# tools/artifacts pull: research/kummer_coordinates_20261022
+# tools/artifacts pull: research/kummer_differential_collector_20261022
+# tools/artifacts pull: research/pencil_sparse_20261022 research/projective_law_followup_20261022
+# tools/artifacts pull: research/three_leads_e2e_20261018/results
+
 on:
   push:
     branches: [main]
