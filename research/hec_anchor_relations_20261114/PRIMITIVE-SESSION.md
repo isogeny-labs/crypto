@@ -23,3 +23,25 @@ Keep the full mathematical10x objective active; runtime remains unmeasured.
 No new error. Shared resume file remains untouched. The lexical KB predates
 this study and did not supply directly relevant normalization prior art; the
 primary rational interpolation paper was read directly instead.
+
+## First normalization gate
+
+### What was done (commands, files, features)
+Added primitive normalization to rational.rs. All9408generated cases pass,
+including684/397/289complete split group checks at genus2/3/4;262of these
+were previously rejected common-factor cases. The synthetic branch control
+failed exact division. Full output retained as PRIMITIVE-GATE-INITIAL.txt.
+
+### Decisions made (and why)
+The control coordinates belong to x^5-x, not the written x^5+x. Amend that
+single synthetic-input coefficient before rerun, without changing coordinates,
+assertions, production algebra or generated curve fixtures.
+
+### Open threads (unfinished, pick up next time)
+Run the corrected branch/repeated-factor controls; only after they pass,
+extend the frozen rank screen with explicit --primitive mode and compare yield.
+
+### Errors (what went wrong, how it was handled)
+I chose branch coordinates for a different curve equation. Exact division
+caught the invalid control. Preserve the failure and protocol amendment;
+no generated-curve failure was hidden or removed.

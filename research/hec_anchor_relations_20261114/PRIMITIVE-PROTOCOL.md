@@ -77,3 +77,12 @@ unused batch outputs, common-factor normalization, orientations, target descent,
 recombination, algebra and final verification. Do not multiply it by previous
 timing ratios from different curves. A complete same-target performance
 protocol and novelty assessment remain necessary for the >=10x objective.
+
+## Synthetic-input correction, before rerun
+
+The specified branch coordinates0,1,-1,10overF101lie on y^2=x^5-x,
+not the mistakenly written y^2=x^5+x. The first run caught this by exact
+polynomial division: all9408generated curve normalization cases passed,
+but the synthetic control failed. Preserve PRIMITIVE-GATE-INITIAL.txt.
+Correct only the synthetic curve's x coefficient to-1; retain every coordinate,
+assertion, generated fixture, seed, count cap and pass criterion unchanged.
