@@ -1,3 +1,21 @@
+# Norm-point reuse result mirrored; next original-prime and cost tasks
+
+pcc/claims/PCC-20261115-21c9c3.json: exact published consumer69ce10b evidence exports mirror unsigned native46008b at51dff2bb. Full695 mathematical records match under the prospective48 counter transformations; one unfiltered test0/all14 phases expected/four whole omissions101/no output/all1099 guards/three actual binaries exact. Same entire finite population and independent elliptic/full-cofactor checks. Three conditional Lean roots pass both original gates and all3 exact bindings36f906; the inspected two-page reportf8d381 is59,050B. [pcc:unverified]
+
+## What was done
+Direct norm transport changes169 calls2→1 plus1doubling; literal13 calls4→2 plus2doublings; retained13 calls4→2 plus1doubling. Every other selected counter and mathematical field remains exact. The negative halving comparison survives. Complete primitive setup/reuse and known public initial elliptic lift comparisons remain open. [pcc:unverified]
+
+## Decisions made
+Preserve and publish root metadata without editing the343 producer scientific inputs, original tools/workflows/policies or vault. Continue from existing all-six HLP tables for originalE2/E3/E4 before selecting any original-prime successor. Freeze a separate protocol before implementation; do not revise the fixed D12/D24/D67 negative or transport the old prime by twisting. [pcc:unverified]
+
+## Open threads
+Actual strict25 replay43674526503 at recorded cadence; complete primitive cost protocol and known-initial-lift baseline; separate original-prime/prime-field endpoint mechanisms; genuineNEW23 of all whole new roots/source/binaries/prepared copies/failures/reports/checkpoint13 before canonical candidatefixture/replay. [pcc:unverified]
+
+## Errors
+CI25 relative self-copy failed before mathematics, staging optional-empty subset and source-authoring syntax/legacy cleanup-schema preflight failures retained. One obsolete415311792B derived root cache RLIB removed only outside all44386 guards/every current+legacy proofsubject/no compilers/retained executable and all Git statuses exact; no source/raw/exe/prepared copies/current caches removed. Root124/clock101/main-ledger/signing/review/conflicts/KB-vault/calibratedadmission and fullcold120 obligations remain open. [pcc:unverified]
+
+---
+
 Current canonical G3:independentnorm FULL02 COMPLETE7b231c exact069/3d/09:26:05→09:33:59UTC/originalnative+driver+portable+cleanliness+outerguards0/all438unchanged/ALL23outer+20innerpairs[0,0]. All12consumer nativeJSON equal75275f/all24producer equalc162f3/3consumerCLIgoldens byteexact/two13theoremgates/13new+11producerbindings. WHOLEfull01failure+full02success originaltrees stagedforgenuinepublication;remoteavailability pending. Own43400864083 exact069 ALLSEVENinitialjobs inprogress,next10:16UTC. Source/ready1521 andPR3877/queue3904 refreshed;no computationaladvantage. Rootoriginalfixture stillaccessblockedadd561/globalNOTgreen;routineglobal09:44. Earlier ACTIVE/PENDING text historical. [pcc:unverified]
 
 ---
