@@ -34,8 +34,10 @@ Input JSON uses `prime`, `variables`, and `polynomials`, with each polynomial
 an array of `{ "exponents": [2,0], "coefficient": 1 }` terms. Signed integer
 coefficients are reduced modulo p; repeated terms are combined. There is no
 expression evaluation. See the fixtures for complete examples. Candidate
-relations currently come from the baseline scout; an external geometric
-candidate/certificate importer remains a follow-up integration.
+relations in the default tracer come from the baseline scout. The new
+`cheap` module separately recognizes paired f3 inputs and constructs the
+useful cubic directly, with exact certificates and no scout. See FOLLOWUP.md.
+An external geometric candidate/certificate importer remains a follow-up.
 
 ## Exact definitions and completion checks
 
@@ -78,8 +80,10 @@ ideal but can change this generator-dependent top ideal and the solver work.
 No solver wall-time speed ratio is produced. The reference construction timer
 is diagnostic only. The closure reports deterministic row counts and degrees;
 they include provenance work conceptually but are not complete field-operation
-or pipeline cost accounting. Discovery is the whole baseline closure; its
+or pipeline cost accounting. In the initial scout mode, discovery is the whole baseline closure; its
 rows and peak matrix degree remain visible beside downstream selection.
+The follow-up direct constructor avoids that scout; its actual cost is not
+yet established by a timed campaign.
 
 ## Fixed elliptic-curve fixtures and observed development checks
 
@@ -161,7 +165,7 @@ Sources checked (KB): unavailable (MCP not loaded and repository wrapper exits
 | Requested fields | fixed fixtures at 2^31-1 and the stated 53-bit prime |
 | Native path and certificate checks | Rust library/CLI; no runtime Python |
 | Independent signed verdict | pending; producer observations remain unverified |
-| Cheap geometric relation discovery | not demonstrated; scout still pays degree 5 |
+| Direct discovery of the cubic for recognized f3 pairs | implemented without a scout; exact development checks; timing pending |
 | Hook into factor-base/P,Q collection | follow-up; not supplied by this fixture harness |
 
 The stand-alone crate avoids changing the repository's production library,
@@ -177,3 +181,24 @@ term-expansion cap; arbitrary imported systems may still be expensive before
 tracing. Closure limits are 5,000 columns, 2,000 sources and 200,000 submitted
 rows per run; interruption reports no completed threshold. Greedy selection
 is bounded, lexicographic, and does not certify a globally best subset.
+
+## Direct-construction speed experiment (not yet measured)
+
+[FOLLOWUP.md](FOLLOWUP.md) derives the short pair syzygy and records native
+development checks. [SPEED_PROTOCOL.md](SPEED_PROTOCOL.md) freezes a tenfold
+target, matched accounting, held-out shared-point fixtures, A/A controls and
+failure rules. No timed campaign or speedup is established `[pcc:unverified]`.
+
+```sh
+cargo build --release --locked --bin compare --bin campaign
+target/release/compare --prepare /tmp/relation-speed-new-fixtures
+```
+
+The `compare` worker computes a full Gröbner basis from scratch; it does not
+use the tracer's completion oracle as a free solver. `campaign` preserves
+all attempts, pins one CPU, enforces worker time/address-space limits, and
+checks exact returned-basis equality. The code and protocol are prepared;
+execution awaits the requested backend choice because IsoLab's remaining
+budget is unknown/exhausted. The current native driver is not a completed
+external-reference campaign; matching CAS input scripts are exported, and
+those supported reference runs remain required before any fastest claim.

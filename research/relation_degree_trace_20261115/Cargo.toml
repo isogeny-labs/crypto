@@ -4,8 +4,12 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.87"
 publish = false
+default-run = "relation-degree-trace"
 
 [workspace]
+
+[features]
+count-field-ops = []
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

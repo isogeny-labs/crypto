@@ -6,6 +6,34 @@ use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::time::Instant;
 
+pub mod cheap;
+pub mod workload;
+
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+pub struct Counters {
+    pub modular_products: u64,
+    pub nontrivial_inversions: u64,
+    pub coefficient_updates: u64,
+}
+#[cfg(feature = "count-field-ops")]
+thread_local! {
+    static COUNTERS: std::cell::Cell<Counters> = std::cell::Cell::new(Counters::default());
+}
+pub fn reset_counters() {
+    #[cfg(feature = "count-field-ops")]
+    COUNTERS.with(|c| c.set(Counters::default()));
+}
+pub fn counters() -> Counters {
+    #[cfg(feature = "count-field-ops")]
+    {
+        COUNTERS.with(|c| c.get())
+    }
+    #[cfg(not(feature = "count-field-ops"))]
+    {
+        Counters::default()
+    }
+}
+
 pub type Mono = Vec<usize>;
 pub type Poly = BTreeMap<Mono, u64>;
 pub type Proof = BTreeMap<(usize, Mono), u64>;
@@ -27,6 +55,12 @@ pub struct System {
 }
 
 fn mul(a: u64, b: u64, p: u64) -> u64 {
+    #[cfg(feature = "count-field-ops")]
+    COUNTERS.with(|cell| {
+        let mut c = cell.get();
+        c.modular_products += 1;
+        cell.set(c);
+    });
     ((a as u128 * b as u128) % p as u128) as u64
 }
 fn pow(mut a: u64, mut b: u64, p: u64) -> u64 {
@@ -42,6 +76,15 @@ fn pow(mut a: u64, mut b: u64, p: u64) -> u64 {
 }
 fn inv(a: u64, p: u64) -> u64 {
     assert!(a > 0 && a < p);
+    if a == 1 {
+        return 1;
+    }
+    #[cfg(feature = "count-field-ops")]
+    COUNTERS.with(|cell| {
+        let mut c = cell.get();
+        c.nontrivial_inversions += 1;
+        cell.set(c);
+    });
     pow(a, p - 2, p)
 }
 fn minus(a: u64, p: u64) -> u64 {
@@ -112,6 +155,12 @@ fn difference(a: &Mono, b: &Mono) -> Mono {
 }
 fn axpy<K: Ord + Clone>(a: &mut BTreeMap<K, u64>, b: &BTreeMap<K, u64>, scale: u64, p: u64) {
     for (m, c) in b {
+        #[cfg(feature = "count-field-ops")]
+        COUNTERS.with(|cell| {
+            let mut c = cell.get();
+            c.coefficient_updates += 1;
+            cell.set(c);
+        });
         let v = ((a.get(m).copied().unwrap_or(0) as u128 + mul(*c, scale, p) as u128) % p as u128)
             as u64;
         if v == 0 {
@@ -756,6 +805,20 @@ pub fn analyze(system: &System, cap: usize, limit: usize) -> Result<Value, Strin
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "count-field-ops")]
+    #[test]
+    fn counters_separate_products_updates_and_inversions() {
+        reset_counters();
+        assert_eq!(mul(7, 9, 101), 63);
+        assert_eq!(inv(1, 101), 1);
+        let mut target = BTreeMap::new();
+        axpy(&mut target, &BTreeMap::from([(vec![1], 8)]), 2, 101);
+        let c = counters();
+        assert_eq!(c.modular_products, 2);
+        assert_eq!(c.coefficient_updates, 1);
+        assert_eq!(c.nontrivial_inversions, 0);
+    }
     fn simple() -> System {
         System {
             prime: 101,
