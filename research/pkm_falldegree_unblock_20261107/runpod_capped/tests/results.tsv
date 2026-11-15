@@ -98,6 +98,11 @@ D24	PASS	LOST P3 relaunch=auto	LOST P3 relaunch=auto	owner decision 13: pod gone
 D24c	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	pod gone and GET 404 after a logged session delete
 D24d	PASS	PENDING P8	PENDING P8	pod absent from the list but GET returns a healthy RUNNING record: no loss evidence, wait
 D24b	PASS	PENDING P8	PENDING P8	S6: missing from the list but GET unreadable (not corroborated)
+D43	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	R1 probe P1: an earlier RunPod-side change, then a restart whose status names the user
+D43b	PASS	LOST P3 relaunch=auto	LOST P3 relaunch=auto	R1: a RunPod-side change after the last alive check-in and before the loss
+D43c	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	R1: the only RunPod-side change was seen while the runner was still alive
+D44	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	R2 probe P2: runner seen done, then gone with GET 404 before the run deadline
+D44b	PASS	LOST P6 relaunch=owner	LOST P6 relaunch=owner	R2 probe P3: runner seen done, then gone with GET 404 after the run deadline
 D25	PASS	ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB	ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB	memory: pilot 30,720 MiB (30 GiB), no cgroup file -> pilot, below 56 GiB
 D26	PASS	ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB	ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB	memory: pilot 71,680 MiB (70 GiB), no cgroup file -> pilot, between 56 and 112 GiB, oversize false: the cell's -m112 row
 D27	PASS	OOM P2m1 as_m112=true source=pilot_log_VmHWM_MiB	OOM P2m1 as_m112=true source=pilot_log_VmHWM_MiB	memory: pilot 128,000 MiB (125 GiB), no cgroup file -> pilot, above 112 GiB: OOM at -m112
@@ -147,6 +152,7 @@ E22	PASS	pkm-x-t14-k1-c6	pkm-x-t14-k1-c6	N2: base NO_EVIDENCE goes to the owner
 E23	PASS	pkm-x-t14-k0-c6-m112	pkm-x-t14-k0-c6-m112	N4: as_m112 with row oversize true is not the -m112 attempt (the review's case)
 E24	PASS	pkm-x-t14-k1-c6	pkm-x-t14-k1-c6	-m112 ABORTED: no -m112-r1
 F01	PASS	pod past creation + 26 h deleted (logged first); young and non-pkm-x pods kept; second pass changes nothing	exit 0, left ["young1","other1"]; exit 0, left ["young1","other1"]; 3 receipt lines	reaper: 27 h old pod without receipts, 1 h old pod, other session's pod
+F08	PASS	pod untouched, skip recorded	exit 0, pods 1	S1: a due pod whose per-name lock is held by another process
 F03	PASS	exit 1	exit 1	reaper: pod list unreadable (network blocked)
 F07	PASS	exit 1, nothing deleted	exit 1, pods 2	S6: unparsable createdAt and a null name: reported, not deleted
 F02	PASS	pod collected by fetch.sh (LIMIT P4) and deleted	exit 0 LIMIT P4	reaper: a run past its hard deadline, with receipts

@@ -378,12 +378,14 @@ pub struct Forecaster {
 
 /// Effective degree of a Boolean system after `falls` affine equations are used to
 /// eliminate as many variables: the Boolean semi-regular degree of the reduced
-/// shape (the `falls` lowest-degree equations dropped), floored at 2.  On Boolean
-/// `m = 2` binary-subspace decomposition systems it upper-bounded the measured
-/// solving degree on every system with factor-base dimension `k ≥ 7`
-/// (ml-cryptanalysis `experiments/dmut-mechanistic-20261114`: 640/640 pre-registered
-/// fresh systems; none of 15,543 systems with `k ≥ 7` fell below it).  Empirical,
-/// not proved.
+/// shape (the `falls` lowest-degree equations dropped), floored at 2.  A forecast
+/// point, not a bound: on Boolean `m = 2` binary-subspace decomposition systems it
+/// was at or above the measured solving degree on all 15,543 measured systems with
+/// `k ≥ 7` (ml-cryptanalysis `experiments/dmut-mechanistic-20261114`), but targets
+/// with four or more decompositions in `V × V` have solving degree at least 3 while
+/// it can be 2, at every `k` (`BOUND_ANALYSIS.md` there; 12 constructed cases at
+/// n = 31–61).  Such targets are rare for random points (heuristically about
+/// `2^(2k−1−n)`).  `[pcc:unverified]`
 pub fn effective_degree(shape: &SystemShape, falls: u32) -> u32 {
     let f = (falls as usize).min(shape.equation_degrees.len());
     let mut degrees = shape.equation_degrees.clone();

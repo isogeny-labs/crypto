@@ -10,16 +10,16 @@ files are re-included by `../.gitignore`).
 **Runs.** `bash tests/run_tests.sh` from `runpod_capped/` writes nothing in the repository and prints the results;
 `bash tests/run_tests.sh --write` also replaces `tests/out/`, `tests/results.tsv` and this file.
 
-**The image layer.** 46 of the 163 cases (launch, fetch, four reaper cases and five refusals that come after the
+**The image layer.** 46 of the 169 cases (launch, fetch, four reaper cases and five refusals that come after the
 binary check) need the image layer: `RPC_LAYER_SRC` (the layer tarball, SHA-256 `a0f7e28e…`, `image.json`
 `layer.digest`) and `RPC_BIN_SRC` (its `usr/local/bin`; defaults in the session scratchpad). Without them those
-cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 117 results and 46 skips; a run with
-it gives 163 results. The layer is the study layer of the image `image/image.json` names (ECR); fetching it
+cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 123 results and 46 skips; a run with
+it gives 169 results. The layer is the study layer of the image `image/image.json` names (ECR); fetching it
 by digest needs read access to that registry, which this container does not have.
 
 Groups: A refusals before any API call; B launch paths; C `fetch.sh` flows; D the outcome classifier alone
 (`fetch.sh --classify-dir`) on synthetic receipt sets: one per class, the review's conflicting cases, the memory rule
-(D25-D37c) and the round-2 cases (D38-D42); E the registered order (`next_allowed`); F `reap.sh`; G syntax and the
+(D25-D37c), the round-2 cases (D38-D42) and the round-3 cases (D43-D44b); E the registered order (`next_allowed`); F `reap.sh`; G syntax and the
 client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.tsv`. Every result here is
 `[pcc:unverified]`.
 
@@ -124,6 +124,11 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | D24c | PASS | pod gone and GET 404 after a logged session delete | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
 | D24d | PASS | pod absent from the list but GET returns a healthy RUNNING record: no loss evidence, wait | PENDING P8 | PENDING P8 |
 | D24b | PASS | S6: missing from the list but GET unreadable (not corroborated) | PENDING P8 | PENDING P8 |
+| D43 | PASS | R1 probe P1: an earlier RunPod-side change, then a restart whose status names the user | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
+| D43b | PASS | R1: a RunPod-side change after the last alive check-in and before the loss | LOST P3 relaunch=auto | LOST P3 relaunch=auto |
+| D43c | PASS | R1: the only RunPod-side change was seen while the runner was still alive | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
+| D44 | PASS | R2 probe P2: runner seen done, then gone with GET 404 before the run deadline | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
+| D44b | PASS | R2 probe P3: runner seen done, then gone with GET 404 after the run deadline | LOST P6 relaunch=owner | LOST P6 relaunch=owner |
 | D25 | PASS | memory: pilot 30,720 MiB (30 GiB), no cgroup file -> pilot, below 56 GiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB | ADMITTED P2d as_m112=false source=pilot_log_VmHWM_MiB |
 | D26 | PASS | memory: pilot 71,680 MiB (70 GiB), no cgroup file -> pilot, between 56 and 112 GiB, oversize false: the cell's -m112 row | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB | ADMITTED P2m3 as_m112=true source=pilot_log_VmHWM_MiB |
 | D27 | PASS | memory: pilot 128,000 MiB (125 GiB), no cgroup file -> pilot, above 112 GiB: OOM at -m112 | OOM P2m1 as_m112=true source=pilot_log_VmHWM_MiB | OOM P2m1 as_m112=true source=pilot_log_VmHWM_MiB |
@@ -173,6 +178,7 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | E23 | PASS | N4: as_m112 with row oversize true is not the -m112 attempt (the review's case) | pkm-x-t14-k0-c6-m112 | pkm-x-t14-k0-c6-m112 |
 | E24 | PASS | -m112 ABORTED: no -m112-r1 | pkm-x-t14-k1-c6 | pkm-x-t14-k1-c6 |
 | F01 | PASS | reaper: 27 h old pod without receipts, 1 h old pod, other session's pod | pod past creation + 26 h deleted (logged first); young and non-pkm-x pods kept; second pass changes nothing | exit 0, left ["young1","other1"]; exit 0, left ["young1","other1"]; 3 receipt lines |
+| F08 | PASS | S1: a due pod whose per-name lock is held by another process | pod untouched, skip recorded | exit 0, pods 1 |
 | F03 | PASS | reaper: pod list unreadable (network blocked) | exit 1 | exit 1 |
 | F07 | PASS | S6: unparsable createdAt and a null name: reported, not deleted | exit 1, nothing deleted | exit 1, pods 2 |
 | F02 | PASS | reaper: a run past its hard deadline, with receipts | pod collected by fetch.sh (LIMIT P4) and deleted | exit 0 LIMIT P4 |
@@ -189,4 +195,4 @@ client pin. Per-case output: `out/<id>.txt`. Machine-readable table: `results.ts
 | G-curl_stub.sh | PASS | syntax of tests/curl_stub.sh | bash -n ok | rc 0 |
 | G-pin | PASS | pinned client copy unchanged | rp_pinned.sh sha256 b4b60199... | b4b60199 |
 
-Summary of this run (image layer available: 1): 163 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T01:50:38Z).
+Summary of this run (image layer available: 1): 169 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-15T03:38:33Z).
