@@ -2206,3 +2206,37 @@ The actual full elliptic E[r] field/canonical Weil-Tate geometric bridge,
 general nonprime supersingular≤6 and other all14 obligations remain separate.
 No novelty/canonical promotion/full14 closure/cryptoPython/new native crypto/
 paid compute/agent upload. [pcc:unverified]
+
+
+### Actual characteristic-five geometric point-kernel inclusion counterexample
+
+The [actual characteristic-five BK control](../research/bk_char_five_geometric_audit_20261115/README.md)
+disproves the unrestricted geometric-point inclusion paraphrase. Actual
+E/F5:y²=x³+3x+2 is nonsingular, has actualcount5 and four explicit nonzero
+points of exactorder5. For every extensionK/F5, all actual5-torsion points
+lie in the actual Point.map image of E(F5), with a whole-kernel bijection
+and actualcardinality5. Thus the entire geometric point kernel over the actual
+algebraic closure is rational over F5, while5 doesnotdivide5^k−1 for anyk>0.
+Prime5 dividesactualbasecount and doesnotdivideq−1. The proof derives x1/2,y±1
+using two actual repeated-S3 relations, a kernelchecked eliminant factor and
+coprime3/5 control, then actual point-map descent/cardinality. No torsion rank,
+point count or canonical fifth-division-polynomial identification is assumed.
+**The original BK r²-count criterion survives**: actualkernel5≠25 and5 doesnotdivide
+actualfiniteextensioncardinality−1, so both sides arefalse in everyactualfinite
+extension. No extra characteristic hypothesis is attributed to the source.
+This concerns the geometric point kernel, not the nonreducedp-torsion group scheme.
+Prior characteristic3 analog credited; no novelty claim.
+Exactlocal **PCC-20261115-e8c175** PASS at2026-11-15T03:04:24Z, signedstandingunverified. Whole61/0/0,
+complete644-character bindinga625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3,
+independentnative1complete/0prefix/0unresolved. Sevenmodules/twoadaptedpriorcores
+plusfivenew; tenformal-config+15artifactpins. Fifteensnapshots/13failedstates/
+successes09,15/failedAPIprobe/pre-editmoduleamendment retained;189files/65objects/
+27544-byte losslessXZ/fivegatefiles plusfourinitialreportdraftfiles in48016-byte
+separateXZ. Finalone-page47593-bytePDF fullyread/visual/inbounds. Fullfinal15 logs:
+exactlyseveninheritedS3argumentadvisories, zero new-modulewarnings/errors.
+Original mathematical argument bodies unchanged; frozen originals untouched.
+Exact originalBK printed142–143/PDF2–3 freshlyfulltextread/visual, no fresh
+full-five-page read claimed. Generalprime≥5/canonicalWeil/rank/determinant source
+proof/full-populationallkcensus/other14 gaps remain. No canonicalpromotion/
+full14closure/cryptoPython/nativeproofeval/limits/flags/waivers/spend/upload.
+[pcc:unverified]
